@@ -52,6 +52,21 @@ public class BlockManager {
         return _instance;
     }
 
+    private BlockManager() {
+        Block air = new Block();
+        air.withTranslucent(true)
+           .withInvisible(true)
+           .withBypassSelectionRay(true)
+           .withPenetrable(true)
+           .withCastsShadows(false)
+           .withRenderBoundingBox(false)
+           .withAllowBlockAttachment(false)
+           .withHardness((byte)0)
+           .withId((byte)0)
+           .withTitle("Air");
+        addBlock(air);
+    }
+
     public BlockFamily getBlockFamily(String title) {
         return _blockFamiliesByTitle.get(title);
     }

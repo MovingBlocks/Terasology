@@ -150,8 +150,28 @@ public class NewChunk implements Externalizable {
         return result;
     }
 
+    public boolean setBlock(int x, int y, int z, Block block) {
+        return setBlock(x, y, z, block.getId());
+    }
+
+    public boolean setBlock(int x, int y, int z, Block newBlock, Block oldBlock) {
+        return setBlock(x, y, z, newBlock, oldBlock);
+    }
+
     public boolean setBlock(Vector3i pos, byte blockId) {
         return setBlock(pos.x, pos.y, pos.z, blockId);
+    }
+
+    public boolean setBlock(Vector3i pos, byte blockId, byte oldBlockId) {
+        return setBlock(pos.x, pos.y, pos.z, blockId, oldBlockId);
+    }
+
+    public boolean setBlock(Vector3i pos, Block block) {
+        return setBlock(pos.x, pos.y, pos.z, block.getId());
+    }
+
+    public boolean setBlock(Vector3i pos, Block block, Block oldBlock) {
+        return setBlock(pos.x, pos.y, pos.z, block.getId(), oldBlock.getId());
     }
 
     public byte getSunlight(Vector3i pos) {

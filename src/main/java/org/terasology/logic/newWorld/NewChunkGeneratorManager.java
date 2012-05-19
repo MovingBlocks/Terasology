@@ -31,4 +31,6 @@ public interface NewChunkGeneratorManager {
     void registerChunkGenerator(NewChunkGenerator generator);
 
     NewChunk generateChunk(Vector3i pos);
+
+    void postProcess(Vector3i pos);
 }

@@ -66,4 +66,9 @@ public class NewChunkGeneratorManagerImpl implements NewChunkGeneratorManager {
         }
         return chunk;
     }
+
+    @Override
+    public void postProcess(Vector3i pos) {
+
+    }
 }

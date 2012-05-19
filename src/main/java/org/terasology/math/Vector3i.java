@@ -96,6 +96,17 @@ public class Vector3i extends javax.vecmath.Tuple3i implements Serializable {
     }
 
     /**
+     * Constructs the integer version of a Vector3f, by adding an offset and flooring it
+     *
+     * @param other
+     */
+    public Vector3i(Vector3f other, float offset) {
+        this.x = TeraMath.floorToInt(other.x + offset);
+        this.y = TeraMath.floorToInt(other.y + offset);
+        this.z = TeraMath.floorToInt(other.z + offset);
+    }
+
+    /**
      * Constructor instantiates a new <code>Vector3i</code> with provides
      * values.
      *
@@ -207,6 +218,12 @@ public class Vector3i extends javax.vecmath.Tuple3i implements Serializable {
         this.x += x;
         this.y += y;
         this.z += z;
+    }
+
+    public void sub(int x, int y, int z) {
+        this.x -= x;
+        this.y -= y;
+        this.z -= z;
     }
 
     /**

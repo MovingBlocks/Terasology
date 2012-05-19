@@ -140,7 +140,7 @@ public class NewLocalWorldProvider implements WorldProvider {
 
     @Override
     public Block getBlock(Vector3f pos) {
-        return getBlock(new Vector3i(pos));
+        return getBlock(new Vector3i(pos, 0.5f));
     }
 
     @Override
@@ -166,7 +166,7 @@ public class NewLocalWorldProvider implements WorldProvider {
 
     @Override
     public byte getLight(Vector3f pos) {
-        return getLight(new Vector3i(pos));
+        return getLight(new Vector3i(pos, 0.5f));
     }
 
     @Override
@@ -194,12 +194,12 @@ public class NewLocalWorldProvider implements WorldProvider {
 
     @Override
     public byte getSunlight(Vector3f pos) {
-        return getSunlight(new Vector3i(pos));
+        return getSunlight(new Vector3i(pos, 0.5f));
     }
 
     @Override
     public byte getTotalLight(Vector3f pos) {
-        return getTotalLight(new Vector3i(pos));
+        return getTotalLight(new Vector3i(pos, 0.5f));
     }
 
 

@@ -82,7 +82,7 @@ public class InternalLightGenerator implements NewChunkGenerator{
 
     private void spreadLightInternal(NewChunk chunk, int x, int y, int z) {
         byte lightValue = chunk.getLight(x,y,z);
-        if (lightValue == 0) return;
+        if (lightValue <= 1) return;
 
         // TODO: use custom bounds checked iterator for this
         for (Vector3i adjDir : ALL_LIGHT_DIRECTIONS) {
@@ -102,7 +102,7 @@ public class InternalLightGenerator implements NewChunkGenerator{
 
     private void spreadSunlightInternal(NewChunk chunk, int x, int y, int z) {
         byte lightValue = chunk.getSunlight(x,y,z);
-        if (lightValue == 0) return;
+        if (lightValue <= 1) return;
 
         for (Vector3i adjDir : HORIZONTAL_LIGHT_DIRECTIONS) {
             int adjX = x + adjDir.x;

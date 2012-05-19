@@ -117,7 +117,7 @@ public class Region3i implements Iterable<Vector3i> {
     {
         Vector3i max = new Vector3i(min);
         max.add(size);
-        max.sub(new Vector3i(1,1,1));
+        max.sub(1,1,1);
         return max;
     }
 
@@ -133,6 +133,20 @@ public class Region3i implements Iterable<Vector3i> {
         Vector3i max = max();
         max.min(other.max());
 
+        return createFromMinMax(min, max);
+    }
+
+
+    /**
+     * Creates a new region that is the same as this region but expanded in all directions by the given amount
+     * @param amount
+     * @return A new region
+     */
+    public Region3i expand(int amount) {
+        Vector3i min = min();
+        min.sub(amount, amount, amount);
+        Vector3i max = max();
+        max.add(amount, amount, amount);
         return createFromMinMax(min, max);
     }
 

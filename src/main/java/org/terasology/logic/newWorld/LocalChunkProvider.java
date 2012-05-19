@@ -77,13 +77,37 @@ public class LocalChunkProvider implements NewChunkProvider
      */
     private void checkRegion(CacheRegion cacheRegion) {
         // TODO: Background thread these operations
-        for (Vector3i chunkPos : cacheRegion.getRegion()) {
+
+        // Produce stage 1 chunks, cache chunks
+        for (Vector3i chunkPos : cacheRegion.getRegion().expand(2)) {
             NewChunk chunk = getChunk(chunkPos);
             if (chunk == null) {
-                chunk = createChunk(chunkPos);
-                // TODO: Further generation
+                createChunk(chunkPos);
             }
         }
+
+        // Advance to stage 2
+        for (Vector3i chunkPos : cacheRegion.getRegion().expand(1)) {
+            NewChunk chunk = getChunk(chunkPos);
+            if (chunk.getChunkState() == NewChunk.State.Awaiting2ndGenerationPass) {
+                fullGenerateChunk(chunk);
+            }
+        }
+
+        // Mark complete
+        for (Vector3i chunkPos : cacheRegion.getRegion()) {
+            NewChunk chunk = getChunk(chunkPos);
+            if (chunk.getChunkState() == NewChunk.State.AwaitingLightPropagation) {
+                chunk.setChunkState(NewChunk.State.Complete);
+            }
+        }
+    }
+
+    private void fullGenerateChunk(NewChunk chunk) {
+        LightPropagator propagator = new LightPropagator(this, Region3i.createFromCenterExtents(chunk.getPos(), Vector3i.one()));
+        propagator.propagateOutOfChunk(chunk.getPos());
+        chunk.setChunkState(NewChunk.State.AwaitingLightPropagation);
+        generator.postProcess(chunk.getPos());
     }
 
     private NewChunk createChunk(Vector3i pos) {
