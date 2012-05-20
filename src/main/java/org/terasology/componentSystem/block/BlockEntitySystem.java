@@ -2,7 +2,6 @@ package org.terasology.componentSystem.block;
 
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.componentSystem.items.InventorySystem;
 import org.terasology.components.*;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.*;
@@ -10,10 +9,9 @@ import org.terasology.events.DamageEvent;
 import org.terasology.events.FullHealthEvent;
 import org.terasology.events.NoHealthEvent;
 import org.terasology.events.inventory.ReceiveItemEvent;
-import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AudioManager;
-import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.newWorld.WorldProvider;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
@@ -24,15 +22,14 @@ import org.terasology.rendering.physics.BulletPhysicsRenderer;
  */
 @RegisterComponentSystem
 public class BlockEntitySystem implements EventHandlerSystem {
-    private static byte EmptyBlockId = 0x0;
 
-    private IWorldProvider worldProvider;
+    private WorldProvider worldProvider;
     private EntityManager entityManager;
     private BlockItemFactory blockItemFactory;
 
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
-        worldProvider = CoreRegistry.get(IWorldProvider.class);
+        worldProvider = CoreRegistry.get(WorldProvider.class);
         blockItemFactory = new BlockItemFactory(entityManager, CoreRegistry.get(PrefabManager.class));
     }
 
@@ -41,14 +38,14 @@ public class BlockEntitySystem implements EventHandlerSystem {
     {
         if (worldProvider == null) return;
         BlockComponent blockComp = entity.getComponent(BlockComponent.class);
-        Block oldBlock = BlockManager.getInstance().getBlock(worldProvider.getBlock(blockComp.getPosition()));
-        worldProvider.setBlock(blockComp.getPosition(), EmptyBlockId, true, true);
+        Block oldBlock = worldProvider.getBlock(blockComp.getPosition());
+        worldProvider.setBlock(blockComp.getPosition(), BlockManager.getInstance().getAir(), oldBlock);
 
         // TODO: This should be driven by block attachment info, and not be billboard specific
         // Remove the upper block if it's a billboard
-        byte upperBlockType = worldProvider.getBlock(blockComp.getPosition().x, blockComp.getPosition().y + 1, blockComp.getPosition().z);
-        if (BlockManager.getInstance().getBlock(upperBlockType).getBlockForm() == Block.BLOCK_FORM.BILLBOARD) {
-            worldProvider.setBlock(blockComp.getPosition().x, blockComp.getPosition().y + 1, blockComp.getPosition().z, (byte) 0x0, true, true);
+        Block upperBlock = worldProvider.getBlock(blockComp.getPosition().x, blockComp.getPosition().y + 1, blockComp.getPosition().z);
+        if (upperBlock.getBlockForm() == Block.BLOCK_FORM.BILLBOARD) {
+            worldProvider.setBlock(blockComp.getPosition().x, blockComp.getPosition().y + 1, blockComp.getPosition().z, BlockManager.getInstance().getAir(), upperBlock);
         }
 
         // TODO: Configurable via block definition
@@ -96,7 +93,7 @@ public class BlockEntitySystem implements EventHandlerSystem {
 
         BlockParticleEffectComponent particleEffect = new BlockParticleEffectComponent();
         particleEffect.spawnCount = 64;
-        particleEffect.blockType = BlockManager.getInstance().getBlock(worldProvider.getBlock(blockComp.getPosition())).getBlockFamily();
+        particleEffect.blockType = worldProvider.getBlock(blockComp.getPosition()).getBlockFamily();
         particleEffect.initialVelocityRange.set(4, 4, 4);
         particleEffect.spawnRange.set(0.3f, 0.3f, 0.3f);
         particleEffect.destroyEntityOnCompletion = true;

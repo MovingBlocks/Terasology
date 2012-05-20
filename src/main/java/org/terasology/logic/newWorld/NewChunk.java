@@ -15,20 +15,22 @@
  */
 package org.terasology.logic.newWorld;
 
+import com.bulletphysics.dynamics.RigidBody;
 import com.google.common.base.Objects;
 import org.terasology.logic.manager.Config;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.model.structures.AABB;
 import org.terasology.model.structures.TeraArray;
 import org.terasology.model.structures.TeraSmartArray;
-import org.terasology.utilities.Helper;
+import org.terasology.rendering.primitives.ChunkMesh;
 
+import javax.vecmath.Vector3d;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.concurrent.locks.ReadWriteLock;
 
 /**
  * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks
@@ -53,8 +55,8 @@ public class NewChunk implements Externalizable {
     public static final int CHUNK_DIMENSION_X = 16;
     public static final int CHUNK_DIMENSION_Y = 256;
     public static final int CHUNK_DIMENSION_Z = 16;
-    public static final byte MAX_LIGHT = 0x0f;
     public static final int VERTICAL_SEGMENTS = Config.getInstance().getVerticalChunkMeshSegments();
+    public static final byte MAX_LIGHT = 0x0f;
 
     private final Vector3i pos = new Vector3i();
 
@@ -62,7 +64,17 @@ public class NewChunk implements Externalizable {
     private final TeraSmartArray sunlight, light, states;
 
     private State chunkState = State.Awaiting2ndGenerationPass;
-    private boolean dirty, lightDirty;
+    private boolean dirty;
+    private AABB aabb;
+
+    // Rendering
+    private ChunkMesh[] mesh;
+    private ChunkMesh[] pendingMesh;
+    private AABB[] subMeshAABB = null;
+
+    // Physics
+    private RigidBody rigidBody = null;
+
 
     private NewChunk() {
         blocks = new TeraArray(CHUNK_DIMENSION_X, CHUNK_DIMENSION_Y, CHUNK_DIMENSION_Z);
@@ -70,7 +82,6 @@ public class NewChunk implements Externalizable {
         light = new TeraSmartArray(CHUNK_DIMENSION_X, CHUNK_DIMENSION_Y, CHUNK_DIMENSION_Z);
         states = new TeraSmartArray(CHUNK_DIMENSION_X, CHUNK_DIMENSION_Y, CHUNK_DIMENSION_Z);
 
-        setLightDirty(true);
         setDirty(true);
     }
 
@@ -101,16 +112,8 @@ public class NewChunk implements Externalizable {
         this.chunkState = chunkState;
     }
 
-    public boolean isLightDirty() {
-        return lightDirty;
-    }
-
     public boolean isDirty() {
         return dirty;
-    }
-
-    public void setLightDirty(boolean lightDirty) {
-        this.lightDirty = lightDirty;
     }
 
     public void setDirty(boolean dirty) {
@@ -189,7 +192,7 @@ public class NewChunk implements Externalizable {
     public boolean setSunlight(int x, int y, int z, byte amount) {
         byte oldValue = sunlight.set(x, y, z, amount);
         if (oldValue != amount) {
-            setLightDirty(true);
+            setDirty(true);
             return true;
         }
         return false;
@@ -210,7 +213,7 @@ public class NewChunk implements Externalizable {
     public boolean setLight(int x, int y, int z, byte amount) {
         byte oldValue = light.set(x, y, z, amount);
         if (oldValue != amount) {
-            setLightDirty(true);
+            setDirty(true);
             return true;
         }
         return false;
@@ -272,20 +275,21 @@ public class NewChunk implements Externalizable {
         return z + getChunkWorldPosZ();
     }
 
+    public AABB getAABB() {
+        if (aabb == null) {
+            Vector3d dimensions = new Vector3d(CHUNK_DIMENSION_X / 2.0, CHUNK_DIMENSION_Y / 2.0, CHUNK_DIMENSION_Z / 2.0);
+            Vector3d position = new Vector3d(getChunkWorldPosX() + dimensions.x - 0.5f, dimensions.y - 0.5f, getChunkWorldPosZ() + dimensions.z - 0.5f);
+            aabb = new AABB(position, dimensions);
+        }
+
+        return aabb;
+    }
+
     // TODO: Protobuf instead???
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeInt(pos.x);
         out.writeInt(pos.y);
         out.writeInt(pos.z);
-
-        // Save flags...
-        byte flags = 0x0;
-        if (isLightDirty()) {
-            flags = Helper.setFlag(flags, (byte) 0);
-        }
-
-        // The flags are stored in the first byte of the file...
-        out.writeByte(flags);
 
         out.writeObject(chunkState);
 
@@ -307,12 +311,9 @@ public class NewChunk implements Externalizable {
         pos.y = in.readInt();
         pos.z = in.readInt();
 
-        // The first byte contains the flags...
-        byte flags = in.readByte();
         // Parse the flags...
-        setLightDirty(Helper.isFlagSet(flags, (byte) 0));
         setDirty(true);
-        chunkState = (State)in.readObject();
+        chunkState = (State) in.readObject();
 
         for (int i = 0; i < blocks.size(); i++)
             blocks.setRawByte(i, in.readByte());
@@ -349,5 +350,49 @@ public class NewChunk implements Externalizable {
     @Override
     public int hashCode() {
         return Objects.hashCode(pos);
+    }
+
+    public void setMesh(ChunkMesh[] mesh) {
+        this.mesh = mesh;
+        if (rigidBody != null) {
+            rigidBody.destroy();
+            rigidBody = null;
+        }
+    }
+
+    public void setPendingMesh(ChunkMesh[] mesh) {
+        this.pendingMesh = mesh;
+    }
+
+    public ChunkMesh[] getMesh() {
+        return mesh;
+    }
+
+    public ChunkMesh[] getPendingMesh() {
+        return pendingMesh;
+    }
+
+    public AABB getSubMeshAABB(int subMesh) {
+        if (subMeshAABB == null) {
+            subMeshAABB = new AABB[VERTICAL_SEGMENTS];
+
+            int heightHalf = CHUNK_DIMENSION_Y / VERTICAL_SEGMENTS / 2;
+
+            for (int i = 0; i < subMeshAABB.length; i++) {
+                Vector3d dimensions = new Vector3d(8, heightHalf, 8);
+                Vector3d position = new Vector3d(getChunkWorldPosX() + dimensions.x - 0.5f, (i * heightHalf * 2) + dimensions.y - 0.5f, getChunkWorldPosZ() + dimensions.z - 0.5f);
+                subMeshAABB[i] = new AABB(position, dimensions);
+            }
+        }
+
+        return subMeshAABB[subMesh];
+    }
+
+    public RigidBody getRigidBody() {
+        return rigidBody;
+    }
+
+    public void setRigidBody(RigidBody rigidBody) {
+        this.rigidBody = rigidBody;
     }
 }

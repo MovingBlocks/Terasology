@@ -7,10 +7,9 @@ import org.terasology.components.*;
 import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.events.ActivateEvent;
-import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AudioManager;
-import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.newWorld.WorldProvider;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
@@ -18,7 +17,6 @@ import org.terasology.model.blocks.BlockFamily;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.AABB;
 
-import javax.print.attribute.standard.Sides;
 import javax.vecmath.Vector3f;
 
 /**
@@ -28,12 +26,12 @@ import javax.vecmath.Vector3f;
 @RegisterComponentSystem
 public class ItemSystem implements EventHandlerSystem {
     private EntityManager entityManager;
-    private IWorldProvider worldProvider;
+    private WorldProvider worldProvider;
     private BlockEntityRegistry blockEntityRegistry;
 
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
-        worldProvider = CoreRegistry.get(IWorldProvider.class);
+        worldProvider = CoreRegistry.get(WorldProvider.class);
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
     }
 
@@ -109,7 +107,7 @@ public class ItemSystem implements EventHandlerSystem {
             return false;
 
         if (canPlaceBlock(block, targetBlock, placementPos)) {
-            worldProvider.setBlock(placementPos.x, placementPos.y, placementPos.z, block.getId(), true, true);
+            worldProvider.setBlock(placementPos.x, placementPos.y, placementPos.z, block, BlockManager.getInstance().getAir());
             AudioManager.play(new AssetUri(AssetType.SOUND, "engine:PlaceBlock"), 0.5f);
             if (blockItem.placedEntity.exists()) {
                 // Establish a block entity
@@ -124,13 +122,13 @@ public class ItemSystem implements EventHandlerSystem {
     }
     
     private boolean canPlaceBlock(Block block, Vector3i targetBlock, Vector3i blockPos) {
-        Block centerBlock = BlockManager.getInstance().getBlock(worldProvider.getBlock(targetBlock.x, targetBlock.y, targetBlock.z));
+        Block centerBlock = worldProvider.getBlock(targetBlock.x, targetBlock.y, targetBlock.z);
 
         if (!centerBlock.isAllowBlockAttachment()) {
             return false;
         }
 
-        Block adjBlock = BlockManager.getInstance().getBlock(worldProvider.getBlock(blockPos.x, blockPos.y, blockPos.z));
+        Block adjBlock = worldProvider.getBlock(blockPos.x, blockPos.y, blockPos.z);
         if (adjBlock != null && !adjBlock.isInvisible() && !adjBlock.isSelectionRayThrough()) {
             return false;
         }

@@ -12,7 +12,6 @@ import org.terasology.components.*;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.NoHealthEvent;
@@ -22,8 +21,7 @@ import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.logic.world.IWorldProvider;
-import org.terasology.math.Side;
+import org.terasology.logic.newWorld.WorldProvider;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
@@ -32,7 +30,6 @@ import org.terasology.model.structures.BlockPosition;
 import org.terasology.model.structures.RayBlockIntersection;
 import org.terasology.rendering.cameras.DefaultCamera;
 import org.terasology.rendering.gui.menus.UIContainerScreen;
-import org.terasology.rendering.gui.components.UIMinion;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
@@ -67,7 +64,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     private LocalPlayer localPlayer;
     private Timer timer;
 
-    private IWorldProvider worldProvider;
+    private WorldProvider worldProvider;
     private DefaultCamera playerCamera;
     private BlockEntityRegistry blockEntityRegistry;
 
@@ -86,7 +83,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     private float lastStepDelta = 0;
 
     public void initialise() {
-        worldProvider = CoreRegistry.get(IWorldProvider.class);
+        worldProvider = CoreRegistry.get(WorldProvider.class);
         localPlayer = CoreRegistry.get(LocalPlayer.class);
         timer = CoreRegistry.get(Timer.class);
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
@@ -235,7 +232,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         if (Config.getInstance().isPlacingBox()) {
             RayBlockIntersection.Intersection selectedBlock = calcSelectedBlock();
             if (selectedBlock != null) {
-                Block block = BlockManager.getInstance().getBlock(worldProvider.getBlockAtPosition(selectedBlock.getBlockPosition().toVector3d()));
+                Block block = worldProvider.getBlock(selectedBlock.getBlockPosition());
                 if (block.isRenderBoundingBox()) {
                     block.getBounds(selectedBlock.getBlockPosition()).render(2f);
                 }
@@ -403,7 +400,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         if (blockIntersection != null) {
             Vector3i centerPos = blockIntersection.getBlockPosition();
 
-            Block block = BlockManager.getInstance().getBlock(worldProvider.getBlock(centerPos));
+            Block block = worldProvider.getBlock(centerPos);
             if (block.isUsable()) {
                 EntityRef blockEntity = blockEntityRegistry.getOrCreateEntityAt(centerPos);
                 // TODO: Shouldn't activate directly, should send use event - same as item?
@@ -436,8 +433,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         if (selectedBlock != null) {
 
             BlockPosition blockPos = selectedBlock.getBlockPosition();
-            byte currentBlockType = worldProvider.getBlock(blockPos.x, blockPos.y, blockPos.z);
-            Block block = BlockManager.getInstance().getBlock(currentBlockType);
+            Block block = worldProvider.getBlock(blockPos.x, blockPos.y, blockPos.z);
             
             int damage = 1;
             if (item != null) {
@@ -506,10 +502,10 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
                     blockPosY = (int) (pos.y + (pos.y >= 0 ? 0.5f : -0.5f)) + y;
                     blockPosZ = (int) (pos.z + (pos.z >= 0 ? 0.5f : -0.5f)) + z;
 
-                    byte blockType = worldProvider.getBlock(blockPosX, blockPosY, blockPosZ);
+                    Block block = worldProvider.getBlock(blockPosX, blockPosY, blockPosZ);
 
                     // Ignore special blocks
-                    if (BlockManager.getInstance().getBlock(blockType).isSelectionRayThrough()) {
+                    if (block.isSelectionRayThrough()) {
                         continue;
                     }
 

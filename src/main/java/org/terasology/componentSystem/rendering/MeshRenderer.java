@@ -76,7 +76,7 @@ public class MeshRenderer implements RenderSystem {
 
                 shader.enable();
                 shader.setFloat4("colorOffset", meshComp.color.x, meshComp.color.y, meshComp.color.z, meshComp.color.w);
-                shader.setFloat("light", worldRenderer.getRenderingLightValueAt(new Vector3d(worldPos)));
+                shader.setFloat("light", worldRenderer.getRenderingLightValueAt(worldPos));
 
                 mesh.render();
 
@@ -112,7 +112,7 @@ public class MeshRenderer implements RenderSystem {
                 glScalef(worldScale, worldScale, worldScale);
 
                 meshComp.material.enable();
-                meshComp.material.setFloat("light", worldRenderer.getRenderingLightValueAt(new Vector3d(worldPos)));
+                meshComp.material.setFloat("light", worldRenderer.getRenderingLightValueAt(worldPos));
                 meshComp.material.setInt("carryingTorch",carryingTorch ? 1 : 0);
                 meshComp.material.bindTextures();
                 meshComp.mesh.render();

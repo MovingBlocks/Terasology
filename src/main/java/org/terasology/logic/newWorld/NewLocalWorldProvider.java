@@ -22,6 +22,7 @@ import org.terasology.logic.generators.ChunkGeneratorTerrain;
 import org.terasology.logic.generators.GeneratorManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.world.ChunkProvider;
+import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
@@ -33,6 +34,8 @@ import javax.vecmath.Vector3f;
  * @author Immortius
  */
 public class NewLocalWorldProvider implements WorldProvider {
+    public final long DAY_NIGHT_LENGTH_IN_MS = Config.getInstance().getDayNightLengthInMs();
+
     private String title;
     private String seed;
 
@@ -76,13 +79,23 @@ public class NewLocalWorldProvider implements WorldProvider {
     }
 
     @Override
+    public WorldView getWorldViewAround(Vector3i chunk) {
+        return WorldView.CreateLocalView(chunk, chunkProvider);
+    }
+
+    @Override
     public boolean isBlockActive(int x, int y, int z) {
         return chunkProvider.isChunkAvailable(TeraMath.calcChunkPos(x,y,z));
     }
 
     @Override
     public boolean isBlockActive(Vector3i pos) {
-        return isBlockActive(pos);
+        return isBlockActive(pos.x, pos.y, pos.z);
+    }
+
+    @Override
+    public boolean isBlockActive(Vector3f pos) {
+        return isBlockActive(new Vector3i(pos, 0.5f));
     }
 
     @Override
@@ -221,6 +234,16 @@ public class NewLocalWorldProvider implements WorldProvider {
     @Override
     public void setTime(long time) {
         timeOffset = time - CoreRegistry.get(Timer.class).getTimeInMs();
+    }
+
+    @Override
+    public float getTimeInDays() {
+        return (float)getTime() / DAY_NIGHT_LENGTH_IN_MS;
+    }
+
+    @Override
+    public void setTimeInDays(float time) {
+        setTime((long)(time * DAY_NIGHT_LENGTH_IN_MS));
     }
 
     @Override

@@ -28,6 +28,7 @@ import javax.vecmath.Vector3f;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -71,50 +72,6 @@ public class LocalChunkProvider implements NewChunkProvider
         }
     }
 
-    /**
-     * Ensure that all the chunks within the region are fully available and fully loaded
-     * @param cacheRegion
-     */
-    private void checkRegion(CacheRegion cacheRegion) {
-        // TODO: Background thread these operations
-
-        // Produce stage 1 chunks, cache chunks
-        for (Vector3i chunkPos : cacheRegion.getRegion().expand(2)) {
-            NewChunk chunk = getChunk(chunkPos);
-            if (chunk == null) {
-                createChunk(chunkPos);
-            }
-        }
-
-        // Advance to stage 2
-        for (Vector3i chunkPos : cacheRegion.getRegion().expand(1)) {
-            NewChunk chunk = getChunk(chunkPos);
-            if (chunk.getChunkState() == NewChunk.State.Awaiting2ndGenerationPass) {
-                fullGenerateChunk(chunk);
-            }
-        }
-
-        // Mark complete
-        for (Vector3i chunkPos : cacheRegion.getRegion()) {
-            NewChunk chunk = getChunk(chunkPos);
-            if (chunk.getChunkState() == NewChunk.State.AwaitingLightPropagation) {
-                chunk.setChunkState(NewChunk.State.Complete);
-            }
-        }
-    }
-
-    private void fullGenerateChunk(NewChunk chunk) {
-        LightPropagator propagator = new LightPropagator(this, Region3i.createFromCenterExtents(chunk.getPos(), Vector3i.one()));
-        propagator.propagateOutOfChunk(chunk.getPos());
-        chunk.setChunkState(NewChunk.State.AwaitingLightPropagation);
-        generator.postProcess(chunk.getPos());
-    }
-
-    private NewChunk createChunk(Vector3i pos) {
-        NewChunk newChunk = generator.generateChunk(pos);
-        nearCache.putIfAbsent(pos, newChunk);
-        return newChunk;
-    }
 
     @Override
     public boolean isChunkAvailable(Vector3i pos) {
@@ -156,6 +113,53 @@ public class LocalChunkProvider implements NewChunkProvider
     @Override
     public boolean isBuildingChunks() {
         return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    /**
+     * Ensure that all the chunks within the region are fully available and fully loaded
+     * @param cacheRegion
+     */
+    private void checkRegion(CacheRegion cacheRegion) {
+        // TODO: Background thread these operations, locking
+
+        // Produce stage 1 chunks, cache chunks
+        for (Vector3i chunkPos : cacheRegion.getRegion().expand(new Vector3i(2,0,2))) {
+            NewChunk chunk = getChunk(chunkPos);
+            if (chunk == null) {
+                createChunk(chunkPos);
+            }
+        }
+
+        // Advance to stage 2
+        for (Vector3i chunkPos : cacheRegion.getRegion().expand(new Vector3i(1,0,1))) {
+            NewChunk chunk = getChunk(chunkPos);
+            if (chunk.getChunkState() == NewChunk.State.Awaiting2ndGenerationPass) {
+                fullGenerateChunk(chunk);
+            }
+        }
+
+        // Mark complete
+        for (Vector3i chunkPos : cacheRegion.getRegion()) {
+            NewChunk chunk = getChunk(chunkPos);
+            if (chunk.getChunkState() == NewChunk.State.AwaitingLightPropagation) {
+                chunk.setChunkState(NewChunk.State.Complete);
+            }
+        }
+    }
+
+    private void fullGenerateChunk(NewChunk chunk) {
+        WorldView worldView = WorldView.CreateLocalView(chunk.getPos(), this);
+        logger.log(Level.INFO, "2nd Pass generating " + chunk.getPos());
+        LightPropagator propagator = new LightPropagator(worldView);
+        propagator.propagateOutOfTargetChunk();
+        chunk.setChunkState(NewChunk.State.AwaitingLightPropagation);
+        generator.postProcess(chunk.getPos());
+    }
+
+    private NewChunk createChunk(Vector3i pos) {
+        NewChunk newChunk = generator.generateChunk(pos);
+        nearCache.putIfAbsent(pos, newChunk);
+        return newChunk;
     }
 
     private static class CacheRegion {
@@ -204,7 +208,7 @@ public class LocalChunkProvider implements NewChunkProvider
         public Region3i getRegion() {
             LocationComponent loc = entity.getComponent(LocationComponent.class);
             if (loc != null) {
-                return Region3i.createFromCenterExtents(worldToChunkPos(loc.getWorldPosition()), new Vector3i(distance,distance,distance));
+                return Region3i.createFromCenterExtents(worldToChunkPos(loc.getWorldPosition()), new Vector3i(distance/2,0,distance/2));
             }
             return Region3i.EMPTY;
         }
@@ -219,7 +223,7 @@ public class LocalChunkProvider implements NewChunkProvider
 
         private Vector3i worldToChunkPos(Vector3f worldPos) {
             worldPos.x /= NewChunk.CHUNK_DIMENSION_X;
-            worldPos.y /= NewChunk.CHUNK_DIMENSION_Y;
+            worldPos.y = 0;
             worldPos.z /= NewChunk.CHUNK_DIMENSION_Z;
             return new Vector3i(worldPos);
         }

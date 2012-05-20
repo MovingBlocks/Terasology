@@ -15,12 +15,20 @@
  */
 package org.terasology.logic.world;
 
+import com.google.common.collect.Sets;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.Config;
+import org.terasology.logic.newWorld.NewChunk;
+import org.terasology.logic.newWorld.WorldProvider;
+import org.terasology.rendering.primitives.ChunkMesh;
+import org.terasology.rendering.primitives.ChunkTessellator;
+import org.terasology.rendering.primitives.NewChunkTessellator;
+import org.terasology.rendering.world.WorldRenderer;
 
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Provides the mechanism for updating and generating chunks.
@@ -37,9 +45,15 @@ public final class ChunkUpdateManager {
     private static final int MAX_THREADS = Config.getInstance().getMaxThreads();
 
     /* CHUNK UPDATES */
-    private static final HashSet<Chunk> _currentlyProcessedChunks = new HashSet<Chunk>();
+    private static final Set<NewChunk> _currentlyProcessedChunks = Sets.newHashSet();
 
+    private final NewChunkTessellator tessellator;
+    private final WorldProvider worldProvider;
 
+    public ChunkUpdateManager(NewChunkTessellator tessellator, WorldProvider worldProvider) {
+        this.tessellator = tessellator;
+        this.worldProvider = worldProvider;
+    }
     /**
      * Updates the given chunk using a new thread from the thread pool. If the maximum amount of chunk updates
      * is reached, the chunk update is ignored. Chunk updates can be forced though.
@@ -48,7 +62,8 @@ public final class ChunkUpdateManager {
      * @param type  The chunk update type
      * @return True if a chunk update was executed
      */
-    public boolean queueChunkUpdate(Chunk chunk, final UPDATE_TYPE type) {
+    // TODO: Review this system
+    public boolean queueChunkUpdate(NewChunk chunk, final UPDATE_TYPE type) {
 
         if (!_currentlyProcessedChunks.contains(chunk) && (_currentlyProcessedChunks.size() < MAX_THREADS || type != UPDATE_TYPE.DEFAULT)) {
             executeChunkUpdate(chunk);
@@ -58,13 +73,19 @@ public final class ChunkUpdateManager {
         return false;
     }
 
-    private void executeChunkUpdate(final Chunk c) {
+    private void executeChunkUpdate(final NewChunk c) {
         _currentlyProcessedChunks.add(c);
+        c.setDirty(false);
 
         // Create a new thread and start processing
         Runnable r = new Runnable() {
             public void run() {
-                c.processChunk();
+                ChunkMesh[] newMeshes = new ChunkMesh[WorldRenderer.VERTICAL_SEGMENTS];
+                for (int seg = 0; seg < WorldRenderer.VERTICAL_SEGMENTS; seg++) {
+                    newMeshes[seg] = tessellator.generateMesh(worldProvider, c.getPos(), NewChunk.CHUNK_DIMENSION_Y / WorldRenderer.VERTICAL_SEGMENTS, seg * (NewChunk.CHUNK_DIMENSION_Y / WorldRenderer.VERTICAL_SEGMENTS));
+                }
+
+                c.setPendingMesh(newMeshes);
                 _currentlyProcessedChunks.remove(c);
             }
         };

@@ -39,7 +39,7 @@ public class ChunkMesh {
     /**
      * Data structure for storing vertex data. Abused like a "struct" in C/C++. Just sad.
      */
-    public class VertexElements {
+    public static class VertexElements {
 
         public VertexElements() {
             vertCount = 0;

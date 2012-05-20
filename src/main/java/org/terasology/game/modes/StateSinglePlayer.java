@@ -43,7 +43,7 @@ import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
-import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.newWorld.WorldProvider;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.protobuf.EntityData;
 import org.terasology.rendering.cameras.Camera;
@@ -185,7 +185,7 @@ public class StateSinglePlayer implements GameState {
     @Override
     public void deactivate() {
         try {
-            CoreRegistry.get(WorldPersister.class).save(new File(PathManager.getInstance().getWorldSavePath(getActiveWorldProvider().getTitle()), ENTITY_DATA_FILE), WorldPersister.SaveFormat.Binary);
+            CoreRegistry.get(WorldPersister.class).save(new File(PathManager.getInstance().getWorldSavePath(CoreRegistry.get(WorldProvider.class).getTitle()), ENTITY_DATA_FILE), WorldPersister.SaveFormat.Binary);
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Failed to save entities", e);
         }
@@ -292,7 +292,7 @@ public class StateSinglePlayer implements GameState {
             localPlayer = new LocalPlayer(iterator.next());
         } else {
             PlayerFactory playerFactory = new PlayerFactory(entityManager);
-            localPlayer = new LocalPlayer(playerFactory.newInstance(new Vector3f(_worldRenderer.getWorldProvider().nextSpawningPoint())));
+            localPlayer = new LocalPlayer(playerFactory.newInstance(nextSpawningPoint()));
         }
         _worldRenderer.setPlayer(localPlayer);
 
@@ -301,7 +301,7 @@ public class StateSinglePlayer implements GameState {
 
         fastForwardWorld();
         CoreRegistry.put(WorldRenderer.class, _worldRenderer);
-        CoreRegistry.put(IWorldProvider.class, _worldRenderer.getWorldProvider());
+        CoreRegistry.put(WorldProvider.class, _worldRenderer.getWorldProvider());
         CoreRegistry.put(LocalPlayer.class, _worldRenderer.getPlayer());
         CoreRegistry.put(Camera.class, _worldRenderer.getActiveCamera());
         CoreRegistry.put(BulletPhysicsRenderer.class, _worldRenderer.getBulletRenderer());
@@ -312,6 +312,31 @@ public class StateSinglePlayer implements GameState {
 
 
     }
+
+    private Vector3f nextSpawningPoint() {
+        return new Vector3f(0,5,0);
+        // TODO: Need to generate an X/Z coord, force a chunk relevent and calculate Y
+        /*
+        ChunkGeneratorTerrain tGen = ((ChunkGeneratorTerrain) getGeneratorManager().getChunkGenerators().get(0));
+
+        FastRandom nRandom = new FastRandom(CoreRegistry.get(Timer.class).getTimeInMs());
+
+        for (; ; ) {
+            int randX = (int) (nRandom.randomDouble() * 128f);
+            int randZ = (int) (nRandom.randomDouble() * 128f);
+
+            for (int y = Chunk.CHUNK_DIMENSION_Y - 1; y >= 32; y--) {
+
+                double dens = tGen.calcDensity(randX + (int) SPAWN_ORIGIN.x, y, randZ + (int) SPAWN_ORIGIN.y);
+
+                if (dens >= 0 && y < 64)
+                    return new Vector3d(randX + SPAWN_ORIGIN.x, y, randZ + SPAWN_ORIGIN.y);
+                else if (dens >= 0 && y >= 64)
+                    break;
+            }
+        } */
+    }
+
 
     private boolean screenHasFocus() {
         for (UIDisplayElement screen : _guiScreens) {
@@ -335,7 +360,7 @@ public class StateSinglePlayer implements GameState {
         int chunksGenerated = 0;
 
         while (chunksGenerated < 64) {
-            getWorldRenderer().generateChunk();
+            getWorldRenderer().pregenerateChunks();
             chunksGenerated++;
 
             _loadingScreen.updateStatus(String.format("Fast forwarding world... %.2f%%! :-)", (chunksGenerated / 64f) * 100f));
@@ -436,20 +461,21 @@ public class StateSinglePlayer implements GameState {
 
             // Features for debug mode only
             if (debugEnabled && !screenHasFocus && Keyboard.getEventKeyState()) {
+                WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
                 if (key == Keyboard.KEY_UP) {
-                    getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() + 0.005);
+                    worldProvider.setTimeInDays(worldProvider.getTimeInDays() + 0.005f);
                 }
 
                 if (key == Keyboard.KEY_DOWN) {
-                    getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() - 0.005);
+                    worldProvider.setTimeInDays(worldProvider.getTimeInDays() - 0.005f);
                 }
 
                 if (key == Keyboard.KEY_RIGHT) {
-                    getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() + 0.02);
+                    worldProvider.setTimeInDays(worldProvider.getTimeInDays() + 0.02f);
                 }
 
                 if (key == Keyboard.KEY_LEFT) {
-                    getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() - 0.02);
+                    worldProvider.setTimeInDays(worldProvider.getTimeInDays() - 0.02f);
                 }
 
                 if (key == Keyboard.KEY_R && !Keyboard.isRepeatEvent()) {
@@ -548,7 +574,4 @@ public class StateSinglePlayer implements GameState {
         return _hud;
     }
 
-    public IWorldProvider getActiveWorldProvider() {
-        return _worldRenderer.getWorldProvider();
-    }
 }

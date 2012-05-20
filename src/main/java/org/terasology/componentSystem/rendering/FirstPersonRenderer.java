@@ -12,7 +12,7 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AssetManager;
 import org.terasology.logic.manager.ShaderManager;
-import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.newWorld.WorldProvider;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;
@@ -39,7 +39,7 @@ import static org.lwjgl.opengl.GL11.*;
 @RegisterComponentSystem(headedOnly = true)
 public class FirstPersonRenderer implements RenderSystem {
 
-    private IWorldProvider worldProvider;
+    private WorldProvider worldProvider;
     private LocalPlayer localPlayer;
     private WorldRenderer worldRenderer;
     private Mesh handMesh;
@@ -49,7 +49,7 @@ public class FirstPersonRenderer implements RenderSystem {
     
     public void initialise() {
         localPlayer = CoreRegistry.get(LocalPlayer.class);
-        worldProvider = CoreRegistry.get(IWorldProvider.class);
+        worldProvider = CoreRegistry.get(WorldProvider.class);
         worldRenderer = CoreRegistry.get(WorldRenderer.class);
 
         Vector2f texPos = new Vector2f(40.0f * 0.015625f, 32.0f * 0.03125f);
@@ -147,7 +147,7 @@ public class FirstPersonRenderer implements RenderSystem {
 
         // Apply biome and overall color offset
         // TODO: Should get temperature, etc from world provider
-        Vector4f color = activeBlock.calcColorOffsetFor(Side.FRONT, worldProvider.getTemperatureAt(TeraMath.floorToInt(playerPos.x), TeraMath.floorToInt(playerPos.z)), worldProvider.getHumidityAt(TeraMath.floorToInt(playerPos.x), TeraMath.floorToInt(playerPos.z)));
+        Vector4f color = activeBlock.calcColorOffsetFor(Side.FRONT, worldProvider.getBiomeProvider().getTemperatureAt(TeraMath.floorToInt(playerPos.x), TeraMath.floorToInt(playerPos.z)), worldProvider.getBiomeProvider().getHumidityAt(TeraMath.floorToInt(playerPos.x), TeraMath.floorToInt(playerPos.z)));
         shader.setFloat3("colorOffset", color.x, color.y, color.z);
 
         glEnable(GL11.GL_BLEND);

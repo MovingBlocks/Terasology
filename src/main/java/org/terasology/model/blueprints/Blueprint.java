@@ -15,7 +15,7 @@
  */
 package org.terasology.model.blueprints;
 
-import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.newWorld.WorldProvider;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.structures.BlockCollection;
 import org.terasology.model.structures.BlockPosition;
@@ -40,7 +40,7 @@ public abstract class Blueprint {
      * @param pos The position the blueprint should be built at
      * @return a BlockSelection containing localized positions for what was built
      */
-    public BlockSelection build(IWorldProvider provider, BlockPosition pos) {
+    public BlockSelection build(WorldProvider provider, BlockPosition pos) {
         return _blockCollection.build(provider,pos);
     }
 

@@ -9,7 +9,7 @@ import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.newWorld.WorldProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
@@ -24,13 +24,13 @@ import javax.vecmath.Vector3f;
 @RegisterComponentSystem(authorativeOnly = true)
 public class ExplosionAction implements EventHandlerSystem {
 
-    private IWorldProvider worldProvider;
+    private WorldProvider worldProvider;
     private FastRandom random = new FastRandom();
     private BulletPhysicsRenderer physicsRenderer;
     private BlockEntityRegistry blockEntityRegistry;
 
     public void initialise() {
-        worldProvider = CoreRegistry.get(IWorldProvider.class);
+        worldProvider = CoreRegistry.get(WorldProvider.class);
         physicsRenderer = CoreRegistry.get(BulletPhysicsRenderer.class);
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
     }
@@ -55,22 +55,20 @@ public class ExplosionAction implements EventHandlerSystem {
                 target.y += direction.y * j;
                 target.z += direction.z * j;
                 blockPos.set((int) target.x, (int) target.y, (int) target.z);
-                byte currentBlockType = worldProvider.getBlock(blockPos);
+                Block currentBlock = worldProvider.getBlock(blockPos);
 
-                if (currentBlockType == 0x0)
+                if (currentBlock.getId() == 0)
                     continue;
-
-                Block currentBlock = BlockManager.getInstance().getBlock(currentBlockType);
 
                 /* PHYSICS */
                 if (currentBlock.isDestructible()) {
                     // TODO: this should be handled centrally somewhere. Actions shouldn't be determining world behaviour
                     // like what happens when a block is destroyed.
-                    worldProvider.setBlock(blockPos, (byte)0x0, true, true);
+                    worldProvider.setBlock(blockPos, BlockManager.getInstance().getAir(), currentBlock);
                     
                     EntityRef blockEntity = blockEntityRegistry.getEntityAt(blockPos);
                     blockEntity.destroy();
-                    physicsRenderer.addTemporaryBlock(target, currentBlockType, impulse, BulletPhysicsRenderer.BLOCK_SIZE.FULL_SIZE);
+                    physicsRenderer.addTemporaryBlock(target, currentBlock.getId(), impulse, BulletPhysicsRenderer.BLOCK_SIZE.FULL_SIZE);
                 }
             }
         }

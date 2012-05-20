@@ -95,6 +95,12 @@ public class Vector3i extends javax.vecmath.Tuple3i implements Serializable {
         this.z = TeraMath.floorToInt(other.z);
     }
 
+    public Vector3i(float x, float y, float z) {
+        this.x = TeraMath.floorToInt(x);
+        this.y = TeraMath.floorToInt(y);
+        this.z = TeraMath.floorToInt(z);
+    }
+
     /**
      * Constructs the integer version of a Vector3f, by adding an offset and flooring it
      *
@@ -104,6 +110,12 @@ public class Vector3i extends javax.vecmath.Tuple3i implements Serializable {
         this.x = TeraMath.floorToInt(other.x + offset);
         this.y = TeraMath.floorToInt(other.y + offset);
         this.z = TeraMath.floorToInt(other.z + offset);
+    }
+
+    public Vector3i(float x, float y, float z, float offset) {
+        this.x = TeraMath.floorToInt(x + offset);
+        this.y = TeraMath.floorToInt(y + offset);
+        this.z = TeraMath.floorToInt(z + offset);
     }
 
     /**

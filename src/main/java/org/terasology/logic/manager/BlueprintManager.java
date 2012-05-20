@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.manager;
 
-import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.newWorld.WorldProvider;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.blueprints.Blueprint;
 import org.terasology.model.blueprints.SimpleBlueprint;
@@ -48,7 +48,7 @@ public class BlueprintManager {
      * @param blockPositions List of block positions
      * @return The final blueprint
      */
-    public Blueprint generateBlueprint(IWorldProvider provider, Collection<BlockPosition> blockPositions) {
+    public Blueprint generateBlueprint(WorldProvider provider, Collection<BlockPosition> blockPositions) {
         // TODO: This probably should be a factory method in Blueprint instead? Needs work, anyway,
         Blueprint bp = new SimpleBlueprint();
 
@@ -68,7 +68,7 @@ public class BlueprintManager {
         for (BlockPosition pos : blockPositions) {
             BlockPosition newPos = new BlockPosition(pos.x - minX, pos.y - minY, pos.z - minZ);
 
-            bp.addBlock(newPos, BlockManager.getInstance().getBlock(provider.getBlock(pos.x, pos.y, pos.z)));
+            bp.addBlock(newPos, provider.getBlock(pos.x, pos.y, pos.z));
         }
 
         return bp;

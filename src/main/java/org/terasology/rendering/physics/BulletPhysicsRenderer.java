@@ -21,6 +21,9 @@ import com.bulletphysics.collision.dispatch.CollisionDispatcher;
 import com.bulletphysics.collision.dispatch.CollisionObject;
 import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
 import com.bulletphysics.collision.shapes.BoxShape;
+import com.bulletphysics.collision.shapes.BvhTriangleMeshShape;
+import com.bulletphysics.collision.shapes.IndexedMesh;
+import com.bulletphysics.collision.shapes.TriangleIndexVertexArray;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
@@ -41,16 +44,16 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.events.inventory.ReceiveItemEvent;
-import org.terasology.game.ComponentSystemManager;
-import org.terasology.game.CoreRegistry;
-import org.terasology.game.Terasology;
+import org.terasology.game.*;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AudioManager;
+import org.terasology.logic.newWorld.NewChunk;
 import org.terasology.logic.world.Chunk;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.rendering.interfaces.IGameObject;
+import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 
@@ -255,14 +258,14 @@ public class BulletPhysicsRenderer implements IGameObject {
     }
 
     public void updateChunks() {
-        ArrayList<Chunk> chunks = CoreRegistry.get(WorldRenderer.class).getChunksInProximity();
+        List<NewChunk> chunks = CoreRegistry.get(WorldRenderer.class).getChunksInProximity();
         HashSet<RigidBody> newBodies = new HashSet<RigidBody>();
 
         for (int i = 0; i < 32 && i < chunks.size(); i++) {
-            final Chunk chunk = chunks.get(i);
+            final NewChunk chunk = chunks.get(i);
 
             if (chunk != null) {
-                chunk.updateRigidBody();
+                updateRigidBody(chunk);
 
                 RigidBody c = chunk.getRigidBody();
 
@@ -283,6 +286,52 @@ public class BulletPhysicsRenderer implements IGameObject {
         }
 
         _chunks = newBodies;
+    }
+
+    private void updateRigidBody(NewChunk chunk) {
+        if (chunk.getRigidBody() != null || chunk.getMesh() == null)
+            return;
+
+        // TODO: Lock on chunk meshes
+        TriangleIndexVertexArray vertexArray = new TriangleIndexVertexArray();
+
+        int tris = 0;
+        ChunkMesh[] meshes = chunk.getMesh();
+        for (int k = 0; k < Chunk.VERTICAL_SEGMENTS; k++) {
+            ChunkMesh mesh = meshes[k];
+
+            if (mesh != null) {
+                IndexedMesh indexedMesh = mesh._indexedMesh;
+
+                if (indexedMesh != null) {
+                    tris += mesh._indexedMesh.numTriangles;
+                    vertexArray.addIndexedMesh(indexedMesh);
+                }
+
+                mesh._indexedMesh = null;
+            }
+        }
+
+        // TODO: Deal with this situation better
+        if (tris == 0) {
+            return;
+        }
+
+        try {
+            BvhTriangleMeshShape shape = new BvhTriangleMeshShape(vertexArray, true);
+
+            Matrix3f rot = new Matrix3f();
+            rot.setIdentity();
+
+            DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, new Vector3f((float) chunk.getPos().x * Chunk.CHUNK_DIMENSION_X, (float) chunk.getPos().y * Chunk.CHUNK_DIMENSION_Y, (float) chunk.getPos().z * Chunk.CHUNK_DIMENSION_Z), 1.0f)));
+
+            RigidBodyConstructionInfo blockConsInf = new RigidBodyConstructionInfo(0, blockMotionState, shape, new Vector3f());
+            RigidBody rigidBody = new RigidBody(blockConsInf);
+            chunk.setRigidBody(rigidBody);
+        } catch (Exception e) {
+            _logger.log(Level.WARNING, "Chunk failed to create rigid body.", e);
+        }
+
     }
 
     public void render() {
@@ -317,7 +366,7 @@ public class BulletPhysicsRenderer implements IGameObject {
                 else if (br.getCollisionShape() == _blockShapeQuarter)
                     GL11.glScalef(0.25f, 0.25f, 0.25f);
 
-                block.renderWithLightValue(_parent.getRenderingLightValueAt(new Vector3d(t.origin)));
+                block.renderWithLightValue(_parent.getRenderingLightValueAt(t.origin));
 
                 GL11.glPopMatrix();
             }

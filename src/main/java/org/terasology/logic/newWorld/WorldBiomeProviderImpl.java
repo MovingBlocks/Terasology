@@ -60,4 +60,9 @@ public class WorldBiomeProviderImpl implements WorldBiomeProvider {
 
         return Biome.FOREST;
     }
+
+    @Override
+    public Biome getBiomeAt(float x, float z) {
+        return getBiomeAt(TeraMath.floorToInt(x + 0.5f), TeraMath.floorToInt(z + 0.5f));
+    }
 }

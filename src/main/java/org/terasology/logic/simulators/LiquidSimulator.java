@@ -16,7 +16,7 @@
 package org.terasology.logic.simulators;
 
 import org.terasology.logic.world.Chunk;
-import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.world.LocalWorldProvider;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.BlockPosition;
@@ -38,7 +38,7 @@ public class LiquidSimulator extends Simulator {
 
     private FastRandom random = new FastRandom();
 
-    public LiquidSimulator(IWorldProvider parent) {
+    public LiquidSimulator(LocalWorldProvider parent) {
         super("Liquid", parent, 1000);
     }
 

@@ -150,6 +150,14 @@ public class Region3i implements Iterable<Vector3i> {
         return createFromMinMax(min, max);
     }
 
+    public Region3i expand(Vector3i amount) {
+        Vector3i min = min();
+        min.sub(amount);
+        Vector3i max = max();
+        max.add(amount);
+        return createFromMinMax(min, max);
+    }
+
     /**
      *
      * @return The position at the center of the region

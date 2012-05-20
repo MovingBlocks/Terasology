@@ -9,7 +9,7 @@ import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.newWorld.WorldProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
@@ -25,7 +25,7 @@ public class BlockEntityRegistry implements EventHandlerSystem, UpdateSubscriber
 
     private PrefabManager prefabManager;
     private EntityManager entityManager;
-    private IWorldProvider worldProvider;
+    private WorldProvider worldProvider;
 
     // TODO: Perhaps a better datastructure for spatial lookups
     // TODO: Or perhaps a build in indexing system for entities
@@ -36,7 +36,7 @@ public class BlockEntityRegistry implements EventHandlerSystem, UpdateSubscriber
     public void initialise() {
         this.entityManager = CoreRegistry.get(EntityManager.class);
         this.prefabManager = CoreRegistry.get(PrefabManager.class);
-        this.worldProvider = CoreRegistry.get(IWorldProvider.class);
+        this.worldProvider = CoreRegistry.get(WorldProvider.class);
         for (EntityRef blockComp : entityManager.iteratorEntities(BlockComponent.class)) {
             BlockComponent comp = blockComp.getComponent(BlockComponent.class);
             blockComponentLookup.put(new Vector3i(comp.getPosition()), blockComp);
@@ -61,11 +61,9 @@ public class BlockEntityRegistry implements EventHandlerSystem, UpdateSubscriber
     public EntityRef getOrCreateEntityAt(Vector3i blockPosition) {
         EntityRef blockEntity = blockComponentLookup.get(blockPosition);
         if (blockEntity == null || !blockEntity.exists()) {
-            byte id = worldProvider.getBlock(blockPosition);
-            if (id == 0)
+            Block block = worldProvider.getBlock(blockPosition);
+            if (block.getId() == 0)
                 return EntityRef.NULL;
-
-            Block block = BlockManager.getInstance().getBlock(id);
 
             blockEntity = entityManager.create(block.getEntityPrefab());
             if (block.isEntityTemporary()) {

@@ -15,7 +15,7 @@
  */
 package org.terasology.model.blueprints;
 
-import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.newWorld.WorldProvider;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.model.structures.BlockSelection;
@@ -53,7 +53,7 @@ public class PortalBlueprint extends Blueprint {
      */
     //TODO: Remember that this was hooked up to Cervator's ES hack, it needs to be hooked back up to _something_ later again
     //public PortalComponent createPortal(IWorldProvider provider, BlockPosition pos) {
-    public void createPortal(IWorldProvider provider, BlockPosition pos) {
+    public void createPortal(WorldProvider provider, BlockPosition pos) {
         // Build the Portal in pieces so we can store what's what in the returned PortalComponent
         BlockSelection portalBlocks = _blockCollection.buildWithFilter(provider, pos, "PortalBlock");
         BlockSelection frameBlocks = _blockCollection.buildWithFilter(provider, pos, "PortalFrameBlock");

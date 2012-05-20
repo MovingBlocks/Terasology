@@ -17,7 +17,7 @@ package org.terasology.logic.simulators;
 
 import org.terasology.logic.generators.ChunkGeneratorTerrain;
 import org.terasology.logic.world.Chunk;
-import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.world.LocalWorldProvider;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.BlockPosition;
 
@@ -34,7 +34,7 @@ public class GrowthSimulator extends Simulator {
     private static final byte DIRT_TYPE = BlockManager.getInstance().getBlock("Dirt").getId();
     private static final byte GRASS_TYPE = BlockManager.getInstance().getBlock("Grass").getId();
 
-    public GrowthSimulator(IWorldProvider parent) {
+    public GrowthSimulator(LocalWorldProvider parent) {
         super("Growth", parent, 1000);
     }
 

@@ -12,12 +12,10 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.game.CoreRegistry;
-import org.terasology.game.Terasology;
 import org.terasology.logic.manager.ShaderManager;
-import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.newWorld.WorldProvider;
 import org.terasology.math.Side;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.BlockFamily;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
@@ -42,7 +40,7 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
     private static final float TEX_SIZE = Block.TEXTURE_OFFSET / 4f;
 
     private EntityManager entityManager;
-    private IWorldProvider worldProvider;
+    private WorldProvider worldProvider;
     // TODO: lose dependency on worldRenderer?
     private WorldRenderer worldRenderer;
 
@@ -51,7 +49,7 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
 
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
-        worldProvider = CoreRegistry.get(IWorldProvider.class);
+        worldProvider = CoreRegistry.get(WorldProvider.class);
         worldRenderer = CoreRegistry.get(WorldRenderer.class);
         displayLists = new TObjectIntHashMap(BlockManager.getInstance().getBlockFamilyCount());
     }
@@ -106,7 +104,7 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
             LocationComponent location = entity.getComponent(LocationComponent.class);
             Vector3f pos = location.getWorldPosition();
             pos.add(particle.position);
-            if (worldProvider.getBlockAtPosition(new Vector3d(pos.x, pos.y + 2 * Math.signum(particle.velocity.y) * particle.size, pos.z)) != 0x0)
+            if (worldProvider.getBlock(new Vector3f(pos.x, pos.y + 2 * Math.signum(particle.velocity.y) * particle.size, pos.z)).getId() != 0x0)
                 particle.velocity.y = 0;
         }
     }
@@ -127,11 +125,11 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
             LocationComponent location = entity.getComponent(LocationComponent.class);
             Vector3f worldPos = location.getWorldPosition();
 
-            if (!worldProvider.isChunkAvailableAt(worldPos)) {
+            if (!worldProvider.isBlockActive(worldPos)) {
                 continue;
             }
-            double temperature = worldProvider.getTemperatureAt((int)worldPos.x, (int)worldPos.z);
-            double humidity = worldProvider.getHumidityAt((int)worldPos.x, (int)worldPos.z);
+            double temperature = worldProvider.getBiomeProvider().getTemperatureAt((int)worldPos.x, (int)worldPos.z);
+            double humidity = worldProvider.getBiomeProvider().getHumidityAt((int)worldPos.x, (int)worldPos.z);
 
             glPushMatrix();
             glTranslated(worldPos.x - cameraPosition.x, worldPos.y - cameraPosition.y, worldPos.z - cameraPosition.z);
@@ -146,7 +144,7 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
                 applyOrientation();
                 glScalef(particle.size, particle.size, particle.size);
 
-                float light = worldRenderer.getRenderingLightValueAt(new Vector3d(worldPos.x + particle.position.x, worldPos.y + particle.position.y, worldPos.z + particle.position.z));
+                float light = worldRenderer.getRenderingLightValueAt(new Vector3f(worldPos.x + particle.position.x, worldPos.y + particle.position.y, worldPos.z + particle.position.z));
                 renderParticle(particle, particleEffect.blockType.getArchetypeBlock().getId(), temperature, humidity, light);
                 glPopMatrix();
             }

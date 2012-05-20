@@ -47,4 +47,6 @@ public interface WorldBiomeProvider {
     * Returns the biome type at the given position.
     */
     public Biome getBiomeAt(int x, int z);
+
+    public Biome getBiomeAt(float x, float z);
 }

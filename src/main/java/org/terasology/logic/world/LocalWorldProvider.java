@@ -46,7 +46,7 @@ import java.util.logging.Logger;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class LocalWorldProvider extends PersistableObject implements IWorldProvider {
+public class LocalWorldProvider extends PersistableObject {
 
     private Logger logger = Logger.getLogger(getClass().getName());
 

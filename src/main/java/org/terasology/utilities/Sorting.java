@@ -1,7 +1,10 @@
 package org.terasology.utilities;
 
+import java.util.Comparator;
 import java.util.List;
 
+// TODO: This class is needs to be refactored, with non-single character variable names
+// TODO: Also someone check that we can actually use this, license-wise
 public final class Sorting {
     // Prevent instantiation
     private Sorting() {

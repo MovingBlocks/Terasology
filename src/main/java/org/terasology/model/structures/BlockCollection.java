@@ -15,11 +15,14 @@
  */
 package org.terasology.model.structures;
 
-import org.terasology.game.Terasology;
-import org.terasology.logic.world.IWorldProvider;
+import com.google.common.collect.Lists;
+import org.terasology.logic.newWorld.BlockUpdate;
+import org.terasology.logic.newWorld.WorldProvider;
+import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -71,7 +74,7 @@ public class BlockCollection {
      * @param position The position to build the collection at (using the collection's attachment position)
      * @return A BlockSelection containing the final positions the blocks were built at
      */
-    public BlockSelection build(IWorldProvider provider, BlockPosition position) {
+    public BlockSelection build(WorldProvider provider, BlockPosition position) {
         return build(provider, position, this);
     }
 
@@ -82,7 +85,7 @@ public class BlockCollection {
      * @param blockName The name of the blocks we want to filter by
      * @return The BlockSelection for the built blocks matching the filter
      */
-    public BlockSelection buildWithFilter(IWorldProvider provider, BlockPosition position, String blockName) {
+    public BlockSelection buildWithFilter(WorldProvider provider, BlockPosition position, String blockName) {
         BlockCollection filteredBlocks = filter(blockName);
         return build(provider, position, filteredBlocks);
     }
@@ -96,17 +99,21 @@ public class BlockCollection {
      * @param buildingBlocks The BlockCollection we are using to build with, which could be filtered or the main one here
      * @return A BlockSelection containing the final positions the blocks were built at
      */
-    public BlockSelection build(IWorldProvider provider, BlockPosition position, BlockCollection buildingBlocks) {
+    public BlockSelection build(WorldProvider provider, BlockPosition position, BlockCollection buildingBlocks) {
         BlockSelection result = new BlockSelection();
         logger.log(Level.INFO, "Going to build this collection into the world at " + position + ", attaching at relative " + _attachPos);
         //System.out.println(toString());
+
+        List<BlockUpdate> updates = Lists.newArrayListWithCapacity(buildingBlocks.getBlocks().size());
         for (BlockPosition pos : buildingBlocks.getBlocks().keySet()) {
             //System.out.println("Processing block " + getBlock(pos) + " relative position " + pos);
             int x = position.x + pos.x - _attachPos.x;
             int y = position.y + pos.y - _attachPos.y;
             int z = position.z + pos.z - _attachPos.z;
             //System.out.println("This block is being placed at " + x + "," + y + "," + z);
-            provider.setBlock(x, y, z, buildingBlocks.getBlocks().get(pos).getId(), true, true);
+
+            // TODO: Fix this up for concurrency
+            provider.setBlock(x, y, z, buildingBlocks.getBlocks().get(pos), provider.getBlock(x, y, z));
             result.add(new BlockPosition(x,y,z));
         }
         return result;

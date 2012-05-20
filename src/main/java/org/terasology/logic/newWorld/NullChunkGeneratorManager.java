@@ -38,4 +38,8 @@ public class NullChunkGeneratorManager implements NewChunkGeneratorManager{
     public NewChunk generateChunk(Vector3i pos) {
         return new NewChunk(pos.x, pos.y, pos.z);
     }
+
+    @Override
+    public void postProcess(Vector3i pos) {
+    }
 }

@@ -22,6 +22,7 @@ import org.terasology.logic.simulators.LiquidSimulator;
 import org.terasology.logic.world.Chunk;
 import org.terasology.logic.world.IBlockObserver;
 import org.terasology.logic.world.IChunkProvider;
+import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.structures.BlockPosition;
@@ -57,6 +58,12 @@ public interface WorldProvider {
     public WorldBiomeProvider getBiomeProvider();
 
     /**
+     * @param chunk
+     * @return A world view centered on the desired chunk, with the surrounding chunks present.
+     */
+    public WorldView getWorldViewAround(Vector3i chunk);
+
+    /**
      * An active block is in a chunk that is available and fully generated.
      * @param x
      * @param y
@@ -71,6 +78,8 @@ public interface WorldProvider {
      * @return Whether the given block is active
      */
     public boolean isBlockActive(Vector3i pos);
+
+    public boolean isBlockActive(Vector3f pos);
 
     /**
      * Changes a number of blocks, if all updates are valid (oldTypes match the current block types in the given positions)
@@ -225,6 +234,10 @@ public interface WorldProvider {
      * @param time The current time
      */
     public void setTime(long time);
+
+    public float getTimeInDays();
+
+    public void setTimeInDays(float time);
 
     /**
      * Disposes this world provider.

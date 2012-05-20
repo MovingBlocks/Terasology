@@ -12,7 +12,7 @@ import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.events.JumpEvent;
 import org.terasology.events.VerticalCollisionEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.newWorld.WorldProvider;
 import org.terasology.logic.world.WorldUtil;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
@@ -39,20 +39,20 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
     public static final float GhostInertia = 4f;
 
     private EntityManager entityManager;
-    private IWorldProvider worldProvider;
+    private WorldProvider worldProvider;
 
     // For reuse to save memory churn
     private AABB entityAABB = new AABB(new Vector3d(), new Vector3d());
     
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
-        worldProvider = CoreRegistry.get(IWorldProvider.class);
+        worldProvider = CoreRegistry.get(WorldProvider.class);
     }
     
     public void update(float delta) {
         for (EntityRef entity : entityManager.iteratorEntities(CharacterMovementComponent.class, AABBCollisionComponent.class, LocationComponent.class)) {
             LocationComponent location = entity.getComponent(LocationComponent.class);
-            if (!worldProvider.isChunkAvailableAt(location.getWorldPosition())) continue;
+            if (!worldProvider.isBlockActive(location.getWorldPosition())) continue;
 
             AABBCollisionComponent collision = entity.getComponent(AABBCollisionComponent.class);
             CharacterMovementComponent movementComp = entity.getComponent(CharacterMovementComponent.class);
@@ -84,8 +84,7 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
 
         for (int i = 0; i < blockPositions.size(); i++) {
             BlockPosition p = blockPositions.get(i);
-            byte blockType = worldProvider.getBlockAtPosition(new Vector3d(p.x, p.y, p.z));
-            Block block = BlockManager.getInstance().getBlock(blockType);
+            Block block = worldProvider.getBlock(p);
 
             if (block.isLiquid()) {
                 for (AABB blockAABB : block.getColliders(p.x, p.y, p.z)) {
@@ -321,10 +320,9 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
 
         for (int i = 0; i < blockPositions.size(); i++) {
             BlockPosition p = blockPositions.get(i);
-            byte blockType1 = worldProvider.getBlockAtPosition(new Vector3d(p.x, p.y, p.z));
+            Block block = worldProvider.getBlock(p);
             calcAABB(position, extents);
 
-            Block block = BlockManager.getInstance().getBlock(blockType1);
             if (block == null || block.isPenetrable())
                 continue;
             for (AABB blockAABB : block.getColliders(p.x, p.y, p.z)) {
@@ -357,8 +355,7 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
         // Check each block position for collision
         for (int i = 0; i < blockPositions.size(); i++) {
             BlockPosition p = blockPositions.get(i);
-            byte blockType = worldProvider.getBlockAtPosition(new Vector3d(p.x, p.y, p.z));
-            Block block = BlockManager.getInstance().getBlock(blockType);
+            Block block = worldProvider.getBlock(p);
 
             if (!block.isPenetrable()) {
                 for (AABB blockAABB : block.getColliders(p.x, p.y, p.z)) {

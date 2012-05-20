@@ -12,7 +12,7 @@ import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AssetManager;
 import org.terasology.logic.manager.ShaderManager;
-import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.newWorld.WorldProvider;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
@@ -32,13 +32,13 @@ import static org.lwjgl.opengl.GL11.*;
 public class BlockDamageRenderer implements RenderSystem {
     
     private EntityManager entityManager;
-    private IWorldProvider worldProvider;
+    private WorldProvider worldProvider;
     private Mesh overlayMesh;
     private Texture effectsTexture;
 
     public void initialise() {
         this.entityManager = CoreRegistry.get(EntityManager.class);
-        this.worldProvider = CoreRegistry.get(IWorldProvider.class);
+        this.worldProvider = CoreRegistry.get(WorldProvider.class);
         this.effectsTexture = AssetManager.loadTexture("engine:effects");
         Vector2f texPos = new Vector2f(0.0f, 0.0f);
         Vector2f texWidth = new Vector2f(0.0624f, 0.0624f);
@@ -62,7 +62,7 @@ public class BlockDamageRenderer implements RenderSystem {
             if (health.currentHealth == health.maxHealth) continue;
 
             BlockComponent blockComp = entity.getComponent(BlockComponent.class);
-            if (!worldProvider.isChunkAvailableAt(blockComp.getPosition())) continue;
+            if (!worldProvider.isBlockActive(blockComp.getPosition())) continue;
 
             glPushMatrix();
             glTranslated(blockComp.getPosition().x - cameraPosition.x, blockComp.getPosition().y - cameraPosition.y, blockComp.getPosition().z - cameraPosition.z);

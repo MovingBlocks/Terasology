@@ -17,10 +17,9 @@ package org.terasology.logic.simulators;
 
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
-import org.terasology.game.Terasology;
 import org.terasology.game.Timer;
 import org.terasology.logic.world.IBlockObserver;
-import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.world.LocalWorldProvider;
 import org.terasology.model.structures.BlockPosition;
 
 import java.util.ArrayList;
@@ -41,13 +40,13 @@ public abstract class Simulator implements IBlockObserver {
     protected final long _updateInterval;
     protected long _lastUpdate;
 
-    protected final IWorldProvider _parent;
+    protected final LocalWorldProvider _parent;
     protected final Set<BlockPosition> _activeBlocks = new HashSet<BlockPosition>();
     protected Timer _timer;
 
     protected final ReentrantLock _lock = new ReentrantLock();
 
-    public Simulator(String name, IWorldProvider parent, long updateInterval) {
+    public Simulator(String name, LocalWorldProvider parent, long updateInterval) {
         _updateInterval = updateInterval;
         _parent = parent;
         _name = name;
@@ -55,7 +54,7 @@ public abstract class Simulator implements IBlockObserver {
         _lastUpdate = _timer.getTimeInMs();
     }
 
-    public Simulator(String name, IWorldProvider parent) {
+    public Simulator(String name, LocalWorldProvider parent) {
         this(name, parent, 1000);
     }
 

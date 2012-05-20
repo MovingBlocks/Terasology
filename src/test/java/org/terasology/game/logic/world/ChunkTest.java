@@ -41,30 +41,30 @@ public class ChunkTest {
 
     @Test
     public void testSetLightDirtyWhenOnLightChange() {
-        chunk.setLightDirty(false);
+        chunk.setDirty(false);
         assertTrue(chunk.setLight(new Vector3i(0, 1, 2), (byte) 0x3));
-        assertTrue(chunk.isLightDirty());
+        assertTrue(chunk.isDirty());
     }
 
     @Test
     public void testNoSetLightDirtyWhenOnLightUnchanged() {
-        chunk.setLightDirty(false);
+        chunk.setDirty(false);
         assertFalse(chunk.setLight(new Vector3i(0, 1, 2), (byte) 0));
-        assertFalse(chunk.isLightDirty());
+        assertFalse(chunk.isDirty());
     }
 
     @Test
     public void testSetSunlightDirtyWhenOnLightChange() {
-        chunk.setLightDirty(false);
+        chunk.setDirty(false);
         assertTrue(chunk.setSunlight(new Vector3i(0, 1, 2), (byte) 0x3));
-        assertTrue(chunk.isLightDirty());
+        assertTrue(chunk.isDirty());
     }
 
     @Test
     public void testNoSetSunlightDirtyWhenOnLightUnchanged() {
-        chunk.setLightDirty(false);
+        chunk.setDirty(false);
         assertFalse(chunk.setSunlight(new Vector3i(0, 1, 2), (byte) 0));
-        assertFalse(chunk.isLightDirty());
+        assertFalse(chunk.isDirty());
     }
 
 }

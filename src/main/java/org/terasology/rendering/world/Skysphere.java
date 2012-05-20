@@ -112,7 +112,7 @@ public class Skysphere implements IGameObject {
 
         glEnable(GL13.GL_TEXTURE_CUBE_MAP);
         GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, _textureIds.get(0));
-        _sunPosAngle = (float) java.lang.Math.toRadians(360.0 * _parent.getWorldProvider().getTime() - 90.0);
+        _sunPosAngle = (float) java.lang.Math.toRadians(360.0 * _parent.getWorldProvider().getTimeInDays() - 90.0);
         Vector4d sunNormalise = new Vector4d(0.0f, java.lang.Math.cos(_sunPosAngle), java.lang.Math.sin(_sunPosAngle), 1.0);
         sunNormalise.normalize();
 
@@ -125,7 +125,7 @@ public class Skysphere implements IGameObject {
         shader.enable();
 
         shader.setFloat4("sunPos", 0.0f, (float) java.lang.Math.cos(_sunPosAngle), (float) java.lang.Math.sin(_sunPosAngle), 1.0f);
-        shader.setFloat("time", (float) _parent.getWorldProvider().getTime());
+        shader.setFloat("time", (float) _parent.getWorldProvider().getTimeInDays());
         shader.setFloat("sunAngle", (float) _sunPosAngle);
         shader.setFloat("turbidity", (float) _turbidity);
         shader.setFloat3("zenith", (float) zenithColor.x, (float) zenithColor.y, (float) zenithColor.z);
@@ -245,7 +245,7 @@ public class Skysphere implements IGameObject {
 
         for (int i = 0; i < (int) CLOUD_RESOLUTION.x; i++) {
             for (int j = 0; j < (int) CLOUD_RESOLUTION.y; j++) {
-                double noise = _noiseGenerator.fBm(i * 0.05, j * 0.05, _parent.getWorldProvider().getTime());
+                double noise = _noiseGenerator.fBm(i * 0.05, j * 0.05, _parent.getWorldProvider().getTimeInDays());
 
                 byte value = (byte) (TeraMath.clamp(noise * 1.25 + 0.25) * 255);
 

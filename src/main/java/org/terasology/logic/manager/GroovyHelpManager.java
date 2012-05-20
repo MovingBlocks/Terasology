@@ -13,7 +13,7 @@ import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.newWorld.WorldProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
@@ -184,7 +184,7 @@ public class GroovyHelpManager {
     }
 
     public RayBlockIntersection.Intersection calcSelectedBlock() {
-        IWorldProvider worldProvider = CoreRegistry.get(IWorldProvider.class);
+        WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
         WorldRenderer worldrenderer = CoreRegistry.get(WorldRenderer.class);
         Camera playerCamera = worldrenderer.getActiveCamera();
         // TODO: Proper and centralised ray tracing support though world
@@ -202,10 +202,10 @@ public class GroovyHelpManager {
                     blockPosY = (int) (pos.y + (pos.y >= 0 ? 0.5f : -0.5f)) + y;
                     blockPosZ = (int) (pos.z + (pos.z >= 0 ? 0.5f : -0.5f)) + z;
 
-                    byte blockType = worldProvider.getBlock(blockPosX, blockPosY, blockPosZ);
+                    Block block = worldProvider.getBlock(blockPosX, blockPosY, blockPosZ);
 
                     // Ignore special blocks
-                    if (BlockManager.getInstance().getBlock(blockType).isSelectionRayThrough()) {
+                    if (block.isSelectionRayThrough()) {
                         continue;
                     }
 

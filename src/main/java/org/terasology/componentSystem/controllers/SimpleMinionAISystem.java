@@ -9,7 +9,7 @@ import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.newWorld.WorldProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
@@ -32,7 +32,7 @@ import java.util.List;
 public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscriberSystem {
 
     private EntityManager entityManager;
-    private IWorldProvider worldProvider;
+    private WorldProvider worldProvider;
     private BlockEntityRegistry blockEntityRegistry;
     private FastRandom random = new FastRandom();
     //private AStarPathfinder aStarPathfinder;
@@ -40,7 +40,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
 
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
-        worldProvider = CoreRegistry.get(IWorldProvider.class);
+        worldProvider = CoreRegistry.get(WorldProvider.class);
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
         timer = CoreRegistry.get(Timer.class);
         //aStarPathfinder = new AStarPathfinder(worldProvider);
@@ -269,7 +269,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
     private boolean attack(EntityRef player, Vector3f position) {
 
         int damage = 1;
-        Block block = BlockManager.getInstance().getBlock(worldProvider.getBlockAtPosition(new Vector3d(position.x, position.y, position.z)));
+        Block block = worldProvider.getBlock(position);
         if (block.isDestructible() && !block.isSelectionRayThrough()) {
             EntityRef blockEntity = blockEntityRegistry.getOrCreateEntityAt(new Vector3i(position));
             blockEntity.send(new DamageEvent(damage, player));

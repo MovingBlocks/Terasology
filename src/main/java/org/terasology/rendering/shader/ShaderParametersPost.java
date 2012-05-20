@@ -25,15 +25,15 @@ import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AssetManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PostProcessingRenderer;
+import org.terasology.logic.newWorld.WorldProvider;
 import org.terasology.rendering.assets.Texture;
-import org.terasology.logic.world.IWorldProvider;
-import org.terasology.logic.world.LocalWorldProvider;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.rendering.world.WorldRenderer;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
 import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 
 /**
  * Shader parameters for the Post-processing shader program.
@@ -68,8 +68,7 @@ public class ShaderParametersPost implements IShaderParameters {
 
         if (CoreRegistry.get(LocalPlayer.class).isValid()) {
             Vector3d cameraPos = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
-            byte blockId = CoreRegistry.get(IWorldProvider.class).getBlockAtPosition(cameraPos);
-            Block block = BlockManager.getInstance().getBlock(blockId);
+            Block block = CoreRegistry.get(WorldProvider.class).getBlock(new Vector3f(cameraPos));
             program.setInt("swimming", block.isLiquid() ? 1 : 0);
         }
     }

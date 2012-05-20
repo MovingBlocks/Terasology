@@ -15,8 +15,8 @@
  */
 package org.terasology.logic.generators;
 
-import org.terasology.logic.world.IWorldProvider;
-import org.terasology.utilities.FastRandom;
+ import org.terasology.logic.world.LocalWorldProvider;
+ import org.terasology.utilities.FastRandom;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,7 +26,7 @@ import java.util.HashMap;
  */
 public class GeneratorManager {
 
-    private final IWorldProvider _parent;
+    private final LocalWorldProvider _parent;
     // TODO: Improve random handling
     private FastRandom random;
 
@@ -34,7 +34,7 @@ public class GeneratorManager {
     protected final ArrayList<ChunkGenerator> _chunkGenerators = new ArrayList<ChunkGenerator>(8);
     protected final HashMap<ChunkGeneratorTerrain.BIOME_TYPE, ArrayList<TreeGenerator>> _treeGenerators = new HashMap<ChunkGeneratorTerrain.BIOME_TYPE, ArrayList<TreeGenerator>>(8);
 
-    public GeneratorManager(IWorldProvider parent) {
+    public GeneratorManager(LocalWorldProvider parent) {
         _parent = parent;
         random = new FastRandom(parent.getSeed().hashCode());
 
@@ -100,7 +100,7 @@ public class GeneratorManager {
         return list.get(id);
     }
 
-    public IWorldProvider getParent() {
+    public LocalWorldProvider getParent() {
         return _parent;
     }
 
