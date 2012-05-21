@@ -1,26 +1,30 @@
-package org.terasology.logic.world;
+package org.terasology.logic.newWorld.chunkCache;
 
-import org.terasology.game.Terasology;
+import org.terasology.logic.newWorld.NewChunk;
+import org.terasology.logic.newWorld.NewChunkCache;
+import org.terasology.logic.world.Chunk;
+import org.terasology.logic.world.IChunkCache;
+import org.terasology.logic.world.LocalWorldProvider;
 import org.terasology.math.Vector3i;
 
 import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ChunkCacheFileSystem implements IChunkCache {
-    private final LocalWorldProvider _parent;
+public class ChunkCacheFileSystem implements NewChunkCache {
     private Logger logger = Logger.getLogger(getClass().getName());
+    private File worldPath;
 
-    public ChunkCacheFileSystem(LocalWorldProvider parent) {
-        _parent = parent;
+    public ChunkCacheFileSystem(File worldPath) {
+        this.worldPath = worldPath;
     }
 
     private String getFileNameFor(Vector3i pos) {
         return pos.x + "." + pos.y + "." + pos.z + ".chunk";
     }
 
-    public Chunk get(Vector3i id) {
-        File f = new File(_parent.getObjectSavePath(), getFileNameFor(id));
+    public NewChunk get(Vector3i id) {
+        File f = new File(worldPath, getFileNameFor(id));
 
         if (!f.exists())
             return null;
@@ -29,8 +33,7 @@ public class ChunkCacheFileSystem implements IChunkCache {
             FileInputStream fileIn = new FileInputStream(f);
             ObjectInputStream in = new ObjectInputStream(fileIn);
 
-            Chunk result = (Chunk) in.readObject();
-            result.setParent(_parent);
+            NewChunk result = (NewChunk) in.readObject();
 
             in.close();
             fileIn.close();
@@ -43,16 +46,15 @@ public class ChunkCacheFileSystem implements IChunkCache {
         return null;
     }
 
-    public void put(Chunk c) {
-        File dirPath = _parent.getObjectSavePath();
-        if (!dirPath.exists()) {
-            if (!dirPath.mkdirs()) {
+    public void put(NewChunk c) {
+        if (!worldPath.exists()) {
+            if (!worldPath.mkdirs()) {
                 logger.log(Level.SEVERE, "Could not create save directory.");
                 return;
             }
         }
 
-        File f = new File(_parent.getObjectSavePath(), getFileNameFor(c.getPos()));
+        File f = new File(worldPath, getFileNameFor(c.getPos()));
 
         try {
             FileOutputStream fileOut = new FileOutputStream(f);
@@ -66,10 +68,9 @@ public class ChunkCacheFileSystem implements IChunkCache {
     }
 
     public float size() {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        return 0;
     }
 
     public void dispose() {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 }

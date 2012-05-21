@@ -71,9 +71,4 @@ public interface NewChunkProvider {
      */
     public float size();
 
-    /**
-     * @return Whether the chunk provider is currently in the process of producing more chunks
-     */
-    boolean isBuildingChunks();
-
 }

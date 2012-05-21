@@ -57,7 +57,7 @@ public class LocalWorldProvider extends PersistableObject {
     protected final GeneratorManager _generatorManager;
 
     /* CHUNK PROVIDER */
-    protected final IChunkProvider _chunkProvider;
+    protected final ChunkProvider _chunkProvider = null;
 
     /* CONST */
     protected final long DAY_NIGHT_LENGTH_IN_MS = Config.getInstance().getDayNightLengthInMs();
@@ -102,7 +102,6 @@ public class LocalWorldProvider extends PersistableObject {
         _random = new FastRandom(seed.hashCode());
 
         _generatorManager = new GeneratorManager(this);
-        _chunkProvider = new ChunkProvider(this);
 
         _liquidSimulator = new LiquidSimulator(this);
         _growthSimulator = new GrowthSimulator(this);
@@ -485,7 +484,7 @@ public class LocalWorldProvider extends PersistableObject {
         return (double) msSinceCreation / (double) DAY_NIGHT_LENGTH_IN_MS;
     }
 
-    public IChunkProvider getChunkProvider() {
+    public ChunkProvider getChunkProvider() {
         return _chunkProvider;
     }
 

@@ -1,4 +1,4 @@
-package org.terasology.logic.world;
+package org.terasology.logic.newWorld;
 
 import org.terasology.game.Terasology;
 import org.terasology.model.structures.BlockPosition;

@@ -32,12 +32,13 @@ import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.*;
 import org.terasology.logic.newWorld.*;
 import org.terasology.logic.newWorld.chunkCache.NullChunkCache;
+import org.terasology.logic.newWorld.generator.FloraGenerator;
 import org.terasology.logic.newWorld.generator.InternalLightGenerator;
 import org.terasology.logic.newWorld.generator.PerlinTerrainGenerator;
 import org.terasology.logic.world.Chunk;
 import org.terasology.logic.world.ChunkUpdateManager;
-import org.terasology.logic.world.WorldTimeEvent;
-import org.terasology.logic.world.WorldUtil;
+import org.terasology.logic.newWorld.WorldTimeEvent;
+import org.terasology.logic.newWorld.WorldUtil;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
@@ -154,6 +155,7 @@ public final class WorldRenderer implements IGameObject {
     public WorldRenderer(String title, String seed, EntityManager manager, LocalPlayerSystem localPlayerSystem) {
         NewChunkGeneratorManager generatorManager = new NewChunkGeneratorManagerImpl(seed, new WorldBiomeProviderImpl(seed));
         generatorManager.registerChunkGenerator(new PerlinTerrainGenerator());
+        generatorManager.registerChunkGenerator(new FloraGenerator());
         generatorManager.registerChunkGenerator(new InternalLightGenerator());
         _chunkProvider = new LocalChunkProvider(new NullChunkCache(), generatorManager);
         _worldProvider = new NewLocalWorldProvider(title, seed, _chunkProvider);
@@ -182,7 +184,6 @@ public final class WorldRenderer implements IGameObject {
     public boolean updateChunksInProximity(boolean force) {
         int newChunkPosX = calcCamChunkOffsetX();
         int newChunkPosZ = calcCamChunkOffsetZ();
-        _pendingChunks = false;
 
         int viewingDistance = Config.getInstance().getActiveViewingDistance();
 
@@ -193,7 +194,7 @@ public final class WorldRenderer implements IGameObject {
                 for (int x = -(viewingDistance / 2); x < (viewingDistance / 2); x++) {
                     for (int z = -(viewingDistance / 2); z < (viewingDistance / 2); z++) {
                         NewChunk c = _chunkProvider.getChunk(newChunkPosX + x, 0, newChunkPosZ + z);
-                        if (c != null && c.getChunkState() == NewChunk.State.Complete) {
+                        if (c != null && c.getChunkState() == NewChunk.State.Complete && _worldProvider.getWorldViewAround(c.getPos()) != null) {
                             _chunksInProximity.add(c);
                         } else {
                             _pendingChunks = true;
@@ -225,7 +226,7 @@ public final class WorldRenderer implements IGameObject {
                     for(int x = r.minX(); x < r.maxX(); ++x) {
                         for(int y = r.minY(); y < r.maxY(); ++y) {
                             NewChunk c = _chunkProvider.getChunk(x, 0, y);
-                            if (c != null) {
+                            if (c != null && c.getChunkState() == NewChunk.State.Complete && _worldProvider.getWorldViewAround(c.getPos()) != null) {
                                 _chunksInProximity.add(c);
                             } else {
                                 _pendingChunks = true;
@@ -610,6 +611,11 @@ public final class WorldRenderer implements IGameObject {
         updateTick(delta);
         PerformanceMonitor.endActivity();
 
+        // Free unused space
+        PerformanceMonitor.startActivity("Update Chunk Cache");
+        _chunkProvider.update();
+        PerformanceMonitor.endActivity();
+
         PerformanceMonitor.startActivity("Update Close Chunks");
         updateChunksInProximity(false);
         PerformanceMonitor.endActivity();
@@ -622,11 +628,7 @@ public final class WorldRenderer implements IGameObject {
             _activeCamera.update(delta);
         }
 
-        // Free unused space
-        // TODO: Cache flush?
-        PerformanceMonitor.startActivity("Flush World Cache");
-        //_worldProvider.getChunkProvider().flushCache();
-        PerformanceMonitor.endActivity();
+
 
         // And finally fire any active events
         PerformanceMonitor.startActivity("Fire Events");
@@ -771,7 +773,15 @@ public final class WorldRenderer implements IGameObject {
      */
     public void setPlayer(LocalPlayer p) {
         _player = p;
-        _chunkProvider.addRegionEntity(p.getEntity(), 32);
+        _chunkProvider.addRegionEntity(p.getEntity(), Config.getInstance().getActiveViewingDistance());
+        updateChunksInProximity(true);
+    }
+
+    public void changeViewDistance(int viewingDistance) {
+        _logger.log(Level.INFO, "New Viewing Distance: " + viewingDistance);
+        if (_player != null) {
+            _chunkProvider.addRegionEntity(_player.getEntity(), viewingDistance);
+        }
         updateChunksInProximity(true);
     }
 

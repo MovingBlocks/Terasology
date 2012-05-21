@@ -1,5 +1,9 @@
-package org.terasology.logic.world;
+package org.terasology.logic.newWorld.chunkCache;
 
+import org.terasology.logic.newWorld.NewChunk;
+import org.terasology.logic.newWorld.NewChunkCache;
+import org.terasology.logic.world.Chunk;
+import org.terasology.logic.world.IChunkCache;
 import org.terasology.math.Vector3i;
 
 import java.io.*;
@@ -9,7 +13,7 @@ import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-public class ChunkCacheGZip implements IChunkCache, Serializable {
+public class ChunkCacheGZip implements NewChunkCache, Serializable {
     ConcurrentHashMap<Vector3i, byte[]> _map = new ConcurrentHashMap<Vector3i, byte[]>();
     int _sizeInByte = 0;
 
@@ -46,8 +50,8 @@ public class ChunkCacheGZip implements IChunkCache, Serializable {
 
     }
 
-    public Chunk get(Vector3i id) {
-        Chunk c = null;
+    public NewChunk get(Vector3i id) {
+        NewChunk c = null;
         try {
             byte[] b = _map.get(id);
             if(b == null)
@@ -55,7 +59,7 @@ public class ChunkCacheGZip implements IChunkCache, Serializable {
             ByteArrayInputStream bais = new ByteArrayInputStream(b);
             GZIPInputStream gzipIn = new GZIPInputStream(bais);
             ObjectInputStream objectIn = new ObjectInputStream(gzipIn);
-            c = (Chunk) objectIn.readObject();
+            c = (NewChunk) objectIn.readObject();
             objectIn.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -65,7 +69,7 @@ public class ChunkCacheGZip implements IChunkCache, Serializable {
         return c;
     }
 
-    public void put(Chunk c) {
+    public void put(NewChunk c) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             GZIPOutputStream gzipOut = new GZIPOutputStream(baos);

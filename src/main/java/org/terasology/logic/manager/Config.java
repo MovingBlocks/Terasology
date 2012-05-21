@@ -450,7 +450,7 @@ public final class Config {
 
         // Make sure to update the chunks "around" the player
         if (worldRenderer != null)
-            worldRenderer.updateChunksInProximity(true);
+            worldRenderer.changeViewDistance(getActiveViewingDistance());
     }
 
     //todo remove this from the config

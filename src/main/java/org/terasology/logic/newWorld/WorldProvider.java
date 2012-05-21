@@ -15,20 +15,8 @@
  */
 package org.terasology.logic.newWorld;
 
-import org.terasology.logic.generators.ChunkGeneratorTerrain;
-import org.terasology.logic.generators.GeneratorManager;
-import org.terasology.logic.simulators.GrowthSimulator;
-import org.terasology.logic.simulators.LiquidSimulator;
-import org.terasology.logic.world.Chunk;
-import org.terasology.logic.world.IBlockObserver;
-import org.terasology.logic.world.IChunkProvider;
-import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.structures.BlockPosition;
-
-import javax.vecmath.Tuple3i;
-import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
 /**

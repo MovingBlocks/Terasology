@@ -16,7 +16,7 @@
 package org.terasology.logic.manager;
 
 import org.terasology.logic.newWorld.WorldProvider;
-import org.terasology.logic.world.WorldTimeEvent;
+import org.terasology.logic.newWorld.WorldTimeEvent;
 
 import java.util.ArrayList;
 

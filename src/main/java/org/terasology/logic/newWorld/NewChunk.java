@@ -46,8 +46,8 @@ public class NewChunk implements Externalizable {
     public static final long serialVersionUID = 79881925217704826L;
 
     public enum State {
-        Awaiting2ndGenerationPass,
-        AwaitingLightPropagation,
+        Awaiting2ndPass,
+        AwaitingFullLighting,
         Complete
     }
 
@@ -63,7 +63,7 @@ public class NewChunk implements Externalizable {
     private final TeraArray blocks;
     private final TeraSmartArray sunlight, light, states;
 
-    private State chunkState = State.Awaiting2ndGenerationPass;
+    private State chunkState = State.Awaiting2ndPass;
     private boolean dirty;
     private AABB aabb;
 
@@ -76,7 +76,7 @@ public class NewChunk implements Externalizable {
     private RigidBody rigidBody = null;
 
 
-    private NewChunk() {
+    public NewChunk() {
         blocks = new TeraArray(CHUNK_DIMENSION_X, CHUNK_DIMENSION_Y, CHUNK_DIMENSION_Z);
         sunlight = new TeraSmartArray(CHUNK_DIMENSION_X, CHUNK_DIMENSION_Y, CHUNK_DIMENSION_Z);
         light = new TeraSmartArray(CHUNK_DIMENSION_X, CHUNK_DIMENSION_Y, CHUNK_DIMENSION_Z);
@@ -394,5 +394,18 @@ public class NewChunk implements Externalizable {
 
     public void setRigidBody(RigidBody rigidBody) {
         this.rigidBody = rigidBody;
+    }
+
+    public void dispose() {
+        if (rigidBody != null) {
+            rigidBody.destroy();
+            rigidBody = null;
+        }
+        if (mesh != null) {
+            for (ChunkMesh chunkMesh : mesh) {
+                chunkMesh.dispose();
+            }
+            mesh = null;
+        }
     }
 }

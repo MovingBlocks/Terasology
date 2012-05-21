@@ -1,6 +1,8 @@
-package org.terasology.logic.world;
+package org.terasology.logic.newWorld.chunkCache;
 
 
+import org.terasology.logic.newWorld.NewChunk;
+import org.terasology.logic.newWorld.NewChunkCache;
 import org.terasology.math.Vector3i;
 
 import java.io.*;
@@ -9,24 +11,24 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
-public class ChunkCacheDeflate implements IChunkCache, Serializable {
-    ConcurrentMap<Vector3i, byte[]> _map = new ConcurrentHashMap<Vector3i, byte[]>();
+public class ChunkCacheDeflate implements NewChunkCache, Serializable {
+    ConcurrentMap<Vector3i, byte[]> map = new ConcurrentHashMap<Vector3i, byte[]>();
     int _sizeInByte = 0;
 
     public ChunkCacheDeflate(){
 
     }
 
-    public Chunk get(Vector3i id) {
-        Chunk c = null;
+    public NewChunk get(Vector3i id) {
+        NewChunk c = null;
         try {
-            byte[] b = _map.get(id);
+            byte[] b = map.get(id);
             if(b == null)
                 return null;
             ByteArrayInputStream bais = new ByteArrayInputStream(b);
             InflaterInputStream gzipIn = new InflaterInputStream(bais);
             ObjectInputStream objectIn = new ObjectInputStream(gzipIn);
-            c = (Chunk) objectIn.readObject();
+            c = (NewChunk) objectIn.readObject();
             objectIn.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -36,7 +38,7 @@ public class ChunkCacheDeflate implements IChunkCache, Serializable {
         return c;
     }
 
-    public void put(Chunk c) {
+    public void put(NewChunk c) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             DeflaterOutputStream gzipOut = new DeflaterOutputStream(baos);
@@ -45,7 +47,7 @@ public class ChunkCacheDeflate implements IChunkCache, Serializable {
             objectOut.close();
             byte[] b = baos.toByteArray();
             _sizeInByte += b.length;
-            _map.put(c.getPos(), b);
+            map.put(c.getPos(), b);
         } catch (IOException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
@@ -56,6 +58,5 @@ public class ChunkCacheDeflate implements IChunkCache, Serializable {
     }
 
     public void dispose() {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 }

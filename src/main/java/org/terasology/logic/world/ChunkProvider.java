@@ -34,7 +34,7 @@ import java.util.logging.Logger;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class ChunkProvider implements IChunkProvider {
+public final class ChunkProvider {
     private static final boolean SAVE_CHUNKS = Config.getInstance().isSaveChunks();
     private static final int CACHE_SIZE = Config.getInstance().getChunkCacheSize();
 
@@ -44,10 +44,10 @@ public final class ChunkProvider implements IChunkProvider {
 
     private final ConcurrentHashMap<Vector3i, Chunk> _nearChunkCache = new ConcurrentHashMap<Vector3i, Chunk>();
     private IChunkCache _farChunkCache;
-    private final LocalWorldProvider _parent;
+    private final LocalWorldProvider _parent = null;
     private ReentrantLock _lockChunkCreation = new ReentrantLock();
 
-    public ChunkProvider(LocalWorldProvider parent) {
+   /* public ChunkProvider(LocalWorldProvider parent) {
         _parent = parent;
         initFarChunkCache();
     }
@@ -67,7 +67,7 @@ public final class ChunkProvider implements IChunkProvider {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     public boolean isChunkAvailable(int x, int y, int z) {
         Chunk c = _nearChunkCache.get(new Vector3i(x,y,z));

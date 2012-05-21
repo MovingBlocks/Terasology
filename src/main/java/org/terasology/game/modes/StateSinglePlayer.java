@@ -35,6 +35,7 @@ import org.terasology.entitySystem.persistence.WorldPersister;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
+import org.terasology.game.Timer;
 import org.terasology.game.bootstrap.EntitySystemBuilder;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AssetManager;
@@ -351,6 +352,7 @@ public class StateSinglePlayer implements GameState {
         return !_pauseGame && !_pauseMenu.isVisible();
     }
 
+    // TODO: This should be its own state, really
     private void fastForwardWorld() {
         _loadingScreen.setVisible(true);
         _hud.setVisible(false);
@@ -359,11 +361,13 @@ public class StateSinglePlayer implements GameState {
 
         int chunksGenerated = 0;
 
-        while (chunksGenerated < 64) {
-            getWorldRenderer().pregenerateChunks();
+        Timer timer = CoreRegistry.get(Timer.class);
+        long startTime = timer.getTimeInMs();
+
+        while (!getWorldRenderer().pregenerateChunks() && timer.getTimeInMs() - startTime < 5000) {
             chunksGenerated++;
 
-            _loadingScreen.updateStatus(String.format("Fast forwarding world... %.2f%%! :-)", (chunksGenerated / 64f) * 100f));
+            _loadingScreen.updateStatus(String.format("Fast forwarding world... %.2f%%! :-)", (timer.getTimeInMs() - startTime) / 50.0f));
 
             renderUserInterface();
             updateUserInterface();

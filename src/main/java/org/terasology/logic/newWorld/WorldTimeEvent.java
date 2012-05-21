@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.world;
+package org.terasology.logic.newWorld;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>

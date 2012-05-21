@@ -49,10 +49,6 @@ public class ChunkProviderTest {
     public void testCreateChunksInRegion() throws Exception{
         chunkProvider.addRegionEntity(new StubLocationEntity(new Vector3f(0,0,0)), 1);
 
-        while (chunkProvider.isBuildingChunks()) {
-            Thread.sleep(10);
-        }
-
         NewChunk chunk = chunkProvider.getChunk(0, 0, 0);
         assertNotNull(chunk);
 

@@ -38,10 +38,6 @@ public class PerlinTerrainGenerator implements NewChunkGenerator {
     private PerlinNoise _pGen1, _pGen2, _pGen3, _pGen4, _pGen5, _pGen8;
     private WorldBiomeProvider biomeProvider;
 
-    public PerlinTerrainGenerator() {
-
-    }
-
     @Override
     public void setWorldSeed(String seed) {
         _pGen1 = new PerlinNoise(seed.hashCode());
