@@ -162,7 +162,7 @@ public class MinionSystem implements EventHandlerSystem {
                 if(helpMan.calcSelectedBlock() != null)
                 {
                     Vector3i centerPos = helpMan.calcSelectedBlock().getBlockPosition();
-                    Vector3f centerPosf = new Vector3f(centerPos.x + 0.5f,centerPos.y + 0.5f,centerPos.z + 0.5f);
+                    Vector3f centerPosf = new Vector3f(centerPos.x ,centerPos.y + 0.5f,centerPos.z);
                     minionai.followingPlayer = false;
                     switch (getSelectedBehaviour())
                     {
@@ -172,12 +172,12 @@ public class MinionSystem implements EventHandlerSystem {
                             break;
                         }
                         case Move: {
-                            minionai.movementTargets.add(new Vector3f(centerPos.x, centerPos.y, centerPos.z));
+                            minionai.movementTargets.add(centerPosf);
                             getSelectedMinion().saveComponent(minionai);
                             break;
                         }
                         case Gather: {
-                            minionai.gatherTargets.add(new Vector3f(centerPos.x, centerPos.y, centerPos.z));
+                            minionai.gatherTargets.add(centerPosf);
                             getSelectedMinion().saveComponent(minionai);
                             break;
                         }
@@ -187,7 +187,7 @@ public class MinionSystem implements EventHandlerSystem {
                             break;
                         }
                         case Test: {
-                            minionai.movementTargets.add(new Vector3f(centerPos.x, centerPos.y, centerPos.z));
+                            minionai.movementTargets.add(centerPosf);
                             getSelectedMinion().saveComponent(minionai);
                             break;
                         }

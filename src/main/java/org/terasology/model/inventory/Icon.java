@@ -135,6 +135,7 @@ public class Icon {
 
         //* Minion bar *//
         Icon gelcubeIcon = new Icon();
+        Icon minioncommandIcon = new Icon();
 
         //Tool Atlas
         pickAxeIcon.setAtlasPosition(0, 0);
@@ -195,6 +196,7 @@ public class Icon {
         woodshaftIcon.setAtlasPosition(9, 1);
        //gel icon (Will be moved to a Minion Icon Atlas)
         gelcubeIcon.setAtlasPosition(13,0);
+        minioncommandIcon.setAtlasPosition(13,3);
 
         icons.put("pickaxe", pickAxeIcon);
 		icons.put("axe", axeIcon);
@@ -259,6 +261,7 @@ public class Icon {
         icons.put("debug", greenPowderIcon);
 
         icons.put("gelcube",gelcubeIcon);
+        icons.put("minioncommand",minioncommandIcon);
 	}
 
 	/**

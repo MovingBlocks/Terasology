@@ -1,27 +1,26 @@
 package org.terasology.entityFactory;
 
-import org.terasology.components.*;
+import org.terasology.components.LocationComponent;
+import org.terasology.components.MeshComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.game.Terasology;
-import org.terasology.logic.manager.AudioManager;
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.Vector3f;
-import java.util.Arrays;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class GelatinousCubeFactory {
+public class MiniionFactory {
 
     private static final Vector3f[] COLORS = {new Vector3f(1.0f, 1.0f, 0.2f), new Vector3f(1.0f, 0.2f, 0.2f), new Vector3f(0.2f, 1.0f, 0.2f), new Vector3f(1.0f, 1.0f, 0.2f)};
 
     private FastRandom random;
     private EntityManager entityManager;
-    
-    public EntityRef generateGelatinousCube(Vector3f position) {
-        EntityRef entity = entityManager.create("core:gelatinousCube");
+
+    // generates minion cubes for minion toolbar
+    public EntityRef generateMiniion(Vector3f position) {
+        EntityRef entity = entityManager.create("miniion:gelatinousMinion");
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc != null) {
             loc.setWorldPosition(position);

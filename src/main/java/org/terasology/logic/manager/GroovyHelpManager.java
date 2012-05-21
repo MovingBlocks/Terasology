@@ -7,6 +7,7 @@ import com.google.gson.stream.JsonReader;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.MinionBarComponent;
 import org.terasology.entityFactory.GelatinousCubeFactory;
+import org.terasology.entityFactory.MiniionFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Prefab;
@@ -141,7 +142,7 @@ public class GroovyHelpManager {
     public void spawnCube(){
         EntityManager entMan = CoreRegistry.get(EntityManager.class);
         if(entMan != null){
-            GelatinousCubeFactory factory = new GelatinousCubeFactory();
+            MiniionFactory factory = new MiniionFactory();
             factory.setEntityManager(entMan);
 
             LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
@@ -153,7 +154,7 @@ public class GroovyHelpManager {
                     Vector3i centerPos = blockIntersection.getBlockPosition();
                     //Vector3i blockPos = blockIntersection.calcAdjacentBlockPos();
                     factory.setRandom(new FastRandom());
-                    inventory.MinionSlots.set(freeSlot, factory.generateGelatinousMinion(new Vector3f(centerPos.x, centerPos.y + 1, centerPos.z)));
+                    inventory.MinionSlots.set(freeSlot, factory.generateMiniion(new Vector3f(centerPos.x, centerPos.y + 1, centerPos.z)));
                 }
             }
 
@@ -163,7 +164,7 @@ public class GroovyHelpManager {
     public void spawnCube(int slot){
         EntityManager entMan = CoreRegistry.get(EntityManager.class);
         if(entMan != null){
-            GelatinousCubeFactory factory = new GelatinousCubeFactory();
+            MiniionFactory factory = new MiniionFactory();
             factory.setEntityManager(entMan);
 
             LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
@@ -175,7 +176,7 @@ public class GroovyHelpManager {
                     Vector3i centerPos = blockIntersection.getBlockPosition();
                     //Vector3i blockPos = blockIntersection.calcAdjacentBlockPos();
                     factory.setRandom(new FastRandom());
-                    inventory.MinionSlots.set(slot, factory.generateGelatinousMinion(new Vector3f(centerPos.x, centerPos.y + 1, centerPos.z)));
+                    inventory.MinionSlots.set(slot, factory.generateMiniion(new Vector3f(centerPos.x, centerPos.y + 1, centerPos.z)));
                     localPlayer.getEntity().saveComponent(inventory);
                 }
             }

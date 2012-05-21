@@ -112,8 +112,10 @@ public class AStarPathing extends Pathfinder{
 
         PathNode node = targetNode;
 
+
         while (node != null) {
             if (node.parent == null) { // skip starting node
+                node = node.parent; //skipping the first point in the list
                 break;
             }
 
@@ -154,8 +156,8 @@ public class AStarPathing extends Pathfinder{
             }
         }
 
-        public Vector3f getCenterVector() {//no need to add 0.5 to the height I think, only messes up distance calculation
-            return new Vector3f(x + 0.5f, y, z + 0.5f);
+        public Vector3f getCenterVector() {
+            return new Vector3f(x, y + 0.5f, z);
         }
 
         public int getHeuristicCost(PathNode to) {
@@ -210,14 +212,5 @@ public class AStarPathing extends Pathfinder{
 
             return 0;
         }
-        /* public int compareTo(PathNode o) {
-            if (this.totalCost > o.totalCost || this.totalCost == 0) {
-                return 1;
-            } else if (this.totalCost < o.totalCost) {
-                return -1;
-            }
-
-            return 0;
-        }*/
     }
 }

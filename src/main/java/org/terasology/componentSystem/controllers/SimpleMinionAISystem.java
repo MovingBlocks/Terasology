@@ -56,7 +56,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
             CharacterMovementComponent moveComp = entity.getComponent(CharacterMovementComponent.class);
             MinionComponent minioncomp = entity.getComponent(MinionComponent.class);
 
-            Vector3f worldPos = location.getWorldPosition();
+            Vector3f worldPos = new Vector3f(location.getWorldPosition());
             moveComp.getDrive().set(0,0,0);
             //  shouldn't use local player, need some way to find nearest player
             LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
@@ -111,8 +111,8 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                         List<Vector3f> targets = ai.movementTargets;
                         if(targets == null || targets.size() < 1) break;
                         Vector3f currentTarget = targets.get(0);
-                        // trying to solve distance calculation with some simple trick of reducing the height to a round int, might not work for taller entities
-                        worldPos.y = worldPos.y - (worldPos.y % 1);
+                        // trying to solve distance calculation with some simple trick of reducing the height to 0.5, might not work for taller entities
+                        worldPos.y = worldPos.y - (worldPos.y % 1) + 0.5f;
 
                         //calc distance to current Target
                         Vector3f dist = new Vector3f(worldPos);
@@ -192,7 +192,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                             }
 
                             // trying to solve distance calculation with some simple trick of reducing the height to a round int, might not work for taller entities
-                            worldPos.y = worldPos.y - (worldPos.y % 1);
+                            worldPos.y = worldPos.y - (worldPos.y % 1) + 0.5f;
                             //calc distance to current Target
                             Vector3f dist = new Vector3f(worldPos);
                             dist.sub(currentTarget);
