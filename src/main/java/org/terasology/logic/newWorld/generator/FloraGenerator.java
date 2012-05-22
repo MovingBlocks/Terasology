@@ -16,7 +16,12 @@
 package org.terasology.logic.newWorld.generator;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Multimap;
 import org.terasology.logic.generators.ChunkGeneratorTerrain;
+import org.terasology.logic.generators.DefaultGenerators;
 import org.terasology.logic.generators.GeneratorManager;
 import org.terasology.logic.generators.TreeGenerator;
 import org.terasology.logic.manager.Config;
@@ -29,6 +34,10 @@ import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.utilities.FastRandom;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Generates some trees, flowers and high grass.
@@ -50,11 +59,17 @@ public class FloraGenerator implements NewChunkGenerator {
     private Block snowBlock;
     private Block sandBlock;
 
+    //private ListMultimap<WorldBiomeProvider.Biome, TreeGenerator> treeGenerators = ArrayListMultimap.create();
+
     public FloraGenerator() {
         grassBlock = BlockManager.getInstance().getBlock("Grass");
         snowBlock = BlockManager.getInstance().getBlock("Snow");
         sandBlock = BlockManager.getInstance().getBlock("Sand");
     }
+
+    /*public void addTreeGenerator(WorldBiomeProvider.Biome type, TreeGenerator gen) {
+        treeGenerators.put(type, gen);
+    } */
 
     @Override
     public void setWorldSeed(String seed) {
@@ -89,7 +104,7 @@ public class FloraGenerator implements NewChunkGenerator {
      *
      * @param c The chunk
      */
-    /*private void generateTrees(NewChunk c, FastRandom random) {
+     /*private void generateTrees(NewChunk c, FastRandom random) {
 
         for (int y = 32; y < Chunk.CHUNK_DIMENSION_Y; y++) {
             for (int x = 0; x < Chunk.CHUNK_DIMENSION_X; x += 4) {
@@ -105,12 +120,12 @@ public class FloraGenerator implements NewChunkGenerator {
                         double rand = Math.abs(random.randomDouble());
 
                         int randomGeneratorId;
-                        int size = _parent.getTreeGenerators(biome).size();
+                        int size = treeGenerators.get(biome).size();
 
                         if (size > 0) {
                             randomGeneratorId = Math.abs(random.randomInt()) % size;
 
-                            TreeGenerator treeGen = _parent.getTreeGenerator(biome, randomGeneratorId);
+                            TreeGenerator treeGen = treeGenerators.get(biome).get(randomGeneratorId);
 
                             if (rand < treeGen.getGenProbability()) {
                                 generateTree(c, treeGen, randX, y, randZ, random);
@@ -120,7 +135,7 @@ public class FloraGenerator implements NewChunkGenerator {
                 }
             }
         }
-    }*/
+    } */
 
     /**
      * Generates grass or a flower on the given chunk.

@@ -45,8 +45,9 @@ public class TeraSmartArray {
 
         int pos = (x * _lX * _lY) + (y * _lX) + z;
 
-        if (x >= _lX || y >= _lY || z >= _lZ || x < 0 || y < 0 || z < 0)
-            return -1;
+        if (x >= _lX || y >= _lY || z >= _lZ || x < 0 || y < 0 || z < 0) {
+            throw new IndexOutOfBoundsException(String.format("(%d, %d, %d)", x, y, z));
+        }
 
         if (pos < _halfSize) {
             int bArray = _array[pos] & 0xFF;

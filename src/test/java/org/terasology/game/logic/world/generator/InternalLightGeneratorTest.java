@@ -86,4 +86,20 @@ public class InternalLightGeneratorTest {
         }
 
     }
+
+    @Test
+    public void sunlightPropagatesUpward() {
+        NewChunk chunk = new NewChunk(0,0,0);
+        for (Vector3i pos : Region3i.createFromCenterExtents(new Vector3i(9,9,9), Vector3i.one())) {
+            chunk.setBlock(pos, solidBlock);
+        }
+
+        chunk.setBlock(new Vector3i(9,9,9), airBlock);
+        chunk.setBlock(new Vector3i(9,8,9), airBlock);
+
+        generator.generateChunk(chunk);
+        assertEquals((byte)13, chunk.getSunlight(new Vector3i(9,7,9)));
+        assertEquals((byte)12, chunk.getSunlight(new Vector3i(9,8,9)));
+        assertEquals((byte)11, chunk.getSunlight(new Vector3i(9,9,9)));
+    }
 }

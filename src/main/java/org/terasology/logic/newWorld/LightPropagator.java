@@ -18,6 +18,7 @@ package org.terasology.logic.newWorld;
 
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
+import org.terasology.model.blocks.Block;
 
 /**
  * @author Immortius
@@ -53,25 +54,14 @@ public class LightPropagator {
 
     private void propagateFrom(int blockX, int blockY, int blockZ) {
         propagateSunlightFrom(blockX, blockY, blockZ);
-        propagateLightFrom(blockX, blockY, blockZ);
+        //propagateLightFrom(blockX, blockY, blockZ);
     }
 
     private void propagateSunlightFrom(int blockX, int blockY, int blockZ) {
         byte lightLevel = worldView.getSunlight(blockX, blockY, blockZ);
-        if (lightLevel <= 1) return;
-
-        for (Vector3i adjDir : HORIZONTAL_LIGHT_DIRECTIONS) {
-            int adjX = blockX + adjDir.x;
-            int adjZ = blockZ + adjDir.z;
-
-            byte adjLightValue = worldView.getSunlight(adjX, blockY, adjZ);
-            if (adjLightValue < lightLevel - 1 && worldView.getBlock(adjX, blockY, adjZ).isTranslucent()) {
-                worldView.setSunlight(adjX, blockY, adjZ, (byte) (lightLevel - 1));
-                propagateSunlightFrom(adjX, blockY, adjZ);
-            }
-        }
-
-        if (blockY > 0) {
+        if (lightLevel == 0) return;
+        // Propagate down
+        if (blockY > 0 && worldView.getBlock(blockX, blockY - 1, blockZ).isTranslucent()) {
             byte lowerLight = worldView.getSunlight(blockX, blockY - 1, blockZ);
             if (lightLevel == NewChunk.MAX_LIGHT) {
                 if (lowerLight < lightLevel) {
@@ -85,11 +75,31 @@ public class LightPropagator {
                 }
             }
         }
-        if (blockY < NewChunk.CHUNK_DIMENSION_Y - 1) {
+        // Propagate up
+        if (blockY < NewChunk.CHUNK_DIMENSION_Y - 1 && worldView.getBlock(blockX, blockY + 1, blockZ).isTranslucent()) {
             byte upperLight = worldView.getSunlight(blockX, blockY + 1, blockZ);
-            if (upperLight < lightLevel - 1) {
-                worldView.setSunlight(blockX, blockY + 1, blockZ, (byte)(lightLevel - 1));
-                propagateSunlightFrom(blockX, blockY + 1, blockZ);
+            if (lightLevel == NewChunk.MAX_LIGHT) {
+                if (upperLight < lightLevel) {
+                    worldView.setSunlight(blockX, blockY + 1, blockZ, lightLevel);
+                    propagateSunlightFrom(blockX, blockY + 1, blockZ);
+                }
+            } else {
+                if (upperLight < lightLevel - 1) {
+                    worldView.setSunlight(blockX, blockY + 1, blockZ, (byte)(lightLevel - 1));
+                    propagateSunlightFrom(blockX, blockY + 1, blockZ);
+                }
+            }
+        }
+
+        if (lightLevel <= 1) return;
+        for (Vector3i adjDir : HORIZONTAL_LIGHT_DIRECTIONS) {
+            int adjX = blockX + adjDir.x;
+            int adjZ = blockZ + adjDir.z;
+
+            byte adjLightValue = worldView.getSunlight(adjX, blockY, adjZ);
+            if (adjLightValue < lightLevel - 1 && worldView.getBlock(adjX, blockY, adjZ).isTranslucent()) {
+                worldView.setSunlight(adjX, blockY, adjZ, (byte) (lightLevel - 1));
+                propagateSunlightFrom(adjX, blockY, adjZ);
             }
         }
     }
@@ -109,14 +119,14 @@ public class LightPropagator {
             }
         }
 
-        if (blockY > 0) {
+        if (blockY > 0 && worldView.getBlock(blockX, blockY - 1, blockZ).isTranslucent()) {
             byte lowerLight = worldView.getLight(blockX, blockY - 1, blockZ);
             if (lowerLight < lightLevel - 1) {
                 worldView.setLight(blockX, blockY - 1, blockZ, (byte) (lightLevel - 1));
                 propagateLightFrom(blockX, blockY - 1, blockZ);
             }
         }
-        if (blockY < NewChunk.CHUNK_DIMENSION_Y - 1) {
+        if (blockY < NewChunk.CHUNK_DIMENSION_Y - 1 && worldView.getBlock(blockX, blockY + 1, blockZ).isTranslucent()) {
             byte upperLight = worldView.getLight(blockX, blockY + 1, blockZ);
             if (upperLight < lightLevel - 1) {
                 worldView.setLight(blockX, blockY + 1, blockZ, (byte) (lightLevel - 1));

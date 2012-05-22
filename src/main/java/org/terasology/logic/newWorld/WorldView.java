@@ -59,8 +59,16 @@ public class WorldView {
         return getSunlight(TeraMath.floorToInt(x + 0.5f), TeraMath.floorToInt(y + 0.5f), TeraMath.floorToInt(z + 0.5f));
     }
 
+    public byte getSunlight(Vector3i pos) {
+        return getSunlight(pos.x, pos.y, pos.z);
+    }
+
     public byte getLight(float x, float y, float z) {
         return getLight(TeraMath.floorToInt(x + 0.5f), TeraMath.floorToInt(y + 0.5f), TeraMath.floorToInt(z + 0.5f));
+    }
+
+    public byte getLight(Vector3i pos) {
+        return getLight(pos.x, pos.y, pos.z);
     }
 
     // TODO: Review

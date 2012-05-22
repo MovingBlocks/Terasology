@@ -90,15 +90,16 @@ public class LocalChunkProvider implements NewChunkProvider
         regions.remove(new CacheRegion(entity, 0));
     }
 
-    // TODO: Spiral update requests around center
     @Override
     public void update() {
         for (CacheRegion cacheRegion : regions) {
             cacheRegion.update();
             if (cacheRegion.isDirty()) {
+                cacheRegion.setUpToDate();
                 checkRegion(cacheRegion);
             }
         }
+        //TODO: Switch to while loop once light propagation moved to background thread
         if (!generatedChunks.isEmpty()) {
             Vector3i chunkPos = generatedChunks.poll();
             logger.log(Level.FINE, "Received Chunk " + chunkPos);
@@ -122,48 +123,16 @@ public class LocalChunkProvider implements NewChunkProvider
                     }
                 }
                 if (!keep) {
+                    // TODO: need some way to not dispose chunks being edited
                     NewChunk chunk = nearCache.get(pos);
                     farCache.put(chunk);
                     iterator.remove();
                     chunk.dispose();
-
                 }
 
             }
         }
 
-    }
-
-    private void checkFullGenerate(Vector3i pos) {
-        NewChunk chunk = getChunk(pos);
-        if (chunk != null && chunk.getChunkState() == NewChunk.State.Awaiting2ndPass) {
-            for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, new Vector3i(1,0,1))) {
-                if (!adjPos.equals(pos)) {
-                    NewChunk adjChunk = getChunk(adjPos);
-                    if (adjChunk == null) {
-                        return;
-                    }
-                }
-            }
-            logger.log(Level.FINE, "Full generating " + pos);
-            fullGenerateChunk(chunk);
-        }
-    }
-
-    private void checkComplete(Vector3i pos) {
-        NewChunk chunk = getChunk(pos);
-        if (chunk != null && chunk.getChunkState() == NewChunk.State.AwaitingFullLighting) {
-            for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, new Vector3i(1,0,1))) {
-                if (!adjPos.equals(pos)) {
-                    NewChunk adjChunk = getChunk(adjPos);
-                    if (adjChunk == null || (adjChunk.getChunkState() == NewChunk.State.Awaiting2ndPass)) {
-                        return;
-                    }
-                }
-            }
-            logger.log(Level.FINE, "Now complete " + pos);
-            chunk.setChunkState(NewChunk.State.Complete);
-        }
     }
 
     @Override
@@ -233,6 +202,29 @@ public class LocalChunkProvider implements NewChunkProvider
         }
     }
 
+    private NewChunk createChunk(Vector3i pos) {
+        NewChunk newChunk = generator.generateChunk(pos);
+        nearCache.putIfAbsent(pos, newChunk);
+        generatedChunks.add(pos);
+        return newChunk;
+    }
+
+    private void checkFullGenerate(Vector3i pos) {
+        NewChunk chunk = getChunk(pos);
+        if (chunk != null && chunk.getChunkState() == NewChunk.State.Awaiting2ndPass) {
+            for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, new Vector3i(1,0,1))) {
+                if (!adjPos.equals(pos)) {
+                    NewChunk adjChunk = getChunk(adjPos);
+                    if (adjChunk == null) {
+                        return;
+                    }
+                }
+            }
+            logger.log(Level.FINE, "Full generating " + pos);
+            fullGenerateChunk(chunk);
+        }
+    }
+
     private void fullGenerateChunk(NewChunk chunk) {
         WorldView worldView = WorldView.CreateLocalView(chunk.getPos(), this);
         LightPropagator propagator = new LightPropagator(worldView);
@@ -241,11 +233,22 @@ public class LocalChunkProvider implements NewChunkProvider
         generator.postProcess(chunk.getPos());
     }
 
-    private NewChunk createChunk(Vector3i pos) {
-        NewChunk newChunk = generator.generateChunk(pos);
-        nearCache.putIfAbsent(pos, newChunk);
-        generatedChunks.add(pos);
-        return newChunk;
+    private void checkComplete(Vector3i pos) {
+        NewChunk chunk = getChunk(pos);
+        if (chunk != null && chunk.getChunkState() == NewChunk.State.AwaitingFullLighting) {
+            for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, new Vector3i(1,0,1))) {
+                if (!adjPos.equals(pos)) {
+                    NewChunk adjChunk = getChunk(adjPos);
+                    if (adjChunk == null || (adjChunk.getChunkState() == NewChunk.State.Awaiting2ndPass)) {
+                        return;
+                    }
+                }
+            }
+            logger.log(Level.FINE, "Now complete " + pos);
+            chunk.setChunkState(NewChunk.State.Complete);
+            // TODO: Send event out
+
+        }
     }
 
     private static class CacheRegion {

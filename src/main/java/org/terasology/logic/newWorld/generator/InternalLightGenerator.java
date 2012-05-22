@@ -102,6 +102,18 @@ public class InternalLightGenerator implements NewChunkGenerator{
 
     private void spreadSunlightInternal(NewChunk chunk, int x, int y, int z) {
         byte lightValue = chunk.getSunlight(x,y,z);
+
+        // If it was max it would already have been spread down
+        if (y > 0 && lightValue < NewChunk.MAX_LIGHT && chunk.getSunlight(x, y - 1, z) < lightValue - 1 && chunk.getBlock(x, y - 1, z).isTranslucent()) {
+            chunk.setSunlight(x, y - 1, z, (byte)(lightValue - 1));
+            spreadSunlightInternal(chunk, x, y - 1, z);
+        }
+
+        if (y < NewChunk.CHUNK_DIMENSION_Y && lightValue < NewChunk.MAX_LIGHT && chunk.getSunlight(x, y + 1, z) < lightValue - 1 && chunk.getBlock(x, y + 1, z).isTranslucent()) {
+            chunk.setSunlight(x, y + 1, z, (byte)(lightValue - 1));
+            spreadSunlightInternal(chunk, x, y + 1, z);
+        }
+
         if (lightValue <= 1) return;
 
         for (Vector3i adjDir : HORIZONTAL_LIGHT_DIRECTIONS) {
@@ -117,10 +129,6 @@ public class InternalLightGenerator implements NewChunkGenerator{
             }
         }
 
-        // If it was max it would already have been spread down
-        if (y > 0 && lightValue < NewChunk.MAX_LIGHT && chunk.getSunlight(x, y - 1, z) < lightValue - 1 && chunk.getBlock(x, y-1, z).isTranslucent()) {
-            chunk.setSunlight(x, y - 1, z, (byte)(lightValue - 1));
-            spreadSunlightInternal(chunk, x, y - 1, z);
-        }
+
     }
 }
