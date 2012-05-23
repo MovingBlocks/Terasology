@@ -17,14 +17,14 @@ package org.terasology.persistence;
 
 import groovy.util.ConfigObject;
 import groovy.util.ConfigSlurper;
-import org.terasology.game.Terasology;
+
+import java.net.MalformedURLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Provides some basic functionality for primitively persisting objects via Config Slurper.
