@@ -26,9 +26,6 @@ import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 
 import javax.vecmath.Vector3f;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.Level;
@@ -70,6 +67,7 @@ public class LocalChunkProvider implements NewChunkProvider
                             createChunk(pos);
                         }
                         catch (InterruptedException e) {
+                            logger.log(Level.INFO, "Generator Thread ending");
                             running = false;
                         }
                     }
@@ -226,7 +224,7 @@ public class LocalChunkProvider implements NewChunkProvider
     }
 
     private void fullGenerateChunk(NewChunk chunk) {
-        WorldView worldView = WorldView.CreateLocalView(chunk.getPos(), this);
+        WorldView worldView = WorldView.createLocalView(chunk.getPos(), this);
         LightPropagator propagator = new LightPropagator(worldView);
         propagator.propagateOutOfTargetChunk();
         chunk.setChunkState(NewChunk.State.AwaitingFullLighting);

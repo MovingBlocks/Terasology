@@ -18,11 +18,7 @@ package org.terasology.logic.newWorld;
 
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
-import org.terasology.logic.generators.ChunkGeneratorTerrain;
-import org.terasology.logic.generators.GeneratorManager;
 import org.terasology.logic.manager.Config;
-import org.terasology.logic.world.ChunkProvider;
-import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
@@ -80,7 +76,7 @@ public class NewLocalWorldProvider implements WorldProvider {
 
     @Override
     public WorldView getWorldViewAround(Vector3i chunk) {
-        return WorldView.CreateLocalView(chunk, chunkProvider);
+        return WorldView.createLocalView(chunk, chunkProvider);
     }
 
     @Override
@@ -110,12 +106,18 @@ public class NewLocalWorldProvider implements WorldProvider {
 
     @Override
     public boolean setBlock(int x, int y, int z, Block type, Block oldType) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        Vector3i chunkPos = TeraMath.calcChunkPos(x, y, z);
+        NewChunk chunk = chunkProvider.getChunk(chunkPos);
+        if (chunk != null) {
+            Vector3i blockPos = TeraMath.calcBlockPos(x, y, z, chunkPos);
+            return chunk.setBlock(blockPos.x, blockPos.y, blockPos.z, type, oldType);
+        }
+        return false;
     }
 
     @Override
     public boolean setBlock(Vector3i pos, Block type, Block oldType) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        return setBlock(pos.x, pos.y, pos.z, type, oldType);
     }
 
     @Override

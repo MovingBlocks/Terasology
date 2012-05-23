@@ -31,8 +31,25 @@ public class WorldView {
     private Region3i region;
     private NewChunk[] chunks;
 
-    public static WorldView CreateLocalView(Vector3i pos, NewChunkProvider chunkProvider) {
+    public static WorldView createLocalView(Vector3i pos, NewChunkProvider chunkProvider) {
         Region3i region = Region3i.createFromCenterExtents(pos, new Vector3i(1,0,1));
+        return createWorldView(region, Vector3i.one(), chunkProvider);
+    }
+
+    public static WorldView createSubview(Vector3i pos, int extent, NewChunkProvider chunkProvider) {
+        Vector3i minPos = new Vector3i(-extent,0,-extent);
+        minPos.add(pos);
+        Vector3i maxPos = new Vector3i(extent, 0, extent);
+        maxPos.add(pos);
+
+        Vector3i minChunk = TeraMath.calcChunkPos(minPos);
+        Vector3i maxChunk = TeraMath.calcChunkPos(maxPos);
+
+        Region3i region = Region3i.createFromMinMax(minChunk, maxChunk);
+        return createWorldView(region, new Vector3i(-minChunk.x, 0, -minChunk.z), chunkProvider);
+    }
+
+    public static WorldView createWorldView(Region3i region, Vector3i offset, NewChunkProvider chunkProvider) {
         NewChunk[] chunks = new NewChunk[region.size().x * region.size().z];
         for (Vector3i chunkPos : region) {
             NewChunk chunk = chunkProvider.getChunk(chunkPos);
@@ -42,7 +59,7 @@ public class WorldView {
             int index = (chunkPos.x - region.min().x) + region.size().x * (chunkPos.z - region.min().z);
             chunks[index] = chunk;
         }
-        return new WorldView(chunks, region, Vector3i.one());
+        return new WorldView(chunks, region, offset);
     }
 
     public WorldView(NewChunk[] chunks, Region3i chunkRegion, Vector3i offset) {

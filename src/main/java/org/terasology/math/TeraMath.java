@@ -226,6 +226,10 @@ public final class TeraMath {
         return (z / Chunk.CHUNK_DIMENSION_Z);
     }
 
+    public static Vector3i calcChunkPos(Vector3i pos) {
+        return calcChunkPos(pos.x, pos.y, pos.z);
+    }
+
     public static Vector3i calcChunkPos(int x, int y, int z) {
         return new Vector3i(calcChunkPosX(x), calcChunkPosY(y), calcChunkPosZ(z));
     }

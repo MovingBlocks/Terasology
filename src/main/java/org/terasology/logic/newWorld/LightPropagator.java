@@ -52,9 +52,13 @@ public class LightPropagator {
         }
     }
 
+    public void pullLightInto(int blockX, int blockY, int blockZ) {
+
+    }
+
     private void propagateFrom(int blockX, int blockY, int blockZ) {
         propagateSunlightFrom(blockX, blockY, blockZ);
-        //propagateLightFrom(blockX, blockY, blockZ);
+        propagateLightFrom(blockX, blockY, blockZ);
     }
 
     private void propagateSunlightFrom(int blockX, int blockY, int blockZ) {

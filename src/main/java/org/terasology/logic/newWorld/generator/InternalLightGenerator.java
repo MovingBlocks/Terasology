@@ -16,11 +16,15 @@
 
 package org.terasology.logic.newWorld.generator;
 
+import com.google.common.collect.Queues;
 import org.terasology.logic.newWorld.NewChunk;
 import org.terasology.logic.newWorld.NewChunkGenerator;
 import org.terasology.logic.newWorld.WorldBiomeProvider;
 import org.terasology.logic.newWorld.WorldProvider;
 import org.terasology.math.Vector3i;
+import org.terasology.model.blocks.Block;
+
+import java.util.Queue;
 
 /**
  * Propagates internal lights and sunlight of a chunk
@@ -51,24 +55,36 @@ public class InternalLightGenerator implements NewChunkGenerator{
     public void generateChunk(NewChunk chunk) {
         int top = NewChunk.CHUNK_DIMENSION_Y - 1;
 
+        short[] tops = new short[NewChunk.CHUNK_DIMENSION_X * NewChunk.CHUNK_DIMENSION_Z];
+
         // Tunnel light down
         for (int x = 0; x < NewChunk.CHUNK_DIMENSION_X; x++) {
             for (int z = 0; z < NewChunk.CHUNK_DIMENSION_Z; z++) {
-                for (int y = top; y >= 0; y--) {
+                int y = top;
+                for (; y >= 0; y--) {
                     if (chunk.getBlock(x, y, z).isTranslucent()) {
                         chunk.setSunlight(x, y, z, NewChunk.MAX_LIGHT);
                     } else {
                         break;
                     }
                 }
+                tops[x + NewChunk.CHUNK_DIMENSION_X * z] = (short)y;
             }
         }
 
         for (int x = 0; x < NewChunk.CHUNK_DIMENSION_X; x++) {
             for (int z = 0; z < NewChunk.CHUNK_DIMENSION_Z; z++) {
                 for (int y = top; y >= 0; y--) {
-                    if (chunk.getBlock(x, y, z).isTranslucent()) {
-                        spreadSunlightInternal(chunk, x,y,z);
+                    Block block = chunk.getBlock(x, y, z);
+                    if (y > tops[x + NewChunk.CHUNK_DIMENSION_X * z] && ((x > 0 && tops[(x - 1) + NewChunk.CHUNK_DIMENSION_X * z] >= y) ||
+                        (x < NewChunk.CHUNK_DIMENSION_X - 1 && tops[(x + 1) + NewChunk.CHUNK_DIMENSION_X * z] >= y) ||
+                        (z > 0 && tops[x + NewChunk.CHUNK_DIMENSION_X * (z - 1)] >= y) ||
+                        (z < NewChunk.CHUNK_DIMENSION_Z - 1 && tops[x + NewChunk.CHUNK_DIMENSION_X * (z + 1)] >= y)))
+                    {
+                        spreadSunlightInternal(chunk, x, y, z);
+                    }
+                    if (block.getLuminance() > 0) {
+                        chunk.setLight(x,y,z,block.getLuminance());
                         spreadLightInternal(chunk,x,y,z);
                     }
                 }

@@ -158,7 +158,7 @@ public class NewChunk implements Externalizable {
     }
 
     public boolean setBlock(int x, int y, int z, Block newBlock, Block oldBlock) {
-        return setBlock(x, y, z, newBlock, oldBlock);
+        return setBlock(x, y, z, newBlock.getId(), oldBlock.getId());
     }
 
     public boolean setBlock(Vector3i pos, byte blockId) {
