@@ -2,10 +2,6 @@ package org.terasology.audio;
 
 import org.terasology.asset.Asset;
 
-import java.io.File;
-import java.io.InputStream;
-import java.net.URL;
-
 public interface Sound extends Asset {
 
     /**

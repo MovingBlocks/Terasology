@@ -15,21 +15,22 @@
 */
 package org.terasology.game;
 
-import org.terasology.game.modes.StateMainMenu;
-import org.terasology.logic.manager.Config;
-import org.terasology.logic.manager.PathManager;
-
-import java.applet.Applet;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import java.applet.Applet;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import org.terasology.game.modes.StateMainMenu;
+import org.terasology.logic.manager.PathManager;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>

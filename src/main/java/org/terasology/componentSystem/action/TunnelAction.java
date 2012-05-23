@@ -1,12 +1,13 @@
 package org.terasology.componentSystem.action;
 
+import javax.vecmath.Vector3f;
+
 import org.terasology.componentSystem.block.BlockEntityRegistry;
 import org.terasology.components.actions.TunnelActionComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.ActivateEvent;
-import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.Vector3i;
@@ -15,18 +16,17 @@ import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
 import org.terasology.utilities.FastRandom;
 
-import javax.vecmath.Vector3f;
-
 /**
  * @author Immortius <immortius@gmail.com>
  */
 public class TunnelAction implements EventHandlerSystem {
-    
+
     private IWorldProvider worldProvider;
     private FastRandom random = new FastRandom();
     private BulletPhysicsRenderer physicsRenderer;
     private BlockEntityRegistry blockEntityRegistry;
-    
+
+    @Override
     public void initialise() {
         worldProvider = CoreRegistry.get(IWorldProvider.class);
         physicsRenderer = CoreRegistry.get(BulletPhysicsRenderer.class);
@@ -56,7 +56,7 @@ public class TunnelAction implements EventHandlerSystem {
                     target.z += direction.z * j;
 
                     blockPos.set((int) target.x, (int) target.y, (int) target.z);
-                    
+
                     byte currentBlockType = worldProvider.getBlock(blockPos);
 
                     if (currentBlockType == 0x0)

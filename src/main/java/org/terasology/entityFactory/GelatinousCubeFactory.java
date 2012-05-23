@@ -1,14 +1,12 @@
 package org.terasology.entityFactory;
 
-import org.terasology.components.*;
+import javax.vecmath.Vector3f;
+
+import org.terasology.components.LocationComponent;
+import org.terasology.components.MeshComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.game.Terasology;
-import org.terasology.logic.manager.AudioManager;
 import org.terasology.utilities.FastRandom;
-
-import javax.vecmath.Vector3f;
-import java.util.Arrays;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -19,13 +17,13 @@ public class GelatinousCubeFactory {
 
     private FastRandom random;
     private EntityManager entityManager;
-    
+
     public EntityRef generateGelatinousCube(Vector3f position) {
         EntityRef entity = entityManager.create("core:gelatinousCube");
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc != null) {
             loc.setWorldPosition(position);
-            loc.setLocalScale(((random.randomFloat() + 1.0f) / 2.0f) * 0.8f + 0.2f);
+            loc.setLocalScale((random.randomFloat() + 1.0f) / 2.0f * 0.8f + 0.2f);
             entity.saveComponent(loc);
         }
 
@@ -45,7 +43,7 @@ public class GelatinousCubeFactory {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc != null) {
             loc.setWorldPosition(position);
-            loc.setLocalScale(((random.randomFloat() + 1.0f) / 2.0f) * 0.8f + 0.2f);
+            loc.setLocalScale((random.randomFloat() + 1.0f) / 2.0f * 0.8f + 0.2f);
             entity.saveComponent(loc);
         }
 

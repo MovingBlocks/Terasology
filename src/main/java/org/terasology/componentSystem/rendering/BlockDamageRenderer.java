@@ -1,8 +1,24 @@
 package org.terasology.componentSystem.rendering;
 
+import static org.lwjgl.opengl.GL11.GL_DST_COLOR;
+import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE;
+import static org.lwjgl.opengl.GL11.GL_ZERO;
+import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glMatrixMode;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glTranslated;
+import static org.lwjgl.opengl.GL11.glTranslatef;
+
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector4f;
+
 import org.lwjgl.opengl.GL11;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.components.BlockComponent;
 import org.terasology.components.HealthComponent;
@@ -18,26 +34,21 @@ import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.world.WorldRenderer;
 
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector4f;
-
-import static org.lwjgl.opengl.GL11.*;
-
 /**
  * @author Immortius <immortius@gmail.com>
  */
 public class BlockDamageRenderer implements RenderSystem {
-    
+
     private EntityManager entityManager;
     private IWorldProvider worldProvider;
     private Mesh overlayMesh;
     private Texture effectsTexture;
 
+    @Override
     public void initialise() {
-        this.entityManager = CoreRegistry.get(EntityManager.class);
-        this.worldProvider = CoreRegistry.get(IWorldProvider.class);
-        this.effectsTexture = AssetManager.loadTexture("engine:effects");
+        entityManager = CoreRegistry.get(EntityManager.class);
+        worldProvider = CoreRegistry.get(IWorldProvider.class);
+        effectsTexture = AssetManager.loadTexture("engine:effects");
         Vector2f texPos = new Vector2f(0.0f, 0.0f);
         Vector2f texWidth = new Vector2f(0.0624f, 0.0624f);
 
@@ -46,6 +57,7 @@ public class BlockDamageRenderer implements RenderSystem {
         overlayMesh = tessellator.generateMesh();
     }
 
+    @Override
     public void renderOverlay() {
         if (effectsTexture == null) return;
 
@@ -83,14 +95,17 @@ public class BlockDamageRenderer implements RenderSystem {
         glDisable(GL11.GL_BLEND);
     }
 
+    @Override
     public void renderFirstPerson() {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    @Override
     public void renderOpaque() {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    @Override
     public void renderTransparent() {
         //To change body of implemented methods use File | Settings | File Templates.
     }
