@@ -1,8 +1,8 @@
 package org.terasology.rendering.gui.components;
 
-import org.lwjgl.input.Keyboard;
+import javax.vecmath.Vector2f;
+
 import org.terasology.components.CharacterMovementComponent;
-import org.terasology.components.HealthComponent;
 import org.terasology.components.SpeedBoostComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -11,8 +11,6 @@ import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AssetManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
-
-import javax.vecmath.Vector2f;
 /*
  *   For Status Effects that don't affect the hearts
  */
