@@ -15,6 +15,44 @@
  */
 package org.terasology.rendering.physics;
 
+import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.vecmath.Matrix3f;
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
+
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
+import org.terasology.components.ItemComponent;
+import org.terasology.components.LocalPlayerComponent;
+import org.terasology.components.LocationComponent;
+import org.terasology.components.MinionBarComponent;
+import org.terasology.entityFactory.BlockItemFactory;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.PrefabManager;
+import org.terasology.events.inventory.ReceiveItemEvent;
+import org.terasology.game.CoreRegistry;
+import org.terasology.game.Timer;
+import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.manager.AudioManager;
+import org.terasology.logic.world.Chunk;
+import org.terasology.model.blocks.Block;
+import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.rendering.interfaces.IGameObject;
+import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.utilities.FastRandom;
+
 import com.bulletphysics.collision.broadphase.BroadphaseInterface;
 import com.bulletphysics.collision.broadphase.DbvtBroadphase;
 import com.bulletphysics.collision.dispatch.CollisionDispatcher;
@@ -27,41 +65,6 @@ import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
 import com.bulletphysics.linearmath.DefaultMotionState;
 import com.bulletphysics.linearmath.Transform;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
-import org.terasology.componentSystem.items.InventorySystem;
-import org.terasology.components.ItemComponent;
-import org.terasology.components.LocalPlayerComponent;
-import org.terasology.components.LocationComponent;
-import org.terasology.components.MinionBarComponent;
-import org.terasology.entityFactory.BlockItemFactory;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.PrefabManager;
-import org.terasology.events.inventory.ReceiveItemEvent;
-import org.terasology.game.ComponentSystemManager;
-import org.terasology.game.CoreRegistry;
-import org.terasology.game.Terasology;
-import org.terasology.game.Timer;
-import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.manager.AudioManager;
-import org.terasology.logic.world.Chunk;
-import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.management.BlockManager;
-import org.terasology.rendering.interfaces.IGameObject;
-import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.utilities.FastRandom;
-
-import javax.vecmath.Matrix3f;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
-import java.nio.FloatBuffer;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Renders blocks using the Bullet physics library.
@@ -121,6 +124,7 @@ public class BulletPhysicsRenderer implements IGameObject {
             return _type;
         }
 
+        @Override
         public int compareTo(BlockRigidBody blockRigidBody) {
             if (blockRigidBody.calcAgeInMs() == calcAgeInMs()) {
                 return 0;
@@ -285,6 +289,7 @@ public class BulletPhysicsRenderer implements IGameObject {
         _chunks = newBodies;
     }
 
+    @Override
     public void render() {
 
         FloatBuffer mBuffer = BufferUtils.createFloatBuffer(16);
@@ -326,6 +331,7 @@ public class BulletPhysicsRenderer implements IGameObject {
         GL11.glPopMatrix();
     }
 
+    @Override
     public void update(float delta) {
         addQueuedBodies();
 
