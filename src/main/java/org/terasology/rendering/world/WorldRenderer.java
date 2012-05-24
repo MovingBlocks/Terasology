@@ -15,23 +15,69 @@
  */
 package org.terasology.rendering.world;
 
+import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_FILL;
+import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
+import static org.lwjgl.opengl.GL11.GL_LIGHT0;
+import static org.lwjgl.opengl.GL11.GL_LINE;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glColorMask;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glPolygonMode;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+
+import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import java.awt.image.BufferedImage;
+
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
+
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.controllers.LocalPlayerSystem;
-import org.terasology.componentSystem.rendering.FirstPersonRenderer;
 import org.terasology.components.AABBCollisionComponent;
 import org.terasology.components.PlayerComponent;
 import org.terasology.entitySystem.EntityManager;
-import org.terasology.game.*;
+import org.terasology.game.ComponentSystemManager;
+import org.terasology.game.CoreRegistry;
+import org.terasology.game.GameEngine;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.generators.ChunkGeneratorTerrain;
-import org.terasology.logic.manager.*;
-import org.terasology.logic.world.*;
+import org.terasology.logic.manager.AudioManager;
+import org.terasology.logic.manager.Config;
+import org.terasology.logic.manager.PathManager;
+import org.terasology.logic.manager.PortalManager;
+import org.terasology.logic.manager.PostProcessingRenderer;
+import org.terasology.logic.manager.WorldTimeEventManager;
+import org.terasology.logic.world.Chunk;
+import org.terasology.logic.world.ChunkUpdateManager;
+import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.world.LocalWorldProvider;
+import org.terasology.logic.world.WorldTimeEvent;
+import org.terasology.logic.world.WorldUtil;
 import org.terasology.math.Rect2i;
 import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;
@@ -45,20 +91,6 @@ import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.utilities.Sorting;
-
-import javax.imageio.ImageIO;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static org.lwjgl.opengl.GL11.*;
 
 /**
  * The world of Terasology. At its most basic the world contains chunks (consisting of a fixed amount of blocks)
@@ -170,8 +202,8 @@ public final class WorldRenderer implements IGameObject {
             // just add all visible chunks
             if (_chunksInProximity.size() == 0 || force) {
                 _chunksInProximity.clear();
-                for (int x = -(viewingDistance / 2); x < (viewingDistance / 2); x++) {
-                    for (int z = -(viewingDistance / 2); z < (viewingDistance / 2); z++) {
+                for (int x = -(viewingDistance / 2); x < viewingDistance / 2; x++) {
+                    for (int z = -(viewingDistance / 2); z < viewingDistance / 2; z++) {
                         Chunk c = _worldProvider.getChunkProvider().getChunk(newChunkPosX + x, 0, newChunkPosZ + z);
                         _chunksInProximity.add(c);
                     }
@@ -226,7 +258,7 @@ public final class WorldRenderer implements IGameObject {
 
         return distLength < (Config.getInstance().getActiveViewingDistance() * 8);
     }*/
-    
+
     private Vector3f getPlayerPosition() {
         if (_player != null) {
             return _player.getPosition();
@@ -344,6 +376,7 @@ public final class WorldRenderer implements IGameObject {
     /**
      * Renders the world.
      */
+    @Override
     public void render() {
         /* QUEUE RENDERER */
         queueRenderer();
@@ -367,7 +400,7 @@ public final class WorldRenderer implements IGameObject {
 
         boolean headUnderWater = false;
 
-        headUnderWater = (_cameraMode == CAMERA_MODE.PLAYER && isUnderwater(getActiveCamera().getPosition()));
+        headUnderWater = _cameraMode == CAMERA_MODE.PLAYER && isUnderwater(getActiveCamera().getPosition());
 
         if (_wireframe)
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -485,7 +518,7 @@ public final class WorldRenderer implements IGameObject {
     }
 
     public float getRenderingLightValueAt(Vector3d pos) {
-        double lightValueSun = ((double) _worldProvider.getLightAtPosition(pos, Chunk.LIGHT_TYPE.SUN));
+        double lightValueSun = _worldProvider.getLightAtPosition(pos, Chunk.LIGHT_TYPE.SUN);
         lightValueSun = lightValueSun / 15.0;
         lightValueSun *= getDaylight();
         double lightValueBlock = _worldProvider.getLightAtPosition(pos, Chunk.LIGHT_TYPE.BLOCK);
@@ -494,6 +527,7 @@ public final class WorldRenderer implements IGameObject {
         return (float) TeraMath.clamp(lightValueSun + lightValueBlock * (1.0 - lightValueSun));
     }
 
+    @Override
     public void update(float delta) {
         PerformanceMonitor.startActivity("Cameras");
         animateSpawnCamera(delta);
@@ -560,7 +594,7 @@ public final class WorldRenderer implements IGameObject {
             }
         }
     }
-    
+
     private boolean isUnderwater(Vector3d pos) {
 
         BlockPosition p = new BlockPosition(pos);
@@ -733,8 +767,9 @@ public final class WorldRenderer implements IGameObject {
         //int bpp = Display.getDisplayMode().getBitsPerPixel(); does return 0 - why?
         final int bpp = 4;
         final ByteBuffer buffer = BufferUtils.createByteBuffer(width * height * bpp); // hardcoded until i know how to get bpp
-        GL11.glReadPixels(0, 0, width, height, (bpp == 3) ? GL11.GL_RGB : GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+        GL11.glReadPixels(0, 0, width, height, bpp == 3 ? GL11.GL_RGB : GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
         Runnable r = new Runnable() {
+            @Override
             public void run() {
                 Calendar cal = Calendar.getInstance();
                 SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmssSSS");
@@ -744,11 +779,11 @@ public final class WorldRenderer implements IGameObject {
 
                 for (int x = 0; x < width; x++)
                     for (int y = 0; y < height; y++) {
-                        int i = (x + (width * y)) * bpp;
+                        int i = (x + width * y) * bpp;
                         int r = buffer.get(i) & 0xFF;
                         int g = buffer.get(i + 1) & 0xFF;
                         int b = buffer.get(i + 2) & 0xFF;
-                        image.setRGB(x, height - (y + 1), (0xFF << 24) | (r << 16) | (g << 8) | b);
+                        image.setRGB(x, height - (y + 1), 0xFF << 24 | r << 16 | g << 8 | b);
                     }
 
                 try {

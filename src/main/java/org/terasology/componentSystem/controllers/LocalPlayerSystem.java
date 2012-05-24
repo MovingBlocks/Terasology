@@ -1,14 +1,29 @@
 package org.terasology.componentSystem.controllers;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.componentSystem.block.BlockEntityRegistry;
-import org.terasology.components.*;
+import org.terasology.components.CharacterMovementComponent;
+import org.terasology.components.HealthComponent;
+import org.terasology.components.InventoryComponent;
+import org.terasology.components.ItemComponent;
+import org.terasology.components.LocalPlayerComponent;
+import org.terasology.components.LocationComponent;
+import org.terasology.components.PlayerComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
@@ -22,7 +37,6 @@ import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.world.IWorldProvider;
-import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
@@ -31,15 +45,8 @@ import org.terasology.model.structures.BlockPosition;
 import org.terasology.model.structures.RayBlockIntersection;
 import org.terasology.rendering.cameras.DefaultCamera;
 import org.terasology.rendering.gui.menus.UIContainerScreen;
-import org.terasology.rendering.gui.components.UIMinion;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import com.bulletphysics.linearmath.QuaternionUtil;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -50,7 +57,7 @@ import java.util.List;
 public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, EventHandlerSystem {
 
     private static TIntIntMap inventorySlotBindMap = new TIntIntHashMap();
-    
+
     static {
         inventorySlotBindMap.put(Keyboard.KEY_1, 0);
         inventorySlotBindMap.put(Keyboard.KEY_2, 1);
@@ -84,6 +91,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     private float bobFactor = 0;
     private float lastStepDelta = 0;
 
+    @Override
     public void initialise() {
         worldProvider = CoreRegistry.get(IWorldProvider.class);
         localPlayer = CoreRegistry.get(LocalPlayer.class);
@@ -92,7 +100,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     }
 
     public void setPlayerCamera(DefaultCamera camera) {
-        this.playerCamera = camera;
+        playerCamera = camera;
     }
 
     @ReceiveEvent(components = {LocalPlayerComponent.class, InventoryComponent.class})
@@ -103,6 +111,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         }
     }
 
+    @Override
     public void update(float delta) {
         if (!localPlayer.isValid())
             return;
@@ -205,7 +214,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         if (stepDelta < 0) stepDelta += charMovementComp.distanceBetweenFootsteps;
         bobFactor += stepDelta;
         lastStepDelta = charMovementComp.footstepDelta;
-        
+
         if (cameraBobbing) {
             playerCamera.setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.5f));
             playerCamera.setBobbingVerticalOffsetFactor(calcBobbingOffset((float) java.lang.Math.PI / 4f, 0.025f, 3f));
@@ -228,6 +237,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         } */
     }
 
+    @Override
     public void renderOverlay() {
         // TODO: Don't render if not in first person?
         // Display the block the player is aiming at
@@ -411,7 +421,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             }
         }
     }
-    
+
     private void useItem(EntityRef player, EntityRef item) {
         // TODO: Raytrace against entities too
         RayBlockIntersection.Intersection blockIntersection = calcSelectedBlock();
@@ -437,7 +447,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             BlockPosition blockPos = selectedBlock.getBlockPosition();
             byte currentBlockType = worldProvider.getBlock(blockPos.x, blockPos.y, blockPos.z);
             Block block = BlockManager.getInstance().getBlock(currentBlockType);
-            
+
             int damage = 1;
             if (item != null) {
                 damage = item.baseDamage;
@@ -461,7 +471,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
         movementInput.set(0, 0, 0);
         lookInput.set((float)(mouseSensititivy * Mouse.getDX()), (float)(mouseSensititivy * Mouse.getDY()));
-        
+
         if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
             movementInput.z -= 1.0f;
         }
@@ -494,7 +504,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         List<RayBlockIntersection.Intersection> inters = new ArrayList<RayBlockIntersection.Intersection>();
 
         Vector3f pos = new Vector3f(playerCamera.getPosition());
-        
+
         int blockPosX, blockPosY, blockPosZ;
 
         for (int x = -3; x <= 3; x++) {
@@ -538,14 +548,17 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     }
 
 
+    @Override
     public void renderOpaque() {
 
     }
 
+    @Override
     public void renderTransparent() {
 
     }
 
+    @Override
     public void renderFirstPerson() {
     }
 }

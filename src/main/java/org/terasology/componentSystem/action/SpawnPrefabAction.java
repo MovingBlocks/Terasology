@@ -16,6 +16,8 @@
 
 package org.terasology.componentSystem.action;
 
+import javax.vecmath.Vector3f;
+
 import org.terasology.components.LocationComponent;
 import org.terasology.components.actions.SpawnPrefabActionComponent;
 import org.terasology.entitySystem.EntityManager;
@@ -24,9 +26,6 @@ import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
-
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius

@@ -16,11 +16,9 @@
 
 package org.terasology.asset;
 
-import com.google.common.collect.Maps;
-
-import java.net.URL;
-import java.util.EnumMap;
 import java.util.Map;
+
+import com.google.common.collect.Maps;
 
 /**
  * @author Immortius

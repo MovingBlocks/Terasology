@@ -16,8 +16,6 @@
 
 package org.terasology.asset;
 
-import java.io.IOException;
-
 /**
  * @author Immortius
  */

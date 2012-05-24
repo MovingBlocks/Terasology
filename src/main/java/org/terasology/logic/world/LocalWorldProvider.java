@@ -16,8 +16,20 @@
 package org.terasology.logic.world;
 
 import groovy.util.ConfigObject;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import java.io.File;
+
+import javax.vecmath.Tuple3i;
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
+
 import org.terasology.game.CoreRegistry;
-import org.terasology.game.Terasology;
 import org.terasology.game.Timer;
 import org.terasology.logic.generators.ChunkGeneratorTerrain;
 import org.terasology.logic.generators.GeneratorManager;
@@ -30,16 +42,6 @@ import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.persistence.PersistableObject;
 import org.terasology.utilities.FastRandom;
-
-import javax.vecmath.Tuple3i;
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
-import java.io.File;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Provides basic support for generating worlds.
@@ -110,6 +112,7 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
         registerObserver(_growthSimulator);
     }
 
+    @Override
     public boolean isChunkAvailableAt(Vector3f position) {
 
         int chunkPosX = TeraMath.calcChunkPosX((int)position.x);
@@ -117,7 +120,8 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
 
         return _chunkProvider.isChunkAvailable(chunkPosX, 0, chunkPosZ);
     }
-    
+
+    @Override
     public boolean isChunkAvailableAt(Tuple3i position) {
         int chunkPosX = TeraMath.calcChunkPosX(position.x);
         int chunkPosZ = TeraMath.calcChunkPosZ(position.z);
@@ -125,15 +129,18 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
         return _chunkProvider.isChunkAvailable(chunkPosX, 0, chunkPosZ);
     }
 
+    @Override
     public final boolean setBlock(Tuple3i pos, byte type, boolean updateLight, boolean overwrite) {
         return setBlock(pos.x, pos.y, pos.z, type, updateLight, overwrite, false);
     }
 
     // TODO: A better system would be to pass through the change maker, and for generators to not work through this interface
+    @Override
     public final boolean setBlock(Tuple3i pos, byte type, boolean updateLight, boolean overwrite, boolean suppressUpdate) {
         return setBlock(pos.x, pos.y, pos.z, type, updateLight, overwrite, suppressUpdate);
     }
 
+    @Override
     public final boolean setBlock(int x, int y, int z, byte type, boolean updateLight, boolean overwrite) {
         return setBlock(x,y,z,type,updateLight,overwrite, false);
     }
@@ -149,6 +156,7 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
      * @param overwrite If true currently present blocks get replaced
      * @return True if a block was set/replaced
      */
+    @Override
     public final boolean setBlock(int x, int y, int z, byte type, boolean updateLight, boolean overwrite, boolean suppressUpdate) {
         int chunkPosX = TeraMath.calcChunkPosX(x);
         int chunkPosZ = TeraMath.calcChunkPosZ(z);
@@ -235,6 +243,7 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
      * @param y The Y-coordinate
      * @param z The Z-coordinate
      */
+    @Override
     public void setState(int x, int y, int z, byte state) {
         int chunkPosX = TeraMath.calcChunkPosX(x);
         int chunkPosZ = TeraMath.calcChunkPosZ(z);
@@ -253,12 +262,13 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
      * @param pos The position
      * @return The block value at the given position
      */
+    @Override
     public final byte getBlockAtPosition(Vector3d pos) {
-        return getBlock((int) (pos.x + ((pos.x >= 0) ? 0.5f : -0.5f)), (int) (pos.y + ((pos.y >= 0) ? 0.5f : -0.5f)), (int) (pos.z + ((pos.z >= 0) ? 0.5f : -0.5f)));
+        return getBlock((int) (pos.x + (pos.x >= 0 ? 0.5f : -0.5f)), (int) (pos.y + (pos.y >= 0 ? 0.5f : -0.5f)), (int) (pos.z + (pos.z >= 0 ? 0.5f : -0.5f)));
     }
 
     public final byte getBlockAtPosition(double x, double y, double z) {
-        return getBlock((int) (x + ((x >= 0) ? 0.5f : -0.5f)), (int) (y + ((y >= 0) ? 0.5f : -0.5f)), (int) (z + ((z >= 0) ? 0.5f : -0.5f)));
+        return getBlock((int) (x + (x >= 0 ? 0.5f : -0.5f)), (int) (y + (y >= 0 ? 0.5f : -0.5f)), (int) (z + (z >= 0 ? 0.5f : -0.5f)));
     }
 
     /**
@@ -268,12 +278,13 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
      * @param type The type of light
      * @return The block value at the given position
      */
+    @Override
     public final byte getLightAtPosition(Vector3d pos, Chunk.LIGHT_TYPE type) {
-        return getLight((int) (pos.x + ((pos.x >= 0) ? 0.5f : -0.5f)), (int) (pos.y + ((pos.y >= 0) ? 0.5f : -0.5f)), (int) (pos.z + ((pos.z >= 0) ? 0.5f : -0.5f)), type);
+        return getLight((int) (pos.x + (pos.x >= 0 ? 0.5f : -0.5f)), (int) (pos.y + (pos.y >= 0 ? 0.5f : -0.5f)), (int) (pos.z + (pos.z >= 0 ? 0.5f : -0.5f)), type);
     }
 
     public final byte getLightAtPosition(double x, double y, double z, Chunk.LIGHT_TYPE type) {
-        return getLight((int) (x + ((x >= 0) ? 0.5f : -0.5f)), (int) (y + ((y >= 0) ? 0.5f : -0.5f)), (int) (z + ((z >= 0) ? 0.5f : -0.5f)), type);
+        return getLight((int) (x + (x >= 0 ? 0.5f : -0.5f)), (int) (y + (y >= 0 ? 0.5f : -0.5f)), (int) (z + (z >= 0 ? 0.5f : -0.5f)), type);
     }
 
     /**
@@ -284,6 +295,7 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
      * @param z The Z-coordinate
      * @return The type of the block
      */
+    @Override
     public final byte getBlock(int x, int y, int z) {
         int chunkPosX = TeraMath.calcChunkPosX(x);
         int chunkPosZ = TeraMath.calcChunkPosZ(z);
@@ -295,10 +307,12 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
         return c.getBlock(blockPosX, y, blockPosZ);
     }
 
+    @Override
     public final byte getBlock(Tuple3i pos) {
         return getBlock(pos.x, pos.y, pos.z);
     }
 
+    @Override
     public final boolean canBlockSeeTheSky(int x, int y, int z) {
         int chunkPosX = TeraMath.calcChunkPosX(x);
         int chunkPosZ = TeraMath.calcChunkPosZ(z);
@@ -310,6 +324,7 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
         return c.canBlockSeeTheSky(blockPosX, y, blockPosZ);
     }
 
+    @Override
     public byte getState(int x, int y, int z) {
         int chunkPosX = TeraMath.calcChunkPosX(x);
         int chunkPosZ = TeraMath.calcChunkPosZ(z);
@@ -330,6 +345,7 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
      * @param type The type of light
      * @return The light value
      */
+    @Override
     public final byte getLight(int x, int y, int z, Chunk.LIGHT_TYPE type) {
         int chunkPosX = TeraMath.calcChunkPosX(x);
         int chunkPosZ = TeraMath.calcChunkPosZ(z);
@@ -350,6 +366,7 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
      * @param intensity The light intensity value
      * @param type      The type of light
      */
+    @Override
     public void setLight(int x, int y, int z, byte intensity, Chunk.LIGHT_TYPE type) {
         int chunkPosX = TeraMath.calcChunkPosX(x);
         int chunkPosZ = TeraMath.calcChunkPosZ(z);
@@ -366,8 +383,9 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
      *
      * @return The spawning point.
      */
+    @Override
     public Vector3d nextSpawningPoint() {
-        ChunkGeneratorTerrain tGen = ((ChunkGeneratorTerrain) getGeneratorManager().getChunkGenerators().get(0));
+        ChunkGeneratorTerrain tGen = (ChunkGeneratorTerrain) getGeneratorManager().getChunkGenerators().get(0);
 
         FastRandom nRandom = new FastRandom(CoreRegistry.get(Timer.class).getTimeInMs());
 
@@ -387,16 +405,19 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
         }
     }
 
+    @Override
     public void dispose() {
         logger.log(Level.INFO, "Disposing local world \"{0}\" and saving all chunks.", getTitle());
         super.dispose();
         getChunkProvider().dispose();
     }
 
+    @Override
     public void registerObserver(IBlockObserver observer) {
         _observers.add(observer);
     }
 
+    @Override
     public void unregisterObserver(IBlockObserver observer) {
         _observers.remove(observer);
     }
@@ -452,6 +473,7 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
      * @return The humidity
      */
 
+    @Override
     public double getHumidityAt(int x, int z) {
         return ((ChunkGeneratorTerrain) getGeneratorManager().getChunkGenerators().get(0)).calcHumidityAtGlobalPosition(x, z);
     }
@@ -463,6 +485,7 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
      * @param z The Z-coordinate
      * @return The temperature
      */
+    @Override
     public double getTemperatureAt(int x, int z) {
         return ((ChunkGeneratorTerrain) getGeneratorManager().getChunkGenerators().get(0)).calcTemperatureAtGlobalPosition(x, z);
     }
@@ -470,45 +493,55 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
     /*
     * Returns the biome type at the given position.
     */
+    @Override
     public ChunkGeneratorTerrain.BIOME_TYPE getActiveBiome(int x, int z) {
         return ((ChunkGeneratorTerrain) getGeneratorManager().getChunkGenerators().get(0)).calcBiomeTypeForGlobalPosition(x, z);
     }
 
 
+    @Override
     public void setTime(double time) {
         if (time >= 0.0)
             _creationTime = CoreRegistry.get(Timer.class).getTimeInMs() - (long) (time * DAY_NIGHT_LENGTH_IN_MS);
     }
 
+    @Override
     public double getTime() {
         long msSinceCreation = CoreRegistry.get(Timer.class).getTimeInMs() - _creationTime;
         return (double) msSinceCreation / (double) DAY_NIGHT_LENGTH_IN_MS;
     }
 
+    @Override
     public IChunkProvider getChunkProvider() {
         return _chunkProvider;
     }
 
+    @Override
     public GeneratorManager getGeneratorManager() {
         return _generatorManager;
     }
 
+    @Override
     public LiquidSimulator getLiquidSimulator() {
         return _liquidSimulator;
     }
 
+    @Override
     public GrowthSimulator getGrowthSimulator() {
         return _growthSimulator;
     }
 
+    @Override
     public FastRandom getRandom() {
         return _random;
     }
 
+    @Override
     public String getTitle() {
         return _title;
     }
 
+    @Override
     public String getSeed() {
         return _seed;
     }

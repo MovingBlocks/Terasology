@@ -15,16 +15,14 @@
  */
 package org.terasology.rendering.shader;
 
+import static org.lwjgl.opengl.GL11.glBindTexture;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AssetManager;
 import org.terasology.rendering.assets.Texture;
-
-import static org.lwjgl.opengl.GL11.glBindTexture;
 
 /**
  * Shader parameters for the Block shader program.
@@ -38,6 +36,7 @@ public class ShaderParametersBlock implements IShaderParameters {
     public ShaderParametersBlock() {
     }
 
+    @Override
     public void applyParameters(ShaderProgram program) {
         if (terrainTex == null) {
             terrainTex = AssetManager.loadTexture("engine:terrain");

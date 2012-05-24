@@ -1,10 +1,20 @@
 package org.terasology.logic.manager;
 
-import java.util.*;
-import java.lang.reflect.*;
-import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
-import org.terasology.components.ItemComponent;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import java.io.FileReader;
+import java.io.IOException;
+
+import javax.vecmath.Vector3f;
+
 import org.terasology.components.MinionBarComponent;
 import org.terasology.entityFactory.GelatinousCubeFactory;
 import org.terasology.entitySystem.EntityManager;
@@ -20,12 +30,10 @@ import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.RayBlockIntersection;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.utilities.ClasspathResourceLoader;
 import org.terasology.utilities.FastRandom;
 
-import javax.vecmath.Vector3f;
-import java.io.FileReader;
-import java.io.IOException;
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
 
 /**
  * Created with IntelliJ IDEA.
@@ -113,9 +121,10 @@ public class GroovyHelpManager {
                     }
                 }
                 else{
-                    for(int j = 0;j<endfilter.length;j++){
-                        if(b.getTitle().endsWith(endfilter[j])){
-                            tempval = b.getTitle().substring(0,b.getTitle().length() - endfilter[j].length());
+                    for (String element : endfilter)
+                    {
+                        if(b.getTitle().endsWith(element)){
+                            tempval = b.getTitle().substring(0,b.getTitle().length() - element.length());
                         }
                     }
                 }

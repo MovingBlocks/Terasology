@@ -15,12 +15,11 @@
  */
 package org.terasology.logic.world;
 
+import java.util.HashSet;
+
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
-import org.terasology.game.Terasology;
 import org.terasology.logic.manager.Config;
-
-import java.util.HashSet;
 
 /**
  * Provides the mechanism for updating and generating chunks.
@@ -63,6 +62,7 @@ public final class ChunkUpdateManager {
 
         // Create a new thread and start processing
         Runnable r = new Runnable() {
+            @Override
             public void run() {
                 c.processChunk();
                 _currentlyProcessedChunks.remove(c);

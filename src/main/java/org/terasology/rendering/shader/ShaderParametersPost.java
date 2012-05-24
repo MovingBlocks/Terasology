@@ -15,25 +15,22 @@
  */
 package org.terasology.rendering.shader;
 
+import static org.lwjgl.opengl.GL11.glBindTexture;
+
+import javax.vecmath.Vector3d;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.game.CoreRegistry;
-import org.terasology.game.Terasology;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AssetManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PostProcessingRenderer;
-import org.terasology.rendering.assets.Texture;
 import org.terasology.logic.world.IWorldProvider;
-import org.terasology.logic.world.LocalWorldProvider;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.world.WorldRenderer;
-
-import static org.lwjgl.opengl.GL11.glBindTexture;
-import javax.vecmath.Vector3d;
 
 /**
  * Shader parameters for the Post-processing shader program.
@@ -44,6 +41,7 @@ public class ShaderParametersPost implements IShaderParameters {
 
     Texture texture = AssetManager.loadTexture("engine:vignette");
 
+    @Override
     public void applyParameters(ShaderProgram program) {
         PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("scene");
 
@@ -63,7 +61,7 @@ public class ShaderParametersPost implements IShaderParameters {
         program.setInt("texBlur", 2);
         program.setInt("texVignette", 3);
         program.setInt("texDepth", 4);
-        
+
         program.setFloat("viewingDistance", Config.getInstance().getActiveViewingDistance() * 8.0f);
 
         if (CoreRegistry.get(LocalPlayer.class).isValid()) {

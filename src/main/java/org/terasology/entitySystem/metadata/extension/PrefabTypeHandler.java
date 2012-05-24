@@ -19,10 +19,7 @@ package org.terasology.entitySystem.metadata.extension;
 import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.entitySystem.metadata.AbstractTypeHandler;
-import org.terasology.entitySystem.metadata.TypeHandler;
 import org.terasology.protobuf.EntityData;
-
-import java.util.List;
 
 /**
  * @author Immortius
