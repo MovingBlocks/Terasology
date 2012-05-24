@@ -1,4 +1,4 @@
-package org.terasology.componentSystem.controllers;
+package org.terasology.mods.miniions.components.componentsystem.controllers;
 
 import org.terasology.components.*;
 import org.terasology.entitySystem.EntityRef;
@@ -9,7 +9,10 @@ import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.GroovyHelpManager;
 import org.terasology.math.Vector3i;
-import org.terasology.rendering.gui.components.UIMinion;
+import org.terasology.mods.miniions.components.MinionBarComponent;
+import org.terasology.mods.miniions.components.MinionComponent;
+import org.terasology.mods.miniions.components.SimpleMinionAIComponent;
+import org.terasology.mods.miniions.gui.components.UIMinion;
 
 import javax.vecmath.Vector3f;
 

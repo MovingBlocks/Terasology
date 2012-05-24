@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.rendering.gui.components.UIMessageBox;
-import org.terasology.rendering.gui.components.UIMinion;
+import org.terasology.mods.miniions.gui.components.UIMinion;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;

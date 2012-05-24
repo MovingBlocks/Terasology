@@ -1,4 +1,4 @@
-package org.terasology.components;
+package org.terasology.mods.miniions.components;
 
 import com.google.common.collect.Lists;
 import org.terasology.entitySystem.Component;

@@ -10,11 +10,10 @@ import org.terasology.entitySystem.PrefabManager;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AssetManager;
-import org.terasology.logic.manager.AudioManager;
 import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.mods.miniions.components.MinionBarComponent;
 
 import javax.vecmath.Vector3f;
-import java.util.Arrays;
 
 /**
  * @author Immortius <immortius@gmail.com>

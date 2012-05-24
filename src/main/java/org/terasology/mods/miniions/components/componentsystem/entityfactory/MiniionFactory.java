@@ -1,4 +1,4 @@
-package org.terasology.entityFactory;
+package org.terasology.mods.miniions.components.componentsystem.entityfactory;
 
 import org.terasology.components.LocationComponent;
 import org.terasology.components.MeshComponent;
@@ -9,7 +9,7 @@ import org.terasology.utilities.FastRandom;
 import javax.vecmath.Vector3f;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * copied from @author Immortius <immortius@gmail.com>
  */
 public class MiniionFactory {
 

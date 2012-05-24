@@ -1,9 +1,9 @@
-package org.terasology.rendering.gui.components;
+package org.terasology.mods.miniions.gui.components;
 
 import org.lwjgl.opengl.Display;
 import org.terasology.components.LocalPlayerComponent;
-import org.terasology.components.MinionBarComponent;
-import org.terasology.components.MinionComponent;
+import org.terasology.mods.miniions.components.MinionBarComponent;
+import org.terasology.mods.miniions.components.MinionComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;

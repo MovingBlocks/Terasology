@@ -1,4 +1,4 @@
-package org.terasology.componentSystem.controllers;
+package org.terasology.mods.miniions.components.componentsystem.controllers;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.componentSystem.block.BlockEntityRegistry;
@@ -18,6 +18,8 @@ import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 
+import org.terasology.mods.miniions.components.MinionComponent;
+import org.terasology.mods.miniions.components.SimpleMinionAIComponent;
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.AxisAngle4f;

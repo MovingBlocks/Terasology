@@ -22,16 +22,15 @@ import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.world.IWorldProvider;
-import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.model.structures.RayBlockIntersection;
+import org.terasology.mods.miniions.components.componentsystem.controllers.MinionSystem;
 import org.terasology.rendering.cameras.DefaultCamera;
 import org.terasology.rendering.gui.menus.UIContainerScreen;
-import org.terasology.rendering.gui.components.UIMinion;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
