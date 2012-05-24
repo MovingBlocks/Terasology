@@ -1,6 +1,6 @@
 package org.terasology.mods.miniions.components.componentsystem.controllers;
 
-import org.terasology.components.*;
+import org.terasology.components.LocalPlayerComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.events.ActivateEvent;
@@ -12,7 +12,7 @@ import org.terasology.math.Vector3i;
 import org.terasology.mods.miniions.components.MinionBarComponent;
 import org.terasology.mods.miniions.components.MinionComponent;
 import org.terasology.mods.miniions.components.SimpleMinionAIComponent;
-import org.terasology.mods.miniions.gui.components.UIMinion;
+import org.terasology.mods.miniions.rendering.gui.components.UIMinion;
 
 import javax.vecmath.Vector3f;
 
@@ -29,6 +29,10 @@ public class MinionSystem implements EventHandlerSystem {
     private final int popupentries = 9;
     private final String behaviourmenu = "minionbehaviour";
     private UIMinion minionbehaviourmenu;
+    public enum Messages{
+        NoPath,
+        Idle
+    }
 
     public void initialise() {}
 
@@ -230,5 +234,25 @@ public class MinionSystem implements EventHandlerSystem {
         LocalPlayerComponent localPlayerComponent = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
         localPlayerComponent.minionSelect = mode;
         localPlayer.getEntity().saveComponent(localPlayerComponent);
+    }
+
+    public String[] getMessage(Messages messages){
+        switch (messages){
+            case NoPath:{
+                String[] content = new String[3];
+                content[0] = "Command not executed"; //description
+                content[1] = "No Path found"; //Title
+                content[2] = "The minion couldn't find a path to destination"; //body
+                return content;
+            }
+            case Idle:{
+                String[] content = new String[3];
+                content[0] = "No more commands"; //description
+                content[1] = "iddle minion"; //Title
+                content[2] = "The minion has no more commands to execute and is now iddle"; //body
+                return content;
+            }
+        }
+        return null;
     }
 }

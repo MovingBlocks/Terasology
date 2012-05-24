@@ -17,12 +17,18 @@ package org.terasology.rendering.gui.menus;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
-import org.terasology.mods.miniions.gui.components.UIMinionbar;
+import org.terasology.mods.miniions.components.MinionComponent;
+import org.terasology.mods.miniions.events.MinionMessageEvent;
+import org.terasology.mods.miniions.rendering.gui.components.UIMessageQueue;
+import org.terasology.mods.miniions.rendering.gui.components.UIMinionbar;
 import org.terasology.rendering.gui.components.*;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.primitives.ChunkTessellator;
@@ -35,7 +41,7 @@ import javax.vecmath.Vector2f;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class UIHeadsUpDisplay extends UIDisplayRenderer {
+public class UIHeadsUpDisplay extends UIDisplayRenderer implements EventHandlerSystem{
 
     /* DISPLAY ELEMENTS */
     private final UICrosshair _crosshair;
@@ -47,7 +53,7 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
 
     private final UIToolbar _toolbar;
     private final UIMinionbar _minionbar;
-    //private final UIMinion _miniongui;
+    private final UIMessageQueue _messagequeue;
     private final UIHealthBar _healthBar;
     private final UIBuff _buffBar;
 
@@ -79,10 +85,10 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
         _minionbar = new UIMinionbar();
         _minionbar.setVisible(true);
         addDisplayElement(_minionbar);
-        /*
-        _miniongui = new UIMinion();
-        _miniongui.setVisible(true);
-        addDisplayElement(_miniongui);*/
+
+        _messagequeue = new UIMessageQueue();
+        _messagequeue.setVisible(true);
+        addDisplayElement(_messagequeue);
 
         _healthBar = new UIHealthBar();
         _healthBar.setVisible(true);
@@ -139,5 +145,17 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
 
     public UIDebugConsole getDebugConsole() {
         return _console;
+    }
+
+    @Override
+    public void initialise() {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @ReceiveEvent(components = {MinionComponent.class})
+    public void onMessageReiceived(MinionMessageEvent event, EntityRef entity) {
+        if(event.getMessageContent().length > 2){
+            _messagequeue.addIconToQueue(event.getMessageType(),event.getMessageContent());
+        }
     }
 }

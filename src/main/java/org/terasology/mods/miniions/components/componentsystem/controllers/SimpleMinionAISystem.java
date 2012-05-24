@@ -2,7 +2,8 @@ package org.terasology.mods.miniions.components.componentsystem.controllers;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.componentSystem.block.BlockEntityRegistry;
-import org.terasology.components.*;
+import org.terasology.components.CharacterMovementComponent;
+import org.terasology.components.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
@@ -12,14 +13,14 @@ import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.mods.miniions.logic.pathfinder.AStarPathing;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
-
 import org.terasology.mods.miniions.components.MinionComponent;
 import org.terasology.mods.miniions.components.SimpleMinionAIComponent;
+import org.terasology.mods.miniions.events.MinionMessageEvent;
+import org.terasology.mods.miniions.logic.pathfinder.AStarPathing;
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.AxisAngle4f;
@@ -185,6 +186,10 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                             if(ai.previousTarget != ai.movementTargets.get(0)){
                                 ai.locked = true;
                                 ai.pathTargets = aStarPathing.findPath(worldPos, new Vector3f(currentTarget));
+                                if(ai.pathTargets == null){
+                                    MinionSystem minionSystem = new MinionSystem();
+                                    entity.send(new MinionMessageEvent(localPlayer.getEntity(),entity,worldPos, MinionMessageEvent.MessageType.Debug,minionSystem.getMessage(MinionSystem.Messages.NoPath)));
+                                }
                             }
                             ai.locked = false;
                             if(ai.pathTargets != null && ai.pathTargets.size() > 0){

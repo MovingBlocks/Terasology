@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.mods.miniions.gui.components;
+package org.terasology.mods.miniions.rendering.gui.components;
 
 import org.lwjgl.opengl.Display;
 import org.terasology.logic.manager.AssetManager;

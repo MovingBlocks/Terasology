@@ -1,14 +1,15 @@
-package org.terasology.mods.miniions.gui.components;
+package org.terasology.mods.miniions.rendering.gui.components;
 
 import org.lwjgl.opengl.Display;
 import org.terasology.components.LocalPlayerComponent;
-import org.terasology.mods.miniions.components.MinionBarComponent;
-import org.terasology.mods.miniions.components.MinionComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AssetManager;
-import org.terasology.rendering.gui.framework.*;
+import org.terasology.mods.miniions.components.MinionBarComponent;
+import org.terasology.mods.miniions.components.MinionComponent;
+import org.terasology.rendering.gui.framework.UIDisplayWindow;
+import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 import javax.vecmath.Vector2f;
 
