@@ -121,25 +121,19 @@ public class Mesh implements Asset {
         int uv1 = 0, uv2 = 0, n = 0, c = 0;
         for (int v = 0; v < vertices.size(); v += 3) {
             vertexBuffer.put(vertices.get(v)).put(vertices.get(v + 1)).put(vertices.get(v + 2));
-            for (int i = 0; i < texCoord0Size; ++i) {
+            for (int i = 0; i < texCoord0Size; ++i)
                 vertexBuffer.put(texcoord0.get(uv1 + i));
-            }
-            for (int i = 0; i < texCoord1Size; ++i) {
+            for (int i = 0; i < texCoord1Size; ++i)
                 vertexBuffer.put(texcoord1.get(uv2 + i));
-            }
-            for (int i = 0; i < normalSize; ++i) {
+            for (int i = 0; i < normalSize; ++i)
                 vertexBuffer.put(normals.get(n + i));
-            }
-            for (int i = 0; i < colorSize; ++i) {
+            for (int i = 0; i < colorSize; ++i)
                 vertexBuffer.put(colors.get(c + i));
-            }
-
             uv1 += texCoord0Size;
             uv2 += texCoord1Size;
             n += normalSize;
             c += colorSize;
         }
-
         vertexBuffer.flip();
         return vertexBuffer;
     }

@@ -41,7 +41,6 @@ public class PersistableObject {
         if (getObjectFileName() != null && getObjectSavePath() != null) {
             _file = new File(getObjectSavePath(), getObjectFileName());
             _path = getObjectSavePath();
-
             if (_file.exists())
                 readPropertiesFromConfigObject(readPropertiesFromFile());
         }
@@ -58,7 +57,6 @@ public class PersistableObject {
             // Make sure the directories exist
             if (!_path.exists())
                 _path.mkdirs();
-
             FileWriter writer = new FileWriter(_file);
             co.writeTo(writer);
             writer.close();
@@ -73,7 +71,6 @@ public class PersistableObject {
         } catch (MalformedURLException e) {
             logger.log(Level.SEVERE, "Failed reading config object. Sorry.", e);
         }
-
         return new ConfigObject();
     }
 

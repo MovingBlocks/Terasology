@@ -147,14 +147,12 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
     }
 
     public boolean generate() {
-        if (isFresh()) {
-            for (ChunkGenerator gen : _parent.getGeneratorManager().getChunkGenerators()) {
+        if (isFresh())
+        {
+            for (ChunkGenerator gen : _parent.getGeneratorManager().getChunkGenerators())
                 gen.generate(this);
-            }
-
             generateSunlight();
             setFresh(false);
-
             return true;
         }
         return false;
@@ -163,33 +161,25 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
     public void updateLight() {
         if (isFresh() || !isLightDirty())
             return;
-
-        for (int x = 0; x < CHUNK_DIMENSION_X; x++) {
-            for (int z = 0; z < CHUNK_DIMENSION_Z; z++) {
-                for (int y = CHUNK_DIMENSION_Y - 1; y >= 0; y--) {
+        for (int x = 0; x < CHUNK_DIMENSION_X; x++)
+            for (int z = 0; z < CHUNK_DIMENSION_Z; z++)
+                for (int y = CHUNK_DIMENSION_Y - 1; y >= 0; y--)
+                {
                     byte blockValue = getBlock(x, y, z);
                     byte lightValue = getLight(x, y, z, LIGHT_TYPE.SUN);
-
-                    if (!BlockManager.getInstance().getBlock(blockValue).isTranslucent()) {
+                    if (!BlockManager.getInstance().getBlock(blockValue).isTranslucent())
                         continue;
-                    }
                     // Spread the sunlight in translucent blocks with a light value greater than zero.
-                    if (lightValue > 0) {
+                    if (lightValue > 0)
                         spreadLight(x, y, z, lightValue, LIGHT_TYPE.SUN);
-                    }
                 }
-            }
-        }
-
         setLightDirty(false);
     }
 
     private void generateSunlight() {
-        for (int x = 0; x < CHUNK_DIMENSION_X; x++) {
-            for (int z = 0; z < CHUNK_DIMENSION_Z; z++) {
+        for (int x = 0; x < CHUNK_DIMENSION_X; x++)
+            for (int z = 0; z < CHUNK_DIMENSION_Z; z++)
                 refreshSunlightAtLocalPos(x, z, false, false);
-            }
-        }
     }
 
     public void refreshSunlightAtLocalPos(int x, int z, boolean spreadLight, boolean refreshSunlight) {
@@ -200,9 +190,8 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
             Block b = BlockManager.getInstance().getBlock(blockId);
 
             // Remember if this "column" is covered
-            if (!b.isInvisible() && b.getBlockForm() != Block.BLOCK_FORM.BILLBOARD && !covered) {
+            if (!b.isInvisible() && b.getBlockForm() != Block.BLOCK_FORM.BILLBOARD && !covered)
                 covered = true;
-            }
 
             byte oldValue = _sunlight.get(x, y, z);
             byte newValue;
@@ -211,33 +200,25 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
             if (!covered) {
                 if (b.isInvisible() || b.getBlockForm() == Block.BLOCK_FORM.BILLBOARD)
                     _sunlight.set(x, y, z, (byte) 15);
-                else
-                    _sunlight.set(x, y, z, (byte) 0x0);
-
+                else _sunlight.set(x, y, z, (byte) 0x0);
                 newValue = _sunlight.get(x, y, z);
-
                 // Otherwise the column is covered. Don't generate any light in the cells...
-            } else {
+            }
+            else {
                 _sunlight.set(x, y, z, (byte) 0);
-
                 // Update the sunlight at the current position (check the surrounding cells)
-                if (refreshSunlight) {
+                if (refreshSunlight)
                     refreshLightAtLocalPos(x, y, z, LIGHT_TYPE.SUN);
-                }
-
                 newValue = _sunlight.get(x, y, z);
             }
-
-
             if (spreadLight && oldValue > newValue)
                 unspreadLight(x, y, z, oldValue, Chunk.LIGHT_TYPE.SUN);
-            else if (spreadLight && oldValue < newValue) {
+            else if (spreadLight && oldValue < newValue)
                 /*
                 * Spread sunlight if the new light value is more intense
                 * than the old value.
                 */
                 spreadLight(x, y, z, newValue, LIGHT_TYPE.SUN);
-            }
         }
     }
 

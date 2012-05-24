@@ -79,32 +79,28 @@ public class AABB {
      */
     public AABB(Iterable<AABB> others) {
         Iterator<AABB> i = others.iterator();
-        if (!i.hasNext()) {
+        if (!i.hasNext())
             _dimensions = new Vector3d();
-        } else {
+        else
+        {
             AABB first = i.next();
             Vector3d min = new Vector3d(first.minX(), first.minY(), first.minZ());
             Vector3d max = new Vector3d(first.maxX(), first.maxY(), first.maxZ());
-            while (i.hasNext()) {
+            while (i.hasNext())
+            {
                 AABB next = i.next();
-                if (next.minX() < min.x) {
+                if (next.minX() < min.x)
                     min.x = next.minX();
-                }
-                if (next.minY() < min.y) {
+                if (next.minY() < min.y)
                     min.y = next.minY();
-                }
-                if (next.minZ() < min.z) {
+                if (next.minZ() < min.z)
                     min.z = next.minZ();
-                }
-                if (next.maxX() > max.x) {
+                if (next.maxX() > max.x)
                     max.x = next.maxX();
-                }
-                if (next.maxY() > max.y) {
+                if (next.maxY() > max.y)
                     max.y = next.maxY();
-                }
-                if (next.maxZ() > max.z) {
+                if (next.maxZ() > max.z)
                     max.z = next.maxZ();
-                }
             }
             _position.set(max);
             _position.add(min);
