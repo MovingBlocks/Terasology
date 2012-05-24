@@ -1,4 +1,4 @@
-package org.terasology.logic.pathfinder;
+package org.terasology.mods.miniions.logic.pathfinder;
 
 /**
  * Created with IntelliJ IDEA.

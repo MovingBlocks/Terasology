@@ -12,7 +12,7 @@ import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.pathfinder.AStarPathing;
+import org.terasology.mods.miniions.logic.pathfinder.AStarPathing;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;

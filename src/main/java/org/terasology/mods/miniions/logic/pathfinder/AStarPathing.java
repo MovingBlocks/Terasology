@@ -1,4 +1,4 @@
-package org.terasology.logic.pathfinder;
+package org.terasology.mods.miniions.logic.pathfinder;
 
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.model.blocks.management.BlockManager;
