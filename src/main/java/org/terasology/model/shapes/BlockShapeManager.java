@@ -30,7 +30,6 @@ public class BlockShapeManager {
     public static BlockShapeManager getInstance() {
         if (instance == null)
             instance = new BlockShapeManager();
-
         return instance;
     }
 

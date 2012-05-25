@@ -15,18 +15,44 @@
  */
 package org.terasology.logic.manager;
 
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.*;
-import org.terasology.game.CoreRegistry;
-import org.terasology.game.Terasology;
-import org.terasology.math.TeraMath;
-import org.terasology.rendering.shader.ShaderProgram;
-import org.terasology.rendering.world.WorldRenderer;
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
+import static org.lwjgl.opengl.GL11.GL_PROJECTION;
+import static org.lwjgl.opengl.GL11.GL_QUADS;
+import static org.lwjgl.opengl.GL11.glBegin;
+import static org.lwjgl.opengl.GL11.glCallList;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glColor4f;
+import static org.lwjgl.opengl.GL11.glEnd;
+import static org.lwjgl.opengl.GL11.glEndList;
+import static org.lwjgl.opengl.GL11.glGenLists;
+import static org.lwjgl.opengl.GL11.glGetTexImage;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glMatrixMode;
+import static org.lwjgl.opengl.GL11.glNewList;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glTexCoord2d;
+import static org.lwjgl.opengl.GL11.glVertex3i;
+import static org.lwjgl.opengl.GL11.glViewport;
 
 import java.nio.FloatBuffer;
 import java.util.HashMap;
 
-import static org.lwjgl.opengl.GL11.*;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.ARBHalfFloatPixel;
+import org.lwjgl.opengl.ARBTextureFloat;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.EXTFramebufferObject;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL14;
+import org.lwjgl.opengl.GLContext;
+import org.terasology.game.CoreRegistry;
+import org.terasology.math.TeraMath;
+import org.terasology.rendering.shader.ShaderProgram;
+import org.terasology.rendering.world.WorldRenderer;
 
 /**
  * TODO

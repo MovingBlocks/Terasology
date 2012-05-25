@@ -16,21 +16,33 @@
 
 package org.terasology.model.shapes;
 
-import com.google.common.collect.Lists;
-import com.google.gson.*;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.procedure.TIntProcedure;
-import org.terasology.math.Side;
-import org.terasology.model.structures.AABB;
 
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
-import java.io.*;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Locale;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
+
+import org.terasology.math.Side;
+import org.terasology.model.structures.AABB;
+
+import com.google.common.collect.Lists;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 
 /**
  * @author Immortius

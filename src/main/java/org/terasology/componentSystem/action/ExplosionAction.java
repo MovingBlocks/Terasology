@@ -1,12 +1,13 @@
 package org.terasology.componentSystem.action;
 
+import javax.vecmath.Vector3f;
+
 import org.terasology.componentSystem.block.BlockEntityRegistry;
 import org.terasology.components.actions.ExplosionActionComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.ActivateEvent;
-import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.Vector3i;
@@ -14,8 +15,6 @@ import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
 import org.terasology.utilities.FastRandom;
-
-import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -27,6 +26,7 @@ public class ExplosionAction implements EventHandlerSystem {
     private BulletPhysicsRenderer physicsRenderer;
     private BlockEntityRegistry blockEntityRegistry;
 
+    @Override
     public void initialise() {
         worldProvider = CoreRegistry.get(IWorldProvider.class);
         physicsRenderer = CoreRegistry.get(BulletPhysicsRenderer.class);
@@ -65,7 +65,7 @@ public class ExplosionAction implements EventHandlerSystem {
                     // TODO: this should be handled centrally somewhere. Actions shouldn't be determining world behaviour
                     // like what happens when a block is destroyed.
                     worldProvider.setBlock(blockPos, (byte)0x0, true, true);
-                    
+
                     EntityRef blockEntity = blockEntityRegistry.getEntityAt(blockPos);
                     blockEntity.destroy();
                     physicsRenderer.addTemporaryBlock(target, currentBlockType, impulse, BulletPhysicsRenderer.BLOCK_SIZE.FULL_SIZE);
