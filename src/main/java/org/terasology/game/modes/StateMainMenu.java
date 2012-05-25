@@ -15,13 +15,14 @@
  */
 package org.terasology.game.modes;
 
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
-import org.terasology.entitySystem.EntityManager;
 import org.terasology.game.GameEngine;
-import org.terasology.game.Terasology;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
@@ -31,8 +32,6 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.menus.UIConfigMenu;
 import org.terasology.rendering.gui.menus.UIMainMenu;
 import org.terasology.rendering.gui.menus.UISelectWorldMenu;
-
-import static org.lwjgl.opengl.GL11.*;
 
 /**
  * The class implements the main game menu.
@@ -77,6 +76,7 @@ public class StateMainMenu implements GameState {
 
 
         singlePlayerButton.addClickListener(new IClickListener() {
+            @Override
             public void clicked(UIDisplayElement element) {
               //  _mainMenu.setVisible(false);
               //  _selectWorldMenu.setVisible(true);
@@ -86,12 +86,14 @@ public class StateMainMenu implements GameState {
         });
 
         exitButton.addClickListener(new IClickListener() {
+            @Override
             public void clicked(UIDisplayElement element) {
                 _gameInstance.shutdown();
             }
         });
 
         configButton.addClickListener(new IClickListener() {
+            @Override
             public void clicked(UIDisplayElement element) {
                 GUIManager.getInstance().setFocusedWindow(_configMenu);
             }
@@ -105,6 +107,7 @@ public class StateMainMenu implements GameState {
         UIButton goToBack = (UIButton)_selectWorldMenu.getElementById("goToBackButton");
 
         goToBack.addClickListener(new IClickListener() {
+            @Override
             public void clicked(UIDisplayElement element) {
                 GUIManager.getInstance().setFocusedWindow(_mainMenu);
             }
@@ -119,8 +122,9 @@ public class StateMainMenu implements GameState {
         UIButton graphicsQualityButton = (UIButton)_configMenu.getElementById("graphicsQualityButton");
         UIButton FOVButton             = (UIButton)_configMenu.getElementById("fovButton");
         UIButton viewingDistanceButton = (UIButton)_configMenu.getElementById("viewingDistanceButton");
-        
+
         backToMainMenuButton.addClickListener(new IClickListener() {
+            @Override
             public void clicked(UIDisplayElement element) {
                 _mainMenu.setVisible(true);
                 _configMenu.setVisible(false);
@@ -128,6 +132,7 @@ public class StateMainMenu implements GameState {
         });
 
         graphicsQualityButton.addClickListener(new IClickListener() {
+            @Override
             public void clicked(UIDisplayElement element) {
                 UIButton button = (UIButton) element;
 
@@ -145,6 +150,7 @@ public class StateMainMenu implements GameState {
         });
 
         FOVButton.addClickListener(new IClickListener() {
+            @Override
             public void clicked(UIDisplayElement element) {
                 UIButton button = (UIButton) element;
 
@@ -184,6 +190,7 @@ public class StateMainMenu implements GameState {
         });
 
         viewingDistanceButton.addClickListener(new IClickListener() {
+            @Override
             public void clicked(UIDisplayElement element) {
                 UIButton button = (UIButton) element;
 

@@ -15,22 +15,17 @@
  */
 package org.terasology.rendering.gui.components;
 
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
+import javax.vecmath.Vector2f;
+
 import org.terasology.components.HealthComponent;
 import org.terasology.components.PoisonedComponent;
-import org.terasology.components.SpeedBoostComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
-import org.terasology.game.Terasology;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AssetManager;
-import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
-
-import javax.vecmath.Vector2f;
 
 /**
  * Small health bar that visualizes the current amount of health points of the player
@@ -74,7 +69,7 @@ public class UIHealthBar extends UIDisplayContainer {
 
         // Show/Hide hearts relatively to the available health points of the player
         for (int i = 0; i < 10; i++) {
-            
+
             if (i < healthRatio * 10f)
                 _hearts[i].setVisible(true);
             else

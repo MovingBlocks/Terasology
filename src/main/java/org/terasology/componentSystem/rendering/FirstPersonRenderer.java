@@ -1,11 +1,32 @@
 package org.terasology.componentSystem.rendering;
 
-import com.google.common.collect.Maps;
+import static org.lwjgl.opengl.GL11.GL_GREATER;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.glAlphaFunc;
+import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glRotatef;
+import static org.lwjgl.opengl.GL11.glScalef;
+import static org.lwjgl.opengl.GL11.glTranslatef;
+
+import java.util.Map;
+
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
+
 import org.lwjgl.opengl.GL11;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.componentSystem.RenderSystem;
-import org.terasology.components.*;
+import org.terasology.components.BlockItemComponent;
+import org.terasology.components.CharacterMovementComponent;
+import org.terasology.components.InventoryComponent;
+import org.terasology.components.ItemComponent;
+import org.terasology.components.LocalPlayerComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
@@ -25,12 +46,7 @@ import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
 
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
-import java.util.Map;
-
-import static org.lwjgl.opengl.GL11.*;
+import com.google.common.collect.Maps;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -42,9 +58,10 @@ public class FirstPersonRenderer implements RenderSystem {
     private WorldRenderer worldRenderer;
     private Mesh handMesh;
     private Texture handTex;
-    
+
     private Map<String, Mesh> iconMeshes = Maps.newHashMap();
-    
+
+    @Override
     public void initialise() {
         localPlayer = CoreRegistry.get(LocalPlayer.class);
         worldProvider = CoreRegistry.get(IWorldProvider.class);
@@ -59,14 +76,17 @@ public class FirstPersonRenderer implements RenderSystem {
         handTex = AssetManager.loadTexture("engine:char");
     }
 
+    @Override
     public void renderOpaque() {
 
     }
 
+    @Override
     public void renderTransparent() {
 
     }
 
+    @Override
     public void renderFirstPerson() {
         CharacterMovementComponent charMoveComp = localPlayer.getEntity().getComponent(CharacterMovementComponent.class);
         float bobOffset = calcBobbingOffset(charMoveComp.footstepDelta / charMoveComp.distanceBetweenFootsteps, (float) java.lang.Math.PI / 8f, 0.05f, 1f) ;
@@ -86,6 +106,7 @@ public class FirstPersonRenderer implements RenderSystem {
 
     }
 
+    @Override
     public void renderOverlay() {
 
     }
@@ -107,7 +128,7 @@ public class FirstPersonRenderer implements RenderSystem {
 
         glPopMatrix();
     }
-    
+
     private void renderIcon(String iconName, float bobOffset, float handMovementAnimationOffset) {
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
         shader.enable();
@@ -134,7 +155,7 @@ public class FirstPersonRenderer implements RenderSystem {
 
         glPopMatrix();
     }
-    
+
     private void renderBlock(BlockFamily blockFamily, float bobOffset, float handMovementAnimationOffset) {
         Block activeBlock = blockFamily.getArchetypeBlock();
         Vector3f playerPos = localPlayer.getPosition();
@@ -177,5 +198,5 @@ public class FirstPersonRenderer implements RenderSystem {
         return (float)java.lang.Math.sin(2 * Math.PI * counter * frequency + phaseOffset) * amplitude;
     }
 
-    
+
 }

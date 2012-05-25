@@ -15,7 +15,14 @@
  */
 package org.terasology.logic.manager;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Logger;
+
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
+
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.audio.OpenALManager;
@@ -27,14 +34,7 @@ import org.terasology.components.CharacterMovementComponent;
 import org.terasology.components.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
-import java.io.IOException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Logger;
+import com.bulletphysics.linearmath.QuaternionUtil;
 
 /**
  * Simple managing class for loading and accessing audio files.
@@ -65,8 +65,9 @@ public abstract class AudioManager implements SoundManager {
      * @param pool Sound pool name
      * @return Sound pool object
      */
+    @Override
     public SoundPool getSoundPool(String pool) {
-        SoundPool soundPool = this._pools.get(pool);
+        SoundPool soundPool = _pools.get(pool);
 
         if (soundPool == null) {
             throw new IllegalArgumentException("Unknown pool '" + pool + "', typo? Available pools: " + _pools.keySet());
@@ -75,10 +76,12 @@ public abstract class AudioManager implements SoundManager {
         return soundPool;
     }
 
+    @Override
     public SoundSource getSoundSource(String pool, Sound sound, int priority) {
         return getSoundPool(pool).getSource(sound, priority);
     }
 
+    @Override
     public SoundSource getSoundSource(String pool, AssetUri soundUri, int priority) {
         Sound sound = (Sound)AssetManager.load(soundUri);
         if (sound != null) {
@@ -90,6 +93,7 @@ public abstract class AudioManager implements SoundManager {
     /**
      * Stops all playback.
      */
+    @Override
     public void stopAllSounds() {
         for (SoundPool pool : _pools.values()) {
             pool.stopAll();
@@ -281,7 +285,7 @@ public abstract class AudioManager implements SoundManager {
     public static SoundSource play(Sound sound, EntityRef entity, float gain, int priority) {
         Vector3f pos = getEntityPosition(entity);
         if (pos == null) return null;
-        
+
         SoundSource source = source(sound, new Vector3d(pos), gain, priority);
 
         if (source == null) {
@@ -291,7 +295,7 @@ public abstract class AudioManager implements SoundManager {
 
         return source.setVelocity(new Vector3d(getEntityVelocity(entity))).setDirection(new Vector3d(getEntityDirection(entity))).play();
     }
-    
+
     private static Vector3f getEntityPosition(EntityRef entity) {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc != null) {
@@ -314,7 +318,7 @@ public abstract class AudioManager implements SoundManager {
         }
         return new Vector3f();
     }
-    
+
     private static Vector3f getEntityVelocity(EntityRef entity) {
         CharacterMovementComponent charMove = entity.getComponent(CharacterMovementComponent.class);
         if (charMove != null) {

@@ -26,15 +26,13 @@ public final class Timer {
     public float getDelta() {
         if (_delta >= 100)
             return 0.1f;
-
-        return _delta / 1000f;
+        else return _delta / 1000f;
     }
 
     public double getDeltaInMS() {
         if (_delta >= 100)
             return 100;
-
-        return _delta;
+        else return _delta;
     }
 
     public double getFps() {

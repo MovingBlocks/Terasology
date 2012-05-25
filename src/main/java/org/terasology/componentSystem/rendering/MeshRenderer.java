@@ -1,5 +1,16 @@
 package org.terasology.componentSystem.rendering;
 
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glRotatef;
+import static org.lwjgl.opengl.GL11.glScalef;
+import static org.lwjgl.opengl.GL11.glTranslated;
+
+import javax.vecmath.AxisAngle4f;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
+
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.components.AABBCollisionComponent;
 import org.terasology.components.LocationComponent;
@@ -7,7 +18,6 @@ import org.terasology.components.MeshComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
-import org.terasology.game.Terasology;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.TeraMath;
@@ -18,13 +28,6 @@ import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
 
-import javax.vecmath.AxisAngle4f;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
-
-import static org.lwjgl.opengl.GL11.*;
-
 /**
  * TODO: This should be made generic (no explicit shader or mesh) and ported directly into WorldRenderer?
  * @author Immortius <immortius@gmail.com>
@@ -34,6 +37,7 @@ public class MeshRenderer implements RenderSystem {
     private Mesh mesh;
     private WorldRenderer worldRenderer;
 
+    @Override
     public void initialise() {
         manager = CoreRegistry.get(EntityManager.class);
         worldRenderer = CoreRegistry.get(WorldRenderer.class);
@@ -44,6 +48,7 @@ public class MeshRenderer implements RenderSystem {
         mesh = tessellator.generateMesh();
     }
 
+    @Override
     public void renderTransparent() {
 
         Vector3d cameraPosition = worldRenderer.getActiveCamera().getPosition();
@@ -83,6 +88,7 @@ public class MeshRenderer implements RenderSystem {
         }
     }
 
+    @Override
     public void renderOpaque() {
         boolean carryingTorch = CoreRegistry.get(LocalPlayer.class).isCarryingTorch();
         Vector3d cameraPosition = worldRenderer.getActiveCamera().getPosition();
@@ -120,9 +126,11 @@ public class MeshRenderer implements RenderSystem {
         }
     }
 
+    @Override
     public void renderOverlay() {
     }
 
+    @Override
     public void renderFirstPerson() {
     }
 }
