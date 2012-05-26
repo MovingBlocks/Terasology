@@ -1,10 +1,7 @@
 package org.terasology.logic.manager;
 
-import java.util.*;
-import java.lang.reflect.*;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
-import org.terasology.components.ItemComponent;
 import org.terasology.components.MinionBarComponent;
 import org.terasology.entityFactory.GelatinousCubeFactory;
 import org.terasology.entitySystem.EntityManager;
@@ -20,12 +17,14 @@ import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.RayBlockIntersection;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.utilities.ClasspathResourceLoader;
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.Vector3f;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -45,7 +44,8 @@ public class GroovyHelpManager {
     {
         HashMap<String,String> commandlist = new HashMap<String, String>();
         Gson gson = new Gson();
-        JsonReader reader = new JsonReader(new FileReader(".\\data\\help\\commands\\commands.json"));
+        String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data" + File.pathSeparator + "help" + File.pathSeparator + "commands" + File.pathSeparator + "commands.json";
+        JsonReader reader = new JsonReader(new FileReader(helpFile));
         reader.beginArray();
         while (reader.hasNext()) {
             groovyhelp = gson.fromJson(reader,GroovyHelp.class);
@@ -74,7 +74,8 @@ public class GroovyHelpManager {
         try
         {
             Gson gson = new Gson();
-            JsonReader reader = new JsonReader(new FileReader(".\\data\\help\\commands\\commands.json"));
+            String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data" + File.pathSeparator + "help" + File.pathSeparator + "commands" + File.pathSeparator + "commands.json";
+            JsonReader reader = new JsonReader(new FileReader(helpFile));
             reader.beginArray();
             while (reader.hasNext()) {
                 groovyhelp = gson.fromJson(reader,GroovyHelp.class);
