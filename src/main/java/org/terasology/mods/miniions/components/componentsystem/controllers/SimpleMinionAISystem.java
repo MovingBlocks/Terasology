@@ -21,6 +21,8 @@ import org.terasology.mods.miniions.components.MinionComponent;
 import org.terasology.mods.miniions.components.SimpleMinionAIComponent;
 import org.terasology.mods.miniions.events.MinionMessageEvent;
 import org.terasology.mods.miniions.logic.pathfinder.AStarPathing;
+import org.terasology.mods.miniions.utilities.MinionMessage;
+import org.terasology.mods.miniions.utilities.MinionMessageType;
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.AxisAngle4f;
@@ -188,7 +190,9 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                                 ai.pathTargets = aStarPathing.findPath(worldPos, new Vector3f(currentTarget));
                                 if(ai.pathTargets == null){
                                     MinionSystem minionSystem = new MinionSystem();
-                                    entity.send(new MinionMessageEvent(localPlayer.getEntity(),entity,worldPos, MinionMessageEvent.MessageType.Debug,minionSystem.getMessage(MinionSystem.Messages.NoPath)));
+                                    MinionMessage messagetosend = new MinionMessage(MinionMessageType.Debug,"test","testdesc","testcont",entity,localPlayer.getEntity());
+                                    entity.send(new MinionMessageEvent(messagetosend));
+                                    ai.movementTargets.remove(0);
                                 }
                             }
                             ai.locked = false;
@@ -205,14 +209,16 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                             dist.sub(currentTarget);
                             double distanceToTarget = dist.length();
 
-                            // TODO need a good way to deal with distance calculation
                             if(distanceToTarget < 0.1d){
                                 if(ai.pathTargets != null && ai.pathTargets.size() > 0){
                                     ai.pathTargets.remove(0);
                                     entity.saveComponent(ai);
                                 }
                                 else{
-                                    ai.movementTargets.remove(0);
+                                    if(ai.movementTargets.size() > 0)
+                                    {
+                                        ai.movementTargets.remove(0);
+                                    }
                                     ai.previousTarget = null;
                                     entity.saveComponent(ai);
                                 }

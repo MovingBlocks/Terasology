@@ -16,14 +16,14 @@
 package org.terasology.rendering.gui.framework;
 
 import org.lwjgl.opengl.Display;
+import org.terasology.rendering.gui.framework.style.UIStyle;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
 import java.util.ArrayList;
 import java.util.HashMap;
+
 import static org.lwjgl.opengl.GL11.*;
-import org.lwjgl.opengl.Display;
-import org.terasology.rendering.gui.framework.style.UIStyle;
 
 /**
  * Composition of multiple display elements.
@@ -32,7 +32,7 @@ import org.terasology.rendering.gui.framework.style.UIStyle;
  */
 public abstract class UIDisplayContainer extends UIDisplayElement {
 
-    final ArrayList<UIDisplayElement> _displayElements = new ArrayList<UIDisplayElement>();
+    protected final ArrayList<UIDisplayElement> _displayElements = new ArrayList<UIDisplayElement>();
     private boolean _crop               = false;
 
     protected UIStyle _style       = null;

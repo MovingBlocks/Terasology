@@ -17,6 +17,7 @@ package org.terasology.rendering.gui.menus;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
+import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
@@ -41,7 +42,9 @@ import javax.vecmath.Vector2f;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class UIHeadsUpDisplay extends UIDisplayRenderer implements EventHandlerSystem{
+public class UIHeadsUpDisplay extends UIDisplayRenderer implements EventHandlerSystem {
+
+    protected EntityManager entityManager;
 
     /* DISPLAY ELEMENTS */
     private final UICrosshair _crosshair;
@@ -149,13 +152,11 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer implements EventHandlerS
 
     @Override
     public void initialise() {
-        //To change body of implemented methods use File | Settings | File Templates.
+        entityManager = CoreRegistry.get(EntityManager.class);
     }
 
     @ReceiveEvent(components = {MinionComponent.class})
-    public void onMessageReiceived(MinionMessageEvent event, EntityRef entity) {
-        if(event.getMessageContent().length > 2){
-            _messagequeue.addIconToQueue(event.getMessageType(),event.getMessageContent());
-        }
+    public void onMessageReceived(MinionMessageEvent event, EntityRef entityref) {
+        _messagequeue.addIconToQueue(event.getMinionMessage());
     }
 }

@@ -84,23 +84,27 @@ public class AStarPathing extends Pathfinder{
                     openSet.add(neighbor);
                 }
             }
+            /*
             if(openSet.size() > 3)
             {
                 Iterator<PathNode> it = openSet.iterator();
                 PathNode first = it.next();
                 PathNode[] closedSet = new PathNode[8];
                 int loopCounter = 0;
+                try{
                 while(it.hasNext()){
-                    PathNode tmpNode = it.next();
+                    PathNode tmpNode = it.next();                 wwwwwwwwwwwwwwww
                     if(tmpNode.totalCost > first.totalCost) {
                         closedSet[loopCounter] = tmpNode;
                         loopCounter++;
                     }
                 }
-                for(int i = 0;i<closedSet.length; i++){
+
+                for(int i = 0;i<loopCounter; i++){
                     openSet.remove(closedSet[i]);
-                }
-            }
+                }}catch (ArrayIndexOutOfBoundsException e){
+                    e.printStackTrace();}
+            }*/
         }
         System.out.println("Path not found!");
         PerformanceMonitor.endActivity();

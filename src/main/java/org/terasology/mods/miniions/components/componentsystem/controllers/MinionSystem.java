@@ -12,7 +12,10 @@ import org.terasology.math.Vector3i;
 import org.terasology.mods.miniions.components.MinionBarComponent;
 import org.terasology.mods.miniions.components.MinionComponent;
 import org.terasology.mods.miniions.components.SimpleMinionAIComponent;
+import org.terasology.mods.miniions.events.MinionMessageEvent;
 import org.terasology.mods.miniions.rendering.gui.components.UIMinion;
+import org.terasology.mods.miniions.utilities.MinionMessage;
+import org.terasology.mods.miniions.utilities.MinionMessageType;
 
 import javax.vecmath.Vector3f;
 
@@ -143,6 +146,11 @@ public class MinionSystem implements EventHandlerSystem {
                 break;
             }
             case Test:{
+                LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+                if(localPlayer == null) return;
+                EntityRef entity = getSelectedMinion();
+                MinionMessage messagetosend = new MinionMessage(MinionMessageType.Debug,"test","testdesc","testcont",entity,localPlayer.getEntity());
+                entity.send(new MinionMessageEvent(messagetosend));
                 break;
             }
             case Disappear:{
