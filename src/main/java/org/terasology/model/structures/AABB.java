@@ -15,18 +15,32 @@
  */
 package org.terasology.model.structures;
 
-import org.lwjgl.opengl.GL11;
-import org.terasology.game.CoreRegistry;
-import org.terasology.game.Terasology;
-import org.terasology.logic.manager.ShaderManager;
-import org.terasology.rendering.world.WorldRenderer;
+import static org.lwjgl.opengl.GL11.GL_LINE_LOOP;
+import static org.lwjgl.opengl.GL11.GL_QUADS;
+import static org.lwjgl.opengl.GL11.glBegin;
+import static org.lwjgl.opengl.GL11.glCallList;
+import static org.lwjgl.opengl.GL11.glColor4f;
+import static org.lwjgl.opengl.GL11.glEnd;
+import static org.lwjgl.opengl.GL11.glEndList;
+import static org.lwjgl.opengl.GL11.glGenLists;
+import static org.lwjgl.opengl.GL11.glLineWidth;
+import static org.lwjgl.opengl.GL11.glNewList;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glScalef;
+import static org.lwjgl.opengl.GL11.glTranslated;
+import static org.lwjgl.opengl.GL11.glVertex3d;
 
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import static org.lwjgl.opengl.GL11.*;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
+
+import org.lwjgl.opengl.GL11;
+import org.terasology.game.CoreRegistry;
+import org.terasology.logic.manager.ShaderManager;
+import org.terasology.rendering.world.WorldRenderer;
 
 /**
  * An axis-aligned bounding box. Provides basic support for inclusion
@@ -51,12 +65,12 @@ public class AABB {
      */
     public AABB(Vector3d position, Vector3d dimensions) {
         setPosition(position);
-        this._dimensions = dimensions;
+        _dimensions = dimensions;
     }
 
     public AABB(Vector3f position, Vector3f dimensions) {
         setPosition(new Vector3d(position));
-        this._dimensions = new Vector3d(dimensions);
+        _dimensions = new Vector3d(dimensions);
     }
 
     /**
@@ -65,32 +79,28 @@ public class AABB {
      */
     public AABB(Iterable<AABB> others) {
         Iterator<AABB> i = others.iterator();
-        if (!i.hasNext()) {
+        if (!i.hasNext())
             _dimensions = new Vector3d();
-        } else {
+        else
+        {
             AABB first = i.next();
             Vector3d min = new Vector3d(first.minX(), first.minY(), first.minZ());
             Vector3d max = new Vector3d(first.maxX(), first.maxY(), first.maxZ());
-            while (i.hasNext()) {
+            while (i.hasNext())
+            {
                 AABB next = i.next();
-                if (next.minX() < min.x) {
+                if (next.minX() < min.x)
                     min.x = next.minX();
-                }
-                if (next.minY() < min.y) {
+                if (next.minY() < min.y)
                     min.y = next.minY();
-                }
-                if (next.minZ() < min.z) {
+                if (next.minZ() < min.z)
                     min.z = next.minZ();
-                }
-                if (next.maxX() > max.x) {
+                if (next.maxX() > max.x)
                     max.x = next.maxX();
-                }
-                if (next.maxY() > max.y) {
+                if (next.maxY() > max.y)
                     max.y = next.maxY();
-                }
-                if (next.maxZ() > max.z) {
+                if (next.maxZ() > max.z)
                     max.z = next.maxZ();
-                }
             }
             _position.set(max);
             _position.add(min);
@@ -154,7 +164,7 @@ public class AABB {
         Vector3d hitNormal = new Vector3d();
 
         double dist = Double.POSITIVE_INFINITY;
-        
+
         if (testX) {
             double distX;
             if (direction.x > 0) {
@@ -432,27 +442,27 @@ public class AABB {
     }
 
     public double minX() {
-        return (getPosition().x - _dimensions.x);
+        return getPosition().x - _dimensions.x;
     }
 
     public double minY() {
-        return (getPosition().y - _dimensions.y);
+        return getPosition().y - _dimensions.y;
     }
 
     public double minZ() {
-        return (getPosition().z - _dimensions.z);
+        return getPosition().z - _dimensions.z;
     }
 
     public double maxX() {
-        return (getPosition().x + _dimensions.x);
+        return getPosition().x + _dimensions.x;
     }
 
     public double maxY() {
-        return (getPosition().y + _dimensions.y);
+        return getPosition().y + _dimensions.y;
     }
 
     public double maxZ() {
-        return (getPosition().z + _dimensions.z);
+        return getPosition().z + _dimensions.z;
     }
 
     public Vector3d getDimensions() {

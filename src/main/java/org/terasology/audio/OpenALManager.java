@@ -1,21 +1,24 @@
 package org.terasology.audio;
 
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
-import org.lwjgl.openal.*;
+import org.lwjgl.openal.AL;
+import org.lwjgl.openal.AL10;
+import org.lwjgl.openal.ALC10;
+import org.lwjgl.openal.ALC11;
+import org.lwjgl.openal.ALCcontext;
+import org.lwjgl.openal.ALCdevice;
 import org.terasology.game.CoreRegistry;
-import org.terasology.game.Terasology;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
-
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
-import java.net.URL;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 
 public class OpenALManager extends AudioManager {
 
@@ -28,6 +31,7 @@ public class OpenALManager extends AudioManager {
         return (OpenALManager) AudioManager.getInstance();
     }
 
+    @Override
     public void initialize() {
         logger.info("Initializing OpenAL audio manager");
         try {
@@ -64,14 +68,16 @@ public class OpenALManager extends AudioManager {
         AL10.alDistanceModel(AL10.AL_INVERSE_DISTANCE_CLAMPED);
 
         // Initialize sound pools
-        this._pools.put("sfx", new BasicSoundPool(30)); // effects pool
-        this._pools.put("music", new BasicStreamingSoundPool(2)); // music pool
+        _pools.put("sfx", new BasicSoundPool(30)); // effects pool
+        _pools.put("music", new BasicStreamingSoundPool(2)); // music pool
     }
 
+    @Override
     public void destroy() {
         AL.destroy();
     }
 
+    @Override
     public void update() {
         LocalPlayer player = CoreRegistry.get(LocalPlayer.class);
 
@@ -85,7 +91,7 @@ public class OpenALManager extends AudioManager {
             OpenALException.checkState("Setting listener velocity");
 
 
-            FloatBuffer listenerOri = BufferUtils.createFloatBuffer(6).put(new float[]{(float) orientation.x, (float) orientation.y, (float) orientation.z, 0.0f, 1.0f, 0.0f});
+            FloatBuffer listenerOri = BufferUtils.createFloatBuffer(6).put(new float[]{orientation.x, orientation.y, orientation.z, 0.0f, 1.0f, 0.0f});
             listenerOri.flip();
             AL10.alListener(AL10.AL_ORIENTATION, listenerOri);
 

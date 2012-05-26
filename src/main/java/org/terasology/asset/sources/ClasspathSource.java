@@ -16,23 +16,15 @@
 
 package org.terasology.asset.sources;
 
-import com.google.common.collect.*;
+import java.net.URL;
+import java.security.CodeSource;
+import java.util.List;
+
+import java.io.File;
+
 import org.terasology.asset.AssetSource;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.CodeSource;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
-import java.util.jar.JarFile;
-import java.util.logging.Logger;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 /**
  * @author Immortius

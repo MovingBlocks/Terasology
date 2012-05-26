@@ -15,9 +15,24 @@
  */
 package org.terasology.rendering.primitives;
 
+import static org.lwjgl.opengl.GL11.GL_COLOR_ARRAY;
+import static org.lwjgl.opengl.GL11.GL_NORMAL_ARRAY;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_COORD_ARRAY;
+import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
+import static org.lwjgl.opengl.GL11.GL_VERTEX_ARRAY;
+import static org.lwjgl.opengl.GL11.glColorPointer;
+import static org.lwjgl.opengl.GL11.glDisableClientState;
+import static org.lwjgl.opengl.GL11.glEnableClientState;
+import static org.lwjgl.opengl.GL11.glNormalPointer;
+import static org.lwjgl.opengl.GL11.glTexCoordPointer;
+import static org.lwjgl.opengl.GL11.glVertexPointer;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
+
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
@@ -26,12 +41,6 @@ import org.lwjgl.opengl.GL15;
 import org.terasology.asset.Asset;
 import org.terasology.asset.AssetUri;
 import org.terasology.logic.manager.VertexBufferObjectManager;
-import org.terasology.rendering.interfaces.IGameObject;
-
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-
-import static org.lwjgl.opengl.GL11.*;
 
 // TODO: Store mesh information in Mesh class in a usable format, for
 public class Mesh implements Asset {
@@ -49,7 +58,7 @@ public class Mesh implements Asset {
     }
 
     public static Mesh buildMesh(TFloatList vertices, TFloatList texCoord0, TFloatList texCoord1, TFloatList normals, TFloatList colors, TIntList indices) {
-        
+
         int vertexCount = vertices.size() / VERTEX_SIZE;
         boolean hasTexCoord0 = texCoord0 != null && texCoord0.size() / TEX_COORD_0_SIZE == vertexCount;
         boolean hasTexCoord1 = texCoord1 != null && texCoord1.size() / TEX_COORD_1_SIZE == vertexCount;
@@ -105,32 +114,26 @@ public class Mesh implements Asset {
     private static FloatBuffer createVertexBuffer(TFloatList vertices, TFloatList texcoord0, TFloatList texcoord1, TFloatList normals, TFloatList colors, int vertexCount, boolean hasTexCoord0, boolean hasTexCoord1, boolean hasNormal, boolean hasColor, int vertSize) {
         FloatBuffer vertexBuffer;
         vertexBuffer = BufferUtils.createFloatBuffer(vertSize * vertexCount);
-        int texCoord0Size = (hasTexCoord0) ? TEX_COORD_0_SIZE : 0;
-        int texCoord1Size = (hasTexCoord1) ? TEX_COORD_1_SIZE : 0;
-        int normalSize = (hasNormal) ? NORMAL_SIZE : 0;
-        int colorSize = (hasColor) ? COLOR_SIZE : 0;
+        int texCoord0Size = hasTexCoord0 ? TEX_COORD_0_SIZE : 0;
+        int texCoord1Size = hasTexCoord1 ? TEX_COORD_1_SIZE : 0;
+        int normalSize = hasNormal ? NORMAL_SIZE : 0;
+        int colorSize = hasColor ? COLOR_SIZE : 0;
         int uv1 = 0, uv2 = 0, n = 0, c = 0;
         for (int v = 0; v < vertices.size(); v += 3) {
             vertexBuffer.put(vertices.get(v)).put(vertices.get(v + 1)).put(vertices.get(v + 2));
-            for (int i = 0; i < texCoord0Size; ++i) {
+            for (int i = 0; i < texCoord0Size; ++i)
                 vertexBuffer.put(texcoord0.get(uv1 + i));
-            }
-            for (int i = 0; i < texCoord1Size; ++i) {
+            for (int i = 0; i < texCoord1Size; ++i)
                 vertexBuffer.put(texcoord1.get(uv2 + i));
-            }
-            for (int i = 0; i < normalSize; ++i) {
+            for (int i = 0; i < normalSize; ++i)
                 vertexBuffer.put(normals.get(n + i));
-            }
-            for (int i = 0; i < colorSize; ++i) {
+            for (int i = 0; i < colorSize; ++i)
                 vertexBuffer.put(colors.get(c + i));
-            }
-
             uv1 += texCoord0Size;
             uv2 += texCoord1Size;
             n += normalSize;
             c += colorSize;
         }
-
         vertexBuffer.flip();
         return vertexBuffer;
     }

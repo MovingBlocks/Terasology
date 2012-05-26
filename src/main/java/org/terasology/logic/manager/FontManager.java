@@ -15,15 +15,15 @@
  */
 package org.terasology.logic.manager;
 
-import org.newdawn.slick.AngelCodeFont;
-import org.newdawn.slick.SlickException;
-import org.newdawn.slick.util.ResourceLoader;
-import org.terasology.game.Terasology;
-
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import java.io.IOException;
+
+import org.newdawn.slick.AngelCodeFont;
+import org.newdawn.slick.SlickException;
+import org.newdawn.slick.util.ResourceLoader;
 
 /**
  * Provides global access to fonts.
