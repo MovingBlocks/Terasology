@@ -96,6 +96,14 @@ public final class TeraMath {
         return value;
     }
 
+    public static int clamp(int value, int min, int max) {
+        if (value > max)
+            return max;
+        if (value < min)
+            return min;
+        return value;
+    }
+
     /**
      * Bilinear interpolation.
      */
@@ -262,6 +270,18 @@ public final class TeraMath {
 
     public static Vector3i calcBlockPos(int x, int y, int z, Vector3i chunkPos) {
         return new Vector3i(calcBlockPosX(x, chunkPos.x), calcBlockPosY(y, chunkPos.y), calcBlockPosZ(z, chunkPos.z));
+    }
+
+    public static Region3i getChunkRegionAroundBlockPos(Vector3i pos, int extent) {
+        Vector3i minPos = new Vector3i(-extent,0,-extent);
+        minPos.add(pos);
+        Vector3i maxPos = new Vector3i(extent, 0, extent);
+        maxPos.add(pos);
+
+        Vector3i minChunk = TeraMath.calcChunkPos(minPos);
+        Vector3i maxChunk = TeraMath.calcChunkPos(maxPos);
+
+        return Region3i.createFromMinMax(minChunk, maxChunk);
     }
 
     /**

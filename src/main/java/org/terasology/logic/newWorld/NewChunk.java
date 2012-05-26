@@ -52,9 +52,9 @@ public class NewChunk implements Externalizable {
     }
 
     /* PUBLIC CONSTANT VALUES */
-    public static final int CHUNK_DIMENSION_X = 16;
-    public static final int CHUNK_DIMENSION_Y = 256;
-    public static final int CHUNK_DIMENSION_Z = 16;
+    public static final int SIZE_X = 16;
+    public static final int SIZE_Y = 256;
+    public static final int SIZE_Z = 16;
     public static final int VERTICAL_SEGMENTS = Config.getInstance().getVerticalChunkMeshSegments();
     public static final byte MAX_LIGHT = 0x0f;
 
@@ -77,10 +77,10 @@ public class NewChunk implements Externalizable {
 
 
     public NewChunk() {
-        blocks = new TeraArray(CHUNK_DIMENSION_X, CHUNK_DIMENSION_Y, CHUNK_DIMENSION_Z);
-        sunlight = new TeraSmartArray(CHUNK_DIMENSION_X, CHUNK_DIMENSION_Y, CHUNK_DIMENSION_Z);
-        light = new TeraSmartArray(CHUNK_DIMENSION_X, CHUNK_DIMENSION_Y, CHUNK_DIMENSION_Z);
-        states = new TeraSmartArray(CHUNK_DIMENSION_X, CHUNK_DIMENSION_Y, CHUNK_DIMENSION_Z);
+        blocks = new TeraArray(SIZE_X, SIZE_Y, SIZE_Z);
+        sunlight = new TeraSmartArray(SIZE_X, SIZE_Y, SIZE_Z);
+        light = new TeraSmartArray(SIZE_X, SIZE_Y, SIZE_Z);
+        states = new TeraSmartArray(SIZE_X, SIZE_Y, SIZE_Z);
 
         setDirty(true);
     }
@@ -101,7 +101,7 @@ public class NewChunk implements Externalizable {
     }
 
     public boolean isInBounds(int x, int y, int z) {
-        return x >= 0 && y >= 0 && z >= 0 && x < CHUNK_DIMENSION_X && y < CHUNK_DIMENSION_Y && z < CHUNK_DIMENSION_Z;
+        return x >= 0 && y >= 0 && z >= 0 && x < SIZE_X && y < SIZE_Y && z < SIZE_Z;
     }
 
     public State getChunkState() {
@@ -146,11 +146,7 @@ public class NewChunk implements Externalizable {
     }
 
     public boolean setBlock(int x, int y, int z, byte newBlockId, byte oldBlockId) {
-        boolean result = blocks.set(x, y, z, newBlockId, oldBlockId);
-        if (result) {
-            setDirty(true);
-        }
-        return result;
+        return blocks.set(x, y, z, newBlockId, oldBlockId);
     }
 
     public boolean setBlock(int x, int y, int z, Block block) {
@@ -191,11 +187,7 @@ public class NewChunk implements Externalizable {
 
     public boolean setSunlight(int x, int y, int z, byte amount) {
         byte oldValue = sunlight.set(x, y, z, amount);
-        if (oldValue != amount) {
-            setDirty(true);
-            return true;
-        }
-        return false;
+        return oldValue != amount;
     }
 
     public byte getLight(Vector3i pos) {
@@ -212,11 +204,7 @@ public class NewChunk implements Externalizable {
 
     public boolean setLight(int x, int y, int z, byte amount) {
         byte oldValue = light.set(x, y, z, amount);
-        if (oldValue != amount) {
-            setDirty(true);
-            return true;
-        }
-        return false;
+        return (oldValue != amount);
     }
 
     public boolean setState(Vector3i pos, byte state, byte oldState) {
@@ -225,10 +213,7 @@ public class NewChunk implements Externalizable {
 
     public boolean setState(int x, int y, int z, byte state, byte oldState) {
         byte prev = states.set(x, y, z, state, oldState);
-        if (prev != oldState) {
-            return false;
-        }
-        return true;
+        return prev == oldState;
     }
 
     public byte getState(Vector3i pos) {
@@ -244,15 +229,15 @@ public class NewChunk implements Externalizable {
     }
 
     public int getChunkWorldPosX() {
-        return pos.x * CHUNK_DIMENSION_X;
+        return pos.x * SIZE_X;
     }
 
     public int getChunkWorldPosY() {
-        return pos.y * CHUNK_DIMENSION_Y;
+        return pos.y * SIZE_Y;
     }
 
     public int getChunkWorldPosZ() {
-        return pos.z * CHUNK_DIMENSION_Z;
+        return pos.z * SIZE_Z;
     }
 
     public Vector3i getBlockWorldPos(Vector3i blockPos) {
@@ -277,7 +262,7 @@ public class NewChunk implements Externalizable {
 
     public AABB getAABB() {
         if (aabb == null) {
-            Vector3d dimensions = new Vector3d(CHUNK_DIMENSION_X / 2.0, CHUNK_DIMENSION_Y / 2.0, CHUNK_DIMENSION_Z / 2.0);
+            Vector3d dimensions = new Vector3d(SIZE_X / 2.0, SIZE_Y / 2.0, SIZE_Z / 2.0);
             Vector3d position = new Vector3d(getChunkWorldPosX() + dimensions.x - 0.5f, dimensions.y - 0.5f, getChunkWorldPosZ() + dimensions.z - 0.5f);
             aabb = new AABB(position, dimensions);
         }
@@ -376,7 +361,7 @@ public class NewChunk implements Externalizable {
         if (subMeshAABB == null) {
             subMeshAABB = new AABB[VERTICAL_SEGMENTS];
 
-            int heightHalf = CHUNK_DIMENSION_Y / VERTICAL_SEGMENTS / 2;
+            int heightHalf = SIZE_Y / VERTICAL_SEGMENTS / 2;
 
             for (int i = 0; i < subMeshAABB.length; i++) {
                 Vector3d dimensions = new Vector3d(8, heightHalf, 8);

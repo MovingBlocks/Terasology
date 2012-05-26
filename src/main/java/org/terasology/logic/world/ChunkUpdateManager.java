@@ -18,16 +18,13 @@ package org.terasology.logic.world;
 import com.google.common.collect.Sets;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
-import org.terasology.game.Terasology;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.newWorld.NewChunk;
 import org.terasology.logic.newWorld.WorldProvider;
 import org.terasology.rendering.primitives.ChunkMesh;
-import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.primitives.NewChunkTessellator;
 import org.terasology.rendering.world.WorldRenderer;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -82,7 +79,7 @@ public final class ChunkUpdateManager {
             public void run() {
                 ChunkMesh[] newMeshes = new ChunkMesh[WorldRenderer.VERTICAL_SEGMENTS];
                 for (int seg = 0; seg < WorldRenderer.VERTICAL_SEGMENTS; seg++) {
-                    newMeshes[seg] = tessellator.generateMesh(worldProvider, c.getPos(), NewChunk.CHUNK_DIMENSION_Y / WorldRenderer.VERTICAL_SEGMENTS, seg * (NewChunk.CHUNK_DIMENSION_Y / WorldRenderer.VERTICAL_SEGMENTS));
+                    newMeshes[seg] = tessellator.generateMesh(worldProvider, c.getPos(), NewChunk.SIZE_Y / WorldRenderer.VERTICAL_SEGMENTS, seg * (NewChunk.SIZE_Y / WorldRenderer.VERTICAL_SEGMENTS));
                 }
 
                 c.setPendingMesh(newMeshes);

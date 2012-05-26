@@ -25,11 +25,9 @@ import org.terasology.logic.newWorld.WorldBiomeProvider;
 import org.terasology.logic.newWorld.WorldProvider;
 import org.terasology.logic.newWorld.WorldView;
 import org.terasology.logic.world.Chunk;
-import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 
 import javax.vecmath.Vector3f;
@@ -57,7 +55,7 @@ public final class NewChunkTessellator {
         ChunkMesh mesh = new ChunkMesh();
 
         WorldView worldView = world.getWorldViewAround(chunkPos);
-        Vector3i chunkOffset = new Vector3i(chunkPos.x * NewChunk.CHUNK_DIMENSION_X, chunkPos.y * NewChunk.CHUNK_DIMENSION_Y, chunkPos.z * NewChunk.CHUNK_DIMENSION_Z);
+        Vector3i chunkOffset = new Vector3i(chunkPos.x * NewChunk.SIZE_X, chunkPos.y * NewChunk.SIZE_Y, chunkPos.z * NewChunk.SIZE_Z);
 
         for (int x = 0; x < Chunk.CHUNK_DIMENSION_X; x++) {
             for (int z = 0; z < Chunk.CHUNK_DIMENSION_Z; z++) {

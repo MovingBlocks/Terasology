@@ -57,6 +57,14 @@ public class Region3i implements Iterable<Vector3i> {
                 max);
     }
 
+    public static Region3i createFromCenterExtents(Vector3i center, int extent)
+    {
+        Vector3i min = new Vector3i(center.x - extent, center.y - extent, center.z - extent);
+        Vector3i max = new Vector3i(center.x + extent, center.y + extent, center.z + extent);
+        return createFromMinMax(min,
+                max);
+    }
+
     public static Region3i createBounded(Vector3i a, Vector3i b)
     {
         Vector3i min = new Vector3i(a);
@@ -74,6 +82,16 @@ public class Region3i implements Iterable<Vector3i> {
             return EMPTY;
         }
         return new Region3i(min, size);
+    }
+
+    public static Region3i createEncompassing(Region3i a, Region3i b) {
+        if (a.isEmpty()) return b;
+        if (b.isEmpty()) return a;
+        Vector3i min = a.min();
+        min.min(b.min());
+        Vector3i max = a.max();
+        max.max(b.max());
+        return createFromMinMax(min, max);
     }
 
     /**
@@ -155,6 +173,14 @@ public class Region3i implements Iterable<Vector3i> {
         min.sub(amount);
         Vector3i max = max();
         max.add(amount);
+        return createFromMinMax(min, max);
+    }
+
+    public Region3i expandToContain(Vector3i adjPos) {
+        Vector3i min = min();
+        min.min(adjPos);
+        Vector3i max = max();
+        max.max(adjPos);
         return createFromMinMax(min, max);
     }
 

@@ -37,7 +37,7 @@ import java.util.logging.Logger;
 public class LocalChunkProvider implements NewChunkProvider
 {
     private static final int NUM_GENERATOR_THREADS = 2;
-    private static final int CACHE_SIZE = (int) Runtime.getRuntime().maxMemory() / 1048576;
+    private static final int CACHE_SIZE = (int) (2 * Runtime.getRuntime().maxMemory() / 1048576);
 
     private Logger logger = Logger.getLogger(getClass().getName());
     private NewChunkCache farCache;
@@ -110,6 +110,7 @@ public class LocalChunkProvider implements NewChunkProvider
             }
         }
         if (nearCache.size() > CACHE_SIZE) {
+            logger.log(Level.INFO, "Compacting cache");
             Iterator<Vector3i> iterator = nearCache.keySet().iterator();
             while (iterator.hasNext()) {
                 Vector3i pos = iterator.next();
@@ -309,9 +310,9 @@ public class LocalChunkProvider implements NewChunkProvider
         }
 
         private Vector3i worldToChunkPos(Vector3f worldPos) {
-            worldPos.x /= NewChunk.CHUNK_DIMENSION_X;
+            worldPos.x /= NewChunk.SIZE_X;
             worldPos.y = 0;
-            worldPos.z /= NewChunk.CHUNK_DIMENSION_Z;
+            worldPos.z /= NewChunk.SIZE_Z;
             return new Vector3i(worldPos);
         }
 

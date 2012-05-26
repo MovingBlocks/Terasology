@@ -37,16 +37,8 @@ public class WorldView {
     }
 
     public static WorldView createSubview(Vector3i pos, int extent, NewChunkProvider chunkProvider) {
-        Vector3i minPos = new Vector3i(-extent,0,-extent);
-        minPos.add(pos);
-        Vector3i maxPos = new Vector3i(extent, 0, extent);
-        maxPos.add(pos);
-
-        Vector3i minChunk = TeraMath.calcChunkPos(minPos);
-        Vector3i maxChunk = TeraMath.calcChunkPos(maxPos);
-
-        Region3i region = Region3i.createFromMinMax(minChunk, maxChunk);
-        return createWorldView(region, new Vector3i(-minChunk.x, 0, -minChunk.z), chunkProvider);
+        Region3i region = TeraMath.getChunkRegionAroundBlockPos(pos, extent);
+        return createWorldView(region, new Vector3i(-region.min().x, 0, -region.min().z), chunkProvider);
     }
 
     public static WorldView createWorldView(Region3i region, Vector3i offset, NewChunkProvider chunkProvider) {
@@ -72,6 +64,20 @@ public class WorldView {
         return getBlock(TeraMath.floorToInt(x + 0.5f), TeraMath.floorToInt(y + 0.5f), TeraMath.floorToInt(z + 0.5f));
     }
 
+    public Block getBlock(Vector3i pos) {
+        return getBlock(pos.x, pos.y, pos.z);
+    }
+
+    // TODO: Review
+    public Block getBlock(int blockX, int blockY, int blockZ) {
+        if (!isYInBounds(blockY)) return BlockManager.getInstance().getBlock((byte)0);
+
+        Vector3i chunkPos = TeraMath.calcChunkPos(blockX, blockY, blockZ);
+        int chunkIndex = relChunkIndex(chunkPos.x, chunkPos.y, chunkPos.z);
+        Vector3i innerBlockPos = TeraMath.calcBlockPos(blockX, blockY, blockZ, chunkPos);
+        return chunks[chunkIndex].getBlock(innerBlockPos);
+    }
+
     public byte getSunlight(float x, float y, float z) {
         return getSunlight(TeraMath.floorToInt(x + 0.5f), TeraMath.floorToInt(y + 0.5f), TeraMath.floorToInt(z + 0.5f));
     }
@@ -86,16 +92,6 @@ public class WorldView {
 
     public byte getLight(Vector3i pos) {
         return getLight(pos.x, pos.y, pos.z);
-    }
-
-    // TODO: Review
-    public Block getBlock(int blockX, int blockY, int blockZ) {
-        if (!isYInBounds(blockY)) return BlockManager.getInstance().getBlock((byte)0);
-
-        Vector3i chunkPos = TeraMath.calcChunkPos(blockX, blockY, blockZ);
-        int chunkIndex = relChunkIndex(chunkPos.x, chunkPos.y, chunkPos.z);
-        Vector3i innerBlockPos = TeraMath.calcBlockPos(blockX, blockY, blockZ, chunkPos);
-        return chunks[chunkIndex].getBlock(innerBlockPos);
     }
 
     public byte getSunlight(int blockX, int blockY, int blockZ) {
@@ -116,6 +112,27 @@ public class WorldView {
         return chunks[chunkIndex].getLight(innerBlockPos);
     }
 
+    public boolean setBlock(Vector3i pos, Block type, Block oldType) {
+        return setBlock(pos.x, pos.y, pos.z, type, oldType);
+    }
+
+    public boolean setBlock(int blockX, int blockY, int blockZ, Block type, Block oldType) {
+        if (!isYInBounds(blockY)) return false;
+
+        Vector3i chunkPos = TeraMath.calcChunkPos(blockX, blockY, blockZ);
+        int chunkIndex = relChunkIndex(chunkPos.x, chunkPos.y, chunkPos.z);
+        Vector3i innerBlockPos = TeraMath.calcBlockPos(blockX, blockY, blockZ, chunkPos);
+        return chunks[chunkIndex].setBlock(innerBlockPos, type, oldType);
+    }
+
+    public void setLight(Vector3i pos, byte light) {
+        setLight(pos.x, pos.y, pos.z, light);
+    }
+
+    public void setSunlight(Vector3i pos, byte light) {
+        setSunlight(pos.x, pos.y, pos.z, light);
+    }
+
     public void setSunlight(int blockX, int blockY, int blockZ, byte light) {
         if (!isYInBounds(blockY)) return;
 
@@ -134,11 +151,31 @@ public class WorldView {
         chunks[chunkIndex].setLight(innerBlockPos, light);
     }
 
+    public void setDirtyAround(Vector3i blockPos) {
+        for (Vector3i pos : TeraMath.getChunkRegionAroundBlockPos(blockPos, 1)) {
+            chunks[relChunkIndex(pos.x, pos.y, pos.z)].setDirty(true);
+        }
+    }
+
+    public void setDirtyAround(Region3i blockRegion) {
+        Vector3i minPos = new Vector3i(blockRegion.min());
+        minPos.sub(1,0,1);
+        Vector3i maxPos = new Vector3i(blockRegion.max());
+        maxPos.add(1,0,1);
+
+        Vector3i minChunk = TeraMath.calcChunkPos(minPos);
+        Vector3i maxChunk = TeraMath.calcChunkPos(maxPos);
+
+        for (Vector3i pos : Region3i.createFromMinMax(minChunk, maxChunk)) {
+            chunks[relChunkIndex(pos.x, pos.y, pos.z)].setDirty(true);
+        }
+    }
+
     private int relChunkIndex(int x, int y, int z) {
         return (x + offset.x) + region.size().x * (z + offset.z);
     }
 
     private boolean isYInBounds(int y) {
-        return y >= 0 && y < NewChunk.CHUNK_DIMENSION_Y;
+        return y >= 0 && y < NewChunk.SIZE_Y;
     }
 }

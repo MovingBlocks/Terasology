@@ -326,7 +326,7 @@ public class StateSinglePlayer implements GameState {
             int randX = (int) (nRandom.randomDouble() * 128f);
             int randZ = (int) (nRandom.randomDouble() * 128f);
 
-            for (int y = Chunk.CHUNK_DIMENSION_Y - 1; y >= 32; y--) {
+            for (int y = Chunk.SIZE_Y - 1; y >= 32; y--) {
 
                 double dens = tGen.calcDensity(randX + (int) SPAWN_ORIGIN.x, y, randZ + (int) SPAWN_ORIGIN.y);
 

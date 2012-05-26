@@ -185,6 +185,7 @@ public final class WorldRenderer implements IGameObject {
         int newChunkPosX = calcCamChunkOffsetX();
         int newChunkPosZ = calcCamChunkOffsetZ();
 
+        // TODO: This should actually be done based on events from the ChunkProvider on new chunk availability/old chunk removal
         int viewingDistance = Config.getInstance().getActiveViewingDistance();
 
         if (_chunkPosX != newChunkPosX || _chunkPosZ != newChunkPosZ || force || _pendingChunks) {
@@ -268,7 +269,7 @@ public final class WorldRenderer implements IGameObject {
         }
 
         private float distanceToCamera(NewChunk chunk) {
-            Vector3f result = new Vector3f((chunk.getPos().x + 0.5f) * NewChunk.CHUNK_DIMENSION_X, 0, (chunk.getPos().z + 0.5f) * NewChunk.CHUNK_DIMENSION_Z);
+            Vector3f result = new Vector3f((chunk.getPos().x + 0.5f) * NewChunk.SIZE_X, 0, (chunk.getPos().z + 0.5f) * NewChunk.SIZE_Z);
 
             Vector3d cameraPos = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
             result.x -= cameraPos.x;
@@ -831,7 +832,7 @@ public final class WorldRenderer implements IGameObject {
 
                 ChunkMesh[] newMeshes = new ChunkMesh[VERTICAL_SEGMENTS];
                 for (int seg = 0; seg < VERTICAL_SEGMENTS; seg++) {
-                    newMeshes[seg] = _chunkTesselator.generateMesh(_worldProvider, chunk.getPos(), NewChunk.CHUNK_DIMENSION_Y / VERTICAL_SEGMENTS, seg * (NewChunk.CHUNK_DIMENSION_Y / VERTICAL_SEGMENTS));
+                    newMeshes[seg] = _chunkTesselator.generateMesh(_worldProvider, chunk.getPos(), NewChunk.SIZE_Y / VERTICAL_SEGMENTS, seg * (NewChunk.SIZE_Y / VERTICAL_SEGMENTS));
                 }
 
                 chunk.setPendingMesh(newMeshes);

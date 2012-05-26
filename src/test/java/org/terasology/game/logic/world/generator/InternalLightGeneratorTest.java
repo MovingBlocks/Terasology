@@ -53,7 +53,7 @@ public class InternalLightGeneratorTest {
         NewChunk chunk = new NewChunk(0,0,0);
         generator.generateChunk(chunk);
 
-        for (Vector3i pos : Region3i.createFromMinAndSize(Vector3i.zero(), new Vector3i(NewChunk.CHUNK_DIMENSION_X, NewChunk.CHUNK_DIMENSION_Y, NewChunk.CHUNK_DIMENSION_Z))) {
+        for (Vector3i pos : Region3i.createFromMinAndSize(Vector3i.zero(), new Vector3i(NewChunk.SIZE_X, NewChunk.SIZE_Y, NewChunk.SIZE_Z))) {
             assertEquals(NewChunk.MAX_LIGHT, chunk.getSunlight(pos));
         }
     }
@@ -73,13 +73,13 @@ public class InternalLightGeneratorTest {
     @Test
     public void pinholeSunlightPropagation() {
         NewChunk chunk = new NewChunk(0,0,0);
-        for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0,NewChunk.CHUNK_DIMENSION_Y - 1,0), new Vector3i(NewChunk.CHUNK_DIMENSION_X,1,NewChunk.CHUNK_DIMENSION_Z))) {
+        for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(0,NewChunk.SIZE_Y - 1,0), new Vector3i(NewChunk.SIZE_X,1,NewChunk.SIZE_Z))) {
             chunk.setBlock(pos, solidBlock);
         }
-        chunk.setBlock(8, NewChunk.CHUNK_DIMENSION_Y - 1, 8, airBlock);
+        chunk.setBlock(8, NewChunk.SIZE_Y - 1, 8, airBlock);
         generator.generateChunk(chunk);
 
-        for (Vector3i pos : Region3i.createFromMinAndSize(Vector3i.zero(), new Vector3i(NewChunk.CHUNK_DIMENSION_X, NewChunk.CHUNK_DIMENSION_Y - 1, NewChunk.CHUNK_DIMENSION_Z))) {
+        for (Vector3i pos : Region3i.createFromMinAndSize(Vector3i.zero(), new Vector3i(NewChunk.SIZE_X, NewChunk.SIZE_Y - 1, NewChunk.SIZE_Z))) {
             int dist = TeraMath.fastAbs(pos.x - 8) + TeraMath.fastAbs(pos.z - 8);
             int expected = Math.max(NewChunk.MAX_LIGHT - dist, 0);
             assertEquals("Incorrect at " + pos, expected, chunk.getSunlight(pos));

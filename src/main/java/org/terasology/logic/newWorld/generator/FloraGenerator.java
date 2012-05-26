@@ -106,9 +106,9 @@ public class FloraGenerator implements NewChunkGenerator {
      */
      /*private void generateTrees(NewChunk c, FastRandom random) {
 
-        for (int y = 32; y < Chunk.CHUNK_DIMENSION_Y; y++) {
-            for (int x = 0; x < Chunk.CHUNK_DIMENSION_X; x += 4) {
-                for (int z = 0; z < Chunk.CHUNK_DIMENSION_Z; z += 4) {
+        for (int y = 32; y < Chunk.SIZE_Y; y++) {
+            for (int x = 0; x < Chunk.SIZE_X; x += 4) {
+                for (int z = 0; z < Chunk.SIZE_Z; z += 4) {
                     WorldBiomeProvider.Biome biome = biomeProvider.getBiomeAt(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
 
                     int randX = x + random.randomInt() % 12 + 6;

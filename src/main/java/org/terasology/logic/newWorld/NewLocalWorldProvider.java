@@ -19,6 +19,7 @@ package org.terasology.logic.newWorld;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.manager.Config;
+import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
@@ -106,11 +107,28 @@ public class NewLocalWorldProvider implements WorldProvider {
 
     @Override
     public boolean setBlock(int x, int y, int z, Block type, Block oldType) {
-        Vector3i chunkPos = TeraMath.calcChunkPos(x, y, z);
-        NewChunk chunk = chunkProvider.getChunk(chunkPos);
-        if (chunk != null) {
-            Vector3i blockPos = TeraMath.calcBlockPos(x, y, z, chunkPos);
-            return chunk.setBlock(blockPos.x, blockPos.y, blockPos.z, type, oldType);
+        if (type.isTranslucent() != oldType.isTranslucent() || type.getLuminance() != oldType.getLuminance()) {
+            Vector3i blockPos = new Vector3i(x, y, z);
+            WorldView worldView = WorldView.createSubview(blockPos, NewChunk.MAX_LIGHT + 1, chunkProvider);
+            if (worldView != null) {
+                if (!worldView.setBlock(x, y, z, type, oldType)) {
+                    return false;
+                }
+
+                Region3i affected = new LightPropagator(worldView).update(x, y, z, type, oldType);
+                if (affected.isEmpty()) {
+                    worldView.setDirtyAround(blockPos);
+                } else {
+                    worldView.setDirtyAround(affected);
+                }
+            }
+        } else {
+            Vector3i chunkPos = TeraMath.calcChunkPos(x, y, z);
+            NewChunk chunk = chunkProvider.getChunk(chunkPos);
+            if (chunk != null) {
+                Vector3i blockPos = TeraMath.calcBlockPos(x, y, z, chunkPos);
+                return chunk.setBlock(blockPos.x, blockPos.y, blockPos.z, type, oldType);
+            }
         }
         return false;
     }
@@ -133,6 +151,8 @@ public class NewLocalWorldProvider implements WorldProvider {
 
     @Override
     public byte getState(int x, int y, int z) {
+        y = TeraMath.clamp(y, 0, NewChunk.SIZE_Y - 1);
+
         Vector3i chunkPos = TeraMath.calcChunkPos(x,y,z);
         NewChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
@@ -144,6 +164,10 @@ public class NewLocalWorldProvider implements WorldProvider {
 
     @Override
     public Block getBlock(int x, int y, int z) {
+        if (y >= NewChunk.SIZE_Y || y < 0) {
+            return BlockManager.getInstance().getAir();
+        }
+
         Vector3i chunkPos = TeraMath.calcChunkPos(x,y,z);
         NewChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
@@ -165,6 +189,8 @@ public class NewLocalWorldProvider implements WorldProvider {
 
     @Override
     public byte getLight(int x, int y, int z) {
+        y = TeraMath.clamp(y, 0, NewChunk.SIZE_Y - 1);
+
         Vector3i chunkPos = TeraMath.calcChunkPos(x,y,z);
         NewChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
@@ -186,6 +212,8 @@ public class NewLocalWorldProvider implements WorldProvider {
 
     @Override
     public byte getSunlight(int x, int y, int z) {
+        y = TeraMath.clamp(y, 0, NewChunk.SIZE_Y - 1);
+
         Vector3i chunkPos = TeraMath.calcChunkPos(x,y,z);
         NewChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
@@ -197,6 +225,8 @@ public class NewLocalWorldProvider implements WorldProvider {
 
     @Override
     public byte getTotalLight(int x, int y, int z) {
+        y = TeraMath.clamp(y, 0, NewChunk.SIZE_Y - 1);
+
         Vector3i chunkPos = TeraMath.calcChunkPos(x,y,z);
         NewChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
