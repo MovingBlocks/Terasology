@@ -31,6 +31,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks
@@ -75,6 +76,8 @@ public class NewChunk implements Externalizable {
     // Physics
     private RigidBody rigidBody = null;
 
+    private ReentrantLock lock = new ReentrantLock();
+
 
     public NewChunk() {
         blocks = new TeraArray(SIZE_X, SIZE_Y, SIZE_Z);
@@ -94,6 +97,14 @@ public class NewChunk implements Externalizable {
 
     public NewChunk(Vector3i pos) {
         this(pos.x, pos.y, pos.z);
+    }
+
+    public void lock() {
+        lock.lock();
+    }
+
+    public void unlock() {
+        lock.unlock();
     }
 
     public Vector3i getPos() {
@@ -117,7 +128,12 @@ public class NewChunk implements Externalizable {
     }
 
     public void setDirty(boolean dirty) {
-        this.dirty = dirty;
+        lock();
+        try {
+            this.dirty = dirty;
+        } finally {
+            unlock();
+        }
     }
 
     public byte getBlockId(Vector3i pos) {

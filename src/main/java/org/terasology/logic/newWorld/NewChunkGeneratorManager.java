@@ -32,5 +32,5 @@ public interface NewChunkGeneratorManager {
 
     NewChunk generateChunk(Vector3i pos);
 
-    void postProcess(Vector3i pos);
+    void postProcess(WorldView worldView);
 }

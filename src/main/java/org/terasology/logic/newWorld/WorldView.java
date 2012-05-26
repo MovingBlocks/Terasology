@@ -171,6 +171,18 @@ public class WorldView {
         }
     }
 
+    public void lock() {
+        for (NewChunk chunk : chunks) {
+            chunk.lock();
+        }
+    }
+
+    public void unlock() {
+        for (NewChunk chunk : chunks) {
+            chunk.unlock();
+        }
+    }
+
     private int relChunkIndex(int x, int y, int z) {
         return (x + offset.x) + region.size().x * (z + offset.z);
     }

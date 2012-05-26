@@ -40,6 +40,6 @@ public class NullChunkGeneratorManager implements NewChunkGeneratorManager{
     }
 
     @Override
-    public void postProcess(Vector3i pos) {
+    public void postProcess(WorldView view) {
     }
 }
