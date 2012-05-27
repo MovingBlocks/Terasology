@@ -14,42 +14,18 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.newWorld.generator;
+package org.terasology.logic.newWorld.generationPhase;
 
 import org.terasology.logic.newWorld.NewChunk;
-import org.terasology.logic.newWorld.NewChunkGenerator;
-import org.terasology.logic.newWorld.WorldBiomeProvider;
-import org.terasology.logic.newWorld.WorldProvider;
-import org.terasology.math.Vector3i;
+import org.terasology.math.Side;
 import org.terasology.model.blocks.Block;
 
 /**
- * Propagates internal lights and sunlight of a chunk
  * @author Immortius
  */
-public class InternalLightGenerator implements NewChunkGenerator{
+public class InternalLightProcessor {
 
-    private static final Vector3i[] HORIZONTAL_LIGHT_DIRECTIONS = {
-            new Vector3i(1, 0, 0), new Vector3i(-1, 0, 0),
-            new Vector3i(0, 0, 1), new Vector3i(0, 0, -1)
-    };
-
-    private static final Vector3i[] ALL_LIGHT_DIRECTIONS = {
-            new Vector3i(1, 0, 0), new Vector3i(-1, 0, 0),
-            new Vector3i(0, 1, 0), new Vector3i(0, -1, 0),
-            new Vector3i(0, 0, 1), new Vector3i(0, 0, -1)
-    };
-
-    @Override
-    public void setWorldSeed(String seed) {
-    }
-
-    @Override
-    public void setWorldBiomeProvider(WorldBiomeProvider biomeProvider) {
-    }
-
-    @Override
-    public void generateChunk(NewChunk chunk) {
+    public static void generateInternalLighting(NewChunk chunk) {
         int top = NewChunk.SIZE_Y - 1;
 
         short[] tops = new short[NewChunk.SIZE_X * NewChunk.SIZE_Z];
@@ -74,9 +50,9 @@ public class InternalLightGenerator implements NewChunkGenerator{
                 for (int y = top; y >= 0; y--) {
                     Block block = chunk.getBlock(x, y, z);
                     if (y > tops[x + NewChunk.SIZE_X * z] && ((x > 0 && tops[(x - 1) + NewChunk.SIZE_X * z] >= y) ||
-                        (x < NewChunk.SIZE_X - 1 && tops[(x + 1) + NewChunk.SIZE_X * z] >= y) ||
-                        (z > 0 && tops[x + NewChunk.SIZE_X * (z - 1)] >= y) ||
-                        (z < NewChunk.SIZE_Z - 1 && tops[x + NewChunk.SIZE_X * (z + 1)] >= y)))
+                            (x < NewChunk.SIZE_X - 1 && tops[(x + 1) + NewChunk.SIZE_X * z] >= y) ||
+                            (z > 0 && tops[x + NewChunk.SIZE_X * (z - 1)] >= y) ||
+                            (z < NewChunk.SIZE_Z - 1 && tops[x + NewChunk.SIZE_X * (z + 1)] >= y)))
                     {
                         spreadSunlightInternal(chunk, x, y, z);
                     }
@@ -89,19 +65,15 @@ public class InternalLightGenerator implements NewChunkGenerator{
         }
     }
 
-    @Override
-    public void postProcessChunk(Vector3i pos, WorldProvider world) {
-    }
-
-    private void spreadLightInternal(NewChunk chunk, int x, int y, int z) {
+    private static void spreadLightInternal(NewChunk chunk, int x, int y, int z) {
         byte lightValue = chunk.getLight(x,y,z);
         if (lightValue <= 1) return;
 
         // TODO: use custom bounds checked iterator for this
-        for (Vector3i adjDir : ALL_LIGHT_DIRECTIONS) {
-            int adjX = x + adjDir.x;
-            int adjY = y + adjDir.y;
-            int adjZ = z + adjDir.z;
+        for (Side adjDir : Side.values()) {
+            int adjX = x + adjDir.getVector3i().x;
+            int adjY = y + adjDir.getVector3i().y;
+            int adjZ = z + adjDir.getVector3i().z;
             if (chunk.isInBounds(adjX, adjY, adjZ)) {
                 byte adjLightValue = chunk.getLight(adjX,adjY,adjZ);
 
@@ -113,7 +85,7 @@ public class InternalLightGenerator implements NewChunkGenerator{
         }
     }
 
-    private void spreadSunlightInternal(NewChunk chunk, int x, int y, int z) {
+    private static void spreadSunlightInternal(NewChunk chunk, int x, int y, int z) {
         byte lightValue = chunk.getSunlight(x,y,z);
 
         // If it was max it would already have been spread down
@@ -129,9 +101,9 @@ public class InternalLightGenerator implements NewChunkGenerator{
 
         if (lightValue <= 1) return;
 
-        for (Vector3i adjDir : HORIZONTAL_LIGHT_DIRECTIONS) {
-            int adjX = x + adjDir.x;
-            int adjZ = z + adjDir.z;
+        for (Side adjDir : Side.horizontalSides()) {
+            int adjX = x + adjDir.getVector3i().x;
+            int adjZ = z + adjDir.getVector3i().z;
 
             if (chunk.isInBounds(adjX, y, adjZ)) {
                 byte adjLightValue = chunk.getSunlight(adjX,y,adjZ);
@@ -141,7 +113,5 @@ public class InternalLightGenerator implements NewChunkGenerator{
                 }
             }
         }
-
-
     }
 }

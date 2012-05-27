@@ -64,8 +64,7 @@ public class TeraSmartArray {
     public byte set(int x, int y, int z, byte b) {
         int pos = (x * _lX * _lY) + (y * _lX) + z;
 
-        if (x >= _lX || y >= _lY || z >= _lZ || x < 0 || y < 0 || z < 0)
-            return 0;
+        assert (x < _lX || y < _lY || z < _lZ || x >= 0 || y >= 0 || z >= 0);
 
         if (pos < _halfSize) {
             int bArray = _array[pos] & 0xFF;

@@ -16,32 +16,11 @@
 
 package org.terasology.logic.newWorld;
 
-import org.terasology.math.Vector3i;
-
 /**
  * @author Immortius
  */
-public class NullChunkGeneratorManager implements NewChunkGeneratorManager{
-    @Override
-    public void setWorldSeed(String seed) {
-    }
+public interface BaseChunkGenerator {
 
-    @Override
-    public void setWorldBiomeProvider(WorldBiomeProvider biomeProvider) {
-    }
-
-    @Override
-    public void registerChunkGenerator(BaseChunkGenerator generator) {
-    }
-
-    @Override
-    public NewChunk generateChunk(Vector3i pos) {
-        return new NewChunk(pos.x, pos.y, pos.z);
-    }
-
-    @Override
-    public void secondPassChunk(Vector3i chunkPos, WorldView view) {
-    }
-
-
+    public void setWorldSeed(String seed);
+    public void setWorldBiomeProvider(WorldBiomeProvider biomeProvider);
 }

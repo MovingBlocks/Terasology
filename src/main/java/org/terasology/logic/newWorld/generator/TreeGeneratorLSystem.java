@@ -13,8 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.generators;
+package org.terasology.logic.newWorld.generator;
 
+import org.terasology.logic.newWorld.WorldProvider;
+import org.terasology.logic.newWorld.WorldView;
+import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.utilities.FastRandom;
 
@@ -34,48 +37,47 @@ public class TreeGeneratorLSystem extends TreeGenerator {
     public final int MAX_ANGLE_OFFSET = 5;
 
     /* SETTINGS */
-    private int _iterations;
-    private double _angleInDegree;
-    private byte _leafType;
-    private byte _barkType;
+    private int iterations;
+    private double angleInDegree;
+    private Block air;
+    private Block leafType;
+    private Block barkType;
 
     /* RULES */
-    private final String _initialAxiom;
-    private final HashMap<String, String> _ruleSet;
-    private final HashMap<String, Double> _probabilities;
+    private final String initialAxiom;
+    private final HashMap<String, String> ruleSet;
+    private final HashMap<String, Double> probabilities;
 
     /**
      * Init. a new L-System based tree generator.
      *
-     * @param manager       The generator manager
      * @param initialAxiom  The initial axiom to use
      * @param ruleSet       The rule set to use
      * @param probabilities The probability array
      * @param iterations    The amount of iterations to execute
      * @param angle         The angle
      */
-    public TreeGeneratorLSystem(GeneratorManager manager, String initialAxiom, HashMap<String, String> ruleSet, HashMap<String, Double> probabilities, int iterations, int angle) {
-        super(manager);
+    public TreeGeneratorLSystem(String initialAxiom, HashMap<String, String> ruleSet, HashMap<String, Double> probabilities, int iterations, int angle) {
+        angleInDegree = angle;
+        this.iterations = iterations;
+        air = BlockManager.getInstance().getAir();
+        leafType = BlockManager.getInstance().getBlock("GreenLeaf");
+        barkType = BlockManager.getInstance().getBlock("OakTrunk");
 
-        _angleInDegree = angle;
-        _iterations = iterations;
-        _leafType = BlockManager.getInstance().getBlock("GreenLeaf").getId();
-        _barkType = BlockManager.getInstance().getBlock("OakTrunk").getId();
-
-        _initialAxiom = initialAxiom;
-        _ruleSet = ruleSet;
-        _probabilities = probabilities;
+        this.initialAxiom = initialAxiom;
+        this.ruleSet = ruleSet;
+        this.probabilities = probabilities;
     }
 
     @Override
-    public void generate(FastRandom rand, int posX, int posY, int posZ, boolean update) {
+    public void generate(WorldView view, FastRandom rand, int posX, int posY, int posZ) {
 
-        String axiom = _initialAxiom;
+        String axiom = initialAxiom;
 
         Stack<Vector3f> _stackPosition = new Stack<Vector3f>();
         Stack<Matrix4f> _stackOrientation = new Stack<Matrix4f>();
 
-        for (int i = 0; i < _iterations; i++) {
+        for (int i = 0; i < iterations; i++) {
 
             String temp = "";
 
@@ -84,8 +86,8 @@ public class TreeGeneratorLSystem extends TreeGenerator {
 
                 double rValue = (rand.randomDouble() + 1.0) / 2.0;
 
-                if (_ruleSet.containsKey(c) && _probabilities.get(c) > (1.0 - rValue))
-                    temp += _ruleSet.get(c);
+                if (ruleSet.containsKey(c) && probabilities.get(c) > (1.0 - rValue))
+                    temp += ruleSet.get(c);
                 else
                     temp += c;
             }
@@ -111,11 +113,10 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                 case 'G':
                 case 'F':
                     // Tree trunk
-                    _generatorManager.getParent().setBlock(posX + (int) position.x + 1, posY + (int) position.y, posZ + (int) position.z, _barkType, update, true, true);
-                    _generatorManager.getParent().setBlock(posX + (int) position.x - 1, posY + (int) position.y, posZ + (int) position.z, _barkType, update, true, true);
-                    _generatorManager.getParent().setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z + 1, _barkType, update, true, true);
-                    _generatorManager.getParent().setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z - 1, _barkType, update, true, true);
-
+                    view.setBlock(posX + (int) position.x + 1, posY + (int) position.y, posZ + (int) position.z, barkType, view.getBlock(posX + (int) position.x + 1, posY + (int) position.y, posZ + (int) position.z));
+                    view.setBlock(posX + (int) position.x - 1, posY + (int) position.y, posZ + (int) position.z, barkType, view.getBlock(posX + (int) position.x - 1, posY + (int) position.y, posZ + (int) position.z));
+                    view.setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z + 1, barkType, view.getBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z + 1));
+                    view.setBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z - 1, barkType, view.getBlock(posX + (int) position.x, posY + (int) position.y, posZ + (int) position.z - 1));
 
                     // Generate leaves
                     if (_stackOrientation.size() > 1) {
@@ -127,18 +128,10 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                                     if (Math.abs(x) == size && Math.abs(y) == size && Math.abs(z) == size)
                                         continue;
 
-                                    if (_generatorManager.getParent().getBlock(posX + (int) position.x + x + 1, posY + (int) position.y + y, posZ + z + (int) position.z) == 0x0)
-                                        _generatorManager.getParent().setBlock(posX + (int) position.x + x + 1, posY + (int) position.y + y, posZ + z + (int) position.z, _leafType, update, true, true);
-
-                                    if (_generatorManager.getParent().getBlock(posX + (int) position.x + x - 1, posY + (int) position.y + y, posZ + z + (int) position.z) == 0x0)
-                                        _generatorManager.getParent().setBlock(posX + (int) position.x + x - 1, posY + (int) position.y + y, posZ + z + (int) position.z, _leafType, update, true, true);
-
-                                    if (_generatorManager.getParent().getBlock(posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z + 1) == 0x0)
-                                        _generatorManager.getParent().setBlock(posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z + 1, _leafType, update, true, true);
-
-                                    if (_generatorManager.getParent().getBlock(posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z - 1) == 0x0)
-                                        _generatorManager.getParent().setBlock(posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z - 1, _leafType, update, true, true);
-
+                                    view.setBlock(posX + (int) position.x + x + 1, posY + (int) position.y + y, posZ + z + (int) position.z, leafType, air);
+                                    view.setBlock(posX + (int) position.x + x - 1, posY + (int) position.y + y, posZ + z + (int) position.z, leafType, air);
+                                    view.setBlock(posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z + 1, leafType, air);
+                                    view.setBlock(posX + (int) position.x + x, posY + (int) position.y + y, posZ + z + (int) position.z - 1, leafType, air);
                                 }
                             }
                         }
@@ -159,46 +152,46 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                     break;
                 case '+':
                     tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, 0, 1), (float) Math.toRadians(_angleInDegree + angleOffset)));
+                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, 0, 1), (float) Math.toRadians(angleInDegree + angleOffset)));
                     rotation.mul(tempRotation);
                     break;
                 case '-':
                     tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, 0, -1), (float) Math.toRadians(_angleInDegree + angleOffset)));
+                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, 0, -1), (float) Math.toRadians(angleInDegree + angleOffset)));
                     rotation.mul(tempRotation);
                     break;
                 case '&':
                     tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, 1, 0), (float) Math.toRadians(_angleInDegree + angleOffset)));
+                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, 1, 0), (float) Math.toRadians(angleInDegree + angleOffset)));
                     rotation.mul(tempRotation);
                     break;
                 case '^':
                     tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, -1, 0), (float) Math.toRadians(_angleInDegree + angleOffset)));
+                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(0, -1, 0), (float) Math.toRadians(angleInDegree + angleOffset)));
                     rotation.mul(tempRotation);
                     break;
                 case '*':
                     tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(1, 0, 0), (float) Math.toRadians(_angleInDegree)));
+                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(1, 0, 0), (float) Math.toRadians(angleInDegree)));
                     rotation.mul(tempRotation);
                     break;
                 case '/':
                     tempRotation.setIdentity();
-                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(-1, 0, 0), (float) Math.toRadians(_angleInDegree)));
+                    tempRotation.setRotation(new AxisAngle4f(new Vector3f(-1, 0, 0), (float) Math.toRadians(angleInDegree)));
                     rotation.mul(tempRotation);
                     break;
             }
         }
     }
 
-    public TreeGenerator withLeafType(byte b) {
-        _leafType = b;
+    public TreeGenerator setLeafType(Block b) {
+        leafType = b;
         return this;
     }
 
 
-    public TreeGenerator withBarkType(byte b) {
-        _barkType = b;
+    public TreeGenerator setBarkType(Block b) {
+        barkType = b;
         return this;
     }
 }

@@ -13,8 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.generators;
+package org.terasology.logic.newWorld.generator;
 
+import org.terasology.logic.generators.GeneratorManager;
+import org.terasology.logic.newWorld.WorldProvider;
+import org.terasology.logic.newWorld.WorldView;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.utilities.FastRandom;
 
@@ -25,14 +28,10 @@ import org.terasology.utilities.FastRandom;
  */
 public class TreeGeneratorCactus extends TreeGenerator {
 
-    public TreeGeneratorCactus(GeneratorManager m) {
-        super(m);
-    }
-
     @Override
-    public void generate(FastRandom rand, int posX, int posY, int posZ, boolean update) {
+    public void generate(WorldView view, FastRandom rand, int posX, int posY, int posZ) {
         for (int y = posY; y < posY + 3; y++) {
-            _generatorManager.getParent().setBlock(posX, y, posZ, BlockManager.getInstance().getBlock("Cactus").getId(), update, true, true);
+            view.setBlock(posX, y, posZ, BlockManager.getInstance().getBlock("Cactus"), view.getBlock(posX, y, posZ));
         }
     }
 }

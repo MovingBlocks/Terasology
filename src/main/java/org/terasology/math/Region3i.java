@@ -215,7 +215,11 @@ public class Region3i implements Iterable<Vector3i> {
      */
     public boolean encompasses(Vector3i pos)
     {
-        return (pos.x >= min.x) && (pos.y >= min.y) && (pos.z >= min.z) && (pos.x < min.x + size.x) && (pos.y < min.y + size.y) && (pos.z < min.z + size.z);
+        return encompasses(pos.x, pos.y, pos.z);
+    }
+
+    public boolean encompasses(int x, int y, int z) {
+        return (x >= min.x) && (y >= min.y) && (z >= min.z) && (x < min.x + size.x) && (y < min.y + size.y) && (z < min.z + size.z);
     }
 
     /**
@@ -264,6 +268,7 @@ public class Region3i implements Iterable<Vector3i> {
     private class Region3iIterator implements Iterator<Vector3i>
     {
         Vector3i pos;
+        Vector3i result = new Vector3i();
 
         public Region3iIterator(Region3i region)
         {

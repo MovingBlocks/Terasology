@@ -21,12 +21,15 @@ import org.terasology.math.*;
 import org.terasology.model.blocks.Block;
 
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Immortius
  */
 public class LightPropagator {
 
+    private Logger logger = Logger.getLogger(getClass().getName());
     private WorldView worldView;
 
     public LightPropagator(WorldView worldView) {
@@ -203,14 +206,19 @@ public class LightPropagator {
                     Vector3i adjPos = new Vector3i(pos);
                     adjPos.add(side.getVector3i());
 
-                    Block block = worldView.getBlock(adjPos);
-                    if (block.isTranslucent()) {
-                        byte adjLight = worldView.getSunlight(adjPos);
-                        if (adjLight < lightLevel - 1) {
-                            worldView.setSunlight(adjPos, (byte) (lightLevel - 1));
-                            nextWave.add(adjPos);
-                            affectedRegion = affectedRegion.expandToContain(adjPos);
+                    try {
+                        Block block = worldView.getBlock(adjPos);
+
+                        if (block.isTranslucent()) {
+                            byte adjLight = worldView.getSunlight(adjPos);
+                            if (adjLight < lightLevel - 1) {
+                                worldView.setSunlight(adjPos, (byte) (lightLevel - 1));
+                                nextWave.add(adjPos);
+                                affectedRegion = affectedRegion.expandToContain(adjPos);
+                            }
                         }
+                    } catch (ArrayIndexOutOfBoundsException e) {
+                        logger.log(Level.SEVERE, String.format("Pushing Light %s %d %s", new Vector3i(x, y, z), lightLevel, worldView.getChunkRegion()), e);
                     }
                 }
             }
@@ -258,14 +266,20 @@ public class LightPropagator {
 
     private Region3i clearSunlight(int x, int y, int z) {
         byte oldSunlight = worldView.getSunlight(x, y, z);
-        worldView.setSunlight(x, y, z, (byte)0);
         if (oldSunlight == NewChunk.MAX_LIGHT) {
+            //logger.log(Level.INFO, "Full Recalculating sunlight");
+            worldView.setSunlight(x, y, z, (byte)0);
             fullRecalculateSunlightAround(x, y, z);
             return Region3i.createFromMinAndSize(new Vector3i(x - NewChunk.MAX_LIGHT + 1, 0, z - NewChunk.MAX_LIGHT + 1), new Vector3i(2 * NewChunk.MAX_LIGHT - 1, NewChunk.SIZE_Y, 2 * NewChunk.MAX_LIGHT - 1));
-        } else {
+        } else if (oldSunlight > 1) {
+            //logger.log(Level.INFO, "Local Recalculating sunlight");
             localRecalculateSunlightAround(x, y, z, oldSunlight);
             return Region3i.createFromCenterExtents(new Vector3i(x,y,z), oldSunlight - 1);
+        } else if (oldSunlight > 0) {
+            worldView.setSunlight(x, y, z, (byte)0);
+            return Region3i.createFromCenterExtents(new Vector3i(x,y,z), 0);
         }
+        return Region3i.EMPTY;
     }
 
     private void clearLight(int x, int y, int z, int oldLightLevel) {
@@ -310,62 +324,52 @@ public class LightPropagator {
         }
     }
 
-    private void fullRecalculateSunlightAround(int x, int y, int z) {
-        int checkY = y - 1;
-        while (checkY >= 0 && worldView.getBlock(x, checkY, z).isTranslucent()) {
-            checkY--;
-        }
-        checkY++;
+    private void fullRecalculateSunlightAround(int blockX, int blockY, int blockZ) {
+        int top = Math.min(NewChunk.SIZE_Y - 2, blockY + NewChunk.MAX_LIGHT - 2);
+        Region3i region = Region3i.createFromMinMax(new Vector3i(blockX - NewChunk.MAX_LIGHT + 1, 0, blockZ - NewChunk.MAX_LIGHT + 1), new Vector3i(blockX + NewChunk.MAX_LIGHT - 1, top, blockZ + NewChunk.MAX_LIGHT - 1));
+        short[] tops = new short[region.size().x * region.size().z];
 
-        // Clear a diamond column of sunlight
-        int yMax = Math.min(y + NewChunk.MAX_LIGHT, NewChunk.SIZE_Y - 1);
-        int yMin = Math.max(0, checkY - NewChunk.MAX_LIGHT + 1);
-        for (int offsetX = 1 - NewChunk.MAX_LIGHT; offsetX < NewChunk.MAX_LIGHT; ++ offsetX) {
-            int zRange = NewChunk.MAX_LIGHT - TeraMath.fastAbs(offsetX);
-            for (int offsetZ = 1 - zRange; offsetZ < zRange; ++offsetZ) {
-                for (int colY = yMin; colY < yMax ; colY++ ) {
-                    worldView.setSunlight(x + offsetX, colY, z + offsetZ, (byte)0);
-                }
-            }
-        }
-
-        // Draw in light from above the column
-        for (int offsetX = 1 - NewChunk.MAX_LIGHT; offsetX < NewChunk.MAX_LIGHT; ++ offsetX) {
-            int zRange = NewChunk.MAX_LIGHT - TeraMath.fastAbs(offsetX);
-            for (int offsetZ = 1 - zRange; offsetZ < zRange; ++offsetZ) {
-                byte light = worldView.getSunlight(x + offsetX, yMax, z + offsetZ);
-                if (light > 1) {
-                    pushSunlight(x + offsetX, yMax, z + offsetZ, light);
-                }
-            }
-        }
-        // Push light up from below the column
-        if (yMin > 0) {
-            for (int offsetX = 1 - NewChunk.MAX_LIGHT; offsetX < NewChunk.MAX_LIGHT; ++ offsetX) {
-                int zRange = NewChunk.MAX_LIGHT - TeraMath.fastAbs(offsetX);
-                for (int offsetZ = 1 - zRange; offsetZ < zRange; ++offsetZ) {
-                    byte light = worldView.getSunlight(x + offsetX, yMin - 1, z + offsetZ);
-                    if (light > 1) {
-                        pushSunlight(x + offsetX, yMin - 1, z + offsetZ, light);
+        // Tunnel light down
+        for (int x = 0; x < region.size().x; x++) {
+            for (int z = 0; z < region.size().z; z++) {
+                int y = top;
+                byte aboveLight = worldView.getSunlight(x + region.min().x, y + 1, z + region.min().z);
+                if (aboveLight == NewChunk.MAX_LIGHT) {
+                    for (; y >= 0; y--) {
+                        if (worldView.getBlock(x + region.min().x, y, z + region.min().z).isTranslucent()) {
+                            worldView.setSunlight(x + region.min().x, y, z + region.min().z, NewChunk.MAX_LIGHT);
+                        } else {
+                            break;
+                        }
                     }
                 }
+                tops[x + region.size().x * z] = (short)y;
+                for (; y >= 0; y--) {
+                    worldView.setSunlight(x + region.min().x, y, z + region.min().z, (byte)0);
+                }
+
             }
         }
-        // Push light in from outside the column
-        for (int offsetX = - NewChunk.MAX_LIGHT; offsetX < NewChunk.MAX_LIGHT + 1; ++offsetX) {
-            int offsetZ = -NewChunk.MAX_LIGHT + TeraMath.fastAbs(offsetX);
-            for (int colY = yMin; colY < yMax; colY++ ) {
-                byte light = worldView.getSunlight(x + offsetX, colY, z + offsetZ);
-                if (light > 1) {
-                    pushSunlight(x + offsetX, colY, z + offsetZ, light);
+
+        // Spread internal to the changed column
+        for (int x = 0; x < region.size().x; x++) {
+            for (int z = 0; z < region.size().z; z++) {
+                // Pull light down
+                if (tops[x + region.size().x * z] == top) {
+                    propagateSunlightFrom(region.min().x + x, top + 1, region.min().z + z, Side.BOTTOM);
                 }
-            }
-            if (offsetZ < 0) {
-                offsetZ *= -1;
-                for (int colY = yMin; colY < yMax; colY++ ) {
-                    byte light = worldView.getSunlight(x + offsetX, colY, z + offsetZ);
-                    if (light > 1) {
-                        pushSunlight(x + offsetX, colY, z + offsetZ, light);
+                for (int y = tops[x + region.size().x * z]; y >= 0; y--) {
+                    if (x <= 0 || tops[(x - 1) + region.size().x * z] < y) {
+                        propagateSunlightFrom(region.min().x + x - 1, y, region.min().z + z, Side.RIGHT);
+                    }
+                    if (x >= region.size().x - 1 || tops[(x + 1) + region.size().x * z] < y) {
+                        propagateSunlightFrom(region.min().x + x + 1, y, region.min().z + z, Side.LEFT);
+                    }
+                    if (z <= 0 || tops[x + region.size().x * (z - 1)] < y) {
+                        propagateSunlightFrom(region.min().x + x, y, region.min().z + z - 1, Side.BACK);
+                    }
+                    if (z >= region.size().z - 1 || tops[x + region.size().x * (z + 1)] < y) {
+                        propagateSunlightFrom(region.min().x + x, y, region.min().z + z + 1, Side.FRONT);
                     }
                 }
             }

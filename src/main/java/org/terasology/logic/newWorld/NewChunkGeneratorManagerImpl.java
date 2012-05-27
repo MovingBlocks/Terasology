@@ -29,6 +29,7 @@ public class NewChunkGeneratorManagerImpl implements NewChunkGeneratorManager {
     private String worldSeed;
     private WorldBiomeProvider biomeProvider;
     private List<NewChunkGenerator> chunkGenerators = Lists.newArrayList();
+    private List<SecondPassChunkGenerator> secondPassChunkGenerators = Lists.newArrayList();
 
     public NewChunkGeneratorManagerImpl(String seed, WorldBiomeProvider biomeProvider) {
         this.worldSeed = seed;
@@ -38,7 +39,10 @@ public class NewChunkGeneratorManagerImpl implements NewChunkGeneratorManager {
     @Override
     public void setWorldSeed(String seed) {
         this.worldSeed = seed;
-        for (NewChunkGenerator generator : chunkGenerators) {
+        for (BaseChunkGenerator generator : chunkGenerators) {
+            generator.setWorldSeed(seed);
+        }
+        for (BaseChunkGenerator generator : secondPassChunkGenerators) {
             generator.setWorldSeed(seed);
         }
     }
@@ -46,16 +50,24 @@ public class NewChunkGeneratorManagerImpl implements NewChunkGeneratorManager {
     @Override
     public void setWorldBiomeProvider(WorldBiomeProvider biomeProvider) {
         this.biomeProvider = biomeProvider;
-        for (NewChunkGenerator generator : chunkGenerators) {
+        for (BaseChunkGenerator generator : chunkGenerators) {
+            generator.setWorldBiomeProvider(biomeProvider);
+        }
+        for (BaseChunkGenerator generator : secondPassChunkGenerators) {
             generator.setWorldBiomeProvider(biomeProvider);
         }
     }
 
     @Override
-    public void registerChunkGenerator(NewChunkGenerator generator) {
-        generator.setWorldSeed(worldSeed);
+    public void registerChunkGenerator(BaseChunkGenerator generator) {
         generator.setWorldBiomeProvider(biomeProvider);
-        chunkGenerators.add(generator);
+        generator.setWorldSeed(worldSeed);
+        if (generator instanceof NewChunkGenerator) {
+            chunkGenerators.add((NewChunkGenerator)generator);
+        }
+        if (generator instanceof SecondPassChunkGenerator) {
+            secondPassChunkGenerators.add((SecondPassChunkGenerator) generator);
+        }
     }
 
     @Override
@@ -68,7 +80,9 @@ public class NewChunkGeneratorManagerImpl implements NewChunkGeneratorManager {
     }
 
     @Override
-    public void postProcess(WorldView view) {
-
+    public void secondPassChunk(Vector3i chunkPos, WorldView view) {
+        for (SecondPassChunkGenerator generator : secondPassChunkGenerators) {
+            generator.postProcessChunk(chunkPos, view);
+        }
     }
 }

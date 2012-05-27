@@ -18,10 +18,10 @@ package org.terasology.logic.newWorld;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import org.terasology.components.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.logic.newWorld.generationPhase.*;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 
@@ -36,86 +36,35 @@ import java.util.logging.Logger;
  */
 public class LocalChunkProvider implements NewChunkProvider
 {
-    private static final int NUM_GENERATOR_THREADS = 2;
-    private static final int NUM_SECOND_PASS_THREADS = 1;
     private static final int CACHE_SIZE = (int) (2 * Runtime.getRuntime().maxMemory() / 1048576);
 
     private Logger logger = Logger.getLogger(getClass().getName());
     private NewChunkCache farCache;
 
-    private Set<Vector3i> generatingChunks = Sets.newHashSet();
-    private BlockingQueue<Vector3i> generateQueue = new PriorityBlockingQueue<Vector3i>(128, new ChunkRelevanceComparator());
-    private ConcurrentLinkedQueue<Vector3i> generatedChunks = Queues.newConcurrentLinkedQueue();
-    private ExecutorService generatorThreadPool = Executors.newFixedThreadPool(NUM_GENERATOR_THREADS);
-
-    private Set<Vector3i> secondPassPendingChunks = Sets.newHashSet();
-    private BlockingQueue<Vector3i> secondPassQueue = new PriorityBlockingQueue<Vector3i>(128, new ChunkRelevanceComparator());
-    private ConcurrentLinkedQueue<Vector3i> secondPassCompleteChunks = Queues.newConcurrentLinkedQueue();
-    private ExecutorService secondPassThreadPool = Executors.newFixedThreadPool(NUM_GENERATOR_THREADS);
-
+    private ChunkPhase generatePhase;
+    private ChunkPhase secondPassPhase;
+    private ChunkPhase internalLightingPhase;
+    private ChunkPhase propagateLightPhase;
     private Set<CacheRegion> regions = Sets.newHashSet();
 
     private ConcurrentMap<Vector3i, NewChunk> nearCache = Maps.newConcurrentMap();
     private NewChunkGeneratorManager generator;
 
     public LocalChunkProvider(NewChunkCache farCache, NewChunkGeneratorManager generator) {
-        logger.setLevel(Level.FINE);
         this.farCache = farCache;
         this.generator = generator;
-        for (int i = 0; i < NUM_GENERATOR_THREADS; ++i) {
-            generatorThreadPool.execute(new Runnable() {
-                @Override
-                public void run() {
-                    Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-                    boolean running = true;
-                    while (running) {
-                        try {
-                            Vector3i pos = generateQueue.take();
-                            createChunk(pos);
-                            generatedChunks.add(pos);
-                        }
-                        catch (InterruptedException e) {
-                            logger.log(Level.INFO, "Generator Thread ending");
-                            running = false;
-                        }
-                        catch (Exception e) {
-                            logger.log(Level.SEVERE, "Error in generate thread", e);
-                        }
-                    }
-                }
-            });
-        }
-        for (int i = 0; i < NUM_SECOND_PASS_THREADS; ++i) {
-            secondPassThreadPool.execute(new Runnable() {
-                @Override
-                public void run() {
-                    Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-                    boolean running = true;
-                    while (running) {
-                        try {
-                            Vector3i pos = secondPassQueue.take();
-                            // TODO: Can get an error here if the chunk is disposed prior to being generated.
-                            fullGenerateChunk(getChunk(pos));
-                            secondPassCompleteChunks.add(pos);
-                        }
-                        catch (InterruptedException e) {
-                            logger.log(Level.INFO, "Second Pass Thread ending");
-                            running = false;
-                        }
-                        catch (Exception e) {
-                            logger.log(Level.SEVERE, "Error in second pass thread", e);
-                        }
-                    }
-                }
-            });
-        }
+        Comparator<Vector3i> chunkRelevanceComparator = new ChunkRelevanceComparator();
+        generatePhase = new CreateChunkPhase(4, chunkRelevanceComparator, generator, nearCache);
+        secondPassPhase = new SecondPassPhase(1, chunkRelevanceComparator, generator, this);
+        internalLightingPhase = new InternalLightingPhase(2, chunkRelevanceComparator, this);
+        propagateLightPhase = new PropagateLightingPhase(1, chunkRelevanceComparator, generator, this);
     }
 
     @Override
     public void addRegionEntity(EntityRef entity, int distance) {
         CacheRegion region = new CacheRegion(entity, distance);
         regions.add(region);
-        checkRegion(region);
+        checkForMissingChunks(region);
     }
 
     @Override
@@ -129,22 +78,34 @@ public class LocalChunkProvider implements NewChunkProvider
             cacheRegion.update();
             if (cacheRegion.isDirty()) {
                 cacheRegion.setUpToDate();
-                checkRegion(cacheRegion);
+                checkForMissingChunks(cacheRegion);
             }
         }
-        while (!generatedChunks.isEmpty()) {
-            Vector3i chunkPos = generatedChunks.poll();
+        while (generatePhase.isResultAvailable()) {
+            Vector3i chunkPos = generatePhase.poll();
             logger.log(Level.FINE, "Received generated chunk " + chunkPos);
-            generatingChunks.remove(chunkPos);
             for (Vector3i pos : Region3i.createFromCenterExtents(chunkPos, new Vector3i(1,0,1))) {
-                checkFullGenerate(pos);
+                checkReadyForSecondPass(pos);
             }
         }
-        while (!secondPassCompleteChunks.isEmpty()) {
-            Vector3i chunkPos = secondPassCompleteChunks.poll();
+        while (secondPassPhase.isResultAvailable()) {
+            Vector3i chunkPos = secondPassPhase.poll();
             logger.log(Level.FINE, "Received second passed chunk " + chunkPos);
-            secondPassPendingChunks.remove(chunkPos);
-            for (Vector3i pos : Region3i.createFromCenterExtents(chunkPos, new Vector3i(2,0,2))) {
+            for (Vector3i pos : Region3i.createFromCenterExtents(chunkPos, new Vector3i(1,0,1))) {
+                checkReadyToDoInternalLighting(pos);
+            }
+        }
+        while (internalLightingPhase.isResultAvailable()) {
+            Vector3i chunkPos = internalLightingPhase.poll();
+            logger.log(Level.FINE, "Received internally lit chunk " + chunkPos);
+            for (Vector3i pos : Region3i.createFromCenterExtents(chunkPos, new Vector3i(1,0,1))) {
+                checkReadyToPropagateLighting(pos);
+            }
+        }
+        while (propagateLightPhase.isResultAvailable()) {
+            Vector3i chunkPos = propagateLightPhase.poll();
+            logger.log(Level.FINE, "Received second passed chunk " + chunkPos);
+            for (Vector3i pos : Region3i.createFromCenterExtents(chunkPos, new Vector3i(1,0,1))) {
                 checkComplete(pos);
             }
         }
@@ -161,7 +122,7 @@ public class LocalChunkProvider implements NewChunkProvider
                     }
                 }
                 if (!keep) {
-                    // TODO: need some way to not dispose chunks being edited
+                    // TODO: need some way to not dispose chunks being edited or generated
                     NewChunk chunk = nearCache.get(pos);
                     farCache.put(chunk);
                     iterator.remove();
@@ -202,20 +163,15 @@ public class LocalChunkProvider implements NewChunkProvider
 
     @Override
     public void dispose() {
-        generatorThreadPool.shutdown();
-        try {
-            generatorThreadPool.awaitTermination(5, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            logger.log(Level.SEVERE, "Interrupted while attempting clean shutdown", e);
-        }
+        generatePhase.dispose();
+        secondPassPhase.dispose();
+        internalLightingPhase.dispose();
+        propagateLightPhase.dispose();
         for (NewChunk chunk : nearCache.values()) {
             farCache.put(chunk);
             chunk.dispose();
         }
         nearCache.clear();
-        generatedChunks.clear();
-        generateQueue.clear();
-        generatingChunks.clear();
     }
 
     @Override
@@ -227,22 +183,20 @@ public class LocalChunkProvider implements NewChunkProvider
      * Checks for uncreated chunks in the region, fetching from far cache as necessary.
      * @param cacheRegion
      */
-    private void checkRegion(CacheRegion cacheRegion) {
-        for (final Vector3i chunkPos : cacheRegion.getRegion().expand(new Vector3i(2,0,2))) {
+    private void checkForMissingChunks(CacheRegion cacheRegion) {
+        for (final Vector3i chunkPos : cacheRegion.getRegion().expand(new Vector3i(4,0,4))) {
             NewChunk chunk = getChunk(chunkPos);
-            if (chunk == null && !generatingChunks.contains(chunkPos)) {
+            //TODO: Add checks for incomplete chunks too
+            if (chunk == null && !generatePhase.processing(chunkPos)) {
                 logger.log(Level.FINE, "Generating Chunk " + chunkPos);
-                generatingChunks.add(chunkPos);
-                if (!generateQueue.offer(chunkPos)) {
-                    logger.severe("Failed to queue chunk generation: " + chunkPos);
-                }
+                generatePhase.queue(chunkPos);
             }
         }
     }
 
-    private void checkFullGenerate(Vector3i pos) {
+    private void checkReadyForSecondPass(Vector3i pos) {
         NewChunk chunk = getChunk(pos);
-        if (chunk != null && chunk.getChunkState() == NewChunk.State.Awaiting2ndPass && !secondPassPendingChunks.contains(pos)) {
+        if (chunk != null && chunk.getChunkState() == NewChunk.State.AdjacencyGenerationPending && !secondPassPhase.processing(pos)) {
             for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, new Vector3i(1,0,1))) {
                 if (!adjPos.equals(pos)) {
                     NewChunk adjChunk = getChunk(adjPos);
@@ -251,21 +205,50 @@ public class LocalChunkProvider implements NewChunkProvider
                     }
                 }
             }
-            logger.log(Level.FINE, "Queueing for second pass " + pos);
-            secondPassPendingChunks.add(pos);
-            if (!secondPassQueue.offer(pos)) {
-                logger.severe("Failed to queue chunk for second pass: " + pos);
+            logger.log(Level.FINE, "Queueing for adjacency generation " + pos);
+            secondPassPhase.queue(pos);
+        }
+    }
+
+    private void checkReadyToDoInternalLighting(Vector3i pos) {
+        NewChunk chunk = getChunk(pos);
+        if (chunk != null && chunk.getChunkState() == NewChunk.State.InternalLightGenerationPending && !internalLightingPhase.processing(pos)) {
+            for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, new Vector3i(1,0,1))) {
+                if (!adjPos.equals(pos)) {
+                    NewChunk adjChunk = getChunk(adjPos);
+                    if (adjChunk == null || adjChunk.getChunkState().compareTo(NewChunk.State.InternalLightGenerationPending) < 0)  {
+                        return;
+                    }
+                }
             }
+            logger.log(Level.FINE, "Queueing for adjacency generation " + pos);
+            internalLightingPhase.queue(pos);
+        }
+    }
+
+    private void checkReadyToPropagateLighting(Vector3i pos) {
+        NewChunk chunk = getChunk(pos);
+        if (chunk != null && chunk.getChunkState() == NewChunk.State.LightPropagationPending && !propagateLightPhase.processing(pos)) {
+            for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, new Vector3i(1,0,1))) {
+                if (!adjPos.equals(pos)) {
+                    NewChunk adjChunk = getChunk(adjPos);
+                    if (adjChunk == null || adjChunk.getChunkState().compareTo(NewChunk.State.LightPropagationPending) < 0) {
+                        return;
+                    }
+                }
+            }
+            logger.log(Level.FINE, "Queueing for second pass " + pos);
+            propagateLightPhase.queue(pos);
         }
     }
 
     private void checkComplete(Vector3i pos) {
         NewChunk chunk = getChunk(pos);
-        if (chunk != null && chunk.getChunkState() == NewChunk.State.AwaitingFullLighting) {
+        if (chunk != null && chunk.getChunkState() == NewChunk.State.FullLightConnectivityPending) {
             for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, new Vector3i(1,0,1))) {
                 if (!adjPos.equals(pos)) {
                     NewChunk adjChunk = getChunk(adjPos);
-                    if (adjChunk == null || (adjChunk.getChunkState() == NewChunk.State.Awaiting2ndPass)) {
+                    if (adjChunk == null || adjChunk.getChunkState().compareTo(NewChunk.State.FullLightConnectivityPending) < 0) {
                         return;
                     }
                 }
@@ -275,25 +258,6 @@ public class LocalChunkProvider implements NewChunkProvider
             // TODO: Send event out
 
         }
-    }
-
-    private NewChunk createChunk(Vector3i pos) {
-        NewChunk newChunk = generator.generateChunk(pos);
-        nearCache.putIfAbsent(pos, newChunk);
-        return newChunk;
-    }
-
-    private void fullGenerateChunk(NewChunk chunk) {
-        WorldView worldView = WorldView.createLocalView(chunk.getPos(), this);
-        worldView.lock();
-        try {
-            LightPropagator propagator = new LightPropagator(worldView);
-            propagator.propagateOutOfTargetChunk();
-            generator.postProcess(worldView);
-        } finally {
-            worldView.unlock();
-        }
-        chunk.setChunkState(NewChunk.State.AwaitingFullLighting);
     }
 
     private static class CacheRegion {

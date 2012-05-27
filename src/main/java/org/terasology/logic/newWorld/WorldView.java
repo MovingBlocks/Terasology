@@ -28,7 +28,8 @@ import org.terasology.model.blocks.management.BlockManager;
 public class WorldView {
 
     private Vector3i offset;
-    private Region3i region;
+    private Region3i chunkRegion;
+    private Region3i blockRegion;
     private NewChunk[] chunks;
 
     public static WorldView createLocalView(Vector3i pos, NewChunkProvider chunkProvider) {
@@ -55,9 +56,19 @@ public class WorldView {
     }
 
     public WorldView(NewChunk[] chunks, Region3i chunkRegion, Vector3i offset) {
-        this.region = chunkRegion;
+        this.chunkRegion = chunkRegion;
+        Vector3i blockMin = new Vector3i();
+        blockMin.sub(offset);
+        blockMin.mult(NewChunk.SIZE_X, 0, NewChunk.SIZE_Z);
+        Vector3i blockSize = chunkRegion.size();
+        blockSize.mult(NewChunk.SIZE_X, NewChunk.SIZE_Y, NewChunk.SIZE_Z);
+        this.blockRegion = Region3i.createFromMinAndSize(blockMin, blockSize);
         this.chunks = chunks;
         this.offset = offset;
+    }
+
+    public Region3i getChunkRegion() {
+        return chunkRegion;
     }
 
     public Block getBlock(float x, float y, float z) {
@@ -70,12 +81,12 @@ public class WorldView {
 
     // TODO: Review
     public Block getBlock(int blockX, int blockY, int blockZ) {
-        if (!isYInBounds(blockY)) return BlockManager.getInstance().getBlock((byte)0);
+        if (!blockRegion.encompasses(blockX, blockY, blockZ)) {
+            return BlockManager.getInstance().getAir();
+        }
 
-        Vector3i chunkPos = TeraMath.calcChunkPos(blockX, blockY, blockZ);
-        int chunkIndex = relChunkIndex(chunkPos.x, chunkPos.y, chunkPos.z);
-        Vector3i innerBlockPos = TeraMath.calcBlockPos(blockX, blockY, blockZ, chunkPos);
-        return chunks[chunkIndex].getBlock(innerBlockPos);
+        int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
+        return chunks[chunkIndex].getBlock(blockX & 0xf, blockY, blockZ & 0xf);
     }
 
     public byte getSunlight(float x, float y, float z) {
@@ -95,21 +106,21 @@ public class WorldView {
     }
 
     public byte getSunlight(int blockX, int blockY, int blockZ) {
-        if (!isYInBounds(blockY)) return 0;
+        if (!blockRegion.encompasses(blockX, blockY, blockZ)) {
+            return 0;
+        }
 
-        Vector3i chunkPos = TeraMath.calcChunkPos(blockX, blockY, blockZ);
-        int chunkIndex = relChunkIndex(chunkPos.x, chunkPos.y, chunkPos.z);
-        Vector3i innerBlockPos = TeraMath.calcBlockPos(blockX, blockY, blockZ, chunkPos);
-        return chunks[chunkIndex].getSunlight(innerBlockPos);
+        int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
+        return chunks[chunkIndex].getSunlight(blockX & 0xf, blockY, blockZ & 0xf);
     }
 
     public byte getLight(int blockX, int blockY, int blockZ) {
-        if (!isYInBounds(blockY)) return 0;
+        if (!blockRegion.encompasses(blockX, blockY, blockZ)) {
+            return 0;
+        }
 
-        Vector3i chunkPos = TeraMath.calcChunkPos(blockX, blockY, blockZ);
-        int chunkIndex = relChunkIndex(chunkPos.x, chunkPos.y, chunkPos.z);
-        Vector3i innerBlockPos = TeraMath.calcBlockPos(blockX, blockY, blockZ, chunkPos);
-        return chunks[chunkIndex].getLight(innerBlockPos);
+        int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
+        return chunks[chunkIndex].getLight(blockX & 0xf, blockY, blockZ & 0xf);
     }
 
     public boolean setBlock(Vector3i pos, Block type, Block oldType) {
@@ -117,12 +128,12 @@ public class WorldView {
     }
 
     public boolean setBlock(int blockX, int blockY, int blockZ, Block type, Block oldType) {
-        if (!isYInBounds(blockY)) return false;
+        if (!blockRegion.encompasses(blockX, blockY, blockZ)) {
+            return false;
+        }
 
-        Vector3i chunkPos = TeraMath.calcChunkPos(blockX, blockY, blockZ);
-        int chunkIndex = relChunkIndex(chunkPos.x, chunkPos.y, chunkPos.z);
-        Vector3i innerBlockPos = TeraMath.calcBlockPos(blockX, blockY, blockZ, chunkPos);
-        return chunks[chunkIndex].setBlock(innerBlockPos, type, oldType);
+        int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
+        return chunks[chunkIndex].setBlock(blockX & 0xf, blockY, blockZ & 0xf, type, oldType);
     }
 
     public void setLight(Vector3i pos, byte light) {
@@ -134,26 +145,22 @@ public class WorldView {
     }
 
     public void setSunlight(int blockX, int blockY, int blockZ, byte light) {
-        if (!isYInBounds(blockY)) return;
-
-        Vector3i chunkPos = TeraMath.calcChunkPos(blockX, blockY, blockZ);
-        int chunkIndex = relChunkIndex(chunkPos.x, chunkPos.y, chunkPos.z);
-        Vector3i innerBlockPos = TeraMath.calcBlockPos(blockX, blockY, blockZ, chunkPos);
-        chunks[chunkIndex].setSunlight(innerBlockPos, light);
+        if (blockRegion.encompasses(blockX, blockY, blockZ)) {
+            int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
+            chunks[chunkIndex].setSunlight(blockX & 0xf, blockY, blockZ & 0xf, light);
+        }
     }
 
     public void setLight(int blockX, int blockY, int blockZ, byte light) {
-        if (!isYInBounds(blockY)) return;
-
-        Vector3i chunkPos = TeraMath.calcChunkPos(blockX, blockY, blockZ);
-        int chunkIndex = relChunkIndex(chunkPos.x, chunkPos.y, chunkPos.z);
-        Vector3i innerBlockPos = TeraMath.calcBlockPos(blockX, blockY, blockZ, chunkPos);
-        chunks[chunkIndex].setLight(innerBlockPos, light);
+        if (blockRegion.encompasses(blockX, blockY, blockZ)) {
+            int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
+            chunks[chunkIndex].setLight(blockX & 0xf, blockY, blockZ & 0xf, light);
+        }
     }
 
     public void setDirtyAround(Vector3i blockPos) {
         for (Vector3i pos : TeraMath.getChunkRegionAroundBlockPos(blockPos, 1)) {
-            chunks[relChunkIndex(pos.x, pos.y, pos.z)].setDirty(true);
+            chunks[pos.x + offset.x + chunkRegion.size().x * (pos.z + offset.z)].setDirty(true);
         }
     }
 
@@ -167,7 +174,7 @@ public class WorldView {
         Vector3i maxChunk = TeraMath.calcChunkPos(maxPos);
 
         for (Vector3i pos : Region3i.createFromMinMax(minChunk, maxChunk)) {
-            chunks[relChunkIndex(pos.x, pos.y, pos.z)].setDirty(true);
+            chunks[pos.x + offset.x + chunkRegion.size().x * (pos.z + offset.z)].setDirty(true);
         }
     }
 
@@ -183,11 +190,7 @@ public class WorldView {
         }
     }
 
-    private int relChunkIndex(int x, int y, int z) {
-        return (x + offset.x) + region.size().x * (z + offset.z);
-    }
-
-    private boolean isYInBounds(int y) {
-        return y >= 0 && y < NewChunk.SIZE_Y;
+    int relChunkIndex(int x, int y, int z) {
+        return (x >> 4) + offset.x + chunkRegion.size().x * ((z >> 4) + offset.z);
     }
 }

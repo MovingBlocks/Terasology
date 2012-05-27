@@ -16,6 +16,7 @@
 package org.terasology.logic.generators;
 
 import org.terasology.logic.manager.Config;
+import org.terasology.logic.newWorld.generator.TreeGenerator;
 import org.terasology.logic.world.Chunk;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.utilities.FastRandom;
@@ -80,7 +81,7 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
 
                             TreeGenerator treeGen = _parent.getTreeGenerator(biome, randomGeneratorId);
 
-                            if (rand < treeGen.getGenProbability()) {
+                            if (rand < treeGen.getGenerationProbability()) {
                                 generateTree(c, treeGen, randX, y, randZ, random);
                             }
                         }
@@ -171,6 +172,6 @@ public class ChunkGeneratorFlora extends ChunkGeneratorTerrain {
         if (!c.canBlockSeeTheSky(x, y + 1, z))
             return;
 
-        treeGen.generate(random, c.getBlockWorldPosX(x), y + 1, c.getBlockWorldPosZ(z), false);
+        //treeGen.generate(random, c.getBlockWorldPosX(x), y + 1, c.getBlockWorldPosZ(z), false);
     }
 }

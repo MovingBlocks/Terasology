@@ -28,9 +28,9 @@ public interface NewChunkGeneratorManager {
 
     void setWorldBiomeProvider(WorldBiomeProvider biomeProvider);
 
-    void registerChunkGenerator(NewChunkGenerator generator);
+    void registerChunkGenerator(BaseChunkGenerator generator);
 
     NewChunk generateChunk(Vector3i pos);
 
-    void postProcess(WorldView worldView);
+    void secondPassChunk(Vector3i chunkPos, WorldView view);
 }

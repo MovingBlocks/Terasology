@@ -16,16 +16,31 @@
 
 package org.terasology.game.logic.world;
 
+import gnu.trove.map.TObjectDoubleMap;
 import org.junit.Before;
 import org.junit.Test;
+import org.lwjgl.LWJGLUtil;
+import org.terasology.game.Terasology;
+import org.terasology.game.TerasologyEngine;
+import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.newWorld.LightPropagator;
 import org.terasology.logic.newWorld.NewChunk;
 import org.terasology.logic.newWorld.WorldView;
+import org.terasology.math.Diamond3iIterator;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.utilities.FastRandom;
+
+import java.io.File;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Level;
 
 import static org.junit.Assert.assertEquals;
 
@@ -106,9 +121,9 @@ public class LightPropagationTest {
 
     @Test
     public void pullLightThroughHolePropagation() {
-            for (Vector3i pos : Region3i.createFromMinMax(new Vector3i(5, WORLD_MIN.y, WORLD_MIN.z), new Vector3i(5, WORLD_MAX.y, WORLD_MAX.z))) {
-                view.setBlock(pos, dirt, air);
-            }
+        for (Vector3i pos : Region3i.createFromMinMax(new Vector3i(5, WORLD_MIN.y, WORLD_MIN.z), new Vector3i(5, WORLD_MAX.y, WORLD_MAX.z))) {
+            view.setBlock(pos, dirt, air);
+        }
         Vector3i lightPos = new Vector3i(4,32,5);
         view.setBlock(lightPos, torch, air);
         propagator.update(lightPos, torch, air);
@@ -200,5 +215,24 @@ public class LightPropagationTest {
             assertEquals(pos.toString(), expected, view.getSunlight(pos));
         }
     }
+
+    /*@Test
+    public void pushSunlightPerf() {
+        Block air = BlockManager.getInstance().getAir();
+        long total = 0;
+        for (int i = 0; i < 1; ++i) {
+            for (Vector3i pos : Region3i.createFromMinMax(WORLD_MIN, WORLD_MAX)) {
+                view.setSunlight(pos, NewChunk.MAX_LIGHT);
+                view.setBlock(pos, air, dirt);
+            }
+            long start = System.nanoTime();
+            for (Vector3i pos : Diamond3iIterator.iterate(new Vector3i(8,128,8),8)) {
+                view.setBlock(pos, dirt, air);
+                new LightPropagator(view).update(pos, dirt, air);
+            }
+            total += System.nanoTime() - start;
+        }
+        System.out.println((double)(total) / 10e8);
+    }*/
 
 }

@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.generators;
 
+ import org.terasology.logic.newWorld.generator.TreeGenerator;
  import org.terasology.logic.world.LocalWorldProvider;
  import org.terasology.utilities.FastRandom;
 
@@ -49,7 +50,7 @@ public class GeneratorManager {
 
     public void loadTrees() {
         // TODO: Turn this into a generic tree loader that goes looking for any tree definitions (MetaBlock = Tree ?)
-        new DefaultGenerators(this);
+        //new DefaultGenerators(this);
     }
 
     public ArrayList<TreeGenerator> getTreeGenerators(ChunkGeneratorTerrain.BIOME_TYPE type) {

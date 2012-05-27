@@ -21,11 +21,9 @@ import org.terasology.math.Vector3i;
 /**
  * @author Immortius
  */
-public interface NewChunkGenerator {
+public interface NewChunkGenerator extends BaseChunkGenerator {
 
-    public void setWorldSeed(String seed);
 
-    public void setWorldBiomeProvider(WorldBiomeProvider biomeProvider);
 
     /**
      * Generate the local contents of a chunk. This should be purely deterministic from the chunk contents, chunk
@@ -34,11 +32,4 @@ public interface NewChunkGenerator {
      */
     public void generateChunk(NewChunk chunk);
 
-    /**
-     * Generates any chunk content that can overlap surrounding chunks. At this point the
-     * chunk is connected to the world, and all changes must be made through the world itself.
-     * @param pos
-     * @param world
-     */
-    public void postProcessChunk(Vector3i pos, WorldProvider world);
 }

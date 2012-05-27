@@ -139,11 +139,6 @@ public class PerlinTerrainGenerator implements NewChunkGenerator {
         }
     }
 
-    @Override
-    public void postProcessChunk(Vector3i pos, WorldProvider world) {
-    }
-
-
     private void GenerateInnerLayer(int x, int y, int z, NewChunk c, WorldBiomeProvider.Biome type) {
         // TODO: GENERATE MINERALS HERE - config waiting at org\terasology\logic\manager\DefaultConfig.groovy 2012/01/22
         c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Stone").getId());

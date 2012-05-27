@@ -47,9 +47,13 @@ public class NewChunk implements Externalizable {
     public static final long serialVersionUID = 79881925217704826L;
 
     public enum State {
-        Awaiting2ndPass,
-        AwaitingFullLighting,
+        AdjacencyGenerationPending,
+        InternalLightGenerationPending,
+        LightPropagationPending,
+        FullLightConnectivityPending,
         Complete
+
+
     }
 
     /* PUBLIC CONSTANT VALUES */
@@ -64,7 +68,7 @@ public class NewChunk implements Externalizable {
     private final TeraArray blocks;
     private final TeraSmartArray sunlight, light, states;
 
-    private State chunkState = State.Awaiting2ndPass;
+    private State chunkState = State.AdjacencyGenerationPending;
     private boolean dirty;
     private AABB aabb;
 
@@ -155,14 +159,16 @@ public class NewChunk implements Externalizable {
     public boolean setBlock(int x, int y, int z, byte blockId) {
         byte oldValue = blocks.set(x, y, z, blockId);
         if (oldValue != blockId) {
-            setDirty(true);
             return true;
         }
         return false;
     }
 
     public boolean setBlock(int x, int y, int z, byte newBlockId, byte oldBlockId) {
-        return blocks.set(x, y, z, newBlockId, oldBlockId);
+        if (newBlockId != oldBlockId) {
+            return blocks.set(x, y, z, newBlockId, oldBlockId);
+        }
+        return false;
     }
 
     public boolean setBlock(int x, int y, int z, Block block) {

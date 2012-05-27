@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.generators;
+package org.terasology.logic.newWorld.generator;
 
+import org.terasology.logic.generators.GeneratorManager;
+import org.terasology.logic.newWorld.WorldProvider;
+import org.terasology.logic.newWorld.WorldView;
 import org.terasology.utilities.FastRandom;
 
 /**
@@ -25,17 +28,7 @@ import org.terasology.utilities.FastRandom;
  */
 public abstract class TreeGenerator {
 
-    protected final GeneratorManager _generatorManager;
-    private double _genProbability = 1.0;
-
-    /**
-     * Init. a new tree generator.
-     *
-     * @param m The generator manager
-     */
-    TreeGenerator(GeneratorManager m) {
-        _generatorManager = m;
-    }
+    private float generationProbability = 1.0f;
 
     /**
      * Generates a tree at the given position.
@@ -44,16 +37,15 @@ public abstract class TreeGenerator {
      * @param posX   Position on the x-axis
      * @param posY   Position on the y-axis
      * @param posZ   Position on the z-axis
-     * @param update If true, the chunk will be queued for updating
      */
-    public abstract void generate(FastRandom rand, int posX, int posY, int posZ, boolean update);
+    public abstract void generate(WorldView view, FastRandom rand, int posX, int posY, int posZ);
 
-    public double getGenProbability() {
-        return _genProbability;
+    public double getGenerationProbability() {
+        return generationProbability;
     }
 
-    public TreeGenerator withGenerationProbability(double genProbability) {
-        this._genProbability = genProbability;
+    public TreeGenerator setGenerationProbability(float genProbability) {
+        this.generationProbability = genProbability;
         return this;
     }
 }

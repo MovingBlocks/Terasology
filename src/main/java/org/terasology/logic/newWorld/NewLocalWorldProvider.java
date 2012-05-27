@@ -127,6 +127,7 @@ public class NewLocalWorldProvider implements WorldProvider {
                 } else {
                     worldView.setDirtyAround(affected);
                 }
+                return true;
             } finally {
                 worldView.unlock();
             }
