@@ -44,7 +44,7 @@ public class GroovyHelpManager {
     {
         HashMap<String,String> commandlist = new HashMap<String, String>();
         Gson gson = new Gson();
-        String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data" + File.pathSeparator + "help" + File.pathSeparator + "commands" + File.pathSeparator + "commands.json";
+        String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data" + File.separator + "help" + File.separator + "commands" + File.separator + "commands.json";
         JsonReader reader = new JsonReader(new FileReader(helpFile));
         reader.beginArray();
         while (reader.hasNext()) {
@@ -74,7 +74,7 @@ public class GroovyHelpManager {
         try
         {
             Gson gson = new Gson();
-            String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data" + File.pathSeparator + "help" + File.pathSeparator + "commands" + File.pathSeparator + "commands.json";
+            String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data" + File.separator + "help" + File.separator + "commands" + File.separator + "commands.json";
             JsonReader reader = new JsonReader(new FileReader(helpFile));
             reader.beginArray();
             while (reader.hasNext()) {
