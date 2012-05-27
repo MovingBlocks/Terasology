@@ -102,7 +102,7 @@ public class UITextWrap extends UIText {
         //if(endpos >maxlines){endpos = maxlines +1;}
         counter = 0;
         Gson gson = new Gson();
-        String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data" + File.pathSeparator + "console" + File.pathSeparator + "consolelog.json";
+        String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data" + File.separator + "console" + File.separator + "consolelog.json";
         JsonReader reader = new JsonReader(new FileReader(helpFile));
         reader.beginArray();
         _text ="";
@@ -137,7 +137,7 @@ public class UITextWrap extends UIText {
 
     public void loadError() throws IOException{
         Gson gson = new Gson();
-        String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data" + File.pathSeparator + "console" + File.pathSeparator + "error.json";
+        String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data" + File.separator + "console" + File.separator + "error.json";
         JsonReader reader = new JsonReader(new FileReader(helpFile));
         reader.beginArray();
         _text ="";
@@ -198,7 +198,7 @@ public class UITextWrap extends UIText {
         }
 
         Gson gson = new Gson();
-        String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data"  + File.pathSeparator + "console" + File.pathSeparator + "consolelog.json";
+        String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data"  + File.separator + "console" + File.separator + "consolelog.json";
         JsonWriter writer = new JsonWriter(new FileWriter(helpFile));
         writer.beginArray();
         Iterator e = finaltext.iterator();
@@ -211,7 +211,7 @@ public class UITextWrap extends UIText {
 
     public int getLineCount()throws IOException{
         Gson gson = new Gson();
-        String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data" + File.pathSeparator + "console" + File.pathSeparator + "consolelog.json";
+        String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data" + File.separator + "console" + File.separator + "consolelog.json";
         JsonReader reader = new JsonReader(new FileReader(helpFile));
         int counter = 0;
         reader.beginArray();
