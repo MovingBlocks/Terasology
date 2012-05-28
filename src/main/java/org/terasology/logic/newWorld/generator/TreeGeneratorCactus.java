@@ -15,8 +15,6 @@
  */
 package org.terasology.logic.newWorld.generator;
 
-import org.terasology.logic.generators.GeneratorManager;
-import org.terasology.logic.newWorld.WorldProvider;
 import org.terasology.logic.newWorld.WorldView;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.utilities.FastRandom;

@@ -16,10 +16,11 @@
 
 package org.terasology.logic.newWorld.generationPhase;
 
-import org.terasology.logic.newWorld.*;
-import org.terasology.math.Side;
+import org.terasology.logic.newWorld.NewChunk;
+import org.terasology.logic.newWorld.NewChunkGeneratorManager;
+import org.terasology.logic.newWorld.NewChunkProvider;
+import org.terasology.logic.newWorld.WorldView;
 import org.terasology.math.Vector3i;
-import org.terasology.model.blocks.Block;
 
 import java.util.Comparator;
 

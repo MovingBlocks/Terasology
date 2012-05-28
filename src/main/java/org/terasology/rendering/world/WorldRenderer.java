@@ -16,6 +16,7 @@
 package org.terasology.rendering.world;
 
 import com.google.common.collect.Lists;
+import com.google.gson.GsonBuilder;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
@@ -32,6 +33,7 @@ import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.generators.DefaultGenerators;
 import org.terasology.logic.manager.*;
 import org.terasology.logic.newWorld.*;
+import org.terasology.logic.newWorld.chunkCache.ChunkCacheGZip;
 import org.terasology.logic.newWorld.chunkCache.NullChunkCache;
 import org.terasology.logic.newWorld.generator.FloraGenerator;
 import org.terasology.logic.newWorld.generator.ForestGenerator;
@@ -61,8 +63,7 @@ import javax.imageio.ImageIO;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -86,6 +87,7 @@ public final class WorldRenderer implements IGameObject {
     /* WORLD PROVIDER */
     private final WorldProvider _worldProvider;
     private NewChunkProvider _chunkProvider;
+    private NewChunkCache chunkCache;
     private Logger _logger = Logger.getLogger(getClass().getName());
 
     /* PLAYER */
@@ -160,7 +162,23 @@ public final class WorldRenderer implements IGameObject {
         ForestGenerator forestGen = new ForestGenerator();
         new DefaultGenerators(forestGen);
         generatorManager.registerChunkGenerator(forestGen);
-        _chunkProvider = new LocalChunkProvider(new NullChunkCache(), generatorManager);
+
+        // TODO: Cleaner method for this?
+        File f = new File(PathManager.getInstance().getWorldSavePath(title), title + ".dat");
+        if (f.exists()) {
+            try {
+                chunkCache = ChunkCacheGZip.load(f);
+            } catch (IOException e) {
+                /* TODO: We really should expose this error via UI so player knows that there is an issue with their world
+                   (don't have the game continue or we risk overwriting their game)
+                 */
+                e.printStackTrace();
+            }
+        }
+        if (chunkCache == null) {
+            chunkCache = new ChunkCacheGZip();
+        }
+        _chunkProvider = new LocalChunkProvider(chunkCache, generatorManager);
         _worldProvider = new NewLocalWorldProvider(title, seed, _chunkProvider);
         _chunkTesselator = new NewChunkTessellator(_worldProvider.getBiomeProvider());
         _skysphere = new Skysphere(this);
@@ -354,7 +372,7 @@ public final class WorldRenderer implements IGameObject {
             NewChunk c = _chunksInProximity.get(i);
             ChunkMesh[] mesh = c.getMesh();
 
-            if (isChunkVisible(c)) {
+            if (isChunkVisible(c) && isChunkValidForRender(c)) {
 
                 if (triangleCount(mesh, ChunkMesh.RENDER_PHASE.OPAQUE) > 0)
                     _renderQueueChunksOpaque.add(c);
@@ -384,7 +402,7 @@ public final class WorldRenderer implements IGameObject {
                     c.setPendingMesh(null);
                 }
 
-                if (c.isDirty() || mesh == null) {
+                if ((c.isDirty() || mesh == null) && isChunkValidForRender(c)) {
                     _statDirtyChunks++;
                     _chunkUpdateManager.queueChunkUpdate(c, ChunkUpdateManager.UPDATE_TYPE.DEFAULT);
                 }
@@ -814,7 +832,28 @@ public final class WorldRenderer implements IGameObject {
      */
     public void dispose() {
         _worldProvider.dispose();
+        WorldInfo worldInfo = _worldProvider.getWorldInfo();
+        try {
+            WorldInfo.save(new File(PathManager.getInstance().getWorldSavePath(worldInfo.getTitle()), WorldInfo.DEFAULT_FILE_NAME), worldInfo);
+        } catch (IOException e) {
+            _logger.log(Level.SEVERE, "Failed to save world manifest");
+        }
+
         AudioManager.getInstance().stopAllSounds();
+        // TODO: this should be elsewhere, perhaps within the chunk cache.
+        File chunkFile = new File(PathManager.getInstance().getWorldSavePath(_worldProvider.getTitle()), _worldProvider.getTitle() + ".dat");
+        try {
+            FileOutputStream fileOut = new FileOutputStream(chunkFile);
+            BufferedOutputStream bos = new BufferedOutputStream(fileOut);
+            ObjectOutputStream out = new ObjectOutputStream(bos);
+            out.writeObject(chunkCache);
+            out.close();
+            bos.flush();
+            bos.close();
+            fileOut.close();
+        } catch (IOException e) {
+            _logger.log(Level.SEVERE, "Error saving chunks", e);
+        }
     }
 
     /**
@@ -828,14 +867,18 @@ public final class WorldRenderer implements IGameObject {
         _chunkProvider.update();
         for (Vector3i pos : Region3i.createFromCenterExtents(new Vector3i(newChunkPosX, 0, newChunkPosZ), new Vector3i(viewingDistance/2, 0, viewingDistance/2))) {
             NewChunk chunk = _chunkProvider.getChunk(pos);
-            if (chunk == null || chunk.getChunkState() != NewChunk.State.Complete) {
-                return false;
+            if (chunk == null || chunk.getChunkState() != NewChunk.State.Complete ) {
+                continue;
             } else if (chunk.isDirty()) {
+                WorldView view = _worldProvider.getWorldViewAround(chunk.getPos());
+                if (view == null) {
+                    continue;
+                }
                 chunk.setDirty(false);
 
                 ChunkMesh[] newMeshes = new ChunkMesh[VERTICAL_SEGMENTS];
                 for (int seg = 0; seg < VERTICAL_SEGMENTS; seg++) {
-                    newMeshes[seg] = _chunkTesselator.generateMesh(_worldProvider, chunk.getPos(), NewChunk.SIZE_Y / VERTICAL_SEGMENTS, seg * (NewChunk.SIZE_Y / VERTICAL_SEGMENTS));
+                    newMeshes[seg] = _chunkTesselator.generateMesh(view, chunk.getPos(), NewChunk.SIZE_Y / VERTICAL_SEGMENTS, seg * (NewChunk.SIZE_Y / VERTICAL_SEGMENTS));
                 }
 
                 chunk.setPendingMesh(newMeshes);
@@ -907,6 +950,10 @@ public final class WorldRenderer implements IGameObject {
 
     public boolean isAABBVisible(AABB aabb) {
         return getActiveCamera().getViewFrustum().intersects(aabb);
+    }
+
+    public boolean isChunkValidForRender(NewChunk c) {
+        return _worldProvider.getWorldViewAround(c.getPos()) != null;
     }
 
     public boolean isChunkVisible(NewChunk c) {

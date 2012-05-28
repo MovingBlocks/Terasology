@@ -1,6 +1,5 @@
 package org.terasology.logic.newWorld;
 
-import org.terasology.game.Terasology;
 import org.terasology.model.structures.BlockPosition;
 
 import javax.vecmath.Vector3f;
@@ -14,12 +13,13 @@ import java.util.List;
  */
 public final class WorldUtil {
 
-    private WorldUtil() {}
+    private WorldUtil() {
+    }
 
     /**
      * Gather the surrounding block positions
      * and order those by the distance to the originating point.
-    */
+     */
     public static List<BlockPosition> gatherAdjacentBlockPositions(Vector3f origin) {
 
         ArrayList<BlockPosition> blockPositions = new ArrayList<BlockPosition>();
@@ -44,7 +44,7 @@ public final class WorldUtil {
     public static void deleteWorld(File world) {
         if (world.isDirectory()) {
             String[] children = world.list();
-            for (int i=0; i<children.length; i++) {
+            for (int i = 0; i < children.length; i++) {
                 File f = new File(world, children[i]);
                 deleteWorld(f);
             }

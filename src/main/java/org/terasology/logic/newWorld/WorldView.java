@@ -33,7 +33,7 @@ public class WorldView {
     private NewChunk[] chunks;
 
     public static WorldView createLocalView(Vector3i pos, NewChunkProvider chunkProvider) {
-        Region3i region = Region3i.createFromCenterExtents(pos, new Vector3i(1,0,1));
+        Region3i region = Region3i.createFromCenterExtents(pos, new Vector3i(1, 0, 1));
         return createWorldView(region, Vector3i.one(), chunkProvider);
     }
 
@@ -166,9 +166,9 @@ public class WorldView {
 
     public void setDirtyAround(Region3i blockRegion) {
         Vector3i minPos = new Vector3i(blockRegion.min());
-        minPos.sub(1,0,1);
+        minPos.sub(1, 0, 1);
         Vector3i maxPos = new Vector3i(blockRegion.max());
-        maxPos.add(1,0,1);
+        maxPos.add(1, 0, 1);
 
         Vector3i minChunk = TeraMath.calcChunkPos(minPos);
         Vector3i maxChunk = TeraMath.calcChunkPos(maxPos);

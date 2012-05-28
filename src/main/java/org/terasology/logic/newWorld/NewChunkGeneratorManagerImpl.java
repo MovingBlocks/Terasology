@@ -63,7 +63,7 @@ public class NewChunkGeneratorManagerImpl implements NewChunkGeneratorManager {
         generator.setWorldBiomeProvider(biomeProvider);
         generator.setWorldSeed(worldSeed);
         if (generator instanceof NewChunkGenerator) {
-            chunkGenerators.add((NewChunkGenerator)generator);
+            chunkGenerators.add((NewChunkGenerator) generator);
         }
         if (generator instanceof SecondPassChunkGenerator) {
             secondPassChunkGenerators.add((SecondPassChunkGenerator) generator);

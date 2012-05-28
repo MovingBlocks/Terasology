@@ -41,7 +41,7 @@ public class InternalLightProcessor {
                         break;
                     }
                 }
-                tops[x + NewChunk.SIZE_X * z] = (short)y;
+                tops[x + NewChunk.SIZE_X * z] = (short) y;
             }
         }
 
@@ -52,13 +52,12 @@ public class InternalLightProcessor {
                     if (y > tops[x + NewChunk.SIZE_X * z] && ((x > 0 && tops[(x - 1) + NewChunk.SIZE_X * z] >= y) ||
                             (x < NewChunk.SIZE_X - 1 && tops[(x + 1) + NewChunk.SIZE_X * z] >= y) ||
                             (z > 0 && tops[x + NewChunk.SIZE_X * (z - 1)] >= y) ||
-                            (z < NewChunk.SIZE_Z - 1 && tops[x + NewChunk.SIZE_X * (z + 1)] >= y)))
-                    {
+                            (z < NewChunk.SIZE_Z - 1 && tops[x + NewChunk.SIZE_X * (z + 1)] >= y))) {
                         spreadSunlightInternal(chunk, x, y, z);
                     }
                     if (block.getLuminance() > 0) {
-                        chunk.setLight(x,y,z,block.getLuminance());
-                        spreadLightInternal(chunk,x,y,z);
+                        chunk.setLight(x, y, z, block.getLuminance());
+                        spreadLightInternal(chunk, x, y, z);
                     }
                 }
             }
@@ -66,7 +65,7 @@ public class InternalLightProcessor {
     }
 
     private static void spreadLightInternal(NewChunk chunk, int x, int y, int z) {
-        byte lightValue = chunk.getLight(x,y,z);
+        byte lightValue = chunk.getLight(x, y, z);
         if (lightValue <= 1) return;
 
         // TODO: use custom bounds checked iterator for this
@@ -75,27 +74,27 @@ public class InternalLightProcessor {
             int adjY = y + adjDir.getVector3i().y;
             int adjZ = z + adjDir.getVector3i().z;
             if (chunk.isInBounds(adjX, adjY, adjZ)) {
-                byte adjLightValue = chunk.getLight(adjX,adjY,adjZ);
+                byte adjLightValue = chunk.getLight(adjX, adjY, adjZ);
 
                 if (adjLightValue < lightValue - 1 && chunk.getBlock(adjX, y, adjZ).isTranslucent()) {
-                    chunk.setLight(adjX, adjY, adjZ, (byte)(lightValue - 1));
-                    spreadLightInternal(chunk,adjX, adjY, adjZ);
+                    chunk.setLight(adjX, adjY, adjZ, (byte) (lightValue - 1));
+                    spreadLightInternal(chunk, adjX, adjY, adjZ);
                 }
             }
         }
     }
 
     private static void spreadSunlightInternal(NewChunk chunk, int x, int y, int z) {
-        byte lightValue = chunk.getSunlight(x,y,z);
+        byte lightValue = chunk.getSunlight(x, y, z);
 
         // If it was max it would already have been spread down
         if (y > 0 && lightValue < NewChunk.MAX_LIGHT && chunk.getSunlight(x, y - 1, z) < lightValue - 1 && chunk.getBlock(x, y - 1, z).isTranslucent()) {
-            chunk.setSunlight(x, y - 1, z, (byte)(lightValue - 1));
+            chunk.setSunlight(x, y - 1, z, (byte) (lightValue - 1));
             spreadSunlightInternal(chunk, x, y - 1, z);
         }
 
         if (y < NewChunk.SIZE_Y && lightValue < NewChunk.MAX_LIGHT && chunk.getSunlight(x, y + 1, z) < lightValue - 1 && chunk.getBlock(x, y + 1, z).isTranslucent()) {
-            chunk.setSunlight(x, y + 1, z, (byte)(lightValue - 1));
+            chunk.setSunlight(x, y + 1, z, (byte) (lightValue - 1));
             spreadSunlightInternal(chunk, x, y + 1, z);
         }
 
@@ -106,9 +105,9 @@ public class InternalLightProcessor {
             int adjZ = z + adjDir.getVector3i().z;
 
             if (chunk.isInBounds(adjX, y, adjZ)) {
-                byte adjLightValue = chunk.getSunlight(adjX,y,adjZ);
+                byte adjLightValue = chunk.getSunlight(adjX, y, adjZ);
                 if (adjLightValue < lightValue - 1 && chunk.getBlock(adjX, y, adjZ).isTranslucent()) {
-                    chunk.setSunlight(adjX, y, adjZ, (byte)(lightValue - 1));
+                    chunk.setSunlight(adjX, y, adjZ, (byte) (lightValue - 1));
                     spreadSunlightInternal(chunk, adjX, y, adjZ);
                 }
             }

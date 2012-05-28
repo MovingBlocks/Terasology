@@ -50,11 +50,10 @@ public final class NewChunkTessellator {
         this.biomeProvider = biomeProvider;
     }
 
-    public ChunkMesh generateMesh(WorldProvider world, Vector3i chunkPos, int meshHeight, int verticalOffset) {
+    public ChunkMesh generateMesh(WorldView worldView, Vector3i chunkPos, int meshHeight, int verticalOffset) {
         PerformanceMonitor.startActivity("GenerateMesh");
         ChunkMesh mesh = new ChunkMesh();
 
-        WorldView worldView = world.getWorldViewAround(chunkPos);
         Vector3i chunkOffset = new Vector3i(chunkPos.x * NewChunk.SIZE_X, chunkPos.y * NewChunk.SIZE_Y, chunkPos.z * NewChunk.SIZE_Z);
 
         for (int x = 0; x < Chunk.CHUNK_DIMENSION_X; x++) {

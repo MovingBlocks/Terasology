@@ -17,9 +17,7 @@
 package org.terasology.logic.newWorld.generationPhase;
 
 import org.terasology.logic.newWorld.NewChunk;
-import org.terasology.logic.newWorld.NewChunkGeneratorManager;
 import org.terasology.logic.newWorld.NewChunkProvider;
-import org.terasology.logic.newWorld.WorldView;
 import org.terasology.math.Vector3i;
 
 import java.util.Comparator;
@@ -45,7 +43,7 @@ public class InternalLightingPhase extends ChunkPhase {
             chunk.setChunkState(NewChunk.State.LightPropagationPending);
         } finally {
             chunk.unlock();
-       }
+        }
     }
 
 

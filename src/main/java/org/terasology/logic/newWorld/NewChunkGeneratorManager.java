@@ -16,7 +16,6 @@
 
 package org.terasology.logic.newWorld;
 
-import org.terasology.logic.world.Chunk;
 import org.terasology.math.Vector3i;
 
 /**

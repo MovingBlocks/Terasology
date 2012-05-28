@@ -20,7 +20,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.terasology.logic.newWorld.NewChunk;
 import org.terasology.logic.newWorld.WorldView;
-import org.terasology.logic.newWorld.generator.InternalLightGenerator;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;

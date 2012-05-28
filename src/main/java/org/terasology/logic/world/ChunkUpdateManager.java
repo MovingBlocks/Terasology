@@ -21,6 +21,7 @@ import org.terasology.game.GameEngine;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.newWorld.NewChunk;
 import org.terasology.logic.newWorld.WorldProvider;
+import org.terasology.logic.newWorld.WorldView;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.NewChunkTessellator;
 import org.terasology.rendering.world.WorldRenderer;
@@ -72,17 +73,21 @@ public final class ChunkUpdateManager {
 
     private void executeChunkUpdate(final NewChunk c) {
         _currentlyProcessedChunks.add(c);
-        c.setDirty(false);
 
         // Create a new thread and start processing
         Runnable r = new Runnable() {
             public void run() {
                 ChunkMesh[] newMeshes = new ChunkMesh[WorldRenderer.VERTICAL_SEGMENTS];
-                for (int seg = 0; seg < WorldRenderer.VERTICAL_SEGMENTS; seg++) {
-                    newMeshes[seg] = tessellator.generateMesh(worldProvider, c.getPos(), NewChunk.SIZE_Y / WorldRenderer.VERTICAL_SEGMENTS, seg * (NewChunk.SIZE_Y / WorldRenderer.VERTICAL_SEGMENTS));
-                }
+                WorldView worldView = worldProvider.getWorldViewAround(c.getPos());
+                if (worldView != null) {
+                    c.setDirty(false);
+                    for (int seg = 0; seg < WorldRenderer.VERTICAL_SEGMENTS; seg++) {
+                        newMeshes[seg] = tessellator.generateMesh(worldView, c.getPos(), NewChunk.SIZE_Y / WorldRenderer.VERTICAL_SEGMENTS, seg * (NewChunk.SIZE_Y / WorldRenderer.VERTICAL_SEGMENTS));
+                    }
 
-                c.setPendingMesh(newMeshes);
+                    c.setPendingMesh(newMeshes);
+
+                }
                 _currentlyProcessedChunks.remove(c);
             }
         };

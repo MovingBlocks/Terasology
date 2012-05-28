@@ -16,8 +16,6 @@
 
 package org.terasology.logic.newWorld.generator;
 
-import org.terasology.logic.generators.GeneratorManager;
-import org.terasology.logic.newWorld.WorldProvider;
 import org.terasology.logic.newWorld.WorldView;
 import org.terasology.utilities.FastRandom;
 
@@ -33,10 +31,10 @@ public abstract class TreeGenerator {
     /**
      * Generates a tree at the given position.
      *
-     * @param rand   The random generator
-     * @param posX   Position on the x-axis
-     * @param posY   Position on the y-axis
-     * @param posZ   Position on the z-axis
+     * @param rand The random generator
+     * @param posX Position on the x-axis
+     * @param posY Position on the y-axis
+     * @param posZ Position on the z-axis
      */
     public abstract void generate(WorldView view, FastRandom rand, int posX, int posY, int posZ);
 

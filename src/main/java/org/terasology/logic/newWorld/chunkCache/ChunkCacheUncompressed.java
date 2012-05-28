@@ -12,7 +12,7 @@ public class ChunkCacheUncompressed implements NewChunkCache {
     ConcurrentMap<Vector3i, NewChunk> map = Maps.newConcurrentMap();
     int _sizeInByte = 0;
 
-    public ChunkCacheUncompressed(){
+    public ChunkCacheUncompressed() {
 
     }
 

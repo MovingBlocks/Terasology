@@ -18,7 +18,10 @@ package org.terasology.logic.newWorld.generator;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import org.terasology.logic.newWorld.*;
+import org.terasology.logic.newWorld.NewChunk;
+import org.terasology.logic.newWorld.SecondPassChunkGenerator;
+import org.terasology.logic.newWorld.WorldBiomeProvider;
+import org.terasology.logic.newWorld.WorldView;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
@@ -51,37 +54,37 @@ public class ForestGenerator implements SecondPassChunkGenerator {
     public void postProcessChunk(Vector3i pos, WorldView view) {
         FastRandom random = new FastRandom(seed.hashCode() ^ (pos.x + 39L * (pos.y + 39L * pos.z)));
         for (int y = 32; y < NewChunk.SIZE_Y; y++) {
-           for (int x = 4; x < NewChunk.SIZE_X; x += 4) {
-               for (int z = 4; z < NewChunk.SIZE_Z; z += 4) {
-                   Vector3i worldPos = new Vector3i(pos);
-                   worldPos.mult(new Vector3i(NewChunk.SIZE_X, NewChunk.SIZE_Y, NewChunk.SIZE_Z));
-                   worldPos.add(x,y,z);
-                   WorldBiomeProvider.Biome biome = biomeProvider.getBiomeAt(worldPos.x, worldPos.z);
+            for (int x = 4; x < NewChunk.SIZE_X; x += 4) {
+                for (int z = 4; z < NewChunk.SIZE_Z; z += 4) {
+                    Vector3i worldPos = new Vector3i(pos);
+                    worldPos.mult(new Vector3i(NewChunk.SIZE_X, NewChunk.SIZE_Y, NewChunk.SIZE_Z));
+                    worldPos.add(x, y, z);
+                    WorldBiomeProvider.Biome biome = biomeProvider.getBiomeAt(worldPos.x, worldPos.z);
 
-                   int randX = x + random.randomInt(3);
-                   int randZ = z + random.randomInt(3);
+                    int randX = x + random.randomInt(3);
+                    int randZ = z + random.randomInt(3);
 
-                   Block posBlock = view.getBlock(randX, y, randZ);
+                    Block posBlock = view.getBlock(randX, y, randZ);
 
-                   if (posBlock.equals(sandBlock) || posBlock.equals(grassBlock) || posBlock.equals(snowBlock)) {
-                       double rand = Math.abs(random.randomDouble());
+                    if (posBlock.equals(sandBlock) || posBlock.equals(grassBlock) || posBlock.equals(snowBlock)) {
+                        double rand = Math.abs(random.randomDouble());
 
-                       int randomGeneratorId;
-                       int size = treeGenerators.get(biome).size();
+                        int randomGeneratorId;
+                        int size = treeGenerators.get(biome).size();
 
-                       if (size > 0) {
-                           randomGeneratorId = Math.abs(random.randomInt()) % size;
+                        if (size > 0) {
+                            randomGeneratorId = Math.abs(random.randomInt()) % size;
 
-                           TreeGenerator treeGen = treeGenerators.get(biome).get(randomGeneratorId);
+                            TreeGenerator treeGen = treeGenerators.get(biome).get(randomGeneratorId);
 
-                           if (rand < treeGen.getGenerationProbability()) {
-                               generateTree(view, treeGen, randX, y, randZ, random);
-                           }
-                       }
-                   }
-               }
-           }
-       }
+                            if (rand < treeGen.getGenerationProbability()) {
+                                generateTree(view, treeGen, randX, y, randZ, random);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**

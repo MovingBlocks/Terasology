@@ -60,6 +60,11 @@ public class NewLocalWorldProvider implements WorldProvider {
         }
     }
 
+    public NewLocalWorldProvider(WorldInfo info, NewChunkProvider chunkProvider) {
+        this(info.getTitle(), info.getSeed(), chunkProvider);
+        setTime(info.getTime());
+    }
+
     @Override
     public String getTitle() {
         return title;
@@ -68,6 +73,11 @@ public class NewLocalWorldProvider implements WorldProvider {
     @Override
     public String getSeed() {
         return seed;
+    }
+
+    @Override
+    public WorldInfo getWorldInfo() {
+        return new WorldInfo(title, seed, getTime());
     }
 
     @Override
@@ -82,7 +92,7 @@ public class NewLocalWorldProvider implements WorldProvider {
 
     @Override
     public boolean isBlockActive(int x, int y, int z) {
-        return chunkProvider.isChunkAvailable(TeraMath.calcChunkPos(x,y,z));
+        return chunkProvider.isChunkAvailable(TeraMath.calcChunkPos(x, y, z));
     }
 
     @Override
@@ -142,10 +152,10 @@ public class NewLocalWorldProvider implements WorldProvider {
 
     @Override
     public boolean setState(int x, int y, int z, byte state, byte oldState) {
-        Vector3i chunkPos = TeraMath.calcChunkPos(x,y,z);
+        Vector3i chunkPos = TeraMath.calcChunkPos(x, y, z);
         NewChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = TeraMath.calcBlockPos(x,y,z, chunkPos);
+            Vector3i blockPos = TeraMath.calcBlockPos(x, y, z, chunkPos);
             return chunk.setState(blockPos, state, oldState);
         }
         return false;
@@ -155,10 +165,10 @@ public class NewLocalWorldProvider implements WorldProvider {
     public byte getState(int x, int y, int z) {
         y = TeraMath.clamp(y, 0, NewChunk.SIZE_Y - 1);
 
-        Vector3i chunkPos = TeraMath.calcChunkPos(x,y,z);
+        Vector3i chunkPos = TeraMath.calcChunkPos(x, y, z);
         NewChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = TeraMath.calcBlockPos(x,y,z, chunkPos);
+            Vector3i blockPos = TeraMath.calcBlockPos(x, y, z, chunkPos);
             return chunk.getState(blockPos);
         }
         return 0;
@@ -170,10 +180,10 @@ public class NewLocalWorldProvider implements WorldProvider {
             return BlockManager.getInstance().getAir();
         }
 
-        Vector3i chunkPos = TeraMath.calcChunkPos(x,y,z);
+        Vector3i chunkPos = TeraMath.calcChunkPos(x, y, z);
         NewChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = TeraMath.calcBlockPos(x,y,z, chunkPos);
+            Vector3i blockPos = TeraMath.calcBlockPos(x, y, z, chunkPos);
             return chunk.getBlock(blockPos);
         }
         return BlockManager.getInstance().getAir();
@@ -193,10 +203,10 @@ public class NewLocalWorldProvider implements WorldProvider {
     public byte getLight(int x, int y, int z) {
         y = TeraMath.clamp(y, 0, NewChunk.SIZE_Y - 1);
 
-        Vector3i chunkPos = TeraMath.calcChunkPos(x,y,z);
+        Vector3i chunkPos = TeraMath.calcChunkPos(x, y, z);
         NewChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = TeraMath.calcBlockPos(x,y,z, chunkPos);
+            Vector3i blockPos = TeraMath.calcBlockPos(x, y, z, chunkPos);
             return chunk.getLight(blockPos);
         }
         return 0;
@@ -216,10 +226,10 @@ public class NewLocalWorldProvider implements WorldProvider {
     public byte getSunlight(int x, int y, int z) {
         y = TeraMath.clamp(y, 0, NewChunk.SIZE_Y - 1);
 
-        Vector3i chunkPos = TeraMath.calcChunkPos(x,y,z);
+        Vector3i chunkPos = TeraMath.calcChunkPos(x, y, z);
         NewChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = TeraMath.calcBlockPos(x,y,z, chunkPos);
+            Vector3i blockPos = TeraMath.calcBlockPos(x, y, z, chunkPos);
             return chunk.getSunlight(blockPos);
         }
         return 0;
@@ -229,11 +239,11 @@ public class NewLocalWorldProvider implements WorldProvider {
     public byte getTotalLight(int x, int y, int z) {
         y = TeraMath.clamp(y, 0, NewChunk.SIZE_Y - 1);
 
-        Vector3i chunkPos = TeraMath.calcChunkPos(x,y,z);
+        Vector3i chunkPos = TeraMath.calcChunkPos(x, y, z);
         NewChunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = TeraMath.calcBlockPos(x,y,z, chunkPos);
-            return (byte)Math.max(chunk.getSunlight(blockPos), chunk.getLight(blockPos));
+            Vector3i blockPos = TeraMath.calcBlockPos(x, y, z, chunkPos);
+            return (byte) Math.max(chunk.getSunlight(blockPos), chunk.getLight(blockPos));
         }
         return 0;
     }
@@ -272,12 +282,12 @@ public class NewLocalWorldProvider implements WorldProvider {
 
     @Override
     public float getTimeInDays() {
-        return (float)getTime() / DAY_NIGHT_LENGTH_IN_MS;
+        return (float) getTime() / DAY_NIGHT_LENGTH_IN_MS;
     }
 
     @Override
     public void setTimeInDays(float time) {
-        setTime((long)(time * DAY_NIGHT_LENGTH_IN_MS));
+        setTime((long) (time * DAY_NIGHT_LENGTH_IN_MS));
     }
 
     @Override

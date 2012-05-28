@@ -22,5 +22,6 @@ package org.terasology.logic.newWorld;
 public interface BaseChunkGenerator {
 
     public void setWorldSeed(String seed);
+
     public void setWorldBiomeProvider(WorldBiomeProvider biomeProvider);
 }

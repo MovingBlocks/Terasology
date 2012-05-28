@@ -2,9 +2,6 @@ package org.terasology.logic.newWorld.chunkCache;
 
 import org.terasology.logic.newWorld.NewChunk;
 import org.terasology.logic.newWorld.NewChunkCache;
-import org.terasology.logic.world.Chunk;
-import org.terasology.logic.world.IChunkCache;
-import org.terasology.logic.world.LocalWorldProvider;
 import org.terasology.math.Vector3i;
 
 import java.io.*;

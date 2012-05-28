@@ -2,8 +2,6 @@ package org.terasology.logic.newWorld.chunkCache;
 
 import org.terasology.logic.newWorld.NewChunk;
 import org.terasology.logic.newWorld.NewChunkCache;
-import org.terasology.logic.world.Chunk;
-import org.terasology.logic.world.IChunkCache;
 import org.terasology.math.Vector3i;
 
 import java.io.*;
@@ -26,8 +24,7 @@ public class ChunkCacheGZip implements NewChunkCache, Serializable {
             return (ChunkCacheGZip) in.readObject();
         } catch (ClassNotFoundException e) {
             throw new IOException("Unable to load chunk cache", e);
-        }
-        finally {
+        } finally {
             // JAVA7 : cleanup
             if (in != null) {
                 try {
@@ -46,7 +43,7 @@ public class ChunkCacheGZip implements NewChunkCache, Serializable {
         }
     }
 
-    public ChunkCacheGZip(){
+    public ChunkCacheGZip() {
 
     }
 
@@ -54,7 +51,7 @@ public class ChunkCacheGZip implements NewChunkCache, Serializable {
         NewChunk c = null;
         try {
             byte[] b = _map.get(id);
-            if(b == null)
+            if (b == null)
                 return null;
             ByteArrayInputStream bais = new ByteArrayInputStream(b);
             GZIPInputStream gzipIn = new GZIPInputStream(bais);
@@ -85,7 +82,7 @@ public class ChunkCacheGZip implements NewChunkCache, Serializable {
     }
 
     public float size() {
-        return (float)_sizeInByte / (1<<20);
+        return (float) _sizeInByte / (1 << 20);
     }
 
     public void dispose() {

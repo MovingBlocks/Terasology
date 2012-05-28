@@ -21,6 +21,7 @@ import org.terasology.model.blocks.Block;
 
 /**
  * A single requested block change.
+ *
  * @author Immortius
  */
 public class BlockUpdate {
@@ -30,7 +31,7 @@ public class BlockUpdate {
     private Block newType;
 
     /**
-     * @param pos The block position to change
+     * @param pos     The block position to change
      * @param newType The block type to change it to
      * @param oldType The block type to change it from
      */

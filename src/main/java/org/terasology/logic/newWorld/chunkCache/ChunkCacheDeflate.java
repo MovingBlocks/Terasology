@@ -15,7 +15,7 @@ public class ChunkCacheDeflate implements NewChunkCache, Serializable {
     ConcurrentMap<Vector3i, byte[]> map = new ConcurrentHashMap<Vector3i, byte[]>();
     int _sizeInByte = 0;
 
-    public ChunkCacheDeflate(){
+    public ChunkCacheDeflate() {
 
     }
 
@@ -23,7 +23,7 @@ public class ChunkCacheDeflate implements NewChunkCache, Serializable {
         NewChunk c = null;
         try {
             byte[] b = map.get(id);
-            if(b == null)
+            if (b == null)
                 return null;
             ByteArrayInputStream bais = new ByteArrayInputStream(b);
             InflaterInputStream gzipIn = new InflaterInputStream(bais);
@@ -54,7 +54,7 @@ public class ChunkCacheDeflate implements NewChunkCache, Serializable {
     }
 
     public float size() {
-        return (float)_sizeInByte /(1<<20);
+        return (float) _sizeInByte / (1 << 20);
     }
 
     public void dispose() {

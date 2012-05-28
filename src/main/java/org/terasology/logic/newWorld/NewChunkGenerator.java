@@ -16,18 +16,16 @@
 
 package org.terasology.logic.newWorld;
 
-import org.terasology.math.Vector3i;
-
 /**
  * @author Immortius
  */
 public interface NewChunkGenerator extends BaseChunkGenerator {
 
 
-
     /**
      * Generate the local contents of a chunk. This should be purely deterministic from the chunk contents, chunk
      * position and world seed - should not depend on external state or other data.
+     *
      * @param chunk
      */
     public void generateChunk(NewChunk chunk);

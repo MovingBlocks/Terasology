@@ -16,7 +16,6 @@
 
 package org.terasology.logic.newWorld;
 
-import org.terasology.logic.world.Chunk;
 import org.terasology.math.Vector3i;
 
 /**
@@ -24,7 +23,10 @@ import org.terasology.math.Vector3i;
  */
 public interface NewChunkCache {
     public NewChunk get(Vector3i position);
+
     public void put(NewChunk c);
+
     public float size();
+
     void dispose();
 }

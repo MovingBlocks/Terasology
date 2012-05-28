@@ -26,6 +26,7 @@ public interface NewChunkProvider {
 
     /**
      * Requests that a region around the given entity be maintained in near cache
+     *
      * @param entity
      * @param distance The region (in chunks) around the entity that should be near cached
      */
@@ -33,6 +34,7 @@ public interface NewChunkProvider {
 
     /**
      * Removes an entity from producing a caching region
+     *
      * @param entity
      */
     public void removeRegionEntity(EntityRef entity);
@@ -57,6 +59,7 @@ public interface NewChunkProvider {
      * @return The chunk, or null if it cannot be obtained
      */
     public NewChunk getChunk(int x, int y, int z);
+
     public NewChunk getChunk(Vector3i chunkPos);
 
     /**

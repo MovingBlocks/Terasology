@@ -25,6 +25,7 @@ import org.terasology.logic.manager.AssetManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
+import org.terasology.logic.newWorld.WorldInfo;
 import org.terasology.logic.newWorld.WorldUtil;
 import org.terasology.rendering.gui.components.*;
 import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
@@ -33,6 +34,7 @@ import org.terasology.rendering.gui.framework.*;
 import javax.vecmath.Vector2f;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -173,10 +175,11 @@ public class UISelectWorldMenu extends UIDisplayWindow {
         }
 
         try{
-            ConfigObject  config = (ConfigObject)_list.getSelectedItem().getValue();
-            Config.getInstance().setDefaultSeed((String)config.get("worldSeed"));
-            Config.getInstance().setWorldTitle((String) config.get("worldTitle"));
-            CoreRegistry.get(GameEngine.class).changeState(new StateSinglePlayer(config.get("worldTitle").toString(), config.get("worldSeed").toString()));
+            WorldInfo info = (WorldInfo)_list.getSelectedItem().getValue();
+            Config.getInstance().setDefaultSeed(info.getSeed());
+            Config.getInstance().setWorldTitle(info.getTitle());
+            // TODO: Need to load time too. Maybe just pass through WorldInfo?
+            CoreRegistry.get(GameEngine.class).changeState(new StateSinglePlayer(info.getTitle(), info.getSeed()));
         }catch (Exception e){
             GUIManager.getInstance().showMessage("Loading error", "Failed reading world data object. Sorry.");
         }
@@ -185,7 +188,6 @@ public class UISelectWorldMenu extends UIDisplayWindow {
     public void fillList(){
         _list.removeAll();
 
-        ConfigObject config = null;
         File worldCatalog = PathManager.getInstance().getWorldPath();
 
         for(File file : worldCatalog.listFiles(new FileFilter() {
@@ -197,15 +199,15 @@ public class UISelectWorldMenu extends UIDisplayWindow {
                 }
             }
         })){
-            File worldManifest = new File(file, "WorldManifest.groovy");
+            File worldManifest = new File(file, WorldInfo.DEFAULT_FILE_NAME);
             if (!worldManifest.exists())
                 continue;
             try {
-                config = new ConfigSlurper().parse(worldManifest.toURI().toURL());
-                if(config.get("worldTitle")!=null&&config.get("worldSeed")!=null){
-                    _list.addItem((String) config.get("worldTitle"), config);
+                WorldInfo info = WorldInfo.load(worldManifest);
+                if (!info.getTitle().isEmpty()) {
+                    _list.addItem(info.getTitle(), info);
                 }
-            } catch (MalformedURLException e) {
+            } catch (IOException e) {
                 logger.log(Level.SEVERE, "Failed reading world data object. Sorry.", e);
             }
         }

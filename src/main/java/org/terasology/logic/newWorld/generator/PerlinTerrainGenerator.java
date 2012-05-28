@@ -19,10 +19,8 @@ package org.terasology.logic.newWorld.generator;
 import org.terasology.logic.newWorld.NewChunk;
 import org.terasology.logic.newWorld.NewChunkGenerator;
 import org.terasology.logic.newWorld.WorldBiomeProvider;
-import org.terasology.logic.newWorld.WorldProvider;
 import org.terasology.logic.world.Chunk;
 import org.terasology.math.TeraMath;
-import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.utilities.PerlinNoise;
 

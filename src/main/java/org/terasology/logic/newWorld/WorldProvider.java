@@ -17,6 +17,7 @@ package org.terasology.logic.newWorld;
 
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
+
 import javax.vecmath.Vector3f;
 
 /**
@@ -41,6 +42,12 @@ public interface WorldProvider {
     public String getSeed();
 
     /**
+     *
+     * @return General world info
+     */
+    public WorldInfo getWorldInfo();
+
+    /**
      * @return Thw world's biome provider
      */
     public WorldBiomeProvider getBiomeProvider();
@@ -53,6 +60,7 @@ public interface WorldProvider {
 
     /**
      * An active block is in a chunk that is available and fully generated.
+     *
      * @param x
      * @param y
      * @param z
@@ -62,6 +70,7 @@ public interface WorldProvider {
 
     /**
      * An active block is in a chunk that is available and fully generated.
+     *
      * @param pos
      * @return Whether the given block is active
      */
@@ -71,13 +80,15 @@ public interface WorldProvider {
 
     /**
      * Changes a number of blocks, if all updates are valid (oldTypes match the current block types in the given positions)
+     *
      * @param updates
      * @return Whether the updates succeeded
      */
-    public boolean setBlocks(BlockUpdate ... updates);
+    public boolean setBlocks(BlockUpdate... updates);
 
     /**
      * Changes a number of blocks, if all updates are valid (oldTypes match the current block types in the given positions)
+     *
      * @param updates
      * @return Whether the updates succeeded
      */
@@ -87,10 +98,10 @@ public interface WorldProvider {
      * Places a block of a specific type at a given position and refreshes the
      * corresponding light values.
      *
-     * @param x           The X-coordinate
-     * @param y           The Y-coordinate
-     * @param z           The Z-coordinate
-     * @param type        The type of the block to set
+     * @param x    The X-coordinate
+     * @param y    The Y-coordinate
+     * @param z    The Z-coordinate
+     * @param type The type of the block to set
      * @return True if a block was set/replaced. Will fail of oldType != the current type, or if the underlying chunk is not available
      */
     public boolean setBlock(int x, int y, int z, Block type, Block oldType);
@@ -99,18 +110,19 @@ public interface WorldProvider {
      * Places a block of a specific type at a given position and refreshes the
      * corresponding light values.
      *
-     * @param pos         Block position
-     * @param type        The type of the block to set
+     * @param pos  Block position
+     * @param type The type of the block to set
      * @return True if a block was set/replaced. Will fail of oldType != the current type, or if the underlying chunk is not available
      */
     public boolean setBlock(Vector3i pos, Block type, Block oldType);
 
     /**
      * Sets the state at the given position
+     *
      * @param x
      * @param y
      * @param z
-     * @param state The new value of state
+     * @param state    The new value of state
      * @param oldState The expected previous value of state
      * @return Whether the state change was made successfully. Will fail of oldType != the current type, or if the underlying chunk is not available
      */
@@ -155,15 +167,16 @@ public interface WorldProvider {
     /**
      * Returns the light value at the given position.
      *
-     * @param x    The X-coordinate
-     * @param y    The Y-coordinate
-     * @param z    The Z-coordinate
+     * @param x The X-coordinate
+     * @param y The Y-coordinate
+     * @param z The Z-coordinate
      * @return The light value
      */
     public byte getLight(int x, int y, int z);
 
     /**
      * Returns the sunlight value at the given position
+     *
      * @param x
      * @param y
      * @param z
@@ -176,7 +189,7 @@ public interface WorldProvider {
     /**
      * Returns the light value at the given position.
      *
-     * @param pos  The position
+     * @param pos The position
      * @return The block value at the given position
      */
     public byte getLight(Vector3f pos);
@@ -184,7 +197,7 @@ public interface WorldProvider {
     /**
      * Returns the sunlight value at the given position.
      *
-     * @param pos  The position
+     * @param pos The position
      * @return The block value at the given position
      */
     public byte getSunlight(Vector3f pos);
@@ -194,7 +207,7 @@ public interface WorldProvider {
     /**
      * Returns the light value at the given position.
      *
-     * @param pos  The position
+     * @param pos The position
      * @return The block value at the given position
      */
     public byte getLight(Vector3i pos);
@@ -202,7 +215,7 @@ public interface WorldProvider {
     /**
      * Returns the sunlight value at the given position.
      *
-     * @param pos  The position
+     * @param pos The position
      * @return The block value at the given position
      */
     public byte getSunlight(Vector3i pos);

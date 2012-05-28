@@ -21,7 +21,6 @@ import org.terasology.logic.newWorld.NewChunkGeneratorManager;
 import org.terasology.math.Vector3i;
 
 import java.util.Comparator;
-import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 
 /**
@@ -32,7 +31,7 @@ public class CreateChunkPhase extends ChunkPhase {
     private ConcurrentMap<Vector3i, NewChunk> nearCache;
     private NewChunkGeneratorManager generator;
 
-    public CreateChunkPhase(int numThreads, Comparator<Vector3i> chunkRelevanceComparator, NewChunkGeneratorManager generator, ConcurrentMap<Vector3i,NewChunk> nearCache) {
+    public CreateChunkPhase(int numThreads, Comparator<Vector3i> chunkRelevanceComparator, NewChunkGeneratorManager generator, ConcurrentMap<Vector3i, NewChunk> nearCache) {
         super(numThreads, chunkRelevanceComparator);
         this.generator = generator;
         this.nearCache = nearCache;

@@ -21,7 +21,7 @@ import org.terasology.math.Vector3i;
 /**
  * @author Immortius
  */
-public class NullChunkGeneratorManager implements NewChunkGeneratorManager{
+public class NullChunkGeneratorManager implements NewChunkGeneratorManager {
     @Override
     public void setWorldSeed(String seed) {
     }

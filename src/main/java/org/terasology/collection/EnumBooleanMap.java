@@ -45,7 +45,7 @@ public class EnumBooleanMap<ENUM extends Enum> {
         return store[key.ordinal()];
     }
 
-    public Boolean put(ENUM key, boolean value) {
+    public boolean put(ENUM key, boolean value) {
         boolean old = store[key.ordinal()];
         store[key.ordinal()] = value;
         return old;
