@@ -28,27 +28,27 @@ import javax.vecmath.Vector2f;
  * @author Overdhose copied from toolbar
  */
 public class UIMinionbar extends UIDisplayContainer {
-    private final UIGraphicsElement _backgroundTexture;
-    private final UIMinionbarCell[] _cells;
+    private final UIGraphicsElement backgroundTexture;
+    private final UIMinionbarCell[] cells;
 
     public UIMinionbar() {
         setSize(new Vector2f(44f, 364f));
 
-        _backgroundTexture = new UIGraphicsElement(AssetManager.loadTexture("engine:guiMinion"));
-        _backgroundTexture.setVisible(true);
-        _backgroundTexture.getTextureSize().set(new Vector2f(22f / 256f, 182f / 256f));
-        _backgroundTexture.getTextureOrigin().set(new Vector2f(0.0f, 0.0f));
-        _backgroundTexture.setSize(getSize());
+        backgroundTexture = new UIGraphicsElement(AssetManager.loadTexture("engine:guiMinion"));
+        backgroundTexture.setVisible(true);
+        backgroundTexture.getTextureSize().set(new Vector2f(22f / 256f, 182f / 256f));
+        backgroundTexture.getTextureOrigin().set(new Vector2f(0.0f, 0.0f));
+        backgroundTexture.setSize(getSize());
 
-        addDisplayElement(_backgroundTexture);
+        addDisplayElement(backgroundTexture);
 
-        _cells = new UIMinionbarCell[9];
+        cells = new UIMinionbarCell[9];
 
         // Create the toolbar cells
         for (int i = 0; i < 9; i++) {
-            _cells[i] = new UIMinionbarCell(i);
-            _cells[i].setVisible(true);
-            addDisplayElement(_cells[i]);
+            cells[i] = new UIMinionbarCell(i);
+            cells[i].setVisible(true);
+            addDisplayElement(cells[i]);
         }
     }
 

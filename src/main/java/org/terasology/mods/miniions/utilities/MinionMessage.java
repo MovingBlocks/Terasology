@@ -1,6 +1,7 @@
 package org.terasology.mods.miniions.utilities;
 
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.mods.miniions.minionenum.MinionMessagePriority;
 
 /**
  * Created with IntelliJ IDEA.
@@ -9,9 +10,9 @@ import org.terasology.entitySystem.EntityRef;
  * Time: 22:28
  * To change this template use File | Settings | File Templates.
  */
-public class MinionMessage implements Comparable<MinionMessage>{
+public class MinionMessage implements Comparable<MinionMessage> {
 
-    private MinionMessageType minionMessageType;
+    private MinionMessagePriority minionMessagePriority;
     private String messageTitle;
     private String messageDescription;
     private String messageContent;
@@ -19,8 +20,8 @@ public class MinionMessage implements Comparable<MinionMessage>{
     private EntityRef Player;
     private int index;
 
-    public MinionMessage(MinionMessageType minionmessagetype, String messagetitle, String messagedescription, String messagecontent, EntityRef minion, EntityRef player){
-        minionMessageType = minionmessagetype;
+    public MinionMessage(MinionMessagePriority minionmessagetype, String messagetitle, String messagedescription, String messagecontent, EntityRef minion, EntityRef player) {
+        minionMessagePriority = minionmessagetype;
         messageTitle = messagetitle;
         messageDescription = messagedescription;
         messageContent = messagecontent;
@@ -28,8 +29,8 @@ public class MinionMessage implements Comparable<MinionMessage>{
         Player = player;
     }
 
-    public MinionMessageType getMinionMessageType() {
-        return minionMessageType;
+    public MinionMessagePriority getMinionMessagePriority() {
+        return minionMessagePriority;
     }
 
     public String getMessageTitle() {
@@ -54,10 +55,11 @@ public class MinionMessage implements Comparable<MinionMessage>{
 
     @Override
     public int compareTo(MinionMessage o) {
-        if(this.getMinionMessageType().ordinal() < o.getMinionMessageType().ordinal())
+        if (this.getMinionMessagePriority().ordinal() < o.getMinionMessagePriority().ordinal()) {
             return -1;
-        else if (this.getMinionMessageType().ordinal() > o.getMinionMessageType().ordinal())
+        } else if (this.getMinionMessagePriority().ordinal() > o.getMinionMessagePriority().ordinal()) {
             return 1;
+        }
         return 0;
     }
 

@@ -9,7 +9,8 @@ import org.terasology.utilities.FastRandom;
 import javax.vecmath.Vector3f;
 
 /**
- * copied from @author Immortius <immortius@gmail.com>
+ * copied from @author Immortius
+ * modified by @author Overdhose
  */
 public class MiniionFactory {
 

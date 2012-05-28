@@ -16,7 +16,8 @@ import javax.vecmath.Vector3f;
  */
 public class MinionCommandComponent {
 
-    public MinionCommandComponent(){}
+    public MinionCommandComponent() {
+    }
 
     public Vector3f startPoint = null;
     public Vector3f endPoint = null;

@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * @author Overdhose
- * copied from SimpleAIComponent, only movementtarget is really used
+ *         copied from SimpleAIComponent, only movementtarget is really used
  */
 public final class SimpleMinionAIComponent implements Component {
 
@@ -29,7 +29,7 @@ public final class SimpleMinionAIComponent implements Component {
     public boolean followingPlayer = true;
     public boolean locked = false;
 
-    public void ClearCommands(){
+    public void ClearCommands() {
         movementTargets.removeAll(movementTargets);
         gatherTargets.removeAll(gatherTargets);
         patrolTargets.removeAll(patrolTargets);

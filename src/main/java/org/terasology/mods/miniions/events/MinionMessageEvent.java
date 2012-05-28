@@ -14,7 +14,7 @@ public class MinionMessageEvent extends AbstractEvent {
 
     private MinionMessage minionMessage;
 
-    public MinionMessageEvent(){
+    public MinionMessageEvent() {
         minionMessage = null;
     }
 

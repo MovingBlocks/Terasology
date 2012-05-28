@@ -21,55 +21,55 @@ import javax.vecmath.Vector2f;
  * Should actually be renamed minionBehaviourMenu for consistency
  * used as a dial menu without ungrabbing the mouse
  */
-public class UIMinion extends UIDisplayWindow{
+public class UIMinion extends UIDisplayWindow {
 
     //private UIButton buttonMove;
-    private final UIGraphicsElement _background;
-    private final UIGraphicsElement _selectionRectangle;
+    private final UIGraphicsElement background;
+    private final UIGraphicsElement selectionrectangle;
 
-    private MinionComponent.MinionBehaviour _Ohbehave;
-    private int _selectedMinion;
+    private int selectedMinion;
 
-    public UIMinion(){
+    public UIMinion() {
 
-        setSize(new Vector2f(60f,180f));
-        _background = new UIGraphicsElement(AssetManager.loadTexture("engine:guiMinion"));
-        _background.getTextureSize().set(new Vector2f(60f / 256f, 180f / 256f));
-        _background.getTextureOrigin().set(new Vector2f(30.0f / 256f, 20.0f / 256f));
-        _background.setSize(getSize());
-        addDisplayElement(_background);
-        _background.setVisible(true);
+        setSize(new Vector2f(60f, 180f));
+        background = new UIGraphicsElement(AssetManager.loadTexture("engine:guiMinion"));
+        background.getTextureSize().set(new Vector2f(60f / 256f, 180f / 256f));
+        background.getTextureOrigin().set(new Vector2f(30.0f / 256f, 20.0f / 256f));
+        background.setSize(getSize());
+        addDisplayElement(background);
+        background.setVisible(true);
 
-        _selectionRectangle = new UIGraphicsElement(AssetManager.loadTexture("engine:guiMinion"));
-        _selectionRectangle.getTextureSize().set(new Vector2f(60f / 256f, 20f / 256f));
-        _selectionRectangle.getTextureOrigin().set(new Vector2f(30f / 256, 0.0f));
-        _selectionRectangle.setSize(new Vector2f(60f, 20f));
-        _selectionRectangle.setVisible(true);
-        addDisplayElement(_selectionRectangle);
+        selectionrectangle = new UIGraphicsElement(AssetManager.loadTexture("engine:guiMinion"));
+        selectionrectangle.getTextureSize().set(new Vector2f(60f / 256f, 20f / 256f));
+        selectionrectangle.getTextureOrigin().set(new Vector2f(30f / 256, 0.0f));
+        selectionrectangle.setSize(new Vector2f(60f, 20f));
+        selectionrectangle.setVisible(true);
+        addDisplayElement(selectionrectangle);
 
     }
 
     @Override
     public void update() {
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-        if(localPlayer != null){
+        if (localPlayer != null) {
             LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
             if (localPlayerComp != null) {
-                _selectedMinion = localPlayerComp.selectedMinion;
+                selectedMinion = localPlayerComp.selectedMinion;
             }
 
             MinionBarComponent inventory = localPlayer.getEntity().getComponent(MinionBarComponent.class);
-            if (inventory == null)
+            if (inventory == null) {
                 return;
-            EntityRef minion = inventory.MinionSlots.get(_selectedMinion);
-            if(minion != null){
+            }
+            EntityRef minion = inventory.MinionSlots.get(selectedMinion);
+            if (minion != null) {
                 MinionComponent minioncomp = minion.getComponent(MinionComponent.class);
-                if(minioncomp != null){
+                if (minioncomp != null) {
                     int selection = 20 * (minioncomp.minionBehaviour.ordinal());
-                    int startpos = (44 *(6-(_selectedMinion+1)));
-                    _selectionRectangle.setPosition(new Vector2f(Display.getWidth()-(100),(Display.getHeight()/2) - startpos + selection));
-                    //setPosition(new Vector2f(2f, (getSize().y - 8f) * _selectedMinion - 2f));
-                    _background.setPosition(new Vector2f(Display.getWidth()-(100),(Display.getHeight()/2) - startpos)); //(25 *(6-(_selectedMinion+1)))
+                    int startpos = (44 * (6 - (selectedMinion + 1)));
+                    selectionrectangle.setPosition(new Vector2f(Display.getWidth() - (100), (Display.getHeight() / 2) - startpos + selection));
+                    //setPosition(new Vector2f(2f, (getSize().y - 8f) * selectedMinion - 2f));
+                    background.setPosition(new Vector2f(Display.getWidth() - (100), (Display.getHeight() / 2) - startpos)); //(25 *(6-(selectedMinion+1)))
                 }
             }
         }

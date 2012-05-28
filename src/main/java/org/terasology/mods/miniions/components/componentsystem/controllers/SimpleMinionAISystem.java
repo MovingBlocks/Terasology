@@ -21,8 +21,8 @@ import org.terasology.mods.miniions.components.MinionComponent;
 import org.terasology.mods.miniions.components.SimpleMinionAIComponent;
 import org.terasology.mods.miniions.events.MinionMessageEvent;
 import org.terasology.mods.miniions.logic.pathfinder.AStarPathing;
+import org.terasology.mods.miniions.minionenum.MinionMessagePriority;
 import org.terasology.mods.miniions.utilities.MinionMessage;
-import org.terasology.mods.miniions.utilities.MinionMessageType;
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.AxisAngle4f;
@@ -62,191 +62,209 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
             MinionComponent minioncomp = entity.getComponent(MinionComponent.class);
 
             Vector3f worldPos = new Vector3f(location.getWorldPosition());
-            moveComp.getDrive().set(0,0,0);
+            moveComp.getDrive().set(0, 0, 0);
             //  shouldn't use local player, need some way to find nearest player
             LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
 
-            if (localPlayer != null)
-            {
-                switch(minioncomp.minionBehaviour){
+            if (localPlayer != null) {
+                switch (minioncomp.minionBehaviour) {
                     case Follow: {
-                        Vector3f dist = new Vector3f(worldPos);
-                        dist.sub(localPlayer.getPosition());
-                        double distanceToPlayer = dist.lengthSquared();
-
-
-                        if (distanceToPlayer > 8) {
-                            // Head to player
-                            Vector3f target = localPlayer.getPosition();
-                            ai.movementTarget.set(target);
-                            ai.followingPlayer = true;
-                            entity.saveComponent(ai);
-                        }
-
-                        setMovement(ai.movementTarget, worldPos, entity, moveComp, location);
+                        executeFollowAI(worldPos, localPlayer, ai, entity, moveComp, location);
                         break;
                     }
-                    case Gather:{
-
-                        List<Vector3f> targets = ai.gatherTargets;
-                        if(targets == null || targets.size() < 1) break;
-                        Vector3f currentTarget = targets.get(0);
-
-                        Vector3f dist = new Vector3f(worldPos);
-                        dist.sub(currentTarget);
-                        double distanceToTarget = dist.lengthSquared();
-
-                        if (distanceToTarget < 4) {
-                            // gather the block
-                            if(timer.getTimeInMs() - ai.lastAttacktime > 500){
-                                ai.lastAttacktime = timer.getTimeInMs();
-                                boolean attacked = attack(entity,currentTarget);
-                                if(!attacked) {
-                                    ai.gatherTargets.remove(currentTarget);
-                                }
-                            }
-                        }
-
-                        entity.saveComponent(ai);
-                        setMovement(currentTarget, worldPos, entity, moveComp, location);
+                    case Gather: {
+                        executeGatherAI(worldPos, ai, entity, moveComp, location);
                         break;
                     }
-                    case Move:{
-                        //get targets, break if none
-                        List<Vector3f> targets = ai.movementTargets;
-                        if(targets == null || targets.size() < 1) break;
-                        Vector3f currentTarget = targets.get(0);
-                        // trying to solve distance calculation with some simple trick of reducing the height to 0.5, might not work for taller entities
-                        worldPos.y = worldPos.y - (worldPos.y % 1) + 0.5f;
-
-                        //calc distance to current Target
-                        Vector3f dist = new Vector3f(worldPos);
-                        dist.sub(currentTarget);
-                        double distanceToTarget = dist.length();
-
-                        // used 1.0 here as a check, should be lower to have the minion jump on the last block, TODO need to calc middle of block
-                        if(distanceToTarget < 0.1d){
-                            ai.movementTargets.remove(0);
-                            entity.saveComponent(ai);
-                            currentTarget = null;
-                            break;
-                        }
-
-                        setMovement(currentTarget, worldPos, entity, moveComp, location);
-                        break;
-
-                    }
-                    case Patrol:{
-                        //get targets, break if none
-                        List<Vector3f> targets = ai.patrolTargets;
-                        if(targets == null || targets.size() < 1) break;
-                        int patrolCounter = ai.patrolCounter;
-                        Vector3f currentTarget = null;
-
-                        //get the patrol point
-                        if(patrolCounter < targets.size()){
-                            currentTarget = targets.get(patrolCounter);
-                        }
-
-                        if(currentTarget == null){
-                            break;
-                        }
-
-                        //calc distance to current Target
-                        Vector3f dist = new Vector3f(worldPos);
-                        dist.sub(currentTarget);
-                        double distanceToTarget = dist.length();
-
-                        if(distanceToTarget < 0.1d){
-                            patrolCounter++;
-                            if(!(patrolCounter < targets.size())) patrolCounter = 0;
-                            ai.patrolCounter = patrolCounter;
-                            entity.saveComponent(ai);
-                            break;
-                        }
-
-                        setMovement(currentTarget,worldPos,entity,moveComp,location);
-
+                    case Move: {
+                        executeMoveAI(worldPos, ai, entity, moveComp, location);
                         break;
                     }
-                    case Test:{
-                        if(!ai.locked){
-                            //get targets, break if none
-                            List<Vector3f> targets = ai.movementTargets;
-                            List<Vector3f> pathTargets = ai.pathTargets;
-                            if(targets == null || targets.size() < 1) break;
-
-                            Vector3f currentTarget; // check if currentTarget target is a path or not
-                            if(pathTargets != null && pathTargets.size() > 0)
-                            {
-                                currentTarget = pathTargets.get(0);
-                            }
-                            else
-                            {
-                                currentTarget = targets.get(0);
-                            }
-                            if(ai.previousTarget != ai.movementTargets.get(0)){
-                                ai.locked = true;
-                                ai.pathTargets = aStarPathing.findPath(worldPos, new Vector3f(currentTarget));
-                                if(ai.pathTargets == null){
-                                    MinionSystem minionSystem = new MinionSystem();
-                                    MinionMessage messagetosend = new MinionMessage(MinionMessageType.Debug,"test","testdesc","testcont",entity,localPlayer.getEntity());
-                                    entity.send(new MinionMessageEvent(messagetosend));
-                                    ai.movementTargets.remove(0);
-                                }
-                            }
-                            ai.locked = false;
-                            if(ai.pathTargets != null && ai.pathTargets.size() > 0){
-                                pathTargets = ai.pathTargets;
-                                ai.previousTarget = targets.get(0); // used to check if the final target changed
-                                currentTarget = pathTargets.get(0);
-                            }
-
-                            // trying to solve distance calculation with some simple trick of reducing the height to a round int, might not work for taller entities
-                            worldPos.y = worldPos.y - (worldPos.y % 1) + 0.5f;
-                            //calc distance to current Target
-                            Vector3f dist = new Vector3f(worldPos);
-                            dist.sub(currentTarget);
-                            double distanceToTarget = dist.length();
-
-                            if(distanceToTarget < 0.1d){
-                                if(ai.pathTargets != null && ai.pathTargets.size() > 0){
-                                    ai.pathTargets.remove(0);
-                                    entity.saveComponent(ai);
-                                }
-                                else{
-                                    if(ai.movementTargets.size() > 0)
-                                    {
-                                        ai.movementTargets.remove(0);
-                                    }
-                                    ai.previousTarget = null;
-                                    entity.saveComponent(ai);
-                                }
-                                break;
-                            }
-
-                            setMovement(currentTarget, worldPos, entity, moveComp, location);
-                            break;
-                        }
+                    case Patrol: {
+                        executePatrolAI(worldPos, ai, entity, moveComp, location);
+                        break;
+                    }
+                    case Test: {
+                        executeTestAI(worldPos, ai, localPlayer, entity, moveComp, location);
+                        break;
                     }
                     default: {
                         break;
                     }
                 }
-
             }
         }
     }
 
-    private void setMovement(Vector3f currentTarget, Vector3f worldPos, EntityRef entity, CharacterMovementComponent moveComp, LocationComponent location){
+    private void executeFollowAI(Vector3f worldPos, LocalPlayer localPlayer, SimpleMinionAIComponent ai, EntityRef entity, CharacterMovementComponent moveComp, LocationComponent location) {
+        Vector3f dist = new Vector3f(worldPos);
+        dist.sub(localPlayer.getPosition());
+        double distanceToPlayer = dist.lengthSquared();
+
+
+        if (distanceToPlayer > 8) {
+            // Head to player
+            Vector3f target = localPlayer.getPosition();
+            ai.movementTarget.set(target);
+            ai.followingPlayer = true;
+            entity.saveComponent(ai);
+        }
+
+        setMovement(ai.movementTarget, worldPos, entity, moveComp, location);
+    }
+
+    private void executeGatherAI(Vector3f worldPos, SimpleMinionAIComponent ai, EntityRef entity, CharacterMovementComponent moveComp, LocationComponent location) {
+        List<Vector3f> targets = ai.gatherTargets;
+        if ((targets == null) || (targets.size() < 1)) {
+            return;
+        }
+        Vector3f currentTarget = targets.get(0);
+
+        Vector3f dist = new Vector3f(worldPos);
+        dist.sub(currentTarget);
+        double distanceToTarget = dist.lengthSquared();
+
+        if (distanceToTarget < 4) {
+            // gather the block
+            if (timer.getTimeInMs() - ai.lastAttacktime > 500) {
+                ai.lastAttacktime = timer.getTimeInMs();
+                boolean attacked = attack(entity, currentTarget);
+                if (!attacked) {
+                    ai.gatherTargets.remove(currentTarget);
+                }
+            }
+        }
+
+        entity.saveComponent(ai);
+        setMovement(currentTarget, worldPos, entity, moveComp, location);
+    }
+
+    private void executeMoveAI(Vector3f worldPos, SimpleMinionAIComponent ai, EntityRef entity, CharacterMovementComponent moveComp, LocationComponent location) {
+        //get targets, break if none
+        List<Vector3f> targets = ai.movementTargets;
+        if ((targets == null) || (targets.size() < 1)) {
+            return;
+        }
+        Vector3f currentTarget = targets.get(0);
+        // trying to solve distance calculation with some simple trick of reducing the height to 0.5, might not work for taller entities
+        worldPos.y = worldPos.y - (worldPos.y % 1) + 0.5f;
+
+        //calc distance to current Target
+        Vector3f dist = new Vector3f(worldPos);
+        dist.sub(currentTarget);
+        double distanceToTarget = dist.length();
+
+        // used 1.0 here as a check, should be lower to have the minion jump on the last block, TODO need to calc middle of block
+        if (distanceToTarget < 0.1d) {
+            ai.movementTargets.remove(0);
+            entity.saveComponent(ai);
+            currentTarget = null;
+            return;
+        }
+
+        setMovement(currentTarget, worldPos, entity, moveComp, location);
+    }
+
+    private void executePatrolAI(Vector3f worldPos, SimpleMinionAIComponent ai, EntityRef entity, CharacterMovementComponent moveComp, LocationComponent location) {
+        //get targets, break if none
+        List<Vector3f> targets = ai.patrolTargets;
+        if ((targets == null) || (targets.size() < 1)) {
+            return;
+        }
+        int patrolCounter = ai.patrolCounter;
+        Vector3f currentTarget = null;
+
+        //get the patrol point
+        if (patrolCounter < targets.size()) {
+            currentTarget = targets.get(patrolCounter);
+        }
+
+        if (currentTarget == null) {
+            return;
+        }
+
+        //calc distance to current Target
+        Vector3f dist = new Vector3f(worldPos);
+        dist.sub(currentTarget);
+        double distanceToTarget = dist.length();
+
+        if (distanceToTarget < 0.1d) {
+            patrolCounter++;
+            if (!(patrolCounter < targets.size())) patrolCounter = 0;
+            ai.patrolCounter = patrolCounter;
+            entity.saveComponent(ai);
+            return;
+        }
+
+        setMovement(currentTarget, worldPos, entity, moveComp, location);
+    }
+
+    private void executeTestAI(Vector3f worldPos, SimpleMinionAIComponent ai, LocalPlayer localPlayer, EntityRef entity, CharacterMovementComponent moveComp, LocationComponent location) {
+        if (!ai.locked) {
+            //get targets, break if none
+            List<Vector3f> targets = ai.movementTargets;
+            List<Vector3f> pathTargets = ai.pathTargets;
+            if ((targets == null) || (targets.size() < 1)) {
+                return;
+            }
+
+            Vector3f currentTarget; // check if currentTarget target is a path or not
+            if ((pathTargets != null) && (pathTargets.size() > 0)) {
+                currentTarget = pathTargets.get(0);
+            } else {
+                currentTarget = targets.get(0);
+            }
+            if (ai.previousTarget != ai.movementTargets.get(0)) {
+                ai.locked = true;
+                ai.pathTargets = aStarPathing.findPath(worldPos, new Vector3f(currentTarget));
+                if (ai.pathTargets == null) {
+                    MinionSystem minionSystem = new MinionSystem();
+                    MinionMessage messagetosend = new MinionMessage(MinionMessagePriority.Debug, "test", "testdesc", "testcont", entity, localPlayer.getEntity());
+                    entity.send(new MinionMessageEvent(messagetosend));
+                    ai.movementTargets.remove(0);
+                }
+            }
+            ai.locked = false;
+            if ((ai.pathTargets != null) && (ai.pathTargets.size() > 0)) {
+                pathTargets = ai.pathTargets;
+                ai.previousTarget = targets.get(0); // used to check if the final target changed
+                currentTarget = pathTargets.get(0);
+            }
+
+            // trying to solve distance calculation with some simple trick of reducing the height to a round int, might not work for taller entities
+            worldPos.y = worldPos.y - (worldPos.y % 1) + 0.5f;
+            //calc distance to current Target
+            Vector3f dist = new Vector3f(worldPos);
+            dist.sub(currentTarget);
+            double distanceToTarget = dist.length();
+
+            if (distanceToTarget < 0.1d) {
+                if ((ai.pathTargets != null) && (ai.pathTargets.size() > 0)) {
+                    ai.pathTargets.remove(0);
+                    entity.saveComponent(ai);
+                } else {
+                    if (ai.movementTargets.size() > 0) {
+                        ai.movementTargets.remove(0);
+                    }
+                    ai.previousTarget = null;
+                    entity.saveComponent(ai);
+                }
+                return;
+            }
+
+            setMovement(currentTarget, worldPos, entity, moveComp, location);
+        }
+    }
+
+    private void setMovement(Vector3f currentTarget, Vector3f worldPos, EntityRef entity, CharacterMovementComponent moveComp, LocationComponent location) {
         Vector3f targetDirection = new Vector3f();
         targetDirection.sub(currentTarget, worldPos);
         if (targetDirection.x * targetDirection.x + targetDirection.z * targetDirection.z > 0.01f) {
             targetDirection.normalize();
             moveComp.setDrive(targetDirection);
 
-            float yaw = (float)Math.atan2(targetDirection.x, targetDirection.z);
-            AxisAngle4f axisAngle = new AxisAngle4f(0,1,0,yaw);
+            float yaw = (float) Math.atan2(targetDirection.x, targetDirection.z);
+            AxisAngle4f axisAngle = new AxisAngle4f(0, 1, 0, yaw);
             location.getLocalRotation().set(axisAngle);
         } else {
             moveComp.setDrive(new Vector3f());
@@ -259,18 +277,18 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
 
         int damage = 1;
         Block block = BlockManager.getInstance().getBlock(worldProvider.getBlockAtPosition(new Vector3d(position.x, position.y, position.z)));
-        if (block.isDestructible() && !block.isSelectionRayThrough()) {
+        if ((block.isDestructible()) && (!block.isSelectionRayThrough())) {
             EntityRef blockEntity = blockEntityRegistry.getOrCreateEntityAt(new Vector3i(position));
             blockEntity.send(new DamageEvent(damage, player));
             return true;
         }
-            return false;
+        return false;
     }
 
     @ReceiveEvent(components = {SimpleMinionAIComponent.class})
     public void onBump(HorizontalCollisionEvent event, EntityRef entity) {
         CharacterMovementComponent moveComp = entity.getComponent(CharacterMovementComponent.class);
-        if (moveComp != null && moveComp.isGrounded) {
+        if ((moveComp != null) && (moveComp.isGrounded)) {
             moveComp.jump = true;
             entity.saveComponent(moveComp);
         }

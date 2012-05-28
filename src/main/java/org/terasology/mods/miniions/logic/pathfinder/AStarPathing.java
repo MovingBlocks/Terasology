@@ -14,7 +14,7 @@ import java.util.*;
  * Time: 10:08
  * To change this template use File | Settings | File Templates.
  */
-public class AStarPathing extends Pathfinder{
+public class AStarPathing extends Pathfinder {
 
     private static int PATH_COST_LIMIT_MULTIPLIER = 5;
     protected Map<Integer, PathNode> pathNodeCache = new HashMap<Integer, PathNode>(20); // storing objects in hash map by object hash code
@@ -30,11 +30,13 @@ public class AStarPathing extends Pathfinder{
     public List<Vector3f> findPath(Vector3f from, Vector3f to) {
         pathNodeCache.clear();
         Queue<PathNode> openSet = new PriorityQueue<PathNode>(20);
-        PathNode target = new PathNode((int)to.x/1,(int)to.y/1,(int)to.z/1);
-        PathNode start = new PathNode((int)from.x/1,(int)from.y/1,(int)from.z/1);
+        PathNode target = new PathNode((int) to.x / 1, (int) to.y / 1, (int) to.z / 1);
+        PathNode start = new PathNode((int) from.x / 1, (int) from.y / 1, (int) from.z / 1);
         Vector3f tempvec = to;
         tempvec.sub(from);
-        if(tempvec.length() < 0.5) return null;
+        if (tempvec.length() < 0.5) {
+            return null;
+        }
         openSet.add(start);
         start.update(0, null, target);
         while (!openSet.isEmpty()) {
@@ -47,24 +49,28 @@ public class AStarPathing extends Pathfinder{
             byte[][] neighborsMatrix = defaultNeighborMatrix;
             for (byte[] matrix : neighborsMatrix) {
                 int nx = node.x + matrix[0];
-                int ny = node.y + matrix[1] +1; //// added 1, start checking neighbor with y+1, as y-1 might be unreachable in 3D if you think about it, but still passable
+                int ny = node.y + matrix[1] + 1; //// added 1, start checking neighbor with y+1, as y-1 might be unreachable in 3D if you think about it, but still passable
                 int nz = node.z + matrix[2];
 
                 //loop through possible neighbours from top to bottom, return the first walkable one if it exists
                 boolean canskip = true;
-                for(int j = 0; j > -3; j--){
-                    if(isWalkable(nx,ny+j,nz)){
+                for (int j = 0; j > -3; j--) {
+                    if (isWalkable(nx, ny + j, nz)) {
                         ny = ny + j;
                         canskip = false;
                         break;
                     }
                 }
-                if(canskip) continue;
+                if (canskip) {
+                    continue;
+                }
 
                 PathNode neighbor = new PathNode(nx, ny, nz);
                 //filter out parent
-                if(node.parent != null){
-                    if(node.parent.equals(neighbor)) continue;
+                if (node.parent != null) {
+                    if (node.parent.equals(neighbor)) {
+                        continue;
+                    }
                 }
 
                 int pathCost = node.getCost(neighbor);
@@ -153,7 +159,7 @@ public class AStarPathing extends Pathfinder{
             return total * (31 * x + y) + z;
         }
 
-        public void store(){
+        public void store() {
             int hashCode = getPathNodeHashCode(x, y, z, totalCost);
             if (!pathNodeCache.containsKey(hashCode)) {
                 pathNodeCache.put(hashCode, new PathNode(x, y, z));
@@ -194,26 +200,34 @@ public class AStarPathing extends Pathfinder{
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if ((o == null) || ((getClass() != o.getClass()))) {
+                return false;
+            }
 
             PathNode pathNode = (PathNode) o;
 
-            if (x != pathNode.x) return false;
-            if (y != pathNode.y) return false;
-            if (z != pathNode.z) return false;
-
+            if (x != pathNode.x) {
+                return false;
+            }
+            if (y != pathNode.y) {
+                return false;
+            }
+            if (z != pathNode.z) {
+                return false;
+            }
             return true;
         }
 
         @Override
         public int compareTo(PathNode o) {
-            if (this.totalCost > o.totalCost || this.totalCost == 0) {
+            if ((this.totalCost > o.totalCost) || (this.totalCost == 0)) {
                 return 1;
             } else if (this.totalCost < o.totalCost) {
                 return -1;
             }
-
             return 0;
         }
     }
