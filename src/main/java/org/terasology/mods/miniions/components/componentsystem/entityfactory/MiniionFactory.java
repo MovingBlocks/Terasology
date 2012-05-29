@@ -20,8 +20,51 @@ public class MiniionFactory {
     private EntityManager entityManager;
 
     // generates minion cubes for minion toolbar
-    public EntityRef generateMiniion(Vector3f position) {
-        EntityRef entity = entityManager.create("miniion:gelatinousMinion");
+    public EntityRef generateMiniion(Vector3f position, int index) {
+        EntityRef entity = null;
+        switch (index) {
+            case 0: {
+                entity = entityManager.create("miniion:monkeyMinion1");
+                break;
+            }
+            case 1: {
+                entity = entityManager.create("miniion:monkeyMinion2");
+                break;
+            }
+            case 2: {
+                entity = entityManager.create("miniion:monkeyMinion3");
+                break;
+            }
+            case 3: {
+                entity = entityManager.create("miniion:monkeyMinion4");
+                break;
+            }
+            case 4: {
+                entity = entityManager.create("miniion:monkeyMinion5");
+                break;
+            }
+            case 5: {
+                entity = entityManager.create("miniion:monkeyMinion6");
+                break;
+            }
+            case 6: {
+                entity = entityManager.create("miniion:monkeyMinion7");
+                break;
+            }
+            case 7: {
+                entity = entityManager.create("miniion:monkeyMinion8");
+                break;
+            }
+            case 8: {
+                entity = entityManager.create("miniion:monkeyMinion9");
+                break;
+            }
+            default:
+                entityManager.create("miniion:monkeyMinion1");
+        }
+        if (entity == null) {
+            return null;
+        }
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc != null) {
             loc.setWorldPosition(position);

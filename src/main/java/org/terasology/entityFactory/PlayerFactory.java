@@ -22,12 +22,12 @@ public class PlayerFactory {
 
     private EntityManager entityManager;
     private BlockItemFactory blockFactory;
-    
+
     public PlayerFactory(EntityManager entityManager) {
         this.entityManager = entityManager;
         blockFactory = new BlockItemFactory(entityManager, CoreRegistry.get(PrefabManager.class));
     }
-    
+
     public EntityRef newInstance(Vector3f spawnPosition) {
         EntityRef player = entityManager.create();
 
@@ -54,7 +54,8 @@ public class PlayerFactory {
         sounds.footstepSounds.add(AssetManager.load(new AssetUri(AssetType.SOUND, "engine:FootGrass4"), Sound.class));
         sounds.footstepSounds.add(AssetManager.load(new AssetUri(AssetType.SOUND, "engine:FootGrass5"), Sound.class));
         player.addComponent(new LocalPlayerComponent());
-        player.addComponent(new InventoryComponent(36));
+        player.addComponent(new InventoryComponent(18));
+        player.addComponent(new ToolbarComponent()); // defaulted to 9 within the toolbarcomponent
         player.addComponent(new MinionBarComponent(9));
 
         player.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Companion"), 16)));
@@ -65,6 +66,6 @@ public class PlayerFactory {
         player.send(new ReceiveItemEvent(entityManager.create("core:railgunTool")));
 
         return player;
-    } 
+    }
 
 }
