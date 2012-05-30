@@ -279,8 +279,12 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
         Block block = BlockManager.getInstance().getBlock(worldProvider.getBlockAtPosition(new Vector3d(position.x, position.y, position.z)));
         if ((block.isDestructible()) && (!block.isSelectionRayThrough())) {
             EntityRef blockEntity = blockEntityRegistry.getOrCreateEntityAt(new Vector3i(position));
-            blockEntity.send(new DamageEvent(damage, player));
-            return true;
+            if (blockEntity == EntityRef.NULL) {
+                return false;
+            } else {
+                blockEntity.send(new DamageEvent(damage, player));
+                return true;
+            }
         }
         return false;
     }
