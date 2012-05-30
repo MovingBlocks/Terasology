@@ -11,7 +11,7 @@ import org.terasology.events.NoHealthEvent;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AudioManager;
-import org.terasology.logic.newWorld.WorldProvider;
+import org.terasology.logic.world.WorldProvider;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;

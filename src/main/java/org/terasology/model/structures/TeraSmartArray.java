@@ -15,6 +15,8 @@
  */
 package org.terasology.model.structures;
 
+import java.util.Arrays;
+
 /**
  * A fast 3D array for efficient storage of 4-bit values.
  *
@@ -36,6 +38,16 @@ public class TeraSmartArray {
 
         _size = _lX * _lY * _lZ;
         _array = new byte[_halfSize = _size / 2];
+    }
+
+    public TeraSmartArray(TeraSmartArray other) {
+        _lX = other._lX;
+        _lY = other._lY;
+        _lZ = other._lZ;
+
+        _size = _lX * _lY * _lZ;
+        _halfSize = _size / 2;
+        _array = Arrays.copyOf(other._array, other._array.length);
     }
 
     /**

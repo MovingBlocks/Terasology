@@ -9,15 +9,13 @@ import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.newWorld.WorldProvider;
+import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.management.BlockManager;
 
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.AxisAngle4f;
-import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 import java.util.List;
 

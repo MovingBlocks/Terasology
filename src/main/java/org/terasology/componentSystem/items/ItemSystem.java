@@ -9,7 +9,7 @@ import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AudioManager;
-import org.terasology.logic.newWorld.WorldProvider;
+import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;

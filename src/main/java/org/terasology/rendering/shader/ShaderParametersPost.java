@@ -17,18 +17,14 @@ package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.game.CoreRegistry;
-import org.terasology.game.Terasology;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AssetManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PostProcessingRenderer;
-import org.terasology.logic.newWorld.WorldProvider;
+import org.terasology.logic.world.WorldProvider;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.rendering.world.WorldRenderer;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;

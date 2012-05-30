@@ -5,11 +5,11 @@ package org.terasology.logic.generators
 
 import org.terasology.logic.generators.ChunkGeneratorTerrain.BIOME_TYPE
 import org.terasology.model.blocks.management.BlockManager
-import org.terasology.logic.newWorld.generator.TreeGeneratorLSystem
-import org.terasology.logic.newWorld.generator.TreeGeneratorCactus
-import org.terasology.logic.newWorld.generator.ForestGenerator
-import org.terasology.logic.newWorld.WorldProvider
-import org.terasology.logic.newWorld.WorldBiomeProvider
+import org.terasology.logic.world.generator.TreeGeneratorLSystem
+import org.terasology.logic.world.generator.TreeGeneratorCactus
+import org.terasology.logic.world.generator.ForestGenerator
+
+import org.terasology.logic.world.WorldBiomeProvider
 
 public class DefaultGenerators {
 

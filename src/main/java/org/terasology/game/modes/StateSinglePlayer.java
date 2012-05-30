@@ -24,6 +24,7 @@ import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.componentSystem.block.BlockEntityRegistry;
 import org.terasology.componentSystem.controllers.LocalPlayerSystem;
 import org.terasology.components.LocalPlayerComponent;
+import org.terasology.components.LocationComponent;
 import org.terasology.entityFactory.PlayerFactory;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
@@ -44,7 +45,10 @@ import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
-import org.terasology.logic.newWorld.WorldProvider;
+import org.terasology.logic.world.Chunk;
+import org.terasology.logic.world.WorldProvider;
+import org.terasology.math.Vector3i;
+import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.protobuf.EntityData;
 import org.terasology.rendering.cameras.Camera;
@@ -287,20 +291,7 @@ public class StateSinglePlayer implements GameState {
             }
         }
 
-        LocalPlayer localPlayer = null;
-        Iterator<EntityRef> iterator = entityManager.iteratorEntities(LocalPlayerComponent.class).iterator();
-        if (iterator.hasNext()) {
-            localPlayer = new LocalPlayer(iterator.next());
-        } else {
-            PlayerFactory playerFactory = new PlayerFactory(entityManager);
-            localPlayer = new LocalPlayer(playerFactory.newInstance(nextSpawningPoint()));
-        }
-        _worldRenderer.setPlayer(localPlayer);
-
-        // Create the first Portal if it doesn't exist yet
-        _worldRenderer.initPortal();
-
-        fastForwardWorld();
+        prepareWorld();
         CoreRegistry.put(WorldRenderer.class, _worldRenderer);
         CoreRegistry.put(WorldProvider.class, _worldRenderer.getWorldProvider());
         CoreRegistry.put(LocalPlayer.class, _worldRenderer.getPlayer());
@@ -352,8 +343,8 @@ public class StateSinglePlayer implements GameState {
         return !_pauseGame && !_pauseMenu.isVisible();
     }
 
-    // TODO: This should be its own state, really
-    private void fastForwardWorld() {
+    // TODO: Maybe should have its own state?
+    private void prepareWorld() {
         _loadingScreen.setVisible(true);
         _hud.setVisible(false);
         _metrics.setVisible(false);
@@ -363,6 +354,37 @@ public class StateSinglePlayer implements GameState {
 
         Timer timer = CoreRegistry.get(Timer.class);
         long startTime = timer.getTimeInMs();
+
+        LocalPlayer localPlayer = null;
+        Iterator<EntityRef> iterator = entityManager.iteratorEntities(LocalPlayerComponent.class).iterator();
+        if (iterator.hasNext()) {
+            localPlayer = new LocalPlayer(iterator.next());
+            _worldRenderer.setPlayer(localPlayer);
+        } else {
+            // Load spawn zone so player spawn location can be determined
+            EntityRef spawnZoneEntity = entityManager.create();
+            spawnZoneEntity.addComponent(new LocationComponent(new Vector3f(Chunk.SIZE_X / 2, Chunk.SIZE_Y / 2, Chunk.SIZE_Z / 2)));
+            _worldRenderer.getChunkProvider().addRegionEntity(spawnZoneEntity, 1);
+
+            while (!_worldRenderer.getWorldProvider().isBlockActive(new Vector3i(Chunk.SIZE_X / 2, Chunk.SIZE_Y / 2, Chunk.SIZE_Z / 2))) {
+                _loadingScreen.updateStatus(String.format("Loading spawn area... %.2f%%! :-)", (timer.getTimeInMs() - startTime) / 50.0f));
+
+                renderUserInterface();
+                updateUserInterface();
+                Display.update();
+            }
+
+            Vector3i spawnPoint = new Vector3i(Chunk.SIZE_X / 2, Chunk.SIZE_Y, Chunk.SIZE_Z / 2);
+            while (_worldRenderer.getWorldProvider().getBlock(spawnPoint) == BlockManager.getInstance().getAir() && spawnPoint.y > 0) {
+                spawnPoint.y--;
+            }
+
+            PlayerFactory playerFactory = new PlayerFactory(entityManager);
+            localPlayer = new LocalPlayer(playerFactory.newInstance(new Vector3f(spawnPoint.x + 0.5f, spawnPoint.y + 2.0f, spawnPoint.z + 0.5f)));
+            _worldRenderer.setPlayer(localPlayer);
+            _worldRenderer.getChunkProvider().removeRegionEntity(spawnZoneEntity);
+            spawnZoneEntity.destroy();
+        }
 
         while (!getWorldRenderer().pregenerateChunks() && timer.getTimeInMs() - startTime < 5000) {
             chunksGenerated++;
@@ -374,6 +396,8 @@ public class StateSinglePlayer implements GameState {
             Display.update();
         }
 
+        // Create the first Portal if it doesn't exist yet
+        _worldRenderer.initPortal();
         _loadingScreen.setVisible(false);
         _hud.setVisible(true);
         _metrics.setVisible(true);

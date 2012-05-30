@@ -2,7 +2,7 @@ package org.terasology.game.logic.world;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.terasology.logic.newWorld.*;
+import org.terasology.logic.world.*;
 import org.terasology.math.Vector3i;
 
 import static org.junit.Assert.assertEquals;
@@ -12,11 +12,11 @@ import static org.junit.Assert.assertTrue;
 
 public class ChunkTest {
 
-    private NewChunk chunk;
+    private Chunk chunk;
 
     @Before
     public void setup() {
-        chunk = new NewChunk(new Vector3i(0,0,0));
+        chunk = new Chunk(new Vector3i(0,0,0));
     }
 
     @Test

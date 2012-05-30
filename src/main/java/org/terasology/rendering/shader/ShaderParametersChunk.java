@@ -20,7 +20,7 @@ import org.lwjgl.opengl.GL13;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AssetManager;
-import org.terasology.logic.newWorld.WorldProvider;
+import org.terasology.logic.world.WorldProvider;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.world.WorldRenderer;

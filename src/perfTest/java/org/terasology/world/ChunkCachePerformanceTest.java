@@ -1,27 +1,22 @@
 package org.terasology.world;
 
-import org.lwjgl.Sys;
-import org.terasology.game.TerasologyEngine;
-import org.terasology.logic.newWorld.NewChunk;
-import org.terasology.logic.newWorld.NewChunkCache;
-import org.terasology.logic.newWorld.chunkCache.ChunkCacheDeflate;
-import org.terasology.logic.newWorld.chunkCache.ChunkCacheFileSystem;
-import org.terasology.logic.newWorld.chunkCache.ChunkCacheGZip;
-import org.terasology.logic.newWorld.chunkCache.ChunkCacheUncompressed;
-import org.terasology.logic.world.*;
+import org.terasology.logic.world.Chunk;
+import org.terasology.logic.world.ChunkStore;
+import org.terasology.logic.world.chunkCache.*;
+import org.terasology.logic.world.chunkCache.ChunkStoreUncompressed;
+import org.terasology.logic.world.chunkCache.ChunkStoreGZip;
 
-import javax.vecmath.Vector3d;
 import java.io.File;
 
 
 public class ChunkCachePerformanceTest extends junit.framework.TestCase{
     private final int SIZE = 2000;
-    private final NewChunk[] chunks = new NewChunk[SIZE];
+    private final Chunk[] chunks = new Chunk[SIZE];
 
 
     void init(){
         for(int k = 0; k < SIZE; ++k){
-            chunks[k] = new NewChunk(k, 0, 0);
+            chunks[k] = new Chunk(k, 0, 0);
         }
     }
 
@@ -30,14 +25,14 @@ public class ChunkCachePerformanceTest extends junit.framework.TestCase{
 
     public void testChunkCash() {
         init();
-        benchmarkCache(new ChunkCacheGZip());
-        benchmarkCache(new ChunkCacheUncompressed());
-        benchmarkCache(new ChunkCacheDeflate());
-        benchmarkCache(new ChunkCacheFileSystem(new File("benchmark-temp")));
+        benchmarkCache(new ChunkStoreGZip());
+        benchmarkCache(new ChunkStoreUncompressed());
+        benchmarkCache(new ChunkStoreDeflate());
+        benchmarkCache(new ChunkStoreFileSystem(new File("benchmark-temp")));
         shutdown();
     }
 
-    void benchmarkCache(NewChunkCache cc){
+    void benchmarkCache(ChunkStore cc){
         long t1 = System.nanoTime();
         for(int k = 0; k < SIZE; ++k){
             cc.put(chunks[k]);

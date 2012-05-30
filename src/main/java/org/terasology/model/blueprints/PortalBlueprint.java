@@ -15,7 +15,7 @@
  */
 package org.terasology.model.blueprints;
 
-import org.terasology.logic.newWorld.WorldProvider;
+import org.terasology.logic.world.WorldProvider;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.model.structures.BlockSelection;

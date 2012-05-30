@@ -16,9 +16,8 @@
 package org.terasology.model.structures;
 
 import com.google.common.collect.Lists;
-import org.terasology.logic.newWorld.BlockUpdate;
-import org.terasology.logic.newWorld.WorldProvider;
-import org.terasology.math.Vector3i;
+import org.terasology.logic.world.BlockUpdate;
+import org.terasology.logic.world.WorldProvider;
 import org.terasology.model.blocks.Block;
 
 import java.util.HashMap;

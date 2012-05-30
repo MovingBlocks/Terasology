@@ -23,10 +23,10 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Event;
 import org.terasology.entitySystem.common.NullIterator;
-import org.terasology.logic.newWorld.chunkCache.NullChunkCache;
-import org.terasology.logic.newWorld.LocalChunkProvider;
-import org.terasology.logic.newWorld.NewChunk;
-import org.terasology.logic.newWorld.NullChunkGeneratorManager;
+import org.terasology.logic.world.chunkCache.NullChunkStore;
+import org.terasology.logic.world.LocalChunkProvider;
+import org.terasology.logic.world.Chunk;
+import org.terasology.logic.world.NullChunkGeneratorManager;
 
 import javax.vecmath.Vector3f;
 
@@ -42,14 +42,14 @@ public class ChunkProviderTest {
 
     @Before
     public void setup() {
-        chunkProvider = new LocalChunkProvider(new NullChunkCache(), new NullChunkGeneratorManager());
+        chunkProvider = new LocalChunkProvider(new NullChunkStore(), new NullChunkGeneratorManager());
     }
 
     @Test
     public void testCreateChunksInRegion() throws Exception{
         chunkProvider.addRegionEntity(new StubLocationEntity(new Vector3f(0,0,0)), 1);
 
-        NewChunk chunk = chunkProvider.getChunk(0, 0, 0);
+        Chunk chunk = chunkProvider.getChunk(0, 0, 0);
         assertNotNull(chunk);
 
     }

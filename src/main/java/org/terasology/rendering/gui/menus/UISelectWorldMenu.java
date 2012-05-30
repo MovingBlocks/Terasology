@@ -15,8 +15,6 @@
  */
 package org.terasology.rendering.gui.menus;
 
-import groovy.util.ConfigObject;
-import groovy.util.ConfigSlurper;
 import org.lwjgl.opengl.Display;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
@@ -25,8 +23,8 @@ import org.terasology.logic.manager.AssetManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
-import org.terasology.logic.newWorld.WorldInfo;
-import org.terasology.logic.newWorld.WorldUtil;
+import org.terasology.logic.world.WorldInfo;
+import org.terasology.logic.world.WorldUtil;
 import org.terasology.rendering.gui.components.*;
 import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
 import org.terasology.rendering.gui.framework.*;
@@ -35,7 +33,6 @@ import javax.vecmath.Vector2f;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -113,8 +110,8 @@ public class UISelectWorldMenu extends UIDisplayWindow {
                 }
 
                 try{
-                    ConfigObject  config = (ConfigObject)_list.getSelectedItem().getValue();
-                    File world = PathManager.getInstance().getWorldSavePath((String) config.get("worldTitle"));
+                    WorldInfo worldInfo = (WorldInfo) _list.getSelectedItem().getValue();
+                    File world = PathManager.getInstance().getWorldSavePath(worldInfo.getTitle());
                     WorldUtil.deleteWorld(world);
                     _list.removeSelectedItem();
                 }catch(Exception e){

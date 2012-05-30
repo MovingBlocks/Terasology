@@ -1,8 +1,6 @@
 package org.terasology.componentSystem.rendering;
 
 import org.lwjgl.opengl.GL11;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.components.BlockComponent;
 import org.terasology.components.HealthComponent;
@@ -12,7 +10,7 @@ import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AssetManager;
 import org.terasology.logic.manager.ShaderManager;
-import org.terasology.logic.newWorld.WorldProvider;
+import org.terasology.logic.world.WorldProvider;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;

@@ -17,7 +17,7 @@
 package org.terasology.game.logic.world;
 
 import org.junit.Test;
-import org.terasology.logic.newWorld.*;
+import org.terasology.logic.world.*;
 import org.terasology.math.Vector3i;
 
 import static org.junit.Assert.assertEquals;
@@ -35,8 +35,8 @@ public class ChunkGeneratorManagerTest {
     @Test
     public void registeredGeneratorsReceivesSeed() {
         WorldBiomeProvider biomeProvider = mock(WorldBiomeProvider.class);
-        NewChunkGeneratorManager generatorManager = new NewChunkGeneratorManagerImpl(Seed, biomeProvider);
-        NewChunkGenerator generator = mock(NewChunkGenerator.class);
+        ChunkGeneratorManager generatorManager = new ChunkGeneratorManagerImpl(Seed, biomeProvider);
+        ChunkGenerator generator = mock(ChunkGenerator.class);
         generatorManager.registerChunkGenerator(generator);
         verify(generator).setWorldSeed(Seed);
     }
@@ -44,8 +44,8 @@ public class ChunkGeneratorManagerTest {
     @Test
     public void registeredGeneratorReceivesBiomeProvider() {
         WorldBiomeProvider biomeProvider = mock(WorldBiomeProvider.class);
-        NewChunkGeneratorManager generatorManager = new NewChunkGeneratorManagerImpl(Seed, biomeProvider);
-        NewChunkGenerator generator = mock(NewChunkGenerator.class);
+        ChunkGeneratorManager generatorManager = new ChunkGeneratorManagerImpl(Seed, biomeProvider);
+        ChunkGenerator generator = mock(ChunkGenerator.class);
         generatorManager.registerChunkGenerator(generator);
         verify(generator).setWorldBiomeProvider(biomeProvider);
     }
@@ -53,8 +53,8 @@ public class ChunkGeneratorManagerTest {
     @Test
     public void changeSeedPropagatedToChunkGenerator() {
         WorldBiomeProvider biomeProvider = mock(WorldBiomeProvider.class);
-        NewChunkGeneratorManager generatorManager = new NewChunkGeneratorManagerImpl(Seed, biomeProvider);
-        NewChunkGenerator generator = mock(NewChunkGenerator.class);
+        ChunkGeneratorManager generatorManager = new ChunkGeneratorManagerImpl(Seed, biomeProvider);
+        ChunkGenerator generator = mock(ChunkGenerator.class);
         generatorManager.registerChunkGenerator(generator);
         generatorManager.setWorldSeed("Seed2");
         verify(generator).setWorldSeed("Seed2");
@@ -63,8 +63,8 @@ public class ChunkGeneratorManagerTest {
     @Test
     public void changeBiomeProviderToChunkGenerator() {
         WorldBiomeProvider biomeProvider = mock(WorldBiomeProvider.class);
-        NewChunkGeneratorManager generatorManager = new NewChunkGeneratorManagerImpl(Seed, biomeProvider);
-        NewChunkGenerator generator = mock(NewChunkGenerator.class);
+        ChunkGeneratorManager generatorManager = new ChunkGeneratorManagerImpl(Seed, biomeProvider);
+        ChunkGenerator generator = mock(ChunkGenerator.class);
         generatorManager.registerChunkGenerator(generator);
         WorldBiomeProvider newBiomeProvider = mock(WorldBiomeProvider.class);
         generatorManager.setWorldBiomeProvider(newBiomeProvider);
@@ -74,12 +74,12 @@ public class ChunkGeneratorManagerTest {
     @Test
     public void createChunkPassesThroughGenerator() {
         WorldBiomeProvider biomeProvider = mock(WorldBiomeProvider.class);
-        NewChunkGeneratorManager generatorManager = new NewChunkGeneratorManagerImpl(Seed, biomeProvider);
-        NewChunkGenerator generator = mock(NewChunkGenerator.class);
+        ChunkGeneratorManager generatorManager = new ChunkGeneratorManagerImpl(Seed, biomeProvider);
+        ChunkGenerator generator = mock(ChunkGenerator.class);
         generatorManager.registerChunkGenerator(generator);
 
         Vector3i pos = new Vector3i(3,4,6);
-        NewChunk chunk = generatorManager.generateChunk(pos);
+        Chunk chunk = generatorManager.generateChunk(pos);
         assertNotNull(chunk);
         assertEquals(pos, chunk.getPos());
 

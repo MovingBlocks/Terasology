@@ -1,6 +1,5 @@
 package org.terasology.componentSystem;
 
-import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import org.lwjgl.BufferUtils;
@@ -13,7 +12,7 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.ShaderManager;
-import org.terasology.logic.newWorld.WorldProvider;
+import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.Side;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
@@ -26,7 +25,6 @@ import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 import java.nio.FloatBuffer;
 import java.util.Iterator;
-import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.*;
 

@@ -15,6 +15,8 @@
  */
 package org.terasology.model.structures;
 
+import java.util.Arrays;
+
 /**
  * A fast 3D array wrapper.
  *
@@ -36,6 +38,14 @@ public class TeraArray {
 
         _size = _lX * _lY * _lZ;
         _array = new byte[_size];
+    }
+
+    public TeraArray(TeraArray other) {
+        this._array = Arrays.copyOf(other._array, other._array.length);
+        this._lX = other._lX;
+        this._lY = other._lY;
+        this._lZ = other._lZ;
+        this._size = other._size;
     }
 
     /**

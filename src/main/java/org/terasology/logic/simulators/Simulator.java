@@ -15,26 +15,16 @@
  */
 package org.terasology.logic.simulators;
 
-import org.terasology.game.CoreRegistry;
-import org.terasology.game.GameEngine;
-import org.terasology.game.Timer;
-import org.terasology.logic.world.IBlockObserver;
-import org.terasology.logic.world.LocalWorldProvider;
-import org.terasology.model.structures.BlockPosition;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.locks.ReentrantLock;
+import org.terasology.logic.world.BlockObserver;
 
 /**
  * Base class for all simulators.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public abstract class Simulator implements IBlockObserver {
+public abstract class Simulator implements BlockObserver {
 
-    private final String _name;
+    /*private final String _name;
     private boolean _running = false;
 
     protected final long _updateInterval;
@@ -148,5 +138,5 @@ public abstract class Simulator implements IBlockObserver {
         return false;
     }
 
-    protected abstract boolean executeSimulation();
+    protected abstract boolean executeSimulation(); */
 }

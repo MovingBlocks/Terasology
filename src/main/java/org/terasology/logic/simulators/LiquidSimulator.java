@@ -15,8 +15,7 @@
  */
 package org.terasology.logic.simulators;
 
-import org.terasology.logic.world.Chunk;
-import org.terasology.logic.world.LocalWorldProvider;
+import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.BlockPosition;
@@ -33,7 +32,7 @@ import java.util.ArrayList;
  */
 public class LiquidSimulator extends Simulator {
 
-    private static final Vector3d[] NEIGHBORS4 = {new Vector3d(-1, 0, 0), new Vector3d(1, 0, 0), new Vector3d(0, 0, 1), new Vector3d(0, 0, -1)};
+    /*private static final Vector3d[] NEIGHBORS4 = {new Vector3d(-1, 0, 0), new Vector3d(1, 0, 0), new Vector3d(0, 0, 1), new Vector3d(0, 0, -1)};
     private static final Vector3d[] NEIGHBORS6 = {new Vector3d(0, -1, 0), new Vector3d(0, 1, 0), new Vector3d(-1, 0, 0), new Vector3d(1, 0, 0), new Vector3d(0, 0, 1), new Vector3d(0, 0, -1)};
 
     private FastRandom random = new FastRandom();
@@ -153,5 +152,10 @@ public class LiquidSimulator extends Simulator {
                 addActiveBlock(nBp);
             }
         }
+    }  */
+
+    @Override
+    public void blockChanged(Vector3i pos, Block newType, Block oldType) {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 }

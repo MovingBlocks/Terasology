@@ -16,7 +16,7 @@
 */
 package org.terasology.model.structures;
 
-import org.terasology.logic.newWorld.WorldProvider;
+import org.terasology.logic.world.WorldProvider;
 import org.terasology.model.blocks.Block;
 
 import javax.vecmath.Vector3d;

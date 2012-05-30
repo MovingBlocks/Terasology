@@ -9,10 +9,9 @@ import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.newWorld.WorldProvider;
+import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.management.BlockManager;
 
 import java.util.List;
 import java.util.Map;

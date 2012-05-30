@@ -2,8 +2,6 @@ package org.terasology.componentSystem.rendering;
 
 import com.google.common.collect.Maps;
 import org.lwjgl.opengl.GL11;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.components.*;
 import org.terasology.entitySystem.EntityRef;
@@ -12,7 +10,7 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AssetManager;
 import org.terasology.logic.manager.ShaderManager;
-import org.terasology.logic.newWorld.WorldProvider;
+import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;

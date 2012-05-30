@@ -34,7 +34,6 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.componentSystem.items.InventorySystem;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.LocationComponent;
@@ -48,7 +47,6 @@ import org.terasology.game.*;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AudioManager;
-import org.terasology.logic.newWorld.NewChunk;
 import org.terasology.logic.world.Chunk;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
@@ -258,11 +256,11 @@ public class BulletPhysicsRenderer implements IGameObject {
     }
 
     public void updateChunks() {
-        List<NewChunk> chunks = CoreRegistry.get(WorldRenderer.class).getChunksInProximity();
+        List<Chunk> chunks = CoreRegistry.get(WorldRenderer.class).getChunksInProximity();
         HashSet<RigidBody> newBodies = new HashSet<RigidBody>();
 
         for (int i = 0; i < 32 && i < chunks.size(); i++) {
-            final NewChunk chunk = chunks.get(i);
+            final Chunk chunk = chunks.get(i);
 
             if (chunk != null) {
                 updateRigidBody(chunk);
@@ -288,7 +286,7 @@ public class BulletPhysicsRenderer implements IGameObject {
         _chunks = newBodies;
     }
 
-    private void updateRigidBody(NewChunk chunk) {
+    private void updateRigidBody(Chunk chunk) {
         if (chunk.getRigidBody() != null || chunk.getMesh() == null)
             return;
 
@@ -323,7 +321,7 @@ public class BulletPhysicsRenderer implements IGameObject {
             Matrix3f rot = new Matrix3f();
             rot.setIdentity();
 
-            DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, new Vector3f((float) chunk.getPos().x * Chunk.CHUNK_DIMENSION_X, (float) chunk.getPos().y * Chunk.CHUNK_DIMENSION_Y, (float) chunk.getPos().z * Chunk.CHUNK_DIMENSION_Z), 1.0f)));
+            DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, new Vector3f((float) chunk.getPos().x * Chunk.SIZE_X, (float) chunk.getPos().y * Chunk.SIZE_Y, (float) chunk.getPos().z * Chunk.SIZE_Z), 1.0f)));
 
             RigidBodyConstructionInfo blockConsInf = new RigidBodyConstructionInfo(0, blockMotionState, shape, new Vector3f());
             RigidBody rigidBody = new RigidBody(blockConsInf);
