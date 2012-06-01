@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.world;
+package org.terasology.logic.world.generator;
 
-import org.terasology.math.Vector3i;
+import org.terasology.logic.world.Chunk;
+import org.terasology.logic.world.generator.BaseChunkGenerator;
 
 /**
  * @author Immortius
  */
-public interface ChunkGeneratorManager {
+public interface ChunkGenerator extends BaseChunkGenerator {
 
-    void setWorldSeed(String seed);
 
-    void setWorldBiomeProvider(WorldBiomeProvider biomeProvider);
+    /**
+     * Generate the local contents of a chunk. This should be purely deterministic from the chunk contents, chunk
+     * position and world seed - should not depend on external state or other data.
+     *
+     * @param chunk
+     */
+    public void generateChunk(Chunk chunk);
 
-    void registerChunkGenerator(BaseChunkGenerator generator);
-
-    Chunk generateChunk(Vector3i pos);
-
-    void secondPassChunk(Vector3i chunkPos, WorldView view);
 }

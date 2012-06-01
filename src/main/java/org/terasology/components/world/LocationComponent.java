@@ -1,4 +1,4 @@
-package org.terasology.components;
+package org.terasology.components.world;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.entitySystem.Component;

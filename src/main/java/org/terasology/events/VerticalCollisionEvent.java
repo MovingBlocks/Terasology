@@ -16,11 +16,11 @@ public class VerticalCollisionEvent extends AbstractEvent {
         this.velocity = new Vector3f(velocity);
         this.location = new Vector3f(location);
     }
-    
+
     public Vector3f getVelocity() {
         return velocity;
     }
-    
+
     public Vector3f getLocation() {
         return location;
     }

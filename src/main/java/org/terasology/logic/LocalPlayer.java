@@ -2,6 +2,7 @@ package org.terasology.logic;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.components.*;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 
 import javax.vecmath.Quat4f;

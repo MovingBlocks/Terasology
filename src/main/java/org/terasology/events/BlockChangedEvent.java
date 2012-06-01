@@ -14,32 +14,36 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.world.chunkCache;
+package org.terasology.events;
 
-import org.terasology.logic.world.Chunk;
-import org.terasology.logic.world.ChunkStore;
+import org.terasology.entitySystem.AbstractEvent;
 import org.terasology.math.Vector3i;
+import org.terasology.model.blocks.Block;
 
 /**
+ * Event when a block has changed
  * @author Immortius
  */
-public class NullChunkStore implements ChunkStore {
+public class BlockChangedEvent extends AbstractEvent {
+    private Block oldType;
+    private Block newType;
+    private Vector3i blockPosition;
 
-    @Override
-    public Chunk get(Vector3i position) {
-        return null;
+    public BlockChangedEvent(Vector3i pos, Block newType, Block oldType) {
+        this.blockPosition = new Vector3i(pos);
+        this.oldType = oldType;
+        this.newType = newType;
     }
 
-    @Override
-    public float size() {
-        return 0;
+    public Vector3i getBlockPosition() {
+        return blockPosition;
     }
 
-    @Override
-    public void dispose() {
+    public Block getOldType() {
+        return oldType;
     }
 
-    @Override
-    public void put(Chunk c) {
+    public Block getNewType() {
+        return newType;
     }
 }

@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import org.lwjgl.opengl.GL11;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.components.*;
+import org.terasology.components.world.BlockItemComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.game.CoreRegistry;
@@ -57,6 +58,10 @@ public class FirstPersonRenderer implements RenderSystem {
         TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, 1), texPos, texWidth, 1.0f, 1.0f, 0.9f, 0.0f, 0.0f, 0.0f);
         handMesh = tessellator.generateMesh();
         handTex = AssetManager.loadTexture("engine:char");
+    }
+
+    @Override
+    public void shutdown() {
     }
 
     public void renderOpaque() {

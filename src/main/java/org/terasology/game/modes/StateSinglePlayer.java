@@ -21,10 +21,9 @@ import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.componentSystem.block.BlockEntityRegistry;
 import org.terasology.componentSystem.controllers.LocalPlayerSystem;
 import org.terasology.components.LocalPlayerComponent;
-import org.terasology.components.LocationComponent;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.entityFactory.PlayerFactory;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
@@ -124,11 +123,8 @@ public class StateSinglePlayer implements GameState {
 
         componentSystemManager = new ComponentSystemManager();
         CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);
-        BlockEntityRegistry blockEntityRegistry = new BlockEntityRegistry();
-        CoreRegistry.put(BlockEntityRegistry.class, blockEntityRegistry);
         localPlayerSys = new LocalPlayerSystem();
         componentSystemManager.register(localPlayerSys, "engine:LocalPlayerSystem");
-        componentSystemManager.register(blockEntityRegistry, "engine:BlockEntityRegistry");
 
         componentSystemManager.loadEngineSystems();
 
@@ -189,6 +185,9 @@ public class StateSinglePlayer implements GameState {
 
     @Override
     public void deactivate() {
+        for (ComponentSystem system : componentSystemManager.iterateAll()) {
+            system.shutdown();
+        }
         try {
             CoreRegistry.get(WorldPersister.class).save(new File(PathManager.getInstance().getWorldSavePath(CoreRegistry.get(WorldProvider.class).getTitle()), ENTITY_DATA_FILE), WorldPersister.SaveFormat.Binary);
         } catch (IOException e) {
@@ -291,10 +290,9 @@ public class StateSinglePlayer implements GameState {
             }
         }
 
-        prepareWorld();
         CoreRegistry.put(WorldRenderer.class, _worldRenderer);
         CoreRegistry.put(WorldProvider.class, _worldRenderer.getWorldProvider());
-        CoreRegistry.put(LocalPlayer.class, _worldRenderer.getPlayer());
+        CoreRegistry.put(LocalPlayer.class, new LocalPlayer(EntityRef.NULL));
         CoreRegistry.put(Camera.class, _worldRenderer.getActiveCamera());
         CoreRegistry.put(BulletPhysicsRenderer.class, _worldRenderer.getBulletRenderer());
 
@@ -302,7 +300,7 @@ public class StateSinglePlayer implements GameState {
             system.initialise();
         }
 
-
+        prepareWorld();
     }
 
     private Vector3f nextSpawningPoint() {
@@ -355,11 +353,10 @@ public class StateSinglePlayer implements GameState {
         Timer timer = CoreRegistry.get(Timer.class);
         long startTime = timer.getTimeInMs();
 
-        LocalPlayer localPlayer = null;
         Iterator<EntityRef> iterator = entityManager.iteratorEntities(LocalPlayerComponent.class).iterator();
         if (iterator.hasNext()) {
-            localPlayer = new LocalPlayer(iterator.next());
-            _worldRenderer.setPlayer(localPlayer);
+            CoreRegistry.get(LocalPlayer.class).setEntity(iterator.next());
+            _worldRenderer.setPlayer(CoreRegistry.get(LocalPlayer.class));
         } else {
             // Load spawn zone so player spawn location can be determined
             EntityRef spawnZoneEntity = entityManager.create();
@@ -380,8 +377,8 @@ public class StateSinglePlayer implements GameState {
             }
 
             PlayerFactory playerFactory = new PlayerFactory(entityManager);
-            localPlayer = new LocalPlayer(playerFactory.newInstance(new Vector3f(spawnPoint.x + 0.5f, spawnPoint.y + 2.0f, spawnPoint.z + 0.5f)));
-            _worldRenderer.setPlayer(localPlayer);
+            CoreRegistry.get(LocalPlayer.class).setEntity(playerFactory.newInstance(new Vector3f(spawnPoint.x + 0.5f, spawnPoint.y + 2.0f, spawnPoint.z + 0.5f)));
+            _worldRenderer.setPlayer(CoreRegistry.get(LocalPlayer.class));
             _worldRenderer.getChunkProvider().removeRegionEntity(spawnZoneEntity);
             spawnZoneEntity.destroy();
         }

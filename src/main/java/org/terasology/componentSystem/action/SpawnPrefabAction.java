@@ -16,13 +16,12 @@
 
 package org.terasology.componentSystem.action;
 
-import org.terasology.components.LocationComponent;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.components.actions.SpawnPrefabActionComponent;
 import org.terasology.entitySystem.*;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
 
-import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
 /**
@@ -36,6 +35,10 @@ public class SpawnPrefabAction implements EventHandlerSystem{
     @Override
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
+    }
+
+    @Override
+    public void shutdown() {
     }
 
     @ReceiveEvent(components = SpawnPrefabActionComponent.class)

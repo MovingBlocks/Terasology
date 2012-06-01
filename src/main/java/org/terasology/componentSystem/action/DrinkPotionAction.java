@@ -20,11 +20,17 @@ public class DrinkPotionAction implements EventHandlerSystem {
 
     public void initialise() {
         }
-        public EntityRef entity;
-        public PotionComponent potion;
-        public PoisonedComponent poisoned;
-        public EntityRef item;
-        public CoreRegistry CoreRegister;
+
+
+    @Override
+    public void shutdown() {
+    }
+
+    public EntityRef entity;
+    public PotionComponent potion;
+    public PoisonedComponent poisoned;
+    public EntityRef item;
+    public CoreRegistry CoreRegister;
 
 
     @ReceiveEvent(components = {PotionComponent.class})

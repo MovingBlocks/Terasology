@@ -2,7 +2,7 @@ package org.terasology.componentSystem.rendering;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.componentSystem.RenderSystem;
-import org.terasology.components.BlockComponent;
+import org.terasology.components.world.BlockComponent;
 import org.terasology.components.HealthComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -44,6 +44,10 @@ public class BlockDamageRenderer implements RenderSystem {
         Tessellator tessellator = new Tessellator();
         TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, 1), texPos, texWidth, 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
         overlayMesh = tessellator.generateMesh();
+    }
+
+    @Override
+    public void shutdown() {
     }
 
     public void renderOverlay() {

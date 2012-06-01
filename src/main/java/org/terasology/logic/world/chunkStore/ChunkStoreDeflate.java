@@ -1,4 +1,4 @@
-package org.terasology.logic.world.chunkCache;
+package org.terasology.logic.world.chunkStore;
 
 
 import org.terasology.logic.world.Chunk;

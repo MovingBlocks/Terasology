@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.world.generator;
+package org.terasology.logic.world.generator.core;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import org.terasology.logic.world.Chunk;
-import org.terasology.logic.world.SecondPassChunkGenerator;
+import org.terasology.logic.world.generator.SecondPassChunkGenerator;
 import org.terasology.logic.world.WorldBiomeProvider;
 import org.terasology.logic.world.WorldView;
+import org.terasology.logic.world.generator.tree.TreeGenerator;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;

@@ -20,7 +20,7 @@ public class DamageEvent extends AbstractEvent {
         this.amount = amount;
         this.instigator = instigator;
     }
-    
+
     public int getAmount() {
         return amount;
     }

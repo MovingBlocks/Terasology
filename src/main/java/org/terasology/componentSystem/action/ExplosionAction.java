@@ -1,6 +1,5 @@
 package org.terasology.componentSystem.action;
 
-import org.terasology.componentSystem.block.BlockEntityRegistry;
 import org.terasology.components.actions.ExplosionActionComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
@@ -8,6 +7,7 @@ import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
+import org.terasology.logic.world.BlockEntityRegistry;
 import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
@@ -32,6 +32,10 @@ public class ExplosionAction implements EventHandlerSystem {
         worldProvider = CoreRegistry.get(WorldProvider.class);
         physicsRenderer = CoreRegistry.get(BulletPhysicsRenderer.class);
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
+    }
+
+    @Override
+    public void shutdown() {
     }
 
     @ReceiveEvent(components = {ExplosionActionComponent.class})

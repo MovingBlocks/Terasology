@@ -17,6 +17,10 @@ public class AccessInventoryAction implements EventHandlerSystem {
     public void initialise() {
     }
 
+    @Override
+    public void shutdown() {
+    }
+
     @ReceiveEvent(components = {AccessInventoryActionComponent.class})
     public void onActivate(ActivateEvent event, EntityRef entity) {
         event.getInstigator().send(new OpenInventoryEvent(entity));

@@ -17,7 +17,7 @@
 package org.terasology.logic.world.generationPhase;
 
 import org.terasology.logic.world.Chunk;
-import org.terasology.logic.world.ChunkGeneratorManager;
+import org.terasology.logic.world.generator.core.ChunkGeneratorManager;
 import org.terasology.logic.world.ChunkProvider;
 import org.terasology.logic.world.WorldView;
 import org.terasology.math.Vector3i;

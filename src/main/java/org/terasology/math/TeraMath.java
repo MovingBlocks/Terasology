@@ -206,7 +206,7 @@ public final class TeraMath {
         if (x < 0)
             x -= 15;
 
-        return (x / Chunk.CHUNK_DIMENSION_X);
+        return (x / Chunk.SIZE_X);
     }
 
     /**
@@ -231,7 +231,7 @@ public final class TeraMath {
         if (z < 0)
             z -= 15;
 
-        return (z / Chunk.CHUNK_DIMENSION_Z);
+        return (z / Chunk.SIZE_Z);
     }
 
     public static Vector3i calcChunkPos(Vector3i pos) {
@@ -250,7 +250,7 @@ public final class TeraMath {
      * @return The X-coordinate of the block within the chunk
      */
     public static int calcBlockPosX(int blockX, int chunkX) {
-        return TeraMath.fastAbs(blockX - (chunkX * Chunk.CHUNK_DIMENSION_X));
+        return TeraMath.fastAbs(blockX - (chunkX * Chunk.SIZE_X));
     }
 
     public static int calcBlockPosY(int blockY, int chunkY) {
@@ -265,7 +265,7 @@ public final class TeraMath {
      * @return The Z-coordinate of the block within the chunk
      */
     public static int calcBlockPosZ(int blockZ, int chunkZ) {
-        return TeraMath.fastAbs(blockZ - (chunkZ * Chunk.CHUNK_DIMENSION_Z));
+        return TeraMath.fastAbs(blockZ - (chunkZ * Chunk.SIZE_Z));
     }
 
     public static Vector3i calcBlockPos(int x, int y, int z, Vector3i chunkPos) {

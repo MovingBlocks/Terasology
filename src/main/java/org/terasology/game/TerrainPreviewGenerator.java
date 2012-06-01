@@ -17,7 +17,7 @@ package org.terasology.game;
 
 import org.terasology.logic.world.WorldBiomeProvider;
 import org.terasology.logic.world.WorldBiomeProviderImpl;
-import org.terasology.logic.world.generator.PerlinTerrainGenerator;
+import org.terasology.logic.world.generator.core.PerlinTerrainGenerator;
 
 import javax.imageio.ImageIO;
 import javax.vecmath.Vector2f;

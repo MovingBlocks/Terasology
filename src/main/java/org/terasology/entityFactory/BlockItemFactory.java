@@ -1,15 +1,10 @@
 package org.terasology.entityFactory;
 
-import org.terasology.components.BlockItemComponent;
-import org.terasology.components.InventoryComponent;
+import org.terasology.components.world.BlockItemComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LightComponent;
-import org.terasology.components.actions.AccessInventoryActionComponent;
-import org.terasology.components.actions.PlaySoundActionComponent;
 import org.terasology.entitySystem.*;
-import org.terasology.logic.manager.AudioManager;
 import org.terasology.model.blocks.BlockFamily;
-import org.terasology.model.blocks.management.BlockManager;
 
 /**
  * @author Immortius <immortius@gmail.com>

@@ -32,11 +32,8 @@ import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.generators.DefaultGenerators;
 import org.terasology.logic.manager.*;
 import org.terasology.logic.world.*;
-import org.terasology.logic.world.chunkCache.ChunkStoreGZip;
-import org.terasology.logic.world.generator.FloraGenerator;
-import org.terasology.logic.world.generator.ForestGenerator;
-import org.terasology.logic.world.generator.LiquidsGenerator;
-import org.terasology.logic.world.generator.PerlinTerrainGenerator;
+import org.terasology.logic.world.chunkStore.ChunkStoreGZip;
+import org.terasology.logic.world.generator.core.*;
 import org.terasology.logic.world.WorldTimeEvent;
 import org.terasology.logic.world.WorldUtil;
 import org.terasology.math.Rect2i;
@@ -178,7 +175,10 @@ public final class WorldRenderer implements IGameObject {
             chunkStore = new ChunkStoreGZip();
         }
         _chunkProvider = new LocalChunkProvider(chunkStore, generatorManager);
-        _worldProvider = new WorldProviderImpl(title, seed, _chunkProvider);
+        EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(title, seed, _chunkProvider));
+        CoreRegistry.put(BlockEntityRegistry.class, entityWorldProvider);
+        CoreRegistry.get(ComponentSystemManager.class).register(entityWorldProvider, "engine:BlockEntityRegistry");
+        _worldProvider = new WorldProviderWrapper(entityWorldProvider);
         _chunkTesselator = new ChunkTessellator(_worldProvider.getBiomeProvider());
         _skysphere = new Skysphere(this);
         _chunkUpdateManager = new ChunkUpdateManager(_chunkTesselator, _worldProvider);

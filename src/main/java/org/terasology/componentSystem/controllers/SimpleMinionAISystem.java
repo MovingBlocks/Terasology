@@ -1,14 +1,15 @@
 package org.terasology.componentSystem.controllers;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.componentSystem.block.BlockEntityRegistry;
 import org.terasology.components.*;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.*;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.world.BlockEntityRegistry;
 import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
@@ -42,6 +43,10 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
         timer = CoreRegistry.get(Timer.class);
         //aStarPathfinder = new AStarPathfinder(worldProvider);
+    }
+
+    @Override
+    public void shutdown() {
     }
 
     public void update(float delta) {

@@ -4,17 +4,16 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.audio.Sound;
 import org.terasology.components.*;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AssetManager;
-import org.terasology.logic.manager.AudioManager;
 import org.terasology.model.blocks.management.BlockManager;
 
 import javax.vecmath.Vector3f;
-import java.util.Arrays;
 
 /**
  * @author Immortius <immortius@gmail.com>

@@ -17,7 +17,7 @@
 package org.terasology.logic.world.generationPhase;
 
 import org.terasology.logic.world.Chunk;
-import org.terasology.logic.world.ChunkGeneratorManager;
+import org.terasology.logic.world.generator.core.ChunkGeneratorManager;
 import org.terasology.math.Vector3i;
 
 import java.util.Comparator;

@@ -36,7 +36,7 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LocalPlayerComponent;
-import org.terasology.components.LocationComponent;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.components.MinionBarComponent;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.EntityManager;
@@ -263,16 +263,18 @@ public class BulletPhysicsRenderer implements IGameObject {
             final Chunk chunk = chunks.get(i);
 
             if (chunk != null) {
-                updateRigidBody(chunk);
+                if (updateRigidBody(chunk)) {
 
-                RigidBody c = chunk.getRigidBody();
+                    RigidBody c = chunk.getRigidBody();
 
-                if (c != null) {
-                    newBodies.add(c);
+                    if (c != null) {
+                        newBodies.add(c);
 
-                    if (!_chunks.contains(c)) {
-                        _discreteDynamicsWorld.addRigidBody(c);
+                        if (!_chunks.contains(c)) {
+                            _discreteDynamicsWorld.addRigidBody(c);
+                        }
                     }
+                    break;
                 }
             }
         }
@@ -286,9 +288,9 @@ public class BulletPhysicsRenderer implements IGameObject {
         _chunks = newBodies;
     }
 
-    private void updateRigidBody(Chunk chunk) {
+    private boolean updateRigidBody(Chunk chunk) {
         if (chunk.getRigidBody() != null || chunk.getMesh() == null)
-            return;
+            return false;
 
         // TODO: Lock on chunk meshes
         TriangleIndexVertexArray vertexArray = new TriangleIndexVertexArray();
@@ -312,7 +314,7 @@ public class BulletPhysicsRenderer implements IGameObject {
 
         // TODO: Deal with this situation better
         if (tris == 0) {
-            return;
+            return false;
         }
 
         try {
@@ -329,6 +331,7 @@ public class BulletPhysicsRenderer implements IGameObject {
         } catch (Exception e) {
             _logger.log(Level.WARNING, "Chunk failed to create rigid body.", e);
         }
+        return true;
 
     }
 

@@ -2,13 +2,12 @@ package org.terasology.componentSystem.rendering;
 
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.components.AABBCollisionComponent;
-import org.terasology.components.LocationComponent;
-import org.terasology.components.MeshComponent;
+import org.terasology.components.world.LocationComponent;
+import org.terasology.components.rendering.MeshComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.game.CoreRegistry;
-import org.terasology.game.Terasology;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.TeraMath;
@@ -44,6 +43,10 @@ public class MeshRenderer implements RenderSystem {
         TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1.0f, 1.0f, 1.0f, 1.0f), 0.8f, 0.8f, 0.6f, 0f, 0f, 0f);
         TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1.0f, 1.0f, 1.0f, 0.6f), 1.0f, 1.0f, 0.8f, 0f, 0f, 0f);
         mesh = tessellator.generateMesh();
+    }
+
+    @Override
+    public void shutdown() {
     }
 
     public void renderTransparent() {

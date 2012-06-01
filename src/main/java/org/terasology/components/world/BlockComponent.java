@@ -1,4 +1,4 @@
-package org.terasology.components;
+package org.terasology.components.world;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.math.Vector3i;

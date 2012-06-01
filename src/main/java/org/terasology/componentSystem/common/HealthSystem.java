@@ -21,6 +21,10 @@ public class HealthSystem implements EventHandlerSystem, UpdateSubscriberSystem 
         entityManager = CoreRegistry.get(EntityManager.class);
     }
 
+    @Override
+    public void shutdown() {
+    }
+
     public void update(float delta) {
         for (EntityRef entity : entityManager.iteratorEntities(HealthComponent.class)) {
             HealthComponent health = entity.getComponent(HealthComponent.class);

@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.world.generator;
+package org.terasology.logic.world.generator.core;
 
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.world.Chunk;
-import org.terasology.logic.world.ChunkGenerator;
+import org.terasology.logic.world.generator.ChunkGenerator;
 import org.terasology.logic.world.WorldBiomeProvider;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;

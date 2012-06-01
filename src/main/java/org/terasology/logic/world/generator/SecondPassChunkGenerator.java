@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.world;
+package org.terasology.logic.world.generator;
 
+import org.terasology.logic.world.WorldView;
+import org.terasology.logic.world.generator.BaseChunkGenerator;
 import org.terasology.math.Vector3i;
 
 /**

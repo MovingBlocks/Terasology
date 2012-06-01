@@ -16,9 +16,7 @@
 package org.terasology.rendering.gui.components;
 
 import org.lwjgl.opengl.GL11;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
-import org.terasology.components.BlockItemComponent;
+import org.terasology.components.world.BlockItemComponent;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LocalPlayerComponent;

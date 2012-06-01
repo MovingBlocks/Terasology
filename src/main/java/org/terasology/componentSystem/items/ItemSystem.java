@@ -2,13 +2,16 @@ package org.terasology.componentSystem.items;
 
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.componentSystem.block.BlockEntityRegistry;
 import org.terasology.components.*;
+import org.terasology.components.world.BlockComponent;
+import org.terasology.components.world.BlockItemComponent;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AudioManager;
+import org.terasology.logic.world.BlockEntityRegistry;
 import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
@@ -35,6 +38,10 @@ public class ItemSystem implements EventHandlerSystem {
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
     }
 
+    @Override
+    public void shutdown() {
+    }
+
     @ReceiveEvent(components=BlockItemComponent.class)
     public void onDestroyed(RemovedComponentEvent event, EntityRef entity) {
         entity.getComponent(BlockItemComponent.class).placedEntity.destroy();
@@ -44,7 +51,6 @@ public class ItemSystem implements EventHandlerSystem {
     public void onPlaceBlock(ActivateEvent event, EntityRef item) {
         ItemComponent itemComp = item.getComponent(ItemComponent.class);
         BlockItemComponent blockItem = item.getComponent(BlockItemComponent.class);
-
 
         Side surfaceDir = Side.inDirection(event.getNormal());
 
@@ -107,16 +113,17 @@ public class ItemSystem implements EventHandlerSystem {
             return false;
 
         if (canPlaceBlock(block, targetBlock, placementPos)) {
-            worldProvider.setBlock(placementPos.x, placementPos.y, placementPos.z, block, BlockManager.getInstance().getAir());
-            AudioManager.play(new AssetUri(AssetType.SOUND, "engine:PlaceBlock"), 0.5f);
-            if (blockItem.placedEntity.exists()) {
-                // Establish a block entity
-                blockItem.placedEntity.addComponent(new BlockComponent(placementPos, false));
-                // TODO: Get regen and wait from block config?
-                blockItem.placedEntity.addComponent(new HealthComponent(type.getArchetypeBlock().getHardness(), 2.0f,1.0f));
-                blockItem.placedEntity = EntityRef.NULL;
+            if (worldProvider.setBlock(placementPos, block, worldProvider.getBlock(placementPos))) {
+                AudioManager.play(new AssetUri(AssetType.SOUND, "engine:PlaceBlock"), 0.5f);
+                if (blockItem.placedEntity.exists()) {
+                    // Establish a block entity
+                    blockItem.placedEntity.addComponent(new BlockComponent(placementPos, false));
+                    // TODO: Get regen and wait from block config?
+                    blockItem.placedEntity.addComponent(new HealthComponent(type.getArchetypeBlock().getHardness(), 2.0f,1.0f));
+                    blockItem.placedEntity = EntityRef.NULL;
+                }
+                return true;
             }
-            return true;
         }
         return false;
     }

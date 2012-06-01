@@ -6,7 +6,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.terasology.components.BlockParticleEffectComponent;
 import org.terasology.components.BlockParticleEffectComponent.Particle;
-import org.terasology.components.LocationComponent;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterComponentSystem;
@@ -50,6 +50,10 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
         worldProvider = CoreRegistry.get(WorldProvider.class);
         worldRenderer = CoreRegistry.get(WorldRenderer.class);
         displayLists = new TObjectIntHashMap(BlockManager.getInstance().getBlockFamilyCount());
+    }
+
+    @Override
+    public void shutdown() {
     }
     
     public void update(float delta) {

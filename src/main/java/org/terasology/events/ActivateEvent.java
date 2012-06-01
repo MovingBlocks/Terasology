@@ -1,10 +1,9 @@
 package org.terasology.events;
 
-import org.terasology.components.BlockComponent;
-import org.terasology.components.LocationComponent;
+import org.terasology.components.world.BlockComponent;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.AbstractEvent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.Event;
 
 import javax.vecmath.Vector3f;
 

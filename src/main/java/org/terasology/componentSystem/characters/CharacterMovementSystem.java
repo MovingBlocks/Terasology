@@ -3,7 +3,7 @@ package org.terasology.componentSystem.characters;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.AABBCollisionComponent;
 import org.terasology.components.CharacterMovementComponent;
-import org.terasology.components.LocationComponent;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterComponentSystem;
@@ -46,6 +46,10 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
         worldProvider = CoreRegistry.get(WorldProvider.class);
+    }
+
+    @Override
+    public void shutdown() {
     }
     
     public void update(float delta) {

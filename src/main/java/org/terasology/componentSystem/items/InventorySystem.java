@@ -16,8 +16,13 @@ public class InventorySystem implements EventHandlerSystem {
     // TODO: differ per item?
     public static final byte MAX_STACK = (byte)99;
 
+    @Override
     public void initialise() {
 
+    }
+
+    @Override
+    public void shutdown() {
     }
 
     @ReceiveEvent(components=InventoryComponent.class)

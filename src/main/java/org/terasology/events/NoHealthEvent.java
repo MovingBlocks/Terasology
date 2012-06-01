@@ -9,11 +9,11 @@ import org.terasology.entitySystem.Event;
  */
 public class NoHealthEvent extends AbstractEvent {
     private EntityRef instigator;
-    
+
     public NoHealthEvent(EntityRef instigator) {
         this.instigator = instigator;
     }
-    
+
     public EntityRef getInstigator() {
         return instigator;
     }

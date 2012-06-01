@@ -20,9 +20,10 @@ import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.terasology.components.LocationComponent;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.logic.world.generationPhase.*;
+import org.terasology.logic.world.generator.core.ChunkGeneratorManager;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 

@@ -2,7 +2,7 @@ package org.terasology.componentSystem.characters;
 
 import org.terasology.audio.Sound;
 import org.terasology.components.CharacterSoundComponent;
-import org.terasology.components.LocationComponent;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
@@ -25,6 +25,10 @@ public class CharacterSoundSystem implements EventHandlerSystem {
     private FastRandom random = new FastRandom();
 
     public void initialise() {
+    }
+
+    @Override
+    public void shutdown() {
     }
     
     @ReceiveEvent(components = {CharacterSoundComponent.class})

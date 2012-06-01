@@ -20,6 +20,11 @@ public class StatusAffectorSystem implements EventHandlerSystem, UpdateSubscribe
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
     }
+
+    @Override
+    public void shutdown() {
+    }
+
     @ReceiveEvent(components = {HealthComponent.class})
     public void giveHealth(BoostHpEvent boosthpEvent, EntityRef entity){
         HealthComponent health = entity.getComponent(HealthComponent.class);

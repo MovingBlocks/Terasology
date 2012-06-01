@@ -3,6 +3,8 @@ package org.terasology.componentSystem.block;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.components.*;
+import org.terasology.components.world.BlockComponent;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.*;
 import org.terasology.events.DamageEvent;
@@ -31,6 +33,10 @@ public class BlockEntitySystem implements EventHandlerSystem {
         entityManager = CoreRegistry.get(EntityManager.class);
         worldProvider = CoreRegistry.get(WorldProvider.class);
         blockItemFactory = new BlockItemFactory(entityManager, CoreRegistry.get(PrefabManager.class));
+    }
+
+    @Override
+    public void shutdown() {
     }
 
     @ReceiveEvent(components={BlockComponent.class})

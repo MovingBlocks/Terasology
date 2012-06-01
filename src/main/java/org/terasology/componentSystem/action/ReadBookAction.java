@@ -19,6 +19,10 @@ import org.terasology.rendering.gui.menus.UIOpenBookScreen;
 public class ReadBookAction implements EventHandlerSystem {
     public void initialise() {}
 
+    @Override
+    public void shutdown() {
+    }
+
     public EntityRef entity;
 
     @ReceiveEvent(components = {BookComponent.class})

@@ -18,6 +18,9 @@ package org.terasology.game.logic.world;
 
 import org.junit.Test;
 import org.terasology.logic.world.*;
+import org.terasology.logic.world.generator.ChunkGenerator;
+import org.terasology.logic.world.generator.core.ChunkGeneratorManager;
+import org.terasology.logic.world.generator.core.ChunkGeneratorManagerImpl;
 import org.terasology.math.Vector3i;
 
 import static org.junit.Assert.assertEquals;

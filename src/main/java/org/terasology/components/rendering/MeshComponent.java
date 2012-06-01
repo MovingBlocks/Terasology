@@ -1,4 +1,4 @@
-package org.terasology.components;
+package org.terasology.components.rendering;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.rendering.assets.Material;

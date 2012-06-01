@@ -2,12 +2,11 @@ package org.terasology.componentSystem.controllers;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.CharacterMovementComponent;
-import org.terasology.components.LocationComponent;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.components.SimpleAIComponent;
 import org.terasology.entitySystem.*;
 import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.game.Terasology;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.utilities.FastRandom;
@@ -28,6 +27,10 @@ public class SimpleAISystem implements EventHandlerSystem, UpdateSubscriberSyste
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
         timer = CoreRegistry.get(Timer.class);
+    }
+
+    @Override
+    public void shutdown() {
     }
 
     public void update(float delta) {

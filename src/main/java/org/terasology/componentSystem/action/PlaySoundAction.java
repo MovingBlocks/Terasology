@@ -22,7 +22,10 @@ public class PlaySoundAction implements EventHandlerSystem {
     private FastRandom random = new FastRandom();
     
     public void initialise() {
-        
+    }
+
+    @Override
+    public void shutdown() {
     }
     
     @ReceiveEvent(components={PlaySoundActionComponent.class})

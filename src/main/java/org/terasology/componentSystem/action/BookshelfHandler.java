@@ -17,6 +17,10 @@ public class BookshelfHandler implements EventHandlerSystem{
     public void initialise() {
     }
 
+    @Override
+    public void shutdown() {
+    }
+
     @ReceiveEvent(components=BookshelfComponent.class,priority=ReceiveEvent.PRIORITY_HIGH)
     public void onActivate(ReceiveItemEvent event, EntityRef entity) {
         if (!event.getItem().hasComponent(BookComponent.class)) event.cancel();

@@ -3,7 +3,7 @@ package org.terasology.events;
 import org.terasology.entitySystem.AbstractEvent;
 import org.terasology.entitySystem.EntityRef;
 
-public class CurePoisonEvent extends AbstractEvent{
+public class CurePoisonEvent extends AbstractEvent {
     private EntityRef instigator;
 
     public CurePoisonEvent() {

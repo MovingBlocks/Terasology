@@ -14,22 +14,32 @@
  * limitations under the License.
  */
 
-package org.terasology.events.inventory;
+package org.terasology.logic.world.chunkStore;
 
-import org.terasology.entitySystem.AbstractEvent;
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.logic.world.Chunk;
+import org.terasology.logic.world.ChunkStore;
+import org.terasology.math.Vector3i;
 
 /**
  * @author Immortius
  */
-public class ReceiveItemEvent extends AbstractEvent {
-    private EntityRef item;
+public class NullChunkStore implements ChunkStore {
 
-    public ReceiveItemEvent(EntityRef item) {
-        this.item = item;
+    @Override
+    public Chunk get(Vector3i position) {
+        return null;
     }
 
-    public EntityRef getItem() {
-        return item;
+    @Override
+    public float size() {
+        return 0;
+    }
+
+    @Override
+    public void dispose() {
+    }
+
+    @Override
+    public void put(Chunk c) {
     }
 }

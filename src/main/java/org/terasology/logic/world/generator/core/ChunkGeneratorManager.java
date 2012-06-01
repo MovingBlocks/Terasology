@@ -14,14 +14,26 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.world;
+package org.terasology.logic.world.generator.core;
+
+import org.terasology.logic.world.Chunk;
+import org.terasology.logic.world.WorldBiomeProvider;
+import org.terasology.logic.world.WorldView;
+import org.terasology.logic.world.generator.BaseChunkGenerator;
+import org.terasology.math.Vector3i;
 
 /**
  * @author Immortius
  */
-public interface BaseChunkGenerator {
+public interface ChunkGeneratorManager {
 
-    public void setWorldSeed(String seed);
+    void setWorldSeed(String seed);
 
-    public void setWorldBiomeProvider(WorldBiomeProvider biomeProvider);
+    void setWorldBiomeProvider(WorldBiomeProvider biomeProvider);
+
+    void registerChunkGenerator(BaseChunkGenerator generator);
+
+    Chunk generateChunk(Vector3i pos);
+
+    void secondPassChunk(Vector3i chunkPos, WorldView view);
 }

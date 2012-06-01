@@ -31,6 +31,10 @@ public class MinionSystem implements EventHandlerSystem {
 
     public void initialise() {}
 
+    @Override
+    public void shutdown() {
+    }
+
     public MinionBarComponent getMinionBar(){
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         if(localPlayer == null) return null;

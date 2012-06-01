@@ -25,12 +25,10 @@ import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 
-import javax.vecmath.Vector3f;
-
 /**
  * @author Immortius
  */
-public class WorldProviderImpl implements WorldProvider {
+public class WorldProviderCoreImpl implements WorldProviderCore {
     public final long DAY_NIGHT_LENGTH_IN_MS = Config.getInstance().getDayNightLengthInMs();
 
     private String title;
@@ -41,7 +39,7 @@ public class WorldProviderImpl implements WorldProvider {
 
     private long timeOffset;
 
-    public WorldProviderImpl(String title, String seed, ChunkProvider chunkProvider) {
+    public WorldProviderCoreImpl(String title, String seed, ChunkProvider chunkProvider) {
         if (seed == null || seed.isEmpty()) {
             throw new IllegalArgumentException("No seed provided.");
         }
@@ -60,7 +58,7 @@ public class WorldProviderImpl implements WorldProvider {
         }
     }
 
-    public WorldProviderImpl(WorldInfo info, ChunkProvider chunkProvider) {
+    public WorldProviderCoreImpl(WorldInfo info, ChunkProvider chunkProvider) {
         this(info.getTitle(), info.getSeed(), chunkProvider);
         setTime(info.getTime());
     }
@@ -93,16 +91,6 @@ public class WorldProviderImpl implements WorldProvider {
     @Override
     public boolean isBlockActive(int x, int y, int z) {
         return chunkProvider.isChunkAvailable(TeraMath.calcChunkPos(x, y, z));
-    }
-
-    @Override
-    public boolean isBlockActive(Vector3i pos) {
-        return isBlockActive(pos.x, pos.y, pos.z);
-    }
-
-    @Override
-    public boolean isBlockActive(Vector3f pos) {
-        return isBlockActive(new Vector3i(pos, 0.5f));
     }
 
     @Override
@@ -146,11 +134,6 @@ public class WorldProviderImpl implements WorldProvider {
     }
 
     @Override
-    public boolean setBlock(Vector3i pos, Block type, Block oldType) {
-        return setBlock(pos.x, pos.y, pos.z, type, oldType);
-    }
-
-    @Override
     public boolean setState(int x, int y, int z, byte state, byte oldState) {
         Vector3i chunkPos = TeraMath.calcChunkPos(x, y, z);
         Chunk chunk = chunkProvider.getChunk(chunkPos);
@@ -190,16 +173,6 @@ public class WorldProviderImpl implements WorldProvider {
     }
 
     @Override
-    public Block getBlock(Vector3f pos) {
-        return getBlock(new Vector3i(pos, 0.5f));
-    }
-
-    @Override
-    public Block getBlock(Vector3i pos) {
-        return getBlock(pos.x, pos.y, pos.z);
-    }
-
-    @Override
     public byte getLight(int x, int y, int z) {
         y = TeraMath.clamp(y, 0, Chunk.SIZE_Y - 1);
 
@@ -210,16 +183,6 @@ public class WorldProviderImpl implements WorldProvider {
             return chunk.getLight(blockPos);
         }
         return 0;
-    }
-
-    @Override
-    public byte getLight(Vector3i pos) {
-        return getLight(pos.x, pos.y, pos.z);
-    }
-
-    @Override
-    public byte getLight(Vector3f pos) {
-        return getLight(new Vector3i(pos, 0.5f));
     }
 
     @Override
@@ -246,28 +209,6 @@ public class WorldProviderImpl implements WorldProvider {
             return (byte) Math.max(chunk.getSunlight(blockPos), chunk.getLight(blockPos));
         }
         return 0;
-    }
-
-
-    @Override
-    public byte getSunlight(Vector3f pos) {
-        return getSunlight(new Vector3i(pos, 0.5f));
-    }
-
-    @Override
-    public byte getTotalLight(Vector3f pos) {
-        return getTotalLight(new Vector3i(pos, 0.5f));
-    }
-
-
-    @Override
-    public byte getSunlight(Vector3i pos) {
-        return getSunlight(pos.x, pos.y, pos.z);
-    }
-
-    @Override
-    public byte getTotalLight(Vector3i pos) {
-        return getTotalLight(pos.x, pos.y, pos.z);
     }
 
     @Override

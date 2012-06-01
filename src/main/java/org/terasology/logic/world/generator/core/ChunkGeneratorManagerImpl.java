@@ -14,9 +14,15 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.world;
+package org.terasology.logic.world.generator.core;
 
 import com.google.common.collect.Lists;
+import org.terasology.logic.world.Chunk;
+import org.terasology.logic.world.WorldBiomeProvider;
+import org.terasology.logic.world.WorldView;
+import org.terasology.logic.world.generator.BaseChunkGenerator;
+import org.terasology.logic.world.generator.ChunkGenerator;
+import org.terasology.logic.world.generator.SecondPassChunkGenerator;
 import org.terasology.math.Vector3i;
 
 import java.util.List;
