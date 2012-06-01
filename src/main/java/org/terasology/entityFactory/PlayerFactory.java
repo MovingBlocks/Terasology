@@ -1,20 +1,26 @@
 package org.terasology.entityFactory;
 
+import javax.vecmath.Vector3f;
+
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.audio.Sound;
-import org.terasology.components.*;
+import org.terasology.components.AABBCollisionComponent;
+import org.terasology.components.CharacterMovementComponent;
+import org.terasology.components.CharacterSoundComponent;
+import org.terasology.components.HealthComponent;
+import org.terasology.components.InventoryComponent;
+import org.terasology.components.LocalPlayerComponent;
+import org.terasology.components.LocationComponent;
+import org.terasology.components.MinionBarComponent;
+import org.terasology.components.PlayerComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AssetManager;
-import org.terasology.logic.manager.AudioManager;
 import org.terasology.model.blocks.management.BlockManager;
-
-import javax.vecmath.Vector3f;
-import java.util.Arrays;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -23,12 +29,12 @@ public class PlayerFactory {
 
     private EntityManager entityManager;
     private BlockItemFactory blockFactory;
-    
+
     public PlayerFactory(EntityManager entityManager) {
         this.entityManager = entityManager;
         blockFactory = new BlockItemFactory(entityManager, CoreRegistry.get(PrefabManager.class));
     }
-    
+
     public EntityRef newInstance(Vector3f spawnPosition) {
         EntityRef player = entityManager.create();
 
@@ -66,6 +72,6 @@ public class PlayerFactory {
         player.send(new ReceiveItemEvent(entityManager.create("core:railgunTool")));
 
         return player;
-    } 
+    }
 
 }

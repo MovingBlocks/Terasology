@@ -15,8 +15,6 @@
  */
 package org.terasology.model.structures;
 
-import org.terasology.game.Terasology;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

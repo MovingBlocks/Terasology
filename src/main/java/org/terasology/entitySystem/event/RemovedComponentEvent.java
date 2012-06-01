@@ -1,7 +1,6 @@
 package org.terasology.entitySystem.event;
 
 import org.terasology.entitySystem.AbstractEvent;
-import org.terasology.entitySystem.Event;
 
 /**
  * @author Immortius <immortius@gmail.com>

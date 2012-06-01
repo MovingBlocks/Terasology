@@ -16,31 +16,19 @@
 
 package org.terasology.game;
 
-import com.google.common.collect.Lists;
-import org.lwjgl.LWJGLException;
-import org.lwjgl.LWJGLUtil;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GLContext;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
-import org.terasology.asset.loaders.*;
-import org.terasology.asset.sources.ClasspathSource;
-import org.terasology.game.modes.GameState;
-import org.terasology.logic.manager.*;
-import org.terasology.model.blocks.management.BlockManager;
-import org.terasology.model.blocks.management.BlockManifestor;
-import org.terasology.model.shapes.BlockShapeManager;
-import org.terasology.performanceMonitor.PerformanceMonitor;
-import org.terasology.rendering.assets.Shader;
-import org.terasology.rendering.assets.metadata.ParamMetadata;
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_LEQUAL;
+import static org.lwjgl.opengl.GL11.glDepthFunc;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glViewport;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Deque;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -50,9 +38,40 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL11.GL_LEQUAL;
-import static org.lwjgl.opengl.GL11.glDepthFunc;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+
+import org.lwjgl.LWJGLException;
+import org.lwjgl.LWJGLUtil;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GLContext;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
+import org.terasology.asset.loaders.GLSLShaderLoader;
+import org.terasology.asset.loaders.MaterialLoader;
+import org.terasology.asset.loaders.ObjMeshLoader;
+import org.terasology.asset.loaders.OggSoundLoader;
+import org.terasology.asset.loaders.OggStreamingSoundLoader;
+import org.terasology.asset.loaders.PNGTextureLoader;
+import org.terasology.asset.sources.ClasspathSource;
+import org.terasology.game.modes.GameState;
+import org.terasology.logic.manager.AssetManager;
+import org.terasology.logic.manager.AudioManager;
+import org.terasology.logic.manager.Config;
+import org.terasology.logic.manager.FontManager;
+import org.terasology.logic.manager.GroovyManager;
+import org.terasology.logic.manager.PathManager;
+import org.terasology.logic.manager.ShaderManager;
+import org.terasology.logic.manager.VertexBufferObjectManager;
+import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.model.blocks.management.BlockManifestor;
+import org.terasology.model.shapes.BlockShapeManager;
+import org.terasology.performanceMonitor.PerformanceMonitor;
+
+import com.google.common.collect.Lists;
 
 /**
  * @author Immortius
@@ -93,11 +112,13 @@ public class TerasologyEngine implements GameEngine {
     private void initLogger() {
         if (LWJGLUtil.DEBUG) {
             System.setOut(new PrintStream(System.out) {
+                @Override
                 public void print(final String message) {
                     Logger.getLogger("").info(message);
                 }
             });
             System.setErr(new PrintStream(System.err) {
+                @Override
                 public void print(final String message) {
                     Logger.getLogger("").severe(message);
                 }
@@ -194,6 +215,7 @@ public class TerasologyEngine implements GameEngine {
     @Override
     public void submitTask(final String name, final Runnable task) {
         threadPool.execute(new Runnable() {
+            @Override
             public void run() {
                 Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
                 PerformanceMonitor.startThread(name);

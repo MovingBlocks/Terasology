@@ -22,9 +22,8 @@ public class BlockShape {
 
     public BlockShape(String title) {
         this.title = title;
-        for (int i = 0; i < fullSide.length; ++i) {
+        for (int i = 0; i < fullSide.length; ++i)
             fullSide[i] = false;
-        }
     }
 
     public BlockMeshPart getCenterMesh() {

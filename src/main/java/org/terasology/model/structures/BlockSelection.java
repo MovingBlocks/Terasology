@@ -15,8 +15,6 @@
  */
 package org.terasology.model.structures;
 
-import org.terasology.game.Terasology;
-
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
@@ -271,6 +269,7 @@ public class BlockSelection {
         return true;
     }
 
+    @Override
     public String toString() {
         String result = "[";
         for (BlockPosition pos : _positions) {

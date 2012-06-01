@@ -15,18 +15,17 @@
  */
 package org.terasology.logic.simulators;
 
-import org.terasology.game.CoreRegistry;
-import org.terasology.game.GameEngine;
-import org.terasology.game.Terasology;
-import org.terasology.game.Timer;
-import org.terasology.logic.world.IBlockObserver;
-import org.terasology.logic.world.IWorldProvider;
-import org.terasology.model.structures.BlockPosition;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
+
+import org.terasology.game.CoreRegistry;
+import org.terasology.game.GameEngine;
+import org.terasology.game.Timer;
+import org.terasology.logic.world.IBlockObserver;
+import org.terasology.logic.world.IWorldProvider;
+import org.terasology.model.structures.BlockPosition;
 
 /**
  * Base class for all simulators.
@@ -113,6 +112,7 @@ public abstract class Simulator implements IBlockObserver {
 
         // Create a new thread and start processing
         Runnable r = new Runnable() {
+            @Override
             public void run() {
                 while (executeSimulation()) ;
                 _running = false;
@@ -128,12 +128,13 @@ public abstract class Simulator implements IBlockObserver {
 
         long currentTime = _timer.getTimeInMs();
 
-        if ((currentTime > _lastUpdate + _updateInterval || force)) {
+        if (currentTime > _lastUpdate + _updateInterval || force) {
 
             _running = true;
 
             // Create a new thread and start processing
             Runnable r = new Runnable() {
+                @Override
                 public void run() {
                     executeSimulation();
                     _running = false;

@@ -8,6 +8,7 @@ import javax.vecmath.Vector3f;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.BlockComponent;
 import org.terasology.components.CameraComponent;
 import org.terasology.entitySystem.AbstractEvent;
@@ -20,7 +21,7 @@ import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
 
 
-public class ClientController {
+public class ClientController implements UpdateSubscriberSystem {
     private double mouseSensititivy = Config.getInstance().getMouseSens();
     private Vector2f lookInput = new Vector2f();
 
@@ -48,11 +49,10 @@ public class ClientController {
     	
     	REPLACE_THIS_WITH_CONFIG();
     }
-		
-    
-    public void processInput(boolean modal, CameraComponent camera) {
-		// get from the ui manager if we are in mouse cursor or look mode
 
+
+    @Override
+    public void update(float delta) {
 		EntityRef mouseTarget = null;
 		
 		if (modal) {

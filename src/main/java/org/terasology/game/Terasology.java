@@ -15,16 +15,11 @@
  */
 package org.terasology.game;
 
-import org.terasology.game.modes.StateMainMenu;
-import org.terasology.logic.manager.Config;
-import org.terasology.logic.manager.PathManager;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
+
+import org.terasology.game.modes.StateMainMenu;
+import org.terasology.logic.manager.PathManager;
 
 /**
  * The heart and soul of Terasology.

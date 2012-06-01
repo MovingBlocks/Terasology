@@ -15,13 +15,12 @@
  */
 package org.terasology.model.structures;
 
-import org.terasology.game.Terasology;
-import org.terasology.logic.world.IWorldProvider;
-import org.terasology.model.blocks.Block;
-
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.terasology.logic.world.IWorldProvider;
+import org.terasology.model.blocks.Block;
 
 /**
  * A collection of actual blocks and their relative positions, usually _not_ absolute positions in an existing world
@@ -185,6 +184,7 @@ public class BlockCollection {
         return positions().calcDepth();
     }
 
+    @Override
     public String toString() {
         String result = "[[";
         for (BlockPosition pos : _blocks.keySet()) {

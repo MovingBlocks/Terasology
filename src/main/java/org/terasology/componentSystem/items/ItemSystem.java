@@ -1,16 +1,23 @@
 package org.terasology.componentSystem.items;
 
+import javax.vecmath.Vector3f;
+
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.componentSystem.block.BlockEntityRegistry;
-import org.terasology.components.*;
+import org.terasology.components.AABBCollisionComponent;
+import org.terasology.components.BlockComponent;
+import org.terasology.components.BlockItemComponent;
+import org.terasology.components.HealthComponent;
+import org.terasology.components.ItemComponent;
+import org.terasology.components.LocationComponent;
+import org.terasology.components.PlayerComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.events.ActivateEvent;
-import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.world.IWorldProvider;
@@ -21,9 +28,6 @@ import org.terasology.model.blocks.BlockFamily;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.AABB;
 
-import javax.print.attribute.standard.Sides;
-import javax.vecmath.Vector3f;
-
 /**
  * TODO: Refactor use methods into events? Usage should become a separate component
  * @author Immortius <immortius@gmail.com>
@@ -33,6 +37,7 @@ public class ItemSystem implements EventHandlerSystem {
     private IWorldProvider worldProvider;
     private BlockEntityRegistry blockEntityRegistry;
 
+    @Override
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
         worldProvider = CoreRegistry.get(IWorldProvider.class);
@@ -124,7 +129,7 @@ public class ItemSystem implements EventHandlerSystem {
         }
         return false;
     }
-    
+
     private boolean canPlaceBlock(Block block, Vector3i targetBlock, Vector3i blockPos) {
         Block centerBlock = BlockManager.getInstance().getBlock(worldProvider.getBlock(targetBlock.x, targetBlock.y, targetBlock.z));
 

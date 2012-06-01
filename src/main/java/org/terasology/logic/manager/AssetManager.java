@@ -1,25 +1,27 @@
 package org.terasology.logic.manager;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Table;
-import org.terasology.asset.*;
+import java.net.URL;
+import java.util.EnumMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.terasology.asset.Asset;
+import org.terasology.asset.AssetLoader;
+import org.terasology.asset.AssetSource;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.common.NullIterator;
 import org.terasology.rendering.assets.Texture;
 
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.CodeSource;
-import java.util.*;
-import java.util.jar.JarFile;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 public class AssetManager {
 
@@ -146,14 +148,14 @@ public class AssetManager {
         }
         return Lists.newArrayList();
     }
-    
+
     public InputStream getAssetStream(AssetUri uri) throws IOException {
-        List<URL> assetURLs = this.getAssetURLs(uri);
+        List<URL> assetURLs = getAssetURLs(uri);
 
         if (assetURLs.isEmpty()) {
             return null;
         }
-        
+
         return assetURLs.get(0).openStream();
     }
 
@@ -165,7 +167,7 @@ public class AssetManager {
     public static Iterable<AssetUri> list() {
         return getInstance().listAssets();
     }
-    
+
     public static Iterable<AssetUri> list(AssetType type) {
         return getInstance().listAssets(type);
     }

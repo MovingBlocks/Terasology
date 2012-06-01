@@ -1,14 +1,29 @@
 package org.terasology.componentSystem.controllers;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.componentSystem.block.BlockEntityRegistry;
-import org.terasology.components.*;
+import org.terasology.components.CharacterMovementComponent;
+import org.terasology.components.HealthComponent;
+import org.terasology.components.InventoryComponent;
+import org.terasology.components.ItemComponent;
+import org.terasology.components.LocalPlayerComponent;
+import org.terasology.components.LocationComponent;
+import org.terasology.components.PlayerComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.EventSystem;
@@ -25,7 +40,6 @@ import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.world.IWorldProvider;
-import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
@@ -34,15 +48,8 @@ import org.terasology.model.structures.BlockPosition;
 import org.terasology.model.structures.RayBlockIntersection;
 import org.terasology.rendering.cameras.DefaultCamera;
 import org.terasology.rendering.gui.menus.UIContainerScreen;
-import org.terasology.rendering.gui.components.UIMinion;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import com.bulletphysics.linearmath.QuaternionUtil;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -106,6 +113,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     private ClientController clientController;
 
     
+    @Override
     public void initialise() {
         worldProvider = CoreRegistry.get(IWorldProvider.class);
         localPlayer = CoreRegistry.get(LocalPlayer.class);
@@ -120,7 +128,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
 
     public void setPlayerCamera(DefaultCamera camera) {
-        this.playerCamera = camera;
+        playerCamera = camera;
     }
 
     @ReceiveEvent(components = {LocalPlayerComponent.class, InventoryComponent.class})
@@ -131,6 +139,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         }
     }
 
+    @Override
     public void update(float delta) {
         if (!localPlayer.isValid())
             return;
@@ -259,6 +268,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         } */
     }
 
+    @Override
     public void renderOverlay() {
         // TODO: Don't render if not in first person?
         // Display the block the player is aiming at
@@ -540,14 +550,17 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     }
 
 
+    @Override
     public void renderOpaque() {
 
     }
 
+    @Override
     public void renderTransparent() {
 
     }
 
+    @Override
     public void renderFirstPerson() {
     }
     
