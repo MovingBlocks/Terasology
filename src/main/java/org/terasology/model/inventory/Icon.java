@@ -1,26 +1,24 @@
 package org.terasology.model.inventory;
 
+import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.lwjgl.opengl.GL11.glTranslatef;
+
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.vecmath.Vector2f;
+
 import org.lwjgl.opengl.GL11;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.logic.manager.AssetManager;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockFamily;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
-import javax.vecmath.Vector2f;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-
-import static org.lwjgl.opengl.GL11.glBindTexture;
-import static org.lwjgl.opengl.GL11.glTranslatef;
-
 /**
  * Icon for rendering items in inventory.
  */
-@SuppressWarnings("rawtypes")
 public class Icon {
 	private static Map<String, Icon> icons;
 

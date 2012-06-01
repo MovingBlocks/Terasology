@@ -19,9 +19,10 @@ import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import org.lwjgl.opengl.Display;
+import org.terasology.logic.manager.PathManager;
 
 import javax.vecmath.Vector2f;
-
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -101,7 +102,8 @@ public class UITextWrap extends UIText {
         //if(endpos >maxlines){endpos = maxlines +1;}
         counter = 0;
         Gson gson = new Gson();
-        JsonReader reader = new JsonReader(new FileReader(".\\data\\console\\consolelog.json"));
+        String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data" + File.separator + "console" + File.separator + "consolelog.json";
+        JsonReader reader = new JsonReader(new FileReader(helpFile));
         reader.beginArray();
         _text ="";
         while (reader.hasNext()) {
@@ -122,7 +124,8 @@ public class UITextWrap extends UIText {
 
     public void loadHelp() throws IOException{
         Gson gson = new Gson();
-        JsonReader reader = new JsonReader(new FileReader(".\\data\\console\\help.json"));
+        String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data" + File.separator + "console" + File.separator + "help.json";
+        JsonReader reader = new JsonReader(new FileReader(helpFile));
         reader.beginArray();
         _text ="";
         while (reader.hasNext()) {
@@ -134,7 +137,8 @@ public class UITextWrap extends UIText {
 
     public void loadError() throws IOException{
         Gson gson = new Gson();
-        JsonReader reader = new JsonReader(new FileReader(".\\data\\console\\error.json"));
+        String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data" + File.separator + "console" + File.separator + "error.json";
+        JsonReader reader = new JsonReader(new FileReader(helpFile));
         reader.beginArray();
         _text ="";
         while (reader.hasNext()) {
@@ -194,7 +198,8 @@ public class UITextWrap extends UIText {
         }
 
         Gson gson = new Gson();
-        JsonWriter writer = new JsonWriter(new FileWriter(".\\data\\console\\consolelog.json"));
+        String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data"  + File.separator + "console" + File.separator + "consolelog.json";
+        JsonWriter writer = new JsonWriter(new FileWriter(helpFile));
         writer.beginArray();
         Iterator e = finaltext.iterator();
         while (e.hasNext()) {
@@ -206,7 +211,8 @@ public class UITextWrap extends UIText {
 
     public int getLineCount()throws IOException{
         Gson gson = new Gson();
-        JsonReader reader = new JsonReader(new FileReader(".\\data\\console\\consolelog.json"));
+        String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data" + File.separator + "console" + File.separator + "consolelog.json";
+        JsonReader reader = new JsonReader(new FileReader(helpFile));
         int counter = 0;
         reader.beginArray();
         while (reader.hasNext()) {

@@ -1,5 +1,8 @@
 package org.terasology.componentSystem.controllers;
 
+import javax.vecmath.AxisAngle4f;
+import javax.vecmath.Vector3f;
+
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.CharacterMovementComponent;
 import org.terasology.components.LocationComponent;
@@ -10,13 +13,9 @@ import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.game.Terasology;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.utilities.FastRandom;
-
-import javax.vecmath.AxisAngle4f;
-import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -27,11 +26,13 @@ public class SimpleAISystem implements EventHandlerSystem, UpdateSubscriberSyste
     private FastRandom random = new FastRandom();
     private Timer timer;
 
+    @Override
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
         timer = CoreRegistry.get(Timer.class);
     }
 
+    @Override
     public void update(float delta) {
         for (EntityRef entity : entityManager.iteratorEntities(SimpleAIComponent.class, CharacterMovementComponent.class, LocationComponent.class)) {
             LocationComponent location = entity.getComponent(LocationComponent.class);

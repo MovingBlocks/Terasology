@@ -12,3 +12,6 @@ Terasology.iws
 .settings
 .gradle
 bin
+src/main/Main.iml
+src/perfTest/PerfTest.iml
+src/test/Test.iml

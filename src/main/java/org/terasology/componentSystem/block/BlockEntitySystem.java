@@ -2,15 +2,21 @@ package org.terasology.componentSystem.block;
 
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.componentSystem.items.InventorySystem;
-import org.terasology.components.*;
+import org.terasology.components.BlockComponent;
+import org.terasology.components.BlockParticleEffectComponent;
+import org.terasology.components.HealthComponent;
+import org.terasology.components.ItemComponent;
+import org.terasology.components.LocationComponent;
 import org.terasology.entityFactory.BlockItemFactory;
-import org.terasology.entitySystem.*;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.PrefabManager;
+import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.FullHealthEvent;
 import org.terasology.events.NoHealthEvent;
 import org.terasology.events.inventory.ReceiveItemEvent;
-import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.world.IWorldProvider;
@@ -29,6 +35,7 @@ public class BlockEntitySystem implements EventHandlerSystem {
     private EntityManager entityManager;
     private BlockItemFactory blockItemFactory;
 
+    @Override
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
         worldProvider = CoreRegistry.get(IWorldProvider.class);
@@ -85,7 +92,7 @@ public class BlockEntitySystem implements EventHandlerSystem {
             entity.destroy();
         }
     }
-    
+
     @ReceiveEvent(components={BlockComponent.class},priority = ReceiveEvent.PRIORITY_HIGH)
     public void onDamaged(DamageEvent event, EntityRef entity) {
         BlockComponent blockComp = entity.getComponent(BlockComponent.class);

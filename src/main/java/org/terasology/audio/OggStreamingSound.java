@@ -1,14 +1,14 @@
 package org.terasology.audio;
 
-import org.terasology.asset.AssetUri;
-import org.terasology.utilities.OggReader;
-
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import java.io.IOException;
+
+import org.terasology.asset.AssetUri;
+import org.terasology.utilities.OggReader;
 
 
 public class OggStreamingSound extends AbstractStreamingSound {
@@ -33,26 +33,26 @@ public class OggStreamingSound extends AbstractStreamingSound {
 
     @Override
     public int getChannels() {
-        return this.file.getChannels();
+        return file.getChannels();
     }
 
     @Override
     public int getSamplingRate() {
-        return this.file.getRate();
+        return file.getRate();
     }
 
     @Override
     public void reset() {
-        if (this.file != null) {
+        if (file != null) {
             try {
-                this.file.close();
+                file.close();
             } catch (IOException e) {
                 logger.log(Level.WARNING, "Failed to close streaming sound: " + getURI(), e);
             }
         }
 
         try {
-            this.file = new OggReader(audioSource.openStream());
+            file = new OggReader(audioSource.openStream());
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Failed to load streaming sound: " + getURI(), e);
         }

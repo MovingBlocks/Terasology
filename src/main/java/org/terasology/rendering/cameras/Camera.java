@@ -61,9 +61,7 @@ public abstract class Camera {
     }
 
     public abstract void loadModelViewMatrix();
-
     public abstract void loadNormalizedModelViewMatrix();
-
 
     public Vector3d getPosition() {
         return _position;
@@ -83,18 +81,15 @@ public abstract class Camera {
 
     public void update(float delta) {
         double diff = Math.abs(_activeFov - _targetFov);
-
         if (diff < 1.0) {
             _activeFov = _targetFov;
             return;
         }
-
         // TODO: Clamp this
-        if (_activeFov < _targetFov) {
+        if (_activeFov < _targetFov)
             _activeFov += 50 * delta;
-        } else if (_activeFov > _targetFov) {
+        else if (_activeFov > _targetFov)
             _activeFov -= 50 * delta;
-        }
     }
 
     public void extendFov(float fov) {

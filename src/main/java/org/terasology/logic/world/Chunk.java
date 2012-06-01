@@ -15,17 +15,24 @@
  */
 package org.terasology.logic.world;
 
-import com.bulletphysics.collision.shapes.BvhTriangleMeshShape;
-import com.bulletphysics.collision.shapes.IndexedMesh;
-import com.bulletphysics.collision.shapes.TriangleIndexVertexArray;
-import com.bulletphysics.dynamics.RigidBody;
-import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
-import com.bulletphysics.linearmath.DefaultMotionState;
-import com.bulletphysics.linearmath.Transform;
+import java.util.ArrayList;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
+import javax.vecmath.Matrix3f;
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
+
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
-import org.terasology.game.Terasology;
 import org.terasology.logic.generators.ChunkGenerator;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.ShaderManager;
@@ -42,18 +49,13 @@ import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 import org.terasology.utilities.Helper;
 
-import javax.vecmath.Matrix3f;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
-import java.util.ArrayList;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.bulletphysics.collision.shapes.BvhTriangleMeshShape;
+import com.bulletphysics.collision.shapes.IndexedMesh;
+import com.bulletphysics.collision.shapes.TriangleIndexVertexArray;
+import com.bulletphysics.dynamics.RigidBody;
+import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
+import com.bulletphysics.linearmath.DefaultMotionState;
+import com.bulletphysics.linearmath.Transform;
 
 /**
  * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks
@@ -141,18 +143,16 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
         _pos.z = z;
         _id = _pos.hashCode();
         _parent = p;
-        _random = new FastRandom((_parent.getSeed()).hashCode() + _pos.hashCode());
+        _random = new FastRandom(_parent.getSeed().hashCode() + _pos.hashCode());
     }
 
     public boolean generate() {
-        if (isFresh()) {
-            for (ChunkGenerator gen : _parent.getGeneratorManager().getChunkGenerators()) {
+        if (isFresh())
+        {
+            for (ChunkGenerator gen : _parent.getGeneratorManager().getChunkGenerators())
                 gen.generate(this);
-            }
-
             generateSunlight();
             setFresh(false);
-
             return true;
         }
         return false;
@@ -161,33 +161,25 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
     public void updateLight() {
         if (isFresh() || !isLightDirty())
             return;
-
-        for (int x = 0; x < CHUNK_DIMENSION_X; x++) {
-            for (int z = 0; z < CHUNK_DIMENSION_Z; z++) {
-                for (int y = CHUNK_DIMENSION_Y - 1; y >= 0; y--) {
+        for (int x = 0; x < CHUNK_DIMENSION_X; x++)
+            for (int z = 0; z < CHUNK_DIMENSION_Z; z++)
+                for (int y = CHUNK_DIMENSION_Y - 1; y >= 0; y--)
+                {
                     byte blockValue = getBlock(x, y, z);
                     byte lightValue = getLight(x, y, z, LIGHT_TYPE.SUN);
-
-                    if (!BlockManager.getInstance().getBlock(blockValue).isTranslucent()) {
+                    if (!BlockManager.getInstance().getBlock(blockValue).isTranslucent())
                         continue;
-                    }
                     // Spread the sunlight in translucent blocks with a light value greater than zero.
-                    if (lightValue > 0) {
+                    if (lightValue > 0)
                         spreadLight(x, y, z, lightValue, LIGHT_TYPE.SUN);
-                    }
                 }
-            }
-        }
-
         setLightDirty(false);
     }
 
     private void generateSunlight() {
-        for (int x = 0; x < CHUNK_DIMENSION_X; x++) {
-            for (int z = 0; z < CHUNK_DIMENSION_Z; z++) {
+        for (int x = 0; x < CHUNK_DIMENSION_X; x++)
+            for (int z = 0; z < CHUNK_DIMENSION_Z; z++)
                 refreshSunlightAtLocalPos(x, z, false, false);
-            }
-        }
     }
 
     public void refreshSunlightAtLocalPos(int x, int z, boolean spreadLight, boolean refreshSunlight) {
@@ -198,9 +190,8 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
             Block b = BlockManager.getInstance().getBlock(blockId);
 
             // Remember if this "column" is covered
-            if ((!b.isInvisible() && b.getBlockForm() != Block.BLOCK_FORM.BILLBOARD) && !covered) {
+            if (!b.isInvisible() && b.getBlockForm() != Block.BLOCK_FORM.BILLBOARD && !covered)
                 covered = true;
-            }
 
             byte oldValue = _sunlight.get(x, y, z);
             byte newValue;
@@ -209,33 +200,25 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
             if (!covered) {
                 if (b.isInvisible() || b.getBlockForm() == Block.BLOCK_FORM.BILLBOARD)
                     _sunlight.set(x, y, z, (byte) 15);
-                else
-                    _sunlight.set(x, y, z, (byte) 0x0);
-
+                else _sunlight.set(x, y, z, (byte) 0x0);
                 newValue = _sunlight.get(x, y, z);
-
                 // Otherwise the column is covered. Don't generate any light in the cells...
-            } else {
+            }
+            else {
                 _sunlight.set(x, y, z, (byte) 0);
-
                 // Update the sunlight at the current position (check the surrounding cells)
-                if (refreshSunlight) {
+                if (refreshSunlight)
                     refreshLightAtLocalPos(x, y, z, LIGHT_TYPE.SUN);
-                }
-
                 newValue = _sunlight.get(x, y, z);
             }
-
-
             if (spreadLight && oldValue > newValue)
                 unspreadLight(x, y, z, oldValue, Chunk.LIGHT_TYPE.SUN);
-            else if (spreadLight && oldValue < newValue) {
+            else if (spreadLight && oldValue < newValue)
                 /*
                 * Spread sunlight if the new light value is more intense
                 * than the old value.
                 */
                 spreadLight(x, y, z, newValue, LIGHT_TYPE.SUN);
-            }
         }
     }
 
@@ -476,6 +459,7 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
      * @param o The chunk to compare to
      * @return The comparison value
      */
+    @Override
     public int compareTo(Chunk o) {
         if (o == null) {
             return 0;
@@ -509,7 +493,7 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
 
             for (int i = 0; i < _subMeshAABB.length; i++) {
                 Vector3d dimensions = new Vector3d(8, heightHalf, 8);
-                Vector3d position = new Vector3d(getChunkWorldPosX() + dimensions.x - 0.5f, (i * heightHalf * 2) + dimensions.y - 0.5f, getChunkWorldPosZ() + dimensions.z - 0.5f);
+                Vector3d position = new Vector3d(getChunkWorldPosX() + dimensions.x - 0.5f, i * heightHalf * 2 + dimensions.y - 0.5f, getChunkWorldPosZ() + dimensions.z - 0.5f);
                 _subMeshAABB[i] = new AABB(position, dimensions);
             }
         }
@@ -532,9 +516,10 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
         * Before starting the illumination process, make sure that the neighbor chunks
         * are present and fully generated.
         */
-        for (int i = 0; i < neighbors.length; i++) {
-            if (neighbors[i] != null) {
-                neighbors[i].generate();
+        for (Chunk neighbor : neighbors)
+        {
+            if (neighbor != null) {
+                neighbor.generate();
             }
         }
 
@@ -569,7 +554,7 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
         if (isReadyForRendering()) {
             ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("chunk");
             // Transfer the world offset of the chunk to the shader for various effects
-            shader.setFloat3("chunkOffset", (float) (_pos.x * Chunk.CHUNK_DIMENSION_X), (float) (_pos.y * Chunk.CHUNK_DIMENSION_Y), (float) (_pos.z * Chunk.CHUNK_DIMENSION_Z));
+            shader.setFloat3("chunkOffset", (_pos.x * Chunk.CHUNK_DIMENSION_X), (_pos.y * Chunk.CHUNK_DIMENSION_Y), (_pos.z * Chunk.CHUNK_DIMENSION_Z));
 
             GL11.glPushMatrix();
 
@@ -597,8 +582,9 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
 
     public boolean generateVBOs() {
         if (_newMeshes != null) {
-            for (int i = 0; i < _newMeshes.length; i++) {
-                _newMeshes[i].generateVBOs();
+            for (ChunkMesh _newMeshe : _newMeshes)
+            {
+                _newMeshe.generateVBOs();
             }
 
             return true;
@@ -620,8 +606,8 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
                     _newMeshes = newMesh;
 
                     if (oldNewMesh != null) {
-                        for (int i = 0; i < oldNewMesh.length; i++)
-                            oldNewMesh[i].dispose();
+                        for (ChunkMesh element : oldNewMesh)
+                            element.dispose();
                     }
                 }
             } finally {
@@ -645,8 +631,9 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
                             _rigidBody = null;
 
                             if (oldActiveMesh != null) {
-                                for (int i = 0; i < oldActiveMesh.length; i++) {
-                                    oldActiveMesh[i].dispose();
+                                for (ChunkMesh element : oldActiveMesh)
+                                {
+                                    element.dispose();
                                 }
                             }
 
@@ -739,12 +726,11 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
             if (_disposed)
                 return;
 
-            if (_activeMeshes != null)
-                for (int i = 0; i < _activeMeshes.length; i++)
-                    _activeMeshes[i].dispose();
+            if (_activeMeshes != null) for (ChunkMesh _activeMeshe : _activeMeshes)
+                _activeMeshe.dispose();
             if (_newMeshes != null) {
-                for (int i = 0; i < _newMeshes.length; i++)
-                    _newMeshes[i].dispose();
+                for (ChunkMesh _newMeshe : _newMeshes)
+                    _newMeshe.dispose();
             }
 
             _activeMeshes = null;
@@ -766,12 +752,11 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
             if (_disposed)
                 return;
 
-            if (_activeMeshes != null)
-                for (int i = 0; i < _activeMeshes.length; i++)
-                    _activeMeshes[i].dispose();
+            if (_activeMeshes != null) for (ChunkMesh _activeMeshe : _activeMeshes)
+                _activeMeshe.dispose();
             if (_newMeshes != null) {
-                for (int i = 0; i < _newMeshes.length; i++)
-                    _newMeshes[i].dispose();
+                for (ChunkMesh _newMeshe : _newMeshes)
+                    _newMeshe.dispose();
             }
 
             _disposed = true;
@@ -804,6 +789,7 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
             return;
 
         CoreRegistry.get(GameEngine.class).submitTask("Update Chunk Collision", new Runnable() {
+            @Override
             public void run() {
                 try {
                     _lockRigidBody.lock();
@@ -878,6 +864,7 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
     }
 
     //Externalizable Interface
+    @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeInt(_id);
         out.writeInt(_pos.x);
@@ -909,6 +896,7 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
             out.writeByte(_states.getRawByte(i));
     }
 
+    @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         _id = in.readInt();
         _pos.x = in.readInt();

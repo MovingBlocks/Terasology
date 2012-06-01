@@ -21,7 +21,15 @@ import groovy.lang.GroovyShell;
 import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceException;
 import groovy.util.ScriptException;
-import org.terasology.componentSystem.items.InventorySystem;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import java.io.File;
+import java.io.IOException;
+
+import javax.vecmath.Vector3f;
+
 import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LocationComponent;
@@ -32,22 +40,12 @@ import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.entitySystem.persistence.WorldPersister;
 import org.terasology.events.inventory.ReceiveItemEvent;
-import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
-import org.terasology.game.Terasology;
-import org.terasology.game.modes.GameState;
 import org.terasology.game.modes.StateSinglePlayer;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.model.blocks.BlockFamily;
 import org.terasology.model.blocks.management.BlockManager;
-import org.terasology.utilities.Helper;
-
-import javax.vecmath.Vector3f;
-import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Manages everything related to using Groovy from within Java.
@@ -64,7 +62,7 @@ public class GroovyManager {
      * Directory where we keep "plugin" files (Groovy scripts we'll run - prolly move this setting elsewhere sometime)
      */
     private static final String PLUGINS_PATH = "groovy/plugins";
-    
+
     private Logger logger = Logger.getLogger(getClass().getName());
 
     /**
@@ -213,7 +211,7 @@ public class GroovyManager {
         public void dumpEntities() throws IOException {
             CoreRegistry.get(WorldPersister.class).save(new File(PathManager.getInstance().getDataPath(), "entityDump.txt"), WorldPersister.SaveFormat.JSON);
         }
-        
+
         public void debugCollision() {
             Config.getInstance().setDebugCollision(!Config.getInstance().isDebugCollision());
         }

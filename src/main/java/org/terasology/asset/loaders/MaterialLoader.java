@@ -16,8 +16,15 @@
 
 package org.terasology.asset.loaders;
 
-import com.google.common.collect.Maps;
-import com.google.gson.*;
+import java.lang.reflect.Type;
+import java.net.URL;
+import java.util.List;
+import java.util.Map;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
@@ -25,15 +32,16 @@ import org.terasology.logic.manager.AssetManager;
 import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.assets.Shader;
 import org.terasology.rendering.assets.Texture;
-import org.terasology.rendering.assets.metadata.ShaderMetadata;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.Type;
-import java.net.URL;
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.Maps;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 
 /**
  * @author Immortius
@@ -118,7 +126,7 @@ public class MaterialLoader implements AssetLoader<Material> {
                         } else if (prop.getValue().getAsJsonPrimitive().isNumber()) {
                             metadata.floatParams.put(prop.getKey(), prop.getValue().getAsFloat());
                         } else if (prop.getValue().getAsJsonPrimitive().isBoolean()) {
-                            metadata.intParams.put(prop.getKey(), (prop.getValue().getAsBoolean()) ? 1 : 0);
+                            metadata.intParams.put(prop.getKey(), prop.getValue().getAsBoolean() ? 1 : 0);
                         }
                     } else if (prop.getValue().isJsonArray()) {
                         JsonArray array = prop.getValue().getAsJsonArray();
