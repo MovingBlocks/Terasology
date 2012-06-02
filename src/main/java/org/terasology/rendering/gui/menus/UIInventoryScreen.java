@@ -17,13 +17,14 @@ package org.terasology.rendering.gui.menus;
 
 import org.terasology.rendering.gui.components.UIInventory;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
+import org.terasology.rendering.gui.framework.UIDisplayWindow;
 
 /**
  * The player's inventory.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class UIInventoryScreen extends UIDisplayRenderer {
+public class UIInventoryScreen extends UIDisplayWindow {
 
     private final UIInventory _inventory;
 
@@ -33,6 +34,7 @@ public class UIInventoryScreen extends UIDisplayRenderer {
         addDisplayElement(_inventory);
 
         update();
+        setModal(true);
     }
 
     @Override

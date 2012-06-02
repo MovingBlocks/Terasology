@@ -32,6 +32,8 @@ import org.terasology.events.ActivateEvent;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.NoHealthEvent;
 import org.terasology.events.OpenInventoryEvent;
+import org.terasology.events.input.KeyDownEvent;
+import org.terasology.events.input.KeyUpEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.game.client.BindTarget;
@@ -46,10 +48,12 @@ import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.model.structures.RayBlockIntersection;
+import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.DefaultCamera;
 import org.terasology.rendering.gui.menus.UIContainerScreen;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
+import org.terasology.rendering.world.WorldRenderer;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -79,6 +83,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     private IWorldProvider worldProvider;
     private DefaultCamera playerCamera;
     private BlockEntityRegistry blockEntityRegistry;
+    private UIContainerScreen containerScreen;
 
 
     private Vector2f lookInput = new Vector2f();
@@ -86,14 +91,11 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     private double mouseSensititivy = Config.getInstance().getMouseSens();
     private long lastTimeSpacePressed;
     private long lastInteraction;
-    private boolean toggleGodMode;
 
     private boolean cameraBobbing = Config.getInstance().isCameraBobbing();
     private float bobFactor = 0;
     private float lastStepDelta = 0;
 
-
-    private boolean jump = false;
     private boolean running = false;
     
     private boolean goForward;
@@ -122,6 +124,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         eventSystem = CoreRegistry.get(EventSystem.class);
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
 
+        containerScreen = GUIManager.getInstance().addWindow(new UIContainerScreen(), "container");
+
         registerBindTargets();
     }
 
@@ -134,8 +138,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     @ReceiveEvent(components = {LocalPlayerComponent.class, InventoryComponent.class})
     public void onOpenContainer(OpenInventoryEvent event, EntityRef entity) {
         if (event.getContainer().hasComponent(InventoryComponent.class)) {
-            // TODO: better way to open UI screen?
-            GUIManager.getInstance().addWindow(new UIContainerScreen(event.getContainer(), entity), "container");
+            containerScreen.openContainer(event.getContainer(), entity);
+            GUIManager.getInstance().setFocusedWindow(containerScreen);
         }
     }
 
@@ -172,11 +176,26 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         resetInput();
     }
 
+    @ReceiveEvent(components = {LocalPlayerComponent.class, CharacterMovementComponent.class})
+    public void onKeyDown(KeyDownEvent keyEvent, EntityRef entity) {
+        CharacterMovementComponent characterMovement = entity.getComponent(CharacterMovementComponent.class);
+        switch (keyEvent.getKey()) {
+            case Keyboard.KEY_SPACE:
+                characterMovement.jump = true;
+                if (timer.getTimeInMs() - lastTimeSpacePressed < 200) {
+                    characterMovement.isGhosting = !characterMovement.isGhosting;
+                }
+
+                lastTimeSpacePressed = timer.getTimeInMs();
+                keyEvent.consume();
+                break;
+        }
+    }
+
     private void resetInput() {
-        toggleGodMode = false;
         lookInput.set(0,0);
         
-        jump = running = false;
+        running = false;
         goForward = goBackward = goLeft = goRight = goUp = goDown = false;
         movementVector.set(0, 0, 0); 
         
@@ -197,11 +216,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         if (lengthSquared > 1) relMove.normalize();
         characterMovementComponent.setDrive(relMove);
 
-        characterMovementComponent.jump = jump;
         characterMovementComponent.isRunning = running;
-        if (toggleGodMode) {
-            characterMovementComponent.isGhosting = !characterMovementComponent.isGhosting;
-        }
     }
 
     private void updateViewDirection(LocalPlayerComponent localPlayerComponent, LocationComponent location) {
@@ -320,18 +335,6 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
                 if (!repeatEvent && state) {
                     MinionSystem minionSystem = new MinionSystem();
                     minionSystem.switchMinionMode();
-                }
-                break;
-            case Keyboard.KEY_SPACE:
-                if (!repeatEvent && state) {
-                    jump = true;
-
-                    // TODO: handle time better
-                    if (timer.getTimeInMs() - lastTimeSpacePressed < 200) {
-                        toggleGodMode = true;
-                    }
-
-                    lastTimeSpacePressed = timer.getTimeInMs();
                 }
                 break;
         }
@@ -566,7 +569,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     
     
     private void registerBindTargets() {
-		clientController = CoreRegistry.get(ClientController.class);
+		/*clientController = CoreRegistry.get(ClientController.class);
 
 		clientController.bind(Keyboard.KEY_W, 
 				new BindTarget("engine", "MoveForward") {
@@ -673,6 +676,6 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 			public void end() {
 				running = false;
 			}
-	    });
+	    }); */
 	}
 }

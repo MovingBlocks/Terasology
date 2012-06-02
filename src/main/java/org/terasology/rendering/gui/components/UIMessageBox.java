@@ -49,7 +49,7 @@ public class UIMessageBox extends UIDialogBox{
 
     public void close(){
         super.close(false);
-        GUIManager.getInstance().setLasFocused();
+        GUIManager.getInstance().setLastFocused();
         GUIManager.getInstance().removeWindow("messageBox");
     }
 }

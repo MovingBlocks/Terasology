@@ -25,6 +25,7 @@ import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.rendering.gui.components.*;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
+import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -35,7 +36,7 @@ import javax.vecmath.Vector2f;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class UIHeadsUpDisplay extends UIDisplayRenderer {
+public class UIHeadsUpDisplay extends UIDisplayWindow {
 
     /* DISPLAY ELEMENTS */
     private final UICrosshair _crosshair;
@@ -43,7 +44,6 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
     private final UIText _debugLine2;
     private final UIText _debugLine3;
     private final UIText _debugLine4;
-    private final UIDebugConsole _console;
 
     private final UIToolbar _toolbar;
     private final UIMinionbar _minionbar;
@@ -69,9 +69,6 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
         addDisplayElement(_debugLine3);
         addDisplayElement(_debugLine4);
 
-        _console = new UIDebugConsole();
-        addDisplayElement(_console);
-
         _toolbar = new UIToolbar();
         _toolbar.setVisible(true);
         addDisplayElement(_toolbar);
@@ -91,6 +88,7 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
         _buffBar = new UIBuff();
         _buffBar.setVisible(true);
         addDisplayElement(_buffBar);
+        setVisible(true);
 
     }
 
@@ -104,7 +102,6 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
 
     public void update() {
         super.update();
-        setOverlay(!_console.isVisible());
 
         _healthBar.setPosition(new Vector2f(_toolbar.getPosition().x, _toolbar.getPosition().y - _toolbar.getSize().y + 8f));
         _crosshair.setPosition(new Vector2f(Display.getWidth() / 2, Display.getHeight() / 2));
@@ -125,19 +122,4 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
         }
     }
 
-    @Override
-    public void processKeyboardInput(int key) {
-        super.processKeyboardInput(key);
-
-        if (!isVisible())
-            return;
-
-        if (key == Keyboard.KEY_TAB) {
-            _console.setVisible(!_console.isVisible());
-        }
-    }
-
-    public UIDebugConsole getDebugConsole() {
-        return _console;
-    }
 }

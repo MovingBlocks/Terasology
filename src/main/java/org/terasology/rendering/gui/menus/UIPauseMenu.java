@@ -26,10 +26,7 @@ import org.terasology.logic.manager.AssetManager;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.components.UITransparentOverlay;
-import org.terasology.rendering.gui.framework.IClickListener;
-import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.UIDisplayRenderer;
-import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import org.terasology.rendering.gui.framework.*;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
@@ -39,7 +36,7 @@ import javax.vecmath.Vector3f;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class UIPauseMenu extends UIDisplayRenderer {
+public class UIPauseMenu extends UIDisplayWindow {
 
     final UITransparentOverlay _overlay;
     final UIGraphicsElement _title;
@@ -126,6 +123,7 @@ public class UIPauseMenu extends UIDisplayRenderer {
         addDisplayElement(_exitButton);
         addDisplayElement(_respawnButton);
         addDisplayElement(_mainMenuButton);
+        setModal(true);
 
         update();
     }

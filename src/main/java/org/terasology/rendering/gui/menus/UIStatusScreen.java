@@ -18,13 +18,14 @@ package org.terasology.rendering.gui.menus;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.components.UITransparentOverlay;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
+import org.terasology.rendering.gui.framework.UIDisplayWindow;
 
 /**
  * Simple status screen with one sole text label usable for status notifications.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class UIStatusScreen extends UIDisplayRenderer {
+public class UIStatusScreen extends UIDisplayWindow {
 
     final UITransparentOverlay _overlay;
     final UIText _status;

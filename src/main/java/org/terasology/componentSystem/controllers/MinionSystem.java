@@ -27,7 +27,10 @@ public class MinionSystem implements EventHandlerSystem {
     private final String behaviourmenu = "minionbehaviour";
     private UIMinion minionbehaviourmenu;
 
-    public void initialise() {}
+    public void initialise() {
+        minionbehaviourmenu = new UIMinion();
+        GUIManager.getInstance().addWindow(minionbehaviourmenu,behaviourmenu);
+    }
 
     public MinionBarComponent getMinionBar(){
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
@@ -37,6 +40,7 @@ public class MinionSystem implements EventHandlerSystem {
         LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
         if(localPlayerComp == null) return null;
         MinionBarComponent minionbar = localPlayer.getEntity().getComponent(MinionBarComponent.class);
+
         return minionbar;
     }
 
@@ -99,12 +103,7 @@ public class MinionSystem implements EventHandlerSystem {
     }
 
     public void RightMouseDown(){
-        minionbehaviourmenu = (UIMinion)GUIManager.getInstance().getWindowById(behaviourmenu);
-        if(minionbehaviourmenu == null) {
-            minionbehaviourmenu = new UIMinion();
-            GUIManager.getInstance().addWindow(minionbehaviourmenu,behaviourmenu);
-        }
-        minionbehaviourmenu.setVisible(true);
+        GUIManager.getInstance().setFocusedWindow(minionbehaviourmenu);
     }
 
     public void RightMouseReleased(){

@@ -1,6 +1,7 @@
 package org.terasology.logic.manager;
 
 import com.google.common.collect.Lists;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.rendering.gui.components.UIMessageBox;
@@ -59,7 +60,7 @@ public class GUIManager {
         _renderer.update();
     }
 
-    public void addWindow(UIDisplayWindow window, String windowId){
+    public <T extends UIDisplayWindow> T addWindow(T window, String windowId){
         if(window.isMaximized()){
             _renderer.addtDisplayElementToPosition(0,window);
         }else{
@@ -67,6 +68,7 @@ public class GUIManager {
         }
 
         _windowsById.put(windowId, window);
+        return window;
     }
 
     public void closeWindows() {
@@ -100,6 +102,9 @@ public class GUIManager {
 
     public void removeWindow(String windowId){
         UIDisplayWindow window = getWindowById(windowId);
+        if (window == null) {
+            return;
+        }
 
         _renderer.removeDisplayElement(window);
 
@@ -131,6 +136,7 @@ public class GUIManager {
     }
 
     public UIDisplayWindow getFocusedWindow() {
+        checkTopWindow();
         return _focusedWindow;
     }
 
@@ -138,9 +144,21 @@ public class GUIManager {
      * Process keyboard input - first look for "system" like events, then otherwise pass to the Player object
      */
     public void processKeyboardInput(int key) {
+        checkTopWindow();
+        if (key == Keyboard.KEY_ESCAPE) {
+            if (_focusedWindow != null && _focusedWindow.isModal()) {
+                _focusedWindow.setVisible(false);
+            }
+        }
+
+        if (_focusedWindow != null && _focusedWindow.isModal() && _focusedWindow.isVisible()) {
+            _focusedWindow.processKeyboardInput(key);
+            return;
+        }
+
         List<UIDisplayElement> screens = Lists.newArrayList(_renderer.getDisplayElements());
         for (UIDisplayElement screen : screens) {
-            if (screen.isVisible() && !screen.isOverlay()) {
+            if (!((UIDisplayWindow)screen).isModal()) {
                 screen.processKeyboardInput(key);
             }
         }
@@ -206,7 +224,7 @@ public class GUIManager {
         }
 
         if(_lastFocused!=null&&_lastFocused.equals(setTopWindow)){
-            return;
+            _lastFocused = _focusedWindow;
         }
 
         _lastFocused = _focusedWindow;
@@ -253,17 +271,19 @@ public class GUIManager {
         setFocusedWindow(messageWindow);
     }
 
-    public void setLasFocused(){
+    public void setLastFocused(){
         _focusedWindow = _lastFocused;
     }
 
-    /*private boolean screenCanFocus(UIDisplayElement s) {
-        boolean result = true;
-
-        for (UIDisplayElement screen : _renderer.getDisplayElements()) {
-            if (screen.isVisible() && !screen.isOverlay() && screen != s)
-                result = false;
+    public void toggleWindow(String windowId) {
+        UIDisplayWindow window = getWindowById(windowId);
+        if (window == null) {
+            return;
         }
-        return result;
-    } */
+        if (window.isVisible()) {
+            window.setVisible(false);
+        } else {
+            setFocusedWindow(window);
+        }
+    }
 }

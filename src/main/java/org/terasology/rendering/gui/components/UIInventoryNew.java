@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class UIInventoryNew extends UIDisplayContainer implements UIInventoryCellNew.CellSubscriber {
 
-    EntityRef entity;
+    EntityRef entity = EntityRef.NULL;
     Vector2f cellBorder = new Vector2f(2,2);
     Vector2f cellSize = new Vector2f(48,48);
     List<UIInventoryCellNew> cells = Lists.newArrayList();
@@ -23,8 +23,7 @@ public class UIInventoryNew extends UIDisplayContainer implements UIInventoryCel
         public void itemClicked(UIInventoryNew inventoryNew, int slot);
     }
 
-    public UIInventoryNew(EntityRef entity, int width) {
-        this.entity = entity;
+    public UIInventoryNew(int width) {
         InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
         if (inventory == null) {
             setVisible(false);
@@ -48,6 +47,10 @@ public class UIInventoryNew extends UIDisplayContainer implements UIInventoryCel
 
     public EntityRef getEntity() {
         return entity;
+    }
+
+    public void setEntity(EntityRef entity) {
+        this.entity = entity;
     }
 
     public void onCellActivated(UIInventoryCellNew cell) {

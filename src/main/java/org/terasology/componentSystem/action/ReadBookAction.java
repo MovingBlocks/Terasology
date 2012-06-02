@@ -6,6 +6,7 @@ import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.ActivateEvent;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.menus.UIOpenBookScreen;
 
 
@@ -15,13 +16,19 @@ import org.terasology.rendering.gui.menus.UIOpenBookScreen;
  *
  */
 public class ReadBookAction implements EventHandlerSystem {
-    public void initialise() {}
+
+    private UIDisplayWindow bookScreen;
+
+    public void initialise() {
+        bookScreen = GUIManager.getInstance().addWindow(new UIOpenBookScreen(), "engine:bookScreen");
+    }
 
     public EntityRef entity;
 
+
     @ReceiveEvent(components = {BookComponent.class})
     public void onActivate(ActivateEvent event, EntityRef entity) {
-        GUIManager.getInstance().addWindow(new UIOpenBookScreen(), "openbook");
+        GUIManager.getInstance().setFocusedWindow(bookScreen);
 
     }
 }

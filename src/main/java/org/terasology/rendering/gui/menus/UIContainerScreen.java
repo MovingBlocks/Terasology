@@ -26,36 +26,41 @@ public class UIContainerScreen  extends UIDisplayWindow implements UIInventoryNe
     private static final int CENTER_BORDER = 100;
     private static final int OUTER_BORDER = 50;
 
-    EntityRef container;
-    EntityRef creature;
+    EntityRef container = EntityRef.NULL;
+    EntityRef creature = EntityRef.NULL;
 
     private final UIInventoryNew playerInventory;
     private final UIInventoryNew containerInventory;
     private final UIGraphicsElement background;
 
-    public UIContainerScreen(EntityRef container, EntityRef creature) {
+    public UIContainerScreen() {
         maximaze();
-        this.container = container;
-        this.creature = creature;
+
         background = new UIGraphicsElement(AssetManager.loadTexture("engine:containerWindow"));
         background.getTextureSize().set(new Vector2f(256f / 256f, 231f / 256f));
         background.getTextureOrigin().set(new Vector2f(0.0f, 0.0f));
         addDisplayElement(background);
 
-        playerInventory = new UIInventoryNew(creature, 4);
+        playerInventory = new UIInventoryNew(4);
         playerInventory.setVisible(true);
         playerInventory.subscribe(this);
         addDisplayElement(playerInventory);
 
-        containerInventory = new UIInventoryNew(container, 4);
+        containerInventory = new UIInventoryNew(4);
         containerInventory.setVisible(true);
         containerInventory.subscribe(this);
         addDisplayElement(containerInventory);
-        setVisible(true);
 
         background.setVisible(true);
 
         update();
+    }
+
+    public void openContainer(EntityRef container, EntityRef creature) {
+        this.container = container;
+        this.creature = creature;
+        playerInventory.setEntity(creature);
+        containerInventory.setEntity(container);
     }
 
     @Override
@@ -89,4 +94,5 @@ public class UIContainerScreen  extends UIDisplayWindow implements UIInventoryNe
         EntityRef itemEntity = fromInventory.itemSlots.get(slot);
         toEntity.send(new ReceiveItemEvent(itemEntity));
     }
+
 }
