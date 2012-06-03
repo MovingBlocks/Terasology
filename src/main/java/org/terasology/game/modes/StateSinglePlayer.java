@@ -54,6 +54,8 @@ import org.terasology.entitySystem.persistence.EntityPersisterHelper;
 import org.terasology.entitySystem.metadata.extension.*;
 import org.terasology.entitySystem.persistence.EntityPersisterHelperImpl;
 import org.terasology.components.PoisonedComponent;
+import org.terasology.events.input.*;
+import org.terasology.events.input.binds.InventoryButton;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
@@ -70,7 +72,6 @@ import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.protobuf.EntityData;
 import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.menus.*;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
 import org.terasology.rendering.primitives.Mesh;
@@ -150,12 +151,31 @@ public class StateSinglePlayer implements GameState {
         CoreRegistry.put(PrefabManager.class, prefabManager);
 
         _entityManager = new PojoEntityManager(componentLibrary, prefabManager);
-        _entityManager.setEventSystem(new PojoEventSystem(_entityManager));
+        EventSystem eventSystem = new PojoEventSystem(_entityManager);
+        _entityManager.setEventSystem(eventSystem);
         CoreRegistry.put(EntityManager.class, _entityManager);
         _componentSystemManager = new ComponentSystemManager();
         CoreRegistry.put(ComponentSystemManager.class, _componentSystemManager);
 
         CoreRegistry.put(WorldPersister.class, new WorldPersister(componentLibrary,_entityManager));
+
+
+        // TODO: Use reflection pending mod support
+        eventSystem.registerEvent("engine:inputEvent", InputEvent.class);
+        eventSystem.registerEvent("engine:keyDownEvent", KeyDownEvent.class);
+        eventSystem.registerEvent("engine:keyEvent", KeyEvent.class);
+        eventSystem.registerEvent("engine:keyUpEvent", KeyUpEvent.class);
+        eventSystem.registerEvent("engine:leftMouseDownButtonEvent", LeftMouseDownButtonEvent.class);
+        eventSystem.registerEvent("engine:leftMouseUpButtonEvent", LeftMouseUpButtonEvent.class);
+        eventSystem.registerEvent("engine:mouseDownButtonEvent", MouseDownButtonEvent.class);
+        eventSystem.registerEvent("engine:mouseUpButtonEvent", MouseUpButtonEvent.class);
+        eventSystem.registerEvent("engine:mouseButtonEvent", MouseButtonEvent.class);
+        eventSystem.registerEvent("engine:mouseWheelEvent", MouseWheelEvent.class);
+        eventSystem.registerEvent("engine:rightMouseDownButtonEvent", RightMouseDownButtonEvent.class);
+        eventSystem.registerEvent("engine:rightMouseUpButtonEvent", RightMouseUpButtonEvent.class);
+        eventSystem.registerEvent("engine:bindButtonEvent", BindButtonEvent.class);
+        eventSystem.registerEvent("engine:inventoryButtonEvent", InventoryButton.class);
+
         // TODO: Use reflection pending mod support
         componentLibrary.registerComponentClass(ExplosionActionComponent.class);
         componentLibrary.registerComponentClass(PlaySoundActionComponent.class);

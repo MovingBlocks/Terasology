@@ -12,6 +12,8 @@ public class KeyEvent extends InputEvent {
 
     public KeyEvent(int key, ButtonState state, float delta, EntityRef target) {
         super(delta, target);
+        this.key = key;
+        this.state = state;
     }
 
 	public ButtonState getState() {

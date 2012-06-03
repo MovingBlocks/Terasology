@@ -22,7 +22,11 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.input.KeyDownEvent;
+import org.terasology.events.input.binds.ConsoleButton;
+import org.terasology.events.input.binds.InventoryButton;
+import org.terasology.events.input.binds.PauseButton;
 import org.terasology.game.CoreRegistry;
+import org.terasology.game.client.ButtonState;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
@@ -34,24 +38,46 @@ import org.terasology.rendering.world.WorldRenderer;
  */
 public class LocalPlayerScreensSystem implements EventHandlerSystem {
 
+    public static final String PAUSE_MENU = "engine:pauseMenu";
+    public static final String INVENTORY = "engine:inventory";
+    public static final String CONSOLE = "engine:console";
+
+    private UIMetrics metrics;
+
     @Override
     public void initialise() {
-        GUIManager.getInstance().addWindow(new UIDebugConsole(), "engine:console");
+        GUIManager.getInstance().addWindow(new UIDebugConsole(), CONSOLE);
         GUIManager.getInstance().addWindow(new UIHeadsUpDisplay(), "engine:hud");
-        GUIManager.getInstance().addWindow(new UIMetrics(), "engine:metrics");
-        GUIManager.getInstance().addWindow(new UIInventoryScreen(), "engine:inventory");
-        GUIManager.getInstance().addWindow(new UIPauseMenu(), "engine:pauseMenu");
+        metrics = new UIMetrics();
+        GUIManager.getInstance().addWindow(metrics, "engine:metrics");
+        GUIManager.getInstance().addWindow(new UIInventoryScreen(), INVENTORY);
+        GUIManager.getInstance().addWindow(new UIPauseMenu(), PAUSE_MENU);
     }
 
-    @ReceiveEvent(components= LocalPlayerComponent.class)
+    @ReceiveEvent(components = LocalPlayerComponent.class)
+    public void onToggleConsole(ConsoleButton event, EntityRef entity) {
+        if (event.getState() == ButtonState.DOWN && GUIManager.getInstance().toggleWindow(CONSOLE)) {
+            event.consume();
+        }
+    }
+
+    @ReceiveEvent(components = LocalPlayerComponent.class)
+    public void onToggleInventory(InventoryButton event, EntityRef entity) {
+        if (event.getState() == ButtonState.DOWN && GUIManager.getInstance().toggleWindow(INVENTORY)) {
+            event.consume();
+        }
+    }
+
+    @ReceiveEvent(components = LocalPlayerComponent.class)
+    public void onTogglePause(PauseButton event, EntityRef entity) {
+        if (event.getState() == ButtonState.DOWN && GUIManager.getInstance().toggleWindow(PAUSE_MENU)) {
+            event.consume();
+        }
+    }
+
+    @ReceiveEvent(components = LocalPlayerComponent.class)
     public void onKeyDown(KeyDownEvent event, EntityRef entity) {
         switch (event.getKey()) {
-            case Keyboard.KEY_ESCAPE:
-                togglePauseMenu();
-                break;
-            case Keyboard.KEY_I:
-                toggleInventory();
-                break;
             case Keyboard.KEY_F3:
                 Config.getInstance().setDebug(!Config.getInstance().isDebug());
                 break;
@@ -61,18 +87,10 @@ public class LocalPlayerScreensSystem implements EventHandlerSystem {
             case Keyboard.KEY_F12:
                 CoreRegistry.get(WorldRenderer.class).printScreen();
                 break;
-            case Keyboard.KEY_TAB:
-                GUIManager.getInstance().toggleWindow("engine:console");
+            case Keyboard.KEY_F4:
+                metrics.toggleMode();
                 break;
         }
-    }
-
-    private void toggleInventory() {
-        GUIManager.getInstance().toggleWindow("engine:inventory");
-    }
-
-    private void togglePauseMenu() {
-        GUIManager.getInstance().toggleWindow("engine:pauseMenu");
     }
 
     private void toggleViewingDistance() {

@@ -72,6 +72,7 @@ public class UIMainMenu extends UIDisplayWindow {
         addDisplayElement(_configButton, "configButton");
         addDisplayElement(_exitButton,   "exitButton");
         addDisplayElement(_singlePlayerButton, "singlePlayerButton");
+        setModal(true);
 
         update();
     }

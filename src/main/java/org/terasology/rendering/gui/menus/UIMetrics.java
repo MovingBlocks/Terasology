@@ -82,17 +82,9 @@ public class UIMetrics extends UIDisplayWindow {
         _currentMode.updateLines(_metricLines);
     }
 
-    @Override
-    public void processKeyboardInput(int key) {
-        super.processKeyboardInput(key);
-
-        if (!isVisible())
-            return;
-
-        if (key == Keyboard.KEY_F4) {
-            _currentMode = Mode.nextMode(_currentMode);
-            PerformanceMonitor.setEnabled(_currentMode != Mode.Off);
-        }
+    public void toggleMode() {
+        _currentMode = Mode.nextMode(_currentMode);
+        PerformanceMonitor.setEnabled(_currentMode != Mode.Off);
     }
 
     private enum Mode {

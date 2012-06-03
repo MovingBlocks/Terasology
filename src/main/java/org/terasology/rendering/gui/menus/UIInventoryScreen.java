@@ -15,8 +15,8 @@
  */
 package org.terasology.rendering.gui.menus;
 
+import org.terasology.events.input.binds.InventoryButton;
 import org.terasology.rendering.gui.components.UIInventory;
-import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 
 /**
@@ -41,5 +41,14 @@ public class UIInventoryScreen extends UIDisplayWindow {
     public void update() {
         super.update();
         _inventory.center();
+    }
+
+    @Override
+    public boolean processBindButton(String id, boolean pressed) {
+        if (pressed && InventoryButton.ID.equals(id)) {
+            close(true);
+            return true;
+        }
+        return false;
     }
 }
