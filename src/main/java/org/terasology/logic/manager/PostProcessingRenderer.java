@@ -347,7 +347,7 @@ public class PostProcessingRenderer {
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("blur");
 
         shader.enable();
-        shader.setFloat("radius", 2.0f);
+        shader.setFloat("radius", 2.5f);
 
         PostProcessingRenderer.getInstance().getFBO("sceneBlur" + id).bind();
         glViewport(0, 0, 1024, 1024);
