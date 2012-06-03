@@ -25,8 +25,8 @@ uniform bool swimming;
 uniform float viewingDistance;
 
 #define Z_NEAR 0.1
-#define BLUR_START 0.25
-#define BLUR_LENGTH 0.25
+#define BLUR_START 0.6
+#define BLUR_LENGTH 0.05
 
 float linDepth() {
     float z = texture2D(texDepth, gl_TexCoord[0].xy).x;
@@ -40,7 +40,7 @@ void main() {
     float depth = linDepth();
     float blur = 0.0;
 
-    if (depth > 0.1 && !swimming)
+    if (depth > BLUR_START && !swimming)
        blur = clamp((depth - BLUR_START) / BLUR_LENGTH, 0.0, 1.0);
     else if (swimming)
        blur = 1.0;
