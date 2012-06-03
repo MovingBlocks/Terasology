@@ -23,7 +23,7 @@ public class GelatinousCubeFactory {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc != null) {
             loc.setWorldPosition(position);
-            loc.setLocalScale((random.randomFloat() + 1.0f) / 2.0f * 0.8f + 0.2f);
+            loc.setLocalScale((random.randomFloat() + 1.0f) * 0.4f + 0.2f);
             entity.saveComponent(loc);
         }
 
@@ -43,7 +43,7 @@ public class GelatinousCubeFactory {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc != null) {
             loc.setWorldPosition(position);
-            loc.setLocalScale((random.randomFloat() + 1.0f) / 2.0f * 0.8f + 0.2f);
+            loc.setLocalScale((random.randomFloat() + 1.0f) * 0.4f + 0.2f);
             entity.saveComponent(loc);
         }
 

@@ -126,7 +126,7 @@ public class MaterialLoader implements AssetLoader<Material> {
                         } else if (prop.getValue().getAsJsonPrimitive().isNumber()) {
                             metadata.floatParams.put(prop.getKey(), prop.getValue().getAsFloat());
                         } else if (prop.getValue().getAsJsonPrimitive().isBoolean()) {
-                            metadata.intParams.put(prop.getKey(), prop.getValue().getAsBoolean() ? 1 : 0);
+                            metadata.intParams.put(prop.getKey(), (prop.getValue().getAsBoolean()) ? 1 : 0);
                         }
                     } else if (prop.getValue().isJsonArray()) {
                         JsonArray array = prop.getValue().getAsJsonArray();

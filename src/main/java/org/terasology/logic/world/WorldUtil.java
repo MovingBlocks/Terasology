@@ -1,26 +1,25 @@
 package org.terasology.logic.world;
 
+import org.terasology.model.structures.BlockPosition;
+
+import javax.vecmath.Vector3f;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import java.io.File;
-
-import javax.vecmath.Vector3f;
-
-import org.terasology.model.structures.BlockPosition;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
 public final class WorldUtil {
 
-    private WorldUtil() {}
+    private WorldUtil() {
+    }
 
     /**
      * Gather the surrounding block positions
      * and order those by the distance to the originating point.
-    */
+     */
     public static List<BlockPosition> gatherAdjacentBlockPositions(Vector3f origin) {
 
         ArrayList<BlockPosition> blockPositions = new ArrayList<BlockPosition>();
@@ -45,8 +44,7 @@ public final class WorldUtil {
     public static void deleteWorld(File world) {
         if (world.isDirectory()) {
             String[] children = world.list();
-            for (String element : children)
-            {
+            for (String element : children) {
                 File f = new File(world, element);
                 deleteWorld(f);
             }

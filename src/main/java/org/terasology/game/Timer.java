@@ -3,43 +3,39 @@ package org.terasology.game;
 import org.lwjgl.Sys;
 
 public final class Timer {
-    private final float _decayRate = 0.95f;
-    private final float _oneMinusDecayRate = 1.0f - _decayRate;
-    private final long _timerTicksPerSecond;
-    private long _last = 0;
-    private long _delta = 0;
-    private float _avgDelta = 0;
+    private final float decayRate = 0.95f;
+    private final float oneMinusDecayRate = 1.0f - decayRate;
+    private final long timerTicksPerSecond;
+    private long last = 0;
+    private long delta = 0;
+    private float avgDelta = 0;
 
     public Timer() {
         //lwjgl libs need to be loaded prior to initialization!
         //do not construct timer earlier
-        _timerTicksPerSecond = Sys.getTimerResolution();
+        timerTicksPerSecond = Sys.getTimerResolution();
     }
 
     public void tick() {
         long now = getTimeInMs();
-        _delta = now - _last;
-        _last = now;
-        _avgDelta = _avgDelta * _decayRate + _delta * _oneMinusDecayRate;
+        delta = now - last;
+        last = now;
+        avgDelta = avgDelta * decayRate + delta * oneMinusDecayRate;
     }
 
     public float getDelta() {
-        if (_delta >= 100)
-            return 0.1f;
-        else return _delta / 1000f;
+        return (delta >= 100) ? 0.1f : delta / 1000f;
     }
 
     public double getDeltaInMS() {
-        if (_delta >= 100)
-            return 100;
-        else return _delta;
+        return (delta >= 100) ? 100 : delta;
     }
 
     public double getFps() {
-        return 1000.0f / _avgDelta;
+        return 1000.0f / avgDelta;
     }
 
     public long getTimeInMs() {
-        return (Sys.getTime() * 1000) / _timerTicksPerSecond;
+        return (Sys.getTime() * 1000) / timerTicksPerSecond;
     }
 }

@@ -86,10 +86,11 @@ public abstract class Camera {
             return;
         }
         // TODO: Clamp this
-        if (_activeFov < _targetFov)
+        if (_activeFov < _targetFov) {
             _activeFov += 50 * delta;
-        else if (_activeFov > _targetFov)
+        } else if (_activeFov > _targetFov) {
             _activeFov -= 50 * delta;
+        }
     }
 
     public void extendFov(float fov) {

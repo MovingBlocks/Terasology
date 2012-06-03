@@ -767,7 +767,7 @@ public final class WorldRenderer implements IGameObject {
         //int bpp = Display.getDisplayMode().getBitsPerPixel(); does return 0 - why?
         final int bpp = 4;
         final ByteBuffer buffer = BufferUtils.createByteBuffer(width * height * bpp); // hardcoded until i know how to get bpp
-        GL11.glReadPixels(0, 0, width, height, bpp == 3 ? GL11.GL_RGB : GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+        GL11.glReadPixels(0, 0, width, height, (bpp == 3) ? GL11.GL_RGB : GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
         Runnable r = new Runnable() {
             @Override
             public void run() {
@@ -783,7 +783,7 @@ public final class WorldRenderer implements IGameObject {
                         int r = buffer.get(i) & 0xFF;
                         int g = buffer.get(i + 1) & 0xFF;
                         int b = buffer.get(i + 2) & 0xFF;
-                        image.setRGB(x, height - (y + 1), 0xFF << 24 | r << 16 | g << 8 | b);
+                        image.setRGB(x, height - (y + 1), (0xFF << 24) | (r << 16) | (g << 8) | b);
                     }
 
                 try {

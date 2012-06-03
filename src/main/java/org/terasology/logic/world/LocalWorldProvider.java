@@ -264,11 +264,11 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
      */
     @Override
     public final byte getBlockAtPosition(Vector3d pos) {
-        return getBlock((int) (pos.x + (pos.x >= 0 ? 0.5f : -0.5f)), (int) (pos.y + (pos.y >= 0 ? 0.5f : -0.5f)), (int) (pos.z + (pos.z >= 0 ? 0.5f : -0.5f)));
+        return getBlock((int) (pos.x + ((pos.x >= 0) ? 0.5f : -0.5f)), (int) (pos.y + ((pos.y >= 0) ? 0.5f : -0.5f)), (int) (pos.z + ((pos.z >= 0) ? 0.5f : -0.5f)));
     }
 
     public final byte getBlockAtPosition(double x, double y, double z) {
-        return getBlock((int) (x + (x >= 0 ? 0.5f : -0.5f)), (int) (y + (y >= 0 ? 0.5f : -0.5f)), (int) (z + (z >= 0 ? 0.5f : -0.5f)));
+        return getBlock((int) (x + ((x >= 0) ? 0.5f : -0.5f)), (int) (y + ((y >= 0) ? 0.5f : -0.5f)), (int) (z + ((z >= 0) ? 0.5f : -0.5f)));
     }
 
     /**
@@ -280,11 +280,11 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
      */
     @Override
     public final byte getLightAtPosition(Vector3d pos, Chunk.LIGHT_TYPE type) {
-        return getLight((int) (pos.x + (pos.x >= 0 ? 0.5f : -0.5f)), (int) (pos.y + (pos.y >= 0 ? 0.5f : -0.5f)), (int) (pos.z + (pos.z >= 0 ? 0.5f : -0.5f)), type);
+        return getLight((int) (pos.x + ((pos.x >= 0) ? 0.5f : -0.5f)), (int) (pos.y + ((pos.y >= 0) ? 0.5f : -0.5f)), (int) (pos.z + ((pos.z >= 0) ? 0.5f : -0.5f)), type);
     }
 
     public final byte getLightAtPosition(double x, double y, double z, Chunk.LIGHT_TYPE type) {
-        return getLight((int) (x + (x >= 0 ? 0.5f : -0.5f)), (int) (y + (y >= 0 ? 0.5f : -0.5f)), (int) (z + (z >= 0 ? 0.5f : -0.5f)), type);
+        return getLight((int) (x + ((x >= 0) ? 0.5f : -0.5f)), (int) (y + ((y >= 0) ? 0.5f : -0.5f)), (int) (z + ((z >= 0) ? 0.5f : -0.5f)), type);
     }
 
     /**

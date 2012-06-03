@@ -13,7 +13,7 @@ public class AlignToSurfaceFamily implements BlockFamily {
     Block _archetype;
 
     /**
-     * @param name   The name for wthe block group.
+     * @param name   The name for the block group.
      * @param blocks The set of blocks that make up the group. Front, Back, Left and Right must be provided - the rest is ignored.
      */
     public AlignToSurfaceFamily(String name, EnumMap<Side, Block> blocks) {

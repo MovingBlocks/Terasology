@@ -137,8 +137,9 @@ public class OggReader extends FilterInputStream {
      *         no more data because the end of the stream has been reached.
      */
     public int read(byte[] b, int off, int len) throws IOException {
-        if (eos)
+        if (eos) {
             return -1;
+        }
         int bytesRead = 0;
         while (!eos && (len > 0)) {
             fillConvbuffer();
@@ -164,8 +165,9 @@ public class OggReader extends FilterInputStream {
      *         no more data because the end of the stream has been reached.
      */
     public int read(ByteBuffer b, int off, int len) throws IOException {
-        if (eos)
+        if (eos) {
             return -1;
+        }
         b.position(off);
         int bytesRead = 0;
         while (!eos && (len > 0)) {
@@ -189,8 +191,9 @@ public class OggReader extends FilterInputStream {
         if (convbufferOff >= convbufferSize) {
             convbufferSize = lazyDecodePacket();
             convbufferOff = 0;
-            if (convbufferSize == -1)
+            if (convbufferSize == -1) {
                 eos = true;
+            }
         }
     }
 
@@ -261,8 +264,9 @@ public class OggReader extends FilterInputStream {
         // Get the first page.
         if (syncState.pageout(page) != 1) {
             // have we simply run out of data?  If so, we're done.
-            if (bytes < 4096)
+            if (bytes < 4096) {
                 return;//break;
+            }
             // error case.  Must not be Vorbis data
             throw new Exception("Input does not appear to be an Ogg bitstream.");
         }
@@ -281,15 +285,18 @@ public class OggReader extends FilterInputStream {
 
         info.init();
         comment.init();
-        if (streamState.pagein(page) < 0)
+        if (streamState.pagein(page) < 0) {
             // error; stream version mismatch perhaps
             throw new Exception("Error reading first page of Ogg bitstream data.");
-        if (streamState.packetout(packet) != 1)
+        }
+        if (streamState.packetout(packet) != 1) {
             // no page? must not be vorbis
             throw new Exception("Error reading initial header packet.");
-        if (info.synthesis_headerin(comment, packet) < 0)
+        }
+        if (info.synthesis_headerin(comment, packet) < 0) {
             // error case; not a vorbis header
             throw new Exception("This Ogg bitstream does not contain Vorbis audio data.");
+        }
 
         // At this point, we're sure we're Vorbis.  We've set up the logical
         // (Ogg) bitstream decoder.  Get the comment and codebook headers and
@@ -306,8 +313,9 @@ public class OggReader extends FilterInputStream {
         while (i < 2) {
             while (i < 2) {
                 int result = syncState.pageout(page);
-                if (result == 0)
+                if (result == 0) {
                     break; // Need more data
+                }
                 // Don't complain about missing or corrupt data yet.  We'll
                 // catch it at the packet output phase
 
@@ -317,12 +325,14 @@ public class OggReader extends FilterInputStream {
                     // at packet out
                     while (i < 2) {
                         result = streamState.packetout(packet);
-                        if (result == 0)
+                        if (result == 0) {
                             break;
-                        if (result == -1)
+                        }
+                        if (result == -1) {
                             // Uh oh; data at some point was corrupted or missing!
                             // We can't tolerate that in a header.  Die.
                             throw new Exception("Corrupt secondary header. Exiting.");
+                        }
                         info.synthesis_headerin(comment, packet);
                         i++;
                     }
@@ -335,10 +345,12 @@ public class OggReader extends FilterInputStream {
             bytes = in.read(buffer, index, 4096);
 
             // NOTE: This is a bugfix. read will return -1 which will mess up syncState.
-            if (bytes < 0)
+            if (bytes < 0) {
                 bytes = 0;
-            if (bytes == 0 && i < 2)
+            }
+            if (bytes == 0 && i < 2) {
                 throw new Exception("End of file before finding all Vorbis headers!");
+            }
             syncState.wrote(bytes);
         }
 
@@ -361,8 +373,9 @@ public class OggReader extends FilterInputStream {
         // check the endianes of the computer.
         final boolean bigEndian = ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN;
 
-        if (block.synthesis(packet) == 0)
+        if (block.synthesis(packet) == 0) {
             dspState.synthesis_blockin(block);
+        }
 
         // **pcm is a multichannel float vector.  In stereo, for
         // example, pcm[0] is left, and pcm[1] is right.  samples is
