@@ -53,6 +53,7 @@ public class PojoEventSystem implements EventSystem {
     @Override
     public void registerEventHandler(EventHandlerSystem handler) {
         Class handlerClass = handler.getClass();
+        // TODO: Support private methods
         if (!Modifier.isPublic(handlerClass.getModifiers())) {
             logger.warning(String.format("Cannot register handler %s, must be public", handler.getClass().getName()));
             return;

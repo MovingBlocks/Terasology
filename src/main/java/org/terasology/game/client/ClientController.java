@@ -37,12 +37,12 @@ public class ClientController implements EventHandlerSystem {
     private Vector2f lookInput = new Vector2f();
 
     //private final Map<Integer, BindTarget> keybinds = new HashMap<Integer, BindTarget>();
-    private Map<String, BindInfo> buttonBinds = Maps.newHashMap();
+    private Map<String, BindButton> buttonBinds = Maps.newHashMap();
 
-    private Map<Integer, BindInfo> keyBinds = Maps.newHashMap();
-    private Map<Integer, BindInfo> mouseButtonBinds = Maps.newHashMap();
-    private BindInfo mouseWheelUpBind;
-    private BindInfo mouseWheelDownBind;
+    private Map<Integer, BindButton> keyBinds = Maps.newHashMap();
+    private Map<Integer, BindButton> mouseButtonBinds = Maps.newHashMap();
+    private BindButton mouseWheelUpBind;
+    private BindButton mouseWheelDownBind;
 
     private IWorldProvider worldProvider;
     private LocalPlayer localPlayer;
@@ -58,23 +58,29 @@ public class ClientController implements EventHandlerSystem {
         REPLACE_THIS_WITH_CONFIG();
     }
 
-    public void registerBindButton(String bindId) {
-        BindInfo info = new BindInfo(bindId, new BindButtonEvent());
-        buttonBinds.put(bindId, info);
+    public BindButton registerBindButton(String bindId) {
+        BindButton bind = new BindButton(bindId, new BindButtonEvent());
+        buttonBinds.put(bindId, bind);
+        return bind;
     }
 
-    public void registerBindButton(String bindId, BindButtonEvent event) {
-        BindInfo info = new BindInfo(bindId, event);
-        buttonBinds.put(bindId, info);
+    public BindButton registerBindButton(String bindId, BindButtonEvent event) {
+        BindButton bind = new BindButton(bindId, event);
+        buttonBinds.put(bindId, bind);
+        return bind;
+    }
+
+    public BindButton getBindButton(String bindId) {
+        return buttonBinds.get(bindId);
     }
 
     public void linkBindButtonToKey(int key, String bindId) {
-        BindInfo bindInfo = buttonBinds.get(bindId);
+        BindButton bindInfo = buttonBinds.get(bindId);
         keyBinds.put(key, bindInfo);
     }
 
     public void linkBindButtonToMouse(int mouseButton, String bindId) {
-        BindInfo bindInfo = buttonBinds.get(bindId);
+        BindButton bindInfo = buttonBinds.get(bindId);
         mouseButtonBinds.put(mouseButton, bindInfo);
     }
 
@@ -88,12 +94,6 @@ public class ClientController implements EventHandlerSystem {
 
     public void update(float delta) {
         updateTarget();
-
-        // TODO: GUI should actually determine whether it has consumed the input (or it should be blocked)
-        UIDisplayWindow focusWindow = GUIManager.getInstance().getFocusedWindow();
-        boolean consumedByUI = focusWindow != null && focusWindow.isVisible() && focusWindow.isModal();
-
-        //updateCameraTarget();
         processMouseInput(delta);
         processKeyboardInput(delta);
     }
@@ -111,7 +111,7 @@ public class ClientController implements EventHandlerSystem {
 
         // TODO: This will change when camera are handled better (via a component)
         Camera camera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
-        // TODO: Check for non-block targets one we have support for that
+        // TODO: Check for non-block targets once we have support for that
 
         RayBlockIntersection.Intersection hitInfo = BlockRaytracer.trace(camera.getPosition(), camera.getViewingDirection(), worldProvider);
         Vector3i newBlockPos = (hitInfo != null) ? hitInfo.getBlockPosition() : null;
@@ -136,18 +136,18 @@ public class ClientController implements EventHandlerSystem {
                 boolean buttonDown = Mouse.getEventButtonState();
                 boolean consumed = sendMouseEvent(button, buttonDown, delta);
 
-                BindInfo bind = mouseButtonBinds.get(button);
+                BindButton bind = mouseButtonBinds.get(button);
                 if (bind != null) {
-                    bind.invoke(buttonDown, delta, consumed, GUIManager.getInstance().isConsumingInput());
+                    bind.updateBindState(buttonDown, delta, target, localPlayer.getEntity(), consumed, GUIManager.getInstance().isConsumingInput());
                 }
             } else if (Mouse.getEventDWheel() != 0) {
                 int wheelMoved = Mouse.getEventDWheel();
                 boolean consumed = sendMouseWheelEvent(wheelMoved, delta);
 
-                BindInfo bind = (wheelMoved > 0) ? mouseWheelUpBind : mouseWheelDownBind;
+                BindButton bind = (wheelMoved > 0) ? mouseWheelUpBind : mouseWheelDownBind;
                 if (bind != null) {
-                    bind.invoke(true, delta, consumed, GUIManager.getInstance().isConsumingInput());
-                    bind.invoke(false, delta, consumed, GUIManager.getInstance().isConsumingInput());
+                    bind.updateBindState(true, delta, target, localPlayer.getEntity(), consumed, GUIManager.getInstance().isConsumingInput());
+                    bind.updateBindState(false, delta, target, localPlayer.getEntity(), consumed, GUIManager.getInstance().isConsumingInput());
                 }
             }
         }
@@ -178,9 +178,9 @@ public class ClientController implements EventHandlerSystem {
             boolean consumed = sendKeyEvent(key, state, delta);
 
             // Update bind
-            BindInfo bind = keyBinds.get(key);
+            BindButton bind = keyBinds.get(key);
             if (bind != null && !Keyboard.isRepeatEvent()) {
-                bind.invoke(Keyboard.getEventKeyState(), delta, consumed, GUIManager.getInstance().isConsumingInput());
+                bind.updateBindState(Keyboard.getEventKeyState(), delta, target, localPlayer.getEntity(), consumed, GUIManager.getInstance().isConsumingInput());
             }
         }
     }
@@ -309,46 +309,6 @@ public class ClientController implements EventHandlerSystem {
 
     }
 
-    private class BindInfo {
-
-        private BindButtonEvent buttonEvent;
-        private int downInputs = 0;
-        private String id;
-
-        public BindInfo(String id, BindButtonEvent event) {
-            this.id = id;
-            this.buttonEvent = event;
-        }
-
-        public boolean invoke(boolean pressed, float delta, boolean keyConsumed, boolean guiOnly) {
-            if (pressed) {
-                if (downInputs++ == 0) {
-                    if (guiOnly) {
-                        GUIManager.getInstance().processBindButton(id, pressed);
-                        keyConsumed = true;
-                    }
-                    if (!keyConsumed) {
-                        buttonEvent.prepare(id, ButtonState.DOWN, delta, target);
-                        localPlayer.getEntity().send(buttonEvent);
-                        keyConsumed = buttonEvent.isConsumed();
-                    }
-                }
-            } else if (downInputs != 0) {
-                if (--downInputs == 0) {
-                    if (guiOnly) {
-                        GUIManager.getInstance().processBindButton(id, pressed);
-                        keyConsumed = true;
-                    }
-                    if (!keyConsumed) {
-                        buttonEvent.prepare(id, ButtonState.UP, delta, target);
-                        localPlayer.getEntity().send(buttonEvent);
-                        keyConsumed = buttonEvent.isConsumed();
-                    }
-                }
-            }
-            return keyConsumed;
-        }
-    }
 }
 
 
