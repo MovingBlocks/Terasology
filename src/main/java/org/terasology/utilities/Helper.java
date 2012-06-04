@@ -43,7 +43,7 @@ public final class Helper {
      * @return True if the flag is set
      */
     public static boolean isFlagSet(byte value, short index) {
-        return (value & 1 << index) != 0;
+        return (value & (1 << index)) != 0;
     }
 
     /**
@@ -54,7 +54,7 @@ public final class Helper {
      * @return The byte value containing the modified flag
      */
     public static byte setFlag(byte value, short index) {
-        return (byte) (value | 1 << index);
+        return (byte) (value | (1 << index));
     }
 
     public static void readMatrix(int type, Matrix4f target) {

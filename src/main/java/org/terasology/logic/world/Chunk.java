@@ -15,21 +15,13 @@
  */
 package org.terasology.logic.world;
 
-import java.util.ArrayList;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
-
-import javax.vecmath.Matrix3f;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
-
+import com.bulletphysics.collision.shapes.BvhTriangleMeshShape;
+import com.bulletphysics.collision.shapes.IndexedMesh;
+import com.bulletphysics.collision.shapes.TriangleIndexVertexArray;
+import com.bulletphysics.dynamics.RigidBody;
+import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
+import com.bulletphysics.linearmath.DefaultMotionState;
+import com.bulletphysics.linearmath.Transform;
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
@@ -49,13 +41,18 @@ import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 import org.terasology.utilities.Helper;
 
-import com.bulletphysics.collision.shapes.BvhTriangleMeshShape;
-import com.bulletphysics.collision.shapes.IndexedMesh;
-import com.bulletphysics.collision.shapes.TriangleIndexVertexArray;
-import com.bulletphysics.dynamics.RigidBody;
-import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
-import com.bulletphysics.linearmath.DefaultMotionState;
-import com.bulletphysics.linearmath.Transform;
+import javax.vecmath.Matrix3f;
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.util.ArrayList;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks
@@ -115,11 +112,11 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
     }
 
     public static String getChunkFileName(Vector3i v) {
-        return Integer.toString(v.hashCode(),36);
+        return Integer.toString(v.hashCode(), 36);
     }
 
     public static String getChunkFileNameFromId(int id) {
-        return Integer.toString(id,36);
+        return Integer.toString(id, 36);
     }
 
     public Chunk() {
@@ -147,10 +144,10 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
     }
 
     public boolean generate() {
-        if (isFresh())
-        {
-            for (ChunkGenerator gen : _parent.getGeneratorManager().getChunkGenerators())
+        if (isFresh()) {
+            for (ChunkGenerator gen : _parent.getGeneratorManager().getChunkGenerators()) {
                 gen.generate(this);
+            }
             generateSunlight();
             setFresh(false);
             return true;
@@ -159,27 +156,34 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
     }
 
     public void updateLight() {
-        if (isFresh() || !isLightDirty())
+        if (isFresh() || !isLightDirty()) {
             return;
-        for (int x = 0; x < CHUNK_DIMENSION_X; x++)
-            for (int z = 0; z < CHUNK_DIMENSION_Z; z++)
-                for (int y = CHUNK_DIMENSION_Y - 1; y >= 0; y--)
-                {
+        }
+        for (int x = 0; x < CHUNK_DIMENSION_X; x++) {
+            for (int z = 0; z < CHUNK_DIMENSION_Z; z++) {
+                for (int y = CHUNK_DIMENSION_Y - 1; y >= 0; y--) {
                     byte blockValue = getBlock(x, y, z);
                     byte lightValue = getLight(x, y, z, LIGHT_TYPE.SUN);
-                    if (!BlockManager.getInstance().getBlock(blockValue).isTranslucent())
+                    if (!BlockManager.getInstance().getBlock(blockValue).isTranslucent()) {
                         continue;
+                    }
+
                     // Spread the sunlight in translucent blocks with a light value greater than zero.
-                    if (lightValue > 0)
+                    if (lightValue > 0) {
                         spreadLight(x, y, z, lightValue, LIGHT_TYPE.SUN);
+                    }
                 }
+            }
+        }
         setLightDirty(false);
     }
 
     private void generateSunlight() {
-        for (int x = 0; x < CHUNK_DIMENSION_X; x++)
-            for (int z = 0; z < CHUNK_DIMENSION_Z; z++)
+        for (int x = 0; x < CHUNK_DIMENSION_X; x++) {
+            for (int z = 0; z < CHUNK_DIMENSION_Z; z++) {
                 refreshSunlightAtLocalPos(x, z, false, false);
+            }
+        }
     }
 
     public void refreshSunlightAtLocalPos(int x, int z, boolean spreadLight, boolean refreshSunlight) {
@@ -190,35 +194,39 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
             Block b = BlockManager.getInstance().getBlock(blockId);
 
             // Remember if this "column" is covered
-            if (!b.isInvisible() && b.getBlockForm() != Block.BLOCK_FORM.BILLBOARD && !covered)
+            if (!b.isInvisible() && b.getBlockForm() != Block.BLOCK_FORM.BILLBOARD && !covered) {
                 covered = true;
+            }
 
             byte oldValue = _sunlight.get(x, y, z);
             byte newValue;
 
             // If the column is not covered...
             if (!covered) {
-                if (b.isInvisible() || b.getBlockForm() == Block.BLOCK_FORM.BILLBOARD)
+                if (b.isInvisible() || b.getBlockForm() == Block.BLOCK_FORM.BILLBOARD) {
                     _sunlight.set(x, y, z, (byte) 15);
-                else _sunlight.set(x, y, z, (byte) 0x0);
+                } else {
+                    _sunlight.set(x, y, z, (byte) 0x0);
+                }
                 newValue = _sunlight.get(x, y, z);
                 // Otherwise the column is covered. Don't generate any light in the cells...
-            }
-            else {
+            } else {
                 _sunlight.set(x, y, z, (byte) 0);
                 // Update the sunlight at the current position (check the surrounding cells)
-                if (refreshSunlight)
+                if (refreshSunlight) {
                     refreshLightAtLocalPos(x, y, z, LIGHT_TYPE.SUN);
+                }
                 newValue = _sunlight.get(x, y, z);
             }
-            if (spreadLight && oldValue > newValue)
+            if (spreadLight && oldValue > newValue) {
                 unspreadLight(x, y, z, oldValue, Chunk.LIGHT_TYPE.SUN);
-            else if (spreadLight && oldValue < newValue)
+            } else if (spreadLight && oldValue < newValue) {
                 /*
                 * Spread sunlight if the new light value is more intense
                 * than the old value.
                 */
                 spreadLight(x, y, z, newValue, LIGHT_TYPE.SUN);
+            }
         }
     }
 
@@ -516,8 +524,7 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
         * Before starting the illumination process, make sure that the neighbor chunks
         * are present and fully generated.
         */
-        for (Chunk neighbor : neighbors)
-        {
+        for (Chunk neighbor : neighbors) {
             if (neighbor != null) {
                 neighbor.generate();
             }
@@ -582,8 +589,7 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
 
     public boolean generateVBOs() {
         if (_newMeshes != null) {
-            for (ChunkMesh _newMeshe : _newMeshes)
-            {
+            for (ChunkMesh _newMeshe : _newMeshes) {
                 _newMeshe.generateVBOs();
             }
 
@@ -606,8 +612,9 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
                     _newMeshes = newMesh;
 
                     if (oldNewMesh != null) {
-                        for (ChunkMesh element : oldNewMesh)
+                        for (ChunkMesh element : oldNewMesh) {
                             element.dispose();
+                        }
                     }
                 }
             } finally {
@@ -631,8 +638,7 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
                             _rigidBody = null;
 
                             if (oldActiveMesh != null) {
-                                for (ChunkMesh element : oldActiveMesh)
-                                {
+                                for (ChunkMesh element : oldActiveMesh) {
                                     element.dispose();
                                 }
                             }
@@ -723,14 +729,17 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
         _lock.lock();
 
         try {
-            if (_disposed)
+            if (_disposed) {
                 return;
+            }
 
-            if (_activeMeshes != null) for (ChunkMesh _activeMeshe : _activeMeshes)
+            if (_activeMeshes != null) for (ChunkMesh _activeMeshe : _activeMeshes) {
                 _activeMeshe.dispose();
+            }
             if (_newMeshes != null) {
-                for (ChunkMesh _newMeshe : _newMeshes)
+                for (ChunkMesh _newMeshe : _newMeshes) {
                     _newMeshe.dispose();
+                }
             }
 
             _activeMeshes = null;
@@ -749,14 +758,17 @@ public class Chunk implements Comparable<Chunk>, Externalizable {
         _lock.lock();
 
         try {
-            if (_disposed)
+            if (_disposed) {
                 return;
+            }
 
-            if (_activeMeshes != null) for (ChunkMesh _activeMeshe : _activeMeshes)
+            if (_activeMeshes != null) for (ChunkMesh _activeMeshe : _activeMeshes) {
                 _activeMeshe.dispose();
+            }
             if (_newMeshes != null) {
-                for (ChunkMesh _newMeshe : _newMeshes)
+                for (ChunkMesh _newMeshe : _newMeshes) {
                     _newMeshe.dispose();
+                }
             }
 
             _disposed = true;

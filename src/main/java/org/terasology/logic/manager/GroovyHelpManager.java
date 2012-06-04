@@ -1,21 +1,7 @@
 package org.terasology.logic.manager;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-
-import javax.vecmath.Vector3f;
-
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
 import org.terasology.components.MinionBarComponent;
 import org.terasology.entityFactory.GelatinousCubeFactory;
 import org.terasology.entitySystem.EntityManager;
@@ -33,8 +19,12 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 
-import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
+import javax.vecmath.Vector3f;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -47,18 +37,17 @@ public class GroovyHelpManager {
 
     private GroovyHelp groovyhelp = new GroovyHelp();
 
-    public GroovyHelpManager()
-    {}
+    public GroovyHelpManager() {
+    }
 
-    public HashMap<String,String> getHelpCommands() throws IOException
-    {
-        HashMap<String,String> commandlist = new HashMap<String, String>();
+    public HashMap<String, String> getHelpCommands() throws IOException {
+        HashMap<String, String> commandlist = new HashMap<String, String>();
         Gson gson = new Gson();
         String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data" + File.separator + "help" + File.separator + "commands" + File.separator + "commands.json";
         JsonReader reader = new JsonReader(new FileReader(helpFile));
         reader.beginArray();
         while (reader.hasNext()) {
-            groovyhelp = gson.fromJson(reader,GroovyHelp.class);
+            groovyhelp = gson.fromJson(reader, GroovyHelp.class);
             commandlist.put(groovyhelp.getCommandName(), groovyhelp.getCommandDesc());
         }
         reader.endArray();
@@ -66,11 +55,10 @@ public class GroovyHelpManager {
         return commandlist;
     }
 
-    public String[] getGroovyCommands(){
+    public String[] getGroovyCommands() {
         Method[] methods = GroovyManager.CommandHelper.class.getDeclaredMethods();
         String[] tempval = new String[methods.length];
-        for (int i=0;i<methods.length;i++)
-        {
+        for (int i = 0; i < methods.length; i++) {
             tempval[i] = methods[i].getName();
         }
         Set<String> set = new HashSet<String>(Arrays.asList(tempval));
@@ -79,87 +67,80 @@ public class GroovyHelpManager {
         return retval;
     }
 
-    public GroovyHelp readCommandHelp(String commandname)
-    {
-        try
-        {
+    public GroovyHelp readCommandHelp(String commandname) {
+        try {
             Gson gson = new Gson();
             String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data" + File.separator + "help" + File.separator + "commands" + File.separator + "commands.json";
             JsonReader reader = new JsonReader(new FileReader(helpFile));
             reader.beginArray();
             while (reader.hasNext()) {
-                groovyhelp = gson.fromJson(reader,GroovyHelp.class);
-                if(groovyhelp.getCommandName().equals(commandname))
-                { return groovyhelp; }
+                groovyhelp = gson.fromJson(reader, GroovyHelp.class);
+                if (groovyhelp.getCommandName().equals(commandname)) {
+                    return groovyhelp;
+                }
             }
             reader.endArray();
             reader.close();
 
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public HashMap<Byte,String> getGroovyBlocks()
-    {
-        HashMap<Byte,String> retval = new HashMap<Byte, String>();
-        String[] endfilter = {"FRONT","BACK","TOP","BOTTOM","LEFT","RIGHT"};
+    public HashMap<Byte, String> getGroovyBlocks() {
+        HashMap<Byte, String> retval = new HashMap<Byte, String>();
+        String[] endfilter = {"FRONT", "BACK", "TOP", "BOTTOM", "LEFT", "RIGHT"};
         String fampref = "org.terasology.model.blocks.";
         String tempval = "";
         boolean nodup = true;
-        for(byte i = -127;i<127;i++){
+        for (byte i = -127; i < 127; i++) {
             Block b = BlockManager.getInstance().getBlock(i);
-            if(b.getId() != 0){
-                if(tempval.length() > 0)
-                {
-                    if(b.getTitle().startsWith(tempval)){
+            if (b.getId() != 0) {
+                if (tempval.length() > 0) {
+                    if (b.getTitle().startsWith(tempval)) {
                         nodup = false;
-                    }
-                    else{
+                    } else {
                         nodup = true;
                         tempval = "";
                     }
-                }
-                else{
-                    for (String element : endfilter)
-                    {
-                        if(b.getTitle().endsWith(element)){
-                            tempval = b.getTitle().substring(0,b.getTitle().length() - element.length());
+                } else {
+                    for (String element : endfilter) {
+                        if (b.getTitle().endsWith(element)) {
+                            tempval = b.getTitle().substring(0, b.getTitle().length() - element.length());
                         }
                     }
                 }
-                if(nodup){
+                if (nodup) {
                     String tempfam = b.getBlockFamily().toString().split("@")[0];
-                    if(tempfam.startsWith(fampref)){
+                    if (tempfam.startsWith(fampref)) {
                         tempfam = tempfam.substring(fampref.length(), tempfam.length());
                     }
-                    if(tempval.length() < 1){
-                        retval.put(b.getId(),b.getTitle() + " and belongs to " + tempfam);
-                    }
-                    else{
-                        retval.put(b.getId(),tempval + " and belongs to " + tempfam);
+                    if (tempval.length() < 1) {
+                        retval.put(b.getId(), b.getTitle() + " and belongs to " + tempfam);
+                    } else {
+                        retval.put(b.getId(), tempval + " and belongs to " + tempfam);
                     }
                 }
             }
-            if(i == 127){break;}
+            if (i == 127) {
+                break;
+            }
         }
 
         return retval;
     }
 
-    public void spawnCube(){
+    public void spawnCube() {
         EntityManager entMan = CoreRegistry.get(EntityManager.class);
-        if(entMan != null){
+        if (entMan != null) {
             GelatinousCubeFactory factory = new GelatinousCubeFactory();
             factory.setEntityManager(entMan);
 
             LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
             MinionBarComponent inventory = localPlayer.getEntity().getComponent(MinionBarComponent.class);
             int freeSlot = inventory.MinionSlots.indexOf(EntityRef.NULL);
-            if(freeSlot != -1) {
+            if (freeSlot != -1) {
                 RayBlockIntersection.Intersection blockIntersection = calcSelectedBlock();
                 if (blockIntersection != null) {
                     Vector3i centerPos = blockIntersection.getBlockPosition();
@@ -172,16 +153,16 @@ public class GroovyHelpManager {
         }
     }
 
-    public void spawnCube(int slot){
+    public void spawnCube(int slot) {
         EntityManager entMan = CoreRegistry.get(EntityManager.class);
-        if(entMan != null){
+        if (entMan != null) {
             GelatinousCubeFactory factory = new GelatinousCubeFactory();
             factory.setEntityManager(entMan);
 
             LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
             MinionBarComponent inventory = localPlayer.getEntity().getComponent(MinionBarComponent.class);
             int freeSlot = inventory.MinionSlots.indexOf(EntityRef.NULL);
-            if(freeSlot != -1) {
+            if (freeSlot != -1) {
                 RayBlockIntersection.Intersection blockIntersection = calcSelectedBlock();
                 if (blockIntersection != null) {
                     Vector3i centerPos = blockIntersection.getBlockPosition();
@@ -242,11 +223,11 @@ public class GroovyHelpManager {
         return null;
     }
 
-    public  ArrayList<Prefab> getItems(){
+    public ArrayList<Prefab> getItems() {
         PrefabManager prefMan = CoreRegistry.get(PrefabManager.class);
         ArrayList<Prefab> prefabs = new ArrayList<Prefab>();
-        Iterator<Prefab> it =  prefMan.listPrefabs().iterator();
-        while(it.hasNext()){
+        Iterator<Prefab> it = prefMan.listPrefabs().iterator();
+        while (it.hasNext()) {
             Prefab prefab = it.next();
             //grabb all
             prefabs.add(prefab);

@@ -15,20 +15,18 @@
  */
 package org.terasology.rendering.physics;
 
-import java.nio.FloatBuffer;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.vecmath.Matrix3f;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
-
+import com.bulletphysics.collision.broadphase.BroadphaseInterface;
+import com.bulletphysics.collision.broadphase.DbvtBroadphase;
+import com.bulletphysics.collision.dispatch.CollisionDispatcher;
+import com.bulletphysics.collision.dispatch.CollisionObject;
+import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
+import com.bulletphysics.collision.shapes.BoxShape;
+import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
+import com.bulletphysics.dynamics.RigidBody;
+import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
+import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
+import com.bulletphysics.linearmath.DefaultMotionState;
+import com.bulletphysics.linearmath.Transform;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.AssetType;
@@ -53,18 +51,14 @@ import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 
-import com.bulletphysics.collision.broadphase.BroadphaseInterface;
-import com.bulletphysics.collision.broadphase.DbvtBroadphase;
-import com.bulletphysics.collision.dispatch.CollisionDispatcher;
-import com.bulletphysics.collision.dispatch.CollisionObject;
-import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
-import com.bulletphysics.collision.shapes.BoxShape;
-import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
-import com.bulletphysics.dynamics.RigidBody;
-import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
-import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
-import com.bulletphysics.linearmath.DefaultMotionState;
-import com.bulletphysics.linearmath.Transform;
+import javax.vecmath.Matrix3f;
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
+import java.nio.FloatBuffer;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Renders blocks using the Bullet physics library.
@@ -106,9 +100,11 @@ public class BulletPhysicsRenderer implements IGameObject {
             Vector3f blockPlayer = new Vector3f();
             tMatrix.get(blockPlayer);
             LocationComponent loc = target.getComponent(LocationComponent.class);
-            if(loc != null)
+            if (loc != null) {
                 blockPlayer.sub(loc.getWorldPosition());
-            else blockPlayer.sub(new Vector3f());
+            } else {
+                blockPlayer.sub(new Vector3f());
+            }
             return blockPlayer.length();
         }
 
@@ -122,11 +118,13 @@ public class BulletPhysicsRenderer implements IGameObject {
 
         @Override
         public int compareTo(BlockRigidBody blockRigidBody) {
-            if (blockRigidBody.calcAgeInMs() == calcAgeInMs())
+            if (blockRigidBody.calcAgeInMs() == calcAgeInMs()) {
                 return 0;
-            if (blockRigidBody.calcAgeInMs() > calcAgeInMs())
+            } else if (blockRigidBody.calcAgeInMs() > calcAgeInMs()) {
                 return 1;
-            else return -1;
+            } else {
+                return -1;
+            }
         }
     }
 
@@ -244,14 +242,17 @@ public class BulletPhysicsRenderer implements IGameObject {
                 RigidBody c = chunk.getRigidBody();
                 if (c != null) {
                     newBodies.add(c);
-                    if (!_chunks.contains(c))
+                    if (!_chunks.contains(c)) {
                         _discreteDynamicsWorld.addRigidBody(c);
+                    }
                 }
             }
         }
-        for (RigidBody body : _chunks)
-            if (!newBodies.contains(body))
+        for (RigidBody body : _chunks) {
+            if (!newBodies.contains(body)) {
                 _discreteDynamicsWorld.removeRigidBody(body);
+            }
+        }
         _chunks = newBodies;
     }
 
@@ -314,37 +315,39 @@ public class BulletPhysicsRenderer implements IGameObject {
         LocalPlayerComponent localPlayerComp = playerent.getComponent(LocalPlayerComponent.class);
         MinionBarComponent inventory = null;
         EntityRef closestminion = null;
-        if(localPlayerComp.minionMode)
+        if (localPlayerComp.minionMode) {
             inventory = playerent.getComponent(MinionBarComponent.class);
-        for (int i = _blocks.size() - 1; i >= 0; i--)
-        {
+        }
+
+        for (int i = _blocks.size() - 1; i >= 0; i--) {
             BlockRigidBody b = _blocks.get(i);
-            if (b._temporary)
+            if (b._temporary) {
                 continue;
+            }
+
             float closestDist = 99999;
-            if(inventory != null)
-            {
-            //check for the closest minion
+            if (inventory != null) {
+                //check for the closest minion
                 Iterator<EntityRef> it = inventory.MinionSlots.iterator();
-                while(it.hasNext())
-                {
+                while (it.hasNext()) {
                     EntityRef minion = it.next();
-                    if(b.distanceToEntity(minion) < closestDist)
-                    {
+                    if (b.distanceToEntity(minion) < closestDist) {
                         closestDist = b.distanceToEntity(minion);
                         closestminion = minion;
                     }
                 }
             }
-            if(localPlayerComp.minionMode)
-                if(closestDist < 8 && !b._picked)
+            if (localPlayerComp.minionMode) {
+                if (closestDist < 8 && !b._picked) {
                     b._picked = true;
-            else {
+                }
+            } else {
                 closestDist = b.distanceToPlayer();
                 // Check if the block is close enough to the player
-                if (b.distanceToPlayer() < 8.0f && !b._picked)
+                if (b.distanceToPlayer() < 8.0f && !b._picked) {
                     // Mark it as picked and remove it from the simulation
                     b._picked = true;
+                }
             }
             // Block was marked as being picked
             if (b._picked && closestDist < 32.0f) {
@@ -356,29 +359,36 @@ public class BulletPhysicsRenderer implements IGameObject {
                     t.getMatrix(tMatrix);
                     Vector3f blockPlayer = new Vector3f();
                     tMatrix.get(blockPlayer);
-                    if(localPlayerComp.minionMode && closestminion != null){
+                    if (localPlayerComp.minionMode && closestminion != null) {
                         LocationComponent minionloc = closestminion.getComponent(LocationComponent.class);
-                        if(minionloc != null) blockPlayer.sub(minionloc.getWorldPosition());
-                        else blockPlayer.sub(new Vector3f());
+                        if (minionloc != null) {
+                            blockPlayer.sub(minionloc.getWorldPosition());
+                        } else {
+                            blockPlayer.sub(new Vector3f());
+                        }
+                    } else {
+                        blockPlayer.sub(new Vector3f(player.getPosition()));
                     }
-                    else blockPlayer.sub(new Vector3f(player.getPosition()));
                     blockPlayer.normalize();
                     blockPlayer.scale(-16000f);
                     b.applyCentralImpulse(blockPlayer);
-                }
-                else {
+                } else {
                     // TODO: Handle full inventories
                     // TODO: Loot blocks should be entities
                     // Block was looted (and reached the player)
                     Block block = BlockManager.getInstance().getBlock(b.getType());
                     EntityRef blockItem = _blockItemFactory.newInstance(block.getBlockFamily());
-                    if(localPlayerComp.minionMode)
-                        if(closestminion != null)
+                    if (localPlayerComp.minionMode) {
+                        if (closestminion != null) {
                             closestminion.send(new ReceiveItemEvent(blockItem));
-                    else playerent.send(new ReceiveItemEvent(blockItem));
+                        }
+                    } else {
+                        playerent.send(new ReceiveItemEvent(blockItem));
+                    }
                     ItemComponent itemComp = blockItem.getComponent(ItemComponent.class);
-                    if (itemComp != null && !itemComp.container.exists())
+                    if (itemComp != null && !itemComp.container.exists()) {
                         blockItem.destroy();
+                    }
                     AudioManager.play(new AssetUri(AssetType.SOUND, "engine:Loot"));
                     _blocks.remove(i);
                     _discreteDynamicsWorld.removeRigidBody(b);
@@ -388,14 +398,16 @@ public class BulletPhysicsRenderer implements IGameObject {
     }
 
     private void removeTemporaryBlocks() {
-        if (_blocks.size() > 0)
+        if (_blocks.size() > 0) {
             for (int i = _blocks.size() - 1; i >= 0; i--) {
-                if (!_blocks.get(i)._temporary)
+                if (!_blocks.get(i)._temporary) {
                     continue;
+                }
                 if (!_blocks.get(i).isActive() || _blocks.get(i).calcAgeInMs() > 10000) {
                     _discreteDynamicsWorld.removeRigidBody(_blocks.get(i));
                     _blocks.remove(i);
                 }
             }
+        }
     }
 }
