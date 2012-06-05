@@ -2,7 +2,6 @@ package org.terasology.game.client;
 
 import com.google.common.collect.Lists;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.events.input.BindButtonEvent;
 import org.terasology.logic.manager.GUIManager;
 
 import java.util.List;
@@ -16,13 +15,14 @@ import java.util.List;
  */
 public class BindButton {
 
-    private BindButtonEvent buttonEvent;
-    private int pressedButtons = 0;
     private String id;
-    private List<BindButtonSubscriber> subscribers = Lists.newArrayList();
-    private EventMode mode = EventMode.BOTH;
+    private BindButtonEvent buttonEvent;
+    private int activeInputs = 0;
 
-    public static enum EventMode {
+    private List<BindButtonSubscriber> subscribers = Lists.newArrayList();
+    private ActivateMode mode = ActivateMode.BOTH;
+
+    public static enum ActivateMode {
         PRESS(true, false),
         RELEASE(false, true),
         BOTH(true, true);
@@ -30,7 +30,7 @@ public class BindButton {
         private boolean activatedOnPress;
         private boolean activatedOnRelease;
 
-        private EventMode(boolean activatedOnPress, boolean activatedOnRelease) {
+        private ActivateMode(boolean activatedOnPress, boolean activatedOnRelease) {
             this.activatedOnPress = activatedOnPress;
             this.activatedOnRelease = activatedOnRelease;
         }
@@ -45,7 +45,7 @@ public class BindButton {
     }
 
     /**
-     * Creates the button. Package-private, as should be created through the ClientController
+     * Creates the button. Package-private, as should be created through the InputSystem
      *
      * @param id
      * @param event
@@ -55,16 +55,16 @@ public class BindButton {
         this.buttonEvent = event;
     }
 
-    public void setMode(EventMode mode) {
+    public void setMode(ActivateMode mode) {
         this.mode = mode;
     }
 
-    public EventMode getMode() {
+    public ActivateMode getMode() {
         return mode;
     }
 
     public ButtonState getState() {
-        return (pressedButtons > 0) ? ButtonState.DOWN : ButtonState.UP;
+        return (activeInputs > 0) ? ButtonState.DOWN : ButtonState.UP;
     }
 
     /**
@@ -98,8 +98,8 @@ public class BindButton {
      */
     boolean updateBindState(boolean pressed, float delta, EntityRef target, EntityRef localPlayer, boolean keyConsumed, boolean guiOnly) {
         if (pressed) {
-            pressedButtons++;
-            if (pressedButtons == 0 && mode.isActivatedOnPress()) {
+            activeInputs++;
+            if (activeInputs == 1 && mode.isActivatedOnPress()) {
                 if (guiOnly) {
                     GUIManager.getInstance().processBindButton(id, pressed);
                     keyConsumed = true;
@@ -113,9 +113,9 @@ public class BindButton {
                     keyConsumed = buttonEvent.isConsumed();
                 }
             }
-        } else if (pressedButtons != 0) {
-            pressedButtons--;
-            if (pressedButtons == 0  && mode.isActivatedOnRelease()) {
+        } else if (activeInputs != 0) {
+            activeInputs--;
+            if (activeInputs == 0  && mode.isActivatedOnRelease()) {
                 if (guiOnly) {
                     GUIManager.getInstance().processBindButton(id, pressed);
                     keyConsumed = true;

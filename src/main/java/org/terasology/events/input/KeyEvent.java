@@ -8,6 +8,7 @@ import org.terasology.game.client.ButtonState;
 public class KeyEvent extends ButtonEvent {
 
     private int key;
+    private ButtonState state;
 
     public KeyEvent(int key, ButtonState state, float delta, EntityRef target) {
         super(delta, target);
@@ -18,6 +19,10 @@ public class KeyEvent extends ButtonEvent {
 	public int getKey() {
 		return key;
 	}
+
+    public ButtonState getState() {
+        return state;
+    }
 
     public String getButtonName() {
         return "key:" + getKeyName();

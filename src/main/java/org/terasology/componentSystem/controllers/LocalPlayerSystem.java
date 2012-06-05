@@ -33,11 +33,9 @@ import org.terasology.events.DamageEvent;
 import org.terasology.events.NoHealthEvent;
 import org.terasology.events.OpenInventoryEvent;
 import org.terasology.events.input.KeyDownEvent;
-import org.terasology.events.input.KeyUpEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
-import org.terasology.game.client.BindTarget;
-import org.terasology.game.client.ClientController;
+import org.terasology.game.client.InputSystem;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
@@ -48,12 +46,10 @@ import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.model.structures.RayBlockIntersection;
-import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.DefaultCamera;
 import org.terasology.rendering.gui.menus.UIContainerScreen;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
-import org.terasology.rendering.world.WorldRenderer;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -112,7 +108,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     };
 	private EventSystem eventSystem;
     private EntityRef localPlayerRef;
-    private ClientController clientController;
+    private InputSystem inputSystem;
 
     
     @Override
@@ -569,9 +565,9 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     
     
     private void registerBindTargets() {
-		/*clientController = CoreRegistry.get(ClientController.class);
+		/*inputSystem = CoreRegistry.get(InputSystem.class);
 
-		clientController.bind(Keyboard.KEY_W, 
+		inputSystem.bind(Keyboard.KEY_W,
 				new BindTarget("engine", "MoveForward") {
 			public void start() {
 				goForward = true;
@@ -588,7 +584,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 			}
 		});
 		
-		clientController.bind(Keyboard.KEY_S, 
+		inputSystem.bind(Keyboard.KEY_S,
 				new BindTarget("engine", "MoveReverse") {
 			public void start() {
 				goBackward = true;
@@ -604,7 +600,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 			}
 	    });
 		
-		clientController.bind(Keyboard.KEY_A, 
+		inputSystem.bind(Keyboard.KEY_A,
 				new BindTarget("engine", "MoveLeft") {
 			public void start() {
 				goLeft = true;
@@ -620,7 +616,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 			}
 	    });
 		
-		clientController.bind(Keyboard.KEY_D, 
+		inputSystem.bind(Keyboard.KEY_D,
 				new BindTarget("engine", "MoveRight") {
 			public void start() {
 				goRight = true;
@@ -636,7 +632,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 			}
 	    });
 		
-		clientController.bind(Keyboard.KEY_SPACE, 
+		inputSystem.bind(Keyboard.KEY_SPACE,
 				new BindTarget("engine", "MoveUp") {
 			public void start() {
 				goUp = jump = true;
@@ -652,7 +648,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 			}
 	    });
 		
-		clientController.bind(Keyboard.KEY_C, 
+		inputSystem.bind(Keyboard.KEY_C,
 				new BindTarget("engine", "MoveDown") {
 			public void start() {
 				goDown = true;
@@ -668,7 +664,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 			}
 	    });
 		
-		clientController.bind(Keyboard.KEY_LSHIFT, 
+		inputSystem.bind(Keyboard.KEY_LSHIFT,
 				new BindTarget("engine", "MoveRun") {
 			public void start() {
 				running = true;

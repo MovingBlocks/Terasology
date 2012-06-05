@@ -8,11 +8,16 @@ import org.terasology.game.client.ButtonState;
 public class MouseButtonEvent extends ButtonEvent {
 
     private int button = 0;
+    private ButtonState state;
 
     public MouseButtonEvent(int button, ButtonState state, float delta, EntityRef target) {
         super(delta, target);
         this.state = state;
         this.button = button;
+    }
+
+    public ButtonState getState() {
+        return state;
     }
 
 	public int getButton() {

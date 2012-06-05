@@ -59,7 +59,8 @@ import org.terasology.events.input.binds.InventoryButton;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
-import org.terasology.game.client.ClientController;
+import org.terasology.game.client.BindButtonEvent;
+import org.terasology.game.client.InputSystem;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.*;
 import org.terasology.logic.mod.Mod;
@@ -111,7 +112,7 @@ public class StateSinglePlayer implements GameState {
     private EntityManager _entityManager;
     private ComponentSystemManager _componentSystemManager;
     private LocalPlayerSystem _localPlayerSys;
-    private ClientController _clientController;
+    private InputSystem _inputSystem;
 
     /* GAME LOOP */
     private boolean _pauseGame = false;
@@ -210,9 +211,9 @@ public class StateSinglePlayer implements GameState {
 
         BlockEntityRegistry blockEntityRegistry = new BlockEntityRegistry();
 
-        _clientController = new ClientController();
-        CoreRegistry.put(ClientController.class, _clientController);
-        _componentSystemManager.register(_clientController, "engine:ClientController");
+        _inputSystem = new InputSystem();
+        CoreRegistry.put(InputSystem.class, _inputSystem);
+        _componentSystemManager.register(_inputSystem, "engine:InputSystem");
         _componentSystemManager.register(blockEntityRegistry, "engine:BlockEntityRegistry");
         CoreRegistry.put(BlockEntityRegistry.class, blockEntityRegistry);
         _componentSystemManager.register(new CharacterMovementSystem(), "engine:CharacterMovementSystem");
@@ -328,14 +329,14 @@ public class StateSinglePlayer implements GameState {
 
     @Override
     public void handleInput(float delta) {
-        _clientController.update(delta);
+        _inputSystem.update(delta);
         /*
         processKeyboardInput();
         processMouseInput();
 
         // TODO: This should be handled outside of the state, need to fix the screens handling
         if (!screenHasFocus())  {
-            _clientController.update(delta);
+            _inputSystem.update(delta);
         } */
 
         if (screenHasFocus() || !shouldUpdateWorld()) {

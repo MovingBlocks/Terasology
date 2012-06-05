@@ -1,6 +1,7 @@
 package org.terasology.game.client;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -25,20 +26,27 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.world.WorldRenderer;
 
-import javax.vecmath.Vector2f;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-
-public class ClientController implements EventHandlerSystem {
+/**
+ * This system processes input, sending it out as events against the LocalPlayer entity.
+ *
+ * In addition to raw keyboard and mouse input, the system handles Bind Buttons and Bind Axis, which can be mapped
+ * to one or more inputs.
+ */
+public class InputSystem implements EventHandlerSystem {
     private Logger logger = Logger.getLogger(getClass().getName());
 
-    private double mouseSensititivy = Config.getInstance().getMouseSens();
-    private Vector2f lookInput = new Vector2f();
+    private float mouseSensitivity = (float)Config.getInstance().getMouseSens();
 
-    //private final Map<Integer, BindTarget> keybinds = new HashMap<Integer, BindTarget>();
+    private Map<String, BindAxis> axisLookup = Maps.newHashMap();
     private Map<String, BindButton> buttonBinds = Maps.newHashMap();
 
+    private List<BindAxis> axisBinds = Lists.newArrayList();
+
+    // Links between primitive inputs and bind buttons
     private Map<Integer, BindButton> keyBinds = Maps.newHashMap();
     private Map<Integer, BindButton> mouseButtonBinds = Maps.newHashMap();
     private BindButton mouseWheelUpBind;
@@ -102,10 +110,22 @@ public class ClientController implements EventHandlerSystem {
         }
     }
 
+    public BindAxis registerBindAxis(String id, BindButton positiveButton, BindButton negativeButton) {
+        return registerBindAxis(id, new BindAxisEvent(), positiveButton, negativeButton);
+    }
+
+    public BindAxis registerBindAxis(String id, BindAxisEvent event, BindButton positiveButton, BindButton negativeButton) {
+        BindAxis axis = new BindAxis(id, event, positiveButton, negativeButton);
+        axisBinds.add(axis);
+        axisLookup.put(id, axis);
+        return axis;
+    }
+
     public void update(float delta) {
         updateTarget();
         processMouseInput(delta);
         processKeyboardInput(delta);
+        processBindAxis(delta);
     }
 
     private void updateTarget() {
@@ -161,6 +181,14 @@ public class ClientController implements EventHandlerSystem {
                 }
             }
         }
+        int deltaX = Mouse.getDX();
+        if (deltaX != 0 && !GUIManager.getInstance().isConsumingInput()) {
+            localPlayer.getEntity().send(new MouseXAxisEvent(deltaX * mouseSensitivity, delta, target));
+        }
+        int deltaY = Mouse.getDY();
+        if (deltaY != 0 && !GUIManager.getInstance().isConsumingInput()) {
+            localPlayer.getEntity().send(new MouseYAxisEvent(deltaY * mouseSensitivity, delta, target));
+        }
     }
 
     @ReceiveEvent(components = LocalPlayerComponent.class, priority = ReceiveEvent.PRIORITY_HIGH)
@@ -181,6 +209,7 @@ public class ClientController implements EventHandlerSystem {
     }
 
     private void processKeyboardInput(float delta) {
+        boolean guiConsumingInput = GUIManager.getInstance().isConsumingInput();
         while (Keyboard.next()) {
             int key = Keyboard.getEventKey();
 
@@ -190,7 +219,7 @@ public class ClientController implements EventHandlerSystem {
             // Update bind
             BindButton bind = keyBinds.get(key);
             if (bind != null && !Keyboard.isRepeatEvent()) {
-                bind.updateBindState(Keyboard.getEventKeyState(), delta, target, localPlayer.getEntity(), consumed, GUIManager.getInstance().isConsumingInput());
+                bind.updateBindState(Keyboard.getEventKeyState(), delta, target, localPlayer.getEntity(), consumed, guiConsumingInput);
             }
         }
     }
@@ -202,6 +231,12 @@ public class ClientController implements EventHandlerSystem {
                 GUIManager.getInstance().processKeyboardInput(keyEvent.getKey());
             }
             keyEvent.consume();
+        }
+    }
+
+    private void processBindAxis(float delta) {
+        for (BindAxis axis : axisBinds) {
+            axis.update(localPlayer.getEntity(), delta, target);
         }
     }
 
@@ -228,7 +263,6 @@ public class ClientController implements EventHandlerSystem {
                 return false;
         }
 
-        logger.info("Sending event: " + event.getState() + ", " + event.getKeyName());
         localPlayer.getEntity().send(event);
         return event.isConsumed();
     }
@@ -257,43 +291,6 @@ public class ClientController implements EventHandlerSystem {
         localPlayer.getEntity().send(mouseWheelEvent);
         return mouseWheelEvent.isConsumed();
     }
-
-    // returns the *previously* bound target, or null if none was previously bound.
-    /*public BindTarget bind(int key, BindTarget target) {
-        return keybinds.put(key, target);
-    }
-
-    public BindTarget unbind(int key) {
-        return keybinds.remove(key);
-    } */
-
-    /*private BindTarget makeEventTarget(final String category,
-                                       final String description, final ReusableEvent downEvent,
-                                       final ReusableEvent upEvent, final ReusableEvent repeatEvent) {
-        return new BindTarget(category, description) {
-            public void start() {
-                if (downEvent != null) {
-                    downEvent.reset();
-                    localPlayer.getEntity().send(downEvent);
-                }
-            }
-
-            public void end() {
-                if (upEvent != null) {
-                    upEvent.reset();
-                    localPlayer.getEntity().send(upEvent);
-                }
-            }
-
-            public void repeat() {
-                if (repeatEvent != null) {
-                    repeatEvent.reset();
-                    localPlayer.getEntity().send(repeatEvent);
-                }
-            }
-        };
-    } */
-
 
     private void REPLACE_THIS_WITH_CONFIG() {
         registerBindButton(InventoryButton.ID, new InventoryButton());
