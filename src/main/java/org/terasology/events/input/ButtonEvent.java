@@ -22,30 +22,17 @@ import org.terasology.game.client.ButtonState;
 /**
  * @author Immortius
  */
-public class BindButtonEvent extends ButtonEvent {
+public abstract class ButtonEvent extends InputEvent {
 
-    private String id;
+    protected ButtonState state;
 
-    public BindButtonEvent() {
-        super(0, EntityRef.NULL);
-    }
-
-    public void prepare(String id, ButtonState state, float delta, EntityRef target) {
-        reset(delta, target);
-        this.id = id;
-        this.state = state;
-    }
-
-    public String getId() {
-        return id;
+    public ButtonEvent(float delta, EntityRef target) {
+        super(delta, target);
     }
 
     public ButtonState getState() {
         return state;
     }
 
-    @Override
-    public String getButtonName() {
-        return "bind:" + id;
-    }
+    public abstract String getButtonName();
 }

@@ -74,6 +74,16 @@ public class ClientController implements EventHandlerSystem {
         return buttonBinds.get(bindId);
     }
 
+    public void linkBindButtonToInput(InputEvent input, String bindId) {
+        if (input instanceof KeyEvent) {
+            linkBindButtonToKey(((KeyEvent) input).getKey(), bindId);
+        } else if (input instanceof MouseButtonEvent) {
+            linkBindButtonToMouse(((MouseButtonEvent) input).getButton(), bindId);
+        } else if (input instanceof MouseWheelEvent) {
+            linkBindButtonToMouseWheel(((MouseWheelEvent) input).getWheelTurns(), bindId);
+        }
+    }
+
     public void linkBindButtonToKey(int key, String bindId) {
         BindButton bindInfo = buttonBinds.get(bindId);
         keyBinds.put(key, bindInfo);
@@ -84,7 +94,7 @@ public class ClientController implements EventHandlerSystem {
         mouseButtonBinds.put(mouseButton, bindInfo);
     }
 
-    private void linkBindButtonToMouseWheel(int direction, String bindId) {
+    public void linkBindButtonToMouseWheel(int direction, String bindId) {
         if (direction > 0) {
             mouseWheelUpBind = buttonBinds.get(bindId);
         } else if (direction < 0) {

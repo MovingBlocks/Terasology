@@ -5,10 +5,9 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.events.input.InputEvent;
 import org.terasology.game.client.ButtonState;
 
-public class KeyEvent extends InputEvent {
+public class KeyEvent extends ButtonEvent {
 
     private int key;
-    private ButtonState state;
 
     public KeyEvent(int key, ButtonState state, float delta, EntityRef target) {
         super(delta, target);
@@ -16,13 +15,13 @@ public class KeyEvent extends InputEvent {
         this.state = state;
     }
 
-	public ButtonState getState() {
-		return state;
-	}
-
 	public int getKey() {
 		return key;
 	}
+
+    public String getButtonName() {
+        return "key:" + getKeyName();
+    }
 
     public String getKeyName() {
         return Keyboard.getKeyName(key);
