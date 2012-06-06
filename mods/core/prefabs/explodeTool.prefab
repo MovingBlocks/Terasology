@@ -3,7 +3,7 @@
     "Item" : {
         "name" : "Explode Tool",
         "icon" : "Dynamite",
-        "usage" : "OnBlock"
+        "usage" : "ON_BLOCK"
     },
     "ExplosionAction" : {},
     "PlaySoundAction" : {

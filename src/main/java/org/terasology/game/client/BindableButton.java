@@ -2,18 +2,20 @@ package org.terasology.game.client;
 
 import com.google.common.collect.Lists;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.game.CoreRegistry;
+import org.terasology.game.Timer;
 import org.terasology.logic.manager.GUIManager;
 
 import java.util.List;
 
 /**
- * A BindButton is pseudo button that is controlled by one or more actual inputs (whether keys, mouse buttons or the
+ * A BindableButton is pseudo button that is controlled by one or more actual inputs (whether keys, mouse buttons or the
  * mouse wheel).
  * <p/>
- * When the BindButton changes state it sends out events like an actual key or button does. It also allows direct
+ * When the BindableButton changes state it sends out events like an actual key or button does. It also allows direct
  * subscription via the {@link BindButtonSubscriber} interface.
  */
-public class BindButton {
+public class BindableButton {
 
     private String id;
     private BindButtonEvent buttonEvent;
@@ -21,6 +23,11 @@ public class BindButton {
 
     private List<BindButtonSubscriber> subscribers = Lists.newArrayList();
     private ActivateMode mode = ActivateMode.BOTH;
+    private boolean repeating = false;
+    private int repeatTime = 0;
+    private long lastActivateTime;
+
+    private Timer timer;
 
     public static enum ActivateMode {
         PRESS(true, false),
@@ -50,9 +57,10 @@ public class BindButton {
      * @param id
      * @param event
      */
-    BindButton(String id, BindButtonEvent event) {
+    BindableButton(String id, BindButtonEvent event) {
         this.id = id;
         this.buttonEvent = event;
+        timer = CoreRegistry.get(Timer.class);
     }
 
     public void setMode(ActivateMode mode) {
@@ -61,6 +69,26 @@ public class BindButton {
 
     public ActivateMode getMode() {
         return mode;
+    }
+
+    public void setRepeating(boolean repeating) {
+        this.repeating = repeating;
+    }
+
+    public boolean isRepeating() {
+        return repeating;
+    }
+
+    /**
+     * Sets the repeat time
+     * @param repeatTimeMs The time between repeat events, in ms
+     */
+    public void setRepeatTime(int repeatTimeMs) {
+        this.repeatTime = repeatTimeMs;
+    }
+
+    public int getRepeatTime() {
+        return repeatTime;
     }
 
     public ButtonState getState() {
@@ -100,6 +128,7 @@ public class BindButton {
         if (pressed) {
             activeInputs++;
             if (activeInputs == 1 && mode.isActivatedOnPress()) {
+                lastActivateTime = timer.getTimeInMs();
                 if (guiOnly) {
                     GUIManager.getInstance().processBindButton(id, pressed);
                     keyConsumed = true;
@@ -131,6 +160,17 @@ public class BindButton {
             }
         }
         return keyConsumed;
+    }
+
+    void update(EntityRef localPlayer, float delta, EntityRef target) {
+        long time = timer.getTimeInMs();
+        if (repeating && getState() == ButtonState.DOWN && mode.isActivatedOnPress() && time - lastActivateTime > repeatTime) {
+            lastActivateTime = time;
+            if (!GUIManager.getInstance().isConsumingInput()) {
+                buttonEvent.prepare(id, ButtonState.REPEAT, delta, target);
+                localPlayer.send(buttonEvent);
+            }
+        }
     }
 
     private boolean triggerOnPress(float delta, EntityRef target) {

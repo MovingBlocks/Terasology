@@ -11,10 +11,9 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.input.*;
-import org.terasology.events.input.binds.ConsoleButton;
-import org.terasology.events.input.binds.InventoryButton;
-import org.terasology.events.input.binds.PauseButton;
+import org.terasology.events.input.binds.*;
 import org.terasology.game.CoreRegistry;
+import org.terasology.game.Timer;
 import org.terasology.logic.BlockRaytracer;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
@@ -41,45 +40,47 @@ public class InputSystem implements EventHandlerSystem {
 
     private float mouseSensitivity = (float)Config.getInstance().getMouseSens();
 
-    private Map<String, BindAxis> axisLookup = Maps.newHashMap();
-    private Map<String, BindButton> buttonBinds = Maps.newHashMap();
+    private Map<String, BindableAxis> axisLookup = Maps.newHashMap();
+    private Map<String, BindableButton> buttonLookup = Maps.newHashMap();
 
-    private List<BindAxis> axisBinds = Lists.newArrayList();
+    private List<BindableAxis> axisBinds = Lists.newArrayList();
+    private List<BindableButton> buttonBinds = Lists.newArrayList();
 
     // Links between primitive inputs and bind buttons
-    private Map<Integer, BindButton> keyBinds = Maps.newHashMap();
-    private Map<Integer, BindButton> mouseButtonBinds = Maps.newHashMap();
-    private BindButton mouseWheelUpBind;
-    private BindButton mouseWheelDownBind;
+    private Map<Integer, BindableButton> keyBinds = Maps.newHashMap();
+    private Map<Integer, BindableButton> mouseButtonBinds = Maps.newHashMap();
+    private BindableButton mouseWheelUpBind;
+    private BindableButton mouseWheelDownBind;
 
     private IWorldProvider worldProvider;
     private LocalPlayer localPlayer;
     private BlockEntityRegistry blockRegistry;
     private EntityRef target = EntityRef.NULL;
     private Vector3i targetBlockPos = null;
+    private Timer timer;
 
     public void initialise() {
         localPlayer = CoreRegistry.get(LocalPlayer.class);
         worldProvider = CoreRegistry.get(IWorldProvider.class);
         blockRegistry = CoreRegistry.get(BlockEntityRegistry.class);
+        timer = CoreRegistry.get(Timer.class);
 
         REPLACE_THIS_WITH_CONFIG();
     }
 
-    public BindButton registerBindButton(String bindId) {
-        BindButton bind = new BindButton(bindId, new BindButtonEvent());
-        buttonBinds.put(bindId, bind);
+    public BindableButton registerBindButton(String bindId) {
+        return registerBindButton(bindId, new BindButtonEvent());
+    }
+
+    public BindableButton registerBindButton(String bindId, BindButtonEvent event) {
+        BindableButton bind = new BindableButton(bindId, event);
+        buttonLookup.put(bindId, bind);
+        buttonBinds.add(bind);
         return bind;
     }
 
-    public BindButton registerBindButton(String bindId, BindButtonEvent event) {
-        BindButton bind = new BindButton(bindId, event);
-        buttonBinds.put(bindId, bind);
-        return bind;
-    }
-
-    public BindButton getBindButton(String bindId) {
-        return buttonBinds.get(bindId);
+    public BindableButton getBindButton(String bindId) {
+        return buttonLookup.get(bindId);
     }
 
     public void linkBindButtonToInput(InputEvent input, String bindId) {
@@ -93,29 +94,33 @@ public class InputSystem implements EventHandlerSystem {
     }
 
     public void linkBindButtonToKey(int key, String bindId) {
-        BindButton bindInfo = buttonBinds.get(bindId);
+        BindableButton bindInfo = buttonLookup.get(bindId);
         keyBinds.put(key, bindInfo);
     }
 
     public void linkBindButtonToMouse(int mouseButton, String bindId) {
-        BindButton bindInfo = buttonBinds.get(bindId);
+        BindableButton bindInfo = buttonLookup.get(bindId);
         mouseButtonBinds.put(mouseButton, bindInfo);
     }
 
     public void linkBindButtonToMouseWheel(int direction, String bindId) {
         if (direction > 0) {
-            mouseWheelUpBind = buttonBinds.get(bindId);
+            mouseWheelUpBind = buttonLookup.get(bindId);
         } else if (direction < 0) {
-            mouseWheelDownBind = buttonBinds.get(bindId);
+            mouseWheelDownBind = buttonLookup.get(bindId);
         }
     }
 
-    public BindAxis registerBindAxis(String id, BindButton positiveButton, BindButton negativeButton) {
+    public BindableAxis registerBindAxis(String id, BindableButton positiveButton, BindableButton negativeButton) {
         return registerBindAxis(id, new BindAxisEvent(), positiveButton, negativeButton);
     }
 
-    public BindAxis registerBindAxis(String id, BindAxisEvent event, BindButton positiveButton, BindButton negativeButton) {
-        BindAxis axis = new BindAxis(id, event, positiveButton, negativeButton);
+    public BindableAxis registerBindAxis(String id, BindAxisEvent event, String positiveButtonId, String negativeButtonId) {
+        return registerBindAxis(id, event, getBindButton(positiveButtonId), getBindButton(negativeButtonId));
+    }
+
+    public BindableAxis registerBindAxis(String id, BindAxisEvent event, BindableButton positiveButton, BindableButton negativeButton) {
+        BindableAxis axis = new BindableAxis(id, event, positiveButton, negativeButton);
         axisBinds.add(axis);
         axisLookup.put(id, axis);
         return axis;
@@ -125,6 +130,7 @@ public class InputSystem implements EventHandlerSystem {
         updateTarget();
         processMouseInput(delta);
         processKeyboardInput(delta);
+        processBindRepeats(delta);
         processBindAxis(delta);
     }
 
@@ -166,7 +172,7 @@ public class InputSystem implements EventHandlerSystem {
                 boolean buttonDown = Mouse.getEventButtonState();
                 boolean consumed = sendMouseEvent(button, buttonDown, delta);
 
-                BindButton bind = mouseButtonBinds.get(button);
+                BindableButton bind = mouseButtonBinds.get(button);
                 if (bind != null) {
                     bind.updateBindState(buttonDown, delta, target, localPlayer.getEntity(), consumed, GUIManager.getInstance().isConsumingInput());
                 }
@@ -174,7 +180,7 @@ public class InputSystem implements EventHandlerSystem {
                 int wheelMoved = Mouse.getEventDWheel();
                 boolean consumed = sendMouseWheelEvent(wheelMoved, delta);
 
-                BindButton bind = (wheelMoved > 0) ? mouseWheelUpBind : mouseWheelDownBind;
+                BindableButton bind = (wheelMoved > 0) ? mouseWheelUpBind : mouseWheelDownBind;
                 if (bind != null) {
                     bind.updateBindState(true, delta, target, localPlayer.getEntity(), consumed, GUIManager.getInstance().isConsumingInput());
                     bind.updateBindState(false, delta, target, localPlayer.getEntity(), consumed, GUIManager.getInstance().isConsumingInput());
@@ -217,7 +223,7 @@ public class InputSystem implements EventHandlerSystem {
             boolean consumed = sendKeyEvent(key, state, delta);
 
             // Update bind
-            BindButton bind = keyBinds.get(key);
+            BindableButton bind = keyBinds.get(key);
             if (bind != null && !Keyboard.isRepeatEvent()) {
                 bind.updateBindState(Keyboard.getEventKeyState(), delta, target, localPlayer.getEntity(), consumed, guiConsumingInput);
             }
@@ -235,8 +241,14 @@ public class InputSystem implements EventHandlerSystem {
     }
 
     private void processBindAxis(float delta) {
-        for (BindAxis axis : axisBinds) {
+        for (BindableAxis axis : axisBinds) {
             axis.update(localPlayer.getEntity(), delta, target);
+        }
+    }
+
+    private void processBindRepeats(float delta) {
+        for (BindableButton button : buttonBinds) {
+            button.update(localPlayer.getEntity(), delta, target);
         }
     }
 
@@ -302,18 +314,48 @@ public class InputSystem implements EventHandlerSystem {
         registerBindButton(PauseButton.ID, new PauseButton());
         linkBindButtonToKey(Keyboard.KEY_ESCAPE, PauseButton.ID);
 
-        /*ReusableEvent windowRemoveSE = ReusableEvent.makeEvent("core", "windowRemove");
-          BindTarget windowRemoveBT = makeEventTarget("core", "windowRemove", windowRemoveSE, null, null);
-          bind(Keyboard.KEY_ESCAPE, windowRemoveBT);
+        registerBindButton(ForwardsButton.ID, new ForwardsButton());
+        linkBindButtonToKey(Keyboard.KEY_W, ForwardsButton.ID);
 
-          ReusableEvent inventoryToggleSE = ReusableEvent.makeEvent("core", "inventoryToggle");
-          BindTarget inventoryToggleBT = makeEventTarget("core", "inventoryToggle", inventoryToggleSE, null, null);
-          bind(Keyboard.KEY_I, inventoryToggleBT);
+        registerBindButton(BackwardsButton.ID,  new BackwardsButton());
+        linkBindButtonToKey(Keyboard.KEY_S, BackwardsButton.ID);
 
-          ReusableEvent debugToggleSE = ReusableEvent.makeEvent("core", "debugToggle");
-          BindTarget debugToggleBT = makeEventTarget("core", "debugToggle", debugToggleSE, null, null);
-          bind(Keyboard.KEY_F3, debugToggleBT);*/
+        registerBindAxis(ForwardsMovementAxis.ID, new ForwardsMovementAxis(), ForwardsButton.ID, BackwardsButton.ID).setSendEventMode(BindableAxis.SendEventMode.WHEN_CHANGED);
 
+        registerBindButton(LeftStrafeButton.ID, new LeftStrafeButton());
+        linkBindButtonToKey(Keyboard.KEY_A, LeftStrafeButton.ID);
+
+        registerBindButton(RightStrafeButton.ID, new RightStrafeButton());
+        linkBindButtonToKey(Keyboard.KEY_D, RightStrafeButton.ID);
+
+        registerBindAxis(StrafeMovementAxis.ID, new StrafeMovementAxis(), LeftStrafeButton.ID, RightStrafeButton.ID).setSendEventMode(BindableAxis.SendEventMode.WHEN_CHANGED);
+
+        registerBindButton(JumpButton.ID, new JumpButton());
+        linkBindButtonToKey(Keyboard.KEY_SPACE, JumpButton.ID);
+
+        registerBindButton(CrouchButton.ID, new CrouchButton());
+        linkBindButtonToKey(Keyboard.KEY_C, CrouchButton.ID);
+
+        registerBindAxis(VerticalMovementAxis.ID, new VerticalMovementAxis(), JumpButton.ID, CrouchButton.ID).setSendEventMode(BindableAxis.SendEventMode.WHEN_CHANGED);
+
+        registerBindButton(RunButton.ID, new RunButton());
+        linkBindButtonToKey(Keyboard.KEY_LSHIFT, RunButton.ID);
+        linkBindButtonToKey(Keyboard.KEY_RSHIFT, RunButton.ID);
+
+        registerBindButton(AttackButton.ID, new AttackButton()).setRepeating(true);
+        linkBindButtonToMouse(1, AttackButton.ID);
+
+        registerBindButton(UseItemButton.ID, new UseItemButton()).setRepeating(true);
+        linkBindButtonToMouse(0, UseItemButton.ID);
+
+        registerBindButton(FrobButton.ID, new FrobButton());
+        linkBindButtonToKey(Keyboard.KEY_E, FrobButton.ID);
+
+        registerBindButton(ToolbarNextButton.ID, new ToolbarNextButton());
+        linkBindButtonToMouseWheel(+1, ToolbarNextButton.ID);
+
+        registerBindButton(ToolbarPrevButton.ID, new ToolbarPrevButton());
+        linkBindButtonToMouseWheel(-1, ToolbarPrevButton.ID);
     }
 
 }

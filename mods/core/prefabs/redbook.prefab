@@ -3,7 +3,7 @@
     "Item" : {
         "name" : "RedBook",
         "icon" : "RedBook",
-        "usage" : "OnUser",
+        "usage" : "ON_USER",
         "renderWithIcon" : true
     },
     "Book" : {

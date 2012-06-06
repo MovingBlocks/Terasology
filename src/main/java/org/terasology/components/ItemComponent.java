@@ -31,15 +31,15 @@ public final class ItemComponent implements Component {
 
     /** Enum to hold item usage possibilities */
     public enum UsageType {
-        None,
-        OnUser,
-        OnBlock,
-        OnEntity,
-        InDirection
+        NONE,
+        ON_USER,
+        ON_BLOCK,
+        ON_ENTITY,
+        IN_DIRECTION
     }
 
     /** Usage setting for this item */
-    public UsageType usage = UsageType.None;
+    public UsageType usage = UsageType.NONE;
 
     /** Does this item drop in quantity on usage (stacks of things would, tools would not) */
     public boolean consumedOnUse = false;
@@ -52,6 +52,7 @@ public final class ItemComponent implements Component {
     private Map<String, Integer> perBlockDamageBonus = Maps.newHashMap();
 
     public Map<String, Integer> getPerBlockDamageBonus() {
+
         return perBlockDamageBonus;
     }
 

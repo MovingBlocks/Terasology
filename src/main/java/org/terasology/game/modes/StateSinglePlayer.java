@@ -33,7 +33,7 @@ import org.terasology.componentSystem.common.StatusAffectorSystem;
 import org.terasology.componentSystem.controllers.LocalPlayerSystem;
 import org.terasology.componentSystem.controllers.SimpleAISystem;
 import org.terasology.componentSystem.controllers.SimpleMinionAISystem;
-import org.terasology.componentSystem.input.LocalPlayerScreensSystem;
+import org.terasology.componentSystem.input.LocalPlayerUIControlSystem;
 import org.terasology.componentSystem.items.InventorySystem;
 import org.terasology.componentSystem.items.ItemSystem;
 import org.terasology.componentSystem.rendering.BlockDamageRenderer;
@@ -240,7 +240,7 @@ public class StateSinglePlayer implements GameState {
         _componentSystemManager.register(new BookshelfHandler(), "engine:BookshelfHandler");
         _componentSystemManager.register(new DrinkPotionAction(), "engine:DrinkPotionAction");
         _componentSystemManager.register(new StatusAffectorSystem(), "engine:StatusAffectorSystem");
-        _componentSystemManager.register(new LocalPlayerScreensSystem(), "engine:LocalPlayerScreensSystem");
+        _componentSystemManager.register(new LocalPlayerUIControlSystem(), "engine:LocalPlayerUIControlSystem");
     }
 
     private void loadPrefabs() {

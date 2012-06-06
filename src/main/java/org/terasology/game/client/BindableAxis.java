@@ -24,16 +24,16 @@ import java.util.List;
 
 /**
  * A Bind Axis is an simulated analog input axis, maintaining a value between -1 and 1.  It is linked to
- * a positive BindButton (that pushes the axis towards 1) and a negative BindButton (that pushes it towards -1)
+ * a positive BindableButton (that pushes the axis towards 1) and a negative BindableButton (that pushes it towards -1)
  *
  * @author Immortius
  */
-public class BindAxis
+public class BindableAxis
 {
     private String id;
     private BindAxisEvent event;
-    private BindButton positiveInput;
-    private BindButton negativeInput;
+    private BindableButton positiveInput;
+    private BindableButton negativeInput;
     private float value = 0;
 
     private List<BindAxisSubscriber> subscribers = Lists.newArrayList();
@@ -63,7 +63,7 @@ public class BindAxis
         public abstract boolean shouldSendEvent(float oldValue, float newValue);
     }
 
-    public BindAxis(String id, BindAxisEvent event, BindButton positiveButton, BindButton negativeButton) {
+    public BindableAxis(String id, BindAxisEvent event, BindableButton positiveButton, BindableButton negativeButton) {
         this.id = id;
         this.event = event;
         this.positiveInput = positiveButton;
@@ -95,17 +95,20 @@ public class BindAxis
         boolean negInput = negativeInput.getState() == ButtonState.DOWN;
 
         float targetValue = 0;
-        if (posInput) {
-            targetValue += 1.0f;
-        }
-        if (negInput) {
-            targetValue -= 1.0f;
+        if (!GUIManager.getInstance().isConsumingInput()) {
+            if (posInput) {
+                targetValue += 1.0f;
+            }
+            if (negInput) {
+                targetValue -= 1.0f;
+            }
         }
 
         // TODO: Interpolate, based on some settings (immediate, linear, lerp?)
 
         float newValue = targetValue;
-        if (sendEventMode.shouldSendEvent(value, newValue) && !GUIManager.getInstance().isConsumingInput()) {
+
+        if (sendEventMode.shouldSendEvent(value, newValue)) {
             event.prepare(id, newValue, delta, target);
             localPlayer.send(event);
             sendEventToSubscribers(delta, target);

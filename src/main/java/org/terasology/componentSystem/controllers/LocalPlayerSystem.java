@@ -1,41 +1,27 @@
 package org.terasology.componentSystem.controllers;
 
+import com.bulletphysics.linearmath.QuaternionUtil;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
-
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.componentSystem.block.BlockEntityRegistry;
-import org.terasology.components.CharacterMovementComponent;
-import org.terasology.components.HealthComponent;
-import org.terasology.components.InventoryComponent;
-import org.terasology.components.ItemComponent;
-import org.terasology.components.LocalPlayerComponent;
-import org.terasology.components.LocationComponent;
-import org.terasology.components.PlayerComponent;
+import org.terasology.components.*;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.entitySystem.EventSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.ActivateEvent;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.NoHealthEvent;
 import org.terasology.events.OpenInventoryEvent;
-import org.terasology.events.input.KeyDownEvent;
+import org.terasology.events.input.MouseXAxisEvent;
+import org.terasology.events.input.MouseYAxisEvent;
+import org.terasology.events.input.binds.*;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
-import org.terasology.game.client.InputSystem;
+import org.terasology.game.client.ButtonState;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
@@ -44,12 +30,16 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
-import org.terasology.model.structures.BlockPosition;
 import org.terasology.model.structures.RayBlockIntersection;
 import org.terasology.rendering.cameras.DefaultCamera;
 import org.terasology.rendering.gui.menus.UIContainerScreen;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -60,7 +50,7 @@ import com.bulletphysics.linearmath.QuaternionUtil;
 public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, EventHandlerSystem {
 
     private static TIntIntMap inventorySlotBindMap = new TIntIntHashMap();
-    
+
     static {
         inventorySlotBindMap.put(Keyboard.KEY_1, 0);
         inventorySlotBindMap.put(Keyboard.KEY_2, 1);
@@ -81,10 +71,6 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     private BlockEntityRegistry blockEntityRegistry;
     private UIContainerScreen containerScreen;
 
-
-    private Vector2f lookInput = new Vector2f();
-
-    private double mouseSensititivy = Config.getInstance().getMouseSens();
     private long lastTimeSpacePressed;
     private long lastInteraction;
 
@@ -92,39 +78,17 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     private float bobFactor = 0;
     private float lastStepDelta = 0;
 
-    private boolean running = false;
-    
-    private boolean goForward;
-    private boolean goBackward;
-    private boolean goLeft;
-    private boolean goRight;
-    private boolean goUp;
-    private boolean goDown;
-	private Vector3f movementVector = new Vector3f();
-    private MovementControlEvent movementContolEvent = new MovementControlEvent() {
-    	public Vector3f getMovementInput() {
-    		return movementVector;
-    	}
-    };
-	private EventSystem eventSystem;
-    private EntityRef localPlayerRef;
-    private InputSystem inputSystem;
+    private Vector3f relativeMovement = new Vector3f();
 
-    
     @Override
     public void initialise() {
         worldProvider = CoreRegistry.get(IWorldProvider.class);
         localPlayer = CoreRegistry.get(LocalPlayer.class);
-        localPlayerRef = localPlayer.getEntity();
         timer = CoreRegistry.get(Timer.class);
-        eventSystem = CoreRegistry.get(EventSystem.class);
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
 
         containerScreen = GUIManager.getInstance().addWindow(new UIContainerScreen(), "container");
-
-        registerBindTargets();
     }
-
 
 
     public void setPlayerCamera(DefaultCamera camera) {
@@ -155,7 +119,6 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
                 return;
         }
 
-        updateViewDirection(localPlayerComponent, location);
         updateMovement(localPlayerComponent, characterMovementComponent, location);
 
         // TODO: Remove, use component camera, breaks spawn camera anyway
@@ -166,118 +129,69 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         // Hand animation update
         localPlayerComponent.handAnimation = Math.max(0, localPlayerComponent.handAnimation - 2.5f * delta);
 
-        entity.saveComponent(location);
         entity.saveComponent(characterMovementComponent);
         entity.saveComponent(localPlayerComponent);
-        resetInput();
+    }
+
+    @ReceiveEvent(components=LocalPlayerComponent.class)
+    public void onMouseX(MouseXAxisEvent event, EntityRef entity) {
+        LocalPlayerComponent localPlayer = entity.getComponent(LocalPlayerComponent.class);
+        localPlayer.viewYaw = (localPlayer.viewYaw - event.getValue()) % 360;
+        entity.saveComponent(localPlayer);
+        LocationComponent loc = entity.getComponent(LocationComponent.class);
+        if (loc != null) {
+            QuaternionUtil.setEuler(loc.getLocalRotation(), TeraMath.DEG_TO_RAD * localPlayer.viewYaw, 0, 0);
+            entity.saveComponent(loc);
+        }
+        event.consume();
+    }
+
+    @ReceiveEvent(components=LocalPlayerComponent.class)
+    public void onMouseY(MouseYAxisEvent event, EntityRef entity) {
+        LocalPlayerComponent localPlayer = entity.getComponent(LocalPlayerComponent.class);
+        localPlayer.viewPitch = TeraMath.clamp(localPlayer.viewPitch - event.getValue(), -89, 89);
+        entity.saveComponent(localPlayer);
+        event.consume();
     }
 
     @ReceiveEvent(components = {LocalPlayerComponent.class, CharacterMovementComponent.class})
-    public void onKeyDown(KeyDownEvent keyEvent, EntityRef entity) {
+    public void onJump(JumpButton event, EntityRef entity) {
+        if (event.getState() == ButtonState.DOWN) {
+            CharacterMovementComponent characterMovement = entity.getComponent(CharacterMovementComponent.class);
+            characterMovement.jump = true;
+            if (timer.getTimeInMs() - lastTimeSpacePressed < 200) {
+                characterMovement.isGhosting = !characterMovement.isGhosting;
+            }
+            lastTimeSpacePressed = timer.getTimeInMs();
+            event.consume();
+        }
+    }
+
+    @ReceiveEvent(components = {LocalPlayerComponent.class, CharacterMovementComponent.class})
+    public void updateForwardsMovement(ForwardsMovementAxis event, EntityRef entity) {
+        relativeMovement.z = event.getValue();
+        event.consume();
+    }
+
+    @ReceiveEvent(components = {LocalPlayerComponent.class, CharacterMovementComponent.class})
+    public void updateStrafeMovement(StrafeMovementAxis event, EntityRef entity) {
+        relativeMovement.x = event.getValue();
+        event.consume();
+    }
+
+    @ReceiveEvent(components = {LocalPlayerComponent.class, CharacterMovementComponent.class})
+    public void updateVerticalMovement(VerticalMovementAxis event, EntityRef entity) {
+        relativeMovement.y = event.getValue();
+        event.consume();
+    }
+
+    @ReceiveEvent(components= {LocalPlayerComponent.class, CharacterMovementComponent.class})
+    public void onRun(RunButton event, EntityRef entity) {
         CharacterMovementComponent characterMovement = entity.getComponent(CharacterMovementComponent.class);
-        switch (keyEvent.getKey()) {
-            case Keyboard.KEY_SPACE:
-                characterMovement.jump = true;
-                if (timer.getTimeInMs() - lastTimeSpacePressed < 200) {
-                    characterMovement.isGhosting = !characterMovement.isGhosting;
-                }
-
-                lastTimeSpacePressed = timer.getTimeInMs();
-                keyEvent.consume();
-                break;
-        }
+        characterMovement.isRunning = event.isDown();
+        event.consume();
     }
 
-    private void resetInput() {
-        lookInput.set(0,0);
-        
-        running = false;
-        goForward = goBackward = goLeft = goRight = goUp = goDown = false;
-        movementVector.set(0, 0, 0); 
-        
-    }
-
-    private void updateMovement(LocalPlayerComponent localPlayerComponent, CharacterMovementComponent characterMovementComponent, LocationComponent location) {
-        Vector3f relMove = new Vector3f(movementVector);
-        relMove.y = 0;
-        if (characterMovementComponent.isGhosting || characterMovementComponent.isSwimming) {
-            Quat4f viewRot = new Quat4f();
-            QuaternionUtil.setEuler(viewRot, TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw, TeraMath.DEG_TO_RAD * localPlayerComponent.viewPitch, 0);
-            QuaternionUtil.quatRotate(viewRot, relMove, relMove);
-            relMove.y += movementVector.y;
-        } else {
-            QuaternionUtil.quatRotate(location.getLocalRotation(), relMove, relMove);
-        }
-        float lengthSquared = relMove.lengthSquared();
-        if (lengthSquared > 1) relMove.normalize();
-        characterMovementComponent.setDrive(relMove);
-
-        characterMovementComponent.isRunning = running;
-    }
-
-    private void updateViewDirection(LocalPlayerComponent localPlayerComponent, LocationComponent location) {
-        localPlayerComponent.viewPitch = TeraMath.clamp(localPlayerComponent.viewPitch + lookInput.y, -89, 89);
-        localPlayerComponent.viewYaw = (localPlayerComponent.viewYaw - lookInput.x) % 360;
-
-        QuaternionUtil.setEuler(location.getLocalRotation(), TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw, 0, 0);
-    }
-
-    private boolean checkRespawn(float deltaSeconds, EntityRef entity, LocalPlayerComponent localPlayerComponent, CharacterMovementComponent characterMovementComponent, LocationComponent location, PlayerComponent playerComponent) {
-        localPlayerComponent.respawnWait -= deltaSeconds;
-        if (localPlayerComponent.respawnWait > 0) {
-            characterMovementComponent.getDrive().set(0,0,0);
-            characterMovementComponent.jump = false;
-            return false;
-        }
-
-        // Respawn
-        localPlayerComponent.isDead = false;
-        HealthComponent health = entity.getComponent(HealthComponent.class);
-        if (health != null) {
-            health.currentHealth = health.maxHealth;
-            entity.saveComponent(health);
-        }
-        location.setWorldPosition(playerComponent.spawnPosition);
-        return true;
-    }
-
-    private void updateCamera(CharacterMovementComponent charMovementComp, Vector3f position, Quat4f rotation) {
-        // The camera position is the player's position plus the eye offset
-        Vector3d cameraPosition = new Vector3d();
-        // TODO: don't hardset eye position
-        cameraPosition.add(new Vector3d(position), new Vector3d(0,0.6f,0));
-
-        playerCamera.getPosition().set(cameraPosition);
-        Vector3f viewDir = new Vector3f(0,0,-1);
-        QuaternionUtil.quatRotate(rotation, viewDir, viewDir);
-        playerCamera.getViewingDirection().set(viewDir);
-
-        float stepDelta = charMovementComp.footstepDelta - lastStepDelta;
-        if (stepDelta < 0) stepDelta += charMovementComp.distanceBetweenFootsteps;
-        bobFactor += stepDelta;
-        lastStepDelta = charMovementComp.footstepDelta;
-        
-        if (cameraBobbing) {
-            playerCamera.setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.5f));
-            playerCamera.setBobbingVerticalOffsetFactor(calcBobbingOffset((float) java.lang.Math.PI / 4f, 0.025f, 3f));
-        } else {
-            playerCamera.setBobbingRotationOffsetFactor(0.0);
-            playerCamera.setBobbingVerticalOffsetFactor(0.0);
-        }
-
-        if (charMovementComp.isGhosting) {
-            playerCamera.extendFov(24);
-        } else {
-            playerCamera.resetFov();
-        }
-
-        /*if (!(DEMO_FLIGHT)) {
-            _defaultCamera.getViewingDirection().set(getViewingDirection());
-        } else {
-            Vector3d viewingTarget = new Vector3d(getPosition().x, 40, getPosition().z - 128);
-            _defaultCamera.getViewingDirection().sub(viewingTarget, getPosition());
-        } */
-    }
 
     @Override
     public void renderOverlay() {
@@ -300,6 +214,73 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         localPlayer.isDead = true;
         localPlayer.respawnWait = 1.0f;
         entity.saveComponent(localPlayer);
+    }
+
+    private void updateMovement(LocalPlayerComponent localPlayerComponent, CharacterMovementComponent characterMovementComponent, LocationComponent location) {
+        Vector3f relMove = new Vector3f(relativeMovement);
+        relMove.y = 0;
+        if (characterMovementComponent.isGhosting || characterMovementComponent.isSwimming) {
+            Quat4f viewRot = new Quat4f();
+            QuaternionUtil.setEuler(viewRot, TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw, TeraMath.DEG_TO_RAD * localPlayerComponent.viewPitch, 0);
+            QuaternionUtil.quatRotate(viewRot, relMove, relMove);
+            relMove.y += relativeMovement.y;
+        } else {
+            QuaternionUtil.quatRotate(location.getLocalRotation(), relMove, relMove);
+        }
+        float lengthSquared = relMove.lengthSquared();
+        if (lengthSquared > 1) relMove.normalize();
+        characterMovementComponent.setDrive(relMove);
+    }
+
+    private boolean checkRespawn(float deltaSeconds, EntityRef entity, LocalPlayerComponent localPlayerComponent, CharacterMovementComponent characterMovementComponent, LocationComponent location, PlayerComponent playerComponent) {
+        localPlayerComponent.respawnWait -= deltaSeconds;
+        if (localPlayerComponent.respawnWait > 0) {
+            characterMovementComponent.getDrive().set(0, 0, 0);
+            characterMovementComponent.jump = false;
+            return false;
+        }
+
+        // Respawn
+        localPlayerComponent.isDead = false;
+        HealthComponent health = entity.getComponent(HealthComponent.class);
+        if (health != null) {
+            health.currentHealth = health.maxHealth;
+            entity.saveComponent(health);
+        }
+        location.setWorldPosition(playerComponent.spawnPosition);
+        entity.saveComponent(location);
+        return true;
+    }
+
+    private void updateCamera(CharacterMovementComponent charMovementComp, Vector3f position, Quat4f rotation) {
+        // The camera position is the player's position plus the eye offset
+        Vector3d cameraPosition = new Vector3d();
+        // TODO: don't hardset eye position
+        cameraPosition.add(new Vector3d(position), new Vector3d(0, 0.6f, 0));
+
+        playerCamera.getPosition().set(cameraPosition);
+        Vector3f viewDir = new Vector3f(0, 0, 1);
+        QuaternionUtil.quatRotate(rotation, viewDir, viewDir);
+        playerCamera.getViewingDirection().set(viewDir);
+
+        float stepDelta = charMovementComp.footstepDelta - lastStepDelta;
+        if (stepDelta < 0) stepDelta += charMovementComp.distanceBetweenFootsteps;
+        bobFactor += stepDelta;
+        lastStepDelta = charMovementComp.footstepDelta;
+
+        if (cameraBobbing) {
+            playerCamera.setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.5f));
+            playerCamera.setBobbingVerticalOffsetFactor(calcBobbingOffset((float) java.lang.Math.PI / 4f, 0.025f, 3f));
+        } else {
+            playerCamera.setBobbingRotationOffsetFactor(0.0);
+            playerCamera.setBobbingVerticalOffsetFactor(0.0);
+        }
+
+        if (charMovementComp.isGhosting) {
+            playerCamera.extendFov(24);
+        } else {
+            playerCamera.resetFov();
+        }
     }
 
     /**
@@ -336,6 +317,68 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         }
     }
 
+    @ReceiveEvent(components = {LocalPlayerComponent.class, InventoryComponent.class})
+    public void onAttackRequest(AttackButton event, EntityRef entity) {
+        if (!event.isDown() || timer.getTimeInMs() - lastInteraction < 200) {
+            return;
+        }
+
+        LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
+        InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
+        if (localPlayerComp.isDead) return;
+
+        EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayerComp.selectedTool);
+        attack(event.getTarget(), entity, selectedItemEntity);
+
+        lastInteraction = timer.getTimeInMs();
+        localPlayerComp.handAnimation = 0.5f;
+        entity.saveComponent(localPlayerComp);
+        event.consume();
+    }
+
+    private void attack(EntityRef target, EntityRef player, EntityRef selectedItemEntity) {
+        // TODO: Should send an attack event to self, and another system common to all creatures should handle this
+        int damage = 1;
+        ItemComponent item = selectedItemEntity.getComponent(ItemComponent.class);
+        if (item != null) {
+            damage = item.baseDamage;
+
+            BlockComponent blockComp = target.getComponent(BlockComponent.class);
+            if (blockComp != null) {
+                Block block = BlockManager.getInstance().getBlock(worldProvider.getBlock(blockComp.getPosition()));
+                if (item.getPerBlockDamageBonus().containsKey(block.getBlockFamily().getTitle())) {
+                    damage += item.getPerBlockDamageBonus().get(block.getBlockFamily().getTitle());
+                }
+            }
+        }
+        target.send(new DamageEvent(damage, player));
+    }
+
+    @ReceiveEvent(components = {LocalPlayerComponent.class, InventoryComponent.class})
+    public void onUseItemRequest(UseItemButton event, EntityRef entity) {
+        if (!event.isDown() || timer.getTimeInMs() - lastInteraction < 200) {
+            return;
+        }
+
+        LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
+        InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
+        if (localPlayerComp.isDead) return;
+
+        EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayerComp.selectedTool);
+
+        ItemComponent item = selectedItemEntity.getComponent(ItemComponent.class);
+        if (item != null && item.usage != ItemComponent.UsageType.NONE) {
+            useItem(entity, selectedItemEntity);
+        } else {
+            attack(event.getTarget(), entity, selectedItemEntity);
+        }
+
+        lastInteraction = timer.getTimeInMs();
+        localPlayerComp.handAnimation = 0.5f;
+        entity.saveComponent(localPlayerComp);
+        event.consume();
+    }
+
     /**
      * Processes the mouse input.
      *
@@ -348,11 +391,10 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         MinionSystem minionsys = new MinionSystem();
         if (wheelMoved != 0) {
             //check mode, act according TODO? use events?
-            if(minionsys.MinionMode())
-                if(minionsys.MinionSelect()) minionsys.menuScroll(wheelMoved);
+            if (minionsys.MinionMode())
+                if (minionsys.MinionSelect()) minionsys.menuScroll(wheelMoved);
                 else minionsys.barScroll(wheelMoved);
-            else
-            {
+            else {
                 LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
                 localPlayerComp.selectedTool = (localPlayerComp.selectedTool + wheelMoved / 120) % 9;
                 while (localPlayerComp.selectedTool < 0) {
@@ -360,13 +402,11 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
                 }
                 localPlayer.getEntity().saveComponent(localPlayerComp);
             }
-        }
-        else if (button == 1 && !state){
+        } else if (button == 1 && !state) {
             // triggers the selected behaviour of a minion
             minionsys.RightMouseReleased();
 
-        }
-        else if (state && (button == 0 || button == 1)) {
+        } else if (state && (button == 0 || button == 1)) {
             processInteractions(button);
         }
     }
@@ -389,43 +429,20 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
         if (localPlayerComp.isDead) return;
 
-        if(minionsys.MinionMode()){
-            if (button == 1  ) {
-                if(minionsys.isMinionSelected()){
+        if (minionsys.MinionMode()) {
+            if (button == 1) {
+                if (minionsys.isMinionSelected()) {
                     // opens the minion behaviour menu
                     lastInteraction = timer.getTimeInMs();
                     minionsys.RightMouseDown();
                     minionsys.setMinionSelectMode(true);
                 }
-            }
-            else{
+            } else {
                 if (Mouse.isButtonDown(0) || button == 0) {
                     // used to set targets for the minion
                     lastInteraction = timer.getTimeInMs();
                     minionsys.setTarget();
                 }
-            }
-        }
-        else{
-            EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayerComp.selectedTool);
-            // Process primary button actions, which depends on the selected item (if any)
-            if (Mouse.isButtonDown(0) || button == 0) {
-                ItemComponent item = selectedItemEntity.getComponent(ItemComponent.class);
-                if (item != null && item.usage != ItemComponent.UsageType.None) {
-                    useItem(entity, selectedItemEntity);
-                }
-                else {
-                    attack(entity, selectedItemEntity);
-                }
-                lastInteraction = timer.getTimeInMs();
-                localPlayerComp.handAnimation = 0.5f;
-                entity.saveComponent(localPlayerComp);
-            // Process secondary button action, which currently is always "attack" (break blocks)
-            } else if (Mouse.isButtonDown(1) || button == 1) {
-                attack(entity, selectedItemEntity);
-                lastInteraction = timer.getTimeInMs();
-                localPlayerComp.handAnimation = 0.5f;
-                entity.saveComponent(localPlayerComp);
             }
         }
 
@@ -451,9 +468,11 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             }
         }
     }
-    
+
     private void useItem(EntityRef player, EntityRef item) {
         // TODO: Raytrace against entities too
+        // TODO: Or should more information be included with events (surface normal?)
+        // TODO: Do we even need the surface normal?
         RayBlockIntersection.Intersection blockIntersection = calcSelectedBlock();
         if (blockIntersection != null) {
             Vector3i centerPos = blockIntersection.getBlockPosition();
@@ -465,37 +484,6 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     }
 
     /**
-     * Attacks with currently held item
-     */
-    // TODO: Move this somewhere more central, for use by all creatures. And activate with event
-    private void attack(EntityRef player, EntityRef withItem) {
-        RayBlockIntersection.Intersection selectedBlock = calcSelectedBlock();
-        ItemComponent item = withItem.getComponent(ItemComponent.class);
-
-        if (selectedBlock != null) {
-
-            BlockPosition blockPos = selectedBlock.getBlockPosition();
-            byte currentBlockType = worldProvider.getBlock(blockPos.x, blockPos.y, blockPos.z);
-            Block block = BlockManager.getInstance().getBlock(currentBlockType);
-            
-            int damage = 1;
-            if (item != null) {
-                damage = item.baseDamage;
-                if (item.getPerBlockDamageBonus().containsKey(block.getBlockFamily().getTitle())) {
-                    damage += item.getPerBlockDamageBonus().get(block.getBlockFamily().getTitle());
-                }
-            }
-
-            EntityRef blockEntity = blockEntityRegistry.getOrCreateEntityAt(blockPos);
-            blockEntity.send(new DamageEvent(damage, player));
-        }
-
-
-    }
-
-
-
-    /**
      * Calculates the currently targeted block in front of the player.
      *
      * @return Intersection point of the targeted block
@@ -505,7 +493,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         List<RayBlockIntersection.Intersection> inters = new ArrayList<RayBlockIntersection.Intersection>();
 
         Vector3f pos = new Vector3f(playerCamera.getPosition());
-        
+
         int blockPosX, blockPosY, blockPosZ;
 
         for (int x = -3; x <= 3; x++) {
@@ -544,7 +532,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         return null;
     }
 
-    public double calcBobbingOffset(float phaseOffset, float amplitude, float frequency) {
+    private double calcBobbingOffset(float phaseOffset, float amplitude, float frequency) {
         return java.lang.Math.sin(bobFactor * frequency + phaseOffset) * amplitude;
     }
 
@@ -562,116 +550,5 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     @Override
     public void renderFirstPerson() {
     }
-    
-    
-    private void registerBindTargets() {
-		/*inputSystem = CoreRegistry.get(InputSystem.class);
 
-		inputSystem.bind(Keyboard.KEY_W,
-				new BindTarget("engine", "MoveForward") {
-			public void start() {
-				goForward = true;
-				movementVector.z = goBackward ? 0 : 1;
-				movementContolEvent.reset();
-				eventSystem.send(localPlayerRef, movementContolEvent);
-}
-
-			public void end() {
-				goForward = false;
-				movementVector.z = goBackward ? -1 : 0;
-				movementContolEvent.reset();
-				eventSystem.send(localPlayerRef, movementContolEvent);
-			}
-		});
-		
-		inputSystem.bind(Keyboard.KEY_S,
-				new BindTarget("engine", "MoveReverse") {
-			public void start() {
-				goBackward = true;
-				movementVector.z = goForward ? 0 : -1;
-				movementContolEvent.reset();
-				eventSystem.send(localPlayerRef, movementContolEvent);
-			}
-			public void end() {
-				goBackward = false;
-				movementVector.z = goForward ? 1 : 0;
-				movementContolEvent.reset();
-				eventSystem.send(localPlayerRef, movementContolEvent);
-			}
-	    });
-		
-		inputSystem.bind(Keyboard.KEY_A,
-				new BindTarget("engine", "MoveLeft") {
-			public void start() {
-				goLeft = true;
-				movementVector.x = goRight ? 0 : 1;
-				movementContolEvent.reset();
-				eventSystem.send(localPlayerRef, movementContolEvent);
-			}
-			public void end() {
-				goLeft = false;
-				movementVector.x = goRight ? -1 : 0;
-				movementContolEvent.reset();
-				eventSystem.send(localPlayerRef, movementContolEvent);
-			}
-	    });
-		
-		inputSystem.bind(Keyboard.KEY_D,
-				new BindTarget("engine", "MoveRight") {
-			public void start() {
-				goRight = true;
-				movementVector.x = goLeft ? 0 : -1;
-				movementContolEvent.reset();
-				eventSystem.send(localPlayerRef, movementContolEvent);
-			}
-			public void end() {
-				goRight = false;
-				movementVector.x = goLeft ? 1 : 0;
-				movementContolEvent.reset();
-				eventSystem.send(localPlayerRef, movementContolEvent);
-			}
-	    });
-		
-		inputSystem.bind(Keyboard.KEY_SPACE,
-				new BindTarget("engine", "MoveUp") {
-			public void start() {
-				goUp = jump = true;
-				movementVector.y = goDown ? 0 : 1;
-				movementContolEvent.reset();
-				eventSystem.send(localPlayerRef, movementContolEvent);
-			}
-			public void end() {
-				goUp = jump = false;
-				movementVector.y = goDown ? -1 : 0;
-				movementContolEvent.reset();
-				eventSystem.send(localPlayerRef, movementContolEvent);
-			}
-	    });
-		
-		inputSystem.bind(Keyboard.KEY_C,
-				new BindTarget("engine", "MoveDown") {
-			public void start() {
-				goDown = true;
-				movementVector.y = goUp ? 0 : -1;
-				movementContolEvent.reset();
-				eventSystem.send(localPlayerRef, movementContolEvent);
-			}
-			public void end() {
-				goDown = false;
-				movementVector.y = goUp ? 1 : 0;
-				movementContolEvent.reset();
-				eventSystem.send(localPlayerRef, movementContolEvent);
-			}
-	    });
-		
-		inputSystem.bind(Keyboard.KEY_LSHIFT,
-				new BindTarget("engine", "MoveRun") {
-			public void start() {
-				running = true;
-			}
-			public void end() {
-				running = false;
-			}
-	    }); */
-	}
 }

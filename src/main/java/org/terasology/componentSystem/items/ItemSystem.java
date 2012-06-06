@@ -51,9 +51,7 @@ public class ItemSystem implements EventHandlerSystem {
 
     @ReceiveEvent(components={BlockItemComponent.class, ItemComponent.class})
     public void onPlaceBlock(ActivateEvent event, EntityRef item) {
-        ItemComponent itemComp = item.getComponent(ItemComponent.class);
         BlockItemComponent blockItem = item.getComponent(BlockItemComponent.class);
-
 
         Side surfaceDir = Side.inDirection(event.getNormal());
 
@@ -72,15 +70,15 @@ public class ItemSystem implements EventHandlerSystem {
     public void checkCanUseItem(ActivateEvent event, EntityRef item) {
         ItemComponent itemComp = item.getComponent(ItemComponent.class);
         switch (itemComp.usage) {
-            case None:
+            case NONE:
                 event.cancel();
                 break;
-            case OnBlock:
+            case ON_BLOCK:
                 if (event.getTarget().getComponent(BlockComponent.class) == null) {
                     event.cancel();
                 }
                 break;
-            case OnEntity:
+            case ON_ENTITY:
                 if (event.getTarget().getComponent(BlockComponent.class) != null) {
                     event.cancel();
                 }

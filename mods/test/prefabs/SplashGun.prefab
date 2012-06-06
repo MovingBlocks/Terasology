@@ -4,7 +4,7 @@
         "name" : "Splash Gun",
         "renderWithIcon" : false,
         "icon" : "railgun",
-        "usage" : "OnUser"
+        "usage" : "ON_USER"
     },
     "spawnPrefabAction" : {
         "prefab" : "testmod:lavasplash"

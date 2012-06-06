@@ -3,7 +3,7 @@
     "Item" : {
         "name" : "RedPotion",
         "icon" : "RedVial",
-        "usage" : "OnUser",
+        "usage" : "ON_USER",
         "consumedOnUse" : true,
         "renderWithIcon" : true
     },

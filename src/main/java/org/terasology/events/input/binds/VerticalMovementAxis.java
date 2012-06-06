@@ -14,25 +14,13 @@
  * limitations under the License.
  */
 
-package org.terasology.events.input;
+package org.terasology.events.input.binds;
 
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.game.client.ButtonState;
+import org.terasology.game.client.BindAxisEvent;
 
 /**
  * @author Immortius
  */
-public abstract class ButtonEvent extends InputEvent {
-
-    public ButtonEvent(float delta, EntityRef target) {
-        super(delta, target);
-    }
-
-    public abstract ButtonState getState();
-
-    public abstract String getButtonName();
-
-    public boolean isDown() {
-        return getState() != ButtonState.UP;
-    }
+public class VerticalMovementAxis extends BindAxisEvent {
+    public static final String ID = "engine:verticalMovementAxis";
 }

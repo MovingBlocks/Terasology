@@ -36,7 +36,7 @@ import org.terasology.rendering.world.WorldRenderer;
 /**
  * @author Immortius
  */
-public class LocalPlayerScreensSystem implements EventHandlerSystem {
+public class LocalPlayerUIControlSystem implements EventHandlerSystem {
 
     public static final String PAUSE_MENU = "engine:pauseMenu";
     public static final String INVENTORY = "engine:inventory";

@@ -44,7 +44,7 @@ public class BlockItemFactory {
             item.stackId = blockFamily.getTitle() + "Block";
             item.stackCount = (byte)quantity;
         }
-        item.usage = ItemComponent.UsageType.OnBlock;
+        item.usage = ItemComponent.UsageType.ON_BLOCK;
         entity.addComponent(item);
 
         BlockItemComponent blockItem = new BlockItemComponent(blockFamily);
