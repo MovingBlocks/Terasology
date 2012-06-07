@@ -26,10 +26,8 @@ import org.terasology.events.input.binds.ConsoleButton;
 import org.terasology.events.input.binds.InventoryButton;
 import org.terasology.events.input.binds.PauseButton;
 import org.terasology.game.CoreRegistry;
-import org.terasology.game.client.ButtonState;
-import org.terasology.logic.manager.Config;
+import org.terasology.game.input.ButtonState;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.menus.*;
 import org.terasology.rendering.world.WorldRenderer;
 

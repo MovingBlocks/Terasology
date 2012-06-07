@@ -2,7 +2,7 @@ package org.terasology.events.input;
 
 
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.game.client.ButtonState;
+import org.terasology.game.input.ButtonState;
 
 public class MouseUpButtonEvent extends MouseButtonEvent {
 

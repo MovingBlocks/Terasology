@@ -16,7 +16,7 @@
 
 package org.terasology.events.input.binds;
 
-import org.terasology.game.client.BindButtonEvent;
+import org.terasology.game.input.BindButtonEvent;
 
 /**
  * @author Immortius

@@ -1,8 +1,6 @@
 package org.terasology.componentSystem.controllers;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
-import gnu.trove.map.TIntIntMap;
-import gnu.trove.map.hash.TIntIntHashMap;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.terasology.componentSystem.RenderSystem;
@@ -15,16 +13,14 @@ import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.ActivateEvent;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.NoHealthEvent;
-import org.terasology.events.OpenInventoryEvent;
 import org.terasology.events.input.MouseXAxisEvent;
 import org.terasology.events.input.MouseYAxisEvent;
 import org.terasology.events.input.binds.*;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
-import org.terasology.game.client.ButtonState;
+import org.terasology.game.input.ButtonState;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
@@ -32,7 +28,6 @@ import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.RayBlockIntersection;
 import org.terasology.rendering.cameras.DefaultCamera;
-import org.terasology.rendering.gui.menus.UIContainerScreen;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3d;
@@ -48,28 +43,11 @@ import java.util.List;
 // TODO: Move more input stuff to a specific input system?
 // TODO: Camera should become an entity/component, so it can follow the player naturally
 public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, EventHandlerSystem {
-
-    private static TIntIntMap inventorySlotBindMap = new TIntIntHashMap();
-
-    static {
-        inventorySlotBindMap.put(Keyboard.KEY_1, 0);
-        inventorySlotBindMap.put(Keyboard.KEY_2, 1);
-        inventorySlotBindMap.put(Keyboard.KEY_3, 2);
-        inventorySlotBindMap.put(Keyboard.KEY_4, 3);
-        inventorySlotBindMap.put(Keyboard.KEY_5, 4);
-        inventorySlotBindMap.put(Keyboard.KEY_6, 5);
-        inventorySlotBindMap.put(Keyboard.KEY_7, 6);
-        inventorySlotBindMap.put(Keyboard.KEY_8, 7);
-        inventorySlotBindMap.put(Keyboard.KEY_9, 8);
-    }
-
     private LocalPlayer localPlayer;
     private Timer timer;
 
     private IWorldProvider worldProvider;
     private DefaultCamera playerCamera;
-    private BlockEntityRegistry blockEntityRegistry;
-
 
     private long lastTimeSpacePressed;
     private long lastInteraction;
@@ -85,11 +63,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         worldProvider = CoreRegistry.get(IWorldProvider.class);
         localPlayer = CoreRegistry.get(LocalPlayer.class);
         timer = CoreRegistry.get(Timer.class);
-        blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
-
-
     }
-
 
     public void setPlayerCamera(DefaultCamera camera) {
         playerCamera = camera;
@@ -184,7 +158,6 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         event.consume();
     }
 
-
     @Override
     public void renderOverlay() {
         // TODO: Don't render if not in first person?
@@ -275,30 +248,6 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         }
     }
 
-    /**
-     * Processes the keyboard input.
-     *
-     * @param key         Pressed key on the keyboard
-     * @param state       The state of the key
-     * @param repeatEvent True if repeat event
-     */
-    public void processKeyboardInput(int key, boolean state, boolean repeatEvent) {
-        if (inventorySlotBindMap.containsKey(key)) {
-            LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
-            localPlayerComp.selectedTool = inventorySlotBindMap.get(key);
-            localPlayer.getEntity().saveComponent(localPlayerComp);
-            return;
-        }
-        switch (key) {
-            case Keyboard.KEY_X:
-                if (!repeatEvent && state) {
-                    MinionSystem minionSystem = new MinionSystem();
-                    minionSystem.switchMinionMode();
-                }
-                break;
-        }
-    }
-
     @ReceiveEvent(components = {LocalPlayerComponent.class, InventoryComponent.class})
     public void onAttackRequest(AttackButton event, EntityRef entity) {
         if (!event.isDown() || timer.getTimeInMs() - lastInteraction < 200) {
@@ -368,6 +317,13 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         event.consume();
     }
 
+    @ReceiveEvent(components = {LocalPlayerComponent.class})
+    public void onSlotButton(ToolbarSlotButton event, EntityRef entity) {
+        LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
+        localPlayerComp.selectedTool = event.getSlot();
+        localPlayer.getEntity().saveComponent(localPlayerComp);
+    }
+
     @ReceiveEvent(components = {LocalPlayerComponent.class, InventoryComponent.class})
     public void onUseItemRequest(UseItemButton event, EntityRef entity) {
         if (!event.isDown() || timer.getTimeInMs() - lastInteraction < 200) {
@@ -391,68 +347,6 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         localPlayerComp.handAnimation = 0.5f;
         entity.saveComponent(localPlayerComp);
         event.consume();
-    }
-
-    /**
-     * Processes the mouse input.
-     *
-     * @param button     Pressed mouse button
-     * @param state      State of the mouse button
-     * @param wheelMoved Distance the mouse wheel moved since last
-     */
-    public void processMouseInput(int button, boolean state, int wheelMoved) {
-        // needed for the minion toolbar
-        MinionSystem minionsys = new MinionSystem();
-        if (wheelMoved != 0) {
-            //check mode, act according TODO? use events?
-            if (minionsys.MinionMode())
-                if (minionsys.MinionSelect()) minionsys.menuScroll(wheelMoved);
-                else minionsys.barScroll(wheelMoved);
-
-        } else if (button == 1 && !state) {
-            // triggers the selected behaviour of a minion
-            minionsys.RightMouseReleased();
-
-        } else if (state && (button == 0 || button == 1)) {
-            processInteractions(button);
-        }
-    }
-
-    /**
-     * Processes interactions for the given mouse button.
-     *
-     * @param button The pressed mouse button
-     */
-    private void processInteractions(int button) {
-        MinionSystem minionsys = new MinionSystem();
-        // Throttle interactions
-        if (timer.getTimeInMs() - lastInteraction < 200) {
-            return;
-        }
-
-        EntityRef entity = localPlayer.getEntity();
-        LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
-        InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
-
-        if (localPlayerComp.isDead) return;
-
-        if (minionsys.MinionMode()) {
-            if (button == 1) {
-                if (minionsys.isMinionSelected()) {
-                    // opens the minion behaviour menu
-                    lastInteraction = timer.getTimeInMs();
-                    minionsys.RightMouseDown();
-                    minionsys.setMinionSelectMode(true);
-                }
-            } else {
-                if (Mouse.isButtonDown(0) || button == 0) {
-                    // used to set targets for the minion
-                    lastInteraction = timer.getTimeInMs();
-                    minionsys.setTarget();
-                }
-            }
-        }
-
     }
 
     private void useItem(EntityRef player, EntityRef item) {

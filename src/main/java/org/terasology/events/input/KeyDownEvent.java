@@ -1,8 +1,7 @@
 package org.terasology.events.input;
 
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.events.input.KeyEvent;
-import org.terasology.game.client.ButtonState;
+import org.terasology.game.input.ButtonState;
 
 public class KeyDownEvent extends KeyEvent {
 

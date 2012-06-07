@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.terasology.events.input.binds;
+package org.terasology.game.input;
 
-import org.terasology.game.input.BindButtonEvent;
+import org.terasology.entitySystem.EntityRef;
 
 /**
  * @author Immortius
  */
-public class InventoryButton extends BindButtonEvent {
-    public static final String ID = "engine:inventoryButton";
+public interface BindAxisSubscriber {
+    void update(float value, float delta, EntityRef target);
 }

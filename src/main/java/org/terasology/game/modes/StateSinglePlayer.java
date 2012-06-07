@@ -15,7 +15,6 @@
  */
 package org.terasology.game.modes;
 
-import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetType;
@@ -56,8 +55,8 @@ import org.terasology.events.input.binds.InventoryButton;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
-import org.terasology.game.client.BindButtonEvent;
-import org.terasology.game.client.InputSystem;
+import org.terasology.game.input.BindButtonEvent;
+import org.terasology.game.input.InputSystem;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.*;
 import org.terasology.logic.mod.Mod;

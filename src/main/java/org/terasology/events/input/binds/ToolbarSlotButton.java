@@ -21,6 +21,14 @@ import org.terasology.game.input.BindButtonEvent;
 /**
  * @author Immortius
  */
-public class InventoryButton extends BindButtonEvent {
-    public static final String ID = "engine:inventoryButton";
+public class ToolbarSlotButton extends BindButtonEvent {
+    private int slot;
+
+    public ToolbarSlotButton(int slot) {
+        this.slot = slot;
+    }
+
+    public int getSlot() {
+        return slot;
+    }
 }

@@ -14,36 +14,13 @@
  * limitations under the License.
  */
 
-package org.terasology.game.client;
+package org.terasology.events.input.binds;
 
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.events.input.AxisEvent;
+import org.terasology.game.input.BindButtonEvent;
 
 /**
  * @author Immortius
  */
-public class BindAxisEvent extends AxisEvent {
-
-    private String id;
-    private float value;
-
-    public BindAxisEvent() {
-        super(0, EntityRef.NULL);
-    }
-
-    @Override
-    public float getValue() {
-        return value;
-    }
-
-    void prepare(String id, float value, float delta, EntityRef target) {
-        reset(delta, target);
-        this.id = id;
-        this.value = value;
-    }
-
-    public String getId() {
-        return id;
-    }
-
+public class ToggleMinionModeButton extends BindButtonEvent {
+    public static final String ID = "minion:toggleMinionMode";
 }

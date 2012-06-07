@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.game.client;
+package org.terasology.game.input;
 
 /**
  * @author Immortius

@@ -3,7 +3,7 @@ package org.terasology.events.input;
 
 import org.lwjgl.input.Mouse;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.game.client.ButtonState;
+import org.terasology.game.input.ButtonState;
 
 public class MouseButtonEvent extends ButtonEvent {
 

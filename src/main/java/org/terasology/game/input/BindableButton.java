@@ -1,4 +1,4 @@
-package org.terasology.game.client;
+package org.terasology.game.input;
 
 import com.google.common.collect.Lists;
 import org.terasology.entitySystem.EntityRef;

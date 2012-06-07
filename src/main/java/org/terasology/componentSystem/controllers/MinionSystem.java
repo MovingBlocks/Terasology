@@ -1,9 +1,13 @@
 package org.terasology.componentSystem.controllers;
 
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 import org.terasology.components.*;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.ActivateEvent;
+import org.terasology.events.input.binds.ToggleMinionModeButton;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.GUIManager;
@@ -31,6 +35,72 @@ public class MinionSystem implements EventHandlerSystem {
         minionbehaviourmenu = new UIMinion();
         GUIManager.getInstance().addWindow(minionbehaviourmenu,behaviourmenu);
     }
+
+    /*@ReceiveEvent(components = LocalPlayerComponent.class)
+    public void onToggleMinionMode(ToggleMinionModeButton event, EntityRef entity) {
+
+    }
+
+    public void processKeyboardInput(int key, boolean state, boolean repeatEvent) {
+        switch (key) {
+            case Keyboard.KEY_X:
+                if (!repeatEvent && state) {
+                    MinionSystem minionSystem = new MinionSystem();
+                    minionSystem.switchMinionMode();
+                }
+                break;
+        }
+    }
+
+    public void processMouseInput(int button, boolean state, int wheelMoved) {
+        // needed for the minion toolbar
+        MinionSystem minionsys = new MinionSystem();
+        if (wheelMoved != 0) {
+            //check mode, act according TODO? use events?
+            if (minionsys.MinionMode())
+                if (minionsys.MinionSelect()) minionsys.menuScroll(wheelMoved);
+                else minionsys.barScroll(wheelMoved);
+
+        } else if (button == 1 && !state) {
+            // triggers the selected behaviour of a minion
+            minionsys.RightMouseReleased();
+
+        } else if (state && (button == 0 || button == 1)) {
+            processInteractions(button);
+        }
+    }
+
+    private void processInteractions(int button) {
+        MinionSystem minionsys = new MinionSystem();
+        // Throttle interactions
+        if (timer.getTimeInMs() - lastInteraction < 200) {
+            return;
+        }
+
+        EntityRef entity = localPlayer.getEntity();
+        LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
+        InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
+
+        if (localPlayerComp.isDead) return;
+
+        if (minionsys.MinionMode()) {
+            if (button == 1) {
+                if (minionsys.isMinionSelected()) {
+                    // opens the minion behaviour menu
+                    lastInteraction = timer.getTimeInMs();
+                    minionsys.RightMouseDown();
+                    minionsys.setMinionSelectMode(true);
+                }
+            } else {
+                if (Mouse.isButtonDown(0) || button == 0) {
+                    // used to set targets for the minion
+                    lastInteraction = timer.getTimeInMs();
+                    minionsys.setTarget();
+                }
+            }
+        }
+
+    } */
 
     public MinionBarComponent getMinionBar(){
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);

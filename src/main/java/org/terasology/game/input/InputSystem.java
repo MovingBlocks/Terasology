@@ -1,4 +1,4 @@
-package org.terasology.game.client;
+package org.terasology.game.input;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
@@ -356,6 +356,15 @@ public class InputSystem implements EventHandlerSystem {
 
         registerBindButton(ToolbarPrevButton.ID, new ToolbarPrevButton()).setMode(BindableButton.ActivateMode.PRESS);
         linkBindButtonToMouseWheel(-1, ToolbarPrevButton.ID);
+
+        for (int i = 0; i < 9; ++i) {
+            String inventorySlotBind = "engine:toolbarSlot" + i;
+            registerBindButton(inventorySlotBind, new ToolbarSlotButton(i));
+            linkBindButtonToKey(Keyboard.KEY_1 + i, inventorySlotBind);
+        }
+
+        registerBindButton(ToggleMinionModeButton.ID, new ToggleMinionModeButton()).setMode(BindableButton.ActivateMode.PRESS);
+        linkBindButtonToKey(Keyboard.KEY_X, ToggleMinionModeButton.ID);
     }
 
 }
