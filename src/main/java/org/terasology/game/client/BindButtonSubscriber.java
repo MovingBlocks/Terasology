@@ -34,6 +34,14 @@ public interface BindButtonSubscriber {
     boolean onPress(float delta, EntityRef target);
 
     /**
+     * Called when the bind repeats
+     * @param delta The time this frame (not per repeat)
+     * @param target The current camera target
+     * @return True if the bind event was consumed
+     */
+    boolean onRepeat(float delta, EntityRef target);
+
+    /**
      * Called when the bind is deactivated
      * @param delta The time passing this frame
      * @param target The current camera target

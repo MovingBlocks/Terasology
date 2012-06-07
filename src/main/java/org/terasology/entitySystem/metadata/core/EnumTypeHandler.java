@@ -1,6 +1,7 @@
 package org.terasology.entitySystem.metadata.core;
 
 import com.google.common.collect.Lists;
+import org.terasology.components.ItemComponent;
 import org.terasology.entitySystem.metadata.TypeHandler;
 import org.terasology.protobuf.EntityData;
 
@@ -29,7 +30,17 @@ public class EnumTypeHandler<T extends Enum> implements TypeHandler<T> {
                 Enum resultValue = Enum.valueOf(enumType, value.getString(0));
                 return enumType.cast(resultValue);
             } catch (IllegalArgumentException iae) {
-                logger.log(Level.WARNING, "Unabled to deserialize enum: ", iae);
+                // TODO: Temp code due to changed enum case, remove after next milestone
+                if (enumType == ItemComponent.UsageType.class) {
+                    if (value.equals("OnUser")) {
+                        return enumType.cast(ItemComponent.UsageType.ON_USER);
+                    } else if (value.equals("OnBlock")) {
+                        return enumType.cast(ItemComponent.UsageType.ON_BLOCK);
+                    } else if (value.equals("InDirection")) {
+                        return enumType.cast(ItemComponent.UsageType.IN_DIRECTION);
+                    }
+                }
+                logger.log(Level.WARNING, "Unable to deserialize enum: ", iae);
             }
         }
         return null;
@@ -54,7 +65,7 @@ public class EnumTypeHandler<T extends Enum> implements TypeHandler<T> {
                 Enum resultValue = Enum.valueOf(enumType, item);
                 result.add(enumType.cast(resultValue));
             } catch (IllegalArgumentException iae) {
-                logger.log(Level.WARNING, "Unabled to deserialize enum: ", iae);
+                logger.log(Level.WARNING, "Unable to deserialize enum: ", iae);
             }
         }
         return result;

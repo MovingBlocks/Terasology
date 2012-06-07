@@ -63,7 +63,7 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer{
         glPopMatrix();
     }
 
-    public void maximaze(){
+    public void maximize(){
         setSize(new Vector2f(Display.getWidth(), Display.getHeight()));
         _maximized = true;
     }

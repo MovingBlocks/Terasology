@@ -30,10 +30,7 @@ import org.terasology.componentSystem.characters.CharacterMovementSystem;
 import org.terasology.componentSystem.characters.CharacterSoundSystem;
 import org.terasology.componentSystem.common.HealthSystem;
 import org.terasology.componentSystem.common.StatusAffectorSystem;
-import org.terasology.componentSystem.controllers.LocalPlayerSystem;
-import org.terasology.componentSystem.controllers.SimpleAISystem;
-import org.terasology.componentSystem.controllers.SimpleMinionAISystem;
-import org.terasology.componentSystem.input.LocalPlayerUIControlSystem;
+import org.terasology.componentSystem.controllers.*;
 import org.terasology.componentSystem.items.InventorySystem;
 import org.terasology.componentSystem.items.ItemSystem;
 import org.terasology.componentSystem.rendering.BlockDamageRenderer;
@@ -166,6 +163,7 @@ public class StateSinglePlayer implements GameState {
         eventSystem.registerEvent("engine:keyDownEvent", KeyDownEvent.class);
         eventSystem.registerEvent("engine:keyEvent", KeyEvent.class);
         eventSystem.registerEvent("engine:keyUpEvent", KeyUpEvent.class);
+        eventSystem.registerEvent("engine:keyRepeatEvent", KeyRepeatEvent.class);
         eventSystem.registerEvent("engine:leftMouseDownButtonEvent", LeftMouseDownButtonEvent.class);
         eventSystem.registerEvent("engine:leftMouseUpButtonEvent", LeftMouseUpButtonEvent.class);
         eventSystem.registerEvent("engine:mouseDownButtonEvent", MouseDownButtonEvent.class);
@@ -240,7 +238,8 @@ public class StateSinglePlayer implements GameState {
         _componentSystemManager.register(new BookshelfHandler(), "engine:BookshelfHandler");
         _componentSystemManager.register(new DrinkPotionAction(), "engine:DrinkPotionAction");
         _componentSystemManager.register(new StatusAffectorSystem(), "engine:StatusAffectorSystem");
-        _componentSystemManager.register(new LocalPlayerUIControlSystem(), "engine:LocalPlayerUIControlSystem");
+        _componentSystemManager.register(new MenuControlSystem(), "engine:MenuControlSystem");
+        _componentSystemManager.register(new DebugControlSystem(), "engine:DebugControlSystem");
     }
 
     private void loadPrefabs() {
@@ -321,6 +320,7 @@ public class StateSinglePlayer implements GameState {
             if (GUIManager.getInstance().getWindowById("engine:statusScreen") == null) {
                 UIStatusScreen statusScreen = GUIManager.getInstance().addWindow(new UIStatusScreen(), "engine:statusScreen");
                 statusScreen.updateStatus("Sorry! Seems like you have died :-(");
+                statusScreen.setVisible(true);
             }
         } else {
             GUIManager.getInstance().removeWindow("engine:statusScreen");
@@ -330,15 +330,8 @@ public class StateSinglePlayer implements GameState {
     @Override
     public void handleInput(float delta) {
         _inputSystem.update(delta);
-        /*
-        processKeyboardInput();
-        processMouseInput();
 
         // TODO: This should be handled outside of the state, need to fix the screens handling
-        if (!screenHasFocus())  {
-            _inputSystem.update(delta);
-        } */
-
         if (screenHasFocus() || !shouldUpdateWorld()) {
             if (Mouse.isGrabbed()) {
                 Mouse.setGrabbed(false);
@@ -470,74 +463,6 @@ public class StateSinglePlayer implements GameState {
     public WorldRenderer getWorldRenderer() {
         return _worldRenderer;
     }
-
-    /**
-     * Process keyboard input - first look for "system" like events, then otherwise pass to the Player object
-     */
-    private void processKeyboardInput() {
-        boolean debugEnabled = Config.getInstance().isDebug();
-
-        boolean screenHasFocus = screenHasFocus();
-
-        while (Keyboard.next()) {
-            int key = Keyboard.getEventKey();
-
-            // Features for debug mode only
-            if (debugEnabled && !screenHasFocus && Keyboard.getEventKeyState()) {
-                if (key == Keyboard.KEY_UP) {
-                    getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() + 0.005);
-                }
-
-                if (key == Keyboard.KEY_DOWN) {
-                    getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() - 0.005);
-                }
-
-                if (key == Keyboard.KEY_RIGHT) {
-                    getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() + 0.02);
-                }
-
-                if (key == Keyboard.KEY_LEFT) {
-                    getActiveWorldProvider().setTime(getActiveWorldProvider().getTime() - 0.02);
-                }
-
-                if (key == Keyboard.KEY_R && !Keyboard.isRepeatEvent()) {
-                    getWorldRenderer().setWireframe(!getWorldRenderer().isWireframe());
-                }
-
-                if (key == Keyboard.KEY_P && !Keyboard.isRepeatEvent()) {
-                    getWorldRenderer().setCameraMode(WorldRenderer.CAMERA_MODE.PLAYER);
-                }
-
-                if (key == Keyboard.KEY_O && !Keyboard.isRepeatEvent()) {
-                    getWorldRenderer().setCameraMode(WorldRenderer.CAMERA_MODE.SPAWN);
-                }
-            }
-
-            // Pass input to the current player
-            if (!screenHasFocus)
-                _localPlayerSys.processKeyboardInput(key, Keyboard.getEventKeyState(), Keyboard.isRepeatEvent());
-        }
-    }
-
-
-    /*
-    * Process mouse input - nothing system-y, so just passing it to the Player class
-    */
-    private void processMouseInput() {
-        boolean screenHasFocus = screenHasFocus();
-        while (Mouse.next()) {
-            int button = Mouse.getEventButton();
-            int wheelMoved = Mouse.getEventDWheel();
-
-            if (GUIManager.getInstance().getFocusedWindow() != null) {
-                GUIManager.getInstance().processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
-            }
-
-            if (!screenHasFocus)
-                _localPlayerSys.processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
-        }
-    }
-
 
     public void pause() {
         _pauseGame = true;

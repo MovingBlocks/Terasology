@@ -167,8 +167,11 @@ public class BindableButton {
         if (repeating && getState() == ButtonState.DOWN && mode.isActivatedOnPress() && time - lastActivateTime > repeatTime) {
             lastActivateTime = time;
             if (!GUIManager.getInstance().isConsumingInput()) {
-                buttonEvent.prepare(id, ButtonState.REPEAT, delta, target);
-                localPlayer.send(buttonEvent);
+                boolean consumed = triggerOnRepeat(delta, target);
+                if (!consumed) {
+                    buttonEvent.prepare(id, ButtonState.REPEAT, delta, target);
+                    localPlayer.send(buttonEvent);
+                }
             }
         }
     }
@@ -176,6 +179,15 @@ public class BindableButton {
     private boolean triggerOnPress(float delta, EntityRef target) {
         for (BindButtonSubscriber subscriber : subscribers) {
             if (subscriber.onPress(delta, target)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean triggerOnRepeat(float delta, EntityRef target) {
+        for (BindButtonSubscriber subscriber : subscribers) {
+            if (subscriber.onRepeat(delta, target)) {
                 return true;
             }
         }

@@ -69,7 +69,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     private IWorldProvider worldProvider;
     private DefaultCamera playerCamera;
     private BlockEntityRegistry blockEntityRegistry;
-    private UIContainerScreen containerScreen;
+
 
     private long lastTimeSpacePressed;
     private long lastInteraction;
@@ -87,20 +87,12 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         timer = CoreRegistry.get(Timer.class);
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
 
-        containerScreen = GUIManager.getInstance().addWindow(new UIContainerScreen(), "container");
+
     }
 
 
     public void setPlayerCamera(DefaultCamera camera) {
         playerCamera = camera;
-    }
-
-    @ReceiveEvent(components = {LocalPlayerComponent.class, InventoryComponent.class})
-    public void onOpenContainer(OpenInventoryEvent event, EntityRef entity) {
-        if (event.getContainer().hasComponent(InventoryComponent.class)) {
-            containerScreen.openContainer(event.getContainer(), entity);
-            GUIManager.getInstance().setFocusedWindow(containerScreen);
-        }
     }
 
     @Override
@@ -298,16 +290,6 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             return;
         }
         switch (key) {
-            case Keyboard.KEY_K:
-                if (!repeatEvent && state) {
-                    localPlayer.getEntity().send(new DamageEvent(9999, null));
-                }
-                break;
-            case Keyboard.KEY_E:
-                if (!repeatEvent && state) {
-                    processFrob();
-                }
-                break;
             case Keyboard.KEY_X:
                 if (!repeatEvent && state) {
                     MinionSystem minionSystem = new MinionSystem();
@@ -354,6 +336,38 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         target.send(new DamageEvent(damage, player));
     }
 
+    @ReceiveEvent(components = {LocalPlayerComponent.class})
+    public void onFrobRequest(FrobButton event, EntityRef entity) {
+        if (event.getState() != ButtonState.DOWN) {
+            return;
+        }
+
+        LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
+        if (localPlayerComp.isDead) return;
+
+        event.getTarget().send(new ActivateEvent(entity, entity));
+        event.consume();
+    }
+
+    @ReceiveEvent(components = {LocalPlayerComponent.class})
+    public void onNextItem(ToolbarNextButton event, EntityRef entity) {
+        LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
+        localPlayerComp.selectedTool = (localPlayerComp.selectedTool + 1) % 9;
+        localPlayer.getEntity().saveComponent(localPlayerComp);
+        event.consume();
+    }
+
+    @ReceiveEvent(components = {LocalPlayerComponent.class})
+    public void onPrevItem(ToolbarPrevButton event, EntityRef entity) {
+        LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
+        localPlayerComp.selectedTool = (localPlayerComp.selectedTool - 1) % 9;
+        if (localPlayerComp.selectedTool < 0) {
+            localPlayerComp.selectedTool = 9 + localPlayerComp.selectedTool;
+        }
+        localPlayer.getEntity().saveComponent(localPlayerComp);
+        event.consume();
+    }
+
     @ReceiveEvent(components = {LocalPlayerComponent.class, InventoryComponent.class})
     public void onUseItemRequest(UseItemButton event, EntityRef entity) {
         if (!event.isDown() || timer.getTimeInMs() - lastInteraction < 200) {
@@ -394,14 +408,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             if (minionsys.MinionMode())
                 if (minionsys.MinionSelect()) minionsys.menuScroll(wheelMoved);
                 else minionsys.barScroll(wheelMoved);
-            else {
-                LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
-                localPlayerComp.selectedTool = (localPlayerComp.selectedTool + wheelMoved / 120) % 9;
-                while (localPlayerComp.selectedTool < 0) {
-                    localPlayerComp.selectedTool = 9 + localPlayerComp.selectedTool;
-                }
-                localPlayer.getEntity().saveComponent(localPlayerComp);
-            }
+
         } else if (button == 1 && !state) {
             // triggers the selected behaviour of a minion
             minionsys.RightMouseReleased();
@@ -446,27 +453,6 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             }
         }
 
-    }
-
-    private void processFrob() {
-        EntityRef entity = localPlayer.getEntity();
-        LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
-
-        if (localPlayerComp.isDead) return;
-
-        // For now, just use blocks
-        RayBlockIntersection.Intersection blockIntersection = calcSelectedBlock();
-        if (blockIntersection != null) {
-            Vector3i centerPos = blockIntersection.getBlockPosition();
-
-            Block block = BlockManager.getInstance().getBlock(worldProvider.getBlock(centerPos));
-            if (block.isUsable()) {
-                EntityRef blockEntity = blockEntityRegistry.getOrCreateEntityAt(centerPos);
-                // TODO: Shouldn't activate directly, should send use event - same as item?
-                // Maybe break out a usable component.
-                blockEntity.send(new ActivateEvent(blockEntity, entity));
-            }
-        }
     }
 
     private void useItem(EntityRef player, EntityRef item) {

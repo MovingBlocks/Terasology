@@ -18,10 +18,8 @@ package org.terasology.rendering.gui.menus;
 import groovy.util.ConfigObject;
 import groovy.util.ConfigSlurper;
 import org.lwjgl.opengl.Display;
-import org.newdawn.slick.Game;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
-import org.terasology.game.Terasology;
 import org.terasology.game.modes.StateSinglePlayer;
 import org.terasology.logic.manager.AssetManager;
 import org.terasology.logic.manager.Config;
@@ -57,7 +55,7 @@ public class UISelectWorldMenu extends UIDisplayWindow {
     final UIDialogCreateNewWorld _window;
 
     public UISelectWorldMenu() {
-        maximaze();
+        maximize();
         _overlay = new UIImageOverlay(AssetManager.loadTexture("engine:menuBackground"));
         _overlay.setVisible(true);
 

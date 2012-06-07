@@ -351,10 +351,10 @@ public class InputSystem implements EventHandlerSystem {
         registerBindButton(FrobButton.ID, new FrobButton());
         linkBindButtonToKey(Keyboard.KEY_E, FrobButton.ID);
 
-        registerBindButton(ToolbarNextButton.ID, new ToolbarNextButton());
+        registerBindButton(ToolbarNextButton.ID, new ToolbarNextButton()).setMode(BindableButton.ActivateMode.PRESS);
         linkBindButtonToMouseWheel(+1, ToolbarNextButton.ID);
 
-        registerBindButton(ToolbarPrevButton.ID, new ToolbarPrevButton());
+        registerBindButton(ToolbarPrevButton.ID, new ToolbarPrevButton()).setMode(BindableButton.ActivateMode.PRESS);
         linkBindButtonToMouseWheel(-1, ToolbarPrevButton.ID);
     }
 

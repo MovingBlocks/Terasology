@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.componentSystem.input;
+package org.terasology.componentSystem.controllers;
 
 import org.lwjgl.input.Keyboard;
 import org.terasology.components.LocalPlayerComponent;
@@ -36,20 +36,16 @@ import org.terasology.rendering.world.WorldRenderer;
 /**
  * @author Immortius
  */
-public class LocalPlayerUIControlSystem implements EventHandlerSystem {
+public class MenuControlSystem implements EventHandlerSystem {
 
     public static final String PAUSE_MENU = "engine:pauseMenu";
     public static final String INVENTORY = "engine:inventory";
     public static final String CONSOLE = "engine:console";
 
-    private UIMetrics metrics;
-
     @Override
     public void initialise() {
         GUIManager.getInstance().addWindow(new UIDebugConsole(), CONSOLE);
         GUIManager.getInstance().addWindow(new UIHeadsUpDisplay(), "engine:hud");
-        metrics = new UIMetrics();
-        GUIManager.getInstance().addWindow(metrics, "engine:metrics");
         GUIManager.getInstance().addWindow(new UIInventoryScreen(), INVENTORY);
         GUIManager.getInstance().addWindow(new UIPauseMenu(), PAUSE_MENU);
     }
@@ -78,24 +74,10 @@ public class LocalPlayerUIControlSystem implements EventHandlerSystem {
     @ReceiveEvent(components = LocalPlayerComponent.class)
     public void onKeyDown(KeyDownEvent event, EntityRef entity) {
         switch (event.getKey()) {
-            case Keyboard.KEY_F3:
-                Config.getInstance().setDebug(!Config.getInstance().isDebug());
-                break;
-            case Keyboard.KEY_F:
-                toggleViewingDistance();
-                break;
             case Keyboard.KEY_F12:
                 CoreRegistry.get(WorldRenderer.class).printScreen();
                 break;
-            case Keyboard.KEY_F4:
-                metrics.toggleMode();
-                break;
         }
     }
-
-    private void toggleViewingDistance() {
-        Config.getInstance().setViewingDistanceById((Config.getInstance().getActiveViewingDistanceId() + 1) % 4);
-    }
-
 
 }

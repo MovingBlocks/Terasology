@@ -2,17 +2,13 @@ package org.terasology.rendering.gui.menus;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
-import org.terasology.componentSystem.items.InventorySystem;
 import org.terasology.components.InventoryComponent;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.events.input.binds.FrobButton;
 import org.terasology.events.inventory.ReceiveItemEvent;
-import org.terasology.game.ComponentSystemManager;
-import org.terasology.game.CoreRegistry;
-import org.terasology.game.Terasology;
 import org.terasology.logic.manager.AssetManager;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.components.UIInventoryNew;
-import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
@@ -34,8 +30,6 @@ public class UIContainerScreen  extends UIDisplayWindow implements UIInventoryNe
     private final UIGraphicsElement background;
 
     public UIContainerScreen() {
-        maximaze();
-
         background = new UIGraphicsElement(AssetManager.loadTexture("engine:containerWindow"));
         background.getTextureSize().set(new Vector2f(256f / 256f, 231f / 256f));
         background.getTextureOrigin().set(new Vector2f(0.0f, 0.0f));
@@ -52,6 +46,7 @@ public class UIContainerScreen  extends UIDisplayWindow implements UIInventoryNe
         addDisplayElement(containerInventory);
 
         background.setVisible(true);
+        setModal(true);
 
         update();
     }
@@ -74,15 +69,15 @@ public class UIContainerScreen  extends UIDisplayWindow implements UIInventoryNe
         background.center();
     }
 
-    @Override
-    public void processKeyboardInput(int key) {
-        if (!isVisible())
-            return;
+    public boolean processBindButton(String id, boolean pressed) {
+        if (!isVisible() || !pressed)
+            return false;
 
-        super.processKeyboardInput(key);
-        if (key == Keyboard.KEY_E) {
-            GUIManager.getInstance().removeWindow(this);
+        if (FrobButton.ID == id) {
+            setVisible(false);
+            return true;
         }
+        return false;
     }
 
     public void itemClicked(UIInventoryNew inventoryNew, int slot) {

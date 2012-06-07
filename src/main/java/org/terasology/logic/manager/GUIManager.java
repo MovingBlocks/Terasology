@@ -257,7 +257,7 @@ public class GUIManager {
 
     private void checkTopWindow(){
 
-        if(_focusedWindow.isModal()&&_focusedWindow.isVisible()){
+        if(_focusedWindow != null && _focusedWindow.isModal() && _focusedWindow.isVisible()){
             return;
         }
 

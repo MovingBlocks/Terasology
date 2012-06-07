@@ -42,7 +42,7 @@ public class UIMainMenu extends UIDisplayWindow {
     final UIText _version;
                                                                   
     public UIMainMenu() {
-        maximaze();
+        maximize();
         _title = new UIGraphicsElement(AssetManager.loadTexture("engine:terasology"));
         _title.setVisible(true);
         _title.setSize(new Vector2f(512f, 128f));
