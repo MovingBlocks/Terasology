@@ -12,10 +12,7 @@ import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LocationComponent;
 import org.terasology.components.PlayerComponent;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
@@ -66,7 +63,7 @@ public class ItemSystem implements EventHandlerSystem {
         }
     }
 
-    @ReceiveEvent(components=ItemComponent.class,priority = ReceiveEvent.PRIORITY_CRITICAL)
+    @ReceiveEvent(components=ItemComponent.class,priority = EventPriority.PRIORITY_CRITICAL)
     public void checkCanUseItem(ActivateEvent event, EntityRef item) {
         ItemComponent itemComp = item.getComponent(ItemComponent.class);
         switch (itemComp.usage) {
@@ -86,7 +83,7 @@ public class ItemSystem implements EventHandlerSystem {
         }
     }
 
-    @ReceiveEvent(components=ItemComponent.class,priority = ReceiveEvent.PRIORITY_TRIVIAL)
+    @ReceiveEvent(components=ItemComponent.class,priority = EventPriority.PRIORITY_TRIVIAL)
     public void usedItem(ActivateEvent event, EntityRef item) {
         ItemComponent itemComp = item.getComponent(ItemComponent.class);
         if (itemComp.consumedOnUse) {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.events.input.binds;
+package org.terasology.mods.miniions.events;
 
 import org.terasology.game.input.BindButtonEvent;
 

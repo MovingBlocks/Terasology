@@ -8,11 +8,7 @@ import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LocationComponent;
 import org.terasology.entityFactory.BlockItemFactory;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.entitySystem.PrefabManager;
-import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.*;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.FullHealthEvent;
 import org.terasology.events.NoHealthEvent;
@@ -93,7 +89,7 @@ public class BlockEntitySystem implements EventHandlerSystem {
         }
     }
 
-    @ReceiveEvent(components={BlockComponent.class},priority = ReceiveEvent.PRIORITY_HIGH)
+    @ReceiveEvent(components={BlockComponent.class},priority = EventPriority.PRIORITY_HIGH)
     public void onDamaged(DamageEvent event, EntityRef entity) {
         BlockComponent blockComp = entity.getComponent(BlockComponent.class);
 

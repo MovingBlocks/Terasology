@@ -17,12 +17,16 @@ package org.terasology.rendering.gui.menus;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
+import org.terasology.entitySystem.*;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
-import org.terasology.game.Terasology;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
+import org.terasology.mods.miniions.components.MinionComponent;
+import org.terasology.mods.miniions.events.MinionMessageEvent;
+import org.terasology.mods.miniions.rendering.gui.components.UIMessageQueue;
+import org.terasology.mods.miniions.rendering.gui.components.UIMinionbar;
 import org.terasology.rendering.gui.components.*;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
@@ -36,7 +40,9 @@ import javax.vecmath.Vector2f;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class UIHeadsUpDisplay extends UIDisplayWindow {
+public class UIHeadsUpDisplay extends UIDisplayWindow implements EventHandlerSystem {
+
+    protected EntityManager entityManager;
 
     /* DISPLAY ELEMENTS */
     private final UICrosshair _crosshair;
@@ -47,7 +53,7 @@ public class UIHeadsUpDisplay extends UIDisplayWindow {
 
     private final UIToolbar _toolbar;
     private final UIMinionbar _minionbar;
-    //private final UIMinion _miniongui;
+    private final UIMessageQueue _messagequeue;
     private final UIHealthBar _healthBar;
     private final UIBuff _buffBar;
 
@@ -76,10 +82,10 @@ public class UIHeadsUpDisplay extends UIDisplayWindow {
         _minionbar = new UIMinionbar();
         _minionbar.setVisible(true);
         addDisplayElement(_minionbar);
-        /*
-        _miniongui = new UIMinion();
-        _miniongui.setVisible(true);
-        addDisplayElement(_miniongui);*/
+
+        _messagequeue = new UIMessageQueue();
+        _messagequeue.setVisible(true);
+        addDisplayElement(_messagequeue);
 
         _healthBar = new UIHealthBar();
         _healthBar.setVisible(true);
@@ -90,6 +96,7 @@ public class UIHeadsUpDisplay extends UIDisplayWindow {
         addDisplayElement(_buffBar);
         setVisible(true);
 
+        CoreRegistry.get(EventSystem.class).registerEventHandler(this);
     }
 
 
@@ -122,4 +129,13 @@ public class UIHeadsUpDisplay extends UIDisplayWindow {
         }
     }
 
+    @Override
+    public void initialise() {
+        entityManager = CoreRegistry.get(EntityManager.class);
+    }
+
+    @ReceiveEvent(components = {MinionComponent.class})
+    public void onMessageReceived(MinionMessageEvent event, EntityRef entityref) {
+        _messagequeue.addIconToQueue(event.getMinionMessage());
+    }
 }

@@ -1,8 +1,6 @@
 package org.terasology.componentSystem.controllers;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.componentSystem.block.BlockEntityRegistry;

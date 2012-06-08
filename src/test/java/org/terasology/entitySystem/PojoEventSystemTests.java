@@ -194,7 +194,7 @@ public class PojoEventSystemTests {
         List<Received> receivedList = Lists.newArrayList();
         public boolean cancel = false;
 
-        @ReceiveEvent(components = StringComponent.class, priority = ReceiveEvent.PRIORITY_HIGH)
+        @ReceiveEvent(components = StringComponent.class, priority = EventPriority.PRIORITY_HIGH)
         public void handleStringEvent(TestEvent event, EntityRef entity) {
             receivedList.add(new Received(event, entity));
             if (cancel) {
@@ -202,7 +202,7 @@ public class PojoEventSystemTests {
             }
         }
 
-        @ReceiveEvent(components = IntegerComponent.class, priority = ReceiveEvent.PRIORITY_HIGH)
+        @ReceiveEvent(components = IntegerComponent.class, priority = EventPriority.PRIORITY_HIGH)
         public void handleIntegerEvent(TestEvent event, EntityRef entity) {
             receivedList.add(new Received(event, entity));
         }

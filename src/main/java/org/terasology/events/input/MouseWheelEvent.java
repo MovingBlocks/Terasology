@@ -27,6 +27,7 @@ public class MouseWheelEvent extends InputEvent {
 
     public MouseWheelEvent(int wheelTurns, float delta, EntityRef target) {
         super(delta, target);
+        this.wheelTurns = wheelTurns;
     }
 
     public int getWheelTurns() {

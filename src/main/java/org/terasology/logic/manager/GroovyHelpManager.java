@@ -2,8 +2,7 @@ package org.terasology.logic.manager;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
-import org.terasology.components.MinionBarComponent;
-import org.terasology.entityFactory.GelatinousCubeFactory;
+import org.terasology.components.LocalPlayerComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Prefab;
@@ -15,6 +14,9 @@ import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.RayBlockIntersection;
+import org.terasology.mods.miniions.components.MinionBarComponent;
+import org.terasology.mods.miniions.components.MinionControllerComponent;
+import org.terasology.mods.miniions.componentsystem.entityfactory.MiniionFactory;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
@@ -134,10 +136,11 @@ public class GroovyHelpManager {
     public void spawnCube() {
         EntityManager entMan = CoreRegistry.get(EntityManager.class);
         if (entMan != null) {
-            GelatinousCubeFactory factory = new GelatinousCubeFactory();
+            MiniionFactory factory = new MiniionFactory();
             factory.setEntityManager(entMan);
 
             LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+            MinionControllerComponent minionController = localPlayer.getEntity().getComponent(MinionControllerComponent.class);
             MinionBarComponent inventory = localPlayer.getEntity().getComponent(MinionBarComponent.class);
             int freeSlot = inventory.MinionSlots.indexOf(EntityRef.NULL);
             if (freeSlot != -1) {
@@ -146,7 +149,7 @@ public class GroovyHelpManager {
                     Vector3i centerPos = blockIntersection.getBlockPosition();
                     //Vector3i blockPos = blockIntersection.calcAdjacentBlockPos();
                     factory.setRandom(new FastRandom());
-                    inventory.MinionSlots.set(freeSlot, factory.generateGelatinousMinion(new Vector3f(centerPos.x, centerPos.y + 1, centerPos.z)));
+                    inventory.MinionSlots.set(freeSlot, factory.generateMiniion(new Vector3f(centerPos.x, centerPos.y + 1, centerPos.z), minionController.selectedMinion));
                 }
             }
 
@@ -156,10 +159,11 @@ public class GroovyHelpManager {
     public void spawnCube(int slot) {
         EntityManager entMan = CoreRegistry.get(EntityManager.class);
         if (entMan != null) {
-            GelatinousCubeFactory factory = new GelatinousCubeFactory();
+            MiniionFactory factory = new MiniionFactory();
             factory.setEntityManager(entMan);
 
             LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+            MinionControllerComponent minionController = localPlayer.getEntity().getComponent(MinionControllerComponent.class);
             MinionBarComponent inventory = localPlayer.getEntity().getComponent(MinionBarComponent.class);
             int freeSlot = inventory.MinionSlots.indexOf(EntityRef.NULL);
             if (freeSlot != -1) {
@@ -168,7 +172,7 @@ public class GroovyHelpManager {
                     Vector3i centerPos = blockIntersection.getBlockPosition();
                     //Vector3i blockPos = blockIntersection.calcAdjacentBlockPos();
                     factory.setRandom(new FastRandom());
-                    inventory.MinionSlots.set(slot, factory.generateGelatinousMinion(new Vector3f(centerPos.x, centerPos.y + 1, centerPos.z)));
+                    inventory.MinionSlots.set(slot, factory.generateMiniion(new Vector3f(centerPos.x, centerPos.y + 1, centerPos.z), minionController.selectedMinion));
                     localPlayer.getEntity().saveComponent(inventory);
                 }
             }

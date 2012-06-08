@@ -19,6 +19,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
 import org.terasology.entitySystem.Prefab;
+import org.terasology.events.input.binds.ConsoleButton;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Terasology;
 import org.terasology.logic.manager.GroovyManager;
@@ -116,6 +117,20 @@ public final class UIDebugConsole extends UIDisplayWindow {
                 }
                 break;
         }
+    }
+
+    @Override
+    public boolean processBindButton(String id, boolean pressed) {
+        if (!isVisible() || !pressed) {
+            return false;
+        }
+
+        if (ConsoleButton.ID.equals(id)) {
+            setVisible(false);
+            return true;
+        }
+
+        return false;
     }
 
     /**

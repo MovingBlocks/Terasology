@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.components;
+package org.terasology.mods.miniions.rendering.gui.components;
 
-import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
-import org.terasology.components.*;
+import org.terasology.components.LocalPlayerComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AssetManager;
-import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.BlockFamily;
 import org.terasology.model.inventory.Icon;
+import org.terasology.mods.miniions.components.MinionBarComponent;
+import org.terasology.mods.miniions.components.MinionComponent;
+import org.terasology.mods.miniions.components.MinionControllerComponent;
+import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
@@ -40,41 +41,42 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class UIMinionbarCell extends UIDisplayElement {
 
-    private final UIGraphicsElement _selectionRectangle;
-    private final UIText _label;
+    private final UIGraphicsElement selectionRectangle;
+    private final UIText label;
 
-    private int _id;
-    private boolean _selected = false;
+    private int id;
+    private boolean selected = false;
 
     public UIMinionbarCell(int id) {
-        _id = id;
+        this.id = id;
 
         setSize(new Vector2f(48f, 48f));
 
-        _selectionRectangle = new UIGraphicsElement(AssetManager.loadTexture("engine:gui"));
-        _selectionRectangle.getTextureSize().set(new Vector2f(24f / 256f, 24f / 256f));
-        _selectionRectangle.getTextureOrigin().set(new Vector2f(0.0f, 24f / 256f));
-        _selectionRectangle.setSize(new Vector2f(48f, 48f));
+        selectionRectangle = new UIGraphicsElement(AssetManager.loadTexture("engine:gui"));
+        selectionRectangle.getTextureSize().set(new Vector2f(24f / 256f, 24f / 256f));
+        selectionRectangle.getTextureOrigin().set(new Vector2f(0.0f, 24f / 256f));
+        selectionRectangle.setSize(new Vector2f(48f, 48f));
 
-        _label = new UIText();
-        _label.setVisible(true);
-        _label.setPosition(new Vector2f(30f, 20f));
+        label = new UIText();
+        label.setVisible(true);
+        label.setPosition(new Vector2f(30f, 20f));
     }
 
     @Override
     public void update() {
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
 
-        _selectionRectangle.setVisible(_selected);
-        setPosition(new Vector2f(2f, (getSize().y - 8f) * _id - 2f));
+        selectionRectangle.setVisible(selected);
+        setPosition(new Vector2f(2f, (getSize().y - 8f) * id - 2f));
 
         MinionBarComponent inventory = localPlayer.getEntity().getComponent(MinionBarComponent.class);
-        if (inventory == null)
+        if (inventory == null) {
             return;
-        if (inventory.MinionSlots.size() > _id) {
-            LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
-            if (localPlayerComp != null) {
-                setSelected(localPlayerComp.selectedMinion == _id);
+        }
+        if (inventory.MinionSlots.size() > id) {
+            MinionControllerComponent minionController = localPlayer.getEntity().getComponent(MinionControllerComponent.class);
+            if (minionController != null) {
+                setSelected(minionController.selectedMinion == id);
             }
         }
     }
@@ -82,38 +84,36 @@ public class UIMinionbarCell extends UIDisplayElement {
     @Override
     public void render() {
 
-        _selectionRectangle.renderTransformed();
+        selectionRectangle.renderTransformed();
 
         MinionBarComponent inventory = CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(MinionBarComponent.class);
         if (inventory == null) {
             return;
         }
-        if (inventory.MinionSlots.size() <= _id)
+        if (inventory.MinionSlots.size() <= id) {
             return;
-        
-        EntityRef minionEntity = inventory.MinionSlots.get(_id);
+        }
+        EntityRef minionEntity = inventory.MinionSlots.get(id);
         MinionComponent minion = minionEntity.getComponent(MinionComponent.class);
-        if (minion == null)
+        if (minion == null) {
             return;
-
+        }
         if (minion.icon.isEmpty()) {
             Icon icon = Icon.get("gelcube");
-            if (icon != null)
-            {
+            if (icon != null) {
                 renderIcon(icon);
             }
         } else {
             Icon icon = Icon.get(minion.icon);
-            if (icon != null)
-            {
+            if (icon != null) {
                 renderIcon(icon);
             }
         }
 
-        _label.renderTransformed();    
+        label.renderTransformed();
 
     }
-    
+
     private void renderIcon(Icon icon) {
         glEnable(GL11.GL_DEPTH_TEST);
         glClear(GL11.GL_DEPTH_BUFFER_BIT);
@@ -125,14 +125,14 @@ public class UIMinionbarCell extends UIDisplayElement {
     }
 
     public void setSelected(boolean selected) {
-        _selected = selected;
+        this.selected = selected;
     }
 
     public boolean getSelected() {
-        return _selected;
+        return selected;
     }
 
     public UIText getLabel() {
-        return _label;
+        return label;
     }
 }

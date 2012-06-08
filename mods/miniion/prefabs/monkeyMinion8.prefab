@@ -1,12 +1,12 @@
 {
-  "name": "core:gelatinousMinion",
+  "name": "miniion:monkeyMinion8",
   "Minion" : {
-    "icon" = "gelcube"
+    "icon" = "minion8"
   },
   "Location" : {},
   "Mesh" : {
     "mesh" : "engine:testmonkey",
-    "material" : "engine:monkeyHead"
+    "material" : "engine:monkeyHead8"
   },
   "CharacterMovement" : {
     "faceMovementDirection" : true

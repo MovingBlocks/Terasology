@@ -12,7 +12,6 @@ import org.terasology.components.HealthComponent;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.LocationComponent;
-import org.terasology.components.MinionBarComponent;
 import org.terasology.components.PlayerComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -21,6 +20,8 @@ import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AssetManager;
 import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.mods.miniions.components.MinionBarComponent;
+import org.terasology.mods.miniions.components.MinionControllerComponent;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -63,6 +64,7 @@ public class PlayerFactory {
         player.addComponent(new LocalPlayerComponent());
         player.addComponent(new InventoryComponent(36));
         player.addComponent(new MinionBarComponent(9));
+        player.addComponent(new MinionControllerComponent());
 
         player.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Companion"), 16)));
         player.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Torch"), 99)));

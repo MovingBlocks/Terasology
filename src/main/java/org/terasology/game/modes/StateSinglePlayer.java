@@ -41,15 +41,14 @@ import org.terasology.entityFactory.PlayerFactory;
 import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentLibraryImpl;
+import org.terasology.entitySystem.metadata.extension.*;
+import org.terasology.entitySystem.persistence.EntityDataJSONFormat;
+import org.terasology.entitySystem.persistence.EntityPersisterHelper;
+import org.terasology.entitySystem.persistence.EntityPersisterHelperImpl;
 import org.terasology.entitySystem.persistence.WorldPersister;
 import org.terasology.entitySystem.pojo.PojoEntityManager;
 import org.terasology.entitySystem.pojo.PojoEventSystem;
 import org.terasology.entitySystem.pojo.PojoPrefabManager;
-import org.terasology.entitySystem.persistence.EntityDataJSONFormat;
-import org.terasology.entitySystem.persistence.EntityPersisterHelper;
-import org.terasology.entitySystem.metadata.extension.*;
-import org.terasology.entitySystem.persistence.EntityPersisterHelperImpl;
-import org.terasology.components.PoisonedComponent;
 import org.terasology.events.input.*;
 import org.terasology.events.input.binds.InventoryButton;
 import org.terasology.game.ComponentSystemManager;
@@ -58,13 +57,21 @@ import org.terasology.game.GameEngine;
 import org.terasology.game.input.BindButtonEvent;
 import org.terasology.game.input.InputSystem;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.manager.*;
+import org.terasology.logic.manager.AssetManager;
+import org.terasology.logic.manager.GUIManager;
+import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.BlockFamily;
 import org.terasology.model.shapes.BlockShapeManager;
+import org.terasology.mods.miniions.components.MinionBarComponent;
+import org.terasology.mods.miniions.components.MinionComponent;
+import org.terasology.mods.miniions.components.MinionControllerComponent;
+import org.terasology.mods.miniions.components.SimpleMinionAIComponent;
+import org.terasology.mods.miniions.componentsystem.controllers.MinionSystem;
+import org.terasology.mods.miniions.componentsystem.controllers.SimpleMinionAISystem;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.protobuf.EntityData;
 import org.terasology.rendering.assets.Material;
@@ -151,6 +158,7 @@ public class StateSinglePlayer implements GameState {
         EventSystem eventSystem = new PojoEventSystem(_entityManager);
         _entityManager.setEventSystem(eventSystem);
         CoreRegistry.put(EntityManager.class, _entityManager);
+        CoreRegistry.put(EventSystem.class, eventSystem);
         _componentSystemManager = new ComponentSystemManager();
         CoreRegistry.put(ComponentSystemManager.class, _componentSystemManager);
 
@@ -204,6 +212,7 @@ public class StateSinglePlayer implements GameState {
         componentLibrary.registerComponentClass(PotionComponent.class);
         componentLibrary.registerComponentClass(SpeedBoostComponent.class);
         componentLibrary.registerComponentClass(PoisonedComponent.class);
+        componentLibrary.registerComponentClass(MinionControllerComponent.class);
         loadPrefabs();
 
         BlockEntityRegistry blockEntityRegistry = new BlockEntityRegistry();
@@ -233,12 +242,12 @@ public class StateSinglePlayer implements GameState {
         _componentSystemManager.register(new AccessInventoryAction(), "engine:AccessInventoryAction");
         _componentSystemManager.register(new SpawnPrefabAction(), "engine:SpawnPrefabAction");
         _componentSystemManager.register(new ReadBookAction(), "engine:ReadBookAction");
-        //_componentSystemManager.register(new DestroyMinion(), "engine:DestroyMinionAction");
         _componentSystemManager.register(new BookshelfHandler(), "engine:BookshelfHandler");
         _componentSystemManager.register(new DrinkPotionAction(), "engine:DrinkPotionAction");
         _componentSystemManager.register(new StatusAffectorSystem(), "engine:StatusAffectorSystem");
         _componentSystemManager.register(new MenuControlSystem(), "engine:MenuControlSystem");
         _componentSystemManager.register(new DebugControlSystem(), "engine:DebugControlSystem");
+        _componentSystemManager.register(new MinionSystem(), "miniion:MinionSystem");
     }
 
     private void loadPrefabs() {

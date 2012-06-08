@@ -1,4 +1,4 @@
-package org.terasology.components;
+package org.terasology.mods.miniions.components;
 
 import org.terasology.entitySystem.Component;
 
@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * @author Overdhose
- * copied from SimpleAIComponent, only movementtarget is really used
+ *         copied from SimpleAIComponent, only movementtarget is really used
  */
 public final class SimpleMinionAIComponent implements Component {
 
@@ -24,10 +24,12 @@ public final class SimpleMinionAIComponent implements Component {
     public List<Vector3f> movementTargets = new ArrayList<Vector3f>();
     public List<Vector3f> gatherTargets = new ArrayList<Vector3f>();
     public List<Vector3f> patrolTargets = new ArrayList<Vector3f>();
+    public List<Vector3f> pathTargets = new ArrayList<Vector3f>();
 
     public boolean followingPlayer = true;
+    public boolean locked = false;
 
-    public void ClearCommands(){
+    public void ClearCommands() {
         movementTargets.removeAll(movementTargets);
         gatherTargets.removeAll(gatherTargets);
         patrolTargets.removeAll(patrolTargets);

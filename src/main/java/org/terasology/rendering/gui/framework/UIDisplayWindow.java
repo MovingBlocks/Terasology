@@ -35,7 +35,7 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer{
     }
 
     public void clearInputControls(){
-        for (UIDisplayElement element: _displayElements) {
+        for (UIDisplayElement element: getDisplayElements()) {
             if(IInputDataElement.class.isInstance(element)){
                 IInputDataElement inputControl = (IInputDataElement)element;
                 inputControl.clearData();
@@ -81,7 +81,7 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer{
     }
 
     public void addDisplayElement(UIDisplayElement element, String elementId) {
-        _displayElements.add(element);
+        addDisplayElement(element);
         _displayElementsById.put(elementId, element);
         element.setParent(this);
     }

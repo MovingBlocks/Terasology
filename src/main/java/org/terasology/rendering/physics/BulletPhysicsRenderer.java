@@ -31,10 +31,8 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.components.ItemComponent;
-import org.terasology.components.LocalPlayerComponent;
-import org.terasology.components.LocationComponent;
-import org.terasology.components.MinionBarComponent;
+import org.terasology.components.*;
+import org.terasology.mods.miniions.components.MinionBarComponent;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -47,6 +45,7 @@ import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.world.Chunk;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.mods.miniions.components.MinionControllerComponent;
 import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
@@ -92,19 +91,14 @@ public class BulletPhysicsRenderer implements IGameObject {
             return blockPlayer.length();
         }
 
-        public float distanceToEntity(EntityRef target) {
+        public float distanceToEntity(Vector3f pos) {
             Transform t = new Transform();
             getMotionState().getWorldTransform(t);
             Matrix4f tMatrix = new Matrix4f();
             t.getMatrix(tMatrix);
             Vector3f blockPlayer = new Vector3f();
             tMatrix.get(blockPlayer);
-            LocationComponent loc = target.getComponent(LocationComponent.class);
-            if (loc != null) {
-                blockPlayer.sub(loc.getWorldPosition());
-            } else {
-                blockPlayer.sub(new Vector3f());
-            }
+            blockPlayer.sub(pos);
             return blockPlayer.length();
         }
 
@@ -309,45 +303,29 @@ public class BulletPhysicsRenderer implements IGameObject {
     }
 
     private void checkForLootedBlocks() {
-        LocalPlayer player = CoreRegistry.get(LocalPlayer.class);
-        // to send blocks to minions, some needed classes
-        EntityRef playerent = player.getEntity();
-        LocalPlayerComponent localPlayerComp = playerent.getComponent(LocalPlayerComponent.class);
-        MinionBarComponent inventory = null;
-        EntityRef closestminion = null;
-        if (localPlayerComp.minionMode) {
-            inventory = playerent.getComponent(MinionBarComponent.class);
-        }
-
         for (int i = _blocks.size() - 1; i >= 0; i--) {
             BlockRigidBody b = _blocks.get(i);
             if (b._temporary) {
                 continue;
             }
 
-            float closestDist = 99999;
-            if (inventory != null) {
-                //check for the closest minion
-                Iterator<EntityRef> it = inventory.MinionSlots.iterator();
-                while (it.hasNext()) {
-                    EntityRef minion = it.next();
-                    if (b.distanceToEntity(minion) < closestDist) {
-                        closestDist = b.distanceToEntity(minion);
-                        closestminion = minion;
-                    }
+            EntityRef closestCreature = EntityRef.NULL;
+            Vector3f closestPosition = new Vector3f();
+            float closestDist = Float.MAX_VALUE;
+
+            // TODO: We should have some other component for things that can pick up items? CreatureComponent? ItemMagnetComponent?
+            for (EntityRef creature : CoreRegistry.get(EntityManager.class).iteratorEntities(InventoryComponent.class, CharacterMovementComponent.class, LocationComponent.class)) {
+                Vector3f pos = creature.getComponent(LocationComponent.class).getWorldPosition();
+                float dist = b.distanceToEntity(pos);
+                if (dist < closestDist) {
+                    closestDist = dist;
+                    closestCreature = creature;
+                    closestPosition.set(pos);
                 }
             }
-            if (localPlayerComp.minionMode) {
-                if (closestDist < 8 && !b._picked) {
-                    b._picked = true;
-                }
-            } else {
-                closestDist = b.distanceToPlayer();
-                // Check if the block is close enough to the player
-                if (b.distanceToPlayer() < 8.0f && !b._picked) {
-                    // Mark it as picked and remove it from the simulation
-                    b._picked = true;
-                }
+
+            if (closestDist < 8 && !b._picked) {
+                b._picked = true;
             }
             // Block was marked as being picked
             if (b._picked && closestDist < 32.0f) {
@@ -359,16 +337,7 @@ public class BulletPhysicsRenderer implements IGameObject {
                     t.getMatrix(tMatrix);
                     Vector3f blockPlayer = new Vector3f();
                     tMatrix.get(blockPlayer);
-                    if (localPlayerComp.minionMode && closestminion != null) {
-                        LocationComponent minionloc = closestminion.getComponent(LocationComponent.class);
-                        if (minionloc != null) {
-                            blockPlayer.sub(minionloc.getWorldPosition());
-                        } else {
-                            blockPlayer.sub(new Vector3f());
-                        }
-                    } else {
-                        blockPlayer.sub(new Vector3f(player.getPosition()));
-                    }
+                    blockPlayer.sub(new Vector3f(closestPosition));
                     blockPlayer.normalize();
                     blockPlayer.scale(-16000f);
                     b.applyCentralImpulse(blockPlayer);
@@ -378,13 +347,8 @@ public class BulletPhysicsRenderer implements IGameObject {
                     // Block was looted (and reached the player)
                     Block block = BlockManager.getInstance().getBlock(b.getType());
                     EntityRef blockItem = _blockItemFactory.newInstance(block.getBlockFamily());
-                    if (localPlayerComp.minionMode) {
-                        if (closestminion != null) {
-                            closestminion.send(new ReceiveItemEvent(blockItem));
-                        }
-                    } else {
-                        playerent.send(new ReceiveItemEvent(blockItem));
-                    }
+                    closestCreature.send(new ReceiveItemEvent(blockItem));
+
                     ItemComponent itemComp = blockItem.getComponent(ItemComponent.class);
                     if (itemComp != null && !itemComp.container.exists()) {
                         blockItem.destroy();

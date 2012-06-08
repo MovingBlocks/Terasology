@@ -9,6 +9,7 @@ import org.terasology.componentSystem.block.BlockEntityRegistry;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.EventPriority;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.input.*;
 import org.terasology.events.input.binds.*;
@@ -21,6 +22,7 @@ import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.world.IWorldProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.model.structures.RayBlockIntersection;
+import org.terasology.mods.miniions.events.ToggleMinionModeButton;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.world.WorldRenderer;
@@ -57,13 +59,11 @@ public class InputSystem implements EventHandlerSystem {
     private BlockEntityRegistry blockRegistry;
     private EntityRef target = EntityRef.NULL;
     private Vector3i targetBlockPos = null;
-    private Timer timer;
 
     public void initialise() {
         localPlayer = CoreRegistry.get(LocalPlayer.class);
         worldProvider = CoreRegistry.get(IWorldProvider.class);
         blockRegistry = CoreRegistry.get(BlockEntityRegistry.class);
-        timer = CoreRegistry.get(Timer.class);
 
         REPLACE_THIS_WITH_CONFIG();
     }
@@ -178,7 +178,7 @@ public class InputSystem implements EventHandlerSystem {
                 }
             } else if (Mouse.getEventDWheel() != 0) {
                 int wheelMoved = Mouse.getEventDWheel();
-                boolean consumed = sendMouseWheelEvent(wheelMoved, delta);
+                boolean consumed = sendMouseWheelEvent(wheelMoved / 120, delta);
 
                 BindableButton bind = (wheelMoved > 0) ? mouseWheelUpBind : mouseWheelDownBind;
                 if (bind != null) {
@@ -197,7 +197,7 @@ public class InputSystem implements EventHandlerSystem {
         }
     }
 
-    @ReceiveEvent(components = LocalPlayerComponent.class, priority = ReceiveEvent.PRIORITY_HIGH)
+    @ReceiveEvent(components = LocalPlayerComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void sendEventToGUI(MouseButtonEvent mouseEvent, EntityRef entity) {
         if (GUIManager.getInstance().isConsumingInput()) {
             GUIManager.getInstance().processMouseInput(mouseEvent.getButton(), mouseEvent.getState() != ButtonState.UP, 0);
@@ -205,11 +205,10 @@ public class InputSystem implements EventHandlerSystem {
         }
     }
 
-    @ReceiveEvent(components = LocalPlayerComponent.class, priority = ReceiveEvent.PRIORITY_HIGH)
+    @ReceiveEvent(components = LocalPlayerComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void sendEventToGUI(MouseWheelEvent mouseEvent, EntityRef entity) {
         if (GUIManager.getInstance().isConsumingInput()) {
-            GUIManager.getInstance().processMouseInput(-1, false, mouseEvent.getWheelTurns());
-            UIDisplayWindow focusWindow = GUIManager.getInstance().getFocusedWindow();
+            GUIManager.getInstance().processMouseInput(-1, false, mouseEvent.getWheelTurns() * 120);
             mouseEvent.consume();
         }
     }
@@ -230,7 +229,7 @@ public class InputSystem implements EventHandlerSystem {
         }
     }
 
-    @ReceiveEvent(components = LocalPlayerComponent.class, priority = ReceiveEvent.PRIORITY_HIGH)
+    @ReceiveEvent(components = LocalPlayerComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void sendEventToGUI(KeyEvent keyEvent, EntityRef entity) {
         if (GUIManager.getInstance().isConsumingInput()) {
             if (keyEvent.getState() != ButtonState.UP) {

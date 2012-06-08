@@ -1,0 +1,10 @@
+{
+    "name" : "miniion:minioncommand",
+    "Item" : {
+        "name" : "Minion Command",
+        "icon" : "minioncommand",
+        "usage" : "OnBlock",
+        "consumedOnUse" : false,
+        "renderWithIcon" : true
+    }
+}

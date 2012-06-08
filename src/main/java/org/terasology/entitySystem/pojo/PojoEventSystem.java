@@ -93,7 +93,7 @@ public class PojoEventSystem implements EventSystem {
 
     @Override
     public <T extends Event> void registerEventReceiver(EventReceiver<T> eventReceiver, Class<T> eventClass, Class<? extends Component>... componentTypes) {
-        registerEventReceiver(eventReceiver, eventClass, ReceiveEvent.PRIORITY_NORMAL, componentTypes);
+        registerEventReceiver(eventReceiver, eventClass, EventPriority.PRIORITY_NORMAL, componentTypes);
     }
 
     @Override
