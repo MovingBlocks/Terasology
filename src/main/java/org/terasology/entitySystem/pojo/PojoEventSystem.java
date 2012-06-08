@@ -1,7 +1,6 @@
 package org.terasology.entitySystem.pojo;
 
 import com.google.common.collect.*;
-import org.reflections.Reflections;
 import org.terasology.entitySystem.*;
 
 import java.lang.reflect.InvocationTargetException;
