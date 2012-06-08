@@ -30,6 +30,7 @@ import java.io.IOException;
 
 import javax.vecmath.Vector3f;
 
+import org.lwjgl.input.Keyboard;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LocationComponent;
@@ -39,6 +40,8 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.entitySystem.persistence.WorldPersister;
+import org.terasology.events.input.binds.BackwardsButton;
+import org.terasology.events.input.binds.ForwardsButton;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
@@ -46,6 +49,7 @@ import org.terasology.game.modes.StateSinglePlayer;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.model.blocks.BlockFamily;
 import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.input.InputSystem;
 
 /**
  * Manages everything related to using Groovy from within Java.
@@ -181,6 +185,17 @@ public class GroovyManager {
             } else {
                 giveBlock(itemPrefabName);
             }
+        }
+
+        public void setupForAZERTY() {
+            InputSystem input = CoreRegistry.get(InputSystem.class);
+            input.linkBindButtonToKey(Keyboard.KEY_Z, ForwardsButton.ID);
+            input.linkBindButtonToKey(Keyboard.KEY_Q, BackwardsButton.ID);
+        }
+
+        public void bindKey(String key, String bind) {
+            InputSystem input = CoreRegistry.get(InputSystem.class);
+            input.linkBindButtonToKey(Keyboard.getKeyIndex(key), bind);
         }
 
         public void fullHealth() {

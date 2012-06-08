@@ -14,13 +14,36 @@
  * limitations under the License.
  */
 
-package org.terasology.game.input;
+package org.terasology.input;
+
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.events.input.AxisEvent;
 
 /**
  * @author Immortius
  */
-public enum ButtonState {
-    DOWN,
-    UP,
-    REPEAT
+public class BindAxisEvent extends AxisEvent {
+
+    private String id;
+    private float value;
+
+    public BindAxisEvent() {
+        super(0, EntityRef.NULL);
+    }
+
+    @Override
+    public float getValue() {
+        return value;
+    }
+
+    void prepare(String id, float value, float delta, EntityRef target) {
+        reset(delta, target);
+        this.id = id;
+        this.value = value;
+    }
+
+    public String getId() {
+        return id;
+    }
+
 }

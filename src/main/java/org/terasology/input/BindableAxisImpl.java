@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.game.input;
+package org.terasology.input;
 
 import com.google.common.collect.Lists;
 import org.terasology.entitySystem.EntityRef;
@@ -28,8 +28,7 @@ import java.util.List;
  *
  * @author Immortius
  */
-public class BindableAxis
-{
+public class BindableAxisImpl implements BindableAxis {
     private String id;
     private BindAxisEvent event;
     private BindableButton positiveInput;
@@ -40,52 +39,39 @@ public class BindableAxis
 
     private SendEventMode sendEventMode = SendEventMode.WHEN_NON_ZERO;
 
-    public enum SendEventMode {
-        ALWAYS {
-            @Override
-            public boolean shouldSendEvent(float oldValue, float newValue) {
-                return true;
-            }
-        },
-        WHEN_NON_ZERO {
-            @Override
-            public boolean shouldSendEvent(float oldValue, float newValue) {
-                return newValue != 0;
-            }
-        },
-        WHEN_CHANGED {
-            @Override
-            public boolean shouldSendEvent(float oldValue, float newValue) {
-                return oldValue != newValue;
-            }
-        };
-
-        public abstract boolean shouldSendEvent(float oldValue, float newValue);
-    }
-
-    public BindableAxis(String id, BindAxisEvent event, BindableButton positiveButton, BindableButton negativeButton) {
+    public BindableAxisImpl(String id, BindAxisEvent event, BindableButton positiveButton, BindableButton negativeButton) {
         this.id = id;
         this.event = event;
         this.positiveInput = positiveButton;
         this.negativeInput = negativeButton;
     }
 
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
     public void setSendEventMode(SendEventMode mode) {
         sendEventMode = mode;
     }
 
+    @Override
     public SendEventMode getSendEventMode() {
         return sendEventMode;
     }
 
+    @Override
     public void subscribe(BindAxisSubscriber subscriber) {
         this.subscribers.add(subscriber);
     }
 
+    @Override
     public void unsubscribe(BindAxisSubscriber subscriber) {
         this.subscribers.remove(subscriber);
     }
 
+    @Override
     public float getValue() {
         return value;
     }

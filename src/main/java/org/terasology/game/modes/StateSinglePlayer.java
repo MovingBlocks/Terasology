@@ -54,8 +54,9 @@ import org.terasology.events.input.binds.InventoryButton;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
-import org.terasology.game.input.BindButtonEvent;
-import org.terasology.game.input.InputSystem;
+import org.terasology.input.BindButtonEvent;
+import org.terasology.input.CameraTargetSystem;
+import org.terasology.input.InputSystem;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AssetManager;
 import org.terasology.logic.manager.GUIManager;
@@ -115,6 +116,7 @@ public class StateSinglePlayer implements GameState {
     private EntityManager _entityManager;
     private ComponentSystemManager _componentSystemManager;
     private LocalPlayerSystem _localPlayerSys;
+    private CameraTargetSystem _cameraTargetSystem;
     private InputSystem _inputSystem;
 
     /* GAME LOOP */
@@ -217,6 +219,9 @@ public class StateSinglePlayer implements GameState {
 
         BlockEntityRegistry blockEntityRegistry = new BlockEntityRegistry();
 
+        _cameraTargetSystem = new CameraTargetSystem();
+        CoreRegistry.put(CameraTargetSystem.class,_cameraTargetSystem);
+        _componentSystemManager.register(_cameraTargetSystem, "engine:CameraTargetSystem");
         _inputSystem = new InputSystem();
         CoreRegistry.put(InputSystem.class, _inputSystem);
         _componentSystemManager.register(_inputSystem, "engine:InputSystem");
@@ -337,6 +342,7 @@ public class StateSinglePlayer implements GameState {
 
     @Override
     public void handleInput(float delta) {
+        _cameraTargetSystem.update();
         _inputSystem.update(delta);
 
         // TODO: This should be handled outside of the state, need to fix the screens handling

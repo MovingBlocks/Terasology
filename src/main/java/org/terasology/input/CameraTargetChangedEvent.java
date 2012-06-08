@@ -14,13 +14,28 @@
  * limitations under the License.
  */
 
-package org.terasology.mods.miniions.events;
+package org.terasology.input;
 
-import org.terasology.input.BindButtonEvent;
+import org.terasology.entitySystem.AbstractEvent;
+import org.terasology.entitySystem.EntityRef;
 
 /**
  * @author Immortius
  */
-public class ToggleMinionModeButton extends BindButtonEvent {
-    public static final String ID = "minion:toggleMinionMode";
+public class CameraTargetChangedEvent extends AbstractEvent {
+    private EntityRef oldTarget;
+    private EntityRef newTarget;
+
+    public CameraTargetChangedEvent(EntityRef oldTarget, EntityRef newTarget) {
+        this.oldTarget = oldTarget;
+        this.newTarget = newTarget;
+    }
+
+    public EntityRef getOldTarget() {
+        return oldTarget;
+    }
+
+    public EntityRef getNewTarget() {
+        return newTarget;
+    }
 }

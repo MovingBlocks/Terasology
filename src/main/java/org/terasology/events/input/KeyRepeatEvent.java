@@ -1,7 +1,7 @@
 package org.terasology.events.input;
 
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.game.input.ButtonState;
+import org.terasology.input.ButtonState;
 
 public class KeyRepeatEvent extends KeyEvent {
 

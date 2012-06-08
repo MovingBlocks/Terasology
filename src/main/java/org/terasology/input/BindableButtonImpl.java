@@ -1,4 +1,4 @@
-package org.terasology.game.input;
+package org.terasology.input;
 
 import com.google.common.collect.Lists;
 import org.terasology.entitySystem.EntityRef;
@@ -15,7 +15,7 @@ import java.util.List;
  * When the BindableButton changes state it sends out events like an actual key or button does. It also allows direct
  * subscription via the {@link BindButtonSubscriber} interface.
  */
-public class BindableButton {
+public class BindableButtonImpl implements BindableButton {
 
     private String id;
     private String displayName;
@@ -30,57 +30,45 @@ public class BindableButton {
 
     private Timer timer;
 
-    public static enum ActivateMode {
-        PRESS(true, false),
-        RELEASE(false, true),
-        BOTH(true, true);
-
-        private boolean activatedOnPress;
-        private boolean activatedOnRelease;
-
-        private ActivateMode(boolean activatedOnPress, boolean activatedOnRelease) {
-            this.activatedOnPress = activatedOnPress;
-            this.activatedOnRelease = activatedOnRelease;
-        }
-
-        public boolean isActivatedOnPress() {
-            return activatedOnPress;
-        }
-
-        public boolean isActivatedOnRelease() {
-            return activatedOnRelease;
-        }
-    }
-
     /**
      * Creates the button. Package-private, as should be created through the InputSystem
      *
      * @param id
      * @param event
      */
-    BindableButton(String id, String displayName, BindButtonEvent event) {
+    BindableButtonImpl(String id, String displayName, BindButtonEvent event) {
         this.id = id;
         this.displayName = displayName;
         this.buttonEvent = event;
         timer = CoreRegistry.get(Timer.class);
     }
 
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
     public String getDisplayName() {
         return displayName;
     }
 
+    @Override
     public void setMode(ActivateMode mode) {
         this.mode = mode;
     }
 
+    @Override
     public ActivateMode getMode() {
         return mode;
     }
 
+    @Override
     public void setRepeating(boolean repeating) {
         this.repeating = repeating;
     }
 
+    @Override
     public boolean isRepeating() {
         return repeating;
     }
@@ -89,14 +77,17 @@ public class BindableButton {
      * Sets the repeat time
      * @param repeatTimeMs The time between repeat events, in ms
      */
+    @Override
     public void setRepeatTime(int repeatTimeMs) {
         this.repeatTime = repeatTimeMs;
     }
 
+    @Override
     public int getRepeatTime() {
         return repeatTime;
     }
 
+    @Override
     public ButtonState getState() {
         return (activeInputs > 0) ? ButtonState.DOWN : ButtonState.UP;
     }
@@ -106,6 +97,7 @@ public class BindableButton {
      *
      * @param subscriber
      */
+    @Override
     public void subscribe(BindButtonSubscriber subscriber) {
         subscribers.add(subscriber);
     }
@@ -115,6 +107,7 @@ public class BindableButton {
      *
      * @param subscriber
      */
+    @Override
     public void unsubscribe(BindButtonSubscriber subscriber) {
         subscribers.remove(subscriber);
     }

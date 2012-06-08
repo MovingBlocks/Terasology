@@ -2,7 +2,7 @@ package org.terasology.events.input;
 
 import org.lwjgl.input.Keyboard;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.game.input.ButtonState;
+import org.terasology.input.ButtonState;
 
 public class KeyEvent extends ButtonEvent {
 

@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.terasology.game.input;
-
-import org.terasology.entitySystem.EntityRef;
+package org.terasology.input;
 
 /**
  * @author Immortius
  */
-public interface BindAxisSubscriber {
-    void update(float value, float delta, EntityRef target);
+public enum ButtonState {
+    DOWN,
+    UP,
+    REPEAT
 }

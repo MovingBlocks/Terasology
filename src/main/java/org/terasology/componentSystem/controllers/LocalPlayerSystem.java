@@ -16,7 +16,7 @@ import org.terasology.events.input.MouseYAxisEvent;
 import org.terasology.events.input.binds.*;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
-import org.terasology.game.input.ButtonState;
+import org.terasology.input.ButtonState;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.world.IWorldProvider;

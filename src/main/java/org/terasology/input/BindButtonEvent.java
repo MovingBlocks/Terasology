@@ -14,36 +14,39 @@
  * limitations under the License.
  */
 
-package org.terasology.game.input;
+package org.terasology.input;
 
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.events.input.AxisEvent;
+import org.terasology.events.input.ButtonEvent;
 
 /**
  * @author Immortius
  */
-public class BindAxisEvent extends AxisEvent {
+public class BindButtonEvent extends ButtonEvent {
 
     private String id;
-    private float value;
+    private ButtonState state;
 
-    public BindAxisEvent() {
+    public BindButtonEvent() {
         super(0, EntityRef.NULL);
     }
 
-    @Override
-    public float getValue() {
-        return value;
-    }
-
-    void prepare(String id, float value, float delta, EntityRef target) {
+    void prepare(String id, ButtonState state, float delta, EntityRef target) {
         reset(delta, target);
         this.id = id;
-        this.value = value;
+        this.state = state;
     }
 
     public String getId() {
         return id;
     }
 
+    public ButtonState getState() {
+        return state;
+    }
+
+    @Override
+    public String getButtonName() {
+        return "bind:" + id;
+    }
 }

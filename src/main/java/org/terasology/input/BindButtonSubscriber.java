@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.game.input;
+package org.terasology.input;
 
 import org.terasology.entitySystem.EntityRef;
 
