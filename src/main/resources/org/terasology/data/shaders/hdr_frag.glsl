@@ -20,7 +20,7 @@ uniform float exposure = 1.0;
 void main(){
     vec4 color = texture2D(texScene, gl_TexCoord[0].xy);
 
-    float t = tonemapReinhard(color, 1.0, exposure);
+    float t = tonemapReinhard(2.5, exposure);
     color *= t;
 
     gl_FragColor = color;

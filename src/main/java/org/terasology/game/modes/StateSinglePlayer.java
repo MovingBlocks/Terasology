@@ -215,6 +215,8 @@ public class StateSinglePlayer implements GameState {
         componentLibrary.registerComponentClass(SpeedBoostComponent.class);
         componentLibrary.registerComponentClass(PoisonedComponent.class);
         componentLibrary.registerComponentClass(MinionControllerComponent.class);
+        componentLibrary.registerComponentClass(CuredComponent.class);
+
         loadPrefabs();
 
         BlockEntityRegistry blockEntityRegistry = new BlockEntityRegistry();
