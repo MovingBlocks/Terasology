@@ -18,6 +18,7 @@ import java.util.List;
 public class BindableButton {
 
     private String id;
+    private String displayName;
     private BindButtonEvent buttonEvent;
     private int activeInputs = 0;
 
@@ -57,10 +58,15 @@ public class BindableButton {
      * @param id
      * @param event
      */
-    BindableButton(String id, BindButtonEvent event) {
+    BindableButton(String id, String displayName, BindButtonEvent event) {
         this.id = id;
+        this.displayName = displayName;
         this.buttonEvent = event;
         timer = CoreRegistry.get(Timer.class);
+    }
+
+    public String getDisplayName() {
+        return displayName;
     }
 
     public void setMode(ActivateMode mode) {

@@ -68,12 +68,12 @@ public class InputSystem implements EventHandlerSystem {
         REPLACE_THIS_WITH_CONFIG();
     }
 
-    public BindableButton registerBindButton(String bindId) {
-        return registerBindButton(bindId, new BindButtonEvent());
+    public BindableButton registerBindButton(String bindId, String displayName) {
+        return registerBindButton(bindId, displayName, new BindButtonEvent());
     }
 
-    public BindableButton registerBindButton(String bindId, BindButtonEvent event) {
-        BindableButton bind = new BindableButton(bindId, event);
+    public BindableButton registerBindButton(String bindId, String displayName, BindButtonEvent event) {
+        BindableButton bind = new BindableButton(bindId, displayName, event);
         buttonLookup.put(bindId, bind);
         buttonBinds.add(bind);
         return bind;
@@ -304,65 +304,65 @@ public class InputSystem implements EventHandlerSystem {
     }
 
     private void REPLACE_THIS_WITH_CONFIG() {
-        registerBindButton(InventoryButton.ID, new InventoryButton());
+        registerBindButton(InventoryButton.ID, "Inventory", new InventoryButton());
         linkBindButtonToKey(Keyboard.KEY_I, InventoryButton.ID);
 
-        registerBindButton(ConsoleButton.ID, new ConsoleButton());
+        registerBindButton(ConsoleButton.ID, "Console", new ConsoleButton());
         linkBindButtonToKey(Keyboard.KEY_TAB, ConsoleButton.ID);
 
-        registerBindButton(PauseButton.ID, new PauseButton());
+        registerBindButton(PauseButton.ID, "Pause", new PauseButton());
         linkBindButtonToKey(Keyboard.KEY_ESCAPE, PauseButton.ID);
 
-        registerBindButton(ForwardsButton.ID, new ForwardsButton());
+        registerBindButton(ForwardsButton.ID, "Forwards", new ForwardsButton());
         linkBindButtonToKey(Keyboard.KEY_W, ForwardsButton.ID);
 
-        registerBindButton(BackwardsButton.ID,  new BackwardsButton());
+        registerBindButton(BackwardsButton.ID, "Backwards", new BackwardsButton());
         linkBindButtonToKey(Keyboard.KEY_S, BackwardsButton.ID);
 
         registerBindAxis(ForwardsMovementAxis.ID, new ForwardsMovementAxis(), ForwardsButton.ID, BackwardsButton.ID).setSendEventMode(BindableAxis.SendEventMode.WHEN_CHANGED);
 
-        registerBindButton(LeftStrafeButton.ID, new LeftStrafeButton());
+        registerBindButton(LeftStrafeButton.ID, "Left", new LeftStrafeButton());
         linkBindButtonToKey(Keyboard.KEY_A, LeftStrafeButton.ID);
 
-        registerBindButton(RightStrafeButton.ID, new RightStrafeButton());
+        registerBindButton(RightStrafeButton.ID, "Right", new RightStrafeButton());
         linkBindButtonToKey(Keyboard.KEY_D, RightStrafeButton.ID);
 
         registerBindAxis(StrafeMovementAxis.ID, new StrafeMovementAxis(), LeftStrafeButton.ID, RightStrafeButton.ID).setSendEventMode(BindableAxis.SendEventMode.WHEN_CHANGED);
 
-        registerBindButton(JumpButton.ID, new JumpButton());
+        registerBindButton(JumpButton.ID, "Jump", new JumpButton());
         linkBindButtonToKey(Keyboard.KEY_SPACE, JumpButton.ID);
 
-        registerBindButton(CrouchButton.ID, new CrouchButton());
+        registerBindButton(CrouchButton.ID, "Crouch", new CrouchButton());
         linkBindButtonToKey(Keyboard.KEY_C, CrouchButton.ID);
 
         registerBindAxis(VerticalMovementAxis.ID, new VerticalMovementAxis(), JumpButton.ID, CrouchButton.ID).setSendEventMode(BindableAxis.SendEventMode.WHEN_CHANGED);
 
-        registerBindButton(RunButton.ID, new RunButton());
+        registerBindButton(RunButton.ID, "Run", new RunButton());
         linkBindButtonToKey(Keyboard.KEY_LSHIFT, RunButton.ID);
         linkBindButtonToKey(Keyboard.KEY_RSHIFT, RunButton.ID);
 
-        registerBindButton(AttackButton.ID, new AttackButton()).setRepeating(true);
+        registerBindButton(AttackButton.ID, "Attack", new AttackButton()).setRepeating(true);
         linkBindButtonToMouse(1, AttackButton.ID);
 
-        registerBindButton(UseItemButton.ID, new UseItemButton()).setRepeating(true);
+        registerBindButton(UseItemButton.ID, "Use Held Item", new UseItemButton()).setRepeating(true);
         linkBindButtonToMouse(0, UseItemButton.ID);
 
-        registerBindButton(FrobButton.ID, new FrobButton());
+        registerBindButton(FrobButton.ID, "Frob", new FrobButton());
         linkBindButtonToKey(Keyboard.KEY_E, FrobButton.ID);
 
-        registerBindButton(ToolbarNextButton.ID, new ToolbarNextButton()).setMode(BindableButton.ActivateMode.PRESS);
+        registerBindButton(ToolbarNextButton.ID, "Toolbar Next", new ToolbarNextButton()).setMode(BindableButton.ActivateMode.PRESS);
         linkBindButtonToMouseWheel(+1, ToolbarNextButton.ID);
 
-        registerBindButton(ToolbarPrevButton.ID, new ToolbarPrevButton()).setMode(BindableButton.ActivateMode.PRESS);
+        registerBindButton(ToolbarPrevButton.ID, "Toolbar Previous", new ToolbarPrevButton()).setMode(BindableButton.ActivateMode.PRESS);
         linkBindButtonToMouseWheel(-1, ToolbarPrevButton.ID);
 
         for (int i = 0; i < 9; ++i) {
             String inventorySlotBind = "engine:toolbarSlot" + i;
-            registerBindButton(inventorySlotBind, new ToolbarSlotButton(i));
+            registerBindButton(inventorySlotBind, "Inventory Slot " + (i + 1), new ToolbarSlotButton(i));
             linkBindButtonToKey(Keyboard.KEY_1 + i, inventorySlotBind);
         }
 
-        registerBindButton(ToggleMinionModeButton.ID, new ToggleMinionModeButton()).setMode(BindableButton.ActivateMode.PRESS);
+        registerBindButton(ToggleMinionModeButton.ID, "Toggle Minion Mode", new ToggleMinionModeButton()).setMode(BindableButton.ActivateMode.PRESS);
         linkBindButtonToKey(Keyboard.KEY_X, ToggleMinionModeButton.ID);
     }
 
