@@ -42,6 +42,7 @@ import org.terasology.entitySystem.PrefabManager;
 import org.terasology.entitySystem.persistence.WorldPersister;
 import org.terasology.events.input.binds.BackwardsButton;
 import org.terasology.events.input.binds.ForwardsButton;
+import org.terasology.events.input.binds.LeftStrafeButton;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
@@ -190,7 +191,9 @@ public class GroovyManager {
         public void setupForAZERTY() {
             InputSystem input = CoreRegistry.get(InputSystem.class);
             input.linkBindButtonToKey(Keyboard.KEY_Z, ForwardsButton.ID);
-            input.linkBindButtonToKey(Keyboard.KEY_Q, BackwardsButton.ID);
+            input.linkBindButtonToKey(Keyboard.KEY_S, BackwardsButton.ID);
+            input.linkBindButtonToKey(Keyboard.KEY_Q, LeftStrafeButton.ID);
+
         }
 
         public void bindKey(String key, String bind) {
