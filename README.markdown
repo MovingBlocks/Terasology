@@ -1,7 +1,7 @@
 Terasology (previously titled Blockmania)
 =========================================
 
-![Terasology](http://blog.movingblocks.net/wp-content/uploads/screen3small.jpg "Terasology")
+![Terasology](https://github.com/MovingBlocks/Terasology/raw/develop/src/main/resources/org/terasology/data/textures/loadingBackground.png "Terasology")
 
 Terasology is a game that pays ample tribute to [Minecraft](http://www.minecraft.net) in initial look and origin, but stakes out its own niche by adopting the NPC-helper and caretaker feel from such games as [Dwarf Fortress](http://www.bay12games.com/dwarves) and [Dungeon Keeper](http://en.wikipedia.org/wiki/Dungeon_Keeper), while striving for added depth and sophistication.
 

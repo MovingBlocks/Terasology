@@ -13,3 +13,4 @@ Terasology.iws
 .settings
 .gradle
 bin
+data/console/consolelog.json

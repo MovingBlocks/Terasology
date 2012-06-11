@@ -245,7 +245,7 @@ public class Skysphere implements IGameObject {
 
         for (int i = 0; i < (int) CLOUD_RESOLUTION.x; i++) {
             for (int j = 0; j < (int) CLOUD_RESOLUTION.y; j++) {
-                double noise = _noiseGenerator.fBm(i * 0.05, j * 0.05, _parent.getWorldProvider().getTime());
+                double noise = _noiseGenerator.fBm(i * 0.008, j * 0.008, _parent.getWorldProvider().getTime());
 
                 byte value = (byte) (TeraMath.clamp(noise * 1.25 + 0.25) * 255);
 
