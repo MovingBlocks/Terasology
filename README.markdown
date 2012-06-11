@@ -1,5 +1,5 @@
-Terasology (previously titled Blockmania)
-=========================================
+Terasology
+==========
 
 ![Terasology](https://github.com/MovingBlocks/Terasology/raw/develop/src/main/resources/org/terasology/data/textures/loadingBackground.png "Terasology")
 
