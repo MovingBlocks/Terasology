@@ -64,6 +64,13 @@ public class ChunkStoreFileSystem implements ChunkStore {
         }
     }
 
+    @Override
+    public boolean contains(Vector3i position) {
+        File f = new File(worldPath, getFileNameFor(position));
+        return f.exists();
+
+    }
+
     public float size() {
         return 0;
     }

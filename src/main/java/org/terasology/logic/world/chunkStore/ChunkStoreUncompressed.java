@@ -24,6 +24,11 @@ public class ChunkStoreUncompressed implements ChunkStore {
         map.put(c.getPos(), c);
     }
 
+    @Override
+    public boolean contains(Vector3i position) {
+        return map.containsKey(position);
+    }
+
     public float size() {
         return 0;
     }

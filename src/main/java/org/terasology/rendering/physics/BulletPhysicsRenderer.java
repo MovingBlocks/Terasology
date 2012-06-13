@@ -259,22 +259,24 @@ public class BulletPhysicsRenderer implements IGameObject {
         List<Chunk> chunks = CoreRegistry.get(WorldRenderer.class).getChunksInProximity();
         HashSet<RigidBody> newBodies = new HashSet<RigidBody>();
 
+        boolean updatedThisFrame = false;
+
         for (int i = 0; i < 32 && i < chunks.size(); i++) {
             final Chunk chunk = chunks.get(i);
 
             if (chunk != null) {
-                if (updateRigidBody(chunk)) {
+                if (!updatedThisFrame && updateRigidBody(chunk)) {
+                    updatedThisFrame = true;
+                }
 
-                    RigidBody c = chunk.getRigidBody();
+                RigidBody c = chunk.getRigidBody();
 
-                    if (c != null) {
-                        newBodies.add(c);
+                if (c != null) {
+                    newBodies.add(c);
 
-                        if (!_chunks.contains(c)) {
-                            _discreteDynamicsWorld.addRigidBody(c);
-                        }
+                    if (!_chunks.contains(c)) {
+                        _discreteDynamicsWorld.addRigidBody(c);
                     }
-                    break;
                 }
             }
         }

@@ -53,6 +53,11 @@ public class ChunkStoreDeflate implements ChunkStore, Serializable {
         }
     }
 
+    @Override
+    public boolean contains(Vector3i position) {
+        return map.containsKey(position);
+    }
+
     public float size() {
         return (float) _sizeInByte / (1 << 20);
     }

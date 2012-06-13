@@ -51,7 +51,6 @@ public class WorldView {
         for (Vector3i chunkPos : region) {
             Chunk chunk = chunkProvider.getChunk(chunkPos);
             if (chunk == null) {
-                logger.log(Level.WARNING, "Failed to load chunk: " + chunkPos);
                 return null;
             }
             int index = (chunkPos.x - region.min().x) + region.size().x * (chunkPos.z - region.min().z);

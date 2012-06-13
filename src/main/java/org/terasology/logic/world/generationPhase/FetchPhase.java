@@ -14,37 +14,30 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.world.chunkStore;
+package org.terasology.logic.world.generationPhase;
 
 import org.terasology.logic.world.Chunk;
 import org.terasology.logic.world.ChunkStore;
 import org.terasology.math.Vector3i;
 
+import java.util.Comparator;
+import java.util.concurrent.ConcurrentMap;
+
 /**
  * @author Immortius
  */
-public class NullChunkStore implements ChunkStore {
+public class FetchPhase extends ChunkPhase {
+    private ChunkStore store;
+    private ConcurrentMap<Vector3i, Chunk> nearCache;
 
-    @Override
-    public Chunk get(Vector3i position) {
-        return null;
+    public FetchPhase(int numThreads, Comparator<Vector3i> chunkRelevanceComparator, ChunkStore store, ConcurrentMap<Vector3i, Chunk> nearCache) {
+        super(numThreads, chunkRelevanceComparator);
+        this.store = store;
+        this.nearCache = nearCache;
     }
 
     @Override
-    public float size() {
-        return 0;
-    }
-
-    @Override
-    public void dispose() {
-    }
-
-    @Override
-    public void put(Chunk c) {
-    }
-
-    @Override
-    public boolean contains(Vector3i position) {
-        return false;
+    protected void process(Vector3i pos) {
+        nearCache.putIfAbsent(pos, store.get(pos));
     }
 }

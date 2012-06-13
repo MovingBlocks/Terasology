@@ -26,6 +26,8 @@ public interface ChunkStore {
 
     public void put(Chunk c);
 
+    public boolean contains(Vector3i position);
+
     public float size();
 
     void dispose();

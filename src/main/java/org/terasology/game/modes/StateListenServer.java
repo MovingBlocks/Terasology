@@ -16,22 +16,7 @@
 
 package org.terasology.game.modes;
 
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
-import org.terasology.componentSystem.block.BlockEntityRegistry;
-import org.terasology.componentSystem.controllers.LocalPlayerSystem;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.PersistableEntityManager;
-import org.terasology.entitySystem.persistence.WorldPersister;
-import org.terasology.game.ComponentSystemManager;
-import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
-import org.terasology.game.bootstrap.EntitySystemBuilder;
-import org.terasology.logic.manager.AssetManager;
-import org.terasology.logic.mod.Mod;
-import org.terasology.logic.mod.ModManager;
-
-import java.util.logging.Logger;
 
 /**
  * @author Immortius

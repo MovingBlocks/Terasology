@@ -48,8 +48,9 @@ public abstract class ChunkPhase {
                 public void run() {
                     Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
                     while (running.get()) {
+                        Vector3i pos = null;
                         try {
-                            Vector3i pos = queue.poll(500, TimeUnit.MILLISECONDS);
+                            pos = queue.poll(500, TimeUnit.MILLISECONDS);
                             if (pos != null) {
                                 process(pos);
                                 completed.add(pos);
@@ -58,6 +59,9 @@ public abstract class ChunkPhase {
                             logger.log(Level.SEVERE, "Thread interrupted", e);
                         } catch (Exception e) {
                             logger.log(Level.SEVERE, "Error in thread", e);
+                            if (pos != null) {
+                                processing.remove(pos);
+                            }
                         }
                     }
                     logger.log(Level.INFO, "Thread shutdown safely");

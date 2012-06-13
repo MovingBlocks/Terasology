@@ -22,10 +22,14 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.game.CoreRegistry;
+import org.terasology.game.GameEngine;
+import org.terasology.game.TerasologyEngine;
 import org.terasology.logic.world.generationPhase.*;
 import org.terasology.logic.world.generator.core.ChunkGeneratorManager;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
+import org.terasology.performanceMonitor.PerformanceMonitor;
 
 import javax.vecmath.Vector3f;
 import java.util.Comparator;
@@ -45,6 +49,7 @@ public class LocalChunkProvider implements ChunkProvider {
     private Logger logger = Logger.getLogger(getClass().getName());
     private ChunkStore farStore;
 
+    private ChunkPhase fetchPhase;
     private ChunkPhase generatePhase;
     private ChunkPhase secondPassPhase;
     private ChunkPhase internalLightingPhase;
@@ -57,10 +62,11 @@ public class LocalChunkProvider implements ChunkProvider {
     public LocalChunkProvider(ChunkStore farStore, ChunkGeneratorManager generator) {
         this.farStore = farStore;
         Comparator<Vector3i> chunkRelevanceComparator = new ChunkRelevanceComparator();
-        generatePhase = new CreateChunkPhase(4, chunkRelevanceComparator, generator, nearCache);
-        secondPassPhase = new SecondPassPhase(1, chunkRelevanceComparator, generator, this);
-        internalLightingPhase = new InternalLightingPhase(2, chunkRelevanceComparator, this);
-        propagateLightPhase = new PropagateLightingPhase(1, chunkRelevanceComparator, generator, this);
+        fetchPhase = new FetchPhase(8, chunkRelevanceComparator, farStore, nearCache);
+        generatePhase = new CreateChunkPhase(8, chunkRelevanceComparator, generator, nearCache);
+        secondPassPhase = new SecondPassPhase(2, chunkRelevanceComparator, generator, this);
+        internalLightingPhase = new InternalLightingPhase(4, chunkRelevanceComparator, this);
+        propagateLightPhase = new PropagateLightingPhase(2, chunkRelevanceComparator, generator, this);
         phases.add(generatePhase);
         phases.add(secondPassPhase);
         phases.add(internalLightingPhase);
@@ -70,6 +76,7 @@ public class LocalChunkProvider implements ChunkProvider {
     @Override
     public void addRegionEntity(EntityRef entity, int distance) {
         CacheRegion region = new CacheRegion(entity, distance);
+        regions.remove(region);
         regions.add(region);
         checkChunkStatus(region);
     }
@@ -85,37 +92,63 @@ public class LocalChunkProvider implements ChunkProvider {
             cacheRegion.update();
             if (cacheRegion.isDirty()) {
                 cacheRegion.setUpToDate();
-                checkChunkStatus(cacheRegion);
+                final Region3i reviewRegion = cacheRegion.getRegion().expand(new Vector3i(1, 0, 1));
+                CoreRegistry.get(GameEngine.class).submitTask("Review chunk region", new Runnable() {
+                    @Override
+                    public void run() {
+                        for (Vector3i chunkPos : reviewRegion) {
+                            Chunk chunk = getChunk(chunkPos);
+                            if (chunk == null) {
+                                PerformanceMonitor.startActivity("Check chunk in cache");
+                                if (farStore.contains(chunkPos) && !fetchPhase.processing(chunkPos)) {
+                                    fetchPhase.queue(chunkPos);
+                                } else if (!generatePhase.processing(chunkPos)) {
+                                    generatePhase.queue(chunkPos);
+                                }
+                                PerformanceMonitor.endActivity();
+                            } else {
+                                checkState(chunk);
+                            }
+                        }
+                    }
+                });
             }
         }
-        while (generatePhase.isResultAvailable()) {
+        if (fetchPhase.isResultAvailable()) {
+            Vector3i chunkPos = fetchPhase.poll();
+            for (Vector3i pos : Region3i.createFromCenterExtents(chunkPos, new Vector3i(1, 0, 1))) {
+                checkState(pos);
+            }
+        }
+        if (generatePhase.isResultAvailable()) {
             Vector3i chunkPos = generatePhase.poll();
             logger.log(Level.FINE, "Received generated chunk " + chunkPos);
             for (Vector3i pos : Region3i.createFromCenterExtents(chunkPos, new Vector3i(1, 0, 1))) {
                 checkReadyForSecondPass(pos);
             }
         }
-        while (secondPassPhase.isResultAvailable()) {
+        if (secondPassPhase.isResultAvailable()) {
             Vector3i chunkPos = secondPassPhase.poll();
             logger.log(Level.FINE, "Received second passed chunk " + chunkPos);
             for (Vector3i pos : Region3i.createFromCenterExtents(chunkPos, new Vector3i(1, 0, 1))) {
                 checkReadyToDoInternalLighting(pos);
             }
         }
-        while (internalLightingPhase.isResultAvailable()) {
+        if (internalLightingPhase.isResultAvailable()) {
             Vector3i chunkPos = internalLightingPhase.poll();
             logger.log(Level.FINE, "Received internally lit chunk " + chunkPos);
             for (Vector3i pos : Region3i.createFromCenterExtents(chunkPos, new Vector3i(1, 0, 1))) {
                 checkReadyToPropagateLighting(pos);
             }
         }
-        while (propagateLightPhase.isResultAvailable()) {
+        if (propagateLightPhase.isResultAvailable()) {
             Vector3i chunkPos = propagateLightPhase.poll();
             logger.log(Level.FINE, "Received second passed chunk " + chunkPos);
             for (Vector3i pos : Region3i.createFromCenterExtents(chunkPos, new Vector3i(1, 0, 1))) {
                 checkComplete(pos);
             }
         }
+        PerformanceMonitor.startActivity("Review cache size");
         if (nearCache.size() > CACHE_SIZE) {
             logger.log(Level.INFO, "Compacting cache");
             Iterator<Vector3i> iterator = nearCache.keySet().iterator();
@@ -123,7 +156,7 @@ public class LocalChunkProvider implements ChunkProvider {
                 Vector3i pos = iterator.next();
                 boolean keep = false;
                 for (CacheRegion region : regions) {
-                    if (region.getRegion().encompasses(pos)) {
+                    if (region.getRegion().expand(new Vector3i(4, 0, 4)).encompasses(pos)) {
                         keep = true;
                         break;
                     }
@@ -138,7 +171,6 @@ public class LocalChunkProvider implements ChunkProvider {
                 }
                 if (!keep) {
                     // TODO: need some way to not dispose chunks being edited (or do so safely)
-                    logger.log(Level.INFO,  "Caching " + pos);
                     Chunk chunk = nearCache.get(pos);
                     farStore.put(chunk);
                     iterator.remove();
@@ -147,7 +179,7 @@ public class LocalChunkProvider implements ChunkProvider {
 
             }
         }
-
+        PerformanceMonitor.endActivity();
     }
 
     @Override
@@ -162,20 +194,7 @@ public class LocalChunkProvider implements ChunkProvider {
 
     @Override
     public Chunk getChunk(Vector3i pos) {
-        Chunk c = nearCache.get(pos);
-        if (c == null) {
-            c = farFetch(pos);
-        }
-        return c;
-    }
-
-    private Chunk farFetch(Vector3i pos) {
-        Chunk c = farStore.get(pos);
-        if (c != null) {
-            Chunk prev = nearCache.putIfAbsent(pos, c);
-            return (prev != null) ? prev : c;
-        }
-        return null;
+        return nearCache.get(pos);
     }
 
     @Override
@@ -202,29 +221,45 @@ public class LocalChunkProvider implements ChunkProvider {
      * @param cacheRegion
      */
     private void checkChunkStatus(CacheRegion cacheRegion) {
-        for (Vector3i chunkPos : cacheRegion.getRegion().expand(new Vector3i(4, 0, 4))) {
+        for (Vector3i chunkPos : cacheRegion.getRegion().expand(new Vector3i(1, 0, 1))) {
             Chunk chunk = getChunk(chunkPos);
-            if (chunk == null && !generatePhase.processing(chunkPos)) {
-                logger.log(Level.FINE, "Generating Chunk " + chunkPos);
-                generatePhase.queue(chunkPos);
-            } else if (chunk != null) {
-                switch (chunk.getChunkState()) {
-                    case AdjacencyGenerationPending:
-                        checkReadyForSecondPass(chunkPos);
-                        break;
-                    case InternalLightGenerationPending:
-                        checkReadyToDoInternalLighting(chunkPos);
-                        break;
-                    case LightPropagationPending:
-                        checkReadyToPropagateLighting(chunkPos);
-                        break;
-                    case FullLightConnectivityPending:
-                        checkComplete(chunkPos);
-                        break;
-                    default:
-                        break;
+            if (chunk == null) {
+                PerformanceMonitor.startActivity("Check chunk in cache");
+                if (farStore.contains(chunkPos) && !fetchPhase.processing(chunkPos)) {
+                    fetchPhase.queue(chunkPos);
+                } else if (!generatePhase.processing(chunkPos)) {
+                    generatePhase.queue(chunkPos);
                 }
+                PerformanceMonitor.endActivity();
+            } else {
+                checkState(chunk);
             }
+        }
+    }
+
+    private void checkState(Vector3i pos) {
+        Chunk chunk = getChunk(pos);
+        if (chunk != null) {
+            checkState(chunk);
+        }
+    }
+
+    private void checkState(Chunk chunk) {
+        switch (chunk.getChunkState()) {
+            case AdjacencyGenerationPending:
+                checkReadyForSecondPass(chunk.getPos());
+                break;
+            case InternalLightGenerationPending:
+                checkReadyToDoInternalLighting(chunk.getPos());
+                break;
+            case LightPropagationPending:
+                checkReadyToPropagateLighting(chunk.getPos());
+                break;
+            case FullLightConnectivityPending:
+                checkComplete(chunk.getPos());
+                break;
+            default:
+                break;
         }
     }
 

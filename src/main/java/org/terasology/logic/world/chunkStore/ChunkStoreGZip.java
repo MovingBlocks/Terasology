@@ -139,6 +139,11 @@ public class ChunkStoreGZip implements ChunkStore, Serializable {
         }
     }
 
+    @Override
+    public boolean contains(Vector3i position) {
+        return modifiedChunks.containsKey(position) || compressedChunks.containsKey(position);
+    }
+
     public float size() {
         return (float) sizeInByte.get() / (1 << 20);
     }
