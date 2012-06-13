@@ -3,7 +3,7 @@
     "Item" : {
         "name" : "Minion Command",
         "icon" : "minioncommand",
-        "usage" : "OnBlock",
+        "usage" : "ON_BLOCK",
         "consumedOnUse" : false,
         "renderWithIcon" : true
     }

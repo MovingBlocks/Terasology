@@ -1,5 +1,5 @@
 /*
- * Copyright 2012
+ * Copyright 2012 <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.terasology.events.DamageEvent;
 import org.terasology.events.input.KeyDownEvent;
 import org.terasology.events.input.KeyEvent;
 import org.terasology.game.CoreRegistry;
+import org.terasology.game.Terasology;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.world.IWorldProvider;
@@ -32,6 +33,8 @@ import org.terasology.rendering.gui.menus.UIMetrics;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
+ *
+ * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Immortius
  */
 public class DebugControlSystem implements EventHandlerSystem {
@@ -95,6 +98,10 @@ public class DebugControlSystem implements EventHandlerSystem {
                 case Keyboard.KEY_K:
                     entity.send(new DamageEvent(9999, null));
                     break;
+                case Keyboard.KEY_H:
+                    GUIManager.getInstance().getWindowById("engine:hud").setVisible(!GUIManager.getInstance().getWindowById("engine:hud").isVisible());
+                    event.consume();
+                    break;
             }
         }
 
@@ -117,6 +124,4 @@ public class DebugControlSystem implements EventHandlerSystem {
     private void toggleViewingDistance() {
         Config.getInstance().setViewingDistanceById((Config.getInstance().getActiveViewingDistanceId() + 1) % 4);
     }
-
-
 }
