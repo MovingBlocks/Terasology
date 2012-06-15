@@ -57,6 +57,7 @@ public class EntitySystemBuilder {
         CoreRegistry.put(EventSystem.class, entityManager.getEventSystem());
 
         registerComponents(library);
+        registerEvents(entityManager.getEventSystem());
         return entityManager;
     }
 
@@ -77,6 +78,14 @@ public class EntitySystemBuilder {
         Set<Class<? extends Component>> componentTypes = reflections.getSubTypesOf(Component.class);
         for (Class<? extends Component> componentType : componentTypes) {
             library.registerComponentClass(componentType);
+        }
+    }
+
+    private void registerEvents(EventSystem eventSystem) {
+        Reflections reflections = new Reflections("org.terasology");
+        Set<Class<? extends Event>> eventTypes = reflections.getSubTypesOf(Event.class);
+        for (Class<? extends Event> eventType : eventTypes) {
+            eventSystem.registerEvent("engine:" + eventType.getSimpleName(), eventType);
         }
     }
 }

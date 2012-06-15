@@ -119,7 +119,7 @@ public class GrowthSimulator implements EventHandlerSystem {
     }
 
     public boolean simulate(Vector3i blockPos) {
-        if (world.getSunlight(new Vector3i(blockPos.x, blockPos.y + 1, blockPos.z)) == Chunk.MAX_LIGHT) {
+        if (dirt.equals(world.getBlock(blockPos)) && world.getSunlight(new Vector3i(blockPos.x, blockPos.y + 1, blockPos.z)) == Chunk.MAX_LIGHT) {
             WorldBiomeProvider.Biome biome = world.getBiomeProvider().getBiomeAt(blockPos.x, blockPos.z);
 
             if (biome.isVegetationFriendly()) {
@@ -129,26 +129,26 @@ public class GrowthSimulator implements EventHandlerSystem {
                 Block bDown = world.getBlock(blockPos.x, blockPos.y, blockPos.z - 1);
 
                 if (bLeft == grass || bRight == grass || bDown == grass || bUp == grass) {
-                    // TODO: don't suppress, but instead ignore updates from self?
-                    world.setBlock(blockPos, grass, dirt);
+                    if (world.setBlock(blockPos, grass, dirt)) {
 
-                    if (bLeft == dirt) {
-                        blockQueue.offer(new Vector3i(blockPos.x - 1, blockPos.y, blockPos.z));
+                        if (bLeft == dirt) {
+                            blockQueue.offer(new Vector3i(blockPos.x - 1, blockPos.y, blockPos.z));
+                        }
+
+                        if (bRight == dirt) {
+                            blockQueue.offer(new Vector3i(blockPos.x + 1, blockPos.y, blockPos.z));
+                        }
+
+                        if (bUp == dirt) {
+                            blockQueue.offer(new Vector3i(blockPos.x, blockPos.y, blockPos.z + 1));
+                        }
+
+                        if (bDown == dirt) {
+                            blockQueue.offer(new Vector3i(blockPos.x, blockPos.y, blockPos.z - 1));
+                        }
+
+                        return true;
                     }
-
-                    if (bRight == dirt) {
-                        blockQueue.offer(new Vector3i(blockPos.x + 1, blockPos.y, blockPos.z));
-                    }
-
-                    if (bUp == dirt) {
-                        blockQueue.offer(new Vector3i(blockPos.x, blockPos.y, blockPos.z + 1));
-                    }
-
-                    if (bDown == dirt) {
-                        blockQueue.offer(new Vector3i(blockPos.x, blockPos.y, blockPos.z - 1));
-                    }
-
-                    return true;
                 }
             }
         }

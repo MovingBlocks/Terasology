@@ -133,24 +133,6 @@ public class StateSinglePlayer implements GameState {
 
         CoreRegistry.put(WorldPersister.class, new WorldPersister(entityManager));
 
-        // TODO: Use reflection pending mod support
-        EventSystem eventSystem = entityManager.getEventSystem();
-        eventSystem.registerEvent("engine:inputEvent", InputEvent.class);
-        eventSystem.registerEvent("engine:keyDownEvent", KeyDownEvent.class);
-        eventSystem.registerEvent("engine:keyEvent", KeyEvent.class);
-        eventSystem.registerEvent("engine:keyUpEvent", KeyUpEvent.class);
-        eventSystem.registerEvent("engine:keyRepeatEvent", KeyRepeatEvent.class);
-        eventSystem.registerEvent("engine:leftMouseDownButtonEvent", LeftMouseDownButtonEvent.class);
-        eventSystem.registerEvent("engine:leftMouseUpButtonEvent", LeftMouseUpButtonEvent.class);
-        eventSystem.registerEvent("engine:mouseDownButtonEvent", MouseDownButtonEvent.class);
-        eventSystem.registerEvent("engine:mouseUpButtonEvent", MouseUpButtonEvent.class);
-        eventSystem.registerEvent("engine:mouseButtonEvent", MouseButtonEvent.class);
-        eventSystem.registerEvent("engine:mouseWheelEvent", MouseWheelEvent.class);
-        eventSystem.registerEvent("engine:rightMouseDownButtonEvent", RightMouseDownButtonEvent.class);
-        eventSystem.registerEvent("engine:rightMouseUpButtonEvent", RightMouseUpButtonEvent.class);
-        eventSystem.registerEvent("engine:bindButtonEvent", BindButtonEvent.class);
-        eventSystem.registerEvent("engine:inventoryButtonEvent", InventoryButton.class);
-
         loadPrefabs();
     }
 
