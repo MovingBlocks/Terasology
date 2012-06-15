@@ -11,13 +11,14 @@ import org.terasology.events.inventory.ReceiveItemEvent;
 
 /**
  * System providing inventory related functionality
+ *
  * @author Immortius <immortius@gmail.com>
  */
 @RegisterComponentSystem
 public class InventorySystem implements EventHandlerSystem {
 
     // TODO: differ per item?
-    public static final byte MAX_STACK = (byte)99;
+    public static final byte MAX_STACK = (byte) 99;
 
     @Override
     public void initialise() {
@@ -28,7 +29,7 @@ public class InventorySystem implements EventHandlerSystem {
     public void shutdown() {
     }
 
-    @ReceiveEvent(components=InventoryComponent.class)
+    @ReceiveEvent(components = InventoryComponent.class)
     public void onDestroyed(RemovedComponentEvent event, EntityRef entity) {
         InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
         for (EntityRef content : inventory.itemSlots) {
@@ -38,11 +39,12 @@ public class InventorySystem implements EventHandlerSystem {
 
     /**
      * Adds an item to an inventory. If the item stacks it may be destroyed or partially moved (stack count diminished).
-     * @param event - the event that triggered, should have a reference to the item
+     *
+     * @param event  - the event that triggered, should have a reference to the item
      * @param entity - the entity that owns the InventoryComponent that is receiving the item
-     * //TODO: Later the player should be allowed to explicitly place a partial stack in a target inventory without merging
+     *               //TODO: Later the player should be allowed to explicitly place a partial stack in a target inventory without merging
      */
-    @ReceiveEvent(components=InventoryComponent.class)
+    @ReceiveEvent(components = InventoryComponent.class)
     public void onReceiveItem(ReceiveItemEvent event, EntityRef entity) {
         InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
         ItemComponent item = event.getItem().getComponent(ItemComponent.class);

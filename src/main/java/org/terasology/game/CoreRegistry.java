@@ -6,6 +6,7 @@ import java.util.Map;
 
 /**
  * Registry giving access to major singleton systems, via the interface they fulfil.
+ *
  * @author Immortius <immortius@gmail.com>
  */
 public class CoreRegistry {
@@ -13,7 +14,8 @@ public class CoreRegistry {
 
     /**
      * Registers a core system
-     * @param type The interface which the system fulfils
+     *
+     * @param type   The interface which the system fulfils
      * @param object The system itself
      * @param <T>
      */
@@ -30,5 +32,6 @@ public class CoreRegistry {
         return type.cast(store.get(type));
     }
 
-    private CoreRegistry() {}
+    private CoreRegistry() {
+    }
 }

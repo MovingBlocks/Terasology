@@ -9,18 +9,20 @@ import javax.vecmath.Vector3f;
 
 /**
  * Component represent the location and facing of an entity in the world
+ *
  * @author Immortius <immortius@gmail.com>
  */
 public final class LocationComponent implements Component {
     // Standard position/rotation
     private Vector3f position = new Vector3f();
-    private Quat4f rotation = new Quat4f(0,0,0,1);
+    private Quat4f rotation = new Quat4f(0, 0, 0, 1);
     private float scale = 1.0f;
 
     // Relative to
     public EntityRef parent = EntityRef.NULL;
 
-    public LocationComponent() {}
+    public LocationComponent() {
+    }
 
     public LocationComponent(Vector3f position) {
         this.position.set(position);
@@ -36,11 +38,11 @@ public final class LocationComponent implements Component {
     public void setLocalPosition(Vector3f newPos) {
         position.set(newPos);
     }
-    
+
     public Quat4f getLocalRotation() {
         return rotation;
     }
-    
+
     public void setLocalRotation(Quat4f newQuat) {
         rotation.set(newQuat);
     }
@@ -68,11 +70,11 @@ public final class LocationComponent implements Component {
         }
         return output;
     }
-    
+
     public Quat4f getWorldRotation() {
-        return getWorldRotation(new Quat4f(0,0,0,1));
+        return getWorldRotation(new Quat4f(0, 0, 0, 1));
     }
-    
+
     public Quat4f getWorldRotation(Quat4f output) {
         output.set(rotation);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
@@ -92,19 +94,19 @@ public final class LocationComponent implements Component {
         }
         return result;
     }
-    
+
     public void setWorldPosition(Vector3f position) {
         this.position.set(position);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (parentLoc != null) {
             this.position.sub(parentLoc.getWorldPosition());
             this.position.scale(1f / parentLoc.getWorldScale());
-            Quat4f rot = new Quat4f(0,0,0,1);
+            Quat4f rot = new Quat4f(0, 0, 0, 1);
             rot.inverse(parentLoc.getWorldRotation());
             QuaternionUtil.quatRotate(rot, this.position, this.position);
         }
     }
-    
+
     public void setWorldRotation(Quat4f rotation) {
         this.rotation.set(rotation);
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);

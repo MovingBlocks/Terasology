@@ -53,7 +53,7 @@ public class Shader implements Asset {
     private int fragmentProgram = 0;
     private int vertexProgram = 0;
     private boolean valid = false;
-    private Map<String,ParamType> params = Maps.newHashMap();
+    private Map<String, ParamType> params = Maps.newHashMap();
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -112,7 +112,7 @@ public class Shader implements Asset {
             @Override
             public Iterator<ParamMetadata> iterator() {
                 return new Iterator<ParamMetadata>() {
-                    Iterator<Map.Entry<String,ParamType>> internal = params.entrySet().iterator();
+                    Iterator<Map.Entry<String, ParamType>> internal = params.entrySet().iterator();
 
                     @Override
                     public boolean hasNext() {
@@ -121,7 +121,7 @@ public class Shader implements Asset {
 
                     @Override
                     public ParamMetadata next() {
-                        Map.Entry<String,ParamType> entry = internal.next();
+                        Map.Entry<String, ParamType> entry = internal.next();
                         return new ParamMetadata(entry.getKey(), entry.getValue());
                     }
 

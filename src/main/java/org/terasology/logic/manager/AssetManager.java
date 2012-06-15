@@ -43,7 +43,7 @@ public class AssetManager {
     }
 
     public void addAssetTemporary(AssetUri uri, Asset asset) {
-        assetCache.put(uri,  asset);
+        assetCache.put(uri, asset);
     }
 
     public Asset loadAsset(AssetUri uri) {
@@ -83,8 +83,7 @@ public class AssetManager {
             } catch (IOException ioe) {
                 logger.log(Level.SEVERE, "Error reading asset " + uri, ioe);
                 return null;
-            }
-            finally {
+            } finally {
                 if (stream != null) {
                     try {
                         stream.close();
@@ -189,8 +188,7 @@ public class AssetManager {
             sourceIterator = assetSources.values().iterator();
             if (sourceIterator.hasNext()) {
                 currentUriIterator = sourceIterator.next().list().iterator();
-            }
-            else {
+            } else {
                 currentUriIterator = NullIterator.newInstance();
             }
             iterate();
@@ -236,8 +234,7 @@ public class AssetManager {
             sourceIterator = assetSources.values().iterator();
             if (sourceIterator.hasNext()) {
                 currentUriIterator = sourceIterator.next().list(type).iterator();
-            }
-            else {
+            } else {
                 currentUriIterator = NullIterator.newInstance();
             }
             iterate();

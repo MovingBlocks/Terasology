@@ -69,7 +69,7 @@ public class ExplosionAction implements EventHandlerSystem {
                     // TODO: this should be handled centrally somewhere. Actions shouldn't be determining world behaviour
                     // like what happens when a block is destroyed.
                     worldProvider.setBlock(blockPos, BlockManager.getInstance().getAir(), currentBlock);
-                    
+
                     EntityRef blockEntity = blockEntityRegistry.getEntityAt(blockPos);
                     blockEntity.destroy();
                     physicsRenderer.addTemporaryBlock(target, currentBlock.getId(), impulse, BulletPhysicsRenderer.BLOCK_SIZE.FULL_SIZE);

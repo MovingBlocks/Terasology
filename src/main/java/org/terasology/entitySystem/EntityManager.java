@@ -38,9 +38,9 @@ public interface EntityManager {
 
     Iterable<EntityRef> iteratorEntities();
 
-    Iterable<EntityRef> iteratorEntities(Class<? extends Component> ...  componentClasses);
+    Iterable<EntityRef> iteratorEntities(Class<? extends Component>... componentClasses);
 
-    <T extends Component> Iterable<Map.Entry<EntityRef,T>> iterateComponents(Class<T> componentClass);
+    <T extends Component> Iterable<Map.Entry<EntityRef, T>> iterateComponents(Class<T> componentClass);
 
 
     /**

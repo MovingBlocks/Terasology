@@ -119,14 +119,13 @@ public class UIInventoryCellNew extends UIDisplayElement {
             if (blockItem != null) {
                 label2.setText(blockItem.blockFamily.getTitle());
             }
-        } else if (item != null){
+        } else if (item != null) {
             if (blockItem != null) {
                 label2.setText(blockItem.blockFamily.getTitle());
-            }else{
+            } else {
                 label2.setText(item.name);
             }
-        }
-            else {
+        } else {
             getLabel().setVisible(false);
         }
     }
@@ -141,6 +140,7 @@ public class UIInventoryCellNew extends UIDisplayElement {
             _mouseDown = false;
         }
     }
+
     private void processMouseInput() {
         Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
 
@@ -183,8 +183,7 @@ public class UIInventoryCellNew extends UIDisplayElement {
             }
         } else {
             Icon icon = Icon.get(item.icon);
-            if (icon != null)
-            {
+            if (icon != null) {
                 renderIcon(icon);
             }
         }

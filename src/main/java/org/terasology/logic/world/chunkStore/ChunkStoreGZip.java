@@ -125,7 +125,8 @@ public class ChunkStoreGZip implements ChunkStore, Serializable {
             c = (Chunk) objectIn.readObject();
             objectIn.close();
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Error loading chunk: ", e);;
+            logger.log(Level.SEVERE, "Error loading chunk: ", e);
+            ;
         } catch (ClassNotFoundException e) {
             logger.log(Level.SEVERE, "Error loading chunk: ", e);
         }

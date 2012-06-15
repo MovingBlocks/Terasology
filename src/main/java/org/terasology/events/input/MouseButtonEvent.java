@@ -20,9 +20,9 @@ public class MouseButtonEvent extends ButtonEvent {
         return state;
     }
 
-	public int getButton() {
-		return button;
-	}
+    public int getButton() {
+        return button;
+    }
 
     public String getMouseButtonName() {
         return Mouse.getButtonName(button);

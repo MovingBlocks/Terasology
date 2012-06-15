@@ -17,7 +17,7 @@ public class GelatinousCubeFactory {
 
     private FastRandom random;
     private EntityManager entityManager;
-    
+
     public EntityRef generateGelatinousCube(Vector3f position) {
         EntityRef entity = entityManager.create("core:gelatinousCube");
         LocationComponent loc = entity.getComponent(LocationComponent.class);

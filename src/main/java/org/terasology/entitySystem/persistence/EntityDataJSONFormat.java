@@ -74,13 +74,13 @@ public class EntityDataJSONFormat {
                 JsonArray prefabArray = jsonObject.getAsJsonArray("prefab");
                 if (prefabArray != null) {
                     for (JsonElement prefabElem : prefabArray) {
-                        world.addPrefab((EntityData.Prefab)context.deserialize(prefabElem, EntityData.Prefab.class));
+                        world.addPrefab((EntityData.Prefab) context.deserialize(prefabElem, EntityData.Prefab.class));
                     }
                 }
                 JsonArray entityArray = jsonObject.getAsJsonArray("entity");
                 if (entityArray != null) {
                     for (JsonElement entityElem : entityArray) {
-                        world.addEntity((EntityData.Entity)context.deserialize(entityElem, EntityData.Entity.class));
+                        world.addEntity((EntityData.Entity) context.deserialize(entityElem, EntityData.Entity.class));
                     }
                 }
                 JsonPrimitive nextId = jsonObject.getAsJsonPrimitive("next_entity_id");
@@ -214,8 +214,7 @@ public class EntityDataJSONFormat {
                 if (name.equals("name")) {
                     if (entry.getValue().isJsonPrimitive())
                         prefab.setName(entry.getValue().getAsString());
-                }
-                else if (name.equals("parent")) {
+                } else if (name.equals("parent")) {
                     if (entry.getValue().isJsonPrimitive()) {
                         prefab.addParentName(entry.getValue().getAsString());
                     } else if (entry.getValue().isJsonArray()) {
@@ -240,47 +239,33 @@ public class EntityDataJSONFormat {
         public JsonElement serialize(EntityData.Value src, Type typeOfSrc, JsonSerializationContext context) {
             if (src.getBooleanCount() > 1) {
                 return context.serialize(src.getBooleanList());
-            }
-            else if (src.getBooleanCount() == 1) {
+            } else if (src.getBooleanCount() == 1) {
                 return context.serialize(src.getBoolean(0));
-            }
-            else if (src.getDoubleCount() > 1) {
+            } else if (src.getDoubleCount() > 1) {
                 return context.serialize(src.getDoubleList());
-            }
-            else if (src.getDoubleCount() == 1) {
+            } else if (src.getDoubleCount() == 1) {
                 return context.serialize(src.getDouble(0));
-            }
-            else if (src.getFloatCount() > 1) {
+            } else if (src.getFloatCount() > 1) {
                 return context.serialize(src.getFloatList());
-            }
-            else if (src.getFloatCount() == 1) {
+            } else if (src.getFloatCount() == 1) {
                 return context.serialize(src.getFloat(0));
-            }
-            else if (src.getIntegerCount() > 1) {
+            } else if (src.getIntegerCount() > 1) {
                 return context.serialize(src.getIntegerList());
-            }
-            else if (src.getIntegerCount() == 1) {
+            } else if (src.getIntegerCount() == 1) {
                 return context.serialize(src.getInteger(0));
-            }
-            else if (src.getLongCount() > 1) {
+            } else if (src.getLongCount() > 1) {
                 return context.serialize(src.getLongList());
-            }
-            else if (src.getLongCount() == 1) {
+            } else if (src.getLongCount() == 1) {
                 return context.serialize(src.getLong(0));
-            }
-            else if (src.getStringCount() > 1) {
+            } else if (src.getStringCount() > 1) {
                 return context.serialize(src.getStringList());
-            }
-            else if (src.getStringCount() == 1) {
+            } else if (src.getStringCount() == 1) {
                 return context.serialize(src.getString(0));
-            }
-            else if (src.getValueCount() > 0) {
+            } else if (src.getValueCount() > 0) {
                 return context.serialize(src.getValueList());
-            }
-            else if (src.hasBytes()) {
+            } else if (src.hasBytes()) {
                 return context.serialize(src.getBytes().toByteArray());
-            }
-            else if (src.getNameValueCount() > 0) {
+            } else if (src.getNameValueCount() > 0) {
                 JsonObject obj = new JsonObject();
                 for (EntityData.NameValue nameValue : src.getNameValueList()) {
                     obj.add(nameValue.getName(), context.serialize(nameValue.getValue()));
@@ -295,27 +280,23 @@ public class EntityDataJSONFormat {
             EntityData.Value.Builder value = EntityData.Value.newBuilder();
             if (json.isJsonPrimitive()) {
                 extractPrimitive(value, json);
-            }
-            else if (json.isJsonObject()) {
+            } else if (json.isJsonObject()) {
                 extractMap(json, context, value);
-            }
-            else if (json.isJsonArray())
-            {
+            } else if (json.isJsonArray()) {
                 JsonArray jsonArray = json.getAsJsonArray();
                 TByteList byteList = new TByteArrayList();
                 for (JsonElement element : jsonArray) {
                     if (element.isJsonArray()) {
-                        value.addValue((EntityData.Value)context.deserialize(element, EntityData.Value.class));
-                    }
-                    else if (json.isJsonObject()) {
+                        value.addValue((EntityData.Value) context.deserialize(element, EntityData.Value.class));
+                    } else if (json.isJsonObject()) {
                         extractMap(json, context, value);
-                    }
-                    else if (element.isJsonPrimitive()) {
+                    } else if (element.isJsonPrimitive()) {
                         extractPrimitive(value, element);
                         if (element.getAsJsonPrimitive().isNumber()) {
                             try {
                                 byteList.add(element.getAsByte());
-                            } catch (NumberFormatException nfe) { }
+                            } catch (NumberFormatException nfe) {
+                            }
                         }
                     }
                 }
@@ -326,8 +307,8 @@ public class EntityDataJSONFormat {
 
         private void extractMap(JsonElement json, JsonDeserializationContext context, EntityData.Value.Builder value) {
             JsonObject nameValueObject = json.getAsJsonObject();
-            for (Map.Entry<String,JsonElement> nameValue : nameValueObject.entrySet()) {
-                EntityData.Value innerValue = (EntityData.Value)context.deserialize(nameValue.getValue(), EntityData.Value.class);
+            for (Map.Entry<String, JsonElement> nameValue : nameValueObject.entrySet()) {
+                EntityData.Value innerValue = (EntityData.Value) context.deserialize(nameValue.getValue(), EntityData.Value.class);
                 value.addNameValue(EntityData.NameValue.newBuilder().setName(nameValue.getKey()).setValue(innerValue));
             }
         }
@@ -340,7 +321,8 @@ public class EntityDataJSONFormat {
                 try {
                     value.addLong(primitive.getAsLong());
                     value.addInteger(primitive.getAsInt());
-                } catch (NumberFormatException e) {}
+                } catch (NumberFormatException e) {
+                }
             }
             if (primitive.isBoolean()) {
                 value.addBoolean(primitive.getAsBoolean());

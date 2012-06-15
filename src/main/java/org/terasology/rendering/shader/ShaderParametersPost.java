@@ -61,7 +61,7 @@ public class ShaderParametersPost implements IShaderParameters {
         program.setInt("texBlur", 2);
         program.setInt("texVignette", 3);
         program.setInt("texDepth", 4);
-        
+
         program.setFloat("viewingDistance", Config.getInstance().getActiveViewingDistance() * 8.0f);
 
         if (CoreRegistry.get(LocalPlayer.class).isValid()) {

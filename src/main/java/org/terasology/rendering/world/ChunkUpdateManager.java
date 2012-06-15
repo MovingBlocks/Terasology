@@ -51,6 +51,7 @@ public final class ChunkUpdateManager {
         this.tessellator = tessellator;
         this.worldProvider = worldProvider;
     }
+
     /**
      * Updates the given chunk using a new thread from the thread pool. If the maximum amount of chunk updates
      * is reached, the chunk update is ignored. Chunk updates can be forced though.

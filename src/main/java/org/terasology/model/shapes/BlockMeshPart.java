@@ -86,18 +86,16 @@ public class BlockMeshPart {
             chunk._vertexElements[meshBit].indices.add(indices[i] + nextIndex);
         }
     }
-    
-    public BlockMeshPart rotate(Quat4f rotation)
-    {
+
+    public BlockMeshPart rotate(Quat4f rotation) {
         Vector3f[] newVertices = new Vector3f[vertices.length];
         Vector3f[] newNormals = new Vector3f[normals.length];
-        
-        for (int i = 0; i < newVertices.length; ++i)
-        {
+
+        for (int i = 0; i < newVertices.length; ++i) {
             newVertices[i] = QuaternionUtil.quatRotate(rotation, vertices[i], new Vector3f());
             newNormals[i] = QuaternionUtil.quatRotate(rotation, normals[i], new Vector3f());
         }
-        
+
         return new BlockMeshPart(newVertices, newNormals, texCoords, indices);
     }
 }

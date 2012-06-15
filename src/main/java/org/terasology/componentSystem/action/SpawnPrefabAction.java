@@ -28,7 +28,7 @@ import javax.vecmath.Vector3f;
  * @author Immortius
  */
 @RegisterComponentSystem
-public class SpawnPrefabAction implements EventHandlerSystem{
+public class SpawnPrefabAction implements EventHandlerSystem {
 
     private EntityManager entityManager;
 

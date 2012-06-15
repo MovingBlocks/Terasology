@@ -24,12 +24,12 @@ public class PlayerFactory {
 
     private EntityManager entityManager;
     private BlockItemFactory blockFactory;
-    
+
     public PlayerFactory(EntityManager entityManager) {
         this.entityManager = entityManager;
         blockFactory = new BlockItemFactory(entityManager, CoreRegistry.get(PrefabManager.class));
     }
-    
+
     public EntityRef newInstance(Vector3f spawnPosition) {
         EntityRef player = entityManager.create();
 
@@ -68,6 +68,6 @@ public class PlayerFactory {
         player.send(new ReceiveItemEvent(entityManager.create("core:railgunTool")));
 
         return player;
-    } 
+    }
 
 }

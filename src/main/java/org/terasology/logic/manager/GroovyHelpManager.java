@@ -29,13 +29,13 @@ public class GroovyHelpManager {
     }
 
     public HashMap<String, String> getHelpCommands() throws IOException {
-        HashMap<String,String> commandlist = new HashMap<String, String>();
+        HashMap<String, String> commandlist = new HashMap<String, String>();
         Gson gson = new Gson();
         String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data" + File.separator + "help" + File.separator + "commands" + File.separator + "commands.json";
         JsonReader reader = new JsonReader(new FileReader(helpFile));
         reader.beginArray();
         while (reader.hasNext()) {
-            groovyhelp = gson.fromJson(reader,GroovyHelp.class);
+            groovyhelp = gson.fromJson(reader, GroovyHelp.class);
             commandlist.put(groovyhelp.getCommandName(), groovyhelp.getCommandDesc());
         }
         reader.endArray();
@@ -43,7 +43,7 @@ public class GroovyHelpManager {
         return commandlist;
     }
 
-    public String[] getGroovyCommands(){
+    public String[] getGroovyCommands() {
         Method[] methods = GroovyManager.CommandHelper.class.getDeclaredMethods();
         String[] tempval = new String[methods.length];
         for (int i = 0; i < methods.length; i++) {
@@ -62,10 +62,10 @@ public class GroovyHelpManager {
             JsonReader reader = new JsonReader(new FileReader(helpFile));
             reader.beginArray();
             while (reader.hasNext()) {
-                groovyhelp = gson.fromJson(reader,GroovyHelp.class);
+                groovyhelp = gson.fromJson(reader, GroovyHelp.class);
                 if (groovyhelp.getCommandName().equals(commandname)) {
                     return groovyhelp;
-            }
+                }
             }
             reader.endArray();
             reader.close();
@@ -77,16 +77,16 @@ public class GroovyHelpManager {
     }
 
     public HashMap<Byte, String> getGroovyBlocks() {
-        HashMap<Byte,String> retval = new HashMap<Byte, String>();
-        String[] endfilter = {"FRONT","BACK","TOP","BOTTOM","LEFT","RIGHT"};
+        HashMap<Byte, String> retval = new HashMap<Byte, String>();
+        String[] endfilter = {"FRONT", "BACK", "TOP", "BOTTOM", "LEFT", "RIGHT"};
         String fampref = "org.terasology.model.blocks.";
         String tempval = "";
         boolean nodup = true;
-        for(byte i = -127;i<127;i++){
+        for (byte i = -127; i < 127; i++) {
             Block b = BlockManager.getInstance().getBlock(i);
-            if(b.getId() != 0){
+            if (b.getId() != 0) {
                 if (tempval.length() > 0) {
-                    if(b.getTitle().startsWith(tempval)){
+                    if (b.getTitle().startsWith(tempval)) {
                         nodup = false;
                     } else {
                         nodup = true;
@@ -96,34 +96,34 @@ public class GroovyHelpManager {
                     for (String element : endfilter) {
                         if (b.getTitle().endsWith(element)) {
                             tempval = b.getTitle().substring(0, b.getTitle().length() - element.length());
-                }
                         }
                     }
-                if(nodup){
+                }
+                if (nodup) {
                     String tempfam = b.getBlockFamily().toString().split("@")[0];
-                    if(tempfam.startsWith(fampref)){
+                    if (tempfam.startsWith(fampref)) {
                         tempfam = tempfam.substring(fampref.length(), tempfam.length());
                     }
-                    if(tempval.length() < 1){
-                        retval.put(b.getId(),b.getTitle() + " and belongs to " + tempfam);
+                    if (tempval.length() < 1) {
+                        retval.put(b.getId(), b.getTitle() + " and belongs to " + tempfam);
                     } else {
-                        retval.put(b.getId(),tempval + " and belongs to " + tempfam);
+                        retval.put(b.getId(), tempval + " and belongs to " + tempfam);
                     }
                 }
             }
             if (i == 127) {
                 break;
-        }
+            }
         }
 
         return retval;
     }
 
-    public  ArrayList<Prefab> getItems(){
+    public ArrayList<Prefab> getItems() {
         PrefabManager prefMan = CoreRegistry.get(PrefabManager.class);
         ArrayList<Prefab> prefabs = new ArrayList<Prefab>();
-        Iterator<Prefab> it =  prefMan.listPrefabs().iterator();
-        while(it.hasNext()){
+        Iterator<Prefab> it = prefMan.listPrefabs().iterator();
+        while (it.hasNext()) {
             Prefab prefab = it.next();
             //grabb all
             prefabs.add(prefab);

@@ -7,7 +7,7 @@ import org.terasology.entitySystem.Event;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class PojoEntityRef extends EntityRef{
+public class PojoEntityRef extends EntityRef {
     int id;
     PojoEntityManager entityManager;
 

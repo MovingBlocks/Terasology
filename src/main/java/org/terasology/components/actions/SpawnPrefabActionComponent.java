@@ -21,8 +21,7 @@ import org.terasology.entitySystem.Component;
 /**
  * @author Immortius
  */
-public class SpawnPrefabActionComponent implements Component
-{
+public class SpawnPrefabActionComponent implements Component {
     public String prefab;
     public ActionTarget spawnLocationRelativeTo = ActionTarget.Target;
 }

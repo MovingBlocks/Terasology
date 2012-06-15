@@ -55,7 +55,7 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
     @Override
     public void shutdown() {
     }
-    
+
     public void update(float delta) {
         for (EntityRef entity : entityManager.iteratorEntities(BlockParticleEffectComponent.class, LocationComponent.class)) {
             BlockParticleEffectComponent particleEffect = entity.getComponent(BlockParticleEffectComponent.class);
@@ -70,7 +70,7 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
                     updatePosition(p, delta);
                 }
             }
-        
+
             for (int i = 0; particleEffect.spawnCount > 0 && i < PARTICLES_PER_UPDATE; ++i) {
                 spawnParticle(particleEffect);
             }
@@ -130,12 +130,12 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
             if (!worldProvider.isBlockActive(worldPos)) {
                 continue;
             }
-            double temperature = worldProvider.getBiomeProvider().getTemperatureAt((int)worldPos.x, (int)worldPos.z);
-            double humidity = worldProvider.getBiomeProvider().getHumidityAt((int)worldPos.x, (int)worldPos.z);
+            double temperature = worldProvider.getBiomeProvider().getTemperatureAt((int) worldPos.x, (int) worldPos.z);
+            double humidity = worldProvider.getBiomeProvider().getHumidityAt((int) worldPos.x, (int) worldPos.z);
 
             glPushMatrix();
             glTranslated(worldPos.x - cameraPosition.x, worldPos.y - cameraPosition.y, worldPos.z - cameraPosition.z);
-            
+
             BlockParticleEffectComponent particleEffect = entity.getComponent(BlockParticleEffectComponent.class);
             if (particleEffect.blockType == null) {
                 return;

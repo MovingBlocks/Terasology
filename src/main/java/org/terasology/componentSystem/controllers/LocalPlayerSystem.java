@@ -102,7 +102,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         entity.saveComponent(localPlayerComponent);
     }
 
-    @ReceiveEvent(components=LocalPlayerComponent.class)
+    @ReceiveEvent(components = LocalPlayerComponent.class)
     public void onMouseX(MouseXAxisEvent event, EntityRef entity) {
         LocalPlayerComponent localPlayer = entity.getComponent(LocalPlayerComponent.class);
         localPlayer.viewYaw = (localPlayer.viewYaw - event.getValue()) % 360;
@@ -111,11 +111,11 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         if (loc != null) {
             QuaternionUtil.setEuler(loc.getLocalRotation(), TeraMath.DEG_TO_RAD * localPlayer.viewYaw, 0, 0);
             entity.saveComponent(loc);
-    }
+        }
         event.consume();
     }
 
-    @ReceiveEvent(components=LocalPlayerComponent.class)
+    @ReceiveEvent(components = LocalPlayerComponent.class)
     public void onMouseY(MouseYAxisEvent event, EntityRef entity) {
         LocalPlayerComponent localPlayer = entity.getComponent(LocalPlayerComponent.class);
         localPlayer.viewPitch = TeraMath.clamp(localPlayer.viewPitch - event.getValue(), -89, 89);
@@ -154,7 +154,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         event.consume();
     }
 
-    @ReceiveEvent(components= {LocalPlayerComponent.class, CharacterMovementComponent.class})
+    @ReceiveEvent(components = {LocalPlayerComponent.class, CharacterMovementComponent.class})
     public void onRun(RunButton event, EntityRef entity) {
         CharacterMovementComponent characterMovement = entity.getComponent(CharacterMovementComponent.class);
         characterMovement.isRunning = event.isDown();
@@ -198,12 +198,12 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         float lengthSquared = relMove.lengthSquared();
         if (lengthSquared > 1) relMove.normalize();
         characterMovementComponent.setDrive(relMove);
-        }
+    }
 
     private boolean checkRespawn(float deltaSeconds, EntityRef entity, LocalPlayerComponent localPlayerComponent, CharacterMovementComponent characterMovementComponent, LocationComponent location, PlayerComponent playerComponent) {
         localPlayerComponent.respawnWait -= deltaSeconds;
         if (localPlayerComponent.respawnWait > 0) {
-            characterMovementComponent.getDrive().set(0,0,0);
+            characterMovementComponent.getDrive().set(0, 0, 0);
             characterMovementComponent.jump = false;
             return false;
         }
@@ -224,7 +224,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         // The camera position is the player's position plus the eye offset
         Vector3d cameraPosition = new Vector3d();
         // TODO: don't hardset eye position
-        cameraPosition.add(new Vector3d(position), new Vector3d(0,0.6f,0));
+        cameraPosition.add(new Vector3d(position), new Vector3d(0, 0.6f, 0));
 
         playerCamera.getPosition().set(cameraPosition);
         Vector3f viewDir = new Vector3f(0, 0, 1);
@@ -235,7 +235,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         if (stepDelta < 0) stepDelta += charMovementComp.distanceBetweenFootsteps;
         bobFactor += stepDelta;
         lastStepDelta = charMovementComp.footstepDelta;
-        
+
         if (cameraBobbing) {
             playerCamera.setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.5f));
             playerCamera.setBobbingVerticalOffsetFactor(calcBobbingOffset((float) java.lang.Math.PI / 4f, 0.025f, 3f));
@@ -255,7 +255,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     public void onAttackRequest(AttackButton event, EntityRef entity) {
         if (!event.isDown() || timer.getTimeInMs() - lastInteraction < 200) {
             return;
-    }
+        }
 
         LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
         InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
@@ -268,7 +268,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         localPlayerComp.handAnimation = 0.5f;
         entity.saveComponent(localPlayerComp);
         event.consume();
-                }
+    }
 
     private void attack(EntityRef target, EntityRef player, EntityRef selectedItemEntity) {
         // TODO: Should send an attack event to self, and another system common to all creatures should handle this
@@ -282,9 +282,9 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
                 Block block = worldProvider.getBlock(blockComp.getPosition());
                 if (item.getPerBlockDamageBonus().containsKey(block.getBlockFamily().getTitle())) {
                     damage += item.getPerBlockDamageBonus().get(block.getBlockFamily().getTitle());
+                }
             }
         }
-    }
         target.send(new DamageEvent(damage, player));
     }
 
@@ -299,7 +299,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
         event.getTarget().send(new ActivateEvent(entity, entity));
         event.consume();
-                    }
+    }
 
     @ReceiveEvent(components = {LocalPlayerComponent.class})
     public void onNextItem(ToolbarNextButton event, EntityRef entity) {
@@ -307,25 +307,25 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         localPlayerComp.selectedTool = (localPlayerComp.selectedTool + 1) % 9;
         localPlayer.getEntity().saveComponent(localPlayerComp);
         event.consume();
-                }
+    }
 
     @ReceiveEvent(components = {LocalPlayerComponent.class})
     public void onPrevItem(ToolbarPrevButton event, EntityRef entity) {
-                LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
+        LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
         localPlayerComp.selectedTool = (localPlayerComp.selectedTool - 1) % 9;
         if (localPlayerComp.selectedTool < 0) {
-                    localPlayerComp.selectedTool = 9 + localPlayerComp.selectedTool;
-                }
-                localPlayer.getEntity().saveComponent(localPlayerComp);
+            localPlayerComp.selectedTool = 9 + localPlayerComp.selectedTool;
+        }
+        localPlayer.getEntity().saveComponent(localPlayerComp);
         event.consume();
-            }
+    }
 
     @ReceiveEvent(components = {LocalPlayerComponent.class})
     public void onSlotButton(ToolbarSlotButton event, EntityRef entity) {
         LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
         localPlayerComp.selectedTool = event.getSlot();
         localPlayer.getEntity().saveComponent(localPlayerComp);
-        }
+    }
 
     @ReceiveEvent(components = {LocalPlayerComponent.class, InventoryComponent.class})
     public void onUseItemRequest(UseItemButton event, EntityRef entity) {
@@ -337,20 +337,20 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
         if (localPlayerComp.isDead) return;
 
-            EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayerComp.selectedTool);
+        EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayerComp.selectedTool);
 
-                ItemComponent item = selectedItemEntity.getComponent(ItemComponent.class);
+        ItemComponent item = selectedItemEntity.getComponent(ItemComponent.class);
         if (item != null && item.usage != ItemComponent.UsageType.NONE) {
-                    useItem(entity, selectedItemEntity);
+            useItem(entity, selectedItemEntity);
         } else {
             attack(event.getTarget(), entity, selectedItemEntity);
-                }
+        }
 
-                lastInteraction = timer.getTimeInMs();
-                localPlayerComp.handAnimation = 0.5f;
-                entity.saveComponent(localPlayerComp);
+        lastInteraction = timer.getTimeInMs();
+        localPlayerComp.handAnimation = 0.5f;
+        entity.saveComponent(localPlayerComp);
         event.consume();
-            }
+    }
 
     private void useItem(EntityRef player, EntityRef item) {
         // TODO: Raytrace against entities too
@@ -376,7 +376,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         List<RayBlockIntersection.Intersection> inters = new ArrayList<RayBlockIntersection.Intersection>();
 
         Vector3f pos = new Vector3f(playerCamera.getPosition());
-        
+
         int blockPosX, blockPosY, blockPosZ;
 
         for (int x = -3; x <= 3; x++) {

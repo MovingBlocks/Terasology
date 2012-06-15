@@ -40,7 +40,7 @@ import java.util.zip.ZipFile;
 public class ModManager {
 
     private Logger logger = Logger.getLogger(getClass().getName());
-    private Map<String,Mod> mods = Maps.newHashMap();
+    private Map<String, Mod> mods = Maps.newHashMap();
 
     public ModManager() {
         refresh();
@@ -50,9 +50,8 @@ public class ModManager {
         mods.clear();
         Gson gson = new Gson();
         File modPath = PathManager.getInstance().getModPath();
-        for(File modFile : modPath.listFiles()) {
-            if (modFile.isDirectory())
-            {
+        for (File modFile : modPath.listFiles()) {
+            if (modFile.isDirectory()) {
                 File modInfoFile = new File(modFile.getPath(), "mod.txt");
                 if (modInfoFile.exists()) {
                     try {
@@ -91,7 +90,7 @@ public class ModManager {
                 mod.setEnabled(true);
             }
         }
-     }
+    }
 
     public Collection<Mod> getMods() {
         return mods.values();

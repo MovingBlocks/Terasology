@@ -23,14 +23,14 @@ import java.util.logging.Logger;
 
 /**
  * This system processes input, sending it out as events against the LocalPlayer entity.
- *
+ * <p/>
  * In addition to raw keyboard and mouse input, the system handles Bind Buttons and Bind Axis, which can be mapped
  * to one or more inputs.
  */
 public class InputSystem implements EventHandlerSystem {
     private Logger logger = Logger.getLogger(getClass().getName());
 
-    private float mouseSensitivity = (float)Config.getInstance().getMouseSens();
+    private float mouseSensitivity = (float) Config.getInstance().getMouseSens();
 
     private Map<String, BindableAxisImpl> axisLookup = Maps.newHashMap();
     private Map<String, BindableButtonImpl> buttonLookup = Maps.newHashMap();

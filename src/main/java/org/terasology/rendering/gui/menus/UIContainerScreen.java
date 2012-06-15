@@ -14,9 +14,10 @@ import javax.vecmath.Vector2f;
 
 /**
  * Displays two inventories, and allows moving items between them
+ *
  * @author Immortius <immortius@gmail.com>
  */
-public class UIContainerScreen  extends UIDisplayWindow implements UIInventoryNew.InventorySubscriber{
+public class UIContainerScreen extends UIDisplayWindow implements UIInventoryNew.InventorySubscriber {
     private static final int CENTER_BORDER = 100;
     private static final int OUTER_BORDER = 50;
 

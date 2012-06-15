@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 /**
  * Simple manager for component systems.
  * This is an initial, rough implementation to be improved later.
+ *
  * @author Immortius <immortius@gmail.com>
  */
 public class ComponentSystemManager {
@@ -43,7 +44,7 @@ public class ComponentSystemManager {
         Set<Class<?>> systems = reflections.getTypesAnnotatedWith(RegisterComponentSystem.class);
         for (Class<?> system : systems) {
             if (!ComponentSystem.class.isAssignableFrom(system)) {
-                logger.log(Level.WARNING, String.format("Cannot load %s, must be a subclass of ComponentSystem",system.getSimpleName()));
+                logger.log(Level.WARNING, String.format("Cannot load %s, must be a subclass of ComponentSystem", system.getSimpleName()));
                 continue;
             }
 
@@ -51,7 +52,7 @@ public class ComponentSystemManager {
             // TODO: filter registrations
             String id = packageName + ":" + system.getSimpleName();
             try {
-                ComponentSystem newSystem = (ComponentSystem)system.newInstance();
+                ComponentSystem newSystem = (ComponentSystem) system.newInstance();
                 register(newSystem, id);
                 logger.log(Level.INFO, "Loaded " + id);
             } catch (InstantiationException e) {
@@ -66,19 +67,19 @@ public class ComponentSystemManager {
     public <T extends ComponentSystem> void register(ComponentSystem object, String name) {
         store.add(object);
         if (object instanceof UpdateSubscriberSystem) {
-            updateSubscribers.add((UpdateSubscriberSystem)object);
+            updateSubscribers.add((UpdateSubscriberSystem) object);
         }
         if (object instanceof RenderSystem) {
-            renderSubscribers.add((RenderSystem)object);
+            renderSubscribers.add((RenderSystem) object);
         }
         if (object instanceof EventHandlerSystem) {
-            CoreRegistry.get(EntityManager.class).getEventSystem().registerEventHandler((EventHandlerSystem)object);
+            CoreRegistry.get(EntityManager.class).getEventSystem().registerEventHandler((EventHandlerSystem) object);
         }
         namedLookup.put(name, object);
     }
 
     // TODO: unregister?
-    
+
     public ComponentSystem get(String name) {
         return namedLookup.get(name);
     }
@@ -97,7 +98,7 @@ public class ComponentSystemManager {
     public Iterable<UpdateSubscriberSystem> iterateUpdateSubscribers() {
         return updateSubscribers;
     }
-    
+
     public Iterable<RenderSystem> iterateRenderSubscribers() {
         return renderSubscribers;
     }

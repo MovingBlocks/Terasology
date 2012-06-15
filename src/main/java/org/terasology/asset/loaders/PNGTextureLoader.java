@@ -69,8 +69,7 @@ public class PNGTextureLoader implements AssetLoader<Texture> {
                     TextureMetadata metadata = gson.fromJson(reader, TextureMetadata.class);
                     if (metadata.filterMode != null) filterMode = metadata.filterMode;
                     if (metadata.wrapMode != null) wrapMode = metadata.wrapMode;
-                }
-                finally {
+                } finally {
                     // JAVA7: Replace with new handling
                     if (reader != null) {
                         try {
@@ -84,6 +83,6 @@ public class PNGTextureLoader implements AssetLoader<Texture> {
             }
         }
 
-        return new Texture(uri, new ByteBuffer[] {data}, width, height, wrapMode, filterMode);
+        return new Texture(uri, new ByteBuffer[]{data}, width, height, wrapMode, filterMode);
     }
 }

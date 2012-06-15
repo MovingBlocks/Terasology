@@ -28,7 +28,7 @@ import static org.lwjgl.opengl.GL11.*;
  */
 @RegisterComponentSystem(headedOnly = true)
 public class BlockDamageRenderer implements RenderSystem {
-    
+
     private EntityManager entityManager;
     private WorldProvider worldProvider;
     private Mesh overlayMesh;

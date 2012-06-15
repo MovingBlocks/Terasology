@@ -34,6 +34,7 @@ public interface Sound extends Asset {
     public void reset();
 
     // TODO: Have these here?
+
     /**
      * @return the size of the sound buffer
      */

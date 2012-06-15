@@ -40,7 +40,7 @@ public class UIMainMenu extends UIDisplayWindow {
     private final UIButton _configButton;
 
     final UIText _version;
-                                                                  
+
     public UIMainMenu() {
         maximize();
         _title = new UIGraphicsElement(AssetManager.loadTexture("engine:terasology"));
@@ -70,7 +70,7 @@ public class UIMainMenu extends UIDisplayWindow {
         addDisplayElement(_title);
         addDisplayElement(_version);
         addDisplayElement(_configButton, "configButton");
-        addDisplayElement(_exitButton,   "exitButton");
+        addDisplayElement(_exitButton, "exitButton");
         addDisplayElement(_singlePlayerButton, "singlePlayerButton");
         setModal(true);
 

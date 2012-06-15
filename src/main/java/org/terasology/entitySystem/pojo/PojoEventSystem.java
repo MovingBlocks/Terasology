@@ -15,8 +15,8 @@ import java.util.logging.Logger;
  */
 public class PojoEventSystem implements EventSystem {
 
-    private Logger logger = Logger.getLogger(getClass().getName()); 
-    
+    private Logger logger = Logger.getLogger(getClass().getName());
+
     private EntityManager entitySystem;
     private Map<Class<? extends Event>, Multimap<Class<? extends Component>, EventHandlerInfo>> componentSpecificHandlers = Maps.newHashMap();
     private Comparator<EventHandlerInfo> priorityComparator = new EventHandlerPriorityComparator();
@@ -59,18 +59,16 @@ public class PojoEventSystem implements EventSystem {
         }
 
         logger.info("Registering event handler " + handlerClass.getName());
-        for (Method method : handlerClass.getMethods())
-        {
+        for (Method method : handlerClass.getMethods()) {
             ReceiveEvent receiveEventAnnotation = method.getAnnotation(ReceiveEvent.class);
             if (receiveEventAnnotation != null) {
                 if (!Modifier.isPublic(method.getModifiers())) {
                     method.setAccessible(true);
                 }
                 Class<?>[] types = method.getParameterTypes();
-                             
-                
-                if (types.length == 2 && Event.class.isAssignableFrom(types[0]) && EntityRef.class.isAssignableFrom(types[1]))
-                {
+
+
+                if (types.length == 2 && Event.class.isAssignableFrom(types[0]) && EntityRef.class.isAssignableFrom(types[1])) {
                     logger.info("Found method: " + method.toString());
                     ReflectedEventHandlerInfo handlerInfo = new ReflectedEventHandlerInfo(handler, method, receiveEventAnnotation.priority(), receiveEventAnnotation.components());
                     for (Class<? extends Component> c : receiveEventAnnotation.components()) {
@@ -81,9 +79,7 @@ public class PojoEventSystem implements EventSystem {
                         }
                         componentMap.put(c, handlerInfo);
                     }
-                }
-                else
-                {
+                } else {
                     logger.warning("Invalid event handler method: " + method.getName());
                 }
             }
@@ -173,26 +169,26 @@ public class PojoEventSystem implements EventSystem {
 
     private interface EventHandlerInfo {
         public boolean isValidFor(EntityRef entity);
+
         public void invoke(EntityRef entity, Event event);
+
         public int getPriority();
     }
 
 
-    private class ReflectedEventHandlerInfo implements EventHandlerInfo
-    {
+    private class ReflectedEventHandlerInfo implements EventHandlerInfo {
         private EventHandlerSystem handler;
         private Method method;
         private Class<? extends Component>[] components;
         private int priority;
 
-        public ReflectedEventHandlerInfo(EventHandlerSystem handler, Method method, int priority, Class<? extends Component> ... components)
-        {
+        public ReflectedEventHandlerInfo(EventHandlerSystem handler, Method method, int priority, Class<? extends Component>... components) {
             this.handler = handler;
             this.method = method;
             this.components = Arrays.copyOf(components, components.length);
             this.priority = priority;
         }
-        
+
         public boolean isValidFor(EntityRef entity) {
             for (Class<? extends Component> component : components) {
                 if (!entity.hasComponent(component)) {
@@ -202,8 +198,7 @@ public class PojoEventSystem implements EventSystem {
             return true;
         }
 
-        public void invoke(EntityRef entity, Event event)
-        {
+        public void invoke(EntityRef entity, Event event) {
             try {
                 method.invoke(handler, event, entity);
             } catch (IllegalAccessException ex) {
@@ -220,13 +215,12 @@ public class PojoEventSystem implements EventSystem {
         }
     }
 
-    private class ReceiverEventHandlerInfo<T extends Event> implements EventHandlerInfo
-    {
+    private class ReceiverEventHandlerInfo<T extends Event> implements EventHandlerInfo {
         private EventReceiver<T> receiver;
         private Class<? extends Component>[] components;
         private int priority;
 
-        public ReceiverEventHandlerInfo(EventReceiver<T> receiver, int priority, Class<? extends Component> ... components) {
+        public ReceiverEventHandlerInfo(EventReceiver<T> receiver, int priority, Class<? extends Component>... components) {
             this.receiver = receiver;
             this.priority = priority;
             this.components = Arrays.copyOf(components, components.length);
@@ -244,7 +238,7 @@ public class PojoEventSystem implements EventSystem {
 
         @Override
         public void invoke(EntityRef entity, Event event) {
-            receiver.onEvent((T)event, entity);
+            receiver.onEvent((T) event, entity);
         }
 
         @Override

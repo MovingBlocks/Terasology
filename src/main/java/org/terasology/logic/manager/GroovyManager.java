@@ -64,7 +64,7 @@ public class GroovyManager {
      * Directory where we keep "plugin" files (Groovy scripts we'll run - prolly move this setting elsewhere sometime)
      */
     private static final String PLUGINS_PATH = "groovy/plugins";
-    
+
     private Logger logger = Logger.getLogger(getClass().getName());
 
     /**
@@ -226,7 +226,7 @@ public class GroovyManager {
         public void dumpEntities() throws IOException {
             CoreRegistry.get(WorldPersister.class).save(new File(PathManager.getInstance().getDataPath(), "entityDump.txt"), WorldPersister.SaveFormat.JSON);
         }
-        
+
         public void debugCollision() {
             Config.getInstance().setDebugCollision(!Config.getInstance().isDebugCollision());
         }

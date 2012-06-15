@@ -25,6 +25,7 @@ import java.io.IOException;
 
 /**
  * Summary information on a world.
+ *
  * @author Immortius
  */
 public class WorldInfo {

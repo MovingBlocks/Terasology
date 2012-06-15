@@ -167,7 +167,7 @@ public class Vector3i extends javax.vecmath.Tuple3i implements Serializable {
      *
      * @param other the other vector to test
      * @return the total distance in axis-aligned steps between this and
-     * other vector (manhattan distance)
+     *         other vector (manhattan distance)
      */
     public int gridDistance(Vector3i other) {
         return Math.abs(other.x - x) + Math.abs(other.y - y) + Math.abs(other.z - z);
@@ -178,7 +178,7 @@ public class Vector3i extends javax.vecmath.Tuple3i implements Serializable {
      * dimensions (manhattan distance)
      *
      * @return the total magnitude of the vector as a sum of its axis aligned
-     * dimensions (manhattan distance)
+     *         dimensions (manhattan distance)
      */
     public int gridMagnitude() {
         return Math.abs(x) + Math.abs(y) + Math.abs(z);

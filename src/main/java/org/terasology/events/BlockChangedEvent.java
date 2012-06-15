@@ -22,6 +22,7 @@ import org.terasology.model.blocks.Block;
 
 /**
  * Event when a block has changed
+ *
  * @author Immortius
  */
 public class BlockChangedEvent extends AbstractEvent {

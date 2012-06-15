@@ -31,11 +31,14 @@ public interface AssetSource {
 
     /**
      * The URL(s) related to a URI. There may be multiple
+     *
      * @param uri
      * @return The url equivalent of this uri
      */
     List<URL> get(AssetUri uri);
+
     Iterable<AssetUri> list();
+
     Iterable<AssetUri> list(AssetType type);
 
 }

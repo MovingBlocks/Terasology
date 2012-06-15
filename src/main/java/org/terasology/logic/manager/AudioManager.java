@@ -81,7 +81,7 @@ public abstract class AudioManager implements SoundManager {
 
     @Override
     public SoundSource getSoundSource(String pool, AssetUri soundUri, int priority) {
-        Sound sound = (Sound)AssetManager.load(soundUri);
+        Sound sound = (Sound) AssetManager.load(soundUri);
         if (sound != null) {
             return getSoundPool(pool).getSource(sound, priority);
         }
@@ -156,7 +156,7 @@ public abstract class AudioManager implements SoundManager {
     /**
      * Returns sound source from "sfx" pool configured for specified sound, position and gain
      *
-     * @param uri Sound uri
+     * @param uri  Sound uri
      * @param pos  Sound source position
      * @param gain Sound source gain
      * @return Sound source object, or null if there is no free sound sources in effects pool
@@ -209,7 +209,7 @@ public abstract class AudioManager implements SoundManager {
     /**
      * Plays specified sound with specified gain
      *
-     * @param uri Sound uri
+     * @param uri  Sound uri
      * @param gain Sound source gain
      * @return Sound source object, or null if there is no free sound sources in effects pool
      */
@@ -220,7 +220,7 @@ public abstract class AudioManager implements SoundManager {
     /**
      * Plays specified sound at specified position and with specified gain
      *
-     * @param uri Sound uri
+     * @param uri  Sound uri
      * @param pos  Sound source position
      * @param gain Sound source gain
      * @return Sound source object, or null if there is no free sound sources in effects pool
@@ -283,7 +283,7 @@ public abstract class AudioManager implements SoundManager {
     public static SoundSource play(Sound sound, EntityRef entity, float gain, int priority) {
         Vector3f pos = getEntityPosition(entity);
         if (pos == null) return null;
-        
+
         SoundSource source = source(sound, new Vector3d(pos), gain, priority);
 
         if (source == null) {
@@ -293,7 +293,7 @@ public abstract class AudioManager implements SoundManager {
 
         return source.setVelocity(new Vector3d(getEntityVelocity(entity))).setDirection(new Vector3d(getEntityDirection(entity))).play();
     }
-    
+
     private static Vector3f getEntityPosition(EntityRef entity) {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc != null) {
@@ -310,13 +310,13 @@ public abstract class AudioManager implements SoundManager {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc != null) {
             Quat4f rot = loc.getWorldRotation();
-            Vector3f dir = new Vector3f(0,0,-1);
+            Vector3f dir = new Vector3f(0, 0, -1);
             QuaternionUtil.quatRotate(rot, dir, dir);
             return dir;
         }
         return new Vector3f();
     }
-    
+
     private static Vector3f getEntityVelocity(EntityRef entity) {
         CharacterMovementComponent charMove = entity.getComponent(CharacterMovementComponent.class);
         if (charMove != null) {
@@ -336,7 +336,7 @@ public abstract class AudioManager implements SoundManager {
 
         pool.stopAll();
 
-        Sound sound = (Sound)AssetManager.load(uri);
+        Sound sound = (Sound) AssetManager.load(uri);
         if (sound == null)
             return null;
 

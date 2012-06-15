@@ -55,7 +55,7 @@ public final class FieldMetadata {
     }
 
     private Method findGetter(Class type, Field field) {
-        Method result = findMethod(type, "get" + field.getName().substring(0,1).toUpperCase(Locale.ENGLISH) + field.getName().substring(1));
+        Method result = findMethod(type, "get" + field.getName().substring(0, 1).toUpperCase(Locale.ENGLISH) + field.getName().substring(1));
         if (result != null && field.getType().equals(result.getReturnType())) {
             return result;
         }
@@ -67,10 +67,10 @@ public final class FieldMetadata {
     }
 
     private Method findSetter(Class type, Field field) {
-        return findMethod(type, "set" + field.getName().substring(0,1).toUpperCase(Locale.ENGLISH) + field.getName().substring(1), field.getType());
+        return findMethod(type, "set" + field.getName().substring(0, 1).toUpperCase(Locale.ENGLISH) + field.getName().substring(1), field.getType());
     }
 
-    private Method findMethod(Class type, String methodName, Class<?> ... parameters) {
+    private Method findMethod(Class type, String methodName, Class<?>... parameters) {
         try {
             return type.getMethod(methodName, parameters);
         } catch (NoSuchMethodException nsme) {

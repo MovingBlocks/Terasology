@@ -18,17 +18,17 @@ import javax.vecmath.Vector3f;
  */
 @RegisterComponentSystem
 public class PlaySoundAction implements EventHandlerSystem {
-    
+
     private FastRandom random = new FastRandom();
-    
+
     public void initialise() {
     }
 
     @Override
     public void shutdown() {
     }
-    
-    @ReceiveEvent(components={PlaySoundActionComponent.class})
+
+    @ReceiveEvent(components = {PlaySoundActionComponent.class})
     public void onActivate(ActivateEvent event, EntityRef entity) {
         PlaySoundActionComponent playSound = entity.getComponent(PlaySoundActionComponent.class);
         if (playSound.sounds.size() > 0) {

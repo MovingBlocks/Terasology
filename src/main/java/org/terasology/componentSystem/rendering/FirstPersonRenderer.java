@@ -46,9 +46,9 @@ public class FirstPersonRenderer implements RenderSystem {
     private WorldRenderer worldRenderer;
     private Mesh handMesh;
     private Texture handTex;
-    
+
     private Map<String, Mesh> iconMeshes = Maps.newHashMap();
-    
+
     @Override
     public void initialise() {
         localPlayer = CoreRegistry.get(LocalPlayer.class);
@@ -81,7 +81,7 @@ public class FirstPersonRenderer implements RenderSystem {
     @Override
     public void renderFirstPerson() {
         CharacterMovementComponent charMoveComp = localPlayer.getEntity().getComponent(CharacterMovementComponent.class);
-        float bobOffset = calcBobbingOffset(charMoveComp.footstepDelta / charMoveComp.distanceBetweenFootsteps, (float) java.lang.Math.PI / 8f, 0.05f, 1f) ;
+        float bobOffset = calcBobbingOffset(charMoveComp.footstepDelta / charMoveComp.distanceBetweenFootsteps, (float) java.lang.Math.PI / 8f, 0.05f, 1f);
         float handMovementAnimationOffset = localPlayer.getEntity().getComponent(LocalPlayerComponent.class).handAnimation;
 
         int invSlotIndex = localPlayer.getEntity().getComponent(LocalPlayerComponent.class).selectedTool;
@@ -120,7 +120,7 @@ public class FirstPersonRenderer implements RenderSystem {
 
         glPopMatrix();
     }
-    
+
     private void renderIcon(String iconName, float bobOffset, float handMovementAnimationOffset) {
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
         shader.enable();
@@ -147,7 +147,7 @@ public class FirstPersonRenderer implements RenderSystem {
 
         glPopMatrix();
     }
-    
+
     private void renderBlock(BlockFamily blockFamily, float bobOffset, float handMovementAnimationOffset) {
         Block activeBlock = blockFamily.getArchetypeBlock();
         Vector3f playerPos = localPlayer.getPosition();
@@ -187,8 +187,8 @@ public class FirstPersonRenderer implements RenderSystem {
     }
 
     private float calcBobbingOffset(float counter, float phaseOffset, float amplitude, float frequency) {
-        return (float)java.lang.Math.sin(2 * Math.PI * counter * frequency + phaseOffset) * amplitude;
+        return (float) java.lang.Math.sin(2 * Math.PI * counter * frequency + phaseOffset) * amplitude;
     }
 
-    
+
 }

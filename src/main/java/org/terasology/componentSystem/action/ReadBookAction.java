@@ -13,8 +13,8 @@ import org.terasology.rendering.gui.menus.UIOpenBookScreen;
 
 /**
  * Reading the Book calls the UI + Contents.
- * @author bi0hax
  *
+ * @author bi0hax
  */
 @RegisterComponentSystem
 public class ReadBookAction implements EventHandlerSystem {

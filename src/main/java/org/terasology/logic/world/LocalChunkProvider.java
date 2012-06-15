@@ -42,7 +42,7 @@ public class LocalChunkProvider implements ChunkProvider {
     private static final int CACHE_SIZE = (int) (2 * Runtime.getRuntime().maxMemory() / 1048576);
     private static final int REQUEST_CHUNK_THREADS = 1;
     private static final int CHUNK_PROCESSING_THREADS = 8;
-    private static final Vector3i LOCAL_REGION_EXTENTS = new Vector3i(1,0,1);
+    private static final Vector3i LOCAL_REGION_EXTENTS = new Vector3i(1, 0, 1);
 
     private Logger logger = Logger.getLogger(getClass().getName());
     private ChunkStore farStore;
@@ -133,7 +133,7 @@ public class LocalChunkProvider implements ChunkProvider {
         CacheRegion region = new CacheRegion(entity, distance);
         regions.remove(region);
         regions.add(region);
-        reviewChunkQueue.offer(new ChunkRequest(ChunkRequest.RequestType.PRODUCE, region.getRegion().expand(new Vector3i(2,0,2))));
+        reviewChunkQueue.offer(new ChunkRequest(ChunkRequest.RequestType.PRODUCE, region.getRegion().expand(new Vector3i(2, 0, 2))));
     }
 
     @Override

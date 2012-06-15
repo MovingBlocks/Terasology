@@ -218,14 +218,14 @@ public class TerasologyEngine implements GameEngine {
                 addLibraryPath(new File(PathManager.getInstance().getDataPath(), "natives/macosx"));
                 break;
             case LWJGLUtil.PLATFORM_LINUX:
-                addLibraryPath(new File(PathManager.getInstance().getDataPath(),"natives/linux"));
+                addLibraryPath(new File(PathManager.getInstance().getDataPath(), "natives/linux"));
                 if (System.getProperty("os.arch").contains("64"))
                     System.loadLibrary("openal64");
                 else
                     System.loadLibrary("openal");
                 break;
             case LWJGLUtil.PLATFORM_WINDOWS:
-                addLibraryPath(new File(PathManager.getInstance().getDataPath(),"natives/windows"));
+                addLibraryPath(new File(PathManager.getInstance().getDataPath(), "natives/windows"));
 
                 if (System.getProperty("os.arch").contains("64"))
                     System.loadLibrary("OpenAL64");
@@ -343,8 +343,7 @@ public class TerasologyEngine implements GameEngine {
         BlockShapeManager.getInstance().reload();
         BlockManifestor manifestor = new BlockManifestor(BlockManager.getInstance());
 
-        try
-        {
+        try {
             manifestor.loadConfig();
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to load block definitions", e);
@@ -479,7 +478,7 @@ public class TerasologyEngine implements GameEngine {
         void enact();
     }
 
-    private class ChangeState implements StateChangeFunction{
+    private class ChangeState implements StateChangeFunction {
         public GameState newState;
 
         public ChangeState(GameState newState) {
@@ -493,7 +492,7 @@ public class TerasologyEngine implements GameEngine {
         }
     }
 
-    private class PushState implements StateChangeFunction{
+    private class PushState implements StateChangeFunction {
         public GameState newState;
 
         public PushState(GameState newState) {
@@ -506,7 +505,7 @@ public class TerasologyEngine implements GameEngine {
         }
     }
 
-    private class PopState implements StateChangeFunction{
+    private class PopState implements StateChangeFunction {
 
         public PopState() {
         }

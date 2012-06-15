@@ -126,8 +126,8 @@ public class BulletPhysicsRenderer implements IGameObject {
                 return 1;
             } else {
                 return -1;
+            }
         }
-    }
     }
 
     public enum BLOCK_SIZE {
@@ -380,12 +380,12 @@ public class BulletPhysicsRenderer implements IGameObject {
                     closestDist = dist;
                     closestCreature = creature;
                     closestPosition.set(pos);
-                    }
                 }
+            }
 
-                if(closestDist < 8 && !b._picked){
-                    b._picked = true;
-                }
+            if (closestDist < 8 && !b._picked) {
+                b._picked = true;
+            }
             // Block was marked as being picked
             if (b._picked && closestDist < 32.0f) {
                 // Animate the movement in direction of the player

@@ -42,7 +42,7 @@ public class BlockItemFactory {
         item.consumedOnUse = true;
         if (blockFamily.getArchetypeBlock().isStackable()) {
             item.stackId = blockFamily.getTitle() + "Block";
-            item.stackCount = (byte)quantity;
+            item.stackCount = (byte) quantity;
         }
         item.usage = ItemComponent.UsageType.ON_BLOCK;
         entity.addComponent(item);
@@ -57,7 +57,7 @@ public class BlockItemFactory {
         }
 
         entity.addComponent(blockItem);
-        
+
         return entity;
     }
 

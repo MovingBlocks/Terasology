@@ -76,7 +76,7 @@ public class PortalManager {
         // 12.5% chance something will spawn locally to the portal - will get fancier later
         boolean spawn = _random.randomBoolean() && _random.randomBoolean() && _random.randomBoolean();
         if (spawn) {
-            Vector3f pos = new Vector3f((float)p.getBlockLocation().x, (float)p.getBlockLocation().y - 1, (float)p.getBlockLocation().z);
+            Vector3f pos = new Vector3f((float) p.getBlockLocation().x, (float) p.getBlockLocation().y - 1, (float) p.getBlockLocation().z);
             factory.generateGelatinousCube(pos);
             logger.log(Level.INFO, "Spawning local GelatinousCube at " + pos);
         }

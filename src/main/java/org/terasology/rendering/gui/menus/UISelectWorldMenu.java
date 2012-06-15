@@ -45,7 +45,6 @@ import java.util.logging.Logger;
  * Select world menu screen.
  *
  * @author Anton Kireev <adeon.k87@gmail.com>
- *
  */
 public class UISelectWorldMenu extends UIDisplayWindow {
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -100,7 +99,7 @@ public class UISelectWorldMenu extends UIDisplayWindow {
             public void clicked(UIDisplayElement element) {
                 GUIManager.getInstance().setFocusedWindow(_window);
                 _window.clearInputControls();
-                UIInput inputWorldName = (UIInput)_window.getElementById("inputWorldTitle");
+                UIInput inputWorldName = (UIInput) _window.getElementById("inputWorldTitle");
                 inputWorldName.setValue(_window.getWorldName());
 
             }
@@ -108,18 +107,18 @@ public class UISelectWorldMenu extends UIDisplayWindow {
 
         _deleteFromList.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
-                
-                if(_list.getSelectedItem() == null){
+
+                if (_list.getSelectedItem() == null) {
                     GUIManager.getInstance().showMessage("Deleting error", "Please choose the world.");
                     return;
                 }
 
-                try{
+                try {
                     WorldInfo worldInfo = (WorldInfo) _list.getSelectedItem().getValue();
                     File world = PathManager.getInstance().getWorldSavePath(worldInfo.getTitle());
                     WorldUtil.deleteWorld(world);
                     _list.removeSelectedItem();
-                }catch(Exception e){
+                } catch (Exception e) {
                     GUIManager.getInstance().showMessage("Deleting error", "Failed deleting world data object. Sorry.");
                 }
             }
@@ -149,13 +148,13 @@ public class UISelectWorldMenu extends UIDisplayWindow {
         _list.getPosition().y = 230f;
 
         _createNewWorld.getPosition().x = _list.getPosition().x;
-        _createNewWorld.getPosition().y = _list.getPosition().y  + _list.getSize().y + 32f;
+        _createNewWorld.getPosition().y = _list.getPosition().y + _list.getSize().y + 32f;
 
-        _loadFromList.getPosition().x =_createNewWorld.getPosition().x + _createNewWorld.getSize().x + 15f;
-        _loadFromList.getPosition().y =_createNewWorld.getPosition().y;
+        _loadFromList.getPosition().x = _createNewWorld.getPosition().x + _createNewWorld.getSize().x + 15f;
+        _loadFromList.getPosition().y = _createNewWorld.getPosition().y;
 
-        _deleteFromList.getPosition().x =_loadFromList.getPosition().x + _loadFromList.getSize().x + 15f;
-        _deleteFromList.getPosition().y =_loadFromList.getPosition().y;
+        _deleteFromList.getPosition().x = _loadFromList.getPosition().x + _loadFromList.getSize().x + 15f;
+        _deleteFromList.getPosition().y = _loadFromList.getPosition().y;
 
 
         _goToBack.centerHorizontally();
@@ -164,43 +163,43 @@ public class UISelectWorldMenu extends UIDisplayWindow {
 
     }
 
-    private void loadSelectedWorld(){
+    private void loadSelectedWorld() {
 
-        if(_list.size()<1){
+        if (_list.size() < 1) {
             GUIManager.getInstance().showMessage("Loading error", "You haven't worlds. Please create new.");
             return;
         }
 
-        if(_list.getSelectedItem() == null){
+        if (_list.getSelectedItem() == null) {
             GUIManager.getInstance().showMessage("Loading error", "Please choose the world.");
             return;
         }
 
-        try{
-            WorldInfo info = (WorldInfo)_list.getSelectedItem().getValue();
+        try {
+            WorldInfo info = (WorldInfo) _list.getSelectedItem().getValue();
             Config.getInstance().setDefaultSeed(info.getSeed());
             Config.getInstance().setWorldTitle(info.getTitle());
             // TODO: Need to load time too. Maybe just pass through WorldInfo?
             CoreRegistry.get(GameEngine.class).changeState(new StateSinglePlayer(info.getTitle(), info.getSeed()));
-        }catch (Exception e){
+        } catch (Exception e) {
             GUIManager.getInstance().showMessage("Loading error", "Failed reading world data object. Sorry.");
         }
     }
 
-    public void fillList(){
+    public void fillList() {
         _list.removeAll();
 
         File worldCatalog = PathManager.getInstance().getWorldPath();
 
-        for(File file : worldCatalog.listFiles(new FileFilter() {
+        for (File file : worldCatalog.listFiles(new FileFilter() {
             public boolean accept(File file) {
-                if(file.isDirectory()){
+                if (file.isDirectory()) {
                     return true;
-                }else{
+                } else {
                     return false;
                 }
             }
-        })){
+        })) {
             File worldManifest = new File(file, WorldInfo.DEFAULT_FILE_NAME);
             if (!worldManifest.exists())
                 continue;

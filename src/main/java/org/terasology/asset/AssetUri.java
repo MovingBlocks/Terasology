@@ -54,7 +54,7 @@ public class AssetUri {
         String[] typeSplit = uri.split(TYPE_SPLIT, 2);
         if (typeSplit.length > 1) {
             type = AssetType.getTypeForId(typeSplit[0]);
-            String[] packageSplit = typeSplit[1].split(PACKAGE_SPLIT,2);
+            String[] packageSplit = typeSplit[1].split(PACKAGE_SPLIT, 2);
             if (packageSplit.length > 1) {
                 packageName = packageSplit[0];
                 assetName = packageSplit[1];

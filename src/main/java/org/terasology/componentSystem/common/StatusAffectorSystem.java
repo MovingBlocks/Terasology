@@ -22,7 +22,7 @@ public class StatusAffectorSystem implements EventHandlerSystem, UpdateSubscribe
     }
 
     @ReceiveEvent(components = {HealthComponent.class})
-    public void giveHealth(BoostHpEvent boosthpEvent, EntityRef entity){
+    public void giveHealth(BoostHpEvent boosthpEvent, EntityRef entity) {
         HealthComponent health = entity.getComponent(HealthComponent.class);
         health.currentHealth = health.maxHealth;
         entity.saveComponent(health);
@@ -33,12 +33,12 @@ public class StatusAffectorSystem implements EventHandlerSystem, UpdateSubscribe
         SpeedBoostComponent speedEffect = new SpeedBoostComponent();
         CharacterMovementComponent charmov = entity.getComponent(CharacterMovementComponent.class);
         entity.addComponent(speedEffect);
-            charmov.runFactor = 8f;
-            entity.saveComponent(charmov);
-      }
+        charmov.runFactor = 8f;
+        entity.saveComponent(charmov);
+    }
 
     @ReceiveEvent(components = {HealthComponent.class})
-    public void isPoisoned(PoisonedEvent poisonEvent, EntityRef entity){
+    public void isPoisoned(PoisonedEvent poisonEvent, EntityRef entity) {
         PoisonedComponent poisonedEffect = new PoisonedComponent();
         HealthComponent health = entity.getComponent(HealthComponent.class);
         entity.addComponent(poisonedEffect);
@@ -46,7 +46,7 @@ public class StatusAffectorSystem implements EventHandlerSystem, UpdateSubscribe
     }
 
     @ReceiveEvent(components = {PoisonedComponent.class})
-    public void curePoisoned(CurePoisonEvent cureEvent, EntityRef entity){
+    public void curePoisoned(CurePoisonEvent cureEvent, EntityRef entity) {
         CuredComponent curedEffect = new CuredComponent();
         PoisonedComponent poisoned = entity.getComponent(PoisonedComponent.class);
         entity.removeComponent(PoisonedComponent.class);
@@ -75,10 +75,10 @@ public class StatusAffectorSystem implements EventHandlerSystem, UpdateSubscribe
             HealthComponent health = entity.getComponent(HealthComponent.class);
             poisonedEffect.poisonDuration = poisonedEffect.poisonDuration - delta;
             //While POISONED:
-            if (poisonedEffect.poisonDuration >=1) {
-                health.currentHealth = Math.min(health.maxHealth, health.currentHealth - (int)poisonedEffect.poisonRate);
+            if (poisonedEffect.poisonDuration >= 1) {
+                health.currentHealth = Math.min(health.maxHealth, health.currentHealth - (int) poisonedEffect.poisonRate);
                 entity.saveComponent(health);
-                if (health.currentHealth <= 0){
+                if (health.currentHealth <= 0) {
                     entity.send(new NoHealthEvent(entity));
                 }
             }
@@ -94,11 +94,11 @@ public class StatusAffectorSystem implements EventHandlerSystem, UpdateSubscribe
             //While Immune:
             if (curedEffect.cureDuration >= 1) {
                 entity.saveComponent(curedEffect);
-    }
+            }
             //Remove Poison Immunity Status
             else entity.removeComponent(CuredComponent.class);
-}
         }
     }
+}
 
 

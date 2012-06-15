@@ -45,8 +45,8 @@ public class Texture implements Asset {
     }
 
     public enum FilterMode {
-        Nearest (GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST),
-        Linear (GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+        Nearest(GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST),
+        Linear(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
 
         private int glMinFilter;
         private int glMagFilter;

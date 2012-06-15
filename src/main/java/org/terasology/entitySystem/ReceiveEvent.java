@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 /**
  * This annotation is used to mark up methods that can be registered to receive events through the EventSystem
- *
+ * <p/>
  * These methods should have the form
  * <code>public void handlerMethod(EventType event, EntityRef entity)</code>
  *
@@ -20,5 +20,6 @@ public @interface ReceiveEvent {
      * What components that the entity must have for this method to be invoked
      */
     Class<? extends Component>[] components();
+
     int priority() default EventPriority.PRIORITY_NORMAL;
 }

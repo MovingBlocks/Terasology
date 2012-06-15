@@ -24,7 +24,8 @@ import org.terasology.logic.world.Chunk;
  */
 public final class TeraMath {
 
-    private TeraMath() {}
+    private TeraMath() {
+    }
 
     public static final float RAD_TO_DEG = (float) (180.0f / Math.PI);
     public static final float DEG_TO_RAD = (float) (Math.PI / 180.0f);
@@ -273,7 +274,7 @@ public final class TeraMath {
     }
 
     public static Region3i getChunkRegionAroundBlockPos(Vector3i pos, int extent) {
-        Vector3i minPos = new Vector3i(-extent,0,-extent);
+        Vector3i minPos = new Vector3i(-extent, 0, -extent);
         minPos.add(pos);
         Vector3i maxPos = new Vector3i(extent, 0, extent);
         maxPos.add(pos);

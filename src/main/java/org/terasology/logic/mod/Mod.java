@@ -45,8 +45,7 @@ public class Mod {
             this.enabled = enabled;
             if (enabled) {
                 AssetManager.getInstance().addAssetSource(modSource);
-            }
-            else {
+            } else {
                 AssetManager.getInstance().removeAssetSource(modSource);
             }
         }

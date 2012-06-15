@@ -165,13 +165,12 @@ public final class UIDebugConsole extends UIDisplayWindow {
         boolean success = false;
         _helpText.resetScroll();
         try {
-            if(_consoleInput.toString().startsWith("help")){
+            if (_consoleInput.toString().startsWith("help")) {
                 getHelp(_consoleInput.toString());
                 addToRingBuffer();
                 resetDebugConsole();
                 return;
-            }
-            else{
+            } else {
                 success = CoreRegistry.get(GroovyManager.class).runGroovyShell(_consoleInput.toString());
             }
         } catch (Exception e) {
@@ -184,71 +183,62 @@ public final class UIDebugConsole extends UIDisplayWindow {
             resetDebugConsole();
             setVisible(false);
         } else {
-            try{
+            try {
                 _helpText.loadError();
-            }
-            catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             logger.log(Level.WARNING, "Console command \"{0}\" is invalid.", _consoleInput);
         }
     }
 
-    private void getHelp(String commandstring) throws IOException
-    {
+    private void getHelp(String commandstring) throws IOException {
         String[] split = commandstring.split(" ");
         GroovyHelpManager groovyhelpmanager = new GroovyHelpManager();
-        if(split.length > 1)
-        {
-            if(split[1].equals("commandList"))
-            {
-                HashMap<String,String> commandhelp = groovyhelpmanager.getHelpCommands();
+        if (split.length > 1) {
+            if (split[1].equals("commandList")) {
+                HashMap<String, String> commandhelp = groovyhelpmanager.getHelpCommands();
                 String[] commandlist = groovyhelpmanager.getGroovyCommands();
-                String retval = "Available commands :" + newLine+ newLine;
-                for(int i=0;i<commandlist.length;i++)
-                {
-                    if(commandhelp.containsKey(commandlist[i])){
-                        retval+= commandlist[i].toString() + " \t: " + commandhelp.get(commandlist[i]).toString() + newLine;
-                    }
-                    else{
-                        retval+= commandlist[i].toString() + " : undocumented" + newLine;
+                String retval = "Available commands :" + newLine + newLine;
+                for (int i = 0; i < commandlist.length; i++) {
+                    if (commandhelp.containsKey(commandlist[i])) {
+                        retval += commandlist[i].toString() + " \t: " + commandhelp.get(commandlist[i]).toString() + newLine;
+                    } else {
+                        retval += commandlist[i].toString() + " : undocumented" + newLine;
                     }
                 }
                 setHelpText(retval);
                 return;
             }
 
-            if(groovyhelpmanager.getHelpCommands().containsKey(split[1]))
-            {
+            if (groovyhelpmanager.getHelpCommands().containsKey(split[1])) {
                 GroovyHelp groovyhelp = groovyhelpmanager.readCommandHelp(split[1]);
                 setHelpText(groovyhelp);
                 return;
             }
-            if(split[1].equals("itemList")){
+            if (split[1].equals("itemList")) {
                 String tempval = "";
                 ArrayList<Prefab> prefabs = groovyhelpmanager.getItems();
                 Iterator<Prefab> it = prefabs.iterator();
-                while (it.hasNext()){
+                while (it.hasNext()) {
                     tempval += "item = " + it.next().getName() + newLine;
                 }
                 setHelpText(tempval);
                 return;
             }
-            if(split[1].equals("blockList")){
+            if (split[1].equals("blockList")) {
                 String tempval = "";
-                HashMap<Byte,String> blocks = groovyhelpmanager.getGroovyBlocks();
-                for(byte i = 0;i<Byte.MAX_VALUE;i++){
-                    if(blocks.containsKey(i)){
-                        tempval+= "blockName = " + blocks.get(i) + ", blockNbr = " + i + newLine;
+                HashMap<Byte, String> blocks = groovyhelpmanager.getGroovyBlocks();
+                for (byte i = 0; i < Byte.MAX_VALUE; i++) {
+                    if (blocks.containsKey(i)) {
+                        tempval += "blockName = " + blocks.get(i) + ", blockNbr = " + i + newLine;
                     }
                 }
                 setHelpText(tempval);
                 return;
             }
             showError();
-        }
-        else
-        {
+        } else {
             showHelp();
         }
     }
@@ -264,31 +254,25 @@ public final class UIDebugConsole extends UIDisplayWindow {
         _consoleInput.setLength(0);
     }
 
-    public void setHelpText(String helptekst) throws IOException
-    {
+    public void setHelpText(String helptekst) throws IOException {
         _helpText.addText(helptekst);
         _helpText.showFromJson();
     }
 
-    public void setHelpText(GroovyHelp groovyhelp) throws IOException
-    {
+    public void setHelpText(GroovyHelp groovyhelp) throws IOException {
         String tempstring = "";
         tempstring += groovyhelp.getCommandName() + " : " + groovyhelp.getCommandDesc() + newLine;
-        if (groovyhelp.getParameters().length > 0)
-        {
+        if (groovyhelp.getParameters().length > 0) {
             String parameters = "accepted parameters :" + newLine;
-            for(int i=0; i<groovyhelp.getParameters().length;i++)
-            {
+            for (int i = 0; i < groovyhelp.getParameters().length; i++) {
                 parameters += groovyhelp.getParameters()[i] + newLine;
             }
-            tempstring += parameters  + newLine;
+            tempstring += parameters + newLine;
         }
-        tempstring += "detailed help : " + groovyhelp.getCommandHelp()  + newLine;
-        if (groovyhelp.getExamples().length > 0)
-        {
+        tempstring += "detailed help : " + groovyhelp.getCommandHelp() + newLine;
+        if (groovyhelp.getExamples().length > 0) {
             String examples = "Example(s) :" + newLine;
-            for(int i=0; i<groovyhelp.getExamples().length;i++)
-            {
+            for (int i = 0; i < groovyhelp.getExamples().length; i++) {
                 examples += groovyhelp.getExamples()[i] + newLine;
             }
             tempstring += examples + newLine;
@@ -297,11 +281,11 @@ public final class UIDebugConsole extends UIDisplayWindow {
         }
     }
 
-    public void showHelp()throws IOException{
+    public void showHelp() throws IOException {
         _helpText.loadHelp();
     }
 
-    public void showError()throws IOException{
+    public void showError() throws IOException {
         _helpText.loadError();
     }
 
@@ -314,24 +298,24 @@ public final class UIDebugConsole extends UIDisplayWindow {
         _helpText.setPosition(new Vector2f(4, 12));
     }
 
-    public void render(){
+    public void render() {
         renderOverlay();
         super.render();
     }
 
-    public void renderOverlay(){
+    public void renderOverlay() {
         glPushMatrix();
         glLoadIdentity();
         glColor4f(0, 0, 0, 0.75f);
         glBegin(GL_QUADS);
         glVertex2f(0f, 0f);
-        glVertex2f((float) Display.getWidth()-border, 0f);
-        glVertex2f((float) Display.getWidth()-border, (float) Display.getHeight()-border);
-        glVertex2f(0f, (float) Display.getHeight()-border);
+        glVertex2f((float) Display.getWidth() - border, 0f);
+        glVertex2f((float) Display.getWidth() - border, (float) Display.getHeight() - border);
+        glVertex2f(0f, (float) Display.getHeight() - border);
         glEnd();
         glBegin(GL_QUADS);
-        glVertex2f(0f, Display.getHeight()-24);
-        glVertex2f((float) 300, Display.getHeight()-24);
+        glVertex2f(0f, Display.getHeight() - 24);
+        glVertex2f((float) 300, Display.getHeight() - 24);
         glVertex2f((float) 300, (float) Display.getHeight());
         glVertex2f(0f, (float) Display.getHeight());
         glEnd();

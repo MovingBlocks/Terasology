@@ -33,6 +33,7 @@ public interface BindableButton {
 
     /**
      * Set the circumstance under which this button sends events
+     *
      * @param mode
      */
     void setMode(ActivateMode mode);
@@ -44,6 +45,7 @@ public interface BindableButton {
 
     /**
      * Sets whether this button sends repeat events while pressed
+     *
      * @param repeating
      */
     void setRepeating(boolean repeating);
@@ -70,12 +72,14 @@ public interface BindableButton {
 
     /**
      * Used to directly subscribe to the button's events
+     *
      * @param subscriber
      */
     void subscribe(BindButtonSubscriber subscriber);
 
     /**
      * Used to unsubscribe from the button's event
+     *
      * @param subscriber
      */
     void unsubscribe(BindButtonSubscriber subscriber);

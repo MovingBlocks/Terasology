@@ -132,7 +132,8 @@ public class Mesh implements Asset {
         return vertexBuffer;
     }
 
-    private Mesh() {}
+    private Mesh() {
+    }
 
     private AssetUri uri = new AssetUri("");
 

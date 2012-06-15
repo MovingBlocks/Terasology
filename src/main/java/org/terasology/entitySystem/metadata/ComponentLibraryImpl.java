@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 
 /**
  * @author Immortius <immortius@gmail.com>
-*/
+ */
 public final class ComponentLibraryImpl implements ComponentLibrary {
     private static final int MAX_SERIALIZATION_DEPTH = 1;
 
@@ -116,9 +116,8 @@ public final class ComponentLibraryImpl implements ComponentLibrary {
         // For lists, createEntityRef the handler for the contained type and wrap in a list type handler
         else if (List.class.isAssignableFrom(typeClass)) {
             // TODO - Improve parameter lookup
-            if (type instanceof ParameterizedType && ((ParameterizedType) type).getActualTypeArguments().length > 0)
-            {
-                TypeHandler innerHandler = getHandlerFor(((ParameterizedType)type).getActualTypeArguments()[0], depth);
+            if (type instanceof ParameterizedType && ((ParameterizedType) type).getActualTypeArguments().length > 0) {
+                TypeHandler innerHandler = getHandlerFor(((ParameterizedType) type).getActualTypeArguments()[0], depth);
                 if (innerHandler != null) {
                     return new ListTypeHandler(innerHandler);
                 }
@@ -130,7 +129,7 @@ public final class ComponentLibraryImpl implements ComponentLibrary {
         else if (Map.class.isAssignableFrom(typeClass)) {
             if (type instanceof ParameterizedType) {
                 // TODO - Improve parameter lookup
-                Type[] types = ((ParameterizedType)type).getActualTypeArguments();
+                Type[] types = ((ParameterizedType) type).getActualTypeArguments();
                 if (types.length > 1 && String.class.equals(types[0])) {
                     TypeHandler valueHandler = getHandlerFor(types[1], depth);
                     if (valueHandler != null) {

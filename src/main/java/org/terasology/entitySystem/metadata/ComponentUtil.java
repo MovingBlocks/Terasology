@@ -9,7 +9,8 @@ import java.util.Locale;
  */
 public class ComponentUtil {
 
-    private ComponentUtil() {}
+    private ComponentUtil() {
+    }
 
     public static String getComponentClassName(Component component) {
         return getComponentClassName(component.getClass());

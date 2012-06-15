@@ -102,9 +102,9 @@ public class UIToolbarCell extends UIDisplayElement {
         if (inventory == null) {
             return;
         }
-        if (inventory.itemSlots.size() <= _id) 
+        if (inventory.itemSlots.size() <= _id)
             return;
-        
+
         EntityRef itemEntity = inventory.itemSlots.get(_id);
         ItemComponent item = itemEntity.getComponent(ItemComponent.class);
         if (item == null)
@@ -117,16 +117,15 @@ public class UIToolbarCell extends UIDisplayElement {
             }
         } else {
             Icon icon = Icon.get(item.icon);
-            if (icon != null)
-            {
+            if (icon != null) {
                 renderIcon(icon);
             }
         }
 
-        _label.renderTransformed();    
+        _label.renderTransformed();
 
     }
-    
+
     private void renderIcon(Icon icon) {
         glEnable(GL11.GL_DEPTH_TEST);
         glClear(GL11.GL_DEPTH_BUFFER_BIT);
@@ -136,7 +135,7 @@ public class UIToolbarCell extends UIDisplayElement {
         glPopMatrix();
         glDisable(GL11.GL_DEPTH_TEST);
     }
-    
+
     private void renderBlockIcon(BlockFamily blockFamily) {
         if (blockFamily == null) return;
 

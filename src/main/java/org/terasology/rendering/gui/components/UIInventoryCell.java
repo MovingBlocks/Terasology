@@ -108,16 +108,13 @@ public class UIInventoryCell extends UIDisplayElement {
             if (blockItem != null) {
                 _label2.setText(blockItem.blockFamily.getTitle());
             }
-        }else if (item != null){
+        } else if (item != null) {
             if (blockItem != null) {
                 _label2.setText(blockItem.blockFamily.getTitle());
-            }
-
-            else{
+            } else {
                 _label2.setText(item.name);
             }
-        }
-        else {
+        } else {
             getLabel().setVisible(false);
         }
     }
@@ -158,8 +155,7 @@ public class UIInventoryCell extends UIDisplayElement {
             }
         } else {
             Icon icon = Icon.get(item.icon);
-            if (icon != null)
-            {
+            if (icon != null) {
                 renderIcon(icon);
             }
         }
@@ -204,7 +200,8 @@ public class UIInventoryCell extends UIDisplayElement {
         GL11.glScalef(20f, 20f, 20f);
         GL11.glRotatef(170f, 1f, 0f, 0f);
         GL11.glRotatef(-16f, 0f, 1f, 0f);
-        glBindTexture(GL11.GL_TEXTURE_2D, terrainTex.getId());;
+        glBindTexture(GL11.GL_TEXTURE_2D, terrainTex.getId());
+        ;
 
         Block block = blockFamily.getArchetypeBlock();
         block.render();

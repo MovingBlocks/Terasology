@@ -39,9 +39,9 @@ public class UIButton extends UIDisplayContainer {
 
     public UIButton(Vector2f size) {
         setSize(size);
-        setClassStyle("button","background-image: engine:gui_menu 256/512 30/512 0 0");
-        setClassStyle("button-mouseover","background-image: engine:gui_menu 256/512 30/512 0 30/512");
-        setClassStyle("button-mouseclick","background-image: engine:gui_menu 256/512 30/512 0 60/512");
+        setClassStyle("button", "background-image: engine:gui_menu 256/512 30/512 0 0");
+        setClassStyle("button-mouseover", "background-image: engine:gui_menu 256/512 30/512 0 30/512");
+        setClassStyle("button-mouseclick", "background-image: engine:gui_menu 256/512 30/512 0 60/512");
         setClassStyle("button");
         _label = new UIText("Untitled");
         _label.setVisible(true);

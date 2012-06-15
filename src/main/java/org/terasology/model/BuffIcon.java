@@ -57,7 +57,7 @@ public class BuffIcon {
         bufficons.put("speed", speed);
         bufficons.put("maxspeed", maxspeed);
 
-       }
+    }
 
     //@return x-offset in icon sheet
     public int getX() {

@@ -97,7 +97,7 @@ public interface SoundPool {
 
     /**
      * Update sound sources
-     *
+     * <p/>
      * <b>!DO NOT USE IT!</b>
      */
     public void update();

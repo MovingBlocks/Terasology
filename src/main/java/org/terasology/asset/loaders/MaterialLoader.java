@@ -54,7 +54,7 @@ public class MaterialLoader implements AssetLoader<Material> {
 
         Material result = new Material(uri, shader);
 
-        for (Map.Entry<String,Texture> entry : metadata.textures.entrySet()) {
+        for (Map.Entry<String, Texture> entry : metadata.textures.entrySet()) {
             result.setTexture(entry.getKey(), entry.getValue());
         }
 
@@ -88,13 +88,13 @@ public class MaterialLoader implements AssetLoader<Material> {
 
     private static class MaterialMetadata {
         String shader;
-        Map<String,Texture> textures = Maps.newHashMap();
+        Map<String, Texture> textures = Maps.newHashMap();
         Map<String, Float> floatParams = Maps.newHashMap();
         Map<String, float[]> floatArrayParams = Maps.newHashMap();
         Map<String, Integer> intParams = Maps.newHashMap();
     }
 
-    private static class MaterialMetadataHandler  implements JsonDeserializer<MaterialMetadata> {
+    private static class MaterialMetadataHandler implements JsonDeserializer<MaterialMetadata> {
 
         @Override
         public MaterialMetadata deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
@@ -107,7 +107,7 @@ public class MaterialLoader implements AssetLoader<Material> {
 
             if (obj.has("params") && obj.get("params").isJsonObject()) {
                 JsonObject params = obj.get("params").getAsJsonObject();
-                for (Map.Entry<String,JsonElement> prop : params.entrySet()) {
+                for (Map.Entry<String, JsonElement> prop : params.entrySet()) {
                     if (prop.getValue().isJsonPrimitive()) {
                         if (prop.getValue().getAsJsonPrimitive().isString()) {
                             Texture texture = AssetManager.loadTexture(prop.getValue().getAsString());

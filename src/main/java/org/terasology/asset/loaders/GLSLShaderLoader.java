@@ -87,8 +87,7 @@ public class GLSLShaderLoader implements AssetLoader<Shader> {
         InputStreamReader reader = new InputStreamReader(stream);
         try {
             return CharStreams.toString(reader);
-        }
-        finally {
+        } finally {
             try {
                 reader.close();
             } catch (IOException e) {

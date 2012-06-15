@@ -40,7 +40,6 @@ public interface WorldProviderCore {
     public String getSeed();
 
     /**
-     *
      * @return General world info
      */
     public WorldInfo getWorldInfo();

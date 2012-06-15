@@ -28,7 +28,10 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface RegisterComponentSystem {
     boolean headedOnly() default false;
+
     boolean headlessOnly() default false;
+
     boolean authorativeOnly() default false;
+
     boolean multiplayerOnly() default false;
 }

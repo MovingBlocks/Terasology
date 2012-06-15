@@ -57,7 +57,7 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
 
     @Override
     public boolean isBlockActive(int x, int y, int z) {
-        return base.isBlockActive(x,y,z);
+        return base.isBlockActive(x, y, z);
     }
 
     @Override
@@ -72,22 +72,22 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
 
     @Override
     public boolean setBlock(int x, int y, int z, Block type, Block oldType) {
-        return base.setBlock(x,y,z,type,oldType);
+        return base.setBlock(x, y, z, type, oldType);
     }
 
     @Override
     public boolean setState(int x, int y, int z, byte state, byte oldState) {
-        return base.setState(x,y,z,state,oldState);
+        return base.setState(x, y, z, state, oldState);
     }
 
     @Override
     public byte getState(int x, int y, int z) {
-        return base.getState(x,y,z);
+        return base.getState(x, y, z);
     }
 
     @Override
     public Block getBlock(int x, int y, int z) {
-        return base.getBlock(x,y,z);
+        return base.getBlock(x, y, z);
     }
 
     @Override

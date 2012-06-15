@@ -62,13 +62,13 @@ public class JsonBlockShapePersister {
             BlockShape shape = new BlockShape(currentShapeName);
             JsonObject shapeObj = json.getAsJsonObject();
             if (shapeObj.has("center")) {
-                shape.setCenterMesh((BlockMeshPart)context.deserialize(shapeObj.get("center"), BlockMeshPart.class));
+                shape.setCenterMesh((BlockMeshPart) context.deserialize(shapeObj.get("center"), BlockMeshPart.class));
             }
 
             for (Side side : Side.values()) {
                 if (shapeObj.has(side.toString().toLowerCase(Locale.ENGLISH))) {
                     JsonObject sideMeshObj = shapeObj.getAsJsonObject(side.toString().toLowerCase(Locale.ENGLISH));
-                    shape.setSideMesh(side, (BlockMeshPart)context.deserialize(sideMeshObj, BlockMeshPart.class));
+                    shape.setSideMesh(side, (BlockMeshPart) context.deserialize(sideMeshObj, BlockMeshPart.class));
                     if (sideMeshObj.has("fullSide")) {
                         shape.setBlockingSide(side, sideMeshObj.get("fullSide").getAsBoolean());
                     }
@@ -89,7 +89,7 @@ public class JsonBlockShapePersister {
                     }
                 }
             } else {
-                colliders.add(new AABB(new Vector3f(), new Vector3f(0.5f,0.5f,0.5f)));
+                colliders.add(new AABB(new Vector3f(), new Vector3f(0.5f, 0.5f, 0.5f)));
             }
             shape.setColliders(colliders);
             return shape;
@@ -145,8 +145,7 @@ public class JsonBlockShapePersister {
         }
     }
 
-    private class Vector3fHandler implements JsonDeserializer<Vector3f>
-    {
+    private class Vector3fHandler implements JsonDeserializer<Vector3f> {
         @Override
         public Vector3f deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             JsonArray jsonArray = json.getAsJsonArray();
@@ -154,8 +153,7 @@ public class JsonBlockShapePersister {
         }
     }
 
-    private class Vector2fHandler implements JsonDeserializer<Vector2f>
-    {
+    private class Vector2fHandler implements JsonDeserializer<Vector2f> {
         @Override
         public Vector2f deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             JsonArray jsonArray = json.getAsJsonArray();

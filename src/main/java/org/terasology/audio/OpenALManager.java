@@ -19,7 +19,7 @@ public class OpenALManager extends AudioManager {
     /**
      * For faster distance check *
      */
-    private final static float MAX_DISTANCE_SQUARED = (float)Math.pow(MAX_DISTANCE, 2);
+    private final static float MAX_DISTANCE_SQUARED = (float) Math.pow(MAX_DISTANCE, 2);
 
     public static OpenALManager getInstance() {
         return (OpenALManager) AudioManager.getInstance();
@@ -97,18 +97,18 @@ public class OpenALManager extends AudioManager {
         }
     }
 
-   /* @Override
-    protected Sound createAudio(String name, URL source) {
-        if (source != null) {
-            return new OggSound(name, source);
-        }
-        return null;
-    }
+    /* @Override
+protected Sound createAudio(String name, URL source) {
+ if (source != null) {
+     return new OggSound(name, source);
+ }
+ return null;
+}
 
-    @Override
-    protected Sound createStreamingAudio(String name, URL source) {
-        return new OggStreamingSound(name, source);
-    }       */
+@Override
+protected Sound createStreamingAudio(String name, URL source) {
+ return new OggStreamingSound(name, source);
+}       */
 
     @Override
     protected boolean checkDistance(Vector3d soundSource) {

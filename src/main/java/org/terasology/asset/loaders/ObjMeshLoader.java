@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 
 /**
  * Importer for Wavefront obj files. Supports core obj mesh data
+ *
  * @author Immortius <immortius@gmail.com>
  */
 
@@ -143,7 +144,7 @@ public class ObjMeshLoader implements AssetLoader<Mesh> {
                         throw new IOException("Bad statement");
                     }
                     // Need to flip v coord, apparently
-                    rawTexCoords.add(new Vector2f(Float.parseFloat(floats[0]), 1- Float.parseFloat(floats[1])));
+                    rawTexCoords.add(new Vector2f(Float.parseFloat(floats[0]), 1 - Float.parseFloat(floats[1])));
                 }
                 // Vertex normal
                 else if ("vn".equals(prefix)) {
@@ -181,8 +182,7 @@ public class ObjMeshLoader implements AssetLoader<Mesh> {
                         }
                     }
                     rawIndices.add(result);
-                }
-                else {
+                } else {
                     logger.warning(String.format("Skipping unsupported obj statement on line %d:\"%s\"", lineNum, line));
                 }
             }

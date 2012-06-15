@@ -12,9 +12,9 @@ import javax.vecmath.Vector3f;
  * @author Immortius <immortius@gmail.com>
  */
 public class LocalPlayer {
-    
+
     private EntityRef entity = EntityRef.NULL;
-    
+
     public LocalPlayer(EntityRef playerEntity) {
         this.entity = playerEntity;
     }
@@ -26,7 +26,7 @@ public class LocalPlayer {
     public boolean isValid() {
         return entity.exists() && entity.hasComponent(LocationComponent.class) && entity.hasComponent(LocalPlayerComponent.class) && entity.hasComponent(PlayerComponent.class);
     }
-    
+
     public Vector3f getPosition() {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         if (location == null) {
@@ -34,29 +34,29 @@ public class LocalPlayer {
         }
         return location.getWorldPosition();
     }
-    
+
     public Quat4f getRotation() {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         if (location == null) {
-            return new Quat4f(0,0,0,1);
+            return new Quat4f(0, 0, 0, 1);
         }
         return location.getWorldRotation();
     }
 
     public boolean isCarryingTorch() {
-        
+
         InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
         LocalPlayerComponent localPlayer = entity.getComponent(LocalPlayerComponent.class);
         if (inventory == null || localPlayer == null)
             return false;
-        
+
         return inventory.itemSlots.get(localPlayer.selectedTool).hasComponent(LightComponent.class);
     }
-    
+
     public EntityRef getEntity() {
         return entity;
     }
-    
+
     public Vector3f getVelocity() {
         CharacterMovementComponent movement = entity.getComponent(CharacterMovementComponent.class);
         if (movement != null) {
@@ -64,20 +64,20 @@ public class LocalPlayer {
         }
         return new Vector3f();
     }
-    
+
     public Vector3f getViewDirection() {
         LocalPlayerComponent localPlayer = entity.getComponent(LocalPlayerComponent.class);
         if (localPlayer == null) {
-            return new Vector3f(0,0,-1);
+            return new Vector3f(0, 0, -1);
         }
         Quat4f rot = new Quat4f();
         QuaternionUtil.setEuler(rot, localPlayer.viewYaw, localPlayer.viewPitch, 0);
         // TODO: Put a generator for direction vectors in a util class somewhere
         // And just put quaternion -> vector somewhere too
-        Vector3f dir = new Vector3f(0,0,-1);
+        Vector3f dir = new Vector3f(0, 0, -1);
         return QuaternionUtil.quatRotate(rot, dir, dir);
     }
-    
+
     public String toString() {
         return String.format("player (x: %.2f, y: %.2f, z: %.2f | x: %.2f, y: %.2f, z: %.2f)", getPosition().x, getPosition().y, getPosition().z, getViewDirection().x, getViewDirection().y, getViewDirection().z);
     }

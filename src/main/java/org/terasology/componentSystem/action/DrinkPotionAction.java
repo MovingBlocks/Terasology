@@ -16,13 +16,14 @@ import org.terasology.logic.manager.AudioManager;
 /**
  * This Handles Potion Consumption
  * Applies effect and returns an empty vial.
+ *
  * @author bi0hax
  */
 @RegisterComponentSystem
 public class DrinkPotionAction implements EventHandlerSystem {
 
     public void initialise() {
-        }
+    }
 
 
     @Override
@@ -37,7 +38,7 @@ public class DrinkPotionAction implements EventHandlerSystem {
 
 
     @ReceiveEvent(components = {PotionComponent.class})
-        public void onActivate(ActivateEvent event, EntityRef entity) {
+    public void onActivate(ActivateEvent event, EntityRef entity) {
         potion = entity.getComponent(PotionComponent.class);
         poisoned = entity.getComponent(PoisonedComponent.class);
         EntityManager entityManager = CoreRegister.get(EntityManager.class);
@@ -59,7 +60,7 @@ public class DrinkPotionAction implements EventHandlerSystem {
                 }
 
 
-            break;
+                break;
 
             case Green:
                 //Receive an Empty Vial (Destroy it if no inventory space available)
@@ -69,7 +70,7 @@ public class DrinkPotionAction implements EventHandlerSystem {
                 }
                 //Poison time!
                 event.getInstigator().send(new PoisonedEvent());
-               break;
+                break;
 
             case Orange: //Cures the Poison.
                 event.getInstigator().send(new CurePoisonEvent());
@@ -92,9 +93,9 @@ public class DrinkPotionAction implements EventHandlerSystem {
 
             default:
                 break;
-             }
+        }
         AudioManager.play(new AssetUri(AssetType.SOUND, "engine:drink"), 1.0f);
 
 
     }
-    }
+}

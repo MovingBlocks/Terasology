@@ -9,7 +9,7 @@ import org.terasology.events.inventory.ReceiveItemEvent;
  *
  */
 @RegisterComponentSystem()
-public class BookshelfHandler implements EventHandlerSystem{
+public class BookshelfHandler implements EventHandlerSystem {
     @Override
     public void initialise() {
     }

@@ -13,5 +13,6 @@ public class RemovedComponentEvent extends AbstractEvent {
         return instance;
     }
 
-    private RemovedComponentEvent() {}
+    private RemovedComponentEvent() {
+    }
 }

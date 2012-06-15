@@ -8,6 +8,7 @@ import org.terasology.entitySystem.Component;
  */
 public class BookshelfComponent implements Component {
 
-    public BookshelfComponent() {}
+    public BookshelfComponent() {
+    }
 
 }

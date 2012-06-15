@@ -67,7 +67,7 @@ public class WorldPersister {
     private EntityManager entityManager;
     private EntityPersisterHelper persisterHelper;
 
-    public WorldPersister( EntityManager entityManager) {
+    public WorldPersister(EntityManager entityManager) {
         this.entityManager = entityManager;
         this.persisterHelper = new EntityPersisterHelperImpl((PersistableEntityManager) entityManager);
     }

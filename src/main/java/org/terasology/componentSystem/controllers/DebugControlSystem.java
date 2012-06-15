@@ -33,7 +33,6 @@ import org.terasology.rendering.gui.menus.UIMetrics;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
- *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Immortius
  */
@@ -61,7 +60,7 @@ public class DebugControlSystem implements EventHandlerSystem {
         boolean debugEnabled = Config.getInstance().isDebug();
         // Features for debug mode only
         if (debugEnabled && event.isDown()) {
-            switch(event.getKey()) {
+            switch (event.getKey()) {
                 case Keyboard.KEY_UP:
                     world.setTimeInDays(world.getTimeInDays() + 0.005f);
                     event.consume();
@@ -87,7 +86,7 @@ public class DebugControlSystem implements EventHandlerSystem {
         boolean debugEnabled = Config.getInstance().isDebug();
         // Features for debug mode only
         if (debugEnabled) {
-            switch(event.getKey()) {
+            switch (event.getKey()) {
                 case Keyboard.KEY_R:
                     worldRenderer.setWireframe(!worldRenderer.isWireframe());
                     event.consume();

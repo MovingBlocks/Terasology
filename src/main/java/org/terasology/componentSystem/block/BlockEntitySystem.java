@@ -22,6 +22,7 @@ import org.terasology.rendering.physics.BulletPhysicsRenderer;
 
 /**
  * Event handler for events affecting block entities
+ *
  * @author Immortius <immortius@gmail.com>
  */
 @RegisterComponentSystem
@@ -42,9 +43,8 @@ public class BlockEntitySystem implements EventHandlerSystem {
     public void shutdown() {
     }
 
-    @ReceiveEvent(components={BlockComponent.class})
-    public void onDestroyed(NoHealthEvent event, EntityRef entity)
-    {
+    @ReceiveEvent(components = {BlockComponent.class})
+    public void onDestroyed(NoHealthEvent event, EntityRef entity) {
         if (worldProvider == null) return;
         BlockComponent blockComp = entity.getComponent(BlockComponent.class);
         Block oldBlock = worldProvider.getBlock(blockComp.getPosition());
@@ -68,8 +68,7 @@ public class BlockEntitySystem implements EventHandlerSystem {
             }
             event.getInstigator().send(new ReceiveItemEvent(item));
             ItemComponent itemComp = item.getComponent(ItemComponent.class);
-            if (itemComp != null && !itemComp.container.exists())
-            {
+            if (itemComp != null && !itemComp.container.exists()) {
                 // TODO: Fix this - entity needs to be added to lootable block or destroyed
                 item.destroy();
                 CoreRegistry.get(BulletPhysicsRenderer.class).addLootableBlocks(blockComp.getPosition().toVector3f(), oldBlock);
@@ -85,15 +84,15 @@ public class BlockEntitySystem implements EventHandlerSystem {
     }
 
     // TODO: Need a occasionally scan for and remove temporary block entities that were never damaged?
-    @ReceiveEvent(components={BlockComponent.class})
+    @ReceiveEvent(components = {BlockComponent.class})
     public void onRepaired(FullHealthEvent event, EntityRef entity) {
         BlockComponent blockComp = entity.getComponent(BlockComponent.class);
         if (blockComp.temporary) {
             entity.destroy();
         }
     }
-    
-    @ReceiveEvent(components={BlockComponent.class},priority = EventPriority.PRIORITY_HIGH)
+
+    @ReceiveEvent(components = {BlockComponent.class}, priority = EventPriority.PRIORITY_HIGH)
     public void onDamaged(DamageEvent event, EntityRef entity) {
         BlockComponent blockComp = entity.getComponent(BlockComponent.class);
 
@@ -110,7 +109,7 @@ public class BlockEntitySystem implements EventHandlerSystem {
         particleEffect.maxSize = 0.1f;
         particleEffect.minLifespan = 1f;
         particleEffect.maxLifespan = 1.5f;
-        particleEffect.targetVelocity.set(0,-5, 0);
+        particleEffect.targetVelocity.set(0, -5, 0);
         particleEffect.acceleration.set(2f, 2f, 2f);
         particleEffect.collideWithBlocks = true;
         particlesEntity.addComponent(particleEffect);

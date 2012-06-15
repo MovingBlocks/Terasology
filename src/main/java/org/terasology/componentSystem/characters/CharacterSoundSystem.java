@@ -21,7 +21,7 @@ import javax.vecmath.Vector3d;
  */
 @RegisterComponentSystem
 public class CharacterSoundSystem implements EventHandlerSystem {
-    
+
     private FastRandom random = new FastRandom();
 
     public void initialise() {
@@ -30,7 +30,7 @@ public class CharacterSoundSystem implements EventHandlerSystem {
     @Override
     public void shutdown() {
     }
-    
+
     @ReceiveEvent(components = {CharacterSoundComponent.class})
     public void footstep(FootstepEvent event, EntityRef entity) {
         if (random == null) return;

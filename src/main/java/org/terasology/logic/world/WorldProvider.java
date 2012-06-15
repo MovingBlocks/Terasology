@@ -36,6 +36,7 @@ public interface WorldProvider extends WorldProviderCore {
     public boolean isBlockActive(Vector3i pos);
 
     public boolean isBlockActive(Vector3f pos);
+
     /**
      * Places a block of a specific type at a given position and refreshes the
      * corresponding light values.
@@ -47,9 +48,8 @@ public interface WorldProvider extends WorldProviderCore {
     public boolean setBlock(Vector3i pos, Block type, Block oldType);
 
     /**
-     *
      * @param pos
-     * @param state The new value of state
+     * @param state    The new value of state
      * @param oldState The expected previous value of state
      * @return Whether the state change was made successfully. Will fail of oldType != the current type, or if the underlying chunk is not available
      */

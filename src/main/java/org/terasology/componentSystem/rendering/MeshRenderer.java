@@ -27,6 +27,7 @@ import static org.lwjgl.opengl.GL11.*;
 
 /**
  * TODO: This should be made generic (no explicit shader or mesh) and ported directly into WorldRenderer?
+ *
  * @author Immortius <immortius@gmail.com>
  */
 @RegisterComponentSystem(headedOnly = true)
@@ -119,7 +120,7 @@ public class MeshRenderer implements RenderSystem {
 
                 meshComp.material.enable();
                 meshComp.material.setFloat("light", worldRenderer.getRenderingLightValueAt(worldPos));
-                meshComp.material.setInt("carryingTorch",carryingTorch ? 1 : 0);
+                meshComp.material.setInt("carryingTorch", carryingTorch ? 1 : 0);
                 meshComp.material.bindTextures();
                 meshComp.mesh.render();
 

@@ -61,6 +61,7 @@ public abstract class Camera {
     }
 
     public abstract void loadModelViewMatrix();
+
     public abstract void loadNormalizedModelViewMatrix();
 
     public Vector3d getPosition() {

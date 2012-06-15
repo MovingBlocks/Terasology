@@ -26,6 +26,7 @@ import javax.vecmath.Vector3f;
 
 /**
  * TODO: Refactor use methods into events? Usage should become a separate component
+ *
  * @author Immortius <immortius@gmail.com>
  */
 @RegisterComponentSystem
@@ -45,12 +46,12 @@ public class ItemSystem implements EventHandlerSystem {
     public void shutdown() {
     }
 
-    @ReceiveEvent(components=BlockItemComponent.class)
+    @ReceiveEvent(components = BlockItemComponent.class)
     public void onDestroyed(RemovedComponentEvent event, EntityRef entity) {
         entity.getComponent(BlockItemComponent.class).placedEntity.destroy();
     }
 
-    @ReceiveEvent(components={BlockItemComponent.class, ItemComponent.class})
+    @ReceiveEvent(components = {BlockItemComponent.class, ItemComponent.class})
     public void onPlaceBlock(ActivateEvent event, EntityRef item) {
         BlockItemComponent blockItem = item.getComponent(BlockItemComponent.class);
 
@@ -67,7 +68,7 @@ public class ItemSystem implements EventHandlerSystem {
         }
     }
 
-    @ReceiveEvent(components=ItemComponent.class,priority = EventPriority.PRIORITY_CRITICAL)
+    @ReceiveEvent(components = ItemComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
     public void checkCanUseItem(ActivateEvent event, EntityRef item) {
         ItemComponent itemComp = item.getComponent(ItemComponent.class);
         switch (itemComp.usage) {
@@ -87,19 +88,19 @@ public class ItemSystem implements EventHandlerSystem {
         }
     }
 
-    @ReceiveEvent(components=ItemComponent.class,priority = EventPriority.PRIORITY_TRIVIAL)
+    @ReceiveEvent(components = ItemComponent.class, priority = EventPriority.PRIORITY_TRIVIAL)
     public void usedItem(ActivateEvent event, EntityRef item) {
         ItemComponent itemComp = item.getComponent(ItemComponent.class);
         if (itemComp.consumedOnUse) {
             itemComp.stackCount--;
             if (itemComp.stackCount == 0) {
                 item.destroy();
-            }
-            else {
+            } else {
                 item.saveComponent(itemComp);
             }
         }
     }
+
     /**
      * Places a block of a given type in front of the player.
      *
@@ -121,7 +122,7 @@ public class ItemSystem implements EventHandlerSystem {
                     // Establish a block entity
                     blockItem.placedEntity.addComponent(new BlockComponent(placementPos, false));
                     // TODO: Get regen and wait from block config?
-                    blockItem.placedEntity.addComponent(new HealthComponent(type.getArchetypeBlock().getHardness(), 2.0f,1.0f));
+                    blockItem.placedEntity.addComponent(new HealthComponent(type.getArchetypeBlock().getHardness(), 2.0f, 1.0f));
                     blockItem.placedEntity = EntityRef.NULL;
                 }
                 return true;
@@ -129,7 +130,7 @@ public class ItemSystem implements EventHandlerSystem {
         }
         return false;
     }
-    
+
     private boolean canPlaceBlock(Block block, Vector3i targetBlock, Vector3i blockPos) {
         Block centerBlock = worldProvider.getBlock(targetBlock.x, targetBlock.y, targetBlock.z);
 

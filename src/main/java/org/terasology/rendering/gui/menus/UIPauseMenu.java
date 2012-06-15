@@ -101,7 +101,7 @@ public class UIPauseMenu extends UIDisplayWindow {
 
                 CharacterMovementComponent characterMovementComponent = playerEntity.getComponent(CharacterMovementComponent.class);
                 if (characterMovementComponent != null) {
-                    characterMovementComponent.setVelocity(new Vector3f(0,0,0));
+                    characterMovementComponent.setVelocity(new Vector3f(0, 0, 0));
                     playerEntity.saveComponent(characterMovementComponent);
                 }
             }

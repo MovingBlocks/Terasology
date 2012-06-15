@@ -21,6 +21,7 @@ import java.util.Iterator;
 
 /**
  * Describes an axis-aligned bounded space in 3D integer.
+ *
  * @author Immortius
  */
 public class Region3i implements Iterable<Vector3i> {
@@ -29,17 +30,14 @@ public class Region3i implements Iterable<Vector3i> {
     private final Vector3i min = new Vector3i();
     private final Vector3i size = new Vector3i();
 
-    public static Region3i createFromMinAndSize(Vector3i min, Vector3i size)
-    {
-        if (size.x <= 0 || size.y <= 0 || size.z <= 0)
-        {
+    public static Region3i createFromMinAndSize(Vector3i min, Vector3i size) {
+        if (size.x <= 0 || size.y <= 0 || size.z <= 0) {
             return EMPTY;
         }
         return new Region3i(min, size);
     }
 
-    public static Region3i createFromCenterExtents(Vector3f center, Vector3f extents)
-    {
+    public static Region3i createFromCenterExtents(Vector3f center, Vector3f extents) {
         Vector3f min = new Vector3f(center.x - extents.x, center.y - extents.y, center.z - extents.z);
         Vector3f max = new Vector3f(center.x + extents.x, center.y + extents.y, center.z + extents.z);
         max.x = max.x - Math.ulp(max.x);
@@ -49,24 +47,21 @@ public class Region3i implements Iterable<Vector3i> {
                 new Vector3i(max));
     }
 
-    public static Region3i createFromCenterExtents(Vector3i center, Vector3i extents)
-    {
+    public static Region3i createFromCenterExtents(Vector3i center, Vector3i extents) {
         Vector3i min = new Vector3i(center.x - extents.x, center.y - extents.y, center.z - extents.z);
         Vector3i max = new Vector3i(center.x + extents.x, center.y + extents.y, center.z + extents.z);
         return createFromMinMax(min,
                 max);
     }
 
-    public static Region3i createFromCenterExtents(Vector3i center, int extent)
-    {
+    public static Region3i createFromCenterExtents(Vector3i center, int extent) {
         Vector3i min = new Vector3i(center.x - extent, center.y - extent, center.z - extent);
         Vector3i max = new Vector3i(center.x + extent, center.y + extent, center.z + extent);
         return createFromMinMax(min,
                 max);
     }
 
-    public static Region3i createBounded(Vector3i a, Vector3i b)
-    {
+    public static Region3i createBounded(Vector3i a, Vector3i b) {
         Vector3i min = new Vector3i(a);
         min.min(b);
         Vector3i max = new Vector3i(a);
@@ -74,11 +69,9 @@ public class Region3i implements Iterable<Vector3i> {
         return createFromMinMax(min, max);
     }
 
-    public static Region3i createFromMinMax(Vector3i min, Vector3i max)
-    {
+    public static Region3i createFromMinMax(Vector3i min, Vector3i max) {
         Vector3i size = new Vector3i(max.x - min.x + 1, max.y - min.y + 1, max.z - min.z + 1);
-        if (size.x <= 0 || size.y <= 0 || size.z <= 0)
-        {
+        if (size.x <= 0 || size.y <= 0 || size.z <= 0) {
             return EMPTY;
         }
         return new Region3i(min, size);
@@ -97,45 +90,39 @@ public class Region3i implements Iterable<Vector3i> {
     /**
      * Constructs an empty Region with size (0,0,0).
      */
-    public Region3i()
-    {
+    public Region3i() {
     }
 
-    private Region3i(Vector3i min, Vector3i size)
-    {
+    private Region3i(Vector3i min, Vector3i size) {
         this.min.set(min);
         this.size.set(size);
     }
 
-    public boolean isEmpty()
-    {
+    public boolean isEmpty() {
         return size.x + size.y + size().z == 0;
     }
 
     /**
      * @return The smallest vector in the region
      */
-    public Vector3i min()
-    {
+    public Vector3i min() {
         return new Vector3i(min);
     }
 
     /**
      * @return The size of the region
      */
-    public Vector3i size()
-    {
+    public Vector3i size() {
         return new Vector3i(size);
     }
 
     /**
      * @return The largest vector in the region
      */
-    public Vector3i max()
-    {
+    public Vector3i max() {
         Vector3i max = new Vector3i(min);
         max.add(size);
-        max.sub(1,1,1);
+        max.sub(1, 1, 1);
         return max;
     }
 
@@ -144,8 +131,7 @@ public class Region3i implements Iterable<Vector3i> {
      * @return The region that is encompassed by both this and other. If they
      *         do not overlap then the empty region is returned
      */
-    public Region3i intersect(Region3i other)
-    {
+    public Region3i intersect(Region3i other) {
         Vector3i min = min();
         min.max(other.min());
         Vector3i max = max();
@@ -157,6 +143,7 @@ public class Region3i implements Iterable<Vector3i> {
 
     /**
      * Creates a new region that is the same as this region but expanded in all directions by the given amount
+     *
      * @param amount
      * @return A new region
      */
@@ -185,11 +172,9 @@ public class Region3i implements Iterable<Vector3i> {
     }
 
     /**
-     *
      * @return The position at the center of the region
      */
-    public Vector3f center()
-    {
+    public Vector3f center() {
         Vector3f result = min.toVector3f();
         result.add(size.toVector3f());
         result.scale(0.5f);
@@ -197,24 +182,20 @@ public class Region3i implements Iterable<Vector3i> {
     }
 
     /**
-     *
      * @param offset
      * @return A copy of the region offset by the given value
      */
-    public Region3i move(Vector3i offset)
-    {
+    public Region3i move(Vector3i offset) {
         Vector3i newMin = min();
         newMin.add(offset);
         return Region3i.createFromMinAndSize(newMin, size);
     }
 
     /**
-     *
      * @param pos
      * @return Whether this region includes pos
      */
-    public boolean encompasses(Vector3i pos)
-    {
+    public boolean encompasses(Vector3i pos) {
         return encompasses(pos.x, pos.y, pos.z);
     }
 
@@ -223,12 +204,10 @@ public class Region3i implements Iterable<Vector3i> {
     }
 
     /**
-     *
      * @param pos
      * @return The nearest position within the region to the given pos.
      */
-    public Vector3i getNearestPointTo(Vector3i pos)
-    {
+    public Vector3i getNearestPointTo(Vector3i pos) {
         Vector3i result = new Vector3i(pos);
         result.min(max());
         result.max(min);
@@ -236,8 +215,7 @@ public class Region3i implements Iterable<Vector3i> {
     }
 
     @Override
-    public Iterator<Vector3i> iterator()
-    {
+    public Iterator<Vector3i> iterator() {
         return new Region3iIterator(this);
     }
 
@@ -249,9 +227,8 @@ public class Region3i implements Iterable<Vector3i> {
     @Override
     public boolean equals(Object obj) {
         if (obj == this) return true;
-        if (obj instanceof Region3i)
-        {
-            Region3i other = (Region3i)obj;
+        if (obj instanceof Region3i) {
+            Region3i other = (Region3i) obj;
             return min.equals(other.min) && size.equals(other.size);
         }
         return false;
@@ -265,33 +242,27 @@ public class Region3i implements Iterable<Vector3i> {
         return hash;
     }
 
-    private class Region3iIterator implements Iterator<Vector3i>
-    {
+    private class Region3iIterator implements Iterator<Vector3i> {
         Vector3i pos;
         Vector3i result = new Vector3i();
 
-        public Region3iIterator(Region3i region)
-        {
+        public Region3iIterator(Region3i region) {
             this.pos = new Vector3i();
         }
 
         @Override
-        public boolean hasNext()
-        {
+        public boolean hasNext() {
             return pos.x < size.x;
         }
 
         @Override
-        public Vector3i next()
-        {
+        public Vector3i next() {
             Vector3i result = new Vector3i(pos.x + min.x, pos.y + min.y, pos.z + min.z);
             pos.z++;
-            if (pos.z >= size.z)
-            {
+            if (pos.z >= size.z) {
                 pos.z = 0;
                 pos.y++;
-                if (pos.y >= size.y)
-                {
+                if (pos.y >= size.y) {
                     pos.y = 0;
                     pos.x++;
                 }
@@ -300,8 +271,7 @@ public class Region3i implements Iterable<Vector3i> {
         }
 
         @Override
-        public void remove()
-        {
+        public void remove() {
             throw new UnsupportedOperationException("Not supported.");
         }
     }

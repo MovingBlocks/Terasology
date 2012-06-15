@@ -22,12 +22,12 @@ import javax.vecmath.Vector3f;
  */
 @RegisterComponentSystem
 public class TunnelAction implements EventHandlerSystem {
-    
+
     private WorldProvider worldProvider;
     private FastRandom random = new FastRandom();
     private BulletPhysicsRenderer physicsRenderer;
     private BlockEntityRegistry blockEntityRegistry;
-    
+
     @Override
     public void initialise() {
         worldProvider = CoreRegistry.get(WorldProvider.class);
@@ -39,7 +39,7 @@ public class TunnelAction implements EventHandlerSystem {
     public void shutdown() {
     }
 
-    @ReceiveEvent(components= TunnelActionComponent.class)
+    @ReceiveEvent(components = TunnelActionComponent.class)
     public void onActivate(ActivateEvent event, EntityRef entity) {
 
         Vector3f dir = new Vector3f(event.getDirection());
@@ -62,7 +62,7 @@ public class TunnelAction implements EventHandlerSystem {
                     target.z += direction.z * j;
 
                     blockPos.set((int) target.x, (int) target.y, (int) target.z);
-                    
+
                     Block currentBlock = worldProvider.getBlock(blockPos);
 
                     if (currentBlock.getId() == 0x0)

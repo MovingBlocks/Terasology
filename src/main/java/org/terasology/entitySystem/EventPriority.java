@@ -26,5 +26,6 @@ public final class EventPriority {
     public static final int PRIORITY_LOW = 50;
     public static final int PRIORITY_TRIVIAL = 0;
 
-    private EventPriority() {}
+    private EventPriority() {
+    }
 }

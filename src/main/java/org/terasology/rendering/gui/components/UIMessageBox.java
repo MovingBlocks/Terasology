@@ -7,13 +7,13 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 
 import javax.vecmath.Vector2f;
 
-public class UIMessageBox extends UIDialogBox{
-    private UIText   _text;
+public class UIMessageBox extends UIDialogBox {
+    private UIText _text;
     private UIButton _buttonOk;
 
     private Vector2f _minSize = new Vector2f(384f, 128f);
 
-    public UIMessageBox(String title, String text){
+    public UIMessageBox(String title, String text) {
         super(title, new Vector2f());
         setModal(true);
 
@@ -28,16 +28,16 @@ public class UIMessageBox extends UIDialogBox{
         _text.setVisible(true);
         _text.setColor(Color.black);
 
-        width = _text.getTextWidth()+15f>_minSize.x?_text.getTextWidth()+15f:_minSize.x;
-        heigh = _text.getTextHeight()+75f>_minSize.y?_text.getTextHeight()+75f:_minSize.y;
+        width = _text.getTextWidth() + 15f > _minSize.x ? _text.getTextWidth() + 15f : _minSize.x;
+        heigh = _text.getTextHeight() + 75f > _minSize.y ? _text.getTextHeight() + 75f : _minSize.y;
         setSize(new Vector2f(width, heigh));
 
-        _text.setPosition(new Vector2f(getSize().x / 2 - _text.getTextWidth()/2, getSize().y / 2 - _text.getTextHeight()/2));
-        _buttonOk.setPosition(new Vector2f(getSize().x / 2 - _buttonOk.getSize().x/2, getSize().y - _buttonOk.getSize().y - 10f));
+        _text.setPosition(new Vector2f(getSize().x / 2 - _text.getTextWidth() / 2, getSize().y / 2 - _text.getTextHeight() / 2));
+        _buttonOk.setPosition(new Vector2f(getSize().x / 2 - _buttonOk.getSize().x / 2, getSize().y - _buttonOk.getSize().y - 10f));
 
         _buttonOk.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
-              close();
+                close();
             }
         });
 
@@ -45,10 +45,10 @@ public class UIMessageBox extends UIDialogBox{
         windowStyleSetup();
 
         addDisplayElement(_text);
-        addDisplayElement(_buttonOk,"buttonOk");
+        addDisplayElement(_buttonOk, "buttonOk");
     }
 
-    public void close(){
+    public void close() {
         super.close(false);
         GUIManager.getInstance().setLastFocused();
         GUIManager.getInstance().removeWindow("messageBox");

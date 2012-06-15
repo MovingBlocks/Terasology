@@ -110,7 +110,7 @@ public class StateSinglePlayer implements GameState {
         // TODO: Change to better mod support, should be enabled via config
         ModManager modManager = new ModManager();
         for (Mod mod : modManager.getMods()) {
-             mod.setEnabled(true);
+            mod.setEnabled(true);
         }
         modManager.saveModSelectionToConfig();
         cacheTextures();
@@ -214,7 +214,7 @@ public class StateSinglePlayer implements GameState {
     public void update(float delta) {
         /* GUI */
         updateUserInterface();
-        
+
         for (UpdateSubscriberSystem updater : componentSystemManager.iterateUpdateSubscribers()) {
             PerformanceMonitor.startActivity(updater.getClass().getSimpleName());
             updater.update(delta);
@@ -227,8 +227,7 @@ public class StateSinglePlayer implements GameState {
         /* TODO: This seems a little off - plus is more of a UI than single player game state concern. Move somewhere
            more appropriate? Possibly HUD? */
         boolean dead = true;
-        for (EntityRef entity : entityManager.iteratorEntities(LocalPlayerComponent.class))
-        {
+        for (EntityRef entity : entityManager.iteratorEntities(LocalPlayerComponent.class)) {
             dead = entity.getComponent(LocalPlayerComponent.class).isDead;
         }
         if (dead) {
@@ -248,17 +247,17 @@ public class StateSinglePlayer implements GameState {
         inputSystem.update(delta);
 
         // TODO: This should be handled outside of the state, need to fix the screens handling
-            if (screenHasFocus() || !shouldUpdateWorld()) {
-                if (Mouse.isGrabbed()) {
-                    Mouse.setGrabbed(false);
-                    Mouse.setCursorPosition(Display.getWidth() / 2, Display.getHeight() / 2);
-                }
-            } else {
+        if (screenHasFocus() || !shouldUpdateWorld()) {
+            if (Mouse.isGrabbed()) {
+                Mouse.setGrabbed(false);
+                Mouse.setCursorPosition(Display.getWidth() / 2, Display.getHeight() / 2);
+            }
+        } else {
             if (!Mouse.isGrabbed()) {
-                    Mouse.setGrabbed(true);
+                Mouse.setGrabbed(true);
             }
         }
-        }
+    }
 
     public void initWorld(String title) {
         initWorld(title, null);
@@ -312,7 +311,7 @@ public class StateSinglePlayer implements GameState {
     }
 
     private Vector3f nextSpawningPoint() {
-        return new Vector3f(0,5,0);
+        return new Vector3f(0, 5, 0);
         // TODO: Need to generate an X/Z coord, force a chunk relevent and calculate Y
         /*
         ChunkGeneratorTerrain tGen = ((ChunkGeneratorTerrain) getGeneratorManager().getChunkGenerators().get(0));
@@ -338,7 +337,7 @@ public class StateSinglePlayer implements GameState {
 
     private boolean screenHasFocus() {
         return GUIManager.getInstance().getFocusedWindow() != null && GUIManager.getInstance().getFocusedWindow().isModal() && GUIManager.getInstance().getFocusedWindow().isVisible();
-            }
+    }
 
     private boolean shouldUpdateWorld() {
         return !pauseGame;
