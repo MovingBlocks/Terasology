@@ -22,8 +22,19 @@ package org.terasology.logic.world;
 public interface WorldBiomeProvider {
 
     public enum Biome {
-        MOUNTAINS, SNOW, DESERT, FOREST, PLAINS
+        MOUNTAINS(true), SNOW(false), DESERT(true), FOREST(true), PLAINS(true);
+
+        private boolean vegetationFriendly;
+
+        private Biome(boolean vegetationFriendly) {
+            this.vegetationFriendly = vegetationFriendly;
+        }
+
+        public boolean isVegetationFriendly() {
+            return vegetationFriendly;
+        }
     }
+
 
     /**
      * Returns the humidity at the given position.
@@ -49,4 +60,6 @@ public interface WorldBiomeProvider {
     public Biome getBiomeAt(int x, int z);
 
     public Biome getBiomeAt(float x, float z);
+
+
 }
