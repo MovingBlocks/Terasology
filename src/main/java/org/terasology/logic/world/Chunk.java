@@ -47,13 +47,11 @@ public class Chunk implements Externalizable {
     public static final long serialVersionUID = 79881925217704826L;
 
     public enum State {
-        AdjacencyGenerationPending,
-        InternalLightGenerationPending,
-        LightPropagationPending,
-        FullLightConnectivityPending,
-        Complete
-
-
+        ADJACENCY_GENERATION_PENDING,
+        INTERNAL_LIGHT_GENERATION_PENDING,
+        LIGHT_PROPAGATION_PENDING,
+        FULL_LIGHT_CONNECTIVITY_PENDING,
+        COMPLETE
     }
 
     /* PUBLIC CONSTANT VALUES */
@@ -68,7 +66,7 @@ public class Chunk implements Externalizable {
     private final TeraArray blocks;
     private final TeraSmartArray sunlight, light, states;
 
-    private State chunkState = State.AdjacencyGenerationPending;
+    private State chunkState = State.ADJACENCY_GENERATION_PENDING;
     private boolean dirty;
     private AABB aabb;
 
@@ -81,6 +79,7 @@ public class Chunk implements Externalizable {
     private RigidBody rigidBody = null;
 
     private ReentrantLock lock = new ReentrantLock();
+    private boolean disposed = false;
 
 
     public Chunk() {
@@ -119,6 +118,10 @@ public class Chunk implements Externalizable {
 
     public void unlock() {
         lock.unlock();
+    }
+
+    public boolean isLocked() {
+        return lock.isLocked();
     }
 
     public Vector3i getPos() {
@@ -400,6 +403,7 @@ public class Chunk implements Externalizable {
     }
 
     public void dispose() {
+        disposed = true;
         if (rigidBody != null) {
             rigidBody.destroy();
             rigidBody = null;
@@ -410,5 +414,9 @@ public class Chunk implements Externalizable {
             }
             mesh = null;
         }
+    }
+
+    public boolean isDisposed() {
+        return disposed;
     }
 }

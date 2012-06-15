@@ -256,7 +256,7 @@ public class BulletPhysicsRenderer implements IGameObject {
     }
 
     public void updateChunks() {
-        List<Chunk> chunks = CoreRegistry.get(WorldRenderer.class).getChunksInProximity();
+        /*List<Chunk> chunks = CoreRegistry.get(WorldRenderer.class).getChunksInProximity();
         HashSet<RigidBody> newBodies = new HashSet<RigidBody>();
 
         boolean updatedThisFrame = false;
@@ -287,7 +287,7 @@ public class BulletPhysicsRenderer implements IGameObject {
             }
         }
 
-        _chunks = newBodies;
+        _chunks = newBodies;     */
     }
 
     private boolean updateRigidBody(Chunk chunk) {

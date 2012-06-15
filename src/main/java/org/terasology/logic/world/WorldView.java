@@ -194,6 +194,15 @@ public class WorldView {
         }
     }
 
+    public boolean isValidView() {
+        for (Chunk chunk : chunks) {
+            if (chunk.isDisposed()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     int relChunkIndex(int x, int y, int z) {
         return (x >> 4) + offset.x + chunkRegion.size().x * ((z >> 4) + offset.z);
     }

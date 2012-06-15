@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.world.generationPhase;
+package org.terasology.logic.world.localChunkProvider;
 
 import org.terasology.logic.world.Chunk;
 import org.terasology.math.Side;
