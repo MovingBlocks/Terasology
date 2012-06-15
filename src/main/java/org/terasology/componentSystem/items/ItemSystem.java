@@ -2,7 +2,10 @@ package org.terasology.componentSystem.items;
 
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.components.*;
+import org.terasology.components.AABBCollisionComponent;
+import org.terasology.components.HealthComponent;
+import org.terasology.components.ItemComponent;
+import org.terasology.components.PlayerComponent;
 import org.terasology.components.world.BlockComponent;
 import org.terasology.components.world.BlockItemComponent;
 import org.terasology.components.world.LocationComponent;
@@ -17,7 +20,6 @@ import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockFamily;
-import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.AABB;
 
 import javax.vecmath.Vector3f;
@@ -32,6 +34,7 @@ public class ItemSystem implements EventHandlerSystem {
     private WorldProvider worldProvider;
     private BlockEntityRegistry blockEntityRegistry;
 
+    @Override
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
         worldProvider = CoreRegistry.get(WorldProvider.class);
@@ -49,7 +52,6 @@ public class ItemSystem implements EventHandlerSystem {
 
     @ReceiveEvent(components={BlockItemComponent.class, ItemComponent.class})
     public void onPlaceBlock(ActivateEvent event, EntityRef item) {
-        ItemComponent itemComp = item.getComponent(ItemComponent.class);
         BlockItemComponent blockItem = item.getComponent(BlockItemComponent.class);
 
         Side surfaceDir = Side.inDirection(event.getNormal());
@@ -65,19 +67,19 @@ public class ItemSystem implements EventHandlerSystem {
         }
     }
 
-    @ReceiveEvent(components=ItemComponent.class,priority = ReceiveEvent.PRIORITY_CRITICAL)
+    @ReceiveEvent(components=ItemComponent.class,priority = EventPriority.PRIORITY_CRITICAL)
     public void checkCanUseItem(ActivateEvent event, EntityRef item) {
         ItemComponent itemComp = item.getComponent(ItemComponent.class);
         switch (itemComp.usage) {
-            case None:
+            case NONE:
                 event.cancel();
                 break;
-            case OnBlock:
+            case ON_BLOCK:
                 if (event.getTarget().getComponent(BlockComponent.class) == null) {
                     event.cancel();
                 }
                 break;
-            case OnEntity:
+            case ON_ENTITY:
                 if (event.getTarget().getComponent(BlockComponent.class) != null) {
                     event.cancel();
                 }
@@ -85,7 +87,7 @@ public class ItemSystem implements EventHandlerSystem {
         }
     }
 
-    @ReceiveEvent(components=ItemComponent.class,priority = ReceiveEvent.PRIORITY_TRIVIAL)
+    @ReceiveEvent(components=ItemComponent.class,priority = EventPriority.PRIORITY_TRIVIAL)
     public void usedItem(ActivateEvent event, EntityRef item) {
         ItemComponent itemComp = item.getComponent(ItemComponent.class);
         if (itemComp.consumedOnUse) {

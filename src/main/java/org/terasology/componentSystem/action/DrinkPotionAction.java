@@ -2,7 +2,10 @@ package org.terasology.componentSystem.action;
 
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.components.*;
+import org.terasology.components.HealthComponent;
+import org.terasology.components.ItemComponent;
+import org.terasology.components.PoisonedComponent;
+import org.terasology.components.PotionComponent;
 import org.terasology.entitySystem.*;
 import org.terasology.events.*;
 import org.terasology.events.inventory.ReceiveItemEvent;

@@ -26,7 +26,6 @@ import org.lwjgl.opengl.GL15;
 import org.terasology.asset.Asset;
 import org.terasology.asset.AssetUri;
 import org.terasology.logic.manager.VertexBufferObjectManager;
-import org.terasology.rendering.interfaces.IGameObject;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -49,7 +48,7 @@ public class Mesh implements Asset {
     }
 
     public static Mesh buildMesh(TFloatList vertices, TFloatList texCoord0, TFloatList texCoord1, TFloatList normals, TFloatList colors, TIntList indices) {
-        
+
         int vertexCount = vertices.size() / VERTEX_SIZE;
         boolean hasTexCoord0 = texCoord0 != null && texCoord0.size() / TEX_COORD_0_SIZE == vertexCount;
         boolean hasTexCoord1 = texCoord1 != null && texCoord1.size() / TEX_COORD_1_SIZE == vertexCount;
@@ -124,13 +123,11 @@ public class Mesh implements Asset {
             for (int i = 0; i < colorSize; ++i) {
                 vertexBuffer.put(colors.get(c + i));
             }
-
             uv1 += texCoord0Size;
             uv2 += texCoord1Size;
             n += normalSize;
             c += colorSize;
         }
-
         vertexBuffer.flip();
         return vertexBuffer;
     }

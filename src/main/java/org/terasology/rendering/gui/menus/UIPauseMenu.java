@@ -15,7 +15,10 @@
  */
 package org.terasology.rendering.gui.menus;
 
-import org.terasology.components.*;
+import org.terasology.components.CharacterMovementComponent;
+import org.terasology.components.HealthComponent;
+import org.terasology.components.LocalPlayerComponent;
+import org.terasology.components.PlayerComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
@@ -28,7 +31,7 @@ import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.components.UITransparentOverlay;
 import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.UIDisplayRenderer;
+import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 import javax.vecmath.Vector2f;
@@ -39,7 +42,7 @@ import javax.vecmath.Vector3f;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class UIPauseMenu extends UIDisplayRenderer {
+public class UIPauseMenu extends UIDisplayWindow {
 
     final UITransparentOverlay _overlay;
     final UIGraphicsElement _title;
@@ -126,6 +129,7 @@ public class UIPauseMenu extends UIDisplayRenderer {
         addDisplayElement(_exitButton);
         addDisplayElement(_respawnButton);
         addDisplayElement(_mainMenuButton);
+        setModal(true);
 
         update();
     }

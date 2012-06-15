@@ -28,6 +28,7 @@ public class ExplosionAction implements EventHandlerSystem {
     private BulletPhysicsRenderer physicsRenderer;
     private BlockEntityRegistry blockEntityRegistry;
 
+    @Override
     public void initialise() {
         worldProvider = CoreRegistry.get(WorldProvider.class);
         physicsRenderer = CoreRegistry.get(BulletPhysicsRenderer.class);

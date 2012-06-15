@@ -3,7 +3,6 @@ package org.terasology.entitySystem.persistence;
 import com.google.gson.*;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Descriptors;
-import com.google.protobuf.Message;
 import gnu.trove.list.TByteList;
 import gnu.trove.list.array.TByteArrayList;
 import org.terasology.protobuf.EntityData;
@@ -58,6 +57,7 @@ public class EntityDataJSONFormat {
 
     private static class WorldHandler implements JsonSerializer<EntityData.World>, JsonDeserializer<EntityData.World> {
 
+        @Override
         public JsonElement serialize(EntityData.World src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject result = new JsonObject();
             for (Map.Entry<Descriptors.FieldDescriptor, Object> field : src.getAllFields().entrySet()) {
@@ -66,6 +66,7 @@ public class EntityDataJSONFormat {
             return result;
         }
 
+        @Override
         public EntityData.World deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             EntityData.World.Builder world = EntityData.World.newBuilder();
             if (json.isJsonObject()) {
@@ -100,6 +101,7 @@ public class EntityDataJSONFormat {
 
     private static class ComponentHandler implements JsonSerializer<EntityData.Component> {
 
+        @Override
         public JsonElement serialize(EntityData.Component src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject result = new JsonObject();
             for (EntityData.NameValue field : src.getFieldList()) {
@@ -111,6 +113,7 @@ public class EntityDataJSONFormat {
     }
 
     private static class ComponentBuilderHandler implements JsonDeserializer<EntityData.Component.Builder> {
+        @Override
         public EntityData.Component.Builder deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             EntityData.Component.Builder component = EntityData.Component.newBuilder();
             JsonObject jsonObject = json.getAsJsonObject();
@@ -127,6 +130,7 @@ public class EntityDataJSONFormat {
 
     private static class EntityHandler implements JsonSerializer<EntityData.Entity>, JsonDeserializer<EntityData.Entity> {
 
+        @Override
         public JsonElement serialize(EntityData.Entity src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject result = new JsonObject();
             if (src.hasId()) {
@@ -149,6 +153,7 @@ public class EntityDataJSONFormat {
             return result;
         }
 
+        @Override
         public EntityData.Entity deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             EntityData.Entity.Builder entity = EntityData.Entity.newBuilder();
             JsonObject jsonObject = json.getAsJsonObject();
@@ -183,6 +188,7 @@ public class EntityDataJSONFormat {
 
     private static class PrefabHandler implements JsonSerializer<EntityData.Prefab>, JsonDeserializer<EntityData.Prefab> {
 
+        @Override
         public JsonElement serialize(EntityData.Prefab src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject result = new JsonObject();
             if (src.hasName()) {
@@ -197,6 +203,7 @@ public class EntityDataJSONFormat {
             return result;
         }
 
+        @Override
         public EntityData.Prefab deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             EntityData.Prefab.Builder prefab = EntityData.Prefab.newBuilder();
             JsonObject jsonObject = json.getAsJsonObject();
@@ -229,6 +236,7 @@ public class EntityDataJSONFormat {
 
     private static class ValueHandler implements JsonSerializer<EntityData.Value>, JsonDeserializer<EntityData.Value> {
 
+        @Override
         public JsonElement serialize(EntityData.Value src, Type typeOfSrc, JsonSerializationContext context) {
             if (src.getBooleanCount() > 1) {
                 return context.serialize(src.getBooleanList());
@@ -282,6 +290,7 @@ public class EntityDataJSONFormat {
             return JsonNull.INSTANCE;
         }
 
+        @Override
         public EntityData.Value deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             EntityData.Value.Builder value = EntityData.Value.newBuilder();
             if (json.isJsonPrimitive()) {

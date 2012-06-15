@@ -17,7 +17,6 @@ package org.terasology.rendering.world;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.CoreRegistry;
-import org.terasology.game.Terasology;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.rendering.interfaces.IGameObject;
@@ -49,6 +48,7 @@ public class BlockGrid implements IGameObject {
         _mesh = tessellator.generateMesh();
     }
 
+    @Override
     public void render() {
         ShaderManager.getInstance().enableDefault();
 
@@ -97,6 +97,7 @@ public class BlockGrid implements IGameObject {
         _gridPositions.clear();
     }
 
+    @Override
     public void update(float delta) {
         // Nothing to do.
     }

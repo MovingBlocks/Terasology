@@ -18,7 +18,6 @@ package org.terasology.utilities;
 import org.lwjgl.BufferUtils;
 
 import javax.vecmath.Matrix4f;
-import java.io.File;
 import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL11.glGetFloat;

@@ -1,9 +1,10 @@
 package org.terasology.rendering.gui.components;
 
+import org.newdawn.slick.Color;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.newdawn.slick.Color;
+
 import javax.vecmath.Vector2f;
 
 public class UIMessageBox extends UIDialogBox{
@@ -49,7 +50,7 @@ public class UIMessageBox extends UIDialogBox{
 
     public void close(){
         super.close(false);
-        GUIManager.getInstance().setLasFocused();
+        GUIManager.getInstance().setLastFocused();
         GUIManager.getInstance().removeWindow("messageBox");
     }
 }

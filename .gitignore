@@ -1,4 +1,5 @@
 SAVED_WORLDS
+screens
 logs
 out
 target
@@ -12,3 +13,5 @@ Terasology.iws
 .settings
 .gradle
 bin
+data/console/consolelog.json
+*~

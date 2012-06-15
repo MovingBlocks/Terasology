@@ -15,18 +15,14 @@
  */
 package org.terasology.rendering.gui.components;
 
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
+import org.terasology.components.CuredComponent;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.PoisonedComponent;
-import org.terasology.components.SpeedBoostComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
-import org.terasology.game.Terasology;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AssetManager;
-import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
@@ -74,7 +70,7 @@ public class UIHealthBar extends UIDisplayContainer {
 
         // Show/Hide hearts relatively to the available health points of the player
         for (int i = 0; i < 10; i++) {
-            
+
             if (i < healthRatio * 10f)
                 _hearts[i].setVisible(true);
             else
@@ -88,15 +84,24 @@ public class UIHealthBar extends UIDisplayContainer {
                     _hearts[i].getTextureOrigin().set(new Vector2f(106f / 256f, 0.0f));
                 }
                 else _hearts[i].getTextureOrigin().set(new Vector2f(52f / 256f, 0.0f));
+            }
+            for (EntityRef entity : entityManager.iteratorEntities(CuredComponent.class)) {
+                //For fixing the Green > Red hearts when cured:
+                CuredComponent cured = CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(CuredComponent.class);
+                entityManager = CoreRegistry.get(EntityManager.class);
+                    if (cured.cureDuration >=1){
+                        _hearts[i].getTextureOrigin().set(new Vector2f(52f / 256f, 0.0f));
+                    }
+                    else _hearts[i].getTextureOrigin().set(new Vector2f(52f / 256f, 0.0f));
 
-        /*Blue Hearts:
-                    _hearts[i].getTextureOrigin().set(new Vector2f(70f / 256f, 0.0f));
-        */
 
+
+                }
+
+            }
 
         }
-
     }
 
-}
-}
+/*Blue Hearts:
+_hearts[i].getTextureOrigin().set(new Vector2f(70f / 256f, 0.0f)); */

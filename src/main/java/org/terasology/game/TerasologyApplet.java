@@ -16,7 +16,6 @@
 package org.terasology.game;
 
 import org.terasology.game.modes.StateMainMenu;
-import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PathManager;
 
 import java.applet.Applet;

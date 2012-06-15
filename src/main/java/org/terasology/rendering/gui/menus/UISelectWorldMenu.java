@@ -25,9 +25,14 @@ import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.world.WorldInfo;
 import org.terasology.logic.world.WorldUtil;
-import org.terasology.rendering.gui.components.*;
+import org.terasology.rendering.gui.components.UIButton;
+import org.terasology.rendering.gui.components.UIImageOverlay;
+import org.terasology.rendering.gui.components.UIInput;
+import org.terasology.rendering.gui.components.UIList;
 import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
-import org.terasology.rendering.gui.framework.*;
+import org.terasology.rendering.gui.framework.IClickListener;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.UIDisplayWindow;
 
 import javax.vecmath.Vector2f;
 import java.io.File;
@@ -54,7 +59,7 @@ public class UISelectWorldMenu extends UIDisplayWindow {
     final UIDialogCreateNewWorld _window;
 
     public UISelectWorldMenu() {
-        maximaze();
+        maximize();
         _overlay = new UIImageOverlay(AssetManager.loadTexture("engine:menuBackground"));
         _overlay.setVisible(true);
 

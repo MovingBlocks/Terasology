@@ -112,7 +112,7 @@ public class ObjMeshLoader implements AssetLoader<Mesh> {
                 lineNum++;
                 if (line.isEmpty())
                     continue;
-                String[] prefixSplit = line.split(" ", 2);
+                String[] prefixSplit = line.trim().split("\\s+", 2);
                 String prefix = prefixSplit[0];
 
                 // Comment
@@ -130,7 +130,7 @@ public class ObjMeshLoader implements AssetLoader<Mesh> {
                 }
                 // Vertex position
                 else if ("v".equals(prefix)) {
-                    String[] floats = prefixSplit[1].split(" ", 4);
+                    String[] floats = prefixSplit[1].trim().split("\\s+", 4);
                     if (floats.length != 3) {
                         throw new IOException("Bad statement");
                     }
@@ -138,8 +138,8 @@ public class ObjMeshLoader implements AssetLoader<Mesh> {
                 }
                 // Vertex texture coords
                 else if ("vt".equals(prefix)) {
-                    String[] floats = prefixSplit[1].split(" ", 3);
-                    if (floats.length != 2) {
+                    String[] floats = prefixSplit[1].trim().split("\\s+", 4);
+                    if (floats.length < 2 || floats.length > 3) {
                         throw new IOException("Bad statement");
                     }
                     // Need to flip v coord, apparently
@@ -147,7 +147,7 @@ public class ObjMeshLoader implements AssetLoader<Mesh> {
                 }
                 // Vertex normal
                 else if ("vn".equals(prefix)) {
-                    String[] floats = prefixSplit[1].split(" ", 4);
+                    String[] floats = prefixSplit[1].trim().split("\\s+", 4);
                     if (floats.length != 3) {
                         throw new IOException("Bad statement");
                     }
@@ -165,7 +165,7 @@ public class ObjMeshLoader implements AssetLoader<Mesh> {
                 }
                 // Face (polygon)
                 else if ("f".equals(prefix)) {
-                    String[] elements = prefixSplit[1].split(" ");
+                    String[] elements = prefixSplit[1].trim().split("\\s+");
                     Tuple3i[] result = new Tuple3i[elements.length];
                     for (int i = 0; i < elements.length; ++i) {
                         String[] parts = elements[i].split("/", 4);

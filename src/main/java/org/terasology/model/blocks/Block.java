@@ -18,7 +18,6 @@ package org.terasology.model.blocks;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.util.ResourceLoader;
 import org.terasology.collection.EnumBooleanMap;
-import org.terasology.game.Terasology;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.Side;
 import org.terasology.model.shapes.BlockMeshPart;
@@ -43,9 +42,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glIsEnabled;
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Stores all information for a specific block type.
@@ -191,7 +188,7 @@ public class Block implements IGameObject {
         int rgbValue = _colorLut.getRGB((int) ((1.0 - temp) * 255.0), (int) ((1.0 - hum) * 255.0));
 
         Color c = new Color(rgbValue);
-        return new Vector4f((float) c.getRed() / 255f, (float) c.getGreen() / 255f, (float) c.getBlue() / 255f, 1.0f);
+        return new Vector4f(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, 1.0f);
     }
 
     /**
@@ -206,7 +203,7 @@ public class Block implements IGameObject {
         int rgbValue = _foliageLut.getRGB((int) ((1.0 - temp) * 255.0), (int) ((1.0 - hum) * 255.0));
 
         Color c = new Color(rgbValue);
-        return new Vector4f((float) c.getRed() / 255f, (float) c.getGreen() / 255f, (float) c.getBlue() / 255f, 1.0f);
+        return new Vector4f(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, 1.0f);
     }
 
     /**
@@ -245,7 +242,7 @@ public class Block implements IGameObject {
      */
     public Vector2f calcTextureOffsetFor(Side side) {
         Vector2f pos = getTextureAtlasPos(side);
-        return new Vector2f((float) pos.x * TEXTURE_OFFSET, (float) pos.y * TEXTURE_OFFSET);
+        return new Vector2f(pos.x * TEXTURE_OFFSET, pos.y * TEXTURE_OFFSET);
     }
 
     public void renderWithLightValue(float light) {
@@ -282,10 +279,12 @@ public class Block implements IGameObject {
         }
     }
 
+    @Override
     public void render() {
         renderWithLightValue(1.0f);
     }
 
+    @Override
     public void update(float delta) {
         // Do nothing
     }
@@ -418,7 +417,7 @@ public class Block implements IGameObject {
         _fullSide.put(side, full);
         return this;
     }
-    
+
     public Block withStraightToInventory(boolean straightToInventory) {
         _straightToInventory = straightToInventory;
         return this;
@@ -597,20 +596,24 @@ public class Block implements IGameObject {
             _z = z;
         }
 
+        @Override
         public Iterator<AABB> iterator() {
             return this;
         }
 
+        @Override
         public boolean hasNext() {
             return _source.hasNext();
         }
 
+        @Override
         public AABB next() {
             AABB base = _source.next();
             return new AABB(new Vector3d(base.getPosition().x + _x, base.getPosition().y + _y, base.getPosition().z + _z),
                     base.getDimensions());
         }
 
+        @Override
         public void remove() {
             throw new UnsupportedOperationException();
         }
@@ -626,6 +629,7 @@ public class Block implements IGameObject {
         return new AABB(pos, new Vector3d(0.5f, 0.5f, 0.5f));
     }
 
+    @Override
     public String toString() {
         // This may seem excessive in logging, but you get both the class name (which may not be "Block") and block title
         return this.getClass().getSimpleName() + ":" + _title + ";id:" + _id;

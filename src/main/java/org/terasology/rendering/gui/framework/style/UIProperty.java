@@ -1,6 +1,5 @@
 package org.terasology.rendering.gui.framework.style;
 
-import org.terasology.game.Terasology;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 
 import javax.vecmath.Vector4f;

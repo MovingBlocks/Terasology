@@ -16,7 +16,6 @@
 
 package org.terasology.logic.manager;
 
-import com.google.common.io.Files;
 import org.lwjgl.LWJGLUtil;
 
 import java.io.File;

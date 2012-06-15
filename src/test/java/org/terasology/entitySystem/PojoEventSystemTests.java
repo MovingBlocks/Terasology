@@ -131,14 +131,32 @@ public class PojoEventSystemTests {
         assertEquals(1, handlerHigh.receivedList.size());
         assertEquals(0, handlerNormal.receivedList.size());
     }
+
+    @Test
+    public void testChildEvent() {
+        entity.addComponent(new IntegerComponent());
+        TestEventHandler handler = new TestEventHandler();
+        eventSystem.registerEvent("test:childEvent", TestChildEvent.class);
+        eventSystem.registerEventHandler(handler);
+
+        TestChildEvent event = new TestChildEvent();
+        eventSystem.send(entity, event);
+        assertEquals(1, handler.childEventReceived.size());
+        assertEquals(1, handler.receivedList.size());
+    }
     
     private static class TestEvent extends AbstractEvent {
         
     }
+
+    public static class TestChildEvent extends TestEvent {
+
+    }
     
     public static class TestEventHandler implements EventHandlerSystem {
 
-        List<Received> receivedList = Lists.newArrayList();        
+        List<Received> receivedList = Lists.newArrayList();
+        List<Received> childEventReceived = Lists.newArrayList();
         
         @ReceiveEvent(components = StringComponent.class)
         public void handleStringEvent(TestEvent event, EntityRef entity) {
@@ -148,6 +166,11 @@ public class PojoEventSystemTests {
         @ReceiveEvent(components = IntegerComponent.class)
         public void handleIntegerEvent(TestEvent event, EntityRef entity) {
             receivedList.add(new Received(event, entity));
+        }
+
+        @ReceiveEvent(components = IntegerComponent.class)
+        public void handleChildEvent(TestChildEvent event, EntityRef entity) {
+            childEventReceived.add(new Received(event, entity));
         }
 
         public void initialise() {
@@ -175,7 +198,7 @@ public class PojoEventSystemTests {
         List<Received> receivedList = Lists.newArrayList();
         public boolean cancel = false;
 
-        @ReceiveEvent(components = StringComponent.class, priority = ReceiveEvent.PRIORITY_HIGH)
+        @ReceiveEvent(components = StringComponent.class, priority = EventPriority.PRIORITY_HIGH)
         public void handleStringEvent(TestEvent event, EntityRef entity) {
             receivedList.add(new Received(event, entity));
             if (cancel) {
@@ -183,7 +206,7 @@ public class PojoEventSystemTests {
             }
         }
 
-        @ReceiveEvent(components = IntegerComponent.class, priority = ReceiveEvent.PRIORITY_HIGH)
+        @ReceiveEvent(components = IntegerComponent.class, priority = EventPriority.PRIORITY_HIGH)
         public void handleIntegerEvent(TestEvent event, EntityRef entity) {
             receivedList.add(new Received(event, entity));
         }

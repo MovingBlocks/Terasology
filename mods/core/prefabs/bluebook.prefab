@@ -3,7 +3,7 @@
     "Item" : {
         "name" : "BlueBook",
         "icon" : "BlueBook",
-        "usage" : "OnUser",
+        "usage" : "ON_USER",
         "renderWithIcon" : true
     },
     "Book" : {

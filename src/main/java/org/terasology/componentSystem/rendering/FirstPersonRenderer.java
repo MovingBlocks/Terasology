@@ -3,7 +3,10 @@ package org.terasology.componentSystem.rendering;
 import com.google.common.collect.Maps;
 import org.lwjgl.opengl.GL11;
 import org.terasology.componentSystem.RenderSystem;
-import org.terasology.components.*;
+import org.terasology.components.CharacterMovementComponent;
+import org.terasology.components.InventoryComponent;
+import org.terasology.components.ItemComponent;
+import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.world.BlockItemComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterComponentSystem;
@@ -46,6 +49,7 @@ public class FirstPersonRenderer implements RenderSystem {
     
     private Map<String, Mesh> iconMeshes = Maps.newHashMap();
     
+    @Override
     public void initialise() {
         localPlayer = CoreRegistry.get(LocalPlayer.class);
         worldProvider = CoreRegistry.get(WorldProvider.class);
@@ -64,14 +68,17 @@ public class FirstPersonRenderer implements RenderSystem {
     public void shutdown() {
     }
 
+    @Override
     public void renderOpaque() {
 
     }
 
+    @Override
     public void renderTransparent() {
 
     }
 
+    @Override
     public void renderFirstPerson() {
         CharacterMovementComponent charMoveComp = localPlayer.getEntity().getComponent(CharacterMovementComponent.class);
         float bobOffset = calcBobbingOffset(charMoveComp.footstepDelta / charMoveComp.distanceBetweenFootsteps, (float) java.lang.Math.PI / 8f, 0.05f, 1f) ;
@@ -91,6 +98,7 @@ public class FirstPersonRenderer implements RenderSystem {
 
     }
 
+    @Override
     public void renderOverlay() {
 
     }

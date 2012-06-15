@@ -2,7 +2,6 @@ package org.terasology.rendering.gui.framework.style;
 
 
 import org.lwjgl.opengl.GL11;
-import org.terasology.game.Terasology;
 import org.terasology.logic.manager.AssetManager;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 

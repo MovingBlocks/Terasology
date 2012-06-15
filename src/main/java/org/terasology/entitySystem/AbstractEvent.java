@@ -20,7 +20,7 @@ package org.terasology.entitySystem;
  * @author Immortius
  */
 public abstract class AbstractEvent implements Event {
-    private boolean cancelled;
+    protected boolean cancelled;
 
     @Override
     public void cancel() {

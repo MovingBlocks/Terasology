@@ -21,12 +21,38 @@ public class PojoEventSystem implements EventSystem {
     private Map<Class<? extends Event>, Multimap<Class<? extends Component>, EventHandlerInfo>> componentSpecificHandlers = Maps.newHashMap();
     private Comparator<EventHandlerInfo> priorityComparator = new EventHandlerPriorityComparator();
 
+    // Event metadata
+    private BiMap<String, Class<? extends Event>> eventIdMap = HashBiMap.create();
+    private Multimap<Class<? extends Event>, Class<? extends Event>> parentEvents = HashMultimap.create();
+
+
     public PojoEventSystem(EntityManager entitySystem) {
         this.entitySystem = entitySystem;
     }
 
+    @Override
+    public void registerEvent(String name, Class<? extends Event> eventType) {
+        if (name != null && !name.isEmpty()) {
+            eventIdMap.put(name, eventType);
+        }
+        logger.info("Registering event " + eventType.getSimpleName());
+        // TODO: Collect interfaces too - use Reflections lib when it becomes available
+        Class parent = eventType.getSuperclass();
+        while (parent != null) {
+            if (Event.class.isAssignableFrom(parent) && !AbstractEvent.class.equals(parent)) {
+                logger.info("Found parent event " + parent.getSimpleName());
+                parentEvents.put(eventType, parent);
+                parent = parent.getSuperclass();
+            } else {
+                parent = null;
+            }
+        }
+    }
+
+    @Override
     public void registerEventHandler(EventHandlerSystem handler) {
         Class handlerClass = handler.getClass();
+        // TODO: Support private methods
         if (!Modifier.isPublic(handlerClass.getModifiers())) {
             logger.warning(String.format("Cannot register handler %s, must be public", handler.getClass().getName()));
             return;
@@ -66,7 +92,7 @@ public class PojoEventSystem implements EventSystem {
 
     @Override
     public <T extends Event> void registerEventReceiver(EventReceiver<T> eventReceiver, Class<T> eventClass, Class<? extends Component>... componentTypes) {
-        registerEventReceiver(eventReceiver, eventClass, ReceiveEvent.PRIORITY_NORMAL, componentTypes);
+        registerEventReceiver(eventReceiver, eventClass, EventPriority.PRIORITY_NORMAL, componentTypes);
     }
 
     @Override
@@ -83,22 +109,9 @@ public class PojoEventSystem implements EventSystem {
 
     }
 
+    @Override
     public void send(EntityRef entity, Event event) {
-        Multimap<Class<? extends Component>, EventHandlerInfo> handlers = componentSpecificHandlers.get(event.getClass());
-        if (handlers == null) return;
-
-        Set<EventHandlerInfo> selectedHandlersSet = Sets.newHashSet();
-        
-        for (Class<? extends Component> compClass : handlers.keySet()) {
-            if (entity.hasComponent(compClass)) {
-                for (EventHandlerInfo eventHandler : handlers.get(compClass)) {
-                    if (eventHandler.isValidFor(entity)) {
-                        selectedHandlersSet.add(eventHandler);
-                    }
-                }
-            }
-        }
-
+        Set<EventHandlerInfo> selectedHandlersSet = selectEventHandlers(event.getClass(), entity);
         List<EventHandlerInfo> selectedHandlers = Lists.newArrayList(selectedHandlersSet);
         Collections.sort(selectedHandlers, priorityComparator);
 
@@ -112,12 +125,39 @@ public class PojoEventSystem implements EventSystem {
         }
     }
 
+    @Override
     public void send(EntityRef entity, Event event, Component component) {
         Multimap<Class<? extends Component>, EventHandlerInfo> handlers = componentSpecificHandlers.get(event.getClass());
         if (handlers != null) {
             for (EventHandlerInfo eventHandler : handlers.get(component.getClass())) {
                 if (eventHandler.isValidFor(entity)) {
                     eventHandler.invoke(entity, event);
+                }
+            }
+        }
+    }
+
+    private Set<EventHandlerInfo> selectEventHandlers(Class<? extends Event> eventType, EntityRef entity) {
+        Set<EventHandlerInfo> result = Sets.newHashSet();
+        selectEventHandlersSpecificToType(eventType, entity, result);
+
+        for (Class<? extends Event> parentEventType : parentEvents.get(eventType)) {
+            selectEventHandlersSpecificToType(parentEventType, entity, result);
+        }
+        return result;
+    }
+
+    private void selectEventHandlersSpecificToType(Class<? extends Event> eventType, EntityRef entity, Set<EventHandlerInfo> result) {
+        Multimap<Class<? extends Component>, EventHandlerInfo> handlers = componentSpecificHandlers.get(eventType);
+        if (handlers == null)
+            return;
+
+        for (Class<? extends Component> compClass : handlers.keySet()) {
+            if (entity.hasComponent(compClass)) {
+                for (EventHandlerInfo eventHandler : handlers.get(compClass)) {
+                    if (eventHandler.isValidFor(entity)) {
+                        result.add(eventHandler);
+                    }
                 }
             }
         }

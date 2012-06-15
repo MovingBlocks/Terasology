@@ -18,7 +18,6 @@ package org.terasology.asset;
 
 import com.google.common.base.Objects;
 
-import java.net.URI;
 import java.util.Locale;
 
 /**

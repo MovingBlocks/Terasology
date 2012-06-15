@@ -2,8 +2,8 @@ package org.terasology.componentSystem.rendering;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.componentSystem.RenderSystem;
-import org.terasology.components.world.BlockComponent;
 import org.terasology.components.HealthComponent;
+import org.terasology.components.world.BlockComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterComponentSystem;
@@ -34,6 +34,7 @@ public class BlockDamageRenderer implements RenderSystem {
     private Mesh overlayMesh;
     private Texture effectsTexture;
 
+    @Override
     public void initialise() {
         this.entityManager = CoreRegistry.get(EntityManager.class);
         this.worldProvider = CoreRegistry.get(WorldProvider.class);
@@ -50,6 +51,7 @@ public class BlockDamageRenderer implements RenderSystem {
     public void shutdown() {
     }
 
+    @Override
     public void renderOverlay() {
         if (effectsTexture == null) return;
 
@@ -87,14 +89,17 @@ public class BlockDamageRenderer implements RenderSystem {
         glDisable(GL11.GL_BLEND);
     }
 
+    @Override
     public void renderFirstPerson() {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    @Override
     public void renderOpaque() {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    @Override
     public void renderTransparent() {
         //To change body of implemented methods use File | Settings | File Templates.
     }

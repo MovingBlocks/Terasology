@@ -16,15 +16,11 @@
 
 package org.terasology.asset.sources;
 
-import com.google.common.io.Files;
-import org.terasology.asset.AssetSource;
-import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.logging.Logger;
 
 /**
@@ -54,7 +50,7 @@ public class DirectorySource extends AbstractSource {
     private void scanFiles(File file, String basePath) {
         for (File child : file.listFiles()) {
             if (child.isDirectory()) {
-                this.scanFiles(child, basePath);
+                scanFiles(child, basePath);
             } else if (child.isFile()) {
                 String key = child.getAbsolutePath();
 

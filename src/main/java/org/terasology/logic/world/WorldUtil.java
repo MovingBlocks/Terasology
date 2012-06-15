@@ -44,8 +44,8 @@ public final class WorldUtil {
     public static void deleteWorld(File world) {
         if (world.isDirectory()) {
             String[] children = world.list();
-            for (int i = 0; i < children.length; i++) {
-                File f = new File(world, children[i]);
+            for (String element : children) {
+                File f = new File(world, element);
                 deleteWorld(f);
             }
             world.delete();

@@ -34,8 +34,6 @@ import org.terasology.logic.manager.*;
 import org.terasology.logic.world.*;
 import org.terasology.logic.world.chunkStore.ChunkStoreGZip;
 import org.terasology.logic.world.generator.core.*;
-import org.terasology.logic.world.WorldTimeEvent;
-import org.terasology.logic.world.WorldUtil;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
@@ -107,8 +105,8 @@ public final class WorldRenderer implements IGameObject {
     /* RENDERING */
     private final LinkedList<IGameObject> _renderQueueTransparent = Lists.newLinkedList();
     private final LinkedList<Chunk> _renderQueueChunksOpaque = Lists.newLinkedList();
-    private final PriorityQueue<Chunk> _renderQueueChunksSortedWater = new PriorityQueue<Chunk>(16*16, new ChunkProximityComparator());
-    private final PriorityQueue<Chunk> _renderQueueChunksSortedBillboards = new PriorityQueue<Chunk>(16*16, new ChunkProximityComparator());
+    private final PriorityQueue<Chunk> _renderQueueChunksSortedWater = new PriorityQueue<Chunk>(16 * 16, new ChunkProximityComparator());
+    private final PriorityQueue<Chunk> _renderQueueChunksSortedBillboards = new PriorityQueue<Chunk>(16 * 16, new ChunkProximityComparator());
 
     /* CORE GAME OBJECTS */
     private final PortalManager _portalManager;
@@ -212,8 +210,8 @@ public final class WorldRenderer implements IGameObject {
             // just add all visible chunks
             if (_chunksInProximity.size() == 0 || force || _pendingChunks) {
                 _chunksInProximity.clear();
-                for (int x = -(viewingDistance / 2); x < (viewingDistance / 2); x++) {
-                    for (int z = -(viewingDistance / 2); z < (viewingDistance / 2); z++) {
+                for (int x = -(viewingDistance / 2); x < viewingDistance / 2; x++) {
+                    for (int z = -(viewingDistance / 2); z < viewingDistance / 2; z++) {
                         Chunk c = _chunkProvider.getChunk(newChunkPosX + x, 0, newChunkPosZ + z);
                         if (c != null && c.getChunkState() == Chunk.State.COMPLETE && _worldProvider.getWorldViewAround(c.getPos()) != null) {
                             _chunksInProximity.add(c);
@@ -232,9 +230,9 @@ public final class WorldRenderer implements IGameObject {
 
                 // remove
                 List<Rect2i> removeRects = Rect2i.subtractEqualsSized(oldView, newView);
-                for(Rect2i r : removeRects) {
-                    for(int x = r.minX(); x < r.maxX(); ++x) {
-                        for(int y = r.minY(); y < r.maxY(); ++y) {
+                for (Rect2i r : removeRects) {
+                    for (int x = r.minX(); x < r.maxX(); ++x) {
+                        for (int y = r.minY(); y < r.maxY(); ++y) {
                             Chunk c = _chunkProvider.getChunk(x, 0, y);
                             _chunksInProximity.remove(c);
                         }
@@ -243,9 +241,9 @@ public final class WorldRenderer implements IGameObject {
 
                 // add
                 List<Rect2i> addRects = Rect2i.subtractEqualsSized(newView, oldView);
-                for(Rect2i r : addRects) {
-                    for(int x = r.minX(); x < r.maxX(); ++x) {
-                        for(int y = r.minY(); y < r.maxY(); ++y) {
+                for (Rect2i r : addRects) {
+                    for (int x = r.minX(); x < r.maxX(); ++x) {
+                        for (int y = r.minY(); y < r.maxY(); ++y) {
                             Chunk c = _chunkProvider.getChunk(x, 0, y);
                             if (c != null && c.getChunkState() == Chunk.State.COMPLETE && _worldProvider.getWorldViewAround(c.getPos()) != null) {
                                 _chunksInProximity.add(c);
@@ -298,7 +296,7 @@ public final class WorldRenderer implements IGameObject {
             return result.length();
         }
     }
-    
+
     private Vector3f getPlayerPosition() {
         if (_player != null) {
             return _player.getPosition();
@@ -450,6 +448,7 @@ public final class WorldRenderer implements IGameObject {
     /**
      * Renders the world.
      */
+    @Override
     public void render() {
         /* QUEUE RENDERER */
         queueRenderer();
@@ -467,13 +466,14 @@ public final class WorldRenderer implements IGameObject {
         getActiveCamera().lookThrough();
         if (Config.getInstance().isDebugCollision()) {
             renderDebugCollision();
-        };
+        }
+        ;
 
         glEnable(GL_LIGHT0);
 
         boolean headUnderWater = false;
 
-        headUnderWater = (_cameraMode == CAMERA_MODE.PLAYER && isUnderwater(new Vector3f(getActiveCamera().getPosition())));
+        headUnderWater = _cameraMode == CAMERA_MODE.PLAYER && isUnderwater(new Vector3f(getActiveCamera().getPosition()));
 
         if (_wireframe)
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -493,7 +493,7 @@ public final class WorldRenderer implements IGameObject {
          * FIRST RENDER PASS: OPAQUE ELEMENTS
          */
         while (_renderQueueChunksOpaque.size() > 0)
-           renderChunk(_renderQueueChunksOpaque.poll(), ChunkMesh.RENDER_PHASE.OPAQUE);
+            renderChunk(_renderQueueChunksOpaque.poll(), ChunkMesh.RENDER_PHASE.OPAQUE);
 
         PerformanceMonitor.endActivity();
 
@@ -513,7 +513,7 @@ public final class WorldRenderer implements IGameObject {
         PerformanceMonitor.startActivity("Render Transparent");
 
         while (_renderQueueTransparent.size() > 0)
-               _renderQueueTransparent.poll().render();
+            _renderQueueTransparent.poll().render();
         for (RenderSystem renderer : _systemManager.iterateRenderSubscribers()) {
             renderer.renderTransparent();
         }
@@ -628,6 +628,7 @@ public final class WorldRenderer implements IGameObject {
         return (float) TeraMath.clamp(lightValueSun + lightValueBlock * (1.0 - lightValueSun));
     }
 
+    @Override
     public void update(float delta) {
         PerformanceMonitor.startActivity("Cameras");
         animateSpawnCamera(delta);
@@ -656,7 +657,6 @@ public final class WorldRenderer implements IGameObject {
         }
 
 
-
         // And finally fire any active events
         PerformanceMonitor.startActivity("Fire Events");
         _worldTimeEventManager.fireWorldTimeEvents();
@@ -668,7 +668,7 @@ public final class WorldRenderer implements IGameObject {
         //_worldProvider.getLiquidSimulator().simulate(false);
         PerformanceMonitor.endActivity();
         PerformanceMonitor.startActivity("Growth");
-       // _worldProvider.getGrowthSimulator().simulate(false);
+        // _worldProvider.getGrowthSimulator().simulate(false);
         PerformanceMonitor.endActivity();
 
         PerformanceMonitor.startActivity("Physics Renderer");
@@ -696,7 +696,7 @@ public final class WorldRenderer implements IGameObject {
             }
         }
     }
-    
+
     private boolean isUnderwater(Vector3f pos) {
 
         BlockPosition p = new BlockPosition(pos);
@@ -877,7 +877,7 @@ public final class WorldRenderer implements IGameObject {
         int viewingDistance = Config.getInstance().getActiveViewingDistance();
 
         _chunkProvider.update();
-        for (Vector3i pos : Region3i.createFromCenterExtents(new Vector3i(newChunkPosX, 0, newChunkPosZ), new Vector3i(viewingDistance/2, 0, viewingDistance/2))) {
+        for (Vector3i pos : Region3i.createFromCenterExtents(new Vector3i(newChunkPosX, 0, newChunkPosZ), new Vector3i(viewingDistance / 2, 0, viewingDistance / 2))) {
             Chunk chunk = _chunkProvider.getChunk(pos);
             if (chunk == null || chunk.getChunkState() != Chunk.State.COMPLETE) {
                 complete = false;
@@ -924,6 +924,7 @@ public final class WorldRenderer implements IGameObject {
         final ByteBuffer buffer = BufferUtils.createByteBuffer(width * height * bpp); // hardcoded until i know how to get bpp
         GL11.glReadPixels(0, 0, width, height, (bpp == 3) ? GL11.GL_RGB : GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
         Runnable r = new Runnable() {
+            @Override
             public void run() {
                 Calendar cal = Calendar.getInstance();
                 SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmssSSS");
@@ -933,7 +934,7 @@ public final class WorldRenderer implements IGameObject {
 
                 for (int x = 0; x < width; x++)
                     for (int y = 0; y < height; y++) {
-                        int i = (x + (width * y)) * bpp;
+                        int i = (x + width * y) * bpp;
                         int r = buffer.get(i) & 0xFF;
                         int g = buffer.get(i + 1) & 0xFF;
                         int b = buffer.get(i + 2) & 0xFF;

@@ -16,10 +16,10 @@
 package org.terasology.rendering.gui.components;
 
 import org.lwjgl.opengl.GL11;
-import org.terasology.components.world.BlockItemComponent;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LocalPlayerComponent;
+import org.terasology.components.world.BlockItemComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
@@ -99,6 +99,9 @@ public class UIToolbarCell extends UIDisplayElement {
         _selectionRectangle.renderTransformed();
 
         InventoryComponent inventory = CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(InventoryComponent.class);
+        if (inventory == null) {
+            return;
+        }
         if (inventory.itemSlots.size() <= _id) 
             return;
         

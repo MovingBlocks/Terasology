@@ -1,9 +1,6 @@
 package org.terasology.rendering.gui.framework.style;
 
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.logic.manager.AssetManager;
-import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 import javax.vecmath.Vector2f;

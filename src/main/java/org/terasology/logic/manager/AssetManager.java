@@ -2,24 +2,16 @@ package org.terasology.logic.manager;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Table;
 import org.terasology.asset.*;
 import org.terasology.entitySystem.common.NullIterator;
 import org.terasology.rendering.assets.Texture;
 
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.CodeSource;
 import java.util.*;
-import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 public class AssetManager {
 
@@ -146,14 +138,14 @@ public class AssetManager {
         }
         return Lists.newArrayList();
     }
-    
+
     public InputStream getAssetStream(AssetUri uri) throws IOException {
-        List<URL> assetURLs = this.getAssetURLs(uri);
+        List<URL> assetURLs = getAssetURLs(uri);
 
         if (assetURLs.isEmpty()) {
             return null;
         }
-        
+
         return assetURLs.get(0).openStream();
     }
 
@@ -165,7 +157,7 @@ public class AssetManager {
     public static Iterable<AssetUri> list() {
         return getInstance().listAssets();
     }
-    
+
     public static Iterable<AssetUri> list(AssetType type) {
         return getInstance().listAssets(type);
     }

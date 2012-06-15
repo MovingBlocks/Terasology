@@ -19,7 +19,7 @@ import org.lwjgl.opengl.Display;
 import org.terasology.logic.manager.AssetManager;
 import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UIText;
-import org.terasology.rendering.gui.framework.UIDisplayRenderer;
+import org.terasology.rendering.gui.framework.UIDisplayWindow;
 
 import javax.vecmath.Vector2f;
 
@@ -28,7 +28,7 @@ import javax.vecmath.Vector2f;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class UILoadingScreen extends UIDisplayRenderer {
+public class UILoadingScreen extends UIDisplayWindow {
 
     final UIImageOverlay _overlay;
     final UIText _status;
@@ -44,6 +44,7 @@ public class UILoadingScreen extends UIDisplayRenderer {
         addDisplayElement(_status);
 
         update();
+        setVisible(true);
     }
 
     @Override

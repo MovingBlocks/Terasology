@@ -1,6 +1,7 @@
 package org.terasology.rendering.gui.framework.style;
 
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
+
 import javax.vecmath.Vector2f;
 
 /*

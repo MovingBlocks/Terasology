@@ -1,6 +1,5 @@
 package org.terasology.utilities;
 
-import java.util.Comparator;
 import java.util.List;
 
 // TODO: This class is needs to be refactored, with non-single character variable names

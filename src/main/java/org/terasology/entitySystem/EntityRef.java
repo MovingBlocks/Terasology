@@ -11,20 +11,17 @@ public abstract class EntityRef {
     public static final NullEntityRef NULL = NullEntityRef.getInstance();
 
     /**
-     *
      * @return Does this entity exist - that is, is not deleted.
      */
     public abstract boolean exists();
 
     /**
-     *
      * @param component
      * @return If this entity has the given component
      */
     public abstract boolean hasComponent(Class<? extends Component> component);
 
     /**
-     *
      * @param componentClass
      * @param <T>
      * @return The requested component, or null if the entity doesn't have a component of this class

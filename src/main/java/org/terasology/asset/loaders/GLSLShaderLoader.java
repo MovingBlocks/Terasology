@@ -20,14 +20,10 @@ import com.google.common.io.CharStreams;
 import com.google.gson.*;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetUri;
-import org.terasology.model.shapes.BlockMeshPart;
-import org.terasology.model.shapes.BlockShape;
 import org.terasology.rendering.assets.Shader;
 import org.terasology.rendering.assets.metadata.ParamMetadata;
 import org.terasology.rendering.assets.metadata.ShaderMetadata;
 
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;

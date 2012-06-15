@@ -1,9 +1,11 @@
 package org.terasology.entityFactory;
 
-import org.terasology.components.world.BlockItemComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LightComponent;
-import org.terasology.entitySystem.*;
+import org.terasology.components.world.BlockItemComponent;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.PrefabManager;
 import org.terasology.model.blocks.BlockFamily;
 
 /**
@@ -42,7 +44,7 @@ public class BlockItemFactory {
             item.stackId = blockFamily.getTitle() + "Block";
             item.stackCount = (byte)quantity;
         }
-        item.usage = ItemComponent.UsageType.OnBlock;
+        item.usage = ItemComponent.UsageType.ON_BLOCK;
         entity.addComponent(item);
 
         BlockItemComponent blockItem = new BlockItemComponent(blockFamily);

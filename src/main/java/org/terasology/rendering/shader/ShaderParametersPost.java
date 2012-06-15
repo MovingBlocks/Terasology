@@ -23,13 +23,14 @@ import org.terasology.logic.manager.AssetManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PostProcessingRenderer;
 import org.terasology.logic.world.WorldProvider;
-import org.terasology.rendering.assets.Texture;
 import org.terasology.model.blocks.Block;
+import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.world.WorldRenderer;
 
-import static org.lwjgl.opengl.GL11.glBindTexture;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
+
+import static org.lwjgl.opengl.GL11.glBindTexture;
 
 /**
  * Shader parameters for the Post-processing shader program.
@@ -40,6 +41,7 @@ public class ShaderParametersPost implements IShaderParameters {
 
     Texture texture = AssetManager.loadTexture("engine:vignette");
 
+    @Override
     public void applyParameters(ShaderProgram program) {
         PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("scene");
 

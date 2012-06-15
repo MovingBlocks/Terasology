@@ -5,6 +5,7 @@ import org.lwjgl.opengl.Display;
 import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
+
 import javax.vecmath.Vector2f;
 
 

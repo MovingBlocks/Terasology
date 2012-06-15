@@ -3,7 +3,6 @@ package org.terasology.entitySystem.persistence;
 import com.google.protobuf.TextFormat;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.PersistableEntityManager;
-import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.protobuf.EntityData;
 
 import java.io.*;

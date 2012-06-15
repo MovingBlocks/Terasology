@@ -15,8 +15,6 @@
  */
 package org.terasology.rendering.primitives;
 
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.logic.manager.AssetManager;
 import org.terasology.rendering.assets.Texture;
 

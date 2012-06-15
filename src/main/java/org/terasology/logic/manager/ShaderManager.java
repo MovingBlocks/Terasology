@@ -20,7 +20,6 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
-import org.terasology.game.Terasology;
 import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.shader.*;

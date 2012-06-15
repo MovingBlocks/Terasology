@@ -35,7 +35,7 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer{
     }
 
     public void clearInputControls(){
-        for (UIDisplayElement element: _displayElements) {
+        for (UIDisplayElement element: getDisplayElements()) {
             if(IInputDataElement.class.isInstance(element)){
                 IInputDataElement inputControl = (IInputDataElement)element;
                 inputControl.clearData();
@@ -63,7 +63,7 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer{
         glPopMatrix();
     }
 
-    public void maximaze(){
+    public void maximize(){
         setSize(new Vector2f(Display.getWidth(), Display.getHeight()));
         _maximized = true;
     }
@@ -81,7 +81,7 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer{
     }
 
     public void addDisplayElement(UIDisplayElement element, String elementId) {
-        _displayElements.add(element);
+        addDisplayElement(element);
         _displayElementsById.put(elementId, element);
         element.setParent(this);
     }

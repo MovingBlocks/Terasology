@@ -19,7 +19,7 @@ import org.terasology.logic.manager.AssetManager;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UIText;
-import org.terasology.rendering.gui.framework.*;
+import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 import javax.vecmath.Vector2f;
@@ -42,7 +42,7 @@ public class UIMainMenu extends UIDisplayWindow {
     final UIText _version;
                                                                   
     public UIMainMenu() {
-        maximaze();
+        maximize();
         _title = new UIGraphicsElement(AssetManager.loadTexture("engine:terasology"));
         _title.setVisible(true);
         _title.setSize(new Vector2f(512f, 128f));
@@ -72,6 +72,7 @@ public class UIMainMenu extends UIDisplayWindow {
         addDisplayElement(_configButton, "configButton");
         addDisplayElement(_exitButton,   "exitButton");
         addDisplayElement(_singlePlayerButton, "singlePlayerButton");
+        setModal(true);
 
         update();
     }

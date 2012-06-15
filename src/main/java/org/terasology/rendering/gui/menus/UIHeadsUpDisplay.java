@@ -15,15 +15,19 @@
  */
 package org.terasology.rendering.gui.menus;
 
-import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
+import org.terasology.entitySystem.*;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
+import org.terasology.mods.miniions.components.MinionComponent;
+import org.terasology.mods.miniions.events.MinionMessageEvent;
+import org.terasology.mods.miniions.rendering.gui.components.UIMessageQueue;
+import org.terasology.mods.miniions.rendering.gui.components.UIMinionbar;
 import org.terasology.rendering.gui.components.*;
-import org.terasology.rendering.gui.framework.UIDisplayRenderer;
+import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -34,7 +38,9 @@ import javax.vecmath.Vector2f;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class UIHeadsUpDisplay extends UIDisplayRenderer {
+public class UIHeadsUpDisplay extends UIDisplayWindow implements EventHandlerSystem {
+
+    protected EntityManager entityManager;
 
     /* DISPLAY ELEMENTS */
     private final UICrosshair _crosshair;
@@ -42,11 +48,10 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
     private final UIText _debugLine2;
     private final UIText _debugLine3;
     private final UIText _debugLine4;
-    private final UIDebugConsole _console;
 
     private final UIToolbar _toolbar;
     private final UIMinionbar _minionbar;
-    //private final UIMinion _miniongui;
+    private final UIMessageQueue _messagequeue;
     private final UIHealthBar _healthBar;
     private final UIBuff _buffBar;
 
@@ -68,9 +73,6 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
         addDisplayElement(_debugLine3);
         addDisplayElement(_debugLine4);
 
-        _console = new UIDebugConsole();
-        addDisplayElement(_console);
-
         _toolbar = new UIToolbar();
         _toolbar.setVisible(true);
         addDisplayElement(_toolbar);
@@ -78,10 +80,10 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
         _minionbar = new UIMinionbar();
         _minionbar.setVisible(true);
         addDisplayElement(_minionbar);
-        /*
-        _miniongui = new UIMinion();
-        _miniongui.setVisible(true);
-        addDisplayElement(_miniongui);*/
+
+        _messagequeue = new UIMessageQueue();
+        _messagequeue.setVisible(true);
+        addDisplayElement(_messagequeue);
 
         _healthBar = new UIHealthBar();
         _healthBar.setVisible(true);
@@ -90,7 +92,9 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
         _buffBar = new UIBuff();
         _buffBar.setVisible(true);
         addDisplayElement(_buffBar);
+        setVisible(true);
 
+        CoreRegistry.get(EventSystem.class).registerEventHandler(this);
     }
 
 
@@ -103,7 +107,6 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
 
     public void update() {
         super.update();
-        setOverlay(!_console.isVisible());
 
         _healthBar.setPosition(new Vector2f(_toolbar.getPosition().x, _toolbar.getPosition().y - _toolbar.getSize().y + 8f));
         _crosshair.setPosition(new Vector2f(Display.getWidth() / 2, Display.getHeight() / 2));
@@ -125,18 +128,16 @@ public class UIHeadsUpDisplay extends UIDisplayRenderer {
     }
 
     @Override
-    public void processKeyboardInput(int key) {
-        super.processKeyboardInput(key);
-
-        if (!isVisible())
-            return;
-
-        if (key == Keyboard.KEY_TAB) {
-            _console.setVisible(!_console.isVisible());
-        }
+    public void initialise() {
+        entityManager = CoreRegistry.get(EntityManager.class);
     }
 
-    public UIDebugConsole getDebugConsole() {
-        return _console;
+    @Override
+    public void shutdown() {
+    }
+
+    @ReceiveEvent(components = {MinionComponent.class})
+    public void onMessageReceived(MinionMessageEvent event, EntityRef entityref) {
+        _messagequeue.addIconToQueue(event.getMinionMessage());
     }
 }

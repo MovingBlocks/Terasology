@@ -22,8 +22,8 @@ import org.terasology.audio.OpenALManager;
 import org.terasology.audio.Sound;
 import org.terasology.audio.SoundPool;
 import org.terasology.audio.SoundSource;
-import org.terasology.components.world.BlockComponent;
 import org.terasology.components.CharacterMovementComponent;
+import org.terasology.components.world.BlockComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 
@@ -63,8 +63,9 @@ public abstract class AudioManager implements SoundManager {
      * @param pool Sound pool name
      * @return Sound pool object
      */
+    @Override
     public SoundPool getSoundPool(String pool) {
-        SoundPool soundPool = this._pools.get(pool);
+        SoundPool soundPool = _pools.get(pool);
 
         if (soundPool == null) {
             throw new IllegalArgumentException("Unknown pool '" + pool + "', typo? Available pools: " + _pools.keySet());
@@ -73,10 +74,12 @@ public abstract class AudioManager implements SoundManager {
         return soundPool;
     }
 
+    @Override
     public SoundSource getSoundSource(String pool, Sound sound, int priority) {
         return getSoundPool(pool).getSource(sound, priority);
     }
 
+    @Override
     public SoundSource getSoundSource(String pool, AssetUri soundUri, int priority) {
         Sound sound = (Sound)AssetManager.load(soundUri);
         if (sound != null) {
@@ -88,6 +91,7 @@ public abstract class AudioManager implements SoundManager {
     /**
      * Stops all playback.
      */
+    @Override
     public void stopAllSounds() {
         for (SoundPool pool : _pools.values()) {
             pool.stopAll();

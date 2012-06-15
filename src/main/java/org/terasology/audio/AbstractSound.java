@@ -2,11 +2,6 @@ package org.terasology.audio;
 
 import org.terasology.asset.AssetUri;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.URL;
-
 import static org.lwjgl.openal.AL10.*;
 
 public abstract class AbstractSound implements Sound {
@@ -27,6 +22,7 @@ public abstract class AbstractSound implements Sound {
         bufferAmount++;
     }
 
+    @Override
     public int getLength() {
         if (length == 0 && bufferId != 0) { // only if buffer is already initialized
             int bits = getBufferBits();
@@ -34,16 +30,18 @@ public abstract class AbstractSound implements Sound {
             int channels = getChannels();
             int frequency = getSamplingRate();
 
-            length = (size / channels / (bits / 8)) / frequency;
+            length = size / channels / (bits / 8) / frequency;
         }
 
         return length;
     }
 
+    @Override
     public int getChannels() {
         return alGetBufferi(bufferId, AL_CHANNELS);
     }
 
+    @Override
     public int getSamplingRate() {
         return alGetBufferi(bufferId, AL_FREQUENCY);
     }
@@ -67,6 +65,7 @@ public abstract class AbstractSound implements Sound {
         return uri;
     }
 
+    @Override
     public void reset() {
     }
 

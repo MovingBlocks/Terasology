@@ -7,6 +7,13 @@ package org.terasology.entitySystem;
 public interface EventSystem {
 
     /**
+     * Registers an event
+     * @param id
+     * @param eventType
+     */
+    void registerEvent(String id, Class<? extends Event> eventType);
+
+    /**
      * Registers an object as an event handler - all methods with the {@link ReceiveEvent} annotation will be registered
      * @param handler
      */

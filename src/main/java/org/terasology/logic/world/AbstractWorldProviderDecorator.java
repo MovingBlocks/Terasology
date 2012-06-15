@@ -16,11 +16,8 @@
 
 package org.terasology.logic.world;
 
-import org.terasology.events.BlockChangedEvent;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
-
-import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius

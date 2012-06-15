@@ -18,10 +18,9 @@ package org.terasology.rendering.gui.menus;
 import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.procedure.TObjectDoubleProcedure;
 import gnu.trove.procedure.TObjectIntProcedure;
-import org.lwjgl.input.Keyboard;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.gui.components.UIText;
-import org.terasology.rendering.gui.framework.UIDisplayRenderer;
+import org.terasology.rendering.gui.framework.UIDisplayWindow;
 
 import javax.vecmath.Vector2f;
 import java.util.ArrayList;
@@ -34,7 +33,7 @@ import java.util.TreeSet;
  *
  * @author Immortius <immortius@gmail.com>
  */
-public class UIMetrics extends UIDisplayRenderer {
+public class UIMetrics extends UIDisplayWindow {
 
     private static final int METRIC_LINES = 10;
 
@@ -59,6 +58,8 @@ public class UIMetrics extends UIDisplayRenderer {
         }
 
         update();
+        setVisible(true);
+        setModal(false);
     }
 
 
@@ -79,18 +80,9 @@ public class UIMetrics extends UIDisplayRenderer {
         _currentMode.updateLines(_metricLines);
     }
 
-    @Override
-    public void processKeyboardInput(int key) {
-        super.processKeyboardInput(key);
-
-        if (!isVisible())
-            return;
-
-        if (key == Keyboard.KEY_F4) {
-            _currentMode = Mode.nextMode(_currentMode);
-        }
+    public void toggleMode() {
+        _currentMode = Mode.nextMode(_currentMode);
         PerformanceMonitor.setEnabled(_currentMode != Mode.Off);
-
     }
 
     private enum Mode {

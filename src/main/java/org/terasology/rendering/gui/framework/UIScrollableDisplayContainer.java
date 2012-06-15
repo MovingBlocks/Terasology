@@ -6,12 +6,6 @@ import org.terasology.rendering.gui.components.UIScrollBar;
 
 import javax.vecmath.Vector2f;
 
-import java.util.ArrayList;
-
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glTranslatef;
-
 
 public class UIScrollableDisplayContainer extends UIDisplayContainer{
 

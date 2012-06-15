@@ -2775,11 +2775,11 @@ public final class Configuration {
       public interface CloudResOrBuilder
           extends com.google.protobuf.MessageOrBuilder {
         
-        // optional float x = 1 [default = 128];
+        // optional float x = 1 [default = 512];
         boolean hasX();
         float getX();
         
-        // optional float y = 2 [default = 128];
+        // optional float y = 2 [default = 512];
         boolean hasY();
         float getY();
       }
@@ -2812,7 +2812,7 @@ public final class Configuration {
         }
         
         private int bitField0_;
-        // optional float x = 1 [default = 128];
+        // optional float x = 1 [default = 512];
         public static final int X_FIELD_NUMBER = 1;
         private float x_;
         public boolean hasX() {
@@ -2822,7 +2822,7 @@ public final class Configuration {
           return x_;
         }
         
-        // optional float y = 2 [default = 128];
+        // optional float y = 2 [default = 512];
         public static final int Y_FIELD_NUMBER = 2;
         private float y_;
         public boolean hasY() {
@@ -2833,8 +2833,8 @@ public final class Configuration {
         }
         
         private void initFields() {
-          x_ = 128F;
-          y_ = 128F;
+          x_ = 512F;
+          y_ = 512F;
         }
         private byte memoizedIsInitialized = -1;
         public final boolean isInitialized() {
@@ -2995,9 +2995,9 @@ public final class Configuration {
           
           public Builder clear() {
             super.clear();
-            x_ = 128F;
+            x_ = 512F;
             bitField0_ = (bitField0_ & ~0x00000001);
-            y_ = 128F;
+            y_ = 512F;
             bitField0_ = (bitField0_ & ~0x00000002);
             return this;
           }
@@ -3114,8 +3114,8 @@ public final class Configuration {
           
           private int bitField0_;
           
-          // optional float x = 1 [default = 128];
-          private float x_ = 128F;
+          // optional float x = 1 [default = 512];
+          private float x_ = 512F;
           public boolean hasX() {
             return ((bitField0_ & 0x00000001) == 0x00000001);
           }
@@ -3130,13 +3130,13 @@ public final class Configuration {
           }
           public Builder clearX() {
             bitField0_ = (bitField0_ & ~0x00000001);
-            x_ = 128F;
+            x_ = 512F;
             onChanged();
             return this;
           }
           
-          // optional float y = 2 [default = 128];
-          private float y_ = 128F;
+          // optional float y = 2 [default = 512];
+          private float y_ = 512F;
           public boolean hasY() {
             return ((bitField0_ & 0x00000002) == 0x00000002);
           }
@@ -3151,7 +3151,7 @@ public final class Configuration {
           }
           public Builder clearY() {
             bitField0_ = (bitField0_ & ~0x00000002);
-            y_ = 128F;
+            y_ = 512F;
             onChanged();
             return this;
           }
@@ -6043,8 +6043,8 @@ public final class Configuration {
       "_post_processing_effects\030\022 \001(\010:\005false\022\'\n" +
       "\030animated_water_and_grass\030\023 \001(\010:\005false\022\'" +
       "\n\034vertical_chunk_mesh_segments\030\024 \001(\005:\0011\032" +
-      "*\n\010CloudRes\022\016\n\001x\030\001 \001(\002:\003128\022\016\n\001y\030\002 \001(\002:\003" +
-      "128\0327\n\013DisplayMode\022\023\n\005width\030\001 \001(\005:\0041280\022" +
+      "*\n\010CloudRes\022\016\n\001x\030\001 \001(\002:\003512\022\016\n\001y\030\002 \001(\002:\003" +
+      "512\0327\n\013DisplayMode\022\023\n\005width\030\001 \001(\005:\0041280\022" +
       "\023\n\006height\030\002 \001(\005:\003720B*\n\027org.terasology.p" +
       "rotobufB\rConfigurationH\001"
     };

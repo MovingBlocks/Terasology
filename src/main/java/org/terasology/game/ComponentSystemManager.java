@@ -3,11 +3,6 @@ package org.terasology.game;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.scanners.TypeAnnotationsScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
-import org.reflections.util.FilterBuilder;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.entitySystem.ComponentSystem;
@@ -40,7 +35,11 @@ public class ComponentSystemManager {
 
     // TODO: Mod support
     public void loadEngineSystems() {
-        Reflections reflections = new Reflections("org.terasology.componentSystem");
+        loadSystems("engine", "org.terasology.componentSystem");
+    }
+
+    public void loadSystems(String packageName, String rootPackagePath) {
+        Reflections reflections = new Reflections(rootPackagePath);
         Set<Class<?>> systems = reflections.getTypesAnnotatedWith(RegisterComponentSystem.class);
         for (Class<?> system : systems) {
             if (!ComponentSystem.class.isAssignableFrom(system)) {
@@ -50,16 +49,18 @@ public class ComponentSystemManager {
 
             RegisterComponentSystem registerInfo = system.getAnnotation(RegisterComponentSystem.class);
             // TODO: filter registrations
+            String id = packageName + ":" + system.getSimpleName();
             try {
                 ComponentSystem newSystem = (ComponentSystem)system.newInstance();
-                register(newSystem, "engine:" + system.getSimpleName());
-                logger.log(Level.INFO, "Loaded engine:" + system.getSimpleName());
+                register(newSystem, id);
+                logger.log(Level.INFO, "Loaded " + id);
             } catch (InstantiationException e) {
-                logger.log(Level.SEVERE, "Failed to load system engine:" + system.getSimpleName(), e);
+                logger.log(Level.SEVERE, "Failed to load system " + id, e);
             } catch (IllegalAccessException e) {
-                logger.log(Level.SEVERE, "Failed to load system engine:" + system.getSimpleName(), e);
+                logger.log(Level.SEVERE, "Failed to load system " + id, e);
             }
         }
+
     }
 
     public <T extends ComponentSystem> void register(ComponentSystem object, String name) {

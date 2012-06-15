@@ -19,10 +19,7 @@ package org.terasology.game.bootstrap;
 import org.reflections.Reflections;
 import org.terasology.asset.AssetType;
 import org.terasology.audio.Sound;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.PersistableEntityManager;
-import org.terasology.entitySystem.PrefabManager;
+import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentLibraryImpl;
 import org.terasology.entitySystem.metadata.extension.*;
@@ -57,6 +54,7 @@ public class EntitySystemBuilder {
         PersistableEntityManager entityManager = new PojoEntityManager(library, prefabManager);
         entityManager.setEventSystem(new PojoEventSystem(entityManager));
         CoreRegistry.put(EntityManager.class, entityManager);
+        CoreRegistry.put(EventSystem.class, entityManager.getEventSystem());
 
         registerComponents(library);
         return entityManager;
@@ -75,7 +73,7 @@ public class EntitySystemBuilder {
     }
 
     private void registerComponents(ComponentLibrary library) {
-        Reflections reflections = new Reflections("org.terasology.components");
+        Reflections reflections = new Reflections("org.terasology");
         Set<Class<? extends Component>> componentTypes = reflections.getSubTypesOf(Component.class);
         for (Class<? extends Component> componentType : componentTypes) {
             library.registerComponentClass(componentType);

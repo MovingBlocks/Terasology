@@ -91,6 +91,16 @@ public abstract class UIDisplayElement {
         }
     }
 
+    /**
+     *
+     * @param id
+     * @param pressed
+     * @return Whether the bind was consumed
+     */
+    public boolean processBindButton(String id, boolean pressed) {
+        return false;
+    }
+
     public boolean isFocused(){
         return _focused;
     }

@@ -15,7 +15,6 @@
  */
 package org.terasology.game.modes;
 
-import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetType;
@@ -27,19 +26,24 @@ import org.terasology.components.world.LocationComponent;
 import org.terasology.entityFactory.PlayerFactory;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventSystem;
 import org.terasology.entitySystem.PersistableEntityManager;
 import org.terasology.entitySystem.persistence.EntityDataJSONFormat;
 import org.terasology.entitySystem.persistence.EntityPersisterHelper;
 import org.terasology.entitySystem.persistence.EntityPersisterHelperImpl;
 import org.terasology.entitySystem.persistence.WorldPersister;
+import org.terasology.events.input.*;
+import org.terasology.events.input.binds.InventoryButton;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.Timer;
 import org.terasology.game.bootstrap.EntitySystemBuilder;
+import org.terasology.input.BindButtonEvent;
+import org.terasology.input.CameraTargetSystem;
+import org.terasology.input.InputSystem;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AssetManager;
-import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.mod.Mod;
@@ -51,15 +55,14 @@ import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.protobuf.EntityData;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.menus.*;
+import org.terasology.rendering.gui.menus.UILoadingScreen;
+import org.terasology.rendering.gui.menus.UIStatusScreen;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.Vector3f;
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -83,23 +86,16 @@ public class StateSinglePlayer implements GameState {
 
     private PersistableEntityManager entityManager;
 
-    /* GUI */
-    private ArrayList<UIDisplayElement> _guiScreens = new ArrayList<UIDisplayElement>();
-    private UIHeadsUpDisplay _hud;
-    private UIMetrics _metrics;
-    private UIPauseMenu _pauseMenu;
-    private UILoadingScreen _loadingScreen;
-    private UIStatusScreen _statusScreen;
-    private UIInventoryScreen _inventoryScreen;
-
     /* RENDERING */
-    private WorldRenderer _worldRenderer;
+    private WorldRenderer worldRenderer;
 
     private ComponentSystemManager componentSystemManager;
     private LocalPlayerSystem localPlayerSys;
+    private CameraTargetSystem cameraTargetSystem;
+    private InputSystem inputSystem;
 
     /* GAME LOOP */
-    private boolean _pauseGame = false;
+    private boolean pauseGame = false;
 
     public StateSinglePlayer(String worldName) {
         this(worldName, null);
@@ -125,29 +121,37 @@ public class StateSinglePlayer implements GameState {
         CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);
         localPlayerSys = new LocalPlayerSystem();
         componentSystemManager.register(localPlayerSys, "engine:LocalPlayerSystem");
+        cameraTargetSystem = new CameraTargetSystem();
+        CoreRegistry.put(CameraTargetSystem.class, cameraTargetSystem);
+        componentSystemManager.register(cameraTargetSystem, "engine:CameraTargetSystem");
+        inputSystem = new InputSystem();
+        CoreRegistry.put(InputSystem.class, inputSystem);
+        componentSystemManager.register(inputSystem, "engine:InputSystem");
 
         componentSystemManager.loadEngineSystems();
+        componentSystemManager.loadSystems("miniions", "org.terasology.mods.miniions");
 
         CoreRegistry.put(WorldPersister.class, new WorldPersister(entityManager));
+
+        // TODO: Use reflection pending mod support
+        EventSystem eventSystem = entityManager.getEventSystem();
+        eventSystem.registerEvent("engine:inputEvent", InputEvent.class);
+        eventSystem.registerEvent("engine:keyDownEvent", KeyDownEvent.class);
+        eventSystem.registerEvent("engine:keyEvent", KeyEvent.class);
+        eventSystem.registerEvent("engine:keyUpEvent", KeyUpEvent.class);
+        eventSystem.registerEvent("engine:keyRepeatEvent", KeyRepeatEvent.class);
+        eventSystem.registerEvent("engine:leftMouseDownButtonEvent", LeftMouseDownButtonEvent.class);
+        eventSystem.registerEvent("engine:leftMouseUpButtonEvent", LeftMouseUpButtonEvent.class);
+        eventSystem.registerEvent("engine:mouseDownButtonEvent", MouseDownButtonEvent.class);
+        eventSystem.registerEvent("engine:mouseUpButtonEvent", MouseUpButtonEvent.class);
+        eventSystem.registerEvent("engine:mouseButtonEvent", MouseButtonEvent.class);
+        eventSystem.registerEvent("engine:mouseWheelEvent", MouseWheelEvent.class);
+        eventSystem.registerEvent("engine:rightMouseDownButtonEvent", RightMouseDownButtonEvent.class);
+        eventSystem.registerEvent("engine:rightMouseUpButtonEvent", RightMouseUpButtonEvent.class);
+        eventSystem.registerEvent("engine:bindButtonEvent", BindButtonEvent.class);
+        eventSystem.registerEvent("engine:inventoryButtonEvent", InventoryButton.class);
+
         loadPrefabs();
-
-        _hud = new UIHeadsUpDisplay();
-        _hud.setVisible(true);
-
-        _pauseMenu = new UIPauseMenu();
-        _loadingScreen = new UILoadingScreen();
-        _statusScreen = new UIStatusScreen();
-        _inventoryScreen = new UIInventoryScreen();
-        _metrics = new UIMetrics();
-
-        _metrics.setVisible(true);
-
-        _guiScreens.add(_metrics);
-        _guiScreens.add(_hud);
-        _guiScreens.add(_pauseMenu);
-        _guiScreens.add(_loadingScreen);
-        _guiScreens.add(_inventoryScreen);
-        _guiScreens.add(_statusScreen);
     }
 
     private void loadPrefabs() {
@@ -188,6 +192,7 @@ public class StateSinglePlayer implements GameState {
         for (ComponentSystem system : componentSystemManager.iterateAll()) {
             system.shutdown();
         }
+        GUIManager.getInstance().closeWindows();
         try {
             CoreRegistry.get(WorldPersister.class).save(new File(PathManager.getInstance().getWorldSavePath(CoreRegistry.get(WorldProvider.class).getTitle()), ENTITY_DATA_FILE), WorldPersister.SaveFormat.Binary);
         } catch (IOException e) {
@@ -198,16 +203,10 @@ public class StateSinglePlayer implements GameState {
     }
 
     @Override
-    public void handleInput(float delta) {
-        processKeyboardInput();
-        processMouseInput();
-    }
-
-    @Override
     public void dispose() {
-        if (_worldRenderer != null) {
-            _worldRenderer.dispose();
-            _worldRenderer = null;
+        if (worldRenderer != null) {
+            worldRenderer.dispose();
+            worldRenderer = null;
         }
     }
 
@@ -221,36 +220,45 @@ public class StateSinglePlayer implements GameState {
             updater.update(delta);
         }
 
-        if (_worldRenderer != null && shouldUpdateWorld())
-            _worldRenderer.update(delta);
+        if (worldRenderer != null && shouldUpdateWorld()) {
+            worldRenderer.update(delta);
+        }
 
-        if (!screenHasFocus())
-            localPlayerSys.updateInput();
-
-            if (screenHasFocus() || !shouldUpdateWorld()) {
-                if (Mouse.isGrabbed()) {
-                    Mouse.setGrabbed(false);
-                    Mouse.setCursorPosition(Display.getWidth() / 2, Display.getHeight() / 2);
-                }
-            } else {
-                if (!Mouse.isGrabbed())
-                    Mouse.setGrabbed(true);
-            }
-
-        // TODO: This seems a little off - plus is more of a UI than single player game state concern. Move somewhere
-        // more appropriate?
+        /* TODO: This seems a little off - plus is more of a UI than single player game state concern. Move somewhere
+           more appropriate? Possibly HUD? */
         boolean dead = true;
         for (EntityRef entity : entityManager.iteratorEntities(LocalPlayerComponent.class))
         {
             dead = entity.getComponent(LocalPlayerComponent.class).isDead;
         }
         if (dead) {
-            _statusScreen.setVisible(true);
-            _statusScreen.updateStatus("Sorry! Seems like you have died. :-(");
+            if (GUIManager.getInstance().getWindowById("engine:statusScreen") == null) {
+                UIStatusScreen statusScreen = GUIManager.getInstance().addWindow(new UIStatusScreen(), "engine:statusScreen");
+                statusScreen.updateStatus("Sorry! Seems like you have died :-(");
+                statusScreen.setVisible(true);
+            }
         } else {
-            _statusScreen.setVisible(false);
+            GUIManager.getInstance().removeWindow("engine:statusScreen");
         }
     }
+
+    @Override
+    public void handleInput(float delta) {
+        cameraTargetSystem.update();
+        inputSystem.update(delta);
+
+        // TODO: This should be handled outside of the state, need to fix the screens handling
+            if (screenHasFocus() || !shouldUpdateWorld()) {
+                if (Mouse.isGrabbed()) {
+                    Mouse.setGrabbed(false);
+                    Mouse.setCursorPosition(Display.getWidth() / 2, Display.getHeight() / 2);
+                }
+            } else {
+            if (!Mouse.isGrabbed()) {
+                    Mouse.setGrabbed(true);
+            }
+        }
+        }
 
     public void initWorld(String title) {
         initWorld(title, null);
@@ -263,9 +271,9 @@ public class StateSinglePlayer implements GameState {
         final FastRandom random = new FastRandom();
 
         // Get rid of the old world
-        if (_worldRenderer != null) {
-            _worldRenderer.dispose();
-            _worldRenderer = null;
+        if (worldRenderer != null) {
+            worldRenderer.dispose();
+            worldRenderer = null;
         }
 
         if (seed == null) {
@@ -277,8 +285,8 @@ public class StateSinglePlayer implements GameState {
         logger.log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
 
         // Init. a new world
-        _worldRenderer = new WorldRenderer(title, seed, entityManager, localPlayerSys);
-        CoreRegistry.put(WorldRenderer.class, _worldRenderer);
+        worldRenderer = new WorldRenderer(title, seed, entityManager, localPlayerSys);
+        CoreRegistry.put(WorldRenderer.class, worldRenderer);
 
         File entityDataFile = new File(PathManager.getInstance().getWorldSavePath(title), ENTITY_DATA_FILE);
         entityManager.clear();
@@ -290,11 +298,11 @@ public class StateSinglePlayer implements GameState {
             }
         }
 
-        CoreRegistry.put(WorldRenderer.class, _worldRenderer);
-        CoreRegistry.put(WorldProvider.class, _worldRenderer.getWorldProvider());
+        CoreRegistry.put(WorldRenderer.class, worldRenderer);
+        CoreRegistry.put(WorldProvider.class, worldRenderer.getWorldProvider());
         CoreRegistry.put(LocalPlayer.class, new LocalPlayer(EntityRef.NULL));
-        CoreRegistry.put(Camera.class, _worldRenderer.getActiveCamera());
-        CoreRegistry.put(BulletPhysicsRenderer.class, _worldRenderer.getBulletRenderer());
+        CoreRegistry.put(Camera.class, worldRenderer.getActiveCamera());
+        CoreRegistry.put(BulletPhysicsRenderer.class, worldRenderer.getBulletRenderer());
 
         for (ComponentSystem system : componentSystemManager.iterateAll()) {
             system.initialise();
@@ -329,23 +337,16 @@ public class StateSinglePlayer implements GameState {
 
 
     private boolean screenHasFocus() {
-        for (UIDisplayElement screen : _guiScreens) {
-            if (screen.isVisible() && !screen.isOverlay()) {
-                return true;
+        return GUIManager.getInstance().getFocusedWindow() != null && GUIManager.getInstance().getFocusedWindow().isModal() && GUIManager.getInstance().getFocusedWindow().isVisible();
             }
-        }
-        return GUIManager.getInstance().getFocusedWindow() != null;
-    }
 
     private boolean shouldUpdateWorld() {
-        return !_pauseGame && !_pauseMenu.isVisible();
+        return !pauseGame;
     }
 
     // TODO: Maybe should have its own state?
     private void prepareWorld() {
-        _loadingScreen.setVisible(true);
-        _hud.setVisible(false);
-        _metrics.setVisible(false);
+        UILoadingScreen loadingScreen = GUIManager.getInstance().addWindow(new UILoadingScreen(), "engine:loadingScreen");
         Display.update();
 
         int chunksGenerated = 0;
@@ -356,15 +357,15 @@ public class StateSinglePlayer implements GameState {
         Iterator<EntityRef> iterator = entityManager.iteratorEntities(LocalPlayerComponent.class).iterator();
         if (iterator.hasNext()) {
             CoreRegistry.get(LocalPlayer.class).setEntity(iterator.next());
-            _worldRenderer.setPlayer(CoreRegistry.get(LocalPlayer.class));
+            worldRenderer.setPlayer(CoreRegistry.get(LocalPlayer.class));
         } else {
             // Load spawn zone so player spawn location can be determined
             EntityRef spawnZoneEntity = entityManager.create();
             spawnZoneEntity.addComponent(new LocationComponent(new Vector3f(Chunk.SIZE_X / 2, Chunk.SIZE_Y / 2, Chunk.SIZE_Z / 2)));
-            _worldRenderer.getChunkProvider().addRegionEntity(spawnZoneEntity, 1);
+            worldRenderer.getChunkProvider().addRegionEntity(spawnZoneEntity, 1);
 
-            while (!_worldRenderer.getWorldProvider().isBlockActive(new Vector3i(Chunk.SIZE_X / 2, Chunk.SIZE_Y / 2, Chunk.SIZE_Z / 2))) {
-                _loadingScreen.updateStatus(String.format("Loading spawn area... %.2f%%! :-)", (timer.getTimeInMs() - startTime) / 50.0f));
+            while (!worldRenderer.getWorldProvider().isBlockActive(new Vector3i(Chunk.SIZE_X / 2, Chunk.SIZE_Y / 2, Chunk.SIZE_Z / 2))) {
+                loadingScreen.updateStatus(String.format("Loading spawn area... %.2f%%! :-)", (timer.getTimeInMs() - startTime) / 50.0f));
 
                 renderUserInterface();
                 updateUserInterface();
@@ -372,40 +373,39 @@ public class StateSinglePlayer implements GameState {
             }
 
             Vector3i spawnPoint = new Vector3i(Chunk.SIZE_X / 2, Chunk.SIZE_Y, Chunk.SIZE_Z / 2);
-            while (_worldRenderer.getWorldProvider().getBlock(spawnPoint) == BlockManager.getInstance().getAir() && spawnPoint.y > 0) {
+            while (worldRenderer.getWorldProvider().getBlock(spawnPoint) == BlockManager.getInstance().getAir() && spawnPoint.y > 0) {
                 spawnPoint.y--;
             }
 
             PlayerFactory playerFactory = new PlayerFactory(entityManager);
             CoreRegistry.get(LocalPlayer.class).setEntity(playerFactory.newInstance(new Vector3f(spawnPoint.x + 0.5f, spawnPoint.y + 2.0f, spawnPoint.z + 0.5f)));
-            _worldRenderer.setPlayer(CoreRegistry.get(LocalPlayer.class));
-            _worldRenderer.getChunkProvider().removeRegionEntity(spawnZoneEntity);
+            worldRenderer.setPlayer(CoreRegistry.get(LocalPlayer.class));
+            worldRenderer.getChunkProvider().removeRegionEntity(spawnZoneEntity);
             spawnZoneEntity.destroy();
         }
 
         while (!getWorldRenderer().pregenerateChunks() && timer.getTimeInMs() - startTime < 5000) {
             chunksGenerated++;
 
-            _loadingScreen.updateStatus(String.format("Fast forwarding world... %.2f%%! :-)", (timer.getTimeInMs() - startTime) / 50.0f));
+            loadingScreen.updateStatus(String.format("Fast forwarding world... %.2f%%! :-)", (timer.getTimeInMs() - startTime) / 50.0f));
 
             renderUserInterface();
             updateUserInterface();
             Display.update();
         }
 
+        GUIManager.getInstance().removeWindow(loadingScreen);
+
         // Create the first Portal if it doesn't exist yet
-        _worldRenderer.initPortal();
-        _loadingScreen.setVisible(false);
-        _hud.setVisible(true);
-        _metrics.setVisible(true);
+        worldRenderer.initPortal();
     }
 
     public void render() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glLoadIdentity();
 
-        if (_worldRenderer != null) {
-            _worldRenderer.render();
+        if (worldRenderer != null) {
+            worldRenderer.render();
         }
 
         /* UI */
@@ -415,188 +415,35 @@ public class StateSinglePlayer implements GameState {
     }
 
     public void renderUserInterface() {
-        for (UIDisplayElement screen : _guiScreens) {
-            screen.render();
-        }
         GUIManager.getInstance().render();
     }
 
     private void updateUserInterface() {
-        for (UIDisplayElement screen : _guiScreens) {
-            screen.update();
-        }
         GUIManager.getInstance().update();
     }
 
     public WorldRenderer getWorldRenderer() {
-        return _worldRenderer;
-    }
-
-    /**
-     * Process keyboard input - first look for "system" like events, then otherwise pass to the Player object
-     */
-    private void processKeyboardInput() {
-        boolean debugEnabled = Config.getInstance().isDebug();
-
-        boolean screenHasFocus = screenHasFocus();
-
-        while (Keyboard.next()) {
-            int key = Keyboard.getEventKey();
-
-            if (Keyboard.getEventKeyState()) {
-                if (!Keyboard.isRepeatEvent()) {
-                    if (key == Keyboard.KEY_ESCAPE) {
-                        if (GUIManager.getInstance().getFocusedWindow() != null) {
-                            GUIManager.getInstance().removeWindow(GUIManager.getInstance().getFocusedWindow());
-                        } else {
-                            togglePauseMenu();
-                        }
-                    }
-
-                    //Should this be here?
-                    if (key == Keyboard.KEY_I) {
-                        toggleInventory();
-                    }
-
-                    if (key == Keyboard.KEY_F3) {
-                        Config.getInstance().setDebug(!Config.getInstance().isDebug());
-                    }
-
-                    if (key == Keyboard.KEY_F && !screenHasFocus) {
-                        toggleViewingDistance();
-                    }
-
-                    if (key == Keyboard.KEY_F12) {
-                        _worldRenderer.printScreen();
-                    }
-                }
-
-                // Pass input to focused GUI element
-                if (GUIManager.getInstance().getFocusedWindow() != null) {
-                    GUIManager.getInstance().processKeyboardInput(key);
-                } else {
-                    for (UIDisplayElement screen : _guiScreens) {
-                        if (screenCanFocus(screen)) {
-                            screen.processKeyboardInput(key);
-                        }
-                    }
-                }
-
-            }
-
-            // Features for debug mode only
-            if (debugEnabled && !screenHasFocus && Keyboard.getEventKeyState()) {
-                WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
-                if (key == Keyboard.KEY_UP) {
-                    worldProvider.setTimeInDays(worldProvider.getTimeInDays() + 0.005f);
-                }
-
-                if (key == Keyboard.KEY_DOWN) {
-                    worldProvider.setTimeInDays(worldProvider.getTimeInDays() - 0.005f);
-                }
-
-                if (key == Keyboard.KEY_RIGHT) {
-                    worldProvider.setTimeInDays(worldProvider.getTimeInDays() + 0.02f);
-                }
-
-                if (key == Keyboard.KEY_LEFT) {
-                    worldProvider.setTimeInDays(worldProvider.getTimeInDays() - 0.02f);
-                }
-
-                if (key == Keyboard.KEY_R && !Keyboard.isRepeatEvent()) {
-                    getWorldRenderer().setWireframe(!getWorldRenderer().isWireframe());
-                }
-
-                if (key == Keyboard.KEY_P && !Keyboard.isRepeatEvent()) {
-                    getWorldRenderer().setCameraMode(WorldRenderer.CAMERA_MODE.PLAYER);
-            }
-
-                if (key == Keyboard.KEY_O && !Keyboard.isRepeatEvent()) {
-                    getWorldRenderer().setCameraMode(WorldRenderer.CAMERA_MODE.SPAWN);
-                }
-            }
-
-            // Pass input to the current player
-            if (!screenHasFocus)
-                localPlayerSys.processKeyboardInput(key, Keyboard.getEventKeyState(), Keyboard.isRepeatEvent());
-        }
-    }
-
-
-    /*
-    * Process mouse input - nothing system-y, so just passing it to the Player class
-    */
-    private void processMouseInput() {
-        boolean screenHasFocus = screenHasFocus();
-        while (Mouse.next()) {
-            int button = Mouse.getEventButton();
-            int wheelMoved = Mouse.getEventDWheel();
-
-            if (GUIManager.getInstance().getFocusedWindow() != null) {
-                GUIManager.getInstance().processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
-            } else {
-                for (UIDisplayElement screen : _guiScreens) {
-                    if (screenCanFocus(screen)) {
-                        screen.processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
-                    }
-                }
-            }
-
-            if (!screenHasFocus)
-                localPlayerSys.processMouseInput(button, Mouse.getEventButtonState(), wheelMoved);
-        }
-    }
-
-
-    private boolean screenCanFocus(UIDisplayElement s) {
-        boolean result = true;
-
-        for (UIDisplayElement screen : _guiScreens) {
-            if (screen.isVisible() && !screen.isOverlay() && screen != s)
-                result = false;
-        }
-
-        return result;
+        return worldRenderer;
     }
 
     public void pause() {
-        _pauseGame = true;
+        pauseGame = true;
     }
 
     public void unpause() {
-        _pauseGame = false;
+        pauseGame = false;
     }
 
     public void togglePauseGame() {
-        if (_pauseGame) {
+        if (pauseGame) {
             unpause();
         } else {
             pause();
         }
     }
 
-    private void toggleInventory() {
-        if (screenCanFocus(_inventoryScreen))
-            _inventoryScreen.setVisible(!_inventoryScreen.isVisible());
-    }
-
-    public void togglePauseMenu() {
-        if (screenCanFocus(_pauseMenu)) {
-            _pauseMenu.setVisible(!_pauseMenu.isVisible());
-        }
-    }
-
-    public void toggleViewingDistance() {
-        Config.getInstance().setViewingDistanceById((Config.getInstance().getActiveViewingDistanceId() + 1) % 4);
-    }
-
     public boolean isGamePaused() {
-        return _pauseGame;
-    }
-
-    public UIHeadsUpDisplay getHud()
-    {
-        return _hud;
+        return pauseGame;
     }
 
 }

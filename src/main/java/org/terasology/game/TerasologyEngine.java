@@ -33,8 +33,6 @@ import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.blocks.management.BlockManifestor;
 import org.terasology.model.shapes.BlockShapeManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
-import org.terasology.rendering.assets.Shader;
-import org.terasology.rendering.assets.metadata.ParamMetadata;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,8 +49,6 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL11.GL_LEQUAL;
-import static org.lwjgl.opengl.GL11.glDepthFunc;
 
 /**
  * @author Immortius
@@ -93,11 +89,13 @@ public class TerasologyEngine implements GameEngine {
     private void initLogger() {
         if (LWJGLUtil.DEBUG) {
             System.setOut(new PrintStream(System.out) {
+                @Override
                 public void print(final String message) {
                     Logger.getLogger("").info(message);
                 }
             });
             System.setErr(new PrintStream(System.err) {
+                @Override
                 public void print(final String message) {
                     Logger.getLogger("").severe(message);
                 }
@@ -194,6 +192,7 @@ public class TerasologyEngine implements GameEngine {
     @Override
     public void submitTask(final String name, final Runnable task) {
         threadPool.execute(new Runnable() {
+            @Override
             public void run() {
                 Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
                 PerformanceMonitor.startThread(name);

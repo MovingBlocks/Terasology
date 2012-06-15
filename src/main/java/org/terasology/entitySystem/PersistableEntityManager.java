@@ -1,6 +1,5 @@
 package org.terasology.entitySystem;
 
-import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TIntList;
 
 /**

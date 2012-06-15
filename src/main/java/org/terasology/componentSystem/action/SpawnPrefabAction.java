@@ -16,8 +16,8 @@
 
 package org.terasology.componentSystem.action;
 
-import org.terasology.components.world.LocationComponent;
 import org.terasology.components.actions.SpawnPrefabActionComponent;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.*;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;

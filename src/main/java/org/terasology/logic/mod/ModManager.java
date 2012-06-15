@@ -18,7 +18,6 @@ package org.terasology.logic.mod;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import org.terasology.asset.sources.ArchiveSource;

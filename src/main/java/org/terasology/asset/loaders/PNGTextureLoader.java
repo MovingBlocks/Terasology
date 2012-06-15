@@ -18,7 +18,6 @@ package org.terasology.asset.loaders;
 
 import com.google.gson.Gson;
 import org.newdawn.slick.opengl.PNGDecoder;
-import org.newdawn.slick.util.ResourceLoader;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetUri;
 import org.terasology.rendering.assets.Texture;

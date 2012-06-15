@@ -18,8 +18,6 @@ package org.terasology.logic.world;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 
-import javax.vecmath.Vector3f;
-
 /**
  * Provides the basic interface for all world providers.
  *

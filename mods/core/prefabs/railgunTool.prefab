@@ -3,7 +3,7 @@
     "Item" : {
         "name" : "Railgun",
         "icon" : "Railgun",
-        "usage" : "InDirection"
+        "usage" : "IN_DIRECTION"
     },
     "TunnelAction" : {},
     "PlaySoundAction" : {

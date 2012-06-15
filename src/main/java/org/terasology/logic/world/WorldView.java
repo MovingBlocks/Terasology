@@ -22,7 +22,6 @@ import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**

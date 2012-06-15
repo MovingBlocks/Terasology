@@ -1,7 +1,6 @@
 package org.terasology.entitySystem.common;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Event;
 import org.terasology.entitySystem.pojo.PojoEntityManager;

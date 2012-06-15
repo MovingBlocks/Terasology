@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-float tonemapReinhard(vec4 color, float brightMax, float exposure) {
-    float Y = dot(vec4(0.30, 0.59, 0.11, 0.0), color);
-    return exposure * (exposure/brightMax + 1.0) / (exposure + 1.0);
+float tonemapReinhard(float brightMax, float exposure) {
+    return exposure * (exposure/(brightMax * brightMax) + 1.0) / (exposure + 1.0);
 }
 
 float calcLambLight(vec3 normal, vec3 lightVec) {

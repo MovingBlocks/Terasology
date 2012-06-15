@@ -19,14 +19,14 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
 import org.terasology.entitySystem.Prefab;
+import org.terasology.events.input.binds.ConsoleButton;
 import org.terasology.game.CoreRegistry;
-import org.terasology.game.Terasology;
-import org.terasology.logic.manager.GroovyManager;
 import org.terasology.logic.manager.GroovyHelp;
 import org.terasology.logic.manager.GroovyHelpManager;
+import org.terasology.logic.manager.GroovyManager;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.components.UITextWrap;
-import org.terasology.rendering.gui.framework.UIScrollableDisplayContainer;
+import org.terasology.rendering.gui.framework.UIDisplayWindow;
 
 import javax.vecmath.Vector2f;
 import java.io.IOException;
@@ -37,14 +37,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
 
 /**
  * The debug console of Terasology.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class UIDebugConsole extends UIScrollableDisplayContainer {
+public final class UIDebugConsole extends UIDisplayWindow {
 
     private Logger logger = Logger.getLogger(getClass().getName());
     private final UIText _consoleText;
@@ -73,7 +72,9 @@ public final class UIDebugConsole extends UIScrollableDisplayContainer {
         _helpText.setColor(Color.green);
         //_helpText.setSize(new Vector2f(0.5f,0.5f));
         _helpText.setVisible(true);
+        setModal(true);
         addDisplayElement(_helpText);
+        setVisible(false);
     }
 
     /**
@@ -87,26 +88,46 @@ public final class UIDebugConsole extends UIScrollableDisplayContainer {
         if (!isVisible())
             return;
 
-        if (key == Keyboard.KEY_BACK) {
-            int length = _consoleInput.length() - 1;
+        switch (key) {
+            case Keyboard.KEY_BACK:
+                int length = _consoleInput.length() - 1;
 
-            if (length < 0) {
-                length = 0;
-            }
-            _consoleInput.setLength(length);
-        } else if (key == Keyboard.KEY_RETURN) {
-            processConsoleString();
-        } else if (key == Keyboard.KEY_UP) {
-            rotateRingBuffer(1);
-        } else if (key == Keyboard.KEY_DOWN) {
-            rotateRingBuffer(-1);
+                if (length < 0) {
+                    length = 0;
+                }
+                _consoleInput.setLength(length);
+                break;
+            case Keyboard.KEY_RETURN:
+                processConsoleString();
+                break;
+            case Keyboard.KEY_UP:
+                rotateRingBuffer(1);
+                break;
+            case Keyboard.KEY_DOWN:
+                rotateRingBuffer(-1);
+                break;
+            default:
+                char c = Keyboard.getEventCharacter();
+
+                if (!Character.isISOControl(c)) {
+                    _consoleInput.append(c);
+                }
+                break;
+        }
+    }
+
+    @Override
+    public boolean processBindButton(String id, boolean pressed) {
+        if (!isVisible() || !pressed) {
+            return false;
         }
 
-        char c = Keyboard.getEventCharacter();
-
-        if (!Character.isISOControl(c)) {
-            _consoleInput.append(c);
+        if (ConsoleButton.ID.equals(id)) {
+            setVisible(false);
+            return true;
         }
+
+        return false;
     }
 
     /**

@@ -41,8 +41,8 @@ message Setting {
 
     message System {
         message CloudRes {
-            optional float x = 1 [default = 128];
-            optional float y = 2 [default = 128];
+            optional float x = 1 [default = 512];
+            optional float y = 2 [default = 512];
         }
         message DisplayMode {
             optional int32 width = 1 [default = 1280];

@@ -18,7 +18,6 @@ package org.terasology.logic.manager;
 import org.terasology.components.SimpleAIComponent;
 import org.terasology.entityFactory.GelatinousCubeFactory;
 import org.terasology.entitySystem.EntityManager;
-import org.terasology.game.Terasology;
 import org.terasology.logic.portals.Portal;
 import org.terasology.utilities.FastRandom;
 
@@ -47,7 +46,7 @@ public class PortalManager {
     private Logger logger = Logger.getLogger(getClass().getName());
 
     public PortalManager(EntityManager entityManager) {
-        this._entityManager = entityManager;
+        _entityManager = entityManager;
         factory = new GelatinousCubeFactory();
         factory.setEntityManager(entityManager);
         factory.setRandom(_random);

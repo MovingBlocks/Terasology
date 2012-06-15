@@ -15,14 +15,10 @@
  */
 package org.terasology.rendering.gui.menus;
 
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.logic.manager.AssetManager;
-import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UIText;
-import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
@@ -46,7 +42,7 @@ public class UIConfigMenu extends UIDisplayWindow {
     final UIText _version;
 
     public UIConfigMenu() {
-        maximaze();
+        maximize();
         _title = new UIGraphicsElement(AssetManager.loadTexture("engine:terasology"));
         _title.setVisible(true);
         _title.setSize(new Vector2f(512f, 128f));

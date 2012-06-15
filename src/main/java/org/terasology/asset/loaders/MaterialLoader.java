@@ -25,7 +25,6 @@ import org.terasology.logic.manager.AssetManager;
 import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.assets.Shader;
 import org.terasology.rendering.assets.Texture;
-import org.terasology.rendering.assets.metadata.ShaderMetadata;
 
 import java.io.IOException;
 import java.io.InputStream;

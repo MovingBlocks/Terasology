@@ -25,9 +25,10 @@ import org.terasology.math.Side;
 import org.terasology.model.structures.AABB;
 
 import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Locale;

@@ -17,7 +17,6 @@ package org.terasology.model.structures;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.CoreRegistry;
-import org.terasology.game.Terasology;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -51,16 +50,17 @@ public class AABB {
      */
     public AABB(Vector3d position, Vector3d dimensions) {
         setPosition(position);
-        this._dimensions = dimensions;
+        _dimensions = dimensions;
     }
 
     public AABB(Vector3f position, Vector3f dimensions) {
         setPosition(new Vector3d(position));
-        this._dimensions = new Vector3d(dimensions);
+        _dimensions = new Vector3d(dimensions);
     }
 
     /**
      * Creates a new AABB that encapsulates a set of AABBs
+     *
      * @param others
      */
     public AABB(Iterable<AABB> others) {
@@ -109,8 +109,8 @@ public class AABB {
      */
     public boolean overlaps(AABB aabb2) {
         return !(maxX() < aabb2.minX() || minX() > aabb2.maxX()) &&
-               !(maxY() < aabb2.minY() || minY() > aabb2.maxY()) &&
-               !(maxZ() < aabb2.minZ() || minZ() > aabb2.maxZ());
+                !(maxY() < aabb2.minY() || minY() > aabb2.maxY()) &&
+                !(maxZ() < aabb2.minZ() || minZ() > aabb2.maxZ());
     }
 
     /**
@@ -121,8 +121,8 @@ public class AABB {
      */
     public boolean contains(Vector3d point) {
         return !(maxX() < point.x || minX() > point.x) &&
-               !(maxY() < point.y || minY() > point.y) &&
-               !(maxZ() < point.z || minZ() > point.z);
+                !(maxY() < point.y || minY() > point.y) &&
+                !(maxZ() < point.z || minZ() > point.z);
     }
 
     public boolean contains(Vector3f point) {
@@ -154,7 +154,7 @@ public class AABB {
         Vector3d hitNormal = new Vector3d();
 
         double dist = Double.POSITIVE_INFINITY;
-        
+
         if (testX) {
             double distX;
             if (direction.x > 0) {
@@ -163,7 +163,7 @@ public class AABB {
                 distX = (_position.x - pos.x + dimensions.x + _dimensions.x) / direction.x;
             }
             if (distX >= 0 && distX < dist) {
-                hitNormal.set(Math.copySign(1,direction.x),0,0);
+                hitNormal.set(Math.copySign(1, direction.x), 0, 0);
             }
         }
         if (testY) {
@@ -174,7 +174,7 @@ public class AABB {
                 distY = (_position.y - pos.y + dimensions.y + _dimensions.y) / direction.y;
             }
             if (distY >= 0 && distY < dist) {
-                hitNormal.set(0,Math.copySign(1,direction.y),0);
+                hitNormal.set(0, Math.copySign(1, direction.y), 0);
             }
         }
         if (testZ) {
@@ -185,7 +185,7 @@ public class AABB {
                 distZ = (_position.z - pos.z + dimensions.z + _dimensions.z) / direction.z;
             }
             if (distZ >= 0 && distZ < dist) {
-                hitNormal.set(0,0,Math.copySign(1,direction.z));
+                hitNormal.set(0, 0, Math.copySign(1, direction.z));
             }
         }
         return hitNormal;
@@ -432,27 +432,27 @@ public class AABB {
     }
 
     public double minX() {
-        return (getPosition().x - _dimensions.x);
+        return getPosition().x - _dimensions.x;
     }
 
     public double minY() {
-        return (getPosition().y - _dimensions.y);
+        return getPosition().y - _dimensions.y;
     }
 
     public double minZ() {
-        return (getPosition().z - _dimensions.z);
+        return getPosition().z - _dimensions.z;
     }
 
     public double maxX() {
-        return (getPosition().x + _dimensions.x);
+        return getPosition().x + _dimensions.x;
     }
 
     public double maxY() {
-        return (getPosition().y + _dimensions.y);
+        return getPosition().y + _dimensions.y;
     }
 
     public double maxZ() {
-        return (getPosition().z + _dimensions.z);
+        return getPosition().z + _dimensions.z;
     }
 
     public Vector3d getDimensions() {

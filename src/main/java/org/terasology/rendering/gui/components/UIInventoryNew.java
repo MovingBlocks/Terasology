@@ -13,41 +13,51 @@ import java.util.List;
  */
 public class UIInventoryNew extends UIDisplayContainer implements UIInventoryCellNew.CellSubscriber {
 
-    EntityRef entity;
+    EntityRef entity = EntityRef.NULL;
     Vector2f cellBorder = new Vector2f(2,2);
     Vector2f cellSize = new Vector2f(48,48);
     List<UIInventoryCellNew> cells = Lists.newArrayList();
     List<InventorySubscriber> subscribers = Lists.newArrayList();
+    private int targetWidth;
 
     public interface InventorySubscriber {
         public void itemClicked(UIInventoryNew inventoryNew, int slot);
     }
 
-    public UIInventoryNew(EntityRef entity, int width) {
+    public UIInventoryNew(int width) {
+        targetWidth = width;
+    }
+
+    public EntityRef getEntity() {
+        return entity;
+    }
+
+    public void setEntity(EntityRef entity) {
         this.entity = entity;
         InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
+        for (UIInventoryCellNew cell : cells) {
+            removeDisplayElement(cell);
+        }
+        cells.clear();
+
         if (inventory == null) {
             setVisible(false);
         }
         else {
             setVisible(true);
-            float height = Math.max(inventory.itemSlots.size() / width, 1);
-            setSize(new Vector2f(width * (cellSize.x + cellBorder.x), height * (cellSize.y + cellBorder.y)));
+            float height = Math.max(inventory.itemSlots.size() / targetWidth, 1);
+            setSize(new Vector2f(targetWidth * (cellSize.x + cellBorder.x), height * (cellSize.y + cellBorder.y)));
 
             for (int i = 0; i < inventory.itemSlots.size(); ++i) {
                 UIInventoryCellNew cell = new UIInventoryCellNew(entity, i, cellSize);
                 cells.add(cell);
                 cell.setSize(cellSize);
-                cell.setPosition(new Vector2f(i % width * (cellSize.x + cellBorder.x), i / width * (cellSize.y + cellBorder.y)));
+                cell.setPosition(new Vector2f(i % targetWidth * (cellSize.x + cellBorder.x), i / targetWidth * (cellSize.y + cellBorder.y)));
                 cell.setVisible(true);
                 cell.subscribe(this);
                 addDisplayElement(cell);
             }
         }
-    }
-
-    public EntityRef getEntity() {
-        return entity;
     }
 
     public void onCellActivated(UIInventoryCellNew cell) {

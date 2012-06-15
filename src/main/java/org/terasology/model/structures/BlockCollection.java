@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+
 /**
  * A collection of actual blocks and their relative positions, usually _not_ absolute positions in an existing world
  * Can also store a specific position that the collection should be oriented around rather than always a specific corner
@@ -191,6 +192,7 @@ public class BlockCollection {
         return positions().calcDepth();
     }
 
+    @Override
     public String toString() {
         String result = "[[";
         for (BlockPosition pos : _blocks.keySet()) {

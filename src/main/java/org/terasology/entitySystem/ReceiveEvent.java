@@ -16,15 +16,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface ReceiveEvent {
-    public static final int PRIORITY_CRITICAL = 200;
-    public static final int PRIORITY_HIGH = 150;
-    public static final int PRIORITY_NORMAL = 100;
-    public static final int PRIORITY_LOW = 50;
-    public static final int PRIORITY_TRIVIAL = 0;
-
     /**
      * What components that the entity must have for this method to be invoked
      */
     Class<? extends Component>[] components();
-    int priority() default PRIORITY_NORMAL;
+    int priority() default EventPriority.PRIORITY_NORMAL;
 }

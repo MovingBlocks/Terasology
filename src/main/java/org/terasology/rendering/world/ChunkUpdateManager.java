@@ -75,6 +75,7 @@ public final class ChunkUpdateManager {
 
         // Create a new thread and start processing
         Runnable r = new Runnable() {
+            @Override
             public void run() {
                 ChunkMesh[] newMeshes = new ChunkMesh[WorldRenderer.VERTICAL_SEGMENTS];
                 WorldView worldView = worldProvider.getWorldViewAround(c.getPos());

@@ -2,7 +2,9 @@ package org.terasology.componentSystem.block;
 
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.components.*;
+import org.terasology.components.BlockParticleEffectComponent;
+import org.terasology.components.HealthComponent;
+import org.terasology.components.ItemComponent;
 import org.terasology.components.world.BlockComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entityFactory.BlockItemFactory;
@@ -29,6 +31,7 @@ public class BlockEntitySystem implements EventHandlerSystem {
     private EntityManager entityManager;
     private BlockItemFactory blockItemFactory;
 
+    @Override
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
         worldProvider = CoreRegistry.get(WorldProvider.class);
@@ -90,7 +93,7 @@ public class BlockEntitySystem implements EventHandlerSystem {
         }
     }
     
-    @ReceiveEvent(components={BlockComponent.class},priority = ReceiveEvent.PRIORITY_HIGH)
+    @ReceiveEvent(components={BlockComponent.class},priority = EventPriority.PRIORITY_HIGH)
     public void onDamaged(DamageEvent event, EntityRef entity) {
         BlockComponent blockComp = entity.getComponent(BlockComponent.class);
 

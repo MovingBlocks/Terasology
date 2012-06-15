@@ -2,8 +2,8 @@ package org.terasology.componentSystem.rendering;
 
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.components.AABBCollisionComponent;
-import org.terasology.components.world.LocationComponent;
 import org.terasology.components.rendering.MeshComponent;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterComponentSystem;
@@ -35,6 +35,7 @@ public class MeshRenderer implements RenderSystem {
     private Mesh mesh;
     private WorldRenderer worldRenderer;
 
+    @Override
     public void initialise() {
         manager = CoreRegistry.get(EntityManager.class);
         worldRenderer = CoreRegistry.get(WorldRenderer.class);
@@ -49,6 +50,7 @@ public class MeshRenderer implements RenderSystem {
     public void shutdown() {
     }
 
+    @Override
     public void renderTransparent() {
 
         Vector3d cameraPosition = worldRenderer.getActiveCamera().getPosition();
@@ -88,6 +90,7 @@ public class MeshRenderer implements RenderSystem {
         }
     }
 
+    @Override
     public void renderOpaque() {
         boolean carryingTorch = CoreRegistry.get(LocalPlayer.class).isCarryingTorch();
         Vector3d cameraPosition = worldRenderer.getActiveCamera().getPosition();
@@ -125,9 +128,11 @@ public class MeshRenderer implements RenderSystem {
         }
     }
 
+    @Override
     public void renderOverlay() {
     }
 
+    @Override
     public void renderFirstPerson() {
     }
 }
