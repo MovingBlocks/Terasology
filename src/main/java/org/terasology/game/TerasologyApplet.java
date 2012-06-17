@@ -50,11 +50,12 @@ public final class TerasologyApplet extends Applet {
 
     private void obtainMods() {
         String[] mods = getParameter("mods").split(",");
-        int rootPathIndex = getDocumentBase().toString().lastIndexOf('/');
-        String path = getDocumentBase().toString().substring(0, rootPathIndex + 1) + "mods/";
+        String modsPath = getParameter("mods_path") + "mods/";
+        //int rootPathIndex = getDocumentBase().toString().lastIndexOf('/');
+        //String path = getDocumentBase().toString().substring(0, rootPathIndex + 1) + "mods/";
         for (String mod : mods) {
             try {
-                URL url = new URL(path + mod);
+                URL url = new URL(modsPath + mod);
                 ReadableByteChannel rbc = Channels.newChannel(url.openStream());
                 FileOutputStream fos = new FileOutputStream(new File(PathManager.getInstance().getModPath(), mod));
                 long readBytes = fos.getChannel().transferFrom(rbc, 0, 1 << 24);
