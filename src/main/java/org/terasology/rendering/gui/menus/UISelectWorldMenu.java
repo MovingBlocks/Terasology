@@ -77,7 +77,7 @@ public class UISelectWorldMenu extends UIDisplayWindow {
 
 
         _goToBack = new UIButton(new Vector2f(256f, 32f));
-        _goToBack.getLabel().setText("Go to back");
+        _goToBack.getLabel().setText("Go back");
         _goToBack.setVisible(true);
 
         _loadFromList = new UIButton(new Vector2f(128f, 32f));
@@ -106,7 +106,7 @@ public class UISelectWorldMenu extends UIDisplayWindow {
             public void clicked(UIDisplayElement element) {
                 
                 if(_list.getSelectedItem() == null){
-                    GUIManager.getInstance().showMessage("Deleting error", "Please choose the world.");
+                    GUIManager.getInstance().showMessage("Error", "Please choose a world first.");
                     return;
                 }
 
@@ -116,7 +116,7 @@ public class UISelectWorldMenu extends UIDisplayWindow {
                     WorldUtil.deleteWorld(world);
                     _list.removeSelectedItem();
                 }catch(Exception e){
-                    GUIManager.getInstance().showMessage("Deleting error", "Failed deleting world data object. Sorry.");
+                    GUIManager.getInstance().showMessage("Error", "Failed deleting world data object. Sorry.");
                 }
             }
         });
@@ -163,12 +163,12 @@ public class UISelectWorldMenu extends UIDisplayWindow {
     private void loadSelectedWorld(){
 
         if(_list.size()<1){
-            GUIManager.getInstance().showMessage("Loading error", "You haven't worlds. Please create new.");
+            GUIManager.getInstance().showMessage("Error", "You did not create a world yet!");
             return;
         }
 
         if(_list.getSelectedItem() == null){
-            GUIManager.getInstance().showMessage("Loading error", "Please choose the world.");
+            GUIManager.getInstance().showMessage("Error", "Please choose a world!");
             return;
         }
 
@@ -178,7 +178,7 @@ public class UISelectWorldMenu extends UIDisplayWindow {
             Config.getInstance().setWorldTitle((String) config.get("worldTitle"));
             CoreRegistry.get(GameEngine.class).changeState(new StateSinglePlayer(config.get("worldTitle").toString(), config.get("worldSeed").toString()));
         }catch (Exception e){
-            GUIManager.getInstance().showMessage("Loading error", "Failed reading world data object. Sorry.");
+            GUIManager.getInstance().showMessage("Error", "Failed reading world data object. Sorry.");
         }
     }
 
