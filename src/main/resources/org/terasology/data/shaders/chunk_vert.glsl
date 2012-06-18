@@ -28,6 +28,8 @@ uniform vec2 waterCoordinate;
 uniform vec2 lavaCoordinate;
 uniform vec3 chunkOffset;
 
+#define ANIMATION_DISTANCE 1024 // sqr(32)
+
 void main()
 {
 	gl_TexCoord[0] = gl_MultiTexCoord0;
@@ -43,10 +45,10 @@ void main()
     normal = gl_NormalMatrix * gl_Normal;
     gl_FrontColor = gl_Color;
 
-	float distance = length(vertexWorldPos);
+	float distance = vertexWorldPos.x * vertexWorldPos.x + vertexWorldPos.y * vertexWorldPos.y + vertexWorldPos.z * vertexWorldPos.z;
 
 #ifdef FLICKERING_LIGHT
-	flickering = (sin(timeToTick(time, 1.0) + 1.0) / 32.0);
+	flickering = (smoothTriangleWave(timeToTick(time, 0.2) + 1.0) / 32.0);
 #else
 	flickering = 0.0;
 #endif
@@ -54,22 +56,22 @@ void main()
 #ifdef ANIMATED_WATER_AND_GRASS
     vec3 vertexChunkPos = vertexWorldPosRaw.xyz + chunkOffset.xyz;
 
-    if (distance < 64.0) {
+    if (distance < ANIMATION_DISTANCE) {
         // GRASS ANIMATION
         for (int i=0; i < 32; i+=2) {
            if (gl_TexCoord[0].x >= wavingCoordinates[i] && gl_TexCoord[0].x < wavingCoordinates[i] + TEXTURE_OFFSET && gl_TexCoord[0].y >= wavingCoordinates[i+1] && gl_TexCoord[0].y < wavingCoordinates[i+1] + TEXTURE_OFFSET) {
                if (gl_TexCoord[0].y < wavingCoordinates[i+1] + TEXTURE_OFFSET / 2.0) {
-                   vertexWorldPos.x += sin(timeToTick(time, 1.0) + vertexChunkPos.x) * 0.3;
-                   vertexWorldPos.y += sin(timeToTick(time, 0.5) + vertexChunkPos.x) * 0.1;
+                   vertexWorldPos.x += smoothTriangleWave(timeToTick(time, 0.15) + vertexChunkPos.x * 0.1 + vertexChunkPos.z * 0.1) * 0.25;
+                   vertexWorldPos.y += smoothTriangleWave(timeToTick(time, 0.05) + vertexChunkPos.x * 0.1 + vertexChunkPos.z * 0.1) * 0.2;
                }
            }
         }
     }
 
     if (gl_TexCoord[0].x >= waterCoordinate.x && gl_TexCoord[0].x < waterCoordinate.x + TEXTURE_OFFSET && gl_TexCoord[0].y >= waterCoordinate.y && gl_TexCoord[0].y < waterCoordinate.y + TEXTURE_OFFSET) {
-        vertexWorldPos.y += sin(timeToTick(time, 1.0) + vertexChunkPos.x +  + vertexChunkPos.z) * sin(timeToTick(time, 0.5) + vertexChunkPos.x  + vertexChunkPos.z + 16.0) * 0.1;
+        vertexWorldPos.y += smoothTriangleWave(timeToTick(time, 0.1) + vertexChunkPos.x * 0.1 + vertexChunkPos.z * 0.1) * 0.1 + smoothTriangleWave(timeToTick(time, 0.05)  + vertexChunkPos.x * 0.1 + vertexChunkPos.z * 0.1) * 0.2;
     } else if (gl_TexCoord[0].x >= lavaCoordinate.x && gl_TexCoord[0].x < lavaCoordinate.x + TEXTURE_OFFSET && gl_TexCoord[0].y >= lavaCoordinate.y && gl_TexCoord[0].y < lavaCoordinate.y + TEXTURE_OFFSET) {
-        vertexWorldPos.y += sin(timeToTick(time, 0.5) + vertexChunkPos.x + vertexChunkPos.z) * 0.1;
+        vertexWorldPos.y += smoothTriangleWave(timeToTick(time, 0.05) + vertexChunkPos.x * 0.1 + vertexChunkPos.z * 0.1) * 0.2;
     }
 #endif
 

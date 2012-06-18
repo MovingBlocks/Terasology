@@ -20,6 +20,7 @@ import org.terasology.logic.generators.GeneratorManager;
 import org.terasology.logic.simulators.GrowthSimulator;
 import org.terasology.logic.simulators.LiquidSimulator;
 import org.terasology.utilities.FastRandom;
+import org.terasology.utilities.PerlinNoise;
 
 import javax.vecmath.Tuple3i;
 import javax.vecmath.Vector3d;
@@ -271,6 +272,11 @@ public interface IWorldProvider {
      * @return The RNG
      */
     public FastRandom getRandom();
+
+    /**
+     *
+     */
+    public PerlinNoise getPerlinGenerator();
 
     /**
      * Disposes this world provider.

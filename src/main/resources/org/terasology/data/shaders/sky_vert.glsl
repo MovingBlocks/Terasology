@@ -25,8 +25,6 @@ uniform vec3    zenith;
 
 vec4 eyePos = vec4(0.0, 0.0, 0.0, 1.0);
 
-#define	EPS	0.1
-
 vec3	allweather ( float t, float cosTheta, float cosGamma )
 {
 	float	gamma      = acos ( cosGamma );
