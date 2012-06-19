@@ -55,7 +55,7 @@ public class Skysphere implements IGameObject {
     private static final float PI = 3.1415926f;
 
     /* SKY */
-    private double _turbidity = 6.0f, _sunPosAngle = 0.1f;
+    private double _turbidity = 4.0f, _sunPosAngle = 0.1f;
 
     /* CLOUDS */
     private static final Vector2f CLOUD_RESOLUTION = Config.getInstance().getCloudResolution();

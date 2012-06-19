@@ -67,8 +67,8 @@ public class PojoEventSystem implements EventSystem {
                     logger.info("Found method: " + method.toString());
                     ReflectedEventHandlerInfo handlerInfo = new ReflectedEventHandlerInfo(handler, method, receiveEventAnnotation.priority(), receiveEventAnnotation.components());
                     for (Class<? extends Component> c : receiveEventAnnotation.components()) {
-                        addEventHandler((Class<? extends Event>)types[0], handlerInfo, c);
-                        for (Class<? extends Event> childType : childEvents.get((Class<? extends Event>)types[0])) {
+                        addEventHandler((Class<? extends Event>) types[0], handlerInfo, c);
+                        for (Class<? extends Event> childType : childEvents.get((Class<? extends Event>) types[0])) {
                             addEventHandler(childType, handlerInfo, c);
                         }
                     }

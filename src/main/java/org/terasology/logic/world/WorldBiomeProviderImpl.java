@@ -22,13 +22,15 @@ import org.terasology.utilities.PerlinNoise;
 /**
  * @author Immortius
  */
+// TODO: Evolve this class into a world description provider (density, height, etc) to feed into the world generators
 public class WorldBiomeProviderImpl implements WorldBiomeProvider {
 
-    PerlinNoise temperatureNoise, humidityNoise;
+    PerlinNoise temperatureNoise, humidityNoise, fogNoise;
 
     public WorldBiomeProviderImpl(String worldSeed) {
         temperatureNoise = new PerlinNoise(worldSeed.hashCode() + 5);
         humidityNoise = new PerlinNoise(worldSeed.hashCode() + 6);
+        fogNoise = new PerlinNoise(worldSeed.hashCode());
     }
 
     @Override
@@ -41,6 +43,11 @@ public class WorldBiomeProviderImpl implements WorldBiomeProvider {
     public float getTemperatureAt(int x, int z) {
         double result = temperatureNoise.fBm(x * 0.0005, 0, 0.0005 * z);
         return (float) TeraMath.clamp((result + 1.0f) / 2.0f);
+    }
+
+    @Override
+    public float getFog(float time, float daylight) {
+        return (float) TeraMath.clamp(fogNoise.noise(time * 4.0, 0.038291, 0.874691) * 15.0 * daylight + 0.1 * daylight, 0.0, 15.0) + 0.05f;
     }
 
     @Override
