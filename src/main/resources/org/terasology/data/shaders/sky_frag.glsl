@@ -23,7 +23,7 @@ uniform	vec4  sunPos;
 uniform samplerCube texCube;
 
 vec4 	eyePos   = vec4(0.0, 0.0, 0.0, 1.0);
-float	colorExp = 8.0;
+float	colorExp = 12.0;
 
 vec3 convertColor() {
     if (colorYxy == vec3(0.0, 0.0, 0.0))

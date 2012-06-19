@@ -42,6 +42,7 @@ import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.persistence.PersistableObject;
 import org.terasology.utilities.FastRandom;
+import org.terasology.utilities.PerlinNoise;
 
 /**
  * Provides basic support for generating worlds.
@@ -75,6 +76,7 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
 
     /* RANDOMNESS */
     protected final FastRandom _random;
+    PerlinNoise _perlinGenerator;
 
     /**
      * Initializes a new world.
@@ -102,6 +104,7 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
 
         // Init. random generator
         _random = new FastRandom(seed.hashCode());
+        _perlinGenerator = new PerlinNoise(seed.hashCode());
 
         _generatorManager = new GeneratorManager(this);
         _chunkProvider = new ChunkProvider(this);
@@ -534,6 +537,11 @@ public class LocalWorldProvider extends PersistableObject implements IWorldProvi
     @Override
     public FastRandom getRandom() {
         return _random;
+    }
+
+    @Override
+    public PerlinNoise getPerlinGenerator() {
+        return _perlinGenerator;
     }
 
     @Override

@@ -37,6 +37,20 @@ uniform vec2 waterCoordinate;
 uniform vec2 lavaCoordinate;
 uniform vec2 grassCoordinate;
 
+#define DAYLIGHT_AMBIENT_COLOR 1.0, 0.9, 0.9
+#define MOONLIGHT_AMBIENT_COLOR 0.8, 0.8, 1.0
+#define NIGHT_BRIGHTNESS 0.25
+#define WATER_COLOR 0.325, 0.819, 0.925, 0.3
+
+#define TORCH_WATER_SPEC 0.8
+#define TORCH_WATER_DIFF 0.7
+#define TORCH_BLOCK_SPEC 0.5
+#define TORCH_BLOCK_DIFF 0.7
+#define WATER_SPEC 1.0
+#define WATER_DIFF 1.0
+#define BLOCK_DIFF 0.25
+#define BLOCK_AMB 1.0
+
 void main(){
     vec4 texCoord = gl_TexCoord[0];
 
@@ -47,8 +61,8 @@ void main(){
     vec3 finalLightDir = lightDir;
 
     /* DAYLIGHT BECOMES... MOONLIGHT! */
-    if (daylight <= 0.0)
-        finalLightDir *= -1.0;
+    /* Now featuring linear interpolation to make the transition more smoothly... :-) */
+    finalLightDir = mix(finalLightDir * -1.0, finalLightDir, daylight);
 
     vec4 color;
 
@@ -57,13 +71,13 @@ void main(){
         vec2 waterOffset = vec2(vertexWorldPosRaw.x + timeToTick(time, 0.1), vertexWorldPosRaw.z) / 16.0;
         normalWater = (texture2D(textureWaterNormal, waterOffset) * 2.0 - 1.0).xyz;
 
-        color = vec4(83.0 / 255.0, 209.0 / 255.0, 236.0 / 255.0, 0.5);
+        color = vec4(WATER_COLOR);
         isWater = true;
     /* APPLY LAVA TEXTURE */
     } else if (texCoord.x >= lavaCoordinate.x && texCoord.x < lavaCoordinate.x + TEXTURE_OFFSET && texCoord.y >= lavaCoordinate.y && texCoord.y < lavaCoordinate.y + TEXTURE_OFFSET) {
         texCoord.x = mod(texCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET);
         texCoord.y = mod(texCoord.y, TEXTURE_OFFSET) / (128.0 / (1.0 / TEXTURE_OFFSET));
-        texCoord.y += mod(timeToTick(time, 0.1),127.0) * (1.0/128.0);
+        texCoord.y += mod(timeToTick(time, 0.1), 127.0) * (1.0/128.0);
 
         color = texture2D(textureLava, texCoord.xy);
     /* APPLY DEFAULT TEXTURE FROM ATLAS */
@@ -79,13 +93,20 @@ void main(){
 
     /* APPLY OVERALL BIOME COLOR OFFSET */
     if (!(texCoord.x >= grassCoordinate.x && texCoord.x < grassCoordinate.x + TEXTURE_OFFSET && texCoord.y >= grassCoordinate.y && texCoord.y < grassCoordinate.y + TEXTURE_OFFSET)) {
-        color.rgb *= gl_Color.rgb;
-        color.a *= gl_Color.a;
+        if (gl_Color.rgb != vec3(1.0)) {
+            color.rgb = color.r * gl_Color.rgb;
+            color.a *= gl_Color.a;
+        }
+        else {
+            color.rgb *= gl_Color.rgb;
+            color.a *= gl_Color.a;
+        }
     /* MASK GRASS AND APPLY BIOME COLOR */
     } else {
         vec4 maskColor = texture2D(textureEffects, vec2(10.0 * TEXTURE_OFFSET + mod(texCoord.x,TEXTURE_OFFSET), mod(texCoord.y,TEXTURE_OFFSET)));
 
-        if (maskColor.a != 0.0) color.rgb *= gl_Color.rgb;
+        // Only use one channel so the color won't be altered
+        if (maskColor.a != 0.0) color.rgb = color.r * gl_Color.rgb;
     }
 
     // Calculate daylight lighting value
@@ -111,11 +132,11 @@ void main(){
     /* CALCULATE TORCHLIGHT */
     if (carryingTorch) {
         if (isWater)
-            torchlight = calcTorchlight(calcLambLight(normalWater, normalizedVPos) * 0.1
-            + 0.9 * calcSpecLightWithOffset(normal, normalizedVPos, normalize(eyeVec), 64.0, normalWater), vertexWorldPos.xyz);
+            torchlight = calcTorchlight(calcLambLight(normalWater, normalizedVPos) * TORCH_WATER_DIFF
+            + TORCH_WATER_SPEC * calcSpecLightWithOffset(normal, normalizedVPos, normalize(eyeVec), 64.0, normalWater), vertexWorldPos.xyz);
         else
-            torchlight = calcTorchlight(calcLambLight(normal, normalizedVPos) * 0.9
-            + 0.1 * calcSpecLight(normal, normalizedVPos, normalize(eyeVec), 32.0), vertexWorldPos.xyz);
+            torchlight = calcTorchlight(calcLambLight(normal, normalizedVPos) * TORCH_BLOCK_DIFF
+            + TORCH_BLOCK_SPEC * calcSpecLight(normal, normalizedVPos, normalize(eyeVec), 32.0), vertexWorldPos.xyz);
     }
 
     vec3 daylightColorValue;
@@ -123,22 +144,22 @@ void main(){
     /* CREATE THE DAYLIGHT LIGHTING MIX */
     if (isWater) {
         /* WATER NEEDS DIFFUSE AND SPECULAR LIGHT */
-        daylightColorValue = vec3(diffuseLighting);
-        daylightColorValue += calcSpecLightWithOffset(normal, finalLightDir, normalize(eyeVec), 64.0, normalWater);
+        daylightColorValue = vec3(diffuseLighting) * WATER_DIFF;
+        daylightColorValue += calcSpecLightWithOffset(normal, finalLightDir, normalize(eyeVec), 64.0, normalWater) * WATER_SPEC;
     } else {
         /* DEFAULT LIGHTING ONLY CONSIST OF DIFFUSE AND AMBIENT LIGHT */
-        daylightColorValue = vec3(1.0 + diffuseLighting * 0.25);
+        daylightColorValue = vec3(BLOCK_AMB + diffuseLighting * BLOCK_DIFF);
     }
 
     /* SUNLIGHT BECOMES MOONLIGHT */
-    vec3 ambientTint = mix(vec3(0.8, 0.8, 1.0), vec3(1.0, 0.99, 0.99), daylight);
+    vec3 ambientTint = mix(vec3(MOONLIGHT_AMBIENT_COLOR), vec3(DAYLIGHT_AMBIENT_COLOR), daylight);
     daylightColorValue.xyz *= ambientTint;
 
     // Scale the lighting according to the daylight and daylight block values and add moonlight during the nights
-    daylightColorValue.xyz *= daylightScaledValue + (0.25 * (1.0 - daylight) * daylightValue);
+    daylightColorValue.xyz *= daylightScaledValue + (NIGHT_BRIGHTNESS * (1.0 - daylight) * daylightValue);
 
     // Calculate the final block light brightness
-    float blockBrightness = (blocklightValue * 0.8 + diffuseLighting * blocklightValue * 0.2);
+    float blockBrightness = (blocklightValue + diffuseLighting * blocklightValue);
 
     torchlight -= flickering;
     if (torchlight < 0.0)
@@ -146,7 +167,7 @@ void main(){
 
     blockBrightness += (1.0 - blockBrightness) * torchlight;
     blockBrightness -= flickering * blocklightValue;
-    blockBrightness *= blocklightDayIntensity * 0.75;
+    blockBrightness *= blocklightDayIntensity;
 
     if (blockBrightness < 0.0)
         blockBrightness = 0.0;
