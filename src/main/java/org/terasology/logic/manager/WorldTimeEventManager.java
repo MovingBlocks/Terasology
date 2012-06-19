@@ -15,7 +15,7 @@
  */
 package org.terasology.logic.manager;
 
-import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.world.WorldProvider;
 import org.terasology.logic.world.WorldTimeEvent;
 
 import java.util.ArrayList;
@@ -26,9 +26,9 @@ import java.util.ArrayList;
 public class WorldTimeEventManager {
 
     protected final ArrayList<WorldTimeEvent> _worldTimeEvents = new ArrayList<WorldTimeEvent>();
-    protected final IWorldProvider _parent;
+    protected final WorldProvider _parent;
 
-    public WorldTimeEventManager(IWorldProvider parent) {
+    public WorldTimeEventManager(WorldProvider parent) {
         _parent = parent;
     }
 
@@ -57,10 +57,10 @@ public class WorldTimeEventManager {
         for (int i = _worldTimeEvents.size() - 1; i >= 0; i--) {
             final WorldTimeEvent event = _worldTimeEvents.get(i);
 
-            if (event.getExecutionTime() > _parent.getTime() % 1.0)
+            if (event.getExecutionTime() > _parent.getTimeInDays() % 1.0)
                 event.setCanFire(true);
 
-            if (event.getExecutionTime() <= _parent.getTime() % 1.0 && event.canFire()) {
+            if (event.getExecutionTime() <= _parent.getTimeInDays() % 1.0 && event.canFire()) {
                 event.setCanFire(false);
                 event.execute();
             }

@@ -5,4 +5,6 @@ package org.terasology.entitySystem;
  */
 public interface ComponentSystem {
     void initialise();
+
+    void shutdown();
 }

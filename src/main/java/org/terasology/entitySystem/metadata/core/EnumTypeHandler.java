@@ -15,11 +15,11 @@ import java.util.logging.Logger;
 public class EnumTypeHandler<T extends Enum> implements TypeHandler<T> {
     private Class<T> enumType;
     private Logger logger = Logger.getLogger(getClass().getName());
-    
+
     public EnumTypeHandler(Class<T> enumType) {
         this.enumType = enumType;
     }
-    
+
     public EntityData.Value serialize(T value) {
         return EntityData.Value.newBuilder().addString(value.toString()).build();
     }

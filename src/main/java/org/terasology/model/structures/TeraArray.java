@@ -15,6 +15,8 @@
  */
 package org.terasology.model.structures;
 
+import java.util.Arrays;
+
 /**
  * A fast 3D array wrapper.
  *
@@ -38,6 +40,14 @@ public class TeraArray {
         _array = new byte[_size];
     }
 
+    public TeraArray(TeraArray other) {
+        this._array = Arrays.copyOf(other._array, other._array.length);
+        this._lX = other._lX;
+        this._lY = other._lY;
+        this._lZ = other._lZ;
+        this._size = other._size;
+    }
+
     /**
      * Returns the byte value at the given position.
      */
@@ -53,14 +63,45 @@ public class TeraArray {
 
     /**
      * Sets the byte value for the given position.
+     *
+     * @param x
+     * @param y
+     * @param z
+     * @param b
+     * @return The old value at the given position
      */
-    public void set(int x, int y, int z, byte b) {
+    public byte set(int x, int y, int z, byte b) {
         int pos = (x * _lX * _lY) + (y * _lX) + z;
 
         if (x >= _lX || y >= _lY || z >= _lZ || x < 0 || y < 0 || z < 0)
-            return;
+            return 0;
 
+        byte old = _array[pos];
         _array[pos] = b;
+        return old;
+    }
+
+    /**
+     * Sets the byte value for the given position.
+     *
+     * @param x
+     * @param y
+     * @param z
+     * @param b
+     * @return The old value at the given position
+     */
+    public boolean set(int x, int y, int z, byte b, byte expected) {
+        int pos = (x * _lX * _lY) + (y * _lX) + z;
+
+        if (x >= _lX || y >= _lY || z >= _lZ || x < 0 || y < 0 || z < 0)
+            return false;
+
+        byte old = _array[pos];
+        if (old == expected) {
+            _array[pos] = b;
+            return true;
+        }
+        return false;
     }
 
     /**

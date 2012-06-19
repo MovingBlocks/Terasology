@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class ListTypeHandler<T> extends AbstractTypeHandler<List<T>> {
     private TypeHandler<T> contentsHandler;
-    
+
     public ListTypeHandler(TypeHandler contentsHandler) {
         this.contentsHandler = contentsHandler;
     }

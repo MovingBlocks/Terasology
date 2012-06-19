@@ -15,26 +15,24 @@
  */
 package org.terasology.logic.manager;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Logger;
-
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
-
+import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.audio.OpenALManager;
 import org.terasology.audio.Sound;
 import org.terasology.audio.SoundPool;
 import org.terasology.audio.SoundSource;
-import org.terasology.components.BlockComponent;
 import org.terasology.components.CharacterMovementComponent;
-import org.terasology.components.LocationComponent;
+import org.terasology.components.world.BlockComponent;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * Simple managing class for loading and accessing audio files.
@@ -83,7 +81,7 @@ public abstract class AudioManager implements SoundManager {
 
     @Override
     public SoundSource getSoundSource(String pool, AssetUri soundUri, int priority) {
-        Sound sound = (Sound)AssetManager.load(soundUri);
+        Sound sound = (Sound) AssetManager.load(soundUri);
         if (sound != null) {
             return getSoundPool(pool).getSource(sound, priority);
         }
@@ -158,7 +156,7 @@ public abstract class AudioManager implements SoundManager {
     /**
      * Returns sound source from "sfx" pool configured for specified sound, position and gain
      *
-     * @param uri Sound uri
+     * @param uri  Sound uri
      * @param pos  Sound source position
      * @param gain Sound source gain
      * @return Sound source object, or null if there is no free sound sources in effects pool
@@ -211,7 +209,7 @@ public abstract class AudioManager implements SoundManager {
     /**
      * Plays specified sound with specified gain
      *
-     * @param uri Sound uri
+     * @param uri  Sound uri
      * @param gain Sound source gain
      * @return Sound source object, or null if there is no free sound sources in effects pool
      */
@@ -222,7 +220,7 @@ public abstract class AudioManager implements SoundManager {
     /**
      * Plays specified sound at specified position and with specified gain
      *
-     * @param uri Sound uri
+     * @param uri  Sound uri
      * @param pos  Sound source position
      * @param gain Sound source gain
      * @return Sound source object, or null if there is no free sound sources in effects pool
@@ -312,7 +310,7 @@ public abstract class AudioManager implements SoundManager {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc != null) {
             Quat4f rot = loc.getWorldRotation();
-            Vector3f dir = new Vector3f(0,0,-1);
+            Vector3f dir = new Vector3f(0, 0, -1);
             QuaternionUtil.quatRotate(rot, dir, dir);
             return dir;
         }
@@ -338,7 +336,7 @@ public abstract class AudioManager implements SoundManager {
 
         pool.stopAll();
 
-        Sound sound = (Sound)AssetManager.load(uri);
+        Sound sound = (Sound) AssetManager.load(uri);
         if (sound == null)
             return null;
 

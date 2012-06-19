@@ -40,19 +40,19 @@ public final class CharacterMovementComponent implements Component {
 
     // Distance since last footstep
     public float footstepDelta = 0.0f;
-    
+
     public Vector3f getVelocity() {
         return velocity;
     }
-    
+
     public void setVelocity(Vector3f newVelocity) {
         velocity.set(newVelocity);
     }
-    
+
     public Vector3f getDrive() {
         return drive;
     }
-    
+
     public void setDrive(Vector3f newDrive) {
         drive.set(newDrive);
     }

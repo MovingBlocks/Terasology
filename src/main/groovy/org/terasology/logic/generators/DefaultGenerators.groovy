@@ -3,54 +3,58 @@
 
 package org.terasology.logic.generators
 
-import org.terasology.logic.generators.ChunkGeneratorTerrain.BIOME_TYPE
 import org.terasology.model.blocks.management.BlockManager
+import org.terasology.logic.world.generator.tree.TreeGeneratorLSystem
+import org.terasology.logic.world.generator.tree.TreeGeneratorCactus
+import org.terasology.logic.world.generator.core.ForestGenerator
+
+import org.terasology.logic.world.WorldBiomeProvider
 
 public class DefaultGenerators {
 
-    public DefaultGenerators(GeneratorManager mngr) {
+    public DefaultGenerators(ForestGenerator mngr) {
 
         def probs = ["A": 1.0d, "B": 0.8d]
 
         // Default Oak
         def rules = ["A": "[&FFBFA]////[&BFFFA]////[&FBFFA]", "B": "[&FFFA]////[&FFFA]////[&FFFA]"]
-        def oakTree = new TreeGeneratorLSystem(mngr, "FFFFFFA", rules, probs, 4, 30).withGenerationProbability(0.08)
+        def oakTree = new TreeGeneratorLSystem("FFFFFFA", rules, probs, 4, 30).setGenerationProbability(0.08)
 
         // Pine
         rules = ["A": "[&FFFFFA]////[&FFFFFA]////[&FFFFFA]"]
-        def pineTree = new TreeGeneratorLSystem(mngr, "FFFFAFFFFFFFAFFFFA", rules, probs, 4, 35).withLeafType(BlockManager.getInstance().getBlock("DarkLeaf").getId()).withGenerationProbability(0.05).withBarkType(BlockManager.getInstance().getBlock("PineTrunk").getId())
+        def pineTree = new TreeGeneratorLSystem("FFFFAFFFFFFFAFFFFA", rules, probs, 4, 35).setLeafType(BlockManager.getInstance().getBlock("DarkLeaf")).setGenerationProbability(0.05).setBarkType(BlockManager.getInstance().getBlock("PineTrunk"))
 
         // Birk
         rules = ["A": "[&FFFAFFF]////[&FFAFFF]////[&FFFAFFF]", "B": "[&FAF]////[&FAF]////[&FAF]"]
-        def birkTree = new TreeGeneratorLSystem(mngr, "FFFFAFFFFBFFFFAFFFFBFFFFAFFFFBFF", rules, probs, 4, 35).withLeafType(BlockManager.getInstance().getBlock("DarkLeaf").getId()).withGenerationProbability(0.02).withBarkType(BlockManager.getInstance().getBlock("BirkTrunk").getId())
+        def birkTree = new TreeGeneratorLSystem("FFFFAFFFFBFFFFAFFFFBFFFFAFFFFBFF", rules, probs, 4, 35).setLeafType(BlockManager.getInstance().getBlock("DarkLeaf")).setGenerationProbability(0.02).setBarkType(BlockManager.getInstance().getBlock("BirkTrunk"))
 
         // Oak variation tree
         rules = ["A": "[&FFBFA]////[&BFFFA]////[&FBFFAFFA]", "B": "[&FFFAFFFF]////[&FFFAFFF]////[&FFFAFFAA]"]
-        def oakVariationTree = new TreeGeneratorLSystem(mngr, "FFFFFFA", rules, probs, 4, 35).withGenerationProbability(0.08)
+        def oakVariationTree = new TreeGeneratorLSystem("FFFFFFA", rules, probs, 4, 35).setGenerationProbability(0.08)
 
         // A red tree
         rules = ["A": "[&FFAFF]////[&FFAFF]////[&FFAFF]"]
-        def redTree = new TreeGeneratorLSystem(mngr, "FFFFFAFAFAF", rules, probs, 4, 40).withLeafType(BlockManager.getInstance().getBlock("RedLeaf").getId()).withGenerationProbability(0.05)
+        def redTree = new TreeGeneratorLSystem("FFFFFAFAFAF", rules, probs, 4, 40).setLeafType(BlockManager.getInstance().getBlock("RedLeaf")).setGenerationProbability(0.05)
 
         // Cactus
-        def cactus = new TreeGeneratorCactus(mngr).withGenerationProbability(0.05)
+        def cactus = new TreeGeneratorCactus().setGenerationProbability(0.05)
 
         // Add the trees to the generator lists
-        mngr.addTreeGenerator BIOME_TYPE.MOUNTAINS, oakTree
-        mngr.addTreeGenerator BIOME_TYPE.MOUNTAINS, pineTree
-        mngr.addTreeGenerator BIOME_TYPE.MOUNTAINS, redTree
+        mngr.addTreeGenerator WorldBiomeProvider.Biome.MOUNTAINS, oakTree
+        mngr.addTreeGenerator WorldBiomeProvider.Biome.MOUNTAINS, pineTree
+        mngr.addTreeGenerator WorldBiomeProvider.Biome.MOUNTAINS, redTree
 
-        mngr.addTreeGenerator BIOME_TYPE.FOREST, oakTree
-        mngr.addTreeGenerator BIOME_TYPE.FOREST, pineTree
-        mngr.addTreeGenerator BIOME_TYPE.FOREST, redTree
-        mngr.addTreeGenerator BIOME_TYPE.FOREST, oakVariationTree
+        mngr.addTreeGenerator WorldBiomeProvider.Biome.FOREST, oakTree
+        mngr.addTreeGenerator WorldBiomeProvider.Biome.FOREST, pineTree
+        mngr.addTreeGenerator WorldBiomeProvider.Biome.FOREST, redTree
+        mngr.addTreeGenerator WorldBiomeProvider.Biome.FOREST, oakVariationTree
 
-        mngr.addTreeGenerator BIOME_TYPE.SNOW, birkTree
+        mngr.addTreeGenerator WorldBiomeProvider.Biome.SNOW, birkTree
 
-        mngr.addTreeGenerator BIOME_TYPE.PLAINS, redTree
-        mngr.addTreeGenerator BIOME_TYPE.PLAINS, cactus
+        mngr.addTreeGenerator WorldBiomeProvider.Biome.PLAINS, redTree
+        mngr.addTreeGenerator WorldBiomeProvider.Biome.PLAINS, cactus
 
-        mngr.addTreeGenerator BIOME_TYPE.DESERT, redTree
-        mngr.addTreeGenerator BIOME_TYPE.DESERT, cactus
+        mngr.addTreeGenerator WorldBiomeProvider.Biome.DESERT, redTree
+        mngr.addTreeGenerator WorldBiomeProvider.Biome.DESERT, cactus
     }
 }

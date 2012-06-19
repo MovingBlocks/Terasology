@@ -1,38 +1,20 @@
 package org.terasology.componentSystem.rendering;
 
-import static org.lwjgl.opengl.GL11.GL_GREATER;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.glAlphaFunc;
-import static org.lwjgl.opengl.GL11.glBindTexture;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glRotatef;
-import static org.lwjgl.opengl.GL11.glScalef;
-import static org.lwjgl.opengl.GL11.glTranslatef;
-
-import java.util.Map;
-
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
-
+import com.google.common.collect.Maps;
 import org.lwjgl.opengl.GL11;
 import org.terasology.componentSystem.RenderSystem;
-import org.terasology.components.BlockItemComponent;
 import org.terasology.components.CharacterMovementComponent;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LocalPlayerComponent;
+import org.terasology.components.world.BlockItemComponent;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AssetManager;
 import org.terasology.logic.manager.ShaderManager;
-import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;
@@ -46,14 +28,20 @@ import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
 
-import com.google.common.collect.Maps;
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
+import java.util.Map;
+
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
+@RegisterComponentSystem(headedOnly = true)
 public class FirstPersonRenderer implements RenderSystem {
 
-    private IWorldProvider worldProvider;
+    private WorldProvider worldProvider;
     private LocalPlayer localPlayer;
     private WorldRenderer worldRenderer;
     private Mesh handMesh;
@@ -64,7 +52,7 @@ public class FirstPersonRenderer implements RenderSystem {
     @Override
     public void initialise() {
         localPlayer = CoreRegistry.get(LocalPlayer.class);
-        worldProvider = CoreRegistry.get(IWorldProvider.class);
+        worldProvider = CoreRegistry.get(WorldProvider.class);
         worldRenderer = CoreRegistry.get(WorldRenderer.class);
 
         Vector2f texPos = new Vector2f(40.0f * 0.015625f, 32.0f * 0.03125f);
@@ -74,6 +62,10 @@ public class FirstPersonRenderer implements RenderSystem {
         TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, 1), texPos, texWidth, 1.0f, 1.0f, 0.9f, 0.0f, 0.0f, 0.0f);
         handMesh = tessellator.generateMesh();
         handTex = AssetManager.loadTexture("engine:char");
+    }
+
+    @Override
+    public void shutdown() {
     }
 
     @Override
@@ -89,7 +81,7 @@ public class FirstPersonRenderer implements RenderSystem {
     @Override
     public void renderFirstPerson() {
         CharacterMovementComponent charMoveComp = localPlayer.getEntity().getComponent(CharacterMovementComponent.class);
-        float bobOffset = calcBobbingOffset(charMoveComp.footstepDelta / charMoveComp.distanceBetweenFootsteps, (float) java.lang.Math.PI / 8f, 0.05f, 1f) ;
+        float bobOffset = calcBobbingOffset(charMoveComp.footstepDelta / charMoveComp.distanceBetweenFootsteps, (float) java.lang.Math.PI / 8f, 0.05f, 1f);
         float handMovementAnimationOffset = localPlayer.getEntity().getComponent(LocalPlayerComponent.class).handAnimation;
 
         int invSlotIndex = localPlayer.getEntity().getComponent(LocalPlayerComponent.class).selectedTool;
@@ -166,7 +158,7 @@ public class FirstPersonRenderer implements RenderSystem {
 
         // Apply biome and overall color offset
         // TODO: Should get temperature, etc from world provider
-        Vector4f color = activeBlock.calcColorOffsetFor(Side.FRONT, worldProvider.getTemperatureAt(TeraMath.floorToInt(playerPos.x), TeraMath.floorToInt(playerPos.z)), worldProvider.getHumidityAt(TeraMath.floorToInt(playerPos.x), TeraMath.floorToInt(playerPos.z)));
+        Vector4f color = activeBlock.calcColorOffsetFor(Side.FRONT, worldProvider.getBiomeProvider().getTemperatureAt(TeraMath.floorToInt(playerPos.x), TeraMath.floorToInt(playerPos.z)), worldProvider.getBiomeProvider().getHumidityAt(TeraMath.floorToInt(playerPos.x), TeraMath.floorToInt(playerPos.z)));
         shader.setFloat3("colorOffset", color.x, color.y, color.z);
 
         glEnable(GL11.GL_BLEND);
@@ -195,7 +187,7 @@ public class FirstPersonRenderer implements RenderSystem {
     }
 
     private float calcBobbingOffset(float counter, float phaseOffset, float amplitude, float frequency) {
-        return (float)java.lang.Math.sin(2 * Math.PI * counter * frequency + phaseOffset) * amplitude;
+        return (float) java.lang.Math.sin(2 * Math.PI * counter * frequency + phaseOffset) * amplitude;
     }
 
 

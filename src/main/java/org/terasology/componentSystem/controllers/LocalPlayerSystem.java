@@ -3,8 +3,9 @@ package org.terasology.componentSystem.controllers;
 import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.componentSystem.block.BlockEntityRegistry;
 import org.terasology.components.*;
+import org.terasology.components.world.BlockComponent;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
@@ -19,11 +20,11 @@ import org.terasology.game.Timer;
 import org.terasology.input.ButtonState;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
-import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.world.BlockEntityRegistry;
+import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.RayBlockIntersection;
 import org.terasology.rendering.cameras.DefaultCamera;
 
@@ -44,7 +45,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     private LocalPlayer localPlayer;
     private Timer timer;
 
-    private IWorldProvider worldProvider;
+    private WorldProvider worldProvider;
     private DefaultCamera playerCamera;
 
     private long lastTimeSpacePressed;
@@ -58,9 +59,13 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
     @Override
     public void initialise() {
-        worldProvider = CoreRegistry.get(IWorldProvider.class);
+        worldProvider = CoreRegistry.get(WorldProvider.class);
         localPlayer = CoreRegistry.get(LocalPlayer.class);
         timer = CoreRegistry.get(Timer.class);
+    }
+
+    @Override
+    public void shutdown() {
     }
 
     public void setPlayerCamera(DefaultCamera camera) {
@@ -97,7 +102,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         entity.saveComponent(localPlayerComponent);
     }
 
-    @ReceiveEvent(components=LocalPlayerComponent.class)
+    @ReceiveEvent(components = LocalPlayerComponent.class)
     public void onMouseX(MouseXAxisEvent event, EntityRef entity) {
         LocalPlayerComponent localPlayer = entity.getComponent(LocalPlayerComponent.class);
         localPlayer.viewYaw = (localPlayer.viewYaw - event.getValue()) % 360;
@@ -110,7 +115,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         event.consume();
     }
 
-    @ReceiveEvent(components=LocalPlayerComponent.class)
+    @ReceiveEvent(components = LocalPlayerComponent.class)
     public void onMouseY(MouseYAxisEvent event, EntityRef entity) {
         LocalPlayerComponent localPlayer = entity.getComponent(LocalPlayerComponent.class);
         localPlayer.viewPitch = TeraMath.clamp(localPlayer.viewPitch - event.getValue(), -89, 89);
@@ -149,7 +154,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         event.consume();
     }
 
-    @ReceiveEvent(components= {LocalPlayerComponent.class, CharacterMovementComponent.class})
+    @ReceiveEvent(components = {LocalPlayerComponent.class, CharacterMovementComponent.class})
     public void onRun(RunButton event, EntityRef entity) {
         CharacterMovementComponent characterMovement = entity.getComponent(CharacterMovementComponent.class);
         characterMovement.isRunning = event.isDown();
@@ -163,7 +168,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         if (Config.getInstance().isPlacingBox()) {
             RayBlockIntersection.Intersection selectedBlock = calcSelectedBlock();
             if (selectedBlock != null) {
-                Block block = BlockManager.getInstance().getBlock(worldProvider.getBlockAtPosition(selectedBlock.getBlockPosition().toVector3d()));
+                Block block = worldProvider.getBlock(selectedBlock.getBlockPosition());
                 if (block.isRenderBoundingBox()) {
                     block.getBounds(selectedBlock.getBlockPosition()).render(2f);
                 }
@@ -274,7 +279,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
             BlockComponent blockComp = target.getComponent(BlockComponent.class);
             if (blockComp != null) {
-                Block block = BlockManager.getInstance().getBlock(worldProvider.getBlock(blockComp.getPosition()));
+                Block block = worldProvider.getBlock(blockComp.getPosition());
                 if (item.getPerBlockDamageBonus().containsKey(block.getBlockFamily().getTitle())) {
                     damage += item.getPerBlockDamageBonus().get(block.getBlockFamily().getTitle());
                 }
@@ -382,10 +387,10 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
                     blockPosY = (int) (pos.y + (pos.y >= 0 ? 0.5f : -0.5f)) + y;
                     blockPosZ = (int) (pos.z + (pos.z >= 0 ? 0.5f : -0.5f)) + z;
 
-                    byte blockType = worldProvider.getBlock(blockPosX, blockPosY, blockPosZ);
+                    Block block = worldProvider.getBlock(blockPosX, blockPosY, blockPosZ);
 
                     // Ignore special blocks
-                    if (BlockManager.getInstance().getBlock(blockType).isSelectionRayThrough()) {
+                    if (block.isSelectionRayThrough()) {
                         continue;
                     }
 

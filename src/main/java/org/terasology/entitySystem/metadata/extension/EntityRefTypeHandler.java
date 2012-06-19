@@ -41,8 +41,7 @@ public class EntityRefTypeHandler implements TypeHandler<EntityRef> {
         for (EntityRef ref : value) {
             if (!ref.exists()) {
                 result.addInteger(0);
-            }
-            else {
+            } else {
                 result.addInteger((ref).getId());
             }
         }

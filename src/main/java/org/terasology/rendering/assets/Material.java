@@ -179,8 +179,7 @@ public class Material implements Asset {
         int texId = -1;
         if (bindMap.containsKey(desc)) {
             texId = bindMap.get(desc);
-        }
-        else {
+        } else {
             // TODO: do this initially, and try and have similar textures in similar slots for all materials.
             ParamMetadata metadata = shader.getParameter(desc);
             if (metadata == null) {

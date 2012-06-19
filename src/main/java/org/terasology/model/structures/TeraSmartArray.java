@@ -15,6 +15,8 @@
  */
 package org.terasology.model.structures;
 
+import java.util.Arrays;
+
 /**
  * A fast 3D array for efficient storage of 4-bit values.
  *
@@ -38,6 +40,16 @@ public class TeraSmartArray {
         _array = new byte[_halfSize = _size / 2];
     }
 
+    public TeraSmartArray(TeraSmartArray other) {
+        _lX = other._lX;
+        _lY = other._lY;
+        _lZ = other._lZ;
+
+        _size = _lX * _lY * _lZ;
+        _halfSize = _size / 2;
+        _array = Arrays.copyOf(other._array, other._array.length);
+    }
+
     /**
      * Returns the byte value at the given position.
      */
@@ -45,8 +57,9 @@ public class TeraSmartArray {
 
         int pos = (x * _lX * _lY) + (y * _lX) + z;
 
-        if (x >= _lX || y >= _lY || z >= _lZ || x < 0 || y < 0 || z < 0)
-            return -1;
+        if (x >= _lX || y >= _lY || z >= _lZ || x < 0 || y < 0 || z < 0) {
+            throw new IndexOutOfBoundsException(String.format("(%d, %d, %d)", x, y, z));
+        }
 
         if (pos < _halfSize) {
             int bArray = _array[pos] & 0xFF;
@@ -60,22 +73,50 @@ public class TeraSmartArray {
     /**
      * Sets the byte value for the given position.
      */
-    public void set(int x, int y, int z, byte b) {
+    public byte set(int x, int y, int z, byte b) {
         int pos = (x * _lX * _lY) + (y * _lX) + z;
 
-        if (x >= _lX || y >= _lY || z >= _lZ || x < 0 || y < 0 || z < 0)
-            return;
+        assert (x < _lX || y < _lY || z < _lZ || x >= 0 || y >= 0 || z >= 0);
 
         if (pos < _halfSize) {
             int bArray = _array[pos] & 0xFF;
+            byte old = (byte) ((bArray & 0x0F) & 0xFF);
             int bInput = b & 0xFF;
             _array[pos] = (byte) ((bInput & 0x0F) | (bArray & 0xF0));
-            return;
+            return old;
         }
 
         int bArray = _array[pos % _halfSize] & 0xFF;
+        byte old = (byte) (bArray >> 4);
         int bInput = b & 0xFF;
         _array[pos % _halfSize] = (byte) ((bArray & 0x0F) | (bInput << 4) & 0xFF);
+        return old;
+    }
+
+    /**
+     * Sets the byte value for the given position.
+     */
+    public byte set(int x, int y, int z, byte b, byte oldB) {
+        int pos = (x * _lX * _lY) + (y * _lX) + z;
+
+        if (x >= _lX || y >= _lY || z >= _lZ || x < 0 || y < 0 || z < 0)
+            return 0;
+
+        if (pos < _halfSize) {
+            int bArray = _array[pos] & 0xFF;
+            byte old = (byte) ((bArray & 0x0F) & 0xFF);
+            if (old == oldB) {
+                int bInput = b & 0xFF;
+                _array[pos] = (byte) ((bInput & 0x0F) | (bArray & 0xF0));
+            }
+            return old;
+        }
+
+        int bArray = _array[pos % _halfSize] & 0xFF;
+        byte old = (byte) (bArray >> 4);
+        int bInput = b & 0xFF;
+        _array[pos % _halfSize] = (byte) ((bArray & 0x0F) | (bInput << 4) & 0xFF);
+        return old;
     }
 
     /**

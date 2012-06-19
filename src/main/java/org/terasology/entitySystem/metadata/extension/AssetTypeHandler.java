@@ -48,7 +48,7 @@ public class AssetTypeHandler<T extends Asset> implements TypeHandler<T> {
         if (value.getStringCount() > 0) {
             AssetUri uri = new AssetUri(type, value.getString(0));
             if (uri.isValid()) {
-                Asset asset =  AssetManager.load(uri);
+                Asset asset = AssetManager.load(uri);
                 if (asset != null && assetClass.isAssignableFrom(asset.getClass())) {
                     return assetClass.cast(asset);
                 }
@@ -77,7 +77,7 @@ public class AssetTypeHandler<T extends Asset> implements TypeHandler<T> {
         for (String item : value.getStringList()) {
             AssetUri uri = new AssetUri(type, item);
             if (uri.isValid()) {
-                Asset asset =  AssetManager.load(uri);
+                Asset asset = AssetManager.load(uri);
                 if (asset != null && assetClass.isAssignableFrom(asset.getClass())) {
                     result.add(assetClass.cast(asset));
                 }

@@ -10,8 +10,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
-* @author Immortius <immortius@gmail.com>
-*/
+ * @author Immortius <immortius@gmail.com>
+ */
 public final class ComponentMetadata<T extends Component> {
     private static final Logger logger = Logger.getLogger(ComponentMetadata.class.getName());
 
@@ -65,7 +65,6 @@ public final class ComponentMetadata<T extends Component> {
         }
         return null;
     }
-
 
 
 }

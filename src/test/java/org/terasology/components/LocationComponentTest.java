@@ -3,11 +3,11 @@ package org.terasology.components;
 import com.bulletphysics.linearmath.QuaternionUtil;
 import org.junit.Before;
 import org.junit.Test;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.math.TeraMath;
 import org.terasology.testUtil.TeraAssert;
 
-import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 

@@ -15,12 +15,16 @@
  */
 package org.terasology.model.structures;
 
+import com.google.common.collect.Lists;
+import org.terasology.logic.world.BlockUpdate;
+import org.terasology.logic.world.WorldProvider;
+import org.terasology.model.blocks.Block;
+
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.terasology.logic.world.IWorldProvider;
-import org.terasology.model.blocks.Block;
 
 /**
  * A collection of actual blocks and their relative positions, usually _not_ absolute positions in an existing world
@@ -33,14 +37,19 @@ public class BlockCollection {
     private static Logger logger = Logger.getLogger(BlockCollection.class.getName());
     // TODO: Can this integrate better with BlockSelection, rather than need its keyset constructed into a BlockSelection for utility?
 
-    /** Map of what blocks are in which positions */
+    /**
+     * Map of what blocks are in which positions
+     */
     private final HashMap<BlockPosition, Block> _blocks = new HashMap<BlockPosition, Block>();
 
-    /** A specific position to use for attaching to a spot in the world - for a tree this could be the bottom trunk block. */
-    private BlockPosition _attachPos = new BlockPosition(0,0,0);
+    /**
+     * A specific position to use for attaching to a spot in the world - for a tree this could be the bottom trunk block.
+     */
+    private BlockPosition _attachPos = new BlockPosition(0, 0, 0);
 
     /**
      * Simple return of the BlockPositions this collection holds in the form of a BlockSelection
+     *
      * @return A BlockSelection containing the positions within this collection
      */
     public BlockSelection positions() {
@@ -49,6 +58,7 @@ public class BlockCollection {
 
     /**
      * Get the Block that matches the given position
+     *
      * @param pos The position we care about
      * @return The block at the position
      */
@@ -58,6 +68,7 @@ public class BlockCollection {
 
     /**
      * Return the main collection
+     *
      * @return The Position-Block map
      */
     public HashMap<BlockPosition, Block> getBlocks() {
@@ -66,22 +77,24 @@ public class BlockCollection {
 
     /**
      * Simply forwards to the main build method including itself as the BlockCollection to draw blocks from
+     *
      * @param provider The world to build the collection in
      * @param position The position to build the collection at (using the collection's attachment position)
      * @return A BlockSelection containing the final positions the blocks were built at
      */
-    public BlockSelection build(IWorldProvider provider, BlockPosition position) {
+    public BlockSelection build(WorldProvider provider, BlockPosition position) {
         return build(provider, position, this);
     }
 
     /**
      * Builds and returns only the blocks in the collection that matches the blockName
-     * @param provider The world to build the collection in
-     * @param position The position to build the collection at (using the collection's attachment position)
+     *
+     * @param provider  The world to build the collection in
+     * @param position  The position to build the collection at (using the collection's attachment position)
      * @param blockName The name of the blocks we want to filter by
      * @return The BlockSelection for the built blocks matching the filter
      */
-    public BlockSelection buildWithFilter(IWorldProvider provider, BlockPosition position, String blockName) {
+    public BlockSelection buildWithFilter(WorldProvider provider, BlockPosition position, String blockName) {
         BlockCollection filteredBlocks = filter(blockName);
         return build(provider, position, filteredBlocks);
     }
@@ -90,29 +103,35 @@ public class BlockCollection {
      * Create the contents of the collection at a specific position in the world, returning the absolute BlockPositions.
      * This can thus be used to for instance build a blueprint, then optionally sort out what was built where so different
      * block types can be made reactive to subsequent input (say a PortalComponent storing what's frame and what's portal)
-     * @param provider The world to build the collection in
-     * @param position The position to build the collection at (using the collection's attachment position)
+     *
+     * @param provider       The world to build the collection in
+     * @param position       The position to build the collection at (using the collection's attachment position)
      * @param buildingBlocks The BlockCollection we are using to build with, which could be filtered or the main one here
      * @return A BlockSelection containing the final positions the blocks were built at
      */
-    public BlockSelection build(IWorldProvider provider, BlockPosition position, BlockCollection buildingBlocks) {
+    public BlockSelection build(WorldProvider provider, BlockPosition position, BlockCollection buildingBlocks) {
         BlockSelection result = new BlockSelection();
         logger.log(Level.INFO, "Going to build this collection into the world at " + position + ", attaching at relative " + _attachPos);
         //System.out.println(toString());
+
+        List<BlockUpdate> updates = Lists.newArrayListWithCapacity(buildingBlocks.getBlocks().size());
         for (BlockPosition pos : buildingBlocks.getBlocks().keySet()) {
             //System.out.println("Processing block " + getBlock(pos) + " relative position " + pos);
             int x = position.x + pos.x - _attachPos.x;
             int y = position.y + pos.y - _attachPos.y;
             int z = position.z + pos.z - _attachPos.z;
             //System.out.println("This block is being placed at " + x + "," + y + "," + z);
-            provider.setBlock(x, y, z, buildingBlocks.getBlocks().get(pos).getId(), true, true);
-            result.add(new BlockPosition(x,y,z));
+
+            // TODO: Fix this up for concurrency
+            provider.setBlock(x, y, z, buildingBlocks.getBlocks().get(pos), provider.getBlock(x, y, z));
+            result.add(new BlockPosition(x, y, z));
         }
         return result;
     }
 
     /**
      * Returns a filtered BlockCollection only including Blocks matching the supplied name
+     *
      * @param blockName The name of the Block we're interested in
      * @return A BlockCollection only containing the interesting blocks
      */
@@ -131,6 +150,7 @@ public class BlockCollection {
     /**
      * TODO: Can this be used by build to not duplicate code? Maybe a static version that takes a BlockCollection param?
      * Calculates a localized version of the BlockSelection in this Collection's map as per a given position
+     *
      * @param localPos The local position we're going to localize against
      * @return The localized BlockSelection
      */
@@ -143,13 +163,13 @@ public class BlockCollection {
             int y = localPos.y + pos.y - _attachPos.y;
             int z = localPos.z + pos.z - _attachPos.z;
             //System.out.println("Localized to " + x + "," + y + "," + z);
-            result.add(new BlockPosition(x,y,z));
+            result.add(new BlockPosition(x, y, z));
         }
         return result;
     }
 
     public void addBlock(BlockPosition pos, Block b) {
-        _blocks.put(pos,b);
+        _blocks.put(pos, b);
     }
 
     public BlockPosition getAttachPos() {
@@ -162,6 +182,7 @@ public class BlockCollection {
 
     /**
      * Returns the width (x) of the backing BlockSelection's widest point (horizontally measured, not diagonally)
+     *
      * @return int holding calculated width or -1 if there are no elements
      */
     public int calcWidth() {
@@ -170,6 +191,7 @@ public class BlockCollection {
 
     /**
      * Returns the height (y) of the backing BlockCollection's highest point (vertically measured, not diagonally)
+     *
      * @return int holding calculated height or -1 if there are no elements
      */
     public int calcHeight() {
@@ -178,6 +200,7 @@ public class BlockCollection {
 
     /**
      * Returns the depth (z) of the backing BlockCollection's deepest point (horizontally measured, not diagonally)
+     *
      * @return int holding calculated depth or -1 if there are no elements
      */
     public int calcDepth() {

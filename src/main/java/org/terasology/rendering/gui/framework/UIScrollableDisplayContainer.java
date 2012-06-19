@@ -6,35 +6,29 @@ import org.terasology.rendering.gui.components.UIScrollBar;
 
 import javax.vecmath.Vector2f;
 
-import java.util.ArrayList;
 
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glTranslatef;
-
-
-public class UIScrollableDisplayContainer extends UIDisplayContainer{
+public class UIScrollableDisplayContainer extends UIDisplayContainer {
 
     /*
      * ScrollBars
      */
-    protected UIScrollBar _scrollBarVertical   = null;
+    protected UIScrollBar _scrollBarVertical = null;
     protected UIScrollBar _scrollBarHorizontal = null;
 
-    private float      _contentHeight         = 1.0f;
-    private float      _contentWidth          = 1.0f;
-    private float      _scrollShiftVertical   = 0.0f;
-    private float      _scrollShiftHorizontal = 0.0f;
+    private float _contentHeight = 1.0f;
+    private float _contentWidth = 1.0f;
+    private float _scrollShiftVertical = 0.0f;
+    private float _scrollShiftHorizontal = 0.0f;
 
-    private float      _oldVertivalValue       = 0.0f;
-    private float      _oldHorizontalValue     = 0.0f;
+    private float _oldVertivalValue = 0.0f;
+    private float _oldHorizontalValue = 0.0f;
 
-    private Vector2f   _containerPosVertical   = null;
-    private Vector2f   _containerPosHorizontal = null;
+    private Vector2f _containerPosVertical = null;
+    private Vector2f _containerPosHorizontal = null;
 
-    public UIScrollableDisplayContainer(){
+    public UIScrollableDisplayContainer() {
         super();
-        _scrollBarVertical   = new UIScrollBar(getSize(), UIScrollBar.ScrollType.vertical);
+        _scrollBarVertical = new UIScrollBar(getSize(), UIScrollBar.ScrollType.vertical);
         _scrollBarHorizontal = new UIScrollBar(getSize(), UIScrollBar.ScrollType.horizontal);
 
         _scrollBarVertical.setVisible(true);
@@ -75,7 +69,7 @@ public class UIScrollableDisplayContainer extends UIDisplayContainer{
         });
     }
 
-    public void setScrollBarsPosition(Vector2f position, Vector2f size){
+    public void setScrollBarsPosition(Vector2f position, Vector2f size) {
         _containerPosVertical = new Vector2f(position.x + size.x - 15f, position.y);
         _scrollBarVertical.setPosition(_containerPosVertical);
         _scrollBarVertical.setMaxMin(0.0f, getSize().y - 15f);
@@ -85,52 +79,52 @@ public class UIScrollableDisplayContainer extends UIDisplayContainer{
         _scrollBarHorizontal.setMaxMin(0.0f, getSize().x - 15f);
     }
 
-    public void render(){
+    public void render() {
         super.render();
     }
 
-    public void update(){
+    public void update() {
 
         Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
 
         if (intersects(mousePos)) {
             _scrollBarVertical.setWheelled(true);
-        }else{
+        } else {
             _scrollBarVertical.setWheelled(false);
         }
 
-        boolean verticalScrollIsScrolled   = _scrollBarVertical.isScrolled();
+        boolean verticalScrollIsScrolled = _scrollBarVertical.isScrolled();
         boolean horizontalScrollIsScrolled = _scrollBarHorizontal.isScrolled();
-        float checkConfusionVertical   = 0.0f;
+        float checkConfusionVertical = 0.0f;
         float checkConfusionHorizontal = 0.0f;
 
 
-        if(!verticalScrollIsScrolled){
+        if (!verticalScrollIsScrolled) {
             _contentHeight = 0.0f;
         }
 
-        if(!horizontalScrollIsScrolled){
+        if (!horizontalScrollIsScrolled) {
             _contentWidth = 0.0f;
         }
 
-        for(UIDisplayElement displayElement:getDisplayElements()){
-            if(!displayElement.isFixed()){
-                if(!verticalScrollIsScrolled){
-                    if(_contentHeight<=(displayElement.getPosition().y + _scrollShiftVertical + displayElement.getSize().y)){
+        for (UIDisplayElement displayElement : getDisplayElements()) {
+            if (!displayElement.isFixed()) {
+                if (!verticalScrollIsScrolled) {
+                    if (_contentHeight <= (displayElement.getPosition().y + _scrollShiftVertical + displayElement.getSize().y)) {
                         _contentHeight = displayElement.getPosition().y + displayElement.getSize().y + _scrollShiftVertical;
                     }
 
-                    if(!_scrollBarVertical.isVisible()&&displayElement.getPosition().y<checkConfusionVertical){
+                    if (!_scrollBarVertical.isVisible() && displayElement.getPosition().y < checkConfusionVertical) {
                         checkConfusionVertical = displayElement.getPosition().y;
                     }
                 }
 
-                if(!horizontalScrollIsScrolled){
-                    if(_contentWidth<=(displayElement.getPosition().x+_scrollShiftHorizontal+ displayElement.getSize().x)){
+                if (!horizontalScrollIsScrolled) {
+                    if (_contentWidth <= (displayElement.getPosition().x + _scrollShiftHorizontal + displayElement.getSize().x)) {
                         _contentWidth = displayElement.getPosition().x + displayElement.getSize().x + _scrollShiftHorizontal;
                     }
 
-                    if(!_scrollBarHorizontal.isVisible()&&displayElement.getPosition().x<checkConfusionHorizontal){
+                    if (!_scrollBarHorizontal.isVisible() && displayElement.getPosition().x < checkConfusionHorizontal) {
                         checkConfusionHorizontal = displayElement.getPosition().x;
                     }
                 }
@@ -138,37 +132,37 @@ public class UIScrollableDisplayContainer extends UIDisplayContainer{
         }
 
 
-        if(_contentHeight<=getSize().y&&_scrollBarVertical.isVisible()){
+        if (_contentHeight <= getSize().y && _scrollBarVertical.isVisible()) {
             _scrollBarVertical.setVisible(false);
-        }else if(_contentHeight>getSize().y&&!_scrollBarVertical.isVisible()){
+        } else if (_contentHeight > getSize().y && !_scrollBarVertical.isVisible()) {
             _scrollBarVertical.setPosition(_containerPosVertical);
             _scrollBarVertical.setVisible(true);
         }
 
-        if(_contentWidth<=getSize().x&&_scrollBarHorizontal.isVisible()){
+        if (_contentWidth <= getSize().x && _scrollBarHorizontal.isVisible()) {
             _scrollBarHorizontal.setVisible(false);
-        }else if(_contentWidth>getSize().x&&!_scrollBarHorizontal.isVisible()){
+        } else if (_contentWidth > getSize().x && !_scrollBarHorizontal.isVisible()) {
             _scrollBarHorizontal.setPosition(_containerPosHorizontal);
             _scrollBarHorizontal.setVisible(true);
         }
 
-        if(checkConfusionVertical<0.0f){
-            for(UIDisplayElement displayElement:getDisplayElements()){
-                if(!displayElement.isFixed()){
-                    displayElement.getPosition().y += (-1)*checkConfusionVertical;
+        if (checkConfusionVertical < 0.0f) {
+            for (UIDisplayElement displayElement : getDisplayElements()) {
+                if (!displayElement.isFixed()) {
+                    displayElement.getPosition().y += (-1) * checkConfusionVertical;
                 }
             }
         }
 
-        if(checkConfusionHorizontal<0.0f){
-            for(UIDisplayElement displayElement:getDisplayElements()){
-                if(!displayElement.isFixed()){
-                    displayElement.getPosition().x += (-1)*checkConfusionHorizontal;
+        if (checkConfusionHorizontal < 0.0f) {
+            for (UIDisplayElement displayElement : getDisplayElements()) {
+                if (!displayElement.isFixed()) {
+                    displayElement.getPosition().x += (-1) * checkConfusionHorizontal;
                 }
             }
         }
 
-        _scrollBarVertical.setStep(_contentHeight, getSize().y  - 15f);
+        _scrollBarVertical.setStep(_contentHeight, getSize().y - 15f);
 
         _scrollBarHorizontal.setStep(_contentWidth, getSize().x - 15f);
 

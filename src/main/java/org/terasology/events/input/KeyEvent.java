@@ -15,9 +15,9 @@ public class KeyEvent extends ButtonEvent {
         this.state = state;
     }
 
-	public int getKey() {
-		return key;
-	}
+    public int getKey() {
+        return key;
+    }
 
     public ButtonState getState() {
         return state;

@@ -2,18 +2,20 @@ package org.terasology.componentSystem.action;
 
 import org.terasology.components.BookComponent;
 import org.terasology.components.BookshelfComponent;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.entitySystem.EventPriority;
-import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.*;
 import org.terasology.events.inventory.ReceiveItemEvent;
 
 /**
  *
  */
+@RegisterComponentSystem()
 public class BookshelfHandler implements EventHandlerSystem {
     @Override
     public void initialise() {
+    }
+
+    @Override
+    public void shutdown() {
     }
 
     @ReceiveEvent(components = BookshelfComponent.class, priority = EventPriority.PRIORITY_HIGH)

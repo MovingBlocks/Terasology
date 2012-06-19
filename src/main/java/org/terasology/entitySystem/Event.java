@@ -7,5 +7,6 @@ package org.terasology.entitySystem;
  */
 public interface Event {
     public void cancel();
+
     public boolean isCancelled();
 }

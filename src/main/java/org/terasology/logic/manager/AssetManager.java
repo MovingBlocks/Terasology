@@ -1,27 +1,17 @@
 package org.terasology.logic.manager;
 
-import java.net.URL;
-import java.util.EnumMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import java.io.IOException;
-import java.io.InputStream;
-
-import org.terasology.asset.Asset;
-import org.terasology.asset.AssetLoader;
-import org.terasology.asset.AssetSource;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import org.terasology.asset.*;
 import org.terasology.entitySystem.common.NullIterator;
 import org.terasology.rendering.assets.Texture;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class AssetManager {
 
@@ -53,7 +43,7 @@ public class AssetManager {
     }
 
     public void addAssetTemporary(AssetUri uri, Asset asset) {
-        assetCache.put(uri,  asset);
+        assetCache.put(uri, asset);
     }
 
     public Asset loadAsset(AssetUri uri) {
@@ -93,8 +83,7 @@ public class AssetManager {
             } catch (IOException ioe) {
                 logger.log(Level.SEVERE, "Error reading asset " + uri, ioe);
                 return null;
-            }
-            finally {
+            } finally {
                 if (stream != null) {
                     try {
                         stream.close();
@@ -199,8 +188,7 @@ public class AssetManager {
             sourceIterator = assetSources.values().iterator();
             if (sourceIterator.hasNext()) {
                 currentUriIterator = sourceIterator.next().list().iterator();
-            }
-            else {
+            } else {
                 currentUriIterator = NullIterator.newInstance();
             }
             iterate();
@@ -246,8 +234,7 @@ public class AssetManager {
             sourceIterator = assetSources.values().iterator();
             if (sourceIterator.hasNext()) {
                 currentUriIterator = sourceIterator.next().list(type).iterator();
-            }
-            else {
+            } else {
                 currentUriIterator = NullIterator.newInstance();
             }
             iterate();

@@ -70,7 +70,7 @@ public class ArchiveSource extends AbstractSource {
 
                 // @todo avoid this risky approach
                 // Using a jar protocol for zip files, because cannot register new protocols for the applet
-                URL url = new URL("jar:file:" + file.getAbsolutePath() + "!/" + entryPath );
+                URL url = new URL("jar:file:" + file.getAbsolutePath() + "!/" + entryPath);
                 addItem(uri, url);
             }
         }

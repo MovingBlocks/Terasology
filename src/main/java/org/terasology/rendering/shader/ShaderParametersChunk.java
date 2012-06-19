@@ -20,7 +20,7 @@ import org.lwjgl.opengl.GL13;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AssetManager;
-import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.world.WorldProvider;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.world.WorldRenderer;
@@ -41,7 +41,7 @@ public class ShaderParametersChunk implements IShaderParameters {
     public void applyParameters(ShaderProgram program) {
         WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-        IWorldProvider worldProvider = CoreRegistry.get(IWorldProvider.class);
+        WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE1);
         glBindTexture(GL11.GL_TEXTURE_2D, lava.getId());
@@ -68,7 +68,7 @@ public class ShaderParametersChunk implements IShaderParameters {
         }
 
         if (worldProvider != null) {
-            program.setFloat("time", (float) worldProvider.getTime());
+            program.setFloat("time", (float) worldProvider.getTimeInDays());
         }
 
         program.setFloat1("wavingCoordinates", BlockManager.getInstance().calcCoordinatesForWavingBlocks());

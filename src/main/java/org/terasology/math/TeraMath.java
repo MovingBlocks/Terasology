@@ -24,7 +24,8 @@ import org.terasology.logic.world.Chunk;
  */
 public final class TeraMath {
 
-    private TeraMath() {}
+    private TeraMath() {
+    }
 
     public static final float RAD_TO_DEG = (float) (180.0f / Math.PI);
     public static final float DEG_TO_RAD = (float) (Math.PI / 180.0f);
@@ -89,6 +90,14 @@ public final class TeraMath {
     }
 
     public static float clamp(float value, float min, float max) {
+        if (value > max)
+            return max;
+        if (value < min)
+            return min;
+        return value;
+    }
+
+    public static int clamp(int value, int min, int max) {
         if (value > max)
             return max;
         if (value < min)
@@ -198,7 +207,18 @@ public final class TeraMath {
         if (x < 0)
             x -= 15;
 
-        return (x / Chunk.CHUNK_DIMENSION_X);
+        return (x / Chunk.SIZE_X);
+    }
+
+    /**
+     * Returns the chunk position of a given coordinate
+     *
+     * @param y
+     * @return The Y-coordinate of the chunk
+     */
+    public static int calcChunkPosY(int y) {
+        // If we ever have multiple vertical chunks, change this
+        return 0;
     }
 
     /**
@@ -212,29 +232,57 @@ public final class TeraMath {
         if (z < 0)
             z -= 15;
 
-        return (z / Chunk.CHUNK_DIMENSION_Z);
+        return (z / Chunk.SIZE_Z);
+    }
+
+    public static Vector3i calcChunkPos(Vector3i pos) {
+        return calcChunkPos(pos.x, pos.y, pos.z);
+    }
+
+    public static Vector3i calcChunkPos(int x, int y, int z) {
+        return new Vector3i(calcChunkPosX(x), calcChunkPosY(y), calcChunkPosZ(z));
     }
 
     /**
      * Returns the internal position of a block within a chunk.
      *
-     * @param x1 The X-coordinate of the block in the world
-     * @param x2 The X-coordinate of the chunk in the world
+     * @param blockX The X-coordinate of the block in the world
+     * @param chunkX The X-coordinate of the chunk in the world
      * @return The X-coordinate of the block within the chunk
      */
-    public static int calcBlockPosX(int x1, int x2) {
-        return TeraMath.fastAbs(x1 - (x2 * Chunk.CHUNK_DIMENSION_X));
+    public static int calcBlockPosX(int blockX, int chunkX) {
+        return TeraMath.fastAbs(blockX - (chunkX * Chunk.SIZE_X));
+    }
+
+    public static int calcBlockPosY(int blockY, int chunkY) {
+        return blockY;
     }
 
     /**
      * Returns the internal position of a block within a chunk.
      *
-     * @param z1 The Z-coordinate of the block in the world
-     * @param z2 The Z-coordinate of the chunk in the world
+     * @param blockZ The Z-coordinate of the block in the world
+     * @param chunkZ The Z-coordinate of the chunk in the world
      * @return The Z-coordinate of the block within the chunk
      */
-    public static int calcBlockPosZ(int z1, int z2) {
-        return TeraMath.fastAbs(z1 - (z2 * Chunk.CHUNK_DIMENSION_Z));
+    public static int calcBlockPosZ(int blockZ, int chunkZ) {
+        return TeraMath.fastAbs(blockZ - (chunkZ * Chunk.SIZE_Z));
+    }
+
+    public static Vector3i calcBlockPos(int x, int y, int z, Vector3i chunkPos) {
+        return new Vector3i(calcBlockPosX(x, chunkPos.x), calcBlockPosY(y, chunkPos.y), calcBlockPosZ(z, chunkPos.z));
+    }
+
+    public static Region3i getChunkRegionAroundBlockPos(Vector3i pos, int extent) {
+        Vector3i minPos = new Vector3i(-extent, 0, -extent);
+        minPos.add(pos);
+        Vector3i maxPos = new Vector3i(extent, 0, extent);
+        maxPos.add(pos);
+
+        Vector3i minChunk = TeraMath.calcChunkPos(minPos);
+        Vector3i maxChunk = TeraMath.calcChunkPos(maxPos);
+
+        return Region3i.createFromMinMax(minChunk, maxChunk);
     }
 
     /**

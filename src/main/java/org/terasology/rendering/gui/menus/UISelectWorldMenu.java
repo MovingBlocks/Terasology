@@ -15,8 +15,6 @@
  */
 package org.terasology.rendering.gui.menus;
 
-import groovy.util.ConfigObject;
-import groovy.util.ConfigSlurper;
 import org.lwjgl.opengl.Display;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
@@ -25,15 +23,21 @@ import org.terasology.logic.manager.AssetManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
+import org.terasology.logic.world.WorldInfo;
 import org.terasology.logic.world.WorldUtil;
-import org.terasology.rendering.gui.components.*;
+import org.terasology.rendering.gui.components.UIButton;
+import org.terasology.rendering.gui.components.UIImageOverlay;
+import org.terasology.rendering.gui.components.UIInput;
+import org.terasology.rendering.gui.components.UIList;
 import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
-import org.terasology.rendering.gui.framework.*;
+import org.terasology.rendering.gui.framework.IClickListener;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.UIDisplayWindow;
 
 import javax.vecmath.Vector2f;
 import java.io.File;
 import java.io.FileFilter;
-import java.net.MalformedURLException;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -41,7 +45,6 @@ import java.util.logging.Logger;
  * Select world menu screen.
  *
  * @author Anton Kireev <adeon.k87@gmail.com>
- *
  */
 public class UISelectWorldMenu extends UIDisplayWindow {
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -96,7 +99,7 @@ public class UISelectWorldMenu extends UIDisplayWindow {
             public void clicked(UIDisplayElement element) {
                 GUIManager.getInstance().setFocusedWindow(_window);
                 _window.clearInputControls();
-                UIInput inputWorldName = (UIInput)_window.getElementById("inputWorldTitle");
+                UIInput inputWorldName = (UIInput) _window.getElementById("inputWorldTitle");
                 inputWorldName.setValue(_window.getWorldName());
 
             }
@@ -104,18 +107,18 @@ public class UISelectWorldMenu extends UIDisplayWindow {
 
         _deleteFromList.addClickListener(new IClickListener() {
             public void clicked(UIDisplayElement element) {
-                
-                if(_list.getSelectedItem() == null){
+
+                if (_list.getSelectedItem() == null) {
                     GUIManager.getInstance().showMessage("Error", "Please choose a world first.");
                     return;
                 }
 
-                try{
-                    ConfigObject  config = (ConfigObject)_list.getSelectedItem().getValue();
-                    File world = PathManager.getInstance().getWorldSavePath((String) config.get("worldTitle"));
+                try {
+                    WorldInfo worldInfo = (WorldInfo) _list.getSelectedItem().getValue();
+                    File world = PathManager.getInstance().getWorldSavePath(worldInfo.getTitle());
                     WorldUtil.deleteWorld(world);
                     _list.removeSelectedItem();
-                }catch(Exception e){
+                } catch (Exception e) {
                     GUIManager.getInstance().showMessage("Error", "Failed deleting world data object. Sorry.");
                 }
             }
@@ -145,13 +148,13 @@ public class UISelectWorldMenu extends UIDisplayWindow {
         _list.getPosition().y = 230f;
 
         _createNewWorld.getPosition().x = _list.getPosition().x;
-        _createNewWorld.getPosition().y = _list.getPosition().y  + _list.getSize().y + 32f;
+        _createNewWorld.getPosition().y = _list.getPosition().y + _list.getSize().y + 32f;
 
-        _loadFromList.getPosition().x =_createNewWorld.getPosition().x + _createNewWorld.getSize().x + 15f;
-        _loadFromList.getPosition().y =_createNewWorld.getPosition().y;
+        _loadFromList.getPosition().x = _createNewWorld.getPosition().x + _createNewWorld.getSize().x + 15f;
+        _loadFromList.getPosition().y = _createNewWorld.getPosition().y;
 
-        _deleteFromList.getPosition().x =_loadFromList.getPosition().x + _loadFromList.getSize().x + 15f;
-        _deleteFromList.getPosition().y =_loadFromList.getPosition().y;
+        _deleteFromList.getPosition().x = _loadFromList.getPosition().x + _loadFromList.getSize().x + 15f;
+        _deleteFromList.getPosition().y = _loadFromList.getPosition().y;
 
 
         _goToBack.centerHorizontally();
@@ -160,52 +163,52 @@ public class UISelectWorldMenu extends UIDisplayWindow {
 
     }
 
-    private void loadSelectedWorld(){
+    private void loadSelectedWorld() {
 
-        if(_list.size()<1){
+        if (_list.size() < 1) {
             GUIManager.getInstance().showMessage("Error", "You did not create a world yet!");
             return;
         }
 
-        if(_list.getSelectedItem() == null){
+        if (_list.getSelectedItem() == null) {
             GUIManager.getInstance().showMessage("Error", "Please choose a world!");
             return;
         }
 
-        try{
-            ConfigObject  config = (ConfigObject)_list.getSelectedItem().getValue();
-            Config.getInstance().setDefaultSeed((String)config.get("worldSeed"));
-            Config.getInstance().setWorldTitle((String) config.get("worldTitle"));
-            CoreRegistry.get(GameEngine.class).changeState(new StateSinglePlayer(config.get("worldTitle").toString(), config.get("worldSeed").toString()));
-        }catch (Exception e){
+        try {
+            WorldInfo info = (WorldInfo) _list.getSelectedItem().getValue();
+            Config.getInstance().setDefaultSeed(info.getSeed());
+            Config.getInstance().setWorldTitle(info.getTitle());
+            // TODO: Need to load time too. Maybe just pass through WorldInfo?
+            CoreRegistry.get(GameEngine.class).changeState(new StateSinglePlayer(info.getTitle(), info.getSeed()));
+        } catch (Exception e) {
             GUIManager.getInstance().showMessage("Error", "Failed reading world data object. Sorry.");
         }
     }
 
-    public void fillList(){
+    public void fillList() {
         _list.removeAll();
 
-        ConfigObject config = null;
         File worldCatalog = PathManager.getInstance().getWorldPath();
 
-        for(File file : worldCatalog.listFiles(new FileFilter() {
+        for (File file : worldCatalog.listFiles(new FileFilter() {
             public boolean accept(File file) {
-                if(file.isDirectory()){
+                if (file.isDirectory()) {
                     return true;
-                }else{
+                } else {
                     return false;
                 }
             }
-        })){
-            File worldManifest = new File(file, "WorldManifest.groovy");
+        })) {
+            File worldManifest = new File(file, WorldInfo.DEFAULT_FILE_NAME);
             if (!worldManifest.exists())
                 continue;
             try {
-                config = new ConfigSlurper().parse(worldManifest.toURI().toURL());
-                if(config.get("worldTitle")!=null&&config.get("worldSeed")!=null){
-                    _list.addItem((String) config.get("worldTitle"), config);
+                WorldInfo info = WorldInfo.load(worldManifest);
+                if (!info.getTitle().isEmpty()) {
+                    _list.addItem(info.getTitle(), info);
                 }
-            } catch (MalformedURLException e) {
+            } catch (IOException e) {
                 logger.log(Level.SEVERE, "Failed reading world data object. Sorry.", e);
             }
         }

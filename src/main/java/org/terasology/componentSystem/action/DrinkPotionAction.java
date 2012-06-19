@@ -2,11 +2,11 @@ package org.terasology.componentSystem.action;
 
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.components.*;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.components.HealthComponent;
+import org.terasology.components.ItemComponent;
+import org.terasology.components.PoisonedComponent;
+import org.terasology.components.PotionComponent;
+import org.terasology.entitySystem.*;
 import org.terasology.events.*;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
@@ -16,21 +16,29 @@ import org.terasology.logic.manager.AudioManager;
 /**
  * This Handles Potion Consumption
  * Applies effect and returns an empty vial.
+ *
  * @author bi0hax
  */
+@RegisterComponentSystem
 public class DrinkPotionAction implements EventHandlerSystem {
 
     public void initialise() {
-        }
-        public EntityRef entity;
-        public PotionComponent potion;
-        public PoisonedComponent poisoned;
-        public EntityRef item;
-        public CoreRegistry CoreRegister;
+    }
+
+
+    @Override
+    public void shutdown() {
+    }
+
+    public EntityRef entity;
+    public PotionComponent potion;
+    public PoisonedComponent poisoned;
+    public EntityRef item;
+    public CoreRegistry CoreRegister;
 
 
     @ReceiveEvent(components = {PotionComponent.class})
-        public void onActivate(ActivateEvent event, EntityRef entity) {
+    public void onActivate(ActivateEvent event, EntityRef entity) {
         potion = entity.getComponent(PotionComponent.class);
         poisoned = entity.getComponent(PoisonedComponent.class);
         EntityManager entityManager = CoreRegister.get(EntityManager.class);
@@ -52,7 +60,7 @@ public class DrinkPotionAction implements EventHandlerSystem {
                 }
 
 
-            break;
+                break;
 
             case Green:
                 //Receive an Empty Vial (Destroy it if no inventory space available)
@@ -62,7 +70,7 @@ public class DrinkPotionAction implements EventHandlerSystem {
                 }
                 //Poison time!
                 event.getInstigator().send(new PoisonedEvent());
-               break;
+                break;
 
             case Orange: //Cures the Poison.
                 event.getInstigator().send(new CurePoisonEvent());
@@ -85,9 +93,9 @@ public class DrinkPotionAction implements EventHandlerSystem {
 
             default:
                 break;
-             }
+        }
         AudioManager.play(new AssetUri(AssetType.SOUND, "engine:drink"), 1.0f);
 
 
     }
-    }
+}

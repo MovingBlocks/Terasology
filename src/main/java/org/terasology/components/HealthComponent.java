@@ -20,7 +20,8 @@ public final class HealthComponent implements Component {
     public float timeSinceLastDamage = 0.0f;
     public float partialRegen = 0.0f;
 
-    public HealthComponent() {}
+    public HealthComponent() {
+    }
 
     public HealthComponent(int maxHealth, float regenRate, float waitBeforeRegen) {
         this.maxHealth = maxHealth;

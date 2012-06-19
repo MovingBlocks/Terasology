@@ -15,13 +15,12 @@
  */
 package org.terasology.utilities;
 
-import static org.lwjgl.opengl.GL11.glGetFloat;
-
-import java.nio.FloatBuffer;
+import org.lwjgl.BufferUtils;
 
 import javax.vecmath.Matrix4f;
+import java.nio.FloatBuffer;
 
-import org.lwjgl.BufferUtils;
+import static org.lwjgl.opengl.GL11.glGetFloat;
 
 /**
  * A simple helper class for various tasks.

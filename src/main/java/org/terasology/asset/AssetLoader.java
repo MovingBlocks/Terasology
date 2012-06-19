@@ -27,9 +27,10 @@ import java.util.List;
 public interface AssetLoader<T extends Asset> {
     /**
      * Loads an asset
+     *
      * @param stream A stream containing the assets data.
-     * @param uri The uri of the asset
-     * @param urls The urls related to the asset. The first url is the url providing the stream
+     * @param uri    The uri of the asset
+     * @param urls   The urls related to the asset. The first url is the url providing the stream
      * @return The loaded asset, or null
      * @throws IOException If there is any error loading the asset
      */

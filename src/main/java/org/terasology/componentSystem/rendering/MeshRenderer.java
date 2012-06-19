@@ -1,22 +1,12 @@
 package org.terasology.componentSystem.rendering;
 
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glRotatef;
-import static org.lwjgl.opengl.GL11.glScalef;
-import static org.lwjgl.opengl.GL11.glTranslated;
-
-import javax.vecmath.AxisAngle4f;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
-
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.components.AABBCollisionComponent;
-import org.terasology.components.LocationComponent;
-import org.terasology.components.MeshComponent;
+import org.terasology.components.rendering.MeshComponent;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.ShaderManager;
@@ -28,10 +18,19 @@ import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
 
+import javax.vecmath.AxisAngle4f;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
+
+import static org.lwjgl.opengl.GL11.*;
+
 /**
  * TODO: This should be made generic (no explicit shader or mesh) and ported directly into WorldRenderer?
+ *
  * @author Immortius <immortius@gmail.com>
  */
+@RegisterComponentSystem(headedOnly = true)
 public class MeshRenderer implements RenderSystem {
     private EntityManager manager;
     private Mesh mesh;
@@ -46,6 +45,10 @@ public class MeshRenderer implements RenderSystem {
         TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1.0f, 1.0f, 1.0f, 1.0f), 0.8f, 0.8f, 0.6f, 0f, 0f, 0f);
         TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1.0f, 1.0f, 1.0f, 0.6f), 1.0f, 1.0f, 0.8f, 0f, 0f, 0f);
         mesh = tessellator.generateMesh();
+    }
+
+    @Override
+    public void shutdown() {
     }
 
     @Override
@@ -79,7 +82,7 @@ public class MeshRenderer implements RenderSystem {
 
                 shader.enable();
                 shader.setFloat4("colorOffset", meshComp.color.x, meshComp.color.y, meshComp.color.z, meshComp.color.w);
-                shader.setFloat("light", worldRenderer.getRenderingLightValueAt(new Vector3d(worldPos)));
+                shader.setFloat("light", worldRenderer.getRenderingLightValueAt(worldPos));
 
                 mesh.render();
 
@@ -116,8 +119,8 @@ public class MeshRenderer implements RenderSystem {
                 glScalef(worldScale, worldScale, worldScale);
 
                 meshComp.material.enable();
-                meshComp.material.setFloat("light", worldRenderer.getRenderingLightValueAt(new Vector3d(worldPos)));
-                meshComp.material.setInt("carryingTorch",carryingTorch ? 1 : 0);
+                meshComp.material.setFloat("light", worldRenderer.getRenderingLightValueAt(worldPos));
+                meshComp.material.setInt("carryingTorch", carryingTorch ? 1 : 0);
                 meshComp.material.bindTextures();
                 meshComp.mesh.render();
 

@@ -57,7 +57,7 @@ public class Tessellator {
 
         resetParams();
     }
-    
+
     public void setUseLighting(boolean enable) {
         this.useLighting = enable;
     }

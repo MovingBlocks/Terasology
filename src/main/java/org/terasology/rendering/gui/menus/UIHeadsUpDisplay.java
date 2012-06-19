@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.gui.menus;
 
-import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.terasology.entitySystem.*;
 import org.terasology.game.CoreRegistry;
@@ -28,7 +27,6 @@ import org.terasology.mods.miniions.events.MinionMessageEvent;
 import org.terasology.mods.miniions.rendering.gui.components.UIMessageQueue;
 import org.terasology.mods.miniions.rendering.gui.components.UIMinionbar;
 import org.terasology.rendering.gui.components.*;
-import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.world.WorldRenderer;
@@ -132,6 +130,10 @@ public class UIHeadsUpDisplay extends UIDisplayWindow implements EventHandlerSys
     @Override
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
+    }
+
+    @Override
+    public void shutdown() {
     }
 
     @ReceiveEvent(components = {MinionComponent.class})

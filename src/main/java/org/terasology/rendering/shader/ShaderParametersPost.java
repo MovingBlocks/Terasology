@@ -15,10 +15,6 @@
  */
 package org.terasology.rendering.shader;
 
-import static org.lwjgl.opengl.GL11.glBindTexture;
-
-import javax.vecmath.Vector3d;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.game.CoreRegistry;
@@ -26,13 +22,16 @@ import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AssetManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PostProcessingRenderer;
-import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.utilities.PerlinNoise;
+
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
+
+import static org.lwjgl.opengl.GL11.glBindTexture;
 
 /**
  * Shader parameters for the Post-processing shader program.
@@ -70,13 +69,10 @@ public class ShaderParametersPost implements IShaderParameters {
         float fogIntensity = 0.0f;
         float daylight = (float) CoreRegistry.get(WorldRenderer.class).getDaylight();
 
-        if (daylight < 1.0 && daylight > 0.25)
-        {
+        if (daylight < 1.0 && daylight > 0.25) {
             float daylightFactor = (1.0f - daylight) / 0.75f;
             fogIntensity = 0.5f * daylightFactor;
-        }
-        else if (daylight <= 0.25f)
-        {
+        } else if (daylight <= 0.25f) {
             float daylightFactor = (0.25f - daylight) / 0.25f;
             fogIntensity = TeraMath.lerpf(0.5f, 0.05f, daylightFactor);
         }
@@ -86,14 +82,13 @@ public class ShaderParametersPost implements IShaderParameters {
         // TODO: This should be a bit more sophisticated
         //fogIntensity = (float) TeraMath.clamp(fogIntensity + renderer.getActiveHumidity(new Vector3d(renderer.getPlayer().getPosition())));
 
-        fogIntensity = fogIntensity + (float) TeraMath.clamp(renderer.getWorldProvider().getPerlinGenerator().noise(renderer.getWorldProvider().getTime() * 4.0 ,0.038291,0.874691)  *  15.0 * daylight + 0.1 * daylight, 0.0, 15.0) + 0.05f;
+        fogIntensity += renderer.getWorldProvider().getBiomeProvider().getFog(renderer.getWorldProvider().getTimeInDays(), daylight);
 
         program.setFloat("fogIntensity", fogIntensity);
 
         if (CoreRegistry.get(LocalPlayer.class).isValid()) {
             Vector3d cameraPos = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
-            byte blockId = CoreRegistry.get(IWorldProvider.class).getBlockAtPosition(cameraPos);
-            Block block = BlockManager.getInstance().getBlock(blockId);
+            Block block = CoreRegistry.get(WorldProvider.class).getBlock(new Vector3f(cameraPos));
             program.setInt("swimming", block.isLiquid() ? 1 : 0);
         }
     }

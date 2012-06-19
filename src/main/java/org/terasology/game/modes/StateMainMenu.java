@@ -15,11 +15,6 @@
  */
 package org.terasology.game.modes;
 
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.terasology.game.GameEngine;
@@ -32,6 +27,8 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.menus.UIConfigMenu;
 import org.terasology.rendering.gui.menus.UIMainMenu;
 import org.terasology.rendering.gui.menus.UISelectWorldMenu;
+
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * The class implements the main game menu.
@@ -47,8 +44,8 @@ import org.terasology.rendering.gui.menus.UISelectWorldMenu;
  */
 public class StateMainMenu implements GameState {
     /* SCREENS */
-    private UIMainMenu        _mainMenu;
-    private UIConfigMenu      _configMenu;
+    private UIMainMenu _mainMenu;
+    private UIConfigMenu _configMenu;
     private UISelectWorldMenu _selectWorldMenu;
 
     private GameEngine _gameInstance = null;
@@ -70,18 +67,18 @@ public class StateMainMenu implements GameState {
         _mainMenu = new UIMainMenu();
         _mainMenu.setVisible(true);
 
-        UIButton singlePlayerButton = (UIButton)_mainMenu.getElementById("singlePlayerButton");
-        UIButton configButton = (UIButton)_mainMenu.getElementById("configButton");
-        UIButton exitButton   = (UIButton)_mainMenu.getElementById("exitButton");
+        UIButton singlePlayerButton = (UIButton) _mainMenu.getElementById("singlePlayerButton");
+        UIButton configButton = (UIButton) _mainMenu.getElementById("configButton");
+        UIButton exitButton = (UIButton) _mainMenu.getElementById("exitButton");
 
 
         singlePlayerButton.addClickListener(new IClickListener() {
             @Override
             public void clicked(UIDisplayElement element) {
-              //  _mainMenu.setVisible(false);
-              //  _selectWorldMenu.setVisible(true);
-              _selectWorldMenu.fillList();
-              GUIManager.getInstance().setFocusedWindow(_selectWorldMenu);
+                //  _mainMenu.setVisible(false);
+                //  _selectWorldMenu.setVisible(true);
+                _selectWorldMenu.fillList();
+                GUIManager.getInstance().setFocusedWindow(_selectWorldMenu);
             }
         });
 
@@ -100,11 +97,11 @@ public class StateMainMenu implements GameState {
         });
     }
 
-    private void setupSelectWorldMenu(){
+    private void setupSelectWorldMenu() {
         _selectWorldMenu = new UISelectWorldMenu();
         _selectWorldMenu.setVisible(false);
 
-        UIButton goToBack = (UIButton)_selectWorldMenu.getElementById("goToBackButton");
+        UIButton goToBack = (UIButton) _selectWorldMenu.getElementById("goToBackButton");
 
         goToBack.addClickListener(new IClickListener() {
             @Override
@@ -118,10 +115,10 @@ public class StateMainMenu implements GameState {
         _configMenu = new UIConfigMenu();
         _configMenu.setVisible(false);
 
-        UIButton backToMainMenuButton  = (UIButton)_configMenu.getElementById("backToMainMenuButton");
-        UIButton graphicsQualityButton = (UIButton)_configMenu.getElementById("graphicsQualityButton");
-        UIButton FOVButton             = (UIButton)_configMenu.getElementById("fovButton");
-        UIButton viewingDistanceButton = (UIButton)_configMenu.getElementById("viewingDistanceButton");
+        UIButton backToMainMenuButton = (UIButton) _configMenu.getElementById("backToMainMenuButton");
+        UIButton graphicsQualityButton = (UIButton) _configMenu.getElementById("graphicsQualityButton");
+        UIButton FOVButton = (UIButton) _configMenu.getElementById("fovButton");
+        UIButton viewingDistanceButton = (UIButton) _configMenu.getElementById("viewingDistanceButton");
 
         backToMainMenuButton.addClickListener(new IClickListener() {
             @Override
@@ -222,9 +219,9 @@ public class StateMainMenu implements GameState {
         GUIManager.getInstance().getWindowById("generate_world").setVisible(false);
         GUIManager.getInstance().setFocusedWindow("main");
 
-        UIButton graphicsQualityButton = (UIButton)_configMenu.getElementById("graphicsQualityButton");
-        UIButton FOVButton             = (UIButton)_configMenu.getElementById("fovButton");
-        UIButton viewingDistanceButton = (UIButton)_configMenu.getElementById("viewingDistanceButton");
+        UIButton graphicsQualityButton = (UIButton) _configMenu.getElementById("graphicsQualityButton");
+        UIButton FOVButton = (UIButton) _configMenu.getElementById("fovButton");
+        UIButton viewingDistanceButton = (UIButton) _configMenu.getElementById("viewingDistanceButton");
 
         if (Config.getInstance().getActiveViewingDistanceId() == 3)
             viewingDistanceButton.getLabel().setText("Viewing Distance: Ultra");

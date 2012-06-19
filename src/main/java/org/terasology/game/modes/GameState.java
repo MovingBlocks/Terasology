@@ -24,13 +24,17 @@ import org.terasology.game.GameEngine;
  */
 public interface GameState {
     public void init(GameEngine engine);
+
     public void dispose();
 
     public void activate();
+
     public void deactivate();
 
     public void handleInput(float delta);
+
     public void update(float delta);
+
     public void render();
 
 }

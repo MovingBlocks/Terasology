@@ -16,30 +16,23 @@
 
 package org.terasology.asset.loaders;
 
-import java.lang.reflect.Type;
-import java.net.URL;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-
+import com.google.common.io.CharStreams;
+import com.google.gson.*;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetUri;
 import org.terasology.rendering.assets.Shader;
 import org.terasology.rendering.assets.metadata.ParamMetadata;
 import org.terasology.rendering.assets.metadata.ShaderMetadata;
 
-import com.google.common.io.CharStreams;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.lang.reflect.Type;
+import java.net.URL;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Immortius
@@ -94,8 +87,7 @@ public class GLSLShaderLoader implements AssetLoader<Shader> {
         InputStreamReader reader = new InputStreamReader(stream);
         try {
             return CharStreams.toString(reader);
-        }
-        finally {
+        } finally {
             try {
                 reader.close();
             } catch (IOException e) {

@@ -28,6 +28,7 @@ public interface BindableAxis {
 
     /**
      * Set the circumstance under which the axis will send events
+     *
      * @param mode
      */
     void setSendEventMode(SendEventMode mode);
@@ -39,12 +40,14 @@ public interface BindableAxis {
 
     /**
      * Registers a direct subscriber to the axis events
+     *
      * @param subscriber
      */
     void subscribe(BindAxisSubscriber subscriber);
 
     /**
      * Unregisters a direct subscriber to the axis events
+     *
      * @param subscriber
      */
     void unsubscribe(BindAxisSubscriber subscriber);

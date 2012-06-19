@@ -16,13 +16,12 @@
 
 package org.terasology.asset.sources;
 
-import java.net.MalformedURLException;
-import java.util.logging.Logger;
+import org.terasology.asset.AssetUri;
 
 import java.io.File;
 import java.io.IOException;
-
-import org.terasology.asset.AssetUri;
+import java.net.MalformedURLException;
+import java.util.logging.Logger;
 
 /**
  * @author Immortius

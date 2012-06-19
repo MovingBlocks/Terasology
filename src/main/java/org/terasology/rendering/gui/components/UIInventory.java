@@ -49,11 +49,11 @@ public class UIInventory extends UIDisplayContainer {
             cell.setVisible(true);
             addDisplayElement(cell);
         }
-        
+
         for (int i = 0; i < 9; i++) {
-        	UIInventoryCell cell = new UIInventoryCell(i);
-        	cell.setVisible(true);
-        	addDisplayElement(cell);
+            UIInventoryCell cell = new UIInventoryCell(i);
+            cell.setVisible(true);
+            addDisplayElement(cell);
         }
     }
 }
