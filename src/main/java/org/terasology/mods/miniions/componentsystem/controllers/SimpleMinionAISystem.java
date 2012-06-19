@@ -1,22 +1,18 @@
 package org.terasology.mods.miniions.componentsystem.controllers;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.componentSystem.block.BlockEntityRegistry;
 import org.terasology.components.CharacterMovementComponent;
-import org.terasology.components.LocationComponent;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.components.world.LocationComponent;
+import org.terasology.entitySystem.*;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.world.BlockEntityRegistry;
+import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.mods.miniions.components.MinionComponent;
 import org.terasology.mods.miniions.components.SimpleMinionAIComponent;
 import org.terasology.mods.miniions.events.MinionMessageEvent;
@@ -26,7 +22,6 @@ import org.terasology.mods.miniions.utilities.MinionMessage;
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.AxisAngle4f;
-import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 import java.util.List;
 
@@ -37,10 +32,11 @@ import java.util.List;
  * Time: 18:25
  * first evolution of the minion AI, could probably use a lot of improvements
  */
+@RegisterComponentSystem
 public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscriberSystem {
 
     private EntityManager entityManager;
-    private IWorldProvider worldProvider;
+    private WorldProvider worldProvider;
     private BlockEntityRegistry blockEntityRegistry;
     private FastRandom random = new FastRandom();
     private AStarPathing aStarPathing;
@@ -48,10 +44,14 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
 
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
-        worldProvider = CoreRegistry.get(IWorldProvider.class);
+        worldProvider = CoreRegistry.get(WorldProvider.class);
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
         timer = CoreRegistry.get(Timer.class);
         aStarPathing = new AStarPathing(worldProvider);
+    }
+
+    @Override
+    public void shutdown() {
     }
 
     public void update(float delta) {
@@ -276,7 +276,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
     private boolean attack(EntityRef player, Vector3f position) {
 
         int damage = 1;
-        Block block = BlockManager.getInstance().getBlock(worldProvider.getBlockAtPosition(new Vector3d(position.x, position.y - 0.5f, position.z)));
+        Block block = worldProvider.getBlock(new Vector3f(position.x, position.y - 0.5f, position.z));
         if ((block.isDestructible()) && (!block.isSelectionRayThrough())) {
             EntityRef blockEntity = blockEntityRegistry.getOrCreateEntityAt(new Vector3i(position));
             if (blockEntity == EntityRef.NULL) {

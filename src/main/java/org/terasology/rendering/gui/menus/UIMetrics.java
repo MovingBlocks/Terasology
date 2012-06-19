@@ -18,10 +18,8 @@ package org.terasology.rendering.gui.menus;
 import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.procedure.TObjectDoubleProcedure;
 import gnu.trove.procedure.TObjectIntProcedure;
-import org.lwjgl.input.Keyboard;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.gui.components.UIText;
-import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 
 import javax.vecmath.Vector2f;

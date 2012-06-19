@@ -15,27 +15,6 @@
  */
 package org.terasology.model.blocks;
 
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glIsEnabled;
-
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import java.awt.Color;
-import java.awt.image.BufferedImage;
-
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector4f;
-
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.util.ResourceLoader;
 import org.terasology.collection.EnumBooleanMap;
@@ -48,6 +27,22 @@ import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.shader.ShaderProgram;
+
+import javax.imageio.ImageIO;
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector4f;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Stores all information for a specific block type.

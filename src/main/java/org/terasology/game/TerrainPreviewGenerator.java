@@ -15,9 +15,9 @@
  */
 package org.terasology.game;
 
-import org.terasology.logic.generators.ChunkGeneratorTerrain;
-import org.terasology.logic.generators.GeneratorManager;
-import org.terasology.logic.world.LocalWorldProvider;
+import org.terasology.logic.world.WorldBiomeProvider;
+import org.terasology.logic.world.WorldBiomeProviderImpl;
+import org.terasology.logic.world.generator.core.PerlinTerrainGenerator;
 
 import javax.imageio.ImageIO;
 import javax.vecmath.Vector2f;
@@ -31,26 +31,27 @@ import java.io.IOException;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class TerrainPreviewGenerator extends ChunkGeneratorTerrain {
+public class TerrainPreviewGenerator {
 
     /* CONST */
     private static final int ZOOM_FACTOR = 4;
     private static final Vector2f POSITION = new Vector2f(-24575.82f, 20786.54f);
 
-    /**
-     * Init. the generator with a given seed value.
-     *
-     * @param generatorManager The generator manager
-     */
-    public TerrainPreviewGenerator(GeneratorManager generatorManager) {
-        super(generatorManager);
-    }
+    private WorldBiomeProvider biomeProvider;
+    PerlinTerrainGenerator generator;
 
     public static void main(String[] args) {
-        GeneratorManager manager = new GeneratorManager(new LocalWorldProvider("World1", "Terasology42"));
-        TerrainPreviewGenerator gen = new TerrainPreviewGenerator(manager);
+        TerrainPreviewGenerator gen = new TerrainPreviewGenerator("Terasology42");
 
         gen.generateMap();
+    }
+
+    public TerrainPreviewGenerator(String seed) {
+        this.biomeProvider = new WorldBiomeProviderImpl(seed);
+        generator = new PerlinTerrainGenerator();
+        generator.setWorldSeed(seed);
+        generator.setWorldBiomeProvider(biomeProvider);
+
     }
 
     public void generateMap() {
@@ -60,7 +61,7 @@ public class TerrainPreviewGenerator extends ChunkGeneratorTerrain {
         int counter = 0;
         for (int x = -128; x < 128; x++) {
             for (int z = -128; z < 128; z++) {
-                BIOME_TYPE bt = calcBiomeTypeForGlobalPosition(x * ZOOM_FACTOR + (int) POSITION.x, z * ZOOM_FACTOR + (int) POSITION.y);
+                WorldBiomeProvider.Biome bt = biomeProvider.getBiomeAt(x * ZOOM_FACTOR + (int) POSITION.x, z * ZOOM_FACTOR + (int) POSITION.y);
 
                 Color color = Color.BLACK;
 
@@ -83,7 +84,7 @@ public class TerrainPreviewGenerator extends ChunkGeneratorTerrain {
                 }
 
                 for (int height = 256; height > 0; height -= 4) {
-                    double n = calcDensity(x * ZOOM_FACTOR + (int) POSITION.x, height - 1, z * ZOOM_FACTOR + (int) POSITION.y);
+                    double n = generator.calcDensity(x * ZOOM_FACTOR + (int) POSITION.x, height - 1, z * ZOOM_FACTOR + (int) POSITION.y);
 
                     if (n >= 0) {
                         if (height > 32)

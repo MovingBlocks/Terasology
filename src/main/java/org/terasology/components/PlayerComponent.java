@@ -6,6 +6,7 @@ import javax.vecmath.Vector3f;
 
 /**
  * Player information that is shared across the network
+ *
  * @author Immortius <immortius@gmail.com>
  */
 public final class PlayerComponent implements Component {

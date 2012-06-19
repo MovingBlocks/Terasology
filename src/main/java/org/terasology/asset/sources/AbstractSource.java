@@ -16,17 +16,16 @@
 
 package org.terasology.asset.sources;
 
-import java.net.URL;
-import java.util.List;
-import java.util.logging.Logger;
-
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
 import org.terasology.asset.AssetSource;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
+import java.net.URL;
+import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * @author Immortius

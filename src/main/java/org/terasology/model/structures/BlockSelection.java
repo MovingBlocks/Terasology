@@ -24,6 +24,7 @@ import java.util.logging.Logger;
  * A selection of block positions, which may be relative (within a BlockCollection) or absolute (placed in a world)
  * Useful for tracking meta-block objects like Portals, Doors, Trees, etc
  * In other words simply a central wrapper around a Set of BlockPositions in case we change Set later or add utility
+ *
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
 public class BlockSelection {
@@ -40,6 +41,7 @@ public class BlockSelection {
 
     /**
      * Constructor useful to take the Set<BlockPosition> you get back via keySet() on Maps, etc
+     *
      * @param positions The initial BlockPositions this selection should contain
      */
     public BlockSelection(Set<BlockPosition> positions) {
@@ -48,8 +50,9 @@ public class BlockSelection {
 
     /**
      * Simple check for being empty
+     *
      * @return boolean empty or not
-     * //TODO: See if there's anywhere this should be used yet?
+     *         //TODO: See if there's anywhere this should be used yet?
      */
     public boolean isEmpty() {
         return _positions.isEmpty();
@@ -57,6 +60,7 @@ public class BlockSelection {
 
     /**
      * Forward the position addition to the internal Set
+     *
      * @param pos BlockPosition to add to this selection
      * @return true if this set did not already contain the position
      */
@@ -66,6 +70,7 @@ public class BlockSelection {
 
     /**
      * Returns the Set containing the selection of positions
+     *
      * @return The positions in a Set
      */
     public Set<BlockPosition> positions() {
@@ -74,6 +79,7 @@ public class BlockSelection {
 
     /**
      * Calculates the highest X (right) value of any position in this BlockSelection, or Integer.MIN_VALUE if empty
+     *
      * @return highest X or Integer.MIN_VALUE if empty TODO: Make this throw exceptions instead!
      */
     public int calcMaxX() {
@@ -88,6 +94,7 @@ public class BlockSelection {
 
     /**
      * Calculates the lowest X (left) value of any position in this BlockSelection, or Integer.MAX_VALUE if empty
+     *
      * @return lowest X or Integer.MAX_VALUE if empty
      */
     public int calcMinX() {
@@ -102,6 +109,7 @@ public class BlockSelection {
 
     /**
      * Returns the total width (x) of the BlockSelection's widest point (horizontally measured, not diagonally)
+     *
      * @return int holding calculated width or -1 if there are no elements
      */
     public int calcWidth() {
@@ -114,6 +122,7 @@ public class BlockSelection {
 
     /**
      * Calculates the highest Y value of any position in this BlockSelection, or Integer.MIN_VALUE if empty
+     *
      * @return highest Y or Integer.MIN_VALUE if empty
      */
     public int calcMaxY() {
@@ -128,6 +137,7 @@ public class BlockSelection {
 
     /**
      * Calculates the lowest Y value of any position in this BlockSelection, or Integer.MAX_VALUE if empty
+     *
      * @return lowest Y or Integer.MAX_VALUE if empty
      */
     public int calcMinY() {
@@ -142,6 +152,7 @@ public class BlockSelection {
 
     /**
      * Returns the total height (y) from the BlockSelection's highest point to the lowest (vertically measured, not diagonally)
+     *
      * @return int holding calculated height or -1 if there are no elements
      */
     public int calcHeight() {
@@ -154,6 +165,7 @@ public class BlockSelection {
 
     /**
      * Calculates the highest Z value of any position in this BlockSelection, or Integer.MIN_VALUE if empty
+     *
      * @return highest Z or Integer.MIN_VALUE if empty
      */
     public int calcMaxZ() {
@@ -168,6 +180,7 @@ public class BlockSelection {
 
     /**
      * Calculates the lowest Z value of any position in this BlockSelection, or Integer.MAX_VALUE if empty
+     *
      * @return lowest Z or Integer.MAX_VALUE if empty
      */
     public int calcMinZ() {
@@ -182,6 +195,7 @@ public class BlockSelection {
 
     /**
      * Returns the total depth (z) of the BlockSelection's closest point to the deepest (horizontally measured, not diagonally)
+     *
      * @return int holding calculated depth or -1 if there are no elements
      */
     public int calcDepth() {
@@ -194,6 +208,7 @@ public class BlockSelection {
 
     /**
      * Compare this BlockSelection's positions vs a given BlockSelection and see if there is any overlap at all
+     *
      * @param otherSelection the other selection of positions
      * @return boolean for overlap or not
      */
@@ -217,6 +232,7 @@ public class BlockSelection {
 
     /**
      * Compare this BlockSelection's positions vs a given BlockSelection and see if this one entirely contains the other
+     *
      * @param otherSelection the other selection of positions
      * @return boolean for full containment or not
      */
@@ -247,6 +263,7 @@ public class BlockSelection {
 
     /**
      * Checks to see if the given BlockSelection can possibly overlap this one, which is figured out by checking bounds
+     *
      * @param otherSelection The other BlockSelection to check with
      * @return boolean for possible overlap or not
      */

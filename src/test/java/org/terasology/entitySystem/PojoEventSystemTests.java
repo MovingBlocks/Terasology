@@ -177,6 +177,10 @@ public class PojoEventSystemTests {
 
         }
 
+        @Override
+        public void shutdown() {
+        }
+
         public static class Received {
             TestEvent event;
             EntityRef entity;
@@ -211,6 +215,11 @@ public class PojoEventSystemTests {
 
         }
 
+        @Override
+        public void shutdown() {
+
+        }
+
         public static class Received {
             TestEvent event;
             EntityRef entity;
@@ -233,6 +242,10 @@ public class PojoEventSystemTests {
 
         public void initialise() {
 
+        }
+
+        @Override
+        public void shutdown() {
         }
 
         public static class Received {

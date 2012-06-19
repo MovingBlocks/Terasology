@@ -12,7 +12,7 @@ public class LeftMouseDownButtonEvent extends MouseDownButtonEvent {
         return event;
     }
 
-	private LeftMouseDownButtonEvent(float delta, EntityRef target) {
+    private LeftMouseDownButtonEvent(float delta, EntityRef target) {
         super(0, delta, target);
     }
 }

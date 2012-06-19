@@ -23,7 +23,8 @@ public class ParamMetadata {
     String name;
     ParamType type;
 
-    public ParamMetadata() {}
+    public ParamMetadata() {
+    }
 
     public ParamMetadata(String name, ParamType type) {
         this.name = name;

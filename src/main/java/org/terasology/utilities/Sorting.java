@@ -2,6 +2,8 @@ package org.terasology.utilities;
 
 import java.util.List;
 
+// TODO: This class is needs to be refactored, with non-single character variable names
+// TODO: Also someone check that we can actually use this, license-wise
 public final class Sorting {
     // Prevent instantiation
     private Sorting() {
@@ -29,7 +31,7 @@ public final class Sorting {
     // based on http://en.wikipedia.org/wiki/Smoothsort
     // The advantage of smoothsort is that it comes closer to O(n) time if the input is already sorted to some degree
     public static <C extends Comparable<? super C>> void smoothSort(List<C> m,
-                                                              int lo, int hi) {
+                                                                    int lo, int hi) {
         int head = lo; // the offset of the first element of the prefix into m
 
         // These variables need a little explaining. If our string of heaps

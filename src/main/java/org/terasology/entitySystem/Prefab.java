@@ -6,7 +6,7 @@ package org.terasology.entitySystem;
  *
  * @author Immortius <immortius@gmail.com>
  */
-public interface Prefab{
+public interface Prefab {
 
     /**
      * @return The identifier for this prefab
@@ -14,7 +14,6 @@ public interface Prefab{
     public String getName();
 
     /**
-     *
      * @param componentClass
      * @param <T>
      * @return The requested component, or null if the entity doesn't have a component of this class
@@ -23,6 +22,7 @@ public interface Prefab{
 
     /**
      * Adds a component to this entity. If the entity already has a component of the same class it is replaced.
+     *
      * @param component
      */
     public <T extends Component> T setComponent(T component);
@@ -34,6 +34,7 @@ public interface Prefab{
 
     /**
      * Iterates over all the components
+     *
      * @return
      */
     public Iterable<Component> listComponents();

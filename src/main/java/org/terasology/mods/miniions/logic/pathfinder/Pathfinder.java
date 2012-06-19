@@ -8,25 +8,21 @@ package org.terasology.mods.miniions.logic.pathfinder;
  * To change this template use File | Settings | File Templates.
  */
 
-import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.world.WorldProvider;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.management.BlockManager;
 
-import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 import java.util.List;
 
 public abstract class Pathfinder {
 
-    protected IWorldProvider world;
-    protected BlockManager blockManager;
+    protected WorldProvider world;
 
     protected boolean pathSmoothing = false;
 
 
-    public Pathfinder(IWorldProvider provider) {
+    public Pathfinder(WorldProvider provider) {
         this.world = provider;
-        blockManager = BlockManager.getInstance();
     }
 
     public boolean isPathSmoothing() {
@@ -49,12 +45,12 @@ public abstract class Pathfinder {
 
     protected boolean isPassable(int x, int y, int z) {
         // @todo add more complicated check
-        return isPassable(blockManager.getBlock(world.getBlock(x, y, z)));
+        return isPassable(world.getBlock(x, y, z));
     }
 
     protected boolean isPassable(Vector3f vec) {
         // @todo add more complicated check
-        return isPassable(blockManager.getBlock(world.getBlockAtPosition(new Vector3d(vec.x, vec.y, vec.z))));
+        return isPassable(world.getBlock(vec));
     }
 
 

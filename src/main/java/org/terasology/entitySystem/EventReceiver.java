@@ -18,6 +18,7 @@ package org.terasology.entitySystem;
 
 /**
  * Interface for a single event receiver
+ *
  * @author Immortius
  */
 public interface EventReceiver<T extends Event> {

@@ -16,9 +16,9 @@
 
 package org.terasology.asset;
 
-import java.util.Map;
-
 import com.google.common.collect.Maps;
+
+import java.util.Map;
 
 /**
  * @author Immortius

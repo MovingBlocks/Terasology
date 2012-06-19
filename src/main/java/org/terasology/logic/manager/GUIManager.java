@@ -25,34 +25,34 @@ import java.util.List;
 public class GUIManager {
     private static GUIManager _instance;
     private UIDisplayRenderer _renderer;
-    private UIDisplayWindow   _focusedWindow;
-    private UIDisplayWindow   _lastFocused;
+    private UIDisplayWindow _focusedWindow;
+    private UIDisplayWindow _lastFocused;
     private HashMap<String, UIDisplayWindow> _windowsById = new HashMap<String, UIDisplayWindow>();
 
-    public GUIManager(){
+    public GUIManager() {
         _renderer = new UIDisplayRenderer();
         _renderer.setVisible(true);
     }
 
-    public static GUIManager getInstance(){
-        if(_instance == null){
+    public static GUIManager getInstance() {
+        if (_instance == null) {
             _instance = new GUIManager();
         }
         return _instance;
     }
 
-    public void render(){
+    public void render() {
         _renderer.render();
     }
 
-    public void update(){
-        if(_focusedWindow==null){
+    public void update() {
+        if (_focusedWindow == null) {
             int size = _renderer.getDisplayElements().size();
-            if(size>0){
+            if (size > 0) {
                 //added this check to prevent the manager from ungrabbing the mouse when the minion behaviour menu pops up
                 // TODO : better way to handle this? not link focus with grabbing / ungrabbing?
-                UIDisplayWindow tempwindow = (UIDisplayWindow)_renderer.getDisplayElements().get(size-1);
-                if(!(tempwindow instanceof UIMinion)){
+                UIDisplayWindow tempwindow = (UIDisplayWindow) _renderer.getDisplayElements().get(size - 1);
+                if (!(tempwindow instanceof UIMinion)) {
                     _focusedWindow = tempwindow;
                 }
             }
@@ -60,10 +60,10 @@ public class GUIManager {
         _renderer.update();
     }
 
-    public <T extends UIDisplayWindow> T addWindow(T window, String windowId){
-        if(window.isMaximized()){
-            _renderer.addtDisplayElementToPosition(0,window);
-        }else{
+    public <T extends UIDisplayWindow> T addWindow(T window, String windowId) {
+        if (window.isMaximized()) {
+            _renderer.addtDisplayElementToPosition(0, window);
+        } else {
             _renderer.addDisplayElement(window);
         }
 
@@ -78,12 +78,12 @@ public class GUIManager {
         }
     }
 
-    public void removeWindow(UIDisplayWindow window){
+    public void removeWindow(UIDisplayWindow window) {
         _renderer.removeDisplayElement(window);
 
-        if(_windowsById.containsValue(window)){
-            for(String key : _windowsById.keySet()){
-                if( _windowsById.get(key).equals(window) ){
+        if (_windowsById.containsValue(window)) {
+            for (String key : _windowsById.keySet()) {
+                if (_windowsById.get(key).equals(window)) {
                     _windowsById.remove(key);
                     break;
                 }
@@ -100,7 +100,7 @@ public class GUIManager {
         }
     }
 
-    public void removeWindow(String windowId){
+    public void removeWindow(String windowId) {
         UIDisplayWindow window = getWindowById(windowId);
         if (window == null) {
             return;
@@ -108,9 +108,9 @@ public class GUIManager {
 
         _renderer.removeDisplayElement(window);
 
-        if(_windowsById.containsValue(window)){
-            for(String key : _windowsById.keySet()){
-                if( _windowsById.get(key).equals(window) ){
+        if (_windowsById.containsValue(window)) {
+            for (String key : _windowsById.keySet()) {
+                if (_windowsById.get(key).equals(window)) {
                     _windowsById.remove(key);
                     break;
                 }
@@ -127,10 +127,10 @@ public class GUIManager {
         }
     }
 
-    public UIDisplayWindow getWindowById(String windowId){
-        if( _windowsById.containsKey(windowId) ){
+    public UIDisplayWindow getWindowById(String windowId) {
+        if (_windowsById.containsKey(windowId)) {
             return _windowsById.get(windowId);
-        }else{
+        } else {
             return null;
         }
     }
@@ -163,7 +163,7 @@ public class GUIManager {
 
         List<UIDisplayElement> screens = Lists.newArrayList(_renderer.getDisplayElements());
         for (UIDisplayElement screen : screens) {
-            if (!((UIDisplayWindow)screen).isModal()) {
+            if (!((UIDisplayWindow) screen).isModal()) {
                 screen.processKeyboardInput(key);
             }
         }
@@ -171,11 +171,11 @@ public class GUIManager {
 
     public void processMouseInput(int button, boolean state, int wheelMoved) {
 
-        if(button==0 && state){
+        if (button == 0 && state) {
             checkTopWindow();
         }
 
-        if(_focusedWindow != null){
+        if (_focusedWindow != null) {
             _focusedWindow.processMouseInput(button, state, wheelMoved);
         }
     }
@@ -189,75 +189,75 @@ public class GUIManager {
         return false;
     }
 
-    public void setFocusedWindow(UIDisplayWindow window){
+    public void setFocusedWindow(UIDisplayWindow window) {
         int size = _renderer.getDisplayElements().size();
 
-        for(int i = 0; i < size; i++){
-            if( window.equals( _renderer.getDisplayElements().get(i) ) ){
+        for (int i = 0; i < size; i++) {
+            if (window.equals(_renderer.getDisplayElements().get(i))) {
                 setTopWindow(i);
                 return;
             }
         }
         _focusedWindow = null;
     }
-    
-    public void setFocusedFromLast(){
 
-        if(_lastFocused == null || _lastFocused.equals(_focusedWindow)){
+    public void setFocusedFromLast() {
+
+        if (_lastFocused == null || _lastFocused.equals(_focusedWindow)) {
             return;
         }
 
-        if( _focusedWindow.isMaximized() && _lastFocused.isMaximized() ){
+        if (_focusedWindow.isMaximized() && _lastFocused.isMaximized()) {
             _focusedWindow.setVisible(false);
         }
 
         _focusedWindow = _lastFocused;
 
-        if(!_focusedWindow.isVisible()){
+        if (!_focusedWindow.isVisible()) {
             _focusedWindow.setVisible(true);
         }
     }
 
-    public void setFocusedWindow(String windowId){
-        if(_windowsById == null || _windowsById.size()<1 || !_windowsById.containsKey(windowId)){
+    public void setFocusedWindow(String windowId) {
+        if (_windowsById == null || _windowsById.size() < 1 || !_windowsById.containsKey(windowId)) {
             return;
         }
         setFocusedWindow(_windowsById.get(windowId));
     }
 
-    private void setTopWindow(int windowPosition){
+    private void setTopWindow(int windowPosition) {
 
-        if(_renderer.getDisplayElements().size()-1 < windowPosition || windowPosition < 0){
+        if (_renderer.getDisplayElements().size() - 1 < windowPosition || windowPosition < 0) {
             return;
         }
 
-        UIDisplayWindow setTopWindow = (UIDisplayWindow)_renderer.getDisplayElements().get(windowPosition);
+        UIDisplayWindow setTopWindow = (UIDisplayWindow) _renderer.getDisplayElements().get(windowPosition);
 
-        if(setTopWindow == null){
+        if (setTopWindow == null) {
             return;
         }
 
         if (_focusedWindow != null && _focusedWindow.isVisible()) {
             _lastFocused = _focusedWindow;
-            if(_lastFocused!=null && _lastFocused.isMaximized() && setTopWindow.isMaximized()){
+            if (_lastFocused != null && _lastFocused.isMaximized() && setTopWindow.isMaximized()) {
                 _lastFocused.setVisible(false);
             }
         }
 
         _focusedWindow = setTopWindow;
 
-        if( !_focusedWindow.isMaximized() ){
-            _renderer.changeElementDepth(windowPosition, _renderer.getDisplayElements().size()-1);
+        if (!_focusedWindow.isMaximized()) {
+            _renderer.changeElementDepth(windowPosition, _renderer.getDisplayElements().size() - 1);
         }
 
-        if(!_focusedWindow.isVisible()){
+        if (!_focusedWindow.isVisible()) {
             _focusedWindow.setVisible(true);
         }
     }
 
-    private void checkTopWindow(){
+    private void checkTopWindow() {
 
-        if(_focusedWindow != null && _focusedWindow.isModal() && _focusedWindow.isVisible()){
+        if (_focusedWindow != null && _focusedWindow.isModal() && _focusedWindow.isVisible()) {
             return;
         }
 
@@ -265,16 +265,17 @@ public class GUIManager {
 
         int size = _renderer.getDisplayElements().size();
 
-        for(int i = size - 1; i>=0; i--){
-            UIDisplayWindow window = (UIDisplayWindow)_renderer.getDisplayElements().get(i);
-            if(window.isVisible() && window.intersects(mousePos) && window.isModal()){
+        for (int i = size - 1; i >= 0; i--) {
+            UIDisplayWindow window = (UIDisplayWindow) _renderer.getDisplayElements().get(i);
+            if (window.isVisible() && window.intersects(mousePos) && window.isModal()) {
                 setTopWindow(i);
                 break;
-            };
+            }
+            ;
         }
     }
 
-    public void showMessage(String title, String text){
+    public void showMessage(String title, String text) {
         UIDisplayWindow messageWindow = new UIMessageBox(title, text);
         messageWindow.setVisible(true);
         messageWindow.center();
@@ -282,7 +283,7 @@ public class GUIManager {
         setFocusedWindow(messageWindow);
     }
 
-    public void setLastFocused(){
+    public void setLastFocused() {
         _focusedWindow = _lastFocused;
     }
 

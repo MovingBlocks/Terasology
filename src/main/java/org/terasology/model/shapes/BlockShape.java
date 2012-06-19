@@ -42,7 +42,7 @@ public class BlockShape {
     public String getTitle() {
         return title;
     }
-    
+
     public Iterable<AABB> getColliders() {
         return colliders;
     }
@@ -58,7 +58,7 @@ public class BlockShape {
     public void setBlockingSide(Side side, boolean blocking) {
         fullSide[side.ordinal()] = blocking;
     }
-    
+
     public void setColliders(Collection<AABB> colliders) {
         this.colliders.clear();
         this.colliders.addAll(colliders);

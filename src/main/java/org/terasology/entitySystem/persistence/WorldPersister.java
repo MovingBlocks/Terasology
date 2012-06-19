@@ -3,7 +3,6 @@ package org.terasology.entitySystem.persistence;
 import com.google.protobuf.TextFormat;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.PersistableEntityManager;
-import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.protobuf.EntityData;
 
 import java.io.*;
@@ -68,9 +67,9 @@ public class WorldPersister {
     private EntityManager entityManager;
     private EntityPersisterHelper persisterHelper;
 
-    public WorldPersister(ComponentLibrary componentLibrary, EntityManager entityManager) {
+    public WorldPersister(EntityManager entityManager) {
         this.entityManager = entityManager;
-        this.persisterHelper = new EntityPersisterHelperImpl(componentLibrary, (PersistableEntityManager) entityManager);
+        this.persisterHelper = new EntityPersisterHelperImpl((PersistableEntityManager) entityManager);
     }
 
     public void save(File file, SaveFormat format) throws IOException {

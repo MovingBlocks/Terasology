@@ -19,7 +19,7 @@ public class ByteTypeHandler implements TypeHandler<Byte> {
 
     public Byte deserialize(EntityData.Value value) {
         if (value.getIntegerCount() > 0) {
-            return (byte)value.getInteger(0);
+            return (byte) value.getInteger(0);
         }
         return null;
     }
@@ -39,7 +39,7 @@ public class ByteTypeHandler implements TypeHandler<Byte> {
     public List<Byte> deserializeList(EntityData.Value value) {
         if (value.hasBytes()) {
             List<Byte> result = Lists.newArrayListWithCapacity(value.getBytes().size());
-            for (byte b : value.getBytes().toByteArray()){
+            for (byte b : value.getBytes().toByteArray()) {
                 result.add(b);
             }
             return result;

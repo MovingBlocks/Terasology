@@ -16,22 +16,20 @@
 
 package org.terasology.asset.loaders;
 
-import java.net.URL;
-import java.nio.ByteBuffer;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
+import com.google.gson.Gson;
 import org.newdawn.slick.opengl.PNGDecoder;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetUri;
 import org.terasology.rendering.assets.Texture;
 
-import com.google.gson.Gson;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.nio.ByteBuffer;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Immortius
@@ -71,8 +69,7 @@ public class PNGTextureLoader implements AssetLoader<Texture> {
                     TextureMetadata metadata = gson.fromJson(reader, TextureMetadata.class);
                     if (metadata.filterMode != null) filterMode = metadata.filterMode;
                     if (metadata.wrapMode != null) wrapMode = metadata.wrapMode;
-                }
-                finally {
+                } finally {
                     // JAVA7: Replace with new handling
                     if (reader != null) {
                         try {
@@ -86,6 +83,6 @@ public class PNGTextureLoader implements AssetLoader<Texture> {
             }
         }
 
-        return new Texture(uri, new ByteBuffer[] {data}, width, height, wrapMode, filterMode);
+        return new Texture(uri, new ByteBuffer[]{data}, width, height, wrapMode, filterMode);
     }
 }

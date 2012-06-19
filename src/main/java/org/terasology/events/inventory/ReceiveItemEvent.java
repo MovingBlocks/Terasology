@@ -22,7 +22,7 @@ import org.terasology.entitySystem.EntityRef;
 /**
  * @author Immortius
  */
-public class ReceiveItemEvent extends AbstractEvent{
+public class ReceiveItemEvent extends AbstractEvent {
     private EntityRef item;
 
     public ReceiveItemEvent(EntityRef item) {

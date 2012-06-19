@@ -2,26 +2,12 @@ package org.terasology.logic.manager;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
-import org.terasology.components.LocalPlayerComponent;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.world.IWorldProvider;
-import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
-import org.terasology.model.structures.RayBlockIntersection;
-import org.terasology.mods.miniions.components.MinionBarComponent;
-import org.terasology.mods.miniions.components.MinionControllerComponent;
-import org.terasology.mods.miniions.componentsystem.entityfactory.MiniionFactory;
-import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.utilities.FastRandom;
 
-import javax.vecmath.Vector3f;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -96,8 +82,8 @@ public class GroovyHelpManager {
         String fampref = "org.terasology.model.blocks.";
         String tempval = "";
         boolean nodup = true;
-        for (byte i = -127; i < 127; i++) {
-            Block b = BlockManager.getInstance().getBlock(i);
+        for (int i = Byte.MIN_VALUE; i <= Byte.MAX_VALUE; i++) {
+            Block b = BlockManager.getInstance().getBlock((byte) i);
             if (b.getId() != 0) {
                 if (tempval.length() > 0) {
                     if (b.getTitle().startsWith(tempval)) {

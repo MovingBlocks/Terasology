@@ -15,13 +15,6 @@
  */
 package org.terasology.rendering.world;
 
-import static org.lwjgl.opengl.GL11.glColorMask;
-
-import java.util.HashSet;
-
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector4f;
-
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.ShaderManager;
@@ -30,6 +23,12 @@ import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
+
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector4f;
+import java.util.HashSet;
+
+import static org.lwjgl.opengl.GL11.glColorMask;
 
 /**
  * Renderable block grid. Can be used for displaying a set of block selection boxes.

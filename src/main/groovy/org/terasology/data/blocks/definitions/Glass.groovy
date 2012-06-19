@@ -22,6 +22,7 @@ package org.terasology.data.blocks.definitions
 block {
     version = 1
     translucent = true
+    castsShadows = false
     shape = "cube"
 
     hardness = 1

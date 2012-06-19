@@ -1,25 +1,23 @@
 package org.terasology.componentSystem.controllers;
 
-import javax.vecmath.AxisAngle4f;
-import javax.vecmath.Vector3f;
-
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.CharacterMovementComponent;
-import org.terasology.components.LocationComponent;
 import org.terasology.components.SimpleAIComponent;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.components.world.LocationComponent;
+import org.terasology.entitySystem.*;
 import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.utilities.FastRandom;
 
+import javax.vecmath.AxisAngle4f;
+import javax.vecmath.Vector3f;
+
 /**
  * @author Immortius <immortius@gmail.com>
  */
+@RegisterComponentSystem(authorativeOnly = true)
 public class SimpleAISystem implements EventHandlerSystem, UpdateSubscriberSystem {
 
     private EntityManager entityManager;
@@ -33,6 +31,10 @@ public class SimpleAISystem implements EventHandlerSystem, UpdateSubscriberSyste
     }
 
     @Override
+    public void shutdown() {
+    }
+
+    @Override
     public void update(float delta) {
         for (EntityRef entity : entityManager.iteratorEntities(SimpleAIComponent.class, CharacterMovementComponent.class, LocationComponent.class)) {
             LocationComponent location = entity.getComponent(LocationComponent.class);
@@ -40,11 +42,10 @@ public class SimpleAISystem implements EventHandlerSystem, UpdateSubscriberSyste
             CharacterMovementComponent moveComp = entity.getComponent(CharacterMovementComponent.class);
 
             Vector3f worldPos = location.getWorldPosition();
-            moveComp.getDrive().set(0,0,0);
+            moveComp.getDrive().set(0, 0, 0);
             // TODO: shouldn't use local player, need some way to find nearest player
             LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-            if (localPlayer != null)
-            {
+            if (localPlayer != null) {
                 Vector3f dist = new Vector3f(worldPos);
                 dist.sub(localPlayer.getPosition());
                 double distanceToPlayer = dist.lengthSquared();
@@ -69,8 +70,8 @@ public class SimpleAISystem implements EventHandlerSystem, UpdateSubscriberSyste
                 targetDirection.normalize();
                 moveComp.setDrive(targetDirection);
 
-                float yaw = (float)Math.atan2(targetDirection.x, targetDirection.z);
-                AxisAngle4f axisAngle = new AxisAngle4f(0,1,0,yaw);
+                float yaw = (float) Math.atan2(targetDirection.x, targetDirection.z);
+                AxisAngle4f axisAngle = new AxisAngle4f(0, 1, 0, yaw);
                 location.getLocalRotation().set(axisAngle);
                 entity.saveComponent(moveComp);
                 entity.saveComponent(location);

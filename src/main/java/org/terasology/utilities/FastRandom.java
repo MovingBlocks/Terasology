@@ -88,7 +88,6 @@ public class FastRandom {
     }
 
     /**
-     *
      * @return Random value between -1f and 1f
      */
     public float randomFloat() {
@@ -96,7 +95,6 @@ public class FastRandom {
     }
 
     /**
-     *
      * @return A random vector3f with each value between -1f and 1f
      */
     //TODO: Produce a unit vector
@@ -105,7 +103,6 @@ public class FastRandom {
     }
 
     /**
-     *
      * @return Random value between 0f and 1f
      */
     public float randomPosFloat() {

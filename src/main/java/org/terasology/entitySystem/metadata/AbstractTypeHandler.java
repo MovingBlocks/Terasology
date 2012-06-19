@@ -1,7 +1,6 @@
 package org.terasology.entitySystem.metadata;
 
 import com.google.common.collect.Lists;
-import org.terasology.entitySystem.metadata.TypeHandler;
 import org.terasology.protobuf.EntityData;
 
 import java.util.List;

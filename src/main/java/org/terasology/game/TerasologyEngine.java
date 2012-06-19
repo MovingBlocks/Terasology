@@ -16,19 +16,29 @@
 
 package org.terasology.game;
 
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_LEQUAL;
-import static org.lwjgl.opengl.GL11.glDepthFunc;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glViewport;
+import com.google.common.collect.Lists;
+import org.lwjgl.LWJGLException;
+import org.lwjgl.LWJGLUtil;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GLContext;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
+import org.terasology.asset.loaders.*;
+import org.terasology.asset.sources.ClasspathSource;
+import org.terasology.game.modes.GameState;
+import org.terasology.logic.manager.*;
+import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.model.blocks.management.BlockManifestor;
+import org.terasology.model.shapes.BlockShapeManager;
+import org.terasology.performanceMonitor.PerformanceMonitor;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.lang.reflect.Field;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -38,40 +48,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-
-import org.lwjgl.LWJGLException;
-import org.lwjgl.LWJGLUtil;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GLContext;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
-import org.terasology.asset.loaders.GLSLShaderLoader;
-import org.terasology.asset.loaders.MaterialLoader;
-import org.terasology.asset.loaders.ObjMeshLoader;
-import org.terasology.asset.loaders.OggSoundLoader;
-import org.terasology.asset.loaders.OggStreamingSoundLoader;
-import org.terasology.asset.loaders.PNGTextureLoader;
-import org.terasology.asset.sources.ClasspathSource;
-import org.terasology.game.modes.GameState;
-import org.terasology.logic.manager.AssetManager;
-import org.terasology.logic.manager.AudioManager;
-import org.terasology.logic.manager.Config;
-import org.terasology.logic.manager.FontManager;
-import org.terasology.logic.manager.GroovyManager;
-import org.terasology.logic.manager.PathManager;
-import org.terasology.logic.manager.ShaderManager;
-import org.terasology.logic.manager.VertexBufferObjectManager;
-import org.terasology.model.blocks.management.BlockManager;
-import org.terasology.model.blocks.management.BlockManifestor;
-import org.terasology.model.shapes.BlockShapeManager;
-import org.terasology.performanceMonitor.PerformanceMonitor;
-
-import com.google.common.collect.Lists;
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * @author Immortius
@@ -241,14 +218,14 @@ public class TerasologyEngine implements GameEngine {
                 addLibraryPath(new File(PathManager.getInstance().getDataPath(), "natives/macosx"));
                 break;
             case LWJGLUtil.PLATFORM_LINUX:
-                addLibraryPath(new File(PathManager.getInstance().getDataPath(),"natives/linux"));
+                addLibraryPath(new File(PathManager.getInstance().getDataPath(), "natives/linux"));
                 if (System.getProperty("os.arch").contains("64"))
                     System.loadLibrary("openal64");
                 else
                     System.loadLibrary("openal");
                 break;
             case LWJGLUtil.PLATFORM_WINDOWS:
-                addLibraryPath(new File(PathManager.getInstance().getDataPath(),"natives/windows"));
+                addLibraryPath(new File(PathManager.getInstance().getDataPath(), "natives/windows"));
 
                 if (System.getProperty("os.arch").contains("64"))
                     System.loadLibrary("OpenAL64");
@@ -366,8 +343,7 @@ public class TerasologyEngine implements GameEngine {
         BlockShapeManager.getInstance().reload();
         BlockManifestor manifestor = new BlockManifestor(BlockManager.getInstance());
 
-        try
-        {
+        try {
             manifestor.loadConfig();
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to load block definitions", e);
@@ -502,7 +478,7 @@ public class TerasologyEngine implements GameEngine {
         void enact();
     }
 
-    private class ChangeState implements StateChangeFunction{
+    private class ChangeState implements StateChangeFunction {
         public GameState newState;
 
         public ChangeState(GameState newState) {
@@ -516,7 +492,7 @@ public class TerasologyEngine implements GameEngine {
         }
     }
 
-    private class PushState implements StateChangeFunction{
+    private class PushState implements StateChangeFunction {
         public GameState newState;
 
         public PushState(GameState newState) {
@@ -529,7 +505,7 @@ public class TerasologyEngine implements GameEngine {
         }
     }
 
-    private class PopState implements StateChangeFunction{
+    private class PopState implements StateChangeFunction {
 
         public PopState() {
         }

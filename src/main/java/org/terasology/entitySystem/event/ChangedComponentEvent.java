@@ -13,5 +13,6 @@ public class ChangedComponentEvent extends AbstractEvent {
         return instance;
     }
 
-    private ChangedComponentEvent() {}
+    private ChangedComponentEvent() {
+    }
 }

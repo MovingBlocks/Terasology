@@ -18,6 +18,7 @@ package org.terasology.logic.mod;
 
 /**
  * Information on a mod
+ *
  * @author Immortius
  */
 public class ModInfo {

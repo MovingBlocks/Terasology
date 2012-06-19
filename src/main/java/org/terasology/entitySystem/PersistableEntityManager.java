@@ -8,7 +8,10 @@ import gnu.trove.list.TIntList;
 public interface PersistableEntityManager extends EntityManager {
 
     EntityRef createEntityRefWithId(int id);
+
     int getNextId();
+
     void setNextId(int id);
+
     TIntList getFreedIds();
 }

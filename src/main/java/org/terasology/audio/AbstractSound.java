@@ -1,13 +1,8 @@
 package org.terasology.audio;
 
-import static org.lwjgl.openal.AL10.AL_BITS;
-import static org.lwjgl.openal.AL10.AL_CHANNELS;
-import static org.lwjgl.openal.AL10.AL_FREQUENCY;
-import static org.lwjgl.openal.AL10.AL_SIZE;
-import static org.lwjgl.openal.AL10.alDeleteBuffers;
-import static org.lwjgl.openal.AL10.alGetBufferi;
-
 import org.terasology.asset.AssetUri;
+
+import static org.lwjgl.openal.AL10.*;
 
 public abstract class AbstractSound implements Sound {
 

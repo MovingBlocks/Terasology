@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  * @author Immortius <immortius@gmail.com>
  */
 public class MappedContainerTypeHandler<T> extends AbstractTypeHandler<T> {
-    
+
     private static Logger logger = Logger.getLogger(MappedContainerTypeHandler.class.getName());
 
     private Class<T> clazz;
@@ -28,7 +28,7 @@ public class MappedContainerTypeHandler<T> extends AbstractTypeHandler<T> {
     public void addField(FieldMetadata info) {
         fields.put(info.getName().toLowerCase(Locale.ENGLISH), info);
     }
-    
+
     public EntityData.Value serialize(T value) {
         if (value == null) return null;
 

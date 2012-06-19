@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import javax.vecmath.Vector3f;
 import java.util.HashSet;
 
 import static org.junit.Assert.*;
@@ -73,6 +74,20 @@ public class Vector3iTest {
         assertEquals(1, v.x);
         assertEquals(2, v.y);
         assertEquals(3, v.z);
+    }
+
+    @Test
+    public void offsetConstructor() {
+        Vector3f vOrig = new Vector3f(0.1f,0.6f,7.2f);
+        Vector3i v = new Vector3i(vOrig, 0.5f);
+        assertEquals(new Vector3i(0, 1, 7), v);
+    }
+
+    @Test
+    public void offsetConstructorWithNegatives() {
+        Vector3f vOrig = new Vector3f(-0.1f,-0.6f,-1.4f);
+        Vector3i v = new Vector3i(vOrig, 0.5f);
+        assertEquals(new Vector3i(0, -1, -1), v);
     }
     
     @Test

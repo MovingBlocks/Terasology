@@ -37,11 +37,11 @@ public abstract class UIDisplayElement {
 
     protected boolean _clickSoundPlayed = false;
     protected boolean _mouseDown = false, _mouseUp = false, _focused = false;
-    protected int     _wheelMoved = 0;
+    protected int _wheelMoved = 0;
 
     private boolean _overlay;
 
-    private boolean _isFixed  = true;
+    private boolean _isFixed = true;
     private boolean _isCroped = true;
 
     private UIDisplayElement _parent;
@@ -83,16 +83,15 @@ public abstract class UIDisplayElement {
             _mouseUp = true;
             _mouseDown = false;
         }
-        
-        if(wheelMoved!=0){
+
+        if (wheelMoved != 0) {
             _wheelMoved = wheelMoved;
-        }else{
+        } else {
             _wheelMoved = 0;
         }
     }
 
     /**
-     *
      * @param id
      * @param pressed
      * @return Whether the bind was consumed
@@ -101,7 +100,7 @@ public abstract class UIDisplayElement {
         return false;
     }
 
-    public boolean isFocused(){
+    public boolean isFocused() {
         return _focused;
     }
 
@@ -129,8 +128,8 @@ public abstract class UIDisplayElement {
     public void setVisible(boolean visible) {
         _visible = visible;
     }
-    
-    public void setFocus(boolean focus){
+
+    public void setFocus(boolean focus) {
         _focused = focus;
     }
 
@@ -193,19 +192,19 @@ public abstract class UIDisplayElement {
         _overlay = value;
     }
 
-    public void setFixed(boolean fix){
+    public void setFixed(boolean fix) {
         _isFixed = fix;
     }
 
-    public boolean isFixed(){
+    public boolean isFixed() {
         return _isFixed;
     }
 
-    public void setCroped(boolean setCroped){
+    public void setCroped(boolean setCroped) {
         _isCroped = setCroped;
     }
 
-    public boolean isCroped(){
+    public boolean isCroped() {
         return _isCroped;
     }
 

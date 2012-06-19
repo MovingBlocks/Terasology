@@ -75,6 +75,7 @@ public class BindableButtonImpl implements BindableButton {
 
     /**
      * Sets the repeat time
+     *
      * @param repeatTimeMs The time between repeat events, in ms
      */
     @Override
@@ -143,7 +144,7 @@ public class BindableButtonImpl implements BindableButton {
             }
         } else if (activeInputs != 0) {
             activeInputs--;
-            if (activeInputs == 0  && mode.isActivatedOnRelease()) {
+            if (activeInputs == 0 && mode.isActivatedOnRelease()) {
                 if (guiOnly) {
                     GUIManager.getInstance().processBindButton(id, pressed);
                     keyConsumed = true;

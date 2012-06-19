@@ -13,5 +13,6 @@ public class AddComponentEvent extends AbstractEvent {
         return instance;
     }
 
-    private AddComponentEvent() {}
+    private AddComponentEvent() {
+    }
 }

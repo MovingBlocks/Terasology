@@ -16,7 +16,6 @@
 package org.terasology.mods.miniions.rendering.gui.components;
 
 import org.lwjgl.opengl.GL11;
-import org.terasology.components.LocalPlayerComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;

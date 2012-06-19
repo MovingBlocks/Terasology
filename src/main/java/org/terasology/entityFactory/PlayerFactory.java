@@ -1,18 +1,10 @@
 package org.terasology.entityFactory;
 
-import javax.vecmath.Vector3f;
-
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.audio.Sound;
-import org.terasology.components.AABBCollisionComponent;
-import org.terasology.components.CharacterMovementComponent;
-import org.terasology.components.CharacterSoundComponent;
-import org.terasology.components.HealthComponent;
-import org.terasology.components.InventoryComponent;
-import org.terasology.components.LocalPlayerComponent;
-import org.terasology.components.LocationComponent;
-import org.terasology.components.PlayerComponent;
+import org.terasology.components.*;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.PrefabManager;
@@ -22,6 +14,8 @@ import org.terasology.logic.manager.AssetManager;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.mods.miniions.components.MinionBarComponent;
 import org.terasology.mods.miniions.components.MinionControllerComponent;
+
+import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius <immortius@gmail.com>

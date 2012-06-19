@@ -5,7 +5,7 @@ import org.terasology.entitySystem.EntityRef;
 
 
 public abstract class InputEvent extends AbstractEvent {
-	private EntityRef target;
+    private EntityRef target;
     private boolean consumed;
     private float delta;
 
@@ -14,9 +14,9 @@ public abstract class InputEvent extends AbstractEvent {
         this.delta = delta;
     }
 
-	public EntityRef getTarget() {
-		return target;
-	}
+    public EntityRef getTarget() {
+        return target;
+    }
 
     public float getDelta() {
         return delta;

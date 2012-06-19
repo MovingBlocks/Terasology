@@ -93,4 +93,8 @@ public class UIMessageQueue extends UIDisplayContainer implements EventHandlerSy
     @Override
     public void initialise() {
     }
+
+    @Override
+    public void shutdown() {
+    }
 }

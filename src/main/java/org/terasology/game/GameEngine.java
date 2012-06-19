@@ -59,12 +59,14 @@ public interface GameEngine {
 
     /**
      * Clears all states, replacing them with newState
+     *
      * @param newState
      */
     void changeState(GameState newState);
 
     /**
      * Deactivates the current state, and activates newState (putting it on top of the stack
+     *
      * @param newState
      */
     void pushState(GameState newState);
@@ -76,8 +78,10 @@ public interface GameEngine {
 
     // TODO: Move task system elsewhere? Need to support saving queued/unfinished tasks too, when the world
     // shuts down
+
     /**
      * Submits a task to be run concurrent with the main thread
+     *
      * @param name
      * @param task
      */

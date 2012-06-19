@@ -1,60 +1,54 @@
 package org.terasology.componentSystem.rendering;
 
-import static org.lwjgl.opengl.GL11.GL_DST_COLOR;
-import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE;
-import static org.lwjgl.opengl.GL11.GL_ZERO;
-import static org.lwjgl.opengl.GL11.glBindTexture;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glTranslated;
-import static org.lwjgl.opengl.GL11.glTranslatef;
-
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector4f;
-
 import org.lwjgl.opengl.GL11;
 import org.terasology.componentSystem.RenderSystem;
-import org.terasology.components.BlockComponent;
 import org.terasology.components.HealthComponent;
+import org.terasology.components.world.BlockComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AssetManager;
 import org.terasology.logic.manager.ShaderManager;
-import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.world.WorldProvider;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.world.WorldRenderer;
 
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector4f;
+
+import static org.lwjgl.opengl.GL11.*;
+
 /**
  * @author Immortius <immortius@gmail.com>
  */
+@RegisterComponentSystem(headedOnly = true)
 public class BlockDamageRenderer implements RenderSystem {
 
     private EntityManager entityManager;
-    private IWorldProvider worldProvider;
+    private WorldProvider worldProvider;
     private Mesh overlayMesh;
     private Texture effectsTexture;
 
     @Override
     public void initialise() {
-        entityManager = CoreRegistry.get(EntityManager.class);
-        worldProvider = CoreRegistry.get(IWorldProvider.class);
-        effectsTexture = AssetManager.loadTexture("engine:effects");
+        this.entityManager = CoreRegistry.get(EntityManager.class);
+        this.worldProvider = CoreRegistry.get(WorldProvider.class);
+        this.effectsTexture = AssetManager.loadTexture("engine:effects");
         Vector2f texPos = new Vector2f(0.0f, 0.0f);
         Vector2f texWidth = new Vector2f(0.0624f, 0.0624f);
 
         Tessellator tessellator = new Tessellator();
         TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1, 1, 1, 1), texPos, texWidth, 1.001f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f);
         overlayMesh = tessellator.generateMesh();
+    }
+
+    @Override
+    public void shutdown() {
     }
 
     @Override
@@ -72,7 +66,7 @@ public class BlockDamageRenderer implements RenderSystem {
             if (health.currentHealth == health.maxHealth) continue;
 
             BlockComponent blockComp = entity.getComponent(BlockComponent.class);
-            if (!worldProvider.isChunkAvailableAt(blockComp.getPosition())) continue;
+            if (!worldProvider.isBlockActive(blockComp.getPosition())) continue;
 
             glPushMatrix();
             glTranslated(blockComp.getPosition().x - cameraPosition.x, blockComp.getPosition().y - cameraPosition.y, blockComp.getPosition().z - cameraPosition.z);

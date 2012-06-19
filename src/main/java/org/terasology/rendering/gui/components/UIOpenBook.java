@@ -1,12 +1,7 @@
 package org.terasology.rendering.gui.components;
 
-import org.newdawn.slick.AngelCodeFont;
-import org.newdawn.slick.Color;
-import org.terasology.components.BookComponent;
-import org.terasology.entitySystem.EntityRef;
 import org.terasology.logic.manager.AssetManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
-import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 import javax.vecmath.Vector2f;
