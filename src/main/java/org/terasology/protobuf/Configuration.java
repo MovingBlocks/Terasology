@@ -2687,7 +2687,7 @@ public final class Configuration {
       boolean hasChunkCacheSize();
       int getChunkCacheSize();
       
-      // optional int32 max_chunk_VBOs = 7 [default = 512];
+      // optional int32 max_chunk_VBOs = 7 [default = 2048];
       boolean hasMaxChunkVBOs();
       int getMaxChunkVBOs();
       
@@ -2720,11 +2720,11 @@ public final class Configuration {
       boolean hasViewingDistanceModerate();
       int getViewingDistanceModerate();
       
-      // optional int32 viewing_distance_far = 15 [default = 26];
+      // optional int32 viewing_distance_far = 15 [default = 32];
       boolean hasViewingDistanceFar();
       int getViewingDistanceFar();
       
-      // optional int32 viewing_distance_ultra = 16 [default = 32];
+      // optional int32 viewing_distance_ultra = 16 [default = 48];
       boolean hasViewingDistanceUltra();
       int getViewingDistanceUltra();
       
@@ -3626,7 +3626,7 @@ public final class Configuration {
         return chunkCacheSize_;
       }
       
-      // optional int32 max_chunk_VBOs = 7 [default = 512];
+      // optional int32 max_chunk_VBOs = 7 [default = 2048];
       public static final int MAX_CHUNK_VBOS_FIELD_NUMBER = 7;
       private int maxChunkVBOs_;
       public boolean hasMaxChunkVBOs() {
@@ -3709,7 +3709,7 @@ public final class Configuration {
         return viewingDistanceModerate_;
       }
       
-      // optional int32 viewing_distance_far = 15 [default = 26];
+      // optional int32 viewing_distance_far = 15 [default = 32];
       public static final int VIEWING_DISTANCE_FAR_FIELD_NUMBER = 15;
       private int viewingDistanceFar_;
       public boolean hasViewingDistanceFar() {
@@ -3719,7 +3719,7 @@ public final class Configuration {
         return viewingDistanceFar_;
       }
       
-      // optional int32 viewing_distance_ultra = 16 [default = 32];
+      // optional int32 viewing_distance_ultra = 16 [default = 48];
       public static final int VIEWING_DISTANCE_ULTRA_FIELD_NUMBER = 16;
       private int viewingDistanceUltra_;
       public boolean hasViewingDistanceUltra() {
@@ -3776,7 +3776,7 @@ public final class Configuration {
         maxThreads_ = 2;
         saveChunks_ = true;
         chunkCacheSize_ = 2048;
-        maxChunkVBOs_ = 512;
+        maxChunkVBOs_ = 2048;
         gamma_ = 2.2F;
         pixelFormat_ = 24;
         displayMode_ = org.terasology.protobuf.Configuration.Setting.System.DisplayMode.getDefaultInstance();
@@ -3784,8 +3784,8 @@ public final class Configuration {
         activeViewingDistanceId_ = 0;
         viewingDistanceNear_ = 8;
         viewingDistanceModerate_ = 16;
-        viewingDistanceFar_ = 26;
-        viewingDistanceUltra_ = 32;
+        viewingDistanceFar_ = 32;
+        viewingDistanceUltra_ = 48;
         flickeringLight_ = false;
         enablePostProcessingEffects_ = false;
         animatedWaterAndGrass_ = false;
@@ -4094,7 +4094,7 @@ public final class Configuration {
           bitField0_ = (bitField0_ & ~0x00000010);
           chunkCacheSize_ = 2048;
           bitField0_ = (bitField0_ & ~0x00000020);
-          maxChunkVBOs_ = 512;
+          maxChunkVBOs_ = 2048;
           bitField0_ = (bitField0_ & ~0x00000040);
           gamma_ = 2.2F;
           bitField0_ = (bitField0_ & ~0x00000080);
@@ -4114,9 +4114,9 @@ public final class Configuration {
           bitField0_ = (bitField0_ & ~0x00001000);
           viewingDistanceModerate_ = 16;
           bitField0_ = (bitField0_ & ~0x00002000);
-          viewingDistanceFar_ = 26;
+          viewingDistanceFar_ = 32;
           bitField0_ = (bitField0_ & ~0x00004000);
-          viewingDistanceUltra_ = 32;
+          viewingDistanceUltra_ = 48;
           bitField0_ = (bitField0_ & ~0x00008000);
           flickeringLight_ = false;
           bitField0_ = (bitField0_ & ~0x00010000);
@@ -4668,8 +4668,8 @@ public final class Configuration {
           return this;
         }
         
-        // optional int32 max_chunk_VBOs = 7 [default = 512];
-        private int maxChunkVBOs_ = 512;
+        // optional int32 max_chunk_VBOs = 7 [default = 2048];
+        private int maxChunkVBOs_ = 2048;
         public boolean hasMaxChunkVBOs() {
           return ((bitField0_ & 0x00000040) == 0x00000040);
         }
@@ -4684,7 +4684,7 @@ public final class Configuration {
         }
         public Builder clearMaxChunkVBOs() {
           bitField0_ = (bitField0_ & ~0x00000040);
-          maxChunkVBOs_ = 512;
+          maxChunkVBOs_ = 2048;
           onChanged();
           return this;
         }
@@ -4905,8 +4905,8 @@ public final class Configuration {
           return this;
         }
         
-        // optional int32 viewing_distance_far = 15 [default = 26];
-        private int viewingDistanceFar_ = 26;
+        // optional int32 viewing_distance_far = 15 [default = 32];
+        private int viewingDistanceFar_ = 32;
         public boolean hasViewingDistanceFar() {
           return ((bitField0_ & 0x00004000) == 0x00004000);
         }
@@ -4921,13 +4921,13 @@ public final class Configuration {
         }
         public Builder clearViewingDistanceFar() {
           bitField0_ = (bitField0_ & ~0x00004000);
-          viewingDistanceFar_ = 26;
+          viewingDistanceFar_ = 32;
           onChanged();
           return this;
         }
         
-        // optional int32 viewing_distance_ultra = 16 [default = 32];
-        private int viewingDistanceUltra_ = 32;
+        // optional int32 viewing_distance_ultra = 16 [default = 48];
+        private int viewingDistanceUltra_ = 48;
         public boolean hasViewingDistanceUltra() {
           return ((bitField0_ & 0x00008000) == 0x00008000);
         }
@@ -4942,7 +4942,7 @@ public final class Configuration {
         }
         public Builder clearViewingDistanceUltra() {
           bitField0_ = (bitField0_ & ~0x00008000);
-          viewingDistanceUltra_ = 32;
+          viewingDistanceUltra_ = 48;
           onChanged();
           return this;
         }
@@ -5999,7 +5999,7 @@ public final class Configuration {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\rConfig2.proto\022\010protobuf\"\250\016\n\007Setting\022&\n" +
+      "\n\rConfig2.proto\022\010protobuf\"\251\016\n\007Setting\022&\n" +
       "\005world\030\001 \001(\0132\027.protobuf.Setting.World\022(\n" +
       "\006player\030\002 \001(\0132\030.protobuf.Setting.Player\022" +
       "(\n\006system\030\003 \001(\0132\030.protobuf.Setting.Syste" +
@@ -6024,29 +6024,29 @@ public final class Configuration {
       "\032\226\001\n\006Player\022\020\n\003fov\030\001 \001(\002:\003100\022\031\n\nmouse_s" +
       "ens\030\002 \001(\002:\0050.075\022\034\n\016camera_bobbing\030\003 \001(\010" +
       ":\004true\022&\n\030render_first_person_view\030\004 \001(\010" +
-      ":\004true\022\031\n\013placing_box\030\005 \001(\010:\004true\032\270\006\n\006Sy" +
+      ":\004true\022\031\n\013placing_box\030\005 \001(\010:\004true\032\271\006\n\006Sy" +
       "stem\022\032\n\rmax_particles\030\001 \001(\005:\003256\022;\n\020clou" +
       "d_resolution\030\002 \001(\0132!.protobuf.Setting.Sy" +
       "stem.CloudRes\022#\n\025cloud_update_interval\030\003" +
       " \001(\005:\0048000\022\026\n\013max_threads\030\004 \001(\005:\0012\022\031\n\013sa",
       "ve_chunks\030\005 \001(\010:\004true\022\036\n\020chunk_cache_siz" +
-      "e\030\006 \001(\005:\0042048\022\033\n\016max_chunk_VBOs\030\007 \001(\005:\0035" +
-      "12\022\022\n\005gamma\030\010 \001(\002:\0032.2\022\030\n\014pixel_format\030\t" +
-      " \001(\005:\00224\022:\n\014display_mode\030\n \001(\0132$.protobu" +
-      "f.Setting.System.DisplayMode\022\031\n\nfullscre" +
-      "en\030\013 \001(\010:\005false\022%\n\032active_viewing_distan" +
-      "ce_id\030\014 \001(\005:\0010\022 \n\025viewing_distance_near\030" +
-      "\r \001(\005:\0018\022%\n\031viewing_distance_moderate\030\016 " +
-      "\001(\005:\00216\022 \n\024viewing_distance_far\030\017 \001(\005:\0022" +
-      "6\022\"\n\026viewing_distance_ultra\030\020 \001(\005:\00232\022\037\n",
-      "\020flickering_light\030\021 \001(\010:\005false\022-\n\036enable" +
-      "_post_processing_effects\030\022 \001(\010:\005false\022\'\n" +
-      "\030animated_water_and_grass\030\023 \001(\010:\005false\022\'" +
-      "\n\034vertical_chunk_mesh_segments\030\024 \001(\005:\0011\032" +
-      "*\n\010CloudRes\022\016\n\001x\030\001 \001(\002:\003512\022\016\n\001y\030\002 \001(\002:\003" +
-      "512\0327\n\013DisplayMode\022\023\n\005width\030\001 \001(\005:\0041280\022" +
-      "\023\n\006height\030\002 \001(\005:\003720B*\n\027org.terasology.p" +
-      "rotobufB\rConfigurationH\001"
+      "e\030\006 \001(\005:\0042048\022\034\n\016max_chunk_VBOs\030\007 \001(\005:\0042" +
+      "048\022\022\n\005gamma\030\010 \001(\002:\0032.2\022\030\n\014pixel_format\030" +
+      "\t \001(\005:\00224\022:\n\014display_mode\030\n \001(\0132$.protob" +
+      "uf.Setting.System.DisplayMode\022\031\n\nfullscr" +
+      "een\030\013 \001(\010:\005false\022%\n\032active_viewing_dista" +
+      "nce_id\030\014 \001(\005:\0010\022 \n\025viewing_distance_near" +
+      "\030\r \001(\005:\0018\022%\n\031viewing_distance_moderate\030\016" +
+      " \001(\005:\00216\022 \n\024viewing_distance_far\030\017 \001(\005:\002" +
+      "32\022\"\n\026viewing_distance_ultra\030\020 \001(\005:\00248\022\037",
+      "\n\020flickering_light\030\021 \001(\010:\005false\022-\n\036enabl" +
+      "e_post_processing_effects\030\022 \001(\010:\005false\022\'" +
+      "\n\030animated_water_and_grass\030\023 \001(\010:\005false\022" +
+      "\'\n\034vertical_chunk_mesh_segments\030\024 \001(\005:\0011" +
+      "\032*\n\010CloudRes\022\016\n\001x\030\001 \001(\002:\003512\022\016\n\001y\030\002 \001(\002:" +
+      "\003512\0327\n\013DisplayMode\022\023\n\005width\030\001 \001(\005:\0041280" +
+      "\022\023\n\006height\030\002 \001(\005:\003720B*\n\027org.terasology." +
+      "protobufB\rConfigurationH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {

@@ -54,7 +54,7 @@ message Setting {
         optional int32 max_threads = 4 [default = 2];
         optional bool save_chunks = 5 [default = true];
         optional int32 chunk_cache_size = 6 [default = 2048];
-        optional int32 max_chunk_VBOs = 7 [default = 512];
+        optional int32 max_chunk_VBOs = 7 [default = 1024];
         optional float gamma = 8 [default = 2.2];
         optional int32 pixel_format = 9 [default = 24];
         optional DisplayMode display_mode = 10;
@@ -62,8 +62,8 @@ message Setting {
         optional int32 active_viewing_distance_id = 12 [default = 0];
         optional int32 viewing_distance_near = 13 [default = 8];
         optional int32 viewing_distance_moderate = 14 [default = 16];
-        optional int32 viewing_distance_far = 15 [default = 26];
-        optional int32 viewing_distance_ultra = 16 [default = 32];
+        optional int32 viewing_distance_far = 15 [default = 32];
+        optional int32 viewing_distance_ultra = 16 [default = 48];
         optional bool flickering_light = 17 [default = false];
         optional bool enable_post_processing_effects = 18 [default = false];
         optional bool animated_water_and_grass = 19 [default = false];

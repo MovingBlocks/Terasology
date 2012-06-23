@@ -1,5 +1,5 @@
 /*
- * Copyright 2012
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -315,6 +315,7 @@ public class TerasologyEngine implements GameEngine {
     public void initOpenGLParams() {
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_NORMALIZE);
         glDepthFunc(GL_LEQUAL);
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,10 @@ package org.terasology.rendering.primitives;
 
 import com.bulletphysics.collision.shapes.IndexedMesh;
 import com.bulletphysics.collision.shapes.ScalarType;
+import gnu.trove.iterator.TByteIterator;
 import gnu.trove.iterator.TFloatIterator;
 import gnu.trove.iterator.TIntIterator;
+import gnu.trove.iterator.TShortIterator;
 import org.lwjgl.BufferUtils;
 import org.terasology.logic.world.Chunk;
 import org.terasology.logic.world.WorldBiomeProvider;
@@ -84,7 +86,7 @@ public final class ChunkTessellator {
 
         for (int j = 0; j < mesh._vertexElements.length; j++) {
             // Vertices double to account for light info
-            mesh._vertexElements[j].finalVertices = BufferUtils.createFloatBuffer(mesh._vertexElements[j].vertices.size() * 2 + mesh._vertexElements[j].tex.size() + mesh._vertexElements[j].color.size() + mesh._vertexElements[j].normals.size());
+            mesh._vertexElements[j].finalVertices = BufferUtils.createByteBuffer(mesh._vertexElements[j].vertices.size() * 2 * 4 + mesh._vertexElements[j].tex.size() * 4 + mesh._vertexElements[j].color.size() * 4 + mesh._vertexElements[j].normals.size() * 4);
 
             int cTex = 0;
             int cColor = 0;
@@ -92,29 +94,29 @@ public final class ChunkTessellator {
 
                 Vector3f vertexPos = new Vector3f(mesh._vertexElements[j].vertices.get(i), mesh._vertexElements[j].vertices.get(i + 1), mesh._vertexElements[j].vertices.get(i + 2));
 
-                mesh._vertexElements[j].finalVertices.put(vertexPos.x);
-                mesh._vertexElements[j].finalVertices.put(vertexPos.y);
-                mesh._vertexElements[j].finalVertices.put(vertexPos.z);
+                mesh._vertexElements[j].finalVertices.putFloat(vertexPos.x);
+                mesh._vertexElements[j].finalVertices.putFloat(vertexPos.y);
+                mesh._vertexElements[j].finalVertices.putFloat(vertexPos.z);
 
-                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].tex.get(cTex));
-                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].tex.get(cTex + 1));
-                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].tex.get(cTex + 2));
+                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].tex.get(cTex));
+                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].tex.get(cTex + 1));
+                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].tex.get(cTex + 2));
 
                 float[] result = new float[3];
                 calcLightingValuesForVertexPos(worldView, vertexPos, result);
 
-                mesh._vertexElements[j].finalVertices.put(result[0]);
-                mesh._vertexElements[j].finalVertices.put(result[1]);
-                mesh._vertexElements[j].finalVertices.put(result[2]);
+                mesh._vertexElements[j].finalVertices.putFloat(result[0]);
+                mesh._vertexElements[j].finalVertices.putFloat(result[1]);
+                mesh._vertexElements[j].finalVertices.putFloat(result[2]);
 
-                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].color.get(cColor));
-                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].color.get(cColor + 1));
-                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].color.get(cColor + 2));
-                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].color.get(cColor + 3));
+                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].color.get(cColor));
+                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].color.get(cColor + 1));
+                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].color.get(cColor + 2));
+                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].color.get(cColor + 3));
 
-                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].normals.get(i));
-                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].normals.get(i + 1));
-                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].normals.get(i + 2));
+                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].normals.get(i));
+                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].normals.get(i + 1));
+                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].normals.get(i + 2));
             }
 
             mesh._vertexElements[j].finalIndices = BufferUtils.createIntBuffer(mesh._vertexElements[j].indices.size());
@@ -315,6 +317,34 @@ public final class ChunkTessellator {
 
     public static int getVertexArrayUpdateCount() {
         return _statVertexArrayUpdateCount;
+    }
+
+    // returns all higher 16 bits as 0 for all results
+    public static int fromFloat( float fval )
+    {
+        int fbits = Float.floatToIntBits( fval );
+        int sign = fbits >>> 16 & 0x8000;          // sign only
+        int val = ( fbits & 0x7fffffff ) + 0x1000; // rounded value
+
+        if( val >= 0x47800000 )               // might be or become NaN/Inf
+        {                                     // avoid Inf due to rounding
+            if( ( fbits & 0x7fffffff ) >= 0x47800000 )
+            {                                 // is or must become NaN/Inf
+                if( val < 0x7f800000 )        // was value but too large
+                    return sign | 0x7c00;     // make it +/-Inf
+                return sign | 0x7c00 |        // remains +/-Inf or NaN
+                        ( fbits & 0x007fffff ) >>> 13; // keep NaN (and Inf) bits
+            }
+            return sign | 0x7bff;             // unrounded not quite Inf
+        }
+        if( val >= 0x38800000 )               // remains normalized value
+            return sign | val - 0x38000000 >>> 13; // exp - 127 + 15
+        if( val < 0x33000000 )                // too small for subnormal
+            return sign;                      // becomes +/-0
+        val = ( fbits & 0x7fffffff ) >>> 23;  // tmp exp for subnormal calc
+        return sign | ( ( fbits & 0x7fffff | 0x800000 ) // add subnormal bit
+                + ( 0x800000 >>> val - 102 )     // round depending on cut off
+                >>> 126 - val );   // div by 2^(1-(exp-127+15)) and >> 13 | exp=0
     }
 
 }
