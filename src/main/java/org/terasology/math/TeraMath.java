@@ -15,7 +15,13 @@
  */
 package org.terasology.math;
 
+import org.lwjgl.BufferUtils;
 import org.terasology.logic.world.Chunk;
+
+import javax.vecmath.Matrix4f;
+import java.nio.FloatBuffer;
+
+import static org.lwjgl.opengl.GL11.glGetFloat;
 
 /**
  * Collection of math functions.
@@ -325,5 +331,25 @@ public final class TeraMath {
     public static int ceilToInt(float val) {
         int i = (int) val;
         return (val >= 0 && val != i) ? i + 1 : i;
+    }
+
+    public static void readMatrix(int type, Matrix4f target) {
+        FloatBuffer matrix = BufferUtils.createFloatBuffer(16);
+        glGetFloat(type, matrix);
+
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                target.setElement(j, i, matrix.get());
+    }
+
+    public static FloatBuffer matrixToBuffer(Matrix4f mat) {
+        FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
+
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                matrixBuffer.put(mat.getElement(j, i));
+
+        matrixBuffer.flip();
+        return matrixBuffer;
     }
 }

@@ -23,7 +23,6 @@ import org.terasology.model.shapes.BlockShape
 import org.terasology.model.shapes.BlockShapeManager
 import org.terasology.model.structures.AABB
 import org.terasology.utilities.ClasspathResourceLoader
-import org.terasology.utilities.Helper
 
 import java.awt.Graphics
 import java.awt.Image

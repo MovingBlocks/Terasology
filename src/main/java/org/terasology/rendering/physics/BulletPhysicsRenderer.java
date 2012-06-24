@@ -20,15 +20,13 @@ import com.bulletphysics.collision.broadphase.DbvtBroadphase;
 import com.bulletphysics.collision.dispatch.CollisionDispatcher;
 import com.bulletphysics.collision.dispatch.CollisionObject;
 import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
-import com.bulletphysics.collision.shapes.BoxShape;
-import com.bulletphysics.collision.shapes.BvhTriangleMeshShape;
-import com.bulletphysics.collision.shapes.IndexedMesh;
-import com.bulletphysics.collision.shapes.TriangleIndexVertexArray;
+import com.bulletphysics.collision.shapes.*;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
 import com.bulletphysics.linearmath.DefaultMotionState;
+import com.bulletphysics.linearmath.MotionState;
 import com.bulletphysics.linearmath.Transform;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -48,8 +46,13 @@ import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.world.Chunk;
+import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.model.shapes.BlockShape;
+import org.terasology.physics.TeraCollisionConfiguration;
+import org.terasology.physics.TeraDynamicsWorld;
+import org.terasology.physics.WorldShape;
 import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.WorldRenderer;
@@ -85,18 +88,6 @@ public class BulletPhysicsRenderer implements IGameObject {
             super(constructionInfo);
             _type = type;
             _createdAt = _timer.getTimeInMs();
-        }
-
-        // TODO: This won't work in multiplayer
-        public float distanceToPlayer() {
-            Transform t = new Transform();
-            getMotionState().getWorldTransform(t);
-            Matrix4f tMatrix = new Matrix4f();
-            t.getMatrix(tMatrix);
-            Vector3f blockPlayer = new Vector3f();
-            tMatrix.get(blockPlayer);
-            blockPlayer.sub(new Vector3f(CoreRegistry.get(LocalPlayer.class).getPosition()));
-            return blockPlayer.length();
         }
 
         public float distanceToEntity(Vector3f pos) {
@@ -150,7 +141,7 @@ public class BulletPhysicsRenderer implements IGameObject {
 
     private final CollisionDispatcher _dispatcher;
     private final BroadphaseInterface _broadphase;
-    private final DefaultCollisionConfiguration _defaultCollisionConfiguration;
+    private final TeraCollisionConfiguration _defaultCollisionConfiguration;
     private final SequentialImpulseConstraintSolver _sequentialImpulseConstraintSolver;
     private final DiscreteDynamicsWorld _discreteDynamicsWorld;
 
@@ -162,23 +153,53 @@ public class BulletPhysicsRenderer implements IGameObject {
 
     public BulletPhysicsRenderer(WorldRenderer parent) {
         _broadphase = new DbvtBroadphase();
-        _defaultCollisionConfiguration = new DefaultCollisionConfiguration();
+        _defaultCollisionConfiguration = new TeraCollisionConfiguration();
         _dispatcher = new CollisionDispatcher(_defaultCollisionConfiguration);
         _sequentialImpulseConstraintSolver = new SequentialImpulseConstraintSolver();
-        _discreteDynamicsWorld = new DiscreteDynamicsWorld(_dispatcher, _broadphase, _sequentialImpulseConstraintSolver, _defaultCollisionConfiguration);
+        _discreteDynamicsWorld = new TeraDynamicsWorld(_dispatcher, _broadphase, _sequentialImpulseConstraintSolver, _defaultCollisionConfiguration);
         _discreteDynamicsWorld.setGravity(new Vector3f(0f, -10f, 0f));
         _parent = parent;
         _blockItemFactory = new BlockItemFactory(CoreRegistry.get(EntityManager.class), CoreRegistry.get(PrefabManager.class));
         _timer = CoreRegistry.get(Timer.class);
+
+        WorldShape worldShape = new WorldShape(parent.getWorldProvider());
+        //worldShape.setMargin(0.1f);
+        //BoxShape worldShape = new BoxShape(new Vector3f(64f, 32f, 64f));
+        /*BoxShape box = new BoxShape(new Vector3f(0.5f, 0.5f, 0.5f));
+        CompoundShape worldShape = new CompoundShape();
+        for (int x = -64; x < 64; ++x) {
+            for (int z = -64; z < 64; z++) {
+                Matrix3f rot = new Matrix3f();
+                rot.setIdentity();
+                Vector3f pos = new Vector3f(x, 32.5f, z);
+                Transform transform = new Transform();
+                transform.set(new Matrix4f(rot, pos, 1.0f));
+                worldShape.addChildShape(transform, box);
+            }
+        }       */
+        Vector3f interia = new Vector3f();
+        worldShape.calculateLocalInertia(100000, interia);
+        Matrix3f rot = new Matrix3f();
+        rot.setIdentity();
+        DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, new Vector3f(0, 0, 0), 1.0f)));
+        //CollisionObject collObject = new CollisionObject();
+        //collObject.setCollisionShape(worldShape);
+        RigidBodyConstructionInfo blockConsInf = new RigidBodyConstructionInfo(0, blockMotionState, worldShape, interia);
+        RigidBody rigidBody = new RigidBody(blockConsInf);
+        //rigidBody.setFriction(0.3f);
+        //rigidBody.setRestitution(0.1f);
+        _discreteDynamicsWorld.addRigidBody(rigidBody);
+       // _discreteDynamicsWorld.addCollisionObject(collObject);
+
     }
 
     public BlockRigidBody[] addLootableBlocks(Vector3f position, Block block) {
         BlockRigidBody result[] = new BlockRigidBody[8];
-        for (int i = 0; i < block.getLootAmount(); i++) {
+        for (int i = 0; i < 1; i++) {
             // Position the smaller blocks
             Vector3f offsetPossition = new Vector3f((float) _random.randomDouble() * 0.5f, (float) _random.randomDouble() * 0.5f, (float) _random.randomDouble() * 0.5f);
             offsetPossition.add(position);
-            result[i] = addBlock(offsetPossition, block.getId(), new Vector3f(0.0f, 4000f, 0.0f), BLOCK_SIZE.QUARTER_SIZE, false);
+            result[i] = addBlock(offsetPossition, block.getId(), new Vector3f(0.0f, 0f, 0.0f), BLOCK_SIZE.QUARTER_SIZE, false);
         }
         return result;
     }
@@ -221,7 +242,7 @@ public class BulletPhysicsRenderer implements IGameObject {
         rot.setIdentity();
         DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, position, 1.0f)));
         Vector3f fallInertia = new Vector3f();
-        shape.calculateLocalInertia(block.getMass(), fallInertia);
+        shape.calculateLocalInertia(10 * block.getMass(), fallInertia);
         RigidBodyConstructionInfo blockCI = new RigidBodyConstructionInfo(block.getMass(), blockMotionState, shape, fallInertia);
         BlockRigidBody rigidBlock = new BlockRigidBody(blockCI, type);
         rigidBlock.setRestitution(0.0f);
@@ -345,11 +366,11 @@ public class BulletPhysicsRenderer implements IGameObject {
         try {
             _discreteDynamicsWorld.stepSimulation(delta, 3);
         } catch (Exception e) {
-            _logger.log(Level.WARNING, "Somehow Bullet Physics managed to throw an exception again. Go along: " + e.toString());
+            _logger.log(Level.WARNING, "Somehow Bullet Physics managed to throw an exception again.", e);
         }
-        updateChunks();
+        //updateChunks();
         removeTemporaryBlocks();
-        checkForLootedBlocks();
+        //checkForLootedBlocks();
     }
 
     private synchronized void addQueuedBodies() {

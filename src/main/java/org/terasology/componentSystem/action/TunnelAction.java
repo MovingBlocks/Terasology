@@ -52,7 +52,7 @@ public class TunnelAction implements EventHandlerSystem {
                 Vector3f direction = random.randomVector3f();
                 direction.normalize();
                 Vector3f impulse = new Vector3f(direction);
-                impulse.scale(800000);
+                impulse.scale(80);
 
                 for (int j = 0; j < 3; j++) {
                     Vector3f target = new Vector3f(origin);

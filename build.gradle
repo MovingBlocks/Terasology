@@ -125,6 +125,13 @@ dependencies{
 
 }
 
+classes.doLast {
+    ant.typedef(name: 'instrumentStack', classname: 'cz.advel.stack.instrument.InstrumentationTask', classpath: sourceSets.main.runtimeClasspath.asPath)
+	ant.instrumentStack(dest: sourceSets.main.output.classesDir, packageName: 'org.terasology.physics') {
+	    fileset(dir: sourceSets.main.output.classesDir)
+	}
+}
+
 jar {
 	manifest {
 		def manifestClasspath = 'libs/'+configurations.runtime.collect { it.getName() }.join(' libs/') 
@@ -140,6 +147,7 @@ jar.doLast {
 	ant.signjar(jar: jar.archivePath, keystore: 'applet/tera.keystore', alias: 'Terasology', storepass: 'Terasology')
 	sourceSets.main.output.resourcesDir = 'target/classes/main'
 }
+
 
 task distLibs(type:Copy) {
 	from {

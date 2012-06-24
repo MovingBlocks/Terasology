@@ -172,7 +172,7 @@ public class Block implements IGameObject {
         withHardness((byte) 3);
         withLuminance((byte) 0);
         withLiquid(false);
-        withMass(64000f);
+        withMass(100f);
         withLootAmount(2);
     }
 

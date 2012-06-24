@@ -514,6 +514,7 @@ public class LocalChunkProvider implements ChunkProvider {
 
         private int score(Vector3i chunk) {
             int score = Integer.MAX_VALUE;
+            // TODO: This isn't thread safe. Fix me
             for (CacheRegion region : regions) {
                 int dist = distFromRegion(chunk, region.center);
                 if (dist < score) {

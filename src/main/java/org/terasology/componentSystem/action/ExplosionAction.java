@@ -50,7 +50,7 @@ public class ExplosionAction implements EventHandlerSystem {
             Vector3f direction = new Vector3f(random.randomFloat(), random.randomFloat(), random.randomFloat());
             direction.normalize();
             Vector3f impulse = new Vector3f(direction);
-            impulse.scale(800000);
+            impulse.scale(80);
 
             for (int j = 0; j < 4; j++) {
                 Vector3f target = new Vector3f(origin);
@@ -72,7 +72,7 @@ public class ExplosionAction implements EventHandlerSystem {
 
                     EntityRef blockEntity = blockEntityRegistry.getEntityAt(blockPos);
                     blockEntity.destroy();
-                    physicsRenderer.addTemporaryBlock(target, currentBlock.getId(), impulse, BulletPhysicsRenderer.BLOCK_SIZE.FULL_SIZE);
+                    physicsRenderer.addTemporaryBlock(target, currentBlock.getId(), impulse, BulletPhysicsRenderer.BLOCK_SIZE.HALF_SIZE);
                 }
             }
         }
