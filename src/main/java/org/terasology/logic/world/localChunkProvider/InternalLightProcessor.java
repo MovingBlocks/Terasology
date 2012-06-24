@@ -29,6 +29,7 @@ public class InternalLightProcessor {
         int top = Chunk.SIZE_Y - 1;
 
         short[] tops = new short[Chunk.SIZE_X * Chunk.SIZE_Z];
+        short[] partLit = new short[Chunk.SIZE_X * Chunk.SIZE_Z];
 
         // Tunnel light down
         for (int x = 0; x < Chunk.SIZE_X; x++) {
@@ -48,6 +49,7 @@ public class InternalLightProcessor {
 
         for (int x = 0; x < Chunk.SIZE_X; x++) {
             for (int z = 0; z < Chunk.SIZE_Z; z++) {
+                spreadSunlightInternal(chunk, x, tops[x + Chunk.SIZE_X * z] + 1, z);
                 for (int y = top; y >= 0; y--) {
                     Block block = chunk.getBlock(x, y, z);
                     if (y > tops[x + Chunk.SIZE_X * z] && ((x > 0 && tops[(x - 1) + Chunk.SIZE_X * z] >= y) ||
@@ -88,8 +90,7 @@ public class InternalLightProcessor {
     private static void spreadSunlightInternal(Chunk chunk, int x, int y, int z) {
         byte lightValue = chunk.getSunlight(x, y, z);
 
-        // If it was max it would already have been spread down
-        if (y > 0 && lightValue < Chunk.MAX_LIGHT && chunk.getSunlight(x, y - 1, z) < lightValue - 1 && chunk.getBlock(x, y - 1, z).isTranslucent()) {
+        if (y > 0 && chunk.getSunlight(x, y - 1, z) < lightValue - 1 && chunk.getBlock(x, y - 1, z).isTranslucent()) {
             chunk.setSunlight(x, y - 1, z, (byte) (lightValue - 1));
             spreadSunlightInternal(chunk, x, y - 1, z);
         }
