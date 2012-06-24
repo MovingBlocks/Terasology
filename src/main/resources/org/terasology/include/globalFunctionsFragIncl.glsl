@@ -48,16 +48,21 @@ float calcTorchlight(float light, vec3 lightPos) {
     return light * clamp(1.0 - (length(lightPos) / 16.0), 0.0, 1.0);
 }
 
-vec4 srgbToLinear(vec4 color) {
-    return pow(color, vec4(1.0 / GAMMA));
+vec4 linearToSrgb(vec4 color) {
+     return vec4(pow(color.rgb, vec3(1.0 / GAMMA)), color.a);
 }
 
-vec4 linearToSrgb(vec4 color) {
-    return pow(color, vec4(GAMMA));
+vec4 srgbToLinear(vec4 color) {
+    return vec4(pow(color.rgb, vec3(GAMMA)), color.a);
 }
 
 float expLightValue(float light) {
-    return light;
+	float lightScaled = (1.0 - light) * 16.0;
+	return pow(0.76, lightScaled);
+}
+
+float expOccValue(float light) {
+    return light * light;
 }
 
 float timeToTick(float time, float speed) {

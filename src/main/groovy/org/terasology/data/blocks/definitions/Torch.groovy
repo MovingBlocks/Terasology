@@ -26,6 +26,7 @@ block {
     version = 1
     blockform = BLOCK_FORM.DEFAULT
 
+    transparent = true
     translucent = true
     penetrable = true
     allowBlockAttachment = false

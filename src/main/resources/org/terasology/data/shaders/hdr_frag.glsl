@@ -18,13 +18,13 @@
 // #define REINHARD_TONEMAP
 // #define BURGESS_TONEMAP
 
-#define EXPOSURE_BIAS 4.0
+#define EXPOSURE_BIAS 2.0
 
 uniform sampler2D texScene;
 uniform float exposure = 1.0;
 
 void main(){
-    vec4 color = texture2D(texScene, gl_TexCoord[0].xy);
+    vec4 color = srgbToLinear(texture2D(texScene, gl_TexCoord[0].xy));
 
 #ifdef REINHARD_TONEMAP
     float t = tonemapReinhard(2.5, exposure);
@@ -46,5 +46,5 @@ void main(){
     color.rgb = finalColor;
 #endif
 
-    gl_FragColor = color;
+    gl_FragColor = linearToSrgb(color);
 }

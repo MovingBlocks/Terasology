@@ -30,6 +30,7 @@ block {
     blockform = BLOCK_FORM.BILLBOARD
     colorsource = COLOR_SOURCE.FOLIAGE_LUT
 
+    transparent = true
     translucent = true
     penetrable = true
 

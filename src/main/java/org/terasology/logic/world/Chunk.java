@@ -68,6 +68,7 @@ public class Chunk implements Externalizable {
 
     private State chunkState = State.ADJACENCY_GENERATION_PENDING;
     private boolean dirty;
+    private boolean animated;
     private AABB aabb;
 
     // Rendering
@@ -369,6 +370,15 @@ public class Chunk implements Externalizable {
     public void setPendingMesh(ChunkMesh[] mesh) {
         this.pendingMesh = mesh;
     }
+
+    public void setAnimated(boolean animated) {
+        this.animated = animated;
+    }
+
+    public boolean getAnimated() {
+        return animated;
+    }
+
 
     public ChunkMesh[] getMesh() {
         return mesh;

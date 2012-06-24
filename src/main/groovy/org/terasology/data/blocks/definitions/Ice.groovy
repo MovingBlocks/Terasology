@@ -23,6 +23,7 @@ block {
     version = 1
     shape = "cube"
     translucent = true
+    transparent = true
 
     hardness = 1
 }

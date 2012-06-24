@@ -54,7 +54,7 @@ public interface WorldBiomeProvider {
      */
     public float getTemperatureAt(int x, int z);
 
-    public float getFog(float time, float daylight);
+    public float getFog(float time);
 
     /*
     * Returns the biome type at the given position.

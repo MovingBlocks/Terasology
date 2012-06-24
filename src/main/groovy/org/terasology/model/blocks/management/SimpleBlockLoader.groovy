@@ -5,6 +5,7 @@ import org.terasology.math.Rotation
 import org.terasology.model.blocks.Block
 
 import javax.vecmath.Vector4f
+import org.terasology.math.Side
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -48,6 +49,10 @@ public class SimpleBlockLoader implements BlockLoader {
             org.terasology.model.blocks.management.SimpleBlockLoader.log.fine "Setting translucent boolean to: " + c.translucent
             b.withTranslucent((boolean) c.translucent)
         }
+        if (c.transparent != [:]) {
+            org.terasology.model.blocks.management.SimpleBlockLoader.log.fine "Setting transparent boolean to: " + c.transparent
+            b.withTransparent((boolean) c.transparent)
+        }
         if (c.invisible != [:]) {
             org.terasology.model.blocks.management.SimpleBlockLoader.log.fine "Setting invisible boolean to: " + c.invisible
             b.withInvisible((boolean) c.invisible)
@@ -75,6 +80,15 @@ public class SimpleBlockLoader implements BlockLoader {
         if (c.bypassSelectionRay != [:]) {
             org.terasology.model.blocks.management.SimpleBlockLoader.log.fine "Setting bypassSelectionRay boolean to: " + c.bypassSelectionRay
             b.withBypassSelectionRay((boolean) c.bypassSelectionRay)
+        }
+        if (c.bypassSelectionRay != [:]) {
+            org.terasology.model.blocks.management.SimpleBlockLoader.log.fine "Setting bypassSelectionRay boolean to: " + c.bypassSelectionRay
+            b.withBypassSelectionRay((boolean) c.bypassSelectionRay)
+        }
+        if (c.affectedByLut != [:]) {
+            for (e in c.affectedByLut) {
+                b.withAffectedByLut((Side) e.key , (boolean) e.value)
+            }
         }
 
         // *** PHYSICS

@@ -236,7 +236,7 @@ public final class ChunkTessellator {
          */
         ChunkMesh.RENDER_TYPE renderType = ChunkMesh.RENDER_TYPE.TRANSLUCENT;
 
-        if (!block.isTranslucent())
+        if (!block.isTransparent())
             renderType = ChunkMesh.RENDER_TYPE.OPAQUE;
         if (block.getTitle().equals("Water") || block.getTitle().equals("Ice"))
             renderType = ChunkMesh.RENDER_TYPE.WATER_AND_ICE;

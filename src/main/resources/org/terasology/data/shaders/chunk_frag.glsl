@@ -38,16 +38,16 @@ uniform vec2 waterCoordinate;
 uniform vec2 lavaCoordinate;
 uniform vec2 grassCoordinate;
 
-#define DAYLIGHT_AMBIENT_COLOR 0.95, 0.9, 0.85
+#define DAYLIGHT_AMBIENT_COLOR 0.95, 0.92, 0.91
 #define MOONLIGHT_AMBIENT_COLOR 0.8, 0.8, 1.0
-#define NIGHT_BRIGHTNESS 0.25
-#define WATER_COLOR 0.325, 0.819, 0.925, 0.5
+#define NIGHT_BRIGHTNESS 0.05
+#define WATER_COLOR 0.325, 0.419, 0.525, 0.75
 
-#define TORCH_WATER_SPEC 0.8
+#define TORCH_WATER_SPEC 8.0
 #define TORCH_WATER_DIFF 0.7
 #define TORCH_BLOCK_SPEC 0.7
 #define TORCH_BLOCK_DIFF 1.0
-#define WATER_SPEC 1.0
+#define WATER_SPEC 8.0
 #define WATER_DIFF 1.0
 #define BLOCK_DIFF 0.25
 #define BLOCK_AMB 1.0
@@ -63,7 +63,8 @@ void main(){
 
     /* DAYLIGHT BECOMES... MOONLIGHT! */
     /* Now featuring linear interpolation to make the transition more smoothly... :-) */
-    finalLightDir = mix(finalLightDir * -1.0, finalLightDir, daylight);
+    if (daylight < 0.1)
+        finalLightDir = mix(finalLightDir * -1.0, finalLightDir, daylight / 0.1);
 
     vec4 color;
 
@@ -86,10 +87,7 @@ void main(){
         color = texture2D(textureAtlas, texCoord.xy);
     }
 
-    /* CONVERT SRGB TO LINEAR COLOR SPACE */
-    color = srgbToLinear(color);
-
-    if (color.a < 0.1)
+    if (color.a < 0.5)
         discard;
 
     /* APPLY OVERALL BIOME COLOR OFFSET */
@@ -107,14 +105,14 @@ void main(){
     }
 
     // Calculate daylight lighting value
-    float daylightValue = expLightValue(gl_TexCoord[1].x);
+    float daylightValue = gl_TexCoord[1].x;
     float daylightScaledValue = daylight * daylightValue;
 
     // Calculate blocklight lighting value
     float blocklightDayIntensity = 1.0 - daylightScaledValue;
-    float blocklightValue = expLightValue(gl_TexCoord[1].y);
+    float blocklightValue = gl_TexCoord[1].y;
 
-    float occlusionValue = gl_TexCoord[1].z;
+    float occlusionValue = expOccValue(gl_TexCoord[1].z);
     float diffuseLighting;
 
     if (isWater) {
@@ -129,10 +127,10 @@ void main(){
     if (carryingTorch) {
         if (isWater)
             torchlight = calcTorchlight(calcLambLight(normalWater, normalizedVPos) * TORCH_WATER_DIFF
-            + TORCH_WATER_SPEC * calcSpecLightWithOffset(normal, normalizedVPos, normalize(eyeVec), 32.0, normalWater), vertexWorldPos.xyz);
+            + TORCH_WATER_SPEC * calcSpecLightWithOffset(normal, normalizedVPos, normalize(eyeVec), 64.0, normalWater), vertexWorldPos.xyz);
         else
             torchlight = calcTorchlight(calcLambLight(normal, normalizedVPos) * TORCH_BLOCK_DIFF
-            + TORCH_BLOCK_SPEC * calcSpecLight(normal, normalizedVPos, normalize(eyeVec), 16.0), vertexWorldPos.xyz);
+            + TORCH_BLOCK_SPEC * calcSpecLight(normal, normalizedVPos, normalize(eyeVec), 32.0), vertexWorldPos.xyz);
     }
 
     vec3 daylightColorValue;
@@ -141,7 +139,7 @@ void main(){
     if (isWater) {
         /* WATER NEEDS DIFFUSE AND SPECULAR LIGHT */
         daylightColorValue = vec3(diffuseLighting) * WATER_DIFF;
-        daylightColorValue += calcSpecLightWithOffset(normal, finalLightDir, normalize(eyeVec), 32.0, normalWater) * WATER_SPEC;
+        daylightColorValue += calcSpecLightWithOffset(normal, finalLightDir, normalize(eyeVec), 64.0, normalWater) * WATER_SPEC;
     } else {
         /* DEFAULT LIGHTING ONLY CONSIST OF DIFFUSE AND AMBIENT LIGHT */
         daylightColorValue = vec3(BLOCK_AMB + diffuseLighting * BLOCK_DIFF);
@@ -152,22 +150,21 @@ void main(){
     daylightColorValue.xyz *= ambientTint;
 
     // Scale the lighting according to the daylight and daylight block values and add moonlight during the nights
-    daylightColorValue.xyz *= daylightScaledValue + (NIGHT_BRIGHTNESS * (1.0 - daylight) * daylightValue);
+    daylightColorValue.xyz *= daylightScaledValue + (NIGHT_BRIGHTNESS * (1.0 - daylight) * expLightValue(daylightValue));
 
     // Calculate the final block light brightness
-    float blockBrightness = (blocklightValue + diffuseLighting * blocklightValue * BLOCK_DIFF);
+    float blockBrightness = (expLightValue(blocklightValue) + diffuseLighting * blocklightValue * BLOCK_DIFF);
 
     torchlight -= flickeringAlternative * torchlight;
 
     blockBrightness += (1.0 - blockBrightness) * torchlight;
     blockBrightness -= flickering * blocklightValue;
     blockBrightness *= blocklightDayIntensity;
-    blockBrightness += (1.00 - blockBrightness) * torchlight;
 
     // Calculate the final blocklight color value and add a slight reddish tint to it
     vec3 blocklightColorValue = vec3(blockBrightness) * vec3(1.0, 0.95, 0.94);
 
     // Apply the final lighting mix
     color.xyz *= (daylightColorValue + blocklightColorValue) * occlusionValue;
-    gl_FragColor = linearToSrgb(color);
+    gl_FragColor = color;
 }

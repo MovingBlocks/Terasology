@@ -442,10 +442,17 @@ class BlockManifestor {
 
         int counter = 0
         _images.each {
-            Vector2f position = calcAtlasPositionForId(counter);
-            g.drawImage(it.value.getScaledInstance(textureSize, textureSize, Image.SCALE_SMOOTH), (int) position.x * textureSize, (int) position.y * textureSize, null)
+            if (!it.key.contains("_Mip")) {
+                BufferedImage image = it.value;
+
+                if (_images.containsKey(it.key + "_Mip") && mipMapLevel > 0)
+                   image = _images.get(it.key + "_Mip")
+
+                Vector2f position = calcAtlasPositionForId(counter);
+                g.drawImage(image.getScaledInstance(textureSize, textureSize, Image.SCALE_SMOOTH), (int) position.x * textureSize, (int) position.y * textureSize, null)
+                // TODO: Throw an exception if the size of the atlas is exceeded
+            }
             counter++
-            // TODO: Throw an exception if the size of the atlas is exceeded
         }
 
         return result;

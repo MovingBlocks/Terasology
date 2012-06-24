@@ -66,21 +66,22 @@ public class ShaderParametersPost implements IShaderParameters {
         program.setFloat("viewingDistance", Config.getInstance().getActiveViewingDistance() * 8.0f);
 
         // Calculate the fog value based on the daylight value
-        float fogIntensity = 0.0f;
+        float fogLinearIntensity = 0.01f;
         float daylight = (float) CoreRegistry.get(WorldRenderer.class).getDaylight();
 
         if (daylight < 1.0 && daylight > 0.25) {
             float daylightFactor = (1.0f - daylight) / 0.75f;
-            fogIntensity = 1.5f * daylightFactor;
+            fogLinearIntensity += 0.75f * daylightFactor;
         } else if (daylight <= 0.25f) {
             float daylightFactor = (0.25f - daylight) / 0.25f;
-            fogIntensity = TeraMath.lerpf(1.0f, 0.05f, daylightFactor);
+            fogLinearIntensity += TeraMath.lerpf(0.75f, 0.0f, daylightFactor);
         }
 
         WorldRenderer renderer = CoreRegistry.get(WorldRenderer.class);
-        fogIntensity += renderer.getWorldProvider().getBiomeProvider().getFog(renderer.getWorldProvider().getTimeInDays(), daylight);
+        float fogIntensity = renderer.getWorldProvider().getBiomeProvider().getFog(renderer.getWorldProvider().getTimeInDays()) * daylight;
 
         program.setFloat("fogIntensity", fogIntensity);
+        program.setFloat("fogLinearIntensity", fogLinearIntensity);
 
         if (CoreRegistry.get(LocalPlayer.class).isValid()) {
             Vector3d cameraPos = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();

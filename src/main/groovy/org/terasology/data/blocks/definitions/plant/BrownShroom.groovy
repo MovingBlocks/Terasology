@@ -27,6 +27,7 @@ block {
     blockform = BLOCK_FORM.BILLBOARD
 
     translucent = true
+    transparent = true
     penetrable = true
 
     hardness = 1

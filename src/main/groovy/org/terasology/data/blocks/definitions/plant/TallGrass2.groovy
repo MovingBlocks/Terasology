@@ -29,6 +29,7 @@ block {
     colorsource = COLOR_SOURCE.FOLIAGE_LUT
     colorOffset = [0.7f, 0.7f, 0.7f, 1.0f]
 
+    transparent = true
     translucent = true
     penetrable = true
 

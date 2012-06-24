@@ -47,8 +47,8 @@ public class WorldBiomeProviderImpl implements WorldBiomeProvider {
     }
 
     @Override
-    public float getFog(float time, float daylight) {
-        return (float) TeraMath.clamp(fogNoise.fBm(time * 0.372891, time * 0.578291, time * 0.78319) * 10.0 * daylight, 0.0, 15.0) + 0.05f;
+    public float getFog(float time) {
+        return (float) TeraMath.clamp(fogNoise.fBm(time * 0.372891, time * 0.578291, time * 0.78319) * 10.0, 0.0, 15.0);
     }
 
     @Override

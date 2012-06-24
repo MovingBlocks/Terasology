@@ -28,7 +28,7 @@ void main(){
     vec4 color;
 
     if (textured) {
-        color = srgbToLinear(texture2D(diffuse, vec2(gl_TexCoord[0].x , gl_TexCoord[0].y)));
+        color = texture2D(diffuse, vec2(gl_TexCoord[0].x , gl_TexCoord[0].y));
     } else {
         color = vec4(1,1,1,1);
     }
@@ -45,7 +45,7 @@ void main(){
 
     if (textured) {
         color.rgb *= colorOffset.rgb;
-        gl_FragColor = linearToSrgb(color);
+        gl_FragColor = color;
     } else {
         gl_FragColor = color;
     }

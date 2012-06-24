@@ -26,6 +26,7 @@ block {
     shape = "Billboard"
     blockform = BLOCK_FORM.BILLBOARD
 
+    transparent = true
     translucent = true
     penetrable = true
 

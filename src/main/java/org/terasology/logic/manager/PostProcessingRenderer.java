@@ -34,11 +34,11 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class PostProcessingRenderer {
 
-    public static final float MAX_EXPOSURE = 16.0f;
+    public static final float MAX_EXPOSURE = 4.0f;
     public static final float MAX_EXPOSURE_NIGHT = 2.0f;
-    public static final float MIN_EXPOSURE = 1.0f;
-    public static final float TARGET_LUMINANCE = 0.5f;
-    public static final float ADJUSTMENT_SPEED = 0.005f;
+    public static final float MIN_EXPOSURE = 0.5f;
+    public static final float TARGET_LUMINANCE = 1.0f;
+    public static final float ADJUSTMENT_SPEED = 0.025f;
 
     private static PostProcessingRenderer _instance = null;
     private float _exposure = 16.0f;

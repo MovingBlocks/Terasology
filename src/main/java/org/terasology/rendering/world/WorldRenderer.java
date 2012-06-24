@@ -74,6 +74,8 @@ import static org.lwjgl.opengl.GL11.*;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public final class WorldRenderer implements IGameObject {
+    public static final int MAX_ANIMATED_CHUNKS = 64;
+    public static final int MAX_BILLBOARD_CHUNKS = 64;
     public static final int VERTICAL_SEGMENTS = Config.getInstance().getVerticalChunkMeshSegments();
 
     /* WORLD PROVIDER */
@@ -381,10 +383,15 @@ public final class WorldRenderer implements IGameObject {
                 else
                     _statIgnoredPhases++;
 
-                if (triangleCount(mesh, ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT) > 0)
+                if (triangleCount(mesh, ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT) > 0 && i < MAX_BILLBOARD_CHUNKS)
                     _renderQueueChunksSortedBillboards.add(c);
                 else
                     _statIgnoredPhases++;
+
+                if (i < MAX_ANIMATED_CHUNKS)
+                    c.setAnimated(true);
+                else
+                    c.setAnimated(false);
 
                 if (c.getPendingMesh() != null) {
                     for (int j = 0; j < c.getPendingMesh().length; j++) {
@@ -588,6 +595,7 @@ public final class WorldRenderer implements IGameObject {
             ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("chunk");
             // Transfer the world offset of the chunk to the shader for various effects
             shader.setFloat3("chunkOffset", (float) (chunk.getPos().x * Chunk.SIZE_X), (float) (chunk.getPos().y * Chunk.SIZE_Y), (float) (chunk.getPos().z * Chunk.SIZE_Z));
+            shader.setFloat("animated", chunk.getAnimated() ? 1.0f: 0.0f);
 
             GL11.glPushMatrix();
 
