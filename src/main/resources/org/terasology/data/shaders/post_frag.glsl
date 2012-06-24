@@ -55,7 +55,8 @@ void main() {
 
     /* FINAL MIX */
     vec4 finalColor = mix(color, colorBlur, blur);
-    finalColor = mix(finalColor, vec4(1.0), 1.0 - 1.0 / pow(2.71828, depth * fogIntensity));
+    float fogDensity = depth * fogIntensity;
+    finalColor = mix(finalColor, vec4(1.0), 1.0 - 1.0 / pow(2.71828, fogDensity * fogDensity));
 
     /* VIGNETTE */
     float vig = texture2D(texVignette, gl_TexCoord[0].xy).x;

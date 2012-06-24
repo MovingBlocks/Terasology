@@ -86,11 +86,16 @@ public abstract class Camera {
             _activeFov = _targetFov;
             return;
         }
-        // TODO: Clamp this
         if (_activeFov < _targetFov) {
-            _activeFov += 50 * delta;
+            _activeFov += 50.0 * delta;
+            if (_activeFov >= _targetFov) {
+                _activeFov = _targetFov;
+            }
         } else if (_activeFov > _targetFov) {
-            _activeFov -= 50 * delta;
+            _activeFov -= 50.0 * delta;
+            if (_activeFov <= _targetFov) {
+                _activeFov = _targetFov;
+            }
         }
     }
 

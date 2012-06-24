@@ -21,6 +21,7 @@ varying vec3 eyeVec;
 varying vec3 lightDir;
 
 varying float flickering;
+varying float flickeringAlternative;
 
 uniform float time;
 uniform float wavingCoordinates[32];
@@ -48,9 +49,11 @@ void main()
 	float distance = vertexWorldPos.x * vertexWorldPos.x + vertexWorldPos.y * vertexWorldPos.y + vertexWorldPos.z * vertexWorldPos.z;
 
 #ifdef FLICKERING_LIGHT
-	flickering = (smoothTriangleWave(timeToTick(time, 0.2) + 1.0) / 32.0);
+	flickering = smoothTriangleWave(timeToTick(time, 0.75)) / 8.0;
+	flickeringAlternative = smoothTriangleWave(timeToTick(time, 0.5) + 0.37281) / 8.0;
 #else
 	flickering = 0.0;
+	flickeringAlternative = 0.0f;
 #endif
 
 #ifdef ANIMATED_WATER_AND_GRASS
