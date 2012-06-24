@@ -35,7 +35,8 @@ public class InternalLightProcessor {
             for (int z = 0; z < Chunk.SIZE_Z; z++) {
                 int y = top;
                 for (; y >= 0; y--) {
-                    if (chunk.getBlock(x, y, z).isTranslucent()) {
+                    Block block = chunk.getBlock(x,y,z);
+                    if (block.isTranslucent() && !block.isLiquid()) {
                         chunk.setSunlight(x, y, z, Chunk.MAX_LIGHT);
                     } else {
                         break;

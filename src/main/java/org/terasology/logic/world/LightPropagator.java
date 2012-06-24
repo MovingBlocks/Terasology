@@ -160,9 +160,14 @@ public class LightPropagator {
         nextWave.add(new Vector3i(x, y, z));
         // First drop MAX_LIGHT until it is blocked
         if (lightLevel == Chunk.MAX_LIGHT && worldView.getSunlight(x, y - 1, z) < Chunk.MAX_LIGHT) {
-            for (int columnY = y - 1; columnY >= 0 && worldView.getBlock(x, columnY, z).isTranslucent(); columnY--) {
-                worldView.setSunlight(x, columnY, z, lightLevel);
-                nextWave.add(new Vector3i(x, columnY, z));
+            for (int columnY = y - 1; columnY >= 0; columnY--) {
+                Block block = worldView.getBlock(x, columnY, z);
+                if (sunlightRetainsFullStrengthIn(block)) {
+                    worldView.setSunlight(x, columnY, z, lightLevel);
+                    nextWave.add(new Vector3i(x, columnY, z));
+                } else {
+                    break;
+                }
             }
         }
 
@@ -341,7 +346,8 @@ public class LightPropagator {
                 byte aboveLight = worldView.getSunlight(x + region.min().x, y + 1, z + region.min().z);
                 if (aboveLight == Chunk.MAX_LIGHT) {
                     for (; y >= 0; y--) {
-                        if (worldView.getBlock(x + region.min().x, y, z + region.min().z).isTranslucent()) {
+                        Block block = worldView.getBlock(x + region.min().x, y, z + region.min().z);
+                        if (sunlightRetainsFullStrengthIn(block)) {
                             worldView.setSunlight(x + region.min().x, y, z + region.min().z, Chunk.MAX_LIGHT);
                         } else {
                             break;
@@ -401,5 +407,8 @@ public class LightPropagator {
         }
     }
 
+    private boolean sunlightRetainsFullStrengthIn(Block block) {
+        return block.isTranslucent() && !block.isLiquid();
+    }
 
 }

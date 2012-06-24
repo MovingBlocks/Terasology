@@ -79,6 +79,7 @@ public class StateSinglePlayer implements GameState {
 
     private String currentWorldName;
     private String currentWorldSeed;
+    private long currentWorldStartTime;
 
     private PersistableEntityManager entityManager;
 
@@ -94,12 +95,17 @@ public class StateSinglePlayer implements GameState {
     private boolean pauseGame = false;
 
     public StateSinglePlayer(String worldName) {
-        this(worldName, null);
+        this(worldName, null, 0);
     }
 
     public StateSinglePlayer(String worldName, String seed) {
+        this(worldName, seed, 0);
+    }
+
+    public StateSinglePlayer(String worldName, String seed, long time) {
         this.currentWorldName = worldName;
         this.currentWorldSeed = seed;
+        this.currentWorldStartTime = time;
     }
 
     public void init(GameEngine engine) {
@@ -162,7 +168,7 @@ public class StateSinglePlayer implements GameState {
 
     @Override
     public void activate() {
-        initWorld(currentWorldName, currentWorldSeed);
+        initWorld(currentWorldName, currentWorldSeed, currentWorldStartTime);
     }
 
     @Override
@@ -238,13 +244,13 @@ public class StateSinglePlayer implements GameState {
     }
 
     public void initWorld(String title) {
-        initWorld(title, null);
+        initWorld(title, null, 0);
     }
 
     /**
      * Init. a new random world.
      */
-    public void initWorld(String title, String seed) {
+    public void initWorld(String title, String seed, long time) {
         final FastRandom random = new FastRandom();
 
         // Get rid of the old world
@@ -262,7 +268,7 @@ public class StateSinglePlayer implements GameState {
         logger.log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
 
         // Init. a new world
-        worldRenderer = new WorldRenderer(title, seed, entityManager, localPlayerSys);
+        worldRenderer = new WorldRenderer(title, seed, time, entityManager, localPlayerSys);
         CoreRegistry.put(WorldRenderer.class, worldRenderer);
 
         File entityDataFile = new File(PathManager.getInstance().getWorldSavePath(title), ENTITY_DATA_FILE);

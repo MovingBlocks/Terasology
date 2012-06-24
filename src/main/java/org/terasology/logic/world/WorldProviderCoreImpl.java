@@ -58,9 +58,13 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         }
     }
 
+    public WorldProviderCoreImpl(String title, String seed, long time, ChunkProvider chunkProvider) {
+        this(title, seed, chunkProvider);
+        setTime(time);
+    }
+
     public WorldProviderCoreImpl(WorldInfo info, ChunkProvider chunkProvider) {
-        this(info.getTitle(), info.getSeed(), chunkProvider);
-        setTime(info.getTime());
+        this(info.getTitle(), info.getSeed(), info.getTime(), chunkProvider);
     }
 
     @Override
