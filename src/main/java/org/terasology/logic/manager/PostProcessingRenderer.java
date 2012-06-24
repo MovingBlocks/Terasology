@@ -18,6 +18,7 @@ package org.terasology.logic.manager;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.*;
 import org.terasology.game.CoreRegistry;
+import org.terasology.game.Timer;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
@@ -43,6 +44,8 @@ public class PostProcessingRenderer {
     private static PostProcessingRenderer _instance = null;
     private float _exposure = 16.0f;
     private int _displayListQuad = -1;
+
+    private float lastExposureUpdate;
 
     private boolean _extensionsAvailable = false;
 
@@ -105,13 +108,10 @@ public class PostProcessingRenderer {
         createFBO("sceneHighPass", 256, 256, false, false);
         createFBO("sceneBloom0", 256, 256, false, false);
         createFBO("sceneBloom1", 256, 256, false, false);
-        createFBO("sceneBloom2", 256, 256, false, false);
 
-        createFBO("sceneBlur0", 1024, 1024, false, false);
-        createFBO("sceneBlur1", 1024, 1024, false, false);
-        createFBO("sceneBlur2", 1024, 1024, false, false);
+        createFBO("sceneBlur0", 512, 512, false, false);
+        createFBO("sceneBlur1", 512, 512, false, false);
 
-        createFBO("scene32", 32, 32, false, false);
         createFBO("scene16", 16, 16, false, false);
         createFBO("scene8", 8, 8, false, false);
         createFBO("scene4", 4, 4, false, false);
@@ -193,6 +193,13 @@ public class PostProcessingRenderer {
     }
 
     private void updateExposure() {
+        long currentTime = CoreRegistry.get(Timer.class).getTimeInMs();
+
+        if (CoreRegistry.get(Timer.class).getTimeInMs() - lastExposureUpdate < 1000)
+            return;
+
+        lastExposureUpdate = currentTime;
+
         FloatBuffer pixels = BufferUtils.createFloatBuffer(4);
         FBO scene = PostProcessingRenderer.getInstance().getFBO("scene1");
 
@@ -246,7 +253,7 @@ public class PostProcessingRenderer {
 
             generateTonemappedScene();
 
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < 2; i++) {
                 generateBloom(i);
                 generateBlur(i);
             }
@@ -323,7 +330,7 @@ public class PostProcessingRenderer {
         shader.setFloat("radius", 2.5f);
 
         PostProcessingRenderer.getInstance().getFBO("sceneBlur" + id).bind();
-        glViewport(0, 0, 1024, 1024);
+        glViewport(0, 0, 512, 512);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -366,7 +373,7 @@ public class PostProcessingRenderer {
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("down");
         shader.enable();
 
-        for (int i = 5; i >= 0; i--) {
+        for (int i = 4; i >= 0; i--) {
             int sizePrev = (int) java.lang.Math.pow(2, i + 1);
 
             int size = (int) java.lang.Math.pow(2, i);
@@ -377,7 +384,7 @@ public class PostProcessingRenderer {
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            if (i == 5)
+            if (i == 4)
                 PostProcessingRenderer.getInstance().getFBO("scene").bindTexture();
             else
                 PostProcessingRenderer.getInstance().getFBO("scene" + sizePrev).bindTexture();

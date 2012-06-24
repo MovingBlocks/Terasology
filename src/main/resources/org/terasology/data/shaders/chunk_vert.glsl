@@ -70,8 +70,11 @@ void main()
     }
 
     if (gl_TexCoord[0].x >= waterCoordinate.x && gl_TexCoord[0].x < waterCoordinate.x + TEXTURE_OFFSET && gl_TexCoord[0].y >= waterCoordinate.y && gl_TexCoord[0].y < waterCoordinate.y + TEXTURE_OFFSET) {
-        vertexWorldPos.y += smoothTriangleWave(timeToTick(time, 0.1) + vertexChunkPos.x * 0.1 + vertexChunkPos.z * 0.1) * 0.1 + smoothTriangleWave(timeToTick(time, 0.05)  + vertexChunkPos.x * 0.1 + vertexChunkPos.z * -0.1 + 0.2372891) * 0.4;
-        vertexWorldPos.y += smoothTriangleWave(timeToTick(time, 0.1)  + vertexChunkPos.x * 0.1 + vertexChunkPos.z * -0.1 + 0.4372891) * 0.2;
+        vertexWorldPos.y += (smoothTriangleWave(timeToTick(time, 0.25) + vertexChunkPos.x * 0.01 + vertexChunkPos.z * 0.01) * 2.0 - 1.0) * 0.3
+        + (smoothTriangleWave(timeToTick(time, 0.025)  + vertexChunkPos.x * 0.05 + vertexChunkPos.z * -0.05 + 0.2372891) * 2.0 - 1.0) * 0.2
+        + (smoothTriangleWave(timeToTick(time, 0.05)  + vertexChunkPos.x * 0.1 + vertexChunkPos.z * 0.1 + 0.4372891) * 2.0 - 1.0) * 0.1;
+        + (smoothTriangleWave(timeToTick(time, 0.1)  + vertexChunkPos.x * 0.2 + vertexChunkPos.z * 0.2 + 0.5372891) * 2.0 - 1.0) * 0.05;
+        + (smoothTriangleWave(timeToTick(time, 0.2)  + vertexChunkPos.x * 0.3 + vertexChunkPos.z * 0.3 + 0.7372891) * 2.0 - 1.0) * 0.01;
     } else if (gl_TexCoord[0].x >= lavaCoordinate.x && gl_TexCoord[0].x < lavaCoordinate.x + TEXTURE_OFFSET && gl_TexCoord[0].y >= lavaCoordinate.y && gl_TexCoord[0].y < lavaCoordinate.y + TEXTURE_OFFSET) {
         vertexWorldPos.y += smoothTriangleWave(timeToTick(time, 0.05) + vertexChunkPos.x * 0.1 + vertexChunkPos.z * 0.1) * 0.2;
     }

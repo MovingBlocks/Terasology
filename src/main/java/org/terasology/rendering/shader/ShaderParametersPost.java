@@ -47,9 +47,9 @@ public class ShaderParametersPost implements IShaderParameters {
         PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("scene");
 
         GL13.glActiveTexture(GL13.GL_TEXTURE1);
-        PostProcessingRenderer.getInstance().getFBO("sceneBloom2").bindTexture();
+        PostProcessingRenderer.getInstance().getFBO("sceneBloom1").bindTexture();
         GL13.glActiveTexture(GL13.GL_TEXTURE2);
-        PostProcessingRenderer.getInstance().getFBO("sceneBlur2").bindTexture();
+        PostProcessingRenderer.getInstance().getFBO("sceneBlur1").bindTexture();
         GL13.glActiveTexture(GL13.GL_TEXTURE3);
         glBindTexture(GL11.GL_TEXTURE_2D, texture.getId());
         GL13.glActiveTexture(GL13.GL_TEXTURE4);
@@ -71,10 +71,10 @@ public class ShaderParametersPost implements IShaderParameters {
 
         if (daylight < 1.0 && daylight > 0.25) {
             float daylightFactor = (1.0f - daylight) / 0.75f;
-            fogLinearIntensity += 0.75f * daylightFactor;
+            fogLinearIntensity += 0.1f * daylightFactor;
         } else if (daylight <= 0.25f) {
             float daylightFactor = (0.25f - daylight) / 0.25f;
-            fogLinearIntensity += TeraMath.lerpf(0.75f, 0.0f, daylightFactor);
+            fogLinearIntensity += TeraMath.lerpf(0.1f, 0.0f, daylightFactor);
         }
 
         WorldRenderer renderer = CoreRegistry.get(WorldRenderer.class);
