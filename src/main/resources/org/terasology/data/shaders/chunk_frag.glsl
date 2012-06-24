@@ -31,21 +31,22 @@ varying vec3 lightDir;
 varying vec3 normal;
 
 varying float flickering;
+varying float flickeringAlternative;
 
 uniform vec3 chunkOffset;
 uniform vec2 waterCoordinate;
 uniform vec2 lavaCoordinate;
 uniform vec2 grassCoordinate;
 
-#define DAYLIGHT_AMBIENT_COLOR 1.0, 0.9, 0.9
+#define DAYLIGHT_AMBIENT_COLOR 0.95, 0.9, 0.85
 #define MOONLIGHT_AMBIENT_COLOR 0.8, 0.8, 1.0
 #define NIGHT_BRIGHTNESS 0.25
-#define WATER_COLOR 0.325, 0.819, 0.925, 0.3
+#define WATER_COLOR 0.325, 0.819, 0.925, 0.5
 
 #define TORCH_WATER_SPEC 0.8
 #define TORCH_WATER_DIFF 0.7
-#define TORCH_BLOCK_SPEC 0.5
-#define TORCH_BLOCK_DIFF 0.7
+#define TORCH_BLOCK_SPEC 0.7
+#define TORCH_BLOCK_DIFF 1.0
 #define WATER_SPEC 1.0
 #define WATER_DIFF 1.0
 #define BLOCK_DIFF 0.25
@@ -93,12 +94,8 @@ void main(){
 
     /* APPLY OVERALL BIOME COLOR OFFSET */
     if (!(texCoord.x >= grassCoordinate.x && texCoord.x < grassCoordinate.x + TEXTURE_OFFSET && texCoord.y >= grassCoordinate.y && texCoord.y < grassCoordinate.y + TEXTURE_OFFSET)) {
-        if (gl_Color.rgb != vec3(1.0)) {
-            color.rgb = color.r * gl_Color.rgb;
-            color.a *= gl_Color.a;
-        }
-        else {
-            color.rgb *= gl_Color.rgb;
+        if (gl_Color.r < 0.99 && gl_Color.g < 0.99 && gl_Color.b < 0.99) {
+            color.rgb = color.g * gl_Color.rgb;
             color.a *= gl_Color.a;
         }
     /* MASK GRASS AND APPLY BIOME COLOR */
@@ -118,7 +115,6 @@ void main(){
     float blocklightValue = expLightValue(gl_TexCoord[1].y);
 
     float occlusionValue = gl_TexCoord[1].z;
-
     float diffuseLighting;
 
     if (isWater) {
@@ -133,10 +129,10 @@ void main(){
     if (carryingTorch) {
         if (isWater)
             torchlight = calcTorchlight(calcLambLight(normalWater, normalizedVPos) * TORCH_WATER_DIFF
-            + TORCH_WATER_SPEC * calcSpecLightWithOffset(normal, normalizedVPos, normalize(eyeVec), 64.0, normalWater), vertexWorldPos.xyz);
+            + TORCH_WATER_SPEC * calcSpecLightWithOffset(normal, normalizedVPos, normalize(eyeVec), 32.0, normalWater), vertexWorldPos.xyz);
         else
             torchlight = calcTorchlight(calcLambLight(normal, normalizedVPos) * TORCH_BLOCK_DIFF
-            + TORCH_BLOCK_SPEC * calcSpecLight(normal, normalizedVPos, normalize(eyeVec), 32.0), vertexWorldPos.xyz);
+            + TORCH_BLOCK_SPEC * calcSpecLight(normal, normalizedVPos, normalize(eyeVec), 16.0), vertexWorldPos.xyz);
     }
 
     vec3 daylightColorValue;
@@ -145,7 +141,7 @@ void main(){
     if (isWater) {
         /* WATER NEEDS DIFFUSE AND SPECULAR LIGHT */
         daylightColorValue = vec3(diffuseLighting) * WATER_DIFF;
-        daylightColorValue += calcSpecLightWithOffset(normal, finalLightDir, normalize(eyeVec), 64.0, normalWater) * WATER_SPEC;
+        daylightColorValue += calcSpecLightWithOffset(normal, finalLightDir, normalize(eyeVec), 32.0, normalWater) * WATER_SPEC;
     } else {
         /* DEFAULT LIGHTING ONLY CONSIST OF DIFFUSE AND AMBIENT LIGHT */
         daylightColorValue = vec3(BLOCK_AMB + diffuseLighting * BLOCK_DIFF);
@@ -159,18 +155,14 @@ void main(){
     daylightColorValue.xyz *= daylightScaledValue + (NIGHT_BRIGHTNESS * (1.0 - daylight) * daylightValue);
 
     // Calculate the final block light brightness
-    float blockBrightness = (blocklightValue + diffuseLighting * blocklightValue);
+    float blockBrightness = (blocklightValue + diffuseLighting * blocklightValue * BLOCK_DIFF);
 
-    torchlight -= flickering;
-    if (torchlight < 0.0)
-        torchlight = 0.0;
+    torchlight -= flickeringAlternative * torchlight;
 
     blockBrightness += (1.0 - blockBrightness) * torchlight;
     blockBrightness -= flickering * blocklightValue;
     blockBrightness *= blocklightDayIntensity;
-
-    if (blockBrightness < 0.0)
-        blockBrightness = 0.0;
+    blockBrightness += (1.00 - blockBrightness) * torchlight;
 
     // Calculate the final blocklight color value and add a slight reddish tint to it
     vec3 blocklightColorValue = vec3(blockBrightness) * vec3(1.0, 0.95, 0.94);

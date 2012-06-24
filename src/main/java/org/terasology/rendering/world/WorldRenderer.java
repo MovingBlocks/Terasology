@@ -467,13 +467,12 @@ public final class WorldRenderer implements IGameObject {
         if (Config.getInstance().isDebugCollision()) {
             renderDebugCollision();
         }
-        ;
 
         glEnable(GL_LIGHT0);
 
-        boolean headUnderWater = false;
+        boolean headUnderWater;
 
-        headUnderWater = _cameraMode == CAMERA_MODE.PLAYER && isUnderwater(new Vector3f(getActiveCamera().getPosition()));
+        headUnderWater = _cameraMode == CAMERA_MODE.PLAYER && isUnderwater();
 
         if (_wireframe)
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -697,20 +696,11 @@ public final class WorldRenderer implements IGameObject {
         }
     }
 
-    private boolean isUnderwater(Vector3f pos) {
-
-        BlockPosition p = new BlockPosition(pos);
-        Block block = getWorldProvider().getBlock(pos);
-        if (block.isLiquid()) {
-            for (AABB blockAABB : block.getColliders(p.x, p.y, p.z)) {
-                if (blockAABB.contains(pos)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+    private boolean isUnderwater() {
+        Vector3d cameraPos = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
+        Block block = CoreRegistry.get(WorldProvider.class).getBlock(new Vector3f(cameraPos));
+        return block.isLiquid();
     }
-
 
     private void animateSpawnCamera(double delta) {
         if (_player == null || !_player.isValid())

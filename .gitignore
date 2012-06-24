@@ -14,4 +14,5 @@ Terasology.iws
 .gradle
 bin
 data/console/consolelog.json
+benchmark-temp
 *~

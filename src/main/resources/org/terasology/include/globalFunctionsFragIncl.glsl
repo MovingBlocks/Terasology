@@ -14,6 +14,18 @@
  * limitations under the License.
  */
 
+#define A 0.22
+#define B 0.30
+#define C 0.10
+#define D 0.20
+#define E 0.01
+#define F 0.30
+#define W 11.2
+
+vec3 uncharted2Tonemap(vec3 x) {
+	return ((x*(A*x+C*B)+D*E)/(x*(A*x+B)+D*F))-E/F;
+}
+
 float tonemapReinhard(float brightMax, float exposure) {
     return exposure * (exposure/(brightMax * brightMax) + 1.0) / (exposure + 1.0);
 }

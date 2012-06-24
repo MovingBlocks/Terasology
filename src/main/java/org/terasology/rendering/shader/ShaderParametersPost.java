@@ -71,17 +71,13 @@ public class ShaderParametersPost implements IShaderParameters {
 
         if (daylight < 1.0 && daylight > 0.25) {
             float daylightFactor = (1.0f - daylight) / 0.75f;
-            fogIntensity = 0.5f * daylightFactor;
+            fogIntensity = 1.5f * daylightFactor;
         } else if (daylight <= 0.25f) {
             float daylightFactor = (0.25f - daylight) / 0.25f;
-            fogIntensity = TeraMath.lerpf(0.5f, 0.05f, daylightFactor);
+            fogIntensity = TeraMath.lerpf(1.0f, 0.05f, daylightFactor);
         }
 
         WorldRenderer renderer = CoreRegistry.get(WorldRenderer.class);
-
-        // TODO: This should be a bit more sophisticated
-        //fogIntensity = (float) TeraMath.clamp(fogIntensity + renderer.getActiveHumidity(new Vector3d(renderer.getPlayer().getPosition())));
-
         fogIntensity += renderer.getWorldProvider().getBiomeProvider().getFog(renderer.getWorldProvider().getTimeInDays(), daylight);
 
         program.setFloat("fogIntensity", fogIntensity);

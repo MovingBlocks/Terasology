@@ -30,7 +30,8 @@ public class WorldBiomeProviderImpl implements WorldBiomeProvider {
     public WorldBiomeProviderImpl(String worldSeed) {
         temperatureNoise = new PerlinNoise(worldSeed.hashCode() + 5);
         humidityNoise = new PerlinNoise(worldSeed.hashCode() + 6);
-        fogNoise = new PerlinNoise(worldSeed.hashCode());
+        fogNoise = new PerlinNoise(worldSeed.hashCode() + 12);
+        fogNoise.setOctaves(8);
     }
 
     @Override
@@ -47,7 +48,7 @@ public class WorldBiomeProviderImpl implements WorldBiomeProvider {
 
     @Override
     public float getFog(float time, float daylight) {
-        return (float) TeraMath.clamp(fogNoise.noise(time * 2.0, 0.038291, 0.874691) * 2.0 * daylight + 0.1 * daylight, 0.0, 8.0) + 0.05f;
+        return (float) TeraMath.clamp(fogNoise.fBm(time * 0.372891, time * 0.578291, time * 0.78319) * 10.0 * daylight, 0.0, 15.0) + 0.05f;
     }
 
     @Override
