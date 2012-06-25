@@ -93,7 +93,12 @@ void main(){
     /* APPLY OVERALL BIOME COLOR OFFSET */
     if (!(texCoord.x >= grassCoordinate.x && texCoord.x < grassCoordinate.x + TEXTURE_OFFSET && texCoord.y >= grassCoordinate.y && texCoord.y < grassCoordinate.y + TEXTURE_OFFSET)) {
         if (gl_Color.r < 0.99 && gl_Color.g < 0.99 && gl_Color.b < 0.99) {
-            color.rgb = color.g * gl_Color.rgb;
+            if (color.g > 0.5) {
+                color.rgb = vec3(color.g) * gl_Color.rgb;
+            } else {
+                color.rgb *= gl_Color.rgb;
+            }
+
             color.a *= gl_Color.a;
         }
     /* MASK GRASS AND APPLY BIOME COLOR */
@@ -101,7 +106,7 @@ void main(){
         vec4 maskColor = texture2D(textureEffects, vec2(10.0 * TEXTURE_OFFSET + mod(texCoord.x,TEXTURE_OFFSET), mod(texCoord.y,TEXTURE_OFFSET)));
 
         // Only use one channel so the color won't be altered
-        if (maskColor.a != 0.0) color.rgb = color.r * gl_Color.rgb;
+        if (maskColor.a != 0.0) color.rgb = vec3(color.g) * gl_Color.rgb;
     }
 
     // Calculate daylight lighting value
