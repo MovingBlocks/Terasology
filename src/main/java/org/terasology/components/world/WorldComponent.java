@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright 2012
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,32 +14,13 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.world.localChunkProvider;
+package org.terasology.components.world;
 
-import org.terasology.logic.world.chunks.ChunkProvider;
-import org.terasology.math.Vector3i;
+import org.terasology.entitySystem.Component;
 
 /**
+ * World component - indicates the world entity. Used for sending world-wide events and storing world information
  * @author Immortius
  */
-public class ShutdownTask implements ChunkTask {
-
-    @Override
-    public void enact() {
-    }
-
-    @Override
-    public boolean isShutdownRequest() {
-        return true;
-    }
-
-    @Override
-    public Vector3i getPosition() {
-        return Vector3i.zero();
-    }
-
-    @Override
-    public ChunkProvider getProvider() {
-        return null;
-    }
+public final class WorldComponent implements Component {
 }

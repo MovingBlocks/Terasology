@@ -15,7 +15,7 @@
  */
 package org.terasology.math;
 
-import org.terasology.logic.world.Chunk;
+import org.terasology.logic.world.chunks.Chunk;
 
 /**
  * Collection of math functions.

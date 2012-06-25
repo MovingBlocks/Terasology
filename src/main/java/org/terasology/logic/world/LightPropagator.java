@@ -17,6 +17,7 @@
 package org.terasology.logic.world;
 
 import com.google.common.collect.Lists;
+import org.terasology.logic.world.chunks.Chunk;
 import org.terasology.math.Diamond3iIterator;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;

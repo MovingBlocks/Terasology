@@ -18,7 +18,7 @@ package org.terasology.game.logic.world.generator;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.terasology.logic.world.Chunk;
+import org.terasology.logic.world.chunks.Chunk;
 import org.terasology.logic.world.localChunkProvider.InternalLightProcessor;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;

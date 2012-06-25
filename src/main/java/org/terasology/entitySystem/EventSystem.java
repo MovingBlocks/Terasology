@@ -8,6 +8,11 @@ package org.terasology.entitySystem;
 public interface EventSystem {
 
     /**
+     * Process all pending events
+     */
+    public void process();
+
+    /**
      * Registers an event
      *
      * @param id

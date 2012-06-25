@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright 2012
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,32 +14,22 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.world.localChunkProvider;
+package org.terasology.logic.world.chunks;
 
-import org.terasology.logic.world.chunks.ChunkProvider;
+import org.terasology.entitySystem.AbstractEvent;
 import org.terasology.math.Vector3i;
 
 /**
  * @author Immortius
  */
-public class ShutdownTask implements ChunkTask {
+public class ChunkReadyEvent extends AbstractEvent {
+    private Vector3i chunkPos = new Vector3i();
 
-    @Override
-    public void enact() {
+    public ChunkReadyEvent(Vector3i chunkPos) {
+        this.chunkPos.set(chunkPos);
     }
 
-    @Override
-    public boolean isShutdownRequest() {
-        return true;
-    }
-
-    @Override
-    public Vector3i getPosition() {
-        return Vector3i.zero();
-    }
-
-    @Override
-    public ChunkProvider getProvider() {
-        return null;
+    public Vector3i getChunkPos() {
+        return chunkPos;
     }
 }

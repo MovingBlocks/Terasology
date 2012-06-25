@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.world;
+package org.terasology.logic.world.chunks;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.logic.world.LightPropagator;
+import org.terasology.logic.world.WorldView;
 import org.terasology.logic.world.generator.core.ChunkGeneratorManager;
 import org.terasology.logic.world.localChunkProvider.*;
 import org.terasology.math.Region3i;
@@ -56,6 +58,8 @@ public class LocalChunkProvider implements ChunkProvider {
     private Set<CacheRegion> regions = Sets.newHashSet();
 
     private ConcurrentMap<Vector3i, Chunk> nearCache = Maps.newConcurrentMap();
+
+    private EntityRef worldEntity = EntityRef.NULL;
 
     public LocalChunkProvider(ChunkStore farStore, ChunkGeneratorManager generator) {
         this.farStore = farStore;
@@ -126,6 +130,10 @@ public class LocalChunkProvider implements ChunkProvider {
                 }
             });
         }
+    }
+
+    public void setWorldEntity(EntityRef worldEntity) {
+        this.worldEntity = worldEntity;
     }
 
     @Override
@@ -242,6 +250,11 @@ public class LocalChunkProvider implements ChunkProvider {
                     public void enact() {
                         Chunk chunk = farStore.get(getPosition());
                         if (nearCache.putIfAbsent(getPosition(), chunk) == null) {
+                            if (chunk.getChunkState() == Chunk.State.COMPLETE) {
+                                for (Vector3i adjPos : Region3i.createFromCenterExtents(getPosition(), LOCAL_REGION_EXTENTS)) {
+                                    checkChunkReady(adjPos);
+                                }
+                            }
                             reviewChunkQueue.offer(new ChunkRequest(ChunkRequest.RequestType.REVIEW, Region3i.createFromCenterExtents(getPosition(), LOCAL_REGION_EXTENTS)));
                         }
                     }
@@ -418,8 +431,21 @@ public class LocalChunkProvider implements ChunkProvider {
             }
             logger.log(Level.FINE, "Now complete " + pos);
             chunk.setChunkState(Chunk.State.COMPLETE);
-            // TODO: Send event out
+            for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, LOCAL_REGION_EXTENTS)) {
+                checkChunkReady(adjPos);
+            }
+        }
+    }
 
+    private void checkChunkReady(Vector3i pos) {
+        if (worldEntity.exists()) {
+            for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, LOCAL_REGION_EXTENTS)) {
+                Chunk chunk = getChunk(pos);
+                if (chunk == null || chunk.getChunkState() != Chunk.State.COMPLETE) {
+                    return;
+                }
+            }
+            worldEntity.send(new ChunkReadyEvent(pos));
         }
     }
 

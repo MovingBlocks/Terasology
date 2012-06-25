@@ -18,7 +18,7 @@ package org.terasology.logic.world.generator.core;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import org.terasology.logic.world.Chunk;
+import org.terasology.logic.world.chunks.Chunk;
 import org.terasology.logic.world.WorldBiomeProvider;
 import org.terasology.logic.world.WorldView;
 import org.terasology.logic.world.generator.SecondPassChunkGenerator;

@@ -16,6 +16,8 @@
 
 package org.terasology.logic.world;
 
+import org.terasology.logic.world.chunks.Chunk;
+import org.terasology.logic.world.chunks.ChunkProvider;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;

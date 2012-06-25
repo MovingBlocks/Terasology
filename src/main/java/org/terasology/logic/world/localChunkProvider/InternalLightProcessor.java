@@ -16,7 +16,7 @@
 
 package org.terasology.logic.world.localChunkProvider;
 
-import org.terasology.logic.world.Chunk;
+import org.terasology.logic.world.chunks.Chunk;
 import org.terasology.math.Side;
 import org.terasology.model.blocks.Block;
 

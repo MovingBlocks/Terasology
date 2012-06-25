@@ -17,12 +17,10 @@ package org.terasology.rendering.primitives;
 
 import com.bulletphysics.collision.shapes.IndexedMesh;
 import com.bulletphysics.collision.shapes.ScalarType;
-import gnu.trove.iterator.TByteIterator;
 import gnu.trove.iterator.TFloatIterator;
 import gnu.trove.iterator.TIntIterator;
-import gnu.trove.iterator.TShortIterator;
 import org.lwjgl.BufferUtils;
-import org.terasology.logic.world.Chunk;
+import org.terasology.logic.world.chunks.Chunk;
 import org.terasology.logic.world.WorldBiomeProvider;
 import org.terasology.logic.world.WorldView;
 import org.terasology.math.Side;

@@ -23,9 +23,11 @@ import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.componentSystem.controllers.LocalPlayerSystem;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.world.LocationComponent;
+import org.terasology.components.world.WorldComponent;
 import org.terasology.entityFactory.PlayerFactory;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventSystem;
 import org.terasology.entitySystem.PersistableEntityManager;
 import org.terasology.entitySystem.persistence.EntityDataJSONFormat;
 import org.terasology.entitySystem.persistence.EntityPersisterHelper;
@@ -44,7 +46,7 @@ import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
-import org.terasology.logic.world.Chunk;
+import org.terasology.logic.world.chunks.Chunk;
 import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.management.BlockManager;
@@ -82,6 +84,7 @@ public class StateSinglePlayer implements GameState {
     private long currentWorldStartTime;
 
     private PersistableEntityManager entityManager;
+    private EventSystem eventSystem;
 
     /* RENDERING */
     private WorldRenderer worldRenderer;
@@ -118,6 +121,7 @@ public class StateSinglePlayer implements GameState {
         cacheTextures();
 
         entityManager = new EntitySystemBuilder().build();
+        eventSystem = CoreRegistry.get(EventSystem.class);
 
         componentSystemManager = new ComponentSystemManager();
         CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);
@@ -173,6 +177,8 @@ public class StateSinglePlayer implements GameState {
 
     @Override
     public void deactivate() {
+        // TODO: Shutdown background threads
+        eventSystem.process();
         for (ComponentSystem system : componentSystemManager.iterateAll()) {
             system.shutdown();
         }
@@ -198,6 +204,8 @@ public class StateSinglePlayer implements GameState {
     public void update(float delta) {
         /* GUI */
         updateUserInterface();
+
+        eventSystem.process();
 
         for (UpdateSubscriberSystem updater : componentSystemManager.iterateUpdateSubscribers()) {
             PerformanceMonitor.startActivity(updater.getClass().getSimpleName());
@@ -281,6 +289,16 @@ public class StateSinglePlayer implements GameState {
             }
         }
 
+        // Create the world entity
+        Iterator<EntityRef> worldEntityIterator = entityManager.iteratorEntities(WorldComponent.class).iterator();
+        if (worldEntityIterator.hasNext()) {
+            worldRenderer.getChunkProvider().setWorldEntity(worldEntityIterator.next());
+        } else {
+            EntityRef worldEntity = entityManager.create();
+            worldEntity.addComponent(new WorldComponent());
+            worldRenderer.getChunkProvider().setWorldEntity(worldEntity);
+        }
+
         CoreRegistry.put(WorldRenderer.class, worldRenderer);
         CoreRegistry.put(WorldProvider.class, worldRenderer.getWorldProvider());
         CoreRegistry.put(LocalPlayer.class, new LocalPlayer(EntityRef.NULL));
@@ -294,30 +312,6 @@ public class StateSinglePlayer implements GameState {
         prepareWorld();
     }
 
-    private Vector3f nextSpawningPoint() {
-        return new Vector3f(0, 5, 0);
-        // TODO: Need to generate an X/Z coord, force a chunk relevent and calculate Y
-        /*
-        ChunkGeneratorTerrain tGen = ((ChunkGeneratorTerrain) getGeneratorManager().getChunkGenerators().get(0));
-
-        FastRandom nRandom = new FastRandom(CoreRegistry.get(Timer.class).getTimeInMs());
-
-        for (; ; ) {
-            int randX = (int) (nRandom.randomDouble() * 128f);
-            int randZ = (int) (nRandom.randomDouble() * 128f);
-
-            for (int y = Chunk.SIZE_Y - 1; y >= 32; y--) {
-
-                double dens = tGen.calcDensity(randX + (int) SPAWN_ORIGIN.x, y, randZ + (int) SPAWN_ORIGIN.y);
-
-                if (dens >= 0 && y < 64)
-                    return new Vector3d(randX + SPAWN_ORIGIN.x, y, randZ + SPAWN_ORIGIN.y);
-                else if (dens >= 0 && y >= 64)
-                    break;
-            }
-        } */
-    }
-
 
     private boolean screenHasFocus() {
         return GUIManager.getInstance().getFocusedWindow() != null && GUIManager.getInstance().getFocusedWindow().isModal() && GUIManager.getInstance().getFocusedWindow().isVisible();
@@ -327,7 +321,7 @@ public class StateSinglePlayer implements GameState {
         return !pauseGame;
     }
 
-    // TODO: Maybe should have its own state?
+    // TODO: Should have its own state
     private void prepareWorld() {
         UILoadingScreen loadingScreen = GUIManager.getInstance().addWindow(new UILoadingScreen(), "engine:loadingScreen");
         Display.update();

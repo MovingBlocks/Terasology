@@ -14,37 +14,22 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.world.chunkStore;
+package org.terasology.logic.world.chunks;
 
-import org.terasology.logic.world.Chunk;
-import org.terasology.logic.world.ChunkStore;
+import org.terasology.logic.world.chunks.Chunk;
 import org.terasology.math.Vector3i;
 
 /**
  * @author Immortius
  */
-public class NullChunkStore implements ChunkStore {
+public interface ChunkStore {
+    public Chunk get(Vector3i position);
 
-    @Override
-    public Chunk get(Vector3i position) {
-        return null;
-    }
+    public void put(Chunk c);
 
-    @Override
-    public float size() {
-        return 0;
-    }
+    public boolean contains(Vector3i position);
 
-    @Override
-    public void dispose() {
-    }
+    public float size();
 
-    @Override
-    public void put(Chunk c) {
-    }
-
-    @Override
-    public boolean contains(Vector3i position) {
-        return false;
-    }
+    void dispose();
 }

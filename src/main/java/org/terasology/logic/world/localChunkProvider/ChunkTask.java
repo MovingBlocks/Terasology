@@ -16,7 +16,7 @@
 
 package org.terasology.logic.world.localChunkProvider;
 
-import org.terasology.logic.world.ChunkProvider;
+import org.terasology.logic.world.chunks.ChunkProvider;
 import org.terasology.math.Vector3i;
 
 /**

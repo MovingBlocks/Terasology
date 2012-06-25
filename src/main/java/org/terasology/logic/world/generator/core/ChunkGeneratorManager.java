@@ -16,7 +16,7 @@
 
 package org.terasology.logic.world.generator.core;
 
-import org.terasology.logic.world.Chunk;
+import org.terasology.logic.world.chunks.Chunk;
 import org.terasology.logic.world.WorldBiomeProvider;
 import org.terasology.logic.world.WorldView;
 import org.terasology.logic.world.generator.BaseChunkGenerator;

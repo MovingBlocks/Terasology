@@ -1,9 +1,9 @@
-package org.terasology.logic.world.chunkStore;
+package org.terasology.logic.world.chunks.store;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
-import org.terasology.logic.world.Chunk;
-import org.terasology.logic.world.ChunkStore;
+import org.terasology.logic.world.chunks.Chunk;
+import org.terasology.logic.world.chunks.ChunkStore;
 import org.terasology.math.Vector3i;
 
 import java.io.*;

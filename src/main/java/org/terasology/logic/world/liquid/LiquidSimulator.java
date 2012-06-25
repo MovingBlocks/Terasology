@@ -13,19 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.componentSystem.worldSimulation;
+package org.terasology.logic.world.liquid;
 
 import com.google.common.collect.Queues;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import org.terasology.components.world.BlockComponent;
+import org.terasology.components.world.WorldComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
-import org.terasology.events.BlockChangedEvent;
+import org.terasology.logic.world.BlockChangedEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.world.WorldProvider;
+import org.terasology.logic.world.chunks.ChunkReadyEvent;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
@@ -102,6 +104,11 @@ public class LiquidSimulator implements EventHandlerSystem {
         if (blockQueue.isEmpty()) {
             executor.shutdownNow();
         }
+    }
+
+    @ReceiveEvent(components = WorldComponent.class)
+    public void chunkReady(ChunkReadyEvent event, EntityRef worldEntity) {
+        logger.log(Level.INFO, "Chunk Ready: " + event.getChunkPos());
     }
 
     @ReceiveEvent(components = BlockComponent.class)

@@ -16,7 +16,7 @@
 
 package org.terasology.logic.world.generator;
 
-import org.terasology.logic.world.Chunk;
+import org.terasology.logic.world.chunks.Chunk;
 
 /**
  * @author Immortius

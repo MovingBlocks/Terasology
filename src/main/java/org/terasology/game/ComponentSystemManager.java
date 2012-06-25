@@ -36,7 +36,7 @@ public class ComponentSystemManager {
 
     // TODO: Mod support
     public void loadEngineSystems() {
-        loadSystems("engine", "org.terasology.componentSystem");
+        loadSystems("engine", "org.terasology");
     }
 
     public void loadSystems(String packageName, String rootPackagePath) {

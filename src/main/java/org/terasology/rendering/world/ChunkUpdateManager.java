@@ -19,7 +19,7 @@ import com.google.common.collect.Sets;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.logic.manager.Config;
-import org.terasology.logic.world.Chunk;
+import org.terasology.logic.world.chunks.Chunk;
 import org.terasology.logic.world.WorldProvider;
 import org.terasology.logic.world.WorldView;
 import org.terasology.rendering.primitives.ChunkMesh;

@@ -2,7 +2,7 @@ package org.terasology.game.logic.world;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.terasology.logic.world.*;
+import org.terasology.logic.world.chunks.Chunk;
 import org.terasology.math.Vector3i;
 
 import static org.junit.Assert.assertEquals;

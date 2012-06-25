@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.world;
+package org.terasology.logic.world.chunks;
 
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.logic.world.chunks.Chunk;
 import org.terasology.math.Vector3i;
 
 /**
  * @author Immortius
  */
 public interface ChunkProvider {
+
+    /**
+     * Sets the world entity, for the purpose of receiving chunk events.
+     * @param entity
+     */
+    public void setWorldEntity(EntityRef entity);
 
     /**
      * Requests that a region around the given entity be maintained in near cache

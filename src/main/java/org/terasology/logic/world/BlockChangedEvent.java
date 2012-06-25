@@ -16,19 +16,35 @@
 
 package org.terasology.logic.world;
 
+import org.terasology.entitySystem.AbstractEvent;
 import org.terasology.math.Vector3i;
+import org.terasology.model.blocks.Block;
 
 /**
+ * Event when a block has changed
+ *
  * @author Immortius
  */
-public interface ChunkStore {
-    public Chunk get(Vector3i position);
+public class BlockChangedEvent extends AbstractEvent {
+    private Block oldType;
+    private Block newType;
+    private Vector3i blockPosition;
 
-    public void put(Chunk c);
+    public BlockChangedEvent(Vector3i pos, Block newType, Block oldType) {
+        this.blockPosition = new Vector3i(pos);
+        this.oldType = oldType;
+        this.newType = newType;
+    }
 
-    public boolean contains(Vector3i position);
+    public Vector3i getBlockPosition() {
+        return blockPosition;
+    }
 
-    public float size();
+    public Block getOldType() {
+        return oldType;
+    }
 
-    void dispose();
+    public Block getNewType() {
+        return newType;
+    }
 }
