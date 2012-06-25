@@ -1,7 +1,7 @@
 package org.terasology.mods.miniions.componentsystem.entityfactory;
 
-import org.terasology.components.LocationComponent;
-import org.terasology.components.MeshComponent;
+import org.terasology.components.rendering.MeshComponent;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.utilities.FastRandom;

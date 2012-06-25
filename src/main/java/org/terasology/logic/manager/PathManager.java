@@ -1,5 +1,5 @@
 /*
- * Copyright 2012
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package org.terasology.logic.manager;
 
-import java.io.File;
-
 import org.lwjgl.LWJGLUtil;
+
+import java.io.File;
 
 /**
  * @author Immortius
@@ -54,7 +54,7 @@ public final class PathManager {
                     rootPath = new File("~/.terasology");
                     break;
                 case LWJGLUtil.PLATFORM_MACOSX:
-                    rootPath = new File(System.getProperty("user.home") + "/Library/" + "terasology");
+                    rootPath = new File(System.getProperty("user.home") + "/Library/Application Support/" + "Terasology");
                     break;
                 case LWJGLUtil.PLATFORM_WINDOWS:
                     rootPath = new File(System.getenv("APPDATA") + "\\.terasology");

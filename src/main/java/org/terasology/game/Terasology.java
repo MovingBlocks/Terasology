@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
  */
 package org.terasology.game;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.terasology.game.modes.StateMainMenu;
 import org.terasology.logic.manager.PathManager;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The heart and soul of Terasology.

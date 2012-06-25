@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ uniform bool carryingTorch = false;
 varying vec4 vertexWorldPos;
 
 void main(){
-    vec4 color = srgbToLinear(texture2D(textureAtlas, vec2(gl_TexCoord[0].x + texOffsetX , gl_TexCoord[0].y + texOffsetY )));
+    vec4 color = texture2D(textureAtlas, vec2(gl_TexCoord[0].x + texOffsetX , gl_TexCoord[0].y + texOffsetY ));
 
     float torchlight = 0.0;
 
@@ -40,5 +40,5 @@ void main(){
     float lightValue = expLightValue(light);
     color.rgb *= clamp(lightValue + torchlight, 0.0, 1.0);
 
-    gl_FragColor = linearToSrgb(color);
+    gl_FragColor = color;
 }

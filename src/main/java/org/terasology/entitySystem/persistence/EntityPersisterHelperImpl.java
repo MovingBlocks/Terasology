@@ -11,7 +11,7 @@ import org.terasology.entitySystem.metadata.ComponentUtil;
 import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.protobuf.EntityData;
 
-import java.lang.reflect.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -36,8 +36,8 @@ public class EntityPersisterHelperImpl implements EntityPersisterHelper {
         this.componentLibrary = componentLibrary;
     }
 
-    public EntityPersisterHelperImpl(ComponentLibrary componentLibrary, PersistableEntityManager entityManager) {
-        this.componentLibrary = componentLibrary;
+    public EntityPersisterHelperImpl(PersistableEntityManager entityManager) {
+        this.componentLibrary = entityManager.getComponentLibrary();
         this.entityManager = entityManager;
         this.prefabManager = entityManager.getPrefabManager();
     }

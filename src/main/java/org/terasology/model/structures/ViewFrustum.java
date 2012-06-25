@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,13 @@
  */
 package org.terasology.model.structures;
 
-import java.nio.FloatBuffer;
-
-import javax.vecmath.Vector3d;
-
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.CoreRegistry;
 import org.terasology.rendering.world.WorldRenderer;
+
+import javax.vecmath.Vector3d;
+import java.nio.FloatBuffer;
 
 /**
  * View frustum usable for frustum culling.

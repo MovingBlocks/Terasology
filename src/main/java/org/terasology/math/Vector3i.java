@@ -95,6 +95,29 @@ public class Vector3i extends javax.vecmath.Tuple3i implements Serializable {
         this.z = TeraMath.floorToInt(other.z);
     }
 
+    public Vector3i(float x, float y, float z) {
+        this.x = TeraMath.floorToInt(x);
+        this.y = TeraMath.floorToInt(y);
+        this.z = TeraMath.floorToInt(z);
+    }
+
+    /**
+     * Constructs the integer version of a Vector3f, by adding an offset and flooring it
+     *
+     * @param other
+     */
+    public Vector3i(Vector3f other, float offset) {
+        this.x = TeraMath.floorToInt(other.x + offset);
+        this.y = TeraMath.floorToInt(other.y + offset);
+        this.z = TeraMath.floorToInt(other.z + offset);
+    }
+
+    public Vector3i(float x, float y, float z, float offset) {
+        this.x = TeraMath.floorToInt(x + offset);
+        this.y = TeraMath.floorToInt(y + offset);
+        this.z = TeraMath.floorToInt(z + offset);
+    }
+
     /**
      * Constructor instantiates a new <code>Vector3i</code> with provides
      * values.
@@ -144,7 +167,7 @@ public class Vector3i extends javax.vecmath.Tuple3i implements Serializable {
      *
      * @param other the other vector to test
      * @return the total distance in axis-aligned steps between this and
-     * other vector (manhattan distance)
+     *         other vector (manhattan distance)
      */
     public int gridDistance(Vector3i other) {
         return Math.abs(other.x - x) + Math.abs(other.y - y) + Math.abs(other.z - z);
@@ -155,7 +178,7 @@ public class Vector3i extends javax.vecmath.Tuple3i implements Serializable {
      * dimensions (manhattan distance)
      *
      * @return the total magnitude of the vector as a sum of its axis aligned
-     * dimensions (manhattan distance)
+     *         dimensions (manhattan distance)
      */
     public int gridMagnitude() {
         return Math.abs(x) + Math.abs(y) + Math.abs(z);
@@ -207,6 +230,12 @@ public class Vector3i extends javax.vecmath.Tuple3i implements Serializable {
         this.x += x;
         this.y += y;
         this.z += z;
+    }
+
+    public void sub(int x, int y, int z) {
+        this.x -= x;
+        this.y -= y;
+        this.z -= z;
     }
 
     /**

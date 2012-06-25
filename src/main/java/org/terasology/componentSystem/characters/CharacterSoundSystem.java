@@ -2,10 +2,11 @@ package org.terasology.componentSystem.characters;
 
 import org.terasology.audio.Sound;
 import org.terasology.components.CharacterSoundComponent;
-import org.terasology.components.LocationComponent;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.FootstepEvent;
 import org.terasology.events.JumpEvent;
 import org.terasology.events.VerticalCollisionEvent;
@@ -18,13 +19,18 @@ import javax.vecmath.Vector3d;
 /**
  * @author Immortius <immortius@gmail.com>
  */
+@RegisterComponentSystem
 public class CharacterSoundSystem implements EventHandlerSystem {
-    
+
     private FastRandom random = new FastRandom();
 
     public void initialise() {
     }
-    
+
+    @Override
+    public void shutdown() {
+    }
+
     @ReceiveEvent(components = {CharacterSoundComponent.class})
     public void footstep(FootstepEvent event, EntityRef entity) {
         if (random == null) return;

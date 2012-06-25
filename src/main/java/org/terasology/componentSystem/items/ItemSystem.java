@@ -1,52 +1,57 @@
 package org.terasology.componentSystem.items;
 
-import javax.vecmath.Vector3f;
-
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.componentSystem.block.BlockEntityRegistry;
 import org.terasology.components.AABBCollisionComponent;
-import org.terasology.components.BlockComponent;
-import org.terasology.components.BlockItemComponent;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
-import org.terasology.components.LocationComponent;
 import org.terasology.components.PlayerComponent;
+import org.terasology.components.world.BlockComponent;
+import org.terasology.components.world.BlockItemComponent;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AudioManager;
-import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.world.BlockEntityRegistry;
+import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockFamily;
-import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.AABB;
+
+import javax.vecmath.Vector3f;
 
 /**
  * TODO: Refactor use methods into events? Usage should become a separate component
+ *
  * @author Immortius <immortius@gmail.com>
  */
+@RegisterComponentSystem
 public class ItemSystem implements EventHandlerSystem {
     private EntityManager entityManager;
-    private IWorldProvider worldProvider;
+    private WorldProvider worldProvider;
     private BlockEntityRegistry blockEntityRegistry;
 
     @Override
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
-        worldProvider = CoreRegistry.get(IWorldProvider.class);
+        worldProvider = CoreRegistry.get(WorldProvider.class);
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
     }
 
-    @ReceiveEvent(components=BlockItemComponent.class)
+    @Override
+    public void shutdown() {
+    }
+
+    @ReceiveEvent(components = BlockItemComponent.class)
     public void onDestroyed(RemovedComponentEvent event, EntityRef entity) {
         entity.getComponent(BlockItemComponent.class).placedEntity.destroy();
     }
 
-    @ReceiveEvent(components={BlockItemComponent.class, ItemComponent.class})
+    @ReceiveEvent(components = {BlockItemComponent.class, ItemComponent.class})
     public void onPlaceBlock(ActivateEvent event, EntityRef item) {
         BlockItemComponent blockItem = item.getComponent(BlockItemComponent.class);
 
@@ -63,7 +68,7 @@ public class ItemSystem implements EventHandlerSystem {
         }
     }
 
-    @ReceiveEvent(components=ItemComponent.class,priority = EventPriority.PRIORITY_CRITICAL)
+    @ReceiveEvent(components = ItemComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
     public void checkCanUseItem(ActivateEvent event, EntityRef item) {
         ItemComponent itemComp = item.getComponent(ItemComponent.class);
         switch (itemComp.usage) {
@@ -83,19 +88,19 @@ public class ItemSystem implements EventHandlerSystem {
         }
     }
 
-    @ReceiveEvent(components=ItemComponent.class,priority = EventPriority.PRIORITY_TRIVIAL)
+    @ReceiveEvent(components = ItemComponent.class, priority = EventPriority.PRIORITY_TRIVIAL)
     public void usedItem(ActivateEvent event, EntityRef item) {
         ItemComponent itemComp = item.getComponent(ItemComponent.class);
         if (itemComp.consumedOnUse) {
             itemComp.stackCount--;
             if (itemComp.stackCount == 0) {
                 item.destroy();
-            }
-            else {
+            } else {
                 item.saveComponent(itemComp);
             }
         }
     }
+
     /**
      * Places a block of a given type in front of the player.
      *
@@ -111,28 +116,29 @@ public class ItemSystem implements EventHandlerSystem {
             return false;
 
         if (canPlaceBlock(block, targetBlock, placementPos)) {
-            worldProvider.setBlock(placementPos.x, placementPos.y, placementPos.z, block.getId(), true, true);
-            AudioManager.play(new AssetUri(AssetType.SOUND, "engine:PlaceBlock"), 0.5f);
-            if (blockItem.placedEntity.exists()) {
-                // Establish a block entity
-                blockItem.placedEntity.addComponent(new BlockComponent(placementPos, false));
-                // TODO: Get regen and wait from block config?
-                blockItem.placedEntity.addComponent(new HealthComponent(type.getArchetypeBlock().getHardness(), 2.0f,1.0f));
-                blockItem.placedEntity = EntityRef.NULL;
+            if (worldProvider.setBlock(placementPos, block, worldProvider.getBlock(placementPos))) {
+                AudioManager.play(new AssetUri(AssetType.SOUND, "engine:PlaceBlock"), 0.5f);
+                if (blockItem.placedEntity.exists()) {
+                    // Establish a block entity
+                    blockItem.placedEntity.addComponent(new BlockComponent(placementPos, false));
+                    // TODO: Get regen and wait from block config?
+                    blockItem.placedEntity.addComponent(new HealthComponent(type.getArchetypeBlock().getHardness(), 2.0f, 1.0f));
+                    blockItem.placedEntity = EntityRef.NULL;
+                }
+                return true;
             }
-            return true;
         }
         return false;
     }
 
     private boolean canPlaceBlock(Block block, Vector3i targetBlock, Vector3i blockPos) {
-        Block centerBlock = BlockManager.getInstance().getBlock(worldProvider.getBlock(targetBlock.x, targetBlock.y, targetBlock.z));
+        Block centerBlock = worldProvider.getBlock(targetBlock.x, targetBlock.y, targetBlock.z);
 
         if (!centerBlock.isAllowBlockAttachment()) {
             return false;
         }
 
-        Block adjBlock = BlockManager.getInstance().getBlock(worldProvider.getBlock(blockPos.x, blockPos.y, blockPos.z));
+        Block adjBlock = worldProvider.getBlock(blockPos.x, blockPos.y, blockPos.z);
         if (adjBlock != null && !adjBlock.isInvisible() && !adjBlock.isSelectionRayThrough()) {
             return false;
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,12 +59,14 @@ public interface GameEngine {
 
     /**
      * Clears all states, replacing them with newState
+     *
      * @param newState
      */
     void changeState(GameState newState);
 
     /**
      * Deactivates the current state, and activates newState (putting it on top of the stack
+     *
      * @param newState
      */
     void pushState(GameState newState);
@@ -76,8 +78,10 @@ public interface GameEngine {
 
     // TODO: Move task system elsewhere? Need to support saving queued/unfinished tasks too, when the world
     // shuts down
+
     /**
      * Submits a task to be run concurrent with the main thread
+     *
      * @param name
      * @param task
      */

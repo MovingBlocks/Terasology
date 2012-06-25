@@ -1,5 +1,5 @@
 /*
- * Copyright 2012
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,8 @@
 
 package org.terasology.asset.loaders;
 
-import java.lang.reflect.Type;
-import java.net.URL;
-import java.util.List;
-import java.util.Map;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
+import com.google.common.collect.Maps;
+import com.google.gson.*;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
@@ -33,15 +26,13 @@ import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.assets.Shader;
 import org.terasology.rendering.assets.Texture;
 
-import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
+import java.net.URL;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Immortius
@@ -63,7 +54,7 @@ public class MaterialLoader implements AssetLoader<Material> {
 
         Material result = new Material(uri, shader);
 
-        for (Map.Entry<String,Texture> entry : metadata.textures.entrySet()) {
+        for (Map.Entry<String, Texture> entry : metadata.textures.entrySet()) {
             result.setTexture(entry.getKey(), entry.getValue());
         }
 
@@ -97,13 +88,13 @@ public class MaterialLoader implements AssetLoader<Material> {
 
     private static class MaterialMetadata {
         String shader;
-        Map<String,Texture> textures = Maps.newHashMap();
+        Map<String, Texture> textures = Maps.newHashMap();
         Map<String, Float> floatParams = Maps.newHashMap();
         Map<String, float[]> floatArrayParams = Maps.newHashMap();
         Map<String, Integer> intParams = Maps.newHashMap();
     }
 
-    private static class MaterialMetadataHandler  implements JsonDeserializer<MaterialMetadata> {
+    private static class MaterialMetadataHandler implements JsonDeserializer<MaterialMetadata> {
 
         @Override
         public MaterialMetadata deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
@@ -116,7 +107,7 @@ public class MaterialLoader implements AssetLoader<Material> {
 
             if (obj.has("params") && obj.get("params").isJsonObject()) {
                 JsonObject params = obj.get("params").getAsJsonObject();
-                for (Map.Entry<String,JsonElement> prop : params.entrySet()) {
+                for (Map.Entry<String, JsonElement> prop : params.entrySet()) {
                     if (prop.getValue().isJsonPrimitive()) {
                         if (prop.getValue().getAsJsonPrimitive().isString()) {
                             Texture texture = AssetManager.loadTexture(prop.getValue().getAsString());

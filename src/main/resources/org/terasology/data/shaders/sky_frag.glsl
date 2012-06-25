@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,14 @@
 
 varying	vec3 colorYxy;
 varying vec3 skyVec;
+varying vec3 skyVecR;
 varying	vec4 McPosition;
 varying	float lv;
 uniform	vec4  sunPos;
+uniform float daylight;
 
-uniform samplerCube texCube;
+uniform samplerCube texCubeSky;
+uniform samplerCube texCubeStars;
 
 vec4 	eyePos   = vec4(0.0, 0.0, 0.0, 1.0);
 float	colorExp = 12.0;
@@ -49,9 +52,14 @@ vec3 convertColor() {
 
 void main () {
     vec3 v = normalize ( McPosition.xyz );
+    vec3 l;
 
-    vec3 l = normalize (sunPos.xyz);
-    float sunHighlight = pow(max(0.0, dot(l, v)), 1024.0);
+    if (daylight > 0.0)
+       l = normalize (sunPos.xyz);
+    else
+       l = normalize (-sunPos.xyz);
+
+    float sunHighlight = pow(max(0.0, dot(l, v)), 1024.0) * 16.0;
     float posSunY = 0.0;
 
     if (sunPos.y > 0.0){
@@ -59,12 +67,10 @@ void main () {
     }
 
     /* ALPHA STARRY NIGHT */
-    float alpha  = (0.7 - posSunY) * (1.0 - lv);
-
-    if (alpha < 0.0)
-        alpha = 0.0;
+    float alpha  = clamp((0.7 - posSunY) * (1.0 - lv), 0.0, 1.0);
 
     vec4 skyColor = vec4(clamp(convertColor(), 0.0, 1.0) + sunHighlight, 1.0);
-    skyColor += alpha * textureCube (texCube, skyVec);
+    skyColor += daylight * textureCube (texCubeSky, skyVec);
+    skyColor += alpha * textureCube (texCubeStars, skyVecR);
     gl_FragColor = skyColor;
 }

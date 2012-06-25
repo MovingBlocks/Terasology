@@ -4,6 +4,7 @@ import org.terasology.entitySystem.common.NullEntityRef;
 
 /**
  * A wrapper around an entity id providing access to common functionality
+ *
  * @author Immortius <immortius@gmail.com>
  */
 public abstract class EntityRef {
@@ -30,6 +31,7 @@ public abstract class EntityRef {
 
     /**
      * Adds a component to this entity. If the entity already has a component of the same class it is replaced.
+     *
      * @param component
      */
     public abstract <T extends Component> T addComponent(T component);
@@ -42,13 +44,15 @@ public abstract class EntityRef {
     /**
      * Saves changes made to a component back to the entity manager (otherwise the changes will not persist for
      * future retrievals
+     *
      * @param component
      */
     // TODO: Actually need this? Or just save entity?
     public abstract void saveComponent(Component component);
-    
+
     /**
      * Iterates over all the components this entity has
+     *
      * @return
      */
     public abstract Iterable<Component> iterateComponents();
@@ -60,13 +64,14 @@ public abstract class EntityRef {
 
     /**
      * Transmits an event to this entity
+     *
      * @param event
      */
     public abstract void send(Event event);
 
     /**
      * @return The identifier of this entity. Should be avoided where possible and the EntityRef
-     * used instead to allow it to be invalidated if the entity is destroyed.
+     *         used instead to allow it to be invalidated if the entity is destroyed.
      */
     public abstract int getId();
 

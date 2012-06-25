@@ -15,11 +15,12 @@ import java.util.Map;
 
 /**
  * A table for storing entities and components. Focused on allowing iteration across a components of a given type
+ *
  * @author Immortius <immortius@gmail.com>
  */
 class ComponentTable {
     private Map<Class, TIntObjectMap<Component>> store = new HashMap<Class, TIntObjectMap<Component>>();
-    
+
     public <T extends Component> T get(int entityId, Class<T> componentClass) {
         TIntObjectMap<Component> entityMap = store.get(componentClass);
         if (entityMap != null) {
@@ -54,14 +55,14 @@ class ComponentTable {
     public void clear() {
         store.clear();
     }
-    
+
     public int getComponentCount(Class<? extends Component> componentClass) {
         TIntObjectMap<Component> map = store.get(componentClass);
         if (map == null)
             return 0;
         return map.size();
     }
-    
+
     public Iterable<Component> iterateComponents(int entityId) {
         List<Component> components = Lists.newArrayList();
         for (TIntObjectMap<Component> componentMap : store.values()) {
@@ -72,7 +73,7 @@ class ComponentTable {
         }
         return components;
     }
-    
+
     public <T extends Component> TIntObjectIterator<T> componentIterator(Class<T> componentClass) {
         TIntObjectMap<T> entityMap = (TIntObjectMap<T>) store.get(componentClass);
         if (entityMap != null) {
@@ -83,7 +84,7 @@ class ComponentTable {
 
     /**
      * Produces an iterator for iterating over all entities
-     *
+     * <p/>
      * This is not designed to be performant, and in general usage entities should not be iterated over.
      *
      * @return An iterator over all entity ids.
@@ -95,5 +96,5 @@ class ComponentTable {
         }
         return idSet.iterator();
     }
-    
+
 }

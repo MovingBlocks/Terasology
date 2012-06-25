@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.terasology.rendering.gui.framework;
 
 /**
  * TODO
+ *
  * @author Anton Kireev <adeon.k87@gmail.com>
  */
 public interface IInputListener {

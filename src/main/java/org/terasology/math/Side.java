@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,6 +90,7 @@ public enum Side {
 
     /**
      * Determines which direction the player is facing
+     *
      * @param x right/left
      * @param y top/bottom
      * @param z back/front
@@ -108,13 +109,14 @@ public enum Side {
 
     /**
      * Determines which horizontal direction the player is facing
+     *
      * @param x right/left
      * @param z back/front
      * @return Side enum with the appropriate direction
      */
     public static Side inHorizontalDirection(double x, double z) {
         if (TeraMath.fastAbs(x) > TeraMath.fastAbs(z)) {
-                return (x > 0) ? RIGHT : LEFT;
+            return (x > 0) ? RIGHT : LEFT;
         }
         return (z > 0) ? BACK : FRONT;
     }

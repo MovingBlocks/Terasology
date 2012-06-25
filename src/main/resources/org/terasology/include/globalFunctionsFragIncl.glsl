@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,20 @@
  * limitations under the License.
  */
 
-float tonemapReinhard(vec4 color, float brightMax, float exposure) {
-    float Y = dot(vec4(0.30, 0.59, 0.11, 0.0), color);
-    return exposure * (exposure/brightMax + 1.0) / (exposure + 1.0);
+#define A 0.22
+#define B 0.30
+#define C 0.10
+#define D 0.20
+#define E 0.01
+#define F 0.30
+#define W 11.2
+
+vec3 uncharted2Tonemap(vec3 x) {
+	return ((x*(A*x+C*B)+D*E)/(x*(A*x+B)+D*F))-E/F;
+}
+
+float tonemapReinhard(float brightMax, float exposure) {
+    return exposure * (exposure/(brightMax * brightMax) + 1.0) / (exposure + 1.0);
 }
 
 float calcLambLight(vec3 normal, vec3 lightVec) {
@@ -37,16 +48,21 @@ float calcTorchlight(float light, vec3 lightPos) {
     return light * clamp(1.0 - (length(lightPos) / 16.0), 0.0, 1.0);
 }
 
-vec4 srgbToLinear(vec4 color) {
-    return pow(color, vec4(1.0 / GAMMA));
+vec4 linearToSrgb(vec4 color) {
+     return vec4(pow(color.rgb, vec3(1.0 / GAMMA)), color.a);
 }
 
-vec4 linearToSrgb(vec4 color) {
-    return pow(color, vec4(GAMMA));
+vec4 srgbToLinear(vec4 color) {
+    return vec4(pow(color.rgb, vec3(GAMMA)), color.a);
 }
 
 float expLightValue(float light) {
-    return light;
+	float lightScaled = (1.0 - light) * 16.0;
+	return pow(0.76, lightScaled);
+}
+
+float expOccValue(float light) {
+    return light * light;
 }
 
 float timeToTick(float time, float speed) {

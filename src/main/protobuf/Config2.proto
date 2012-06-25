@@ -62,8 +62,8 @@ message Setting {
         optional int32 active_viewing_distance_id = 12 [default = 0];
         optional int32 viewing_distance_near = 13 [default = 8];
         optional int32 viewing_distance_moderate = 14 [default = 16];
-        optional int32 viewing_distance_far = 15 [default = 26];
-        optional int32 viewing_distance_ultra = 16 [default = 32];
+        optional int32 viewing_distance_far = 15 [default = 32];
+        optional int32 viewing_distance_ultra = 16 [default = 48];
         optional bool flickering_light = 17 [default = false];
         optional bool enable_post_processing_effects = 18 [default = false];
         optional bool animated_water_and_grass = 19 [default = false];

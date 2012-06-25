@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.shader;
 
+import com.google.common.io.CharStreams;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
@@ -23,8 +24,11 @@ import org.newdawn.slick.util.ResourceLoader;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.model.blocks.Block;
+import org.terasology.rendering.assets.Shader;
 
 import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -45,9 +49,6 @@ public class ShaderProgram {
     private int _shaderProgram, _fragmentProgram, _vertexProgram;
     private String _title;
 
-    private static String _preProcessorPreamble = "#version 120 \n float TEXTURE_OFFSET = " + Block.TEXTURE_OFFSET + "; \n";
-    private static String _includedFunctionsVertex = "", _includedFunctionsFragment = "";
-
     private IShaderParameters _parameters;
 
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -57,11 +58,6 @@ public class ShaderProgram {
     }
 
     public ShaderProgram(String title, IShaderParameters params) {
-        if (_includedFunctionsVertex.length() == 0 || _includedFunctionsFragment.length() == 0) {
-            _includedFunctionsFragment += readShader("globalFunctionsFragIncl.glsl");
-            _includedFunctionsVertex += readShader("globalFunctionsVertIncl.glsl");
-        }
-
         _title = title;
         _parameters = params;
 
@@ -104,11 +100,12 @@ public class ShaderProgram {
 
         int shaderId = GL20.glCreateShader(type);
 
-        String code = getCustomPreprocessorPreamble() + "\n";
+        StringBuilder shader = Shader.createShaderBuilder();
+
         if (type == GL20.GL_FRAGMENT_SHADER)
-            code += _includedFunctionsFragment + "\n";
+            shader.append(Shader.getIncludedFunctionsFragment()).append("\n");
         else
-            code += _includedFunctionsVertex + "\n";
+            shader.append(Shader.getIncludedFunctionsVertex()).append("\n");
 
         String filename = _title;
 
@@ -121,7 +118,7 @@ public class ShaderProgram {
         logger.log(Level.INFO, "Loading shader {0} ({1}, type = {2})", new String[]{_title, filename, String.valueOf(type)});
 
         // Read in the shader code
-        code += readShader(filename);
+        shader.append(readShader(filename));
 
         if (type == GL20.GL_FRAGMENT_SHADER) {
             _fragmentProgram = shaderId;
@@ -129,7 +126,7 @@ public class ShaderProgram {
             _vertexProgram = shaderId;
         }
 
-        GL20.glShaderSource(shaderId, code);
+        GL20.glShaderSource(shaderId, shader.toString());
         GL20.glCompileShader(shaderId);
 
         printLogInfo(shaderId);
@@ -169,13 +166,6 @@ public class ShaderProgram {
         infoBuffer.get(infoBytes);
 
         logger.log(Level.INFO, "{0}", new String(infoBytes));
-    }
-
-    private String getCustomPreprocessorPreamble() {
-        return _preProcessorPreamble
-                + (Config.getInstance().isAnimatedWaterAndGrass() ? "#define ANIMATED_WATER_AND_GRASS \n" : "")
-                + (Config.getInstance().isFlickeringLight() ? "#define FLICKERING_LIGHT \n" : "")
-                + "#define GAMMA " + ((Double) Config.getInstance().getGamma()).toString() + "\n";
     }
 
     public void enable() {

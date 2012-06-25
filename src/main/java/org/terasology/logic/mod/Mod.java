@@ -1,5 +1,5 @@
 /*
- * Copyright 2012
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,8 +45,7 @@ public class Mod {
             this.enabled = enabled;
             if (enabled) {
                 AssetManager.getInstance().addAssetSource(modSource);
-            }
-            else {
+            } else {
                 AssetManager.getInstance().removeAssetSource(modSource);
             }
         }

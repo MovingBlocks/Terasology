@@ -1,5 +1,5 @@
 /*
- * Copyright 2012
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,11 +31,14 @@ public interface AssetSource {
 
     /**
      * The URL(s) related to a URI. There may be multiple
+     *
      * @param uri
      * @return The url equivalent of this uri
      */
     List<URL> get(AssetUri uri);
+
     Iterable<AssetUri> list();
+
     Iterable<AssetUri> list(AssetType type);
 
 }

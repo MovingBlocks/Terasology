@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,24 @@
  */
 package org.terasology.rendering.gui.menus;
 
-import org.terasology.components.*;
+import org.terasology.components.CharacterMovementComponent;
+import org.terasology.components.HealthComponent;
+import org.terasology.components.LocalPlayerComponent;
+import org.terasology.components.PlayerComponent;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
-import org.terasology.game.Terasology;
 import org.terasology.game.modes.StateMainMenu;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AssetManager;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.components.UITransparentOverlay;
-import org.terasology.rendering.gui.framework.*;
+import org.terasology.rendering.gui.framework.IClickListener;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.UIDisplayWindow;
+import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
@@ -95,7 +101,7 @@ public class UIPauseMenu extends UIDisplayWindow {
 
                 CharacterMovementComponent characterMovementComponent = playerEntity.getComponent(CharacterMovementComponent.class);
                 if (characterMovementComponent != null) {
-                    characterMovementComponent.setVelocity(new Vector3f(0,0,0));
+                    characterMovementComponent.setVelocity(new Vector3f(0, 0, 0));
                     playerEntity.saveComponent(characterMovementComponent);
                 }
             }

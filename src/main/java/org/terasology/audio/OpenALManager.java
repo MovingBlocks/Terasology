@@ -1,31 +1,25 @@
 package org.terasology.audio;
 
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
-
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
-import org.lwjgl.openal.AL;
-import org.lwjgl.openal.AL10;
-import org.lwjgl.openal.ALC10;
-import org.lwjgl.openal.ALC11;
-import org.lwjgl.openal.ALCcontext;
-import org.lwjgl.openal.ALCdevice;
+import org.lwjgl.openal.*;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+
 public class OpenALManager extends AudioManager {
 
     /**
      * For faster distance check *
      */
-    private final static float MAX_DISTANCE_SQUARED = (float)Math.pow(MAX_DISTANCE, 2);
+    private final static float MAX_DISTANCE_SQUARED = (float) Math.pow(MAX_DISTANCE, 2);
 
     public static OpenALManager getInstance() {
         return (OpenALManager) AudioManager.getInstance();
@@ -103,18 +97,18 @@ public class OpenALManager extends AudioManager {
         }
     }
 
-   /* @Override
-    protected Sound createAudio(String name, URL source) {
-        if (source != null) {
-            return new OggSound(name, source);
-        }
-        return null;
-    }
+    /* @Override
+protected Sound createAudio(String name, URL source) {
+ if (source != null) {
+     return new OggSound(name, source);
+ }
+ return null;
+}
 
-    @Override
-    protected Sound createStreamingAudio(String name, URL source) {
-        return new OggStreamingSound(name, source);
-    }       */
+@Override
+protected Sound createStreamingAudio(String name, URL source) {
+ return new OggStreamingSound(name, source);
+}       */
 
     @Override
     protected boolean checkDistance(Vector3d soundSource) {

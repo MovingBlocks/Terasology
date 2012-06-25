@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,22 +31,23 @@ varying vec3 lightDir;
 varying vec3 normal;
 
 varying float flickering;
+varying float flickeringAlternative;
 
 uniform vec3 chunkOffset;
 uniform vec2 waterCoordinate;
 uniform vec2 lavaCoordinate;
 uniform vec2 grassCoordinate;
 
-#define DAYLIGHT_AMBIENT_COLOR 1.0, 0.9, 0.9
+#define DAYLIGHT_AMBIENT_COLOR 0.95, 0.92, 0.91
 #define MOONLIGHT_AMBIENT_COLOR 0.8, 0.8, 1.0
-#define NIGHT_BRIGHTNESS 0.25
-#define WATER_COLOR 0.325, 0.819, 0.925, 0.3
+#define NIGHT_BRIGHTNESS 0.05
+#define WATER_COLOR 0.325, 0.419, 0.525, 0.75
 
-#define TORCH_WATER_SPEC 0.8
+#define TORCH_WATER_SPEC 8.0
 #define TORCH_WATER_DIFF 0.7
-#define TORCH_BLOCK_SPEC 0.5
-#define TORCH_BLOCK_DIFF 0.7
-#define WATER_SPEC 1.0
+#define TORCH_BLOCK_SPEC 0.7
+#define TORCH_BLOCK_DIFF 1.0
+#define WATER_SPEC 8.0
 #define WATER_DIFF 1.0
 #define BLOCK_DIFF 0.25
 #define BLOCK_AMB 1.0
@@ -62,7 +63,8 @@ void main(){
 
     /* DAYLIGHT BECOMES... MOONLIGHT! */
     /* Now featuring linear interpolation to make the transition more smoothly... :-) */
-    finalLightDir = mix(finalLightDir * -1.0, finalLightDir, daylight);
+    if (daylight < 0.1)
+        finalLightDir = mix(finalLightDir * -1.0, finalLightDir, daylight / 0.1);
 
     vec4 color;
 
@@ -85,20 +87,13 @@ void main(){
         color = texture2D(textureAtlas, texCoord.xy);
     }
 
-    /* CONVERT SRGB TO LINEAR COLOR SPACE */
-    color = srgbToLinear(color);
-
-    if (color.a < 0.1)
+    if (color.a < 0.5)
         discard;
 
     /* APPLY OVERALL BIOME COLOR OFFSET */
     if (!(texCoord.x >= grassCoordinate.x && texCoord.x < grassCoordinate.x + TEXTURE_OFFSET && texCoord.y >= grassCoordinate.y && texCoord.y < grassCoordinate.y + TEXTURE_OFFSET)) {
-        if (gl_Color.rgb != vec3(1.0)) {
-            color.rgb = color.r * gl_Color.rgb;
-            color.a *= gl_Color.a;
-        }
-        else {
-            color.rgb *= gl_Color.rgb;
+        if (gl_Color.r < 0.99 && gl_Color.g < 0.99 && gl_Color.b < 0.99) {
+            color.rgb = color.g * gl_Color.rgb;
             color.a *= gl_Color.a;
         }
     /* MASK GRASS AND APPLY BIOME COLOR */
@@ -110,15 +105,14 @@ void main(){
     }
 
     // Calculate daylight lighting value
-    float daylightValue = expLightValue(gl_TexCoord[1].x);
+    float daylightValue = gl_TexCoord[1].x;
     float daylightScaledValue = daylight * daylightValue;
 
     // Calculate blocklight lighting value
     float blocklightDayIntensity = 1.0 - daylightScaledValue;
-    float blocklightValue = expLightValue(gl_TexCoord[1].y);
+    float blocklightValue = gl_TexCoord[1].y;
 
-    float occlusionValue = gl_TexCoord[1].z;
-
+    float occlusionValue = expOccValue(gl_TexCoord[1].z);
     float diffuseLighting;
 
     if (isWater) {
@@ -156,26 +150,21 @@ void main(){
     daylightColorValue.xyz *= ambientTint;
 
     // Scale the lighting according to the daylight and daylight block values and add moonlight during the nights
-    daylightColorValue.xyz *= daylightScaledValue + (NIGHT_BRIGHTNESS * (1.0 - daylight) * daylightValue);
+    daylightColorValue.xyz *= daylightScaledValue + (NIGHT_BRIGHTNESS * (1.0 - daylight) * expLightValue(daylightValue));
 
     // Calculate the final block light brightness
-    float blockBrightness = (blocklightValue + diffuseLighting * blocklightValue);
+    float blockBrightness = (expLightValue(blocklightValue) + diffuseLighting * blocklightValue * BLOCK_DIFF);
 
-    torchlight -= flickering;
-    if (torchlight < 0.0)
-        torchlight = 0.0;
+    torchlight -= flickeringAlternative * torchlight;
 
     blockBrightness += (1.0 - blockBrightness) * torchlight;
     blockBrightness -= flickering * blocklightValue;
     blockBrightness *= blocklightDayIntensity;
-
-    if (blockBrightness < 0.0)
-        blockBrightness = 0.0;
 
     // Calculate the final blocklight color value and add a slight reddish tint to it
     vec3 blocklightColorValue = vec3(blockBrightness) * vec3(1.0, 0.95, 0.94);
 
     // Apply the final lighting mix
     color.xyz *= (daylightColorValue + blocklightColorValue) * occlusionValue;
-    gl_FragColor = linearToSrgb(color);
+    gl_FragColor = color;
 }

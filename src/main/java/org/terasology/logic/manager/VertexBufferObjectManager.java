@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import gnu.trove.list.array.TIntArrayList;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL15;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -68,6 +69,18 @@ public class VertexBufferObjectManager {
     }
 
     public void bufferVboElementData(int id, IntBuffer buffer, int drawMode) {
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, id);
+        GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buffer, drawMode);
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+    }
+
+    public void bufferVboData(int id, ByteBuffer buffer, int drawMode) {
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, id);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, drawMode);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+    }
+
+    public void bufferVboElementData(int id, ByteBuffer buffer, int drawMode) {
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, id);
         GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buffer, drawMode);
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);

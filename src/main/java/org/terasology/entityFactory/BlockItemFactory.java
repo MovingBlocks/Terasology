@@ -1,8 +1,8 @@
 package org.terasology.entityFactory;
 
-import org.terasology.components.BlockItemComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LightComponent;
+import org.terasology.components.world.BlockItemComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.PrefabManager;
@@ -42,7 +42,7 @@ public class BlockItemFactory {
         item.consumedOnUse = true;
         if (blockFamily.getArchetypeBlock().isStackable()) {
             item.stackId = blockFamily.getTitle() + "Block";
-            item.stackCount = (byte)quantity;
+            item.stackCount = (byte) quantity;
         }
         item.usage = ItemComponent.UsageType.ON_BLOCK;
         entity.addComponent(item);

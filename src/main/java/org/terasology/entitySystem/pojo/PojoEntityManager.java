@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 
 /**
  * Prototype entity manager. Not intended for final use, but a stand in for experimentation.
+ *
  * @author Immortius <immortius@gmail.com>
  */
 public class PojoEntityManager implements EntityManager, PersistableEntityManager {
@@ -84,28 +85,33 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
         return result;
     }
 
-	@Override
+    @Override
     public int getComponentCount(Class<? extends Component> componentClass) {
         return store.getComponentCount(componentClass);
     }
 
-	@Override
+    @Override
+    public ComponentLibrary getComponentLibrary() {
+        return componentLibrary;
+    }
+
+    @Override
     public EventSystem getEventSystem() {
         return eventSystem;
     }
 
-	@Override
+    @Override
     public void setEventSystem(EventSystem eventSystem) {
         this.eventSystem = eventSystem;
     }
 
-	@Override
+    @Override
     public PrefabManager getPrefabManager() {
         return prefabManager;
     }
 
-	@Override
-    public <T extends Component> Iterable<Map.Entry<EntityRef,T>> iterateComponents(Class<T> componentClass) {
+    @Override
+    public <T extends Component> Iterable<Map.Entry<EntityRef, T>> iterateComponents(Class<T> componentClass) {
         TIntObjectIterator<T> iterator = store.componentIterator(componentClass);
         if (iterator != null) {
             List<Map.Entry<EntityRef, T>> list = new ArrayList<Map.Entry<EntityRef, T>>();
@@ -169,7 +175,7 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
         entityCache.remove(ref);
         freedIds.add(entityId);
         if (ref instanceof PojoEntityRef) {
-            ((PojoEntityRef)ref).invalidate();
+            ((PojoEntityRef) ref).invalidate();
         }
         store.remove(entityId);
     }
@@ -212,7 +218,7 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
         }
         return EntityRef.NULL;
     }
-	
+
     private EntityRef createEntityRef(int entityId) {
         if (entityId == NULL_ID) {
             return EntityRef.NULL;
@@ -238,11 +244,10 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
         return freedIds;
     }
 
-    private static class EntityEntry<T> implements Map.Entry<EntityRef, T>
-    {
+    private static class EntityEntry<T> implements Map.Entry<EntityRef, T> {
         private EntityRef key;
         private T value;
-        
+
         public EntityEntry(EntityRef ref, T value) {
             this.key = ref;
             this.value = value;
@@ -261,8 +266,7 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
         }
     }
 
-    private class EntityIterable implements Iterable<EntityRef>
-    {
+    private class EntityIterable implements Iterable<EntityRef> {
         private TIntList list;
 
         public EntityIterable(TIntList list) {
@@ -273,11 +277,10 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
             return new EntityIterator(list.iterator());
         }
     }
-    
-    private class EntityIterator implements Iterator<EntityRef>
-    {
+
+    private class EntityIterator implements Iterator<EntityRef> {
         private TIntIterator idIterator;
-        
+
         public EntityIterator(TIntIterator idIterator) {
             this.idIterator = idIterator;
         }

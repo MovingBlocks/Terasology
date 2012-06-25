@@ -1,11 +1,9 @@
 package org.terasology.input;
 
-import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.terasology.componentSystem.block.BlockEntityRegistry;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
@@ -14,16 +12,10 @@ import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.input.*;
 import org.terasology.events.input.binds.*;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.BlockRaytracer;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.logic.world.IWorldProvider;
-import org.terasology.math.Vector3i;
-import org.terasology.model.structures.RayBlockIntersection;
 import org.terasology.mods.miniions.events.ToggleMinionModeButton;
-import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.world.WorldRenderer;
 
 import java.util.List;
 import java.util.Map;
@@ -31,14 +23,14 @@ import java.util.logging.Logger;
 
 /**
  * This system processes input, sending it out as events against the LocalPlayer entity.
- *
+ * <p/>
  * In addition to raw keyboard and mouse input, the system handles Bind Buttons and Bind Axis, which can be mapped
  * to one or more inputs.
  */
 public class InputSystem implements EventHandlerSystem {
     private Logger logger = Logger.getLogger(getClass().getName());
 
-    private float mouseSensitivity = (float)Config.getInstance().getMouseSens();
+    private float mouseSensitivity = (float) Config.getInstance().getMouseSens();
 
     private Map<String, BindableAxisImpl> axisLookup = Maps.newHashMap();
     private Map<String, BindableButtonImpl> buttonLookup = Maps.newHashMap();
@@ -60,6 +52,10 @@ public class InputSystem implements EventHandlerSystem {
         cameraTargetSystem = CoreRegistry.get(CameraTargetSystem.class);
 
         REPLACE_THIS_WITH_CONFIG();
+    }
+
+    @Override
+    public void shutdown() {
     }
 
     public BindableButton registerBindButton(String bindId, String displayName) {

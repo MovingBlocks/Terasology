@@ -1,5 +1,5 @@
 /*
- * Copyright 2012
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ public class ArchiveSource extends AbstractSource {
 
                 // @todo avoid this risky approach
                 // Using a jar protocol for zip files, because cannot register new protocols for the applet
-                URL url = new URL("jar:file:" + file.getAbsolutePath() + "!/" + entryPath );
+                URL url = new URL("jar:file:" + file.getAbsolutePath() + "!/" + entryPath);
                 addItem(uri, url);
             }
         }

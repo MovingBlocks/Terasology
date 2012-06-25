@@ -1,5 +1,5 @@
 /*
- * Copyright 2012
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import org.terasology.entitySystem.EntityRef;
 /**
  * @author Immortius
  */
-public class ReceiveItemEvent extends AbstractEvent{
+public class ReceiveItemEvent extends AbstractEvent {
     private EntityRef item;
 
     public ReceiveItemEvent(EntityRef item) {

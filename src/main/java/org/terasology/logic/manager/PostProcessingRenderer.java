@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,44 +15,18 @@
  */
 package org.terasology.logic.manager;
 
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
-import static org.lwjgl.opengl.GL11.GL_PROJECTION;
-import static org.lwjgl.opengl.GL11.GL_QUADS;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glCallList;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glColor4f;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glEndList;
-import static org.lwjgl.opengl.GL11.glGenLists;
-import static org.lwjgl.opengl.GL11.glGetTexImage;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
-import static org.lwjgl.opengl.GL11.glNewList;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glTexCoord2d;
-import static org.lwjgl.opengl.GL11.glVertex3i;
-import static org.lwjgl.opengl.GL11.glViewport;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.*;
+import org.terasology.game.CoreRegistry;
+import org.terasology.game.Timer;
+import org.terasology.math.TeraMath;
+import org.terasology.rendering.shader.ShaderProgram;
+import org.terasology.rendering.world.WorldRenderer;
 
 import java.nio.FloatBuffer;
 import java.util.HashMap;
 
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.ARBHalfFloatPixel;
-import org.lwjgl.opengl.ARBTextureFloat;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.EXTFramebufferObject;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-import org.lwjgl.opengl.GL14;
-import org.lwjgl.opengl.GLContext;
-import org.terasology.game.CoreRegistry;
-import org.terasology.math.TeraMath;
-import org.terasology.rendering.shader.ShaderProgram;
-import org.terasology.rendering.world.WorldRenderer;
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * TODO
@@ -63,13 +37,15 @@ public class PostProcessingRenderer {
 
     public static final float MAX_EXPOSURE = 4.0f;
     public static final float MAX_EXPOSURE_NIGHT = 2.0f;
-    public static final float MIN_EXPOSURE = 1.0f;
+    public static final float MIN_EXPOSURE = 0.5f;
     public static final float TARGET_LUMINANCE = 1.0f;
-    public static final float ADJUSTMENT_SPEED = 0.05f;
+    public static final float ADJUSTMENT_SPEED = 0.025f;
 
     private static PostProcessingRenderer _instance = null;
     private float _exposure = 16.0f;
     private int _displayListQuad = -1;
+
+    private float lastExposureUpdate;
 
     private boolean _extensionsAvailable = false;
 
@@ -132,13 +108,10 @@ public class PostProcessingRenderer {
         createFBO("sceneHighPass", 256, 256, false, false);
         createFBO("sceneBloom0", 256, 256, false, false);
         createFBO("sceneBloom1", 256, 256, false, false);
-        createFBO("sceneBloom2", 256, 256, false, false);
 
-        createFBO("sceneBlur0", 1024, 1024, false, false);
-        createFBO("sceneBlur1", 1024, 1024, false, false);
-        createFBO("sceneBlur2", 1024, 1024, false, false);
+        createFBO("sceneBlur0", 512, 512, false, false);
+        createFBO("sceneBlur1", 512, 512, false, false);
 
-        createFBO("scene32", 32, 32, false, false);
         createFBO("scene16", 16, 16, false, false);
         createFBO("scene8", 8, 8, false, false);
         createFBO("scene4", 4, 4, false, false);
@@ -220,6 +193,13 @@ public class PostProcessingRenderer {
     }
 
     private void updateExposure() {
+        long currentTime = CoreRegistry.get(Timer.class).getTimeInMs();
+
+        if (CoreRegistry.get(Timer.class).getTimeInMs() - lastExposureUpdate < 1000)
+            return;
+
+        lastExposureUpdate = currentTime;
+
         FloatBuffer pixels = BufferUtils.createFloatBuffer(4);
         FBO scene = PostProcessingRenderer.getInstance().getFBO("scene1");
 
@@ -273,7 +253,7 @@ public class PostProcessingRenderer {
 
             generateTonemappedScene();
 
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < 2; i++) {
                 generateBloom(i);
                 generateBlur(i);
             }
@@ -350,7 +330,7 @@ public class PostProcessingRenderer {
         shader.setFloat("radius", 2.5f);
 
         PostProcessingRenderer.getInstance().getFBO("sceneBlur" + id).bind();
-        glViewport(0, 0, 1024, 1024);
+        glViewport(0, 0, 512, 512);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -393,7 +373,7 @@ public class PostProcessingRenderer {
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("down");
         shader.enable();
 
-        for (int i = 5; i >= 0; i--) {
+        for (int i = 4; i >= 0; i--) {
             int sizePrev = (int) java.lang.Math.pow(2, i + 1);
 
             int size = (int) java.lang.Math.pow(2, i);
@@ -404,7 +384,7 @@ public class PostProcessingRenderer {
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            if (i == 5)
+            if (i == 4)
                 PostProcessingRenderer.getInstance().getFBO("scene").bindTexture();
             else
                 PostProcessingRenderer.getInstance().getFBO("scene" + sizePrev).bindTexture();

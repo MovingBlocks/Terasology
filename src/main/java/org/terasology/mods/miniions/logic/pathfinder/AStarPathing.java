@@ -1,7 +1,6 @@
 package org.terasology.mods.miniions.logic.pathfinder;
 
-import org.terasology.logic.world.IWorldProvider;
-import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.logic.world.WorldProvider;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 
 import javax.vecmath.Vector3f;
@@ -22,9 +21,8 @@ public class AStarPathing extends Pathfinder {
             {-1, 0, 0}, {1, 0, 0}, {0, 0, -1}, {0, 0, 1} // horizontal X and Z
     };
 
-    public AStarPathing(IWorldProvider provider) {
+    public AStarPathing(WorldProvider provider) {
         super(provider);
-        blockManager = BlockManager.getInstance();
     }
 
     public List<Vector3f> findPath(Vector3f from, Vector3f to) {

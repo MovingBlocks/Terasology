@@ -2,7 +2,7 @@ package org.terasology.entitySystem;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.terasology.components.LocationComponent;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentLibraryImpl;
 import org.terasology.entitySystem.metadata.extension.Quat4fTypeHandler;

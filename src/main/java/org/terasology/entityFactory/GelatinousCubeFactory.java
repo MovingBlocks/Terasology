@@ -1,12 +1,12 @@
 package org.terasology.entityFactory;
 
-import javax.vecmath.Vector3f;
-
-import org.terasology.components.LocationComponent;
-import org.terasology.components.MeshComponent;
+import org.terasology.components.rendering.MeshComponent;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.utilities.FastRandom;
+
+import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius <immortius@gmail.com>

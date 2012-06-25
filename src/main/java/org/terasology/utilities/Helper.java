@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,12 @@
  */
 package org.terasology.utilities;
 
-import static org.lwjgl.opengl.GL11.glGetFloat;
-
-import java.nio.FloatBuffer;
+import org.lwjgl.BufferUtils;
 
 import javax.vecmath.Matrix4f;
+import java.nio.FloatBuffer;
 
-import org.lwjgl.BufferUtils;
+import static org.lwjgl.opengl.GL11.glGetFloat;
 
 /**
  * A simple helper class for various tasks.

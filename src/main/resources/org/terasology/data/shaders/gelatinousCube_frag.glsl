@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ varying vec4 vertexWorldPos;
 uniform float light = 1.0;
 
 void main(){
-    vec4 color = srgbToLinear(texture2D(texture, vec2(gl_TexCoord[0].x , gl_TexCoord[0].y)));
+    vec4 color = texture2D(texture, vec2(gl_TexCoord[0].x , gl_TexCoord[0].y));
 
     float torchlight = 0.0;
     float highlight = calcLambLight(normal, -normalize(vertexWorldPos.xyz));
@@ -39,5 +39,5 @@ void main(){
 
     color.a = gl_Color.a;
 
-    gl_FragColor = linearToSrgb(color);
+    gl_FragColor = color;
 }

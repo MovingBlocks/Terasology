@@ -1,5 +1,5 @@
 /*
- * Copyright 2012
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,5 +26,6 @@ public final class EventPriority {
     public static final int PRIORITY_LOW = 50;
     public static final int PRIORITY_TRIVIAL = 0;
 
-    private EventPriority() {}
+    private EventPriority() {
+    }
 }

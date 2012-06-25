@@ -1,5 +1,5 @@
 /*
- * Copyright 2012
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,33 +16,22 @@
 
 package org.terasology.model.shapes;
 
+import com.google.common.collect.Lists;
+import com.google.gson.*;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.procedure.TIntProcedure;
-
-import java.lang.reflect.Type;
-import java.util.List;
-import java.util.Locale;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
-
 import org.terasology.math.Side;
 import org.terasology.model.structures.AABB;
 
-import com.google.common.collect.Lists;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * @author Immortius
@@ -73,13 +62,13 @@ public class JsonBlockShapePersister {
             BlockShape shape = new BlockShape(currentShapeName);
             JsonObject shapeObj = json.getAsJsonObject();
             if (shapeObj.has("center")) {
-                shape.setCenterMesh((BlockMeshPart)context.deserialize(shapeObj.get("center"), BlockMeshPart.class));
+                shape.setCenterMesh((BlockMeshPart) context.deserialize(shapeObj.get("center"), BlockMeshPart.class));
             }
 
             for (Side side : Side.values()) {
                 if (shapeObj.has(side.toString().toLowerCase(Locale.ENGLISH))) {
                     JsonObject sideMeshObj = shapeObj.getAsJsonObject(side.toString().toLowerCase(Locale.ENGLISH));
-                    shape.setSideMesh(side, (BlockMeshPart)context.deserialize(sideMeshObj, BlockMeshPart.class));
+                    shape.setSideMesh(side, (BlockMeshPart) context.deserialize(sideMeshObj, BlockMeshPart.class));
                     if (sideMeshObj.has("fullSide")) {
                         shape.setBlockingSide(side, sideMeshObj.get("fullSide").getAsBoolean());
                     }
@@ -100,7 +89,7 @@ public class JsonBlockShapePersister {
                     }
                 }
             } else {
-                colliders.add(new AABB(new Vector3f(), new Vector3f(0.5f,0.5f,0.5f)));
+                colliders.add(new AABB(new Vector3f(), new Vector3f(0.5f, 0.5f, 0.5f)));
             }
             shape.setColliders(colliders);
             return shape;
@@ -156,8 +145,7 @@ public class JsonBlockShapePersister {
         }
     }
 
-    private class Vector3fHandler implements JsonDeserializer<Vector3f>
-    {
+    private class Vector3fHandler implements JsonDeserializer<Vector3f> {
         @Override
         public Vector3f deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             JsonArray jsonArray = json.getAsJsonArray();
@@ -165,8 +153,7 @@ public class JsonBlockShapePersister {
         }
     }
 
-    private class Vector2fHandler implements JsonDeserializer<Vector2f>
-    {
+    private class Vector2fHandler implements JsonDeserializer<Vector2f> {
         @Override
         public Vector2f deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             JsonArray jsonArray = json.getAsJsonArray();

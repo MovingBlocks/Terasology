@@ -14,8 +14,8 @@ import java.util.List;
 public class UIInventoryNew extends UIDisplayContainer implements UIInventoryCellNew.CellSubscriber {
 
     EntityRef entity = EntityRef.NULL;
-    Vector2f cellBorder = new Vector2f(2,2);
-    Vector2f cellSize = new Vector2f(48,48);
+    Vector2f cellBorder = new Vector2f(2, 2);
+    Vector2f cellSize = new Vector2f(48, 48);
     List<UIInventoryCellNew> cells = Lists.newArrayList();
     List<InventorySubscriber> subscribers = Lists.newArrayList();
     private int targetWidth;
@@ -42,8 +42,7 @@ public class UIInventoryNew extends UIDisplayContainer implements UIInventoryCel
 
         if (inventory == null) {
             setVisible(false);
-        }
-        else {
+        } else {
             setVisible(true);
             float height = Math.max(inventory.itemSlots.size() / targetWidth, 1);
             setSize(new Vector2f(targetWidth * (cellSize.x + cellBorder.x), height * (cellSize.y + cellBorder.y)));

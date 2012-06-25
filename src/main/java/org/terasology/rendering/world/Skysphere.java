@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,8 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
-import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.glu.Sphere;
 import org.terasology.game.CoreRegistry;
-import org.terasology.game.GameEngine;
 import org.terasology.game.Timer;
 import org.terasology.logic.manager.AssetManager;
 import org.terasology.logic.manager.Config;
@@ -51,30 +49,20 @@ import static org.lwjgl.opengl.GL11.*;
 public class Skysphere implements IGameObject {
 
     private static int _displayListSphere = -1;
-    private static int _displayListClouds = -1;
     private static final float PI = 3.1415926f;
 
     /* SKY */
     private double _turbidity = 4.0f, _sunPosAngle = 0.1f;
-
-    /* CLOUDS */
-    private static final Vector2f CLOUD_RESOLUTION = Config.getInstance().getCloudResolution();
-    private static final long CLOUD_UPDATE_INTERVAL = Config.getInstance().getCloudUpdateInterval();
     private static IntBuffer _textureIds;
-
-    private final PerlinNoise _noiseGenerator;
-    private Timer _timer = CoreRegistry.get(Timer.class);
-    private long _lastCloudUpdate = _timer.getTimeInMs() - CLOUD_UPDATE_INTERVAL;
-    ByteBuffer _cloudByteBuffer = null;
 
     private final WorldRenderer _parent;
 
     public Skysphere(WorldRenderer parent) {
         _parent = parent;
-        _noiseGenerator = new PerlinNoise(_parent.getWorldProvider().getSeed().hashCode());
 
         initTextures();
-        loadStarTextures();
+        loadCubeMap(_textureIds.get(0), "stars", 128);
+        loadCubeMap(_textureIds.get(1), "sky", 512);
     }
 
     private void initTextures() {
@@ -84,10 +72,10 @@ public class Skysphere implements IGameObject {
         }
     }
 
-    private void loadStarTextures() {
+    private void loadCubeMap(int textureId, String name, int size) {
         int internalFormat = GL11.GL_RGBA8, format = GL12.GL_BGRA;
 
-        GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, _textureIds.get(0));
+        GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, textureId);
 
         GL11.glTexParameteri(GL13.GL_TEXTURE_CUBE_MAP, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
         GL11.glTexParameteri(GL13.GL_TEXTURE_CUBE_MAP, GL12.GL_TEXTURE_WRAP_R, GL12.GL_CLAMP_TO_EDGE);
@@ -97,22 +85,24 @@ public class Skysphere implements IGameObject {
 
         for (int i = 0; i < 6; i++) {
 
-            ByteBuffer data = AssetManager.loadTexture("engine:stars" + (i + 1)).getImageData(0);
+            ByteBuffer data = AssetManager.loadTexture("engine:"+ name + (i + 1)).getImageData(0);
 
-            GL11.glTexImage2D(GL13.GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, 256, 256,
+            GL11.glTexImage2D(GL13.GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, size, size,
                     0, format, GL11.GL_UNSIGNED_BYTE, data);
         }
     }
 
     public void render() {
-        updateClouds();
-
         glDisable(GL_CULL_FACE);
         glDisable(GL_DEPTH_TEST);
 
         glEnable(GL13.GL_TEXTURE_CUBE_MAP);
+        GL13.glActiveTexture(GL13.GL_TEXTURE0);
         GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, _textureIds.get(0));
-        _sunPosAngle = (float) java.lang.Math.toRadians(360.0 * _parent.getWorldProvider().getTime() - 90.0);
+        GL13.glActiveTexture(GL13.GL_TEXTURE1);
+        GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, _textureIds.get(1));
+
+        _sunPosAngle = (float) java.lang.Math.toRadians(360.0 * _parent.getWorldProvider().getTimeInDays() - 90.0);
         Vector4d sunNormalise = new Vector4d(0.0f, java.lang.Math.cos(_sunPosAngle), java.lang.Math.sin(_sunPosAngle), 1.0);
         sunNormalise.normalize();
 
@@ -124,26 +114,19 @@ public class Skysphere implements IGameObject {
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("sky");
         shader.enable();
 
+        shader.setInt("texCubeStars", 0);
+        shader.setInt("texCubeSky", 1);
         shader.setFloat4("sunPos", 0.0f, (float) java.lang.Math.cos(_sunPosAngle), (float) java.lang.Math.sin(_sunPosAngle), 1.0f);
-        shader.setFloat("time", (float) _parent.getWorldProvider().getTime());
+        shader.setFloat("time", _parent.getWorldProvider().getTimeInDays());
         shader.setFloat("sunAngle", (float) _sunPosAngle);
         shader.setFloat("turbidity", (float) _turbidity);
         shader.setFloat3("zenith", (float) zenithColor.x, (float) zenithColor.y, (float) zenithColor.z);
+        shader.setFloat("daylight", (float) getDaylight());
 
         // Draw the skysphere
         drawSphere();
 
         glDisable(GL13.GL_TEXTURE_CUBE_MAP);
-
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        ShaderManager.getInstance().enableShader("clouds");
-        // Apply daylight
-        int lightClouds = GL20.glGetUniformLocation(ShaderManager.getInstance().getShaderProgram("clouds").getShaderId(), "light");
-        GL20.glUniform1f(lightClouds, (float) getDaylight());
-
-        // Finally draw the clouds
-        drawClouds();
-
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
     }
@@ -170,16 +153,6 @@ public class Skysphere implements IGameObject {
     }
 
     public void update(float delta) {
-        if (_cloudByteBuffer == null && _timer.getTimeInMs() - _lastCloudUpdate >= CLOUD_UPDATE_INTERVAL) {
-            _lastCloudUpdate = _timer.getTimeInMs();
-
-            CoreRegistry.get(GameEngine.class).submitTask("Generate Clouds", new Runnable() {
-                public void run() {
-                    generateNewClouds();
-                }
-            });
-        }
-
         // Set the light direction according to the position of the sun
         FloatBuffer buffer = BufferUtils.createFloatBuffer(4);
         buffer.put(0.0f).put((float) java.lang.Math.cos(_sunPosAngle)).put((float) java.lang.Math.sin(_sunPosAngle)).put(1.0f);
@@ -201,77 +174,6 @@ public class Skysphere implements IGameObject {
         }
 
         glCallList(_displayListSphere);
-    }
-
-    private void drawClouds() {
-        glEnable(GL11.GL_BLEND);
-        glBindTexture(GL_TEXTURE_2D, _textureIds.get(1));
-
-        glPushMatrix();
-        glTranslatef(0, 8.0f, 0);
-        glScalef(128f, 1.0f, 128f);
-
-        if (_displayListClouds == -1) {
-            _displayListClouds = glGenLists(1);
-
-            glNewList(_displayListClouds, GL11.GL_COMPILE);
-
-            glBegin(GL_QUADS);
-
-            glTexCoord2d(1, 1);
-            glVertex3f(0.5f, 0.0f, 0.5f);
-            glTexCoord2d(0, 1);
-            glVertex3f(-0.5f, 0.0f, 0.5f);
-            glTexCoord2d(0, 0);
-            glVertex3f(-0.5f, 0.0f, -0.5f);
-            glTexCoord2d(1, 0);
-            glVertex3f(0.5f, 0.0f, -0.5f);
-
-            glEnd();
-            glEndList();
-        }
-
-        glCallList(_displayListClouds);
-
-        glPopMatrix();
-
-        glDisable(GL_BLEND);
-
-    }
-
-    private void generateNewClouds() {
-        // Generate some new clouds according to the current time
-        ByteBuffer clouds = ByteBuffer.allocateDirect((int) CLOUD_RESOLUTION.x * (int) CLOUD_RESOLUTION.y * 3);
-
-        for (int i = 0; i < (int) CLOUD_RESOLUTION.x; i++) {
-            for (int j = 0; j < (int) CLOUD_RESOLUTION.y; j++) {
-                double noise = _noiseGenerator.fBm(i * 0.008, j * 0.008, _parent.getWorldProvider().getTime());
-
-                byte value = (byte) (TeraMath.clamp(noise * 1.25 + 0.25) * 255);
-
-                clouds.put(value);
-                clouds.put(value);
-                clouds.put(value);
-            }
-        }
-
-        _cloudByteBuffer = clouds;
-        _cloudByteBuffer.flip();
-    }
-
-    private void updateClouds() {
-        if (_cloudByteBuffer != null) {
-            glBindTexture(GL_TEXTURE_2D, _textureIds.get(1));
-
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, (int) CLOUD_RESOLUTION.x, (int) CLOUD_RESOLUTION.y, 0, GL_RGB, GL_UNSIGNED_BYTE, _cloudByteBuffer);
-
-            _cloudByteBuffer = null;
-        }
     }
 
     public double getSunPosAngle() {

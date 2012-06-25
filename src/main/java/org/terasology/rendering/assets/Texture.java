@@ -1,5 +1,5 @@
 /*
- * Copyright 2012
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,6 @@ import org.terasology.asset.AssetUri;
 import java.nio.ByteBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_T;
 
 /**
  * @author Immortius
@@ -47,8 +45,8 @@ public class Texture implements Asset {
     }
 
     public enum FilterMode {
-        Nearest (GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST),
-        Linear (GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+        Nearest(GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST),
+        Linear(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
 
         private int glMinFilter;
         private int glMagFilter;

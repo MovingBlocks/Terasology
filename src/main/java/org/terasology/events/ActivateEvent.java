@@ -1,11 +1,11 @@
 package org.terasology.events;
 
-import javax.vecmath.Vector3f;
-
-import org.terasology.components.BlockComponent;
-import org.terasology.components.LocationComponent;
+import org.terasology.components.world.BlockComponent;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.AbstractEvent;
 import org.terasology.entitySystem.EntityRef;
+
+import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius <immortius@gmail.com>

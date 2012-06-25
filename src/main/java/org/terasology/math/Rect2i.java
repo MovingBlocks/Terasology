@@ -15,8 +15,7 @@ public class Rect2i {
     public int w;
     public int h;
 
-    public Rect2i(int x, int y, int w, int h)
-    {
+    public Rect2i(int x, int y, int w, int h) {
         this.x = x;
         this.y = y;
 
@@ -33,8 +32,7 @@ public class Rect2i {
         boolean overlap = a.overlaps(b);
         boolean equal = (a.x == b.x) && (a.y == b.y);
 
-        if (equal)
-        {
+        if (equal) {
             // empty list
             return result;
         }
@@ -59,25 +57,21 @@ public class Rect2i {
     }
 
     public String toString() {
-        return String.format("x=%d y=%d w=%d h=%d", x,y, w, h);
+        return String.format("x=%d y=%d w=%d h=%d", x, y, w, h);
     }
 
-    private static void subtractEqualsSizedHelper(int x, int y, Rect2i b, int splitCenterX, int splitCenterY, ArrayList<Rect2i> result)
-    {
-        if (!b.contains(x, y) && x != splitCenterX && y != splitCenterY)
-        {
+    private static void subtractEqualsSizedHelper(int x, int y, Rect2i b, int splitCenterX, int splitCenterY, ArrayList<Rect2i> result) {
+        if (!b.contains(x, y) && x != splitCenterX && y != splitCenterY) {
             Rect2i candidate = createRectSpanning2Points(x, y, splitCenterX, splitCenterY);
 
-            if (candidate.w * candidate.h > 0)
-            {
+            if (candidate.w * candidate.h > 0) {
                 result.add(candidate);
             }
         }
     }
 
     // @return minimum rect that contains both points
-    public static Rect2i createRectSpanning2Points(int x0, int y0, int x1, int y1)
-    {
+    public static Rect2i createRectSpanning2Points(int x0, int y0, int x1, int y1) {
         int x = Math.min(x0, x1);
         int y = Math.min(y0, y1);
 
@@ -128,6 +122,6 @@ public class Rect2i {
     }
 
     public int area() {
-        return w*h;
+        return w * h;
     }
 }

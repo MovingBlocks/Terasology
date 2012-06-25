@@ -1,5 +1,5 @@
 /*
- * Copyright 2012
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,14 @@
 
 package org.terasology.asset.sources;
 
-import java.net.URL;
-import java.security.CodeSource;
-import java.util.List;
-
-import java.io.File;
-
 import org.terasology.asset.AssetSource;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+
+import java.io.File;
+import java.net.URL;
+import java.security.CodeSource;
+import java.util.List;
 
 /**
  * @author Immortius

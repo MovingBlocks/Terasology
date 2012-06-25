@@ -25,7 +25,7 @@ public final class BlockParticleEffectComponent implements Component {
     public float maxSize = 1.0f;
     public float minLifespan = 0.0f;
     public float maxLifespan = 1.0f;
-    
+
     // Lifetime conditions
     public Vector3f targetVelocity = new Vector3f();
     public Vector3f acceleration = new Vector3f();
@@ -38,7 +38,7 @@ public final class BlockParticleEffectComponent implements Component {
         public Vector3f position = new Vector3f();
         public float size = 1.0f;
         public float lifeRemaining = 1.0f;
-        public Vector2f texOffset = new Vector2f(0,0);
+        public Vector2f texOffset = new Vector2f(0, 0);
         //public Vector2f texSize = new Vector2f(1,1);
 
         public Particle clone() {

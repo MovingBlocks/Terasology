@@ -6,6 +6,7 @@ import org.terasology.components.actions.AccessInventoryActionComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.events.OpenInventoryEvent;
 import org.terasology.logic.manager.GUIManager;
@@ -14,12 +15,17 @@ import org.terasology.rendering.gui.menus.UIContainerScreen;
 /**
  * @author Immortius <immortius@gmail.com>
  */
+@RegisterComponentSystem(authorativeOnly = true)
 public class AccessInventoryAction implements EventHandlerSystem {
 
     private UIContainerScreen containerScreen;
 
     public void initialise() {
         containerScreen = GUIManager.getInstance().addWindow(new UIContainerScreen(), "container");
+    }
+
+    @Override
+    public void shutdown() {
     }
 
     @ReceiveEvent(components = {AccessInventoryActionComponent.class})

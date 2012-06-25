@@ -1,5 +1,5 @@
 /*
- * Copyright 2012
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ public class Shader implements Asset {
     private int fragmentProgram = 0;
     private int vertexProgram = 0;
     private boolean valid = false;
-    private Map<String,ParamType> params = Maps.newHashMap();
+    private Map<String, ParamType> params = Maps.newHashMap();
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -112,7 +112,7 @@ public class Shader implements Asset {
             @Override
             public Iterator<ParamMetadata> iterator() {
                 return new Iterator<ParamMetadata>() {
-                    Iterator<Map.Entry<String,ParamType>> internal = params.entrySet().iterator();
+                    Iterator<Map.Entry<String, ParamType>> internal = params.entrySet().iterator();
 
                     @Override
                     public boolean hasNext() {
@@ -121,7 +121,7 @@ public class Shader implements Asset {
 
                     @Override
                     public ParamMetadata next() {
-                        Map.Entry<String,ParamType> entry = internal.next();
+                        Map.Entry<String, ParamType> entry = internal.next();
                         return new ParamMetadata(entry.getKey(), entry.getValue());
                     }
 
@@ -134,7 +134,7 @@ public class Shader implements Asset {
         };
     }
 
-    int generateShaderInstance() {
+    public int generateShaderInstance() {
         int shaderProgram = GL20.glCreateProgram();
 
         GL20.glAttachShader(shaderProgram, fragmentProgram);
@@ -203,7 +203,7 @@ public class Shader implements Asset {
         logger.log(Level.INFO, "{0}", new String(infoBytes));
     }
 
-    private StringBuilder createShaderBuilder() {
+    public static StringBuilder createShaderBuilder() {
         StringBuilder builder = new StringBuilder().append(PreProcessorPreamble);
         if (Config.getInstance().isAnimatedWaterAndGrass())
             builder.append("#define ANIMATED_WATER_AND_GRASS \n");
@@ -213,6 +213,14 @@ public class Shader implements Asset {
         builder.append(((Double) Config.getInstance().getGamma()).toString());
         builder.append('\n');
         return builder;
+    }
+
+    public static String getIncludedFunctionsVertex() {
+        return IncludedFunctionsVertex;
+    }
+
+    public static String getIncludedFunctionsFragment() {
+        return IncludedFunctionsFragment;
     }
 
     static {

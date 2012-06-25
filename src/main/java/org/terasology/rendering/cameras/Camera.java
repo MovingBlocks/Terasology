@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,6 +61,7 @@ public abstract class Camera {
     }
 
     public abstract void loadModelViewMatrix();
+
     public abstract void loadNormalizedModelViewMatrix();
 
     public Vector3d getPosition() {
@@ -85,11 +86,16 @@ public abstract class Camera {
             _activeFov = _targetFov;
             return;
         }
-        // TODO: Clamp this
         if (_activeFov < _targetFov) {
-            _activeFov += 50 * delta;
+            _activeFov += 50.0 * delta;
+            if (_activeFov >= _targetFov) {
+                _activeFov = _targetFov;
+            }
         } else if (_activeFov > _targetFov) {
-            _activeFov -= 50 * delta;
+            _activeFov -= 50.0 * delta;
+            if (_activeFov <= _targetFov) {
+                _activeFov = _targetFov;
+            }
         }
     }
 

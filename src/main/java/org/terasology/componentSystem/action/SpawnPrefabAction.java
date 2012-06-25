@@ -1,5 +1,5 @@
 /*
- * Copyright 2012
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,27 +16,29 @@
 
 package org.terasology.componentSystem.action;
 
-import javax.vecmath.Vector3f;
-
-import org.terasology.components.LocationComponent;
 import org.terasology.components.actions.SpawnPrefabActionComponent;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.components.world.LocationComponent;
+import org.terasology.entitySystem.*;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
+
+import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius
  */
-public class SpawnPrefabAction implements EventHandlerSystem{
+@RegisterComponentSystem
+public class SpawnPrefabAction implements EventHandlerSystem {
 
     private EntityManager entityManager;
 
     @Override
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
+    }
+
+    @Override
+    public void shutdown() {
     }
 
     @ReceiveEvent(components = SpawnPrefabActionComponent.class)

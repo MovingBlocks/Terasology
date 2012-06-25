@@ -7,6 +7,7 @@ import org.terasology.entitySystem.pojo.PojoEntityManager;
 
 /**
  * Null entity implementation - acts the same as an empty entity, except you cannot add anything to it.
+ *
  * @author Immortius <immortius@gmail.com>
  */
 public class NullEntityRef extends EntityRef {

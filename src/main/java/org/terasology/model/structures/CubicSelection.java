@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,8 @@ public class CubicSelection extends BlockSelection {
 
     /**
      * Constructor simply based on two given positions
-     * @param firstCorner The first corner
+     *
+     * @param firstCorner  The first corner
      * @param secondCorner The second corner
      */
     public CubicSelection(BlockPosition firstCorner, BlockPosition secondCorner) {
@@ -45,10 +46,11 @@ public class CubicSelection extends BlockSelection {
      * Constructor that creates a CubicSelection of certain stats around a single central anchor position.
      * Note: The top left front corner is placed at half the width, height, and depth from the anchor
      * Rounding issues from odd parameters have NOT been considered
+     *
      * @param anchor The central position to place the CubicSelection around
-     * @param width Width of the whole selection
+     * @param width  Width of the whole selection
      * @param height Height of the whole selection
-     * @param depth Depth of the whole selection
+     * @param depth  Depth of the whole selection
      */
     public CubicSelection(BlockPosition anchor, int width, int height, int depth) {
         BlockPosition topLeftFront = new BlockPosition(anchor.x - width / 2, anchor.y - height / 2, anchor.z - depth / 2);
@@ -66,6 +68,7 @@ public class CubicSelection extends BlockSelection {
 
     /**
      * Checks if this CubicSelection overlaps any of the positions in the supplied BlockSelection (which is fairly easy)
+     *
      * @param otherSelection A BlockSelection to test against
      * @return boolean for overlap or not
      */
@@ -96,6 +99,7 @@ public class CubicSelection extends BlockSelection {
 
     /**
      * Checks if this CubicSelection contain all the positions in the supplied BlockSelection (which is very easy)
+     *
      * @param otherSelection A BlockSelection to test against
      * @return boolean for containment or not
      */
@@ -111,6 +115,7 @@ public class CubicSelection extends BlockSelection {
 
     /**
      * Simple toString
+     *
      * @return String with the cubic selection's two positions
      */
     @Override

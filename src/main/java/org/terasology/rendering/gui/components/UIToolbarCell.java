@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,10 @@
 package org.terasology.rendering.gui.components;
 
 import org.lwjgl.opengl.GL11;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
-import org.terasology.components.BlockItemComponent;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LocalPlayerComponent;
+import org.terasology.components.world.BlockItemComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
@@ -101,9 +99,12 @@ public class UIToolbarCell extends UIDisplayElement {
         _selectionRectangle.renderTransformed();
 
         InventoryComponent inventory = CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(InventoryComponent.class);
-        if (inventory.itemSlots.size() <= _id) 
+        if (inventory == null) {
             return;
-        
+        }
+        if (inventory.itemSlots.size() <= _id)
+            return;
+
         EntityRef itemEntity = inventory.itemSlots.get(_id);
         ItemComponent item = itemEntity.getComponent(ItemComponent.class);
         if (item == null)
@@ -116,16 +117,15 @@ public class UIToolbarCell extends UIDisplayElement {
             }
         } else {
             Icon icon = Icon.get(item.icon);
-            if (icon != null)
-            {
+            if (icon != null) {
                 renderIcon(icon);
             }
         }
 
-        _label.renderTransformed();    
+        _label.renderTransformed();
 
     }
-    
+
     private void renderIcon(Icon icon) {
         glEnable(GL11.GL_DEPTH_TEST);
         glClear(GL11.GL_DEPTH_BUFFER_BIT);
@@ -135,7 +135,7 @@ public class UIToolbarCell extends UIDisplayElement {
         glPopMatrix();
         glDisable(GL11.GL_DEPTH_TEST);
     }
-    
+
     private void renderBlockIcon(BlockFamily blockFamily) {
         if (blockFamily == null) return;
 

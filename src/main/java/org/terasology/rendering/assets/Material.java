@@ -1,5 +1,5 @@
 /*
- * Copyright 2012
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -179,8 +179,7 @@ public class Material implements Asset {
         int texId = -1;
         if (bindMap.containsKey(desc)) {
             texId = bindMap.get(desc);
-        }
-        else {
+        } else {
             // TODO: do this initially, and try and have similar textures in similar slots for all materials.
             ParamMetadata metadata = shader.getParameter(desc);
             if (metadata == null) {

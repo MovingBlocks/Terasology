@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,9 +33,9 @@ import static org.lwjgl.opengl.GL11.*;
 public abstract class UIDisplayContainer extends UIDisplayElement {
 
     final ArrayList<UIDisplayElement> _displayElements = new ArrayList<UIDisplayElement>();
-    private boolean _crop               = false;
+    private boolean _crop = false;
 
-    protected UIStyle _style       = null;
+    protected UIStyle _style = null;
     private final HashMap<String, UIStyle> _styleClasses = new HashMap<String, UIStyle>();
 
     protected Vector4f _cropMargin = new Vector4f(/*TOP*/    0.0f,
@@ -58,38 +58,38 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
 
     public void render() {
         boolean testCrop = false;
-        int cropX      = 0;
-        int cropY      = 0;
-        int cropWidth  = 0;
+        int cropX = 0;
+        int cropY = 0;
+        int cropWidth = 0;
         int cropHeight = 0;
 
         if (!isVisible())
             return;
 
         //Cut the elements
-        if(_crop){
-            cropX      = (int)calcAbsolutePosition().x - (int)(_cropMargin.w);
-            cropY      = Display.getHeight() - (int)calcAbsolutePosition().y - (int)getSize().y - (int)_cropMargin.z;
-            cropWidth  = (int)getSize().x + (int)_cropMargin.y;
-            cropHeight = (int)getSize().y + (int)_cropMargin.x;
+        if (_crop) {
+            cropX = (int) calcAbsolutePosition().x - (int) (_cropMargin.w);
+            cropY = Display.getHeight() - (int) calcAbsolutePosition().y - (int) getSize().y - (int) _cropMargin.z;
+            cropWidth = (int) getSize().x + (int) _cropMargin.y;
+            cropHeight = (int) getSize().y + (int) _cropMargin.x;
             glEnable(GL_SCISSOR_TEST);
             glScissor(cropX, cropY, cropWidth, cropHeight);
         }
 
         // Render all display elements
         for (int i = 0; i < _displayElements.size(); i++) {
-            testCrop = _crop&&!_displayElements.get(i).isCroped();
-            if(testCrop){
+            testCrop = _crop && !_displayElements.get(i).isCroped();
+            if (testCrop) {
                 glDisable(GL_SCISSOR_TEST);
             }
             _displayElements.get(i).renderTransformed();
-            if(testCrop){
+            if (testCrop) {
                 glEnable(GL_SCISSOR_TEST);
                 glScissor(cropX, cropY, cropWidth, cropHeight);
             }
         }
 
-        if(_crop){
+        if (_crop) {
             glDisable(GL_SCISSOR_TEST);
         }
     }
@@ -136,7 +136,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     }
 
     public void addtDisplayElementToPosition(int position, UIDisplayElement element) {
-        _displayElements.add(position,element);
+        _displayElements.add(position, element);
         element.setParent(this);
     }
 
@@ -159,7 +159,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     /*
      * Set the option for cut elements
      */
-    public void setCrop(boolean crop){
+    public void setCrop(boolean crop) {
         _crop = crop;
     }
 
@@ -170,7 +170,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * z - bottom
      * w - left
      */
-    public void setCropMargin(Vector4f margin){
+    public void setCropMargin(Vector4f margin) {
         _cropMargin = margin;
     }
 
@@ -179,13 +179,13 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * Set styles for current element
      *
      */
-    public void setStyle(String property, String value){
-        if(_style==null){
+    public void setStyle(String property, String value) {
+        if (_style == null) {
             _style = new UIStyle(getSize());
-            _style.setPosition(new Vector2f(0f,0f));
+            _style.setPosition(new Vector2f(0f, 0f));
             _style.setVisible(true);
             _style.setCroped(false);
-            addtDisplayElementToPosition(0,_style);
+            addtDisplayElementToPosition(0, _style);
         }
         _style.parse(property, value);
     }
@@ -193,38 +193,38 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     /*
      * Set style with tag(style class)
      */
-    public void setClassStyle(String className, String value){
+    public void setClassStyle(String className, String value) {
         UIStyle style = new UIStyle(getSize());
-        style.setPosition(new Vector2f(0f,0f));
+        style.setPosition(new Vector2f(0f, 0f));
         style.setVisible(true);
         style.setCroped(false);
         style.parse(value);
-        _styleClasses.put(className,style);
+        _styleClasses.put(className, style);
     }
 
     /*
      * If the style was marked by class, apply the class
      */
-    public void setClassStyle(String className){
-        if(_styleClasses.containsKey(className)){
-            if(_style!=null){
+    public void setClassStyle(String className) {
+        if (_styleClasses.containsKey(className)) {
+            if (_style != null) {
                 removeDisplayElement(_style);
             }
             _style = _styleClasses.get(className);
-            addtDisplayElementToPosition(0,_style);
+            addtDisplayElementToPosition(0, _style);
         }
     }
 
     /*
      * Get Style variable
      */
-    public UIStyle getStyle(){
-        if(_style==null){
+    public UIStyle getStyle() {
+        if (_style == null) {
             _style = new UIStyle(getSize());
-            _style.setPosition(new Vector2f(0f,0f));
+            _style.setPosition(new Vector2f(0f, 0f));
             _style.setVisible(true);
             _style.setCroped(false);
-            addtDisplayElementToPosition(0,_style);
+            addtDisplayElementToPosition(0, _style);
         }
         return _style;
     }

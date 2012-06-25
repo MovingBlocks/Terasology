@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,17 @@
  */
 package org.terasology.logic.manager;
 
-import java.util.HashSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
-
 import org.terasology.components.SimpleAIComponent;
 import org.terasology.entityFactory.GelatinousCubeFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.logic.portals.Portal;
 import org.terasology.utilities.FastRandom;
+
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
+import java.util.HashSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Manages Portals - a core game feature anchoring parts of the world, allowing spawning within a certain radius,
@@ -77,7 +76,7 @@ public class PortalManager {
         // 12.5% chance something will spawn locally to the portal - will get fancier later
         boolean spawn = _random.randomBoolean() && _random.randomBoolean() && _random.randomBoolean();
         if (spawn) {
-            Vector3f pos = new Vector3f((float)p.getBlockLocation().x, (float)p.getBlockLocation().y - 1, (float)p.getBlockLocation().z);
+            Vector3f pos = new Vector3f((float) p.getBlockLocation().x, (float) p.getBlockLocation().y - 1, (float) p.getBlockLocation().z);
             factory.generateGelatinousCube(pos);
             logger.log(Level.INFO, "Spawning local GelatinousCube at " + pos);
         }

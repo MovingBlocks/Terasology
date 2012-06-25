@@ -1,5 +1,5 @@
 /*
- * Copyright 2012
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,12 @@
 
 package org.terasology.asset.sources;
 
-import java.net.MalformedURLException;
-import java.util.logging.Logger;
+import org.terasology.asset.AssetUri;
 
 import java.io.File;
 import java.io.IOException;
-
-import org.terasology.asset.AssetUri;
+import java.net.MalformedURLException;
+import java.util.logging.Logger;
 
 /**
  * @author Immortius

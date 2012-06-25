@@ -1,5 +1,5 @@
 /*
- * Copyright 2012
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package org.terasology.asset;
 
-import java.util.Locale;
-
 import com.google.common.base.Objects;
+
+import java.util.Locale;
 
 /**
  * @author Immortius
@@ -54,7 +54,7 @@ public class AssetUri {
         String[] typeSplit = uri.split(TYPE_SPLIT, 2);
         if (typeSplit.length > 1) {
             type = AssetType.getTypeForId(typeSplit[0]);
-            String[] packageSplit = typeSplit[1].split(PACKAGE_SPLIT,2);
+            String[] packageSplit = typeSplit[1].split(PACKAGE_SPLIT, 2);
             if (packageSplit.length > 1) {
                 packageName = packageSplit[0];
                 assetName = packageSplit[1];

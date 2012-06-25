@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.terasology.model.blueprints;
 
-import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.world.WorldProvider;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.structures.BlockCollection;
 import org.terasology.model.structures.BlockPosition;
@@ -25,23 +25,26 @@ import org.terasology.model.structures.BlockSelection;
  * Blueprints are instructions for creating specific block structures in the world - relative positions of set blocks
  * Players (and creatures) can dynamically place blueprints of assorted types in-game creating the resulting product
  * Some blueprint types may additionally define selections of positions that are special for some reason (like Portals)
+ *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
 public abstract class Blueprint {
 
-    /** The Blocks and which BlockPositions they exist at in this blueprint. Every Blueprint has this */
+    /**
+     * The Blocks and which BlockPositions they exist at in this blueprint. Every Blueprint has this
+     */
     protected BlockCollection _blockCollection = new BlockCollection();
 
     /**
      * Builds the blueprint in the given world at the given position, relative to the blueprint's attachment position
      *
      * @param provider The world the blueprint should be build in
-     * @param pos The position the blueprint should be built at
+     * @param pos      The position the blueprint should be built at
      * @return a BlockSelection containing localized positions for what was built
      */
-    public BlockSelection build(IWorldProvider provider, BlockPosition pos) {
-        return _blockCollection.build(provider,pos);
+    public BlockSelection build(WorldProvider provider, BlockPosition pos) {
+        return _blockCollection.build(provider, pos);
     }
 
     /**

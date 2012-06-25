@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 <benjamin.glatzel@me.com>
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com> <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,34 +21,38 @@ import org.terasology.components.LocalPlayerComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.input.KeyDownEvent;
 import org.terasology.events.input.KeyEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.game.Terasology;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.world.WorldProvider;
 import org.terasology.rendering.gui.menus.UIMetrics;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
- *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Immortius
  */
+@RegisterComponentSystem
 public class DebugControlSystem implements EventHandlerSystem {
 
     private UIMetrics metrics;
-    private IWorldProvider world;
+    private WorldProvider world;
     private WorldRenderer worldRenderer;
 
     @Override
     public void initialise() {
         metrics = new UIMetrics();
         GUIManager.getInstance().addWindow(metrics, "engine:metrics");
-        world = CoreRegistry.get(IWorldProvider.class);
+        world = CoreRegistry.get(WorldProvider.class);
         worldRenderer = CoreRegistry.get(WorldRenderer.class);
+    }
+
+    @Override
+    public void shutdown() {
     }
 
     @ReceiveEvent(components = LocalPlayerComponent.class)
@@ -56,21 +60,21 @@ public class DebugControlSystem implements EventHandlerSystem {
         boolean debugEnabled = Config.getInstance().isDebug();
         // Features for debug mode only
         if (debugEnabled && event.isDown()) {
-            switch(event.getKey()) {
+            switch (event.getKey()) {
                 case Keyboard.KEY_UP:
-                    world.setTime(world.getTime() + 0.005);
+                    world.setTimeInDays(world.getTimeInDays() + 0.005f);
                     event.consume();
                     break;
                 case Keyboard.KEY_DOWN:
-                    world.setTime(world.getTime() - 0.005);
+                    world.setTimeInDays(world.getTimeInDays() - 0.005f);
                     event.consume();
                     break;
                 case Keyboard.KEY_RIGHT:
-                    world.setTime(world.getTime() + 0.02);
+                    world.setTimeInDays(world.getTimeInDays() + 0.02f);
                     event.consume();
                     break;
                 case Keyboard.KEY_LEFT:
-                    world.setTime(world.getTime() - 0.02);
+                    world.setTimeInDays(world.getTimeInDays() - 0.02f);
                     event.consume();
                     break;
             }
@@ -82,7 +86,7 @@ public class DebugControlSystem implements EventHandlerSystem {
         boolean debugEnabled = Config.getInstance().isDebug();
         // Features for debug mode only
         if (debugEnabled) {
-            switch(event.getKey()) {
+            switch (event.getKey()) {
                 case Keyboard.KEY_R:
                     worldRenderer.setWireframe(!worldRenderer.isWireframe());
                     event.consume();

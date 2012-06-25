@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
  */
 package org.terasology.rendering.gui.components;
 
-import javax.vecmath.Vector2f;
-
 import org.terasology.components.CuredComponent;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.PoisonedComponent;
@@ -27,6 +25,8 @@ import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AssetManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
+
+import javax.vecmath.Vector2f;
 
 /**
  * Small health bar that visualizes the current amount of health points of the player
@@ -76,32 +76,29 @@ public class UIHealthBar extends UIDisplayContainer {
             else
                 _hearts[i].setVisible(false);
 
-        //Show Poisoned Status with Green Hearts:
+            //Show Poisoned Status with Green Hearts:
             PoisonedComponent poisoned = CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(PoisonedComponent.class);
             entityManager = CoreRegistry.get(EntityManager.class);
             for (EntityRef entity : entityManager.iteratorEntities(PoisonedComponent.class)) {
-                if (poisoned.poisonDuration >=1){
+                if (poisoned.poisonDuration >= 1) {
                     _hearts[i].getTextureOrigin().set(new Vector2f(106f / 256f, 0.0f));
-                }
-                else _hearts[i].getTextureOrigin().set(new Vector2f(52f / 256f, 0.0f));
+                } else _hearts[i].getTextureOrigin().set(new Vector2f(52f / 256f, 0.0f));
             }
             for (EntityRef entity : entityManager.iteratorEntities(CuredComponent.class)) {
                 //For fixing the Green > Red hearts when cured:
                 CuredComponent cured = CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(CuredComponent.class);
                 entityManager = CoreRegistry.get(EntityManager.class);
-                    if (cured.cureDuration >=1){
-                        _hearts[i].getTextureOrigin().set(new Vector2f(52f / 256f, 0.0f));
-                    }
-                    else _hearts[i].getTextureOrigin().set(new Vector2f(52f / 256f, 0.0f));
+                if (cured.cureDuration >= 1) {
+                    _hearts[i].getTextureOrigin().set(new Vector2f(52f / 256f, 0.0f));
+                } else _hearts[i].getTextureOrigin().set(new Vector2f(52f / 256f, 0.0f));
 
-
-
-                }
 
             }
 
         }
+
     }
+}
 
 /*Blue Hearts:
 _hearts[i].getTextureOrigin().set(new Vector2f(70f / 256f, 0.0f)); */

@@ -1,5 +1,5 @@
 /*
-*  Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+*  Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -16,9 +16,8 @@
 */
 package org.terasology.model.structures;
 
-import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.world.WorldProvider;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.management.BlockManager;
 
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
@@ -104,8 +103,8 @@ public class RayBlockIntersection {
      * @param rayDirection The direction of the ray
      * @return The list of intersections
      */
-    public static ArrayList<Intersection> executeIntersection(IWorldProvider w, int x, int y, int z, Vector3d rayOrigin, Vector3d rayDirection) {
-        Block block = BlockManager.getInstance().getBlock(w.getBlock(x, y, z));
+    public static ArrayList<Intersection> executeIntersection(WorldProvider w, int x, int y, int z, Vector3d rayOrigin, Vector3d rayDirection) {
+        Block block = w.getBlock(x, y, z);
         /*
          * Ignore invisible blocks.
          */

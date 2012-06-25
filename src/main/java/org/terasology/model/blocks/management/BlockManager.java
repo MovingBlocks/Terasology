@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ public class BlockManager {
     /* BLOCKS */
     private final HashMap<String, Block> _blocksByTitle = new HashMap<String, Block>(128);
     private final TByteObjectHashMap<Block> _blocksById = new TByteObjectHashMap<Block>(128);
-    
+
     private final HashMap<String, BlockFamily> _blockFamiliesByTitle = new HashMap<String, BlockFamily>(128);
 
     public static BlockManager getInstance() {
@@ -50,6 +50,21 @@ public class BlockManager {
             _instance = new BlockManager();
 
         return _instance;
+    }
+
+    private BlockManager() {
+        Block air = new Block();
+        air.withTranslucent(true)
+                .withInvisible(true)
+                .withBypassSelectionRay(true)
+                .withPenetrable(true)
+                .withCastsShadows(false)
+                .withRenderBoundingBox(false)
+                .withAllowBlockAttachment(false)
+                .withHardness((byte) 0)
+                .withId((byte) 0)
+                .withTitle("Air");
+        addBlock(air);
     }
 
     public BlockFamily getBlockFamily(String title) {
@@ -63,8 +78,12 @@ public class BlockManager {
     public Block getBlock(byte id) {
         Block result = _blocksById.get(id);
         if (result == null)
-            return _blocksById.get((byte)0);
+            return _blocksById.get((byte) 0);
         return result;
+    }
+
+    public Block getAir() {
+        return _blocksById.get((byte) 0);
     }
 
     public int getBlockFamilyCount() {
@@ -91,13 +110,13 @@ public class BlockManager {
             _blocksByTitle.put(b.getTitle(), b);
         }
     }
-    
+
     public void addAllBlockFamilies(Iterable<BlockFamily> families) {
         for (BlockFamily family : families) {
             _blockFamiliesByTitle.put(family.getTitle(), family);
         }
     }
-            
+
 
     public FloatBuffer calcCoordinatesForWavingBlocks() {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(32);

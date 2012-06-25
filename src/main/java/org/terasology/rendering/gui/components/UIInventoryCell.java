@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,9 @@ package org.terasology.rendering.gui.components;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
-import org.terasology.components.BlockItemComponent;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
+import org.terasology.components.world.BlockItemComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
@@ -110,16 +108,13 @@ public class UIInventoryCell extends UIDisplayElement {
             if (blockItem != null) {
                 _label2.setText(blockItem.blockFamily.getTitle());
             }
-        }else if (item != null){
+        } else if (item != null) {
             if (blockItem != null) {
                 _label2.setText(blockItem.blockFamily.getTitle());
-            }
-
-            else{
+            } else {
                 _label2.setText(item.name);
             }
-        }
-        else {
+        } else {
             getLabel().setVisible(false);
         }
     }
@@ -160,8 +155,7 @@ public class UIInventoryCell extends UIDisplayElement {
             }
         } else {
             Icon icon = Icon.get(item.icon);
-            if (icon != null)
-            {
+            if (icon != null) {
                 renderIcon(icon);
             }
         }
@@ -206,7 +200,8 @@ public class UIInventoryCell extends UIDisplayElement {
         GL11.glScalef(20f, 20f, 20f);
         GL11.glRotatef(170f, 1f, 0f, 0f);
         GL11.glRotatef(-16f, 0f, 1f, 0f);
-        glBindTexture(GL11.GL_TEXTURE_2D, terrainTex.getId());;
+        glBindTexture(GL11.GL_TEXTURE_2D, terrainTex.getId());
+        ;
 
         Block block = blockFamily.getArchetypeBlock();
         block.render();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,11 +49,11 @@ public class UIInventory extends UIDisplayContainer {
             cell.setVisible(true);
             addDisplayElement(cell);
         }
-        
+
         for (int i = 0; i < 9; i++) {
-        	UIInventoryCell cell = new UIInventoryCell(i);
-        	cell.setVisible(true);
-        	addDisplayElement(cell);
+            UIInventoryCell cell = new UIInventoryCell(i);
+            cell.setVisible(true);
+            addDisplayElement(cell);
         }
     }
 }

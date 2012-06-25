@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ import java.util.Iterator;
 public class UITextWrap extends UIText {
 
     public final String newLine = System.getProperty("line.separator");
-    private long currentpos=0,wheelycount = 0;
+    private long currentpos = 0, wheelycount = 0;
 
     public UITextWrap() {
         super();
@@ -54,13 +54,12 @@ public class UITextWrap extends UIText {
 
     @Override
     public void update() {
-        if(wheelycount !=0)
-        {
+        if (wheelycount != 0) {
             currentpos += wheelycount;
             wheelycount = 0;
-            try{
-            showFromJson();}
-            catch (Exception e){
+            try {
+                showFromJson();
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -68,11 +67,13 @@ public class UITextWrap extends UIText {
 
     @Override
     public void processMouseInput(int button, boolean state, int wheelMoved) {
-        super.processMouseInput(button,state,wheelMoved);
-        if(_wheelMoved !=0)
-        {
-            if (_wheelMoved > 0){wheelycount++;}
-            else{wheelycount--;}
+        super.processMouseInput(button, state, wheelMoved);
+        if (_wheelMoved != 0) {
+            if (_wheelMoved > 0) {
+                wheelycount++;
+            } else {
+                wheelycount--;
+            }
             _wheelMoved = 0;
         }
     }
@@ -81,39 +82,34 @@ public class UITextWrap extends UIText {
         _text = text;
     }
 
-    public void showFromJson()throws IOException{
+    public void showFromJson() throws IOException {
         int maxlines = getLineCount();
         int screenlines = getScreenLines();
-        long beginpos, endpos,counter;
-        if(screenlines > maxlines){
+        long beginpos, endpos, counter;
+        if (screenlines > maxlines) {
             beginpos = -1;
-        }
-        else
-        {
-            if(currentpos < 0){
+        } else {
+            if (currentpos < 0) {
                 currentpos = 0;
             }
-            if(currentpos > maxlines - screenlines){
+            if (currentpos > maxlines - screenlines) {
                 currentpos = maxlines - screenlines;
             }
-            beginpos = maxlines - (screenlines + currentpos) -1;
+            beginpos = maxlines - (screenlines + currentpos) - 1;
         }
-        endpos = beginpos + screenlines +1;
+        endpos = beginpos + screenlines + 1;
         //if(endpos >maxlines){endpos = maxlines +1;}
         counter = 0;
         Gson gson = new Gson();
         String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data" + File.separator + "console" + File.separator + "consolelog.json";
         JsonReader reader = new JsonReader(new FileReader(helpFile));
         reader.beginArray();
-        _text ="";
+        _text = "";
         while (reader.hasNext()) {
-            if(counter > beginpos && counter < endpos)
-            {
-                _text += gson.fromJson(reader,String.class);
-            }
-            else
-            {
-                gson.fromJson(reader,String.class);
+            if (counter > beginpos && counter < endpos) {
+                _text += gson.fromJson(reader, String.class);
+            } else {
+                gson.fromJson(reader, String.class);
             }
             counter++;
         }
@@ -122,94 +118,95 @@ public class UITextWrap extends UIText {
 
     }
 
-    public void loadHelp() throws IOException{
+    public void loadHelp() throws IOException {
         Gson gson = new Gson();
         String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data" + File.separator + "console" + File.separator + "help.json";
         JsonReader reader = new JsonReader(new FileReader(helpFile));
         reader.beginArray();
-        _text ="";
+        _text = "";
         while (reader.hasNext()) {
-                _text += gson.fromJson(reader,String.class) + newLine;
+            _text += gson.fromJson(reader, String.class) + newLine;
         }
         reader.endArray();
         reader.close();
     }
 
-    public void loadError() throws IOException{
+    public void loadError() throws IOException {
         Gson gson = new Gson();
         String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data" + File.separator + "console" + File.separator + "error.json";
         JsonReader reader = new JsonReader(new FileReader(helpFile));
         reader.beginArray();
-        _text ="";
+        _text = "";
         while (reader.hasNext()) {
-            _text += gson.fromJson(reader,String.class) + newLine;
+            _text += gson.fromJson(reader, String.class) + newLine;
         }
         reader.endArray();
         reader.close();
     }
 
-    public void resetScroll(){
+    public void resetScroll() {
         currentpos = 0;
     }
 
-    public void addText(String addtext) throws IOException{
+    public void addText(String addtext) throws IOException {
         String wrappedtext = "";
         int linecounter = 0;
         String[] parts = addtext.split(newLine);
         ArrayList<String> finaltext = new ArrayList<String>();
-        int width = Display.getWidth()- 8;
-        int charCount = (int)(width /7);
-        for(int i = 0;i<parts.length;i++){
-            if(parts[i].length() > charCount){
+        int width = Display.getWidth() - 8;
+        int charCount = (int) (width / 7);
+        for (int i = 0; i < parts.length; i++) {
+            if (parts[i].length() > charCount) {
                 int endpoint = charCount;
                 int beginpoint = 0;
-                while(endpoint > beginpoint) {
-                    for(int j=endpoint;j>beginpoint;j--){
-                        Character ch =  parts[i].charAt(j);
-                        if(Character.isSpaceChar(ch))
-                        {endpoint = j; break;}
-                        else {
-                            switch(ch){
-                                case '.' :
-                                case '?' :
-                                case ';' :
-                                case ':' :
-                                case '\t' :
-                                case '!' : endpoint = j; break;
+                while (endpoint > beginpoint) {
+                    for (int j = endpoint; j > beginpoint; j--) {
+                        Character ch = parts[i].charAt(j);
+                        if (Character.isSpaceChar(ch)) {
+                            endpoint = j;
+                            break;
+                        } else {
+                            switch (ch) {
+                                case '.':
+                                case '?':
+                                case ';':
+                                case ':':
+                                case '\t':
+                                case '!':
+                                    endpoint = j;
+                                    break;
                             }
                         }
                     }
-                    finaltext.add(parts[i].substring(beginpoint,endpoint) + newLine);
+                    finaltext.add(parts[i].substring(beginpoint, endpoint) + newLine);
                     linecounter++;
                     beginpoint = endpoint + 1;
-                    endpoint = beginpoint + charCount ;
-                    if(endpoint > parts[i].length() -1)
-                    {
-                        finaltext.add(parts[i].substring(beginpoint,parts[i].length()) + newLine);
+                    endpoint = beginpoint + charCount;
+                    if (endpoint > parts[i].length() - 1) {
+                        finaltext.add(parts[i].substring(beginpoint, parts[i].length()) + newLine);
                         linecounter++;
                         endpoint = -1;
                     }
                 }
-            }
-            else{
+            } else {
                 finaltext.add(parts[i] + newLine);
                 linecounter++;
             }
         }
 
         Gson gson = new Gson();
-        String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data"  + File.separator + "console" + File.separator + "consolelog.json";
+        String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data" + File.separator + "console" + File.separator + "consolelog.json";
         JsonWriter writer = new JsonWriter(new FileWriter(helpFile));
         writer.beginArray();
         Iterator e = finaltext.iterator();
         while (e.hasNext()) {
-            gson.toJson(e.next(),String.class,writer);
+            gson.toJson(e.next(), String.class, writer);
         }
         writer.endArray();
         writer.close();
     }
 
-    public int getLineCount()throws IOException{
+    public int getLineCount() throws IOException {
         Gson gson = new Gson();
         String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data" + File.separator + "console" + File.separator + "consolelog.json";
         JsonReader reader = new JsonReader(new FileReader(helpFile));
@@ -217,16 +214,16 @@ public class UITextWrap extends UIText {
         reader.beginArray();
         while (reader.hasNext()) {
             counter++;
-            gson.fromJson(reader,String.class);
+            gson.fromJson(reader, String.class);
         }
         reader.endArray();
         reader.close();
         return counter;
     }
 
-    private int getScreenLines(){
-        int disp = Display.getHeight() -8 -70;
-        return disp/16;
+    private int getScreenLines() {
+        int disp = Display.getHeight() - 8 - 70;
+        return disp / 16;
     }
 
     //private String getGsonString(Path path)

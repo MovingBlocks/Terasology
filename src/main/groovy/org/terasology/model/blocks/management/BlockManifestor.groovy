@@ -1,7 +1,7 @@
 package org.terasology.model.blocks.management
 
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -442,10 +442,17 @@ class BlockManifestor {
 
         int counter = 0
         _images.each {
-            Vector2f position = calcAtlasPositionForId(counter);
-            g.drawImage(it.value.getScaledInstance(textureSize, textureSize, Image.SCALE_SMOOTH), (int) position.x * textureSize, (int) position.y * textureSize, null)
+            if (!it.key.contains("_Mip")) {
+                BufferedImage image = it.value;
+
+                if (_images.containsKey(it.key + "_Mip") && mipMapLevel > 0)
+                   image = _images.get(it.key + "_Mip")
+
+                Vector2f position = calcAtlasPositionForId(counter);
+                g.drawImage(image.getScaledInstance(textureSize, textureSize, Image.SCALE_SMOOTH), (int) position.x * textureSize, (int) position.y * textureSize, null)
+                // TODO: Throw an exception if the size of the atlas is exceeded
+            }
             counter++
-            // TODO: Throw an exception if the size of the atlas is exceeded
         }
 
         return result;

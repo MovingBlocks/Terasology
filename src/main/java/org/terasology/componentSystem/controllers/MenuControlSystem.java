@@ -1,5 +1,5 @@
 /*
- * Copyright 2012
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import org.terasology.components.LocalPlayerComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.input.KeyDownEvent;
 import org.terasology.events.input.binds.ConsoleButton;
 import org.terasology.events.input.binds.InventoryButton;
@@ -28,12 +29,16 @@ import org.terasology.events.input.binds.PauseButton;
 import org.terasology.game.CoreRegistry;
 import org.terasology.input.ButtonState;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.rendering.gui.menus.*;
+import org.terasology.rendering.gui.menus.UIDebugConsole;
+import org.terasology.rendering.gui.menus.UIHeadsUpDisplay;
+import org.terasology.rendering.gui.menus.UIInventoryScreen;
+import org.terasology.rendering.gui.menus.UIPauseMenu;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
  * @author Immortius
  */
+@RegisterComponentSystem
 public class MenuControlSystem implements EventHandlerSystem {
 
     public static final String PAUSE_MENU = "engine:pauseMenu";
@@ -46,6 +51,10 @@ public class MenuControlSystem implements EventHandlerSystem {
         GUIManager.getInstance().addWindow(new UIHeadsUpDisplay(), "engine:hud");
         GUIManager.getInstance().addWindow(new UIInventoryScreen(), INVENTORY);
         GUIManager.getInstance().addWindow(new UIPauseMenu(), PAUSE_MENU);
+    }
+
+    @Override
+    public void shutdown() {
     }
 
     @ReceiveEvent(components = LocalPlayerComponent.class)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,11 @@
  */
 package org.terasology.rendering.primitives;
 
-import java.nio.ByteBuffer;
-
-import javax.vecmath.Vector4f;
-
 import org.terasology.logic.manager.AssetManager;
 import org.terasology.rendering.assets.Texture;
+
+import javax.vecmath.Vector4f;
+import java.nio.ByteBuffer;
 
 public class MeshFactory {
 

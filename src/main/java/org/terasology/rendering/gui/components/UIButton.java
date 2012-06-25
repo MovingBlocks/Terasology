@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,6 @@
  */
 package org.terasology.rendering.gui.components;
 
-import java.util.ArrayList;
-
-import javax.vecmath.Vector2f;
-
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetType;
@@ -26,6 +22,9 @@ import org.terasology.asset.AssetUri;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
+
+import javax.vecmath.Vector2f;
+import java.util.ArrayList;
 
 /**
  * A simple graphical button usable for creating user interface.
@@ -40,9 +39,9 @@ public class UIButton extends UIDisplayContainer {
 
     public UIButton(Vector2f size) {
         setSize(size);
-        setClassStyle("button","background-image: engine:gui_menu 256/512 30/512 0 0");
-        setClassStyle("button-mouseover","background-image: engine:gui_menu 256/512 30/512 0 30/512");
-        setClassStyle("button-mouseclick","background-image: engine:gui_menu 256/512 30/512 0 60/512");
+        setClassStyle("button", "background-image: engine:gui_menu 256/512 30/512 0 0");
+        setClassStyle("button-mouseover", "background-image: engine:gui_menu 256/512 30/512 0 30/512");
+        setClassStyle("button-mouseclick", "background-image: engine:gui_menu 256/512 30/512 0 60/512");
         setClassStyle("button");
         _label = new UIText("Untitled");
         _label.setVisible(true);

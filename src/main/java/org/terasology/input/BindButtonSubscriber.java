@@ -1,5 +1,5 @@
 /*
- * Copyright 2012
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,8 @@ public interface BindButtonSubscriber {
 
     /**
      * Called when the bind is activated
-     * @param delta The time passing this frame
+     *
+     * @param delta  The time passing this frame
      * @param target The current camera target
      * @return True if the bind event was consumed
      */
@@ -35,7 +36,8 @@ public interface BindButtonSubscriber {
 
     /**
      * Called when the bind repeats
-     * @param delta The time this frame (not per repeat)
+     *
+     * @param delta  The time this frame (not per repeat)
      * @param target The current camera target
      * @return True if the bind event was consumed
      */
@@ -43,7 +45,8 @@ public interface BindButtonSubscriber {
 
     /**
      * Called when the bind is deactivated
-     * @param delta The time passing this frame
+     *
+     * @param delta  The time passing this frame
      * @param target The current camera target
      * @return True if the bind event was consumed
      */

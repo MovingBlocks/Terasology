@@ -11,7 +11,7 @@ import javax.vecmath.Vector3f;
  * @author Immortius <immortius@gmail.com>
  */
 public enum Rotation {
-    None (getQuaternionForHorizRot(0)){
+    None(getQuaternionForHorizRot(0)) {
         @Override
         public Side rotate(Side side) {
             return side;
@@ -22,7 +22,7 @@ public enum Rotation {
             return aabb;
         }
     },
-    HorizontalClockwise (getQuaternionForHorizRot(1)) {
+    HorizontalClockwise(getQuaternionForHorizRot(1)) {
         @Override
         public Side rotate(Side side) {
             return side.rotateClockwise(1);
@@ -33,7 +33,7 @@ public enum Rotation {
             return rotateHorizontalAABB(aabb, 1);
         }
     },
-    Horizontal180 (getQuaternionForHorizRot(2)) {
+    Horizontal180(getQuaternionForHorizRot(2)) {
         @Override
         public Side rotate(Side side) {
             return side.rotateClockwise(2);
@@ -44,7 +44,7 @@ public enum Rotation {
             return rotateHorizontalAABB(aabb, 2);
         }
     },
-    HorizontalAntiClockwise (getQuaternionForHorizRot(3)) {
+    HorizontalAntiClockwise(getQuaternionForHorizRot(3)) {
         @Override
         public Side rotate(Side side) {
             return side.rotateClockwise(3);
@@ -56,14 +56,16 @@ public enum Rotation {
         }
     };
 
-    private static Rotation[] horizontalRotations = new Rotation[] {None, HorizontalClockwise, Horizontal180, HorizontalAntiClockwise};
+    private static Rotation[] horizontalRotations = new Rotation[]{None, HorizontalClockwise, Horizontal180, HorizontalAntiClockwise};
 
-    public static Rotation[] horizontalRotations() { return horizontalRotations; }
-    
+    public static Rotation[] horizontalRotations() {
+        return horizontalRotations;
+    }
+
     private Quat4f quat4f;
-    
+
     public abstract Side rotate(Side side);
-    
+
     public abstract AABB rotate(AABB aabb);
 
     private Rotation(Quat4f quat4f) {

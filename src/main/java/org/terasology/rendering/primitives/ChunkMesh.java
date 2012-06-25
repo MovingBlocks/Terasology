@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,20 @@
 package org.terasology.rendering.primitives;
 
 import com.bulletphysics.collision.shapes.IndexedMesh;
+import gnu.trove.list.TByteList;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
+import gnu.trove.list.TShortList;
+import gnu.trove.list.array.TByteArrayList;
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.list.array.TShortArrayList;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
 import org.terasology.logic.manager.VertexBufferObjectManager;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.concurrent.locks.ReentrantLock;
@@ -39,7 +44,7 @@ public class ChunkMesh {
     /**
      * Data structure for storing vertex data. Abused like a "struct" in C/C++. Just sad.
      */
-    public class VertexElements {
+    public static class VertexElements {
 
         public VertexElements() {
             vertCount = 0;
@@ -57,7 +62,7 @@ public class ChunkMesh {
         public final TIntList indices;
         public int vertCount;
 
-        public FloatBuffer finalVertices;
+        public ByteBuffer finalVertices;
         public IntBuffer finalIndices;
     }
 
@@ -196,7 +201,7 @@ public class ChunkMesh {
 
                 glNormalPointer(GL11.GL_FLOAT, STRIDE, OFFSET_NORMAL);
 
-                GL11.glDrawElements(GL11.GL_TRIANGLES, _vertexCount[id], GL_UNSIGNED_INT, 0);
+                GL11.glDrawElements(GL11.GL_TRIANGLES, _vertexCount[id], GL11.GL_UNSIGNED_INT, 0);
 
                 glDisableClientState(GL_NORMAL_ARRAY);
                 glDisableClientState(GL_COLOR_ARRAY);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,6 @@
  */
 package org.terasology.rendering.shader;
 
-import static org.lwjgl.opengl.GL11.glBindTexture;
-
-import javax.vecmath.Vector3d;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.game.CoreRegistry;
@@ -26,13 +22,16 @@ import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AssetManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PostProcessingRenderer;
-import org.terasology.logic.world.IWorldProvider;
+import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.utilities.PerlinNoise;
+
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
+
+import static org.lwjgl.opengl.GL11.glBindTexture;
 
 /**
  * Shader parameters for the Post-processing shader program.
@@ -48,9 +47,9 @@ public class ShaderParametersPost implements IShaderParameters {
         PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("scene");
 
         GL13.glActiveTexture(GL13.GL_TEXTURE1);
-        PostProcessingRenderer.getInstance().getFBO("sceneBloom2").bindTexture();
+        PostProcessingRenderer.getInstance().getFBO("sceneBloom1").bindTexture();
         GL13.glActiveTexture(GL13.GL_TEXTURE2);
-        PostProcessingRenderer.getInstance().getFBO("sceneBlur2").bindTexture();
+        PostProcessingRenderer.getInstance().getFBO("sceneBlur1").bindTexture();
         GL13.glActiveTexture(GL13.GL_TEXTURE3);
         glBindTexture(GL11.GL_TEXTURE_2D, texture.getId());
         GL13.glActiveTexture(GL13.GL_TEXTURE4);
@@ -67,33 +66,26 @@ public class ShaderParametersPost implements IShaderParameters {
         program.setFloat("viewingDistance", Config.getInstance().getActiveViewingDistance() * 8.0f);
 
         // Calculate the fog value based on the daylight value
-        float fogIntensity = 0.0f;
+        float fogLinearIntensity = 0.01f;
         float daylight = (float) CoreRegistry.get(WorldRenderer.class).getDaylight();
 
-        if (daylight < 1.0 && daylight > 0.25)
-        {
+        if (daylight < 1.0 && daylight > 0.25) {
             float daylightFactor = (1.0f - daylight) / 0.75f;
-            fogIntensity = 0.5f * daylightFactor;
-        }
-        else if (daylight <= 0.25f)
-        {
+            fogLinearIntensity += 0.1f * daylightFactor;
+        } else if (daylight <= 0.25f) {
             float daylightFactor = (0.25f - daylight) / 0.25f;
-            fogIntensity = TeraMath.lerpf(0.5f, 0.05f, daylightFactor);
+            fogLinearIntensity += TeraMath.lerpf(0.1f, 0.0f, daylightFactor);
         }
 
         WorldRenderer renderer = CoreRegistry.get(WorldRenderer.class);
-
-        // TODO: This should be a bit more sophisticated
-        //fogIntensity = (float) TeraMath.clamp(fogIntensity + renderer.getActiveHumidity(new Vector3d(renderer.getPlayer().getPosition())));
-
-        fogIntensity = fogIntensity + (float) TeraMath.clamp(renderer.getWorldProvider().getPerlinGenerator().noise(renderer.getWorldProvider().getTime() * 4.0 ,0.038291,0.874691)  *  15.0 * daylight + 0.1 * daylight, 0.0, 15.0) + 0.05f;
+        float fogIntensity = renderer.getWorldProvider().getBiomeProvider().getFog(renderer.getWorldProvider().getTimeInDays()) * daylight;
 
         program.setFloat("fogIntensity", fogIntensity);
+        program.setFloat("fogLinearIntensity", fogLinearIntensity);
 
         if (CoreRegistry.get(LocalPlayer.class).isValid()) {
             Vector3d cameraPos = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
-            byte blockId = CoreRegistry.get(IWorldProvider.class).getBlockAtPosition(cameraPos);
-            Block block = BlockManager.getInstance().getBlock(blockId);
+            Block block = CoreRegistry.get(WorldProvider.class).getBlock(new Vector3f(cameraPos));
             program.setInt("swimming", block.isLiquid() ? 1 : 0);
         }
     }
