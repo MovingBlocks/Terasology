@@ -87,18 +87,6 @@ public class BulletPhysicsRenderer implements IGameObject {
             _createdAt = _timer.getTimeInMs();
         }
 
-        // TODO: This won't work in multiplayer
-        public float distanceToPlayer() {
-            Transform t = new Transform();
-            getMotionState().getWorldTransform(t);
-            Matrix4f tMatrix = new Matrix4f();
-            t.getMatrix(tMatrix);
-            Vector3f blockPlayer = new Vector3f();
-            tMatrix.get(blockPlayer);
-            blockPlayer.sub(new Vector3f(CoreRegistry.get(LocalPlayer.class).getPosition()));
-            return blockPlayer.length();
-        }
-
         public float distanceToEntity(Vector3f pos) {
             Transform t = new Transform();
             getMotionState().getWorldTransform(t);
@@ -140,7 +128,7 @@ public class BulletPhysicsRenderer implements IGameObject {
     private Logger _logger = Logger.getLogger(getClass().getName());
 
     private final LinkedList<RigidBody> _insertionQueue = new LinkedList<RigidBody>();
-    private final ArrayList<BlockRigidBody> _blocks = new ArrayList<BlockRigidBody>();
+    private final LinkedList<BlockRigidBody> _blocks = new LinkedList<BlockRigidBody>();
 
     private HashSet<RigidBody> _chunks = new HashSet<RigidBody>();
 
@@ -208,7 +196,8 @@ public class BulletPhysicsRenderer implements IGameObject {
      */
     public synchronized BlockRigidBody addBlock(Vector3f position, byte type, Vector3f impulse, BLOCK_SIZE size, boolean temporary) {
         if (temporary && _blocks.size() > MAX_TEMP_BLOCKS)
-            return null;
+          removeTemporaryBlocks();
+
         BoxShape shape = _blockShape;
         Block block = BlockManager.getInstance().getBlock(type);
         if (block.isTranslucent())
@@ -231,6 +220,7 @@ public class BulletPhysicsRenderer implements IGameObject {
         // Apply impulse
         rigidBlock.applyImpulse(impulse, new Vector3f(0.0f, 0.0f, 0.0f));
         _insertionQueue.add(rigidBlock);
+
         return rigidBlock;
     }
 
@@ -356,7 +346,7 @@ public class BulletPhysicsRenderer implements IGameObject {
         while (!_insertionQueue.isEmpty()) {
             RigidBody body = _insertionQueue.poll();
             if (body instanceof BlockRigidBody)
-                _blocks.add((BlockRigidBody) body);
+                _blocks.addFirst((BlockRigidBody) body);
             _discreteDynamicsWorld.addRigidBody(body);
         }
     }
@@ -426,7 +416,7 @@ public class BulletPhysicsRenderer implements IGameObject {
                 if (!_blocks.get(i)._temporary) {
                     continue;
                 }
-                if (!_blocks.get(i).isActive() || _blocks.get(i).calcAgeInMs() > 10000) {
+                if (!_blocks.get(i).isActive() || _blocks.get(i).calcAgeInMs() > 10000 || _blocks.size() > MAX_TEMP_BLOCKS) {
                     _discreteDynamicsWorld.removeRigidBody(_blocks.get(i));
                     _blocks.remove(i);
                 }
