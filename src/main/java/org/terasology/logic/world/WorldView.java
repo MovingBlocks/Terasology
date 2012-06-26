@@ -30,6 +30,10 @@ import java.util.logging.Logger;
 public class WorldView {
     private static Logger logger = Logger.getLogger(WorldView.class.getName());
 
+    private int chunkSizeX = Chunk.SIZE_X;
+    private int chunkSizeY = Chunk.SIZE_Y;
+    private int chunkSizeZ = Chunk.SIZE_Z;
+
     private Vector3i offset;
     private Region3i chunkRegion;
     private Region3i blockRegion;
@@ -62,9 +66,9 @@ public class WorldView {
         this.chunkRegion = chunkRegion;
         Vector3i blockMin = new Vector3i();
         blockMin.sub(offset);
-        blockMin.mult(Chunk.SIZE_X, 0, Chunk.SIZE_Z);
+        blockMin.mult(chunkSizeX, 0, chunkSizeZ);
         Vector3i blockSize = chunkRegion.size();
-        blockSize.mult(Chunk.SIZE_X, Chunk.SIZE_Y, Chunk.SIZE_Z);
+        blockSize.mult(chunkSizeX, chunkSizeY, chunkSizeZ);
         this.blockRegion = Region3i.createFromMinAndSize(blockMin, blockSize);
         this.chunks = chunks;
         this.offset = offset;
@@ -204,5 +208,11 @@ public class WorldView {
 
     int relChunkIndex(int x, int y, int z) {
         return (x >> 4) + offset.x + chunkRegion.size().x * ((z >> 4) + offset.z);
+    }
+
+    public void setChunkSize(Vector3i size) {
+        chunkSizeX = size.x;
+        chunkSizeY = size.y;
+        chunkSizeZ = size.z;
     }
 }

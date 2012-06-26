@@ -18,6 +18,7 @@ package org.terasology.rendering.world;
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.ShaderManager;
+import org.terasology.math.Vector3i;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.primitives.Mesh;
@@ -37,10 +38,22 @@ import static org.lwjgl.opengl.GL11.glColorMask;
  */
 public class BlockGrid implements IGameObject {
 
+    public class GridPosition {
+        public GridPosition(Vector3i position, byte blockType) {
+            this.position = position;
+            this.blockType = blockType;
+        }
+
+        public Vector3i position;
+        public byte blockType;
+    }
+
     /* CONST */
     private final Mesh _mesh;
 
-    private final HashSet<BlockPosition> _gridPositions = new HashSet<BlockPosition>();
+    private final HashSet<GridPosition> _gridPositions = new HashSet<GridPosition>();
+    private Vector3i _minBounds = new Vector3i(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
+    private Vector3i _maxBounds = new Vector3i(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
 
     public BlockGrid() {
         Tessellator tessellator = new Tessellator();
@@ -59,11 +72,11 @@ public class BlockGrid implements IGameObject {
                 glColorMask(true, true, true, true);
             }
 
-            for (BlockPosition gp : _gridPositions) {
+            for (GridPosition gp : _gridPositions) {
                 GL11.glPushMatrix();
 
                 Vector3d cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
-                GL11.glTranslated(gp.x - cameraPosition.x, gp.y - cameraPosition.y, gp.z - cameraPosition.z);
+                GL11.glTranslated(gp.position.x - cameraPosition.x, gp.position.y - cameraPosition.y, gp.position.z - cameraPosition.z);
 
                 _mesh.render();
 
@@ -77,8 +90,28 @@ public class BlockGrid implements IGameObject {
      *
      * @param gridPosition The block position to add
      */
-    public void addGridPosition(BlockPosition gridPosition) {
-        _gridPositions.add(gridPosition);
+    public void addGridPosition(Vector3i gridPosition, byte blockType) {
+        if (gridPosition.x < _minBounds.x) {
+            _minBounds.x = gridPosition.x;
+        }
+        if (gridPosition.y < _minBounds.y) {
+            _minBounds.y = gridPosition.y;
+        }
+        if (gridPosition.z < _minBounds.z) {
+            _minBounds.z = gridPosition.z;
+        }
+
+        if (gridPosition.x > _maxBounds.x) {
+            _maxBounds.x = gridPosition.x;
+        }
+        if (gridPosition.y > _maxBounds.y) {
+            _maxBounds.y = gridPosition.y;
+        }
+        if (gridPosition.z > _maxBounds.z) {
+            _maxBounds.z = gridPosition.z;
+        }
+
+        _gridPositions.add(new GridPosition(gridPosition, blockType));
     }
 
     /**
@@ -90,10 +123,24 @@ public class BlockGrid implements IGameObject {
         _gridPositions.remove(gridPosition);
     }
 
+    public HashSet<GridPosition> getGridPositions() {
+        return _gridPositions;
+    }
+
+    public Vector3i getMinBounds() {
+        return _minBounds;
+    }
+
+    public Vector3i getMaxBounds() {
+        return _maxBounds;
+    }
+
     /**
      * Removes all block positions from the grid.
      */
     public void clear() {
+        _minBounds = new Vector3i(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
+        _maxBounds = new Vector3i(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
         _gridPositions.clear();
     }
 
