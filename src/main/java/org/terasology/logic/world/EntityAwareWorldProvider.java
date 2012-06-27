@@ -105,9 +105,6 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         EntityRef blockEntity = blockComponentLookup.get(blockPosition);
         if (blockEntity == null || !blockEntity.exists()) {
             Block block = getBlock(blockPosition.x, blockPosition.y, blockPosition.z);
-            if (block.getId() == 0)
-                return EntityRef.NULL;
-
             blockEntity = entityManager.create(block.getEntityPrefab());
             if (block.isEntityTemporary()) {
                 tempBlocks.add(blockEntity);

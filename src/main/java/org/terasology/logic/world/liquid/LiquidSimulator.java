@@ -16,8 +16,6 @@
 package org.terasology.logic.world.liquid;
 
 import com.google.common.collect.Queues;
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
 import org.terasology.components.world.BlockComponent;
 import org.terasology.components.world.WorldComponent;
 import org.terasology.entitySystem.EntityRef;
@@ -27,8 +25,10 @@ import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.logic.world.BlockChangedEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.world.WorldProvider;
+import org.terasology.logic.world.WorldView;
 import org.terasology.logic.world.chunks.ChunkReadyEvent;
 import org.terasology.math.Side;
+import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
@@ -50,6 +50,8 @@ import java.util.logging.Logger;
 @RegisterComponentSystem
 public class LiquidSimulator implements EventHandlerSystem {
 
+    private static byte MAX_LIQUID_DEPTH = 0x7;
+
     private Logger logger = Logger.getLogger(getClass().getName());
 
     private WorldProvider world;
@@ -57,6 +59,8 @@ public class LiquidSimulator implements EventHandlerSystem {
     private Block grass;
     private Block snow;
     private Block dirt;
+    private Block water;
+    private Block lava;
     private BlockingQueue<Vector3i> blockQueue;
     private ExecutorService executor;
 
@@ -69,6 +73,9 @@ public class LiquidSimulator implements EventHandlerSystem {
         grass = BlockManager.getInstance().getBlock("Grass");
         snow = BlockManager.getInstance().getBlock("Snow");
         dirt = BlockManager.getInstance().getBlock("Dirt");
+        water = BlockManager.getInstance().getBlock("Water");
+        lava = BlockManager.getInstance().getBlock("Lava");
+
         blockQueue = Queues.newLinkedBlockingQueue();
         running.set(true);
 
@@ -81,7 +88,10 @@ public class LiquidSimulator implements EventHandlerSystem {
                     try {
                         Vector3i blockPos = blockQueue.take();
                         if (world.isBlockActive(blockPos)) {
-                            simulate(blockPos);
+                            WorldView view = world.getWorldViewAround(TeraMath.calcChunkPos(blockPos));
+                            if (view != null && view.isValidView()) {
+                                simulate(blockPos, view);
+                            }
                         }
                         Thread.sleep(50);
                     } catch (InterruptedException e) {
@@ -108,139 +118,104 @@ public class LiquidSimulator implements EventHandlerSystem {
 
     @ReceiveEvent(components = WorldComponent.class)
     public void chunkReady(ChunkReadyEvent event, EntityRef worldEntity) {
-        logger.log(Level.INFO, "Chunk Ready: " + event.getChunkPos());
+
     }
 
     @ReceiveEvent(components = BlockComponent.class)
     public void blockChanged(BlockChangedEvent event, EntityRef blockEntity) {
-        if (event.getNewType().isLiquid()) {
+        if (!event.getNewType().isLiquid()) {
+            LiquidData currentState = world.getLiquid(event.getBlockPosition());
+            if (currentState.getDepth() > 0) {
+                world.setLiquid(event.getBlockPosition(), new LiquidData(), currentState);
+            }
             blockQueue.offer(event.getBlockPosition());
-        } else if (event.getNewType() == BlockManager.getInstance().getAir()) {
-            Block block = fillWithLiquid(event.getBlockPosition());
-            if (block.isLiquid()) {
-                world.setBlock(event.getBlockPosition(), block, event.getNewType());
-                event.cancel();
+        } else {
+            LiquidData currentState = world.getLiquid(event.getBlockPosition());
+            if (currentState.getDepth() == 0) {
+                world.setLiquid(event.getBlockPosition(), new LiquidData((water.equals(event.getNewType())) ? LiquidType.WATER : LiquidType.LAVA, MAX_LIQUID_DEPTH), currentState);
             }
-        } else if (event.getOldType().isLiquid()) {
-            Vector3i belowPos = new Vector3i(event.getBlockPosition());
-            belowPos.y -= 1;
-            if (world.getBlock(belowPos).isLiquid()) {
-                blockQueue.offer(belowPos);
-            }
-            for (Side side : Side.horizontalSides()) {
+
+            for (Side side : Side.values()) {
                 Vector3i adjPos = new Vector3i(event.getBlockPosition());
                 adjPos.add(side.getVector3i());
-                if (world.getBlock(adjPos).isLiquid()) {
-                    blockQueue.offer(belowPos);
+                blockQueue.offer(adjPos);
+            }
+        }
+    }
+
+    public void simulate(Vector3i blockPos, WorldView view) {
+        Block block = view.getBlock(blockPos);
+        LiquidData current = view.getLiquid(blockPos);
+        LiquidData newState = calcStateFor(blockPos, view);
+        if (!newState.equals(current)) {
+            logger.log(Level.INFO, "Setting " + blockPos + " to depth " + newState.getDepth());
+            if (world.setLiquid(blockPos, newState, current)) {
+                world.setBlock(blockPos, ((newState.getType() == LiquidType.WATER) ? water : lava), block);
+                Vector3i belowBlockPos = new Vector3i(blockPos.x, blockPos.y - 1, blockPos.z);
+                Block belowType = world.getBlock(belowBlockPos);
+                if (grass.equals(belowType) || snow.equals(belowType)) {
+                    world.setBlock(belowBlockPos, dirt, belowType);
                 }
             }
         }
     }
 
-    public void simulate(Vector3i blockPos) {
-        Vector3i belowBlockPos = new Vector3i(blockPos.x, blockPos.y - 1, blockPos.z);
-        Block type = world.getBlock(blockPos);
-
-        if (!checkValidForLiquid(blockPos, type)) {
-            world.setBlock(blockPos, air, type);
-            if (world.getBlock(belowBlockPos).equals(type)) {
-                blockQueue.offer(belowBlockPos);
-            }
-            for (Side side : Side.horizontalSides()) {
-                Vector3i adjPos = new Vector3i(blockPos);
-                adjPos.add(side.getVector3i());
-                if (world.getBlock(adjPos).equals(type)) {
-                    blockQueue.offer(adjPos);
-                }
-            }
-            return;
+    public static LiquidData calcStateFor(Vector3i pos, WorldView worldView) {
+        Block block = worldView.getBlock(pos);
+        if (isLiquidBlocking(block)) {
+            return new LiquidData();
         }
 
-
-        Block belowType = world.getBlock(belowBlockPos);
-        if (belowType.equals(air) || belowType.getBlockForm() == Block.BLOCK_FORM.BILLBOARD) {
-            world.setBlock(belowBlockPos, type, belowType);
+        // Check if full/source location
+        LiquidData currentState = worldView.getLiquid(pos);
+        if (currentState.getDepth() == MAX_LIQUID_DEPTH) {
+            return currentState;
         }
+
+        LiquidData aboveState = worldView.getLiquid(pos.x, pos.y + 1, pos.z);
+        if (aboveState.getDepth() > 0) {
+            return new LiquidData(aboveState.getType(), MAX_LIQUID_DEPTH);
+        }
+
+        LiquidData h1 = new LiquidData();
+        LiquidData h2 = new LiquidData();
         for (Side side : Side.horizontalSides()) {
-            Vector3i adjPos = new Vector3i(blockPos);
-            adjPos.add(side.getVector3i());
-            Block adjType = world.getBlock(adjPos);
-            if ((adjType.equals(air) || adjType.getBlockForm() == Block.BLOCK_FORM.BILLBOARD) && checkValidForLiquid(adjPos, type)) {
-                world.setBlock(adjPos, type, adjType);
+            Vector3i adjDir = side.getVector3i();
+            LiquidData state = worldView.getLiquid(pos.x + adjDir.x, pos.y, pos.z + adjDir.z);
+            Block supportingBlock = worldView.getBlock(pos.x + adjDir.x, pos.y - 1, pos.z + adjDir.z);
+
+            // TODO: Improve supporting block calculation (needs to not include grass, but include liquids)
+            if (!supportingBlock.isPenetrable()) {
+                if (state.getDepth() > h1.getDepth()) {
+                    h2 = h1;
+                    h1 = state;
+                } else if (state.getDepth() > h2.getDepth()) {
+                    h2 = state;
+                }
             }
         }
 
-        // Convert grass and snow to dirt if water is above
-        if (grass.equals(belowType) || snow.equals(belowType)) {
-            world.setBlock(belowBlockPos, dirt, belowType);
+        if (h1.getDepth() > 0) {
+            if (h2.getDepth() == 0) {
+                return new LiquidData(h1.getType(), h1.getDepth() - 1);
+            } else if (h1.getType() == h2.getType()) {
+                if (h1.getDepth() == h2.getDepth()) {
+                    return new LiquidData(h1.getType(), h1.getDepth());
+                }
+                return new LiquidData(h1.getType(), (byte)(h1.getDepth() - 1));
+            } else {
+                byte finalDepth = (byte)(h1.getDepth() - h2.getDepth() - 1);
+                if (finalDepth > 0) {
+                    return new LiquidData(h1.getType(), finalDepth);
+                }
+            }
         }
+
+        return new LiquidData();
     }
 
-    private boolean checkValidForLiquid(Vector3i blockPos, Block type) {
-        Vector3i aboveBlockPos = new Vector3i(blockPos.x, blockPos.y + 1, blockPos.z);
-        if (world.getBlock(aboveBlockPos).equals(type)) {
-            return true;
-        } else {
-            int adjacent = 0;
-            int adjacentGaps = 0;
-            for (Side side : Side.horizontalSides()) {
-                Vector3i adjPos = new Vector3i(blockPos);
-                adjPos.add(side.getVector3i());
-
-                Block adjType = world.getBlock(adjPos);
-                if (adjType.equals(type)) {
-                    adjPos.y -= 1;
-                    Block adjSupport = world.getBlock(adjPos);
-                    if (!(adjSupport.isLiquid() || adjSupport.equals(air))) {
-                        adjacent++;
-                    } else {
-                        adjacentGaps++;
-                    }
-                } else if (adjType.equals(air) || adjType.getBlockForm() == Block.BLOCK_FORM.BILLBOARD) {
-                    adjacentGaps++;
-                }
-            }
-            return adjacentGaps == 0 || (adjacentGaps == 1 && adjacent > 0) || adjacent >= 1;
-        }
-    }
-
-    private Block fillWithLiquid(Vector3i blockPos) {
-        Vector3i aboveBlockPos = new Vector3i(blockPos.x, blockPos.y + 1, blockPos.z);
-        Block aboveType = world.getBlock(aboveBlockPos);
-        if (aboveType.isLiquid()) {
-            return aboveType;
-        }
-        TObjectIntMap<Block> adjacencyMap = new TObjectIntHashMap<Block>();
-        int gaps = 0;
-        for (Side side : Side.horizontalSides()) {
-            Vector3i adjPos = new Vector3i(blockPos);
-            adjPos.add(side.getVector3i());
-
-            Block adjType = world.getBlock(adjPos);
-            if (adjType.isLiquid()) {
-                adjPos.y -= 1;
-                Block adjSupport = world.getBlock(adjPos);
-                if (!(adjSupport.isLiquid() || adjSupport.equals(air))) {
-                    adjacencyMap.adjustOrPutValue(adjType, 1, 1);
-                }
-            } else if (adjType.equals(air) || adjType.getBlockForm() == Block.BLOCK_FORM.BILLBOARD) {
-                gaps++;
-            }
-        }
-        if (adjacencyMap.size() > 0) {
-            Block adjType = air;
-            int count = 0;
-            for (Block block : adjacencyMap.keySet()) {
-                if (adjacencyMap.get(block) > count) {
-                    adjType = block;
-                    count = adjacencyMap.get(block);
-                }
-            }
-            if (count > 1 || (count == 1 && gaps <= 1)) {
-                return adjType;
-            }
-        }
-        return air;
+    private static boolean isLiquidBlocking(Block block) {
+        return !block.isPenetrable();
     }
 
 }

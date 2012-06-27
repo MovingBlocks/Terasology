@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.world;
 
+import org.terasology.logic.world.liquid.LiquidData;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 
@@ -49,19 +50,19 @@ public interface WorldProvider extends WorldProviderCore {
 
     /**
      * @param pos
-     * @param state    The new value of state
-     * @param oldState The expected previous value of state
-     * @return Whether the state change was made successfully. Will fail of oldType != the current type, or if the underlying chunk is not available
+     * @param state    The new value of the liquid state
+     * @param oldState The expected previous value of the liquid state
+     * @return Whether the liquid change was made successfully. Will fail of oldState != the current state, or if the underlying chunk is not available
      */
-    public boolean setState(Vector3i pos, byte state, byte oldState);
+    public boolean setLiquid(Vector3i pos, LiquidData state, LiquidData oldState);
 
     /**
-     * Returns the state at the given position.
+     * Returns the liquid state at the given position.
      *
      * @param blockPos
      * @return The state of the block
      */
-    public byte getState(Vector3i blockPos);
+    public LiquidData getLiquid(Vector3i blockPos);
 
     /**
      * Returns the block value at the given position.

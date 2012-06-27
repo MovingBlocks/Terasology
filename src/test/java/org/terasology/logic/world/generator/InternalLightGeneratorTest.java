@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.game.logic.world.generator;
+package org.terasology.logic.world.generator;
 
 import org.junit.Before;
 import org.junit.Test;

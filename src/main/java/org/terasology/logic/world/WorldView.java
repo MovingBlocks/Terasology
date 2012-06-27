@@ -18,6 +18,7 @@ package org.terasology.logic.world;
 
 import org.terasology.logic.world.chunks.Chunk;
 import org.terasology.logic.world.chunks.ChunkProvider;
+import org.terasology.logic.world.liquid.LiquidData;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
@@ -42,9 +43,14 @@ public class WorldView {
         return createWorldView(region, Vector3i.one(), chunkProvider);
     }
 
-    public static WorldView createSubview(Vector3i pos, int extent, ChunkProvider chunkProvider) {
+    public static WorldView createSubviewAroundBlock(Vector3i pos, int extent, ChunkProvider chunkProvider) {
         Region3i region = TeraMath.getChunkRegionAroundBlockPos(pos, extent);
         return createWorldView(region, new Vector3i(-region.min().x, 0, -region.min().z), chunkProvider);
+    }
+
+    public static WorldView createSubviewAroundChunk(Vector3i chunkPos, ChunkProvider chunkProvider) {
+        Region3i region = Region3i.createFromCenterExtents(chunkPos, new Vector3i(1, 0, 1));
+        return createWorldView(region, new Vector3i(-region.min().x, 0, - region.min().z), chunkProvider);
     }
 
     public static WorldView createWorldView(Region3i region, Vector3i offset, ChunkProvider chunkProvider) {
@@ -139,6 +145,31 @@ public class WorldView {
 
         int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
         return chunks[chunkIndex].setBlock(blockX & 0xf, blockY, blockZ & 0xf, type, oldType);
+    }
+
+    public LiquidData getLiquid(Vector3i pos) {
+        return getLiquid(pos.x, pos.y, pos.z);
+    }
+
+    public LiquidData getLiquid(int x, int y, int z) {
+        if (!blockRegion.encompasses(x, y, z)) {
+            return new LiquidData();
+        }
+
+        int chunkIndex = relChunkIndex(x, y, z);
+        return chunks[chunkIndex].getLiquid(x & 0xf, y, z & 0xf);
+    }
+
+    public boolean setLiquid(Vector3i pos, LiquidData newState, LiquidData oldState) {
+        return setLiquid(pos.x, pos.y, pos.z, newState, oldState);
+    }
+
+    public boolean setLiquid(int x, int y, int z, LiquidData newState, LiquidData oldState) {
+        if (blockRegion.encompasses(x, y, z)) {
+            int chunkIndex = relChunkIndex(x, y, z);
+            return chunks[chunkIndex].setLiquid(x & 0xf, y, z & 0xf, newState, oldState);
+        }
+        return false;
     }
 
     public void setLight(Vector3i pos, byte light) {

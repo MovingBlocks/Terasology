@@ -1,4 +1,4 @@
-package org.terasology.game.logic.world;
+package org.terasology.logic.world;
 
 import org.junit.Before;
 import org.junit.Test;

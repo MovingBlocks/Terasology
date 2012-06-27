@@ -114,8 +114,10 @@ public class TeraSmartArray {
 
         int bArray = _array[pos % _halfSize] & 0xFF;
         byte old = (byte) (bArray >> 4);
-        int bInput = b & 0xFF;
-        _array[pos % _halfSize] = (byte) ((bArray & 0x0F) | (bInput << 4) & 0xFF);
+        if (old == oldB) {
+            int bInput = b & 0xFF;
+            _array[pos % _halfSize] = (byte) ((bArray & 0x0F) | (bInput << 4) & 0xFF);
+        }
         return old;
     }
 

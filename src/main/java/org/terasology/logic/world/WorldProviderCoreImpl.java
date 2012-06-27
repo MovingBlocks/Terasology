@@ -21,6 +21,7 @@ import org.terasology.game.Timer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.world.chunks.Chunk;
 import org.terasology.logic.world.chunks.ChunkProvider;
+import org.terasology.logic.world.liquid.LiquidData;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
@@ -90,8 +91,13 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     }
 
     @Override
-    public WorldView getWorldViewAround(Vector3i chunk) {
+    public WorldView getLocalView(Vector3i chunk) {
         return WorldView.createLocalView(chunk, chunkProvider);
+    }
+
+    @Override
+    public WorldView getWorldViewAround(Vector3i chunk) {
+        return WorldView.createSubviewAroundChunk(chunk, chunkProvider);
     }
 
     @Override
@@ -114,9 +120,9 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         Vector3i blockPos = new Vector3i(x, y, z);
         WorldView worldView;
         if (type.isTranslucent() != oldType.isTranslucent() || type.getLuminance() != oldType.getLuminance()) {
-            worldView = WorldView.createSubview(blockPos, Chunk.MAX_LIGHT + 1, chunkProvider);
+            worldView = WorldView.createSubviewAroundBlock(blockPos, Chunk.MAX_LIGHT + 1, chunkProvider);
         } else {
-            worldView = WorldView.createSubview(blockPos, 1, chunkProvider);
+            worldView = WorldView.createSubviewAroundBlock(blockPos, 1, chunkProvider);
         }
         if (worldView != null) {
             worldView.lock();
@@ -140,27 +146,28 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     }
 
     @Override
-    public boolean setState(int x, int y, int z, byte state, byte oldState) {
+    public boolean setLiquid(int x, int y, int z, LiquidData newState, LiquidData oldState) {
+        // TODO: Locking, light changes
         Vector3i chunkPos = TeraMath.calcChunkPos(x, y, z);
         Chunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
             Vector3i blockPos = TeraMath.calcBlockPos(x, y, z, chunkPos);
-            return chunk.setState(blockPos, state, oldState);
+            return chunk.setLiquid(blockPos, newState, oldState);
         }
         return false;
     }
 
     @Override
-    public byte getState(int x, int y, int z) {
+    public LiquidData getLiquid(int x, int y, int z) {
         y = TeraMath.clamp(y, 0, Chunk.SIZE_Y - 1);
 
         Vector3i chunkPos = TeraMath.calcChunkPos(x, y, z);
         Chunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
             Vector3i blockPos = TeraMath.calcBlockPos(x, y, z, chunkPos);
-            return chunk.getState(blockPos);
+            return chunk.getLiquid(blockPos);
         }
-        return 0;
+        return new LiquidData();
     }
 
     @Override

@@ -79,7 +79,7 @@ public final class ChunkUpdateManager {
             @Override
             public void run() {
                 ChunkMesh[] newMeshes = new ChunkMesh[WorldRenderer.VERTICAL_SEGMENTS];
-                WorldView worldView = worldProvider.getWorldViewAround(c.getPos());
+                WorldView worldView = worldProvider.getLocalView(c.getPos());
                 if (worldView != null) {
                     c.setDirty(false);
                     for (int seg = 0; seg < WorldRenderer.VERTICAL_SEGMENTS; seg++) {

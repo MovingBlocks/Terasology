@@ -220,7 +220,7 @@ public final class WorldRenderer implements IGameObject {
                 for (int x = -(viewingDistance / 2); x < viewingDistance / 2; x++) {
                     for (int z = -(viewingDistance / 2); z < viewingDistance / 2; z++) {
                         Chunk c = _chunkProvider.getChunk(newChunkPosX + x, 0, newChunkPosZ + z);
-                        if (c != null && c.getChunkState() == Chunk.State.COMPLETE && _worldProvider.getWorldViewAround(c.getPos()) != null) {
+                        if (c != null && c.getChunkState() == Chunk.State.COMPLETE && _worldProvider.getLocalView(c.getPos()) != null) {
                             _chunksInProximity.add(c);
                         } else {
                             _pendingChunks = true;
@@ -252,7 +252,7 @@ public final class WorldRenderer implements IGameObject {
                     for (int x = r.minX(); x < r.maxX(); ++x) {
                         for (int y = r.minY(); y < r.maxY(); ++y) {
                             Chunk c = _chunkProvider.getChunk(x, 0, y);
-                            if (c != null && c.getChunkState() == Chunk.State.COMPLETE && _worldProvider.getWorldViewAround(c.getPos()) != null) {
+                            if (c != null && c.getChunkState() == Chunk.State.COMPLETE && _worldProvider.getLocalView(c.getPos()) != null) {
                                 _chunksInProximity.add(c);
                             } else {
                                 _pendingChunks = true;
@@ -886,7 +886,7 @@ public final class WorldRenderer implements IGameObject {
                 complete = false;
                 continue;
             } else if (chunk.isDirty()) {
-                WorldView view = _worldProvider.getWorldViewAround(chunk.getPos());
+                WorldView view = _worldProvider.getLocalView(chunk.getPos());
                 if (view == null) {
                     continue;
                 }
@@ -970,7 +970,7 @@ public final class WorldRenderer implements IGameObject {
     }
 
     public boolean isChunkValidForRender(Chunk c) {
-        return _worldProvider.getWorldViewAround(c.getPos()) != null;
+        return _worldProvider.getLocalView(c.getPos()) != null;
     }
 
     public boolean isChunkVisible(Chunk c) {

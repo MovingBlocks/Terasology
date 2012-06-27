@@ -18,6 +18,8 @@ package org.terasology.logic.world.chunks;
 import com.bulletphysics.dynamics.RigidBody;
 import com.google.common.base.Objects;
 import org.terasology.logic.manager.Config;
+import org.terasology.logic.world.liquid.LiquidData;
+import org.terasology.logic.world.liquid.LiquidType;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
@@ -60,11 +62,14 @@ public class Chunk implements Externalizable {
     public static final int SIZE_Z = 16;
     public static final int VERTICAL_SEGMENTS = Config.getInstance().getVerticalChunkMeshSegments();
     public static final byte MAX_LIGHT = 0x0f;
+    public static final byte MAX_LIQUID_DEPTH = 0x07;
 
     private final Vector3i pos = new Vector3i();
 
     private final TeraArray blocks;
-    private final TeraSmartArray sunlight, light, states;
+    private final TeraSmartArray sunlight;
+    private final TeraSmartArray light;
+    private final TeraSmartArray liquid;
 
     private State chunkState = State.ADJACENCY_GENERATION_PENDING;
     private boolean dirty;
@@ -87,7 +92,7 @@ public class Chunk implements Externalizable {
         blocks = new TeraArray(SIZE_X, SIZE_Y, SIZE_Z);
         sunlight = new TeraSmartArray(SIZE_X, SIZE_Y, SIZE_Z);
         light = new TeraSmartArray(SIZE_X, SIZE_Y, SIZE_Z);
-        states = new TeraSmartArray(SIZE_X, SIZE_Y, SIZE_Z);
+        liquid = new TeraSmartArray(SIZE_X, SIZE_Y, SIZE_Z);
 
         setDirty(true);
     }
@@ -108,7 +113,7 @@ public class Chunk implements Externalizable {
         blocks = new TeraArray(other.blocks);
         sunlight = new TeraSmartArray(other.sunlight);
         light = new TeraSmartArray(other.light);
-        states = new TeraSmartArray(other.states);
+        liquid = new TeraSmartArray(other.liquid);
         chunkState = other.chunkState;
         dirty = true;
     }
@@ -243,21 +248,22 @@ public class Chunk implements Externalizable {
         return (oldValue != amount);
     }
 
-    public boolean setState(Vector3i pos, byte state, byte oldState) {
-        return setState(pos.x, pos.y, pos.z, state, oldState);
+    public boolean setLiquid(Vector3i pos, LiquidData newState, LiquidData oldState) {
+        return setLiquid(pos.x, pos.y, pos.z, newState, oldState);
     }
 
-    public boolean setState(int x, int y, int z, byte state, byte oldState) {
-        byte prev = states.set(x, y, z, state, oldState);
-        return prev == oldState;
+    public boolean setLiquid(int x, int y, int z, LiquidData newState, LiquidData oldState) {
+        byte expected = oldState.toByte();
+        byte newValue = newState.toByte();
+        return liquid.set(x, y, z, newValue, expected) == expected;
     }
 
-    public byte getState(Vector3i pos) {
-        return states.get(pos.x, pos.y, pos.z);
+    public LiquidData getLiquid(Vector3i pos) {
+        return getLiquid(pos.x, pos.y, pos.z);
     }
 
-    public byte getState(int x, int y, int z) {
-        return states.get(x, y, z);
+    public LiquidData getLiquid(int x, int y, int z) {
+        return new LiquidData((liquid.get(x, y, z)));
     }
 
     public Vector3i getChunkWorldPos() {
@@ -323,8 +329,8 @@ public class Chunk implements Externalizable {
         for (int i = 0; i < light.sizePacked(); i++)
             out.writeByte(light.getRawByte(i));
 
-        for (int i = 0; i < states.sizePacked(); i++)
-            out.writeByte(states.getRawByte(i));
+        for (int i = 0; i < liquid.sizePacked(); i++)
+            out.writeByte(liquid.getRawByte(i));
     }
 
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
@@ -345,8 +351,8 @@ public class Chunk implements Externalizable {
         for (int i = 0; i < light.sizePacked(); i++)
             light.setRawByte(i, in.readByte());
 
-        for (int i = 0; i < states.sizePacked(); i++)
-            states.setRawByte(i, in.readByte());
+        for (int i = 0; i < liquid.sizePacked(); i++)
+            liquid.setRawByte(i, in.readByte());
     }
 
     @Override
