@@ -203,11 +203,7 @@ public final class TeraMath {
      * @return The X-coordinate of the chunk
      */
     public static int calcChunkPosX(int x) {
-        // Offset for chunks with negative positions
-        if (x < 0)
-            x -= 15;
-
-        return (x / Chunk.SIZE_X);
+        return (x >> Chunk.POWER_X);
     }
 
     /**
@@ -228,11 +224,7 @@ public final class TeraMath {
      * @return The Z-coordinate of the chunk
      */
     public static int calcChunkPosZ(int z) {
-        // Offset for chunks with negative positions
-        if (z < 0)
-            z -= 15;
-
-        return (z / Chunk.SIZE_Z);
+        return (z >> Chunk.POWER_Z);
     }
 
     public static Vector3i calcChunkPos(Vector3i pos) {
@@ -247,14 +239,13 @@ public final class TeraMath {
      * Returns the internal position of a block within a chunk.
      *
      * @param blockX The X-coordinate of the block in the world
-     * @param chunkX The X-coordinate of the chunk in the world
      * @return The X-coordinate of the block within the chunk
      */
-    public static int calcBlockPosX(int blockX, int chunkX) {
-        return TeraMath.fastAbs(blockX - (chunkX * Chunk.SIZE_X));
+    public static int calcBlockPosX(int blockX) {
+        return blockX & Chunk.INNER_CHUNK_POS_FILTER_X;
     }
 
-    public static int calcBlockPosY(int blockY, int chunkY) {
+    public static int calcBlockPosY(int blockY) {
         return blockY;
     }
 
@@ -262,15 +253,14 @@ public final class TeraMath {
      * Returns the internal position of a block within a chunk.
      *
      * @param blockZ The Z-coordinate of the block in the world
-     * @param chunkZ The Z-coordinate of the chunk in the world
      * @return The Z-coordinate of the block within the chunk
      */
-    public static int calcBlockPosZ(int blockZ, int chunkZ) {
-        return TeraMath.fastAbs(blockZ - (chunkZ * Chunk.SIZE_Z));
+    public static int calcBlockPosZ(int blockZ) {
+        return blockZ & Chunk.INNER_CHUNK_POS_FILTER_Z;
     }
 
-    public static Vector3i calcBlockPos(int x, int y, int z, Vector3i chunkPos) {
-        return new Vector3i(calcBlockPosX(x, chunkPos.x), calcBlockPosY(y, chunkPos.y), calcBlockPosZ(z, chunkPos.z));
+    public static Vector3i calcBlockPos(int x, int y, int z) {
+        return new Vector3i(calcBlockPosX(x), calcBlockPosY(y), calcBlockPosZ(z));
     }
 
     public static Region3i getChunkRegionAroundBlockPos(Vector3i pos, int extent) {

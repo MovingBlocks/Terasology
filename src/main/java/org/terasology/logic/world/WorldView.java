@@ -89,7 +89,7 @@ public class WorldView {
         }
 
         int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
-        return chunks[chunkIndex].getBlock(blockX & 0xf, blockY, blockZ & 0xf);
+        return chunks[chunkIndex].getBlock(TeraMath.calcBlockPos(blockX, blockY, blockZ));
     }
 
     public byte getSunlight(float x, float y, float z) {
@@ -114,7 +114,7 @@ public class WorldView {
         }
 
         int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
-        return chunks[chunkIndex].getSunlight(blockX & 0xf, blockY, blockZ & 0xf);
+        return chunks[chunkIndex].getSunlight(TeraMath.calcBlockPos(blockX, blockY, blockZ));
     }
 
     public byte getLight(int blockX, int blockY, int blockZ) {
@@ -123,7 +123,7 @@ public class WorldView {
         }
 
         int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
-        return chunks[chunkIndex].getLight(blockX & 0xf, blockY, blockZ & 0xf);
+        return chunks[chunkIndex].getLight(TeraMath.calcBlockPos(blockX, blockY, blockZ));
     }
 
     public boolean setBlock(Vector3i pos, Block type, Block oldType) {
@@ -136,7 +136,7 @@ public class WorldView {
         }
 
         int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
-        return chunks[chunkIndex].setBlock(blockX & 0xf, blockY, blockZ & 0xf, type, oldType);
+        return chunks[chunkIndex].setBlock(TeraMath.calcBlockPos(blockX, blockY, blockZ), type, oldType);
     }
 
     public void setLight(Vector3i pos, byte light) {
@@ -150,14 +150,14 @@ public class WorldView {
     public void setSunlight(int blockX, int blockY, int blockZ, byte light) {
         if (blockRegion.encompasses(blockX, blockY, blockZ)) {
             int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
-            chunks[chunkIndex].setSunlight(blockX & 0xf, blockY, blockZ & 0xf, light);
+            chunks[chunkIndex].setSunlight(TeraMath.calcBlockPos(blockX, blockY, blockZ), light);
         }
     }
 
     public void setLight(int blockX, int blockY, int blockZ, byte light) {
         if (blockRegion.encompasses(blockX, blockY, blockZ)) {
             int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
-            chunks[chunkIndex].setLight(blockX & 0xf, blockY, blockZ & 0xf, light);
+            chunks[chunkIndex].setLight(TeraMath.calcBlockPos(blockX, blockY, blockZ), light);
         }
     }
 
@@ -203,6 +203,6 @@ public class WorldView {
     }
 
     int relChunkIndex(int x, int y, int z) {
-        return (x >> 4) + offset.x + chunkRegion.size().x * ((z >> 4) + offset.z);
+        return TeraMath.calcChunkPosX(x) + offset.x + chunkRegion.size().x * (TeraMath.calcChunkPosZ(z) + offset.z);
     }
 }
