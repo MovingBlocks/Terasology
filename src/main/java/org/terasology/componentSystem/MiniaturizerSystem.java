@@ -56,6 +56,7 @@ public class MiniaturizerSystem implements UpdateSubscriberSystem, RenderSystem 
             {
                 min.chunkMesh = worldRenderer.getChunkTesselator().generateMinaturizedMesh(min.miniatureChunk);
                 min.chunkMesh.generateVBOs();
+                min.chunkMesh._vertexElements = null;
             }
 
             //min.orientation += delta * 15f;
@@ -80,6 +81,7 @@ public class MiniaturizerSystem implements UpdateSubscriberSystem, RenderSystem 
             glRotatef(min.orientation, 0, 1 ,0);
 
             ShaderManager.getInstance().enableShader("chunk");
+            ShaderManager.getInstance().getShaderProgram("chunk").setFloat("blockScale", MiniaturizerComponent.SCALE);
 
             min.chunkMesh.render(ChunkMesh.RENDER_PHASE.OPAQUE);
             min.chunkMesh.render(ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT);

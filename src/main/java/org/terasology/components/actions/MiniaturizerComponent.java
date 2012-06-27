@@ -24,7 +24,11 @@ public class MiniaturizerComponent implements Component {
     public BlockGrid blockGrid = new BlockGrid();
 
     public void reset() {
-        chunkMesh = null;
+        if (chunkMesh != null) {
+            chunkMesh.dispose();
+            chunkMesh = null;
+        }
+
         orientation = 0;
         renderPosition = null;
         miniatureChunk = null;

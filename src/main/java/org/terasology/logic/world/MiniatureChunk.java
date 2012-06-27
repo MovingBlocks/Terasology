@@ -45,9 +45,9 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class MiniatureChunk extends Chunk {
-    public static final int SIZE_X = 1024;
+    public static final int SIZE_X = 512;
     public static final int SIZE_Y = 256;
-    public static final int SIZE_Z = 1024;
+    public static final int SIZE_Z = 512;
     public static final int INNER_CHUNK_POS_FILTER_X = TeraMath.ceilPowerOfTwo(SIZE_X) - 1;
     public static final int INNER_CHUNK_POS_FILTER_Z = TeraMath.ceilPowerOfTwo(SIZE_Z) - 1;
     public static final int POWER_X = TeraMath.sizeOfPower(SIZE_X);
