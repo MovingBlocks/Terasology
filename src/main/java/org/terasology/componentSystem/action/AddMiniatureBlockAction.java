@@ -67,8 +67,8 @@ public class AddMiniatureBlockAction implements EventHandlerSystem {
                         if (localPos.x >= MiniatureChunk.SIZE_X || localPos.y >= MiniatureChunk.SIZE_Y || localPos.z >= MiniatureChunk.SIZE_Z || localPos.x < 0 || localPos.y < 0 || localPos.z < 0)
                             continue;
 
-                        chunk.setSunlight(localPos, (byte) 0x0F);
-                        chunk.setLight(localPos, (byte) 0x0F);
+                        chunk.setSunlight(localPos, worldProvider.getSunlight(globalPos));
+                        chunk.setLight(localPos, worldProvider.getLight(globalPos));
                         chunk.setBlock(localPos, worldProvider.getBlock(globalPos).getId());
                     }
                 }

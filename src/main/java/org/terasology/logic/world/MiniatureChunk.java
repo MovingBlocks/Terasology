@@ -18,6 +18,7 @@ package org.terasology.logic.world;
 import com.bulletphysics.dynamics.RigidBody;
 import com.google.common.base.Objects;
 import org.terasology.logic.manager.Config;
+import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
@@ -44,7 +45,29 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class MiniatureChunk extends Chunk {
-    public static final int SIZE_X = 128;
-    public static final int SIZE_Y = 128;
-    public static final int SIZE_Z = 128;
+    public static final int SIZE_X = 1024;
+    public static final int SIZE_Y = 256;
+    public static final int SIZE_Z = 1024;
+    public static final int INNER_CHUNK_POS_FILTER_X = TeraMath.ceilPowerOfTwo(SIZE_X) - 1;
+    public static final int INNER_CHUNK_POS_FILTER_Z = TeraMath.ceilPowerOfTwo(SIZE_Z) - 1;
+    public static final int POWER_X = TeraMath.sizeOfPower(SIZE_X);
+    public static final int POWER_Z = TeraMath.sizeOfPower(SIZE_Z);
+    public static final int VERTICAL_SEGMENTS = Config.getInstance().getVerticalChunkMeshSegments();
+    public static final byte MAX_LIGHT = 0x0f;
+
+    public static final Vector3i CHUNK_POWER = new Vector3i(POWER_X, 0, POWER_Z);
+    public static final Vector3i CHUNK_SIZE = new Vector3i(SIZE_X, SIZE_Y, SIZE_Z);
+    public static final Vector3i INNER_CHUNK_POS_FILTER = new Vector3i(INNER_CHUNK_POS_FILTER_X, 0, INNER_CHUNK_POS_FILTER_Z);
+
+    public int getChunkSizeX() {
+        return SIZE_X;
+    }
+
+    public int getChunkSizeY() {
+        return SIZE_Y;
+    }
+
+    public int getChunkSizeZ() {
+        return SIZE_Z;
+    }
 }

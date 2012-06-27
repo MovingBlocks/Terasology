@@ -82,12 +82,12 @@ public final class ChunkTessellator {
     }
 
     public ChunkMesh generateMinaturizedMesh(MiniatureChunk miniatureChunk) {
-        PerformanceMonitor.startActivity("GenerateMesh");
+        PerformanceMonitor.startActivity("GenerateMinuatureMesh");
         ChunkMesh mesh = new ChunkMesh();
 
-        Chunk[] chunks = { miniatureChunk };
+        MiniatureChunk[] chunks = { miniatureChunk };
         WorldView localWorldView = new WorldView(chunks, Region3i.createFromCenterExtents(Vector3i.zero(), Vector3i.zero()), Vector3i.zero());
-        localWorldView.setChunkSize(new Vector3i(MiniatureChunk.SIZE_X, MiniatureChunk.SIZE_Y, MiniatureChunk.SIZE_Z));
+        localWorldView.setChunkSize(new Vector3i(MiniatureChunk.CHUNK_SIZE));
 
         for (int x = 0; x < MiniatureChunk.SIZE_X; x++) {
             for (int z = 0; z < MiniatureChunk.SIZE_Z; z++) {

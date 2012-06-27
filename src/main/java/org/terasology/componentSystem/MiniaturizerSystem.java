@@ -58,7 +58,7 @@ public class MiniaturizerSystem implements UpdateSubscriberSystem, RenderSystem 
                 min.chunkMesh.generateVBOs();
             }
 
-            min.orientation += delta * 15f;
+            //min.orientation += delta * 15f;
         }
     }
 

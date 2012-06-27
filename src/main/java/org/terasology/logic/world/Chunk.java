@@ -66,10 +66,14 @@ public class Chunk implements Externalizable {
     public static final int VERTICAL_SEGMENTS = Config.getInstance().getVerticalChunkMeshSegments();
     public static final byte MAX_LIGHT = 0x0f;
 
+    public static final Vector3i CHUNK_POWER = new Vector3i(POWER_X, 0, POWER_Z);
+    public static final Vector3i CHUNK_SIZE = new Vector3i(SIZE_X, SIZE_Y, SIZE_Z);
+    public static final Vector3i INNER_CHUNK_POS_FILTER = new Vector3i(INNER_CHUNK_POS_FILTER_X, 0, INNER_CHUNK_POS_FILTER_Z);
+
     private final Vector3i pos = new Vector3i();
 
-    private final TeraArray blocks;
-    private final TeraSmartArray sunlight, light, states;
+    protected TeraArray blocks;
+    protected TeraSmartArray sunlight, light, states;
 
     private State chunkState = State.ADJACENCY_GENERATION_PENDING;
     private boolean dirty;
@@ -89,10 +93,10 @@ public class Chunk implements Externalizable {
 
 
     public Chunk() {
-        blocks = new TeraArray(SIZE_X, SIZE_Y, SIZE_Z);
-        sunlight = new TeraSmartArray(SIZE_X, SIZE_Y, SIZE_Z);
-        light = new TeraSmartArray(SIZE_X, SIZE_Y, SIZE_Z);
-        states = new TeraSmartArray(SIZE_X, SIZE_Y, SIZE_Z);
+        blocks = new TeraArray(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        sunlight = new TeraSmartArray(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        light = new TeraSmartArray(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        states = new TeraSmartArray(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
 
         setDirty(true);
     }
@@ -135,7 +139,7 @@ public class Chunk implements Externalizable {
     }
 
     public boolean isInBounds(int x, int y, int z) {
-        return x >= 0 && y >= 0 && z >= 0 && x < SIZE_X && y < SIZE_Y && z < SIZE_Z;
+        return x >= 0 && y >= 0 && z >= 0 && x < getChunkSizeX() && y < getChunkSizeY() && z < getChunkSizeZ();
     }
 
     public State getChunkState() {
@@ -270,15 +274,15 @@ public class Chunk implements Externalizable {
     }
 
     public int getChunkWorldPosX() {
-        return pos.x * SIZE_X;
+        return pos.x * getChunkSizeX();
     }
 
     public int getChunkWorldPosY() {
-        return pos.y * SIZE_Y;
+        return pos.y * getChunkSizeY();
     }
 
     public int getChunkWorldPosZ() {
-        return pos.z * SIZE_Z;
+        return pos.z * getChunkSizeZ();
     }
 
     public Vector3i getBlockWorldPos(Vector3i blockPos) {
@@ -303,7 +307,7 @@ public class Chunk implements Externalizable {
 
     public AABB getAABB() {
         if (aabb == null) {
-            Vector3d dimensions = new Vector3d(SIZE_X / 2.0, SIZE_Y / 2.0, SIZE_Z / 2.0);
+            Vector3d dimensions = new Vector3d(getChunkSizeX() / 2.0, getChunkSizeY() / 2.0, getChunkSizeZ() / 2.0);
             Vector3d position = new Vector3d(getChunkWorldPosX() + dimensions.x - 0.5f, dimensions.y - 0.5f, getChunkWorldPosZ() + dimensions.z - 0.5f);
             aabb = new AABB(position, dimensions);
         }
@@ -433,5 +437,17 @@ public class Chunk implements Externalizable {
 
     public boolean isDisposed() {
         return disposed;
+    }
+
+    public int getChunkSizeX() {
+        return SIZE_X;
+    }
+
+    public int getChunkSizeY() {
+        return SIZE_Y;
+    }
+
+    public int getChunkSizeZ() {
+        return SIZE_Z;
     }
 }

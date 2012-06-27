@@ -15,7 +15,7 @@ import javax.vecmath.Vector3f;
  */
 public class MiniaturizerComponent implements Component {
 
-    public static final float SCALE = 1f / 16f;
+    public static final float SCALE = 1f / 32f;
 
     public ChunkMesh chunkMesh;
     public float orientation;
