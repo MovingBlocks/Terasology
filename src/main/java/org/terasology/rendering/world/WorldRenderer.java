@@ -915,8 +915,8 @@ public final class WorldRenderer implements IGameObject {
 
     public void printScreen() {
         GL11.glReadBuffer(GL11.GL_FRONT);
-        final int width = Display.getDisplayMode().getWidth();
-        final int height = Display.getDisplayMode().getHeight();
+        final int width = Display.getWidth();
+        final int height = Display.getHeight();
         //int bpp = Display.getDisplayMode().getBitsPerPixel(); does return 0 - why?
         final int bpp = 4;
         final ByteBuffer buffer = BufferUtils.createByteBuffer(width * height * bpp); // hardcoded until i know how to get bpp
