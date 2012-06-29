@@ -142,7 +142,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         Vector3i chunkPos = TeraMath.calcChunkPos(x, y, z);
         Chunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = TeraMath.calcBlockPos(x, y, z, chunkPos);
+            Vector3i blockPos = TeraMath.calcBlockPos(x, y, z);
             return chunk.setState(blockPos, state, oldState);
         }
         return false;
@@ -155,7 +155,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         Vector3i chunkPos = TeraMath.calcChunkPos(x, y, z);
         Chunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = TeraMath.calcBlockPos(x, y, z, chunkPos);
+            Vector3i blockPos = TeraMath.calcBlockPos(x, y, z);
             return chunk.getState(blockPos);
         }
         return 0;
@@ -170,7 +170,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         Vector3i chunkPos = TeraMath.calcChunkPos(x, y, z);
         Chunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = TeraMath.calcBlockPos(x, y, z, chunkPos);
+            Vector3i blockPos = TeraMath.calcBlockPos(x, y, z);
             return chunk.getBlock(blockPos);
         }
         return BlockManager.getInstance().getAir();
@@ -183,7 +183,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         Vector3i chunkPos = TeraMath.calcChunkPos(x, y, z);
         Chunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = TeraMath.calcBlockPos(x, y, z, chunkPos);
+            Vector3i blockPos = TeraMath.calcBlockPos(x, y, z);
             return chunk.getLight(blockPos);
         }
         return 0;
@@ -196,7 +196,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         Vector3i chunkPos = TeraMath.calcChunkPos(x, y, z);
         Chunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = TeraMath.calcBlockPos(x, y, z, chunkPos);
+            Vector3i blockPos = TeraMath.calcBlockPos(x, y, z);
             return chunk.getSunlight(blockPos);
         }
         return 0;
@@ -209,7 +209,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         Vector3i chunkPos = TeraMath.calcChunkPos(x, y, z);
         Chunk chunk = chunkProvider.getChunk(chunkPos);
         if (chunk != null) {
-            Vector3i blockPos = TeraMath.calcBlockPos(x, y, z, chunkPos);
+            Vector3i blockPos = TeraMath.calcBlockPos(x, y, z);
             return (byte) Math.max(chunk.getSunlight(blockPos), chunk.getLight(blockPos));
         }
         return 0;

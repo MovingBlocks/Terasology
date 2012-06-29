@@ -43,9 +43,11 @@ public class PostProcessingRenderer {
 
     private static PostProcessingRenderer _instance = null;
     private float _exposure = 16.0f;
+    private float _sceneLuminance = 1.0f;
     private int _displayListQuad = -1;
 
-    private float lastExposureUpdate;
+
+    private long lastExposureUpdate;
 
     private boolean _extensionsAvailable = false;
 
@@ -195,22 +197,22 @@ public class PostProcessingRenderer {
     private void updateExposure() {
         long currentTime = CoreRegistry.get(Timer.class).getTimeInMs();
 
-        if (CoreRegistry.get(Timer.class).getTimeInMs() - lastExposureUpdate < 1000)
-            return;
+        if (currentTime - lastExposureUpdate > 1000) {
+            lastExposureUpdate = currentTime;
 
-        lastExposureUpdate = currentTime;
+            FloatBuffer pixels = BufferUtils.createFloatBuffer(4);
+            FBO scene = PostProcessingRenderer.getInstance().getFBO("scene1");
 
-        FloatBuffer pixels = BufferUtils.createFloatBuffer(4);
-        FBO scene = PostProcessingRenderer.getInstance().getFBO("scene1");
+            scene.bindTexture();
+            glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, GL11.GL_FLOAT, pixels);
+            scene.unbindTexture();
 
-        scene.bindTexture();
-        glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, GL11.GL_FLOAT, pixels);
-        scene.unbindTexture();
+            _sceneLuminance = 0.2126f * pixels.get(0) + 0.7152f * pixels.get(1) + 0.0722f * pixels.get(2);
 
-        float lum = 0.2126f * pixels.get(0) + 0.7152f * pixels.get(1) + 0.0722f * pixels.get(2);
+        }
 
-        if (lum > 0.0f) // No division by zero
-            _exposure = (float) TeraMath.lerp(_exposure, TARGET_LUMINANCE / lum, ADJUSTMENT_SPEED);
+        if (_sceneLuminance > 0.0f) // No division by zero
+            _exposure = (float) TeraMath.lerp(_exposure, TARGET_LUMINANCE / _sceneLuminance, ADJUSTMENT_SPEED);
 
         float maxExposure = MAX_EXPOSURE;
 

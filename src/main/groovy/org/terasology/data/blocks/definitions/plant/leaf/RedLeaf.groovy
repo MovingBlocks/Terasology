@@ -33,5 +33,5 @@ block {
     translucent = true
 
     colorsource = COLOR_SOURCE.FOLIAGE_LUT
-    colorOffset = [1.0f, 0.8f, 0.8f, 1.0f]
+    colorOffset = [1.25f, 0.75f, 0.75f, 1.0f]
 }
