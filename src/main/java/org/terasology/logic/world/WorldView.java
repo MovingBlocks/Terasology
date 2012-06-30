@@ -238,4 +238,8 @@ public class WorldView {
     int relChunkIndex(int x, int y, int z) {
         return (x >> 4) + offset.x + chunkRegion.size().x * ((z >> 4) + offset.z);
     }
+
+    public Vector3i toWorldPos(Vector3i localPos) {
+        return new Vector3i(localPos.x + (offset.x + chunkRegion.min().x) * Chunk.SIZE_X, localPos.y, localPos.z + (offset.z + chunkRegion.min().z) * Chunk.SIZE_Z);
+    }
 }

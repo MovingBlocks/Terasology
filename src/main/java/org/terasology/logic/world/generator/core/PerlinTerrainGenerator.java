@@ -19,7 +19,10 @@ package org.terasology.logic.world.generator.core;
 import org.terasology.logic.world.chunks.Chunk;
 import org.terasology.logic.world.WorldBiomeProvider;
 import org.terasology.logic.world.generator.ChunkGenerator;
+import org.terasology.logic.world.liquid.LiquidData;
+import org.terasology.logic.world.liquid.LiquidType;
 import org.terasology.math.TeraMath;
+import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.utilities.PerlinNoise;
 
@@ -34,6 +37,8 @@ public class PerlinTerrainGenerator implements ChunkGenerator {
 
     private PerlinNoise _pGen1, _pGen2, _pGen3, _pGen4, _pGen5, _pGen8;
     private WorldBiomeProvider biomeProvider;
+
+    private Block air = BlockManager.getInstance().getAir();
 
     @Override
     public void setWorldSeed(String seed) {
@@ -87,17 +92,18 @@ public class PerlinTerrainGenerator implements ChunkGenerator {
                 for (int y = Chunk.SIZE_Y; y >= 0; y--) {
 
                     if (y == 0) { // The very deepest layer of the world is an indestructible mantle
-                        c.setBlock(x, y, z, BlockManager.getInstance().getBlock("MantleStone").getId());
+                        c.setBlock(x, y, z, BlockManager.getInstance().getBlock("MantleStone"));
                         break;
                     }
 
                     if (y <= 32 && y > 0) { // Ocean
-                        c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Water").getId());
+                        c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Water"));
+                        c.setLiquid(x, y, z, new LiquidData(LiquidType.WATER, Chunk.MAX_LIQUID_DEPTH));
 
                         if (y == 32) {
                             // Ice layer
                             if (type == WorldBiomeProvider.Biome.SNOW)
-                                c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Ice").getId());
+                                c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Ice"));
                         }
                     }
 
@@ -112,7 +118,7 @@ public class PerlinTerrainGenerator implements ChunkGenerator {
                         if (calcCaveDensity(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z)) > -0.7)
                             GenerateOuterLayer(x, y, z, firstBlockHeight, c, type);
                         else
-                            c.setBlock(x, y, z, (byte) 0);
+                            c.setBlock(x, y, z, air);
 
                         continue;
                     } else if (dens >= 32) {
@@ -124,7 +130,7 @@ public class PerlinTerrainGenerator implements ChunkGenerator {
                         if (calcCaveDensity(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z)) > -0.6)
                             GenerateInnerLayer(x, y, z, c, type);
                         else
-                            c.setBlock(x, y, z, (byte) 0);
+                            c.setBlock(x, y, z, air);
 
                         continue;
                     }
@@ -138,7 +144,7 @@ public class PerlinTerrainGenerator implements ChunkGenerator {
 
     private void GenerateInnerLayer(int x, int y, int z, Chunk c, WorldBiomeProvider.Biome type) {
         // TODO: GENERATE MINERALS HERE - config waiting at org\terasology\logic\manager\DefaultConfig.groovy 2012/01/22
-        c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Stone").getId());
+        c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Stone"));
     }
 
     private void GenerateOuterLayer(int x, int y, int z, int firstBlockHeight, Chunk c, WorldBiomeProvider.Biome type) {
@@ -151,32 +157,32 @@ public class PerlinTerrainGenerator implements ChunkGenerator {
             case MOUNTAINS:
                 // Beach
                 if (y >= 28 && y <= 34) {
-                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Sand").getId());
+                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Sand"));
                 } else if (depth == 0 && y > 32 && y < 128) {
                     // Grass on top
-                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Grass").getId());
+                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Grass"));
                 } else if (depth == 0 && y >= 128) {
                     // Grass on top
-                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Snow").getId());
+                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Snow"));
                 } else if (depth > 32) {
                     // Stone
-                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Stone").getId());
+                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Stone"));
                 } else {
                     // Dirt
-                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Dirt").getId());
+                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Dirt"));
                 }
 
                 break;
             case SNOW:
                 if (depth == 0.0 && y > 32) {
                     // Snow on top
-                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Snow").getId());
+                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Snow"));
                 } else if (depth > 32) {
                     // Stone
-                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Stone").getId());
+                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Stone"));
                 } else {
                     // Dirt
-                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Dirt").getId());
+                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Dirt"));
                 }
 
                 break;
@@ -184,9 +190,9 @@ public class PerlinTerrainGenerator implements ChunkGenerator {
             case DESERT:
                 if (depth > 8) {
                     // Stone
-                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Stone").getId());
+                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Stone"));
                 } else {
-                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Sand").getId());
+                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock("Sand"));
                 }
 
                 break;

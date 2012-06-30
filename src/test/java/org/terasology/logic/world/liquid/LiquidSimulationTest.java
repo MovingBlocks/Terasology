@@ -51,12 +51,16 @@ public class LiquidSimulationTest {
         dirt.withId((byte) 1);
         BlockManager.getInstance().addBlock(dirt);
 
+        for (int x = -Chunk.SIZE_X + 1; x < 2 * Chunk.SIZE_X; ++x) {
+            for (int z = -Chunk.SIZE_Z + 1; z < 2 * Chunk.SIZE_Z; ++z) {
+                view.setBlock(x, 0, z, dirt, air);
+            }
+        }
+
     }
 
     @Test
     public void calcStateSolidBlock() {
-        view.setBlock(new Vector3i(0,0,0), dirt, air);
-        view.setBlock(new Vector3i(1,0,0), dirt, air);
         view.setBlock(new Vector3i(0,1,0), dirt, air);
         view.setLiquid(new Vector3i(1, 1, 0), new LiquidData(LiquidType.WATER, (byte)7), new LiquidData());
 
@@ -65,10 +69,23 @@ public class LiquidSimulationTest {
 
     @Test
     public void calcStateFlowIntoDecaying() {
-        view.setBlock(new Vector3i(0,0,0), dirt, air);
-        view.setBlock(new Vector3i(1,0,0), dirt, air);
         view.setLiquid(new Vector3i(1, 1, 0), new LiquidData(LiquidType.WATER, (byte)7), new LiquidData());
 
-        assertEquals(new LiquidData(LiquidType.WATER, (byte)6), LiquidSimulator.calcStateFor(new Vector3i(0, 1, 0), view));
+        assertEquals(new LiquidData(LiquidType.WATER, 2), LiquidSimulator.calcStateFor(new Vector3i(0, 1, 0), view));
+    }
+
+    @Test
+    public void calcStateFlowDownwards() {
+        view.setLiquid(new Vector3i(0, 2, 0), new LiquidData(LiquidType.WATER, 3), new LiquidData());
+
+        assertEquals(new LiquidData(LiquidType.WATER, 6), LiquidSimulator.calcStateFor(new Vector3i(0, 1, 0), view));
+    }
+
+    @Test
+    public void calcStateWhenAnnexed() {
+        view.setLiquid(new Vector3i(0, 2, 0), new LiquidData(LiquidType.WATER, 3), new LiquidData());
+        view.setLiquid(new Vector3i(0, 1, 0), new LiquidData(LiquidType.WATER, 6), new LiquidData());
+        view.setLiquid(new Vector3i(0, 2, 0), new LiquidData(), new LiquidData(LiquidType.WATER, 3));
+        assertEquals(new LiquidData(), LiquidSimulator.calcStateFor(new Vector3i(0, 1, 0), view));
     }
 }

@@ -114,11 +114,11 @@ public class FloraGenerator implements ChunkGenerator {
                 double rand = random.standNormalDistrDouble();
 
                 if (rand > -0.4 && rand < 0.4) {
-                    c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("TallGrass1").getId());
+                    c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("TallGrass1"));
                 } else if (rand > -0.6 && rand < 0.6) {
-                    c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("TallGrass2").getId());
+                    c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("TallGrass2"));
                 } else {
-                    c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("TallGrass3").getId());
+                    c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("TallGrass3"));
                 }
 
                 double flowerRand = random.randomDouble();
@@ -128,13 +128,13 @@ public class FloraGenerator implements ChunkGenerator {
                  */
                 if (random.standNormalDistrDouble() < -2) {
                     if (flowerRand >= -1.0 && flowerRand < 0.2) {
-                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("RedFlower").getId());
+                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("RedFlower"));
                     } else if (flowerRand >= 0.2 && flowerRand < 0.6) {
-                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("YellowFlower").getId());
+                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("YellowFlower"));
                     } else if (flowerRand >= 0.6 && flowerRand < 0.7) {
-                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("BrownShroom").getId());
+                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("BrownShroom"));
                     } else if (flowerRand >= 0.7 && flowerRand < 0.8) {
-                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("RedShroom").getId());
+                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("RedShroom"));
                     }
                 }
             }

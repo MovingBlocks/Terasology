@@ -104,4 +104,17 @@ public class WorldViewTest {
         WorldView worldView = new WorldView(chunks, Region3i.createFromCenterExtents(new Vector3i(1, 0, 1), new Vector3i(1,0,1)), new Vector3i(1,1,1));
         assertEquals(solidBlock, worldView.getBlock(0, 0, 0));
     }
+
+    @Test
+    public void localToWorld() {
+        Chunk chunk = new Chunk(new Vector3i(1,0,1));
+        chunk.setBlock(new Vector3i(0,0,0), solidBlock);
+
+        Chunk[] chunks = new Chunk[] {new Chunk(new Vector3i(0,0,0)), new Chunk(new Vector3i(1,0,0)), new Chunk(new Vector3i(2,0,0)),
+                new Chunk(new Vector3i(0,0,1)), chunk, new Chunk(new Vector3i(2,0,1)),
+                new Chunk(new Vector3i(0,0,2)), new Chunk(new Vector3i(1,0,2)), new Chunk(new Vector3i(2,0,2))};
+
+        WorldView worldView = new WorldView(chunks, Region3i.createFromCenterExtents(new Vector3i(1, 0, 1), new Vector3i(1,0,1)), new Vector3i(1,1,1));
+        assertEquals(new Vector3i(Chunk.SIZE_X, 0, Chunk.SIZE_Z), worldView.toWorldPos(Vector3i.zero()));
+    }
 }

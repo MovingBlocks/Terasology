@@ -159,14 +159,6 @@ public class Chunk implements Externalizable {
         }
     }
 
-    public byte getBlockId(Vector3i pos) {
-        return blocks.get(pos.x, pos.y, pos.z);
-    }
-
-    public byte getBlockId(int x, int y, int z) {
-        return blocks.get(x, y, z);
-    }
-
     public Block getBlock(Vector3i pos) {
         return BlockManager.getInstance().getBlock(blocks.get(pos.x, pos.y, pos.z));
     }
@@ -175,43 +167,35 @@ public class Chunk implements Externalizable {
         return BlockManager.getInstance().getBlock(blocks.get(x, y, z));
     }
 
-    public boolean setBlock(int x, int y, int z, byte blockId) {
-        byte oldValue = blocks.set(x, y, z, blockId);
-        if (oldValue != blockId) {
+    public boolean setBlock(int x, int y, int z, Block block) {
+        byte oldValue = blocks.set(x, y, z, block.getId());
+        if (oldValue != block.getId()) {
+            if (!block.isLiquid()) {
+                setLiquid(x, y, z, new LiquidData());
+            }
             return true;
         }
         return false;
     }
 
-    public boolean setBlock(int x, int y, int z, byte newBlockId, byte oldBlockId) {
-        if (newBlockId != oldBlockId) {
-            return blocks.set(x, y, z, newBlockId, oldBlockId);
+    public boolean setBlock(int x, int y, int z, Block newBlock, Block oldBlock) {
+        if (newBlock != oldBlock) {
+            if (blocks.set(x, y, z, newBlock.getId(), oldBlock.getId())) {
+                if (!newBlock.isLiquid()) {
+                    setLiquid(x, y, z, new LiquidData());
+                }
+                return true;
+            }
         }
         return false;
     }
 
-    public boolean setBlock(int x, int y, int z, Block block) {
-        return setBlock(x, y, z, block.getId());
-    }
-
-    public boolean setBlock(int x, int y, int z, Block newBlock, Block oldBlock) {
-        return setBlock(x, y, z, newBlock.getId(), oldBlock.getId());
-    }
-
-    public boolean setBlock(Vector3i pos, byte blockId) {
-        return setBlock(pos.x, pos.y, pos.z, blockId);
-    }
-
-    public boolean setBlock(Vector3i pos, byte blockId, byte oldBlockId) {
-        return setBlock(pos.x, pos.y, pos.z, blockId, oldBlockId);
-    }
-
     public boolean setBlock(Vector3i pos, Block block) {
-        return setBlock(pos.x, pos.y, pos.z, block.getId());
+        return setBlock(pos.x, pos.y, pos.z, block);
     }
 
     public boolean setBlock(Vector3i pos, Block block, Block oldBlock) {
-        return setBlock(pos.x, pos.y, pos.z, block.getId(), oldBlock.getId());
+        return setBlock(pos.x, pos.y, pos.z, block, oldBlock);
     }
 
     public byte getSunlight(Vector3i pos) {
@@ -256,6 +240,11 @@ public class Chunk implements Externalizable {
         byte expected = oldState.toByte();
         byte newValue = newState.toByte();
         return liquid.set(x, y, z, newValue, expected) == expected;
+    }
+
+    public void setLiquid(int x, int y, int z, LiquidData newState) {
+        byte newValue = newState.toByte();
+        liquid.set(x, y, z, newValue);
     }
 
     public LiquidData getLiquid(Vector3i pos) {

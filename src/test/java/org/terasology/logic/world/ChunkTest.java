@@ -4,6 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.terasology.logic.world.chunks.Chunk;
 import org.terasology.math.Vector3i;
+import org.terasology.model.blocks.Block;
+import org.terasology.model.blocks.management.BlockManager;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -21,8 +23,11 @@ public class ChunkTest {
 
     @Test
     public void testChangeBlock() {
-        chunk.setBlock(new Vector3i(1,2,3), (byte) 4);
-        assertEquals(4, chunk.getBlockId(new Vector3i(1, 2, 3)));
+        Block block = new Block();
+        block.withId((byte)4);
+        BlockManager.getInstance().addBlock(block);
+        chunk.setBlock(new Vector3i(1,2,3), block);
+        assertEquals(block, chunk.getBlock(new Vector3i(1, 2, 3)));
     }
 
 }

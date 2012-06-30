@@ -56,33 +56,13 @@ public class LiquidsGenerator implements ChunkGenerator {
             Block currentBlock = c.getBlock(8, y, 8);
             if ((grass.equals(currentBlock) || snow.equals(currentBlock)) && !grassGenerated && y >= 32 && random.randomDouble() > 0.8) {
                 c.setBlock(8, y, 8, water, currentBlock);
+                c.setLiquid(8, y, 8, new LiquidData(LiquidType.WATER, 7));
                 grassGenerated = true;
             } else if ((stone.equals(currentBlock)) && !lavaGenerated && c.getBlock(8, y + 1, 8).equals(BlockManager.getInstance().getAir())) {
                 c.setBlock(8, y, 8, lava, currentBlock);
+                c.setLiquid(8, y, 8, new LiquidData(LiquidType.LAVA, 7));
                 lavaGenerated = true;
             }
-
-            // TODO: Liquid simulator notification? Or leave that to full chunk completion notification?
-
-            /*boolean set = false;
-            if ((title.equals("Grass") || title.equals("Snow")) && !grassGenerated && y >= 32 && random.randomDouble() > 0.8) {
-                _parent.getParent().setBlock(blockWorldPos.x, blockWorldPos.y, blockWorldPos.z, BlockManager.getInstance().getBlock("Water").getId(), true, true, true);
-                set = true;
-                grassGenerated = true;
-            } else if (title.equals("Stone") && !lavaGenerated && c.getBlock(8, y + 1, 8) == 0x0) {
-                _parent.getParent().setBlock(blockWorldPos.x, blockWorldPos.y, blockWorldPos.z, BlockManager.getInstance().getBlock("Lava").getId(), true, true, true);
-                set = true;
-                lavaGenerated = true;
-            }
-
-            if (set) {
-                LiquidSimulator sim = new LiquidSimulator(_parent.getParent());
-                sim.addActiveBlock(blockWorldPos);
-                sim.simulateAll();
-            }
-
-            if (lavaGenerated)
-                return;*/
         }
     }
 
