@@ -49,7 +49,9 @@ public class InternalLightProcessor {
 
         for (int x = 0; x < Chunk.SIZE_X; x++) {
             for (int z = 0; z < Chunk.SIZE_Z; z++) {
-                spreadSunlightInternal(chunk, x, tops[x + Chunk.SIZE_X * z] + 1, z);
+                if (tops[x + Chunk.SIZE_X * z] < top) {
+                    spreadSunlightInternal(chunk, x, tops[x + Chunk.SIZE_X * z] + 1, z);
+                }
                 for (int y = top; y >= 0; y--) {
                     Block block = chunk.getBlock(x, y, z);
                     if (y > tops[x + Chunk.SIZE_X * z] && ((x > 0 && tops[(x - 1) + Chunk.SIZE_X * z] >= y) ||

@@ -446,7 +446,6 @@ public final class WorldRenderer implements IGameObject {
         PerformanceMonitor.endActivity();
 
         _renderQueueTransparent.add(_bulletRenderer);
-        _renderQueueTransparent.add(_blockGrid);
 
         resetStats();
     }
@@ -719,6 +718,7 @@ public final class WorldRenderer implements IGameObject {
         if (_player == null || !_player.isValid())
             return;
         PlayerComponent player = _player.getEntity().getComponent(PlayerComponent.class);
+
         Vector3f cameraPosition = new Vector3f(player.spawnPosition);
         cameraPosition.y += 32;
         cameraPosition.x += Math.sin(getTick() * 0.0005f) * 32f;
@@ -920,8 +920,8 @@ public final class WorldRenderer implements IGameObject {
 
     public void printScreen() {
         GL11.glReadBuffer(GL11.GL_FRONT);
-        final int width = Display.getDisplayMode().getWidth();
-        final int height = Display.getDisplayMode().getHeight();
+        final int width = Display.getWidth();
+        final int height = Display.getHeight();
         //int bpp = Display.getDisplayMode().getBitsPerPixel(); does return 0 - why?
         final int bpp = 4;
         final ByteBuffer buffer = BufferUtils.createByteBuffer(width * height * bpp); // hardcoded until i know how to get bpp
@@ -1033,5 +1033,9 @@ public final class WorldRenderer implements IGameObject {
                 _activeCamera = _spawnCamera;
                 break;
         }
+    }
+
+    public ChunkTessellator getChunkTesselator() {
+        return _chunkTesselator;
     }
 }
