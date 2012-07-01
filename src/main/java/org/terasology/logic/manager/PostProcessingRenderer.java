@@ -107,6 +107,8 @@ public class PostProcessingRenderer {
     public void initialize() {
         createOrUpdateFullscreenFbos();
 
+        createFBO("sceneReflected", 512, 512, true, true);
+
         createFBO("sceneHighPass", 256, 256, false, false);
         createFBO("sceneBloom0", 256, 256, false, false);
         createFBO("sceneBloom1", 256, 256, false, false);
@@ -234,11 +236,29 @@ public class PostProcessingRenderer {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
+    public void beginRenderReflectedScene() {
+        if (!_extensionsAvailable)
+            return;
+
+        getFBO("sceneReflected").bind();
+
+        glViewport(0, 0, 512, 512);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+
     public void endRenderScene() {
         if (!_extensionsAvailable)
             return;
 
         getFBO("scene").unbind();
+    }
+
+    public void endRenderReflectedScene() {
+        if (!_extensionsAvailable)
+            return;
+
+        getFBO("sceneReflected").unbind();
+        glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
 
     /**

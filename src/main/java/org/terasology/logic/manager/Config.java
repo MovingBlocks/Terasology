@@ -412,6 +412,10 @@ public final class Config {
         _setting.getPlayerBuilder().setPlacingBox(placingBox);
     }
 
+    public boolean isComplexWater() {
+        return false;
+    }
+
     /* MODS */
 
     public List<String> getActiveMods() {

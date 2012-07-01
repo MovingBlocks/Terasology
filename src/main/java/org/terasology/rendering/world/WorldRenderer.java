@@ -435,16 +435,6 @@ public final class WorldRenderer implements IGameObject {
         return count;
     }
 
-    private void queueRenderer() {
-        PerformanceMonitor.startActivity("Update and Queue Chunks");
-        updateAndQueueVisibleChunks();
-        PerformanceMonitor.endActivity();
-
-        _renderQueueTransparent.add(_bulletRenderer);
-
-        resetStats();
-    }
-
     private void resetStats() {
         _statChunkMeshEmpty = 0;
         _statChunkNotReady = 0;
@@ -456,22 +446,58 @@ public final class WorldRenderer implements IGameObject {
      */
     @Override
     public void render() {
-        /* QUEUE RENDERER */
-        queueRenderer();
+        _renderQueueTransparent.add(_bulletRenderer);
+        resetStats();
+
+        updateAndQueueVisibleChunks();
+
+        if (Config.getInstance().isComplexWater()) {
+            PostProcessingRenderer.getInstance().beginRenderReflectedScene();
+            glCullFace(GL11.GL_FRONT);
+            getActiveCamera().setReflected(true);
+            renderWorldReflection(getActiveCamera());
+            getActiveCamera().setReflected(false);
+            glCullFace(GL11.GL_BACK);
+            PostProcessingRenderer.getInstance().endRenderReflectedScene();
+        }
 
         PostProcessingRenderer.getInstance().beginRenderScene();
+        renderWorld(getActiveCamera());
+        PostProcessingRenderer.getInstance().endRenderScene();
 
+        /* RENDER THE FINAL POST-PROCESSED SCENE */
+        PerformanceMonitor.startActivity("Render Post-Processing");
+        PostProcessingRenderer.getInstance().renderScene();
+        PerformanceMonitor.endActivity();
+
+        if (_cameraMode == CAMERA_MODE.PLAYER) {
+            glClear(GL_DEPTH_BUFFER_BIT);
+            glPushMatrix();
+            glLoadIdentity();
+            _activeCamera.loadProjectionMatrix(80f);
+
+            PerformanceMonitor.startActivity("Render First Person");
+            for (RenderSystem renderer : _systemManager.iterateRenderSubscribers()) {
+                renderer.renderFirstPerson();
+            }
+            PerformanceMonitor.endActivity();
+
+            glPopMatrix();
+        }
+    }
+
+    public void renderWorld(Camera camera) {
         /* SKYSPHERE */
         PerformanceMonitor.startActivity("Render Sky");
-        getActiveCamera().lookThroughNormalized();
+        camera.lookThroughNormalized();
         _skysphere.render();
         PerformanceMonitor.endActivity();
 
         /* WORLD RENDERING */
         PerformanceMonitor.startActivity("Render World");
-        getActiveCamera().lookThrough();
+        camera.lookThrough();
         if (Config.getInstance().isDebugCollision()) {
-            renderDebugCollision();
+            renderDebugCollision(camera);
         }
 
         glEnable(GL_LIGHT0);
@@ -498,7 +524,7 @@ public final class WorldRenderer implements IGameObject {
          * FIRST RENDER PASS: OPAQUE ELEMENTS
          */
         while (_renderQueueChunksOpaque.size() > 0)
-            renderChunk(_renderQueueChunksOpaque.poll(), ChunkMesh.RENDER_PHASE.OPAQUE);
+            renderChunk(_renderQueueChunksOpaque.poll(), ChunkMesh.RENDER_PHASE.OPAQUE, camera);
 
         PerformanceMonitor.endActivity();
 
@@ -511,7 +537,7 @@ public final class WorldRenderer implements IGameObject {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         while (_renderQueueChunksSortedBillboards.size() > 0)
-            renderChunk(_renderQueueChunksSortedBillboards.poll(), ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT);
+            renderChunk(_renderQueueChunksSortedBillboards.poll(), ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT, camera);
 
         PerformanceMonitor.endActivity();
 
@@ -542,10 +568,10 @@ public final class WorldRenderer implements IGameObject {
 
                 if (j == 0) {
                     glColorMask(false, false, false, false);
-                    renderChunk(c, ChunkMesh.RENDER_PHASE.WATER_AND_ICE);
+                    renderChunk(c, ChunkMesh.RENDER_PHASE.WATER_AND_ICE, camera);
                 } else {
                     glColorMask(true, true, true, true);
-                    renderChunk(c, ChunkMesh.RENDER_PHASE.WATER_AND_ICE);
+                    renderChunk(c, ChunkMesh.RENDER_PHASE.WATER_AND_ICE, camera);
                 }
             }
         }
@@ -565,40 +591,44 @@ public final class WorldRenderer implements IGameObject {
         glDisable(GL_LIGHT0);
 
         PerformanceMonitor.endActivity();
-
-        PostProcessingRenderer.getInstance().endRenderScene();
-
-        /* RENDER THE FINAL POST-PROCESSED SCENE */
-        PerformanceMonitor.startActivity("Render Post-Processing");
-        PostProcessingRenderer.getInstance().renderScene();
-        PerformanceMonitor.endActivity();
-
-        if (_cameraMode == CAMERA_MODE.PLAYER) {
-            glClear(GL_DEPTH_BUFFER_BIT);
-            glPushMatrix();
-            glLoadIdentity();
-            _activeCamera.loadProjectionMatrix(80f);
-
-            PerformanceMonitor.startActivity("Render First Person");
-            for (RenderSystem renderer : _systemManager.iterateRenderSubscribers()) {
-                renderer.renderFirstPerson();
-            }
-            PerformanceMonitor.endActivity();
-
-            glPopMatrix();
-        }
     }
 
-    private void renderChunk(Chunk chunk, ChunkMesh.RENDER_PHASE phase) {
+    public void renderWorldReflection(Camera camera) {
+        PerformanceMonitor.startActivity("Render Sky");
+        camera.lookThroughNormalized();
+        _skysphere.render();
+
+        camera.lookThrough();
+
+        glEnable(GL_LIGHT0);
+
+        for (Chunk c : _renderQueueChunksOpaque)
+            renderChunk(c, ChunkMesh.RENDER_PHASE.OPAQUE, camera);
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        for (Chunk c : _renderQueueChunksSortedBillboards)
+            renderChunk(c, ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT, camera);
+
+        for (IGameObject g : _renderQueueTransparent)
+            g.render();
+
+        glDisable(GL_BLEND);
+        glDisable(GL_LIGHT0);
+    }
+
+    private void renderChunk(Chunk chunk, ChunkMesh.RENDER_PHASE phase, Camera camera) {
         if (chunk.getChunkState() == Chunk.State.COMPLETE && chunk.getMesh() != null) {
             ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("chunk");
             // Transfer the world offset of the chunk to the shader for various effects
             shader.setFloat3("chunkOffset", (float) (chunk.getPos().x * Chunk.SIZE_X), (float) (chunk.getPos().y * Chunk.SIZE_Y), (float) (chunk.getPos().z * Chunk.SIZE_Z));
             shader.setFloat("animated", chunk.getAnimated() ? 1.0f: 0.0f);
+            shader.setFloat("clipHeight", camera.getClipHeight());
 
             GL11.glPushMatrix();
 
-            Vector3d cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
+            Vector3d cameraPosition = camera.getPosition();
             GL11.glTranslated(chunk.getPos().x * Chunk.SIZE_X - cameraPosition.x, chunk.getPos().y * Chunk.SIZE_Y - cameraPosition.y, chunk.getPos().z * Chunk.SIZE_Z - cameraPosition.z);
 
             for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
@@ -682,7 +712,7 @@ public final class WorldRenderer implements IGameObject {
         PerformanceMonitor.endActivity();
     }
 
-    private void renderDebugCollision() {
+    private void renderDebugCollision(Camera camera) {
         if (_player != null && _player.isValid()) {
             AABBCollisionComponent collision = _player.getEntity().getComponent(AABBCollisionComponent.class);
             if (collision != null) {
@@ -692,7 +722,7 @@ public final class WorldRenderer implements IGameObject {
             }
         }
 
-        List<BlockPosition> blocks = WorldUtil.gatherAdjacentBlockPositions(new Vector3f(getActiveCamera().getPosition()));
+        List<BlockPosition> blocks = WorldUtil.gatherAdjacentBlockPositions(new Vector3f(camera.getPosition()));
 
         for (int i = 0; i < blocks.size(); i++) {
             BlockPosition p = blocks.get(i);
