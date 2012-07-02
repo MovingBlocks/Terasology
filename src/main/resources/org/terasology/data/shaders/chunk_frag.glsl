@@ -18,14 +18,18 @@ uniform sampler2D textureAtlas;
 uniform sampler2D textureWaterNormal;
 uniform sampler2D textureLava;
 uniform sampler2D textureEffects;
+uniform sampler2D textureWaterReflection;
 
 uniform float time;
 uniform float daylight = 1.0;
 uniform bool swimming;
 uniform bool carryingTorch;
 
+uniform float clipHeight = 0.0;
+
 varying vec4 vertexWorldPosRaw;
 varying vec4 vertexWorldPos;
+varying vec4 vertexPos;
 varying vec3 eyeVec;
 varying vec3 lightDir;
 varying vec3 normal;
@@ -42,17 +46,24 @@ uniform vec2 grassCoordinate;
 #define MOONLIGHT_AMBIENT_COLOR 0.8, 0.8, 1.0
 #define NIGHT_BRIGHTNESS 0.05
 #define WATER_COLOR 0.325, 0.419, 0.525, 0.75
+#define REFLECTION_COLOR 0.95, 0.97, 1.0, 0.75
 
 #define TORCH_WATER_SPEC 8.0
 #define TORCH_WATER_DIFF 0.7
 #define TORCH_BLOCK_SPEC 0.7
 #define TORCH_BLOCK_DIFF 1.0
-#define WATER_SPEC 8.0
+#define WATER_SPEC 2.0
 #define WATER_DIFF 1.0
 #define BLOCK_DIFF 0.25
 #define BLOCK_AMB 1.0
 
+#define WATER_REFRACTION 0.1
+
 void main(){
+	if (clipHeight > 0 && vertexWorldPosRaw.y < clipHeight) {
+        discard;
+	}
+
     vec4 texCoord = gl_TexCoord[0];
 
     vec3 normalizedVPos = -normalize(vertexWorldPos.xyz);
@@ -70,10 +81,25 @@ void main(){
 
     /* APPLY WATER TEXTURE */
     if (texCoord.x >= waterCoordinate.x && texCoord.x < waterCoordinate.x + TEXTURE_OFFSET && texCoord.y >= waterCoordinate.y && texCoord.y < waterCoordinate.y + TEXTURE_OFFSET) {
-        vec2 waterOffset = vec2(vertexWorldPosRaw.x + timeToTick(time, 0.1), vertexWorldPosRaw.z) / 16.0;
+        vec2 waterOffset = vec2(vertexWorldPosRaw.x + timeToTick(time, 0.1), vertexWorldPosRaw.z + timeToTick(time, 0.1)) / 8.0;
+        vec2 waterOffsetLarge = vec2(vertexWorldPosRaw.x - timeToTick(time, 0.1), vertexWorldPosRaw.z + timeToTick(time, 0.1)) / 16.0;
+
         normalWater = (texture2D(textureWaterNormal, waterOffset) * 2.0 - 1.0).xyz;
 
+#ifdef COMPLEX_WATER
+        vec3 normalWaterLarge = (texture2D(textureWaterNormal, waterOffsetLarge) * 2.0 - 1.0).xyz;
+
+        vec2 projectedPos = 0.5 * (vertexPos.st/vertexPos.q) + vec2(0.5);
+        normalWater = mix(normalWater, normalWaterLarge, clamp(0.5 + length(projectedPos), 0.0, 1.0));
+
+        color = texture2D(textureWaterReflection, projectedPos + normalWater.xy * WATER_REFRACTION) * vec4(REFLECTION_COLOR);
+
+        // Fresnel
+        color = mix(color, vec4(WATER_COLOR), clamp(dot(vec3(0.0, 1.0, 0.0), normalize(eyeVec)), 0.0, 1.0));
+#else
         color = vec4(WATER_COLOR);
+#endif
+
         isWater = true;
     /* APPLY LAVA TEXTURE */
     } else if (texCoord.x >= lavaCoordinate.x && texCoord.x < lavaCoordinate.x + TEXTURE_OFFSET && texCoord.y >= lavaCoordinate.y && texCoord.y < lavaCoordinate.y + TEXTURE_OFFSET) {
