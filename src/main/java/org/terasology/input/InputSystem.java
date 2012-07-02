@@ -287,8 +287,10 @@ public class InputSystem implements EventHandlerSystem {
         keyvalue = inputConfig.getKeyInventory();
         if (keyvalue < 256) {
             linkBindButtonToKey(keyvalue, InventoryButton.ID);
-        } else {
+        } else if (keyvalue < 259) {
             linkBindButtonToMouse(linkMouseByConfig(keyvalue), InventoryButton.ID);
+        } else {
+            linkBindButtonToMouseWheel(linkMouseByConfig(keyvalue), InventoryButton.ID);
         }
 
         registerBindButton(ConsoleButton.ID, "Console", new ConsoleButton());
@@ -398,16 +400,20 @@ public class InputSystem implements EventHandlerSystem {
         keyvalue = inputConfig.getKeyToolnext();
         if (keyvalue < 256) {
             linkBindButtonToKey(keyvalue, ToolbarNextButton.ID);
-        } else {
+        } else if (keyvalue < 259) {
             linkBindButtonToMouse(linkMouseByConfig(keyvalue), ToolbarNextButton.ID);
+        } else {
+            linkBindButtonToMouseWheel(linkMouseByConfig(keyvalue), ToolbarNextButton.ID);
         }
 
         registerBindButton(ToolbarPrevButton.ID, "Toolbar Previous", new ToolbarPrevButton()).setMode(BindableButtonImpl.ActivateMode.PRESS);
         keyvalue = inputConfig.getKeyToolprev();
         if (keyvalue < 256) {
             linkBindButtonToKey(keyvalue, ToolbarPrevButton.ID);
-        } else {
+        } else if (keyvalue < 259) {
             linkBindButtonToMouse(linkMouseByConfig(keyvalue), ToolbarPrevButton.ID);
+        } else {
+            linkBindButtonToMouseWheel(linkMouseByConfig(keyvalue), ToolbarPrevButton.ID);
         }
 
         /*keyvalue = inputConfig.getKeyToolslot1();
@@ -422,6 +428,12 @@ public class InputSystem implements EventHandlerSystem {
             registerBindButton(inventorySlotBind, "Inventory Slot " + (i + 1), new ToolbarSlotButton(i));
             linkBindButtonToKey(Keyboard.KEY_1 + i, inventorySlotBind);
         }*/
+
+        for (int i = 0; i < 9; ++i) {
+            String inventorySlotBind = "engine:toolbarSlot" + i;
+            registerBindButton(inventorySlotBind, "Inventory Slot " + (i + 1), new ToolbarSlotButton(i));
+            linkBindButtonToKey(Keyboard.KEY_1 + i, inventorySlotBind);
+        }
 
         registerBindButton(ToggleMinionModeButton.ID, "Toggle Minion Mode", new ToggleMinionModeButton()).setMode(BindableButtonImpl.ActivateMode.PRESS);
         keyvalue = inputConfig.getKeyMinionmode();
