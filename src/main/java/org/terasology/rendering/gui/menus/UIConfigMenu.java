@@ -34,10 +34,11 @@ public class UIConfigMenu extends UIDisplayWindow {
     final UIImageOverlay _overlay;
     final UIGraphicsElement _title;
 
-    private final UIButton _graphicsQualityButton,
-            _backToMainMenuButton,
-            _viewingDistanceButton,
-            _fovButton;
+    private final UIButton _backToMainMenuButton,
+            _videoOptions,
+            _soundOptions,
+            _inputOptions,
+            _modOptions;
 
     final UIText _version;
 
@@ -53,18 +54,21 @@ public class UIConfigMenu extends UIDisplayWindow {
         _overlay = new UIImageOverlay(AssetManager.loadTexture("engine:loadingBackground"));
         _overlay.setVisible(true);
 
-        _graphicsQualityButton = new UIButton(new Vector2f(256f, 32f));
-        _graphicsQualityButton.getLabel().setText("Graphics Quality: Ugly");
-        _graphicsQualityButton.setVisible(true);
+        _videoOptions = new UIButton(new Vector2f(256f, 32f));
+        _videoOptions.getLabel().setText("Graphical options...");
+        _videoOptions.setVisible(true);
 
-        _viewingDistanceButton = new UIButton(new Vector2f(256f, 32f));
-        _viewingDistanceButton.getLabel().setText("Viewing Distance: Near");
-        _viewingDistanceButton.setVisible(true);
+        _soundOptions = new UIButton(new Vector2f(256f, 32f));
+        _soundOptions.getLabel().setText("Audio options...");
+        _soundOptions.setVisible(true);
 
-        // TODO: Replace with a slider later on
-        _fovButton = new UIButton(new Vector2f(256f, 32f));
-        _fovButton.getLabel().setText("Field of View: 80");
-        _fovButton.setVisible(true);
+        _inputOptions = new UIButton(new Vector2f(256f, 32f));
+        _inputOptions.getLabel().setText("Input options...");
+        _inputOptions.setVisible(true);
+
+        _modOptions = new UIButton(new Vector2f(256f, 32f));
+        _modOptions.getLabel().setText("Mod options...");
+        _modOptions.setVisible(true);
 
         _backToMainMenuButton = new UIButton(new Vector2f(256f, 32f));
         _backToMainMenuButton.getLabel().setText("Return to Main Menu");
@@ -74,10 +78,11 @@ public class UIConfigMenu extends UIDisplayWindow {
         addDisplayElement(_title);
         addDisplayElement(_version);
 
-        addDisplayElement(_graphicsQualityButton, "graphicsQualityButton");
-        addDisplayElement(_fovButton, "fovButton");
         addDisplayElement(_backToMainMenuButton, "backToMainMenuButton");
-        addDisplayElement(_viewingDistanceButton, "viewingDistanceButton");
+        addDisplayElement(_videoOptions, "videoOptionsButton");
+        addDisplayElement(_soundOptions, "soundOptionsButton");
+        addDisplayElement(_inputOptions, "inputOptionsButton");
+        addDisplayElement(_modOptions, "modOptionsButton");
         update();
     }
 
@@ -88,14 +93,17 @@ public class UIConfigMenu extends UIDisplayWindow {
         _version.centerHorizontally();
         _version.getPosition().y = 230f;
 
-        _graphicsQualityButton.centerHorizontally();
-        _graphicsQualityButton.getPosition().y = 300f + 40f;
+        _videoOptions.centerHorizontally();
+        _videoOptions.getPosition().y = 300f;
 
-        _viewingDistanceButton.centerHorizontally();
-        _viewingDistanceButton.getPosition().y = 300f + 2 * 40f;
+        _soundOptions.centerHorizontally();
+        _soundOptions.getPosition().y = 300f + 40f;
 
-        _fovButton.centerHorizontally();
-        _fovButton.getPosition().y = 300f + 3 * 40f;
+        _inputOptions.centerHorizontally();
+        _inputOptions.getPosition().y = 300f + 2 * 40f;
+
+        _modOptions.centerHorizontally();
+        _modOptions.getPosition().y = 300f + 3 * 40f;
 
         _backToMainMenuButton.centerHorizontally();
         _backToMainMenuButton.getPosition().y = 300f + 5 * 40f;
