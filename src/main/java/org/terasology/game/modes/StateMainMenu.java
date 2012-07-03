@@ -353,10 +353,20 @@ public class StateMainMenu implements GameState {
         _inputOptionsMenu.setVisible(false);
 
         UIButton inputToSettingsMenuButton = (UIButton) _inputOptionsMenu.getElementById("inputToSettingsMenuButton");
+
+        UIButton ForwardButton = (UIButton) _inputOptionsMenu.getElementById("ForwardButton");
+
         inputToSettingsMenuButton.addClickListener(new IClickListener() {
             @Override
             public void clicked(UIDisplayElement element) {
                 GUIManager.getInstance().setFocusedWindow(_configMenu);
+            }
+        });
+
+        ForwardButton.addClickListener(new IClickListener() {
+            @Override
+            public void clicked(UIDisplayElement element) {
+                GUIManager.getInstance().showMessage("Bind button", "Press a button or mouse button");
             }
         });
     }

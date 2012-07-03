@@ -297,32 +297,40 @@ public class InputSystem implements EventHandlerSystem {
         keyvalue = inputConfig.getKeyConsole();
         if (keyvalue < 256) {
             linkBindButtonToKey(keyvalue, ConsoleButton.ID);
-        } else {
+        } else if (keyvalue < 259) {
             linkBindButtonToMouse(linkMouseByConfig(keyvalue), ConsoleButton.ID);
+        } else {
+            linkBindButtonToMouseWheel(linkMouseByConfig(keyvalue), ConsoleButton.ID);
         }
 
         registerBindButton(PauseButton.ID, "Pause", new PauseButton());
         keyvalue = inputConfig.getKeyPauze();
         if (keyvalue < 256) {
             linkBindButtonToKey(keyvalue, PauseButton.ID);
-        } else {
+        } else if (keyvalue < 259) {
             linkBindButtonToMouse(linkMouseByConfig(keyvalue), PauseButton.ID);
+        } else {
+            linkBindButtonToMouseWheel(linkMouseByConfig(keyvalue), PauseButton.ID);
         }
 
         registerBindButton(ForwardsButton.ID, "Forwards", new ForwardsButton());
         keyvalue = inputConfig.getKeyForward();
         if (keyvalue < 256) {
             linkBindButtonToKey(keyvalue, ForwardsButton.ID);
-        } else {
+        } else if (keyvalue < 259) {
             linkBindButtonToMouse(linkMouseByConfig(keyvalue), ForwardsButton.ID);
+        } else {
+            linkBindButtonToMouseWheel(linkMouseByConfig(keyvalue), ForwardsButton.ID);
         }
 
         registerBindButton(BackwardsButton.ID, "Backwards", new BackwardsButton());
         keyvalue = inputConfig.getKeyBackward();
         if (keyvalue < 256) {
             linkBindButtonToKey(keyvalue, BackwardsButton.ID);
-        } else {
+        } else if (keyvalue < 259) {
             linkBindButtonToMouse(linkMouseByConfig(keyvalue), BackwardsButton.ID);
+        } else {
+            linkBindButtonToMouseWheel(linkMouseByConfig(keyvalue), BackwardsButton.ID);
         }
 
         registerBindAxis(ForwardsMovementAxis.ID, new ForwardsMovementAxis(), ForwardsButton.ID, BackwardsButton.ID).setSendEventMode(BindableAxisImpl.SendEventMode.WHEN_CHANGED);
@@ -331,16 +339,20 @@ public class InputSystem implements EventHandlerSystem {
         keyvalue = inputConfig.getKeyLeft();
         if (keyvalue < 256) {
             linkBindButtonToKey(keyvalue, LeftStrafeButton.ID);
-        } else {
+        } else if (keyvalue < 259) {
             linkBindButtonToMouse(linkMouseByConfig(keyvalue), LeftStrafeButton.ID);
+        } else {
+            linkBindButtonToMouseWheel(linkMouseByConfig(keyvalue), LeftStrafeButton.ID);
         }
 
         registerBindButton(RightStrafeButton.ID, "Right", new RightStrafeButton());
         keyvalue = inputConfig.getKeyRight();
         if (keyvalue < 256) {
             linkBindButtonToKey(keyvalue, RightStrafeButton.ID);
-        } else {
+        } else if (keyvalue < 259) {
             linkBindButtonToMouse(linkMouseByConfig(keyvalue), RightStrafeButton.ID);
+        } else {
+            linkBindButtonToMouseWheel(linkMouseByConfig(keyvalue), RightStrafeButton.ID);
         }
 
         registerBindAxis(StrafeMovementAxis.ID, new StrafeMovementAxis(), LeftStrafeButton.ID, RightStrafeButton.ID).setSendEventMode(BindableAxisImpl.SendEventMode.WHEN_CHANGED);
@@ -349,16 +361,20 @@ public class InputSystem implements EventHandlerSystem {
         keyvalue = inputConfig.getKeyJump();
         if (keyvalue < 256) {
             linkBindButtonToKey(keyvalue, JumpButton.ID);
-        } else {
+        } else if (keyvalue < 259) {
             linkBindButtonToMouse(linkMouseByConfig(keyvalue), JumpButton.ID);
+        } else {
+            linkBindButtonToMouseWheel(linkMouseByConfig(keyvalue), JumpButton.ID);
         }
 
         registerBindButton(CrouchButton.ID, "Crouch", new CrouchButton());
         keyvalue = inputConfig.getKeyCrouch();
         if (keyvalue < 256) {
             linkBindButtonToKey(keyvalue, CrouchButton.ID);
-        } else {
+        } else if (keyvalue < 259) {
             linkBindButtonToMouse(linkMouseByConfig(keyvalue), CrouchButton.ID);
+        } else {
+            linkBindButtonToMouseWheel(linkMouseByConfig(keyvalue), CrouchButton.ID);
         }
 
         registerBindAxis(VerticalMovementAxis.ID, new VerticalMovementAxis(), JumpButton.ID, CrouchButton.ID).setSendEventMode(BindableAxisImpl.SendEventMode.WHEN_CHANGED);
@@ -367,8 +383,10 @@ public class InputSystem implements EventHandlerSystem {
         keyvalue = inputConfig.getKeyRun();
         if (keyvalue < 256) {
             linkBindButtonToKey(keyvalue, RunButton.ID);
-        } else {
+        } else if (keyvalue < 259) {
             linkBindButtonToMouse(linkMouseByConfig(keyvalue), RunButton.ID);
+        } else {
+            linkBindButtonToMouseWheel(linkMouseByConfig(keyvalue), RunButton.ID);
         }
         // linkBindButtonToKey(Keyboard.KEY_RSHIFT, RunButton.ID); // necessary?
 
@@ -376,24 +394,30 @@ public class InputSystem implements EventHandlerSystem {
         keyvalue = inputConfig.getKeyAttack();
         if (keyvalue < 256) {
             linkBindButtonToKey(keyvalue, AttackButton.ID);
-        } else {
+        } else if (keyvalue < 259) {
             linkBindButtonToMouse(linkMouseByConfig(keyvalue), AttackButton.ID);
+        } else {
+            linkBindButtonToMouseWheel(linkMouseByConfig(keyvalue), AttackButton.ID);
         }
 
         registerBindButton(UseItemButton.ID, "Use Held Item", new UseItemButton()).setRepeating(true);
         keyvalue = inputConfig.getKeyUsehelditem();
         if (keyvalue < 256) {
             linkBindButtonToKey(keyvalue, UseItemButton.ID);
-        } else {
+        } else if (keyvalue < 259) {
             linkBindButtonToMouse(linkMouseByConfig(keyvalue), UseItemButton.ID);
+        } else {
+            linkBindButtonToMouseWheel(linkMouseByConfig(keyvalue), UseItemButton.ID);
         }
 
         registerBindButton(FrobButton.ID, "Frob", new FrobButton());
         keyvalue = inputConfig.getKeyFrob();
         if (keyvalue < 256) {
             linkBindButtonToKey(keyvalue, FrobButton.ID);
-        } else {
+        } else if (keyvalue < 259) {
             linkBindButtonToMouse(linkMouseByConfig(keyvalue), FrobButton.ID);
+        } else {
+            linkBindButtonToMouseWheel(linkMouseByConfig(keyvalue), FrobButton.ID);
         }
 
         registerBindButton(ToolbarNextButton.ID, "Toolbar Next", new ToolbarNextButton()).setMode(BindableButtonImpl.ActivateMode.PRESS);
@@ -439,8 +463,10 @@ public class InputSystem implements EventHandlerSystem {
         keyvalue = inputConfig.getKeyMinionmode();
         if (keyvalue < 256) {
             linkBindButtonToKey(keyvalue, ToggleMinionModeButton.ID);
-        } else {
+        } else if (keyvalue < 259) {
             linkBindButtonToMouse(linkMouseByConfig(keyvalue), ToggleMinionModeButton.ID);
+        } else {
+            linkBindButtonToMouseWheel(linkMouseByConfig(keyvalue), ToggleMinionModeButton.ID);
         }
     }
 
