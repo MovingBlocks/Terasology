@@ -24,8 +24,8 @@ import org.terasology.input.ButtonState;
  */
 public abstract class ButtonEvent extends InputEvent {
 
-    public ButtonEvent(float delta, EntityRef target) {
-        super(delta, target);
+    public ButtonEvent(float delta) {
+        super(delta);
     }
 
     public abstract ButtonState getState();

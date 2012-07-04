@@ -32,8 +32,8 @@ public class MouseAxisEvent extends AxisEvent {
     private MouseAxis mouseAxis;
 
 
-    public MouseAxisEvent(MouseAxis axis, float value, float delta, EntityRef target) {
-        super(delta, target);
+    public MouseAxisEvent(MouseAxis axis, float value, float delta) {
+        super(delta);
         this.mouseAxis = axis;
         this.value = value;
     }

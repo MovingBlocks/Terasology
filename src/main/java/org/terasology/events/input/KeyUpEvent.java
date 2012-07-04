@@ -5,15 +5,15 @@ import org.terasology.input.ButtonState;
 
 public class KeyUpEvent extends KeyEvent {
 
-    private static KeyUpEvent event = new KeyUpEvent(0, 0, EntityRef.NULL);
+    private static KeyUpEvent event = new KeyUpEvent(0, 0);
 
-    public static KeyUpEvent create(int key, float delta, EntityRef target) {
-        event.reset(delta, target);
+    public static KeyUpEvent create(int key, float delta) {
+        event.reset(delta);
         event.setKey(key);
         return event;
     }
 
-    private KeyUpEvent(int key, float delta, EntityRef target) {
-        super(key, ButtonState.UP, delta, target);
+    private KeyUpEvent(int key, float delta) {
+        super(key, ButtonState.UP, delta);
     }
 }

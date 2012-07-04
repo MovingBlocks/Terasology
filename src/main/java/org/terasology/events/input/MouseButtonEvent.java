@@ -10,8 +10,8 @@ public class MouseButtonEvent extends ButtonEvent {
     private int button = 0;
     private ButtonState state;
 
-    public MouseButtonEvent(int button, ButtonState state, float delta, EntityRef target) {
-        super(delta, target);
+    public MouseButtonEvent(int button, ButtonState state, float delta) {
+        super(delta);
         this.state = state;
         this.button = button;
     }

@@ -55,7 +55,7 @@ public class ItemSystem implements EventHandlerSystem {
     public void onPlaceBlock(ActivateEvent event, EntityRef item) {
         BlockItemComponent blockItem = item.getComponent(BlockItemComponent.class);
 
-        Side surfaceDir = Side.inDirection(event.getNormal());
+        Side surfaceDir = Side.inDirection(event.getHitNormal());
 
         Vector3f attachDir = surfaceDir.reverse().getVector3i().toVector3f();
         Vector3f rawDirection = new Vector3f(event.getDirection());

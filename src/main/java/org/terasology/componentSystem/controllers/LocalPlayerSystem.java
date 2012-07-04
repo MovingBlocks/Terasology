@@ -18,22 +18,17 @@ import org.terasology.events.input.binds.*;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.input.ButtonState;
+import org.terasology.input.CameraTargetSystem;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
-import org.terasology.logic.world.BlockEntityRegistry;
 import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.TeraMath;
-import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.structures.RayBlockIntersection;
 import org.terasology.rendering.cameras.DefaultCamera;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -43,6 +38,7 @@ import java.util.List;
 // TODO: Camera should become an entity/component, so it can follow the player naturally
 public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, EventHandlerSystem {
     private LocalPlayer localPlayer;
+    private CameraTargetSystem cameraTargetSystem;
     private Timer timer;
 
     private WorldProvider worldProvider;
@@ -62,6 +58,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         worldProvider = CoreRegistry.get(WorldProvider.class);
         localPlayer = CoreRegistry.get(LocalPlayer.class);
         timer = CoreRegistry.get(Timer.class);
+        cameraTargetSystem = CoreRegistry.get(CameraTargetSystem.class);
     }
 
     @Override
@@ -166,11 +163,12 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         // TODO: Don't render if not in first person?
         // Display the block the player is aiming at
         if (Config.getInstance().isPlacingBox()) {
-            RayBlockIntersection.Intersection selectedBlock = calcSelectedBlock();
-            if (selectedBlock != null) {
-                Block block = worldProvider.getBlock(selectedBlock.getBlockPosition());
+            EntityRef target = cameraTargetSystem.getTarget();
+            BlockComponent blockComp = target.getComponent(BlockComponent.class);
+            if (blockComp != null) {
+                Block block = worldProvider.getBlock(blockComp.getPosition());
                 if (block.isRenderBoundingBox()) {
-                    block.getBounds(selectedBlock.getBlockPosition()).render(2f);
+                    block.getBounds(blockComp.getPosition()).render(2f);
                 }
             }
         }
@@ -341,7 +339,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
         ItemComponent item = selectedItemEntity.getComponent(ItemComponent.class);
         if (item != null && item.usage != ItemComponent.UsageType.NONE) {
-            useItem(entity, selectedItemEntity);
+            useItem(event.getTarget(), entity, selectedItemEntity, event.getHitPosition(), event.getHitNormal());
         } else {
             attack(event.getTarget(), entity, selectedItemEntity);
         }
@@ -352,67 +350,12 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         event.consume();
     }
 
-    private void useItem(EntityRef player, EntityRef item) {
-        // TODO: Raytrace against entities too
-        // TODO: Or should more information be included with events (surface normal?)
-        // TODO: Do we even need the surface normal?
-        RayBlockIntersection.Intersection blockIntersection = calcSelectedBlock();
-        if (blockIntersection != null) {
-            Vector3i centerPos = blockIntersection.getBlockPosition();
-
-            item.send(new ActivateEvent(CoreRegistry.get(BlockEntityRegistry.class).getOrCreateEntityAt(centerPos), player, new Vector3f(playerCamera.getPosition()), new Vector3f(playerCamera.getViewingDirection()), blockIntersection.getSurfaceNormal()));
+    private void useItem(EntityRef target, EntityRef player, EntityRef item, Vector3f hitPosition, Vector3f hitNormal) {
+        if (target.exists()) {
+            item.send(new ActivateEvent(target, player, new Vector3f(playerCamera.getPosition()), new Vector3f(playerCamera.getViewingDirection()), hitPosition, hitNormal));
         } else {
             item.send(new ActivateEvent(player, new Vector3f(playerCamera.getPosition()), new Vector3f(playerCamera.getViewingDirection())));
         }
-    }
-
-    /**
-     * Calculates the currently targeted block in front of the player.
-     *
-     * @return Intersection point of the targeted block
-     */
-    private RayBlockIntersection.Intersection calcSelectedBlock() {
-        // TODO: Proper and centralised ray tracing support though world
-        List<RayBlockIntersection.Intersection> inters = new ArrayList<RayBlockIntersection.Intersection>();
-
-        Vector3f pos = new Vector3f(playerCamera.getPosition());
-
-        int blockPosX, blockPosY, blockPosZ;
-
-        for (int x = -3; x <= 3; x++) {
-            for (int y = -3; y <= 3; y++) {
-                for (int z = -3; z <= 3; z++) {
-                    // Make sure the correct block positions are calculated relatively to the position of the player
-                    blockPosX = (int) (pos.x + (pos.x >= 0 ? 0.5f : -0.5f)) + x;
-                    blockPosY = (int) (pos.y + (pos.y >= 0 ? 0.5f : -0.5f)) + y;
-                    blockPosZ = (int) (pos.z + (pos.z >= 0 ? 0.5f : -0.5f)) + z;
-
-                    Block block = worldProvider.getBlock(blockPosX, blockPosY, blockPosZ);
-
-                    // Ignore special blocks
-                    if (block.isSelectionRayThrough()) {
-                        continue;
-                    }
-
-                    // The ray originates from the "player's eye"
-                    List<RayBlockIntersection.Intersection> iss = RayBlockIntersection.executeIntersection(worldProvider, blockPosX, blockPosY, blockPosZ, playerCamera.getPosition(), playerCamera.getViewingDirection());
-
-                    if (iss != null) {
-                        inters.addAll(iss);
-                    }
-                }
-            }
-        }
-
-        /**
-         * Calculated the closest intersection.
-         */
-        if (inters.size() > 0) {
-            Collections.sort(inters);
-            return inters.get(0);
-        }
-
-        return null;
     }
 
     private double calcBobbingOffset(float phaseOffset, float amplitude, float frequency) {

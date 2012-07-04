@@ -1,5 +1,6 @@
 package org.terasology.math;
 
+import javax.vecmath.Tuple3i;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 import java.io.Serializable;
@@ -138,7 +139,7 @@ public class Vector3i extends javax.vecmath.Tuple3i implements Serializable {
      *
      * @param other The Vector3i to copy
      */
-    public Vector3i(Vector3i other) {
+    public Vector3i(Tuple3i other) {
         this.x = other.x;
         this.y = other.y;
         this.z = other.z;

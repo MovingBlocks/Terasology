@@ -23,7 +23,7 @@ import org.terasology.entitySystem.EntityRef;
  */
 public class MouseYAxisEvent extends MouseAxisEvent {
 
-    public MouseYAxisEvent(float value, float delta, EntityRef target) {
-        super(MouseAxis.Y, value, delta, target);
+    public MouseYAxisEvent(float value, float delta) {
+        super(MouseAxis.Y, value, delta);
     }
 }

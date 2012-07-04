@@ -6,6 +6,7 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.manager.GUIManager;
 
+import javax.vecmath.Vector3f;
 import java.util.List;
 
 /**
@@ -124,7 +125,7 @@ public class BindableButtonImpl implements BindableButton {
      * @param guiOnly     Is the gui consuming input
      * @return Whether the button's event has been consumed
      */
-    boolean updateBindState(boolean pressed, float delta, EntityRef target, EntityRef localPlayer, boolean keyConsumed, boolean guiOnly) {
+    boolean updateBindState(boolean pressed, float delta, EntityRef localPlayer, EntityRef target, Vector3f hitPosition, Vector3f hitNormal, boolean keyConsumed, boolean guiOnly) {
         if (pressed) {
             activeInputs++;
             if (activeInputs == 1 && mode.isActivatedOnPress()) {
@@ -137,7 +138,8 @@ public class BindableButtonImpl implements BindableButton {
                     keyConsumed = triggerOnPress(delta, target);
                 }
                 if (!keyConsumed) {
-                    buttonEvent.prepare(id, ButtonState.DOWN, delta, target);
+                    buttonEvent.prepare(id, ButtonState.DOWN, delta);
+                    buttonEvent.setTarget(target, hitPosition, hitNormal);
                     localPlayer.send(buttonEvent);
                     keyConsumed = buttonEvent.isConsumed();
                 }
@@ -153,7 +155,8 @@ public class BindableButtonImpl implements BindableButton {
                     keyConsumed = triggerOnRelease(delta, target);
                 }
                 if (!keyConsumed) {
-                    buttonEvent.prepare(id, ButtonState.UP, delta, target);
+                    buttonEvent.prepare(id, ButtonState.UP, delta);
+                    buttonEvent.setTarget(target, hitPosition, hitNormal);
                     localPlayer.send(buttonEvent);
                     keyConsumed = buttonEvent.isConsumed();
                 }
@@ -162,14 +165,15 @@ public class BindableButtonImpl implements BindableButton {
         return keyConsumed;
     }
 
-    void update(EntityRef localPlayer, float delta, EntityRef target) {
+    void update(EntityRef localPlayer, float delta, EntityRef target, Vector3f hitPosition, Vector3f hitNormal) {
         long time = timer.getTimeInMs();
         if (repeating && getState() == ButtonState.DOWN && mode.isActivatedOnPress() && time - lastActivateTime > repeatTime) {
             lastActivateTime = time;
             if (!GUIManager.getInstance().isConsumingInput()) {
                 boolean consumed = triggerOnRepeat(delta, target);
                 if (!consumed) {
-                    buttonEvent.prepare(id, ButtonState.REPEAT, delta, target);
+                    buttonEvent.prepare(id, ButtonState.REPEAT, delta);
+                    buttonEvent.setTarget(target, hitPosition, hitNormal);
                     localPlayer.send(buttonEvent);
                 }
             }

@@ -17,28 +17,36 @@
 package org.terasology.input;
 
 import com.google.common.base.Objects;
+import org.terasology.components.world.BlockComponent;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.BlockRaytracer;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.world.BlockEntityRegistry;
 import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.Vector3i;
-import org.terasology.model.structures.RayBlockIntersection;
 import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.physics.BulletPhysicsRenderer;
+import org.terasology.rendering.physics.HitResult;
 import org.terasology.rendering.world.WorldRenderer;
+
+import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius
  */
 public class CameraTargetSystem implements ComponentSystem {
 
+    // TODO: This should come from somewhere, probably player entity?
+    public static final float TARGET_DISTANCE = 5f;
+
     private WorldProvider worldProvider;
     private LocalPlayer localPlayer;
     private BlockEntityRegistry blockRegistry;
     private EntityRef target = EntityRef.NULL;
     private Vector3i targetBlockPos = null;
+    private Vector3f hitPosition = new Vector3f();
+    private Vector3f hitNormal = new Vector3f();
 
     public void initialise() {
         localPlayer = CoreRegistry.get(LocalPlayer.class);
@@ -50,8 +58,24 @@ public class CameraTargetSystem implements ComponentSystem {
     public void shutdown() {
     }
 
+    public boolean isTargetAvailable() {
+        return target.exists() || targetBlockPos != null;
+    }
+
     public EntityRef getTarget() {
+        if (targetBlockPos != null && !target.exists()) {
+            return blockRegistry.getOrCreateEntityAt(targetBlockPos);
+        }
         return target;
+    }
+
+    public Vector3f getHitPosition() {
+        return new Vector3f(hitPosition);
+    }
+
+    public Vector3f getHitNormal() {
+        return new Vector3f(hitNormal);
+
     }
 
     public void update() {
@@ -70,21 +94,31 @@ public class CameraTargetSystem implements ComponentSystem {
         Camera camera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
         // TODO: Check for non-block targets once we have support for that
 
-        RayBlockIntersection.Intersection hitInfo = BlockRaytracer.trace(camera.getPosition(), camera.getViewingDirection(), worldProvider);
-        Vector3i newBlockPos = (hitInfo != null) ? hitInfo.getBlockPosition() : null;
+        BulletPhysicsRenderer physicsRenderer = CoreRegistry.get(BulletPhysicsRenderer.class);
+        HitResult hitInfo = physicsRenderer.rayTrace(new Vector3f(camera.getPosition()), new Vector3f(camera.getViewingDirection()), TARGET_DISTANCE);
 
-        if (!Objects.equal(targetBlockPos, newBlockPos) || lostTarget) {
-            EntityRef oldTarget = target;
+        if (hitInfo.isHit()) {
+            hitPosition = hitInfo.getHitPoint();
+            hitNormal = hitInfo.getHitNormal();
 
-            target = EntityRef.NULL;
-            targetBlockPos = newBlockPos;
-            if (newBlockPos != null) {
-                target = blockRegistry.getOrCreateEntityAt(targetBlockPos);
+            Vector3i newBlockPos = null;
+            BlockComponent blockComp = hitInfo.getEntity().getComponent(BlockComponent.class);
+            if (blockComp != null) {
+                newBlockPos = new Vector3i(blockComp.getPosition());
             }
+            if (!Objects.equal(targetBlockPos, newBlockPos) || lostTarget) {
+                EntityRef oldTarget = target;
 
-            oldTarget.send(new CameraOutEvent());
-            target.send(new CameraOverEvent());
-            localPlayer.getEntity().send(new CameraTargetChangedEvent(oldTarget, target));
+                target = EntityRef.NULL;
+                targetBlockPos = newBlockPos;
+                if (newBlockPos != null) {
+                    target = hitInfo.getEntity();
+                }
+
+                oldTarget.send(new CameraOutEvent());
+                target.send(new CameraOverEvent());
+                localPlayer.getEntity().send(new CameraTargetChangedEvent(oldTarget, target));
+            }
         }
     }
 }

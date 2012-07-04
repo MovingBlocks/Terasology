@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.logic.manager.GUIManager;
 
+import javax.vecmath.Vector3f;
 import java.util.List;
 
 /**
@@ -76,7 +77,7 @@ public class BindableAxisImpl implements BindableAxis {
         return value;
     }
 
-    void update(EntityRef localPlayer, float delta, EntityRef target) {
+    void update(EntityRef localPlayer, float delta, EntityRef target, Vector3f hitPosition, Vector3f hitNormal) {
         boolean posInput = positiveInput.getState() == ButtonState.DOWN;
         boolean negInput = negativeInput.getState() == ButtonState.DOWN;
 
@@ -95,7 +96,8 @@ public class BindableAxisImpl implements BindableAxis {
         float newValue = targetValue;
 
         if (sendEventMode.shouldSendEvent(value, newValue)) {
-            event.prepare(id, newValue, delta, target);
+            event.prepare(id, newValue, delta);
+            event.setTarget(target, hitPosition, hitNormal);
             localPlayer.send(event);
             sendEventToSubscribers(delta, target);
         }

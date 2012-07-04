@@ -28,7 +28,7 @@ public class BindAxisEvent extends AxisEvent {
     private float value;
 
     public BindAxisEvent() {
-        super(0, EntityRef.NULL);
+        super(0);
     }
 
     @Override
@@ -36,8 +36,8 @@ public class BindAxisEvent extends AxisEvent {
         return value;
     }
 
-    void prepare(String id, float value, float delta, EntityRef target) {
-        reset(delta, target);
+    void prepare(String id, float value, float delta) {
+        reset(delta);
         this.id = id;
         this.value = value;
     }

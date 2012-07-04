@@ -28,11 +28,11 @@ public class BindButtonEvent extends ButtonEvent {
     private ButtonState state;
 
     public BindButtonEvent() {
-        super(0, EntityRef.NULL);
+        super(0);
     }
 
-    void prepare(String id, ButtonState state, float delta, EntityRef target) {
-        reset(delta, target);
+    void prepare(String id, ButtonState state, float delta) {
+        reset(delta);
         this.id = id;
         this.state = state;
     }

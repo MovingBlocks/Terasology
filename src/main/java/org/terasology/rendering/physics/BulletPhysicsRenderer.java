@@ -17,16 +17,18 @@ package org.terasology.rendering.physics;
 
 import com.bulletphysics.collision.broadphase.BroadphaseInterface;
 import com.bulletphysics.collision.broadphase.DbvtBroadphase;
-import com.bulletphysics.collision.dispatch.CollisionDispatcher;
-import com.bulletphysics.collision.dispatch.CollisionObject;
-import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
-import com.bulletphysics.collision.shapes.*;
+import com.bulletphysics.collision.dispatch.*;
+import com.bulletphysics.collision.shapes.BoxShape;
+import com.bulletphysics.collision.shapes.BvhTriangleMeshShape;
+import com.bulletphysics.collision.shapes.IndexedMesh;
+import com.bulletphysics.collision.shapes.TriangleIndexVertexArray;
+import com.bulletphysics.collision.shapes.voxel.VoxelPhysicsWorld;
+import com.bulletphysics.collision.shapes.voxel.VoxelWorldShape;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
 import com.bulletphysics.linearmath.DefaultMotionState;
-import com.bulletphysics.linearmath.MotionState;
 import com.bulletphysics.linearmath.Transform;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -43,25 +45,18 @@ import org.terasology.entitySystem.PrefabManager;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
-import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AudioManager;
+import org.terasology.logic.world.BlockEntityRegistry;
 import org.terasology.logic.world.Chunk;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
-import org.terasology.model.shapes.BlockShape;
-import org.terasology.physics.TeraCollisionConfiguration;
-import org.terasology.physics.TeraDynamicsWorld;
-import org.terasology.physics.WorldShape;
 import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 
-import javax.vecmath.Matrix3f;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
+import javax.vecmath.*;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -141,9 +136,10 @@ public class BulletPhysicsRenderer implements IGameObject {
 
     private final CollisionDispatcher _dispatcher;
     private final BroadphaseInterface _broadphase;
-    private final TeraCollisionConfiguration _defaultCollisionConfiguration;
+    private final CollisionConfiguration _defaultCollisionConfiguration;
     private final SequentialImpulseConstraintSolver _sequentialImpulseConstraintSolver;
     private final DiscreteDynamicsWorld _discreteDynamicsWorld;
+    private final BlockEntityRegistry blockEntityRegistry;
 
     private final BlockItemFactory _blockItemFactory;
 
@@ -153,44 +149,38 @@ public class BulletPhysicsRenderer implements IGameObject {
 
     public BulletPhysicsRenderer(WorldRenderer parent) {
         _broadphase = new DbvtBroadphase();
-        _defaultCollisionConfiguration = new TeraCollisionConfiguration();
+        _defaultCollisionConfiguration = new DefaultCollisionConfiguration();
         _dispatcher = new CollisionDispatcher(_defaultCollisionConfiguration);
         _sequentialImpulseConstraintSolver = new SequentialImpulseConstraintSolver();
-        _discreteDynamicsWorld = new TeraDynamicsWorld(_dispatcher, _broadphase, _sequentialImpulseConstraintSolver, _defaultCollisionConfiguration);
+        _discreteDynamicsWorld = new DiscreteDynamicsWorld(_dispatcher, _broadphase, _sequentialImpulseConstraintSolver, _defaultCollisionConfiguration);
         _discreteDynamicsWorld.setGravity(new Vector3f(0f, -10f, 0f));
         _parent = parent;
         _blockItemFactory = new BlockItemFactory(CoreRegistry.get(EntityManager.class), CoreRegistry.get(PrefabManager.class));
+        blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
         _timer = CoreRegistry.get(Timer.class);
 
-        WorldShape worldShape = new WorldShape(parent.getWorldProvider());
-        //worldShape.setMargin(0.1f);
-        //BoxShape worldShape = new BoxShape(new Vector3f(64f, 32f, 64f));
-        /*BoxShape box = new BoxShape(new Vector3f(0.5f, 0.5f, 0.5f));
-        CompoundShape worldShape = new CompoundShape();
-        for (int x = -64; x < 64; ++x) {
-            for (int z = -64; z < 64; z++) {
-                Matrix3f rot = new Matrix3f();
-                rot.setIdentity();
-                Vector3f pos = new Vector3f(x, 32.5f, z);
-                Transform transform = new Transform();
-                transform.set(new Matrix4f(rot, pos, 1.0f));
-                worldShape.addChildShape(transform, box);
-            }
-        }       */
-        Vector3f interia = new Vector3f();
-        worldShape.calculateLocalInertia(100000, interia);
+        PhysicsWorldWrapper wrapper = new PhysicsWorldWrapper(parent.getWorldProvider());
+        VoxelWorldShape worldShape = new VoxelWorldShape(wrapper);
+
         Matrix3f rot = new Matrix3f();
         rot.setIdentity();
         DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, new Vector3f(0, 0, 0), 1.0f)));
-        //CollisionObject collObject = new CollisionObject();
-        //collObject.setCollisionShape(worldShape);
-        RigidBodyConstructionInfo blockConsInf = new RigidBodyConstructionInfo(0, blockMotionState, worldShape, interia);
+        RigidBodyConstructionInfo blockConsInf = new RigidBodyConstructionInfo(0, blockMotionState, worldShape, new Vector3f());
         RigidBody rigidBody = new RigidBody(blockConsInf);
-        //rigidBody.setFriction(0.3f);
-        //rigidBody.setRestitution(0.1f);
         _discreteDynamicsWorld.addRigidBody(rigidBody);
-       // _discreteDynamicsWorld.addCollisionObject(collObject);
+    }
 
+    public HitResult rayTrace(Vector3f from, Vector3f direction, float distance) {
+        Vector3f to = new Vector3f(direction);
+        to.scale(distance);
+        to.add(from);
+
+        CollisionWorld.ClosestRayResultWithUserDataCallback closest = new CollisionWorld.ClosestRayResultWithUserDataCallback(from, to);
+        _discreteDynamicsWorld.rayTest(from, to, closest);
+        if (closest.userData instanceof Vector3i) {
+            return new HitResult(blockEntityRegistry.getOrCreateEntityAt((Vector3i)closest.userData), closest.hitPointWorld, closest.hitNormalWorld);
+        }
+        return new HitResult();
     }
 
     public BlockRigidBody[] addLootableBlocks(Vector3f position, Block block) {

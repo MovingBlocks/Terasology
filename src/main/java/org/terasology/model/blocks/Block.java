@@ -20,6 +20,7 @@ import org.newdawn.slick.util.ResourceLoader;
 import org.terasology.collection.EnumBooleanMap;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.Side;
+import org.terasology.math.Vector3i;
 import org.terasology.model.shapes.BlockMeshPart;
 import org.terasology.model.structures.AABB;
 import org.terasology.model.structures.BlockPosition;
@@ -579,7 +580,7 @@ public class Block implements IGameObject {
         return new OffsetAABBIterator(_colliders, x, y, z);
     }
 
-    public AABB getBounds(BlockPosition pos) {
+    public AABB getBounds(Vector3i pos) {
         return new AABB(new Vector3d(_bounds.getPosition().x + pos.x, _bounds.getPosition().y + pos.y, _bounds.getPosition().z + pos.z), _bounds.getDimensions());
     }
 

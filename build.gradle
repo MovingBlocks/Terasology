@@ -113,8 +113,10 @@ dependencies{
 	compile group: 'com.projectdarkstar.ext.jorbis', name: 'jorbis', version: '0.0.17'
 	compile group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: '2.8.3'
 	compile group: 'org.lwjgl.lwjgl', name: 'lwjgl_util', version: '2.8.3'
+	//compile group: 'org.terasology.bullet', name: 'tera-bullet', version : '1.0-SNAPSHOT'
 	compile group: 'io.netty', name: 'netty', version: '3.4.4.Final'
 	compile group: 'org.reflections', name: 'reflections', version: '0.9.7.RC1'
+	compile group: 'java3d', name: 'vecmath', version: '1.3.1'
 	compile fileTree(dir: 'libs', include: '*.jar')	
 	testCompile group: 'junit', name: 'junit', version: '4.10'
 	testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.0'
@@ -123,13 +125,6 @@ dependencies{
     perfTestCompile sourceSets.test.output
     perfTestRuntime configurations.testRuntime
 
-}
-
-classes.doLast {
-    ant.typedef(name: 'instrumentStack', classname: 'cz.advel.stack.instrument.InstrumentationTask', classpath: sourceSets.main.runtimeClasspath.asPath)
-	ant.instrumentStack(dest: sourceSets.main.output.classesDir, packageName: 'org.terasology.physics') {
-	    fileset(dir: sourceSets.main.output.classesDir)
-	}
 }
 
 jar {

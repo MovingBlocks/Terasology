@@ -9,8 +9,8 @@ public class KeyEvent extends ButtonEvent {
     private int key;
     private ButtonState state;
 
-    public KeyEvent(int key, ButtonState state, float delta, EntityRef target) {
-        super(delta, target);
+    public KeyEvent(int key, ButtonState state, float delta) {
+        super(delta);
         this.key = key;
         this.state = state;
     }

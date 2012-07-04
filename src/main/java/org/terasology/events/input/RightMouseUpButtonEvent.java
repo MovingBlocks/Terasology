@@ -5,15 +5,15 @@ import org.terasology.entitySystem.EntityRef;
 
 public class RightMouseUpButtonEvent extends MouseUpButtonEvent {
 
-    private static RightMouseUpButtonEvent event = new RightMouseUpButtonEvent(0, EntityRef.NULL);
+    private static RightMouseUpButtonEvent event = new RightMouseUpButtonEvent(0);
 
-    public static RightMouseUpButtonEvent create(float delta, EntityRef target) {
-        event.reset(delta, target);
+    public static RightMouseUpButtonEvent create(float delta) {
+        event.reset(delta);
         return event;
     }
 
-    private RightMouseUpButtonEvent(float delta, EntityRef target) {
-        super(1, delta, target);
+    private RightMouseUpButtonEvent(float delta) {
+        super(1, delta);
     }
 
 }

@@ -3,19 +3,37 @@ package org.terasology.events.input;
 import org.terasology.entitySystem.AbstractEvent;
 import org.terasology.entitySystem.EntityRef;
 
+import javax.vecmath.Vector3f;
+
 
 public abstract class InputEvent extends AbstractEvent {
-    private EntityRef target;
     private boolean consumed;
     private float delta;
 
-    public InputEvent(float delta, EntityRef target) {
-        this.target = target;
+    private EntityRef target = EntityRef.NULL;
+    private Vector3f hitPosition;
+    private Vector3f hitNormal;
+
+    public InputEvent(float delta) {
         this.delta = delta;
+    }
+
+    public void setTarget(EntityRef target, Vector3f hitPosition, Vector3f hitNormal) {
+        this.target = target;
+        this.hitPosition = hitPosition;
+        this.hitNormal = hitNormal;
     }
 
     public EntityRef getTarget() {
         return target;
+    }
+
+    public Vector3f getHitPosition() {
+        return hitPosition;
+    }
+
+    public Vector3f getHitNormal() {
+        return hitNormal;
     }
 
     public float getDelta() {
@@ -31,10 +49,10 @@ public abstract class InputEvent extends AbstractEvent {
         return consumed;
     }
 
-    protected void reset(float delta, EntityRef target) {
+    protected void reset(float delta) {
         consumed = false;
         cancelled = false;
         this.delta = delta;
-        this.target = target;
+        this.target = EntityRef.NULL;
     }
 }

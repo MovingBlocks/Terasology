@@ -1,18 +1,16 @@
 package org.terasology.events.input;
 
 
-import org.terasology.entitySystem.EntityRef;
-
 public class LeftMouseDownButtonEvent extends MouseDownButtonEvent {
 
-    private static LeftMouseDownButtonEvent event = new LeftMouseDownButtonEvent(0, EntityRef.NULL);
+    private static LeftMouseDownButtonEvent event = new LeftMouseDownButtonEvent(0);
 
-    public static LeftMouseDownButtonEvent create(float delta, EntityRef target) {
-        event.reset(delta, target);
+    public static LeftMouseDownButtonEvent create(float delta) {
+        event.reset(delta);
         return event;
     }
 
-    private LeftMouseDownButtonEvent(float delta, EntityRef target) {
-        super(0, delta, target);
+    private LeftMouseDownButtonEvent(float delta) {
+        super(0, delta);
     }
 }

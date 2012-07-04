@@ -132,7 +132,7 @@ public class InputSystem implements EventHandlerSystem {
 
                 BindableButtonImpl bind = mouseButtonBinds.get(button);
                 if (bind != null) {
-                    bind.updateBindState(buttonDown, delta, cameraTargetSystem.getTarget(), localPlayer.getEntity(), consumed, GUIManager.getInstance().isConsumingInput());
+                    bind.updateBindState(buttonDown, delta, localPlayer.getEntity(), cameraTargetSystem.getTarget(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, GUIManager.getInstance().isConsumingInput());
                 }
             } else if (Mouse.getEventDWheel() != 0) {
                 int wheelMoved = Mouse.getEventDWheel();
@@ -140,18 +140,28 @@ public class InputSystem implements EventHandlerSystem {
 
                 BindableButtonImpl bind = (wheelMoved > 0) ? mouseWheelUpBind : mouseWheelDownBind;
                 if (bind != null) {
-                    bind.updateBindState(true, delta, cameraTargetSystem.getTarget(), localPlayer.getEntity(), consumed, GUIManager.getInstance().isConsumingInput());
-                    bind.updateBindState(false, delta, cameraTargetSystem.getTarget(), localPlayer.getEntity(), consumed, GUIManager.getInstance().isConsumingInput());
+                    bind.updateBindState(true, delta, localPlayer.getEntity(), cameraTargetSystem.getTarget(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, GUIManager.getInstance().isConsumingInput());
+                    bind.updateBindState(false, delta, localPlayer.getEntity(), cameraTargetSystem.getTarget(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, GUIManager.getInstance().isConsumingInput());
                 }
             }
         }
         int deltaX = Mouse.getDX();
         if (deltaX != 0 && !GUIManager.getInstance().isConsumingInput()) {
-            localPlayer.getEntity().send(new MouseXAxisEvent(deltaX * mouseSensitivity, delta, cameraTargetSystem.getTarget()));
+            MouseAxisEvent event = new MouseXAxisEvent(deltaX * mouseSensitivity, delta);
+            setupTarget(event);
+            localPlayer.getEntity().send(event);
         }
         int deltaY = Mouse.getDY();
         if (deltaY != 0 && !GUIManager.getInstance().isConsumingInput()) {
-            localPlayer.getEntity().send(new MouseYAxisEvent(deltaY * mouseSensitivity, delta, cameraTargetSystem.getTarget()));
+            MouseAxisEvent event = new MouseYAxisEvent(deltaY * mouseSensitivity, delta);
+            setupTarget(event);
+            localPlayer.getEntity().send(event);
+        }
+    }
+
+    private void setupTarget(InputEvent event) {
+        if (cameraTargetSystem.isTargetAvailable()) {
+            event.setTarget(cameraTargetSystem.getTarget(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal());
         }
     }
 
@@ -182,7 +192,7 @@ public class InputSystem implements EventHandlerSystem {
             // Update bind
             BindableButtonImpl bind = keyBinds.get(key);
             if (bind != null && !Keyboard.isRepeatEvent()) {
-                bind.updateBindState(Keyboard.getEventKeyState(), delta, cameraTargetSystem.getTarget(), localPlayer.getEntity(), consumed, guiConsumingInput);
+                bind.updateBindState(Keyboard.getEventKeyState(), delta, localPlayer.getEntity(), cameraTargetSystem.getTarget(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, guiConsumingInput);
             }
         }
     }
@@ -199,13 +209,13 @@ public class InputSystem implements EventHandlerSystem {
 
     private void processBindAxis(float delta) {
         for (BindableAxisImpl axis : axisBinds) {
-            axis.update(localPlayer.getEntity(), delta, cameraTargetSystem.getTarget());
+            axis.update(localPlayer.getEntity(), delta, cameraTargetSystem.getTarget(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal());
         }
     }
 
     private void processBindRepeats(float delta) {
         for (BindableButtonImpl button : buttonBinds) {
-            button.update(localPlayer.getEntity(), delta, cameraTargetSystem.getTarget());
+            button.update(localPlayer.getEntity(), delta, cameraTargetSystem.getTarget(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal());
         }
     }
 
@@ -220,18 +230,18 @@ public class InputSystem implements EventHandlerSystem {
         KeyEvent event;
         switch (state) {
             case UP:
-                event = KeyUpEvent.create(key, delta, cameraTargetSystem.getTarget());
+                event = KeyUpEvent.create(key, delta);
                 break;
             case DOWN:
-                event = KeyDownEvent.create(key, delta, cameraTargetSystem.getTarget());
+                event = KeyDownEvent.create(key, delta);
                 break;
             case REPEAT:
-                event = KeyRepeatEvent.create(key, delta, cameraTargetSystem.getTarget());
+                event = KeyRepeatEvent.create(key, delta);
                 break;
             default:
                 return false;
         }
-
+        setupTarget(event);
         localPlayer.getEntity().send(event);
         return event.isConsumed();
     }
@@ -242,21 +252,23 @@ public class InputSystem implements EventHandlerSystem {
             case -1:
                 return false;
             case 0:
-                event = (buttonDown) ? LeftMouseDownButtonEvent.create(delta, cameraTargetSystem.getTarget()) : LeftMouseUpButtonEvent.create(delta, cameraTargetSystem.getTarget());
+                event = (buttonDown) ? LeftMouseDownButtonEvent.create(delta) : LeftMouseUpButtonEvent.create(delta);
                 break;
             case 1:
-                event = (buttonDown) ? RightMouseDownButtonEvent.create(delta, cameraTargetSystem.getTarget()) : RightMouseUpButtonEvent.create(delta, cameraTargetSystem.getTarget());
+                event = (buttonDown) ? RightMouseDownButtonEvent.create(delta) : RightMouseUpButtonEvent.create(delta);
                 break;
             default:
-                event = (buttonDown) ? MouseDownButtonEvent.create(button, delta, cameraTargetSystem.getTarget()) : MouseUpButtonEvent.create(button, delta, cameraTargetSystem.getTarget());
+                event = (buttonDown) ? MouseDownButtonEvent.create(button, delta) : MouseUpButtonEvent.create(button, delta);
                 break;
         }
+        setupTarget(event);
         localPlayer.getEntity().send(event);
         return event.isConsumed();
     }
 
     private boolean sendMouseWheelEvent(int wheelTurns, float delta) {
-        MouseWheelEvent mouseWheelEvent = new MouseWheelEvent(wheelTurns, delta, cameraTargetSystem.getTarget());
+        MouseWheelEvent mouseWheelEvent = new MouseWheelEvent(wheelTurns, delta);
+        setupTarget(mouseWheelEvent);
         localPlayer.getEntity().send(mouseWheelEvent);
         return mouseWheelEvent.isConsumed();
     }

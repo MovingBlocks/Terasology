@@ -23,8 +23,8 @@ import org.terasology.entitySystem.EntityRef;
  */
 public abstract class AxisEvent extends InputEvent {
 
-    public AxisEvent(float delta, EntityRef target) {
-        super(delta, target);
+    public AxisEvent(float delta) {
+        super(delta);
     }
 
     public abstract float getValue();
