@@ -19,6 +19,7 @@
 varying vec3 normal;
 varying vec4 vertexWorldPosRaw;
 varying vec4 vertexWorldPos;
+varying vec4 vertexPos;
 varying vec3 eyeVec;
 varying vec3 lightDir;
 
@@ -73,6 +74,8 @@ void main()
         }
     }
 
+// Currently disabled
+#if 0
     if (gl_TexCoord[0].x >= waterCoordinate.x && gl_TexCoord[0].x < waterCoordinate.x + TEXTURE_OFFSET && gl_TexCoord[0].y >= waterCoordinate.y && gl_TexCoord[0].y < waterCoordinate.y + TEXTURE_OFFSET) {
         vertexWorldPos.y += (smoothTriangleWave(timeToTick(time, 0.25) + vertexChunkPos.x * 0.01 + vertexChunkPos.z * 0.01) * 2.0 - 1.0) * 0.05 * blockScale
         + (smoothTriangleWave(timeToTick(time, 0.025)  + vertexChunkPos.x * 0.1 + vertexChunkPos.z * -0.05 + 0.2372891) * 2.0 - 1.0) * 0.05 * blockScale;
@@ -81,5 +84,8 @@ void main()
     }
 #endif
 
-    gl_Position = gl_ProjectionMatrix * vertexWorldPos;
+#endif
+
+    vertexPos = gl_ProjectionMatrix * vertexWorldPos;
+    gl_Position = vertexPos;
 }

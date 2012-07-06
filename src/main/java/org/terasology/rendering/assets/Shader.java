@@ -207,6 +207,8 @@ public class Shader implements Asset {
         StringBuilder builder = new StringBuilder().append(PreProcessorPreamble);
         if (Config.getInstance().isAnimatedWaterAndGrass())
             builder.append("#define ANIMATED_WATER_AND_GRASS \n");
+        if (Config.getInstance().isComplexWater())
+            builder.append("#define COMPLEX_WATER \n");
         if (Config.getInstance().isFlickeringLight())
             builder.append("#define FLICKERING_LIGHT \n");
         builder.append("#define GAMMA ");
