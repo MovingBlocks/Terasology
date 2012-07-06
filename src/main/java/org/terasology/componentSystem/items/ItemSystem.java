@@ -149,10 +149,9 @@ public class ItemSystem implements EventHandlerSystem {
                 LocationComponent location = player.getComponent(LocationComponent.class);
                 AABBCollisionComponent collision = player.getComponent(AABBCollisionComponent.class);
                 Vector3f worldPos = location.getWorldPosition();
-                for (AABB blockAABB : block.getColliders(blockPos.x, blockPos.y, blockPos.z)) {
-                    if (blockAABB.overlaps(new AABB(worldPos, collision.getExtents()))) {
-                        return false;
-                    }
+                AABB blockAABB = block.getBounds(blockPos);
+                if (blockAABB.overlaps(new AABB(worldPos, collision.getExtents()))) {
+                    return false;
                 }
             }
         }

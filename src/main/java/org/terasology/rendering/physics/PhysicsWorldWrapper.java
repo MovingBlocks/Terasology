@@ -31,7 +31,6 @@ import javax.vecmath.Vector3f;
  */
 public class PhysicsWorldWrapper implements VoxelPhysicsWorld {
 
-    private BoxShape defaultShape = new BoxShape(new Vector3f(0.5f, 0.5f, 0.5f));
     private WorldProvider world;
 
     public PhysicsWorldWrapper(WorldProvider world) {
@@ -41,7 +40,7 @@ public class PhysicsWorldWrapper implements VoxelPhysicsWorld {
     @Override
     public VoxelInfo getCollisionShapeAt(int x, int y, int z) {
         Block block = world.getBlock(x, y, z);
-        return new TeraVoxelInfo(defaultShape, !block.isSelectionRayThrough(), !block.isPenetrable(), new Vector3i(x, y, z));
+        return new TeraVoxelInfo(block, !block.isSelectionRayThrough(), !block.isPenetrable(), new Vector3i(x, y, z));
     }
 
     private static class TeraVoxelInfo implements VoxelInfo {
@@ -50,11 +49,13 @@ public class PhysicsWorldWrapper implements VoxelPhysicsWorld {
         private boolean blocking;
         private CollisionShape shape;
         private Vector3i position;
+        private Vector3f offset;
 
-        public TeraVoxelInfo(CollisionShape shape, boolean colliding, boolean blocking, Vector3i position) {
+        public TeraVoxelInfo(Block block, boolean colliding, boolean blocking, Vector3i position) {
+            this.shape = block.getCollisionShape();
+            this.offset = block.getCollisionOffset();
             this.colliding = shape != null && colliding;
             this.blocking = shape != null && blocking;
-            this.shape = shape;
             this.position = position;
         }
 
@@ -71,6 +72,11 @@ public class PhysicsWorldWrapper implements VoxelPhysicsWorld {
         @Override
         public CollisionShape getCollisionShape() {
             return shape;
+        }
+
+        @Override
+        public Vector3f getCollisionOffset() {
+            return offset;
         }
 
         @Override

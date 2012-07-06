@@ -732,9 +732,8 @@ public final class WorldRenderer implements IGameObject {
         for (int i = 0; i < blocks.size(); i++) {
             BlockPosition p = blocks.get(i);
             Block block = getWorldProvider().getBlock(new Vector3f(p.x, p.y, p.z));
-            for (AABB blockAABB : block.getColliders(p.x, p.y, p.z)) {
-                blockAABB.render(1f);
-            }
+
+            block.getBounds(new Vector3i(p.x, p.y, p.z, 0.5f)).render(1f);
         }
     }
 

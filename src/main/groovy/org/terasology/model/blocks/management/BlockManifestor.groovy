@@ -36,7 +36,7 @@ import org.terasology.logic.manager.AssetManager
 import org.terasology.asset.AssetUri
 import org.terasology.asset.AssetType
 import org.terasology.rendering.assets.Texture
-import org.terasology.asset.loaders.PNGTextureLoader
+
 import org.newdawn.slick.opengl.PNGDecoder
 import java.nio.ByteBuffer
 
@@ -313,7 +313,7 @@ class BlockManifestor {
     }
     
     private void applyBlockShape(Block b, BlockShape shape, FacesInfo faces) {
-        applyBlockShape(b, shape, faces, Rotation.None)
+        applyBlockShape(b, shape, faces, Rotation.NONE)
     }
 
     private void applyBlockShape(Block b, BlockShape shape, FacesInfo faces, Rotation rotation) {
@@ -329,13 +329,8 @@ class BlockManifestor {
             b.withFullSide(targetSide, shape.isBlockingSide(side));
             b.withTextureAtlasPos(targetSide, faces.sides.get(side))
         }
-        
-        List<AABB> colliders = []
-        for (AABB col : shape.colliders) {
-            colliders.add(rotation.rotate(col));
-        }
-        b.setColliders(colliders);
-        
+
+        b.setCollision(shape.getCollisionOffset(rotation), shape.getCollisionShape(rotation))
     }
 
     private Vector2f calcTextureOffsetFor(Vector2f face) {

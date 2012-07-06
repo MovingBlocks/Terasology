@@ -295,7 +295,7 @@ public class BulletPhysicsRenderer implements IGameObject, EventReceiver<BlockCh
             _logger.log(Level.WARNING, "Somehow Bullet Physics managed to throw an exception again.", e);
         }
         removeTemporaryBlocks();
-        checkForLootedBlocks();
+        //checkForLootedBlocks();
     }
 
     private synchronized void addQueuedBodies() {

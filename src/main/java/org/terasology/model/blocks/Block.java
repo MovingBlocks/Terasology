@@ -15,6 +15,8 @@
  */
 package org.terasology.model.blocks;
 
+import com.bulletphysics.collision.shapes.CollisionShape;
+import com.bulletphysics.linearmath.Transform;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.util.ResourceLoader;
 import org.terasology.collection.EnumBooleanMap;
@@ -30,9 +32,7 @@ import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.shader.ShaderProgram;
 
 import javax.imageio.ImageIO;
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector4f;
+import javax.vecmath.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -147,7 +147,8 @@ public class Block implements IGameObject {
 
     /* COLLISION */
 
-    private List<AABB> _colliders = new ArrayList<AABB>();
+    private CollisionShape collisionShape;
+    private Vector3f collisionOffset;
     public AABB _bounds = new AABB(new Vector3d(), new Vector3d());
 
     /**
@@ -459,10 +460,21 @@ public class Block implements IGameObject {
         return this;
     }
 
-    public void setColliders(List<AABB> colliders) {
-        _colliders = new ArrayList<AABB>(colliders);
+    public void setCollision(Vector3f offset, CollisionShape shape) {
+        collisionShape = shape;
+        collisionOffset = offset;
+        Transform t = new Transform(new Matrix4f(new Quat4f(0,0,0,1), offset, 1.0f));
+        Vector3f min = new Vector3f();
+        Vector3f max = new Vector3f();
+        shape.getAabb(t, min, max);
+        Vector3f center = new Vector3f();
+        center.add(min, max);
+        center.scale(0.5f);
+        Vector3f dim = new Vector3f();
+        dim.sub(max, min);
+        dim.scale(0.5f);
 
-        _bounds = new AABB(colliders);
+        _bounds = new AABB(center, dim);
     }
 
     public COLOR_SOURCE getColorSource() {
@@ -589,54 +601,21 @@ public class Block implements IGameObject {
         return _entityPrefab;
     }
 
-    /**
-     * @param x x offset
-     * @param y y offset
-     * @param z z offset
-     * @return An iterator over the colliders for this block, offset by the given values
-     */
-    public Iterable<AABB> getColliders(int x, int y, int z) {
-        return new OffsetAABBIterator(_colliders, x, y, z);
+    public CollisionShape getCollisionShape() {
+        return collisionShape;
+    }
+
+    public Vector3f getCollisionOffset() {
+        return collisionOffset;
     }
 
     public AABB getBounds(Vector3i pos) {
         return new AABB(new Vector3d(_bounds.getPosition().x + pos.x, _bounds.getPosition().y + pos.y, _bounds.getPosition().z + pos.z), _bounds.getDimensions());
     }
 
-    private class OffsetAABBIterator implements Iterable<AABB>, Iterator<AABB> {
-        Iterator<AABB> _source;
-        int _x;
-        int _y;
-        int _z;
-
-        public OffsetAABBIterator(Iterable<AABB> source, int x, int y, int z) {
-            _source = source.iterator();
-            _x = x;
-            _y = y;
-            _z = z;
-        }
-
-        @Override
-        public Iterator<AABB> iterator() {
-            return this;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return _source.hasNext();
-        }
-
-        @Override
-        public AABB next() {
-            AABB base = _source.next();
-            return new AABB(new Vector3d(base.getPosition().x + _x, base.getPosition().y + _y, base.getPosition().z + _z),
-                    base.getDimensions());
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
+    public AABB getBounds(Vector3f floatPos) {
+        Vector3i pos = new Vector3i(floatPos, 0.5f);
+        return new AABB(new Vector3d(_bounds.getPosition().x + pos.x, _bounds.getPosition().y + pos.y, _bounds.getPosition().z + pos.z), _bounds.getDimensions());
     }
 
     /**

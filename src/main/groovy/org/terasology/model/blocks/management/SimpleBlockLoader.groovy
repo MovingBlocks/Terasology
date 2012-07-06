@@ -21,7 +21,7 @@ public class SimpleBlockLoader implements BlockLoader {
     }
 
     public Block loadBlock(ConfigObject blockConfig) {
-        return loadBlock(blockConfig, Rotation.None);
+        return loadBlock(blockConfig, Rotation.NONE);
     }
     
     public Block loadBlock(ConfigObject blockConfig, Rotation rotation) {

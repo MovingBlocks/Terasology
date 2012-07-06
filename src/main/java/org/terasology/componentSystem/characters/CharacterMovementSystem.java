@@ -91,13 +91,12 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
             Block block = worldProvider.getBlock(p);
 
             if (block.isLiquid()) {
-                for (AABB blockAABB : block.getColliders(p.x, p.y, p.z)) {
-                    if (blockAABB.contains(top)) {
-                        topUnderwater = true;
-                    }
-                    if (blockAABB.contains(bottom)) {
-                        bottomUnderwater = true;
-                    }
+                AABB blockAABB = block.getBounds(p);
+                if (blockAABB.contains(top)) {
+                    topUnderwater = true;
+                }
+                if (blockAABB.contains(bottom)) {
+                    bottomUnderwater = true;
                 }
             }
         }
@@ -329,10 +328,8 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
 
             if (block == null || block.isPenetrable())
                 continue;
-            for (AABB blockAABB : block.getColliders(p.x, p.y, p.z)) {
-                if (!entityAABB.overlaps(blockAABB))
-                    continue;
-
+            AABB blockAABB = block.getBounds(p);
+            if (entityAABB.overlaps(blockAABB)) {
                 double direction = origin.y - position.y;
 
                 if (direction >= 0) {
@@ -362,36 +359,35 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
             Block block = worldProvider.getBlock(p);
 
             if (!block.isPenetrable()) {
-                for (AABB blockAABB : block.getColliders(p.x, p.y, p.z)) {
-                    if (calcAABB(position, extents).overlaps(blockAABB)) {
-                        result = true;
-                        Vector3d direction = new Vector3d(position.x, 0f, position.z);
-                        direction.x -= origin.x;
-                        direction.z -= origin.z;
+                AABB blockAABB = block.getBounds(p);
+                if (calcAABB(position, extents).overlaps(blockAABB)) {
+                    result = true;
+                    Vector3d direction = new Vector3d(position.x, 0f, position.z);
+                    direction.x -= origin.x;
+                    direction.z -= origin.z;
 
-                        // Calculate the point of intersection on the block's AABB
-                        Vector3d blockPoi = blockAABB.closestPointOnAABBToPoint(new Vector3d(origin));
-                        Vector3d entityPoi = calcAABB(origin, extents).closestPointOnAABBToPoint(blockPoi);
+                    // Calculate the point of intersection on the block's AABB
+                    Vector3d blockPoi = blockAABB.closestPointOnAABBToPoint(new Vector3d(origin));
+                    Vector3d entityPoi = calcAABB(origin, extents).closestPointOnAABBToPoint(blockPoi);
 
-                        Vector3d planeNormal = blockAABB.getFirstHitPlane(direction, new Vector3d(origin), new Vector3d(extents), true, false, true);
+                    Vector3d planeNormal = blockAABB.getFirstHitPlane(direction, new Vector3d(origin), new Vector3d(extents), true, false, true);
 
-                        // Find a vector parallel to the surface normal
-                        Vector3d slideVector = new Vector3d(planeNormal.z, 0, -planeNormal.x);
-                        Vector3d pushBack = new Vector3d();
+                    // Find a vector parallel to the surface normal
+                    Vector3d slideVector = new Vector3d(planeNormal.z, 0, -planeNormal.x);
+                    Vector3d pushBack = new Vector3d();
 
-                        pushBack.sub(blockPoi, entityPoi);
+                    pushBack.sub(blockPoi, entityPoi);
 
-                        // Calculate the intensity of the diversion alongside the block
-                        double length = slideVector.dot(direction);
+                    // Calculate the intensity of the diversion alongside the block
+                    double length = slideVector.dot(direction);
 
-                        Vector3d newPosition = new Vector3d();
-                        newPosition.z = origin.z + pushBack.z * 0.2 + length * slideVector.z;
-                        newPosition.x = origin.x + pushBack.x * 0.2 + length * slideVector.x;
-                        newPosition.y = origin.y;
+                    Vector3d newPosition = new Vector3d();
+                    newPosition.z = origin.z + pushBack.z * 0.2 + length * slideVector.z;
+                    newPosition.x = origin.x + pushBack.x * 0.2 + length * slideVector.x;
+                    newPosition.y = origin.y;
 
-                        // Update the position
-                        position.set(newPosition);
-                    }
+                    // Update the position
+                    position.set(newPosition);
                 }
             }
         }

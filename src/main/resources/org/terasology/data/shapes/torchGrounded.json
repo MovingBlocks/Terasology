@@ -23,10 +23,13 @@
 		],
 		"fullSide" : false
 	},
-	"colliders" : [
-		{
-			"position" : [0.000000, -0.218750, -0.000000],
-			"extents" : [0.070313, 0.281250, 0.070313]
-		}
-	]
+	"collision" : {
+        "colliders" : [
+            {
+                "position" : [0.000000, -0.218750, -0.000000],
+                "extents" : [0.070313, 0.281250, 0.070313]
+            }
+        ],
+        "symmetric" : true
+	}
 }
