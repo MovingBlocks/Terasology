@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 varying	vec4 	McPosition;
 varying	vec3 	colorYxy;
 varying vec3    skyVec;
+varying vec3    skyVecR;
 varying float   lv;
 uniform	vec4 	sunPos;
 uniform float	sunAngle;
@@ -24,8 +25,6 @@ uniform	float	turbidity;
 uniform vec3    zenith;
 
 vec4 eyePos = vec4(0.0, 0.0, 0.0, 1.0);
-
-#define	EPS	0.1
 
 vec3	allweather ( float t, float cosTheta, float cosGamma )
 {
@@ -70,7 +69,8 @@ void main(void)
     vec3 v          = normalize ( (gl_Vertex-eyePos).xyz );    
     vec3 l          = normalize ( sunPos.xyz );
     lv              = dot  ( l, v );
-    skyVec          = r * v.xyz;
+    skyVecR         = r * v.xyz;
+    skyVec          = v.xyz;
     colorYxy        = allweatherSky ( turbidity, abs(v.y)+0.35, lv, l.y );
     McPosition      = gl_Vertex;
     gl_Position     = ftransform();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,11 @@ import com.bulletphysics.collision.shapes.ScalarType;
 import gnu.trove.iterator.TFloatIterator;
 import gnu.trove.iterator.TIntIterator;
 import org.lwjgl.BufferUtils;
-import org.terasology.logic.world.Chunk;
+import org.terasology.logic.world.MiniatureChunk;
 import org.terasology.logic.world.WorldBiomeProvider;
 import org.terasology.logic.world.WorldView;
+import org.terasology.logic.world.chunks.Chunk;
+import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
@@ -77,6 +79,34 @@ public final class ChunkTessellator {
         return mesh;
     }
 
+    public ChunkMesh generateMinaturizedMesh(MiniatureChunk miniatureChunk) {
+        PerformanceMonitor.startActivity("GenerateMinuatureMesh");
+        ChunkMesh mesh = new ChunkMesh();
+
+        MiniatureChunk[] chunks = { miniatureChunk };
+        WorldView localWorldView = new WorldView(chunks, Region3i.createFromCenterExtents(Vector3i.zero(), Vector3i.zero()), Vector3i.zero());
+        localWorldView.setChunkSize(new Vector3i(MiniatureChunk.CHUNK_SIZE));
+
+        for (int x = 0; x < MiniatureChunk.SIZE_X; x++) {
+            for (int z = 0; z < MiniatureChunk.SIZE_Z; z++) {
+                for (int y = 0; y < MiniatureChunk.SIZE_Y; y++) {
+                    Block block = miniatureChunk.getBlock(x,y,z);
+
+                    if (block == null || block.isInvisible())
+                        continue;
+
+                    generateBlockVertices(localWorldView, mesh, x, y, z, 0.0f, 0.0f);
+                }
+            }
+        }
+
+        generateOptimizedBuffers(localWorldView, mesh);
+        _statVertexArrayUpdateCount++;
+
+        PerformanceMonitor.endActivity();
+        return mesh;
+    }
+
     private void generateOptimizedBuffers(WorldView worldView, ChunkMesh mesh) {
         PerformanceMonitor.startActivity("OptimizeBuffers");
 
@@ -84,7 +114,7 @@ public final class ChunkTessellator {
 
         for (int j = 0; j < mesh._vertexElements.length; j++) {
             // Vertices double to account for light info
-            mesh._vertexElements[j].finalVertices = BufferUtils.createFloatBuffer(mesh._vertexElements[j].vertices.size() * 2 + mesh._vertexElements[j].tex.size() + mesh._vertexElements[j].color.size() + mesh._vertexElements[j].normals.size());
+            mesh._vertexElements[j].finalVertices = BufferUtils.createByteBuffer(mesh._vertexElements[j].vertices.size() * 2 * 4 + mesh._vertexElements[j].tex.size() * 4 + mesh._vertexElements[j].color.size() * 4 + mesh._vertexElements[j].normals.size() * 4);
 
             int cTex = 0;
             int cColor = 0;
@@ -92,29 +122,29 @@ public final class ChunkTessellator {
 
                 Vector3f vertexPos = new Vector3f(mesh._vertexElements[j].vertices.get(i), mesh._vertexElements[j].vertices.get(i + 1), mesh._vertexElements[j].vertices.get(i + 2));
 
-                mesh._vertexElements[j].finalVertices.put(vertexPos.x);
-                mesh._vertexElements[j].finalVertices.put(vertexPos.y);
-                mesh._vertexElements[j].finalVertices.put(vertexPos.z);
+                mesh._vertexElements[j].finalVertices.putFloat(vertexPos.x);
+                mesh._vertexElements[j].finalVertices.putFloat(vertexPos.y);
+                mesh._vertexElements[j].finalVertices.putFloat(vertexPos.z);
 
-                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].tex.get(cTex));
-                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].tex.get(cTex + 1));
-                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].tex.get(cTex + 2));
+                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].tex.get(cTex));
+                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].tex.get(cTex + 1));
+                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].tex.get(cTex + 2));
 
                 float[] result = new float[3];
                 calcLightingValuesForVertexPos(worldView, vertexPos, result);
 
-                mesh._vertexElements[j].finalVertices.put(result[0]);
-                mesh._vertexElements[j].finalVertices.put(result[1]);
-                mesh._vertexElements[j].finalVertices.put(result[2]);
+                mesh._vertexElements[j].finalVertices.putFloat(result[0]);
+                mesh._vertexElements[j].finalVertices.putFloat(result[1]);
+                mesh._vertexElements[j].finalVertices.putFloat(result[2]);
 
-                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].color.get(cColor));
-                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].color.get(cColor + 1));
-                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].color.get(cColor + 2));
-                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].color.get(cColor + 3));
+                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].color.get(cColor));
+                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].color.get(cColor + 1));
+                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].color.get(cColor + 2));
+                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].color.get(cColor + 3));
 
-                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].normals.get(i));
-                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].normals.get(i + 1));
-                mesh._vertexElements[j].finalVertices.put(mesh._vertexElements[j].normals.get(i + 2));
+                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].normals.get(i));
+                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].normals.get(i + 1));
+                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].normals.get(i + 2));
             }
 
             mesh._vertexElements[j].finalIndices = BufferUtils.createIntBuffer(mesh._vertexElements[j].indices.size());
@@ -234,7 +264,7 @@ public final class ChunkTessellator {
          */
         ChunkMesh.RENDER_TYPE renderType = ChunkMesh.RENDER_TYPE.TRANSLUCENT;
 
-        if (!block.isTranslucent())
+        if (!block.isTransparent())
             renderType = ChunkMesh.RENDER_TYPE.OPAQUE;
         if (block.getTitle().equals("Water") || block.getTitle().equals("Ice"))
             renderType = ChunkMesh.RENDER_TYPE.WATER_AND_ICE;
@@ -316,5 +346,4 @@ public final class ChunkTessellator {
     public static int getVertexArrayUpdateCount() {
         return _statVertexArrayUpdateCount;
     }
-
 }

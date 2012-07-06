@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,27 @@
  * limitations under the License.
  */
 
+ #define WAVING_COORDINATE_COUNT 10
+
 varying vec3 normal;
 varying vec4 vertexWorldPosRaw;
 varying vec4 vertexWorldPos;
+varying vec4 vertexPos;
 varying vec3 eyeVec;
 varying vec3 lightDir;
 
 varying float flickering;
+varying float flickeringAlternative;
+
+uniform float blockScale = 1.0;
 
 uniform float time;
-uniform float wavingCoordinates[32];
+uniform float wavingCoordinates[WAVING_COORDINATE_COUNT];
 uniform vec2 waterCoordinate;
 uniform vec2 lavaCoordinate;
 uniform vec3 chunkOffset;
+
+uniform float animated;
 
 void main()
 {
@@ -43,35 +51,41 @@ void main()
     normal = gl_NormalMatrix * gl_Normal;
     gl_FrontColor = gl_Color;
 
-	float distance = length(vertexWorldPos);
-
 #ifdef FLICKERING_LIGHT
-	flickering = (sin(timeToTick(time, 1.0) + 1.0) / 32.0);
+	flickering = smoothTriangleWave(timeToTick(time, 1.0)) / 64.0;
+	flickeringAlternative = smoothTriangleWave(timeToTick(time, 1.0) + 0.37281) / 64.0;
 #else
 	flickering = 0.0;
+	flickeringAlternative = 0.0f;
 #endif
 
 #ifdef ANIMATED_WATER_AND_GRASS
     vec3 vertexChunkPos = vertexWorldPosRaw.xyz + chunkOffset.xyz;
 
-    if (distance < 64.0) {
+    if (animated > 0.0) {
         // GRASS ANIMATION
-        for (int i=0; i < 32; i+=2) {
+        for (int i=0; i < WAVING_COORDINATE_COUNT; i+=2) {
            if (gl_TexCoord[0].x >= wavingCoordinates[i] && gl_TexCoord[0].x < wavingCoordinates[i] + TEXTURE_OFFSET && gl_TexCoord[0].y >= wavingCoordinates[i+1] && gl_TexCoord[0].y < wavingCoordinates[i+1] + TEXTURE_OFFSET) {
                if (gl_TexCoord[0].y < wavingCoordinates[i+1] + TEXTURE_OFFSET / 2.0) {
-                   vertexWorldPos.x += sin(timeToTick(time, 1.0) + vertexChunkPos.x) * 0.3;
-                   vertexWorldPos.y += sin(timeToTick(time, 0.5) + vertexChunkPos.x) * 0.1;
+                   vertexWorldPos.x += (smoothTriangleWave(timeToTick(time, 0.2) + vertexChunkPos.x * 0.1 + vertexChunkPos.z * 0.1) * 2.0 - 1.0) * 0.1 * blockScale;
+                   vertexWorldPos.y += (smoothTriangleWave(timeToTick(time, 0.1) + vertexChunkPos.x * 0.5 + vertexChunkPos.z * -0.5) * 2.0 - 1.0) * 0.05 * blockScale;
                }
            }
         }
     }
 
+// Currently disabled
+#if 0
     if (gl_TexCoord[0].x >= waterCoordinate.x && gl_TexCoord[0].x < waterCoordinate.x + TEXTURE_OFFSET && gl_TexCoord[0].y >= waterCoordinate.y && gl_TexCoord[0].y < waterCoordinate.y + TEXTURE_OFFSET) {
-        vertexWorldPos.y += sin(timeToTick(time, 1.0) + vertexChunkPos.x +  + vertexChunkPos.z) * sin(timeToTick(time, 0.5) + vertexChunkPos.x  + vertexChunkPos.z + 16.0) * 0.1;
+        vertexWorldPos.y += (smoothTriangleWave(timeToTick(time, 0.25) + vertexChunkPos.x * 0.01 + vertexChunkPos.z * 0.01) * 2.0 - 1.0) * 0.05 * blockScale
+        + (smoothTriangleWave(timeToTick(time, 0.025)  + vertexChunkPos.x * 0.1 + vertexChunkPos.z * -0.05 + 0.2372891) * 2.0 - 1.0) * 0.05 * blockScale;
     } else if (gl_TexCoord[0].x >= lavaCoordinate.x && gl_TexCoord[0].x < lavaCoordinate.x + TEXTURE_OFFSET && gl_TexCoord[0].y >= lavaCoordinate.y && gl_TexCoord[0].y < lavaCoordinate.y + TEXTURE_OFFSET) {
-        vertexWorldPos.y += sin(timeToTick(time, 0.5) + vertexChunkPos.x + vertexChunkPos.z) * 0.1;
+        vertexWorldPos.y += smoothTriangleWave(timeToTick(time, 0.05) + vertexChunkPos.x * 0.1 + vertexChunkPos.z * 0.1) * 0.2 * blockScale;
     }
 #endif
 
-    gl_Position = gl_ProjectionMatrix * vertexWorldPos;
+#endif
+
+    vertexPos = gl_ProjectionMatrix * vertexWorldPos;
+    gl_Position = vertexPos;
 }

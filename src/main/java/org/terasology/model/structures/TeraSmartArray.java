@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,8 +114,10 @@ public class TeraSmartArray {
 
         int bArray = _array[pos % _halfSize] & 0xFF;
         byte old = (byte) (bArray >> 4);
-        int bInput = b & 0xFF;
-        _array[pos % _halfSize] = (byte) ((bArray & 0x0F) | (bInput << 4) & 0xFF);
+        if (old == oldB) {
+            int bInput = b & 0xFF;
+            _array[pos % _halfSize] = (byte) ((bArray & 0x0F) | (bInput << 4) & 0xFF);
+        }
         return old;
     }
 

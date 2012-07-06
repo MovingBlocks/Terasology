@@ -1,5 +1,5 @@
 /*
- * Copyright 2012
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package org.terasology.logic.world;
 
+import org.terasology.logic.world.liquid.LiquidData;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 
@@ -51,6 +52,11 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     }
 
     @Override
+    public WorldView getLocalView(Vector3i chunk) {
+        return base.getLocalView(chunk);
+    }
+
+    @Override
     public WorldView getWorldViewAround(Vector3i chunk) {
         return base.getWorldViewAround(chunk);
     }
@@ -76,13 +82,13 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     }
 
     @Override
-    public boolean setState(int x, int y, int z, byte state, byte oldState) {
-        return base.setState(x, y, z, state, oldState);
+    public boolean setLiquid(int x, int y, int z, LiquidData newState, LiquidData oldState) {
+        return base.setLiquid(x, y, z, newState, oldState);
     }
 
     @Override
-    public byte getState(int x, int y, int z) {
-        return base.getState(x, y, z);
+    public LiquidData getLiquid(int x, int y, int z) {
+        return base.getLiquid(x, y, z);
     }
 
     @Override

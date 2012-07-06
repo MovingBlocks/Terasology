@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.terasology.logic.manager;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.*;
 import org.terasology.game.CoreRegistry;
+import org.terasology.game.Timer;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
@@ -36,13 +37,17 @@ public class PostProcessingRenderer {
 
     public static final float MAX_EXPOSURE = 4.0f;
     public static final float MAX_EXPOSURE_NIGHT = 2.0f;
-    public static final float MIN_EXPOSURE = 1.0f;
+    public static final float MIN_EXPOSURE = 0.5f;
     public static final float TARGET_LUMINANCE = 1.0f;
-    public static final float ADJUSTMENT_SPEED = 0.05f;
+    public static final float ADJUSTMENT_SPEED = 0.025f;
 
     private static PostProcessingRenderer _instance = null;
     private float _exposure = 16.0f;
+    private float _sceneLuminance = 1.0f;
     private int _displayListQuad = -1;
+
+
+    private long lastExposureUpdate;
 
     private boolean _extensionsAvailable = false;
 
@@ -102,16 +107,15 @@ public class PostProcessingRenderer {
     public void initialize() {
         createOrUpdateFullscreenFbos();
 
+        createFBO("sceneReflected", 512, 512, true, true);
+
         createFBO("sceneHighPass", 256, 256, false, false);
         createFBO("sceneBloom0", 256, 256, false, false);
         createFBO("sceneBloom1", 256, 256, false, false);
-        createFBO("sceneBloom2", 256, 256, false, false);
 
-        createFBO("sceneBlur0", 1024, 1024, false, false);
-        createFBO("sceneBlur1", 1024, 1024, false, false);
-        createFBO("sceneBlur2", 1024, 1024, false, false);
+        createFBO("sceneBlur0", 512, 512, false, false);
+        createFBO("sceneBlur1", 512, 512, false, false);
 
-        createFBO("scene32", 32, 32, false, false);
         createFBO("scene16", 16, 16, false, false);
         createFBO("scene8", 8, 8, false, false);
         createFBO("scene4", 4, 4, false, false);
@@ -193,17 +197,24 @@ public class PostProcessingRenderer {
     }
 
     private void updateExposure() {
-        FloatBuffer pixels = BufferUtils.createFloatBuffer(4);
-        FBO scene = PostProcessingRenderer.getInstance().getFBO("scene1");
+        long currentTime = CoreRegistry.get(Timer.class).getTimeInMs();
 
-        scene.bindTexture();
-        glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, GL11.GL_FLOAT, pixels);
-        scene.unbindTexture();
+        if (currentTime - lastExposureUpdate > 1000) {
+            lastExposureUpdate = currentTime;
 
-        float lum = 0.2126f * pixels.get(0) + 0.7152f * pixels.get(1) + 0.0722f * pixels.get(2);
+            FloatBuffer pixels = BufferUtils.createFloatBuffer(4);
+            FBO scene = PostProcessingRenderer.getInstance().getFBO("scene1");
 
-        if (lum > 0.0f) // No division by zero
-            _exposure = (float) TeraMath.lerp(_exposure, TARGET_LUMINANCE / lum, ADJUSTMENT_SPEED);
+            scene.bindTexture();
+            glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, GL11.GL_FLOAT, pixels);
+            scene.unbindTexture();
+
+            _sceneLuminance = 0.2126f * pixels.get(0) + 0.7152f * pixels.get(1) + 0.0722f * pixels.get(2);
+
+        }
+
+        if (_sceneLuminance > 0.0f) // No division by zero
+            _exposure = (float) TeraMath.lerp(_exposure, TARGET_LUMINANCE / _sceneLuminance, ADJUSTMENT_SPEED);
 
         float maxExposure = MAX_EXPOSURE;
 
@@ -225,11 +236,29 @@ public class PostProcessingRenderer {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
+    public void beginRenderReflectedScene() {
+        if (!_extensionsAvailable)
+            return;
+
+        getFBO("sceneReflected").bind();
+
+        glViewport(0, 0, 512, 512);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+
     public void endRenderScene() {
         if (!_extensionsAvailable)
             return;
 
         getFBO("scene").unbind();
+    }
+
+    public void endRenderReflectedScene() {
+        if (!_extensionsAvailable)
+            return;
+
+        getFBO("sceneReflected").unbind();
+        glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
 
     /**
@@ -246,7 +275,7 @@ public class PostProcessingRenderer {
 
             generateTonemappedScene();
 
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < 2; i++) {
                 generateBloom(i);
                 generateBlur(i);
             }
@@ -323,7 +352,7 @@ public class PostProcessingRenderer {
         shader.setFloat("radius", 2.5f);
 
         PostProcessingRenderer.getInstance().getFBO("sceneBlur" + id).bind();
-        glViewport(0, 0, 1024, 1024);
+        glViewport(0, 0, 512, 512);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -366,7 +395,7 @@ public class PostProcessingRenderer {
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("down");
         shader.enable();
 
-        for (int i = 5; i >= 0; i--) {
+        for (int i = 4; i >= 0; i--) {
             int sizePrev = (int) java.lang.Math.pow(2, i + 1);
 
             int size = (int) java.lang.Math.pow(2, i);
@@ -377,7 +406,7 @@ public class PostProcessingRenderer {
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            if (i == 5)
+            if (i == 4)
                 PostProcessingRenderer.getInstance().getFBO("scene").bindTexture();
             else
                 PostProcessingRenderer.getInstance().getFBO("scene" + sizePrev).bindTexture();

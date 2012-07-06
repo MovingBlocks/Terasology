@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ void main(){
     vec4 color;
 
     if (textured) {
-        color = srgbToLinear(texture2D(diffuse, vec2(gl_TexCoord[0].x , gl_TexCoord[0].y)));
+        color = texture2D(diffuse, vec2(gl_TexCoord[0].x , gl_TexCoord[0].y));
     } else {
         color = vec4(1,1,1,1);
     }
@@ -45,7 +45,7 @@ void main(){
 
     if (textured) {
         color.rgb *= colorOffset.rgb;
-        gl_FragColor = linearToSrgb(color);
+        gl_FragColor = color;
     } else {
         gl_FragColor = color;
     }

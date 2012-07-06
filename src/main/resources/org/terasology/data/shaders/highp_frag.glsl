@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ void main() {
     vec4 color = texture2D(tex, gl_TexCoord[0].xy);
     float lum = 0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b;
 
-    if (lum > 1.25)
+    if (lum > 1.0)
         gl_FragColor = color;
     else
         gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);

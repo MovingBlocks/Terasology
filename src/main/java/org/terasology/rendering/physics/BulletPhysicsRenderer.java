@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import com.bulletphysics.collision.shapes.BoxShape;
 import com.bulletphysics.collision.shapes.BvhTriangleMeshShape;
 import com.bulletphysics.collision.shapes.IndexedMesh;
 import com.bulletphysics.collision.shapes.TriangleIndexVertexArray;
-import com.bulletphysics.collision.shapes.voxel.VoxelPhysicsWorld;
 import com.bulletphysics.collision.shapes.voxel.VoxelWorldShape;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
 import com.bulletphysics.dynamics.RigidBody;
@@ -41,17 +40,16 @@ import org.terasology.components.world.BlockComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.*;
-import org.terasology.events.BlockChangedEvent;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.manager.AudioManager;
+import org.terasology.logic.world.BlockChangedEvent;
 import org.terasology.logic.world.BlockEntityRegistry;
-import org.terasology.logic.world.Chunk;
+import org.terasology.logic.world.chunks.Chunk;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
-import org.terasology.model.structures.BlockPosition;
 import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.WorldRenderer;
@@ -59,7 +57,6 @@ import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.*;
 import java.nio.FloatBuffer;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -127,7 +124,7 @@ public class BulletPhysicsRenderer implements IGameObject, EventReceiver<BlockCh
     private Logger _logger = Logger.getLogger(getClass().getName());
 
     private final LinkedList<RigidBody> _insertionQueue = new LinkedList<RigidBody>();
-    private final ArrayList<BlockRigidBody> _blocks = new ArrayList<BlockRigidBody>();
+    private final LinkedList<BlockRigidBody> _blocks = new LinkedList<BlockRigidBody>();
 
     private HashSet<RigidBody> _chunks = new HashSet<RigidBody>();
 
@@ -231,7 +228,8 @@ public class BulletPhysicsRenderer implements IGameObject, EventReceiver<BlockCh
      */
     public synchronized BlockRigidBody addBlock(Vector3f position, byte type, Vector3f impulse, BLOCK_SIZE size, boolean temporary) {
         if (temporary && _blocks.size() > MAX_TEMP_BLOCKS)
-            return null;
+          removeTemporaryBlocks();
+
         BoxShape shape = _blockShape;
         Block block = BlockManager.getInstance().getBlock(type);
         if (block.isTranslucent())
@@ -254,6 +252,7 @@ public class BulletPhysicsRenderer implements IGameObject, EventReceiver<BlockCh
         // Apply impulse
         rigidBlock.applyImpulse(impulse, new Vector3f(0.0f, 0.0f, 0.0f));
         _insertionQueue.add(rigidBlock);
+
         return rigidBlock;
     }
 
@@ -379,7 +378,7 @@ public class BulletPhysicsRenderer implements IGameObject, EventReceiver<BlockCh
         while (!_insertionQueue.isEmpty()) {
             RigidBody body = _insertionQueue.poll();
             if (body instanceof BlockRigidBody)
-                _blocks.add((BlockRigidBody) body);
+                _blocks.addFirst((BlockRigidBody) body);
             _discreteDynamicsWorld.addRigidBody(body);
         }
     }
@@ -449,7 +448,7 @@ public class BulletPhysicsRenderer implements IGameObject, EventReceiver<BlockCh
                 if (!_blocks.get(i)._temporary) {
                     continue;
                 }
-                if (!_blocks.get(i).isActive() || _blocks.get(i).calcAgeInMs() > 10000) {
+                if (!_blocks.get(i).isActive() || _blocks.get(i).calcAgeInMs() > 10000 || _blocks.size() > MAX_TEMP_BLOCKS) {
                     _discreteDynamicsWorld.removeRigidBody(_blocks.get(i));
                     _blocks.remove(i);
                 }

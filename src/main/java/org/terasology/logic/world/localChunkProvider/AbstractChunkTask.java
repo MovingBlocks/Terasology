@@ -1,5 +1,5 @@
 /*
- * Copyright 2012
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package org.terasology.logic.world.localChunkProvider;
 
-import org.terasology.logic.world.ChunkProvider;
+import org.terasology.logic.world.chunks.ChunkProvider;
 import org.terasology.math.Vector3i;
 
 /**

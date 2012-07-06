@@ -1,5 +1,5 @@
 /*
- * Copyright 2012
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package org.terasology.logic.world;
 
 import com.google.common.collect.Lists;
+import org.terasology.logic.world.chunks.Chunk;
 import org.terasology.math.Diamond3iIterator;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
@@ -160,9 +161,14 @@ public class LightPropagator {
         nextWave.add(new Vector3i(x, y, z));
         // First drop MAX_LIGHT until it is blocked
         if (lightLevel == Chunk.MAX_LIGHT && worldView.getSunlight(x, y - 1, z) < Chunk.MAX_LIGHT) {
-            for (int columnY = y - 1; columnY >= 0 && worldView.getBlock(x, columnY, z).isTranslucent(); columnY--) {
-                worldView.setSunlight(x, columnY, z, lightLevel);
-                nextWave.add(new Vector3i(x, columnY, z));
+            for (int columnY = y - 1; columnY >= 0; columnY--) {
+                Block block = worldView.getBlock(x, columnY, z);
+                if (sunlightRetainsFullStrengthIn(block)) {
+                    worldView.setSunlight(x, columnY, z, lightLevel);
+                    nextWave.add(new Vector3i(x, columnY, z));
+                } else {
+                    break;
+                }
             }
         }
 
@@ -174,7 +180,7 @@ public class LightPropagator {
             nextWave = temp;
             nextWave.clear();
 
-            // Only move sunlight up and down if it is below max light
+            // Only move sunlight up if it is below max light
             if (lightLevel < Chunk.MAX_LIGHT) {
                 for (Vector3i pos : currentWave) {
                     // Move sunlight up
@@ -190,17 +196,19 @@ public class LightPropagator {
                             }
                         }
                     }
-                    // Move sunlight down
-                    if (pos.y > 0) {
-                        Vector3i adjPos = new Vector3i(pos.x, pos.y - 1, pos.z);
-                        Block block = worldView.getBlock(adjPos);
-                        if (block.isTranslucent()) {
-                            byte adjLight = worldView.getSunlight(adjPos);
-                            if (adjLight < lightLevel - 1) {
-                                worldView.setSunlight(adjPos, (byte) (lightLevel - 1));
-                                nextWave.add(adjPos);
-                                affectedRegion = affectedRegion.expandToContain(adjPos);
-                            }
+                }
+            }
+            for (Vector3i pos : currentWave) {
+                // Move sunlight down
+                if (pos.y > 0) {
+                    Vector3i adjPos = new Vector3i(pos.x, pos.y - 1, pos.z);
+                    Block block = worldView.getBlock(adjPos);
+                    if (block.isTranslucent()) {
+                        byte adjLight = worldView.getSunlight(adjPos);
+                        if (adjLight < lightLevel - 1) {
+                            worldView.setSunlight(adjPos, (byte) (lightLevel - 1));
+                            nextWave.add(adjPos);
+                            affectedRegion = affectedRegion.expandToContain(adjPos);
                         }
                     }
                 }
@@ -341,13 +349,15 @@ public class LightPropagator {
                 byte aboveLight = worldView.getSunlight(x + region.min().x, y + 1, z + region.min().z);
                 if (aboveLight == Chunk.MAX_LIGHT) {
                     for (; y >= 0; y--) {
-                        if (worldView.getBlock(x + region.min().x, y, z + region.min().z).isTranslucent()) {
+                        Block block = worldView.getBlock(x + region.min().x, y, z + region.min().z);
+                        if (sunlightRetainsFullStrengthIn(block)) {
                             worldView.setSunlight(x + region.min().x, y, z + region.min().z, Chunk.MAX_LIGHT);
                         } else {
                             break;
                         }
                     }
                 }
+
                 tops[x + region.size().x * z] = (short) y;
                 for (; y >= 0; y--) {
                     worldView.setSunlight(x + region.min().x, y, z + region.min().z, (byte) 0);
@@ -360,8 +370,8 @@ public class LightPropagator {
         for (int x = 0; x < region.size().x; x++) {
             for (int z = 0; z < region.size().z; z++) {
                 // Pull light down
-                if (tops[x + region.size().x * z] == top) {
-                    propagateSunlightFrom(region.min().x + x, top + 1, region.min().z + z, Side.BOTTOM);
+                if (tops[x + region.size().x * z] > 0) {
+                    propagateSunlightFrom(region.min().x + x, tops[x + region.size().x * z] + 1, region.min().z + z, Side.BOTTOM);
                 }
                 for (int y = tops[x + region.size().x * z]; y >= 0; y--) {
                     if (x <= 0 || tops[(x - 1) + region.size().x * z] < y) {
@@ -401,5 +411,8 @@ public class LightPropagator {
         }
     }
 
+    private boolean sunlightRetainsFullStrengthIn(Block block) {
+        return block.isTranslucent() && !block.isLiquid();
+    }
 
 }

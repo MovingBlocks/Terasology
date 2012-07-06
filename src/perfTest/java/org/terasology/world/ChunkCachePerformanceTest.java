@@ -1,10 +1,10 @@
 package org.terasology.world;
 
-import org.terasology.logic.world.Chunk;
-import org.terasology.logic.world.ChunkStore;
-import org.terasology.logic.world.chunkStore.*;
-import org.terasology.logic.world.chunkStore.ChunkStoreUncompressed;
-import org.terasology.logic.world.chunkStore.ChunkStoreGZip;
+import org.terasology.logic.world.chunks.Chunk;
+import org.terasology.logic.world.chunks.ChunkStore;
+import org.terasology.logic.world.chunks.store.*;
+import org.terasology.logic.world.chunks.store.ChunkStoreUncompressed;
+import org.terasology.logic.world.chunks.store.ChunkStoreGZip;
 
 import java.io.File;
 

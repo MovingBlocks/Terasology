@@ -1,5 +1,5 @@
 /*
- * Copyright 2012
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@ import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
-import org.terasology.events.BlockChangedEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
@@ -106,9 +105,6 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         EntityRef blockEntity = blockComponentLookup.get(blockPosition);
         if (blockEntity == null || !blockEntity.exists()) {
             Block block = getBlock(blockPosition.x, blockPosition.y, blockPosition.z);
-            if (block.getId() == 0)
-                return EntityRef.NULL;
-
             blockEntity = entityManager.create(block.getEntityPrefab());
             if (block.isEntityTemporary()) {
                 tempBlocks.add(blockEntity);

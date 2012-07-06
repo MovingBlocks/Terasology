@@ -1,5 +1,5 @@
 /*
- * Copyright 2012
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,8 @@ public interface WorldBiomeProvider {
      * @return The temperature
      */
     public float getTemperatureAt(int x, int z);
+
+    public float getFog(float time);
 
     /*
     * Returns the biome type at the given position.

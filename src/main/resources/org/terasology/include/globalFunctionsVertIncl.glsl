@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,4 +16,16 @@
 
 float timeToTick(float time, float speed) {
     return time * 4000.0 * speed;
+}
+
+// Crytek fast sin/cos approximations
+
+float smoothCurve( float x ) {
+  return x * x * ( 3.0 - 2.0 * x );
+}
+float triangleWave( float x ) {
+  return abs( fract( x + 0.5 ) * 2.0 - 1.0 );
+}
+float smoothTriangleWave( float x ) {
+  return smoothCurve( triangleWave( x ) ) * 2.0 - 1.0 ;
 }

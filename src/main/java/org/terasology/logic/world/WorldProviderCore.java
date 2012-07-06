@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package org.terasology.logic.world;
 
+import org.terasology.logic.world.liquid.LiquidData;
+import org.terasology.logic.world.liquid.LiquidType;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 
@@ -53,7 +55,14 @@ public interface WorldProviderCore {
      * @param chunk
      * @return A world view centered on the desired chunk, with the surrounding chunks present.
      */
+    public WorldView getLocalView(Vector3i chunk);
+
+    /**
+     * @param chunk
+     * @return A world view of the chunks around the desired chunk, uncentered.
+     */
     public WorldView getWorldViewAround(Vector3i chunk);
+
 
     /**
      * An active block is in a chunk that is available and fully generated.
@@ -94,26 +103,24 @@ public interface WorldProviderCore {
     public boolean setBlock(int x, int y, int z, Block type, Block oldType);
 
     /**
-     * Sets the state at the given position
-     *
      * @param x
      * @param y
      * @param z
-     * @param state    The new value of state
-     * @param oldState The expected previous value of state
-     * @return Whether the state change was made successfully. Will fail of oldType != the current type, or if the underlying chunk is not available
+     * @param newData
+     * @param oldData
+     * @return Whether the liquid change was made successfully. Will fail if the current data doesn't match the oldData, or if the underlying chunk is not available
      */
-    public boolean setState(int x, int y, int z, byte state, byte oldState);
+    public boolean setLiquid(int x, int y, int z, LiquidData newData, LiquidData oldData);
 
     /**
-     * Returns the state at the given position.
+     * Returns the liquid state at the given position.
      *
      * @param x The X-coordinate
      * @param y The Y-coordinate
      * @param z The Z-coordinate
-     * @return The state of the block
+     * @return The liquid data of the block
      */
-    public byte getState(int x, int y, int z);
+    public LiquidData getLiquid(int x, int y, int z);
 
     /**
      * Returns the block at the given position.

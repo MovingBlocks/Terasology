@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -410,6 +410,10 @@ public final class Config {
 
     public void setPlacingBox(boolean placingBox) {
         _setting.getPlayerBuilder().setPlacingBox(placingBox);
+    }
+
+    public boolean isComplexWater() {
+        return false;
     }
 
     /* MODS */

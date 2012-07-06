@@ -66,6 +66,7 @@ public class PlayerFactory {
         player.send(new ReceiveItemEvent(entityManager.create("core:pickaxe")));
         player.send(new ReceiveItemEvent(entityManager.create("core:explodeTool")));
         player.send(new ReceiveItemEvent(entityManager.create("core:railgunTool")));
+        player.send(new ReceiveItemEvent(entityManager.create("core:miniaturizer")));
 
         return player;
     }

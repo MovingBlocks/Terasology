@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import com.google.common.collect.Sets;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.logic.manager.Config;
-import org.terasology.logic.world.Chunk;
+import org.terasology.logic.world.chunks.Chunk;
 import org.terasology.logic.world.WorldProvider;
 import org.terasology.logic.world.WorldView;
 import org.terasology.rendering.primitives.ChunkMesh;
@@ -79,7 +79,7 @@ public final class ChunkUpdateManager {
             @Override
             public void run() {
                 ChunkMesh[] newMeshes = new ChunkMesh[WorldRenderer.VERTICAL_SEGMENTS];
-                WorldView worldView = worldProvider.getWorldViewAround(c.getPos());
+                WorldView worldView = worldProvider.getLocalView(c.getPos());
                 if (worldView != null) {
                     c.setDirty(false);
                     for (int seg = 0; seg < WorldRenderer.VERTICAL_SEGMENTS; seg++) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,9 @@ block {
 
     hardness = 1
 
+    transparent = false
     translucent = true
 
     colorsource = COLOR_SOURCE.FOLIAGE_LUT
-    colorOffset = [1.0f, 0.8f, 0.8f, 1.0f]
+    colorOffset = [1.25f, 0.75f, 0.75f, 1.0f]
 }

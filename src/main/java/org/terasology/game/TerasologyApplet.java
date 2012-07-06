@@ -1,5 +1,5 @@
 /*
-* Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+* Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -48,11 +48,12 @@ public final class TerasologyApplet extends Applet {
 
     private void obtainMods() {
         String[] mods = getParameter("mods").split(",");
-        int rootPathIndex = getDocumentBase().toString().lastIndexOf('/');
-        String path = getDocumentBase().toString().substring(0, rootPathIndex + 1) + "mods/";
+        String modsPath = getParameter("mods_path") + "mods/";
+        //int rootPathIndex = getDocumentBase().toString().lastIndexOf('/');
+        //String path = getDocumentBase().toString().substring(0, rootPathIndex + 1) + "mods/";
         for (String mod : mods) {
             try {
-                URL url = new URL(path + mod);
+                URL url = new URL(modsPath + mod);
                 ReadableByteChannel rbc = Channels.newChannel(url.openStream());
                 FileOutputStream fos = new FileOutputStream(new File(PathManager.getInstance().getModPath(), mod));
                 long readBytes = fos.getChannel().transferFrom(rbc, 0, 1 << 24);

@@ -9,6 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.concurrent.BlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,9 +28,22 @@ public class PojoEventSystem implements EventSystem {
     private BiMap<String, Class<? extends Event>> eventIdMap = HashBiMap.create();
     private Multimap<Class<? extends Event>, Class<? extends Event>> childEvents = HashMultimap.create();
 
+    private Thread mainThread;
+    private BlockingQueue<PendingEvent>  pendingEvents = Queues.newLinkedBlockingQueue();
 
     public PojoEventSystem(EntityManager entitySystem) {
         this.entitySystem = entitySystem;
+        this.mainThread = Thread.currentThread();
+    }
+
+    public void process() {
+        for (PendingEvent event = pendingEvents.poll(); event != null; event = pendingEvents.poll()) {
+            if (event.getComponent() != null) {
+                send(event.getEntity(), event.getEvent(), event.getComponent());
+            } else {
+                send(event.getEntity(), event.getEvent());
+            }
+        }
     }
 
     @Override
@@ -67,8 +81,8 @@ public class PojoEventSystem implements EventSystem {
                     logger.info("Found method: " + method.toString());
                     ReflectedEventHandlerInfo handlerInfo = new ReflectedEventHandlerInfo(handler, method, receiveEventAnnotation.priority(), receiveEventAnnotation.components());
                     for (Class<? extends Component> c : receiveEventAnnotation.components()) {
-                        addEventHandler((Class<? extends Event>)types[0], handlerInfo, c);
-                        for (Class<? extends Event> childType : childEvents.get((Class<? extends Event>)types[0])) {
+                        addEventHandler((Class<? extends Event>) types[0], handlerInfo, c);
+                        for (Class<? extends Event> childType : childEvents.get((Class<? extends Event>) types[0])) {
                             addEventHandler(childType, handlerInfo, c);
                         }
                     }
@@ -102,32 +116,39 @@ public class PojoEventSystem implements EventSystem {
                 addEventHandler(childType, info, c);
             }
         }
-
     }
 
     @Override
     public void send(EntityRef entity, Event event) {
-        Set<EventHandlerInfo> selectedHandlersSet = selectEventHandlers(event.getClass(), entity);
-        List<EventHandlerInfo> selectedHandlers = Lists.newArrayList(selectedHandlersSet);
-        Collections.sort(selectedHandlers, priorityComparator);
+        if (Thread.currentThread() != mainThread) {
+            pendingEvents.offer(new PendingEvent(entity, event));
+        } else {
+            Set<EventHandlerInfo> selectedHandlersSet = selectEventHandlers(event.getClass(), entity);
+            List<EventHandlerInfo> selectedHandlers = Lists.newArrayList(selectedHandlersSet);
+            Collections.sort(selectedHandlers, priorityComparator);
 
-        for (EventHandlerInfo handler : selectedHandlers) {
-            // Check isValid at each stage in case components were removed.
-            if (handler.isValidFor(entity)) {
-                handler.invoke(entity, event);
-                if (event.isCancelled())
-                    return;
+            for (EventHandlerInfo handler : selectedHandlers) {
+                // Check isValid at each stage in case components were removed.
+                if (handler.isValidFor(entity)) {
+                    handler.invoke(entity, event);
+                    if (event.isCancelled())
+                        return;
+                }
             }
         }
     }
 
     @Override
     public void send(EntityRef entity, Event event, Component component) {
-        Multimap<Class<? extends Component>, EventHandlerInfo> handlers = componentSpecificHandlers.get(event.getClass());
-        if (handlers != null) {
-            for (EventHandlerInfo eventHandler : handlers.get(component.getClass())) {
-                if (eventHandler.isValidFor(entity)) {
-                    eventHandler.invoke(entity, event);
+        if (Thread.currentThread() != mainThread) {
+            pendingEvents.offer(new PendingEvent(entity, event, component));
+        } else {
+            Multimap<Class<? extends Component>, EventHandlerInfo> handlers = componentSpecificHandlers.get(event.getClass());
+            if (handlers != null) {
+                for (EventHandlerInfo eventHandler : handlers.get(component.getClass())) {
+                    if (eventHandler.isValidFor(entity)) {
+                        eventHandler.invoke(entity, event);
+                    }
                 }
             }
         }

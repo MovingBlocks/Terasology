@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,9 @@ import org.terasology.model.structures.ViewFrustum;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
+import static org.lwjgl.opengl.GL11.glScalef;
+import static org.lwjgl.opengl.GL11.glTranslatef;
+
 /**
  * Provides global access to fonts.
  *
@@ -39,13 +42,21 @@ public abstract class Camera {
     /* VIEW FRUSTUM */
     protected final ViewFrustum _viewFrustum = new ViewFrustum();
 
+    protected boolean _reflected = false;
+
     /**
      * Applies the projection and modelview matrix.
      */
     public void lookThrough() {
         loadProjectionMatrix();
         loadModelViewMatrix();
+
+        if (_reflected) {
+            glTranslatef(0.0f, 2f * ((float) -_position.y + 32f), 0.0f);
+            glScalef(1.0f, -1.0f, 1.0f);
+        }
     }
+
 
     /**
      * Applies the projection and the normalized modelview matrix (positioned at the origin without any offset like bobbing) .
@@ -87,11 +98,16 @@ public abstract class Camera {
             _activeFov = _targetFov;
             return;
         }
-        // TODO: Clamp this
         if (_activeFov < _targetFov) {
-            _activeFov += 50 * delta;
+            _activeFov += 50.0 * delta;
+            if (_activeFov >= _targetFov) {
+                _activeFov = _targetFov;
+            }
         } else if (_activeFov > _targetFov) {
-            _activeFov -= 50 * delta;
+            _activeFov -= 50.0 * delta;
+            if (_activeFov <= _targetFov) {
+                _activeFov = _targetFov;
+            }
         }
     }
 
@@ -101,5 +117,15 @@ public abstract class Camera {
 
     public void resetFov() {
         _targetFov = Config.getInstance().getFov();
+    }
+
+    public void setReflected(boolean reflected) {
+        _reflected = reflected;
+    }
+
+    public float getClipHeight() {
+        if (_reflected)
+            return 31.5f;
+        return 0;
     }
 }

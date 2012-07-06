@@ -82,8 +82,8 @@ public class GroovyHelpManager {
         String fampref = "org.terasology.model.blocks.";
         String tempval = "";
         boolean nodup = true;
-        for (byte i = -127; i < 127; i++) {
-            Block b = BlockManager.getInstance().getBlock(i);
+        for (int i = Byte.MIN_VALUE; i <= Byte.MAX_VALUE; i++) {
+            Block b = BlockManager.getInstance().getBlock((byte) i);
             if (b.getId() != 0) {
                 if (tempval.length() > 0) {
                     if (b.getTitle().startsWith(tempval)) {

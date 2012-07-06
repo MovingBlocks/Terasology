@@ -23,6 +23,8 @@ import javax.vecmath.Vector3f;
 @RegisterComponentSystem
 public class TunnelAction implements EventHandlerSystem {
 
+    private static int MAX_DESTROYED_BLOCKS = 100;
+
     private WorldProvider worldProvider;
     private FastRandom random = new FastRandom();
     private BulletPhysicsRenderer physicsRenderer;
@@ -45,6 +47,8 @@ public class TunnelAction implements EventHandlerSystem {
         Vector3f dir = new Vector3f(event.getDirection());
         Vector3f origin = new Vector3f(event.getOrigin());
         Vector3i blockPos = new Vector3i();
+
+        int blockCounter = MAX_DESTROYED_BLOCKS;
         for (int s = 4; s <= 10000; s += 30) {
             origin.add(dir);
 
@@ -68,16 +72,18 @@ public class TunnelAction implements EventHandlerSystem {
                     if (currentBlock.getId() == 0x0)
                         continue;
 
-                    /* PHYSICS */
                     if (currentBlock.isDestructible()) {
-                        // TODO: this should be handled centrally somewhere. Actions shouldn't be determining world behaviour
-                        // like what happens when a block is destroyed.
                         worldProvider.setBlock(blockPos, BlockManager.getInstance().getAir(), currentBlock);
 
                         EntityRef blockEntity = blockEntityRegistry.getEntityAt(blockPos);
                         blockEntity.destroy();
                         physicsRenderer.addTemporaryBlock(target, currentBlock.getId(), impulse, BulletPhysicsRenderer.BLOCK_SIZE.FULL_SIZE);
+
+                        blockCounter--;
                     }
+
+                    if (blockCounter <= 0)
+                        return;
                 }
             }
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package org.terasology.logic.world;
 
+import org.terasology.logic.world.liquid.LiquidData;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 
@@ -48,13 +49,13 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
     }
 
     @Override
-    public boolean setState(Vector3i pos, byte state, byte oldState) {
-        return core.setState(pos.x, pos.y, pos.z, state, oldState);
+    public boolean setLiquid(Vector3i pos, LiquidData state, LiquidData oldState) {
+        return core.setLiquid(pos.x, pos.y, pos.z, state, oldState);
     }
 
     @Override
-    public byte getState(Vector3i blockPos) {
-        return core.getState(blockPos.x, blockPos.y, blockPos.z);
+    public LiquidData getLiquid(Vector3i blockPos) {
+        return core.getLiquid(blockPos.x, blockPos.y, blockPos.z);
     }
 
     @Override

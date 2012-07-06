@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.componentSystem.controllers.LocalPlayerSystem;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.world.LocationComponent;
+import org.terasology.components.world.WorldComponent;
 import org.terasology.entityFactory.PlayerFactory;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
@@ -32,14 +33,11 @@ import org.terasology.entitySystem.persistence.EntityDataJSONFormat;
 import org.terasology.entitySystem.persistence.EntityPersisterHelper;
 import org.terasology.entitySystem.persistence.EntityPersisterHelperImpl;
 import org.terasology.entitySystem.persistence.WorldPersister;
-import org.terasology.events.input.*;
-import org.terasology.events.input.binds.InventoryButton;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.Timer;
 import org.terasology.game.bootstrap.EntitySystemBuilder;
-import org.terasology.input.BindButtonEvent;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.LocalPlayer;
@@ -48,7 +46,7 @@ import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
-import org.terasology.logic.world.Chunk;
+import org.terasology.logic.world.chunks.Chunk;
 import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.management.BlockManager;
@@ -83,8 +81,10 @@ public class StateSinglePlayer implements GameState {
 
     private String currentWorldName;
     private String currentWorldSeed;
+    private long currentWorldStartTime;
 
     private PersistableEntityManager entityManager;
+    private EventSystem eventSystem;
 
     /* RENDERING */
     private WorldRenderer worldRenderer;
@@ -98,12 +98,17 @@ public class StateSinglePlayer implements GameState {
     private boolean pauseGame = false;
 
     public StateSinglePlayer(String worldName) {
-        this(worldName, null);
+        this(worldName, null, 0);
     }
 
     public StateSinglePlayer(String worldName, String seed) {
+        this(worldName, seed, 0);
+    }
+
+    public StateSinglePlayer(String worldName, String seed, long time) {
         this.currentWorldName = worldName;
         this.currentWorldSeed = seed;
+        this.currentWorldStartTime = time;
     }
 
     public void init(GameEngine engine) {
@@ -116,6 +121,7 @@ public class StateSinglePlayer implements GameState {
         cacheTextures();
 
         entityManager = new EntitySystemBuilder().build();
+        eventSystem = CoreRegistry.get(EventSystem.class);
 
         componentSystemManager = new ComponentSystemManager();
         CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);
@@ -166,11 +172,13 @@ public class StateSinglePlayer implements GameState {
 
     @Override
     public void activate() {
-        initWorld(currentWorldName, currentWorldSeed);
+        initWorld(currentWorldName, currentWorldSeed, currentWorldStartTime);
     }
 
     @Override
     public void deactivate() {
+        // TODO: Shutdown background threads
+        eventSystem.process();
         for (ComponentSystem system : componentSystemManager.iterateAll()) {
             system.shutdown();
         }
@@ -196,6 +204,8 @@ public class StateSinglePlayer implements GameState {
     public void update(float delta) {
         /* GUI */
         updateUserInterface();
+
+        eventSystem.process();
 
         for (UpdateSubscriberSystem updater : componentSystemManager.iterateUpdateSubscribers()) {
             PerformanceMonitor.startActivity(updater.getClass().getSimpleName());
@@ -242,13 +252,13 @@ public class StateSinglePlayer implements GameState {
     }
 
     public void initWorld(String title) {
-        initWorld(title, null);
+        initWorld(title, null, 0);
     }
 
     /**
      * Init. a new random world.
      */
-    public void initWorld(String title, String seed) {
+    public void initWorld(String title, String seed, long time) {
         final FastRandom random = new FastRandom();
 
         // Get rid of the old world
@@ -266,7 +276,7 @@ public class StateSinglePlayer implements GameState {
         logger.log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
 
         // Init. a new world
-        worldRenderer = new WorldRenderer(title, seed, entityManager, localPlayerSys);
+        worldRenderer = new WorldRenderer(title, seed, time, entityManager, localPlayerSys);
         CoreRegistry.put(WorldRenderer.class, worldRenderer);
 
         File entityDataFile = new File(PathManager.getInstance().getWorldSavePath(title), ENTITY_DATA_FILE);
@@ -277,6 +287,16 @@ public class StateSinglePlayer implements GameState {
             } catch (IOException e) {
                 logger.log(Level.SEVERE, "Failed to load entity data", e);
             }
+        }
+
+        // Create the world entity
+        Iterator<EntityRef> worldEntityIterator = entityManager.iteratorEntities(WorldComponent.class).iterator();
+        if (worldEntityIterator.hasNext()) {
+            worldRenderer.getChunkProvider().setWorldEntity(worldEntityIterator.next());
+        } else {
+            EntityRef worldEntity = entityManager.create();
+            worldEntity.addComponent(new WorldComponent());
+            worldRenderer.getChunkProvider().setWorldEntity(worldEntity);
         }
 
         CoreRegistry.put(WorldRenderer.class, worldRenderer);
@@ -292,30 +312,6 @@ public class StateSinglePlayer implements GameState {
         prepareWorld();
     }
 
-    private Vector3f nextSpawningPoint() {
-        return new Vector3f(0, 5, 0);
-        // TODO: Need to generate an X/Z coord, force a chunk relevent and calculate Y
-        /*
-        ChunkGeneratorTerrain tGen = ((ChunkGeneratorTerrain) getGeneratorManager().getChunkGenerators().get(0));
-
-        FastRandom nRandom = new FastRandom(CoreRegistry.get(Timer.class).getTimeInMs());
-
-        for (; ; ) {
-            int randX = (int) (nRandom.randomDouble() * 128f);
-            int randZ = (int) (nRandom.randomDouble() * 128f);
-
-            for (int y = Chunk.SIZE_Y - 1; y >= 32; y--) {
-
-                double dens = tGen.calcDensity(randX + (int) SPAWN_ORIGIN.x, y, randZ + (int) SPAWN_ORIGIN.y);
-
-                if (dens >= 0 && y < 64)
-                    return new Vector3d(randX + SPAWN_ORIGIN.x, y, randZ + SPAWN_ORIGIN.y);
-                else if (dens >= 0 && y >= 64)
-                    break;
-            }
-        } */
-    }
-
 
     private boolean screenHasFocus() {
         return GUIManager.getInstance().getFocusedWindow() != null && GUIManager.getInstance().getFocusedWindow().isModal() && GUIManager.getInstance().getFocusedWindow().isVisible();
@@ -325,7 +321,7 @@ public class StateSinglePlayer implements GameState {
         return !pauseGame;
     }
 
-    // TODO: Maybe should have its own state?
+    // TODO: Should have its own state
     private void prepareWorld() {
         UILoadingScreen loadingScreen = GUIManager.getInstance().addWindow(new UILoadingScreen(), "engine:loadingScreen");
         Display.update();

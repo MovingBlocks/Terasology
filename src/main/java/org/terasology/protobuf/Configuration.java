@@ -2720,11 +2720,11 @@ public final class Configuration {
       boolean hasViewingDistanceModerate();
       int getViewingDistanceModerate();
       
-      // optional int32 viewing_distance_far = 15 [default = 26];
+      // optional int32 viewing_distance_far = 15 [default = 32];
       boolean hasViewingDistanceFar();
       int getViewingDistanceFar();
       
-      // optional int32 viewing_distance_ultra = 16 [default = 32];
+      // optional int32 viewing_distance_ultra = 16 [default = 48];
       boolean hasViewingDistanceUltra();
       int getViewingDistanceUltra();
       
@@ -3709,7 +3709,7 @@ public final class Configuration {
         return viewingDistanceModerate_;
       }
       
-      // optional int32 viewing_distance_far = 15 [default = 26];
+      // optional int32 viewing_distance_far = 15 [default = 32];
       public static final int VIEWING_DISTANCE_FAR_FIELD_NUMBER = 15;
       private int viewingDistanceFar_;
       public boolean hasViewingDistanceFar() {
@@ -3719,7 +3719,7 @@ public final class Configuration {
         return viewingDistanceFar_;
       }
       
-      // optional int32 viewing_distance_ultra = 16 [default = 32];
+      // optional int32 viewing_distance_ultra = 16 [default = 48];
       public static final int VIEWING_DISTANCE_ULTRA_FIELD_NUMBER = 16;
       private int viewingDistanceUltra_;
       public boolean hasViewingDistanceUltra() {
@@ -3784,8 +3784,8 @@ public final class Configuration {
         activeViewingDistanceId_ = 0;
         viewingDistanceNear_ = 8;
         viewingDistanceModerate_ = 16;
-        viewingDistanceFar_ = 26;
-        viewingDistanceUltra_ = 32;
+        viewingDistanceFar_ = 32;
+        viewingDistanceUltra_ = 48;
         flickeringLight_ = false;
         enablePostProcessingEffects_ = false;
         animatedWaterAndGrass_ = false;
@@ -4114,9 +4114,9 @@ public final class Configuration {
           bitField0_ = (bitField0_ & ~0x00001000);
           viewingDistanceModerate_ = 16;
           bitField0_ = (bitField0_ & ~0x00002000);
-          viewingDistanceFar_ = 26;
+          viewingDistanceFar_ = 32;
           bitField0_ = (bitField0_ & ~0x00004000);
-          viewingDistanceUltra_ = 32;
+          viewingDistanceUltra_ = 48;
           bitField0_ = (bitField0_ & ~0x00008000);
           flickeringLight_ = false;
           bitField0_ = (bitField0_ & ~0x00010000);
@@ -4905,8 +4905,8 @@ public final class Configuration {
           return this;
         }
         
-        // optional int32 viewing_distance_far = 15 [default = 26];
-        private int viewingDistanceFar_ = 26;
+        // optional int32 viewing_distance_far = 15 [default = 32];
+        private int viewingDistanceFar_ = 32;
         public boolean hasViewingDistanceFar() {
           return ((bitField0_ & 0x00004000) == 0x00004000);
         }
@@ -4921,13 +4921,13 @@ public final class Configuration {
         }
         public Builder clearViewingDistanceFar() {
           bitField0_ = (bitField0_ & ~0x00004000);
-          viewingDistanceFar_ = 26;
+          viewingDistanceFar_ = 32;
           onChanged();
           return this;
         }
         
-        // optional int32 viewing_distance_ultra = 16 [default = 32];
-        private int viewingDistanceUltra_ = 32;
+        // optional int32 viewing_distance_ultra = 16 [default = 48];
+        private int viewingDistanceUltra_ = 48;
         public boolean hasViewingDistanceUltra() {
           return ((bitField0_ & 0x00008000) == 0x00008000);
         }
@@ -4942,7 +4942,7 @@ public final class Configuration {
         }
         public Builder clearViewingDistanceUltra() {
           bitField0_ = (bitField0_ & ~0x00008000);
-          viewingDistanceUltra_ = 32;
+          viewingDistanceUltra_ = 48;
           onChanged();
           return this;
         }
@@ -6037,8 +6037,8 @@ public final class Configuration {
       "en\030\013 \001(\010:\005false\022%\n\032active_viewing_distan" +
       "ce_id\030\014 \001(\005:\0010\022 \n\025viewing_distance_near\030" +
       "\r \001(\005:\0018\022%\n\031viewing_distance_moderate\030\016 " +
-      "\001(\005:\00216\022 \n\024viewing_distance_far\030\017 \001(\005:\0022" +
-      "6\022\"\n\026viewing_distance_ultra\030\020 \001(\005:\00232\022\037\n",
+      "\001(\005:\00216\022 \n\024viewing_distance_far\030\017 \001(\005:\0023" +
+      "2\022\"\n\026viewing_distance_ultra\030\020 \001(\005:\00248\022\037\n",
       "\020flickering_light\030\021 \001(\010:\005false\022-\n\036enable" +
       "_post_processing_effects\030\022 \001(\010:\005false\022\'\n" +
       "\030animated_water_and_grass\030\023 \001(\010:\005false\022\'" +

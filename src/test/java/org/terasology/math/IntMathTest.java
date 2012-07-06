@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.terasology.logic.world.chunks.Chunk;
+
 import static org.junit.Assert.*;
 
 /**
@@ -75,7 +77,7 @@ public class IntMathTest
     }
     
     @Test
-    public void TestFloorToInt()
+    public void testFloorToInt()
     {
         assertEquals(0, TeraMath.floorToInt(0f));
         assertEquals(1, TeraMath.floorToInt(1f));
@@ -85,7 +87,7 @@ public class IntMathTest
     }
     
     @Test
-    public void TestCeilToInt()
+    public void testCeilToInt()
     {
         assertEquals(0, TeraMath.ceilToInt(0f));
         assertEquals(1, TeraMath.ceilToInt(1f));
@@ -93,4 +95,13 @@ public class IntMathTest
         assertEquals(0, TeraMath.ceilToInt(-0.5f));
         assertEquals(-1, TeraMath.ceilToInt(-1f));
     }
+
+    @Test
+    public void testChunkPosX() {
+        assertEquals(0, TeraMath.calcChunkPosX(1));
+        assertEquals(1, TeraMath.calcChunkPosX(Chunk.SIZE_X));
+        assertEquals(-1, TeraMath.calcChunkPosX(-1));
+        assertEquals(-2, TeraMath.calcChunkPosX(-Chunk.SIZE_X - 1));
+    }
+
 }

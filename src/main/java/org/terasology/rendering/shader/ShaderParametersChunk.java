@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import org.lwjgl.opengl.GL13;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AssetManager;
+import org.terasology.logic.manager.PostProcessingRenderer;
 import org.terasology.logic.world.WorldProvider;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.rendering.assets.Texture;
@@ -49,13 +50,18 @@ public class ShaderParametersChunk implements IShaderParameters {
         glBindTexture(GL11.GL_TEXTURE_2D, water.getId());
         GL13.glActiveTexture(GL13.GL_TEXTURE3);
         glBindTexture(GL11.GL_TEXTURE_2D, effects.getId());
+        GL13.glActiveTexture(GL13.GL_TEXTURE4);
+        PostProcessingRenderer.getInstance().getFBO("sceneReflected").bindTexture();
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         glBindTexture(GL11.GL_TEXTURE_2D, terrain.getId());
 
         program.setInt("textureLava", 1);
         program.setInt("textureWaterNormal", 2);
         program.setInt("textureEffects", 3);
+        program.setInt("textureWaterReflection", 4);
         program.setInt("textureAtlas", 0);
+
+        program.setFloat("blockScale", 1.0f);
 
         if (worldRenderer != null)
             program.setFloat("daylight", (float) worldRenderer.getDaylight());

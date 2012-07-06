@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,6 +112,7 @@ public class Block implements IGameObject {
     private boolean _bypassSelectionRay;
     private boolean _liquid;
     private boolean _waving;
+    private boolean _transparent;
 
     private boolean _usable;
 
@@ -136,6 +137,7 @@ public class Block implements IGameObject {
     private BlockMeshPart _centerMesh;
     private EnumMap<Side, BlockMeshPart> _sideMesh = new EnumMap<Side, BlockMeshPart>(Side.class);
     private EnumBooleanMap<Side> _fullSide = new EnumBooleanMap<Side>(Side.class);
+    private EnumBooleanMap<Side> _affectedByLut = new EnumBooleanMap<Side>(Side.class);
 
     // For liquid handling
     private EnumMap<Side, BlockMeshPart> _loweredSideMesh = new EnumMap<Side, BlockMeshPart>(Side.class);
@@ -158,6 +160,7 @@ public class Block implements IGameObject {
             withTextureAtlasPos(side, new Vector2f(0.0f, 0.0f));
             withColorOffset(side, new Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
             withFullSide(side, false);
+            withAffectedByLut(side, true);
         }
 
         // Load the default settings
@@ -219,10 +222,12 @@ public class Block implements IGameObject {
     public Vector4f calcColorOffsetFor(Side side, double temperature, double humidity) {
         Vector4f color = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
 
-        if (getColorSource() == COLOR_SOURCE.COLOR_LUT)
-            color.set(calcColorForTemperatureAndHumidity(temperature, humidity));
-        else if (getColorSource() == COLOR_SOURCE.FOLIAGE_LUT) {
-            color.set(calcFoliageColorForTemperatureAndHumidity(temperature, humidity));
+        if (_affectedByLut.get(side)) {
+            if (getColorSource() == COLOR_SOURCE.COLOR_LUT)
+                color.set(calcColorForTemperatureAndHumidity(temperature, humidity));
+            else if (getColorSource() == COLOR_SOURCE.FOLIAGE_LUT) {
+                color.set(calcFoliageColorForTemperatureAndHumidity(temperature, humidity));
+            }
         }
 
         Vector4f colorOffset = _colorOffset.get(side);
@@ -309,6 +314,11 @@ public class Block implements IGameObject {
 
     public Block withTranslucent(boolean translucent) {
         _translucent = translucent;
+        return this;
+    }
+
+    public Block withTransparent(boolean transparent) {
+        _transparent = transparent;
         return this;
     }
 
@@ -416,6 +426,11 @@ public class Block implements IGameObject {
 
     public Block withFullSide(Side side, boolean full) {
         _fullSide.put(side, full);
+        return this;
+    }
+
+    public Block withAffectedByLut(Side side, boolean full) {
+        _affectedByLut.put(side, full);
         return this;
     }
 
@@ -544,6 +559,10 @@ public class Block implements IGameObject {
 
     public boolean isSelectionRayThrough() {
         return _bypassSelectionRay;
+    }
+
+    public boolean isTransparent() {
+        return _transparent;
     }
 
     public boolean isTranslucent() {

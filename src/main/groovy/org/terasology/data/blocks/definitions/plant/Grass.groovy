@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Benjamin Glatzel <benjamin.glatzel@me.com>.
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package org.terasology.data.blocks.definitions.plant
 
 import org.terasology.model.blocks.Block.COLOR_SOURCE
+import org.terasology.math.Side
 
 /**
  * Grass is a little more interesting as its faces differ.
@@ -39,6 +40,7 @@ block {
 
     // Works as an Enum :-)
     colorsource = COLOR_SOURCE.COLOR_LUT
+    affectedByLut = [(Side.BOTTOM):(false)]
 
     // Plant stuff! Helps guide growth and if "evolve" is present a maxed plant may transform type
     // Grass grows from 0 (dirt/non-existent) to 1 (grass block), may rarely grow again and evolve
