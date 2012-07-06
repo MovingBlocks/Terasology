@@ -9,6 +9,7 @@ import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.world.WorldProvider;
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.AxisAngle4f;
@@ -20,6 +21,7 @@ import javax.vecmath.Vector3f;
 @RegisterComponentSystem(authorativeOnly = true)
 public class SimpleAISystem implements EventHandlerSystem, UpdateSubscriberSystem {
 
+    private WorldProvider worldProvider;
     private EntityManager entityManager;
     private FastRandom random = new FastRandom();
     private Timer timer;
@@ -28,6 +30,7 @@ public class SimpleAISystem implements EventHandlerSystem, UpdateSubscriberSyste
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
         timer = CoreRegistry.get(Timer.class);
+        worldProvider = CoreRegistry.get(WorldProvider.class);
     }
 
     @Override
@@ -38,10 +41,15 @@ public class SimpleAISystem implements EventHandlerSystem, UpdateSubscriberSyste
     public void update(float delta) {
         for (EntityRef entity : entityManager.iteratorEntities(SimpleAIComponent.class, CharacterMovementComponent.class, LocationComponent.class)) {
             LocationComponent location = entity.getComponent(LocationComponent.class);
+            Vector3f worldPos = location.getWorldPosition();
+
+            // Skip this AI if not in a loaded chunk
+            if (!worldProvider.isBlockActive(worldPos)) {
+                continue;
+            }
             SimpleAIComponent ai = entity.getComponent(SimpleAIComponent.class);
             CharacterMovementComponent moveComp = entity.getComponent(CharacterMovementComponent.class);
 
-            Vector3f worldPos = location.getWorldPosition();
             moveComp.getDrive().set(0, 0, 0);
             // TODO: shouldn't use local player, need some way to find nearest player
             LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);

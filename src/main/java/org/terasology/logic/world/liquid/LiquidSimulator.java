@@ -95,6 +95,8 @@ public class LiquidSimulator implements EventHandlerSystem {
                             task.run();
                         } catch (InterruptedException e) {
                             logger.log(Level.INFO, "Interrupted");
+                        } catch (Exception e) {
+                            logger.log(Level.SEVERE, "Error in water simulation", e);
                         }
                     }
                 }
@@ -323,11 +325,13 @@ public class LiquidSimulator implements EventHandlerSystem {
         @Override
         public void run() {
             WorldView view = world.getLocalView(chunkPos);
-            for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(-1, 0, -1), new Vector3i(Chunk.SIZE_X + 2, Chunk.SIZE_Y, Chunk.SIZE_Z + 2))) {
-                LiquidData state = view.getLiquid(pos);
-                LiquidData newState = calcStateFor(pos, view);
-                if (!newState.equals(state)) {
-                    blockQueue.offer(new SimulateBlock(view.toWorldPos(pos), 0));
+            if (view != null) {
+                for (Vector3i pos : Region3i.createFromMinAndSize(new Vector3i(-1, 0, -1), new Vector3i(Chunk.SIZE_X + 2, Chunk.SIZE_Y, Chunk.SIZE_Z + 2))) {
+                    LiquidData state = view.getLiquid(pos);
+                    LiquidData newState = calcStateFor(pos, view);
+                    if (!newState.equals(state)) {
+                        blockQueue.offer(new SimulateBlock(view.toWorldPos(pos), 0));
+                    }
                 }
             }
         }

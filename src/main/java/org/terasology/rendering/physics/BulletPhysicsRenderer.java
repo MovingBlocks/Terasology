@@ -256,81 +256,6 @@ public class BulletPhysicsRenderer implements IGameObject, EventReceiver<BlockCh
         return rigidBlock;
     }
 
-    public void updateChunks() {
-        List<Chunk> chunks = CoreRegistry.get(WorldRenderer.class).getChunksInProximity();
-        HashSet<RigidBody> newBodies = new HashSet<RigidBody>();
-        boolean updatedThisFrame = false;
-
-        for (int i = 0; i < 32 && i < chunks.size(); i++) {
-            final Chunk chunk = chunks.get(i);
-            if (chunk != null) {
-                if (!updatedThisFrame && updateRigidBody(chunk)) {
-                    updatedThisFrame = true;
-                }
-                RigidBody c = chunk.getRigidBody();
-                if (c != null) {
-                    newBodies.add(c);
-                    if (!_chunks.contains(c)) {
-                        _discreteDynamicsWorld.addRigidBody(c);
-                    }
-                }
-            }
-        }
-        for (RigidBody body : _chunks) {
-            if (!newBodies.contains(body)) {
-                _discreteDynamicsWorld.removeRigidBody(body);
-            }
-        }
-        _chunks = newBodies;
-    }
-
-    private boolean updateRigidBody(Chunk chunk) {
-        if (chunk.getRigidBody() != null || chunk.getMesh() == null)
-            return false;
-
-        // TODO: Lock on chunk meshes
-        TriangleIndexVertexArray vertexArray = new TriangleIndexVertexArray();
-
-        int tris = 0;
-        ChunkMesh[] meshes = chunk.getMesh();
-        for (int k = 0; k < Chunk.VERTICAL_SEGMENTS; k++) {
-            ChunkMesh mesh = meshes[k];
-
-            if (mesh != null) {
-                IndexedMesh indexedMesh = mesh._indexedMesh;
-
-                if (indexedMesh != null) {
-                    tris += mesh._indexedMesh.numTriangles;
-                    vertexArray.addIndexedMesh(indexedMesh);
-                }
-
-                mesh._indexedMesh = null;
-            }
-        }
-
-        // TODO: Deal with this situation better
-        if (tris == 0) {
-            return false;
-        }
-
-        try {
-            BvhTriangleMeshShape shape = new BvhTriangleMeshShape(vertexArray, true);
-
-            Matrix3f rot = new Matrix3f();
-            rot.setIdentity();
-
-            DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, new Vector3f((float) chunk.getPos().x * Chunk.SIZE_X, (float) chunk.getPos().y * Chunk.SIZE_Y, (float) chunk.getPos().z * Chunk.SIZE_Z), 1.0f)));
-
-            RigidBodyConstructionInfo blockConsInf = new RigidBodyConstructionInfo(0, blockMotionState, shape, new Vector3f());
-            RigidBody rigidBody = new RigidBody(blockConsInf);
-            chunk.setRigidBody(rigidBody);
-        } catch (Exception e) {
-            _logger.log(Level.WARNING, "Chunk failed to create rigid body.", e);
-        }
-        return true;
-
-    }
-
     @Override
     public void render() {
         FloatBuffer mBuffer = BufferUtils.createFloatBuffer(16);
@@ -369,9 +294,8 @@ public class BulletPhysicsRenderer implements IGameObject, EventReceiver<BlockCh
         } catch (Exception e) {
             _logger.log(Level.WARNING, "Somehow Bullet Physics managed to throw an exception again.", e);
         }
-        //updateChunks();
         removeTemporaryBlocks();
-        //checkForLootedBlocks();
+        checkForLootedBlocks();
     }
 
     private synchronized void addQueuedBodies() {

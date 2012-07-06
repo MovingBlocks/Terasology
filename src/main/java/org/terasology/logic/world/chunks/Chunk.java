@@ -15,7 +15,6 @@
  */
 package org.terasology.logic.world.chunks;
 
-import com.bulletphysics.dynamics.RigidBody;
 import com.google.common.base.Objects;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.world.liquid.LiquidData;
@@ -88,9 +87,6 @@ public class Chunk implements Externalizable {
     private ChunkMesh[] mesh;
     private ChunkMesh[] pendingMesh;
     private AABB[] subMeshAABB = null;
-
-    // Physics
-    private RigidBody rigidBody = null;
 
     private ReentrantLock lock = new ReentrantLock();
     private boolean disposed = false;
@@ -364,10 +360,6 @@ public class Chunk implements Externalizable {
 
     public void setMesh(ChunkMesh[] mesh) {
         this.mesh = mesh;
-        if (rigidBody != null) {
-            rigidBody.destroy();
-            rigidBody = null;
-        }
     }
 
     public void setPendingMesh(ChunkMesh[] mesh) {
@@ -407,20 +399,8 @@ public class Chunk implements Externalizable {
         return subMeshAABB[subMesh];
     }
 
-    public RigidBody getRigidBody() {
-        return rigidBody;
-    }
-
-    public void setRigidBody(RigidBody rigidBody) {
-        this.rigidBody = rigidBody;
-    }
-
     public void dispose() {
         disposed = true;
-        if (rigidBody != null) {
-            rigidBody.destroy();
-            rigidBody = null;
-        }
         if (mesh != null) {
             for (ChunkMesh chunkMesh : mesh) {
                 chunkMesh.dispose();
