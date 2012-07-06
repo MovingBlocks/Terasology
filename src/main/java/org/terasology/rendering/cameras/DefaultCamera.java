@@ -21,6 +21,7 @@ import org.lwjgl.util.glu.GLU;
 import org.terasology.math.TeraMath;
 
 import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.util.glu.GLU.gluPerspective;
@@ -32,7 +33,7 @@ import static org.lwjgl.util.glu.GLU.gluPerspective;
  */
 public class DefaultCamera extends Camera {
 
-    private double _bobbingRotationOffsetFactor, _bobbingVerticalOffsetFactor = 0.0;
+    private float _bobbingRotationOffsetFactor, _bobbingVerticalOffsetFactor = 0.0f;
 
     public void loadProjectionMatrix(float fov) {
         glMatrixMode(GL_PROJECTION);
@@ -46,7 +47,7 @@ public class DefaultCamera extends Camera {
     public void loadModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
         glLoadIdentity();
-        Vector3d right = new Vector3d();
+        Vector3f right = new Vector3f();
         right.cross(_viewingDirection, _up);
         right.scale(_bobbingRotationOffsetFactor);
         GLU.gluLookAt(0f, (float) _bobbingVerticalOffsetFactor * 2.0f, 0f, (float) _viewingDirection.x, (float) _viewingDirection.y + (float) _bobbingVerticalOffsetFactor * 2.0f, (float) _viewingDirection.z, (float) _up.x + (float) right.x, (float) _up.y + (float) right.y, (float) _up.z + (float) right.z);
@@ -56,18 +57,18 @@ public class DefaultCamera extends Camera {
     public void loadNormalizedModelViewMatrix() {
         glMatrixMode(GL11.GL_MODELVIEW);
         glLoadIdentity();
-        Vector3d right = new Vector3d();
+        Vector3f right = new Vector3f();
         right.cross(_viewingDirection, _up);
         right.scale(_bobbingRotationOffsetFactor);
         GLU.gluLookAt(0f, 0f, 0f, (float) _viewingDirection.x, (float) _viewingDirection.y, (float) _viewingDirection.z, (float) _up.x + (float) right.x, (float) _up.y + (float) right.y, (float) _up.z + (float) right.z);
         _viewFrustum.updateFrustum();
     }
 
-    public void setBobbingRotationOffsetFactor(double f) {
+    public void setBobbingRotationOffsetFactor(float f) {
         _bobbingRotationOffsetFactor = f;
     }
 
-    public void setBobbingVerticalOffsetFactor(double f) {
+    public void setBobbingVerticalOffsetFactor(float f) {
         _bobbingVerticalOffsetFactor = f;
     }
 }

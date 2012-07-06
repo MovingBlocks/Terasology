@@ -21,6 +21,7 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.rendering.world.WorldRenderer;
 
 import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 import java.nio.FloatBuffer;
 
 /**
@@ -133,7 +134,7 @@ public class ViewFrustum {
 
         Vector3d[] aabbVertices = aabb.getVertices();
 
-        Vector3d cp = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
+        Vector3f cp = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
 
         for (int i = 0; i < 6; i++) {
             if (_planes[i].getA() * (aabbVertices[0].x - cp.x) + _planes[i].getB() * (aabbVertices[0].y - cp.y) + _planes[i].getC() * (aabbVertices[0].z - cp.z) + _planes[i].getD() > 0)

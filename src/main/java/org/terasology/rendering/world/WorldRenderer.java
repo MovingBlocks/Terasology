@@ -289,7 +289,7 @@ public final class WorldRenderer implements IGameObject {
         private float distanceToCamera(Chunk chunk) {
             Vector3f result = new Vector3f((chunk.getPos().x + 0.5f) * Chunk.SIZE_X, 0, (chunk.getPos().z + 0.5f) * Chunk.SIZE_Z);
 
-            Vector3d cameraPos = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
+            Vector3f cameraPos = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
             result.x -= cameraPos.x;
             result.z -= cameraPos.z;
 
@@ -592,7 +592,7 @@ public final class WorldRenderer implements IGameObject {
 
             GL11.glPushMatrix();
 
-            Vector3d cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
+            Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
             GL11.glTranslated(chunk.getPos().x * Chunk.SIZE_X - cameraPosition.x, chunk.getPos().y * Chunk.SIZE_Y - cameraPosition.y, chunk.getPos().z * Chunk.SIZE_Z - cameraPosition.z);
 
             for (int i = 0; i < VERTICAL_SEGMENTS; i++) {

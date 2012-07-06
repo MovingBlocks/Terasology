@@ -65,8 +65,8 @@ public class ShaderParametersPost implements IShaderParameters {
         program.setFloat("viewingDistance", Config.getInstance().getActiveViewingDistance() * 8.0f);
 
         if (CoreRegistry.get(LocalPlayer.class).isValid()) {
-            Vector3d cameraPos = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
-            Block block = CoreRegistry.get(WorldProvider.class).getBlock(new Vector3f(cameraPos));
+            Vector3f cameraPos = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
+            Block block = CoreRegistry.get(WorldProvider.class).getBlock(cameraPos);
             program.setInt("swimming", block.isLiquid() ? 1 : 0);
         }
     }

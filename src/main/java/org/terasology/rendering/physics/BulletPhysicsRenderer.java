@@ -325,7 +325,7 @@ public class BulletPhysicsRenderer implements IGameObject {
         FloatBuffer mBuffer = BufferUtils.createFloatBuffer(16);
         float[] mFloat = new float[16];
         GL11.glPushMatrix();
-        Vector3d cameraPosition = _parent.getActiveCamera().getPosition();
+        Vector3f cameraPosition = _parent.getActiveCamera().getPosition();
         GL11.glTranslated(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
         List<CollisionObject> collisionObjects = _discreteDynamicsWorld.getCollisionObjectArray();
         for (CollisionObject co : collisionObjects) {

@@ -19,6 +19,7 @@ import org.terasology.logic.manager.Config;
 import org.terasology.model.structures.ViewFrustum;
 
 import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 
 /**
  * Provides global access to fonts.
@@ -28,9 +29,9 @@ import javax.vecmath.Vector3d;
 public abstract class Camera {
 
     /* CAMERA PARAMETERS */
-    protected final Vector3d _position = new Vector3d(0, 0, 0);
-    protected final Vector3d _up = new Vector3d(0, 1, 0);
-    protected final Vector3d _viewingDirection = new Vector3d(1, 0, 0);
+    protected final Vector3f _position = new Vector3f(0, 0, 0);
+    protected final Vector3f _up = new Vector3f(0, 1, 0);
+    protected final Vector3f _viewingDirection = new Vector3f(1, 0, 0);
 
     protected float _targetFov = Config.getInstance().getFov();
     protected float _activeFov = Config.getInstance().getFov() / 4f;
@@ -64,15 +65,15 @@ public abstract class Camera {
 
     public abstract void loadNormalizedModelViewMatrix();
 
-    public Vector3d getPosition() {
+    public Vector3f getPosition() {
         return _position;
     }
 
-    public Vector3d getViewingDirection() {
+    public Vector3f getViewingDirection() {
         return _viewingDirection;
     }
 
-    public Vector3d getUp() {
+    public Vector3f getUp() {
         return _up;
     }
 

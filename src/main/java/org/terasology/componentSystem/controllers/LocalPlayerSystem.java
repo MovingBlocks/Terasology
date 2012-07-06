@@ -226,8 +226,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
         playerCamera.getPosition().set(cameraPosition);
         Vector3f viewDir = new Vector3f(0, 0, 1);
-        QuaternionUtil.quatRotate(rotation, viewDir, viewDir);
-        playerCamera.getViewingDirection().set(viewDir);
+        QuaternionUtil.quatRotate(rotation, viewDir, playerCamera.getViewingDirection());
 
         float stepDelta = charMovementComp.footstepDelta - lastStepDelta;
         if (stepDelta < 0) stepDelta += charMovementComp.distanceBetweenFootsteps;
@@ -238,8 +237,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             playerCamera.setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.5f));
             playerCamera.setBobbingVerticalOffsetFactor(calcBobbingOffset((float) java.lang.Math.PI / 4f, 0.025f, 3f));
         } else {
-            playerCamera.setBobbingRotationOffsetFactor(0.0);
-            playerCamera.setBobbingVerticalOffsetFactor(0.0);
+            playerCamera.setBobbingRotationOffsetFactor(0.0f);
+            playerCamera.setBobbingVerticalOffsetFactor(0.0f);
         }
 
         if (charMovementComp.isGhosting) {
@@ -358,8 +357,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         }
     }
 
-    private double calcBobbingOffset(float phaseOffset, float amplitude, float frequency) {
-        return java.lang.Math.sin(bobFactor * frequency + phaseOffset) * amplitude;
+    private float calcBobbingOffset(float phaseOffset, float amplitude, float frequency) {
+        return (float) java.lang.Math.sin(bobFactor * frequency + phaseOffset) * amplitude;
     }
 
 

@@ -7,6 +7,7 @@ import org.terasology.logic.manager.SoundManager;
 import org.terasology.rendering.world.WorldRenderer;
 
 import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 
 import static org.lwjgl.openal.AL10.*;
 
@@ -339,7 +340,7 @@ public class BasicSoundSource implements SoundSource {
         float[] pos = new float[]{(float) position.x, (float) position.y, (float) position.z};
 
         if (isAbsolute()) {
-            Vector3d cameraPos = getCameraPosition();
+            Vector3f cameraPos = getCameraPosition();
             pos[0] -= cameraPos.x;
             pos[1] -= cameraPos.y;
             pos[2] -= cameraPos.z;
@@ -367,7 +368,7 @@ public class BasicSoundSource implements SoundSource {
         }
     }
 
-    private Vector3d getCameraPosition() {
+    private Vector3f getCameraPosition() {
         return CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
     }
 

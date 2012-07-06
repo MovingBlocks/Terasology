@@ -20,6 +20,7 @@ import org.terasology.entitySystem.*;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.Timer;
+import org.terasology.input.CameraTargetSystem;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.mods.miniions.components.MinionComponent;
@@ -118,10 +119,11 @@ public class UIHeadsUpDisplay extends UIDisplayWindow implements EventHandlerSys
         _debugLine4.setVisible(enableDebug);
 
         if (enableDebug) {
+            CameraTargetSystem cameraTarget = CoreRegistry.get(CameraTargetSystem.class);
             double memoryUsage = ((double) Runtime.getRuntime().totalMemory() - (double) Runtime.getRuntime().freeMemory()) / 1048576.0;
             Timer timer = CoreRegistry.get(Timer.class);
             _debugLine1.setText(String.format("fps: %.2f, mem usage: %.2f MB, total mem: %.2f, max mem: %.2f", timer.getFps(), memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0));
-            _debugLine2.setText(String.format("%s", CoreRegistry.get(LocalPlayer.class)));
+            _debugLine2.setText(String.format("%s", cameraTarget.toString()));
             _debugLine3.setText(String.format("%s", CoreRegistry.get(WorldRenderer.class)));
             _debugLine4.setText(String.format("total vus: %s | active threads: %s", ChunkTessellator.getVertexArrayUpdateCount(), CoreRegistry.get(GameEngine.class).getActiveTaskCount()));
         }

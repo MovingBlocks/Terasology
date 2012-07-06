@@ -54,7 +54,7 @@ public class MeshRenderer implements RenderSystem {
     @Override
     public void renderTransparent() {
 
-        Vector3d cameraPosition = worldRenderer.getActiveCamera().getPosition();
+        Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
         for (EntityRef entity : manager.iteratorEntities(MeshComponent.class, AABBCollisionComponent.class, LocationComponent.class)) {
             // TODO: Probably don't need this collision component, there should be some sort of AABB built into the mesh
             MeshComponent meshComp = entity.getComponent(MeshComponent.class);
@@ -94,7 +94,7 @@ public class MeshRenderer implements RenderSystem {
     @Override
     public void renderOpaque() {
         boolean carryingTorch = CoreRegistry.get(LocalPlayer.class).isCarryingTorch();
-        Vector3d cameraPosition = worldRenderer.getActiveCamera().getPosition();
+        Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
         for (EntityRef entity : manager.iteratorEntities(MeshComponent.class, AABBCollisionComponent.class, LocationComponent.class)) {
             // TODO: Probably don't need this collision component, there should be some sort of AABB built into the mesh
             MeshComponent meshComp = entity.getComponent(MeshComponent.class);

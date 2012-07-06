@@ -19,6 +19,7 @@ import org.terasology.rendering.world.WorldRenderer;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -59,7 +60,7 @@ public class BlockDamageRenderer implements RenderSystem {
         glBindTexture(GL11.GL_TEXTURE_2D, effectsTexture.getId());
         glEnable(GL11.GL_BLEND);
         glBlendFunc(GL_DST_COLOR, GL_ZERO);
-        Vector3d cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
+        Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
 
         for (EntityRef entity : entityManager.iteratorEntities(HealthComponent.class, BlockComponent.class)) {
             HealthComponent health = entity.getComponent(HealthComponent.class);

@@ -96,29 +96,38 @@ public class CameraTargetSystem implements ComponentSystem {
 
         BulletPhysicsRenderer physicsRenderer = CoreRegistry.get(BulletPhysicsRenderer.class);
         HitResult hitInfo = physicsRenderer.rayTrace(new Vector3f(camera.getPosition()), new Vector3f(camera.getViewingDirection()), TARGET_DISTANCE);
+        Vector3i newBlockPos = null;
 
         if (hitInfo.isHit()) {
             hitPosition = hitInfo.getHitPoint();
             hitNormal = hitInfo.getHitNormal();
 
-            Vector3i newBlockPos = null;
+
             BlockComponent blockComp = hitInfo.getEntity().getComponent(BlockComponent.class);
             if (blockComp != null) {
                 newBlockPos = new Vector3i(blockComp.getPosition());
             }
-            if (!Objects.equal(targetBlockPos, newBlockPos) || lostTarget) {
-                EntityRef oldTarget = target;
-
-                target = EntityRef.NULL;
-                targetBlockPos = newBlockPos;
-                if (newBlockPos != null) {
-                    target = hitInfo.getEntity();
-                }
-
-                oldTarget.send(new CameraOutEvent());
-                target.send(new CameraOverEvent());
-                localPlayer.getEntity().send(new CameraTargetChangedEvent(oldTarget, target));
-            }
         }
+        if (!Objects.equal(targetBlockPos, newBlockPos) || lostTarget) {
+            EntityRef oldTarget = target;
+
+            target = EntityRef.NULL;
+            targetBlockPos = newBlockPos;
+            if (newBlockPos != null) {
+                target = hitInfo.getEntity();
+            }
+
+            oldTarget.send(new CameraOutEvent());
+            target.send(new CameraOverEvent());
+            localPlayer.getEntity().send(new CameraTargetChangedEvent(oldTarget, target));
+        }
+    }
+
+    public String toString() {
+        Camera camera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
+        if (targetBlockPos != null) {
+            return String.format("From: %f %f %f, Dir: %f %f %f, Hit %d %d %d %f %f %f", camera.getPosition().x, camera.getPosition().y, camera.getPosition().z, camera.getViewingDirection().x, camera.getViewingDirection().y, camera.getViewingDirection().z, targetBlockPos.x, targetBlockPos.y, targetBlockPos.z, hitPosition.x, hitPosition.y, hitPosition.z);
+        }
+        return "";
     }
 }

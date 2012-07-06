@@ -118,7 +118,7 @@ protected Sound createStreamingAudio(String name, URL source) {
             return false;
         }
 
-        Vector3d soundPosition = new Vector3d(soundSource);
+        Vector3f soundPosition = new Vector3f(soundSource);
         soundPosition.sub(camera.getPosition());
 
         return soundPosition.lengthSquared() < MAX_DISTANCE_SQUARED;

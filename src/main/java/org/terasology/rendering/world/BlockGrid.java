@@ -25,6 +25,7 @@ import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
 
 import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 import java.util.HashSet;
 
@@ -62,7 +63,7 @@ public class BlockGrid implements IGameObject {
             for (BlockPosition gp : _gridPositions) {
                 GL11.glPushMatrix();
 
-                Vector3d cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
+                Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
                 GL11.glTranslated(gp.x - cameraPosition.x, gp.y - cameraPosition.y, gp.z - cameraPosition.z);
 
                 _mesh.render();

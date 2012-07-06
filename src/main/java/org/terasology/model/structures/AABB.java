@@ -291,7 +291,7 @@ public class AABB {
         ShaderManager.getInstance().enableDefault();
 
         glPushMatrix();
-        Vector3d cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
+        Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
         glTranslated(getPosition().x - cameraPosition.x, -cameraPosition.y, getPosition().z - cameraPosition.z);
 
         renderLocally(lineThickness);
