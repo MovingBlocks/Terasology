@@ -37,11 +37,11 @@ import org.terasology.asset.AssetUri;
 import org.terasology.components.CharacterMovementComponent;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
+import org.terasology.components.world.BlockComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entityFactory.BlockItemFactory;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.PrefabManager;
+import org.terasology.entitySystem.*;
+import org.terasology.events.BlockChangedEvent;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
@@ -51,6 +51,7 @@ import org.terasology.logic.world.Chunk;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.model.structures.BlockPosition;
 import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.WorldRenderer;
@@ -70,7 +71,7 @@ import java.util.logging.Logger;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class BulletPhysicsRenderer implements IGameObject {
+public class BulletPhysicsRenderer implements IGameObject, EventReceiver<BlockChangedEvent> {
 
     private class BlockRigidBody extends RigidBody implements Comparable<BlockRigidBody> {
         private final byte _type;
@@ -158,6 +159,7 @@ public class BulletPhysicsRenderer implements IGameObject {
         _blockItemFactory = new BlockItemFactory(CoreRegistry.get(EntityManager.class), CoreRegistry.get(PrefabManager.class));
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
         _timer = CoreRegistry.get(Timer.class);
+        CoreRegistry.get(EventSystem.class).registerEventReceiver(this, BlockChangedEvent.class, BlockComponent.class);
 
         PhysicsWorldWrapper wrapper = new PhysicsWorldWrapper(parent.getWorldProvider());
         VoxelWorldShape worldShape = new VoxelWorldShape(wrapper);
@@ -168,6 +170,7 @@ public class BulletPhysicsRenderer implements IGameObject {
         RigidBodyConstructionInfo blockConsInf = new RigidBodyConstructionInfo(0, blockMotionState, worldShape, new Vector3f());
         RigidBody rigidBody = new RigidBody(blockConsInf);
         _discreteDynamicsWorld.addRigidBody(rigidBody);
+
     }
 
     public HitResult rayTrace(Vector3f from, Vector3f direction, float distance) {
@@ -181,6 +184,15 @@ public class BulletPhysicsRenderer implements IGameObject {
             return new HitResult(blockEntityRegistry.getOrCreateEntityAt((Vector3i)closest.userData), closest.hitPointWorld, closest.hitNormalWorld);
         }
         return new HitResult();
+    }
+
+    @Override
+    public void onEvent(BlockChangedEvent event, EntityRef entity) {
+        Vector3f min = event.getBlockPosition().toVector3f();
+        min.sub(new Vector3f(0.6f, 0.6f, 0.6f));
+        Vector3f max = event.getBlockPosition().toVector3f();
+        max.add(new Vector3f(0.6f, 0.6f, 0.6f));
+        _discreteDynamicsWorld.awakenRigidBodiesInArea(min, max);
     }
 
     public BlockRigidBody[] addLootableBlocks(Vector3f position, Block block) {
