@@ -1,5 +1,6 @@
 package org.terasology.components;
 
+import com.bulletphysics.collision.dispatch.GhostObject;
 import org.terasology.entitySystem.Component;
 
 import javax.vecmath.Vector3f;
@@ -9,12 +10,19 @@ import javax.vecmath.Vector3f;
  */
 public final class CharacterMovementComponent implements Component {
 
+    // Collision settings
+    public float height = 1.6f;
+    public float radius = 0.3f;
+
     // Speed settings
     public float maxGroundSpeed = 5.0f;
     public float maxWaterSpeed = 2.0f;
     public float maxGhostSpeed = 5.0f;
     public float runFactor = 1.5f;
     public float jumpSpeed = 10.0f;
+
+    // Movement settings
+    public float stepHeight = 0.35f;
 
     // Determines how easily the play can change direction
     // TODO: Separate player agiliy from environmental friction, and ground from air control
@@ -40,6 +48,8 @@ public final class CharacterMovementComponent implements Component {
 
     // Distance since last footstep
     public float footstepDelta = 0.0f;
+
+    public transient GhostObject collider;
 
     public Vector3f getVelocity() {
         return velocity;

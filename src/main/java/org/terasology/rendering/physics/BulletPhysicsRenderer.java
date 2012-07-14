@@ -16,14 +16,13 @@
 package org.terasology.rendering.physics;
 
 import com.bulletphysics.collision.broadphase.BroadphaseInterface;
+import com.bulletphysics.collision.broadphase.CollisionFilterGroups;
 import com.bulletphysics.collision.broadphase.DbvtBroadphase;
 import com.bulletphysics.collision.dispatch.*;
-import com.bulletphysics.collision.shapes.BoxShape;
-import com.bulletphysics.collision.shapes.BvhTriangleMeshShape;
-import com.bulletphysics.collision.shapes.IndexedMesh;
-import com.bulletphysics.collision.shapes.TriangleIndexVertexArray;
+import com.bulletphysics.collision.shapes.*;
 import com.bulletphysics.collision.shapes.voxel.VoxelWorldShape;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
+import com.bulletphysics.dynamics.DynamicsWorld;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
@@ -147,6 +146,7 @@ public class BulletPhysicsRenderer implements IGameObject, EventReceiver<BlockCh
 
     public BulletPhysicsRenderer(WorldRenderer parent) {
         _broadphase = new DbvtBroadphase();
+        _broadphase.getOverlappingPairCache().setInternalGhostPairCallback(new GhostPairCallback());
         _defaultCollisionConfiguration = new DefaultCollisionConfiguration();
         _dispatcher = new CollisionDispatcher(_defaultCollisionConfiguration);
         _sequentialImpulseConstraintSolver = new SequentialImpulseConstraintSolver();
@@ -168,6 +168,20 @@ public class BulletPhysicsRenderer implements IGameObject, EventReceiver<BlockCh
         RigidBody rigidBody = new RigidBody(blockConsInf);
         _discreteDynamicsWorld.addRigidBody(rigidBody);
 
+    }
+
+    public GhostObject creationCollider(Vector3f pos, ConvexShape shape) {
+        Transform startTransform = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), pos, 1.0f));
+        GhostObject result = new PairCachingGhostObject();
+        result.setWorldTransform(startTransform);
+        result.setCollisionShape(shape);
+        result.setCollisionFlags(CollisionFlags.CHARACTER_OBJECT);
+        _discreteDynamicsWorld.addCollisionObject(result, CollisionFilterGroups.CHARACTER_FILTER, (short)(CollisionFilterGroups.STATIC_FILTER | CollisionFilterGroups.DEFAULT_FILTER));
+        return result;
+    }
+
+    public void removeCollider(GhostObject collider) {
+        _discreteDynamicsWorld.removeCollisionObject(collider);
     }
 
     public HitResult rayTrace(Vector3f from, Vector3f direction, float distance) {

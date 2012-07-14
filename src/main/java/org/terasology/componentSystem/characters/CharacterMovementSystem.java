@@ -27,7 +27,6 @@ import java.util.List;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-@RegisterComponentSystem
 public class CharacterMovementSystem implements UpdateSubscriberSystem {
 
     public static final float UnderwaterGravity = 0.25f;

@@ -22,6 +22,7 @@ import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceException;
 import groovy.util.ScriptException;
 import org.lwjgl.input.Keyboard;
+import org.terasology.components.CharacterMovementComponent;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.world.LocationComponent;
@@ -169,6 +170,12 @@ public class GroovyManager {
             if (itemComp != null && !itemComp.container.exists()) {
                 item.destroy();
             }
+        }
+
+        private void setStepHeight(float amount) {
+            EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
+            CharacterMovementComponent comp = playerEntity.getComponent(CharacterMovementComponent.class);
+            comp.stepHeight = amount;
         }
 
         private void giveItem(String itemPrefabName) {

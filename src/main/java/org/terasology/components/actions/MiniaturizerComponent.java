@@ -17,7 +17,7 @@ public class MiniaturizerComponent implements Component {
 
     public static final float SCALE = 1f / 32f;
 
-    public ChunkMesh chunkMesh;
+    public transient ChunkMesh chunkMesh;
     public float orientation;
     public Vector3f renderPosition;
     public MiniatureChunk miniatureChunk;
