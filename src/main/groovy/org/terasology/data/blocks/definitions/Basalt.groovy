@@ -19,7 +19,7 @@ package org.terasology.data.blocks.definitions
 /**
  *  Basalt is an igneous extrusive volcanic rock which can form whole layers. Basalt is used for  road base, concrete
  *  aggregate, asphalt pavement aggregate, railroad ballast, filter stone in drain fields. Thin slabs of basalt are cut
- *  and sometimes polished for use as floor tiles, building veneer
+ *  and sometimes polished for use as floor tiles, building veneer.
  */
 block {
     version = 1
