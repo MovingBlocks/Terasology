@@ -72,7 +72,7 @@ public class UIMinionbarCell extends UIDisplayElement {
         if (inventory == null) {
             return;
         }
-        if (inventory.MinionSlots.size() > id) {
+        if (inventory.minionSlots.size() > id) {
             MinionControllerComponent minionController = localPlayer.getEntity().getComponent(MinionControllerComponent.class);
             if (minionController != null) {
                 setSelected(minionController.selectedMinion == id);
@@ -89,10 +89,10 @@ public class UIMinionbarCell extends UIDisplayElement {
         if (inventory == null) {
             return;
         }
-        if (inventory.MinionSlots.size() <= id) {
+        if (inventory.minionSlots.size() <= id) {
             return;
         }
-        EntityRef minionEntity = inventory.MinionSlots.get(id);
+        EntityRef minionEntity = inventory.minionSlots.get(id);
         MinionComponent minion = minionEntity.getComponent(MinionComponent.class);
         if (minion == null) {
             return;

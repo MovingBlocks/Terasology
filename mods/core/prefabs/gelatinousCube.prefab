@@ -5,6 +5,9 @@
     "renderType" : "GelatinousCube"
   },
   "CharacterMovement" : {
+    "height" : 1,
+    "radius" : 0.5,
+    "stepHeight" : 0,
     "faceMovementDirection" : true
   },
   "SimpleAI" : {},

@@ -39,7 +39,7 @@ public class PortalManager {
      */
     private final HashSet<Portal> _portalStore = new HashSet<Portal>();
 
-    private final int maxMobs = 0;
+    private final int maxMobs = 16;
     private final FastRandom _random = new FastRandom();
     private EntityManager _entityManager;
     private GelatinousCubeFactory factory;

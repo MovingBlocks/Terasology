@@ -53,9 +53,6 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
     private WorldProvider worldProvider;
     private BulletPhysicsRenderer physics;
 
-    // For reuse to save memory churn
-    private AABB entityAABB = new AABB(new Vector3d(), new Vector3d());
-
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
         worldProvider = CoreRegistry.get(WorldProvider.class);
@@ -82,8 +79,8 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
             CharacterMovementComponent movementComp = entity.getComponent(CharacterMovementComponent.class);
 
             if (movementComp.collider == null) {
-                float height = movementComp.height - 2 * movementComp.radius;
-                float width = movementComp.radius;
+                float height = (movementComp.height - 2 * movementComp.radius) * location.getWorldScale();
+                float width = movementComp.radius * location.getWorldScale();
                 ConvexShape capsule = new CapsuleShape(width, height);
                 movementComp.collider = physics.creationCollider(location.getWorldPosition(), capsule);
                 movementComp.collider.setUserPointer(entity);
@@ -300,13 +297,14 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
         result.finalPosition = position;
 
         float steppedUpDist = moveUp((moveDelta.y > 0) ? moveDelta.y : 0, stepHeight, collider, result, position);
-        moveHorizontal(new Vector3f(moveDelta.x, 0, moveDelta.z), collider, position);
+        result.hitHoriz = moveHorizontal(new Vector3f(moveDelta.x, 0, moveDelta.z), collider, position);
         moveDown((moveDelta.y < 0) ? moveDelta.y : 0, steppedUpDist, collider, result, position);
         return result;
     }
 
-    private void moveHorizontal(Vector3f horizMove, GhostObject collider, Vector3f position) {
+    private boolean moveHorizontal(Vector3f horizMove, GhostObject collider, Vector3f position) {
         float remainingFraction = 1.0f;
+        boolean horizontalHit = false;
         Vector3f normalizedDir = Vector3fUtil.safeNormalize(horizMove, new Vector3f());
         Vector3f targetPos = new Vector3f(position);
         targetPos.add(horizMove);
@@ -322,6 +320,9 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
                 actualMove.sub(targetPos, position);
                 actualMove.scale(Math.max(0, callback.closestHitFraction));
                 position.add(actualMove);
+                if (callback.hitNormalWorld.dot(new Vector3f(0,1,0)) < 0.5f)  {
+                    horizontalHit = true;
+                }
 
                 extractResidualMovement(callback.hitNormalWorld, targetPos, position);
 
@@ -341,6 +342,7 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
                 position.set(targetPos);
             }
         }
+        return horizontalHit;
     }
 
     private void moveDown(float fallAmount, float stepDownAmount, GhostObject collider, MoveResult result, Vector3f position) {

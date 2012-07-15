@@ -1,6 +1,8 @@
 package org.terasology.componentSystem.action;
 
 import org.terasology.components.actions.ExplosionActionComponent;
+import org.terasology.components.world.BlockComponent;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
@@ -41,8 +43,31 @@ public class ExplosionAction implements EventHandlerSystem {
 
     @ReceiveEvent(components = {ExplosionActionComponent.class})
     public void onActivate(ActivateEvent event, EntityRef entity) {
-        Vector3f origin = event.getTargetLocation();
-        if (origin == null) return;
+        ExplosionActionComponent explosionComp = entity.getComponent(ExplosionActionComponent.class);
+        Vector3f origin = null;
+        switch (explosionComp.relativeTo) {
+            case Self:
+                LocationComponent loc = entity.getComponent(LocationComponent.class);
+                if (loc != null) {
+                    origin = loc.getWorldPosition();
+                } else {
+                    BlockComponent blockComp = entity.getComponent(BlockComponent.class);
+                    if (blockComp != null) {
+                        origin = blockComp.getPosition().toVector3f();
+                    }
+                }
+                break;
+            case Instigator:
+                origin = event.getInstigatorLocation();
+                break;
+            default:
+                origin = event.getTargetLocation();
+                break;
+        }
+
+        if (origin == null) {
+            return;
+        }
 
         Vector3i blockPos = new Vector3i();
         for (int i = 0; i < 256; i++) {

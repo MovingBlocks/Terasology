@@ -61,7 +61,7 @@ public class UIMinion extends UIDisplayWindow {
             if (inventory == null) {
                 return;
             }
-            EntityRef minion = inventory.MinionSlots.get(selectedMinion);
+            EntityRef minion = inventory.minionSlots.get(selectedMinion);
             if (minion != null) {
                 MinionComponent minioncomp = minion.getComponent(MinionComponent.class);
                 if (minioncomp != null) {

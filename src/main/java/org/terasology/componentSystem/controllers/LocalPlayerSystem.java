@@ -294,7 +294,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
         if (localPlayerComp.isDead) return;
 
-        event.getTarget().send(new ActivateEvent(entity, entity));
+        event.getTarget().send(new ActivateEvent(entity, entity, playerCamera.getPosition(), playerCamera.getViewingDirection(), event.getHitPosition(), event.getHitNormal()));
         event.consume();
     }
 

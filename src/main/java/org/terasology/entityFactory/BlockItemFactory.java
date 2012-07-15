@@ -33,6 +33,9 @@ public class BlockItemFactory {
     }
 
     private EntityRef newInstance(BlockFamily blockFamily, int quantity, EntityRef placedEntity) {
+        if (blockFamily == null) {
+            return EntityRef.NULL;
+        }
         EntityRef entity = entityManager.create();
         if (blockFamily.getArchetypeBlock().getLuminance() > 0) {
             entity.addComponent(new LightComponent());
