@@ -205,7 +205,7 @@ public class Shader implements Asset {
 
     public static StringBuilder createShaderBuilder() {
         StringBuilder builder = new StringBuilder().append(PreProcessorPreamble);
-        if (Config.getInstance().isAnimatedWaterAndGrass())
+        if (Config.getInstance().isAnimatedGrass())
             builder.append("#define ANIMATED_WATER_AND_GRASS \n");
         if (Config.getInstance().isComplexWater())
             builder.append("#define COMPLEX_WATER \n");
