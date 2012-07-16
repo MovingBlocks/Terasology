@@ -15,7 +15,6 @@
  */
 package org.terasology.rendering.primitives;
 
-import gnu.trove.iterator.TFloatIterator;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
@@ -27,7 +26,7 @@ import org.lwjgl.opengl.GL15;
 import org.terasology.asset.Asset;
 import org.terasology.asset.AssetUri;
 import org.terasology.logic.manager.VertexBufferObjectManager;
-import org.terasology.model.structures.AABB;
+import org.terasology.math.AABB;
 
 import javax.vecmath.Vector3f;
 import java.nio.FloatBuffer;

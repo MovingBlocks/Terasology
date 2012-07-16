@@ -1,6 +1,5 @@
 package org.terasology.componentSystem.rendering;
 
-import com.bulletphysics.linearmath.AabbUtil2;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.components.rendering.MeshComponent;
 import org.terasology.components.world.LocationComponent;
@@ -11,7 +10,7 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.TeraMath;
-import org.terasology.model.structures.AABB;
+import org.terasology.math.AABB;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;

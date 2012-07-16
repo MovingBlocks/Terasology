@@ -21,7 +21,7 @@ import org.terasology.math.Rotation
 import org.terasology.math.Side
 import org.terasology.model.shapes.BlockShape
 import org.terasology.model.shapes.BlockShapeManager
-import org.terasology.model.structures.AABB
+
 import org.terasology.utilities.ClasspathResourceLoader
 
 import java.awt.Graphics

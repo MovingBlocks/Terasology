@@ -13,7 +13,7 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.logic.world.WorldProvider;
 import org.terasology.logic.world.WorldUtil;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.structures.AABB;
+import org.terasology.math.AABB;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 

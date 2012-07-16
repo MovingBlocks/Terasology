@@ -22,12 +22,11 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
-import org.terasology.model.structures.AABB;
+import org.terasology.math.AABB;
 import org.terasology.model.structures.TeraArray;
 import org.terasology.model.structures.TeraSmartArray;
 import org.terasology.rendering.primitives.ChunkMesh;
 
-import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 import java.io.Externalizable;
 import java.io.IOException;

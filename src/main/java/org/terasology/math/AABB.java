@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.model.structures;
+package org.terasology.math;
 
 import com.bulletphysics.linearmath.AabbUtil2;
 import com.bulletphysics.linearmath.Transform;
 import com.google.common.base.Objects;
-import org.terasology.math.Vector3fUtil;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;

@@ -1,10 +1,7 @@
 package org.terasology.math;
 
-import org.terasology.model.structures.AABB;
-
 import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
 /**

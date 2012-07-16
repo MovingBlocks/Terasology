@@ -24,8 +24,8 @@ import org.terasology.logic.manager.Config;
 import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.structures.AABB;
-import org.terasology.model.structures.AABBRenderer;
+import org.terasology.math.AABB;
+import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.cameras.DefaultCamera;
 
 import javax.vecmath.Quat4f;
