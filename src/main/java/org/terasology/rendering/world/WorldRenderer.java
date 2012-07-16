@@ -21,7 +21,6 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.controllers.LocalPlayerSystem;
-import org.terasology.components.AABBCollisionComponent;
 import org.terasology.components.PlayerComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.game.ComponentSystemManager;
@@ -46,6 +45,7 @@ import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.structures.AABB;
+import org.terasology.model.structures.AABBRenderer;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.cameras.Camera;
@@ -624,6 +624,7 @@ public final class WorldRenderer implements IGameObject {
     }
 
     private void renderChunk(Chunk chunk, ChunkMesh.RENDER_PHASE phase, Camera camera) {
+
         if (chunk.getChunkState() == Chunk.State.COMPLETE && chunk.getMesh() != null) {
             ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("chunk");
             // Transfer the world offset of the chunk to the shader for various effects
@@ -639,7 +640,8 @@ public final class WorldRenderer implements IGameObject {
             for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
                 if (!chunk.getMesh()[i].isEmpty()) {
                     if (Config.getInstance().isRenderChunkBoundingBoxes()) {
-                        chunk.getSubMeshAABB(i).renderLocally(1f);
+                        AABBRenderer aabbRenderer = new AABBRenderer(chunk.getSubMeshAABB(i));
+                        aabbRenderer.renderLocally(1f);
                         _statRenderedTriangles += 12;
                     }
 
@@ -718,23 +720,7 @@ public final class WorldRenderer implements IGameObject {
     }
 
     private void renderDebugCollision(Camera camera) {
-        if (_player != null && _player.isValid()) {
-            AABBCollisionComponent collision = _player.getEntity().getComponent(AABBCollisionComponent.class);
-            if (collision != null) {
-                Vector3f worldLoc = _player.getPosition();
-                AABB aabb = new AABB(new Vector3d(worldLoc), new Vector3d(collision.getExtents()));
-                aabb.render(1f);
-            }
-        }
-
-        List<BlockPosition> blocks = WorldUtil.gatherAdjacentBlockPositions(new Vector3f(camera.getPosition()));
-
-        for (int i = 0; i < blocks.size(); i++) {
-            BlockPosition p = blocks.get(i);
-            Block block = getWorldProvider().getBlock(new Vector3f(p.x, p.y, p.z));
-
-            block.getBounds(new Vector3i(p.x, p.y, p.z, 0.5f)).render(1f);
-        }
+        // TODO: Implement
     }
 
     private boolean isUnderwater() {

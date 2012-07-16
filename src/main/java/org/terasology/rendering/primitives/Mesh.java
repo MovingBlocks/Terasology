@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.primitives;
 
+import gnu.trove.iterator.TFloatIterator;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
@@ -26,7 +27,9 @@ import org.lwjgl.opengl.GL15;
 import org.terasology.asset.Asset;
 import org.terasology.asset.AssetUri;
 import org.terasology.logic.manager.VertexBufferObjectManager;
+import org.terasology.model.structures.AABB;
 
+import javax.vecmath.Vector3f;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -40,6 +43,25 @@ public class Mesh implements Asset {
     private static final int TEX_COORD_1_SIZE = 3;
     private static final int COLOR_SIZE = 4;
     private static final int NORMAL_SIZE = 3;
+
+    private AssetUri uri = new AssetUri("");
+    private AABB aabb;
+
+    private int stride;
+    private int vertexOffset;
+    private int texCoord0Offset;
+    private int texCoord1Offset;
+    private int colorOffset;
+    private int normalOffset;
+
+    private boolean hasTexCoord0 = false;
+    private boolean hasTexCoord1 = false;
+    private boolean hasColor = false;
+    private boolean hasNormal = false;
+
+    private int vboVertexBuffer;
+    private int vboIndexBuffer;
+    private int indexCount;
 
     public static Mesh buildMesh(AssetUri uri, TFloatList vertices, TFloatList texCoord0, TFloatList texCoord1, TFloatList normals, TFloatList colors, TIntList indices) {
         Mesh mesh = buildMesh(vertices, texCoord0, texCoord1, normals, colors, indices);
@@ -69,6 +91,7 @@ public class Mesh implements Asset {
         mesh.vboVertexBuffer = VertexBufferObjectManager.getInstance().getVboId();
         mesh.vboIndexBuffer = VertexBufferObjectManager.getInstance().getVboId();
         mesh.indexCount = indices.size();
+        mesh.aabb = calculateAABB(vertices, vertexCount);
 
         VertexBufferObjectManager.getInstance().bufferVboData(mesh.vboVertexBuffer, vertexBuffer, GL15.GL_STATIC_DRAW);
         VertexBufferObjectManager.getInstance().bufferVboElementData(mesh.vboIndexBuffer, indexBuffer, GL15.GL_STATIC_DRAW);
@@ -99,6 +122,25 @@ public class Mesh implements Asset {
         }
 
         return mesh;
+    }
+
+    private static AABB calculateAABB(TFloatList vertices, int vertexCount) {
+        if (vertexCount == 0) {
+            return AABB.createEmpty();
+        }
+
+        Vector3f min = new Vector3f(vertices.get(0), vertices.get(1), vertices.get(2));
+        Vector3f max = new Vector3f(vertices.get(0), vertices.get(1), vertices.get(2));
+        for (int index = 1; index < vertexCount; ++index) {
+            min.x = Math.min(min.x, vertices.get(3 * index));
+            max.x = Math.max(max.x, vertices.get(3 * index));
+            min.y = Math.min(min.y, vertices.get(3 * index + 1));
+            max.y = Math.max(max.y, vertices.get(3 * index + 1));
+            min.z = Math.min(min.z, vertices.get(3 * index + 2));
+            max.z = Math.max(max.z, vertices.get(3 * index + 2));
+        }
+        return AABB.createMinMax(min, max);
+
     }
 
     private static FloatBuffer createVertexBuffer(TFloatList vertices, TFloatList texcoord0, TFloatList texcoord1, TFloatList normals, TFloatList colors, int vertexCount, boolean hasTexCoord0, boolean hasTexCoord1, boolean hasNormal, boolean hasColor, int vertSize) {
@@ -135,23 +177,9 @@ public class Mesh implements Asset {
     private Mesh() {
     }
 
-    private AssetUri uri = new AssetUri("");
-
-    private int stride;
-    private int vertexOffset;
-    private int texCoord0Offset;
-    private int texCoord1Offset;
-    private int colorOffset;
-    private int normalOffset;
-
-    private boolean hasTexCoord0 = false;
-    private boolean hasTexCoord1 = false;
-    private boolean hasColor = false;
-    private boolean hasNormal = false;
-
-    private int vboVertexBuffer;
-    private int vboIndexBuffer;
-    private int indexCount;
+    public AABB getAABB() {
+        return aabb;
+    }
 
     @Override
     public AssetUri getURI() {

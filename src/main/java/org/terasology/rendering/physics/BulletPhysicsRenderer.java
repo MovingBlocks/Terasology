@@ -15,9 +15,7 @@
  */
 package org.terasology.rendering.physics;
 
-import com.bulletphysics.collision.broadphase.BroadphaseInterface;
-import com.bulletphysics.collision.broadphase.CollisionFilterGroups;
-import com.bulletphysics.collision.broadphase.DbvtBroadphase;
+import com.bulletphysics.collision.broadphase.*;
 import com.bulletphysics.collision.dispatch.*;
 import com.bulletphysics.collision.shapes.*;
 import com.bulletphysics.collision.shapes.voxel.VoxelWorldShape;
@@ -28,6 +26,8 @@ import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
 import com.bulletphysics.linearmath.DefaultMotionState;
 import com.bulletphysics.linearmath.Transform;
+import com.bulletphysics.util.ObjectArrayList;
+import com.google.common.collect.Lists;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.AssetType;
@@ -49,6 +49,7 @@ import org.terasology.logic.world.chunks.Chunk;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.model.structures.AABB;
 import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.WorldRenderer;
@@ -170,18 +171,42 @@ public class BulletPhysicsRenderer implements IGameObject, EventReceiver<BlockCh
 
     }
 
-    public GhostObject creationCollider(Vector3f pos, ConvexShape shape) {
+    // TODO: Wrap ghost object
+
+    public GhostObject createCollider(Vector3f pos, ConvexShape shape, short groups, short filters) {
+        return createCollider(pos, shape, groups, filters, 0);
+    }
+
+    public GhostObject createCollider(Vector3f pos, ConvexShape shape, short groups, short filters, int collisionFlags) {
         Transform startTransform = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), pos, 1.0f));
-        GhostObject result = new PairCachingGhostObject();
+        PairCachingGhostObject result = new PairCachingGhostObject();
         result.setWorldTransform(startTransform);
         result.setCollisionShape(shape);
-        result.setCollisionFlags(CollisionFlags.CHARACTER_OBJECT);
-        _discreteDynamicsWorld.addCollisionObject(result, CollisionFilterGroups.CHARACTER_FILTER, (short)(CollisionFilterGroups.STATIC_FILTER | CollisionFilterGroups.DEFAULT_FILTER));
+        result.setCollisionFlags(collisionFlags);
+        _discreteDynamicsWorld.addCollisionObject(result, groups, filters);
         return result;
     }
 
     public void removeCollider(GhostObject collider) {
         _discreteDynamicsWorld.removeCollisionObject(collider);
+    }
+
+    public Iterable<EntityRef> scanArea(AABB area, short collisionMask) {
+        // TODO: Add the aabbTest method from newer versions of bullet to TeraBullet, use that instead
+        BoxShape shape = new BoxShape(area.getExtents());
+        GhostObject scanObject = createCollider(area.getCenter(), shape, CollisionFilterGroups.DEFAULT_FILTER, collisionMask, 0);
+        // This in particular is overkill
+        _broadphase.calculateOverlappingPairs(_dispatcher);
+        List<EntityRef> result = Lists.newArrayList();
+        for (int i = 0; i < scanObject.getNumOverlappingObjects(); ++i) {
+            CollisionObject other = scanObject.getOverlappingObject(i);
+            Object userObj = other.getUserPointer();
+            if (userObj instanceof EntityRef) {
+                result.add((EntityRef)userObj);
+            }
+        }
+        removeCollider(scanObject);
+        return result;
     }
 
     public HitResult rayTrace(Vector3f from, Vector3f direction, float distance) {

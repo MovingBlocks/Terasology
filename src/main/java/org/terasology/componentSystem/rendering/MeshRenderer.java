@@ -1,7 +1,7 @@
 package org.terasology.componentSystem.rendering;
 
+import com.bulletphysics.linearmath.AabbUtil2;
 import org.terasology.componentSystem.RenderSystem;
-import org.terasology.components.AABBCollisionComponent;
 import org.terasology.components.rendering.MeshComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
@@ -18,10 +18,7 @@ import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
 
-import javax.vecmath.AxisAngle4f;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
+import javax.vecmath.*;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -55,26 +52,24 @@ public class MeshRenderer implements RenderSystem {
     public void renderTransparent() {
 
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
-        for (EntityRef entity : manager.iteratorEntities(MeshComponent.class, AABBCollisionComponent.class, LocationComponent.class)) {
+        for (EntityRef entity : manager.iteratorEntities(MeshComponent.class, LocationComponent.class)) {
             // TODO: Probably don't need this collision component, there should be some sort of AABB built into the mesh
             MeshComponent meshComp = entity.getComponent(MeshComponent.class);
             if (meshComp.renderType == MeshComponent.RenderType.Normal) continue;
 
-            AABBCollisionComponent collision = entity.getComponent(AABBCollisionComponent.class);
             LocationComponent location = entity.getComponent(LocationComponent.class);
 
+            Quat4f worldRot = location.getWorldRotation();
             Vector3f worldPos = location.getWorldPosition();
-            Vector3d extents = new Vector3d(collision.getExtents());
             float worldScale = location.getWorldScale();
-            extents.scale(worldScale);
-            AABB aabb = new AABB(new Vector3d(worldPos), new Vector3d(collision.getExtents()));
+            AABB aabb = mesh.getAABB().transform(worldRot, worldPos, worldScale);
 
             if (worldRenderer.isAABBVisible(aabb)) {
                 glPushMatrix();
 
                 glTranslated(worldPos.x - cameraPosition.x, worldPos.y - cameraPosition.y, worldPos.z - cameraPosition.z);
                 AxisAngle4f rot = new AxisAngle4f();
-                rot.set(location.getWorldRotation());
+                rot.set(worldRot);
                 glRotatef(TeraMath.RAD_TO_DEG * rot.angle, rot.x, rot.y, rot.z);
                 glScalef(worldScale, worldScale, worldScale);
 
@@ -95,19 +90,19 @@ public class MeshRenderer implements RenderSystem {
     public void renderOpaque() {
         boolean carryingTorch = CoreRegistry.get(LocalPlayer.class).isCarryingTorch();
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
-        for (EntityRef entity : manager.iteratorEntities(MeshComponent.class, AABBCollisionComponent.class, LocationComponent.class)) {
+        for (EntityRef entity : manager.iteratorEntities(MeshComponent.class, LocationComponent.class)) {
             // TODO: Probably don't need this collision component, there should be some sort of AABB built into the mesh
             MeshComponent meshComp = entity.getComponent(MeshComponent.class);
             if (meshComp.renderType != MeshComponent.RenderType.Normal || meshComp.mesh == null) continue;
 
-            AABBCollisionComponent collision = entity.getComponent(AABBCollisionComponent.class);
             LocationComponent location = entity.getComponent(LocationComponent.class);
 
+
+
+            Quat4f worldRot = location.getWorldRotation();
             Vector3f worldPos = location.getWorldPosition();
-            Vector3d extents = new Vector3d(collision.getExtents());
             float worldScale = location.getWorldScale();
-            extents.scale(worldScale);
-            AABB aabb = new AABB(new Vector3d(worldPos), new Vector3d(collision.getExtents()));
+            AABB aabb = meshComp.mesh.getAABB().transform(worldRot, worldPos, worldScale);
 
             if (worldRenderer.isAABBVisible(aabb)) {
                 glPushMatrix();

@@ -1,6 +1,8 @@
 package org.terasology.componentSystem.characters;
 
 import com.bulletphysics.BulletGlobals;
+import com.bulletphysics.collision.broadphase.CollisionFilterGroups;
+import com.bulletphysics.collision.dispatch.CollisionFlags;
 import com.bulletphysics.collision.dispatch.CollisionObject;
 import com.bulletphysics.collision.dispatch.CollisionWorld;
 import com.bulletphysics.collision.dispatch.GhostObject;
@@ -8,7 +10,6 @@ import com.bulletphysics.collision.shapes.CapsuleShape;
 import com.bulletphysics.collision.shapes.ConvexShape;
 import com.bulletphysics.linearmath.Transform;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.components.AABBCollisionComponent;
 import org.terasology.components.CharacterMovementComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.*;
@@ -19,15 +20,10 @@ import org.terasology.events.JumpEvent;
 import org.terasology.events.VerticalCollisionEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.world.WorldProvider;
-import org.terasology.logic.world.WorldUtil;
 import org.terasology.math.Vector3fUtil;
-import org.terasology.model.blocks.Block;
-import org.terasology.model.structures.AABB;
-import org.terasology.model.structures.BlockPosition;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
 
 import javax.vecmath.*;
-import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -82,7 +78,7 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
                 float height = (movementComp.height - 2 * movementComp.radius) * location.getWorldScale();
                 float width = movementComp.radius * location.getWorldScale();
                 ConvexShape capsule = new CapsuleShape(width, height);
-                movementComp.collider = physics.creationCollider(location.getWorldPosition(), capsule);
+                movementComp.collider = physics.createCollider(location.getWorldPosition(), capsule, CollisionFilterGroups.CHARACTER_FILTER, (short)(CollisionFilterGroups.STATIC_FILTER | CollisionFilterGroups.DEFAULT_FILTER), CollisionFlags.CHARACTER_OBJECT);
                 movementComp.collider.setUserPointer(entity);
                 capsule.setMargin(0.05f);
             }

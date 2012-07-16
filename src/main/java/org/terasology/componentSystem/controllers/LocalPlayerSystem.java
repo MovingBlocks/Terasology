@@ -24,6 +24,8 @@ import org.terasology.logic.manager.Config;
 import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;
+import org.terasology.model.structures.AABB;
+import org.terasology.model.structures.AABBRenderer;
 import org.terasology.rendering.cameras.DefaultCamera;
 
 import javax.vecmath.Quat4f;
@@ -52,6 +54,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     private float lastStepDelta = 0;
 
     private Vector3f relativeMovement = new Vector3f();
+
+    private AABBRenderer aabbRenderer = new AABBRenderer(AABB.createEmpty());
 
     @Override
     public void initialise() {
@@ -168,7 +172,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             if (blockComp != null) {
                 Block block = worldProvider.getBlock(blockComp.getPosition());
                 if (block.isRenderBoundingBox()) {
-                    block.getBounds(blockComp.getPosition()).render(2f);
+                    aabbRenderer.setAABB(block.getBounds(blockComp.getPosition()));
+                    aabbRenderer.render(2f);
                 }
             }
         }

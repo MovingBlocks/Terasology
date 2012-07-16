@@ -32,6 +32,7 @@ import static org.lwjgl.opengl.GL11.*;
  * @author Immortius <immortius@gmail.com>
  */
 // TODO: Generalise for non-block particles
+// TODO: Dispose display lists
 @RegisterComponentSystem(headedOnly = true)
 public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, RenderSystem {
     private static final int PARTICLES_PER_UPDATE = 32;

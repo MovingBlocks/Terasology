@@ -15,17 +15,17 @@
  */
 package org.terasology.model.structures;
 
-import org.lwjgl.opengl.GL11;
-import org.terasology.game.CoreRegistry;
-import org.terasology.logic.manager.ShaderManager;
-import org.terasology.rendering.world.WorldRenderer;
+import com.bulletphysics.linearmath.AabbUtil2;
+import com.bulletphysics.linearmath.Transform;
+import com.google.common.base.Objects;
+import org.terasology.math.Vector3fUtil;
 
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 import java.util.ArrayList;
 import java.util.Iterator;
-
-import static org.lwjgl.opengl.GL11.*;
 
 /**
  * An axis-aligned bounding box. Provides basic support for inclusion
@@ -35,27 +35,25 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class AABB {
 
-    private final Vector3d _position = new Vector3d();
-    private final Vector3d _dimensions;
-    private Vector3d[] _vertices;
+    private final Vector3f min;
+    private final Vector3f max;
 
-    private int _displayListWire = -1;
-    private int _displayListSolid = -1;
+    private Vector3f[] vertices;
 
-    /**
-     * Creates a new AABB at the given position with the given dimensions.
-     *
-     * @param position   The position
-     * @param dimensions The dimensions
-     */
-    public AABB(Vector3d position, Vector3d dimensions) {
-        setPosition(position);
-        _dimensions = dimensions;
+    public static AABB createMinMax(Vector3f min, Vector3f max) {
+        return new AABB(new Vector3f(min), new Vector3f(max));
     }
 
-    public AABB(Vector3f position, Vector3f dimensions) {
-        setPosition(new Vector3d(position));
-        _dimensions = new Vector3d(dimensions);
+    public static AABB createCenterExtent(Vector3f center, Vector3f extent) {
+        Vector3f min = new Vector3f(center);
+        min.sub(extent);
+        Vector3f max = new Vector3f(center);
+        max.add(extent);
+        return new AABB(min, max);
+    }
+
+    public static AABB createEmpty() {
+        return new AABB(new Vector3f(), new Vector3f());
     }
 
     /**
@@ -63,42 +61,68 @@ public class AABB {
      *
      * @param others
      */
-    public AABB(Iterable<AABB> others) {
+    public static AABB createEncompassing(Iterable<AABB> others) {
+        Vector3f min;
+        Vector3f max;
         Iterator<AABB> i = others.iterator();
-        if (!i.hasNext()) {
-            _dimensions = new Vector3d();
+        if (i.hasNext()) {
+            AABB next = i.next();
+            min = next.getMin();
+            max = next.getMax();
         } else {
-            AABB first = i.next();
-            Vector3d min = new Vector3d(first.minX(), first.minY(), first.minZ());
-            Vector3d max = new Vector3d(first.maxX(), first.maxY(), first.maxZ());
-            while (i.hasNext()) {
-                AABB next = i.next();
-                if (next.minX() < min.x) {
-                    min.x = next.minX();
-                }
-                if (next.minY() < min.y) {
-                    min.y = next.minY();
-                }
-                if (next.minZ() < min.z) {
-                    min.z = next.minZ();
-                }
-                if (next.maxX() > max.x) {
-                    max.x = next.maxX();
-                }
-                if (next.maxY() > max.y) {
-                    max.y = next.maxY();
-                }
-                if (next.maxZ() > max.z) {
-                    max.z = next.maxZ();
-                }
-            }
-            _position.set(max);
-            _position.add(min);
-            _position.scale(0.5);
-            _dimensions = new Vector3d(max);
-            _dimensions.sub(min);
-            _dimensions.scale(0.5);
+            return createEmpty();
         }
+        while (i.hasNext()) {
+            AABB next = i.next();
+            Vector3f otherMin = next.getMin();
+            Vector3f otherMax = next.getMax();
+            Vector3fUtil.min(min, otherMin, min);
+            Vector3fUtil.max(max, otherMax, max);
+        }
+        return new AABB(min, max);
+    }
+
+    private AABB(Vector3f min, Vector3f max) {
+        this.min = min;
+        this.max = max;
+    }
+
+    public Vector3f getExtents() {
+        Vector3f dimensions = new Vector3f(max);
+        dimensions.sub(min);
+        dimensions.scale(0.5f);
+        return dimensions;
+    }
+
+    public Vector3f getCenter() {
+        Vector3f dimensions = new Vector3f(max);
+        dimensions.add(min);
+        dimensions.scale(0.5f);
+        return dimensions;
+    }
+
+    public Vector3f getMin() {
+        return new Vector3f(min);
+    }
+
+    public Vector3f getMax() {
+        return new Vector3f(max);
+    }
+
+    public AABB move(Vector3f offset) {
+        Vector3f newMin = new Vector3f(min);
+        newMin.add(offset);
+        Vector3f newMax = new Vector3f(max);
+        newMax.add(offset);
+        return new AABB(newMin, newMax);
+    }
+
+    public AABB transform(Quat4f rotation, Vector3f offset, float scale) {
+        Transform transform = new Transform(new Matrix4f(rotation, offset, scale));
+        Vector3f newMin = new Vector3f();
+        Vector3f newMax = new Vector3f();
+        AabbUtil2.transformAabb(min, max, 0.01f, transform, newMin, newMax);
+        return new AABB(newMin, newMax);
     }
 
     /**
@@ -108,9 +132,9 @@ public class AABB {
      * @return True if overlapping
      */
     public boolean overlaps(AABB aabb2) {
-        return !(maxX() < aabb2.minX() || minX() > aabb2.maxX()) &&
-                !(maxY() < aabb2.minY() || minY() > aabb2.maxY()) &&
-                !(maxZ() < aabb2.minZ() || minZ() > aabb2.maxZ());
+        return !(max.x < aabb2.min.x || min.x > aabb2.max.x) &&
+                !(max.y < aabb2.min.y || min.y > aabb2.max.y) &&
+                !(max.z < aabb2.min.z || min.z > aabb2.max.z);
     }
 
     /**
@@ -120,15 +144,21 @@ public class AABB {
      * @return True if containing
      */
     public boolean contains(Vector3d point) {
-        return !(maxX() < point.x || minX() > point.x) &&
-                !(maxY() < point.y || minY() > point.y) &&
-                !(maxZ() < point.z || minZ() > point.z);
+        return !(max.x < point.x || min.x > point.x) &&
+                !(max.y < point.y || min.y > point.y) &&
+                !(max.z < point.z || min.z > point.z);
     }
 
+    /**
+     * Returns true if the AABB contains the given point.
+     *
+     * @param point The point to check for inclusion
+     * @return True if containing
+     */
     public boolean contains(Vector3f point) {
-        return !(maxX() < point.x || minX() > point.x) &&
-                !(maxY() < point.y || minY() > point.y) &&
-                !(maxZ() < point.z || minZ() > point.z);
+        return !(max.x < point.x || min.x > point.x) &&
+                !(max.y < point.y || min.y > point.y) &&
+                !(max.z < point.z || min.z > point.z);
     }
 
     /**
@@ -137,52 +167,52 @@ public class AABB {
      * @param p The point
      * @return The point on the AABB closest to the given point
      */
-    public Vector3d closestPointOnAABBToPoint(Vector3d p) {
-        Vector3d r = new Vector3d(p);
+    public Vector3f closestPointOnAABBToPoint(Vector3f p) {
+        Vector3f r = new Vector3f(p);
 
-        if (p.x < minX()) r.x = minX();
-        if (p.x > maxX()) r.x = maxX();
-        if (p.y < minY()) r.y = minY();
-        if (p.y > maxY()) r.y = maxY();
-        if (p.z < minZ()) r.z = minZ();
-        if (p.z > maxZ()) r.z = maxZ();
+        if (p.x < min.x) r.x = min.x;
+        if (p.x > max.x) r.x = max.x;
+        if (p.y < min.y) r.y = min.y;
+        if (p.y > max.y) r.y = max.y;
+        if (p.z < min.z) r.z = min.z;
+        if (p.z > max.z) r.z = max.z;
 
         return r;
     }
 
-    public Vector3d getFirstHitPlane(Vector3d direction, Vector3d pos, Vector3d dimensions, boolean testX, boolean testY, boolean testZ) {
-        Vector3d hitNormal = new Vector3d();
+    public Vector3f getFirstHitPlane(Vector3f direction, Vector3f pos, Vector3f dimensions, boolean testX, boolean testY, boolean testZ) {
+        Vector3f hitNormal = new Vector3f();
 
-        double dist = Double.POSITIVE_INFINITY;
+        float dist = Float.POSITIVE_INFINITY;
 
         if (testX) {
-            double distX;
+            float distX;
             if (direction.x > 0) {
-                distX = (_position.x - pos.x - dimensions.x - _dimensions.x) / direction.x;
+                distX = (min.x - pos.x - dimensions.x) / direction.x;
             } else {
-                distX = (_position.x - pos.x + dimensions.x + _dimensions.x) / direction.x;
+                distX = (max.x - pos.x + dimensions.x) / direction.x;
             }
             if (distX >= 0 && distX < dist) {
                 hitNormal.set(Math.copySign(1, direction.x), 0, 0);
             }
         }
         if (testY) {
-            double distY;
+            float distY;
             if (direction.y > 0) {
-                distY = (_position.y - pos.y - dimensions.y - _dimensions.y) / direction.y;
+                distY = (min.y - pos.y - dimensions.y) / direction.y;
             } else {
-                distY = (_position.y - pos.y + dimensions.y + _dimensions.y) / direction.y;
+                distY = (max.y - pos.y + dimensions.y) / direction.y;
             }
             if (distY >= 0 && distY < dist) {
                 hitNormal.set(0, Math.copySign(1, direction.y), 0);
             }
         }
         if (testZ) {
-            double distZ;
+            float distZ;
             if (direction.z > 0) {
-                distZ = (_position.z - pos.z - dimensions.z - _dimensions.z) / direction.z;
+                distZ = (min.z - pos.z - dimensions.z) / direction.z;
             } else {
-                distZ = (_position.z - pos.z + dimensions.z + _dimensions.z) / direction.z;
+                distZ = (max.z - pos.z + dimensions.z) / direction.z;
             }
             if (distZ >= 0 && distZ < dist) {
                 hitNormal.set(0, 0, Math.copySign(1, direction.z));
@@ -202,26 +232,26 @@ public class AABB {
      * @param testZ       True if the z-axis should be tested
      * @return The normal
      */
-    public Vector3d normalForPlaneClosestToOrigin(Vector3d pointOnAABB, Vector3d origin, boolean testX, boolean testY, boolean testZ) {
-        ArrayList<Vector3d> normals = new ArrayList<Vector3d>();
+    public Vector3f normalForPlaneClosestToOrigin(Vector3f pointOnAABB, Vector3f origin, boolean testX, boolean testY, boolean testZ) {
+        ArrayList<Vector3f> normals = new ArrayList<Vector3f>();
 
-        if (pointOnAABB.z == minZ() && testZ) normals.add(new Vector3d(0, 0, -1));
-        if (pointOnAABB.z == maxZ() && testZ) normals.add(new Vector3d(0, 0, 1));
-        if (pointOnAABB.x == minX() && testX) normals.add(new Vector3d(-1, 0, 0));
-        if (pointOnAABB.x == maxX() && testX) normals.add(new Vector3d(1, 0, 0));
-        if (pointOnAABB.y == minY() && testY) normals.add(new Vector3d(0, -1, 0));
-        if (pointOnAABB.y == maxY() && testY) normals.add(new Vector3d(0, 1, 0));
+        if (pointOnAABB.z == min.z && testZ) normals.add(new Vector3f(0, 0, -1));
+        if (pointOnAABB.z == max.z && testZ) normals.add(new Vector3f(0, 0, 1));
+        if (pointOnAABB.x == min.x && testX) normals.add(new Vector3f(-1, 0, 0));
+        if (pointOnAABB.x == max.x && testX) normals.add(new Vector3f(1, 0, 0));
+        if (pointOnAABB.y == min.y && testY) normals.add(new Vector3f(0, -1, 0));
+        if (pointOnAABB.y == max.y && testY) normals.add(new Vector3f(0, 1, 0));
 
-        double minDistance = Double.MAX_VALUE;
-        Vector3d closestNormal = new Vector3d();
+        float minDistance = Float.MAX_VALUE;
+        Vector3f closestNormal = new Vector3f();
 
         for (int i = 0; i < normals.size(); i++) {
-            Vector3d n = normals.get(i);
+            Vector3f n = normals.get(i);
 
-            Vector3d diff = new Vector3d(centerPointForNormal(n));
+            Vector3f diff = new Vector3f(centerPointForNormal(n));
             diff.sub(origin);
 
-            double distance = diff.length();
+            float distance = diff.length();
 
             if (distance < minDistance) {
                 minDistance = distance;
@@ -238,21 +268,45 @@ public class AABB {
      * @param normal The normal
      * @return The center point
      */
-    public Vector3d centerPointForNormal(Vector3d normal) {
+    public Vector3f centerPointForNormal(Vector3f normal) {
         if (normal.x == 1 && normal.y == 0 && normal.z == 0)
-            return new Vector3d(getPosition().x + _dimensions.x, getPosition().y, getPosition().z);
+            return new Vector3f(max.x, getCenter().y, getCenter().z);
         if (normal.x == -1 && normal.y == 0 && normal.z == 0)
-            return new Vector3d(getPosition().x - _dimensions.x, getPosition().y, getPosition().z);
+            return new Vector3f(min.x, getCenter().y, getCenter().z);
         if (normal.x == 0 && normal.y == 0 && normal.z == 1)
-            return new Vector3d(getPosition().x, getPosition().y, getPosition().z + _dimensions.z);
+            return new Vector3f(getCenter().x, getCenter().y, max.z);
         if (normal.x == 0 && normal.y == 0 && normal.z == -1)
-            return new Vector3d(getPosition().x, getPosition().y, getPosition().z - _dimensions.z);
+            return new Vector3f(getCenter().x, getCenter().y, min.z);
         if (normal.x == 0 && normal.y == 1 && normal.z == 0)
-            return new Vector3d(getPosition().x, getPosition().y + _dimensions.y, getPosition().z);
+            return new Vector3f(getCenter().x, max.y, getCenter().z);
         if (normal.x == 0 && normal.y == -1 && normal.z == 0)
-            return new Vector3d(getPosition().x, getPosition().y - _dimensions.y, getPosition().z);
+            return new Vector3f(getCenter().x, min.y, getCenter().z);
 
-        return new Vector3d();
+        return new Vector3f();
+    }
+
+    public float minX() {
+        return min.x;
+    }
+
+    public float minY() {
+        return min.y;
+    }
+
+    public float minZ() {
+        return min.z;
+    }
+
+    public float maxX() {
+        return max.x;
+    }
+
+    public float maxY() {
+        return max.y;
+    }
+
+    public float maxZ() {
+        return max.z;
     }
 
     /**
@@ -260,211 +314,38 @@ public class AABB {
      *
      * @return The vertices
      */
-    public Vector3d[] getVertices() {
-        if (_vertices == null) {
-            Vector3d[] vertices = new Vector3d[8];
+    public Vector3f[] getVertices() {
+        if (vertices == null) {
+            vertices = new Vector3f[8];
 
             // Front
-            vertices[0] = new Vector3d(minX(), minY(), maxZ());
-            vertices[1] = new Vector3d(maxX(), minY(), maxZ());
-            vertices[2] = new Vector3d(maxX(), maxY(), maxZ());
-            vertices[3] = new Vector3d(minX(), maxY(), maxZ());
+            vertices[0] = new Vector3f(min.x, min.y, max.z);
+            vertices[1] = new Vector3f(max.x, min.y, max.z);
+            vertices[2] = new Vector3f(max.x, max.y, max.z);
+            vertices[3] = new Vector3f(min.x, max.y, max.z);
             // Back
-            vertices[4] = new Vector3d(minX(), minY(), minZ());
-            vertices[5] = new Vector3d(maxX(), minY(), minZ());
-            vertices[6] = new Vector3d(maxX(), maxY(), minZ());
-            vertices[7] = new Vector3d(minX(), maxY(), minZ());
-
-            _vertices = vertices;
+            vertices[4] = new Vector3f(min.x, min.y, min.z);
+            vertices[5] = new Vector3f(max.x, min.y, min.z);
+            vertices[6] = new Vector3f(max.x, max.y, min.z);
+            vertices[7] = new Vector3f(min.x, max.y, min.z);
         }
 
-        return _vertices;
+        return vertices;
     }
 
-    /**
-     * Renders this AABB.
-     * <p/>
-     *
-     * @param lineThickness The thickness of the line
-     */
-    public void render(float lineThickness) {
-        ShaderManager.getInstance().enableDefault();
-
-        glPushMatrix();
-        Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
-        glTranslated(getPosition().x - cameraPosition.x, -cameraPosition.y, getPosition().z - cameraPosition.z);
-
-        renderLocally(lineThickness);
-
-        glPopMatrix();
-    }
-
-    public void renderLocally(float lineThickness) {
-        ShaderManager.getInstance().enableDefault();
-
-        if (_displayListWire == -1) {
-            generateDisplayListWire();
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
         }
-
-        glPushMatrix();
-        glTranslated(0f, getPosition().y, 0f);
-
-        glLineWidth(lineThickness);
-        glCallList(_displayListWire);
-
-        glPopMatrix();
-    }
-
-    public void renderSolidLocally() {
-        ShaderManager.getInstance().enableDefault();
-
-        if (_displayListSolid == -1) {
-            generateDisplayListSolid();
+        if (obj instanceof AABB) {
+            AABB other = (AABB) obj;
+            return Objects.equal(min, other.min) && Objects.equal(max, other.max);
         }
-
-        glPushMatrix();
-
-        glTranslated(0f, getPosition().y, 0f);
-        glScalef(1.5f, 1.5f, 1.5f);
-
-        glCallList(_displayListSolid);
-
-        glPopMatrix();
+        return false;
     }
 
-    private void generateDisplayListSolid() {
-        _displayListSolid = glGenLists(1);
-
-        glNewList(_displayListSolid, GL11.GL_COMPILE);
-        glBegin(GL_QUADS);
-        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-
-        GL11.glVertex3d(-_dimensions.x, _dimensions.y, _dimensions.z);
-        GL11.glVertex3d(_dimensions.x, _dimensions.y, _dimensions.z);
-        GL11.glVertex3d(_dimensions.x, _dimensions.y, -_dimensions.z);
-        GL11.glVertex3d(-_dimensions.x, _dimensions.y, -_dimensions.z);
-
-        GL11.glVertex3d(-_dimensions.x, -_dimensions.y, -_dimensions.z);
-        GL11.glVertex3d(-_dimensions.x, -_dimensions.y, _dimensions.z);
-        GL11.glVertex3d(-_dimensions.x, _dimensions.y, _dimensions.z);
-        GL11.glVertex3d(-_dimensions.x, _dimensions.y, -_dimensions.z);
-
-        GL11.glVertex3d(-_dimensions.x, -_dimensions.y, _dimensions.z);
-        GL11.glVertex3d(_dimensions.x, -_dimensions.y, _dimensions.z);
-        GL11.glVertex3d(_dimensions.x, _dimensions.y, _dimensions.z);
-        GL11.glVertex3d(-_dimensions.x, _dimensions.y, _dimensions.z);
-
-        GL11.glVertex3d(_dimensions.x, _dimensions.y, -_dimensions.z);
-        GL11.glVertex3d(_dimensions.x, _dimensions.y, _dimensions.z);
-        GL11.glVertex3d(_dimensions.x, -_dimensions.y, _dimensions.z);
-        GL11.glVertex3d(_dimensions.x, -_dimensions.y, -_dimensions.z);
-
-        GL11.glVertex3d(-_dimensions.x, _dimensions.y, -_dimensions.z);
-        GL11.glVertex3d(_dimensions.x, _dimensions.y, -_dimensions.z);
-        GL11.glVertex3d(_dimensions.x, -_dimensions.y, -_dimensions.z);
-        GL11.glVertex3d(-_dimensions.x, -_dimensions.y, -_dimensions.z);
-
-        GL11.glVertex3d(-_dimensions.x, -_dimensions.y, -_dimensions.z);
-        GL11.glVertex3d(_dimensions.x, -_dimensions.y, -_dimensions.z);
-        GL11.glVertex3d(_dimensions.x, -_dimensions.y, _dimensions.z);
-        GL11.glVertex3d(-_dimensions.x, -_dimensions.y, _dimensions.z);
-        glEnd();
-        glEndList();
-
+    public int hashCode() {
+        return Objects.hashCode(min, max);
     }
-
-    private void generateDisplayListWire() {
-        double offset = 0.001;
-
-        _displayListWire = glGenLists(1);
-
-        glNewList(_displayListWire, GL11.GL_COMPILE);
-        glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
-
-        // FRONT
-        glBegin(GL_LINE_LOOP);
-        glVertex3d(-_dimensions.x - offset, -_dimensions.y - offset, -_dimensions.z - offset);
-        glVertex3d(+_dimensions.x + offset, -_dimensions.y - offset, -_dimensions.z - offset);
-        glVertex3d(+_dimensions.x + offset, +_dimensions.y + offset, -_dimensions.z - offset);
-        glVertex3d(-_dimensions.x - offset, +_dimensions.y + offset, -_dimensions.z - offset);
-        glEnd();
-
-        // BACK
-        glBegin(GL_LINE_LOOP);
-        glVertex3d(-_dimensions.x - offset, -_dimensions.y - offset, +_dimensions.z + offset);
-        glVertex3d(+_dimensions.x + offset, -_dimensions.y - offset, +_dimensions.z + offset);
-        glVertex3d(+_dimensions.x + offset, +_dimensions.y + offset, +_dimensions.z + offset);
-        glVertex3d(-_dimensions.x - offset, +_dimensions.y + offset, +_dimensions.z + offset);
-        glEnd();
-
-        // TOP
-        glBegin(GL_LINE_LOOP);
-        glVertex3d(-_dimensions.x - offset, -_dimensions.y - offset, -_dimensions.z - offset);
-        glVertex3d(+_dimensions.x + offset, -_dimensions.y - offset, -_dimensions.z - offset);
-        glVertex3d(+_dimensions.x + offset, -_dimensions.y - offset, +_dimensions.z + offset);
-        glVertex3d(-_dimensions.x - offset, -_dimensions.y - offset, +_dimensions.z + offset);
-        glEnd();
-
-        // BOTTOM
-        glBegin(GL_LINE_LOOP);
-        glVertex3d(-_dimensions.x - offset, +_dimensions.y + offset, -_dimensions.z - offset);
-        glVertex3d(+_dimensions.x + offset, +_dimensions.y + offset, -_dimensions.z - offset);
-        glVertex3d(+_dimensions.x + offset, +_dimensions.y + offset, +_dimensions.z + offset);
-        glVertex3d(-_dimensions.x - offset, +_dimensions.y + offset, +_dimensions.z + offset);
-        glEnd();
-
-        // LEFT
-        glBegin(GL_LINE_LOOP);
-        glVertex3d(-_dimensions.x - offset, -_dimensions.y - offset, -_dimensions.z - offset);
-        glVertex3d(-_dimensions.x - offset, -_dimensions.y - offset, +_dimensions.z + offset);
-        glVertex3d(-_dimensions.x - offset, +_dimensions.y + offset, +_dimensions.z + offset);
-        glVertex3d(-_dimensions.x - offset, +_dimensions.y + offset, -_dimensions.z - offset);
-        glEnd();
-
-        // RIGHT
-        glBegin(GL_LINE_LOOP);
-        glVertex3d(+_dimensions.x + offset, -_dimensions.y - offset, -_dimensions.z - offset);
-        glVertex3d(+_dimensions.x + offset, -_dimensions.y - offset, +_dimensions.z + offset);
-        glVertex3d(+_dimensions.x + offset, +_dimensions.y + offset, +_dimensions.z + offset);
-        glVertex3d(+_dimensions.x + offset, +_dimensions.y + offset, -_dimensions.z - offset);
-        glEnd();
-        glEndList();
-    }
-
-    public double minX() {
-        return getPosition().x - _dimensions.x;
-    }
-
-    public double minY() {
-        return getPosition().y - _dimensions.y;
-    }
-
-    public double minZ() {
-        return getPosition().z - _dimensions.z;
-    }
-
-    public double maxX() {
-        return getPosition().x + _dimensions.x;
-    }
-
-    public double maxY() {
-        return getPosition().y + _dimensions.y;
-    }
-
-    public double maxZ() {
-        return getPosition().z + _dimensions.z;
-    }
-
-    public Vector3d getDimensions() {
-        return _dimensions;
-    }
-
-    public Vector3d getPosition() {
-        return _position;
-    }
-
-    public void setPosition(Vector3d position) {
-        _position.set(position);
-    }
-
 }

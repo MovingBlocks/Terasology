@@ -63,4 +63,18 @@ public final class Vector3fUtil {
         }
         return out;
     }
+
+    public static Vector3f min(Vector3f a, Vector3f b, Vector3f out) {
+        out.x = Math.min(a.x, b.x);
+        out.y = Math.min(a.y, b.y);
+        out.z = Math.min(a.z, b.z);
+        return out;
+    }
+
+    public static Vector3f max(Vector3f a, Vector3f b, Vector3f out) {
+        out.x = Math.max(a.x, b.x);
+        out.y = Math.max(a.y, b.y);
+        out.z = Math.max(a.z, b.z);
+        return out;
+    }
 }

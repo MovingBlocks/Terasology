@@ -21,11 +21,11 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.util.ResourceLoader;
 import org.terasology.collection.EnumBooleanMap;
 import org.terasology.logic.manager.ShaderManager;
+import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.model.shapes.BlockMeshPart;
 import org.terasology.model.structures.AABB;
-import org.terasology.model.structures.BlockPosition;
 import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
@@ -36,10 +36,7 @@ import javax.vecmath.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.EnumMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -149,7 +146,7 @@ public class Block implements IGameObject {
 
     private CollisionShape collisionShape;
     private Vector3f collisionOffset;
-    public AABB _bounds = new AABB(new Vector3d(), new Vector3d());
+    public AABB _bounds = AABB.createEmpty();
 
     /**
      * Init. a new block with default properties in place.
@@ -467,14 +464,8 @@ public class Block implements IGameObject {
         Vector3f min = new Vector3f();
         Vector3f max = new Vector3f();
         shape.getAabb(t, min, max);
-        Vector3f center = new Vector3f();
-        center.add(min, max);
-        center.scale(0.5f);
-        Vector3f dim = new Vector3f();
-        dim.sub(max, min);
-        dim.scale(0.5f);
 
-        _bounds = new AABB(center, dim);
+        _bounds = AABB.createMinMax(min, max);
     }
 
     public COLOR_SOURCE getColorSource() {
@@ -610,22 +601,11 @@ public class Block implements IGameObject {
     }
 
     public AABB getBounds(Vector3i pos) {
-        return new AABB(new Vector3d(_bounds.getPosition().x + pos.x, _bounds.getPosition().y + pos.y, _bounds.getPosition().z + pos.z), _bounds.getDimensions());
+        return _bounds.move(pos.toVector3f());
     }
 
     public AABB getBounds(Vector3f floatPos) {
-        Vector3i pos = new Vector3i(floatPos, 0.5f);
-        return new AABB(new Vector3d(_bounds.getPosition().x + pos.x, _bounds.getPosition().y + pos.y, _bounds.getPosition().z + pos.z), _bounds.getDimensions());
-    }
-
-    /**
-     * Returns the AABB for a block at the given position.
-     *
-     * @param pos The position
-     * @return The AABB
-     */
-    public static AABB AABBForBlockAt(Vector3d pos) {
-        return new AABB(pos, new Vector3d(0.5f, 0.5f, 0.5f));
+        return getBounds(new Vector3i(floatPos, 0.5f));
     }
 
     @Override

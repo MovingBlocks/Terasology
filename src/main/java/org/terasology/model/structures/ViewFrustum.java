@@ -132,7 +132,7 @@ public class ViewFrustum {
      */
     public boolean intersects(AABB aabb) {
 
-        Vector3d[] aabbVertices = aabb.getVertices();
+        Vector3f[] aabbVertices = aabb.getVertices();
 
         Vector3f cp = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
 
