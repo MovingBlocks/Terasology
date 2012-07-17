@@ -98,6 +98,7 @@ public class Mesh implements Asset {
             offset += COLOR_SIZE;
         }
 
+        indexBuffer.flip();
         return mesh;
     }
 
