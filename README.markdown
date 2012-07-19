@@ -1,6 +1,8 @@
 Terasology
 ==========
 
+[TEMP DOWNLOAD LINK](https://dl.dropbox.com/u/36720163/Terasology.zip) - Hello Gronkh users! And thanks to user 0xFF for the upload!
+
 ![Terasology](https://github.com/MovingBlocks/Terasology/raw/develop/src/main/resources/org/terasology/data/textures/loadingBackground.png "Terasology")
 
 Terasology is a game that pays ample tribute to [Minecraft](http://www.minecraft.net) in initial look and origin, but stakes out its own niche by adopting the NPC-helper and caretaker feel from such games as [Dwarf Fortress](http://www.bay12games.com/dwarves) and [Dungeon Keeper](http://en.wikipedia.org/wiki/Dungeon_Keeper), while striving for added depth and sophistication.
