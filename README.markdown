@@ -1,7 +1,7 @@
 Terasology
 ==========
 
-[TEMP DOWNLOAD LINK](https://dl.dropbox.com/u/36720163/Terasology.zip) - Hello Gronkh users! And thanks to user 0xFF for the upload!
+[Download now from GitHub](https://github.com/MovingBlocks/Terasology/downloads) - Hello Gronkh users and internet at large!
 
 ![Terasology](https://github.com/MovingBlocks/Terasology/raw/develop/src/main/resources/org/terasology/data/textures/loadingBackground.png "Terasology")
 
