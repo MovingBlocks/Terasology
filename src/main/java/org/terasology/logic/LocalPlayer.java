@@ -4,6 +4,7 @@ import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.components.*;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.physics.character.CharacterMovementComponent;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;

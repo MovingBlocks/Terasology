@@ -2,6 +2,7 @@ package org.terasology.entitySystem;
 
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 
+import javax.vecmath.Vector3f;
 import java.util.Map;
 
 /**
@@ -19,6 +20,16 @@ public interface EntityManager {
     EntityRef create();
 
     /**
+     * @return A references to a new, unused entity with the desired components
+     */
+    EntityRef create(Component ... components);
+
+    /**
+     * @return A references to a new, unused entity with the desired components
+     */
+    EntityRef create(Iterable<Component> components);
+
+    /**
      * @param prefabName The name of the prefab to create.
      * @return A new entity, based on the the prefab of the given name. If the prefab doesn't exist, just a new entity.
      */
@@ -29,6 +40,13 @@ public interface EntityManager {
      * @return A new entity, based on the given prefab
      */
     EntityRef create(Prefab prefab);
+
+    /**
+     * @param prefab
+     * @param position
+     * @return A new entity, based on the given prefab, at the desired position
+     */
+    EntityRef create(Prefab prefab, Vector3f position);
 
     /**
      * @param componentClass

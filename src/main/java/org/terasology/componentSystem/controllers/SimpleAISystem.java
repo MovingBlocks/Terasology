@@ -1,7 +1,7 @@
 package org.terasology.componentSystem.controllers;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.components.CharacterMovementComponent;
+import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.components.SimpleAIComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.*;

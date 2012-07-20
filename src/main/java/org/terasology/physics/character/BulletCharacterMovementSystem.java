@@ -1,4 +1,4 @@
-package org.terasology.componentSystem.characters;
+package org.terasology.physics.character;
 
 import com.bulletphysics.BulletGlobals;
 import com.bulletphysics.collision.broadphase.CollisionFilterGroups;
@@ -10,7 +10,6 @@ import com.bulletphysics.collision.shapes.CapsuleShape;
 import com.bulletphysics.collision.shapes.ConvexShape;
 import com.bulletphysics.linearmath.Transform;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.components.CharacterMovementComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.event.RemovedComponentEvent;

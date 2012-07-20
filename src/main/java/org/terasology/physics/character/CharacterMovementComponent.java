@@ -1,4 +1,4 @@
-package org.terasology.components;
+package org.terasology.physics.character;
 
 import com.bulletphysics.collision.dispatch.GhostObject;
 import org.terasology.entitySystem.Component;

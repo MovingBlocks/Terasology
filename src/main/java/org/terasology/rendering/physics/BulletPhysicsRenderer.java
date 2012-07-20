@@ -30,7 +30,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.components.CharacterMovementComponent;
+import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.world.BlockComponent;
@@ -53,6 +53,7 @@ import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.*;
 import java.nio.FloatBuffer;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -119,10 +120,9 @@ public class BulletPhysicsRenderer implements IGameObject, EventReceiver<BlockCh
     private static final int MAX_TEMP_BLOCKS = 128;
     private Logger _logger = Logger.getLogger(getClass().getName());
 
-    private final LinkedList<RigidBody> _insertionQueue = new LinkedList<RigidBody>();
+    private final Deque<RigidBodyRequest> _insertionQueue = new LinkedList<RigidBodyRequest>();
+    private final Deque<RigidBody> _removalQueue = new LinkedList<RigidBody>();
     private final LinkedList<BlockRigidBody> _blocks = new LinkedList<BlockRigidBody>();
-
-    private HashSet<RigidBody> _chunks = new HashSet<RigidBody>();
 
     private final BoxShape _blockShape = new BoxShape(new Vector3f(0.5f, 0.5f, 0.5f));
     private final BoxShape _blockShapeHalf = new BoxShape(new Vector3f(0.25f, 0.25f, 0.25f));
@@ -181,6 +181,18 @@ public class BulletPhysicsRenderer implements IGameObject, EventReceiver<BlockCh
         result.setCollisionFlags(collisionFlags);
         _discreteDynamicsWorld.addCollisionObject(result, groups, filters);
         return result;
+    }
+
+    public void addRigidBody(RigidBody body) {
+        _insertionQueue.add(new RigidBodyRequest(body, CollisionFilterGroups.DEFAULT_FILTER, (short)(CollisionFilterGroups.DEFAULT_FILTER | CollisionFilterGroups.STATIC_FILTER)));
+    }
+
+    public void addRigidBody(RigidBody body, short groups, short filter) {
+        _insertionQueue.add(new RigidBodyRequest(body, groups, filter));
+    }
+
+    public void removeRigidBody(RigidBody body) {
+        _removalQueue.add(body);
     }
 
     public void removeCollider(GhostObject collider) {
@@ -286,7 +298,7 @@ public class BulletPhysicsRenderer implements IGameObject, EventReceiver<BlockCh
         rigidBlock._temporary = temporary;
         // Apply impulse
         rigidBlock.applyImpulse(impulse, new Vector3f(0.0f, 0.0f, 0.0f));
-        _insertionQueue.add(rigidBlock);
+        _insertionQueue.add(new RigidBodyRequest(rigidBlock, CollisionFilterGroups.DEFAULT_FILTER, (short)(CollisionFilterGroups.DEFAULT_FILTER | CollisionFilterGroups.STATIC_FILTER)));
 
         return rigidBlock;
     }
@@ -323,7 +335,7 @@ public class BulletPhysicsRenderer implements IGameObject, EventReceiver<BlockCh
 
     @Override
     public void update(float delta) {
-        addQueuedBodies();
+        processQueuedBodies();
         try {
             _discreteDynamicsWorld.stepSimulation(delta, 3);
         } catch (Exception e) {
@@ -333,12 +345,16 @@ public class BulletPhysicsRenderer implements IGameObject, EventReceiver<BlockCh
         checkForLootedBlocks();
     }
 
-    private synchronized void addQueuedBodies() {
+    private synchronized void processQueuedBodies() {
         while (!_insertionQueue.isEmpty()) {
-            RigidBody body = _insertionQueue.poll();
-            if (body instanceof BlockRigidBody)
-                _blocks.addFirst((BlockRigidBody) body);
-            _discreteDynamicsWorld.addRigidBody(body);
+            RigidBodyRequest request = _insertionQueue.poll();
+            if (request.body instanceof BlockRigidBody)
+                _blocks.addFirst((BlockRigidBody) request.body);
+            _discreteDynamicsWorld.addRigidBody(request.body, request.groups, request.filter);
+        }
+        while (!_removalQueue.isEmpty()) {
+            RigidBody body = _removalQueue.poll();
+            _discreteDynamicsWorld.removeRigidBody(body);
         }
     }
 
@@ -412,6 +428,19 @@ public class BulletPhysicsRenderer implements IGameObject, EventReceiver<BlockCh
                     _blocks.remove(i);
                 }
             }
+        }
+    }
+
+    private static class RigidBodyRequest
+    {
+        final RigidBody body;
+        final short groups;
+        final short filter;
+
+        public RigidBodyRequest(RigidBody body, short groups, short filter) {
+            this.body = body;
+            this.groups = groups;
+            this.filter = filter;
         }
     }
 }

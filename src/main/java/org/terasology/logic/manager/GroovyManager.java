@@ -16,13 +16,14 @@
 
 package org.terasology.logic.manager;
 
+import com.bulletphysics.linearmath.QuaternionUtil;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceException;
 import groovy.util.ScriptException;
 import org.lwjgl.input.Keyboard;
-import org.terasology.components.CharacterMovementComponent;
+import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.world.LocationComponent;
@@ -43,7 +44,9 @@ import org.terasology.input.InputSystem;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.model.blocks.BlockFamily;
 import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
+import org.terasology.rendering.world.WorldRenderer;
 
 import javax.vecmath.Vector3f;
 import java.io.File;
@@ -176,6 +179,19 @@ public class GroovyManager {
             EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
             CharacterMovementComponent comp = playerEntity.getComponent(CharacterMovementComponent.class);
             comp.stepHeight = amount;
+        }
+
+        private void spawnPrefab(String prefabName) {
+            Camera camera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
+            Vector3f spawnPos = camera.getPosition();
+            Vector3f offset = camera.getViewingDirection();
+            offset.scale(3);
+            spawnPos.add(offset);
+
+            Prefab prefab = CoreRegistry.get(PrefabManager.class).getPrefab(prefabName);
+            if (prefab != null && prefab.getComponent(LocationComponent.class) != null) {
+                CoreRegistry.get(EntityManager.class).create(prefab, spawnPos);
+            }
         }
 
         private void giveItem(String itemPrefabName) {

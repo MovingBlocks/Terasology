@@ -1,6 +1,6 @@
 package org.terasology.rendering.gui.components;
 
-import org.terasology.components.CharacterMovementComponent;
+import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.components.CuredComponent;
 import org.terasology.components.SpeedBoostComponent;
 import org.terasology.entitySystem.EntityManager;

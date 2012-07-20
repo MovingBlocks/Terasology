@@ -1,7 +1,6 @@
-package org.terasology.componentSystem.characters;
+package org.terasology.physics.character;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.components.CharacterMovementComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;

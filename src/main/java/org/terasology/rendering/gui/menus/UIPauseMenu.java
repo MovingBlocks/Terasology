@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.gui.menus;
 
-import org.terasology.components.CharacterMovementComponent;
+import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.PlayerComponent;

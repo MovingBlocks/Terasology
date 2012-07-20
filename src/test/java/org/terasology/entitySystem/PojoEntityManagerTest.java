@@ -40,6 +40,15 @@ public class PojoEntityManagerTest {
         EntityRef entity = entityManager.create();
         assertNotNull(entity);
     }
+
+    @Test
+    public void createEntityWithComponent() {
+        StringComponent comp = new StringComponent("Test");
+        EntityRef entity = entityManager.create(comp);
+        assertNotNull(entity);
+        assertNotNull(entity.getComponent(StringComponent.class));
+        assertEquals(comp, entity.getComponent(StringComponent.class));
+    }
     
     @Test
     public void addAndRetrieveComponent() {
