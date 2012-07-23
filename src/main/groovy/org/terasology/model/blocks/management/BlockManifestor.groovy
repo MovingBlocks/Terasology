@@ -39,6 +39,7 @@ import org.terasology.rendering.assets.Texture
 
 import org.newdawn.slick.opengl.PNGDecoder
 import java.nio.ByteBuffer
+import org.terasology.rendering.assets.Material
 
 /**
  * This Groovy class is responsible for keeping the Block Manifest in sync between
@@ -167,7 +168,13 @@ class BlockManifestor {
             data[i] = buf;
         }
 
-        AssetManager.getInstance().addAssetTemporary(new AssetUri(AssetType.TEXTURE, "engine:terrain"), new Texture(data, width, height, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest));
+        Texture terrainTex = new Texture(data, width, height, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest);
+        AssetManager.getInstance().addAssetTemporary(new AssetUri(AssetType.TEXTURE, "engine:terrain"), terrainTex);
+        Material terrainMat = new Material(new AssetUri(AssetType.MATERIAL, "engine:terrain"), AssetManager.loadShader("engine:block"));
+        terrainMat.setTexture("textureAtlas", terrainTex);
+        terrainMat.setFloat3("colorOffset", 1, 1, 1);
+        terrainMat.setInt("textured", 1);
+        AssetManager.getInstance().addAssetTemporary(new AssetUri(AssetType.MATERIAL, "engine:terrain"), terrainMat);
     }
 
     /**

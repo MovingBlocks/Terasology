@@ -23,6 +23,8 @@ import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceException;
 import groovy.util.ScriptException;
 import org.lwjgl.input.Keyboard;
+import org.terasology.components.rendering.MeshComponent;
+import org.terasology.model.blocks.Block;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
@@ -191,6 +193,24 @@ public class GroovyManager {
             Prefab prefab = CoreRegistry.get(PrefabManager.class).getPrefab(prefabName);
             if (prefab != null && prefab.getComponent(LocationComponent.class) != null) {
                 CoreRegistry.get(EntityManager.class).create(prefab, spawnPos);
+            }
+        }
+
+        private void spawnDroppedBlock(String blockName) {
+            Camera camera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
+            Vector3f spawnPos = camera.getPosition();
+            Vector3f offset = camera.getViewingDirection();
+            offset.scale(3);
+            spawnPos.add(offset);
+
+            Block block = BlockManager.getInstance().getBlock(blockName);
+            if (block == null) return;
+
+            Prefab prefab = CoreRegistry.get(PrefabManager.class).getPrefab("core:droppedBlock");
+            if (prefab != null && prefab.getComponent(LocationComponent.class) != null) {
+                EntityRef blockEntity = CoreRegistry.get(EntityManager.class).create(prefab, spawnPos);
+                MeshComponent blockMesh = blockEntity.getComponent(MeshComponent.class);
+                blockMesh.mesh = block.getMesh();
             }
         }
 

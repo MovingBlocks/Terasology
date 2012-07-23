@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright 2012
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,25 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.portals;
 
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
+package org.terasology.components.utility;
+
+import org.terasology.entitySystem.Component;
 
 /**
- * Portals are a key structure component of the world
- *
- * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
+ * Component describes the lifespan of an entity. When the lifespan ends the entity is destroyed.
+ * @author Immortius
  */
-public class Portal {
+public class LifespanComponent implements Component {
+    // Lifespan in seconds
+    public float lifespan = 5;
 
-    private final Vector3f _blockLocation;
-
-    public Portal(Vector3f loc) {
-        _blockLocation = loc;
+    public LifespanComponent() {
     }
 
-    public Vector3f getBlockLocation() {
-        return _blockLocation;
+    public LifespanComponent(float span) {
+        this.lifespan = span;
     }
 }

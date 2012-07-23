@@ -248,6 +248,13 @@ public class Block implements IGameObject {
         return new Vector2f(pos.x * TEXTURE_OFFSET, pos.y * TEXTURE_OFFSET);
     }
 
+    public Mesh getMesh() {
+        if (_mesh == null) {
+            generateMesh();
+        }
+        return _mesh;
+    }
+
     public void renderWithLightValue(float light) {
         if (isInvisible())
             return;
@@ -257,20 +264,7 @@ public class Block implements IGameObject {
         shader.setFloat("light", light);
 
         if (_mesh == null) {
-            Tessellator tessellator = new Tessellator();
-            tessellator.setColor(new Vector4f(1, 1, 1, 1));
-            if (_centerMesh != null) {
-                tessellator.addMeshPart(_centerMesh);
-            }
-            for (Side dir : Side.values()) {
-                BlockMeshPart part = _sideMesh.get(dir);
-                if (part != null) {
-                    float lightLevel = DIRECTION_LIT_LEVEL.get(dir);
-                    tessellator.setColor(new Vector4f(lightLevel, lightLevel, lightLevel, lightLevel));
-                    tessellator.addMeshPart(part);
-                }
-            }
-            _mesh = tessellator.generateMesh();
+            generateMesh();
         }
 
         if (getBlockForm() != BLOCK_FORM.BILLBOARD || !glIsEnabled(GL11.GL_CULL_FACE)) {
@@ -280,6 +274,23 @@ public class Block implements IGameObject {
             _mesh.render();
             glEnable(GL11.GL_CULL_FACE);
         }
+    }
+
+    private void generateMesh() {
+        Tessellator tessellator = new Tessellator();
+        tessellator.setColor(new Vector4f(1, 1, 1, 1));
+        if (_centerMesh != null) {
+            tessellator.addMeshPart(_centerMesh);
+        }
+        for (Side dir : Side.values()) {
+            BlockMeshPart part = _sideMesh.get(dir);
+            if (part != null) {
+                float lightLevel = DIRECTION_LIT_LEVEL.get(dir);
+                tessellator.setColor(new Vector4f(lightLevel, lightLevel, lightLevel, lightLevel));
+                tessellator.addMeshPart(part);
+            }
+        }
+        _mesh = tessellator.generateMesh();
     }
 
     @Override

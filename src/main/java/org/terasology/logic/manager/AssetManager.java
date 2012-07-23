@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.terasology.asset.*;
 import org.terasology.entitySystem.common.NullIterator;
+import org.terasology.rendering.assets.Shader;
 import org.terasology.rendering.assets.Texture;
 
 import java.io.IOException;
@@ -177,6 +178,10 @@ public class AssetManager {
 
     public static Texture loadTexture(String simpleUri) {
         return load(new AssetUri(AssetType.TEXTURE, simpleUri), Texture.class);
+    }
+
+    public static Shader loadShader(String simpleUri) {
+        return load(new AssetUri(AssetType.SHADER, simpleUri), Shader.class);
     }
 
     private class AllAssetIterator implements Iterator<AssetUri> {

@@ -12,5 +12,8 @@
     "Mesh" : {
         "mesh" : "engine:cube",
         "material" : "engine:default"
+    },
+    "Lifespan" : {
+        "lifespan" : 30
     }
 }

@@ -114,7 +114,7 @@ public class PortalManager {
         return _portalStore.size() >= 1;
     }
 
-    public void addPortal(Vector3d loc) {
+    public void addPortal(Vector3f loc) {
         _portalStore.add(new Portal(loc));
     }
 

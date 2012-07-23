@@ -838,9 +838,9 @@ public final class WorldRenderer implements IGameObject {
      */
     public void initPortal() {
         if (!_portalManager.hasPortal()) {
-            Vector3d loc = new Vector3d(getPlayerPosition().x, getPlayerPosition().y + 4, getPlayerPosition().z);
+            Vector3f loc = new Vector3f(getPlayerPosition().x, getPlayerPosition().y + 4, getPlayerPosition().z);
             _logger.log(Level.INFO, "Portal location is" + loc);
-            Vector3i pos = new Vector3i((int) loc.x - 1, (int) loc.y, (int) loc.z);
+            Vector3i pos = new Vector3i(loc.x, loc.y, loc.z, 0.5f);
             while (true) {
                 Block oldBlock = _worldProvider.getBlock(pos);
                 if (_worldProvider.setBlock(pos, BlockManager.getInstance().getBlock("PortalBlock"), oldBlock)) {

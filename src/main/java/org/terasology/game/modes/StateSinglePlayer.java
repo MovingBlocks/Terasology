@@ -355,7 +355,7 @@ public class StateSinglePlayer implements GameState {
             }
 
             PlayerFactory playerFactory = new PlayerFactory(entityManager);
-            CoreRegistry.get(LocalPlayer.class).setEntity(playerFactory.newInstance(new Vector3f(spawnPoint.x + 0.5f, spawnPoint.y + 2.0f, spawnPoint.z + 0.5f)));
+            CoreRegistry.get(LocalPlayer.class).setEntity(playerFactory.newInstance(new Vector3f(spawnPoint.x, spawnPoint.y + 1.5f, spawnPoint.z)));
             worldRenderer.setPlayer(CoreRegistry.get(LocalPlayer.class));
             worldRenderer.getChunkProvider().removeRegionEntity(spawnZoneEntity);
             spawnZoneEntity.destroy();
