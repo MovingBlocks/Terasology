@@ -82,7 +82,7 @@ sourceSets {
 	main {
 		java { srcDirs = [] }
 		groovy { srcDirs = ['src/main/java','src/main/groovy'] }
-		resources { srcDir = 'src/main/resources' }
+		resources { srcDirs = ['src/main/resources'] }
 		output.resourcesDir = 'target/classes/main'
 	}
 	perfTest
