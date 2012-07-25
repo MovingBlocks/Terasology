@@ -74,7 +74,7 @@ sourceCompatibility = 1.6
 buildDir = 'target'
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.0-milestone-8a'
+    gradleVersion = '1.0'
 }
 
 // Compiles everything as groovy, due to java<->groovy interdependencies
@@ -82,7 +82,7 @@ sourceSets {
 	main {
 		java { srcDirs = [] }
 		groovy { srcDirs = ['src/main/java','src/main/groovy'] }
-		resources { srcDir = 'src/main/resources' }
+		resources { srcDirs = ['src/main/resources'] }
 		output.resourcesDir = 'target/classes/main'
 	}
 	perfTest
