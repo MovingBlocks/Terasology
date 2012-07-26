@@ -65,6 +65,7 @@ public class LocalChunkProvider implements ChunkProvider {
         this.farStore = farStore;
         this.generator = generator;
 
+
         reviewChunkQueue = new PriorityBlockingQueue<ChunkRequest>(32);
         reviewThreads = Executors.newFixedThreadPool(REQUEST_CHUNK_THREADS);
         for (int i = 0; i < REQUEST_CHUNK_THREADS; ++i) {

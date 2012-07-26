@@ -1,6 +1,5 @@
 package org.terasology.componentSystem.common;
 
-import java.util.ArrayList;
 import java.util.Set;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
@@ -14,16 +13,16 @@ import org.terasology.entitySystem.*;
 import org.terasology.game.CoreRegistry;
 
 /**
- * @author aherber andre.herber@yahoo.de
+ * @author aherber <andre.herber@yahoo.de>
  *
  * Checks if The Collisionvolume of an Entity, that has changed its Location, overlaps any detectionarea.
  * If the volumes overlap, the entity is registered as a detected Entity in the RadarComponent.
  * Otherwise if the Collisionvolume of an Entity lays outside of the detectionarea the Entity 
  * gets removed from the Set of detected Entities.     
  * @param LocationChangeEvent Event send by Entity who has change its location 
- * @param EntityRef entity    Entity who has Changed its location 
+ * @param EntityRef entity    Entity that has changed its location 
  */ 
-@RegisterComponentSystem
+@RegisterComponentSystem(authorativeOnly=true)
 public class RadarSystem implements EventHandlerSystem, UpdateSubscriberSystem{
 
     private EntityManager entityManager;
@@ -72,7 +71,6 @@ public class RadarSystem implements EventHandlerSystem, UpdateSubscriberSystem{
 			}
 		}
 	}
-    entity.destroy();
   }
   
   /**
@@ -83,8 +81,10 @@ public class RadarSystem implements EventHandlerSystem, UpdateSubscriberSystem{
    * @param AABB entityAABB  =  CollisionVolume of the Entity that is checked against the detectionarea 
    */ 
   public void checkDetectionAreas(AABB entityAABB, EntityRef entity){
+	  System.out.println("check areas");
 	for(EntityRef curEntity : entityManager.iteratorEntities(RadarComponent.class, LocationComponent.class)){
 		if(curEntity != null && !curEntity.equals(entity)){
+			  System.out.println("check found Radarentity  ");
 			RadarComponent radar = curEntity.getComponent(RadarComponent.class);
 			LocationComponent location = curEntity.getComponent(LocationComponent.class);
 			if(radar != null && location != null){
@@ -100,18 +100,6 @@ public class RadarSystem implements EventHandlerSystem, UpdateSubscriberSystem{
 	 }
   }
   
-//TODO change detectionArea when viewing distance is changed
-//  @ReceiveEvent(components = {RadarComponent.class})
-//    public void onChangeViewingDistance(ChangeViewingDistanceEvent event, EntityRef entity) {
-//    	int activeViewingDistance = org.terasology.logic.manager.Config.getInstance().getActiveViewingDistance();
-//      RadarComponent radar = entity.getComponent(RadarComponent.class);
-//      AABB detectionArea = radar.getDetectionArea();
-//      detectionArea.getDimensions().x = activeViewingDistance*Chunk.SIZE_X;
-//      detectionArea.getDimensions().z = activeViewingDistance*Chunk.SIZE_Z;
-//      detectionArea.getDimensions().y = Chunk.SIZE_Y;
-//    	entity.saveComponent(radar);
-//      updateDetected(entity);
-//   }
   
   /**
    *.Updates the detectionstatus of all detected Entities of an Entity  

@@ -1,22 +1,15 @@
 package org.terasology.components;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.model.structures.AABB;
 import org.terasology.logic.world.chunks.Chunk;
 
-import org.terasology.logic.manager.Config;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.game.Timer;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
 /**

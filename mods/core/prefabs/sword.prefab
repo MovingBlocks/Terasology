@@ -5,7 +5,7 @@
         "icon" : "Sword",
         "usage" : "IN_DIRECTION",
         "renderWithIcon" : true,
-        "baseDamage" : 3
+        "baseDamage" : 10
     },
      "MeleeAttackAction" : {},
     "PlaySoundAction" : {

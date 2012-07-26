@@ -2,8 +2,6 @@ package org.terasology.componentSystem.controllers;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.CharacterMovementComponent;
-import org.terasology.components.LocalPlayerComponent;
-import org.terasology.components.RadarComponent;
 import org.terasology.components.SimpleAIComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.*;
@@ -99,4 +97,8 @@ public class SimpleAISystem implements EventHandlerSystem, UpdateSubscriberSyste
         }
     }
     
+    @ReceiveEvent(components = {SimpleAIComponent.class})
+    public void onDeath(NoHealthEvent event, EntityRef entity) {
+    	entity.destroy();
+    }
 }
