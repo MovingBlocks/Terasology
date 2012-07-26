@@ -1,5 +1,6 @@
 package org.terasology.entityFactory;
 
+import org.terasology.components.HealthComponent;
 import org.terasology.components.rendering.MeshComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
@@ -20,12 +21,14 @@ public class GelatinousCubeFactory {
 
     public EntityRef generateGelatinousCube(Vector3f position) {
         EntityRef entity = entityManager.create("core:gelatinousCube");
+        entity.addComponent(new HealthComponent());
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc != null) {
             loc.setWorldPosition(position);
             loc.setLocalScale((random.randomFloat() + 1.0f) * 0.4f + 0.2f);
             entity.saveComponent(loc);
         }
+        
 
         MeshComponent mesh = entity.getComponent(MeshComponent.class);
         if (mesh != null) {

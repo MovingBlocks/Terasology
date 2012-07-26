@@ -11,6 +11,7 @@ import org.terasology.events.FootstepEvent;
 import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.events.JumpEvent;
 import org.terasology.events.VerticalCollisionEvent;
+import org.terasology.events.LocationChangeEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.world.WorldProvider;
 import org.terasology.logic.world.WorldUtil;
@@ -22,6 +23,8 @@ import org.terasology.performanceMonitor.PerformanceMonitor;
 import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
+
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -55,6 +58,8 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
     public void update(float delta) {
         for (EntityRef entity : entityManager.iteratorEntities(CharacterMovementComponent.class, AABBCollisionComponent.class, LocationComponent.class)) {
             LocationComponent location = entity.getComponent(LocationComponent.class);
+            LocationComponent oldLocation = new LocationComponent(location.getWorldPosition());
+
             if (!worldProvider.isBlockActive(location.getWorldPosition())) continue;
 
             AABBCollisionComponent collision = entity.getComponent(AABBCollisionComponent.class);
@@ -62,10 +67,38 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
 
             updatePosition(delta, entity, location, collision, movementComp);
             updateSwimStatus(location, collision, movementComp);
-
             entity.saveComponent(location);
             entity.saveComponent(movementComp);
+            
+            locationChangedTest(entity,oldLocation,location);
         }
+    }
+   
+    /**
+     * Test wheter the actual position of a Character has changed. If the Location of a Charater has been Changed a LocationChangedEvent is sent. 
+     *
+     * @param oldPosition
+     * @param newPosition
+     * @param entity
+     */
+    public void locationChangedTest(EntityRef entity, LocationComponent oldPosition, LocationComponent newPosition){
+    	Vector3f owp = oldPosition.getWorldPosition();
+    	Vector3f nwp = newPosition.getWorldPosition();
+    	float[] owparray = new float[3];
+    	float[] nwparray = new float[3];
+    	owp.get(owparray);
+    	nwp.get(nwparray);
+
+    	boolean locationChange = false;
+    	for(int i = 0; i < 3; i++){
+    		if(owparray[i] != nwparray[i]){
+    			locationChange = true;
+    			break;
+    		}
+    	}
+    	if(locationChange){
+    		 entity.send(new org.terasology.events.LocationChangeEvent(entity));
+    	}
     }
 
     /**

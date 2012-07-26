@@ -16,6 +16,8 @@
 
 package org.terasology.asset;
 
+import org.terasology.asset.AssetUri;
+
 /**
  * @author Immortius
  */

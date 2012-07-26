@@ -2,10 +2,13 @@ package org.terasology.componentSystem.controllers;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.CharacterMovementComponent;
+import org.terasology.components.LocalPlayerComponent;
+import org.terasology.components.RadarComponent;
 import org.terasology.components.SimpleAIComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.*;
 import org.terasology.events.HorizontalCollisionEvent;
+import org.terasology.events.NoHealthEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
@@ -95,4 +98,5 @@ public class SimpleAISystem implements EventHandlerSystem, UpdateSubscriberSyste
             entity.saveComponent(moveComp);
         }
     }
+    
 }

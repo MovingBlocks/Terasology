@@ -1,0 +1,14 @@
+{
+    "name" : "core:sword",
+    "Item" : {
+        "name" : "Sword",
+        "icon" : "Sword",
+        "usage" : "IN_DIRECTION",
+        "renderWithIcon" : true,
+        "baseDamage" : 3
+    },
+     "MeleeAttackAction" : {},
+    "PlaySoundAction" : {
+  "sounds" : ["engine:Explode1", "engine:Explode2", "engine:Explode3", "engine:Explode4", "engine:Explode5"] 
+     }
+}
