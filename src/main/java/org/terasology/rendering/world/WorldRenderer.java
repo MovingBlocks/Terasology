@@ -156,6 +156,9 @@ public final class WorldRenderer implements IGameObject {
      */
     public WorldRenderer(String title, String seed, long time, EntityManager manager, LocalPlayerSystem localPlayerSystem) {
         ChunkGeneratorManager generatorManager = new ChunkGeneratorManagerImpl(seed, new WorldBiomeProviderImpl(seed));
+        // TODO save and load generator (name + parameter); GUI selection
+        // Use FlatTerrainGenerator instead of PerlinTerrainGenerator
+        // generatorManager.registerChunkGenerator(new FlatTerrainGenerator());
         generatorManager.registerChunkGenerator(new PerlinTerrainGenerator());
         generatorManager.registerChunkGenerator(new FloraGenerator());
         generatorManager.registerChunkGenerator(new LiquidsGenerator());
