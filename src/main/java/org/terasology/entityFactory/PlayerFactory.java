@@ -81,9 +81,14 @@ public class PlayerFactory {
         chestContents.send(new ReceiveItemEvent(entityManager.create("core:redbook")));
         chestContents.send(new ReceiveItemEvent(entityManager.create("core:railgunTool")));
 
-        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Brick"), 42)));
-        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Ice"), 42)));
-        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Plank"), 42)));
+        chestContents.send(new ReceiveItemEvent(entityManager.create("core:mrbarsack")));
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Cobaltite"), 99)));
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("NativeGoldOre"), 99)));
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Microcline"), 99)));
+
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Brick"), 99)));
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Ice"), 99)));
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Plank"), 99)));
 
         // Inner goodie chest
         EntityRef innerChest = blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Chest"));

@@ -1,0 +1,9 @@
+{
+    "name" : "core:mrbarsack",
+    "Item" : {
+        "name" : "Mr Barsack's Axe",
+        "icon" : "Axe",
+        "renderWithIcon" : true,
+        "baseDamage" : 50
+    }
+}
