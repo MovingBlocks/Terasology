@@ -139,7 +139,6 @@ jar.doFirst {
 	sourceSets.main.output.resourcesDir = '/dev/null'
 }
 jar.doLast {
-	ant.signjar(jar: jar.archivePath, keystore: 'applet/tera.keystore', alias: 'Terasology', storepass: 'Terasology')
 	sourceSets.main.output.resourcesDir = 'target/classes/main'
 }
 
@@ -226,6 +225,9 @@ task applet(type:Copy) {
 	}
 	from (jar.archivePath)
     into('target/applet')
+}
+applet.doFirst {
+    ant.signjar(jar: jar.archivePath, keystore: 'applet/tera.keystore', alias: 'Terasology', storepass: 'Terasology')
 }
 applet.doLast {
 	file('target/applet/libs').listFiles().each {

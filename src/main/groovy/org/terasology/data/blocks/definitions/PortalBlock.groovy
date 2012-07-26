@@ -17,10 +17,10 @@
 package org.terasology.data.blocks.definitions
 
 /**
- * A PortalBlock will be tied to the central game concept of the same name. It is indestructible (for now)
+ * A PortalBlock will be tied to the central game concept of the same name. Temporarily not indestructible!
  */
 block {
     version = 1
     shape = "cube"
-    hardness = 0
+    //hardness = 0
 }
