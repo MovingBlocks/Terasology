@@ -2,7 +2,7 @@
 
 ##############################################################################
 ##
-##  Gradle start up script for UN*X - now with fixed line endings! (maybe)
+##  Gradle start up script for UN*X
 ##
 ##############################################################################
 
@@ -107,7 +107,7 @@ fi
 
 # For Darwin, add options to specify how the application appears in the dock
 if $darwin; then
-    JAVA_OPTS="$JAVA_OPTS \"-Xdock:name=$APP_NAME\" \"-Xdock:icon=$APP_HOME/media/gradle.icns\""
+    GRADLE_OPTS="$GRADLE_OPTS \"-Xdock:name=$APP_NAME\" \"-Xdock:icon=$APP_HOME/media/gradle.icns\""
 fi
 
 # For Cygwin, switch paths to Windows format before running java
