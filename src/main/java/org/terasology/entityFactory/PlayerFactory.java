@@ -1,20 +1,14 @@
 package org.terasology.entityFactory;
 
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
-import org.terasology.audio.Sound;
 import org.terasology.components.*;
-import org.terasology.components.world.BlockItemComponent;
+import org.terasology.components.block.BlockItemComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.manager.AssetManager;
 import org.terasology.model.blocks.management.BlockManager;
-import org.terasology.mods.miniions.components.MinionBarComponent;
-import org.terasology.mods.miniions.components.MinionControllerComponent;
 
 import javax.vecmath.Vector3f;
 

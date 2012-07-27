@@ -25,6 +25,7 @@ import groovy.util.ScriptException;
 import org.lwjgl.input.Keyboard;
 import org.terasology.components.rendering.MeshComponent;
 import org.terasology.model.blocks.Block;
+import org.terasology.physics.BlockPickupComponent;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
@@ -210,7 +211,11 @@ public class GroovyManager {
             if (prefab != null && prefab.getComponent(LocationComponent.class) != null) {
                 EntityRef blockEntity = CoreRegistry.get(EntityManager.class).create(prefab, spawnPos);
                 MeshComponent blockMesh = blockEntity.getComponent(MeshComponent.class);
+                BlockPickupComponent blockPickup = blockEntity.getComponent(BlockPickupComponent.class);
+                blockPickup.blockFamily = block.getBlockFamily();
                 blockMesh.mesh = block.getMesh();
+                blockEntity.saveComponent(blockMesh);
+                blockEntity.saveComponent(blockPickup);
             }
         }
 

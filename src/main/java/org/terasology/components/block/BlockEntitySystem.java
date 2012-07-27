@@ -1,11 +1,10 @@
-package org.terasology.componentSystem.block;
+package org.terasology.components.block;
 
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.components.BlockParticleEffectComponent;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
-import org.terasology.components.world.BlockComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.*;

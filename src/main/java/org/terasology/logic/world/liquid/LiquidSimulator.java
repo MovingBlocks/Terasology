@@ -16,7 +16,7 @@
 package org.terasology.logic.world.liquid;
 
 import com.google.common.collect.Queues;
-import org.terasology.components.world.BlockComponent;
+import org.terasology.components.block.BlockComponent;
 import org.terasology.components.world.WorldComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
@@ -39,7 +39,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

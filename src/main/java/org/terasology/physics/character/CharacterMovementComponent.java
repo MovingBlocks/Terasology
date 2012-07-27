@@ -1,6 +1,7 @@
 package org.terasology.physics.character;
 
 import com.bulletphysics.collision.dispatch.GhostObject;
+import com.bulletphysics.collision.dispatch.PairCachingGhostObject;
 import org.terasology.entitySystem.Component;
 
 import javax.vecmath.Vector3f;
@@ -49,7 +50,7 @@ public final class CharacterMovementComponent implements Component {
     // Distance since last footstep
     public float footstepDelta = 0.0f;
 
-    public transient GhostObject collider;
+    public transient PairCachingGhostObject collider;
 
     public Vector3f getVelocity() {
         return velocity;

@@ -20,7 +20,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
-import org.terasology.components.world.BlockItemComponent;
+import org.terasology.components.block.BlockItemComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;

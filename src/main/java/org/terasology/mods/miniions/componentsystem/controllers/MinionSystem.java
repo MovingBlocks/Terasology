@@ -1,7 +1,7 @@
 package org.terasology.mods.miniions.componentsystem.controllers;
 
 import org.terasology.components.LocalPlayerComponent;
-import org.terasology.components.world.BlockComponent;
+import org.terasology.components.block.BlockComponent;
 import org.terasology.entitySystem.*;
 import org.terasology.events.ActivateEvent;
 import org.terasology.events.input.MouseWheelEvent;

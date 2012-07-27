@@ -1,22 +1,16 @@
 package org.terasology.componentSystem.action;
 
 import org.terasology.components.actions.MiniaturizerComponent;
-import org.terasology.components.world.BlockComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.world.BlockEntityRegistry;
 import org.terasology.logic.world.MiniatureChunk;
 import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.Vector3i;
-import org.terasology.model.blocks.management.BlockManager;
-import org.terasology.model.structures.BlockPosition;
-import org.terasology.rendering.physics.BulletPhysicsRenderer;
 import org.terasology.rendering.world.BlockGrid;
-import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.Vector3f;
 import java.util.HashSet;

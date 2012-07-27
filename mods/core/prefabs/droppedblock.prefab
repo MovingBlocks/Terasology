@@ -11,9 +11,11 @@
     },
     "Mesh" : {
         "mesh" : "engine:cube",
-        "material" : "engine:default"
+        "material" : "engine:terrain"
     },
     "Lifespan" : {
         "lifespan" : 30
+    },
+    "BlockPickup" : {
     }
 }

@@ -10,15 +10,17 @@
         "excessSpeedDamageMultiplier" : 20,
         "fallingDamageSpeedThreshold" : 15
     },
-    "AABBCollision" : {
-        "extents" : [0.3, 0.8, 0.3]
-    },
     "CharacterMovement" : {
         "groundFriction" : 16,
         "maxGroundSpeed" : 3,
         "distanceBetweenFootsteps" : 1.5,
         "height" : 1.6,
         "radius" : 0.3
+    },
+    "BoxShape" : {
+        "extents" : [0.6, 1.6, 0.6]
+    },
+    "Trigger" : {
     },
     "CharacterSound" : {
         "footstepSounds" : ["engine:FootGrass1","engine:FootGrass2","engine:FootGrass3","engine:FootGrass4","engine:FootGrass5"]

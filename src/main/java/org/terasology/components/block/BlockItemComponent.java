@@ -1,4 +1,4 @@
-package org.terasology.components.world;
+package org.terasology.components.block;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;

@@ -20,6 +20,7 @@ import com.bulletphysics.collision.dispatch.*;
 import com.bulletphysics.collision.shapes.*;
 import com.bulletphysics.collision.shapes.voxel.VoxelWorldShape;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
+import com.bulletphysics.dynamics.DynamicsWorld;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
@@ -33,7 +34,7 @@ import org.terasology.asset.AssetUri;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
-import org.terasology.components.world.BlockComponent;
+import org.terasology.components.block.BlockComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.*;
@@ -54,7 +55,6 @@ import org.terasology.utilities.FastRandom;
 import javax.vecmath.*;
 import java.nio.FloatBuffer;
 import java.util.Deque;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -167,13 +167,17 @@ public class BulletPhysicsRenderer implements IGameObject, EventReceiver<BlockCh
 
     }
 
+    public DynamicsWorld getWorld() {
+        return _discreteDynamicsWorld;
+    }
+
     // TODO: Wrap ghost object
 
-    public GhostObject createCollider(Vector3f pos, ConvexShape shape, short groups, short filters) {
+    public PairCachingGhostObject createCollider(Vector3f pos, ConvexShape shape, short groups, short filters) {
         return createCollider(pos, shape, groups, filters, 0);
     }
 
-    public GhostObject createCollider(Vector3f pos, ConvexShape shape, short groups, short filters, int collisionFlags) {
+    public PairCachingGhostObject createCollider(Vector3f pos, ConvexShape shape, short groups, short filters, int collisionFlags) {
         Transform startTransform = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), pos, 1.0f));
         PairCachingGhostObject result = new PairCachingGhostObject();
         result.setWorldTransform(startTransform);

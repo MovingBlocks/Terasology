@@ -1,7 +1,7 @@
 package org.terasology.componentSystem.action;
 
 import org.terasology.components.actions.ExplosionActionComponent;
-import org.terasology.components.world.BlockComponent;
+import org.terasology.components.block.BlockComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;

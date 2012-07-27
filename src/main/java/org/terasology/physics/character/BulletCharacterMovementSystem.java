@@ -77,7 +77,7 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
                 float height = (movementComp.height - 2 * movementComp.radius) * location.getWorldScale();
                 float width = movementComp.radius * location.getWorldScale();
                 ConvexShape capsule = new CapsuleShape(width, height);
-                movementComp.collider = physics.createCollider(location.getWorldPosition(), capsule, CollisionFilterGroups.CHARACTER_FILTER, (short)(CollisionFilterGroups.STATIC_FILTER | CollisionFilterGroups.DEFAULT_FILTER), CollisionFlags.CHARACTER_OBJECT);
+                movementComp.collider = physics.createCollider(location.getWorldPosition(), capsule, CollisionFilterGroups.CHARACTER_FILTER, (short)(CollisionFilterGroups.STATIC_FILTER | CollisionFilterGroups.DEFAULT_FILTER | CollisionFilterGroups.SENSOR_TRIGGER), CollisionFlags.CHARACTER_OBJECT);
                 movementComp.collider.setUserPointer(entity);
                 capsule.setMargin(0.05f);
             }
