@@ -32,7 +32,7 @@ import javax.vecmath.Vector2f
 
 import org.terasology.model.blocks.*
 import org.terasology.logic.manager.PathManager
-import org.terasology.logic.manager.AssetManager
+import org.terasology.asset.AssetManager
 import org.terasology.asset.AssetUri
 import org.terasology.asset.AssetType
 import org.terasology.rendering.assets.Texture

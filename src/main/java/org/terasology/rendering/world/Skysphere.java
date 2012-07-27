@@ -20,16 +20,11 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.util.glu.Sphere;
-import org.terasology.game.CoreRegistry;
-import org.terasology.game.Timer;
-import org.terasology.logic.manager.AssetManager;
-import org.terasology.logic.manager.Config;
+import org.terasology.asset.AssetManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.shader.ShaderProgram;
-import org.terasology.utilities.PerlinNoise;
 
-import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector4d;
 import javax.vecmath.Vector4f;

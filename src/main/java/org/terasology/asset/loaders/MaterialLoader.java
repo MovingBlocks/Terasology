@@ -21,7 +21,7 @@ import com.google.gson.*;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.logic.manager.AssetManager;
+import org.terasology.asset.AssetManager;
 import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.assets.Shader;
 import org.terasology.rendering.assets.Texture;

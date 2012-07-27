@@ -2,7 +2,7 @@ package org.terasology.mods.miniions.rendering.gui.components;
 
 import org.lwjgl.opengl.Display;
 import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.logic.manager.AssetManager;
+import org.terasology.asset.AssetManager;
 import org.terasology.mods.miniions.minionenum.MinionMessagePriority;
 import org.terasology.mods.miniions.utilities.MinionMessage;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;

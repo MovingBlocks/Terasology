@@ -5,7 +5,7 @@ import org.terasology.components.InventoryComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.events.input.binds.FrobButton;
 import org.terasology.events.inventory.ReceiveItemEvent;
-import org.terasology.logic.manager.AssetManager;
+import org.terasology.asset.AssetManager;
 import org.terasology.rendering.gui.components.UIInventoryNew;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;

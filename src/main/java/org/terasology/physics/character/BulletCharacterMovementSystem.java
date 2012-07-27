@@ -254,8 +254,10 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
                 movementComp.isGrounded = false;
                 movementComp.getVelocity().y += movementComp.jumpSpeed;
             }
-
         } else {
+            if (moveResult.hitTop && movementComp.getVelocity().y > 0) {
+                movementComp.getVelocity().y = -0.5f * movementComp.getVelocity().y;
+            }
             movementComp.isGrounded = false;
             movementComp.jump = false;
         }

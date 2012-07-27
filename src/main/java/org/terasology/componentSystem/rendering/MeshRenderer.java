@@ -1,7 +1,6 @@
 package org.terasology.componentSystem.rendering;
 
 import com.google.common.collect.*;
-import org.terasology.asset.AssetUri;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.components.rendering.MeshComponent;
 import org.terasology.components.world.LocationComponent;
@@ -10,7 +9,6 @@ import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.manager.AssetManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.TeraMath;
 import org.terasology.math.AABB;
@@ -23,7 +21,6 @@ import org.terasology.rendering.world.WorldRenderer;
 
 import javax.vecmath.*;
 
-import java.util.Map;
 import java.util.Set;
 
 import static org.lwjgl.opengl.GL11.*;

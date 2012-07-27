@@ -24,8 +24,7 @@ import com.bulletphysics.collision.dispatch.GhostObject;
 import com.bulletphysics.collision.dispatch.PairCachingGhostObject;
 import com.bulletphysics.collision.narrowphase.ManifoldPoint;
 import com.bulletphysics.collision.narrowphase.PersistentManifold;
-import com.bulletphysics.collision.shapes.BoxShape;
-import com.bulletphysics.collision.shapes.ConvexShape;
+import com.bulletphysics.collision.shapes.*;
 import com.bulletphysics.dynamics.DynamicsWorld;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
@@ -42,7 +41,8 @@ import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.physics.shapes.BoxShapeComponent;
+import org.terasology.physics.character.CharacterMovementComponent;
+import org.terasology.physics.shapes.*;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
 
 import javax.vecmath.Matrix4f;
@@ -121,12 +121,30 @@ public class PhysicsSystem implements EventHandlerSystem, UpdateSubscriberSystem
         }
     }
 
+    // TODO: Flyweight this (take scale as parameter)
     private ConvexShape getShapeFor(EntityRef entity) {
         BoxShapeComponent box = entity.getComponent(BoxShapeComponent.class);
         if (box != null) {
             Vector3f halfExtents = new Vector3f(box.extents);
             halfExtents.scale(0.5f);
             return new BoxShape(halfExtents);
+        }
+        CapsuleShapeComponent capsule = entity.getComponent(CapsuleShapeComponent.class);
+        if (capsule != null) {
+            return new CapsuleShape(capsule.radius, capsule.height);
+        }
+        CylinderShapeComponent cylinder = entity.getComponent(CylinderShapeComponent.class);
+        if (cylinder != null) {
+            return new CylinderShape(new Vector3f(cylinder.radius, 0.5f * cylinder.height, cylinder.radius));
+        }
+        SphereShapeComponent sphere = entity.getComponent(SphereShapeComponent.class);
+        if (sphere != null) {
+            return new SphereShape(sphere.radius);
+        }
+        // TODO: Convex Hull
+        CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
+        if (characterMovementComponent != null) {
+            return new CapsuleShape(characterMovementComponent.radius, characterMovementComponent.height);
         }
         return null;
     }

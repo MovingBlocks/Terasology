@@ -1,8 +1,7 @@
-package org.terasology.logic.manager;
+package org.terasology.asset;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.terasology.asset.*;
 import org.terasology.entitySystem.common.NullIterator;
 import org.terasology.rendering.assets.Shader;
 import org.terasology.rendering.assets.Texture;
@@ -16,14 +15,14 @@ import java.util.logging.Logger;
 
 public class AssetManager {
 
-    private static AssetManager _instance = null;
+    private static AssetManager instance = null;
 
     public static AssetManager getInstance() {
-        if (_instance == null) {
-            _instance = new AssetManager();
+        if (instance == null) {
+            instance = new AssetManager();
         }
 
-        return _instance;
+        return instance;
     }
 
     private Logger logger = Logger.getLogger(this.getClass().getCanonicalName());

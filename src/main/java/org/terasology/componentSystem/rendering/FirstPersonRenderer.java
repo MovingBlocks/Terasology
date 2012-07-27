@@ -12,7 +12,7 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.manager.AssetManager;
+import org.terasology.asset.AssetManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.Side;

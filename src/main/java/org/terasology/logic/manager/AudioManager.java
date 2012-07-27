@@ -16,6 +16,7 @@
 package org.terasology.logic.manager;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
+import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.audio.OpenALManager;
