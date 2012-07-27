@@ -24,9 +24,6 @@ import org.terasology.entitySystem.*;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AudioManager;
-import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.BlockFamily;
-import org.terasology.model.blocks.management.BlockManager;
 
 /**
  * @author Immortius
@@ -55,7 +52,7 @@ public class BlockPickupSystem implements EventHandlerSystem {
 
     @Override
     public void initialise() {
-        blockItemFactory = new BlockItemFactory(CoreRegistry.get(EntityManager.class), CoreRegistry.get(PrefabManager.class));
+        blockItemFactory = new BlockItemFactory(CoreRegistry.get(EntityManager.class));
     }
 
     @Override

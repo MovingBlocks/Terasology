@@ -4,7 +4,6 @@ import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.entitySystem.Component;
 import org.terasology.logic.world.MiniatureChunk;
-import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.BlockGrid;
 

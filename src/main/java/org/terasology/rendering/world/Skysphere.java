@@ -26,7 +26,6 @@ import org.terasology.logic.manager.AssetManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.TeraMath;
-import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.utilities.PerlinNoise;
 
@@ -46,7 +45,7 @@ import static org.lwjgl.opengl.GL11.*;
  * @author Anthony Kireev <adeon.k87@gmail.com>
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class Skysphere implements IGameObject {
+public class Skysphere {
 
     private static int _displayListSphere = -1;
     private static final float PI = 3.1415926f;

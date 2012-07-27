@@ -49,7 +49,6 @@ import org.terasology.rendering.AABBRenderer;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.DefaultCamera;
-import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
@@ -77,7 +76,7 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class WorldRenderer implements IGameObject {
+public final class WorldRenderer {
     public static final int MAX_ANIMATED_CHUNKS = 64;
     public static final int MAX_BILLBOARD_CHUNKS = 64;
     public static final int VERTICAL_SEGMENTS = Config.getInstance().getVerticalChunkMeshSegments();
@@ -109,7 +108,6 @@ public final class WorldRenderer implements IGameObject {
     private int _chunkPosX, _chunkPosZ;
 
     /* RENDERING */
-    private final LinkedList<IGameObject> _renderQueueTransparent = Lists.newLinkedList();
     private final LinkedList<Chunk> _renderQueueChunksOpaque = Lists.newLinkedList();
     private final PriorityQueue<Chunk> _renderQueueChunksSortedWater = new PriorityQueue<Chunk>(16 * 16, new ChunkProximityComparator());
     private final PriorityQueue<Chunk> _renderQueueChunksSortedBillboards = new PriorityQueue<Chunk>(16 * 16, new ChunkProximityComparator());
@@ -448,9 +446,7 @@ public final class WorldRenderer implements IGameObject {
     /**
      * Renders the world.
      */
-    @Override
     public void render() {
-        _renderQueueTransparent.add(_bulletRenderer);
         resetStats();
 
         updateAndQueueVisibleChunks();
@@ -547,8 +543,6 @@ public final class WorldRenderer implements IGameObject {
 
         PerformanceMonitor.startActivity("Render Transparent");
 
-        while (_renderQueueTransparent.size() > 0)
-            _renderQueueTransparent.poll().render();
         for (RenderSystem renderer : _systemManager.iterateRenderSubscribers()) {
             renderer.renderTransparent();
         }
@@ -615,8 +609,6 @@ public final class WorldRenderer implements IGameObject {
         for (Chunk c : _renderQueueChunksSortedBillboards)
             renderChunk(c, ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT, camera);
 
-        for (IGameObject g : _renderQueueTransparent)
-            g.render();
 
         glDisable(GL_BLEND);
         glDisable(GL_LIGHT0);
@@ -670,7 +662,6 @@ public final class WorldRenderer implements IGameObject {
         return (float) TeraMath.clamp(lightValueSun + lightValueBlock * (1.0 - lightValueSun));
     }
 
-    @Override
     public void update(float delta) {
         PerformanceMonitor.startActivity("Cameras");
         animateSpawnCamera(delta);

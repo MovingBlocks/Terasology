@@ -201,10 +201,9 @@ public class UIInventoryCell extends UIDisplayElement {
         GL11.glRotatef(170f, 1f, 0f, 0f);
         GL11.glRotatef(-16f, 0f, 1f, 0f);
         glBindTexture(GL11.GL_TEXTURE_2D, terrainTex.getId());
-        ;
 
         Block block = blockFamily.getArchetypeBlock();
-        block.render();
+        block.renderWithLightValue(1.0f);
 
         GL11.glPopMatrix();
 

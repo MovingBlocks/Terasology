@@ -3,10 +3,8 @@ package org.terasology.componentSystem.action;
 import org.terasology.components.actions.ExplosionActionComponent;
 import org.terasology.components.block.BlockComponent;
 import org.terasology.components.world.LocationComponent;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entityFactory.DroppedBlockFactory;
+import org.terasology.entitySystem.*;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.world.BlockEntityRegistry;
@@ -29,12 +27,14 @@ public class ExplosionAction implements EventHandlerSystem {
     private FastRandom random = new FastRandom();
     private BulletPhysicsRenderer physicsRenderer;
     private BlockEntityRegistry blockEntityRegistry;
+    private DroppedBlockFactory droppedBlockFactory;
 
     @Override
     public void initialise() {
         worldProvider = CoreRegistry.get(WorldProvider.class);
         physicsRenderer = CoreRegistry.get(BulletPhysicsRenderer.class);
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
+        droppedBlockFactory = new DroppedBlockFactory(CoreRegistry.get(EntityManager.class));
     }
 
     @Override
@@ -97,7 +97,9 @@ public class ExplosionAction implements EventHandlerSystem {
 
                     EntityRef blockEntity = blockEntityRegistry.getEntityAt(blockPos);
                     blockEntity.destroy();
-                    physicsRenderer.addTemporaryBlock(target, currentBlock.getId(), impulse, BulletPhysicsRenderer.BLOCK_SIZE.HALF_SIZE);
+                    if (random.randomInt(4) == 0) {
+                        droppedBlockFactory.newInstance(target, currentBlock.getBlockFamily());
+                    }
                 }
             }
         }

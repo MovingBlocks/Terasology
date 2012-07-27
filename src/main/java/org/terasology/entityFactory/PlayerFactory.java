@@ -5,9 +5,7 @@ import org.terasology.components.block.BlockItemComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.PrefabManager;
 import org.terasology.events.inventory.ReceiveItemEvent;
-import org.terasology.game.CoreRegistry;
 import org.terasology.model.blocks.management.BlockManager;
 
 import javax.vecmath.Vector3f;
@@ -22,7 +20,7 @@ public class PlayerFactory {
 
     public PlayerFactory(EntityManager entityManager) {
         this.entityManager = entityManager;
-        blockFactory = new BlockItemFactory(entityManager, CoreRegistry.get(PrefabManager.class));
+        blockFactory = new BlockItemFactory(entityManager);
     }
 
     public EntityRef newInstance(Vector3f spawnPosition) {

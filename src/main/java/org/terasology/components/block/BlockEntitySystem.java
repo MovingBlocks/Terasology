@@ -7,6 +7,7 @@ import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entityFactory.BlockItemFactory;
+import org.terasology.entityFactory.DroppedBlockFactory;
 import org.terasology.entitySystem.*;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.FullHealthEvent;
@@ -30,12 +31,14 @@ public class BlockEntitySystem implements EventHandlerSystem {
     private WorldProvider worldProvider;
     private EntityManager entityManager;
     private BlockItemFactory blockItemFactory;
+    private DroppedBlockFactory droppedBlockFactory;
 
     @Override
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
         worldProvider = CoreRegistry.get(WorldProvider.class);
-        blockItemFactory = new BlockItemFactory(entityManager, CoreRegistry.get(PrefabManager.class));
+        blockItemFactory = new BlockItemFactory(entityManager);
+        droppedBlockFactory = new DroppedBlockFactory(entityManager);
     }
 
     @Override
@@ -70,11 +73,11 @@ public class BlockEntitySystem implements EventHandlerSystem {
             if (itemComp != null && !itemComp.container.exists()) {
                 // TODO: Fix this - entity needs to be added to lootable block or destroyed
                 item.destroy();
-                CoreRegistry.get(BulletPhysicsRenderer.class).addLootableBlocks(blockComp.getPosition().toVector3f(), oldBlock);
+                droppedBlockFactory.newInstance(blockComp.getPosition().toVector3f(), oldBlock.getBlockFamily());
             }
         } else {
             /* PHYSICS */
-            CoreRegistry.get(BulletPhysicsRenderer.class).addLootableBlocks(blockComp.getPosition().toVector3f(), oldBlock);
+            droppedBlockFactory.newInstance(blockComp.getPosition().toVector3f(), oldBlock.getBlockFamily());
         }
 
         if (oldBlock.isEntityTemporary()) {

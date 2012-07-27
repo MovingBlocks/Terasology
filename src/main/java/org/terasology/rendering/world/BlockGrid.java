@@ -20,7 +20,6 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.Vector3i;
 import org.terasology.model.structures.BlockPosition;
-import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
@@ -37,7 +36,7 @@ import static org.lwjgl.opengl.GL11.glColorMask;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class BlockGrid implements IGameObject {
+public class BlockGrid {
 
     public class GridPosition {
         public GridPosition(Vector3i position, byte blockType) {
@@ -62,7 +61,6 @@ public class BlockGrid implements IGameObject {
         _mesh = tessellator.generateMesh();
     }
 
-    @Override
     public void render() {
         ShaderManager.getInstance().enableDefault();
 
@@ -145,8 +143,4 @@ public class BlockGrid implements IGameObject {
         _gridPositions.clear();
     }
 
-    @Override
-    public void update(float delta) {
-        // Nothing to do.
-    }
 }

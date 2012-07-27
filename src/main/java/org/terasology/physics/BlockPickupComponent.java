@@ -18,6 +18,7 @@
 package org.terasology.physics;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.model.blocks.BlockFamily;
 
 /**
@@ -25,4 +26,5 @@ import org.terasology.model.blocks.BlockFamily;
  */
 public class BlockPickupComponent implements Component {
     public BlockFamily blockFamily;
+    public EntityRef placedEntity;
 }

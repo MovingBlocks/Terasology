@@ -181,9 +181,16 @@ public class PhysicsSystem implements EventHandlerSystem, UpdateSubscriberSystem
 
     private class EntityMotionState extends MotionState {
         private EntityRef entity;
+        private Transform transform;
 
         public EntityMotionState(EntityRef entity) {
             this.entity = entity;
+            transform = new Transform();
+            LocationComponent loc = entity.getComponent(LocationComponent.class);
+            if (loc != null) {
+                // NOTE: JBullet ignores scale anyway
+                this.transform.set(new Matrix4f(loc.getWorldRotation(), loc.getWorldPosition(), 1));
+            }
         }
 
         @Override
@@ -198,6 +205,7 @@ public class PhysicsSystem implements EventHandlerSystem, UpdateSubscriberSystem
 
         @Override
         public void setWorldTransform(Transform transform) {
+            this.transform.set(transform);
             LocationComponent loc = entity.getComponent(LocationComponent.class);
             if (loc != null) {
                 loc.setWorldPosition(transform.origin);

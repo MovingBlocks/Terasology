@@ -16,7 +16,6 @@
 
 package org.terasology.logic.manager;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import groovy.util.GroovyScriptEngine;
@@ -48,7 +47,6 @@ import org.terasology.logic.LocalPlayer;
 import org.terasology.model.blocks.BlockFamily;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.physics.BulletPhysicsRenderer;
 import org.terasology.rendering.world.WorldRenderer;
 
 import javax.vecmath.Vector3f;
@@ -167,7 +165,7 @@ public class GroovyManager {
         private void giveBlock(BlockFamily blockFamily, int quantity) {
             if (quantity < 1) return;
 
-            BlockItemFactory factory = new BlockItemFactory(CoreRegistry.get(EntityManager.class), CoreRegistry.get(PrefabManager.class));
+            BlockItemFactory factory = new BlockItemFactory(CoreRegistry.get(EntityManager.class));
             EntityRef item = factory.newInstance(blockFamily, quantity);
 
             EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
@@ -282,10 +280,6 @@ public class GroovyManager {
 
         public void exit() {
             CoreRegistry.get(GameEngine.class).shutdown();
-        }
-
-        public void spawnLoot() {
-            CoreRegistry.get(BulletPhysicsRenderer.class).addLootableBlocks(CoreRegistry.get(LocalPlayer.class).getPosition(), BlockManager.getInstance().getBlock("Dirt"));
         }
     }
 }

@@ -13,11 +13,9 @@ import org.terasology.model.blocks.BlockFamily;
  */
 public class BlockItemFactory {
     private EntityManager entityManager;
-    private PrefabManager prefabManager;
 
-    public BlockItemFactory(EntityManager entityManager, PrefabManager prefabManager) {
+    public BlockItemFactory(EntityManager entityManager) {
         this.entityManager = entityManager;
-        this.prefabManager = prefabManager;
     }
 
     public EntityRef newInstance(BlockFamily blockFamily) {

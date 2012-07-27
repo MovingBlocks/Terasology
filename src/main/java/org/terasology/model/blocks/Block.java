@@ -25,7 +25,6 @@ import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.model.shapes.BlockMeshPart;
 import org.terasology.math.AABB;
-import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.shader.ShaderProgram;
@@ -47,7 +46,7 @@ import static org.lwjgl.opengl.GL11.*;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
-public class Block implements IGameObject {
+public class Block {
 
     private static final Logger logger = Logger.getLogger(Block.class.getName());
     public static final int ATLAS_SIZE_IN_PX = 256;
@@ -292,17 +291,6 @@ public class Block implements IGameObject {
         }
         _mesh = tessellator.generateMesh();
     }
-
-    @Override
-    public void render() {
-        renderWithLightValue(1.0f);
-    }
-
-    @Override
-    public void update(float delta) {
-        // Do nothing
-    }
-
 
     // TODO: Change all of these to setters
     public Block withId(byte id) {
