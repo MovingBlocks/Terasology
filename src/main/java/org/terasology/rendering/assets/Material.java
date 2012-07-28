@@ -199,4 +199,5 @@ public class Material implements Asset {
     public AssetUri getURI() {
         return uri;
     }
+
 }

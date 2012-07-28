@@ -21,9 +21,9 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
-import org.terasology.components.world.BlockItemComponent;
+import org.terasology.components.block.BlockItemComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.logic.manager.AssetManager;
+import org.terasology.asset.AssetManager;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockFamily;
 import org.terasology.model.inventory.Icon;
@@ -232,7 +232,7 @@ public class UIInventoryCellNew extends UIDisplayElement {
         glBindTexture(GL11.GL_TEXTURE_2D, terrainTex.getId());
 
         Block block = blockFamily.getArchetypeBlock();
-        block.render();
+        block.renderWithLightValue(1.0f);
 
         GL11.glPopMatrix();
 

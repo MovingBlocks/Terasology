@@ -50,38 +50,59 @@ public class ModManager {
         mods.clear();
         Gson gson = new Gson();
         File modPath = PathManager.getInstance().getModPath();
-        for (File modFile : modPath.listFiles()) {
-            if (modFile.isDirectory()) {
-                File modInfoFile = new File(modFile.getPath(), "mod.txt");
-                if (modInfoFile.exists()) {
-                    try {
-                        ModInfo modInfo = gson.fromJson(new FileReader(modInfoFile), ModInfo.class);
+
+        // Directories first (they should override zips)
+        for (File modFile : modPath.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return pathname.isDirectory();
+            }
+        })) {
+            File modInfoFile = new File(modFile.getPath(), "mod.txt");
+            if (modInfoFile.exists()) {
+                try {
+                    ModInfo modInfo = gson.fromJson(new FileReader(modInfoFile), ModInfo.class);
+                    if (!mods.containsKey(modInfo.getId())) {
                         mods.put(modInfo.getId(), new Mod(modFile, modInfo, new DirectorySource(modInfo.getId(), modFile)));
                         logger.info("Discovered mod: " + modInfo.getDisplayName());
+                    } else {
+                        logger.info("Discovered duplicate mod: " + modInfo.getDisplayName() + ", skipping");
+                    }
+                } catch (FileNotFoundException e) {
+                    logger.log(Level.WARNING, "Failed to load mod manifest for mod at " + modFile, e);
+                } catch (JsonIOException e) {
+                    logger.log(Level.WARNING, "Failed to load mod manifest for mod at " + modFile, e);
+                }
+            }
+        }
+
+        // Zip files next
+        for (File modFile : modPath.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return pathname.isFile() && pathname.getName().endsWith(".zip");
+            }
+        })) {
+            try {
+                ZipFile zipFile = new ZipFile(modFile);
+                ZipEntry modInfoEntry = zipFile.getEntry("mod.txt");
+                if (modInfoEntry != null) {
+                    try {
+                        ModInfo modInfo = gson.fromJson(new InputStreamReader(zipFile.getInputStream(modInfoEntry)), ModInfo.class);
+                        if (!mods.containsKey(modInfo.getId())) {
+                            mods.put(modInfo.getId(), new Mod(modFile, modInfo, new ArchiveSource(modInfo.getId(), modFile)));
+                            logger.info("Discovered mod: " + modInfo.getDisplayName());
+                        } else {
+                            logger.info("Discovered duplicate mod: " + modInfo.getDisplayName() + ", skipping");
+                        }
                     } catch (FileNotFoundException e) {
                         logger.log(Level.WARNING, "Failed to load mod manifest for mod at " + modFile, e);
                     } catch (JsonIOException e) {
                         logger.log(Level.WARNING, "Failed to load mod manifest for mod at " + modFile, e);
                     }
                 }
-            } else if (modFile.isFile() && modFile.getName().endsWith(".zip")) {
-                try {
-                    ZipFile zipFile = new ZipFile(modFile);
-                    ZipEntry modInfoEntry = zipFile.getEntry("mod.txt");
-                    if (modInfoEntry != null) {
-                        try {
-                            ModInfo modInfo = gson.fromJson(new InputStreamReader(zipFile.getInputStream(modInfoEntry)), ModInfo.class);
-                            mods.put(modInfo.getId(), new Mod(modFile, modInfo, new ArchiveSource(modInfo.getId(), modFile)));
-                            logger.info("Discovered mod: " + modInfo.getDisplayName());
-                        } catch (FileNotFoundException e) {
-                            logger.log(Level.WARNING, "Failed to load mod manifest for mod at " + modFile, e);
-                        } catch (JsonIOException e) {
-                            logger.log(Level.WARNING, "Failed to load mod manifest for mod at " + modFile, e);
-                        }
-                    }
-                } catch (IOException e) {
-                    logger.log(Level.SEVERE, "Invalid mod file: " + modFile, e);
-                }
+            } catch (IOException e) {
+                logger.log(Level.SEVERE, "Invalid mod file: " + modFile, e);
             }
         }
         for (String activeModId : Config.getInstance().getActiveMods()) {

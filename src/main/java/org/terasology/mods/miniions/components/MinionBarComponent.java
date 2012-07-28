@@ -15,14 +15,14 @@ import java.util.List;
  */
 public class MinionBarComponent implements Component {
 
-    public List<EntityRef> MinionSlots = Lists.newArrayList();
+    public List<EntityRef> minionSlots = Lists.newArrayList();
 
     public MinionBarComponent() {
     }
 
     public MinionBarComponent(int numSlots) {
         for (int i = 0; i < numSlots; ++i) {
-            MinionSlots.add(EntityRef.NULL);
+            minionSlots.add(EntityRef.NULL);
         }
     }
 }

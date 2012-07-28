@@ -1,7 +1,7 @@
 package org.terasology.mods.miniions.componentsystem.controllers;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.components.CharacterMovementComponent;
+import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.*;
 import org.terasology.events.DamageEvent;

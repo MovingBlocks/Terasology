@@ -21,7 +21,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.controllers.LocalPlayerSystem;
-import org.terasology.components.AABBCollisionComponent;
+import org.terasology.componentSystem.rendering.MeshRenderer;
 import org.terasology.components.PlayerComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.game.ComponentSystemManager;
@@ -45,12 +45,11 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
-import org.terasology.model.structures.AABB;
-import org.terasology.model.structures.BlockPosition;
+import org.terasology.math.AABB;
+import org.terasology.rendering.AABBRenderer;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.DefaultCamera;
-import org.terasology.rendering.interfaces.IGameObject;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
@@ -78,7 +77,7 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class WorldRenderer implements IGameObject {
+public final class WorldRenderer {
     public static final int MAX_ANIMATED_CHUNKS = 64;
     public static final int MAX_BILLBOARD_CHUNKS = 64;
     public static final int VERTICAL_SEGMENTS = Config.getInstance().getVerticalChunkMeshSegments();
@@ -110,7 +109,6 @@ public final class WorldRenderer implements IGameObject {
     private int _chunkPosX, _chunkPosZ;
 
     /* RENDERING */
-    private final LinkedList<IGameObject> _renderQueueTransparent = Lists.newLinkedList();
     private final LinkedList<Chunk> _renderQueueChunksOpaque = Lists.newLinkedList();
     private final PriorityQueue<Chunk> _renderQueueChunksSortedWater = new PriorityQueue<Chunk>(16 * 16, new ChunkProximityComparator());
     private final PriorityQueue<Chunk> _renderQueueChunksSortedBillboards = new PriorityQueue<Chunk>(16 * 16, new ChunkProximityComparator());
@@ -440,9 +438,7 @@ public final class WorldRenderer implements IGameObject {
     /**
      * Renders the world.
      */
-    @Override
     public void render() {
-        _renderQueueTransparent.add(_bulletRenderer);
         resetStats();
 
         updateAndQueueVisibleChunks();
@@ -539,8 +535,6 @@ public final class WorldRenderer implements IGameObject {
 
         PerformanceMonitor.startActivity("Render Transparent");
 
-        while (_renderQueueTransparent.size() > 0)
-            _renderQueueTransparent.poll().render();
         for (RenderSystem renderer : _systemManager.iterateRenderSubscribers()) {
             renderer.renderTransparent();
         }
@@ -607,14 +601,13 @@ public final class WorldRenderer implements IGameObject {
         for (Chunk c : _renderQueueChunksSortedBillboards)
             renderChunk(c, ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT, camera);
 
-        for (IGameObject g : _renderQueueTransparent)
-            g.render();
 
         glDisable(GL_BLEND);
         glDisable(GL_LIGHT0);
     }
 
     private void renderChunk(Chunk chunk, ChunkMesh.RENDER_PHASE phase, Camera camera) {
+
         if (chunk.getChunkState() == Chunk.State.COMPLETE && chunk.getMesh() != null) {
             ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("chunk");
             // Transfer the world offset of the chunk to the shader for various effects
@@ -630,7 +623,8 @@ public final class WorldRenderer implements IGameObject {
             for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
                 if (!chunk.getMesh()[i].isEmpty()) {
                     if (Config.getInstance().isRenderChunkBoundingBoxes()) {
-                        chunk.getSubMeshAABB(i).renderLocally(1f);
+                        AABBRenderer aabbRenderer = new AABBRenderer(chunk.getSubMeshAABB(i));
+                        aabbRenderer.renderLocally(1f);
                         _statRenderedTriangles += 12;
                     }
 
@@ -660,7 +654,6 @@ public final class WorldRenderer implements IGameObject {
         return (float) TeraMath.clamp(lightValueSun + lightValueBlock * (1.0 - lightValueSun));
     }
 
-    @Override
     public void update(float delta) {
         PerformanceMonitor.startActivity("Cameras");
         animateSpawnCamera(delta);
@@ -709,23 +702,7 @@ public final class WorldRenderer implements IGameObject {
     }
 
     private void renderDebugCollision(Camera camera) {
-        if (_player != null && _player.isValid()) {
-            AABBCollisionComponent collision = _player.getEntity().getComponent(AABBCollisionComponent.class);
-            if (collision != null) {
-                Vector3f worldLoc = _player.getPosition();
-                AABB aabb = new AABB(new Vector3d(worldLoc), new Vector3d(collision.getExtents()));
-                aabb.render(1f);
-            }
-        }
-
-        List<BlockPosition> blocks = WorldUtil.gatherAdjacentBlockPositions(new Vector3f(camera.getPosition()));
-
-        for (int i = 0; i < blocks.size(); i++) {
-            BlockPosition p = blocks.get(i);
-            Block block = getWorldProvider().getBlock(new Vector3f(p.x, p.y, p.z));
-
-            block.getBounds(new Vector3i(p.x, p.y, p.z, 0.5f)).render(1f);
-        }
+        // TODO: Implement
     }
 
     private boolean isUnderwater() {
@@ -844,9 +821,9 @@ public final class WorldRenderer implements IGameObject {
      */
     public void initPortal() {
         if (!_portalManager.hasPortal()) {
-            Vector3d loc = new Vector3d(getPlayerPosition().x, getPlayerPosition().y + 4, getPlayerPosition().z);
+            Vector3f loc = new Vector3f(getPlayerPosition().x, getPlayerPosition().y + 4, getPlayerPosition().z);
             _logger.log(Level.INFO, "Portal location is" + loc);
-            Vector3i pos = new Vector3i((int) loc.x - 1, (int) loc.y, (int) loc.z);
+            Vector3i pos = new Vector3i(loc.x, loc.y, loc.z, 0.5f);
             while (true) {
                 Block oldBlock = _worldProvider.getBlock(pos);
                 if (_worldProvider.setBlock(pos, BlockManager.getInstance().getBlock("PortalBlock"), oldBlock)) {
@@ -978,7 +955,7 @@ public final class WorldRenderer implements IGameObject {
 
     @Override
     public String toString() {
-        return String.format("world (biome: %s, time: %.2f, exposure: %.2f, sun: %.2f, cache: %fMb, dirty: %d, ign: %d, vis: %d, tri: %d, empty: %d, !ready: %d, seed: \"%s\", title: \"%s\")", getPlayerBiome(), _worldProvider.getTimeInDays(), PostProcessingRenderer.getInstance().getExposure(), _skysphere.getSunPosAngle(), _chunkProvider.size(), _statDirtyChunks, _statIgnoredPhases, _statVisibleChunks, _statRenderedTriangles, _statChunkMeshEmpty, _statChunkNotReady, _worldProvider.getSeed(), _worldProvider.getTitle());
+        return String.format("world (numdropped: %d, biome: %s, time: %.2f, exposure: %.2f, sun: %.2f, cache: %fMb, dirty: %d, ign: %d, vis: %d, tri: %d, empty: %d, !ready: %d, seed: \"%s\", title: \"%s\")", ((MeshRenderer)CoreRegistry.get(ComponentSystemManager.class).get("engine:MeshRenderer")).lastRendered, getPlayerBiome(), _worldProvider.getTimeInDays(), PostProcessingRenderer.getInstance().getExposure(), _skysphere.getSunPosAngle(), _chunkProvider.size(), _statDirtyChunks, _statIgnoredPhases, _statVisibleChunks, _statRenderedTriangles, _statChunkMeshEmpty, _statChunkNotReady, _worldProvider.getSeed(), _worldProvider.getTitle());
     }
 
     public LocalPlayer getPlayer() {

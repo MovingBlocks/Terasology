@@ -17,7 +17,7 @@
 package org.terasology.input;
 
 import com.google.common.base.Objects;
-import org.terasology.components.world.BlockComponent;
+import org.terasology.components.block.BlockComponent;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;

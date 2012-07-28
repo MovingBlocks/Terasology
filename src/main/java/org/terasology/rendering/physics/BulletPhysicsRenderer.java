@@ -15,49 +15,33 @@
  */
 package org.terasology.rendering.physics;
 
-import com.bulletphysics.collision.broadphase.BroadphaseInterface;
-import com.bulletphysics.collision.broadphase.DbvtBroadphase;
+import com.bulletphysics.collision.broadphase.*;
 import com.bulletphysics.collision.dispatch.*;
-import com.bulletphysics.collision.shapes.BoxShape;
-import com.bulletphysics.collision.shapes.BvhTriangleMeshShape;
-import com.bulletphysics.collision.shapes.IndexedMesh;
-import com.bulletphysics.collision.shapes.TriangleIndexVertexArray;
+import com.bulletphysics.collision.shapes.*;
 import com.bulletphysics.collision.shapes.voxel.VoxelWorldShape;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
+import com.bulletphysics.dynamics.DynamicsWorld;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
 import com.bulletphysics.linearmath.DefaultMotionState;
 import com.bulletphysics.linearmath.Transform;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
-import org.terasology.components.CharacterMovementComponent;
-import org.terasology.components.InventoryComponent;
-import org.terasology.components.ItemComponent;
-import org.terasology.components.world.BlockComponent;
-import org.terasology.components.world.LocationComponent;
+import com.google.common.collect.Lists;
+import org.terasology.components.block.BlockComponent;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.*;
-import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
-import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.world.BlockChangedEvent;
 import org.terasology.logic.world.BlockEntityRegistry;
-import org.terasology.logic.world.chunks.Chunk;
 import org.terasology.math.Vector3i;
-import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.management.BlockManager;
-import org.terasology.rendering.interfaces.IGameObject;
-import org.terasology.rendering.primitives.ChunkMesh;
+import org.terasology.math.AABB;
+import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.*;
-import java.nio.FloatBuffer;
-import java.util.HashSet;
+import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -68,69 +52,12 @@ import java.util.logging.Logger;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class BulletPhysicsRenderer implements IGameObject, EventReceiver<BlockChangedEvent> {
+public class BulletPhysicsRenderer implements EventReceiver<BlockChangedEvent> {
 
-    private class BlockRigidBody extends RigidBody implements Comparable<BlockRigidBody> {
-        private final byte _type;
-        private final long _createdAt;
-
-        public boolean _temporary = false;
-        public boolean _picked = false;
-
-        public BlockRigidBody(RigidBodyConstructionInfo constructionInfo, byte type) {
-            super(constructionInfo);
-            _type = type;
-            _createdAt = _timer.getTimeInMs();
-        }
-
-        public float distanceToEntity(Vector3f pos) {
-            Transform t = new Transform();
-            getMotionState().getWorldTransform(t);
-            Matrix4f tMatrix = new Matrix4f();
-            t.getMatrix(tMatrix);
-            Vector3f blockPlayer = new Vector3f();
-            tMatrix.get(blockPlayer);
-            blockPlayer.sub(pos);
-            return blockPlayer.length();
-        }
-
-        public long calcAgeInMs() {
-            return _timer.getTimeInMs() - _createdAt;
-        }
-
-        public byte getType() {
-            return _type;
-        }
-
-        @Override
-        public int compareTo(BlockRigidBody blockRigidBody) {
-            if (blockRigidBody.calcAgeInMs() == calcAgeInMs()) {
-                return 0;
-            } else if (blockRigidBody.calcAgeInMs() > calcAgeInMs()) {
-                return 1;
-            } else {
-                return -1;
-            }
-        }
-    }
-
-    public enum BLOCK_SIZE {
-        FULL_SIZE,
-        HALF_SIZE,
-        QUARTER_SIZE
-    }
-
-    private static final int MAX_TEMP_BLOCKS = 128;
     private Logger _logger = Logger.getLogger(getClass().getName());
 
-    private final LinkedList<RigidBody> _insertionQueue = new LinkedList<RigidBody>();
-    private final LinkedList<BlockRigidBody> _blocks = new LinkedList<BlockRigidBody>();
-
-    private HashSet<RigidBody> _chunks = new HashSet<RigidBody>();
-
-    private final BoxShape _blockShape = new BoxShape(new Vector3f(0.5f, 0.5f, 0.5f));
-    private final BoxShape _blockShapeHalf = new BoxShape(new Vector3f(0.25f, 0.25f, 0.25f));
-    private final BoxShape _blockShapeQuarter = new BoxShape(new Vector3f(0.125f, 0.125f, 0.125f));
+    private final Deque<RigidBodyRequest> _insertionQueue = new LinkedList<RigidBodyRequest>();
+    private final Deque<RigidBody> _removalQueue = new LinkedList<RigidBody>();
 
     private final CollisionDispatcher _dispatcher;
     private final BroadphaseInterface _broadphase;
@@ -147,13 +74,14 @@ public class BulletPhysicsRenderer implements IGameObject, EventReceiver<BlockCh
 
     public BulletPhysicsRenderer(WorldRenderer parent) {
         _broadphase = new DbvtBroadphase();
+        _broadphase.getOverlappingPairCache().setInternalGhostPairCallback(new GhostPairCallback());
         _defaultCollisionConfiguration = new DefaultCollisionConfiguration();
         _dispatcher = new CollisionDispatcher(_defaultCollisionConfiguration);
         _sequentialImpulseConstraintSolver = new SequentialImpulseConstraintSolver();
         _discreteDynamicsWorld = new DiscreteDynamicsWorld(_dispatcher, _broadphase, _sequentialImpulseConstraintSolver, _defaultCollisionConfiguration);
-        _discreteDynamicsWorld.setGravity(new Vector3f(0f, -10f, 0f));
+        _discreteDynamicsWorld.setGravity(new Vector3f(0f, -15f, 0f));
         _parent = parent;
-        _blockItemFactory = new BlockItemFactory(CoreRegistry.get(EntityManager.class), CoreRegistry.get(PrefabManager.class));
+        _blockItemFactory = new BlockItemFactory(CoreRegistry.get(EntityManager.class));
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
         _timer = CoreRegistry.get(Timer.class);
         CoreRegistry.get(EventSystem.class).registerEventReceiver(this, BlockChangedEvent.class, BlockComponent.class);
@@ -166,8 +94,63 @@ public class BulletPhysicsRenderer implements IGameObject, EventReceiver<BlockCh
         DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, new Vector3f(0, 0, 0), 1.0f)));
         RigidBodyConstructionInfo blockConsInf = new RigidBodyConstructionInfo(0, blockMotionState, worldShape, new Vector3f());
         RigidBody rigidBody = new RigidBody(blockConsInf);
+        rigidBody.setCollisionFlags(CollisionFlags.STATIC_OBJECT | rigidBody.getCollisionFlags());
         _discreteDynamicsWorld.addRigidBody(rigidBody);
 
+    }
+
+    public DynamicsWorld getWorld() {
+        return _discreteDynamicsWorld;
+    }
+
+    // TODO: Wrap ghost object
+
+    public PairCachingGhostObject createCollider(Vector3f pos, ConvexShape shape, short groups, short filters) {
+        return createCollider(pos, shape, groups, filters, 0);
+    }
+
+    public PairCachingGhostObject createCollider(Vector3f pos, ConvexShape shape, short groups, short filters, int collisionFlags) {
+        Transform startTransform = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), pos, 1.0f));
+        PairCachingGhostObject result = new PairCachingGhostObject();
+        result.setWorldTransform(startTransform);
+        result.setCollisionShape(shape);
+        result.setCollisionFlags(collisionFlags);
+        _discreteDynamicsWorld.addCollisionObject(result, groups, filters);
+        return result;
+    }
+
+    public void addRigidBody(RigidBody body) {
+        _insertionQueue.add(new RigidBodyRequest(body, CollisionFilterGroups.DEFAULT_FILTER, (short)(CollisionFilterGroups.DEFAULT_FILTER | CollisionFilterGroups.STATIC_FILTER)));
+    }
+
+    public void addRigidBody(RigidBody body, short groups, short filter) {
+        _insertionQueue.add(new RigidBodyRequest(body, groups, filter));
+    }
+
+    public void removeRigidBody(RigidBody body) {
+        _removalQueue.add(body);
+    }
+
+    public void removeCollider(GhostObject collider) {
+        _discreteDynamicsWorld.removeCollisionObject(collider);
+    }
+
+    public Iterable<EntityRef> scanArea(AABB area, short collisionMask) {
+        // TODO: Add the aabbTest method from newer versions of bullet to TeraBullet, use that instead
+        BoxShape shape = new BoxShape(area.getExtents());
+        GhostObject scanObject = createCollider(area.getCenter(), shape, CollisionFilterGroups.DEFAULT_FILTER, collisionMask, 0);
+        // This in particular is overkill
+        _broadphase.calculateOverlappingPairs(_dispatcher);
+        List<EntityRef> result = Lists.newArrayList();
+        for (int i = 0; i < scanObject.getNumOverlappingObjects(); ++i) {
+            CollisionObject other = scanObject.getOverlappingObject(i);
+            Object userObj = other.getUserPointer();
+            if (userObj instanceof EntityRef) {
+                result.add((EntityRef)userObj);
+            }
+        }
+        removeCollider(scanObject);
+        return result;
     }
 
     public HitResult rayTrace(Vector3f from, Vector3f direction, float distance) {
@@ -192,191 +175,38 @@ public class BulletPhysicsRenderer implements IGameObject, EventReceiver<BlockCh
         _discreteDynamicsWorld.awakenRigidBodiesInArea(min, max);
     }
 
-    public BlockRigidBody[] addLootableBlocks(Vector3f position, Block block) {
-        BlockRigidBody result[] = new BlockRigidBody[8];
-        for (int i = 0; i < 1; i++) {
-            // Position the smaller blocks
-            Vector3f offsetPossition = new Vector3f((float) _random.randomDouble() * 0.5f, (float) _random.randomDouble() * 0.5f, (float) _random.randomDouble() * 0.5f);
-            offsetPossition.add(position);
-            result[i] = addBlock(offsetPossition, block.getId(), new Vector3f(0.0f, 0f, 0.0f), BLOCK_SIZE.QUARTER_SIZE, false);
-        }
-        return result;
-    }
-
-    public BlockRigidBody addTemporaryBlock(Vector3f position, byte type, BLOCK_SIZE size) {
-        BlockRigidBody result = addBlock(position, type, size, true);
-        return result;
-    }
-
-    public BlockRigidBody addTemporaryBlock(Vector3f position, byte type, Vector3f impulse, BLOCK_SIZE size) {
-        BlockRigidBody result = addBlock(position, type, impulse, size, true);
-        return result;
-    }
-
-    public BlockRigidBody addBlock(Vector3f position, byte type, BLOCK_SIZE size, boolean temporary) {
-        return addBlock(position, type, new Vector3f(0f, 0f, 0f), size, temporary);
-    }
-
-    /**
-     * Adds a new physics block to be rendered as a rigid body. Translucent blocks are ignored.
-     *
-     * @param position The position
-     * @param type     The block type
-     * @param impulse  An impulse
-     * @param size     The size of the block
-     * @return The created rigid body (if any)
-     */
-    public synchronized BlockRigidBody addBlock(Vector3f position, byte type, Vector3f impulse, BLOCK_SIZE size, boolean temporary) {
-        if (temporary && _blocks.size() > MAX_TEMP_BLOCKS)
-          removeTemporaryBlocks();
-
-        BoxShape shape = _blockShape;
-        Block block = BlockManager.getInstance().getBlock(type);
-        if (block.isTranslucent())
-            return null;
-        if (size == BLOCK_SIZE.HALF_SIZE)
-            shape = _blockShapeHalf;
-        else if (size == BLOCK_SIZE.QUARTER_SIZE)
-            shape = _blockShapeQuarter;
-        Matrix3f rot = new Matrix3f();
-        rot.setIdentity();
-        DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, position, 1.0f)));
-        Vector3f fallInertia = new Vector3f();
-        shape.calculateLocalInertia(10 * block.getMass(), fallInertia);
-        RigidBodyConstructionInfo blockCI = new RigidBodyConstructionInfo(block.getMass(), blockMotionState, shape, fallInertia);
-        BlockRigidBody rigidBlock = new BlockRigidBody(blockCI, type);
-        rigidBlock.setRestitution(0.0f);
-        rigidBlock.setAngularFactor(0.5f);
-        rigidBlock.setFriction(0.5f);
-        rigidBlock._temporary = temporary;
-        // Apply impulse
-        rigidBlock.applyImpulse(impulse, new Vector3f(0.0f, 0.0f, 0.0f));
-        _insertionQueue.add(rigidBlock);
-
-        return rigidBlock;
-    }
-
-    @Override
-    public void render() {
-        FloatBuffer mBuffer = BufferUtils.createFloatBuffer(16);
-        float[] mFloat = new float[16];
-        GL11.glPushMatrix();
-        Vector3f cameraPosition = _parent.getActiveCamera().getPosition();
-        GL11.glTranslated(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
-        List<CollisionObject> collisionObjects = _discreteDynamicsWorld.getCollisionObjectArray();
-        for (CollisionObject co : collisionObjects) {
-            if (co.getClass().equals(BlockRigidBody.class)) {
-                BlockRigidBody br = (BlockRigidBody) co;
-                Block block = BlockManager.getInstance().getBlock(br.getType());
-                Transform t = new Transform();
-                br.getMotionState().getWorldTransform(t);
-                t.getOpenGLMatrix(mFloat);
-                mBuffer.put(mFloat);
-                mBuffer.flip();
-                GL11.glPushMatrix();
-                GL11.glMultMatrix(mBuffer);
-                if (br.getCollisionShape() == _blockShapeHalf)
-                    GL11.glScalef(0.5f, 0.5f, 0.5f);
-                else if (br.getCollisionShape() == _blockShapeQuarter)
-                    GL11.glScalef(0.25f, 0.25f, 0.25f);
-                block.renderWithLightValue(_parent.getRenderingLightValueAt(t.origin));
-                GL11.glPopMatrix();
-            }
-        }
-        GL11.glPopMatrix();
-    }
-
-    @Override
     public void update(float delta) {
-        addQueuedBodies();
+        processQueuedBodies();
         try {
-            _discreteDynamicsWorld.stepSimulation(delta, 3);
+            PerformanceMonitor.startActivity("Step Simulation");
+            _discreteDynamicsWorld.stepSimulation(delta, 1);
+            PerformanceMonitor.endActivity();
         } catch (Exception e) {
             _logger.log(Level.WARNING, "Somehow Bullet Physics managed to throw an exception again.", e);
         }
-        removeTemporaryBlocks();
-        checkForLootedBlocks();
     }
 
-    private synchronized void addQueuedBodies() {
+    private synchronized void processQueuedBodies() {
         while (!_insertionQueue.isEmpty()) {
-            RigidBody body = _insertionQueue.poll();
-            if (body instanceof BlockRigidBody)
-                _blocks.addFirst((BlockRigidBody) body);
-            _discreteDynamicsWorld.addRigidBody(body);
+            RigidBodyRequest request = _insertionQueue.poll();
+            _discreteDynamicsWorld.addRigidBody(request.body, request.groups, request.filter);
+        }
+        while (!_removalQueue.isEmpty()) {
+            RigidBody body = _removalQueue.poll();
+            _discreteDynamicsWorld.removeRigidBody(body);
         }
     }
 
-    private void checkForLootedBlocks() {
-        for (int i = _blocks.size() - 1; i >= 0; i--) {
-            BlockRigidBody b = _blocks.get(i);
-            if (b._temporary) {
-                continue;
-            }
+    private static class RigidBodyRequest
+    {
+        final RigidBody body;
+        final short groups;
+        final short filter;
 
-            EntityRef closestCreature = EntityRef.NULL;
-            Vector3f closestPosition = new Vector3f();
-            float closestDist = Float.MAX_VALUE;
-
-            // TODO: We should have some other component for things that can pick up items? CreatureComponent? ItemMagnetComponent?
-            for (EntityRef creature : CoreRegistry.get(EntityManager.class).iteratorEntities(InventoryComponent.class, CharacterMovementComponent.class, LocationComponent.class)) {
-                Vector3f pos = creature.getComponent(LocationComponent.class).getWorldPosition();
-                float dist = b.distanceToEntity(pos);
-                if (dist < closestDist) {
-                    closestDist = dist;
-                    closestCreature = creature;
-                    closestPosition.set(pos);
-                }
-            }
-
-            if (closestDist < 8 && !b._picked) {
-                b._picked = true;
-            }
-            // Block was marked as being picked
-            if (b._picked && closestDist < 32.0f) {
-                // Animate the movement in direction of the player
-                if (closestDist > 1.0) {
-                    Transform t = new Transform();
-                    b.getMotionState().getWorldTransform(t);
-                    Matrix4f tMatrix = new Matrix4f();
-                    t.getMatrix(tMatrix);
-                    Vector3f blockPlayer = new Vector3f();
-                    tMatrix.get(blockPlayer);
-                    blockPlayer.sub(new Vector3f(closestPosition));
-                    blockPlayer.normalize();
-                    blockPlayer.scale(-16000f);
-                    b.applyCentralImpulse(blockPlayer);
-                } else {
-                    // TODO: Handle full inventories
-                    // TODO: Loot blocks should be entities
-                    // Block was looted (and reached the player)
-                    Block block = BlockManager.getInstance().getBlock(b.getType());
-                    EntityRef blockItem = _blockItemFactory.newInstance(block.getBlockFamily());
-                    closestCreature.send(new ReceiveItemEvent(blockItem));
-
-                    ItemComponent itemComp = blockItem.getComponent(ItemComponent.class);
-                    if (itemComp != null && !itemComp.container.exists()) {
-                        blockItem.destroy();
-                    }
-                    AudioManager.play(new AssetUri(AssetType.SOUND, "engine:Loot"));
-                    _blocks.remove(i);
-                    _discreteDynamicsWorld.removeRigidBody(b);
-                }
-            }
-        }
-    }
-
-    private void removeTemporaryBlocks() {
-        if (_blocks.size() > 0) {
-            for (int i = _blocks.size() - 1; i >= 0; i--) {
-                if (!_blocks.get(i)._temporary) {
-                    continue;
-                }
-                if (!_blocks.get(i).isActive() || _blocks.get(i).calcAgeInMs() > 10000 || _blocks.size() > MAX_TEMP_BLOCKS) {
-                    _discreteDynamicsWorld.removeRigidBody(_blocks.get(i));
-                    _blocks.remove(i);
-                }
-            }
+        public RigidBodyRequest(RigidBody body, short groups, short filter) {
+            this.body = body;
+            this.groups = groups;
+            this.filter = filter;
         }
     }
 }

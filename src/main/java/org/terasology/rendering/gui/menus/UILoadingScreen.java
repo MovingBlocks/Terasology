@@ -16,7 +16,7 @@
 package org.terasology.rendering.gui.menus;
 
 import org.lwjgl.opengl.Display;
-import org.terasology.logic.manager.AssetManager;
+import org.terasology.asset.AssetManager;
 import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;

@@ -2,7 +2,7 @@ package org.terasology.entityFactory;
 
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LightComponent;
-import org.terasology.components.world.BlockItemComponent;
+import org.terasology.components.block.BlockItemComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.PrefabManager;
@@ -13,11 +13,9 @@ import org.terasology.model.blocks.BlockFamily;
  */
 public class BlockItemFactory {
     private EntityManager entityManager;
-    private PrefabManager prefabManager;
 
-    public BlockItemFactory(EntityManager entityManager, PrefabManager prefabManager) {
+    public BlockItemFactory(EntityManager entityManager) {
         this.entityManager = entityManager;
-        this.prefabManager = prefabManager;
     }
 
     public EntityRef newInstance(BlockFamily blockFamily) {
@@ -33,6 +31,9 @@ public class BlockItemFactory {
     }
 
     private EntityRef newInstance(BlockFamily blockFamily, int quantity, EntityRef placedEntity) {
+        if (blockFamily == null) {
+            return EntityRef.NULL;
+        }
         EntityRef entity = entityManager.create();
         if (blockFamily.getArchetypeBlock().getLuminance() > 0) {
             entity.addComponent(new LightComponent());

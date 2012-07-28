@@ -16,6 +16,7 @@
 package org.terasology.logic.portals;
 
 import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 
 /**
  * Portals are a key structure component of the world
@@ -24,13 +25,13 @@ import javax.vecmath.Vector3d;
  */
 public class Portal {
 
-    private final Vector3d _blockLocation;
+    private final Vector3f _blockLocation;
 
-    public Portal(Vector3d loc) {
+    public Portal(Vector3f loc) {
         _blockLocation = loc;
     }
 
-    public Vector3d getBlockLocation() {
+    public Vector3f getBlockLocation() {
         return _blockLocation;
     }
 }

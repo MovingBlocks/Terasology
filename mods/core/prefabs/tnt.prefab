@@ -1,7 +1,9 @@
 {
   "name": "core:tnt",
   "PlaySoundAction" : {
-    sounds = ["engine:Explode1","engine:Explode2","engine:Explode3","engine:Explode4","engine:Explode5"]
+    "sounds" : ["engine:Explode1","engine:Explode2","engine:Explode3","engine:Explode4","engine:Explode5"]
   },
-  "ExplosionAction": {}
+  "ExplosionAction": {
+    "relativeTo" : "Self"
+  }
 }

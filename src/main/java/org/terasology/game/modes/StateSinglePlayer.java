@@ -42,7 +42,7 @@ import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.generators.DefaultGenerators;
-import org.terasology.logic.manager.AssetManager;
+import org.terasology.asset.AssetManager;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.mod.Mod;
@@ -294,16 +294,6 @@ public class StateSinglePlayer implements GameState {
         worldRenderer = new WorldRenderer(title, seed, time, chunkGeneratorManager, entityManager, localPlayerSys);
         CoreRegistry.put(WorldRenderer.class, worldRenderer);
 
-        File entityDataFile = new File(PathManager.getInstance().getWorldSavePath(title), ENTITY_DATA_FILE);
-        entityManager.clear();
-        if (entityDataFile.exists()) {
-            try {
-                CoreRegistry.get(WorldPersister.class).load(entityDataFile, WorldPersister.SaveFormat.Binary);
-            } catch (IOException e) {
-                logger.log(Level.SEVERE, "Failed to load entity data", e);
-            }
-        }
-
         // Create the world entity
         Iterator<EntityRef> worldEntityIterator = entityManager.iteratorEntities(WorldComponent.class).iterator();
         if (worldEntityIterator.hasNext()) {
@@ -322,6 +312,16 @@ public class StateSinglePlayer implements GameState {
 
         for (ComponentSystem system : componentSystemManager.iterateAll()) {
             system.initialise();
+        }
+
+        File entityDataFile = new File(PathManager.getInstance().getWorldSavePath(title), ENTITY_DATA_FILE);
+        entityManager.clear();
+        if (entityDataFile.exists()) {
+            try {
+                CoreRegistry.get(WorldPersister.class).load(entityDataFile, WorldPersister.SaveFormat.Binary);
+            } catch (IOException e) {
+                logger.log(Level.SEVERE, "Failed to load entity data", e);
+            }
         }
 
         prepareWorld();
@@ -405,7 +405,7 @@ public class StateSinglePlayer implements GameState {
             }
 
             PlayerFactory playerFactory = new PlayerFactory(entityManager);
-            CoreRegistry.get(LocalPlayer.class).setEntity(playerFactory.newInstance(new Vector3f(spawnPoint.x + 0.5f, spawnPoint.y + 2.0f, spawnPoint.z + 0.5f)));
+            CoreRegistry.get(LocalPlayer.class).setEntity(playerFactory.newInstance(new Vector3f(spawnPoint.x, spawnPoint.y + 1.5f, spawnPoint.z)));
             worldRenderer.setPlayer(CoreRegistry.get(LocalPlayer.class));
             worldRenderer.getChunkProvider().removeRegionEntity(spawnZoneEntity);
             spawnZoneEntity.destroy();

@@ -4,7 +4,7 @@ import org.lwjgl.opengl.Display;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.manager.AssetManager;
+import org.terasology.asset.AssetManager;
 import org.terasology.mods.miniions.components.MinionBarComponent;
 import org.terasology.mods.miniions.components.MinionComponent;
 import org.terasology.mods.miniions.components.MinionControllerComponent;
@@ -61,7 +61,7 @@ public class UIMinion extends UIDisplayWindow {
             if (inventory == null) {
                 return;
             }
-            EntityRef minion = inventory.MinionSlots.get(selectedMinion);
+            EntityRef minion = inventory.minionSlots.get(selectedMinion);
             if (minion != null) {
                 MinionComponent minioncomp = minion.getComponent(MinionComponent.class);
                 if (minioncomp != null) {

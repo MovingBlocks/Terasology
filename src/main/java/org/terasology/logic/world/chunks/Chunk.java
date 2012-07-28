@@ -22,12 +22,12 @@ import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
-import org.terasology.model.structures.AABB;
+import org.terasology.math.AABB;
 import org.terasology.model.structures.TeraArray;
 import org.terasology.model.structures.TeraSmartArray;
 import org.terasology.rendering.primitives.ChunkMesh;
 
-import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -297,9 +297,9 @@ public class Chunk implements Externalizable {
 
     public AABB getAABB() {
         if (aabb == null) {
-            Vector3d dimensions = new Vector3d(getChunkSizeX() / 2.0, getChunkSizeY() / 2.0, getChunkSizeZ() / 2.0);
-            Vector3d position = new Vector3d(getChunkWorldPosX() + dimensions.x - 0.5f, dimensions.y - 0.5f, getChunkWorldPosZ() + dimensions.z - 0.5f);
-            aabb = new AABB(position, dimensions);
+            Vector3f dimensions = new Vector3f(0.5f * getChunkSizeX(), 0.5f * getChunkSizeY(), 0.5f * getChunkSizeZ());
+            Vector3f position = new Vector3f(getChunkWorldPosX() + dimensions.x - 0.5f, dimensions.y - 0.5f, getChunkWorldPosZ() + dimensions.z - 0.5f);
+            aabb = AABB.createCenterExtent(position, dimensions);
         }
 
         return aabb;
@@ -390,9 +390,9 @@ public class Chunk implements Externalizable {
             int heightHalf = SIZE_Y / VERTICAL_SEGMENTS / 2;
 
             for (int i = 0; i < subMeshAABB.length; i++) {
-                Vector3d dimensions = new Vector3d(8, heightHalf, 8);
-                Vector3d position = new Vector3d(getChunkWorldPosX() + dimensions.x - 0.5f, (i * heightHalf * 2) + dimensions.y - 0.5f, getChunkWorldPosZ() + dimensions.z - 0.5f);
-                subMeshAABB[i] = new AABB(position, dimensions);
+                Vector3f dimensions = new Vector3f(8, heightHalf, 8);
+                Vector3f position = new Vector3f(getChunkWorldPosX() + dimensions.x - 0.5f, (i * heightHalf * 2) + dimensions.y - 0.5f, getChunkWorldPosZ() + dimensions.z - 0.5f);
+                subMeshAABB[i] = AABB.createCenterExtent(position, dimensions);
             }
         }
 

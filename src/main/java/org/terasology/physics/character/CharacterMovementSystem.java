@@ -1,12 +1,9 @@
-package org.terasology.componentSystem.characters;
+package org.terasology.physics.character;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.components.AABBCollisionComponent;
-import org.terasology.components.CharacterMovementComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.FootstepEvent;
 import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.events.JumpEvent;
@@ -15,7 +12,7 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.logic.world.WorldProvider;
 import org.terasology.logic.world.WorldUtil;
 import org.terasology.model.blocks.Block;
-import org.terasology.model.structures.AABB;
+import org.terasology.math.AABB;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 
@@ -27,7 +24,6 @@ import java.util.List;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-@RegisterComponentSystem
 public class CharacterMovementSystem implements UpdateSubscriberSystem {
 
     public static final float UnderwaterGravity = 0.25f;
@@ -41,7 +37,7 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
     private WorldProvider worldProvider;
 
     // For reuse to save memory churn
-    private AABB entityAABB = new AABB(new Vector3d(), new Vector3d());
+    private AABB entityAABB = AABB.createEmpty();
 
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
@@ -53,15 +49,14 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
     }
 
     public void update(float delta) {
-        for (EntityRef entity : entityManager.iteratorEntities(CharacterMovementComponent.class, AABBCollisionComponent.class, LocationComponent.class)) {
+        for (EntityRef entity : entityManager.iteratorEntities(CharacterMovementComponent.class, LocationComponent.class)) {
             LocationComponent location = entity.getComponent(LocationComponent.class);
             if (!worldProvider.isBlockActive(location.getWorldPosition())) continue;
 
-            AABBCollisionComponent collision = entity.getComponent(AABBCollisionComponent.class);
             CharacterMovementComponent movementComp = entity.getComponent(CharacterMovementComponent.class);
 
-            updatePosition(delta, entity, location, collision, movementComp);
-            updateSwimStatus(location, collision, movementComp);
+            updatePosition(delta, entity, location, movementComp);
+            updateSwimStatus(location, movementComp);
 
             entity.saveComponent(location);
             entity.saveComponent(movementComp);
@@ -73,18 +68,17 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
      * only if both points are in water does the character count as swimming.
      *
      * @param location
-     * @param aabb
      * @param movementComp
      */
-    private void updateSwimStatus(LocationComponent location, AABBCollisionComponent aabb, CharacterMovementComponent movementComp) {
+    private void updateSwimStatus(LocationComponent location, CharacterMovementComponent movementComp) {
         Vector3f worldPos = location.getWorldPosition();
         List<BlockPosition> blockPositions = WorldUtil.gatherAdjacentBlockPositions(worldPos);
         boolean topUnderwater = false;
         boolean bottomUnderwater = false;
         Vector3f top = new Vector3f(worldPos);
         Vector3f bottom = new Vector3f(worldPos);
-        top.y += aabb.getExtents().y / 2;
-        bottom.y -= aabb.getExtents().y / 2;
+        top.y += 0.25f * movementComp.height;
+        bottom.y -= 0.25f * movementComp.height;
 
         for (int i = 0; i < blockPositions.size(); i++) {
             BlockPosition p = blockPositions.get(i);
@@ -110,18 +104,18 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
         movementComp.isSwimming = newSwimming;
     }
 
-    private void updatePosition(float delta, EntityRef entity, LocationComponent location, AABBCollisionComponent collision, CharacterMovementComponent movementComp) {
+    private void updatePosition(float delta, EntityRef entity, LocationComponent location, CharacterMovementComponent movementComp) {
 
         if (movementComp.isGhosting) {
-            ghost(delta, entity, location, collision, movementComp);
+            ghost(delta, entity, location, movementComp);
         } else if (movementComp.isSwimming) {
-            swim(delta, entity, location, collision, movementComp);
+            swim(delta, entity, location, movementComp);
         } else {
-            walk(delta, entity, location, collision, movementComp);
+            walk(delta, entity, location, movementComp);
         }
     }
 
-    private void ghost(float delta, EntityRef entity, LocationComponent location, AABBCollisionComponent collision, CharacterMovementComponent movementComp) {
+    private void ghost(float delta, EntityRef entity, LocationComponent location, CharacterMovementComponent movementComp) {
         Vector3f desiredVelocity = new Vector3f(movementComp.getDrive());
         float maxSpeed = movementComp.maxGhostSpeed;
         if (movementComp.isRunning) {
@@ -152,7 +146,7 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
         }
     }
 
-    private void walk(float delta, EntityRef entity, LocationComponent location, AABBCollisionComponent collision, CharacterMovementComponent movementComp) {
+    private void walk(float delta, EntityRef entity, LocationComponent location, CharacterMovementComponent movementComp) {
         Vector3f desiredVelocity = new Vector3f(movementComp.getDrive());
         float maxSpeed = movementComp.maxGroundSpeed;
         if (movementComp.isRunning) {
@@ -186,7 +180,7 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
         Vector3f oldPos = new Vector3f(worldPos);
         worldPos.y += movementComp.getVelocity().y * delta;
 
-        Vector3f extents = new Vector3f(collision.getExtents());
+        Vector3f extents = new Vector3f(movementComp.radius, 0.5f * movementComp.height, movementComp.radius);
         extents.scale(location.getWorldScale());
 
         if (verticalHitTest(worldPos, oldPos, extents)) {
@@ -244,7 +238,7 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
         }
     }
 
-    private void swim(float delta, EntityRef entity, LocationComponent location, AABBCollisionComponent collision, CharacterMovementComponent movementComp) {
+    private void swim(float delta, EntityRef entity, LocationComponent location, CharacterMovementComponent movementComp) {
         Vector3f desiredVelocity = new Vector3f(movementComp.getDrive());
         float maxSpeed = movementComp.maxWaterSpeed;
         if (movementComp.isRunning) {
@@ -274,7 +268,7 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
         Vector3f oldPos = new Vector3f(worldPos);
         worldPos.y += movementComp.getVelocity().y * delta;
 
-        Vector3f extents = new Vector3f(collision.getExtents());
+        Vector3f extents = new Vector3f(movementComp.radius, 0.5f * movementComp.height, movementComp.radius);
         extents.scale(location.getWorldScale());
 
         if (verticalHitTest(worldPos, oldPos, extents)) {
@@ -333,10 +327,10 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
                 double direction = origin.y - position.y;
 
                 if (direction >= 0) {
-                    position.y = (float) (blockAABB.getPosition().y + blockAABB.getDimensions().y + entityAABB.getDimensions().y);
+                    position.y = (float) (blockAABB.getCenter().y + blockAABB.getExtents().y + entityAABB.getExtents().y);
                     position.y += java.lang.Math.ulp(position.y);
                 } else {
-                    position.y = (float) (blockAABB.getPosition().y - blockAABB.getDimensions().y - entityAABB.getDimensions().y);
+                    position.y = (float) (blockAABB.getCenter().y - blockAABB.getExtents().y - entityAABB.getExtents().y);
                     position.y -= java.lang.Math.ulp(position.y);
                 }
 
@@ -362,19 +356,19 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
                 AABB blockAABB = block.getBounds(p);
                 if (calcAABB(position, extents).overlaps(blockAABB)) {
                     result = true;
-                    Vector3d direction = new Vector3d(position.x, 0f, position.z);
+                    Vector3f direction = new Vector3f(position.x, 0f, position.z);
                     direction.x -= origin.x;
                     direction.z -= origin.z;
 
                     // Calculate the point of intersection on the block's AABB
-                    Vector3d blockPoi = blockAABB.closestPointOnAABBToPoint(new Vector3d(origin));
-                    Vector3d entityPoi = calcAABB(origin, extents).closestPointOnAABBToPoint(blockPoi);
+                    Vector3f blockPoi = blockAABB.closestPointOnAABBToPoint(origin);
+                    Vector3f entityPoi = calcAABB(origin, extents).closestPointOnAABBToPoint(blockPoi);
 
-                    Vector3d planeNormal = blockAABB.getFirstHitPlane(direction, new Vector3d(origin), new Vector3d(extents), true, false, true);
+                    Vector3f planeNormal = blockAABB.getFirstHitPlane(direction, origin, extents, true, false, true);
 
                     // Find a vector parallel to the surface normal
-                    Vector3d slideVector = new Vector3d(planeNormal.z, 0, -planeNormal.x);
-                    Vector3d pushBack = new Vector3d();
+                    Vector3f slideVector = new Vector3f(planeNormal.z, 0, -planeNormal.x);
+                    Vector3f pushBack = new Vector3f();
 
                     pushBack.sub(blockPoi, entityPoi);
 
@@ -396,8 +390,8 @@ public class CharacterMovementSystem implements UpdateSubscriberSystem {
     }
 
     private AABB calcAABB(Vector3f position, Vector3f extents) {
-        entityAABB.getPosition().set(position);
-        entityAABB.getDimensions().set(extents);
+        entityAABB.getCenter().set(position);
+        entityAABB.getExtents().set(extents);
         return entityAABB;
     }
 

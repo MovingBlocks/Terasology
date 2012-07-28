@@ -17,6 +17,7 @@
 package org.terasology.logic.world.chunks;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.terasology.components.world.LocationComponent;
@@ -34,6 +35,9 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -60,6 +64,8 @@ public class LocalChunkProvider implements ChunkProvider {
     private ConcurrentMap<Vector3i, Chunk> nearCache = Maps.newConcurrentMap();
 
     private EntityRef worldEntity = EntityRef.NULL;
+
+    private ReadWriteLock regionLock = new ReentrantReadWriteLock();
 
     public LocalChunkProvider(ChunkStore farStore, ChunkGeneratorManager generator) {
         this.farStore = farStore;
@@ -139,57 +145,73 @@ public class LocalChunkProvider implements ChunkProvider {
     @Override
     public void addRegionEntity(EntityRef entity, int distance) {
         CacheRegion region = new CacheRegion(entity, distance);
-        regions.remove(region);
-        regions.add(region);
+        regionLock.writeLock().lock();
+        try {
+            regions.remove(region);
+            regions.add(region);
+        } finally  {
+            regionLock.writeLock().unlock();
+        }
         reviewChunkQueue.offer(new ChunkRequest(ChunkRequest.RequestType.PRODUCE, region.getRegion().expand(new Vector3i(2, 0, 2))));
     }
 
     @Override
     public void removeRegionEntity(EntityRef entity) {
-        regions.remove(new CacheRegion(entity, 0));
+        regionLock.writeLock().lock();
+        try {
+            regions.remove(new CacheRegion(entity, 0));
+        } finally {
+            regionLock.writeLock().unlock();
+        }
     }
 
     @Override
     public void update() {
-        for (CacheRegion cacheRegion : regions) {
-            cacheRegion.update();
-            if (cacheRegion.isDirty()) {
-                cacheRegion.setUpToDate();
-                reviewChunkQueue.offer(new ChunkRequest(ChunkRequest.RequestType.PRODUCE, cacheRegion.getRegion().expand(new Vector3i(2, 0, 2))));
+        regionLock.readLock().lock();
+        try {
+            for (CacheRegion cacheRegion : regions) {
+                cacheRegion.update();
+                if (cacheRegion.isDirty()) {
+                    cacheRegion.setUpToDate();
+                    reviewChunkQueue.offer(new ChunkRequest(ChunkRequest.RequestType.PRODUCE, cacheRegion.getRegion().expand(new Vector3i(2, 0, 2))));
+                }
             }
-        }
-        PerformanceMonitor.startActivity("Review cache size");
-        if (nearCache.size() > CACHE_SIZE) {
-            logger.log(Level.INFO, "Compacting cache");
-            Iterator<Vector3i> iterator = nearCache.keySet().iterator();
-            while (iterator.hasNext()) {
-                Vector3i pos = iterator.next();
-                boolean keep = false;
-                for (CacheRegion region : regions) {
-                    if (region.getRegion().expand(new Vector3i(4, 0, 4)).encompasses(pos)) {
-                        keep = true;
-                        break;
-                    }
-                }
-                if (!keep) {
-                    // TODO: need some way to not dispose chunks being edited or processed (or do so safely)
-                    Chunk chunk = nearCache.get(pos);
-                    if (chunk.isLocked()) {
-                        continue;
-                    }
-                    chunk.lock();
-                    try {
-                        farStore.put(chunk);
-                        iterator.remove();
-                        chunk.dispose();
-                    } finally {
-                        chunk.unlock();
-                    }
-                }
 
+            PerformanceMonitor.startActivity("Review cache size");
+            if (nearCache.size() > CACHE_SIZE) {
+                logger.log(Level.INFO, "Compacting cache");
+                Iterator<Vector3i> iterator = nearCache.keySet().iterator();
+                while (iterator.hasNext()) {
+                    Vector3i pos = iterator.next();
+                    boolean keep = false;
+                    for (CacheRegion region : regions) {
+                        if (region.getRegion().expand(new Vector3i(4, 0, 4)).encompasses(pos)) {
+                            keep = true;
+                            break;
+                        }
+                    }
+                    if (!keep) {
+                        // TODO: need some way to not dispose chunks being edited or processed (or do so safely)
+                        Chunk chunk = nearCache.get(pos);
+                        if (chunk.isLocked()) {
+                            continue;
+                        }
+                        chunk.lock();
+                        try {
+                            farStore.put(chunk);
+                            iterator.remove();
+                            chunk.dispose();
+                        } finally {
+                            chunk.unlock();
+                        }
+                    }
+
+                }
             }
+            PerformanceMonitor.endActivity();
+        } finally {
+            regionLock.readLock().unlock();
         }
-        PerformanceMonitor.endActivity();
     }
 
     @Override
@@ -541,13 +563,19 @@ public class LocalChunkProvider implements ChunkProvider {
         private int score(Vector3i chunk) {
             int score = Integer.MAX_VALUE;
             // TODO: This isn't thread safe. Fix me
-            for (CacheRegion region : regions) {
-                int dist = distFromRegion(chunk, region.center);
-                if (dist < score) {
-                    score = dist;
+
+            regionLock.readLock().lock();
+            try {
+                for (CacheRegion region : regions) {
+                    int dist = distFromRegion(chunk, region.center);
+                    if (dist < score) {
+                        score = dist;
+                    }
                 }
+                return score;
+            } finally {
+                regionLock.readLock().unlock();
             }
-            return score;
         }
 
         private int distFromRegion(Vector3i pos, Vector3i regionCenter) {

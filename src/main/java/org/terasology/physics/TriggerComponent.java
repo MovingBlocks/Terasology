@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright 2012
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.interfaces;
+
+package org.terasology.physics;
+
+import org.terasology.entitySystem.Component;
 
 /**
- * The base class of all game objects.
- *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Immortius
  */
-public interface IGameObject {
-
-    /**
-     * Rendering operations have to implement this method.
-     */
-    public void render();
-
-    /**
-     * Updating operations have to implement this method.
-     */
-    public void update(float delta);
-
+public class TriggerComponent implements Component {
+    // TODO: Flags
 }

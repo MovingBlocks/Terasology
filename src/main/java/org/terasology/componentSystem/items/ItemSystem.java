@@ -1,14 +1,12 @@
 package org.terasology.componentSystem.items;
 
+import com.bulletphysics.collision.broadphase.CollisionFilterGroups;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.components.AABBCollisionComponent;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
-import org.terasology.components.PlayerComponent;
-import org.terasology.components.world.BlockComponent;
-import org.terasology.components.world.BlockItemComponent;
-import org.terasology.components.world.LocationComponent;
+import org.terasology.components.block.BlockComponent;
+import org.terasology.components.block.BlockItemComponent;
 import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.events.ActivateEvent;
@@ -20,7 +18,7 @@ import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockFamily;
-import org.terasology.model.structures.AABB;
+import org.terasology.rendering.physics.BulletPhysicsRenderer;
 
 import javax.vecmath.Vector3f;
 
@@ -145,15 +143,7 @@ public class ItemSystem implements EventHandlerSystem {
 
         // Prevent players from placing blocks inside their bounding boxes
         if (!block.isPenetrable()) {
-            for (EntityRef player : entityManager.iteratorEntities(PlayerComponent.class, AABBCollisionComponent.class, LocationComponent.class)) {
-                LocationComponent location = player.getComponent(LocationComponent.class);
-                AABBCollisionComponent collision = player.getComponent(AABBCollisionComponent.class);
-                Vector3f worldPos = location.getWorldPosition();
-                AABB blockAABB = block.getBounds(blockPos);
-                if (blockAABB.overlaps(new AABB(worldPos, collision.getExtents()))) {
-                    return false;
-                }
-            }
+            return !CoreRegistry.get(BulletPhysicsRenderer.class).scanArea(block.getBounds(blockPos), CollisionFilterGroups.ALL_FILTER).iterator().hasNext();
         }
         return true;
     }

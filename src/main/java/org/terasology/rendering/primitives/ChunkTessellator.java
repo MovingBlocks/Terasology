@@ -110,8 +110,6 @@ public final class ChunkTessellator {
     private void generateOptimizedBuffers(WorldView worldView, ChunkMesh mesh) {
         PerformanceMonitor.startActivity("OptimizeBuffers");
 
-        generateBulletBuffers(mesh);
-
         for (int j = 0; j < mesh._vertexElements.length; j++) {
             // Vertices double to account for light info
             mesh._vertexElements[j].finalVertices = BufferUtils.createByteBuffer(mesh._vertexElements[j].vertices.size() * 2 * 4 + mesh._vertexElements[j].tex.size() * 4 + mesh._vertexElements[j].color.size() * 4 + mesh._vertexElements[j].normals.size() * 4);
@@ -157,26 +155,6 @@ public final class ChunkTessellator {
             mesh._vertexElements[j].finalIndices.flip();
         }
         PerformanceMonitor.endActivity();
-    }
-
-    private void generateBulletBuffers(ChunkMesh mesh) {
-        mesh._indexedMesh = new IndexedMesh();
-        mesh._indexedMesh.vertexBase = BufferUtils.createByteBuffer(mesh._vertexElements[0].vertices.size() * FLOAT_BYTES);
-        mesh._indexedMesh.triangleIndexBase = BufferUtils.createByteBuffer(mesh._vertexElements[0].indices.size() * INT_BYTES);
-        mesh._indexedMesh.triangleIndexStride = 3 * INT_BYTES;
-        mesh._indexedMesh.vertexStride = 3 * FLOAT_BYTES;
-        mesh._indexedMesh.numVertices = mesh._vertexElements[0].vertices.size() / 3;
-        mesh._indexedMesh.numTriangles = mesh._vertexElements[0].indices.size() / 3;
-        mesh._indexedMesh.indexType = ScalarType.INTEGER;
-
-        TIntIterator indexIterator = mesh._vertexElements[0].indices.iterator();
-        while (indexIterator.hasNext()) {
-            mesh._indexedMesh.triangleIndexBase.putInt(indexIterator.next());
-        }
-        TFloatIterator vertIterator = mesh._vertexElements[0].vertices.iterator();
-        while (vertIterator.hasNext()) {
-            mesh._indexedMesh.vertexBase.putFloat(vertIterator.next());
-        }
     }
 
     private void calcLightingValuesForVertexPos(WorldView worldView, Vector3f vertexPos, float[] output) {

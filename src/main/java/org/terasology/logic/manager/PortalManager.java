@@ -39,7 +39,7 @@ public class PortalManager {
      */
     private final HashSet<Portal> _portalStore = new HashSet<Portal>();
 
-    private final int maxMobs = 32;
+    private final int maxMobs = 16;
     private final FastRandom _random = new FastRandom();
     private EntityManager _entityManager;
     private GelatinousCubeFactory factory;
@@ -114,7 +114,7 @@ public class PortalManager {
         return _portalStore.size() >= 1;
     }
 
-    public void addPortal(Vector3d loc) {
+    public void addPortal(Vector3f loc) {
         _portalStore.add(new Portal(loc));
     }
 

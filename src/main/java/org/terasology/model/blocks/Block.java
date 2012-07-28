@@ -19,14 +19,15 @@ import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.linearmath.Transform;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.util.ResourceLoader;
+import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.collection.EnumBooleanMap;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.model.shapes.BlockMeshPart;
-import org.terasology.model.structures.AABB;
-import org.terasology.model.structures.BlockPosition;
-import org.terasology.rendering.interfaces.IGameObject;
+import org.terasology.math.AABB;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.shader.ShaderProgram;
@@ -36,10 +37,7 @@ import javax.vecmath.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.EnumMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -51,7 +49,7 @@ import static org.lwjgl.opengl.GL11.*;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
-public class Block implements IGameObject {
+public class Block {
 
     private static final Logger logger = Logger.getLogger(Block.class.getName());
     public static final int ATLAS_SIZE_IN_PX = 256;
@@ -149,7 +147,7 @@ public class Block implements IGameObject {
 
     private CollisionShape collisionShape;
     private Vector3f collisionOffset;
-    public AABB _bounds = new AABB(new Vector3d(), new Vector3d());
+    public AABB _bounds = AABB.createEmpty();
 
     /**
      * Init. a new block with default properties in place.
@@ -252,6 +250,13 @@ public class Block implements IGameObject {
         return new Vector2f(pos.x * TEXTURE_OFFSET, pos.y * TEXTURE_OFFSET);
     }
 
+    public Mesh getMesh() {
+        if (_mesh == null) {
+            generateMesh();
+        }
+        return _mesh;
+    }
+
     public void renderWithLightValue(float light) {
         if (isInvisible())
             return;
@@ -261,20 +266,7 @@ public class Block implements IGameObject {
         shader.setFloat("light", light);
 
         if (_mesh == null) {
-            Tessellator tessellator = new Tessellator();
-            tessellator.setColor(new Vector4f(1, 1, 1, 1));
-            if (_centerMesh != null) {
-                tessellator.addMeshPart(_centerMesh);
-            }
-            for (Side dir : Side.values()) {
-                BlockMeshPart part = _sideMesh.get(dir);
-                if (part != null) {
-                    float lightLevel = DIRECTION_LIT_LEVEL.get(dir);
-                    tessellator.setColor(new Vector4f(lightLevel, lightLevel, lightLevel, lightLevel));
-                    tessellator.addMeshPart(part);
-                }
-            }
-            _mesh = tessellator.generateMesh();
+            generateMesh();
         }
 
         if (getBlockForm() != BLOCK_FORM.BILLBOARD || !glIsEnabled(GL11.GL_CULL_FACE)) {
@@ -286,16 +278,23 @@ public class Block implements IGameObject {
         }
     }
 
-    @Override
-    public void render() {
-        renderWithLightValue(1.0f);
+    private void generateMesh() {
+        Tessellator tessellator = new Tessellator();
+        tessellator.setColor(new Vector4f(1, 1, 1, 1));
+        if (_centerMesh != null) {
+            tessellator.addMeshPart(_centerMesh);
+        }
+        for (Side dir : Side.values()) {
+            BlockMeshPart part = _sideMesh.get(dir);
+            if (part != null) {
+                float lightLevel = DIRECTION_LIT_LEVEL.get(dir);
+                tessellator.setColor(new Vector4f(lightLevel, lightLevel, lightLevel, lightLevel));
+                tessellator.addMeshPart(part);
+            }
+        }
+        // TODO: Remove hard coded package name
+        _mesh = tessellator.generateMesh(new AssetUri(AssetType.MESH, "engine:" + _title));
     }
-
-    @Override
-    public void update(float delta) {
-        // Do nothing
-    }
-
 
     // TODO: Change all of these to setters
     public Block withId(byte id) {
@@ -467,14 +466,8 @@ public class Block implements IGameObject {
         Vector3f min = new Vector3f();
         Vector3f max = new Vector3f();
         shape.getAabb(t, min, max);
-        Vector3f center = new Vector3f();
-        center.add(min, max);
-        center.scale(0.5f);
-        Vector3f dim = new Vector3f();
-        dim.sub(max, min);
-        dim.scale(0.5f);
 
-        _bounds = new AABB(center, dim);
+        _bounds = AABB.createMinMax(min, max);
     }
 
     public COLOR_SOURCE getColorSource() {
@@ -610,22 +603,11 @@ public class Block implements IGameObject {
     }
 
     public AABB getBounds(Vector3i pos) {
-        return new AABB(new Vector3d(_bounds.getPosition().x + pos.x, _bounds.getPosition().y + pos.y, _bounds.getPosition().z + pos.z), _bounds.getDimensions());
+        return _bounds.move(pos.toVector3f());
     }
 
     public AABB getBounds(Vector3f floatPos) {
-        Vector3i pos = new Vector3i(floatPos, 0.5f);
-        return new AABB(new Vector3d(_bounds.getPosition().x + pos.x, _bounds.getPosition().y + pos.y, _bounds.getPosition().z + pos.z), _bounds.getDimensions());
-    }
-
-    /**
-     * Returns the AABB for a block at the given position.
-     *
-     * @param pos The position
-     * @return The AABB
-     */
-    public static AABB AABBForBlockAt(Vector3d pos) {
-        return new AABB(pos, new Vector3d(0.5f, 0.5f, 0.5f));
+        return getBounds(new Vector3i(floatPos, 0.5f));
     }
 
     @Override

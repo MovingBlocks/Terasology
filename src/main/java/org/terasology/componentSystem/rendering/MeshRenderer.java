@@ -1,29 +1,47 @@
 package org.terasology.componentSystem.rendering;
 
+import com.bulletphysics.linearmath.Transform;
+import com.google.common.collect.*;
+import gnu.trove.list.TFloatList;
+import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TFloatArrayList;
+import gnu.trove.list.array.TIntArrayList;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL13;
+import org.lwjgl.opengl.GL15;
 import org.terasology.componentSystem.RenderSystem;
-import org.terasology.components.AABBCollisionComponent;
+import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.rendering.MeshComponent;
 import org.terasology.components.world.LocationComponent;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.*;
+import org.terasology.entitySystem.event.AddComponentEvent;
+import org.terasology.entitySystem.event.RemovedComponentEvent;
+import org.terasology.events.input.KeyDownEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.ShaderManager;
+import org.terasology.logic.manager.VertexBufferObjectManager;
 import org.terasology.math.TeraMath;
-import org.terasology.model.structures.AABB;
+import org.terasology.math.AABB;
+import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
 
-import javax.vecmath.AxisAngle4f;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
+import javax.vecmath.*;
+
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.util.Set;
+import java.util.logging.Logger;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.glColorPointer;
 
 /**
  * TODO: This should be made generic (no explicit shader or mesh) and ported directly into WorldRenderer?
@@ -31,10 +49,22 @@ import static org.lwjgl.opengl.GL11.*;
  * @author Immortius <immortius@gmail.com>
  */
 @RegisterComponentSystem(headedOnly = true)
-public class MeshRenderer implements RenderSystem {
+public class MeshRenderer implements RenderSystem, EventHandlerSystem {
+    private Logger logger = Logger.getLogger(getClass().getName());
     private EntityManager manager;
-    private Mesh mesh;
+    private Mesh gelatinousCubeMesh;
     private WorldRenderer worldRenderer;
+
+    private Multimap<Material, EntityRef> opaqueMesh = ArrayListMultimap.create();
+    private Multimap<Material, EntityRef> translucentMesh = HashMultimap.create();
+    private Set<EntityRef> gelatinous = Sets.newHashSet();
+
+    private int batchVertexBuffer;
+    private int batchIndexBuffer;
+
+    boolean batch = false;
+
+    public int lastRendered;
 
     @Override
     public void initialise() {
@@ -44,47 +74,72 @@ public class MeshRenderer implements RenderSystem {
         Tessellator tessellator = new Tessellator();
         TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1.0f, 1.0f, 1.0f, 1.0f), 0.8f, 0.8f, 0.6f, 0f, 0f, 0f);
         TessellatorHelper.addBlockMesh(tessellator, new Vector4f(1.0f, 1.0f, 1.0f, 0.6f), 1.0f, 1.0f, 0.8f, 0f, 0f, 0f);
-        mesh = tessellator.generateMesh();
+        gelatinousCubeMesh = tessellator.generateMesh();
+
+        batchVertexBuffer = VertexBufferObjectManager.getInstance().getVboId();
+        batchIndexBuffer = VertexBufferObjectManager.getInstance().getVboId();
     }
 
     @Override
     public void shutdown() {
     }
 
+    /*@ReceiveEvent(components = {LocalPlayerComponent.class})
+    public void onKeyDown(KeyDownEvent event, EntityRef entity) {
+        if (event.getKeyCharacter() == ';') {
+            batch = !batch;
+        }
+    }*/
+
+    @ReceiveEvent(components = {MeshComponent.class})
+    public void onNewMesh(AddComponentEvent event, EntityRef entity) {
+        MeshComponent meshComp = entity.getComponent(MeshComponent.class);
+        if (meshComp.renderType == MeshComponent.RenderType.GelatinousCube) {
+            gelatinous.add(entity);
+        } else {
+            opaqueMesh.put(meshComp.material, entity);
+        }
+    }
+
+    @ReceiveEvent(components = {MeshComponent.class})
+    public void onDestroyMesh(RemovedComponentEvent event, EntityRef entity) {
+        MeshComponent meshComponent = entity.getComponent(MeshComponent.class);
+        if (meshComponent.renderType == MeshComponent.RenderType.GelatinousCube) {
+            gelatinous.remove(entity);
+        } else {
+            opaqueMesh.remove(meshComponent.material, entity);
+        }
+    }
+
     @Override
     public void renderTransparent() {
 
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
-        for (EntityRef entity : manager.iteratorEntities(MeshComponent.class, AABBCollisionComponent.class, LocationComponent.class)) {
-            // TODO: Probably don't need this collision component, there should be some sort of AABB built into the mesh
+        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("gelatinousCube");
+        shader.enable();
+
+        for (EntityRef entity : gelatinous) {
             MeshComponent meshComp = entity.getComponent(MeshComponent.class);
-            if (meshComp.renderType == MeshComponent.RenderType.Normal) continue;
-
-            AABBCollisionComponent collision = entity.getComponent(AABBCollisionComponent.class);
             LocationComponent location = entity.getComponent(LocationComponent.class);
+            if (location == null) continue;
 
+            Quat4f worldRot = location.getWorldRotation();
             Vector3f worldPos = location.getWorldPosition();
-            Vector3d extents = new Vector3d(collision.getExtents());
             float worldScale = location.getWorldScale();
-            extents.scale(worldScale);
-            AABB aabb = new AABB(new Vector3d(worldPos), new Vector3d(collision.getExtents()));
-
+            AABB aabb = gelatinousCubeMesh.getAABB().transform(worldRot, worldPos, worldScale);
             if (worldRenderer.isAABBVisible(aabb)) {
                 glPushMatrix();
 
                 glTranslated(worldPos.x - cameraPosition.x, worldPos.y - cameraPosition.y, worldPos.z - cameraPosition.z);
                 AxisAngle4f rot = new AxisAngle4f();
-                rot.set(location.getWorldRotation());
+                rot.set(worldRot);
                 glRotatef(TeraMath.RAD_TO_DEG * rot.angle, rot.x, rot.y, rot.z);
                 glScalef(worldScale, worldScale, worldScale);
 
-                ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("gelatinousCube");
-
-                shader.enable();
                 shader.setFloat4("colorOffset", meshComp.color.x, meshComp.color.y, meshComp.color.z, meshComp.color.w);
                 shader.setFloat("light", worldRenderer.getRenderingLightValueAt(worldPos));
 
-                mesh.render();
+                gelatinousCubeMesh.render();
 
                 glPopMatrix();
             }
@@ -95,19 +150,118 @@ public class MeshRenderer implements RenderSystem {
     public void renderOpaque() {
         boolean carryingTorch = CoreRegistry.get(LocalPlayer.class).isCarryingTorch();
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
-        for (EntityRef entity : manager.iteratorEntities(MeshComponent.class, AABBCollisionComponent.class, LocationComponent.class)) {
-            // TODO: Probably don't need this collision component, there should be some sort of AABB built into the mesh
+
+        Quat4f worldRot = new Quat4f();
+        Vector3f worldPos = new Vector3f();
+        AxisAngle4f rot = new AxisAngle4f();
+        Matrix4f matrix = new Matrix4f();
+        Transform trans = new Transform();
+        Transform normTrans = new Transform();
+
+        glPushMatrix();
+        glTranslated(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
+
+        for (Material material : opaqueMesh.keys()) {
+            Mesh lastMesh = null;
+            material.enable();
+            material.setInt("carryingTorch", carryingTorch ? 1 : 0);
+            material.setFloat("light", 1);
+            material.bindTextures();
+            lastRendered = opaqueMesh.get(material).size();
+
+            // Batching
+            TFloatList vertexData = new TFloatArrayList();
+            TIntList indexData = new TIntArrayList();
+            int indexOffset = 0;
+            float[] openglMat = new float[16];
+            FloatBuffer mBuffer = BufferUtils.createFloatBuffer(16);
+
+            for (EntityRef entity : opaqueMesh.get(material)) {
+                //Basic rendering
+                if (!batch) {
+
+                    MeshComponent meshComp = entity.getComponent(MeshComponent.class);
+                    LocationComponent location = entity.getComponent(LocationComponent.class);
+
+                    if (location == null || meshComp.mesh == null) continue;
+
+                    location.getWorldRotation(worldRot);
+                    location.getWorldPosition(worldPos);
+                    float worldScale = location.getWorldScale();
+                    matrix.set(worldRot, worldPos, worldScale);
+                    trans.set(matrix);
+                    AABB aabb = meshComp.mesh.getAABB().transform(trans);
+                    if (worldRenderer.isAABBVisible(aabb)) {
+                        if (meshComp.mesh != lastMesh) {
+                            if (lastMesh != null) {
+                                lastMesh.postRender();
+                            }
+                            lastMesh = meshComp.mesh;
+                            meshComp.mesh.preRender();
+                        }
+                        glPushMatrix();
+                        trans.getOpenGLMatrix(openglMat);
+                        mBuffer.put(openglMat);
+                        mBuffer.flip();
+                        glMultMatrix(mBuffer);
+
+                        material.setFloat("light", worldRenderer.getRenderingLightValueAt(worldPos));
+
+                        meshComp.mesh.doRender();
+
+                        glPopMatrix();
+                    }
+                } else {
+                    // Batching
+                    MeshComponent meshComp = entity.getComponent(MeshComponent.class);
+                    LocationComponent location = entity.getComponent(LocationComponent.class);
+                    if (location == null) continue;
+
+                    location.getWorldRotation(worldRot);
+                    location.getWorldPosition(worldPos);
+                    float worldScale = location.getWorldScale();
+                    matrix.set(worldRot, worldPos, worldScale);
+                    trans.set(matrix);
+                    matrix.set(worldRot, new Vector3f(), 1);
+                    normTrans.set(matrix);
+                    AABB aabb = meshComp.mesh.getAABB().transform(trans);
+
+                    if (worldRenderer.isAABBVisible(aabb)) {
+                        indexOffset = meshComp.mesh.addToBatch(trans, normTrans, vertexData, indexData, indexOffset);
+                    }
+
+                    if (indexOffset > 100)
+                    {
+                        renderBatch(vertexData, indexData);
+                        vertexData.clear();
+                        indexData.clear();
+                    }
+                }
+            }
+            if (lastMesh != null) {
+                lastMesh.postRender();
+            }
+
+            if (batch) {
+                renderBatch(vertexData, indexData);
+            }
+        }
+
+        glPopMatrix();
+
+        /*for (EntityRef entity : manager.iteratorEntities(MeshComponent.class)) {
             MeshComponent meshComp = entity.getComponent(MeshComponent.class);
             if (meshComp.renderType != MeshComponent.RenderType.Normal || meshComp.mesh == null) continue;
 
-            AABBCollisionComponent collision = entity.getComponent(AABBCollisionComponent.class);
             LocationComponent location = entity.getComponent(LocationComponent.class);
+            if (location == null) continue;
 
+
+
+            Quat4f worldRot = location.getWorldRotation();
             Vector3f worldPos = location.getWorldPosition();
-            Vector3d extents = new Vector3d(collision.getExtents());
             float worldScale = location.getWorldScale();
-            extents.scale(worldScale);
-            AABB aabb = new AABB(new Vector3d(worldPos), new Vector3d(collision.getExtents()));
+            AABB aabb = meshComp.mesh.getAABB().transform(worldRot, worldPos, worldScale);
 
             if (worldRenderer.isAABBVisible(aabb)) {
                 glPushMatrix();
@@ -126,7 +280,54 @@ public class MeshRenderer implements RenderSystem {
 
                 glPopMatrix();
             }
-        }
+        }*/
+    }
+
+    private void renderBatch(TFloatList vertexData, TIntList indexData) {
+        if (vertexData.size() == 0 || indexData.size() == 0) return;
+
+        PerformanceMonitor.startActivity("BatchRenderMesh");
+        FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(vertexData.size());
+        vertexBuffer.put(vertexData.toArray());
+        vertexBuffer.flip();
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, batchVertexBuffer);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, vertexBuffer, GL15.GL_DYNAMIC_DRAW);
+
+        IntBuffer indexBuffer = BufferUtils.createIntBuffer(indexData.size());
+        indexBuffer.put(indexData.toArray());
+        indexBuffer.flip();
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, batchIndexBuffer);
+        GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL15.GL_DYNAMIC_DRAW);
+
+        glPushMatrix();
+
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        glEnableClientState(GL_COLOR_ARRAY);
+        glEnableClientState(GL_NORMAL_ARRAY);
+
+        //GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, batchVertexBuffer);
+        //GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, batchIndexBuffer);
+
+        glVertexPointer(Mesh.VERTEX_SIZE, GL11.GL_FLOAT, 15 * 4, 0);
+        GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
+        glTexCoordPointer(Mesh.TEX_COORD_0_SIZE, GL11.GL_FLOAT, 15 * 4, 4 * 3);
+        GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
+        glTexCoordPointer(Mesh.TEX_COORD_1_SIZE, GL11.GL_FLOAT, 15 * 4, 4 * 5);
+        glColorPointer(Mesh.COLOR_SIZE, GL11.GL_FLOAT, 15 * 4, 4 * 11);
+        glNormalPointer(GL11.GL_FLOAT, 15 * 4, 4 * 8);
+
+        GL12.glDrawRangeElements(GL11.GL_TRIANGLES, 0, indexData.size(), indexData.size(), GL_UNSIGNED_INT, 0);
+
+        glDisableClientState(GL_NORMAL_ARRAY);
+        glDisableClientState(GL_COLOR_ARRAY);
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        glDisableClientState(GL_VERTEX_ARRAY);
+
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+        glPopMatrix();
+        PerformanceMonitor.endActivity();
     }
 
     @Override

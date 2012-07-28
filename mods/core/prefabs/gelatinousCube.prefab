@@ -5,12 +5,12 @@
     "renderType" : "GelatinousCube"
   },
   "CharacterMovement" : {
+    "height" : 1,
+    "radius" : 0.5,
+    "stepHeight" : 0,
     "faceMovementDirection" : true
   },
   "SimpleAI" : {},
-  "AABBCollision" : {
-    "extents" : [0.5, 0.5, 0.5]
-  },
   "CharacterSound" : {
     "footstepSounds" : ["engine:Slime1", "engine:Slime2", "engine:Slime3", "engine:Slime4", "engine:Slime5"],
     "footstepVolume" : 0.7

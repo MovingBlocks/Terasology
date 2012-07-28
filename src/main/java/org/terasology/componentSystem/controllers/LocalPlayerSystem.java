@@ -4,7 +4,7 @@ import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.*;
-import org.terasology.components.world.BlockComponent;
+import org.terasology.components.block.BlockComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
@@ -24,6 +24,9 @@ import org.terasology.logic.manager.Config;
 import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;
+import org.terasology.math.AABB;
+import org.terasology.physics.character.CharacterMovementComponent;
+import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.cameras.DefaultCamera;
 
 import javax.vecmath.Quat4f;
@@ -52,6 +55,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     private float lastStepDelta = 0;
 
     private Vector3f relativeMovement = new Vector3f();
+
+    private AABBRenderer aabbRenderer = new AABBRenderer(AABB.createEmpty());
 
     @Override
     public void initialise() {
@@ -168,7 +173,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             if (blockComp != null) {
                 Block block = worldProvider.getBlock(blockComp.getPosition());
                 if (block.isRenderBoundingBox()) {
-                    block.getBounds(blockComp.getPosition()).render(2f);
+                    aabbRenderer.setAABB(block.getBounds(blockComp.getPosition()));
+                    aabbRenderer.render(2f);
                 }
             }
         }
@@ -294,7 +300,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
         if (localPlayerComp.isDead) return;
 
-        event.getTarget().send(new ActivateEvent(entity, entity));
+        event.getTarget().send(new ActivateEvent(entity, entity, playerCamera.getPosition(), playerCamera.getViewingDirection(), event.getHitPosition(), event.getHitNormal()));
         event.consume();
     }
 

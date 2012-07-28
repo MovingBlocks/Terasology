@@ -5,6 +5,7 @@ import org.terasology.components.*;
 import org.terasology.entitySystem.*;
 import org.terasology.events.*;
 import org.terasology.game.CoreRegistry;
+import org.terasology.physics.character.CharacterMovementComponent;
 
 /**
  * Status Affector System : Different Effect Handling [Affecting the player]

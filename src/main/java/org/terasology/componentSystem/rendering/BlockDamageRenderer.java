@@ -3,12 +3,12 @@ package org.terasology.componentSystem.rendering;
 import org.lwjgl.opengl.GL11;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.components.HealthComponent;
-import org.terasology.components.world.BlockComponent;
+import org.terasology.components.block.BlockComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.manager.AssetManager;
+import org.terasology.asset.AssetManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.world.WorldProvider;
 import org.terasology.rendering.assets.Texture;
@@ -18,7 +18,6 @@ import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.world.WorldRenderer;
 
 import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 
