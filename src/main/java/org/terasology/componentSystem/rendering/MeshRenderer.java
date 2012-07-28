@@ -64,6 +64,8 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
 
     boolean batch = false;
 
+    public int lastRendered;
+
     @Override
     public void initialise() {
         manager = CoreRegistry.get(EntityManager.class);
@@ -87,7 +89,7 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
         if (event.getKeyCharacter() == ';') {
             batch = !batch;
         }
-    } */
+    }*/
 
     @ReceiveEvent(components = {MeshComponent.class})
     public void onNewMesh(AddComponentEvent event, EntityRef entity) {
@@ -152,8 +154,12 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
         Quat4f worldRot = new Quat4f();
         Vector3f worldPos = new Vector3f();
         AxisAngle4f rot = new AxisAngle4f();
+        Matrix4f matrix = new Matrix4f();
+        Transform trans = new Transform();
+        Transform normTrans = new Transform();
 
-
+        glPushMatrix();
+        glTranslated(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
 
         for (Material material : opaqueMesh.keys()) {
             Mesh lastMesh = null;
@@ -161,11 +167,14 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
             material.setInt("carryingTorch", carryingTorch ? 1 : 0);
             material.setFloat("light", 1);
             material.bindTextures();
+            lastRendered = opaqueMesh.get(material).size();
 
             // Batching
             TFloatList vertexData = new TFloatArrayList();
             TIntList indexData = new TIntArrayList();
             int indexOffset = 0;
+            float[] openglMat = new float[16];
+            FloatBuffer mBuffer = BufferUtils.createFloatBuffer(16);
 
             for (EntityRef entity : opaqueMesh.get(material)) {
                 //Basic rendering
@@ -179,7 +188,9 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
                     location.getWorldRotation(worldRot);
                     location.getWorldPosition(worldPos);
                     float worldScale = location.getWorldScale();
-                    AABB aabb = meshComp.mesh.getAABB().transform(worldRot, worldPos, worldScale);
+                    matrix.set(worldRot, worldPos, worldScale);
+                    trans.set(matrix);
+                    AABB aabb = meshComp.mesh.getAABB().transform(trans);
                     if (worldRenderer.isAABBVisible(aabb)) {
                         if (meshComp.mesh != lastMesh) {
                             if (lastMesh != null) {
@@ -189,10 +200,10 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
                             meshComp.mesh.preRender();
                         }
                         glPushMatrix();
-                        glTranslated(worldPos.x - cameraPosition.x, worldPos.y - cameraPosition.y, worldPos.z - cameraPosition.z);
-                        rot.set(worldRot);
-                        glRotatef(TeraMath.RAD_TO_DEG * rot.angle, rot.x, rot.y, rot.z);
-                        glScalef(worldScale, worldScale, worldScale);
+                        trans.getOpenGLMatrix(openglMat);
+                        mBuffer.put(openglMat);
+                        mBuffer.flip();
+                        glMultMatrix(mBuffer);
 
                         material.setFloat("light", worldRenderer.getRenderingLightValueAt(worldPos));
 
@@ -209,12 +220,21 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
                     location.getWorldRotation(worldRot);
                     location.getWorldPosition(worldPos);
                     float worldScale = location.getWorldScale();
-                    Transform transform = new Transform(new Matrix4f(worldRot, worldPos, worldScale));
-                    Transform normalTransform = new Transform(new Matrix4f(worldRot, new Vector3f(), 1));
-                    AABB aabb = meshComp.mesh.getAABB().transform(transform);
+                    matrix.set(worldRot, worldPos, worldScale);
+                    trans.set(matrix);
+                    matrix.set(worldRot, new Vector3f(), 1);
+                    normTrans.set(matrix);
+                    AABB aabb = meshComp.mesh.getAABB().transform(trans);
 
                     if (worldRenderer.isAABBVisible(aabb)) {
-                        indexOffset = meshComp.mesh.addToBatch(transform, normalTransform, vertexData, indexData, indexOffset);
+                        indexOffset = meshComp.mesh.addToBatch(trans, normTrans, vertexData, indexData, indexOffset);
+                    }
+
+                    if (indexOffset > 100)
+                    {
+                        renderBatch(vertexData, indexData);
+                        vertexData.clear();
+                        indexData.clear();
                     }
                 }
             }
@@ -223,56 +243,11 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
             }
 
             if (batch) {
-                PerformanceMonitor.startActivity("BatchRenderMesh");
-                if (vertexData.size() == 0 || indexData.size() == 0) continue;
-
-                FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(vertexData.size());
-                vertexBuffer.put(vertexData.toArray());
-                vertexBuffer.flip();
-                IntBuffer indexBuffer = BufferUtils.createIntBuffer(indexData.size());
-                indexBuffer.put(indexData.toArray());
-                indexBuffer.flip();
-                GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, batchVertexBuffer);
-                GL15.glBufferData(GL15.GL_ARRAY_BUFFER, (FloatBuffer)null, GL15.GL_DYNAMIC_DRAW);
-                GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, vertexBuffer);
-                GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-                GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, batchIndexBuffer);
-                GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, (IntBuffer)null, GL15.GL_DYNAMIC_DRAW);
-                GL15.glBufferSubData(GL15.GL_ELEMENT_ARRAY_BUFFER, 0, indexBuffer);
-                GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
-
-                glPushMatrix();
-                glTranslated(- cameraPosition.x, - cameraPosition.y, - cameraPosition.z);
-
-                glEnableClientState(GL_VERTEX_ARRAY);
-                glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-                glEnableClientState(GL_COLOR_ARRAY);
-                glEnableClientState(GL_NORMAL_ARRAY);
-
-                GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, batchVertexBuffer);
-                GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, batchIndexBuffer);
-
-                glVertexPointer(Mesh.VERTEX_SIZE, GL11.GL_FLOAT, 15 * 4, 0);
-                GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
-                glTexCoordPointer(Mesh.TEX_COORD_0_SIZE, GL11.GL_FLOAT, 15 * 4, 4 * 3);
-                GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
-                glTexCoordPointer(Mesh.TEX_COORD_1_SIZE, GL11.GL_FLOAT, 15 * 4, 4 * 5);
-                glColorPointer(Mesh.COLOR_SIZE, GL11.GL_FLOAT, 15 * 4, 4 * 11);
-                glNormalPointer(GL11.GL_FLOAT, 15 * 4, 4 * 8);
-
-                GL12.glDrawRangeElements(GL11.GL_TRIANGLES, 0, indexData.size(), indexData.size(), GL_UNSIGNED_INT, 0);
-
-                glDisableClientState(GL_NORMAL_ARRAY);
-                glDisableClientState(GL_COLOR_ARRAY);
-                glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-                glDisableClientState(GL_VERTEX_ARRAY);
-
-                GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-                GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
-                glPopMatrix();
-                PerformanceMonitor.endActivity();
+                renderBatch(vertexData, indexData);
             }
         }
+
+        glPopMatrix();
 
         /*for (EntityRef entity : manager.iteratorEntities(MeshComponent.class)) {
             MeshComponent meshComp = entity.getComponent(MeshComponent.class);
@@ -306,6 +281,53 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
                 glPopMatrix();
             }
         }*/
+    }
+
+    private void renderBatch(TFloatList vertexData, TIntList indexData) {
+        if (vertexData.size() == 0 || indexData.size() == 0) return;
+
+        PerformanceMonitor.startActivity("BatchRenderMesh");
+        FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(vertexData.size());
+        vertexBuffer.put(vertexData.toArray());
+        vertexBuffer.flip();
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, batchVertexBuffer);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, vertexBuffer, GL15.GL_DYNAMIC_DRAW);
+
+        IntBuffer indexBuffer = BufferUtils.createIntBuffer(indexData.size());
+        indexBuffer.put(indexData.toArray());
+        indexBuffer.flip();
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, batchIndexBuffer);
+        GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL15.GL_DYNAMIC_DRAW);
+
+        glPushMatrix();
+
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        glEnableClientState(GL_COLOR_ARRAY);
+        glEnableClientState(GL_NORMAL_ARRAY);
+
+        //GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, batchVertexBuffer);
+        //GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, batchIndexBuffer);
+
+        glVertexPointer(Mesh.VERTEX_SIZE, GL11.GL_FLOAT, 15 * 4, 0);
+        GL13.glClientActiveTexture(GL13.GL_TEXTURE0);
+        glTexCoordPointer(Mesh.TEX_COORD_0_SIZE, GL11.GL_FLOAT, 15 * 4, 4 * 3);
+        GL13.glClientActiveTexture(GL13.GL_TEXTURE1);
+        glTexCoordPointer(Mesh.TEX_COORD_1_SIZE, GL11.GL_FLOAT, 15 * 4, 4 * 5);
+        glColorPointer(Mesh.COLOR_SIZE, GL11.GL_FLOAT, 15 * 4, 4 * 11);
+        glNormalPointer(GL11.GL_FLOAT, 15 * 4, 4 * 8);
+
+        GL12.glDrawRangeElements(GL11.GL_TRIANGLES, 0, indexData.size(), indexData.size(), GL_UNSIGNED_INT, 0);
+
+        glDisableClientState(GL_NORMAL_ARRAY);
+        glDisableClientState(GL_COLOR_ARRAY);
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        glDisableClientState(GL_VERTEX_ARRAY);
+
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+        glPopMatrix();
+        PerformanceMonitor.endActivity();
     }
 
     @Override

@@ -236,7 +236,7 @@ public class Mesh implements Asset {
     }
 
     public void doRender() {
-        GL12.glDrawRangeElements(GL11.GL_TRIANGLES, 0, indexCount, indexCount, GL_UNSIGNED_INT, 0);
+        GL11.glDrawElements(GL11.GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
     }
 
     public void render() {

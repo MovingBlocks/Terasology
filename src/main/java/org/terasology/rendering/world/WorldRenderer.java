@@ -21,6 +21,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.controllers.LocalPlayerSystem;
+import org.terasology.componentSystem.rendering.MeshRenderer;
 import org.terasology.components.PlayerComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.game.ComponentSystemManager;
@@ -963,7 +964,7 @@ public final class WorldRenderer {
 
     @Override
     public String toString() {
-        return String.format("world (biome: %s, time: %.2f, exposure: %.2f, sun: %.2f, cache: %fMb, dirty: %d, ign: %d, vis: %d, tri: %d, empty: %d, !ready: %d, seed: \"%s\", title: \"%s\")", getPlayerBiome(), _worldProvider.getTimeInDays(), PostProcessingRenderer.getInstance().getExposure(), _skysphere.getSunPosAngle(), _chunkProvider.size(), _statDirtyChunks, _statIgnoredPhases, _statVisibleChunks, _statRenderedTriangles, _statChunkMeshEmpty, _statChunkNotReady, _worldProvider.getSeed(), _worldProvider.getTitle());
+        return String.format("world (numdropped: %d, biome: %s, time: %.2f, exposure: %.2f, sun: %.2f, cache: %fMb, dirty: %d, ign: %d, vis: %d, tri: %d, empty: %d, !ready: %d, seed: \"%s\", title: \"%s\")", ((MeshRenderer)CoreRegistry.get(ComponentSystemManager.class).get("engine:MeshRenderer")).lastRendered, getPlayerBiome(), _worldProvider.getTimeInDays(), PostProcessingRenderer.getInstance().getExposure(), _skysphere.getSunPosAngle(), _chunkProvider.size(), _statDirtyChunks, _statIgnoredPhases, _statVisibleChunks, _statRenderedTriangles, _statChunkMeshEmpty, _statChunkNotReady, _worldProvider.getSeed(), _worldProvider.getTitle());
     }
 
     public LocalPlayer getPlayer() {
