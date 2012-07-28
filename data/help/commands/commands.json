@@ -65,5 +65,28 @@
 "examples":[
 "<help giveBlocks>",
 "<help commandList>"
+]},
+{"commandName":"spawnLoot",
+"parameters":[],
+"commandDesc":"Debug command - makes a dirt block loot to your inventory",
+"commandHelp":"",
+"examples":[
+"<help giveBlocks>",
+"<help commandList>"
+]},
+{"commandName":"bindKey",
+"parameters":[],
+"commandDesc":"Debug command - maps a key to a function",
+"commandHelp":"",
+"examples":[
+"<help giveBlocks>",
+"<help commandList>"
+]},
+{"commandName":"setupForAZERTY",
+"parameters":[],
+"commandDesc":"Enables typical key bindings for AZERTY keyboards",
+"commandHelp":"",
+"examples":[
+"<setupForAZERTY>",
 ]}
 ]

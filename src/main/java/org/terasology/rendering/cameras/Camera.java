@@ -64,6 +64,10 @@ public abstract class Camera {
     public void lookThroughNormalized() {
         loadProjectionMatrix();
         loadNormalizedModelViewMatrix();
+
+        if (_reflected) {
+            glScalef(1.0f, -1.0f, 1.0f);
+        }
     }
 
     public abstract void loadProjectionMatrix(float fov);

@@ -79,7 +79,7 @@ public class TunnelAction implements EventHandlerSystem {
                         EntityRef blockEntity = blockEntityRegistry.getEntityAt(blockPos);
                         blockEntity.destroy();
 
-                        if (random.randomInt(8) == 0) {
+                        if (random.randomInt(6) == 0) {
                             EntityRef block = droppedBlockFactory.newInstance(target, currentBlock.getBlockFamily(), 5);
                             block.send(new ImpulseEvent(impulse));
                         }

@@ -8,6 +8,7 @@
 "",
 "Type 'help commandList' to see a list of available commands",
 "Type 'help <command>' to see command specific help if documented",
+"Type 'help blockList' for a handy list of all available blocks",
 "",
 "to close the console, simply press the same key again you used to open it (tab by default) ",
 "",

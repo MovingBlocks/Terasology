@@ -279,16 +279,6 @@ public class StateSinglePlayer implements GameState {
         worldRenderer = new WorldRenderer(title, seed, time, entityManager, localPlayerSys);
         CoreRegistry.put(WorldRenderer.class, worldRenderer);
 
-        File entityDataFile = new File(PathManager.getInstance().getWorldSavePath(title), ENTITY_DATA_FILE);
-        entityManager.clear();
-        if (entityDataFile.exists()) {
-            try {
-                CoreRegistry.get(WorldPersister.class).load(entityDataFile, WorldPersister.SaveFormat.Binary);
-            } catch (IOException e) {
-                logger.log(Level.SEVERE, "Failed to load entity data", e);
-            }
-        }
-
         // Create the world entity
         Iterator<EntityRef> worldEntityIterator = entityManager.iteratorEntities(WorldComponent.class).iterator();
         if (worldEntityIterator.hasNext()) {
@@ -307,6 +297,16 @@ public class StateSinglePlayer implements GameState {
 
         for (ComponentSystem system : componentSystemManager.iterateAll()) {
             system.initialise();
+        }
+
+        File entityDataFile = new File(PathManager.getInstance().getWorldSavePath(title), ENTITY_DATA_FILE);
+        entityManager.clear();
+        if (entityDataFile.exists()) {
+            try {
+                CoreRegistry.get(WorldPersister.class).load(entityDataFile, WorldPersister.SaveFormat.Binary);
+            } catch (IOException e) {
+                logger.log(Level.SEVERE, "Failed to load entity data", e);
+            }
         }
 
         prepareWorld();

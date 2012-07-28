@@ -140,7 +140,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         PerformanceMonitor.startActivity("BlockChangedEventQueue");
         BlockChangedEvent event = eventQueue.poll();
         while (event != null) {
-            logger.info(String.format("%s: %s -> %s", event.getBlockPosition(), event.getOldType().getBlockFamily().getTitle(), event.getNewType().getBlockFamily().getTitle()));
+            logger.finer(String.format("%s: %s -> %s", event.getBlockPosition(), event.getOldType().getBlockFamily().getTitle(), event.getNewType().getBlockFamily().getTitle()));
             getOrCreateEntityAt(event.getBlockPosition()).send(event);
             if (processed++ >= 4) {
                 break;

@@ -174,7 +174,7 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
                     MeshComponent meshComp = entity.getComponent(MeshComponent.class);
                     LocationComponent location = entity.getComponent(LocationComponent.class);
 
-                    if (location == null) continue;
+                    if (location == null || meshComp.mesh == null) continue;
 
                     location.getWorldRotation(worldRot);
                     location.getWorldPosition(worldPos);

@@ -95,9 +95,9 @@ public class InputSystem implements EventHandlerSystem {
 
     public void linkBindButtonToMouseWheel(int direction, String bindId) {
         if (direction > 0) {
-            mouseWheelUpBind = buttonLookup.get(bindId);
-        } else if (direction < 0) {
             mouseWheelDownBind = buttonLookup.get(bindId);
+        } else if (direction < 0) {
+            mouseWheelUpBind = buttonLookup.get(bindId);
         }
     }
 

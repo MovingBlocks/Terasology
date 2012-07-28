@@ -19,6 +19,9 @@ import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.linearmath.Transform;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.util.ResourceLoader;
+import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.collection.EnumBooleanMap;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.Side;
@@ -289,7 +292,8 @@ public class Block {
                 tessellator.addMeshPart(part);
             }
         }
-        _mesh = tessellator.generateMesh();
+        // TODO: Remove hard coded package name
+        _mesh = tessellator.generateMesh(new AssetUri(AssetType.MESH, "engine:" + _title));
     }
 
     // TODO: Change all of these to setters
