@@ -76,7 +76,7 @@ public class ExplosionAction implements EventHandlerSystem {
             Vector3f direction = new Vector3f(random.randomFloat(), random.randomFloat(), random.randomFloat());
             direction.normalize();
             Vector3f impulse = new Vector3f(direction);
-            impulse.scale(300);
+            impulse.scale(150);
 
             for (int j = 0; j < 4; j++) {
                 Vector3f target = new Vector3f(origin);

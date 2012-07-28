@@ -18,7 +18,9 @@ import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.world.WorldProvider;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.physics.ImpulseEvent;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
+import org.terasology.utilities.FastRandom;
 
 /**
  * Event handler for events affecting block entities
@@ -32,6 +34,7 @@ public class BlockEntitySystem implements EventHandlerSystem {
     private EntityManager entityManager;
     private BlockItemFactory blockItemFactory;
     private DroppedBlockFactory droppedBlockFactory;
+    private FastRandom random;
 
     @Override
     public void initialise() {
@@ -39,6 +42,7 @@ public class BlockEntitySystem implements EventHandlerSystem {
         worldProvider = CoreRegistry.get(WorldProvider.class);
         blockItemFactory = new BlockItemFactory(entityManager);
         droppedBlockFactory = new DroppedBlockFactory(entityManager);
+        random = new FastRandom();
     }
 
     @Override
@@ -73,11 +77,13 @@ public class BlockEntitySystem implements EventHandlerSystem {
             if (itemComp != null && !itemComp.container.exists()) {
                 // TODO: Fix this - entity needs to be added to lootable block or destroyed
                 item.destroy();
-                droppedBlockFactory.newInstance(blockComp.getPosition().toVector3f(), oldBlock.getBlockFamily(), 20);
+                EntityRef block = droppedBlockFactory.newInstance(blockComp.getPosition().toVector3f(), oldBlock.getBlockFamily(), 20);
+                block.send(new ImpulseEvent(random.randomVector3f(30)));
             }
         } else {
             /* PHYSICS */
-            droppedBlockFactory.newInstance(blockComp.getPosition().toVector3f(), oldBlock.getBlockFamily(), 20);
+            EntityRef block = droppedBlockFactory.newInstance(blockComp.getPosition().toVector3f(), oldBlock.getBlockFamily(), 20);
+            block.send(new ImpulseEvent(random.randomVector3f(30)));
         }
 
         if (oldBlock.isEntityTemporary()) {
