@@ -16,3 +16,7 @@ bin
 data/console/consolelog.json
 benchmark-temp
 *~
+
+# Ignore error logs 
+*.log
+
