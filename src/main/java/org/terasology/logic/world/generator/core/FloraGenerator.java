@@ -15,6 +15,8 @@
  */
 package org.terasology.logic.world.generator.core;
 
+import java.util.Map;
+
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.world.chunks.Chunk;
 import org.terasology.logic.world.WorldBiomeProvider;
@@ -141,5 +143,13 @@ public class FloraGenerator implements ChunkGenerator {
         }
     }
 
+    @Override
+    public Map<String, String> getInitParameters() {
+        return null;
+    }
+
+    @Override
+    public void setInitParameters(Map<String, String> initParameters) {
+    }
 
 }

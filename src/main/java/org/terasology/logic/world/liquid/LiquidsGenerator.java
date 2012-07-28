@@ -15,6 +15,8 @@
  */
 package org.terasology.logic.world.liquid;
 
+import java.util.Map;
+
 import org.terasology.logic.world.chunks.Chunk;
 import org.terasology.logic.world.WorldBiomeProvider;
 import org.terasology.logic.world.generator.ChunkGenerator;
@@ -75,4 +77,14 @@ public class LiquidsGenerator implements ChunkGenerator {
     public void setWorldBiomeProvider(WorldBiomeProvider biomeProvider) {
         this.biomeProvider = biomeProvider;
     }
+
+    @Override
+    public Map<String, String> getInitParameters() {
+        return null;
+    }
+
+    @Override
+    public void setInitParameters(Map<String, String> initParameters) {
+    }
+
 }

@@ -16,6 +16,8 @@
 
 package org.terasology.logic.world.generator.core;
 
+import java.util.List;
+
 import org.terasology.logic.world.chunks.Chunk;
 import org.terasology.logic.world.WorldBiomeProvider;
 import org.terasology.logic.world.WorldView;
@@ -27,6 +29,8 @@ import org.terasology.math.Vector3i;
  */
 public interface ChunkGeneratorManager {
 
+	List<BaseChunkGenerator> getBaseChunkGenerators();
+	
     void setWorldSeed(String seed);
 
     void setWorldBiomeProvider(WorldBiomeProvider biomeProvider);

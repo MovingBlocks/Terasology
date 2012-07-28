@@ -16,6 +16,8 @@
 
 package org.terasology.logic.world.generator.core;
 
+import java.util.Map;
+
 import org.terasology.logic.world.chunks.Chunk;
 import org.terasology.logic.world.WorldBiomeProvider;
 import org.terasology.logic.world.generator.ChunkGenerator;
@@ -275,4 +277,14 @@ public class PerlinTerrainGenerator implements ChunkGenerator {
     private double calcCaveDensity(double x, double y, double z) {
         return _pGen8.fBm(x * 0.02, y * 0.02, z * 0.02);
     }
+
+    @Override
+    public Map<String, String> getInitParameters() {
+        return null;
+    }
+
+    @Override
+    public void setInitParameters(Map<String, String> initParameters) {
+    }
+
 }

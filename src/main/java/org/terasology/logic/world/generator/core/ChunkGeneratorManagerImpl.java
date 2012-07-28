@@ -25,6 +25,7 @@ import org.terasology.logic.world.generator.ChunkGenerator;
 import org.terasology.logic.world.generator.SecondPassChunkGenerator;
 import org.terasology.math.Vector3i;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -74,6 +75,14 @@ public class ChunkGeneratorManagerImpl implements ChunkGeneratorManager {
         }
     }
 
+    @Override
+    public List<BaseChunkGenerator> getBaseChunkGenerators() {
+    	List<BaseChunkGenerator> baseChunkGenerators = new ArrayList<BaseChunkGenerator>();
+    	baseChunkGenerators.addAll(chunkGenerators);
+    	baseChunkGenerators.addAll(secondPassChunkGenerators);
+    	return baseChunkGenerators;
+    }
+    
     @Override
     public Chunk generateChunk(Vector3i pos) {
         Chunk chunk = new Chunk(pos);

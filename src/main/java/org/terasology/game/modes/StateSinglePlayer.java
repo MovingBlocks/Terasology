@@ -288,10 +288,12 @@ public class StateSinglePlayer implements GameState {
         // Init ChunkGeneratorManager
         ChunkGeneratorManager chunkGeneratorManager = initChunkGeneratorManager(title);
         chunkGeneratorManager.setWorldSeed(seed);
-        chunkGeneratorManager.setWorldBiomeProvider(new WorldBiomeProviderImpl(seed));
-        
+        chunkGeneratorManager.setWorldBiomeProvider(new WorldBiomeProviderImpl(
+                seed));
+
         // Init. a new world
-        worldRenderer = new WorldRenderer(title, seed, time, chunkGeneratorManager, entityManager, localPlayerSys);
+        worldRenderer = new WorldRenderer(title, seed, time,
+                chunkGeneratorManager, entityManager, localPlayerSys);
         CoreRegistry.put(WorldRenderer.class, worldRenderer);
 
         // Create the world entity
@@ -327,42 +329,44 @@ public class StateSinglePlayer implements GameState {
         prepareWorld();
     }
 
-	private ChunkGeneratorManager initChunkGeneratorManager(String title) {
-		ChunkGeneratorManager chunkGeneratorManager = null;
+    private ChunkGeneratorManager initChunkGeneratorManager(String title) {
+        ChunkGeneratorManager chunkGeneratorManager = null;
 
-		File generatorDataFile = new File(PathManager.getInstance()
-				.getWorldSavePath(title), CHUNK_GENERATOR_FILE);
-		
-		try {
-			chunkGeneratorManager = new ChunkGeneratorPersister().load(generatorDataFile);
-		} catch (IOException e) {
-			logger.log(Level.SEVERE, "Failed to load generator data", e);
-			// TODO Improved exception handling
-		}
+        File generatorDataFile = new File(PathManager.getInstance()
+                .getWorldSavePath(title), CHUNK_GENERATOR_FILE);
 
-		if (chunkGeneratorManager == null) {
-			// Create default chunkGeneratorManager
-			chunkGeneratorManager = new ChunkGeneratorManagerImpl();
-			chunkGeneratorManager
-					.registerChunkGenerator(new PerlinTerrainGenerator());
-			chunkGeneratorManager.registerChunkGenerator(new FloraGenerator());
-			chunkGeneratorManager
-					.registerChunkGenerator(new LiquidsGenerator());
-			ForestGenerator forestGen = new ForestGenerator();
-			new DefaultGenerators(forestGen);
-			chunkGeneratorManager.registerChunkGenerator(forestGen);
+        try {
+            chunkGeneratorManager = new ChunkGeneratorPersister()
+                    .load(generatorDataFile);
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "Failed to load generator data", e);
+            // TODO Improved exception handling
+        }
 
-			try {
-				new ChunkGeneratorPersister().save(generatorDataFile, chunkGeneratorManager);
-			} catch (IOException e) {
-				logger.log(Level.SEVERE, "Failed to save generator data", e);
-				// TODO Improved exception handling				
-			}
-		}
+        if (chunkGeneratorManager == null) {
+            // Create default chunkGeneratorManager
+            chunkGeneratorManager = new ChunkGeneratorManagerImpl();
+            chunkGeneratorManager
+                    .registerChunkGenerator(new PerlinTerrainGenerator());
+            chunkGeneratorManager.registerChunkGenerator(new FloraGenerator());
+            chunkGeneratorManager
+                    .registerChunkGenerator(new LiquidsGenerator());
+            ForestGenerator forestGen = new ForestGenerator();
+            new DefaultGenerators(forestGen);
+            chunkGeneratorManager.registerChunkGenerator(forestGen);
 
-		return chunkGeneratorManager;
-	}
-	
+            try {
+                new ChunkGeneratorPersister().save(generatorDataFile,
+                        chunkGeneratorManager);
+            } catch (IOException e) {
+                logger.log(Level.SEVERE, "Failed to save generator data", e);
+                // TODO Improved exception handling
+            }
+        }
+
+        return chunkGeneratorManager;
+    }
+
     private boolean screenHasFocus() {
         return GUIManager.getInstance().getFocusedWindow() != null && GUIManager.getInstance().getFocusedWindow().isModal() && GUIManager.getInstance().getFocusedWindow().isVisible();
     }
