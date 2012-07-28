@@ -37,9 +37,7 @@ public class ChunkGeneratorManagerImpl implements ChunkGeneratorManager {
     private List<ChunkGenerator> chunkGenerators = Lists.newArrayList();
     private List<SecondPassChunkGenerator> secondPassChunkGenerators = Lists.newArrayList();
 
-    public ChunkGeneratorManagerImpl(String seed, WorldBiomeProvider biomeProvider) {
-        this.worldSeed = seed;
-        this.biomeProvider = biomeProvider;
+    public ChunkGeneratorManagerImpl() {
     }
 
     @Override

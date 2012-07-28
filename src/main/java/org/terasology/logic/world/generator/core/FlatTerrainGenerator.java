@@ -6,6 +6,12 @@ import org.terasology.logic.world.generator.ChunkGenerator;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 
+/**
+ * Create a flat world with a specified height.
+ * It use the WorldBiomeProvider but not the seed.
+ * 
+ * @author Mathias Kalb
+ */
 public class FlatTerrainGenerator implements ChunkGenerator {
 
 	// TODO FlatTerrainGenerator: What is a good value for MAX_Y?

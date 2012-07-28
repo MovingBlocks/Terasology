@@ -154,19 +154,7 @@ public final class WorldRenderer implements IGameObject {
      * @param title The title/description of the world
      * @param seed  The seed string used to generate the terrain
      */
-    public WorldRenderer(String title, String seed, long time, EntityManager manager, LocalPlayerSystem localPlayerSystem) {
-        ChunkGeneratorManager generatorManager = new ChunkGeneratorManagerImpl(seed, new WorldBiomeProviderImpl(seed));
-        // TODO save and load generator (name + parameter); GUI selection
-        // Use FlatTerrainGenerator instead of PerlinTerrainGenerator
-        // generatorManager.registerChunkGenerator(new FlatTerrainGenerator());
-        generatorManager.registerChunkGenerator(new PerlinTerrainGenerator());
-        generatorManager.registerChunkGenerator(new FloraGenerator());
-        generatorManager.registerChunkGenerator(new LiquidsGenerator());
-        ForestGenerator forestGen = new ForestGenerator();
-        new DefaultGenerators(forestGen);
-        generatorManager.registerChunkGenerator(forestGen);
-
-
+    public WorldRenderer(String title, String seed, long time, ChunkGeneratorManager chunkGeneratorManager, EntityManager manager, LocalPlayerSystem localPlayerSystem) {
         // TODO: Cleaner method for this?
         File f = new File(PathManager.getInstance().getWorldSavePath(title), title + ".dat");
         if (f.exists()) {
@@ -182,7 +170,7 @@ public final class WorldRenderer implements IGameObject {
         if (chunkStore == null) {
             chunkStore = new ChunkStoreGZip();
         }
-        _chunkProvider = new LocalChunkProvider(chunkStore, generatorManager);
+        _chunkProvider = new LocalChunkProvider(chunkStore, chunkGeneratorManager);
         EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(title, seed, time, _chunkProvider));
         CoreRegistry.put(BlockEntityRegistry.class, entityWorldProvider);
         CoreRegistry.get(ComponentSystemManager.class).register(entityWorldProvider, "engine:BlockEntityRegistry");
