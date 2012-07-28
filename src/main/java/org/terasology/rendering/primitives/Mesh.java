@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.primitives;
 
+import com.bulletphysics.linearmath.Transform;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
@@ -37,11 +38,11 @@ import static org.lwjgl.opengl.GL11.*;
 // TODO: Store mesh information in Mesh class in a usable format, for
 public class Mesh implements Asset {
 
-    private static final int VERTEX_SIZE = 3;
-    private static final int TEX_COORD_0_SIZE = 2;
-    private static final int TEX_COORD_1_SIZE = 3;
-    private static final int COLOR_SIZE = 4;
-    private static final int NORMAL_SIZE = 3;
+    public static final int VERTEX_SIZE = 3;
+    public static final int TEX_COORD_0_SIZE = 2;
+    public static final int TEX_COORD_1_SIZE = 3;
+    public static final int COLOR_SIZE = 4;
+    public static final int NORMAL_SIZE = 3;
 
     private AssetUri uri = new AssetUri("");
     private AABB aabb;
@@ -61,6 +62,13 @@ public class Mesh implements Asset {
     private int vboVertexBuffer;
     private int vboIndexBuffer;
     private int indexCount;
+
+    private TFloatList vertices;
+    private TFloatList texCoord0;
+    private TFloatList texCoord1;
+    private TFloatList normals;
+    private TFloatList colors;
+    private TIntList indices;
 
     public static Mesh buildMesh(AssetUri uri, TFloatList vertices, TFloatList texCoord0, TFloatList texCoord1, TFloatList normals, TFloatList colors, TIntList indices) {
         Mesh mesh = buildMesh(vertices, texCoord0, texCoord1, normals, colors, indices);
@@ -87,12 +95,18 @@ public class Mesh implements Asset {
         indexBuffer.flip();
 
         Mesh mesh = new Mesh();
-        mesh.vboVertexBuffer = VertexBufferObjectManager.getInstance().getVboId();
-        mesh.vboIndexBuffer = VertexBufferObjectManager.getInstance().getVboId();
+        mesh.vertices = vertices;
+        mesh.texCoord0 = texCoord0;
+        mesh.texCoord1 = texCoord1;
+        mesh.normals = normals;
+        mesh.colors = colors;
+        mesh.indices = indices;
         mesh.indexCount = indices.size();
         mesh.aabb = calculateAABB(vertices, vertexCount);
 
+        mesh.vboVertexBuffer = VertexBufferObjectManager.getInstance().getVboId();
         VertexBufferObjectManager.getInstance().bufferVboData(mesh.vboVertexBuffer, vertexBuffer, GL15.GL_STATIC_DRAW);
+        mesh.vboIndexBuffer = VertexBufferObjectManager.getInstance().getVboId();
         VertexBufferObjectManager.getInstance().bufferVboElementData(mesh.vboIndexBuffer, indexBuffer, GL15.GL_STATIC_DRAW);
 
         mesh.stride = vertSize * 4;
@@ -185,7 +199,7 @@ public class Mesh implements Asset {
         return uri;
     }
 
-    public void render() {
+    public void preRender() {
         glEnableClientState(GL_VERTEX_ARRAY);
         if (hasTexCoord0 || hasTexCoord1) glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         if (hasColor) glEnableClientState(GL_COLOR_ARRAY);
@@ -208,9 +222,9 @@ public class Mesh implements Asset {
 
         if (hasColor) glColorPointer(COLOR_SIZE, GL11.GL_FLOAT, stride, colorOffset);
         if (hasNormal) glNormalPointer(GL11.GL_FLOAT, stride, normalOffset);
+    }
 
-        GL12.glDrawRangeElements(GL11.GL_TRIANGLES, 0, indexCount, indexCount, GL_UNSIGNED_INT, 0);
-
+    public void postRender() {
         if (hasNormal) glDisableClientState(GL_NORMAL_ARRAY);
         if (hasColor) glDisableClientState(GL_COLOR_ARRAY);
         if (hasTexCoord0 || hasTexCoord1) glDisableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -220,4 +234,47 @@ public class Mesh implements Asset {
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
+    public void doRender() {
+        GL12.glDrawRangeElements(GL11.GL_TRIANGLES, 0, indexCount, indexCount, GL_UNSIGNED_INT, 0);
+    }
+
+    public void render() {
+        preRender();
+        doRender();
+        postRender();
+    }
+
+    public int addToBatch(Transform transform, Transform normalTransform, TFloatList vertexData, TIntList indexData, int indexOffset) {
+        int uv1 = 0, uv2 = 0, n = 0, c = 0;
+        for (int v = 0; v < vertices.size(); v += 3) {
+            Vector3f vert = new Vector3f(vertices.get(v), vertices.get(v + 1), vertices.get(v + 2));
+            transform.transform(vert);
+            vertexData.add(vert.x);
+            vertexData.add(vert.y);
+            vertexData.add(vert.z);
+            for (int i = 0; i < TEX_COORD_0_SIZE; ++i) {
+                vertexData.add(texCoord0.get(uv1 + i));
+            }
+            for (int i = 0; i < TEX_COORD_1_SIZE; ++i) {
+                vertexData.add(texCoord1.get(uv2 + i));
+            }
+            Vector3f norm = new Vector3f(normals.get(n), normals.get(n + 1), normals.get(n + 2));
+            normalTransform.transform(norm);
+            vertexData.add(norm.x);
+            vertexData.add(norm.y);
+            vertexData.add(norm.z);
+            for (int i = 0; i < COLOR_SIZE; ++i) {
+                vertexData.add(colors.get(c + i));
+            }
+            uv1 += TEX_COORD_0_SIZE;
+            uv2 += TEX_COORD_1_SIZE;
+            n += NORMAL_SIZE;
+            c += COLOR_SIZE;
+        }
+        TIntIterator indexIterator = indices.iterator();
+        while (indexIterator.hasNext()) {
+            indexData.add(indexIterator.next() + indexOffset);
+        }
+        return indexOffset + vertices.size() / 3;
+    }
 }

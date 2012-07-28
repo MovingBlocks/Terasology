@@ -105,6 +105,14 @@ public class PhysicsSystem implements EventHandlerSystem, UpdateSubscriberSystem
         }
     }
 
+    @ReceiveEvent(components = {RigidBodyComponent.class})
+    public void onImpulse(ImpulseEvent event, EntityRef entity) {
+        RigidBody body = entityRigidBodies.get(entity);
+        if (body != null) {
+            body.applyCentralImpulse(event.getImpulse());
+        }
+    }
+
     @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class})
     public void removeRigidBody(RemovedComponentEvent event, EntityRef entity) {
         RigidBody body = entityRigidBodies.remove(entity);

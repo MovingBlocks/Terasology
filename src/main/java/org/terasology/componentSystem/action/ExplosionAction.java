@@ -12,6 +12,7 @@ import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.physics.ImpulseEvent;
 import org.terasology.rendering.physics.BulletPhysicsRenderer;
 import org.terasology.utilities.FastRandom;
 
@@ -75,7 +76,7 @@ public class ExplosionAction implements EventHandlerSystem {
             Vector3f direction = new Vector3f(random.randomFloat(), random.randomFloat(), random.randomFloat());
             direction.normalize();
             Vector3f impulse = new Vector3f(direction);
-            impulse.scale(80);
+            impulse.scale(300);
 
             for (int j = 0; j < 4; j++) {
                 Vector3f target = new Vector3f(origin);
@@ -98,7 +99,8 @@ public class ExplosionAction implements EventHandlerSystem {
                     EntityRef blockEntity = blockEntityRegistry.getEntityAt(blockPos);
                     blockEntity.destroy();
                     if (random.randomInt(4) == 0) {
-                        droppedBlockFactory.newInstance(target, currentBlock.getBlockFamily());
+                        EntityRef block = droppedBlockFactory.newInstance(target, currentBlock.getBlockFamily(), 5);
+                        block.send(new ImpulseEvent(impulse));
                     }
                 }
             }

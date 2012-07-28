@@ -20,6 +20,7 @@ import org.terasology.components.ItemComponent;
 import org.terasology.components.LightComponent;
 import org.terasology.components.block.BlockItemComponent;
 import org.terasology.components.rendering.MeshComponent;
+import org.terasology.components.utility.LifespanComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -43,11 +44,11 @@ public class DroppedBlockFactory {
         this.entityManager = entityManager;
     }
 
-    public EntityRef newInstance(Vector3f location, BlockFamily blockFamily) {
-        return newInstance(location, blockFamily, EntityRef.NULL);
+    public EntityRef newInstance(Vector3f location, BlockFamily blockFamily, float lifespan) {
+        return newInstance(location, blockFamily, lifespan, EntityRef.NULL);
     }
 
-    private EntityRef newInstance(Vector3f location, BlockFamily blockFamily, EntityRef placedEntity) {
+    private EntityRef newInstance(Vector3f location, BlockFamily blockFamily, float lifespan, EntityRef placedEntity) {
         if (blockFamily.getArchetypeBlock().isTranslucent()) {
             return EntityRef.NULL;
         }
@@ -61,6 +62,9 @@ public class DroppedBlockFactory {
             blockMesh.mesh = blockFamily.getArchetypeBlock().getMesh();
             blockEntity.saveComponent(blockMesh);
             blockEntity.saveComponent(blockPickup);
+            LifespanComponent lifespanComp = blockEntity.getComponent(LifespanComponent.class);
+            lifespanComp.lifespan = lifespan;
+            blockEntity.saveComponent(lifespanComp);
             return blockEntity;
         }
         return EntityRef.NULL;
