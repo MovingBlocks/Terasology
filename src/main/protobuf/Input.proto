@@ -9,17 +9,17 @@ option optimize_for = SPEED;
 message InputSetting {
     optional bool EnableMusic = 1 [default = false]; // enable / disable music
     optional bool EnableSound = 2 [default = false]; // enable / disable sound
-    optional string key_forward = 3 [default = "Z"];
+    optional string key_forward = 3 [default = "W"];
     optional string key_backward = 4 [default = "S"];
-    optional string key_left = 5 [default = "Q"];
+    optional string key_left = 5 [default = "A"];
     optional string key_right = 6 [default = "D"];
     optional string key_jump = 7 [default = "SPACE"];
     optional string key_console = 8 [default = "TAB"];
     optional string key_inventory = 9 [default = "I"];
     optional string key_crouch = 10 [default = "C"];
     optional string key_run = 11 [default = "LSHIFT"];
-    optional string key_attack = 12 [default = "MOUSELEFT"];
-    optional string key_usehelditem = 13 [default = "MOUSERIGHT"];
+    optional string key_attack = 12 [default = "MOUSERIGHT"];
+    optional string key_usehelditem = 13 [default = "MOUSELEFT"];
     optional string key_frob = 14 [default = "E"];
     optional string key_toolnext = 15 [default = "MOUSEWHEElUP"];
     optional string key_toolprev = 16 [default = "MOUSEWHEELDOWN"];

@@ -4,3292 +4,3001 @@
 package org.terasology.protobuf;
 
 public final class InputData {
-    private InputData() {
+  private InputData() {}
+  public static void registerAllExtensions(
+      com.google.protobuf.ExtensionRegistry registry) {
+  }
+  public interface InputSettingOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
+    
+    // optional bool EnableMusic = 1 [default = false];
+    boolean hasEnableMusic();
+    boolean getEnableMusic();
+    
+    // optional bool EnableSound = 2 [default = false];
+    boolean hasEnableSound();
+    boolean getEnableSound();
+    
+    // optional string key_forward = 3 [default = "W"];
+    boolean hasKeyForward();
+    String getKeyForward();
+    
+    // optional string key_backward = 4 [default = "S"];
+    boolean hasKeyBackward();
+    String getKeyBackward();
+    
+    // optional string key_left = 5 [default = "A"];
+    boolean hasKeyLeft();
+    String getKeyLeft();
+    
+    // optional string key_right = 6 [default = "D"];
+    boolean hasKeyRight();
+    String getKeyRight();
+    
+    // optional string key_jump = 7 [default = "SPACE"];
+    boolean hasKeyJump();
+    String getKeyJump();
+    
+    // optional string key_console = 8 [default = "TAB"];
+    boolean hasKeyConsole();
+    String getKeyConsole();
+    
+    // optional string key_inventory = 9 [default = "I"];
+    boolean hasKeyInventory();
+    String getKeyInventory();
+    
+    // optional string key_crouch = 10 [default = "C"];
+    boolean hasKeyCrouch();
+    String getKeyCrouch();
+    
+    // optional string key_run = 11 [default = "LSHIFT"];
+    boolean hasKeyRun();
+    String getKeyRun();
+    
+    // optional string key_attack = 12 [default = "MOUSERIGHT"];
+    boolean hasKeyAttack();
+    String getKeyAttack();
+    
+    // optional string key_usehelditem = 13 [default = "MOUSELEFT"];
+    boolean hasKeyUsehelditem();
+    String getKeyUsehelditem();
+    
+    // optional string key_frob = 14 [default = "E"];
+    boolean hasKeyFrob();
+    String getKeyFrob();
+    
+    // optional string key_toolnext = 15 [default = "MOUSEWHEElUP"];
+    boolean hasKeyToolnext();
+    String getKeyToolnext();
+    
+    // optional string key_toolprev = 16 [default = "MOUSEWHEELDOWN"];
+    boolean hasKeyToolprev();
+    String getKeyToolprev();
+    
+    // optional string key_toolslot1 = 17 [default = "1"];
+    boolean hasKeyToolslot1();
+    String getKeyToolslot1();
+    
+    // optional string key_toolslot2 = 18 [default = "2"];
+    boolean hasKeyToolslot2();
+    String getKeyToolslot2();
+    
+    // optional string key_toolslot3 = 19 [default = "3"];
+    boolean hasKeyToolslot3();
+    String getKeyToolslot3();
+    
+    // optional string key_toolslot4 = 20 [default = "4"];
+    boolean hasKeyToolslot4();
+    String getKeyToolslot4();
+    
+    // optional string key_toolslot5 = 21 [default = "5"];
+    boolean hasKeyToolslot5();
+    String getKeyToolslot5();
+    
+    // optional string key_toolslot6 = 22 [default = "6"];
+    boolean hasKeyToolslot6();
+    String getKeyToolslot6();
+    
+    // optional string key_toolslot7 = 23 [default = "7"];
+    boolean hasKeyToolslot7();
+    String getKeyToolslot7();
+    
+    // optional string key_toolslot8 = 24 [default = "8"];
+    boolean hasKeyToolslot8();
+    String getKeyToolslot8();
+    
+    // optional string key_toolslot9 = 25 [default = "9"];
+    boolean hasKeyToolslot9();
+    String getKeyToolslot9();
+    
+    // optional string key_minionmode = 26 [default = "X"];
+    boolean hasKeyMinionmode();
+    String getKeyMinionmode();
+    
+    // optional string key_hidegui = 27 [default = "H"];
+    boolean hasKeyHidegui();
+    String getKeyHidegui();
+    
+    // optional string key_pauze = 28 [default = "ESCAPE"];
+    boolean hasKeyPauze();
+    String getKeyPauze();
+    
+    // optional string jumpbehaviour = 29 [default = "NORMAL"];
+    boolean hasJumpbehaviour();
+    String getJumpbehaviour();
+  }
+  public static final class InputSetting extends
+      com.google.protobuf.GeneratedMessage
+      implements InputSettingOrBuilder {
+    // Use InputSetting.newBuilder() to construct.
+    private InputSetting(Builder builder) {
+      super(builder);
     }
-
-    public static void registerAllExtensions(
-            com.google.protobuf.ExtensionRegistry registry) {
+    private InputSetting(boolean noInit) {}
+    
+    private static final InputSetting defaultInstance;
+    public static InputSetting getDefaultInstance() {
+      return defaultInstance;
     }
-
-    public interface InputSettingOrBuilder
-            extends com.google.protobuf.MessageOrBuilder {
-
-        // optional bool EnableMusic = 1 [default = false];
-        boolean hasEnableMusic();
-
-        boolean getEnableMusic();
-
-        // optional bool EnableSound = 2 [default = false];
-        boolean hasEnableSound();
-
-        boolean getEnableSound();
-
-        // optional string key_forward = 3 [default = "Z"];
-        boolean hasKeyForward();
-
-        String getKeyForward();
-
-        // optional string key_backward = 4 [default = "S"];
-        boolean hasKeyBackward();
-
-        String getKeyBackward();
-
-        // optional string key_left = 5 [default = "Q"];
-        boolean hasKeyLeft();
-
-        String getKeyLeft();
-
-        // optional string key_right = 6 [default = "D"];
-        boolean hasKeyRight();
-
-        String getKeyRight();
-
-        // optional string key_jump = 7 [default = "SPACE"];
-        boolean hasKeyJump();
-
-        String getKeyJump();
-
-        // optional string key_console = 8 [default = "TAB"];
-        boolean hasKeyConsole();
-
-        String getKeyConsole();
-
-        // optional string key_inventory = 9 [default = "I"];
-        boolean hasKeyInventory();
-
-        String getKeyInventory();
-
-        // optional string key_crouch = 10 [default = "C"];
-        boolean hasKeyCrouch();
-
-        String getKeyCrouch();
-
-        // optional string key_run = 11 [default = "LSHIFT"];
-        boolean hasKeyRun();
-
-        String getKeyRun();
-
-        // optional string key_attack = 12 [default = "MOUSELEFT"];
-        boolean hasKeyAttack();
-
-        String getKeyAttack();
-
-        // optional string key_usehelditem = 13 [default = "MOUSERIGHT"];
-        boolean hasKeyUsehelditem();
-
-        String getKeyUsehelditem();
-
-        // optional string key_frob = 14 [default = "E"];
-        boolean hasKeyFrob();
-
-        String getKeyFrob();
-
-        // optional string key_toolnext = 15 [default = "MOUSEWHEElUP"];
-        boolean hasKeyToolnext();
-
-        String getKeyToolnext();
-
-        // optional string key_toolprev = 16 [default = "MOUSEWHEELDOWN"];
-        boolean hasKeyToolprev();
-
-        String getKeyToolprev();
-
-        // optional string key_toolslot1 = 17 [default = "1"];
-        boolean hasKeyToolslot1();
-
-        String getKeyToolslot1();
-
-        // optional string key_toolslot2 = 18 [default = "2"];
-        boolean hasKeyToolslot2();
-
-        String getKeyToolslot2();
-
-        // optional string key_toolslot3 = 19 [default = "3"];
-        boolean hasKeyToolslot3();
-
-        String getKeyToolslot3();
-
-        // optional string key_toolslot4 = 20 [default = "4"];
-        boolean hasKeyToolslot4();
-
-        String getKeyToolslot4();
-
-        // optional string key_toolslot5 = 21 [default = "5"];
-        boolean hasKeyToolslot5();
-
-        String getKeyToolslot5();
-
-        // optional string key_toolslot6 = 22 [default = "6"];
-        boolean hasKeyToolslot6();
-
-        String getKeyToolslot6();
-
-        // optional string key_toolslot7 = 23 [default = "7"];
-        boolean hasKeyToolslot7();
-
-        String getKeyToolslot7();
-
-        // optional string key_toolslot8 = 24 [default = "8"];
-        boolean hasKeyToolslot8();
-
-        String getKeyToolslot8();
-
-        // optional string key_toolslot9 = 25 [default = "9"];
-        boolean hasKeyToolslot9();
-
-        String getKeyToolslot9();
-
-        // optional string key_minionmode = 26 [default = "X"];
-        boolean hasKeyMinionmode();
-
-        String getKeyMinionmode();
-
-        // optional string key_hidegui = 27 [default = "H"];
-        boolean hasKeyHidegui();
-
-        String getKeyHidegui();
-
-        // optional string key_pauze = 28 [default = "ESCAPE"];
-        boolean hasKeyPauze();
-
-        String getKeyPauze();
-
-        // optional string jumpbehaviour = 29 [default = "NORMAL"];
-        boolean hasJumpbehaviour();
-
-        String getJumpbehaviour();
+    
+    public InputSetting getDefaultInstanceForType() {
+      return defaultInstance;
     }
-
-    public static final class InputSetting extends
-            com.google.protobuf.GeneratedMessage
-            implements InputSettingOrBuilder {
-        // Use InputSetting.newBuilder() to construct.
-        private InputSetting(Builder builder) {
-            super(builder);
-        }
-
-        private InputSetting(boolean noInit) {
-        }
-
-        private static final InputSetting defaultInstance;
-
-        public static InputSetting getDefaultInstance() {
-            return defaultInstance;
-        }
-
-        public InputSetting getDefaultInstanceForType() {
-            return defaultInstance;
-        }
-
-        public static final com.google.protobuf.Descriptors.Descriptor
+    
+    public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-            return org.terasology.protobuf.InputData.internal_static_InputSetting_descriptor;
-        }
-
-        protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      return org.terasology.protobuf.InputData.internal_static_InputSetting_descriptor;
+    }
+    
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-            return org.terasology.protobuf.InputData.internal_static_InputSetting_fieldAccessorTable;
-        }
-
-        private int bitField0_;
-        // optional bool EnableMusic = 1 [default = false];
-        public static final int ENABLEMUSIC_FIELD_NUMBER = 1;
-        private boolean enableMusic_;
-
-        public boolean hasEnableMusic() {
-            return ((bitField0_ & 0x00000001) == 0x00000001);
-        }
-
-        public boolean getEnableMusic() {
-            return enableMusic_;
-        }
-
-        // optional bool EnableSound = 2 [default = false];
-        public static final int ENABLESOUND_FIELD_NUMBER = 2;
-        private boolean enableSound_;
-
-        public boolean hasEnableSound() {
-            return ((bitField0_ & 0x00000002) == 0x00000002);
-        }
-
-        public boolean getEnableSound() {
-            return enableSound_;
-        }
-
-        // optional string key_forward = 3 [default = "Z"];
-        public static final int KEY_FORWARD_FIELD_NUMBER = 3;
-        private java.lang.Object keyForward_;
-
-        public boolean hasKeyForward() {
-            return ((bitField0_ & 0x00000004) == 0x00000004);
-        }
-
-        public String getKeyForward() {
-            java.lang.Object ref = keyForward_;
-            if (ref instanceof String) {
-                return (String) ref;
-            } else {
-                com.google.protobuf.ByteString bs =
-                        (com.google.protobuf.ByteString) ref;
-                String s = bs.toStringUtf8();
-                if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-                    keyForward_ = s;
-                }
-                return s;
-            }
-        }
-
-        private com.google.protobuf.ByteString getKeyForwardBytes() {
-            java.lang.Object ref = keyForward_;
-            if (ref instanceof String) {
-                com.google.protobuf.ByteString b =
-                        com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-                keyForward_ = b;
-                return b;
-            } else {
-                return (com.google.protobuf.ByteString) ref;
-            }
-        }
-
-        // optional string key_backward = 4 [default = "S"];
-        public static final int KEY_BACKWARD_FIELD_NUMBER = 4;
-        private java.lang.Object keyBackward_;
-
-        public boolean hasKeyBackward() {
-            return ((bitField0_ & 0x00000008) == 0x00000008);
-        }
-
-        public String getKeyBackward() {
-            java.lang.Object ref = keyBackward_;
-            if (ref instanceof String) {
-                return (String) ref;
-            } else {
-                com.google.protobuf.ByteString bs =
-                        (com.google.protobuf.ByteString) ref;
-                String s = bs.toStringUtf8();
-                if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-                    keyBackward_ = s;
-                }
-                return s;
-            }
-        }
-
-        private com.google.protobuf.ByteString getKeyBackwardBytes() {
-            java.lang.Object ref = keyBackward_;
-            if (ref instanceof String) {
-                com.google.protobuf.ByteString b =
-                        com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-                keyBackward_ = b;
-                return b;
-            } else {
-                return (com.google.protobuf.ByteString) ref;
-            }
-        }
-
-        // optional string key_left = 5 [default = "Q"];
-        public static final int KEY_LEFT_FIELD_NUMBER = 5;
-        private java.lang.Object keyLeft_;
-
-        public boolean hasKeyLeft() {
-            return ((bitField0_ & 0x00000010) == 0x00000010);
-        }
-
-        public String getKeyLeft() {
-            java.lang.Object ref = keyLeft_;
-            if (ref instanceof String) {
-                return (String) ref;
-            } else {
-                com.google.protobuf.ByteString bs =
-                        (com.google.protobuf.ByteString) ref;
-                String s = bs.toStringUtf8();
-                if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-                    keyLeft_ = s;
-                }
-                return s;
-            }
-        }
-
-        private com.google.protobuf.ByteString getKeyLeftBytes() {
-            java.lang.Object ref = keyLeft_;
-            if (ref instanceof String) {
-                com.google.protobuf.ByteString b =
-                        com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-                keyLeft_ = b;
-                return b;
-            } else {
-                return (com.google.protobuf.ByteString) ref;
-            }
-        }
-
-        // optional string key_right = 6 [default = "D"];
-        public static final int KEY_RIGHT_FIELD_NUMBER = 6;
-        private java.lang.Object keyRight_;
-
-        public boolean hasKeyRight() {
-            return ((bitField0_ & 0x00000020) == 0x00000020);
-        }
-
-        public String getKeyRight() {
-            java.lang.Object ref = keyRight_;
-            if (ref instanceof String) {
-                return (String) ref;
-            } else {
-                com.google.protobuf.ByteString bs =
-                        (com.google.protobuf.ByteString) ref;
-                String s = bs.toStringUtf8();
-                if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-                    keyRight_ = s;
-                }
-                return s;
-            }
-        }
-
-        private com.google.protobuf.ByteString getKeyRightBytes() {
-            java.lang.Object ref = keyRight_;
-            if (ref instanceof String) {
-                com.google.protobuf.ByteString b =
-                        com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-                keyRight_ = b;
-                return b;
-            } else {
-                return (com.google.protobuf.ByteString) ref;
-            }
-        }
-
-        // optional string key_jump = 7 [default = "SPACE"];
-        public static final int KEY_JUMP_FIELD_NUMBER = 7;
-        private java.lang.Object keyJump_;
-
-        public boolean hasKeyJump() {
-            return ((bitField0_ & 0x00000040) == 0x00000040);
-        }
-
-        public String getKeyJump() {
-            java.lang.Object ref = keyJump_;
-            if (ref instanceof String) {
-                return (String) ref;
-            } else {
-                com.google.protobuf.ByteString bs =
-                        (com.google.protobuf.ByteString) ref;
-                String s = bs.toStringUtf8();
-                if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-                    keyJump_ = s;
-                }
-                return s;
-            }
-        }
-
-        private com.google.protobuf.ByteString getKeyJumpBytes() {
-            java.lang.Object ref = keyJump_;
-            if (ref instanceof String) {
-                com.google.protobuf.ByteString b =
-                        com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-                keyJump_ = b;
-                return b;
-            } else {
-                return (com.google.protobuf.ByteString) ref;
-            }
-        }
-
-        // optional string key_console = 8 [default = "TAB"];
-        public static final int KEY_CONSOLE_FIELD_NUMBER = 8;
-        private java.lang.Object keyConsole_;
-
-        public boolean hasKeyConsole() {
-            return ((bitField0_ & 0x00000080) == 0x00000080);
-        }
-
-        public String getKeyConsole() {
-            java.lang.Object ref = keyConsole_;
-            if (ref instanceof String) {
-                return (String) ref;
-            } else {
-                com.google.protobuf.ByteString bs =
-                        (com.google.protobuf.ByteString) ref;
-                String s = bs.toStringUtf8();
-                if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-                    keyConsole_ = s;
-                }
-                return s;
-            }
-        }
-
-        private com.google.protobuf.ByteString getKeyConsoleBytes() {
-            java.lang.Object ref = keyConsole_;
-            if (ref instanceof String) {
-                com.google.protobuf.ByteString b =
-                        com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-                keyConsole_ = b;
-                return b;
-            } else {
-                return (com.google.protobuf.ByteString) ref;
-            }
-        }
-
-        // optional string key_inventory = 9 [default = "I"];
-        public static final int KEY_INVENTORY_FIELD_NUMBER = 9;
-        private java.lang.Object keyInventory_;
-
-        public boolean hasKeyInventory() {
-            return ((bitField0_ & 0x00000100) == 0x00000100);
-        }
-
-        public String getKeyInventory() {
-            java.lang.Object ref = keyInventory_;
-            if (ref instanceof String) {
-                return (String) ref;
-            } else {
-                com.google.protobuf.ByteString bs =
-                        (com.google.protobuf.ByteString) ref;
-                String s = bs.toStringUtf8();
-                if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-                    keyInventory_ = s;
-                }
-                return s;
-            }
-        }
-
-        private com.google.protobuf.ByteString getKeyInventoryBytes() {
-            java.lang.Object ref = keyInventory_;
-            if (ref instanceof String) {
-                com.google.protobuf.ByteString b =
-                        com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-                keyInventory_ = b;
-                return b;
-            } else {
-                return (com.google.protobuf.ByteString) ref;
-            }
-        }
-
-        // optional string key_crouch = 10 [default = "C"];
-        public static final int KEY_CROUCH_FIELD_NUMBER = 10;
-        private java.lang.Object keyCrouch_;
-
-        public boolean hasKeyCrouch() {
-            return ((bitField0_ & 0x00000200) == 0x00000200);
-        }
-
-        public String getKeyCrouch() {
-            java.lang.Object ref = keyCrouch_;
-            if (ref instanceof String) {
-                return (String) ref;
-            } else {
-                com.google.protobuf.ByteString bs =
-                        (com.google.protobuf.ByteString) ref;
-                String s = bs.toStringUtf8();
-                if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-                    keyCrouch_ = s;
-                }
-                return s;
-            }
-        }
-
-        private com.google.protobuf.ByteString getKeyCrouchBytes() {
-            java.lang.Object ref = keyCrouch_;
-            if (ref instanceof String) {
-                com.google.protobuf.ByteString b =
-                        com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-                keyCrouch_ = b;
-                return b;
-            } else {
-                return (com.google.protobuf.ByteString) ref;
-            }
-        }
-
-        // optional string key_run = 11 [default = "LSHIFT"];
-        public static final int KEY_RUN_FIELD_NUMBER = 11;
-        private java.lang.Object keyRun_;
-
-        public boolean hasKeyRun() {
-            return ((bitField0_ & 0x00000400) == 0x00000400);
-        }
-
-        public String getKeyRun() {
-            java.lang.Object ref = keyRun_;
-            if (ref instanceof String) {
-                return (String) ref;
-            } else {
-                com.google.protobuf.ByteString bs =
-                        (com.google.protobuf.ByteString) ref;
-                String s = bs.toStringUtf8();
-                if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-                    keyRun_ = s;
-                }
-                return s;
-            }
-        }
-
-        private com.google.protobuf.ByteString getKeyRunBytes() {
-            java.lang.Object ref = keyRun_;
-            if (ref instanceof String) {
-                com.google.protobuf.ByteString b =
-                        com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-                keyRun_ = b;
-                return b;
-            } else {
-                return (com.google.protobuf.ByteString) ref;
-            }
-        }
-
-        // optional string key_attack = 12 [default = "MOUSELEFT"];
-        public static final int KEY_ATTACK_FIELD_NUMBER = 12;
-        private java.lang.Object keyAttack_;
-
-        public boolean hasKeyAttack() {
-            return ((bitField0_ & 0x00000800) == 0x00000800);
-        }
-
-        public String getKeyAttack() {
-            java.lang.Object ref = keyAttack_;
-            if (ref instanceof String) {
-                return (String) ref;
-            } else {
-                com.google.protobuf.ByteString bs =
-                        (com.google.protobuf.ByteString) ref;
-                String s = bs.toStringUtf8();
-                if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-                    keyAttack_ = s;
-                }
-                return s;
-            }
-        }
-
-        private com.google.protobuf.ByteString getKeyAttackBytes() {
-            java.lang.Object ref = keyAttack_;
-            if (ref instanceof String) {
-                com.google.protobuf.ByteString b =
-                        com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-                keyAttack_ = b;
-                return b;
-            } else {
-                return (com.google.protobuf.ByteString) ref;
-            }
-        }
-
-        // optional string key_usehelditem = 13 [default = "MOUSERIGHT"];
-        public static final int KEY_USEHELDITEM_FIELD_NUMBER = 13;
-        private java.lang.Object keyUsehelditem_;
-
-        public boolean hasKeyUsehelditem() {
-            return ((bitField0_ & 0x00001000) == 0x00001000);
-        }
-
-        public String getKeyUsehelditem() {
-            java.lang.Object ref = keyUsehelditem_;
-            if (ref instanceof String) {
-                return (String) ref;
-            } else {
-                com.google.protobuf.ByteString bs =
-                        (com.google.protobuf.ByteString) ref;
-                String s = bs.toStringUtf8();
-                if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-                    keyUsehelditem_ = s;
-                }
-                return s;
-            }
-        }
-
-        private com.google.protobuf.ByteString getKeyUsehelditemBytes() {
-            java.lang.Object ref = keyUsehelditem_;
-            if (ref instanceof String) {
-                com.google.protobuf.ByteString b =
-                        com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-                keyUsehelditem_ = b;
-                return b;
-            } else {
-                return (com.google.protobuf.ByteString) ref;
-            }
-        }
-
-        // optional string key_frob = 14 [default = "E"];
-        public static final int KEY_FROB_FIELD_NUMBER = 14;
-        private java.lang.Object keyFrob_;
-
-        public boolean hasKeyFrob() {
-            return ((bitField0_ & 0x00002000) == 0x00002000);
-        }
-
-        public String getKeyFrob() {
-            java.lang.Object ref = keyFrob_;
-            if (ref instanceof String) {
-                return (String) ref;
-            } else {
-                com.google.protobuf.ByteString bs =
-                        (com.google.protobuf.ByteString) ref;
-                String s = bs.toStringUtf8();
-                if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-                    keyFrob_ = s;
-                }
-                return s;
-            }
-        }
-
-        private com.google.protobuf.ByteString getKeyFrobBytes() {
-            java.lang.Object ref = keyFrob_;
-            if (ref instanceof String) {
-                com.google.protobuf.ByteString b =
-                        com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-                keyFrob_ = b;
-                return b;
-            } else {
-                return (com.google.protobuf.ByteString) ref;
-            }
-        }
-
-        // optional string key_toolnext = 15 [default = "MOUSEWHEElUP"];
-        public static final int KEY_TOOLNEXT_FIELD_NUMBER = 15;
-        private java.lang.Object keyToolnext_;
-
-        public boolean hasKeyToolnext() {
-            return ((bitField0_ & 0x00004000) == 0x00004000);
-        }
-
-        public String getKeyToolnext() {
-            java.lang.Object ref = keyToolnext_;
-            if (ref instanceof String) {
-                return (String) ref;
-            } else {
-                com.google.protobuf.ByteString bs =
-                        (com.google.protobuf.ByteString) ref;
-                String s = bs.toStringUtf8();
-                if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-                    keyToolnext_ = s;
-                }
-                return s;
-            }
-        }
-
-        private com.google.protobuf.ByteString getKeyToolnextBytes() {
-            java.lang.Object ref = keyToolnext_;
-            if (ref instanceof String) {
-                com.google.protobuf.ByteString b =
-                        com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-                keyToolnext_ = b;
-                return b;
-            } else {
-                return (com.google.protobuf.ByteString) ref;
-            }
-        }
-
-        // optional string key_toolprev = 16 [default = "MOUSEWHEELDOWN"];
-        public static final int KEY_TOOLPREV_FIELD_NUMBER = 16;
-        private java.lang.Object keyToolprev_;
-
-        public boolean hasKeyToolprev() {
-            return ((bitField0_ & 0x00008000) == 0x00008000);
-        }
-
-        public String getKeyToolprev() {
-            java.lang.Object ref = keyToolprev_;
-            if (ref instanceof String) {
-                return (String) ref;
-            } else {
-                com.google.protobuf.ByteString bs =
-                        (com.google.protobuf.ByteString) ref;
-                String s = bs.toStringUtf8();
-                if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-                    keyToolprev_ = s;
-                }
-                return s;
-            }
-        }
-
-        private com.google.protobuf.ByteString getKeyToolprevBytes() {
-            java.lang.Object ref = keyToolprev_;
-            if (ref instanceof String) {
-                com.google.protobuf.ByteString b =
-                        com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-                keyToolprev_ = b;
-                return b;
-            } else {
-                return (com.google.protobuf.ByteString) ref;
-            }
-        }
-
-        // optional string key_toolslot1 = 17 [default = "1"];
-        public static final int KEY_TOOLSLOT1_FIELD_NUMBER = 17;
-        private java.lang.Object keyToolslot1_;
-
-        public boolean hasKeyToolslot1() {
-            return ((bitField0_ & 0x00010000) == 0x00010000);
-        }
-
-        public String getKeyToolslot1() {
-            java.lang.Object ref = keyToolslot1_;
-            if (ref instanceof String) {
-                return (String) ref;
-            } else {
-                com.google.protobuf.ByteString bs =
-                        (com.google.protobuf.ByteString) ref;
-                String s = bs.toStringUtf8();
-                if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-                    keyToolslot1_ = s;
-                }
-                return s;
-            }
-        }
-
-        private com.google.protobuf.ByteString getKeyToolslot1Bytes() {
-            java.lang.Object ref = keyToolslot1_;
-            if (ref instanceof String) {
-                com.google.protobuf.ByteString b =
-                        com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-                keyToolslot1_ = b;
-                return b;
-            } else {
-                return (com.google.protobuf.ByteString) ref;
-            }
-        }
-
-        // optional string key_toolslot2 = 18 [default = "2"];
-        public static final int KEY_TOOLSLOT2_FIELD_NUMBER = 18;
-        private java.lang.Object keyToolslot2_;
-
-        public boolean hasKeyToolslot2() {
-            return ((bitField0_ & 0x00020000) == 0x00020000);
-        }
-
-        public String getKeyToolslot2() {
-            java.lang.Object ref = keyToolslot2_;
-            if (ref instanceof String) {
-                return (String) ref;
-            } else {
-                com.google.protobuf.ByteString bs =
-                        (com.google.protobuf.ByteString) ref;
-                String s = bs.toStringUtf8();
-                if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-                    keyToolslot2_ = s;
-                }
-                return s;
-            }
-        }
-
-        private com.google.protobuf.ByteString getKeyToolslot2Bytes() {
-            java.lang.Object ref = keyToolslot2_;
-            if (ref instanceof String) {
-                com.google.protobuf.ByteString b =
-                        com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-                keyToolslot2_ = b;
-                return b;
-            } else {
-                return (com.google.protobuf.ByteString) ref;
-            }
-        }
-
-        // optional string key_toolslot3 = 19 [default = "3"];
-        public static final int KEY_TOOLSLOT3_FIELD_NUMBER = 19;
-        private java.lang.Object keyToolslot3_;
-
-        public boolean hasKeyToolslot3() {
-            return ((bitField0_ & 0x00040000) == 0x00040000);
-        }
-
-        public String getKeyToolslot3() {
-            java.lang.Object ref = keyToolslot3_;
-            if (ref instanceof String) {
-                return (String) ref;
-            } else {
-                com.google.protobuf.ByteString bs =
-                        (com.google.protobuf.ByteString) ref;
-                String s = bs.toStringUtf8();
-                if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-                    keyToolslot3_ = s;
-                }
-                return s;
-            }
-        }
-
-        private com.google.protobuf.ByteString getKeyToolslot3Bytes() {
-            java.lang.Object ref = keyToolslot3_;
-            if (ref instanceof String) {
-                com.google.protobuf.ByteString b =
-                        com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-                keyToolslot3_ = b;
-                return b;
-            } else {
-                return (com.google.protobuf.ByteString) ref;
-            }
-        }
-
-        // optional string key_toolslot4 = 20 [default = "4"];
-        public static final int KEY_TOOLSLOT4_FIELD_NUMBER = 20;
-        private java.lang.Object keyToolslot4_;
-
-        public boolean hasKeyToolslot4() {
-            return ((bitField0_ & 0x00080000) == 0x00080000);
-        }
-
-        public String getKeyToolslot4() {
-            java.lang.Object ref = keyToolslot4_;
-            if (ref instanceof String) {
-                return (String) ref;
-            } else {
-                com.google.protobuf.ByteString bs =
-                        (com.google.protobuf.ByteString) ref;
-                String s = bs.toStringUtf8();
-                if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-                    keyToolslot4_ = s;
-                }
-                return s;
-            }
-        }
-
-        private com.google.protobuf.ByteString getKeyToolslot4Bytes() {
-            java.lang.Object ref = keyToolslot4_;
-            if (ref instanceof String) {
-                com.google.protobuf.ByteString b =
-                        com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-                keyToolslot4_ = b;
-                return b;
-            } else {
-                return (com.google.protobuf.ByteString) ref;
-            }
-        }
-
-        // optional string key_toolslot5 = 21 [default = "5"];
-        public static final int KEY_TOOLSLOT5_FIELD_NUMBER = 21;
-        private java.lang.Object keyToolslot5_;
-
-        public boolean hasKeyToolslot5() {
-            return ((bitField0_ & 0x00100000) == 0x00100000);
-        }
-
-        public String getKeyToolslot5() {
-            java.lang.Object ref = keyToolslot5_;
-            if (ref instanceof String) {
-                return (String) ref;
-            } else {
-                com.google.protobuf.ByteString bs =
-                        (com.google.protobuf.ByteString) ref;
-                String s = bs.toStringUtf8();
-                if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-                    keyToolslot5_ = s;
-                }
-                return s;
-            }
-        }
-
-        private com.google.protobuf.ByteString getKeyToolslot5Bytes() {
-            java.lang.Object ref = keyToolslot5_;
-            if (ref instanceof String) {
-                com.google.protobuf.ByteString b =
-                        com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-                keyToolslot5_ = b;
-                return b;
-            } else {
-                return (com.google.protobuf.ByteString) ref;
-            }
-        }
-
-        // optional string key_toolslot6 = 22 [default = "6"];
-        public static final int KEY_TOOLSLOT6_FIELD_NUMBER = 22;
-        private java.lang.Object keyToolslot6_;
-
-        public boolean hasKeyToolslot6() {
-            return ((bitField0_ & 0x00200000) == 0x00200000);
-        }
-
-        public String getKeyToolslot6() {
-            java.lang.Object ref = keyToolslot6_;
-            if (ref instanceof String) {
-                return (String) ref;
-            } else {
-                com.google.protobuf.ByteString bs =
-                        (com.google.protobuf.ByteString) ref;
-                String s = bs.toStringUtf8();
-                if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-                    keyToolslot6_ = s;
-                }
-                return s;
-            }
-        }
-
-        private com.google.protobuf.ByteString getKeyToolslot6Bytes() {
-            java.lang.Object ref = keyToolslot6_;
-            if (ref instanceof String) {
-                com.google.protobuf.ByteString b =
-                        com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-                keyToolslot6_ = b;
-                return b;
-            } else {
-                return (com.google.protobuf.ByteString) ref;
-            }
-        }
-
-        // optional string key_toolslot7 = 23 [default = "7"];
-        public static final int KEY_TOOLSLOT7_FIELD_NUMBER = 23;
-        private java.lang.Object keyToolslot7_;
-
-        public boolean hasKeyToolslot7() {
-            return ((bitField0_ & 0x00400000) == 0x00400000);
-        }
-
-        public String getKeyToolslot7() {
-            java.lang.Object ref = keyToolslot7_;
-            if (ref instanceof String) {
-                return (String) ref;
-            } else {
-                com.google.protobuf.ByteString bs =
-                        (com.google.protobuf.ByteString) ref;
-                String s = bs.toStringUtf8();
-                if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-                    keyToolslot7_ = s;
-                }
-                return s;
-            }
-        }
-
-        private com.google.protobuf.ByteString getKeyToolslot7Bytes() {
-            java.lang.Object ref = keyToolslot7_;
-            if (ref instanceof String) {
-                com.google.protobuf.ByteString b =
-                        com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-                keyToolslot7_ = b;
-                return b;
-            } else {
-                return (com.google.protobuf.ByteString) ref;
-            }
-        }
-
-        // optional string key_toolslot8 = 24 [default = "8"];
-        public static final int KEY_TOOLSLOT8_FIELD_NUMBER = 24;
-        private java.lang.Object keyToolslot8_;
-
-        public boolean hasKeyToolslot8() {
-            return ((bitField0_ & 0x00800000) == 0x00800000);
-        }
-
-        public String getKeyToolslot8() {
-            java.lang.Object ref = keyToolslot8_;
-            if (ref instanceof String) {
-                return (String) ref;
-            } else {
-                com.google.protobuf.ByteString bs =
-                        (com.google.protobuf.ByteString) ref;
-                String s = bs.toStringUtf8();
-                if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-                    keyToolslot8_ = s;
-                }
-                return s;
-            }
-        }
-
-        private com.google.protobuf.ByteString getKeyToolslot8Bytes() {
-            java.lang.Object ref = keyToolslot8_;
-            if (ref instanceof String) {
-                com.google.protobuf.ByteString b =
-                        com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-                keyToolslot8_ = b;
-                return b;
-            } else {
-                return (com.google.protobuf.ByteString) ref;
-            }
-        }
-
-        // optional string key_toolslot9 = 25 [default = "9"];
-        public static final int KEY_TOOLSLOT9_FIELD_NUMBER = 25;
-        private java.lang.Object keyToolslot9_;
-
-        public boolean hasKeyToolslot9() {
-            return ((bitField0_ & 0x01000000) == 0x01000000);
-        }
-
-        public String getKeyToolslot9() {
-            java.lang.Object ref = keyToolslot9_;
-            if (ref instanceof String) {
-                return (String) ref;
-            } else {
-                com.google.protobuf.ByteString bs =
-                        (com.google.protobuf.ByteString) ref;
-                String s = bs.toStringUtf8();
-                if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-                    keyToolslot9_ = s;
-                }
-                return s;
-            }
-        }
-
-        private com.google.protobuf.ByteString getKeyToolslot9Bytes() {
-            java.lang.Object ref = keyToolslot9_;
-            if (ref instanceof String) {
-                com.google.protobuf.ByteString b =
-                        com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-                keyToolslot9_ = b;
-                return b;
-            } else {
-                return (com.google.protobuf.ByteString) ref;
-            }
-        }
-
-        // optional string key_minionmode = 26 [default = "X"];
-        public static final int KEY_MINIONMODE_FIELD_NUMBER = 26;
-        private java.lang.Object keyMinionmode_;
-
-        public boolean hasKeyMinionmode() {
-            return ((bitField0_ & 0x02000000) == 0x02000000);
-        }
-
-        public String getKeyMinionmode() {
-            java.lang.Object ref = keyMinionmode_;
-            if (ref instanceof String) {
-                return (String) ref;
-            } else {
-                com.google.protobuf.ByteString bs =
-                        (com.google.protobuf.ByteString) ref;
-                String s = bs.toStringUtf8();
-                if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-                    keyMinionmode_ = s;
-                }
-                return s;
-            }
-        }
-
-        private com.google.protobuf.ByteString getKeyMinionmodeBytes() {
-            java.lang.Object ref = keyMinionmode_;
-            if (ref instanceof String) {
-                com.google.protobuf.ByteString b =
-                        com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-                keyMinionmode_ = b;
-                return b;
-            } else {
-                return (com.google.protobuf.ByteString) ref;
-            }
-        }
-
-        // optional string key_hidegui = 27 [default = "H"];
-        public static final int KEY_HIDEGUI_FIELD_NUMBER = 27;
-        private java.lang.Object keyHidegui_;
-
-        public boolean hasKeyHidegui() {
-            return ((bitField0_ & 0x04000000) == 0x04000000);
-        }
-
-        public String getKeyHidegui() {
-            java.lang.Object ref = keyHidegui_;
-            if (ref instanceof String) {
-                return (String) ref;
-            } else {
-                com.google.protobuf.ByteString bs =
-                        (com.google.protobuf.ByteString) ref;
-                String s = bs.toStringUtf8();
-                if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-                    keyHidegui_ = s;
-                }
-                return s;
-            }
-        }
-
-        private com.google.protobuf.ByteString getKeyHideguiBytes() {
-            java.lang.Object ref = keyHidegui_;
-            if (ref instanceof String) {
-                com.google.protobuf.ByteString b =
-                        com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-                keyHidegui_ = b;
-                return b;
-            } else {
-                return (com.google.protobuf.ByteString) ref;
-            }
-        }
-
-        // optional string key_pauze = 28 [default = "ESCAPE"];
-        public static final int KEY_PAUZE_FIELD_NUMBER = 28;
-        private java.lang.Object keyPauze_;
-
-        public boolean hasKeyPauze() {
-            return ((bitField0_ & 0x08000000) == 0x08000000);
-        }
-
-        public String getKeyPauze() {
-            java.lang.Object ref = keyPauze_;
-            if (ref instanceof String) {
-                return (String) ref;
-            } else {
-                com.google.protobuf.ByteString bs =
-                        (com.google.protobuf.ByteString) ref;
-                String s = bs.toStringUtf8();
-                if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-                    keyPauze_ = s;
-                }
-                return s;
-            }
-        }
-
-        private com.google.protobuf.ByteString getKeyPauzeBytes() {
-            java.lang.Object ref = keyPauze_;
-            if (ref instanceof String) {
-                com.google.protobuf.ByteString b =
-                        com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-                keyPauze_ = b;
-                return b;
-            } else {
-                return (com.google.protobuf.ByteString) ref;
-            }
-        }
-
-        // optional string jumpbehaviour = 29 [default = "NORMAL"];
-        public static final int JUMPBEHAVIOUR_FIELD_NUMBER = 29;
-        private java.lang.Object jumpbehaviour_;
-
-        public boolean hasJumpbehaviour() {
-            return ((bitField0_ & 0x10000000) == 0x10000000);
-        }
-
-        public String getJumpbehaviour() {
-            java.lang.Object ref = jumpbehaviour_;
-            if (ref instanceof String) {
-                return (String) ref;
-            } else {
-                com.google.protobuf.ByteString bs =
-                        (com.google.protobuf.ByteString) ref;
-                String s = bs.toStringUtf8();
-                if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-                    jumpbehaviour_ = s;
-                }
-                return s;
-            }
-        }
-
-        private com.google.protobuf.ByteString getJumpbehaviourBytes() {
-            java.lang.Object ref = jumpbehaviour_;
-            if (ref instanceof String) {
-                com.google.protobuf.ByteString b =
-                        com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-                jumpbehaviour_ = b;
-                return b;
-            } else {
-                return (com.google.protobuf.ByteString) ref;
-            }
-        }
-
-        private void initFields() {
-            enableMusic_ = false;
-            enableSound_ = false;
-            keyForward_ = "Z";
-            keyBackward_ = "S";
-            keyLeft_ = "Q";
-            keyRight_ = "D";
-            keyJump_ = "SPACE";
-            keyConsole_ = "TAB";
-            keyInventory_ = "I";
-            keyCrouch_ = "C";
-            keyRun_ = "LSHIFT";
-            keyAttack_ = "MOUSELEFT";
-            keyUsehelditem_ = "MOUSERIGHT";
-            keyFrob_ = "E";
-            keyToolnext_ = "MOUSEWHEElUP";
-            keyToolprev_ = "MOUSEWHEELDOWN";
-            keyToolslot1_ = "1";
-            keyToolslot2_ = "2";
-            keyToolslot3_ = "3";
-            keyToolslot4_ = "4";
-            keyToolslot5_ = "5";
-            keyToolslot6_ = "6";
-            keyToolslot7_ = "7";
-            keyToolslot8_ = "8";
-            keyToolslot9_ = "9";
-            keyMinionmode_ = "X";
-            keyHidegui_ = "H";
-            keyPauze_ = "ESCAPE";
-            jumpbehaviour_ = "NORMAL";
-        }
-
-        private byte memoizedIsInitialized = -1;
-
-        public final boolean isInitialized() {
-            byte isInitialized = memoizedIsInitialized;
-            if (isInitialized != -1) return isInitialized == 1;
-
-            memoizedIsInitialized = 1;
-            return true;
-        }
-
-        public void writeTo(com.google.protobuf.CodedOutputStream output)
-                throws java.io.IOException {
-            getSerializedSize();
-            if (((bitField0_ & 0x00000001) == 0x00000001)) {
-                output.writeBool(1, enableMusic_);
-            }
-            if (((bitField0_ & 0x00000002) == 0x00000002)) {
-                output.writeBool(2, enableSound_);
-            }
-            if (((bitField0_ & 0x00000004) == 0x00000004)) {
-                output.writeBytes(3, getKeyForwardBytes());
-            }
-            if (((bitField0_ & 0x00000008) == 0x00000008)) {
-                output.writeBytes(4, getKeyBackwardBytes());
-            }
-            if (((bitField0_ & 0x00000010) == 0x00000010)) {
-                output.writeBytes(5, getKeyLeftBytes());
-            }
-            if (((bitField0_ & 0x00000020) == 0x00000020)) {
-                output.writeBytes(6, getKeyRightBytes());
-            }
-            if (((bitField0_ & 0x00000040) == 0x00000040)) {
-                output.writeBytes(7, getKeyJumpBytes());
-            }
-            if (((bitField0_ & 0x00000080) == 0x00000080)) {
-                output.writeBytes(8, getKeyConsoleBytes());
-            }
-            if (((bitField0_ & 0x00000100) == 0x00000100)) {
-                output.writeBytes(9, getKeyInventoryBytes());
-            }
-            if (((bitField0_ & 0x00000200) == 0x00000200)) {
-                output.writeBytes(10, getKeyCrouchBytes());
-            }
-            if (((bitField0_ & 0x00000400) == 0x00000400)) {
-                output.writeBytes(11, getKeyRunBytes());
-            }
-            if (((bitField0_ & 0x00000800) == 0x00000800)) {
-                output.writeBytes(12, getKeyAttackBytes());
-            }
-            if (((bitField0_ & 0x00001000) == 0x00001000)) {
-                output.writeBytes(13, getKeyUsehelditemBytes());
-            }
-            if (((bitField0_ & 0x00002000) == 0x00002000)) {
-                output.writeBytes(14, getKeyFrobBytes());
-            }
-            if (((bitField0_ & 0x00004000) == 0x00004000)) {
-                output.writeBytes(15, getKeyToolnextBytes());
-            }
-            if (((bitField0_ & 0x00008000) == 0x00008000)) {
-                output.writeBytes(16, getKeyToolprevBytes());
-            }
-            if (((bitField0_ & 0x00010000) == 0x00010000)) {
-                output.writeBytes(17, getKeyToolslot1Bytes());
-            }
-            if (((bitField0_ & 0x00020000) == 0x00020000)) {
-                output.writeBytes(18, getKeyToolslot2Bytes());
-            }
-            if (((bitField0_ & 0x00040000) == 0x00040000)) {
-                output.writeBytes(19, getKeyToolslot3Bytes());
-            }
-            if (((bitField0_ & 0x00080000) == 0x00080000)) {
-                output.writeBytes(20, getKeyToolslot4Bytes());
-            }
-            if (((bitField0_ & 0x00100000) == 0x00100000)) {
-                output.writeBytes(21, getKeyToolslot5Bytes());
-            }
-            if (((bitField0_ & 0x00200000) == 0x00200000)) {
-                output.writeBytes(22, getKeyToolslot6Bytes());
-            }
-            if (((bitField0_ & 0x00400000) == 0x00400000)) {
-                output.writeBytes(23, getKeyToolslot7Bytes());
-            }
-            if (((bitField0_ & 0x00800000) == 0x00800000)) {
-                output.writeBytes(24, getKeyToolslot8Bytes());
-            }
-            if (((bitField0_ & 0x01000000) == 0x01000000)) {
-                output.writeBytes(25, getKeyToolslot9Bytes());
-            }
-            if (((bitField0_ & 0x02000000) == 0x02000000)) {
-                output.writeBytes(26, getKeyMinionmodeBytes());
-            }
-            if (((bitField0_ & 0x04000000) == 0x04000000)) {
-                output.writeBytes(27, getKeyHideguiBytes());
-            }
-            if (((bitField0_ & 0x08000000) == 0x08000000)) {
-                output.writeBytes(28, getKeyPauzeBytes());
-            }
-            if (((bitField0_ & 0x10000000) == 0x10000000)) {
-                output.writeBytes(29, getJumpbehaviourBytes());
-            }
-            getUnknownFields().writeTo(output);
-        }
-
-        private int memoizedSerializedSize = -1;
-
-        public int getSerializedSize() {
-            int size = memoizedSerializedSize;
-            if (size != -1) return size;
-
-            size = 0;
-            if (((bitField0_ & 0x00000001) == 0x00000001)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeBoolSize(1, enableMusic_);
-            }
-            if (((bitField0_ & 0x00000002) == 0x00000002)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeBoolSize(2, enableSound_);
-            }
-            if (((bitField0_ & 0x00000004) == 0x00000004)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeBytesSize(3, getKeyForwardBytes());
-            }
-            if (((bitField0_ & 0x00000008) == 0x00000008)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeBytesSize(4, getKeyBackwardBytes());
-            }
-            if (((bitField0_ & 0x00000010) == 0x00000010)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeBytesSize(5, getKeyLeftBytes());
-            }
-            if (((bitField0_ & 0x00000020) == 0x00000020)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeBytesSize(6, getKeyRightBytes());
-            }
-            if (((bitField0_ & 0x00000040) == 0x00000040)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeBytesSize(7, getKeyJumpBytes());
-            }
-            if (((bitField0_ & 0x00000080) == 0x00000080)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeBytesSize(8, getKeyConsoleBytes());
-            }
-            if (((bitField0_ & 0x00000100) == 0x00000100)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeBytesSize(9, getKeyInventoryBytes());
-            }
-            if (((bitField0_ & 0x00000200) == 0x00000200)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeBytesSize(10, getKeyCrouchBytes());
-            }
-            if (((bitField0_ & 0x00000400) == 0x00000400)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeBytesSize(11, getKeyRunBytes());
-            }
-            if (((bitField0_ & 0x00000800) == 0x00000800)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeBytesSize(12, getKeyAttackBytes());
-            }
-            if (((bitField0_ & 0x00001000) == 0x00001000)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeBytesSize(13, getKeyUsehelditemBytes());
-            }
-            if (((bitField0_ & 0x00002000) == 0x00002000)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeBytesSize(14, getKeyFrobBytes());
-            }
-            if (((bitField0_ & 0x00004000) == 0x00004000)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeBytesSize(15, getKeyToolnextBytes());
-            }
-            if (((bitField0_ & 0x00008000) == 0x00008000)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeBytesSize(16, getKeyToolprevBytes());
-            }
-            if (((bitField0_ & 0x00010000) == 0x00010000)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeBytesSize(17, getKeyToolslot1Bytes());
-            }
-            if (((bitField0_ & 0x00020000) == 0x00020000)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeBytesSize(18, getKeyToolslot2Bytes());
-            }
-            if (((bitField0_ & 0x00040000) == 0x00040000)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeBytesSize(19, getKeyToolslot3Bytes());
-            }
-            if (((bitField0_ & 0x00080000) == 0x00080000)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeBytesSize(20, getKeyToolslot4Bytes());
-            }
-            if (((bitField0_ & 0x00100000) == 0x00100000)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeBytesSize(21, getKeyToolslot5Bytes());
-            }
-            if (((bitField0_ & 0x00200000) == 0x00200000)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeBytesSize(22, getKeyToolslot6Bytes());
-            }
-            if (((bitField0_ & 0x00400000) == 0x00400000)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeBytesSize(23, getKeyToolslot7Bytes());
-            }
-            if (((bitField0_ & 0x00800000) == 0x00800000)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeBytesSize(24, getKeyToolslot8Bytes());
-            }
-            if (((bitField0_ & 0x01000000) == 0x01000000)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeBytesSize(25, getKeyToolslot9Bytes());
-            }
-            if (((bitField0_ & 0x02000000) == 0x02000000)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeBytesSize(26, getKeyMinionmodeBytes());
-            }
-            if (((bitField0_ & 0x04000000) == 0x04000000)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeBytesSize(27, getKeyHideguiBytes());
-            }
-            if (((bitField0_ & 0x08000000) == 0x08000000)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeBytesSize(28, getKeyPauzeBytes());
-            }
-            if (((bitField0_ & 0x10000000) == 0x10000000)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeBytesSize(29, getJumpbehaviourBytes());
-            }
-            size += getUnknownFields().getSerializedSize();
-            memoizedSerializedSize = size;
-            return size;
-        }
-
-        private static final long serialVersionUID = 0L;
-
-        @java.lang.Override
-        protected java.lang.Object writeReplace()
-                throws java.io.ObjectStreamException {
-            return super.writeReplace();
-        }
-
-        public static org.terasology.protobuf.InputData.InputSetting parseFrom(
-                com.google.protobuf.ByteString data)
-                throws com.google.protobuf.InvalidProtocolBufferException {
-            return newBuilder().mergeFrom(data).buildParsed();
-        }
-
-        public static org.terasology.protobuf.InputData.InputSetting parseFrom(
-                com.google.protobuf.ByteString data,
-                com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-                throws com.google.protobuf.InvalidProtocolBufferException {
-            return newBuilder().mergeFrom(data, extensionRegistry)
-                    .buildParsed();
-        }
-
-        public static org.terasology.protobuf.InputData.InputSetting parseFrom(byte[] data)
-                throws com.google.protobuf.InvalidProtocolBufferException {
-            return newBuilder().mergeFrom(data).buildParsed();
-        }
-
-        public static org.terasology.protobuf.InputData.InputSetting parseFrom(
-                byte[] data,
-                com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-                throws com.google.protobuf.InvalidProtocolBufferException {
-            return newBuilder().mergeFrom(data, extensionRegistry)
-                    .buildParsed();
-        }
-
-        public static org.terasology.protobuf.InputData.InputSetting parseFrom(java.io.InputStream input)
-                throws java.io.IOException {
-            return newBuilder().mergeFrom(input).buildParsed();
-        }
-
-        public static org.terasology.protobuf.InputData.InputSetting parseFrom(
-                java.io.InputStream input,
-                com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-                throws java.io.IOException {
-            return newBuilder().mergeFrom(input, extensionRegistry)
-                    .buildParsed();
-        }
-
-        public static org.terasology.protobuf.InputData.InputSetting parseDelimitedFrom(java.io.InputStream input)
-                throws java.io.IOException {
-            Builder builder = newBuilder();
-            if (builder.mergeDelimitedFrom(input)) {
-                return builder.buildParsed();
-            } else {
-                return null;
-            }
-        }
-
-        public static org.terasology.protobuf.InputData.InputSetting parseDelimitedFrom(
-                java.io.InputStream input,
-                com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-                throws java.io.IOException {
-            Builder builder = newBuilder();
-            if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
-                return builder.buildParsed();
-            } else {
-                return null;
-            }
-        }
-
-        public static org.terasology.protobuf.InputData.InputSetting parseFrom(
-                com.google.protobuf.CodedInputStream input)
-                throws java.io.IOException {
-            return newBuilder().mergeFrom(input).buildParsed();
-        }
-
-        public static org.terasology.protobuf.InputData.InputSetting parseFrom(
-                com.google.protobuf.CodedInputStream input,
-                com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-                throws java.io.IOException {
-            return newBuilder().mergeFrom(input, extensionRegistry)
-                    .buildParsed();
-        }
-
-        public static Builder newBuilder() {
-            return Builder.create();
-        }
-
-        public Builder newBuilderForType() {
-            return newBuilder();
-        }
-
-        public static Builder newBuilder(org.terasology.protobuf.InputData.InputSetting prototype) {
-            return newBuilder().mergeFrom(prototype);
-        }
-
-        public Builder toBuilder() {
-            return newBuilder(this);
-        }
-
-        @java.lang.Override
-        protected Builder newBuilderForType(
-                com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-            Builder builder = new Builder(parent);
-            return builder;
-        }
-
-        public static final class Builder extends
-                com.google.protobuf.GeneratedMessage.Builder<Builder>
-                implements org.terasology.protobuf.InputData.InputSettingOrBuilder {
-            public static final com.google.protobuf.Descriptors.Descriptor
-            getDescriptor() {
-                return org.terasology.protobuf.InputData.internal_static_InputSetting_descriptor;
-            }
-
-            protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-            internalGetFieldAccessorTable() {
-                return org.terasology.protobuf.InputData.internal_static_InputSetting_fieldAccessorTable;
-            }
-
-            // Construct using org.terasology.protobuf.InputData.InputSetting.newBuilder()
-            private Builder() {
-                maybeForceBuilderInitialization();
-            }
-
-            private Builder(BuilderParent parent) {
-                super(parent);
-                maybeForceBuilderInitialization();
-            }
-
-            private void maybeForceBuilderInitialization() {
-                if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
-                }
-            }
-
-            private static Builder create() {
-                return new Builder();
-            }
-
-            public Builder clear() {
-                super.clear();
-                enableMusic_ = false;
-                bitField0_ = (bitField0_ & ~0x00000001);
-                enableSound_ = false;
-                bitField0_ = (bitField0_ & ~0x00000002);
-                keyForward_ = "Z";
-                bitField0_ = (bitField0_ & ~0x00000004);
-                keyBackward_ = "S";
-                bitField0_ = (bitField0_ & ~0x00000008);
-                keyLeft_ = "Q";
-                bitField0_ = (bitField0_ & ~0x00000010);
-                keyRight_ = "D";
-                bitField0_ = (bitField0_ & ~0x00000020);
-                keyJump_ = "SPACE";
-                bitField0_ = (bitField0_ & ~0x00000040);
-                keyConsole_ = "TAB";
-                bitField0_ = (bitField0_ & ~0x00000080);
-                keyInventory_ = "I";
-                bitField0_ = (bitField0_ & ~0x00000100);
-                keyCrouch_ = "C";
-                bitField0_ = (bitField0_ & ~0x00000200);
-                keyRun_ = "LSHIFT";
-                bitField0_ = (bitField0_ & ~0x00000400);
-                keyAttack_ = "MOUSELEFT";
-                bitField0_ = (bitField0_ & ~0x00000800);
-                keyUsehelditem_ = "MOUSERIGHT";
-                bitField0_ = (bitField0_ & ~0x00001000);
-                keyFrob_ = "E";
-                bitField0_ = (bitField0_ & ~0x00002000);
-                keyToolnext_ = "MOUSEWHEElUP";
-                bitField0_ = (bitField0_ & ~0x00004000);
-                keyToolprev_ = "MOUSEWHEELDOWN";
-                bitField0_ = (bitField0_ & ~0x00008000);
-                keyToolslot1_ = "1";
-                bitField0_ = (bitField0_ & ~0x00010000);
-                keyToolslot2_ = "2";
-                bitField0_ = (bitField0_ & ~0x00020000);
-                keyToolslot3_ = "3";
-                bitField0_ = (bitField0_ & ~0x00040000);
-                keyToolslot4_ = "4";
-                bitField0_ = (bitField0_ & ~0x00080000);
-                keyToolslot5_ = "5";
-                bitField0_ = (bitField0_ & ~0x00100000);
-                keyToolslot6_ = "6";
-                bitField0_ = (bitField0_ & ~0x00200000);
-                keyToolslot7_ = "7";
-                bitField0_ = (bitField0_ & ~0x00400000);
-                keyToolslot8_ = "8";
-                bitField0_ = (bitField0_ & ~0x00800000);
-                keyToolslot9_ = "9";
-                bitField0_ = (bitField0_ & ~0x01000000);
-                keyMinionmode_ = "X";
-                bitField0_ = (bitField0_ & ~0x02000000);
-                keyHidegui_ = "H";
-                bitField0_ = (bitField0_ & ~0x04000000);
-                keyPauze_ = "ESCAPE";
-                bitField0_ = (bitField0_ & ~0x08000000);
-                jumpbehaviour_ = "NORMAL";
-                bitField0_ = (bitField0_ & ~0x10000000);
-                return this;
-            }
-
-            public Builder clone() {
-                return create().mergeFrom(buildPartial());
-            }
-
-            public com.google.protobuf.Descriptors.Descriptor
-            getDescriptorForType() {
-                return org.terasology.protobuf.InputData.InputSetting.getDescriptor();
-            }
-
-            public org.terasology.protobuf.InputData.InputSetting getDefaultInstanceForType() {
-                return org.terasology.protobuf.InputData.InputSetting.getDefaultInstance();
-            }
-
-            public org.terasology.protobuf.InputData.InputSetting build() {
-                org.terasology.protobuf.InputData.InputSetting result = buildPartial();
-                if (!result.isInitialized()) {
-                    throw newUninitializedMessageException(result);
-                }
-                return result;
-            }
-
-            private org.terasology.protobuf.InputData.InputSetting buildParsed()
-                    throws com.google.protobuf.InvalidProtocolBufferException {
-                org.terasology.protobuf.InputData.InputSetting result = buildPartial();
-                if (!result.isInitialized()) {
-                    throw newUninitializedMessageException(
-                            result).asInvalidProtocolBufferException();
-                }
-                return result;
-            }
-
-            public org.terasology.protobuf.InputData.InputSetting buildPartial() {
-                org.terasology.protobuf.InputData.InputSetting result = new org.terasology.protobuf.InputData.InputSetting(this);
-                int from_bitField0_ = bitField0_;
-                int to_bitField0_ = 0;
-                if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
-                    to_bitField0_ |= 0x00000001;
-                }
-                result.enableMusic_ = enableMusic_;
-                if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
-                    to_bitField0_ |= 0x00000002;
-                }
-                result.enableSound_ = enableSound_;
-                if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
-                    to_bitField0_ |= 0x00000004;
-                }
-                result.keyForward_ = keyForward_;
-                if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
-                    to_bitField0_ |= 0x00000008;
-                }
-                result.keyBackward_ = keyBackward_;
-                if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
-                    to_bitField0_ |= 0x00000010;
-                }
-                result.keyLeft_ = keyLeft_;
-                if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
-                    to_bitField0_ |= 0x00000020;
-                }
-                result.keyRight_ = keyRight_;
-                if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
-                    to_bitField0_ |= 0x00000040;
-                }
-                result.keyJump_ = keyJump_;
-                if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
-                    to_bitField0_ |= 0x00000080;
-                }
-                result.keyConsole_ = keyConsole_;
-                if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
-                    to_bitField0_ |= 0x00000100;
-                }
-                result.keyInventory_ = keyInventory_;
-                if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
-                    to_bitField0_ |= 0x00000200;
-                }
-                result.keyCrouch_ = keyCrouch_;
-                if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
-                    to_bitField0_ |= 0x00000400;
-                }
-                result.keyRun_ = keyRun_;
-                if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
-                    to_bitField0_ |= 0x00000800;
-                }
-                result.keyAttack_ = keyAttack_;
-                if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
-                    to_bitField0_ |= 0x00001000;
-                }
-                result.keyUsehelditem_ = keyUsehelditem_;
-                if (((from_bitField0_ & 0x00002000) == 0x00002000)) {
-                    to_bitField0_ |= 0x00002000;
-                }
-                result.keyFrob_ = keyFrob_;
-                if (((from_bitField0_ & 0x00004000) == 0x00004000)) {
-                    to_bitField0_ |= 0x00004000;
-                }
-                result.keyToolnext_ = keyToolnext_;
-                if (((from_bitField0_ & 0x00008000) == 0x00008000)) {
-                    to_bitField0_ |= 0x00008000;
-                }
-                result.keyToolprev_ = keyToolprev_;
-                if (((from_bitField0_ & 0x00010000) == 0x00010000)) {
-                    to_bitField0_ |= 0x00010000;
-                }
-                result.keyToolslot1_ = keyToolslot1_;
-                if (((from_bitField0_ & 0x00020000) == 0x00020000)) {
-                    to_bitField0_ |= 0x00020000;
-                }
-                result.keyToolslot2_ = keyToolslot2_;
-                if (((from_bitField0_ & 0x00040000) == 0x00040000)) {
-                    to_bitField0_ |= 0x00040000;
-                }
-                result.keyToolslot3_ = keyToolslot3_;
-                if (((from_bitField0_ & 0x00080000) == 0x00080000)) {
-                    to_bitField0_ |= 0x00080000;
-                }
-                result.keyToolslot4_ = keyToolslot4_;
-                if (((from_bitField0_ & 0x00100000) == 0x00100000)) {
-                    to_bitField0_ |= 0x00100000;
-                }
-                result.keyToolslot5_ = keyToolslot5_;
-                if (((from_bitField0_ & 0x00200000) == 0x00200000)) {
-                    to_bitField0_ |= 0x00200000;
-                }
-                result.keyToolslot6_ = keyToolslot6_;
-                if (((from_bitField0_ & 0x00400000) == 0x00400000)) {
-                    to_bitField0_ |= 0x00400000;
-                }
-                result.keyToolslot7_ = keyToolslot7_;
-                if (((from_bitField0_ & 0x00800000) == 0x00800000)) {
-                    to_bitField0_ |= 0x00800000;
-                }
-                result.keyToolslot8_ = keyToolslot8_;
-                if (((from_bitField0_ & 0x01000000) == 0x01000000)) {
-                    to_bitField0_ |= 0x01000000;
-                }
-                result.keyToolslot9_ = keyToolslot9_;
-                if (((from_bitField0_ & 0x02000000) == 0x02000000)) {
-                    to_bitField0_ |= 0x02000000;
-                }
-                result.keyMinionmode_ = keyMinionmode_;
-                if (((from_bitField0_ & 0x04000000) == 0x04000000)) {
-                    to_bitField0_ |= 0x04000000;
-                }
-                result.keyHidegui_ = keyHidegui_;
-                if (((from_bitField0_ & 0x08000000) == 0x08000000)) {
-                    to_bitField0_ |= 0x08000000;
-                }
-                result.keyPauze_ = keyPauze_;
-                if (((from_bitField0_ & 0x10000000) == 0x10000000)) {
-                    to_bitField0_ |= 0x10000000;
-                }
-                result.jumpbehaviour_ = jumpbehaviour_;
-                result.bitField0_ = to_bitField0_;
-                onBuilt();
-                return result;
-            }
-
-            public Builder mergeFrom(com.google.protobuf.Message other) {
-                if (other instanceof org.terasology.protobuf.InputData.InputSetting) {
-                    return mergeFrom((org.terasology.protobuf.InputData.InputSetting) other);
-                } else {
-                    super.mergeFrom(other);
-                    return this;
-                }
-            }
-
-            public Builder mergeFrom(org.terasology.protobuf.InputData.InputSetting other) {
-                if (other == org.terasology.protobuf.InputData.InputSetting.getDefaultInstance()) return this;
-                if (other.hasEnableMusic()) {
-                    setEnableMusic(other.getEnableMusic());
-                }
-                if (other.hasEnableSound()) {
-                    setEnableSound(other.getEnableSound());
-                }
-                if (other.hasKeyForward()) {
-                    setKeyForward(other.getKeyForward());
-                }
-                if (other.hasKeyBackward()) {
-                    setKeyBackward(other.getKeyBackward());
-                }
-                if (other.hasKeyLeft()) {
-                    setKeyLeft(other.getKeyLeft());
-                }
-                if (other.hasKeyRight()) {
-                    setKeyRight(other.getKeyRight());
-                }
-                if (other.hasKeyJump()) {
-                    setKeyJump(other.getKeyJump());
-                }
-                if (other.hasKeyConsole()) {
-                    setKeyConsole(other.getKeyConsole());
-                }
-                if (other.hasKeyInventory()) {
-                    setKeyInventory(other.getKeyInventory());
-                }
-                if (other.hasKeyCrouch()) {
-                    setKeyCrouch(other.getKeyCrouch());
-                }
-                if (other.hasKeyRun()) {
-                    setKeyRun(other.getKeyRun());
-                }
-                if (other.hasKeyAttack()) {
-                    setKeyAttack(other.getKeyAttack());
-                }
-                if (other.hasKeyUsehelditem()) {
-                    setKeyUsehelditem(other.getKeyUsehelditem());
-                }
-                if (other.hasKeyFrob()) {
-                    setKeyFrob(other.getKeyFrob());
-                }
-                if (other.hasKeyToolnext()) {
-                    setKeyToolnext(other.getKeyToolnext());
-                }
-                if (other.hasKeyToolprev()) {
-                    setKeyToolprev(other.getKeyToolprev());
-                }
-                if (other.hasKeyToolslot1()) {
-                    setKeyToolslot1(other.getKeyToolslot1());
-                }
-                if (other.hasKeyToolslot2()) {
-                    setKeyToolslot2(other.getKeyToolslot2());
-                }
-                if (other.hasKeyToolslot3()) {
-                    setKeyToolslot3(other.getKeyToolslot3());
-                }
-                if (other.hasKeyToolslot4()) {
-                    setKeyToolslot4(other.getKeyToolslot4());
-                }
-                if (other.hasKeyToolslot5()) {
-                    setKeyToolslot5(other.getKeyToolslot5());
-                }
-                if (other.hasKeyToolslot6()) {
-                    setKeyToolslot6(other.getKeyToolslot6());
-                }
-                if (other.hasKeyToolslot7()) {
-                    setKeyToolslot7(other.getKeyToolslot7());
-                }
-                if (other.hasKeyToolslot8()) {
-                    setKeyToolslot8(other.getKeyToolslot8());
-                }
-                if (other.hasKeyToolslot9()) {
-                    setKeyToolslot9(other.getKeyToolslot9());
-                }
-                if (other.hasKeyMinionmode()) {
-                    setKeyMinionmode(other.getKeyMinionmode());
-                }
-                if (other.hasKeyHidegui()) {
-                    setKeyHidegui(other.getKeyHidegui());
-                }
-                if (other.hasKeyPauze()) {
-                    setKeyPauze(other.getKeyPauze());
-                }
-                if (other.hasJumpbehaviour()) {
-                    setJumpbehaviour(other.getJumpbehaviour());
-                }
-                this.mergeUnknownFields(other.getUnknownFields());
-                return this;
-            }
-
-            public final boolean isInitialized() {
-                return true;
-            }
-
-            public Builder mergeFrom(
-                    com.google.protobuf.CodedInputStream input,
-                    com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-                    throws java.io.IOException {
-                com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-                        com.google.protobuf.UnknownFieldSet.newBuilder(
-                                this.getUnknownFields());
-                while (true) {
-                    int tag = input.readTag();
-                    switch (tag) {
-                        case 0:
-                            this.setUnknownFields(unknownFields.build());
-                            onChanged();
-                            return this;
-                        default: {
-                            if (!parseUnknownField(input, unknownFields,
-                                    extensionRegistry, tag)) {
-                                this.setUnknownFields(unknownFields.build());
-                                onChanged();
-                                return this;
-                            }
-                            break;
-                        }
-                        case 8: {
-                            bitField0_ |= 0x00000001;
-                            enableMusic_ = input.readBool();
-                            break;
-                        }
-                        case 16: {
-                            bitField0_ |= 0x00000002;
-                            enableSound_ = input.readBool();
-                            break;
-                        }
-                        case 26: {
-                            bitField0_ |= 0x00000004;
-                            keyForward_ = input.readBytes();
-                            break;
-                        }
-                        case 34: {
-                            bitField0_ |= 0x00000008;
-                            keyBackward_ = input.readBytes();
-                            break;
-                        }
-                        case 42: {
-                            bitField0_ |= 0x00000010;
-                            keyLeft_ = input.readBytes();
-                            break;
-                        }
-                        case 50: {
-                            bitField0_ |= 0x00000020;
-                            keyRight_ = input.readBytes();
-                            break;
-                        }
-                        case 58: {
-                            bitField0_ |= 0x00000040;
-                            keyJump_ = input.readBytes();
-                            break;
-                        }
-                        case 66: {
-                            bitField0_ |= 0x00000080;
-                            keyConsole_ = input.readBytes();
-                            break;
-                        }
-                        case 74: {
-                            bitField0_ |= 0x00000100;
-                            keyInventory_ = input.readBytes();
-                            break;
-                        }
-                        case 82: {
-                            bitField0_ |= 0x00000200;
-                            keyCrouch_ = input.readBytes();
-                            break;
-                        }
-                        case 90: {
-                            bitField0_ |= 0x00000400;
-                            keyRun_ = input.readBytes();
-                            break;
-                        }
-                        case 98: {
-                            bitField0_ |= 0x00000800;
-                            keyAttack_ = input.readBytes();
-                            break;
-                        }
-                        case 106: {
-                            bitField0_ |= 0x00001000;
-                            keyUsehelditem_ = input.readBytes();
-                            break;
-                        }
-                        case 114: {
-                            bitField0_ |= 0x00002000;
-                            keyFrob_ = input.readBytes();
-                            break;
-                        }
-                        case 122: {
-                            bitField0_ |= 0x00004000;
-                            keyToolnext_ = input.readBytes();
-                            break;
-                        }
-                        case 130: {
-                            bitField0_ |= 0x00008000;
-                            keyToolprev_ = input.readBytes();
-                            break;
-                        }
-                        case 138: {
-                            bitField0_ |= 0x00010000;
-                            keyToolslot1_ = input.readBytes();
-                            break;
-                        }
-                        case 146: {
-                            bitField0_ |= 0x00020000;
-                            keyToolslot2_ = input.readBytes();
-                            break;
-                        }
-                        case 154: {
-                            bitField0_ |= 0x00040000;
-                            keyToolslot3_ = input.readBytes();
-                            break;
-                        }
-                        case 162: {
-                            bitField0_ |= 0x00080000;
-                            keyToolslot4_ = input.readBytes();
-                            break;
-                        }
-                        case 170: {
-                            bitField0_ |= 0x00100000;
-                            keyToolslot5_ = input.readBytes();
-                            break;
-                        }
-                        case 178: {
-                            bitField0_ |= 0x00200000;
-                            keyToolslot6_ = input.readBytes();
-                            break;
-                        }
-                        case 186: {
-                            bitField0_ |= 0x00400000;
-                            keyToolslot7_ = input.readBytes();
-                            break;
-                        }
-                        case 194: {
-                            bitField0_ |= 0x00800000;
-                            keyToolslot8_ = input.readBytes();
-                            break;
-                        }
-                        case 202: {
-                            bitField0_ |= 0x01000000;
-                            keyToolslot9_ = input.readBytes();
-                            break;
-                        }
-                        case 210: {
-                            bitField0_ |= 0x02000000;
-                            keyMinionmode_ = input.readBytes();
-                            break;
-                        }
-                        case 218: {
-                            bitField0_ |= 0x04000000;
-                            keyHidegui_ = input.readBytes();
-                            break;
-                        }
-                        case 226: {
-                            bitField0_ |= 0x08000000;
-                            keyPauze_ = input.readBytes();
-                            break;
-                        }
-                        case 234: {
-                            bitField0_ |= 0x10000000;
-                            jumpbehaviour_ = input.readBytes();
-                            break;
-                        }
-                    }
-                }
-            }
-
-            private int bitField0_;
-
-            // optional bool EnableMusic = 1 [default = false];
-            private boolean enableMusic_;
-
-            public boolean hasEnableMusic() {
-                return ((bitField0_ & 0x00000001) == 0x00000001);
-            }
-
-            public boolean getEnableMusic() {
-                return enableMusic_;
-            }
-
-            public Builder setEnableMusic(boolean value) {
-                bitField0_ |= 0x00000001;
-                enableMusic_ = value;
-                onChanged();
-                return this;
-            }
-
-            public Builder clearEnableMusic() {
-                bitField0_ = (bitField0_ & ~0x00000001);
-                enableMusic_ = false;
-                onChanged();
-                return this;
-            }
-
-            // optional bool EnableSound = 2 [default = false];
-            private boolean enableSound_;
-
-            public boolean hasEnableSound() {
-                return ((bitField0_ & 0x00000002) == 0x00000002);
-            }
-
-            public boolean getEnableSound() {
-                return enableSound_;
-            }
-
-            public Builder setEnableSound(boolean value) {
-                bitField0_ |= 0x00000002;
-                enableSound_ = value;
-                onChanged();
-                return this;
-            }
-
-            public Builder clearEnableSound() {
-                bitField0_ = (bitField0_ & ~0x00000002);
-                enableSound_ = false;
-                onChanged();
-                return this;
-            }
-
-            // optional string key_forward = 3 [default = "Z"];
-            private java.lang.Object keyForward_ = "Z";
-
-            public boolean hasKeyForward() {
-                return ((bitField0_ & 0x00000004) == 0x00000004);
-            }
-
-            public String getKeyForward() {
-                java.lang.Object ref = keyForward_;
-                if (!(ref instanceof String)) {
-                    String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-                    keyForward_ = s;
-                    return s;
-                } else {
-                    return (String) ref;
-                }
-            }
-
-            public Builder setKeyForward(String value) {
-                if (value == null) {
-                    throw new NullPointerException();
-                }
-                bitField0_ |= 0x00000004;
-                keyForward_ = value;
-                onChanged();
-                return this;
-            }
-
-            public Builder clearKeyForward() {
-                bitField0_ = (bitField0_ & ~0x00000004);
-                keyForward_ = getDefaultInstance().getKeyForward();
-                onChanged();
-                return this;
-            }
-
-            void setKeyForward(com.google.protobuf.ByteString value) {
-                bitField0_ |= 0x00000004;
-                keyForward_ = value;
-                onChanged();
-            }
-
-            // optional string key_backward = 4 [default = "S"];
-            private java.lang.Object keyBackward_ = "S";
-
-            public boolean hasKeyBackward() {
-                return ((bitField0_ & 0x00000008) == 0x00000008);
-            }
-
-            public String getKeyBackward() {
-                java.lang.Object ref = keyBackward_;
-                if (!(ref instanceof String)) {
-                    String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-                    keyBackward_ = s;
-                    return s;
-                } else {
-                    return (String) ref;
-                }
-            }
-
-            public Builder setKeyBackward(String value) {
-                if (value == null) {
-                    throw new NullPointerException();
-                }
-                bitField0_ |= 0x00000008;
-                keyBackward_ = value;
-                onChanged();
-                return this;
-            }
-
-            public Builder clearKeyBackward() {
-                bitField0_ = (bitField0_ & ~0x00000008);
-                keyBackward_ = getDefaultInstance().getKeyBackward();
-                onChanged();
-                return this;
-            }
-
-            void setKeyBackward(com.google.protobuf.ByteString value) {
-                bitField0_ |= 0x00000008;
-                keyBackward_ = value;
-                onChanged();
-            }
-
-            // optional string key_left = 5 [default = "Q"];
-            private java.lang.Object keyLeft_ = "Q";
-
-            public boolean hasKeyLeft() {
-                return ((bitField0_ & 0x00000010) == 0x00000010);
-            }
-
-            public String getKeyLeft() {
-                java.lang.Object ref = keyLeft_;
-                if (!(ref instanceof String)) {
-                    String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-                    keyLeft_ = s;
-                    return s;
-                } else {
-                    return (String) ref;
-                }
-            }
-
-            public Builder setKeyLeft(String value) {
-                if (value == null) {
-                    throw new NullPointerException();
-                }
-                bitField0_ |= 0x00000010;
-                keyLeft_ = value;
-                onChanged();
-                return this;
-            }
-
-            public Builder clearKeyLeft() {
-                bitField0_ = (bitField0_ & ~0x00000010);
-                keyLeft_ = getDefaultInstance().getKeyLeft();
-                onChanged();
-                return this;
-            }
-
-            void setKeyLeft(com.google.protobuf.ByteString value) {
-                bitField0_ |= 0x00000010;
-                keyLeft_ = value;
-                onChanged();
-            }
-
-            // optional string key_right = 6 [default = "D"];
-            private java.lang.Object keyRight_ = "D";
-
-            public boolean hasKeyRight() {
-                return ((bitField0_ & 0x00000020) == 0x00000020);
-            }
-
-            public String getKeyRight() {
-                java.lang.Object ref = keyRight_;
-                if (!(ref instanceof String)) {
-                    String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-                    keyRight_ = s;
-                    return s;
-                } else {
-                    return (String) ref;
-                }
-            }
-
-            public Builder setKeyRight(String value) {
-                if (value == null) {
-                    throw new NullPointerException();
-                }
-                bitField0_ |= 0x00000020;
-                keyRight_ = value;
-                onChanged();
-                return this;
-            }
-
-            public Builder clearKeyRight() {
-                bitField0_ = (bitField0_ & ~0x00000020);
-                keyRight_ = getDefaultInstance().getKeyRight();
-                onChanged();
-                return this;
-            }
-
-            void setKeyRight(com.google.protobuf.ByteString value) {
-                bitField0_ |= 0x00000020;
-                keyRight_ = value;
-                onChanged();
-            }
-
-            // optional string key_jump = 7 [default = "SPACE"];
-            private java.lang.Object keyJump_ = "SPACE";
-
-            public boolean hasKeyJump() {
-                return ((bitField0_ & 0x00000040) == 0x00000040);
-            }
-
-            public String getKeyJump() {
-                java.lang.Object ref = keyJump_;
-                if (!(ref instanceof String)) {
-                    String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-                    keyJump_ = s;
-                    return s;
-                } else {
-                    return (String) ref;
-                }
-            }
-
-            public Builder setKeyJump(String value) {
-                if (value == null) {
-                    throw new NullPointerException();
-                }
-                bitField0_ |= 0x00000040;
-                keyJump_ = value;
-                onChanged();
-                return this;
-            }
-
-            public Builder clearKeyJump() {
-                bitField0_ = (bitField0_ & ~0x00000040);
-                keyJump_ = getDefaultInstance().getKeyJump();
-                onChanged();
-                return this;
-            }
-
-            void setKeyJump(com.google.protobuf.ByteString value) {
-                bitField0_ |= 0x00000040;
-                keyJump_ = value;
-                onChanged();
-            }
-
-            // optional string key_console = 8 [default = "TAB"];
-            private java.lang.Object keyConsole_ = "TAB";
-
-            public boolean hasKeyConsole() {
-                return ((bitField0_ & 0x00000080) == 0x00000080);
-            }
-
-            public String getKeyConsole() {
-                java.lang.Object ref = keyConsole_;
-                if (!(ref instanceof String)) {
-                    String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-                    keyConsole_ = s;
-                    return s;
-                } else {
-                    return (String) ref;
-                }
-            }
-
-            public Builder setKeyConsole(String value) {
-                if (value == null) {
-                    throw new NullPointerException();
-                }
-                bitField0_ |= 0x00000080;
-                keyConsole_ = value;
-                onChanged();
-                return this;
-            }
-
-            public Builder clearKeyConsole() {
-                bitField0_ = (bitField0_ & ~0x00000080);
-                keyConsole_ = getDefaultInstance().getKeyConsole();
-                onChanged();
-                return this;
-            }
-
-            void setKeyConsole(com.google.protobuf.ByteString value) {
-                bitField0_ |= 0x00000080;
-                keyConsole_ = value;
-                onChanged();
-            }
-
-            // optional string key_inventory = 9 [default = "I"];
-            private java.lang.Object keyInventory_ = "I";
-
-            public boolean hasKeyInventory() {
-                return ((bitField0_ & 0x00000100) == 0x00000100);
-            }
-
-            public String getKeyInventory() {
-                java.lang.Object ref = keyInventory_;
-                if (!(ref instanceof String)) {
-                    String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-                    keyInventory_ = s;
-                    return s;
-                } else {
-                    return (String) ref;
-                }
-            }
-
-            public Builder setKeyInventory(String value) {
-                if (value == null) {
-                    throw new NullPointerException();
-                }
-                bitField0_ |= 0x00000100;
-                keyInventory_ = value;
-                onChanged();
-                return this;
-            }
-
-            public Builder clearKeyInventory() {
-                bitField0_ = (bitField0_ & ~0x00000100);
-                keyInventory_ = getDefaultInstance().getKeyInventory();
-                onChanged();
-                return this;
-            }
-
-            void setKeyInventory(com.google.protobuf.ByteString value) {
-                bitField0_ |= 0x00000100;
-                keyInventory_ = value;
-                onChanged();
-            }
-
-            // optional string key_crouch = 10 [default = "C"];
-            private java.lang.Object keyCrouch_ = "C";
-
-            public boolean hasKeyCrouch() {
-                return ((bitField0_ & 0x00000200) == 0x00000200);
-            }
-
-            public String getKeyCrouch() {
-                java.lang.Object ref = keyCrouch_;
-                if (!(ref instanceof String)) {
-                    String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-                    keyCrouch_ = s;
-                    return s;
-                } else {
-                    return (String) ref;
-                }
-            }
-
-            public Builder setKeyCrouch(String value) {
-                if (value == null) {
-                    throw new NullPointerException();
-                }
-                bitField0_ |= 0x00000200;
-                keyCrouch_ = value;
-                onChanged();
-                return this;
-            }
-
-            public Builder clearKeyCrouch() {
-                bitField0_ = (bitField0_ & ~0x00000200);
-                keyCrouch_ = getDefaultInstance().getKeyCrouch();
-                onChanged();
-                return this;
-            }
-
-            void setKeyCrouch(com.google.protobuf.ByteString value) {
-                bitField0_ |= 0x00000200;
-                keyCrouch_ = value;
-                onChanged();
-            }
-
-            // optional string key_run = 11 [default = "LSHIFT"];
-            private java.lang.Object keyRun_ = "LSHIFT";
-
-            public boolean hasKeyRun() {
-                return ((bitField0_ & 0x00000400) == 0x00000400);
-            }
-
-            public String getKeyRun() {
-                java.lang.Object ref = keyRun_;
-                if (!(ref instanceof String)) {
-                    String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-                    keyRun_ = s;
-                    return s;
-                } else {
-                    return (String) ref;
-                }
-            }
-
-            public Builder setKeyRun(String value) {
-                if (value == null) {
-                    throw new NullPointerException();
-                }
-                bitField0_ |= 0x00000400;
-                keyRun_ = value;
-                onChanged();
-                return this;
-            }
-
-            public Builder clearKeyRun() {
-                bitField0_ = (bitField0_ & ~0x00000400);
-                keyRun_ = getDefaultInstance().getKeyRun();
-                onChanged();
-                return this;
-            }
-
-            void setKeyRun(com.google.protobuf.ByteString value) {
-                bitField0_ |= 0x00000400;
-                keyRun_ = value;
-                onChanged();
-            }
-
-            // optional string key_attack = 12 [default = "MOUSELEFT"];
-            private java.lang.Object keyAttack_ = "MOUSELEFT";
-
-            public boolean hasKeyAttack() {
-                return ((bitField0_ & 0x00000800) == 0x00000800);
-            }
-
-            public String getKeyAttack() {
-                java.lang.Object ref = keyAttack_;
-                if (!(ref instanceof String)) {
-                    String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-                    keyAttack_ = s;
-                    return s;
-                } else {
-                    return (String) ref;
-                }
-            }
-
-            public Builder setKeyAttack(String value) {
-                if (value == null) {
-                    throw new NullPointerException();
-                }
-                bitField0_ |= 0x00000800;
-                keyAttack_ = value;
-                onChanged();
-                return this;
-            }
-
-            public Builder clearKeyAttack() {
-                bitField0_ = (bitField0_ & ~0x00000800);
-                keyAttack_ = getDefaultInstance().getKeyAttack();
-                onChanged();
-                return this;
-            }
-
-            void setKeyAttack(com.google.protobuf.ByteString value) {
-                bitField0_ |= 0x00000800;
-                keyAttack_ = value;
-                onChanged();
-            }
-
-            // optional string key_usehelditem = 13 [default = "MOUSERIGHT"];
-            private java.lang.Object keyUsehelditem_ = "MOUSERIGHT";
-
-            public boolean hasKeyUsehelditem() {
-                return ((bitField0_ & 0x00001000) == 0x00001000);
-            }
-
-            public String getKeyUsehelditem() {
-                java.lang.Object ref = keyUsehelditem_;
-                if (!(ref instanceof String)) {
-                    String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-                    keyUsehelditem_ = s;
-                    return s;
-                } else {
-                    return (String) ref;
-                }
-            }
-
-            public Builder setKeyUsehelditem(String value) {
-                if (value == null) {
-                    throw new NullPointerException();
-                }
-                bitField0_ |= 0x00001000;
-                keyUsehelditem_ = value;
-                onChanged();
-                return this;
-            }
-
-            public Builder clearKeyUsehelditem() {
-                bitField0_ = (bitField0_ & ~0x00001000);
-                keyUsehelditem_ = getDefaultInstance().getKeyUsehelditem();
-                onChanged();
-                return this;
-            }
-
-            void setKeyUsehelditem(com.google.protobuf.ByteString value) {
-                bitField0_ |= 0x00001000;
-                keyUsehelditem_ = value;
-                onChanged();
-            }
-
-            // optional string key_frob = 14 [default = "E"];
-            private java.lang.Object keyFrob_ = "E";
-
-            public boolean hasKeyFrob() {
-                return ((bitField0_ & 0x00002000) == 0x00002000);
-            }
-
-            public String getKeyFrob() {
-                java.lang.Object ref = keyFrob_;
-                if (!(ref instanceof String)) {
-                    String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-                    keyFrob_ = s;
-                    return s;
-                } else {
-                    return (String) ref;
-                }
-            }
-
-            public Builder setKeyFrob(String value) {
-                if (value == null) {
-                    throw new NullPointerException();
-                }
-                bitField0_ |= 0x00002000;
-                keyFrob_ = value;
-                onChanged();
-                return this;
-            }
-
-            public Builder clearKeyFrob() {
-                bitField0_ = (bitField0_ & ~0x00002000);
-                keyFrob_ = getDefaultInstance().getKeyFrob();
-                onChanged();
-                return this;
-            }
-
-            void setKeyFrob(com.google.protobuf.ByteString value) {
-                bitField0_ |= 0x00002000;
-                keyFrob_ = value;
-                onChanged();
-            }
-
-            // optional string key_toolnext = 15 [default = "MOUSEWHEElUP"];
-            private java.lang.Object keyToolnext_ = "MOUSEWHEElUP";
-
-            public boolean hasKeyToolnext() {
-                return ((bitField0_ & 0x00004000) == 0x00004000);
-            }
-
-            public String getKeyToolnext() {
-                java.lang.Object ref = keyToolnext_;
-                if (!(ref instanceof String)) {
-                    String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-                    keyToolnext_ = s;
-                    return s;
-                } else {
-                    return (String) ref;
-                }
-            }
-
-            public Builder setKeyToolnext(String value) {
-                if (value == null) {
-                    throw new NullPointerException();
-                }
-                bitField0_ |= 0x00004000;
-                keyToolnext_ = value;
-                onChanged();
-                return this;
-            }
-
-            public Builder clearKeyToolnext() {
-                bitField0_ = (bitField0_ & ~0x00004000);
-                keyToolnext_ = getDefaultInstance().getKeyToolnext();
-                onChanged();
-                return this;
-            }
-
-            void setKeyToolnext(com.google.protobuf.ByteString value) {
-                bitField0_ |= 0x00004000;
-                keyToolnext_ = value;
-                onChanged();
-            }
-
-            // optional string key_toolprev = 16 [default = "MOUSEWHEELDOWN"];
-            private java.lang.Object keyToolprev_ = "MOUSEWHEELDOWN";
-
-            public boolean hasKeyToolprev() {
-                return ((bitField0_ & 0x00008000) == 0x00008000);
-            }
-
-            public String getKeyToolprev() {
-                java.lang.Object ref = keyToolprev_;
-                if (!(ref instanceof String)) {
-                    String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-                    keyToolprev_ = s;
-                    return s;
-                } else {
-                    return (String) ref;
-                }
-            }
-
-            public Builder setKeyToolprev(String value) {
-                if (value == null) {
-                    throw new NullPointerException();
-                }
-                bitField0_ |= 0x00008000;
-                keyToolprev_ = value;
-                onChanged();
-                return this;
-            }
-
-            public Builder clearKeyToolprev() {
-                bitField0_ = (bitField0_ & ~0x00008000);
-                keyToolprev_ = getDefaultInstance().getKeyToolprev();
-                onChanged();
-                return this;
-            }
-
-            void setKeyToolprev(com.google.protobuf.ByteString value) {
-                bitField0_ |= 0x00008000;
-                keyToolprev_ = value;
-                onChanged();
-            }
-
-            // optional string key_toolslot1 = 17 [default = "1"];
-            private java.lang.Object keyToolslot1_ = "1";
-
-            public boolean hasKeyToolslot1() {
-                return ((bitField0_ & 0x00010000) == 0x00010000);
-            }
-
-            public String getKeyToolslot1() {
-                java.lang.Object ref = keyToolslot1_;
-                if (!(ref instanceof String)) {
-                    String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-                    keyToolslot1_ = s;
-                    return s;
-                } else {
-                    return (String) ref;
-                }
-            }
-
-            public Builder setKeyToolslot1(String value) {
-                if (value == null) {
-                    throw new NullPointerException();
-                }
-                bitField0_ |= 0x00010000;
-                keyToolslot1_ = value;
-                onChanged();
-                return this;
-            }
-
-            public Builder clearKeyToolslot1() {
-                bitField0_ = (bitField0_ & ~0x00010000);
-                keyToolslot1_ = getDefaultInstance().getKeyToolslot1();
-                onChanged();
-                return this;
-            }
-
-            void setKeyToolslot1(com.google.protobuf.ByteString value) {
-                bitField0_ |= 0x00010000;
-                keyToolslot1_ = value;
-                onChanged();
-            }
-
-            // optional string key_toolslot2 = 18 [default = "2"];
-            private java.lang.Object keyToolslot2_ = "2";
-
-            public boolean hasKeyToolslot2() {
-                return ((bitField0_ & 0x00020000) == 0x00020000);
-            }
-
-            public String getKeyToolslot2() {
-                java.lang.Object ref = keyToolslot2_;
-                if (!(ref instanceof String)) {
-                    String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-                    keyToolslot2_ = s;
-                    return s;
-                } else {
-                    return (String) ref;
-                }
-            }
-
-            public Builder setKeyToolslot2(String value) {
-                if (value == null) {
-                    throw new NullPointerException();
-                }
-                bitField0_ |= 0x00020000;
-                keyToolslot2_ = value;
-                onChanged();
-                return this;
-            }
-
-            public Builder clearKeyToolslot2() {
-                bitField0_ = (bitField0_ & ~0x00020000);
-                keyToolslot2_ = getDefaultInstance().getKeyToolslot2();
-                onChanged();
-                return this;
-            }
-
-            void setKeyToolslot2(com.google.protobuf.ByteString value) {
-                bitField0_ |= 0x00020000;
-                keyToolslot2_ = value;
-                onChanged();
-            }
-
-            // optional string key_toolslot3 = 19 [default = "3"];
-            private java.lang.Object keyToolslot3_ = "3";
-
-            public boolean hasKeyToolslot3() {
-                return ((bitField0_ & 0x00040000) == 0x00040000);
-            }
-
-            public String getKeyToolslot3() {
-                java.lang.Object ref = keyToolslot3_;
-                if (!(ref instanceof String)) {
-                    String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-                    keyToolslot3_ = s;
-                    return s;
-                } else {
-                    return (String) ref;
-                }
-            }
-
-            public Builder setKeyToolslot3(String value) {
-                if (value == null) {
-                    throw new NullPointerException();
-                }
-                bitField0_ |= 0x00040000;
-                keyToolslot3_ = value;
-                onChanged();
-                return this;
-            }
-
-            public Builder clearKeyToolslot3() {
-                bitField0_ = (bitField0_ & ~0x00040000);
-                keyToolslot3_ = getDefaultInstance().getKeyToolslot3();
-                onChanged();
-                return this;
-            }
-
-            void setKeyToolslot3(com.google.protobuf.ByteString value) {
-                bitField0_ |= 0x00040000;
-                keyToolslot3_ = value;
-                onChanged();
-            }
-
-            // optional string key_toolslot4 = 20 [default = "4"];
-            private java.lang.Object keyToolslot4_ = "4";
-
-            public boolean hasKeyToolslot4() {
-                return ((bitField0_ & 0x00080000) == 0x00080000);
-            }
-
-            public String getKeyToolslot4() {
-                java.lang.Object ref = keyToolslot4_;
-                if (!(ref instanceof String)) {
-                    String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-                    keyToolslot4_ = s;
-                    return s;
-                } else {
-                    return (String) ref;
-                }
-            }
-
-            public Builder setKeyToolslot4(String value) {
-                if (value == null) {
-                    throw new NullPointerException();
-                }
-                bitField0_ |= 0x00080000;
-                keyToolslot4_ = value;
-                onChanged();
-                return this;
-            }
-
-            public Builder clearKeyToolslot4() {
-                bitField0_ = (bitField0_ & ~0x00080000);
-                keyToolslot4_ = getDefaultInstance().getKeyToolslot4();
-                onChanged();
-                return this;
-            }
-
-            void setKeyToolslot4(com.google.protobuf.ByteString value) {
-                bitField0_ |= 0x00080000;
-                keyToolslot4_ = value;
-                onChanged();
-            }
-
-            // optional string key_toolslot5 = 21 [default = "5"];
-            private java.lang.Object keyToolslot5_ = "5";
-
-            public boolean hasKeyToolslot5() {
-                return ((bitField0_ & 0x00100000) == 0x00100000);
-            }
-
-            public String getKeyToolslot5() {
-                java.lang.Object ref = keyToolslot5_;
-                if (!(ref instanceof String)) {
-                    String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-                    keyToolslot5_ = s;
-                    return s;
-                } else {
-                    return (String) ref;
-                }
-            }
-
-            public Builder setKeyToolslot5(String value) {
-                if (value == null) {
-                    throw new NullPointerException();
-                }
-                bitField0_ |= 0x00100000;
-                keyToolslot5_ = value;
-                onChanged();
-                return this;
-            }
-
-            public Builder clearKeyToolslot5() {
-                bitField0_ = (bitField0_ & ~0x00100000);
-                keyToolslot5_ = getDefaultInstance().getKeyToolslot5();
-                onChanged();
-                return this;
-            }
-
-            void setKeyToolslot5(com.google.protobuf.ByteString value) {
-                bitField0_ |= 0x00100000;
-                keyToolslot5_ = value;
-                onChanged();
-            }
-
-            // optional string key_toolslot6 = 22 [default = "6"];
-            private java.lang.Object keyToolslot6_ = "6";
-
-            public boolean hasKeyToolslot6() {
-                return ((bitField0_ & 0x00200000) == 0x00200000);
-            }
-
-            public String getKeyToolslot6() {
-                java.lang.Object ref = keyToolslot6_;
-                if (!(ref instanceof String)) {
-                    String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-                    keyToolslot6_ = s;
-                    return s;
-                } else {
-                    return (String) ref;
-                }
-            }
-
-            public Builder setKeyToolslot6(String value) {
-                if (value == null) {
-                    throw new NullPointerException();
-                }
-                bitField0_ |= 0x00200000;
-                keyToolslot6_ = value;
-                onChanged();
-                return this;
-            }
-
-            public Builder clearKeyToolslot6() {
-                bitField0_ = (bitField0_ & ~0x00200000);
-                keyToolslot6_ = getDefaultInstance().getKeyToolslot6();
-                onChanged();
-                return this;
-            }
-
-            void setKeyToolslot6(com.google.protobuf.ByteString value) {
-                bitField0_ |= 0x00200000;
-                keyToolslot6_ = value;
-                onChanged();
-            }
-
-            // optional string key_toolslot7 = 23 [default = "7"];
-            private java.lang.Object keyToolslot7_ = "7";
-
-            public boolean hasKeyToolslot7() {
-                return ((bitField0_ & 0x00400000) == 0x00400000);
-            }
-
-            public String getKeyToolslot7() {
-                java.lang.Object ref = keyToolslot7_;
-                if (!(ref instanceof String)) {
-                    String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-                    keyToolslot7_ = s;
-                    return s;
-                } else {
-                    return (String) ref;
-                }
-            }
-
-            public Builder setKeyToolslot7(String value) {
-                if (value == null) {
-                    throw new NullPointerException();
-                }
-                bitField0_ |= 0x00400000;
-                keyToolslot7_ = value;
-                onChanged();
-                return this;
-            }
-
-            public Builder clearKeyToolslot7() {
-                bitField0_ = (bitField0_ & ~0x00400000);
-                keyToolslot7_ = getDefaultInstance().getKeyToolslot7();
-                onChanged();
-                return this;
-            }
-
-            void setKeyToolslot7(com.google.protobuf.ByteString value) {
-                bitField0_ |= 0x00400000;
-                keyToolslot7_ = value;
-                onChanged();
-            }
-
-            // optional string key_toolslot8 = 24 [default = "8"];
-            private java.lang.Object keyToolslot8_ = "8";
-
-            public boolean hasKeyToolslot8() {
-                return ((bitField0_ & 0x00800000) == 0x00800000);
-            }
-
-            public String getKeyToolslot8() {
-                java.lang.Object ref = keyToolslot8_;
-                if (!(ref instanceof String)) {
-                    String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-                    keyToolslot8_ = s;
-                    return s;
-                } else {
-                    return (String) ref;
-                }
-            }
-
-            public Builder setKeyToolslot8(String value) {
-                if (value == null) {
-                    throw new NullPointerException();
-                }
-                bitField0_ |= 0x00800000;
-                keyToolslot8_ = value;
-                onChanged();
-                return this;
-            }
-
-            public Builder clearKeyToolslot8() {
-                bitField0_ = (bitField0_ & ~0x00800000);
-                keyToolslot8_ = getDefaultInstance().getKeyToolslot8();
-                onChanged();
-                return this;
-            }
-
-            void setKeyToolslot8(com.google.protobuf.ByteString value) {
-                bitField0_ |= 0x00800000;
-                keyToolslot8_ = value;
-                onChanged();
-            }
-
-            // optional string key_toolslot9 = 25 [default = "9"];
-            private java.lang.Object keyToolslot9_ = "9";
-
-            public boolean hasKeyToolslot9() {
-                return ((bitField0_ & 0x01000000) == 0x01000000);
-            }
-
-            public String getKeyToolslot9() {
-                java.lang.Object ref = keyToolslot9_;
-                if (!(ref instanceof String)) {
-                    String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-                    keyToolslot9_ = s;
-                    return s;
-                } else {
-                    return (String) ref;
-                }
-            }
-
-            public Builder setKeyToolslot9(String value) {
-                if (value == null) {
-                    throw new NullPointerException();
-                }
-                bitField0_ |= 0x01000000;
-                keyToolslot9_ = value;
-                onChanged();
-                return this;
-            }
-
-            public Builder clearKeyToolslot9() {
-                bitField0_ = (bitField0_ & ~0x01000000);
-                keyToolslot9_ = getDefaultInstance().getKeyToolslot9();
-                onChanged();
-                return this;
-            }
-
-            void setKeyToolslot9(com.google.protobuf.ByteString value) {
-                bitField0_ |= 0x01000000;
-                keyToolslot9_ = value;
-                onChanged();
-            }
-
-            // optional string key_minionmode = 26 [default = "X"];
-            private java.lang.Object keyMinionmode_ = "X";
-
-            public boolean hasKeyMinionmode() {
-                return ((bitField0_ & 0x02000000) == 0x02000000);
-            }
-
-            public String getKeyMinionmode() {
-                java.lang.Object ref = keyMinionmode_;
-                if (!(ref instanceof String)) {
-                    String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-                    keyMinionmode_ = s;
-                    return s;
-                } else {
-                    return (String) ref;
-                }
-            }
-
-            public Builder setKeyMinionmode(String value) {
-                if (value == null) {
-                    throw new NullPointerException();
-                }
-                bitField0_ |= 0x02000000;
-                keyMinionmode_ = value;
-                onChanged();
-                return this;
-            }
-
-            public Builder clearKeyMinionmode() {
-                bitField0_ = (bitField0_ & ~0x02000000);
-                keyMinionmode_ = getDefaultInstance().getKeyMinionmode();
-                onChanged();
-                return this;
-            }
-
-            void setKeyMinionmode(com.google.protobuf.ByteString value) {
-                bitField0_ |= 0x02000000;
-                keyMinionmode_ = value;
-                onChanged();
-            }
-
-            // optional string key_hidegui = 27 [default = "H"];
-            private java.lang.Object keyHidegui_ = "H";
-
-            public boolean hasKeyHidegui() {
-                return ((bitField0_ & 0x04000000) == 0x04000000);
-            }
-
-            public String getKeyHidegui() {
-                java.lang.Object ref = keyHidegui_;
-                if (!(ref instanceof String)) {
-                    String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-                    keyHidegui_ = s;
-                    return s;
-                } else {
-                    return (String) ref;
-                }
-            }
-
-            public Builder setKeyHidegui(String value) {
-                if (value == null) {
-                    throw new NullPointerException();
-                }
-                bitField0_ |= 0x04000000;
-                keyHidegui_ = value;
-                onChanged();
-                return this;
-            }
-
-            public Builder clearKeyHidegui() {
-                bitField0_ = (bitField0_ & ~0x04000000);
-                keyHidegui_ = getDefaultInstance().getKeyHidegui();
-                onChanged();
-                return this;
-            }
-
-            void setKeyHidegui(com.google.protobuf.ByteString value) {
-                bitField0_ |= 0x04000000;
-                keyHidegui_ = value;
-                onChanged();
-            }
-
-            // optional string key_pauze = 28 [default = "ESCAPE"];
-            private java.lang.Object keyPauze_ = "ESCAPE";
-
-            public boolean hasKeyPauze() {
-                return ((bitField0_ & 0x08000000) == 0x08000000);
-            }
-
-            public String getKeyPauze() {
-                java.lang.Object ref = keyPauze_;
-                if (!(ref instanceof String)) {
-                    String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-                    keyPauze_ = s;
-                    return s;
-                } else {
-                    return (String) ref;
-                }
-            }
-
-            public Builder setKeyPauze(String value) {
-                if (value == null) {
-                    throw new NullPointerException();
-                }
-                bitField0_ |= 0x08000000;
-                keyPauze_ = value;
-                onChanged();
-                return this;
-            }
-
-            public Builder clearKeyPauze() {
-                bitField0_ = (bitField0_ & ~0x08000000);
-                keyPauze_ = getDefaultInstance().getKeyPauze();
-                onChanged();
-                return this;
-            }
-
-            void setKeyPauze(com.google.protobuf.ByteString value) {
-                bitField0_ |= 0x08000000;
-                keyPauze_ = value;
-                onChanged();
-            }
-
-            // optional string jumpbehaviour = 29 [default = "NORMAL"];
-            private java.lang.Object jumpbehaviour_ = "NORMAL";
-
-            public boolean hasJumpbehaviour() {
-                return ((bitField0_ & 0x10000000) == 0x10000000);
-            }
-
-            public String getJumpbehaviour() {
-                java.lang.Object ref = jumpbehaviour_;
-                if (!(ref instanceof String)) {
-                    String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-                    jumpbehaviour_ = s;
-                    return s;
-                } else {
-                    return (String) ref;
-                }
-            }
-
-            public Builder setJumpbehaviour(String value) {
-                if (value == null) {
-                    throw new NullPointerException();
-                }
-                bitField0_ |= 0x10000000;
-                jumpbehaviour_ = value;
-                onChanged();
-                return this;
-            }
-
-            public Builder clearJumpbehaviour() {
-                bitField0_ = (bitField0_ & ~0x10000000);
-                jumpbehaviour_ = getDefaultInstance().getJumpbehaviour();
-                onChanged();
-                return this;
-            }
-
-            void setJumpbehaviour(com.google.protobuf.ByteString value) {
-                bitField0_ |= 0x10000000;
-                jumpbehaviour_ = value;
-                onChanged();
-            }
-
-            // @@protoc_insertion_point(builder_scope:InputSetting)
-        }
-
-        static {
-            defaultInstance = new InputSetting(true);
-            defaultInstance.initFields();
-        }
-
-        // @@protoc_insertion_point(class_scope:InputSetting)
+      return org.terasology.protobuf.InputData.internal_static_InputSetting_fieldAccessorTable;
     }
-
-    private static com.google.protobuf.Descriptors.Descriptor
-            internal_static_InputSetting_descriptor;
-    private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-            internal_static_InputSetting_fieldAccessorTable;
-
-    public static com.google.protobuf.Descriptors.FileDescriptor
-    getDescriptor() {
-        return descriptor;
+    
+    private int bitField0_;
+    // optional bool EnableMusic = 1 [default = false];
+    public static final int ENABLEMUSIC_FIELD_NUMBER = 1;
+    private boolean enableMusic_;
+    public boolean hasEnableMusic() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
     }
-
-    private static com.google.protobuf.Descriptors.FileDescriptor
-            descriptor;
-
+    public boolean getEnableMusic() {
+      return enableMusic_;
+    }
+    
+    // optional bool EnableSound = 2 [default = false];
+    public static final int ENABLESOUND_FIELD_NUMBER = 2;
+    private boolean enableSound_;
+    public boolean hasEnableSound() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    public boolean getEnableSound() {
+      return enableSound_;
+    }
+    
+    // optional string key_forward = 3 [default = "W"];
+    public static final int KEY_FORWARD_FIELD_NUMBER = 3;
+    private java.lang.Object keyForward_;
+    public boolean hasKeyForward() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    public String getKeyForward() {
+      java.lang.Object ref = keyForward_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          keyForward_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getKeyForwardBytes() {
+      java.lang.Object ref = keyForward_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        keyForward_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // optional string key_backward = 4 [default = "S"];
+    public static final int KEY_BACKWARD_FIELD_NUMBER = 4;
+    private java.lang.Object keyBackward_;
+    public boolean hasKeyBackward() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    public String getKeyBackward() {
+      java.lang.Object ref = keyBackward_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          keyBackward_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getKeyBackwardBytes() {
+      java.lang.Object ref = keyBackward_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        keyBackward_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // optional string key_left = 5 [default = "A"];
+    public static final int KEY_LEFT_FIELD_NUMBER = 5;
+    private java.lang.Object keyLeft_;
+    public boolean hasKeyLeft() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    public String getKeyLeft() {
+      java.lang.Object ref = keyLeft_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          keyLeft_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getKeyLeftBytes() {
+      java.lang.Object ref = keyLeft_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        keyLeft_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // optional string key_right = 6 [default = "D"];
+    public static final int KEY_RIGHT_FIELD_NUMBER = 6;
+    private java.lang.Object keyRight_;
+    public boolean hasKeyRight() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    public String getKeyRight() {
+      java.lang.Object ref = keyRight_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          keyRight_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getKeyRightBytes() {
+      java.lang.Object ref = keyRight_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        keyRight_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // optional string key_jump = 7 [default = "SPACE"];
+    public static final int KEY_JUMP_FIELD_NUMBER = 7;
+    private java.lang.Object keyJump_;
+    public boolean hasKeyJump() {
+      return ((bitField0_ & 0x00000040) == 0x00000040);
+    }
+    public String getKeyJump() {
+      java.lang.Object ref = keyJump_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          keyJump_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getKeyJumpBytes() {
+      java.lang.Object ref = keyJump_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        keyJump_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // optional string key_console = 8 [default = "TAB"];
+    public static final int KEY_CONSOLE_FIELD_NUMBER = 8;
+    private java.lang.Object keyConsole_;
+    public boolean hasKeyConsole() {
+      return ((bitField0_ & 0x00000080) == 0x00000080);
+    }
+    public String getKeyConsole() {
+      java.lang.Object ref = keyConsole_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          keyConsole_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getKeyConsoleBytes() {
+      java.lang.Object ref = keyConsole_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        keyConsole_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // optional string key_inventory = 9 [default = "I"];
+    public static final int KEY_INVENTORY_FIELD_NUMBER = 9;
+    private java.lang.Object keyInventory_;
+    public boolean hasKeyInventory() {
+      return ((bitField0_ & 0x00000100) == 0x00000100);
+    }
+    public String getKeyInventory() {
+      java.lang.Object ref = keyInventory_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          keyInventory_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getKeyInventoryBytes() {
+      java.lang.Object ref = keyInventory_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        keyInventory_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // optional string key_crouch = 10 [default = "C"];
+    public static final int KEY_CROUCH_FIELD_NUMBER = 10;
+    private java.lang.Object keyCrouch_;
+    public boolean hasKeyCrouch() {
+      return ((bitField0_ & 0x00000200) == 0x00000200);
+    }
+    public String getKeyCrouch() {
+      java.lang.Object ref = keyCrouch_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          keyCrouch_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getKeyCrouchBytes() {
+      java.lang.Object ref = keyCrouch_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        keyCrouch_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // optional string key_run = 11 [default = "LSHIFT"];
+    public static final int KEY_RUN_FIELD_NUMBER = 11;
+    private java.lang.Object keyRun_;
+    public boolean hasKeyRun() {
+      return ((bitField0_ & 0x00000400) == 0x00000400);
+    }
+    public String getKeyRun() {
+      java.lang.Object ref = keyRun_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          keyRun_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getKeyRunBytes() {
+      java.lang.Object ref = keyRun_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        keyRun_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // optional string key_attack = 12 [default = "MOUSERIGHT"];
+    public static final int KEY_ATTACK_FIELD_NUMBER = 12;
+    private java.lang.Object keyAttack_;
+    public boolean hasKeyAttack() {
+      return ((bitField0_ & 0x00000800) == 0x00000800);
+    }
+    public String getKeyAttack() {
+      java.lang.Object ref = keyAttack_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          keyAttack_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getKeyAttackBytes() {
+      java.lang.Object ref = keyAttack_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        keyAttack_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // optional string key_usehelditem = 13 [default = "MOUSELEFT"];
+    public static final int KEY_USEHELDITEM_FIELD_NUMBER = 13;
+    private java.lang.Object keyUsehelditem_;
+    public boolean hasKeyUsehelditem() {
+      return ((bitField0_ & 0x00001000) == 0x00001000);
+    }
+    public String getKeyUsehelditem() {
+      java.lang.Object ref = keyUsehelditem_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          keyUsehelditem_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getKeyUsehelditemBytes() {
+      java.lang.Object ref = keyUsehelditem_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        keyUsehelditem_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // optional string key_frob = 14 [default = "E"];
+    public static final int KEY_FROB_FIELD_NUMBER = 14;
+    private java.lang.Object keyFrob_;
+    public boolean hasKeyFrob() {
+      return ((bitField0_ & 0x00002000) == 0x00002000);
+    }
+    public String getKeyFrob() {
+      java.lang.Object ref = keyFrob_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          keyFrob_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getKeyFrobBytes() {
+      java.lang.Object ref = keyFrob_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        keyFrob_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // optional string key_toolnext = 15 [default = "MOUSEWHEElUP"];
+    public static final int KEY_TOOLNEXT_FIELD_NUMBER = 15;
+    private java.lang.Object keyToolnext_;
+    public boolean hasKeyToolnext() {
+      return ((bitField0_ & 0x00004000) == 0x00004000);
+    }
+    public String getKeyToolnext() {
+      java.lang.Object ref = keyToolnext_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          keyToolnext_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getKeyToolnextBytes() {
+      java.lang.Object ref = keyToolnext_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        keyToolnext_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // optional string key_toolprev = 16 [default = "MOUSEWHEELDOWN"];
+    public static final int KEY_TOOLPREV_FIELD_NUMBER = 16;
+    private java.lang.Object keyToolprev_;
+    public boolean hasKeyToolprev() {
+      return ((bitField0_ & 0x00008000) == 0x00008000);
+    }
+    public String getKeyToolprev() {
+      java.lang.Object ref = keyToolprev_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          keyToolprev_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getKeyToolprevBytes() {
+      java.lang.Object ref = keyToolprev_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        keyToolprev_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // optional string key_toolslot1 = 17 [default = "1"];
+    public static final int KEY_TOOLSLOT1_FIELD_NUMBER = 17;
+    private java.lang.Object keyToolslot1_;
+    public boolean hasKeyToolslot1() {
+      return ((bitField0_ & 0x00010000) == 0x00010000);
+    }
+    public String getKeyToolslot1() {
+      java.lang.Object ref = keyToolslot1_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          keyToolslot1_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getKeyToolslot1Bytes() {
+      java.lang.Object ref = keyToolslot1_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        keyToolslot1_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // optional string key_toolslot2 = 18 [default = "2"];
+    public static final int KEY_TOOLSLOT2_FIELD_NUMBER = 18;
+    private java.lang.Object keyToolslot2_;
+    public boolean hasKeyToolslot2() {
+      return ((bitField0_ & 0x00020000) == 0x00020000);
+    }
+    public String getKeyToolslot2() {
+      java.lang.Object ref = keyToolslot2_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          keyToolslot2_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getKeyToolslot2Bytes() {
+      java.lang.Object ref = keyToolslot2_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        keyToolslot2_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // optional string key_toolslot3 = 19 [default = "3"];
+    public static final int KEY_TOOLSLOT3_FIELD_NUMBER = 19;
+    private java.lang.Object keyToolslot3_;
+    public boolean hasKeyToolslot3() {
+      return ((bitField0_ & 0x00040000) == 0x00040000);
+    }
+    public String getKeyToolslot3() {
+      java.lang.Object ref = keyToolslot3_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          keyToolslot3_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getKeyToolslot3Bytes() {
+      java.lang.Object ref = keyToolslot3_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        keyToolslot3_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // optional string key_toolslot4 = 20 [default = "4"];
+    public static final int KEY_TOOLSLOT4_FIELD_NUMBER = 20;
+    private java.lang.Object keyToolslot4_;
+    public boolean hasKeyToolslot4() {
+      return ((bitField0_ & 0x00080000) == 0x00080000);
+    }
+    public String getKeyToolslot4() {
+      java.lang.Object ref = keyToolslot4_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          keyToolslot4_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getKeyToolslot4Bytes() {
+      java.lang.Object ref = keyToolslot4_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        keyToolslot4_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // optional string key_toolslot5 = 21 [default = "5"];
+    public static final int KEY_TOOLSLOT5_FIELD_NUMBER = 21;
+    private java.lang.Object keyToolslot5_;
+    public boolean hasKeyToolslot5() {
+      return ((bitField0_ & 0x00100000) == 0x00100000);
+    }
+    public String getKeyToolslot5() {
+      java.lang.Object ref = keyToolslot5_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          keyToolslot5_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getKeyToolslot5Bytes() {
+      java.lang.Object ref = keyToolslot5_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        keyToolslot5_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // optional string key_toolslot6 = 22 [default = "6"];
+    public static final int KEY_TOOLSLOT6_FIELD_NUMBER = 22;
+    private java.lang.Object keyToolslot6_;
+    public boolean hasKeyToolslot6() {
+      return ((bitField0_ & 0x00200000) == 0x00200000);
+    }
+    public String getKeyToolslot6() {
+      java.lang.Object ref = keyToolslot6_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          keyToolslot6_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getKeyToolslot6Bytes() {
+      java.lang.Object ref = keyToolslot6_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        keyToolslot6_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // optional string key_toolslot7 = 23 [default = "7"];
+    public static final int KEY_TOOLSLOT7_FIELD_NUMBER = 23;
+    private java.lang.Object keyToolslot7_;
+    public boolean hasKeyToolslot7() {
+      return ((bitField0_ & 0x00400000) == 0x00400000);
+    }
+    public String getKeyToolslot7() {
+      java.lang.Object ref = keyToolslot7_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          keyToolslot7_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getKeyToolslot7Bytes() {
+      java.lang.Object ref = keyToolslot7_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        keyToolslot7_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // optional string key_toolslot8 = 24 [default = "8"];
+    public static final int KEY_TOOLSLOT8_FIELD_NUMBER = 24;
+    private java.lang.Object keyToolslot8_;
+    public boolean hasKeyToolslot8() {
+      return ((bitField0_ & 0x00800000) == 0x00800000);
+    }
+    public String getKeyToolslot8() {
+      java.lang.Object ref = keyToolslot8_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          keyToolslot8_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getKeyToolslot8Bytes() {
+      java.lang.Object ref = keyToolslot8_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        keyToolslot8_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // optional string key_toolslot9 = 25 [default = "9"];
+    public static final int KEY_TOOLSLOT9_FIELD_NUMBER = 25;
+    private java.lang.Object keyToolslot9_;
+    public boolean hasKeyToolslot9() {
+      return ((bitField0_ & 0x01000000) == 0x01000000);
+    }
+    public String getKeyToolslot9() {
+      java.lang.Object ref = keyToolslot9_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          keyToolslot9_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getKeyToolslot9Bytes() {
+      java.lang.Object ref = keyToolslot9_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        keyToolslot9_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // optional string key_minionmode = 26 [default = "X"];
+    public static final int KEY_MINIONMODE_FIELD_NUMBER = 26;
+    private java.lang.Object keyMinionmode_;
+    public boolean hasKeyMinionmode() {
+      return ((bitField0_ & 0x02000000) == 0x02000000);
+    }
+    public String getKeyMinionmode() {
+      java.lang.Object ref = keyMinionmode_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          keyMinionmode_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getKeyMinionmodeBytes() {
+      java.lang.Object ref = keyMinionmode_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        keyMinionmode_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // optional string key_hidegui = 27 [default = "H"];
+    public static final int KEY_HIDEGUI_FIELD_NUMBER = 27;
+    private java.lang.Object keyHidegui_;
+    public boolean hasKeyHidegui() {
+      return ((bitField0_ & 0x04000000) == 0x04000000);
+    }
+    public String getKeyHidegui() {
+      java.lang.Object ref = keyHidegui_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          keyHidegui_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getKeyHideguiBytes() {
+      java.lang.Object ref = keyHidegui_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        keyHidegui_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // optional string key_pauze = 28 [default = "ESCAPE"];
+    public static final int KEY_PAUZE_FIELD_NUMBER = 28;
+    private java.lang.Object keyPauze_;
+    public boolean hasKeyPauze() {
+      return ((bitField0_ & 0x08000000) == 0x08000000);
+    }
+    public String getKeyPauze() {
+      java.lang.Object ref = keyPauze_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          keyPauze_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getKeyPauzeBytes() {
+      java.lang.Object ref = keyPauze_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        keyPauze_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // optional string jumpbehaviour = 29 [default = "NORMAL"];
+    public static final int JUMPBEHAVIOUR_FIELD_NUMBER = 29;
+    private java.lang.Object jumpbehaviour_;
+    public boolean hasJumpbehaviour() {
+      return ((bitField0_ & 0x10000000) == 0x10000000);
+    }
+    public String getJumpbehaviour() {
+      java.lang.Object ref = jumpbehaviour_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          jumpbehaviour_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getJumpbehaviourBytes() {
+      java.lang.Object ref = jumpbehaviour_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        jumpbehaviour_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    private void initFields() {
+      enableMusic_ = false;
+      enableSound_ = false;
+      keyForward_ = "W";
+      keyBackward_ = "S";
+      keyLeft_ = "A";
+      keyRight_ = "D";
+      keyJump_ = "SPACE";
+      keyConsole_ = "TAB";
+      keyInventory_ = "I";
+      keyCrouch_ = "C";
+      keyRun_ = "LSHIFT";
+      keyAttack_ = "MOUSERIGHT";
+      keyUsehelditem_ = "MOUSELEFT";
+      keyFrob_ = "E";
+      keyToolnext_ = "MOUSEWHEElUP";
+      keyToolprev_ = "MOUSEWHEELDOWN";
+      keyToolslot1_ = "1";
+      keyToolslot2_ = "2";
+      keyToolslot3_ = "3";
+      keyToolslot4_ = "4";
+      keyToolslot5_ = "5";
+      keyToolslot6_ = "6";
+      keyToolslot7_ = "7";
+      keyToolslot8_ = "8";
+      keyToolslot9_ = "9";
+      keyMinionmode_ = "X";
+      keyHidegui_ = "H";
+      keyPauze_ = "ESCAPE";
+      jumpbehaviour_ = "NORMAL";
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+      
+      memoizedIsInitialized = 1;
+      return true;
+    }
+    
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeBool(1, enableMusic_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeBool(2, enableSound_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeBytes(3, getKeyForwardBytes());
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeBytes(4, getKeyBackwardBytes());
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeBytes(5, getKeyLeftBytes());
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeBytes(6, getKeyRightBytes());
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        output.writeBytes(7, getKeyJumpBytes());
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        output.writeBytes(8, getKeyConsoleBytes());
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        output.writeBytes(9, getKeyInventoryBytes());
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        output.writeBytes(10, getKeyCrouchBytes());
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        output.writeBytes(11, getKeyRunBytes());
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        output.writeBytes(12, getKeyAttackBytes());
+      }
+      if (((bitField0_ & 0x00001000) == 0x00001000)) {
+        output.writeBytes(13, getKeyUsehelditemBytes());
+      }
+      if (((bitField0_ & 0x00002000) == 0x00002000)) {
+        output.writeBytes(14, getKeyFrobBytes());
+      }
+      if (((bitField0_ & 0x00004000) == 0x00004000)) {
+        output.writeBytes(15, getKeyToolnextBytes());
+      }
+      if (((bitField0_ & 0x00008000) == 0x00008000)) {
+        output.writeBytes(16, getKeyToolprevBytes());
+      }
+      if (((bitField0_ & 0x00010000) == 0x00010000)) {
+        output.writeBytes(17, getKeyToolslot1Bytes());
+      }
+      if (((bitField0_ & 0x00020000) == 0x00020000)) {
+        output.writeBytes(18, getKeyToolslot2Bytes());
+      }
+      if (((bitField0_ & 0x00040000) == 0x00040000)) {
+        output.writeBytes(19, getKeyToolslot3Bytes());
+      }
+      if (((bitField0_ & 0x00080000) == 0x00080000)) {
+        output.writeBytes(20, getKeyToolslot4Bytes());
+      }
+      if (((bitField0_ & 0x00100000) == 0x00100000)) {
+        output.writeBytes(21, getKeyToolslot5Bytes());
+      }
+      if (((bitField0_ & 0x00200000) == 0x00200000)) {
+        output.writeBytes(22, getKeyToolslot6Bytes());
+      }
+      if (((bitField0_ & 0x00400000) == 0x00400000)) {
+        output.writeBytes(23, getKeyToolslot7Bytes());
+      }
+      if (((bitField0_ & 0x00800000) == 0x00800000)) {
+        output.writeBytes(24, getKeyToolslot8Bytes());
+      }
+      if (((bitField0_ & 0x01000000) == 0x01000000)) {
+        output.writeBytes(25, getKeyToolslot9Bytes());
+      }
+      if (((bitField0_ & 0x02000000) == 0x02000000)) {
+        output.writeBytes(26, getKeyMinionmodeBytes());
+      }
+      if (((bitField0_ & 0x04000000) == 0x04000000)) {
+        output.writeBytes(27, getKeyHideguiBytes());
+      }
+      if (((bitField0_ & 0x08000000) == 0x08000000)) {
+        output.writeBytes(28, getKeyPauzeBytes());
+      }
+      if (((bitField0_ & 0x10000000) == 0x10000000)) {
+        output.writeBytes(29, getJumpbehaviourBytes());
+      }
+      getUnknownFields().writeTo(output);
+    }
+    
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+    
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(1, enableMusic_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(2, enableSound_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(3, getKeyForwardBytes());
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(4, getKeyBackwardBytes());
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(5, getKeyLeftBytes());
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(6, getKeyRightBytes());
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(7, getKeyJumpBytes());
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(8, getKeyConsoleBytes());
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(9, getKeyInventoryBytes());
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(10, getKeyCrouchBytes());
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(11, getKeyRunBytes());
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(12, getKeyAttackBytes());
+      }
+      if (((bitField0_ & 0x00001000) == 0x00001000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(13, getKeyUsehelditemBytes());
+      }
+      if (((bitField0_ & 0x00002000) == 0x00002000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(14, getKeyFrobBytes());
+      }
+      if (((bitField0_ & 0x00004000) == 0x00004000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(15, getKeyToolnextBytes());
+      }
+      if (((bitField0_ & 0x00008000) == 0x00008000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(16, getKeyToolprevBytes());
+      }
+      if (((bitField0_ & 0x00010000) == 0x00010000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(17, getKeyToolslot1Bytes());
+      }
+      if (((bitField0_ & 0x00020000) == 0x00020000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(18, getKeyToolslot2Bytes());
+      }
+      if (((bitField0_ & 0x00040000) == 0x00040000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(19, getKeyToolslot3Bytes());
+      }
+      if (((bitField0_ & 0x00080000) == 0x00080000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(20, getKeyToolslot4Bytes());
+      }
+      if (((bitField0_ & 0x00100000) == 0x00100000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(21, getKeyToolslot5Bytes());
+      }
+      if (((bitField0_ & 0x00200000) == 0x00200000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(22, getKeyToolslot6Bytes());
+      }
+      if (((bitField0_ & 0x00400000) == 0x00400000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(23, getKeyToolslot7Bytes());
+      }
+      if (((bitField0_ & 0x00800000) == 0x00800000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(24, getKeyToolslot8Bytes());
+      }
+      if (((bitField0_ & 0x01000000) == 0x01000000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(25, getKeyToolslot9Bytes());
+      }
+      if (((bitField0_ & 0x02000000) == 0x02000000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(26, getKeyMinionmodeBytes());
+      }
+      if (((bitField0_ & 0x04000000) == 0x04000000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(27, getKeyHideguiBytes());
+      }
+      if (((bitField0_ & 0x08000000) == 0x08000000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(28, getKeyPauzeBytes());
+      }
+      if (((bitField0_ & 0x10000000) == 0x10000000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(29, getJumpbehaviourBytes());
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+    
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+    
+    public static org.terasology.protobuf.InputData.InputSetting parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static org.terasology.protobuf.InputData.InputSetting parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static org.terasology.protobuf.InputData.InputSetting parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static org.terasology.protobuf.InputData.InputSetting parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static org.terasology.protobuf.InputData.InputSetting parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static org.terasology.protobuf.InputData.InputSetting parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    public static org.terasology.protobuf.InputData.InputSetting parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static org.terasology.protobuf.InputData.InputSetting parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static org.terasology.protobuf.InputData.InputSetting parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static org.terasology.protobuf.InputData.InputSetting parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(org.terasology.protobuf.InputData.InputSetting prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+    
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements org.terasology.protobuf.InputData.InputSettingOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.terasology.protobuf.InputData.internal_static_InputSetting_descriptor;
+      }
+      
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.terasology.protobuf.InputData.internal_static_InputSetting_fieldAccessorTable;
+      }
+      
+      // Construct using org.terasology.protobuf.InputData.InputSetting.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+      
+      private Builder(BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+      
+      public Builder clear() {
+        super.clear();
+        enableMusic_ = false;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        enableSound_ = false;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        keyForward_ = "W";
+        bitField0_ = (bitField0_ & ~0x00000004);
+        keyBackward_ = "S";
+        bitField0_ = (bitField0_ & ~0x00000008);
+        keyLeft_ = "A";
+        bitField0_ = (bitField0_ & ~0x00000010);
+        keyRight_ = "D";
+        bitField0_ = (bitField0_ & ~0x00000020);
+        keyJump_ = "SPACE";
+        bitField0_ = (bitField0_ & ~0x00000040);
+        keyConsole_ = "TAB";
+        bitField0_ = (bitField0_ & ~0x00000080);
+        keyInventory_ = "I";
+        bitField0_ = (bitField0_ & ~0x00000100);
+        keyCrouch_ = "C";
+        bitField0_ = (bitField0_ & ~0x00000200);
+        keyRun_ = "LSHIFT";
+        bitField0_ = (bitField0_ & ~0x00000400);
+        keyAttack_ = "MOUSERIGHT";
+        bitField0_ = (bitField0_ & ~0x00000800);
+        keyUsehelditem_ = "MOUSELEFT";
+        bitField0_ = (bitField0_ & ~0x00001000);
+        keyFrob_ = "E";
+        bitField0_ = (bitField0_ & ~0x00002000);
+        keyToolnext_ = "MOUSEWHEElUP";
+        bitField0_ = (bitField0_ & ~0x00004000);
+        keyToolprev_ = "MOUSEWHEELDOWN";
+        bitField0_ = (bitField0_ & ~0x00008000);
+        keyToolslot1_ = "1";
+        bitField0_ = (bitField0_ & ~0x00010000);
+        keyToolslot2_ = "2";
+        bitField0_ = (bitField0_ & ~0x00020000);
+        keyToolslot3_ = "3";
+        bitField0_ = (bitField0_ & ~0x00040000);
+        keyToolslot4_ = "4";
+        bitField0_ = (bitField0_ & ~0x00080000);
+        keyToolslot5_ = "5";
+        bitField0_ = (bitField0_ & ~0x00100000);
+        keyToolslot6_ = "6";
+        bitField0_ = (bitField0_ & ~0x00200000);
+        keyToolslot7_ = "7";
+        bitField0_ = (bitField0_ & ~0x00400000);
+        keyToolslot8_ = "8";
+        bitField0_ = (bitField0_ & ~0x00800000);
+        keyToolslot9_ = "9";
+        bitField0_ = (bitField0_ & ~0x01000000);
+        keyMinionmode_ = "X";
+        bitField0_ = (bitField0_ & ~0x02000000);
+        keyHidegui_ = "H";
+        bitField0_ = (bitField0_ & ~0x04000000);
+        keyPauze_ = "ESCAPE";
+        bitField0_ = (bitField0_ & ~0x08000000);
+        jumpbehaviour_ = "NORMAL";
+        bitField0_ = (bitField0_ & ~0x10000000);
+        return this;
+      }
+      
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+      
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.terasology.protobuf.InputData.InputSetting.getDescriptor();
+      }
+      
+      public org.terasology.protobuf.InputData.InputSetting getDefaultInstanceForType() {
+        return org.terasology.protobuf.InputData.InputSetting.getDefaultInstance();
+      }
+      
+      public org.terasology.protobuf.InputData.InputSetting build() {
+        org.terasology.protobuf.InputData.InputSetting result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+      
+      private org.terasology.protobuf.InputData.InputSetting buildParsed()
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        org.terasology.protobuf.InputData.InputSetting result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(
+            result).asInvalidProtocolBufferException();
+        }
+        return result;
+      }
+      
+      public org.terasology.protobuf.InputData.InputSetting buildPartial() {
+        org.terasology.protobuf.InputData.InputSetting result = new org.terasology.protobuf.InputData.InputSetting(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.enableMusic_ = enableMusic_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.enableSound_ = enableSound_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.keyForward_ = keyForward_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.keyBackward_ = keyBackward_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.keyLeft_ = keyLeft_;
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+          to_bitField0_ |= 0x00000020;
+        }
+        result.keyRight_ = keyRight_;
+        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+          to_bitField0_ |= 0x00000040;
+        }
+        result.keyJump_ = keyJump_;
+        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+          to_bitField0_ |= 0x00000080;
+        }
+        result.keyConsole_ = keyConsole_;
+        if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
+          to_bitField0_ |= 0x00000100;
+        }
+        result.keyInventory_ = keyInventory_;
+        if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
+          to_bitField0_ |= 0x00000200;
+        }
+        result.keyCrouch_ = keyCrouch_;
+        if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
+          to_bitField0_ |= 0x00000400;
+        }
+        result.keyRun_ = keyRun_;
+        if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
+          to_bitField0_ |= 0x00000800;
+        }
+        result.keyAttack_ = keyAttack_;
+        if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
+          to_bitField0_ |= 0x00001000;
+        }
+        result.keyUsehelditem_ = keyUsehelditem_;
+        if (((from_bitField0_ & 0x00002000) == 0x00002000)) {
+          to_bitField0_ |= 0x00002000;
+        }
+        result.keyFrob_ = keyFrob_;
+        if (((from_bitField0_ & 0x00004000) == 0x00004000)) {
+          to_bitField0_ |= 0x00004000;
+        }
+        result.keyToolnext_ = keyToolnext_;
+        if (((from_bitField0_ & 0x00008000) == 0x00008000)) {
+          to_bitField0_ |= 0x00008000;
+        }
+        result.keyToolprev_ = keyToolprev_;
+        if (((from_bitField0_ & 0x00010000) == 0x00010000)) {
+          to_bitField0_ |= 0x00010000;
+        }
+        result.keyToolslot1_ = keyToolslot1_;
+        if (((from_bitField0_ & 0x00020000) == 0x00020000)) {
+          to_bitField0_ |= 0x00020000;
+        }
+        result.keyToolslot2_ = keyToolslot2_;
+        if (((from_bitField0_ & 0x00040000) == 0x00040000)) {
+          to_bitField0_ |= 0x00040000;
+        }
+        result.keyToolslot3_ = keyToolslot3_;
+        if (((from_bitField0_ & 0x00080000) == 0x00080000)) {
+          to_bitField0_ |= 0x00080000;
+        }
+        result.keyToolslot4_ = keyToolslot4_;
+        if (((from_bitField0_ & 0x00100000) == 0x00100000)) {
+          to_bitField0_ |= 0x00100000;
+        }
+        result.keyToolslot5_ = keyToolslot5_;
+        if (((from_bitField0_ & 0x00200000) == 0x00200000)) {
+          to_bitField0_ |= 0x00200000;
+        }
+        result.keyToolslot6_ = keyToolslot6_;
+        if (((from_bitField0_ & 0x00400000) == 0x00400000)) {
+          to_bitField0_ |= 0x00400000;
+        }
+        result.keyToolslot7_ = keyToolslot7_;
+        if (((from_bitField0_ & 0x00800000) == 0x00800000)) {
+          to_bitField0_ |= 0x00800000;
+        }
+        result.keyToolslot8_ = keyToolslot8_;
+        if (((from_bitField0_ & 0x01000000) == 0x01000000)) {
+          to_bitField0_ |= 0x01000000;
+        }
+        result.keyToolslot9_ = keyToolslot9_;
+        if (((from_bitField0_ & 0x02000000) == 0x02000000)) {
+          to_bitField0_ |= 0x02000000;
+        }
+        result.keyMinionmode_ = keyMinionmode_;
+        if (((from_bitField0_ & 0x04000000) == 0x04000000)) {
+          to_bitField0_ |= 0x04000000;
+        }
+        result.keyHidegui_ = keyHidegui_;
+        if (((from_bitField0_ & 0x08000000) == 0x08000000)) {
+          to_bitField0_ |= 0x08000000;
+        }
+        result.keyPauze_ = keyPauze_;
+        if (((from_bitField0_ & 0x10000000) == 0x10000000)) {
+          to_bitField0_ |= 0x10000000;
+        }
+        result.jumpbehaviour_ = jumpbehaviour_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+      
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.terasology.protobuf.InputData.InputSetting) {
+          return mergeFrom((org.terasology.protobuf.InputData.InputSetting)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+      
+      public Builder mergeFrom(org.terasology.protobuf.InputData.InputSetting other) {
+        if (other == org.terasology.protobuf.InputData.InputSetting.getDefaultInstance()) return this;
+        if (other.hasEnableMusic()) {
+          setEnableMusic(other.getEnableMusic());
+        }
+        if (other.hasEnableSound()) {
+          setEnableSound(other.getEnableSound());
+        }
+        if (other.hasKeyForward()) {
+          setKeyForward(other.getKeyForward());
+        }
+        if (other.hasKeyBackward()) {
+          setKeyBackward(other.getKeyBackward());
+        }
+        if (other.hasKeyLeft()) {
+          setKeyLeft(other.getKeyLeft());
+        }
+        if (other.hasKeyRight()) {
+          setKeyRight(other.getKeyRight());
+        }
+        if (other.hasKeyJump()) {
+          setKeyJump(other.getKeyJump());
+        }
+        if (other.hasKeyConsole()) {
+          setKeyConsole(other.getKeyConsole());
+        }
+        if (other.hasKeyInventory()) {
+          setKeyInventory(other.getKeyInventory());
+        }
+        if (other.hasKeyCrouch()) {
+          setKeyCrouch(other.getKeyCrouch());
+        }
+        if (other.hasKeyRun()) {
+          setKeyRun(other.getKeyRun());
+        }
+        if (other.hasKeyAttack()) {
+          setKeyAttack(other.getKeyAttack());
+        }
+        if (other.hasKeyUsehelditem()) {
+          setKeyUsehelditem(other.getKeyUsehelditem());
+        }
+        if (other.hasKeyFrob()) {
+          setKeyFrob(other.getKeyFrob());
+        }
+        if (other.hasKeyToolnext()) {
+          setKeyToolnext(other.getKeyToolnext());
+        }
+        if (other.hasKeyToolprev()) {
+          setKeyToolprev(other.getKeyToolprev());
+        }
+        if (other.hasKeyToolslot1()) {
+          setKeyToolslot1(other.getKeyToolslot1());
+        }
+        if (other.hasKeyToolslot2()) {
+          setKeyToolslot2(other.getKeyToolslot2());
+        }
+        if (other.hasKeyToolslot3()) {
+          setKeyToolslot3(other.getKeyToolslot3());
+        }
+        if (other.hasKeyToolslot4()) {
+          setKeyToolslot4(other.getKeyToolslot4());
+        }
+        if (other.hasKeyToolslot5()) {
+          setKeyToolslot5(other.getKeyToolslot5());
+        }
+        if (other.hasKeyToolslot6()) {
+          setKeyToolslot6(other.getKeyToolslot6());
+        }
+        if (other.hasKeyToolslot7()) {
+          setKeyToolslot7(other.getKeyToolslot7());
+        }
+        if (other.hasKeyToolslot8()) {
+          setKeyToolslot8(other.getKeyToolslot8());
+        }
+        if (other.hasKeyToolslot9()) {
+          setKeyToolslot9(other.getKeyToolslot9());
+        }
+        if (other.hasKeyMinionmode()) {
+          setKeyMinionmode(other.getKeyMinionmode());
+        }
+        if (other.hasKeyHidegui()) {
+          setKeyHidegui(other.getKeyHidegui());
+        }
+        if (other.hasKeyPauze()) {
+          setKeyPauze(other.getKeyPauze());
+        }
+        if (other.hasJumpbehaviour()) {
+          setJumpbehaviour(other.getJumpbehaviour());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+      
+      public final boolean isInitialized() {
+        return true;
+      }
+      
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder(
+            this.getUnknownFields());
+        while (true) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              this.setUnknownFields(unknownFields.build());
+              onChanged();
+              return this;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                this.setUnknownFields(unknownFields.build());
+                onChanged();
+                return this;
+              }
+              break;
+            }
+            case 8: {
+              bitField0_ |= 0x00000001;
+              enableMusic_ = input.readBool();
+              break;
+            }
+            case 16: {
+              bitField0_ |= 0x00000002;
+              enableSound_ = input.readBool();
+              break;
+            }
+            case 26: {
+              bitField0_ |= 0x00000004;
+              keyForward_ = input.readBytes();
+              break;
+            }
+            case 34: {
+              bitField0_ |= 0x00000008;
+              keyBackward_ = input.readBytes();
+              break;
+            }
+            case 42: {
+              bitField0_ |= 0x00000010;
+              keyLeft_ = input.readBytes();
+              break;
+            }
+            case 50: {
+              bitField0_ |= 0x00000020;
+              keyRight_ = input.readBytes();
+              break;
+            }
+            case 58: {
+              bitField0_ |= 0x00000040;
+              keyJump_ = input.readBytes();
+              break;
+            }
+            case 66: {
+              bitField0_ |= 0x00000080;
+              keyConsole_ = input.readBytes();
+              break;
+            }
+            case 74: {
+              bitField0_ |= 0x00000100;
+              keyInventory_ = input.readBytes();
+              break;
+            }
+            case 82: {
+              bitField0_ |= 0x00000200;
+              keyCrouch_ = input.readBytes();
+              break;
+            }
+            case 90: {
+              bitField0_ |= 0x00000400;
+              keyRun_ = input.readBytes();
+              break;
+            }
+            case 98: {
+              bitField0_ |= 0x00000800;
+              keyAttack_ = input.readBytes();
+              break;
+            }
+            case 106: {
+              bitField0_ |= 0x00001000;
+              keyUsehelditem_ = input.readBytes();
+              break;
+            }
+            case 114: {
+              bitField0_ |= 0x00002000;
+              keyFrob_ = input.readBytes();
+              break;
+            }
+            case 122: {
+              bitField0_ |= 0x00004000;
+              keyToolnext_ = input.readBytes();
+              break;
+            }
+            case 130: {
+              bitField0_ |= 0x00008000;
+              keyToolprev_ = input.readBytes();
+              break;
+            }
+            case 138: {
+              bitField0_ |= 0x00010000;
+              keyToolslot1_ = input.readBytes();
+              break;
+            }
+            case 146: {
+              bitField0_ |= 0x00020000;
+              keyToolslot2_ = input.readBytes();
+              break;
+            }
+            case 154: {
+              bitField0_ |= 0x00040000;
+              keyToolslot3_ = input.readBytes();
+              break;
+            }
+            case 162: {
+              bitField0_ |= 0x00080000;
+              keyToolslot4_ = input.readBytes();
+              break;
+            }
+            case 170: {
+              bitField0_ |= 0x00100000;
+              keyToolslot5_ = input.readBytes();
+              break;
+            }
+            case 178: {
+              bitField0_ |= 0x00200000;
+              keyToolslot6_ = input.readBytes();
+              break;
+            }
+            case 186: {
+              bitField0_ |= 0x00400000;
+              keyToolslot7_ = input.readBytes();
+              break;
+            }
+            case 194: {
+              bitField0_ |= 0x00800000;
+              keyToolslot8_ = input.readBytes();
+              break;
+            }
+            case 202: {
+              bitField0_ |= 0x01000000;
+              keyToolslot9_ = input.readBytes();
+              break;
+            }
+            case 210: {
+              bitField0_ |= 0x02000000;
+              keyMinionmode_ = input.readBytes();
+              break;
+            }
+            case 218: {
+              bitField0_ |= 0x04000000;
+              keyHidegui_ = input.readBytes();
+              break;
+            }
+            case 226: {
+              bitField0_ |= 0x08000000;
+              keyPauze_ = input.readBytes();
+              break;
+            }
+            case 234: {
+              bitField0_ |= 0x10000000;
+              jumpbehaviour_ = input.readBytes();
+              break;
+            }
+          }
+        }
+      }
+      
+      private int bitField0_;
+      
+      // optional bool EnableMusic = 1 [default = false];
+      private boolean enableMusic_ ;
+      public boolean hasEnableMusic() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      public boolean getEnableMusic() {
+        return enableMusic_;
+      }
+      public Builder setEnableMusic(boolean value) {
+        bitField0_ |= 0x00000001;
+        enableMusic_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearEnableMusic() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        enableMusic_ = false;
+        onChanged();
+        return this;
+      }
+      
+      // optional bool EnableSound = 2 [default = false];
+      private boolean enableSound_ ;
+      public boolean hasEnableSound() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      public boolean getEnableSound() {
+        return enableSound_;
+      }
+      public Builder setEnableSound(boolean value) {
+        bitField0_ |= 0x00000002;
+        enableSound_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearEnableSound() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        enableSound_ = false;
+        onChanged();
+        return this;
+      }
+      
+      // optional string key_forward = 3 [default = "W"];
+      private java.lang.Object keyForward_ = "W";
+      public boolean hasKeyForward() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      public String getKeyForward() {
+        java.lang.Object ref = keyForward_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          keyForward_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setKeyForward(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000004;
+        keyForward_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearKeyForward() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        keyForward_ = getDefaultInstance().getKeyForward();
+        onChanged();
+        return this;
+      }
+      void setKeyForward(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00000004;
+        keyForward_ = value;
+        onChanged();
+      }
+      
+      // optional string key_backward = 4 [default = "S"];
+      private java.lang.Object keyBackward_ = "S";
+      public boolean hasKeyBackward() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      public String getKeyBackward() {
+        java.lang.Object ref = keyBackward_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          keyBackward_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setKeyBackward(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000008;
+        keyBackward_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearKeyBackward() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        keyBackward_ = getDefaultInstance().getKeyBackward();
+        onChanged();
+        return this;
+      }
+      void setKeyBackward(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00000008;
+        keyBackward_ = value;
+        onChanged();
+      }
+      
+      // optional string key_left = 5 [default = "A"];
+      private java.lang.Object keyLeft_ = "A";
+      public boolean hasKeyLeft() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      public String getKeyLeft() {
+        java.lang.Object ref = keyLeft_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          keyLeft_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setKeyLeft(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000010;
+        keyLeft_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearKeyLeft() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        keyLeft_ = getDefaultInstance().getKeyLeft();
+        onChanged();
+        return this;
+      }
+      void setKeyLeft(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00000010;
+        keyLeft_ = value;
+        onChanged();
+      }
+      
+      // optional string key_right = 6 [default = "D"];
+      private java.lang.Object keyRight_ = "D";
+      public boolean hasKeyRight() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      public String getKeyRight() {
+        java.lang.Object ref = keyRight_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          keyRight_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setKeyRight(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000020;
+        keyRight_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearKeyRight() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        keyRight_ = getDefaultInstance().getKeyRight();
+        onChanged();
+        return this;
+      }
+      void setKeyRight(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00000020;
+        keyRight_ = value;
+        onChanged();
+      }
+      
+      // optional string key_jump = 7 [default = "SPACE"];
+      private java.lang.Object keyJump_ = "SPACE";
+      public boolean hasKeyJump() {
+        return ((bitField0_ & 0x00000040) == 0x00000040);
+      }
+      public String getKeyJump() {
+        java.lang.Object ref = keyJump_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          keyJump_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setKeyJump(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000040;
+        keyJump_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearKeyJump() {
+        bitField0_ = (bitField0_ & ~0x00000040);
+        keyJump_ = getDefaultInstance().getKeyJump();
+        onChanged();
+        return this;
+      }
+      void setKeyJump(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00000040;
+        keyJump_ = value;
+        onChanged();
+      }
+      
+      // optional string key_console = 8 [default = "TAB"];
+      private java.lang.Object keyConsole_ = "TAB";
+      public boolean hasKeyConsole() {
+        return ((bitField0_ & 0x00000080) == 0x00000080);
+      }
+      public String getKeyConsole() {
+        java.lang.Object ref = keyConsole_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          keyConsole_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setKeyConsole(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000080;
+        keyConsole_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearKeyConsole() {
+        bitField0_ = (bitField0_ & ~0x00000080);
+        keyConsole_ = getDefaultInstance().getKeyConsole();
+        onChanged();
+        return this;
+      }
+      void setKeyConsole(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00000080;
+        keyConsole_ = value;
+        onChanged();
+      }
+      
+      // optional string key_inventory = 9 [default = "I"];
+      private java.lang.Object keyInventory_ = "I";
+      public boolean hasKeyInventory() {
+        return ((bitField0_ & 0x00000100) == 0x00000100);
+      }
+      public String getKeyInventory() {
+        java.lang.Object ref = keyInventory_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          keyInventory_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setKeyInventory(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000100;
+        keyInventory_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearKeyInventory() {
+        bitField0_ = (bitField0_ & ~0x00000100);
+        keyInventory_ = getDefaultInstance().getKeyInventory();
+        onChanged();
+        return this;
+      }
+      void setKeyInventory(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00000100;
+        keyInventory_ = value;
+        onChanged();
+      }
+      
+      // optional string key_crouch = 10 [default = "C"];
+      private java.lang.Object keyCrouch_ = "C";
+      public boolean hasKeyCrouch() {
+        return ((bitField0_ & 0x00000200) == 0x00000200);
+      }
+      public String getKeyCrouch() {
+        java.lang.Object ref = keyCrouch_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          keyCrouch_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setKeyCrouch(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000200;
+        keyCrouch_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearKeyCrouch() {
+        bitField0_ = (bitField0_ & ~0x00000200);
+        keyCrouch_ = getDefaultInstance().getKeyCrouch();
+        onChanged();
+        return this;
+      }
+      void setKeyCrouch(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00000200;
+        keyCrouch_ = value;
+        onChanged();
+      }
+      
+      // optional string key_run = 11 [default = "LSHIFT"];
+      private java.lang.Object keyRun_ = "LSHIFT";
+      public boolean hasKeyRun() {
+        return ((bitField0_ & 0x00000400) == 0x00000400);
+      }
+      public String getKeyRun() {
+        java.lang.Object ref = keyRun_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          keyRun_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setKeyRun(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000400;
+        keyRun_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearKeyRun() {
+        bitField0_ = (bitField0_ & ~0x00000400);
+        keyRun_ = getDefaultInstance().getKeyRun();
+        onChanged();
+        return this;
+      }
+      void setKeyRun(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00000400;
+        keyRun_ = value;
+        onChanged();
+      }
+      
+      // optional string key_attack = 12 [default = "MOUSERIGHT"];
+      private java.lang.Object keyAttack_ = "MOUSERIGHT";
+      public boolean hasKeyAttack() {
+        return ((bitField0_ & 0x00000800) == 0x00000800);
+      }
+      public String getKeyAttack() {
+        java.lang.Object ref = keyAttack_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          keyAttack_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setKeyAttack(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000800;
+        keyAttack_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearKeyAttack() {
+        bitField0_ = (bitField0_ & ~0x00000800);
+        keyAttack_ = getDefaultInstance().getKeyAttack();
+        onChanged();
+        return this;
+      }
+      void setKeyAttack(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00000800;
+        keyAttack_ = value;
+        onChanged();
+      }
+      
+      // optional string key_usehelditem = 13 [default = "MOUSELEFT"];
+      private java.lang.Object keyUsehelditem_ = "MOUSELEFT";
+      public boolean hasKeyUsehelditem() {
+        return ((bitField0_ & 0x00001000) == 0x00001000);
+      }
+      public String getKeyUsehelditem() {
+        java.lang.Object ref = keyUsehelditem_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          keyUsehelditem_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setKeyUsehelditem(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00001000;
+        keyUsehelditem_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearKeyUsehelditem() {
+        bitField0_ = (bitField0_ & ~0x00001000);
+        keyUsehelditem_ = getDefaultInstance().getKeyUsehelditem();
+        onChanged();
+        return this;
+      }
+      void setKeyUsehelditem(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00001000;
+        keyUsehelditem_ = value;
+        onChanged();
+      }
+      
+      // optional string key_frob = 14 [default = "E"];
+      private java.lang.Object keyFrob_ = "E";
+      public boolean hasKeyFrob() {
+        return ((bitField0_ & 0x00002000) == 0x00002000);
+      }
+      public String getKeyFrob() {
+        java.lang.Object ref = keyFrob_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          keyFrob_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setKeyFrob(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00002000;
+        keyFrob_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearKeyFrob() {
+        bitField0_ = (bitField0_ & ~0x00002000);
+        keyFrob_ = getDefaultInstance().getKeyFrob();
+        onChanged();
+        return this;
+      }
+      void setKeyFrob(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00002000;
+        keyFrob_ = value;
+        onChanged();
+      }
+      
+      // optional string key_toolnext = 15 [default = "MOUSEWHEElUP"];
+      private java.lang.Object keyToolnext_ = "MOUSEWHEElUP";
+      public boolean hasKeyToolnext() {
+        return ((bitField0_ & 0x00004000) == 0x00004000);
+      }
+      public String getKeyToolnext() {
+        java.lang.Object ref = keyToolnext_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          keyToolnext_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setKeyToolnext(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00004000;
+        keyToolnext_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearKeyToolnext() {
+        bitField0_ = (bitField0_ & ~0x00004000);
+        keyToolnext_ = getDefaultInstance().getKeyToolnext();
+        onChanged();
+        return this;
+      }
+      void setKeyToolnext(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00004000;
+        keyToolnext_ = value;
+        onChanged();
+      }
+      
+      // optional string key_toolprev = 16 [default = "MOUSEWHEELDOWN"];
+      private java.lang.Object keyToolprev_ = "MOUSEWHEELDOWN";
+      public boolean hasKeyToolprev() {
+        return ((bitField0_ & 0x00008000) == 0x00008000);
+      }
+      public String getKeyToolprev() {
+        java.lang.Object ref = keyToolprev_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          keyToolprev_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setKeyToolprev(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00008000;
+        keyToolprev_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearKeyToolprev() {
+        bitField0_ = (bitField0_ & ~0x00008000);
+        keyToolprev_ = getDefaultInstance().getKeyToolprev();
+        onChanged();
+        return this;
+      }
+      void setKeyToolprev(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00008000;
+        keyToolprev_ = value;
+        onChanged();
+      }
+      
+      // optional string key_toolslot1 = 17 [default = "1"];
+      private java.lang.Object keyToolslot1_ = "1";
+      public boolean hasKeyToolslot1() {
+        return ((bitField0_ & 0x00010000) == 0x00010000);
+      }
+      public String getKeyToolslot1() {
+        java.lang.Object ref = keyToolslot1_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          keyToolslot1_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setKeyToolslot1(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00010000;
+        keyToolslot1_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearKeyToolslot1() {
+        bitField0_ = (bitField0_ & ~0x00010000);
+        keyToolslot1_ = getDefaultInstance().getKeyToolslot1();
+        onChanged();
+        return this;
+      }
+      void setKeyToolslot1(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00010000;
+        keyToolslot1_ = value;
+        onChanged();
+      }
+      
+      // optional string key_toolslot2 = 18 [default = "2"];
+      private java.lang.Object keyToolslot2_ = "2";
+      public boolean hasKeyToolslot2() {
+        return ((bitField0_ & 0x00020000) == 0x00020000);
+      }
+      public String getKeyToolslot2() {
+        java.lang.Object ref = keyToolslot2_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          keyToolslot2_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setKeyToolslot2(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00020000;
+        keyToolslot2_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearKeyToolslot2() {
+        bitField0_ = (bitField0_ & ~0x00020000);
+        keyToolslot2_ = getDefaultInstance().getKeyToolslot2();
+        onChanged();
+        return this;
+      }
+      void setKeyToolslot2(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00020000;
+        keyToolslot2_ = value;
+        onChanged();
+      }
+      
+      // optional string key_toolslot3 = 19 [default = "3"];
+      private java.lang.Object keyToolslot3_ = "3";
+      public boolean hasKeyToolslot3() {
+        return ((bitField0_ & 0x00040000) == 0x00040000);
+      }
+      public String getKeyToolslot3() {
+        java.lang.Object ref = keyToolslot3_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          keyToolslot3_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setKeyToolslot3(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00040000;
+        keyToolslot3_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearKeyToolslot3() {
+        bitField0_ = (bitField0_ & ~0x00040000);
+        keyToolslot3_ = getDefaultInstance().getKeyToolslot3();
+        onChanged();
+        return this;
+      }
+      void setKeyToolslot3(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00040000;
+        keyToolslot3_ = value;
+        onChanged();
+      }
+      
+      // optional string key_toolslot4 = 20 [default = "4"];
+      private java.lang.Object keyToolslot4_ = "4";
+      public boolean hasKeyToolslot4() {
+        return ((bitField0_ & 0x00080000) == 0x00080000);
+      }
+      public String getKeyToolslot4() {
+        java.lang.Object ref = keyToolslot4_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          keyToolslot4_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setKeyToolslot4(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00080000;
+        keyToolslot4_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearKeyToolslot4() {
+        bitField0_ = (bitField0_ & ~0x00080000);
+        keyToolslot4_ = getDefaultInstance().getKeyToolslot4();
+        onChanged();
+        return this;
+      }
+      void setKeyToolslot4(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00080000;
+        keyToolslot4_ = value;
+        onChanged();
+      }
+      
+      // optional string key_toolslot5 = 21 [default = "5"];
+      private java.lang.Object keyToolslot5_ = "5";
+      public boolean hasKeyToolslot5() {
+        return ((bitField0_ & 0x00100000) == 0x00100000);
+      }
+      public String getKeyToolslot5() {
+        java.lang.Object ref = keyToolslot5_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          keyToolslot5_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setKeyToolslot5(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00100000;
+        keyToolslot5_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearKeyToolslot5() {
+        bitField0_ = (bitField0_ & ~0x00100000);
+        keyToolslot5_ = getDefaultInstance().getKeyToolslot5();
+        onChanged();
+        return this;
+      }
+      void setKeyToolslot5(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00100000;
+        keyToolslot5_ = value;
+        onChanged();
+      }
+      
+      // optional string key_toolslot6 = 22 [default = "6"];
+      private java.lang.Object keyToolslot6_ = "6";
+      public boolean hasKeyToolslot6() {
+        return ((bitField0_ & 0x00200000) == 0x00200000);
+      }
+      public String getKeyToolslot6() {
+        java.lang.Object ref = keyToolslot6_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          keyToolslot6_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setKeyToolslot6(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00200000;
+        keyToolslot6_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearKeyToolslot6() {
+        bitField0_ = (bitField0_ & ~0x00200000);
+        keyToolslot6_ = getDefaultInstance().getKeyToolslot6();
+        onChanged();
+        return this;
+      }
+      void setKeyToolslot6(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00200000;
+        keyToolslot6_ = value;
+        onChanged();
+      }
+      
+      // optional string key_toolslot7 = 23 [default = "7"];
+      private java.lang.Object keyToolslot7_ = "7";
+      public boolean hasKeyToolslot7() {
+        return ((bitField0_ & 0x00400000) == 0x00400000);
+      }
+      public String getKeyToolslot7() {
+        java.lang.Object ref = keyToolslot7_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          keyToolslot7_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setKeyToolslot7(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00400000;
+        keyToolslot7_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearKeyToolslot7() {
+        bitField0_ = (bitField0_ & ~0x00400000);
+        keyToolslot7_ = getDefaultInstance().getKeyToolslot7();
+        onChanged();
+        return this;
+      }
+      void setKeyToolslot7(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00400000;
+        keyToolslot7_ = value;
+        onChanged();
+      }
+      
+      // optional string key_toolslot8 = 24 [default = "8"];
+      private java.lang.Object keyToolslot8_ = "8";
+      public boolean hasKeyToolslot8() {
+        return ((bitField0_ & 0x00800000) == 0x00800000);
+      }
+      public String getKeyToolslot8() {
+        java.lang.Object ref = keyToolslot8_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          keyToolslot8_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setKeyToolslot8(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00800000;
+        keyToolslot8_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearKeyToolslot8() {
+        bitField0_ = (bitField0_ & ~0x00800000);
+        keyToolslot8_ = getDefaultInstance().getKeyToolslot8();
+        onChanged();
+        return this;
+      }
+      void setKeyToolslot8(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00800000;
+        keyToolslot8_ = value;
+        onChanged();
+      }
+      
+      // optional string key_toolslot9 = 25 [default = "9"];
+      private java.lang.Object keyToolslot9_ = "9";
+      public boolean hasKeyToolslot9() {
+        return ((bitField0_ & 0x01000000) == 0x01000000);
+      }
+      public String getKeyToolslot9() {
+        java.lang.Object ref = keyToolslot9_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          keyToolslot9_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setKeyToolslot9(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x01000000;
+        keyToolslot9_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearKeyToolslot9() {
+        bitField0_ = (bitField0_ & ~0x01000000);
+        keyToolslot9_ = getDefaultInstance().getKeyToolslot9();
+        onChanged();
+        return this;
+      }
+      void setKeyToolslot9(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x01000000;
+        keyToolslot9_ = value;
+        onChanged();
+      }
+      
+      // optional string key_minionmode = 26 [default = "X"];
+      private java.lang.Object keyMinionmode_ = "X";
+      public boolean hasKeyMinionmode() {
+        return ((bitField0_ & 0x02000000) == 0x02000000);
+      }
+      public String getKeyMinionmode() {
+        java.lang.Object ref = keyMinionmode_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          keyMinionmode_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setKeyMinionmode(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x02000000;
+        keyMinionmode_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearKeyMinionmode() {
+        bitField0_ = (bitField0_ & ~0x02000000);
+        keyMinionmode_ = getDefaultInstance().getKeyMinionmode();
+        onChanged();
+        return this;
+      }
+      void setKeyMinionmode(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x02000000;
+        keyMinionmode_ = value;
+        onChanged();
+      }
+      
+      // optional string key_hidegui = 27 [default = "H"];
+      private java.lang.Object keyHidegui_ = "H";
+      public boolean hasKeyHidegui() {
+        return ((bitField0_ & 0x04000000) == 0x04000000);
+      }
+      public String getKeyHidegui() {
+        java.lang.Object ref = keyHidegui_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          keyHidegui_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setKeyHidegui(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x04000000;
+        keyHidegui_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearKeyHidegui() {
+        bitField0_ = (bitField0_ & ~0x04000000);
+        keyHidegui_ = getDefaultInstance().getKeyHidegui();
+        onChanged();
+        return this;
+      }
+      void setKeyHidegui(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x04000000;
+        keyHidegui_ = value;
+        onChanged();
+      }
+      
+      // optional string key_pauze = 28 [default = "ESCAPE"];
+      private java.lang.Object keyPauze_ = "ESCAPE";
+      public boolean hasKeyPauze() {
+        return ((bitField0_ & 0x08000000) == 0x08000000);
+      }
+      public String getKeyPauze() {
+        java.lang.Object ref = keyPauze_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          keyPauze_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setKeyPauze(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x08000000;
+        keyPauze_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearKeyPauze() {
+        bitField0_ = (bitField0_ & ~0x08000000);
+        keyPauze_ = getDefaultInstance().getKeyPauze();
+        onChanged();
+        return this;
+      }
+      void setKeyPauze(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x08000000;
+        keyPauze_ = value;
+        onChanged();
+      }
+      
+      // optional string jumpbehaviour = 29 [default = "NORMAL"];
+      private java.lang.Object jumpbehaviour_ = "NORMAL";
+      public boolean hasJumpbehaviour() {
+        return ((bitField0_ & 0x10000000) == 0x10000000);
+      }
+      public String getJumpbehaviour() {
+        java.lang.Object ref = jumpbehaviour_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          jumpbehaviour_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setJumpbehaviour(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x10000000;
+        jumpbehaviour_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearJumpbehaviour() {
+        bitField0_ = (bitField0_ & ~0x10000000);
+        jumpbehaviour_ = getDefaultInstance().getJumpbehaviour();
+        onChanged();
+        return this;
+      }
+      void setJumpbehaviour(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x10000000;
+        jumpbehaviour_ = value;
+        onChanged();
+      }
+      
+      // @@protoc_insertion_point(builder_scope:InputSetting)
+    }
+    
     static {
-        java.lang.String[] descriptorData = {
-                "\n\013Input.proto\"\231\006\n\014InputSetting\022\032\n\013Enable" +
-                        "Music\030\001 \001(\010:\005false\022\032\n\013EnableSound\030\002 \001(\010:" +
-                        "\005false\022\026\n\013key_forward\030\003 \001(\t:\001Z\022\027\n\014key_ba" +
-                        "ckward\030\004 \001(\t:\001S\022\023\n\010key_left\030\005 \001(\t:\001Q\022\024\n\t" +
-                        "key_right\030\006 \001(\t:\001D\022\027\n\010key_jump\030\007 \001(\t:\005SP" +
-                        "ACE\022\030\n\013key_console\030\010 \001(\t:\003TAB\022\030\n\rkey_inv" +
-                        "entory\030\t \001(\t:\001I\022\025\n\nkey_crouch\030\n \001(\t:\001C\022\027" +
-                        "\n\007key_run\030\013 \001(\t:\006LSHIFT\022\035\n\nkey_attack\030\014 " +
-                        "\001(\t:\tMOUSELEFT\022#\n\017key_usehelditem\030\r \001(\t:" +
-                        "\nMOUSERIGHT\022\023\n\010key_frob\030\016 \001(\t:\001E\022\"\n\014key_",
-                "toolnext\030\017 \001(\t:\014MOUSEWHEElUP\022$\n\014key_tool" +
-                        "prev\030\020 \001(\t:\016MOUSEWHEELDOWN\022\030\n\rkey_toolsl" +
-                        "ot1\030\021 \001(\t:\0011\022\030\n\rkey_toolslot2\030\022 \001(\t:\0012\022\030" +
-                        "\n\rkey_toolslot3\030\023 \001(\t:\0013\022\030\n\rkey_toolslot" +
-                        "4\030\024 \001(\t:\0014\022\030\n\rkey_toolslot5\030\025 \001(\t:\0015\022\030\n\r" +
-                        "key_toolslot6\030\026 \001(\t:\0016\022\030\n\rkey_toolslot7\030" +
-                        "\027 \001(\t:\0017\022\030\n\rkey_toolslot8\030\030 \001(\t:\0018\022\030\n\rke" +
-                        "y_toolslot9\030\031 \001(\t:\0019\022\031\n\016key_minionmode\030\032" +
-                        " \001(\t:\001X\022\026\n\013key_hidegui\030\033 \001(\t:\001H\022\031\n\tkey_p" +
-                        "auze\030\034 \001(\t:\006ESCAPE\022\035\n\rjumpbehaviour\030\035 \001(",
-                "\t:\006NORMALB&\n\027org.terasology.protobufB\tIn" +
-                        "putDataH\001"
-        };
-        com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-                new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
-                    public com.google.protobuf.ExtensionRegistry assignDescriptors(
-                            com.google.protobuf.Descriptors.FileDescriptor root) {
-                        descriptor = root;
-                        internal_static_InputSetting_descriptor =
-                                getDescriptor().getMessageTypes().get(0);
-                        internal_static_InputSetting_fieldAccessorTable = new
-                                com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-                                internal_static_InputSetting_descriptor,
-                                new java.lang.String[]{"EnableMusic", "EnableSound", "KeyForward", "KeyBackward", "KeyLeft", "KeyRight", "KeyJump", "KeyConsole", "KeyInventory", "KeyCrouch", "KeyRun", "KeyAttack", "KeyUsehelditem", "KeyFrob", "KeyToolnext", "KeyToolprev", "KeyToolslot1", "KeyToolslot2", "KeyToolslot3", "KeyToolslot4", "KeyToolslot5", "KeyToolslot6", "KeyToolslot7", "KeyToolslot8", "KeyToolslot9", "KeyMinionmode", "KeyHidegui", "KeyPauze", "Jumpbehaviour",},
-                                org.terasology.protobuf.InputData.InputSetting.class,
-                                org.terasology.protobuf.InputData.InputSetting.Builder.class);
-                        return null;
-                    }
-                };
-        com.google.protobuf.Descriptors.FileDescriptor
-                .internalBuildGeneratedFileFrom(descriptorData,
-                        new com.google.protobuf.Descriptors.FileDescriptor[]{
-                        }, assigner);
+      defaultInstance = new InputSetting(true);
+      defaultInstance.initFields();
     }
-
-    // @@protoc_insertion_point(outer_class_scope)
+    
+    // @@protoc_insertion_point(class_scope:InputSetting)
+  }
+  
+  private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_InputSetting_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_InputSetting_fieldAccessorTable;
+  
+  public static com.google.protobuf.Descriptors.FileDescriptor
+      getDescriptor() {
+    return descriptor;
+  }
+  private static com.google.protobuf.Descriptors.FileDescriptor
+      descriptor;
+  static {
+    java.lang.String[] descriptorData = {
+      "\n\013Input.proto\"\231\006\n\014InputSetting\022\032\n\013Enable" +
+      "Music\030\001 \001(\010:\005false\022\032\n\013EnableSound\030\002 \001(\010:" +
+      "\005false\022\026\n\013key_forward\030\003 \001(\t:\001W\022\027\n\014key_ba" +
+      "ckward\030\004 \001(\t:\001S\022\023\n\010key_left\030\005 \001(\t:\001A\022\024\n\t" +
+      "key_right\030\006 \001(\t:\001D\022\027\n\010key_jump\030\007 \001(\t:\005SP" +
+      "ACE\022\030\n\013key_console\030\010 \001(\t:\003TAB\022\030\n\rkey_inv" +
+      "entory\030\t \001(\t:\001I\022\025\n\nkey_crouch\030\n \001(\t:\001C\022\027" +
+      "\n\007key_run\030\013 \001(\t:\006LSHIFT\022\036\n\nkey_attack\030\014 " +
+      "\001(\t:\nMOUSERIGHT\022\"\n\017key_usehelditem\030\r \001(\t" +
+      ":\tMOUSELEFT\022\023\n\010key_frob\030\016 \001(\t:\001E\022\"\n\014key_",
+      "toolnext\030\017 \001(\t:\014MOUSEWHEElUP\022$\n\014key_tool" +
+      "prev\030\020 \001(\t:\016MOUSEWHEELDOWN\022\030\n\rkey_toolsl" +
+      "ot1\030\021 \001(\t:\0011\022\030\n\rkey_toolslot2\030\022 \001(\t:\0012\022\030" +
+      "\n\rkey_toolslot3\030\023 \001(\t:\0013\022\030\n\rkey_toolslot" +
+      "4\030\024 \001(\t:\0014\022\030\n\rkey_toolslot5\030\025 \001(\t:\0015\022\030\n\r" +
+      "key_toolslot6\030\026 \001(\t:\0016\022\030\n\rkey_toolslot7\030" +
+      "\027 \001(\t:\0017\022\030\n\rkey_toolslot8\030\030 \001(\t:\0018\022\030\n\rke" +
+      "y_toolslot9\030\031 \001(\t:\0019\022\031\n\016key_minionmode\030\032" +
+      " \001(\t:\001X\022\026\n\013key_hidegui\030\033 \001(\t:\001H\022\031\n\tkey_p" +
+      "auze\030\034 \001(\t:\006ESCAPE\022\035\n\rjumpbehaviour\030\035 \001(",
+      "\t:\006NORMALB&\n\027org.terasology.protobufB\tIn" +
+      "putDataH\001"
+    };
+    com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
+      new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
+        public com.google.protobuf.ExtensionRegistry assignDescriptors(
+            com.google.protobuf.Descriptors.FileDescriptor root) {
+          descriptor = root;
+          internal_static_InputSetting_descriptor =
+            getDescriptor().getMessageTypes().get(0);
+          internal_static_InputSetting_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_InputSetting_descriptor,
+              new java.lang.String[] { "EnableMusic", "EnableSound", "KeyForward", "KeyBackward", "KeyLeft", "KeyRight", "KeyJump", "KeyConsole", "KeyInventory", "KeyCrouch", "KeyRun", "KeyAttack", "KeyUsehelditem", "KeyFrob", "KeyToolnext", "KeyToolprev", "KeyToolslot1", "KeyToolslot2", "KeyToolslot3", "KeyToolslot4", "KeyToolslot5", "KeyToolslot6", "KeyToolslot7", "KeyToolslot8", "KeyToolslot9", "KeyMinionmode", "KeyHidegui", "KeyPauze", "Jumpbehaviour", },
+              org.terasology.protobuf.InputData.InputSetting.class,
+              org.terasology.protobuf.InputData.InputSetting.Builder.class);
+          return null;
+        }
+      };
+    com.google.protobuf.Descriptors.FileDescriptor
+      .internalBuildGeneratedFileFrom(descriptorData,
+        new com.google.protobuf.Descriptors.FileDescriptor[] {
+        }, assigner);
+  }
+  
+  // @@protoc_insertion_point(outer_class_scope)
 }
