@@ -66,8 +66,10 @@ message Setting {
         optional int32 viewing_distance_ultra = 16 [default = 48];
         optional bool flickering_light = 17 [default = false];
         optional bool enable_post_processing_effects = 18 [default = false];
-        optional bool animated_water_and_grass = 19 [default = false];
+        optional bool animated_grass = 19 [default = false];
         optional int32 vertical_chunk_mesh_segments = 20 [default = 1];
+        optional int32 blur_intensity = 21 [default = 3];  // 0-4 Off, Some, Normal, Max
+        optional bool reflective_water = 22 [default = false];
     }
 
     optional World world = 1;

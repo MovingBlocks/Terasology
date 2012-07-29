@@ -2736,13 +2736,21 @@ public final class Configuration {
       boolean hasEnablePostProcessingEffects();
       boolean getEnablePostProcessingEffects();
       
-      // optional bool animated_water_and_grass = 19 [default = false];
-      boolean hasAnimatedWaterAndGrass();
-      boolean getAnimatedWaterAndGrass();
+      // optional bool animated_grass = 19 [default = false];
+      boolean hasAnimatedGrass();
+      boolean getAnimatedGrass();
       
       // optional int32 vertical_chunk_mesh_segments = 20 [default = 1];
       boolean hasVerticalChunkMeshSegments();
       int getVerticalChunkMeshSegments();
+      
+      // optional int32 blur_intensity = 21 [default = 3];
+      boolean hasBlurIntensity();
+      int getBlurIntensity();
+      
+      // optional bool reflective_water = 22 [default = false];
+      boolean hasReflectiveWater();
+      boolean getReflectiveWater();
     }
     public static final class System extends
         com.google.protobuf.GeneratedMessage
@@ -3749,14 +3757,14 @@ public final class Configuration {
         return enablePostProcessingEffects_;
       }
       
-      // optional bool animated_water_and_grass = 19 [default = false];
-      public static final int ANIMATED_WATER_AND_GRASS_FIELD_NUMBER = 19;
-      private boolean animatedWaterAndGrass_;
-      public boolean hasAnimatedWaterAndGrass() {
+      // optional bool animated_grass = 19 [default = false];
+      public static final int ANIMATED_GRASS_FIELD_NUMBER = 19;
+      private boolean animatedGrass_;
+      public boolean hasAnimatedGrass() {
         return ((bitField0_ & 0x00040000) == 0x00040000);
       }
-      public boolean getAnimatedWaterAndGrass() {
-        return animatedWaterAndGrass_;
+      public boolean getAnimatedGrass() {
+        return animatedGrass_;
       }
       
       // optional int32 vertical_chunk_mesh_segments = 20 [default = 1];
@@ -3767,6 +3775,26 @@ public final class Configuration {
       }
       public int getVerticalChunkMeshSegments() {
         return verticalChunkMeshSegments_;
+      }
+      
+      // optional int32 blur_intensity = 21 [default = 3];
+      public static final int BLUR_INTENSITY_FIELD_NUMBER = 21;
+      private int blurIntensity_;
+      public boolean hasBlurIntensity() {
+        return ((bitField0_ & 0x00100000) == 0x00100000);
+      }
+      public int getBlurIntensity() {
+        return blurIntensity_;
+      }
+      
+      // optional bool reflective_water = 22 [default = false];
+      public static final int REFLECTIVE_WATER_FIELD_NUMBER = 22;
+      private boolean reflectiveWater_;
+      public boolean hasReflectiveWater() {
+        return ((bitField0_ & 0x00200000) == 0x00200000);
+      }
+      public boolean getReflectiveWater() {
+        return reflectiveWater_;
       }
       
       private void initFields() {
@@ -3788,8 +3816,10 @@ public final class Configuration {
         viewingDistanceUltra_ = 48;
         flickeringLight_ = false;
         enablePostProcessingEffects_ = false;
-        animatedWaterAndGrass_ = false;
+        animatedGrass_ = false;
         verticalChunkMeshSegments_ = 1;
+        blurIntensity_ = 3;
+        reflectiveWater_ = false;
       }
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
@@ -3858,10 +3888,16 @@ public final class Configuration {
           output.writeBool(18, enablePostProcessingEffects_);
         }
         if (((bitField0_ & 0x00040000) == 0x00040000)) {
-          output.writeBool(19, animatedWaterAndGrass_);
+          output.writeBool(19, animatedGrass_);
         }
         if (((bitField0_ & 0x00080000) == 0x00080000)) {
           output.writeInt32(20, verticalChunkMeshSegments_);
+        }
+        if (((bitField0_ & 0x00100000) == 0x00100000)) {
+          output.writeInt32(21, blurIntensity_);
+        }
+        if (((bitField0_ & 0x00200000) == 0x00200000)) {
+          output.writeBool(22, reflectiveWater_);
         }
         getUnknownFields().writeTo(output);
       }
@@ -3946,11 +3982,19 @@ public final class Configuration {
         }
         if (((bitField0_ & 0x00040000) == 0x00040000)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeBoolSize(19, animatedWaterAndGrass_);
+            .computeBoolSize(19, animatedGrass_);
         }
         if (((bitField0_ & 0x00080000) == 0x00080000)) {
           size += com.google.protobuf.CodedOutputStream
             .computeInt32Size(20, verticalChunkMeshSegments_);
+        }
+        if (((bitField0_ & 0x00100000) == 0x00100000)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeInt32Size(21, blurIntensity_);
+        }
+        if (((bitField0_ & 0x00200000) == 0x00200000)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeBoolSize(22, reflectiveWater_);
         }
         size += getUnknownFields().getSerializedSize();
         memoizedSerializedSize = size;
@@ -4122,10 +4166,14 @@ public final class Configuration {
           bitField0_ = (bitField0_ & ~0x00010000);
           enablePostProcessingEffects_ = false;
           bitField0_ = (bitField0_ & ~0x00020000);
-          animatedWaterAndGrass_ = false;
+          animatedGrass_ = false;
           bitField0_ = (bitField0_ & ~0x00040000);
           verticalChunkMeshSegments_ = 1;
           bitField0_ = (bitField0_ & ~0x00080000);
+          blurIntensity_ = 3;
+          bitField0_ = (bitField0_ & ~0x00100000);
+          reflectiveWater_ = false;
+          bitField0_ = (bitField0_ & ~0x00200000);
           return this;
         }
         
@@ -4247,11 +4295,19 @@ public final class Configuration {
           if (((from_bitField0_ & 0x00040000) == 0x00040000)) {
             to_bitField0_ |= 0x00040000;
           }
-          result.animatedWaterAndGrass_ = animatedWaterAndGrass_;
+          result.animatedGrass_ = animatedGrass_;
           if (((from_bitField0_ & 0x00080000) == 0x00080000)) {
             to_bitField0_ |= 0x00080000;
           }
           result.verticalChunkMeshSegments_ = verticalChunkMeshSegments_;
+          if (((from_bitField0_ & 0x00100000) == 0x00100000)) {
+            to_bitField0_ |= 0x00100000;
+          }
+          result.blurIntensity_ = blurIntensity_;
+          if (((from_bitField0_ & 0x00200000) == 0x00200000)) {
+            to_bitField0_ |= 0x00200000;
+          }
+          result.reflectiveWater_ = reflectiveWater_;
           result.bitField0_ = to_bitField0_;
           onBuilt();
           return result;
@@ -4322,11 +4378,17 @@ public final class Configuration {
           if (other.hasEnablePostProcessingEffects()) {
             setEnablePostProcessingEffects(other.getEnablePostProcessingEffects());
           }
-          if (other.hasAnimatedWaterAndGrass()) {
-            setAnimatedWaterAndGrass(other.getAnimatedWaterAndGrass());
+          if (other.hasAnimatedGrass()) {
+            setAnimatedGrass(other.getAnimatedGrass());
           }
           if (other.hasVerticalChunkMeshSegments()) {
             setVerticalChunkMeshSegments(other.getVerticalChunkMeshSegments());
+          }
+          if (other.hasBlurIntensity()) {
+            setBlurIntensity(other.getBlurIntensity());
+          }
+          if (other.hasReflectiveWater()) {
+            setReflectiveWater(other.getReflectiveWater());
           }
           this.mergeUnknownFields(other.getUnknownFields());
           return this;
@@ -4459,12 +4521,22 @@ public final class Configuration {
               }
               case 152: {
                 bitField0_ |= 0x00040000;
-                animatedWaterAndGrass_ = input.readBool();
+                animatedGrass_ = input.readBool();
                 break;
               }
               case 160: {
                 bitField0_ |= 0x00080000;
                 verticalChunkMeshSegments_ = input.readInt32();
+                break;
+              }
+              case 168: {
+                bitField0_ |= 0x00100000;
+                blurIntensity_ = input.readInt32();
+                break;
+              }
+              case 176: {
+                bitField0_ |= 0x00200000;
+                reflectiveWater_ = input.readBool();
                 break;
               }
             }
@@ -4989,23 +5061,23 @@ public final class Configuration {
           return this;
         }
         
-        // optional bool animated_water_and_grass = 19 [default = false];
-        private boolean animatedWaterAndGrass_ ;
-        public boolean hasAnimatedWaterAndGrass() {
+        // optional bool animated_grass = 19 [default = false];
+        private boolean animatedGrass_ ;
+        public boolean hasAnimatedGrass() {
           return ((bitField0_ & 0x00040000) == 0x00040000);
         }
-        public boolean getAnimatedWaterAndGrass() {
-          return animatedWaterAndGrass_;
+        public boolean getAnimatedGrass() {
+          return animatedGrass_;
         }
-        public Builder setAnimatedWaterAndGrass(boolean value) {
+        public Builder setAnimatedGrass(boolean value) {
           bitField0_ |= 0x00040000;
-          animatedWaterAndGrass_ = value;
+          animatedGrass_ = value;
           onChanged();
           return this;
         }
-        public Builder clearAnimatedWaterAndGrass() {
+        public Builder clearAnimatedGrass() {
           bitField0_ = (bitField0_ & ~0x00040000);
-          animatedWaterAndGrass_ = false;
+          animatedGrass_ = false;
           onChanged();
           return this;
         }
@@ -5027,6 +5099,48 @@ public final class Configuration {
         public Builder clearVerticalChunkMeshSegments() {
           bitField0_ = (bitField0_ & ~0x00080000);
           verticalChunkMeshSegments_ = 1;
+          onChanged();
+          return this;
+        }
+        
+        // optional int32 blur_intensity = 21 [default = 3];
+        private int blurIntensity_ = 3;
+        public boolean hasBlurIntensity() {
+          return ((bitField0_ & 0x00100000) == 0x00100000);
+        }
+        public int getBlurIntensity() {
+          return blurIntensity_;
+        }
+        public Builder setBlurIntensity(int value) {
+          bitField0_ |= 0x00100000;
+          blurIntensity_ = value;
+          onChanged();
+          return this;
+        }
+        public Builder clearBlurIntensity() {
+          bitField0_ = (bitField0_ & ~0x00100000);
+          blurIntensity_ = 3;
+          onChanged();
+          return this;
+        }
+        
+        // optional bool reflective_water = 22 [default = false];
+        private boolean reflectiveWater_ ;
+        public boolean hasReflectiveWater() {
+          return ((bitField0_ & 0x00200000) == 0x00200000);
+        }
+        public boolean getReflectiveWater() {
+          return reflectiveWater_;
+        }
+        public Builder setReflectiveWater(boolean value) {
+          bitField0_ |= 0x00200000;
+          reflectiveWater_ = value;
+          onChanged();
+          return this;
+        }
+        public Builder clearReflectiveWater() {
+          bitField0_ = (bitField0_ & ~0x00200000);
+          reflectiveWater_ = false;
           onChanged();
           return this;
         }
@@ -5999,7 +6113,7 @@ public final class Configuration {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\rConfig2.proto\022\010protobuf\"\250\016\n\007Setting\022&\n" +
+      "\n\rConfig2.proto\022\010protobuf\"\332\016\n\007Setting\022&\n" +
       "\005world\030\001 \001(\0132\027.protobuf.Setting.World\022(\n" +
       "\006player\030\002 \001(\0132\030.protobuf.Setting.Player\022" +
       "(\n\006system\030\003 \001(\0132\030.protobuf.Setting.Syste" +
@@ -6024,7 +6138,7 @@ public final class Configuration {
       "\032\226\001\n\006Player\022\020\n\003fov\030\001 \001(\002:\003100\022\031\n\nmouse_s" +
       "ens\030\002 \001(\002:\0050.075\022\034\n\016camera_bobbing\030\003 \001(\010" +
       ":\004true\022&\n\030render_first_person_view\030\004 \001(\010" +
-      ":\004true\022\031\n\013placing_box\030\005 \001(\010:\004true\032\270\006\n\006Sy" +
+      ":\004true\022\031\n\013placing_box\030\005 \001(\010:\004true\032\352\006\n\006Sy" +
       "stem\022\032\n\rmax_particles\030\001 \001(\005:\003256\022;\n\020clou" +
       "d_resolution\030\002 \001(\0132!.protobuf.Setting.Sy" +
       "stem.CloudRes\022#\n\025cloud_update_interval\030\003" +
@@ -6040,13 +6154,14 @@ public final class Configuration {
       "\001(\005:\00216\022 \n\024viewing_distance_far\030\017 \001(\005:\0023" +
       "2\022\"\n\026viewing_distance_ultra\030\020 \001(\005:\00248\022\037\n",
       "\020flickering_light\030\021 \001(\010:\005false\022-\n\036enable" +
-      "_post_processing_effects\030\022 \001(\010:\005false\022\'\n" +
-      "\030animated_water_and_grass\030\023 \001(\010:\005false\022\'" +
-      "\n\034vertical_chunk_mesh_segments\030\024 \001(\005:\0011\032" +
-      "*\n\010CloudRes\022\016\n\001x\030\001 \001(\002:\003512\022\016\n\001y\030\002 \001(\002:\003" +
-      "512\0327\n\013DisplayMode\022\023\n\005width\030\001 \001(\005:\0041280\022" +
-      "\023\n\006height\030\002 \001(\005:\003720B*\n\027org.terasology.p" +
-      "rotobufB\rConfigurationH\001"
+      "_post_processing_effects\030\022 \001(\010:\005false\022\035\n" +
+      "\016animated_grass\030\023 \001(\010:\005false\022\'\n\034vertical" +
+      "_chunk_mesh_segments\030\024 \001(\005:\0011\022\031\n\016blur_in" +
+      "tensity\030\025 \001(\005:\0013\022\037\n\020reflective_water\030\026 \001" +
+      "(\010:\005false\032*\n\010CloudRes\022\016\n\001x\030\001 \001(\002:\003512\022\016\n" +
+      "\001y\030\002 \001(\002:\003512\0327\n\013DisplayMode\022\023\n\005width\030\001 " +
+      "\001(\005:\0041280\022\023\n\006height\030\002 \001(\005:\003720B*\n\027org.te" +
+      "rasology.protobufB\rConfigurationH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -6098,7 +6213,7 @@ public final class Configuration {
           internal_static_protobuf_Setting_System_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_protobuf_Setting_System_descriptor,
-              new java.lang.String[] { "MaxParticles", "CloudResolution", "CloudUpdateInterval", "MaxThreads", "SaveChunks", "ChunkCacheSize", "MaxChunkVBOs", "Gamma", "PixelFormat", "DisplayMode", "Fullscreen", "ActiveViewingDistanceId", "ViewingDistanceNear", "ViewingDistanceModerate", "ViewingDistanceFar", "ViewingDistanceUltra", "FlickeringLight", "EnablePostProcessingEffects", "AnimatedWaterAndGrass", "VerticalChunkMeshSegments", },
+              new java.lang.String[] { "MaxParticles", "CloudResolution", "CloudUpdateInterval", "MaxThreads", "SaveChunks", "ChunkCacheSize", "MaxChunkVBOs", "Gamma", "PixelFormat", "DisplayMode", "Fullscreen", "ActiveViewingDistanceId", "ViewingDistanceNear", "ViewingDistanceModerate", "ViewingDistanceFar", "ViewingDistanceUltra", "FlickeringLight", "EnablePostProcessingEffects", "AnimatedGrass", "VerticalChunkMeshSegments", "BlurIntensity", "ReflectiveWater", },
               org.terasology.protobuf.Configuration.Setting.System.class,
               org.terasology.protobuf.Configuration.Setting.System.Builder.class);
           internal_static_protobuf_Setting_System_CloudRes_descriptor =

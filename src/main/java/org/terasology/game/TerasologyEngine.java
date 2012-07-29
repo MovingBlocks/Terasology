@@ -377,6 +377,7 @@ public class TerasologyEngine implements GameEngine {
     private void cleanup() {
         logger.log(Level.INFO, "Shutting down Terasology...");
         Config.getInstance().saveConfig(new File(PathManager.getInstance().getWorldPath(), "last.cfg"));
+        InputConfig.getInstance().saveConfig(new File(PathManager.getInstance().getWorldPath(), "lastinput.cfg"));
         doPurgeStates();
         terminateThreads();
     }
