@@ -55,8 +55,7 @@ public class FlatTerrainGenerator implements ChunkGenerator {
     }
 
     public boolean isValidHeight(final int height) {
-        return height >= FlatTerrainGenerator.MIN_HEIGHT
-                && height <= FlatTerrainGenerator.MAX_HEIGHT;
+        return height >= FlatTerrainGenerator.MIN_HEIGHT && height <= FlatTerrainGenerator.MAX_HEIGHT;
     }
 
     /**
@@ -86,8 +85,7 @@ public class FlatTerrainGenerator implements ChunkGenerator {
                 try {
                     setHeight(Integer.parseInt(heightStr));
                 } catch (final NumberFormatException e) {
-                    logger.severe("Cannot set initParameters! "
-                            + initParameters);
+                    logger.severe("Cannot set initParameters! " + initParameters);
                     // TODO Improved exception handling
                 }
             }
@@ -98,60 +96,48 @@ public class FlatTerrainGenerator implements ChunkGenerator {
     public void generateChunk(final Chunk chunk) {
         for (int x = 0; x < Chunk.SIZE_X; x++) {
             for (int z = 0; z < Chunk.SIZE_Z; z++) {
-                final WorldBiomeProvider.Biome type = biomeProvider.getBiomeAt(
-                        chunk.getBlockWorldPosX(x), chunk.getBlockWorldPosZ(z));
+                final WorldBiomeProvider.Biome type = biomeProvider.getBiomeAt(chunk.getBlockWorldPosX(x), chunk.getBlockWorldPosZ(z));
 
                 for (int y = Chunk.SIZE_Y; y >= 0; y--) {
                     if (y == 0) {
                         // bedrock/mantle
-                        chunk.setBlock(x, y, z, BlockManager.getInstance()
-                                .getBlock("MantleStone"));
+                        chunk.setBlock(x, y, z, BlockManager.getInstance().getBlock("MantleStone"));
                     } else if (y < height) {
                         // underground
                         switch (type) {
                         case FOREST:
-                            chunk.setBlock(x, y, z, BlockManager.getInstance()
-                                    .getBlock("Dirt"));
+                            chunk.setBlock(x, y, z, BlockManager.getInstance().getBlock("Dirt"));
                             break;
                         case PLAINS:
-                            chunk.setBlock(x, y, z, BlockManager.getInstance()
-                                    .getBlock("Dirt"));
+                            chunk.setBlock(x, y, z, BlockManager.getInstance().getBlock("Dirt"));
                             break;
                         case MOUNTAINS:
-                            chunk.setBlock(x, y, z, BlockManager.getInstance()
-                                    .getBlock("Stone"));
+                            chunk.setBlock(x, y, z, BlockManager.getInstance().getBlock("Stone"));
                             break;
                         case SNOW:
-                            chunk.setBlock(x, y, z, BlockManager.getInstance()
-                                    .getBlock("Snow"));
+                            chunk.setBlock(x, y, z, BlockManager.getInstance().getBlock("Snow"));
                             break;
                         case DESERT:
-                            chunk.setBlock(x, y, z, BlockManager.getInstance()
-                                    .getBlock("Sand"));
+                            chunk.setBlock(x, y, z, BlockManager.getInstance().getBlock("Sand"));
                             break;
                         }
                     } else if (y == height) {
                         // surface
                         switch (type) {
                         case FOREST:
-                            chunk.setBlock(x, y, z, BlockManager.getInstance()
-                                    .getBlock("Dirt"));
+                            chunk.setBlock(x, y, z, BlockManager.getInstance().getBlock("Dirt"));
                             break;
                         case PLAINS:
-                            chunk.setBlock(x, y, z, BlockManager.getInstance()
-                                    .getBlock("Grass"));
+                            chunk.setBlock(x, y, z, BlockManager.getInstance().getBlock("Grass"));
                             break;
                         case MOUNTAINS:
-                            chunk.setBlock(x, y, z, BlockManager.getInstance()
-                                    .getBlock("Stone"));
+                            chunk.setBlock(x, y, z, BlockManager.getInstance().getBlock("Stone"));
                             break;
                         case SNOW:
-                            chunk.setBlock(x, y, z, BlockManager.getInstance()
-                                    .getBlock("Snow"));
+                            chunk.setBlock(x, y, z, BlockManager.getInstance().getBlock("Snow"));
                             break;
                         case DESERT:
-                            chunk.setBlock(x, y, z, BlockManager.getInstance()
-                                    .getBlock("Sand"));
+                            chunk.setBlock(x, y, z, BlockManager.getInstance().getBlock("Sand"));
                             break;
                         }
                     } else {

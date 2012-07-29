@@ -16,17 +16,20 @@
 
 package org.terasology.logic.world.generator.core;
 
-import com.google.common.collect.Lists;
-import org.terasology.logic.world.chunks.Chunk;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.terasology.logic.generators.DefaultGenerators;
 import org.terasology.logic.world.WorldBiomeProvider;
 import org.terasology.logic.world.WorldView;
+import org.terasology.logic.world.chunks.Chunk;
 import org.terasology.logic.world.generator.BaseChunkGenerator;
 import org.terasology.logic.world.generator.ChunkGenerator;
 import org.terasology.logic.world.generator.SecondPassChunkGenerator;
+import org.terasology.logic.world.liquid.LiquidsGenerator;
 import org.terasology.math.Vector3i;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.google.common.collect.Lists;
 
 /**
  * @author Immortius
@@ -35,36 +38,49 @@ public class ChunkGeneratorManagerImpl implements ChunkGeneratorManager {
 
     private String worldSeed;
     private WorldBiomeProvider biomeProvider;
-    private List<ChunkGenerator> chunkGenerators = Lists.newArrayList();
-    private List<SecondPassChunkGenerator> secondPassChunkGenerators = Lists.newArrayList();
+    private final List<ChunkGenerator> chunkGenerators = Lists.newArrayList();
+    private final List<SecondPassChunkGenerator> secondPassChunkGenerators = Lists
+            .newArrayList();
 
     public ChunkGeneratorManagerImpl() {
     }
 
+    public static ChunkGeneratorManagerImpl getDefaultInstance() {
+        final ChunkGeneratorManagerImpl chunkGeneratorManager = new ChunkGeneratorManagerImpl();
+        chunkGeneratorManager.registerChunkGenerator(new PerlinTerrainGenerator());
+        chunkGeneratorManager.registerChunkGenerator(new FloraGenerator());
+        chunkGeneratorManager.registerChunkGenerator(new LiquidsGenerator());
+        final ForestGenerator forestGen = new ForestGenerator();
+        new DefaultGenerators(forestGen);
+        chunkGeneratorManager.registerChunkGenerator(forestGen);
+
+        return chunkGeneratorManager;
+    }
+
     @Override
-    public void setWorldSeed(String seed) {
-        this.worldSeed = seed;
-        for (BaseChunkGenerator generator : chunkGenerators) {
+    public void setWorldSeed(final String seed) {
+        worldSeed = seed;
+        for (final BaseChunkGenerator generator : chunkGenerators) {
             generator.setWorldSeed(seed);
         }
-        for (BaseChunkGenerator generator : secondPassChunkGenerators) {
+        for (final BaseChunkGenerator generator : secondPassChunkGenerators) {
             generator.setWorldSeed(seed);
         }
     }
 
     @Override
-    public void setWorldBiomeProvider(WorldBiomeProvider biomeProvider) {
+    public void setWorldBiomeProvider(final WorldBiomeProvider biomeProvider) {
         this.biomeProvider = biomeProvider;
-        for (BaseChunkGenerator generator : chunkGenerators) {
+        for (final BaseChunkGenerator generator : chunkGenerators) {
             generator.setWorldBiomeProvider(biomeProvider);
         }
-        for (BaseChunkGenerator generator : secondPassChunkGenerators) {
+        for (final BaseChunkGenerator generator : secondPassChunkGenerators) {
             generator.setWorldBiomeProvider(biomeProvider);
         }
     }
 
     @Override
-    public void registerChunkGenerator(BaseChunkGenerator generator) {
+    public void registerChunkGenerator(final BaseChunkGenerator generator) {
         generator.setWorldBiomeProvider(biomeProvider);
         generator.setWorldSeed(worldSeed);
         if (generator instanceof ChunkGenerator) {
@@ -77,24 +93,24 @@ public class ChunkGeneratorManagerImpl implements ChunkGeneratorManager {
 
     @Override
     public List<BaseChunkGenerator> getBaseChunkGenerators() {
-    	List<BaseChunkGenerator> baseChunkGenerators = new ArrayList<BaseChunkGenerator>();
-    	baseChunkGenerators.addAll(chunkGenerators);
-    	baseChunkGenerators.addAll(secondPassChunkGenerators);
-    	return baseChunkGenerators;
+        final List<BaseChunkGenerator> baseChunkGenerators = new ArrayList<BaseChunkGenerator>();
+        baseChunkGenerators.addAll(chunkGenerators);
+        baseChunkGenerators.addAll(secondPassChunkGenerators);
+        return baseChunkGenerators;
     }
-    
+
     @Override
-    public Chunk generateChunk(Vector3i pos) {
-        Chunk chunk = new Chunk(pos);
-        for (ChunkGenerator generator : chunkGenerators) {
+    public Chunk generateChunk(final Vector3i pos) {
+        final Chunk chunk = new Chunk(pos);
+        for (final ChunkGenerator generator : chunkGenerators) {
             generator.generateChunk(chunk);
         }
         return chunk;
     }
 
     @Override
-    public void secondPassChunk(Vector3i chunkPos, WorldView view) {
-        for (SecondPassChunkGenerator generator : secondPassChunkGenerators) {
+    public void secondPassChunk(final Vector3i chunkPos, final WorldView view) {
+        for (final SecondPassChunkGenerator generator : secondPassChunkGenerators) {
             generator.postProcessChunk(chunkPos, view);
         }
     }

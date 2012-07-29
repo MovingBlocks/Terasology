@@ -28,9 +28,9 @@ public interface BaseChunkGenerator {
     void setWorldSeed(String seed);
 
     void setWorldBiomeProvider(WorldBiomeProvider biomeProvider);
-    
+
     Map<String, String> getInitParameters();
-    
+
     void setInitParameters(Map<String, String> initParameters);
-    
+
 }

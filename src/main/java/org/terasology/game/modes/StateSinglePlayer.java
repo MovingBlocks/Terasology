@@ -288,12 +288,10 @@ public class StateSinglePlayer implements GameState {
         // Init ChunkGeneratorManager
         ChunkGeneratorManager chunkGeneratorManager = initChunkGeneratorManager(title);
         chunkGeneratorManager.setWorldSeed(seed);
-        chunkGeneratorManager.setWorldBiomeProvider(new WorldBiomeProviderImpl(
-                seed));
+        chunkGeneratorManager.setWorldBiomeProvider(new WorldBiomeProviderImpl(seed));
 
         // Init. a new world
-        worldRenderer = new WorldRenderer(title, seed, time,
-                chunkGeneratorManager, entityManager, localPlayerSys);
+        worldRenderer = new WorldRenderer(title, seed, time, chunkGeneratorManager, entityManager, localPlayerSys);
         CoreRegistry.put(WorldRenderer.class, worldRenderer);
 
         // Create the world entity
@@ -332,12 +330,10 @@ public class StateSinglePlayer implements GameState {
     private ChunkGeneratorManager initChunkGeneratorManager(String title) {
         ChunkGeneratorManager chunkGeneratorManager = null;
 
-        File generatorDataFile = new File(PathManager.getInstance()
-                .getWorldSavePath(title), CHUNK_GENERATOR_FILE);
+        File generatorDataFile = new File(PathManager.getInstance().getWorldSavePath(title), CHUNK_GENERATOR_FILE);
 
         try {
-            chunkGeneratorManager = new ChunkGeneratorPersister()
-                    .load(generatorDataFile);
+            chunkGeneratorManager = new ChunkGeneratorPersister().load(generatorDataFile);
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Failed to load generator data", e);
             // TODO Improved exception handling
@@ -345,19 +341,10 @@ public class StateSinglePlayer implements GameState {
 
         if (chunkGeneratorManager == null) {
             // Create default chunkGeneratorManager
-            chunkGeneratorManager = new ChunkGeneratorManagerImpl();
-            chunkGeneratorManager
-                    .registerChunkGenerator(new PerlinTerrainGenerator());
-            chunkGeneratorManager.registerChunkGenerator(new FloraGenerator());
-            chunkGeneratorManager
-                    .registerChunkGenerator(new LiquidsGenerator());
-            ForestGenerator forestGen = new ForestGenerator();
-            new DefaultGenerators(forestGen);
-            chunkGeneratorManager.registerChunkGenerator(forestGen);
+            chunkGeneratorManager = ChunkGeneratorManagerImpl.getDefaultInstance();
 
             try {
-                new ChunkGeneratorPersister().save(generatorDataFile,
-                        chunkGeneratorManager);
+                new ChunkGeneratorPersister().save(generatorDataFile, chunkGeneratorManager);
             } catch (IOException e) {
                 logger.log(Level.SEVERE, "Failed to save generator data", e);
                 // TODO Improved exception handling

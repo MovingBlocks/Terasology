@@ -149,7 +149,7 @@ public class FloraGenerator implements ChunkGenerator {
     }
 
     @Override
-    public void setInitParameters(Map<String, String> initParameters) {
+    public void setInitParameters(final Map<String, String> initParameters) {
     }
 
 }

@@ -21,18 +21,13 @@ import com.google.gson.JsonSyntaxException;
  */
 public final class ChunkGeneratorJSONFormat {
 
-    public static void write(final ChunkGeneratorManager chunkGeneratorManager,
-            final BufferedWriter writer) throws IOException {
-        ChunkGeneratorJSONFormat.newGson().toJson(
-                new JSONChunkGeneratorManager(chunkGeneratorManager), writer);
+    public static void write(final ChunkGeneratorManager chunkGeneratorManager, final BufferedWriter writer) throws IOException {
+        ChunkGeneratorJSONFormat.newGson().toJson(new JSONChunkGeneratorManager(chunkGeneratorManager), writer);
     }
 
-    public static ChunkGeneratorManager read(final BufferedReader reader)
-            throws IOException {
+    public static ChunkGeneratorManager read(final BufferedReader reader) throws IOException {
         try {
-            final JSONChunkGeneratorManager jsonChunkGeneratorManager = ChunkGeneratorJSONFormat
-                    .newGson()
-                    .fromJson(reader, JSONChunkGeneratorManager.class);
+            final JSONChunkGeneratorManager jsonChunkGeneratorManager = ChunkGeneratorJSONFormat.newGson().fromJson(reader, JSONChunkGeneratorManager.class);
 
             return jsonChunkGeneratorManager.createChunkGeneratorManager();
         } catch (final JsonSyntaxException e) {
@@ -51,29 +46,22 @@ public final class ChunkGeneratorJSONFormat {
         private final String className;
         private final List<JSONBaseChunkGenerator> baseChunkGenerators;
 
-        JSONChunkGeneratorManager(
-                final ChunkGeneratorManager chunkGeneratorManager) {
+        JSONChunkGeneratorManager(final ChunkGeneratorManager chunkGeneratorManager) {
             className = chunkGeneratorManager.getClass().getName();
             baseChunkGenerators = new ArrayList<ChunkGeneratorJSONFormat.JSONBaseChunkGenerator>();
-            for (final BaseChunkGenerator baseChunkGenerator : chunkGeneratorManager
-                    .getBaseChunkGenerators()) {
-                baseChunkGenerators.add(new JSONBaseChunkGenerator(
-                        baseChunkGenerator));
+            for (final BaseChunkGenerator baseChunkGenerator : chunkGeneratorManager.getBaseChunkGenerators()) {
+                baseChunkGenerators.add(new JSONBaseChunkGenerator(baseChunkGenerator));
             }
         }
 
         @SuppressWarnings("rawtypes")
         ChunkGeneratorManager createChunkGeneratorManager() throws IOException {
             try {
-                final Class chunkGeneratorManagerClass = Class
-                        .forName(className);
-                final ChunkGeneratorManager chunkGeneratorManager = (ChunkGeneratorManager) chunkGeneratorManagerClass
-                        .newInstance();
+                final Class chunkGeneratorManagerClass = Class.forName(className);
+                final ChunkGeneratorManager chunkGeneratorManager = (ChunkGeneratorManager) chunkGeneratorManagerClass.newInstance();
 
                 for (final JSONBaseChunkGenerator jsonBaseChunkGenerator : baseChunkGenerators) {
-                    chunkGeneratorManager
-                            .registerChunkGenerator(jsonBaseChunkGenerator
-                                    .createBaseChunkGenerator());
+                    chunkGeneratorManager.registerChunkGenerator(jsonBaseChunkGenerator.createBaseChunkGenerator());
                 }
 
                 return chunkGeneratorManager;
@@ -100,8 +88,7 @@ public final class ChunkGeneratorJSONFormat {
         BaseChunkGenerator createBaseChunkGenerator() throws IOException {
             try {
                 final Class baseChunkGeneratorClass = Class.forName(className);
-                final BaseChunkGenerator baseChunkGenerator = (BaseChunkGenerator) baseChunkGeneratorClass
-                        .newInstance();
+                final BaseChunkGenerator baseChunkGenerator = (BaseChunkGenerator) baseChunkGeneratorClass.newInstance();
                 baseChunkGenerator.setInitParameters(initParameters);
                 return baseChunkGenerator;
             } catch (final ClassNotFoundException e) {

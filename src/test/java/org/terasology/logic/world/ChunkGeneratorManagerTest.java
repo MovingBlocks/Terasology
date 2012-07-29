@@ -16,89 +16,84 @@
 
 package org.terasology.logic.world;
 
+import org.junit.Assert;
 import org.junit.Test;
-import org.terasology.logic.world.*;
+import org.mockito.Mockito;
 import org.terasology.logic.world.chunks.Chunk;
 import org.terasology.logic.world.generator.ChunkGenerator;
 import org.terasology.logic.world.generator.core.ChunkGeneratorManager;
 import org.terasology.logic.world.generator.core.ChunkGeneratorManagerImpl;
 import org.terasology.math.Vector3i;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-
 /**
  * @author Immortius
  */
 public class ChunkGeneratorManagerTest {
 
-    private final static String Seed = "Seed";
+    private final static String SEED = "Seed";
 
     @Test
     public void registeredGeneratorsReceivesSeed() {
-        WorldBiomeProvider biomeProvider = mock(WorldBiomeProvider.class);
-        ChunkGeneratorManager generatorManager = new ChunkGeneratorManagerImpl();
-        generatorManager.setWorldSeed(Seed);
+        final WorldBiomeProvider biomeProvider = Mockito.mock(WorldBiomeProvider.class);
+        final ChunkGeneratorManager generatorManager = new ChunkGeneratorManagerImpl();
+        generatorManager.setWorldSeed(ChunkGeneratorManagerTest.SEED);
         generatorManager.setWorldBiomeProvider(biomeProvider);
-        ChunkGenerator generator = mock(ChunkGenerator.class);
+        final ChunkGenerator generator = Mockito.mock(ChunkGenerator.class);
         generatorManager.registerChunkGenerator(generator);
-        verify(generator).setWorldSeed(Seed);
+        Mockito.verify(generator).setWorldSeed(ChunkGeneratorManagerTest.SEED);
     }
 
     @Test
     public void registeredGeneratorReceivesBiomeProvider() {
-        WorldBiomeProvider biomeProvider = mock(WorldBiomeProvider.class);
-        ChunkGeneratorManager generatorManager = new ChunkGeneratorManagerImpl();
-        generatorManager.setWorldSeed(Seed);
+        final WorldBiomeProvider biomeProvider = Mockito.mock(WorldBiomeProvider.class);
+        final ChunkGeneratorManager generatorManager = new ChunkGeneratorManagerImpl();
+        generatorManager.setWorldSeed(ChunkGeneratorManagerTest.SEED);
         generatorManager.setWorldBiomeProvider(biomeProvider);
-        ChunkGenerator generator = mock(ChunkGenerator.class);
+        final ChunkGenerator generator = Mockito.mock(ChunkGenerator.class);
         generatorManager.registerChunkGenerator(generator);
-        verify(generator).setWorldBiomeProvider(biomeProvider);
+        Mockito.verify(generator).setWorldBiomeProvider(biomeProvider);
     }
 
     @Test
     public void changeSeedPropagatedToChunkGenerator() {
-        WorldBiomeProvider biomeProvider = mock(WorldBiomeProvider.class);
-        ChunkGeneratorManager generatorManager = new ChunkGeneratorManagerImpl();
-        generatorManager.setWorldSeed(Seed);
+        final WorldBiomeProvider biomeProvider = Mockito.mock(WorldBiomeProvider.class);
+        final ChunkGeneratorManager generatorManager = new ChunkGeneratorManagerImpl();
+        generatorManager.setWorldSeed(ChunkGeneratorManagerTest.SEED);
         generatorManager.setWorldBiomeProvider(biomeProvider);
-        ChunkGenerator generator = mock(ChunkGenerator.class);
+        final ChunkGenerator generator = Mockito.mock(ChunkGenerator.class);
         generatorManager.registerChunkGenerator(generator);
         generatorManager.setWorldSeed("Seed2");
-        verify(generator).setWorldSeed("Seed2");
+        Mockito.verify(generator).setWorldSeed("Seed2");
     }
 
     @Test
     public void changeBiomeProviderToChunkGenerator() {
-        WorldBiomeProvider biomeProvider = mock(WorldBiomeProvider.class);
-        ChunkGeneratorManager generatorManager = new ChunkGeneratorManagerImpl();
-        generatorManager.setWorldSeed(Seed);
+        final WorldBiomeProvider biomeProvider = Mockito.mock(WorldBiomeProvider.class);
+        final ChunkGeneratorManager generatorManager = new ChunkGeneratorManagerImpl();
+        generatorManager.setWorldSeed(ChunkGeneratorManagerTest.SEED);
         generatorManager.setWorldBiomeProvider(biomeProvider);
-        ChunkGenerator generator = mock(ChunkGenerator.class);
+        final ChunkGenerator generator = Mockito.mock(ChunkGenerator.class);
         generatorManager.registerChunkGenerator(generator);
-        WorldBiomeProvider newBiomeProvider = mock(WorldBiomeProvider.class);
+        final WorldBiomeProvider newBiomeProvider = Mockito.mock(WorldBiomeProvider.class);
         generatorManager.setWorldBiomeProvider(newBiomeProvider);
-        verify(generator).setWorldBiomeProvider(newBiomeProvider);
+        Mockito.verify(generator).setWorldBiomeProvider(newBiomeProvider);
     }
 
     @Test
     public void createChunkPassesThroughGenerator() {
-        WorldBiomeProvider biomeProvider = mock(WorldBiomeProvider.class);
-        ChunkGeneratorManager generatorManager = new ChunkGeneratorManagerImpl();
-        generatorManager.setWorldSeed(Seed);
+        final WorldBiomeProvider biomeProvider = Mockito.mock(WorldBiomeProvider.class);
+        final ChunkGeneratorManager generatorManager = new ChunkGeneratorManagerImpl();
+        generatorManager.setWorldSeed(ChunkGeneratorManagerTest.SEED);
         generatorManager.setWorldBiomeProvider(biomeProvider);
-        ChunkGenerator generator = mock(ChunkGenerator.class);
+        final ChunkGenerator generator = Mockito.mock(ChunkGenerator.class);
         generatorManager.registerChunkGenerator(generator);
 
-        Vector3i pos = new Vector3i(3,4,6);
-        Chunk chunk = generatorManager.generateChunk(pos);
-        assertNotNull(chunk);
-        assertEquals(pos, chunk.getPos());
+        final Vector3i pos = new Vector3i(3, 4, 6);
+        final Chunk chunk = generatorManager.generateChunk(pos);
+        Assert.assertNotNull(chunk);
+        Assert.assertEquals(pos, chunk.getPos());
 
-        verify(generator).generateChunk(chunk);
+        Mockito.verify(generator).generateChunk(chunk);
     }
-
 
 }

@@ -22,20 +22,16 @@ public class ChunkGeneratorPersister {
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
-    public void save(final File file,
-            final ChunkGeneratorManager chunkGeneratorManager)
-            throws IOException {
+    public void save(final File file, final ChunkGeneratorManager chunkGeneratorManager) throws IOException {
         final File parentFile = file.getParentFile();
         if (parentFile != null) {
-            parentFile.mkdirs();
+            parentFile.mkdirs(); // TODO Error handling
         }
         final FileOutputStream out = new FileOutputStream(file);
 
         try {
-            final BufferedWriter bufferedWriter = new BufferedWriter(
-                    new OutputStreamWriter(out));
-            ChunkGeneratorJSONFormat.write(chunkGeneratorManager,
-                    bufferedWriter);
+            final BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(out));
+            ChunkGeneratorJSONFormat.write(chunkGeneratorManager, bufferedWriter);
             bufferedWriter.flush();
         } finally {
             // JAVA7 : Replace with improved resource handling
@@ -51,10 +47,8 @@ public class ChunkGeneratorPersister {
         final FileInputStream in = new FileInputStream(file);
         ChunkGeneratorManager chunkGeneratorManager = null;
         try {
-            final BufferedReader bufferedReader = new BufferedReader(
-                    new InputStreamReader(in));
-            chunkGeneratorManager = ChunkGeneratorJSONFormat
-                    .read(bufferedReader);
+            final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+            chunkGeneratorManager = ChunkGeneratorJSONFormat.read(bufferedReader);
         } finally {
             // JAVA7: Replace with improved resource handling
             try {

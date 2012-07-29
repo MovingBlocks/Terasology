@@ -44,20 +44,20 @@ public class PerlinTerrainGenerator implements ChunkGenerator {
 
     @Override
     public void setWorldSeed(String seed) {
-		if (seed != null) {
-			_pGen1 = new PerlinNoise(seed.hashCode());
-			_pGen1.setOctaves(8);
+        if (seed != null) {
+            _pGen1 = new PerlinNoise(seed.hashCode());
+            _pGen1.setOctaves(8);
 
-			_pGen2 = new PerlinNoise(seed.hashCode() + 1);
-			_pGen2.setOctaves(8);
+            _pGen2 = new PerlinNoise(seed.hashCode() + 1);
+            _pGen2.setOctaves(8);
 
-			_pGen3 = new PerlinNoise(seed.hashCode() + 2);
-			_pGen3.setOctaves(8);
+            _pGen3 = new PerlinNoise(seed.hashCode() + 2);
+            _pGen3.setOctaves(8);
 
-			_pGen4 = new PerlinNoise(seed.hashCode() + 3);
-			_pGen5 = new PerlinNoise(seed.hashCode() + 4);
-			_pGen8 = new PerlinNoise(seed.hashCode() + 7);
-		}
+            _pGen4 = new PerlinNoise(seed.hashCode() + 3);
+            _pGen5 = new PerlinNoise(seed.hashCode() + 4);
+            _pGen8 = new PerlinNoise(seed.hashCode() + 7);
+        }
     }
 
     @Override
@@ -284,7 +284,7 @@ public class PerlinTerrainGenerator implements ChunkGenerator {
     }
 
     @Override
-    public void setInitParameters(Map<String, String> initParameters) {
+    public void setInitParameters(final Map<String, String> initParameters) {
     }
 
 }
