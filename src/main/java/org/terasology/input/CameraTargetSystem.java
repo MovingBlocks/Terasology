@@ -26,11 +26,14 @@ import org.terasology.logic.world.BlockEntityRegistry;
 import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.physics.BulletPhysics;
+import org.terasology.physics.CollisionGroup;
+import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.physics.HitResult;
 import org.terasology.rendering.world.WorldRenderer;
 
 import javax.vecmath.Vector3f;
+import java.util.Arrays;
 
 /**
  * @author Immortius
@@ -47,6 +50,7 @@ public class CameraTargetSystem implements ComponentSystem {
     private Vector3i targetBlockPos = null;
     private Vector3f hitPosition = new Vector3f();
     private Vector3f hitNormal = new Vector3f();
+    private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD};
 
     public void initialise() {
         localPlayer = CoreRegistry.get(LocalPlayer.class);
@@ -78,6 +82,10 @@ public class CameraTargetSystem implements ComponentSystem {
 
     }
 
+    public void setFilter(CollisionGroup ... filter) {
+        this.filter = Arrays.copyOf(filter, filter.length);
+    }
+
     public void update() {
         // Repair lost target
         // TODO: Improvements to temporary chunk handling will remove the need for this
@@ -94,7 +102,7 @@ public class CameraTargetSystem implements ComponentSystem {
         Camera camera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
 
         BulletPhysics physicsRenderer = CoreRegistry.get(BulletPhysics.class);
-        HitResult hitInfo = physicsRenderer.rayTrace(new Vector3f(camera.getPosition()), new Vector3f(camera.getViewingDirection()), TARGET_DISTANCE);
+        HitResult hitInfo = physicsRenderer.rayTrace(new Vector3f(camera.getPosition()), new Vector3f(camera.getViewingDirection()), TARGET_DISTANCE, filter);
         Vector3i newBlockPos = null;
 
         EntityRef newTarget = EntityRef.NULL;

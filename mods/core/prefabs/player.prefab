@@ -18,7 +18,7 @@
         "radius" : 0.3
     },
     "BoxShape" : {
-        "extents" : [1.4, 1.6, 1.4]
+        "extents" : [1.5, 1.6, 1.5]
     },
     "Trigger" : {
         "detectGroups" : ["engine:debris"]

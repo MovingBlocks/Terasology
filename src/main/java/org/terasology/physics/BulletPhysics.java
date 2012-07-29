@@ -26,6 +26,7 @@ import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
 import com.bulletphysics.linearmath.DefaultMotionState;
 import com.bulletphysics.linearmath.Transform;
+import com.bulletphysics.linearmath.VectorUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.terasology.components.block.BlockComponent;
@@ -172,6 +173,26 @@ public class BulletPhysics implements EventReceiver<BlockChangedEvent> {
         to.add(from);
 
         CollisionWorld.ClosestRayResultWithUserDataCallback closest = new CollisionWorld.ClosestRayResultWithUserDataCallback(from, to);
+        closest.collisionFilterGroup = CollisionFilterGroups.SENSOR_TRIGGER;
+        _discreteDynamicsWorld.rayTest(from, to, closest);
+        if (closest.userData instanceof Vector3i) {
+            return new HitResult(blockEntityRegistry.getOrCreateEntityAt((Vector3i)closest.userData), closest.hitPointWorld, closest.hitNormalWorld);
+        } else if (closest.userData instanceof EntityRef) {
+            return new HitResult((EntityRef) closest.userData, closest.hitPointWorld, closest.hitNormalWorld);
+        }
+        return new HitResult();
+    }
+
+    public HitResult rayTrace(Vector3f from, Vector3f direction, float distance, CollisionGroup ... collisionGroups) {
+        Vector3f to = new Vector3f(direction);
+        to.scale(distance);
+        to.add(from);
+
+        short filter = combineGroups(collisionGroups);
+
+        CollisionWorld.ClosestRayResultWithUserDataCallback closest = new CollisionWorld.ClosestRayResultWithUserDataCallback(from, to);
+        closest.collisionFilterGroup = CollisionFilterGroups.ALL_FILTER;
+        closest.collisionFilterMask = filter;
         _discreteDynamicsWorld.rayTest(from, to, closest);
         if (closest.userData instanceof Vector3i) {
             return new HitResult(blockEntityRegistry.getOrCreateEntityAt((Vector3i)closest.userData), closest.hitPointWorld, closest.hitNormalWorld);
@@ -224,4 +245,5 @@ public class BulletPhysics implements EventReceiver<BlockChangedEvent> {
             this.filter = filter;
         }
     }
+
 }
