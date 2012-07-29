@@ -423,6 +423,22 @@ public final class Config {
     public void setComplexWater(boolean reflectwater) {
         _setting.getSystemBuilder().setReflectiveWater(reflectwater);
     }
+    
+    public int getMusicVolume() {
+        return _setting.getSystemBuilder().getMusicVolume();
+    }
+
+    public void setMusicVolume(int volume) {
+        _setting.getSystemBuilder().setMusicVolume(volume);
+    }
+    
+    public int getSoundVolume() {
+        return _setting.getSystemBuilder().getSoundVolume();
+    }
+
+    public void setSoundVolume(int volume) {
+        _setting.getSystemBuilder().setSoundVolume(volume);
+    }
 
     /* MODS */
 
@@ -462,25 +478,6 @@ public final class Config {
             worldRenderer.changeViewDistance(getActiveViewingDistance());
     }
 
-    //todo remove this from the config
-    public void setGraphicsQuality(int qualityLevel) {
-        if (qualityLevel == 0) {
-            setEnablePostProcessingEffects(false);
-            setAnimatedGrass(false);
-            setFlickeringLight(false);
-        } else if (qualityLevel == 1) {
-            setEnablePostProcessingEffects(true);
-            setAnimatedGrass(false);
-            setFlickeringLight(true);
-        } else if (qualityLevel == 2) {
-            setEnablePostProcessingEffects(true);
-            setAnimatedGrass(true);
-            setFlickeringLight(true);
-        }
-
-        ShaderManager.getInstance().recompileAllShaders();
-    }
-
     public void setBlurIntensity(int blurlevel) {
         _setting.getSystemBuilder().setBlurIntensity(blurlevel);
         switch (blurlevel) {
@@ -495,17 +492,6 @@ public final class Config {
             default:
                 return; // normal?
         }
-    }
-
-    //todo remove this from the config
-    public int getGraphicsQuality() {
-        if (isEnablePostProcessingEffects() & isFlickeringLight() && !isAnimatedGrass()) {
-            return 1;
-        } else if (isEnablePostProcessingEffects() & isFlickeringLight() && isAnimatedGrass()) {
-            return 2;
-        }
-
-        return 0;
     }
 }
 
