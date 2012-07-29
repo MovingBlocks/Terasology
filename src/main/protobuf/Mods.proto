@@ -1,0 +1,11 @@
+/**
+ * @author Overdhose
+ */
+
+option java_package = "org.terasology.protobuf";
+option java_outer_classname = "ModData";
+option optimize_for = SPEED;
+
+message Mods {
+    optional bool EnableMinions  = 1 [default = false]; // enable / disable mods
+}
