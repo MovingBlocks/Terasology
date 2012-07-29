@@ -356,12 +356,12 @@ public final class Config {
         _setting.getSystemBuilder().setEnablePostProcessingEffects(enablePostProcessingEffects);
     }
 
-    public boolean isAnimatedWaterAndGrass() {
-        return _setting.getSystemBuilder().getAnimatedWaterAndGrass();
+    public boolean isAnimatedGrass() {
+        return _setting.getSystemBuilder().getAnimatedGrass();
     }
 
-    public void setAnimatedWaterAndGrass(boolean animatedWaterAndGrass) {
-        _setting.getSystemBuilder().setAnimatedWaterAndGrass(animatedWaterAndGrass);
+    public void setAnimatedGrass(boolean animatedGrass) {
+        _setting.getSystemBuilder().setAnimatedGrass(animatedGrass);
     }
 
     public int getVerticalChunkMeshSegments() {
@@ -412,8 +412,16 @@ public final class Config {
         _setting.getPlayerBuilder().setPlacingBox(placingBox);
     }
 
+    public int getBlurIntensity() {
+        return _setting.getSystemBuilder().getBlurIntensity();
+    }
+
     public boolean isComplexWater() {
-        return false;
+        return _setting.getSystemBuilder().getReflectiveWater();
+    }
+
+    public void setComplexWater(boolean reflectwater) {
+        _setting.getSystemBuilder().setReflectiveWater(reflectwater);
     }
 
     /* MODS */
@@ -458,26 +466,42 @@ public final class Config {
     public void setGraphicsQuality(int qualityLevel) {
         if (qualityLevel == 0) {
             setEnablePostProcessingEffects(false);
-            setAnimatedWaterAndGrass(false);
+            setAnimatedGrass(false);
             setFlickeringLight(false);
         } else if (qualityLevel == 1) {
             setEnablePostProcessingEffects(true);
-            setAnimatedWaterAndGrass(false);
+            setAnimatedGrass(false);
             setFlickeringLight(true);
         } else if (qualityLevel == 2) {
             setEnablePostProcessingEffects(true);
-            setAnimatedWaterAndGrass(true);
+            setAnimatedGrass(true);
             setFlickeringLight(true);
         }
 
         ShaderManager.getInstance().recompileAllShaders();
     }
 
+    public void setBlurIntensity(int blurlevel) {
+        _setting.getSystemBuilder().setBlurIntensity(blurlevel);
+        switch (blurlevel) {
+            case 0:
+                return; //off
+            case 1:
+                return; //some
+            case 2:
+                return; //normal
+            case 3:
+                return; // max
+            default:
+                return; // normal?
+        }
+    }
+
     //todo remove this from the config
     public int getGraphicsQuality() {
-        if (isEnablePostProcessingEffects() & isFlickeringLight() && !isAnimatedWaterAndGrass()) {
+        if (isEnablePostProcessingEffects() & isFlickeringLight() && !isAnimatedGrass()) {
             return 1;
-        } else if (isEnablePostProcessingEffects() & isFlickeringLight() && isAnimatedWaterAndGrass()) {
+        } else if (isEnablePostProcessingEffects() & isFlickeringLight() && isAnimatedGrass()) {
             return 2;
         }
 

@@ -24,9 +24,7 @@ import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.menus.UIConfigMenu;
-import org.terasology.rendering.gui.menus.UIMainMenu;
-import org.terasology.rendering.gui.menus.UISelectWorldMenu;
+import org.terasology.rendering.gui.menus.*;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -46,6 +44,10 @@ public class StateMainMenu implements GameState {
     /* SCREENS */
     private UIMainMenu _mainMenu;
     private UIConfigMenu _configMenu;
+    private UIVideoOptions _videoOptionsMenu;
+    private UISoundOptions _soundOptionsMenu;
+    private UIInputOptions _inputOptionsMenu;
+    private UIModOptions _modOptionMenu;
     private UISelectWorldMenu _selectWorldMenu;
 
     private GameEngine _gameInstance = null;
@@ -57,10 +59,18 @@ public class StateMainMenu implements GameState {
         setupMainMenu();
         setupSelectWorldMenu();
         setupConfigMenu();
+        setupVideoOptionsMenu();
+        setupSoundOptionsMenu();
+        setupInputOptionsMenu();
+        setupModOptionsMenu();
 
         GUIManager.getInstance().addWindow(_mainMenu, "main");
         GUIManager.getInstance().addWindow(_configMenu, "config");
         GUIManager.getInstance().addWindow(_selectWorldMenu, "selectWorld");
+        GUIManager.getInstance().addWindow(_videoOptionsMenu, "videoOptions");
+        GUIManager.getInstance().addWindow(_soundOptionsMenu, "soundOptions");
+        GUIManager.getInstance().addWindow(_inputOptionsMenu, "inputOptions");
+        GUIManager.getInstance().addWindow(_modOptionMenu, "modOptions");
     }
 
     private void setupMainMenu() {
@@ -116,15 +126,66 @@ public class StateMainMenu implements GameState {
         _configMenu.setVisible(false);
 
         UIButton backToMainMenuButton = (UIButton) _configMenu.getElementById("backToMainMenuButton");
-        UIButton graphicsQualityButton = (UIButton) _configMenu.getElementById("graphicsQualityButton");
-        UIButton FOVButton = (UIButton) _configMenu.getElementById("fovButton");
-        UIButton viewingDistanceButton = (UIButton) _configMenu.getElementById("viewingDistanceButton");
+        UIButton videoOptionsButton = (UIButton) _configMenu.getElementById("videoOptionsButton");
+        UIButton soundOptionsButton = (UIButton) _configMenu.getElementById("soundOptionsButton");
+        UIButton inputOptionsButton = (UIButton) _configMenu.getElementById("inputOptionsButton");
+        UIButton modOptionsButton = (UIButton) _configMenu.getElementById("modOptionsButton");
 
         backToMainMenuButton.addClickListener(new IClickListener() {
             @Override
             public void clicked(UIDisplayElement element) {
-                _mainMenu.setVisible(true);
-                _configMenu.setVisible(false);
+                GUIManager.getInstance().setFocusedWindow(_mainMenu);
+            }
+        });
+
+        videoOptionsButton.addClickListener(new IClickListener() {
+            @Override
+            public void clicked(UIDisplayElement element) {
+                GUIManager.getInstance().setFocusedWindow(_videoOptionsMenu);
+            }
+        });
+
+        soundOptionsButton.addClickListener(new IClickListener() {
+            @Override
+            public void clicked(UIDisplayElement element) {
+                GUIManager.getInstance().setFocusedWindow(_soundOptionsMenu);
+            }
+        });
+
+        inputOptionsButton.addClickListener(new IClickListener() {
+            @Override
+            public void clicked(UIDisplayElement element) {
+                GUIManager.getInstance().setFocusedWindow(_inputOptionsMenu);
+            }
+        });
+
+        modOptionsButton.addClickListener(new IClickListener() {
+            @Override
+            public void clicked(UIDisplayElement element) {
+                GUIManager.getInstance().setFocusedWindow(_modOptionMenu);
+            }
+        });
+
+
+    }
+
+    private void setupVideoOptionsMenu() {
+        _videoOptionsMenu = new UIVideoOptions();
+        _videoOptionsMenu.setVisible(false);
+
+        UIButton videoToSettingsMenuButton = (UIButton) _videoOptionsMenu.getElementById("backToSettingsMenuButton");
+        UIButton graphicsQualityButton = (UIButton) _videoOptionsMenu.getElementById("graphicsQualityButton");
+        UIButton FOVButton = (UIButton) _videoOptionsMenu.getElementById("fovButton");
+        UIButton viewingDistanceButton = (UIButton) _videoOptionsMenu.getElementById("viewingDistanceButton");
+        UIButton animateGrassButton = (UIButton) _videoOptionsMenu.getElementById("animateGrassButton");
+        UIButton reflectiveWaterButton = (UIButton) _videoOptionsMenu.getElementById("reflectiveWaterButton");
+        UIButton blurIntensityButton = (UIButton) _videoOptionsMenu.getElementById("blurIntensityButton");
+        UIButton bobbingButton = (UIButton) _videoOptionsMenu.getElementById("bobbingButton");
+
+        videoToSettingsMenuButton.addClickListener(new IClickListener() {
+            @Override
+            public void clicked(UIDisplayElement element) {
+                GUIManager.getInstance().setFocusedWindow(_configMenu);
             }
         });
 
@@ -206,6 +267,147 @@ public class StateMainMenu implements GameState {
                 }
             }
         });
+
+        animateGrassButton.addClickListener(new IClickListener() {
+            @Override
+            public void clicked(UIDisplayElement element) {
+                UIButton button = (UIButton) element;
+
+                if (button.getLabel().getText().equals("Animated grass: false")) {
+                    button.getLabel().setText("Animated grass: true");
+                    Config.getInstance().setAnimatedGrass(true);
+                } else if (button.getLabel().getText().equals("Animated grass: true")) {
+                    button.getLabel().setText("Animated grass: false");
+                    Config.getInstance().setAnimatedGrass(false);
+                }
+            }
+        });
+
+        reflectiveWaterButton.addClickListener(new IClickListener() {
+            @Override
+            public void clicked(UIDisplayElement element) {
+                UIButton button = (UIButton) element;
+
+                if (button.getLabel().getText().equals("Reflective water: false")) {
+                    button.getLabel().setText("Reflective water: true");
+                    Config.getInstance().setComplexWater(true);
+                } else if (button.getLabel().getText().equals("Reflective water: true")) {
+                    button.getLabel().setText("Reflective water: false");
+                    Config.getInstance().setComplexWater(false);
+                }
+            }
+        });
+
+        blurIntensityButton.addClickListener(new IClickListener() {
+            @Override
+            public void clicked(UIDisplayElement element) {
+                UIButton button = (UIButton) element;
+
+                if (button.getLabel().getText().equals("Blur intensity: Normal")) {
+                    button.getLabel().setText("Blur intensity: Max");
+                    Config.getInstance().setBlurIntensity(3);
+                } else if (button.getLabel().getText().equals("Blur intensity: Max")) {
+                    button.getLabel().setText("Blur intensity: Off");
+                    Config.getInstance().setBlurIntensity(0);
+                } else if (button.getLabel().getText().equals("Blur intensity: Off")) {
+                    button.getLabel().setText("Blur intensity: Some");
+                    Config.getInstance().setBlurIntensity(1);
+                } else if (button.getLabel().getText().equals("Blur intensity: Some")) {
+                    button.getLabel().setText("Blur intensity: Normal");
+                    Config.getInstance().setBlurIntensity(2);
+                }
+            }
+        });
+
+        bobbingButton.addClickListener(new IClickListener() {
+            @Override
+            public void clicked(UIDisplayElement element) {
+                UIButton button = (UIButton) element;
+
+                if (button.getLabel().getText().equals("Bobbing: true")) {
+                    button.getLabel().setText("Bobbing: false");
+                    Config.getInstance().setCameraBobbing(false);
+                } else if (button.getLabel().getText().equals("Bobbing: false")) {
+                    button.getLabel().setText("Bobbing: true");
+                    Config.getInstance().setCameraBobbing(true);
+                }
+            }
+        });
+    }
+
+    private void setupSoundOptionsMenu() {
+        _soundOptionsMenu = new UISoundOptions();
+        _soundOptionsMenu.setVisible(false);
+
+        UIButton soundToSettingsMenuButton = (UIButton) _soundOptionsMenu.getElementById("soundToSettingsMenuButton");
+        soundToSettingsMenuButton.addClickListener(new IClickListener() {
+            @Override
+            public void clicked(UIDisplayElement element) {
+                GUIManager.getInstance().setFocusedWindow(_configMenu);
+            }
+        });
+    }
+
+    private void setupInputOptionsMenu() {
+        _inputOptionsMenu = new UIInputOptions();
+        _inputOptionsMenu.setVisible(false);
+
+        UIButton inputToSettingsMenuButton = (UIButton) _inputOptionsMenu.getElementById("inputToSettingsMenuButton");
+
+        UIButton ForwardButton = (UIButton) _inputOptionsMenu.getElementById("ForwardButton");
+
+        inputToSettingsMenuButton.addClickListener(new IClickListener() {
+            @Override
+            public void clicked(UIDisplayElement element) {
+                GUIManager.getInstance().setFocusedWindow(_configMenu);
+            }
+        });
+
+        ForwardButton.addClickListener(new IClickListener() {
+            @Override
+            public void clicked(UIDisplayElement element) {
+                GUIManager.getInstance().showMessage("Bind button", "Press a button or mouse button");
+            }
+        });
+    }
+
+    private void setupModOptionsMenu() {
+        _modOptionMenu = new UIModOptions();
+        _modOptionMenu.setVisible(false);
+
+        UIButton backToSettingsMenuButton = (UIButton) _modOptionMenu.getElementById("backToSettingsMenuButton");
+        UIButton minionsButton = (UIButton) _modOptionMenu.getElementById("minionsButton");
+        UIButton minionOptionsButton = (UIButton) _modOptionMenu.getElementById("minionOptionsButton");
+
+        backToSettingsMenuButton.addClickListener(new IClickListener() {
+            @Override
+            public void clicked(UIDisplayElement element) {
+                GUIManager.getInstance().setFocusedWindow(_configMenu);
+            }
+        });
+
+        minionOptionsButton.addClickListener(new IClickListener() {
+            @Override
+            public void clicked(UIDisplayElement element) {
+                _modOptionMenu.setVisible(true);
+                _configMenu.setVisible(false);
+            }
+        });
+
+        minionsButton.addClickListener(new IClickListener() {
+            @Override
+            public void clicked(UIDisplayElement element) {
+                UIButton button = (UIButton) element;
+
+                if (button.getLabel().getText().equals("Minions enabled : false")) {
+                    Config.getInstance().setGraphicsQuality(1);
+                    button.getLabel().setText("Minions enabled : true");
+                } else if (button.getLabel().getText().equals("Minions enabled : true")) {
+                    Config.getInstance().setGraphicsQuality(1);
+                    button.getLabel().setText("Minions enabled : false");
+                }
+            }
+        });
     }
 
     @Override
@@ -215,13 +417,18 @@ public class StateMainMenu implements GameState {
 
         GUIManager.getInstance().getWindowById("main").setVisible(true);
         GUIManager.getInstance().getWindowById("config").setVisible(false);
+        GUIManager.getInstance().getWindowById("videoOptions").setVisible(false);
         GUIManager.getInstance().getWindowById("selectWorld").setVisible(false);
         GUIManager.getInstance().getWindowById("generate_world").setVisible(false);
         GUIManager.getInstance().setFocusedWindow("main");
 
-        UIButton graphicsQualityButton = (UIButton) _configMenu.getElementById("graphicsQualityButton");
-        UIButton FOVButton = (UIButton) _configMenu.getElementById("fovButton");
-        UIButton viewingDistanceButton = (UIButton) _configMenu.getElementById("viewingDistanceButton");
+        UIButton graphicsQualityButton = (UIButton) _videoOptionsMenu.getElementById("graphicsQualityButton");
+        UIButton FOVButton = (UIButton) _videoOptionsMenu.getElementById("fovButton");
+        UIButton viewingDistanceButton = (UIButton) _videoOptionsMenu.getElementById("viewingDistanceButton");
+        UIButton animateGrassButton = (UIButton) _videoOptionsMenu.getElementById("animateGrassButton");
+        UIButton reflectiveWaterButton = (UIButton) _videoOptionsMenu.getElementById("reflectiveWaterButton");
+        UIButton blurIntensityButton = (UIButton) _videoOptionsMenu.getElementById("blurIntensityButton");
+        UIButton bobbingButton = (UIButton) _videoOptionsMenu.getElementById("bobbingButton");
 
         if (Config.getInstance().getActiveViewingDistanceId() == 3)
             viewingDistanceButton.getLabel().setText("Viewing Distance: Ultra");
@@ -241,6 +448,34 @@ public class StateMainMenu implements GameState {
 
         // TODO: Replace with a slider later on
         FOVButton.getLabel().setText("Field of View: " + (int) Config.getInstance().getFov());
+
+        if (Config.getInstance().isAnimatedGrass()) {
+            animateGrassButton.getLabel().setText("Animated grass: true");
+        } else {
+            animateGrassButton.getLabel().setText("Animated grass: false");
+        }
+
+        if (Config.getInstance().isComplexWater()) {
+            reflectiveWaterButton.getLabel().setText("Reflective water: true");
+        } else {
+            reflectiveWaterButton.getLabel().setText("Reflective water: false");
+        }
+
+        if (Config.getInstance().getBlurIntensity() == 0) {
+            blurIntensityButton.getLabel().setText("Blur intensity: Off");
+        } else if (Config.getInstance().getBlurIntensity() == 1) {
+            blurIntensityButton.getLabel().setText("Blur intensity: Some");
+        } else if (Config.getInstance().getBlurIntensity() == 2) {
+            blurIntensityButton.getLabel().setText("Blur intensity: Normal");
+        } else if (Config.getInstance().getBlurIntensity() == 3) {
+            blurIntensityButton.getLabel().setText("Blur intensity: Max");
+        }
+
+        if (Config.getInstance().isCameraBobbing()) {
+            bobbingButton.getLabel().setText("Bobbing: true");
+        } else {
+            bobbingButton.getLabel().setText("Bobbing: false");
+        }
     }
 
     @Override
