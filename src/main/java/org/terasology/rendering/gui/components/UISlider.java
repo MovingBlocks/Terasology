@@ -11,6 +11,11 @@ import org.terasology.rendering.gui.framework.IChangedListener;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
+/**
+ * A simple Slider.
+ * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
+ *
+ */
 public class UISlider extends UIDisplayContainer {
 	
     private final ArrayList<IChangedListener> _changedListeners = new ArrayList<IChangedListener>();
@@ -22,8 +27,7 @@ public class UISlider extends UIDisplayContainer {
 	private int _max;
 	private int _range;
 	
-	private boolean _moveActive = false;
-
+	private static UISlider _moveActive = null;
 
 	public UISlider(Vector2f size, int min, int max) {
         setSize(size);
@@ -50,7 +54,6 @@ public class UISlider extends UIDisplayContainer {
         addDisplayElement(_label);
         
         calcRange();
-        changeSlider(_min);
 	}
 
 	public void update() {
@@ -60,7 +63,7 @@ public class UISlider extends UIDisplayContainer {
 
         if (intersects(mousePos)) {
             setClassStyle("slider-mouseover");
-            if (_mouseDown && !_moveActive)
+            if (_mouseDown && _moveActive == null)
             {
             	changeSlider(mousePos.x);
             }
@@ -77,18 +80,18 @@ public class UISlider extends UIDisplayContainer {
     
     private void updateSlider(Vector2f mousePos) {        
 		if (_slider.intersects(mousePos)) {
-			if (_mouseDown) {
-				_moveActive = true;
+			if (_mouseDown && _moveActive == null) {
+				_moveActive = this;
 			}
 		}
 
 		if (_mouseUp) {
-			_moveActive = false;
+			_moveActive = null;
 			_mouseDown = false;
 			_mouseUp = false;
 		}
 
-		if (_moveActive) {
+		if (_moveActive == this) {
 			changeSlider(mousePos.x);
 		}
 	}
@@ -169,7 +172,7 @@ public class UISlider extends UIDisplayContainer {
 			value -= _min;
 		}
 		
-		float pos = (int)(value * ((getSize().x - _slider.getSize().x) / (float)_range));
+		float pos = value * ((getSize().x - _slider.getSize().x) / (float)_range);
 		if (pos < 0)
 		{
 			pos = 0;

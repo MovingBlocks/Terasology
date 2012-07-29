@@ -52,7 +52,7 @@ public class InputSystem implements EventHandlerSystem {
         localPlayer = CoreRegistry.get(LocalPlayer.class);
         cameraTargetSystem = CoreRegistry.get(CameraTargetSystem.class);
 
-        REPLACE_THIS_WITH_CONFIG();
+        loadInputConfig();
     }
 
     @Override
@@ -291,7 +291,7 @@ public class InputSystem implements EventHandlerSystem {
         }
     }
 
-    private void REPLACE_THIS_WITH_CONFIG() {
+    private void loadInputConfig() {
         InputConfig inputConfig = InputConfig.getInstance();
         int keyvalue;
 
@@ -316,7 +316,7 @@ public class InputSystem implements EventHandlerSystem {
         }
 
         registerBindButton(PauseButton.ID, "Pause", new PauseButton());
-        keyvalue = inputConfig.getKeyPauze();
+        keyvalue = inputConfig.getKeyPause();
         if (keyvalue < 256) {
             linkBindButtonToKey(keyvalue, PauseButton.ID);
         } else if (keyvalue < 259) {
