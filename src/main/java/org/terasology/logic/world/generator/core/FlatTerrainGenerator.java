@@ -18,6 +18,7 @@ import org.terasology.model.blocks.management.BlockManager;
  */
 public class FlatTerrainGenerator implements ChunkGenerator {
 
+    private static final String INIT_PARAMETER_HEIGHT = "height";
     // TODO FlatTerrainGenerator: What is a good value for MAX_Y?
     public static final int MAX_HEIGHT = Chunk.SIZE_Y - 100;
     public static final int MIN_HEIGHT = 0;
@@ -73,14 +74,14 @@ public class FlatTerrainGenerator implements ChunkGenerator {
     @Override
     public Map<String, String> getInitParameters() {
         final Map<String, String> initParameters = new HashMap<String, String>();
-        initParameters.put("height", String.valueOf(height));
+        initParameters.put(FlatTerrainGenerator.INIT_PARAMETER_HEIGHT, String.valueOf(height));
         return initParameters;
     }
 
     @Override
     public void setInitParameters(final Map<String, String> initParameters) {
         if (initParameters != null) {
-            final String heightStr = initParameters.get("height");
+            final String heightStr = initParameters.get(FlatTerrainGenerator.INIT_PARAMETER_HEIGHT);
             if (heightStr != null) {
                 try {
                     setHeight(Integer.parseInt(heightStr));
