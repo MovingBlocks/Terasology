@@ -162,6 +162,8 @@ public class BulletPhysicsRenderer implements EventReceiver<BlockChangedEvent> {
         _discreteDynamicsWorld.rayTest(from, to, closest);
         if (closest.userData instanceof Vector3i) {
             return new HitResult(blockEntityRegistry.getOrCreateEntityAt((Vector3i)closest.userData), closest.hitPointWorld, closest.hitNormalWorld);
+        } else if (closest.userData instanceof EntityRef) {
+            return new HitResult((EntityRef) closest.userData, closest.hitPointWorld, closest.hitNormalWorld);
         }
         return new HitResult();
     }

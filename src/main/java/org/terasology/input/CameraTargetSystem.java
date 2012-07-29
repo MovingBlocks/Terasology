@@ -63,8 +63,8 @@ public class CameraTargetSystem implements ComponentSystem {
     }
 
     public EntityRef getTarget() {
-        if (targetBlockPos != null && !target.exists()) {
-            return blockRegistry.getOrCreateEntityAt(targetBlockPos);
+        if (!target.exists() && targetBlockPos != null) {
+            target = blockRegistry.getOrCreateEntityAt(targetBlockPos);
         }
         return target;
     }
@@ -92,30 +92,27 @@ public class CameraTargetSystem implements ComponentSystem {
 
         // TODO: This will change when camera are handled better (via a component)
         Camera camera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
-        // TODO: Check for non-block targets once we have support for that
 
         BulletPhysicsRenderer physicsRenderer = CoreRegistry.get(BulletPhysicsRenderer.class);
         HitResult hitInfo = physicsRenderer.rayTrace(new Vector3f(camera.getPosition()), new Vector3f(camera.getViewingDirection()), TARGET_DISTANCE);
         Vector3i newBlockPos = null;
 
+        EntityRef newTarget = EntityRef.NULL;
         if (hitInfo.isHit()) {
+            newTarget = hitInfo.getEntity();
             hitPosition = hitInfo.getHitPoint();
             hitNormal = hitInfo.getHitNormal();
 
-
-            BlockComponent blockComp = hitInfo.getEntity().getComponent(BlockComponent.class);
+            BlockComponent blockComp = newTarget.getComponent(BlockComponent.class);
             if (blockComp != null) {
                 newBlockPos = new Vector3i(blockComp.getPosition());
             }
         }
-        if (!Objects.equal(targetBlockPos, newBlockPos) || lostTarget) {
+        if (!Objects.equal(target, newTarget) || lostTarget) {
             EntityRef oldTarget = target;
 
-            target = EntityRef.NULL;
+            target = newTarget;
             targetBlockPos = newBlockPos;
-            if (newBlockPos != null) {
-                target = hitInfo.getEntity();
-            }
 
             oldTarget.send(new CameraOutEvent());
             target.send(new CameraOverEvent());

@@ -18,7 +18,7 @@
         "radius" : 0.3
     },
     "BoxShape" : {
-        "extents" : [0.6, 1.6, 0.6]
+        "extents" : [1.4, 1.6, 1.4]
     },
     "Trigger" : {
     },

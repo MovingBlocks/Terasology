@@ -1,10 +1,13 @@
 package org.terasology.componentSystem.controllers;
 
+import com.bulletphysics.linearmath.AabbUtil2;
 import com.bulletphysics.linearmath.QuaternionUtil;
+import com.bulletphysics.linearmath.Transform;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.*;
 import org.terasology.components.block.BlockComponent;
+import org.terasology.components.rendering.MeshComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
@@ -29,6 +32,7 @@ import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.cameras.DefaultCamera;
 
+import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
@@ -169,13 +173,24 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         // Display the block the player is aiming at
         if (Config.getInstance().isPlacingBox()) {
             EntityRef target = cameraTargetSystem.getTarget();
+            AABB aabb = null;
             BlockComponent blockComp = target.getComponent(BlockComponent.class);
             if (blockComp != null) {
                 Block block = worldProvider.getBlock(blockComp.getPosition());
                 if (block.isRenderBoundingBox()) {
-                    aabbRenderer.setAABB(block.getBounds(blockComp.getPosition()));
-                    aabbRenderer.render(2f);
+                    aabb = block.getBounds(blockComp.getPosition());
                 }
+            } else {
+                MeshComponent mesh = target.getComponent(MeshComponent.class);
+                LocationComponent location = target.getComponent(LocationComponent.class);
+                if (mesh != null && mesh.mesh != null && location != null) {
+                    aabb = mesh.mesh.getAABB();
+                    aabb = aabb.transform(location.getWorldRotation(), location.getWorldPosition(), location.getWorldScale());
+                }
+            }
+            if (aabb != null) {
+                aabbRenderer.setAABB(aabb);
+                aabbRenderer.render(2f);
             }
         }
     }
