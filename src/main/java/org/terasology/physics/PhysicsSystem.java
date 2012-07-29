@@ -17,7 +17,6 @@
 package org.terasology.physics;
 
 import com.bulletphysics.collision.broadphase.BroadphasePair;
-import com.bulletphysics.collision.broadphase.CollisionFilterGroups;
 import com.bulletphysics.collision.dispatch.CollisionFlags;
 import com.bulletphysics.collision.dispatch.CollisionObject;
 import com.bulletphysics.collision.dispatch.GhostObject;
@@ -31,7 +30,9 @@ import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.linearmath.MotionState;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.util.ObjectArrayList;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import gnu.trove.iterator.TFloatIterator;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
@@ -43,11 +44,11 @@ import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.physics.shapes.*;
-import org.terasology.rendering.physics.BulletPhysicsRenderer;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -56,13 +57,13 @@ import java.util.Map;
 @RegisterComponentSystem
 public class PhysicsSystem implements EventHandlerSystem, UpdateSubscriberSystem {
 
-    private BulletPhysicsRenderer physics;
+    private BulletPhysics physics;
     private Map<EntityRef, RigidBody> entityRigidBodies = Maps.newHashMap();
     private Map<EntityRef, PairCachingGhostObject> entityTriggers = Maps.newHashMap();
 
     @Override
     public void initialise() {
-        physics = CoreRegistry.get(BulletPhysicsRenderer.class);
+        physics = CoreRegistry.get(BulletPhysics.class);
     }
 
     @Override
@@ -84,7 +85,7 @@ public class PhysicsSystem implements EventHandlerSystem, UpdateSubscriberSystem
             RigidBody collider = new RigidBody(info);
             collider.setUserPointer(entity);
             RigidBody oldBody = entityRigidBodies.put(entity, collider);
-            physics.addRigidBody(collider, CollisionFilterGroups.DEFAULT_FILTER, (short) (CollisionFilterGroups.DEFAULT_FILTER | CollisionFilterGroups.STATIC_FILTER | CollisionFilterGroups.KINEMATIC_FILTER | CollisionFilterGroups.SENSOR_TRIGGER));
+            physics.addRigidBody(collider, Lists.<CollisionGroup>newArrayList(rigidBody.collisionGroup), rigidBody.collidesWith);
             if (oldBody != null) {
                 physics.removeRigidBody(oldBody);
             }
@@ -99,7 +100,8 @@ public class PhysicsSystem implements EventHandlerSystem, UpdateSubscriberSystem
         if (shape != null) {
             float scale = location.getWorldScale();
             shape.setLocalScaling(new Vector3f(scale, scale, scale));
-            PairCachingGhostObject triggerObj = physics.createCollider(location.getWorldPosition(), shape, CollisionFilterGroups.SENSOR_TRIGGER, (short) (CollisionFilterGroups.DEFAULT_FILTER | CollisionFilterGroups.SENSOR_TRIGGER), CollisionFlags.NO_CONTACT_RESPONSE);
+            List<CollisionGroup> detectGroups = Lists.newArrayList(trigger.detectGroups);
+            PairCachingGhostObject triggerObj = physics.createCollider(location.getWorldPosition(), shape, Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.SENSOR), detectGroups, CollisionFlags.NO_CONTACT_RESPONSE);
             triggerObj.setUserPointer(entity);
             entityTriggers.put(entity, triggerObj);
         }
@@ -137,6 +139,10 @@ public class PhysicsSystem implements EventHandlerSystem, UpdateSubscriberSystem
             halfExtents.scale(0.5f);
             return new BoxShape(halfExtents);
         }
+        SphereShapeComponent sphere = entity.getComponent(SphereShapeComponent.class);
+        if (sphere != null) {
+            return new SphereShape(sphere.radius);
+        }
         CapsuleShapeComponent capsule = entity.getComponent(CapsuleShapeComponent.class);
         if (capsule != null) {
             return new CapsuleShape(capsule.radius, capsule.height);
@@ -145,11 +151,19 @@ public class PhysicsSystem implements EventHandlerSystem, UpdateSubscriberSystem
         if (cylinder != null) {
             return new CylinderShape(new Vector3f(cylinder.radius, 0.5f * cylinder.height, cylinder.radius));
         }
-        SphereShapeComponent sphere = entity.getComponent(SphereShapeComponent.class);
-        if (sphere != null) {
-            return new SphereShape(sphere.radius);
+        HullShapeComponent hull = entity.getComponent(HullShapeComponent.class);
+        if (hull != null) {
+            ObjectArrayList<Vector3f> verts = new ObjectArrayList<Vector3f>();
+            TFloatIterator iterator = hull.sourceMesh.getVertices().iterator();
+            while (iterator.hasNext()) {
+                Vector3f newVert = new Vector3f();
+                newVert.x = iterator.next();
+                newVert.y = iterator.next();
+                newVert.z = iterator.next();
+                verts.add(newVert);
+            }
+            return new ConvexHullShape(verts);
         }
-        // TODO: Convex Hull
         CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
         if (characterMovementComponent != null) {
             return new CapsuleShape(characterMovementComponent.radius, characterMovementComponent.height);
@@ -207,16 +221,9 @@ public class PhysicsSystem implements EventHandlerSystem, UpdateSubscriberSystem
 
     private class EntityMotionState extends MotionState {
         private EntityRef entity;
-        private Transform transform;
 
         public EntityMotionState(EntityRef entity) {
             this.entity = entity;
-            transform = new Transform();
-            LocationComponent loc = entity.getComponent(LocationComponent.class);
-            if (loc != null) {
-                // NOTE: JBullet ignores scale anyway
-                this.transform.set(new Matrix4f(loc.getWorldRotation(), loc.getWorldPosition(), 1));
-            }
         }
 
         @Override
@@ -231,7 +238,6 @@ public class PhysicsSystem implements EventHandlerSystem, UpdateSubscriberSystem
 
         @Override
         public void setWorldTransform(Transform transform) {
-            this.transform.set(transform);
             LocationComponent loc = entity.getComponent(LocationComponent.class);
             if (loc != null) {
                 loc.setWorldPosition(transform.origin);

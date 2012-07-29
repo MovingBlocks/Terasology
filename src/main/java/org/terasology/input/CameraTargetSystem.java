@@ -25,9 +25,9 @@ import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.world.BlockEntityRegistry;
 import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.Vector3i;
+import org.terasology.physics.BulletPhysics;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.physics.BulletPhysicsRenderer;
-import org.terasology.rendering.physics.HitResult;
+import org.terasology.physics.HitResult;
 import org.terasology.rendering.world.WorldRenderer;
 
 import javax.vecmath.Vector3f;
@@ -93,7 +93,7 @@ public class CameraTargetSystem implements ComponentSystem {
         // TODO: This will change when camera are handled better (via a component)
         Camera camera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
 
-        BulletPhysicsRenderer physicsRenderer = CoreRegistry.get(BulletPhysicsRenderer.class);
+        BulletPhysics physicsRenderer = CoreRegistry.get(BulletPhysics.class);
         HitResult hitInfo = physicsRenderer.rayTrace(new Vector3f(camera.getPosition()), new Vector3f(camera.getViewingDirection()), TARGET_DISTANCE);
         Vector3i newBlockPos = null;
 

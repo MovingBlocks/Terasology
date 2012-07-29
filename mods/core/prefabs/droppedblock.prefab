@@ -7,7 +7,9 @@
         "extents" : [1, 1, 1]
     },
     "RigidBody" : {
-        "mass" : 10f
+        "mass" : 10f,
+        "collisionGroup" : "engine:debris",
+        "collidesWith" : ["engine:world","engine:debris","engine:sensor"]
     },
     "Mesh" : {
         "mesh" : "engine:cube",

@@ -1,5 +1,6 @@
 package org.terasology.componentSystem.controllers;
 
+import com.bulletphysics.collision.dispatch.CollisionFlags;
 import com.bulletphysics.linearmath.AabbUtil2;
 import com.bulletphysics.linearmath.QuaternionUtil;
 import com.bulletphysics.linearmath.Transform;

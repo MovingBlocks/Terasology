@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.rendering.physics;
+package org.terasology.physics;
 
 import com.bulletphysics.collision.shapes.BoxShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
