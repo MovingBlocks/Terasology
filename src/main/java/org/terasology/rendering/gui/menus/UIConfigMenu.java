@@ -28,19 +28,19 @@ import javax.vecmath.Vector2f;
  * Main menu screen.
  *
  * @author Anton Kireev <adeon.k87@gmail.com>
+ * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
 public class UIConfigMenu extends UIDisplayWindow {
 
     final UIImageOverlay _overlay;
     final UIGraphicsElement _title;
-
-    private final UIButton _backToMainMenuButton,
-            _videoOptions,
-            _soundOptions,
-            _inputOptions,
-            _modOptions;
-
     final UIText _version;
+
+    private final UIButton _backToMainMenuButton;
+    private final UIButton _videoButton;
+    private final UIButton _audioButton;
+    private final UIButton _controlsButton;
+    private final UIButton _modsButton;
 
     public UIConfigMenu() {
         maximize();
@@ -48,27 +48,27 @@ public class UIConfigMenu extends UIDisplayWindow {
         _title.setVisible(true);
         _title.setSize(new Vector2f(512f, 128f));
 
-        _version = new UIText("Pre Alpha");
+        _version = new UIText("Settings");
         _version.setVisible(true);
 
         _overlay = new UIImageOverlay(AssetManager.loadTexture("engine:loadingBackground"));
         _overlay.setVisible(true);
 
-        _videoOptions = new UIButton(new Vector2f(256f, 32f));
-        _videoOptions.getLabel().setText("Graphical options...");
-        _videoOptions.setVisible(true);
+        _videoButton = new UIButton(new Vector2f(256f, 32f));
+        _videoButton.getLabel().setText("Video");
+        _videoButton.setVisible(true);
 
-        _soundOptions = new UIButton(new Vector2f(256f, 32f));
-        _soundOptions.getLabel().setText("Audio options...");
-        _soundOptions.setVisible(true);
+        _audioButton = new UIButton(new Vector2f(256f, 32f));
+        _audioButton.getLabel().setText("Audio");
+        _audioButton.setVisible(true);
 
-        _inputOptions = new UIButton(new Vector2f(256f, 32f));
-        _inputOptions.getLabel().setText("Input options...");
-        _inputOptions.setVisible(true);
+        _controlsButton = new UIButton(new Vector2f(256f, 32f));
+        _controlsButton.getLabel().setText("Controls");
+        _controlsButton.setVisible(true);
 
-        _modOptions = new UIButton(new Vector2f(256f, 32f));
-        _modOptions.getLabel().setText("Mod options...");
-        _modOptions.setVisible(true);
+        _modsButton = new UIButton(new Vector2f(256f, 32f));
+        _modsButton.getLabel().setText("Mods");
+        _modsButton.setVisible(true);
 
         _backToMainMenuButton = new UIButton(new Vector2f(256f, 32f));
         _backToMainMenuButton.getLabel().setText("Return to Main Menu");
@@ -78,11 +78,11 @@ public class UIConfigMenu extends UIDisplayWindow {
         addDisplayElement(_title);
         addDisplayElement(_version);
 
+        addDisplayElement(_videoButton, "videoButton");
+        addDisplayElement(_audioButton, "audioButton");
+        addDisplayElement(_controlsButton, "controlsButton");
+        addDisplayElement(_modsButton, "modsButton");
         addDisplayElement(_backToMainMenuButton, "backToMainMenuButton");
-        addDisplayElement(_videoOptions, "videoOptionsButton");
-        addDisplayElement(_soundOptions, "soundOptionsButton");
-        addDisplayElement(_inputOptions, "inputOptionsButton");
-        addDisplayElement(_modOptions, "modOptionsButton");
         update();
     }
 
@@ -93,20 +93,20 @@ public class UIConfigMenu extends UIDisplayWindow {
         _version.centerHorizontally();
         _version.getPosition().y = 230f;
 
-        _videoOptions.centerHorizontally();
-        _videoOptions.getPosition().y = 300f;
+        _videoButton.centerHorizontally();
+        _videoButton.getPosition().y = 300f;
 
-        _soundOptions.centerHorizontally();
-        _soundOptions.getPosition().y = 300f + 40f;
+        _audioButton.centerHorizontally();
+        _audioButton.getPosition().y = 300f + 40f;
 
-        _inputOptions.centerHorizontally();
-        _inputOptions.getPosition().y = 300f + 2 * 40f;
+        _controlsButton.centerHorizontally();
+        _controlsButton.getPosition().y = 300f + 2 * 40f;
 
-        _modOptions.centerHorizontally();
-        _modOptions.getPosition().y = 300f + 3 * 40f;
+        _modsButton.centerHorizontally();
+        _modsButton.getPosition().y = 300f + 3 * 40f;
 
         _backToMainMenuButton.centerHorizontally();
-        _backToMainMenuButton.getPosition().y = 300f + 5 * 40f;
+        _backToMainMenuButton.getPosition().y = 300f + 7 * 40f;
 
         _title.centerHorizontally();
         _title.getPosition().y = 128f;

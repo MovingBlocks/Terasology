@@ -67,7 +67,7 @@ public final class InputConfig {
         }
     }
 
-    public int getKey(String skey) {
+    private int strToKey(String skey) {
         if (skey.startsWith("MOUSE")) {
             if (skey == "MOUSELEFT") {
                 return 256;
@@ -86,115 +86,242 @@ public final class InputConfig {
             return Keyboard.getKeyIndex(skey);
         }
     }
+    
+    private String keyToStr(int key) {
+    	if (key < 256) {
+            return Keyboard.getKeyName(key);
+        } else {
+            if (key == 256) {
+                return "MOUSELEFT";
+            } else if (key == 257) {
+                return "MOUSERIGHT";
+            } else if (key == 258) {
+                return "MOUSEMIDDLE";
+            } else if (key == 259) {
+                return "MOUSEWHEELUP";
+            } else if (key == 260) {
+                return "MOUSEWHEELDOWN";
+            } else {
+                return "MOUSEMOVE";
+            }
+        }
+    }
 
     /* Get / Set methods */
 
     public int getKeyForward() {
-        return getKey(_inputsetting.getKeyForward());
+        return strToKey(_inputsetting.getKeyForward());
+    }
+    
+    public void setKeyForward(int i) {
+    	_inputsetting.setKeyForward(keyToStr(i));
     }
 
     public int getKeyBackward() {
-        return getKey(_inputsetting.getKeyBackward());
+        return strToKey(_inputsetting.getKeyBackward());
+    }
+    
+    public void setKeyBackward(int i) {
+    	_inputsetting.setKeyBackward(keyToStr(i));
     }
 
-    public int getJumpbehaviour() {
-        return getKey(_inputsetting.getJumpbehaviour());
+    public int getKeyJumpbehaviour() {
+        return strToKey(_inputsetting.getJumpbehaviour());
+    }
+    
+    public void setKeyJumpbehaviour(int i) {
+    	//TODO remove jump behavior button?
     }
 
     public int getKeyAttack() {
-        return getKey(_inputsetting.getKeyAttack());
+        return strToKey(_inputsetting.getKeyAttack());
+    }
+    
+    public void setKeyAttack(int i) {
+    	_inputsetting.setKeyAttack(keyToStr(i));
     }
 
     public int getKeyConsole() {
-        return getKey(_inputsetting.getKeyConsole());
+        return strToKey(_inputsetting.getKeyConsole());
+    }
+    
+    public void setKeyConsole(int i) {
+    	_inputsetting.setKeyConsole(keyToStr(i));
     }
 
     public int getKeyCrouch() {
-        return getKey(_inputsetting.getKeyCrouch());
+        return strToKey(_inputsetting.getKeyCrouch());
+    }
+    
+    public void setKeyCrouch(int i) {
+    	_inputsetting.setKeyCrouch(keyToStr(i));
     }
 
     public int getKeyFrob() {
-        return getKey(_inputsetting.getKeyFrob());
+        return strToKey(_inputsetting.getKeyFrob());
+    }
+    
+    public void setKeyFrob(int i) {
+    	_inputsetting.setKeyFrob(keyToStr(i));
     }
 
     public int getKeyHidegui() {
-        return getKey(_inputsetting.getKeyHidegui());
+        return strToKey(_inputsetting.getKeyHidegui());
+    }
+    
+    public void setKeyHidegui(int i) {
+    	_inputsetting.setKeyHidegui(keyToStr(i));
     }
 
     public int getKeyInventory() {
-        return getKey(_inputsetting.getKeyInventory());
+        return strToKey(_inputsetting.getKeyInventory());
+    }
+    
+    public void setKeyInventory(int i) {
+    	_inputsetting.setKeyInventory(keyToStr(i));
     }
 
     public int getKeyJump() {
-        return getKey(_inputsetting.getKeyJump());
+        return strToKey(_inputsetting.getKeyJump());
+    }
+    
+    public void setKeyJump(int i) {
+    	_inputsetting.setKeyJump(keyToStr(i));
     }
 
     public int getKeyLeft() {
-        return getKey(_inputsetting.getKeyLeft());
+        return strToKey(_inputsetting.getKeyLeft());
+    }
+    
+    public void setKeyLeft(int i) {
+    	_inputsetting.setKeyLeft(keyToStr(i));
     }
 
     public int getKeyMinionmode() {
-        return getKey(_inputsetting.getKeyMinionmode());
+        return strToKey(_inputsetting.getKeyMinionmode());
+    }
+    
+    public void setKeyMinionmode(int i) {
+    	_inputsetting.setKeyMinionmode(keyToStr(i));
     }
 
-    public int getKeyPauze() {
-        return getKey(_inputsetting.getKeyPauze());
+    public int getKeyPause() {
+        return strToKey(_inputsetting.getKeyPause());
+    }
+    
+    public void setKeyPause(int i) {
+    	_inputsetting.setKeyPause(keyToStr(i));
     }
 
     public int getKeyRight() {
-        return getKey(_inputsetting.getKeyRight());
+        return strToKey(_inputsetting.getKeyRight());
+    }
+    
+    public void setKeyRight(int i) {
+    	_inputsetting.setKeyRight(keyToStr(i));
     }
 
     public int getKeyRun() {
-        return getKey(_inputsetting.getKeyRun());
+        return strToKey(_inputsetting.getKeyRun());
+    }
+    
+    public void setKeyRun(int i) {
+    	_inputsetting.setKeyRun(keyToStr(i));
     }
 
     public int getKeyToolnext() {
-        return getKey(_inputsetting.getKeyToolnext());
+        return strToKey(_inputsetting.getKeyToolnext());
+    }
+    
+    public void setKeyToolnext(int i) {
+    	_inputsetting.setKeyToolnext(keyToStr(i));
     }
 
     public int getKeyToolprev() {
-        return getKey(_inputsetting.getKeyToolprev());
+        return strToKey(_inputsetting.getKeyToolprev());
+    }
+    
+    public void setKeyToolprev(int i) {
+    	_inputsetting.setKeyToolprev(keyToStr(i));
     }
 
     public int getKeyToolslot1() {
-        return getKey(_inputsetting.getKeyToolslot1());
+        return strToKey(_inputsetting.getKeyToolslot1());
+    }
+    
+    public void setKeyToolslot1(int i) {
+    	_inputsetting.setKeyToolslot1(keyToStr(i));
     }
 
     public int getKeyToolslot2() {
-        return getKey(_inputsetting.getKeyToolslot2());
+        return strToKey(_inputsetting.getKeyToolslot2());
     }
-
+    
+    public void setKeyToolslot2(int i) {
+    	_inputsetting.setKeyToolslot2(keyToStr(i));
+    }
+    
     public int getKeyToolslot3() {
-        return getKey(_inputsetting.getKeyToolslot3());
+        return strToKey(_inputsetting.getKeyToolslot3());
     }
-
+    
+    public void setKeyToolslot3(int i) {
+    	_inputsetting.setKeyToolslot3(keyToStr(i));
+    }
+    
     public int getKeyToolslot4() {
-        return getKey(_inputsetting.getKeyToolslot4());
+        return strToKey(_inputsetting.getKeyToolslot4());
+    }  
+    
+    public void setKeyToolslot4(int i) {
+    	_inputsetting.setKeyToolslot4(keyToStr(i));
     }
 
     public int getKeyToolslot5() {
-        return getKey(_inputsetting.getKeyToolslot5());
+        return strToKey(_inputsetting.getKeyToolslot5());
+    }
+    
+    public void setKeyToolslot5(int i) {
+    	_inputsetting.setKeyToolslot5(keyToStr(i));
     }
 
     public int getKeyToolslot6() {
-        return getKey(_inputsetting.getKeyToolslot6());
+        return strToKey(_inputsetting.getKeyToolslot6());
+    }
+    
+    public void setKeyToolslot6(int i) {
+    	_inputsetting.setKeyToolslot6(keyToStr(i));
     }
 
     public int getKeyToolslot7() {
-        return getKey(_inputsetting.getKeyToolslot7());
+        return strToKey(_inputsetting.getKeyToolslot7());
+    }
+    
+    public void setKeyToolslot7(int i) {
+    	_inputsetting.setKeyToolslot7(keyToStr(i));
     }
 
     public int getKeyToolslot8() {
-        return getKey(_inputsetting.getKeyToolslot8());
+        return strToKey(_inputsetting.getKeyToolslot8());
+    }
+    
+    public void setKeyToolslot8(int i) {
+    	_inputsetting.setKeyToolslot8(keyToStr(i));
     }
 
     public int getKeyToolslot9() {
-        return getKey(_inputsetting.getKeyToolslot9());
+        return strToKey(_inputsetting.getKeyToolslot9());
+    }
+    
+    public void setKeyToolslot9(int i) {
+    	_inputsetting.setKeyToolslot9(keyToStr(i));
     }
 
     public int getKeyUsehelditem() {
-        return getKey(_inputsetting.getKeyUsehelditem());
+        return strToKey(_inputsetting.getKeyUsehelditem());
     }
-
+    
+    public void setKeyUsehelditem(int i) {
+    	_inputsetting.setKeyUsehelditem(keyToStr(i));
+    }
 }
