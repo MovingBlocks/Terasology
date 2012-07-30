@@ -19,8 +19,10 @@ package org.terasology.model.shapes;
 import com.bulletphysics.collision.shapes.BoxShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.collision.shapes.CompoundShape;
+import com.bulletphysics.collision.shapes.ConvexHullShape;
 import com.bulletphysics.linearmath.QuaternionUtil;
 import com.bulletphysics.linearmath.Transform;
+import com.bulletphysics.util.ObjectArrayList;
 import com.google.gson.*;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
@@ -92,7 +94,22 @@ public class JsonBlockShapePersister {
             if (collisionInfo.has("symmetric") && collisionInfo.get("symmetric").isJsonPrimitive() && collisionInfo.get("symmetric").getAsJsonPrimitive().isBoolean()) {
                 shape.setCollisionSymmetric(collisionInfo.get("symmetric").getAsBoolean());
             }
-            if (collisionInfo.has("colliders") && collisionInfo.get("colliders").isJsonArray() && collisionInfo.get("colliders").getAsJsonArray().size() > 0) {
+            if (collisionInfo.has("convexHull") && collisionInfo.get("convexHull").isJsonPrimitive() && collisionInfo.get("convexHull").getAsJsonPrimitive().isBoolean()) {
+                ObjectArrayList<Vector3f> verts = buildVertList(shape);
+                if (shape.isCollisionSymmetric()) {
+                    ConvexHullShape convexHull = new ConvexHullShape(verts);
+                    shape.setCollisionShape(convexHull);
+                } else {
+                    for (Rotation rot : Rotation.horizontalRotations()) {
+                        ObjectArrayList<Vector3f> transformedVerts = new ObjectArrayList<Vector3f>();
+                        for (Vector3f vert : verts) {
+                            transformedVerts.add(QuaternionUtil.quatRotate(rot.getQuat4f(), vert, new Vector3f()));
+                        }
+                        ConvexHullShape convexHull = new ConvexHullShape(transformedVerts);
+                        shape.setCollisionShape(rot, convexHull);
+                    }
+                }
+            } else if (collisionInfo.has("colliders") && collisionInfo.get("colliders").isJsonArray() && collisionInfo.get("colliders").getAsJsonArray().size() > 0) {
                 JsonArray colliderArray = collisionInfo.get("colliders").getAsJsonArray();
                 if (shape.isCollisionSymmetric()) {
                     ColliderInfo info = processColliders(context, colliderArray, Rotation.NONE);
@@ -113,6 +130,25 @@ public class JsonBlockShapePersister {
                 shape.setCollisionShape(CUBE_SHAPE);
                 shape.setCollisionSymmetric(true);
             }
+        }
+
+        private ObjectArrayList<Vector3f> buildVertList(BlockShape shape) {
+            ObjectArrayList<Vector3f> result = new ObjectArrayList<Vector3f>();
+            BlockMeshPart meshPart = shape.getCenterMesh();
+            if (meshPart != null) {
+                for (int i = 0; i < meshPart.size(); ++i) {
+                    result.add(meshPart.getVertex(i));
+                }
+            }
+            for (Side side : Side.values()) {
+                BlockMeshPart sidePart = shape.getSideMesh(side);
+                if (sidePart != null) {
+                    for (int i = 0; i < sidePart.size(); ++i) {
+                        result.add(sidePart.getVertex(i));
+                    }
+                }
+            }
+            return result;
         }
 
         private ColliderInfo processColliders(JsonDeserializationContext context, JsonArray colliderArray, Rotation rot) {
