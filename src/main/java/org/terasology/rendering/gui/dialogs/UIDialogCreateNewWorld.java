@@ -1,28 +1,13 @@
 package org.terasology.rendering.gui.dialogs;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.newdawn.slick.Color;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.modes.StateSinglePlayer;
-import org.terasology.logic.generators.DefaultGenerators;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.logic.world.generator.core.ChunkGeneratorManager;
-import org.terasology.logic.world.generator.core.ChunkGeneratorManagerImpl;
-import org.terasology.logic.world.generator.core.FlatTerrainGenerator;
-import org.terasology.logic.world.generator.core.FloraGenerator;
-import org.terasology.logic.world.generator.core.ForestGenerator;
-import org.terasology.logic.world.generator.core.PerlinTerrainGenerator;
-import org.terasology.logic.world.generator.persistence.ChunkGeneratorPersister;
-import org.terasology.logic.world.liquid.LiquidsGenerator;
 import org.terasology.rendering.gui.components.*;
 import org.terasology.rendering.gui.framework.IClickListener;
-import org.terasology.rendering.gui.framework.IStateButtonAction;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.utilities.FastRandom;
 
@@ -36,8 +21,6 @@ import javax.vecmath.Vector2f;
  */
 
 public class UIDialogCreateNewWorld extends UIDialogBox {
-	private Logger logger = Logger.getLogger(getClass().getName());
-	
     private UIButton _okButton;
     private UIButton _cancelButton;
 
