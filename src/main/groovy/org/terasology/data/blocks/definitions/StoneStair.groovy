@@ -14,21 +14,16 @@
  * limitations under the License.
  */
 
-package org.terasology.data.blocks.definitions.furniture
+package org.terasology.data.blocks.definitions
 
 /**
- * A bookcase only has books on the front. Well, at least this one does, for now
+ * Stone material stairs
  */
 block {
     version = 1
-
-    // Graphics
+    alignment = "HorizontalDirection"
     faces {
-        topbottom = "ChestTopBottom"
+        all = "Stone"
     }
-
-    entityPrefab = "core:bookcase"
-    stackable = false
-    straightToInventory = true
-    usable = true
+    shape = "engine:stair"
 }
