@@ -224,7 +224,7 @@ public class PerlinTerrainGenerator implements ChunkGenerator {
         double river = calcRiverTerrain(x, z);
 
         float temp = biomeProvider.getTemperatureAt(x, z);
-        float humidity = biomeProvider.getHumidityAt(x, z);
+        float humidity = biomeProvider.getHumidityAt(x, z) * temp;
 
         Vector2f distanceToMountainBiome = new Vector2f(temp - 0.25f, humidity - 0.35f);
 
@@ -252,25 +252,17 @@ public class PerlinTerrainGenerator implements ChunkGenerator {
 
     private double calcMountainDensity(double x, double y, double z) {
         double x1, y1, z1;
-
-        x1 = x * 0.002;
-        y1 = y * 0.001;
-        z1 = z * 0.002;
+        x1 = x * 0.002;y1 = y * 0.001; z1 = z * 0.002;
 
         double result = _pGen4.fBm(x1, y1, z1);
-
         return result > 0.0 ? result : 0;
     }
 
     private double calcHillDensity(double x, double y, double z) {
         double x1, y1, z1;
-
-        x1 = x * 0.008;
-        y1 = y * 0.006;
-        z1 = z * 0.008;
+        x1 = x * 0.008; y1 = y * 0.006; z1 = z * 0.008;
 
         double result = _pGen5.fBm(x1, y1, z1) - 0.1;
-
         return result > 0.0 ? result : 0;
     }
 

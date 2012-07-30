@@ -31,7 +31,6 @@ public class WorldBiomeProviderImpl implements WorldBiomeProvider {
         temperatureNoise = new PerlinNoise(worldSeed.hashCode() + 5);
         humidityNoise = new PerlinNoise(worldSeed.hashCode() + 6);
         fogNoise = new PerlinNoise(worldSeed.hashCode() + 12);
-        fogNoise.setOctaves(8);
     }
 
     @Override
@@ -54,7 +53,7 @@ public class WorldBiomeProviderImpl implements WorldBiomeProvider {
     @Override
     public Biome getBiomeAt(int x, int z) {
         double temp = getTemperatureAt(x, z);
-        double humidity = getHumidityAt(x, z);
+        double humidity = getHumidityAt(x, z) * temp;
 
         if (temp >= 0.5 && humidity < 0.3) {
             return Biome.DESERT;
