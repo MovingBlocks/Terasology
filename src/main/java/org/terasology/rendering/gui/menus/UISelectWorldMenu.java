@@ -62,7 +62,7 @@ public class UISelectWorldMenu extends UIDisplayWindow {
         _overlay = new UIImageOverlay(AssetManager.loadTexture("engine:menuBackground"));
         _overlay.setVisible(true);
 
-        _window = new UIDialogCreateNewWorld("Create new world", new Vector2f(512f, 256f));
+        _window = new UIDialogCreateNewWorld("Create new world", new Vector2f(512f, 320f));
         _window.center();
 
         _window.setModal(true);
