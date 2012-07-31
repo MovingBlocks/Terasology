@@ -81,6 +81,7 @@ public class Icon {
         Icon swordIcon = new Icon();
         Icon bowIcon = new Icon();
         Icon xbowIcon = new Icon();
+
         //* VIALS & POTIONS *//
         Icon emptyVialIcon = new Icon();
         Icon redVialIcon = new Icon();
