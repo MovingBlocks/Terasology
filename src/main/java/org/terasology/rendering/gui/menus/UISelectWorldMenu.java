@@ -25,10 +25,7 @@ import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.world.WorldInfo;
 import org.terasology.logic.world.WorldUtil;
-import org.terasology.rendering.gui.components.UIButton;
-import org.terasology.rendering.gui.components.UIImageOverlay;
-import org.terasology.rendering.gui.components.UIInput;
-import org.terasology.rendering.gui.components.UIList;
+import org.terasology.rendering.gui.components.*;
 import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
 import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -62,7 +59,7 @@ public class UISelectWorldMenu extends UIDisplayWindow {
         _overlay = new UIImageOverlay(AssetManager.loadTexture("engine:menuBackground"));
         _overlay.setVisible(true);
 
-        _window = new UIDialogCreateNewWorld("Create new world", new Vector2f(512f, 256f));
+        _window = new UIDialogCreateNewWorld("Create new world", new Vector2f(512f, 320f));
         _window.center();
 
         _window.setModal(true);
@@ -77,7 +74,6 @@ public class UISelectWorldMenu extends UIDisplayWindow {
                 loadSelectedWorld();
             }
         });
-
 
         _goToBack = new UIButton(new Vector2f(256f, 32f));
         _goToBack.getLabel().setText("Go back");

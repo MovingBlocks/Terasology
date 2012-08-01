@@ -67,7 +67,7 @@ public final class InputData {
     boolean hasKeyFrob();
     String getKeyFrob();
     
-    // optional string key_toolnext = 15 [default = "MOUSEWHEElUP"];
+    // optional string key_toolnext = 15 [default = "MOUSEWHEELUP"];
     boolean hasKeyToolnext();
     String getKeyToolnext();
     
@@ -119,9 +119,9 @@ public final class InputData {
     boolean hasKeyHidegui();
     String getKeyHidegui();
     
-    // optional string key_pauze = 28 [default = "ESCAPE"];
-    boolean hasKeyPauze();
-    String getKeyPauze();
+    // optional string key_pause = 28 [default = "ESCAPE"];
+    boolean hasKeyPause();
+    String getKeyPause();
     
     // optional string jumpbehaviour = 29 [default = "NORMAL"];
     boolean hasJumpbehaviour();
@@ -560,7 +560,7 @@ public final class InputData {
       }
     }
     
-    // optional string key_toolnext = 15 [default = "MOUSEWHEElUP"];
+    // optional string key_toolnext = 15 [default = "MOUSEWHEELUP"];
     public static final int KEY_TOOLNEXT_FIELD_NUMBER = 15;
     private java.lang.Object keyToolnext_;
     public boolean hasKeyToolnext() {
@@ -976,14 +976,14 @@ public final class InputData {
       }
     }
     
-    // optional string key_pauze = 28 [default = "ESCAPE"];
-    public static final int KEY_PAUZE_FIELD_NUMBER = 28;
-    private java.lang.Object keyPauze_;
-    public boolean hasKeyPauze() {
+    // optional string key_pause = 28 [default = "ESCAPE"];
+    public static final int KEY_PAUSE_FIELD_NUMBER = 28;
+    private java.lang.Object keyPause_;
+    public boolean hasKeyPause() {
       return ((bitField0_ & 0x08000000) == 0x08000000);
     }
-    public String getKeyPauze() {
-      java.lang.Object ref = keyPauze_;
+    public String getKeyPause() {
+      java.lang.Object ref = keyPause_;
       if (ref instanceof String) {
         return (String) ref;
       } else {
@@ -991,17 +991,17 @@ public final class InputData {
             (com.google.protobuf.ByteString) ref;
         String s = bs.toStringUtf8();
         if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          keyPauze_ = s;
+          keyPause_ = s;
         }
         return s;
       }
     }
-    private com.google.protobuf.ByteString getKeyPauzeBytes() {
-      java.lang.Object ref = keyPauze_;
+    private com.google.protobuf.ByteString getKeyPauseBytes() {
+      java.lang.Object ref = keyPause_;
       if (ref instanceof String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        keyPauze_ = b;
+        keyPause_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
@@ -1055,7 +1055,7 @@ public final class InputData {
       keyAttack_ = "MOUSERIGHT";
       keyUsehelditem_ = "MOUSELEFT";
       keyFrob_ = "E";
-      keyToolnext_ = "MOUSEWHEElUP";
+      keyToolnext_ = "MOUSEWHEELUP";
       keyToolprev_ = "MOUSEWHEELDOWN";
       keyToolslot1_ = "1";
       keyToolslot2_ = "2";
@@ -1068,7 +1068,7 @@ public final class InputData {
       keyToolslot9_ = "9";
       keyMinionmode_ = "X";
       keyHidegui_ = "H";
-      keyPauze_ = "ESCAPE";
+      keyPause_ = "ESCAPE";
       jumpbehaviour_ = "NORMAL";
     }
     private byte memoizedIsInitialized = -1;
@@ -1165,7 +1165,7 @@ public final class InputData {
         output.writeBytes(27, getKeyHideguiBytes());
       }
       if (((bitField0_ & 0x08000000) == 0x08000000)) {
-        output.writeBytes(28, getKeyPauzeBytes());
+        output.writeBytes(28, getKeyPauseBytes());
       }
       if (((bitField0_ & 0x10000000) == 0x10000000)) {
         output.writeBytes(29, getJumpbehaviourBytes());
@@ -1289,7 +1289,7 @@ public final class InputData {
       }
       if (((bitField0_ & 0x08000000) == 0x08000000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(28, getKeyPauzeBytes());
+          .computeBytesSize(28, getKeyPauseBytes());
       }
       if (((bitField0_ & 0x10000000) == 0x10000000)) {
         size += com.google.protobuf.CodedOutputStream
@@ -1447,7 +1447,7 @@ public final class InputData {
         bitField0_ = (bitField0_ & ~0x00001000);
         keyFrob_ = "E";
         bitField0_ = (bitField0_ & ~0x00002000);
-        keyToolnext_ = "MOUSEWHEElUP";
+        keyToolnext_ = "MOUSEWHEELUP";
         bitField0_ = (bitField0_ & ~0x00004000);
         keyToolprev_ = "MOUSEWHEELDOWN";
         bitField0_ = (bitField0_ & ~0x00008000);
@@ -1473,7 +1473,7 @@ public final class InputData {
         bitField0_ = (bitField0_ & ~0x02000000);
         keyHidegui_ = "H";
         bitField0_ = (bitField0_ & ~0x04000000);
-        keyPauze_ = "ESCAPE";
+        keyPause_ = "ESCAPE";
         bitField0_ = (bitField0_ & ~0x08000000);
         jumpbehaviour_ = "NORMAL";
         bitField0_ = (bitField0_ & ~0x10000000);
@@ -1626,7 +1626,7 @@ public final class InputData {
         if (((from_bitField0_ & 0x08000000) == 0x08000000)) {
           to_bitField0_ |= 0x08000000;
         }
-        result.keyPauze_ = keyPauze_;
+        result.keyPause_ = keyPause_;
         if (((from_bitField0_ & 0x10000000) == 0x10000000)) {
           to_bitField0_ |= 0x10000000;
         }
@@ -1728,8 +1728,8 @@ public final class InputData {
         if (other.hasKeyHidegui()) {
           setKeyHidegui(other.getKeyHidegui());
         }
-        if (other.hasKeyPauze()) {
-          setKeyPauze(other.getKeyPauze());
+        if (other.hasKeyPause()) {
+          setKeyPause(other.getKeyPause());
         }
         if (other.hasJumpbehaviour()) {
           setJumpbehaviour(other.getJumpbehaviour());
@@ -1902,7 +1902,7 @@ public final class InputData {
             }
             case 226: {
               bitField0_ |= 0x08000000;
-              keyPauze_ = input.readBytes();
+              keyPause_ = input.readBytes();
               break;
             }
             case 234: {
@@ -2390,8 +2390,8 @@ public final class InputData {
         onChanged();
       }
       
-      // optional string key_toolnext = 15 [default = "MOUSEWHEElUP"];
-      private java.lang.Object keyToolnext_ = "MOUSEWHEElUP";
+      // optional string key_toolnext = 15 [default = "MOUSEWHEELUP"];
+      private java.lang.Object keyToolnext_ = "MOUSEWHEELUP";
       public boolean hasKeyToolnext() {
         return ((bitField0_ & 0x00004000) == 0x00004000);
       }
@@ -2858,39 +2858,39 @@ public final class InputData {
         onChanged();
       }
       
-      // optional string key_pauze = 28 [default = "ESCAPE"];
-      private java.lang.Object keyPauze_ = "ESCAPE";
-      public boolean hasKeyPauze() {
+      // optional string key_pause = 28 [default = "ESCAPE"];
+      private java.lang.Object keyPause_ = "ESCAPE";
+      public boolean hasKeyPause() {
         return ((bitField0_ & 0x08000000) == 0x08000000);
       }
-      public String getKeyPauze() {
-        java.lang.Object ref = keyPauze_;
+      public String getKeyPause() {
+        java.lang.Object ref = keyPause_;
         if (!(ref instanceof String)) {
           String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-          keyPauze_ = s;
+          keyPause_ = s;
           return s;
         } else {
           return (String) ref;
         }
       }
-      public Builder setKeyPauze(String value) {
+      public Builder setKeyPause(String value) {
         if (value == null) {
     throw new NullPointerException();
   }
   bitField0_ |= 0x08000000;
-        keyPauze_ = value;
+        keyPause_ = value;
         onChanged();
         return this;
       }
-      public Builder clearKeyPauze() {
+      public Builder clearKeyPause() {
         bitField0_ = (bitField0_ & ~0x08000000);
-        keyPauze_ = getDefaultInstance().getKeyPauze();
+        keyPause_ = getDefaultInstance().getKeyPause();
         onChanged();
         return this;
       }
-      void setKeyPauze(com.google.protobuf.ByteString value) {
+      void setKeyPause(com.google.protobuf.ByteString value) {
         bitField0_ |= 0x08000000;
-        keyPauze_ = value;
+        keyPause_ = value;
         onChanged();
       }
       
@@ -2965,7 +2965,7 @@ public final class InputData {
       "\n\007key_run\030\013 \001(\t:\006LSHIFT\022\036\n\nkey_attack\030\014 " +
       "\001(\t:\nMOUSERIGHT\022\"\n\017key_usehelditem\030\r \001(\t" +
       ":\tMOUSELEFT\022\023\n\010key_frob\030\016 \001(\t:\001E\022\"\n\014key_",
-      "toolnext\030\017 \001(\t:\014MOUSEWHEElUP\022$\n\014key_tool" +
+      "toolnext\030\017 \001(\t:\014MOUSEWHEELUP\022$\n\014key_tool" +
       "prev\030\020 \001(\t:\016MOUSEWHEELDOWN\022\030\n\rkey_toolsl" +
       "ot1\030\021 \001(\t:\0011\022\030\n\rkey_toolslot2\030\022 \001(\t:\0012\022\030" +
       "\n\rkey_toolslot3\030\023 \001(\t:\0013\022\030\n\rkey_toolslot" +
@@ -2974,7 +2974,7 @@ public final class InputData {
       "\027 \001(\t:\0017\022\030\n\rkey_toolslot8\030\030 \001(\t:\0018\022\030\n\rke" +
       "y_toolslot9\030\031 \001(\t:\0019\022\031\n\016key_minionmode\030\032" +
       " \001(\t:\001X\022\026\n\013key_hidegui\030\033 \001(\t:\001H\022\031\n\tkey_p" +
-      "auze\030\034 \001(\t:\006ESCAPE\022\035\n\rjumpbehaviour\030\035 \001(",
+      "ause\030\034 \001(\t:\006ESCAPE\022\035\n\rjumpbehaviour\030\035 \001(",
       "\t:\006NORMALB&\n\027org.terasology.protobufB\tIn" +
       "putDataH\001"
     };
@@ -2988,7 +2988,7 @@ public final class InputData {
           internal_static_InputSetting_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_InputSetting_descriptor,
-              new java.lang.String[] { "EnableMusic", "EnableSound", "KeyForward", "KeyBackward", "KeyLeft", "KeyRight", "KeyJump", "KeyConsole", "KeyInventory", "KeyCrouch", "KeyRun", "KeyAttack", "KeyUsehelditem", "KeyFrob", "KeyToolnext", "KeyToolprev", "KeyToolslot1", "KeyToolslot2", "KeyToolslot3", "KeyToolslot4", "KeyToolslot5", "KeyToolslot6", "KeyToolslot7", "KeyToolslot8", "KeyToolslot9", "KeyMinionmode", "KeyHidegui", "KeyPauze", "Jumpbehaviour", },
+              new java.lang.String[] { "EnableMusic", "EnableSound", "KeyForward", "KeyBackward", "KeyLeft", "KeyRight", "KeyJump", "KeyConsole", "KeyInventory", "KeyCrouch", "KeyRun", "KeyAttack", "KeyUsehelditem", "KeyFrob", "KeyToolnext", "KeyToolprev", "KeyToolslot1", "KeyToolslot2", "KeyToolslot3", "KeyToolslot4", "KeyToolslot5", "KeyToolslot6", "KeyToolslot7", "KeyToolslot8", "KeyToolslot9", "KeyMinionmode", "KeyHidegui", "KeyPause", "Jumpbehaviour", },
               org.terasology.protobuf.InputData.InputSetting.class,
               org.terasology.protobuf.InputData.InputSetting.Builder.class);
           return null;

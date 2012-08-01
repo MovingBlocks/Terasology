@@ -107,6 +107,10 @@ public final class Configuration {
       // optional string default_seed = 11 [default = "Blockmaina42"];
       boolean hasDefaultSeed();
       String getDefaultSeed();
+      
+      // optional int32 chunk_generator = 12 [default = 0];
+      boolean hasChunkGenerator();
+      int getChunkGenerator();
     }
     public static final class World extends
         com.google.protobuf.GeneratedMessage
@@ -679,6 +683,16 @@ public final class Configuration {
         }
       }
       
+      // optional int32 chunk_generator = 12 [default = 0];
+      public static final int CHUNK_GENERATOR_FIELD_NUMBER = 12;
+      private int chunkGenerator_;
+      public boolean hasChunkGenerator() {
+        return ((bitField0_ & 0x00000400) == 0x00000400);
+      }
+      public int getChunkGenerator() {
+        return chunkGenerator_;
+      }
+      
       private void initFields() {
         worldTitle_ = "New World";
         forestGrassDensity_ = 0.3F;
@@ -690,6 +704,7 @@ public final class Configuration {
         initialTimeOffsetInMs_ = 60000L;
         spawnOrigin_ = org.terasology.protobuf.Configuration.Setting.World.Origin.getDefaultInstance();
         defaultSeed_ = "Blockmaina42";
+        chunkGenerator_ = 0;
       }
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
@@ -732,6 +747,9 @@ public final class Configuration {
         }
         if (((bitField0_ & 0x00000200) == 0x00000200)) {
           output.writeBytes(11, getDefaultSeedBytes());
+        }
+        if (((bitField0_ & 0x00000400) == 0x00000400)) {
+          output.writeInt32(12, chunkGenerator_);
         }
         getUnknownFields().writeTo(output);
       }
@@ -781,6 +799,10 @@ public final class Configuration {
         if (((bitField0_ & 0x00000200) == 0x00000200)) {
           size += com.google.protobuf.CodedOutputStream
             .computeBytesSize(11, getDefaultSeedBytes());
+        }
+        if (((bitField0_ & 0x00000400) == 0x00000400)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeInt32Size(12, chunkGenerator_);
         }
         size += getUnknownFields().getSerializedSize();
         memoizedSerializedSize = size;
@@ -931,6 +953,8 @@ public final class Configuration {
           bitField0_ = (bitField0_ & ~0x00000100);
           defaultSeed_ = "Blockmaina42";
           bitField0_ = (bitField0_ & ~0x00000200);
+          chunkGenerator_ = 0;
+          bitField0_ = (bitField0_ & ~0x00000400);
           return this;
         }
         
@@ -1013,6 +1037,10 @@ public final class Configuration {
             to_bitField0_ |= 0x00000200;
           }
           result.defaultSeed_ = defaultSeed_;
+          if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
+            to_bitField0_ |= 0x00000400;
+          }
+          result.chunkGenerator_ = chunkGenerator_;
           result.bitField0_ = to_bitField0_;
           onBuilt();
           return result;
@@ -1058,6 +1086,9 @@ public final class Configuration {
           }
           if (other.hasDefaultSeed()) {
             setDefaultSeed(other.getDefaultSeed());
+          }
+          if (other.hasChunkGenerator()) {
+            setChunkGenerator(other.getChunkGenerator());
           }
           this.mergeUnknownFields(other.getUnknownFields());
           return this;
@@ -1142,6 +1173,11 @@ public final class Configuration {
               case 90: {
                 bitField0_ |= 0x00000200;
                 defaultSeed_ = input.readBytes();
+                break;
+              }
+              case 96: {
+                bitField0_ |= 0x00000400;
+                chunkGenerator_ = input.readInt32();
                 break;
               }
             }
@@ -1457,6 +1493,27 @@ public final class Configuration {
           bitField0_ |= 0x00000200;
           defaultSeed_ = value;
           onChanged();
+        }
+        
+        // optional int32 chunk_generator = 12 [default = 0];
+        private int chunkGenerator_ ;
+        public boolean hasChunkGenerator() {
+          return ((bitField0_ & 0x00000400) == 0x00000400);
+        }
+        public int getChunkGenerator() {
+          return chunkGenerator_;
+        }
+        public Builder setChunkGenerator(int value) {
+          bitField0_ |= 0x00000400;
+          chunkGenerator_ = value;
+          onChanged();
+          return this;
+        }
+        public Builder clearChunkGenerator() {
+          bitField0_ = (bitField0_ & ~0x00000400);
+          chunkGenerator_ = 0;
+          onChanged();
+          return this;
         }
         
         // @@protoc_insertion_point(builder_scope:protobuf.Setting.World)
@@ -2751,6 +2808,14 @@ public final class Configuration {
       // optional bool reflective_water = 22 [default = false];
       boolean hasReflectiveWater();
       boolean getReflectiveWater();
+      
+      // optional int32 music_volume = 23 [default = 100];
+      boolean hasMusicVolume();
+      int getMusicVolume();
+      
+      // optional int32 sound_volume = 24 [default = 100];
+      boolean hasSoundVolume();
+      int getSoundVolume();
     }
     public static final class System extends
         com.google.protobuf.GeneratedMessage
@@ -3797,6 +3862,26 @@ public final class Configuration {
         return reflectiveWater_;
       }
       
+      // optional int32 music_volume = 23 [default = 100];
+      public static final int MUSIC_VOLUME_FIELD_NUMBER = 23;
+      private int musicVolume_;
+      public boolean hasMusicVolume() {
+        return ((bitField0_ & 0x00400000) == 0x00400000);
+      }
+      public int getMusicVolume() {
+        return musicVolume_;
+      }
+      
+      // optional int32 sound_volume = 24 [default = 100];
+      public static final int SOUND_VOLUME_FIELD_NUMBER = 24;
+      private int soundVolume_;
+      public boolean hasSoundVolume() {
+        return ((bitField0_ & 0x00800000) == 0x00800000);
+      }
+      public int getSoundVolume() {
+        return soundVolume_;
+      }
+      
       private void initFields() {
         maxParticles_ = 256;
         cloudResolution_ = org.terasology.protobuf.Configuration.Setting.System.CloudRes.getDefaultInstance();
@@ -3820,6 +3905,8 @@ public final class Configuration {
         verticalChunkMeshSegments_ = 1;
         blurIntensity_ = 3;
         reflectiveWater_ = false;
+        musicVolume_ = 100;
+        soundVolume_ = 100;
       }
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
@@ -3898,6 +3985,12 @@ public final class Configuration {
         }
         if (((bitField0_ & 0x00200000) == 0x00200000)) {
           output.writeBool(22, reflectiveWater_);
+        }
+        if (((bitField0_ & 0x00400000) == 0x00400000)) {
+          output.writeInt32(23, musicVolume_);
+        }
+        if (((bitField0_ & 0x00800000) == 0x00800000)) {
+          output.writeInt32(24, soundVolume_);
         }
         getUnknownFields().writeTo(output);
       }
@@ -3995,6 +4088,14 @@ public final class Configuration {
         if (((bitField0_ & 0x00200000) == 0x00200000)) {
           size += com.google.protobuf.CodedOutputStream
             .computeBoolSize(22, reflectiveWater_);
+        }
+        if (((bitField0_ & 0x00400000) == 0x00400000)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeInt32Size(23, musicVolume_);
+        }
+        if (((bitField0_ & 0x00800000) == 0x00800000)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeInt32Size(24, soundVolume_);
         }
         size += getUnknownFields().getSerializedSize();
         memoizedSerializedSize = size;
@@ -4174,6 +4275,10 @@ public final class Configuration {
           bitField0_ = (bitField0_ & ~0x00100000);
           reflectiveWater_ = false;
           bitField0_ = (bitField0_ & ~0x00200000);
+          musicVolume_ = 100;
+          bitField0_ = (bitField0_ & ~0x00400000);
+          soundVolume_ = 100;
+          bitField0_ = (bitField0_ & ~0x00800000);
           return this;
         }
         
@@ -4308,6 +4413,14 @@ public final class Configuration {
             to_bitField0_ |= 0x00200000;
           }
           result.reflectiveWater_ = reflectiveWater_;
+          if (((from_bitField0_ & 0x00400000) == 0x00400000)) {
+            to_bitField0_ |= 0x00400000;
+          }
+          result.musicVolume_ = musicVolume_;
+          if (((from_bitField0_ & 0x00800000) == 0x00800000)) {
+            to_bitField0_ |= 0x00800000;
+          }
+          result.soundVolume_ = soundVolume_;
           result.bitField0_ = to_bitField0_;
           onBuilt();
           return result;
@@ -4389,6 +4502,12 @@ public final class Configuration {
           }
           if (other.hasReflectiveWater()) {
             setReflectiveWater(other.getReflectiveWater());
+          }
+          if (other.hasMusicVolume()) {
+            setMusicVolume(other.getMusicVolume());
+          }
+          if (other.hasSoundVolume()) {
+            setSoundVolume(other.getSoundVolume());
           }
           this.mergeUnknownFields(other.getUnknownFields());
           return this;
@@ -4537,6 +4656,16 @@ public final class Configuration {
               case 176: {
                 bitField0_ |= 0x00200000;
                 reflectiveWater_ = input.readBool();
+                break;
+              }
+              case 184: {
+                bitField0_ |= 0x00400000;
+                musicVolume_ = input.readInt32();
+                break;
+              }
+              case 192: {
+                bitField0_ |= 0x00800000;
+                soundVolume_ = input.readInt32();
                 break;
               }
             }
@@ -5141,6 +5270,48 @@ public final class Configuration {
         public Builder clearReflectiveWater() {
           bitField0_ = (bitField0_ & ~0x00200000);
           reflectiveWater_ = false;
+          onChanged();
+          return this;
+        }
+        
+        // optional int32 music_volume = 23 [default = 100];
+        private int musicVolume_ = 100;
+        public boolean hasMusicVolume() {
+          return ((bitField0_ & 0x00400000) == 0x00400000);
+        }
+        public int getMusicVolume() {
+          return musicVolume_;
+        }
+        public Builder setMusicVolume(int value) {
+          bitField0_ |= 0x00400000;
+          musicVolume_ = value;
+          onChanged();
+          return this;
+        }
+        public Builder clearMusicVolume() {
+          bitField0_ = (bitField0_ & ~0x00400000);
+          musicVolume_ = 100;
+          onChanged();
+          return this;
+        }
+        
+        // optional int32 sound_volume = 24 [default = 100];
+        private int soundVolume_ = 100;
+        public boolean hasSoundVolume() {
+          return ((bitField0_ & 0x00800000) == 0x00800000);
+        }
+        public int getSoundVolume() {
+          return soundVolume_;
+        }
+        public Builder setSoundVolume(int value) {
+          bitField0_ |= 0x00800000;
+          soundVolume_ = value;
+          onChanged();
+          return this;
+        }
+        public Builder clearSoundVolume() {
+          bitField0_ = (bitField0_ & ~0x00800000);
+          soundVolume_ = 100;
           onChanged();
           return this;
         }
@@ -6113,12 +6284,12 @@ public final class Configuration {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\rConfig2.proto\022\010protobuf\"\332\016\n\007Setting\022&\n" +
+      "\n\rConfig2.proto\022\010protobuf\"\254\017\n\007Setting\022&\n" +
       "\005world\030\001 \001(\0132\027.protobuf.Setting.World\022(\n" +
       "\006player\030\002 \001(\0132\030.protobuf.Setting.Player\022" +
       "(\n\006system\030\003 \001(\0132\030.protobuf.Setting.Syste" +
       "m\022/\n\ndebug_info\030\004 \001(\0132\033.protobuf.Setting" +
-      ".DebugInfo\022\022\n\nactive_mod\030\005 \003(\t\032\266\003\n\005World" +
+      ".DebugInfo\022\022\n\nactive_mod\030\005 \003(\t\032\322\003\n\005World" +
       "\022\036\n\013world_title\030\001 \001(\t:\tNew World\022!\n\024fore" +
       "st_grass_density\030\002 \001(\002:\0030.3\022!\n\024plains_gr" +
       "ass_density\030\003 \001(\002:\0030.2\022!\n\022snow_grass_den" +
@@ -6128,40 +6299,42 @@ public final class Configuration {
       "\001(\022:\0071800000\022(\n\031initial_time_offset_in_m" +
       "s\030\t \001(\022:\00560000\0224\n\014spawn_origin\030\n \001(\0132\036.p" +
       "rotobuf.Setting.World.Origin\022\"\n\014default_" +
-      "seed\030\013 \001(\t:\014Blockmaina42\032-\n\006Origin\022\021\n\001x\030" +
-      "\001 \001(\002:\006-24429\022\020\n\001y\030\002 \001(\002:\00520547\032\316\001\n\tDebu" +
-      "gInfo\022\024\n\005debug\030\001 \001(\010:\005false\022\036\n\017debug_col" +
-      "lision\030\002 \001(\010:\005false\022*\n\033render_chunk_boun" +
-      "ding_boxes\030\003 \001(\010:\005false\022\032\n\013demo_flight\030\004",
-      " \001(\010:\005false\022\037\n\021demo_flight_speed\030\005 \001(\002:\004" +
-      "0.08\022\"\n\023DEPRECATED_god_mode\030\006 \001(\010:\005false" +
-      "\032\226\001\n\006Player\022\020\n\003fov\030\001 \001(\002:\003100\022\031\n\nmouse_s" +
-      "ens\030\002 \001(\002:\0050.075\022\034\n\016camera_bobbing\030\003 \001(\010" +
-      ":\004true\022&\n\030render_first_person_view\030\004 \001(\010" +
-      ":\004true\022\031\n\013placing_box\030\005 \001(\010:\004true\032\352\006\n\006Sy" +
-      "stem\022\032\n\rmax_particles\030\001 \001(\005:\003256\022;\n\020clou" +
-      "d_resolution\030\002 \001(\0132!.protobuf.Setting.Sy" +
-      "stem.CloudRes\022#\n\025cloud_update_interval\030\003" +
-      " \001(\005:\0048000\022\026\n\013max_threads\030\004 \001(\005:\0012\022\031\n\013sa",
-      "ve_chunks\030\005 \001(\010:\004true\022\036\n\020chunk_cache_siz" +
-      "e\030\006 \001(\005:\0042048\022\033\n\016max_chunk_VBOs\030\007 \001(\005:\0035" +
-      "12\022\022\n\005gamma\030\010 \001(\002:\0032.2\022\030\n\014pixel_format\030\t" +
-      " \001(\005:\00224\022:\n\014display_mode\030\n \001(\0132$.protobu" +
-      "f.Setting.System.DisplayMode\022\031\n\nfullscre" +
-      "en\030\013 \001(\010:\005false\022%\n\032active_viewing_distan" +
-      "ce_id\030\014 \001(\005:\0010\022 \n\025viewing_distance_near\030" +
-      "\r \001(\005:\0018\022%\n\031viewing_distance_moderate\030\016 " +
-      "\001(\005:\00216\022 \n\024viewing_distance_far\030\017 \001(\005:\0023" +
-      "2\022\"\n\026viewing_distance_ultra\030\020 \001(\005:\00248\022\037\n",
-      "\020flickering_light\030\021 \001(\010:\005false\022-\n\036enable" +
-      "_post_processing_effects\030\022 \001(\010:\005false\022\035\n" +
-      "\016animated_grass\030\023 \001(\010:\005false\022\'\n\034vertical" +
-      "_chunk_mesh_segments\030\024 \001(\005:\0011\022\031\n\016blur_in" +
-      "tensity\030\025 \001(\005:\0013\022\037\n\020reflective_water\030\026 \001" +
-      "(\010:\005false\032*\n\010CloudRes\022\016\n\001x\030\001 \001(\002:\003512\022\016\n" +
-      "\001y\030\002 \001(\002:\003512\0327\n\013DisplayMode\022\023\n\005width\030\001 " +
-      "\001(\005:\0041280\022\023\n\006height\030\002 \001(\005:\003720B*\n\027org.te" +
-      "rasology.protobufB\rConfigurationH\001"
+      "seed\030\013 \001(\t:\014Blockmaina42\022\032\n\017chunk_genera" +
+      "tor\030\014 \001(\005:\0010\032-\n\006Origin\022\021\n\001x\030\001 \001(\002:\006-2442" +
+      "9\022\020\n\001y\030\002 \001(\002:\00520547\032\316\001\n\tDebugInfo\022\024\n\005deb" +
+      "ug\030\001 \001(\010:\005false\022\036\n\017debug_collision\030\002 \001(\010" +
+      ":\005false\022*\n\033render_chunk_bounding_boxes\030\003",
+      " \001(\010:\005false\022\032\n\013demo_flight\030\004 \001(\010:\005false\022" +
+      "\037\n\021demo_flight_speed\030\005 \001(\002:\0040.08\022\"\n\023DEPR" +
+      "ECATED_god_mode\030\006 \001(\010:\005false\032\226\001\n\006Player\022" +
+      "\020\n\003fov\030\001 \001(\002:\003100\022\031\n\nmouse_sens\030\002 \001(\002:\0050" +
+      ".075\022\034\n\016camera_bobbing\030\003 \001(\010:\004true\022&\n\030re" +
+      "nder_first_person_view\030\004 \001(\010:\004true\022\031\n\013pl" +
+      "acing_box\030\005 \001(\010:\004true\032\240\007\n\006System\022\032\n\rmax_" +
+      "particles\030\001 \001(\005:\003256\022;\n\020cloud_resolution" +
+      "\030\002 \001(\0132!.protobuf.Setting.System.CloudRe" +
+      "s\022#\n\025cloud_update_interval\030\003 \001(\005:\0048000\022\026",
+      "\n\013max_threads\030\004 \001(\005:\0012\022\031\n\013save_chunks\030\005 " +
+      "\001(\010:\004true\022\036\n\020chunk_cache_size\030\006 \001(\005:\004204" +
+      "8\022\033\n\016max_chunk_VBOs\030\007 \001(\005:\003512\022\022\n\005gamma\030" +
+      "\010 \001(\002:\0032.2\022\030\n\014pixel_format\030\t \001(\005:\00224\022:\n\014" +
+      "display_mode\030\n \001(\0132$.protobuf.Setting.Sy" +
+      "stem.DisplayMode\022\031\n\nfullscreen\030\013 \001(\010:\005fa" +
+      "lse\022%\n\032active_viewing_distance_id\030\014 \001(\005:" +
+      "\0010\022 \n\025viewing_distance_near\030\r \001(\005:\0018\022%\n\031" +
+      "viewing_distance_moderate\030\016 \001(\005:\00216\022 \n\024v" +
+      "iewing_distance_far\030\017 \001(\005:\00232\022\"\n\026viewing",
+      "_distance_ultra\030\020 \001(\005:\00248\022\037\n\020flickering_" +
+      "light\030\021 \001(\010:\005false\022-\n\036enable_post_proces" +
+      "sing_effects\030\022 \001(\010:\005false\022\035\n\016animated_gr" +
+      "ass\030\023 \001(\010:\005false\022\'\n\034vertical_chunk_mesh_" +
+      "segments\030\024 \001(\005:\0011\022\031\n\016blur_intensity\030\025 \001(" +
+      "\005:\0013\022\037\n\020reflective_water\030\026 \001(\010:\005false\022\031\n" +
+      "\014music_volume\030\027 \001(\005:\003100\022\031\n\014sound_volume" +
+      "\030\030 \001(\005:\003100\032*\n\010CloudRes\022\016\n\001x\030\001 \001(\002:\003512\022" +
+      "\016\n\001y\030\002 \001(\002:\003512\0327\n\013DisplayMode\022\023\n\005width\030" +
+      "\001 \001(\005:\0041280\022\023\n\006height\030\002 \001(\005:\003720B*\n\027org.",
+      "terasology.protobufB\rConfigurationH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -6181,7 +6354,7 @@ public final class Configuration {
           internal_static_protobuf_Setting_World_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_protobuf_Setting_World_descriptor,
-              new java.lang.String[] { "WorldTitle", "ForestGrassDensity", "PlainsGrassDensity", "SnowGrassDensity", "MountainGrassDensity", "DesertGrassDensity", "DayNightLengthInMs", "InitialTimeOffsetInMs", "SpawnOrigin", "DefaultSeed", },
+              new java.lang.String[] { "WorldTitle", "ForestGrassDensity", "PlainsGrassDensity", "SnowGrassDensity", "MountainGrassDensity", "DesertGrassDensity", "DayNightLengthInMs", "InitialTimeOffsetInMs", "SpawnOrigin", "DefaultSeed", "ChunkGenerator", },
               org.terasology.protobuf.Configuration.Setting.World.class,
               org.terasology.protobuf.Configuration.Setting.World.Builder.class);
           internal_static_protobuf_Setting_World_Origin_descriptor =
@@ -6213,7 +6386,7 @@ public final class Configuration {
           internal_static_protobuf_Setting_System_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_protobuf_Setting_System_descriptor,
-              new java.lang.String[] { "MaxParticles", "CloudResolution", "CloudUpdateInterval", "MaxThreads", "SaveChunks", "ChunkCacheSize", "MaxChunkVBOs", "Gamma", "PixelFormat", "DisplayMode", "Fullscreen", "ActiveViewingDistanceId", "ViewingDistanceNear", "ViewingDistanceModerate", "ViewingDistanceFar", "ViewingDistanceUltra", "FlickeringLight", "EnablePostProcessingEffects", "AnimatedGrass", "VerticalChunkMeshSegments", "BlurIntensity", "ReflectiveWater", },
+              new java.lang.String[] { "MaxParticles", "CloudResolution", "CloudUpdateInterval", "MaxThreads", "SaveChunks", "ChunkCacheSize", "MaxChunkVBOs", "Gamma", "PixelFormat", "DisplayMode", "Fullscreen", "ActiveViewingDistanceId", "ViewingDistanceNear", "ViewingDistanceModerate", "ViewingDistanceFar", "ViewingDistanceUltra", "FlickeringLight", "EnablePostProcessingEffects", "AnimatedGrass", "VerticalChunkMeshSegments", "BlurIntensity", "ReflectiveWater", "MusicVolume", "SoundVolume", },
               org.terasology.protobuf.Configuration.Setting.System.class,
               org.terasology.protobuf.Configuration.Setting.System.Builder.class);
           internal_static_protobuf_Setting_System_CloudRes_descriptor =

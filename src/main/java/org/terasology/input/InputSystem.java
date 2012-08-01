@@ -1,3 +1,18 @@
+/*
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.terasology.input;
 
 import com.google.common.collect.Lists;
@@ -52,7 +67,7 @@ public class InputSystem implements EventHandlerSystem {
         localPlayer = CoreRegistry.get(LocalPlayer.class);
         cameraTargetSystem = CoreRegistry.get(CameraTargetSystem.class);
 
-        REPLACE_THIS_WITH_CONFIG();
+        loadInputConfig();
     }
 
     @Override
@@ -291,7 +306,7 @@ public class InputSystem implements EventHandlerSystem {
         }
     }
 
-    private void REPLACE_THIS_WITH_CONFIG() {
+    private void loadInputConfig() {
         InputConfig inputConfig = InputConfig.getInstance();
         int keyvalue;
 
@@ -316,7 +331,7 @@ public class InputSystem implements EventHandlerSystem {
         }
 
         registerBindButton(PauseButton.ID, "Pause", new PauseButton());
-        keyvalue = inputConfig.getKeyPauze();
+        keyvalue = inputConfig.getKeyPause();
         if (keyvalue < 256) {
             linkBindButtonToKey(keyvalue, PauseButton.ID);
         } else if (keyvalue < 259) {

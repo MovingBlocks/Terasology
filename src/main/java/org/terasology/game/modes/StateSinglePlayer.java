@@ -41,12 +41,23 @@ import org.terasology.game.bootstrap.EntitySystemBuilder;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.generators.DefaultGenerators;
 import org.terasology.asset.AssetManager;
+import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.logic.world.chunks.Chunk;
+import org.terasology.logic.world.generator.core.ChunkGeneratorManager;
+import org.terasology.logic.world.generator.core.ChunkGeneratorManagerImpl;
+import org.terasology.logic.world.generator.core.FlatTerrainGenerator;
+import org.terasology.logic.world.generator.core.FloraGenerator;
+import org.terasology.logic.world.generator.core.ForestGenerator;
+import org.terasology.logic.world.generator.core.PerlinTerrainGenerator;
+import org.terasology.logic.world.generator.persistence.ChunkGeneratorPersister;
+import org.terasology.logic.world.liquid.LiquidsGenerator;
+import org.terasology.logic.world.WorldBiomeProviderImpl;
 import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.management.BlockManager;
@@ -77,6 +88,7 @@ import static org.lwjgl.opengl.GL11.*;
 public class StateSinglePlayer implements GameState {
 
     public static final String ENTITY_DATA_FILE = "entity.dat";
+    public static final String CHUNK_GENERATOR_FILE = "chunk_generator.json";
     private Logger logger = Logger.getLogger(getClass().getName());
 
     private String currentWorldName;
@@ -275,8 +287,13 @@ public class StateSinglePlayer implements GameState {
 
         logger.log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
 
+        // Init ChunkGeneratorManager
+        ChunkGeneratorManager chunkGeneratorManager = initChunkGeneratorManager(title);
+        chunkGeneratorManager.setWorldSeed(seed);
+        chunkGeneratorManager.setWorldBiomeProvider(new WorldBiomeProviderImpl(seed));
+
         // Init. a new world
-        worldRenderer = new WorldRenderer(title, seed, time, entityManager, localPlayerSys);
+        worldRenderer = new WorldRenderer(title, seed, time, chunkGeneratorManager, entityManager, localPlayerSys);
         CoreRegistry.put(WorldRenderer.class, worldRenderer);
 
         // Create the world entity
@@ -312,6 +329,41 @@ public class StateSinglePlayer implements GameState {
         prepareWorld();
     }
 
+    private ChunkGeneratorManager initChunkGeneratorManager(String title) {
+        ChunkGeneratorManager chunkGeneratorManager = null;
+
+        File generatorDataFile = new File(PathManager.getInstance().getWorldSavePath(title), CHUNK_GENERATOR_FILE);
+
+        try {
+            chunkGeneratorManager = new ChunkGeneratorPersister().load(generatorDataFile);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to load generator data", e);
+            // TODO Improved exception handling
+        }
+
+        if (chunkGeneratorManager == null) {
+        	//lets choose the chunk generator
+			switch (Config.getInstance().getChunkGenerator()) {
+			case 1:		//flat
+				chunkGeneratorManager = new ChunkGeneratorManagerImpl();
+				chunkGeneratorManager.registerChunkGenerator(new FlatTerrainGenerator());
+				chunkGeneratorManager.registerChunkGenerator(new FloraGenerator());
+				chunkGeneratorManager.registerChunkGenerator(new LiquidsGenerator());
+				break;
+			default:	//normal
+				chunkGeneratorManager = ChunkGeneratorManagerImpl.getDefaultInstance();
+			}
+
+            try {
+                new ChunkGeneratorPersister().save(generatorDataFile, chunkGeneratorManager);
+            } catch (IOException e) {
+                logger.log(Level.SEVERE, "Failed to save generator data", e);
+                // TODO Improved exception handling
+            }
+        }
+
+        return chunkGeneratorManager;
+    }
 
     private boolean screenHasFocus() {
         return GUIManager.getInstance().getFocusedWindow() != null && GUIManager.getInstance().getFocusedWindow().isModal() && GUIManager.getInstance().getFocusedWindow().isVisible();
@@ -342,7 +394,7 @@ public class StateSinglePlayer implements GameState {
             worldRenderer.getChunkProvider().addRegionEntity(spawnZoneEntity, 1);
 
             while (!worldRenderer.getWorldProvider().isBlockActive(new Vector3i(Chunk.SIZE_X / 2, Chunk.SIZE_Y / 2, Chunk.SIZE_Z / 2))) {
-                loadingScreen.updateStatus(String.format("Loading spawn area... %.2f%%! :-)", (timer.getTimeInMs() - startTime) / 50.0f));
+                loadingScreen.updateStatus(String.format("Loading spawn area... %.2f%%! :-)", (timer.getTimeInMs() - startTime) / 50.0f), (timer.getTimeInMs() - startTime) / 50.0f);
 
                 renderUserInterface();
                 updateUserInterface();
@@ -364,7 +416,7 @@ public class StateSinglePlayer implements GameState {
         while (!getWorldRenderer().pregenerateChunks() && timer.getTimeInMs() - startTime < 5000) {
             chunksGenerated++;
 
-            loadingScreen.updateStatus(String.format("Fast forwarding world... %.2f%%! :-)", (timer.getTimeInMs() - startTime) / 50.0f));
+            loadingScreen.updateStatus(String.format("Fast forwarding world... %.2f%%! :-)", (timer.getTimeInMs() - startTime) / 50.0f), (timer.getTimeInMs() - startTime) / 50.0f);
 
             renderUserInterface();
             updateUserInterface();
