@@ -43,7 +43,6 @@ public class CameraTargetSystem implements ComponentSystem {
     // TODO: This should come from somewhere, probably player entity?
     public static final float TARGET_DISTANCE = 5f;
 
-    private WorldProvider worldProvider;
     private LocalPlayer localPlayer;
     private BlockEntityRegistry blockRegistry;
     private EntityRef target = EntityRef.NULL;
@@ -54,7 +53,6 @@ public class CameraTargetSystem implements ComponentSystem {
 
     public void initialise() {
         localPlayer = CoreRegistry.get(LocalPlayer.class);
-        worldProvider = CoreRegistry.get(WorldProvider.class);
         blockRegistry = CoreRegistry.get(BlockEntityRegistry.class);
     }
 

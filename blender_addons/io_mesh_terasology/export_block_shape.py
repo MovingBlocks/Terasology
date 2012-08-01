@@ -16,6 +16,8 @@ import bpy
 import os
 import datetime
 import math
+import mathutils
+from mathutils import Vector
 
 def convertVec3d(v):
 		return -v[0], v[2], v[1]
@@ -88,7 +90,7 @@ def writeMeshCollision(
 			if object.teraColliderType == 'AABB':
 				writeAABBCollider(object, fw, scene)
 			elif object.teraColliderType == 'Sphere':
-				writeSphereCollider
+				writeSphereCollider(object, fw, scene)
 	if not first:
 		fw("\n		]\n")
 	fw('	}')
@@ -102,11 +104,10 @@ def writeSphereCollider(
 		
 	mesh = obj.data
 		
-	center = [0.0,0.0,0.0]
+	center = Vector((0, 0, 0))
 		
 	for v in mesh.vertices:
-		vert = mesh.vertices[index].co
-		center += vert
+		center += v.co
 		
 	center /= len(mesh.vertices)
 	

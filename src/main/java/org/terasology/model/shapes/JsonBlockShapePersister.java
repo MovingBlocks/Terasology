@@ -16,13 +16,11 @@
 
 package org.terasology.model.shapes;
 
-import com.bulletphysics.collision.shapes.BoxShape;
-import com.bulletphysics.collision.shapes.CollisionShape;
-import com.bulletphysics.collision.shapes.CompoundShape;
-import com.bulletphysics.collision.shapes.ConvexHullShape;
+import com.bulletphysics.collision.shapes.*;
 import com.bulletphysics.linearmath.QuaternionUtil;
 import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.util.ObjectArrayList;
+import com.google.common.collect.Lists;
 import com.google.gson.*;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
@@ -35,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -152,47 +151,59 @@ public class JsonBlockShapePersister {
         }
 
         private ColliderInfo processColliders(JsonDeserializationContext context, JsonArray colliderArray, Rotation rot) {
-            if (colliderArray.size() == 1) {
-                JsonElement shapeDef = colliderArray.get(0);
-                if (shapeDef.isJsonObject()) {
-                    JsonObject collider = shapeDef.getAsJsonObject();
-                    return processBoxShape(context, collider, rot);
-                } else {
-                    ColliderInfo info = new ColliderInfo(new Vector3f(), CUBE_SHAPE);
-                    info.symmetric = true;
-                    return info;
+            List<ColliderInfo> colliders = Lists.newArrayList();
+            for (JsonElement elem : colliderArray) {
+                if (elem.isJsonObject()) {
+                    JsonObject colliderObj = elem.getAsJsonObject();
+                    if (colliderObj.has("type") && colliderObj.get("type").isJsonPrimitive() && colliderObj.getAsJsonPrimitive("type").isString()) {
+                        String type = colliderObj.get("type").getAsString();
+                        if ("AABB".equals(type)) {
+                            colliders.add(processAABBShape(context, colliderObj, rot));
+                        } else if ("Sphere".equals(type)) {
+                            colliders.add(processSphereShape(context, colliderObj, rot));
+                        }
+                    }
                 }
+            }
+            if (colliders.size() > 1) {
+                return processCompoundShape(colliders);
+            } else if (colliders.size() == 1) {
+                return colliders.get(0);
             } else {
-                return processCompoundShape(context, colliderArray, rot);
+                ColliderInfo result = new ColliderInfo(new Vector3f(), CUBE_SHAPE);
+                result.symmetric = true;
+                return result;
             }
         }
 
-        private ColliderInfo processCompoundShape(JsonDeserializationContext context, JsonArray colliderArray, Rotation rot) {
+        private ColliderInfo processCompoundShape(List<ColliderInfo> colliders) {
             CompoundShape collisionShape = new CompoundShape();
-            Quat4f rotQuat = rot.getQuat4f();
 
-            for (JsonElement item : colliderArray) {
-                if (item.isJsonObject()) {
-                    JsonObject collider = item.getAsJsonObject();
-                    ColliderInfo info = processBoxShape(context, collider, Rotation.NONE);
-                    Matrix4f shapeOffset = new Matrix4f(rotQuat, QuaternionUtil.quatRotate(rot.getQuat4f(), info.offset, info.offset), 1.0f);
-                    Transform transform = new Transform(shapeOffset);
-                    collisionShape.addChildShape(transform, info.collisionShape);
-                }
+            for (ColliderInfo collider : colliders) {
+                Transform transform = new Transform(new Matrix4f(Rotation.NONE.getQuat4f(), collider.offset, 1.0f));
+                collisionShape.addChildShape(transform, collider.collisionShape);
             }
             return new ColliderInfo(new Vector3f(), collisionShape);
         }
 
-        private ColliderInfo processBoxShape(JsonDeserializationContext context, JsonObject colliderDef, Rotation rot) {
+        private ColliderInfo processAABBShape(JsonDeserializationContext context, JsonObject colliderDef, Rotation rot) {
             Vector3f offset = context.deserialize(colliderDef.get("position"), Vector3f.class);
             Vector3f extent = context.deserialize(colliderDef.get("extents"), Vector3f.class);
-            if (offset == null) throw new JsonParseException("Collider missing position");
-            if (extent == null) throw new JsonParseException("Collider missing extents");
+            if (offset == null) throw new JsonParseException("AABB Collider missing position");
+            if (extent == null) throw new JsonParseException("AABB Collider missing extents");
 
             QuaternionUtil.quatRotate(rot.getQuat4f(), extent, extent);
             extent.absolute();
 
             return new ColliderInfo(QuaternionUtil.quatRotate(rot.getQuat4f(), offset, offset), new BoxShape(extent));
+        }
+
+        private ColliderInfo processSphereShape(JsonDeserializationContext context, JsonObject colliderDef, Rotation rot) {
+            Vector3f offset = context.deserialize(colliderDef.get("position"), Vector3f.class);
+            float radius = colliderDef.get("radius").getAsFloat();
+            if (offset == null) throw new JsonParseException("Sphere Collider missing position");
+
+            return new ColliderInfo(QuaternionUtil.quatRotate(rot.getQuat4f(), offset, offset), new SphereShape(radius));
         }
 
         private class ColliderInfo {
