@@ -43,6 +43,7 @@ import org.terasology.input.InputSystem;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.generators.DefaultGenerators;
 import org.terasology.asset.AssetManager;
+import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.mod.Mod;
@@ -50,6 +51,7 @@ import org.terasology.logic.mod.ModManager;
 import org.terasology.logic.world.chunks.Chunk;
 import org.terasology.logic.world.generator.core.ChunkGeneratorManager;
 import org.terasology.logic.world.generator.core.ChunkGeneratorManagerImpl;
+import org.terasology.logic.world.generator.core.FlatTerrainGenerator;
 import org.terasology.logic.world.generator.core.FloraGenerator;
 import org.terasology.logic.world.generator.core.ForestGenerator;
 import org.terasology.logic.world.generator.core.PerlinTerrainGenerator;
@@ -334,14 +336,23 @@ public class StateSinglePlayer implements GameState {
 
         try {
             chunkGeneratorManager = new ChunkGeneratorPersister().load(generatorDataFile);
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to load generator data", e);
             // TODO Improved exception handling
         }
 
         if (chunkGeneratorManager == null) {
-            // Create default chunkGeneratorManager
-            chunkGeneratorManager = ChunkGeneratorManagerImpl.getDefaultInstance();
+        	//lets choose the chunk generator
+			switch (Config.getInstance().getChunkGenerator()) {
+			case 1:		//flat
+				chunkGeneratorManager = new ChunkGeneratorManagerImpl();
+				chunkGeneratorManager.registerChunkGenerator(new FlatTerrainGenerator());
+				chunkGeneratorManager.registerChunkGenerator(new FloraGenerator());
+				chunkGeneratorManager.registerChunkGenerator(new LiquidsGenerator());
+				break;
+			default:	//normal
+				chunkGeneratorManager = ChunkGeneratorManagerImpl.getDefaultInstance();
+			}
 
             try {
                 new ChunkGeneratorPersister().save(generatorDataFile, chunkGeneratorManager);
