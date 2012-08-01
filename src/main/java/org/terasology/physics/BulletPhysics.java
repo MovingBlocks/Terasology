@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.physics;
+package org.terasology.physics;
 
 import com.bulletphysics.collision.broadphase.*;
 import com.bulletphysics.collision.dispatch.*;
@@ -26,7 +26,9 @@ import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
 import com.bulletphysics.linearmath.DefaultMotionState;
 import com.bulletphysics.linearmath.Transform;
+import com.bulletphysics.linearmath.VectorUtil;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.terasology.components.block.BlockComponent;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.*;
@@ -34,6 +36,7 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.world.BlockChangedEvent;
 import org.terasology.logic.world.BlockEntityRegistry;
+import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.math.AABB;
 import org.terasology.performanceMonitor.PerformanceMonitor;
@@ -41,9 +44,7 @@ import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.*;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,7 +53,7 @@ import java.util.logging.Logger;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class BulletPhysicsRenderer implements EventReceiver<BlockChangedEvent> {
+public class BulletPhysics implements EventReceiver<BlockChangedEvent> {
 
     private Logger _logger = Logger.getLogger(getClass().getName());
 
@@ -65,14 +66,12 @@ public class BulletPhysicsRenderer implements EventReceiver<BlockChangedEvent> {
     private final SequentialImpulseConstraintSolver _sequentialImpulseConstraintSolver;
     private final DiscreteDynamicsWorld _discreteDynamicsWorld;
     private final BlockEntityRegistry blockEntityRegistry;
+    private final CollisionGroupManager collisionGroupManager;
 
-    private final BlockItemFactory _blockItemFactory;
 
-    private Timer _timer;
-    private FastRandom _random = new FastRandom();
-    private final WorldRenderer _parent;
+    public BulletPhysics(WorldProvider world) {
+        collisionGroupManager = CoreRegistry.get(CollisionGroupManager.class);
 
-    public BulletPhysicsRenderer(WorldRenderer parent) {
         _broadphase = new DbvtBroadphase();
         _broadphase.getOverlappingPairCache().setInternalGhostPairCallback(new GhostPairCallback());
         _defaultCollisionConfiguration = new DefaultCollisionConfiguration();
@@ -80,13 +79,10 @@ public class BulletPhysicsRenderer implements EventReceiver<BlockChangedEvent> {
         _sequentialImpulseConstraintSolver = new SequentialImpulseConstraintSolver();
         _discreteDynamicsWorld = new DiscreteDynamicsWorld(_dispatcher, _broadphase, _sequentialImpulseConstraintSolver, _defaultCollisionConfiguration);
         _discreteDynamicsWorld.setGravity(new Vector3f(0f, -15f, 0f));
-        _parent = parent;
-        _blockItemFactory = new BlockItemFactory(CoreRegistry.get(EntityManager.class));
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
-        _timer = CoreRegistry.get(Timer.class);
         CoreRegistry.get(EventSystem.class).registerEventReceiver(this, BlockChangedEvent.class, BlockComponent.class);
 
-        PhysicsWorldWrapper wrapper = new PhysicsWorldWrapper(parent.getWorldProvider());
+        PhysicsWorldWrapper wrapper = new PhysicsWorldWrapper(world);
         VoxelWorldShape worldShape = new VoxelWorldShape(wrapper);
 
         Matrix3f rot = new Matrix3f();
@@ -95,21 +91,35 @@ public class BulletPhysicsRenderer implements EventReceiver<BlockChangedEvent> {
         RigidBodyConstructionInfo blockConsInf = new RigidBodyConstructionInfo(0, blockMotionState, worldShape, new Vector3f());
         RigidBody rigidBody = new RigidBody(blockConsInf);
         rigidBody.setCollisionFlags(CollisionFlags.STATIC_OBJECT | rigidBody.getCollisionFlags());
-        _discreteDynamicsWorld.addRigidBody(rigidBody);
-
+        _discreteDynamicsWorld.addRigidBody(rigidBody, combineGroups(StandardCollisionGroup.WORLD), (short)(CollisionFilterGroups.ALL_FILTER ^ CollisionFilterGroups.STATIC_FILTER));
     }
 
     public DynamicsWorld getWorld() {
         return _discreteDynamicsWorld;
     }
 
-    // TODO: Wrap ghost object
-
-    public PairCachingGhostObject createCollider(Vector3f pos, ConvexShape shape, short groups, short filters) {
+    // TODO: Wrap ghost object?
+    public PairCachingGhostObject createCollider(Vector3f pos, ConvexShape shape, List<CollisionGroup> groups, List<CollisionGroup> filters) {
         return createCollider(pos, shape, groups, filters, 0);
     }
 
-    public PairCachingGhostObject createCollider(Vector3f pos, ConvexShape shape, short groups, short filters, int collisionFlags) {
+    private short combineGroups(CollisionGroup ... groups) {
+        return combineGroups(Arrays.asList(groups));
+    }
+
+    private short combineGroups(Iterable<CollisionGroup> groups) {
+        short flags = 0;
+        for (CollisionGroup group : groups) {
+            flags |= group.getFlag();
+        }
+        return flags;
+    }
+
+    public PairCachingGhostObject createCollider(Vector3f pos, ConvexShape shape, List<CollisionGroup> groups, List<CollisionGroup> filters, int collisionFlags) {
+        return createCollider(pos, shape, combineGroups(groups), combineGroups(filters), collisionFlags);
+    }
+
+    private PairCachingGhostObject createCollider(Vector3f pos, ConvexShape shape, short groups, short filters, int collisionFlags) {
         Transform startTransform = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), pos, 1.0f));
         PairCachingGhostObject result = new PairCachingGhostObject();
         result.setWorldTransform(startTransform);
@@ -120,11 +130,15 @@ public class BulletPhysicsRenderer implements EventReceiver<BlockChangedEvent> {
     }
 
     public void addRigidBody(RigidBody body) {
-        _insertionQueue.add(new RigidBodyRequest(body, CollisionFilterGroups.DEFAULT_FILTER, (short)(CollisionFilterGroups.DEFAULT_FILTER | CollisionFilterGroups.STATIC_FILTER)));
+        _insertionQueue.add(new RigidBodyRequest(body, CollisionFilterGroups.DEFAULT_FILTER, (short)(CollisionFilterGroups.DEFAULT_FILTER | CollisionFilterGroups.STATIC_FILTER | CollisionFilterGroups.SENSOR_TRIGGER)));
+    }
+
+    public void addRigidBody(RigidBody body, List<CollisionGroup> groups, List<CollisionGroup> filter) {
+        _insertionQueue.add(new RigidBodyRequest(body, combineGroups(groups), combineGroups(filter)));
     }
 
     public void addRigidBody(RigidBody body, short groups, short filter) {
-        _insertionQueue.add(new RigidBodyRequest(body, groups, filter));
+        _insertionQueue.add(new RigidBodyRequest(body, groups, (short)(filter | CollisionFilterGroups.SENSOR_TRIGGER)));
     }
 
     public void removeRigidBody(RigidBody body) {
@@ -135,10 +149,10 @@ public class BulletPhysicsRenderer implements EventReceiver<BlockChangedEvent> {
         _discreteDynamicsWorld.removeCollisionObject(collider);
     }
 
-    public Iterable<EntityRef> scanArea(AABB area, short collisionMask) {
+    public Iterable<EntityRef> scanArea(AABB area, Iterable<CollisionGroup> collisionFilter) {
         // TODO: Add the aabbTest method from newer versions of bullet to TeraBullet, use that instead
         BoxShape shape = new BoxShape(area.getExtents());
-        GhostObject scanObject = createCollider(area.getCenter(), shape, CollisionFilterGroups.DEFAULT_FILTER, collisionMask, 0);
+        GhostObject scanObject = createCollider(area.getCenter(), shape, CollisionFilterGroups.SENSOR_TRIGGER, combineGroups(collisionFilter), CollisionFlags.NO_CONTACT_RESPONSE);
         // This in particular is overkill
         _broadphase.calculateOverlappingPairs(_dispatcher);
         List<EntityRef> result = Lists.newArrayList();
@@ -159,9 +173,31 @@ public class BulletPhysicsRenderer implements EventReceiver<BlockChangedEvent> {
         to.add(from);
 
         CollisionWorld.ClosestRayResultWithUserDataCallback closest = new CollisionWorld.ClosestRayResultWithUserDataCallback(from, to);
+        closest.collisionFilterGroup = CollisionFilterGroups.SENSOR_TRIGGER;
         _discreteDynamicsWorld.rayTest(from, to, closest);
         if (closest.userData instanceof Vector3i) {
             return new HitResult(blockEntityRegistry.getOrCreateEntityAt((Vector3i)closest.userData), closest.hitPointWorld, closest.hitNormalWorld);
+        } else if (closest.userData instanceof EntityRef) {
+            return new HitResult((EntityRef) closest.userData, closest.hitPointWorld, closest.hitNormalWorld);
+        }
+        return new HitResult();
+    }
+
+    public HitResult rayTrace(Vector3f from, Vector3f direction, float distance, CollisionGroup ... collisionGroups) {
+        Vector3f to = new Vector3f(direction);
+        to.scale(distance);
+        to.add(from);
+
+        short filter = combineGroups(collisionGroups);
+
+        CollisionWorld.ClosestRayResultWithUserDataCallback closest = new CollisionWorld.ClosestRayResultWithUserDataCallback(from, to);
+        closest.collisionFilterGroup = CollisionFilterGroups.ALL_FILTER;
+        closest.collisionFilterMask = filter;
+        _discreteDynamicsWorld.rayTest(from, to, closest);
+        if (closest.userData instanceof Vector3i) {
+            return new HitResult(blockEntityRegistry.getOrCreateEntityAt((Vector3i)closest.userData), closest.hitPointWorld, closest.hitNormalWorld);
+        } else if (closest.userData instanceof EntityRef) {
+            return new HitResult((EntityRef) closest.userData, closest.hitPointWorld, closest.hitNormalWorld);
         }
         return new HitResult();
     }
@@ -209,4 +245,5 @@ public class BulletPhysicsRenderer implements EventReceiver<BlockChangedEvent> {
             this.filter = filter;
         }
     }
+
 }

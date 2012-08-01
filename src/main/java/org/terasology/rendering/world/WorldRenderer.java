@@ -46,17 +46,16 @@ import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.math.AABB;
+import org.terasology.physics.BulletPhysics;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.DefaultCamera;
-import org.terasology.rendering.physics.BulletPhysicsRenderer;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.shader.ShaderProgram;
 
 import javax.imageio.ImageIO;
-import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -132,7 +131,7 @@ public final class WorldRenderer {
     private final WorldTimeEventManager _worldTimeEventManager;
 
     /* PHYSICS */
-    private final BulletPhysicsRenderer _bulletRenderer;
+    private final BulletPhysics _bulletPhysics;
 
     /* BLOCK GRID */
     private final BlockGrid _blockGrid;
@@ -173,13 +172,13 @@ public final class WorldRenderer {
         CoreRegistry.put(BlockEntityRegistry.class, entityWorldProvider);
         CoreRegistry.get(ComponentSystemManager.class).register(entityWorldProvider, "engine:BlockEntityRegistry");
         _worldProvider = new WorldProviderWrapper(entityWorldProvider);
+        _bulletPhysics = new BulletPhysics(_worldProvider);
         _chunkTesselator = new ChunkTessellator(_worldProvider.getBiomeProvider());
         _skysphere = new Skysphere(this);
         _chunkUpdateManager = new ChunkUpdateManager(_chunkTesselator, _worldProvider);
         _worldTimeEventManager = new WorldTimeEventManager(_worldProvider);
         _portalManager = new PortalManager(manager);
         _blockGrid = new BlockGrid();
-        _bulletRenderer = new BulletPhysicsRenderer(this);
 
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
         localPlayerSystem.setPlayerCamera(_defaultCamera);
@@ -697,7 +696,7 @@ public final class WorldRenderer {
         PerformanceMonitor.endActivity();
 
         PerformanceMonitor.startActivity("Physics Renderer");
-        _bulletRenderer.update(delta);
+        _bulletPhysics.update(delta);
         PerformanceMonitor.endActivity();
     }
 
@@ -1011,8 +1010,8 @@ public final class WorldRenderer {
         this._wireframe = _wireframe;
     }
 
-    public BulletPhysicsRenderer getBulletRenderer() {
-        return _bulletRenderer;
+    public BulletPhysics getBulletRenderer() {
+        return _bulletPhysics;
     }
 
     public Camera getActiveCamera() {

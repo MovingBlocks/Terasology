@@ -43,6 +43,7 @@ import org.terasology.input.InputSystem;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.generators.DefaultGenerators;
 import org.terasology.asset.AssetManager;
+import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.mod.Mod;
@@ -50,6 +51,7 @@ import org.terasology.logic.mod.ModManager;
 import org.terasology.logic.world.chunks.Chunk;
 import org.terasology.logic.world.generator.core.ChunkGeneratorManager;
 import org.terasology.logic.world.generator.core.ChunkGeneratorManagerImpl;
+import org.terasology.logic.world.generator.core.FlatTerrainGenerator;
 import org.terasology.logic.world.generator.core.FloraGenerator;
 import org.terasology.logic.world.generator.core.ForestGenerator;
 import org.terasology.logic.world.generator.core.PerlinTerrainGenerator;
@@ -60,11 +62,11 @@ import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.physics.BulletPhysics;
 import org.terasology.protobuf.EntityData;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.gui.menus.UILoadingScreen;
 import org.terasology.rendering.gui.menus.UIStatusScreen;
-import org.terasology.rendering.physics.BulletPhysicsRenderer;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 
@@ -308,7 +310,7 @@ public class StateSinglePlayer implements GameState {
         CoreRegistry.put(WorldProvider.class, worldRenderer.getWorldProvider());
         CoreRegistry.put(LocalPlayer.class, new LocalPlayer(EntityRef.NULL));
         CoreRegistry.put(Camera.class, worldRenderer.getActiveCamera());
-        CoreRegistry.put(BulletPhysicsRenderer.class, worldRenderer.getBulletRenderer());
+        CoreRegistry.put(BulletPhysics.class, worldRenderer.getBulletRenderer());
 
         for (ComponentSystem system : componentSystemManager.iterateAll()) {
             system.initialise();
@@ -334,14 +336,23 @@ public class StateSinglePlayer implements GameState {
 
         try {
             chunkGeneratorManager = new ChunkGeneratorPersister().load(generatorDataFile);
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to load generator data", e);
             // TODO Improved exception handling
         }
 
         if (chunkGeneratorManager == null) {
-            // Create default chunkGeneratorManager
-            chunkGeneratorManager = ChunkGeneratorManagerImpl.getDefaultInstance();
+        	//lets choose the chunk generator
+			switch (Config.getInstance().getChunkGenerator()) {
+			case 1:		//flat
+				chunkGeneratorManager = new ChunkGeneratorManagerImpl();
+				chunkGeneratorManager.registerChunkGenerator(new FlatTerrainGenerator());
+				chunkGeneratorManager.registerChunkGenerator(new FloraGenerator());
+				chunkGeneratorManager.registerChunkGenerator(new LiquidsGenerator());
+				break;
+			default:	//normal
+				chunkGeneratorManager = ChunkGeneratorManagerImpl.getDefaultInstance();
+			}
 
             try {
                 new ChunkGeneratorPersister().save(generatorDataFile, chunkGeneratorManager);
@@ -383,7 +394,7 @@ public class StateSinglePlayer implements GameState {
             worldRenderer.getChunkProvider().addRegionEntity(spawnZoneEntity, 1);
 
             while (!worldRenderer.getWorldProvider().isBlockActive(new Vector3i(Chunk.SIZE_X / 2, Chunk.SIZE_Y / 2, Chunk.SIZE_Z / 2))) {
-                loadingScreen.updateStatus(String.format("Loading spawn area... %.2f%%! :-)", (timer.getTimeInMs() - startTime) / 50.0f));
+                loadingScreen.updateStatus(String.format("Loading spawn area... %.2f%%! :-)", (timer.getTimeInMs() - startTime) / 50.0f), (timer.getTimeInMs() - startTime) / 50.0f);
 
                 renderUserInterface();
                 updateUserInterface();
@@ -405,7 +416,7 @@ public class StateSinglePlayer implements GameState {
         while (!getWorldRenderer().pregenerateChunks() && timer.getTimeInMs() - startTime < 5000) {
             chunksGenerated++;
 
-            loadingScreen.updateStatus(String.format("Fast forwarding world... %.2f%%! :-)", (timer.getTimeInMs() - startTime) / 50.0f));
+            loadingScreen.updateStatus(String.format("Fast forwarding world... %.2f%%! :-)", (timer.getTimeInMs() - startTime) / 50.0f), (timer.getTimeInMs() - startTime) / 50.0f);
 
             renderUserInterface();
             updateUserInterface();

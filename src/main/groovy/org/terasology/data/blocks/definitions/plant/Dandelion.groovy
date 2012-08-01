@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.terasology.data.blocks.definitions.plant
 
 import org.terasology.model.blocks.Block.BLOCK_FORM
@@ -21,6 +20,7 @@ import org.terasology.model.blocks.Block.COLOR_SOURCE
 
 /**
  * Another flower with an actual name, wee!
+ * @author (art) eleazzaar
  */
 block {
     version = 1

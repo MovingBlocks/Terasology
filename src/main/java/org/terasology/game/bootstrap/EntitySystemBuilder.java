@@ -29,6 +29,7 @@ import org.terasology.entitySystem.pojo.PojoPrefabManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.BlockFamily;
+import org.terasology.physics.CollisionGroup;
 import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.primitives.Mesh;
 
@@ -71,6 +72,7 @@ public class EntitySystemBuilder {
         library.registerTypeHandler(Vector3f.class, new Vector3fTypeHandler());
         library.registerTypeHandler(Vector2f.class, new Vector2fTypeHandler());
         library.registerTypeHandler(Vector3i.class, new Vector3iTypeHandler());
+        library.registerTypeHandler(CollisionGroup.class, new CollisionGroupTypeHandler());
     }
 
     private void registerComponents(ComponentLibrary library) {
