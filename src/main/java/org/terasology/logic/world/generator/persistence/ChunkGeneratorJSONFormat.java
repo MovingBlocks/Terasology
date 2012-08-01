@@ -15,6 +15,8 @@
  */
 package org.terasology.logic.world.generator.persistence;
 
+import groovy.json.JsonException;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -27,7 +29,7 @@ import org.terasology.logic.world.generator.core.ChunkGeneratorManager;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.JsonParseException;
 
 /**
  * Read and write the ChunkGeneratorManager from/to a JSON file.
@@ -45,7 +47,9 @@ public final class ChunkGeneratorJSONFormat {
             final JSONChunkGeneratorManager jsonChunkGeneratorManager = ChunkGeneratorJSONFormat.newGson().fromJson(reader, JSONChunkGeneratorManager.class);
 
             return jsonChunkGeneratorManager.createChunkGeneratorManager();
-        } catch (final JsonSyntaxException e) {
+        } catch (final JsonException e) {
+            throw new IOException("Failed to load chunkGeneratorManager", e);
+        } catch (final JsonParseException e) {
             throw new IOException("Failed to load chunkGeneratorManager", e);
         } catch (final IOException e) {
             throw new IOException("Failed to load chunkGeneratorManager", e);
