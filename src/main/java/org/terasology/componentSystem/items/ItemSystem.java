@@ -16,6 +16,7 @@
 package org.terasology.componentSystem.items;
 
 import com.bulletphysics.collision.broadphase.CollisionFilterGroups;
+import com.google.common.collect.Lists;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.components.HealthComponent;
@@ -33,7 +34,9 @@ import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockFamily;
-import org.terasology.rendering.physics.BulletPhysicsRenderer;
+import org.terasology.physics.BulletPhysics;
+import org.terasology.physics.CollisionGroup;
+import org.terasology.physics.StandardCollisionGroup;
 
 import javax.vecmath.Vector3f;
 
@@ -158,7 +161,7 @@ public class ItemSystem implements EventHandlerSystem {
 
         // Prevent players from placing blocks inside their bounding boxes
         if (!block.isPenetrable()) {
-            return !CoreRegistry.get(BulletPhysicsRenderer.class).scanArea(block.getBounds(blockPos), CollisionFilterGroups.ALL_FILTER).iterator().hasNext();
+            return !CoreRegistry.get(BulletPhysics.class).scanArea(block.getBounds(blockPos), Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.DEFAULT, StandardCollisionGroup.CHARACTER)).iterator().hasNext();
         }
         return true;
     }

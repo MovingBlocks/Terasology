@@ -34,7 +34,6 @@ import org.terasology.logic.world.WorldProvider;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.physics.ImpulseEvent;
-import org.terasology.rendering.physics.BulletPhysicsRenderer;
 import org.terasology.utilities.FastRandom;
 
 /**

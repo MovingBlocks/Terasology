@@ -25,8 +25,8 @@ import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.physics.BulletPhysics;
 import org.terasology.physics.ImpulseEvent;
-import org.terasology.rendering.physics.BulletPhysicsRenderer;
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.Vector3f;
@@ -41,14 +41,14 @@ public class TunnelAction implements EventHandlerSystem {
 
     private WorldProvider worldProvider;
     private FastRandom random = new FastRandom();
-    private BulletPhysicsRenderer physicsRenderer;
+    private BulletPhysics physicsRenderer;
     private BlockEntityRegistry blockEntityRegistry;
     private DroppedBlockFactory droppedBlockFactory;
 
     @Override
     public void initialise() {
         worldProvider = CoreRegistry.get(WorldProvider.class);
-        physicsRenderer = CoreRegistry.get(BulletPhysicsRenderer.class);
+        physicsRenderer = CoreRegistry.get(BulletPhysics.class);
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
         droppedBlockFactory = new DroppedBlockFactory(CoreRegistry.get(EntityManager.class));
     }

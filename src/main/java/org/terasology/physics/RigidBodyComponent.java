@@ -16,7 +16,10 @@
 
 package org.terasology.physics;
 
+import com.google.common.collect.Lists;
 import org.terasology.entitySystem.Component;
+
+import java.util.List;
 
 /**
  * @author Immortius
@@ -24,4 +27,6 @@ import org.terasology.entitySystem.Component;
 public class RigidBodyComponent implements Component {
     public float mass = 10.0f;
 
+    public CollisionGroup collisionGroup = StandardCollisionGroup.DEFAULT;
+    public List<CollisionGroup> collidesWith = Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD, StandardCollisionGroup.KINEMATIC);
 }

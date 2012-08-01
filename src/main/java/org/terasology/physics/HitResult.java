@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.rendering.physics;
+package org.terasology.physics;
 
 import org.terasology.entitySystem.EntityRef;
 

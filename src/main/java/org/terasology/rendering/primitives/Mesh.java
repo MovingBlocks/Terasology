@@ -200,6 +200,10 @@ public class Mesh implements Asset {
         return uri;
     }
 
+    public TFloatList getVertices() {
+        return vertices;
+    }
+
     public void preRender() {
         glEnableClientState(GL_VERTEX_ARRAY);
         if (hasTexCoord0 || hasTexCoord1) glEnableClientState(GL_TEXTURE_COORD_ARRAY);

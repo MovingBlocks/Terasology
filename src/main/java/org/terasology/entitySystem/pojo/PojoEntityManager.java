@@ -27,8 +27,10 @@ import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.ChangedComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
+import org.terasology.entitySystem.metadata.extension.CollisionGroupTypeHandler;
 import org.terasology.entitySystem.metadata.extension.EntityRefTypeHandler;
 import org.terasology.entitySystem.metadata.extension.PrefabTypeHandler;
+import org.terasology.physics.CollisionGroup;
 
 import javax.vecmath.Vector3f;
 import java.util.*;

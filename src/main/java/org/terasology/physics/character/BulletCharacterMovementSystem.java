@@ -16,7 +16,6 @@
 package org.terasology.physics.character;
 
 import com.bulletphysics.BulletGlobals;
-import com.bulletphysics.collision.broadphase.CollisionFilterGroups;
 import com.bulletphysics.collision.dispatch.CollisionFlags;
 import com.bulletphysics.collision.dispatch.CollisionObject;
 import com.bulletphysics.collision.dispatch.CollisionWorld;
@@ -24,6 +23,7 @@ import com.bulletphysics.collision.dispatch.GhostObject;
 import com.bulletphysics.collision.shapes.CapsuleShape;
 import com.bulletphysics.collision.shapes.ConvexShape;
 import com.bulletphysics.linearmath.Transform;
+import com.google.common.collect.Lists;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.*;
@@ -35,7 +35,9 @@ import org.terasology.events.VerticalCollisionEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.Vector3fUtil;
-import org.terasology.rendering.physics.BulletPhysicsRenderer;
+import org.terasology.physics.BulletPhysics;
+import org.terasology.physics.CollisionGroup;
+import org.terasology.physics.StandardCollisionGroup;
 
 import javax.vecmath.*;
 import java.util.logging.Logger;
@@ -61,12 +63,12 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
 
     private EntityManager entityManager;
     private WorldProvider worldProvider;
-    private BulletPhysicsRenderer physics;
+    private BulletPhysics physics;
 
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
         worldProvider = CoreRegistry.get(WorldProvider.class);
-        physics = CoreRegistry.get(BulletPhysicsRenderer.class);
+        physics = CoreRegistry.get(BulletPhysics.class);
     }
 
     @Override
@@ -92,7 +94,7 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
                 float height = (movementComp.height - 2 * movementComp.radius) * location.getWorldScale();
                 float width = movementComp.radius * location.getWorldScale();
                 ConvexShape capsule = new CapsuleShape(width, height);
-                movementComp.collider = physics.createCollider(location.getWorldPosition(), capsule, CollisionFilterGroups.CHARACTER_FILTER, (short)(CollisionFilterGroups.STATIC_FILTER | CollisionFilterGroups.DEFAULT_FILTER | CollisionFilterGroups.SENSOR_TRIGGER), CollisionFlags.CHARACTER_OBJECT);
+                movementComp.collider = physics.createCollider(location.getWorldPosition(), capsule, Lists.<CollisionGroup>newArrayList(movementComp.collisionGroup), movementComp.collidesWith, CollisionFlags.CHARACTER_OBJECT);
                 movementComp.collider.setUserPointer(entity);
                 capsule.setMargin(0.05f);
             }

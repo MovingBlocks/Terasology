@@ -1,5 +1,5 @@
 /*
- * Copyright 2012
+ * Copyright 2012  Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,10 @@
 
 package org.terasology.physics;
 
-import com.google.common.collect.Lists;
-import org.terasology.entitySystem.Component;
-
-import java.util.List;
-
 /**
  * @author Immortius
  */
-public class TriggerComponent implements Component {
-    public List<CollisionGroup> detectGroups = Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.DEFAULT);
+public interface CollisionGroup {
+    public short getFlag();
+    public String getName();
 }
