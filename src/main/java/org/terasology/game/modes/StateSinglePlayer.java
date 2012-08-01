@@ -336,23 +336,20 @@ public class StateSinglePlayer implements GameState {
 
         try {
             chunkGeneratorManager = new ChunkGeneratorPersister().load(generatorDataFile);
-        } catch (Exception e) {
+        } catch (IOException e) {
             logger.log(Level.SEVERE, "Failed to load generator data", e);
             // TODO Improved exception handling
         }
 
         if (chunkGeneratorManager == null) {
-        	//lets choose the chunk generator
-			switch (Config.getInstance().getChunkGenerator()) {
-			case 1:		//flat
-				chunkGeneratorManager = new ChunkGeneratorManagerImpl();
-				chunkGeneratorManager.registerChunkGenerator(new FlatTerrainGenerator());
-				chunkGeneratorManager.registerChunkGenerator(new FloraGenerator());
-				chunkGeneratorManager.registerChunkGenerator(new LiquidsGenerator());
-				break;
-			default:	//normal
-				chunkGeneratorManager = ChunkGeneratorManagerImpl.getDefaultInstance();
-			}
+            // lets choose the chunk generator
+            switch (Config.getInstance().getChunkGenerator()) {
+            case 1: // flat
+                chunkGeneratorManager = ChunkGeneratorManagerImpl.getFlatInstance();
+                break;
+            default: // normal
+                chunkGeneratorManager = ChunkGeneratorManagerImpl.getDefaultInstance();
+            }
 
             try {
                 new ChunkGeneratorPersister().save(generatorDataFile, chunkGeneratorManager);
