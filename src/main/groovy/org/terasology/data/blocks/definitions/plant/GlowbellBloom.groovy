@@ -19,7 +19,7 @@ import org.terasology.model.blocks.Block.BLOCK_FORM
 import org.terasology.model.blocks.Block.COLOR_SOURCE
 
 /**
- * A flower with an actual name, wee!
+ * A flower that can emit a glow (bloomed version)
  * @author (art) eleazzaar
  */
 block {

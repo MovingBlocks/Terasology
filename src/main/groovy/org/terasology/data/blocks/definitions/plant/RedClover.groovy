@@ -19,7 +19,7 @@ import org.terasology.model.blocks.Block.BLOCK_FORM
 import org.terasology.model.blocks.Block.COLOR_SOURCE
 
 /**
- * A flower with an actual name, wee!
+ * Maybe you can find a four leaf clover among these?
  * @author (art) eleazzaar
  */
 block {

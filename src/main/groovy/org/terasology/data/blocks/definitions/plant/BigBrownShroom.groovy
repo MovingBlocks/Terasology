@@ -19,7 +19,7 @@ import org.terasology.model.blocks.Block.BLOCK_FORM
 import org.terasology.model.blocks.Block.COLOR_SOURCE
 
 /**
- * A flower with an actual name, wee!
+ * Like a normal shroom, just bigger and brown
  * @author (art) eleazzaar
  */
 block {

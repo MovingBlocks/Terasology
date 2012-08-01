@@ -19,7 +19,7 @@ import org.terasology.model.blocks.Block.BLOCK_FORM
 import org.terasology.model.blocks.Block.COLOR_SOURCE
 
 /**
- * A flower with an actual name, wee!
+ * Cotton in various stages of its life-cycle
  * @author (art) eleazzaar
  */
 block {
