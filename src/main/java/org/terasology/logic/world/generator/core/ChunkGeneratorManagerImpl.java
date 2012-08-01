@@ -39,8 +39,7 @@ public class ChunkGeneratorManagerImpl implements ChunkGeneratorManager {
     private String worldSeed;
     private WorldBiomeProvider biomeProvider;
     private final List<ChunkGenerator> chunkGenerators = Lists.newArrayList();
-    private final List<SecondPassChunkGenerator> secondPassChunkGenerators = Lists
-            .newArrayList();
+    private final List<SecondPassChunkGenerator> secondPassChunkGenerators = Lists.newArrayList();
 
     public ChunkGeneratorManagerImpl() {
     }
@@ -48,6 +47,18 @@ public class ChunkGeneratorManagerImpl implements ChunkGeneratorManager {
     public static ChunkGeneratorManagerImpl getDefaultInstance() {
         final ChunkGeneratorManagerImpl chunkGeneratorManager = new ChunkGeneratorManagerImpl();
         chunkGeneratorManager.registerChunkGenerator(new PerlinTerrainGenerator());
+        chunkGeneratorManager.registerChunkGenerator(new FloraGenerator());
+        chunkGeneratorManager.registerChunkGenerator(new LiquidsGenerator());
+        final ForestGenerator forestGen = new ForestGenerator();
+        new DefaultGenerators(forestGen);
+        chunkGeneratorManager.registerChunkGenerator(forestGen);
+
+        return chunkGeneratorManager;
+    }
+
+    public static ChunkGeneratorManagerImpl getFlatInstance() {
+        final ChunkGeneratorManagerImpl chunkGeneratorManager = new ChunkGeneratorManagerImpl();
+        chunkGeneratorManager.registerChunkGenerator(new FlatTerrainGenerator());
         chunkGeneratorManager.registerChunkGenerator(new FloraGenerator());
         chunkGeneratorManager.registerChunkGenerator(new LiquidsGenerator());
         final ForestGenerator forestGen = new ForestGenerator();
