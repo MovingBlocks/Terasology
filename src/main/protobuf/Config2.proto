@@ -20,6 +20,7 @@ message Setting {
         optional sint64 initial_time_offset_in_ms = 9 [default = 60000];
         optional Origin spawn_origin = 10;
         optional string default_seed = 11 [default = "Blockmaina42"];
+        optional int32 chunk_generator = 12 [default = 0];
     }
 
     message DebugInfo {

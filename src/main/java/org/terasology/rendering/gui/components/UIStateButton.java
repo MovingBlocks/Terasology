@@ -86,7 +86,8 @@ public class UIStateButton extends UIButton {
 	    	getLabel().setText(_states.get(stateID).first);
 	    	_currentState = stateID;
 	    	
-	    	_states.get(stateID).second.action(this);
+	    	if (_states.get(stateID).second != null)
+	    		_states.get(stateID).second.action(this);
     	}
     }
     
