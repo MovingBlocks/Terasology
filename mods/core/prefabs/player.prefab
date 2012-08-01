@@ -18,9 +18,10 @@
         "radius" : 0.3
     },
     "BoxShape" : {
-        "extents" : [0.6, 1.6, 0.6]
+        "extents" : [1.5, 1.6, 1.5]
     },
     "Trigger" : {
+        "detectGroups" : ["engine:debris"]
     },
     "CharacterSound" : {
         "footstepSounds" : ["engine:FootGrass1","engine:FootGrass2","engine:FootGrass3","engine:FootGrass4","engine:FootGrass5"]

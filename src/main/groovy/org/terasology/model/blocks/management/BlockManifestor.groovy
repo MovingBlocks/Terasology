@@ -1,5 +1,3 @@
-package org.terasology.model.blocks.management
-
 /*
  * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
@@ -15,6 +13,7 @@ package org.terasology.model.blocks.management
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.model.blocks.management
 
 import groovy.util.logging.Log
 import org.terasology.math.Rotation

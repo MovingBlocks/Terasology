@@ -16,11 +16,14 @@
 
 package org.terasology.physics;
 
+import com.google.common.collect.Lists;
 import org.terasology.entitySystem.Component;
+
+import java.util.List;
 
 /**
  * @author Immortius
  */
 public class TriggerComponent implements Component {
-    // TODO: Flags
+    public List<CollisionGroup> detectGroups = Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.DEFAULT);
 }

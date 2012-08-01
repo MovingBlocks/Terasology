@@ -186,7 +186,7 @@ public class Block {
      * @param hum  The humidity
      * @return The color value
      */
-    public Vector4f calcColorForTemperatureAndHumidity(double temp, double hum) {
+    public static Vector4f calcColorForTemperatureAndHumidity(double temp, double hum) {
         hum *= temp;
         int rgbValue = _colorLut.getRGB((int) ((1.0 - temp) * 255.0), (int) ((1.0 - hum) * 255.0));
 
@@ -201,7 +201,7 @@ public class Block {
      * @param hum  The humidity
      * @return The color value
      */
-    public Vector4f calcFoliageColorForTemperatureAndHumidity(double temp, double hum) {
+    public static Vector4f calcFoliageColorForTemperatureAndHumidity(double temp, double hum) {
         hum *= temp;
         int rgbValue = _foliageLut.getRGB((int) ((1.0 - temp) * 255.0), (int) ((1.0 - hum) * 255.0));
 

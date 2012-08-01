@@ -172,6 +172,14 @@ public final class Config {
     public void setDefaultSeed(String defaultSeed) {
         _setting.getWorldBuilder().setDefaultSeed(defaultSeed);
     }
+    
+    public int getChunkGenerator() {
+        return _setting.getWorldBuilder().getChunkGenerator();
+    }
+
+    public void setChunkGenerator(int chunkGenerator) {
+        _setting.getWorldBuilder().setChunkGenerator(chunkGenerator);
+    }
 
     public boolean isDebug() {
         return _setting.getDebugInfoBuilder().getDebug();
