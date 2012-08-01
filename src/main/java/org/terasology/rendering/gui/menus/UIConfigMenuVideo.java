@@ -138,6 +138,8 @@ public class UIConfigMenuVideo extends UIDisplayWindow {
 					Config.getInstance().setAnimatedGrass(false);
 				else
 					Config.getInstance().setAnimatedGrass(true);
+
+                ShaderManager.getInstance().recompileAllShaders();
 			}
 		};
 		_animateGrassButton.addState("Animate Grass: Off", animateGrassStateAction);
@@ -154,6 +156,8 @@ public class UIConfigMenuVideo extends UIDisplayWindow {
 					Config.getInstance().setComplexWater(false);
 				else
 					Config.getInstance().setComplexWater(true);
+
+                ShaderManager.getInstance().recompileAllShaders();
 			}
 		};
         _reflectiveWaterButton.addState("Reflective water: Off", reflectiveWaterStateAction);
