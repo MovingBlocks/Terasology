@@ -33,6 +33,7 @@ import org.terasology.logic.world.generator.core.ChunkGeneratorManager;
  * 
  * @author Mathias Kalb
  */
+// TODO: This should possibly be saved in the WorldManifest, or perhaps in a protobuf world data file along with the block manifest and chunks? Review as part of mod arc.
 public class ChunkGeneratorPersister {
 
     private final Logger logger = Logger.getLogger(getClass().getName());
@@ -59,17 +60,19 @@ public class ChunkGeneratorPersister {
     }
 
     public ChunkGeneratorManager load(final File file) throws IOException {
-        final FileInputStream in = new FileInputStream(file);
         ChunkGeneratorManager chunkGeneratorManager = null;
-        try {
-            final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
-            chunkGeneratorManager = ChunkGeneratorJSONFormat.read(bufferedReader);
-        } finally {
-            // JAVA7: Replace with improved resource handling
+        if (file.exists()) {
+            final FileInputStream in = new FileInputStream(file);
             try {
-                in.close();
-            } catch (final IOException e) {
-                logger.log(Level.SEVERE, "Failed to close file", e);
+                final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+                chunkGeneratorManager = ChunkGeneratorJSONFormat.read(bufferedReader);
+            } finally {
+                // JAVA7: Replace with improved resource handling
+                try {
+                    in.close();
+                } catch (final IOException e) {
+                    logger.log(Level.SEVERE, "Failed to close file", e);
+                }
             }
         }
         return chunkGeneratorManager;
