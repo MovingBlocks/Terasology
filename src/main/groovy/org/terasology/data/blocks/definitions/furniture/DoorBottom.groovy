@@ -18,5 +18,6 @@ package org.terasology.data.blocks.definitions.furniture
 
 block {
     version = 1
+    shape = "engine:door"
     alignment = "HorizontalDirection"
 }
