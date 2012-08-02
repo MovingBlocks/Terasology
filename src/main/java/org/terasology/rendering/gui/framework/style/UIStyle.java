@@ -28,14 +28,14 @@ import javax.vecmath.Vector2f;
 public class UIStyle extends UIDisplayContainer {
 
     //background
-    private UIPropertyBackground _background = new UIPropertyBackground();
+    private UIPropertyBackground _background;
     //borders
-    UIPropertyBorder _border = new UIPropertyBorder();
+    UIPropertyBorder _border;
 
     public UIStyle(Vector2f size) {
+        _border = new UIPropertyBorder();
+        _background = new UIPropertyBackground();
         setSize(size);
-        _background.setSize(getSize());
-        _border.setSize(getSize());
         addDisplayElement(_background);
         addDisplayElement(_border);
     }
@@ -59,6 +59,12 @@ public class UIStyle extends UIDisplayContainer {
         value = value.trim();
         value = value.replaceAll("[ ]+", " ");
         return value;
+    }
+
+    public void setSize(Vector2f size){
+        super.setSize(size);
+        _background.setSize(size);
+        _border.setSize(size);
     }
 
 }
