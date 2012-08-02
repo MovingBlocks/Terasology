@@ -173,12 +173,15 @@ public final class Config {
         _setting.getWorldBuilder().setDefaultSeed(defaultSeed);
     }
     
-    public int getChunkGenerator() {
-        return _setting.getWorldBuilder().getChunkGenerator();
+    public List<String> getChunkGenerator() {
+        return _setting.getWorldBuilder().getChunkGeneratorList();
     }
 
-    public void setChunkGenerator(int chunkGenerator) {
-        _setting.getWorldBuilder().setChunkGenerator(chunkGenerator);
+    public void setChunkGenerator(String[] list) {
+    	_setting.getWorldBuilder().clearChunkGenerator();
+        for (int i = 0; i < list.length; i++) {
+        	_setting.getWorldBuilder().addChunkGenerator(list[i]);
+		}
     }
 
     public boolean isDebug() {

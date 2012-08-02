@@ -96,7 +96,8 @@ public class UIConfigMenuControls extends UIDisplayWindow {
             Toolslot7Button,
             Toolslot8Button,
             Toolslot9Button,
-            UsehelditemButton;
+            UsehelditemButton,
+            defaultButton;
 
     final UIText subtitle;
 
@@ -144,7 +145,7 @@ public class UIConfigMenuControls extends UIDisplayWindow {
         LeftButton.addClickListener(editButtonClick);
         LeftButton.setVisible(true);
         JumpbehaviourButton = new UIButton(new Vector2f(64f, 32f));
-        JumpbehaviourButton.getLabel().setText("");
+        JumpbehaviourButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyJumpbehaviour()));
         JumpbehaviourButton.addClickListener(editButtonClick);
         JumpbehaviourButton.setVisible(true);
         AttackButton = new UIButton(new Vector2f(64f, 32f));
@@ -235,6 +236,43 @@ public class UIConfigMenuControls extends UIDisplayWindow {
         UsehelditemButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyUsehelditem()));
         UsehelditemButton.addClickListener(editButtonClick);
         UsehelditemButton.setVisible(true);
+        defaultButton = new UIButton(new Vector2f(80f, 32f));
+        defaultButton.getLabel().setText("Default");
+        defaultButton.setVisible(true);
+        defaultButton.addClickListener(new IClickListener() {	
+			@Override
+			public void clicked(UIDisplayElement element) {
+				InputConfig.getInstance().loadDefaultConfig();
+				
+		        ForwardButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyForward()));
+		        BackwardButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyBackward()));
+		        RightButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyRight()));
+		        LeftButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyLeft()));
+		        JumpbehaviourButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyJumpbehaviour()));
+		        AttackButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyAttack()));
+		        ConsoleButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyConsole()));
+		        CrouchButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyCrouch()));
+		        ActivateButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyFrob()));
+		        HideguiButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyHidegui()));
+		        InventoryButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyInventory()));
+		        JumpButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyJump()));
+		        MinionmodeButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyMinionmode()));
+		        PauseButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyPause()));
+		        RunButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyRun()));
+		        ToolnextButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolnext()));
+		        ToolprevButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolprev()));
+		        Toolslot1Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot1()));
+		        Toolslot2Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot2()));
+		        Toolslot3Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot3()));
+		        Toolslot4Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot4()));
+		        Toolslot5Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot5()));
+		        Toolslot6Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot6()));
+		        Toolslot7Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot7()));
+		        Toolslot8Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot8()));
+		        Toolslot9Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot9()));
+		        UsehelditemButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyUsehelditem()));
+			}
+		});
 
         ForwardButtontext = new UIText("Forward");
         BackwardButtontext = new UIText("Backward");
@@ -355,6 +393,7 @@ public class UIConfigMenuControls extends UIDisplayWindow {
         addDisplayElement(Toolslot8Button, "Toolslot8Button");
         addDisplayElement(Toolslot9Button, "Toolslot9Button");
         addDisplayElement(UsehelditemButton, "UsehelditemButton");
+        addDisplayElement(defaultButton, "defaultButton");
         update();
     }
     
@@ -407,6 +446,8 @@ public class UIConfigMenuControls extends UIDisplayWindow {
 			InputConfig.getInstance().setKeyAttack(key);
 		else if (button == ConsoleButton)
 			InputConfig.getInstance().setKeyConsole(key);
+		else if (button == CrouchButton)
+			InputConfig.getInstance().setKeyCrouch(key);
 		else if (button == ActivateButton)
 			InputConfig.getInstance().setKeyForward(key);
 		else if (button == HideguiButton)
@@ -443,6 +484,8 @@ public class UIConfigMenuControls extends UIDisplayWindow {
 			InputConfig.getInstance().setKeyToolslot8(key);
 		else if (button == Toolslot9Button)
 			InputConfig.getInstance().setKeyToolslot9(key);
+		else if (button == UsehelditemButton)
+			InputConfig.getInstance().setKeyUsehelditem(key);
 		else {
 			editButton.getLabel().setText(editButtonCurrent);
 			return;
@@ -503,6 +546,9 @@ public class UIConfigMenuControls extends UIDisplayWindow {
         ToolprevButtontext.getPosition().y = 200f + 8 * 40f + marginTextTop;
         ToolprevButton.getPosition().x = center - 3 * rowWidth;
         ToolprevButton.getPosition().y = 200f + 8 * 40f;
+        
+        defaultButton.getPosition().x = center - 4 * rowWidth;
+        defaultButton.getPosition().y = 300f + 7 * 40f;
 
         //row 2
         ActivateButtontext.getPosition().x = center - 2 * rowWidth;   // (frob)
@@ -613,6 +659,7 @@ public class UIConfigMenuControls extends UIDisplayWindow {
     
     private String keyToStrShort(int key) {
     	if (key < 256) {
+    		//replace the names of the buttons which are to long with shorter names here.. i am just to lazy :D
             return Keyboard.getKeyName(key);
         } else {
             if (key == 256) {

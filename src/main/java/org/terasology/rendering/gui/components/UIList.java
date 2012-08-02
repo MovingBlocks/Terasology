@@ -35,7 +35,7 @@ import java.util.List;
 
 public class UIList extends UIScrollableDisplayContainer implements IInputDataElement {
 
-    private int _selectedItemIndex = -1;
+    protected int _selectedItemIndex = -1;
     private final ArrayList<IClickListener> _doubleClickListeners = new ArrayList<IClickListener>();
 
     //List items
@@ -186,7 +186,7 @@ public class UIList extends UIScrollableDisplayContainer implements IInputDataEl
         return _items.get(_selectedItemIndex);
     }
 
-    /*
+	/*
      * Remove all items
      */
     public void removeAll() {

@@ -47,7 +47,7 @@ public final class InputConfig {
         return loadConfig(new File(PathManager.getInstance().getWorldPath(), "lastinput.cfg"));
     }
 
-    private void loadDefaultConfig() {
+    public void loadDefaultConfig() {
         _inputsetting = InputData.InputSetting.newBuilder();
     }
 

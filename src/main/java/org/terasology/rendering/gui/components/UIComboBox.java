@@ -139,6 +139,10 @@ public class UIComboBox extends UIDisplayContainer {
             _baseInput.setValue(_baseList.getSelectedItem().getText());
         }
     }
+    
+    public int getSelectedItemIndex() {
+		return _baseList._selectedItemIndex;
+	}
 
     private void setListStyle(){
         _baseList.setClassStyle("windowSkin", "border-image-top: engine:gui_menu 159/512 1/512 263/512 17/512 2");
