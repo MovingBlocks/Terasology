@@ -446,6 +446,8 @@ public class UIConfigMenuControls extends UIDisplayWindow {
 			InputConfig.getInstance().setKeyAttack(key);
 		else if (button == ConsoleButton)
 			InputConfig.getInstance().setKeyConsole(key);
+		else if (button == CrouchButton)
+			InputConfig.getInstance().setKeyCrouch(key);
 		else if (button == ActivateButton)
 			InputConfig.getInstance().setKeyForward(key);
 		else if (button == HideguiButton)
