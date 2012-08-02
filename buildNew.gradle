@@ -10,7 +10,6 @@ apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
-apply plugin: 'application'
 
 /* Gradle Wrapper ---------------------------------------------------------- */
 /* Uncomment this task and change 'gradleVersion' to create a new wrapper version.
@@ -21,32 +20,29 @@ task wrapper(type: Wrapper) {
 
 /* General: Java/Grooy ----------------------------------------------------- */
 sourceCompatibility = 1.6
-mainClassName = "org.terasology.game.Terasology"
 
 // Compiles everything as groovy, due to java<->groovy interdependencies
+compileJava.enabled = false
+sourceSets.main.groovy.srcDirs = ["src/main/java", "src/main/groovy"]
+
+// Workaround for task "run"
+// TODO find a way to remove this and the bad workaround for JARs
+sourceSets.main.output.resourcesDir = sourceSets.main.output.classesDir
+
 sourceSets {
-    main {
-        java { srcDirs = [] }
-        groovy { srcDirs = ['src/main/java','src/main/groovy'] }
-        output.resourcesDir = output.classesDir // TODO find a way to remove this
-    }
     perfTest
 }
 
-jar {
-    manifest {
-// def manifestClasspath = configurations.runtime.collect { it.getName() }.join(',')
-// def manifestClasspath = 'libs/'+configurations.runtime.collect { it.getName() }.join(' libs/') 
-        attributes("Implementation-Title": project.name, "Main-Class": mainClassName)
-    }
+/* Dependencies/Configurations --------------------------------------------- */
+configurations.compile.transitive = false;
+
+configurations {
+    perfTestCompile.extendsFrom testCompile
 }
 
-/* Dependencies ------------------------------------------------------------ */
 repositories {
     mavenCentral()
 }
-
-configurations.compile.transitive = false;
 
 dependencies {
     groovy group: 'org.codehaus.groovy', name: 'groovy', version: '1.8.7'
@@ -63,10 +59,7 @@ dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
     testCompile group: 'junit', name: 'junit', version: '4.10'
     testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.0'
-    perfTestCompile sourceSets.main.output
-    perfTestCompile configurations.testCompile
-    perfTestCompile sourceSets.test.output
-    perfTestRuntime configurations.testRuntime
+    perfTestCompile sourceSets.main.output // TODO Check why this is needed.
 }
 
 /* Natives ----------------------------------------------------------------- */
@@ -99,8 +92,48 @@ task extractNatives {
     dependsOn extractLinuxNatives
     dependsOn extractMacOSXNatives
 }
+
+/* IDE --------------------------------------------------------------------- */
 ideaModule.dependsOn extractNatives
 eclipseClasspath.dependsOn extractNatives
-run.dependsOn extractNatives
-distZip.dependsOn extractNatives
-installApp.dependsOn extractNatives
+
+/* Tasks ------------------------------------------------------------------- */
+jar {
+    manifest {
+// def manifestClasspath = configurations.runtime.collect { it.getName() }.join(',')
+// def manifestClasspath = 'libs/'+configurations.runtime.collect { it.getName() }.join(' libs/') 
+        attributes("Implementation-Title": project.name, "Main-Class": "org.terasology.game.Terasology")
+    }
+}
+jar.doFirst {
+    sourceSets.main.output.resourcesDir = '/dev/null'
+}
+jar.doLast {
+    sourceSets.main.output.resourcesDir = sourceSets.main.output.classesDir
+}
+
+test {
+    // ignoreFailures: Specifies whether the build should break when the verifications performed by this task fail.
+    ignoreFailures = true
+    // showStandardStreams: makes the standard streams (err and out) visible at console when running tests
+    testLogging.showStandardStreams = true
+    jvmArgs '-Xms512m', '-Xmx1024m', '-XX:MaxPermSize=128m'
+}
+
+// TODO This is not a normal JUnit Test. It should be replaced with a JavaExec task.
+task perfTests(type: Test) {
+    dependsOn cleanPerfTests
+    testLogging.showStandardStreams = true
+    testClassesDir = sourceSets.perfTest.output.classesDir
+    classpath = sourceSets.perfTest.runtimeClasspath
+    jvmArgs '-Xms512m', '-Xmx1024m', '-XX:MaxPermSize=128m'
+}
+
+task run(type:JavaExec) {
+    description = 'Run Terasology'
+    dependsOn extractNatives
+    dependsOn classes
+    main = "org.terasology.game.Terasology"
+    classpath sourceSets.main.output.classesDir
+    classpath configurations.runtime
+}
