@@ -108,9 +108,14 @@ public final class Configuration {
       boolean hasDefaultSeed();
       String getDefaultSeed();
       
-      // optional int32 chunk_generator = 12 [default = 0];
-      boolean hasChunkGenerator();
-      int getChunkGenerator();
+      // repeated string chunk_generator = 12;
+      java.util.List<String> getChunkGeneratorList();
+      int getChunkGeneratorCount();
+      String getChunkGenerator(int index);
+      
+      // optional int32 chunk_generator_flat_height = 13 [default = 50];
+      boolean hasChunkGeneratorFlatHeight();
+      int getChunkGeneratorFlatHeight();
     }
     public static final class World extends
         com.google.protobuf.GeneratedMessage
@@ -683,14 +688,28 @@ public final class Configuration {
         }
       }
       
-      // optional int32 chunk_generator = 12 [default = 0];
+      // repeated string chunk_generator = 12;
       public static final int CHUNK_GENERATOR_FIELD_NUMBER = 12;
-      private int chunkGenerator_;
-      public boolean hasChunkGenerator() {
+      private com.google.protobuf.LazyStringList chunkGenerator_;
+      public java.util.List<String>
+          getChunkGeneratorList() {
+        return chunkGenerator_;
+      }
+      public int getChunkGeneratorCount() {
+        return chunkGenerator_.size();
+      }
+      public String getChunkGenerator(int index) {
+        return chunkGenerator_.get(index);
+      }
+      
+      // optional int32 chunk_generator_flat_height = 13 [default = 50];
+      public static final int CHUNK_GENERATOR_FLAT_HEIGHT_FIELD_NUMBER = 13;
+      private int chunkGeneratorFlatHeight_;
+      public boolean hasChunkGeneratorFlatHeight() {
         return ((bitField0_ & 0x00000400) == 0x00000400);
       }
-      public int getChunkGenerator() {
-        return chunkGenerator_;
+      public int getChunkGeneratorFlatHeight() {
+        return chunkGeneratorFlatHeight_;
       }
       
       private void initFields() {
@@ -704,7 +723,8 @@ public final class Configuration {
         initialTimeOffsetInMs_ = 60000L;
         spawnOrigin_ = org.terasology.protobuf.Configuration.Setting.World.Origin.getDefaultInstance();
         defaultSeed_ = "Blockmaina42";
-        chunkGenerator_ = 0;
+        chunkGenerator_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        chunkGeneratorFlatHeight_ = 50;
       }
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
@@ -748,8 +768,11 @@ public final class Configuration {
         if (((bitField0_ & 0x00000200) == 0x00000200)) {
           output.writeBytes(11, getDefaultSeedBytes());
         }
+        for (int i = 0; i < chunkGenerator_.size(); i++) {
+          output.writeBytes(12, chunkGenerator_.getByteString(i));
+        }
         if (((bitField0_ & 0x00000400) == 0x00000400)) {
-          output.writeInt32(12, chunkGenerator_);
+          output.writeInt32(13, chunkGeneratorFlatHeight_);
         }
         getUnknownFields().writeTo(output);
       }
@@ -800,9 +823,18 @@ public final class Configuration {
           size += com.google.protobuf.CodedOutputStream
             .computeBytesSize(11, getDefaultSeedBytes());
         }
+        {
+          int dataSize = 0;
+          for (int i = 0; i < chunkGenerator_.size(); i++) {
+            dataSize += com.google.protobuf.CodedOutputStream
+              .computeBytesSizeNoTag(chunkGenerator_.getByteString(i));
+          }
+          size += dataSize;
+          size += 1 * getChunkGeneratorList().size();
+        }
         if (((bitField0_ & 0x00000400) == 0x00000400)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeInt32Size(12, chunkGenerator_);
+            .computeInt32Size(13, chunkGeneratorFlatHeight_);
         }
         size += getUnknownFields().getSerializedSize();
         memoizedSerializedSize = size;
@@ -953,8 +985,10 @@ public final class Configuration {
           bitField0_ = (bitField0_ & ~0x00000100);
           defaultSeed_ = "Blockmaina42";
           bitField0_ = (bitField0_ & ~0x00000200);
-          chunkGenerator_ = 0;
+          chunkGenerator_ = com.google.protobuf.LazyStringArrayList.EMPTY;
           bitField0_ = (bitField0_ & ~0x00000400);
+          chunkGeneratorFlatHeight_ = 50;
+          bitField0_ = (bitField0_ & ~0x00000800);
           return this;
         }
         
@@ -1037,10 +1071,16 @@ public final class Configuration {
             to_bitField0_ |= 0x00000200;
           }
           result.defaultSeed_ = defaultSeed_;
-          if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
-            to_bitField0_ |= 0x00000400;
+          if (((bitField0_ & 0x00000400) == 0x00000400)) {
+            chunkGenerator_ = new com.google.protobuf.UnmodifiableLazyStringList(
+                chunkGenerator_);
+            bitField0_ = (bitField0_ & ~0x00000400);
           }
           result.chunkGenerator_ = chunkGenerator_;
+          if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
+            to_bitField0_ |= 0x00000400;
+          }
+          result.chunkGeneratorFlatHeight_ = chunkGeneratorFlatHeight_;
           result.bitField0_ = to_bitField0_;
           onBuilt();
           return result;
@@ -1087,8 +1127,18 @@ public final class Configuration {
           if (other.hasDefaultSeed()) {
             setDefaultSeed(other.getDefaultSeed());
           }
-          if (other.hasChunkGenerator()) {
-            setChunkGenerator(other.getChunkGenerator());
+          if (!other.chunkGenerator_.isEmpty()) {
+            if (chunkGenerator_.isEmpty()) {
+              chunkGenerator_ = other.chunkGenerator_;
+              bitField0_ = (bitField0_ & ~0x00000400);
+            } else {
+              ensureChunkGeneratorIsMutable();
+              chunkGenerator_.addAll(other.chunkGenerator_);
+            }
+            onChanged();
+          }
+          if (other.hasChunkGeneratorFlatHeight()) {
+            setChunkGeneratorFlatHeight(other.getChunkGeneratorFlatHeight());
           }
           this.mergeUnknownFields(other.getUnknownFields());
           return this;
@@ -1175,9 +1225,14 @@ public final class Configuration {
                 defaultSeed_ = input.readBytes();
                 break;
               }
-              case 96: {
-                bitField0_ |= 0x00000400;
-                chunkGenerator_ = input.readInt32();
+              case 98: {
+                ensureChunkGeneratorIsMutable();
+                chunkGenerator_.add(input.readBytes());
+                break;
+              }
+              case 104: {
+                bitField0_ |= 0x00000800;
+                chunkGeneratorFlatHeight_ = input.readInt32();
                 break;
               }
             }
@@ -1495,23 +1550,79 @@ public final class Configuration {
           onChanged();
         }
         
-        // optional int32 chunk_generator = 12 [default = 0];
-        private int chunkGenerator_ ;
-        public boolean hasChunkGenerator() {
-          return ((bitField0_ & 0x00000400) == 0x00000400);
+        // repeated string chunk_generator = 12;
+        private com.google.protobuf.LazyStringList chunkGenerator_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        private void ensureChunkGeneratorIsMutable() {
+          if (!((bitField0_ & 0x00000400) == 0x00000400)) {
+            chunkGenerator_ = new com.google.protobuf.LazyStringArrayList(chunkGenerator_);
+            bitField0_ |= 0x00000400;
+           }
         }
-        public int getChunkGenerator() {
-          return chunkGenerator_;
+        public java.util.List<String>
+            getChunkGeneratorList() {
+          return java.util.Collections.unmodifiableList(chunkGenerator_);
         }
-        public Builder setChunkGenerator(int value) {
-          bitField0_ |= 0x00000400;
-          chunkGenerator_ = value;
+        public int getChunkGeneratorCount() {
+          return chunkGenerator_.size();
+        }
+        public String getChunkGenerator(int index) {
+          return chunkGenerator_.get(index);
+        }
+        public Builder setChunkGenerator(
+            int index, String value) {
+          if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureChunkGeneratorIsMutable();
+          chunkGenerator_.set(index, value);
+          onChanged();
+          return this;
+        }
+        public Builder addChunkGenerator(String value) {
+          if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureChunkGeneratorIsMutable();
+          chunkGenerator_.add(value);
+          onChanged();
+          return this;
+        }
+        public Builder addAllChunkGenerator(
+            java.lang.Iterable<String> values) {
+          ensureChunkGeneratorIsMutable();
+          super.addAll(values, chunkGenerator_);
           onChanged();
           return this;
         }
         public Builder clearChunkGenerator() {
+          chunkGenerator_ = com.google.protobuf.LazyStringArrayList.EMPTY;
           bitField0_ = (bitField0_ & ~0x00000400);
-          chunkGenerator_ = 0;
+          onChanged();
+          return this;
+        }
+        void addChunkGenerator(com.google.protobuf.ByteString value) {
+          ensureChunkGeneratorIsMutable();
+          chunkGenerator_.add(value);
+          onChanged();
+        }
+        
+        // optional int32 chunk_generator_flat_height = 13 [default = 50];
+        private int chunkGeneratorFlatHeight_ = 50;
+        public boolean hasChunkGeneratorFlatHeight() {
+          return ((bitField0_ & 0x00000800) == 0x00000800);
+        }
+        public int getChunkGeneratorFlatHeight() {
+          return chunkGeneratorFlatHeight_;
+        }
+        public Builder setChunkGeneratorFlatHeight(int value) {
+          bitField0_ |= 0x00000800;
+          chunkGeneratorFlatHeight_ = value;
+          onChanged();
+          return this;
+        }
+        public Builder clearChunkGeneratorFlatHeight() {
+          bitField0_ = (bitField0_ & ~0x00000800);
+          chunkGeneratorFlatHeight_ = 50;
           onChanged();
           return this;
         }
@@ -6284,12 +6395,12 @@ public final class Configuration {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\rConfig2.proto\022\010protobuf\"\254\017\n\007Setting\022&\n" +
+      "\n\rConfig2.proto\022\010protobuf\"\322\017\n\007Setting\022&\n" +
       "\005world\030\001 \001(\0132\027.protobuf.Setting.World\022(\n" +
       "\006player\030\002 \001(\0132\030.protobuf.Setting.Player\022" +
       "(\n\006system\030\003 \001(\0132\030.protobuf.Setting.Syste" +
       "m\022/\n\ndebug_info\030\004 \001(\0132\033.protobuf.Setting" +
-      ".DebugInfo\022\022\n\nactive_mod\030\005 \003(\t\032\322\003\n\005World" +
+      ".DebugInfo\022\022\n\nactive_mod\030\005 \003(\t\032\370\003\n\005World" +
       "\022\036\n\013world_title\030\001 \001(\t:\tNew World\022!\n\024fore" +
       "st_grass_density\030\002 \001(\002:\0030.3\022!\n\024plains_gr" +
       "ass_density\030\003 \001(\002:\0030.2\022!\n\022snow_grass_den" +
@@ -6299,42 +6410,43 @@ public final class Configuration {
       "\001(\022:\0071800000\022(\n\031initial_time_offset_in_m" +
       "s\030\t \001(\022:\00560000\0224\n\014spawn_origin\030\n \001(\0132\036.p" +
       "rotobuf.Setting.World.Origin\022\"\n\014default_" +
-      "seed\030\013 \001(\t:\014Blockmaina42\022\032\n\017chunk_genera" +
-      "tor\030\014 \001(\005:\0010\032-\n\006Origin\022\021\n\001x\030\001 \001(\002:\006-2442" +
-      "9\022\020\n\001y\030\002 \001(\002:\00520547\032\316\001\n\tDebugInfo\022\024\n\005deb" +
-      "ug\030\001 \001(\010:\005false\022\036\n\017debug_collision\030\002 \001(\010" +
-      ":\005false\022*\n\033render_chunk_bounding_boxes\030\003",
-      " \001(\010:\005false\022\032\n\013demo_flight\030\004 \001(\010:\005false\022" +
-      "\037\n\021demo_flight_speed\030\005 \001(\002:\0040.08\022\"\n\023DEPR" +
-      "ECATED_god_mode\030\006 \001(\010:\005false\032\226\001\n\006Player\022" +
-      "\020\n\003fov\030\001 \001(\002:\003100\022\031\n\nmouse_sens\030\002 \001(\002:\0050" +
-      ".075\022\034\n\016camera_bobbing\030\003 \001(\010:\004true\022&\n\030re" +
-      "nder_first_person_view\030\004 \001(\010:\004true\022\031\n\013pl" +
-      "acing_box\030\005 \001(\010:\004true\032\240\007\n\006System\022\032\n\rmax_" +
-      "particles\030\001 \001(\005:\003256\022;\n\020cloud_resolution" +
-      "\030\002 \001(\0132!.protobuf.Setting.System.CloudRe" +
-      "s\022#\n\025cloud_update_interval\030\003 \001(\005:\0048000\022\026",
-      "\n\013max_threads\030\004 \001(\005:\0012\022\031\n\013save_chunks\030\005 " +
-      "\001(\010:\004true\022\036\n\020chunk_cache_size\030\006 \001(\005:\004204" +
-      "8\022\033\n\016max_chunk_VBOs\030\007 \001(\005:\003512\022\022\n\005gamma\030" +
-      "\010 \001(\002:\0032.2\022\030\n\014pixel_format\030\t \001(\005:\00224\022:\n\014" +
-      "display_mode\030\n \001(\0132$.protobuf.Setting.Sy" +
-      "stem.DisplayMode\022\031\n\nfullscreen\030\013 \001(\010:\005fa" +
-      "lse\022%\n\032active_viewing_distance_id\030\014 \001(\005:" +
-      "\0010\022 \n\025viewing_distance_near\030\r \001(\005:\0018\022%\n\031" +
-      "viewing_distance_moderate\030\016 \001(\005:\00216\022 \n\024v" +
-      "iewing_distance_far\030\017 \001(\005:\00232\022\"\n\026viewing",
-      "_distance_ultra\030\020 \001(\005:\00248\022\037\n\020flickering_" +
-      "light\030\021 \001(\010:\005false\022-\n\036enable_post_proces" +
-      "sing_effects\030\022 \001(\010:\005false\022\035\n\016animated_gr" +
-      "ass\030\023 \001(\010:\005false\022\'\n\034vertical_chunk_mesh_" +
-      "segments\030\024 \001(\005:\0011\022\031\n\016blur_intensity\030\025 \001(" +
-      "\005:\0013\022\037\n\020reflective_water\030\026 \001(\010:\005false\022\031\n" +
-      "\014music_volume\030\027 \001(\005:\003100\022\031\n\014sound_volume" +
-      "\030\030 \001(\005:\003100\032*\n\010CloudRes\022\016\n\001x\030\001 \001(\002:\003512\022" +
-      "\016\n\001y\030\002 \001(\002:\003512\0327\n\013DisplayMode\022\023\n\005width\030" +
-      "\001 \001(\005:\0041280\022\023\n\006height\030\002 \001(\005:\003720B*\n\027org.",
-      "terasology.protobufB\rConfigurationH\001"
+      "seed\030\013 \001(\t:\014Blockmaina42\022\027\n\017chunk_genera" +
+      "tor\030\014 \003(\t\022\'\n\033chunk_generator_flat_height" +
+      "\030\r \001(\005:\00250\032-\n\006Origin\022\021\n\001x\030\001 \001(\002:\006-24429\022" +
+      "\020\n\001y\030\002 \001(\002:\00520547\032\316\001\n\tDebugInfo\022\024\n\005debug" +
+      "\030\001 \001(\010:\005false\022\036\n\017debug_collision\030\002 \001(\010:\005",
+      "false\022*\n\033render_chunk_bounding_boxes\030\003 \001" +
+      "(\010:\005false\022\032\n\013demo_flight\030\004 \001(\010:\005false\022\037\n" +
+      "\021demo_flight_speed\030\005 \001(\002:\0040.08\022\"\n\023DEPREC" +
+      "ATED_god_mode\030\006 \001(\010:\005false\032\226\001\n\006Player\022\020\n" +
+      "\003fov\030\001 \001(\002:\003100\022\031\n\nmouse_sens\030\002 \001(\002:\0050.0" +
+      "75\022\034\n\016camera_bobbing\030\003 \001(\010:\004true\022&\n\030rend" +
+      "er_first_person_view\030\004 \001(\010:\004true\022\031\n\013plac" +
+      "ing_box\030\005 \001(\010:\004true\032\240\007\n\006System\022\032\n\rmax_pa" +
+      "rticles\030\001 \001(\005:\003256\022;\n\020cloud_resolution\030\002" +
+      " \001(\0132!.protobuf.Setting.System.CloudRes\022",
+      "#\n\025cloud_update_interval\030\003 \001(\005:\0048000\022\026\n\013" +
+      "max_threads\030\004 \001(\005:\0012\022\031\n\013save_chunks\030\005 \001(" +
+      "\010:\004true\022\036\n\020chunk_cache_size\030\006 \001(\005:\0042048\022" +
+      "\033\n\016max_chunk_VBOs\030\007 \001(\005:\003512\022\022\n\005gamma\030\010 " +
+      "\001(\002:\0032.2\022\030\n\014pixel_format\030\t \001(\005:\00224\022:\n\014di" +
+      "splay_mode\030\n \001(\0132$.protobuf.Setting.Syst" +
+      "em.DisplayMode\022\031\n\nfullscreen\030\013 \001(\010:\005fals" +
+      "e\022%\n\032active_viewing_distance_id\030\014 \001(\005:\0010" +
+      "\022 \n\025viewing_distance_near\030\r \001(\005:\0018\022%\n\031vi" +
+      "ewing_distance_moderate\030\016 \001(\005:\00216\022 \n\024vie",
+      "wing_distance_far\030\017 \001(\005:\00232\022\"\n\026viewing_d" +
+      "istance_ultra\030\020 \001(\005:\00248\022\037\n\020flickering_li" +
+      "ght\030\021 \001(\010:\005false\022-\n\036enable_post_processi" +
+      "ng_effects\030\022 \001(\010:\005false\022\035\n\016animated_gras" +
+      "s\030\023 \001(\010:\005false\022\'\n\034vertical_chunk_mesh_se" +
+      "gments\030\024 \001(\005:\0011\022\031\n\016blur_intensity\030\025 \001(\005:" +
+      "\0013\022\037\n\020reflective_water\030\026 \001(\010:\005false\022\031\n\014m" +
+      "usic_volume\030\027 \001(\005:\003100\022\031\n\014sound_volume\030\030" +
+      " \001(\005:\003100\032*\n\010CloudRes\022\016\n\001x\030\001 \001(\002:\003512\022\016\n" +
+      "\001y\030\002 \001(\002:\003512\0327\n\013DisplayMode\022\023\n\005width\030\001 ",
+      "\001(\005:\0041280\022\023\n\006height\030\002 \001(\005:\003720B*\n\027org.te" +
+      "rasology.protobufB\rConfigurationH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -6354,7 +6466,7 @@ public final class Configuration {
           internal_static_protobuf_Setting_World_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_protobuf_Setting_World_descriptor,
-              new java.lang.String[] { "WorldTitle", "ForestGrassDensity", "PlainsGrassDensity", "SnowGrassDensity", "MountainGrassDensity", "DesertGrassDensity", "DayNightLengthInMs", "InitialTimeOffsetInMs", "SpawnOrigin", "DefaultSeed", "ChunkGenerator", },
+              new java.lang.String[] { "WorldTitle", "ForestGrassDensity", "PlainsGrassDensity", "SnowGrassDensity", "MountainGrassDensity", "DesertGrassDensity", "DayNightLengthInMs", "InitialTimeOffsetInMs", "SpawnOrigin", "DefaultSeed", "ChunkGenerator", "ChunkGeneratorFlatHeight", },
               org.terasology.protobuf.Configuration.Setting.World.class,
               org.terasology.protobuf.Configuration.Setting.World.Builder.class);
           internal_static_protobuf_Setting_World_Origin_descriptor =

@@ -16,6 +16,8 @@
 
 package org.terasology.logic.world.generator.core;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,17 +57,53 @@ public class ChunkGeneratorManagerImpl implements ChunkGeneratorManager {
 
         return chunkGeneratorManager;
     }
+    
+    public static ChunkGeneratorManagerImpl buildChunkGenerator(List<String> list) {
+    	final ChunkGeneratorManagerImpl chunkGeneratorManager = new ChunkGeneratorManagerImpl();
+    	
+    	for (String generator : list) {
+			try {
+				BaseChunkGenerator chunkGenerator = null;
+				Class<?> [] classParm = null;
+				Object [] objectParm = null;
+				
+				Constructor<?> c = Class.forName(generator).getConstructor(classParm);
+				chunkGenerator = (BaseChunkGenerator) c.newInstance(objectParm);
+				
+				if (chunkGenerator instanceof ForestGenerator) {
+					new DefaultGenerators((ForestGenerator) chunkGenerator);
+				}
+				
+				chunkGeneratorManager.registerChunkGenerator(chunkGenerator);
+				
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			} catch (NoSuchMethodException e) {
+				e.printStackTrace();
+			} catch (SecurityException e) {
+				e.printStackTrace();
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			}
+		}
 
-    public static ChunkGeneratorManagerImpl getFlatInstance() {
-        final ChunkGeneratorManagerImpl chunkGeneratorManager = new ChunkGeneratorManagerImpl();
-        chunkGeneratorManager.registerChunkGenerator(new FlatTerrainGenerator());
-        chunkGeneratorManager.registerChunkGenerator(new FloraGenerator());
-        chunkGeneratorManager.registerChunkGenerator(new LiquidsGenerator());
-        final ForestGenerator forestGen = new ForestGenerator();
-        new DefaultGenerators(forestGen);
-        chunkGeneratorManager.registerChunkGenerator(forestGen);
-
-        return chunkGeneratorManager;
+    	return chunkGeneratorManager;
+    }
+    
+    public String[] getChunkGeneratorsName() {
+    	String[] generators = new String[chunkGenerators.size()];
+    	
+    	for (int i = 0; i < chunkGenerators.size(); i++) {
+    		generators[i] = chunkGenerators.get(0).getClass().getName();
+		}
+    	
+    	return generators;
     }
 
     @Override

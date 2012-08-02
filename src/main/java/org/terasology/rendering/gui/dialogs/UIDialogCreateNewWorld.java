@@ -15,12 +15,20 @@
  */
 package org.terasology.rendering.gui.dialogs;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.newdawn.slick.Color;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.modes.StateSinglePlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.logic.world.generator.core.FlatTerrainGenerator;
+import org.terasology.logic.world.generator.core.FloraGenerator;
+import org.terasology.logic.world.generator.core.ForestGenerator;
+import org.terasology.logic.world.generator.core.PerlinTerrainGenerator;
+import org.terasology.logic.world.liquid.LiquidsGenerator;
 import org.terasology.rendering.gui.components.*;
 import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -103,8 +111,27 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
                 } else {
                     Config.getInstance().setWorldTitle(getWorldName());
                 }
+                
+                List<String> chunkList = new ArrayList<String>();
+				switch (_chunkGenerator.getSelectedItemIndex()) {
+				case 1:   //flat
+					chunkList.add(FlatTerrainGenerator.class.getName());
+					//if (checkboxFlora == selected) ... (pseudo code)
+					chunkList.add(FloraGenerator.class.getName());
+					chunkList.add(LiquidsGenerator.class.getName());
+					chunkList.add(ForestGenerator.class.getName());
+					break;
+
+				default:  //normal
+					chunkList.add(PerlinTerrainGenerator.class.getName());
+					chunkList.add(FloraGenerator.class.getName());
+					chunkList.add(LiquidsGenerator.class.getName());
+					chunkList.add(ForestGenerator.class.getName());
+					break;
+				}
 				
-				Config.getInstance().setChunkGenerator((Integer)_chunkGenerator.getSelectedItem().getValue());
+				String[] chunksListArr = chunkList.toArray(new String[chunkList.size()]);
+				Config.getInstance().setChunkGenerator(chunksListArr);
 				
                 CoreRegistry.get(GameEngine.class).changeState(new StateSinglePlayer(Config.getInstance().getWorldTitle(), Config.getInstance().getDefaultSeed()));
             }
