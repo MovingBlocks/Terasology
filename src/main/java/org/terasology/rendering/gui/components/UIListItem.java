@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.gui.components;
 
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 
@@ -46,6 +48,18 @@ public class UIListItem extends UIDisplayContainer {
 
         addDisplayElement(_label);
 
+    }
+
+    public void update(){
+        if(_isSelected){
+            return;
+        }
+        Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
+        if (intersects(mousePos)) {
+            _label.setColor(Color.orange);
+        }else{
+            _label.setColor(Color.lightGray);
+        }
     }
 
     public Object getValue() {
