@@ -95,16 +95,6 @@ public class ChunkGeneratorManagerImpl implements ChunkGeneratorManager {
 
     	return chunkGeneratorManager;
     }
-    
-    public String[] getChunkGeneratorsName() {
-    	String[] generators = new String[chunkGenerators.size()];
-    	
-    	for (int i = 0; i < chunkGenerators.size(); i++) {
-    		generators[i] = chunkGenerators.get(0).getClass().getName();
-		}
-    	
-    	return generators;
-    }
 
     @Override
     public void setWorldSeed(final String seed) {
