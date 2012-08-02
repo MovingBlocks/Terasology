@@ -17,6 +17,7 @@ package org.terasology.rendering.gui.menus;
 
 import org.terasology.asset.AssetManager;
 import org.terasology.rendering.gui.components.UIButton;
+import org.terasology.rendering.gui.components.UIComboBox;
 import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
@@ -72,6 +73,7 @@ public class UIMainMenu extends UIDisplayWindow {
         addDisplayElement(_configButton, "configButton");
         addDisplayElement(_exitButton, "exitButton");
         addDisplayElement(_singlePlayerButton, "singlePlayerButton");
+
         setModal(true);
 
         update();

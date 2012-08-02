@@ -18,6 +18,8 @@ package org.terasology.rendering.gui.components;
 
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 
+import javax.vecmath.Vector2f;
+
 import static org.lwjgl.opengl.GL11.*;
 
 /**
@@ -26,6 +28,10 @@ import static org.lwjgl.opengl.GL11.*;
  * @author Anton Kireev <adeon.k87@gmail.com>
  */
 public class UITextCursor extends UIDisplayElement {
+
+    public UITextCursor(){
+        setSize(new Vector2f(2f,15f));
+    }
 
     public void render() {
         glPushMatrix();

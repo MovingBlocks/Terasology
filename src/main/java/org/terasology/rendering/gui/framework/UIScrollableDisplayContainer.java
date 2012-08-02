@@ -98,6 +98,14 @@ public class UIScrollableDisplayContainer extends UIDisplayContainer {
         super.render();
     }
 
+    public UIScrollBar getScrollBarVertival(){
+        return _scrollBarVertical;
+    }
+
+    public UIScrollBar getScrollBarHorizontal(){
+        return _scrollBarHorizontal;
+    }
+
     public void update() {
 
         Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());

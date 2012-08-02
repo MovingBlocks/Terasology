@@ -97,6 +97,10 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     public void update() {
         if (!isVisible())
             return;
+        
+        /*if(_style != null && (_style.getSize().y != getSize().y || _style.getSize().x != getSize().x)){
+            _style.setSize(getSize());
+        }  */
 
         // Update all display elements
         for (int i = 0; i < _displayElements.size(); i++) {
@@ -194,7 +198,14 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * Set style with tag(style class)
      */
     public void setClassStyle(String className, String value) {
-        UIStyle style = new UIStyle(getSize());
+        UIStyle style = null;
+
+        if(_styleClasses.containsKey(className)){
+            style = _styleClasses.get(className);
+        }else{
+            style = new UIStyle(getSize());
+        }
+
         style.setPosition(new Vector2f(0f, 0f));
         style.setVisible(true);
         style.setCroped(false);
