@@ -83,32 +83,35 @@ public class UIConfigMenu extends UIDisplayWindow {
         addDisplayElement(_controlsButton, "controlsButton");
         addDisplayElement(_modsButton, "modsButton");
         addDisplayElement(_backToMainMenuButton, "backToMainMenuButton");
-        update();
+
+        layout();
     }
-
+    
     @Override
-    public void update() {
-        super.update();
-
-        _version.centerHorizontally();
-        _version.getPosition().y = 230f;
-
-        _videoButton.centerHorizontally();
-        _videoButton.getPosition().y = 300f;
-
-        _audioButton.centerHorizontally();
-        _audioButton.getPosition().y = 300f + 40f;
-
-        _controlsButton.centerHorizontally();
-        _controlsButton.getPosition().y = 300f + 2 * 40f;
-
-        _modsButton.centerHorizontally();
-        _modsButton.getPosition().y = 300f + 3 * 40f;
-
-        _backToMainMenuButton.centerHorizontally();
-        _backToMainMenuButton.getPosition().y = 300f + 7 * 40f;
-
-        _title.centerHorizontally();
-        _title.getPosition().y = 128f;
+    public void layout() {
+    	super.layout();
+    	
+    	if (_version != null) {
+	        _version.centerHorizontally();
+	        _version.getPosition().y = 230f;
+	
+	        _videoButton.centerHorizontally();
+	        _videoButton.getPosition().y = 300f;
+	
+	        _audioButton.centerHorizontally();
+	        _audioButton.getPosition().y = 300f + 40f;
+	
+	        _controlsButton.centerHorizontally();
+	        _controlsButton.getPosition().y = 300f + 2 * 40f;
+	
+	        _modsButton.centerHorizontally();
+	        _modsButton.getPosition().y = 300f + 3 * 40f;
+	
+	        _backToMainMenuButton.centerHorizontally();
+	        _backToMainMenuButton.getPosition().y = 300f + 7 * 40f;
+	
+	        _title.centerHorizontally();
+	        _title.getPosition().y = 128f;
+    	}
     }
 }

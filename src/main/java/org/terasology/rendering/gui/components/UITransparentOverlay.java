@@ -54,6 +54,11 @@ public class UITransparentOverlay extends UIDisplayElement {
 
     @Override
     public void update() {
-        setSize(new Vector2f((float) Display.getWidth(), (float) Display.getHeight()));
+        
     }
+
+	@Override
+	public void layout() {
+		setSize(new Vector2f((float) Display.getWidth(), (float) Display.getHeight()));
+	}
 }

@@ -79,6 +79,11 @@ public class UIMinionbarCell extends UIDisplayElement {
             }
         }
     }
+    
+	@Override
+	public void layout() {
+
+	}
 
     @Override
     public void render() {

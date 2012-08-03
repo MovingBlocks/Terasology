@@ -97,14 +97,24 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     public void update() {
         if (!isVisible())
             return;
-        
-        /*if(_style != null && (_style.getSize().y != getSize().y || _style.getSize().x != getSize().x)){
-            _style.setSize(getSize());
-        }  */
+
+        if (Display.wasResized()) {
+        	layout();
+        }
 
         // Update all display elements
         for (int i = 0; i < _displayElements.size(); i++) {
             _displayElements.get(i).update();
+        }
+    }
+    
+    public void layout() {
+        if (!isVisible())
+            return;
+
+        // Update layout of all display elements
+        for (int i = 0; i < _displayElements.size(); i++) {
+            _displayElements.get(i).layout();
         }
     }
 
@@ -238,5 +248,12 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             addtDisplayElementToPosition(0, _style);
         }
         return _style;
+    }
+    
+    @Override
+    public void setSize(Vector2f scale) {
+    	super.setSize(scale);
+    	
+    	layout();
     }
 }

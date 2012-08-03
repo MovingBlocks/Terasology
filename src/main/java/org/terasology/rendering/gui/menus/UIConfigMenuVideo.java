@@ -213,46 +213,46 @@ public class UIConfigMenuVideo extends UIDisplayWindow {
         addDisplayElement(_bobbingButton, "bobbingButton");
         addDisplayElement(_backToConfigMenuButton, "backToConfigMenuButton");
 
-        update();
+        layout();
     }
 
-    // blur =  off, little bit, medium and blind ferret
-
     @Override
-    public void update() {
-        super.update();
+    public void layout() {
+        super.layout();
 
-        _version.centerHorizontally();
-        _version.getPosition().y = 230f;
-
-        _title.centerHorizontally();
-        _title.getPosition().y = 128f;
-        
-        //row 1
-        _graphicsQualityButton.getPosition().x = Display.getWidth() / 2 - _graphicsQualityButton.getSize().x - 10;
-        _graphicsQualityButton.getPosition().y = 300f;
-
-        _viewingDistanceButton.getPosition().x = Display.getWidth() / 2 - _viewingDistanceButton.getSize().x - 10;
-        _viewingDistanceButton.getPosition().y = 300f + 40f;
-
-        _fovButton.getPosition().x = Display.getWidth() / 2 - _fovButton.getSize().x - 10;
-        _fovButton.getPosition().y = 300f + 2 * 40f;
-        
-        _bobbingButton.getPosition().x = Display.getWidth() / 2 - _bobbingButton.getSize().x - 10;
-        _bobbingButton.getPosition().y = 300f + 3 * 40f;
-
-        //row 2
-        _animateGrassButton.getPosition().x = Display.getWidth() / 2 + 10;
-        _animateGrassButton.getPosition().y = 300f;
-
-        _reflectiveWaterButton.getPosition().x = Display.getWidth() / 2 + 10;
-        _reflectiveWaterButton.getPosition().y = 300f + 40f;
-
-        _blurIntensityButton.getPosition().x = Display.getWidth() / 2 + 10;
-        _blurIntensityButton.getPosition().y = 300f + 2 * 40f;
-
-        //back
-        _backToConfigMenuButton.centerHorizontally();
-        _backToConfigMenuButton.getPosition().y = 300f + 7 * 40f;
+        if (_version != null) {
+	        _version.centerHorizontally();
+	        _version.getPosition().y = 230f;
+	
+	        _title.centerHorizontally();
+	        _title.getPosition().y = 128f;
+	        
+	        //row 1
+	        _graphicsQualityButton.getPosition().x = Display.getWidth() / 2 - _graphicsQualityButton.getSize().x - 10;
+	        _graphicsQualityButton.getPosition().y = 300f;
+	
+	        _viewingDistanceButton.getPosition().x = Display.getWidth() / 2 - _viewingDistanceButton.getSize().x - 10;
+	        _viewingDistanceButton.getPosition().y = 300f + 40f;
+	
+	        _fovButton.getPosition().x = Display.getWidth() / 2 - _fovButton.getSize().x - 10;
+	        _fovButton.getPosition().y = 300f + 2 * 40f;
+	        
+	        _bobbingButton.getPosition().x = Display.getWidth() / 2 - _bobbingButton.getSize().x - 10;
+	        _bobbingButton.getPosition().y = 300f + 3 * 40f;
+	
+	        //row 2
+	        _animateGrassButton.getPosition().x = Display.getWidth() / 2 + 10;
+	        _animateGrassButton.getPosition().y = 300f;
+	
+	        _reflectiveWaterButton.getPosition().x = Display.getWidth() / 2 + 10;
+	        _reflectiveWaterButton.getPosition().y = 300f + 40f;
+	
+	        _blurIntensityButton.getPosition().x = Display.getWidth() / 2 + 10;
+	        _blurIntensityButton.getPosition().y = 300f + 2 * 40f;
+	
+	        //back
+	        _backToConfigMenuButton.centerHorizontally();
+	        _backToConfigMenuButton.getPosition().y = 300f + 7 * 40f;
+        }
     }
 }

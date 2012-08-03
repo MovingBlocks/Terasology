@@ -87,11 +87,17 @@ public class UISlider extends UIDisplayContainer {
             setClassStyle("slider");
         }
 
-        // Position the label in the center of the button
-        _label.setPosition(new Vector2f(getSize().x / 2 - _label.getTextWidth() / 2, getSize().y / 2 - _label.getTextHeight() / 2));
-        
         super.update();
     }
+	
+	@Override
+	public void layout() {
+		super.layout();
+		
+		if (_label != null) {
+			_label.setPosition(new Vector2f(getSize().x / 2 - _label.getTextWidth() / 2, getSize().y / 2 - _label.getTextHeight() / 2));
+		}
+	}
     
     private void updateSlider(Vector2f mousePos) {        
 		if (_slider.intersects(mousePos)) {

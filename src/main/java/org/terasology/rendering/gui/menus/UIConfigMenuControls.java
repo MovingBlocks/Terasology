@@ -394,7 +394,8 @@ public class UIConfigMenuControls extends UIDisplayWindow {
         addDisplayElement(Toolslot9Button, "Toolslot9Button");
         addDisplayElement(UsehelditemButton, "UsehelditemButton");
         addDisplayElement(defaultButton, "defaultButton");
-        update();
+        
+        layout();
     }
     
     @Override
@@ -495,165 +496,167 @@ public class UIConfigMenuControls extends UIDisplayWindow {
 	}
 
     @Override
-    public void update() {
-        super.update();
+    public void layout() {
+        super.layout();
 
-        subtitle.centerHorizontally();
-        subtitle.getPosition().y = 130f;
-        
-        float center = Display.getWidth() / 2;
-        float rowWidth = 110;
-        float marginTextTop = 7;
-
-        //row 1
-        ForwardButtontext.getPosition().x = center - 4 * rowWidth;
-        ForwardButtontext.getPosition().y = 200f + marginTextTop;
-        ForwardButton.getPosition().x = center - 3 * rowWidth;
-        ForwardButton.getPosition().y = 200f;
-
-        BackwardButtontext.getPosition().x = center - 4 * rowWidth;
-        BackwardButtontext.getPosition().y = 200f + 40f + marginTextTop;
-        BackwardButton.getPosition().x = center - 3 * rowWidth;
-        BackwardButton.getPosition().y = 200f + 40f;
-
-        LeftButtontext.getPosition().x = center - 4 * rowWidth;
-        LeftButtontext.getPosition().y = 200f + 2 * 40f + marginTextTop;
-        LeftButton.getPosition().x = center - 3 * rowWidth;
-        LeftButton.getPosition().y = 200f + 2 * 40f;
-
-        RightButtontext.getPosition().x = center - 4 * rowWidth;
-        RightButtontext.getPosition().y = 200f + 3 * 40f + marginTextTop;
-        RightButton.getPosition().x = center - 3 * rowWidth;
-        RightButton.getPosition().y = 200f + 3 * 40f;
-
-
-        AttackButtontext.getPosition().x = center - 4 * rowWidth;
-        AttackButtontext.getPosition().y = 200f + 5 * 40f + marginTextTop;
-        AttackButton.getPosition().x = center - 3 * rowWidth;
-        AttackButton.getPosition().y = 200f + 5 * 40f;
-
-        UsehelditemButtontext.getPosition().x = center - 4 * rowWidth;
-        UsehelditemButtontext.getPosition().y = 200f + 6 * 40f + marginTextTop;
-        UsehelditemButton.getPosition().x = center - 3 * rowWidth;
-        UsehelditemButton.getPosition().y = 200f + 6 * 40f;
-
-        ToolnextButtontext.getPosition().x = center - 4 * rowWidth;
-        ToolnextButtontext.getPosition().y = 200f + 7 * 40f + marginTextTop;
-        ToolnextButton.getPosition().x = center - 3 * rowWidth;
-        ToolnextButton.getPosition().y = 200f + 7 * 40f;
-
-        ToolprevButtontext.getPosition().x = center - 4 * rowWidth;
-        ToolprevButtontext.getPosition().y = 200f + 8 * 40f + marginTextTop;
-        ToolprevButton.getPosition().x = center - 3 * rowWidth;
-        ToolprevButton.getPosition().y = 200f + 8 * 40f;
-        
-        defaultButton.getPosition().x = center - 4 * rowWidth;
-        defaultButton.getPosition().y = 300f + 7 * 40f;
-
-        //row 2
-        ActivateButtontext.getPosition().x = center - 2 * rowWidth;   // (frob)
-        ActivateButtontext.getPosition().y = 200f + marginTextTop;   // (frob)
-        ActivateButton.getPosition().x = center - rowWidth;    // (frob)
-        ActivateButton.getPosition().y = 200f;    // (frob)
-
-        InventoryButtontext.getPosition().x = center - 2 * rowWidth;
-        InventoryButtontext.getPosition().y = 200f + 40f + marginTextTop;
-        InventoryButton.getPosition().x = center - rowWidth;
-        InventoryButton.getPosition().y = 200f + 40f;
-
-        JumpButtontext.getPosition().x = center - 2 * rowWidth;
-        JumpButtontext.getPosition().y = 200f + 3 * 40f + marginTextTop;
-        JumpButton.getPosition().x = center - rowWidth;
-        JumpButton.getPosition().y = 200f + 3 * 40f;
-
-        RunButtontext.getPosition().x = center - 2 * rowWidth;
-        RunButtontext.getPosition().y = 200f + 4 * 40f + marginTextTop;
-        RunButton.getPosition().x = center - rowWidth;
-        RunButton.getPosition().y = 200f + 4 * 40f;
-
-        CrouchButtontext.getPosition().x = center - 2 * rowWidth;
-        CrouchButtontext.getPosition().y = 200f + 5 * 40f + marginTextTop;
-        CrouchButton.getPosition().x = center - rowWidth;
-        CrouchButton.getPosition().y = 200f + 5 * 40f;
-
-        PauseButtontext.getPosition().x = center - 2 * rowWidth;
-        PauseButtontext.getPosition().y = 200f + 7 * 40f + marginTextTop;
-        PauseButton.getPosition().x = center - rowWidth;
-        PauseButton.getPosition().y = 200f + 7 * 40f;
-
-        ConsoleButtontext.getPosition().x = center - 2 * rowWidth;
-        ConsoleButtontext.getPosition().y = 200f + 8 * 40f + marginTextTop;
-        ConsoleButton.getPosition().x = center - rowWidth;
-        ConsoleButton.getPosition().y = 200f + 8 * 40f;
-        
-        //row 3
-        HideguiButtontext.getPosition().x = center;
-        HideguiButtontext.getPosition().y = 200f + marginTextTop;
-        HideguiButton.getPosition().x = center + rowWidth;
-        HideguiButton.getPosition().y = 200f;
-
-        JumpbehaviourButtontext.getPosition().x = center;
-        JumpbehaviourButtontext.getPosition().y = 200f + 40f + marginTextTop;
-        JumpbehaviourButton.getPosition().x = center + rowWidth;
-        JumpbehaviourButton.getPosition().y = 200f + 40f;
-
-        MinionmodeButtontext.getPosition().x = center;
-        MinionmodeButtontext.getPosition().y = 200f + 2 * 40f + marginTextTop;
-        MinionmodeButton.getPosition().x = center + rowWidth;
-        MinionmodeButton.getPosition().y = 200f + 2 * 40f;
-        
-        //row 4
-        Toolslot1Buttontext.getPosition().x = center + 2 * rowWidth;
-        Toolslot1Buttontext.getPosition().y = 200f + marginTextTop;
-        Toolslot1Button.getPosition().x = center + 3 * rowWidth;
-        Toolslot1Button.getPosition().y = 200f;
-        
-        Toolslot2Buttontext.getPosition().x = center + 2 * rowWidth;
-        Toolslot2Buttontext.getPosition().y = 200f + 40f + marginTextTop;
-        Toolslot2Button.getPosition().x = center + 3 * rowWidth;
-        Toolslot2Button.getPosition().y = 200f + 40f;
-        
-        Toolslot3Buttontext.getPosition().x = center + 2 * rowWidth;
-        Toolslot3Buttontext.getPosition().y = 200f + 2 * 40f + marginTextTop;
-        Toolslot3Button.getPosition().x = center + 3 * rowWidth;
-        Toolslot3Button.getPosition().y = 200f + 2 * 40f;
-        
-        Toolslot4Buttontext.getPosition().x = center + 2 * rowWidth;
-        Toolslot4Buttontext.getPosition().y = 200f + 3 * 40f + marginTextTop;
-        Toolslot4Button.getPosition().x = center + 3 * rowWidth;
-        Toolslot4Button.getPosition().y = 200f + 3 * 40f;
-        
-        Toolslot5Buttontext.getPosition().x = center + 2 * rowWidth;
-        Toolslot5Buttontext.getPosition().y = 200f + 4 * 40f + marginTextTop;
-        Toolslot5Button.getPosition().x = center + 3 * rowWidth;
-        Toolslot5Button.getPosition().y = 200f + 4 * 40f;
-        
-        Toolslot6Buttontext.getPosition().x = center + 2 * rowWidth;
-        Toolslot6Buttontext.getPosition().y = 200f + 5 * 40f + marginTextTop;
-        Toolslot6Button.getPosition().x = center + 3 * rowWidth;
-        Toolslot6Button.getPosition().y = 200f + 5 * 40f;
-        
-        Toolslot7Buttontext.getPosition().x = center + 2 * rowWidth;
-        Toolslot7Buttontext.getPosition().y = 200f + 6 * 40f + marginTextTop;
-        Toolslot7Button.getPosition().x = center + 3 * rowWidth;
-        Toolslot7Button.getPosition().y = 200f + 6 * 40f;
-        
-        Toolslot8Buttontext.getPosition().x = center + 2 * rowWidth;
-        Toolslot8Buttontext.getPosition().y = 200f + 7 * 40f + marginTextTop;
-        Toolslot8Button.getPosition().x = center + 3 * rowWidth;
-        Toolslot8Button.getPosition().y = 200f + 7 * 40f;
-        
-        Toolslot9Buttontext.getPosition().x = center + 2 * rowWidth;
-        Toolslot9Buttontext.getPosition().y = 200f + 8 * 40f + marginTextTop;
-        Toolslot9Button.getPosition().x = center + 3 * rowWidth;
-        Toolslot9Button.getPosition().y = 200f + 8 * 40f;
-
-        
-        _backToConfigMenuButton.centerHorizontally();
-        _backToConfigMenuButton.getPosition().y = 300f + 7 * 40f;
-
-        title.centerHorizontally();
-        title.getPosition().y = 28f;
+        if (subtitle != null) {
+	        float center = Display.getWidth() / 2;
+	        float rowWidth = 110;
+	        float marginTextTop = 7;
+	        
+	        subtitle.centerHorizontally();
+	        subtitle.getPosition().y = 130f;
+	
+	        //row 1
+	        ForwardButtontext.getPosition().x = center - 4 * rowWidth;
+	        ForwardButtontext.getPosition().y = 200f + marginTextTop;
+	        ForwardButton.getPosition().x = center - 3 * rowWidth;
+	        ForwardButton.getPosition().y = 200f;
+	
+	        BackwardButtontext.getPosition().x = center - 4 * rowWidth;
+	        BackwardButtontext.getPosition().y = 200f + 40f + marginTextTop;
+	        BackwardButton.getPosition().x = center - 3 * rowWidth;
+	        BackwardButton.getPosition().y = 200f + 40f;
+	
+	        LeftButtontext.getPosition().x = center - 4 * rowWidth;
+	        LeftButtontext.getPosition().y = 200f + 2 * 40f + marginTextTop;
+	        LeftButton.getPosition().x = center - 3 * rowWidth;
+	        LeftButton.getPosition().y = 200f + 2 * 40f;
+	
+	        RightButtontext.getPosition().x = center - 4 * rowWidth;
+	        RightButtontext.getPosition().y = 200f + 3 * 40f + marginTextTop;
+	        RightButton.getPosition().x = center - 3 * rowWidth;
+	        RightButton.getPosition().y = 200f + 3 * 40f;
+	
+	
+	        AttackButtontext.getPosition().x = center - 4 * rowWidth;
+	        AttackButtontext.getPosition().y = 200f + 5 * 40f + marginTextTop;
+	        AttackButton.getPosition().x = center - 3 * rowWidth;
+	        AttackButton.getPosition().y = 200f + 5 * 40f;
+	
+	        UsehelditemButtontext.getPosition().x = center - 4 * rowWidth;
+	        UsehelditemButtontext.getPosition().y = 200f + 6 * 40f + marginTextTop;
+	        UsehelditemButton.getPosition().x = center - 3 * rowWidth;
+	        UsehelditemButton.getPosition().y = 200f + 6 * 40f;
+	
+	        ToolnextButtontext.getPosition().x = center - 4 * rowWidth;
+	        ToolnextButtontext.getPosition().y = 200f + 7 * 40f + marginTextTop;
+	        ToolnextButton.getPosition().x = center - 3 * rowWidth;
+	        ToolnextButton.getPosition().y = 200f + 7 * 40f;
+	
+	        ToolprevButtontext.getPosition().x = center - 4 * rowWidth;
+	        ToolprevButtontext.getPosition().y = 200f + 8 * 40f + marginTextTop;
+	        ToolprevButton.getPosition().x = center - 3 * rowWidth;
+	        ToolprevButton.getPosition().y = 200f + 8 * 40f;
+	        
+	        defaultButton.getPosition().x = center - 4 * rowWidth;
+	        defaultButton.getPosition().y = 300f + 7 * 40f;
+	
+	        //row 2
+	        ActivateButtontext.getPosition().x = center - 2 * rowWidth;   // (frob)
+	        ActivateButtontext.getPosition().y = 200f + marginTextTop;   // (frob)
+	        ActivateButton.getPosition().x = center - rowWidth;    // (frob)
+	        ActivateButton.getPosition().y = 200f;    // (frob)
+	
+	        InventoryButtontext.getPosition().x = center - 2 * rowWidth;
+	        InventoryButtontext.getPosition().y = 200f + 40f + marginTextTop;
+	        InventoryButton.getPosition().x = center - rowWidth;
+	        InventoryButton.getPosition().y = 200f + 40f;
+	
+	        JumpButtontext.getPosition().x = center - 2 * rowWidth;
+	        JumpButtontext.getPosition().y = 200f + 3 * 40f + marginTextTop;
+	        JumpButton.getPosition().x = center - rowWidth;
+	        JumpButton.getPosition().y = 200f + 3 * 40f;
+	
+	        RunButtontext.getPosition().x = center - 2 * rowWidth;
+	        RunButtontext.getPosition().y = 200f + 4 * 40f + marginTextTop;
+	        RunButton.getPosition().x = center - rowWidth;
+	        RunButton.getPosition().y = 200f + 4 * 40f;
+	
+	        CrouchButtontext.getPosition().x = center - 2 * rowWidth;
+	        CrouchButtontext.getPosition().y = 200f + 5 * 40f + marginTextTop;
+	        CrouchButton.getPosition().x = center - rowWidth;
+	        CrouchButton.getPosition().y = 200f + 5 * 40f;
+	
+	        PauseButtontext.getPosition().x = center - 2 * rowWidth;
+	        PauseButtontext.getPosition().y = 200f + 7 * 40f + marginTextTop;
+	        PauseButton.getPosition().x = center - rowWidth;
+	        PauseButton.getPosition().y = 200f + 7 * 40f;
+	
+	        ConsoleButtontext.getPosition().x = center - 2 * rowWidth;
+	        ConsoleButtontext.getPosition().y = 200f + 8 * 40f + marginTextTop;
+	        ConsoleButton.getPosition().x = center - rowWidth;
+	        ConsoleButton.getPosition().y = 200f + 8 * 40f;
+	        
+	        //row 3
+	        HideguiButtontext.getPosition().x = center;
+	        HideguiButtontext.getPosition().y = 200f + marginTextTop;
+	        HideguiButton.getPosition().x = center + rowWidth;
+	        HideguiButton.getPosition().y = 200f;
+	
+	        JumpbehaviourButtontext.getPosition().x = center;
+	        JumpbehaviourButtontext.getPosition().y = 200f + 40f + marginTextTop;
+	        JumpbehaviourButton.getPosition().x = center + rowWidth;
+	        JumpbehaviourButton.getPosition().y = 200f + 40f;
+	
+	        MinionmodeButtontext.getPosition().x = center;
+	        MinionmodeButtontext.getPosition().y = 200f + 2 * 40f + marginTextTop;
+	        MinionmodeButton.getPosition().x = center + rowWidth;
+	        MinionmodeButton.getPosition().y = 200f + 2 * 40f;
+	        
+	        //row 4
+	        Toolslot1Buttontext.getPosition().x = center + 2 * rowWidth;
+	        Toolslot1Buttontext.getPosition().y = 200f + marginTextTop;
+	        Toolslot1Button.getPosition().x = center + 3 * rowWidth;
+	        Toolslot1Button.getPosition().y = 200f;
+	        
+	        Toolslot2Buttontext.getPosition().x = center + 2 * rowWidth;
+	        Toolslot2Buttontext.getPosition().y = 200f + 40f + marginTextTop;
+	        Toolslot2Button.getPosition().x = center + 3 * rowWidth;
+	        Toolslot2Button.getPosition().y = 200f + 40f;
+	        
+	        Toolslot3Buttontext.getPosition().x = center + 2 * rowWidth;
+	        Toolslot3Buttontext.getPosition().y = 200f + 2 * 40f + marginTextTop;
+	        Toolslot3Button.getPosition().x = center + 3 * rowWidth;
+	        Toolslot3Button.getPosition().y = 200f + 2 * 40f;
+	        
+	        Toolslot4Buttontext.getPosition().x = center + 2 * rowWidth;
+	        Toolslot4Buttontext.getPosition().y = 200f + 3 * 40f + marginTextTop;
+	        Toolslot4Button.getPosition().x = center + 3 * rowWidth;
+	        Toolslot4Button.getPosition().y = 200f + 3 * 40f;
+	        
+	        Toolslot5Buttontext.getPosition().x = center + 2 * rowWidth;
+	        Toolslot5Buttontext.getPosition().y = 200f + 4 * 40f + marginTextTop;
+	        Toolslot5Button.getPosition().x = center + 3 * rowWidth;
+	        Toolslot5Button.getPosition().y = 200f + 4 * 40f;
+	        
+	        Toolslot6Buttontext.getPosition().x = center + 2 * rowWidth;
+	        Toolslot6Buttontext.getPosition().y = 200f + 5 * 40f + marginTextTop;
+	        Toolslot6Button.getPosition().x = center + 3 * rowWidth;
+	        Toolslot6Button.getPosition().y = 200f + 5 * 40f;
+	        
+	        Toolslot7Buttontext.getPosition().x = center + 2 * rowWidth;
+	        Toolslot7Buttontext.getPosition().y = 200f + 6 * 40f + marginTextTop;
+	        Toolslot7Button.getPosition().x = center + 3 * rowWidth;
+	        Toolslot7Button.getPosition().y = 200f + 6 * 40f;
+	        
+	        Toolslot8Buttontext.getPosition().x = center + 2 * rowWidth;
+	        Toolslot8Buttontext.getPosition().y = 200f + 7 * 40f + marginTextTop;
+	        Toolslot8Button.getPosition().x = center + 3 * rowWidth;
+	        Toolslot8Button.getPosition().y = 200f + 7 * 40f;
+	        
+	        Toolslot9Buttontext.getPosition().x = center + 2 * rowWidth;
+	        Toolslot9Buttontext.getPosition().y = 200f + 8 * 40f + marginTextTop;
+	        Toolslot9Button.getPosition().x = center + 3 * rowWidth;
+	        Toolslot9Button.getPosition().y = 200f + 8 * 40f;
+	
+	        
+	        _backToConfigMenuButton.centerHorizontally();
+	        _backToConfigMenuButton.getPosition().y = 300f + 7 * 40f;
+	
+	        title.centerHorizontally();
+	        title.getPosition().y = 28f;
+        }
     }
     
     

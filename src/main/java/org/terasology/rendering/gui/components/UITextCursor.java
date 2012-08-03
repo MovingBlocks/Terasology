@@ -52,4 +52,9 @@ public class UITextCursor extends UIDisplayElement {
     public void setPositionBySymbol() {
         //setPosition();
     }
+
+	@Override
+	public void layout() {
+
+	}
 }

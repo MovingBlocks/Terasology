@@ -210,6 +210,7 @@ public class GUIManager {
         for (int i = 0; i < size; i++) {
             if (window.equals(_renderer.getDisplayElements().get(i))) {
                 setTopWindow(i);
+                _renderer.layout();
                 return;
             }
         }
