@@ -21,10 +21,10 @@ import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UISlider;
 import org.terasology.rendering.gui.components.UIText;
-import org.terasology.rendering.gui.framework.IChangedListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import org.terasology.rendering.gui.framework.events.IChangedListener;
 
 import javax.vecmath.Vector2f;
 

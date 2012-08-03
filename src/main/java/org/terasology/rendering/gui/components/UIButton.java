@@ -20,8 +20,8 @@ import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.logic.manager.AudioManager;
-import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
+import org.terasology.rendering.gui.framework.events.IClickListener;
 
 import javax.vecmath.Vector2f;
 import java.util.ArrayList;

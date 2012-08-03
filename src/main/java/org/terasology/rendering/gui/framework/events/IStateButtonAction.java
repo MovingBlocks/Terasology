@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.framework;
+package org.terasology.rendering.gui.framework.events;
+
+import org.terasology.rendering.gui.framework.UIDisplayElement;
 
 
 public interface IStateButtonAction {

@@ -27,9 +27,9 @@ import org.terasology.logic.world.WorldInfo;
 import org.terasology.logic.world.WorldUtil;
 import org.terasology.rendering.gui.components.*;
 import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
-import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
+import org.terasology.rendering.gui.framework.events.IClickListener;
 
 import javax.vecmath.Vector2f;
 import java.io.File;

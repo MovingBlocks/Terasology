@@ -24,12 +24,12 @@ import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UISlider;
 import org.terasology.rendering.gui.components.UIStateButton;
 import org.terasology.rendering.gui.components.UIText;
-import org.terasology.rendering.gui.framework.IChangedListener;
-import org.terasology.rendering.gui.framework.IClickListener;
-import org.terasology.rendering.gui.framework.IStateButtonAction;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import org.terasology.rendering.gui.framework.events.IChangedListener;
+import org.terasology.rendering.gui.framework.events.IClickListener;
+import org.terasology.rendering.gui.framework.events.IStateButtonAction;
 
 import javax.vecmath.Vector2f;
 

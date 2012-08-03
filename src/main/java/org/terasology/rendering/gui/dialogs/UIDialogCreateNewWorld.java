@@ -30,8 +30,8 @@ import org.terasology.logic.world.generator.core.ForestGenerator;
 import org.terasology.logic.world.generator.core.PerlinTerrainGenerator;
 import org.terasology.logic.world.liquid.LiquidsGenerator;
 import org.terasology.rendering.gui.components.*;
-import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.events.IClickListener;
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.Vector2f;

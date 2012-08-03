@@ -22,10 +22,10 @@ import org.terasology.logic.manager.InputConfig;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UIText;
-import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import org.terasology.rendering.gui.framework.events.IClickListener;
 
 import javax.vecmath.Vector2f;
 
