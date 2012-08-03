@@ -18,30 +18,69 @@ task wrapper(type: Wrapper) {
 }
 */
 
-/* General: Java/Grooy ----------------------------------------------------- */
-sourceCompatibility = 1.6
-
-// Compiles everything as groovy, due to java<->groovy interdependencies
-compileJava.enabled = false
-sourceSets.main.groovy.srcDirs = ["src/main/java", "src/main/groovy"]
-
-// Workaround for task "run"
-// TODO find a way to remove this and the bad workaround for JARs
-sourceSets.main.output.resourcesDir = sourceSets.main.output.classesDir
-
-sourceSets {
-    perfTest
-}
-
-/* Dependencies/Configurations --------------------------------------------- */
-configurations.compile.transitive = false;
-
-configurations {
-    perfTestCompile.extendsFrom testCompile
+ext {
+   startDateTimeString = new Date().format("yyyy-MM-dd_hh-mm-ss")
+   dirSavedWorlds = 'SAVED_WORLDS'
+   dirNatives = 'natives'
+   mainClassName = "org.terasology.game.Terasology"
 }
 
 repositories {
     mavenCentral()
+}
+
+/* Natives ----------------------------------------------------------------- */
+configurations {
+    natives
+}
+
+dependencies {
+    natives group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: '2.8.3'
+}
+
+task extractWindowsNatives(type:Copy) {
+    from {
+        configurations.natives.collect { it.getName().contains('-natives-window') ? zipTree(it) : [] }
+    }
+    into ("$dirNatives/windows")
+    exclude ('META-INF/**')
+}
+
+task extractMacOSXNatives(type:Copy) {
+    from {
+        configurations.natives.collect { it.getName().contains('-natives-osx') ? zipTree(it) : [] }
+    }
+    into ("$dirNatives/macosx")
+    exclude ('META-INF/**')
+}
+
+task extractLinuxNatives(type:Copy) {
+    from {
+        configurations.natives.collect { it.getName().contains('-natives-linux') ? zipTree(it) : [] }
+    }
+    into ("$dirNatives/linux")
+    exclude ('META-INF/**')
+}
+
+task extractNatives {
+    dependsOn extractWindowsNatives
+    dependsOn extractLinuxNatives
+    dependsOn extractMacOSXNatives
+}
+
+/* Java/Grooy -------------------------------------------------------------- */
+sourceCompatibility = 1.6
+
+// Compiles everything as groovy, due to java<->groovy interdependencies
+compileJava.enabled = false
+sourceSets.main.java.srcDirs.each { sourceSets.main.groovy.srcDirs it }
+
+configurations {
+    compile {
+        transitive = false;
+        exclude module: 'lwjgl-platform'
+        exclude module: 'jinput-platform'
+    }
 }
 
 dependencies {
@@ -59,65 +98,23 @@ dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
     testCompile group: 'junit', name: 'junit', version: '4.10'
     testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.0'
-    perfTestCompile sourceSets.main.output // TODO Check why this is needed.
-}
-
-/* Natives ----------------------------------------------------------------- */
-task extractWindowsNatives(type:Copy) {
-    from {
-        configurations.runtime.collect { it.getName().contains('-natives-window') ? zipTree(it) : [] }
-    }
-    into ('natives/windows')
-    exclude ('META-INF/**')
-}
-
-task extractMacOSXNatives(type:Copy) {
-    from {
-        configurations.runtime.collect { it.getName().contains('-natives-osx') ? zipTree(it) : [] }
-    }
-    into ('natives/macosx')
-    exclude ('META-INF/**')
-}
-
-task extractLinuxNatives(type:Copy) {
-    from {
-        configurations.runtime.collect { it.getName().contains('-natives-linux') ? zipTree(it) : [] }
-    }
-    into ('natives/linux')
-    exclude ('META-INF/**')
-}
-
-task extractNatives {
-    dependsOn extractWindowsNatives
-    dependsOn extractLinuxNatives
-    dependsOn extractMacOSXNatives
 }
 
 /* IDE --------------------------------------------------------------------- */
 ideaModule.dependsOn extractNatives
 eclipseClasspath.dependsOn extractNatives
 
-/* Tasks ------------------------------------------------------------------- */
-jar {
-    manifest {
-// def manifestClasspath = configurations.runtime.collect { it.getName() }.join(',')
-// def manifestClasspath = 'libs/'+configurations.runtime.collect { it.getName() }.join(' libs/') 
-        attributes("Implementation-Title": project.name, "Main-Class": "org.terasology.game.Terasology")
-    }
-}
-jar.doFirst {
-    sourceSets.main.output.resourcesDir = '/dev/null'
-}
-jar.doLast {
-    sourceSets.main.output.resourcesDir = sourceSets.main.output.classesDir
+/* perfTest ----------------------------------------------------------------- */
+sourceSets {
+    perfTest
 }
 
-test {
-    // ignoreFailures: Specifies whether the build should break when the verifications performed by this task fail.
-    ignoreFailures = true
-    // showStandardStreams: makes the standard streams (err and out) visible at console when running tests
-    testLogging.showStandardStreams = true
-    jvmArgs '-Xms512m', '-Xmx1024m', '-XX:MaxPermSize=128m'
+configurations {
+    perfTestCompile.extendsFrom testCompile
+}
+
+dependencies {
+    perfTestCompile sourceSets.main.output
 }
 
 // TODO This is not a normal JUnit Test. It should be replaced with a JavaExec task.
@@ -129,11 +126,48 @@ task perfTests(type: Test) {
     jvmArgs '-Xms512m', '-Xmx1024m', '-XX:MaxPermSize=128m'
 }
 
+/* Tasks ------------------------------------------------------------------- */
+jar {
+    manifest {
+        attributes("Implementation-Title": project.name, "Main-Class": mainClassName)
+    }
+}
+
+test {
+    // ignoreFailures: Specifies whether the build should break when the verifications performed by this task fail.
+    ignoreFailures = true
+    // showStandardStreams: makes the standard streams (err and out) visible at console when running tests
+    testLogging.showStandardStreams = true
+    jvmArgs '-Xms512m', '-Xmx1024m', '-XX:MaxPermSize=128m'
+}
+
+task distLibs(type:Sync) {
+    from configurations.runtime
+    into "$buildDir/dist/libs"
+}
+
+task assembleMainOutput(type:Sync) {
+    from sourceSets.main.output
+    into "$buildDir/mainOutput"
+}
+
 task run(type:JavaExec) {
     description = 'Run Terasology'
     dependsOn extractNatives
-    dependsOn classes
-    main = "org.terasology.game.Terasology"
-    classpath sourceSets.main.output.classesDir
+    dependsOn assembleMainOutput
+    main = mainClassName
+    classpath "$buildDir/mainOutput"
     classpath configurations.runtime
+}
+
+task deleteSavedWorlds(type: Delete) {
+    description = "Delete all saved worlds (subfolders of '$dirSavedWorlds')"
+    delete file(dirSavedWorlds).listFiles().findAll { it.directory }
+}
+
+task zipSavedWorlds(type: Zip) {
+    description = "Zip the content of the folder '$dirSavedWorlds'"
+    appendix = "savedWorlds"
+    classifier = startDateTimeString
+    from dirSavedWorlds
 }
