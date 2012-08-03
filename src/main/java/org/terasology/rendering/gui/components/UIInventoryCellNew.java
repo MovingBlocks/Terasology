@@ -129,6 +129,12 @@ public class UIInventoryCellNew extends UIDisplayElement {
             getLabel().setVisible(false);
         }
     }
+    
+	@Override
+	public void layout() {
+		// TODO Auto-generated method stub
+		
+	}
 
     public void processMouseInput(int button, boolean state, int wheelMoved) {
         if (button == 0 && state && !_mouseUp) {

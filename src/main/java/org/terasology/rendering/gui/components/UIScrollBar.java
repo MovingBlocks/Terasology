@@ -17,8 +17,8 @@ package org.terasology.rendering.gui.components;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import org.terasology.rendering.gui.framework.IScrollListener;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
+import org.terasology.rendering.gui.framework.events.IScrollListener;
 
 import javax.vecmath.Vector2f;
 import java.util.ArrayList;

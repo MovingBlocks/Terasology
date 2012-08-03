@@ -108,4 +108,11 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer {
 
         return _displayElementsById.get(elementId);
     }
+    
+    @Override
+    public void setSize(Vector2f scale) {
+    	super.setSize(scale);
+    	
+    	layout();
+    }
 }

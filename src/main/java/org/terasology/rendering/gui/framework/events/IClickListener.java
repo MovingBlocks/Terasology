@@ -13,14 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.framework;
+package org.terasology.rendering.gui.framework.events;
+
+import org.terasology.rendering.gui.framework.UIDisplayElement;
 
 /**
- * TODO
+ * Notified on click events.
  *
- * @author Anton Kireev <adeon.k87@gmail.com>
+ * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public interface IScrollListener {
-    public void scrolled(UIDisplayElement element);
-}
+public interface IClickListener {
 
+    public void clicked(UIDisplayElement element);
+
+}

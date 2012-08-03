@@ -76,28 +76,30 @@ public class UIMainMenu extends UIDisplayWindow {
 
         setModal(true);
 
-        update();
+        layout();
     }
 
     @Override
-    public void update() {
-        super.update();
+    public void layout() {
+        super.layout();
 
-        _version.centerHorizontally();
-        _version.getPosition().y = 230f;
-
-        _singlePlayerButton.centerHorizontally();
-        _singlePlayerButton.getPosition().y = 300f + 40f;
-
-        _exitButton.centerHorizontally();
-        _exitButton.getPosition().y = 300f + 3 * 32f + 64f;
-        _configButton.centerHorizontally();
-        _configButton.getPosition().y = 300f + 2 * 40f;
-
-        _exitButton.centerHorizontally();
-        _exitButton.getPosition().y = 300f + 4 * 40f;
-
-        _title.centerHorizontally();
-        _title.getPosition().y = 128f;
+        if (_version != null) {
+	        _version.centerHorizontally();
+	        _version.getPosition().y = 230f;
+	
+	        _singlePlayerButton.centerHorizontally();
+	        _singlePlayerButton.getPosition().y = 300f + 40f;
+	
+	        _exitButton.centerHorizontally();
+	        _exitButton.getPosition().y = 300f + 3 * 32f + 64f;
+	        _configButton.centerHorizontally();
+	        _configButton.getPosition().y = 300f + 2 * 40f;
+	
+	        _exitButton.centerHorizontally();
+	        _exitButton.getPosition().y = 300f + 4 * 40f;
+	
+	        _title.centerHorizontally();
+	        _title.getPosition().y = 128f;
+        }
     }
 }
