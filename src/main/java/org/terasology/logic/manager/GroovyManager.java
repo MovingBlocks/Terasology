@@ -22,6 +22,7 @@ import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceException;
 import groovy.util.ScriptException;
 import org.lwjgl.input.Keyboard;
+import org.terasology.components.SimpleAIComponent;
 import org.terasology.components.rendering.MeshComponent;
 import org.terasology.model.blocks.Block;
 import org.terasology.physics.BlockPickupComponent;
@@ -258,6 +259,25 @@ public class GroovyManager {
                 LocationComponent location = player.getEntity().getComponent(LocationComponent.class);
                 if (location != null) {
                     location.setWorldPosition(new Vector3f(x, y, z));
+                }
+            }
+        }
+
+        public void deslime() {
+            EntityManager entityManager = CoreRegistry.get(EntityManager.class);
+            for (EntityRef ref : entityManager.iteratorEntities(SimpleAIComponent.class)) {
+                ref.destroy();;
+            }
+        }
+
+        public void sleigh() {
+            LocalPlayer player = CoreRegistry.get(LocalPlayer.class);
+            if (player != null) {
+                CharacterMovementComponent moveComp = player.getEntity().getComponent(CharacterMovementComponent.class);
+                if (moveComp.slopeFactor > 0.7f) {
+                    moveComp.slopeFactor = 0.6f;
+                } else {
+                    moveComp.slopeFactor = 0.9f;
                 }
             }
         }

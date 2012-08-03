@@ -45,6 +45,7 @@ public final class CharacterMovementComponent implements Component {
 
     // Movement settings
     public float stepHeight = 0.35f;
+    public float slopeFactor = 0.6f; // Cosine of the maximum slope traversable. 1 is no slope, 0 is any slope
 
     // Determines how easily the play can change direction
     // TODO: Separate player agiliy from environmental friction, and ground from air control
