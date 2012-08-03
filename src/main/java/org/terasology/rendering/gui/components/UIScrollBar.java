@@ -225,4 +225,10 @@ public class UIScrollBar extends UIDisplayContainer {
     public void setWheelled(boolean wheelled) {
         _wheelled = wheelled;
     }
+
+    public void resetScrollPosition(){
+        if( !isScrolled( ) ){
+            scrolled((-1) * _scrolBarThumb.getThumbPosition());
+        }
+    }
 }
