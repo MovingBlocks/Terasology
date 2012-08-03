@@ -89,6 +89,13 @@ public class UIComboBox extends UIDisplayContainer {
     public void update(){
         super.update();
         checkSelectedItem();
+
+
+        if(_opened){
+            _baseButton.setClassStyle("button-mouseclick");
+        }else{
+            _baseButton.setClassStyle("button");
+        }
         
         Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
         
@@ -116,7 +123,6 @@ public class UIComboBox extends UIDisplayContainer {
             }
 
         }else{
-            //if(_baseList)
 
             if(_mouseDown && _opened){
                 clicked();
@@ -162,11 +168,11 @@ public class UIComboBox extends UIDisplayContainer {
         _opened = !_opened;
         _baseInput.setFocus(_opened);
         _baseList.setVisible(_opened);
-
-        if(_opened){
-            _baseButton.setClassStyle("button-mouseclick");
-        }else{
-            _baseButton.setClassStyle("button");
+        
+        if( !_opened ){
+            _baseList.getScrollBarHorizontal().resetScrollPosition();
+            _baseList.getScrollBarVertival().resetScrollPosition();
         }
+        
     }
 }
