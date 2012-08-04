@@ -5,9 +5,9 @@
  * - View tasks for this project: $ gradlew tasks
  */
 
-apply plugin: 'project-report'
 apply plugin: 'java'
 apply plugin: 'groovy'
+apply plugin: 'project-report'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 
@@ -19,10 +19,14 @@ task wrapper(type: Wrapper) {
 */
 
 ext {
-   startDateTimeString = new Date().format("yyyy-MM-dd_hh-mm-ss")
-   dirSavedWorlds = 'SAVED_WORLDS'
-   dirNatives = 'natives'
-   mainClassName = "org.terasology.game.Terasology"
+    startDateTimeString = new Date().format("yyyy-MM-dd_hh-mm-ss")
+    dirSavedWorlds = 'SAVED_WORLDS'
+    dirNatives = 'natives'
+    dirData = 'data'
+    destDirLibs = 'libs'
+    destDirMainOutput = 'mainOutput'
+    destDirMods = 'distributions/mods'
+    mainClassName = "org.terasology.game.Terasology"
 }
 
 repositories {
@@ -68,7 +72,7 @@ task extractNatives {
     dependsOn extractMacOSXNatives
 }
 
-/* Java/Grooy -------------------------------------------------------------- */
+/* Java/Groovy ------------------------------------------------------------- */
 sourceCompatibility = 1.6
 
 // Compiles everything as groovy, due to java<->groovy interdependencies
@@ -100,6 +104,21 @@ dependencies {
     testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.0'
 }
 
+jar {
+    manifest {
+        def manifestClasspath = "$destDirLibs/"+configurations.runtime.collect { it.getName() }.join(" $destDirLibs/") 
+        attributes("Implementation-Title": project.name, "Main-Class": mainClassName, "Class-Path" : manifestClasspath)
+    }
+}
+
+test {
+    // ignoreFailures: Specifies whether the build should break when the verifications performed by this task fail.
+    ignoreFailures = true
+    // showStandardStreams: makes the standard streams (err and out) visible at console when running tests
+    testLogging.showStandardStreams = true
+    jvmArgs '-Xms512m', '-Xmx1024m', '-XX:MaxPermSize=128m'
+}
+
 /* perfTest ----------------------------------------------------------------- */
 sourceSets {
     perfTest
@@ -123,28 +142,9 @@ task perfTests(type: Test) {
 }
 
 /* Tasks ------------------------------------------------------------------- */
-jar {
-    manifest {
-        attributes("Implementation-Title": project.name, "Main-Class": mainClassName)
-    }
-}
-
-test {
-    // ignoreFailures: Specifies whether the build should break when the verifications performed by this task fail.
-    ignoreFailures = true
-    // showStandardStreams: makes the standard streams (err and out) visible at console when running tests
-    testLogging.showStandardStreams = true
-    jvmArgs '-Xms512m', '-Xmx1024m', '-XX:MaxPermSize=128m'
-}
-
-task distLibs(type:Sync) {
-    from configurations.runtime
-    into "$buildDir/dist/libs"
-}
-
 task assembleMainOutput(type:Sync) {
     from sourceSets.main.output
-    into "$buildDir/mainOutput"
+    into "$buildDir/$destDirMainOutput"
 }
 
 task run(type:JavaExec) {
@@ -152,7 +152,7 @@ task run(type:JavaExec) {
     dependsOn extractNatives
     dependsOn assembleMainOutput
     main = mainClassName
-    classpath "$buildDir/mainOutput"
+    classpath "$buildDir/$destDirMainOutput"
     classpath configurations.runtime
 }
 
@@ -171,4 +171,44 @@ task zipSavedWorlds(type: Zip) {
 task execProtobuf(type:Exec) {
     description = "Runs Googles 'Protobuf Compiler'"
     commandLine 'protobuf\\compiler\\protoc.exe', '--proto_path=src\\main\\protobuf', '--java_out', 'src\\main\\java', 'src\\main\\protobuf\\*'
+}
+
+task distMods {
+    mkdir("$buildDir/$destDirMods")
+    file('mods').listFiles().each { File mod ->
+        if (mod.isDirectory() ) {
+            task('distMod-' + mod.getName(), type: Zip) {
+                from (mod)
+                archiveName = mod.getName() + '.zip'
+                destinationDir = file("$buildDir/$destDirMods")
+            }
+            distMods.dependsOn tasks['distMod-' + mod.getName()]
+        }
+    }
+}
+
+task distZip(type:Zip) {
+    description = 'Creates a ZIP distribution'
+    dependsOn extractNatives
+    dependsOn distMods
+    into (project.name) {
+        from 'README.markdown'
+        from 'LICENSE.txt'
+        from jar
+        from('launchScripts') {
+            exclude('Launcher.xml')
+        }
+        into(destDirLibs) {
+            from configurations.runtime
+        }
+        into(dirNatives) {
+            from dirNatives
+        }
+        into(dirData) {
+            from dirData
+        }
+        into("mods") {
+            from "$buildDir/$destDirMods"
+        }
+    }
 }
