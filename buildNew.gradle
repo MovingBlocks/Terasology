@@ -100,10 +100,6 @@ dependencies {
     testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.0'
 }
 
-/* IDE --------------------------------------------------------------------- */
-ideaModule.dependsOn extractNatives
-eclipseClasspath.dependsOn extractNatives
-
 /* perfTest ----------------------------------------------------------------- */
 sourceSets {
     perfTest
@@ -170,4 +166,9 @@ task zipSavedWorlds(type: Zip) {
     appendix = "savedWorlds"
     classifier = startDateTimeString
     from dirSavedWorlds
+}
+
+task execProtobuf(type:Exec) {
+    description = "Runs Googles 'Protobuf Compiler'"
+    commandLine 'protobuf\\compiler\\protoc.exe', '--proto_path=src\\main\\protobuf', '--java_out', 'src\\main\\java', 'src\\main\\protobuf\\*'
 }
