@@ -212,3 +212,11 @@ task distZip(type:Zip) {
         }
     }
 }
+
+/* Applet -------------------------------------------------------------------*/
+// TODO Implement Applet tasks
+
+/* IDE --------------------------------------------------------------------- */
+// TODO Check if other configurations for IDEA are necessary.
+ideaModule.dependsOn extractNatives
+eclipseClasspath.dependsOn extractNatives
