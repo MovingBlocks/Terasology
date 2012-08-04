@@ -27,9 +27,9 @@ import org.terasology.logic.world.WorldInfo;
 import org.terasology.logic.world.WorldUtil;
 import org.terasology.rendering.gui.components.*;
 import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
-import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
+import org.terasology.rendering.gui.framework.events.IClickListener;
 
 import javax.vecmath.Vector2f;
 import java.io.File;
@@ -134,29 +134,32 @@ public class UISelectWorldMenu extends UIDisplayWindow {
         addDisplayElement(_goToBack, "goToBackButton");
         addDisplayElement(_createNewWorld, "createWorldButton");
         addDisplayElement(_deleteFromList, "deleteFromListButton");
-        update();
+        
+        layout();
     }
 
     @Override
-    public void update() {
-        super.update();
-        _list.centerHorizontally();
-        _list.getPosition().y = 230f;
-
-        _createNewWorld.getPosition().x = _list.getPosition().x;
-        _createNewWorld.getPosition().y = _list.getPosition().y + _list.getSize().y + 32f;
-
-        _loadFromList.getPosition().x = _createNewWorld.getPosition().x + _createNewWorld.getSize().x + 15f;
-        _loadFromList.getPosition().y = _createNewWorld.getPosition().y;
-
-        _deleteFromList.getPosition().x = _loadFromList.getPosition().x + _loadFromList.getSize().x + 15f;
-        _deleteFromList.getPosition().y = _loadFromList.getPosition().y;
-
-
-        _goToBack.centerHorizontally();
-
-        _goToBack.getPosition().y = Display.getHeight() - _goToBack.getSize().y - 32f;
-
+    public void layout() {
+        super.layout();
+        
+        if (_list != null) {
+	        _list.centerHorizontally();
+	        _list.getPosition().y = 230f;
+	
+	        _createNewWorld.getPosition().x = _list.getPosition().x;
+	        _createNewWorld.getPosition().y = _list.getPosition().y + _list.getSize().y + 32f;
+	
+	        _loadFromList.getPosition().x = _createNewWorld.getPosition().x + _createNewWorld.getSize().x + 15f;
+	        _loadFromList.getPosition().y = _createNewWorld.getPosition().y;
+	
+	        _deleteFromList.getPosition().x = _loadFromList.getPosition().x + _loadFromList.getSize().x + 15f;
+	        _deleteFromList.getPosition().y = _loadFromList.getPosition().y;
+	
+	
+	        _goToBack.centerHorizontally();
+	
+	        _goToBack.getPosition().y = Display.getHeight() - _goToBack.getSize().y - 32f;
+        }
     }
 
     private void loadSelectedWorld() {
@@ -175,6 +178,7 @@ public class UISelectWorldMenu extends UIDisplayWindow {
             WorldInfo info = (WorldInfo) _list.getSelectedItem().getValue();
             Config.getInstance().setDefaultSeed(info.getSeed());
             Config.getInstance().setWorldTitle(info.getTitle());
+            Config.getInstance().setChunkGenerator(info.getChunkGenerators());
             // TODO: Need to load time too. Maybe just pass through WorldInfo?
             CoreRegistry.get(GameEngine.class).changeState(new StateSinglePlayer(info.getTitle(), info.getSeed(), info.getTime()));
         } catch (Exception e) {

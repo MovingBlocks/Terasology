@@ -64,23 +64,26 @@ public class UIConfigMenuMods extends UIDisplayWindow {
         addDisplayElement(_minionsButton, "minionsButton");
         addDisplayElement(_minionOptionsButton, "minionOptionsButton");
         addDisplayElement(_backToConfigMenuButton, "backToConfigMenuButton");
-        update();
+
+        layout();
     }
 
     @Override
-    public void update() {
-        super.update();
+    public void layout() {
+        super.layout();
 
-        _minionsButton.centerHorizontally();
-        _minionsButton.getPosition().y = 300f;
-
-        _minionOptionsButton.centerHorizontally();
-        _minionOptionsButton.getPosition().y = 300f + 40f;
-
-        _backToConfigMenuButton.centerHorizontally();
-        _backToConfigMenuButton.getPosition().y = 300f + 7 * 40f;
-
-        _title.centerHorizontally();
-        _title.getPosition().y = 128f;
+        if (_minionsButton != null) {
+	        _minionsButton.centerHorizontally();
+	        _minionsButton.getPosition().y = 300f;
+	
+	        _minionOptionsButton.centerHorizontally();
+	        _minionOptionsButton.getPosition().y = 300f + 40f;
+	
+	        _backToConfigMenuButton.centerHorizontally();
+	        _backToConfigMenuButton.getPosition().y = 300f + 7 * 40f;
+	
+	        _title.centerHorizontally();
+	        _title.getPosition().y = 128f;
+        }
     }
 }

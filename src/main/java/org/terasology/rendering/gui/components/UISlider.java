@@ -22,9 +22,9 @@ import javax.vecmath.Vector2f;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetManager;
-import org.terasology.rendering.gui.framework.IChangedListener;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import org.terasology.rendering.gui.framework.events.IChangedListener;
 
 /**
  * A simple Slider.
@@ -87,11 +87,17 @@ public class UISlider extends UIDisplayContainer {
             setClassStyle("slider");
         }
 
-        // Position the label in the center of the button
-        _label.setPosition(new Vector2f(getSize().x / 2 - _label.getTextWidth() / 2, getSize().y / 2 - _label.getTextHeight() / 2));
-        
         super.update();
     }
+	
+	@Override
+	public void layout() {
+		super.layout();
+		
+		if (_label != null) {
+			_label.setPosition(new Vector2f(getSize().x / 2 - _label.getTextWidth() / 2, getSize().y / 2 - _label.getTextHeight() / 2));
+		}
+	}
     
     private void updateSlider(Vector2f mousePos) {        
 		if (_slider.intersects(mousePos)) {

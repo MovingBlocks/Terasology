@@ -20,8 +20,8 @@ import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.logic.manager.AudioManager;
-import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
+import org.terasology.rendering.gui.framework.events.IClickListener;
 
 import javax.vecmath.Vector2f;
 import java.util.ArrayList;
@@ -76,9 +76,15 @@ public class UIButton extends UIDisplayContainer {
             _mouseDown = false;
             setClassStyle("button");
         }
-
-        // Position the label in the center of the button
-        _label.setPosition(new Vector2f(getSize().x / 2 - getLabel().getTextWidth() / 2, getSize().y / 2 - getLabel().getTextHeight() / 2));
+    }
+    
+    @Override
+    public void layout() {
+    	super.layout();
+    	
+    	if (_label != null) {
+    		_label.setPosition(new Vector2f(getSize().x / 2 - getLabel().getTextWidth() / 2, getSize().y / 2 - getLabel().getTextHeight() / 2));
+    	}
     }
 
     public void clicked() {

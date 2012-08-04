@@ -284,4 +284,9 @@ public class UIPropertyBorder extends UIProperty {
             }
         }
     }
+
+	@Override
+	public void layout() {
+
+	}
 }

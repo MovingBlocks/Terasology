@@ -55,7 +55,6 @@ import org.terasology.logic.world.generator.core.FlatTerrainGenerator;
 import org.terasology.logic.world.generator.core.FloraGenerator;
 import org.terasology.logic.world.generator.core.ForestGenerator;
 import org.terasology.logic.world.generator.core.PerlinTerrainGenerator;
-import org.terasology.logic.world.generator.persistence.ChunkGeneratorPersister;
 import org.terasology.logic.world.liquid.LiquidsGenerator;
 import org.terasology.logic.world.WorldBiomeProviderImpl;
 import org.terasology.logic.world.WorldProvider;
@@ -330,36 +329,7 @@ public class StateSinglePlayer implements GameState {
     }
 
     private ChunkGeneratorManager initChunkGeneratorManager(String title) {
-        ChunkGeneratorManager chunkGeneratorManager = null;
-
-        File generatorDataFile = new File(PathManager.getInstance().getWorldSavePath(title), CHUNK_GENERATOR_FILE);
-
-        try {
-            chunkGeneratorManager = new ChunkGeneratorPersister().load(generatorDataFile);
-        } catch (IOException e) {
-            logger.log(Level.SEVERE, "Failed to load generator data", e);
-            // TODO Improved exception handling
-        }
-
-        if (chunkGeneratorManager == null) {
-            // lets choose the chunk generator
-            switch (Config.getInstance().getChunkGenerator()) {
-            case 1: // flat
-                chunkGeneratorManager = ChunkGeneratorManagerImpl.getFlatInstance();
-                break;
-            default: // normal
-                chunkGeneratorManager = ChunkGeneratorManagerImpl.getDefaultInstance();
-            }
-
-            try {
-                new ChunkGeneratorPersister().save(generatorDataFile, chunkGeneratorManager);
-            } catch (IOException e) {
-                logger.log(Level.SEVERE, "Failed to save generator data", e);
-                // TODO Improved exception handling
-            }
-        }
-
-        return chunkGeneratorManager;
+        return ChunkGeneratorManagerImpl.buildChunkGenerator(Config.getInstance().getChunkGenerator());
     }
 
     private boolean screenHasFocus() {

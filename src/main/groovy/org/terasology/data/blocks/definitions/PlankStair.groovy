@@ -13,8 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.framework;
 
-public interface IChangedListener {
-	public void changed(UIDisplayElement element);
+package org.terasology.data.blocks.definitions
+
+/**
+ * Plank material stairs
+ */
+block {
+    version = 1
+    alignment = "HorizontalDirection"
+    faces {
+        all = "Plank"
+    }
+    shape = "engine:stair"
+
 }

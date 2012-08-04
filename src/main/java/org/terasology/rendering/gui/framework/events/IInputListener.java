@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.framework;
+package org.terasology.rendering.gui.framework.events;
+
+import org.terasology.rendering.gui.framework.UIDisplayElement;
 
 /**
  * TODO
  *
  * @author Anton Kireev <adeon.k87@gmail.com>
  */
-public interface IScrollListener {
-    public void scrolled(UIDisplayElement element);
+public interface IInputListener {
+    public void keyPressed(UIDisplayElement element);
 }
-

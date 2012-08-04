@@ -96,6 +96,9 @@ public class UIHeadsUpDisplay extends UIDisplayWindow implements EventHandlerSys
         setVisible(true);
 
         CoreRegistry.get(EventSystem.class).registerEventHandler(this);
+        
+        update();
+        layout();
     }
 
 
@@ -108,9 +111,6 @@ public class UIHeadsUpDisplay extends UIDisplayWindow implements EventHandlerSys
 
     public void update() {
         super.update();
-
-        _healthBar.setPosition(new Vector2f(_toolbar.getPosition().x, _toolbar.getPosition().y - _toolbar.getSize().y + 8f));
-        _crosshair.setPosition(new Vector2f(Display.getWidth() / 2, Display.getHeight() / 2));
 
         boolean enableDebug = Config.getInstance().isDebug();
         _debugLine1.setVisible(enableDebug);
@@ -127,6 +127,16 @@ public class UIHeadsUpDisplay extends UIDisplayWindow implements EventHandlerSys
             _debugLine3.setText(String.format("%s", CoreRegistry.get(WorldRenderer.class)));
             _debugLine4.setText(String.format("total vus: %s | active threads: %s", ChunkTessellator.getVertexArrayUpdateCount(), CoreRegistry.get(GameEngine.class).getActiveTaskCount()));
         }
+    }
+    
+    @Override
+    public void layout() {
+    	super.layout();
+    	
+    	if (_healthBar != null) {
+	        _healthBar.setPosition(new Vector2f(_toolbar.getPosition().x, _toolbar.getPosition().y - _toolbar.getSize().y + 8f));
+	        _crosshair.setPosition(new Vector2f(Display.getWidth() / 2, Display.getHeight() / 2));
+    	}
     }
 
     @Override

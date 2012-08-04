@@ -27,14 +27,16 @@ public class UIOpenBookScreen extends UIDisplayWindow {
         _openbook = new UIOpenBook();
         _openbook.setVisible(true);
         addDisplayElement(_openbook);
-        update();
+        layout();
         setModal(true);
     }
 
     @Override
-    public void update() {
-        super.update();
-        _openbook.isVisible();
-        _openbook.center();
+    public void layout() {
+        super.layout();
+        
+        if (_openbook != null) {
+        	_openbook.center();
+        }
     }
 }

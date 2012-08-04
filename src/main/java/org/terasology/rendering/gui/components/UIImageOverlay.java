@@ -30,10 +30,13 @@ public class UIImageOverlay extends UIGraphicsElement {
 
     public UIImageOverlay(Texture texture) {
         super(texture);
+        layout();
     }
 
     @Override
-    public void update() {
-        setSize(new Vector2f((float) Display.getWidth(), (float) Display.getHeight()));
+    public void layout() {
+    	super.layout();
+    	
+    	setSize(new Vector2f((float) Display.getWidth(), (float) Display.getHeight()));
     }
 }

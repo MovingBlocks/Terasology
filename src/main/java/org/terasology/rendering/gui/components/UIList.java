@@ -17,9 +17,9 @@ package org.terasology.rendering.gui.components;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.IInputDataElement;
 import org.terasology.rendering.gui.framework.UIScrollableDisplayContainer;
+import org.terasology.rendering.gui.framework.events.IClickListener;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
@@ -35,7 +35,7 @@ import java.util.List;
 
 public class UIList extends UIScrollableDisplayContainer implements IInputDataElement {
 
-    private int _selectedItemIndex = -1;
+    protected int _selectedItemIndex = -1;
     private final ArrayList<IClickListener> _doubleClickListeners = new ArrayList<IClickListener>();
 
     //List items
@@ -47,27 +47,25 @@ public class UIList extends UIScrollableDisplayContainer implements IInputDataEl
         setScrollBarsPosition(getPosition(), getSize());
 
         //ToDo Create skin for UIList
-        setStyle("border-image-top", "engine:gui_menu 159/512 18/512 264/512 0 18");
-        setStyle("border-image-right", "engine:gui_menu 9/512 63/512 423/512 18/512 9");
-        setStyle("border-image-bottom", "engine:gui_menu 159/512 9/512 264/512 81/512 9");
-        setStyle("border-image-left", "engine:gui_menu 8/512 64/512 256/512 17/512 8");
+        setClassStyle("screenSkin", "border-image-top: engine:gui_menu 159/512 18/512 264/512 0 18");
+        setClassStyle("screenSkin", "border-image-right: engine:gui_menu 9/512 63/512 423/512 18/512 9");
+        setClassStyle("screenSkin", "border-image-bottom: engine:gui_menu 159/512 9/512 264/512 81/512 9");
+        setClassStyle("screenSkin", "border-image-left: engine:gui_menu 8/512 64/512 256/512 17/512 8");
 
-        setStyle("border-corner-topleft", "engine:gui_menu 256/512 0");
-        setStyle("border-corner-topright", "engine:gui_menu 423/512 0");
-        setStyle("border-corner-bottomright", "engine:gui_menu 423/512 81/512");
-        setStyle("border-corner-bottomleft", "engine:gui_menu 256/512 81/512");
+        setClassStyle("screenSkin", "border-corner-topleft: engine:gui_menu 256/512 0");
+        setClassStyle("screenSkin", "border-corner-topright: engine:gui_menu 423/512 0");
+        setClassStyle("screenSkin", "border-corner-bottomright: engine:gui_menu 423/512 81/512");
+        setClassStyle("screenSkin", "border-corner-bottomleft: engine:gui_menu 256/512 81/512");
+        setClassStyle("screenSkin", "background-image: engine:gui_menu 159/512 63/512 264/512 18/512");
 
-        setStyle("background-image", "engine:gui_menu 159/512 63/512 264/512 18/512");
+        setClassStyle("screenSkin");
+
         setCropMargin(new Vector4f(-15f, -15f, -15f, 0));
     }
 
     public void update() {
         Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
-        if (intersects(mousePos)) {
-
-            if (_scrollBarVertical.intersects(mousePos) || _scrollBarHorizontal.intersects(mousePos)) {
-                return;
-            }
+        if (intersects(mousePos) && !checkClickOnScrollBar(mousePos)) {
 
             boolean itemClicked = false;
             for (int i = (_items.size() - 1); i >= 0; i--) {
@@ -103,6 +101,14 @@ public class UIList extends UIScrollableDisplayContainer implements IInputDataEl
         super.update();
     }
 
+    public boolean checkClickOnScrollBar(Vector2f mousePos){
+        if (_scrollBarVertical.intersects(mousePos) || _scrollBarHorizontal.intersects(mousePos)) {
+            return true;
+        }
+
+        return false;
+    }
+
     public void render() {
         super.render();
     }
@@ -119,7 +125,6 @@ public class UIList extends UIScrollableDisplayContainer implements IInputDataEl
     public int size() {
         return _items.size();
     }
-
 
     public void addItem(String text, Object value) {
 
@@ -181,7 +186,7 @@ public class UIList extends UIScrollableDisplayContainer implements IInputDataEl
         return _items.get(_selectedItemIndex);
     }
 
-    /*
+	/*
      * Remove all items
      */
     public void removeAll() {
@@ -205,6 +210,18 @@ public class UIList extends UIScrollableDisplayContainer implements IInputDataEl
     */
     public Object getValue() {
         return _items.get(_selectedItemIndex).getValue();
+    }
+
+    public UIListItem getItem(int index){
+        if(!_items.isEmpty()){
+            return _items.get(index);
+        }else{
+            return null;
+        }
+    }
+
+    public boolean isEmpty(){
+        return _items.isEmpty();
     }
 
     /*

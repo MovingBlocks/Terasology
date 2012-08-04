@@ -18,6 +18,7 @@ package org.terasology.rendering.gui.framework;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.rendering.gui.components.UIScrollBar;
+import org.terasology.rendering.gui.framework.events.IScrollListener;
 
 import javax.vecmath.Vector2f;
 
@@ -96,6 +97,14 @@ public class UIScrollableDisplayContainer extends UIDisplayContainer {
 
     public void render() {
         super.render();
+    }
+
+    public UIScrollBar getScrollBarVertival(){
+        return _scrollBarVertical;
+    }
+
+    public UIScrollBar getScrollBarHorizontal(){
+        return _scrollBarHorizontal;
     }
 
     public void update() {

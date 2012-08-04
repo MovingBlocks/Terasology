@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.framework;
 
-/**
- * TODO
- *
- * @author Anton Kireev <adeon.k87@gmail.com>
- */
-public interface IInputListener {
-    public void keyPressed(UIDisplayElement element);
+package org.terasology.data.blocks.definitions.soil
+
+block {
+    version = 1
+    alignment = "HorizontalDirection"
+    faces {
+        all = "Clay"
+    }
+    shape = "engine:slope"
 }

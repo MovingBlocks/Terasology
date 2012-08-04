@@ -13,15 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.framework;
+
+package org.terasology.data.blocks.definitions
 
 /**
- * Notified on click events.
- *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Marble is the only metamorphic flux stone, and is commonly used for building material. It is very valuable
+ * because it frequently contains a wide variety of gems.
  */
-public interface IClickListener {
+block {
+    version = 1
+    faces {
+        all = "Marble"
+    }
+    shape = "engine:testSphere"
 
-    public void clicked(UIDisplayElement element);
 
+    physics {
+        mass = 128000
+    }
 }
