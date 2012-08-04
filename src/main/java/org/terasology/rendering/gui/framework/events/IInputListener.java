@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.framework;
+package org.terasology.rendering.gui.framework.events;
+
+import org.terasology.rendering.gui.framework.UIDisplayElement;
 
 /**
- * Notified on click events.
+ * TODO
  *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Anton Kireev <adeon.k87@gmail.com>
  */
-public interface IClickListener {
-
-    public void clicked(UIDisplayElement element);
-
+public interface IInputListener {
+    public void keyPressed(UIDisplayElement element);
 }

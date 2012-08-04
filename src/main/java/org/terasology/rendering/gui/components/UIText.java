@@ -87,6 +87,11 @@ public class UIText extends UIDisplayElement {
     public void update() {
         // Nothing to do here
     }
+    
+	@Override
+	public void layout() {
+		// Nothing to do here
+	}
 
     public String getText() {
         return _text;
@@ -94,6 +99,10 @@ public class UIText extends UIDisplayElement {
 
     public void setText(String text) {
         _text = text;
+        
+        UIDisplayElement parent = getParent();
+        if (parent != null)
+        	parent.layout();
     }
 
     public Color getColor() {

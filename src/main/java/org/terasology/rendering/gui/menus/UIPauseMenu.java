@@ -29,10 +29,10 @@ import org.terasology.asset.AssetManager;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.components.UITransparentOverlay;
-import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import org.terasology.rendering.gui.framework.events.IClickListener;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
@@ -131,26 +131,28 @@ public class UIPauseMenu extends UIDisplayWindow {
         addDisplayElement(_mainMenuButton);
         setModal(true);
 
-        update();
+        layout();
     }
 
     @Override
-    public void update() {
-        super.update();
+    public void layout() {
+        super.layout();
 
-        _version.centerHorizontally();
-        _version.getPosition().y = 230f;
-
-        _respawnButton.centerHorizontally();
-        _respawnButton.getPosition().y = 300f;
-
-        _mainMenuButton.centerHorizontally();
-        _mainMenuButton.getPosition().y = 300f + 32f + 24f;
-
-        _exitButton.centerHorizontally();
-        _exitButton.getPosition().y = 300f + 2 * 32f + 32f;
-
-        _title.centerHorizontally();
-        _title.getPosition().y = 128f;
+        if (_version != null) {
+	        _version.centerHorizontally();
+	        _version.getPosition().y = 230f;
+	
+	        _respawnButton.centerHorizontally();
+	        _respawnButton.getPosition().y = 300f;
+	
+	        _mainMenuButton.centerHorizontally();
+	        _mainMenuButton.getPosition().y = 300f + 32f + 24f;
+	
+	        _exitButton.centerHorizontally();
+	        _exitButton.getPosition().y = 300f + 2 * 32f + 32f;
+	
+	        _title.centerHorizontally();
+	        _title.getPosition().y = 128f;
+        }
     }
 }

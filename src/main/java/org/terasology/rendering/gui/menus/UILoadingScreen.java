@@ -44,15 +44,17 @@ public class UILoadingScreen extends UIDisplayWindow {
         addDisplayElement(_overlay);
         addDisplayElement(_progressBar);
 
-        update();
+        layout();
         setVisible(true);
     }
 
     @Override
-    public void update() {
-        super.update();
+    public void layout() {
+        super.layout();
 
-        _progressBar.setPosition(new Vector2f(_progressBar.calcCenterPosition().x, Display.getHeight() - 84.0f));
+        if (_progressBar != null) {
+        	_progressBar.setPosition(new Vector2f(_progressBar.calcCenterPosition().x, Display.getHeight() - 84.0f));
+        }
     }
 
     public void updateStatus(String string, float percent) {

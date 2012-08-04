@@ -113,4 +113,9 @@ public class UIPropertyBackground extends UIProperty {
         }
     }
 
+	@Override
+	public void layout() {
+
+	}
+
 }

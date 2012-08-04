@@ -104,10 +104,20 @@ public abstract class UIDisplayElement {
         return _focused;
     }
 
-
+    /**
+     * Render related actions here. Will be executed every tick.
+     */
     public abstract void render();
 
+    /**
+     * Update related actions, such as checking for mouse position or events here. Will be executed every tick.
+     */
     public abstract void update();
+    
+    /**
+     * Set the layout of the child elements here. Will be executed if the display or a parent window was resized.
+     */
+    public abstract void layout();
 
     public Vector2f getPosition() {
         return _position;

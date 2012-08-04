@@ -19,7 +19,7 @@ import com.google.gson.internal.Pair;
 
 import javax.vecmath.Vector2f;
 
-import org.terasology.rendering.gui.framework.IStateButtonAction;
+import org.terasology.rendering.gui.framework.events.IStateButtonAction;
 
 import java.util.LinkedList;
 

@@ -21,10 +21,10 @@ import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UISlider;
 import org.terasology.rendering.gui.components.UIText;
-import org.terasology.rendering.gui.framework.IChangedListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import org.terasology.rendering.gui.framework.events.IChangedListener;
 
 import javax.vecmath.Vector2f;
 
@@ -97,26 +97,29 @@ public class UIConfigMenuAudio extends UIDisplayWindow {
         addDisplayElement(_soundOptionSlider, "soundVolumeSlider");
         addDisplayElement(_musicOptionSlider, "musicVolumeSlider");
         addDisplayElement(_backToConfigMenuButton, "backToConfigMenuButton");
-        update();
+        
+        layout();
     }
 
     @Override
-    public void update() {
-        super.update();
-
-        _version.centerHorizontally();
-        _version.getPosition().y = 230f;
-
-        _soundOptionSlider.centerHorizontally();
-        _soundOptionSlider.getPosition().y = 300f;
-
-        _musicOptionSlider.centerHorizontally();
-        _musicOptionSlider.getPosition().y = 300f + 40f;
-
-        _backToConfigMenuButton.centerHorizontally();
-        _backToConfigMenuButton.getPosition().y = 300f + 7 * 40f;
-
-        _title.centerHorizontally();
-        _title.getPosition().y = 128f;
+    public void layout() {
+    	super.layout();
+    	
+    	if (_version != null) {
+	        _version.centerHorizontally();
+	        _version.getPosition().y = 230f;
+	
+	        _soundOptionSlider.centerHorizontally();
+	        _soundOptionSlider.getPosition().y = 300f;
+	
+	        _musicOptionSlider.centerHorizontally();
+	        _musicOptionSlider.getPosition().y = 300f + 40f;
+	
+	        _backToConfigMenuButton.centerHorizontally();
+	        _backToConfigMenuButton.getPosition().y = 300f + 7 * 40f;
+	
+	        _title.centerHorizontally();
+	        _title.getPosition().y = 128f;
+    	}
     }
 }
