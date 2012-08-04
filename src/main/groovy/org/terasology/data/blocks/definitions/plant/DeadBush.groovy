@@ -30,7 +30,6 @@ block {
     transparent = true
     translucent = true
     penetrable = true
-    waving = true
 
     hardness = 1
 }

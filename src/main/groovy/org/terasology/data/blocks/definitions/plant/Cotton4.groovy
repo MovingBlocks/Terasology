@@ -19,7 +19,7 @@ import org.terasology.model.blocks.Block.BLOCK_FORM
 import org.terasology.model.blocks.Block.COLOR_SOURCE
 
 /**
- * Lavender. Smells good!
+ * Cotton in various stages of its life-cycle
  * @author (art) eleazzaar
  */
 block {
@@ -30,6 +30,7 @@ block {
     transparent = true
     translucent = true
     penetrable = true
+    waving = true
 
     hardness = 1
 }
