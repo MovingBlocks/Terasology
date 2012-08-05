@@ -18,13 +18,16 @@ package org.terasology.rendering.gui.menus;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetManager;
+import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.InputConfig;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIImageOverlay;
+import org.terasology.rendering.gui.components.UISlider;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import org.terasology.rendering.gui.framework.events.IChangedListener;
 import org.terasology.rendering.gui.framework.events.IClickListener;
 
 import javax.vecmath.Vector2f;
@@ -99,6 +102,7 @@ public class UIConfigMenuControls extends UIDisplayWindow {
             UsehelditemButton,
             defaultButton;
 
+    final UISlider MouseSensitivity;
     final UIText subtitle;
 
     public UIConfigMenuControls() {
@@ -125,7 +129,7 @@ public class UIConfigMenuControls extends UIDisplayWindow {
         overlay = new UIImageOverlay(AssetManager.loadTexture("engine:loadingBackground"));
         overlay.setVisible(true);
 
-        _backToConfigMenuButton = new UIButton(new Vector2f(256f, 32f));
+        _backToConfigMenuButton = new UIButton(new Vector2f(128f, 32f));
         _backToConfigMenuButton.getLabel().setText("Back");
         _backToConfigMenuButton.setVisible(true);
 
@@ -237,13 +241,25 @@ public class UIConfigMenuControls extends UIDisplayWindow {
         UsehelditemButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyUsehelditem()));
         UsehelditemButton.addClickListener(editButtonClick);
         UsehelditemButton.setVisible(true);
-        defaultButton = new UIButton(new Vector2f(80f, 32f));
+        MouseSensitivity = new UISlider(new Vector2f(256f, 32f), 20, 150);
+        MouseSensitivity.setVisible(true);
+        MouseSensitivity.addChangedListener(new IChangedListener() {
+			@Override
+			public void changed(UIDisplayElement element) {
+				UISlider slider = (UISlider) element;
+				slider.setText("Mouse Sensitivity: " + String.valueOf(slider.getValue()));
+				Config.getInstance().setMouseSens((float)slider.getValue() / 1000f);
+			}
+		});
+        MouseSensitivity.setValue((int) (Config.getInstance().getMouseSens() * 1000));
+        defaultButton = new UIButton(new Vector2f(128f, 32f));
         defaultButton.getLabel().setText("Default");
         defaultButton.setVisible(true);
         defaultButton.addClickListener(new IClickListener() {	
 			@Override
 			public void click(UIDisplayElement element, int button) {
 				InputConfig.getInstance().loadDefaultConfig();
+				Config.getInstance().setMouseSens(0.075f);
 				
 		        ForwardButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyForward()));
 		        BackwardButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyBackward()));
@@ -272,6 +288,7 @@ public class UIConfigMenuControls extends UIDisplayWindow {
 		        Toolslot8Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot8()));
 		        Toolslot9Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot9()));
 		        UsehelditemButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyUsehelditem()));
+		        MouseSensitivity.setValue((int) (Config.getInstance().getMouseSens() * 1000));
 			}
 		});
 
@@ -394,6 +411,7 @@ public class UIConfigMenuControls extends UIDisplayWindow {
         addDisplayElement(Toolslot8Button, "Toolslot8Button");
         addDisplayElement(Toolslot9Button, "Toolslot9Button");
         addDisplayElement(UsehelditemButton, "UsehelditemButton");
+        addDisplayElement(MouseSensitivity, "MouseSensitivity");
         addDisplayElement(defaultButton, "defaultButton");
         
         layout();
@@ -508,7 +526,7 @@ public class UIConfigMenuControls extends UIDisplayWindow {
 	        subtitle.centerHorizontally();
 	        subtitle.getPosition().y = 130f;
 	
-	        //row 1
+	        //row 1	        
 	        ForwardButtontext.getPosition().x = center - 4 * rowWidth;
 	        ForwardButtontext.getPosition().y = 200f + marginTextTop;
 	        ForwardButton.getPosition().x = center - 3 * rowWidth;
@@ -549,9 +567,6 @@ public class UIConfigMenuControls extends UIDisplayWindow {
 	        ToolprevButtontext.getPosition().y = 200f + 8 * 40f + marginTextTop;
 	        ToolprevButton.getPosition().x = center - 3 * rowWidth;
 	        ToolprevButton.getPosition().y = 200f + 8 * 40f;
-	        
-	        defaultButton.getPosition().x = center - 4 * rowWidth;
-	        defaultButton.getPosition().y = 300f + 7 * 40f;
 	
 	        //row 2
 	        ActivateButtontext.getPosition().x = center - 2 * rowWidth;   // (frob)
@@ -651,8 +666,13 @@ public class UIConfigMenuControls extends UIDisplayWindow {
 	        Toolslot9Button.getPosition().x = center + 3 * rowWidth;
 	        Toolslot9Button.getPosition().y = 200f + 8 * 40f;
 	
+	        MouseSensitivity.getPosition().x = center - 4 * rowWidth;
+	        MouseSensitivity.getPosition().y = 300f + 7 * 40f;
 	        
-	        _backToConfigMenuButton.centerHorizontally();
+	        defaultButton.getPosition().x = center + 2 * rowWidth - 100;
+	        defaultButton.getPosition().y =  300f + 7 * 40f;
+	        
+	        _backToConfigMenuButton.getPosition().x = center + 3 * rowWidth - 64;
 	        _backToConfigMenuButton.getPosition().y = 300f + 7 * 40f;
 	
 	        title.centerHorizontally();
