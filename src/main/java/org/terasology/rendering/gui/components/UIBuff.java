@@ -60,7 +60,7 @@ public class UIBuff extends UIDisplayContainer {
 
     @Override
     public void update() {
-
+    	//TODO do this with events instead.
         super.update();
         SpeedBoostComponent speed = CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(SpeedBoostComponent.class);
         CharacterMovementComponent charmov = CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(CharacterMovementComponent.class);

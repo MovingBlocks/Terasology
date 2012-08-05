@@ -68,6 +68,7 @@ public class UIToolbarCell extends UIDisplayElement {
 
     @Override
     public void update() {
+    	//TODO use eveants for this instead.
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
 
         _selectionRectangle.setVisible(_selected);

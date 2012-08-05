@@ -66,9 +66,10 @@ public class UIPauseMenu extends UIDisplayWindow {
         _exitButton.setVisible(true);
 
         _exitButton.addClickListener(new IClickListener() {
-            public void clicked(UIDisplayElement element) {
-                CoreRegistry.get(GameEngine.class).shutdown();
-            }
+			@Override
+			public void click(UIDisplayElement element, int button) {
+				CoreRegistry.get(GameEngine.class).shutdown();
+			}
         });
 
         _respawnButton = new UIButton(new Vector2f(256f, 32f));
@@ -76,7 +77,8 @@ public class UIPauseMenu extends UIDisplayWindow {
         _respawnButton.setVisible(true);
 
         _respawnButton.addClickListener(new IClickListener() {
-            public void clicked(UIDisplayElement element) {
+			@Override
+			public void click(UIDisplayElement element, int button) {
                 setVisible(false);
                 EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
 
@@ -104,7 +106,7 @@ public class UIPauseMenu extends UIDisplayWindow {
                     characterMovementComponent.setVelocity(new Vector3f(0, 0, 0));
                     playerEntity.saveComponent(characterMovementComponent);
                 }
-            }
+			}
         });
 
         _mainMenuButton = new UIButton(new Vector2f(256f, 32f));
@@ -112,10 +114,11 @@ public class UIPauseMenu extends UIDisplayWindow {
         _mainMenuButton.setVisible(true);
 
         _mainMenuButton.addClickListener(new IClickListener() {
-            public void clicked(UIDisplayElement element) {
+			@Override
+			public void click(UIDisplayElement element, int button) {
                 setVisible(false);
                 CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu());
-            }
+			}
         });
 
         _overlay = new UITransparentOverlay();

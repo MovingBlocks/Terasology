@@ -160,6 +160,8 @@ public class InputSystem implements EventHandlerSystem {
                     bind.updateBindState(false, delta, localPlayer.getEntity(), cameraTargetSystem.getTarget(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, GUIManager.getInstance().isConsumingInput());
                 }
             }
+            
+            GUIManager.getInstance().processMouseInput(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel());
         }
         int deltaX = Mouse.getDX();
         if (deltaX != 0 && !GUIManager.getInstance().isConsumingInput()) {

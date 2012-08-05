@@ -15,25 +15,23 @@
  */
 package org.terasology.rendering.gui.components;
 
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
-import org.terasology.rendering.gui.framework.events.IClickListener;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.events.IMouseButtonListener;
+import org.terasology.rendering.gui.framework.events.IMouseMoveListener;
 
 import javax.vecmath.Vector2f;
-import java.util.ArrayList;
 
 /**
  * A simple graphical button usable for creating user interface.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
 public class UIButton extends UIDisplayContainer {
-
-    private final ArrayList<IClickListener> _clickListeners = new ArrayList<IClickListener>();
 
     private final UIText _label;
 
@@ -43,41 +41,54 @@ public class UIButton extends UIDisplayContainer {
         setClassStyle("button-mouseover", "background-image: engine:gui_menu 256/512 30/512 0 30/512");
         setClassStyle("button-mouseclick", "background-image: engine:gui_menu 256/512 30/512 0 60/512");
         setClassStyle("button");
+        
+        addMouseListener(new IMouseMoveListener() {	
+			@Override
+			public void leave(UIDisplayElement element) {
+				setClassStyle("button");
+			}
+			
+			@Override
+			public void hover(UIDisplayElement element) {
+
+			}
+			
+			@Override
+			public void enter(UIDisplayElement element) {
+	            AudioManager.play(new AssetUri(AssetType.SOUND, "engine:click"), 1.0f);
+				setClassStyle("button-mouseover");
+			}
+
+			@Override
+			public void move(UIDisplayElement element) {
+
+			}
+		});
+        
+        addMouseButtonListener(new IMouseButtonListener() {					
+			@Override
+			public void up(UIDisplayElement element, int button, boolean intersect) {
+				setClassStyle("button");
+			}
+			
+			@Override
+			public void down(UIDisplayElement element, int button, boolean intersect) {
+				if (intersect)
+					setClassStyle("button-mouseclick");
+			}
+			
+			@Override
+			public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
+
+			}
+		});
+        
         _label = new UIText("Untitled");
         _label.setVisible(true);
+        
         addDisplayElement(_label);
     }
 
-    @Override
-    public void update() {
-        Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
-
-        if (intersects(mousePos)) {
-
-            if (!_clickSoundPlayed) {
-                AudioManager.play(new AssetUri(AssetType.SOUND, "engine:click"), 1.0f);
-                _clickSoundPlayed = true;
-            }
-
-            if (_mouseUp) {
-                _mouseUp = false;
-                clicked();
-            }
-
-            if (_mouseDown) {
-                setClassStyle("button-mouseclick");
-            } else {
-                setClassStyle("button-mouseover");
-            }
-
-        } else {
-            _clickSoundPlayed = false;
-            _mouseUp = false;
-            _mouseDown = false;
-            setClassStyle("button");
-        }
-    }
-    
     @Override
     public void layout() {
     	super.layout();
@@ -87,21 +98,7 @@ public class UIButton extends UIDisplayContainer {
     	}
     }
 
-    public void clicked() {
-        for (int i = 0; i < _clickListeners.size(); i++) {
-            _clickListeners.get(i).clicked(this);
-        }
-    }
-
     public UIText getLabel() {
         return _label;
-    }
-
-    public void addClickListener(IClickListener listener) {
-        _clickListeners.add(listener);
-    }
-
-    public void removeClickListener(IClickListener listener) {
-        _clickListeners.remove(listener);
     }
 }

@@ -30,6 +30,7 @@ import org.terasology.model.inventory.Icon;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import org.terasology.rendering.gui.framework.events.IMouseMoveListener;
 
 import javax.vecmath.Vector2f;
 import java.util.List;
@@ -86,6 +87,30 @@ public class UIInventoryCellNew extends UIDisplayElement {
         label2 = new UIText();
         label2.setVisible(true);
         label2.setPosition(new Vector2f(0f, -14f));
+        
+        addMouseListener(new IMouseMoveListener() {	
+			@Override
+			public void leave(UIDisplayElement element) {
+	            selectionRectangle.setVisible(false);
+	            label2.setVisible(false);
+			}
+			
+			@Override
+			public void hover(UIDisplayElement element) {
+
+			}
+			
+			@Override
+			public void enter(UIDisplayElement element) {
+	            selectionRectangle.setVisible(true);
+	            label2.setVisible(true);
+			}
+
+			@Override
+			public void move(UIDisplayElement element) {
+
+			}
+		});
     }
 
     public void subscribe(CellSubscriber subscriber) {
@@ -102,8 +127,8 @@ public class UIInventoryCellNew extends UIDisplayElement {
 
     @Override
     public void update() {
-        processMouseInput();
 
+    	//TODO move this to mouse event listeners
         InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
         if (inventory == null || inventory.itemSlots.size() < slot) {
             getLabel().setVisible(false);
@@ -135,38 +160,6 @@ public class UIInventoryCellNew extends UIDisplayElement {
 		// TODO Auto-generated method stub
 		
 	}
-
-    public void processMouseInput(int button, boolean state, int wheelMoved) {
-        if (button == 0 && state && !_mouseUp) {
-            _mouseDown = true;
-            _mouseUp = false;
-            _clickSoundPlayed = false;
-        } else if (button == 0 && !state && _mouseDown) {
-            _mouseUp = true;
-            _mouseDown = false;
-        }
-    }
-
-    private void processMouseInput() {
-        Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
-
-        if (intersects(mousePos)) {
-            selectionRectangle.setVisible(true);
-            label2.setVisible(true);
-            if (_mouseUp) {
-                _mouseUp = false;
-                for (CellSubscriber subscriber : subscribers) {
-                    subscriber.onCellActivated(this);
-                }
-            }
-        } else {
-            _clickSoundPlayed = false;
-            _mouseUp = false;
-            _mouseDown = false;
-            selectionRectangle.setVisible(false);
-            label2.setVisible(false);
-        }
-    }
 
     @Override
     public void render() {

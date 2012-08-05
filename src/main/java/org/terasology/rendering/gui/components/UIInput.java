@@ -15,6 +15,14 @@
  */
 package org.terasology.rendering.gui.components;
 
+import static org.lwjgl.opengl.GL11.GL_QUADS;
+import static org.lwjgl.opengl.GL11.glBegin;
+import static org.lwjgl.opengl.GL11.glColor4f;
+import static org.lwjgl.opengl.GL11.glEnd;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glVertex2f;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -24,7 +32,12 @@ import org.terasology.asset.AssetUri;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.gui.framework.IInputDataElement;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.events.IClickListener;
+import org.terasology.rendering.gui.framework.events.IFocusListener;
 import org.terasology.rendering.gui.framework.events.IInputListener;
+import org.terasology.rendering.gui.framework.events.IMouseButtonListener;
+import org.terasology.rendering.gui.framework.events.IMouseMoveListener;
 
 import javax.vecmath.Vector2f;
 import java.util.ArrayList;
@@ -49,12 +62,122 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
     private float _textWidthInContainer = 0;  //The width of the text inside the INPUT field.
 
     private String _prevInputValue = new String();
+    
+    private UIInput _inputObj = this;
+    
+    private class UITextCursor extends UIDisplayElement {
+
+        public UITextCursor(){
+            setSize(new Vector2f(2f,15f));
+        }
+
+        public void render() {
+            glPushMatrix();
+            glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
+            glBegin(GL_QUADS);
+            glVertex2f(getPosition().x, getPosition().y);
+            glVertex2f(getPosition().x + 2f, getPosition().y);
+            glVertex2f(getPosition().x + 2f, getPosition().y + 15f);
+            glVertex2f(getPosition().x, getPosition().y + 15f);
+            glEnd();
+            glPopMatrix();
+        }
+
+        public void update() {
+
+        }
+
+        public void setPositionBySymbol() {
+            //setPosition();
+        }
+
+    	@Override
+    	public void layout() {
+
+    	}
+    }
 
     public UIInput(Vector2f size) {
         setSize(size);
         setCrop(true);
         setStyle("background-image", "engine:gui_menu 256/512 30/512 0 90/512");
+        
+        addClickListener(new IClickListener() {
+			@Override
+			public void click(UIDisplayElement element, int button) {
+				if (!isDisabled()) {
+					setFocus(_inputObj);
+					setStyle("background-position", "0 120/512");
+					
+					if (_inputValue.length() > 0 && _inputText.getTextWidth() > 0) {
+			            Vector2f absolutePosition = _inputText.calcAbsolutePosition();
+			            float positionRelativeElement = absolutePosition.x + _inputText.getTextWidth() - new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()).x;
+			            float averageSymbols = _inputText.getTextWidth() / _inputValue.length();
+	
+			            int pos = Math.abs((int) (positionRelativeElement / averageSymbols) - _inputValue.length());
+	
+			            if (pos > _inputValue.length()) {
+			                pos = _inputValue.length();
+			            } else if (pos < 0) {
+			                pos = 0;
+			            }
+			            
+			            _cursorPosition = pos;
+					}
+				}
+			}
+		});
+        addMouseButtonListener(new IMouseButtonListener() {							
+			@Override
+			public void up(UIDisplayElement element, int button, boolean intersect) {
 
+			}
+			
+			@Override
+			public void down(UIDisplayElement element, int button, boolean intersect) {
+				if (isFocused() && !intersect)
+					setFocus(null);
+			}
+			
+			@Override
+			public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
+
+			}
+		});
+        addMouseListener(new IMouseMoveListener() {		
+			@Override
+			public void leave(UIDisplayElement element) {
+				setStyle("background-position", "0 90/512");
+			}
+			
+			@Override
+			public void hover(UIDisplayElement element) {
+
+			}
+			
+			@Override
+			public void enter(UIDisplayElement element) {
+                AudioManager.play(new AssetUri(AssetType.SOUND, "engine:PlaceBlock"));
+			}
+
+			@Override
+			public void move(UIDisplayElement element) {
+
+			}
+		});
+        addFocusListener(new IFocusListener() {
+			@Override
+			public void focusOn(UIDisplayElement element) {
+				if (!isDisabled())
+					_textCursor.setVisible(true);
+			}
+			
+			@Override
+			public void focusOff(UIDisplayElement element) {
+				_textCursor.setVisible(false);
+			}
+		});
+        
         _inputText = new UIText();
         _inputText.setVisible(true);
         _inputText.setColor(Color.black);
@@ -63,6 +186,7 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
         _textCursor = new UITextCursor();
         _textCursor.setVisible(true);
         _textCursor.setPosition(new Vector2f(getPosition().x + _padding.x, getPosition().y));
+        _textCursor.setVisible(false);
 
         addDisplayElement(_inputText);
         addDisplayElement(_textCursor);
@@ -70,73 +194,11 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
 
     @Override
     public void update() {
-        Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
-
-        if (intersects(mousePos)) {
-
-            if (!_clickSoundPlayed) {
-                AudioManager.play(new AssetUri(AssetType.SOUND, "engine:PlaceBlock"));
-                _clickSoundPlayed = true;
-            }
-
-            if (_mouseUp) {
-                _mouseUp = false;
-            }
-
-            if (_mouseDown) {
-                clicked(mousePos);
-            }
-
-        } else {
-            if (_mouseDown) {
-                _focused = false;
-            }
-            _clickSoundPlayed = false;
-            _mouseUp = false;
-            _mouseDown = false;
-            setStyle("background-position", "0 90/512");
-        }
-
-        if (isFocused()) {
-            if (!isDisabled() && !_textCursor.isVisible()) {
-                _textCursor.setVisible(true);
-            }
-            setStyle("background-position", "0 120/512");
-        } else {
-            if (_textCursor.isVisible()) {
-                _textCursor.setVisible(false);
-            }
-            setStyle("background-position", "0 90/512");
-        }
-
         _inputText.setPosition(new Vector2f(_padding.x, getSize().y/2 - _inputText.getTextHeight()/2));
-
-        if(!isDisabled() && isFocused()){
-            _textCursor.setPosition(new Vector2f(_textCursor.getPosition().x, getSize().y/2 - _textCursor.getSize().y/1.5f));
-        }
+        _textCursor.setPosition(new Vector2f(_textCursor.getPosition().x, getSize().y/2 - _textCursor.getSize().y/1.5f));
 
         updateTextShift();
         super.update();
-    }
-
-    public void clicked(Vector2f mousePos) {
-        _focused = true;
-
-        if ( !isDisabled() && _inputValue.length() > 0 && _inputText.getTextWidth() > 0) {
-            Vector2f absolutePosition = _inputText.calcAbsolutePosition();
-            float positionRelativeElement = absolutePosition.x + _inputText.getTextWidth() - mousePos.x;
-            float averageSymbols = _inputText.getTextWidth() / _inputValue.length();
-
-            int pos = Math.abs((int) (positionRelativeElement / averageSymbols) - _inputValue.length());
-
-            if (pos > _inputValue.length()) {
-                pos = _inputValue.length();
-            } else if (pos < 0) {
-                pos = 0;
-            }
-            _cursorPosition = pos;
-        }
-
     }
 
     @Override
@@ -239,11 +301,6 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
             cursorPos = (_textWidthInContainer - _padding.x) / 2;
         }
         _textCursor.setPosition(new Vector2f(cursorPos, _textCursor.getPosition().y));
-    }
-
-    @Override
-    public boolean isFocused() {
-        return _focused;
     }
 
     /*

@@ -81,6 +81,7 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
         _chunkGenerator = new UIComboBox(new Vector2f(176f, 22f), new Vector2f(176f, 88f));
         _chunkGenerator.addItem("Normal", new Integer(0));
         _chunkGenerator.addItem("Flat", new Integer(1));
+        _chunkGenerator.setSelectedItemIndex(0);
         _chunkGenerator.setVisible(true);
 
 
@@ -98,43 +99,44 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
         _okButton.setVisible(true);
 
         _okButton.addClickListener(new IClickListener() {
-            public void clicked(UIDisplayElement element) {
-                if (_inputSeed.getValue().length() > 0) {
-                    Config.getInstance().setDefaultSeed(_inputSeed.getValue());
-                } else {
-                    FastRandom random = new FastRandom();
-                    Config.getInstance().setDefaultSeed(random.randomCharacterString(32));
-                }
-
-                if (_inputWorldTitle.getValue().length() > 0) {
-                    Config.getInstance().setWorldTitle(_inputWorldTitle.getValue());
-                } else {
-                    Config.getInstance().setWorldTitle(getWorldName());
-                }
-                
-                List<String> chunkList = new ArrayList<String>();
-				switch (_chunkGenerator.getSelectedItemIndex()) {
-				case 1:   //flat
-					chunkList.add(FlatTerrainGenerator.class.getName());
-					//if (checkboxFlora == selected) ... (pseudo code)
-					chunkList.add(FloraGenerator.class.getName());
-					chunkList.add(LiquidsGenerator.class.getName());
-					chunkList.add(ForestGenerator.class.getName());
-					break;
-
-				default:  //normal
-					chunkList.add(PerlinTerrainGenerator.class.getName());
-					chunkList.add(FloraGenerator.class.getName());
-					chunkList.add(LiquidsGenerator.class.getName());
-					chunkList.add(ForestGenerator.class.getName());
-					break;
-				}
-				
-				String[] chunksListArr = chunkList.toArray(new String[chunkList.size()]);
-				Config.getInstance().setChunkGenerator(chunksListArr);
-				
-                CoreRegistry.get(GameEngine.class).changeState(new StateSinglePlayer(Config.getInstance().getWorldTitle(), Config.getInstance().getDefaultSeed()));
-            }
+			@Override
+			public void click(UIDisplayElement element, int button) {
+	                if (_inputSeed.getValue().length() > 0) {
+	                    Config.getInstance().setDefaultSeed(_inputSeed.getValue());
+	                } else {
+	                    FastRandom random = new FastRandom();
+	                    Config.getInstance().setDefaultSeed(random.randomCharacterString(32));
+	                }
+	
+	                if (_inputWorldTitle.getValue().length() > 0) {
+	                    Config.getInstance().setWorldTitle(_inputWorldTitle.getValue());
+	                } else {
+	                    Config.getInstance().setWorldTitle(getWorldName());
+	                }
+	                
+	                List<String> chunkList = new ArrayList<String>();
+					switch (_chunkGenerator.getSelectedItemIndex()) {
+					case 1:   //flat
+						chunkList.add(FlatTerrainGenerator.class.getName());
+						//if (checkboxFlora == selected) ... (pseudo code)
+						chunkList.add(FloraGenerator.class.getName());
+						chunkList.add(LiquidsGenerator.class.getName());
+						chunkList.add(ForestGenerator.class.getName());
+						break;
+	
+					default:  //normal
+						chunkList.add(PerlinTerrainGenerator.class.getName());
+						chunkList.add(FloraGenerator.class.getName());
+						chunkList.add(LiquidsGenerator.class.getName());
+						chunkList.add(ForestGenerator.class.getName());
+						break;
+					}
+					
+					String[] chunksListArr = chunkList.toArray(new String[chunkList.size()]);
+					Config.getInstance().setChunkGenerator(chunksListArr);
+					
+	                CoreRegistry.get(GameEngine.class).changeState(new StateSinglePlayer(Config.getInstance().getWorldTitle(), Config.getInstance().getDefaultSeed()));
+			}
         });
 
 
@@ -144,9 +146,10 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
         _cancelButton.setVisible(true);
 
         _cancelButton.addClickListener(new IClickListener() {
-            public void clicked(UIDisplayElement element) {
-                close(true);
-            }
+			@Override
+			public void click(UIDisplayElement element, int button) {
+				close(true);
+			}
         });
 
         addDisplayElement(_inputWorldTitleLabel, "inputWorldTitleLabel");

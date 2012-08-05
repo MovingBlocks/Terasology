@@ -55,11 +55,15 @@ public class UIConfigMenuVideo extends UIDisplayWindow {
     final UIText _version;
     
     private final IClickListener clickAction = new IClickListener() {
-        @Override
-        public void clicked(UIDisplayElement element) {
-        	UIStateButton button = (UIStateButton) element;
-            button.nextState();
-        }
+		@Override
+		public void click(UIDisplayElement element, int button) {
+        	UIStateButton b = (UIStateButton) element;
+        	
+        	if (button == 0)
+        		b.nextState();
+        	else if (button == 1)
+        		b.previousState();
+		}
     };
 
     public UIConfigMenuVideo() {

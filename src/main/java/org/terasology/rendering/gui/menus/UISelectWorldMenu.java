@@ -30,6 +30,7 @@ import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.events.IClickListener;
+import org.terasology.rendering.gui.framework.events.IMouseButtonListener;
 
 import javax.vecmath.Vector2f;
 import java.io.File;
@@ -70,9 +71,10 @@ public class UISelectWorldMenu extends UIDisplayWindow {
         _list.setVisible(true);
 
         _list.addDoubleClickListener(new IClickListener() {
-            public void clicked(UIDisplayElement element) {
-                loadSelectedWorld();
-            }
+			@Override
+			public void click(UIDisplayElement element, int button) {
+				loadSelectedWorld();
+			}
         });
 
         _goToBack = new UIButton(new Vector2f(256f, 32f));
@@ -92,18 +94,18 @@ public class UISelectWorldMenu extends UIDisplayWindow {
         _deleteFromList.setVisible(true);
 
         _createNewWorld.addClickListener(new IClickListener() {
-            public void clicked(UIDisplayElement element) {
+			@Override
+			public void click(UIDisplayElement element, int button) {
                 GUIManager.getInstance().setFocusedWindow(_window);
                 _window.clearInputControls();
                 UIInput inputWorldName = (UIInput) _window.getElementById("inputWorldTitle");
                 inputWorldName.setValue(_window.getWorldName());
-
-            }
+			}
         });
 
         _deleteFromList.addClickListener(new IClickListener() {
-            public void clicked(UIDisplayElement element) {
-
+			@Override
+			public void click(UIDisplayElement element, int button) {
                 if (_list.getSelectedItem() == null) {
                     GUIManager.getInstance().showMessage("Error", "Please choose a world first.");
                     return;
@@ -117,14 +119,15 @@ public class UISelectWorldMenu extends UIDisplayWindow {
                 } catch (Exception e) {
                     GUIManager.getInstance().showMessage("Error", "Failed deleting world data object. Sorry.");
                 }
-            }
+			}
         });
 
         _loadFromList.addClickListener(new IClickListener() {
-            public void clicked(UIDisplayElement element) {
-                loadSelectedWorld();
-            }
-        });
+			@Override
+			public void click(UIDisplayElement element, int button) {
+				loadSelectedWorld();
+			}
+		});
 
         fillList();
 

@@ -51,9 +51,10 @@ public class UIMessageBox extends UIDialogBox {
         _buttonOk.setPosition(new Vector2f(getSize().x / 2 - _buttonOk.getSize().x / 2, getSize().y - _buttonOk.getSize().y - 10f));
 
         _buttonOk.addClickListener(new IClickListener() {
-            public void clicked(UIDisplayElement element) {
-                close();
-            }
+			@Override
+			public void click(UIDisplayElement element, int button) {
+				close();
+			}
         });
 
         resize();

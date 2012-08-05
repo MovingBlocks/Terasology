@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.gui.components;
 
+import java.util.ArrayList;
+
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.AngelCodeFont;
@@ -25,6 +27,7 @@ import org.terasology.logic.manager.FontManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.events.IChangedListener;
 
 import javax.vecmath.Vector2f;
 
@@ -37,6 +40,7 @@ import static org.lwjgl.opengl.GL11.glDisable;
  */
 public class UIText extends UIDisplayElement {
 
+	private final ArrayList<IChangedListener> _changedListeners = new ArrayList<IChangedListener>();
     protected String _text = "";
 
     private Color _shadowColor = new Color(Color.black);
@@ -55,8 +59,6 @@ public class UIText extends UIDisplayElement {
     }
 
     public UIText(String text) {
-        super();
-
         _text = text;
     }
 
@@ -85,12 +87,18 @@ public class UIText extends UIDisplayElement {
 
     @Override
     public void update() {
-        // Nothing to do here
+
     }
     
 	@Override
 	public void layout() {
-		// Nothing to do here
+
+	}
+	
+	private void notifyChangedListeners() {
+		for (IChangedListener listener : _changedListeners) {
+			listener.changed(this);
+		}
 	}
 
     public String getText() {
@@ -99,10 +107,7 @@ public class UIText extends UIDisplayElement {
 
     public void setText(String text) {
         _text = text;
-        
-        UIDisplayElement parent = getParent();
-        if (parent != null)
-        	parent.layout();
+        notifyChangedListeners();
     }
 
     public Color getColor() {
@@ -148,5 +153,13 @@ public class UIText extends UIDisplayElement {
     public Vector2f calcCenterPosition() {
         // This has to be calculated separately since the width of the text depends on the selected font
         return new Vector2f(Display.getWidth() / 2 - getTextWidth() / 2, Display.getHeight() / 2 - getTextHeight());
+    }
+
+	public void addChangedListener(IChangedListener listener) {
+        _changedListeners.add(listener);
+    }
+
+    public void removeChangedListener(IChangedListener listener) {
+    	_changedListeners.remove(listener);
     }
 }

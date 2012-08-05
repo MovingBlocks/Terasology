@@ -105,7 +105,8 @@ public class UIConfigMenuControls extends UIDisplayWindow {
         maximize();
         
         IClickListener editButtonClick = new IClickListener() {
-			public void clicked(UIDisplayElement element) {
+			@Override
+			public void click(UIDisplayElement element, int button) {
 				if (editButton == null) {
 					editButton = (UIButton) element;
 					editButtonCurrent = editButton.getLabel().getText();
@@ -241,7 +242,7 @@ public class UIConfigMenuControls extends UIDisplayWindow {
         defaultButton.setVisible(true);
         defaultButton.addClickListener(new IClickListener() {	
 			@Override
-			public void clicked(UIDisplayElement element) {
+			public void click(UIDisplayElement element, int button) {
 				InputConfig.getInstance().loadDefaultConfig();
 				
 		        ForwardButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyForward()));

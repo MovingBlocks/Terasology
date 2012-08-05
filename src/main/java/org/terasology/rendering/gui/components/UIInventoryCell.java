@@ -15,8 +15,6 @@
  */
 package org.terasology.rendering.gui.components;
 
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
@@ -31,6 +29,7 @@ import org.terasology.model.inventory.Icon;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import org.terasology.rendering.gui.framework.events.IMouseMoveListener;
 
 import javax.vecmath.Vector2f;
 
@@ -71,6 +70,30 @@ public class UIInventoryCell extends UIDisplayElement {
         _label2 = new UIText();
         _label2.setVisible(false);
         _label2.setPosition(new Vector2f(0f, -14f));
+        
+        addMouseListener(new IMouseMoveListener() {	
+			@Override
+			public void leave(UIDisplayElement element) {
+	            _selectionRectangle.setVisible(false);
+	            _label2.setVisible(false);
+			}
+			
+			@Override
+			public void hover(UIDisplayElement element) {
+
+			}
+			
+			@Override
+			public void enter(UIDisplayElement element) {
+	            _selectionRectangle.setVisible(true);
+	            _label2.setVisible(true);
+			}
+
+			@Override
+			public void move(UIDisplayElement element) {
+
+			}
+		});
     }
 
     private Vector2f findPosition() {
@@ -89,9 +112,8 @@ public class UIInventoryCell extends UIDisplayElement {
 
     @Override
     public void update() {
+    	//TODO implement this behavior with events
         setPosition(findPosition());
-
-        processMouseInput();
 
         InventoryComponent inventory = CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(InventoryComponent.class);
         if (inventory == null || inventory.itemSlots.size() < _id) {
@@ -123,21 +145,6 @@ public class UIInventoryCell extends UIDisplayElement {
 	public void layout() {
 
 	}
-
-    private void processMouseInput() {
-        Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
-
-        if (intersects(mousePos)) {
-            _selectionRectangle.setVisible(true);
-            _label2.setVisible(true);
-        } else {
-            _clickSoundPlayed = false;
-            _mouseUp = false;
-            _mouseDown = false;
-            _selectionRectangle.setVisible(false);
-            _label2.setVisible(false);
-        }
-    }
 
     @Override
     public void render() {

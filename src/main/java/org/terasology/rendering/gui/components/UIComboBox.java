@@ -22,6 +22,11 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.events.IChangedListener;
+import org.terasology.rendering.gui.framework.events.IClickListener;
+import org.terasology.rendering.gui.framework.events.IMouseButtonListener;
+import org.terasology.rendering.gui.framework.events.IMouseMoveListener;
 
 import javax.vecmath.Vector2f;
 
@@ -31,6 +36,7 @@ public class UIComboBox extends UIDisplayContainer {
     private UIList   _baseList;
 
     private boolean _opened;
+    private final UIComboBox _comboObj = this;
 
     public UIComboBox(Vector2f size){
         initBaseItems(size, new Vector2f(size.x - 2, size.x + size.x/2 - 2));
@@ -43,8 +49,56 @@ public class UIComboBox extends UIDisplayContainer {
     private void initBaseItems(Vector2f size, Vector2f listSize){
         setSize(size);
         _opened = false;
+        
+        addMouseButtonListener(new IMouseButtonListener() {
+			@Override
+			public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
 
-        _baseInput  = new UIInput(size);
+			}
+			
+			@Override
+			public void up(UIDisplayElement element, int button, boolean intersect) {
+				if (intersect)
+					_opened = !_opened;
+				else if (!_baseList.intersects(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY())))
+					_opened = false;
+				
+		        _baseList.setVisible(_opened);
+		        
+		        if (!_opened) {
+		            _baseList.getScrollBarHorizontal().resetScrollPosition();
+		            _baseList.getScrollBarVertival().resetScrollPosition();
+		        }
+			}
+			
+			@Override
+			public void down(UIDisplayElement element, int button, boolean intersect) {
+	
+			}
+		});
+        addMouseListener(new IMouseMoveListener() {
+			@Override
+			public void leave(UIDisplayElement element) {
+
+			}
+			
+			@Override
+			public void hover(UIDisplayElement element) {
+
+			}
+			
+			@Override
+			public void enter(UIDisplayElement element) {
+				AudioManager.play(new AssetUri(AssetType.SOUND, "engine:PlaceBlock"));
+			}
+
+			@Override
+			public void move(UIDisplayElement element) {
+
+			}
+		});
+
+        _baseInput = new UIInput(size);
         _baseInput.setVisible(true);
         _baseInput.setDisabled(true);
 
@@ -53,104 +107,28 @@ public class UIComboBox extends UIDisplayContainer {
         _baseButton.getPosition().x = size.x   - _baseButton.getSize().x;
         _baseButton.getPosition().y = size.y/2 - _baseButton.getSize().y/2;
         _baseButton.getLabel().setText("");
-
         _baseButton.setClassStyle("button", "background-image: engine:gui_menu 18/512 18/512 432/512 0");
         _baseButton.setClassStyle("button-mouseover", "background-image: engine:gui_menu 18/512 18/512 432/512 0");
         _baseButton.setClassStyle("button-mouseclick", "background-image: engine:gui_menu 18/512 18/512 432/512 18/512");
 
-        _baseList   = new UIList(listSize);
-
+        _baseList = new UIList(listSize);
         _baseList.getPosition().y = size.y + 2;
         _baseList.setVisible(false);
+        _baseList.addClickListener(new IClickListener() {	
+			@Override
+			public void click(UIDisplayElement element, int button) {
+				_opened = !_opened;
+				_baseList.setVisible(_opened);
+			}
+		});
+        _baseList.addChangedListener(new IChangedListener() {	
+			@Override
+			public void changed(UIDisplayElement element) {
+				if (_baseList.getSelectedItem() != null)
+					_baseInput.setValue(_baseList.getSelectedItem().getText());
+			}
+		});
 
-        setListStyle();
-
-        addDisplayElement(_baseInput);
-        addDisplayElement(_baseButton);
-        addDisplayElement(_baseList);
-    }
-
-    public void setValue(String test){
-        _baseInput.setValue(test);
-    }
-
-    public void addItem(String text, Object value) {
-        _baseList.addItem(text, value);
-    }
-    
-    public UIListItem getSelectedItem(){
-        if(_baseList.getSelectedItem()!=null){
-            return _baseList.getSelectedItem();
-        }else{
-            return _baseList.getItem(0);
-        }
-    }
-
-    public void update(){
-        super.update();
-        checkSelectedItem();
-
-
-        if(_opened){
-            _baseButton.setClassStyle("button-mouseclick");
-        }else{
-            _baseButton.setClassStyle("button");
-        }
-        
-        Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
-        
-        if(_baseList.checkClickOnScrollBar(mousePos) ||
-           _baseList.getScrollBarVertival().isScrolled() ||
-           _baseList.getScrollBarHorizontal().isScrolled()
-          ){
-            return;
-        }
-
-        if (intersects(mousePos)) {
-
-            if (!_clickSoundPlayed) {
-                AudioManager.play(new AssetUri(AssetType.SOUND, "engine:PlaceBlock"));
-                _clickSoundPlayed = true;
-            }
-
-            if (_mouseUp) {
-                _mouseUp = false;
-            }
-            
-            if(_mouseDown){
-                clicked();
-                _mouseDown = false;
-            }
-
-        }else{
-
-            if(_mouseDown && _opened){
-                clicked();
-            }
-
-            _mouseDown = false;
-            _clickSoundPlayed = false;
-            _mouseUp = false;
-
-        }
-
-    }
-    
-    private void checkSelectedItem(){
-        if(_baseList.getSelectedItem() == null){
-            if(!_baseList.isEmpty()){
-                _baseInput.setValue(_baseList.getItem(0).getText());
-            }
-        }else{
-            _baseInput.setValue(_baseList.getSelectedItem().getText());
-        }
-    }
-    
-    public int getSelectedItemIndex() {
-		return _baseList._selectedItemIndex;
-	}
-
-    private void setListStyle(){
         _baseList.setClassStyle("windowSkin", "border-image-top: engine:gui_menu 159/512 1/512 263/512 17/512 2");
         _baseList.setClassStyle("windowSkin", "border-image-right: engine:gui_menu 1/512 63/512 423/512 17/512 2");
         _baseList.setClassStyle("windowSkin", "border-image-bottom: engine:gui_menu 159/512 1/512 263/512 81/512 2");
@@ -162,17 +140,25 @@ public class UIComboBox extends UIDisplayContainer {
         _baseList.setClassStyle("windowSkin", "border-corner-bottomleft: engine:gui_menu 64/512 81/512");
         _baseList.setClassStyle("windowSkin", "background-image: engine:gui_menu 159/512 63/512 264/512 18/512");
         _baseList.setClassStyle("windowSkin");
+
+        addDisplayElement(_baseInput);
+        addDisplayElement(_baseButton);
+        addDisplayElement(_baseList);
     }
 
-    public void clicked() {
-        _opened = !_opened;
-        _baseInput.setFocus(_opened);
-        _baseList.setVisible(_opened);
-        
-        if( !_opened ){
-            _baseList.getScrollBarHorizontal().resetScrollPosition();
-            _baseList.getScrollBarVertival().resetScrollPosition();
-        }
-        
+    public void addItem(String text, Object value) {
+        _baseList.addItem(text, value);
+    }
+    
+    public void setSelectedItemIndex(int i) {
+    	_baseList.setSelectedItemIndex(i);
+    }
+    
+    public int getSelectedItemIndex() {
+		return _baseList.getSelectedItemIndex();
+	}
+    
+    public Object getValue() {
+    	return _baseList.getValue();
     }
 }

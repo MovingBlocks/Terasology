@@ -22,9 +22,15 @@ import javax.vecmath.Vector2f;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
+import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 import org.terasology.rendering.gui.framework.events.IChangedListener;
+import org.terasology.rendering.gui.framework.events.IMouseButtonListener;
+import org.terasology.rendering.gui.framework.events.IMouseMoveListener;
 
 /**
  * A simple Slider.
@@ -42,7 +48,7 @@ public class UISlider extends UIDisplayContainer {
 	private int _max;
 	private int _range;
 	
-	private static UISlider _moveActive = null;
+	private final UISlider _sliderObj = this;
 
 	public UISlider(Vector2f size, int min, int max) {
         setSize(size);
@@ -54,6 +60,49 @@ public class UISlider extends UIDisplayContainer {
         setClassStyle("slider-mouseover", "background-image: engine:gui_menu 256/512 30/512 0 30/512");
         setClassStyle("slider");
         
+        addMouseListener(new IMouseMoveListener() {	
+			@Override
+			public void leave(UIDisplayElement element) {
+				setClassStyle("slider");
+			}
+			
+			@Override
+			public void hover(UIDisplayElement element) {
+
+			}
+			
+			@Override
+			public void enter(UIDisplayElement element) {
+	            AudioManager.play(new AssetUri(AssetType.SOUND, "engine:click"), 1.0f);
+				setClassStyle("slider-mouseover");
+			}
+
+			@Override
+			public void move(UIDisplayElement element) {
+				if (isFocused()) {
+					changeSlider(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()).x);
+				}
+			}
+		});
+        
+        addMouseButtonListener(new IMouseButtonListener() {			
+			@Override
+			public void up(UIDisplayElement element, int button, boolean intersect) {
+				setClassStyle("slider");
+			}
+			
+			@Override
+			public void down(UIDisplayElement element, int button, boolean intersect) {
+				if (intersect)
+					changeSlider(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()).x);
+			}
+			
+			@Override
+			public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
+
+			}
+		});
+        
         _slider = new UIGraphicsElement(AssetManager.loadTexture("engine:gui_menu"));
         _slider.setParent(this);
         _slider.setVisible(true);
@@ -61,6 +110,24 @@ public class UISlider extends UIDisplayContainer {
         _slider.getTextureOrigin().set(0f, 60f / 512f);
         _slider.getTextureSize().set(new Vector2f(256f / 512f, 30f / 512f));
         _slider.setSize(new Vector2f(16f, getSize().y));
+        _slider.addMouseButtonListener(new IMouseButtonListener() {									
+			@Override
+			public void up(UIDisplayElement element, int button, boolean intersect) {
+				setFocus(null);
+			}
+			
+			@Override
+			public void down(UIDisplayElement element, int button, boolean intersect) {
+				if (!isFocused() && intersect) {
+					setFocus(_sliderObj);
+				}
+			}
+			
+			@Override
+			public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
+				
+			}
+		});
         
         _label = new UIText("");
         _label.setVisible(true);
@@ -70,25 +137,6 @@ public class UISlider extends UIDisplayContainer {
         
         calcRange();
 	}
-
-	public void update() {
-        Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
-        
-        updateSlider(mousePos);
-
-        if (intersects(mousePos)) {
-            setClassStyle("slider-mouseover");
-            if (_mouseDown && _moveActive == null)
-            {
-            	changeSlider(mousePos.x);
-            }
-        } 
-        else {
-            setClassStyle("slider");
-        }
-
-        super.update();
-    }
 	
 	@Override
 	public void layout() {
@@ -96,24 +144,6 @@ public class UISlider extends UIDisplayContainer {
 		
 		if (_label != null) {
 			_label.setPosition(new Vector2f(getSize().x / 2 - _label.getTextWidth() / 2, getSize().y / 2 - _label.getTextHeight() / 2));
-		}
-	}
-    
-    private void updateSlider(Vector2f mousePos) {        
-		if (_slider.intersects(mousePos)) {
-			if (_mouseDown && _moveActive == null) {
-				_moveActive = this;
-			}
-		}
-
-		if (_mouseUp) {
-			_moveActive = null;
-			_mouseDown = false;
-			_mouseUp = false;
-		}
-
-		if (_moveActive == this) {
-			changeSlider(mousePos.x);
 		}
 	}
 	
@@ -211,7 +241,6 @@ public class UISlider extends UIDisplayContainer {
 	}
 	
 	private void notifyChangedListeners() {
-		_label.setText(String.valueOf(_currentValue));
 		for (IChangedListener listener : _changedListeners) {
 			listener.changed(this);
 		}
