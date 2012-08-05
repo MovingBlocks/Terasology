@@ -20,6 +20,7 @@ import org.terasology.asset.AssetUri;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.events.IChangedListener;
 import org.terasology.rendering.gui.framework.events.IMouseButtonListener;
 import org.terasology.rendering.gui.framework.events.IMouseMoveListener;
 
@@ -85,6 +86,12 @@ public class UIButton extends UIDisplayContainer {
         
         _label = new UIText("Untitled");
         _label.setVisible(true);
+        _label.addChangedListener(new IChangedListener() {
+			@Override
+			public void changed(UIDisplayElement element) {
+				layout();
+			}
+		});
         
         addDisplayElement(_label);
     }
