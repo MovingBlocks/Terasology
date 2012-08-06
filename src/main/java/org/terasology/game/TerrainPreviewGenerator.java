@@ -15,10 +15,10 @@
  */
 package org.terasology.game;
 
-import org.terasology.logic.world.WorldBiomeProvider;
-import org.terasology.logic.world.WorldBiomeProviderImpl;
-import org.terasology.logic.world.generator.core.PerlinTerrainGenerator;
-import org.terasology.model.blocks.Block;
+import org.terasology.world.WorldBiomeProvider;
+import org.terasology.world.WorldBiomeProviderImpl;
+import org.terasology.world.generator.core.PerlinTerrainGenerator;
+import org.terasology.world.block.Block;
 
 import javax.imageio.ImageIO;
 import javax.vecmath.Vector2f;
@@ -115,9 +115,9 @@ public class TerrainPreviewGenerator {
                         Vector4f vecCol = new Vector4f();
 
                         if (mapStyle == MapStyle.COLOR_LUT)
-                            vecCol = Block.calcColorForTemperatureAndHumidity(temp, humidity);
+                            vecCol = Block.ColorSource.COLOR_LUT.calcColor(temp, humidity);
                         else if (mapStyle == MapStyle.FOLIAGE_LUT)
-                            vecCol = Block.calcFoliageColorForTemperatureAndHumidity(temp, humidity);
+                            vecCol = Block.ColorSource.FOLIAGE_LUT.calcColor(temp, humidity);
 
                         for (int height = 256; height > 0; height -= 4) {
                             double n = generator.calcDensity(x * ZOOM_FACTOR + (int) POSITION.x, height - 1, z * ZOOM_FACTOR + (int) POSITION.y);

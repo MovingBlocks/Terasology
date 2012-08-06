@@ -22,9 +22,9 @@ import org.terasology.logic.LocalPlayer;
 import org.terasology.asset.AssetManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PostProcessingRenderer;
-import org.terasology.logic.world.WorldProvider;
+import org.terasology.world.WorldProvider;
 import org.terasology.math.TeraMath;
-import org.terasology.model.blocks.Block;
+import org.terasology.world.block.Block;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.world.WorldRenderer;
 

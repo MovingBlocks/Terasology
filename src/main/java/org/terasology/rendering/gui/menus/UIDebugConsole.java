@@ -27,6 +27,8 @@ import org.terasology.logic.manager.GroovyManager;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.components.UITextWrap;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
+import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.management.BlockManager;
 
 import javax.vecmath.Vector2f;
 import java.io.IOException;
@@ -227,14 +229,14 @@ public final class UIDebugConsole extends UIDisplayWindow {
                 return;
             }
             if (split[1].equals("blockList")) {
-                String tempval = "";
-                HashMap<Byte, String> blocks = groovyhelpmanager.getGroovyBlocks();
-                for (byte i = 0; i < Byte.MAX_VALUE; i++) {
-                    if (blocks.containsKey(i)) {
-                        tempval += "blockName = " + blocks.get(i) + ", blockNbr = " + i + newLine;
-                    }
+                StringBuilder stringBuilder = new StringBuilder();
+                for (BlockFamily blockFamily : BlockManager.getInstance().listBlockFamilies()) {
+                    stringBuilder.append(blockFamily.getDisplayName());
+                    stringBuilder.append(" - ");
+                    stringBuilder.append(blockFamily.getURI().toString());
+                    stringBuilder.append(newLine);
                 }
-                setHelpText(tempval);
+                setHelpText(stringBuilder.toString());
                 return;
             }
             showError();

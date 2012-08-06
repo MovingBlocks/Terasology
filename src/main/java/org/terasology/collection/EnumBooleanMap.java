@@ -16,22 +16,23 @@
 
 package org.terasology.collection;
 
+import java.util.EnumSet;
+
 /**
  * EnumMap for storing primitive booleans against each enum value.
  * Values default to false
  *
  * @author Immortius <immortius@gmail.com>
  */
-// TODO: Remove, use EnumSet instead?
-public class EnumBooleanMap<ENUM extends Enum> {
-    private boolean[] store;
+public class EnumBooleanMap<ENUM extends Enum<ENUM>> {
+    private EnumSet<ENUM> store;
 
     public EnumBooleanMap(Class<ENUM> enumClass) {
-        store = new boolean[enumClass.getEnumConstants().length];
+        store = EnumSet.noneOf(enumClass);
     }
 
     public int size() {
-        return store.length;
+        return store.size();
     }
 
     public boolean isEmpty() {
@@ -43,28 +44,25 @@ public class EnumBooleanMap<ENUM extends Enum> {
     }
 
     public boolean get(ENUM key) {
-        return store[key.ordinal()];
+        return store.contains(key);
     }
 
     public boolean put(ENUM key, boolean value) {
-        boolean old = store[key.ordinal()];
-        store[key.ordinal()] = value;
-        return old;
+        if (value) {
+            return !store.add(key);
+        } else {
+            return store.remove(key);
+        }
     }
 
     public void putAll(EnumBooleanMap<ENUM> other) {
-        assert other.store.length == store.length;
-        for (int i = 0; i < store.length; ++i) {
-            store[i] = other.store[i];
-        }
+        store.addAll(other.store);
     }
 
     /**
      * Sets all values to false
      */
     public void clear() {
-        for (int i = 0; i < store.length; ++i) {
-            store[i] = false;
-        }
+        store.clear();
     }
 }

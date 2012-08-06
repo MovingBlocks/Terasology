@@ -23,7 +23,7 @@ import groovy.util.ResourceException;
 import groovy.util.ScriptException;
 import org.lwjgl.input.Keyboard;
 import org.terasology.components.rendering.MeshComponent;
-import org.terasology.model.blocks.Block;
+import org.terasology.world.block.Block;
 import org.terasology.physics.BlockPickupComponent;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.components.HealthComponent;
@@ -44,8 +44,9 @@ import org.terasology.game.GameEngine;
 import org.terasology.game.modes.StateSinglePlayer;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.model.blocks.BlockFamily;
-import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.world.block.BlockUri;
+import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.management.BlockManager;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -158,7 +159,7 @@ public class GroovyManager {
         }
 
         public void giveBlock(String title, int quantity) {
-            BlockFamily blockFamily = BlockManager.getInstance().getBlockFamily(title);
+            BlockFamily blockFamily = BlockManager.getInstance().getBlockFamily(new BlockUri(title));
             giveBlock(blockFamily, quantity);
         }
 

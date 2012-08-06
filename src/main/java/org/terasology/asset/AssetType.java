@@ -46,7 +46,10 @@ public enum AssetType {
             return null;
         }
     },
-    MATERIAL("material", "materials");
+    MATERIAL("material", "materials"),
+    BLOCK_DEFINITION("blockdef", "blocks"),
+    BLOCK_TILE("blocktile", "blockTiles");
+
 
     private String typeId;
     private String subDir;

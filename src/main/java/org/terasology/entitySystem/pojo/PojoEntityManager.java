@@ -121,6 +121,7 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
                 loc.setWorldPosition(position);
             }
         }
+        components.add(new EntityInfoComponent(prefab.getName()));
         return create(components);
     }
 
@@ -130,6 +131,7 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
         for (Component component : prefab.listComponents()) {
             components.add(componentLibrary.copy(component));
         }
+        components.add(new EntityInfoComponent(prefab.getName()));
         return create(components);
     }
 

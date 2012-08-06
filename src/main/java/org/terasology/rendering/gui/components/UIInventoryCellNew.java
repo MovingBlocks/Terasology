@@ -24,8 +24,8 @@ import org.terasology.components.ItemComponent;
 import org.terasology.components.block.BlockItemComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.asset.AssetManager;
-import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.BlockFamily;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.family.BlockFamily;
 import org.terasology.model.inventory.Icon;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -117,11 +117,11 @@ public class UIInventoryCellNew extends UIDisplayElement {
             getLabel().setVisible(true);
             getLabel().setText(Integer.toString(item.stackCount));
             if (blockItem != null) {
-                label2.setText(blockItem.blockFamily.getTitle());
+                label2.setText(blockItem.blockFamily.getDisplayName());
             }
         } else if (item != null) {
             if (blockItem != null) {
-                label2.setText(blockItem.blockFamily.getTitle());
+                label2.setText(blockItem.blockFamily.getDisplayName());
             } else {
                 label2.setText(item.name);
             }

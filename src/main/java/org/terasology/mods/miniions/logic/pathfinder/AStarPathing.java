@@ -15,7 +15,7 @@
  */
 package org.terasology.mods.miniions.logic.pathfinder;
 
-import org.terasology.logic.world.WorldProvider;
+import org.terasology.world.WorldProvider;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 
 import javax.vecmath.Vector3f;

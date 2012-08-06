@@ -16,13 +16,12 @@
 
 package org.terasology.physics;
 
-import com.bulletphysics.collision.shapes.BoxShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.collision.shapes.voxel.VoxelInfo;
 import com.bulletphysics.collision.shapes.voxel.VoxelPhysicsWorld;
-import org.terasology.logic.world.WorldProvider;
+import org.terasology.world.WorldProvider;
 import org.terasology.math.Vector3i;
-import org.terasology.model.blocks.Block;
+import org.terasology.world.block.Block;
 
 import javax.vecmath.Vector3f;
 
@@ -40,7 +39,7 @@ public class PhysicsWorldWrapper implements VoxelPhysicsWorld {
     @Override
     public VoxelInfo getCollisionShapeAt(int x, int y, int z) {
         Block block = world.getBlock(x, y, z);
-        return new TeraVoxelInfo(block, !block.isSelectionRayThrough(), !block.isPenetrable(), new Vector3i(x, y, z));
+        return new TeraVoxelInfo(block, block.isTargetable(), !block.isPenetrable(), new Vector3i(x, y, z));
     }
 
     private static class TeraVoxelInfo implements VoxelInfo {

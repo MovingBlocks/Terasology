@@ -25,8 +25,8 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.asset.AssetManager;
-import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.BlockFamily;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.family.BlockFamily;
 import org.terasology.model.inventory.Icon;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -106,11 +106,11 @@ public class UIInventoryCell extends UIDisplayElement {
             getLabel().setVisible(true);
             getLabel().setText(Integer.toString(item.stackCount));
             if (blockItem != null) {
-                _label2.setText(blockItem.blockFamily.getTitle());
+                _label2.setText(blockItem.blockFamily.getDisplayName());
             }
         } else if (item != null) {
             if (blockItem != null) {
-                _label2.setText(blockItem.blockFamily.getTitle());
+                _label2.setText(blockItem.blockFamily.getDisplayName());
             } else {
                 _label2.setText(item.name);
             }

@@ -16,9 +16,10 @@
 package org.terasology.model.structures;
 
 import com.google.common.collect.Lists;
-import org.terasology.logic.world.BlockUpdate;
-import org.terasology.logic.world.WorldProvider;
-import org.terasology.model.blocks.Block;
+import org.terasology.world.BlockUpdate;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockUri;
 
 import java.util.HashMap;
 import java.util.List;
@@ -91,11 +92,11 @@ public class BlockCollection {
      *
      * @param provider  The world to build the collection in
      * @param position  The position to build the collection at (using the collection's attachment position)
-     * @param blockName The name of the blocks we want to filter by
+     * @param blockUri  The uri of the blocks we want to filter by
      * @return The BlockSelection for the built blocks matching the filter
      */
-    public BlockSelection buildWithFilter(WorldProvider provider, BlockPosition position, String blockName) {
-        BlockCollection filteredBlocks = filter(blockName);
+    public BlockSelection buildWithFilter(WorldProvider provider, BlockPosition position, BlockUri blockUri) {
+        BlockCollection filteredBlocks = filter(blockUri);
         return build(provider, position, filteredBlocks);
     }
 
@@ -132,14 +133,14 @@ public class BlockCollection {
     /**
      * Returns a filtered BlockCollection only including Blocks matching the supplied name
      *
-     * @param blockName The name of the Block we're interested in
+     * @param blockUri The uri of the Block we're interested in
      * @return A BlockCollection only containing the interesting blocks
      */
-    public BlockCollection filter(String blockName) {
+    public BlockCollection filter(BlockUri blockUri) {
         BlockCollection filtered = new BlockCollection();
         for (BlockPosition pos : _blocks.keySet()) {
             Block b = _blocks.get(pos);
-            if (b.getTitle().equals(blockName)) {
+            if (b.getURI().equals(blockUri)) {
                 //System.out.println("Block " + b + " matches the filter for " + blockName + " so adding it");
                 filtered.addBlock(pos, b);
             }

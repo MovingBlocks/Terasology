@@ -24,10 +24,10 @@ import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.world.BlockEntityRegistry;
-import org.terasology.logic.world.WorldProvider;
+import org.terasology.world.BlockEntityRegistry;
+import org.terasology.world.WorldProvider;
 import org.terasology.math.Vector3i;
-import org.terasology.model.blocks.Block;
+import org.terasology.world.block.Block;
 import org.terasology.mods.miniions.components.MinionComponent;
 import org.terasology.mods.miniions.components.SimpleMinionAIComponent;
 import org.terasology.mods.miniions.events.MinionMessageEvent;
@@ -292,7 +292,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
 
         int damage = 1;
         Block block = worldProvider.getBlock(new Vector3f(position.x, position.y - 0.5f, position.z));
-        if ((block.isDestructible()) && (!block.isSelectionRayThrough())) {
+        if ((block.isDestructible()) && (block.isTargetable())) {
             EntityRef blockEntity = blockEntityRegistry.getOrCreateEntityAt(new Vector3i(position));
             if (blockEntity == EntityRef.NULL) {
                 return false;
