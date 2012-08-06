@@ -33,7 +33,7 @@ public class UIStateButton extends UIButton {
     private int _currentState = -1;
     
     public UIStateButton(Vector2f size) {
-		super(size);
+		super(size, UIButton.eButtonType.NORMAL);
 	}
 
     /**

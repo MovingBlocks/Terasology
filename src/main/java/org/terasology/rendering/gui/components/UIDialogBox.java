@@ -88,7 +88,7 @@ public class UIDialogBox extends UIDisplayWindow {
 			}
 		});
 
-        _close = new UIButton(new Vector2f(19f, 19f));
+        _close = new UIButton(new Vector2f(19f, 19f), UIButton.eButtonType.NORMAL);
         _close.getPosition().x = getSize().x - 25f;
         _close.setVisible(true);
         _close.getLabel().setText("");

@@ -77,19 +77,19 @@ public class UISelectWorldMenu extends UIDisplayWindow {
 			}
         });
 
-        _goToBack = new UIButton(new Vector2f(256f, 32f));
+        _goToBack = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _goToBack.getLabel().setText("Go back");
         _goToBack.setVisible(true);
 
-        _loadFromList = new UIButton(new Vector2f(128f, 32f));
+        _loadFromList = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
         _loadFromList.getLabel().setText("Load");
         _loadFromList.setVisible(true);
 
-        _createNewWorld = new UIButton(new Vector2f(192f, 32f));
+        _createNewWorld = new UIButton(new Vector2f(192f, 32f), UIButton.eButtonType.NORMAL);
         _createNewWorld.getLabel().setText("Create new world");
         _createNewWorld.setVisible(true);
 
-        _deleteFromList = new UIButton(new Vector2f(128f, 32f));
+        _deleteFromList = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
         _deleteFromList.getLabel().setText("Delete");
         _deleteFromList.setVisible(true);
 

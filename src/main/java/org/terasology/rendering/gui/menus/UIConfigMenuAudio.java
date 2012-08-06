@@ -86,7 +86,7 @@ public class UIConfigMenuAudio extends UIDisplayWindow {
 		});
         _musicOptionSlider.setVisible(true);
 
-        _backToConfigMenuButton = new UIButton(new Vector2f(256f, 32f));
+        _backToConfigMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _backToConfigMenuButton.getLabel().setText("Back");
         _backToConfigMenuButton.setVisible(true);
 

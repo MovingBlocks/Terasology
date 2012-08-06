@@ -35,9 +35,15 @@ import javax.vecmath.Vector2f;
 public class UIButton extends UIDisplayContainer {
 
     private final UIText _label;
+    
+	public enum eButtonType {NORMAL, TOGGLE};
+    private boolean _toggleState = false;
+    private eButtonType _buttonType;
 
-    public UIButton(Vector2f size) {
+    public UIButton(Vector2f size, eButtonType buttonType) {
         setSize(size);
+        
+        _buttonType = buttonType;
         
         //TODO give user of the UIButton component more styling options. deliver these styles over the constructor?
         setClassStyle("button", "background-image: engine:gui_menu 256/512 30/512 0 0");
@@ -45,11 +51,17 @@ public class UIButton extends UIDisplayContainer {
         setClassStyle("button-mouseclick", "background-image: engine:gui_menu 256/512 30/512 0 60/512");
         setClassStyle("button");
         
-        //TODO also let the user decide which behavior he wants. otherwise you need to overwrite the behavior (see Combobox)
         addMouseMoveListener(new MouseMoveListener() {	
 			@Override
 			public void leave(UIDisplayElement element) {
-				setClassStyle("button");
+				if (_buttonType == eButtonType.TOGGLE) {
+					if (_toggleState)
+						setClassStyle("button-mouseclick");
+					else
+						setClassStyle("button");
+				}
+				else
+					setClassStyle("button");
 			}
 			
 			@Override
@@ -60,7 +72,8 @@ public class UIButton extends UIDisplayContainer {
 			@Override
 			public void enter(UIDisplayElement element) {
 	            AudioManager.play(new AssetUri(AssetType.SOUND, "engine:click"), 1.0f);
-				setClassStyle("button-mouseover");
+	            if (_buttonType == eButtonType.NORMAL)
+	            	setClassStyle("button-mouseover");
 			}
 
 			@Override
@@ -72,13 +85,26 @@ public class UIButton extends UIDisplayContainer {
         addMouseButtonListener(new MouseButtonListener() {					
 			@Override
 			public void up(UIDisplayElement element, int button, boolean intersect) {
-				setClassStyle("button");
+				if (_buttonType == eButtonType.NORMAL)
+					setClassStyle("button");
 			}
 			
 			@Override
 			public void down(UIDisplayElement element, int button, boolean intersect) {
-				if (intersect)
-					setClassStyle("button-mouseclick");
+				if (intersect) {
+					if (_buttonType == eButtonType.TOGGLE) {
+						if (_toggleState) {
+							setClassStyle("button");
+							_toggleState = false;
+						}
+						else {
+							setClassStyle("button-mouseclick");
+							_toggleState = true;
+						}
+					}
+					else
+						setClassStyle("button-mouseclick");
+				}
 			}
 			
 			@Override
@@ -110,5 +136,18 @@ public class UIButton extends UIDisplayContainer {
 
     public UIText getLabel() {
         return _label;
+    }
+    
+    public boolean getToggleState() {
+		return _toggleState;
+	}
+    
+    public void setToggleState(boolean state) {
+    	_toggleState = state;
+    	
+		if (_toggleState)
+			setClassStyle("button-mouseclick");
+		else
+			setClassStyle("button");
     }
 }

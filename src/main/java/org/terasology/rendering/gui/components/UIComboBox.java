@@ -63,6 +63,7 @@ public class UIComboBox extends UIDisplayContainer {
 					_opened = false;
 				
 		        _baseList.setVisible(_opened);
+				_baseButton.setToggleState(_opened);
 		        
 		        if (!_opened) {
 		            _baseList.getScrollBarHorizontal().resetScrollPosition();
@@ -101,7 +102,7 @@ public class UIComboBox extends UIDisplayContainer {
         _baseInput.setVisible(true);
         _baseInput.setDisabled(true);
 
-        _baseButton = new UIButton(new Vector2f(18f, 18f));
+        _baseButton = new UIButton(new Vector2f(18f, 18f), UIButton.eButtonType.TOGGLE);
         _baseButton.setVisible(true);
         _baseButton.getPosition().x = size.x   - _baseButton.getSize().x;
         _baseButton.getPosition().y = size.y/2 - _baseButton.getSize().y/2;
@@ -109,30 +110,6 @@ public class UIComboBox extends UIDisplayContainer {
         _baseButton.setClassStyle("button", "background-image: engine:gui_menu 18/512 18/512 432/512 0");
         _baseButton.setClassStyle("button-mouseover", "background-image: engine:gui_menu 18/512 18/512 432/512 0");
         _baseButton.setClassStyle("button-mouseclick", "background-image: engine:gui_menu 18/512 18/512 432/512 18/512");
-        _baseButton.addMouseMoveListener(new MouseMoveListener() {
-			@Override
-			public void move(UIDisplayElement element) {
-				
-			}
-			
-			@Override
-			public void leave(UIDisplayElement element) {
-				if (_opened)
-					_baseButton.setClassStyle("button-mouseclick");
-			}
-			
-			@Override
-			public void hover(UIDisplayElement element) {
-				if (_opened)
-					_baseButton.setClassStyle("button-mouseclick");
-			}
-			
-			@Override
-			public void enter(UIDisplayElement element) {
-				if (_opened)
-					_baseButton.setClassStyle("button-mouseclick");
-			}
-		});
 
         _baseList = new UIList(listSize);
         _baseList.getPosition().y = size.y + 2;

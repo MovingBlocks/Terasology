@@ -46,15 +46,15 @@ public class UIConfigMenuMods extends UIDisplayWindow {
         _overlay = new UIImageOverlay(AssetManager.loadTexture("engine:loadingBackground"));
         _overlay.setVisible(true);
 
-        _minionsButton = new UIButton(new Vector2f(256f, 32f));
+        _minionsButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _minionsButton.getLabel().setText("Minions enabled : false");
         _minionsButton.setVisible(true);
 
-        _minionOptionsButton = new UIButton(new Vector2f(256f, 32f));
+        _minionOptionsButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _minionOptionsButton.getLabel().setText("Minion Options...");
         _minionOptionsButton.setVisible(true);
 
-        _backToConfigMenuButton = new UIButton(new Vector2f(256f, 32f));
+        _backToConfigMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _backToConfigMenuButton.getLabel().setText("Back");
         _backToConfigMenuButton.setVisible(true);
 

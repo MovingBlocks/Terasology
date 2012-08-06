@@ -35,7 +35,7 @@ public class UIMessageBox extends UIDialogBox {
         float width = 0f;
         float heigh = 0f;
 
-        _buttonOk = new UIButton(new Vector2f(128f, 32f));
+        _buttonOk = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
         _buttonOk.getLabel().setText("Ok");
         _buttonOk.setVisible(true);
 

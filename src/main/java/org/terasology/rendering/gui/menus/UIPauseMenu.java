@@ -61,7 +61,7 @@ public class UIPauseMenu extends UIDisplayWindow {
         _version = new UIText("Pre Alpha");
         _version.setVisible(true);
 
-        _exitButton = new UIButton(new Vector2f(256f, 32f));
+        _exitButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _exitButton.getLabel().setText("Exit Terasology");
         _exitButton.setVisible(true);
 
@@ -72,7 +72,7 @@ public class UIPauseMenu extends UIDisplayWindow {
 			}
         });
 
-        _respawnButton = new UIButton(new Vector2f(256f, 32f));
+        _respawnButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _respawnButton.getLabel().setText("Respawn");
         _respawnButton.setVisible(true);
 
@@ -109,7 +109,7 @@ public class UIPauseMenu extends UIDisplayWindow {
 			}
         });
 
-        _mainMenuButton = new UIButton(new Vector2f(256f, 32f));
+        _mainMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _mainMenuButton.getLabel().setText("Return to Main Menu");
         _mainMenuButton.setVisible(true);
 

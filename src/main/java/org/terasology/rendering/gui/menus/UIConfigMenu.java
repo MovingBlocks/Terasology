@@ -54,23 +54,23 @@ public class UIConfigMenu extends UIDisplayWindow {
         _overlay = new UIImageOverlay(AssetManager.loadTexture("engine:loadingBackground"));
         _overlay.setVisible(true);
 
-        _videoButton = new UIButton(new Vector2f(256f, 32f));
+        _videoButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _videoButton.getLabel().setText("Video");
         _videoButton.setVisible(true);
 
-        _audioButton = new UIButton(new Vector2f(256f, 32f));
+        _audioButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _audioButton.getLabel().setText("Audio");
         _audioButton.setVisible(true);
 
-        _controlsButton = new UIButton(new Vector2f(256f, 32f));
+        _controlsButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _controlsButton.getLabel().setText("Controls");
         _controlsButton.setVisible(true);
 
-        _modsButton = new UIButton(new Vector2f(256f, 32f));
+        _modsButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _modsButton.getLabel().setText("Mods");
         _modsButton.setVisible(true);
 
-        _backToMainMenuButton = new UIButton(new Vector2f(256f, 32f));
+        _backToMainMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _backToMainMenuButton.getLabel().setText("Return to Main Menu");
         _backToMainMenuButton.setVisible(true);
 

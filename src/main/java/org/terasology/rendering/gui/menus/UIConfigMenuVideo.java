@@ -200,7 +200,7 @@ public class UIConfigMenuVideo extends UIDisplayWindow {
         _bobbingButton.addClickListener(clickAction);
         _bobbingButton.setVisible(true);
         
-        _backToConfigMenuButton = new UIButton(new Vector2f(256f, 32f));
+        _backToConfigMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _backToConfigMenuButton.getLabel().setText("Back");
         _backToConfigMenuButton.setVisible(true);
 
