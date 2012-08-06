@@ -24,7 +24,7 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIScrollableDisplayContainer;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.ClickListener;
-import org.terasology.rendering.gui.framework.events.IMouseMoveListener;
+import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
@@ -70,7 +70,7 @@ public class UIList extends UIScrollableDisplayContainer implements IInputDataEl
 	            setSize(new Vector2f(_label.getTextWidth(), getSize().y));
 	        }
 	        
-	        addMouseMoveListener(new IMouseMoveListener() {		
+	        addMouseMoveListener(new MouseMoveListener() {		
 				@Override
 				public void leave(UIDisplayElement element) {
 					if(!_isSelected)

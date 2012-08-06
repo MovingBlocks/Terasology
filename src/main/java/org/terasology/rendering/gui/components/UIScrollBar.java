@@ -21,8 +21,8 @@ import org.terasology.asset.AssetManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
-import org.terasology.rendering.gui.framework.events.IMouseButtonListener;
-import org.terasology.rendering.gui.framework.events.IMouseMoveListener;
+import org.terasology.rendering.gui.framework.events.MouseButtonListener;
+import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 import org.terasology.rendering.gui.framework.events.ScrollListener;
 
 import javax.vecmath.Vector2f;
@@ -199,7 +199,7 @@ public class UIScrollBar extends UIDisplayContainer {
         }
         
         _scrolBarThumb.setVisible(true);
-        _scrolBarThumb.addMouseButtonListener(new IMouseButtonListener() {
+        _scrolBarThumb.addMouseButtonListener(new MouseButtonListener() {
 			@Override
 			public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
 				scrolled(calculateScrollFromWheel(((-1) * wheel / 30) / _step));
@@ -225,7 +225,7 @@ public class UIScrollBar extends UIDisplayContainer {
 				}
 			}
 		});
-        addMouseMoveListener(new IMouseMoveListener() {
+        addMouseMoveListener(new MouseMoveListener() {
 			@Override
 			public void move(UIDisplayElement element) {
 				if (_scrolled) {

@@ -23,7 +23,7 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
-public interface IMouseButtonListener {
+public interface MouseButtonListener {
 
 	/**
 	 * Mouse up event. Will be called if mouse was released anywhere in the UI.

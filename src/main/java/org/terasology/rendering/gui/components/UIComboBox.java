@@ -25,8 +25,8 @@ import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.ClickListener;
-import org.terasology.rendering.gui.framework.events.IMouseButtonListener;
-import org.terasology.rendering.gui.framework.events.IMouseMoveListener;
+import org.terasology.rendering.gui.framework.events.MouseButtonListener;
+import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 
 import javax.vecmath.Vector2f;
 
@@ -50,7 +50,7 @@ public class UIComboBox extends UIDisplayContainer {
         setSize(size);
         _opened = false;
         
-        addMouseButtonListener(new IMouseButtonListener() {
+        addMouseButtonListener(new MouseButtonListener() {
 			@Override
 			public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
 
@@ -76,7 +76,7 @@ public class UIComboBox extends UIDisplayContainer {
 	
 			}
 		});
-        addMouseMoveListener(new IMouseMoveListener() {
+        addMouseMoveListener(new MouseMoveListener() {
 			@Override
 			public void leave(UIDisplayElement element) {
 

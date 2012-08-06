@@ -21,8 +21,8 @@ import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
-import org.terasology.rendering.gui.framework.events.IMouseButtonListener;
-import org.terasology.rendering.gui.framework.events.IMouseMoveListener;
+import org.terasology.rendering.gui.framework.events.MouseButtonListener;
+import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 
 import javax.vecmath.Vector2f;
 
@@ -43,7 +43,7 @@ public class UIButton extends UIDisplayContainer {
         setClassStyle("button-mouseclick", "background-image: engine:gui_menu 256/512 30/512 0 60/512");
         setClassStyle("button");
         
-        addMouseMoveListener(new IMouseMoveListener() {	
+        addMouseMoveListener(new MouseMoveListener() {	
 			@Override
 			public void leave(UIDisplayElement element) {
 				setClassStyle("button");
@@ -66,7 +66,7 @@ public class UIButton extends UIDisplayContainer {
 			}
 		});
         
-        addMouseButtonListener(new IMouseButtonListener() {					
+        addMouseButtonListener(new MouseButtonListener() {					
 			@Override
 			public void up(UIDisplayElement element, int button, boolean intersect) {
 				setClassStyle("button");

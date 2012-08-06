@@ -29,8 +29,8 @@ import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
-import org.terasology.rendering.gui.framework.events.IMouseButtonListener;
-import org.terasology.rendering.gui.framework.events.IMouseMoveListener;
+import org.terasology.rendering.gui.framework.events.MouseButtonListener;
+import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 
 /**
  * A simple Slider.
@@ -60,7 +60,7 @@ public class UISlider extends UIDisplayContainer {
         setClassStyle("slider-mouseover", "background-image: engine:gui_menu 256/512 30/512 0 30/512");
         setClassStyle("slider");
         
-        addMouseMoveListener(new IMouseMoveListener() {	
+        addMouseMoveListener(new MouseMoveListener() {	
 			@Override
 			public void leave(UIDisplayElement element) {
 				setClassStyle("slider");
@@ -85,7 +85,7 @@ public class UISlider extends UIDisplayContainer {
 			}
 		});
         
-        addMouseButtonListener(new IMouseButtonListener() {			
+        addMouseButtonListener(new MouseButtonListener() {			
 			@Override
 			public void up(UIDisplayElement element, int button, boolean intersect) {
 				setClassStyle("slider");
@@ -110,7 +110,7 @@ public class UISlider extends UIDisplayContainer {
         _slider.getTextureOrigin().set(0f, 60f / 512f);
         _slider.getTextureSize().set(new Vector2f(256f / 512f, 30f / 512f));
         _slider.setSize(new Vector2f(16f, getSize().y));
-        _slider.addMouseButtonListener(new IMouseButtonListener() {									
+        _slider.addMouseButtonListener(new MouseButtonListener() {									
 			@Override
 			public void up(UIDisplayElement element, int button, boolean intersect) {
 				setFocus(null);

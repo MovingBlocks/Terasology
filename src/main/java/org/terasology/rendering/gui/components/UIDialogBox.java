@@ -20,8 +20,8 @@ import org.lwjgl.opengl.Display;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.events.ClickListener;
-import org.terasology.rendering.gui.framework.events.IMouseButtonListener;
-import org.terasology.rendering.gui.framework.events.IMouseMoveListener;
+import org.terasology.rendering.gui.framework.events.MouseButtonListener;
+import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 
 import javax.vecmath.Vector2f;
 
@@ -40,7 +40,7 @@ public class UIDialogBox extends UIDisplayWindow {
         _title.setVisible(true);
         _title.getPosition().x = (getPosition().x + size.x / 2f) - _title.getSize().x / 2;
         _title.setTitle(title);
-        _title.addMouseButtonListener(new IMouseButtonListener() {	
+        _title.addMouseButtonListener(new MouseButtonListener() {	
 			@Override
 			public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
 
@@ -62,7 +62,7 @@ public class UIDialogBox extends UIDisplayWindow {
 				}
 			}
 		});
-        _title.addMouseMoveListener(new IMouseMoveListener() {
+        _title.addMouseMoveListener(new MouseMoveListener() {
 			@Override
 			public void move(UIDisplayElement element) {
 		        if (_dragged) {

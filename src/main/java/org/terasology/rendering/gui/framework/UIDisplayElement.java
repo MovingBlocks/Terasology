@@ -22,8 +22,8 @@ import org.lwjgl.opengl.Display;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.FocusListener;
-import org.terasology.rendering.gui.framework.events.IMouseButtonListener;
-import org.terasology.rendering.gui.framework.events.IMouseMoveListener;
+import org.terasology.rendering.gui.framework.events.MouseButtonListener;
+import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 
 import javax.vecmath.Vector2f;
 
@@ -38,8 +38,8 @@ public abstract class UIDisplayElement {
 
 	protected static UIDisplayElement _focusedElement;
 	protected enum EMouseEvents {ENTER, LEAVE, HOVER, MOVE};
-    private final ArrayList<IMouseMoveListener> _mouseListeners = new ArrayList<IMouseMoveListener>();
-    private final ArrayList<IMouseButtonListener> _mouseButtonListeners = new ArrayList<IMouseButtonListener>();
+    private final ArrayList<MouseMoveListener> _mouseListeners = new ArrayList<MouseMoveListener>();
+    private final ArrayList<MouseButtonListener> _mouseButtonListeners = new ArrayList<MouseButtonListener>();
     private final ArrayList<ClickListener> _clickListeners = new ArrayList<ClickListener>();
     private final ArrayList<FocusListener> _focusListeners = new ArrayList<FocusListener>();
     private EMouseEvents lastMouseState;
@@ -279,27 +279,27 @@ public abstract class UIDisplayElement {
     
     private void notifyMouseButtonListeners(int button, boolean state, int wheel, boolean intersect) {
     	if (button == -1) {
-	        for (IMouseButtonListener listener : _mouseButtonListeners) {
+	        for (MouseButtonListener listener : _mouseButtonListeners) {
 	        	listener.wheel(this, wheel, intersect);
 	        }
     	}
     	else if (state) {
-	        for (IMouseButtonListener listener : _mouseButtonListeners) {
+	        for (MouseButtonListener listener : _mouseButtonListeners) {
 	        	listener.down(this, button, intersect);
 	        }
     	}
     	else {
-	        for (IMouseButtonListener listener : _mouseButtonListeners) {
+	        for (MouseButtonListener listener : _mouseButtonListeners) {
 	        	listener.up(this, button, intersect);
 	        }
     	}  	
     }
     
-    public void addMouseButtonListener(IMouseButtonListener listener) {
+    public void addMouseButtonListener(MouseButtonListener listener) {
     	_mouseButtonListeners.add(listener);
     }
 
-    public void removeMouseButtonListener(IMouseButtonListener listener) {
+    public void removeMouseButtonListener(MouseButtonListener listener) {
     	_mouseButtonListeners.remove(listener);
     }
     
@@ -341,33 +341,33 @@ public abstract class UIDisplayElement {
     private void notifyMouseListeners(EMouseEvents type) {
     	switch (type) {
     	case ENTER:
-    		for (IMouseMoveListener listener : _mouseListeners) {
+    		for (MouseMoveListener listener : _mouseListeners) {
     			listener.enter(this);
     		}
         break;
     	case LEAVE:
-    		for (IMouseMoveListener listener : _mouseListeners) {
+    		for (MouseMoveListener listener : _mouseListeners) {
     			listener.leave(this);
     		}
         break;
     	case HOVER:
-    		for (IMouseMoveListener listener : _mouseListeners) {
+    		for (MouseMoveListener listener : _mouseListeners) {
     			listener.hover(this);
     		}
         break;
     	case MOVE:
-    		for (IMouseMoveListener listener : _mouseListeners) {
+    		for (MouseMoveListener listener : _mouseListeners) {
     			listener.move(this);
     		}
         break;
     	}
     }
     
-    public void addMouseMoveListener(IMouseMoveListener listener) {
+    public void addMouseMoveListener(MouseMoveListener listener) {
         _mouseListeners.add(listener);
     }
 
-    public void removeMouseMoveListener(IMouseMoveListener listener) {
+    public void removeMouseMoveListener(MouseMoveListener listener) {
     	_mouseListeners.remove(listener);
     }
 }

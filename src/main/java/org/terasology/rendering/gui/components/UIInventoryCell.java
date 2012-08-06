@@ -29,7 +29,7 @@ import org.terasology.model.inventory.Icon;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
-import org.terasology.rendering.gui.framework.events.IMouseMoveListener;
+import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 
 import javax.vecmath.Vector2f;
 
@@ -71,7 +71,7 @@ public class UIInventoryCell extends UIDisplayElement {
         _label2.setVisible(false);
         _label2.setPosition(new Vector2f(0f, -14f));
         
-        addMouseMoveListener(new IMouseMoveListener() {	
+        addMouseMoveListener(new MouseMoveListener() {	
 			@Override
 			public void leave(UIDisplayElement element) {
 	            _selectionRectangle.setVisible(false);

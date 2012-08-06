@@ -36,8 +36,8 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.FocusListener;
 import org.terasology.rendering.gui.framework.events.InputListener;
-import org.terasology.rendering.gui.framework.events.IMouseButtonListener;
-import org.terasology.rendering.gui.framework.events.IMouseMoveListener;
+import org.terasology.rendering.gui.framework.events.MouseButtonListener;
+import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 
 import javax.vecmath.Vector2f;
 import java.util.ArrayList;
@@ -127,7 +127,7 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
 				}
 			}
 		});
-        addMouseButtonListener(new IMouseButtonListener() {							
+        addMouseButtonListener(new MouseButtonListener() {							
 			@Override
 			public void up(UIDisplayElement element, int button, boolean intersect) {
 
@@ -144,7 +144,7 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
 
 			}
 		});
-        addMouseMoveListener(new IMouseMoveListener() {		
+        addMouseMoveListener(new MouseMoveListener() {		
 			@Override
 			public void leave(UIDisplayElement element) {
 				setStyle("background-position", "0 90/512");

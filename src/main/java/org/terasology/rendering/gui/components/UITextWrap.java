@@ -21,7 +21,7 @@ import com.google.gson.stream.JsonWriter;
 import org.lwjgl.opengl.Display;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.events.IMouseButtonListener;
+import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 
 import javax.vecmath.Vector2f;
 import java.io.File;
@@ -58,7 +58,7 @@ public class UITextWrap extends UIText {
     }
     
     private void setup() {
-    	addMouseButtonListener(new IMouseButtonListener() {
+    	addMouseButtonListener(new MouseButtonListener() {
 			@Override
 			public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
 				if (wheel != 0) {

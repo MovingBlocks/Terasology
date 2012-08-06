@@ -7,7 +7,7 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  *
  */
-public interface IMouseMoveListener {
+public interface MouseMoveListener {
 	/**
 	 * Hover event. Will be called if the mouse is over the element and moves. (Still mouse won't cause any events.)
 	 * @param element The element of the event.
