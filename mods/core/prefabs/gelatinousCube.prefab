@@ -10,12 +10,9 @@
     "stepHeight" : 0,
     "faceMovementDirection" : true
   },
-  "Health" : {},
   "SimpleAI" : {},
   "CharacterSound" : {
     "footstepSounds" : ["engine:Slime1", "engine:Slime2", "engine:Slime3", "engine:Slime4", "engine:Slime5"],
     "footstepVolume" : 0.7
-  }, "Trigger" : {
-        "detectGroups" : ["engine:debris","engine:character"]
-    }
+  }
 }

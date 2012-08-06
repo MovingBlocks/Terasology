@@ -21,7 +21,6 @@ import org.terasology.components.SimpleAIComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.*;
 import org.terasology.events.HorizontalCollisionEvent;
-import org.terasology.events.NoHealthEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
@@ -110,11 +109,5 @@ public class SimpleAISystem implements EventHandlerSystem, UpdateSubscriberSyste
             moveComp.jump = true;
             entity.saveComponent(moveComp);
         }
-    }
-    
-    //TODO Add Rigid Body to Entity when dead and render it with its mesh
-    @ReceiveEvent(components = {SimpleAIComponent.class})
-    public void onDeath(NoHealthEvent event, EntityRef entity) {
-    	entity.destroy();
     }
 }

@@ -19,7 +19,6 @@ import org.terasology.components.rendering.MeshComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.physics.shapes.BoxShapeComponent;
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.Vector3f;
@@ -41,10 +40,6 @@ public class GelatinousCubeFactory {
             loc.setWorldPosition(position);
             loc.setLocalScale((random.randomFloat() + 1.0f) * 0.4f + 0.2f);
             entity.saveComponent(loc);
-            BoxShapeComponent box = new BoxShapeComponent();
-            box.extents = new Vector3f(loc.getLocalScale(), loc.getLocalScale(), loc.getLocalScale());
-            entity.addComponent(box);
-            entity.saveComponent(box);
         }
 
         MeshComponent mesh = entity.getComponent(MeshComponent.class);

@@ -19,7 +19,6 @@ import com.google.common.collect.Maps;
 import org.lwjgl.opengl.GL11;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.physics.character.CharacterMovementComponent;
-import org.terasology.physics.shapes.HullShapeComponent;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LocalPlayerComponent;

@@ -17,12 +17,10 @@ package org.terasology.mods.miniions.componentsystem.controllers;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.physics.character.CharacterMovementComponent;
-import org.terasology.components.SimpleAIComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.*;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.HorizontalCollisionEvent;
-import org.terasology.events.NoHealthEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
@@ -313,11 +311,5 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
             moveComp.jump = true;
             entity.saveComponent(moveComp);
         }
-    }
-    
-    //TODO Add Rigid Body to ENtity when dead and render it with its mesh
-    @ReceiveEvent(components = {SimpleMinionAIComponent.class})
-    public void onDeath(NoHealthEvent event, EntityRef entity) {
-    	entity.destroy();
     }
 }
