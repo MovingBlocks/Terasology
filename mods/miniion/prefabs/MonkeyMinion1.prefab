@@ -12,7 +12,7 @@
     "faceMovementDirection" : true
   },
   "SimpleMinionAI" : {},
-  "AABBCollision" : {
+ "AABBCollision" : {
     "extents" : [0.5, 0.5, 0.5]
   },
   "CharacterSound" : {
@@ -39,5 +39,6 @@
         0
       ]
     },
-    "AccessInventoryAction": {}
+    "AccessInventoryAction": {},
+    "Health" : {}
 }

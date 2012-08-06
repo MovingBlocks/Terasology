@@ -1,0 +1,15 @@
+{
+    "name" : "core:deadbody",
+    "CapsuleShape" : {
+     "radius" : 0.5,
+     "height" : 1.0
+    },
+    "RigidBody" : {
+        "mass" : 10f,
+        "collisionGroup" : "engine:debris",
+        "collidesWith" : ["engine:world","engine:debris","engine:sensor","engine:character"]
+    },
+    "Lifespan" : {
+        "lifespan" : 30
+    }
+}

@@ -16,11 +16,16 @@
 package org.terasology.mods.miniions.componentsystem.controllers;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
+import org.terasology.physics.HitResult;
+import org.terasology.physics.ImpulseEvent;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.components.world.LocationComponent;
+import org.terasology.entityFactory.DeadEntityFactory;
 import org.terasology.entitySystem.*;
 import org.terasology.events.DamageEvent;
+import org.terasology.events.HitEvent;
 import org.terasology.events.HorizontalCollisionEvent;
+import org.terasology.events.NoHealthEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
@@ -53,6 +58,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
     private EntityManager entityManager;
     private WorldProvider worldProvider;
     private BlockEntityRegistry blockEntityRegistry;
+    private DeadEntityFactory deadEntityFactory;
     private FastRandom random = new FastRandom();
     private AStarPathing aStarPathing;
     private Timer timer;
@@ -62,6 +68,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
         worldProvider = CoreRegistry.get(WorldProvider.class);
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
         timer = CoreRegistry.get(Timer.class);
+        deadEntityFactory = new DeadEntityFactory();
         aStarPathing = new AStarPathing(worldProvider);
     }
 
@@ -266,7 +273,6 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                 }
                 return;
             }
-
             setMovement(currentTarget, worldPos, entity, moveComp, location);
         }
     }
@@ -311,5 +317,25 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
             moveComp.jump = true;
             entity.saveComponent(moveComp);
         }
+    }
+    
+    @ReceiveEvent(components = {SimpleMinionAIComponent.class})
+    public void onDeath(NoHealthEvent event, EntityRef entity) {
+       //Create Dead Body (temporarily)
+       EntityRef deadEntity = deadEntityFactory.newInstance(30,entity);
+       //TODO Should be dynamic based on the position and the force of of the last strike
+       //This is an exaggerated, static example for testing purposes.
+       Vector3f impulse = new Vector3f(40, 40, 40);
+	   deadEntity.send(new ImpulseEvent(impulse));
+	   entity.destroy();
+    }
+    
+    @ReceiveEvent(components = {SimpleMinionAIComponent.class})
+    public void onHit(HitEvent event, EntityRef entity) {
+    	//Push Entity on Hit (needs Rigid Body);
+    	HitResult hitResult = event.getHitResult();
+    	Vector3f hitNormal = hitResult.getHitNormal();
+    	hitNormal.scale(20);//TODO Should scale to the force of the impact
+  	    entity.send(new ImpulseEvent(hitNormal));
     }
 }

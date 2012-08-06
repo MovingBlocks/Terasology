@@ -39,5 +39,6 @@
         0
       ]
     },
-    "AccessInventoryAction": {}
+    "AccessInventoryAction": {},
+     "Health" : {}
 }
