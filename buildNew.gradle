@@ -24,6 +24,7 @@ ext {
     dirNatives = 'natives'
     dirData = 'data'
     destDirLibs = 'libs'
+    destDirApplet = 'applet'
     destDirMainOutput = 'mainOutput'
     destDirMods = 'distributions/mods'
     mainClassName = "org.terasology.game.Terasology"
@@ -215,6 +216,39 @@ task distZip(type:Zip) {
 
 /* Applet -------------------------------------------------------------------*/
 // TODO Implement Applet tasks
+
+task appletMods {
+    mkdir("$buildDir/$destDirApplet/mods")
+    file('mods').listFiles().each { File mod ->
+        if (mod.isDirectory() ) {
+            task('appletMod-' + mod.getName(), type: Zip) {
+                from (mod)
+                archiveName = mod.getName() + '.zip'
+                destinationDir = file("$buildDir/$destDirApplet/mods/")
+            }
+            appletMods.dependsOn tasks['appletMod-' + mod.getName()]
+        }
+    }
+}
+
+task appletLibs(type:Copy) {
+    from configurations.runtime
+    into("$buildDir/$destDirApplet/libs")
+    exclude { details -> details.file.name.contains("lwjgl") || details.file.name.contains("jinput") }
+}
+
+task applet(type:Copy) {
+    description = 'Creates a game distribution playable through a browser.'
+    dependsOn jar
+    dependsOn appletLibs
+    dependsOn appletMods
+
+    from('applet') {
+        exclude '*.keystore'
+    }
+    from (jar.archivePath)
+    into("$buildDir/$destDirApplet")
+}
 
 /* IDE --------------------------------------------------------------------- */
 // TODO Check if other configurations for IDEA are necessary.
