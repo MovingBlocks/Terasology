@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.gui.menus;
 
-import org.terasology.logic.manager.AssetManager;
+import org.terasology.asset.AssetManager;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UIText;
@@ -28,18 +28,19 @@ import javax.vecmath.Vector2f;
  * Main menu screen.
  *
  * @author Anton Kireev <adeon.k87@gmail.com>
+ * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
 public class UIConfigMenu extends UIDisplayWindow {
 
     final UIImageOverlay _overlay;
     final UIGraphicsElement _title;
-
-    private final UIButton _graphicsQualityButton,
-            _backToMainMenuButton,
-            _viewingDistanceButton,
-            _fovButton;
-
     final UIText _version;
+
+    private final UIButton _backToMainMenuButton;
+    private final UIButton _videoButton;
+    private final UIButton _audioButton;
+    private final UIButton _controlsButton;
+    private final UIButton _modsButton;
 
     public UIConfigMenu() {
         maximize();
@@ -47,24 +48,27 @@ public class UIConfigMenu extends UIDisplayWindow {
         _title.setVisible(true);
         _title.setSize(new Vector2f(512f, 128f));
 
-        _version = new UIText("Pre Alpha");
+        _version = new UIText("Settings");
         _version.setVisible(true);
 
         _overlay = new UIImageOverlay(AssetManager.loadTexture("engine:loadingBackground"));
         _overlay.setVisible(true);
 
-        _graphicsQualityButton = new UIButton(new Vector2f(256f, 32f));
-        _graphicsQualityButton.getLabel().setText("Graphics Quality: Ugly");
-        _graphicsQualityButton.setVisible(true);
+        _videoButton = new UIButton(new Vector2f(256f, 32f));
+        _videoButton.getLabel().setText("Video");
+        _videoButton.setVisible(true);
 
-        _viewingDistanceButton = new UIButton(new Vector2f(256f, 32f));
-        _viewingDistanceButton.getLabel().setText("Viewing Distance: Near");
-        _viewingDistanceButton.setVisible(true);
+        _audioButton = new UIButton(new Vector2f(256f, 32f));
+        _audioButton.getLabel().setText("Audio");
+        _audioButton.setVisible(true);
 
-        // TODO: Replace with a slider later on
-        _fovButton = new UIButton(new Vector2f(256f, 32f));
-        _fovButton.getLabel().setText("Field of View: 80");
-        _fovButton.setVisible(true);
+        _controlsButton = new UIButton(new Vector2f(256f, 32f));
+        _controlsButton.getLabel().setText("Controls");
+        _controlsButton.setVisible(true);
+
+        _modsButton = new UIButton(new Vector2f(256f, 32f));
+        _modsButton.getLabel().setText("Mods");
+        _modsButton.setVisible(true);
 
         _backToMainMenuButton = new UIButton(new Vector2f(256f, 32f));
         _backToMainMenuButton.getLabel().setText("Return to Main Menu");
@@ -74,33 +78,40 @@ public class UIConfigMenu extends UIDisplayWindow {
         addDisplayElement(_title);
         addDisplayElement(_version);
 
-        addDisplayElement(_graphicsQualityButton, "graphicsQualityButton");
-        addDisplayElement(_fovButton, "fovButton");
+        addDisplayElement(_videoButton, "videoButton");
+        addDisplayElement(_audioButton, "audioButton");
+        addDisplayElement(_controlsButton, "controlsButton");
+        addDisplayElement(_modsButton, "modsButton");
         addDisplayElement(_backToMainMenuButton, "backToMainMenuButton");
-        addDisplayElement(_viewingDistanceButton, "viewingDistanceButton");
-        update();
+
+        layout();
     }
-
+    
     @Override
-    public void update() {
-        super.update();
-
-        _version.centerHorizontally();
-        _version.getPosition().y = 230f;
-
-        _graphicsQualityButton.centerHorizontally();
-        _graphicsQualityButton.getPosition().y = 300f + 40f;
-
-        _viewingDistanceButton.centerHorizontally();
-        _viewingDistanceButton.getPosition().y = 300f + 2 * 40f;
-
-        _fovButton.centerHorizontally();
-        _fovButton.getPosition().y = 300f + 3 * 40f;
-
-        _backToMainMenuButton.centerHorizontally();
-        _backToMainMenuButton.getPosition().y = 300f + 5 * 40f;
-
-        _title.centerHorizontally();
-        _title.getPosition().y = 128f;
+    public void layout() {
+    	super.layout();
+    	
+    	if (_version != null) {
+	        _version.centerHorizontally();
+	        _version.getPosition().y = 230f;
+	
+	        _videoButton.centerHorizontally();
+	        _videoButton.getPosition().y = 300f;
+	
+	        _audioButton.centerHorizontally();
+	        _audioButton.getPosition().y = 300f + 40f;
+	
+	        _controlsButton.centerHorizontally();
+	        _controlsButton.getPosition().y = 300f + 2 * 40f;
+	
+	        _modsButton.centerHorizontally();
+	        _modsButton.getPosition().y = 300f + 3 * 40f;
+	
+	        _backToMainMenuButton.centerHorizontally();
+	        _backToMainMenuButton.getPosition().y = 300f + 7 * 40f;
+	
+	        _title.centerHorizontally();
+	        _title.getPosition().y = 128f;
+    	}
     }
 }

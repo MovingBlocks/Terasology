@@ -16,6 +16,8 @@
 
 package org.terasology.logic.world.generator.core;
 
+import java.util.Map;
+
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import org.terasology.logic.world.chunks.Chunk;
@@ -114,4 +116,14 @@ public class ForestGenerator implements SecondPassChunkGenerator {
     public void setWorldBiomeProvider(WorldBiomeProvider biomeProvider) {
         this.biomeProvider = biomeProvider;
     }
+
+    @Override
+    public Map<String, String> getInitParameters() {
+        return null;
+    }
+
+    @Override
+    public void setInitParameters(final Map<String, String> initParameters) {
+    }
+
 }

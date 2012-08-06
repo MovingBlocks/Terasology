@@ -1,11 +1,28 @@
+/*
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.terasology.mods.miniions.componentsystem.controllers;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.components.CharacterMovementComponent;
+import org.terasology.physics.character.CharacterMovementComponent;
+import org.terasology.components.SimpleAIComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.*;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.HorizontalCollisionEvent;
+import org.terasology.events.NoHealthEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
@@ -296,5 +313,11 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
             moveComp.jump = true;
             entity.saveComponent(moveComp);
         }
+    }
+    
+    //TODO Add Rigid Body to ENtity when dead and render it with its mesh
+    @ReceiveEvent(components = {SimpleMinionAIComponent.class})
+    public void onDeath(NoHealthEvent event, EntityRef entity) {
+    	entity.destroy();
     }
 }

@@ -1,10 +1,22 @@
+/*
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.terasology.math;
-
-import org.terasology.model.structures.AABB;
 
 import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
 /**
@@ -87,13 +99,15 @@ public enum Rotation {
             clockwiseSteps = -clockwiseSteps + 2;
         }
         clockwiseSteps = clockwiseSteps % 4;
+        Vector3f center = collider.getCenter();
+        Vector3f extents = collider.getExtents();
         switch (clockwiseSteps) {
             case 1:
-                return new AABB(new Vector3d(-collider.getPosition().z, collider.getPosition().y, collider.getPosition().x), new Vector3d(collider.getDimensions().z, collider.getDimensions().y, collider.getDimensions().x));
+                return AABB.createCenterExtent(new Vector3f(-center.z, center.y, center.x), new Vector3f(extents.z, extents.y, extents.x));
             case 2:
-                return new AABB(new Vector3d(-collider.getPosition().x, collider.getPosition().y, -collider.getPosition().z), collider.getDimensions());
+                return AABB.createCenterExtent(new Vector3f(-center.x, center.y, -center.z), extents);
             case 3:
-                return new AABB(new Vector3d(collider.getPosition().z, collider.getPosition().y, -collider.getPosition().x), new Vector3d(collider.getDimensions().z, collider.getDimensions().y, collider.getDimensions().x));
+                return AABB.createCenterExtent(new Vector3f(center.z, center.y, -center.x), new Vector3f(extents.z, extents.y, extents.x));
             default:
                 return collider;
         }

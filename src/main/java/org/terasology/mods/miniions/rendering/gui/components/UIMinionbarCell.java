@@ -19,7 +19,7 @@ import org.lwjgl.opengl.GL11;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.manager.AssetManager;
+import org.terasology.asset.AssetManager;
 import org.terasology.model.inventory.Icon;
 import org.terasology.mods.miniions.components.MinionBarComponent;
 import org.terasology.mods.miniions.components.MinionComponent;
@@ -72,13 +72,18 @@ public class UIMinionbarCell extends UIDisplayElement {
         if (inventory == null) {
             return;
         }
-        if (inventory.MinionSlots.size() > id) {
+        if (inventory.minionSlots.size() > id) {
             MinionControllerComponent minionController = localPlayer.getEntity().getComponent(MinionControllerComponent.class);
             if (minionController != null) {
                 setSelected(minionController.selectedMinion == id);
             }
         }
     }
+    
+	@Override
+	public void layout() {
+
+	}
 
     @Override
     public void render() {
@@ -89,10 +94,10 @@ public class UIMinionbarCell extends UIDisplayElement {
         if (inventory == null) {
             return;
         }
-        if (inventory.MinionSlots.size() <= id) {
+        if (inventory.minionSlots.size() <= id) {
             return;
         }
-        EntityRef minionEntity = inventory.MinionSlots.get(id);
+        EntityRef minionEntity = inventory.minionSlots.get(id);
         MinionComponent minion = minionEntity.getComponent(MinionComponent.class);
         if (minion == null) {
             return;

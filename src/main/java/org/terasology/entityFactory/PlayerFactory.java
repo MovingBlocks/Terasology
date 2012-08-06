@@ -1,20 +1,27 @@
+/*
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.terasology.entityFactory;
 
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
-import org.terasology.audio.Sound;
 import org.terasology.components.*;
-import org.terasology.components.world.BlockItemComponent;
+import org.terasology.components.block.BlockItemComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.PrefabManager;
 import org.terasology.events.inventory.ReceiveItemEvent;
-import org.terasology.game.CoreRegistry;
-import org.terasology.logic.manager.AssetManager;
 import org.terasology.model.blocks.management.BlockManager;
-import org.terasology.mods.miniions.components.MinionBarComponent;
-import org.terasology.mods.miniions.components.MinionControllerComponent;
 
 import javax.vecmath.Vector3f;
 
@@ -28,49 +35,33 @@ public class PlayerFactory {
 
     public PlayerFactory(EntityManager entityManager) {
         this.entityManager = entityManager;
-        blockFactory = new BlockItemFactory(entityManager, CoreRegistry.get(PrefabManager.class));
+        blockFactory = new BlockItemFactory(entityManager);
     }
 
     public EntityRef newInstance(Vector3f spawnPosition) {
-        EntityRef player = entityManager.create();
-
-        player.addComponent(new LocationComponent(spawnPosition));
-        PlayerComponent playerComponent = new PlayerComponent();
+        EntityRef player = entityManager.create("core:player");
+        LocationComponent location = player.getComponent(LocationComponent.class);
+        location.setWorldPosition(spawnPosition);
+        player.saveComponent(location);
+        PlayerComponent playerComponent = player.getComponent(PlayerComponent.class);
         playerComponent.spawnPosition.set(spawnPosition);
-        player.addComponent(playerComponent);
-        HealthComponent healthComponent = new HealthComponent(255, 5, 2f);
-        healthComponent.excessSpeedDamageMultiplier = 20f;
-        healthComponent.fallingDamageSpeedThreshold = 15f;
-        player.addComponent(healthComponent);
-        player.addComponent(new RadarComponent());
-
-        AABBCollisionComponent collision = player.addComponent(new AABBCollisionComponent());
-        collision.setExtents(new Vector3f(.3f, 0.8f, .3f));
-
-        CharacterMovementComponent movementComp = player.addComponent(new CharacterMovementComponent());
-        movementComp.groundFriction = 16f;
-        movementComp.maxGroundSpeed = 3f;
-        movementComp.distanceBetweenFootsteps = 1.5f;
-        CharacterSoundComponent sounds = player.addComponent(new CharacterSoundComponent());
-        sounds.footstepSounds.add(AssetManager.load(new AssetUri(AssetType.SOUND, "engine:FootGrass1"), Sound.class));
-        sounds.footstepSounds.add(AssetManager.load(new AssetUri(AssetType.SOUND, "engine:FootGrass2"), Sound.class));
-        sounds.footstepSounds.add(AssetManager.load(new AssetUri(AssetType.SOUND, "engine:FootGrass3"), Sound.class));
-        sounds.footstepSounds.add(AssetManager.load(new AssetUri(AssetType.SOUND, "engine:FootGrass4"), Sound.class));
-        sounds.footstepSounds.add(AssetManager.load(new AssetUri(AssetType.SOUND, "engine:FootGrass5"), Sound.class));
+        player.saveComponent(playerComponent);
         player.addComponent(new LocalPlayerComponent());
-        player.addComponent(new InventoryComponent(36));
-        player.addComponent(new MinionBarComponent(9));
-        player.addComponent(new MinionControllerComponent());
 
         // Goodie chest
         EntityRef chest = blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Chest"));
         BlockItemComponent blockItem = chest.getComponent(BlockItemComponent.class);
         EntityRef chestContents = blockItem.placedEntity;
 
-        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Companion"), 42)));
-        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("BrickStair"), 42)));
-        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Tnt"), 42)));
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Companion"), 99)));
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("BrickStair"), 99)));
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Tnt"), 99)));
         chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Bookcase"), 1)));
+
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("ClaySlope"), 99)));
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("ClaySteepSlope"), 99)));
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("MarbleSphere"), 99)));
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("StoneStair"), 99)));
 
         chestContents.send(new ReceiveItemEvent(entityManager.create("core:purplepotion")));
         chestContents.send(new ReceiveItemEvent(entityManager.create("core:greenpotion")));
@@ -92,31 +83,30 @@ public class PlayerFactory {
         chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Ice"), 99)));
         chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Plank"), 99)));
 
-
         // Inner goodie chest
         EntityRef innerChest = blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Chest"));
         BlockItemComponent innerBlockItem = innerChest.getComponent(BlockItemComponent.class);
         EntityRef innerChestContents = innerBlockItem.placedEntity;
 
-        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Alabaster"), 42)));
-        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Basalt"), 42)));
-        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Gabbro"), 42)));
-        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Hornblende"), 42)));
+        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Alabaster"), 99)));
+        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Basalt"), 99)));
+        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Gabbro"), 99)));
+        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Hornblende"), 99)));
 
-        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("OrangeSandStone"), 42)));
-        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Phyllite"), 42)));
-        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Schist"), 42)));
-        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Cinnabar"), 42)));
+        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("OrangeSandStone"), 99)));
+        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Phyllite"), 99)));
+        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Schist"), 99)));
+        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Cinnabar"), 99)));
 
-        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Lava"), 42)));
-        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Water"), 42)));
-        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Rutile"), 42)));
-        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Kaolinite"), 42)));
+        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Lava"), 99)));
+        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Water"), 99)));
+        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Rutile"), 99)));
+        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Kaolinite"), 99)));
 
-        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Iris"), 42)));
-        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Dandelion"), 42)));
-        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Tulip"), 42)));
-        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("YellowFlower"), 42)));
+        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Iris"), 99)));
+        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Dandelion"), 99)));
+        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("Tulip"), 99)));
+        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("YellowFlower"), 99)));
 
         // Place inner chest into outer chest
         chestContents.send(new ReceiveItemEvent(innerChest));

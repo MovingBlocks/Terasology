@@ -74,7 +74,7 @@ sourceCompatibility = 1.6
 buildDir = 'target'
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.0-milestone-8a'
+    gradleVersion = '1.0'
 }
 
 // Compiles everything as groovy, due to java<->groovy interdependencies
@@ -82,7 +82,7 @@ sourceSets {
 	main {
 		java { srcDirs = [] }
 		groovy { srcDirs = ['src/main/java','src/main/groovy'] }
-		resources { srcDir = 'src/main/resources' }
+		resources { srcDirs = ['src/main/resources'] }
 		output.resourcesDir = 'target/classes/main'
 	}
 	perfTest
@@ -139,7 +139,6 @@ jar.doFirst {
 	sourceSets.main.output.resourcesDir = '/dev/null'
 }
 jar.doLast {
-	ant.signjar(jar: jar.archivePath, keystore: 'applet/tera.keystore', alias: 'Terasology', storepass: 'Terasology')
 	sourceSets.main.output.resourcesDir = 'target/classes/main'
 }
 
@@ -226,6 +225,9 @@ task applet(type:Copy) {
 	}
 	from (jar.archivePath)
     into('target/applet')
+}
+applet.doFirst {
+    ant.signjar(jar: jar.archivePath, keystore: 'applet/tera.keystore', alias: 'Terasology', storepass: 'Terasology')
 }
 applet.doLast {
 	file('target/applet/libs').listFiles().each {

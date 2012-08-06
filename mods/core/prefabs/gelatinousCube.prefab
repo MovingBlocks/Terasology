@@ -1,27 +1,21 @@
 {
   "name": "core:gelatinousCube",
-  
   "Location" : {},
   "Mesh" : {
     "renderType" : "GelatinousCube"
   },
-   "Health" : {
-        "currentHealth" : 10,
-        "maxHealth" : 10,
-        "regenRate" : 5,
-        "waitBeforeRegen" : 2,
-        "excessSpeedDamageMultiplier" : 20,
-        "fallingDamageSpeedThreshold" : 15
-    },
   "CharacterMovement" : {
+    "height" : 1,
+    "radius" : 0.5,
+    "stepHeight" : 0,
     "faceMovementDirection" : true
   },
+  "Health" : {},
   "SimpleAI" : {},
-  "AABBCollision" : {
-    "extents" : [0.5, 0.5, 0.5]
-  },
   "CharacterSound" : {
     "footstepSounds" : ["engine:Slime1", "engine:Slime2", "engine:Slime3", "engine:Slime4", "engine:Slime5"],
     "footstepVolume" : 0.7
-  }
+  }, "Trigger" : {
+        "detectGroups" : ["engine:debris","engine:character"]
+    }
 }

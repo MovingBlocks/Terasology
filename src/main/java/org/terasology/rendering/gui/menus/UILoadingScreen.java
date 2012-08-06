@@ -16,8 +16,9 @@
 package org.terasology.rendering.gui.menus;
 
 import org.lwjgl.opengl.Display;
-import org.terasology.logic.manager.AssetManager;
+import org.terasology.asset.AssetManager;
 import org.terasology.rendering.gui.components.UIImageOverlay;
+import org.terasology.rendering.gui.components.UIProgressBar;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 
@@ -31,30 +32,33 @@ import javax.vecmath.Vector2f;
 public class UILoadingScreen extends UIDisplayWindow {
 
     final UIImageOverlay _overlay;
-    final UIText _status;
+    final UIProgressBar _progressBar;
 
     public UILoadingScreen() {
-        _status = new UIText("Loading...");
-        _status.setVisible(true);
-
         _overlay = new UIImageOverlay(AssetManager.loadTexture("engine:loadingBackground"));
         _overlay.setVisible(true);
 
-        addDisplayElement(_overlay);
-        addDisplayElement(_status);
+        _progressBar = new UIProgressBar(new Vector2f(256f, 15f));
+        _progressBar.setVisible(true);
 
-        update();
+        addDisplayElement(_overlay);
+        addDisplayElement(_progressBar);
+
+        layout();
         setVisible(true);
     }
 
     @Override
-    public void update() {
-        super.update();
+    public void layout() {
+        super.layout();
 
-        _status.setPosition(new Vector2f(_status.calcCenterPosition().x, Display.getHeight() - 64.0f));
+        if (_progressBar != null) {
+        	_progressBar.setPosition(new Vector2f(_progressBar.calcCenterPosition().x, Display.getHeight() - 84.0f));
+        }
     }
 
-    public void updateStatus(String string) {
-        _status.setText(string);
+    public void updateStatus(String string, float percent) {
+        _progressBar.setValue((int)percent);
+        _progressBar.setText(string);
     }
 }

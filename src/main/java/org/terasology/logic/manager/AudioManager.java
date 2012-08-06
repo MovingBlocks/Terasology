@@ -16,14 +16,15 @@
 package org.terasology.logic.manager;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
+import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.audio.OpenALManager;
 import org.terasology.audio.Sound;
 import org.terasology.audio.SoundPool;
 import org.terasology.audio.SoundSource;
-import org.terasology.components.CharacterMovementComponent;
-import org.terasology.components.world.BlockComponent;
+import org.terasology.physics.character.CharacterMovementComponent;
+import org.terasology.components.block.BlockComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 

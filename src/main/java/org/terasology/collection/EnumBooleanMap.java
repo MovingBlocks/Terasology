@@ -22,6 +22,7 @@ package org.terasology.collection;
  *
  * @author Immortius <immortius@gmail.com>
  */
+// TODO: Remove, use EnumSet instead?
 public class EnumBooleanMap<ENUM extends Enum> {
     private boolean[] store;
 

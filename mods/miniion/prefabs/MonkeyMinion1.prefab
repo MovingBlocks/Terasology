@@ -38,6 +38,9 @@
         0,
         0
       ]
-    },
+    }, "Trigger" : {
+        "detectGroups" : ["engine:character"]
+    },"Health" : {},
     "AccessInventoryAction": {}
+    
 }

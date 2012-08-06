@@ -16,6 +16,8 @@
 
 package org.terasology.logic.world.generator.core;
 
+import java.util.Map;
+
 import org.terasology.logic.world.chunks.Chunk;
 import org.terasology.logic.world.WorldBiomeProvider;
 import org.terasology.logic.world.generator.ChunkGenerator;
@@ -42,18 +44,20 @@ public class PerlinTerrainGenerator implements ChunkGenerator {
 
     @Override
     public void setWorldSeed(String seed) {
-        _pGen1 = new PerlinNoise(seed.hashCode());
-        _pGen1.setOctaves(8);
+        if (seed != null) {
+            _pGen1 = new PerlinNoise(seed.hashCode());
+            _pGen1.setOctaves(8);
 
-        _pGen2 = new PerlinNoise(seed.hashCode() + 1);
-        _pGen2.setOctaves(8);
+            _pGen2 = new PerlinNoise(seed.hashCode() + 1);
+            _pGen2.setOctaves(8);
 
-        _pGen3 = new PerlinNoise(seed.hashCode() + 2);
-        _pGen3.setOctaves(8);
+            _pGen3 = new PerlinNoise(seed.hashCode() + 2);
+            _pGen3.setOctaves(8);
 
-        _pGen4 = new PerlinNoise(seed.hashCode() + 3);
-        _pGen5 = new PerlinNoise(seed.hashCode() + 4);
-        _pGen8 = new PerlinNoise(seed.hashCode() + 7);
+            _pGen4 = new PerlinNoise(seed.hashCode() + 3);
+            _pGen5 = new PerlinNoise(seed.hashCode() + 4);
+            _pGen8 = new PerlinNoise(seed.hashCode() + 7);
+        }
     }
 
     @Override
@@ -220,7 +224,7 @@ public class PerlinTerrainGenerator implements ChunkGenerator {
         double river = calcRiverTerrain(x, z);
 
         float temp = biomeProvider.getTemperatureAt(x, z);
-        float humidity = biomeProvider.getHumidityAt(x, z);
+        float humidity = biomeProvider.getHumidityAt(x, z) * temp;
 
         Vector2f distanceToMountainBiome = new Vector2f(temp - 0.25f, humidity - 0.35f);
 
@@ -248,29 +252,31 @@ public class PerlinTerrainGenerator implements ChunkGenerator {
 
     private double calcMountainDensity(double x, double y, double z) {
         double x1, y1, z1;
-
-        x1 = x * 0.002;
-        y1 = y * 0.001;
-        z1 = z * 0.002;
+        x1 = x * 0.002;y1 = y * 0.001; z1 = z * 0.002;
 
         double result = _pGen4.fBm(x1, y1, z1);
-
         return result > 0.0 ? result : 0;
     }
 
     private double calcHillDensity(double x, double y, double z) {
         double x1, y1, z1;
-
-        x1 = x * 0.008;
-        y1 = y * 0.006;
-        z1 = z * 0.008;
+        x1 = x * 0.008; y1 = y * 0.006; z1 = z * 0.008;
 
         double result = _pGen5.fBm(x1, y1, z1) - 0.1;
-
         return result > 0.0 ? result : 0;
     }
 
     private double calcCaveDensity(double x, double y, double z) {
         return _pGen8.fBm(x * 0.02, y * 0.02, z * 0.02);
     }
+
+    @Override
+    public Map<String, String> getInitParameters() {
+        return null;
+    }
+
+    @Override
+    public void setInitParameters(final Map<String, String> initParameters) {
+    }
+
 }

@@ -1,0 +1,23 @@
+{
+    "name" : "core:droppedblock",
+    "Location" : {
+        "scale" : 0.5
+    },
+    "BoxShape" : {
+        "extents" : [1, 1, 1]
+    },
+    "RigidBody" : {
+        "mass" : 10f,
+        "collisionGroup" : "engine:debris",
+        "collidesWith" : ["engine:world","engine:debris","engine:sensor"]
+    },
+    "Mesh" : {
+        "mesh" : "engine:cube",
+        "material" : "engine:terrain"
+    },
+    "Lifespan" : {
+        "lifespan" : 30
+    },
+    "BlockPickup" : {
+    }
+}

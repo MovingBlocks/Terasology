@@ -50,29 +50,45 @@ class ExportBlockShape(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
 		row.prop(self, "apply_modifiers")
 		
 #UI Panel
+
+bpy.types.Scene.teraAuthor = StringProperty(
+	name="Author",
+	description="Is this side of the block complete",
+	default = "")
+	
+bpy.types.Scene.teraCollisionType = bpy.props.EnumProperty( 
+	name = "Collision Type",
+	description="Type of collision to use for this block",
+	items = [("FullCube", "Full Cube", "The entire block is solid"),
+		("AutoAABB", "Auto AABB", "An AABB is calculated that encompasses the block mesh"),
+		("ConvexHull", "Auto Convex Hull", "A convex hull is calculated that encompasses the block mesh"),
+		("Manual", "Manual", "One or more colliders are specified to describe the collision")])
+		
+bpy.types.Scene.teraCollisionSymmetric = BoolProperty(
+	name="Is Collision Symmetric",
+	description="Whether the collision is symmetric for all rotations of the block",
+	default = False)
+	
+bpy.types.Scene.teraBillboardNormals = BoolProperty(
+	name="Use Billboard Normals",
+	description="Are normals set up for billboards (pointing up)",
+	default = False)
 		
 bpy.types.Object.teraFullSide = BoolProperty(
 	name="Full Side",
 	description="Is this side of the block complete",
 	default = False)
 	
-bpy.types.Object.teraAABB = BoolProperty(
-	name="Is AABB Collider",
-	description="Is this object used to describe an AABB collider",
-	default = False)
-	
-bpy.types.Scene.teraAuthor = StringProperty(
-	name="Author",
-	description="Is this side of the block complete",
-	default = "")
-	
-bpy.types.Scene.teraAutoCollider = BoolProperty(
-	name="Auto-generate Collider",
-	description="Automatically generate an AABB collider that encapulates the block",
-	default = False)
-		
-class UIPanel(bpy.types.Panel):
-	bl_label = "Terasology Properties"
+bpy.types.Object.teraColliderType = bpy.props.EnumProperty( 
+	name = "Collider Type",
+	description="Type of collider this mesh provides",
+	items = [("None", "None", "This mesh is not a collider"),
+		("AABB", "AABB", "This mesh provides a aabb collider"),
+		("Sphere", "Sphere", "This mesh provides a sphere collider")],
+	default = "None")
+			
+class TeraScenePropUIPanel(bpy.types.Panel):
+	bl_label = "Terasology Scene Properties"
 	bl_space_type = "VIEW_3D"
 	bl_region_type = "UI"
 
@@ -82,7 +98,17 @@ class UIPanel(bpy.types.Panel):
 		if not scene:
 			return
 		layout.prop(scene, 'teraAuthor')
-		layout.prop(scene, 'teraAutoCollider')
+		layout.prop(scene, 'teraCollisionType')
+		layout.prop(scene, 'teraCollisionSymmetric')
+		layout.prop(scene, 'teraBillboardNormals')
+				
+class TeraObjectPropUIPanel(bpy.types.Panel):
+	bl_label = "Terasology Mesh Properties"
+	bl_space_type = "VIEW_3D"
+	bl_region_type = "UI"
+
+	def draw(self, context):
+		layout = self.layout
 		
 		ob = context.object
 		if not ob:
@@ -91,7 +117,7 @@ class UIPanel(bpy.types.Panel):
 			return
 		
 		layout.prop(ob, 'teraFullSide')
-		layout.prop(ob, 'teraAABB')
+		layout.prop(ob, 'teraColliderType')
 		
 def menu_export(self, context):
 	self.layout.operator(ExportBlockShape.bl_idname, text="Terasology Block Shape (.json)")

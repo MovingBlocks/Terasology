@@ -32,17 +32,22 @@ public class WorldInfo {
     private String title = "";
     private String seed = "";
     private long time = 0;
-    public static final String DEFAULT_FILE_NAME = "WorldManifest.json";
+    private String[] chunkGenerators = new String[] {};
+
+	public static final String DEFAULT_FILE_NAME = "WorldManifest.json";
 
     public WorldInfo() {
     }
 
-    public WorldInfo(String title, String seed, long time) {
+    public WorldInfo(String title, String seed, long time, String[] chunkGenerators) {
         if (title != null) {
             this.title = title;
         }
         if (seed != null) {
             this.seed = seed;
+        }
+        if (chunkGenerators != null) {
+        	this.chunkGenerators = chunkGenerators;
         }
         this.time = time;
     }
@@ -93,4 +98,12 @@ public class WorldInfo {
     public void setTime(long time) {
         this.time = time;
     }
+    
+    public String[] getChunkGenerators() {
+		return chunkGenerators;
+	}
+
+	public void setChunkGenerators(String[] chunkGenerators) {
+		this.chunkGenerators = chunkGenerators;
+	}
 }

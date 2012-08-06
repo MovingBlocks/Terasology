@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.primitives;
 
-import org.terasology.logic.manager.AssetManager;
+import org.terasology.asset.AssetManager;
 import org.terasology.rendering.assets.Texture;
 
 import javax.vecmath.Vector4f;

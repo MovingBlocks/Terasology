@@ -1,3 +1,18 @@
+/*
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.terasology.rendering.gui.components;
 
 import org.lwjgl.input.Keyboard;
@@ -8,8 +23,8 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.gui.framework.IInputDataElement;
-import org.terasology.rendering.gui.framework.IInputListener;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
+import org.terasology.rendering.gui.framework.events.IInputListener;
 
 import javax.vecmath.Vector2f;
 import java.util.ArrayList;
@@ -43,11 +58,11 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
         _inputText = new UIText();
         _inputText.setVisible(true);
         _inputText.setColor(Color.black);
-        _inputText.setPosition(new Vector2f(getPosition().x + _padding.x, getPosition().y + _padding.y));
+        _inputText.setPosition(new Vector2f(getPosition().x + _padding.x, getPosition().y));
 
         _textCursor = new UITextCursor();
         _textCursor.setVisible(true);
-        _textCursor.setPosition(new Vector2f(getPosition().x + _padding.x, getPosition().y + _padding.y / 2));
+        _textCursor.setPosition(new Vector2f(getPosition().x + _padding.x, getPosition().y));
 
         addDisplayElement(_inputText);
         addDisplayElement(_textCursor);
@@ -83,7 +98,7 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
         }
 
         if (isFocused()) {
-            if (!_textCursor.isVisible()) {
+            if (!isDisabled() && !_textCursor.isVisible()) {
                 _textCursor.setVisible(true);
             }
             setStyle("background-position", "0 120/512");
@@ -93,6 +108,13 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
             }
             setStyle("background-position", "0 90/512");
         }
+
+        _inputText.setPosition(new Vector2f(_padding.x, getSize().y/2 - _inputText.getTextHeight()/2));
+
+        if(!isDisabled() && isFocused()){
+            _textCursor.setPosition(new Vector2f(_textCursor.getPosition().x, getSize().y/2 - _textCursor.getSize().y/1.5f));
+        }
+
         updateTextShift();
         super.update();
     }
@@ -100,7 +122,7 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
     public void clicked(Vector2f mousePos) {
         _focused = true;
 
-        if (_inputValue.length() > 0 && _inputText.getTextWidth() > 0) {
+        if ( !isDisabled() && _inputValue.length() > 0 && _inputText.getTextWidth() > 0) {
             Vector2f absolutePosition = _inputText.calcAbsolutePosition();
             float positionRelativeElement = absolutePosition.x + _inputText.getTextWidth() - mousePos.x;
             float averageSymbols = _inputText.getTextWidth() / _inputValue.length();
@@ -119,7 +141,7 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
 
     @Override
     public void processKeyboardInput(int key) {
-        if (isFocused()) {
+        if (isFocused() && !isDisabled()) {
             if (key == Keyboard.KEY_BACK) {
 
                 _cursorPosition--;
@@ -236,6 +258,14 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
     */
     public int getMaxLength() {
         return _maxLength;
+    }
+
+    public void setDisabled(boolean isDisabled){
+        _disabled = isDisabled;
+    }
+
+    public boolean isDisabled(){
+        return _disabled;
     }
 
 }

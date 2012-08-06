@@ -1,14 +1,28 @@
+/*
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.terasology.componentSystem.items;
 
+import com.bulletphysics.collision.broadphase.CollisionFilterGroups;
+import com.google.common.collect.Lists;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.components.AABBCollisionComponent;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
-import org.terasology.components.PlayerComponent;
-import org.terasology.components.world.BlockComponent;
-import org.terasology.components.world.BlockItemComponent;
-import org.terasology.components.world.LocationComponent;
+import org.terasology.components.block.BlockComponent;
+import org.terasology.components.block.BlockItemComponent;
 import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.events.ActivateEvent;
@@ -20,7 +34,9 @@ import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockFamily;
-import org.terasology.model.structures.AABB;
+import org.terasology.physics.BulletPhysics;
+import org.terasology.physics.CollisionGroup;
+import org.terasology.physics.StandardCollisionGroup;
 
 import javax.vecmath.Vector3f;
 
@@ -145,15 +161,7 @@ public class ItemSystem implements EventHandlerSystem {
 
         // Prevent players from placing blocks inside their bounding boxes
         if (!block.isPenetrable()) {
-            for (EntityRef player : entityManager.iteratorEntities(PlayerComponent.class, AABBCollisionComponent.class, LocationComponent.class)) {
-                LocationComponent location = player.getComponent(LocationComponent.class);
-                AABBCollisionComponent collision = player.getComponent(AABBCollisionComponent.class);
-                Vector3f worldPos = location.getWorldPosition();
-                AABB blockAABB = block.getBounds(blockPos);
-                if (blockAABB.overlaps(new AABB(worldPos, collision.getExtents()))) {
-                    return false;
-                }
-            }
+            return !CoreRegistry.get(BulletPhysics.class).scanArea(block.getBounds(blockPos), Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.DEFAULT, StandardCollisionGroup.CHARACTER)).iterator().hasNext();
         }
         return true;
     }

@@ -41,21 +41,31 @@ import org.terasology.game.bootstrap.EntitySystemBuilder;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.manager.AssetManager;
+import org.terasology.logic.generators.DefaultGenerators;
+import org.terasology.asset.AssetManager;
+import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.logic.world.chunks.Chunk;
+import org.terasology.logic.world.generator.core.ChunkGeneratorManager;
+import org.terasology.logic.world.generator.core.ChunkGeneratorManagerImpl;
+import org.terasology.logic.world.generator.core.FlatTerrainGenerator;
+import org.terasology.logic.world.generator.core.FloraGenerator;
+import org.terasology.logic.world.generator.core.ForestGenerator;
+import org.terasology.logic.world.generator.core.PerlinTerrainGenerator;
+import org.terasology.logic.world.liquid.LiquidsGenerator;
+import org.terasology.logic.world.WorldBiomeProviderImpl;
 import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.physics.BulletPhysics;
 import org.terasology.protobuf.EntityData;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.gui.menus.UILoadingScreen;
 import org.terasology.rendering.gui.menus.UIStatusScreen;
-import org.terasology.rendering.physics.BulletPhysicsRenderer;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 
@@ -77,6 +87,7 @@ import static org.lwjgl.opengl.GL11.*;
 public class StateSinglePlayer implements GameState {
 
     public static final String ENTITY_DATA_FILE = "entity.dat";
+    public static final String CHUNK_GENERATOR_FILE = "chunk_generator.json";
     private Logger logger = Logger.getLogger(getClass().getName());
 
     private String currentWorldName;
@@ -275,19 +286,14 @@ public class StateSinglePlayer implements GameState {
 
         logger.log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
 
-        // Init. a new world
-        worldRenderer = new WorldRenderer(title, seed, time, entityManager, localPlayerSys);
-        CoreRegistry.put(WorldRenderer.class, worldRenderer);
+        // Init ChunkGeneratorManager
+        ChunkGeneratorManager chunkGeneratorManager = initChunkGeneratorManager(title);
+        chunkGeneratorManager.setWorldSeed(seed);
+        chunkGeneratorManager.setWorldBiomeProvider(new WorldBiomeProviderImpl(seed));
 
-        File entityDataFile = new File(PathManager.getInstance().getWorldSavePath(title), ENTITY_DATA_FILE);
-        entityManager.clear();
-        if (entityDataFile.exists()) {
-            try {
-                CoreRegistry.get(WorldPersister.class).load(entityDataFile, WorldPersister.SaveFormat.Binary);
-            } catch (IOException e) {
-                logger.log(Level.SEVERE, "Failed to load entity data", e);
-            }
-        }
+        // Init. a new world
+        worldRenderer = new WorldRenderer(title, seed, time, chunkGeneratorManager, entityManager, localPlayerSys);
+        CoreRegistry.put(WorldRenderer.class, worldRenderer);
 
         // Create the world entity
         Iterator<EntityRef> worldEntityIterator = entityManager.iteratorEntities(WorldComponent.class).iterator();
@@ -303,15 +309,28 @@ public class StateSinglePlayer implements GameState {
         CoreRegistry.put(WorldProvider.class, worldRenderer.getWorldProvider());
         CoreRegistry.put(LocalPlayer.class, new LocalPlayer(EntityRef.NULL));
         CoreRegistry.put(Camera.class, worldRenderer.getActiveCamera());
-        CoreRegistry.put(BulletPhysicsRenderer.class, worldRenderer.getBulletRenderer());
+        CoreRegistry.put(BulletPhysics.class, worldRenderer.getBulletRenderer());
 
         for (ComponentSystem system : componentSystemManager.iterateAll()) {
             system.initialise();
         }
 
+        File entityDataFile = new File(PathManager.getInstance().getWorldSavePath(title), ENTITY_DATA_FILE);
+        entityManager.clear();
+        if (entityDataFile.exists()) {
+            try {
+                CoreRegistry.get(WorldPersister.class).load(entityDataFile, WorldPersister.SaveFormat.Binary);
+            } catch (IOException e) {
+                logger.log(Level.SEVERE, "Failed to load entity data", e);
+            }
+        }
+
         prepareWorld();
     }
 
+    private ChunkGeneratorManager initChunkGeneratorManager(String title) {
+        return ChunkGeneratorManagerImpl.buildChunkGenerator(Config.getInstance().getChunkGenerator());
+    }
 
     private boolean screenHasFocus() {
         return GUIManager.getInstance().getFocusedWindow() != null && GUIManager.getInstance().getFocusedWindow().isModal() && GUIManager.getInstance().getFocusedWindow().isVisible();
@@ -342,7 +361,7 @@ public class StateSinglePlayer implements GameState {
             worldRenderer.getChunkProvider().addRegionEntity(spawnZoneEntity, 1);
 
             while (!worldRenderer.getWorldProvider().isBlockActive(new Vector3i(Chunk.SIZE_X / 2, Chunk.SIZE_Y / 2, Chunk.SIZE_Z / 2))) {
-                loadingScreen.updateStatus(String.format("Loading spawn area... %.2f%%! :-)", (timer.getTimeInMs() - startTime) / 50.0f));
+                loadingScreen.updateStatus(String.format("Loading spawn area... %.2f%%! :-)", (timer.getTimeInMs() - startTime) / 50.0f), (timer.getTimeInMs() - startTime) / 50.0f);
 
                 renderUserInterface();
                 updateUserInterface();
@@ -355,7 +374,7 @@ public class StateSinglePlayer implements GameState {
             }
 
             PlayerFactory playerFactory = new PlayerFactory(entityManager);
-            CoreRegistry.get(LocalPlayer.class).setEntity(playerFactory.newInstance(new Vector3f(spawnPoint.x + 0.5f, spawnPoint.y + 2.0f, spawnPoint.z + 0.5f)));
+            CoreRegistry.get(LocalPlayer.class).setEntity(playerFactory.newInstance(new Vector3f(spawnPoint.x, spawnPoint.y + 1.5f, spawnPoint.z)));
             worldRenderer.setPlayer(CoreRegistry.get(LocalPlayer.class));
             worldRenderer.getChunkProvider().removeRegionEntity(spawnZoneEntity);
             spawnZoneEntity.destroy();
@@ -364,7 +383,7 @@ public class StateSinglePlayer implements GameState {
         while (!getWorldRenderer().pregenerateChunks() && timer.getTimeInMs() - startTime < 5000) {
             chunksGenerated++;
 
-            loadingScreen.updateStatus(String.format("Fast forwarding world... %.2f%%! :-)", (timer.getTimeInMs() - startTime) / 50.0f));
+            loadingScreen.updateStatus(String.format("Fast forwarding world... %.2f%%! :-)", (timer.getTimeInMs() - startTime) / 50.0f), (timer.getTimeInMs() - startTime) / 50.0f);
 
             renderUserInterface();
             updateUserInterface();

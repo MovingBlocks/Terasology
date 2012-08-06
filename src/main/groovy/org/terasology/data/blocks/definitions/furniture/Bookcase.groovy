@@ -25,9 +25,6 @@ block {
     // Graphics
     faces {
         topbottom = "ChestTopBottom"
-        left = "ChestTopBottom"
-        right = "ChestTopBottom"
-        back = "ChestTopBottom"
     }
 
     entityPrefab = "core:bookcase"

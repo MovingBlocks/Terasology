@@ -17,9 +17,13 @@ package org.terasology.model.blocks.management;
 
 import gnu.trove.map.hash.TByteObjectHashMap;
 import org.lwjgl.BufferUtils;
+import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.math.Side;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockFamily;
+import org.terasology.rendering.primitives.Mesh;
 
 import javax.vecmath.Vector2f;
 import java.nio.FloatBuffer;
@@ -108,6 +112,10 @@ public class BlockManager {
         _blocksById.putAll(blocks);
         for (Block b : blocks.values()) {
             _blocksByTitle.put(b.getTitle(), b);
+            Mesh blockMesh = b.getMesh();
+            if (blockMesh != null) {
+                AssetManager.getInstance().addAssetTemporary(blockMesh.getURI(), blockMesh);
+            }
         }
     }
 

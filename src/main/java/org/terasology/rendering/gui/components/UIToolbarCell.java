@@ -19,11 +19,11 @@ import org.lwjgl.opengl.GL11;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LocalPlayerComponent;
-import org.terasology.components.world.BlockItemComponent;
+import org.terasology.components.block.BlockItemComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.manager.AssetManager;
+import org.terasology.asset.AssetManager;
 import org.terasology.model.blocks.Block;
 import org.terasology.model.blocks.BlockFamily;
 import org.terasology.model.inventory.Icon;
@@ -93,6 +93,11 @@ public class UIToolbarCell extends UIDisplayElement {
             }
         }
     }
+    
+    @Override
+    public void layout() {
+    	
+    }
 
     @Override
     public void render() {
@@ -153,7 +158,7 @@ public class UIToolbarCell extends UIDisplayElement {
         glBindTexture(GL11.GL_TEXTURE_2D, terrainTex.getId());
 
         Block block = blockFamily.getArchetypeBlock();
-        block.render();
+        block.renderWithLightValue(1.0f);
 
         GL11.glPopMatrix();
 

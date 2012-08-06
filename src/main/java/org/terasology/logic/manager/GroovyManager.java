@@ -22,6 +22,10 @@ import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceException;
 import groovy.util.ScriptException;
 import org.lwjgl.input.Keyboard;
+import org.terasology.components.rendering.MeshComponent;
+import org.terasology.model.blocks.Block;
+import org.terasology.physics.BlockPickupComponent;
+import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.world.LocationComponent;
@@ -42,7 +46,8 @@ import org.terasology.input.InputSystem;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.model.blocks.BlockFamily;
 import org.terasology.model.blocks.management.BlockManager;
-import org.terasology.rendering.physics.BulletPhysicsRenderer;
+import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.world.WorldRenderer;
 
 import javax.vecmath.Vector3f;
 import java.io.File;
@@ -160,7 +165,7 @@ public class GroovyManager {
         private void giveBlock(BlockFamily blockFamily, int quantity) {
             if (quantity < 1) return;
 
-            BlockItemFactory factory = new BlockItemFactory(CoreRegistry.get(EntityManager.class), CoreRegistry.get(PrefabManager.class));
+            BlockItemFactory factory = new BlockItemFactory(CoreRegistry.get(EntityManager.class));
             EntityRef item = factory.newInstance(blockFamily, quantity);
 
             EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
@@ -168,6 +173,47 @@ public class GroovyManager {
             ItemComponent itemComp = item.getComponent(ItemComponent.class);
             if (itemComp != null && !itemComp.container.exists()) {
                 item.destroy();
+            }
+        }
+
+        private void setStepHeight(float amount) {
+            EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
+            CharacterMovementComponent comp = playerEntity.getComponent(CharacterMovementComponent.class);
+            comp.stepHeight = amount;
+        }
+
+        private void spawnPrefab(String prefabName) {
+            Camera camera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
+            Vector3f spawnPos = camera.getPosition();
+            Vector3f offset = camera.getViewingDirection();
+            offset.scale(3);
+            spawnPos.add(offset);
+
+            Prefab prefab = CoreRegistry.get(PrefabManager.class).getPrefab(prefabName);
+            if (prefab != null && prefab.getComponent(LocationComponent.class) != null) {
+                CoreRegistry.get(EntityManager.class).create(prefab, spawnPos);
+            }
+        }
+
+        private void spawnDroppedBlock(String blockName) {
+            Camera camera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
+            Vector3f spawnPos = camera.getPosition();
+            Vector3f offset = camera.getViewingDirection();
+            offset.scale(3);
+            spawnPos.add(offset);
+
+            Block block = BlockManager.getInstance().getBlock(blockName);
+            if (block == null) return;
+
+            Prefab prefab = CoreRegistry.get(PrefabManager.class).getPrefab("core:droppedBlock");
+            if (prefab != null && prefab.getComponent(LocationComponent.class) != null) {
+                EntityRef blockEntity = CoreRegistry.get(EntityManager.class).create(prefab, spawnPos);
+                MeshComponent blockMesh = blockEntity.getComponent(MeshComponent.class);
+                BlockPickupComponent blockPickup = blockEntity.getComponent(BlockPickupComponent.class);
+                blockPickup.blockFamily = block.getBlockFamily();
+                blockMesh.mesh = block.getMesh();
+                blockEntity.saveComponent(blockMesh);
+                blockEntity.saveComponent(blockPickup);
             }
         }
 
@@ -234,10 +280,6 @@ public class GroovyManager {
 
         public void exit() {
             CoreRegistry.get(GameEngine.class).shutdown();
-        }
-
-        public void spawnLoot() {
-            CoreRegistry.get(BulletPhysicsRenderer.class).addLootableBlocks(CoreRegistry.get(LocalPlayer.class).getPosition(), BlockManager.getInstance().getBlock("Dirt"));
         }
     }
 }

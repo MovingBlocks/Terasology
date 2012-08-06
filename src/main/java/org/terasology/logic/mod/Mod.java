@@ -17,7 +17,7 @@
 package org.terasology.logic.mod;
 
 import org.terasology.asset.AssetSource;
-import org.terasology.logic.manager.AssetManager;
+import org.terasology.asset.AssetManager;
 
 import java.io.File;
 

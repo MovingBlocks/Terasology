@@ -20,7 +20,6 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 import org.terasology.math.TeraMath;
 
-import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -50,7 +49,7 @@ public class DefaultCamera extends Camera {
         Vector3f right = new Vector3f();
         right.cross(_viewingDirection, _up);
         right.scale(_bobbingRotationOffsetFactor);
-        GLU.gluLookAt(0f, (float) _bobbingVerticalOffsetFactor * 2.0f, 0f, (float) _viewingDirection.x, (float) _viewingDirection.y + (float) _bobbingVerticalOffsetFactor * 2.0f, (float) _viewingDirection.z, (float) _up.x + (float) right.x, (float) _up.y + (float) right.y, (float) _up.z + (float) right.z);
+        GLU.gluLookAt(0f, _bobbingVerticalOffsetFactor * 2.0f, 0f, _viewingDirection.x, _viewingDirection.y + _bobbingVerticalOffsetFactor * 2.0f, _viewingDirection.z, _up.x + right.x, _up.y + right.y, _up.z + right.z);
         _viewFrustum.updateFrustum();
     }
 
@@ -60,7 +59,7 @@ public class DefaultCamera extends Camera {
         Vector3f right = new Vector3f();
         right.cross(_viewingDirection, _up);
         right.scale(_bobbingRotationOffsetFactor);
-        GLU.gluLookAt(0f, 0f, 0f, (float) _viewingDirection.x, (float) _viewingDirection.y, (float) _viewingDirection.z, (float) _up.x + (float) right.x, (float) _up.y + (float) right.y, (float) _up.z + (float) right.z);
+        GLU.gluLookAt(0f, 0f, 0f, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, _up.x + right.x, _up.y + right.y, _up.z + right.z);
         _viewFrustum.updateFrustum();
     }
 

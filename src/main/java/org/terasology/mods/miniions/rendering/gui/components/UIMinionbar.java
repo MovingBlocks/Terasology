@@ -16,7 +16,7 @@
 package org.terasology.mods.miniions.rendering.gui.components;
 
 import org.lwjgl.opengl.Display;
-import org.terasology.logic.manager.AssetManager;
+import org.terasology.asset.AssetManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 

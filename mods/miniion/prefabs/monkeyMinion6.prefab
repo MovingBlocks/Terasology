@@ -40,4 +40,7 @@
       ]
     },
     "AccessInventoryAction": {}
+    , "Trigger" : {
+        "detectGroups" : ["engine:character"]
+    },"Health" : {}
 }

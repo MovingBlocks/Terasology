@@ -58,4 +58,9 @@ public class UICrosshair extends UIDisplayElement {
     @Override
     public void update() {
     }
+
+	@Override
+	public void layout() {
+
+	}
 }

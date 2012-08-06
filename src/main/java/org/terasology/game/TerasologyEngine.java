@@ -23,6 +23,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GLContext;
+import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.loaders.*;
@@ -33,6 +34,7 @@ import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.model.blocks.management.BlockManifestor;
 import org.terasology.model.shapes.BlockShapeManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.physics.CollisionGroupManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -110,7 +112,7 @@ public class TerasologyEngine implements GameEngine {
         }
 
         try {
-            FileHandler fh = new FileHandler(new File(dirPath, "Terasology.log").getAbsolutePath(), true);
+            FileHandler fh = new FileHandler(new File(dirPath, "Terasology.log").getAbsolutePath(), false);
             fh.setLevel(Level.INFO);
             fh.setFormatter(new SimpleFormatter());
             Logger.getLogger("").addHandler(fh);
@@ -332,6 +334,7 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void initManagers() {
+        CoreRegistry.put(CollisionGroupManager.class, new CollisionGroupManager());
         CoreRegistry.put(GroovyManager.class, new GroovyManager());
         AssetManager.getInstance().register(AssetType.MESH, "obj", new ObjMeshLoader());
         AssetManager.getInstance().register(AssetType.MUSIC, "ogg", new OggStreamingSoundLoader());
@@ -374,6 +377,7 @@ public class TerasologyEngine implements GameEngine {
     private void cleanup() {
         logger.log(Level.INFO, "Shutting down Terasology...");
         Config.getInstance().saveConfig(new File(PathManager.getInstance().getWorldPath(), "last.cfg"));
+        InputConfig.getInstance().saveConfig(new File(PathManager.getInstance().getWorldPath(), "lastinput.cfg"));
         doPurgeStates();
         terminateThreads();
     }

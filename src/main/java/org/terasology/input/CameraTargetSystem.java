@@ -17,7 +17,7 @@
 package org.terasology.input;
 
 import com.google.common.base.Objects;
-import org.terasology.components.world.BlockComponent;
+import org.terasology.components.block.BlockComponent;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
@@ -25,12 +25,15 @@ import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.world.BlockEntityRegistry;
 import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.Vector3i;
+import org.terasology.physics.BulletPhysics;
+import org.terasology.physics.CollisionGroup;
+import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.physics.BulletPhysicsRenderer;
-import org.terasology.rendering.physics.HitResult;
+import org.terasology.physics.HitResult;
 import org.terasology.rendering.world.WorldRenderer;
 
 import javax.vecmath.Vector3f;
+import java.util.Arrays;
 
 /**
  * @author Immortius
@@ -40,17 +43,16 @@ public class CameraTargetSystem implements ComponentSystem {
     // TODO: This should come from somewhere, probably player entity?
     public static final float TARGET_DISTANCE = 5f;
 
-    private WorldProvider worldProvider;
     private LocalPlayer localPlayer;
     private BlockEntityRegistry blockRegistry;
     private EntityRef target = EntityRef.NULL;
     private Vector3i targetBlockPos = null;
     private Vector3f hitPosition = new Vector3f();
     private Vector3f hitNormal = new Vector3f();
+    private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD};
 
     public void initialise() {
         localPlayer = CoreRegistry.get(LocalPlayer.class);
-        worldProvider = CoreRegistry.get(WorldProvider.class);
         blockRegistry = CoreRegistry.get(BlockEntityRegistry.class);
     }
 
@@ -63,8 +65,8 @@ public class CameraTargetSystem implements ComponentSystem {
     }
 
     public EntityRef getTarget() {
-        if (targetBlockPos != null && !target.exists()) {
-            return blockRegistry.getOrCreateEntityAt(targetBlockPos);
+        if (!target.exists() && targetBlockPos != null) {
+            target = blockRegistry.getOrCreateEntityAt(targetBlockPos);
         }
         return target;
     }
@@ -76,6 +78,10 @@ public class CameraTargetSystem implements ComponentSystem {
     public Vector3f getHitNormal() {
         return new Vector3f(hitNormal);
 
+    }
+
+    public void setFilter(CollisionGroup ... filter) {
+        this.filter = Arrays.copyOf(filter, filter.length);
     }
 
     public void update() {
@@ -92,30 +98,27 @@ public class CameraTargetSystem implements ComponentSystem {
 
         // TODO: This will change when camera are handled better (via a component)
         Camera camera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
-        // TODO: Check for non-block targets once we have support for that
 
-        BulletPhysicsRenderer physicsRenderer = CoreRegistry.get(BulletPhysicsRenderer.class);
-        HitResult hitInfo = physicsRenderer.rayTrace(new Vector3f(camera.getPosition()), new Vector3f(camera.getViewingDirection()), TARGET_DISTANCE);
+        BulletPhysics physicsRenderer = CoreRegistry.get(BulletPhysics.class);
+        HitResult hitInfo = physicsRenderer.rayTrace(new Vector3f(camera.getPosition()), new Vector3f(camera.getViewingDirection()), TARGET_DISTANCE, filter);
         Vector3i newBlockPos = null;
 
+        EntityRef newTarget = EntityRef.NULL;
         if (hitInfo.isHit()) {
+            newTarget = hitInfo.getEntity();
             hitPosition = hitInfo.getHitPoint();
             hitNormal = hitInfo.getHitNormal();
 
-
-            BlockComponent blockComp = hitInfo.getEntity().getComponent(BlockComponent.class);
+            BlockComponent blockComp = newTarget.getComponent(BlockComponent.class);
             if (blockComp != null) {
                 newBlockPos = new Vector3i(blockComp.getPosition());
             }
         }
-        if (!Objects.equal(targetBlockPos, newBlockPos) || lostTarget) {
+        if (!Objects.equal(target, newTarget) || lostTarget) {
             EntityRef oldTarget = target;
 
-            target = EntityRef.NULL;
+            target = newTarget;
             targetBlockPos = newBlockPos;
-            if (newBlockPos != null) {
-                target = hitInfo.getEntity();
-            }
 
             oldTarget.send(new CameraOutEvent());
             target.send(new CameraOverEvent());

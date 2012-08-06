@@ -17,7 +17,7 @@
 package org.terasology.componentSystem.worldSimulation;
 
 import com.google.common.collect.Queues;
-import org.terasology.components.world.BlockComponent;
+import org.terasology.components.block.BlockComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;

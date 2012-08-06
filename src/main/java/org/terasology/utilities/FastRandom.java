@@ -103,6 +103,17 @@ public class FastRandom {
     }
 
     /**
+     * @return A random vector3f with each value between -1f and 1f
+     */
+    //TODO: Produce a unit vector
+    public Vector3f randomVector3f(float scale) {
+        Vector3f vec = new Vector3f(randomFloat(), randomFloat(), randomFloat());
+        vec.normalize();
+        vec.scale(scale);
+        return vec;
+    }
+
+    /**
      * @return Random value between 0f and 1f
      */
     public float randomPosFloat() {

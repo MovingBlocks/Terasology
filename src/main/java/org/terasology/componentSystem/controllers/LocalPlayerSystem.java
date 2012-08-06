@@ -1,10 +1,29 @@
+/*
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.terasology.componentSystem.controllers;
 
+import com.bulletphysics.collision.dispatch.CollisionFlags;
+import com.bulletphysics.linearmath.AabbUtil2;
 import com.bulletphysics.linearmath.QuaternionUtil;
+import com.bulletphysics.linearmath.Transform;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.*;
-import org.terasology.components.world.BlockComponent;
+import org.terasology.components.block.BlockComponent;
+import org.terasology.components.rendering.MeshComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
@@ -24,8 +43,12 @@ import org.terasology.logic.manager.Config;
 import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;
+import org.terasology.math.AABB;
+import org.terasology.physics.character.CharacterMovementComponent;
+import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.cameras.DefaultCamera;
 
+import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
@@ -52,6 +75,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     private float lastStepDelta = 0;
 
     private Vector3f relativeMovement = new Vector3f();
+
+    private AABBRenderer aabbRenderer = new AABBRenderer(AABB.createEmpty());
 
     @Override
     public void initialise() {
@@ -164,12 +189,24 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         // Display the block the player is aiming at
         if (Config.getInstance().isPlacingBox()) {
             EntityRef target = cameraTargetSystem.getTarget();
+            AABB aabb = null;
             BlockComponent blockComp = target.getComponent(BlockComponent.class);
             if (blockComp != null) {
                 Block block = worldProvider.getBlock(blockComp.getPosition());
                 if (block.isRenderBoundingBox()) {
-                    block.getBounds(blockComp.getPosition()).render(2f);
+                    aabb = block.getBounds(blockComp.getPosition());
                 }
+            } else {
+                MeshComponent mesh = target.getComponent(MeshComponent.class);
+                LocationComponent location = target.getComponent(LocationComponent.class);
+                if (mesh != null && mesh.mesh != null && location != null) {
+                    aabb = mesh.mesh.getAABB();
+                    aabb = aabb.transform(location.getWorldRotation(), location.getWorldPosition(), location.getWorldScale());
+                }
+            }
+            if (aabb != null) {
+                aabbRenderer.setAABB(aabb);
+                aabbRenderer.render(2f);
             }
         }
     }
@@ -294,7 +331,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
         if (localPlayerComp.isDead) return;
 
-        event.getTarget().send(new ActivateEvent(entity, entity));
+        event.getTarget().send(new ActivateEvent(entity, entity, playerCamera.getPosition(), playerCamera.getViewingDirection(), event.getHitPosition(), event.getHitNormal()));
         event.consume();
     }
 

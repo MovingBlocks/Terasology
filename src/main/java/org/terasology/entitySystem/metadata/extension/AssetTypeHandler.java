@@ -21,7 +21,7 @@ import org.terasology.asset.Asset;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.metadata.TypeHandler;
-import org.terasology.logic.manager.AssetManager;
+import org.terasology.asset.AssetManager;
 import org.terasology.protobuf.EntityData;
 
 import java.util.List;

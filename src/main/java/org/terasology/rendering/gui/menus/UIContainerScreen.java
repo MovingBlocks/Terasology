@@ -1,3 +1,18 @@
+/*
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.terasology.rendering.gui.menus;
 
 import org.lwjgl.opengl.Display;
@@ -5,7 +20,7 @@ import org.terasology.components.InventoryComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.events.input.binds.FrobButton;
 import org.terasology.events.inventory.ReceiveItemEvent;
-import org.terasology.logic.manager.AssetManager;
+import org.terasology.asset.AssetManager;
 import org.terasology.rendering.gui.components.UIInventoryNew;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
@@ -47,7 +62,7 @@ public class UIContainerScreen extends UIDisplayWindow implements UIInventoryNew
         background.setVisible(true);
         setModal(true);
 
-        update();
+        layout();
     }
 
     public void openContainer(EntityRef container, EntityRef creature) {
@@ -58,8 +73,8 @@ public class UIContainerScreen extends UIDisplayWindow implements UIInventoryNew
     }
 
     @Override
-    public void update() {
-        super.update();
+    public void layout() {
+        super.layout();
         playerInventory.setPosition(new Vector2f(0.5f * Display.getWidth() - CENTER_BORDER - playerInventory.getSize().x, 0));
         playerInventory.centerVertically();
         containerInventory.setPosition(new Vector2f(0.5f * Display.getWidth() + CENTER_BORDER, 0));

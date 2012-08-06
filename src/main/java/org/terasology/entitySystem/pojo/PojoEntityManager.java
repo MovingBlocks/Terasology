@@ -1,18 +1,38 @@
+/*
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.terasology.entitySystem.pojo;
 
+import com.google.common.collect.Lists;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.iterator.TIntObjectIterator;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.common.NullIterator;
 import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.ChangedComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
+import org.terasology.entitySystem.metadata.extension.CollisionGroupTypeHandler;
 import org.terasology.entitySystem.metadata.extension.EntityRefTypeHandler;
 import org.terasology.entitySystem.metadata.extension.PrefabTypeHandler;
+import org.terasology.physics.CollisionGroup;
 
+import javax.vecmath.Vector3f;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -61,6 +81,23 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
     }
 
     @Override
+    public EntityRef create(Component... components) {
+        return create(Arrays.asList(components));
+    }
+
+    @Override
+    public EntityRef create(Iterable<Component> components) {
+        EntityRef entity = create();
+        for (Component c : components) {
+            store.put(entity.getId(), c);
+        }
+        if (eventSystem != null) {
+            eventSystem.send(entity, AddComponentEvent.newInstance());
+        }
+        return entity;
+    }
+
+    @Override
     public EntityRef create(String prefabName) {
         if (prefabName != null && !prefabName.isEmpty()) {
             Prefab prefab = prefabManager.getPrefab(prefabName);
@@ -74,15 +111,26 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
     }
 
     @Override
-    public EntityRef create(Prefab prefab) {
-        EntityRef result = create();
-        if (prefab != null) {
-            for (Component component : prefab.listComponents()) {
-                result.addComponent(componentLibrary.copy(component));
+    public EntityRef create(Prefab prefab, Vector3f position) {
+        List<Component> components = Lists.newArrayList();
+        for (Component component : prefab.listComponents()) {
+            Component newComp = componentLibrary.copy(component);
+            components.add(newComp);
+            if (newComp instanceof LocationComponent) {
+                LocationComponent loc = (LocationComponent) newComp;
+                loc.setWorldPosition(position);
             }
-            result.addComponent(new EntityInfoComponent(prefab.getName()));
         }
-        return result;
+        return create(components);
+    }
+
+    @Override
+    public EntityRef create(Prefab prefab) {
+        List<Component> components = Lists.newArrayList();
+        for (Component component : prefab.listComponents()) {
+            components.add(componentLibrary.copy(component));
+        }
+        return create(components);
     }
 
     @Override

@@ -45,7 +45,7 @@ uniform vec2 grassCoordinate;
 #define DAYLIGHT_AMBIENT_COLOR 0.95, 0.92, 0.91
 #define MOONLIGHT_AMBIENT_COLOR 0.8, 0.8, 1.0
 #define NIGHT_BRIGHTNESS 0.05
-#define WATER_COLOR 0.325, 0.419, 0.525, 0.75
+#define WATER_COLOR 0.325, 0.419, 0.525, 0.5
 #define REFLECTION_COLOR 0.95, 0.97, 1.0, 0.75
 
 #define TORCH_WATER_SPEC 8.0
@@ -60,7 +60,7 @@ uniform vec2 grassCoordinate;
 #define WATER_REFRACTION 0.1
 
 void main(){
-	if (clipHeight > 0 && vertexWorldPosRaw.y < clipHeight) {
+	if (clipHeight > 0.0 && vertexWorldPosRaw.y < clipHeight) {
         discard;
 	}
 
@@ -94,8 +94,11 @@ void main(){
 
         color = texture2D(textureWaterReflection, projectedPos + normalWater.xy * WATER_REFRACTION) * vec4(REFLECTION_COLOR);
 
+        float ndot = dot(normalize(eyeVec), vec3(0.0, 1.0, 0.0));
+        float fresnel= 1.0 - clamp(0.5 + ndot * ndot * 0.5, 0.0, 1.0);
         // Fresnel
-        color = mix(color, vec4(WATER_COLOR), clamp(dot(vec3(0.0, 1.0, 0.0), normalize(eyeVec)), 0.0, 1.0));
+        //color = vec4(vec3(fresnel), 1.0);
+        color = mix(vec4(WATER_COLOR), color, fresnel);
 #else
         color = vec4(WATER_COLOR);
 #endif

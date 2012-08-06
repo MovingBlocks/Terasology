@@ -39,14 +39,16 @@ public class UIStatusScreen extends UIDisplayWindow {
         addDisplayElement(_overlay);
         addDisplayElement(_status);
 
-        update();
+        layout();
     }
 
     @Override
-    public void update() {
-        super.update();
+    public void layout() {
+        super.layout();
 
-        _status.setPosition(_status.calcCenterPosition());
+        if (_status != null) {
+        	_status.setPosition(_status.calcCenterPosition());
+        }
     }
 
     public void updateStatus(String string) {

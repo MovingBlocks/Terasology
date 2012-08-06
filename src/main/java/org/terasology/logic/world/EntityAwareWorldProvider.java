@@ -21,7 +21,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.HealthComponent;
-import org.terasology.components.world.BlockComponent;
+import org.terasology.components.block.BlockComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
@@ -31,16 +31,20 @@ import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.Vector3i;
 import org.terasology.model.blocks.Block;
+import org.terasology.performanceMonitor.PerformanceMonitor;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
+import java.util.logging.Logger;
 
 /**
  * @author Immortius
  */
 public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator implements BlockEntityRegistry, EventHandlerSystem, UpdateSubscriberSystem {
 
+    private Logger logger = Logger.getLogger(getClass().getName());
     private EntityManager entityManager;
 
     // TODO: Perhaps a better datastructure for spatial lookups
@@ -50,7 +54,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     private List<EntityRef> tempBlocks = Lists.newArrayList();
 
     private Thread mainThread;
-    private Queue<BlockChangedEvent> eventQueue = Queues.newConcurrentLinkedQueue();
+    private BlockingQueue<BlockChangedEvent> eventQueue = Queues.newLinkedBlockingQueue();
 
     public EntityAwareWorldProvider(WorldProviderCore base) {
         super(base);
@@ -133,11 +137,18 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     @Override
     public void update(float delta) {
         int processed = 0;
-        while (!eventQueue.isEmpty() && processed < 32) {
-            BlockChangedEvent event = eventQueue.poll();
+        PerformanceMonitor.startActivity("BlockChangedEventQueue");
+        BlockChangedEvent event = eventQueue.poll();
+        while (event != null) {
+            logger.finer(String.format("%s: %s -> %s", event.getBlockPosition(), event.getOldType().getBlockFamily().getTitle(), event.getNewType().getBlockFamily().getTitle()));
             getOrCreateEntityAt(event.getBlockPosition()).send(event);
-            processed++;
+            if (processed++ >= 4) {
+                break;
+            }
+            event = eventQueue.poll();
         }
+        PerformanceMonitor.endActivity();
+        PerformanceMonitor.startActivity("Temp Blocks Cleanup");
         for (EntityRef entity : tempBlocks) {
             BlockComponent blockComp = entity.getComponent(BlockComponent.class);
             if (blockComp == null || !blockComp.temporary)
@@ -149,5 +160,6 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
             }
         }
         tempBlocks.clear();
+        PerformanceMonitor.endActivity();
     }
 }

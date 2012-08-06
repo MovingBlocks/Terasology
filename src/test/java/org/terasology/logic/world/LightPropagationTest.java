@@ -18,9 +18,7 @@ package org.terasology.logic.world;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.terasology.logic.world.LightPropagator;
 import org.terasology.logic.world.chunks.Chunk;
-import org.terasology.logic.world.WorldView;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
