@@ -1,0 +1,222 @@
+/*
+ * This is a Gradle build file:
+ * - Gradle Homepage: http://gradle.org/
+ * - Gradle Documentation: http://gradle.org/documentation
+ * - View tasks for this project: $ gradlew tasks
+ */
+
+apply plugin: 'java'
+apply plugin: 'groovy'
+apply plugin: 'project-report'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+
+/* Gradle Wrapper ---------------------------------------------------------- */
+/* Uncomment this task and change 'gradleVersion' to create a new wrapper version.
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.1'
+}
+*/
+
+ext {
+    startDateTimeString = new Date().format("yyyy-MM-dd_hh-mm-ss")
+    dirSavedWorlds = 'SAVED_WORLDS'
+    dirNatives = 'natives'
+    dirData = 'data'
+    destDirLibs = 'libs'
+    destDirMainOutput = 'mainOutput'
+    destDirMods = 'distributions/mods'
+    mainClassName = "org.terasology.game.Terasology"
+}
+
+repositories {
+    mavenCentral()
+}
+
+/* Natives ----------------------------------------------------------------- */
+configurations {
+    natives
+}
+
+dependencies {
+    natives group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: '2.8.3'
+}
+
+task extractWindowsNatives(type:Copy) {
+    from {
+        configurations.natives.collect { it.getName().contains('-natives-window') ? zipTree(it) : [] }
+    }
+    into ("$dirNatives/windows")
+    exclude ('META-INF/**')
+}
+
+task extractMacOSXNatives(type:Copy) {
+    from {
+        configurations.natives.collect { it.getName().contains('-natives-osx') ? zipTree(it) : [] }
+    }
+    into ("$dirNatives/macosx")
+    exclude ('META-INF/**')
+}
+
+task extractLinuxNatives(type:Copy) {
+    from {
+        configurations.natives.collect { it.getName().contains('-natives-linux') ? zipTree(it) : [] }
+    }
+    into ("$dirNatives/linux")
+    exclude ('META-INF/**')
+}
+
+task extractNatives {
+    dependsOn extractWindowsNatives
+    dependsOn extractLinuxNatives
+    dependsOn extractMacOSXNatives
+}
+
+/* Java/Groovy ------------------------------------------------------------- */
+sourceCompatibility = 1.6
+
+// Compiles everything as groovy, due to java<->groovy interdependencies
+compileJava.enabled = false
+sourceSets.main.java.srcDirs.each { sourceSets.main.groovy.srcDirs it }
+
+configurations {
+    compile {
+        transitive = false;
+        exclude module: 'lwjgl-platform'
+        exclude module: 'jinput-platform'
+    }
+}
+
+dependencies {
+    groovy group: 'org.codehaus.groovy', name: 'groovy', version: '1.8.7'
+    compile group: 'com.google.guava', name: 'guava', version: '12.0.1'
+    compile group: 'com.google.code.gson', name: 'gson', version: '2.1'
+    compile group: 'com.google.protobuf', name: 'protobuf-java', version: '2.4.1'
+    compile group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.2'
+    compile group: 'com.projectdarkstar.ext.jorbis', name: 'jorbis', version: '0.0.17'
+    compile group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: '2.8.3'
+    compile group: 'org.lwjgl.lwjgl', name: 'lwjgl_util', version: '2.8.3'
+    compile group: 'io.netty', name: 'netty', version: '3.4.4.Final'
+    compile group: 'org.reflections', name: 'reflections', version: '0.9.7.RC1'
+    compile group: 'java3d', name: 'vecmath', version: '1.3.1'
+    compile fileTree(dir: 'libs', include: '*.jar')
+    testCompile group: 'junit', name: 'junit', version: '4.10'
+    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.0'
+}
+
+jar {
+    manifest {
+        def manifestClasspath = "$destDirLibs/"+configurations.runtime.collect { it.getName() }.join(" $destDirLibs/") 
+        attributes("Implementation-Title": project.name, "Main-Class": mainClassName, "Class-Path" : manifestClasspath)
+    }
+}
+
+test {
+    // ignoreFailures: Specifies whether the build should break when the verifications performed by this task fail.
+    ignoreFailures = true
+    // showStandardStreams: makes the standard streams (err and out) visible at console when running tests
+    testLogging.showStandardStreams = true
+    jvmArgs '-Xms512m', '-Xmx1024m', '-XX:MaxPermSize=128m'
+}
+
+/* perfTest ----------------------------------------------------------------- */
+sourceSets {
+    perfTest
+}
+
+configurations {
+    perfTestCompile.extendsFrom testCompile
+}
+
+dependencies {
+    perfTestCompile sourceSets.main.output
+}
+
+// TODO This is not a normal JUnit Test. It should be replaced with a JavaExec task.
+task perfTests(type: Test) {
+    dependsOn cleanPerfTests
+    testLogging.showStandardStreams = true
+    testClassesDir = sourceSets.perfTest.output.classesDir
+    classpath = sourceSets.perfTest.runtimeClasspath
+    jvmArgs '-Xms512m', '-Xmx1024m', '-XX:MaxPermSize=128m'
+}
+
+/* Tasks ------------------------------------------------------------------- */
+task assembleMainOutput(type:Sync) {
+    from sourceSets.main.output
+    into "$buildDir/$destDirMainOutput"
+}
+
+task run(type:JavaExec) {
+    description = 'Run Terasology'
+    dependsOn extractNatives
+    dependsOn assembleMainOutput
+    main = mainClassName
+    classpath "$buildDir/$destDirMainOutput"
+    classpath configurations.runtime
+}
+
+task deleteSavedWorlds(type: Delete) {
+    description = "Delete all saved worlds (subfolders of '$dirSavedWorlds')"
+    delete file(dirSavedWorlds).listFiles().findAll { it.directory }
+}
+
+task zipSavedWorlds(type: Zip) {
+    description = "Zip the content of the folder '$dirSavedWorlds'"
+    appendix = "savedWorlds"
+    classifier = startDateTimeString
+    from dirSavedWorlds
+}
+
+task execProtobuf(type:Exec) {
+    description = "Runs Googles 'Protobuf Compiler'"
+    commandLine 'protobuf\\compiler\\protoc.exe', '--proto_path=src\\main\\protobuf', '--java_out', 'src\\main\\java', 'src\\main\\protobuf\\*'
+}
+
+task distMods {
+    mkdir("$buildDir/$destDirMods")
+    file('mods').listFiles().each { File mod ->
+        if (mod.isDirectory() ) {
+            task('distMod-' + mod.getName(), type: Zip) {
+                from (mod)
+                archiveName = mod.getName() + '.zip'
+                destinationDir = file("$buildDir/$destDirMods")
+            }
+            distMods.dependsOn tasks['distMod-' + mod.getName()]
+        }
+    }
+}
+
+task distZip(type:Zip) {
+    description = 'Creates a ZIP distribution'
+    dependsOn extractNatives
+    dependsOn distMods
+    into (project.name) {
+        from 'README.markdown'
+        from 'LICENSE.txt'
+        from jar
+        from('launchScripts') {
+            exclude('Launcher.xml')
+        }
+        into(destDirLibs) {
+            from configurations.runtime
+        }
+        into(dirNatives) {
+            from dirNatives
+        }
+        into(dirData) {
+            from dirData
+        }
+        into("mods") {
+            from "$buildDir/$destDirMods"
+        }
+    }
+}
+
+/* Applet -------------------------------------------------------------------*/
+// TODO Implement Applet tasks
+
+/* IDE --------------------------------------------------------------------- */
+// TODO Check if other configurations for IDEA are necessary.
+ideaModule.dependsOn extractNatives
+eclipseClasspath.dependsOn extractNatives
