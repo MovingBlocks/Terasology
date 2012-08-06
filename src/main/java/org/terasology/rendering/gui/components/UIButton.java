@@ -38,11 +38,14 @@ public class UIButton extends UIDisplayContainer {
 
     public UIButton(Vector2f size) {
         setSize(size);
+        
+        //TODO give user of the UIButton component more styling options. deliver these styles over the constructor?
         setClassStyle("button", "background-image: engine:gui_menu 256/512 30/512 0 0");
         setClassStyle("button-mouseover", "background-image: engine:gui_menu 256/512 30/512 0 30/512");
         setClassStyle("button-mouseclick", "background-image: engine:gui_menu 256/512 30/512 0 60/512");
         setClassStyle("button");
         
+        //TODO also let the user decide which behavior he wants. otherwise you need to overwrite the behavior (see Combobox)
         addMouseMoveListener(new MouseMoveListener() {	
 			@Override
 			public void leave(UIDisplayElement element) {

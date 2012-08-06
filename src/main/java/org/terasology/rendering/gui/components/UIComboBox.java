@@ -36,7 +36,6 @@ public class UIComboBox extends UIDisplayContainer {
     private UIList   _baseList;
 
     private boolean _opened;
-    private final UIComboBox _comboObj = this;
 
     public UIComboBox(Vector2f size){
         initBaseItems(size, new Vector2f(size.x - 2, size.x + size.x/2 - 2));
@@ -110,6 +109,30 @@ public class UIComboBox extends UIDisplayContainer {
         _baseButton.setClassStyle("button", "background-image: engine:gui_menu 18/512 18/512 432/512 0");
         _baseButton.setClassStyle("button-mouseover", "background-image: engine:gui_menu 18/512 18/512 432/512 0");
         _baseButton.setClassStyle("button-mouseclick", "background-image: engine:gui_menu 18/512 18/512 432/512 18/512");
+        _baseButton.addMouseMoveListener(new MouseMoveListener() {
+			@Override
+			public void move(UIDisplayElement element) {
+				
+			}
+			
+			@Override
+			public void leave(UIDisplayElement element) {
+				if (_opened)
+					_baseButton.setClassStyle("button-mouseclick");
+			}
+			
+			@Override
+			public void hover(UIDisplayElement element) {
+				if (_opened)
+					_baseButton.setClassStyle("button-mouseclick");
+			}
+			
+			@Override
+			public void enter(UIDisplayElement element) {
+				if (_opened)
+					_baseButton.setClassStyle("button-mouseclick");
+			}
+		});
 
         _baseList = new UIList(listSize);
         _baseList.getPosition().y = size.y + 2;
