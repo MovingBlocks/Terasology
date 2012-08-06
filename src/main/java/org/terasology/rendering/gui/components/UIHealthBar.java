@@ -59,7 +59,7 @@ public class UIHealthBar extends UIDisplayContainer {
 
     @Override
     public void update() {
-
+    	//TODO solve this over events somehow.
         super.update();
 
         float healthRatio = 0;

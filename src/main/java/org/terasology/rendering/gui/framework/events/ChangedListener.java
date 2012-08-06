@@ -17,12 +17,6 @@ package org.terasology.rendering.gui.framework.events;
 
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 
-/**
- * TODO
- *
- * @author Anton Kireev <adeon.k87@gmail.com>
- */
-public interface IScrollListener {
-    public void scrolled(UIDisplayElement element);
+public interface ChangedListener {
+	public void changed(UIDisplayElement element);
 }
-

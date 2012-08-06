@@ -24,7 +24,7 @@ import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
-import org.terasology.rendering.gui.framework.events.IChangedListener;
+import org.terasology.rendering.gui.framework.events.ChangedListener;
 
 import javax.vecmath.Vector2f;
 
@@ -57,7 +57,7 @@ public class UIConfigMenuAudio extends UIDisplayWindow {
         _overlay.setVisible(true);
 
         _soundOptionSlider = new UISlider(new Vector2f(256f, 32f), 0, 100);
-        _soundOptionSlider.addChangedListener(new IChangedListener() {
+        _soundOptionSlider.addChangedListener(new ChangedListener() {
 			@Override
 			public void changed(UIDisplayElement element) {
 				UISlider slider = (UISlider)element;
@@ -72,7 +72,7 @@ public class UIConfigMenuAudio extends UIDisplayWindow {
         _soundOptionSlider.setVisible(true);
 
         _musicOptionSlider = new UISlider(new Vector2f(256f, 32f), 0, 100);
-        _musicOptionSlider.addChangedListener(new IChangedListener() {
+        _musicOptionSlider.addChangedListener(new ChangedListener() {
 			@Override
 			public void changed(UIDisplayElement element) {
 				UISlider slider = (UISlider)element;

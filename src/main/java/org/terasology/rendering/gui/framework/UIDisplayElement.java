@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.logic.manager.ShaderManager;
-import org.terasology.rendering.gui.framework.events.IClickListener;
-import org.terasology.rendering.gui.framework.events.IFocusListener;
+import org.terasology.rendering.gui.framework.events.ClickListener;
+import org.terasology.rendering.gui.framework.events.FocusListener;
 import org.terasology.rendering.gui.framework.events.IMouseButtonListener;
 import org.terasology.rendering.gui.framework.events.IMouseMoveListener;
 
@@ -40,8 +40,8 @@ public abstract class UIDisplayElement {
 	protected enum EMouseEvents {ENTER, LEAVE, HOVER, MOVE};
     private final ArrayList<IMouseMoveListener> _mouseListeners = new ArrayList<IMouseMoveListener>();
     private final ArrayList<IMouseButtonListener> _mouseButtonListeners = new ArrayList<IMouseButtonListener>();
-    private final ArrayList<IClickListener> _clickListeners = new ArrayList<IClickListener>();
-    private final ArrayList<IFocusListener> _focusListeners = new ArrayList<IFocusListener>();
+    private final ArrayList<ClickListener> _clickListeners = new ArrayList<ClickListener>();
+    private final ArrayList<FocusListener> _focusListeners = new ArrayList<FocusListener>();
     private EMouseEvents lastMouseState;
     private boolean _mouseIsDown = false;
     // TODO: Default this to true
@@ -304,37 +304,37 @@ public abstract class UIDisplayElement {
     }
     
     private void notifyClickListeners(int value) {
-        for (IClickListener listener : _clickListeners) {
+        for (ClickListener listener : _clickListeners) {
         	listener.click(this, value);
         }
     }
     
-    public void addClickListener(IClickListener listener) {
+    public void addClickListener(ClickListener listener) {
     	_clickListeners.add(listener);
     }
 
-    public void removeClickListener(IClickListener listener) {
+    public void removeClickListener(ClickListener listener) {
     	_clickListeners.remove(listener);
     }
     
     private void notifyFocusListeners(boolean focus) {
     	if (focus) {
-	        for (IFocusListener listener : _focusListeners) {
+	        for (FocusListener listener : _focusListeners) {
 	        	listener.focusOn(this);
 	        }
     	}
     	else {
-	        for (IFocusListener listener : _focusListeners) {
+	        for (FocusListener listener : _focusListeners) {
 	        	listener.focusOff(this);
 	        }
     	}
     }
     
-    public void addFocusListener(IFocusListener listener) {
+    public void addFocusListener(FocusListener listener) {
     	_focusListeners.add(listener);
     }
 
-    public void removeFocusListener(IFocusListener listener) {
+    public void removeFocusListener(FocusListener listener) {
     	_focusListeners.remove(listener);
     }
     
@@ -363,11 +363,11 @@ public abstract class UIDisplayElement {
     	}
     }
     
-    public void addMouseListener(IMouseMoveListener listener) {
+    public void addMouseMoveListener(IMouseMoveListener listener) {
         _mouseListeners.add(listener);
     }
 
-    public void removeMouseListener(IMouseMoveListener listener) {
+    public void removeMouseMoveListener(IMouseMoveListener listener) {
     	_mouseListeners.remove(listener);
     }
 }

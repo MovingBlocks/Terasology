@@ -23,7 +23,7 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 import org.terasology.rendering.gui.framework.events.IMouseButtonListener;
 import org.terasology.rendering.gui.framework.events.IMouseMoveListener;
-import org.terasology.rendering.gui.framework.events.IScrollListener;
+import org.terasology.rendering.gui.framework.events.ScrollListener;
 
 import javax.vecmath.Vector2f;
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ public class UIScrollBar extends UIDisplayContainer {
     private UIScrollBarThumb _scrolBarThumb;
 
     //Scroll Listeners
-    private final ArrayList<IScrollListener> _scrollListeners = new ArrayList<IScrollListener>();
+    private final ArrayList<ScrollListener> _scrollListeners = new ArrayList<ScrollListener>();
 
     //Options
     private float _max;
@@ -225,7 +225,7 @@ public class UIScrollBar extends UIDisplayContainer {
 				}
 			}
 		});
-        addMouseListener(new IMouseMoveListener() {
+        addMouseMoveListener(new IMouseMoveListener() {
 			@Override
 			public void move(UIDisplayElement element) {
 				if (_scrolled) {
@@ -294,11 +294,11 @@ public class UIScrollBar extends UIDisplayContainer {
         }
 	}
 
-    public void addScrollListener(IScrollListener listener) {
+    public void addScrollListener(ScrollListener listener) {
         _scrollListeners.add(listener);
     }
 
-    public void removeScrollListener(IScrollListener listener) {
+    public void removeScrollListener(ScrollListener listener) {
         _scrollListeners.remove(listener);
     }
 

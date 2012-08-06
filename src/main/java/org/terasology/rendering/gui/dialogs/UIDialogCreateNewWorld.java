@@ -31,7 +31,7 @@ import org.terasology.logic.world.generator.core.PerlinTerrainGenerator;
 import org.terasology.logic.world.liquid.LiquidsGenerator;
 import org.terasology.rendering.gui.components.*;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.events.IClickListener;
+import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.Vector2f;
@@ -98,7 +98,7 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
         _okButton.setPosition(new Vector2f(size.x / 2 - _okButton.getSize().x - 16f, size.y - _okButton.getSize().y - 10));
         _okButton.setVisible(true);
 
-        _okButton.addClickListener(new IClickListener() {
+        _okButton.addClickListener(new ClickListener() {
 			@Override
 			public void click(UIDisplayElement element, int button) {
 	                if (_inputSeed.getValue().length() > 0) {
@@ -145,7 +145,7 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
         _cancelButton.getLabel().setText("Cancel");
         _cancelButton.setVisible(true);
 
-        _cancelButton.addClickListener(new IClickListener() {
+        _cancelButton.addClickListener(new ClickListener() {
 			@Override
 			public void click(UIDisplayElement element, int button) {
 				close(true);

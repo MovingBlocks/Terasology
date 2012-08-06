@@ -28,7 +28,7 @@ import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
-import org.terasology.rendering.gui.framework.events.IChangedListener;
+import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.IMouseButtonListener;
 import org.terasology.rendering.gui.framework.events.IMouseMoveListener;
 
@@ -39,7 +39,7 @@ import org.terasology.rendering.gui.framework.events.IMouseMoveListener;
  */
 public class UISlider extends UIDisplayContainer {
 	
-    private final ArrayList<IChangedListener> _changedListeners = new ArrayList<IChangedListener>();
+    private final ArrayList<ChangedListener> _changedListeners = new ArrayList<ChangedListener>();
 	private final UIText _label;
 	private final UIGraphicsElement _slider;
 	
@@ -60,7 +60,7 @@ public class UISlider extends UIDisplayContainer {
         setClassStyle("slider-mouseover", "background-image: engine:gui_menu 256/512 30/512 0 30/512");
         setClassStyle("slider");
         
-        addMouseListener(new IMouseMoveListener() {	
+        addMouseMoveListener(new IMouseMoveListener() {	
 			@Override
 			public void leave(UIDisplayElement element) {
 				setClassStyle("slider");
@@ -241,16 +241,16 @@ public class UISlider extends UIDisplayContainer {
 	}
 	
 	private void notifyChangedListeners() {
-		for (IChangedListener listener : _changedListeners) {
+		for (ChangedListener listener : _changedListeners) {
 			listener.changed(this);
 		}
 	}
 
-	public void addChangedListener(IChangedListener listener) {
+	public void addChangedListener(ChangedListener listener) {
         _changedListeners.add(listener);
     }
 
-    public void removeChangedListener(IChangedListener listener) {
+    public void removeChangedListener(ChangedListener listener) {
     	_changedListeners.remove(listener);
     }
 	

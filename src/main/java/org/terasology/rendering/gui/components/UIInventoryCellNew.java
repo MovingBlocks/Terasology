@@ -88,7 +88,7 @@ public class UIInventoryCellNew extends UIDisplayElement {
         label2.setVisible(true);
         label2.setPosition(new Vector2f(0f, -14f));
         
-        addMouseListener(new IMouseMoveListener() {	
+        addMouseMoveListener(new IMouseMoveListener() {	
 			@Override
 			public void leave(UIDisplayElement element) {
 	            selectionRectangle.setVisible(false);

@@ -23,8 +23,8 @@ import org.terasology.asset.AssetUri;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.events.IChangedListener;
-import org.terasology.rendering.gui.framework.events.IClickListener;
+import org.terasology.rendering.gui.framework.events.ChangedListener;
+import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.IMouseButtonListener;
 import org.terasology.rendering.gui.framework.events.IMouseMoveListener;
 
@@ -76,7 +76,7 @@ public class UIComboBox extends UIDisplayContainer {
 	
 			}
 		});
-        addMouseListener(new IMouseMoveListener() {
+        addMouseMoveListener(new IMouseMoveListener() {
 			@Override
 			public void leave(UIDisplayElement element) {
 
@@ -114,14 +114,14 @@ public class UIComboBox extends UIDisplayContainer {
         _baseList = new UIList(listSize);
         _baseList.getPosition().y = size.y + 2;
         _baseList.setVisible(false);
-        _baseList.addClickListener(new IClickListener() {	
+        _baseList.addClickListener(new ClickListener() {	
 			@Override
 			public void click(UIDisplayElement element, int button) {
 				_opened = !_opened;
 				_baseList.setVisible(_opened);
 			}
 		});
-        _baseList.addChangedListener(new IChangedListener() {	
+        _baseList.addChangedListener(new ChangedListener() {	
 			@Override
 			public void changed(UIDisplayElement element) {
 				if (_baseList.getSelectedItem() != null)

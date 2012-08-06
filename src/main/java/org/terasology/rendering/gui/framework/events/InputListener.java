@@ -17,6 +17,11 @@ package org.terasology.rendering.gui.framework.events;
 
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 
-public interface IChangedListener {
-	public void changed(UIDisplayElement element);
+/**
+ * TODO
+ *
+ * @author Anton Kireev <adeon.k87@gmail.com>
+ */
+public interface InputListener {
+    public void keyPressed(UIDisplayElement element);
 }

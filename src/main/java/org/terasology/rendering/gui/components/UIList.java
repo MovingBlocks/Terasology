@@ -22,8 +22,8 @@ import org.terasology.rendering.gui.framework.IInputDataElement;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIScrollableDisplayContainer;
-import org.terasology.rendering.gui.framework.events.IChangedListener;
-import org.terasology.rendering.gui.framework.events.IClickListener;
+import org.terasology.rendering.gui.framework.events.ChangedListener;
+import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.IMouseMoveListener;
 
 import javax.vecmath.Vector2f;
@@ -41,11 +41,11 @@ import java.util.List;
 public class UIList extends UIScrollableDisplayContainer implements IInputDataElement {
 
     private UIListItem _selectedItem = null;
-    private final ArrayList<IClickListener> _doubleClickListeners = new ArrayList<IClickListener>();
+    private final ArrayList<ClickListener> _doubleClickListeners = new ArrayList<ClickListener>();
 
     //List items
     private final List<UIListItem> _items = new ArrayList<UIListItem>();
-	private final List<IChangedListener> _changedListeners = new ArrayList<IChangedListener>();
+	private final List<ChangedListener> _changedListeners = new ArrayList<ChangedListener>();
 	
 	public class UIListItem extends UIDisplayContainer {
 	    private Object _value;
@@ -70,7 +70,7 @@ public class UIList extends UIScrollableDisplayContainer implements IInputDataEl
 	            setSize(new Vector2f(_label.getTextWidth(), getSize().y));
 	        }
 	        
-	        addMouseListener(new IMouseMoveListener() {		
+	        addMouseMoveListener(new IMouseMoveListener() {		
 				@Override
 				public void leave(UIDisplayElement element) {
 					if(!_isSelected)
@@ -173,7 +173,7 @@ public class UIList extends UIScrollableDisplayContainer implements IInputDataEl
 
         newItem.getPosition().y += 32f * _items.size();
         newItem.setFixed(false);
-        newItem.addClickListener(new IClickListener() {
+        newItem.addClickListener(new ClickListener() {
         	private long _lastTime = System.currentTimeMillis();
         	private int _lastButton = -1;
         	
@@ -314,25 +314,25 @@ public class UIList extends UIScrollableDisplayContainer implements IInputDataEl
         }
     }
     
-    public void addDoubleClickListener(IClickListener listener) {
+    public void addDoubleClickListener(ClickListener listener) {
         _doubleClickListeners.add(listener);
     }
 
-    public void removeDoubleClickListener(IClickListener listener) {
+    public void removeDoubleClickListener(ClickListener listener) {
         _doubleClickListeners.remove(listener);
     }
     
 	private void notifyChangedListeners() {
-		for (IChangedListener listener : _changedListeners) {
+		for (ChangedListener listener : _changedListeners) {
 			listener.changed(this);
 		}
 	}
     
-    public void addChangedListener(IChangedListener listener) {
+    public void addChangedListener(ChangedListener listener) {
         _changedListeners.add(listener);
     }
 
-    public void removeChangedListener(IChangedListener listener) {
+    public void removeChangedListener(ChangedListener listener) {
     	_changedListeners.remove(listener);
     }
 }

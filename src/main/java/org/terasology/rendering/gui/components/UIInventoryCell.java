@@ -71,7 +71,7 @@ public class UIInventoryCell extends UIDisplayElement {
         _label2.setVisible(false);
         _label2.setPosition(new Vector2f(0f, -14f));
         
-        addMouseListener(new IMouseMoveListener() {	
+        addMouseMoveListener(new IMouseMoveListener() {	
 			@Override
 			public void leave(UIDisplayElement element) {
 	            _selectionRectangle.setVisible(false);

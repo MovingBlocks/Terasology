@@ -19,8 +19,9 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
-import org.terasology.rendering.gui.framework.events.IClickListener;
+import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.IMouseButtonListener;
+import org.terasology.rendering.gui.framework.events.IMouseMoveListener;
 
 import javax.vecmath.Vector2f;
 
@@ -61,13 +62,38 @@ public class UIDialogBox extends UIDisplayWindow {
 				}
 			}
 		});
+        _title.addMouseMoveListener(new IMouseMoveListener() {
+			@Override
+			public void move(UIDisplayElement element) {
+		        if (_dragged) {
+			        Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
+		            drag(new Vector2f(_prevMousePos.x - mousePos.x, _prevMousePos.y - mousePos.y));
+		            _prevMousePos = new Vector2f(mousePos);
+		        }
+			}
+			
+			@Override
+			public void leave(UIDisplayElement element) {
+				
+			}
+			
+			@Override
+			public void hover(UIDisplayElement element) {
+				
+			}
+			
+			@Override
+			public void enter(UIDisplayElement element) {
+				
+			}
+		});
 
         _close = new UIButton(new Vector2f(19f, 19f));
         _close.getPosition().x = getSize().x - 25f;
         _close.setVisible(true);
         _close.getLabel().setText("");
 
-        _close.addClickListener(new IClickListener() {
+        _close.addClickListener(new ClickListener() {
 			@Override
 			public void click(UIDisplayElement element, int button) {
 				close(true);
@@ -78,17 +104,6 @@ public class UIDialogBox extends UIDisplayWindow {
 
         addDisplayElement(_close);
         addDisplayElement(_title);
-    }
-
-    public void update() {
-        Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
-
-        if (_dragged) {
-            drag(new Vector2f(_prevMousePos.x - mousePos.x, _prevMousePos.y - mousePos.y));
-            _prevMousePos = new Vector2f(mousePos);
-        }
-
-        super.update();
     }
 
     public void resize() {

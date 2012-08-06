@@ -27,8 +27,8 @@ import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
-import org.terasology.rendering.gui.framework.events.IChangedListener;
-import org.terasology.rendering.gui.framework.events.IClickListener;
+import org.terasology.rendering.gui.framework.events.ChangedListener;
+import org.terasology.rendering.gui.framework.events.ClickListener;
 
 import javax.vecmath.Vector2f;
 
@@ -108,7 +108,7 @@ public class UIConfigMenuControls extends UIDisplayWindow {
     public UIConfigMenuControls() {
         maximize();
         
-        IClickListener editButtonClick = new IClickListener() {
+        ClickListener editButtonClick = new ClickListener() {
 			@Override
 			public void click(UIDisplayElement element, int button) {
 				if (editButton == null) {
@@ -243,7 +243,7 @@ public class UIConfigMenuControls extends UIDisplayWindow {
         UsehelditemButton.setVisible(true);
         MouseSensitivity = new UISlider(new Vector2f(256f, 32f), 20, 150);
         MouseSensitivity.setVisible(true);
-        MouseSensitivity.addChangedListener(new IChangedListener() {
+        MouseSensitivity.addChangedListener(new ChangedListener() {
 			@Override
 			public void changed(UIDisplayElement element) {
 				UISlider slider = (UISlider) element;
@@ -255,7 +255,7 @@ public class UIConfigMenuControls extends UIDisplayWindow {
         defaultButton = new UIButton(new Vector2f(128f, 32f));
         defaultButton.getLabel().setText("Default");
         defaultButton.setVisible(true);
-        defaultButton.addClickListener(new IClickListener() {	
+        defaultButton.addClickListener(new ClickListener() {	
 			@Override
 			public void click(UIDisplayElement element, int button) {
 				InputConfig.getInstance().loadDefaultConfig();

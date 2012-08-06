@@ -18,7 +18,7 @@ package org.terasology.rendering.gui.framework;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.rendering.gui.components.UIScrollBar;
-import org.terasology.rendering.gui.framework.events.IScrollListener;
+import org.terasology.rendering.gui.framework.events.ScrollListener;
 
 import javax.vecmath.Vector2f;
 
@@ -56,7 +56,7 @@ public class UIScrollableDisplayContainer extends UIDisplayContainer {
         addDisplayElement(_scrollBarVertical);
         addDisplayElement(_scrollBarHorizontal);
 
-        _scrollBarVertical.addScrollListener(new IScrollListener() {
+        _scrollBarVertical.addScrollListener(new ScrollListener() {
             public void scrolled(UIDisplayElement element) {
                 float shift = (_scrollBarVertical.getValue() - _oldVertivalValue);
                 _scrollShiftVertical += shift;
@@ -70,7 +70,7 @@ public class UIScrollableDisplayContainer extends UIDisplayContainer {
             }
         });
 
-        _scrollBarHorizontal.addScrollListener(new IScrollListener() {
+        _scrollBarHorizontal.addScrollListener(new ScrollListener() {
             public void scrolled(UIDisplayElement element) {
                 float shift = (_scrollBarHorizontal.getValue() - _oldHorizontalValue);
                 _scrollShiftHorizontal += shift;

@@ -29,7 +29,7 @@ import org.terasology.rendering.gui.components.*;
 import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
-import org.terasology.rendering.gui.framework.events.IClickListener;
+import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.IMouseButtonListener;
 
 import javax.vecmath.Vector2f;
@@ -70,7 +70,7 @@ public class UISelectWorldMenu extends UIDisplayWindow {
         _list = new UIList(new Vector2f(512f, 256f));
         _list.setVisible(true);
 
-        _list.addDoubleClickListener(new IClickListener() {
+        _list.addDoubleClickListener(new ClickListener() {
 			@Override
 			public void click(UIDisplayElement element, int button) {
 				loadSelectedWorld();
@@ -93,7 +93,7 @@ public class UISelectWorldMenu extends UIDisplayWindow {
         _deleteFromList.getLabel().setText("Delete");
         _deleteFromList.setVisible(true);
 
-        _createNewWorld.addClickListener(new IClickListener() {
+        _createNewWorld.addClickListener(new ClickListener() {
 			@Override
 			public void click(UIDisplayElement element, int button) {
                 GUIManager.getInstance().setFocusedWindow(_window);
@@ -103,7 +103,7 @@ public class UISelectWorldMenu extends UIDisplayWindow {
 			}
         });
 
-        _deleteFromList.addClickListener(new IClickListener() {
+        _deleteFromList.addClickListener(new ClickListener() {
 			@Override
 			public void click(UIDisplayElement element, int button) {
                 if (_list.getSelectedItem() == null) {
@@ -122,7 +122,7 @@ public class UISelectWorldMenu extends UIDisplayWindow {
 			}
         });
 
-        _loadFromList.addClickListener(new IClickListener() {
+        _loadFromList.addClickListener(new ClickListener() {
 			@Override
 			public void click(UIDisplayElement element, int button) {
 				loadSelectedWorld();

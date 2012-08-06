@@ -2,7 +2,7 @@ package org.terasology.rendering.gui.framework.events;
 
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 
-public interface IFocusListener {
+public interface FocusListener {
 
 	public void focusOn(UIDisplayElement element);
 	

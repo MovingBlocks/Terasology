@@ -32,7 +32,7 @@ import org.terasology.rendering.gui.components.UITransparentOverlay;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
-import org.terasology.rendering.gui.framework.events.IClickListener;
+import org.terasology.rendering.gui.framework.events.ClickListener;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
@@ -65,7 +65,7 @@ public class UIPauseMenu extends UIDisplayWindow {
         _exitButton.getLabel().setText("Exit Terasology");
         _exitButton.setVisible(true);
 
-        _exitButton.addClickListener(new IClickListener() {
+        _exitButton.addClickListener(new ClickListener() {
 			@Override
 			public void click(UIDisplayElement element, int button) {
 				CoreRegistry.get(GameEngine.class).shutdown();
@@ -76,7 +76,7 @@ public class UIPauseMenu extends UIDisplayWindow {
         _respawnButton.getLabel().setText("Respawn");
         _respawnButton.setVisible(true);
 
-        _respawnButton.addClickListener(new IClickListener() {
+        _respawnButton.addClickListener(new ClickListener() {
 			@Override
 			public void click(UIDisplayElement element, int button) {
                 setVisible(false);
@@ -113,7 +113,7 @@ public class UIPauseMenu extends UIDisplayWindow {
         _mainMenuButton.getLabel().setText("Return to Main Menu");
         _mainMenuButton.setVisible(true);
 
-        _mainMenuButton.addClickListener(new IClickListener() {
+        _mainMenuButton.addClickListener(new ClickListener() {
 			@Override
 			public void click(UIDisplayElement element, int button) {
                 setVisible(false);
