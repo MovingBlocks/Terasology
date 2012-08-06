@@ -54,7 +54,9 @@ public class BlockDefinition {
     public Vector4f colorOffset = new Vector4f(1, 1, 1, 1);
     public ColorOffsets colorOffsets;
 
-    public Physics physics;
+    public float mass = 10f;
+    public boolean debrisOnDestroy = true;
+
     public Entity entity;
     public Inventory inventory;
 
@@ -69,11 +71,6 @@ public class BlockDefinition {
         NONE,
         HORIZONTAL,
         ALIGNTOSURFACE
-    }
-
-    public static class Physics {
-        public float mass = 10f;
-        public boolean debrisOnDestroy = true;
     }
 
     public static class Tiles {

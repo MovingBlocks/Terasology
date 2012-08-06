@@ -18,7 +18,5 @@
  * Stone is just raw stone in the world
  */
 {
-    "physics" : {
-        "mass" = 100
-    }
+    "mass" = 100
 }

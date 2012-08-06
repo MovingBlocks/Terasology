@@ -15,6 +15,7 @@
  */
 package org.terasology.world.block.family;
 
+import com.google.common.collect.Maps;
 import org.terasology.asset.AssetUri;
 import org.terasology.math.Side;
 import org.terasology.world.block.Block;
@@ -22,6 +23,7 @@ import org.terasology.world.block.BlockUri;
 
 import java.util.EnumMap;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Block group for blocks that can be oriented around the vertical axis.
@@ -30,13 +32,13 @@ import java.util.Locale;
  */
 public class HorizontalBlockFamily extends AbstractBlockFamily {
 
-    private EnumMap<Side, Block> blocks = new EnumMap<Side, Block>(Side.class);
+    private Map<Side, Block> blocks = Maps.newEnumMap(Side.class);
 
     /**
      * @param uri   The asset uri for the block group.
      * @param blocks The set of blocks that make up the group. Front, Back, Left and Right must be provided - the rest is ignored.
      */
-    public HorizontalBlockFamily(BlockUri uri, EnumMap<Side, Block> blocks) {
+    public HorizontalBlockFamily(BlockUri uri, Map<Side, Block> blocks) {
         super(uri);
         for (Side side : Side.horizontalSides()) {
             Block block = blocks.get(side);

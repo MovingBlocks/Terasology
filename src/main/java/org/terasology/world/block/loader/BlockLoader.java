@@ -40,6 +40,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.family.HorizontalBlockFamily;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.block.shapes.BlockShape;
@@ -160,10 +161,11 @@ public class BlockLoader {
             logger.log(Level.INFO, "Loading " + blockDefUri);
             BlockDefinition blockDef = loadBlockDefinition(blockDefUri);
             if (blockDef != null) {
-                // TODO: Different rotation strategies
                 // TODO: Multifamily definitions
-                Block block = createRawBlock(blockDef, properCase(blockDefUri.getAssetName()));
                 Map<BlockPart, Integer> tileIndices = prepareTiles(blockDef, blockDefUri.getSimpleString());
+                Map<BlockPart, Block.ColorSource> colorSourceMap = prepareColorSources(blockDef);
+                Map<BlockPart, Vector4f> colorOffsetsMap = prepareColorOffsets(blockDef);
+
                 BlockShape shape = null;
                 if (!blockDef.shape.isEmpty()) {
                     shape = (BlockShape) AssetManager.load(new AssetUri(AssetType.SHAPE, blockDef.shape));
@@ -172,21 +174,48 @@ public class BlockLoader {
                     shape = cubeShape;
                 }
 
-                applyShape(block, shape, tileIndices);
-                Map<BlockPart, Block.ColorSource> colorSourceMap = prepareColorSources(blockDef);
-                Map<BlockPart, Vector4f> colorOffsetsMap = prepareColorOffsets(blockDef);
-                for (BlockPart part : BlockPart.values()) {
-                    block.setColorSource(part, colorSourceMap.get(part));
-                    block.setColorOffset(part, colorOffsetsMap.get(part));
+                if (blockDef.liquid) {
+                    blockDef.rotation = BlockDefinition.RotationType.NONE;
                 }
 
-                // Lowered mesh for liquids
-                if (block.isLiquid()) {
-                    applyLoweredShape(block, loweredShape, tileIndices);
-                }
+                switch (blockDef.rotation) {
+                    case HORIZONTAL:
+                        Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
 
-                BlockFamily family = new SymmetricFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), block);
-                registerFamily(family);
+                        for (Rotation rot : Rotation.horizontalRotations()) {
+                            Block block = createRawBlock(blockDef, properCase(blockDefUri.getAssetName()));
+                            applyShape(block, shape, tileIndices, rot);
+
+                            for (BlockPart part : BlockPart.values()) {
+                                block.setColorSource(part, colorSourceMap.get(part));
+                                block.setColorOffset(part, colorOffsetsMap.get(part));
+                            }
+
+                            blockMap.put(rot.rotate(Side.FRONT), block);
+                        }
+
+                        BlockFamily horizFamily = new HorizontalBlockFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap);
+                        registerFamily(horizFamily);
+                        break;
+                    case ALIGNTOSURFACE:
+                    default:
+                        Block block = createRawBlock(blockDef, properCase(blockDefUri.getAssetName()));
+                        applyShape(block, shape, tileIndices, Rotation.NONE);
+
+                        for (BlockPart part : BlockPart.values()) {
+                            block.setColorSource(part, colorSourceMap.get(part));
+                            block.setColorOffset(part, colorOffsetsMap.get(part));
+                        }
+
+                        // Lowered mesh for liquids
+                        if (block.isLiquid()) {
+                            applyLoweredShape(block, loweredShape, tileIndices);
+                        }
+
+                        BlockFamily family = new SymmetricFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), block);
+                        registerFamily(family);
+                        break;
+                }
             }
         }
     }
@@ -239,19 +268,19 @@ public class BlockLoader {
         return result;
     }
 
-    // TODO: Rotation
-    private void applyShape(Block block, BlockShape shape, Map<BlockPart, Integer> tileIndices) {
+    private void applyShape(Block block, BlockShape shape, Map<BlockPart, Integer> tileIndices, Rotation rot) {
         for (BlockPart part : BlockPart.values()) {
             if (shape.getMeshPart(part) != null) {
+                BlockPart targetPart = rot.rotate(part);
                 Vector2f atlasPos = calcAtlasPositionForId(tileIndices.get(part));
-                block.setMeshPart(part, shape.getMeshPart(part).rotate(Rotation.NONE.getQuat4f()).mapTexCoords(atlasPos, Block.TEXTURE_OFFSET_WIDTH));
-                block.setTextureAtlasPos(part, atlasPos);
+                block.setMeshPart(targetPart, shape.getMeshPart(part).rotate(rot.getQuat4f()).mapTexCoords(atlasPos, Block.TEXTURE_OFFSET_WIDTH));
+                block.setTextureAtlasPos(targetPart, atlasPos);
                 if (part.isSide()) {
-                    block.setFullSide(part.getSide(), shape.isBlockingSide(part.getSide()));
+                    block.setFullSide(targetPart.getSide(), shape.isBlockingSide(part.getSide()));
                 }
             }
         }
-        block.setCollision(shape.getCollisionOffset(), shape.getCollisionShape());
+        block.setCollision(shape.getCollisionOffset(rot), shape.getCollisionShape(rot));
     }
 
     private void applyLoweredShape(Block block, BlockShape shape, Map<BlockPart, Integer> tileIndices) {
@@ -285,10 +314,8 @@ public class BlockLoader {
             block.setDisplayName(properCase(defaultName));
         }
 
-        if (def.physics != null) {
-            block.setMass(def.physics.mass);
-            block.setDebrisOnDestroy(def.physics.debrisOnDestroy);
-        }
+        block.setMass(def.mass);
+        block.setDebrisOnDestroy(def.debrisOnDestroy);
 
         if (def.entity != null) {
             block.setEntityPrefab(def.entity.prefab);

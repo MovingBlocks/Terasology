@@ -19,7 +19,5 @@
 */
 {
     "hardness" : 0,
-    "physics" : {
-        "mass" : 256000
-    }
+    "mass" : 256000
 }

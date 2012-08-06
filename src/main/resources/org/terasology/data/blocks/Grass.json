@@ -21,9 +21,6 @@
  * and that the appropriate image file to use equals the Block name + .png (in the same mod)
  */
 {
-    // Grass is actually a solid grass-covered block, so it is OK to attach stuff to it
-    "attachmentAllowed" : true,
-
     // Graphics
     "tiles" : {                     // "tiles" being present means we'll override some with a different graphic
         "sides" : "engine:GrassSide",     // sides means all four (not top/bottom) and can itself be overridden
