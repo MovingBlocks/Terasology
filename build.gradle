@@ -27,6 +27,7 @@ ext {
     subDirLibs = 'libs'
     subDirMods = 'mods'
     destDirApplet = 'distributions/applet'
+    destDirApplication = 'distributions/application'
     destDirMainOutput = 'mainOutput'
     destDirMods = "distributions/$subDirMods"
     mainClassName = 'org.terasology.game.Terasology'
@@ -46,7 +47,7 @@ dependencies {
     natives group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: '2.8.3'
 }
 
-task extractWindowsNatives(type:Copy) {
+task extractWindowsNatives(type:Sync) {
     from {
         configurations.natives.collect { it.getName().contains('-natives-window') ? zipTree(it) : [] }
     }
@@ -54,7 +55,7 @@ task extractWindowsNatives(type:Copy) {
     exclude ('META-INF/**')
 }
 
-task extractMacOSXNatives(type:Copy) {
+task extractMacOSXNatives(type:Sync) {
     from {
         configurations.natives.collect { it.getName().contains('-natives-osx') ? zipTree(it) : [] }
     }
@@ -62,7 +63,7 @@ task extractMacOSXNatives(type:Copy) {
     exclude ('META-INF/**')
 }
 
-task extractLinuxNatives(type:Copy) {
+task extractLinuxNatives(type:Sync) {
     from {
         configurations.natives.collect { it.getName().contains('-natives-linux') ? zipTree(it) : [] }
     }
@@ -146,14 +147,14 @@ task perfTests(type: Test) {
     jvmArgs '-Xms512m', '-Xmx1024m', '-XX:MaxPermSize=128m'
 }
 
-/* Tasks ------------------------------------------------------------------- */
+/* Misc tasks ------------------------------------------------------------------- */
 task assembleMainOutput(type:Sync) {
     from sourceSets.main.output
     into "$buildDir/$destDirMainOutput"
 }
 
 task run(type:JavaExec) {
-    description = 'Run Terasology'
+    description = "Run 'Terasology'"
     dependsOn extractNatives
     dependsOn assembleMainOutput
     main = mainClassName
@@ -161,25 +162,31 @@ task run(type:JavaExec) {
     classpath configurations.runtime
 }
 
-task deleteSavedWorlds(type: Delete) {
-    description = "Delete all saved worlds (subfolders of '$dirSavedWorlds')"
+task deleteSavedWorldsSubfolders(type: Delete) {
+    description = "Delete all subfolders from '$dirSavedWorlds'"
     delete file(dirSavedWorlds).listFiles().findAll { it.directory }
 }
 
-task zipSavedWorlds(type: Zip) {
-    description = "Zip the content of the folder '$dirSavedWorlds'"
+task deleteSavedWorldsFiles(type: Delete) {
+    description = "Delete all files from '$dirSavedWorlds'"
+    delete file(dirSavedWorlds).listFiles().findAll { !it.directory }
+}
+
+task zipSavedWorldsFolder(type: Zip) {
+    description = "Creates a SavedWorlds ZIP file from '$dirSavedWorlds'"
     appendix = "SavedWorlds"
     classifier = startDateTimeString
-    into (project.name + "/$dirSavedWorlds") {
+    into (dirSavedWorlds) {
         from dirSavedWorlds
     }
 }
 
-task execProtobuf(type:Exec) {
-    description = "Runs Googles 'Protobuf Compiler'"
+task runProtobuf(type:Exec) {
+    description = "Run 'Protobuf Compiler'"
     commandLine 'protobuf\\compiler\\protoc.exe', '--proto_path=src\\main\\protobuf', '--java_out', 'src\\main\\java', 'src\\main\\protobuf\\*'
 }
 
+/* Distributions: Application/Applet ----------------------------------------*/
 task distMods {
     mkdir("$buildDir/$destDirMods")
     file('mods').listFiles().each { File mod ->
@@ -194,41 +201,41 @@ task distMods {
     }
 }
 
-task distZip(type:Zip) {
-    description = "Creates a ZIP distribution"
+task distApplication(type:Sync) {
+    description = "Creates an Application folder"
     dependsOn extractNatives
     dependsOn distMods
-    into (project.name) {
-        from 'README.markdown'
-        from 'LICENSE.txt'
-        from jar
-        from('launchScripts') {
-            exclude('Launcher.xml')
-        }
-        into(subDirLibs) {
-            from configurations.runtime
-        }
-        into(dirNatives) {
-            from dirNatives
-        }
-        into(dirData) {
-            from dirData
-        }
-        into(subDirMods) {
-            from "$buildDir/$destDirMods"
-        }
+    into("$buildDir/$destDirApplication")
+    from 'README.markdown'
+    from 'LICENSE.txt'
+    from jar
+    from('launchScripts') {
+        exclude('Launcher.xml')
+    }
+    into(subDirLibs) {
+        from configurations.runtime
+    }
+    into(dirNatives) {
+        from dirNatives
+    }
+    into(dirData) {
+        from dirData
+    }
+    into(subDirMods) {
+        from "$buildDir/$destDirMods"
     }
 }
 
-/* Applet -------------------------------------------------------------------*/
-task distApplet(type:Copy) {
-    description = "Creates an Applet distribution folder"
+task distApplet(type:Sync) {
+    description = "Creates an Applet folder"
     dependsOn distMods
     into("$buildDir/$destDirApplet")
+    from 'README.markdown'
+    from 'LICENSE.txt'
+    from jar
     from(dirApplet) {
         exclude '*.keystore'
     }
-    from jar
     into(subDirLibs) {
         from configurations.runtime
         exclude { details -> details.file.name.contains("lwjgl") || details.file.name.contains("jinput") }
@@ -245,13 +252,25 @@ distApplet.doLast {
     }
 }
 
+task distModsZip(type:Zip) {
+    description = "Creates a MODs ZIP file from '$buildDir/$destDirMods'"
+    dependsOn distMods
+    appendix 'Mods'
+    from "$buildDir/$destDirMods"
+}
+
+task distApplicationZip(type:Zip) {
+    description = "Creates an Application ZIP file from '$buildDir/$destDirApplication'"
+    dependsOn distApplication
+    appendix 'Application'
+    from "$buildDir/$destDirApplication"
+}
+
 task distAppletZip(type:Zip) {
-    description = "Creates a zipped Applet distribution"
+    description = "Creates an Applet ZIP file from '$buildDir/$destDirApplet'"
     dependsOn distApplet
     appendix 'Applet'
-    into (project.name + "/$dirApplet") {
-        from "$buildDir/$destDirApplet"
-    }
+    from "$buildDir/$destDirApplet"
 }
 
 /* IDE --------------------------------------------------------------------- */
