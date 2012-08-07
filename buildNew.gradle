@@ -20,13 +20,17 @@ task wrapper(type: Wrapper) {
 
 ext {
     startDateTimeString = new Date().format("yyyy-MM-dd_hh-mm-ss")
-    dirSavedWorlds = 'SAVED_WORLDS'
-    dirNatives = 'natives'
+    dirApplet = 'applet'
     dirData = 'data'
-    destDirLibs = 'libs'
+    dirNatives = 'natives'
+    dirSavedWorlds = 'SAVED_WORLDS'
+    subDirLibs = 'libs'
+    subDirMods = 'mods'
+    destDirApplet = 'distributions/applet'
     destDirMainOutput = 'mainOutput'
-    destDirMods = 'distributions/mods'
-    mainClassName = "org.terasology.game.Terasology"
+    destDirMods = "distributions/$subDirMods"
+    mainClassName = 'org.terasology.game.Terasology'
+    jarFileName = 'Terasology.jar'
 }
 
 repositories {
@@ -105,8 +109,9 @@ dependencies {
 }
 
 jar {
+    archiveName = jarFileName
     manifest {
-        def manifestClasspath = "$destDirLibs/"+configurations.runtime.collect { it.getName() }.join(" $destDirLibs/") 
+        def manifestClasspath = "$subDirLibs/"+configurations.runtime.collect { it.getName() }.join(" $subDirLibs/") 
         attributes("Implementation-Title": project.name, "Main-Class": mainClassName, "Class-Path" : manifestClasspath)
     }
 }
@@ -163,9 +168,11 @@ task deleteSavedWorlds(type: Delete) {
 
 task zipSavedWorlds(type: Zip) {
     description = "Zip the content of the folder '$dirSavedWorlds'"
-    appendix = "savedWorlds"
+    appendix = "SavedWorlds"
     classifier = startDateTimeString
-    from dirSavedWorlds
+    into (project.name + "/$dirSavedWorlds") {
+        from dirSavedWorlds
+    }
 }
 
 task execProtobuf(type:Exec) {
@@ -188,7 +195,7 @@ task distMods {
 }
 
 task distZip(type:Zip) {
-    description = 'Creates a ZIP distribution'
+    description = "Creates a ZIP distribution"
     dependsOn extractNatives
     dependsOn distMods
     into (project.name) {
@@ -198,7 +205,7 @@ task distZip(type:Zip) {
         from('launchScripts') {
             exclude('Launcher.xml')
         }
-        into(destDirLibs) {
+        into(subDirLibs) {
             from configurations.runtime
         }
         into(dirNatives) {
@@ -207,14 +214,45 @@ task distZip(type:Zip) {
         into(dirData) {
             from dirData
         }
-        into("mods") {
+        into(subDirMods) {
             from "$buildDir/$destDirMods"
         }
     }
 }
 
 /* Applet -------------------------------------------------------------------*/
-// TODO Implement Applet tasks
+task distApplet(type:Copy) {
+    description = "Creates an Applet distribution folder"
+    dependsOn distMods
+    into("$buildDir/$destDirApplet")
+    from(dirApplet) {
+        exclude '*.keystore'
+    }
+    from jar
+    into(subDirLibs) {
+        from configurations.runtime
+        exclude { details -> details.file.name.contains("lwjgl") || details.file.name.contains("jinput") }
+    }
+    into(subDirMods) {
+        from "$buildDir/$destDirMods"
+    }
+}
+distApplet.doLast {
+    ant.signjar(jar: "$buildDir/$destDirApplet/$jarFileName", keystore: "$dirApplet/tera.keystore", alias: 'Terasology', storepass: 'Terasology')
+    file("$buildDir/$destDirApplet/$subDirLibs").listFiles().each {
+        if (it.getName().endsWith(".jar"))
+            ant.signjar(jar: it, keystore: "$dirApplet/tera.keystore", alias: 'Terasology', storepass: 'Terasology')
+    }
+}
+
+task distAppletZip(type:Zip) {
+    description = "Creates a zipped Applet distribution"
+    dependsOn distApplet
+    appendix 'Applet'
+    into (project.name + "/$dirApplet") {
+        from "$buildDir/$destDirApplet"
+    }
+}
 
 /* IDE --------------------------------------------------------------------- */
 // TODO Check if other configurations for IDEA are necessary.
