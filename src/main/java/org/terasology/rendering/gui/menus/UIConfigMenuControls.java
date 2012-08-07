@@ -46,7 +46,7 @@ public class UIConfigMenuControls extends UIDisplayWindow {
 
     final UIText ForwardButtontext,
             BackwardButtontext,
-            JumpbehaviourButtontext,
+            //JumpbehaviourButtontext,
             AttackButtontext,
             ConsoleButtontext,
             CrouchButtontext,
@@ -77,7 +77,7 @@ public class UIConfigMenuControls extends UIDisplayWindow {
             BackwardButton,
             RightButton,
             LeftButton,
-            JumpbehaviourButton,
+            //JumpbehaviourButton,
             AttackButton,
             ConsoleButton,
             CrouchButton,
@@ -149,10 +149,10 @@ public class UIConfigMenuControls extends UIDisplayWindow {
         LeftButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyLeft()));
         LeftButton.addClickListener(editButtonClick);
         LeftButton.setVisible(true);
-        JumpbehaviourButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
-        JumpbehaviourButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyJumpbehaviour()));
-        JumpbehaviourButton.addClickListener(editButtonClick);
-        JumpbehaviourButton.setVisible(true);
+        //JumpbehaviourButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
+        //JumpbehaviourButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyJumpbehaviour()));
+        //JumpbehaviourButton.addClickListener(editButtonClick);
+        //JumpbehaviourButton.setVisible(true);
         AttackButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
         AttackButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyAttack()));
         AttackButton.addClickListener(editButtonClick);
@@ -265,7 +265,7 @@ public class UIConfigMenuControls extends UIDisplayWindow {
 		        BackwardButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyBackward()));
 		        RightButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyRight()));
 		        LeftButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyLeft()));
-		        JumpbehaviourButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyJumpbehaviour()));
+		        //JumpbehaviourButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyJumpbehaviour()));
 		        AttackButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyAttack()));
 		        ConsoleButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyConsole()));
 		        CrouchButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyCrouch()));
@@ -310,7 +310,7 @@ public class UIConfigMenuControls extends UIDisplayWindow {
         PauseButtontext = new UIText("Pause");
         HideguiButtontext = new UIText("Hide HUD");
         MinionmodeButtontext = new UIText("Minion mode");
-        JumpbehaviourButtontext = new UIText("Jump behaviour");
+        //JumpbehaviourButtontext = new UIText("Jump behaviour");
         ConsoleButtontext = new UIText("Console");
 
         Toolslot1Buttontext = new UIText("Hotkey 1");
@@ -327,7 +327,7 @@ public class UIConfigMenuControls extends UIDisplayWindow {
         BackwardButtontext.setVisible(true);
         RightButtontext.setVisible(true);
         LeftButtontext.setVisible(true);
-        JumpbehaviourButtontext.setVisible(true);
+        //JumpbehaviourButtontext.setVisible(true);
         AttackButtontext.setVisible(true);
         ConsoleButtontext.setVisible(true);
         CrouchButtontext.setVisible(true);
@@ -357,7 +357,7 @@ public class UIConfigMenuControls extends UIDisplayWindow {
 
         addDisplayElement(ForwardButtontext);
         addDisplayElement(BackwardButtontext);
-        addDisplayElement(JumpbehaviourButtontext);
+        //addDisplayElement(JumpbehaviourButtontext);
         addDisplayElement(AttackButtontext);
         addDisplayElement(ConsoleButtontext);
         addDisplayElement(CrouchButtontext);
@@ -388,7 +388,7 @@ public class UIConfigMenuControls extends UIDisplayWindow {
         addDisplayElement(BackwardButton, "BackwardButton");
         addDisplayElement(RightButton, "RightButton");
         addDisplayElement(LeftButton, "LeftButton");
-        addDisplayElement(JumpbehaviourButton, "JumpbehaviourButton");
+        //addDisplayElement(JumpbehaviourButton, "JumpbehaviourButton");
         addDisplayElement(AttackButton, "AttackButton");
         addDisplayElement(ConsoleButton, "ConsoleButton");
         addDisplayElement(CrouchButton, "CrouchButton");
@@ -460,8 +460,8 @@ public class UIConfigMenuControls extends UIDisplayWindow {
 			InputConfig.getInstance().setKeyRight(key);
 		else if (button == LeftButton)
 			InputConfig.getInstance().setKeyLeft(key);
-		else if (button == JumpbehaviourButton)
-			InputConfig.getInstance().setKeyJumpbehaviour(key);
+		//else if (button == JumpbehaviourButton)
+		//	InputConfig.getInstance().setKeyJumpbehaviour(key);
 		else if (button == AttackButton)
 			InputConfig.getInstance().setKeyAttack(key);
 		else if (button == ConsoleButton)
@@ -610,15 +610,15 @@ public class UIConfigMenuControls extends UIDisplayWindow {
 	        HideguiButton.getPosition().x = center + rowWidth;
 	        HideguiButton.getPosition().y = 200f;
 	
-	        JumpbehaviourButtontext.getPosition().x = center;
-	        JumpbehaviourButtontext.getPosition().y = 200f + 40f + marginTextTop;
-	        JumpbehaviourButton.getPosition().x = center + rowWidth;
-	        JumpbehaviourButton.getPosition().y = 200f + 40f;
+	        //JumpbehaviourButtontext.getPosition().x = center;
+	        //JumpbehaviourButtontext.getPosition().y = 200f + 40f + marginTextTop;
+	        //JumpbehaviourButton.getPosition().x = center + rowWidth;
+	        //JumpbehaviourButton.getPosition().y = 200f + 40f;
 	
 	        MinionmodeButtontext.getPosition().x = center;
-	        MinionmodeButtontext.getPosition().y = 200f + 2 * 40f + marginTextTop;
+	        MinionmodeButtontext.getPosition().y = 200f + 40f + marginTextTop;
 	        MinionmodeButton.getPosition().x = center + rowWidth;
-	        MinionmodeButton.getPosition().y = 200f + 2 * 40f;
+	        MinionmodeButton.getPosition().y = 200f + 40f;
 	        
 	        //row 4
 	        Toolslot1Buttontext.getPosition().x = center + 2 * rowWidth;

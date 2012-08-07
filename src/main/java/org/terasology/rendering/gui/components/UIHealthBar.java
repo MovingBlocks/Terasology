@@ -26,8 +26,6 @@ import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.HealthChangedEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.mods.miniions.components.MinionComponent;
-import org.terasology.mods.miniions.events.MinionMessageEvent;
 import org.terasology.asset.AssetManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
@@ -76,6 +74,10 @@ public class UIHealthBar extends UIDisplayContainer implements EventHandlerSyste
 	
     @ReceiveEvent(components = {HealthComponent.class})
     public void onHealthChange(HealthChangedEvent event, EntityRef entityref) {
+    	
+    	if (entityref != CoreRegistry.get(LocalPlayer.class).getEntity())
+    		return;
+    	
         float healthRatio = (float) event.getCurrentHealth() / event.getMaxHealth();
 
         // Show/Hide hearts relatively to the available health points of the player

@@ -80,6 +80,8 @@ public class UIProgressBar extends UIDisplayContainer {
     
     public void setText(String text){
         _label.setText(text);
+        
+        layout();
     }
 
     private class UIProgressLine extends UIDisplayContainer {

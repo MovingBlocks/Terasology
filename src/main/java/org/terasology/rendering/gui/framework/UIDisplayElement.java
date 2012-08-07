@@ -200,6 +200,9 @@ public abstract class UIDisplayElement {
 
     public void setVisible(boolean visible) {
         _visible = visible;
+        
+        if (_visible)
+        	layout();
     }
 
     public boolean isVisible() {

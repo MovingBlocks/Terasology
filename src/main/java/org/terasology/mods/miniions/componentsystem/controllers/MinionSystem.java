@@ -88,10 +88,7 @@ public class MinionSystem implements EventHandlerSystem {
     public void onNextMinion(ToolbarNextButton event, EntityRef entity) {
         MinionControllerComponent minionController = entity.getComponent(MinionControllerComponent.class);
         if (minionController.minionMode) {
-            minionController.selectedMinion = (minionController.selectedMinion - 1) % 9;
-            if (minionController.selectedMinion < 0) {
-                minionController.selectedMinion += 9;
-            }
+            minionController.selectedMinion = (minionController.selectedMinion + 1) % 9;
             entity.saveComponent(minionController);
             event.consume();
         }
@@ -101,7 +98,10 @@ public class MinionSystem implements EventHandlerSystem {
     public void onPrevMinion(ToolbarPrevButton event, EntityRef entity) {
         MinionControllerComponent minionController = entity.getComponent(MinionControllerComponent.class);
         if (minionController.minionMode) {
-            minionController.selectedMinion = (minionController.selectedMinion + 1) % 9;
+            minionController.selectedMinion = (minionController.selectedMinion - 1) % 9;
+            if (minionController.selectedMinion < 0) {
+                minionController.selectedMinion += 9;
+            }
             entity.saveComponent(minionController);
             event.consume();
         }

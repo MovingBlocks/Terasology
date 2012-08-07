@@ -72,7 +72,12 @@ public class GUIManager {
                 }
             }
         }
+        
         _renderer.update();
+
+        if (Display.wasResized()) {
+        	_renderer.layout();
+        }
     }
 
     public <T extends UIDisplayWindow> T addWindow(T window, String windowId) {

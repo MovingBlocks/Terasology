@@ -50,11 +50,13 @@ public class UIMinionbar extends UIDisplayContainer {
             cells[i].setVisible(true);
             addDisplayElement(cells[i]);
         }
+        
+        layout();
     }
 
     @Override
-    public void update() {
-        super.update();
+    public void layout() {
+        super.layout();
 
         centerVertically();
         getPosition().x = Display.getWidth() - getSize().x;

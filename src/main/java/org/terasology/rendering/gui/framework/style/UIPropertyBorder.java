@@ -263,7 +263,7 @@ public class UIPropertyBorder extends UIProperty {
         glPopMatrix();
     }
 
-    public void update() {
+    public void layout() {
         if (_showTextured) {
             for (String borderType : _images.keySet()) {
                 if (borderType.equals("top") || borderType.equals("bottom")) {
@@ -284,9 +284,4 @@ public class UIPropertyBorder extends UIProperty {
             }
         }
     }
-
-	@Override
-	public void layout() {
-
-	}
 }
