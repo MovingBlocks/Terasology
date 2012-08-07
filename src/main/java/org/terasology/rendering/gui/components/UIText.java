@@ -27,7 +27,7 @@ import org.terasology.logic.manager.FontManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.events.IChangedListener;
+import org.terasology.rendering.gui.framework.events.ChangedListener;
 
 import javax.vecmath.Vector2f;
 
@@ -40,7 +40,7 @@ import static org.lwjgl.opengl.GL11.glDisable;
  */
 public class UIText extends UIDisplayElement {
 
-	private final ArrayList<IChangedListener> _changedListeners = new ArrayList<IChangedListener>();
+	private final ArrayList<ChangedListener> _changedListeners = new ArrayList<ChangedListener>();
     protected String _text = "";
 
     private Color _shadowColor = new Color(Color.black);
@@ -96,7 +96,7 @@ public class UIText extends UIDisplayElement {
 	}
 	
 	private void notifyChangedListeners() {
-		for (IChangedListener listener : _changedListeners) {
+		for (ChangedListener listener : _changedListeners) {
 			listener.changed(this);
 		}
 	}
@@ -155,11 +155,11 @@ public class UIText extends UIDisplayElement {
         return new Vector2f(Display.getWidth() / 2 - getTextWidth() / 2, Display.getHeight() / 2 - getTextHeight());
     }
 
-	public void addChangedListener(IChangedListener listener) {
+	public void addChangedListener(ChangedListener listener) {
         _changedListeners.add(listener);
     }
 
-    public void removeChangedListener(IChangedListener listener) {
+    public void removeChangedListener(ChangedListener listener) {
     	_changedListeners.remove(listener);
     }
 }

@@ -18,7 +18,7 @@ package org.terasology.rendering.gui.components;
 import org.newdawn.slick.Color;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.events.IClickListener;
+import org.terasology.rendering.gui.framework.events.ClickListener;
 
 import javax.vecmath.Vector2f;
 
@@ -35,7 +35,7 @@ public class UIMessageBox extends UIDialogBox {
         float width = 0f;
         float heigh = 0f;
 
-        _buttonOk = new UIButton(new Vector2f(128f, 32f));
+        _buttonOk = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
         _buttonOk.getLabel().setText("Ok");
         _buttonOk.setVisible(true);
 
@@ -50,7 +50,7 @@ public class UIMessageBox extends UIDialogBox {
         _text.setPosition(new Vector2f(getSize().x / 2 - _text.getTextWidth() / 2, getSize().y / 2 - _text.getTextHeight() / 2));
         _buttonOk.setPosition(new Vector2f(getSize().x / 2 - _buttonOk.getSize().x / 2, getSize().y - _buttonOk.getSize().y - 10f));
 
-        _buttonOk.addClickListener(new IClickListener() {
+        _buttonOk.addClickListener(new ClickListener() {
 			@Override
 			public void click(UIDisplayElement element, int button) {
 				close();

@@ -33,11 +33,11 @@ import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.gui.framework.IInputDataElement;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.events.IClickListener;
-import org.terasology.rendering.gui.framework.events.IFocusListener;
-import org.terasology.rendering.gui.framework.events.IInputListener;
-import org.terasology.rendering.gui.framework.events.IMouseButtonListener;
-import org.terasology.rendering.gui.framework.events.IMouseMoveListener;
+import org.terasology.rendering.gui.framework.events.ClickListener;
+import org.terasology.rendering.gui.framework.events.FocusListener;
+import org.terasology.rendering.gui.framework.events.InputListener;
+import org.terasology.rendering.gui.framework.events.MouseButtonListener;
+import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 
 import javax.vecmath.Vector2f;
 import java.util.ArrayList;
@@ -50,7 +50,7 @@ import java.util.ArrayList;
  */
 public class UIInput extends UIDisplayContainer implements IInputDataElement {
     //	TODO: Add text selection and paste from clipboard
-    private final ArrayList<IInputListener> _inputListeners = new ArrayList<IInputListener>();
+    private final ArrayList<InputListener> _inputListeners = new ArrayList<InputListener>();
 
     private final StringBuffer _inputValue = new StringBuffer();
     private final UIText _inputText;
@@ -102,7 +102,7 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
         setCrop(true);
         setStyle("background-image", "engine:gui_menu 256/512 30/512 0 90/512");
         
-        addClickListener(new IClickListener() {
+        addClickListener(new ClickListener() {
 			@Override
 			public void click(UIDisplayElement element, int button) {
 				if (!isDisabled()) {
@@ -127,7 +127,7 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
 				}
 			}
 		});
-        addMouseButtonListener(new IMouseButtonListener() {							
+        addMouseButtonListener(new MouseButtonListener() {							
 			@Override
 			public void up(UIDisplayElement element, int button, boolean intersect) {
 
@@ -144,7 +144,7 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
 
 			}
 		});
-        addMouseListener(new IMouseMoveListener() {		
+        addMouseMoveListener(new MouseMoveListener() {		
 			@Override
 			public void leave(UIDisplayElement element) {
 				setStyle("background-position", "0 90/512");
@@ -165,7 +165,7 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
 
 			}
 		});
-        addFocusListener(new IFocusListener() {
+        addFocusListener(new FocusListener() {
 			@Override
 			public void focusOn(UIDisplayElement element) {
 				if (!isDisabled())

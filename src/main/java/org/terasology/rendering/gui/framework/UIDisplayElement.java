@@ -20,10 +20,10 @@ import java.util.ArrayList;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.logic.manager.ShaderManager;
-import org.terasology.rendering.gui.framework.events.IClickListener;
-import org.terasology.rendering.gui.framework.events.IFocusListener;
-import org.terasology.rendering.gui.framework.events.IMouseButtonListener;
-import org.terasology.rendering.gui.framework.events.IMouseMoveListener;
+import org.terasology.rendering.gui.framework.events.ClickListener;
+import org.terasology.rendering.gui.framework.events.FocusListener;
+import org.terasology.rendering.gui.framework.events.MouseButtonListener;
+import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 
 import javax.vecmath.Vector2f;
 
@@ -38,10 +38,10 @@ public abstract class UIDisplayElement {
 
 	protected static UIDisplayElement _focusedElement;
 	protected enum EMouseEvents {ENTER, LEAVE, HOVER, MOVE};
-    private final ArrayList<IMouseMoveListener> _mouseListeners = new ArrayList<IMouseMoveListener>();
-    private final ArrayList<IMouseButtonListener> _mouseButtonListeners = new ArrayList<IMouseButtonListener>();
-    private final ArrayList<IClickListener> _clickListeners = new ArrayList<IClickListener>();
-    private final ArrayList<IFocusListener> _focusListeners = new ArrayList<IFocusListener>();
+    private final ArrayList<MouseMoveListener> _mouseListeners = new ArrayList<MouseMoveListener>();
+    private final ArrayList<MouseButtonListener> _mouseButtonListeners = new ArrayList<MouseButtonListener>();
+    private final ArrayList<ClickListener> _clickListeners = new ArrayList<ClickListener>();
+    private final ArrayList<FocusListener> _focusListeners = new ArrayList<FocusListener>();
     private EMouseEvents lastMouseState;
     private boolean _mouseIsDown = false;
     // TODO: Default this to true
@@ -279,95 +279,95 @@ public abstract class UIDisplayElement {
     
     private void notifyMouseButtonListeners(int button, boolean state, int wheel, boolean intersect) {
     	if (button == -1) {
-	        for (IMouseButtonListener listener : _mouseButtonListeners) {
+	        for (MouseButtonListener listener : _mouseButtonListeners) {
 	        	listener.wheel(this, wheel, intersect);
 	        }
     	}
     	else if (state) {
-	        for (IMouseButtonListener listener : _mouseButtonListeners) {
+	        for (MouseButtonListener listener : _mouseButtonListeners) {
 	        	listener.down(this, button, intersect);
 	        }
     	}
     	else {
-	        for (IMouseButtonListener listener : _mouseButtonListeners) {
+	        for (MouseButtonListener listener : _mouseButtonListeners) {
 	        	listener.up(this, button, intersect);
 	        }
     	}  	
     }
     
-    public void addMouseButtonListener(IMouseButtonListener listener) {
+    public void addMouseButtonListener(MouseButtonListener listener) {
     	_mouseButtonListeners.add(listener);
     }
 
-    public void removeMouseButtonListener(IMouseButtonListener listener) {
+    public void removeMouseButtonListener(MouseButtonListener listener) {
     	_mouseButtonListeners.remove(listener);
     }
     
     private void notifyClickListeners(int value) {
-        for (IClickListener listener : _clickListeners) {
+        for (ClickListener listener : _clickListeners) {
         	listener.click(this, value);
         }
     }
     
-    public void addClickListener(IClickListener listener) {
+    public void addClickListener(ClickListener listener) {
     	_clickListeners.add(listener);
     }
 
-    public void removeClickListener(IClickListener listener) {
+    public void removeClickListener(ClickListener listener) {
     	_clickListeners.remove(listener);
     }
     
     private void notifyFocusListeners(boolean focus) {
     	if (focus) {
-	        for (IFocusListener listener : _focusListeners) {
+	        for (FocusListener listener : _focusListeners) {
 	        	listener.focusOn(this);
 	        }
     	}
     	else {
-	        for (IFocusListener listener : _focusListeners) {
+	        for (FocusListener listener : _focusListeners) {
 	        	listener.focusOff(this);
 	        }
     	}
     }
     
-    public void addFocusListener(IFocusListener listener) {
+    public void addFocusListener(FocusListener listener) {
     	_focusListeners.add(listener);
     }
 
-    public void removeFocusListener(IFocusListener listener) {
+    public void removeFocusListener(FocusListener listener) {
     	_focusListeners.remove(listener);
     }
     
     private void notifyMouseListeners(EMouseEvents type) {
     	switch (type) {
     	case ENTER:
-    		for (IMouseMoveListener listener : _mouseListeners) {
+    		for (MouseMoveListener listener : _mouseListeners) {
     			listener.enter(this);
     		}
         break;
     	case LEAVE:
-    		for (IMouseMoveListener listener : _mouseListeners) {
+    		for (MouseMoveListener listener : _mouseListeners) {
     			listener.leave(this);
     		}
         break;
     	case HOVER:
-    		for (IMouseMoveListener listener : _mouseListeners) {
+    		for (MouseMoveListener listener : _mouseListeners) {
     			listener.hover(this);
     		}
         break;
     	case MOVE:
-    		for (IMouseMoveListener listener : _mouseListeners) {
+    		for (MouseMoveListener listener : _mouseListeners) {
     			listener.move(this);
     		}
         break;
     	}
     }
     
-    public void addMouseListener(IMouseMoveListener listener) {
+    public void addMouseMoveListener(MouseMoveListener listener) {
         _mouseListeners.add(listener);
     }
 
-    public void removeMouseListener(IMouseMoveListener listener) {
+    public void removeMouseMoveListener(MouseMoveListener listener) {
     	_mouseListeners.remove(listener);
     }
 }

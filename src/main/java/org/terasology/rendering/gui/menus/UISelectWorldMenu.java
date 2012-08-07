@@ -29,8 +29,8 @@ import org.terasology.rendering.gui.components.*;
 import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
-import org.terasology.rendering.gui.framework.events.IClickListener;
-import org.terasology.rendering.gui.framework.events.IMouseButtonListener;
+import org.terasology.rendering.gui.framework.events.ClickListener;
+import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 
 import javax.vecmath.Vector2f;
 import java.io.File;
@@ -70,30 +70,30 @@ public class UISelectWorldMenu extends UIDisplayWindow {
         _list = new UIList(new Vector2f(512f, 256f));
         _list.setVisible(true);
 
-        _list.addDoubleClickListener(new IClickListener() {
+        _list.addDoubleClickListener(new ClickListener() {
 			@Override
 			public void click(UIDisplayElement element, int button) {
 				loadSelectedWorld();
 			}
         });
 
-        _goToBack = new UIButton(new Vector2f(256f, 32f));
+        _goToBack = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _goToBack.getLabel().setText("Go back");
         _goToBack.setVisible(true);
 
-        _loadFromList = new UIButton(new Vector2f(128f, 32f));
+        _loadFromList = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
         _loadFromList.getLabel().setText("Load");
         _loadFromList.setVisible(true);
 
-        _createNewWorld = new UIButton(new Vector2f(192f, 32f));
+        _createNewWorld = new UIButton(new Vector2f(192f, 32f), UIButton.eButtonType.NORMAL);
         _createNewWorld.getLabel().setText("Create new world");
         _createNewWorld.setVisible(true);
 
-        _deleteFromList = new UIButton(new Vector2f(128f, 32f));
+        _deleteFromList = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
         _deleteFromList.getLabel().setText("Delete");
         _deleteFromList.setVisible(true);
 
-        _createNewWorld.addClickListener(new IClickListener() {
+        _createNewWorld.addClickListener(new ClickListener() {
 			@Override
 			public void click(UIDisplayElement element, int button) {
                 GUIManager.getInstance().setFocusedWindow(_window);
@@ -103,7 +103,7 @@ public class UISelectWorldMenu extends UIDisplayWindow {
 			}
         });
 
-        _deleteFromList.addClickListener(new IClickListener() {
+        _deleteFromList.addClickListener(new ClickListener() {
 			@Override
 			public void click(UIDisplayElement element, int button) {
                 if (_list.getSelectedItem() == null) {
@@ -122,7 +122,7 @@ public class UISelectWorldMenu extends UIDisplayWindow {
 			}
         });
 
-        _loadFromList.addClickListener(new IClickListener() {
+        _loadFromList.addClickListener(new ClickListener() {
 			@Override
 			public void click(UIDisplayElement element, int button) {
 				loadSelectedWorld();

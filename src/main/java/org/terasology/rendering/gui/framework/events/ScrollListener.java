@@ -22,6 +22,7 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
  *
  * @author Anton Kireev <adeon.k87@gmail.com>
  */
-public interface IInputListener {
-    public void keyPressed(UIDisplayElement element);
+public interface ScrollListener {
+    public void scrolled(UIDisplayElement element);
 }
+

@@ -19,7 +19,7 @@ import com.google.gson.internal.Pair;
 
 import javax.vecmath.Vector2f;
 
-import org.terasology.rendering.gui.framework.events.IStateButtonAction;
+import org.terasology.rendering.gui.framework.events.StateButtonAction;
 
 import java.util.LinkedList;
 
@@ -29,11 +29,11 @@ import java.util.LinkedList;
  *
  */
 public class UIStateButton extends UIButton {
-	private final LinkedList<Pair<String, IStateButtonAction>> _states = new LinkedList<Pair<String, IStateButtonAction>>();
+	private final LinkedList<Pair<String, StateButtonAction>> _states = new LinkedList<Pair<String, StateButtonAction>>();
     private int _currentState = -1;
     
     public UIStateButton(Vector2f size) {
-		super(size);
+		super(size, UIButton.eButtonType.NORMAL);
 	}
 
     /**
@@ -42,8 +42,8 @@ public class UIStateButton extends UIButton {
      * @param action The action which will be executed as the button enters this state.
      * @return Returns the state ID.
      */
-    public int addState(String state, IStateButtonAction action) {
-    	_states.add(new Pair<String, IStateButtonAction>(state, action));
+    public int addState(String state, StateButtonAction action) {
+    	_states.add(new Pair<String, StateButtonAction>(state, action));
     	return _states.size() - 1;
     }
     

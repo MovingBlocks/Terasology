@@ -23,10 +23,10 @@ import org.terasology.asset.AssetUri;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.events.IChangedListener;
-import org.terasology.rendering.gui.framework.events.IClickListener;
-import org.terasology.rendering.gui.framework.events.IMouseButtonListener;
-import org.terasology.rendering.gui.framework.events.IMouseMoveListener;
+import org.terasology.rendering.gui.framework.events.ChangedListener;
+import org.terasology.rendering.gui.framework.events.ClickListener;
+import org.terasology.rendering.gui.framework.events.MouseButtonListener;
+import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 
 import javax.vecmath.Vector2f;
 
@@ -36,7 +36,6 @@ public class UIComboBox extends UIDisplayContainer {
     private UIList   _baseList;
 
     private boolean _opened;
-    private final UIComboBox _comboObj = this;
 
     public UIComboBox(Vector2f size){
         initBaseItems(size, new Vector2f(size.x - 2, size.x + size.x/2 - 2));
@@ -50,7 +49,7 @@ public class UIComboBox extends UIDisplayContainer {
         setSize(size);
         _opened = false;
         
-        addMouseButtonListener(new IMouseButtonListener() {
+        addMouseButtonListener(new MouseButtonListener() {
 			@Override
 			public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
 
@@ -64,6 +63,7 @@ public class UIComboBox extends UIDisplayContainer {
 					_opened = false;
 				
 		        _baseList.setVisible(_opened);
+				_baseButton.setToggleState(_opened);
 		        
 		        if (!_opened) {
 		            _baseList.getScrollBarHorizontal().resetScrollPosition();
@@ -76,7 +76,7 @@ public class UIComboBox extends UIDisplayContainer {
 	
 			}
 		});
-        addMouseListener(new IMouseMoveListener() {
+        addMouseMoveListener(new MouseMoveListener() {
 			@Override
 			public void leave(UIDisplayElement element) {
 
@@ -102,7 +102,7 @@ public class UIComboBox extends UIDisplayContainer {
         _baseInput.setVisible(true);
         _baseInput.setDisabled(true);
 
-        _baseButton = new UIButton(new Vector2f(18f, 18f));
+        _baseButton = new UIButton(new Vector2f(18f, 18f), UIButton.eButtonType.TOGGLE);
         _baseButton.setVisible(true);
         _baseButton.getPosition().x = size.x   - _baseButton.getSize().x;
         _baseButton.getPosition().y = size.y/2 - _baseButton.getSize().y/2;
@@ -114,14 +114,14 @@ public class UIComboBox extends UIDisplayContainer {
         _baseList = new UIList(listSize);
         _baseList.getPosition().y = size.y + 2;
         _baseList.setVisible(false);
-        _baseList.addClickListener(new IClickListener() {	
+        _baseList.addClickListener(new ClickListener() {	
 			@Override
 			public void click(UIDisplayElement element, int button) {
 				_opened = !_opened;
 				_baseList.setVisible(_opened);
 			}
 		});
-        _baseList.addChangedListener(new IChangedListener() {	
+        _baseList.addChangedListener(new ChangedListener() {	
 			@Override
 			public void changed(UIDisplayElement element) {
 				if (_baseList.getSelectedItem() != null)

@@ -18,6 +18,6 @@ package org.terasology.rendering.gui.framework.events;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 
 
-public interface IStateButtonAction {
+public interface StateButtonAction {
 	public void action(UIDisplayElement element);
 }

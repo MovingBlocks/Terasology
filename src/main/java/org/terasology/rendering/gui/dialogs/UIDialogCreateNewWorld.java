@@ -31,7 +31,7 @@ import org.terasology.logic.world.generator.core.PerlinTerrainGenerator;
 import org.terasology.logic.world.liquid.LiquidsGenerator;
 import org.terasology.rendering.gui.components.*;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.events.IClickListener;
+import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.Vector2f;
@@ -93,12 +93,12 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
         _chunkGeneratorLabel.setPosition(new Vector2f(_inputSeed.getPosition().x, _inputSeed.getPosition().y + _inputSeed.getSize().y + 16f));
         _chunkGenerator.setPosition(new Vector2f(_chunkGeneratorLabel.getPosition().x, _chunkGeneratorLabel.getPosition().y + _chunkGeneratorLabel.getSize().y + 8f));
 
-        _okButton = new UIButton(new Vector2f(128f, 32f));
+        _okButton = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
         _okButton.getLabel().setText("Play");
         _okButton.setPosition(new Vector2f(size.x / 2 - _okButton.getSize().x - 16f, size.y - _okButton.getSize().y - 10));
         _okButton.setVisible(true);
 
-        _okButton.addClickListener(new IClickListener() {
+        _okButton.addClickListener(new ClickListener() {
 			@Override
 			public void click(UIDisplayElement element, int button) {
 	                if (_inputSeed.getValue().length() > 0) {
@@ -140,12 +140,12 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
         });
 
 
-        _cancelButton = new UIButton(new Vector2f(128f, 32f));
+        _cancelButton = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
         _cancelButton.setPosition(new Vector2f(_okButton.getPosition().x + _okButton.getSize().x + 16f, _okButton.getPosition().y));
         _cancelButton.getLabel().setText("Cancel");
         _cancelButton.setVisible(true);
 
-        _cancelButton.addClickListener(new IClickListener() {
+        _cancelButton.addClickListener(new ClickListener() {
 			@Override
 			public void click(UIDisplayElement element, int button) {
 				close(true);

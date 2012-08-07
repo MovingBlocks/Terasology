@@ -2,7 +2,7 @@ package org.terasology.rendering.gui.framework.events;
 
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 
-public interface IClickListener {
+public interface ClickListener {
 
 	/**
 	 * Click event. Will be called if the specific item was clicked.
