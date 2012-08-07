@@ -32,7 +32,7 @@ import org.terasology.world.block.management.BlockManager;
  * @author Immortius
  */
 public class WorldProviderCoreImpl implements WorldProviderCore {
-    public final long DAY_NIGHT_LENGTH_IN_MS = Config.getInstance().getDayNightLengthInMs();
+    private final long DAY_NIGHT_LENGTH_IN_MS = Config.getInstance().getDayNightLengthInMs();
 
     private String title;
     private String seed;

@@ -39,6 +39,7 @@ import org.terasology.rendering.assets.Texture;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.BlockUri;
+import org.terasology.world.block.family.AlignToSurfaceFamily;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.HorizontalBlockFamily;
 import org.terasology.world.block.family.SymmetricFamily;
@@ -68,6 +69,7 @@ public class BlockLoader {
     private static final int NUM_MIPMAPS = 5;
 
     private Logger logger = Logger.getLogger(getClass().getName());
+    private JsonParser parser;
     private Gson gson;
 
     private BlockShape cubeShape;
@@ -83,6 +85,7 @@ public class BlockLoader {
     private List<BlockFamily> blockFamilies = Lists.newArrayList();
 
     public BlockLoader() {
+        parser = new JsonParser();
         gson = new GsonBuilder()
                 .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
                 .registerTypeAdapter(BlockDefinition.Tiles.class, new BlockTilesDefinitionHandler())
@@ -137,8 +140,8 @@ public class BlockLoader {
             logger.severe("Too many tiles, culling overflow");
         }
 
-        g.setColor(new Color(0,0,0));
-        g.drawRect(0,0,textureSize,textureSize);
+        g.setColor(new Color(0, 0, 0));
+        g.drawRect(0, 0, textureSize, textureSize);
 
         for (int index = 0; index < tiles.size() && index < MAX_TILES; ++index) {
             Tile tile = tiles.get(index);
@@ -159,64 +162,130 @@ public class BlockLoader {
         logger.log(Level.INFO, "Loading Blocks...");
         for (AssetUri blockDefUri : AssetManager.list(AssetType.BLOCK_DEFINITION)) {
             logger.log(Level.INFO, "Loading " + blockDefUri);
-            BlockDefinition blockDef = loadBlockDefinition(blockDefUri);
-            if (blockDef != null) {
-                // TODO: Multifamily definitions
-                Map<BlockPart, Integer> tileIndices = prepareTiles(blockDef, blockDefUri.getSimpleString());
-                Map<BlockPart, Block.ColorSource> colorSourceMap = prepareColorSources(blockDef);
-                Map<BlockPart, Vector4f> colorOffsetsMap = prepareColorOffsets(blockDef);
+            try {
+                JsonElement rawJson = readJson(blockDefUri);
+                if (rawJson != null) {
+                    JsonObject blockDefJson = rawJson.getAsJsonObject();
+                    BlockDefinition blockDef = loadBlockDefinition(blockDefJson);
 
-                BlockShape shape = null;
-                if (!blockDef.shape.isEmpty()) {
-                    shape = (BlockShape) AssetManager.load(new AssetUri(AssetType.SHAPE, blockDef.shape));
+                    if (blockDef.liquid) {
+                        blockDef.rotation = BlockDefinition.RotationType.NONE;
+                    }
+
+                    switch (blockDef.rotation) {
+                        case ALIGNTOSURFACE:
+                            processAlignToSurfaceFamily(blockDefUri, blockDefJson);
+                            break;
+                        case HORIZONTAL:
+                            processHorizontalBlockFamily(blockDefUri, blockDef);
+                            break;
+
+                        default:
+                            processSingleBlockFamily(blockDefUri, blockDef);
+                            break;
+                    }
+
                 }
-                if (shape == null) {
-                    shape = cubeShape;
-                }
-
-                if (blockDef.liquid) {
-                    blockDef.rotation = BlockDefinition.RotationType.NONE;
-                }
-
-                switch (blockDef.rotation) {
-                    case HORIZONTAL:
-                        Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
-
-                        for (Rotation rot : Rotation.horizontalRotations()) {
-                            Block block = createRawBlock(blockDef, properCase(blockDefUri.getAssetName()));
-                            applyShape(block, shape, tileIndices, rot);
-
-                            for (BlockPart part : BlockPart.values()) {
-                                block.setColorSource(part, colorSourceMap.get(part));
-                                block.setColorOffset(part, colorOffsetsMap.get(part));
-                            }
-
-                            blockMap.put(rot.rotate(Side.FRONT), block);
-                        }
-
-                        BlockFamily horizFamily = new HorizontalBlockFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap);
-                        registerFamily(horizFamily);
-                        break;
-                    case ALIGNTOSURFACE:
-                    default:
-                        Block block = createRawBlock(blockDef, properCase(blockDefUri.getAssetName()));
-                        applyShape(block, shape, tileIndices, Rotation.NONE);
-
-                        for (BlockPart part : BlockPart.values()) {
-                            block.setColorSource(part, colorSourceMap.get(part));
-                            block.setColorOffset(part, colorOffsetsMap.get(part));
-                        }
-
-                        // Lowered mesh for liquids
-                        if (block.isLiquid()) {
-                            applyLoweredShape(block, loweredShape, tileIndices);
-                        }
-
-                        BlockFamily family = new SymmetricFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), block);
-                        registerFamily(family);
-                        break;
-                }
+            } catch (JsonParseException e) {
+                logger.log(Level.SEVERE, "Failed to load block '" + blockDefUri + "'", e);
             }
+        }
+    }
+
+    private void processAlignToSurfaceFamily(AssetUri blockDefUri, JsonObject blockDefJson) {
+        Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
+        if (blockDefJson.has("top")) {
+            JsonObject topDefJson = blockDefJson.getAsJsonObject("top");
+            blockDefJson.remove("top");
+            mergeJsonInto(blockDefJson, topDefJson);
+            BlockDefinition topDef = loadBlockDefinition(topDefJson);
+            blockMap.put(Side.TOP, constructSingleBlock(blockDefUri, topDef));
+        }
+        if (blockDefJson.has("sides")) {
+            JsonObject sideDefJson = blockDefJson.getAsJsonObject("sides");
+            blockDefJson.remove("sides");
+            mergeJsonInto(blockDefJson, sideDefJson);
+            BlockDefinition sideDef = loadBlockDefinition(sideDefJson);
+            constructHorizontalBlocks(blockDefUri, sideDef, blockMap);
+        }
+        if (blockDefJson.has("bottom")) {
+            JsonObject bottomDefJson = blockDefJson.getAsJsonObject("bottom");
+            blockDefJson.remove("bottom");
+            mergeJsonInto(blockDefJson, bottomDefJson);
+            BlockDefinition bottomDef = loadBlockDefinition(bottomDefJson);
+            blockMap.put(Side.BOTTOM, constructSingleBlock(blockDefUri, bottomDef));
+        }
+        BlockFamily family = new AlignToSurfaceFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap);
+        registerFamily(family);
+    }
+
+    private void mergeJsonInto(JsonObject from, JsonObject to) {
+
+        for (Map.Entry<String, JsonElement> entry : from.entrySet()) {
+            if (entry.getValue().isJsonObject()) {
+               if (to.has(entry.getKey())) {
+
+               } else {
+                   to.add(entry.getKey(), entry.getValue());
+               }
+            } else {
+                to.add(entry.getKey(), entry.getValue());
+            }
+        }
+    }
+
+    private void processSingleBlockFamily(AssetUri blockDefUri, BlockDefinition blockDef) {
+        Block block = constructSingleBlock(blockDefUri, blockDef);
+
+        BlockFamily family = new SymmetricFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), block);
+        registerFamily(family);
+    }
+
+    private Block constructSingleBlock(AssetUri blockDefUri, BlockDefinition blockDef) {
+        Map<BlockPart, Integer> tileIndices = prepareTiles(blockDef, blockDefUri.getSimpleString());
+        Map<BlockPart, Block.ColorSource> colorSourceMap = prepareColorSources(blockDef);
+        Map<BlockPart, Vector4f> colorOffsetsMap = prepareColorOffsets(blockDef);
+        BlockShape shape = getShape(blockDef);
+
+        Block block = createRawBlock(blockDef, properCase(blockDefUri.getAssetName()));
+        applyShape(block, shape, tileIndices, Rotation.NONE);
+
+        for (BlockPart part : BlockPart.values()) {
+            block.setColorSource(part, colorSourceMap.get(part));
+            block.setColorOffset(part, colorOffsetsMap.get(part));
+        }
+
+        // Lowered mesh for liquids
+        if (block.isLiquid()) {
+            applyLoweredShape(block, loweredShape, tileIndices);
+        }
+        return block;
+    }
+
+    private void processHorizontalBlockFamily(AssetUri blockDefUri, BlockDefinition blockDef) {
+        Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
+        constructHorizontalBlocks(blockDefUri, blockDef, blockMap);
+
+        BlockFamily horizFamily = new HorizontalBlockFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap);
+        registerFamily(horizFamily);
+    }
+
+    private void constructHorizontalBlocks(AssetUri blockDefUri, BlockDefinition blockDef, Map<Side, Block> blockMap) {
+        Map<BlockPart, Integer> tileIndices = prepareTiles(blockDef, blockDefUri.getSimpleString());
+        Map<BlockPart, Block.ColorSource> colorSourceMap = prepareColorSources(blockDef);
+        Map<BlockPart, Vector4f> colorOffsetsMap = prepareColorOffsets(blockDef);
+        BlockShape shape = getShape(blockDef);
+
+        for (Rotation rot : Rotation.horizontalRotations()) {
+            Block block = createRawBlock(blockDef, properCase(blockDefUri.getAssetName()));
+            applyShape(block, shape, tileIndices, rot);
+
+            for (BlockPart part : BlockPart.values()) {
+                block.setColorSource(part, colorSourceMap.get(part));
+                block.setColorOffset(part, colorOffsetsMap.get(part));
+            }
+
+            blockMap.put(rot.rotate(Side.FRONT), block);
         }
     }
 
@@ -268,13 +337,24 @@ public class BlockLoader {
         return result;
     }
 
+    private BlockShape getShape(BlockDefinition blockDef) {
+        BlockShape shape = null;
+        if (!blockDef.shape.isEmpty()) {
+            shape = (BlockShape) AssetManager.load(new AssetUri(AssetType.SHAPE, blockDef.shape));
+        }
+        if (shape == null) {
+            return cubeShape;
+        }
+        return shape;
+    }
+
     private void applyShape(Block block, BlockShape shape, Map<BlockPart, Integer> tileIndices, Rotation rot) {
         for (BlockPart part : BlockPart.values()) {
+            Vector2f atlasPos = calcAtlasPositionForId(tileIndices.get(part));
+            BlockPart targetPart = rot.rotate(part);
+            block.setTextureAtlasPos(targetPart, atlasPos);
             if (shape.getMeshPart(part) != null) {
-                BlockPart targetPart = rot.rotate(part);
-                Vector2f atlasPos = calcAtlasPositionForId(tileIndices.get(part));
                 block.setMeshPart(targetPart, shape.getMeshPart(part).rotate(rot.getQuat4f()).mapTexCoords(atlasPos, Block.TEXTURE_OFFSET_WIDTH));
-                block.setTextureAtlasPos(targetPart, atlasPos);
                 if (part.isSide()) {
                     block.setFullSide(targetPart.getSide(), shape.isBlockingSide(part.getSide()));
                 }
@@ -369,13 +449,13 @@ public class BlockLoader {
         }
     }
 
-    private BlockDefinition loadBlockDefinition(AssetUri blockDefUri) {
+    private JsonElement readJson(AssetUri blockDefUri) {
         InputStream stream = null;
         try {
             stream = AssetManager.assetStream(blockDefUri);
             if (stream != null) {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-                return gson.fromJson(reader, BlockDefinition.class);
+                return parser.parse(reader);
             } else {
                 logger.severe("Failed to load block definition '" + blockDefUri + "'");
             }
@@ -394,6 +474,10 @@ public class BlockLoader {
             }
         }
         return null;
+    }
+
+    private BlockDefinition loadBlockDefinition(JsonElement element) {
+        return gson.fromJson(element, BlockDefinition.class);
     }
 
     private static class BlockTilesDefinitionHandler implements JsonDeserializer<BlockDefinition.Tiles> {

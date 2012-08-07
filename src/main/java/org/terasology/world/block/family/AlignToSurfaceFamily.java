@@ -15,6 +15,7 @@
  */
 package org.terasology.world.block.family;
 
+import com.google.common.collect.Maps;
 import org.terasology.asset.AssetUri;
 import org.terasology.math.Side;
 import org.terasology.world.block.Block;
@@ -22,19 +23,20 @@ import org.terasology.world.block.BlockUri;
 
 import java.util.EnumMap;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
 public class AlignToSurfaceFamily extends AbstractBlockFamily {
-    private EnumMap<Side, Block> blocks = new EnumMap<Side, Block>(Side.class);
+    private Map<Side, Block> blocks = Maps.newEnumMap(Side.class);
     private Block archetype;
 
     /**
      * @param uri   The uri for the block group.
      * @param blocks The set of blocks that make up the group. Front, Back, Left and Right must be provided - the rest is ignored.
      */
-    public AlignToSurfaceFamily(BlockUri uri, EnumMap<Side, Block> blocks) {
+    public AlignToSurfaceFamily(BlockUri uri, Map<Side, Block> blocks) {
         super(uri);
         for (Side side : Side.values()) {
             Block block = blocks.get(side);

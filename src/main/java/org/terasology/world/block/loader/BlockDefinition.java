@@ -63,10 +63,6 @@ public class BlockDefinition {
     public String shape = "";
     public RotationType rotation = RotationType.NONE;
 
-    public BlockDefinition top;
-    public BlockDefinition bottom;
-    public BlockDefinition sides;
-
     public static enum RotationType {
         NONE,
         HORIZONTAL,
