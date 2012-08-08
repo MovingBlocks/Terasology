@@ -81,10 +81,11 @@ public class BlockManager {
     }
 
     public void setBlockIdMap(Map<String, Byte> blockUris) {
+        reset();
         for (Map.Entry<String, Byte> entry : blockUris.entrySet()) {
             idByUri.put(new BlockUri(entry.getKey()), (byte) entry.getValue());
         }
-        nextId = blockUris.size();
+        nextId = idByUri.size();
     }
 
     public Map<String, Byte> getBlockIdMap() {

@@ -28,6 +28,7 @@ import org.terasology.rendering.gui.components.*;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.IClickListener;
 import org.terasology.utilities.FastRandom;
+import org.terasology.world.WorldInfo;
 import org.terasology.world.generator.core.FlatTerrainGenerator;
 import org.terasology.world.generator.core.FloraGenerator;
 import org.terasology.world.generator.core.ForestGenerator;
@@ -133,7 +134,7 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
 				String[] chunksListArr = chunkList.toArray(new String[chunkList.size()]);
 				Config.getInstance().setChunkGenerator(chunksListArr);
 				
-                CoreRegistry.get(GameEngine.class).changeState(new StateSinglePlayer(Config.getInstance().getWorldTitle(), Config.getInstance().getDefaultSeed()));
+                CoreRegistry.get(GameEngine.class).changeState(new StateSinglePlayer(new WorldInfo(Config.getInstance().getWorldTitle(), Config.getInstance().getDefaultSeed(), Config.getInstance().getDayNightLengthInMs() / 4, chunksListArr)));
             }
         });
 

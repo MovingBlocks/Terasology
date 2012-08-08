@@ -180,7 +180,7 @@ public class UISelectWorldMenu extends UIDisplayWindow {
             Config.getInstance().setWorldTitle(info.getTitle());
             Config.getInstance().setChunkGenerator(info.getChunkGenerators());
             // TODO: Need to load time too. Maybe just pass through WorldInfo?
-            CoreRegistry.get(GameEngine.class).changeState(new StateSinglePlayer(info.getTitle(), info.getSeed(), info.getTime()));
+            CoreRegistry.get(GameEngine.class).changeState(new StateSinglePlayer(info));
         } catch (Exception e) {
             GUIManager.getInstance().showMessage("Error", "Failed reading world data object. Sorry.");
         }

@@ -147,12 +147,11 @@ public final class WorldRenderer {
     /**
      * Initializes a new (local) world for the single player mode.
      *
-     * @param title The title/description of the world
-     * @param seed  The seed string used to generate the terrain
+     * @param worldInfo Information describing the world
      */
-    public WorldRenderer(String title, String seed, long time, ChunkGeneratorManager chunkGeneratorManager, EntityManager manager, LocalPlayerSystem localPlayerSystem) {
-        // TODO: Cleaner method for this?
-        File f = new File(PathManager.getInstance().getWorldSavePath(title), title + ".dat");
+    public WorldRenderer(WorldInfo worldInfo, ChunkGeneratorManager chunkGeneratorManager, EntityManager manager, LocalPlayerSystem localPlayerSystem) {
+        // TODO: Cleaner method for this? Should not be using the world title
+        File f = new File(PathManager.getInstance().getWorldSavePath(worldInfo.getTitle()), worldInfo.getTitle() + ".dat");
         if (f.exists()) {
             try {
                 chunkStore = ChunkStoreGZip.load(f);
@@ -166,9 +165,8 @@ public final class WorldRenderer {
         if (chunkStore == null) {
             chunkStore = new ChunkStoreGZip();
         }
-        String[] chunkGenerators = Config.getInstance().getChunkGenerator().toArray(new String[Config.getInstance().getChunkGenerator().size()]);
         _chunkProvider = new LocalChunkProvider(chunkStore, chunkGeneratorManager);
-        EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(title, seed, time, chunkGenerators, _chunkProvider));
+        EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(worldInfo, _chunkProvider));
         CoreRegistry.put(BlockEntityRegistry.class, entityWorldProvider);
         CoreRegistry.get(ComponentSystemManager.class).register(entityWorldProvider, "engine:BlockEntityRegistry");
         _worldProvider = new WorldProviderWrapper(entityWorldProvider);

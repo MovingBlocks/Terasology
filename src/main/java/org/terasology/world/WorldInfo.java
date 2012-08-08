@@ -32,7 +32,7 @@ import java.util.Map;
  *
  * @author Immortius
  */
-// TODO: Store this stuff in a protobuf
+// TODO: Store this stuff in a protobuf?
 public class WorldInfo {
     public static final String DEFAULT_FILE_NAME = "WorldManifest.json";
 
