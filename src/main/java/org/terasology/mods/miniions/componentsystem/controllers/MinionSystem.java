@@ -37,7 +37,7 @@ import org.terasology.mods.miniions.events.MinionMessageEvent;
 import org.terasology.mods.miniions.events.ToggleMinionModeButton;
 import org.terasology.mods.miniions.minionenum.MinionBehaviour;
 import org.terasology.mods.miniions.minionenum.MinionMessagePriority;
-import org.terasology.mods.miniions.rendering.gui.components.UIMinion;
+import org.terasology.mods.miniions.rendering.gui.components.UIMinionBehaviourMenu;
 import org.terasology.mods.miniions.utilities.MinionMessage;
 import org.terasology.utilities.FastRandom;
 
@@ -58,12 +58,12 @@ public class MinionSystem implements EventHandlerSystem {
     private static final int POPUP_ENTRIES = 9;
     private static final String BEHAVIOUR_MENU = "minionbehaviour";
 
-    private UIMinion minionBehaviourMenu;
+    private UIMinionBehaviourMenu minionBehaviourMenu;
     private MiniionFactory minionFactory;
 
     @Override
     public void initialise() {
-        minionBehaviourMenu = GUIManager.getInstance().addWindow(new UIMinion(), BEHAVIOUR_MENU);
+        minionBehaviourMenu = GUIManager.getInstance().addWindow(new UIMinionBehaviourMenu(), BEHAVIOUR_MENU);
         minionFactory = new MiniionFactory();
         minionFactory.setEntityManager(CoreRegistry.get(EntityManager.class));
         minionFactory.setRandom(new FastRandom());

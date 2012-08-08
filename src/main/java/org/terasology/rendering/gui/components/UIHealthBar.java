@@ -17,6 +17,7 @@ package org.terasology.rendering.gui.components;
 
 import org.terasology.components.CuredComponent;
 import org.terasology.components.HealthComponent;
+import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.PoisonedComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -72,12 +73,8 @@ public class UIHealthBar extends UIDisplayContainer implements EventHandlerSyste
 		
 	}
 	
-    @ReceiveEvent(components = {HealthComponent.class})
-    public void onHealthChange(HealthChangedEvent event, EntityRef entityref) {
-    	
-    	if (entityref != CoreRegistry.get(LocalPlayer.class).getEntity())
-    		return;
-    	
+	@ReceiveEvent(components = {LocalPlayerComponent.class, HealthComponent.class})
+    public void onHealthChange(HealthChangedEvent event, EntityRef entityref) {    	
         float healthRatio = (float) event.getCurrentHealth() / event.getMaxHealth();
 
         // Show/Hide hearts relatively to the available health points of the player

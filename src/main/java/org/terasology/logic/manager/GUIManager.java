@@ -19,7 +19,7 @@ import com.google.common.collect.Lists;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import org.terasology.mods.miniions.rendering.gui.components.UIMinion;
+import org.terasology.mods.miniions.rendering.gui.components.UIMinionBehaviourMenu;
 import org.terasology.rendering.gui.components.UIMessageBox;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
@@ -67,7 +67,7 @@ public class GUIManager {
                 //added this check to prevent the manager from ungrabbing the mouse when the minion behaviour menu pops up
                 // TODO : better way to handle this? not link focus with grabbing / ungrabbing?
                 UIDisplayWindow tempwindow = (UIDisplayWindow) _renderer.getDisplayElements().get(size - 1);
-                if (!(tempwindow instanceof UIMinion)) {
+                if (!(tempwindow instanceof UIMinionBehaviourMenu)) {
                     _focusedWindow = tempwindow;
                 }
             }

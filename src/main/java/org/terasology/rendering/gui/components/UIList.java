@@ -35,7 +35,7 @@ import java.util.List;
  * A simple graphical List
  *
  * @author Anton Kireev <adeon.k87@gmail.com>
- * @version 0.1
+ * @version 0.2
  */
 
 public class UIList extends UIScrollableDisplayContainer implements IInputDataElement {
