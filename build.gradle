@@ -11,8 +11,7 @@ apply plugin: 'project-report'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 
-/* Gradle Wrapper ---------------------------------------------------------- */
-/* Uncomment this task and change 'gradleVersion' to create a new wrapper version.
+/* Gradle Wrapper: Uncomment this task, change 'gradleVersion' and run "wrapper".
 task wrapper(type: Wrapper) {
     gradleVersion = '1.1'
 }
@@ -86,7 +85,6 @@ sourceSets.main.java.srcDirs.each { sourceSets.main.groovy.srcDirs it }
 
 configurations {
     compile {
-        transitive = false;
         exclude module: 'lwjgl-platform'
         exclude module: 'jinput-platform'
     }
@@ -181,14 +179,14 @@ task zipSavedWorldsFolder(type: Zip) {
     }
 }
 
-task runProtobuf(type:Exec) {
-    description = "Run 'Protobuf Compiler'"
+task runProtobufWindows(type:Exec) {
+    description = "Run 'Protobuf Compiler' (Windows)"
     commandLine 'protobuf\\compiler\\protoc.exe', '--proto_path=src\\main\\protobuf', '--java_out', 'src\\main\\java', 'src\\main\\protobuf\\*'
 }
 
 /* Distributions: Application/Applet ----------------------------------------*/
 task distMods {
-    mkdir("$buildDir/$destDirMods")
+    mkdir("$buildDir/$destDirMods") // TODO Remove or change mkdir
     file('mods').listFiles().each { File mod ->
         if (mod.isDirectory() ) {
             task('distMod-' + mod.getName(), type: Zip) {
@@ -274,6 +272,5 @@ task distAppletZip(type:Zip) {
 }
 
 /* IDE --------------------------------------------------------------------- */
-// TODO Check if other configurations for IDEA are necessary.
 ideaModule.dependsOn extractNatives
 eclipseClasspath.dependsOn extractNatives
