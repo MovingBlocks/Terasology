@@ -113,8 +113,15 @@ public class AssetManager {
     }
 
     public void clear() {
-        // TODO: Unload assets
-        //assetCache.clear();
+        Iterator<Asset> iterator = assetCache.values().iterator();
+        while (iterator.hasNext()) {
+            Asset asset = iterator.next();
+            // Don't dispose engine assets, all sorts of systems have references to them
+            if (!asset.getURI().getPackage().equals("engine")) {
+                asset.dispose();
+                iterator.remove();
+            }
+        }
     }
 
     public void addAssetSource(AssetSource source) {

@@ -15,8 +15,12 @@
  */
 package org.terasology.world.block.management;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import gnu.trove.iterator.TObjectByteIterator;
 import gnu.trove.map.hash.TByteObjectHashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.map.hash.TObjectByteHashMap;
 import org.lwjgl.BufferUtils;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockPart;
@@ -25,6 +29,7 @@ import org.terasology.world.block.family.BlockFamily;
 
 import javax.vecmath.Vector2f;
 import java.nio.FloatBuffer;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -39,8 +44,10 @@ public class BlockManager {
 
     /* BLOCKS */
     private final Map<BlockUri, Block> blocksByUri = Maps.newHashMapWithExpectedSize(256);
-    private final TByteObjectHashMap<Block> blocksById = new TByteObjectHashMap<Block>(128);
+    private final TByteObjectHashMap<Block> blocksById = new TByteObjectHashMap<Block>(256);
 
+    private int nextId = 1;
+    private final TObjectByteHashMap<BlockUri> idByUri = new TObjectByteHashMap<BlockUri>(256);
     private final Map<BlockUri, BlockFamily> familyByUri = Maps.newHashMapWithExpectedSize(128);
 
     public static BlockManager getInstance() {
@@ -58,6 +65,7 @@ public class BlockManager {
         blocksById.clear();
         blocksByUri.clear();
         familyByUri.clear();
+        nextId = 1;
 
         Block air = new Block();
         air.setTranslucent(true);
@@ -72,6 +80,23 @@ public class BlockManager {
         air.setUri(new BlockUri("engine", "air"));
         blocksById.put(air.getId(), air);
         blocksByUri.put(air.getURI(), air);
+        idByUri.put(air.getURI(), air.getId());
+    }
+
+    public void setBlockIdMap(Map<String, Byte> blockUris) {
+        for (Map.Entry<String, Byte> entry : blockUris.entrySet()) {
+            idByUri.put(new BlockUri(entry.getKey()), (byte) entry.getValue());
+        }
+        nextId = blockUris.size();
+    }
+
+    public Map<String, Byte> getBlockIdMap() {
+        Map<String, Byte> result = Maps.newHashMapWithExpectedSize(idByUri.size());
+        TObjectByteIterator<BlockUri> iterator = idByUri.iterator();
+        while(iterator.hasNext()) {
+            result.put(iterator.key().toString(), iterator.value());
+        }
+        return result;
     }
 
     public BlockFamily getBlockFamily(String uri) {
@@ -114,6 +139,12 @@ public class BlockManager {
     public void addBlockFamily(BlockFamily family) {
         familyByUri.put(family.getURI(), family);
         for (Block block : family.listBlocks()) {
+            byte id = idByUri.get(block.getURI());
+            if (id == 0) {
+                id = (byte)nextId++;
+                idByUri.put(block.getURI(), id);
+            }
+            block.setId(id);
             blocksById.put(block.getId(), block);
             blocksByUri.put(block.getURI(), block);
         }

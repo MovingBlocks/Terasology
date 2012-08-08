@@ -200,6 +200,18 @@ public class Mesh implements Asset {
         return uri;
     }
 
+    @Override
+    public void dispose() {
+        if (vboVertexBuffer != 0) {
+            VertexBufferObjectManager.getInstance().putVboId(vboVertexBuffer);
+            vboVertexBuffer = 0;
+        }
+        if (vboIndexBuffer != 0) {
+            VertexBufferObjectManager.getInstance().putVboId(vboIndexBuffer);
+            vboIndexBuffer = 0;
+        }
+    }
+
     public TFloatList getVertices() {
         return vertices;
     }

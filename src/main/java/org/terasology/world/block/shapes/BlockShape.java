@@ -59,6 +59,10 @@ public class BlockShape implements Asset {
         return uri;
     }
 
+    @Override
+    public void dispose() {
+    }
+
     public void setURI(AssetUri uri) {
         this.uri = uri;
     }

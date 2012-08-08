@@ -78,10 +78,6 @@ public class BlockLoader {
     private TObjectIntMap<AssetUri> tileIndexes = new TObjectIntHashMap<AssetUri>();
     private List<Tile> tiles = Lists.newArrayList();
 
-    private int nextId = 1;
-    private TObjectByteMap<BlockUri> blockIds = new TObjectByteHashMap<BlockUri>();
-    private Set<BlockUri> unresolvedBlocks = Sets.newHashSet();
-
     private List<BlockFamily> blockFamilies = Lists.newArrayList();
 
     public BlockLoader() {
@@ -291,20 +287,6 @@ public class BlockLoader {
 
     private void registerFamily(BlockFamily family) {
         blockFamilies.add(family);
-        for (Block block : family.listBlocks()) {
-            if (blockIds.containsKey(block.getURI())) {
-                block.setId(blockIds.get(block.getURI()));
-                unresolvedBlocks.remove(block.getURI());
-            } else {
-                if (nextId == MAX_BLOCKS) {
-                    logger.severe("Out of block ids, too many blocks");
-                } else {
-                    byte id = (byte)(nextId++);
-                    block.setId(id);
-                    blockIds.put(block.getURI(), id);
-                }
-            }
-        }
     }
 
     private Map<BlockPart, Vector4f> prepareColorOffsets(BlockDefinition blockDef) {

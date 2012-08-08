@@ -82,7 +82,9 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public WorldInfo getWorldInfo() {
-        return new WorldInfo(title, seed, getTime());
+        WorldInfo worldInfo = new WorldInfo(title, seed, getTime());
+        worldInfo.setBlockIdMap(BlockManager.getInstance().getBlockIdMap());
+        return worldInfo;
     }
 
     @Override

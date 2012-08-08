@@ -47,6 +47,7 @@ import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
+import org.terasology.world.WorldInfo;
 import org.terasology.world.block.loader.BlockLoader;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.generator.core.ChunkGeneratorManager;
@@ -128,6 +129,8 @@ public class StateSinglePlayer implements GameState {
             mod.setEnabled(true);
         }
         modManager.saveModSelectionToConfig();
+        AssetManager.getInstance().clear();
+        BlockManager.getInstance().reset();
         BlockLoader blockLoader = new BlockLoader();
         blockLoader.load();
         blockLoader.buildAtlas();

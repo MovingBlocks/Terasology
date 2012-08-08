@@ -16,23 +16,30 @@
 
 package org.terasology.world;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.gson.GsonBuilder;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Summary information on a world.
  *
  * @author Immortius
  */
+// TODO: Store this stuff in a protobuf
 public class WorldInfo {
+    public static final String DEFAULT_FILE_NAME = "WorldManifest.json";
+
     private String title = "";
     private String seed = "";
     private long time = 0;
-    public static final String DEFAULT_FILE_NAME = "WorldManifest.json";
+    private Map<String, Byte> blockIdMap = Maps.newHashMap();
 
     public WorldInfo() {
     }
@@ -92,5 +99,13 @@ public class WorldInfo {
 
     public void setTime(long time) {
         this.time = time;
+    }
+
+    public Map<String, Byte> getBlockIdMap() {
+        return blockIdMap;
+    }
+
+    public void setBlockIdMap(Map<String, Byte> blockIdMap) {
+        this.blockIdMap = blockIdMap;
     }
 }

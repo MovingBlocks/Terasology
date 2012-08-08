@@ -39,6 +39,10 @@ public class Tile implements Asset {
         return uri;
     }
 
+    @Override
+    public void dispose() {
+    }
+
     public BufferedImage getImage() {
         return image;
     }
