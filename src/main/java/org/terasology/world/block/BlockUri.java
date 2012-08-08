@@ -32,7 +32,8 @@ import java.util.Locale;
  */
 public class BlockUri {
     private static final String PACKAGE_SEPARATOR = ":";
-    private static final String IDENTIFIER_SEPARATOR = "//.";
+    private static final String IDENTIFIER_SEPARATOR = ".";
+    private static final String IDENTIFIER_SEPARATOR_REGEX = "\\.";
 
     private String packageName = "";
     private String familyName = "";
@@ -58,7 +59,7 @@ public class BlockUri {
         String[] split = uri.toLowerCase(Locale.ENGLISH).split(PACKAGE_SEPARATOR, 2);
         if (split.length > 1) {
             packageName = split[0];
-            split = split[1].split(IDENTIFIER_SEPARATOR, 2);
+            split = split[1].split(IDENTIFIER_SEPARATOR_REGEX, 2);
             if (split.length > 1) {
                 familyName = split[0];
                 blockIdentifier = split[1];

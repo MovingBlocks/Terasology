@@ -15,6 +15,9 @@
  */
 package org.terasology.rendering.gui.dialogs;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.newdawn.slick.Color;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
@@ -22,9 +25,14 @@ import org.terasology.game.modes.StateSinglePlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.components.*;
-import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.events.IClickListener;
 import org.terasology.utilities.FastRandom;
+import org.terasology.world.generator.core.FlatTerrainGenerator;
+import org.terasology.world.generator.core.FloraGenerator;
+import org.terasology.world.generator.core.ForestGenerator;
+import org.terasology.world.generator.core.PerlinTerrainGenerator;
+import org.terasology.world.liquid.LiquidsGenerator;
 
 import javax.vecmath.Vector2f;
 
@@ -44,7 +52,7 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
     private UIText _inputWorldTitleLabel;
     private UIInput _inputWorldTitle;
     private UIText _chunkGeneratorLabel;
-    private UIStateButton _chunkGenerator;
+    private UIComboBox _chunkGenerator;
 
     public UIDialogCreateNewWorld(String title, Vector2f size) {
         super(title, size);
@@ -69,23 +77,18 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
         _chunkGeneratorLabel.setColor(Color.darkGray);
         _chunkGeneratorLabel.getSize().y = 16f;
         _chunkGeneratorLabel.setVisible(true);
-        _chunkGenerator = new UIStateButton(new Vector2f(128f, 30f));
-		_chunkGenerator.addState("Normal", null);
-		_chunkGenerator.addState("Flat", null);
-		_chunkGenerator.setState(0);
-		_chunkGenerator.addClickListener(new IClickListener() {
-			@Override
-			public void clicked(UIDisplayElement element) {
-				UIStateButton button = (UIStateButton) element;
-				button.nextState();
-			}
-		});
+
+        _chunkGenerator = new UIComboBox(new Vector2f(176f, 22f), new Vector2f(176f, 88f));
+        _chunkGenerator.addItem("Normal", new Integer(0));
+        _chunkGenerator.addItem("Flat", new Integer(1));
         _chunkGenerator.setVisible(true);
+
 
         _inputWorldTitleLabel.setPosition(new Vector2f(15f, 32f));
         _inputWorldTitle.setPosition(new Vector2f(_inputWorldTitleLabel.getPosition().x, _inputWorldTitleLabel.getPosition().y + _inputWorldTitleLabel.getSize().y + 8f));
         _inputSeedLabel.setPosition(new Vector2f(_inputWorldTitle.getPosition().x, _inputWorldTitle.getPosition().y + _inputWorldTitle.getSize().y + 16f));
         _inputSeed.setPosition(new Vector2f(_inputSeedLabel.getPosition().x, _inputSeedLabel.getPosition().y + _inputSeedLabel.getSize().y + 8f));
+        
         _chunkGeneratorLabel.setPosition(new Vector2f(_inputSeed.getPosition().x, _inputSeed.getPosition().y + _inputSeed.getSize().y + 16f));
         _chunkGenerator.setPosition(new Vector2f(_chunkGeneratorLabel.getPosition().x, _chunkGeneratorLabel.getPosition().y + _chunkGeneratorLabel.getSize().y + 8f));
 
@@ -108,8 +111,27 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
                 } else {
                     Config.getInstance().setWorldTitle(getWorldName());
                 }
+                
+                List<String> chunkList = new ArrayList<String>();
+				switch (_chunkGenerator.getSelectedItemIndex()) {
+				case 1:   //flat
+					chunkList.add(FlatTerrainGenerator.class.getName());
+					//if (checkboxFlora == selected) ... (pseudo code)
+					chunkList.add(FloraGenerator.class.getName());
+					chunkList.add(LiquidsGenerator.class.getName());
+					chunkList.add(ForestGenerator.class.getName());
+					break;
+
+				default:  //normal
+					chunkList.add(PerlinTerrainGenerator.class.getName());
+					chunkList.add(FloraGenerator.class.getName());
+					chunkList.add(LiquidsGenerator.class.getName());
+					chunkList.add(ForestGenerator.class.getName());
+					break;
+				}
 				
-				Config.getInstance().setChunkGenerator(_chunkGenerator.getState());
+				String[] chunksListArr = chunkList.toArray(new String[chunkList.size()]);
+				Config.getInstance().setChunkGenerator(chunksListArr);
 				
                 CoreRegistry.get(GameEngine.class).changeState(new StateSinglePlayer(Config.getInstance().getWorldTitle(), Config.getInstance().getDefaultSeed()));
             }
@@ -132,9 +154,9 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
         addDisplayElement(_inputSeedLabel, "inputSeedLabel");
         addDisplayElement(_inputSeed, "inputSeed");
         addDisplayElement(_chunkGeneratorLabel, "chunkGeneratorLabel");
-        addDisplayElement(_chunkGenerator, "chunkGenerator");
         addDisplayElement(_okButton, "okButton");
         addDisplayElement(_cancelButton, "cancelButton");
+        addDisplayElement(_chunkGenerator, "chunkGenerator");
     }
 
     public String getWorldName() {

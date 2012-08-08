@@ -15,11 +15,9 @@
  */
 package org.terasology.world.block.management;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import gnu.trove.iterator.TObjectByteIterator;
 import gnu.trove.map.hash.TByteObjectHashMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectByteHashMap;
 import org.lwjgl.BufferUtils;
 import org.terasology.world.block.Block;
@@ -29,7 +27,6 @@ import org.terasology.world.block.family.BlockFamily;
 
 import javax.vecmath.Vector2f;
 import java.nio.FloatBuffer;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -93,7 +90,8 @@ public class BlockManager {
     public Map<String, Byte> getBlockIdMap() {
         Map<String, Byte> result = Maps.newHashMapWithExpectedSize(idByUri.size());
         TObjectByteIterator<BlockUri> iterator = idByUri.iterator();
-        while(iterator.hasNext()) {
+        while (iterator.hasNext()) {
+            iterator.advance();
             result.put(iterator.key().toString(), iterator.value());
         }
         return result;
@@ -141,7 +139,7 @@ public class BlockManager {
         for (Block block : family.listBlocks()) {
             byte id = idByUri.get(block.getURI());
             if (id == 0) {
-                id = (byte)nextId++;
+                id = (byte) nextId++;
                 idByUri.put(block.getURI(), id);
             }
             block.setId(id);

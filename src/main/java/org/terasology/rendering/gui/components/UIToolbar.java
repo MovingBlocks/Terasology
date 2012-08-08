@@ -51,11 +51,11 @@ public class UIToolbar extends UIDisplayContainer {
             addDisplayElement(_cells[i]);
         }
     }
-
+    
     @Override
-    public void update() {
-        super.update();
-
+    public void layout() {
+    	super.layout();
+    	
         centerHorizontally();
         getPosition().y = Display.getHeight() - getSize().y;
     }

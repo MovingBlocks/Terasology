@@ -129,14 +129,44 @@ public class FloraGenerator implements ChunkGenerator {
                  * Generate flowers.
                  */
                 if (random.standNormalDistrDouble() < -2) {
-                    if (flowerRand >= -1.0 && flowerRand < 0.2) {
-                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:RedFlower"));
-                    } else if (flowerRand >= 0.2 && flowerRand < 0.6) {
+                    if (flowerRand >= -1.0 && flowerRand < -0.9) {
                         c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:YellowFlower"));
-                    } else if (flowerRand >= 0.6 && flowerRand < 0.7) {
+                    } else if (flowerRand >= -0.9 && flowerRand < -0.8) {
+                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:RedFlower"));
+                    } else if (flowerRand >= -0.8 && flowerRand < -0.7) {
                         c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:BrownShroom"));
-                    } else if (flowerRand >= 0.7 && flowerRand < 0.8) {
+                    } else if (flowerRand >= -0.7 && flowerRand < -0.6) {
+                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:BigBrownShroom"));
+                    } else if (flowerRand >= -0.6 && flowerRand < -0.5) {
                         c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:RedShroom"));
+                    } else if (flowerRand >= -0.5 && flowerRand < -0.4) {
+                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:RedClover"));
+                    } else if (flowerRand >= -0.4 && flowerRand < -0.3) {
+                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:Lavender"));
+                    } else if (flowerRand >= -0.3 && flowerRand < -0.2) {
+                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:Iris"));
+                    } else if (flowerRand >= -0.2 && flowerRand < -0.1) {
+                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:GlowbellBloom"));
+                    } else if (flowerRand >= -0.1 && flowerRand < 0.0) {
+                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:Glowbell"));
+                    } else if (flowerRand >= 0.0 && flowerRand < 0.1) {
+                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:DeadBush"));
+                    } else if (flowerRand >= 0.1 && flowerRand < 0.2) {
+                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:Dandelion"));
+                    } else if (flowerRand >= 0.2 && flowerRand < 0.3) {
+                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:Cotton1"));
+                    } else if (flowerRand >= 0.3 && flowerRand < 0.4) {
+                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:Cotton2"));
+                    } else if (flowerRand >= 0.4 && flowerRand < 0.5) {
+                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:Cotton3"));
+                    } else if (flowerRand >= 0.5 && flowerRand < 0.6) {
+                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:Cotton4"));
+                    } else if (flowerRand >= 0.6 && flowerRand < 0.7) {
+                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:Cotton5"));
+                    } else if (flowerRand >= 0.7 && flowerRand < 0.8) {
+                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:Cotton6"));
+                    } else if (flowerRand >= 0.8 && flowerRand < 0.9) {
+                        c.setBlock(x, y + 1, z, BlockManager.getInstance().getBlock("engine:Tulip"));
                     }
                 }
             }

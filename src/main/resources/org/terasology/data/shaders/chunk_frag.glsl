@@ -60,7 +60,7 @@ uniform vec2 grassCoordinate;
 #define WATER_REFRACTION 0.1
 
 void main(){
-	if (clipHeight > 0 && vertexWorldPosRaw.y < clipHeight) {
+	if (clipHeight > 0.0 && vertexWorldPosRaw.y < clipHeight) {
         discard;
 	}
 

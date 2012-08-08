@@ -166,8 +166,9 @@ public final class WorldRenderer {
         if (chunkStore == null) {
             chunkStore = new ChunkStoreGZip();
         }
+        String[] chunkGenerators = Config.getInstance().getChunkGenerator().toArray(new String[Config.getInstance().getChunkGenerator().size()]);
         _chunkProvider = new LocalChunkProvider(chunkStore, chunkGeneratorManager);
-        EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(title, seed, time, _chunkProvider));
+        EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(title, seed, time, chunkGenerators, _chunkProvider));
         CoreRegistry.put(BlockEntityRegistry.class, entityWorldProvider);
         CoreRegistry.get(ComponentSystemManager.class).register(entityWorldProvider, "engine:BlockEntityRegistry");
         _worldProvider = new WorldProviderWrapper(entityWorldProvider);

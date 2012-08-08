@@ -24,8 +24,8 @@ import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UISlider;
 import org.terasology.rendering.gui.components.UIStateButton;
-import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.events.IClickListener;
 import org.terasology.rendering.gui.menus.*;
 
 import static org.lwjgl.opengl.GL11.*;

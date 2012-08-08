@@ -62,7 +62,7 @@ public class UIContainerScreen extends UIDisplayWindow implements UIInventoryNew
         background.setVisible(true);
         setModal(true);
 
-        update();
+        layout();
     }
 
     public void openContainer(EntityRef container, EntityRef creature) {
@@ -73,8 +73,8 @@ public class UIContainerScreen extends UIDisplayWindow implements UIInventoryNew
     }
 
     @Override
-    public void update() {
-        super.update();
+    public void layout() {
+        super.layout();
         playerInventory.setPosition(new Vector2f(0.5f * Display.getWidth() - CENTER_BORDER - playerInventory.getSize().x, 0));
         playerInventory.centerVertically();
         containerInventory.setPosition(new Vector2f(0.5f * Display.getWidth() + CENTER_BORDER, 0));

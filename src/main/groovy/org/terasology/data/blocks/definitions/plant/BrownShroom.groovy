@@ -16,7 +16,6 @@
 
 package org.terasology.data.blocks.definitions.plant
 
-import org.terasology.world.block.Block.BLOCK_FORM
 
 /**
  * A brown mushroom. It isn't magic yet

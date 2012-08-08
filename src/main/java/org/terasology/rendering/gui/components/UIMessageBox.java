@@ -17,8 +17,8 @@ package org.terasology.rendering.gui.components;
 
 import org.newdawn.slick.Color;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.events.IClickListener;
 
 import javax.vecmath.Vector2f;
 

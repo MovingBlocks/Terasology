@@ -40,16 +40,20 @@ public class WorldInfo {
     private String seed = "";
     private long time = 0;
     private Map<String, Byte> blockIdMap = Maps.newHashMap();
+    private String[] chunkGenerators = new String[] {};
 
     public WorldInfo() {
     }
 
-    public WorldInfo(String title, String seed, long time) {
+    public WorldInfo(String title, String seed, long time, String[] chunkGenerators) {
         if (title != null) {
             this.title = title;
         }
         if (seed != null) {
             this.seed = seed;
+        }
+        if (chunkGenerators != null) {
+        	this.chunkGenerators = chunkGenerators;
         }
         this.time = time;
     }
@@ -108,4 +112,12 @@ public class WorldInfo {
     public void setBlockIdMap(Map<String, Byte> blockIdMap) {
         this.blockIdMap = blockIdMap;
     }
+    
+    public String[] getChunkGenerators() {
+		return chunkGenerators;
+	}
+
+	public void setChunkGenerators(String[] chunkGenerators) {
+		this.chunkGenerators = chunkGenerators;
+	}
 }

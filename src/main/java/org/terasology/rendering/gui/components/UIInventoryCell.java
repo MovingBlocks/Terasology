@@ -118,6 +118,11 @@ public class UIInventoryCell extends UIDisplayElement {
             getLabel().setVisible(false);
         }
     }
+    
+	@Override
+	public void layout() {
+
+	}
 
     private void processMouseInput() {
         Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());

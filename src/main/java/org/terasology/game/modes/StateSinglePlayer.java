@@ -17,6 +17,7 @@ package org.terasology.game.modes;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
@@ -41,25 +42,12 @@ import org.terasology.game.bootstrap.EntitySystemBuilder;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.asset.AssetManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
-import org.terasology.world.WorldInfo;
-import org.terasology.world.block.loader.BlockLoader;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.generator.core.ChunkGeneratorManager;
-import org.terasology.world.generator.core.ChunkGeneratorManagerImpl;
-import org.terasology.world.generator.core.FlatTerrainGenerator;
-import org.terasology.world.generator.core.FloraGenerator;
-import org.terasology.world.generator.persistence.ChunkGeneratorPersister;
-import org.terasology.world.liquid.LiquidsGenerator;
-import org.terasology.world.WorldBiomeProviderImpl;
-import org.terasology.world.WorldProvider;
 import org.terasology.math.Vector3i;
-import org.terasology.world.block.management.BlockManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.protobuf.EntityData;
@@ -68,6 +56,13 @@ import org.terasology.rendering.gui.menus.UILoadingScreen;
 import org.terasology.rendering.gui.menus.UIStatusScreen;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
+import org.terasology.world.WorldBiomeProviderImpl;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.block.loader.BlockLoader;
+import org.terasology.world.block.management.BlockManager;
+import org.terasology.world.chunks.Chunk;
+import org.terasology.world.generator.core.ChunkGeneratorManager;
+import org.terasology.world.generator.core.ChunkGeneratorManagerImpl;
 
 import javax.vecmath.Vector3f;
 import java.io.*;
@@ -334,39 +329,7 @@ public class StateSinglePlayer implements GameState {
     }
 
     private ChunkGeneratorManager initChunkGeneratorManager(String title) {
-        ChunkGeneratorManager chunkGeneratorManager = null;
-
-        File generatorDataFile = new File(PathManager.getInstance().getWorldSavePath(title), CHUNK_GENERATOR_FILE);
-
-        try {
-            chunkGeneratorManager = new ChunkGeneratorPersister().load(generatorDataFile);
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Failed to load generator data", e);
-            // TODO Improved exception handling
-        }
-
-        if (chunkGeneratorManager == null) {
-        	//lets choose the chunk generator
-			switch (Config.getInstance().getChunkGenerator()) {
-			case 1:		//flat
-				chunkGeneratorManager = new ChunkGeneratorManagerImpl();
-				chunkGeneratorManager.registerChunkGenerator(new FlatTerrainGenerator());
-				chunkGeneratorManager.registerChunkGenerator(new FloraGenerator());
-				chunkGeneratorManager.registerChunkGenerator(new LiquidsGenerator());
-				break;
-			default:	//normal
-				chunkGeneratorManager = ChunkGeneratorManagerImpl.getDefaultInstance();
-			}
-
-            try {
-                new ChunkGeneratorPersister().save(generatorDataFile, chunkGeneratorManager);
-            } catch (IOException e) {
-                logger.log(Level.SEVERE, "Failed to save generator data", e);
-                // TODO Improved exception handling
-            }
-        }
-
-        return chunkGeneratorManager;
+        return ChunkGeneratorManagerImpl.buildChunkGenerator(Config.getInstance().getChunkGenerator());
     }
 
     private boolean screenHasFocus() {
@@ -381,8 +344,6 @@ public class StateSinglePlayer implements GameState {
     private void prepareWorld() {
         UILoadingScreen loadingScreen = GUIManager.getInstance().addWindow(new UILoadingScreen(), "engine:loadingScreen");
         Display.update();
-
-        int chunksGenerated = 0;
 
         Timer timer = CoreRegistry.get(Timer.class);
         long startTime = timer.getTimeInMs();
@@ -418,8 +379,6 @@ public class StateSinglePlayer implements GameState {
         }
 
         while (!getWorldRenderer().pregenerateChunks() && timer.getTimeInMs() - startTime < 5000) {
-            chunksGenerated++;
-
             loadingScreen.updateStatus(String.format("Fast forwarding world... %.2f%%! :-)", (timer.getTimeInMs() - startTime) / 50.0f), (timer.getTimeInMs() - startTime) / 50.0f);
 
             renderUserInterface();

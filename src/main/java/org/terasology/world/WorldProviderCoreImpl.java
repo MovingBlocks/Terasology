@@ -36,13 +36,14 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     private String title;
     private String seed;
+    private String[] chunkGenerators;
 
     private WorldBiomeProvider biomeProvider;
     private ChunkProvider chunkProvider;
 
     private long timeOffset;
 
-    public WorldProviderCoreImpl(String title, String seed, ChunkProvider chunkProvider) {
+    public WorldProviderCoreImpl(String title, String seed, String[] chunkGenerators, ChunkProvider chunkProvider) {
         if (seed == null || seed.isEmpty()) {
             throw new IllegalArgumentException("No seed provided.");
         }
@@ -52,6 +53,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
         this.title = title;
         this.seed = seed;
+        this.chunkGenerators = chunkGenerators;
         this.biomeProvider = new WorldBiomeProviderImpl(seed);
         this.chunkProvider = chunkProvider;
 
@@ -61,13 +63,13 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         }
     }
 
-    public WorldProviderCoreImpl(String title, String seed, long time, ChunkProvider chunkProvider) {
-        this(title, seed, chunkProvider);
+    public WorldProviderCoreImpl(String title, String seed, long time, String[] chunkGenerators, ChunkProvider chunkProvider) {
+        this(title, seed, chunkGenerators, chunkProvider);
         setTime(time);
     }
 
     public WorldProviderCoreImpl(WorldInfo info, ChunkProvider chunkProvider) {
-        this(info.getTitle(), info.getSeed(), info.getTime(), chunkProvider);
+        this(info.getTitle(), info.getSeed(), info.getTime(), info.getChunkGenerators(), chunkProvider);
     }
 
     @Override
@@ -82,7 +84,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public WorldInfo getWorldInfo() {
-        WorldInfo worldInfo = new WorldInfo(title, seed, getTime());
+        WorldInfo worldInfo = new WorldInfo(title, seed, getTime(), chunkGenerators);
         worldInfo.setBlockIdMap(BlockManager.getInstance().getBlockIdMap());
         return worldInfo;
     }

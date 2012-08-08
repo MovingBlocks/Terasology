@@ -25,12 +25,14 @@ block {
     version = 1
     shape = "Billboard"
     blockform = BLOCK_FORM.BILLBOARD
-    colorsource = Block.ColorSource.FOLIAGE_LUT
 
     transparent = true
     translucent = true
     penetrable = true
     waving = true
+
+    // Glowy!
+    luminance = 6
 
     hardness = 1
 }

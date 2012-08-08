@@ -33,14 +33,17 @@ public class UIInventoryScreen extends UIDisplayWindow {
         _inventory.setVisible(true);
         addDisplayElement(_inventory);
 
-        update();
+        layout();
         setModal(true);
     }
 
     @Override
-    public void update() {
-        super.update();
-        _inventory.center();
+    public void layout() {
+        super.layout();
+        
+        if (_inventory != null) {
+        	_inventory.center();
+        }
     }
 
     @Override

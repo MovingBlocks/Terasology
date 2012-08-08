@@ -15,7 +15,6 @@
  */
 package org.terasology.data.blocks.definitions.plant
 
-import org.terasology.world.block.Block
 
 /**
  * A flower with an actual name, wee!
@@ -25,7 +24,6 @@ block {
     version = 1
     shape = "Billboard"
     blockform = BLOCK_FORM.BILLBOARD
-    colorsource = Block.ColorSource.FOLIAGE_LUT
 
     transparent = true
     translucent = true
