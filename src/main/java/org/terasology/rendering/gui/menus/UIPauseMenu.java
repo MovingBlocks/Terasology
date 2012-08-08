@@ -32,7 +32,7 @@ import org.terasology.rendering.gui.components.UITransparentOverlay;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
-import org.terasology.rendering.gui.framework.events.IClickListener;
+import org.terasology.rendering.gui.framework.events.ClickListener;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
@@ -61,22 +61,24 @@ public class UIPauseMenu extends UIDisplayWindow {
         _version = new UIText("Pre Alpha");
         _version.setVisible(true);
 
-        _exitButton = new UIButton(new Vector2f(256f, 32f));
+        _exitButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _exitButton.getLabel().setText("Exit Terasology");
         _exitButton.setVisible(true);
 
-        _exitButton.addClickListener(new IClickListener() {
-            public void clicked(UIDisplayElement element) {
-                CoreRegistry.get(GameEngine.class).shutdown();
-            }
+        _exitButton.addClickListener(new ClickListener() {
+			@Override
+			public void click(UIDisplayElement element, int button) {
+				CoreRegistry.get(GameEngine.class).shutdown();
+			}
         });
 
-        _respawnButton = new UIButton(new Vector2f(256f, 32f));
+        _respawnButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _respawnButton.getLabel().setText("Respawn");
         _respawnButton.setVisible(true);
 
-        _respawnButton.addClickListener(new IClickListener() {
-            public void clicked(UIDisplayElement element) {
+        _respawnButton.addClickListener(new ClickListener() {
+			@Override
+			public void click(UIDisplayElement element, int button) {
                 setVisible(false);
                 EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
 
@@ -104,18 +106,19 @@ public class UIPauseMenu extends UIDisplayWindow {
                     characterMovementComponent.setVelocity(new Vector3f(0, 0, 0));
                     playerEntity.saveComponent(characterMovementComponent);
                 }
-            }
+			}
         });
 
-        _mainMenuButton = new UIButton(new Vector2f(256f, 32f));
+        _mainMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _mainMenuButton.getLabel().setText("Return to Main Menu");
         _mainMenuButton.setVisible(true);
 
-        _mainMenuButton.addClickListener(new IClickListener() {
-            public void clicked(UIDisplayElement element) {
+        _mainMenuButton.addClickListener(new ClickListener() {
+			@Override
+			public void click(UIDisplayElement element, int button) {
                 setVisible(false);
                 CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu());
-            }
+			}
         });
 
         _overlay = new UITransparentOverlay();

@@ -41,6 +41,7 @@ public class StatusAffectorSystem implements EventHandlerSystem, UpdateSubscribe
     public void giveHealth(BoostHpEvent boosthpEvent, EntityRef entity) {
         HealthComponent health = entity.getComponent(HealthComponent.class);
         health.currentHealth = health.maxHealth;
+        entity.send(new HealthChangedEvent(entity, health.currentHealth, health.maxHealth));
         entity.saveComponent(health);
     }
 

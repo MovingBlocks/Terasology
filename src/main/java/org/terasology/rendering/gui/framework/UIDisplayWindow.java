@@ -37,7 +37,7 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer {
 
     public void close(boolean clearInputControls) {
         setVisible(false);
-        setFocus(false);
+        setFocus(null);
         GUIManager.getInstance().setFocusedFromLast();
         if (clearInputControls) {
             clearInputControls();
@@ -46,7 +46,7 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer {
 
     public void show() {
         setVisible(true);
-        setFocus(true);
+        setFocus(this);
     }
 
     public void clearInputControls() {

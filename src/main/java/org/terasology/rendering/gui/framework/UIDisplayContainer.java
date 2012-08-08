@@ -98,10 +98,6 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         if (!isVisible())
             return;
 
-        if (Display.wasResized()) {
-        	layout();
-        }
-
         // Update all display elements
         for (int i = 0; i < _displayElements.size(); i++) {
             _displayElements.get(i).update();
@@ -234,6 +230,8 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             _style = _styleClasses.get(className);
             addtDisplayElementToPosition(0, _style);
         }
+        
+        layout();
     }
 
     /*

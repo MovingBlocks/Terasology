@@ -17,7 +17,6 @@ package org.terasology.rendering.gui.menus;
 
 import org.terasology.asset.AssetManager;
 import org.terasology.rendering.gui.components.UIButton;
-import org.terasology.rendering.gui.components.UIComboBox;
 import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
@@ -51,16 +50,16 @@ public class UIMainMenu extends UIDisplayWindow {
         _version = new UIText("Pre Alpha");
         _version.setVisible(true);
 
-        _exitButton = new UIButton(new Vector2f(256f, 32f));
+        _exitButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _exitButton.getLabel().setText("Exit Terasology");
         _exitButton.setVisible(true);
 
 
-        _configButton = new UIButton(new Vector2f(256f, 32f));
+        _configButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _configButton.getLabel().setText("Settings");
         _configButton.setVisible(true);
 
-        _singlePlayerButton = new UIButton(new Vector2f(256f, 32f));
+        _singlePlayerButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _singlePlayerButton.getLabel().setText("Single player");
         _singlePlayerButton.setVisible(true);
 
@@ -90,8 +89,6 @@ public class UIMainMenu extends UIDisplayWindow {
 	        _singlePlayerButton.centerHorizontally();
 	        _singlePlayerButton.getPosition().y = 300f + 40f;
 	
-	        _exitButton.centerHorizontally();
-	        _exitButton.getPosition().y = 300f + 3 * 32f + 64f;
 	        _configButton.centerHorizontally();
 	        _configButton.getPosition().y = 300f + 2 * 40f;
 	

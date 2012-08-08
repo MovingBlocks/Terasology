@@ -18,14 +18,17 @@ package org.terasology.rendering.gui.menus;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetManager;
+import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.InputConfig;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIImageOverlay;
+import org.terasology.rendering.gui.components.UISlider;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
-import org.terasology.rendering.gui.framework.events.IClickListener;
+import org.terasology.rendering.gui.framework.events.ChangedListener;
+import org.terasology.rendering.gui.framework.events.ClickListener;
 
 import javax.vecmath.Vector2f;
 
@@ -43,7 +46,7 @@ public class UIConfigMenuControls extends UIDisplayWindow {
 
     final UIText ForwardButtontext,
             BackwardButtontext,
-            JumpbehaviourButtontext,
+            //JumpbehaviourButtontext,
             AttackButtontext,
             ConsoleButtontext,
             CrouchButtontext,
@@ -74,7 +77,7 @@ public class UIConfigMenuControls extends UIDisplayWindow {
             BackwardButton,
             RightButton,
             LeftButton,
-            JumpbehaviourButton,
+            //JumpbehaviourButton,
             AttackButton,
             ConsoleButton,
             CrouchButton,
@@ -99,13 +102,15 @@ public class UIConfigMenuControls extends UIDisplayWindow {
             UsehelditemButton,
             defaultButton;
 
+    final UISlider MouseSensitivity;
     final UIText subtitle;
 
     public UIConfigMenuControls() {
         maximize();
         
-        IClickListener editButtonClick = new IClickListener() {
-			public void clicked(UIDisplayElement element) {
+        ClickListener editButtonClick = new ClickListener() {
+			@Override
+			public void click(UIDisplayElement element, int button) {
 				if (editButton == null) {
 					editButton = (UIButton) element;
 					editButtonCurrent = editButton.getLabel().getText();
@@ -124,131 +129,143 @@ public class UIConfigMenuControls extends UIDisplayWindow {
         overlay = new UIImageOverlay(AssetManager.loadTexture("engine:loadingBackground"));
         overlay.setVisible(true);
 
-        _backToConfigMenuButton = new UIButton(new Vector2f(256f, 32f));
+        _backToConfigMenuButton = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
         _backToConfigMenuButton.getLabel().setText("Back");
         _backToConfigMenuButton.setVisible(true);
 
-        ForwardButton = new UIButton(new Vector2f(64f, 32f));
+        ForwardButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
         ForwardButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyForward()));
 		ForwardButton.addClickListener(editButtonClick);
         ForwardButton.setVisible(true);
-        BackwardButton = new UIButton(new Vector2f(64f, 32f));
+        BackwardButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
         BackwardButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyBackward()));
         BackwardButton.addClickListener(editButtonClick);
         BackwardButton.setVisible(true);
-        RightButton = new UIButton(new Vector2f(64f, 32f));
+        RightButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
         RightButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyRight()));
         RightButton.addClickListener(editButtonClick);
         RightButton.setVisible(true);
-        LeftButton = new UIButton(new Vector2f(64f, 32f));
+        LeftButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
         LeftButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyLeft()));
         LeftButton.addClickListener(editButtonClick);
         LeftButton.setVisible(true);
-        JumpbehaviourButton = new UIButton(new Vector2f(64f, 32f));
-        JumpbehaviourButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyJumpbehaviour()));
-        JumpbehaviourButton.addClickListener(editButtonClick);
-        JumpbehaviourButton.setVisible(true);
-        AttackButton = new UIButton(new Vector2f(64f, 32f));
+        //JumpbehaviourButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
+        //JumpbehaviourButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyJumpbehaviour()));
+        //JumpbehaviourButton.addClickListener(editButtonClick);
+        //JumpbehaviourButton.setVisible(true);
+        AttackButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
         AttackButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyAttack()));
         AttackButton.addClickListener(editButtonClick);
         AttackButton.setVisible(true);
-        ConsoleButton = new UIButton(new Vector2f(64f, 32f));
+        ConsoleButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
         ConsoleButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyConsole()));
         ConsoleButton.addClickListener(editButtonClick);
         ConsoleButton.setVisible(true);
-        CrouchButton = new UIButton(new Vector2f(64f, 32f));
+        CrouchButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
         CrouchButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyCrouch()));
         CrouchButton.addClickListener(editButtonClick);
         CrouchButton.setVisible(true);
-        ActivateButton = new UIButton(new Vector2f(64f, 32f));    // (frob)
+        ActivateButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);    // (frob)
         ActivateButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyFrob()));
         ActivateButton.addClickListener(editButtonClick);
         ActivateButton.setVisible(true);
-        HideguiButton = new UIButton(new Vector2f(64f, 32f));
+        HideguiButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
         HideguiButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyHidegui()));
         HideguiButton.addClickListener(editButtonClick);
         HideguiButton.setVisible(true);
-        InventoryButton = new UIButton(new Vector2f(64f, 32f));
+        InventoryButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
         InventoryButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyInventory()));
         InventoryButton.addClickListener(editButtonClick);
         InventoryButton.setVisible(true);
-        JumpButton = new UIButton(new Vector2f(64f, 32f));
+        JumpButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
         JumpButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyJump()));
         JumpButton.addClickListener(editButtonClick);
         JumpButton.setVisible(true);
-        MinionmodeButton = new UIButton(new Vector2f(64f, 32f));
+        MinionmodeButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
         MinionmodeButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyMinionmode()));
         MinionmodeButton.addClickListener(editButtonClick);
         MinionmodeButton.setVisible(true);
-        PauseButton = new UIButton(new Vector2f(64f, 32f));
+        PauseButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
         PauseButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyPause()));
         PauseButton.addClickListener(editButtonClick);
         PauseButton.setVisible(true);
-        RunButton = new UIButton(new Vector2f(64f, 32f));
+        RunButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
         RunButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyRun()));
         RunButton.addClickListener(editButtonClick);
         RunButton.setVisible(true);
-        ToolnextButton = new UIButton(new Vector2f(64f, 32f));
+        ToolnextButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
         ToolnextButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolnext()));
         ToolnextButton.addClickListener(editButtonClick);
         ToolnextButton.setVisible(true);
-        ToolprevButton = new UIButton(new Vector2f(64f, 32f));
+        ToolprevButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
         ToolprevButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolprev()));
         ToolprevButton.addClickListener(editButtonClick);
         ToolprevButton.setVisible(true);
-        Toolslot1Button = new UIButton(new Vector2f(64f, 32f));
+        Toolslot1Button = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
         Toolslot1Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot1()));
         Toolslot1Button.addClickListener(editButtonClick);
         Toolslot1Button.setVisible(true);
-        Toolslot2Button = new UIButton(new Vector2f(64f, 32f));
+        Toolslot2Button = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
         Toolslot2Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot2()));
         Toolslot2Button.addClickListener(editButtonClick);
         Toolslot2Button.setVisible(true);
-        Toolslot3Button = new UIButton(new Vector2f(64f, 32f));
+        Toolslot3Button = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
         Toolslot3Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot3()));
         Toolslot3Button.addClickListener(editButtonClick);
         Toolslot3Button.setVisible(true);
-        Toolslot4Button = new UIButton(new Vector2f(64f, 32f));
+        Toolslot4Button = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
         Toolslot4Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot4()));
         Toolslot4Button.addClickListener(editButtonClick);
         Toolslot4Button.setVisible(true);
-        Toolslot5Button = new UIButton(new Vector2f(64f, 32f));
+        Toolslot5Button = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
         Toolslot5Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot5()));
         Toolslot5Button.addClickListener(editButtonClick);
         Toolslot5Button.setVisible(true);
-        Toolslot6Button = new UIButton(new Vector2f(64f, 32f));
+        Toolslot6Button = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
         Toolslot6Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot6()));
         Toolslot6Button.addClickListener(editButtonClick);
         Toolslot6Button.setVisible(true);
-        Toolslot7Button = new UIButton(new Vector2f(64f, 32f));
+        Toolslot7Button = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
         Toolslot7Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot7()));
         Toolslot7Button.addClickListener(editButtonClick);
         Toolslot7Button.setVisible(true);
-        Toolslot8Button = new UIButton(new Vector2f(64f, 32f));
+        Toolslot8Button = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
         Toolslot8Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot8()));
         Toolslot8Button.addClickListener(editButtonClick);
         Toolslot8Button.setVisible(true);
-        Toolslot9Button = new UIButton(new Vector2f(64f, 32f));
+        Toolslot9Button = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
         Toolslot9Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot9()));
         Toolslot9Button.addClickListener(editButtonClick);
         Toolslot9Button.setVisible(true);
-        UsehelditemButton = new UIButton(new Vector2f(64f, 32f));
+        UsehelditemButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
         UsehelditemButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyUsehelditem()));
         UsehelditemButton.addClickListener(editButtonClick);
         UsehelditemButton.setVisible(true);
-        defaultButton = new UIButton(new Vector2f(80f, 32f));
+        MouseSensitivity = new UISlider(new Vector2f(256f, 32f), 20, 150);
+        MouseSensitivity.setVisible(true);
+        MouseSensitivity.addChangedListener(new ChangedListener() {
+			@Override
+			public void changed(UIDisplayElement element) {
+				UISlider slider = (UISlider) element;
+				slider.setText("Mouse Sensitivity: " + String.valueOf(slider.getValue()));
+				Config.getInstance().setMouseSens((float)slider.getValue() / 1000f);
+			}
+		});
+        MouseSensitivity.setValue((int) (Config.getInstance().getMouseSens() * 1000));
+        defaultButton = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
         defaultButton.getLabel().setText("Default");
         defaultButton.setVisible(true);
-        defaultButton.addClickListener(new IClickListener() {	
+        defaultButton.addClickListener(new ClickListener() {	
 			@Override
-			public void clicked(UIDisplayElement element) {
+			public void click(UIDisplayElement element, int button) {
 				InputConfig.getInstance().loadDefaultConfig();
+				Config.getInstance().setMouseSens(0.075f);
 				
 		        ForwardButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyForward()));
 		        BackwardButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyBackward()));
 		        RightButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyRight()));
 		        LeftButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyLeft()));
-		        JumpbehaviourButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyJumpbehaviour()));
+		        //JumpbehaviourButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyJumpbehaviour()));
 		        AttackButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyAttack()));
 		        ConsoleButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyConsole()));
 		        CrouchButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyCrouch()));
@@ -271,6 +288,7 @@ public class UIConfigMenuControls extends UIDisplayWindow {
 		        Toolslot8Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot8()));
 		        Toolslot9Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot9()));
 		        UsehelditemButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyUsehelditem()));
+		        MouseSensitivity.setValue((int) (Config.getInstance().getMouseSens() * 1000));
 			}
 		});
 
@@ -292,7 +310,7 @@ public class UIConfigMenuControls extends UIDisplayWindow {
         PauseButtontext = new UIText("Pause");
         HideguiButtontext = new UIText("Hide HUD");
         MinionmodeButtontext = new UIText("Minion mode");
-        JumpbehaviourButtontext = new UIText("Jump behaviour");
+        //JumpbehaviourButtontext = new UIText("Jump behaviour");
         ConsoleButtontext = new UIText("Console");
 
         Toolslot1Buttontext = new UIText("Hotkey 1");
@@ -309,7 +327,7 @@ public class UIConfigMenuControls extends UIDisplayWindow {
         BackwardButtontext.setVisible(true);
         RightButtontext.setVisible(true);
         LeftButtontext.setVisible(true);
-        JumpbehaviourButtontext.setVisible(true);
+        //JumpbehaviourButtontext.setVisible(true);
         AttackButtontext.setVisible(true);
         ConsoleButtontext.setVisible(true);
         CrouchButtontext.setVisible(true);
@@ -339,7 +357,7 @@ public class UIConfigMenuControls extends UIDisplayWindow {
 
         addDisplayElement(ForwardButtontext);
         addDisplayElement(BackwardButtontext);
-        addDisplayElement(JumpbehaviourButtontext);
+        //addDisplayElement(JumpbehaviourButtontext);
         addDisplayElement(AttackButtontext);
         addDisplayElement(ConsoleButtontext);
         addDisplayElement(CrouchButtontext);
@@ -370,7 +388,7 @@ public class UIConfigMenuControls extends UIDisplayWindow {
         addDisplayElement(BackwardButton, "BackwardButton");
         addDisplayElement(RightButton, "RightButton");
         addDisplayElement(LeftButton, "LeftButton");
-        addDisplayElement(JumpbehaviourButton, "JumpbehaviourButton");
+        //addDisplayElement(JumpbehaviourButton, "JumpbehaviourButton");
         addDisplayElement(AttackButton, "AttackButton");
         addDisplayElement(ConsoleButton, "ConsoleButton");
         addDisplayElement(CrouchButton, "CrouchButton");
@@ -393,6 +411,7 @@ public class UIConfigMenuControls extends UIDisplayWindow {
         addDisplayElement(Toolslot8Button, "Toolslot8Button");
         addDisplayElement(Toolslot9Button, "Toolslot9Button");
         addDisplayElement(UsehelditemButton, "UsehelditemButton");
+        addDisplayElement(MouseSensitivity, "MouseSensitivity");
         addDisplayElement(defaultButton, "defaultButton");
         
         layout();
@@ -441,8 +460,8 @@ public class UIConfigMenuControls extends UIDisplayWindow {
 			InputConfig.getInstance().setKeyRight(key);
 		else if (button == LeftButton)
 			InputConfig.getInstance().setKeyLeft(key);
-		else if (button == JumpbehaviourButton)
-			InputConfig.getInstance().setKeyJumpbehaviour(key);
+		//else if (button == JumpbehaviourButton)
+		//	InputConfig.getInstance().setKeyJumpbehaviour(key);
 		else if (button == AttackButton)
 			InputConfig.getInstance().setKeyAttack(key);
 		else if (button == ConsoleButton)
@@ -507,7 +526,7 @@ public class UIConfigMenuControls extends UIDisplayWindow {
 	        subtitle.centerHorizontally();
 	        subtitle.getPosition().y = 130f;
 	
-	        //row 1
+	        //row 1	        
 	        ForwardButtontext.getPosition().x = center - 4 * rowWidth;
 	        ForwardButtontext.getPosition().y = 200f + marginTextTop;
 	        ForwardButton.getPosition().x = center - 3 * rowWidth;
@@ -548,9 +567,6 @@ public class UIConfigMenuControls extends UIDisplayWindow {
 	        ToolprevButtontext.getPosition().y = 200f + 8 * 40f + marginTextTop;
 	        ToolprevButton.getPosition().x = center - 3 * rowWidth;
 	        ToolprevButton.getPosition().y = 200f + 8 * 40f;
-	        
-	        defaultButton.getPosition().x = center - 4 * rowWidth;
-	        defaultButton.getPosition().y = 300f + 7 * 40f;
 	
 	        //row 2
 	        ActivateButtontext.getPosition().x = center - 2 * rowWidth;   // (frob)
@@ -594,15 +610,15 @@ public class UIConfigMenuControls extends UIDisplayWindow {
 	        HideguiButton.getPosition().x = center + rowWidth;
 	        HideguiButton.getPosition().y = 200f;
 	
-	        JumpbehaviourButtontext.getPosition().x = center;
-	        JumpbehaviourButtontext.getPosition().y = 200f + 40f + marginTextTop;
-	        JumpbehaviourButton.getPosition().x = center + rowWidth;
-	        JumpbehaviourButton.getPosition().y = 200f + 40f;
+	        //JumpbehaviourButtontext.getPosition().x = center;
+	        //JumpbehaviourButtontext.getPosition().y = 200f + 40f + marginTextTop;
+	        //JumpbehaviourButton.getPosition().x = center + rowWidth;
+	        //JumpbehaviourButton.getPosition().y = 200f + 40f;
 	
 	        MinionmodeButtontext.getPosition().x = center;
-	        MinionmodeButtontext.getPosition().y = 200f + 2 * 40f + marginTextTop;
+	        MinionmodeButtontext.getPosition().y = 200f + 40f + marginTextTop;
 	        MinionmodeButton.getPosition().x = center + rowWidth;
-	        MinionmodeButton.getPosition().y = 200f + 2 * 40f;
+	        MinionmodeButton.getPosition().y = 200f + 40f;
 	        
 	        //row 4
 	        Toolslot1Buttontext.getPosition().x = center + 2 * rowWidth;
@@ -650,8 +666,13 @@ public class UIConfigMenuControls extends UIDisplayWindow {
 	        Toolslot9Button.getPosition().x = center + 3 * rowWidth;
 	        Toolslot9Button.getPosition().y = 200f + 8 * 40f;
 	
+	        MouseSensitivity.getPosition().x = center - 4 * rowWidth;
+	        MouseSensitivity.getPosition().y = 300f + 7 * 40f;
 	        
-	        _backToConfigMenuButton.centerHorizontally();
+	        defaultButton.getPosition().x = center + 2 * rowWidth - 100;
+	        defaultButton.getPosition().y =  300f + 7 * 40f;
+	        
+	        _backToConfigMenuButton.getPosition().x = center + 3 * rowWidth - 64;
 	        _backToConfigMenuButton.getPosition().y = 300f + 7 * 40f;
 	
 	        title.centerHorizontally();

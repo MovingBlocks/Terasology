@@ -20,6 +20,7 @@ import org.terasology.entitySystem.EntityRef;
 
 /**
  * @author Immortius <immortius@gmail.com>
+ * @deprecated Use HealthChangedEvent instead.
  */
 public class NoHealthEvent extends AbstractEvent {
     private EntityRef instigator;

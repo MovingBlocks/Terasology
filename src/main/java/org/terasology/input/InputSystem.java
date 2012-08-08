@@ -160,6 +160,8 @@ public class InputSystem implements EventHandlerSystem {
                     bind.updateBindState(false, delta, localPlayer.getEntity(), cameraTargetSystem.getTarget(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, GUIManager.getInstance().isConsumingInput());
                 }
             }
+            
+            GUIManager.getInstance().processMouseInput(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel());
         }
         int deltaX = Mouse.getDX();
         if (deltaX != 0 && !GUIManager.getInstance().isConsumingInput()) {
@@ -181,6 +183,7 @@ public class InputSystem implements EventHandlerSystem {
         }
     }
 
+    //TODO Send mouse / keyboard input on another way to the GUIManager. Let the GUI manager directly subscribe to these events.
     @ReceiveEvent(components = LocalPlayerComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void sendEventToGUI(MouseButtonEvent mouseEvent, EntityRef entity) {
         if (GUIManager.getInstance().isConsumingInput()) {
