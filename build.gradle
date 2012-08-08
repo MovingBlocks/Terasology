@@ -10,6 +10,7 @@ apply plugin: 'groovy'
 apply plugin: 'project-report'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
+apply plugin: 'checkstyle'
 
 /* Gradle Wrapper: Uncomment this task, change 'gradleVersion' and run "wrapper".
 task wrapper(type: Wrapper) {
