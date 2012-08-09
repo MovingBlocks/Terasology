@@ -50,6 +50,7 @@ public class UIPauseMenu extends UIDisplayWindow {
     final UIButton _exitButton;
     final UIButton _mainMenuButton;
     final UIButton _respawnButton;
+    final UIButton _backToGameButton;
 
     final UIText _version;
 
@@ -124,6 +125,17 @@ public class UIPauseMenu extends UIDisplayWindow {
         _overlay = new UITransparentOverlay();
         _overlay.setVisible(true);
 
+
+        _backToGameButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
+        _backToGameButton.getLabel().setText("Back to game");
+        _backToGameButton.setVisible(true);
+        _backToGameButton.addClickListener(new ClickListener() {
+            public void click(UIDisplayElement element, int button) {
+                setVisible(false);
+            }
+        });
+
+
         addDisplayElement(_overlay);
 
         addDisplayElement(_title);
@@ -132,6 +144,7 @@ public class UIPauseMenu extends UIDisplayWindow {
         addDisplayElement(_exitButton);
         addDisplayElement(_respawnButton);
         addDisplayElement(_mainMenuButton);
+        addDisplayElement(_backToGameButton);
         setModal(true);
 
         layout();
@@ -142,20 +155,23 @@ public class UIPauseMenu extends UIDisplayWindow {
         super.layout();
 
         if (_version != null) {
-	        _version.centerHorizontally();
-	        _version.getPosition().y = 230f;
+            _version.centerHorizontally();
+            _version.getPosition().y = 230f;
+
+            _backToGameButton.centerHorizontally();
+            _backToGameButton.getPosition().y = 300f;
+
+            _respawnButton.centerHorizontally();
+            _respawnButton.getPosition().y = 300f + 32f + 24f;
 	
-	        _respawnButton.centerHorizontally();
-	        _respawnButton.getPosition().y = 300f;
+            _mainMenuButton.centerHorizontally();
+            _mainMenuButton.getPosition().y = 300f + 2 * 32f + 24f + 4f;
 	
-	        _mainMenuButton.centerHorizontally();
-	        _mainMenuButton.getPosition().y = 300f + 32f + 24f;
+            _exitButton.centerHorizontally();
+            _exitButton.getPosition().y = 300f + 3 * 32f + 24f + 8f;
 	
-	        _exitButton.centerHorizontally();
-	        _exitButton.getPosition().y = 300f + 2 * 32f + 32f;
-	
-	        _title.centerHorizontally();
-	        _title.getPosition().y = 128f;
+            _title.centerHorizontally();
+            _title.getPosition().y = 128f;
         }
     }
 }
