@@ -117,18 +117,21 @@ jar {
 }
 
 task sourceJar(type: Jar) {
+    description = "Create a JAR with all sources (main: java, groovy, resources)"
     manifest.attributes("Implementation-Title": project.name)
     classifier = 'sources'
     from sourceSets.main.output
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
+    description = "Create a JAR with the JavaDoc for the java sources"
     manifest.attributes("Implementation-Title": project.name)
     classifier = 'javadoc'
     from javadoc.destinationDir
 }
 
 task groovydocJar(type: Jar, dependsOn: groovydoc) {
+    description = "Create a JAR with the GroovyDoc for the groovy and java sources"
     manifest.attributes("Implementation-Title": project.name)
     classifier = 'groovydoc'
     from groovydoc.destinationDir
@@ -142,6 +145,7 @@ test {
     jvmArgs '-Xms512m', '-Xmx1024m', '-XX:MaxPermSize=128m'
 }
 
+// ignoreFailures: Whether or not this task will ignore failures and continue running the build.
 checkstyle.ignoreFailures = true
 
 /* perfTest ----------------------------------------------------------------- */
