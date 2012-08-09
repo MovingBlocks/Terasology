@@ -116,6 +116,24 @@ jar {
     }
 }
 
+task sourceJar(type: Jar) {
+    manifest.attributes("Implementation-Title": project.name)
+    classifier = 'sources'
+    from sourceSets.main.output
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    manifest.attributes("Implementation-Title": project.name)
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+task groovydocJar(type: Jar, dependsOn: groovydoc) {
+    manifest.attributes("Implementation-Title": project.name)
+    classifier = 'groovydoc'
+    from groovydoc.destinationDir
+}
+
 test {
     // ignoreFailures: Specifies whether the build should break when the verifications performed by this task fail.
     ignoreFailures = true
