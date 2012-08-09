@@ -4,7 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.vecmath.Vector2f;
 import org.terasology.components.InventoryComponent;
+import org.terasology.components.PlayerComponent;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.EventSystem;
+import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.event.ChangedComponentEvent;
+import org.terasology.game.CoreRegistry;
+import org.terasology.logic.LocalPlayer;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 
 /**
@@ -12,7 +19,7 @@ import org.terasology.rendering.gui.framework.UIDisplayContainer;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  *
  */
-public class UIItemContainer extends UIDisplayContainer {
+public class UIItemContainer extends UIDisplayContainer implements EventHandlerSystem {
 
     private EntityRef entity = null;
     InventoryComponent entityInventory = null;
@@ -28,7 +35,7 @@ public class UIItemContainer extends UIDisplayContainer {
         this.cols = cols;
         this.rows = rows;
         
-        //CoreRegistry.get(EventSystem.class).registerEventHandler(this);
+        CoreRegistry.get(EventSystem.class).registerEventHandler(this);
     }
     
     private void fillInventoryCells() {
@@ -64,16 +71,8 @@ public class UIItemContainer extends UIDisplayContainer {
 	    	for (int i = 0; i < cells.size(); ++i)
 	        {
 	    		cells.get(i).setItem(entityInventory.itemSlots.get(i), i);
-	    		
 	        }
     	}
-    }
-    
-    @Override
-    public void update() {
-    	super.update();
-    	
-    	updateInventoryCells();
     }
     
     public List<UIItemCell> getCells() {
@@ -97,6 +96,7 @@ public class UIItemContainer extends UIDisplayContainer {
 
 	public void setCellMargin(Vector2f cellMargin) {
 		this.cellMargin = cellMargin;
+		fillInventoryCells();
 	}
 
 	public Vector2f getCellSize() {
@@ -105,6 +105,7 @@ public class UIItemContainer extends UIDisplayContainer {
 
 	public void setCellSize(Vector2f cellSize) {
 		this.cellSize = cellSize;
+		fillInventoryCells();
 	}
 
 	public int getCols() {
@@ -113,6 +114,7 @@ public class UIItemContainer extends UIDisplayContainer {
 
 	public void setCols(int cols) {
 		this.cols = cols;
+		fillInventoryCells();
 	}
 
 	public int getRows() {
@@ -121,9 +123,9 @@ public class UIItemContainer extends UIDisplayContainer {
 
 	public void setRows(int rows) {
 		this.rows = rows;
+		fillInventoryCells();
 	}
 	
-	/*
     @Override
     public void initialise() {
 
@@ -134,8 +136,25 @@ public class UIItemContainer extends UIDisplayContainer {
     }
     
     @ReceiveEvent(components = InventoryComponent.class)
-    public void onReceiveItem(ReceiveItemEvent event, EntityRef entity) {
-	    fillInventoryCells();
+    public void onReceiveItem(ChangedComponentEvent event, EntityRef entity) {
+	    updateInventoryCells();
+    }
+    
+    /*
+    @Override
+    public void setVisible(boolean visible) {
+    	super.setVisible(visible);
+    	
+    	//this is ugly. need to find a way to clean the movement slot as the container gets closed.
+    	EntityRef player = CoreRegistry.get(LocalPlayer.class).getEntity();
+    	
+    	if (player == null)
+    		return;
+    	
+    	PlayerComponent playerComponent = player.getComponent(PlayerComponent.class);
+    	
+    	if (playerComponent == null)
+    		return;
     }
     */
 }

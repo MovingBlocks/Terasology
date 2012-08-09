@@ -47,8 +47,6 @@ public class UISlider extends UIDisplayContainer {
 	private int _min;
 	private int _max;
 	private int _range;
-	
-	private final UISlider _sliderObj = this;
 
 	public UISlider(Vector2f size, int min, int max) {
         setSize(size);
@@ -119,7 +117,7 @@ public class UISlider extends UIDisplayContainer {
 			@Override
 			public void down(UIDisplayElement element, int button, boolean intersect) {
 				if (!isFocused() && intersect) {
-					setFocus(_sliderObj);
+					setFocus(UISlider.this);
 				}
 			}
 			
