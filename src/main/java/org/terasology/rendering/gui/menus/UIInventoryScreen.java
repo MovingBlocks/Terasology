@@ -36,10 +36,11 @@ public class UIInventoryScreen extends UIDisplayWindow {
 	private UIGraphicsElement background;
 
     public UIInventoryScreen() {
-        setSize(new Vector2f(176.0f * 2.5f, 167.0f * 2.5f));
+        setSize(new Vector2f(192.0f * 2.5f, 180.0f * 2.5f));
         
         inventory = new UIItemContainer(9, 4);
         inventory.setVisible(true);
+        inventory.setCellMargin(new Vector2f(1, 1));
 
         background = new UIGraphicsElement(AssetManager.loadTexture("engine:inventory"));
         background.setSize(getSize());
@@ -71,9 +72,9 @@ public class UIInventoryScreen extends UIDisplayWindow {
         	inventory.getPosition().y += 48;
         	
         	if (inventory.getCells().size() >= 9) {
+        		float toolbarPos = calcAbsolutePosition().y + 208;
 	        	for (int i = 0; i < 9; i++) {
-	        		System.out.print("|");
-	        		inventory.getCells().get(i).getPosition().y += 200;		
+	        		inventory.getCells().get(i).getPosition().y = toolbarPos;		
 				}
         	}
         }
