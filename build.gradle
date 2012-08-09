@@ -11,6 +11,7 @@ apply plugin: 'project-report'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'checkstyle'
+apply plugin: 'codenarc'
 
 /* Gradle Wrapper: Uncomment this task, change 'gradleVersion' and run "wrapper".
 task wrapper(type: Wrapper) {
@@ -147,6 +148,7 @@ test {
 
 // ignoreFailures: Whether or not this task will ignore failures and continue running the build.
 checkstyle.ignoreFailures = true
+codenarc.ignoreFailures = true
 
 /* perfTest ----------------------------------------------------------------- */
 sourceSets {
