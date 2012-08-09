@@ -16,47 +16,64 @@
 package org.terasology.rendering.gui.components;
 
 import org.lwjgl.opengl.Display;
-import org.terasology.asset.AssetManager;
+import org.terasology.components.LocalPlayerComponent;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.game.CoreRegistry;
+import org.terasology.logic.LocalPlayer;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
-import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 import javax.vecmath.Vector2f;
 
 /**
  * A small toolbar placed on the bottom of the screen.
- *
+ * TODO maybe get rid of this class. The UIItemContainer alone can do this job.
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
 public class UIToolbar extends UIDisplayContainer {
-    private final UIGraphicsElement _backgroundTexture;
-    private final UIToolbarCell[] _cells;
-
+	
+    private final UIItemContainer tools;
+    private int previousSelected = 0;
+    
     public UIToolbar() {
         setSize(new Vector2f(364f, 44f));
+        
+        tools = new UIItemContainer(9, 1);
+        tools.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity());
+        tools.setVisible(true);
 
-        _backgroundTexture = new UIGraphicsElement(AssetManager.loadTexture("engine:gui"));
-        _backgroundTexture.setVisible(true);
-        _backgroundTexture.getTextureSize().set(new Vector2f(182f / 256f, 22f / 256f));
-        _backgroundTexture.getTextureOrigin().set(new Vector2f(0.0f, 0.0f));
-        _backgroundTexture.setSize(getSize());
-
-        addDisplayElement(_backgroundTexture);
-
-        _cells = new UIToolbarCell[9];
-
-        // Create the toolbar cells
-        for (int i = 0; i < 9; i++) {
-            _cells[i] = new UIToolbarCell(i);
-            _cells[i].setVisible(true);
-            addDisplayElement(_cells[i]);
-        }
+        addDisplayElement(tools);
+        
+        layout();
     }
-    
-    @Override
+
+	@Override
     public void layout() {
     	super.layout();
-    	
+    			
         centerHorizontally();
         getPosition().y = Display.getHeight() - getSize().y;
     }
+	
+	@Override
+	public void update() {
+		super.update();
+
+		//TODO this is a work around to set the entity when its there. constructor will execute before..
+		if (tools != null && CoreRegistry.get(LocalPlayer.class).getEntity() != EntityRef.NULL) {
+			if (tools.getEntity() == EntityRef.NULL) {
+				tools.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity());
+			}
+		}
+
+		//set the selection rectangle
+		if (tools.getCells().size() > 0) {
+			LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+			LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
+			
+			tools.getCells().get(previousSelected).setSelectionRectangleEnable(false);
+			tools.getCells().get(localPlayerComp.selectedTool).setSelectionRectangleEnable(true);
+			previousSelected = localPlayerComp.selectedTool;
+		}
+	}
 }

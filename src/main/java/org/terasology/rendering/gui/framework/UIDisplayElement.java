@@ -173,7 +173,7 @@ public abstract class UIDisplayElement {
     public abstract void render();
 
     /**
-     * Update related actions, such as checking for mouse position or events here. Will be executed every tick.
+     * Update related actions, for tasks which needs continuously updates. Will be executed every tick. Needs to be avoided.
      */
     public abstract void update();
     
@@ -200,6 +200,9 @@ public abstract class UIDisplayElement {
 
     public void setVisible(boolean visible) {
         _visible = visible;
+        
+        if (_visible)
+        	layout();
     }
 
     public boolean isVisible() {

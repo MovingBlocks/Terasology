@@ -30,6 +30,7 @@ import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.ActivateEvent;
 import org.terasology.events.DamageEvent;
+import org.terasology.events.HealthChangedEvent;
 import org.terasology.events.NoHealthEvent;
 import org.terasology.events.input.MouseXAxisEvent;
 import org.terasology.events.input.MouseYAxisEvent;
@@ -248,6 +249,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         HealthComponent health = entity.getComponent(HealthComponent.class);
         if (health != null) {
             health.currentHealth = health.maxHealth;
+            entity.send(new HealthChangedEvent(entity, health.currentHealth, health.maxHealth));
             entity.saveComponent(health);
         }
         location.setWorldPosition(playerComponent.spawnPosition);

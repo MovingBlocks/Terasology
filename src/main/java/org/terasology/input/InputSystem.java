@@ -183,6 +183,7 @@ public class InputSystem implements EventHandlerSystem {
         }
     }
 
+    //TODO Send mouse / keyboard input on another way to the GUIManager. Let the GUI manager directly subscribe to these events.
     @ReceiveEvent(components = LocalPlayerComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void sendEventToGUI(MouseButtonEvent mouseEvent, EntityRef entity) {
         if (GUIManager.getInstance().isConsumingInput()) {
