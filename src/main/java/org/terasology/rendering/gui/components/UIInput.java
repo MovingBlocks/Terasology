@@ -87,10 +87,6 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
 
         }
 
-        public void setPositionBySymbol() {
-            //setPosition();
-        }
-
     	@Override
     	public void layout() {
 

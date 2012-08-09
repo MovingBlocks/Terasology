@@ -48,6 +48,12 @@ public class UISlider extends UIDisplayContainer {
 	private int _max;
 	private int _range;
 
+	/**
+	 * Creates a slider.
+	 * @param size The size of the slider.
+	 * @param min The minimum value the slider can have.
+	 * @param max The maximum value the slider can have.
+	 */
 	public UISlider(Vector2f size, int min, int max) {
         setSize(size);
         _min = min;
@@ -145,6 +151,10 @@ public class UISlider extends UIDisplayContainer {
 		}
 	}
 	
+	/**
+	 * Changes the slider position based on the value.
+	 * @param value The value the slider should have.
+	 */
 	private void changeSlider(int value)
 	{
 		if (value < _min) {
@@ -164,6 +174,10 @@ public class UISlider extends UIDisplayContainer {
 		}
 	}
 
+	/**
+	 * Changes the slider position based on the mouse position.
+	 * @param pos The position of the mouse in x direction.
+	 */
 	private void changeSlider(float pos) {
 		float sliderPos = pos - getPosition().x - _slider.getSize().x / 2;
 		if (sliderPos < 0)

@@ -23,7 +23,7 @@ import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
-import org.terasology.rendering.gui.menus.UIOpenBookScreen;
+import org.terasology.rendering.gui.windows.UIScreenBook;
 
 
 /**
@@ -37,7 +37,7 @@ public class ReadBookAction implements EventHandlerSystem {
     private UIDisplayWindow bookScreen;
 
     public void initialise() {
-        bookScreen = GUIManager.getInstance().addWindow(new UIOpenBookScreen(), "engine:bookScreen");
+        bookScreen = GUIManager.getInstance().addWindow(new UIScreenBook(), "engine:bookScreen");
     }
 
     @Override

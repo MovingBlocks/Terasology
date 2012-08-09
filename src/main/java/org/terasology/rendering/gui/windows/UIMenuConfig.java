@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.menus;
+package org.terasology.rendering.gui.windows;
 
 import org.terasology.asset.AssetManager;
 import org.terasology.rendering.gui.components.UIButton;
@@ -30,7 +30,7 @@ import javax.vecmath.Vector2f;
  * @author Anton Kireev <adeon.k87@gmail.com>
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
-public class UIConfigMenu extends UIDisplayWindow {
+public class UIMenuConfig extends UIDisplayWindow {
 
     final UIImageOverlay _overlay;
     final UIGraphicsElement _title;
@@ -42,7 +42,7 @@ public class UIConfigMenu extends UIDisplayWindow {
     private final UIButton _controlsButton;
     private final UIButton _modsButton;
 
-    public UIConfigMenu() {
+    public UIMenuConfig() {
         maximize();
         _title = new UIGraphicsElement(AssetManager.loadTexture("engine:terasology"));
         _title.setVisible(true);

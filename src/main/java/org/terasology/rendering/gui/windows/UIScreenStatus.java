@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.menus;
+package org.terasology.rendering.gui.windows;
 
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.components.UITransparentOverlay;
@@ -24,12 +24,12 @@ import org.terasology.rendering.gui.framework.UIDisplayWindow;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class UIStatusScreen extends UIDisplayWindow {
+public class UIScreenStatus extends UIDisplayWindow {
 
     final UITransparentOverlay _overlay;
     final UIText _status;
 
-    public UIStatusScreen() {
+    public UIScreenStatus() {
         _status = new UIText("Loading...");
         _status.setVisible(true);
 
