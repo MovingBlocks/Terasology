@@ -38,6 +38,8 @@ public class UIItemCellIcon extends UIDisplayContainer {
 	private Vector2f itemCountPosition = new Vector2f(30f, 25f);
 
 	public UIItemCellIcon() {
+		itemEntity = EntityRef.NULL;
+		
         terrainTex = AssetManager.loadTexture("engine:terrain");
         
         itemCount = new UIText();
@@ -68,7 +70,7 @@ public class UIItemCellIcon extends UIDisplayContainer {
 	
     @Override
     public void render() {
-        if (itemEntity == null)
+        if (!itemEntity.exists())
         	return;
 
         if (itemComponent == null)
@@ -135,7 +137,7 @@ public class UIItemCellIcon extends UIDisplayContainer {
 
 	public void setItemEntity(EntityRef itemEntity) {
 		this.itemEntity = itemEntity;
-		if (itemEntity != null)
+		if (itemEntity.exists())
 			this.itemComponent = itemEntity.getComponent(ItemComponent.class);
 		else
 			this.itemComponent = null;

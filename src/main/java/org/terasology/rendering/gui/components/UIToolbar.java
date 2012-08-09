@@ -58,8 +58,9 @@ public class UIToolbar extends UIDisplayContainer {
 	@Override
 	public void update() {
 		super.update();
+		//TODO solve this with events
 
-		//TODO this is a work around to set the entity when its there. constructor will execute before..
+		//this is a work around to set the entity when its there. constructor will execute before..
 		if (tools != null && CoreRegistry.get(LocalPlayer.class).getEntity() != EntityRef.NULL) {
 			if (tools.getEntity() == EntityRef.NULL) {
 				tools.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity());

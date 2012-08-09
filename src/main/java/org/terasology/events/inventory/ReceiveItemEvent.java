@@ -29,6 +29,11 @@ public class ReceiveItemEvent extends AbstractEvent {
     public ReceiveItemEvent(EntityRef item) {
         this.item = item;
     }
+    
+    public ReceiveItemEvent(EntityRef item, int slot) {
+        this.item = item;
+        this.slot = slot;
+    }
 
     public EntityRef getItem() {
         return item;
@@ -36,9 +41,5 @@ public class ReceiveItemEvent extends AbstractEvent {
     
     public int getSlot() {
 		return slot;
-	}
-
-	public void setSlot(int slot) {
-		this.slot = slot;
 	}
 }
