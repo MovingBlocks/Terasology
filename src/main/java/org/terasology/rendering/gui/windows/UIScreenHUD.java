@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.menus;
+package org.terasology.rendering.gui.windows;
 
 import org.lwjgl.opengl.Display;
+import org.terasology.asset.AssetManager;
 import org.terasology.entitySystem.*;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.Timer;
 import org.terasology.input.CameraTargetSystem;
-import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.mods.miniions.components.MinionComponent;
 import org.terasology.mods.miniions.events.MinionMessageEvent;
@@ -29,6 +29,7 @@ import org.terasology.mods.miniions.rendering.gui.components.UIMessageQueue;
 import org.terasology.mods.miniions.rendering.gui.components.UIMinionbar;
 import org.terasology.rendering.gui.components.*;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
+import org.terasology.rendering.gui.framework.UIGraphicsElement;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -39,12 +40,12 @@ import javax.vecmath.Vector2f;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class UIHeadsUpDisplay extends UIDisplayWindow implements EventHandlerSystem {
+public class UIScreenHUD extends UIDisplayWindow implements EventHandlerSystem {
 
     protected EntityManager entityManager;
 
     /* DISPLAY ELEMENTS */
-    private final UICrosshair _crosshair;
+    private final UIGraphicsElement _crosshair;
     private final UIText _debugLine1;
     private final UIText _debugLine2;
     private final UIText _debugLine3;
@@ -59,8 +60,11 @@ public class UIHeadsUpDisplay extends UIDisplayWindow implements EventHandlerSys
     /**
      * Init. the HUD.
      */
-    public UIHeadsUpDisplay() {
-        _crosshair = new UICrosshair();
+    public UIScreenHUD() {
+        _crosshair = new UIGraphicsElement(AssetManager.loadTexture("engine:gui"));
+        _crosshair.getTextureSize().set(new Vector2f(20f / 256f, 20f / 256f));
+        _crosshair.getTextureOrigin().set(new Vector2f(24f / 256f, 24f / 256f));
+        _crosshair.setSize(new Vector2f(40f, 40f));
         _crosshair.setVisible(true);
 
         _debugLine1 = new UIText(new Vector2f(4, 4));

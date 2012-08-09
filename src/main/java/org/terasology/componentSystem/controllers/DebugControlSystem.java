@@ -29,7 +29,7 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.world.WorldProvider;
-import org.terasology.rendering.gui.menus.UIMetrics;
+import org.terasology.rendering.gui.windows.UIScreenMetrics;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
@@ -39,13 +39,13 @@ import org.terasology.rendering.world.WorldRenderer;
 @RegisterComponentSystem
 public class DebugControlSystem implements EventHandlerSystem {
 
-    private UIMetrics metrics;
+    private UIScreenMetrics metrics;
     private WorldProvider world;
     private WorldRenderer worldRenderer;
 
     @Override
     public void initialise() {
-        metrics = new UIMetrics();
+        metrics = new UIScreenMetrics();
         GUIManager.getInstance().addWindow(metrics, "engine:metrics");
         world = CoreRegistry.get(WorldProvider.class);
         worldRenderer = CoreRegistry.get(WorldRenderer.class);

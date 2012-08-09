@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.menus;
+package org.terasology.rendering.gui.windows;
 
 import org.terasology.asset.AssetManager;
 import org.terasology.logic.manager.Config;
@@ -33,7 +33,7 @@ import javax.vecmath.Vector2f;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  *         Date: 29/07/12
  */
-public class UIConfigMenuAudio extends UIDisplayWindow {
+public class UIMenuConfigAudio extends UIDisplayWindow {
 
     final UIImageOverlay _overlay;
     final UIGraphicsElement _title;
@@ -43,7 +43,7 @@ public class UIConfigMenuAudio extends UIDisplayWindow {
     private final UISlider _musicOptionSlider;
     private final UIButton _backToConfigMenuButton;
 
-    public UIConfigMenuAudio() {
+    public UIMenuConfigAudio() {
         maximize();
 
         _title = new UIGraphicsElement(AssetManager.loadTexture("engine:terasology"));
