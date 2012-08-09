@@ -64,6 +64,12 @@ public interface EntityManager {
     EntityRef create(Prefab prefab, Vector3f position);
 
     /**
+     * @param other
+     * @return A new entity with a copy of each of the other entity's components
+     */
+    EntityRef copy(EntityRef other);
+
+    /**
      * @param componentClass
      * @return The number of entities with this component class
      */
