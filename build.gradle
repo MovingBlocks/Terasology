@@ -124,6 +124,8 @@ test {
     jvmArgs '-Xms512m', '-Xmx1024m', '-XX:MaxPermSize=128m'
 }
 
+checkstyle.ignoreFailures = true
+
 /* perfTest ----------------------------------------------------------------- */
 sourceSets {
     perfTest
