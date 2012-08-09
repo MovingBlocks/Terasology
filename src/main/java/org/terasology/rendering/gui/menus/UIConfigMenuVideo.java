@@ -24,12 +24,12 @@ import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UISlider;
 import org.terasology.rendering.gui.components.UIStateButton;
 import org.terasology.rendering.gui.components.UIText;
-import org.terasology.rendering.gui.framework.IChangedListener;
-import org.terasology.rendering.gui.framework.IClickListener;
-import org.terasology.rendering.gui.framework.IStateButtonAction;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import org.terasology.rendering.gui.framework.events.ChangedListener;
+import org.terasology.rendering.gui.framework.events.ClickListener;
+import org.terasology.rendering.gui.framework.events.StateButtonAction;
 
 import javax.vecmath.Vector2f;
 
@@ -54,12 +54,16 @@ public class UIConfigMenuVideo extends UIDisplayWindow {
 
     final UIText _version;
     
-    private final IClickListener clickAction = new IClickListener() {
-        @Override
-        public void clicked(UIDisplayElement element) {
-        	UIStateButton button = (UIStateButton) element;
-            button.nextState();
-        }
+    private final ClickListener clickAction = new ClickListener() {
+		@Override
+		public void click(UIDisplayElement element, int button) {
+        	UIStateButton b = (UIStateButton) element;
+        	
+        	if (button == 0)
+        		b.nextState();
+        	else if (button == 1)
+        		b.previousState();
+		}
     };
 
     public UIConfigMenuVideo() {
@@ -75,7 +79,7 @@ public class UIConfigMenuVideo extends UIDisplayWindow {
         _overlay.setVisible(true);
 
         _graphicsQualityButton = new UIStateButton(new Vector2f(256f, 32f));
-        IStateButtonAction graphicsQualityStateAction = new IStateButtonAction() {
+        StateButtonAction graphicsQualityStateAction = new StateButtonAction() {
 			@Override
 			public void action(UIDisplayElement element) {
 				UIStateButton button = (UIStateButton)element;
@@ -104,7 +108,7 @@ public class UIConfigMenuVideo extends UIDisplayWindow {
         _graphicsQualityButton.setVisible(true);
 
         _viewingDistanceButton = new UIStateButton(new Vector2f(256f, 32f));
-        IStateButtonAction viewingDistanceStateAction = new IStateButtonAction() {
+        StateButtonAction viewingDistanceStateAction = new StateButtonAction() {
 			@Override
 			public void action(UIDisplayElement element) {
 				UIStateButton button = (UIStateButton)element;
@@ -119,7 +123,7 @@ public class UIConfigMenuVideo extends UIDisplayWindow {
         _viewingDistanceButton.setVisible(true);
 
         _fovButton = new UISlider(new Vector2f(256f, 32f), 75, 120);
-        _fovButton.addChangedListener(new IChangedListener() {
+        _fovButton.addChangedListener(new ChangedListener() {
 			@Override
 			public void changed(UIDisplayElement element) {
 				UISlider slider = (UISlider)element;
@@ -130,7 +134,7 @@ public class UIConfigMenuVideo extends UIDisplayWindow {
         _fovButton.setVisible(true);
 
         _animateGrassButton = new UIStateButton(new Vector2f(256f, 32f));
-        IStateButtonAction animateGrassStateAction = new IStateButtonAction() {
+        StateButtonAction animateGrassStateAction = new StateButtonAction() {
 			@Override
 			public void action(UIDisplayElement element) {
 				UIStateButton button = (UIStateButton)element;
@@ -148,7 +152,7 @@ public class UIConfigMenuVideo extends UIDisplayWindow {
         _animateGrassButton.setVisible(true);
 
         _reflectiveWaterButton = new UIStateButton(new Vector2f(256f, 32f));
-        IStateButtonAction reflectiveWaterStateAction = new IStateButtonAction() {
+        StateButtonAction reflectiveWaterStateAction = new StateButtonAction() {
 			@Override
 			public void action(UIDisplayElement element) {
 				UIStateButton button = (UIStateButton)element;
@@ -166,7 +170,7 @@ public class UIConfigMenuVideo extends UIDisplayWindow {
         _reflectiveWaterButton.setVisible(true);
 
         _blurIntensityButton = new UIStateButton(new Vector2f(256f, 32f));
-        IStateButtonAction blurIntensityStateAction = new IStateButtonAction() {
+        StateButtonAction blurIntensityStateAction = new StateButtonAction() {
 			@Override
 			public void action(UIDisplayElement element) {
 				UIStateButton button = (UIStateButton)element;
@@ -181,7 +185,7 @@ public class UIConfigMenuVideo extends UIDisplayWindow {
         _blurIntensityButton.setVisible(true);
 
         _bobbingButton = new UIStateButton(new Vector2f(256f, 32f));
-        IStateButtonAction bobbingStateAction = new IStateButtonAction() {
+        StateButtonAction bobbingStateAction = new StateButtonAction() {
 			@Override
 			public void action(UIDisplayElement element) {
 				UIStateButton button = (UIStateButton)element;
@@ -196,7 +200,7 @@ public class UIConfigMenuVideo extends UIDisplayWindow {
         _bobbingButton.addClickListener(clickAction);
         _bobbingButton.setVisible(true);
         
-        _backToConfigMenuButton = new UIButton(new Vector2f(256f, 32f));
+        _backToConfigMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _backToConfigMenuButton.getLabel().setText("Back");
         _backToConfigMenuButton.setVisible(true);
 
@@ -213,46 +217,46 @@ public class UIConfigMenuVideo extends UIDisplayWindow {
         addDisplayElement(_bobbingButton, "bobbingButton");
         addDisplayElement(_backToConfigMenuButton, "backToConfigMenuButton");
 
-        update();
+        layout();
     }
 
-    // blur =  off, little bit, medium and blind ferret
-
     @Override
-    public void update() {
-        super.update();
+    public void layout() {
+        super.layout();
 
-        _version.centerHorizontally();
-        _version.getPosition().y = 230f;
-
-        _title.centerHorizontally();
-        _title.getPosition().y = 128f;
-        
-        //row 1
-        _graphicsQualityButton.getPosition().x = Display.getWidth() / 2 - _graphicsQualityButton.getSize().x - 10;
-        _graphicsQualityButton.getPosition().y = 300f;
-
-        _viewingDistanceButton.getPosition().x = Display.getWidth() / 2 - _viewingDistanceButton.getSize().x - 10;
-        _viewingDistanceButton.getPosition().y = 300f + 40f;
-
-        _fovButton.getPosition().x = Display.getWidth() / 2 - _fovButton.getSize().x - 10;
-        _fovButton.getPosition().y = 300f + 2 * 40f;
-        
-        _bobbingButton.getPosition().x = Display.getWidth() / 2 - _bobbingButton.getSize().x - 10;
-        _bobbingButton.getPosition().y = 300f + 3 * 40f;
-
-        //row 2
-        _animateGrassButton.getPosition().x = Display.getWidth() / 2 + 10;
-        _animateGrassButton.getPosition().y = 300f;
-
-        _reflectiveWaterButton.getPosition().x = Display.getWidth() / 2 + 10;
-        _reflectiveWaterButton.getPosition().y = 300f + 40f;
-
-        _blurIntensityButton.getPosition().x = Display.getWidth() / 2 + 10;
-        _blurIntensityButton.getPosition().y = 300f + 2 * 40f;
-
-        //back
-        _backToConfigMenuButton.centerHorizontally();
-        _backToConfigMenuButton.getPosition().y = 300f + 7 * 40f;
+        if (_version != null) {
+	        _version.centerHorizontally();
+	        _version.getPosition().y = 230f;
+	
+	        _title.centerHorizontally();
+	        _title.getPosition().y = 128f;
+	        
+	        //row 1
+	        _graphicsQualityButton.getPosition().x = Display.getWidth() / 2 - _graphicsQualityButton.getSize().x - 10;
+	        _graphicsQualityButton.getPosition().y = 300f;
+	
+	        _viewingDistanceButton.getPosition().x = Display.getWidth() / 2 - _viewingDistanceButton.getSize().x - 10;
+	        _viewingDistanceButton.getPosition().y = 300f + 40f;
+	
+	        _fovButton.getPosition().x = Display.getWidth() / 2 - _fovButton.getSize().x - 10;
+	        _fovButton.getPosition().y = 300f + 2 * 40f;
+	        
+	        _bobbingButton.getPosition().x = Display.getWidth() / 2 - _bobbingButton.getSize().x - 10;
+	        _bobbingButton.getPosition().y = 300f + 3 * 40f;
+	
+	        //row 2
+	        _animateGrassButton.getPosition().x = Display.getWidth() / 2 + 10;
+	        _animateGrassButton.getPosition().y = 300f;
+	
+	        _reflectiveWaterButton.getPosition().x = Display.getWidth() / 2 + 10;
+	        _reflectiveWaterButton.getPosition().y = 300f + 40f;
+	
+	        _blurIntensityButton.getPosition().x = Display.getWidth() / 2 + 10;
+	        _blurIntensityButton.getPosition().y = 300f + 2 * 40f;
+	
+	        //back
+	        _backToConfigMenuButton.centerHorizontally();
+	        _backToConfigMenuButton.getPosition().y = 300f + 7 * 40f;
+        }
     }
 }

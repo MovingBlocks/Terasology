@@ -90,6 +90,11 @@ public class UIGraphicsElement extends UIDisplayElement {
     @Override
     public void update() {
     }
+    
+	@Override
+	public void layout() {
+
+	}
 
     /*
      * Rotate graphics element

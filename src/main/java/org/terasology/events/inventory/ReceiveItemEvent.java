@@ -24,12 +24,22 @@ import org.terasology.entitySystem.EntityRef;
  */
 public class ReceiveItemEvent extends AbstractEvent {
     private EntityRef item;
+    private int slot = -1;
 
     public ReceiveItemEvent(EntityRef item) {
         this.item = item;
+    }
+    
+    public ReceiveItemEvent(EntityRef item, int slot) {
+        this.item = item;
+        this.slot = slot;
     }
 
     public EntityRef getItem() {
         return item;
     }
+    
+    public int getSlot() {
+		return slot;
+	}
 }

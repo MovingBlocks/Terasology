@@ -29,10 +29,10 @@ import org.terasology.asset.AssetManager;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.components.UITransparentOverlay;
-import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import org.terasology.rendering.gui.framework.events.ClickListener;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
@@ -50,6 +50,7 @@ public class UIPauseMenu extends UIDisplayWindow {
     final UIButton _exitButton;
     final UIButton _mainMenuButton;
     final UIButton _respawnButton;
+    final UIButton _backToGameButton;
 
     final UIText _version;
 
@@ -61,22 +62,24 @@ public class UIPauseMenu extends UIDisplayWindow {
         _version = new UIText("Pre Alpha");
         _version.setVisible(true);
 
-        _exitButton = new UIButton(new Vector2f(256f, 32f));
+        _exitButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _exitButton.getLabel().setText("Exit Terasology");
         _exitButton.setVisible(true);
 
-        _exitButton.addClickListener(new IClickListener() {
-            public void clicked(UIDisplayElement element) {
-                CoreRegistry.get(GameEngine.class).shutdown();
-            }
+        _exitButton.addClickListener(new ClickListener() {
+			@Override
+			public void click(UIDisplayElement element, int button) {
+				CoreRegistry.get(GameEngine.class).shutdown();
+			}
         });
 
-        _respawnButton = new UIButton(new Vector2f(256f, 32f));
+        _respawnButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _respawnButton.getLabel().setText("Respawn");
         _respawnButton.setVisible(true);
 
-        _respawnButton.addClickListener(new IClickListener() {
-            public void clicked(UIDisplayElement element) {
+        _respawnButton.addClickListener(new ClickListener() {
+			@Override
+			public void click(UIDisplayElement element, int button) {
                 setVisible(false);
                 EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
 
@@ -104,22 +107,34 @@ public class UIPauseMenu extends UIDisplayWindow {
                     characterMovementComponent.setVelocity(new Vector3f(0, 0, 0));
                     playerEntity.saveComponent(characterMovementComponent);
                 }
-            }
+			}
         });
 
-        _mainMenuButton = new UIButton(new Vector2f(256f, 32f));
+        _mainMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _mainMenuButton.getLabel().setText("Return to Main Menu");
         _mainMenuButton.setVisible(true);
 
-        _mainMenuButton.addClickListener(new IClickListener() {
-            public void clicked(UIDisplayElement element) {
+        _mainMenuButton.addClickListener(new ClickListener() {
+			@Override
+			public void click(UIDisplayElement element, int button) {
                 setVisible(false);
                 CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu());
-            }
+			}
         });
 
         _overlay = new UITransparentOverlay();
         _overlay.setVisible(true);
+
+
+        _backToGameButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
+        _backToGameButton.getLabel().setText("Back to game");
+        _backToGameButton.setVisible(true);
+        _backToGameButton.addClickListener(new ClickListener() {
+            public void click(UIDisplayElement element, int button) {
+                setVisible(false);
+            }
+        });
+
 
         addDisplayElement(_overlay);
 
@@ -129,28 +144,34 @@ public class UIPauseMenu extends UIDisplayWindow {
         addDisplayElement(_exitButton);
         addDisplayElement(_respawnButton);
         addDisplayElement(_mainMenuButton);
+        addDisplayElement(_backToGameButton);
         setModal(true);
 
-        update();
+        layout();
     }
 
     @Override
-    public void update() {
-        super.update();
+    public void layout() {
+        super.layout();
 
-        _version.centerHorizontally();
-        _version.getPosition().y = 230f;
+        if (_version != null) {
+            _version.centerHorizontally();
+            _version.getPosition().y = 230f;
 
-        _respawnButton.centerHorizontally();
-        _respawnButton.getPosition().y = 300f;
+            _backToGameButton.centerHorizontally();
+            _backToGameButton.getPosition().y = 300f;
 
-        _mainMenuButton.centerHorizontally();
-        _mainMenuButton.getPosition().y = 300f + 32f + 24f;
-
-        _exitButton.centerHorizontally();
-        _exitButton.getPosition().y = 300f + 2 * 32f + 32f;
-
-        _title.centerHorizontally();
-        _title.getPosition().y = 128f;
+            _respawnButton.centerHorizontally();
+            _respawnButton.getPosition().y = 300f + 32f + 24f;
+	
+            _mainMenuButton.centerHorizontally();
+            _mainMenuButton.getPosition().y = 300f + 2 * 32f + 24f + 4f;
+	
+            _exitButton.centerHorizontally();
+            _exitButton.getPosition().y = 300f + 3 * 32f + 24f + 8f;
+	
+            _title.centerHorizontally();
+            _title.getPosition().y = 128f;
+        }
     }
 }

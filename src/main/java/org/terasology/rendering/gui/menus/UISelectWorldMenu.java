@@ -27,9 +27,10 @@ import org.terasology.logic.world.WorldInfo;
 import org.terasology.logic.world.WorldUtil;
 import org.terasology.rendering.gui.components.*;
 import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
-import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
+import org.terasology.rendering.gui.framework.events.ClickListener;
+import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 
 import javax.vecmath.Vector2f;
 import java.io.File;
@@ -69,41 +70,42 @@ public class UISelectWorldMenu extends UIDisplayWindow {
         _list = new UIList(new Vector2f(512f, 256f));
         _list.setVisible(true);
 
-        _list.addDoubleClickListener(new IClickListener() {
-            public void clicked(UIDisplayElement element) {
-                loadSelectedWorld();
-            }
+        _list.addDoubleClickListener(new ClickListener() {
+			@Override
+			public void click(UIDisplayElement element, int button) {
+				loadSelectedWorld();
+			}
         });
 
-        _goToBack = new UIButton(new Vector2f(256f, 32f));
+        _goToBack = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _goToBack.getLabel().setText("Go back");
         _goToBack.setVisible(true);
 
-        _loadFromList = new UIButton(new Vector2f(128f, 32f));
+        _loadFromList = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
         _loadFromList.getLabel().setText("Load");
         _loadFromList.setVisible(true);
 
-        _createNewWorld = new UIButton(new Vector2f(192f, 32f));
+        _createNewWorld = new UIButton(new Vector2f(192f, 32f), UIButton.eButtonType.NORMAL);
         _createNewWorld.getLabel().setText("Create new world");
         _createNewWorld.setVisible(true);
 
-        _deleteFromList = new UIButton(new Vector2f(128f, 32f));
+        _deleteFromList = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
         _deleteFromList.getLabel().setText("Delete");
         _deleteFromList.setVisible(true);
 
-        _createNewWorld.addClickListener(new IClickListener() {
-            public void clicked(UIDisplayElement element) {
+        _createNewWorld.addClickListener(new ClickListener() {
+			@Override
+			public void click(UIDisplayElement element, int button) {
                 GUIManager.getInstance().setFocusedWindow(_window);
                 _window.clearInputControls();
                 UIInput inputWorldName = (UIInput) _window.getElementById("inputWorldTitle");
                 inputWorldName.setValue(_window.getWorldName());
-
-            }
+			}
         });
 
-        _deleteFromList.addClickListener(new IClickListener() {
-            public void clicked(UIDisplayElement element) {
-
+        _deleteFromList.addClickListener(new ClickListener() {
+			@Override
+			public void click(UIDisplayElement element, int button) {
                 if (_list.getSelectedItem() == null) {
                     GUIManager.getInstance().showMessage("Error", "Please choose a world first.");
                     return;
@@ -117,14 +119,15 @@ public class UISelectWorldMenu extends UIDisplayWindow {
                 } catch (Exception e) {
                     GUIManager.getInstance().showMessage("Error", "Failed deleting world data object. Sorry.");
                 }
-            }
+			}
         });
 
-        _loadFromList.addClickListener(new IClickListener() {
-            public void clicked(UIDisplayElement element) {
-                loadSelectedWorld();
-            }
-        });
+        _loadFromList.addClickListener(new ClickListener() {
+			@Override
+			public void click(UIDisplayElement element, int button) {
+				loadSelectedWorld();
+			}
+		});
 
         fillList();
 
@@ -134,29 +137,32 @@ public class UISelectWorldMenu extends UIDisplayWindow {
         addDisplayElement(_goToBack, "goToBackButton");
         addDisplayElement(_createNewWorld, "createWorldButton");
         addDisplayElement(_deleteFromList, "deleteFromListButton");
-        update();
+        
+        layout();
     }
 
     @Override
-    public void update() {
-        super.update();
-        _list.centerHorizontally();
-        _list.getPosition().y = 230f;
-
-        _createNewWorld.getPosition().x = _list.getPosition().x;
-        _createNewWorld.getPosition().y = _list.getPosition().y + _list.getSize().y + 32f;
-
-        _loadFromList.getPosition().x = _createNewWorld.getPosition().x + _createNewWorld.getSize().x + 15f;
-        _loadFromList.getPosition().y = _createNewWorld.getPosition().y;
-
-        _deleteFromList.getPosition().x = _loadFromList.getPosition().x + _loadFromList.getSize().x + 15f;
-        _deleteFromList.getPosition().y = _loadFromList.getPosition().y;
-
-
-        _goToBack.centerHorizontally();
-
-        _goToBack.getPosition().y = Display.getHeight() - _goToBack.getSize().y - 32f;
-
+    public void layout() {
+        super.layout();
+        
+        if (_list != null) {
+	        _list.centerHorizontally();
+	        _list.getPosition().y = 230f;
+	
+	        _createNewWorld.getPosition().x = _list.getPosition().x;
+	        _createNewWorld.getPosition().y = _list.getPosition().y + _list.getSize().y + 32f;
+	
+	        _loadFromList.getPosition().x = _createNewWorld.getPosition().x + _createNewWorld.getSize().x + 15f;
+	        _loadFromList.getPosition().y = _createNewWorld.getPosition().y;
+	
+	        _deleteFromList.getPosition().x = _loadFromList.getPosition().x + _loadFromList.getSize().x + 15f;
+	        _deleteFromList.getPosition().y = _loadFromList.getPosition().y;
+	
+	
+	        _goToBack.centerHorizontally();
+	
+	        _goToBack.getPosition().y = Display.getHeight() - _goToBack.getSize().y - 32f;
+        }
     }
 
     private void loadSelectedWorld() {
@@ -175,6 +181,7 @@ public class UISelectWorldMenu extends UIDisplayWindow {
             WorldInfo info = (WorldInfo) _list.getSelectedItem().getValue();
             Config.getInstance().setDefaultSeed(info.getSeed());
             Config.getInstance().setWorldTitle(info.getTitle());
+            Config.getInstance().setChunkGenerator(info.getChunkGenerators());
             // TODO: Need to load time too. Maybe just pass through WorldInfo?
             CoreRegistry.get(GameEngine.class).changeState(new StateSinglePlayer(info.getTitle(), info.getSeed(), info.getTime()));
         } catch (Exception e) {

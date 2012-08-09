@@ -19,6 +19,7 @@ import org.terasology.entitySystem.AbstractEvent;
 
 /**
  * @author Immortius <immortius@gmail.com>
+ * @deprecated Use HealthChangedEvent instead.
  */
 public class FullHealthEvent extends AbstractEvent {
 }

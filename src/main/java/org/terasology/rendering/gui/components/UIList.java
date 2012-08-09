@@ -17,9 +17,14 @@ package org.terasology.rendering.gui.components;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import org.terasology.rendering.gui.framework.IClickListener;
+import org.newdawn.slick.Color;
 import org.terasology.rendering.gui.framework.IInputDataElement;
+import org.terasology.rendering.gui.framework.UIDisplayContainer;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIScrollableDisplayContainer;
+import org.terasology.rendering.gui.framework.events.ChangedListener;
+import org.terasology.rendering.gui.framework.events.ClickListener;
+import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
@@ -30,16 +35,102 @@ import java.util.List;
  * A simple graphical List
  *
  * @author Anton Kireev <adeon.k87@gmail.com>
- * @version 0.1
+ * @version 0.2
  */
 
 public class UIList extends UIScrollableDisplayContainer implements IInputDataElement {
 
-    private int _selectedItemIndex = -1;
-    private final ArrayList<IClickListener> _doubleClickListeners = new ArrayList<IClickListener>();
+    private UIListItem _selectedItem = null;
+    private final ArrayList<ClickListener> _doubleClickListeners = new ArrayList<ClickListener>();
 
     //List items
-    private List<UIListItem> _items = new ArrayList<UIListItem>();
+    private final List<UIListItem> _items = new ArrayList<UIListItem>();
+	private final List<ChangedListener> _changedListeners = new ArrayList<ChangedListener>();
+	
+	public class UIListItem extends UIDisplayContainer {
+	    private Object _value;
+	    private String _text;
+	    private boolean _isSelected;
+	    private Vector2f _padding = new Vector2f(5f, 15f);
+
+	    private final UIText _label;
+
+	    public UIListItem(Vector2f size, String text, Object value) {
+	        setSize(size);
+	        _text = text;
+	        _value = value;
+
+	        _label = new UIText();
+	        _label.setVisible(true);
+	        _label.setColor(Color.lightGray);
+	        _label.setPosition(new Vector2f((getPosition().x + _padding.x), (getPosition().y + _padding.y)));
+	        _label.setText(_text);
+
+	        if (getSize().x < _label.getTextWidth()) {
+	            setSize(new Vector2f(_label.getTextWidth(), getSize().y));
+	        }
+	        
+	        addMouseMoveListener(new MouseMoveListener() {		
+				@Override
+				public void leave(UIDisplayElement element) {
+					if(!_isSelected)
+						_label.setColor(Color.lightGray);
+				}
+				
+				@Override
+				public void hover(UIDisplayElement element) {
+
+				}
+				
+				@Override
+				public void enter(UIDisplayElement element) {
+					if(!_isSelected)
+						_label.setColor(Color.orange);
+				}
+
+				@Override
+				public void move(UIDisplayElement element) {
+
+				}
+			});
+
+	        addDisplayElement(_label);
+
+	    }
+
+	    public Object getValue() {
+	        return _value;
+	    }
+
+	    public void setValue(Object value) {
+	        _value = value;
+	    }
+
+	    public String getText() {
+	        return _text;
+	    }
+
+	    public void setText(String text) {
+	        _label.setText(_text);
+	        _text = text;
+	    }
+
+	    public boolean isSelected() {
+	        return _isSelected;
+	    }
+
+	    public void setSelected(boolean selected) {
+	        _isSelected = selected;
+
+	        if (_isSelected) {
+	            setStyle("background-color", "#e1ddd4 1");
+	            _label.setColor(Color.orange);
+	        } else {
+	            setStyle("background", "none");
+	            _label.setColor(Color.lightGray);
+	        }
+	    }
+	}
 
     public UIList(Vector2f size) {
         setSize(size);
@@ -47,70 +138,20 @@ public class UIList extends UIScrollableDisplayContainer implements IInputDataEl
         setScrollBarsPosition(getPosition(), getSize());
 
         //ToDo Create skin for UIList
-        setStyle("border-image-top", "engine:gui_menu 159/512 18/512 264/512 0 18");
-        setStyle("border-image-right", "engine:gui_menu 9/512 63/512 423/512 18/512 9");
-        setStyle("border-image-bottom", "engine:gui_menu 159/512 9/512 264/512 81/512 9");
-        setStyle("border-image-left", "engine:gui_menu 8/512 64/512 256/512 17/512 8");
+        setClassStyle("screenSkin", "border-image-top: engine:gui_menu 159/512 18/512 264/512 0 18");
+        setClassStyle("screenSkin", "border-image-right: engine:gui_menu 9/512 63/512 423/512 18/512 9");
+        setClassStyle("screenSkin", "border-image-bottom: engine:gui_menu 159/512 9/512 264/512 81/512 9");
+        setClassStyle("screenSkin", "border-image-left: engine:gui_menu 8/512 64/512 256/512 17/512 8");
 
-        setStyle("border-corner-topleft", "engine:gui_menu 256/512 0");
-        setStyle("border-corner-topright", "engine:gui_menu 423/512 0");
-        setStyle("border-corner-bottomright", "engine:gui_menu 423/512 81/512");
-        setStyle("border-corner-bottomleft", "engine:gui_menu 256/512 81/512");
+        setClassStyle("screenSkin", "border-corner-topleft: engine:gui_menu 256/512 0");
+        setClassStyle("screenSkin", "border-corner-topright: engine:gui_menu 423/512 0");
+        setClassStyle("screenSkin", "border-corner-bottomright: engine:gui_menu 423/512 81/512");
+        setClassStyle("screenSkin", "border-corner-bottomleft: engine:gui_menu 256/512 81/512");
+        setClassStyle("screenSkin", "background-image: engine:gui_menu 159/512 63/512 264/512 18/512");
 
-        setStyle("background-image", "engine:gui_menu 159/512 63/512 264/512 18/512");
+        setClassStyle("screenSkin");
+
         setCropMargin(new Vector4f(-15f, -15f, -15f, 0));
-    }
-
-    public void update() {
-        Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
-        if (intersects(mousePos)) {
-
-            if (_scrollBarVertical.intersects(mousePos) || _scrollBarHorizontal.intersects(mousePos)) {
-                return;
-            }
-
-            boolean itemClicked = false;
-            for (int i = (_items.size() - 1); i >= 0; i--) {
-                UIListItem item = _items.get(i);
-                if (item.isVisible()) {
-                    if (item.intersects(mousePos)) {
-                        if (_mouseDown) {
-                            if (item.isSelected()) {
-                                doubleClick();
-                                break;
-                            }
-                            if (_selectedItemIndex >= 0) {
-                                _items.get(_selectedItemIndex).setSelected(false);
-                            }
-                            item.setSelected(true);
-                            _selectedItemIndex = i;
-                            _mouseDown = false;
-                            itemClicked = true;
-                        }
-                    }
-                }
-            }
-            if (!itemClicked) {
-                _mouseUp = false;
-                _mouseDown = false;
-            }
-
-        } else {
-            _wheelMoved = 0;
-            _mouseUp = false;
-            _mouseDown = false;
-        }
-        super.update();
-    }
-
-    public void render() {
-        super.render();
-    }
-
-    private void doubleClick() {
-        for (int i = 0; i < _doubleClickListeners.size(); i++) {
-            _doubleClickListeners.get(i).clicked(this);
-        }
     }
 
     /*
@@ -120,10 +161,9 @@ public class UIList extends UIScrollableDisplayContainer implements IInputDataEl
         return _items.size();
     }
 
-
     public void addItem(String text, Object value) {
 
-        UIListItem newItem = new UIListItem(new Vector2f(getSize().x, (32f)), text, value);
+        final UIListItem newItem = new UIListItem(new Vector2f(getSize().x, (32f)), text, value);
 
         newItem.setVisible(true);
 
@@ -133,6 +173,36 @@ public class UIList extends UIScrollableDisplayContainer implements IInputDataEl
 
         newItem.getPosition().y += 32f * _items.size();
         newItem.setFixed(false);
+        newItem.addClickListener(new ClickListener() {
+        	private long _lastTime = System.currentTimeMillis();
+        	private int _lastButton = -1;
+        	
+			@Override
+			public void click(UIDisplayElement element, int button) {
+				Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
+				if (!getScrollBarHorizontal().intersects(mousePos) && !getScrollBarVertival().intersects(mousePos)) {
+					//handle double click
+					if ((System.currentTimeMillis() - _lastTime) < 200 && _lastButton == button) {
+						notifyDoubleClickListeners();
+					}
+					_lastTime = System.currentTimeMillis();
+					_lastButton = button;
+					
+					//select the clicked item
+					UIListItem item = (UIListItem) element;
+					
+					if (item != _selectedItem) {
+						if (_selectedItem != null)
+							_selectedItem.setSelected(false);
+						
+						_selectedItem = item;
+						_selectedItem.setSelected(true);
+						
+						notifyChangedListeners();
+					}
+				}
+			}
+		});
 
         _items.add(newItem);
         addDisplayElement(newItem);
@@ -143,45 +213,55 @@ public class UIList extends UIScrollableDisplayContainer implements IInputDataEl
     */
     public void removeSelectedItem() {
 
-        if (_selectedItemIndex < 0) {
+        if (_selectedItem == null) {
             return;
         }
 
-        removeDisplayElement(_items.get(_selectedItemIndex));
-        _items.remove(_selectedItemIndex);
+        int index = getSelectedItemIndex();
+        removeDisplayElement(_selectedItem);
+        _items.remove(_selectedItem);
 
-        for (int i = _selectedItemIndex; i < _items.size(); i++) {
+        for (int i = index; i < _items.size(); i++) {
             _items.get(i).getPosition().y -= 32f;
         }
 
-        if (_selectedItemIndex > _items.size() - 1) {
-            if (_items.size() - 1 >= 0) {
-                _selectedItemIndex = _items.size() - 1;
-                _items.get(_selectedItemIndex).setSelected(true);
-            } else {
-                _selectedItemIndex = -1;
-            }
+        if (_items.size() > 0) {
+	        if (index <= _items.size() - 1)
+	        	setSelectedItemIndex(index);
+	        else
+	        	setSelectedItemIndex(_items.size() - 1);
+	        
+            _selectedItem.setSelected(true);
         }
-
-        if (_selectedItemIndex >= 0) {
-            _items.get(_selectedItemIndex).setSelected(true);
+        else {
+        	_selectedItem = null;
         }
-
     }
 
-    /*
-     * Return selected item
-     */
+    public void setSelectedItemIndex(int i) {
+    	if (_selectedItem != null)
+    		_selectedItem.setSelected(false);
+    	
+    	_selectedItem = _items.get(i);
+    	_selectedItem.setSelected(true);
+    	
+    	notifyChangedListeners();
+    }
+    
     public UIListItem getSelectedItem() {
-
-        if (_selectedItemIndex < 0) {
-            return null;
-        }
-
-        return _items.get(_selectedItemIndex);
+		return _selectedItem;
+    }
+    
+    public int getSelectedItemIndex() {
+    	for (int i = 0; i < _items.size(); i++) {
+			if (_items.get(i) == _selectedItem)
+				return i;
+		}
+    	
+    	return -1;
     }
 
-    /*
+	/*
      * Remove all items
      */
     public void removeAll() {
@@ -204,25 +284,55 @@ public class UIList extends UIScrollableDisplayContainer implements IInputDataEl
     * Returns the value of the selected item
     */
     public Object getValue() {
-        return _items.get(_selectedItemIndex).getValue();
+        return _selectedItem.getValue();
+    }
+
+    public UIListItem getItem(int index){
+        if(!_items.isEmpty()){
+            return _items.get(index);
+        } else {
+            return null;
+        }
+    }
+
+    public boolean isEmpty(){
+        return _items.isEmpty();
     }
 
     /*
      * Reset to selected element
      */
     public void clearData() {
-        if (_selectedItemIndex < 0) {
-            return;
-        }
-        _items.get(_selectedItemIndex).setSelected(false);
-        _selectedItemIndex = -1;
+    	if (_selectedItem != null)
+    		_selectedItem.setSelected(false);
+    	_selectedItem = null;
     }
 
-    public void addDoubleClickListener(IClickListener listener) {
+    private void notifyDoubleClickListeners() {
+        for (int i = 0; i < _doubleClickListeners.size(); i++) {
+            _doubleClickListeners.get(i).click(this, 0);
+        }
+    }
+    
+    public void addDoubleClickListener(ClickListener listener) {
         _doubleClickListeners.add(listener);
     }
 
-    public void removeDoubleClickListener(IClickListener listener) {
+    public void removeDoubleClickListener(ClickListener listener) {
         _doubleClickListeners.remove(listener);
+    }
+    
+	private void notifyChangedListeners() {
+		for (ChangedListener listener : _changedListeners) {
+			listener.changed(this);
+		}
+	}
+    
+    public void addChangedListener(ChangedListener listener) {
+        _changedListeners.add(listener);
+    }
+
+    public void removeChangedListener(ChangedListener listener) {
+    	_changedListeners.remove(listener);
     }
 }

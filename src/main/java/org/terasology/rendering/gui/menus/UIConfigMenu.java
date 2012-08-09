@@ -54,23 +54,23 @@ public class UIConfigMenu extends UIDisplayWindow {
         _overlay = new UIImageOverlay(AssetManager.loadTexture("engine:loadingBackground"));
         _overlay.setVisible(true);
 
-        _videoButton = new UIButton(new Vector2f(256f, 32f));
+        _videoButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _videoButton.getLabel().setText("Video");
         _videoButton.setVisible(true);
 
-        _audioButton = new UIButton(new Vector2f(256f, 32f));
+        _audioButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _audioButton.getLabel().setText("Audio");
         _audioButton.setVisible(true);
 
-        _controlsButton = new UIButton(new Vector2f(256f, 32f));
+        _controlsButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _controlsButton.getLabel().setText("Controls");
         _controlsButton.setVisible(true);
 
-        _modsButton = new UIButton(new Vector2f(256f, 32f));
+        _modsButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _modsButton.getLabel().setText("Mods");
         _modsButton.setVisible(true);
 
-        _backToMainMenuButton = new UIButton(new Vector2f(256f, 32f));
+        _backToMainMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _backToMainMenuButton.getLabel().setText("Return to Main Menu");
         _backToMainMenuButton.setVisible(true);
 
@@ -83,32 +83,35 @@ public class UIConfigMenu extends UIDisplayWindow {
         addDisplayElement(_controlsButton, "controlsButton");
         addDisplayElement(_modsButton, "modsButton");
         addDisplayElement(_backToMainMenuButton, "backToMainMenuButton");
-        update();
+
+        layout();
     }
-
+    
     @Override
-    public void update() {
-        super.update();
-
-        _version.centerHorizontally();
-        _version.getPosition().y = 230f;
-
-        _videoButton.centerHorizontally();
-        _videoButton.getPosition().y = 300f;
-
-        _audioButton.centerHorizontally();
-        _audioButton.getPosition().y = 300f + 40f;
-
-        _controlsButton.centerHorizontally();
-        _controlsButton.getPosition().y = 300f + 2 * 40f;
-
-        _modsButton.centerHorizontally();
-        _modsButton.getPosition().y = 300f + 3 * 40f;
-
-        _backToMainMenuButton.centerHorizontally();
-        _backToMainMenuButton.getPosition().y = 300f + 7 * 40f;
-
-        _title.centerHorizontally();
-        _title.getPosition().y = 128f;
+    public void layout() {
+    	super.layout();
+    	
+    	if (_version != null) {
+	        _version.centerHorizontally();
+	        _version.getPosition().y = 230f;
+	
+	        _videoButton.centerHorizontally();
+	        _videoButton.getPosition().y = 300f;
+	
+	        _audioButton.centerHorizontally();
+	        _audioButton.getPosition().y = 300f + 40f;
+	
+	        _controlsButton.centerHorizontally();
+	        _controlsButton.getPosition().y = 300f + 2 * 40f;
+	
+	        _modsButton.centerHorizontally();
+	        _modsButton.getPosition().y = 300f + 3 * 40f;
+	
+	        _backToMainMenuButton.centerHorizontally();
+	        _backToMainMenuButton.getPosition().y = 300f + 7 * 40f;
+	
+	        _title.centerHorizontally();
+	        _title.getPosition().y = 128f;
+    	}
     }
 }

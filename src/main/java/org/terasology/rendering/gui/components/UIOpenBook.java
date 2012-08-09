@@ -22,7 +22,7 @@ import org.terasology.rendering.gui.framework.UIGraphicsElement;
 import javax.vecmath.Vector2f;
 
 /**
- *
+ * TODO Get rid of this class. the gui components should be reduced to a minimum. move to hui.menus?
  */
 public class UIOpenBook extends UIDisplayContainer {
 

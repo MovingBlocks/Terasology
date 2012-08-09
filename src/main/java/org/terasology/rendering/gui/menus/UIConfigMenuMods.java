@@ -46,15 +46,15 @@ public class UIConfigMenuMods extends UIDisplayWindow {
         _overlay = new UIImageOverlay(AssetManager.loadTexture("engine:loadingBackground"));
         _overlay.setVisible(true);
 
-        _minionsButton = new UIButton(new Vector2f(256f, 32f));
+        _minionsButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _minionsButton.getLabel().setText("Minions enabled : false");
         _minionsButton.setVisible(true);
 
-        _minionOptionsButton = new UIButton(new Vector2f(256f, 32f));
+        _minionOptionsButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _minionOptionsButton.getLabel().setText("Minion Options...");
         _minionOptionsButton.setVisible(true);
 
-        _backToConfigMenuButton = new UIButton(new Vector2f(256f, 32f));
+        _backToConfigMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _backToConfigMenuButton.getLabel().setText("Back");
         _backToConfigMenuButton.setVisible(true);
 
@@ -64,23 +64,26 @@ public class UIConfigMenuMods extends UIDisplayWindow {
         addDisplayElement(_minionsButton, "minionsButton");
         addDisplayElement(_minionOptionsButton, "minionOptionsButton");
         addDisplayElement(_backToConfigMenuButton, "backToConfigMenuButton");
-        update();
+
+        layout();
     }
 
     @Override
-    public void update() {
-        super.update();
+    public void layout() {
+        super.layout();
 
-        _minionsButton.centerHorizontally();
-        _minionsButton.getPosition().y = 300f;
-
-        _minionOptionsButton.centerHorizontally();
-        _minionOptionsButton.getPosition().y = 300f + 40f;
-
-        _backToConfigMenuButton.centerHorizontally();
-        _backToConfigMenuButton.getPosition().y = 300f + 7 * 40f;
-
-        _title.centerHorizontally();
-        _title.getPosition().y = 128f;
+        if (_minionsButton != null) {
+	        _minionsButton.centerHorizontally();
+	        _minionsButton.getPosition().y = 300f;
+	
+	        _minionOptionsButton.centerHorizontally();
+	        _minionOptionsButton.getPosition().y = 300f + 40f;
+	
+	        _backToConfigMenuButton.centerHorizontally();
+	        _backToConfigMenuButton.getPosition().y = 300f + 7 * 40f;
+	
+	        _title.centerHorizontally();
+	        _title.getPosition().y = 128f;
+        }
     }
 }

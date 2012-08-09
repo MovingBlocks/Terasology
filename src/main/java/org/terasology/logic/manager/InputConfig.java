@@ -47,7 +47,7 @@ public final class InputConfig {
         return loadConfig(new File(PathManager.getInstance().getWorldPath(), "lastinput.cfg"));
     }
 
-    private void loadDefaultConfig() {
+    public void loadDefaultConfig() {
         _inputsetting = InputData.InputSetting.newBuilder();
     }
 
@@ -84,15 +84,15 @@ public final class InputConfig {
 
     private int strToKey(String skey) {
         if (skey.startsWith("MOUSE")) {
-            if (skey == "MOUSELEFT") {
+            if (skey.equals("MOUSELEFT")) {
                 return 256;
-            } else if (skey == "MOUSERIGHT") {
+            } else if (skey.equals("MOUSERIGHT")) {
                 return 257;
-            } else if (skey == "MOUSEMIDDLE") {
+            } else if (skey.equals("MOUSEMIDDLE")) {
                 return 258;
-            } else if (skey == "MOUSEWHEELUP") {
+            } else if (skey.equals("MOUSEWHEELUP")) {
                 return 259;
-            } else if (skey == "MOUSEWHEELDOWN") {
+            } else if (skey.equals("MOUSEWHEELDOWN")) {
                 return 260;
             } else {
                 return 261;
