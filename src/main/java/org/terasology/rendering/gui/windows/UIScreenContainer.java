@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.menus;
+package org.terasology.rendering.gui.windows;
 
 import org.lwjgl.opengl.Display;
 import org.terasology.entitySystem.EntityRef;
@@ -29,7 +29,7 @@ import javax.vecmath.Vector2f;
  *
  * @author Immortius <immortius@gmail.com>
  */
-public class UIContainerScreen extends UIDisplayWindow {
+public class UIScreenContainer extends UIDisplayWindow {
     private static final int CENTER_BORDER = 100;
     private static final int OUTER_BORDER = 50;
 
@@ -40,7 +40,7 @@ public class UIContainerScreen extends UIDisplayWindow {
     private final UIItemContainer containerInventory;
     private final UIGraphicsElement background;
 
-    public UIContainerScreen() {
+    public UIScreenContainer() {
         setModal(true);
         
         background = new UIGraphicsElement(AssetManager.loadTexture("engine:containerWindow"));

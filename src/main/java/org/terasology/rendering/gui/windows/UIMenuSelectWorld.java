@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.menus;
+package org.terasology.rendering.gui.windows;
 
 import org.lwjgl.opengl.Display;
 import org.terasology.game.CoreRegistry;
@@ -44,7 +44,7 @@ import java.util.logging.Logger;
  *
  * @author Anton Kireev <adeon.k87@gmail.com>
  */
-public class UISelectWorldMenu extends UIDisplayWindow {
+public class UIMenuSelectWorld extends UIDisplayWindow {
     private Logger logger = Logger.getLogger(getClass().getName());
 
     final UIImageOverlay _overlay;
@@ -55,7 +55,7 @@ public class UISelectWorldMenu extends UIDisplayWindow {
     final UIButton _deleteFromList;
     final UIDialogCreateNewWorld _window;
 
-    public UISelectWorldMenu() {
+    public UIMenuSelectWorld() {
         maximize();
         _overlay = new UIImageOverlay(AssetManager.loadTexture("engine:menuBackground"));
         _overlay.setVisible(true);

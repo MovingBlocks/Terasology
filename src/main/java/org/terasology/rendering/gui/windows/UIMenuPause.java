@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.menus;
+package org.terasology.rendering.gui.windows;
 
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.components.HealthComponent;
@@ -42,7 +42,7 @@ import javax.vecmath.Vector3f;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class UIPauseMenu extends UIDisplayWindow {
+public class UIMenuPause extends UIDisplayWindow {
 
     final UITransparentOverlay _overlay;
     final UIGraphicsElement _title;
@@ -54,7 +54,7 @@ public class UIPauseMenu extends UIDisplayWindow {
 
     final UIText _version;
 
-    public UIPauseMenu() {
+    public UIMenuPause() {
         _title = new UIGraphicsElement(AssetManager.loadTexture("engine:terasology"));
         _title.setVisible(true);
         _title.setSize(new Vector2f(512f, 128f));

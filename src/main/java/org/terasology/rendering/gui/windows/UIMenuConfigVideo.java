@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.menus;
+package org.terasology.rendering.gui.windows;
 
 import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetManager;
@@ -38,7 +38,7 @@ import javax.vecmath.Vector2f;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  *         Date: 29/07/12
  */
-public class UIConfigMenuVideo extends UIDisplayWindow {
+public class UIMenuConfigVideo extends UIDisplayWindow {
 
     final UIImageOverlay _overlay;
     final UIGraphicsElement _title;
@@ -66,7 +66,7 @@ public class UIConfigMenuVideo extends UIDisplayWindow {
 		}
     };
 
-    public UIConfigMenuVideo() {
+    public UIMenuConfigVideo() {
         maximize();
         _title = new UIGraphicsElement(AssetManager.loadTexture("engine:terasology"));
         _title.setVisible(true);

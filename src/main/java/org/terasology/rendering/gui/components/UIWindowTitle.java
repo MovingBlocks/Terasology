@@ -22,6 +22,10 @@ import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 import javax.vecmath.Vector2f;
 
+/**
+ * 
+ * TODO get rid of this. put it directly into the UIDialogBox.
+ */
 public class UIWindowTitle extends UIDisplayContainer {
     private UIGraphicsElement _leftBackground;
     private UIGraphicsElement _centerBackground;

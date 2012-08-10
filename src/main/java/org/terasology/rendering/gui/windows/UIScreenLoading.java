@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.menus;
+package org.terasology.rendering.gui.windows;
 
 import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetManager;
@@ -29,12 +29,12 @@ import javax.vecmath.Vector2f;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class UILoadingScreen extends UIDisplayWindow {
+public class UIScreenLoading extends UIDisplayWindow {
 
     final UIImageOverlay _overlay;
     final UIProgressBar _progressBar;
 
-    public UILoadingScreen() {
+    public UIScreenLoading() {
         _overlay = new UIImageOverlay(AssetManager.loadTexture("engine:loadingBackground"));
         _overlay.setVisible(true);
 

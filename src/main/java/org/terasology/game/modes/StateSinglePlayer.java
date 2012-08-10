@@ -52,8 +52,8 @@ import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.protobuf.EntityData;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.gui.menus.UILoadingScreen;
-import org.terasology.rendering.gui.menus.UIStatusScreen;
+import org.terasology.rendering.gui.windows.UIScreenLoading;
+import org.terasology.rendering.gui.windows.UIScreenStatus;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldBiomeProviderImpl;
@@ -224,7 +224,7 @@ public class StateSinglePlayer implements GameState {
         }
         if (dead) {
             if (GUIManager.getInstance().getWindowById("engine:statusScreen") == null) {
-                UIStatusScreen statusScreen = GUIManager.getInstance().addWindow(new UIStatusScreen(), "engine:statusScreen");
+                UIScreenStatus statusScreen = GUIManager.getInstance().addWindow(new UIScreenStatus(), "engine:statusScreen");
                 statusScreen.updateStatus("Sorry! Seems like you have died :-(");
                 statusScreen.setVisible(true);
             }
@@ -322,7 +322,7 @@ public class StateSinglePlayer implements GameState {
 
     // TODO: Should have its own state
     private void prepareWorld() {
-        UILoadingScreen loadingScreen = GUIManager.getInstance().addWindow(new UILoadingScreen(), "engine:loadingScreen");
+        UIScreenLoading loadingScreen = GUIManager.getInstance().addWindow(new UIScreenLoading(), "engine:loadingScreen");
         Display.update();
 
         Timer timer = CoreRegistry.get(Timer.class);

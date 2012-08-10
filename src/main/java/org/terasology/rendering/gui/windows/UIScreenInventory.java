@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.menus;
+package org.terasology.rendering.gui.windows;
 
 import javax.vecmath.Vector2f;
 
@@ -30,12 +30,12 @@ import org.terasology.rendering.gui.framework.UIGraphicsElement;
  *
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
-public class UIInventoryScreen extends UIDisplayWindow {
+public class UIScreenInventory extends UIDisplayWindow {
 
     private final UIItemContainer inventory;
 	private UIGraphicsElement background;
 
-    public UIInventoryScreen() {
+    public UIScreenInventory() {
         setSize(new Vector2f(192.0f * 2.5f, 180.0f * 2.5f));
         
         inventory = new UIItemContainer(9, 4);
