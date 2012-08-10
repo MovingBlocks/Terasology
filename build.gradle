@@ -10,19 +10,7 @@ apply plugin: 'groovy'
 apply plugin: 'project-report'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
-
-/* Optional check plugins
 apply plugin: 'checkstyle'
-apply plugin: 'codenarc'
-apply plugin: 'findbugs'
-apply plugin: 'pmd'
-
-// ignoreFailures: Whether or not this task will ignore failures and continue running the build.
-checkstyle.ignoreFailures = true
-codenarc.ignoreFailures = true
-findbugs.ignoreFailures = true
-pmd.ignoreFailures = true
-*/
 
 /* Gradle Wrapper: Uncomment this task, change 'gradleVersion' and run "wrapper".
 task wrapper(type: Wrapper) {
@@ -156,6 +144,19 @@ test {
     testLogging.showStandardStreams = true
     jvmArgs '-Xms512m', '-Xmx1024m', '-XX:MaxPermSize=128m'
 }
+
+/* Check ------------------------------------------------------------------- */
+checkstyle.ignoreFailures = true
+/* Optional check plugins
+apply plugin: 'codenarc'
+apply plugin: 'findbugs'
+apply plugin: 'pmd'
+
+// ignoreFailures: Whether or not this task will ignore failures and continue running the build.
+codenarc.ignoreFailures = true
+findbugs.ignoreFailures = true
+pmd.ignoreFailures = true
+*/
 
 /* perfTest ----------------------------------------------------------------- */
 sourceSets {
