@@ -31,14 +31,14 @@ import javax.vecmath.Vector2f;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
 public class UIToolbar extends UIDisplayContainer {
-	
+    
     private final UIItemContainer tools;
     private int previousSelected = 0;
     
     public UIToolbar() {
         setSize(new Vector2f(364f, 44f));
         
-        tools = new UIItemContainer(9, 1);
+        tools = new UIItemContainer(9);
         tools.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity());
         tools.setVisible(true);
 
@@ -47,34 +47,34 @@ public class UIToolbar extends UIDisplayContainer {
         layout();
     }
 
-	@Override
+    @Override
     public void layout() {
-    	super.layout();
-    			
+        super.layout();
+                
         centerHorizontally();
         getPosition().y = Display.getHeight() - getSize().y;
     }
-	
-	@Override
-	public void update() {
-		super.update();
-		//TODO solve this with events
+    
+    @Override
+    public void update() {
+        super.update();
+        //TODO solve this with events
 
-		//this is a work around to set the entity when its there. constructor will execute before..
-		if (tools != null && CoreRegistry.get(LocalPlayer.class).getEntity() != EntityRef.NULL) {
-			if (tools.getEntity() == EntityRef.NULL) {
-				tools.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity());
-			}
-		}
+        //this is a work around to set the entity when its there. constructor will execute before..
+        if (tools != null && CoreRegistry.get(LocalPlayer.class).getEntity() != EntityRef.NULL) {
+            if (tools.getEntity() == EntityRef.NULL) {
+                tools.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity(), 0, 8);
+            }
+        }
 
-		//set the selection rectangle
-		if (tools.getCells().size() > 0) {
-			LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-			LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
-			
-			tools.getCells().get(previousSelected).setSelectionRectangleEnable(false);
-			tools.getCells().get(localPlayerComp.selectedTool).setSelectionRectangleEnable(true);
-			previousSelected = localPlayerComp.selectedTool;
-		}
-	}
+        //set the selection rectangle
+        if (tools.getCells().size() > 0) {
+            LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+            LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
+            
+            tools.getCells().get(previousSelected).setSelectionRectangleEnable(false);
+            tools.getCells().get(localPlayerComp.selectedTool).setSelectionRectangleEnable(true);
+            previousSelected = localPlayerComp.selectedTool;
+        }
+    }
 }
