@@ -18,8 +18,8 @@ package org.terasology.events.input.binds;
 import org.terasology.input.BindButtonEvent;
 
 /**
- * @author Immortius
+ * @author small-jeeper
  */
 public class DropItemButton extends BindButtonEvent {
-    public static final String ID = "engine:throwOutItem";
+    public static final String ID = "engine:dropItem";
 }

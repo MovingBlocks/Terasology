@@ -315,7 +315,7 @@ public class InputSystem implements EventHandlerSystem {
         /*test*/
         String dropItemBind = "engine:dropItem";
         BindableButton dropBind = registerBindButton(dropItemBind, "Drop Item", new DropItemButton());
-        //  trowOoutBind.setRepeating(true);
+        dropBind.setRepeating(true);
         dropBind.setMode(BindableButton.ActivateMode.BOTH);
 
         linkBindButtonToKey(Keyboard.KEY_Q, dropItemBind);

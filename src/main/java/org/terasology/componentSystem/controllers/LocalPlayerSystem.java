@@ -44,6 +44,7 @@ import org.terasology.input.ButtonState;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
+import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;
@@ -52,12 +53,11 @@ import org.terasology.physics.ImpulseEvent;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.cameras.DefaultCamera;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.UIGraphicsElement;
 import org.terasology.utilities.FastRandom;
 
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
+import javax.vecmath.*;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -344,51 +344,68 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
     @ReceiveEvent(components = {LocalPlayerComponent.class})
     public void onDropItem(DropItemButton event, EntityRef entity){
+        LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
+        InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
+        EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayerComp.selectedTool);
+        BlockItemComponent block = selectedItemEntity.getComponent(BlockItemComponent.class);
 
-        /*if (!event.isDown() || timer.getTimeInMs() - lastInteraction < 200) {
+        if(!selectedItemEntity.hasComponent(BlockItemComponent.class) || block.blockFamily.getArchetypeBlock().isPenetrable()){
             return;
-        }    */
+        }
 
         if(event.getState() == ButtonState.DOWN && lastTimeThrowInteraction == 0){
             lastTimeThrowInteraction = timer.getTimeInMs();
             return;
         }
 
-        float dropPower  = (float)Math.floor((timer.getTimeInMs() - lastTimeThrowInteraction)/1000)*25f;
-        lastTimeThrowInteraction = 0;
-
-        if(dropPower>125f){
-            dropPower = 125f;
-        }
-        
-        LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
-        InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
         if (localPlayerComp.isDead) return;
 
-        EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayerComp.selectedTool);
+        UIGraphicsElement crossHair = (UIGraphicsElement)GUIManager.getInstance().getWindowById("engine:hud").getElementById("crosshair");
 
-        if(selectedItemEntity.hasComponent(BlockItemComponent.class)){
-            BlockItemComponent block = selectedItemEntity.getComponent(BlockItemComponent.class);
+        crossHair.getTextureSize().set(new Vector2f(22f / 256f, 22f / 256f));
+
+        float dropPower  = (float)Math.floor((timer.getTimeInMs() - lastTimeThrowInteraction)/200);
+
+        if(dropPower>6){
+            dropPower = 6;
+        }
+
+        crossHair.getTextureOrigin().set(new Vector2f((46f + 22f*dropPower) / 256f, 23f / 256f));
+
+        if(event.getState() == ButtonState.UP){
+            dropPower *= 25f;
+
             EntityManager entityManager = CoreRegistry.get(EntityManager.class);
             DroppedBlockFactory droppedBlockFactory = new DroppedBlockFactory(entityManager);
 
-            Vector3f newPosition = new Vector3f(playerCamera.getPosition().x + playerCamera.getViewingDirection().x*2,
-                                                playerCamera.getPosition().y + playerCamera.getViewingDirection().y*2,
-                                                playerCamera.getPosition().z + playerCamera.getViewingDirection().z*2
+            Vector3f newPosition = new Vector3f(playerCamera.getPosition().x + playerCamera.getViewingDirection().x*1.5f,
+                                                playerCamera.getPosition().y + playerCamera.getViewingDirection().y*1.5f,
+                                                playerCamera.getPosition().z + playerCamera.getViewingDirection().z*1.5f
                                                );
+
             EntityRef droppedBlock = droppedBlockFactory.newInstance(new Vector3f(newPosition), block.blockFamily, 20);
-            droppedBlock.send(new ImpulseEvent(new Vector3f(playerCamera.getViewingDirection().x*dropPower, playerCamera.getViewingDirection().y*dropPower, playerCamera.getViewingDirection().z*dropPower)));
 
-            ItemComponent item  = selectedItemEntity.getComponent(ItemComponent.class);
-            item.stackCount--;
+            if(!droppedBlock.equals(EntityRef.NULL)){
 
-            if(item.stackCount<=0){
-                selectedItemEntity.destroy();
+                droppedBlock.send(new ImpulseEvent(new Vector3f(playerCamera.getViewingDirection().x*dropPower, playerCamera.getViewingDirection().y*dropPower, playerCamera.getViewingDirection().z*dropPower)));
+
+                ItemComponent item  = selectedItemEntity.getComponent(ItemComponent.class);
+                item.stackCount--;
+
+                if(item.stackCount<=0){
+                    selectedItemEntity.destroy();
+                }
+
+                localPlayerComp.handAnimation = 0.5f;
             }
+
+            lastTimeThrowInteraction = 0;
+            crossHair.getTextureSize().set(new Vector2f(20f / 256f, 20f / 256f));
+            crossHair.getTextureOrigin().set(new Vector2f(24f / 256f, 24f / 256f));
+
 
         }
 
-        localPlayerComp.handAnimation = 0.5f;
         entity.saveComponent(localPlayerComp);
         event.consume();
     }
