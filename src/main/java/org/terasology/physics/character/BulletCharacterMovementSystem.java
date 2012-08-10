@@ -414,9 +414,8 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
 
             if (callback.hasHit()) {
                 hit = true;
-                break;
 
-                /*Vector3f contactPoint = null;
+                Vector3f contactPoint = null;
                 contactPoint = callback.hitPointWorld;
                 logger.info(contactPoint.toString());
 
@@ -427,8 +426,8 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
                     Vector3f toWorld = new Vector3f(contactPoint);
                     toWorld.y -= 0.2f;
                     CollisionWorld.ClosestRayResultCallback rayResult = new CollisionWorld.ClosestRayResultCallback(fromWorld, toWorld);
-                    callback.hitCollisionObject.getCollisionShape().setMargin(0);
                     CollisionWorld.rayTestSingle(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), fromWorld, 1.0f)), new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), toWorld, 1.0f)), callback.hitCollisionObject, callback.hitCollisionObject.getCollisionShape(), callback.hitCollisionObject.getWorldTransform(new Transform()), rayResult);
+
 
                     if (rayResult.hasHit()) {
                         normal = rayResult.hitNormalWorld;
@@ -456,17 +455,17 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
                         expectedMove.scale(((float) Math.sqrt(sqrDist) + HORIZONTAL_PENETRATION_LEEWAY));
                         targetPos.add(currentPos, expectedMove);
                     } else {
-                        if (!rayResult.hasHit()) {
+                        /*if (!rayResult.hasHit()) {
                             logger.info("Raycast missed");
-                        }
-                        hit = true;
+                        } */
+                        //hit = true;
                         break;
                     }
                 } else {
                     logger.info("No contact point");
                     hit = true;
                     break;
-                }    */
+                }
             } else {
                 break;
             }
@@ -484,7 +483,11 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
             }
             return false;
         } else {
-            position.set(currentPos);
+            if (stepDownAmount > 0) {
+                moveDown(fallAmount - steppedUpAmount, 0, 0, slopeFactor, collider, position);
+            } else {
+                position.set(currentPos);
+            }
             return true;
         }
     }

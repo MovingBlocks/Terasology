@@ -25,6 +25,7 @@ import com.google.gson.*;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.procedure.TIntProcedure;
+import org.lwjgl.BufferUtils;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetUri;
 import org.terasology.math.Rotation;
@@ -37,6 +38,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.util.List;
 import java.util.Locale;
 
@@ -133,6 +136,32 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShape> {
                 shape.setCollisionSymmetric(true);
             }
         }
+
+        /*private IndexedMesh toIndexedMesh(BlockMeshPart meshPart) {
+            IndexedMesh mesh = new IndexedMesh();
+            // 3 Floats per vertex
+            mesh.vertexBase = BufferUtils.createByteBuffer(meshPart.size() * 3 * 4);
+            mesh.vertexStride = 3 * 4;
+            // 3 Vertices per triangle, each index is a Integer
+            mesh.triangleIndexBase = BufferUtils.createByteBuffer(meshPart.indicesSize() * 4);
+            mesh.triangleIndexStride = 3 * 4;
+            mesh.numVertices = meshPart.size();
+            mesh.numTriangles = meshPart.indicesSize() / 3;
+            mesh.indexType = ScalarType.INTEGER;
+
+            ByteBuffer vertices = BufferUtils.createByteBuffer(3 * 4 * meshPart.size());
+            for (int i = 0; i < meshPart.size(); ++i) {
+                Vector3f vertex = meshPart.getVertex(i);
+                mesh.vertexBase.putFloat(vertex.x);
+                mesh.vertexBase.putFloat(vertex.y);
+                mesh.vertexBase.putFloat(vertex.z);
+            }
+            ByteBuffer indices = BufferUtils.createByteBuffer(meshPart.indicesSize() * 4);
+            for (int i = 0; i < meshPart.indicesSize(); ++i) {
+                mesh.triangleIndexBase.putInt(meshPart.getIndex(i));
+            }
+            return mesh;
+        }*/
 
         private ObjectArrayList<Vector3f> buildVertList(BlockShape shape) {
             ObjectArrayList<Vector3f> result = new ObjectArrayList<Vector3f>();
