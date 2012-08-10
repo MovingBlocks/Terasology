@@ -220,7 +220,6 @@ task runProtobufWindows(type:Exec) {
 
 /* Distributions: Application/Applet ----------------------------------------*/
 task distMods {
-    mkdir("$buildDir/$destDirMods") // TODO Remove or change mkdir
     file('mods').listFiles().each { File mod ->
         if (mod.isDirectory() ) {
             task('distMod-' + mod.getName(), type: Zip) {
