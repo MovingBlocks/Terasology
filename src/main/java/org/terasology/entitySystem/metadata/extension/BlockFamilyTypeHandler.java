@@ -35,7 +35,7 @@ public class BlockFamilyTypeHandler implements TypeHandler<BlockFamily> {
 
     public BlockFamily deserialize(EntityData.Value value) {
         if (value.getStringCount() > 0) {
-            return BlockManager.getInstance().getBlockFamily(new BlockUri(value.getString(0)));
+            return BlockManager.getInstance().getBlockFamily(value.getString(0));
         }
         return null;
     }
@@ -55,7 +55,7 @@ public class BlockFamilyTypeHandler implements TypeHandler<BlockFamily> {
     public List<BlockFamily> deserializeList(EntityData.Value value) {
         List<BlockFamily> result = Lists.newArrayListWithCapacity(value.getStringCount());
         for (String item : value.getStringList()) {
-            result.add(BlockManager.getInstance().getBlockFamily(new BlockUri(item)));
+            result.add(BlockManager.getInstance().getBlockFamily(item));
         }
         return result;
     }

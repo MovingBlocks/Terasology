@@ -43,11 +43,11 @@ public class LiquidsGenerator implements ChunkGenerator {
     private Block lava;
 
     public LiquidsGenerator() {
-        grass = BlockManager.getInstance().getBlock(new BlockUri("engine:Grass"));
-        snow = BlockManager.getInstance().getBlock(new BlockUri("engine:Snow"));
-        water = BlockManager.getInstance().getBlock(new BlockUri("engine:Water"));
-        lava = BlockManager.getInstance().getBlock(new BlockUri("engine:Lava"));
-        stone = BlockManager.getInstance().getBlock(new BlockUri("engine:Stone"));
+        grass = BlockManager.getInstance().getBlock("engine:Grass");
+        snow = BlockManager.getInstance().getBlock("engine:Snow");
+        water = BlockManager.getInstance().getBlock("engine:Water");
+        lava = BlockManager.getInstance().getBlock("engine:Lava");
+        stone = BlockManager.getInstance().getBlock("engine:Stone");
     }
 
     @Override

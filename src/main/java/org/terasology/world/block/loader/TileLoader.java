@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -45,6 +46,7 @@ public class TileLoader implements AssetLoader<Tile> {
         if (image.getHeight() == TILE_SIZE && image.getWidth() == TILE_SIZE) {
             return new Tile(uri, image);
         }
+        logger.log(Level.SEVERE, "Invalid tile '" + uri + "', tiles must be 16x16");
         return null;
     }
 }

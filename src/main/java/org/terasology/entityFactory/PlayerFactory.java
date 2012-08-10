@@ -50,24 +50,24 @@ public class PlayerFactory {
         player.addComponent(new LocalPlayerComponent());
 
         // Goodie chest
-        EntityRef chest = blockFactory.newInstance(BlockManager.getInstance().getBlockFamily(new BlockUri("engine:chest")));
+        EntityRef chest = blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("core:chest"));
         BlockItemComponent blockItem = chest.getComponent(BlockItemComponent.class);
         EntityRef chestContents = blockItem.placedEntity;
 
-        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:companion"), 99)));
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("core:companion"), 99)));
         chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:BrickStair"), 99)));
-        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Tnt"), 99)));
-        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Bookcase"), 1)));
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("core:Tnt"), 99)));
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("core:Bookcase"), 1)));
 
-        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:ClaySlope"), 99)));
-        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:ClaySteepSlope"), 99)));
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:ClaySlope"), 99)));
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:ClaySteepSlope"), 99)));
         chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:StoneStair"), 99)));
-        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:MarbleStair"), 99)));
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:MarbleStair"), 99)));
 
-        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Marble"), 99)));
-        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:MarbleSphere"), 99)));
-        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:MarbleSlope"), 99)));
-        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:MarbleSteepSlope"), 99)));
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:Marble"), 99)));
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:MarbleSphere"), 99)));
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:MarbleSlope"), 99)));
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:MarbleSteepSlope"), 99)));
 
         chestContents.send(new ReceiveItemEvent(entityManager.create("core:purplepotion")));
         chestContents.send(new ReceiveItemEvent(entityManager.create("core:greenpotion")));
@@ -80,33 +80,33 @@ public class PlayerFactory {
         chestContents.send(new ReceiveItemEvent(entityManager.create("core:railgunTool")));
 
         chestContents.send(new ReceiveItemEvent(entityManager.create("core:mrbarsack")));
-        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Cobaltite"), 99)));
-        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:NativeGoldOre"), 99)));
-        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Microcline"), 99)));
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:Cobaltite"), 99)));
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:NativeGoldOre"), 99)));
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:Microcline"), 99)));
 
         chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Brick"), 99)));
         chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Ice"), 99)));
         chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Plank"), 99)));
 
         // Inner goodie chest
-        EntityRef innerChest = blockFactory.newInstance(BlockManager.getInstance().getBlockFamily(new BlockUri("engine:Chest")));
+        EntityRef innerChest = blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("core:Chest"));
         BlockItemComponent innerBlockItem = innerChest.getComponent(BlockItemComponent.class);
         EntityRef innerChestContents = innerBlockItem.placedEntity;
 
-        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Alabaster"), 99)));
-        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Basalt"), 99)));
-        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Gabbro"), 99)));
-        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Hornblende"), 99)));
+        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:Alabaster"), 99)));
+        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:Basalt"), 99)));
+        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:Gabbro"), 99)));
+        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:Hornblende"), 99)));
 
-        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:OrangeSandStone"), 99)));
-        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Phyllite"), 99)));
-        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Schist"), 99)));
-        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Cinnabar"), 99)));
+        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:OrangeSandStone"), 99)));
+        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:Phyllite"), 99)));
+        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:Schist"), 99)));
+        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:Cinnabar"), 99)));
 
         innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Lava"), 99)));
         innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Water"), 99)));
-        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Rutile"), 99)));
-        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Kaolinite"), 99)));
+        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:Rutile"), 99)));
+        innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:Kaolinite"), 99)));
 
         innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Iris"), 99)));
         innerChestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Dandelion"), 99)));
@@ -118,7 +118,7 @@ public class PlayerFactory {
 
         player.send(new ReceiveItemEvent(entityManager.create("core:pickaxe")));
         player.send(new ReceiveItemEvent(entityManager.create("core:axe")));
-        player.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily(new BlockUri("engine:Torch")), 99)));
+        player.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Torch"), 99)));
         player.send(new ReceiveItemEvent(entityManager.create("core:explodeTool")));
         player.send(new ReceiveItemEvent(entityManager.create("core:railgunTool")));
         player.send(new ReceiveItemEvent(entityManager.create("core:miniaturizer")));

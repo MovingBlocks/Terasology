@@ -20,6 +20,7 @@ import gnu.trove.iterator.TObjectByteIterator;
 import gnu.trove.map.hash.TByteObjectHashMap;
 import gnu.trove.map.hash.TObjectByteHashMap;
 import org.lwjgl.BufferUtils;
+import org.terasology.entitySystem.EntityManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.BlockUri;
@@ -192,5 +193,9 @@ public class BlockManager {
 
         buffer.flip();
         return buffer;
+    }
+
+    public boolean hasBlockFamily(BlockUri uri) {
+        return familyByUri.containsKey(uri);
     }
 }

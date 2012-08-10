@@ -72,11 +72,11 @@ public class LiquidSimulator implements EventHandlerSystem {
     public void initialise() {
         world = CoreRegistry.get(WorldProvider.class);
         air = BlockManager.getInstance().getAir();
-        grass = BlockManager.getInstance().getBlock(new BlockUri("engine:Grass"));
-        snow = BlockManager.getInstance().getBlock(new BlockUri("engine:Snow"));
-        dirt = BlockManager.getInstance().getBlock(new BlockUri("engine:Dirt"));
-        water = BlockManager.getInstance().getBlock(new BlockUri("engine:Water"));
-        lava = BlockManager.getInstance().getBlock(new BlockUri("engine:Lava"));
+        grass = BlockManager.getInstance().getBlock("engine:Grass");
+        snow = BlockManager.getInstance().getBlock("engine:Snow");
+        dirt = BlockManager.getInstance().getBlock("engine:Dirt");
+        water = BlockManager.getInstance().getBlock("engine:Water");
+        lava = BlockManager.getInstance().getBlock("engine:Lava");
 
         blockQueue = Queues.newLinkedBlockingQueue();
 

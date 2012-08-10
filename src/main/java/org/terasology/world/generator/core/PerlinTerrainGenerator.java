@@ -46,6 +46,10 @@ public class PerlinTerrainGenerator implements ChunkGenerator {
     private Block water = BlockManager.getInstance().getBlock("engine:Water");
     private Block ice = BlockManager.getInstance().getBlock("engine:Ice");
     private Block stone = BlockManager.getInstance().getBlock("engine:Stone");
+    private Block sand = BlockManager.getInstance().getBlock("engine:Sand");
+    private Block grass = BlockManager.getInstance().getBlock("engine:Grass");
+    private Block snow = BlockManager.getInstance().getBlock("engine:Snow");
+    private Block dirt = BlockManager.getInstance().getBlock("engine:Dirt");
 
     @Override
     public void setWorldSeed(String seed) {
@@ -166,32 +170,32 @@ public class PerlinTerrainGenerator implements ChunkGenerator {
             case MOUNTAINS:
                 // Beach
                 if (y >= 28 && y <= 34) {
-                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock(new BlockUri("engine:Sand")));
+                    c.setBlock(x, y, z, sand);
                 } else if (depth == 0 && y > 32 && y < 128) {
                     // Grass on top
-                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock(new BlockUri("engine:Grass")));
+                    c.setBlock(x, y, z, grass);
                 } else if (depth == 0 && y >= 128) {
                     // Grass on top
-                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock(new BlockUri("engine:Snow")));
+                    c.setBlock(x, y, z, snow);
                 } else if (depth > 32) {
                     // Stone
-                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock(new BlockUri("engine:Stone")));
+                    c.setBlock(x, y, z, stone);
                 } else {
                     // Dirt
-                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock(new BlockUri("engine:Dirt")));
+                    c.setBlock(x, y, z, dirt);
                 }
 
                 break;
             case SNOW:
                 if (depth == 0.0 && y > 32) {
                     // Snow on top
-                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock(new BlockUri("engine:Snow")));
+                    c.setBlock(x, y, z, snow);
                 } else if (depth > 32) {
                     // Stone
-                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock(new BlockUri("engine:Stone")));
+                    c.setBlock(x, y, z, stone);
                 } else {
                     // Dirt
-                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock(new BlockUri("engine:Dirt")));
+                    c.setBlock(x, y, z, dirt);
                 }
 
                 break;
@@ -199,9 +203,9 @@ public class PerlinTerrainGenerator implements ChunkGenerator {
             case DESERT:
                 if (depth > 8) {
                     // Stone
-                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock(new BlockUri("engine:Stone")));
+                    c.setBlock(x, y, z, stone);
                 } else {
-                    c.setBlock(x, y, z, BlockManager.getInstance().getBlock(new BlockUri("engine:Sand")));
+                    c.setBlock(x, y, z, sand);
                 }
 
                 break;

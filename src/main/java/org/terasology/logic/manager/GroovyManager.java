@@ -159,7 +159,7 @@ public class GroovyManager {
         }
 
         public void giveBlock(String title, int quantity) {
-            BlockFamily blockFamily = BlockManager.getInstance().getBlockFamily(new BlockUri(title));
+            BlockFamily blockFamily = BlockManager.getInstance().getBlockFamily(title);
             giveBlock(blockFamily, quantity);
         }
 

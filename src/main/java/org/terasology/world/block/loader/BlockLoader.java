@@ -67,6 +67,7 @@ public class BlockLoader {
     private static final int MAX_BLOCKS = 256;
     private static final int MAX_TILES = 256;
     private static final int NUM_MIPMAPS = 5;
+    public static final String AUTO_BLOCK_URL_FRAGMENT = "/auto/";
 
     private Logger logger = Logger.getLogger(getClass().getName());
     private JsonParser parser;
@@ -77,8 +78,6 @@ public class BlockLoader {
 
     private TObjectIntMap<AssetUri> tileIndexes = new TObjectIntHashMap<AssetUri>();
     private List<Tile> tiles = Lists.newArrayList();
-
-    private List<BlockFamily> blockFamilies = Lists.newArrayList();
 
     public BlockLoader() {
         parser = new JsonParser();
@@ -95,7 +94,20 @@ public class BlockLoader {
 
     public void load() {
         loadBlocks();
-        registerBlocks();
+        loadAutoBlocks();
+    }
+
+    private void loadAutoBlocks() {
+        logger.log(Level.INFO, "Loading Auto Blocks...");
+        BlockDefinition defaultBlockDef = new BlockDefinition();
+        for (AssetUri blockTileUri : AssetManager.list(AssetType.BLOCK_TILE)) {
+            if (AssetManager.getInstance().getAssetURLs(blockTileUri).get(0).getPath().contains(AUTO_BLOCK_URL_FRAGMENT)) {
+                BlockUri uri = new BlockUri(blockTileUri.getPackage(), blockTileUri.getAssetName());
+                if (!BlockManager.getInstance().hasBlockFamily(uri)) {
+                    processSingleBlockFamily(blockTileUri, defaultBlockDef);
+                }
+            }
+        }
     }
 
     public void buildAtlas() {
@@ -150,18 +162,20 @@ public class BlockLoader {
         return result;
     }
 
-    private void registerBlocks() {
-        BlockManager.getInstance().addAllBlockFamilies(blockFamilies);
-    }
-
     private void loadBlocks() {
         logger.log(Level.INFO, "Loading Blocks...");
         for (AssetUri blockDefUri : AssetManager.list(AssetType.BLOCK_DEFINITION)) {
-            logger.log(Level.INFO, "Loading " + blockDefUri);
             try {
                 JsonElement rawJson = readJson(blockDefUri);
                 if (rawJson != null) {
                     JsonObject blockDefJson = rawJson.getAsJsonObject();
+                    // Don't process templates
+                    if (blockDefJson.has("template") && blockDefJson.get("template").getAsBoolean()) {
+                        continue;
+                    }
+                    logger.log(Level.INFO, "Loading " + blockDefUri);
+                    inheritData(blockDefUri, blockDefJson);
+
                     BlockDefinition blockDef = loadBlockDefinition(blockDefJson);
 
                     if (blockDef.liquid) {
@@ -184,7 +198,27 @@ public class BlockLoader {
                 }
             } catch (JsonParseException e) {
                 logger.log(Level.SEVERE, "Failed to load block '" + blockDefUri + "'", e);
+            } catch (NullPointerException e) {
+                logger.log(Level.SEVERE, "Failed to load block '" + blockDefUri + "'", e);
             }
+        }
+    }
+
+    private void inheritData(AssetUri rootAssetUri, JsonObject blockDefJson) {
+
+        JsonObject parentObj = blockDefJson;
+        while (parentObj.has("basedOn")) {
+            AssetUri parentUri = new AssetUri(AssetType.BLOCK_DEFINITION, parentObj.get("basedOn").getAsString());
+            if (rootAssetUri.equals(parentUri)) {
+                logger.severe("Circular inheritance detected in " + rootAssetUri);
+                break;
+            } else if (!parentUri.isValid()) {
+                logger.severe(rootAssetUri + " based on invalid uri: " + parentObj.get("basedOn").getAsString());
+                break;
+            }
+            JsonObject parent = readJson(parentUri).getAsJsonObject();
+            mergeJsonInto(parent, blockDefJson);
+            parentObj = parent;
         }
     }
 
@@ -216,16 +250,15 @@ public class BlockLoader {
     }
 
     private void mergeJsonInto(JsonObject from, JsonObject to) {
-
         for (Map.Entry<String, JsonElement> entry : from.entrySet()) {
             if (entry.getValue().isJsonObject()) {
-               if (to.has(entry.getKey())) {
-
-               } else {
+               if (!to.has(entry.getKey())) {
                    to.add(entry.getKey(), entry.getValue());
                }
             } else {
-                to.add(entry.getKey(), entry.getValue());
+                if (!to.has(entry.getKey())) {
+                    to.add(entry.getKey(), entry.getValue());
+                }
             }
         }
     }
@@ -238,13 +271,13 @@ public class BlockLoader {
     }
 
     private Block constructSingleBlock(AssetUri blockDefUri, BlockDefinition blockDef) {
-        Map<BlockPart, Integer> tileIndices = prepareTiles(blockDef, blockDefUri.getSimpleString());
+        Map<BlockPart, AssetUri> tileUris = prepareTiles(blockDef, blockDefUri.getSimpleString());
         Map<BlockPart, Block.ColorSource> colorSourceMap = prepareColorSources(blockDef);
         Map<BlockPart, Vector4f> colorOffsetsMap = prepareColorOffsets(blockDef);
         BlockShape shape = getShape(blockDef);
 
         Block block = createRawBlock(blockDef, properCase(blockDefUri.getAssetName()));
-        applyShape(block, shape, tileIndices, Rotation.NONE);
+        applyShape(block, shape, tileUris, Rotation.NONE);
 
         for (BlockPart part : BlockPart.values()) {
             block.setColorSource(part, colorSourceMap.get(part));
@@ -253,7 +286,7 @@ public class BlockLoader {
 
         // Lowered mesh for liquids
         if (block.isLiquid()) {
-            applyLoweredShape(block, loweredShape, tileIndices);
+            applyLoweredShape(block, loweredShape, tileUris);
         }
         return block;
     }
@@ -267,14 +300,14 @@ public class BlockLoader {
     }
 
     private void constructHorizontalBlocks(AssetUri blockDefUri, BlockDefinition blockDef, Map<Side, Block> blockMap) {
-        Map<BlockPart, Integer> tileIndices = prepareTiles(blockDef, blockDefUri.getSimpleString());
+        Map<BlockPart, AssetUri> tileUris = prepareTiles(blockDef, blockDefUri.getSimpleString());
         Map<BlockPart, Block.ColorSource> colorSourceMap = prepareColorSources(blockDef);
         Map<BlockPart, Vector4f> colorOffsetsMap = prepareColorOffsets(blockDef);
         BlockShape shape = getShape(blockDef);
 
         for (Rotation rot : Rotation.horizontalRotations()) {
             Block block = createRawBlock(blockDef, properCase(blockDefUri.getAssetName()));
-            applyShape(block, shape, tileIndices, rot);
+            applyShape(block, shape, tileUris, rot);
 
             for (BlockPart part : BlockPart.values()) {
                 block.setColorSource(part, colorSourceMap.get(part));
@@ -286,7 +319,7 @@ public class BlockLoader {
     }
 
     private void registerFamily(BlockFamily family) {
-        blockFamilies.add(family);
+        BlockManager.getInstance().addBlockFamily(family);
     }
 
     private Map<BlockPart, Vector4f> prepareColorOffsets(BlockDefinition blockDef) {
@@ -330,9 +363,11 @@ public class BlockLoader {
         return shape;
     }
 
-    private void applyShape(Block block, BlockShape shape, Map<BlockPart, Integer> tileIndices, Rotation rot) {
+    private void applyShape(Block block, BlockShape shape, Map<BlockPart, AssetUri> tileUris, Rotation rot) {
         for (BlockPart part : BlockPart.values()) {
-            Vector2f atlasPos = calcAtlasPositionForId(tileIndices.get(part));
+            // TODO: Need to be more sensible with the texture atlas. Because things like block particles read from a part that may not exist, we're being fairly lenient
+            int tileIndex = getTileIndex(tileUris.get(part), shape.getMeshPart(part) != null);
+            Vector2f atlasPos = calcAtlasPositionForId(tileIndex);
             BlockPart targetPart = rot.rotate(part);
             block.setTextureAtlasPos(targetPart, atlasPos);
             if (shape.getMeshPart(part) != null) {
@@ -345,10 +380,10 @@ public class BlockLoader {
         block.setCollision(shape.getCollisionOffset(rot), shape.getCollisionShape(rot));
     }
 
-    private void applyLoweredShape(Block block, BlockShape shape, Map<BlockPart, Integer> tileIndices) {
+    private void applyLoweredShape(Block block, BlockShape shape, Map<BlockPart, AssetUri> tileUris) {
         for (Side side : Side.values()) {
             BlockPart part = BlockPart.fromSide(side);
-            block.setLoweredLiquidMesh(part.getSide(), shape.getMeshPart(part).rotate(Rotation.NONE.getQuat4f()).mapTexCoords(calcAtlasPositionForId(tileIndices.get(part)), Block.TEXTURE_OFFSET_WIDTH));
+            block.setLoweredLiquidMesh(part.getSide(), shape.getMeshPart(part).rotate(Rotation.NONE.getQuat4f()).mapTexCoords(calcAtlasPositionForId(getTileIndex(tileUris.get(part), true)), Block.TEXTURE_OFFSET_WIDTH));
         }
     }
 
@@ -392,43 +427,42 @@ public class BlockLoader {
         return block;
     }
 
-    private Map<BlockPart, Integer> prepareTiles(BlockDefinition blockDef, String defaultName) {
-        Map<BlockPart, Integer> tileIndices = Maps.newEnumMap(BlockPart.class);
+    private Map<BlockPart, AssetUri> prepareTiles(BlockDefinition blockDef, String defaultName) {
+        Map<BlockPart, AssetUri> tileUris = Maps.newEnumMap(BlockPart.class);
         if (!blockDef.tile.isEmpty()) {
             defaultName = blockDef.tile;
         }
-        int tileId = getTileIndex(defaultName);
+        AssetUri tileUri = new AssetUri(AssetType.BLOCK_TILE, defaultName);
         for (BlockPart part : BlockPart.values()) {
-            tileIndices.put(part, tileId);
+            tileUris.put(part, tileUri);
         }
 
         if (blockDef.tiles != null) {
             for (BlockPart part : BlockPart.values()) {
                 String partTile = blockDef.tiles.map.get(part);
                 if (partTile != null) {
-                    tileId = getTileIndex(blockDef.tiles.map.get(part));
-                    tileIndices.put(part, tileId);
+                    tileUri = new AssetUri(AssetType.BLOCK_TILE, blockDef.tiles.map.get(part));
+                    tileUris.put(part, tileUri);
                 }
             }
         }
-        return tileIndices;
+        return tileUris;
     }
 
-    private int getTileIndex(String tileUri) {
-        AssetUri uri = new AssetUri(AssetType.BLOCK_TILE, tileUri);
-        if (tileIndexes.containsKey(tileUri)) {
-            return tileIndexes.get(tileUri);
+    private int getTileIndex(AssetUri uri, boolean warnOnError) {
+        if (tileIndexes.containsKey(uri)) {
+            return tileIndexes.get(uri);
         }
-        Tile tile = (Tile)AssetManager.load(uri);
+        Tile tile = (Tile)AssetManager.tryLoad(uri);
         if (tile != null) {
             int index = tiles.size();
             tiles.add(tile);
             tileIndexes.put(uri, index);
             return index;
-        } else {
+        } else if (warnOnError) {
             logger.warning("Unable to resolve block tile '" + uri + "'");
-            return 0;
         }
+        return 0;
     }
 
     private JsonElement readJson(AssetUri blockDefUri) {
