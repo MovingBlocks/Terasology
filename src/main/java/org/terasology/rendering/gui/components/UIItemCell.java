@@ -368,7 +368,7 @@ public class UIItemCell extends UIDisplayContainer  {
             
             if (item != null) {
                 if (blockItem != null)
-                    itemLabel.setText(blockItem.blockFamily.getTitle());
+                    itemLabel.setText(blockItem.blockFamily.getDisplayName());
                 else
                     itemLabel.setText(item.name);
             }

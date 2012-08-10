@@ -22,7 +22,6 @@ import static org.lwjgl.openal.AL10.*;
 public abstract class AbstractSound implements Sound {
 
     // TODO: Do we have proper support for unloading sounds (as mods are changed?)
-    private static int bufferAmount = 0;
 
     private AssetUri uri;
     private int bufferId = 0;
@@ -33,8 +32,6 @@ public abstract class AbstractSound implements Sound {
         this.bufferId = bufferId;
 
         OpenALException.checkState("Allocating sound buffer");
-
-        bufferAmount++;
     }
 
     @Override
@@ -85,9 +82,12 @@ public abstract class AbstractSound implements Sound {
     }
 
     @Override
-    protected void finalize() throws Throwable {
+    public void dispose() {
         if (bufferId != 0) {
-            alDeleteBuffers(bufferId);
+            // TODO: need to ensure the sound is not in use, or stop it?
+            //alDeleteBuffers(bufferId);
+            //bufferId = 0;
+            //OpenALException.checkState("Deleting buffer data");
         }
     }
 }

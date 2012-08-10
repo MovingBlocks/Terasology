@@ -23,8 +23,8 @@ import org.terasology.asset.AssetManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
-import org.terasology.logic.world.WorldInfo;
-import org.terasology.logic.world.WorldUtil;
+import org.terasology.world.WorldInfo;
+import org.terasology.world.WorldUtil;
 import org.terasology.rendering.gui.components.*;
 import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -183,7 +183,7 @@ public class UIMenuSelectWorld extends UIDisplayWindow {
             Config.getInstance().setWorldTitle(info.getTitle());
             Config.getInstance().setChunkGenerator(info.getChunkGenerators());
             // TODO: Need to load time too. Maybe just pass through WorldInfo?
-            CoreRegistry.get(GameEngine.class).changeState(new StateSinglePlayer(info.getTitle(), info.getSeed(), info.getTime()));
+            CoreRegistry.get(GameEngine.class).changeState(new StateSinglePlayer(info));
         } catch (Exception e) {
             GUIManager.getInstance().showMessage("Error", "Failed reading world data object. Sorry.");
         }

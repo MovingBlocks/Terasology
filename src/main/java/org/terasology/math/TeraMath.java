@@ -16,7 +16,7 @@
 package org.terasology.math;
 
 import org.lwjgl.BufferUtils;
-import org.terasology.logic.world.chunks.Chunk;
+import org.terasology.world.chunks.Chunk;
 
 import javax.vecmath.Matrix4f;
 import java.nio.FloatBuffer;

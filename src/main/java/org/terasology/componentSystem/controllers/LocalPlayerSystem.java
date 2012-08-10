@@ -15,10 +15,7 @@
  */
 package org.terasology.componentSystem.controllers;
 
-import com.bulletphysics.collision.dispatch.CollisionFlags;
-import com.bulletphysics.linearmath.AabbUtil2;
 import com.bulletphysics.linearmath.QuaternionUtil;
-import com.bulletphysics.linearmath.Transform;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.*;
@@ -45,9 +42,9 @@ import org.terasology.input.CameraTargetSystem;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.logic.world.WorldProvider;
+import org.terasology.world.WorldProvider;
 import org.terasology.math.TeraMath;
-import org.terasology.model.blocks.Block;
+import org.terasology.world.block.Block;
 import org.terasology.math.AABB;
 import org.terasology.physics.ImpulseEvent;
 import org.terasology.physics.character.CharacterMovementComponent;
@@ -57,7 +54,10 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 import org.terasology.utilities.FastRandom;
 
-import javax.vecmath.*;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
+import javax.vecmath.Vector2f;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -199,7 +199,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             BlockComponent blockComp = target.getComponent(BlockComponent.class);
             if (blockComp != null) {
                 Block block = worldProvider.getBlock(blockComp.getPosition());
-                if (block.isRenderBoundingBox()) {
+                if (block.isTargetable()) {
                     aabb = block.getBounds(blockComp.getPosition());
                 }
             } else {
@@ -321,8 +321,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             BlockComponent blockComp = target.getComponent(BlockComponent.class);
             if (blockComp != null) {
                 Block block = worldProvider.getBlock(blockComp.getPosition());
-                if (item.getPerBlockDamageBonus().containsKey(block.getBlockFamily().getTitle())) {
-                    damage += item.getPerBlockDamageBonus().get(block.getBlockFamily().getTitle());
+                if (item.getPerBlockDamageBonus().containsKey(block.getBlockFamily().getURI().toString())) {
+                    damage += item.getPerBlockDamageBonus().get(block.getBlockFamily().getURI().toString());
                 }
             }
         }

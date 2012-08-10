@@ -27,15 +27,14 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.ShaderManager;
-import org.terasology.logic.world.WorldProvider;
-import org.terasology.math.Side;
-import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockPart;
+import org.terasology.world.block.management.BlockManager;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 
-import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 import java.nio.FloatBuffer;
@@ -146,8 +145,8 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
             if (!worldProvider.isBlockActive(worldPos)) {
                 continue;
             }
-            double temperature = worldProvider.getBiomeProvider().getTemperatureAt((int) worldPos.x, (int) worldPos.z);
-            double humidity = worldProvider.getBiomeProvider().getHumidityAt((int) worldPos.x, (int) worldPos.z);
+            float temperature = worldProvider.getBiomeProvider().getTemperatureAt((int) worldPos.x, (int) worldPos.z);
+            float humidity = worldProvider.getBiomeProvider().getHumidityAt((int) worldPos.x, (int) worldPos.z);
 
             glPushMatrix();
             glTranslated(worldPos.x - cameraPosition.x, worldPos.y - cameraPosition.y, worldPos.z - cameraPosition.z);
@@ -190,7 +189,7 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
         GL11.glLoadMatrix(model);
     }
 
-    protected void renderParticle(Particle particle, byte blockType, double temperature, double humidity, float light) {
+    protected void renderParticle(Particle particle, byte blockType, float temperature, float humidity, float light) {
         int displayList = displayLists.get(BlockManager.getInstance().getBlock(blockType).getBlockFamily());
         if (displayList == 0) {
             displayList = glGenLists(1);
@@ -202,7 +201,7 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
 
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("particle");
 
-        Vector4f color = BlockManager.getInstance().getBlock(blockType).calcColorOffsetFor(Side.FRONT, temperature, humidity);
+        Vector4f color = BlockManager.getInstance().getBlock(blockType).calcColorOffsetFor(BlockPart.FRONT, temperature, humidity);
         shader.setFloat3("colorOffset", color.x, color.y, color.z);
         shader.setFloat("texOffsetX", particle.texOffset.x);
         shader.setFloat("texOffsetY", particle.texOffset.y);
@@ -215,16 +214,16 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
         Block b = BlockManager.getInstance().getBlock(blockType);
 
         glBegin(GL_QUADS);
-        GL11.glTexCoord2f(b.calcTextureOffsetFor(Side.FRONT).x, b.calcTextureOffsetFor(Side.FRONT).y);
+        GL11.glTexCoord2f(b.getTextureOffsetFor(BlockPart.FRONT).x, b.getTextureOffsetFor(BlockPart.FRONT).y);
         GL11.glVertex3f(-0.5f, -0.5f, 0.0f);
 
-        GL11.glTexCoord2f(b.calcTextureOffsetFor(Side.FRONT).x + TEX_SIZE, b.calcTextureOffsetFor(Side.FRONT).y);
+        GL11.glTexCoord2f(b.getTextureOffsetFor(BlockPart.FRONT).x + TEX_SIZE, b.getTextureOffsetFor(BlockPart.FRONT).y);
         GL11.glVertex3f(0.5f, -0.5f, 0.0f);
 
-        GL11.glTexCoord2f(b.calcTextureOffsetFor(Side.FRONT).x + TEX_SIZE, b.calcTextureOffsetFor(Side.FRONT).y + TEX_SIZE);
+        GL11.glTexCoord2f(b.getTextureOffsetFor(BlockPart.FRONT).x + TEX_SIZE, b.getTextureOffsetFor(BlockPart.FRONT).y + TEX_SIZE);
         GL11.glVertex3f(0.5f, 0.5f, 0.0f);
 
-        GL11.glTexCoord2f(b.calcTextureOffsetFor(Side.FRONT).x, b.calcTextureOffsetFor(Side.FRONT).y + TEX_SIZE);
+        GL11.glTexCoord2f(b.getTextureOffsetFor(BlockPart.FRONT).x, b.getTextureOffsetFor(BlockPart.FRONT).y + TEX_SIZE);
         GL11.glVertex3f(-0.5f, 0.5f, 0.0f);
         glEnd();
 

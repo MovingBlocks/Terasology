@@ -23,8 +23,8 @@ package org.terasology.mods.miniions.logic.pathfinder;
  * To change this template use File | Settings | File Templates.
  */
 
-import org.terasology.logic.world.WorldProvider;
-import org.terasology.model.blocks.Block;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.block.Block;
 
 import javax.vecmath.Vector3f;
 import java.util.List;
