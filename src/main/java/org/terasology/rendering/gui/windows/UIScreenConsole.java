@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.menus;
+package org.terasology.rendering.gui.windows;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
@@ -43,7 +43,7 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public final class UIDebugConsole extends UIDisplayWindow {
+public final class UIScreenConsole extends UIDisplayWindow {
 
     private Logger logger = Logger.getLogger(getClass().getName());
     private final UIText _consoleText;
@@ -58,7 +58,7 @@ public final class UIDebugConsole extends UIDisplayWindow {
     /**
      * Init. a new Terasology console.
      */
-    public UIDebugConsole() {
+    public UIScreenConsole() {
         setPosition(new Vector2f(0, 0));
         setSize(new Vector2f(Display.getDisplayMode().getWidth(), Display.getDisplayMode().getHeight()));
 

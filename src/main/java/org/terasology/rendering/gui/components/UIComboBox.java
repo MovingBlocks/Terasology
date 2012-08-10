@@ -30,6 +30,10 @@ import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 
 import javax.vecmath.Vector2f;
 
+/**
+ * A combo box.
+ *
+ */
 public class UIComboBox extends UIDisplayContainer {
     private UIInput  _baseInput;
     private UIButton _baseButton;
@@ -37,10 +41,19 @@ public class UIComboBox extends UIDisplayContainer {
 
     private boolean _opened;
 
+    /**
+     * Creates a combo box with the given size.
+     * @param size
+     */
     public UIComboBox(Vector2f size){
         initBaseItems(size, new Vector2f(size.x - 2, size.x + size.x/2 - 2));
     }
     
+    /**
+     * Creates a combo box with the given size for the combo box size and the list size.
+     * @param size The size of the combo box (without the list).
+     * @param listSize The size of the list.
+     */
     public UIComboBox(Vector2f size, Vector2f listSize){
         initBaseItems(size, listSize);
     }
@@ -150,14 +163,27 @@ public class UIComboBox extends UIDisplayContainer {
         _baseList.addItem(text, value);
     }
     
+    /**
+     * Select an specific item in the list.
+     * @param i The item to select.
+     */
     public void setSelectedItemIndex(int i) {
     	_baseList.setSelectedItemIndex(i);
     }
     
+    /**
+     * Get the selected item in the list.
+     * @return Returns the selected item.
+     */
     public int getSelectedItemIndex() {
 		return _baseList.getSelectedItemIndex();
 	}
     
+    /**
+     * Get the value of the selected item in the combo box list.
+     * @return Returns the value of the selected item. If no data is attached to the list entry null will be returned.
+     * @see UIList
+     */
     public Object getValue() {
     	return _baseList.getValue();
     }

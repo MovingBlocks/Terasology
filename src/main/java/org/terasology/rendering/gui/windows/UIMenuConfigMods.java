@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.menus;
+package org.terasology.rendering.gui.windows;
 
 import org.terasology.asset.AssetManager;
 import org.terasology.rendering.gui.components.UIButton;
@@ -28,7 +28,7 @@ import javax.vecmath.Vector2f;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  *         Date: 29/07/12
  */
-public class UIConfigMenuMods extends UIDisplayWindow {
+public class UIMenuConfigMods extends UIDisplayWindow {
 
     final UIImageOverlay _overlay;
     final UIGraphicsElement _title;
@@ -37,7 +37,7 @@ public class UIConfigMenuMods extends UIDisplayWindow {
             _minionOptionsButton,
             _backToConfigMenuButton;
 
-    public UIConfigMenuMods() {
+    public UIMenuConfigMods() {
         maximize();
         _title = new UIGraphicsElement(AssetManager.loadTexture("engine:terasology"));
         _title.setVisible(true);

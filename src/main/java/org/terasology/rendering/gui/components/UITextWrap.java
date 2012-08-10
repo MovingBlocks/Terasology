@@ -35,6 +35,9 @@ import java.util.Iterator;
  * Simple text element supporting text shadowing.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * 
+ * TODO clean this up / write from scratch.
+ * TODO this is directly bind to the debug console? If so it should not work this way. Make an abstract widget out of this, which can also be used in other places.
  */
 public class UITextWrap extends UIText {
 

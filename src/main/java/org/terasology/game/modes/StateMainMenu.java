@@ -26,7 +26,7 @@ import org.terasology.rendering.gui.components.UISlider;
 import org.terasology.rendering.gui.components.UIStateButton;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
-import org.terasology.rendering.gui.menus.*;
+import org.terasology.rendering.gui.windows.*;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -45,13 +45,13 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class StateMainMenu implements GameState {
     /* SCREENS */
-    private UIMainMenu _mainMenu;
-    private UIConfigMenu _configMenu;
-    private UIConfigMenuVideo _configMenuVideo;
-    private UIConfigMenuAudio _configMenuAudio;
-    private UIConfigMenuControls _configMenuControls;
-    private UIConfigMenuMods _configMenuMods;
-    private UISelectWorldMenu _selectWorldMenu;
+    private UIMenuMain _mainMenu;
+    private UIMenuConfig _configMenu;
+    private UIMenuConfigVideo _configMenuVideo;
+    private UIMenuConfigAudio _configMenuAudio;
+    private UIMenuConfigControls _configMenuControls;
+    private UIMenuConfigMods _configMenuMods;
+    private UIMenuSelectWorld _selectWorldMenu;
 
     private GameEngine _gameInstance = null;
 
@@ -77,7 +77,7 @@ public class StateMainMenu implements GameState {
     }
 
     private void setupMainMenu() {
-        _mainMenu = new UIMainMenu();
+        _mainMenu = new UIMenuMain();
         _mainMenu.setVisible(true);
 
         UIButton singlePlayerButton = (UIButton) _mainMenu.getElementById("singlePlayerButton");
@@ -109,7 +109,7 @@ public class StateMainMenu implements GameState {
     }
 
     private void setupSelectWorldMenu() {
-        _selectWorldMenu = new UISelectWorldMenu();
+        _selectWorldMenu = new UIMenuSelectWorld();
         _selectWorldMenu.setVisible(false);
 
         UIButton goToBack = (UIButton) _selectWorldMenu.getElementById("goToBackButton");
@@ -123,7 +123,7 @@ public class StateMainMenu implements GameState {
     }
 
     private void setupConfigMenu() {
-        _configMenu = new UIConfigMenu();
+        _configMenu = new UIMenuConfig();
         _configMenu.setVisible(false);
 
         UIButton videoButton = (UIButton) _configMenu.getElementById("videoButton");
@@ -169,7 +169,7 @@ public class StateMainMenu implements GameState {
     }
 
     private void setupConfigMenuVideo() {
-        _configMenuVideo = new UIConfigMenuVideo();
+        _configMenuVideo = new UIMenuConfigVideo();
         _configMenuVideo.setVisible(false);
 
         UIButton videoToSettingsMenuButton = (UIButton) _configMenuVideo.getElementById("backToConfigMenuButton");
@@ -182,7 +182,7 @@ public class StateMainMenu implements GameState {
     }
 
     private void setupConfigMenuAudio() {
-    	_configMenuAudio = new UIConfigMenuAudio();
+    	_configMenuAudio = new UIMenuConfigAudio();
         _configMenuAudio.setVisible(false);
 
         UIButton backToConfigMenuButton = (UIButton) _configMenuAudio.getElementById("backToConfigMenuButton");
@@ -195,7 +195,7 @@ public class StateMainMenu implements GameState {
     }
 
     private void setupConfigMenuControls() {
-    	_configMenuControls = new UIConfigMenuControls();
+    	_configMenuControls = new UIMenuConfigControls();
         _configMenuControls.setVisible(false);
 
         UIButton backToSettingsMenuButton = (UIButton) _configMenuControls.getElementById("backToConfigMenuButton");
@@ -209,7 +209,7 @@ public class StateMainMenu implements GameState {
     }
 
     private void setupConfigMenuMods() {
-    	_configMenuMods = new UIConfigMenuMods();
+    	_configMenuMods = new UIMenuConfigMods();
         _configMenuMods.setVisible(false);
 
         UIButton minionsButton = (UIButton) _configMenuMods.getElementById("minionsButton");

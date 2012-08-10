@@ -13,30 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.menus;
+package org.terasology.rendering.gui.windows;
 
-import org.terasology.rendering.gui.components.UIOpenBook;
+import javax.vecmath.Vector2f;
+
+import org.terasology.asset.AssetManager;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
+import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
-public class UIOpenBookScreen extends UIDisplayWindow {
+public class UIScreenBook extends UIDisplayWindow {
 
-    private final UIOpenBook _openbook;
+    private final UIGraphicsElement background;
 
-    public UIOpenBookScreen() {
+    public UIScreenBook() {
         maximize();
-        _openbook = new UIOpenBook();
-        _openbook.setVisible(true);
-        addDisplayElement(_openbook);
-        layout();
         setModal(true);
+        
+        background = new UIGraphicsElement(AssetManager.loadTexture("engine:openbook"));
+        background.setPosition(new Vector2f(-250, -200));
+        background.setSize(new Vector2f(500, 300));
+        background.setVisible(true);
+        
+        addDisplayElement(background);
+        
+        layout();
     }
 
     @Override
     public void layout() {
         super.layout();
         
-        if (_openbook != null) {
-        	_openbook.center();
+        if (background != null) {
+        	background.center();
         }
     }
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.menus;
+package org.terasology.rendering.gui.windows;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
@@ -37,7 +37,7 @@ import javax.vecmath.Vector2f;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  *         Date: 29/07/12
  */
-public class UIConfigMenuControls extends UIDisplayWindow {
+public class UIMenuConfigControls extends UIDisplayWindow {
 
 	String editButtonCurrent = "";
 	UIButton editButton = null;
@@ -105,7 +105,7 @@ public class UIConfigMenuControls extends UIDisplayWindow {
     final UISlider MouseSensitivity;
     final UIText subtitle;
 
-    public UIConfigMenuControls() {
+    public UIMenuConfigControls() {
         maximize();
         
         ClickListener editButtonClick = new ClickListener() {

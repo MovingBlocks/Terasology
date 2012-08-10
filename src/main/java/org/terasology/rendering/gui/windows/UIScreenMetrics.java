@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.menus;
+package org.terasology.rendering.gui.windows;
 
 import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.procedure.TObjectDoubleProcedure;
@@ -33,7 +33,7 @@ import java.util.TreeSet;
  *
  * @author Immortius <immortius@gmail.com>
  */
-public class UIMetrics extends UIDisplayWindow {
+public class UIScreenMetrics extends UIDisplayWindow {
 
     private static final int METRIC_LINES = 10;
 
@@ -46,7 +46,7 @@ public class UIMetrics extends UIDisplayWindow {
     /**
      * Init. the HUD.
      */
-    public UIMetrics() {
+    public UIScreenMetrics() {
         setOverlay(true);
         _headerLine = new UIText(new Vector2f(4, 70));
         addDisplayElement(_headerLine);

@@ -40,6 +40,11 @@ public class UIButton extends UIDisplayContainer {
     private boolean _toggleState = false;
     private eButtonType _buttonType;
 
+    /**
+     * Create a simple button, where 2 types are possible. The normal button and the toggle button.
+     * @param size The size of the button.
+     * @param buttonType The type of the button which can be normal or toggle.
+     */
     public UIButton(Vector2f size, eButtonType buttonType) {
         setSize(size);
         
@@ -142,6 +147,10 @@ public class UIButton extends UIDisplayContainer {
 		return _toggleState;
 	}
     
+    /**
+     * Set the state of the toggle button. Only has an affect if the button was created as an toggle button.
+     * @param state True to set the pressed state.
+     */
     public void setToggleState(boolean state) {
     	_toggleState = state;
     	
