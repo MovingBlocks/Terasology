@@ -27,5 +27,5 @@ import javax.vecmath.Vector3f;
  */
 public final class PlayerComponent implements Component {
     public Vector3f spawnPosition = new Vector3f();
-    public EntityRef movementSlot = EntityRef.NULL;
+    public EntityRef transferSlot = EntityRef.NULL;
 }

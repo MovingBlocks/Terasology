@@ -32,13 +32,18 @@ import org.terasology.rendering.gui.framework.UIGraphicsElement;
  */
 public class UIScreenInventory extends UIDisplayWindow {
 
+    private final UIItemContainer toolbar;
     private final UIItemContainer inventory;
-	private UIGraphicsElement background;
+    private UIGraphicsElement background;
 
     public UIScreenInventory() {
         setSize(new Vector2f(192.0f * 2.5f, 180.0f * 2.5f));
         
-        inventory = new UIItemContainer(9, 4);
+        toolbar = new UIItemContainer(9);
+        toolbar.setVisible(true);
+        toolbar.setCellMargin(new Vector2f(1, 1));
+        
+        inventory = new UIItemContainer(9);
         inventory.setVisible(true);
         inventory.setCellMargin(new Vector2f(1, 1));
 
@@ -48,6 +53,7 @@ public class UIScreenInventory extends UIDisplayWindow {
         background.setVisible(true);
         
         addDisplayElement(background);
+        addDisplayElement(toolbar);
         addDisplayElement(inventory);
 
         layout();
@@ -56,10 +62,13 @@ public class UIScreenInventory extends UIDisplayWindow {
     
     @Override
     public void setVisible(boolean visible) {
-    	super.setVisible(visible);
-    	
-    	if (visible)
-            inventory.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity());
+        super.setVisible(visible);
+        
+        if (visible) {
+            toolbar.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity(), 0, 8);
+            inventory.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity(), 9);
+            //TODO connect toolbar <-> inventory somehow to allow fast transfer.
+        }
     }
 
     @Override
@@ -67,16 +76,11 @@ public class UIScreenInventory extends UIDisplayWindow {
         super.layout();
         
         if (inventory != null) {
-        	background.center();
-        	inventory.center();
-        	inventory.getPosition().y += 48;
-        	
-        	if (inventory.getCells().size() >= 9) {
-        		float toolbarPos = calcAbsolutePosition().y + 208;
-	        	for (int i = 0; i < 9; i++) {
-	        		inventory.getCells().get(i).getPosition().y = toolbarPos;		
-				}
-        	}
+            background.center();
+            toolbar.center();
+            toolbar.getPosition().y += 254;
+            inventory.center();
+            inventory.getPosition().y += 98;
         }
     }
     

@@ -113,6 +113,20 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             _displayElements.get(i).layout();
         }
     }
+    
+    @Override
+    public boolean processBindButton(String id, boolean pressed) {
+        if (!isVisible())
+            return false;
+    	
+        boolean ret = super.processBindButton(id, pressed);
+        // Pass the bind key to all display elements
+        for (int i = 0; i < _displayElements.size(); i++) {
+        	ret |= _displayElements.get(i).processBindButton(id, pressed);
+        }
+        
+        return ret;
+    }
 
     @Override
     public void processKeyboardInput(int key) {

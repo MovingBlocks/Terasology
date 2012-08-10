@@ -20,40 +20,51 @@ import org.lwjgl.opengl.Display;
 import org.terasology.componentSystem.items.InventorySystem;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
+import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.PlayerComponent;
 import org.terasology.components.block.BlockItemComponent;
+import org.terasology.entityFactory.DroppedBlockFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.events.input.binds.RunButton;
 import org.terasology.game.CoreRegistry;
 import org.terasology.asset.AssetManager;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.physics.ImpulseEvent;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
+import org.terasology.rendering.gui.framework.events.WindowListener;
 
 import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
 
 /**
  * A cell which can contain an item and supports drag and drop.
+ * To move an item the item will be moved to a special transfer slot as item will be dragged. This slot is in the PlayerComponent class.
+ * Therefore the item belongs to nobody as the transfer is ongoing and needs to be reseted as the action was interrupted.
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
- *
- * TODO empty the movement cell as the window was closed.
- * TODO save the cell which was dragged.
+ * @see PlayerComponent
  */
 public class UIItemCell extends UIDisplayContainer  {
 
-    //movement
-    private static UIItemCellIcon movementIcon;
+    //transfer
+    private static UIItemCellIcon transferIcon;
     
-    //entity
-    private EntityRef ownerEntity;
+    //inventory entity
+    private EntityRef ownerEntity = EntityRef.NULL;
+    private EntityRef itemEntity = EntityRef.NULL;
     private InventoryComponent ownerInventory;
-    private EntityRef itemEntity;
     private int slot;
+    
+    //connected inventory entity
+    private EntityRef connectedEntity = EntityRef.NULL;
+    private boolean fastTransferPressed = false;
     
     //sub elements
     private final UIGraphicsElement selectionRectangle;
@@ -95,8 +106,11 @@ public class UIItemCell extends UIDisplayContainer  {
         @Override
         public void move(UIDisplayElement element) {
             if (ownerInventory != null) {
-                if (getFromMovementSlot().exists()) { //TODO avoid to let EVERY cell update the position
-                    movementIcon.setPosition(new Vector2f(Mouse.getX() - getSize().x / 2, Display.getHeight() - Mouse.getY() - getSize().y / 2));
+                if (getFromTransferSlot().exists()) {
+                    ItemComponent item = getFromTransferSlot().getComponent(ItemComponent.class);
+                    if (item.container == ownerEntity) {
+                        transferIcon.setPosition(new Vector2f(Mouse.getX() - getSize().x / 2, Display.getHeight() - Mouse.getY() - getSize().y / 2));
+                    }
                 }
             }
         }
@@ -109,41 +123,49 @@ public class UIItemCell extends UIDisplayContainer  {
         
         @Override
         public void up(UIDisplayElement element, int button, boolean intersect) {
+
+        }
+        
+        @Override
+        public void down(UIDisplayElement element, int button, boolean intersect) {
             if (intersect) {
                 if (!enableDrag)
                     return;
                 
                 if (ownerInventory != null) {
+                    //left click
                     if (button == 0) {
                         //drop
-                        if (getFromMovementSlot().exists()) {
+                        if (getFromTransferSlot().exists()) {
                             
-                            moveItem();
+                            moveItem(UIItemCell.this, (byte) 0, true);
                             
                         }
                         //drag
                         else {
                             
-                            //move item to the movement slot
-                            sendToMovementSlot(itemEntity, (byte) -1);
+                            //move item to the transfer slot
+                            sendToTransferSlot(itemEntity, (byte) 0);
                             
-                            //enable movement icon
-                            setMovementIconVisibility(true);
-                            
+                            if (fastTransferPressed && connectedEntity.exists()) {
+                                moveItemAutomatic(connectedEntity, true);
+                            }
                         }
                     }
+                    //right click
                     else if (button == 1) {
-                        if (!getFromMovementSlot().exists()) {
+                        //drop
+                        if (getFromTransferSlot().exists()) {
+                         
+                            moveItem(UIItemCell.this, (byte) 1, true);
+                            
+                        }
+                        //drag
+                        else {
                             
                             //copy half of the stack
                             ItemComponent item = itemEntity.getComponent(ItemComponent.class);
-                            sendToMovementSlot(itemEntity, (byte) (item.stackCount / 2));
-                            
-                            //enable movement icon
-                            setMovementIconVisibility(true);
-                            
-                        }
-                        else {
+                            sendToTransferSlot(itemEntity, (byte) (item.stackCount / 2));
                             
                         }
                     }
@@ -153,10 +175,22 @@ public class UIItemCell extends UIDisplayContainer  {
                 //TODO reset dragged item if not dropped onto a UIItemCell. (how can we figure this out..)
             }
         }
+    };
+    private WindowListener windowListener = new WindowListener() {
+        @Override
+        public void open(UIDisplayElement element) {
+            
+        }
         
         @Override
-        public void down(UIDisplayElement element, int button, boolean intersect) {
-            //TODO do the stuff on mouse button down. but there is probably a bug in the GUI event system? event will be send twice?
+        public void close(UIDisplayElement element) {
+            UIDisplayWindow window = (UIDisplayWindow) element;
+            
+            //TODO just drop the item?
+            //lets reset the item of the window got closed.
+            reset();
+            
+            window.removeWindowListener(this);
         }
     };
         
@@ -177,25 +211,25 @@ public class UIItemCell extends UIDisplayContainer  {
         selectionRectangle.getTextureSize().set(new Vector2f(24f / 256f, 24f / 256f));
         selectionRectangle.getTextureOrigin().set(new Vector2f(0.0f, 23f / 256f));
         selectionRectangle.setSize(getSize());
-
+        
         background = new UIGraphicsElement(guiTex);
         background.getTextureSize().set(new Vector2f(20f / 256f, 20f / 256f));
         background.getTextureOrigin().set(new Vector2f(1.0f / 256f, 1f / 256f));
         background.setSize(getSize());
         background.setVisible(true);
         background.setFixed(true);
-
+        
         itemLabel = new UIText();
         itemLabel.setVisible(false);
         itemLabel.setPosition(itemLabelPosition);
-                
+        
         icon = new UIItemCellIcon();
         icon.setVisible(true);
         
-        if (movementIcon == null) {
-            movementIcon = new UIItemCellIcon();
-            movementIcon.setVisible(false);
-            movementIcon.setItemEntity(EntityRef.NULL);
+        if (transferIcon == null) {
+            transferIcon = new UIItemCellIcon();
+            transferIcon.setVisible(false);
+            transferIcon.setItemEntity(EntityRef.NULL);
         }
         
         addMouseMoveListener(mouseMoveListener);
@@ -207,130 +241,325 @@ public class UIItemCell extends UIDisplayContainer  {
         addDisplayElement(itemLabel);
     }
     
-    /**
-     * Move the item in the movement inventory slot to this owners inventory slot.
-     */
-    private void moveItem() {
-        EntityRef item = getFromMovementSlot();
-        
-        //no items on the target slot
-        if (!ownerInventory.itemSlots.get(slot).exists()) {
-            moveItemPlace();
-        }
-        //target slot contains an item
-        else {
-            ItemComponent sourceItem = item.getComponent(ItemComponent.class);
-            ItemComponent targetItem = ownerInventory.itemSlots.get(slot).getComponent(ItemComponent.class);
 
-            //target slot contains same item and is stackable
-            if (targetItem.stackId.equals(sourceItem.stackId) && !targetItem.stackId.isEmpty() && !sourceItem.stackId.isEmpty()) {
-                moveItemMerge();
+    /**
+     * Drop the item in the transfer slot.
+     * TODO not working yet.
+     */
+    private void dropitem() {
+        EntityRef item = getFromTransferSlot();
+        
+        if (item.exists()) {
+            BlockItemComponent blockItem = item.getComponent(BlockItemComponent.class);
+            
+            int dropPower = 6;
+            EntityManager entityManager = CoreRegistry.get(EntityManager.class);
+            LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+            LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
+            DroppedBlockFactory droppedBlockFactory = new DroppedBlockFactory(entityManager);
+            EntityRef droppedBlock = droppedBlockFactory.newInstance(new Vector3f(localPlayer.getPosition().x + localPlayer.getViewDirection().x * 1.5f, localPlayer.getPosition().y + localPlayer.getViewDirection().y * 1.5f, localPlayer.getPosition().z + localPlayer.getViewDirection().z * 1.5f), blockItem.blockFamily, 20);
+            droppedBlock.send(new ImpulseEvent(new Vector3f(localPlayer.getViewDirection().x*dropPower, localPlayer.getViewDirection().y*dropPower, localPlayer.getViewDirection().z*dropPower)));
+            
+            localPlayerComp.handAnimation = 0.5f;
+        }
+        
+        System.out.println("drop");
+    }
+    
+    /**
+     * Move the item in the transfer inventory slot to this owners inventory automatically to a free slot or merge if an item of the same block exists. The item will be dropped if no free slot is available.
+     * @param targetEntity The target inventory entity to send the item too.
+     * @param dropOnFull True if drop the item if target inventory is full.
+     */
+    private void moveItemAutomatic(EntityRef targetEntity, boolean dropOnFull) {
+        ItemComponent sourceItem = getFromTransferSlot().getComponent(ItemComponent.class);
+        ItemComponent targetItem;
+        
+        InventoryComponent targetInventory = targetEntity.getComponent(InventoryComponent.class);
+        
+        if (getFromTransferSlot().exists() && targetInventory != null) {
+            
+            //is stackable
+            if (!sourceItem.stackId.isEmpty()) {
+                for (EntityRef itemStack : targetInventory.itemSlots) {
+                    targetItem = itemStack.getComponent(ItemComponent.class);
+                    
+                    if (targetItem != null) {
+                        if (targetItem.stackId.equals(sourceItem.stackId)) {
+                            
+                            int spaceLeft = InventorySystem.MAX_STACK - targetItem.stackCount;
+                            
+                            //source stack is to big to merge full in
+                            if (spaceLeft < sourceItem.stackCount) {
+                                
+                                targetItem.stackCount = InventorySystem.MAX_STACK;
+                                sourceItem.stackCount -= spaceLeft;
+                                
+                            }
+                            //merge source stack fully in
+                            else {
+                                
+                                targetItem.stackCount += sourceItem.stackCount;
+                                
+                                //remove item from transfer slot
+                                sendToTransferSlot(EntityRef.NULL, (byte) 0);
+                                
+                            }
+                            
+                        }
+                    }
+                    
+                    //check if stack is fully merged into existing stacks
+                    if (!getFromTransferSlot().exists()) {
+                        break;
+                    }
+                    
+                }
             }
-            //target slot contains another item and/or none stackable
+            
+            //check if after merging (or not able to merge) still items left (this can only happen if the player receives an item in the meantime)
+            if (getFromTransferSlot().exists()) {
+                
+                //check for a free slot
+                int freeSlot = targetInventory.itemSlots.indexOf(EntityRef.NULL);
+                if (freeSlot != -1) {
+                    //place the item in the item slot
+                    sourceItem.container = targetEntity;
+                    targetInventory.itemSlots.set(freeSlot, getFromTransferSlot());
+                    
+                    //remove item from transfer slot
+                    sendToTransferSlot(EntityRef.NULL, (byte) 0);
+                }
+                //no free slots
+                else {
+                    if (dropOnFull)
+                        dropitem();
+                }
+                
+            }
+            
+            //notify component changed listeners
+            targetEntity.saveComponent(targetInventory);
+            
+        }
+    }
+    
+   /**
+    * Move the item in the transfer inventory slot to the targetCell.
+    * This method is split up into moveItemPlace, moveItemMerge and moveItemSwap.
+    * @param targetCell The target cell to move the item to.
+    * @param amount The amount to move.
+    * @param dropOnFail Drop the item on failure.
+    */
+    private void moveItem(UIItemCell targetCell, byte amount, boolean dropOnFail) {
+        EntityRef item = getFromTransferSlot();
+        if (item.exists()) {
+
+            boolean success = false;
+            
+            if (!success) {
+                //try to place the block
+                success = moveItemPlace(targetCell, amount);
+            }
+            
+            if (!success) {
+                //try to merge
+                success = moveItemMerge(targetCell, amount);
+            }
+            
+            if (!success) {
+                //try to swap
+                success = moveItemSwap(targetCell);
+            }
+            
+            if (!success && dropOnFail) {
+                //failed (should not happen)
+                dropitem();
+            }
+
+            //notify component changed listeners
+            ownerEntity.saveComponent(ownerInventory);
+            
+        }
+    }
+
+    /**
+     * Place the item in the transfer slot directly on the target cell.
+     * @param targetCell The target cell to move the item to.
+     * @param amount The amount to place. 0 for whole stack.
+     */
+    private boolean moveItemPlace(UIItemCell targetCell, byte amount) {
+        EntityRef item = getFromTransferSlot();
+        ItemComponent sourceItem = item.getComponent(ItemComponent.class);
+        
+        //check if target slot is empty
+        if (!ownerInventory.itemSlots.get(targetCell.slot).exists()) {    
+            //place whole stack
+            if (amount == 0) {
+                //place the item in the item slot
+                sourceItem.container = ownerEntity;
+                ownerInventory.itemSlots.set(targetCell.slot, item);
+                
+                //remove item from transfer slot
+                sendToTransferSlot(EntityRef.NULL, (byte) 0);
+                
+                return true;
+            }
+            //place an specific amount
             else {
-                moveItemSwap();
+                //create an item
+                EntityManager entityManager = CoreRegistry.get(EntityManager.class);
+                EntityRef copy = entityManager.copy(item);
+                ItemComponent copyItem = copy.getComponent(ItemComponent.class);
+    
+                //items in transfer slot left
+                if (sourceItem.stackCount > amount) {
+                    sourceItem.stackCount -= amount;
+                    copyItem.stackCount = amount;
+                    
+                    copyItem.container = ownerEntity;
+                    ownerInventory.itemSlots.set(targetCell.slot, copy);
+ 
+                    return true;
+                }
+                //no items in transfer slot left
+                else {
+                    //place whole stack
+                    ownerInventory.itemSlots.set(targetCell.slot, item);
+                    
+                    //remove item from transfer slot
+                    sendToTransferSlot(EntityRef.NULL, (byte) 0);
+                    
+                    return true;
+                }
             }
-            
         }
         
-        //notify component changed listeners
-        ownerEntity.saveComponent(ownerInventory);
+        return false;
     }
 
     /**
-     * Place the movement item directly on this owners inventory slot.
+     * Merge the item in the transfer slot with the target cell.
+     * @param targetCell The target cell to move the item to.
+     * @param amount The amount to merge. 0 for whole stack.
      */
-    private void moveItemPlace() {
-        EntityRef item = getFromMovementSlot();
+    private boolean moveItemMerge(UIItemCell targetCell, byte amount) {
+        EntityRef item = getFromTransferSlot();
         ItemComponent sourceItem = item.getComponent(ItemComponent.class);
+        ItemComponent targetItem = targetCell.ownerInventory.itemSlots.get(targetCell.slot).getComponent(ItemComponent.class);
+        
+        //make sure the items can be merged
+        if (targetItem.stackId.equals(sourceItem.stackId) && !targetItem.stackId.isEmpty() && !sourceItem.stackId.isEmpty()) {
+            //merge whole stack
+            if (amount == 0) {
+                int spaceLeft = InventorySystem.MAX_STACK - targetItem.stackCount;
+                
+                //source stack is to big to merge full in
+                if (spaceLeft < sourceItem.stackCount) {
+                    
+                    targetItem.stackCount = InventorySystem.MAX_STACK;
+                    sourceItem.stackCount -= spaceLeft;
+                    
+                    return true;
+                }
+                //merge source stack fully in
+                else {
+                    
+                    targetItem.stackCount += sourceItem.stackCount;
+                    
+                    //remove item from transfer slot
+                    sendToTransferSlot(EntityRef.NULL, (byte) 0);
+                    
+                    return true;
+                }
+            }
+            //merge an specific amount
+            else {
+                int spaceLeft = InventorySystem.MAX_STACK - targetItem.stackCount;
+                
+                //items can be merged in
+                if (spaceLeft > amount) {
+                    targetItem.stackCount += amount;
+                    
+                    //items left in transfer slot left
+                    if (sourceItem.stackCount > amount) {
+                        //subtract the transfered amount
+                        sourceItem.stackCount -= amount;
+                    }
+                    //no items in transfer slot left
+                    else {
+                        //remove item from transfer slot
+                        sendToTransferSlot(EntityRef.NULL, (byte) 0);
+                    }
 
-        //place the item in the item slot
-        sourceItem.container = ownerEntity;
-        ownerInventory.itemSlots.set(slot, item);
-        
-        //remove item from movement slot
-        sendToMovementSlot(EntityRef.NULL, (byte) -1);
-        
-        //disable movement icon
-        setMovementIconVisibility(false);
-    }
-
-    /**
-     * Merge the movement item with this owners inventory slot.
-     */
-    private void moveItemMerge() {
-        EntityRef item = getFromMovementSlot();
-        ItemComponent sourceItem = item.getComponent(ItemComponent.class);
-        ItemComponent targetItem = ownerInventory.itemSlots.get(slot).getComponent(ItemComponent.class);
-        
-        int spaceLeft = InventorySystem.MAX_STACK - targetItem.stackCount;
-        
-        //source stack is to big to merge full in
-        if (spaceLeft < sourceItem.stackCount) {
-            
-            targetItem.stackCount = InventorySystem.MAX_STACK;
-            sourceItem.stackCount -= spaceLeft;
-            
+                    return true;
+                }
+            }
         }
-        //merge source stack fully in
-        else {
-            
-            targetItem.stackCount += sourceItem.stackCount;
-            
-            //remove item from movement slot
-            sendToMovementSlot(EntityRef.NULL, (byte) -1);
-            
-            //disable movement icon
-            setMovementIconVisibility(false);
-            
-        }
+        
+        return false;
     }
     
     /**
-     * Swap the items of this owners inventory slot and the movement item slot.
+     * Swap the items of the transfer item slot and the target cell.
+     * @param targetCell The target cell to move the item to.
      */
-    private void moveItemSwap() {
-        EntityRef item = getFromMovementSlot();
+    private boolean moveItemSwap(UIItemCell targetCell) {
+        EntityRef item = getFromTransferSlot();
         ItemComponent sourceItem = item.getComponent(ItemComponent.class);
+        ItemComponent targetItem = targetCell.itemEntity.getComponent(ItemComponent.class);
         
-        //move item to the movement slot
-        sendToMovementSlot(itemEntity, (byte) -1);
+        //move item to the transfer slot
+        targetItem.container = sourceItem.container;
+        sendToTransferSlot(targetCell.itemEntity, (byte) 0);
         
         //place the item in the item slot
         sourceItem.container = ownerEntity;
-        ownerInventory.itemSlots.set(slot, item);
+        ownerInventory.itemSlots.set(targetCell.slot, item);
         
-        //enable movement icon
-        setMovementIconVisibility(true);
+        return true;
     }
     
     /**
-     * Resets the item in the movement slot to its owner.
-     * TODO ...
+     * Resets the item in the transfer slot to its owner.
      */
     private void reset() {
-        ownerInventory.itemSlots.set(slot, getFromMovementSlot());
-        sendToMovementSlot(EntityRef.NULL, (byte) -1);
+        EntityRef item = getFromTransferSlot();
+        if (item.exists()) {
+            ItemComponent itemComponent = item.getComponent(ItemComponent.class);
+            moveItemAutomatic(itemComponent.container, true);
+        }
     }
     
-    /**
-     * Get item in the movement slot.
-     * @return Returns the item in the movement slot.
-     */
-    private EntityRef getFromMovementSlot() {
-        return CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(PlayerComponent.class).movementSlot;
-    }
-    
-    /**
-     * Send an item in the movement slot.
-     * @param item The item to send to the movement slot.
-     * @param amount The amount to send to the movement slot. -1 for whole stack.
-     */
-    private void sendToMovementSlot(EntityRef item, byte amount) {
-        //transfer whole stack
-        if (amount == -1) {
+    @Override
+    public boolean processBindButton(String id, boolean pressed) {
+        if (id.equals(RunButton.ID)) {
+            fastTransferPressed = pressed;
             
-            CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(PlayerComponent.class).movementSlot = item;
+            return true;
+        }
+        
+        return super.processBindButton(id, pressed);
+    }
+    
+    /**
+     * Get item from the transfer slot.
+     * @return Returns the item in the transfer slot.
+     */
+    private EntityRef getFromTransferSlot() {
+        return CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(PlayerComponent.class).transferSlot;
+    }
+    
+    /**
+     * Send an item to the transfer slot. Update the visibility of the transfer icon.
+     * @param item The item to send to the transfer slot.
+     * @param amount The amount to send to the transfer slot. 0 for whole stack.
+     */
+    private void sendToTransferSlot(EntityRef item, byte amount) {
+        //transfer whole stack
+        if (amount == 0) {
+            
+            CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(PlayerComponent.class).transferSlot = item;
             
             if (item.exists()) {
                 //remove the item from the inventory slot
@@ -350,7 +579,22 @@ public class UIItemCell extends UIDisplayContainer  {
             itemComponent.stackCount = amount;
             itemComponent.container = ownerEntity;
             
-            CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(PlayerComponent.class).movementSlot = moveItem;
+            CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(PlayerComponent.class).transferSlot = moveItem;
+        }
+        
+        //enable/disable transfer item
+        if (getFromTransferSlot().exists()) {
+            GUIManager.getInstance().getFocusedWindow().removeDisplayElement(transferIcon);
+            GUIManager.getInstance().getFocusedWindow().addDisplayElement(transferIcon, "transferIcon");
+            GUIManager.getInstance().getFocusedWindow().removeWindowListener(windowListener);
+            GUIManager.getInstance().getFocusedWindow().addWindowListener(windowListener);
+            transferIcon.setItemEntity(getFromTransferSlot());
+            transferIcon.setVisible(true);
+        }
+        else {
+            GUIManager.getInstance().getFocusedWindow().removeDisplayElement(transferIcon);
+            transferIcon.setItemEntity(EntityRef.NULL);
+            transferIcon.setVisible(false);
         }
         
         //notify component changed listeners
@@ -358,7 +602,7 @@ public class UIItemCell extends UIDisplayContainer  {
     }
     
     /**
-     * Set the visibility of the movement icon.
+     * Set the visibility of the label.
      * @param enable True to be displayed.
      */
     private void setLabelVisibility(boolean enable) {
@@ -377,22 +621,6 @@ public class UIItemCell extends UIDisplayContainer  {
         } else {
             itemLabel.setVisible(false);
         }
-    }
-    
-    /**
-     * Set the visibility of the movement icon.
-     * @param enable True to be displayed.
-     */
-    private void setMovementIconVisibility(boolean enable) {
-        if (enable) {
-            GUIManager.getInstance().getFocusedWindow().addDisplayElement(movementIcon);
-            movementIcon.setItemEntity(getFromMovementSlot());
-        } else {
-            GUIManager.getInstance().getFocusedWindow().removeDisplayElement(movementIcon);
-            movementIcon.setItemEntity(EntityRef.NULL);
-        }
-        
-        movementIcon.setVisible(enable);
     }
     
     /**
@@ -460,5 +688,21 @@ public class UIItemCell extends UIDisplayContainer  {
      */
     public void setSelectionRectangleEnable(boolean enable) {
         selectionRectangle.setVisible(enable);
+    }
+    
+    /**
+     * Get the inventory entity which is connected with this cell. This allows fast transfer between 2 inventories.
+     * @return Returns the entity of the connected inventory.
+     */
+    public EntityRef getConnected() {
+        return connectedEntity;
+    }
+
+    /**
+     * Set the inventory entity which is connected with this cell. This allows fast transfer between 2 inventories.
+     * @param entity The entity inventory to connect with this cell.
+     */
+    public void setConnected(EntityRef entity) {
+        this.connectedEntity = entity;
     }
 }
