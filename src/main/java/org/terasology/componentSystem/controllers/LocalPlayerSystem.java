@@ -23,8 +23,11 @@ import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.*;
 import org.terasology.components.block.BlockComponent;
+import org.terasology.components.block.BlockItemComponent;
 import org.terasology.components.rendering.MeshComponent;
 import org.terasology.components.world.LocationComponent;
+import org.terasology.entityFactory.DroppedBlockFactory;
+import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
@@ -45,9 +48,11 @@ import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.TeraMath;
 import org.terasology.model.blocks.Block;
 import org.terasology.math.AABB;
+import org.terasology.physics.ImpulseEvent;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.cameras.DefaultCamera;
+import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
@@ -69,7 +74,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     private DefaultCamera playerCamera;
 
     private long lastTimeSpacePressed;
-    private long lastInteraction;
+    private long lastInteraction, lastTimeThrowInteraction;
 
     private boolean cameraBobbing = Config.getInstance().isCameraBobbing();
     private float bobFactor = 0;
@@ -334,6 +339,57 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         if (localPlayerComp.isDead) return;
 
         event.getTarget().send(new ActivateEvent(entity, entity, playerCamera.getPosition(), playerCamera.getViewingDirection(), event.getHitPosition(), event.getHitNormal()));
+        event.consume();
+    }
+
+    @ReceiveEvent(components = {LocalPlayerComponent.class})
+    public void onDropItem(DropItemButton event, EntityRef entity){
+
+        /*if (!event.isDown() || timer.getTimeInMs() - lastInteraction < 200) {
+            return;
+        }    */
+
+        if(event.getState() == ButtonState.DOWN && lastTimeThrowInteraction == 0){
+            lastTimeThrowInteraction = timer.getTimeInMs();
+            return;
+        }
+
+        float dropPower  = (float)Math.floor((timer.getTimeInMs() - lastTimeThrowInteraction)/1000)*25f;
+        lastTimeThrowInteraction = 0;
+
+        if(dropPower>125f){
+            dropPower = 125f;
+        }
+        
+        LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
+        InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
+        if (localPlayerComp.isDead) return;
+
+        EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayerComp.selectedTool);
+
+        if(selectedItemEntity.hasComponent(BlockItemComponent.class)){
+            BlockItemComponent block = selectedItemEntity.getComponent(BlockItemComponent.class);
+            EntityManager entityManager = CoreRegistry.get(EntityManager.class);
+            DroppedBlockFactory droppedBlockFactory = new DroppedBlockFactory(entityManager);
+
+            Vector3f newPosition = new Vector3f(playerCamera.getPosition().x + playerCamera.getViewingDirection().x*2,
+                                                playerCamera.getPosition().y + playerCamera.getViewingDirection().y*2,
+                                                playerCamera.getPosition().z + playerCamera.getViewingDirection().z*2
+                                               );
+            EntityRef droppedBlock = droppedBlockFactory.newInstance(new Vector3f(newPosition), block.blockFamily, 20);
+            droppedBlock.send(new ImpulseEvent(new Vector3f(playerCamera.getViewingDirection().x*dropPower, playerCamera.getViewingDirection().y*dropPower, playerCamera.getViewingDirection().z*dropPower)));
+
+            ItemComponent item  = selectedItemEntity.getComponent(ItemComponent.class);
+            item.stackCount--;
+
+            if(item.stackCount<=0){
+                selectedItemEntity.destroy();
+            }
+
+        }
+
+        localPlayerComp.handAnimation = 0.5f;
+        entity.saveComponent(localPlayerComp);
         event.consume();
     }
 
