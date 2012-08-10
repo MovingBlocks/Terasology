@@ -16,9 +16,6 @@
 
 package org.terasology.entityFactory;
 
-import org.terasology.components.ItemComponent;
-import org.terasology.components.LightComponent;
-import org.terasology.components.block.BlockItemComponent;
 import org.terasology.components.rendering.MeshComponent;
 import org.terasology.components.utility.LifespanComponent;
 import org.terasology.components.world.LocationComponent;
@@ -27,10 +24,9 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.game.CoreRegistry;
-import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.BlockFamily;
-import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.world.block.family.BlockFamily;
 import org.terasology.physics.BlockPickupComponent;
+import org.terasology.physics.RigidBodyComponent;
 
 import javax.vecmath.Vector3f;
 
@@ -49,22 +45,29 @@ public class DroppedBlockFactory {
     }
 
     private EntityRef newInstance(Vector3f location, BlockFamily blockFamily, float lifespan, EntityRef placedEntity) {
-        if (blockFamily.getArchetypeBlock().isTranslucent()) {
+        if (!blockFamily.getArchetypeBlock().isDebrisOnDestroy()) {
             return EntityRef.NULL;
         }
         Prefab prefab = CoreRegistry.get(PrefabManager.class).getPrefab("core:droppedBlock");
         if (prefab != null && prefab.getComponent(LocationComponent.class) != null) {
-            EntityRef blockEntity = CoreRegistry.get(EntityManager.class).create(prefab, location);
-            MeshComponent blockMesh = blockEntity.getComponent(MeshComponent.class);
+            EntityRef blockEntity = entityManager.create(prefab, location);
+
             BlockPickupComponent blockPickup = blockEntity.getComponent(BlockPickupComponent.class);
             blockPickup.blockFamily = blockFamily;
             blockPickup.placedEntity = placedEntity;
+            blockEntity.saveComponent(blockPickup);
+
+            MeshComponent blockMesh = blockEntity.getComponent(MeshComponent.class);
             blockMesh.mesh = blockFamily.getArchetypeBlock().getMesh();
             blockEntity.saveComponent(blockMesh);
-            blockEntity.saveComponent(blockPickup);
+
             LifespanComponent lifespanComp = blockEntity.getComponent(LifespanComponent.class);
             lifespanComp.lifespan = lifespan;
             blockEntity.saveComponent(lifespanComp);
+
+            RigidBodyComponent rigidBody = blockEntity.getComponent(RigidBodyComponent.class);
+            rigidBody.mass = blockFamily.getArchetypeBlock().getMass();
+            blockEntity.saveComponent(rigidBody);
             return blockEntity;
         }
         return EntityRef.NULL;

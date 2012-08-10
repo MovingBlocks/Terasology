@@ -17,6 +17,7 @@ package org.terasology.game.modes;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
@@ -41,36 +42,32 @@ import org.terasology.game.bootstrap.EntitySystemBuilder;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.generators.DefaultGenerators;
-import org.terasology.asset.AssetManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
-import org.terasology.logic.world.chunks.Chunk;
-import org.terasology.logic.world.generator.core.ChunkGeneratorManager;
-import org.terasology.logic.world.generator.core.ChunkGeneratorManagerImpl;
-import org.terasology.logic.world.generator.core.FlatTerrainGenerator;
-import org.terasology.logic.world.generator.core.FloraGenerator;
-import org.terasology.logic.world.generator.core.ForestGenerator;
-import org.terasology.logic.world.generator.core.PerlinTerrainGenerator;
-import org.terasology.logic.world.liquid.LiquidsGenerator;
-import org.terasology.logic.world.WorldBiomeProviderImpl;
-import org.terasology.logic.world.WorldProvider;
 import org.terasology.math.Vector3i;
-import org.terasology.model.blocks.management.BlockManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.protobuf.EntityData;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.gui.menus.UILoadingScreen;
-import org.terasology.rendering.gui.menus.UIStatusScreen;
+import org.terasology.rendering.gui.windows.UIScreenLoading;
+import org.terasology.rendering.gui.windows.UIScreenStatus;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
+import org.terasology.world.WorldBiomeProviderImpl;
+import org.terasology.world.WorldInfo;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.block.loader.BlockLoader;
+import org.terasology.world.block.management.BlockManager;
+import org.terasology.world.chunks.Chunk;
+import org.terasology.world.generator.core.ChunkGeneratorManager;
+import org.terasology.world.generator.core.ChunkGeneratorManagerImpl;
 
 import javax.vecmath.Vector3f;
 import java.io.*;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -87,12 +84,9 @@ import static org.lwjgl.opengl.GL11.*;
 public class StateSinglePlayer implements GameState {
 
     public static final String ENTITY_DATA_FILE = "entity.dat";
-    public static final String CHUNK_GENERATOR_FILE = "chunk_generator.json";
     private Logger logger = Logger.getLogger(getClass().getName());
 
-    private String currentWorldName;
-    private String currentWorldSeed;
-    private long currentWorldStartTime;
+    private WorldInfo worldInfo;
 
     private PersistableEntityManager entityManager;
     private EventSystem eventSystem;
@@ -108,18 +102,8 @@ public class StateSinglePlayer implements GameState {
     /* GAME LOOP */
     private boolean pauseGame = false;
 
-    public StateSinglePlayer(String worldName) {
-        this(worldName, null, 0);
-    }
-
-    public StateSinglePlayer(String worldName, String seed) {
-        this(worldName, seed, 0);
-    }
-
-    public StateSinglePlayer(String worldName, String seed, long time) {
-        this.currentWorldName = worldName;
-        this.currentWorldSeed = seed;
-        this.currentWorldStartTime = time;
+    public StateSinglePlayer(WorldInfo worldInfo) {
+        this.worldInfo = worldInfo;
     }
 
     public void init(GameEngine engine) {
@@ -129,6 +113,11 @@ public class StateSinglePlayer implements GameState {
             mod.setEnabled(true);
         }
         modManager.saveModSelectionToConfig();
+        AssetManager.getInstance().clear();
+        BlockManager.getInstance().setBlockIdMap(worldInfo.getBlockIdMap());
+        BlockLoader blockLoader = new BlockLoader();
+        blockLoader.load();
+        blockLoader.buildAtlas();
         cacheTextures();
 
         entityManager = new EntitySystemBuilder().build();
@@ -183,7 +172,7 @@ public class StateSinglePlayer implements GameState {
 
     @Override
     public void activate() {
-        initWorld(currentWorldName, currentWorldSeed, currentWorldStartTime);
+        initWorld();
     }
 
     @Override
@@ -235,7 +224,7 @@ public class StateSinglePlayer implements GameState {
         }
         if (dead) {
             if (GUIManager.getInstance().getWindowById("engine:statusScreen") == null) {
-                UIStatusScreen statusScreen = GUIManager.getInstance().addWindow(new UIStatusScreen(), "engine:statusScreen");
+                UIScreenStatus statusScreen = GUIManager.getInstance().addWindow(new UIScreenStatus(), "engine:statusScreen");
                 statusScreen.updateStatus("Sorry! Seems like you have died :-(");
                 statusScreen.setVisible(true);
             }
@@ -262,14 +251,10 @@ public class StateSinglePlayer implements GameState {
         }
     }
 
-    public void initWorld(String title) {
-        initWorld(title, null, 0);
-    }
-
     /**
      * Init. a new random world.
      */
-    public void initWorld(String title, String seed, long time) {
+    public void initWorld() {
         final FastRandom random = new FastRandom();
 
         // Get rid of the old world
@@ -278,21 +263,19 @@ public class StateSinglePlayer implements GameState {
             worldRenderer = null;
         }
 
-        if (seed == null) {
-            seed = random.randomCharacterString(16);
-        } else if (seed.isEmpty()) {
-            seed = random.randomCharacterString(16);
+        if (worldInfo.getSeed() == null || worldInfo.getSeed().isEmpty()) {
+            worldInfo.setSeed(random.randomCharacterString(16));
         }
 
-        logger.log(Level.INFO, "Creating new World with seed \"{0}\"", seed);
+        logger.log(Level.INFO, "World seed: \"{0}\"", worldInfo.getSeed());
 
         // Init ChunkGeneratorManager
-        ChunkGeneratorManager chunkGeneratorManager = initChunkGeneratorManager(title);
-        chunkGeneratorManager.setWorldSeed(seed);
-        chunkGeneratorManager.setWorldBiomeProvider(new WorldBiomeProviderImpl(seed));
+        ChunkGeneratorManager chunkGeneratorManager = ChunkGeneratorManagerImpl.buildChunkGenerator(Arrays.asList(worldInfo.getChunkGenerators()));
+        chunkGeneratorManager.setWorldSeed(worldInfo.getSeed());
+        chunkGeneratorManager.setWorldBiomeProvider(new WorldBiomeProviderImpl(worldInfo.getSeed()));
 
         // Init. a new world
-        worldRenderer = new WorldRenderer(title, seed, time, chunkGeneratorManager, entityManager, localPlayerSys);
+        worldRenderer = new WorldRenderer(worldInfo, chunkGeneratorManager, entityManager, localPlayerSys);
         CoreRegistry.put(WorldRenderer.class, worldRenderer);
 
         // Create the world entity
@@ -315,7 +298,8 @@ public class StateSinglePlayer implements GameState {
             system.initialise();
         }
 
-        File entityDataFile = new File(PathManager.getInstance().getWorldSavePath(title), ENTITY_DATA_FILE);
+        // TODO: Should probably not use the world title as a path?
+        File entityDataFile = new File(PathManager.getInstance().getWorldSavePath(worldInfo.getTitle()), ENTITY_DATA_FILE);
         entityManager.clear();
         if (entityDataFile.exists()) {
             try {
@@ -328,10 +312,6 @@ public class StateSinglePlayer implements GameState {
         prepareWorld();
     }
 
-    private ChunkGeneratorManager initChunkGeneratorManager(String title) {
-        return ChunkGeneratorManagerImpl.buildChunkGenerator(Config.getInstance().getChunkGenerator());
-    }
-
     private boolean screenHasFocus() {
         return GUIManager.getInstance().getFocusedWindow() != null && GUIManager.getInstance().getFocusedWindow().isModal() && GUIManager.getInstance().getFocusedWindow().isVisible();
     }
@@ -342,10 +322,8 @@ public class StateSinglePlayer implements GameState {
 
     // TODO: Should have its own state
     private void prepareWorld() {
-        UILoadingScreen loadingScreen = GUIManager.getInstance().addWindow(new UILoadingScreen(), "engine:loadingScreen");
+        UIScreenLoading loadingScreen = GUIManager.getInstance().addWindow(new UIScreenLoading(), "engine:loadingScreen");
         Display.update();
-
-        int chunksGenerated = 0;
 
         Timer timer = CoreRegistry.get(Timer.class);
         long startTime = timer.getTimeInMs();
@@ -381,8 +359,6 @@ public class StateSinglePlayer implements GameState {
         }
 
         while (!getWorldRenderer().pregenerateChunks() && timer.getTimeInMs() - startTime < 5000) {
-            chunksGenerated++;
-
             loadingScreen.updateStatus(String.format("Fast forwarding world... %.2f%%! :-)", (timer.getTimeInMs() - startTime) / 50.0f), (timer.getTimeInMs() - startTime) / 50.0f);
 
             renderUserInterface();

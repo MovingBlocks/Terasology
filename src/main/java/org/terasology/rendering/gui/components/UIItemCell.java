@@ -22,6 +22,7 @@ import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.PlayerComponent;
 import org.terasology.components.block.BlockItemComponent;
+import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.asset.AssetManager;
@@ -68,10 +69,10 @@ public class UIItemCell extends UIDisplayContainer  {
     private boolean enableSelectionRectangle = true;
 
     private MouseMoveListener mouseMoveListener = new MouseMoveListener() {    
-		@Override
+        @Override
         public void leave(UIDisplayElement element) {
-        	setLabelVisibility(false);
-        	
+            setLabelVisibility(false);
+            
             if (enableSelectionRectangle) {
                 selectionRectangle.setVisible(false);
             }
@@ -84,14 +85,14 @@ public class UIItemCell extends UIDisplayContainer  {
         
         @Override
         public void enter(UIDisplayElement element) {
-        	setLabelVisibility(true);
+            setLabelVisibility(true);
             
             if (enableSelectionRectangle) {
                 selectionRectangle.setVisible(true);
             }
         }
 
-		@Override
+        @Override
         public void move(UIDisplayElement element) {
             if (ownerInventory != null) {
                 if (getFromMovementSlot().exists()) { //TODO avoid to let EVERY cell update the position
@@ -113,35 +114,39 @@ public class UIItemCell extends UIDisplayContainer  {
                     return;
                 
                 if (ownerInventory != null) {
-	                if (button == 0) {
-	                	//drop
-	                    if (getFromMovementSlot().exists()) {
-	                    	
-	                        moveItem(getFromMovementSlot());
-	                        
-	                    }
-	                    //drag
-	                    else {
-	                    	
-	                    	//move item to the movement slot
-	                        sendToMovementSlot(itemEntity, (byte) -1);
-	                        
-	                        //enable movement icon
-	                        setMovementIconVisibility(true);
-	                    }
-	                }
-	                else if (button == 1) {
-	                	if (!getFromMovementSlot().exists()) {
-	                		
-	                		//copy half of the stack
-	                		ItemComponent item = itemEntity.getComponent(ItemComponent.class);
-	                		sendToMovementSlot(itemEntity, (byte) (item.stackCount / 2));
-	                		
-	                        //enable movement icon
-	                        setMovementIconVisibility(true);
-	                        
-	                    }
-	                }
+                    if (button == 0) {
+                        //drop
+                        if (getFromMovementSlot().exists()) {
+                            
+                            moveItem();
+                            
+                        }
+                        //drag
+                        else {
+                            
+                            //move item to the movement slot
+                            sendToMovementSlot(itemEntity, (byte) -1);
+                            
+                            //enable movement icon
+                            setMovementIconVisibility(true);
+                            
+                        }
+                    }
+                    else if (button == 1) {
+                        if (!getFromMovementSlot().exists()) {
+                            
+                            //copy half of the stack
+                            ItemComponent item = itemEntity.getComponent(ItemComponent.class);
+                            sendToMovementSlot(itemEntity, (byte) (item.stackCount / 2));
+                            
+                            //enable movement icon
+                            setMovementIconVisibility(true);
+                            
+                        }
+                        else {
+                            
+                        }
+                    }
                 }
             }
             else {
@@ -203,77 +208,100 @@ public class UIItemCell extends UIDisplayContainer  {
     }
     
     /**
-     * Move an given item to this item cells slot.
-     * @param item The item to move.
+     * Move the item in the movement inventory slot to this owners inventory slot.
      */
-    private void moveItem(EntityRef item) {
-        ItemComponent sourceItem = item.getComponent(ItemComponent.class);
-        ItemComponent targetItem;
-    	
+    private void moveItem() {
+        EntityRef item = getFromMovementSlot();
+        
         //no items on the target slot
-    	if (!ownerInventory.itemSlots.get(slot).exists()) {
-    		
-    		//place the item in the item slot
-			sourceItem.container = ownerEntity;
-    		ownerInventory.itemSlots.set(slot, item);
-    		
-    		//remove item from movement slot
+        if (!ownerInventory.itemSlots.get(slot).exists()) {
+            moveItemPlace();
+        }
+        //target slot contains an item
+        else {
+            ItemComponent sourceItem = item.getComponent(ItemComponent.class);
+            ItemComponent targetItem = ownerInventory.itemSlots.get(slot).getComponent(ItemComponent.class);
+
+            //target slot contains same item and is stackable
+            if (targetItem.stackId.equals(sourceItem.stackId) && !targetItem.stackId.isEmpty() && !sourceItem.stackId.isEmpty()) {
+                moveItemMerge();
+            }
+            //target slot contains another item and/or none stackable
+            else {
+                moveItemSwap();
+            }
+            
+        }
+        
+        //notify component changed listeners
+        ownerEntity.saveComponent(ownerInventory);
+    }
+
+    /**
+     * Place the movement item directly on this owners inventory slot.
+     */
+    private void moveItemPlace() {
+        EntityRef item = getFromMovementSlot();
+        ItemComponent sourceItem = item.getComponent(ItemComponent.class);
+
+        //place the item in the item slot
+        sourceItem.container = ownerEntity;
+        ownerInventory.itemSlots.set(slot, item);
+        
+        //remove item from movement slot
+        sendToMovementSlot(EntityRef.NULL, (byte) -1);
+        
+        //disable movement icon
+        setMovementIconVisibility(false);
+    }
+
+    /**
+     * Merge the movement item with this owners inventory slot.
+     */
+    private void moveItemMerge() {
+        EntityRef item = getFromMovementSlot();
+        ItemComponent sourceItem = item.getComponent(ItemComponent.class);
+        ItemComponent targetItem = ownerInventory.itemSlots.get(slot).getComponent(ItemComponent.class);
+        
+        int spaceLeft = InventorySystem.MAX_STACK - targetItem.stackCount;
+        
+        //source stack is to big to merge full in
+        if (spaceLeft < sourceItem.stackCount) {
+            
+            targetItem.stackCount = InventorySystem.MAX_STACK;
+            sourceItem.stackCount -= spaceLeft;
+            
+        }
+        //merge source stack fully in
+        else {
+            
+            targetItem.stackCount += sourceItem.stackCount;
+            
+            //remove item from movement slot
             sendToMovementSlot(EntityRef.NULL, (byte) -1);
             
             //disable movement icon
             setMovementIconVisibility(false);
             
-    	}
-    	//target slot contains an item
-    	else {
-    		
-    		targetItem = ownerInventory.itemSlots.get(slot).getComponent(ItemComponent.class);
-
-    		//target slot contains same item and is stackable (merge)
-    		if (targetItem.stackId.equals(sourceItem.stackId) && !targetItem.stackId.isEmpty() && !sourceItem.stackId.isEmpty()) {
-    			
-    			int spaceLeft = InventorySystem.MAX_STACK - targetItem.stackCount;
-    			
-    			//source stack is to big to merge full in
-    			if (spaceLeft < sourceItem.stackCount) {
-    				
-    				targetItem.stackCount = InventorySystem.MAX_STACK;
-    				sourceItem.stackCount -= spaceLeft;
-    				
-    			}
-    			//merge source stack fully in
-    			else {
-    				
-    				targetItem.stackCount += sourceItem.stackCount;
-    				
-    	    		//remove item from movement slot
-    	            sendToMovementSlot(EntityRef.NULL, (byte) -1);
-    	            
-                    //disable movement icon
-                    setMovementIconVisibility(false);
-                    
-    			}
-    			
-    		}
-    		//target slot contains another item and/or none stackable
-    		else {
-    			
-            	//move item to the movement slot
-    			sendToMovementSlot(itemEntity, (byte) -1);
-    			
-        		//place the item in the item slot
-    			sourceItem.container = ownerEntity;
-    			ownerInventory.itemSlots.set(slot, item);
-    			
-                //enable movement icon
-                setMovementIconVisibility(true);
-                
-    		}
-    		
-    	}
-    	
-        //notify component changed listeners
-        ownerEntity.saveComponent(ownerInventory);
+        }
+    }
+    
+    /**
+     * Swap the items of this owners inventory slot and the movement item slot.
+     */
+    private void moveItemSwap() {
+        EntityRef item = getFromMovementSlot();
+        ItemComponent sourceItem = item.getComponent(ItemComponent.class);
+        
+        //move item to the movement slot
+        sendToMovementSlot(itemEntity, (byte) -1);
+        
+        //place the item in the item slot
+        sourceItem.container = ownerEntity;
+        ownerInventory.itemSlots.set(slot, item);
+        
+        //enable movement icon
+        setMovementIconVisibility(true);
     }
     
     /**
@@ -281,8 +309,8 @@ public class UIItemCell extends UIDisplayContainer  {
      * TODO ...
      */
     private void reset() {
-    	ownerInventory.itemSlots.set(slot, getFromMovementSlot());
-    	sendToMovementSlot(EntityRef.NULL, (byte) -1);
+        ownerInventory.itemSlots.set(slot, getFromMovementSlot());
+        sendToMovementSlot(EntityRef.NULL, (byte) -1);
     }
     
     /**
@@ -290,7 +318,7 @@ public class UIItemCell extends UIDisplayContainer  {
      * @return Returns the item in the movement slot.
      */
     private EntityRef getFromMovementSlot() {
-    	return CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(PlayerComponent.class).movementSlot;
+        return CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(PlayerComponent.class).movementSlot;
     }
     
     /**
@@ -299,27 +327,32 @@ public class UIItemCell extends UIDisplayContainer  {
      * @param amount The amount to send to the movement slot. -1 for whole stack.
      */
     private void sendToMovementSlot(EntityRef item, byte amount) {
-    	//transfer whole stack
-    	if (amount == -1) {
-    		
-	    	CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(PlayerComponent.class).movementSlot = item;
-	        
-	    	if (item.exists()) {
-		        //remove the item from the inventory slot
-		        ownerInventory.itemSlots.set(ownerInventory.itemSlots.indexOf(item), EntityRef.NULL);
-	    	}
-	    	
-    	}
-    	//transfer part of stack
-    	else if (amount > 0 && amount <= InventorySystem.MAX_STACK) {
-    		
-    		//TODO copy/create new block of same type as the item, move item to movement slot.
-    		
-    		ItemComponent itemComponent = itemEntity.getComponent(ItemComponent.class);
-    		itemComponent.stackCount -= amount;
-    		
-    	}
-    	
+        //transfer whole stack
+        if (amount == -1) {
+            
+            CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(PlayerComponent.class).movementSlot = item;
+            
+            if (item.exists()) {
+                //remove the item from the inventory slot
+                ownerInventory.itemSlots.set(ownerInventory.itemSlots.indexOf(item), EntityRef.NULL);
+            }
+            
+        }
+        //transfer part of stack
+        else if (amount > 0 && amount <= InventorySystem.MAX_STACK) {
+            ItemComponent itemComponent = itemEntity.getComponent(ItemComponent.class);
+            itemComponent.stackCount -= amount;
+            
+            //create the item
+            EntityManager entityManager = CoreRegistry.get(EntityManager.class);
+            EntityRef moveItem = entityManager.copy(item);
+            itemComponent = moveItem.getComponent(ItemComponent.class);
+            itemComponent.stackCount = amount;
+            itemComponent.container = ownerEntity;
+            
+            CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(PlayerComponent.class).movementSlot = moveItem;
+        }
+        
         //notify component changed listeners
         ownerEntity.saveComponent(ownerInventory);
     }
@@ -335,7 +368,7 @@ public class UIItemCell extends UIDisplayContainer  {
             
             if (item != null) {
                 if (blockItem != null)
-                    itemLabel.setText(blockItem.blockFamily.getTitle());
+                    itemLabel.setText(blockItem.blockFamily.getDisplayName());
                 else
                     itemLabel.setText(item.name);
             }
@@ -344,21 +377,21 @@ public class UIItemCell extends UIDisplayContainer  {
         } else {
             itemLabel.setVisible(false);
         }
-	}
+    }
     
     /**
      * Set the visibility of the movement icon.
      * @param enable True to be displayed.
      */
     private void setMovementIconVisibility(boolean enable) {
-    	if (enable) {
+        if (enable) {
             GUIManager.getInstance().getFocusedWindow().addDisplayElement(movementIcon);
             movementIcon.setItemEntity(getFromMovementSlot());
-    	} else {
+        } else {
             GUIManager.getInstance().getFocusedWindow().removeDisplayElement(movementIcon);
             movementIcon.setItemEntity(EntityRef.NULL);
-    	}
-    	
+        }
+        
         movementIcon.setVisible(enable);
     }
     

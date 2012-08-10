@@ -18,11 +18,10 @@ package org.terasology.asset;
 
 import com.google.common.collect.Maps;
 import org.terasology.asset.loaders.*;
-import org.terasology.asset.AssetManager;
+import org.terasology.world.block.loader.TileLoader;
+import org.terasology.world.block.shapes.JsonBlockShapeLoader;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -35,12 +34,12 @@ import java.util.logging.Logger;
  */
 public enum AssetType {
     PREFAB("prefab", "prefabs", null, null),
-    SOUND("sound", "sounds", "ogg", OggSoundLoader.class),
-    MUSIC("music", "music", "ogg", OggStreamingSoundLoader.class),
-    SHAPE("shape", "shapes", null, null),
-    MESH("mesh", "mesh", "obj", ObjMeshLoader.class),
-    TEXTURE("texture", "textures", "png", PNGTextureLoader.class),
-    SHADER("shader", "shaders", "glsl", GLSLShaderLoader.class) {
+    SOUND("sound", "sounds", "ogg", new OggSoundLoader()),
+    MUSIC("music", "music", "ogg", new OggStreamingSoundLoader()),
+    SHAPE("shape", "shapes", "json", new JsonBlockShapeLoader()),
+    MESH("mesh", "mesh", "obj", new ObjMeshLoader()),
+    TEXTURE("texture", "textures", "png", new PNGTextureLoader()),
+    SHADER("shader", "shaders", "glsl", new GLSLShaderLoader()) {
         @Override
         public AssetUri getUri(String sourceId, String item) {
             int index = item.lastIndexOf("_frag.glsl");
@@ -56,7 +55,9 @@ public enum AssetType {
             return null;
         }
     },
-    MATERIAL("material", "materials", "mat", MaterialLoader.class);
+    MATERIAL("material", "materials", "mat", new MaterialLoader()),
+    BLOCK_DEFINITION("blockdef", "blocks", null, null),
+    BLOCK_TILE("blocktile", "blockTiles", "png", new TileLoader());
 
 
 
@@ -80,14 +81,9 @@ public enum AssetType {
     private static Map<String, AssetType> subDirLookup;
 
     /**
-     * The AssetLoader class able to load assets of this type.
-     */
-    private Class<? extends AssetLoader> assetLoaderClass;
-
-    /**
      * An instance of the asset loader for the current asset type.
      */
-    private AssetLoader assetLoaderInstance;
+    private AssetLoader assetLoader;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -107,11 +103,11 @@ public enum AssetType {
      * Public API
      * ========== */
 
-    private AssetType(String typeId, String subDir, String fileExtension, Class<? extends AssetLoader> assetLoaderClass) {
+    private AssetType(String typeId, String subDir, String fileExtension, AssetLoader assetLoader) {
         this.typeId = typeId;
         this.subDir = subDir;
         this.fileExtension = fileExtension;
-        this.assetLoaderClass = assetLoaderClass;
+        this.assetLoader = assetLoader;
     }
 
     public String getTypeId() {
@@ -126,41 +122,11 @@ public enum AssetType {
         return fileExtension;
     }
 
-    public Class<? extends AssetLoader> getAssetLoaderClass() {
-        return assetLoaderClass;
-    }
-
     /**
      * Returns an instance of the asset loader class assigned to this asset type.
      */
-    public AssetLoader getAssetLoaderInstance() {
-        // Use cached instance if already created
-        if(assetLoaderInstance != null) {
-            return assetLoaderInstance;
-        }
-
-        // Bail out if no asset loader class was assigned to the asset type
-        if(assetLoaderClass == null) {
-            return null;
-        }
-
-        try {
-            assetLoaderInstance = assetLoaderClass.getConstructor().newInstance();
-        } catch(NoSuchMethodException e) {
-            // Error logging in "finally" block
-        } catch(InstantiationException e) {
-            // Error logging in "finally" block
-        } catch (IllegalAccessException e) {
-            // Error logging in "finally" block
-        } catch (InvocationTargetException e) {
-            // Error logging in "finally" block
-        } finally {
-            if(assetLoaderInstance == null) {
-                logger.log(Level.SEVERE, String.format("Error creating asset loader from class '%s'.", assetLoaderClass));
-            }
-        }
-
-        return assetLoaderInstance;
+    public AssetLoader getAssetLoader() {
+        return assetLoader;
     }
 
     public AssetUri getUri(String sourceId, String item) {
@@ -190,13 +156,13 @@ public enum AssetType {
      */
     public static void registerAssetTypes() {
         for(AssetType type : AssetType.values()) {
-            AssetLoader loader = type.getAssetLoaderInstance();
+            AssetLoader loader = type.getAssetLoader();
             if(loader == null) continue; // No loader has been assigned to this AssetType
 
             AssetManager.getInstance().register(
                     type,
                     type.getFileExtension(),
-                    type.getAssetLoaderInstance()
+                    loader
             );
         }
     }

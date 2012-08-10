@@ -8,7 +8,6 @@ import org.terasology.entitySystem.EntityRef;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  * 
  */
-//TODO this class will be used instead of the FullHealth, NoHealth event.
 public class HealthChangedEvent extends AbstractEvent {
 	private EntityRef instigator;
 	private int currentHealth;

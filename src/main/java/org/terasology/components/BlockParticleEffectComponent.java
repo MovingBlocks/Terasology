@@ -17,7 +17,7 @@ package org.terasology.components;
 
 import com.google.common.collect.Lists;
 import org.terasology.entitySystem.Component;
-import org.terasology.model.blocks.BlockFamily;
+import org.terasology.world.block.family.BlockFamily;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;

@@ -25,7 +25,7 @@ import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.asset.AssetManager;
 import org.terasology.logic.manager.ShaderManager;
-import org.terasology.logic.world.WorldProvider;
+import org.terasology.world.WorldProvider;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;

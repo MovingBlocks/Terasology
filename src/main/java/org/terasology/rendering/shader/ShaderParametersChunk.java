@@ -21,8 +21,8 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.asset.AssetManager;
 import org.terasology.logic.manager.PostProcessingRenderer;
-import org.terasology.logic.world.WorldProvider;
-import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.block.management.BlockManager;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -37,9 +37,13 @@ public class ShaderParametersChunk implements IShaderParameters {
     private Texture lava = AssetManager.loadTexture("engine:custom_lava_still");
     private Texture water = AssetManager.loadTexture("engine:water_normal");
     private Texture effects = AssetManager.loadTexture("engine:effects");
-    private Texture terrain = AssetManager.loadTexture("engine:terrain");
 
     public void applyParameters(ShaderProgram program) {
+        Texture terrain = AssetManager.loadTexture("engine:terrain");
+        if (terrain == null) {
+            return;
+        }
+
         WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
@@ -78,9 +82,9 @@ public class ShaderParametersChunk implements IShaderParameters {
         }
 
         program.setFloat1("wavingCoordinates", BlockManager.getInstance().calcCoordinatesForWavingBlocks());
-        program.setFloat2("grassCoordinate", BlockManager.getInstance().calcCoordinate("Grass"));
-        program.setFloat2("waterCoordinate", BlockManager.getInstance().calcCoordinate("Water"));
-        program.setFloat2("lavaCoordinate", BlockManager.getInstance().calcCoordinate("Lava"));
+        program.setFloat2("grassCoordinate", BlockManager.getInstance().calcCoordinate("engine:grass"));
+        program.setFloat2("waterCoordinate", BlockManager.getInstance().calcCoordinate("engine:water"));
+        program.setFloat2("lavaCoordinate", BlockManager.getInstance().calcCoordinate("engine:lava"));
     }
 
 }

@@ -24,7 +24,7 @@ import org.lwjgl.opengl.GL20;
 import org.terasology.asset.Asset;
 import org.terasology.asset.AssetUri;
 import org.terasology.logic.manager.Config;
-import org.terasology.model.blocks.Block;
+import org.terasology.world.block.Block;
 import org.terasology.rendering.assets.metadata.ParamMetadata;
 import org.terasology.rendering.assets.metadata.ParamType;
 import org.terasology.rendering.assets.metadata.ShaderMetadata;

@@ -29,10 +29,10 @@ import org.terasology.events.input.binds.PauseButton;
 import org.terasology.game.CoreRegistry;
 import org.terasology.input.ButtonState;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.rendering.gui.menus.UIDebugConsole;
-import org.terasology.rendering.gui.menus.UIHeadsUpDisplay;
-import org.terasology.rendering.gui.menus.UIInventoryScreen;
-import org.terasology.rendering.gui.menus.UIPauseMenu;
+import org.terasology.rendering.gui.windows.UIScreenConsole;
+import org.terasology.rendering.gui.windows.UIScreenHUD;
+import org.terasology.rendering.gui.windows.UIScreenInventory;
+import org.terasology.rendering.gui.windows.UIMenuPause;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
@@ -47,10 +47,10 @@ public class MenuControlSystem implements EventHandlerSystem {
 
     @Override
     public void initialise() {
-        GUIManager.getInstance().addWindow(new UIDebugConsole(), CONSOLE);
-        GUIManager.getInstance().addWindow(new UIHeadsUpDisplay(), "engine:hud");
-        GUIManager.getInstance().addWindow(new UIInventoryScreen(), INVENTORY);
-        GUIManager.getInstance().addWindow(new UIPauseMenu(), PAUSE_MENU);
+        GUIManager.getInstance().addWindow(new UIScreenConsole(), CONSOLE);
+        GUIManager.getInstance().addWindow(new UIScreenHUD(), "engine:hud");
+        GUIManager.getInstance().addWindow(new UIScreenInventory(), INVENTORY);
+        GUIManager.getInstance().addWindow(new UIMenuPause(), PAUSE_MENU);
     }
 
     @Override

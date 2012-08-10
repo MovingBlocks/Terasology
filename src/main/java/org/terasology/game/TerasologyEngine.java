@@ -29,11 +29,11 @@ import org.terasology.asset.AssetUri;
 import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.game.modes.GameState;
 import org.terasology.logic.manager.*;
-import org.terasology.model.blocks.management.BlockManager;
-import org.terasology.model.blocks.management.BlockManifestor;
-import org.terasology.model.shapes.BlockShapeManager;
+import org.terasology.world.block.loader.TileLoader;
+import org.terasology.world.block.management.BlockManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.physics.CollisionGroupManager;
+import org.terasology.world.block.shapes.JsonBlockShapeLoader;
 
 import java.io.File;
 import java.io.IOException;
@@ -338,30 +338,10 @@ public class TerasologyEngine implements GameEngine {
 
         AssetType.registerAssetTypes();
         AssetManager.getInstance().addAssetSource(new ClasspathSource("engine", getClass().getProtectionDomain().getCodeSource(), "org/terasology/data"));
-        // TODO: Shouldn't be setting up the block/block shape managers here (do on transition to StateSinglePlayer)
-        BlockShapeManager.getInstance().reload();
-        BlockManifestor manifestor = new BlockManifestor(BlockManager.getInstance());
 
-        try {
-            manifestor.loadConfig();
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Failed to load block definitions", e);
-            System.exit(-1);
-        }
-
-        for (AssetUri uri : AssetManager.list(AssetType.SHADER)) {
-            AssetManager.load(uri);
-        }
-
-        for (AssetUri uri : AssetManager.list(AssetType.MATERIAL)) {
-            AssetManager.load(uri);
-        }
-
-        // TODO: This has to occur after the BlockManager has been created, so that texture:engine:terrain exists. Fix this.
         ShaderManager.getInstance();
         VertexBufferObjectManager.getInstance();
         FontManager.getInstance();
-
     }
 
     private void initTimer() {

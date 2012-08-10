@@ -30,9 +30,9 @@ import org.terasology.events.NoHealthEvent;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AudioManager;
-import org.terasology.logic.world.WorldProvider;
-import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.management.BlockManager;
 import org.terasology.physics.ImpulseEvent;
 import org.terasology.utilities.FastRandom;
 
@@ -73,14 +73,14 @@ public class BlockEntitySystem implements EventHandlerSystem {
         // TODO: This should be driven by block attachment info, and not be billboard specific
         // Remove the upper block if it's a billboard
         Block upperBlock = worldProvider.getBlock(blockComp.getPosition().x, blockComp.getPosition().y + 1, blockComp.getPosition().z);
-        if (upperBlock.getBlockForm() == Block.BLOCK_FORM.BILLBOARD) {
+        if (upperBlock.isSupportRequired()) {
             worldProvider.setBlock(blockComp.getPosition().x, blockComp.getPosition().y + 1, blockComp.getPosition().z, BlockManager.getInstance().getAir(), upperBlock);
         }
 
         // TODO: Configurable via block definition
         AudioManager.play(new AssetUri(AssetType.SOUND, "engine:RemoveBlock"), 0.6f);
 
-        if ((oldBlock.isStraightToInventory() || !oldBlock.isEntityTemporary()) && event.getInstigator().exists()) {
+        if ((oldBlock.isDirectPickup() || !oldBlock.isEntityTemporary()) && event.getInstigator().exists()) {
             EntityRef item = blockItemFactory.newInstance(oldBlock.getBlockFamily(), entity);
             if (!oldBlock.isEntityTemporary()) {
                 entity.removeComponent(HealthComponent.class);

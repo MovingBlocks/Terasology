@@ -22,15 +22,16 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
-import org.terasology.logic.world.BlockChangedEvent;
+import org.terasology.world.BlockChangedEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.world.chunks.Chunk;
-import org.terasology.logic.world.WorldBiomeProvider;
-import org.terasology.logic.world.WorldProvider;
+import org.terasology.world.block.BlockUri;
+import org.terasology.world.chunks.Chunk;
+import org.terasology.world.WorldBiomeProvider;
+import org.terasology.world.WorldProvider;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
-import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.management.BlockManager;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -61,8 +62,8 @@ public class GrowthSimulator implements EventHandlerSystem {
     public void initialise() {
         world = CoreRegistry.get(WorldProvider.class);
         air = BlockManager.getInstance().getAir();
-        grass = BlockManager.getInstance().getBlock("Grass");
-        dirt = BlockManager.getInstance().getBlock("Dirt");
+        grass = BlockManager.getInstance().getBlock("engine:grass");
+        dirt = BlockManager.getInstance().getBlock("engine:dirt");
         blockQueue = Queues.newLinkedBlockingQueue();
         running.set(true);
 

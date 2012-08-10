@@ -61,7 +61,17 @@ public class AssetManager {
         assetCache.put(uri, asset);
     }
 
+    public Asset tryLoadAsset(AssetUri uri) {
+        return loadAsset(uri, false);
+    }
+
+
     public Asset loadAsset(AssetUri uri) {
+        return loadAsset(uri, true);
+    }
+
+    private Asset loadAsset(AssetUri uri, boolean logErrors) {
+
         if (!uri.isValid()) return null;
 
         Asset asset = assetCache.get(uri);
@@ -69,7 +79,9 @@ public class AssetManager {
 
         List<URL> urls = getAssetURLs(uri);
         if (urls.size() == 0) {
-            logger.log(Level.WARNING, "Unable to resolve asset: " + uri);
+            if (logErrors) {
+                logger.log(Level.WARNING, "Unable to resolve asset: " + uri);
+            }
             return null;
         }
 
@@ -113,8 +125,15 @@ public class AssetManager {
     }
 
     public void clear() {
-        // TODO: Unload assets
-        //assetCache.clear();
+        Iterator<Asset> iterator = assetCache.values().iterator();
+        while (iterator.hasNext()) {
+            Asset asset = iterator.next();
+            // Don't dispose engine assets, all sorts of systems have references to them
+            if (!asset.getURI().getPackage().equals("engine")) {
+                asset.dispose();
+                iterator.remove();
+            }
+        }
     }
 
     public void addAssetSource(AssetSource source) {
@@ -178,6 +197,10 @@ public class AssetManager {
 
     public static Asset load(AssetUri uri) {
         return getInstance().loadAsset(uri);
+    }
+
+    public static Asset tryLoad(AssetUri uri) {
+        return getInstance().tryLoadAsset(uri);
     }
 
     public static <T extends Asset> T load(AssetUri uri, Class<T> assetClass) {
