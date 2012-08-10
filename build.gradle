@@ -10,7 +10,19 @@ apply plugin: 'groovy'
 apply plugin: 'project-report'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
+
+/* Optional check plugins
 apply plugin: 'checkstyle'
+apply plugin: 'codenarc'
+apply plugin: 'findbugs'
+apply plugin: 'pmd'
+
+// ignoreFailures: Whether or not this task will ignore failures and continue running the build.
+checkstyle.ignoreFailures = true
+codenarc.ignoreFailures = true
+findbugs.ignoreFailures = true
+pmd.ignoreFailures = true
+*/
 
 /* Gradle Wrapper: Uncomment this task, change 'gradleVersion' and run "wrapper".
 task wrapper(type: Wrapper) {
@@ -114,6 +126,27 @@ jar {
         def manifestClasspath = "$subDirLibs/"+configurations.runtime.collect { it.getName() }.join(" $subDirLibs/") 
         attributes("Implementation-Title": project.name, "Main-Class": mainClassName, "Class-Path" : manifestClasspath)
     }
+}
+
+task sourceJar(type: Jar) {
+    description = "Create a JAR with all sources (main: java, groovy, resources)"
+    manifest.attributes("Implementation-Title": project.name)
+    classifier = 'sources'
+    from sourceSets.main.output
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    description = "Create a JAR with the JavaDoc for the java sources"
+    manifest.attributes("Implementation-Title": project.name)
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+task groovydocJar(type: Jar, dependsOn: groovydoc) {
+    description = "Create a JAR with the GroovyDoc for the groovy and java sources"
+    manifest.attributes("Implementation-Title": project.name)
+    classifier = 'groovydoc'
+    from groovydoc.destinationDir
 }
 
 test {
