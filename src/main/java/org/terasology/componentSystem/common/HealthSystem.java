@@ -56,9 +56,10 @@ public class HealthSystem implements EventHandlerSystem, UpdateSubscriberSystem 
                     health.currentHealth = Math.min(health.maxHealth, health.currentHealth + (int) health.partialRegen);
                     health.partialRegen %= 1f;
                     if (health.currentHealth == health.maxHealth) {
-                        entity.send(new FullHealthEvent());
+                        entity.send(new FullHealthEvent(entity, health.maxHealth));
+                    } else {
+                        entity.send(new HealthChangedEvent(entity, health.currentHealth, health.maxHealth));
                     }
-                    entity.send(new HealthChangedEvent(entity, health.currentHealth, health.maxHealth));
                 }
             }
             entity.saveComponent(health);
@@ -89,9 +90,10 @@ public class HealthSystem implements EventHandlerSystem, UpdateSubscriberSystem 
         health.timeSinceLastDamage = 0;
         health.currentHealth -= damageAmount;
         if (health.currentHealth <= 0) {
-            entity.send(new NoHealthEvent(instigator));
+            entity.send(new NoHealthEvent(instigator, health.maxHealth));
+        } else {
+            entity.send(new HealthChangedEvent(instigator, health.currentHealth, health.maxHealth));
         }
-        entity.send(new HealthChangedEvent(instigator, health.currentHealth, health.maxHealth));
         entity.saveComponent(health);
     }
 }

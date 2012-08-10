@@ -15,8 +15,9 @@
  */
 package org.terasology.model.blueprints;
 
-import org.terasology.logic.world.WorldProvider;
-import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.block.BlockUri;
+import org.terasology.world.block.management.BlockManager;
 import org.terasology.model.structures.BlockPosition;
 import org.terasology.model.structures.BlockSelection;
 
@@ -35,13 +36,13 @@ public class PortalBlueprint extends Blueprint {
      */
     public PortalBlueprint() {
         // This becomes the portalBlocks Selection in PortalComponent
-        _blockCollection.addBlock(new BlockPosition(1, 1, 0), BlockManager.getInstance().getBlock("PortalBlock"));
+        _blockCollection.addBlock(new BlockPosition(1, 1, 0), BlockManager.getInstance().getBlock("engine:portal"));
 
         // And these guys make up the frame
-        _blockCollection.addBlock(new BlockPosition(1, 2, 0), BlockManager.getInstance().getBlock("PortalFrameBlock"));
-        _blockCollection.addBlock(new BlockPosition(0, 1, 0), BlockManager.getInstance().getBlock("PortalFrameBlock"));
-        _blockCollection.addBlock(new BlockPosition(2, 1, 0), BlockManager.getInstance().getBlock("PortalFrameBlock"));
-        _blockCollection.addBlock(new BlockPosition(1, 0, 0), BlockManager.getInstance().getBlock("PortalFrameBlock"));
+        _blockCollection.addBlock(new BlockPosition(1, 2, 0), BlockManager.getInstance().getBlock("engine:PortalFrame"));
+        _blockCollection.addBlock(new BlockPosition(0, 1, 0), BlockManager.getInstance().getBlock("engine:PortalFrame"));
+        _blockCollection.addBlock(new BlockPosition(2, 1, 0), BlockManager.getInstance().getBlock("engine:PortalFrame"));
+        _blockCollection.addBlock(new BlockPosition(1, 0, 0), BlockManager.getInstance().getBlock("engine:PortalFrame"));
 
         // Set the position we'll use as the attachment point
         _blockCollection.setAttachPos(new BlockPosition(1, -1, 0));
@@ -59,8 +60,8 @@ public class PortalBlueprint extends Blueprint {
     //public PortalComponent createPortal(IWorldProvider provider, BlockPosition pos) {
     public void createPortal(WorldProvider provider, BlockPosition pos) {
         // Build the Portal in pieces so we can store what's what in the returned PortalComponent
-        BlockSelection portalBlocks = _blockCollection.buildWithFilter(provider, pos, "PortalBlock");
-        BlockSelection frameBlocks = _blockCollection.buildWithFilter(provider, pos, "PortalFrameBlock");
+        BlockSelection portalBlocks = _blockCollection.buildWithFilter(provider, pos, new BlockUri("engine:portal"));
+        BlockSelection frameBlocks = _blockCollection.buildWithFilter(provider, pos, new BlockUri("engine:portalframe"));
 
         //return new PortalComponent(portalBlocks, frameBlocks);
     }

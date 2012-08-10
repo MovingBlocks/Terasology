@@ -24,7 +24,7 @@ import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.world.WorldProvider;
+import org.terasology.world.WorldProvider;
 import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.AxisAngle4f;

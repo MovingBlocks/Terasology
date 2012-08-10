@@ -18,6 +18,7 @@ package org.terasology.componentSystem.rendering;
 import com.google.common.collect.Maps;
 import org.lwjgl.opengl.GL11;
 import org.terasology.componentSystem.RenderSystem;
+import org.terasology.world.block.BlockPart;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
@@ -29,11 +30,10 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.asset.AssetManager;
 import org.terasology.logic.manager.ShaderManager;
-import org.terasology.logic.world.WorldProvider;
-import org.terasology.math.Side;
+import org.terasology.world.WorldProvider;
 import org.terasology.math.TeraMath;
-import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.BlockFamily;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.family.BlockFamily;
 import org.terasology.model.inventory.Icon;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.primitives.Mesh;
@@ -172,8 +172,7 @@ public class FirstPersonRenderer implements RenderSystem {
         shader.enable();
 
         // Apply biome and overall color offset
-        // TODO: Should get temperature, etc from world provider
-        Vector4f color = activeBlock.calcColorOffsetFor(Side.FRONT, worldProvider.getBiomeProvider().getTemperatureAt(TeraMath.floorToInt(playerPos.x), TeraMath.floorToInt(playerPos.z)), worldProvider.getBiomeProvider().getHumidityAt(TeraMath.floorToInt(playerPos.x), TeraMath.floorToInt(playerPos.z)));
+        Vector4f color = activeBlock.calcColorOffsetFor(BlockPart.CENTER, worldProvider.getBiomeProvider().getTemperatureAt(TeraMath.floorToInt(playerPos.x), TeraMath.floorToInt(playerPos.z)), worldProvider.getBiomeProvider().getHumidityAt(TeraMath.floorToInt(playerPos.x), TeraMath.floorToInt(playerPos.z)));
         shader.setFloat3("colorOffset", color.x, color.y, color.z);
 
         glEnable(GL11.GL_BLEND);

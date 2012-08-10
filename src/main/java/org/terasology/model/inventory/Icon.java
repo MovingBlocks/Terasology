@@ -17,8 +17,8 @@ package org.terasology.model.inventory;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.AssetManager;
-import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.BlockFamily;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.family.BlockFamily;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 

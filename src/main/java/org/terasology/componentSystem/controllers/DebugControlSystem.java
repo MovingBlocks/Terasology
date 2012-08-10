@@ -28,7 +28,7 @@ import org.terasology.events.input.KeyEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.logic.world.WorldProvider;
+import org.terasology.world.WorldProvider;
 import org.terasology.rendering.gui.menus.UIMetrics;
 import org.terasology.rendering.world.WorldRenderer;
 

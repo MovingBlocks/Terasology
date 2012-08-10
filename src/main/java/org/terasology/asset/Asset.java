@@ -21,4 +21,5 @@ package org.terasology.asset;
  */
 public interface Asset {
     public AssetUri getURI();
+    public void dispose();
 }

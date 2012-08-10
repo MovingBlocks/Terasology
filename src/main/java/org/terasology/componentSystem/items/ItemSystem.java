@@ -15,7 +15,6 @@
  */
 package org.terasology.componentSystem.items;
 
-import com.bulletphysics.collision.broadphase.CollisionFilterGroups;
 import com.google.common.collect.Lists;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
@@ -28,12 +27,12 @@ import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AudioManager;
-import org.terasology.logic.world.BlockEntityRegistry;
-import org.terasology.logic.world.WorldProvider;
+import org.terasology.world.BlockEntityRegistry;
+import org.terasology.world.WorldProvider;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
-import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.BlockFamily;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.family.BlockFamily;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.StandardCollisionGroup;
@@ -150,12 +149,12 @@ public class ItemSystem implements EventHandlerSystem {
     private boolean canPlaceBlock(Block block, Vector3i targetBlock, Vector3i blockPos) {
         Block centerBlock = worldProvider.getBlock(targetBlock.x, targetBlock.y, targetBlock.z);
 
-        if (!centerBlock.isAllowBlockAttachment()) {
+        if (!centerBlock.isAttachmentAllowed()) {
             return false;
         }
 
         Block adjBlock = worldProvider.getBlock(blockPos.x, blockPos.y, blockPos.z);
-        if (adjBlock != null && !adjBlock.isInvisible() && !adjBlock.isSelectionRayThrough()) {
+        if (!adjBlock.isInvisible() || adjBlock.isTargetable()) {
             return false;
         }
 

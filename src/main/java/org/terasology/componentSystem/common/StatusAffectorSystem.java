@@ -96,7 +96,9 @@ public class StatusAffectorSystem implements EventHandlerSystem, UpdateSubscribe
                 health.currentHealth = Math.min(health.maxHealth, health.currentHealth - (int) poisonedEffect.poisonRate);
                 entity.saveComponent(health);
                 if (health.currentHealth <= 0) {
-                    entity.send(new NoHealthEvent(entity));
+                    entity.send(new NoHealthEvent(entity, health.maxHealth));
+                } else {
+                    entity.send(new HealthChangedEvent(entity, health.currentHealth, health.maxHealth));
                 }
             }
             //Remove POISONED Status

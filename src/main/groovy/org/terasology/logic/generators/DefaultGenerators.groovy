@@ -3,12 +3,12 @@
 
 package org.terasology.logic.generators
 
-import org.terasology.model.blocks.management.BlockManager
-import org.terasology.logic.world.generator.tree.TreeGeneratorLSystem
-import org.terasology.logic.world.generator.tree.TreeGeneratorCactus
-import org.terasology.logic.world.generator.core.ForestGenerator
+import org.terasology.world.block.management.BlockManager
+import org.terasology.world.generator.tree.TreeGeneratorLSystem
+import org.terasology.world.generator.tree.TreeGeneratorCactus
+import org.terasology.world.generator.core.ForestGenerator
 
-import org.terasology.logic.world.WorldBiomeProvider
+import org.terasology.world.WorldBiomeProvider
 
 public class DefaultGenerators {
 
@@ -22,11 +22,11 @@ public class DefaultGenerators {
 
         // Pine
         rules = ["A": "[&FFFFFA]////[&FFFFFA]////[&FFFFFA]"]
-        def pineTree = new TreeGeneratorLSystem("FFFFAFFFFFFFAFFFFA", rules, probs, 4, 35).setLeafType(BlockManager.getInstance().getBlock("DarkLeaf")).setGenerationProbability(0.05).setBarkType(BlockManager.getInstance().getBlock("PineTrunk"))
+        def pineTree = new TreeGeneratorLSystem("FFFFAFFFFFFFAFFFFA", rules, probs, 4, 35).setLeafType(BlockManager.getInstance().getBlock("engine:DarkLeaf")).setGenerationProbability(0.05).setBarkType(BlockManager.getInstance().getBlock("engine:PineTrunk"))
 
         // Birk
         rules = ["A": "[&FFFAFFF]////[&FFAFFF]////[&FFFAFFF]", "B": "[&FAF]////[&FAF]////[&FAF]"]
-        def birkTree = new TreeGeneratorLSystem("FFFFAFFFFBFFFFAFFFFBFFFFAFFFFBFF", rules, probs, 4, 35).setLeafType(BlockManager.getInstance().getBlock("DarkLeaf")).setGenerationProbability(0.02).setBarkType(BlockManager.getInstance().getBlock("BirkTrunk"))
+        def birkTree = new TreeGeneratorLSystem("FFFFAFFFFBFFFFAFFFFBFFFFAFFFFBFF", rules, probs, 4, 35).setLeafType(BlockManager.getInstance().getBlock("engine:DarkLeaf")).setGenerationProbability(0.02).setBarkType(BlockManager.getInstance().getBlock("engine:BirkTrunk"))
 
         // Oak variation tree
         rules = ["A": "[&FFBFA]////[&BFFFA]////[&FBFFAFFA]", "B": "[&FFFAFFFF]////[&FFFAFFF]////[&FFFAFFAA]"]
@@ -34,7 +34,7 @@ public class DefaultGenerators {
 
         // A red tree
         rules = ["A": "[&FFAFF]////[&FFAFF]////[&FFAFF]"]
-        def redTree = new TreeGeneratorLSystem("FFFFFAFAFAF", rules, probs, 4, 40).setLeafType(BlockManager.getInstance().getBlock("RedLeaf")).setGenerationProbability(0.05)
+        def redTree = new TreeGeneratorLSystem("FFFFFAFAFAF", rules, probs, 4, 40).setLeafType(BlockManager.getInstance().getBlock("engine:RedLeaf")).setGenerationProbability(0.05)
 
         // Cactus
         def cactus = new TreeGeneratorCactus().setGenerationProbability(0.05)

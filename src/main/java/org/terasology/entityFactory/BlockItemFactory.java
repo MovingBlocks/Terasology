@@ -20,8 +20,7 @@ import org.terasology.components.LightComponent;
 import org.terasology.components.block.BlockItemComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.PrefabManager;
-import org.terasology.model.blocks.BlockFamily;
+import org.terasology.world.block.family.BlockFamily;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -54,10 +53,10 @@ public class BlockItemFactory {
             entity.addComponent(new LightComponent());
         }
         ItemComponent item = new ItemComponent();
-        item.name = blockFamily.getTitle();
+        item.name = blockFamily.getDisplayName();
         item.consumedOnUse = true;
         if (blockFamily.getArchetypeBlock().isStackable()) {
-            item.stackId = blockFamily.getTitle() + "Block";
+            item.stackId = "block:" + blockFamily.getURI().toString();
             item.stackCount = (byte) quantity;
         }
         item.usage = ItemComponent.UsageType.ON_BLOCK;

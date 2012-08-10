@@ -20,16 +20,9 @@ import org.terasology.entitySystem.EntityRef;
 
 /**
  * @author Immortius <immortius@gmail.com>
- * @deprecated Use HealthChangedEvent instead.
  */
-public class NoHealthEvent extends AbstractEvent {
-    private EntityRef instigator;
-
-    public NoHealthEvent(EntityRef instigator) {
-        this.instigator = instigator;
-    }
-
-    public EntityRef getInstigator() {
-        return instigator;
+public class NoHealthEvent extends HealthChangedEvent {
+    public NoHealthEvent(EntityRef instigator, int maximumHealth) {
+        super(instigator, 0, maximumHealth);
     }
 }

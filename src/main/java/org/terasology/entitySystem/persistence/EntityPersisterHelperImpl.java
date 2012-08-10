@@ -412,8 +412,12 @@ public class EntityPersisterHelperImpl implements EntityPersisterHelper {
 
                 if (!Objects.equal(origValue, deltaValue)) {
                     EntityData.Value value = field.serialize(deltaValue);
-                    componentMessage.addField(EntityData.NameValue.newBuilder().setName(field.getName()).setValue(value).build());
-                    changed = true;
+                    if (value != null) {
+                        componentMessage.addField(EntityData.NameValue.newBuilder().setName(field.getName()).setValue(value).build());
+                        changed = true;
+                    } else {
+                        logger.log(Level.SEVERE, "Exception serializing component type: " + base.getClass() + ", field: " + field.getName() + " - returned null");
+                    }
                 }
             } catch (IllegalAccessException e) {
                 logger.log(Level.SEVERE, "Exception during serializing component type: " + base.getClass(), e);

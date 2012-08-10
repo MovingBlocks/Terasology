@@ -28,7 +28,7 @@ import org.terasology.entitySystem.pojo.PojoEventSystem;
 import org.terasology.entitySystem.pojo.PojoPrefabManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.Vector3i;
-import org.terasology.model.blocks.BlockFamily;
+import org.terasology.world.block.family.BlockFamily;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.primitives.Mesh;
