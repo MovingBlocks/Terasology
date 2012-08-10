@@ -20,6 +20,8 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import org.lwjgl.opengl.Display;
 import org.terasology.logic.manager.PathManager;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 
 import javax.vecmath.Vector2f;
 import java.io.File;
@@ -33,49 +35,59 @@ import java.util.Iterator;
  * Simple text element supporting text shadowing.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * 
+ * TODO clean this up / write from scratch.
+ * TODO this is directly bind to the debug console? If so it should not work this way. Make an abstract widget out of this, which can also be used in other places.
  */
 public class UITextWrap extends UIText {
 
     public final String newLine = System.getProperty("line.separator");
-    private long currentpos = 0, wheelycount = 0;
+    private long currentpos = 0;
 
     public UITextWrap() {
         super();
+        setup();
     }
 
     public UITextWrap(String text) {
         super(text);
+        setup();
 
     }
 
     public UITextWrap(Vector2f position) {
         super(position);
+        setup();
     }
-
-    @Override
-    public void update() {
-        if (wheelycount != 0) {
-            currentpos += wheelycount;
-            wheelycount = 0;
-            try {
-                showFromJson();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Override
-    public void processMouseInput(int button, boolean state, int wheelMoved) {
-        super.processMouseInput(button, state, wheelMoved);
-        if (_wheelMoved != 0) {
-            if (_wheelMoved > 0) {
-                wheelycount++;
-            } else {
-                wheelycount--;
-            }
-            _wheelMoved = 0;
-        }
+    
+    private void setup() {
+    	addMouseButtonListener(new MouseButtonListener() {
+			@Override
+			public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
+				if (wheel != 0) {
+					if (wheel > 0)
+						currentpos++;
+					else
+						currentpos--;
+					
+					try {
+						showFromJson();	//TODO something buggy here :D scroll causes help blockList to be displayed.
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			
+			@Override
+			public void up(UIDisplayElement element, int button, boolean intersect) {
+				
+			}
+			
+			@Override
+			public void down(UIDisplayElement element, int button, boolean intersect) {
+				
+			}
+		});
     }
 
     public void setText(String text) {

@@ -24,9 +24,9 @@ import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UISlider;
 import org.terasology.rendering.gui.components.UIStateButton;
-import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.menus.*;
+import org.terasology.rendering.gui.framework.events.ClickListener;
+import org.terasology.rendering.gui.windows.*;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -45,13 +45,13 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class StateMainMenu implements GameState {
     /* SCREENS */
-    private UIMainMenu _mainMenu;
-    private UIConfigMenu _configMenu;
-    private UIConfigMenuVideo _configMenuVideo;
-    private UIConfigMenuAudio _configMenuAudio;
-    private UIConfigMenuControls _configMenuControls;
-    private UIConfigMenuMods _configMenuMods;
-    private UISelectWorldMenu _selectWorldMenu;
+    private UIMenuMain _mainMenu;
+    private UIMenuConfig _configMenu;
+    private UIMenuConfigVideo _configMenuVideo;
+    private UIMenuConfigAudio _configMenuAudio;
+    private UIMenuConfigControls _configMenuControls;
+    private UIMenuConfigMods _configMenuMods;
+    private UIMenuSelectWorld _selectWorldMenu;
 
     private GameEngine _gameInstance = null;
 
@@ -77,7 +77,7 @@ public class StateMainMenu implements GameState {
     }
 
     private void setupMainMenu() {
-        _mainMenu = new UIMainMenu();
+        _mainMenu = new UIMenuMain();
         _mainMenu.setVisible(true);
 
         UIButton singlePlayerButton = (UIButton) _mainMenu.getElementById("singlePlayerButton");
@@ -85,47 +85,45 @@ public class StateMainMenu implements GameState {
         UIButton exitButton = (UIButton) _mainMenu.getElementById("exitButton");
 
 
-        singlePlayerButton.addClickListener(new IClickListener() {
-            @Override
-            public void clicked(UIDisplayElement element) {
-                //  _mainMenu.setVisible(false);
-                //  _selectWorldMenu.setVisible(true);
-                _selectWorldMenu.fillList();
-                GUIManager.getInstance().setFocusedWindow(_selectWorldMenu);
-            }
+        singlePlayerButton.addClickListener(new ClickListener() {
+			@Override
+			public void click(UIDisplayElement element, int button) {
+            	_selectWorldMenu.fillList();
+            	GUIManager.getInstance().setFocusedWindow(_selectWorldMenu);
+			}
         });
 
-        exitButton.addClickListener(new IClickListener() {
-            @Override
-            public void clicked(UIDisplayElement element) {
-                _gameInstance.shutdown();
-            }
+        exitButton.addClickListener(new ClickListener() {
+			@Override
+			public void click(UIDisplayElement element, int button) {
+				_gameInstance.shutdown();
+			}
         });
 
-        configButton.addClickListener(new IClickListener() {
-            @Override
-            public void clicked(UIDisplayElement element) {
-                GUIManager.getInstance().setFocusedWindow(_configMenu);
-            }
+        configButton.addClickListener(new ClickListener() {
+			@Override
+			public void click(UIDisplayElement element, int button) {
+				GUIManager.getInstance().setFocusedWindow(_configMenu);
+			}
         });
     }
 
     private void setupSelectWorldMenu() {
-        _selectWorldMenu = new UISelectWorldMenu();
+        _selectWorldMenu = new UIMenuSelectWorld();
         _selectWorldMenu.setVisible(false);
 
         UIButton goToBack = (UIButton) _selectWorldMenu.getElementById("goToBackButton");
 
-        goToBack.addClickListener(new IClickListener() {
-            @Override
-            public void clicked(UIDisplayElement element) {
-                GUIManager.getInstance().setFocusedWindow(_mainMenu);
-            }
+        goToBack.addClickListener(new ClickListener() {
+			@Override
+			public void click(UIDisplayElement element, int button) {
+				GUIManager.getInstance().setFocusedWindow(_mainMenu);
+			}
         });
     }
 
     private void setupConfigMenu() {
-        _configMenu = new UIConfigMenu();
+        _configMenu = new UIMenuConfig();
         _configMenu.setVisible(false);
 
         UIButton videoButton = (UIButton) _configMenu.getElementById("videoButton");
@@ -134,118 +132,118 @@ public class StateMainMenu implements GameState {
         UIButton modsButton = (UIButton) _configMenu.getElementById("modsButton");
         UIButton backToMainMenuButton = (UIButton) _configMenu.getElementById("backToMainMenuButton");
 
-        videoButton.addClickListener(new IClickListener() {
-            @Override
-            public void clicked(UIDisplayElement element) {
-                GUIManager.getInstance().setFocusedWindow(_configMenuVideo);
-            }
+        videoButton.addClickListener(new ClickListener() {
+			@Override
+			public void click(UIDisplayElement element, int button) {
+				GUIManager.getInstance().setFocusedWindow(_configMenuVideo);
+			}
         });
 
-        audioButton.addClickListener(new IClickListener() {
-            @Override
-            public void clicked(UIDisplayElement element) {
-                GUIManager.getInstance().setFocusedWindow(_configMenuAudio);
-            }
+        audioButton.addClickListener(new ClickListener() {
+			@Override
+			public void click(UIDisplayElement element, int button) {
+				GUIManager.getInstance().setFocusedWindow(_configMenuAudio);
+			}
         });
 
-        controlsButton.addClickListener(new IClickListener() {
-            @Override
-            public void clicked(UIDisplayElement element) {
-                GUIManager.getInstance().setFocusedWindow(_configMenuControls);
-            }
+        controlsButton.addClickListener(new ClickListener() {
+			@Override
+			public void click(UIDisplayElement element, int button) {
+				GUIManager.getInstance().setFocusedWindow(_configMenuControls);
+			}
         });
 
-        modsButton.addClickListener(new IClickListener() {
-            @Override
-            public void clicked(UIDisplayElement element) {
-                GUIManager.getInstance().setFocusedWindow(_configMenuMods);
-            }
+        modsButton.addClickListener(new ClickListener() {
+			@Override
+			public void click(UIDisplayElement element, int button) {
+				GUIManager.getInstance().setFocusedWindow(_configMenuMods);
+			}
         });
 
-        backToMainMenuButton.addClickListener(new IClickListener() {
-            @Override
-            public void clicked(UIDisplayElement element) {
-                GUIManager.getInstance().setFocusedWindow(_mainMenu);
-            }
+        backToMainMenuButton.addClickListener(new ClickListener() {
+			@Override
+			public void click(UIDisplayElement element, int button) {
+				GUIManager.getInstance().setFocusedWindow(_mainMenu);
+			}
         });
     }
 
     private void setupConfigMenuVideo() {
-        _configMenuVideo = new UIConfigMenuVideo();
+        _configMenuVideo = new UIMenuConfigVideo();
         _configMenuVideo.setVisible(false);
 
         UIButton videoToSettingsMenuButton = (UIButton) _configMenuVideo.getElementById("backToConfigMenuButton");
-        videoToSettingsMenuButton.addClickListener(new IClickListener() {
-            @Override
-            public void clicked(UIDisplayElement element) {
-                GUIManager.getInstance().setFocusedWindow(_configMenu);
-            }
+        videoToSettingsMenuButton.addClickListener(new ClickListener() {
+			@Override
+			public void click(UIDisplayElement element, int button) {
+				GUIManager.getInstance().setFocusedWindow(_configMenu);
+			}
         });
     }
 
     private void setupConfigMenuAudio() {
-    	_configMenuAudio = new UIConfigMenuAudio();
+    	_configMenuAudio = new UIMenuConfigAudio();
         _configMenuAudio.setVisible(false);
 
         UIButton backToConfigMenuButton = (UIButton) _configMenuAudio.getElementById("backToConfigMenuButton");
-        backToConfigMenuButton.addClickListener(new IClickListener() {
-            @Override
-            public void clicked(UIDisplayElement element) {
-                GUIManager.getInstance().setFocusedWindow(_configMenu);
-            }
+        backToConfigMenuButton.addClickListener(new ClickListener() {
+			@Override
+			public void click(UIDisplayElement element, int button) {
+				GUIManager.getInstance().setFocusedWindow(_configMenu);
+			}
         });
     }
 
     private void setupConfigMenuControls() {
-    	_configMenuControls = new UIConfigMenuControls();
+    	_configMenuControls = new UIMenuConfigControls();
         _configMenuControls.setVisible(false);
 
         UIButton backToSettingsMenuButton = (UIButton) _configMenuControls.getElementById("backToConfigMenuButton");
 
-        backToSettingsMenuButton.addClickListener(new IClickListener() {
-            @Override
-            public void clicked(UIDisplayElement element) {
-                GUIManager.getInstance().setFocusedWindow(_configMenu);
-            }
+        backToSettingsMenuButton.addClickListener(new ClickListener() {
+			@Override
+			public void click(UIDisplayElement element, int button) {
+				GUIManager.getInstance().setFocusedWindow(_configMenu);
+			}
         });
     }
 
     private void setupConfigMenuMods() {
-    	_configMenuMods = new UIConfigMenuMods();
+    	_configMenuMods = new UIMenuConfigMods();
         _configMenuMods.setVisible(false);
 
         UIButton minionsButton = (UIButton) _configMenuMods.getElementById("minionsButton");
         UIButton minionOptionsButton = (UIButton) _configMenuMods.getElementById("minionOptionsButton");
         UIButton backToSettingsMenuButton = (UIButton) _configMenuMods.getElementById("backToConfigMenuButton");
 
-        minionOptionsButton.addClickListener(new IClickListener() {
-            @Override
-            public void clicked(UIDisplayElement element) {
-            	_configMenuMods.setVisible(true);
-                _configMenu.setVisible(false);
-            }
+        minionOptionsButton.addClickListener(new ClickListener() {
+			@Override
+			public void click(UIDisplayElement element, int button) {
+	            _configMenuMods.setVisible(true);
+	            _configMenu.setVisible(false);
+			}
         });
 
-        minionsButton.addClickListener(new IClickListener() {
-            @Override
-            public void clicked(UIDisplayElement element) {
-                UIButton button = (UIButton) element;
+        minionsButton.addClickListener(new ClickListener() {
+			@Override
+			public void click(UIDisplayElement element, int button) {
+                UIButton b = (UIButton) element;
 
-                if (button.getLabel().getText().equals("Minions enabled : false")) {
+                if (b.getLabel().getText().equals("Minions enabled : false")) {
                     
-                    button.getLabel().setText("Minions enabled : true");
-                } else if (button.getLabel().getText().equals("Minions enabled : true")) {
+                    b.getLabel().setText("Minions enabled : true");
+                } else if (b.getLabel().getText().equals("Minions enabled : true")) {
                     
-                    button.getLabel().setText("Minions enabled : false");
+                    b.getLabel().setText("Minions enabled : false");
                 }
-            }
+			}
         });
         
-        backToSettingsMenuButton.addClickListener(new IClickListener() {
-            @Override
-            public void clicked(UIDisplayElement element) {
-                GUIManager.getInstance().setFocusedWindow(_configMenu);
-            }
+        backToSettingsMenuButton.addClickListener(new ClickListener() {
+			@Override
+			public void click(UIDisplayElement element, int button) {
+				GUIManager.getInstance().setFocusedWindow(_configMenu);
+			}
         });
     }
 

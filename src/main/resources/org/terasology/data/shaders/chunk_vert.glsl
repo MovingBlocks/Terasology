@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- #define WAVING_COORDINATE_COUNT 14
+ #define WAVING_COORDINATE_COUNT 32
 
 varying vec3 normal;
 varying vec4 vertexWorldPosRaw;

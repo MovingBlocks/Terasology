@@ -20,8 +20,8 @@ import com.google.gson.stream.JsonReader;
 import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.game.CoreRegistry;
-import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.management.BlockManager;
 
 import java.io.File;
 import java.io.FileReader;
@@ -89,49 +89,6 @@ public class GroovyHelpManager {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public HashMap<Byte, String> getGroovyBlocks() {
-        HashMap<Byte, String> retval = new HashMap<Byte, String>();
-        String[] endfilter = {"FRONT", "BACK", "TOP", "BOTTOM", "LEFT", "RIGHT"};
-        String fampref = "org.terasology.model.blocks.";
-        String tempval = "";
-        boolean nodup = true;
-        for (int i = Byte.MIN_VALUE; i <= Byte.MAX_VALUE; i++) {
-            Block b = BlockManager.getInstance().getBlock((byte) i);
-            if (b.getId() != 0) {
-                if (tempval.length() > 0) {
-                    if (b.getTitle().startsWith(tempval)) {
-                        nodup = false;
-                    } else {
-                        nodup = true;
-                        tempval = "";
-                    }
-                } else {
-                    for (String element : endfilter) {
-                        if (b.getTitle().endsWith(element)) {
-                            tempval = b.getTitle().substring(0, b.getTitle().length() - element.length());
-                        }
-                    }
-                }
-                if (nodup) {
-                    String tempfam = b.getBlockFamily().toString().split("@")[0];
-                    if (tempfam.startsWith(fampref)) {
-                        tempfam = tempfam.substring(fampref.length(), tempfam.length());
-                    }
-                    if (tempval.length() < 1) {
-                        retval.put(b.getId(), b.getTitle() + " and belongs to " + tempfam);
-                    } else {
-                        retval.put(b.getId(), tempval + " and belongs to " + tempfam);
-                    }
-                }
-            }
-            if (i == 127) {
-                break;
-            }
-        }
-
-        return retval;
     }
 
     public ArrayList<Prefab> getItems() {

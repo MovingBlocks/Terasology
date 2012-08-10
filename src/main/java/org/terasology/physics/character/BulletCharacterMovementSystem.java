@@ -30,7 +30,7 @@ import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.events.JumpEvent;
 import org.terasology.events.VerticalCollisionEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.world.WorldProvider;
+import org.terasology.world.WorldProvider;
 import org.terasology.math.Vector3fUtil;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.physics.CollisionGroup;

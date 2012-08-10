@@ -29,22 +29,21 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.generators.DefaultGenerators;
 import org.terasology.logic.manager.*;
-import org.terasology.logic.world.*;
-import org.terasology.logic.world.chunks.Chunk;
-import org.terasology.logic.world.chunks.ChunkProvider;
-import org.terasology.logic.world.chunks.ChunkStore;
-import org.terasology.logic.world.chunks.LocalChunkProvider;
-import org.terasology.logic.world.chunks.store.ChunkStoreGZip;
-import org.terasology.logic.world.generator.core.*;
-import org.terasology.logic.world.liquid.LiquidsGenerator;
+import org.terasology.world.*;
+import org.terasology.world.block.BlockUri;
+import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.ChunkStore;
+import org.terasology.world.chunks.LocalChunkProvider;
+import org.terasology.world.chunks.store.ChunkStoreGZip;
+import org.terasology.world.generator.core.*;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
-import org.terasology.model.blocks.Block;
-import org.terasology.model.blocks.management.BlockManager;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.management.BlockManager;
 import org.terasology.math.AABB;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.rendering.AABBRenderer;
@@ -148,12 +147,11 @@ public final class WorldRenderer {
     /**
      * Initializes a new (local) world for the single player mode.
      *
-     * @param title The title/description of the world
-     * @param seed  The seed string used to generate the terrain
+     * @param worldInfo Information describing the world
      */
-    public WorldRenderer(String title, String seed, long time, ChunkGeneratorManager chunkGeneratorManager, EntityManager manager, LocalPlayerSystem localPlayerSystem) {
-        // TODO: Cleaner method for this?
-        File f = new File(PathManager.getInstance().getWorldSavePath(title), title + ".dat");
+    public WorldRenderer(WorldInfo worldInfo, ChunkGeneratorManager chunkGeneratorManager, EntityManager manager, LocalPlayerSystem localPlayerSystem) {
+        // TODO: Cleaner method for this? Should not be using the world title
+        File f = new File(PathManager.getInstance().getWorldSavePath(worldInfo.getTitle()), worldInfo.getTitle() + ".dat");
         if (f.exists()) {
             try {
                 chunkStore = ChunkStoreGZip.load(f);
@@ -168,7 +166,7 @@ public final class WorldRenderer {
             chunkStore = new ChunkStoreGZip();
         }
         _chunkProvider = new LocalChunkProvider(chunkStore, chunkGeneratorManager);
-        EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(title, seed, time, _chunkProvider));
+        EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(worldInfo, _chunkProvider));
         CoreRegistry.put(BlockEntityRegistry.class, entityWorldProvider);
         CoreRegistry.get(ComponentSystemManager.class).register(entityWorldProvider, "engine:BlockEntityRegistry");
         _worldProvider = new WorldProviderWrapper(entityWorldProvider);
@@ -825,7 +823,7 @@ public final class WorldRenderer {
             Vector3i pos = new Vector3i(loc.x, loc.y, loc.z, 0.5f);
             while (true) {
                 Block oldBlock = _worldProvider.getBlock(pos);
-                if (_worldProvider.setBlock(pos, BlockManager.getInstance().getBlock("PortalBlock"), oldBlock)) {
+                if (_worldProvider.setBlock(pos, BlockManager.getInstance().getBlock("engine:portal"), oldBlock)) {
                     break;
                 }
                 // TODO: keep trying, but make sure chunk is loaded.

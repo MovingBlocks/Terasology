@@ -1,0 +1,4 @@
+{
+    "id" : "minerals",
+    "displayName" : "Metouto's Mineral Pack"
+}

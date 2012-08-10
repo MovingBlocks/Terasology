@@ -17,9 +17,11 @@ package org.terasology.rendering.gui.components;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import org.terasology.rendering.gui.framework.IClickListener;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
+import org.terasology.rendering.gui.framework.events.ClickListener;
+import org.terasology.rendering.gui.framework.events.MouseButtonListener;
+import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 
 import javax.vecmath.Vector2f;
 
@@ -38,54 +40,70 @@ public class UIDialogBox extends UIDisplayWindow {
         _title.setVisible(true);
         _title.getPosition().x = (getPosition().x + size.x / 2f) - _title.getSize().x / 2;
         _title.setTitle(title);
+        _title.addMouseButtonListener(new MouseButtonListener() {	
+			@Override
+			public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
 
+			}
+			
+			@Override
+			public void up(UIDisplayElement element, int button, boolean intersect) {
+				_dragged = false;
+				_prevMousePos = null;
+			}
+			
+			@Override
+			public void down(UIDisplayElement element, int button, boolean intersect) {
+				if (intersect) {
+					_dragged = true;
+                    if (_prevMousePos == null) {
+                        _prevMousePos = new Vector2f(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()));
+                    }
+				}
+			}
+		});
+        _title.addMouseMoveListener(new MouseMoveListener() {
+			@Override
+			public void move(UIDisplayElement element) {
+		        if (_dragged) {
+			        Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
+		            drag(new Vector2f(_prevMousePos.x - mousePos.x, _prevMousePos.y - mousePos.y));
+		            _prevMousePos = new Vector2f(mousePos);
+		        }
+			}
+			
+			@Override
+			public void leave(UIDisplayElement element) {
+				
+			}
+			
+			@Override
+			public void hover(UIDisplayElement element) {
+				
+			}
+			
+			@Override
+			public void enter(UIDisplayElement element) {
+				
+			}
+		});
 
-        _close = new UIButton(new Vector2f(19f, 19f));
-
+        _close = new UIButton(new Vector2f(19f, 19f), UIButton.eButtonType.NORMAL);
         _close.getPosition().x = getSize().x - 25f;
         _close.setVisible(true);
         _close.getLabel().setText("");
 
-        _close.addClickListener(new IClickListener() {
-            public void clicked(UIDisplayElement element) {
-                close(true);
-            }
-        });
+        _close.addClickListener(new ClickListener() {
+			@Override
+			public void click(UIDisplayElement element, int button) {
+				close(true);
+			}
+		});
 
         windowStyleSetup();
 
         addDisplayElement(_close);
         addDisplayElement(_title);
-    }
-
-    public void update() {
-        Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
-        if (intersects(mousePos)) {
-            if (_mouseDown) {
-                _focused = true;
-                if (_title.intersects(mousePos)) {
-                    _dragged = true;
-                    if (_prevMousePos == null) {
-                        _prevMousePos = new Vector2f(mousePos);
-                    }
-                }
-            }
-        }
-
-        if (_dragged) {
-            drag(new Vector2f(_prevMousePos.x - mousePos.x, _prevMousePos.y - mousePos.y));
-            _prevMousePos = new Vector2f(mousePos);
-        }
-
-        if (!_mouseDown || !_dragged || _mouseUp) {
-            _dragged = false;
-            _mouseDown = false;
-            _prevMousePos = null;
-            _mouseUp = false;
-            _focused = false;
-        }
-
-        super.update();
     }
 
     public void resize() {

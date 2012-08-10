@@ -16,9 +16,13 @@
 package org.terasology.events;
 
 import org.terasology.entitySystem.AbstractEvent;
+import org.terasology.entitySystem.EntityRef;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class FullHealthEvent extends AbstractEvent {
+public class FullHealthEvent extends HealthChangedEvent {
+    public FullHealthEvent(EntityRef instigator, int maximumHealth) {
+        super(instigator, maximumHealth, maximumHealth);
+    }
 }

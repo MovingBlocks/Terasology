@@ -20,7 +20,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.terasology.logic.world.chunks.Chunk;
+import org.terasology.world.chunks.Chunk;
 
 import static org.junit.Assert.*;
 

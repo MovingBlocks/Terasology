@@ -17,7 +17,7 @@ package org.terasology.components.block;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.model.blocks.BlockFamily;
+import org.terasology.world.block.family.BlockFamily;
 
 /**
  * Combined with ItemComponent, represents an

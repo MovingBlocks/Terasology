@@ -3,6 +3,7 @@ screens
 logs
 out
 target
+build
 .DS_Store
 Terasology.iml
 Terasology.ipr

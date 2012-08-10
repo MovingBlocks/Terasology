@@ -103,6 +103,16 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             _displayElements.get(i).update();
         }
     }
+    
+    public void layout() {
+        if (!isVisible())
+            return;
+
+        // Update layout of all display elements
+        for (int i = 0; i < _displayElements.size(); i++) {
+            _displayElements.get(i).layout();
+        }
+    }
 
     @Override
     public void processKeyboardInput(int key) {
@@ -194,7 +204,14 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * Set style with tag(style class)
      */
     public void setClassStyle(String className, String value) {
-        UIStyle style = new UIStyle(getSize());
+        UIStyle style = null;
+
+        if(_styleClasses.containsKey(className)){
+            style = _styleClasses.get(className);
+        }else{
+            style = new UIStyle(getSize());
+        }
+
         style.setPosition(new Vector2f(0f, 0f));
         style.setVisible(true);
         style.setCroped(false);
@@ -213,6 +230,8 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             _style = _styleClasses.get(className);
             addtDisplayElementToPosition(0, _style);
         }
+        
+        layout();
     }
 
     /*
@@ -227,5 +246,12 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             addtDisplayElementToPosition(0, _style);
         }
         return _style;
+    }
+    
+    @Override
+    public void setSize(Vector2f scale) {
+    	super.setSize(scale);
+    	
+    	layout();
     }
 }

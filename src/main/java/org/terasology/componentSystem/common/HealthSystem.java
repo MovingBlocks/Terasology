@@ -20,6 +20,7 @@ import org.terasology.components.HealthComponent;
 import org.terasology.entitySystem.*;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.FullHealthEvent;
+import org.terasology.events.HealthChangedEvent;
 import org.terasology.events.NoHealthEvent;
 import org.terasology.events.VerticalCollisionEvent;
 import org.terasology.game.CoreRegistry;
@@ -55,7 +56,9 @@ public class HealthSystem implements EventHandlerSystem, UpdateSubscriberSystem 
                     health.currentHealth = Math.min(health.maxHealth, health.currentHealth + (int) health.partialRegen);
                     health.partialRegen %= 1f;
                     if (health.currentHealth == health.maxHealth) {
-                        entity.send(new FullHealthEvent());
+                        entity.send(new FullHealthEvent(entity, health.maxHealth));
+                    } else {
+                        entity.send(new HealthChangedEvent(entity, health.currentHealth, health.maxHealth));
                     }
                 }
             }
@@ -87,7 +90,9 @@ public class HealthSystem implements EventHandlerSystem, UpdateSubscriberSystem 
         health.timeSinceLastDamage = 0;
         health.currentHealth -= damageAmount;
         if (health.currentHealth <= 0) {
-            entity.send(new NoHealthEvent(instigator));
+            entity.send(new NoHealthEvent(instigator, health.maxHealth));
+        } else {
+            entity.send(new HealthChangedEvent(instigator, health.currentHealth, health.maxHealth));
         }
         entity.saveComponent(health);
     }

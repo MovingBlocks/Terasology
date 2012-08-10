@@ -15,6 +15,8 @@
  */
 package org.terasology.math;
 
+import org.terasology.world.block.BlockPart;
+
 import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -77,6 +79,13 @@ public enum Rotation {
     private Quat4f quat4f;
 
     public abstract Side rotate(Side side);
+
+    public BlockPart rotate(BlockPart part) {
+        if (part.isSide()) {
+            return BlockPart.fromSide(rotate(part.getSide()));
+        }
+        return part;
+    }
 
     public abstract AABB rotate(AABB aabb);
 

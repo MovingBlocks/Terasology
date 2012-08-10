@@ -93,11 +93,14 @@ public abstract class AbstractStreamingSound implements Sound {
     public abstract int getBufferBits();
 
     @Override
-    protected void finalize() throws Throwable {
+    public void dispose() {
+        // TODO: Fix this
         for (int i = 0; i < buffers.length; i++) {
             if (buffers[i] != 0) {
-                AL10.alDeleteBuffers(buffers[i]);
+               // AL10.alDeleteBuffers(buffers[i]);
             }
         }
+        OpenALException.checkState("Deleting buffer data");
+        buffers = new int[0];
     }
 }

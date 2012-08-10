@@ -31,10 +31,13 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
  */
 public class ShaderParametersParticle implements IShaderParameters {
 
-    private Texture terrainTex = AssetManager.loadTexture("engine:terrain");
-
     @Override
     public void applyParameters(ShaderProgram program) {
+        Texture terrainTex = AssetManager.loadTexture("engine:terrain");
+        if (terrainTex == null) {
+            return;
+        }
+
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0);

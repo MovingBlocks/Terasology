@@ -15,19 +15,17 @@
  */
 package org.terasology.rendering.primitives;
 
-import com.bulletphysics.collision.shapes.IndexedMesh;
-import com.bulletphysics.collision.shapes.ScalarType;
-import gnu.trove.iterator.TFloatIterator;
 import gnu.trove.iterator.TIntIterator;
 import org.lwjgl.BufferUtils;
-import org.terasology.logic.world.MiniatureChunk;
-import org.terasology.logic.world.WorldBiomeProvider;
-import org.terasology.logic.world.WorldView;
-import org.terasology.logic.world.chunks.Chunk;
+import org.terasology.world.MiniatureChunk;
+import org.terasology.world.WorldBiomeProvider;
+import org.terasology.world.WorldView;
+import org.terasology.world.chunks.Chunk;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
-import org.terasology.model.blocks.Block;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockPart;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 
 import javax.vecmath.Vector3f;
@@ -210,9 +208,9 @@ public final class ChunkTessellator {
             if (i < 4) {
                 Block b = blocks[i];
 
-                if (b.isCastsShadows() && b.getBlockForm() != Block.BLOCK_FORM.BILLBOARD) {
+                if (b.isShadowCasting() && !b.isTranslucent()) {
                     occCounter++;
-                } else if (b.isCastsShadows() && b.getBlockForm() == Block.BLOCK_FORM.BILLBOARD) {
+                } else if (b.isShadowCasting()) {
                     occCounterBillboard++;
                 }
             }
@@ -234,7 +232,7 @@ public final class ChunkTessellator {
         PerformanceMonitor.endActivity();
     }
 
-    private void generateBlockVertices(WorldView view, ChunkMesh mesh, int x, int y, int z, double temp, double hum) {
+    private void generateBlockVertices(WorldView view, ChunkMesh mesh, int x, int y, int z, float temp, float hum) {
         Block block = view.getBlock(x, y, z);
 
         /*
@@ -242,18 +240,17 @@ public final class ChunkTessellator {
          */
         ChunkMesh.RENDER_TYPE renderType = ChunkMesh.RENDER_TYPE.TRANSLUCENT;
 
-        if (!block.isTransparent())
+        if (!block.isTranslucent())
             renderType = ChunkMesh.RENDER_TYPE.OPAQUE;
-        if (block.getTitle().equals("Water") || block.getTitle().equals("Ice"))
+        // TODO: Review special case, or alternatively compare uris.
+        if (block.getURI().toString().equals("engine:water") || block.getURI().toString().equals("engine:ice"))
             renderType = ChunkMesh.RENDER_TYPE.WATER_AND_ICE;
-        if (block.getBlockForm() == Block.BLOCK_FORM.BILLBOARD)
+        if (block.isDoubleSided())
             renderType = ChunkMesh.RENDER_TYPE.BILLBOARD;
 
-        Block.BLOCK_FORM blockForm = block.getBlockForm();
-
-        if (block.getCenterMesh() != null) {
-            Vector4f colorOffset = block.calcColorOffsetFor(Side.TOP, temp, hum);
-            block.getCenterMesh().appendTo(mesh, x, y, z, colorOffset, renderType.getIndex());
+        if (block.getMeshPart(BlockPart.CENTER) != null) {
+            Vector4f colorOffset = block.calcColorOffsetFor(BlockPart.CENTER, temp, hum);
+            block.getMeshPart(BlockPart.CENTER).appendTo(mesh, x, y, z, colorOffset, renderType.getIndex());
         }
 
         boolean[] drawDir = new boolean[6];
@@ -269,7 +266,7 @@ public final class ChunkTessellator {
         }
 
         // If the block is lowered, some more faces may have to be drawn
-        if (blockForm == Block.BLOCK_FORM.LOWERED_BLOCK) {
+        if (block.isLiquid()) {
             // Draw horizontal sides if visible from below
             for (Side side : Side.horizontalSides()) {
                 Vector3i offset = side.getVector3i();
@@ -280,14 +277,14 @@ public final class ChunkTessellator {
             // Draw the top if below a non-lowered block
             // TODO: Don't need to render the top if each side and the block above each side are either liquid or opaque solids.
             Block blockToCheck = view.getBlock(x, y + 1, z);
-            drawDir[Side.TOP.ordinal()] |= blockToCheck.getBlockForm() != Block.BLOCK_FORM.LOWERED_BLOCK;
+            drawDir[Side.TOP.ordinal()] |= !blockToCheck.isLiquid();
 
             Block bottomBlock = view.getBlock(x, y - 1, z);
-            if (bottomBlock.getBlockForm() == Block.BLOCK_FORM.LOWERED_BLOCK || bottomBlock.getId() == 0x0) {
+            if (bottomBlock.isLiquid() || bottomBlock.getId() == 0x0) {
                 for (Side dir : Side.values()) {
                     if (drawDir[dir.ordinal()]) {
-                        Vector4f colorOffset = block.calcColorOffsetFor(dir, temp, hum);
-                        block.getLoweredSideMesh(dir).appendTo(mesh, x, y, z, colorOffset, renderType.getIndex());
+                        Vector4f colorOffset = block.calcColorOffsetFor(BlockPart.fromSide(dir), temp, hum);
+                        block.getLoweredLiquidMesh(dir).appendTo(mesh, x, y, z, colorOffset, renderType.getIndex());
                     }
                 }
                 return;
@@ -296,8 +293,8 @@ public final class ChunkTessellator {
 
         for (Side dir : Side.values()) {
             if (drawDir[dir.ordinal()]) {
-                Vector4f colorOffset = block.calcColorOffsetFor(dir, temp, hum);
-                block.getSideMesh(dir).appendTo(mesh, x, y, z, colorOffset, renderType.getIndex());
+                Vector4f colorOffset = block.calcColorOffsetFor(BlockPart.fromSide(dir), temp, hum);
+                block.getMeshPart(BlockPart.fromSide(dir)).appendTo(mesh, x, y, z, colorOffset, renderType.getIndex());
             }
         }
     }
@@ -310,14 +307,14 @@ public final class ChunkTessellator {
      * @return True if the side is visible for the given block types
      */
     private boolean isSideVisibleForBlockTypes(Block blockToCheck, Block currentBlock, Side side) {
-        if (currentBlock.getSideMesh(side) == null) return false;
+        if (currentBlock.getMeshPart(BlockPart.fromSide(side)) == null) return false;
 
         // Liquids can be transparent but there should be no visible adjacent faces
         // !!! In comparison to leaves !!!
         if (currentBlock.isLiquid() && blockToCheck.isLiquid()) return false;
 
         return blockToCheck.getId() == 0x0 ||
-                !blockToCheck.isBlockingSide(side.reverse()) ||
+                !blockToCheck.isFullSide(side.reverse()) ||
                 (!currentBlock.isTranslucent() && blockToCheck.isTranslucent());
     }
 

@@ -58,10 +58,11 @@ public class UIProgressBar extends UIDisplayContainer {
     }
 
     @Override
-    public void update(){
-        setCropMargin(new Vector4f(0f, -(getSize().x - getSize().x * (_value/100f)), 0f, 0f));
-        float posX = (getSize().x - _label.getTextWidth())/2;
-        _label.getPosition().x = posX;
+    public void layout() {
+    	super.layout();
+    	
+    	if (_label != null)
+    		_label.getPosition().x = (getSize().x - _label.getTextWidth())/2;
     }
 
     public int getValue() {
@@ -70,6 +71,7 @@ public class UIProgressBar extends UIDisplayContainer {
 
     public void setValue(int value) {
         _value = value;
+        setCropMargin(new Vector4f(0f, -(getSize().x - getSize().x * (_value/100f)), 0f, 0f));
     }
 
     public void setTextColor(Color color) {
@@ -78,6 +80,8 @@ public class UIProgressBar extends UIDisplayContainer {
     
     public void setText(String text){
         _label.setText(text);
+        
+        layout();
     }
 
     private class UIProgressLine extends UIDisplayContainer {

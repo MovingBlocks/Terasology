@@ -106,6 +106,14 @@ public class Texture implements Asset {
         return uri;
     }
 
+    @Override
+    public void dispose() {
+        if (id != 0) {
+            glDeleteTextures(id);
+            id = 0;
+        }
+    }
+
     public int getId() {
         return id;
     }

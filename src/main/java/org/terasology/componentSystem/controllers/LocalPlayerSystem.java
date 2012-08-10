@@ -15,10 +15,7 @@
  */
 package org.terasology.componentSystem.controllers;
 
-import com.bulletphysics.collision.dispatch.CollisionFlags;
-import com.bulletphysics.linearmath.AabbUtil2;
 import com.bulletphysics.linearmath.QuaternionUtil;
-import com.bulletphysics.linearmath.Transform;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.*;
@@ -30,6 +27,7 @@ import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.ActivateEvent;
 import org.terasology.events.DamageEvent;
+import org.terasology.events.HealthChangedEvent;
 import org.terasology.events.NoHealthEvent;
 import org.terasology.events.input.MouseXAxisEvent;
 import org.terasology.events.input.MouseYAxisEvent;
@@ -40,15 +38,14 @@ import org.terasology.input.ButtonState;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
-import org.terasology.logic.world.WorldProvider;
+import org.terasology.world.WorldProvider;
 import org.terasology.math.TeraMath;
-import org.terasology.model.blocks.Block;
+import org.terasology.world.block.Block;
 import org.terasology.math.AABB;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.cameras.DefaultCamera;
 
-import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
@@ -193,7 +190,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             BlockComponent blockComp = target.getComponent(BlockComponent.class);
             if (blockComp != null) {
                 Block block = worldProvider.getBlock(blockComp.getPosition());
-                if (block.isRenderBoundingBox()) {
+                if (block.isTargetable()) {
                     aabb = block.getBounds(blockComp.getPosition());
                 }
             } else {
@@ -248,6 +245,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         HealthComponent health = entity.getComponent(HealthComponent.class);
         if (health != null) {
             health.currentHealth = health.maxHealth;
+            entity.send(new HealthChangedEvent(entity, health.currentHealth, health.maxHealth));
             entity.saveComponent(health);
         }
         location.setWorldPosition(playerComponent.spawnPosition);
@@ -314,8 +312,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             BlockComponent blockComp = target.getComponent(BlockComponent.class);
             if (blockComp != null) {
                 Block block = worldProvider.getBlock(blockComp.getPosition());
-                if (item.getPerBlockDamageBonus().containsKey(block.getBlockFamily().getTitle())) {
-                    damage += item.getPerBlockDamageBonus().get(block.getBlockFamily().getTitle());
+                if (item.getPerBlockDamageBonus().containsKey(block.getBlockFamily().getURI().toString())) {
+                    damage += item.getPerBlockDamageBonus().get(block.getBlockFamily().getURI().toString());
                 }
             }
         }
