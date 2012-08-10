@@ -16,6 +16,7 @@
 package org.terasology.world.block.management;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import gnu.trove.iterator.TObjectByteIterator;
 import gnu.trove.map.hash.TByteObjectHashMap;
 import gnu.trove.map.hash.TObjectByteHashMap;
@@ -29,6 +30,7 @@ import org.terasology.world.block.family.BlockFamily;
 import javax.vecmath.Vector2f;
 import java.nio.FloatBuffer;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Provides access to blocks by block id or block title.
@@ -46,6 +48,9 @@ public class BlockManager {
 
     private int nextId = 1;
     private final TObjectByteHashMap<BlockUri> idByUri = new TObjectByteHashMap<BlockUri>(256);
+
+    /* Families */
+    private final Map<BlockUri, BlockFamily> partiallyRegisteredFamilies = Maps.newHashMap();
     private final Map<BlockUri, BlockFamily> familyByUri = Maps.newHashMapWithExpectedSize(128);
 
     public static BlockManager getInstance() {
@@ -63,6 +68,7 @@ public class BlockManager {
         blocksById.clear();
         blocksByUri.clear();
         familyByUri.clear();
+        partiallyRegisteredFamilies.clear();
         nextId = 1;
 
         Block air = new Block();
@@ -100,11 +106,19 @@ public class BlockManager {
     }
 
     public BlockFamily getBlockFamily(String uri) {
-        return familyByUri.get(new BlockUri(uri));
+        return getBlockFamily(new BlockUri(uri));
     }
 
     public BlockFamily getBlockFamily(BlockUri uri) {
-        return familyByUri.get(uri);
+        BlockFamily family = familyByUri.get(uri);
+        if (family == null) {
+            family = partiallyRegisteredFamilies.get(uri);
+            if (family != null) {
+                partiallyRegisteredFamilies.remove(uri);
+                registerBlockFamily(family);
+            }
+        }
+        return family;
     }
 
     public Block getBlock(String uri) {
@@ -114,7 +128,14 @@ public class BlockManager {
     public Block getBlock(BlockUri uri) {
         Block block = blocksByUri.get(uri);
         if (block == null) {
-            return blocksById.get((byte) 0);
+            // Check if partially registered by getting the block family
+            BlockFamily family = getBlockFamily(uri.getFamilyUri());
+            if (family != null) {
+                block = family.getBlockFor(uri);
+            }
+            if (block == null) {
+                return blocksById.get((byte) 0);
+            }
         }
         return block;
     }
@@ -137,6 +158,14 @@ public class BlockManager {
     }
 
     public void addBlockFamily(BlockFamily family) {
+        if (idByUri.get(family.getArchetypeBlock()) == 0) {
+            partiallyRegisteredFamilies.put(family.getURI(), family);
+        } else {
+            registerBlockFamily(family);
+        }
+    }
+
+    private void registerBlockFamily(BlockFamily family) {
         familyByUri.put(family.getURI(), family);
         for (Block block : family.listBlocks()) {
             byte id = idByUri.get(block.getURI());
@@ -162,9 +191,19 @@ public class BlockManager {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(32);
 
         int counter = 0;
-        for (Block b : blocksByUri.values()) {
-            if (b.isWaving()) {
-                Vector2f pos = b.getTextureAtlasPos(BlockPart.TOP);
+        for (BlockFamily b : familyByUri.values()) {
+            if (b.getArchetypeBlock().isWaving()) {
+                // TODO: Don't use random block part
+                Vector2f pos = b.getArchetypeBlock().getTextureAtlasPos(BlockPart.TOP);
+                buffer.put(pos.x);
+                buffer.put(pos.y);
+                counter++;
+            }
+        }
+        for (BlockFamily b : partiallyRegisteredFamilies.values()) {
+            if (b.getArchetypeBlock().isWaving()) {
+                // TODO: Don't use random block part
+                Vector2f pos = b.getArchetypeBlock().getTextureAtlasPos(BlockPart.TOP);
                 buffer.put(pos.x);
                 buffer.put(pos.y);
                 counter++;
@@ -183,10 +222,12 @@ public class BlockManager {
 
     public FloatBuffer calcCoordinate(String uri) {
         BlockUri blockUri = new BlockUri(uri);
+        Block block = getBlock(blockUri);
         FloatBuffer buffer = BufferUtils.createFloatBuffer(2);
 
-        if (blocksByUri.containsKey(blockUri)) {
-            Vector2f position = blocksByUri.get(blockUri).getTextureAtlasPos(BlockPart.LEFT);
+        if (!block.isInvisible()) {
+            // TODO: Don't use random block part
+            Vector2f position = block.getTextureAtlasPos(BlockPart.LEFT);
             buffer.put(position.x);
             buffer.put(position.y);
         }
@@ -196,6 +237,6 @@ public class BlockManager {
     }
 
     public boolean hasBlockFamily(BlockUri uri) {
-        return familyByUri.containsKey(uri);
+        return familyByUri.containsKey(uri) || partiallyRegisteredFamilies.containsKey(uri);
     }
 }

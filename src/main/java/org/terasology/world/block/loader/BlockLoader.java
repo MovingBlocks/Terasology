@@ -32,8 +32,10 @@ import org.newdawn.slick.opengl.PNGDecoder;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.logic.manager.PathManager;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
+import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.world.block.Block;
@@ -63,11 +65,12 @@ import java.util.logging.Logger;
  * @author Immortius
  */
 public class BlockLoader {
-
-    private static final int MAX_BLOCKS = 256;
     private static final int MAX_TILES = 256;
-    private static final int NUM_MIPMAPS = 5;
     public static final String AUTO_BLOCK_URL_FRAGMENT = "/auto/";
+
+    // TODO: for now these are fixed (constant in the chunk shader)
+    private int atlasSize = 256;
+    private int tileSize = 16;
 
     private Logger logger = Logger.getLogger(getClass().getName());
     private JsonParser parser;
@@ -92,6 +95,14 @@ public class BlockLoader {
         loweredShape = (BlockShape) AssetManager.load(new AssetUri(AssetType.SHAPE, "engine:loweredCube"));
     }
 
+    public int getAtlasSize() {
+        return atlasSize;
+    }
+
+    public int getNumMipmaps() {
+        return TeraMath.sizeOfPower(tileSize) + 1;
+    }
+
     public void load() {
         loadBlocks();
         loadAutoBlocks();
@@ -111,8 +122,9 @@ public class BlockLoader {
     }
 
     public void buildAtlas() {
-        ByteBuffer[] data = new ByteBuffer[NUM_MIPMAPS];
-        for (int i = 0; i < NUM_MIPMAPS; ++i) {
+        int numMipMaps = getNumMipmaps();
+        ByteBuffer[] data = new ByteBuffer[numMipMaps];
+        for (int i = 0; i < numMipMaps; ++i) {
             BufferedImage image = generateAtlas(i);
             /*if (i == 0) {
                 try {
@@ -136,7 +148,7 @@ public class BlockLoader {
             }
         }
 
-        Texture terrainTex = new Texture(data, Block.ATLAS_SIZE_IN_PX, Block.ATLAS_SIZE_IN_PX, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest);
+        Texture terrainTex = new Texture(data, atlasSize, atlasSize, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest);
         AssetManager.getInstance().addAssetTemporary(new AssetUri(AssetType.TEXTURE, "engine:terrain"), terrainTex);
         Material terrainMat = new Material(new AssetUri(AssetType.MATERIAL, "engine:terrain"), AssetManager.loadShader("engine:block"));
         terrainMat.setTexture("textureAtlas", terrainTex);
@@ -146,8 +158,9 @@ public class BlockLoader {
     }
 
     private BufferedImage generateAtlas(int mipMapLevel) {
-        int size = Block.ATLAS_SIZE_IN_PX / (1 << mipMapLevel);
-        int textureSize = Block.TEXTURE_SIZE_IN_PX / (1 << mipMapLevel);
+        int size = atlasSize / (1 << mipMapLevel);
+        int textureSize = tileSize / (1 << mipMapLevel);
+        int tilesPerDim = atlasSize / tileSize;
 
         BufferedImage result = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         Graphics g = result.getGraphics();
@@ -159,8 +172,8 @@ public class BlockLoader {
         for (int index = 0; index < tiles.size() && index < MAX_TILES; ++index) {
             Tile tile = tiles.get(index);
 
-            int posX = (index) % Block.ATLAS_ELEMENTS_PER_ROW_AND_COLUMN;
-            int posY = (index) / Block.ATLAS_ELEMENTS_PER_ROW_AND_COLUMN;
+            int posX = (index) % tilesPerDim;
+            int posY = (index) / tilesPerDim;
             g.drawImage(tile.getImage().getScaledInstance(textureSize, textureSize, Image.SCALE_SMOOTH), posX * textureSize, posY * textureSize, null);
         }
 
@@ -393,7 +406,8 @@ public class BlockLoader {
     }
 
     private Vector2f calcAtlasPositionForId(int id) {
-        return new Vector2f((id % Block.ATLAS_ELEMENTS_PER_ROW_AND_COLUMN) * Block.TEXTURE_OFFSET, (id / Block.ATLAS_ELEMENTS_PER_ROW_AND_COLUMN) * Block.TEXTURE_OFFSET);
+        int tilesPerDim = atlasSize / tileSize;
+        return new Vector2f((id % tilesPerDim) * Block.TEXTURE_OFFSET, (id / tilesPerDim) * Block.TEXTURE_OFFSET);
     }
 
     private Block createRawBlock(BlockDefinition def, String defaultName) {
