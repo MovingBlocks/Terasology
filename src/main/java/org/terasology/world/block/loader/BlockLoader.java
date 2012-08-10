@@ -114,6 +114,14 @@ public class BlockLoader {
         ByteBuffer[] data = new ByteBuffer[NUM_MIPMAPS];
         for (int i = 0; i < NUM_MIPMAPS; ++i) {
             BufferedImage image = generateAtlas(i);
+            /*if (i == 0) {
+                try {
+                    ImageIO.write(image, "png", new File(PathManager.getInstance().getScreensPath(), "tiles.png"));
+                } catch (IOException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+            }*/
+
             // TODO: Read data directly from image buffer into texture
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             try {
@@ -147,9 +155,6 @@ public class BlockLoader {
         if (tiles.size() > MAX_TILES) {
             logger.severe("Too many tiles, culling overflow");
         }
-
-        g.setColor(new Color(0, 0, 0));
-        g.drawRect(0, 0, textureSize, textureSize);
 
         for (int index = 0; index < tiles.size() && index < MAX_TILES; ++index) {
             Tile tile = tiles.get(index);
