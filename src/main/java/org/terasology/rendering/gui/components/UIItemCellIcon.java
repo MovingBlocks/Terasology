@@ -97,8 +97,10 @@ public class UIItemCellIcon extends UIDisplayContainer {
     }
 
     private void renderBlockIcon(BlockFamily blockFamily) {
-        if (blockFamily == null)
+        if (blockFamily == null) {
+            renderIcon(Icon.get("questionmark"));
             return;
+        }
 
         glEnable(GL11.GL_DEPTH_TEST);
         glClear(GL11.GL_DEPTH_BUFFER_BIT);

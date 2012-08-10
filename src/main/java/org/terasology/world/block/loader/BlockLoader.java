@@ -126,13 +126,13 @@ public class BlockLoader {
         ByteBuffer[] data = new ByteBuffer[numMipMaps];
         for (int i = 0; i < numMipMaps; ++i) {
             BufferedImage image = generateAtlas(i);
-            /*if (i == 0) {
+            if (i == 0) {
                 try {
                     ImageIO.write(image, "png", new File(PathManager.getInstance().getScreensPath(), "tiles.png"));
                 } catch (IOException e) {
                     e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
-            }*/
+            }
 
             // TODO: Read data directly from image buffer into texture
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -198,19 +198,25 @@ public class BlockLoader {
 
                     if (blockDef.liquid) {
                         blockDef.rotation = BlockDefinition.RotationType.NONE;
+                        blockDef.shapes.clear();
+                        blockDef.shape = "";
                     }
 
-                    switch (blockDef.rotation) {
-                        case ALIGNTOSURFACE:
-                            processAlignToSurfaceFamily(blockDefUri, blockDefJson);
-                            break;
-                        case HORIZONTAL:
-                            processHorizontalBlockFamily(blockDefUri, blockDef);
-                            break;
+                    if (blockDef.shapes.isEmpty()) {
+                        switch (blockDef.rotation) {
+                            case ALIGNTOSURFACE:
+                                processAlignToSurfaceFamily(blockDefUri, blockDefJson);
+                                break;
+                            case HORIZONTAL:
+                                processHorizontalBlockFamily(blockDefUri, blockDef);
+                                break;
 
-                        default:
-                            processSingleBlockFamily(blockDefUri, blockDef);
-                            break;
+                            default:
+                                processSingleBlockFamily(blockDefUri, blockDef);
+                                break;
+                        }
+                    } else {
+                        processMultiBlockFamily(blockDefUri, blockDef);
                     }
 
                 }
@@ -237,6 +243,32 @@ public class BlockLoader {
             JsonObject parent = readJson(parentUri).getAsJsonObject();
             mergeJsonInto(parent, blockDefJson);
             parentObj = parent;
+        }
+    }
+
+    private void processMultiBlockFamily(AssetUri blockDefUri, BlockDefinition blockDef) {
+        for (String shapeString : blockDef.shapes) {
+            AssetUri shapeUri = new AssetUri(AssetType.SHAPE, shapeString);
+            BlockShape shape = (BlockShape) AssetManager.load(shapeUri);
+            if (shape != null) {
+                BlockUri familyUri;
+                if (shape.equals(cubeShape)) {
+                    familyUri = new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName());
+                } else {
+                    familyUri = new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName(), shapeUri.getPackage(), shapeUri.getAssetName());
+                }
+                blockDef.shape = shapeString;
+                if (shape.isCollisionSymmetric()) {
+                    Block block = constructSingleBlock(blockDefUri, blockDef);
+                    BlockFamily family = new SymmetricFamily(familyUri, block);
+                    registerFamily(family);
+                } else {
+                    Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
+                    constructHorizontalBlocks(blockDefUri, blockDef, blockMap);
+                    BlockFamily horizFamily = new HorizontalBlockFamily(familyUri, blockMap);
+                    registerFamily(horizFamily);
+                }
+            }
         }
     }
 

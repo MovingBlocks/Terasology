@@ -158,7 +158,7 @@ public class BlockManager {
     }
 
     public void addBlockFamily(BlockFamily family) {
-        if (idByUri.get(family.getArchetypeBlock()) == 0) {
+        if (idByUri.get(family.getArchetypeBlock().getURI()) == 0) {
             partiallyRegisteredFamilies.put(family.getURI(), family);
         } else {
             registerBlockFamily(family);

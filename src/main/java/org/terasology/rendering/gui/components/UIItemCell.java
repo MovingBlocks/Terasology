@@ -367,10 +367,16 @@ public class UIItemCell extends UIDisplayContainer  {
             BlockItemComponent blockItem = itemEntity.getComponent(BlockItemComponent.class);
             
             if (item != null) {
-                if (blockItem != null)
-                    itemLabel.setText(blockItem.blockFamily.getDisplayName());
-                else
+                if (blockItem != null) {
+                    if (blockItem.blockFamily != null) {
+                        itemLabel.setText(blockItem.blockFamily.getDisplayName());
+                    } else {
+                        itemLabel.setText("Broken Block");
+                    }
+
+                } else {
                     itemLabel.setText(item.name);
+                }
             }
             
             itemLabel.setVisible(enable);
