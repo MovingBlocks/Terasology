@@ -163,19 +163,17 @@ sourceSets {
 }
 
 configurations {
-    perfTestCompile.extendsFrom testCompile
+    perfTestCompile.extendsFrom compile
 }
 
 dependencies {
     perfTestCompile sourceSets.main.output
 }
 
-// TODO This is not a normal JUnit Test. It should be replaced with a JavaExec task.
-task perfTests(type: Test) {
-    dependsOn cleanPerfTests
-    testLogging.showStandardStreams = true
-    testClassesDir = sourceSets.perfTest.output.classesDir
-    classpath = sourceSets.perfTest.runtimeClasspath
+task runChunkCachePerformanceTest(type:JavaExec) {
+    description = "Run 'ChunkCachePerformanceTest'"
+    main = 'org.terasology.world.ChunkCachePerformanceTest'
+    classpath sourceSets.perfTest.runtimeClasspath
     jvmArgs '-Xms512m', '-Xmx1024m', '-XX:MaxPermSize=128m'
 }
 
@@ -192,6 +190,7 @@ task run(type:JavaExec) {
     main = mainClassName
     classpath "$buildDir/$destDirMainOutput"
     classpath configurations.runtime
+    // TODO jvmArgs needed?
 }
 
 task deleteSavedWorldsSubfolders(type: Delete) {
