@@ -111,6 +111,15 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
     }
 
     @Override
+    public EntityRef create(String prefabName, Vector3f position) {
+        if (prefabName != null && !prefabName.isEmpty()) {
+            Prefab prefab = prefabManager.getPrefab(prefabName);
+            return create(prefab, position);
+        }
+        return create();
+    }
+
+    @Override
     public EntityRef create(Prefab prefab, Vector3f position) {
         List<Component> components = Lists.newArrayList();
         for (Component component : prefab.listComponents()) {
@@ -243,6 +252,7 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
     }
 
     <T extends Component> T getComponent(int entityId, Class<T> componentClass) {
+        //return componentLibrary.copy(store.get(entityId, componentClass));
         return store.get(entityId, componentClass);
     }
 
@@ -269,14 +279,28 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
     }
 
     void saveComponent(int entityId, Component component) {
-        if (eventSystem != null) {
-            eventSystem.send(createEntityRef(entityId), ChangedComponentEvent.newInstance(), component);
-        }
+        addComponent(entityId, component);
     }
 
+    @Override
     public EntityRef createEntityRefWithId(int id) {
         if (!freedIds.contains(id)) {
             return createEntityRef(id);
+        }
+        return EntityRef.NULL;
+    }
+
+    @Override
+    public EntityRef createEntityWithId(int id, Iterable<Component> components) {
+        if (!freedIds.contains(id)) {
+            EntityRef entity = createEntityRef(id);
+            for (Component c : components) {
+                store.put(id, c);
+            }
+            if (eventSystem != null) {
+                eventSystem.send(entity, AddComponentEvent.newInstance());
+            }
+            return entity;
         }
         return EntityRef.NULL;
     }

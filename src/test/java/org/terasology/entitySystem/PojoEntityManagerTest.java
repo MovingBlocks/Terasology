@@ -13,6 +13,7 @@ import org.terasology.entitySystem.pojo.PojoPrefabManager;
 import org.terasology.entitySystem.stubs.EntityRefComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
+import org.terasology.game.bootstrap.EntitySystemBuilder;
 
 import java.util.Iterator;
 import java.util.List;
@@ -27,12 +28,13 @@ import static org.mockito.Mockito.verify;
  */
 public class PojoEntityManagerTest {
 
-    PojoEntityManager entityManager;
+    PersistableEntityManager entityManager;
     
     @Before
     public void setup() {
-        ComponentLibrary componentLibrary = new ComponentLibraryImpl();
-        entityManager = new PojoEntityManager(componentLibrary, new PojoPrefabManager(componentLibrary));
+        EntitySystemBuilder builder = new EntitySystemBuilder();
+
+        entityManager = builder.build();
     }
     
     @Test

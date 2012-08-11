@@ -25,9 +25,8 @@ public class ChunkTest {
 
     @Test
     public void testChangeBlock() {
-        Block block = new Block();
-        block.setId((byte) 4);
-        BlockManager.getInstance().addBlockFamily(new SymmetricFamily(new BlockUri("some:uri"), block));
+        BlockManager.getInstance().addBlockFamily(new SymmetricFamily(new BlockUri("some:uri"), new Block()));
+        Block block = BlockManager.getInstance().getBlock("some:uri");
         chunk.setBlock(new Vector3i(1,2,3), block);
         assertEquals(block, chunk.getBlock(new Vector3i(1, 2, 3)));
     }

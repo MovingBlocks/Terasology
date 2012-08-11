@@ -66,7 +66,7 @@ public class PojoEventSystem implements EventSystem {
         if (name != null && !name.isEmpty()) {
             eventIdMap.put(name, eventType);
         }
-        logger.info("Registering event " + eventType.getSimpleName());
+        logger.fine("Registering event " + eventType.getSimpleName());
         for (Class parent : Reflections.getAllSuperTypes(eventType, Predicates.assignableFrom(Event.class))) {
             if (!AbstractEvent.class.equals(parent) && !Event.class.equals(parent)) {
                 childEvents.put(parent, eventType);

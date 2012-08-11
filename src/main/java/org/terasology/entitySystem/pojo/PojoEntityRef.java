@@ -18,6 +18,7 @@ package org.terasology.entitySystem.pojo;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Event;
+import org.terasology.entitySystem.common.NullIterator;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -43,42 +44,59 @@ public class PojoEntityRef extends EntityRef {
 
     @Override
     public <T extends Component> T getComponent(Class<T> componentClass) {
-        return entityManager.getComponent(id, componentClass);
+        if (exists()) {
+            return entityManager.getComponent(id, componentClass);
+        }
+        return null;
     }
 
     @Override
     public <T extends Component> T addComponent(T component) {
-        return entityManager.addComponent(id, component);
+        if (exists()) {
+            return entityManager.addComponent(id, component);
+        }
+        return component;
     }
 
     @Override
     public void removeComponent(Class<? extends Component> componentClass) {
-        entityManager.removeComponent(id, componentClass);
+        if (exists()) {
+            entityManager.removeComponent(id, componentClass);
+        }
     }
 
     @Override
     public void saveComponent(Component component) {
-        entityManager.saveComponent(id, component);
+        if (exists()) {
+            entityManager.saveComponent(id, component);
+        }
     }
 
     @Override
     public Iterable<Component> iterateComponents() {
-        return entityManager.iterateComponents(id);
+        if (exists()) {
+            return entityManager.iterateComponents(id);
+        }
+        return NullIterator.newInstance();
     }
 
     @Override
     public void destroy() {
-        entityManager.destroy(id);
+        if (exists()) {
+            entityManager.destroy(id);
+        }
     }
 
     @Override
     public void send(Event event) {
-        entityManager.getEventSystem().send(this, event);
+        if (exists()) {
+            entityManager.getEventSystem().send(this, event);
+        }
     }
 
     @Override
     public boolean hasComponent(Class<? extends Component> component) {
-        return entityManager.hasComponent(id, component);
+        return exists() && entityManager.hasComponent(id, component);
     }
 
     @Override

@@ -22,6 +22,8 @@ import gnu.trove.list.TIntList;
  */
 public interface PersistableEntityManager extends EntityManager {
 
+    EntityRef createEntityWithId(int id, Iterable<Component> components);
+
     EntityRef createEntityRefWithId(int id);
 
     int getNextId();

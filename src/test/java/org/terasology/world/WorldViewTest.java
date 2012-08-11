@@ -42,8 +42,8 @@ public class WorldViewTest {
         solidBlock = new Block();
         solidBlock.setDisplayName("Stone");
         solidBlock.setUri(new BlockUri("engine:stone"));
-        solidBlock.setId((byte) 1);
         BlockManager.getInstance().addBlockFamily(new SymmetricFamily(solidBlock.getURI(), solidBlock));
+        solidBlock = BlockManager.getInstance().getBlock(solidBlock.getURI());
     }
 
     @Test

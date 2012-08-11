@@ -61,6 +61,13 @@ public interface EntityManager {
      * @param position
      * @return A new entity, based on the given prefab, at the desired position
      */
+    EntityRef create(String prefab, Vector3f position);
+
+    /**
+     * @param prefab
+     * @param position
+     * @return A new entity, based on the given prefab, at the desired position
+     */
     EntityRef create(Prefab prefab, Vector3f position);
 
     /**
