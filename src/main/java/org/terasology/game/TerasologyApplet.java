@@ -15,9 +15,6 @@
 */
 package org.terasology.game;
 
-import org.terasology.game.modes.StateMainMenu;
-import org.terasology.logic.manager.PathManager;
-
 import java.applet.Applet;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -29,6 +26,9 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.terasology.game.modes.StateMainMenu;
+import org.terasology.logic.manager.PathManager;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>

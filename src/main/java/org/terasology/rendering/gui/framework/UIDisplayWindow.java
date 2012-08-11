@@ -15,16 +15,23 @@
  */
 package org.terasology.rendering.gui.framework;
 
-import org.lwjgl.opengl.Display;
-import org.terasology.logic.manager.GUIManager;
-import org.terasology.rendering.gui.framework.events.WindowListener;
-
-import javax.vecmath.Vector2f;
+import static org.lwjgl.opengl.GL11.GL_QUADS;
+import static org.lwjgl.opengl.GL11.glBegin;
+import static org.lwjgl.opengl.GL11.glColor4f;
+import static org.lwjgl.opengl.GL11.glEnd;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glVertex2f;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static org.lwjgl.opengl.GL11.*;
+import javax.vecmath.Vector2f;
+
+import org.lwjgl.opengl.Display;
+import org.terasology.logic.manager.GUIManager;
+import org.terasology.rendering.gui.framework.events.WindowListener;
 
 public class UIDisplayWindow extends UIScrollableDisplayContainer {
 

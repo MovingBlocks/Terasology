@@ -15,14 +15,14 @@
  */
 package org.terasology.rendering.gui.components;
 
+import javax.vecmath.Vector2f;
+
 import org.lwjgl.opengl.Display;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
-
-import javax.vecmath.Vector2f;
 
 /**
  * A small toolbar placed on the bottom of the screen.

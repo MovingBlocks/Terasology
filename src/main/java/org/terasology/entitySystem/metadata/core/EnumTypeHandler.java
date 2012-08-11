@@ -15,14 +15,15 @@
  */
 package org.terasology.entitySystem.metadata.core;
 
-import com.google.common.collect.Lists;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.terasology.components.ItemComponent;
 import org.terasology.entitySystem.metadata.TypeHandler;
 import org.terasology.protobuf.EntityData;
 
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.google.common.collect.Lists;
 
 /**
  * @author Immortius <immortius@gmail.com>

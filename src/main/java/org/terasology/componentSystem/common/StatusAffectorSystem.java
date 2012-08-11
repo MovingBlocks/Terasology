@@ -16,9 +16,21 @@
 package org.terasology.componentSystem.common;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.components.*;
-import org.terasology.entitySystem.*;
-import org.terasology.events.*;
+import org.terasology.components.CuredComponent;
+import org.terasology.components.HealthComponent;
+import org.terasology.components.PoisonedComponent;
+import org.terasology.components.SpeedBoostComponent;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.events.BoostHpEvent;
+import org.terasology.events.BoostSpeedEvent;
+import org.terasology.events.CurePoisonEvent;
+import org.terasology.events.HealthChangedEvent;
+import org.terasology.events.NoHealthEvent;
+import org.terasology.events.PoisonedEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.physics.character.CharacterMovementComponent;
 

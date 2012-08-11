@@ -16,11 +16,12 @@
 
 package org.terasology.entitySystem.metadata.core;
 
-import com.google.common.collect.Lists;
+import java.util.List;
+
 import org.terasology.entitySystem.metadata.TypeHandler;
 import org.terasology.protobuf.EntityData;
 
-import java.util.List;
+import com.google.common.collect.Lists;
 
 /**
  * @author Immortius

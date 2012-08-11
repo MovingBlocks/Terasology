@@ -17,16 +17,25 @@ package org.terasology.logic.manager;
 
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
+
+import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.assets.Texture;
-import org.terasology.rendering.shader.*;
-
-import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.terasology.rendering.shader.IShaderParameters;
+import org.terasology.rendering.shader.ShaderParametersBlock;
+import org.terasology.rendering.shader.ShaderParametersChunk;
+import org.terasology.rendering.shader.ShaderParametersDefault;
+import org.terasology.rendering.shader.ShaderParametersGelCube;
+import org.terasology.rendering.shader.ShaderParametersHdr;
+import org.terasology.rendering.shader.ShaderParametersParticle;
+import org.terasology.rendering.shader.ShaderParametersPost;
+import org.terasology.rendering.shader.ShaderProgram;
 
 /**
  * Provides support for loading and applying shaders.

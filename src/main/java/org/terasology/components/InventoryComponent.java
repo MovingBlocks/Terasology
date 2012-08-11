@@ -15,11 +15,12 @@
  */
 package org.terasology.components;
 
-import com.google.common.collect.Lists;
+import java.util.List;
+
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 
-import java.util.List;
+import com.google.common.collect.Lists;
 
 /**
  * Allows an entity to store items

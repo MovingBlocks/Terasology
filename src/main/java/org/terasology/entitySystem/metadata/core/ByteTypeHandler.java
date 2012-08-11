@@ -15,13 +15,15 @@
  */
 package org.terasology.entitySystem.metadata.core;
 
-import com.google.common.collect.Lists;
-import com.google.protobuf.ByteString;
 import gnu.trove.list.array.TByteArrayList;
+
+import java.util.List;
+
 import org.terasology.entitySystem.metadata.TypeHandler;
 import org.terasology.protobuf.EntityData;
 
-import java.util.List;
+import com.google.common.collect.Lists;
+import com.google.protobuf.ByteString;
 
 /**
  * @author Immortius <immortius@gmail.com>

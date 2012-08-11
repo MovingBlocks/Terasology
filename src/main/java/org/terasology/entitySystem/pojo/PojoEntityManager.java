@@ -15,27 +15,40 @@
  */
 package org.terasology.entitySystem.pojo;
 
-import com.google.common.collect.Lists;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.iterator.TIntObjectIterator;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.vecmath.Vector3f;
+
 import org.terasology.components.world.LocationComponent;
-import org.terasology.entitySystem.*;
+import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.EntityInfoComponent;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventSystem;
+import org.terasology.entitySystem.PersistableEntityManager;
+import org.terasology.entitySystem.Prefab;
+import org.terasology.entitySystem.PrefabManager;
 import org.terasology.entitySystem.common.NullIterator;
 import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.ChangedComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.metadata.extension.CollisionGroupTypeHandler;
 import org.terasology.entitySystem.metadata.extension.EntityRefTypeHandler;
 import org.terasology.entitySystem.metadata.extension.PrefabTypeHandler;
-import org.terasology.physics.CollisionGroup;
 
-import javax.vecmath.Vector3f;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.google.common.collect.Lists;
 
 /**
  * Prototype entity manager. Not intended for final use, but a stand in for experimentation.

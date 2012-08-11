@@ -1,16 +1,27 @@
 package org.terasology.entitySystem.pojo;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Map;
+
+import javax.vecmath.Vector3f;
+
 import org.junit.Before;
 import org.junit.Test;
-import org.terasology.entitySystem.*;
+import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.EntityInfoComponent;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.Prefab;
+import org.terasology.entitySystem.PrefabManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentLibraryImpl;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
+import org.terasology.entitySystem.metadata.ComponentUtil;
 import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.entitySystem.metadata.extension.Vector3fTypeHandler;
-import org.terasology.entitySystem.metadata.ComponentUtil;
 import org.terasology.entitySystem.persistence.EntityPersisterHelper;
 import org.terasology.entitySystem.persistence.EntityPersisterHelperImpl;
 import org.terasology.entitySystem.stubs.GetterSetterComponent;
@@ -19,11 +30,8 @@ import org.terasology.entitySystem.stubs.MappedTypeComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.protobuf.EntityData;
 
-import javax.vecmath.Vector3f;
-
-import java.util.Map;
-
-import static org.junit.Assert.*;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * @author Immortius <immortius@gmail.com>

@@ -15,7 +15,14 @@
  */
 package org.terasology.logic.manager;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Logger;
+
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
+
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
@@ -23,17 +30,12 @@ import org.terasology.audio.OpenALManager;
 import org.terasology.audio.Sound;
 import org.terasology.audio.SoundPool;
 import org.terasology.audio.SoundSource;
-import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.components.block.BlockComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.physics.character.CharacterMovementComponent;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Logger;
+import com.bulletphysics.linearmath.QuaternionUtil;
 
 /**
  * Simple managing class for loading and accessing audio files.

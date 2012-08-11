@@ -1,7 +1,6 @@
 package org.terasology.model.structures;
 
 
-import org.terasology.model.structures.TeraSmartArray;
 import org.terasology.utilities.FastRandom;
 
 public class TeraSmartArrayTest extends junit.framework.TestCase {

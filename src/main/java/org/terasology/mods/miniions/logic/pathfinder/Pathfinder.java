@@ -23,11 +23,12 @@ package org.terasology.mods.miniions.logic.pathfinder;
  * To change this template use File | Settings | File Templates.
  */
 
-import org.terasology.world.WorldProvider;
-import org.terasology.world.block.Block;
+import java.util.List;
 
 import javax.vecmath.Vector3f;
-import java.util.List;
+
+import org.terasology.world.WorldProvider;
+import org.terasology.world.block.Block;
 
 public abstract class Pathfinder {
 

@@ -16,15 +16,15 @@
 
 package org.terasology.asset.loaders;
 
-import org.terasology.asset.AssetLoader;
-import org.terasology.asset.AssetUri;
-import org.terasology.audio.OggStreamingSound;
-import org.terasology.audio.Sound;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
+
+import org.terasology.asset.AssetLoader;
+import org.terasology.asset.AssetUri;
+import org.terasology.audio.OggStreamingSound;
+import org.terasology.audio.Sound;
 
 /**
  * @author Immortius

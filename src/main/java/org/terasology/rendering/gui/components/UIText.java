@@ -15,7 +15,11 @@
  */
 package org.terasology.rendering.gui.components;
 
+import static org.lwjgl.opengl.GL11.glDisable;
+
 import java.util.ArrayList;
+
+import javax.vecmath.Vector2f;
 
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
@@ -28,10 +32,6 @@ import org.terasology.logic.manager.ShaderManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
-
-import javax.vecmath.Vector2f;
-
-import static org.lwjgl.opengl.GL11.glDisable;
 
 /**
  * Simple text element supporting text shadowing.

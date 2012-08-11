@@ -15,13 +15,14 @@
  */
 package org.terasology.math;
 
-import org.lwjgl.BufferUtils;
-import org.terasology.world.chunks.Chunk;
+import static org.lwjgl.opengl.GL11.glGetFloat;
 
-import javax.vecmath.Matrix4f;
 import java.nio.FloatBuffer;
 
-import static org.lwjgl.opengl.GL11.glGetFloat;
+import javax.vecmath.Matrix4f;
+
+import org.lwjgl.BufferUtils;
+import org.terasology.world.chunks.Chunk;
 
 /**
  * Collection of math functions.

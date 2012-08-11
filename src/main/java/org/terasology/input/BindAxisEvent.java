@@ -16,7 +16,6 @@
 
 package org.terasology.input;
 
-import org.terasology.entitySystem.EntityRef;
 import org.terasology.events.input.AxisEvent;
 
 /**

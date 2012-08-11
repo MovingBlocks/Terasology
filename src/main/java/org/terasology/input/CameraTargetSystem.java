@@ -16,23 +16,25 @@
 
 package org.terasology.input;
 
-import com.google.common.base.Objects;
+import java.util.Arrays;
+
+import javax.vecmath.Vector3f;
+
 import org.terasology.components.block.BlockComponent;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.world.BlockEntityRegistry;
 import org.terasology.math.Vector3i;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.physics.CollisionGroup;
+import org.terasology.physics.HitResult;
 import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.rendering.cameras.Camera;
-import org.terasology.physics.HitResult;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.world.BlockEntityRegistry;
 
-import javax.vecmath.Vector3f;
-import java.util.Arrays;
+import com.google.common.base.Objects;
 
 /**
  * @author Immortius

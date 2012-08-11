@@ -15,11 +15,12 @@
  */
 package org.terasology.components;
 
-import com.google.common.collect.Maps;
+import java.util.Map;
+
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 
-import java.util.Map;
+import com.google.common.collect.Maps;
 
 /**
  * Item data is stored using this component

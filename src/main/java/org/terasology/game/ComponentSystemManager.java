@@ -15,8 +15,12 @@
  */
 package org.terasology.game;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.reflections.Reflections;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
@@ -25,11 +29,8 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.RegisterComponentSystem;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * Simple manager for component systems.

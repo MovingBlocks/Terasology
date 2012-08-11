@@ -15,16 +15,7 @@
  */
 package org.terasology.entitySystem.persistence;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import gnu.trove.procedure.TIntProcedure;
-import org.terasology.entitySystem.*;
-import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.metadata.ComponentMetadata;
-import org.terasology.entitySystem.metadata.ComponentUtil;
-import org.terasology.entitySystem.metadata.FieldMetadata;
-import org.terasology.protobuf.EntityData;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -32,6 +23,22 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.EntityInfoComponent;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.PersistableEntityManager;
+import org.terasology.entitySystem.Prefab;
+import org.terasology.entitySystem.PrefabManager;
+import org.terasology.entitySystem.metadata.ComponentLibrary;
+import org.terasology.entitySystem.metadata.ComponentMetadata;
+import org.terasology.entitySystem.metadata.ComponentUtil;
+import org.terasology.entitySystem.metadata.FieldMetadata;
+import org.terasology.protobuf.EntityData;
+
+import com.google.common.base.Objects;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 
 /**
  * @author Immortius <immortius@gmail.com>

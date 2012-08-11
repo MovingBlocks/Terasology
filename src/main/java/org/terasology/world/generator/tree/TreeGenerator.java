@@ -16,8 +16,8 @@
 
 package org.terasology.world.generator.tree;
 
-import org.terasology.world.WorldView;
 import org.terasology.utilities.FastRandom;
+import org.terasology.world.WorldView;
 
 /**
  * Object generators are used to generate objects like trees etc.

@@ -15,9 +15,15 @@
  */
 package org.terasology.mods.miniions.componentsystem.controllers;
 
+import javax.vecmath.Vector3f;
+
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.block.BlockComponent;
-import org.terasology.entitySystem.*;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.events.input.MouseWheelEvent;
 import org.terasology.events.input.binds.AttackButton;
@@ -40,8 +46,6 @@ import org.terasology.mods.miniions.minionenum.MinionMessagePriority;
 import org.terasology.mods.miniions.rendering.gui.components.UIMinionBehaviourMenu;
 import org.terasology.mods.miniions.utilities.MinionMessage;
 import org.terasology.utilities.FastRandom;
-
-import javax.vecmath.Vector3f;
 
 /**
  * Created with IntelliJ IDEA.

@@ -15,11 +15,17 @@
  */
 package org.terasology.world.block.management;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import gnu.trove.iterator.TObjectByteIterator;
 import gnu.trove.map.hash.TByteObjectHashMap;
 import gnu.trove.map.hash.TObjectByteHashMap;
+
+import java.nio.FloatBuffer;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
+
+import javax.vecmath.Vector2f;
+
 import org.lwjgl.BufferUtils;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockPart;
@@ -27,11 +33,8 @@ import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.loader.BlockLoader;
 
-import javax.vecmath.Vector2f;
-import java.nio.FloatBuffer;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Logger;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * Provides access to blocks by block id or block title.

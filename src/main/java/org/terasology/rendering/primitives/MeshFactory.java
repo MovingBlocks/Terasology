@@ -15,11 +15,12 @@
  */
 package org.terasology.rendering.primitives;
 
-import org.terasology.asset.AssetManager;
-import org.terasology.rendering.assets.Texture;
+import java.nio.ByteBuffer;
 
 import javax.vecmath.Vector4f;
-import java.nio.ByteBuffer;
+
+import org.terasology.asset.AssetManager;
+import org.terasology.rendering.assets.Texture;
 
 public class MeshFactory {
 

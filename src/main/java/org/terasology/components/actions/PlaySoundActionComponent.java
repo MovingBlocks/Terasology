@@ -15,12 +15,13 @@
  */
 package org.terasology.components.actions;
 
-import com.google.common.collect.Lists;
+import java.util.Arrays;
+import java.util.List;
+
 import org.terasology.audio.Sound;
 import org.terasology.entitySystem.Component;
 
-import java.util.Arrays;
-import java.util.List;
+import com.google.common.collect.Lists;
 
 /**
  * When activated, plays a random sound

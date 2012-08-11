@@ -15,11 +15,16 @@
  */
 package org.terasology.entitySystem.persistence;
 
-import org.terasology.entitySystem.*;
+import java.util.Map;
+
+import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.PersistableEntityManager;
+import org.terasology.entitySystem.Prefab;
+import org.terasology.entitySystem.PrefabManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.protobuf.EntityData;
-
-import java.util.Map;
 
 /**
  * Interface for persist Entity System related classes to and from EntityData messages.

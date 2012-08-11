@@ -1,6 +1,9 @@
 package org.terasology.entitySystem;
 
-import com.google.common.collect.Lists;
+import static org.junit.Assert.assertEquals;
+
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
@@ -11,9 +14,7 @@ import org.terasology.entitySystem.pojo.PojoPrefabManager;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 
-import java.util.List;
-
-import static org.junit.Assert.*;
+import com.google.common.collect.Lists;
 
 
 /**

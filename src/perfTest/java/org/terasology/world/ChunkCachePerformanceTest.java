@@ -1,12 +1,13 @@
 package org.terasology.world;
 
+import java.io.File;
+
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkStore;
-import org.terasology.world.chunks.store.*;
-import org.terasology.world.chunks.store.ChunkStoreUncompressed;
+import org.terasology.world.chunks.store.ChunkStoreDeflate;
+import org.terasology.world.chunks.store.ChunkStoreFileSystem;
 import org.terasology.world.chunks.store.ChunkStoreGZip;
-
-import java.io.File;
+import org.terasology.world.chunks.store.ChunkStoreUncompressed;
 
 
 public class ChunkCachePerformanceTest extends junit.framework.TestCase{

@@ -15,13 +15,21 @@
  */
 package org.terasology.rendering.gui.framework.style;
 
-import org.terasology.asset.AssetManager;
-import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import static org.lwjgl.opengl.GL11.GL_QUADS;
+import static org.lwjgl.opengl.GL11.glBegin;
+import static org.lwjgl.opengl.GL11.glColor4f;
+import static org.lwjgl.opengl.GL11.glEnd;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glTranslatef;
+import static org.lwjgl.opengl.GL11.glVertex2f;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
 
-import static org.lwjgl.opengl.GL11.*;
+import org.terasology.asset.AssetManager;
+import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 //background-color:    <color hex> <alpha 0.0-1.0>
 //background-image:    <texture_name> <texture_size x> <texture_size y> <texture_position x> <texture_position y> (<rotate_angle>)

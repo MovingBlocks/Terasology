@@ -15,11 +15,11 @@
  */
 package org.terasology.rendering.gui.components;
 
+import javax.vecmath.Vector2f;
+
 import org.terasology.asset.AssetManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
-
-import javax.vecmath.Vector2f;
 
 /**
  * TODO Get rid of this class. the gui components should be reduced to a minimum. move to hui.menus?

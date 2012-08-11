@@ -15,20 +15,21 @@
  */
 package org.terasology.model.inventory;
 
-import org.lwjgl.opengl.GL11;
-import org.terasology.asset.AssetManager;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.family.BlockFamily;
-import org.terasology.rendering.assets.Texture;
-import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.lwjgl.opengl.GL11.glTranslatef;
 
-import javax.vecmath.Vector2f;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import static org.lwjgl.opengl.GL11.glBindTexture;
-import static org.lwjgl.opengl.GL11.glTranslatef;
+import javax.vecmath.Vector2f;
+
+import org.lwjgl.opengl.GL11;
+import org.terasology.asset.AssetManager;
+import org.terasology.rendering.assets.Texture;
+import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.family.BlockFamily;
 
 /**
  * Icon for rendering items in inventory.

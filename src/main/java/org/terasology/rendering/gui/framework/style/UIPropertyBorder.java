@@ -16,17 +16,26 @@
 package org.terasology.rendering.gui.framework.style;
 
 
-import org.lwjgl.opengl.GL11;
-import org.terasology.asset.AssetManager;
-import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import static org.lwjgl.opengl.GL11.glBegin;
+import static org.lwjgl.opengl.GL11.glColor4f;
+import static org.lwjgl.opengl.GL11.glEnd;
+import static org.lwjgl.opengl.GL11.glLineWidth;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glTranslatef;
+import static org.lwjgl.opengl.GL11.glVertex2f;
 
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector4f;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.lwjgl.opengl.GL11.*;
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
+
+import org.lwjgl.opengl.GL11;
+import org.terasology.asset.AssetManager;
+import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 public class UIPropertyBorder extends UIProperty {
     private Logger logger = Logger.getLogger(getClass().getName());

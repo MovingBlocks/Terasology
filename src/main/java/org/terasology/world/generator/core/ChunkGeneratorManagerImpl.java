@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.terasology.logic.generators.DefaultGenerators;
+import org.terasology.math.Vector3i;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.WorldView;
 import org.terasology.world.chunks.Chunk;
@@ -29,7 +30,6 @@ import org.terasology.world.generator.BaseChunkGenerator;
 import org.terasology.world.generator.ChunkGenerator;
 import org.terasology.world.generator.SecondPassChunkGenerator;
 import org.terasology.world.liquid.LiquidsGenerator;
-import org.terasology.math.Vector3i;
 
 import com.google.common.collect.Lists;
 

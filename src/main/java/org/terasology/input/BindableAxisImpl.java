@@ -16,12 +16,14 @@
 
 package org.terasology.input;
 
-import com.google.common.collect.Lists;
+import java.util.List;
+
+import javax.vecmath.Vector3f;
+
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.logic.manager.GUIManager;
 
-import javax.vecmath.Vector3f;
-import java.util.List;
+import com.google.common.collect.Lists;
 
 /**
  * A Bind Axis is an simulated analog input axis, maintaining a value between -1 and 1.  It is linked to
