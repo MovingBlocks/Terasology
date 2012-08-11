@@ -72,7 +72,7 @@ public class UIScreenHUD extends UIDisplayWindow implements EventHandlerSystem {
         _debugLine3 = new UIText(new Vector2f(4, 38));
         _debugLine4 = new UIText(new Vector2f(4, 54));
 
-        addDisplayElement(_crosshair);
+        addDisplayElement(_crosshair, "crosshair");
         addDisplayElement(_debugLine1);
         addDisplayElement(_debugLine2);
         addDisplayElement(_debugLine3);
