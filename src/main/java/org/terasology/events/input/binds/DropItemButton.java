@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.events.input.binds;
+
+import org.terasology.input.BindButtonEvent;
 
 /**
- * Brick material stairs
+ * @author small-jeeper
  */
-{
-    "rotation" : "horizontal",
-    "tile" : "engine:Brick",
-    "shape" : "engine:stair",
-    "hardness" : 8,
-    "mass" : 128
+public class DropItemButton extends BindButtonEvent {
+    public static final String ID = "engine:dropItem";
 }

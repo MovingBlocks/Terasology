@@ -114,10 +114,7 @@ public class StateSinglePlayer implements GameState {
         }
         modManager.saveModSelectionToConfig();
         AssetManager.getInstance().clear();
-        BlockManager.getInstance().setBlockIdMap(worldInfo.getBlockIdMap());
-        BlockLoader blockLoader = new BlockLoader();
-        blockLoader.load();
-        blockLoader.buildAtlas();
+        BlockManager.getInstance().load(worldInfo.getBlockIdMap());
         cacheTextures();
 
         entityManager = new EntitySystemBuilder().build();

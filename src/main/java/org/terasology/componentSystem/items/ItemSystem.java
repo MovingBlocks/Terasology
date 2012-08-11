@@ -123,6 +123,9 @@ public class ItemSystem implements EventHandlerSystem {
      * @return True if a block was placed
      */
     private boolean placeBlock(BlockFamily type, Vector3i targetBlock, Side surfaceDirection, Side secondaryDirection, BlockItemComponent blockItem) {
+        if (type == null)
+            return true;
+
         Vector3i placementPos = new Vector3i(targetBlock);
         placementPos.add(surfaceDirection.getVector3i());
 

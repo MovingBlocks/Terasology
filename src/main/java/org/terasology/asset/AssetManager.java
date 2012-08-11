@@ -58,7 +58,10 @@ public class AssetManager {
     }
 
     public void addAssetTemporary(AssetUri uri, Asset asset) {
-        assetCache.put(uri, asset);
+        Asset old = assetCache.put(uri, asset);
+        if (old != null) {
+            old.dispose();
+        }
     }
 
     public Asset tryLoadAsset(AssetUri uri) {

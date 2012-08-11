@@ -54,9 +54,6 @@ public class Block {
 
     private static final Logger logger = Logger.getLogger(Block.class.getName());
 
-    public static final int ATLAS_SIZE_IN_PX = 256;
-    public static final int TEXTURE_SIZE_IN_PX = 16;
-    public static final int ATLAS_ELEMENTS_PER_ROW_AND_COLUMN = ATLAS_SIZE_IN_PX / TEXTURE_SIZE_IN_PX;
     public static final float TEXTURE_OFFSET = 0.0625f;
     public static final float TEXTURE_OFFSET_WIDTH = 0.0624f;
 
