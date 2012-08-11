@@ -15,13 +15,14 @@
  */
 package org.terasology.world;
 
-import org.terasology.model.structures.BlockPosition;
-
-import javax.vecmath.Vector3f;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import javax.vecmath.Vector3f;
+
+import org.terasology.model.structures.BlockPosition;
 
 /**
  * @author Immortius <immortius@gmail.com>

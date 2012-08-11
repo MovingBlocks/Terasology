@@ -15,13 +15,18 @@
  */
 package org.terasology.entitySystem.pojo;
 
-import com.google.common.collect.Maps;
+import java.util.Collections;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
+
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 
-import java.util.*;
+import com.google.common.collect.Maps;
 
 /**
  * @author Immortius <immortius@gmail.com>

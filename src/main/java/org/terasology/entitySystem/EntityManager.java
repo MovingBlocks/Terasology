@@ -15,10 +15,11 @@
  */
 package org.terasology.entitySystem;
 
-import org.terasology.entitySystem.metadata.ComponentLibrary;
+import java.util.Map;
 
 import javax.vecmath.Vector3f;
-import java.util.Map;
+
+import org.terasology.entitySystem.metadata.ComponentLibrary;
 
 /**
  * @author Immortius <immortius@gmail.com>

@@ -2,7 +2,9 @@ package org.terasology.rendering.gui.components;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.vecmath.Vector2f;
+
 import org.terasology.components.InventoryComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;

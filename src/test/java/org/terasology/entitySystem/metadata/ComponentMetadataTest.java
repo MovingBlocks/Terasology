@@ -16,11 +16,11 @@
 
 package org.terasology.entitySystem.metadata;
 
+import static org.junit.Assert.assertNull;
+
 import org.junit.Test;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.entitySystem.stubs.UnsupportedTypeComponent;
-
-import static org.junit.Assert.assertNull;
 
 /**
  * @author Immortius

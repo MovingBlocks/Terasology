@@ -15,6 +15,13 @@
  */
 package org.terasology.componentSystem;
 
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glRotatef;
+import static org.lwjgl.opengl.GL11.glScalef;
+
+import javax.vecmath.Vector3f;
+
 import org.lwjgl.opengl.GL11;
 import org.terasology.components.actions.MiniaturizerComponent;
 import org.terasology.entitySystem.EntityManager;
@@ -24,10 +31,6 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.world.WorldRenderer;
-
-import javax.vecmath.Vector3f;
-
-import static org.lwjgl.opengl.GL11.*;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>

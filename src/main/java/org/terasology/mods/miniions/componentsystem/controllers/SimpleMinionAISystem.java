@@ -15,30 +15,35 @@
  */
 package org.terasology.mods.miniions.componentsystem.controllers;
 
+import java.util.List;
+
+import javax.vecmath.AxisAngle4f;
+import javax.vecmath.Vector3f;
+
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.components.world.LocationComponent;
-import org.terasology.entitySystem.*;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.WorldProvider;
 import org.terasology.math.Vector3i;
-import org.terasology.world.block.Block;
 import org.terasology.mods.miniions.components.MinionComponent;
 import org.terasology.mods.miniions.components.SimpleMinionAIComponent;
 import org.terasology.mods.miniions.events.MinionMessageEvent;
 import org.terasology.mods.miniions.logic.pathfinder.AStarPathing;
 import org.terasology.mods.miniions.minionenum.MinionMessagePriority;
 import org.terasology.mods.miniions.utilities.MinionMessage;
+import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.utilities.FastRandom;
-
-import javax.vecmath.AxisAngle4f;
-import javax.vecmath.Vector3f;
-import java.util.List;
+import org.terasology.world.BlockEntityRegistry;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.block.Block;
 
 /**
  * Created with IntelliJ IDEA.

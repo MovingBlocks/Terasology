@@ -15,12 +15,12 @@
  */
 package org.terasology.rendering.gui.framework;
 
+import javax.vecmath.Vector2f;
+
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.rendering.gui.components.UIScrollBar;
 import org.terasology.rendering.gui.framework.events.ScrollListener;
-
-import javax.vecmath.Vector2f;
 
 
 public class UIScrollableDisplayContainer extends UIDisplayContainer {

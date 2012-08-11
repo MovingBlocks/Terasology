@@ -15,10 +15,10 @@
  */
 package org.terasology.entitySystem.metadata.extension;
 
+import javax.vecmath.Vector3f;
+
 import org.terasology.entitySystem.metadata.AbstractTypeHandler;
 import org.terasology.protobuf.EntityData;
-
-import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius <immortius@gmail.com>

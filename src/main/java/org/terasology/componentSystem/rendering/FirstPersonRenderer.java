@@ -15,11 +15,29 @@
  */
 package org.terasology.componentSystem.rendering;
 
-import com.google.common.collect.Maps;
+import static org.lwjgl.opengl.GL11.GL_GREATER;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.glAlphaFunc;
+import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glRotatef;
+import static org.lwjgl.opengl.GL11.glScalef;
+import static org.lwjgl.opengl.GL11.glTranslatef;
+
+import java.util.Map;
+
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
+
 import org.lwjgl.opengl.GL11;
+import org.terasology.asset.AssetManager;
 import org.terasology.componentSystem.RenderSystem;
-import org.terasology.world.block.BlockPart;
-import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LocalPlayerComponent;
@@ -28,13 +46,10 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.asset.AssetManager;
 import org.terasology.logic.manager.ShaderManager;
-import org.terasology.world.WorldProvider;
 import org.terasology.math.TeraMath;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.family.BlockFamily;
 import org.terasology.model.inventory.Icon;
+import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.MeshFactory;
@@ -42,13 +57,12 @@ import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockPart;
+import org.terasology.world.block.family.BlockFamily;
 
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
-import java.util.Map;
-
-import static org.lwjgl.opengl.GL11.*;
+import com.google.common.collect.Maps;
 
 /**
  * @author Immortius <immortius@gmail.com>

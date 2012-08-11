@@ -16,16 +16,12 @@
 
 package org.terasology.logic.mod;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.gson.JsonIOException;
-import org.terasology.asset.sources.ArchiveSource;
-import org.terasology.asset.sources.DirectorySource;
-import org.terasology.logic.manager.Config;
-import org.terasology.logic.manager.PathManager;
-
-import java.io.*;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +29,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
+import org.terasology.asset.sources.ArchiveSource;
+import org.terasology.asset.sources.DirectorySource;
+import org.terasology.logic.manager.Config;
+import org.terasology.logic.manager.PathManager;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
 
 /**
  * @author Immortius

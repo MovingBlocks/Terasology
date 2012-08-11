@@ -15,9 +15,9 @@
  */
 package org.terasology.entitySystem.metadata;
 
-import org.terasology.protobuf.EntityData;
-
 import java.util.List;
+
+import org.terasology.protobuf.EntityData;
 
 /**
  * @author Immortius <immortius@gmail.com>

@@ -15,7 +15,13 @@
  */
 package org.terasology.world.liquid;
 
-import com.google.common.collect.Queues;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.terasology.components.block.BlockComponent;
 import org.terasology.components.world.WorldComponent;
 import org.terasology.entitySystem.EntityRef;
@@ -23,25 +29,19 @@ import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.game.CoreRegistry;
-import org.terasology.world.BlockChangedEvent;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.WorldView;
-import org.terasology.world.block.BlockUri;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkReadyEvent;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.world.BlockChangedEvent;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.WorldView;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
+import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkReadyEvent;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.google.common.collect.Queues;
 
 /**
  * Rough draft of Minecraft-like behavior of liquids. Will be replaced with some

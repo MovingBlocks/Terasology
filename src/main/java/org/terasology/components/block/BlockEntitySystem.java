@@ -23,18 +23,23 @@ import org.terasology.components.ItemComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entityFactory.DroppedBlockFactory;
-import org.terasology.entitySystem.*;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.EventPriority;
+import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.FullHealthEvent;
 import org.terasology.events.NoHealthEvent;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AudioManager;
+import org.terasology.physics.ImpulseEvent;
+import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
-import org.terasology.physics.ImpulseEvent;
-import org.terasology.utilities.FastRandom;
 
 /**
  * Event handler for events affecting block entities

@@ -1,12 +1,10 @@
 package org.terasology.testUtil;
 
-import groovy.lang.Tuple;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import javax.vecmath.Tuple3f;
 import javax.vecmath.Tuple4f;
-import javax.vecmath.Vector3f;
-
-import static org.junit.Assert.*;
 
 
 /**

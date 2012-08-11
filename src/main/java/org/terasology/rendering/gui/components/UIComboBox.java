@@ -16,6 +16,8 @@
 
 package org.terasology.rendering.gui.components;
 
+import javax.vecmath.Vector2f;
+
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetType;
@@ -27,8 +29,6 @@ import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
-
-import javax.vecmath.Vector2f;
 
 /**
  * A combo box.

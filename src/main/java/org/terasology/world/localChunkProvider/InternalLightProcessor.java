@@ -16,9 +16,9 @@
 
 package org.terasology.world.localChunkProvider;
 
-import org.terasology.world.chunks.Chunk;
 import org.terasology.math.Side;
 import org.terasology.world.block.Block;
+import org.terasology.world.chunks.Chunk;
 
 /**
  * @author Immortius

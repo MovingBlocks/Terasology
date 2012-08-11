@@ -15,22 +15,18 @@
  */
 package org.terasology.mods.miniions.rendering.gui.components;
 
+import javax.vecmath.Vector2f;
+
 import org.lwjgl.opengl.Display;
-import org.terasology.components.LocalPlayerComponent;
+import org.terasology.asset.AssetManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.entitySystem.EventSystem;
-import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.asset.AssetManager;
 import org.terasology.mods.miniions.components.MinionBarComponent;
 import org.terasology.mods.miniions.components.MinionComponent;
 import org.terasology.mods.miniions.components.MinionControllerComponent;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
-
-import javax.vecmath.Vector2f;
 
 /**
  * Created with IntelliJ IDEA.

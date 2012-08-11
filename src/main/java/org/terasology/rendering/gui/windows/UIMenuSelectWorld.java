@@ -15,29 +15,32 @@
  */
 package org.terasology.rendering.gui.windows;
 
-import org.lwjgl.opengl.Display;
-import org.terasology.game.CoreRegistry;
-import org.terasology.game.GameEngine;
-import org.terasology.game.modes.StateSinglePlayer;
-import org.terasology.asset.AssetManager;
-import org.terasology.logic.manager.Config;
-import org.terasology.logic.manager.GUIManager;
-import org.terasology.logic.manager.PathManager;
-import org.terasology.world.WorldInfo;
-import org.terasology.world.WorldUtil;
-import org.terasology.rendering.gui.components.*;
-import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
-import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.UIDisplayWindow;
-import org.terasology.rendering.gui.framework.events.ClickListener;
-import org.terasology.rendering.gui.framework.events.MouseButtonListener;
-
-import javax.vecmath.Vector2f;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.vecmath.Vector2f;
+
+import org.lwjgl.opengl.Display;
+import org.terasology.asset.AssetManager;
+import org.terasology.game.CoreRegistry;
+import org.terasology.game.GameEngine;
+import org.terasology.game.modes.StateSinglePlayer;
+import org.terasology.logic.manager.Config;
+import org.terasology.logic.manager.GUIManager;
+import org.terasology.logic.manager.PathManager;
+import org.terasology.rendering.gui.components.UIButton;
+import org.terasology.rendering.gui.components.UIImageOverlay;
+import org.terasology.rendering.gui.components.UIInput;
+import org.terasology.rendering.gui.components.UIList;
+import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.UIDisplayWindow;
+import org.terasology.rendering.gui.framework.events.ClickListener;
+import org.terasology.world.WorldInfo;
+import org.terasology.world.WorldUtil;
 
 /**
  * Select world menu screen.

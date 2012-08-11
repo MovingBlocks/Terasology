@@ -15,19 +15,23 @@
  */
 package org.terasology.logic.manager;
 
-import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
-import org.terasology.entitySystem.Prefab;
-import org.terasology.entitySystem.PrefabManager;
-import org.terasology.game.CoreRegistry;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.management.BlockManager;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+import org.terasology.entitySystem.Prefab;
+import org.terasology.entitySystem.PrefabManager;
+import org.terasology.game.CoreRegistry;
+
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
 
 /**
  * Created with IntelliJ IDEA.

@@ -15,6 +15,8 @@
  */
 package org.terasology.componentSystem.characters;
 
+import javax.vecmath.Vector3d;
+
 import org.terasology.audio.Sound;
 import org.terasology.components.CharacterSoundComponent;
 import org.terasology.components.world.LocationComponent;
@@ -28,8 +30,6 @@ import org.terasology.events.VerticalCollisionEvent;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.SoundManager;
 import org.terasology.utilities.FastRandom;
-
-import javax.vecmath.Vector3d;
 
 /**
  * @author Immortius <immortius@gmail.com>

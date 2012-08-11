@@ -16,10 +16,10 @@
 
 package org.terasology.logic.mod;
 
-import org.terasology.asset.AssetSource;
-import org.terasology.asset.AssetManager;
-
 import java.io.File;
+
+import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetSource;
 
 /**
  * @author Immortius

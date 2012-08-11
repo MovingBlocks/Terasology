@@ -15,19 +15,25 @@
  */
 package org.terasology.audio;
 
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
+
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
-import org.lwjgl.openal.*;
+import org.lwjgl.openal.AL;
+import org.lwjgl.openal.AL10;
+import org.lwjgl.openal.ALC10;
+import org.lwjgl.openal.ALC11;
+import org.lwjgl.openal.ALCcontext;
+import org.lwjgl.openal.ALCdevice;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
-
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 
 public class OpenALManager extends AudioManager {
 

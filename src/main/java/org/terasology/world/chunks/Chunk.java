@@ -15,24 +15,26 @@
  */
 package org.terasology.world.chunks;
 
-import com.google.common.base.Objects;
-import org.terasology.logic.manager.Config;
-import org.terasology.world.liquid.LiquidData;
-import org.terasology.math.TeraMath;
-import org.terasology.math.Vector3i;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.management.BlockManager;
-import org.terasology.math.AABB;
-import org.terasology.model.structures.TeraArray;
-import org.terasology.model.structures.TeraSmartArray;
-import org.terasology.rendering.primitives.ChunkMesh;
-
-import javax.vecmath.Vector3f;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.concurrent.locks.ReentrantLock;
+
+import javax.vecmath.Vector3f;
+
+import org.terasology.logic.manager.Config;
+import org.terasology.math.AABB;
+import org.terasology.math.TeraMath;
+import org.terasology.math.Vector3i;
+import org.terasology.model.structures.TeraArray;
+import org.terasology.model.structures.TeraSmartArray;
+import org.terasology.rendering.primitives.ChunkMesh;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.management.BlockManager;
+import org.terasology.world.liquid.LiquidData;
+
+import com.google.common.base.Objects;
 
 /**
  * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks

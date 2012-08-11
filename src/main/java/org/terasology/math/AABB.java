@@ -15,16 +15,17 @@
  */
 package org.terasology.math;
 
-import com.bulletphysics.linearmath.AabbUtil2;
-import com.bulletphysics.linearmath.Transform;
-import com.google.common.base.Objects;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
-import java.util.ArrayList;
-import java.util.Iterator;
+
+import com.bulletphysics.linearmath.AabbUtil2;
+import com.bulletphysics.linearmath.Transform;
+import com.google.common.base.Objects;
 
 /**
  * An axis-aligned bounding box. Provides basic support for inclusion

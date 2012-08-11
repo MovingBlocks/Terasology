@@ -15,6 +15,31 @@
  */
 package org.terasology.physics.character;
 
+import java.util.logging.Logger;
+
+import javax.vecmath.AxisAngle4f;
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+
+import org.terasology.componentSystem.UpdateSubscriberSystem;
+import org.terasology.components.world.LocationComponent;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.event.RemovedComponentEvent;
+import org.terasology.events.FootstepEvent;
+import org.terasology.events.HorizontalCollisionEvent;
+import org.terasology.events.JumpEvent;
+import org.terasology.events.VerticalCollisionEvent;
+import org.terasology.game.CoreRegistry;
+import org.terasology.math.Vector3fUtil;
+import org.terasology.physics.BulletPhysics;
+import org.terasology.physics.CollisionGroup;
+import org.terasology.world.WorldProvider;
+
 import com.bulletphysics.BulletGlobals;
 import com.bulletphysics.collision.dispatch.CollisionFlags;
 import com.bulletphysics.collision.dispatch.CollisionObject;
@@ -24,22 +49,6 @@ import com.bulletphysics.collision.shapes.CapsuleShape;
 import com.bulletphysics.collision.shapes.ConvexShape;
 import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.Lists;
-import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.components.world.LocationComponent;
-import org.terasology.entitySystem.*;
-import org.terasology.entitySystem.event.RemovedComponentEvent;
-import org.terasology.events.FootstepEvent;
-import org.terasology.events.HorizontalCollisionEvent;
-import org.terasology.events.JumpEvent;
-import org.terasology.events.VerticalCollisionEvent;
-import org.terasology.game.CoreRegistry;
-import org.terasology.world.WorldProvider;
-import org.terasology.math.Vector3fUtil;
-import org.terasology.physics.BulletPhysics;
-import org.terasology.physics.CollisionGroup;
-
-import javax.vecmath.*;
-import java.util.logging.Logger;
 
 /**
  * @author Immortius <immortius@gmail.com>

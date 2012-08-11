@@ -15,19 +15,20 @@
  */
 package org.terasology.mods.miniions.rendering.gui.components;
 
-import org.lwjgl.opengl.Display;
-import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.asset.AssetManager;
-import org.terasology.mods.miniions.minionenum.MinionMessagePriority;
-import org.terasology.mods.miniions.utilities.MinionMessage;
-import org.terasology.rendering.gui.framework.UIDisplayContainer;
-import org.terasology.rendering.gui.framework.UIGraphicsElement;
-
-import javax.vecmath.Vector2f;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.Queue;
+
+import javax.vecmath.Vector2f;
+
+import org.lwjgl.opengl.Display;
+import org.terasology.asset.AssetManager;
+import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.mods.miniions.minionenum.MinionMessagePriority;
+import org.terasology.mods.miniions.utilities.MinionMessage;
+import org.terasology.rendering.gui.framework.UIDisplayContainer;
+import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 /**
  * Created with IntelliJ IDEA.

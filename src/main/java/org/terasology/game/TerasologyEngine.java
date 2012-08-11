@@ -16,30 +16,23 @@
 
 package org.terasology.game;
 
-import com.google.common.collect.Lists;
-import org.lwjgl.LWJGLException;
-import org.lwjgl.LWJGLUtil;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GLContext;
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
-import org.terasology.asset.sources.ClasspathSource;
-import org.terasology.game.modes.GameState;
-import org.terasology.logic.manager.*;
-import org.terasology.world.block.loader.TileLoader;
-import org.terasology.world.block.management.BlockManager;
-import org.terasology.performanceMonitor.PerformanceMonitor;
-import org.terasology.physics.CollisionGroupManager;
-import org.terasology.world.block.shapes.JsonBlockShapeLoader;
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_LEQUAL;
+import static org.lwjgl.opengl.GL11.GL_NORMALIZE;
+import static org.lwjgl.opengl.GL11.glDepthFunc;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glViewport;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Deque;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -49,7 +42,28 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-import static org.lwjgl.opengl.GL11.*;
+import org.lwjgl.LWJGLException;
+import org.lwjgl.LWJGLUtil;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GLContext;
+import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.sources.ClasspathSource;
+import org.terasology.game.modes.GameState;
+import org.terasology.logic.manager.AudioManager;
+import org.terasology.logic.manager.Config;
+import org.terasology.logic.manager.FontManager;
+import org.terasology.logic.manager.GroovyManager;
+import org.terasology.logic.manager.InputConfig;
+import org.terasology.logic.manager.PathManager;
+import org.terasology.logic.manager.ShaderManager;
+import org.terasology.logic.manager.VertexBufferObjectManager;
+import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.physics.CollisionGroupManager;
+
+import com.google.common.collect.Lists;
 
 /**
  * @author Immortius

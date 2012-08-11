@@ -15,13 +15,18 @@
  */
 package org.terasology.logic.manager;
 
-import com.google.protobuf.TextFormat;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.lwjgl.input.Keyboard;
 import org.terasology.protobuf.InputData;
 
-import java.io.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.google.protobuf.TextFormat;
 
 /**
  * @author Overdhose

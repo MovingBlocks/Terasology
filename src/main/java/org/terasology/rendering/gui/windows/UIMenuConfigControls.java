@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.gui.windows;
 
+import javax.vecmath.Vector2f;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetManager;
@@ -29,8 +31,6 @@ import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.ClickListener;
-
-import javax.vecmath.Vector2f;
 
 /**
  * @author Overdhose

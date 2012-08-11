@@ -15,7 +15,10 @@
  */
 package org.terasology.rendering.gui.windows;
 
-import org.terasology.physics.character.CharacterMovementComponent;
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
+
+import org.terasology.asset.AssetManager;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.PlayerComponent;
@@ -25,7 +28,7 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.modes.StateMainMenu;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.asset.AssetManager;
+import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.components.UITransparentOverlay;
@@ -33,9 +36,6 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
-
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
 
 /**
  * Simple pause menu providing buttons for respawning the player and creating a new world.

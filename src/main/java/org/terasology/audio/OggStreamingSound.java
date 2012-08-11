@@ -15,14 +15,14 @@
  */
 package org.terasology.audio;
 
-import org.terasology.asset.AssetUri;
-import org.terasology.utilities.OggReader;
-
 import java.io.IOException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.terasology.asset.AssetUri;
+import org.terasology.utilities.OggReader;
 
 
 public class OggStreamingSound extends AbstractStreamingSound {

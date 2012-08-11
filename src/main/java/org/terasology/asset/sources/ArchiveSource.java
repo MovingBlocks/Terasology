@@ -16,8 +16,6 @@
 
 package org.terasology.asset.sources;
 
-import org.terasology.asset.AssetUri;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -26,6 +24,8 @@ import java.util.jar.JarFile;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
+import org.terasology.asset.AssetUri;
 
 /**
  * @author Immortius

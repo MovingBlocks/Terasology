@@ -15,8 +15,12 @@
  */
 package org.terasology.rendering.gui.components;
 
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
+
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+import org.terasology.asset.AssetManager;
 import org.terasology.componentSystem.items.InventorySystem;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
@@ -28,7 +32,6 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.events.input.binds.RunButton;
 import org.terasology.game.CoreRegistry;
-import org.terasology.asset.AssetManager;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.physics.ImpulseEvent;
@@ -40,9 +43,6 @@ import org.terasology.rendering.gui.framework.UIGraphicsElement;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 import org.terasology.rendering.gui.framework.events.WindowListener;
-
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
 
 /**
  * A cell which can contain an item and supports drag and drop.

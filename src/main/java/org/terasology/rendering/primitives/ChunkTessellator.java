@@ -16,20 +16,21 @@
 package org.terasology.rendering.primitives;
 
 import gnu.trove.iterator.TIntIterator;
-import org.lwjgl.BufferUtils;
-import org.terasology.world.MiniatureChunk;
-import org.terasology.world.WorldBiomeProvider;
-import org.terasology.world.WorldView;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.math.Region3i;
-import org.terasology.math.Side;
-import org.terasology.math.Vector3i;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockPart;
-import org.terasology.performanceMonitor.PerformanceMonitor;
 
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
+
+import org.lwjgl.BufferUtils;
+import org.terasology.math.Region3i;
+import org.terasology.math.Side;
+import org.terasology.math.Vector3i;
+import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.world.MiniatureChunk;
+import org.terasology.world.WorldBiomeProvider;
+import org.terasology.world.WorldView;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockPart;
+import org.terasology.world.chunks.Chunk;
 
 /**
  * Generates tessellated chunk meshes from chunks.

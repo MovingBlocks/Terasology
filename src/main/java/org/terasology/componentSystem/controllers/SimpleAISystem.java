@@ -15,20 +15,24 @@
  */
 package org.terasology.componentSystem.controllers;
 
+import javax.vecmath.AxisAngle4f;
+import javax.vecmath.Vector3f;
+
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.components.SimpleAIComponent;
 import org.terasology.components.world.LocationComponent;
-import org.terasology.entitySystem.*;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.world.WorldProvider;
+import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.utilities.FastRandom;
-
-import javax.vecmath.AxisAngle4f;
-import javax.vecmath.Vector3f;
+import org.terasology.world.WorldProvider;
 
 /**
  * @author Immortius <immortius@gmail.com>

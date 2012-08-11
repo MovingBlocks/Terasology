@@ -18,12 +18,12 @@ package org.terasology.world.generator.core;
 import java.util.Map;
 
 import org.terasology.logic.manager.Config;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldBiomeProvider;
-import org.terasology.world.generator.ChunkGenerator;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
-import org.terasology.utilities.FastRandom;
+import org.terasology.world.chunks.Chunk;
+import org.terasology.world.generator.ChunkGenerator;
 
 /**
  * Generates some trees, flowers and high grass.

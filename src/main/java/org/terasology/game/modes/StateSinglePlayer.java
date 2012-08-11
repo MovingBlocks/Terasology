@@ -15,6 +15,23 @@
  */
 package org.terasology.game.modes;
 
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.vecmath.Vector3f;
+
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetManager;
@@ -42,7 +59,6 @@ import org.terasology.game.bootstrap.EntitySystemBuilder;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.mod.Mod;
@@ -59,20 +75,10 @@ import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldBiomeProviderImpl;
 import org.terasology.world.WorldInfo;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.block.loader.BlockLoader;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.generator.core.ChunkGeneratorManager;
 import org.terasology.world.generator.core.ChunkGeneratorManagerImpl;
-
-import javax.vecmath.Vector3f;
-import java.io.*;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Play mode.

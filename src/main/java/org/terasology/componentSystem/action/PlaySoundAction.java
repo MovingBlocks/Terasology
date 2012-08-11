@@ -15,6 +15,8 @@
  */
 package org.terasology.componentSystem.action;
 
+import javax.vecmath.Vector3f;
+
 import org.terasology.audio.Sound;
 import org.terasology.components.actions.PlaySoundActionComponent;
 import org.terasology.entitySystem.EntityRef;
@@ -25,8 +27,6 @@ import org.terasology.events.ActivateEvent;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.SoundManager;
 import org.terasology.utilities.FastRandom;
-
-import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius <immortius@gmail.com>

@@ -15,9 +15,9 @@
  */
 package org.terasology.game;
 
-import com.google.common.collect.Maps;
-
 import java.util.Map;
+
+import com.google.common.collect.Maps;
 
 /**
  * Registry giving access to major singleton systems, via the interface they fulfil.
