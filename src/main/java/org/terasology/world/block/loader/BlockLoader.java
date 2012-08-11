@@ -18,15 +18,12 @@ package org.terasology.world.block.loader;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-import gnu.trove.map.TObjectByteMap;
 import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectByteHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import org.newdawn.slick.opengl.PNGDecoder;
 import org.terasology.asset.AssetManager;
@@ -45,7 +42,6 @@ import org.terasology.world.block.family.AlignToSurfaceFamily;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.HorizontalBlockFamily;
 import org.terasology.world.block.family.SymmetricFamily;
-import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.block.shapes.BlockShape;
 
 import javax.imageio.ImageIO;
@@ -103,21 +99,91 @@ public class BlockLoader {
         return TeraMath.sizeOfPower(tileSize) + 1;
     }
 
-    public void load() {
-        loadBlocks();
-        loadAutoBlocks();
+    public LoadBlockDefinitionResults loadBlockDefinitions() {
+        logger.log(Level.INFO, "Loading Blocks...");
+        LoadBlockDefinitionResults result = new LoadBlockDefinitionResults();
+        for (AssetUri blockDefUri : AssetManager.list(AssetType.BLOCK_DEFINITION)) {
+            try {
+                JsonElement rawJson = readJson(blockDefUri);
+                if (rawJson != null) {
+                    JsonObject blockDefJson = rawJson.getAsJsonObject();
+
+                    // Don't process templates
+                    if (blockDefJson.has("template") && blockDefJson.get("template").getAsBoolean()) {
+                        continue;
+                    }
+                    logger.log(Level.INFO, "Loading " + blockDefUri);
+
+                    BlockDefinition blockDef = loadBlockDefinition(inheritData(blockDefUri, blockDefJson));
+
+                    if (isShapelessBlockFamily(blockDef)) {
+                        indexTile(getDefaultTile(blockDef, blockDefUri), true);
+                        result.shapelessDefinitions.add(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()));
+                    } else {
+                        if (blockDef.liquid) {
+                            blockDef.rotation = BlockDefinition.RotationType.NONE;
+                            blockDef.shapes.clear();
+                            blockDef.shape = "";
+                        }
+
+                        if (blockDef.shapes.isEmpty()) {
+                            switch (blockDef.rotation) {
+                                case ALIGNTOSURFACE:
+                                    result.families.add(processAlignToSurfaceFamily(blockDefUri, blockDefJson));
+                                    break;
+                                case HORIZONTAL:
+                                    result.families.add(processHorizontalBlockFamily(blockDefUri, blockDef));
+                                    break;
+
+                                default:
+                                    result.families.add(processSingleBlockFamily(blockDefUri, blockDef));
+                                    break;
+                            }
+                        } else {
+                            result.families.addAll(processMultiBlockFamily(blockDefUri, blockDef));
+                        }
+                    }
+
+                }
+            } catch (JsonParseException e) {
+                logger.log(Level.SEVERE, "Failed to load block '" + blockDefUri + "'", e);
+            } catch (NullPointerException e) {
+                logger.log(Level.SEVERE, "Failed to load block '" + blockDefUri + "'", e);
+            }
+        }
+        result.shapelessDefinitions.addAll(loadAutoBlocks());
+        return result;
     }
 
-    private void loadAutoBlocks() {
-        logger.log(Level.INFO, "Loading Auto Blocks...");
-        BlockDefinition defaultBlockDef = new BlockDefinition();
-        for (AssetUri blockTileUri : AssetManager.list(AssetType.BLOCK_TILE)) {
-            if (AssetManager.getInstance().getAssetURLs(blockTileUri).get(0).getPath().contains(AUTO_BLOCK_URL_FRAGMENT)) {
-                BlockUri uri = new BlockUri(blockTileUri.getPackage(), blockTileUri.getAssetName());
-                if (!BlockManager.getInstance().hasBlockFamily(uri)) {
-                    processSingleBlockFamily(blockTileUri, defaultBlockDef);
-                }
+    public BlockFamily loadWithShape(BlockUri uri) {
+        BlockShape shape = cubeShape;
+        if (uri.hasShape()) {
+            AssetUri shapeUri = uri.getShapeUri();
+            if (!shapeUri.isValid()) {
+                return null;
             }
+            shape = (BlockShape) AssetManager.load(shapeUri);
+            if (shape == null) {
+                return null;
+            }
+        }
+        AssetUri blockDefUri = new AssetUri(AssetType.BLOCK_DEFINITION, uri.getPackage(), uri.getFamily());
+        BlockDefinition def;
+        if (AssetManager.getInstance().getAssetURLs(blockDefUri).isEmpty()) {
+            // An auto-block
+            def = new BlockDefinition();
+        } else {
+            def = loadBlockDefinition(inheritData(blockDefUri, readJson(blockDefUri).getAsJsonObject()));
+        }
+
+        def.shape = (shape.getURI().getSimpleString());
+        if (shape.isCollisionSymmetric()) {
+            Block block = constructSingleBlock(blockDefUri, def);
+            return new SymmetricFamily(uri, block);
+        } else {
+            Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
+            constructHorizontalBlocks(blockDefUri, def, blockMap);
+            return new HorizontalBlockFamily(uri, blockMap);
         }
     }
 
@@ -180,55 +246,24 @@ public class BlockLoader {
         return result;
     }
 
-    private void loadBlocks() {
-        logger.log(Level.INFO, "Loading Blocks...");
-        for (AssetUri blockDefUri : AssetManager.list(AssetType.BLOCK_DEFINITION)) {
-            try {
-                JsonElement rawJson = readJson(blockDefUri);
-                if (rawJson != null) {
-                    JsonObject blockDefJson = rawJson.getAsJsonObject();
-                    // Don't process templates
-                    if (blockDefJson.has("template") && blockDefJson.get("template").getAsBoolean()) {
-                        continue;
-                    }
-                    logger.log(Level.INFO, "Loading " + blockDefUri);
-                    inheritData(blockDefUri, blockDefJson);
-
-                    BlockDefinition blockDef = loadBlockDefinition(blockDefJson);
-
-                    if (blockDef.liquid) {
-                        blockDef.rotation = BlockDefinition.RotationType.NONE;
-                        blockDef.shapes.clear();
-                        blockDef.shape = "";
-                    }
-
-                    if (blockDef.shapes.isEmpty()) {
-                        switch (blockDef.rotation) {
-                            case ALIGNTOSURFACE:
-                                processAlignToSurfaceFamily(blockDefUri, blockDefJson);
-                                break;
-                            case HORIZONTAL:
-                                processHorizontalBlockFamily(blockDefUri, blockDef);
-                                break;
-
-                            default:
-                                processSingleBlockFamily(blockDefUri, blockDef);
-                                break;
-                        }
-                    } else {
-                        processMultiBlockFamily(blockDefUri, blockDef);
-                    }
-
-                }
-            } catch (JsonParseException e) {
-                logger.log(Level.SEVERE, "Failed to load block '" + blockDefUri + "'", e);
-            } catch (NullPointerException e) {
-                logger.log(Level.SEVERE, "Failed to load block '" + blockDefUri + "'", e);
+    private List<BlockUri> loadAutoBlocks() {
+        logger.log(Level.INFO, "Loading Auto Blocks...");
+        List<BlockUri> result = Lists.newArrayList();
+        for (AssetUri blockTileUri : AssetManager.list(AssetType.BLOCK_TILE)) {
+            if (AssetManager.getInstance().getAssetURLs(blockTileUri).get(0).getPath().contains(AUTO_BLOCK_URL_FRAGMENT)) {
+                BlockUri uri = new BlockUri(blockTileUri.getPackage(), blockTileUri.getAssetName());
+                result.add(uri);
+                getTileIndex(blockTileUri, true);
             }
         }
+        return result;
     }
 
-    private void inheritData(AssetUri rootAssetUri, JsonObject blockDefJson) {
+    private boolean isShapelessBlockFamily(BlockDefinition blockDef) {
+        return blockDef.shapes.isEmpty() && blockDef.shape.isEmpty() && blockDef.rotation == BlockDefinition.RotationType.NONE && !blockDef.liquid && blockDef.tiles == null;
+    }
+
+    private JsonObject inheritData(AssetUri rootAssetUri, JsonObject blockDefJson) {
 
         JsonObject parentObj = blockDefJson;
         while (parentObj.has("basedOn")) {
@@ -244,9 +279,11 @@ public class BlockLoader {
             mergeJsonInto(parent, blockDefJson);
             parentObj = parent;
         }
+        return blockDefJson;
     }
 
-    private void processMultiBlockFamily(AssetUri blockDefUri, BlockDefinition blockDef) {
+    private List<BlockFamily> processMultiBlockFamily(AssetUri blockDefUri, BlockDefinition blockDef) {
+        List<BlockFamily> result = Lists.newArrayList();
         for (String shapeString : blockDef.shapes) {
             AssetUri shapeUri = new AssetUri(AssetType.SHAPE, shapeString);
             BlockShape shape = (BlockShape) AssetManager.load(shapeUri);
@@ -260,19 +297,18 @@ public class BlockLoader {
                 blockDef.shape = shapeString;
                 if (shape.isCollisionSymmetric()) {
                     Block block = constructSingleBlock(blockDefUri, blockDef);
-                    BlockFamily family = new SymmetricFamily(familyUri, block);
-                    registerFamily(family);
+                    result.add(new SymmetricFamily(familyUri, block));
                 } else {
                     Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
                     constructHorizontalBlocks(blockDefUri, blockDef, blockMap);
-                    BlockFamily horizFamily = new HorizontalBlockFamily(familyUri, blockMap);
-                    registerFamily(horizFamily);
+                    result.add(new HorizontalBlockFamily(familyUri, blockMap));
                 }
             }
         }
+        return result;
     }
 
-    private void processAlignToSurfaceFamily(AssetUri blockDefUri, JsonObject blockDefJson) {
+    private BlockFamily processAlignToSurfaceFamily(AssetUri blockDefUri, JsonObject blockDefJson) {
         Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
         if (blockDefJson.has("top")) {
             JsonObject topDefJson = blockDefJson.getAsJsonObject("top");
@@ -295,8 +331,7 @@ public class BlockLoader {
             BlockDefinition bottomDef = loadBlockDefinition(bottomDefJson);
             blockMap.put(Side.BOTTOM, constructSingleBlock(blockDefUri, bottomDef));
         }
-        BlockFamily family = new AlignToSurfaceFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap);
-        registerFamily(family);
+        return new AlignToSurfaceFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap);
     }
 
     private void mergeJsonInto(JsonObject from, JsonObject to) {
@@ -313,15 +348,14 @@ public class BlockLoader {
         }
     }
 
-    private void processSingleBlockFamily(AssetUri blockDefUri, BlockDefinition blockDef) {
+    private BlockFamily processSingleBlockFamily(AssetUri blockDefUri, BlockDefinition blockDef) {
         Block block = constructSingleBlock(blockDefUri, blockDef);
 
-        BlockFamily family = new SymmetricFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), block);
-        registerFamily(family);
+        return new SymmetricFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), block);
     }
 
     private Block constructSingleBlock(AssetUri blockDefUri, BlockDefinition blockDef) {
-        Map<BlockPart, AssetUri> tileUris = prepareTiles(blockDef, blockDefUri.getSimpleString());
+        Map<BlockPart, AssetUri> tileUris = prepareTiles(blockDef, blockDefUri);
         Map<BlockPart, Block.ColorSource> colorSourceMap = prepareColorSources(blockDef);
         Map<BlockPart, Vector4f> colorOffsetsMap = prepareColorOffsets(blockDef);
         BlockShape shape = getShape(blockDef);
@@ -341,16 +375,15 @@ public class BlockLoader {
         return block;
     }
 
-    private void processHorizontalBlockFamily(AssetUri blockDefUri, BlockDefinition blockDef) {
+    private BlockFamily processHorizontalBlockFamily(AssetUri blockDefUri, BlockDefinition blockDef) {
         Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
         constructHorizontalBlocks(blockDefUri, blockDef, blockMap);
 
-        BlockFamily horizFamily = new HorizontalBlockFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap);
-        registerFamily(horizFamily);
+        return new HorizontalBlockFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap);
     }
 
     private void constructHorizontalBlocks(AssetUri blockDefUri, BlockDefinition blockDef, Map<Side, Block> blockMap) {
-        Map<BlockPart, AssetUri> tileUris = prepareTiles(blockDef, blockDefUri.getSimpleString());
+        Map<BlockPart, AssetUri> tileUris = prepareTiles(blockDef, blockDefUri);
         Map<BlockPart, Block.ColorSource> colorSourceMap = prepareColorSources(blockDef);
         Map<BlockPart, Vector4f> colorOffsetsMap = prepareColorOffsets(blockDef);
         BlockShape shape = getShape(blockDef);
@@ -366,10 +399,6 @@ public class BlockLoader {
 
             blockMap.put(rot.rotate(Side.FRONT), block);
         }
-    }
-
-    private void registerFamily(BlockFamily family) {
-        BlockManager.getInstance().addBlockFamily(family);
     }
 
     private Map<BlockPart, Vector4f> prepareColorOffsets(BlockDefinition blockDef) {
@@ -478,12 +507,10 @@ public class BlockLoader {
         return block;
     }
 
-    private Map<BlockPart, AssetUri> prepareTiles(BlockDefinition blockDef, String defaultName) {
+    private Map<BlockPart, AssetUri> prepareTiles(BlockDefinition blockDef, AssetUri uri) {
+        AssetUri tileUri = getDefaultTile(blockDef, uri);
+
         Map<BlockPart, AssetUri> tileUris = Maps.newEnumMap(BlockPart.class);
-        if (!blockDef.tile.isEmpty()) {
-            defaultName = blockDef.tile;
-        }
-        AssetUri tileUri = new AssetUri(AssetType.BLOCK_TILE, defaultName);
         for (BlockPart part : BlockPart.values()) {
             tileUris.put(part, tileUri);
         }
@@ -500,11 +527,23 @@ public class BlockLoader {
         return tileUris;
     }
 
+    private AssetUri getDefaultTile(BlockDefinition blockDef, AssetUri uri) {
+        String defaultName = uri.getSimpleString();
+        if (!blockDef.tile.isEmpty()) {
+            defaultName = blockDef.tile;
+        }
+        return new AssetUri(AssetType.BLOCK_TILE, defaultName);
+    }
+
     private int getTileIndex(AssetUri uri, boolean warnOnError) {
         if (tileIndexes.containsKey(uri)) {
             return tileIndexes.get(uri);
         }
-        Tile tile = (Tile)AssetManager.tryLoad(uri);
+        return indexTile(uri, warnOnError);
+    }
+
+    private int indexTile(AssetUri uri, boolean warnOnError) {
+        Tile tile = (Tile) AssetManager.tryLoad(uri);
         if (tile != null) {
             int index = tiles.size();
             tiles.add(tile);
@@ -691,8 +730,11 @@ public class BlockLoader {
         private String toLowercase(Object o) {
             return o.toString().toLowerCase(Locale.ENGLISH);
         }
+    }
 
-
+    public static class LoadBlockDefinitionResults {
+        public List<BlockFamily> families = Lists.newArrayList();
+        public List<BlockUri> shapelessDefinitions = Lists.newArrayList();
     }
 
 }

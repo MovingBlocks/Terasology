@@ -139,10 +139,11 @@ public class BlockUri {
                 builder.append(PACKAGE_SEPARATOR);
                 builder.append(shapeName);
             }
-            if (blockIdentifier.isEmpty()) {
-                return packageName + PACKAGE_SEPARATOR + familyName;
+            if (!blockIdentifier.isEmpty()) {
+                builder.append(IDENTIFIER_SEPARATOR);
+                builder.append(blockIdentifier);
             }
-            return packageName + PACKAGE_SEPARATOR + familyName + IDENTIFIER_SEPARATOR + blockIdentifier;
+            return builder.toString();
         }
         return "";
     }
@@ -164,4 +165,7 @@ public class BlockUri {
         return Objects.hashCode(packageName, familyName, shapePackageName, shapeName, blockIdentifier);
     }
 
+    public boolean hasShape() {
+        return !shapePackageName.isEmpty() || !shapeName.isEmpty();
+    }
 }

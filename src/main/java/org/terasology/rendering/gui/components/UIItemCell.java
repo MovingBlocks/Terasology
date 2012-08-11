@@ -51,7 +51,6 @@ public class UIItemCell extends UIDisplayContainer  {
     
     //entity
     private EntityRef ownerEntity;
-    private InventoryComponent ownerInventory;
     private EntityRef itemEntity;
     private int slot;
     
@@ -94,6 +93,7 @@ public class UIItemCell extends UIDisplayContainer  {
 
         @Override
         public void move(UIDisplayElement element) {
+            InventoryComponent ownerInventory = ownerEntity.getComponent(InventoryComponent.class);
             if (ownerInventory != null) {
                 if (getFromMovementSlot().exists()) { //TODO avoid to let EVERY cell update the position
                     movementIcon.setPosition(new Vector2f(Mouse.getX() - getSize().x / 2, Display.getHeight() - Mouse.getY() - getSize().y / 2));
@@ -109,6 +109,7 @@ public class UIItemCell extends UIDisplayContainer  {
         
         @Override
         public void up(UIDisplayElement element, int button, boolean intersect) {
+            InventoryComponent ownerInventory = ownerEntity.getComponent(InventoryComponent.class);
             if (intersect) {
                 if (!enableDrag)
                     return;
@@ -167,7 +168,6 @@ public class UIItemCell extends UIDisplayContainer  {
      */
     public UIItemCell(EntityRef owner, Vector2f size) {
         this.ownerEntity = owner;
-        this.ownerInventory = ownerEntity.getComponent(InventoryComponent.class);
         
         setSize(size);
 
@@ -212,6 +212,7 @@ public class UIItemCell extends UIDisplayContainer  {
      */
     private void moveItem() {
         EntityRef item = getFromMovementSlot();
+        InventoryComponent ownerInventory = ownerEntity.getComponent(InventoryComponent.class);
         
         //no items on the target slot
         if (!ownerInventory.itemSlots.get(slot).exists()) {
@@ -241,6 +242,7 @@ public class UIItemCell extends UIDisplayContainer  {
      * Place the movement item directly on this owners inventory slot.
      */
     private void moveItemPlace() {
+        InventoryComponent ownerInventory = ownerEntity.getComponent(InventoryComponent.class);
         EntityRef item = getFromMovementSlot();
         ItemComponent sourceItem = item.getComponent(ItemComponent.class);
 
@@ -260,6 +262,7 @@ public class UIItemCell extends UIDisplayContainer  {
      */
     private void moveItemMerge() {
         EntityRef item = getFromMovementSlot();
+        InventoryComponent ownerInventory = ownerEntity.getComponent(InventoryComponent.class);
         ItemComponent sourceItem = item.getComponent(ItemComponent.class);
         ItemComponent targetItem = ownerInventory.itemSlots.get(slot).getComponent(ItemComponent.class);
         
@@ -291,6 +294,7 @@ public class UIItemCell extends UIDisplayContainer  {
      */
     private void moveItemSwap() {
         EntityRef item = getFromMovementSlot();
+        InventoryComponent ownerInventory = ownerEntity.getComponent(InventoryComponent.class);
         ItemComponent sourceItem = item.getComponent(ItemComponent.class);
         
         //move item to the movement slot
@@ -309,6 +313,7 @@ public class UIItemCell extends UIDisplayContainer  {
      * TODO ...
      */
     private void reset() {
+        InventoryComponent ownerInventory = ownerEntity.getComponent(InventoryComponent.class);
         ownerInventory.itemSlots.set(slot, getFromMovementSlot());
         sendToMovementSlot(EntityRef.NULL, (byte) -1);
     }
@@ -327,6 +332,7 @@ public class UIItemCell extends UIDisplayContainer  {
      * @param amount The amount to send to the movement slot. -1 for whole stack.
      */
     private void sendToMovementSlot(EntityRef item, byte amount) {
+        InventoryComponent ownerInventory = ownerEntity.getComponent(InventoryComponent.class);
         //transfer whole stack
         if (amount == -1) {
             
