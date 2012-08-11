@@ -312,7 +312,14 @@ public class InputSystem implements EventHandlerSystem {
     private void loadInputConfig() {
         InputConfig inputConfig = InputConfig.getInstance();
         int keyvalue;
+        /*test*/
+        String dropItemBind = "engine:dropItem";
+        BindableButton dropBind = registerBindButton(dropItemBind, "Drop Item", new DropItemButton());
+        dropBind.setRepeating(true);
+        dropBind.setMode(BindableButton.ActivateMode.BOTH);
 
+        linkBindButtonToKey(Keyboard.KEY_Q, dropItemBind);
+        /*test*/
         registerBindButton(InventoryButton.ID, "Inventory", new InventoryButton());
         keyvalue = inputConfig.getKeyInventory();
         if (keyvalue < 256) {
