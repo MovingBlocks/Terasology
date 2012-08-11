@@ -13,19 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.components;
+package org.terasology.events.input.binds;
 
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.EntityRef;
-
-import javax.vecmath.Vector3f;
+import org.terasology.input.BindButtonEvent;
 
 /**
- * Player information that is shared across the network
- *
- * @author Immortius <immortius@gmail.com>
+ * @author small-jeeper
  */
-public final class PlayerComponent implements Component {
-    public Vector3f spawnPosition = new Vector3f();
-    public EntityRef transferSlot = EntityRef.NULL;
+public class DropItemButton extends BindButtonEvent {
+    public static final String ID = "engine:dropItem";
 }
