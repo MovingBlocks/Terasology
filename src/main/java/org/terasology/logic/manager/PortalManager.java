@@ -15,17 +15,17 @@
  */
 package org.terasology.logic.manager;
 
+import java.util.HashSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.vecmath.Vector3f;
+
 import org.terasology.components.SimpleAIComponent;
 import org.terasology.entityFactory.GelatinousCubeFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.logic.portals.Portal;
 import org.terasology.utilities.FastRandom;
-
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
-import java.util.HashSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Manages Portals - a core game feature anchoring parts of the world, allowing spawning within a certain radius,

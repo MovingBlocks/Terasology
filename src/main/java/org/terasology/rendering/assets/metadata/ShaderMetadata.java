@@ -16,9 +16,9 @@
 
 package org.terasology.rendering.assets.metadata;
 
-import com.google.common.collect.Lists;
-
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 /**
  * @author Immortius

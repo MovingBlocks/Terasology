@@ -16,9 +16,9 @@
 
 package org.terasology.world.block;
 
-import org.terasology.math.Side;
-
 import java.util.EnumMap;
+
+import org.terasology.math.Side;
 
 /**
  * @author Immortius

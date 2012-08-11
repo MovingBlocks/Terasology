@@ -15,15 +15,14 @@
  */
 package org.terasology.world.block.family;
 
-import com.google.common.collect.Maps;
-import org.terasology.asset.AssetUri;
+import java.util.Locale;
+import java.util.Map;
+
 import org.terasology.math.Side;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 
-import java.util.EnumMap;
-import java.util.Locale;
-import java.util.Map;
+import com.google.common.collect.Maps;
 
 /**
  * @author Immortius <immortius@gmail.com>

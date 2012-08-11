@@ -16,6 +16,32 @@
 
 package org.terasology.physics;
 
+import gnu.trove.iterator.TFloatIterator;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+
+import org.terasology.componentSystem.UpdateSubscriberSystem;
+import org.terasology.components.world.LocationComponent;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.EventPriority;
+import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.event.AddComponentEvent;
+import org.terasology.entitySystem.event.RemovedComponentEvent;
+import org.terasology.game.CoreRegistry;
+import org.terasology.physics.character.CharacterMovementComponent;
+import org.terasology.physics.shapes.BoxShapeComponent;
+import org.terasology.physics.shapes.CapsuleShapeComponent;
+import org.terasology.physics.shapes.CylinderShapeComponent;
+import org.terasology.physics.shapes.HullShapeComponent;
+import org.terasology.physics.shapes.SphereShapeComponent;
+
 import com.bulletphysics.collision.broadphase.BroadphasePair;
 import com.bulletphysics.collision.dispatch.CollisionFlags;
 import com.bulletphysics.collision.dispatch.CollisionObject;
@@ -23,7 +49,12 @@ import com.bulletphysics.collision.dispatch.GhostObject;
 import com.bulletphysics.collision.dispatch.PairCachingGhostObject;
 import com.bulletphysics.collision.narrowphase.ManifoldPoint;
 import com.bulletphysics.collision.narrowphase.PersistentManifold;
-import com.bulletphysics.collision.shapes.*;
+import com.bulletphysics.collision.shapes.BoxShape;
+import com.bulletphysics.collision.shapes.CapsuleShape;
+import com.bulletphysics.collision.shapes.ConvexHullShape;
+import com.bulletphysics.collision.shapes.ConvexShape;
+import com.bulletphysics.collision.shapes.CylinderShape;
+import com.bulletphysics.collision.shapes.SphereShape;
 import com.bulletphysics.dynamics.DynamicsWorld;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
@@ -32,21 +63,6 @@ import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.util.ObjectArrayList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import gnu.trove.iterator.TFloatIterator;
-import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.components.world.LocationComponent;
-import org.terasology.entitySystem.*;
-import org.terasology.entitySystem.event.AddComponentEvent;
-import org.terasology.entitySystem.event.RemovedComponentEvent;
-import org.terasology.game.CoreRegistry;
-import org.terasology.physics.character.CharacterMovementComponent;
-import org.terasology.physics.shapes.*;
-
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Immortius

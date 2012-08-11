@@ -16,11 +16,15 @@
 
 package org.terasology.network;
 
-import org.jboss.netty.channel.*;
-import org.terasology.protobuf.NetData;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.ChannelStateEvent;
+import org.jboss.netty.channel.ExceptionEvent;
+import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
+import org.terasology.protobuf.NetData;
 
 /**
  * @author Immortius

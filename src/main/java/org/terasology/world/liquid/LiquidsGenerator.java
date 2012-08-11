@@ -17,13 +17,12 @@ package org.terasology.world.liquid;
 
 import java.util.Map;
 
-import org.terasology.world.block.BlockUri;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldBiomeProvider;
-import org.terasology.world.generator.ChunkGenerator;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
-import org.terasology.utilities.FastRandom;
+import org.terasology.world.chunks.Chunk;
+import org.terasology.world.generator.ChunkGenerator;
 
 /**
  * First draft to generate procedurally generated liquid streams. The source blocks are currently

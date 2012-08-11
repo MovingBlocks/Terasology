@@ -16,11 +16,11 @@
 
 package org.terasology.world;
 
-import org.terasology.world.liquid.LiquidData;
+import javax.vecmath.Vector3f;
+
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
-
-import javax.vecmath.Vector3f;
+import org.terasology.world.liquid.LiquidData;
 
 /**
  * @author Immortius

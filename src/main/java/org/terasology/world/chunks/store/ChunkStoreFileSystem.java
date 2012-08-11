@@ -15,13 +15,17 @@
  */
 package org.terasology.world.chunks.store;
 
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkStore;
-import org.terasology.math.Vector3i;
-
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.terasology.math.Vector3i;
+import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkStore;
 
 public class ChunkStoreFileSystem implements ChunkStore {
     private Logger logger = Logger.getLogger(getClass().getName());

@@ -15,11 +15,11 @@
  */
 package org.terasology.game;
 
-import org.terasology.game.modes.StateMainMenu;
-import org.terasology.logic.manager.PathManager;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.terasology.game.modes.StateMainMenu;
+import org.terasology.logic.manager.PathManager;
 
 /**
  * The heart and soul of Terasology.

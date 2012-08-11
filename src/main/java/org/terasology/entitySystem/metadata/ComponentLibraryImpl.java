@@ -15,17 +15,33 @@
  */
 package org.terasology.entitySystem.metadata;
 
-import com.google.common.collect.Maps;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.metadata.core.*;
-
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.metadata.core.BooleanTypeHandler;
+import org.terasology.entitySystem.metadata.core.ByteTypeHandler;
+import org.terasology.entitySystem.metadata.core.DoubleTypeHandler;
+import org.terasology.entitySystem.metadata.core.EnumTypeHandler;
+import org.terasology.entitySystem.metadata.core.FloatTypeHandler;
+import org.terasology.entitySystem.metadata.core.IntTypeHandler;
+import org.terasology.entitySystem.metadata.core.ListTypeHandler;
+import org.terasology.entitySystem.metadata.core.LongTypeHandler;
+import org.terasology.entitySystem.metadata.core.MappedContainerTypeHandler;
+import org.terasology.entitySystem.metadata.core.NumberTypeHandler;
+import org.terasology.entitySystem.metadata.core.StringMapTypeHandler;
+import org.terasology.entitySystem.metadata.core.StringTypeHandler;
+
+import com.google.common.collect.Maps;
 
 /**
  * @author Immortius <immortius@gmail.com>

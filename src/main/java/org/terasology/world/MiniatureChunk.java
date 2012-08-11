@@ -16,9 +16,9 @@
 package org.terasology.world;
 
 import org.terasology.logic.manager.Config;
-import org.terasology.world.chunks.Chunk;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
+import org.terasology.world.chunks.Chunk;
 
 /**
  * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks

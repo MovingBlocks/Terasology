@@ -15,12 +15,12 @@
  */
 package org.terasology.rendering.gui.components;
 
+import javax.vecmath.Vector2f;
+
 import org.newdawn.slick.Color;
 import org.terasology.asset.AssetManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
-
-import javax.vecmath.Vector2f;
 
 /**
  * 

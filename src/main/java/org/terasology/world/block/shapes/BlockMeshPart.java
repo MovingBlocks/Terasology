@@ -15,14 +15,16 @@
  */
 package org.terasology.world.block.shapes;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
-import org.terasology.rendering.primitives.ChunkMesh;
+import java.util.Arrays;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
-import java.util.Arrays;
+
+import org.terasology.rendering.primitives.ChunkMesh;
+
+import com.bulletphysics.linearmath.QuaternionUtil;
 
 /**
  * Describes the elements composing part of a block mesh. Multiple parts are patched together to define the mesh

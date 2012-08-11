@@ -15,14 +15,18 @@
  */
 package org.terasology.logic;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
-import org.terasology.components.*;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+
+import org.terasology.components.InventoryComponent;
+import org.terasology.components.LightComponent;
+import org.terasology.components.LocalPlayerComponent;
+import org.terasology.components.PlayerComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.physics.character.CharacterMovementComponent;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
+import com.bulletphysics.linearmath.QuaternionUtil;
 
 /**
  * @author Immortius <immortius@gmail.com>

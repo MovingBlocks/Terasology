@@ -16,7 +16,6 @@
 
 package org.terasology.physics.shapes;
 
-import com.bulletphysics.collision.shapes.CapsuleShape;
 import org.terasology.entitySystem.Component;
 
 /**

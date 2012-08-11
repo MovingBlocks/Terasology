@@ -16,19 +16,6 @@
 
 package org.terasology.rendering.assets;
 
-import com.google.common.collect.Maps;
-import com.google.common.io.CharStreams;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
-import org.terasology.asset.Asset;
-import org.terasology.asset.AssetUri;
-import org.terasology.logic.manager.Config;
-import org.terasology.world.block.Block;
-import org.terasology.rendering.assets.metadata.ParamMetadata;
-import org.terasology.rendering.assets.metadata.ParamType;
-import org.terasology.rendering.assets.metadata.ShaderMetadata;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -38,6 +25,20 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL20;
+import org.terasology.asset.Asset;
+import org.terasology.asset.AssetUri;
+import org.terasology.logic.manager.Config;
+import org.terasology.rendering.assets.metadata.ParamMetadata;
+import org.terasology.rendering.assets.metadata.ParamType;
+import org.terasology.rendering.assets.metadata.ShaderMetadata;
+import org.terasology.world.block.Block;
+
+import com.google.common.collect.Maps;
+import com.google.common.io.CharStreams;
 
 /**
  * @author Immortius

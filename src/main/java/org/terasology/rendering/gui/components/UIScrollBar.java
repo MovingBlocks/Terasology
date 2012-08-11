@@ -15,6 +15,10 @@
  */
 package org.terasology.rendering.gui.components;
 
+import java.util.ArrayList;
+
+import javax.vecmath.Vector2f;
+
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetManager;
@@ -24,9 +28,6 @@ import org.terasology.rendering.gui.framework.UIGraphicsElement;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 import org.terasology.rendering.gui.framework.events.ScrollListener;
-
-import javax.vecmath.Vector2f;
-import java.util.ArrayList;
 
 /*
  * A simple graphical ScrollBar

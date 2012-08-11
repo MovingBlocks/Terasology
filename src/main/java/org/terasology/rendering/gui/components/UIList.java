@@ -15,6 +15,12 @@
  */
 package org.terasology.rendering.gui.components;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
+
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
@@ -25,11 +31,6 @@ import org.terasology.rendering.gui.framework.UIScrollableDisplayContainer;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
-
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector4f;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A simple graphical List

@@ -16,7 +16,6 @@
 
 package org.terasology.world.block.family;
 
-import org.terasology.asset.AssetUri;
 import org.terasology.world.block.BlockUri;
 
 /**

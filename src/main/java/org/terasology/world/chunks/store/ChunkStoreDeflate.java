@@ -16,15 +16,20 @@
 package org.terasology.world.chunks.store;
 
 
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkStore;
-import org.terasology.math.Vector3i;
-
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
+
+import org.terasology.math.Vector3i;
+import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkStore;
 
 public class ChunkStoreDeflate implements ChunkStore, Serializable {
     ConcurrentMap<Vector3i, byte[]> map = new ConcurrentHashMap<Vector3i, byte[]>();

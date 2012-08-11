@@ -1,8 +1,8 @@
 package org.terasology.math;
 
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 
 /**
  * @author Immortius <immortius@gmail.com>

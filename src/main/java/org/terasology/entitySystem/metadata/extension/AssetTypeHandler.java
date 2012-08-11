@@ -16,15 +16,16 @@
 
 package org.terasology.entitySystem.metadata.extension;
 
-import com.google.common.collect.Lists;
+import java.util.List;
+
 import org.terasology.asset.Asset;
+import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.metadata.TypeHandler;
-import org.terasology.asset.AssetManager;
 import org.terasology.protobuf.EntityData;
 
-import java.util.List;
+import com.google.common.collect.Lists;
 
 /**
  * @author Immortius

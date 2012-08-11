@@ -16,9 +16,9 @@
 
 package org.terasology.physics;
 
-import org.terasology.entitySystem.AbstractEvent;
-
 import javax.vecmath.Vector3f;
+
+import org.terasology.entitySystem.AbstractEvent;
 
 /**
  * @author Immortius

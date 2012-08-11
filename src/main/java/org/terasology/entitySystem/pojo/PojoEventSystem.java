@@ -15,18 +15,40 @@
  */
 package org.terasology.entitySystem.pojo;
 
-import com.google.common.base.Predicates;
-import com.google.common.collect.*;
-import org.reflections.Reflections;
-import org.terasology.entitySystem.*;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.reflections.Reflections;
+import org.terasology.entitySystem.AbstractEvent;
+import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.Event;
+import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.EventPriority;
+import org.terasology.entitySystem.EventReceiver;
+import org.terasology.entitySystem.EventSystem;
+import org.terasology.entitySystem.ReceiveEvent;
+
+import com.google.common.base.Predicates;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Queues;
+import com.google.common.collect.Sets;
 
 /**
  * @author Immortius <immortius@gmail.com>

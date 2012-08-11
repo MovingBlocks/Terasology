@@ -15,11 +15,12 @@
  */
 package org.terasology.rendering.gui.framework.style;
 
-import org.terasology.rendering.gui.framework.UIDisplayElement;
-
-import javax.vecmath.Vector4f;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.vecmath.Vector4f;
+
+import org.terasology.rendering.gui.framework.UIDisplayElement;
 
 public abstract class UIProperty extends UIDisplayElement {
     private Logger logger = Logger.getLogger(getClass().getName());

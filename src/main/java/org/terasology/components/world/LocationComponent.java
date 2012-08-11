@@ -15,12 +15,13 @@
  */
 package org.terasology.components.world;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
+import com.bulletphysics.linearmath.QuaternionUtil;
 
 /**
  * Component represent the location and facing of an entity in the world

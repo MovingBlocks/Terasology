@@ -15,29 +15,35 @@
  */
 package org.terasology.componentSystem.items;
 
-import com.google.common.collect.Lists;
+import javax.vecmath.Vector3f;
+
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.block.BlockComponent;
 import org.terasology.components.block.BlockItemComponent;
-import org.terasology.entitySystem.*;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.EventPriority;
+import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AudioManager;
-import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.WorldProvider;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.family.BlockFamily;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.StandardCollisionGroup;
+import org.terasology.world.BlockEntityRegistry;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.family.BlockFamily;
 
-import javax.vecmath.Vector3f;
+import com.google.common.collect.Lists;
 
 /**
  * TODO: Refactor use methods into events? Usage should become a separate component

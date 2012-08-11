@@ -16,28 +16,39 @@
 
 package org.terasology.world.chunks;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import org.terasology.components.world.LocationComponent;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.world.LightPropagator;
-import org.terasology.world.WorldView;
-import org.terasology.world.generator.core.ChunkGeneratorManager;
-import org.terasology.world.localChunkProvider.*;
-import org.terasology.math.Region3i;
-import org.terasology.math.Vector3i;
-import org.terasology.performanceMonitor.PerformanceMonitor;
-
-import javax.vecmath.Vector3f;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.vecmath.Vector3f;
+
+import org.terasology.components.world.LocationComponent;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.math.Region3i;
+import org.terasology.math.Vector3i;
+import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.world.LightPropagator;
+import org.terasology.world.WorldView;
+import org.terasology.world.generator.core.ChunkGeneratorManager;
+import org.terasology.world.localChunkProvider.AbstractChunkTask;
+import org.terasology.world.localChunkProvider.ChunkRequest;
+import org.terasology.world.localChunkProvider.ChunkTask;
+import org.terasology.world.localChunkProvider.InternalLightProcessor;
+import org.terasology.world.localChunkProvider.ShutdownTask;
+
+import com.google.common.base.Objects;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * @author Immortius

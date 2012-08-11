@@ -15,10 +15,18 @@
  */
 package org.terasology.componentSystem.controllers;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
+
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.components.*;
+import org.terasology.components.HealthComponent;
+import org.terasology.components.InventoryComponent;
+import org.terasology.components.ItemComponent;
+import org.terasology.components.LocalPlayerComponent;
+import org.terasology.components.PlayerComponent;
 import org.terasology.components.block.BlockComponent;
 import org.terasology.components.block.BlockItemComponent;
 import org.terasology.components.rendering.MeshComponent;
@@ -34,7 +42,18 @@ import org.terasology.events.HealthChangedEvent;
 import org.terasology.events.NoHealthEvent;
 import org.terasology.events.input.MouseXAxisEvent;
 import org.terasology.events.input.MouseYAxisEvent;
-import org.terasology.events.input.binds.*;
+import org.terasology.events.input.binds.AttackButton;
+import org.terasology.events.input.binds.DropItemButton;
+import org.terasology.events.input.binds.ForwardsMovementAxis;
+import org.terasology.events.input.binds.FrobButton;
+import org.terasology.events.input.binds.JumpButton;
+import org.terasology.events.input.binds.RunButton;
+import org.terasology.events.input.binds.StrafeMovementAxis;
+import org.terasology.events.input.binds.ToolbarNextButton;
+import org.terasology.events.input.binds.ToolbarPrevButton;
+import org.terasology.events.input.binds.ToolbarSlotButton;
+import org.terasology.events.input.binds.UseItemButton;
+import org.terasology.events.input.binds.VerticalMovementAxis;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.input.ButtonState;
@@ -42,22 +61,17 @@ import org.terasology.input.CameraTargetSystem;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.world.WorldProvider;
-import org.terasology.math.TeraMath;
-import org.terasology.world.block.Block;
 import org.terasology.math.AABB;
+import org.terasology.math.TeraMath;
 import org.terasology.physics.ImpulseEvent;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.cameras.DefaultCamera;
-import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
-import org.terasology.utilities.FastRandom;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.block.Block;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector2f;
+import com.bulletphysics.linearmath.QuaternionUtil;
 
 /**
  * @author Immortius <immortius@gmail.com>

@@ -15,9 +15,9 @@
  */
 package org.terasology.utilities;
 
-import org.terasology.math.TeraMath;
-
 import javax.vecmath.Vector3f;
+
+import org.terasology.math.TeraMath;
 
 /**
  * Random number generator based on the Xorshift generator by George Marsaglia.

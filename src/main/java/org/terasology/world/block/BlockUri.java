@@ -16,11 +16,12 @@
 
 package org.terasology.world.block;
 
-import com.google.common.base.Objects;
+import java.util.Locale;
+
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 
-import java.util.Locale;
+import com.google.common.base.Objects;
 
 /**
  * Identifier for both blocks and block families.
