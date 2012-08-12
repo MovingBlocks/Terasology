@@ -16,9 +16,11 @@
 
 package org.terasology.world;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Queues;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.logging.Logger;
+
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.block.BlockComponent;
@@ -30,13 +32,12 @@ import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.Vector3i;
-import org.terasology.world.block.Block;
 import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.world.block.Block;
 
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.BlockingQueue;
-import java.util.logging.Logger;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Queues;
 
 /**
  * @author Immortius

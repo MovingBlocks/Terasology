@@ -1,5 +1,15 @@
 package org.terasology.rendering.gui.components;
 
+import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glTranslatef;
+
+import javax.vecmath.Vector2f;
+
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.AssetManager;
 import org.terasology.components.ItemComponent;
@@ -10,10 +20,6 @@ import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.family.BlockFamily;
-
-import javax.vecmath.Vector2f;
-
-import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Displays a little icon and item count for an item cell.
@@ -97,8 +103,10 @@ public class UIItemCellIcon extends UIDisplayContainer {
     }
 
     private void renderBlockIcon(BlockFamily blockFamily) {
-        if (blockFamily == null)
+        if (blockFamily == null) {
+            renderIcon(Icon.get("questionmark"));
             return;
+        }
 
         glEnable(GL11.GL_DEPTH_TEST);
         glClear(GL11.GL_DEPTH_BUFFER_BIT);

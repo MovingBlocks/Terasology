@@ -15,14 +15,14 @@
  */
 package org.terasology.rendering.gui.windows;
 
+import javax.vecmath.Vector2f;
+
 import org.lwjgl.opengl.Display;
-import org.terasology.entitySystem.EntityRef;
 import org.terasology.asset.AssetManager;
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.rendering.gui.components.UIItemContainer;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
-
-import javax.vecmath.Vector2f;
 
 /**
  * Displays two inventories, and allows moving items between them
@@ -48,10 +48,10 @@ public class UIScreenContainer extends UIDisplayWindow {
         background.getTextureOrigin().set(new Vector2f(0.0f, 0.0f));
         background.setVisible(true);
         
-        playerInventory = new UIItemContainer(4, 9);
+        playerInventory = new UIItemContainer(4);
         playerInventory.setVisible(true);
 
-        containerInventory = new UIItemContainer(4, 9);
+        containerInventory = new UIItemContainer(4);
         containerInventory.setVisible(true);
         
         addDisplayElement(background);
@@ -66,6 +66,9 @@ public class UIScreenContainer extends UIDisplayWindow {
         this.creature = creature;
         playerInventory.setEntity(creature);
         containerInventory.setEntity(container);
+        
+        playerInventory.setConnected(container);
+        containerInventory.setConnected(creature);
     }
 
     @Override

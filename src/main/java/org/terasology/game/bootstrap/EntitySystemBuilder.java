@@ -16,28 +16,41 @@
 
 package org.terasology.game.bootstrap;
 
-import org.reflections.Reflections;
-import org.terasology.asset.AssetType;
-import org.terasology.audio.Sound;
-import org.terasology.entitySystem.*;
-import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.metadata.ComponentLibraryImpl;
-import org.terasology.entitySystem.metadata.extension.*;
-import org.terasology.entitySystem.pojo.PojoEntityManager;
-import org.terasology.entitySystem.pojo.PojoEventSystem;
-import org.terasology.entitySystem.pojo.PojoPrefabManager;
-import org.terasology.game.CoreRegistry;
-import org.terasology.math.Vector3i;
-import org.terasology.world.block.family.BlockFamily;
-import org.terasology.physics.CollisionGroup;
-import org.terasology.rendering.assets.Material;
-import org.terasology.rendering.primitives.Mesh;
+import java.util.Set;
 
 import javax.vecmath.Color4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
-import java.util.Set;
+
+import org.reflections.Reflections;
+import org.terasology.asset.AssetType;
+import org.terasology.audio.Sound;
+import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.Event;
+import org.terasology.entitySystem.EventSystem;
+import org.terasology.entitySystem.PersistableEntityManager;
+import org.terasology.entitySystem.PrefabManager;
+import org.terasology.entitySystem.metadata.ComponentLibrary;
+import org.terasology.entitySystem.metadata.ComponentLibraryImpl;
+import org.terasology.entitySystem.metadata.extension.AssetTypeHandler;
+import org.terasology.entitySystem.metadata.extension.BlockFamilyTypeHandler;
+import org.terasology.entitySystem.metadata.extension.CollisionGroupTypeHandler;
+import org.terasology.entitySystem.metadata.extension.Color4fTypeHandler;
+import org.terasology.entitySystem.metadata.extension.Quat4fTypeHandler;
+import org.terasology.entitySystem.metadata.extension.Vector2fTypeHandler;
+import org.terasology.entitySystem.metadata.extension.Vector3fTypeHandler;
+import org.terasology.entitySystem.metadata.extension.Vector3iTypeHandler;
+import org.terasology.entitySystem.pojo.PojoEntityManager;
+import org.terasology.entitySystem.pojo.PojoEventSystem;
+import org.terasology.entitySystem.pojo.PojoPrefabManager;
+import org.terasology.game.CoreRegistry;
+import org.terasology.math.Vector3i;
+import org.terasology.physics.CollisionGroup;
+import org.terasology.rendering.assets.Material;
+import org.terasology.rendering.primitives.Mesh;
+import org.terasology.world.block.family.BlockFamily;
 
 /**
  * @author Immortius

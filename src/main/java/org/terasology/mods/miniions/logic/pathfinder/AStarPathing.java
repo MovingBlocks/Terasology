@@ -15,11 +15,17 @@
  */
 package org.terasology.mods.miniions.logic.pathfinder;
 
-import org.terasology.world.WorldProvider;
-import org.terasology.performanceMonitor.PerformanceMonitor;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 import javax.vecmath.Vector3f;
-import java.util.*;
+
+import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.world.WorldProvider;
 
 /**
  * Created with IntelliJ IDEA.

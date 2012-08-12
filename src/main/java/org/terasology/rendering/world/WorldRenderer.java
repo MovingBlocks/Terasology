@@ -15,7 +15,45 @@
  */
 package org.terasology.rendering.world;
 
-import com.google.common.collect.Lists;
+import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_FILL;
+import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
+import static org.lwjgl.opengl.GL11.GL_LIGHT0;
+import static org.lwjgl.opengl.GL11.GL_LINE;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glColorMask;
+import static org.lwjgl.opengl.GL11.glCullFace;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glPolygonMode;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+
+import java.awt.image.BufferedImage;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.imageio.ImageIO;
+import javax.vecmath.Vector3f;
+
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
@@ -29,42 +67,45 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.manager.*;
-import org.terasology.world.*;
-import org.terasology.world.block.BlockUri;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.chunks.ChunkStore;
-import org.terasology.world.chunks.LocalChunkProvider;
-import org.terasology.world.chunks.store.ChunkStoreGZip;
-import org.terasology.world.generator.core.*;
+import org.terasology.logic.manager.AudioManager;
+import org.terasology.logic.manager.Config;
+import org.terasology.logic.manager.PathManager;
+import org.terasology.logic.manager.PortalManager;
+import org.terasology.logic.manager.PostProcessingRenderer;
+import org.terasology.logic.manager.ShaderManager;
+import org.terasology.logic.manager.WorldTimeEventManager;
+import org.terasology.math.AABB;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.management.BlockManager;
-import org.terasology.math.AABB;
+import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.rendering.AABBRenderer;
-import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.DefaultCamera;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.shader.ShaderProgram;
+import org.terasology.world.BlockEntityRegistry;
+import org.terasology.world.EntityAwareWorldProvider;
+import org.terasology.world.WorldBiomeProvider;
+import org.terasology.world.WorldInfo;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.WorldProviderCoreImpl;
+import org.terasology.world.WorldProviderWrapper;
+import org.terasology.world.WorldTimeEvent;
+import org.terasology.world.WorldView;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.management.BlockManager;
+import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.ChunkStore;
+import org.terasology.world.chunks.LocalChunkProvider;
+import org.terasology.world.chunks.store.ChunkStoreGZip;
+import org.terasology.world.generator.core.ChunkGeneratorManager;
 
-import javax.imageio.ImageIO;
-import javax.vecmath.Vector3f;
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.nio.ByteBuffer;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static org.lwjgl.opengl.GL11.*;
+import com.google.common.collect.Lists;
 
 /**
  * The world of Terasology. At its most basic the world contains chunks (consisting of a fixed amount of blocks)

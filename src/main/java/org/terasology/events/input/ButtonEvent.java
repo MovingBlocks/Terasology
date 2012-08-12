@@ -16,7 +16,6 @@
 
 package org.terasology.events.input;
 
-import org.terasology.entitySystem.EntityRef;
 import org.terasology.input.ButtonState;
 
 /**

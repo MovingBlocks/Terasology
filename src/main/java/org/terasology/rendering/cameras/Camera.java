@@ -15,14 +15,13 @@
  */
 package org.terasology.rendering.cameras;
 
-import org.terasology.logic.manager.Config;
-import org.terasology.model.structures.ViewFrustum;
-
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
-
 import static org.lwjgl.opengl.GL11.glScalef;
 import static org.lwjgl.opengl.GL11.glTranslatef;
+
+import javax.vecmath.Vector3f;
+
+import org.terasology.logic.manager.Config;
+import org.terasology.model.structures.ViewFrustum;
 
 /**
  * Provides global access to fonts.

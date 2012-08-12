@@ -29,10 +29,10 @@ import org.terasology.events.input.binds.PauseButton;
 import org.terasology.game.CoreRegistry;
 import org.terasology.input.ButtonState;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.rendering.gui.windows.UIMenuPause;
 import org.terasology.rendering.gui.windows.UIScreenConsole;
 import org.terasology.rendering.gui.windows.UIScreenHUD;
 import org.terasology.rendering.gui.windows.UIScreenInventory;
-import org.terasology.rendering.gui.windows.UIMenuPause;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**

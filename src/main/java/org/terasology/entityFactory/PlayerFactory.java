@@ -15,16 +15,16 @@
  */
 package org.terasology.entityFactory;
 
-import org.terasology.components.*;
+import javax.vecmath.Vector3f;
+
+import org.terasology.components.LocalPlayerComponent;
+import org.terasology.components.PlayerComponent;
 import org.terasology.components.block.BlockItemComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.events.inventory.ReceiveItemEvent;
-import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.management.BlockManager;
-
-import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -55,7 +55,7 @@ public class PlayerFactory {
         EntityRef chestContents = blockItem.placedEntity;
 
         chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("core:companion"), 99)));
-        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:BrickStair"), 99)));
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:brick:engine:stair"), 99)));
         chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("core:Tnt"), 99)));
         chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("core:Bookcase"), 1)));
 

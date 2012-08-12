@@ -16,18 +16,18 @@
 
 package org.terasology.world;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Before;
 import org.junit.Test;
-import org.terasology.world.block.BlockUri;
-import org.terasology.world.block.family.SymmetricFamily;
-import org.terasology.world.chunks.Chunk;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockUri;
+import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.management.BlockManager;
-
-import static org.junit.Assert.assertEquals;
+import org.terasology.world.chunks.Chunk;
 
 /**
  * @author Immortius

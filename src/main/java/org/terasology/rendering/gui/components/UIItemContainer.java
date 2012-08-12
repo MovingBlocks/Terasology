@@ -2,16 +2,16 @@ package org.terasology.rendering.gui.components;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.vecmath.Vector2f;
+
 import org.terasology.components.InventoryComponent;
-import org.terasology.components.PlayerComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.EventSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.event.ChangedComponentEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.LocalPlayer;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 
 /**
@@ -21,19 +21,22 @@ import org.terasology.rendering.gui.framework.UIDisplayContainer;
  */
 public class UIItemContainer extends UIDisplayContainer implements EventHandlerSystem {
 
-    private EntityRef entity = null;
-    InventoryComponent entityInventory = null;
+    private EntityRef entity = EntityRef.NULL;
+    private InventoryComponent entityInventory;
     private List<UIItemCell> cells = new ArrayList<UIItemCell>();
     
+    private EntityRef connectedEntity = EntityRef.NULL;
+    
     private Vector2f cellMargin = new Vector2f(2, 2);
-	private Vector2f cellSize = new Vector2f(48, 48);
+    private Vector2f cellSize = new Vector2f(48, 48);
     
     private int cols;
-    private int rows;
 
-    public UIItemContainer(int cols, int rows) {
+    private int slotStart = -1;
+    private int slotEnd = -1;
+
+    public UIItemContainer(int cols) {
         this.cols = cols;
-        this.rows = rows;
         
         CoreRegistry.get(EventSystem.class).registerEventHandler(this);
     }
@@ -41,91 +44,140 @@ public class UIItemContainer extends UIDisplayContainer implements EventHandlerS
     private void fillInventoryCells() {
         if (entityInventory != null)
         {
-        	//remove old cells
-        	for (UIItemCell cell : cells) {
-				removeDisplayElement(cell);
-			}
-        	cells.clear();
-        	
-        	//add new cells
+            //remove old cells
+            for (UIItemCell cell : cells) {
+                removeDisplayElement(cell);
+            }
+            cells.clear();
+            
+            //add new cells
             setVisible(true);
-	    	setSize(new Vector2f(cols * (cellSize.x + cellMargin.x), rows * (cellSize.y + cellMargin.y)));
+            setSize(new Vector2f(cols * (cellSize.x + cellMargin.x), (entityInventory.itemSlots.size() / cols) * (cellSize.y + cellMargin.y)));
 
-	    	int size = Math.min(entityInventory.itemSlots.size(), cols * rows);
-	        for (int i = 0; i < size; ++i)
-	        {
-	            UIItemCell cell = new UIItemCell(entity, cellSize);
-	            cell.setItem(entityInventory.itemSlots.get(i), i);
-	            cell.setSize(cellSize);
-	            cell.setPosition(new Vector2f((i % cols) * (cellSize.x + cellMargin.x), (i / cols) * (cellSize.y + cellMargin.y)));
-	            cell.setVisible(true);
-	            
-	            cells.add(cell);
-	            addDisplayElement(cell);
-	        }
+            int start = 0;
+            int end = entityInventory.itemSlots.size();
+                    
+            if (slotStart != -1) {
+                start = slotStart;
+            }
+            
+            if (slotEnd != -1) {
+                end = slotEnd;
+            }
+            
+            for (int i = start; i < end; ++i)
+            {
+                UIItemCell cell = new UIItemCell(entity, cellSize);
+                cell.setItem(entityInventory.itemSlots.get(i), i);
+                cell.setSize(cellSize);
+                cell.setConnected(connectedEntity);
+                cell.setPosition(new Vector2f(((i - start) % cols) * (cellSize.x + cellMargin.x), ((i - start) / cols) * (cellSize.y + cellMargin.y)));
+                cell.setVisible(true);
+                
+                cells.add(cell);
+                addDisplayElement(cell);
+            }
         }
-	}
+    }
     
     public void updateInventoryCells() {
-    	if (entityInventory != null) {
-	    	for (int i = 0; i < cells.size(); ++i)
-	        {
-	    		cells.get(i).setItem(entityInventory.itemSlots.get(i), i);
-	        }
-    	}
+        if (entityInventory != null) {
+            int start = Math.max(slotStart, 0);
+            for (int i = 0; i < cells.size(); ++i)
+            {
+                cells.get(i).setItem(entityInventory.itemSlots.get(start), start);
+                start++;
+            }
+        }
+    }
+    
+    /**
+     * Get the entity which is connected to this container for supporting fast transfer.
+     * @return
+     */
+    public EntityRef getConnected() {
+        return connectedEntity;
+    }
+
+    /**
+     * Set the connected entity which is connected to this container.
+     * Therefore fast transfer will be enabled to this entities inventory.
+     * Fast transfer means pressing an button and clicking on an item will automatically transfer the item to this entities inventory.
+     * @param entity The entity to connect to this container.
+     */
+    public void setConnected(EntityRef entity) {
+        this.connectedEntity = entity;
+        
+        for (UIItemCell cell : cells) {
+            cell.setConnected(connectedEntity);
+        }
     }
     
     public List<UIItemCell> getCells() {
-		return cells;
-	}
+        return cells;
+    }
     
-	public EntityRef getEntity() {
-		return entity;
-	}
+    public EntityRef getEntity() {
+        return entity;
+    }
 
-	public void setEntity(EntityRef entity) {
+    public void setEntity(EntityRef entity) {
         this.entity = entity;
         this.entityInventory = entity.getComponent(InventoryComponent.class);
+        
+        this.slotStart = -1;
+        this.slotEnd = -1;
+        
+        fillInventoryCells();
+    }
+    
+    public void setEntity(EntityRef entity, int slotStart) {        
+        this.entity = entity;
+        this.entityInventory = entity.getComponent(InventoryComponent.class);
+        
+        this.slotStart = slotStart;
+        this.slotEnd = -1;
+        
+        fillInventoryCells();
+    }
+    
+    public void setEntity(EntityRef entity, int slotStart, int slotEnd) {        
+        this.entity = entity;
+        this.entityInventory = entity.getComponent(InventoryComponent.class);
+        
+        this.slotStart = slotStart;
+        this.slotEnd = slotEnd + 1;
         
         fillInventoryCells();
     }
 
     public Vector2f getCellMargin() {
-		return cellMargin;
-	}
+        return cellMargin;
+    }
 
-	public void setCellMargin(Vector2f cellMargin) {
-		this.cellMargin = cellMargin;
-		fillInventoryCells();
-	}
+    public void setCellMargin(Vector2f cellMargin) {
+        this.cellMargin = cellMargin;
+        fillInventoryCells();
+    }
 
-	public Vector2f getCellSize() {
-		return cellSize;
-	}
+    public Vector2f getCellSize() {
+        return cellSize;
+    }
 
-	public void setCellSize(Vector2f cellSize) {
-		this.cellSize = cellSize;
-		fillInventoryCells();
-	}
+    public void setCellSize(Vector2f cellSize) {
+        this.cellSize = cellSize;
+        fillInventoryCells();
+    }
 
-	public int getCols() {
-		return cols;
-	}
+    public int getCols() {
+        return cols;
+    }
 
-	public void setCols(int cols) {
-		this.cols = cols;
-		fillInventoryCells();
-	}
-
-	public int getRows() {
-		return rows;
-	}
-
-	public void setRows(int rows) {
-		this.rows = rows;
-		fillInventoryCells();
-	}
-	
+    public void setCols(int cols) {
+        this.cols = cols;
+        fillInventoryCells();
+    }
+    
     @Override
     public void initialise() {
 
@@ -137,24 +189,6 @@ public class UIItemContainer extends UIDisplayContainer implements EventHandlerS
     
     @ReceiveEvent(components = InventoryComponent.class)
     public void onReceiveItem(ChangedComponentEvent event, EntityRef entity) {
-	    updateInventoryCells();
+        updateInventoryCells();
     }
-    
-    /*
-    @Override
-    public void setVisible(boolean visible) {
-    	super.setVisible(visible);
-    	
-    	//this is ugly. need to find a way to clean the movement slot as the container gets closed.
-    	EntityRef player = CoreRegistry.get(LocalPlayer.class).getEntity();
-    	
-    	if (player == null)
-    		return;
-    	
-    	PlayerComponent playerComponent = player.getComponent(PlayerComponent.class);
-    	
-    	if (playerComponent == null)
-    		return;
-    }
-    */
 }

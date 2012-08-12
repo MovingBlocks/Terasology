@@ -16,9 +16,9 @@
 
 package org.terasology.math;
 
-import com.bulletphysics.BulletGlobals;
-
 import javax.vecmath.Vector3f;
+
+import com.bulletphysics.BulletGlobals;
 
 /**
  * @author Immortius

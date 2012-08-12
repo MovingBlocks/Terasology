@@ -19,11 +19,11 @@ package org.terasology.world;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.terasology.math.Vector3i;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.generator.ChunkGenerator;
 import org.terasology.world.generator.core.ChunkGeneratorManager;
 import org.terasology.world.generator.core.ChunkGeneratorManagerImpl;
-import org.terasology.math.Vector3i;
 
 /**
  * @author Immortius

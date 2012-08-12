@@ -15,13 +15,14 @@
  */
 package org.terasology.model;
 
-import org.terasology.asset.AssetManager;
-import org.terasology.rendering.gui.framework.UIGraphicsElement;
-
-import javax.vecmath.Vector2f;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
+import javax.vecmath.Vector2f;
+
+import org.terasology.asset.AssetManager;
+import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 /*
  * @author bi0hax

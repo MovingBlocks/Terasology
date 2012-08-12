@@ -15,8 +15,10 @@
  */
 package org.terasology.input;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.terasology.components.LocalPlayerComponent;
@@ -24,8 +26,42 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.EventPriority;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.events.input.*;
-import org.terasology.events.input.binds.*;
+import org.terasology.events.input.InputEvent;
+import org.terasology.events.input.KeyDownEvent;
+import org.terasology.events.input.KeyEvent;
+import org.terasology.events.input.KeyRepeatEvent;
+import org.terasology.events.input.KeyUpEvent;
+import org.terasology.events.input.LeftMouseDownButtonEvent;
+import org.terasology.events.input.LeftMouseUpButtonEvent;
+import org.terasology.events.input.MouseAxisEvent;
+import org.terasology.events.input.MouseButtonEvent;
+import org.terasology.events.input.MouseDownButtonEvent;
+import org.terasology.events.input.MouseUpButtonEvent;
+import org.terasology.events.input.MouseWheelEvent;
+import org.terasology.events.input.MouseXAxisEvent;
+import org.terasology.events.input.MouseYAxisEvent;
+import org.terasology.events.input.RightMouseDownButtonEvent;
+import org.terasology.events.input.RightMouseUpButtonEvent;
+import org.terasology.events.input.binds.AttackButton;
+import org.terasology.events.input.binds.BackwardsButton;
+import org.terasology.events.input.binds.ConsoleButton;
+import org.terasology.events.input.binds.CrouchButton;
+import org.terasology.events.input.binds.DropItemButton;
+import org.terasology.events.input.binds.ForwardsButton;
+import org.terasology.events.input.binds.ForwardsMovementAxis;
+import org.terasology.events.input.binds.FrobButton;
+import org.terasology.events.input.binds.InventoryButton;
+import org.terasology.events.input.binds.JumpButton;
+import org.terasology.events.input.binds.LeftStrafeButton;
+import org.terasology.events.input.binds.PauseButton;
+import org.terasology.events.input.binds.RightStrafeButton;
+import org.terasology.events.input.binds.RunButton;
+import org.terasology.events.input.binds.StrafeMovementAxis;
+import org.terasology.events.input.binds.ToolbarNextButton;
+import org.terasology.events.input.binds.ToolbarPrevButton;
+import org.terasology.events.input.binds.ToolbarSlotButton;
+import org.terasology.events.input.binds.UseItemButton;
+import org.terasology.events.input.binds.VerticalMovementAxis;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
@@ -33,9 +69,8 @@ import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.InputConfig;
 import org.terasology.mods.miniions.events.ToggleMinionModeButton;
 
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * This system processes input, sending it out as events against the LocalPlayer entity.
@@ -312,7 +347,14 @@ public class InputSystem implements EventHandlerSystem {
     private void loadInputConfig() {
         InputConfig inputConfig = InputConfig.getInstance();
         int keyvalue;
+        /*test*/
+        String dropItemBind = "engine:dropItem";
+        BindableButton dropBind = registerBindButton(dropItemBind, "Drop Item", new DropItemButton());
+        dropBind.setRepeating(true);
+        dropBind.setMode(BindableButton.ActivateMode.BOTH);
 
+        linkBindButtonToKey(Keyboard.KEY_Q, dropItemBind);
+        /*test*/
         registerBindButton(InventoryButton.ID, "Inventory", new InventoryButton());
         keyvalue = inputConfig.getKeyInventory();
         if (keyvalue < 256) {

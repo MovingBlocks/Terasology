@@ -18,13 +18,20 @@ package org.terasology.rendering.gui.dialogs;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.vecmath.Vector2f;
+
 import org.newdawn.slick.Color;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.modes.StateSinglePlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.rendering.gui.components.*;
+import org.terasology.rendering.gui.components.UIButton;
+import org.terasology.rendering.gui.components.UIComboBox;
+import org.terasology.rendering.gui.components.UIDialogBox;
+import org.terasology.rendering.gui.components.UIInput;
+import org.terasology.rendering.gui.components.UIList;
+import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.utilities.FastRandom;
@@ -34,8 +41,6 @@ import org.terasology.world.generator.core.FloraGenerator;
 import org.terasology.world.generator.core.ForestGenerator;
 import org.terasology.world.generator.core.PerlinTerrainGenerator;
 import org.terasology.world.liquid.LiquidsGenerator;
-
-import javax.vecmath.Vector2f;
 
 /*
  * Dialog for generate new world

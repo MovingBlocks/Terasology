@@ -16,10 +16,10 @@
 
 package org.terasology.physics;
 
-import com.google.common.collect.Maps;
-
 import java.util.Locale;
 import java.util.Map;
+
+import com.google.common.collect.Maps;
 
 /**
  * @author Immortius

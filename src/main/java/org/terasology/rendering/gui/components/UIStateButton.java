@@ -15,13 +15,13 @@
  */
 package org.terasology.rendering.gui.components;
 
-import com.google.gson.internal.Pair;
+import java.util.LinkedList;
 
 import javax.vecmath.Vector2f;
 
 import org.terasology.rendering.gui.framework.events.StateButtonAction;
 
-import java.util.LinkedList;
+import com.google.gson.internal.Pair;
 
 /**
  * This class extends the UIButton and adds functionality to add states to a button. Each state will be assigned a label and a action to execute as the button enters the state.

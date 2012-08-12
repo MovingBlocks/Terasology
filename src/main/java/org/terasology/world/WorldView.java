@@ -16,16 +16,16 @@
 
 package org.terasology.world;
 
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.liquid.LiquidData;
+import java.util.logging.Logger;
+
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
-
-import java.util.logging.Logger;
+import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.liquid.LiquidData;
 
 /**
  * @author Immortius

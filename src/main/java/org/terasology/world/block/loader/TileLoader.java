@@ -16,10 +16,6 @@
 
 package org.terasology.world.block.loader;
 
-import org.terasology.asset.AssetLoader;
-import org.terasology.asset.AssetUri;
-
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,6 +23,11 @@ import java.net.URL;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.imageio.ImageIO;
+
+import org.terasology.asset.AssetLoader;
+import org.terasology.asset.AssetUri;
 
 /**
  * Loader for block tiles

@@ -15,11 +15,12 @@
  */
 package org.terasology.mods.miniions.components;
 
-import org.terasology.entitySystem.Component;
-
-import javax.vecmath.Vector3f;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.vecmath.Vector3f;
+
+import org.terasology.entitySystem.Component;
 
 /**
  * @author Overdhose

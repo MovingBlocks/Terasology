@@ -18,18 +18,17 @@ package org.terasology.world.generator.core;
 
 import java.util.Map;
 
-import org.terasology.world.block.BlockUri;
-import org.terasology.world.chunks.Chunk;
+import javax.vecmath.Vector2f;
+
+import org.terasology.math.TeraMath;
+import org.terasology.utilities.PerlinNoise;
 import org.terasology.world.WorldBiomeProvider;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.management.BlockManager;
+import org.terasology.world.chunks.Chunk;
 import org.terasology.world.generator.ChunkGenerator;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
-import org.terasology.math.TeraMath;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.management.BlockManager;
-import org.terasology.utilities.PerlinNoise;
-
-import javax.vecmath.Vector2f;
 
 /**
  * @author Immortius

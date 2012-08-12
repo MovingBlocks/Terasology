@@ -15,16 +15,17 @@
  */
 package org.terasology.world.generator.tree;
 
-import org.terasology.utilities.FastRandom;
-import org.terasology.world.WorldView;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.management.BlockManager;
+import java.util.HashMap;
+import java.util.Stack;
 
 import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
-import java.util.HashMap;
-import java.util.Stack;
+
+import org.terasology.utilities.FastRandom;
+import org.terasology.world.WorldView;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.management.BlockManager;
 
 /**
  * Allows the generation of complex trees based on L-Systems.

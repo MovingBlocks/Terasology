@@ -15,7 +15,11 @@
  */
 package org.terasology.logic.manager;
 
-import com.google.common.collect.Lists;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.vecmath.Vector2f;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -25,9 +29,7 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 
-import javax.vecmath.Vector2f;
-import java.util.HashMap;
-import java.util.List;
+import com.google.common.collect.Lists;
 
 /**
  * First version of simple GUI manager.

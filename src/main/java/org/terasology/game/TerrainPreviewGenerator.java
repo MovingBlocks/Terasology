@@ -15,18 +15,20 @@
  */
 package org.terasology.game;
 
-import org.terasology.world.WorldBiomeProvider;
-import org.terasology.world.WorldBiomeProviderImpl;
-import org.terasology.world.generator.core.PerlinTerrainGenerator;
-import org.terasology.world.block.Block;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+
+import org.terasology.world.WorldBiomeProvider;
+import org.terasology.world.WorldBiomeProviderImpl;
+import org.terasology.world.block.Block;
+import org.terasology.world.generator.core.PerlinTerrainGenerator;
 
 /**
  * Simple preview generator. Generates heightmap images using the terrain generator.

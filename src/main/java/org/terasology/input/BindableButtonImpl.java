@@ -15,14 +15,16 @@
  */
 package org.terasology.input;
 
-import com.google.common.collect.Lists;
+import java.util.List;
+
+import javax.vecmath.Vector3f;
+
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.manager.GUIManager;
 
-import javax.vecmath.Vector3f;
-import java.util.List;
+import com.google.common.collect.Lists;
 
 /**
  * A BindableButton is pseudo button that is controlled by one or more actual inputs (whether keys, mouse buttons or the

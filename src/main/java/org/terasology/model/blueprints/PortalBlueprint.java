@@ -15,11 +15,11 @@
  */
 package org.terasology.model.blueprints;
 
+import org.terasology.model.structures.BlockPosition;
+import org.terasology.model.structures.BlockSelection;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.management.BlockManager;
-import org.terasology.model.structures.BlockPosition;
-import org.terasology.model.structures.BlockSelection;
 
 //import org.terasology.es.PortalComponent;
 

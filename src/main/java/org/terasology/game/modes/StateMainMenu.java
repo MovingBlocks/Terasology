@@ -15,6 +15,11 @@
  */
 package org.terasology.game.modes;
 
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.terasology.game.GameEngine;
@@ -26,9 +31,13 @@ import org.terasology.rendering.gui.components.UISlider;
 import org.terasology.rendering.gui.components.UIStateButton;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
-import org.terasology.rendering.gui.windows.*;
-
-import static org.lwjgl.opengl.GL11.*;
+import org.terasology.rendering.gui.windows.UIMenuConfig;
+import org.terasology.rendering.gui.windows.UIMenuConfigAudio;
+import org.terasology.rendering.gui.windows.UIMenuConfigControls;
+import org.terasology.rendering.gui.windows.UIMenuConfigMods;
+import org.terasology.rendering.gui.windows.UIMenuConfigVideo;
+import org.terasology.rendering.gui.windows.UIMenuMain;
+import org.terasology.rendering.gui.windows.UIMenuSelectWorld;
 
 /**
  * The class implements the main game menu.

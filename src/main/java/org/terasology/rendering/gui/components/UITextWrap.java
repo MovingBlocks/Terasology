@@ -15,21 +15,23 @@
  */
 package org.terasology.rendering.gui.components;
 
-import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import org.lwjgl.opengl.Display;
-import org.terasology.logic.manager.PathManager;
-import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.events.MouseButtonListener;
-
-import javax.vecmath.Vector2f;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import javax.vecmath.Vector2f;
+
+import org.lwjgl.opengl.Display;
+import org.terasology.logic.manager.PathManager;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.events.MouseButtonListener;
+
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 
 /**
  * Simple text element supporting text shadowing.

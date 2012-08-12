@@ -15,15 +15,16 @@
  */
 package org.terasology.physics.character;
 
-import com.bulletphysics.collision.dispatch.GhostObject;
-import com.bulletphysics.collision.dispatch.PairCachingGhostObject;
-import com.google.common.collect.Lists;
+import java.util.List;
+
+import javax.vecmath.Vector3f;
+
 import org.terasology.entitySystem.Component;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.StandardCollisionGroup;
 
-import javax.vecmath.Vector3f;
-import java.util.List;
+import com.bulletphysics.collision.dispatch.PairCachingGhostObject;
+import com.google.common.collect.Lists;
 
 /**
  * @author Immortius <immortius@gmail.com>

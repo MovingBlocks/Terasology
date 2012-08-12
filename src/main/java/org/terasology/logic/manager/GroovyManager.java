@@ -21,14 +21,19 @@ import groovy.lang.GroovyShell;
 import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceException;
 import groovy.util.ScriptException;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.vecmath.Vector3f;
+
 import org.lwjgl.input.Keyboard;
-import org.terasology.components.SimpleAIComponent;
-import org.terasology.components.rendering.MeshComponent;
-import org.terasology.world.block.Block;
-import org.terasology.physics.BlockPickupComponent;
-import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
+import org.terasology.components.SimpleAIComponent;
+import org.terasology.components.rendering.MeshComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.EntityManager;
@@ -42,20 +47,15 @@ import org.terasology.events.input.binds.LeftStrafeButton;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
-import org.terasology.game.modes.StateSinglePlayer;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.world.block.BlockUri;
-import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.block.management.BlockManager;
+import org.terasology.physics.BlockPickupComponent;
+import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
-
-import javax.vecmath.Vector3f;
-import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.management.BlockManager;
 
 /**
  * Manages everything related to using Groovy from within Java.

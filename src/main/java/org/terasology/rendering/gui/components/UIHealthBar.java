@@ -15,6 +15,9 @@
  */
 package org.terasology.rendering.gui.components;
 
+import javax.vecmath.Vector2f;
+
+import org.terasology.asset.AssetManager;
 import org.terasology.components.CuredComponent;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.LocalPlayerComponent;
@@ -27,11 +30,8 @@ import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.HealthChangedEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.asset.AssetManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
-
-import javax.vecmath.Vector2f;
 
 /**
  * Small health bar that visualizes the current amount of health points of the player

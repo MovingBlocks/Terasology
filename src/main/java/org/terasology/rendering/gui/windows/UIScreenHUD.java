@@ -15,9 +15,15 @@
  */
 package org.terasology.rendering.gui.windows;
 
+import javax.vecmath.Vector2f;
+
 import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetManager;
-import org.terasology.entitySystem.*;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.EventSystem;
+import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.Timer;
@@ -27,13 +33,14 @@ import org.terasology.mods.miniions.components.MinionComponent;
 import org.terasology.mods.miniions.events.MinionMessageEvent;
 import org.terasology.mods.miniions.rendering.gui.components.UIMessageQueue;
 import org.terasology.mods.miniions.rendering.gui.components.UIMinionbar;
-import org.terasology.rendering.gui.components.*;
+import org.terasology.rendering.gui.components.UIBuff;
+import org.terasology.rendering.gui.components.UIHealthBar;
+import org.terasology.rendering.gui.components.UIText;
+import org.terasology.rendering.gui.components.UIToolbar;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.world.WorldRenderer;
-
-import javax.vecmath.Vector2f;
 
 /**
  * HUD displayed on the user's screen.
@@ -72,7 +79,7 @@ public class UIScreenHUD extends UIDisplayWindow implements EventHandlerSystem {
         _debugLine3 = new UIText(new Vector2f(4, 38));
         _debugLine4 = new UIText(new Vector2f(4, 54));
 
-        addDisplayElement(_crosshair);
+        addDisplayElement(_crosshair, "crosshair");
         addDisplayElement(_debugLine1);
         addDisplayElement(_debugLine2);
         addDisplayElement(_debugLine3);

@@ -15,15 +15,19 @@
  */
 package org.terasology.rendering.gui.framework;
 
-import org.lwjgl.opengl.Display;
-import org.terasology.rendering.gui.framework.style.UIStyle;
+import static org.lwjgl.opengl.GL11.GL_SCISSOR_TEST;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glScissor;
 
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector4f;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static org.lwjgl.opengl.GL11.*;
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
+
+import org.lwjgl.opengl.Display;
+import org.terasology.rendering.gui.framework.style.UIStyle;
 
 /**
  * Composition of multiple display elements.
@@ -112,6 +116,20 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         for (int i = 0; i < _displayElements.size(); i++) {
             _displayElements.get(i).layout();
         }
+    }
+    
+    @Override
+    public boolean processBindButton(String id, boolean pressed) {
+        if (!isVisible())
+            return false;
+    	
+        boolean ret = super.processBindButton(id, pressed);
+        // Pass the bind key to all display elements
+        for (int i = 0; i < _displayElements.size(); i++) {
+        	ret |= _displayElements.get(i).processBindButton(id, pressed);
+        }
+        
+        return ret;
     }
 
     @Override

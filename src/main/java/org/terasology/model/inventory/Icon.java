@@ -15,20 +15,21 @@
  */
 package org.terasology.model.inventory;
 
-import org.lwjgl.opengl.GL11;
-import org.terasology.asset.AssetManager;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.family.BlockFamily;
-import org.terasology.rendering.assets.Texture;
-import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.lwjgl.opengl.GL11.glTranslatef;
 
-import javax.vecmath.Vector2f;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import static org.lwjgl.opengl.GL11.glBindTexture;
-import static org.lwjgl.opengl.GL11.glTranslatef;
+import javax.vecmath.Vector2f;
+
+import org.lwjgl.opengl.GL11;
+import org.terasology.asset.AssetManager;
+import org.terasology.rendering.assets.Texture;
+import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.family.BlockFamily;
 
 /**
  * Icon for rendering items in inventory.
@@ -86,7 +87,10 @@ public class Icon {
     private static void loadIcons() {
         icons = new HashMap<String, Icon>();
 
-        //TODO: Hmm, does this mean we have hard coded our tool displays? Should try to move this to ToolManager in that case?
+        // TODO: Hmm, does this mean we have hard coded our tool displays? Should try to move this to ToolManager in that case?
+        // TODO: I'ld suggest an icon atlas asset
+        Icon questionMarkIcon = new Icon();
+
         //* TOOLS *//
         Icon pickAxeIcon = new Icon();
         Icon axeIcon = new Icon();
@@ -159,6 +163,8 @@ public class Icon {
         Icon minionIcon9 = new Icon();
         Icon minioncommandIcon = new Icon();
 
+        questionMarkIcon.setAtlasPosition(4,0);
+
         //Tool Atlas
         pickAxeIcon.setAtlasPosition(0, 0);
         axeIcon.setAtlasPosition(0, 1);
@@ -228,6 +234,8 @@ public class Icon {
         minionIcon8.setAtlasPosition(15, 7);
         minionIcon9.setAtlasPosition(15, 8);
         minioncommandIcon.setAtlasPosition(13, 3);
+
+        icons.put("questionmark", questionMarkIcon);
 
         icons.put("pickaxe", pickAxeIcon);
         icons.put("axe", axeIcon);

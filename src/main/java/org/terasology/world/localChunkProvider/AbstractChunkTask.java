@@ -16,8 +16,8 @@
 
 package org.terasology.world.localChunkProvider;
 
-import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.math.Vector3i;
+import org.terasology.world.chunks.ChunkProvider;
 
 /**
  * @author Immortius

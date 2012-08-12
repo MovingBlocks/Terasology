@@ -15,18 +15,23 @@
  */
 package org.terasology.asset;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.EnumMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.terasology.entitySystem.common.NullIterator;
 import org.terasology.rendering.assets.Shader;
 import org.terasology.rendering.assets.Texture;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 public class AssetManager {
 
@@ -58,7 +63,10 @@ public class AssetManager {
     }
 
     public void addAssetTemporary(AssetUri uri, Asset asset) {
-        assetCache.put(uri, asset);
+        Asset old = assetCache.put(uri, asset);
+        if (old != null) {
+            old.dispose();
+        }
     }
 
     public Asset tryLoadAsset(AssetUri uri) {

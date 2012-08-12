@@ -19,14 +19,14 @@ package org.terasology.world;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.manager.Config;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.liquid.LiquidData;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
+import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.liquid.LiquidData;
 
 /**
  * @author Immortius

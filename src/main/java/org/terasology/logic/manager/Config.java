@@ -15,18 +15,24 @@
  */
 package org.terasology.logic.manager;
 
-import com.google.protobuf.TextFormat;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.vecmath.Vector2f;
+
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.PixelFormat;
 import org.terasology.game.CoreRegistry;
 import org.terasology.protobuf.Configuration;
 import org.terasology.rendering.world.WorldRenderer;
 
-import javax.vecmath.Vector2f;
-import java.io.*;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.google.protobuf.TextFormat;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>,

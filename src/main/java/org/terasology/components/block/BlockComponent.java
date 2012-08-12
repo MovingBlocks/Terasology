@@ -15,10 +15,10 @@
  */
 package org.terasology.components.block;
 
+import javax.vecmath.Tuple3i;
+
 import org.terasology.entitySystem.Component;
 import org.terasology.math.Vector3i;
-
-import javax.vecmath.Tuple3i;
 
 /**
  * Used for entities representing a block in the world
