@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.gui.dialogs;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -105,13 +106,13 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
             public void click(UIDisplayElement element, int button) {
             	//validation of the input
             	if (_inputWorldTitle.getValue().isEmpty()) {
-            		//GUIManager.getInstance().showMessage("Error", "Please enter a world name");
+            		GUIManager.getInstance().showMessage("Error", "Please enter a world name");
             		
-            		//return;
-            	} else if (PathManager.getInstance().getWorldSavePath(_inputWorldTitle.getValue()).exists()) {
-            		//GUIManager.getInstance().showMessage("Error", "A World with this name already exists");
+            		return;
+            	} else if ((new File(PathManager.getInstance().getWorldSavePath(_inputWorldTitle.getValue()), WorldInfo.DEFAULT_FILE_NAME)).exists()) {
+            		GUIManager.getInstance().showMessage("Error", "A World with this name already exists");
             		
-            		//return;
+            		return;
             	}
             	
             	//set the world settings
