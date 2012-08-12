@@ -145,10 +145,6 @@ public class BindableButtonImpl implements BindableButton {
             activeInputs++;
             if (activeInputs == 1 && mode.isActivatedOnPress()) {
                 lastActivateTime = timer.getTimeInMs();
-                if (guiOnly) {
-                    GUIManager.getInstance().processBindButton(id, pressed);
-                    keyConsumed = true;
-                }
                 if (!keyConsumed) {
                     keyConsumed = triggerOnPress(delta, target);
                 }
@@ -162,10 +158,6 @@ public class BindableButtonImpl implements BindableButton {
         } else if (activeInputs != 0) {
             activeInputs--;
             if (activeInputs == 0 && mode.isActivatedOnRelease()) {
-                if (guiOnly) {
-                    GUIManager.getInstance().processBindButton(id, pressed);
-                    keyConsumed = true;
-                }
                 if (!keyConsumed) {
                     keyConsumed = triggerOnRelease(delta, target);
                 }

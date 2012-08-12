@@ -16,6 +16,8 @@
 package org.terasology.rendering.gui.framework;
 
 import org.lwjgl.opengl.Display;
+import org.terasology.events.input.KeyEvent;
+import org.terasology.input.BindButtonEvent;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.framework.events.WindowListener;
 
@@ -33,12 +35,18 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer {
     private final HashMap<String, UIDisplayElement> _displayElementsById = new HashMap<String, UIDisplayElement>();
     private boolean _maximized = false;
     private boolean _modal = false;
+    private String[] closeBinds;
+    private int[] closeKeys;
 
     protected void drag(Vector2f value) {
         getPosition().x -= value.x;
         getPosition().y -= value.y;
     }
 
+    /**
+     * Close a window. This will automatically activate the last window which was opened.
+     * @param clearInputControls
+     */
     public void close(boolean clearInputControls) {
         setVisible(false);
         setFocus(null);
@@ -115,12 +123,36 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer {
         return _maximized;
     }
 
+    /**
+     * Check if the window is modal. A modal window will consume all input events. Input events are mouse move, mouse button, mouse wheel and keyboard input.
+     * @return Returns true if the window is modal.
+     */
     public boolean isModal() {
         return _modal;
     }
 
+    /**
+     * Set the windows modality. A modal window will consume all input events. Input events are mouse move, mouse button, mouse wheel and keyboard input.
+     * @param modal True for modal.
+     */
     public void setModal(boolean modal) {
         _modal = modal;
+    }
+    
+    /**
+     * Set the bind keys which will close the window when pressed.
+     * @param binds The bind key ID. For possible bind keys see the {@link org.terasology.events.input.binds} package.
+     */
+    public void setCloseBinds(String[] binds) {
+        this.closeBinds = binds;
+    }
+    
+    /**
+     * Set the keys which will close the window when pressed.
+     * @param keys The keys value. For possible keys see {@link org.lwjgl.input.Keyboard}.
+     */
+    public void setCloseKeys(int[] keys) {
+        this.closeKeys = keys;
     }
 
     public void addDisplayElement(UIDisplayElement element, String elementId) {
@@ -138,10 +170,43 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer {
     }
     
     @Override
-    public void setSize(Vector2f scale) {
-        super.setSize(scale);
+    public void processKeyboardInput(KeyEvent event) {
         
-        layout();
+        if (!isVisible() || !_modal)
+            return;
+        
+        if (closeKeys != null) {
+            for (int key : closeKeys) {
+                if (key == event.getKey() && event.isDown()) {
+                    close(true);
+                    event.consume();
+                    
+                    return;
+                }
+            }
+        }
+        
+        super.processKeyboardInput(event);
+    }
+    
+    @Override
+    public void processBindButton(BindButtonEvent event) {
+        
+        if (!isVisible() || !_modal)
+            return;
+        
+        if (closeBinds != null) {
+            for (String key : closeBinds) {
+                if (key.equals(event.getId()) && event.isDown()) {
+                    close(true);
+                    event.consume();
+                    
+                    return;
+                }
+            }
+        }
+        
+        super.processBindButton(event);
     }
     
     @Override

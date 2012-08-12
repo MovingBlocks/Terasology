@@ -24,6 +24,7 @@ import org.terasology.game.GameEngine;
 import org.terasology.game.modes.StateSinglePlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.logic.manager.PathManager;
 import org.terasology.rendering.gui.components.*;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
@@ -100,44 +101,56 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
         _okButton.setVisible(true);
 
         _okButton.addClickListener(new ClickListener() {
-			@Override
-			public void click(UIDisplayElement element, int button) {
-	                if (_inputSeed.getValue().length() > 0) {
-	                    Config.getInstance().setDefaultSeed(_inputSeed.getValue());
-	                } else {
-	                    FastRandom random = new FastRandom();
-	                    Config.getInstance().setDefaultSeed(random.randomCharacterString(32));
-	                }
-	
-	                if (_inputWorldTitle.getValue().length() > 0) {
-	                    Config.getInstance().setWorldTitle(_inputWorldTitle.getValue());
-	                } else {
-	                    Config.getInstance().setWorldTitle(getWorldName());
-	                }
-	                
-	                List<String> chunkList = new ArrayList<String>();
-					switch (_chunkGenerator.getSelectedItemIndex()) {
-					case 1:   //flat
-						chunkList.add(FlatTerrainGenerator.class.getName());
-						//if (checkboxFlora == selected) ... (pseudo code)
-						chunkList.add(FloraGenerator.class.getName());
-						chunkList.add(LiquidsGenerator.class.getName());
-						chunkList.add(ForestGenerator.class.getName());
-						break;
-	
-					default:  //normal
-						chunkList.add(PerlinTerrainGenerator.class.getName());
-						chunkList.add(FloraGenerator.class.getName());
-						chunkList.add(LiquidsGenerator.class.getName());
-						chunkList.add(ForestGenerator.class.getName());
-						break;
-					}
-					
-					String[] chunksListArr = chunkList.toArray(new String[chunkList.size()]);
-					Config.getInstance().setChunkGenerator(chunksListArr);
-					
-	                CoreRegistry.get(GameEngine.class).changeState(new StateSinglePlayer(new WorldInfo(Config.getInstance().getWorldTitle(), Config.getInstance().getDefaultSeed(), Config.getInstance().getDayNightLengthInMs() / 4, chunksListArr)));
-			}
+            @Override
+            public void click(UIDisplayElement element, int button) {
+            	//validation of the input
+            	if (_inputWorldTitle.getValue().isEmpty()) {
+            		//GUIManager.getInstance().showMessage("Error", "Please enter a world name");
+            		
+            		//return;
+            	} else if (PathManager.getInstance().getWorldSavePath(_inputWorldTitle.getValue()).exists()) {
+            		//GUIManager.getInstance().showMessage("Error", "A World with this name already exists");
+            		
+            		//return;
+            	}
+            	
+            	//set the world settings
+                if (_inputSeed.getValue().length() > 0) {
+                    Config.getInstance().setDefaultSeed(_inputSeed.getValue());
+                } else {
+                    FastRandom random = new FastRandom();
+                    Config.getInstance().setDefaultSeed(random.randomCharacterString(32));
+                }
+
+                if (_inputWorldTitle.getValue().length() > 0) {
+                    Config.getInstance().setWorldTitle(_inputWorldTitle.getValue());
+                } else {
+                    Config.getInstance().setWorldTitle(getWorldName());
+                }
+                
+                List<String> chunkList = new ArrayList<String>();
+                switch (_chunkGenerator.getSelectedItemIndex()) {
+                case 1:   //flat
+                    chunkList.add(FlatTerrainGenerator.class.getName());
+                    //if (checkboxFlora == selected) ... (pseudo code)
+                    chunkList.add(FloraGenerator.class.getName());
+                    chunkList.add(LiquidsGenerator.class.getName());
+                    chunkList.add(ForestGenerator.class.getName());
+                    break;
+
+                default:  //normal
+                    chunkList.add(PerlinTerrainGenerator.class.getName());
+                    chunkList.add(FloraGenerator.class.getName());
+                    chunkList.add(LiquidsGenerator.class.getName());
+                    chunkList.add(ForestGenerator.class.getName());
+                    break;
+                }
+                
+                String[] chunksListArr = chunkList.toArray(new String[chunkList.size()]);
+                Config.getInstance().setChunkGenerator(chunksListArr);
+                
+                CoreRegistry.get(GameEngine.class).changeState(new StateSinglePlayer(new WorldInfo(Config.getInstance().getWorldTitle(), Config.getInstance().getDefaultSeed(), Config.getInstance().getDayNightLengthInMs() / 4, chunksListArr)));
+            }
         });
 
 
@@ -147,10 +160,10 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
         _cancelButton.setVisible(true);
 
         _cancelButton.addClickListener(new ClickListener() {
-			@Override
-			public void click(UIDisplayElement element, int button) {
-				close(true);
-			}
+            @Override
+            public void click(UIDisplayElement element, int button) {
+                close(true);
+            }
         });
 
         addDisplayElement(_inputWorldTitleLabel, "inputWorldTitleLabel");

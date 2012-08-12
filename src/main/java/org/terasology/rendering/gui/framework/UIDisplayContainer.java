@@ -16,6 +16,8 @@
 package org.terasology.rendering.gui.framework;
 
 import org.lwjgl.opengl.Display;
+import org.terasology.events.input.KeyEvent;
+import org.terasology.input.BindButtonEvent;
 import org.terasology.rendering.gui.framework.style.UIStyle;
 
 import javax.vecmath.Vector2f;
@@ -115,29 +117,28 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     }
     
     @Override
-    public boolean processBindButton(String id, boolean pressed) {
+    public void processBindButton(BindButtonEvent event) {
         if (!isVisible())
-            return false;
+            return;
     	
-        boolean ret = super.processBindButton(id, pressed);
+        super.processBindButton(event);
+        
         // Pass the bind key to all display elements
         for (int i = 0; i < _displayElements.size(); i++) {
-        	ret |= _displayElements.get(i).processBindButton(id, pressed);
+        	_displayElements.get(i).processBindButton(event);
         }
-        
-        return ret;
     }
 
     @Override
-    public void processKeyboardInput(int key) {
+    public void processKeyboardInput(KeyEvent event) {
         if (!isVisible())
             return;
 
-        super.processKeyboardInput(key);
+        super.processKeyboardInput(event);
 
         // Pass the pressed key to all display elements
         for (int i = 0; i < _displayElements.size(); i++) {
-            _displayElements.get(i).processKeyboardInput(key);
+            _displayElements.get(i).processKeyboardInput(event);
         }
     }
 

@@ -19,8 +19,11 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
 import org.terasology.entitySystem.Prefab;
+import org.terasology.events.input.KeyEvent;
 import org.terasology.events.input.binds.ConsoleButton;
+import org.terasology.events.input.binds.PauseButton;
 import org.terasology.game.CoreRegistry;
+import org.terasology.input.BindButtonEvent;
 import org.terasology.logic.manager.GroovyHelp;
 import org.terasology.logic.manager.GroovyHelpManager;
 import org.terasology.logic.manager.GroovyManager;
@@ -61,6 +64,11 @@ public final class UIScreenConsole extends UIDisplayWindow {
      * Init. a new Terasology console.
      */
     public UIScreenConsole() {
+        setModal(true);
+        setCloseBinds(new String[] {ConsoleButton.ID});
+        setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
+        setCloseBinds(new String[] {PauseButton.ID});
+        
         setPosition(new Vector2f(0, 0));
         setSize(new Vector2f(Display.getDisplayMode().getWidth(), Display.getDisplayMode().getHeight()));
 
@@ -74,7 +82,7 @@ public final class UIScreenConsole extends UIDisplayWindow {
         _helpText.setColor(Color.green);
         //_helpText.setSize(new Vector2f(0.5f,0.5f));
         _helpText.setVisible(true);
-        setModal(true);
+
         addDisplayElement(_helpText);
         setVisible(false);
     }
@@ -84,13 +92,13 @@ public final class UIScreenConsole extends UIDisplayWindow {
      *
      * @param key The key
      */
-    public void processKeyboardInput(int key) {
-        super.processKeyboardInput(key);
+    public void processKeyboardInput(KeyEvent event) {
+        super.processKeyboardInput(event);
 
         if (!isVisible())
             return;
 
-        switch (key) {
+        switch (event.getKey()) {
             case Keyboard.KEY_BACK:
                 int length = _consoleInput.length() - 1;
 
@@ -119,17 +127,15 @@ public final class UIScreenConsole extends UIDisplayWindow {
     }
 
     @Override
-    public boolean processBindButton(String id, boolean pressed) {
-        if (!isVisible() || !pressed) {
-            return false;
+    public void processBindButton(BindButtonEvent event) {
+        if (!isVisible() || !event.isDown()) {
+            return;
         }
 
-        if (ConsoleButton.ID.equals(id)) {
+        if (ConsoleButton.ID.equals(event.getId())) {
             setVisible(false);
-            return true;
+            event.consume();
         }
-
-        return false;
     }
 
     /**

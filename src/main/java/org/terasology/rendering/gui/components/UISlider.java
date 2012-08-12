@@ -38,23 +38,23 @@ import org.terasology.rendering.gui.framework.events.MouseMoveListener;
  *
  */
 public class UISlider extends UIDisplayContainer {
-	
+    
     private final ArrayList<ChangedListener> _changedListeners = new ArrayList<ChangedListener>();
-	private final UIText _label;
-	private final UIGraphicsElement _slider;
-	
-	private int _currentValue;
-	private int _min;
-	private int _max;
-	private int _range;
+    private final UIText _label;
+    private final UIGraphicsElement _slider;
+    
+    private int _currentValue;
+    private int _min;
+    private int _max;
+    private int _range;
 
-	/**
-	 * Creates a slider.
-	 * @param size The size of the slider.
-	 * @param min The minimum value the slider can have.
-	 * @param max The maximum value the slider can have.
-	 */
-	public UISlider(Vector2f size, int min, int max) {
+    /**
+     * Creates a slider.
+     * @param size The size of the slider.
+     * @param min The minimum value the slider can have.
+     * @param max The maximum value the slider can have.
+     */
+    public UISlider(Vector2f size, int min, int max) {
         setSize(size);
         _min = min;
         _max = max;
@@ -64,48 +64,48 @@ public class UISlider extends UIDisplayContainer {
         setClassStyle("slider-mouseover", "background-image: engine:gui_menu 256/512 30/512 0 30/512");
         setClassStyle("slider");
         
-        addMouseMoveListener(new MouseMoveListener() {	
-			@Override
-			public void leave(UIDisplayElement element) {
-				setClassStyle("slider");
-			}
-			
-			@Override
-			public void hover(UIDisplayElement element) {
+        addMouseMoveListener(new MouseMoveListener() {    
+            @Override
+            public void leave(UIDisplayElement element) {
+                setClassStyle("slider");
+            }
+            
+            @Override
+            public void hover(UIDisplayElement element) {
 
-			}
-			
-			@Override
-			public void enter(UIDisplayElement element) {
-	            AudioManager.play(new AssetUri(AssetType.SOUND, "engine:click"), 1.0f);
-				setClassStyle("slider-mouseover");
-			}
+            }
+            
+            @Override
+            public void enter(UIDisplayElement element) {
+                AudioManager.play(new AssetUri(AssetType.SOUND, "engine:click"), 1.0f);
+                setClassStyle("slider-mouseover");
+            }
 
-			@Override
-			public void move(UIDisplayElement element) {
-				if (isFocused()) {
-					changeSlider(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()).x);
-				}
-			}
-		});
+            @Override
+            public void move(UIDisplayElement element) {
+                if (isFocused()) {
+                    changeSlider(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()).x);
+                }
+            }
+        });
         
-        addMouseButtonListener(new MouseButtonListener() {			
-			@Override
-			public void up(UIDisplayElement element, int button, boolean intersect) {
-				setClassStyle("slider");
-			}
-			
-			@Override
-			public void down(UIDisplayElement element, int button, boolean intersect) {
-				if (intersect)
-					changeSlider(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()).x);
-			}
-			
-			@Override
-			public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
+        addMouseButtonListener(new MouseButtonListener() {            
+            @Override
+            public void up(UIDisplayElement element, int button, boolean intersect) {
+                setClassStyle("slider");
+            }
+            
+            @Override
+            public void down(UIDisplayElement element, int button, boolean intersect) {
+                if (intersect)
+                    changeSlider(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()).x);
+            }
+            
+            @Override
+            public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
 
-			}
-		});
+            }
+        });
         
         _slider = new UIGraphicsElement(AssetManager.loadTexture("engine:gui_menu"));
         _slider.setParent(this);
@@ -114,24 +114,24 @@ public class UISlider extends UIDisplayContainer {
         _slider.getTextureOrigin().set(0f, 60f / 512f);
         _slider.getTextureSize().set(new Vector2f(256f / 512f, 30f / 512f));
         _slider.setSize(new Vector2f(16f, getSize().y));
-        _slider.addMouseButtonListener(new MouseButtonListener() {									
-			@Override
-			public void up(UIDisplayElement element, int button, boolean intersect) {
-				setFocus(null);
-			}
-			
-			@Override
-			public void down(UIDisplayElement element, int button, boolean intersect) {
-				if (!isFocused() && intersect) {
-					setFocus(UISlider.this);
-				}
-			}
-			
-			@Override
-			public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
-				
-			}
-		});
+        _slider.addMouseButtonListener(new MouseButtonListener() {                                    
+            @Override
+            public void up(UIDisplayElement element, int button, boolean intersect) {
+                setFocus(null);
+            }
+            
+            @Override
+            public void down(UIDisplayElement element, int button, boolean intersect) {
+                if (!isFocused() && intersect) {
+                    setFocus(UISlider.this);
+                }
+            }
+            
+            @Override
+            public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
+                
+            }
+        });
         
         _label = new UIText("");
         _label.setVisible(true);
@@ -140,163 +140,165 @@ public class UISlider extends UIDisplayContainer {
         addDisplayElement(_label);
         
         calcRange();
-	}
-	
-	@Override
-	public void layout() {
-		super.layout();
-		
-		if (_label != null) {
-			_label.setPosition(new Vector2f(getSize().x / 2 - _label.getTextWidth() / 2, getSize().y / 2 - _label.getTextHeight() / 2));
-		}
-	}
-	
-	/**
-	 * Changes the slider position based on the value.
-	 * @param value The value the slider should have.
-	 */
-	private void changeSlider(int value)
-	{
-		if (value < _min) {
-			value = _min;
-		}
-		else if (value > _max) {
-			value = _max;
-		}
-		
-		_slider.getPosition().set(valueToPos(value), 0);
-		
-		if (value != _currentValue)
-		{
-			_currentValue = value;
-			
-			notifyChangedListeners();
-		}
-	}
+    }
+    
+    @Override
+    public void layout() {
+        super.layout();
+        
+        if (_label != null) {
+            _label.setPosition(new Vector2f(getSize().x / 2 - _label.getTextWidth() / 2, getSize().y / 2 - _label.getTextHeight() / 2));
+        }
+    }
+    
+    /**
+     * Changes the slider position based on the value.
+     * @param value The value the slider should have.
+     */
+    private void changeSlider(int value)
+    {
+        if (value < _min) {
+            value = _min;
+        }
+        else if (value > _max) {
+            value = _max;
+        }
+        
+        _slider.getPosition().set(valueToPos(value), 0);
+        
+        if (value != _currentValue)
+        {
+            _currentValue = value;
+            
+            notifyChangedListeners();
+        }
+    }
 
-	/**
-	 * Changes the slider position based on the mouse position.
-	 * @param pos The position of the mouse in x direction.
-	 */
-	private void changeSlider(float pos) {
-		float sliderPos = pos - getPosition().x - _slider.getSize().x / 2;
-		if (sliderPos < 0)
-		{
-			sliderPos = 0;
-		}
-		else if (sliderPos > (getSize().x - _slider.getSize().x))
-		{
-			sliderPos = getSize().x - _slider.getSize().x;
-		}
-		
-		_slider.getPosition().set(sliderPos, 0);
-		
-		int newValue = posToValue(sliderPos);
-		if (newValue != _currentValue)
-		{
-			_currentValue = newValue;
-			
-			notifyChangedListeners();
-		}
-	}
+    /**
+     * Changes the slider position based on the mouse position.
+     * @param pos The position of the mouse in x direction.
+     */
+    private void changeSlider(float pos) {
+        float sliderPos = pos - getPosition().x - _slider.getSize().x / 2;
+        if (sliderPos < 0)
+        {
+            sliderPos = 0;
+        }
+        else if (sliderPos > (getSize().x - _slider.getSize().x))
+        {
+            sliderPos = getSize().x - _slider.getSize().x;
+        }
+        
+        _slider.getPosition().set(sliderPos, 0);
+        
+        int newValue = posToValue(sliderPos);
+        if (newValue != _currentValue)
+        {
+            _currentValue = newValue;
+            
+            notifyChangedListeners();
+        }
+    }
 
-	/**
-	 * Calculate slider value from position.
-	 * @param pos The position of the slider.
-	 * @return Returns the value at the given position.
-	 */
-	private int posToValue(float pos) {
-		int value = Math.round(pos / ((getSize().x - _slider.getSize().x) / (float)_range));
-		
-		value += _min;
-		
-		if (value < _min) {
-			value = _min;
-		}
-		else if (value > _max) {
-			value = _max;
-		}
-		
-		return value;
-	}
-	
-	/**
-	 * Calculate slider position from value.
-	 * @param value The value of the slider.
-	 * @return Returns the position at the given value.
-	 */
-	private float valueToPos(int value) {
-		if (_min < 0)
-		{
-			value += -_min;
-		}
-		else
-		{
-			value -= _min;
-		}
-		
-		float pos = value * ((getSize().x - _slider.getSize().x) / (float)_range);
-		if (pos < 0)
-		{
-			pos = 0;
-		}
-		else if (pos > getSize().x)
-		{
-			pos = getSize().x;
-		}
-		
-		return pos;
-	}
-	
-	private void calcRange() {
-		_range = _max - _min;
-	}
-	
-	private void notifyChangedListeners() {
-		for (ChangedListener listener : _changedListeners) {
-			listener.changed(this);
-		}
-	}
+    /**
+     * Calculate slider value from position.
+     * @param pos The position of the slider.
+     * @return Returns the value at the given position.
+     */
+    private int posToValue(float pos) {
+        int value = Math.round(pos / ((getSize().x - _slider.getSize().x) / (float)_range));
+        
+        value += _min;
+        
+        if (value < _min) {
+            value = _min;
+        }
+        else if (value > _max) {
+            value = _max;
+        }
+        
+        return value;
+    }
+    
+    /**
+     * Calculate slider position from value.
+     * @param value The value of the slider.
+     * @return Returns the position at the given value.
+     */
+    private float valueToPos(int value) {
+        if (_min < 0)
+        {
+            value += -_min;
+        }
+        else
+        {
+            value -= _min;
+        }
+        
+        float pos = value * ((getSize().x - _slider.getSize().x) / (float)_range);
+        if (pos < 0)
+        {
+            pos = 0;
+        }
+        else if (pos > getSize().x)
+        {
+            pos = getSize().x;
+        }
+        
+        return pos;
+    }
+    
+    private void calcRange() {
+        _range = _max - _min;
+    }
+    
+    private void notifyChangedListeners() {
+        for (ChangedListener listener : _changedListeners) {
+            listener.changed(this);
+        }
+    }
 
-	public void addChangedListener(ChangedListener listener) {
+    public void addChangedListener(ChangedListener listener) {
         _changedListeners.add(listener);
     }
 
     public void removeChangedListener(ChangedListener listener) {
-    	_changedListeners.remove(listener);
+        _changedListeners.remove(listener);
     }
-	
+    
     public int getValue() {
-		return _currentValue;
-	}
+        return _currentValue;
+    }
 
-	public void setValue(int value) {
-		changeSlider(value);
-	}    
-	
-	public int getMax() {
-		return _max;
-	}
+    public void setValue(int value) {
+        changeSlider(value);
+    }    
+    
+    public int getMax() {
+        return _max;
+    }
 
-	public void setMax(int max) {
-		_max = max;
-		calcRange();
-	}
+    public void setMax(int max) {
+        _max = max;
+        calcRange();
+    }
 
-	public int getMin() {
-		return _min;
-	}
+    public int getMin() {
+        return _min;
+    }
 
-	public void setMin(int min) {
-		_min = min;
-		calcRange();
-	}
-	
-	public void setText(String text) {
-		_label.setText(text);
-	}
-	
-	public String getText() {
-		return _label.getText();
-	}
+    public void setMin(int min) {
+        _min = min;
+        calcRange();
+    }
+    
+    public void setText(String text) {
+        _label.setText(text);
+        
+        layout();
+    }
+    
+    public String getText() {
+        return _label.getText();
+    }
 }

@@ -50,9 +50,7 @@ import org.terasology.physics.ImpulseEvent;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.cameras.DefaultCamera;
-import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
-import org.terasology.utilities.FastRandom;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3d;

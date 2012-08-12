@@ -17,6 +17,7 @@ package org.terasology.rendering.gui.windows;
 
 import javax.vecmath.Vector2f;
 
+import org.lwjgl.input.Keyboard;
 import org.terasology.asset.AssetManager;
 import org.terasology.events.input.binds.InventoryButton;
 import org.terasology.game.CoreRegistry;
@@ -37,6 +38,9 @@ public class UIScreenInventory extends UIDisplayWindow {
     private UIGraphicsElement background;
 
     public UIScreenInventory() {
+    	setModal(true);
+    	setCloseBinds(new String[] {InventoryButton.ID});
+    	setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
         setSize(new Vector2f(192.0f * 2.5f, 180.0f * 2.5f));
         
         toolbar = new UIItemContainer(9);
@@ -57,7 +61,6 @@ public class UIScreenInventory extends UIDisplayWindow {
         addDisplayElement(inventory);
 
         layout();
-        setModal(true);
     }
     
     @Override
@@ -82,15 +85,5 @@ public class UIScreenInventory extends UIDisplayWindow {
             inventory.center();
             inventory.getPosition().y += 98;
         }
-    }
-    
-    @Override
-    public boolean processBindButton(String id, boolean pressed) {
-        if (pressed && InventoryButton.ID.equals(id)) {
-            close(true);
-            return true;
-        }
-        
-        return false;
     }
 }

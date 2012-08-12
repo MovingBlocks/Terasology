@@ -16,10 +16,13 @@
 package org.terasology.rendering.gui.windows;
 
 import org.terasology.asset.AssetManager;
+import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIImageOverlay;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import org.terasology.rendering.gui.framework.events.ClickListener;
 
 import javax.vecmath.Vector2f;
 
@@ -38,7 +41,9 @@ public class UIMenuConfigMods extends UIDisplayWindow {
             _backToConfigMenuButton;
 
     public UIMenuConfigMods() {
+        setModal(true);
         maximize();
+        
         _title = new UIGraphicsElement(AssetManager.loadTexture("engine:terasology"));
         _title.setVisible(true);
         _title.setSize(new Vector2f(512f, 128f));
@@ -57,7 +62,13 @@ public class UIMenuConfigMods extends UIDisplayWindow {
         _backToConfigMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _backToConfigMenuButton.getLabel().setText("Back");
         _backToConfigMenuButton.setVisible(true);
-
+        _backToConfigMenuButton.addClickListener(new ClickListener() {
+            @Override
+            public void click(UIDisplayElement element, int button) {
+                GUIManager.getInstance().setFocusedWindow(GUIManager.getInstance().getWindowById("menuConfig"));
+            }
+        });
+        
         addDisplayElement(_overlay);
         addDisplayElement(_title);
 
@@ -73,17 +84,17 @@ public class UIMenuConfigMods extends UIDisplayWindow {
         super.layout();
 
         if (_minionsButton != null) {
-	        _minionsButton.centerHorizontally();
-	        _minionsButton.getPosition().y = 300f;
-	
-	        _minionOptionsButton.centerHorizontally();
-	        _minionOptionsButton.getPosition().y = 300f + 40f;
-	
-	        _backToConfigMenuButton.centerHorizontally();
-	        _backToConfigMenuButton.getPosition().y = 300f + 7 * 40f;
-	
-	        _title.centerHorizontally();
-	        _title.getPosition().y = 128f;
+            _minionsButton.centerHorizontally();
+            _minionsButton.getPosition().y = 300f;
+    
+            _minionOptionsButton.centerHorizontally();
+            _minionOptionsButton.getPosition().y = 300f + 40f;
+    
+            _backToConfigMenuButton.centerHorizontally();
+            _backToConfigMenuButton.getPosition().y = 300f + 7 * 40f;
+    
+            _title.centerHorizontally();
+            _title.getPosition().y = 128f;
         }
     }
 }

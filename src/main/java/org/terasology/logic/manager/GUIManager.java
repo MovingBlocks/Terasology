@@ -16,9 +16,20 @@
 package org.terasology.logic.manager;
 
 import com.google.common.collect.Lists;
-import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+import org.terasology.components.LocalPlayerComponent;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.EventPriority;
+import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.events.input.KeyEvent;
+import org.terasology.events.input.MouseButtonEvent;
+import org.terasology.events.input.MouseWheelEvent;
+import org.terasology.events.input.MouseXAxisEvent;
+import org.terasology.events.input.MouseYAxisEvent;
+import org.terasology.input.BindButtonEvent;
+import org.terasology.input.ButtonState;
 import org.terasology.mods.miniions.rendering.gui.components.UIMinionBehaviourMenu;
 import org.terasology.rendering.gui.components.UIMessageBox;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -35,9 +46,10 @@ import java.util.List;
  * ToDo Add GUI manager to single player
  *
  * @author Kireev Anton <adeon.k87@gmail.com>
+ * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
 
-public class GUIManager {
+public class GUIManager implements EventHandlerSystem {
     private static GUIManager _instance;
     private UIDisplayRenderer _renderer;
     private UIDisplayWindow _focusedWindow;
@@ -52,6 +64,7 @@ public class GUIManager {
     public static GUIManager getInstance() {
         if (_instance == null) {
             _instance = new GUIManager();
+            
         }
         return _instance;
     }
@@ -76,7 +89,7 @@ public class GUIManager {
         _renderer.update();
 
         if (Display.wasResized()) {
-        	_renderer.layout();
+            _renderer.layout();
         }
     }
 
@@ -160,36 +173,23 @@ public class GUIManager {
         return _focusedWindow;
     }
 
+    /**
+     * Check if the GUI will consume the input events. Input events are changes of the mouse position, mouse button, mouse wheel and keyboard input.
+     * @return Returns true if the GUI will consume the input events.
+     */
     public boolean isConsumingInput() {
         checkTopWindow();
         return _focusedWindow != null && _focusedWindow.isModal() && _focusedWindow.isVisible();
     }
 
     /**
-     * Process keyboard input - first look for "system" like events, then otherwise pass to the Player object
+     * Process the mouse input on the active window.
+     * @param button The button. Left = 0, Right = 1, Middle = 2.
+     * @param state The state of the button. True for pressed.
+     * @param wheelMoved The mouse wheel movement. wheel = 0 for no movement. wheel > 0 for up. wheel < 0 for down.
+     * 
      */
-    public void processKeyboardInput(int key) {
-        checkTopWindow();
-        if (key == Keyboard.KEY_ESCAPE) {
-            if (_focusedWindow != null && _focusedWindow.isModal()) {
-                _focusedWindow.setVisible(false);
-            }
-        }
-
-        if (_focusedWindow != null && _focusedWindow.isModal() && _focusedWindow.isVisible()) {
-            _focusedWindow.processKeyboardInput(key);
-            return;
-        }
-
-        List<UIDisplayElement> screens = Lists.newArrayList(_renderer.getDisplayElements());
-        for (UIDisplayElement screen : screens) {
-            if (!((UIDisplayWindow) screen).isModal()) {
-                screen.processKeyboardInput(key);
-            }
-        }
-    }
-
-    public void processMouseInput(int button, boolean state, int wheelMoved) {
+    private void processMouseInput(int button, boolean state, int wheelMoved) {
 
         if (button == 0 && state) {
             checkTopWindow();
@@ -199,14 +199,36 @@ public class GUIManager {
             _focusedWindow.processMouseInput(button, state, wheelMoved);
         }
     }
+    
+    private void processKeyboardInput(KeyEvent event) {
+        checkTopWindow();
+        /*
+        if (key == Keyboard.KEY_ESCAPE) {
+            if (_focusedWindow != null && _focusedWindow.isModal()) {
+                _focusedWindow.setVisible(false);
+            }
+        }
+        */
 
-    public boolean processBindButton(String id, boolean pressed) {
+        if (_focusedWindow != null && _focusedWindow.isModal() && _focusedWindow.isVisible()) {
+            _focusedWindow.processKeyboardInput(event);
+            return;
+        }
+
+        List<UIDisplayElement> screens = Lists.newArrayList(_renderer.getDisplayElements());
+        for (UIDisplayElement screen : screens) {
+            if (!((UIDisplayWindow) screen).isModal()) {
+                screen.processKeyboardInput(event);
+            }
+        }
+    }
+
+    private void processBindButton(BindButtonEvent event) {
         checkTopWindow();
 
         if (_focusedWindow != null && _focusedWindow.isModal() && _focusedWindow.isVisible()) {
-            return _focusedWindow.processBindButton(id, pressed);
+            _focusedWindow.processBindButton(event);
         }
-        return false;
     }
 
     public void setFocusedWindow(UIDisplayWindow window) {
@@ -325,5 +347,97 @@ public class GUIManager {
         }
         return false;
     }
+    
+    @Override
+    public void initialise() {
+        
+    }
 
+    @Override
+    public void shutdown() {
+        
+    }
+    
+    /*
+      The following events will capture the mouse and keyboard inputs. They have the highest priority so the GUI will always come first.
+      If a window is "modal" it will consume all input events so no other than the GUI will handle these events.
+    */
+    
+    //mouse movement events
+    @ReceiveEvent(components = LocalPlayerComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    public void onMouseX(MouseXAxisEvent event, EntityRef entity) {
+        if (isConsumingInput()) {
+            processMouseInput(-1, false, 0);
+            
+            if (_focusedWindow != null) {
+                if (_focusedWindow.isModal()) {
+                    event.consume();
+                }
+            }
+        }
+    }
+    
+    @ReceiveEvent(components = LocalPlayerComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    public void onMouseY(MouseYAxisEvent event, EntityRef entity) {
+        if (isConsumingInput()) {
+            processMouseInput(-1, false, 0);
+            
+            if (_focusedWindow != null) {
+                if (_focusedWindow.isModal()) {
+                    event.consume();
+                }
+            }
+        }
+    }
+    
+    //mouse button events
+    @ReceiveEvent(components = LocalPlayerComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    public void mouseButtonEvent(MouseButtonEvent event, EntityRef entity) {
+        if (isConsumingInput()) {
+            processMouseInput(event.getButton(), event.getState() != ButtonState.UP, 0);
+            
+            if (_focusedWindow != null) {
+                if (_focusedWindow.isModal()) {
+                    event.consume();
+                }
+            }
+        }
+    }
+
+    //mouse wheel events
+    @ReceiveEvent(components = LocalPlayerComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    public void mouseWheelEvent(MouseWheelEvent event, EntityRef entity) {
+        if (isConsumingInput()) {
+            processMouseInput(-1, false, event.getWheelTurns() * 120);
+            
+            if (_focusedWindow != null) {
+                if (_focusedWindow.isModal()) {
+                    event.consume();
+                }
+            }
+        }
+    }
+
+    //raw input events
+    @ReceiveEvent(components = LocalPlayerComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    public void keyEvent(KeyEvent event, EntityRef entity) {
+        if (isConsumingInput()) {
+            processKeyboardInput(event);
+        }
+    }
+    
+    //bind input events (will be send after raw input events, if a bind button was pressed and the raw input event hasn't consumed the event)
+    @ReceiveEvent(components = LocalPlayerComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    public void bindEvent(BindButtonEvent event, EntityRef entity) {
+        if (isConsumingInput()) {
+            processBindButton(event);
+            
+            if (_focusedWindow != null) {
+                //if modal, consume the event so it wont get caught from others
+                if (_focusedWindow.isModal()) {
+                    event.consume();
+                }
+            }
+        }
+    }
 }

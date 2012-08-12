@@ -15,8 +15,10 @@
  */
 package org.terasology.rendering.gui.windows;
 
+import org.lwjgl.input.Keyboard;
 import org.terasology.asset.AssetManager;
 import org.terasology.logic.manager.Config;
+import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UISlider;
@@ -25,6 +27,7 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
+import org.terasology.rendering.gui.framework.events.ClickListener;
 
 import javax.vecmath.Vector2f;
 
@@ -44,6 +47,9 @@ public class UIMenuConfigAudio extends UIDisplayWindow {
     private final UIButton _backToConfigMenuButton;
 
     public UIMenuConfigAudio() {
+        setModal(true);
+        setCloseBinds(new String[] {});
+        setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
         maximize();
 
         _title = new UIGraphicsElement(AssetManager.loadTexture("engine:terasology"));
@@ -58,37 +64,43 @@ public class UIMenuConfigAudio extends UIDisplayWindow {
 
         _soundOptionSlider = new UISlider(new Vector2f(256f, 32f), 0, 100);
         _soundOptionSlider.addChangedListener(new ChangedListener() {
-			@Override
-			public void changed(UIDisplayElement element) {
-				UISlider slider = (UISlider)element;
-				if (slider.getValue() > 0)
-					slider.setText("Sound Volume: " + String.valueOf(slider.getValue()));
-				else
-					slider.setText("Sound Volume: Off");
-				
-				Config.getInstance().setSoundVolume(slider.getValue());
-			}
-		});
+            @Override
+            public void changed(UIDisplayElement element) {
+                UISlider slider = (UISlider)element;
+                if (slider.getValue() > 0)
+                    slider.setText("Sound Volume: " + String.valueOf(slider.getValue()));
+                else
+                    slider.setText("Sound Volume: Off");
+                
+                Config.getInstance().setSoundVolume(slider.getValue());
+            }
+        });
         _soundOptionSlider.setVisible(true);
 
         _musicOptionSlider = new UISlider(new Vector2f(256f, 32f), 0, 100);
         _musicOptionSlider.addChangedListener(new ChangedListener() {
-			@Override
-			public void changed(UIDisplayElement element) {
-				UISlider slider = (UISlider)element;
-				if (slider.getValue() > 0)
-					slider.setText("Music Volume: " + String.valueOf(slider.getValue()));
-				else
-					slider.setText("Music Volume: Off");
-				
-				Config.getInstance().setMusicVolume(slider.getValue());
-			}
-		});
+            @Override
+            public void changed(UIDisplayElement element) {
+                UISlider slider = (UISlider)element;
+                if (slider.getValue() > 0)
+                    slider.setText("Music Volume: " + String.valueOf(slider.getValue()));
+                else
+                    slider.setText("Music Volume: Off");
+                
+                Config.getInstance().setMusicVolume(slider.getValue());
+            }
+        });
         _musicOptionSlider.setVisible(true);
 
         _backToConfigMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _backToConfigMenuButton.getLabel().setText("Back");
         _backToConfigMenuButton.setVisible(true);
+        _backToConfigMenuButton.addClickListener(new ClickListener() {
+            @Override
+            public void click(UIDisplayElement element, int button) {
+                GUIManager.getInstance().setFocusedWindow(GUIManager.getInstance().getWindowById("menuConfig"));
+            }
+        });
 
         addDisplayElement(_overlay);
         addDisplayElement(_title);
@@ -103,23 +115,28 @@ public class UIMenuConfigAudio extends UIDisplayWindow {
 
     @Override
     public void layout() {
-    	super.layout();
-    	
-    	if (_version != null) {
-	        _version.centerHorizontally();
-	        _version.getPosition().y = 230f;
-	
-	        _soundOptionSlider.centerHorizontally();
-	        _soundOptionSlider.getPosition().y = 300f;
-	
-	        _musicOptionSlider.centerHorizontally();
-	        _musicOptionSlider.getPosition().y = 300f + 40f;
-	
-	        _backToConfigMenuButton.centerHorizontally();
-	        _backToConfigMenuButton.getPosition().y = 300f + 7 * 40f;
-	
-	        _title.centerHorizontally();
-	        _title.getPosition().y = 128f;
-    	}
+        super.layout();
+        
+        if (_version != null) {
+            _version.centerHorizontally();
+            _version.getPosition().y = 230f;
+    
+            _soundOptionSlider.centerHorizontally();
+            _soundOptionSlider.getPosition().y = 300f;
+    
+            _musicOptionSlider.centerHorizontally();
+            _musicOptionSlider.getPosition().y = 300f + 40f;
+    
+            _backToConfigMenuButton.centerHorizontally();
+            _backToConfigMenuButton.getPosition().y = 300f + 7 * 40f;
+    
+            _title.centerHorizontally();
+            _title.getPosition().y = 128f;
+        }
+    }
+
+    public void setup() {
+        _soundOptionSlider.setValue(Config.getInstance().getSoundVolume());
+        _musicOptionSlider.setValue(Config.getInstance().getMusicVolume());
     }
 }

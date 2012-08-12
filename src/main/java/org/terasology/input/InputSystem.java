@@ -19,11 +19,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.terasology.components.LocalPlayerComponent;
-import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.entitySystem.EventPriority;
-import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.EventSystem;
 import org.terasology.events.input.*;
 import org.terasology.events.input.binds.*;
 import org.terasology.game.CoreRegistry;
@@ -66,6 +63,8 @@ public class InputSystem implements EventHandlerSystem {
     public void initialise() {
         localPlayer = CoreRegistry.get(LocalPlayer.class);
         cameraTargetSystem = CoreRegistry.get(CameraTargetSystem.class);
+        
+        CoreRegistry.get(EventSystem.class).registerEventHandler(GUIManager.getInstance());
 
         loadInputConfig();
     }
@@ -140,7 +139,9 @@ public class InputSystem implements EventHandlerSystem {
     }
 
     private void processMouseInput(float delta) {
+        //process mouse clicks
         while (Mouse.next()) {
+            //left/right/middle mouse click
             if (Mouse.getEventButton() != -1) {
                 int button = Mouse.getEventButton();
                 boolean buttonDown = Mouse.getEventButtonState();
@@ -150,7 +151,9 @@ public class InputSystem implements EventHandlerSystem {
                 if (bind != null) {
                     bind.updateBindState(buttonDown, delta, localPlayer.getEntity(), cameraTargetSystem.getTarget(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, GUIManager.getInstance().isConsumingInput());
                 }
-            } else if (Mouse.getEventDWheel() != 0) {
+            }
+            //mouse wheel
+            else if (Mouse.getEventDWheel() != 0) {
                 int wheelMoved = Mouse.getEventDWheel();
                 boolean consumed = sendMouseWheelEvent(wheelMoved / 120, delta);
 
@@ -160,17 +163,19 @@ public class InputSystem implements EventHandlerSystem {
                     bind.updateBindState(false, delta, localPlayer.getEntity(), cameraTargetSystem.getTarget(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, GUIManager.getInstance().isConsumingInput());
                 }
             }
-            
-            GUIManager.getInstance().processMouseInput(Mouse.getEventButton(), Mouse.getEventButtonState(), Mouse.getEventDWheel());
         }
+        
+        //process mouse movement x axis
         int deltaX = Mouse.getDX();
-        if (deltaX != 0 && !GUIManager.getInstance().isConsumingInput()) {
+        if (deltaX != 0) {
             MouseAxisEvent event = new MouseXAxisEvent(deltaX * mouseSensitivity, delta);
             setupTarget(event);
             localPlayer.getEntity().send(event);
         }
+        
+        //process mouse movement y axis
         int deltaY = Mouse.getDY();
-        if (deltaY != 0 && !GUIManager.getInstance().isConsumingInput()) {
+        if (deltaY != 0) {
             MouseAxisEvent event = new MouseYAxisEvent(deltaY * mouseSensitivity, delta);
             setupTarget(event);
             localPlayer.getEntity().send(event);
@@ -178,25 +183,8 @@ public class InputSystem implements EventHandlerSystem {
     }
 
     private void setupTarget(InputEvent event) {
-        if (cameraTargetSystem.isTargetAvailable()) {
+        if (cameraTargetSystem.isTargetAvailable() && !GUIManager.getInstance().isConsumingInput()) {
             event.setTarget(cameraTargetSystem.getTarget(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal());
-        }
-    }
-
-    //TODO Send mouse / keyboard input on another way to the GUIManager. Let the GUI manager directly subscribe to these events.
-    @ReceiveEvent(components = LocalPlayerComponent.class, priority = EventPriority.PRIORITY_HIGH)
-    public void sendEventToGUI(MouseButtonEvent mouseEvent, EntityRef entity) {
-        if (GUIManager.getInstance().isConsumingInput()) {
-            GUIManager.getInstance().processMouseInput(mouseEvent.getButton(), mouseEvent.getState() != ButtonState.UP, 0);
-            mouseEvent.consume();
-        }
-    }
-
-    @ReceiveEvent(components = LocalPlayerComponent.class, priority = EventPriority.PRIORITY_HIGH)
-    public void sendEventToGUI(MouseWheelEvent mouseEvent, EntityRef entity) {
-        if (GUIManager.getInstance().isConsumingInput()) {
-            GUIManager.getInstance().processMouseInput(-1, false, mouseEvent.getWheelTurns() * 120);
-            mouseEvent.consume();
         }
     }
 
@@ -213,16 +201,6 @@ public class InputSystem implements EventHandlerSystem {
             if (bind != null && !Keyboard.isRepeatEvent()) {
                 bind.updateBindState(Keyboard.getEventKeyState(), delta, localPlayer.getEntity(), cameraTargetSystem.getTarget(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, guiConsumingInput);
             }
-        }
-    }
-
-    @ReceiveEvent(components = LocalPlayerComponent.class, priority = EventPriority.PRIORITY_HIGH)
-    public void sendEventToGUI(KeyEvent keyEvent, EntityRef entity) {
-        if (GUIManager.getInstance().isConsumingInput()) {
-            if (keyEvent.getState() != ButtonState.UP) {
-                GUIManager.getInstance().processKeyboardInput(keyEvent.getKey());
-            }
-            keyEvent.consume();
         }
     }
 
@@ -508,7 +486,4 @@ public class InputSystem implements EventHandlerSystem {
     }
 
 }
-
-
-	
 
