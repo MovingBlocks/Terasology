@@ -186,6 +186,8 @@ public class PhysicsSystem implements EventHandlerSystem, UpdateSubscriberSystem
 
     @Override
     public void update(float delta) {
+        List<CollisionPair> collisionPairs = Lists.newArrayList();
+
         DynamicsWorld world = physics.getWorld();
         ObjectArrayList<PersistentManifold> manifolds = new ObjectArrayList<PersistentManifold>();
         for (PairCachingGhostObject trigger : entityTriggers.values()) {
@@ -216,19 +218,36 @@ public class PhysicsSystem implements EventHandlerSystem, UpdateSubscriberSystem
                     for (int point = 0; point < manifold.getNumContacts(); ++point) {
                         ManifoldPoint manifoldPoint = manifold.getContactPoint(point);
                         if (manifoldPoint.getDistance() < 0) {
-                            entity.send(new CollideEvent(otherEntity));
-                            otherEntity.send(new CollideEvent(entity));
+                            collisionPairs.add(new CollisionPair(entity, otherEntity));
                             break;
                         }
                     }
                 }
             }
 
-
             LocationComponent location = entity.getComponent(LocationComponent.class);
             if (location != null) {
                 trigger.setWorldTransform(new Transform(new Matrix4f(location.getWorldRotation(), location.getWorldPosition(), 1.0f)));
             }
+        }
+
+        for (CollisionPair pair : collisionPairs) {
+            if (pair.b.exists()) {
+                pair.a.send(new CollideEvent(pair.b));
+            }
+            if (pair.a.exists()) {
+                pair.b.send(new CollideEvent(pair.a));
+            }
+        }
+    }
+
+    private static class CollisionPair {
+        EntityRef a;
+        EntityRef b;
+
+        public CollisionPair(EntityRef a, EntityRef b) {
+            this.a = a;
+            this.b = b;
         }
     }
 
