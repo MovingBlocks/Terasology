@@ -68,6 +68,7 @@ import com.google.common.collect.Lists;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
+// TODO: Merge this with Physics System
 public class BulletPhysics implements EventReceiver<BlockChangedEvent> {
 
     private Logger _logger = Logger.getLogger(getClass().getName());
@@ -118,11 +119,11 @@ public class BulletPhysics implements EventReceiver<BlockChangedEvent> {
         return createCollider(pos, shape, groups, filters, 0);
     }
 
-    private short combineGroups(CollisionGroup ... groups) {
+    public static short combineGroups(CollisionGroup ... groups) {
         return combineGroups(Arrays.asList(groups));
     }
 
-    private short combineGroups(Iterable<CollisionGroup> groups) {
+    public static short combineGroups(Iterable<CollisionGroup> groups) {
         short flags = 0;
         for (CollisionGroup group : groups) {
             flags |= group.getFlag();

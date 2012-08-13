@@ -16,6 +16,7 @@
 
 package org.terasology.physics;
 
+import com.bulletphysics.BulletGlobals;
 import gnu.trove.iterator.TFloatIterator;
 
 import java.util.List;
@@ -33,6 +34,7 @@ import org.terasology.entitySystem.EventPriority;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.entitySystem.event.AddComponentEvent;
+import org.terasology.entitySystem.event.ChangedComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.physics.character.CharacterMovementComponent;
@@ -85,6 +87,10 @@ public class PhysicsSystem implements EventHandlerSystem, UpdateSubscriberSystem
 
     @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
     public void newRigidBody(AddComponentEvent event, EntityRef entity) {
+        createRigidBody(entity);
+    }
+
+    private void createRigidBody(EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         RigidBodyComponent rigidBody = entity.getComponent(RigidBodyComponent.class);
         ConvexShape shape = getShapeFor(entity);
@@ -107,6 +113,10 @@ public class PhysicsSystem implements EventHandlerSystem, UpdateSubscriberSystem
 
     @ReceiveEvent(components = {TriggerComponent.class, LocationComponent.class})
     public void newTrigger(AddComponentEvent event, EntityRef entity) {
+        createTrigger(entity);
+    }
+
+    private void createTrigger(EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         TriggerComponent trigger = entity.getComponent(TriggerComponent.class);
         ConvexShape shape = getShapeFor(entity);
@@ -142,6 +152,40 @@ public class PhysicsSystem implements EventHandlerSystem, UpdateSubscriberSystem
         if (ghost != null) {
             physics.removeCollider(ghost);
         }
+    }
+
+    @ReceiveEvent(components = {TriggerComponent.class, LocationComponent.class})
+    public void updateTrigger(ChangedComponentEvent event, EntityRef entity) {
+        LocationComponent location = entity.getComponent(LocationComponent.class);
+        PairCachingGhostObject triggerObj = entityTriggers.get(entity);
+
+        if (triggerObj != null) {
+            float scale = location.getWorldScale();
+            if (Math.abs(triggerObj.getCollisionShape().getLocalScaling(new Vector3f()).x - scale) > BulletGlobals.SIMD_EPSILON) {
+                physics.removeCollider(triggerObj);
+                createTrigger(entity);
+            } else {
+                triggerObj.setWorldTransform(new Transform(new Matrix4f(location.getWorldRotation(), location.getWorldPosition(), 1.0f)));
+            }
+        }
+
+        // TODO: update if detectGroups changed
+    }
+
+    @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class})
+    public void updateRigidBody(ChangedComponentEvent event, EntityRef entity) {
+        LocationComponent location = entity.getComponent(LocationComponent.class);
+        RigidBody rigidBody = entityRigidBodies.get(entity);
+
+        if (rigidBody != null) {
+            float scale = location.getWorldScale();
+            if (Math.abs(rigidBody.getCollisionShape().getLocalScaling(new Vector3f()).x - scale) > BulletGlobals.SIMD_EPSILON) {
+                physics.removeRigidBody(rigidBody);
+                createRigidBody(entity);
+            }
+        }
+
+        // TODO: update if mass or collision groups change
     }
 
     // TODO: Flyweight this (take scale as parameter)
@@ -223,11 +267,6 @@ public class PhysicsSystem implements EventHandlerSystem, UpdateSubscriberSystem
                         }
                     }
                 }
-            }
-
-            LocationComponent location = entity.getComponent(LocationComponent.class);
-            if (location != null) {
-                trigger.setWorldTransform(new Transform(new Matrix4f(location.getWorldRotation(), location.getWorldPosition(), 1.0f)));
             }
         }
 
