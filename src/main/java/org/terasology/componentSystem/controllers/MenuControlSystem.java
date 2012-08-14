@@ -22,6 +22,7 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.events.NoHealthEvent;
 import org.terasology.events.input.KeyDownEvent;
 import org.terasology.events.input.binds.ConsoleButton;
 import org.terasology.events.input.binds.InventoryButton;
@@ -33,6 +34,7 @@ import org.terasology.rendering.gui.windows.UIScreenConsole;
 import org.terasology.rendering.gui.windows.UIScreenHUD;
 import org.terasology.rendering.gui.windows.UIScreenInventory;
 import org.terasology.rendering.gui.windows.UIMenuPause;
+import org.terasology.rendering.gui.windows.UIScreenDeath;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
@@ -51,6 +53,7 @@ public class MenuControlSystem implements EventHandlerSystem {
         GUIManager.getInstance().addWindow(new UIScreenHUD(), "engine:hud");
         GUIManager.getInstance().addWindow(new UIScreenInventory(), INVENTORY);
         GUIManager.getInstance().addWindow(new UIMenuPause(), PAUSE_MENU);
+        GUIManager.getInstance().addWindow(new UIScreenDeath(), "engine:death");
     }
 
     @Override
@@ -59,21 +62,24 @@ public class MenuControlSystem implements EventHandlerSystem {
 
     @ReceiveEvent(components = LocalPlayerComponent.class)
     public void onToggleConsole(ConsoleButton event, EntityRef entity) {
-        if (event.getState() == ButtonState.DOWN && GUIManager.getInstance().toggleWindow(CONSOLE)) {
+        if (event.getState() == ButtonState.DOWN) {
+        	GUIManager.getInstance().setFocusedWindow(CONSOLE);
             event.consume();
         }
     }
 
     @ReceiveEvent(components = LocalPlayerComponent.class)
     public void onToggleInventory(InventoryButton event, EntityRef entity) {
-        if (event.getState() == ButtonState.DOWN && GUIManager.getInstance().toggleWindow(INVENTORY)) {
+        if (event.getState() == ButtonState.DOWN) {
+        	GUIManager.getInstance().setFocusedWindow(INVENTORY);
             event.consume();
         }
     }
 
     @ReceiveEvent(components = LocalPlayerComponent.class)
     public void onTogglePause(PauseButton event, EntityRef entity) {
-        if (event.getState() == ButtonState.DOWN && GUIManager.getInstance().toggleWindow(PAUSE_MENU)) {
+        if (event.getState() == ButtonState.DOWN) {
+        	GUIManager.getInstance().setFocusedWindow(PAUSE_MENU);
             event.consume();
         }
     }
@@ -85,6 +91,11 @@ public class MenuControlSystem implements EventHandlerSystem {
                 CoreRegistry.get(WorldRenderer.class).printScreen();
                 break;
         }
+    }
+    
+    @ReceiveEvent(components = {LocalPlayerComponent.class})
+    public void onDeath(NoHealthEvent event, EntityRef entity) {
+    	GUIManager.getInstance().setFocusedWindow("engine:death");
     }
 
 }

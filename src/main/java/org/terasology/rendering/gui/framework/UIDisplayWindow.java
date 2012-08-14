@@ -50,7 +50,7 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer {
     public void close(boolean clearInputControls) {
         setVisible(false);
         setFocus(null);
-        GUIManager.getInstance().setFocusedFromLast();
+        GUIManager.getInstance().setLastFocused();
         if (clearInputControls) {
             clearInputControls();
         }
@@ -210,13 +210,13 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer {
     }
     
     @Override
-    public void setVisible(boolean visible) {
-        super.setVisible(visible);
-        
-        if (visible) {
+    public void setVisible(boolean visible) {        
+        if (visible && !isVisible()) {
             notifyWindowListeners(eWindowEvent.OPEN);
-        } else {
+        } else if (!visible && isVisible()) {
             notifyWindowListeners(eWindowEvent.CLOSE);
         }
+        
+        super.setVisible(visible);
     }
 }

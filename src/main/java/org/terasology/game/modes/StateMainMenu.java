@@ -17,7 +17,6 @@ package org.terasology.game.modes;
 
 import java.util.Iterator;
 
-import org.lwjgl.input.Mouse;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
@@ -45,7 +44,7 @@ import static org.lwjgl.opengl.GL11.*;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Anton Kireev <adeon.k87@gmail.com>
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
- * @version 0.2
+ * @version 0.3
  */
 public class StateMainMenu implements GameState {
     private GameEngine _gameInstance = null;
@@ -132,7 +131,6 @@ public class StateMainMenu implements GameState {
             CoreRegistry.get(LocalPlayer.class).setEntity(iterator.next());
         }
         
-        Mouse.setGrabbed(false);
         playBackgroundMusic();
 
         _configMenuVideo.setup();
@@ -151,7 +149,7 @@ public class StateMainMenu implements GameState {
         }
         
         stopBackgroundMusic();
-        GUIManager.getInstance().closeWindows();
+        GUIManager.getInstance().removeAllWindows();
         
         entityManager.clear();
     }

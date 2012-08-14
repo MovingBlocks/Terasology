@@ -30,8 +30,8 @@ import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.ActivateEvent;
 import org.terasology.events.DamageEvent;
-import org.terasology.events.HealthChangedEvent;
 import org.terasology.events.NoHealthEvent;
+import org.terasology.events.RespawnEvent;
 import org.terasology.events.input.MouseXAxisEvent;
 import org.terasology.events.input.MouseYAxisEvent;
 import org.terasology.events.input.binds.*;
@@ -107,11 +107,9 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         LocalPlayerComponent localPlayerComponent = entity.getComponent(LocalPlayerComponent.class);
         CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
         LocationComponent location = entity.getComponent(LocationComponent.class);
-        PlayerComponent playerComponent = entity.getComponent(PlayerComponent.class);
 
         if (localPlayerComponent.isDead) {
-            if (!checkRespawn(delta, entity, localPlayerComponent, characterMovementComponent, location, playerComponent))
-                return;
+            return;
         }
 
         updateMovement(localPlayerComponent, characterMovementComponent, location);
@@ -219,8 +217,35 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     public void onDeath(NoHealthEvent event, EntityRef entity) {
         LocalPlayerComponent localPlayer = entity.getComponent(LocalPlayerComponent.class);
         localPlayer.isDead = true;
-        localPlayer.respawnWait = 1.0f;
         entity.saveComponent(localPlayer);
+    }
+    
+    @ReceiveEvent(components = {LocalPlayerComponent.class})
+    public void onRespawn(RespawnEvent event, EntityRef entity) {
+        LocalPlayerComponent localPlayerComponent = entity.getComponent(LocalPlayerComponent.class);
+        if (localPlayerComponent.isDead) {
+            localPlayerComponent.isDead = false;
+            entity.saveComponent(localPlayerComponent);
+        }
+
+        LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
+        PlayerComponent playerComponent = entity.getComponent(PlayerComponent.class);
+        if (playerComponent != null && locationComponent != null) {
+            locationComponent.setWorldPosition(playerComponent.spawnPosition);
+            entity.saveComponent(locationComponent);
+        }
+
+        HealthComponent healthComponent = entity.getComponent(HealthComponent.class);
+        if (healthComponent != null) {
+            healthComponent.currentHealth = healthComponent.maxHealth;
+            entity.saveComponent(healthComponent);
+        }
+
+        CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
+        if (characterMovementComponent != null) {
+            characterMovementComponent.setVelocity(new Vector3f(0, 0, 0));
+            entity.saveComponent(characterMovementComponent);
+        }
     }
 
     private void updateMovement(LocalPlayerComponent localPlayerComponent, CharacterMovementComponent characterMovementComponent, LocationComponent location) {
@@ -237,27 +262,6 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         float lengthSquared = relMove.lengthSquared();
         if (lengthSquared > 1) relMove.normalize();
         characterMovementComponent.setDrive(relMove);
-    }
-
-    private boolean checkRespawn(float deltaSeconds, EntityRef entity, LocalPlayerComponent localPlayerComponent, CharacterMovementComponent characterMovementComponent, LocationComponent location, PlayerComponent playerComponent) {
-        localPlayerComponent.respawnWait -= deltaSeconds;
-        if (localPlayerComponent.respawnWait > 0) {
-            characterMovementComponent.getDrive().set(0, 0, 0);
-            characterMovementComponent.jump = false;
-            return false;
-        }
-
-        // Respawn
-        localPlayerComponent.isDead = false;
-        HealthComponent health = entity.getComponent(HealthComponent.class);
-        if (health != null) {
-            health.currentHealth = health.maxHealth;
-            entity.send(new HealthChangedEvent(entity, health.currentHealth, health.maxHealth));
-            entity.saveComponent(health);
-        }
-        location.setWorldPosition(playerComponent.spawnPosition);
-        entity.saveComponent(location);
-        return true;
     }
 
     private void updateCamera(CharacterMovementComponent charMovementComp, Vector3f position, Quat4f rotation) {
