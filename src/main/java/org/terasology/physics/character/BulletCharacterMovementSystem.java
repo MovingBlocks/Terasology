@@ -15,14 +15,16 @@
  */
 package org.terasology.physics.character;
 
-import java.util.logging.Logger;
-
-import javax.vecmath.AxisAngle4f;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
-
+import com.bulletphysics.BulletGlobals;
+import com.bulletphysics.collision.dispatch.CollisionFlags;
+import com.bulletphysics.collision.dispatch.CollisionObject;
+import com.bulletphysics.collision.dispatch.CollisionWorld;
+import com.bulletphysics.collision.dispatch.GhostObject;
 import com.bulletphysics.collision.dispatch.PairCachingGhostObject;
+import com.bulletphysics.collision.shapes.CapsuleShape;
+import com.bulletphysics.collision.shapes.ConvexShape;
+import com.bulletphysics.linearmath.Transform;
+import com.google.common.collect.Lists;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
@@ -41,35 +43,34 @@ import org.terasology.physics.BulletPhysics;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.world.WorldProvider;
 
-import com.bulletphysics.BulletGlobals;
-import com.bulletphysics.collision.dispatch.CollisionFlags;
-import com.bulletphysics.collision.dispatch.CollisionObject;
-import com.bulletphysics.collision.dispatch.CollisionWorld;
-import com.bulletphysics.collision.dispatch.GhostObject;
-import com.bulletphysics.collision.shapes.CapsuleShape;
-import com.bulletphysics.collision.shapes.ConvexShape;
-import com.bulletphysics.linearmath.Transform;
-import com.google.common.collect.Lists;
+import javax.vecmath.AxisAngle4f;
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
 @RegisterComponentSystem
-public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, EventHandlerSystem {
+public final class BulletCharacterMovementSystem implements UpdateSubscriberSystem, EventHandlerSystem {
 
     private static final float VERTICAL_PENETRATION_LEEWAY = 0.05f;
     private static final float VERTICAL_PENETRATION = 0.04f;
     private static final float HORIZONTAL_PENETRATION_LEEWAY = 0.04f;
     private static final float HORIZONTAL_PENETRATION = 0.03f;
 
-    public static final float Gravity = 28.0f;
-    public static final float TerminalVelocity = 64.0f;
+    public static final float GRAVITY = 28.0f;
+    public static final float TERMINAL_VELOCITY = 64.0f;
 
-    public static final float UnderwaterGravity = 0.25f;
-    public static final float UnderwaterInertia = 2.0f;
-    public static final float WaterTerminalVelocity = 4.0f;
+    public static final float UNDERWATER_GRAVITY = 0.25f;
+    public static final float UNDERWATER_INERTIA = 2.0f;
+    public static final float WATER_TERMINAL_VELOCITY = 4.0f;
 
-    public static final float GhostInertia = 4f;
+    public static final float GHOST_INERTIA = 4f;
+
+    private static final float CHECK_FORWARD_DIST = 0.05f;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -166,12 +167,12 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
         }
         desiredVelocity.scale(maxSpeed);
 
-        desiredVelocity.y -= UnderwaterGravity;
+        desiredVelocity.y -= UNDERWATER_GRAVITY;
 
         // Modify velocity towards desired, up to the maximum rate determined by friction
         Vector3f velocityDiff = new Vector3f(desiredVelocity);
         velocityDiff.sub(movementComp.getVelocity());
-        velocityDiff.scale(Math.min(UnderwaterInertia * delta, 1.0f));
+        velocityDiff.scale(Math.min(UNDERWATER_INERTIA * delta, 1.0f));
 
         movementComp.getVelocity().x += velocityDiff.x;
         movementComp.getVelocity().y += velocityDiff.y;
@@ -214,7 +215,7 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
         Vector3f velocityDiff = new Vector3f(desiredVelocity);
         velocityDiff.sub(movementComp.getVelocity());
 
-        velocityDiff.scale(Math.min(GhostInertia * delta, 1.0f));
+        velocityDiff.scale(Math.min(GHOST_INERTIA * delta, 1.0f));
 
         movementComp.getVelocity().add(velocityDiff);
 
@@ -259,7 +260,7 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
 
         movementComp.getVelocity().x += velocityDiff.x;
         movementComp.getVelocity().z += velocityDiff.z;
-        movementComp.getVelocity().y = Math.max(-TerminalVelocity, (movementComp.getVelocity().y - Gravity * delta));
+        movementComp.getVelocity().y = Math.max(-TERMINAL_VELOCITY, (movementComp.getVelocity().y - GRAVITY * delta));
 
         Vector3f moveDelta = new Vector3f(movementComp.getVelocity());
         moveDelta.scale(delta);
@@ -425,12 +426,20 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
             if (callback.hasHit()) {
                 hit = true;
 
-                Vector3f contactPoint = null;
-                contactPoint = callback.hitPointWorld;
-                logger.info(contactPoint.toString());
+                Vector3f contactPoint = callback.hitPointWorld;
 
                 Vector3f normal = callback.hitNormalWorld;
                 if (contactPoint != null) {
+                    float originalSlope = normal.dot(new Vector3f(0, 1, 0));
+                    if (originalSlope >= slopeFactor) {
+                        hit = true;
+                        break;
+                    }
+
+                    float slope = 1;
+                    boolean foundSlope = false;
+
+                    // We do two ray traces, and use the steepest, to avoid incongruities with the slopes
                     Vector3f fromWorld = new Vector3f(contactPoint);
                     fromWorld.y += 0.2f;
                     Vector3f toWorld = new Vector3f(contactPoint);
@@ -438,13 +447,30 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
                     CollisionWorld.ClosestRayResultCallback rayResult = new CollisionWorld.ClosestRayResultCallback(fromWorld, toWorld);
                     CollisionWorld.rayTestSingle(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), fromWorld, 1.0f)), new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), toWorld, 1.0f)), callback.hitCollisionObject, callback.hitCollisionObject.getCollisionShape(), callback.hitCollisionObject.getWorldTransform(new Transform()), rayResult);
 
+                    if (rayResult.hasHit()) {
+                        foundSlope = true;
+                        slope = Math.min(slope, (rayResult.hitNormalWorld.dot(new Vector3f(0, 1, 0))));
+                    }
+
+                    Vector3f secondTraceOffset = new Vector3f(callback.hitNormalWorld);
+                    secondTraceOffset.y = 0;
+                    secondTraceOffset.normalize();
+                    secondTraceOffset.scale(CHECK_FORWARD_DIST);
+                    fromWorld.add(secondTraceOffset);
+                    toWorld.add(secondTraceOffset);
+
+                    rayResult = new CollisionWorld.ClosestRayResultCallback(fromWorld, toWorld);
+                    CollisionWorld.rayTestSingle(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), fromWorld, 1.0f)), new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), toWorld, 1.0f)), callback.hitCollisionObject, callback.hitCollisionObject.getCollisionShape(), callback.hitCollisionObject.getWorldTransform(new Transform()), rayResult);
 
                     if (rayResult.hasHit()) {
-                        normal = rayResult.hitNormalWorld;
-                        logger.info("Slope: " + rayResult.hitNormalWorld.dot(new Vector3f(0, 1, 0)));
+                        foundSlope = true;
+                        slope = Math.min(slope, (rayResult.hitNormalWorld.dot(new Vector3f(0, 1, 0))));
                     }
-                    if (normal.dot(new Vector3f(0, 1, 0)) < slopeFactor) {
+                    if (!foundSlope) {
+                        slope = originalSlope;
+                    }
 
+                    if (slope < slopeFactor) {
                         remainingDist -= actualDist;
                         expectedMove.set(targetPos);
                         expectedMove.sub(currentPos);
@@ -454,11 +480,11 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
                         if (sqrDist > BulletGlobals.SIMD_EPSILON) {
                             expectedMove.normalize();
                             if (expectedMove.dot(normalizedDir) <= 0.0f) {
-                                hit = true;
+                                //hit = true;
                                 break;
                             }
                         } else {
-                            hit = true;
+                            //hit = true;
                             break;
                         }
                         normalizedDir.set(expectedMove);
@@ -468,11 +494,10 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
                         /*if (!rayResult.hasHit()) {
                             logger.info("Raycast missed");
                         } */
-                        //hit = true;
+                        hit = true;
                         break;
                     }
                 } else {
-                    logger.info("No contact point");
                     hit = true;
                     break;
                 }
@@ -493,11 +518,11 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
             }
             return false;
         } else {
-            if (stepDownAmount > 0) {
-                moveDown(fallAmount - steppedUpAmount, 0, 0, slopeFactor, collider, position);
-            } else {
+            //if (stepDownAmount > 0) {
+                //moveDown(fallAmount - steppedUpAmount, 0, 0, slopeFactor, collider, position);
+            //} else {
                 position.set(currentPos);
-            }
+            //}
             return true;
         }
     }
