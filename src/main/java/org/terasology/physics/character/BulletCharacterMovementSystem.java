@@ -427,7 +427,6 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
 
                 Vector3f contactPoint = null;
                 contactPoint = callback.hitPointWorld;
-                logger.info(contactPoint.toString());
 
                 Vector3f normal = callback.hitNormalWorld;
                 if (contactPoint != null) {
@@ -441,7 +440,6 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
 
                     if (rayResult.hasHit()) {
                         normal = rayResult.hitNormalWorld;
-                        logger.info("Slope: " + rayResult.hitNormalWorld.dot(new Vector3f(0, 1, 0)));
                     }
                     if (normal.dot(new Vector3f(0, 1, 0)) < slopeFactor) {
 
@@ -472,7 +470,6 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
                         break;
                     }
                 } else {
-                    logger.info("No contact point");
                     hit = true;
                     break;
                 }
