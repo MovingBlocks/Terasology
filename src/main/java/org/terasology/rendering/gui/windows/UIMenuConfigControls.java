@@ -15,12 +15,12 @@
  */
 package org.terasology.rendering.gui.windows;
 
-import javax.vecmath.Vector2f;
-
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetManager;
+import org.terasology.events.input.KeyEvent;
 import org.terasology.logic.manager.Config;
+import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.InputConfig;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIImageOverlay;
@@ -32,6 +32,8 @@ import org.terasology.rendering.gui.framework.UIGraphicsElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 
+import javax.vecmath.Vector2f;
+
 /**
  * @author Overdhose
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
@@ -39,8 +41,8 @@ import org.terasology.rendering.gui.framework.events.ClickListener;
  */
 public class UIMenuConfigControls extends UIDisplayWindow {
 
-	String editButtonCurrent = "";
-	UIButton editButton = null;
+    String editButtonCurrent = "";
+    UIButton editButton = null;
     final UIImageOverlay overlay;
     final UIGraphicsElement title;
 
@@ -106,18 +108,19 @@ public class UIMenuConfigControls extends UIDisplayWindow {
     final UIText subtitle;
 
     public UIMenuConfigControls() {
+        setModal(true);
         maximize();
         
         ClickListener editButtonClick = new ClickListener() {
-			@Override
-			public void click(UIDisplayElement element, int button) {
-				if (editButton == null) {
-					editButton = (UIButton) element;
-					editButtonCurrent = editButton.getLabel().getText();
-					editButton.getLabel().setText("...");
-				}
-			}
-		};
+            @Override
+            public void click(UIDisplayElement element, int button) {
+                if (editButton == null) {
+                    editButton = (UIButton) element;
+                    editButtonCurrent = editButton.getLabel().getText();
+                    editButton.getLabel().setText("...");
+                }
+            }
+        };
 
         title = new UIGraphicsElement(AssetManager.loadTexture("engine:terasology"));
         title.setVisible(true);
@@ -132,21 +135,23 @@ public class UIMenuConfigControls extends UIDisplayWindow {
         _backToConfigMenuButton = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
         _backToConfigMenuButton.getLabel().setText("Back");
         _backToConfigMenuButton.setVisible(true);
+        _backToConfigMenuButton.addClickListener(new ClickListener() {
+            @Override
+            public void click(UIDisplayElement element, int button) {
+                GUIManager.getInstance().setFocusedWindow(GUIManager.getInstance().getWindowById("menuConfig"));
+            }
+        });
 
         ForwardButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
-        ForwardButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyForward()));
-		ForwardButton.addClickListener(editButtonClick);
+        ForwardButton.addClickListener(editButtonClick);
         ForwardButton.setVisible(true);
         BackwardButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
-        BackwardButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyBackward()));
         BackwardButton.addClickListener(editButtonClick);
         BackwardButton.setVisible(true);
         RightButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
-        RightButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyRight()));
         RightButton.addClickListener(editButtonClick);
         RightButton.setVisible(true);
         LeftButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
-        LeftButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyLeft()));
         LeftButton.addClickListener(editButtonClick);
         LeftButton.setVisible(true);
         //JumpbehaviourButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
@@ -154,143 +159,95 @@ public class UIMenuConfigControls extends UIDisplayWindow {
         //JumpbehaviourButton.addClickListener(editButtonClick);
         //JumpbehaviourButton.setVisible(true);
         AttackButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
-        AttackButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyAttack()));
         AttackButton.addClickListener(editButtonClick);
-        AttackButton.setVisible(true);
+        AttackButton.setVisible(true);  
         ConsoleButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
-        ConsoleButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyConsole()));
         ConsoleButton.addClickListener(editButtonClick);
         ConsoleButton.setVisible(true);
         CrouchButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
-        CrouchButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyCrouch()));
         CrouchButton.addClickListener(editButtonClick);
         CrouchButton.setVisible(true);
         ActivateButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);    // (frob)
-        ActivateButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyFrob()));
         ActivateButton.addClickListener(editButtonClick);
         ActivateButton.setVisible(true);
         HideguiButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
-        HideguiButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyHidegui()));
         HideguiButton.addClickListener(editButtonClick);
         HideguiButton.setVisible(true);
         InventoryButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
-        InventoryButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyInventory()));
         InventoryButton.addClickListener(editButtonClick);
         InventoryButton.setVisible(true);
         JumpButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
-        JumpButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyJump()));
         JumpButton.addClickListener(editButtonClick);
         JumpButton.setVisible(true);
         MinionmodeButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
-        MinionmodeButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyMinionmode()));
         MinionmodeButton.addClickListener(editButtonClick);
         MinionmodeButton.setVisible(true);
         PauseButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
-        PauseButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyPause()));
         PauseButton.addClickListener(editButtonClick);
         PauseButton.setVisible(true);
         RunButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
-        RunButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyRun()));
         RunButton.addClickListener(editButtonClick);
         RunButton.setVisible(true);
         ToolnextButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
-        ToolnextButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolnext()));
         ToolnextButton.addClickListener(editButtonClick);
         ToolnextButton.setVisible(true);
         ToolprevButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
-        ToolprevButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolprev()));
         ToolprevButton.addClickListener(editButtonClick);
         ToolprevButton.setVisible(true);
         Toolslot1Button = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
-        Toolslot1Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot1()));
         Toolslot1Button.addClickListener(editButtonClick);
         Toolslot1Button.setVisible(true);
         Toolslot2Button = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
-        Toolslot2Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot2()));
         Toolslot2Button.addClickListener(editButtonClick);
         Toolslot2Button.setVisible(true);
         Toolslot3Button = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
-        Toolslot3Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot3()));
         Toolslot3Button.addClickListener(editButtonClick);
         Toolslot3Button.setVisible(true);
         Toolslot4Button = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
-        Toolslot4Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot4()));
         Toolslot4Button.addClickListener(editButtonClick);
         Toolslot4Button.setVisible(true);
         Toolslot5Button = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
-        Toolslot5Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot5()));
         Toolslot5Button.addClickListener(editButtonClick);
         Toolslot5Button.setVisible(true);
         Toolslot6Button = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
-        Toolslot6Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot6()));
         Toolslot6Button.addClickListener(editButtonClick);
         Toolslot6Button.setVisible(true);
         Toolslot7Button = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
-        Toolslot7Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot7()));
         Toolslot7Button.addClickListener(editButtonClick);
         Toolslot7Button.setVisible(true);
         Toolslot8Button = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
-        Toolslot8Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot8()));
         Toolslot8Button.addClickListener(editButtonClick);
         Toolslot8Button.setVisible(true);
         Toolslot9Button = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
-        Toolslot9Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot9()));
         Toolslot9Button.addClickListener(editButtonClick);
         Toolslot9Button.setVisible(true);
         UsehelditemButton = new UIButton(new Vector2f(64f, 32f), UIButton.eButtonType.NORMAL);
-        UsehelditemButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyUsehelditem()));
         UsehelditemButton.addClickListener(editButtonClick);
         UsehelditemButton.setVisible(true);
         MouseSensitivity = new UISlider(new Vector2f(256f, 32f), 20, 150);
         MouseSensitivity.setVisible(true);
         MouseSensitivity.addChangedListener(new ChangedListener() {
-			@Override
-			public void changed(UIDisplayElement element) {
-				UISlider slider = (UISlider) element;
-				slider.setText("Mouse Sensitivity: " + String.valueOf(slider.getValue()));
-				Config.getInstance().setMouseSens((float)slider.getValue() / 1000f);
-			}
-		});
+            @Override
+            public void changed(UIDisplayElement element) {
+                UISlider slider = (UISlider) element;
+                slider.setText("Mouse Sensitivity: " + String.valueOf(slider.getValue()));
+                Config.getInstance().setMouseSens((float)slider.getValue() / 1000f);
+            }
+        });
         MouseSensitivity.setValue((int) (Config.getInstance().getMouseSens() * 1000));
         defaultButton = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
         defaultButton.getLabel().setText("Default");
         defaultButton.setVisible(true);
-        defaultButton.addClickListener(new ClickListener() {	
-			@Override
-			public void click(UIDisplayElement element, int button) {
-				InputConfig.getInstance().loadDefaultConfig();
-				Config.getInstance().setMouseSens(0.075f);
-				
-		        ForwardButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyForward()));
-		        BackwardButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyBackward()));
-		        RightButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyRight()));
-		        LeftButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyLeft()));
-		        //JumpbehaviourButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyJumpbehaviour()));
-		        AttackButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyAttack()));
-		        ConsoleButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyConsole()));
-		        CrouchButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyCrouch()));
-		        ActivateButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyFrob()));
-		        HideguiButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyHidegui()));
-		        InventoryButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyInventory()));
-		        JumpButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyJump()));
-		        MinionmodeButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyMinionmode()));
-		        PauseButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyPause()));
-		        RunButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyRun()));
-		        ToolnextButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolnext()));
-		        ToolprevButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolprev()));
-		        Toolslot1Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot1()));
-		        Toolslot2Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot2()));
-		        Toolslot3Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot3()));
-		        Toolslot4Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot4()));
-		        Toolslot5Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot5()));
-		        Toolslot6Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot6()));
-		        Toolslot7Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot7()));
-		        Toolslot8Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot8()));
-		        Toolslot9Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot9()));
-		        UsehelditemButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyUsehelditem()));
-		        MouseSensitivity.setValue((int) (Config.getInstance().getMouseSens() * 1000));
-			}
-		});
+        defaultButton.addClickListener(new ClickListener() {    
+            @Override
+            public void click(UIDisplayElement element, int button) {
+                InputConfig.getInstance().loadDefaultConfig();
+                Config.getInstance().setMouseSens(0.075f);
+                
+                setup();
+                MouseSensitivity.setValue((int) (Config.getInstance().getMouseSens() * 1000));
+            }
+        });
 
         ForwardButtontext = new UIText("Forward");
         BackwardButtontext = new UIText("Backward");
@@ -418,272 +375,272 @@ public class UIMenuConfigControls extends UIDisplayWindow {
     }
     
     @Override
-    public void processKeyboardInput(int key) {
-    	if (editButton != null) {
-    		changeButton(editButton, key);
-    		editButton = null;
-    	}
-    	
-    	super.processKeyboardInput(key);
+    public void processKeyboardInput(KeyEvent event) {
+        super.processKeyboardInput(event);
+        
+        if (editButton != null) {
+            changeButton(editButton, event.getKey());
+            editButton = null;
+        }
     }
 
-	@Override
+    @Override
     public void processMouseInput(int button, boolean state, int wheelMoved) {
-    	if (editButton != null) {
-    		int key = -1;
-    		if (button == 0)
-    			key = 256;
-    		else if (button == 1)
-    			key = 257;
-    		else if (button == 2)
-    			key = 258;
-    		else if (wheelMoved > 0)
-    			key = 259;
-    		else if (wheelMoved < 0)
-    			key = 260;
-    		
-    		if (key != -1) {
-    			changeButton(editButton, key);
-	    		editButton = null;
-    		}
-    	}
-    	
-    	super.processMouseInput(button, state, wheelMoved);
+        if (editButton != null) {
+            int key = -1;
+            if (button == 0)
+                key = 256;
+            else if (button == 1)
+                key = 257;
+            else if (button == 2)
+                key = 258;
+            else if (wheelMoved > 0)
+                key = 259;
+            else if (wheelMoved < 0)
+                key = 260;
+            
+            if (key != -1) {
+                changeButton(editButton, key);
+                editButton = null;
+            }
+        }
+        
+        super.processMouseInput(button, state, wheelMoved);
     }
-	
+    
     private void changeButton(UIButton button, int key) {
-		if (button == ForwardButton)
-			InputConfig.getInstance().setKeyForward(key);
-		else if (button == BackwardButton)
-			InputConfig.getInstance().setKeyBackward(key);
-		else if (button == RightButton)
-			InputConfig.getInstance().setKeyRight(key);
-		else if (button == LeftButton)
-			InputConfig.getInstance().setKeyLeft(key);
-		//else if (button == JumpbehaviourButton)
-		//	InputConfig.getInstance().setKeyJumpbehaviour(key);
-		else if (button == AttackButton)
-			InputConfig.getInstance().setKeyAttack(key);
-		else if (button == ConsoleButton)
-			InputConfig.getInstance().setKeyConsole(key);
-		else if (button == CrouchButton)
-			InputConfig.getInstance().setKeyCrouch(key);
-		else if (button == ActivateButton)
-			InputConfig.getInstance().setKeyForward(key);
-		else if (button == HideguiButton)
-			InputConfig.getInstance().setKeyHidegui(key);
-		else if (button == InventoryButton)
-			InputConfig.getInstance().setKeyInventory(key);
-		else if (button == JumpButton)
-			InputConfig.getInstance().setKeyJump(key);
-		else if (button == MinionmodeButton)
-			InputConfig.getInstance().setKeyMinionmode(key);
-		else if (button == PauseButton)
-			InputConfig.getInstance().setKeyPause(key);
-		else if (button == RunButton)
-			InputConfig.getInstance().setKeyRun(key);
-		else if (button == ToolnextButton)
-			InputConfig.getInstance().setKeyToolnext(key);
-		else if (button == ToolprevButton)
-			InputConfig.getInstance().setKeyToolprev(key);
-		else if (button == Toolslot1Button)
-			InputConfig.getInstance().setKeyToolslot1(key);
-		else if (button == Toolslot2Button)
-			InputConfig.getInstance().setKeyToolslot2(key);
-		else if (button == Toolslot3Button)
-			InputConfig.getInstance().setKeyToolslot3(key);
-		else if (button == Toolslot4Button)
-			InputConfig.getInstance().setKeyToolslot4(key);
-		else if (button == Toolslot5Button)
-			InputConfig.getInstance().setKeyToolslot5(key);
-		else if (button == Toolslot6Button)
-			InputConfig.getInstance().setKeyToolslot6(key);
-		else if (button == Toolslot7Button)
-			InputConfig.getInstance().setKeyToolslot7(key);
-		else if (button == Toolslot8Button)
-			InputConfig.getInstance().setKeyToolslot8(key);
-		else if (button == Toolslot9Button)
-			InputConfig.getInstance().setKeyToolslot9(key);
-		else if (button == UsehelditemButton)
-			InputConfig.getInstance().setKeyUsehelditem(key);
-		else {
-			editButton.getLabel().setText(editButtonCurrent);
-			return;
-		}
-		
-		editButton.getLabel().setText(keyToStrShort(key));
-	}
+        if (button == ForwardButton)
+            InputConfig.getInstance().setKeyForward(key);
+        else if (button == BackwardButton)
+            InputConfig.getInstance().setKeyBackward(key);
+        else if (button == RightButton)
+            InputConfig.getInstance().setKeyRight(key);
+        else if (button == LeftButton)
+            InputConfig.getInstance().setKeyLeft(key);
+        //else if (button == JumpbehaviourButton)
+        //    InputConfig.getInstance().setKeyJumpbehaviour(key);
+        else if (button == AttackButton)
+            InputConfig.getInstance().setKeyAttack(key);
+        else if (button == ConsoleButton)
+            InputConfig.getInstance().setKeyConsole(key);
+        else if (button == CrouchButton)
+            InputConfig.getInstance().setKeyCrouch(key);
+        else if (button == ActivateButton)
+            InputConfig.getInstance().setKeyForward(key);
+        else if (button == HideguiButton)
+            InputConfig.getInstance().setKeyHidegui(key);
+        else if (button == InventoryButton)
+            InputConfig.getInstance().setKeyInventory(key);
+        else if (button == JumpButton)
+            InputConfig.getInstance().setKeyJump(key);
+        else if (button == MinionmodeButton)
+            InputConfig.getInstance().setKeyMinionmode(key);
+        else if (button == PauseButton)
+            InputConfig.getInstance().setKeyPause(key);
+        else if (button == RunButton)
+            InputConfig.getInstance().setKeyRun(key);
+        else if (button == ToolnextButton)
+            InputConfig.getInstance().setKeyToolnext(key);
+        else if (button == ToolprevButton)
+            InputConfig.getInstance().setKeyToolprev(key);
+        else if (button == Toolslot1Button)
+            InputConfig.getInstance().setKeyToolslot1(key);
+        else if (button == Toolslot2Button)
+            InputConfig.getInstance().setKeyToolslot2(key);
+        else if (button == Toolslot3Button)
+            InputConfig.getInstance().setKeyToolslot3(key);
+        else if (button == Toolslot4Button)
+            InputConfig.getInstance().setKeyToolslot4(key);
+        else if (button == Toolslot5Button)
+            InputConfig.getInstance().setKeyToolslot5(key);
+        else if (button == Toolslot6Button)
+            InputConfig.getInstance().setKeyToolslot6(key);
+        else if (button == Toolslot7Button)
+            InputConfig.getInstance().setKeyToolslot7(key);
+        else if (button == Toolslot8Button)
+            InputConfig.getInstance().setKeyToolslot8(key);
+        else if (button == Toolslot9Button)
+            InputConfig.getInstance().setKeyToolslot9(key);
+        else if (button == UsehelditemButton)
+            InputConfig.getInstance().setKeyUsehelditem(key);
+        else {
+            editButton.getLabel().setText(editButtonCurrent);
+            return;
+        }
+        
+        editButton.getLabel().setText(keyToStrShort(key));
+    }
 
     @Override
     public void layout() {
         super.layout();
 
         if (subtitle != null) {
-	        float center = Display.getWidth() / 2;
-	        float rowWidth = 110;
-	        float marginTextTop = 7;
-	        
-	        subtitle.centerHorizontally();
-	        subtitle.getPosition().y = 130f;
-	
-	        //row 1	        
-	        ForwardButtontext.getPosition().x = center - 4 * rowWidth;
-	        ForwardButtontext.getPosition().y = 200f + marginTextTop;
-	        ForwardButton.getPosition().x = center - 3 * rowWidth;
-	        ForwardButton.getPosition().y = 200f;
-	
-	        BackwardButtontext.getPosition().x = center - 4 * rowWidth;
-	        BackwardButtontext.getPosition().y = 200f + 40f + marginTextTop;
-	        BackwardButton.getPosition().x = center - 3 * rowWidth;
-	        BackwardButton.getPosition().y = 200f + 40f;
-	
-	        LeftButtontext.getPosition().x = center - 4 * rowWidth;
-	        LeftButtontext.getPosition().y = 200f + 2 * 40f + marginTextTop;
-	        LeftButton.getPosition().x = center - 3 * rowWidth;
-	        LeftButton.getPosition().y = 200f + 2 * 40f;
-	
-	        RightButtontext.getPosition().x = center - 4 * rowWidth;
-	        RightButtontext.getPosition().y = 200f + 3 * 40f + marginTextTop;
-	        RightButton.getPosition().x = center - 3 * rowWidth;
-	        RightButton.getPosition().y = 200f + 3 * 40f;
-	
-	
-	        AttackButtontext.getPosition().x = center - 4 * rowWidth;
-	        AttackButtontext.getPosition().y = 200f + 5 * 40f + marginTextTop;
-	        AttackButton.getPosition().x = center - 3 * rowWidth;
-	        AttackButton.getPosition().y = 200f + 5 * 40f;
-	
-	        UsehelditemButtontext.getPosition().x = center - 4 * rowWidth;
-	        UsehelditemButtontext.getPosition().y = 200f + 6 * 40f + marginTextTop;
-	        UsehelditemButton.getPosition().x = center - 3 * rowWidth;
-	        UsehelditemButton.getPosition().y = 200f + 6 * 40f;
-	
-	        ToolnextButtontext.getPosition().x = center - 4 * rowWidth;
-	        ToolnextButtontext.getPosition().y = 200f + 7 * 40f + marginTextTop;
-	        ToolnextButton.getPosition().x = center - 3 * rowWidth;
-	        ToolnextButton.getPosition().y = 200f + 7 * 40f;
-	
-	        ToolprevButtontext.getPosition().x = center - 4 * rowWidth;
-	        ToolprevButtontext.getPosition().y = 200f + 8 * 40f + marginTextTop;
-	        ToolprevButton.getPosition().x = center - 3 * rowWidth;
-	        ToolprevButton.getPosition().y = 200f + 8 * 40f;
-	
-	        //row 2
-	        ActivateButtontext.getPosition().x = center - 2 * rowWidth;   // (frob)
-	        ActivateButtontext.getPosition().y = 200f + marginTextTop;   // (frob)
-	        ActivateButton.getPosition().x = center - rowWidth;    // (frob)
-	        ActivateButton.getPosition().y = 200f;    // (frob)
-	
-	        InventoryButtontext.getPosition().x = center - 2 * rowWidth;
-	        InventoryButtontext.getPosition().y = 200f + 40f + marginTextTop;
-	        InventoryButton.getPosition().x = center - rowWidth;
-	        InventoryButton.getPosition().y = 200f + 40f;
-	
-	        JumpButtontext.getPosition().x = center - 2 * rowWidth;
-	        JumpButtontext.getPosition().y = 200f + 3 * 40f + marginTextTop;
-	        JumpButton.getPosition().x = center - rowWidth;
-	        JumpButton.getPosition().y = 200f + 3 * 40f;
-	
-	        RunButtontext.getPosition().x = center - 2 * rowWidth;
-	        RunButtontext.getPosition().y = 200f + 4 * 40f + marginTextTop;
-	        RunButton.getPosition().x = center - rowWidth;
-	        RunButton.getPosition().y = 200f + 4 * 40f;
-	
-	        CrouchButtontext.getPosition().x = center - 2 * rowWidth;
-	        CrouchButtontext.getPosition().y = 200f + 5 * 40f + marginTextTop;
-	        CrouchButton.getPosition().x = center - rowWidth;
-	        CrouchButton.getPosition().y = 200f + 5 * 40f;
-	
-	        PauseButtontext.getPosition().x = center - 2 * rowWidth;
-	        PauseButtontext.getPosition().y = 200f + 7 * 40f + marginTextTop;
-	        PauseButton.getPosition().x = center - rowWidth;
-	        PauseButton.getPosition().y = 200f + 7 * 40f;
-	
-	        ConsoleButtontext.getPosition().x = center - 2 * rowWidth;
-	        ConsoleButtontext.getPosition().y = 200f + 8 * 40f + marginTextTop;
-	        ConsoleButton.getPosition().x = center - rowWidth;
-	        ConsoleButton.getPosition().y = 200f + 8 * 40f;
-	        
-	        //row 3
-	        HideguiButtontext.getPosition().x = center;
-	        HideguiButtontext.getPosition().y = 200f + marginTextTop;
-	        HideguiButton.getPosition().x = center + rowWidth;
-	        HideguiButton.getPosition().y = 200f;
-	
-	        //JumpbehaviourButtontext.getPosition().x = center;
-	        //JumpbehaviourButtontext.getPosition().y = 200f + 40f + marginTextTop;
-	        //JumpbehaviourButton.getPosition().x = center + rowWidth;
-	        //JumpbehaviourButton.getPosition().y = 200f + 40f;
-	
-	        MinionmodeButtontext.getPosition().x = center;
-	        MinionmodeButtontext.getPosition().y = 200f + 40f + marginTextTop;
-	        MinionmodeButton.getPosition().x = center + rowWidth;
-	        MinionmodeButton.getPosition().y = 200f + 40f;
-	        
-	        //row 4
-	        Toolslot1Buttontext.getPosition().x = center + 2 * rowWidth;
-	        Toolslot1Buttontext.getPosition().y = 200f + marginTextTop;
-	        Toolslot1Button.getPosition().x = center + 3 * rowWidth;
-	        Toolslot1Button.getPosition().y = 200f;
-	        
-	        Toolslot2Buttontext.getPosition().x = center + 2 * rowWidth;
-	        Toolslot2Buttontext.getPosition().y = 200f + 40f + marginTextTop;
-	        Toolslot2Button.getPosition().x = center + 3 * rowWidth;
-	        Toolslot2Button.getPosition().y = 200f + 40f;
-	        
-	        Toolslot3Buttontext.getPosition().x = center + 2 * rowWidth;
-	        Toolslot3Buttontext.getPosition().y = 200f + 2 * 40f + marginTextTop;
-	        Toolslot3Button.getPosition().x = center + 3 * rowWidth;
-	        Toolslot3Button.getPosition().y = 200f + 2 * 40f;
-	        
-	        Toolslot4Buttontext.getPosition().x = center + 2 * rowWidth;
-	        Toolslot4Buttontext.getPosition().y = 200f + 3 * 40f + marginTextTop;
-	        Toolslot4Button.getPosition().x = center + 3 * rowWidth;
-	        Toolslot4Button.getPosition().y = 200f + 3 * 40f;
-	        
-	        Toolslot5Buttontext.getPosition().x = center + 2 * rowWidth;
-	        Toolslot5Buttontext.getPosition().y = 200f + 4 * 40f + marginTextTop;
-	        Toolslot5Button.getPosition().x = center + 3 * rowWidth;
-	        Toolslot5Button.getPosition().y = 200f + 4 * 40f;
-	        
-	        Toolslot6Buttontext.getPosition().x = center + 2 * rowWidth;
-	        Toolslot6Buttontext.getPosition().y = 200f + 5 * 40f + marginTextTop;
-	        Toolslot6Button.getPosition().x = center + 3 * rowWidth;
-	        Toolslot6Button.getPosition().y = 200f + 5 * 40f;
-	        
-	        Toolslot7Buttontext.getPosition().x = center + 2 * rowWidth;
-	        Toolslot7Buttontext.getPosition().y = 200f + 6 * 40f + marginTextTop;
-	        Toolslot7Button.getPosition().x = center + 3 * rowWidth;
-	        Toolslot7Button.getPosition().y = 200f + 6 * 40f;
-	        
-	        Toolslot8Buttontext.getPosition().x = center + 2 * rowWidth;
-	        Toolslot8Buttontext.getPosition().y = 200f + 7 * 40f + marginTextTop;
-	        Toolslot8Button.getPosition().x = center + 3 * rowWidth;
-	        Toolslot8Button.getPosition().y = 200f + 7 * 40f;
-	        
-	        Toolslot9Buttontext.getPosition().x = center + 2 * rowWidth;
-	        Toolslot9Buttontext.getPosition().y = 200f + 8 * 40f + marginTextTop;
-	        Toolslot9Button.getPosition().x = center + 3 * rowWidth;
-	        Toolslot9Button.getPosition().y = 200f + 8 * 40f;
-	
-	        MouseSensitivity.getPosition().x = center - 4 * rowWidth;
-	        MouseSensitivity.getPosition().y = 300f + 7 * 40f;
-	        
-	        defaultButton.getPosition().x = center + 2 * rowWidth - 100;
-	        defaultButton.getPosition().y =  300f + 7 * 40f;
-	        
-	        _backToConfigMenuButton.getPosition().x = center + 3 * rowWidth - 64;
-	        _backToConfigMenuButton.getPosition().y = 300f + 7 * 40f;
-	
-	        title.centerHorizontally();
-	        title.getPosition().y = 28f;
+            float center = Display.getWidth() / 2;
+            float rowWidth = 110;
+            float marginTextTop = 7;
+            
+            subtitle.centerHorizontally();
+            subtitle.getPosition().y = 130f;
+    
+            //row 1            
+            ForwardButtontext.getPosition().x = center - 4 * rowWidth;
+            ForwardButtontext.getPosition().y = 200f + marginTextTop;
+            ForwardButton.getPosition().x = center - 3 * rowWidth;
+            ForwardButton.getPosition().y = 200f;
+    
+            BackwardButtontext.getPosition().x = center - 4 * rowWidth;
+            BackwardButtontext.getPosition().y = 200f + 40f + marginTextTop;
+            BackwardButton.getPosition().x = center - 3 * rowWidth;
+            BackwardButton.getPosition().y = 200f + 40f;
+    
+            LeftButtontext.getPosition().x = center - 4 * rowWidth;
+            LeftButtontext.getPosition().y = 200f + 2 * 40f + marginTextTop;
+            LeftButton.getPosition().x = center - 3 * rowWidth;
+            LeftButton.getPosition().y = 200f + 2 * 40f;
+    
+            RightButtontext.getPosition().x = center - 4 * rowWidth;
+            RightButtontext.getPosition().y = 200f + 3 * 40f + marginTextTop;
+            RightButton.getPosition().x = center - 3 * rowWidth;
+            RightButton.getPosition().y = 200f + 3 * 40f;
+    
+    
+            AttackButtontext.getPosition().x = center - 4 * rowWidth;
+            AttackButtontext.getPosition().y = 200f + 5 * 40f + marginTextTop;
+            AttackButton.getPosition().x = center - 3 * rowWidth;
+            AttackButton.getPosition().y = 200f + 5 * 40f;
+    
+            UsehelditemButtontext.getPosition().x = center - 4 * rowWidth;
+            UsehelditemButtontext.getPosition().y = 200f + 6 * 40f + marginTextTop;
+            UsehelditemButton.getPosition().x = center - 3 * rowWidth;
+            UsehelditemButton.getPosition().y = 200f + 6 * 40f;
+    
+            ToolnextButtontext.getPosition().x = center - 4 * rowWidth;
+            ToolnextButtontext.getPosition().y = 200f + 7 * 40f + marginTextTop;
+            ToolnextButton.getPosition().x = center - 3 * rowWidth;
+            ToolnextButton.getPosition().y = 200f + 7 * 40f;
+    
+            ToolprevButtontext.getPosition().x = center - 4 * rowWidth;
+            ToolprevButtontext.getPosition().y = 200f + 8 * 40f + marginTextTop;
+            ToolprevButton.getPosition().x = center - 3 * rowWidth;
+            ToolprevButton.getPosition().y = 200f + 8 * 40f;
+    
+            //row 2
+            ActivateButtontext.getPosition().x = center - 2 * rowWidth;   // (frob)
+            ActivateButtontext.getPosition().y = 200f + marginTextTop;   // (frob)
+            ActivateButton.getPosition().x = center - rowWidth;    // (frob)
+            ActivateButton.getPosition().y = 200f;    // (frob)
+    
+            InventoryButtontext.getPosition().x = center - 2 * rowWidth;
+            InventoryButtontext.getPosition().y = 200f + 40f + marginTextTop;
+            InventoryButton.getPosition().x = center - rowWidth;
+            InventoryButton.getPosition().y = 200f + 40f;
+    
+            JumpButtontext.getPosition().x = center - 2 * rowWidth;
+            JumpButtontext.getPosition().y = 200f + 3 * 40f + marginTextTop;
+            JumpButton.getPosition().x = center - rowWidth;
+            JumpButton.getPosition().y = 200f + 3 * 40f;
+    
+            RunButtontext.getPosition().x = center - 2 * rowWidth;
+            RunButtontext.getPosition().y = 200f + 4 * 40f + marginTextTop;
+            RunButton.getPosition().x = center - rowWidth;
+            RunButton.getPosition().y = 200f + 4 * 40f;
+    
+            CrouchButtontext.getPosition().x = center - 2 * rowWidth;
+            CrouchButtontext.getPosition().y = 200f + 5 * 40f + marginTextTop;
+            CrouchButton.getPosition().x = center - rowWidth;
+            CrouchButton.getPosition().y = 200f + 5 * 40f;
+    
+            PauseButtontext.getPosition().x = center - 2 * rowWidth;
+            PauseButtontext.getPosition().y = 200f + 7 * 40f + marginTextTop;
+            PauseButton.getPosition().x = center - rowWidth;
+            PauseButton.getPosition().y = 200f + 7 * 40f;
+    
+            ConsoleButtontext.getPosition().x = center - 2 * rowWidth;
+            ConsoleButtontext.getPosition().y = 200f + 8 * 40f + marginTextTop;
+            ConsoleButton.getPosition().x = center - rowWidth;
+            ConsoleButton.getPosition().y = 200f + 8 * 40f;
+            
+            //row 3
+            HideguiButtontext.getPosition().x = center;
+            HideguiButtontext.getPosition().y = 200f + marginTextTop;
+            HideguiButton.getPosition().x = center + rowWidth;
+            HideguiButton.getPosition().y = 200f;
+    
+            //JumpbehaviourButtontext.getPosition().x = center;
+            //JumpbehaviourButtontext.getPosition().y = 200f + 40f + marginTextTop;
+            //JumpbehaviourButton.getPosition().x = center + rowWidth;
+            //JumpbehaviourButton.getPosition().y = 200f + 40f;
+    
+            MinionmodeButtontext.getPosition().x = center;
+            MinionmodeButtontext.getPosition().y = 200f + 40f + marginTextTop;
+            MinionmodeButton.getPosition().x = center + rowWidth;
+            MinionmodeButton.getPosition().y = 200f + 40f;
+            
+            //row 4
+            Toolslot1Buttontext.getPosition().x = center + 2 * rowWidth;
+            Toolslot1Buttontext.getPosition().y = 200f + marginTextTop;
+            Toolslot1Button.getPosition().x = center + 3 * rowWidth;
+            Toolslot1Button.getPosition().y = 200f;
+            
+            Toolslot2Buttontext.getPosition().x = center + 2 * rowWidth;
+            Toolslot2Buttontext.getPosition().y = 200f + 40f + marginTextTop;
+            Toolslot2Button.getPosition().x = center + 3 * rowWidth;
+            Toolslot2Button.getPosition().y = 200f + 40f;
+            
+            Toolslot3Buttontext.getPosition().x = center + 2 * rowWidth;
+            Toolslot3Buttontext.getPosition().y = 200f + 2 * 40f + marginTextTop;
+            Toolslot3Button.getPosition().x = center + 3 * rowWidth;
+            Toolslot3Button.getPosition().y = 200f + 2 * 40f;
+            
+            Toolslot4Buttontext.getPosition().x = center + 2 * rowWidth;
+            Toolslot4Buttontext.getPosition().y = 200f + 3 * 40f + marginTextTop;
+            Toolslot4Button.getPosition().x = center + 3 * rowWidth;
+            Toolslot4Button.getPosition().y = 200f + 3 * 40f;
+            
+            Toolslot5Buttontext.getPosition().x = center + 2 * rowWidth;
+            Toolslot5Buttontext.getPosition().y = 200f + 4 * 40f + marginTextTop;
+            Toolslot5Button.getPosition().x = center + 3 * rowWidth;
+            Toolslot5Button.getPosition().y = 200f + 4 * 40f;
+            
+            Toolslot6Buttontext.getPosition().x = center + 2 * rowWidth;
+            Toolslot6Buttontext.getPosition().y = 200f + 5 * 40f + marginTextTop;
+            Toolslot6Button.getPosition().x = center + 3 * rowWidth;
+            Toolslot6Button.getPosition().y = 200f + 5 * 40f;
+            
+            Toolslot7Buttontext.getPosition().x = center + 2 * rowWidth;
+            Toolslot7Buttontext.getPosition().y = 200f + 6 * 40f + marginTextTop;
+            Toolslot7Button.getPosition().x = center + 3 * rowWidth;
+            Toolslot7Button.getPosition().y = 200f + 6 * 40f;
+            
+            Toolslot8Buttontext.getPosition().x = center + 2 * rowWidth;
+            Toolslot8Buttontext.getPosition().y = 200f + 7 * 40f + marginTextTop;
+            Toolslot8Button.getPosition().x = center + 3 * rowWidth;
+            Toolslot8Button.getPosition().y = 200f + 7 * 40f;
+            
+            Toolslot9Buttontext.getPosition().x = center + 2 * rowWidth;
+            Toolslot9Buttontext.getPosition().y = 200f + 8 * 40f + marginTextTop;
+            Toolslot9Button.getPosition().x = center + 3 * rowWidth;
+            Toolslot9Button.getPosition().y = 200f + 8 * 40f;
+    
+            MouseSensitivity.getPosition().x = center - 4 * rowWidth;
+            MouseSensitivity.getPosition().y = 300f + 7 * 40f;
+            
+            defaultButton.getPosition().x = center + 2 * rowWidth - 100;
+            defaultButton.getPosition().y =  300f + 7 * 40f;
+            
+            _backToConfigMenuButton.getPosition().x = center + 3 * rowWidth - 64;
+            _backToConfigMenuButton.getPosition().y = 300f + 7 * 40f;
+    
+            title.centerHorizontally();
+            title.getPosition().y = 28f;
         }
     }
     
     
     private String keyToStrShort(int key) {
-    	if (key < 256) {
-    		//replace the names of the buttons which are to long with shorter names here.. i am just to lazy :D
+        if (key < 256) {
+            //replace the names of the buttons which are to long with shorter names here.. i am just to lazy :D
             return Keyboard.getKeyName(key);
         } else {
             if (key == 256) {
@@ -700,5 +657,34 @@ public class UIMenuConfigControls extends UIDisplayWindow {
                 return "MOVE";
             }
         }
+    }
+
+    public void setup() {
+        ForwardButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyForward()));
+        BackwardButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyBackward()));
+        RightButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyRight()));
+        LeftButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyLeft()));
+        AttackButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyAttack()));
+        ConsoleButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyConsole()));
+        CrouchButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyCrouch()));
+        ActivateButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyFrob()));
+        HideguiButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyHidegui()));
+        InventoryButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyInventory()));
+        JumpButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyJump()));
+        MinionmodeButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyMinionmode()));
+        PauseButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyPause()));
+        RunButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyRun()));
+        ToolnextButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolnext()));
+        ToolprevButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolprev()));
+        Toolslot1Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot1()));
+        Toolslot2Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot2()));
+        Toolslot3Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot3()));
+        Toolslot4Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot4()));
+        Toolslot5Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot5()));
+        Toolslot6Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot6()));
+        Toolslot7Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot7()));
+        Toolslot8Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot8()));
+        Toolslot9Button.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyToolslot9()));
+        UsehelditemButton.getLabel().setText(keyToStrShort(InputConfig.getInstance().getKeyUsehelditem()));
     }
 }

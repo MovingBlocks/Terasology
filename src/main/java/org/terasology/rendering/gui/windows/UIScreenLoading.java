@@ -34,6 +34,9 @@ public class UIScreenLoading extends UIDisplayWindow {
     final UIProgressBar _progressBar;
 
     public UIScreenLoading() {
+        setModal(true);
+        setVisible(true);
+        
         _overlay = new UIImageOverlay(AssetManager.loadTexture("engine:loadingBackground"));
         _overlay.setVisible(true);
 
@@ -44,7 +47,7 @@ public class UIScreenLoading extends UIDisplayWindow {
         addDisplayElement(_progressBar);
 
         layout();
-        setVisible(true);
+
     }
 
     @Override
@@ -52,7 +55,7 @@ public class UIScreenLoading extends UIDisplayWindow {
         super.layout();
 
         if (_progressBar != null) {
-        	_progressBar.setPosition(new Vector2f(_progressBar.calcCenterPosition().x, Display.getHeight() - 84.0f));
+            _progressBar.setPosition(new Vector2f(_progressBar.calcCenterPosition().x, Display.getHeight() - 84.0f));
         }
     }
 

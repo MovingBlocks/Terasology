@@ -23,6 +23,10 @@ import org.terasology.rendering.gui.components.UIScrollBar;
 import org.terasology.rendering.gui.framework.events.ScrollListener;
 
 
+/**
+ * 
+ * TODO clean this up. get rid of the code in the update function, use events instead.
+ */
 public class UIScrollableDisplayContainer extends UIDisplayContainer {
 
     /*

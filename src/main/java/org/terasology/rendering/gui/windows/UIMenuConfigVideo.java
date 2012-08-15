@@ -15,11 +15,10 @@
  */
 package org.terasology.rendering.gui.windows;
 
-import javax.vecmath.Vector2f;
-
 import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetManager;
 import org.terasology.logic.manager.Config;
+import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIImageOverlay;
@@ -32,6 +31,8 @@ import org.terasology.rendering.gui.framework.UIGraphicsElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.StateButtonAction;
+
+import javax.vecmath.Vector2f;
 
 /**
  * @author Overdhose
@@ -67,7 +68,9 @@ public class UIMenuConfigVideo extends UIDisplayWindow {
     };
 
     public UIMenuConfigVideo() {
+    	setModal(true);
         maximize();
+        
         _title = new UIGraphicsElement(AssetManager.loadTexture("engine:terasology"));
         _title.setVisible(true);
         _title.setSize(new Vector2f(512f, 128f));
@@ -203,6 +206,12 @@ public class UIMenuConfigVideo extends UIDisplayWindow {
         _backToConfigMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _backToConfigMenuButton.getLabel().setText("Back");
         _backToConfigMenuButton.setVisible(true);
+        _backToConfigMenuButton.addClickListener(new ClickListener() {
+			@Override
+			public void click(UIDisplayElement element, int button) {
+				GUIManager.getInstance().setFocusedWindow(GUIManager.getInstance().getWindowById("menuConfig"));
+			}
+		});
 
         addDisplayElement(_overlay);
         addDisplayElement(_title);
@@ -259,4 +268,35 @@ public class UIMenuConfigVideo extends UIDisplayWindow {
 	        _backToConfigMenuButton.getPosition().y = 300f + 7 * 40f;
         }
     }
+    
+    public void setup() {
+        _fovButton.setValue((int)Config.getInstance().getFov());
+        _viewingDistanceButton.setState(Config.getInstance().getActiveViewingDistanceId());
+        _blurIntensityButton.setState(Config.getInstance().getBlurIntensity());
+    	
+    	if (Config.getInstance().isEnablePostProcessingEffects() && Config.getInstance().isFlickeringLight())
+            _graphicsQualityButton.setState(2);
+        else if (!Config.getInstance().isEnablePostProcessingEffects() && Config.getInstance().isFlickeringLight())
+        	_graphicsQualityButton.setState(1);
+        else
+        	_graphicsQualityButton.setState(0);
+        
+        if (Config.getInstance().isAnimatedGrass()) {
+            _animateGrassButton.setState(1);
+        } else {
+            _animateGrassButton.setState(0);
+        }
+
+        if (Config.getInstance().isComplexWater()) {
+            _reflectiveWaterButton.setState(1);
+        } else {
+            _reflectiveWaterButton.setState(0);
+        }
+
+        if (Config.getInstance().isCameraBobbing()) {
+            _bobbingButton.setState(1);
+        } else {
+            _bobbingButton.setState(0);
+        }
+	}
 }

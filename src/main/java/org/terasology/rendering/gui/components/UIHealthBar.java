@@ -62,20 +62,9 @@ public class UIHealthBar extends UIDisplayContainer implements EventHandlerSyste
         
         CoreRegistry.get(EventSystem.class).registerEventHandler(this);
     }
-
-	@Override
-	public void initialise() {
-		entityManager = CoreRegistry.get(EntityManager.class);
-	}
-
-	@Override
-	public void shutdown() {
-		
-	}
-	
-	@ReceiveEvent(components = {LocalPlayerComponent.class, HealthComponent.class})
-    public void onHealthChange(HealthChangedEvent event, EntityRef entityref) {    	
-        float healthRatio = (float) event.getCurrentHealth() / event.getMaxHealth();
+    
+	private void updateHealthBar(int currentHealth, int maxHealth) {
+        float healthRatio = (float) currentHealth / maxHealth;
 
         // Show/Hide hearts relatively to the available health points of the player
         for (int i = 0; i < 10; i++) {
@@ -105,6 +94,21 @@ public class UIHealthBar extends UIDisplayContainer implements EventHandlerSyste
                 	_hearts[i].getTextureOrigin().set(new Vector2f(52f / 256f, 0.0f));
             }
         }
+	}
+
+	@Override
+	public void initialise() {
+		entityManager = CoreRegistry.get(EntityManager.class);
+	}
+
+	@Override
+	public void shutdown() {
+		
+	}
+	
+	@ReceiveEvent(components = {LocalPlayerComponent.class, HealthComponent.class})
+    public void onHealthChange(HealthChangedEvent event, EntityRef entityref) {    	
+		updateHealthBar(event.getCurrentHealth(), event.getMaxHealth());
     }
 }
 

@@ -18,11 +18,14 @@ package org.terasology.rendering.gui.windows;
 import javax.vecmath.Vector2f;
 
 import org.terasology.asset.AssetManager;
+import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UIText;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import org.terasology.rendering.gui.framework.events.ClickListener;
 
 /**
  * Main menu screen.
@@ -43,7 +46,9 @@ public class UIMenuConfig extends UIDisplayWindow {
     private final UIButton _modsButton;
 
     public UIMenuConfig() {
+        setModal(true);
         maximize();
+        
         _title = new UIGraphicsElement(AssetManager.loadTexture("engine:terasology"));
         _title.setVisible(true);
         _title.setSize(new Vector2f(512f, 128f));
@@ -57,22 +62,52 @@ public class UIMenuConfig extends UIDisplayWindow {
         _videoButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _videoButton.getLabel().setText("Video");
         _videoButton.setVisible(true);
+        _videoButton.addClickListener(new ClickListener() {
+            @Override
+            public void click(UIDisplayElement element, int button) {
+                GUIManager.getInstance().setFocusedWindow(GUIManager.getInstance().getWindowById("menuConfigVideo"));
+            }
+        });
 
         _audioButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _audioButton.getLabel().setText("Audio");
         _audioButton.setVisible(true);
+        _audioButton.addClickListener(new ClickListener() {
+            @Override
+            public void click(UIDisplayElement element, int button) {
+                GUIManager.getInstance().setFocusedWindow(GUIManager.getInstance().getWindowById("menuConfigAudio"));
+            }
+        });
 
         _controlsButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _controlsButton.getLabel().setText("Controls");
         _controlsButton.setVisible(true);
+        _controlsButton.addClickListener(new ClickListener() {
+            @Override
+            public void click(UIDisplayElement element, int button) {
+                GUIManager.getInstance().setFocusedWindow(GUIManager.getInstance().getWindowById("menuConfigControls"));
+            }
+        });
 
         _modsButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _modsButton.getLabel().setText("Mods");
         _modsButton.setVisible(true);
+        _modsButton.addClickListener(new ClickListener() {
+            @Override
+            public void click(UIDisplayElement element, int button) {
+                GUIManager.getInstance().setFocusedWindow(GUIManager.getInstance().getWindowById("menuConfigMods"));
+            }
+        });
 
         _backToMainMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _backToMainMenuButton.getLabel().setText("Return to Main Menu");
         _backToMainMenuButton.setVisible(true);
+        _backToMainMenuButton.addClickListener(new ClickListener() {
+            @Override
+            public void click(UIDisplayElement element, int button) {
+                GUIManager.getInstance().setFocusedWindow(GUIManager.getInstance().getWindowById("menuMain"));
+            }
+        });
 
         addDisplayElement(_overlay);
         addDisplayElement(_title);
@@ -89,29 +124,29 @@ public class UIMenuConfig extends UIDisplayWindow {
     
     @Override
     public void layout() {
-    	super.layout();
-    	
-    	if (_version != null) {
-	        _version.centerHorizontally();
-	        _version.getPosition().y = 230f;
-	
-	        _videoButton.centerHorizontally();
-	        _videoButton.getPosition().y = 300f;
-	
-	        _audioButton.centerHorizontally();
-	        _audioButton.getPosition().y = 300f + 40f;
-	
-	        _controlsButton.centerHorizontally();
-	        _controlsButton.getPosition().y = 300f + 2 * 40f;
-	
-	        _modsButton.centerHorizontally();
-	        _modsButton.getPosition().y = 300f + 3 * 40f;
-	
-	        _backToMainMenuButton.centerHorizontally();
-	        _backToMainMenuButton.getPosition().y = 300f + 7 * 40f;
-	
-	        _title.centerHorizontally();
-	        _title.getPosition().y = 128f;
-    	}
+        super.layout();
+        
+        if (_version != null) {
+            _version.centerHorizontally();
+            _version.getPosition().y = 230f;
+    
+            _videoButton.centerHorizontally();
+            _videoButton.getPosition().y = 300f;
+    
+            _audioButton.centerHorizontally();
+            _audioButton.getPosition().y = 300f + 40f;
+    
+            _controlsButton.centerHorizontally();
+            _controlsButton.getPosition().y = 300f + 2 * 40f;
+    
+            _modsButton.centerHorizontally();
+            _modsButton.getPosition().y = 300f + 3 * 40f;
+    
+            _backToMainMenuButton.centerHorizontally();
+            _backToMainMenuButton.getPosition().y = 300f + 7 * 40f;
+    
+            _title.centerHorizontally();
+            _title.getPosition().y = 128f;
+        }
     }
 }

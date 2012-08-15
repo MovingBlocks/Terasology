@@ -15,77 +15,70 @@
  */
 package org.terasology.rendering.gui.windows;
 
+import javax.vecmath.Vector2f;
+
 import org.lwjgl.input.Keyboard;
 import org.terasology.events.RespawnEvent;
-import org.terasology.events.input.binds.PauseButton;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.modes.StateMainMenu;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.asset.AssetManager;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.components.UITransparentOverlay;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
-import org.terasology.rendering.gui.framework.UIGraphicsElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
-
-import javax.vecmath.Vector2f;
+import org.terasology.rendering.gui.framework.events.WindowListener;
 
 /**
- * Simple pause menu providing buttons for respawning the player and creating a new world.
+ * Simple status screen with one sole text label usable for status notifications.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
-public class UIMenuPause extends UIDisplayWindow {
+public class UIScreenDeath extends UIDisplayWindow {
 
-    final UITransparentOverlay _overlay;
-    final UIGraphicsElement _title;
+    private final UITransparentOverlay _overlay;
+    private final UIText _meassage;
+    private final UIButton _respawnButton;
+    private final UIButton _exitButton;
+    private final UIButton _mainMenuButton;
 
-    final UIButton _exitButton;
-    final UIButton _mainMenuButton;
-    final UIButton _respawnButton;
-    final UIButton _backToGameButton;
-
-    final UIText _version;
-
-    public UIMenuPause() {
-        setCloseBinds(new String[] {PauseButton.ID});
-        setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
+    public UIScreenDeath() {
         setModal(true);
+        setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
+        maximize();
         
-        _title = new UIGraphicsElement(AssetManager.loadTexture("engine:terasology"));
-        _title.setVisible(true);
-        _title.setSize(new Vector2f(512f, 128f));
-
-        _version = new UIText("Pre Alpha");
-        _version.setVisible(true);
-
-        _exitButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
-        _exitButton.getLabel().setText("Exit Terasology");
-        _exitButton.setVisible(true);
-
-        _exitButton.addClickListener(new ClickListener() {
+        addWindowListener(new WindowListener() {
             @Override
-            public void click(UIDisplayElement element, int button) {
-                CoreRegistry.get(GameEngine.class).shutdown();
+            public void open(UIDisplayElement element) {
+
+            }
+            
+            @Override
+            public void close(UIDisplayElement element) {
+                respawn();
             }
         });
+        
+        _meassage = new UIText("You are dead");
+        _meassage.setVisible(true);
 
+        _overlay = new UITransparentOverlay(200f, 0f, 0f, 0.25f);
+        _overlay.setVisible(true);
+        
         _respawnButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
-        _respawnButton.getLabel().setText("Respawn");
         _respawnButton.setVisible(true);
-
+        _respawnButton.getLabel().setText("Respawn");
         _respawnButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                CoreRegistry.get(LocalPlayer.class).getEntity().send(new RespawnEvent());
-                
+                respawn();
                 close(true);
             }
         });
-
+        
         _mainMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _mainMenuButton.getLabel().setText("Return to Main Menu");
         _mainMenuButton.setVisible(true);
@@ -96,41 +89,38 @@ public class UIMenuPause extends UIDisplayWindow {
             }
         });
 
-        _overlay = new UITransparentOverlay();
-        _overlay.setVisible(true);
 
-
-        _backToGameButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
-        _backToGameButton.getLabel().setText("Back to game");
-        _backToGameButton.setVisible(true);
-        _backToGameButton.addClickListener(new ClickListener() {
+        _exitButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
+        _exitButton.getLabel().setText("Exit Terasology");
+        _exitButton.setVisible(true);
+        _exitButton.addClickListener(new ClickListener() {
+            @Override
             public void click(UIDisplayElement element, int button) {
-                setVisible(false);
+                CoreRegistry.get(GameEngine.class).shutdown();
             }
         });
 
         addDisplayElement(_overlay);
-        addDisplayElement(_title);
-        addDisplayElement(_version);
+        addDisplayElement(_meassage);
         addDisplayElement(_exitButton);
         addDisplayElement(_respawnButton);
         addDisplayElement(_mainMenuButton);
-        addDisplayElement(_backToGameButton);
 
         layout();
+    }
+    
+    private void respawn() {
+        CoreRegistry.get(LocalPlayer.class).getEntity().send(new RespawnEvent());
     }
 
     @Override
     public void layout() {
         super.layout();
 
-        if (_version != null) {
-            _version.centerHorizontally();
-            _version.getPosition().y = 230f;
-
-            _backToGameButton.centerHorizontally();
-            _backToGameButton.getPosition().y = 300f;
-
+        if (_meassage != null) {
+        	_meassage.center();
+        	_meassage.getPosition().y -= 100;
+        	
             _respawnButton.centerHorizontally();
             _respawnButton.getPosition().y = 300f + 32f + 24f;
     
@@ -139,9 +129,11 @@ public class UIMenuPause extends UIDisplayWindow {
     
             _exitButton.centerHorizontally();
             _exitButton.getPosition().y = 300f + 3 * 32f + 24f + 8f;
-    
-            _title.centerHorizontally();
-            _title.getPosition().y = 128f;
         }
+    }
+
+    public void updateStatus(String string) {
+        _meassage.setText(string);
+        layout();
     }
 }

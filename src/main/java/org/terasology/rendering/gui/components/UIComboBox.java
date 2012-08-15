@@ -132,6 +132,7 @@ public class UIComboBox extends UIDisplayContainer {
 			public void click(UIDisplayElement element, int button) {
 				_opened = !_opened;
 				_baseList.setVisible(_opened);
+				_baseButton.setToggleState(false);
 			}
 		});
         _baseList.addChangedListener(new ChangedListener() {	

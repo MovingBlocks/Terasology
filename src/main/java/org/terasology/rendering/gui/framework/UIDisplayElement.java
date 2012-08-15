@@ -25,6 +25,8 @@ import javax.vecmath.Vector2f;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+import org.terasology.events.input.KeyEvent;
+import org.terasology.input.BindButtonEvent;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.FocusListener;
@@ -35,10 +37,13 @@ import org.terasology.rendering.gui.framework.events.MouseMoveListener;
  * Base class for all displayable UI elements.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
 public abstract class UIDisplayElement {
 
 	protected static UIDisplayElement _focusedElement;
+	
+	//event stuff
 	protected enum EMouseEvents {ENTER, LEAVE, HOVER, MOVE};
     private final ArrayList<MouseMoveListener> _mouseListeners = new ArrayList<MouseMoveListener>();
     private final ArrayList<MouseButtonListener> _mouseButtonListeners = new ArrayList<MouseButtonListener>();
@@ -46,18 +51,17 @@ public abstract class UIDisplayElement {
     private final ArrayList<FocusListener> _focusListeners = new ArrayList<FocusListener>();
     private EMouseEvents lastMouseState;
     private boolean _mouseIsDown = false;
+    
+    //layout
     // TODO: Default this to true
     private boolean _visible = false;
-
-    private final Vector2f _position = new Vector2f(0, 0);
-    private final Vector2f _size = new Vector2f(1, 1);
-
     protected boolean _disabled = false;
-
     private boolean _overlay;
-
     private boolean _isFixed = true;
     private boolean _isCroped = true;
+    
+    private final Vector2f _position = new Vector2f(0, 0);
+    private final Vector2f _size = new Vector2f(1, 1);
 
     private UIDisplayElement _parent;
 
@@ -83,9 +87,13 @@ public abstract class UIDisplayElement {
             glPopMatrix();
         }
     }
+    
+    public void processBindButton(BindButtonEvent event) {
+    	
+    }
 
-    public void processKeyboardInput(int key) {
-        // Nothing to do here
+    public void processKeyboardInput(KeyEvent event) {
+    	
     }
 
     public void processMouseInput(int button, boolean state, int wheelMoved) {
@@ -100,9 +108,10 @@ public abstract class UIDisplayElement {
     	    		notifyMouseButtonListeners(button, false, wheelMoved, true);
     	    		_mouseIsDown = false;
     	        }
-		       
+		        
+		        //mouse wheel listeners
 		        if (wheelMoved != 0) {
-		            notifyMouseButtonListeners(-1, false, wheelMoved, false);
+		            notifyMouseButtonListeners(-1, false, wheelMoved, true);
 		        }
     			
 		        //mouse position listeners
@@ -122,6 +131,7 @@ public abstract class UIDisplayElement {
     	    		_mouseIsDown = false;
     	        }
     	        
+    	        //mouse wheel listeners
     	        if (wheelMoved != 0) {
     	            notifyMouseButtonListeners(-1, false, wheelMoved, false);
     	        }
@@ -134,18 +144,10 @@ public abstract class UIDisplayElement {
     		}
     	}
     	
-    	if (_mouseListeners.size() > 0) {
+    	//check for no changes in button presses -> this means mouse was moved
+    	if (_mouseListeners.size() > 0 && button == -1 && wheelMoved == 0) {
     		notifyMouseListeners(EMouseEvents.MOVE);
     	}
-    }
-
-    /**
-     * @param id
-     * @param pressed
-     * @return Whether the bind was consumed
-     */
-    public boolean processBindButton(String id, boolean pressed) {
-        return false;
     }
 
     public boolean isFocused() {

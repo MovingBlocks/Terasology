@@ -15,23 +15,18 @@
  */
 package org.terasology.rendering.gui.framework;
 
-import static org.lwjgl.opengl.GL11.GL_QUADS;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glColor4f;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glVertex2f;
+import org.lwjgl.opengl.Display;
+import org.terasology.events.input.KeyEvent;
+import org.terasology.input.BindButtonEvent;
+import org.terasology.logic.manager.GUIManager;
+import org.terasology.rendering.gui.framework.events.WindowListener;
+
+import javax.vecmath.Vector2f;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import javax.vecmath.Vector2f;
-
-import org.lwjgl.opengl.Display;
-import org.terasology.logic.manager.GUIManager;
-import org.terasology.rendering.gui.framework.events.WindowListener;
+import static org.lwjgl.opengl.GL11.*;
 
 public class UIDisplayWindow extends UIScrollableDisplayContainer {
 
@@ -40,16 +35,22 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer {
     private final HashMap<String, UIDisplayElement> _displayElementsById = new HashMap<String, UIDisplayElement>();
     private boolean _maximized = false;
     private boolean _modal = false;
+    private String[] closeBinds;
+    private int[] closeKeys;
 
     protected void drag(Vector2f value) {
         getPosition().x -= value.x;
         getPosition().y -= value.y;
     }
 
+    /**
+     * Close a window. This will automatically activate the last window which was opened.
+     * @param clearInputControls
+     */
     public void close(boolean clearInputControls) {
         setVisible(false);
         setFocus(null);
-        GUIManager.getInstance().setFocusedFromLast();
+        GUIManager.getInstance().setLastFocused();
         if (clearInputControls) {
             clearInputControls();
         }
@@ -122,12 +123,36 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer {
         return _maximized;
     }
 
+    /**
+     * Check if the window is modal. A modal window will consume all input events. Input events are mouse move, mouse button, mouse wheel and keyboard input.
+     * @return Returns true if the window is modal.
+     */
     public boolean isModal() {
         return _modal;
     }
 
+    /**
+     * Set the windows modality. A modal window will consume all input events. Input events are mouse move, mouse button, mouse wheel and keyboard input.
+     * @param modal True for modal.
+     */
     public void setModal(boolean modal) {
         _modal = modal;
+    }
+    
+    /**
+     * Set the bind keys which will close the window when pressed.
+     * @param binds The bind key ID. For possible bind keys see the {@link org.terasology.events.input.binds} package.
+     */
+    public void setCloseBinds(String[] binds) {
+        this.closeBinds = binds;
+    }
+    
+    /**
+     * Set the keys which will close the window when pressed.
+     * @param keys The keys value. For possible keys see {@link org.lwjgl.input.Keyboard}.
+     */
+    public void setCloseKeys(int[] keys) {
+        this.closeKeys = keys;
     }
 
     public void addDisplayElement(UIDisplayElement element, String elementId) {
@@ -145,20 +170,53 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer {
     }
     
     @Override
-    public void setSize(Vector2f scale) {
-        super.setSize(scale);
+    public void processKeyboardInput(KeyEvent event) {
         
-        layout();
+        if (!isVisible() || !_modal)
+            return;
+        
+        if (closeKeys != null) {
+            for (int key : closeKeys) {
+                if (key == event.getKey() && event.isDown()) {
+                    close(true);
+                    event.consume();
+                    
+                    return;
+                }
+            }
+        }
+        
+        super.processKeyboardInput(event);
     }
     
     @Override
-    public void setVisible(boolean visible) {
-        super.setVisible(visible);
+    public void processBindButton(BindButtonEvent event) {
         
-        if (visible) {
+        if (!isVisible() || !_modal)
+            return;
+        
+        if (closeBinds != null) {
+            for (String key : closeBinds) {
+                if (key.equals(event.getId()) && event.isDown()) {
+                    close(true);
+                    event.consume();
+                    
+                    return;
+                }
+            }
+        }
+        
+        super.processBindButton(event);
+    }
+    
+    @Override
+    public void setVisible(boolean visible) {        
+        if (visible && !isVisible()) {
             notifyWindowListeners(eWindowEvent.OPEN);
-        } else {
+        } else if (!visible && isVisible()) {
             notifyWindowListeners(eWindowEvent.CLOSE);
         }
+        
+        super.setVisible(visible);
     }
 }

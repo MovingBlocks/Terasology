@@ -17,7 +17,9 @@ package org.terasology.rendering.gui.windows;
 
 import javax.vecmath.Vector2f;
 
+import org.lwjgl.input.Keyboard;
 import org.terasology.asset.AssetManager;
+import org.terasology.events.input.binds.UseItemButton;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
@@ -26,8 +28,10 @@ public class UIScreenBook extends UIDisplayWindow {
     private final UIGraphicsElement background;
 
     public UIScreenBook() {
+    	setModal(true);
+    	setCloseBinds(new String[] {UseItemButton.ID});
+    	setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
         maximize();
-        setModal(true);
         
         background = new UIGraphicsElement(AssetManager.loadTexture("engine:openbook"));
         background.setPosition(new Vector2f(-250, -200));

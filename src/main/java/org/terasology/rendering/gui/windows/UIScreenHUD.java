@@ -146,7 +146,7 @@ public class UIScreenHUD extends UIDisplayWindow implements EventHandlerSystem {
     	
     	if (_healthBar != null) {
 	        _healthBar.setPosition(new Vector2f(_toolbar.getPosition().x, _toolbar.getPosition().y - _toolbar.getSize().y + 8f));
-	        _crosshair.setPosition(new Vector2f(Display.getWidth() / 2, Display.getHeight() / 2));
+	        _crosshair.setPosition(new Vector2f((Display.getWidth() / 2) - (_crosshair.getSize().x / 2), (Display.getHeight() / 2) - (_crosshair.getSize().y / 2)));
     	}
     }
 

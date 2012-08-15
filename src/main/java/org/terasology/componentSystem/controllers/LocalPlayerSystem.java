@@ -15,18 +15,10 @@
  */
 package org.terasology.componentSystem.controllers;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
-
+import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.components.HealthComponent;
-import org.terasology.components.InventoryComponent;
-import org.terasology.components.ItemComponent;
-import org.terasology.components.LocalPlayerComponent;
-import org.terasology.components.PlayerComponent;
+import org.terasology.components.*;
 import org.terasology.components.block.BlockComponent;
 import org.terasology.components.block.BlockItemComponent;
 import org.terasology.components.rendering.MeshComponent;
@@ -40,20 +32,10 @@ import org.terasology.events.ActivateEvent;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.HealthChangedEvent;
 import org.terasology.events.NoHealthEvent;
+import org.terasology.events.RespawnEvent;
 import org.terasology.events.input.MouseXAxisEvent;
 import org.terasology.events.input.MouseYAxisEvent;
-import org.terasology.events.input.binds.AttackButton;
-import org.terasology.events.input.binds.DropItemButton;
-import org.terasology.events.input.binds.ForwardsMovementAxis;
-import org.terasology.events.input.binds.FrobButton;
-import org.terasology.events.input.binds.JumpButton;
-import org.terasology.events.input.binds.RunButton;
-import org.terasology.events.input.binds.StrafeMovementAxis;
-import org.terasology.events.input.binds.ToolbarNextButton;
-import org.terasology.events.input.binds.ToolbarPrevButton;
-import org.terasology.events.input.binds.ToolbarSlotButton;
-import org.terasology.events.input.binds.UseItemButton;
-import org.terasology.events.input.binds.VerticalMovementAxis;
+import org.terasology.events.input.binds.*;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.input.ButtonState;
@@ -61,17 +43,20 @@ import org.terasology.input.CameraTargetSystem;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.math.AABB;
+import org.terasology.world.WorldProvider;
 import org.terasology.math.TeraMath;
+import org.terasology.world.block.Block;
+import org.terasology.math.AABB;
 import org.terasology.physics.ImpulseEvent;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.cameras.DefaultCamera;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.block.Block;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
+import javax.vecmath.Vector2f;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -123,11 +108,9 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         LocalPlayerComponent localPlayerComponent = entity.getComponent(LocalPlayerComponent.class);
         CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
         LocationComponent location = entity.getComponent(LocationComponent.class);
-        PlayerComponent playerComponent = entity.getComponent(PlayerComponent.class);
 
         if (localPlayerComponent.isDead) {
-            if (!checkRespawn(delta, entity, localPlayerComponent, characterMovementComponent, location, playerComponent))
-                return;
+            return;
         }
 
         updateMovement(localPlayerComponent, characterMovementComponent, location);
@@ -235,8 +218,36 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     public void onDeath(NoHealthEvent event, EntityRef entity) {
         LocalPlayerComponent localPlayer = entity.getComponent(LocalPlayerComponent.class);
         localPlayer.isDead = true;
-        localPlayer.respawnWait = 1.0f;
         entity.saveComponent(localPlayer);
+    }
+    
+    @ReceiveEvent(components = {LocalPlayerComponent.class})
+    public void onRespawn(RespawnEvent event, EntityRef entity) {
+        LocalPlayerComponent localPlayerComponent = entity.getComponent(LocalPlayerComponent.class);
+        if (localPlayerComponent.isDead) {
+            localPlayerComponent.isDead = false;
+            entity.saveComponent(localPlayerComponent);
+        }
+
+        LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
+        PlayerComponent playerComponent = entity.getComponent(PlayerComponent.class);
+        if (playerComponent != null && locationComponent != null) {
+            locationComponent.setWorldPosition(playerComponent.spawnPosition);
+            entity.saveComponent(locationComponent);
+        }
+
+        HealthComponent healthComponent = entity.getComponent(HealthComponent.class);
+        if (healthComponent != null) {
+            healthComponent.currentHealth = healthComponent.maxHealth;
+            entity.send(new HealthChangedEvent(entity, healthComponent.currentHealth, healthComponent.maxHealth));
+            entity.saveComponent(healthComponent);
+        }
+
+        CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
+        if (characterMovementComponent != null) {
+            characterMovementComponent.setVelocity(new Vector3f(0, 0, 0));
+            entity.saveComponent(characterMovementComponent);
+        }
     }
 
     private void updateMovement(LocalPlayerComponent localPlayerComponent, CharacterMovementComponent characterMovementComponent, LocationComponent location) {
@@ -253,27 +264,6 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         float lengthSquared = relMove.lengthSquared();
         if (lengthSquared > 1) relMove.normalize();
         characterMovementComponent.setDrive(relMove);
-    }
-
-    private boolean checkRespawn(float deltaSeconds, EntityRef entity, LocalPlayerComponent localPlayerComponent, CharacterMovementComponent characterMovementComponent, LocationComponent location, PlayerComponent playerComponent) {
-        localPlayerComponent.respawnWait -= deltaSeconds;
-        if (localPlayerComponent.respawnWait > 0) {
-            characterMovementComponent.getDrive().set(0, 0, 0);
-            characterMovementComponent.jump = false;
-            return false;
-        }
-
-        // Respawn
-        localPlayerComponent.isDead = false;
-        HealthComponent health = entity.getComponent(HealthComponent.class);
-        if (health != null) {
-            health.currentHealth = health.maxHealth;
-            entity.send(new HealthChangedEvent(entity, health.currentHealth, health.maxHealth));
-            entity.saveComponent(health);
-        }
-        location.setWorldPosition(playerComponent.spawnPosition);
-        entity.saveComponent(location);
-        return true;
     }
 
     private void updateCamera(CharacterMovementComponent charMovementComp, Vector3f position, Quat4f rotation) {

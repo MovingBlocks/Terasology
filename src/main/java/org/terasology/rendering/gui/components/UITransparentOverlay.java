@@ -34,24 +34,27 @@ import org.terasology.rendering.primitives.TessellatorHelper;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class UITransparentOverlay extends UIDisplayElement {
-    private static Mesh _mesh;
+    private Mesh _mesh;
 
     public UITransparentOverlay() {
-        if (_mesh == null) {
-            Tessellator tessellator = new Tessellator();
-            TessellatorHelper.addGUIQuadMesh(tessellator, new Vector4f(0.0f, 0.0f, 0.0f, 0.25f), 1.0f, 1.0f);
-            _mesh = tessellator.generateMesh();
-        }
+        createMesh(0f, 0f, 0f, 0.25f);
+    }
+
+    public UITransparentOverlay(float r, float g, float b, float a) {
+        createMesh(r, g, b, a);
+    }
+    private void createMesh(float r, float g, float b, float a) {
+        Tessellator tessellator = new Tessellator();
+        TessellatorHelper.addGUIQuadMesh(tessellator, new Vector4f(r, g, b, a), 1.0f, 1.0f);
+        _mesh = tessellator.generateMesh();
     }
 
     @Override
     public void render() {
-        if (_mesh != null) {
-            glPushMatrix();
-            glScalef(getSize().x, getSize().y, 0.0f);
-            _mesh.render();
-            glPopMatrix();
-        }
+        glPushMatrix();
+        glScalef(getSize().x, getSize().y, 0.0f);
+        _mesh.render();
+        glPopMatrix();
     }
 
     @Override
@@ -59,8 +62,8 @@ public class UITransparentOverlay extends UIDisplayElement {
         
     }
 
-	@Override
-	public void layout() {
-		setSize(new Vector2f((float) Display.getWidth(), (float) Display.getHeight()));
-	}
+    @Override
+    public void layout() {
+        setSize(new Vector2f((float) Display.getWidth(), (float) Display.getHeight()));
+    }
 }

@@ -15,30 +15,13 @@
  */
 package org.terasology.game.modes;
 
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.vecmath.Vector3f;
-
-import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.componentSystem.controllers.LocalPlayerSystem;
+import org.terasology.componentSystem.controllers.MenuControlSystem;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.components.world.WorldComponent;
@@ -51,6 +34,7 @@ import org.terasology.entitySystem.persistence.EntityDataJSONFormat;
 import org.terasology.entitySystem.persistence.EntityPersisterHelper;
 import org.terasology.entitySystem.persistence.EntityPersisterHelperImpl;
 import org.terasology.entitySystem.persistence.WorldPersister;
+import org.terasology.events.RespawnEvent;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
@@ -69,16 +53,25 @@ import org.terasology.physics.BulletPhysics;
 import org.terasology.protobuf.EntityData;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.gui.windows.UIScreenLoading;
-import org.terasology.rendering.gui.windows.UIScreenStatus;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldBiomeProviderImpl;
 import org.terasology.world.WorldInfo;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.block.loader.BlockLoader;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.generator.core.ChunkGeneratorManager;
 import org.terasology.world.generator.core.ChunkGeneratorManagerImpl;
+
+import javax.vecmath.Vector3f;
+import java.io.*;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Play mode.
@@ -185,7 +178,7 @@ public class StateSinglePlayer implements GameState {
         for (ComponentSystem system : componentSystemManager.iterateAll()) {
             system.shutdown();
         }
-        GUIManager.getInstance().closeWindows();
+        GUIManager.getInstance().removeAllWindows();
         try {
             CoreRegistry.get(WorldPersister.class).save(new File(PathManager.getInstance().getWorldSavePath(CoreRegistry.get(WorldProvider.class).getTitle()), ENTITY_DATA_FILE), WorldPersister.SaveFormat.Binary);
         } catch (IOException e) {
@@ -218,40 +211,12 @@ public class StateSinglePlayer implements GameState {
         if (worldRenderer != null && shouldUpdateWorld()) {
             worldRenderer.update(delta);
         }
-
-        /* TODO: This seems a little off - plus is more of a UI than single player game state concern. Move somewhere
-           more appropriate? Possibly HUD? */
-        boolean dead = true;
-        for (EntityRef entity : entityManager.iteratorEntities(LocalPlayerComponent.class)) {
-            dead = entity.getComponent(LocalPlayerComponent.class).isDead;
-        }
-        if (dead) {
-            if (GUIManager.getInstance().getWindowById("engine:statusScreen") == null) {
-                UIScreenStatus statusScreen = GUIManager.getInstance().addWindow(new UIScreenStatus(), "engine:statusScreen");
-                statusScreen.updateStatus("Sorry! Seems like you have died :-(");
-                statusScreen.setVisible(true);
-            }
-        } else {
-            GUIManager.getInstance().removeWindow("engine:statusScreen");
-        }
     }
 
     @Override
     public void handleInput(float delta) {
         cameraTargetSystem.update();
         inputSystem.update(delta);
-
-        // TODO: This should be handled outside of the state, need to fix the screens handling
-        if (screenHasFocus() || !shouldUpdateWorld()) {
-            if (Mouse.isGrabbed()) {
-                Mouse.setGrabbed(false);
-                Mouse.setCursorPosition(Display.getWidth() / 2, Display.getHeight() / 2);
-            }
-        } else {
-            if (!Mouse.isGrabbed()) {
-                Mouse.setGrabbed(true);
-            }
-        }
     }
 
     /**
@@ -326,6 +291,7 @@ public class StateSinglePlayer implements GameState {
     // TODO: Should have its own state
     private void prepareWorld() {
         UIScreenLoading loadingScreen = GUIManager.getInstance().addWindow(new UIScreenLoading(), "engine:loadingScreen");
+        GUIManager.getInstance().setFocusedWindow(loadingScreen);
         Display.update();
 
         Timer timer = CoreRegistry.get(Timer.class);
@@ -368,8 +334,17 @@ public class StateSinglePlayer implements GameState {
             updateUserInterface();
             Display.update();
         }
+        
+
+        //respawn the player if he was dead and left the game (without respawning)
+        EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
+        LocalPlayerComponent localPlayerComponent = playerEntity.getComponent(LocalPlayerComponent.class);
+        if (localPlayerComponent.isDead) {
+        	playerEntity.send(new RespawnEvent());
+        }
 
         GUIManager.getInstance().removeWindow(loadingScreen);
+        GUIManager.getInstance().setFocusedWindow(MenuControlSystem.HUD);
 
         // Create the first Portal if it doesn't exist yet
         worldRenderer.initPortal();
