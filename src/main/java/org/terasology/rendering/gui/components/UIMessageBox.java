@@ -15,12 +15,12 @@
  */
 package org.terasology.rendering.gui.components;
 
+import javax.vecmath.Vector2f;
+
 import org.newdawn.slick.Color;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
-
-import javax.vecmath.Vector2f;
 
 public class UIMessageBox extends UIDialogBox {
     private UIText _text;

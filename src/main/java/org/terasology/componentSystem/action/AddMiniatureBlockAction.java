@@ -15,6 +15,10 @@
  */
 package org.terasology.componentSystem.action;
 
+import java.util.HashSet;
+
+import javax.vecmath.Vector3f;
+
 import org.terasology.components.actions.MiniaturizerComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
@@ -22,13 +26,10 @@ import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.world.MiniatureChunk;
-import org.terasology.world.WorldProvider;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.world.BlockGrid;
-
-import javax.vecmath.Vector3f;
-import java.util.HashSet;
+import org.terasology.world.MiniatureChunk;
+import org.terasology.world.WorldProvider;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>

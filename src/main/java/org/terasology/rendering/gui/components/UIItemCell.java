@@ -57,7 +57,7 @@ public class UIItemCell extends UIDisplayContainer  {
     //transfer
     private static UIItemCellIcon transferIcon;
     
-    //inventory entity
+    //entity
     private EntityRef ownerEntity = EntityRef.NULL;
     private EntityRef itemEntity = EntityRef.NULL;
     private InventoryComponent ownerInventory;
@@ -79,6 +79,7 @@ public class UIItemCell extends UIDisplayContainer  {
     //settings
     private boolean enableDrag = true;
     private boolean enableSelectionRectangle = true;
+    private boolean fastPressed = false;
 
     private MouseMoveListener mouseMoveListener = new MouseMoveListener() {    
         @Override
@@ -114,13 +115,18 @@ public class UIItemCell extends UIDisplayContainer  {
         public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
             if (intersect) {
                 
+                byte amount = 1;
+                if (fastPressed) {
+                    amount = 2;
+                }
+                
                 //move item to the transfer slot
                 if (wheel > 0) {
-                    moveItem(UIItemCell.this, (byte) 1, false, false);
+                    moveItem(UIItemCell.this, amount, false, false);
                 }
                 //get item from transfer slot
                 else {
-                    sendToTransferSlot(UIItemCell.this, (byte) 1);
+                    sendToTransferSlot(UIItemCell.this, amount);
                 }
                 
                 moveTransferIcon();
@@ -166,7 +172,12 @@ public class UIItemCell extends UIDisplayContainer  {
                         //drop
                         if (getFromTransferSlot().exists()) {
                          
-                            moveItem(UIItemCell.this, (byte) 1, true, true);
+                            byte amount = 1;
+                            if (fastPressed) {
+                                amount = 2;
+                            }
+                            
+                            moveItem(UIItemCell.this, amount, true, true);
                             
                         }
                         //drag
@@ -174,7 +185,9 @@ public class UIItemCell extends UIDisplayContainer  {
                             
                             //copy half of the stack
                             ItemComponent item = itemEntity.getComponent(ItemComponent.class);
-                            sendToTransferSlot(UIItemCell.this, (byte) (item.stackCount / 2));
+                            if (item != null) {
+                                sendToTransferSlot(UIItemCell.this, (byte) (item.stackCount / 2));
+                            }
                             
                             moveTransferIcon();
                             
@@ -704,10 +717,16 @@ public class UIItemCell extends UIDisplayContainer  {
             BlockItemComponent blockItem = itemEntity.getComponent(BlockItemComponent.class);
             
             if (item != null) {
-                if (blockItem != null)
-                    itemLabel.setText(blockItem.blockFamily.getDisplayName());
-                else
+                if (blockItem != null) {
+                    if (blockItem.blockFamily != null) {
+                        itemLabel.setText(blockItem.blockFamily.getDisplayName());
+                    } else {
+                        itemLabel.setText("Broken Block");
+                    }
+
+                } else {
                     itemLabel.setText(item.name);
+                }
             }
             
             itemLabel.setVisible(enable);
@@ -722,6 +741,10 @@ public class UIItemCell extends UIDisplayContainer  {
         
         if (event.getKey() == Keyboard.KEY_LSHIFT) {
             fastTransferPressed = event.isDown();
+        }
+        
+        if (event.getKey() == Keyboard.KEY_LCONTROL) {
+            fastPressed = event.isDown();
         }
     }
     

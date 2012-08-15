@@ -18,15 +18,17 @@ package org.terasology.rendering.gui.windows;
 import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.procedure.TObjectDoubleProcedure;
 import gnu.trove.procedure.TObjectIntProcedure;
-import org.terasology.performanceMonitor.PerformanceMonitor;
-import org.terasology.rendering.gui.components.UIText;
-import org.terasology.rendering.gui.framework.UIDisplayWindow;
 
-import javax.vecmath.Vector2f;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
+import javax.vecmath.Vector2f;
+
+import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.rendering.gui.components.UIText;
+import org.terasology.rendering.gui.framework.UIDisplayWindow;
 
 /**
  * UI element that graphs performance metrics

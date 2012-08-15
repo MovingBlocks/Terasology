@@ -16,13 +16,19 @@
 
 package org.terasology.asset;
 
-import com.google.common.collect.Maps;
-import org.terasology.asset.loaders.*;
+import java.util.Map;
+import java.util.logging.Logger;
+
+import org.terasology.asset.loaders.GLSLShaderLoader;
+import org.terasology.asset.loaders.MaterialLoader;
+import org.terasology.asset.loaders.ObjMeshLoader;
+import org.terasology.asset.loaders.OggSoundLoader;
+import org.terasology.asset.loaders.OggStreamingSoundLoader;
+import org.terasology.asset.loaders.PNGTextureLoader;
 import org.terasology.world.block.loader.TileLoader;
 import org.terasology.world.block.shapes.JsonBlockShapeLoader;
 
-import java.util.Map;
-import java.util.logging.Logger;
+import com.google.common.collect.Maps;
 
 
 

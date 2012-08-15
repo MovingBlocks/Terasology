@@ -15,13 +15,13 @@
  */
 package org.terasology.rendering.gui.windows;
 
+import javax.vecmath.Vector2f;
+
 import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetManager;
 import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UIProgressBar;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
-
-import javax.vecmath.Vector2f;
 
 /**
  * Simple status screen with one sole text label usable for status notifications.

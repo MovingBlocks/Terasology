@@ -16,6 +16,34 @@
 
 package org.terasology.physics;
 
+import com.bulletphysics.BulletGlobals;
+import gnu.trove.iterator.TFloatIterator;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+
+import org.terasology.componentSystem.UpdateSubscriberSystem;
+import org.terasology.components.world.LocationComponent;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.EventPriority;
+import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.event.AddComponentEvent;
+import org.terasology.entitySystem.event.ChangedComponentEvent;
+import org.terasology.entitySystem.event.RemovedComponentEvent;
+import org.terasology.game.CoreRegistry;
+import org.terasology.physics.character.CharacterMovementComponent;
+import org.terasology.physics.shapes.BoxShapeComponent;
+import org.terasology.physics.shapes.CapsuleShapeComponent;
+import org.terasology.physics.shapes.CylinderShapeComponent;
+import org.terasology.physics.shapes.HullShapeComponent;
+import org.terasology.physics.shapes.SphereShapeComponent;
+
 import com.bulletphysics.collision.broadphase.BroadphasePair;
 import com.bulletphysics.collision.dispatch.CollisionFlags;
 import com.bulletphysics.collision.dispatch.CollisionObject;
@@ -23,7 +51,12 @@ import com.bulletphysics.collision.dispatch.GhostObject;
 import com.bulletphysics.collision.dispatch.PairCachingGhostObject;
 import com.bulletphysics.collision.narrowphase.ManifoldPoint;
 import com.bulletphysics.collision.narrowphase.PersistentManifold;
-import com.bulletphysics.collision.shapes.*;
+import com.bulletphysics.collision.shapes.BoxShape;
+import com.bulletphysics.collision.shapes.CapsuleShape;
+import com.bulletphysics.collision.shapes.ConvexHullShape;
+import com.bulletphysics.collision.shapes.ConvexShape;
+import com.bulletphysics.collision.shapes.CylinderShape;
+import com.bulletphysics.collision.shapes.SphereShape;
 import com.bulletphysics.dynamics.DynamicsWorld;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
@@ -32,21 +65,6 @@ import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.util.ObjectArrayList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import gnu.trove.iterator.TFloatIterator;
-import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.components.world.LocationComponent;
-import org.terasology.entitySystem.*;
-import org.terasology.entitySystem.event.AddComponentEvent;
-import org.terasology.entitySystem.event.RemovedComponentEvent;
-import org.terasology.game.CoreRegistry;
-import org.terasology.physics.character.CharacterMovementComponent;
-import org.terasology.physics.shapes.*;
-
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Immortius
@@ -69,6 +87,10 @@ public class PhysicsSystem implements EventHandlerSystem, UpdateSubscriberSystem
 
     @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
     public void newRigidBody(AddComponentEvent event, EntityRef entity) {
+        createRigidBody(entity);
+    }
+
+    private void createRigidBody(EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         RigidBodyComponent rigidBody = entity.getComponent(RigidBodyComponent.class);
         ConvexShape shape = getShapeFor(entity);
@@ -91,6 +113,10 @@ public class PhysicsSystem implements EventHandlerSystem, UpdateSubscriberSystem
 
     @ReceiveEvent(components = {TriggerComponent.class, LocationComponent.class})
     public void newTrigger(AddComponentEvent event, EntityRef entity) {
+        createTrigger(entity);
+    }
+
+    private void createTrigger(EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         TriggerComponent trigger = entity.getComponent(TriggerComponent.class);
         ConvexShape shape = getShapeFor(entity);
@@ -126,6 +152,40 @@ public class PhysicsSystem implements EventHandlerSystem, UpdateSubscriberSystem
         if (ghost != null) {
             physics.removeCollider(ghost);
         }
+    }
+
+    @ReceiveEvent(components = {TriggerComponent.class, LocationComponent.class})
+    public void updateTrigger(ChangedComponentEvent event, EntityRef entity) {
+        LocationComponent location = entity.getComponent(LocationComponent.class);
+        PairCachingGhostObject triggerObj = entityTriggers.get(entity);
+
+        if (triggerObj != null) {
+            float scale = location.getWorldScale();
+            if (Math.abs(triggerObj.getCollisionShape().getLocalScaling(new Vector3f()).x - scale) > BulletGlobals.SIMD_EPSILON) {
+                physics.removeCollider(triggerObj);
+                createTrigger(entity);
+            } else {
+                triggerObj.setWorldTransform(new Transform(new Matrix4f(location.getWorldRotation(), location.getWorldPosition(), 1.0f)));
+            }
+        }
+
+        // TODO: update if detectGroups changed
+    }
+
+    @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class})
+    public void updateRigidBody(ChangedComponentEvent event, EntityRef entity) {
+        LocationComponent location = entity.getComponent(LocationComponent.class);
+        RigidBody rigidBody = entityRigidBodies.get(entity);
+
+        if (rigidBody != null) {
+            float scale = location.getWorldScale();
+            if (Math.abs(rigidBody.getCollisionShape().getLocalScaling(new Vector3f()).x - scale) > BulletGlobals.SIMD_EPSILON) {
+                physics.removeRigidBody(rigidBody);
+                createRigidBody(entity);
+            }
+        }
+
+        // TODO: update if mass or collision groups change
     }
 
     // TODO: Flyweight this (take scale as parameter)
@@ -170,6 +230,8 @@ public class PhysicsSystem implements EventHandlerSystem, UpdateSubscriberSystem
 
     @Override
     public void update(float delta) {
+        List<CollisionPair> collisionPairs = Lists.newArrayList();
+
         DynamicsWorld world = physics.getWorld();
         ObjectArrayList<PersistentManifold> manifolds = new ObjectArrayList<PersistentManifold>();
         for (PairCachingGhostObject trigger : entityTriggers.values()) {
@@ -200,19 +262,31 @@ public class PhysicsSystem implements EventHandlerSystem, UpdateSubscriberSystem
                     for (int point = 0; point < manifold.getNumContacts(); ++point) {
                         ManifoldPoint manifoldPoint = manifold.getContactPoint(point);
                         if (manifoldPoint.getDistance() < 0) {
-                            entity.send(new CollideEvent(otherEntity));
-                            otherEntity.send(new CollideEvent(entity));
+                            collisionPairs.add(new CollisionPair(entity, otherEntity));
                             break;
                         }
                     }
                 }
             }
+        }
 
-
-            LocationComponent location = entity.getComponent(LocationComponent.class);
-            if (location != null) {
-                trigger.setWorldTransform(new Transform(new Matrix4f(location.getWorldRotation(), location.getWorldPosition(), 1.0f)));
+        for (CollisionPair pair : collisionPairs) {
+            if (pair.b.exists()) {
+                pair.a.send(new CollideEvent(pair.b));
             }
+            if (pair.a.exists()) {
+                pair.b.send(new CollideEvent(pair.a));
+            }
+        }
+    }
+
+    private static class CollisionPair {
+        EntityRef a;
+        EntityRef b;
+
+        public CollisionPair(EntityRef a, EntityRef b) {
+            this.a = a;
+            this.b = b;
         }
     }
 

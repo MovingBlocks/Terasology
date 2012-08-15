@@ -15,16 +15,18 @@
  */
 package org.terasology.rendering.gui.components;
 
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glScalef;
+
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
+
 import org.lwjgl.opengl.Display;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
-
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector4f;
-
-import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Transparent fullscreen overlay.

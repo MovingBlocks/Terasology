@@ -15,11 +15,11 @@
  */
 package org.terasology.rendering.gui.components;
 
-import org.newdawn.slick.Color;
-import org.terasology.rendering.gui.framework.UIDisplayContainer;
-
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
+
+import org.newdawn.slick.Color;
+import org.terasology.rendering.gui.framework.UIDisplayContainer;
 
 /**
  * A simple graphical progressBar

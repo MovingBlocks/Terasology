@@ -16,8 +16,8 @@
 
 package org.terasology.world.generator;
 
-import org.terasology.world.WorldView;
 import org.terasology.math.Vector3i;
+import org.terasology.world.WorldView;
 
 /**
  * @author Immortius

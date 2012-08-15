@@ -17,12 +17,13 @@ package org.terasology.rendering.primitives;
 
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
-import org.terasology.asset.AssetUri;
-import org.terasology.world.block.shapes.BlockMeshPart;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
+
+import org.terasology.asset.AssetUri;
+import org.terasology.world.block.shapes.BlockMeshPart;
 
 public class Tessellator {
 

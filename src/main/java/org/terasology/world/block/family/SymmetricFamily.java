@@ -15,13 +15,11 @@
  */
 package org.terasology.world.block.family;
 
-import com.google.common.collect.Lists;
-import org.terasology.asset.AssetUri;
+import java.util.Arrays;
+
 import org.terasology.math.Side;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
-
-import java.util.Arrays;
 
 /**
  * The standard block group consisting of a single symmetrical block that doesn't need rotations

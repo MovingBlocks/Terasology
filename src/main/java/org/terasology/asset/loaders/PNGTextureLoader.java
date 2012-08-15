@@ -16,12 +16,6 @@
 
 package org.terasology.asset.loaders;
 
-import com.google.gson.Gson;
-import org.newdawn.slick.opengl.PNGDecoder;
-import org.terasology.asset.AssetLoader;
-import org.terasology.asset.AssetUri;
-import org.terasology.rendering.assets.Texture;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -30,6 +24,13 @@ import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.newdawn.slick.opengl.PNGDecoder;
+import org.terasology.asset.AssetLoader;
+import org.terasology.asset.AssetUri;
+import org.terasology.rendering.assets.Texture;
+
+import com.google.gson.Gson;
 
 /**
  * @author Immortius

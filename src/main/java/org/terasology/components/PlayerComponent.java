@@ -15,10 +15,10 @@
  */
 package org.terasology.components;
 
+import javax.vecmath.Vector3f;
+
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
-
-import javax.vecmath.Vector3f;
 
 /**
  * Player information that is shared across the network

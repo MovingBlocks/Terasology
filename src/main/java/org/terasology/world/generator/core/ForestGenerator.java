@@ -18,17 +18,18 @@ package org.terasology.world.generator.core;
 
 import java.util.Map;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
-import org.terasology.world.chunks.Chunk;
+import org.terasology.math.Vector3i;
+import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.WorldView;
-import org.terasology.world.generator.SecondPassChunkGenerator;
-import org.terasology.world.generator.tree.TreeGenerator;
-import org.terasology.math.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
-import org.terasology.utilities.FastRandom;
+import org.terasology.world.chunks.Chunk;
+import org.terasology.world.generator.SecondPassChunkGenerator;
+import org.terasology.world.generator.tree.TreeGenerator;
+
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 
 /**
  * @author Immortius

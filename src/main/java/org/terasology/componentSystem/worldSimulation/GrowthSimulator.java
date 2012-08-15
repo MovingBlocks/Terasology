@@ -16,23 +16,6 @@
 
 package org.terasology.componentSystem.worldSimulation;
 
-import com.google.common.collect.Queues;
-import org.terasology.components.block.BlockComponent;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
-import org.terasology.world.BlockChangedEvent;
-import org.terasology.game.CoreRegistry;
-import org.terasology.world.block.BlockUri;
-import org.terasology.world.chunks.Chunk;
-import org.terasology.world.WorldBiomeProvider;
-import org.terasology.world.WorldProvider;
-import org.terasology.math.Side;
-import org.terasology.math.Vector3i;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.management.BlockManager;
-
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -40,6 +23,23 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.terasology.components.block.BlockComponent;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.game.CoreRegistry;
+import org.terasology.math.Side;
+import org.terasology.math.Vector3i;
+import org.terasology.world.BlockChangedEvent;
+import org.terasology.world.WorldBiomeProvider;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.management.BlockManager;
+import org.terasology.world.chunks.Chunk;
+
+import com.google.common.collect.Queues;
 
 /**
  * @author Immortius

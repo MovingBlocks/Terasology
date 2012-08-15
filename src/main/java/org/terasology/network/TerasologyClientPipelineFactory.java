@@ -16,6 +16,8 @@
 
 package org.terasology.network;
 
+import static org.jboss.netty.channel.Channels.pipeline;
+
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.handler.codec.protobuf.ProtobufDecoder;
@@ -23,8 +25,6 @@ import org.jboss.netty.handler.codec.protobuf.ProtobufEncoder;
 import org.jboss.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import org.jboss.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import org.terasology.protobuf.NetData;
-
-import static org.jboss.netty.channel.Channels.pipeline;
 
 /**
  * @author Immortius

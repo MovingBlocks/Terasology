@@ -16,16 +16,6 @@
 
 package org.terasology.asset.loaders;
 
-import com.google.common.collect.Maps;
-import com.google.gson.*;
-import org.terasology.asset.AssetLoader;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
-import org.terasology.asset.AssetManager;
-import org.terasology.rendering.assets.Material;
-import org.terasology.rendering.assets.Shader;
-import org.terasology.rendering.assets.Texture;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -33,6 +23,24 @@ import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+
+import org.terasology.asset.AssetLoader;
+import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
+import org.terasology.rendering.assets.Material;
+import org.terasology.rendering.assets.Shader;
+import org.terasology.rendering.assets.Texture;
+
+import com.google.common.collect.Maps;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 
 /**
  * @author Immortius

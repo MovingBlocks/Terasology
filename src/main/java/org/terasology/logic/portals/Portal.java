@@ -15,7 +15,6 @@
  */
 package org.terasology.logic.portals;
 
-import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
 /**

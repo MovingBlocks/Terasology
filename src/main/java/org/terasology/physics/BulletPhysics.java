@@ -15,9 +15,44 @@
  */
 package org.terasology.physics;
 
-import com.bulletphysics.collision.broadphase.*;
-import com.bulletphysics.collision.dispatch.*;
-import com.bulletphysics.collision.shapes.*;
+import java.util.Arrays;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.vecmath.Matrix3f;
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+
+import org.terasology.components.block.BlockComponent;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventReceiver;
+import org.terasology.entitySystem.EventSystem;
+import org.terasology.game.CoreRegistry;
+import org.terasology.math.AABB;
+import org.terasology.math.Vector3i;
+import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.world.BlockChangedEvent;
+import org.terasology.world.BlockEntityRegistry;
+import org.terasology.world.WorldProvider;
+
+import com.bulletphysics.collision.broadphase.BroadphaseInterface;
+import com.bulletphysics.collision.broadphase.CollisionFilterGroups;
+import com.bulletphysics.collision.broadphase.DbvtBroadphase;
+import com.bulletphysics.collision.dispatch.CollisionConfiguration;
+import com.bulletphysics.collision.dispatch.CollisionDispatcher;
+import com.bulletphysics.collision.dispatch.CollisionFlags;
+import com.bulletphysics.collision.dispatch.CollisionObject;
+import com.bulletphysics.collision.dispatch.CollisionWorld;
+import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
+import com.bulletphysics.collision.dispatch.GhostObject;
+import com.bulletphysics.collision.dispatch.GhostPairCallback;
+import com.bulletphysics.collision.dispatch.PairCachingGhostObject;
+import com.bulletphysics.collision.shapes.BoxShape;
+import com.bulletphysics.collision.shapes.ConvexShape;
 import com.bulletphysics.collision.shapes.voxel.VoxelWorldShape;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
 import com.bulletphysics.dynamics.DynamicsWorld;
@@ -27,26 +62,13 @@ import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSo
 import com.bulletphysics.linearmath.DefaultMotionState;
 import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.Lists;
-import org.terasology.components.block.BlockComponent;
-import org.terasology.entitySystem.*;
-import org.terasology.game.CoreRegistry;
-import org.terasology.world.BlockChangedEvent;
-import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.WorldProvider;
-import org.terasology.math.Vector3i;
-import org.terasology.math.AABB;
-import org.terasology.performanceMonitor.PerformanceMonitor;
-
-import javax.vecmath.*;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Renders blocks using the Bullet physics library.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
+// TODO: Merge this with Physics System
 public class BulletPhysics implements EventReceiver<BlockChangedEvent> {
 
     private Logger _logger = Logger.getLogger(getClass().getName());
@@ -97,11 +119,11 @@ public class BulletPhysics implements EventReceiver<BlockChangedEvent> {
         return createCollider(pos, shape, groups, filters, 0);
     }
 
-    private short combineGroups(CollisionGroup ... groups) {
+    public static short combineGroups(CollisionGroup ... groups) {
         return combineGroups(Arrays.asList(groups));
     }
 
-    private short combineGroups(Iterable<CollisionGroup> groups) {
+    public static short combineGroups(Iterable<CollisionGroup> groups) {
         short flags = 0;
         for (CollisionGroup group : groups) {
             flags |= group.getFlag();

@@ -1,10 +1,9 @@
 package org.terasology.utilities;
 
 
-import org.terasology.math.Rect2i;
-import org.terasology.math.TeraMath;
-
 import java.util.List;
+
+import org.terasology.math.Rect2i;
 
 public class TestRect2i extends junit.framework.TestCase {
     private Rect2i findAnyRectWithArea(List<Rect2i> rects, int area) {

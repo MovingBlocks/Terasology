@@ -16,12 +16,16 @@
 
 package org.terasology.world.block.loader;
 
-import com.google.common.collect.Maps;
+import java.util.EnumMap;
+import java.util.List;
+
+import javax.vecmath.Vector4f;
+
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockPart;
 
-import javax.vecmath.Vector4f;
-import java.util.EnumMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * @author Immortius
@@ -61,6 +65,7 @@ public class BlockDefinition {
     public Inventory inventory;
 
     public String shape = "";
+    public List<String> shapes = Lists.newArrayList();
     public RotationType rotation = RotationType.NONE;
 
     public static enum RotationType {

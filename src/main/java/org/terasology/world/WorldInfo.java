@@ -16,16 +16,14 @@
 
 package org.terasology.world;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.gson.GsonBuilder;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
+
+import com.google.common.collect.Maps;
+import com.google.gson.GsonBuilder;
 
 /**
  * Summary information on a world.

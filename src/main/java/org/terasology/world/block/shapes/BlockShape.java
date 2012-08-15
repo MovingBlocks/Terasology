@@ -15,8 +15,10 @@
  */
 package org.terasology.world.block.shapes;
 
-import com.bulletphysics.collision.shapes.CollisionShape;
-import com.google.common.collect.Maps;
+import java.util.EnumMap;
+
+import javax.vecmath.Vector3f;
+
 import org.terasology.asset.Asset;
 import org.terasology.asset.AssetUri;
 import org.terasology.collection.EnumBooleanMap;
@@ -24,8 +26,8 @@ import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.world.block.BlockPart;
 
-import javax.vecmath.Vector3f;
-import java.util.EnumMap;
+import com.bulletphysics.collision.shapes.CollisionShape;
+import com.google.common.collect.Maps;
 
 /**
  * Describes a shape that a block can take. The shape may also be rotated if not symmetrical.

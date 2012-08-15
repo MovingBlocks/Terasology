@@ -15,7 +15,6 @@
  */
 package org.terasology.events;
 
-import org.terasology.entitySystem.AbstractEvent;
 import org.terasology.entitySystem.EntityRef;
 
 /**

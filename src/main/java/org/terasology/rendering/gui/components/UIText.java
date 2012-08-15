@@ -15,7 +15,11 @@
  */
 package org.terasology.rendering.gui.components;
 
+import static org.lwjgl.opengl.GL11.glDisable;
+
 import java.util.ArrayList;
+
+import javax.vecmath.Vector2f;
 
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
@@ -29,10 +33,6 @@ import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 
-import javax.vecmath.Vector2f;
-
-import static org.lwjgl.opengl.GL11.glDisable;
-
 /**
  * Simple text element supporting text shadowing.
  *
@@ -40,7 +40,7 @@ import static org.lwjgl.opengl.GL11.glDisable;
  */
 public class UIText extends UIDisplayElement {
 
-    private final ArrayList<ChangedListener> _changedListeners = new ArrayList<ChangedListener>();
+	private final ArrayList<ChangedListener> _changedListeners = new ArrayList<ChangedListener>();
     protected String _text = "";
 
     private Color _shadowColor = new Color(Color.black);
@@ -90,16 +90,16 @@ public class UIText extends UIDisplayElement {
 
     }
     
-    @Override
-    public void layout() {
+	@Override
+	public void layout() {
 
-    }
-    
-    private void notifyChangedListeners() {
-        for (ChangedListener listener : _changedListeners) {
-            listener.changed(this);
-        }
-    }
+	}
+	
+	private void notifyChangedListeners() {
+		for (ChangedListener listener : _changedListeners) {
+			listener.changed(this);
+		}
+	}
 
     public String getText() {
         return _text;
@@ -155,11 +155,11 @@ public class UIText extends UIDisplayElement {
         return new Vector2f(Display.getWidth() / 2 - getTextWidth() / 2, Display.getHeight() / 2 - getTextHeight());
     }
 
-    public void addChangedListener(ChangedListener listener) {
+	public void addChangedListener(ChangedListener listener) {
         _changedListeners.add(listener);
     }
 
     public void removeChangedListener(ChangedListener listener) {
-        _changedListeners.remove(listener);
+    	_changedListeners.remove(listener);
     }
 }

@@ -16,9 +16,9 @@
 
 package org.terasology.world.chunks.store;
 
+import org.terasology.math.Vector3i;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkStore;
-import org.terasology.math.Vector3i;
 
 /**
  * @author Immortius

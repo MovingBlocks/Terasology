@@ -15,34 +15,42 @@
  */
 package org.terasology.world.block;
 
-import com.bulletphysics.collision.shapes.CollisionShape;
-import com.bulletphysics.linearmath.Transform;
-import com.google.common.collect.Maps;
-import org.lwjgl.opengl.GL11;
-import org.newdawn.slick.util.ResourceLoader;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
-import org.terasology.collection.EnumBooleanMap;
-import org.terasology.logic.manager.ShaderManager;
-import org.terasology.math.Side;
-import org.terasology.math.Vector3i;
-import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.block.shapes.BlockMeshPart;
-import org.terasology.math.AABB;
-import org.terasology.rendering.primitives.Mesh;
-import org.terasology.rendering.primitives.Tessellator;
-import org.terasology.rendering.shader.ShaderProgram;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glIsEnabled;
 
-import javax.imageio.ImageIO;
-import javax.vecmath.*;
-import java.awt.*;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.EnumMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.lwjgl.opengl.GL11.*;
+import javax.imageio.ImageIO;
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
+
+import org.lwjgl.opengl.GL11;
+import org.newdawn.slick.util.ResourceLoader;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
+import org.terasology.collection.EnumBooleanMap;
+import org.terasology.logic.manager.ShaderManager;
+import org.terasology.math.AABB;
+import org.terasology.math.Side;
+import org.terasology.math.Vector3i;
+import org.terasology.rendering.primitives.Mesh;
+import org.terasology.rendering.primitives.Tessellator;
+import org.terasology.rendering.shader.ShaderProgram;
+import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.shapes.BlockMeshPart;
+
+import com.bulletphysics.collision.shapes.CollisionShape;
+import com.bulletphysics.linearmath.Transform;
+import com.google.common.collect.Maps;
 
 /**
  * Stores all information for a specific block type.
@@ -54,9 +62,6 @@ public class Block {
 
     private static final Logger logger = Logger.getLogger(Block.class.getName());
 
-    public static final int ATLAS_SIZE_IN_PX = 256;
-    public static final int TEXTURE_SIZE_IN_PX = 16;
-    public static final int ATLAS_ELEMENTS_PER_ROW_AND_COLUMN = ATLAS_SIZE_IN_PX / TEXTURE_SIZE_IN_PX;
     public static final float TEXTURE_OFFSET = 0.0625f;
     public static final float TEXTURE_OFFSET_WIDTH = 0.0624f;
 
