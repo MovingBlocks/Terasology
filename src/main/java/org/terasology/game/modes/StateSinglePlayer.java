@@ -21,6 +21,7 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.componentSystem.controllers.LocalPlayerSystem;
+import org.terasology.componentSystem.controllers.MenuControlSystem;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.components.world.WorldComponent;
@@ -343,6 +344,7 @@ public class StateSinglePlayer implements GameState {
         }
 
         GUIManager.getInstance().removeWindow(loadingScreen);
+        GUIManager.getInstance().setFocusedWindow(MenuControlSystem.HUD);
 
         // Create the first Portal if it doesn't exist yet
         worldRenderer.initPortal();

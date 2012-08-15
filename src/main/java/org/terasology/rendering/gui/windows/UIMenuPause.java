@@ -89,11 +89,9 @@ public class UIMenuPause extends UIDisplayWindow {
         _mainMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _mainMenuButton.getLabel().setText("Return to Main Menu");
         _mainMenuButton.setVisible(true);
-
         _mainMenuButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                setVisible(false);
                 CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu());
             }
         });

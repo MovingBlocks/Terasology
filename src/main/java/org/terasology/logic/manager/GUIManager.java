@@ -264,7 +264,7 @@ public class GUIManager implements EventHandlerSystem {
     }
     
     private void setMouseMovement(boolean enable) {
-        if (enable) {
+        if (enable || _currentFocused == null) {
             Mouse.setGrabbed(false);
         } else {
             Mouse.setGrabbed(true);

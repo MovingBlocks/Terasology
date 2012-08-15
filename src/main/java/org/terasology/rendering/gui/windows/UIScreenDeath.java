@@ -20,6 +20,8 @@ import javax.vecmath.Vector2f;
 import org.lwjgl.input.Keyboard;
 import org.terasology.events.RespawnEvent;
 import org.terasology.game.CoreRegistry;
+import org.terasology.game.GameEngine;
+import org.terasology.game.modes.StateMainMenu;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIText;
@@ -38,8 +40,10 @@ import org.terasology.rendering.gui.framework.events.WindowListener;
 public class UIScreenDeath extends UIDisplayWindow {
 
     private final UITransparentOverlay _overlay;
-    private final UIText _status;
-    private final UIButton _respwan;
+    private final UIText _meassage;
+    private final UIButton _respawnButton;
+    private final UIButton _exitButton;
+    private final UIButton _mainMenuButton;
 
     public UIScreenDeath() {
         setModal(true);
@@ -58,26 +62,49 @@ public class UIScreenDeath extends UIDisplayWindow {
             }
         });
         
-        _status = new UIText("You are dead.");
-        _status.setVisible(true);
+        _meassage = new UIText("You are dead");
+        _meassage.setVisible(true);
 
         _overlay = new UITransparentOverlay(200f, 0f, 0f, 0.25f);
         _overlay.setVisible(true);
         
-        _respwan = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
-        _respwan.setVisible(true);
-        _respwan.getLabel().setText("Respawn");
-        _respwan.addClickListener(new ClickListener() {
+        _respawnButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
+        _respawnButton.setVisible(true);
+        _respawnButton.getLabel().setText("Respawn");
+        _respawnButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
                 respawn();
                 close(true);
             }
         });
+        
+        _mainMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
+        _mainMenuButton.getLabel().setText("Return to Main Menu");
+        _mainMenuButton.setVisible(true);
+        _mainMenuButton.addClickListener(new ClickListener() {
+            @Override
+            public void click(UIDisplayElement element, int button) {
+                CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu());
+            }
+        });
+
+
+        _exitButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
+        _exitButton.getLabel().setText("Exit Terasology");
+        _exitButton.setVisible(true);
+        _exitButton.addClickListener(new ClickListener() {
+            @Override
+            public void click(UIDisplayElement element, int button) {
+                CoreRegistry.get(GameEngine.class).shutdown();
+            }
+        });
 
         addDisplayElement(_overlay);
-        addDisplayElement(_status);
-        addDisplayElement(_respwan);
+        addDisplayElement(_meassage);
+        addDisplayElement(_exitButton);
+        addDisplayElement(_respawnButton);
+        addDisplayElement(_mainMenuButton);
 
         layout();
     }
@@ -90,15 +117,23 @@ public class UIScreenDeath extends UIDisplayWindow {
     public void layout() {
         super.layout();
 
-        if (_status != null) {
-            _status.center();
-            _respwan.center();
-            _respwan.getPosition().y += 50;
+        if (_meassage != null) {
+        	_meassage.center();
+        	_meassage.getPosition().y -= 100;
+        	
+            _respawnButton.centerHorizontally();
+            _respawnButton.getPosition().y = 300f + 32f + 24f;
+    
+            _mainMenuButton.centerHorizontally();
+            _mainMenuButton.getPosition().y = 300f + 2 * 32f + 24f + 4f;
+    
+            _exitButton.centerHorizontally();
+            _exitButton.getPosition().y = 300f + 3 * 32f + 24f + 8f;
         }
     }
 
     public void updateStatus(String string) {
-        _status.setText(string);
+        _meassage.setText(string);
         layout();
     }
 }

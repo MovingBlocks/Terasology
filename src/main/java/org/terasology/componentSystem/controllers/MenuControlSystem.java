@@ -46,11 +46,12 @@ public class MenuControlSystem implements EventHandlerSystem {
     public static final String PAUSE_MENU = "engine:pauseMenu";
     public static final String INVENTORY = "engine:inventory";
     public static final String CONSOLE = "engine:console";
+	public static final String HUD = "engine:hud";
 
     @Override
     public void initialise() {
         GUIManager.getInstance().addWindow(new UIScreenConsole(), CONSOLE);
-        GUIManager.getInstance().addWindow(new UIScreenHUD(), "engine:hud");
+        GUIManager.getInstance().addWindow(new UIScreenHUD(), HUD);
         GUIManager.getInstance().addWindow(new UIScreenInventory(), INVENTORY);
         GUIManager.getInstance().addWindow(new UIMenuPause(), PAUSE_MENU);
         GUIManager.getInstance().addWindow(new UIScreenDeath(), "engine:death");
