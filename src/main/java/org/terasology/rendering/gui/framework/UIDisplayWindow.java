@@ -44,13 +44,12 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer {
     }
 
     /**
-     * Close a window. This will automatically activate the last window which was opened.
+     * Close a window. This will just make the window invisible, it will not be removed from the GUIManager.
      * @param clearInputControls
      */
     public void close(boolean clearInputControls) {
         setVisible(false);
         setFocus(null);
-        GUIManager.getInstance().setLastFocused();
         if (clearInputControls) {
             clearInputControls();
         }
@@ -218,5 +217,7 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer {
         }
         
         super.setVisible(visible);
+        
+        GUIManager.getInstance().checkMouseMovement();
     }
 }

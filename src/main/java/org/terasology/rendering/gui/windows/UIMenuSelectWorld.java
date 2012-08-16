@@ -25,7 +25,10 @@ import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.world.WorldInfo;
 import org.terasology.world.WorldUtil;
-import org.terasology.rendering.gui.components.*;
+import org.terasology.rendering.gui.components.UIButton;
+import org.terasology.rendering.gui.components.UIImageOverlay;
+import org.terasology.rendering.gui.components.UIInput;
+import org.terasology.rendering.gui.components.UIList;
 import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
@@ -52,7 +55,6 @@ public class UIMenuSelectWorld extends UIDisplayWindow {
     final UIButton _createNewWorld;
     final UIButton _loadFromList;
     final UIButton _deleteFromList;
-    final UIDialogCreateNewWorld _window;
 
     public UIMenuSelectWorld() {
         setModal(true);
@@ -60,13 +62,6 @@ public class UIMenuSelectWorld extends UIDisplayWindow {
         
         _overlay = new UIImageOverlay(AssetManager.loadTexture("engine:menuBackground"));
         _overlay.setVisible(true);
-
-        _window = new UIDialogCreateNewWorld("Create new world", new Vector2f(512f, 320f));
-        _window.center();
-
-        _window.setModal(true);
-
-        GUIManager.getInstance().addWindow(_window, "generate_world");
 
         _list = new UIList(new Vector2f(512f, 256f));
         _list.setVisible(true);
@@ -103,8 +98,14 @@ public class UIMenuSelectWorld extends UIDisplayWindow {
         _createNewWorld.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().setFocusedWindow(_window);
+
+                UIDialogCreateNewWorld _window = new UIDialogCreateNewWorld("Create new world", new Vector2f(512f, 320f));
+                _window.center();
                 _window.clearInputControls();
+                
+                GUIManager.getInstance().addWindow(_window, "generate_world");
+                GUIManager.getInstance().setFocusedWindow(_window);
+
                 UIInput inputWorldName = (UIInput) _window.getElementById("inputWorldTitle");
                 inputWorldName.setValue(_window.getWorldName());
             }
