@@ -60,7 +60,6 @@ public class UIItemCell extends UIDisplayContainer  {
     //entity
     private EntityRef ownerEntity = EntityRef.NULL;
     private EntityRef itemEntity = EntityRef.NULL;
-    private InventoryComponent ownerInventory;
     private int slot;
     
     //connected inventory entity
@@ -144,7 +143,7 @@ public class UIItemCell extends UIDisplayContainer  {
                 if (!enableDrag)
                     return;
                 
-                if (ownerInventory != null) {
+                if (ownerEntity.getComponent(InventoryComponent.class) != null) {
                     //left click
                     if (button == 0) {
                         //drop
@@ -224,7 +223,6 @@ public class UIItemCell extends UIDisplayContainer  {
      */
     public UIItemCell(EntityRef owner, Vector2f size) {
         this.ownerEntity = owner;
-        this.ownerInventory = ownerEntity.getComponent(InventoryComponent.class);
         
         setSize(size);
 
@@ -265,7 +263,7 @@ public class UIItemCell extends UIDisplayContainer  {
     }
     
     private void moveTransferIcon() {
-        if (ownerInventory != null) {
+        if (ownerEntity.getComponent(InventoryComponent.class) != null) {
             if (getFromTransferSlot().exists()) {
                 ItemComponent item = getFromTransferSlot().getComponent(ItemComponent.class);
                 if (item.container == ownerEntity) {
@@ -396,6 +394,7 @@ public class UIItemCell extends UIDisplayContainer  {
     */
     private void moveItem(UIItemCell targetCell, byte amount, boolean swap, boolean dropOnFail) {
         EntityRef item = getFromTransferSlot();
+        InventoryComponent ownerInventory = ownerEntity.getComponent(InventoryComponent.class);
         if (item.exists()) {
 
             boolean success = false;
@@ -434,14 +433,15 @@ public class UIItemCell extends UIDisplayContainer  {
     private boolean moveItemPlace(UIItemCell targetCell, byte amount) {
         EntityRef item = getFromTransferSlot();
         ItemComponent sourceItem = item.getComponent(ItemComponent.class);
+        InventoryComponent targetInventory = targetCell.getOwnerEntity().getComponent(InventoryComponent.class);
         
         //check if target slot is empty
-        if (!targetCell.ownerInventory.itemSlots.get(targetCell.slot).exists()) {    
+        if (!targetInventory.itemSlots.get(targetCell.slot).exists()) {
             //place whole stack
             if (amount == 0) {
                 //place the item in the item slot
                 sourceItem.container = targetCell.ownerEntity;
-                targetCell.ownerInventory.itemSlots.set(targetCell.slot, item);
+                targetInventory.itemSlots.set(targetCell.slot, item);
                 
                 //remove item from transfer slot
                 sendToTransferSlot(null, (byte) 0);
@@ -463,14 +463,14 @@ public class UIItemCell extends UIDisplayContainer  {
                     copyItem.stackCount = amount;
                     
                     copyItem.container = targetCell.ownerEntity;
-                    targetCell.ownerInventory.itemSlots.set(targetCell.slot, copy);
+                    targetInventory.itemSlots.set(targetCell.slot, copy);
  
                     return true;
                 }
                 //no items in transfer slot left
                 else {
                     //place whole stack
-                    targetCell.ownerInventory.itemSlots.set(targetCell.slot, item);
+                    targetInventory.itemSlots.set(targetCell.slot, item);
                     
                     //remove item from transfer slot
                     sendToTransferSlot(null, (byte) 0);
@@ -491,7 +491,8 @@ public class UIItemCell extends UIDisplayContainer  {
     private boolean moveItemMerge(UIItemCell targetCell, byte amount) {
         EntityRef item = getFromTransferSlot();
         ItemComponent sourceItem = item.getComponent(ItemComponent.class);
-        ItemComponent targetItem = targetCell.ownerInventory.itemSlots.get(targetCell.slot).getComponent(ItemComponent.class);
+        InventoryComponent targetInventory = targetCell.getOwnerEntity().getComponent(InventoryComponent.class);
+        ItemComponent targetItem = targetInventory.itemSlots.get(targetCell.slot).getComponent(ItemComponent.class);
         
         //make sure the items can be merged
         if (targetItem.stackId.equals(sourceItem.stackId) && !targetItem.stackId.isEmpty() && !sourceItem.stackId.isEmpty()) {
@@ -552,7 +553,7 @@ public class UIItemCell extends UIDisplayContainer  {
         EntityRef item = getFromTransferSlot();
         ItemComponent sourceItem = item.getComponent(ItemComponent.class);
         ItemComponent targetItem = targetCell.itemEntity.getComponent(ItemComponent.class);
-        
+
         //remove item from transfer slot
         sendToTransferSlot(null, (byte) 0);
         
@@ -562,7 +563,8 @@ public class UIItemCell extends UIDisplayContainer  {
         
         //place the item in the item slot
         sourceItem.container = targetCell.ownerEntity;
-        targetCell.ownerInventory.itemSlots.set(targetCell.slot, item);
+        InventoryComponent targetInventory = targetCell.getOwnerEntity().getComponent(InventoryComponent.class);
+        targetInventory.itemSlots.set(targetCell.slot, item);
         
         return true;
     }
@@ -610,7 +612,8 @@ public class UIItemCell extends UIDisplayContainer  {
                 CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(PlayerComponent.class).transferSlot = sourceCell.itemEntity;
                 
                 //remove the item from the inventory slot
-                sourceCell.ownerInventory.itemSlots.set(sourceCell.ownerInventory.itemSlots.indexOf(sourceCell.itemEntity), EntityRef.NULL);
+                InventoryComponent sourceInventory = sourceCell.getOwnerEntity().getComponent(InventoryComponent.class);
+                sourceInventory.itemSlots.set(sourceInventory.itemSlots.indexOf(sourceCell.itemEntity), EntityRef.NULL);
                 
             }
             //transfer part of stack
@@ -641,7 +644,8 @@ public class UIItemCell extends UIDisplayContainer  {
                         //remove source item if no items left
                         if (sourceItem.stackCount == 0) {
                             //remove item from the owners inventory slot
-                            sourceCell.ownerInventory.itemSlots.set(sourceCell.ownerInventory.itemSlots.indexOf(sourceCell.itemEntity), EntityRef.NULL);
+                            InventoryComponent sourceInventory = sourceCell.getOwnerEntity().getComponent(InventoryComponent.class);
+                            sourceInventory.itemSlots.set(sourceInventory.itemSlots.indexOf(sourceCell.itemEntity), EntityRef.NULL);
                         }
                         
                     }
@@ -676,7 +680,8 @@ public class UIItemCell extends UIDisplayContainer  {
                         CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(PlayerComponent.class).transferSlot = sourceCell.itemEntity;
                         
                         //remove item from the owners inventory slot
-                        sourceCell.ownerInventory.itemSlots.set(sourceCell.ownerInventory.itemSlots.indexOf(sourceCell.itemEntity), EntityRef.NULL);
+                        InventoryComponent sourceInventory = sourceCell.getOwnerEntity().getComponent(InventoryComponent.class);
+                        sourceInventory.itemSlots.set(sourceInventory.itemSlots.indexOf(sourceCell.itemEntity), EntityRef.NULL);
                         
                     }
                     
@@ -703,7 +708,8 @@ public class UIItemCell extends UIDisplayContainer  {
         
         if (sourceCell != null) {
             //notify component changed listeners
-            sourceCell.ownerEntity.saveComponent(sourceCell.ownerInventory);
+            InventoryComponent sourceInventory = sourceCell.getOwnerEntity().getComponent(InventoryComponent.class);
+            sourceCell.ownerEntity.saveComponent(sourceInventory);
         }
     }
     
