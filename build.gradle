@@ -19,7 +19,7 @@ task wrapper(type: Wrapper) {
 */
 
 ext {
-    startDateTimeString = new Date().format("yyyy-MM-dd_hh-mm-ss")
+    startDateTimeString = new Date().format("yyyy-MM-dd_HH-mm-ss")
     dirApplet = 'applet'
     dirData = 'data'
     dirNatives = 'natives'
@@ -32,6 +32,8 @@ ext {
     destDirMods = "distributions/$subDirMods"
     mainClassName = 'org.terasology.game.Terasology'
     jarFileName = 'Terasology.jar'
+    env = System.getenv() // read environment variables, including variables passed by jenking continuous integration server
+    versionInfoFile = new File(sourceSets.main.output.resourcesDir, 'org/terasology/versionInfo.properties')
 }
 
 repositories {
@@ -107,6 +109,21 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.10'
     testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.0'
 }
+
+task createVersionInfoFile << {
+    if (env.BUILD_NUMBER != null) {
+        ant.propertyfile (file: versionInfoFile) {
+            ant.entry(key:'buildNumber',value:env.BUILD_NUMBER)
+            ant.entry(key:'buildId',value:env.BUILD_ID)
+            ant.entry(key:'buildTag',value:env.BUILD_TAG)
+            ant.entry(key:'buildUrl',value:env.BUILD_URL)
+            ant.entry(key:'gitBranch',value:env.GIT_BRANCH)
+            ant.entry(key:'gitCommit',value:env.GIT_COMMIT)
+        }
+    }
+}
+createVersionInfoFile.dependsOn processResources
+classes.dependsOn createVersionInfoFile
 
 jar {
     archiveName = jarFileName
