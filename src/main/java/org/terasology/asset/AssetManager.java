@@ -65,7 +65,8 @@ public class AssetManager {
     public void addAssetTemporary(AssetUri uri, Asset asset) {
         Asset old = assetCache.put(uri, asset);
         if (old != null) {
-            old.dispose();
+            // TODO - most of our assets cause crashes when disposed at the moment
+            // old.dispose();
         }
     }
 

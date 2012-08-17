@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityInfoComponent;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.PersistableEntityManager;
 import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
@@ -28,6 +29,7 @@ import org.terasology.entitySystem.stubs.GetterSetterComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.MappedTypeComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
+import org.terasology.game.bootstrap.EntitySystemBuilder;
 import org.terasology.protobuf.EntityData;
 
 import com.google.common.collect.Lists;
@@ -39,21 +41,21 @@ import com.google.common.collect.Maps;
 public class EntitySerializationTest {
 
 	ComponentLibrary componentLibrary;
-    PojoEntityManager entityManager;
+    PersistableEntityManager entityManager;
     EntityPersisterHelper entityPersisterHelper;
     PrefabManager prefabManager;
 
     @Before
     public void setup() {
 
-        componentLibrary = new ComponentLibraryImpl();
-        componentLibrary.registerTypeHandler(Vector3f.class, new Vector3fTypeHandler());
-        componentLibrary.registerComponentClass(IntegerComponent.class);
-        componentLibrary.registerComponentClass(StringComponent.class);
-        componentLibrary.registerComponentClass(GetterSetterComponent.class);
-        prefabManager = new PojoPrefabManager(componentLibrary);
-        entityManager = new PojoEntityManager(componentLibrary, prefabManager);
+        EntitySystemBuilder builder = new EntitySystemBuilder();
+        entityManager = builder.build();
+        entityManager.getComponentLibrary().registerComponentClass(GetterSetterComponent.class);
+        entityManager.getComponentLibrary().registerComponentClass(StringComponent.class);
+        entityManager.getComponentLibrary().registerComponentClass(IntegerComponent.class);
         entityPersisterHelper = new EntityPersisterHelperImpl(entityManager);
+        componentLibrary = entityManager.getComponentLibrary();
+        prefabManager = entityManager.getPrefabManager();
     }
 
     @Test
@@ -126,7 +128,9 @@ public class EntitySerializationTest {
         prefab.setComponent(new StringComponent("Value"));
 
         EntityRef entity = entityManager.create(prefab);
-        entity.getComponent(StringComponent.class).value = "Delta";
+        StringComponent comp = entity.getComponent(StringComponent.class);
+        comp.value = "Delta";
+        entity.saveComponent(comp);
         EntityData.Entity entityData = entityPersisterHelper.serializeEntity(entity);
 
         assertEquals(entity.getId(), entityData.getId());
@@ -192,7 +196,9 @@ public class EntitySerializationTest {
         prefab.setComponent(new StringComponent("Value"));
 
         EntityRef entity = entityManager.create("Test");
-        entity.getComponent(StringComponent.class).value = "Delta";
+        StringComponent comp = entity.getComponent(StringComponent.class);
+        comp.value = "Delta";
+        entity.saveComponent(comp);
         EntityData.Entity entityData = entityPersisterHelper.serializeEntity(entity);
         entityManager.clear();
         EntityRef loadedEntity = entityPersisterHelper.deserializeEntity(entityData);
@@ -232,7 +238,9 @@ public class EntitySerializationTest {
         prefab.setComponent(new StringComponent("Value"));
 
         EntityRef entity = entityManager.create(prefab);
-        entity.getComponent(StringComponent.class).value = "New";
+        StringComponent comp = entity.getComponent(StringComponent.class);
+        comp.value = "New";
+        entity.saveComponent(comp);
 
         EntityData.Entity entityData = entityPersisterHelper.serializeEntity(entity);
 
@@ -262,7 +270,9 @@ public class EntitySerializationTest {
         prefab.setComponent(new StringComponent("Value"));
 
         EntityRef entity = entityManager.create(prefab);
-        entity.getComponent(StringComponent.class).value = "New";
+        StringComponent comp = entity.getComponent(StringComponent.class);
+        comp.value = "New";
+        entity.saveComponent(comp);
 
         EntityData.Entity entityData = entityPersisterHelper.serializeEntity(entity);
         entityManager.clear();

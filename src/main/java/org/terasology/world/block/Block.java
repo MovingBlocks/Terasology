@@ -577,9 +577,15 @@ public class Block {
         shader.enable();
         shader.setFloat("light", light);
 
+        if (mesh.isDisposed()) {
+            logger.severe("Mesh disposed");
+            return;
+        }
+
         if (mesh == null) {
             generateMesh();
         }
+
 
         if (!isDoubleSided() || !glIsEnabled(GL11.GL_CULL_FACE)) {
             mesh.render();
@@ -602,7 +608,6 @@ public class Block {
         }
         mesh = tessellator.generateMesh(new AssetUri(AssetType.MESH, uri.toString()));
         AssetManager.getInstance().addAssetTemporary(mesh.getURI(), mesh);
-
     }
 
     @Override

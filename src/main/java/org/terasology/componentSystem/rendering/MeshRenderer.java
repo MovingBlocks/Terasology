@@ -40,6 +40,7 @@ import gnu.trove.list.array.TIntArrayList;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.vecmath.AxisAngle4f;
@@ -223,7 +224,13 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
                     MeshComponent meshComp = entity.getComponent(MeshComponent.class);
                     LocationComponent location = entity.getComponent(LocationComponent.class);
 
-                    if (location == null || meshComp.mesh == null) continue;
+                    if (location == null || meshComp.mesh == null) {
+                        continue;
+                    }
+                    if (meshComp.mesh.isDisposed()) {
+                        logger.log(Level.SEVERE, "Found disposed mesh");
+                        continue;
+                    }
 
                     location.getWorldRotation(worldRot);
                     location.getWorldPosition(worldPos);

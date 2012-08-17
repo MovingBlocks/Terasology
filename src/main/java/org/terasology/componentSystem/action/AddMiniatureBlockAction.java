@@ -61,7 +61,8 @@ public class AddMiniatureBlockAction implements EventHandlerSystem {
 
             Vector3i targetPos = new Vector3i(event.getTargetLocation());
 
-            entity.getComponent(MiniaturizerComponent.class).blockGrid.addGridPosition(targetPos, worldProvider.getBlock(targetPos).getId());
+            comp.blockGrid.addGridPosition(targetPos, worldProvider.getBlock(targetPos).getId());
+            entity.saveComponent(comp);
         }
         else {
 
@@ -89,8 +90,8 @@ public class AddMiniatureBlockAction implements EventHandlerSystem {
 
             comp.miniatureChunk = chunk;
             comp.renderPosition = new Vector3f(renderLocation);
-
             grid.clear();
+            entity.saveComponent(comp);
         }
 
     }

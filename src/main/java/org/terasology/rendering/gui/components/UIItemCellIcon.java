@@ -28,8 +28,7 @@ import org.terasology.world.block.family.BlockFamily;
  */
 public class UIItemCellIcon extends UIDisplayContainer {
     //entity
-    private EntityRef itemEntity;
-    private ItemComponent itemComponent;
+    private EntityRef itemEntity = EntityRef.NULL;
 
     //sub elements
     private final UIText itemCount;
@@ -39,8 +38,6 @@ public class UIItemCellIcon extends UIDisplayContainer {
     private Vector2f itemCountPosition = new Vector2f(26f, 5f);
 
     public UIItemCellIcon() {
-        itemEntity = EntityRef.NULL;
-
         terrainTex = AssetManager.loadTexture("engine:terrain");
 
         itemCount = new UIText();
@@ -57,6 +54,7 @@ public class UIItemCellIcon extends UIDisplayContainer {
 
     @Override
     public void update() {
+        ItemComponent itemComponent = itemEntity.getComponent(ItemComponent.class);
         //item count visibility
         if (itemComponent != null) {
             if (itemComponent.stackCount > 1) {
@@ -70,9 +68,7 @@ public class UIItemCellIcon extends UIDisplayContainer {
 
     @Override
     public void render() {
-        if (!itemEntity.exists())
-            return;
-
+        ItemComponent itemComponent = itemEntity.getComponent(ItemComponent.class);
         if (itemComponent == null)
             return;
 
@@ -138,9 +134,5 @@ public class UIItemCellIcon extends UIDisplayContainer {
 
     public void setItemEntity(EntityRef itemEntity) {
         this.itemEntity = itemEntity;
-        if (itemEntity.exists())
-            this.itemComponent = itemEntity.getComponent(ItemComponent.class);
-        else
-            this.itemComponent = null;
     }
 }

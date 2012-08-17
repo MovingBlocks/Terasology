@@ -15,6 +15,10 @@
  */
 package org.terasology.entitySystem.persistence;
 
+import com.google.common.base.Objects;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import com.google.common.collect.Maps;
 import gnu.trove.procedure.TIntProcedure;
 
 import java.lang.reflect.InvocationTargetException;
@@ -171,28 +175,30 @@ public class EntityPersisterHelperImpl implements EntityPersisterHelper {
 
     @Override
     public EntityRef deserializeEntity(EntityData.Entity entityData) {
-        EntityRef entity = entityManager.createEntityRefWithId(entityData.getId());
+        Map<Class<? extends Component>, Component> componentMap = Maps.newHashMap();
         if (entityData.hasParentPrefab() && !entityData.getParentPrefab().isEmpty() && prefabManager.exists(entityData.getParentPrefab())) {
             Prefab prefab = prefabManager.getPrefab(entityData.getParentPrefab());
             for (Component component : prefab.listComponents()) {
                 String componentName = ComponentUtil.getComponentClassName(component.getClass());
                 if (!containsIgnoreCase(componentName, entityData.getRemovedComponentList())) {
-                    entity.addComponent(componentLibrary.copy(component));
+                    componentMap.put(component.getClass(), componentLibrary.copy(component));
                 }
             }
-            entity.addComponent(new EntityInfoComponent(entityData.getParentPrefab()));
+            componentMap.put(EntityInfoComponent.class, new EntityInfoComponent(entityData.getParentPrefab()));
         }
         for (EntityData.Component componentData : entityData.getComponentList()) {
             Class<? extends Component> componentClass = getComponentClass(componentData);
             if (componentClass == null) continue;
 
-            if (!entity.hasComponent(componentClass)) {
-                entity.addComponent(deserializeComponent(componentData));
+            Component existingComponent = componentMap.get(componentClass);
+            if (existingComponent == null) {
+                Component newComponent = deserializeComponent(componentData);
+                componentMap.put(componentClass, newComponent);
             } else {
-                deserializeComponentOnto(entity.getComponent(componentClass), componentData);
+                deserializeComponentOnto(existingComponent, componentData);
             }
         }
-        return entity;
+        return entityManager.createEntityWithId(entityData.getId(), componentMap.values());
     }
 
     @Override

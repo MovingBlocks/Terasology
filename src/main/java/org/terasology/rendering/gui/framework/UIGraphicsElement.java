@@ -35,12 +35,16 @@ import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
 
+import java.util.logging.Logger;
+
 /**
  * Provides support for rendering graphical elements.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class UIGraphicsElement extends UIDisplayElement {
+    private Logger logger = Logger.getLogger(getClass().getName());
+
     private final Texture texture;
 
     private final Vector2f _textureOrigin = new Vector2f(0.0f, 0.0f);
@@ -63,6 +67,11 @@ public class UIGraphicsElement extends UIDisplayElement {
     public void render() {
         if (_mesh == null)
             return;
+
+        if (_mesh.isDisposed()) {
+            logger.severe("Disposed mesh encountered!");
+            return;
+        }
 
         ShaderManager.getInstance().enableDefaultTextured();
         glBindTexture(GL11.GL_TEXTURE_2D, texture != null ? texture.getId() : 0);

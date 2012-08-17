@@ -223,6 +223,10 @@ public class Mesh implements Asset {
         }
     }
 
+    public boolean isDisposed() {
+        return vboVertexBuffer == 0 || vboIndexBuffer == 0;
+    }
+
     public TFloatList getVertices() {
         return vertices;
     }

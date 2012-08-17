@@ -97,6 +97,8 @@ public class StatusAffectorSystem implements EventHandlerSystem, UpdateSubscribe
                 entity.saveComponent(charmov);
                 entity.removeComponent(SpeedBoostComponent.class);
 
+            } else {
+                entity.saveComponent(speedEffect);
             }
         }
         for (EntityRef entity : entityManager.iteratorEntities(HealthComponent.class, PoisonedComponent.class)) {
@@ -116,6 +118,8 @@ public class StatusAffectorSystem implements EventHandlerSystem, UpdateSubscribe
             //Remove POISONED Status
             if (poisonedEffect.poisonDuration <= 0) {
                 entity.removeComponent(PoisonedComponent.class);
+            } else {
+                entity.saveComponent(poisonedEffect);
             }
         }
         for (EntityRef entity : entityManager.iteratorEntities(CuredComponent.class)) {

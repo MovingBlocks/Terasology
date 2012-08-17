@@ -49,23 +49,20 @@ public class SpawnPrefabAction implements EventHandlerSystem {
     public void onActivate(ActivateEvent event, EntityRef entity) {
         SpawnPrefabActionComponent spawnInfo = entity.getComponent(SpawnPrefabActionComponent.class);
         if (spawnInfo.prefab != null) {
-            EntityRef newEntity = entityManager.create(spawnInfo.prefab);
-            LocationComponent loc = newEntity.getComponent(LocationComponent.class);
-            if (loc != null) {
-                switch (spawnInfo.spawnLocationRelativeTo) {
-                    case Instigator:
-                        loc.setWorldPosition(event.getInstigatorLocation());
-                        break;
-                    case Target:
-                        Vector3f pos = event.getTargetLocation();
-                        if (pos != null) {
-                            loc.setWorldPosition(pos);
-                        }
-                        break;
-                }
-                // TODO: Set rotation
-                newEntity.saveComponent(loc);
+            Vector3f spawnLoc = new Vector3f();
+            switch (spawnInfo.spawnLocationRelativeTo) {
+                case Instigator:
+                    spawnLoc.set(event.getInstigatorLocation());
+                    break;
+                case Target:
+                    Vector3f pos = event.getTargetLocation();
+                    if (pos != null) {
+                        spawnLoc.set(pos);
+                    }
+                    break;
             }
+
+            EntityRef newEntity = entityManager.create(spawnInfo.prefab, spawnLoc);
         }
     }
 }
