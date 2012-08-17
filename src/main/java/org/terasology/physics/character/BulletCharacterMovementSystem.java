@@ -15,14 +15,16 @@
  */
 package org.terasology.physics.character;
 
-import java.util.logging.Logger;
-
-import javax.vecmath.AxisAngle4f;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
-
+import com.bulletphysics.BulletGlobals;
+import com.bulletphysics.collision.dispatch.CollisionFlags;
+import com.bulletphysics.collision.dispatch.CollisionObject;
+import com.bulletphysics.collision.dispatch.CollisionWorld;
+import com.bulletphysics.collision.dispatch.GhostObject;
 import com.bulletphysics.collision.dispatch.PairCachingGhostObject;
+import com.bulletphysics.collision.shapes.CapsuleShape;
+import com.bulletphysics.collision.shapes.ConvexShape;
+import com.bulletphysics.linearmath.Transform;
+import com.google.common.collect.Lists;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
@@ -41,41 +43,57 @@ import org.terasology.physics.BulletPhysics;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.world.WorldProvider;
 
-import com.bulletphysics.BulletGlobals;
-import com.bulletphysics.collision.dispatch.CollisionFlags;
-import com.bulletphysics.collision.dispatch.CollisionObject;
-import com.bulletphysics.collision.dispatch.CollisionWorld;
-import com.bulletphysics.collision.dispatch.GhostObject;
-import com.bulletphysics.collision.shapes.CapsuleShape;
-import com.bulletphysics.collision.shapes.ConvexShape;
-import com.bulletphysics.linearmath.Transform;
-import com.google.common.collect.Lists;
+import javax.vecmath.AxisAngle4f;
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+import java.util.logging.Logger;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
 @RegisterComponentSystem
-public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, EventHandlerSystem {
+public final class BulletCharacterMovementSystem implements UpdateSubscriberSystem, EventHandlerSystem {
 
+    /**
+     * The amount of extra distance added to vertical movement to allow for penetration.
+     */
     private static final float VERTICAL_PENETRATION_LEEWAY = 0.05f;
+    /**
+     * The amount of vertical penetration to allow.
+     */
     private static final float VERTICAL_PENETRATION = 0.04f;
+    /**
+     * The amount of extra distance added to horizontal movement to allow for penentration.
+     */
     private static final float HORIZONTAL_PENETRATION_LEEWAY = 0.04f;
+    /**
+     * The amount of horizontal penetration to allow.
+     */
     private static final float HORIZONTAL_PENETRATION = 0.03f;
 
-    public static final float Gravity = 28.0f;
-    public static final float TerminalVelocity = 64.0f;
+    public static final float GRAVITY = 28.0f;
+    public static final float TERMINAL_VELOCITY = 64.0f;
 
-    public static final float UnderwaterGravity = 0.25f;
-    public static final float UnderwaterInertia = 2.0f;
-    public static final float WaterTerminalVelocity = 4.0f;
+    public static final float UNDERWATER_GRAVITY = 0.25f;
+    public static final float UNDERWATER_INERTIA = 2.0f;
+    public static final float WATER_TERMINAL_VELOCITY = 4.0f;
 
-    public static final float GhostInertia = 4f;
+    public static final float GHOST_INERTIA = 4f;
+
+    private static final float CHECK_FORWARD_DIST = 0.05f;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     private EntityManager entityManager;
     private WorldProvider worldProvider;
     private BulletPhysics physics;
+
+    // Processing state variables
+
+    private float steppedUpDist = 0;
+    private boolean stepped = false;
+
 
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
@@ -88,7 +106,7 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
     }
 
     @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
-    public void onDestroy(RemovedComponentEvent event, EntityRef entity) {
+    public void onDestroy(final RemovedComponentEvent event, final EntityRef entity) {
         CharacterMovementComponent comp = entity.getComponent(CharacterMovementComponent.class);
         if (comp.collider != null) {
             physics.removeCollider(comp.collider);
@@ -98,7 +116,9 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
     public void update(float delta) {
         for (EntityRef entity : entityManager.iteratorEntities(CharacterMovementComponent.class, LocationComponent.class)) {
             LocationComponent location = entity.getComponent(LocationComponent.class);
-            if (!worldProvider.isBlockActive(location.getWorldPosition())) continue;
+            if (!worldProvider.isBlockActive(location.getWorldPosition())) {
+                continue;
+            }
 
             CharacterMovementComponent movementComp = entity.getComponent(CharacterMovementComponent.class);
 
@@ -148,7 +168,7 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
         movementComp.isSwimming = newSwimming;
     }
 
-    private void updatePosition(float delta, EntityRef entity, LocationComponent location, CharacterMovementComponent movementComp) {
+    private void updatePosition(final float delta, final EntityRef entity, final LocationComponent location, final CharacterMovementComponent movementComp) {
         if (movementComp.isGhosting) {
             ghost(delta, location, movementComp);
         } else if (movementComp.isSwimming) {
@@ -166,12 +186,12 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
         }
         desiredVelocity.scale(maxSpeed);
 
-        desiredVelocity.y -= UnderwaterGravity;
+        desiredVelocity.y -= UNDERWATER_GRAVITY;
 
         // Modify velocity towards desired, up to the maximum rate determined by friction
         Vector3f velocityDiff = new Vector3f(desiredVelocity);
         velocityDiff.sub(movementComp.getVelocity());
-        velocityDiff.scale(Math.min(UnderwaterInertia * delta, 1.0f));
+        velocityDiff.scale(Math.min(UNDERWATER_INERTIA * delta, 1.0f));
 
         movementComp.getVelocity().x += velocityDiff.x;
         movementComp.getVelocity().y += velocityDiff.y;
@@ -187,7 +207,7 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
         moveDelta.scale(delta);
 
         // Note: No stepping underwater, no issue with slopes
-        MoveResult moveResult = move(location.getWorldPosition(), moveDelta, 0, -1, movementComp.collider);
+        MoveResult moveResult = move(location.getWorldPosition(), moveDelta, 0, 0, -1, movementComp.collider);
         Vector3f distanceMoved = new Vector3f(moveResult.finalPosition);
         distanceMoved.sub(location.getWorldPosition());
 
@@ -214,7 +234,7 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
         Vector3f velocityDiff = new Vector3f(desiredVelocity);
         velocityDiff.sub(movementComp.getVelocity());
 
-        velocityDiff.scale(Math.min(GhostInertia * delta, 1.0f));
+        velocityDiff.scale(Math.min(GHOST_INERTIA * delta, 1.0f));
 
         movementComp.getVelocity().add(velocityDiff);
 
@@ -259,12 +279,12 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
 
         movementComp.getVelocity().x += velocityDiff.x;
         movementComp.getVelocity().z += velocityDiff.z;
-        movementComp.getVelocity().y = Math.max(-TerminalVelocity, (movementComp.getVelocity().y - Gravity * delta));
+        movementComp.getVelocity().y = Math.max(-TERMINAL_VELOCITY, (movementComp.getVelocity().y - GRAVITY * delta));
 
         Vector3f moveDelta = new Vector3f(movementComp.getVelocity());
         moveDelta.scale(delta);
 
-        MoveResult moveResult = move(location.getWorldPosition(), moveDelta, (movementComp.isGrounded) ? movementComp.stepHeight : 0, movementComp.slopeFactor, movementComp.collider);
+        MoveResult moveResult = move(location.getWorldPosition(), moveDelta, movementComp.stepHeight, (movementComp.isGrounded) ? movementComp.stepHeight : 0, movementComp.slopeFactor, movementComp.collider);
         Vector3f distanceMoved = new Vector3f(moveResult.finalPosition);
         distanceMoved.sub(location.getWorldPosition());
 
@@ -318,22 +338,41 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
         public boolean hitTop = false;
     }
 
+    private MoveResult move(Vector3f startPosition, Vector3f moveDelta, float stepHeight, float stepDownHeight, float slopeFactor, PairCachingGhostObject collider) {
+        steppedUpDist = 0;
+        stepped = false;
 
-    private MoveResult move(Vector3f startPosition, Vector3f moveDelta, float stepHeight, float slopeFactor, PairCachingGhostObject collider) {
         MoveResult result = new MoveResult();
         Vector3f position = new Vector3f(startPosition);
         result.finalPosition = position;
 
-        float steppedUpDist = moveUp((moveDelta.y > 0) ? moveDelta.y : 0, stepHeight, collider, result, position);
-        result.hitHoriz = moveHorizontal(new Vector3f(moveDelta.x, 0, moveDelta.z), collider, position, slopeFactor);
-        result.hitBottom = moveDown((moveDelta.y < 0) ? moveDelta.y : 0, steppedUpDist, stepHeight, slopeFactor, collider, position);
+        // Actual upwards movement
+        if (moveDelta.y > 0) {
+            result.hitTop = moveDelta.y - moveUp(moveDelta.y, collider, position) > BulletGlobals.SIMD_EPSILON;
+        }
+        result.hitHoriz = moveHorizontal(new Vector3f(moveDelta.x, 0, moveDelta.z), collider, position, slopeFactor, stepHeight);
+        if (moveDelta.y < 0 || steppedUpDist > 0) {
+            float dist = (moveDelta.y < 0) ? moveDelta.y : 0;
+            dist -= steppedUpDist;
+            result.hitBottom = moveDown(dist, slopeFactor, collider, position);
+        }
+        if (!result.hitBottom && stepDownHeight > 0) {
+            Vector3f tempPos = new Vector3f(position);
+            result.hitBottom = moveDown(-stepDownHeight, slopeFactor, collider, tempPos);
+            // Don't apply step down if nothing to step onto
+            if (result.hitBottom) {
+                position.set(tempPos);
+            }
+        }
         return result;
     }
 
-    private boolean moveHorizontal(Vector3f horizMove, PairCachingGhostObject collider, Vector3f position, float slopeFactor) {
+    private boolean moveHorizontal(Vector3f horizMove, PairCachingGhostObject collider, Vector3f position, float slopeFactor, float stepHeight) {
         float remainingFraction = 1.0f;
         float dist = horizMove.length();
-        if (dist < BulletGlobals.SIMD_EPSILON) return false;
+        if (dist < BulletGlobals.SIMD_EPSILON) {
+            return false;
+        }
 
         boolean horizontalHit = false;
         Vector3f normalizedDir = Vector3fUtil.safeNormalize(horizMove, new Vector3f());
@@ -341,6 +380,7 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
         targetPos.scale(dist + HORIZONTAL_PENETRATION_LEEWAY);
         targetPos.add(position);
         int iteration = 0;
+        Vector3f lastHitNormal = new Vector3f(0, 1, 0);
         while (remainingFraction >= 0.01f && iteration++ < 10) {
             SweepCallback callback = sweep(position, targetPos, collider, slopeFactor, HORIZONTAL_PENETRATION);
 
@@ -360,18 +400,34 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
                 dist -= actualDist;
                 Vector3f newDir = new Vector3f(normalizedDir);
                 newDir.scale(dist);
-                extractResidualMovement(callback.hitNormalWorld, newDir);
 
                 float slope = callback.hitNormalWorld.dot(new Vector3f(0, 1, 0));
-                if (slope < slopeFactor) {
-                    horizontalHit = true;
+                // We step up if we're hitting a big slope, or if we're grazing the ground)
+                if (slope < slopeFactor || 1 - slope < BulletGlobals.SIMD_EPSILON) {
+                    boolean stepping = checkStep(collider, position, newDir, callback, slopeFactor, stepHeight);
+                    if (!stepping) {
+                        horizontalHit = true;
 
-                    Vector3f modifiedNormal = new Vector3f(callback.hitNormalWorld);
-                    modifiedNormal.y = 0;
-                    if (modifiedNormal.lengthSquared() > BulletGlobals.SIMD_EPSILON) {
-                        modifiedNormal.normalize();
-                        extractResidualMovement(modifiedNormal, newDir);
+                        Vector3f newHorizDir = new Vector3f(newDir.x, 0, newDir.z);
+                        Vector3f horizNormal = new Vector3f(callback.hitNormalWorld.x, 0, callback.hitNormalWorld.z);
+                        if (horizNormal.lengthSquared() > BulletGlobals.SIMD_EPSILON) {
+                            horizNormal.normalize();
+                            if (lastHitNormal.dot(horizNormal) > BulletGlobals.SIMD_EPSILON) {
+                                break;
+                            }
+                            lastHitNormal.set(horizNormal);
+                            extractResidualMovement(horizNormal, newHorizDir);
+                        }
+
+                        newDir.set(newHorizDir);
                     }
+                } else {
+                    // Hitting a shallow slope, move up it
+                    Vector3f newHorizDir = new Vector3f(newDir.x, 0, newDir.z);
+                    extractResidualMovement(callback.hitNormalWorld, newDir);
+                    Vector3f modHorizDir = new Vector3f(newDir);
+                    modHorizDir.y = 0;
+                    newDir.scale(newHorizDir.length() / modHorizDir.length());
                 }
 
                 float sqrDist = newDir.lengthSquared();
@@ -397,39 +453,81 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
         return horizontalHit;
     }
 
-    private boolean moveDown(float fallAmount, float steppedUpAmount, float stepDownAmount, float slopeFactor, PairCachingGhostObject collider, Vector3f position) {
-        float stepDist = steppedUpAmount - fallAmount + stepDownAmount;
-        float remainingDist = stepDist;
+    private boolean checkStep(PairCachingGhostObject collider, Vector3f position, Vector3f direction, SweepCallback callback, float slopeFactor, float stepHeight) {
+        if (!stepped) {
+            stepped = true;
 
-        Vector3f currentPos = new Vector3f(position);
+            Vector3f lookAheadOffset = new Vector3f(direction);
+            lookAheadOffset.y = 0;
+            lookAheadOffset.normalize();
+            lookAheadOffset.scale(CHECK_FORWARD_DIST);
+            boolean hitStep = false;
+            float stepSlope = 1f;
+
+            Vector3f fromWorld = new Vector3f(callback.hitPointWorld);
+            fromWorld.y += stepHeight + 0.05f;
+            fromWorld.add(lookAheadOffset);
+            Vector3f toWorld = new Vector3f(callback.hitPointWorld);
+            toWorld.y -= 0.05f;
+            toWorld.add(lookAheadOffset);
+            CollisionWorld.ClosestRayResultCallback rayResult = new CollisionWorld.ClosestRayResultCallback(fromWorld, toWorld);
+            CollisionWorld.rayTestSingle(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), fromWorld, 1.0f)), new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), toWorld, 1.0f)), callback.hitCollisionObject, callback.hitCollisionObject.getCollisionShape(), callback.hitCollisionObject.getWorldTransform(new Transform()), rayResult);
+            if (rayResult.hasHit()) {
+                hitStep = true;
+                stepSlope = rayResult.hitNormalWorld.dot(new Vector3f(0, 1, 0));
+            }
+            fromWorld.add(lookAheadOffset);
+            toWorld.add(lookAheadOffset);
+            rayResult = new CollisionWorld.ClosestRayResultCallback(fromWorld, toWorld);
+            CollisionWorld.rayTestSingle(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), fromWorld, 1.0f)), new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), toWorld, 1.0f)), callback.hitCollisionObject, callback.hitCollisionObject.getCollisionShape(), callback.hitCollisionObject.getWorldTransform(new Transform()), rayResult);
+            if (rayResult.hasHit()) {
+                hitStep = true;
+                stepSlope = Math.min(stepSlope, rayResult.hitNormalWorld.dot(new Vector3f(0, 1, 0)));
+            }
+
+            if (hitStep && stepSlope >= slopeFactor) {
+                steppedUpDist = moveUp(stepHeight, collider, position);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean moveDown(float dist, float slopeFactor, PairCachingGhostObject collider, Vector3f position) {
+
+        float remainingDist = -dist;
+
         Vector3f targetPos = new Vector3f(position);
         targetPos.y -= remainingDist + VERTICAL_PENETRATION_LEEWAY;
-        Vector3f normalizedDir = new Vector3f(targetPos);
-        normalizedDir.sub(currentPos);
-        normalizedDir.normalize();
+        Vector3f normalizedDir = new Vector3f(0, -1, 0);
         boolean hit = false;
 
         int iteration = 0;
         while (remainingDist > BulletGlobals.SIMD_EPSILON && iteration++ < 10) {
-            SweepCallback callback = sweep(currentPos, targetPos, collider, -1.0f, VERTICAL_PENETRATION);
+            SweepCallback callback = sweep(position, targetPos, collider, -1.0f, VERTICAL_PENETRATION);
 
             float actualDist = Math.max(0, (remainingDist + VERTICAL_PENETRATION_LEEWAY) * callback.closestHitFraction - VERTICAL_PENETRATION_LEEWAY);
             Vector3f expectedMove = new Vector3f(targetPos);
-            expectedMove.sub(currentPos);
+            expectedMove.sub(position);
             if (expectedMove.lengthSquared() > BulletGlobals.SIMD_EPSILON) {
                 expectedMove.normalize();
                 expectedMove.scale(actualDist);
-                currentPos.add(expectedMove);
+                position.add(expectedMove);
+            }
+
+            remainingDist -= actualDist;
+            if (remainingDist < BulletGlobals.SIMD_EPSILON) {
+                break;
             }
 
             if (callback.hasHit()) {
-                hit = true;
+                Vector3f contactPoint = callback.hitPointWorld;
+                float originalSlope = callback.hitNormalWorld.dot(new Vector3f(0, 1, 0));
+                if (originalSlope < slopeFactor) {
+                    float slope = 1;
+                    boolean foundSlope = false;
 
-                Vector3f contactPoint = null;
-                contactPoint = callback.hitPointWorld;
-
-                Vector3f normal = callback.hitNormalWorld;
-                if (contactPoint != null) {
+                    // We do two ray traces, and use the steepest, to avoid incongruities with the slopes
                     Vector3f fromWorld = new Vector3f(contactPoint);
                     fromWorld.y += 0.2f;
                     Vector3f toWorld = new Vector3f(contactPoint);
@@ -437,15 +535,34 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
                     CollisionWorld.ClosestRayResultCallback rayResult = new CollisionWorld.ClosestRayResultCallback(fromWorld, toWorld);
                     CollisionWorld.rayTestSingle(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), fromWorld, 1.0f)), new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), toWorld, 1.0f)), callback.hitCollisionObject, callback.hitCollisionObject.getCollisionShape(), callback.hitCollisionObject.getWorldTransform(new Transform()), rayResult);
 
+                    if (rayResult.hasHit()) {
+                        foundSlope = true;
+                        slope = Math.min(slope, (rayResult.hitNormalWorld.dot(new Vector3f(0, 1, 0))));
+                    }
+
+                    Vector3f secondTraceOffset = new Vector3f(callback.hitNormalWorld);
+                    secondTraceOffset.y = 0;
+                    secondTraceOffset.normalize();
+                    secondTraceOffset.scale(CHECK_FORWARD_DIST);
+                    fromWorld.add(secondTraceOffset);
+                    toWorld.add(secondTraceOffset);
+
+                    rayResult = new CollisionWorld.ClosestRayResultCallback(fromWorld, toWorld);
+                    CollisionWorld.rayTestSingle(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), fromWorld, 1.0f)), new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), toWorld, 1.0f)), callback.hitCollisionObject, callback.hitCollisionObject.getCollisionShape(), callback.hitCollisionObject.getWorldTransform(new Transform()), rayResult);
 
                     if (rayResult.hasHit()) {
-                        normal = rayResult.hitNormalWorld;
+                        foundSlope = true;
+                        slope = Math.min(slope, (rayResult.hitNormalWorld.dot(new Vector3f(0, 1, 0))));
                     }
-                    if (normal.dot(new Vector3f(0, 1, 0)) < slopeFactor) {
 
+                    if (!foundSlope) {
+                        slope = originalSlope;
+                    }
+
+                    if (slope < slopeFactor) {
                         remainingDist -= actualDist;
                         expectedMove.set(targetPos);
-                        expectedMove.sub(currentPos);
+                        expectedMove.sub(position);
 
                         extractResidualMovement(callback.hitNormalWorld, expectedMove);
                         float sqrDist = expectedMove.lengthSquared();
@@ -459,14 +576,16 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
                             hit = true;
                             break;
                         }
+                        if (expectedMove.y > -BulletGlobals.SIMD_EPSILON) {
+                            hit = true;
+                            break;
+                        }
                         normalizedDir.set(expectedMove);
-                        expectedMove.scale(((float) Math.sqrt(sqrDist) + HORIZONTAL_PENETRATION_LEEWAY));
-                        targetPos.add(currentPos, expectedMove);
+
+                        expectedMove.scale(-remainingDist / expectedMove.y + HORIZONTAL_PENETRATION_LEEWAY);
+                        targetPos.add(position, expectedMove);
                     } else {
-                        /*if (!rayResult.hasHit()) {
-                            logger.info("Raycast missed");
-                        } */
-                        //hit = true;
+                        hit = true;
                         break;
                     }
                 } else {
@@ -482,42 +601,19 @@ public class BulletCharacterMovementSystem implements UpdateSubscriberSystem, Ev
             hit = true;
         }
 
-        if (!hit) {
-            if (stepDownAmount > 0) {
-                moveDown(fallAmount - steppedUpAmount, 0, 0, slopeFactor, collider, position);
-            } else {
-                position.set(currentPos);
-            }
-            return false;
-        } else {
-            if (stepDownAmount > 0) {
-                moveDown(fallAmount - steppedUpAmount, 0, 0, slopeFactor, collider, position);
-            } else {
-                position.set(currentPos);
-            }
-            return true;
-        }
+        return hit;
     }
 
-    private float moveUp(float riseAmount, float stepHeight, GhostObject collider, MoveResult result, Vector3f position) {
-        float vertDist = riseAmount + stepHeight;
-        float steppedUpDist = 0;
-
-        SweepCallback callback = sweep(position, new Vector3f(position.x, position.y + vertDist + VERTICAL_PENETRATION_LEEWAY, position.z), collider, -1.0f, VERTICAL_PENETRATION_LEEWAY);
+    private float moveUp(float riseAmount, GhostObject collider, Vector3f position) {
+        SweepCallback callback = sweep(position, new Vector3f(position.x, position.y + riseAmount + VERTICAL_PENETRATION_LEEWAY, position.z), collider, -1.0f, VERTICAL_PENETRATION_LEEWAY);
 
         if (callback.hasHit()) {
-            float actualDist = Math.max(0, ((vertDist + VERTICAL_PENETRATION_LEEWAY) * callback.closestHitFraction) - VERTICAL_PENETRATION_LEEWAY);
+            float actualDist = Math.max(0, ((riseAmount + VERTICAL_PENETRATION_LEEWAY) * callback.closestHitFraction) - VERTICAL_PENETRATION_LEEWAY);
             position.y += actualDist;
-            if (actualDist <= riseAmount) {
-                result.hitTop = true;
-            } else {
-                steppedUpDist = actualDist - riseAmount;
-            }
-        } else {
-            position.y += vertDist;
-            steppedUpDist = stepHeight;
+            return actualDist;
         }
-        return steppedUpDist;
+        position.y += riseAmount;
+        return riseAmount;
     }
 
     private SweepCallback sweep(Vector3f from, Vector3f to, GhostObject collider, float slopeFactor, float allowedPenetration) {
