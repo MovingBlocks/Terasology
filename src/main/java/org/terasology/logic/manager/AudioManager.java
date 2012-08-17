@@ -302,10 +302,6 @@ public abstract class AudioManager implements SoundManager {
         if (loc != null) {
             return loc.getWorldPosition();
         }
-        BlockComponent blockComp = entity.getComponent(BlockComponent.class);
-        if (blockComp != null) {
-            return blockComp.getPosition().toVector3f();
-        }
         return null;
     }
 

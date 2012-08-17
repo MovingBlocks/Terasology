@@ -75,10 +75,6 @@ public class ActivateEvent extends AbstractEvent {
         if (loc != null) {
             return loc.getWorldPosition();
         }
-        BlockComponent blockComp = target.getComponent(BlockComponent.class);
-        if (blockComp != null) {
-            return blockComp.getPosition().toVector3f();
-        }
         return null;
     }
 

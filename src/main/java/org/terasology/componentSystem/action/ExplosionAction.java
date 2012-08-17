@@ -70,11 +70,6 @@ public class ExplosionAction implements EventHandlerSystem {
                 LocationComponent loc = entity.getComponent(LocationComponent.class);
                 if (loc != null) {
                     origin = loc.getWorldPosition();
-                } else {
-                    BlockComponent blockComp = entity.getComponent(BlockComponent.class);
-                    if (blockComp != null) {
-                        origin = blockComp.getPosition().toVector3f();
-                    }
                 }
                 break;
             case Instigator:

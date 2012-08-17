@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.HealthComponent;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -38,6 +39,8 @@ import org.terasology.world.block.Block;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+
+import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius
@@ -113,6 +116,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
             if (block.isEntityTemporary()) {
                 tempBlocks.add(blockEntity);
             }
+            blockEntity.addComponent(new LocationComponent(blockPosition.toVector3f()));
             blockEntity.addComponent(new BlockComponent(blockPosition, block.isEntityTemporary()));
             // TODO: Get regen and wait from block config?
             if (block.isDestructible()) {
