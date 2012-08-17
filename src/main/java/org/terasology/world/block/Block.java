@@ -283,7 +283,7 @@ public class Block {
      */
     // TODO: Remove this once SSAO is implemented?
     public boolean isShadowCasting() {
-        return shadowCasting;
+        return shadowCasting && luminance == 0;
     }
 
     public void setShadowCasting(boolean shadowCasting) {
