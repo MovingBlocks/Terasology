@@ -437,46 +437,38 @@ public class UIItemCell extends UIDisplayContainer  {
         
         //check if target slot is empty
         if (!targetInventory.itemSlots.get(targetCell.slot).exists()) {
+            
             //place whole stack
             if (amount == 0) {
-                //place the item in the item slot
-                sourceItem.container = targetCell.ownerEntity;
+                amount = sourceItem.stackCount;
+            }
+            
+            //create an item
+            EntityManager entityManager = CoreRegistry.get(EntityManager.class);
+            EntityRef copy = entityManager.copy(item);
+            ItemComponent copyItem = copy.getComponent(ItemComponent.class);
+            
+            amount = (byte) Math.min(amount, sourceItem.stackCount);
+            
+            //items in transfer slot left
+            if (sourceItem.stackCount > amount) {
+                sourceItem.stackCount -= amount;
+                copyItem.stackCount = amount;
+                
+                copyItem.container = targetCell.ownerEntity;
+                targetInventory.itemSlots.set(targetCell.slot, copy);
+
+                return true;
+            }
+            //no items in transfer slot left
+            else {
+                //place whole stack
                 targetInventory.itemSlots.set(targetCell.slot, item);
                 
                 //remove item from transfer slot
                 sendToTransferSlot(null, (byte) 0);
                 
                 return true;
-            }
-            //place an specific amount
-            else {
-                //create an item
-                EntityManager entityManager = CoreRegistry.get(EntityManager.class);
-                EntityRef copy = entityManager.copy(item);
-                ItemComponent copyItem = copy.getComponent(ItemComponent.class);
-                
-                amount = (byte) Math.min(amount, sourceItem.stackCount);
-                
-                //items in transfer slot left
-                if (sourceItem.stackCount > amount) {
-                    sourceItem.stackCount -= amount;
-                    copyItem.stackCount = amount;
-                    
-                    copyItem.container = targetCell.ownerEntity;
-                    targetInventory.itemSlots.set(targetCell.slot, copy);
- 
-                    return true;
-                }
-                //no items in transfer slot left
-                else {
-                    //place whole stack
-                    targetInventory.itemSlots.set(targetCell.slot, item);
-                    
-                    //remove item from transfer slot
-                    sendToTransferSlot(null, (byte) 0);
-                    
-                    return true;
-                }
             }
         }
         
@@ -495,50 +487,28 @@ public class UIItemCell extends UIDisplayContainer  {
         ItemComponent targetItem = targetInventory.itemSlots.get(targetCell.slot).getComponent(ItemComponent.class);
         
         //make sure the items can be merged
-        if (targetItem.stackId.equals(sourceItem.stackId) && !targetItem.stackId.isEmpty() && !sourceItem.stackId.isEmpty()) {
+        if (targetItem.stackId.equals(sourceItem.stackId) && !targetItem.stackId.isEmpty() && !sourceItem.stackId.isEmpty()) {            
             //merge whole stack
             if (amount == 0) {
-                int spaceLeft = InventorySystem.MAX_STACK - targetItem.stackCount;
                 amount = sourceItem.stackCount;
+            }
+            
+            int spaceLeft = InventorySystem.MAX_STACK - targetItem.stackCount;
+            amount = (byte) Math.min(amount, sourceItem.stackCount);
+            amount = (byte) Math.min(amount, spaceLeft);
+            
+            //items can be merged in
+            if (spaceLeft > 0) {
+                targetItem.stackCount += amount;
+                sourceItem.stackCount -= amount;
                 
-                //source stack is to big to merge full in
-                if (spaceLeft < amount) {
-                    
-                    targetItem.stackCount = InventorySystem.MAX_STACK;
-                    sourceItem.stackCount -= spaceLeft;
-                    
-                    return true;
-                }
-                //merge source stack fully in
-                else {
-                    
-                    targetItem.stackCount += sourceItem.stackCount;
-                    
+                //check if items in transfer slot left
+                if (sourceItem.stackCount == 0) {
                     //remove item from transfer slot
                     sendToTransferSlot(null, (byte) 0);
-                    
-                    return true;
                 }
-            }
-            //merge an specific amount
-            else {
-                int spaceLeft = InventorySystem.MAX_STACK - targetItem.stackCount;
-                amount = (byte) Math.min(amount, sourceItem.stackCount);
-                amount = (byte) Math.min(amount, spaceLeft);
-                
-                //items can be merged in
-                if (spaceLeft > 0) {
-                    targetItem.stackCount += amount;
-                    sourceItem.stackCount -= amount;
-                    
-                    //check if items in transfer slot left
-                    if (sourceItem.stackCount == 0) {
-                        //remove item from transfer slot
-                        sendToTransferSlot(null, (byte) 0);
-                    }
 
-                    return true;
-                }
+                return true;
             }
         }
         
@@ -600,31 +570,20 @@ public class UIItemCell extends UIDisplayContainer  {
             CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(PlayerComponent.class).transferSlot = EntityRef.NULL;
         }
         else {
-        
-            //transfer whole stack
-            if (amount == 0) {
+            EntityRef target = getFromTransferSlot();
+            ItemComponent targetItem = target.getComponent(ItemComponent.class);
+            ItemComponent sourceItem = sourceCell.itemEntity.getComponent(ItemComponent.class);
+            
+            //check if item is in item slot
+            if (sourceCell.itemEntity.exists()) {
                 
-                //already something in transfer slot
-                if (getItemEntity().exists()) {
-                    reset();
+                //transfer whole stack
+                if (amount == 0) {
+                    amount = sourceItem.stackCount;
                 }
                 
-                CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(PlayerComponent.class).transferSlot = sourceCell.itemEntity;
-                
-                //remove the item from the inventory slot
-                InventoryComponent sourceInventory = sourceCell.getOwnerEntity().getComponent(InventoryComponent.class);
-                sourceInventory.itemSlots.set(sourceInventory.itemSlots.indexOf(sourceCell.itemEntity), EntityRef.NULL);
-                
-            }
-            //transfer part of stack
-            else if (amount > 0 && amount <= InventorySystem.MAX_STACK) {
-
-                EntityRef target = getFromTransferSlot();
-                ItemComponent targetItem = target.getComponent(ItemComponent.class);
-                ItemComponent sourceItem = sourceCell.itemEntity.getComponent(ItemComponent.class);
-                
                 //merge with existing item in transfer slot
-                if (target.exists() && sourceCell.itemEntity.exists()) {
+                if (target.exists()) {
                     
                     //merge if they can be merged
                     if (targetItem.stackId.equals(sourceItem.stackId) && !targetItem.stackId.isEmpty() && !sourceItem.stackId.isEmpty()) {
@@ -652,8 +611,8 @@ public class UIItemCell extends UIDisplayContainer  {
                     
                 }
                 //no item in transfer slot
-                else if (sourceCell.itemEntity.exists()) {
-
+                else {
+    
                     amount = (byte) Math.min(amount, sourceItem.stackCount);
                     
                     //items in transfer slot left
@@ -688,7 +647,6 @@ public class UIItemCell extends UIDisplayContainer  {
                 }
                 
             }
-            
         }
         
         //enable/disable transfer item

@@ -25,7 +25,10 @@ import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.world.WorldInfo;
 import org.terasology.world.WorldUtil;
-import org.terasology.rendering.gui.components.*;
+import org.terasology.rendering.gui.components.UIButton;
+import org.terasology.rendering.gui.components.UIImageOverlay;
+import org.terasology.rendering.gui.components.UIInput;
+import org.terasology.rendering.gui.components.UIList;
 import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
@@ -52,7 +55,6 @@ public class UIMenuSelectWorld extends UIDisplayWindow {
     final UIButton createNewWorld;
     final UIButton loadFromList;
     final UIButton deleteFromList;
-    final UIDialogCreateNewWorld window;
 
     public UIMenuSelectWorld() {
         setModal(true);
@@ -60,13 +62,6 @@ public class UIMenuSelectWorld extends UIDisplayWindow {
         
         overlay = new UIImageOverlay(AssetManager.loadTexture("engine:menuBackground"));
         overlay.setVisible(true);
-
-        window = new UIDialogCreateNewWorld("Create new world", new Vector2f(512f, 320f));
-        window.center();
-
-        window.setModal(true);
-
-        GUIManager.getInstance().addWindow(window, "generate_world");
 
         list = new UIList(new Vector2f(512f, 256f));
         list.setVisible(true);
@@ -103,10 +98,16 @@ public class UIMenuSelectWorld extends UIDisplayWindow {
         createNewWorld.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().setFocusedWindow(window);
-                window.clearInputControls();
-                UIInput inputWorldName = (UIInput) window.getElementById("inputWorldTitle");
-                inputWorldName.setValue(window.getWorldName());
+
+                UIDialogCreateNewWorld _window = new UIDialogCreateNewWorld("Create new world", new Vector2f(512f, 320f));
+                _window.center();
+                _window.clearInputControls();
+
+                GUIManager.getInstance().addWindow(_window, "generate_world");
+                GUIManager.getInstance().setFocusedWindow(_window);
+
+                UIInput inputWorldName = (UIInput) _window.getElementById("inputWorldTitle");
+                inputWorldName.setValue(_window.getWorldName());
             }
         });
 
@@ -189,7 +190,6 @@ public class UIMenuSelectWorld extends UIDisplayWindow {
             Config.getInstance().setDefaultSeed(info.getSeed());
             Config.getInstance().setWorldTitle(info.getTitle());
             Config.getInstance().setChunkGenerator(info.getChunkGenerators());
-            // TODO: Need to load time too. Maybe just pass through WorldInfo?
             CoreRegistry.get(GameEngine.class).changeState(new StateSinglePlayer(info));
         } catch (Exception e) {
             GUIManager.getInstance().showMessage("Error", "Failed reading world data object. Sorry.");

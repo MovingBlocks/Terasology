@@ -105,7 +105,7 @@ public class UIMenuPause extends UIDisplayWindow {
         _backToGameButton.setVisible(true);
         _backToGameButton.addClickListener(new ClickListener() {
             public void click(UIDisplayElement element, int button) {
-                setVisible(false);
+                close(true);
             }
         });
 
