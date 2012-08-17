@@ -77,9 +77,11 @@ public class BlockManager {
         blocksById.clear();
         blocksByUri.clear();
         familyByUri.clear();
+        idByUri.clear();
         partiallyRegisteredFamilies.clear();
         shapelessBlockDefinition.clear();
         nextId = 1;
+        blockLoader = new BlockLoader();
 
         Block air = new Block();
         air.setTranslucent(true);

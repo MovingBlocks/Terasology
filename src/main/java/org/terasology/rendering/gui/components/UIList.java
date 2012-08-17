@@ -231,8 +231,7 @@ public class UIList extends UIScrollableDisplayContainer implements IInputDataEl
 	        	setSelectedItemIndex(index);
 	        else
 	        	setSelectedItemIndex(_items.size() - 1);
-	        
-            _selectedItem.setSelected(true);
+
         }
         else {
         	_selectedItem = null;

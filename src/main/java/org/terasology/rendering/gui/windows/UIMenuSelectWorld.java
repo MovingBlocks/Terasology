@@ -46,90 +46,90 @@ import java.util.logging.Logger;
 public class UIMenuSelectWorld extends UIDisplayWindow {
     private Logger logger = Logger.getLogger(getClass().getName());
 
-    final UIImageOverlay _overlay;
-    final UIList _list;
-    final UIButton _goToBack;
-    final UIButton _createNewWorld;
-    final UIButton _loadFromList;
-    final UIButton _deleteFromList;
-    final UIDialogCreateNewWorld _window;
+    final UIImageOverlay overlay;
+    final UIList list;
+    final UIButton goToBack;
+    final UIButton createNewWorld;
+    final UIButton loadFromList;
+    final UIButton deleteFromList;
+    final UIDialogCreateNewWorld window;
 
     public UIMenuSelectWorld() {
         setModal(true);
         maximize();
         
-        _overlay = new UIImageOverlay(AssetManager.loadTexture("engine:menuBackground"));
-        _overlay.setVisible(true);
+        overlay = new UIImageOverlay(AssetManager.loadTexture("engine:menuBackground"));
+        overlay.setVisible(true);
 
-        _window = new UIDialogCreateNewWorld("Create new world", new Vector2f(512f, 320f));
-        _window.center();
+        window = new UIDialogCreateNewWorld("Create new world", new Vector2f(512f, 320f));
+        window.center();
 
-        _window.setModal(true);
+        window.setModal(true);
 
-        GUIManager.getInstance().addWindow(_window, "generate_world");
+        GUIManager.getInstance().addWindow(window, "generate_world");
 
-        _list = new UIList(new Vector2f(512f, 256f));
-        _list.setVisible(true);
+        list = new UIList(new Vector2f(512f, 256f));
+        list.setVisible(true);
 
-        _list.addDoubleClickListener(new ClickListener() {
+        list.addDoubleClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
                 loadSelectedWorld();
             }
         });
 
-        _goToBack = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
-        _goToBack.getLabel().setText("Go back");
-        _goToBack.setVisible(true);
-        _goToBack.addClickListener(new ClickListener() {
+        goToBack = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
+        goToBack.getLabel().setText("Go back");
+        goToBack.setVisible(true);
+        goToBack.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
                 GUIManager.getInstance().setFocusedWindow(GUIManager.getInstance().getWindowById("menuMain"));
             }
         });
 
-        _loadFromList = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
-        _loadFromList.getLabel().setText("Load");
-        _loadFromList.setVisible(true);
+        loadFromList = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
+        loadFromList.getLabel().setText("Load");
+        loadFromList.setVisible(true);
 
-        _createNewWorld = new UIButton(new Vector2f(192f, 32f), UIButton.eButtonType.NORMAL);
-        _createNewWorld.getLabel().setText("Create new world");
-        _createNewWorld.setVisible(true);
+        createNewWorld = new UIButton(new Vector2f(192f, 32f), UIButton.eButtonType.NORMAL);
+        createNewWorld.getLabel().setText("Create new world");
+        createNewWorld.setVisible(true);
 
-        _deleteFromList = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
-        _deleteFromList.getLabel().setText("Delete");
-        _deleteFromList.setVisible(true);
+        deleteFromList = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
+        deleteFromList.getLabel().setText("Delete");
+        deleteFromList.setVisible(true);
 
-        _createNewWorld.addClickListener(new ClickListener() {
+        createNewWorld.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().setFocusedWindow(_window);
-                _window.clearInputControls();
-                UIInput inputWorldName = (UIInput) _window.getElementById("inputWorldTitle");
-                inputWorldName.setValue(_window.getWorldName());
+                GUIManager.getInstance().setFocusedWindow(window);
+                window.clearInputControls();
+                UIInput inputWorldName = (UIInput) window.getElementById("inputWorldTitle");
+                inputWorldName.setValue(window.getWorldName());
             }
         });
 
-        _deleteFromList.addClickListener(new ClickListener() {
+        deleteFromList.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                if (_list.getSelectedItem() == null) {
+                if (list.getSelectedItem() == null) {
                     GUIManager.getInstance().showMessage("Error", "Please choose a world first.");
                     return;
                 }
 
                 try {
-                    WorldInfo worldInfo = (WorldInfo) _list.getSelectedItem().getValue();
+                    WorldInfo worldInfo = (WorldInfo) list.getSelectedItem().getValue();
                     File world = PathManager.getInstance().getWorldSavePath(worldInfo.getTitle());
                     WorldUtil.deleteWorld(world);
-                    _list.removeSelectedItem();
+                    list.removeSelectedItem();
                 } catch (Exception e) {
                     GUIManager.getInstance().showMessage("Error", "Failed deleting world data object. Sorry.");
                 }
             }
         });
 
-        _loadFromList.addClickListener(new ClickListener() {
+        loadFromList.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
                 loadSelectedWorld();
@@ -138,12 +138,12 @@ public class UIMenuSelectWorld extends UIDisplayWindow {
 
         fillList();
 
-        addDisplayElement(_overlay);
-        addDisplayElement(_list, "list");
-        addDisplayElement(_loadFromList, "loadFromListButton");
-        addDisplayElement(_goToBack, "goToBackButton");
-        addDisplayElement(_createNewWorld, "createWorldButton");
-        addDisplayElement(_deleteFromList, "deleteFromListButton");
+        addDisplayElement(overlay);
+        addDisplayElement(list, "list");
+        addDisplayElement(loadFromList, "loadFromListButton");
+        addDisplayElement(goToBack, "goToBackButton");
+        addDisplayElement(createNewWorld, "createWorldButton");
+        addDisplayElement(deleteFromList, "deleteFromListButton");
         
         layout();
     }
@@ -152,40 +152,40 @@ public class UIMenuSelectWorld extends UIDisplayWindow {
     public void layout() {
         super.layout();
         
-        if (_list != null) {
-            _list.centerHorizontally();
-            _list.getPosition().y = 230f;
+        if (list != null) {
+            list.centerHorizontally();
+            list.getPosition().y = 230f;
     
-            _createNewWorld.getPosition().x = _list.getPosition().x;
-            _createNewWorld.getPosition().y = _list.getPosition().y + _list.getSize().y + 32f;
+            createNewWorld.getPosition().x = list.getPosition().x;
+            createNewWorld.getPosition().y = list.getPosition().y + list.getSize().y + 32f;
     
-            _loadFromList.getPosition().x = _createNewWorld.getPosition().x + _createNewWorld.getSize().x + 15f;
-            _loadFromList.getPosition().y = _createNewWorld.getPosition().y;
+            loadFromList.getPosition().x = createNewWorld.getPosition().x + createNewWorld.getSize().x + 15f;
+            loadFromList.getPosition().y = createNewWorld.getPosition().y;
     
-            _deleteFromList.getPosition().x = _loadFromList.getPosition().x + _loadFromList.getSize().x + 15f;
-            _deleteFromList.getPosition().y = _loadFromList.getPosition().y;
+            deleteFromList.getPosition().x = loadFromList.getPosition().x + loadFromList.getSize().x + 15f;
+            deleteFromList.getPosition().y = loadFromList.getPosition().y;
     
     
-            _goToBack.centerHorizontally();
+            goToBack.centerHorizontally();
     
-            _goToBack.getPosition().y = Display.getHeight() - _goToBack.getSize().y - 32f;
+            goToBack.getPosition().y = Display.getHeight() - goToBack.getSize().y - 32f;
         }
     }
 
     private void loadSelectedWorld() {
 
-        if (_list.size() < 1) {
+        if (list.size() < 1) {
             GUIManager.getInstance().showMessage("Error", "You did not create a world yet!");
             return;
         }
 
-        if (_list.getSelectedItem() == null) {
+        if (list.getSelectedItem() == null) {
             GUIManager.getInstance().showMessage("Error", "Please choose a world!");
             return;
         }
 
         try {
-            WorldInfo info = (WorldInfo) _list.getSelectedItem().getValue();
+            WorldInfo info = (WorldInfo) list.getSelectedItem().getValue();
             Config.getInstance().setDefaultSeed(info.getSeed());
             Config.getInstance().setWorldTitle(info.getTitle());
             Config.getInstance().setChunkGenerator(info.getChunkGenerators());
@@ -197,7 +197,7 @@ public class UIMenuSelectWorld extends UIDisplayWindow {
     }
 
     public void fillList() {
-        _list.removeAll();
+        list.removeAll();
 
         File worldCatalog = PathManager.getInstance().getWorldPath();
 
@@ -216,7 +216,7 @@ public class UIMenuSelectWorld extends UIDisplayWindow {
             try {
                 WorldInfo info = WorldInfo.load(worldManifest);
                 if (!info.getTitle().isEmpty()) {
-                    _list.addItem(info.getTitle(), info);
+                    list.addItem(info.getTitle(), info);
                 }
             } catch (IOException e) {
                 logger.log(Level.SEVERE, "Failed reading world data object. Sorry.", e);

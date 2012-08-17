@@ -725,15 +725,6 @@ public final class WorldRenderer {
         _worldTimeEventManager.fireWorldTimeEvents();
         PerformanceMonitor.endActivity();
 
-        // Simulate world
-        // TODO: Simulators
-        PerformanceMonitor.startActivity("Liquid");
-        //_worldProvider.getLiquidSimulator().simulate(false);
-        PerformanceMonitor.endActivity();
-        PerformanceMonitor.startActivity("Growth");
-        // _worldProvider.getGrowthSimulator().simulate(false);
-        PerformanceMonitor.endActivity();
-
         PerformanceMonitor.startActivity("Physics Renderer");
         _bulletPhysics.update(delta);
         PerformanceMonitor.endActivity();
