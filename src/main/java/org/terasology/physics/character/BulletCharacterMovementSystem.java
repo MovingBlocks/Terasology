@@ -55,10 +55,22 @@ import java.util.logging.Logger;
 @RegisterComponentSystem
 public final class BulletCharacterMovementSystem implements UpdateSubscriberSystem, EventHandlerSystem {
 
+    /**
+     * The amount of extra distance added to vertical movement to allow for penetration.
+     */
     private static final float VERTICAL_PENETRATION_LEEWAY = 0.05f;
-    private static final float VERTICAL_PENETRATION = 0.05f;
-    private static final float HORIZONTAL_PENETRATION_LEEWAY = 0.05f;
-    private static final float HORIZONTAL_PENETRATION = 0.05f;
+    /**
+     * The amount of vertical penetration to allow.
+     */
+    private static final float VERTICAL_PENETRATION = 0.04f;
+    /**
+     * The amount of extra distance added to horizontal movement to allow for penentration.
+     */
+    private static final float HORIZONTAL_PENETRATION_LEEWAY = 0.04f;
+    /**
+     * The amount of horizontal penetration to allow.
+     */
+    private static final float HORIZONTAL_PENETRATION = 0.03f;
 
     public static final float GRAVITY = 28.0f;
     public static final float TERMINAL_VELOCITY = 64.0f;
@@ -77,6 +89,12 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
     private WorldProvider worldProvider;
     private BulletPhysics physics;
 
+    // Processing state variables
+
+    private float steppedUpDist = 0;
+    private boolean stepped = false;
+
+
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
         worldProvider = CoreRegistry.get(WorldProvider.class);
@@ -88,7 +106,7 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
     }
 
     @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
-    public void onDestroy(RemovedComponentEvent event, EntityRef entity) {
+    public void onDestroy(final RemovedComponentEvent event, final EntityRef entity) {
         CharacterMovementComponent comp = entity.getComponent(CharacterMovementComponent.class);
         if (comp.collider != null) {
             physics.removeCollider(comp.collider);
@@ -98,7 +116,9 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
     public void update(float delta) {
         for (EntityRef entity : entityManager.iteratorEntities(CharacterMovementComponent.class, LocationComponent.class)) {
             LocationComponent location = entity.getComponent(LocationComponent.class);
-            if (!worldProvider.isBlockActive(location.getWorldPosition())) continue;
+            if (!worldProvider.isBlockActive(location.getWorldPosition())) {
+                continue;
+            }
 
             CharacterMovementComponent movementComp = entity.getComponent(CharacterMovementComponent.class);
 
@@ -148,7 +168,7 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
         movementComp.isSwimming = newSwimming;
     }
 
-    private void updatePosition(float delta, EntityRef entity, LocationComponent location, CharacterMovementComponent movementComp) {
+    private void updatePosition(final float delta, final EntityRef entity, final LocationComponent location, final CharacterMovementComponent movementComp) {
         if (movementComp.isGhosting) {
             ghost(delta, location, movementComp);
         } else if (movementComp.isSwimming) {
@@ -318,10 +338,6 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
         public boolean hitTop = false;
     }
 
-    private float steppedUpDist = 0;
-    private boolean stepped = false;
-
-
     private MoveResult move(Vector3f startPosition, Vector3f moveDelta, float stepHeight, float stepDownHeight, float slopeFactor, PairCachingGhostObject collider) {
         steppedUpDist = 0;
         stepped = false;
@@ -335,14 +351,28 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
             result.hitTop = moveDelta.y - moveUp(moveDelta.y, collider, position) > BulletGlobals.SIMD_EPSILON;
         }
         result.hitHoriz = moveHorizontal(new Vector3f(moveDelta.x, 0, moveDelta.z), collider, position, slopeFactor, stepHeight);
-        result.hitBottom = moveDown((moveDelta.y < 0) ? moveDelta.y : 0, steppedUpDist, 0, slopeFactor, collider, position);
+        if (moveDelta.y < 0 || steppedUpDist > 0) {
+            float dist = (moveDelta.y < 0) ? moveDelta.y : 0;
+            dist -= steppedUpDist;
+            result.hitBottom = moveDown(dist, slopeFactor, collider, position);
+        }
+        if (!result.hitBottom && stepDownHeight > 0) {
+            Vector3f tempPos = new Vector3f(position);
+            result.hitBottom = moveDown(-stepDownHeight, slopeFactor, collider, tempPos);
+            // Don't apply step down if nothing to step onto
+            if (result.hitBottom) {
+                position.set(tempPos);
+            }
+        }
         return result;
     }
 
     private boolean moveHorizontal(Vector3f horizMove, PairCachingGhostObject collider, Vector3f position, float slopeFactor, float stepHeight) {
         float remainingFraction = 1.0f;
         float dist = horizMove.length();
-        if (dist < BulletGlobals.SIMD_EPSILON) return false;
+        if (dist < BulletGlobals.SIMD_EPSILON) {
+            return false;
+        }
 
         boolean horizontalHit = false;
         Vector3f normalizedDir = Vector3fUtil.safeNormalize(horizMove, new Vector3f());
@@ -350,6 +380,7 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
         targetPos.scale(dist + HORIZONTAL_PENETRATION_LEEWAY);
         targetPos.add(position);
         int iteration = 0;
+        Vector3f lastHitNormal = new Vector3f(0, 1, 0);
         while (remainingFraction >= 0.01f && iteration++ < 10) {
             SweepCallback callback = sweep(position, targetPos, collider, slopeFactor, HORIZONTAL_PENETRATION);
 
@@ -371,23 +402,32 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
                 newDir.scale(dist);
 
                 float slope = callback.hitNormalWorld.dot(new Vector3f(0, 1, 0));
-                logger.info("Hit slope: " + slope + " <> " + slopeFactor);
                 // We step up if we're hitting a big slope, or if we're grazing the ground)
                 if (slope < slopeFactor || 1 - slope < BulletGlobals.SIMD_EPSILON) {
-
                     boolean stepping = checkStep(collider, position, newDir, callback, slopeFactor, stepHeight);
                     if (!stepping) {
                         horizontalHit = true;
 
-                        Vector3f modifiedNormal = new Vector3f(callback.hitNormalWorld);
-                        modifiedNormal.y = 0;
-                        if (modifiedNormal.lengthSquared() > BulletGlobals.SIMD_EPSILON) {
-                            modifiedNormal.normalize();
-                            extractResidualMovement(modifiedNormal, newDir);
+                        Vector3f newHorizDir = new Vector3f(newDir.x, 0, newDir.z);
+                        Vector3f horizNormal = new Vector3f(callback.hitNormalWorld.x, 0, callback.hitNormalWorld.z);
+                        if (horizNormal.lengthSquared() > BulletGlobals.SIMD_EPSILON) {
+                            horizNormal.normalize();
+                            if (lastHitNormal.dot(horizNormal) > BulletGlobals.SIMD_EPSILON) {
+                                break;
+                            }
+                            lastHitNormal.set(horizNormal);
+                            extractResidualMovement(horizNormal, newHorizDir);
                         }
+
+                        newDir.set(newHorizDir);
                     }
                 } else {
+                    // Hitting a shallow slope, move up it
+                    Vector3f newHorizDir = new Vector3f(newDir.x, 0, newDir.z);
                     extractResidualMovement(callback.hitNormalWorld, newDir);
+                    Vector3f modHorizDir = new Vector3f(newDir);
+                    modHorizDir.y = 0;
+                    newDir.scale(newHorizDir.length() / modHorizDir.length());
                 }
 
                 float sqrDist = newDir.lengthSquared();
@@ -399,17 +439,11 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
                 } else {
                     break;
                 }
-                //dist = (float) Math.sqrt(sqrDist);
-                Vector3f horizDir = new Vector3f(newDir.x, 0, newDir.z);
-                float horizLength = horizDir.length();
-                if (horizLength > BulletGlobals.SIMD_EPSILON) {
-                    normalizedDir.set(newDir);
-                    targetPos.set(normalizedDir);
-                    targetPos.scale((dist / horizLength) + HORIZONTAL_PENETRATION_LEEWAY);
-                    targetPos.add(position);
-                } else {
-                    break;
-                }
+                dist = (float) Math.sqrt(sqrDist);
+                normalizedDir.set(newDir);
+                targetPos.set(normalizedDir);
+                targetPos.scale(dist + HORIZONTAL_PENETRATION_LEEWAY);
+                targetPos.add(position);
             } else {
                 normalizedDir.scale(dist);
                 position.add(normalizedDir);
@@ -452,7 +486,6 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
             }
 
             if (hitStep && stepSlope >= slopeFactor) {
-                logger.info("Moved Up");
                 steppedUpDist = moveUp(stepHeight, collider, position);
                 return true;
             }
@@ -460,44 +493,37 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
         return false;
     }
 
-    private boolean moveDown(float fallAmount, float steppedUpAmount, float stepDownAmount, float slopeFactor, PairCachingGhostObject collider, Vector3f position) {
-        float stepDist = steppedUpAmount - fallAmount + stepDownAmount;
-        float remainingDist = stepDist;
+    private boolean moveDown(float dist, float slopeFactor, PairCachingGhostObject collider, Vector3f position) {
 
-        Vector3f currentPos = new Vector3f(position);
+        float remainingDist = -dist;
+
         Vector3f targetPos = new Vector3f(position);
         targetPos.y -= remainingDist + VERTICAL_PENETRATION_LEEWAY;
-        Vector3f normalizedDir = new Vector3f(targetPos);
-        normalizedDir.sub(currentPos);
-        normalizedDir.normalize();
+        Vector3f normalizedDir = new Vector3f(0, -1, 0);
         boolean hit = false;
 
         int iteration = 0;
         while (remainingDist > BulletGlobals.SIMD_EPSILON && iteration++ < 10) {
-            SweepCallback callback = sweep(currentPos, targetPos, collider, -1.0f, VERTICAL_PENETRATION);
+            SweepCallback callback = sweep(position, targetPos, collider, -1.0f, VERTICAL_PENETRATION);
 
             float actualDist = Math.max(0, (remainingDist + VERTICAL_PENETRATION_LEEWAY) * callback.closestHitFraction - VERTICAL_PENETRATION_LEEWAY);
             Vector3f expectedMove = new Vector3f(targetPos);
-            expectedMove.sub(currentPos);
+            expectedMove.sub(position);
             if (expectedMove.lengthSquared() > BulletGlobals.SIMD_EPSILON) {
                 expectedMove.normalize();
                 expectedMove.scale(actualDist);
-                currentPos.add(expectedMove);
+                position.add(expectedMove);
+            }
+
+            remainingDist -= actualDist;
+            if (remainingDist < BulletGlobals.SIMD_EPSILON) {
+                break;
             }
 
             if (callback.hasHit()) {
-                hit = true;
-
                 Vector3f contactPoint = callback.hitPointWorld;
-
-                Vector3f normal = callback.hitNormalWorld;
-                if (contactPoint != null) {
-                    float originalSlope = normal.dot(new Vector3f(0, 1, 0));
-                    if (originalSlope >= slopeFactor) {
-                        hit = true;
-                        break;
-                    }
-
+                float originalSlope = callback.hitNormalWorld.dot(new Vector3f(0, 1, 0));
+                if (originalSlope < slopeFactor) {
                     float slope = 1;
                     boolean foundSlope = false;
 
@@ -528,6 +554,7 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
                         foundSlope = true;
                         slope = Math.min(slope, (rayResult.hitNormalWorld.dot(new Vector3f(0, 1, 0))));
                     }
+
                     if (!foundSlope) {
                         slope = originalSlope;
                     }
@@ -535,27 +562,29 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
                     if (slope < slopeFactor) {
                         remainingDist -= actualDist;
                         expectedMove.set(targetPos);
-                        expectedMove.sub(currentPos);
+                        expectedMove.sub(position);
 
                         extractResidualMovement(callback.hitNormalWorld, expectedMove);
                         float sqrDist = expectedMove.lengthSquared();
                         if (sqrDist > BulletGlobals.SIMD_EPSILON) {
                             expectedMove.normalize();
                             if (expectedMove.dot(normalizedDir) <= 0.0f) {
-                                //hit = true;
+                                hit = true;
                                 break;
                             }
                         } else {
-                            //hit = true;
+                            hit = true;
+                            break;
+                        }
+                        if (expectedMove.y > -BulletGlobals.SIMD_EPSILON) {
+                            hit = true;
                             break;
                         }
                         normalizedDir.set(expectedMove);
-                        expectedMove.scale(((float) Math.sqrt(sqrDist) + HORIZONTAL_PENETRATION_LEEWAY));
-                        targetPos.add(currentPos, expectedMove);
+
+                        expectedMove.scale(-remainingDist / expectedMove.y + HORIZONTAL_PENETRATION_LEEWAY);
+                        targetPos.add(position, expectedMove);
                     } else {
-                        /*if (!rayResult.hasHit()) {
-                            logger.info("Raycast missed");
-                        } */
                         hit = true;
                         break;
                     }
@@ -572,21 +601,7 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
             hit = true;
         }
 
-        if (!hit) {
-            if (stepDownAmount > 0) {
-                moveDown(fallAmount - steppedUpAmount, 0, 0, slopeFactor, collider, position);
-            } else {
-                position.set(currentPos);
-            }
-            return false;
-        } else {
-            //if (stepDownAmount > 0) {
-                //moveDown(fallAmount - steppedUpAmount, 0, 0, slopeFactor, collider, position);
-            //} else {
-                position.set(currentPos);
-            //}
-            return true;
-        }
+        return hit;
     }
 
     private float moveUp(float riseAmount, GhostObject collider, Vector3f position) {
