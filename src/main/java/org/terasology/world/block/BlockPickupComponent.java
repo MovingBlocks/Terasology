@@ -15,7 +15,7 @@
  */
 
 // TODO: Move to another package
-package org.terasology.physics;
+package org.terasology.world.block;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
@@ -26,5 +26,5 @@ import org.terasology.world.block.family.BlockFamily;
  */
 public class BlockPickupComponent implements Component {
     public BlockFamily blockFamily;
-    public EntityRef placedEntity;
+    public EntityRef placedEntity = EntityRef.NULL;
 }

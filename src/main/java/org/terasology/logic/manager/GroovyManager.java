@@ -49,7 +49,7 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.physics.BlockPickupComponent;
+import org.terasology.world.block.BlockPickupComponent;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;

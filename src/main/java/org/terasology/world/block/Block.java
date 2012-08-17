@@ -35,6 +35,7 @@ import javax.vecmath.Vector4f;
 
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.util.ResourceLoader;
+import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.collection.EnumBooleanMap;
@@ -600,6 +601,8 @@ public class Block {
             }
         }
         mesh = tessellator.generateMesh(new AssetUri(AssetType.MESH, uri.toString()));
+        AssetManager.getInstance().addAssetTemporary(mesh.getURI(), mesh);
+
     }
 
     @Override

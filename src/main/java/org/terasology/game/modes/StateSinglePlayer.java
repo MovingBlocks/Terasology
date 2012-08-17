@@ -58,6 +58,7 @@ import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldBiomeProviderImpl;
 import org.terasology.world.WorldInfo;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.loader.BlockLoader;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
@@ -115,6 +116,7 @@ public class StateSinglePlayer implements GameState {
         AssetManager.getInstance().clear();
         BlockManager.getInstance().load(worldInfo.getBlockIdMap());
         cacheTextures();
+        cacheBlockMesh();
 
         entityManager = new EntitySystemBuilder().build();
         eventSystem = CoreRegistry.get(EventSystem.class);
@@ -163,6 +165,12 @@ public class StateSinglePlayer implements GameState {
     private void cacheTextures() {
         for (AssetUri textureURI : AssetManager.list(AssetType.TEXTURE)) {
             AssetManager.load(textureURI);
+        }
+    }
+
+    private void cacheBlockMesh() {
+        for (BlockFamily family : BlockManager.getInstance().listBlockFamilies()) {
+            family.getArchetypeBlock().getMesh();
         }
     }
 
@@ -348,6 +356,7 @@ public class StateSinglePlayer implements GameState {
 
         // Create the first Portal if it doesn't exist yet
         worldRenderer.initPortal();
+        worldRenderer.getWorldProvider().setTime(worldInfo.getTime());
     }
 
     public void render() {

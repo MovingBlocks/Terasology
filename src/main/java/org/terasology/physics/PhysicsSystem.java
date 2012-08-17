@@ -75,10 +75,12 @@ public class PhysicsSystem implements EventHandlerSystem, UpdateSubscriberSystem
     private BulletPhysics physics;
     private Map<EntityRef, RigidBody> entityRigidBodies = Maps.newHashMap();
     private Map<EntityRef, PairCachingGhostObject> entityTriggers = Maps.newHashMap();
+    private int skipProcessingFrames = 4;
 
     @Override
     public void initialise() {
         physics = CoreRegistry.get(BulletPhysics.class);
+        skipProcessingFrames = 4;
     }
 
     @Override
@@ -230,6 +232,12 @@ public class PhysicsSystem implements EventHandlerSystem, UpdateSubscriberSystem
 
     @Override
     public void update(float delta) {
+        // TODO: This shouldn't be necessary once this is correctly sequenced after the main physics update
+        if (skipProcessingFrames > 0) {
+            skipProcessingFrames--;
+            return;
+        }
+
         List<CollisionPair> collisionPairs = Lists.newArrayList();
 
         DynamicsWorld world = physics.getWorld();

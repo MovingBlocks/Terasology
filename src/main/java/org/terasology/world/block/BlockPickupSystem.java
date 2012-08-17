@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.physics;
+package org.terasology.world.block;
 
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
@@ -28,6 +28,7 @@ import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AudioManager;
+import org.terasology.physics.CollideEvent;
 
 /**
  * @author Immortius
