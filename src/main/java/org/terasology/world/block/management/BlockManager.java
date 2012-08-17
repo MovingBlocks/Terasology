@@ -85,7 +85,7 @@ public class BlockManager {
         air.setTranslucent(true);
         air.setInvisible(true);
         air.setTargetable(false);
-        air.setPenetrable(false);
+        air.setPenetrable(true);
         air.setShadowCasting(false);
         air.setAttachmentAllowed(false);
         air.setHardness((byte) 0);

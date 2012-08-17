@@ -13,7 +13,7 @@ import javax.vecmath.Vector2f;
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.AssetManager;
 import org.terasology.components.ItemComponent;
-import org.terasology.components.block.BlockItemComponent;
+import org.terasology.world.block.BlockItemComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.model.inventory.Icon;
 import org.terasology.rendering.assets.Texture;

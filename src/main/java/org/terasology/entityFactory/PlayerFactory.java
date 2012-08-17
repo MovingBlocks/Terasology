@@ -19,7 +19,7 @@ import javax.vecmath.Vector3f;
 
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.PlayerComponent;
-import org.terasology.components.block.BlockItemComponent;
+import org.terasology.world.block.BlockItemComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;

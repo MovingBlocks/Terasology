@@ -41,7 +41,7 @@ import org.terasology.componentSystem.RenderSystem;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LocalPlayerComponent;
-import org.terasology.components.block.BlockItemComponent;
+import org.terasology.world.block.BlockItemComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.game.CoreRegistry;

@@ -18,7 +18,7 @@ package org.terasology.componentSystem.action;
 import javax.vecmath.Vector3f;
 
 import org.terasology.components.actions.ExplosionActionComponent;
-import org.terasology.components.block.BlockComponent;
+import org.terasology.world.block.BlockComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entityFactory.DroppedBlockFactory;
 import org.terasology.entitySystem.EntityManager;

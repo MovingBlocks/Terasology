@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.components.block;
+package org.terasology.world.block;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;

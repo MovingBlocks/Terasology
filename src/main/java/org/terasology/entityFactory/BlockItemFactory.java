@@ -17,7 +17,7 @@ package org.terasology.entityFactory;
 
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LightComponent;
-import org.terasology.components.block.BlockItemComponent;
+import org.terasology.world.block.BlockItemComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.world.block.family.BlockFamily;

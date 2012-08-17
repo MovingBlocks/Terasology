@@ -21,8 +21,8 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
-import org.terasology.components.block.BlockComponent;
-import org.terasology.components.block.BlockItemComponent;
+import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.BlockItemComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
@@ -163,7 +163,7 @@ public class ItemSystem implements EventHandlerSystem {
         }
 
         Block adjBlock = worldProvider.getBlock(blockPos.x, blockPos.y, blockPos.z);
-        if (!adjBlock.isInvisible() || adjBlock.isTargetable()) {
+        if (!adjBlock.isPenetrable() || adjBlock.isTargetable()) {
             return false;
         }
 

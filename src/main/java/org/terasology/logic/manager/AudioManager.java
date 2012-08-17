@@ -30,7 +30,7 @@ import org.terasology.audio.OpenALManager;
 import org.terasology.audio.Sound;
 import org.terasology.audio.SoundPool;
 import org.terasology.audio.SoundSource;
-import org.terasology.components.block.BlockComponent;
+import org.terasology.world.block.BlockComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.physics.character.CharacterMovementComponent;

@@ -23,7 +23,7 @@ import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.PlayerComponent;
-import org.terasology.components.block.BlockItemComponent;
+import org.terasology.world.block.BlockItemComponent;
 import org.terasology.entityFactory.DroppedBlockFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;

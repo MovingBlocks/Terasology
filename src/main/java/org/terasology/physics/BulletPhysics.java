@@ -27,7 +27,7 @@ import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
-import org.terasology.components.block.BlockComponent;
+import org.terasology.world.block.BlockComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventReceiver;
 import org.terasology.entitySystem.EventSystem;

@@ -18,7 +18,7 @@ package org.terasology.mods.miniions.componentsystem.controllers;
 import javax.vecmath.Vector3f;
 
 import org.terasology.components.LocalPlayerComponent;
-import org.terasology.components.block.BlockComponent;
+import org.terasology.world.block.BlockComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;

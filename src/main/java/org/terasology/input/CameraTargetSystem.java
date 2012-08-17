@@ -20,7 +20,7 @@ import java.util.Arrays;
 
 import javax.vecmath.Vector3f;
 
-import org.terasology.components.block.BlockComponent;
+import org.terasology.world.block.BlockComponent;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
