@@ -71,6 +71,8 @@ public class UIScreenInventory extends UIDisplayWindow {
             toolbar.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity(), 0, 8);
             inventory.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity(), 9);
             //TODO connect toolbar <-> inventory somehow to allow fast transfer.
+            
+            layout();
         }
     }
 

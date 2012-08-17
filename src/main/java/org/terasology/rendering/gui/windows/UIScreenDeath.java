@@ -118,9 +118,9 @@ public class UIScreenDeath extends UIDisplayWindow {
         super.layout();
 
         if (_meassage != null) {
-        	_meassage.center();
-        	_meassage.getPosition().y -= 100;
-        	
+            _meassage.center();
+            _meassage.getPosition().y -= 100;
+            
             _respawnButton.centerHorizontally();
             _respawnButton.getPosition().y = 300f + 32f + 24f;
     

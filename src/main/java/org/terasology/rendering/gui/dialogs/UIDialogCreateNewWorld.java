@@ -59,6 +59,7 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
 
     public UIDialogCreateNewWorld(String title, Vector2f size) {
         super(title, size);
+        setModal(true);
 
         _inputSeed = new UIInput(new Vector2f(256f, 30f));
         _inputSeed.setVisible(true);
