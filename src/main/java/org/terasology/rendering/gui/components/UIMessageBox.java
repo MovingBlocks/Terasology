@@ -53,7 +53,7 @@ public class UIMessageBox extends UIDialogBox {
         _buttonOk.addClickListener(new ClickListener() {
 			@Override
 			public void click(UIDisplayElement element, int button) {
-				close();
+				close(true);
 			}
         });
 
@@ -63,10 +63,14 @@ public class UIMessageBox extends UIDialogBox {
         addDisplayElement(_text);
         addDisplayElement(_buttonOk, "buttonOk");
     }
-
-    public void close() {
-        super.close(false);
-        GUIManager.getInstance().setLastFocused();
-        GUIManager.getInstance().removeWindow("messageBox");
+    
+    @Override
+    /**
+     * Close a window. This will remove the window from the GUIManager.
+     */
+    public void close(boolean clearInputControls) {
+    	super.close(clearInputControls);
+    	
+    	GUIManager.getInstance().removeWindow(this);
     }
 }

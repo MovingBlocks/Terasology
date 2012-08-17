@@ -30,7 +30,6 @@ import org.terasology.events.input.MouseXAxisEvent;
 import org.terasology.events.input.MouseYAxisEvent;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.ButtonState;
-import org.terasology.mods.miniions.rendering.gui.components.UIMinionBehaviourMenu;
 import org.terasology.rendering.gui.components.UIMessageBox;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
@@ -50,40 +49,38 @@ import java.util.List;
 
 public class GUIManager implements EventHandlerSystem {
     
-    private static GUIManager _instance;
-    private HashMap<String, UIDisplayWindow> _windowsById = new HashMap<String, UIDisplayWindow>();
+    private static GUIManager instance;
+    private HashMap<String, UIDisplayWindow> windowsById = new HashMap<String, UIDisplayWindow>();
     
     //renderer
-    private UIDisplayRenderer _renderer;
-    
-    //focused
-    private UIDisplayWindow _currentFocused;
-    private UIDisplayWindow _lastFocused;
+    private UIDisplayRenderer renderer;
 
     public GUIManager() {
-        _renderer = new UIDisplayRenderer();
-        _renderer.setVisible(true);
+        renderer = new UIDisplayRenderer();
+        renderer.setVisible(true);
     }
 
     public static GUIManager getInstance() {
-        if (_instance == null) {
-            _instance = new GUIManager();
+        if (instance == null) {
+            instance = new GUIManager();
             
         }
-        return _instance;
+        return instance;
     }
 
     /**
      * Render all visible display elements an their child's.
      */
     public void render() {
-        _renderer.render();
+        renderer.render();
     }
 
     /**
      * Updates all visible display elements and their child's. Will update the layout if the display was resized.
      */
     public void update() {
+    	//TODO what should the following code do?
+    	/*
         if (_currentFocused == null) {
             int size = _renderer.getDisplayElements().size();
             if (size > 0) {
@@ -95,11 +92,12 @@ public class GUIManager implements EventHandlerSystem {
                 }
             }
         }
+        */
         
-        _renderer.update();
+        renderer.update();
 
         if (Display.wasResized()) {
-            _renderer.layout();
+            renderer.layout();
         }
     }
 
@@ -111,15 +109,15 @@ public class GUIManager implements EventHandlerSystem {
      */
     public <T extends UIDisplayWindow> T addWindow(T window, String windowId) {
         if (window.isMaximized()) {
-            _renderer.addtDisplayElementToPosition(0, window);
+            renderer.addtDisplayElementToPosition(0, window);
         } else {
-            _renderer.addDisplayElement(window);
+            renderer.addDisplayElement(window);
         }
 
-        _windowsById.put(windowId, window);
+        windowsById.put(windowId, window);
         
-        if (_windowsById.size() == 1) {
-            setFocusedWindow(_windowsById.get(0));
+        if (windowsById.size() == 1) {
+            setFocusedWindow(windowsById.get(0));
         }
         
         return window;
@@ -129,7 +127,7 @@ public class GUIManager implements EventHandlerSystem {
      * Close all windows which where added and remove them from the GUIManager. Therefore they won't be updated or rendered anymore.
      */
     public void removeAllWindows() {
-        List<String> windowIds = Lists.newArrayList(_windowsById.keySet());
+        List<String> windowIds = Lists.newArrayList(windowsById.keySet());
         for (String windowId : windowIds) {
             removeWindow(windowId);
         }
@@ -145,25 +143,14 @@ public class GUIManager implements EventHandlerSystem {
             return;
         }
         
-        _renderer.removeDisplayElement(window);
+        renderer.removeDisplayElement(window);
 
-        for (String key : _windowsById.keySet()) {
-            if (_windowsById.get(key).equals(window)) {
-                _windowsById.remove(key);
+        for (String key : windowsById.keySet()) {
+            if (windowsById.get(key).equals(window)) {
+                windowsById.remove(key);
                 break;
             }
         }
-
-        if (_currentFocused == window) {
-            _currentFocused = null;
-        }
-        if (_lastFocused == window) {
-            _lastFocused = null;
-        } else {
-            _currentFocused = _lastFocused;
-        }
-        
-        setMouseMovement(isConsumingInput());
     }
     
     /**
@@ -180,27 +167,11 @@ public class GUIManager implements EventHandlerSystem {
      * @return Returns the reference of the window with the given id or null if there is none with this id.
      */
     public UIDisplayWindow getWindowById(String windowId) {
-        if (_windowsById.containsKey(windowId)) {
-            return _windowsById.get(windowId);
+        if (windowsById.containsKey(windowId)) {
+            return windowsById.get(windowId);
         } else {
             return null;
         }
-    }
-
-    /**
-     * Get the current focused window.
-     * @return Returns the current focused window.
-     */
-    public UIDisplayWindow getFocusedWindow() {
-        return _currentFocused;
-    }
-
-    /**
-     * Check if the GUI will consume the input events. Input events are changes of the mouse position, mouse button, mouse wheel and keyboard input.
-     * @return Returns true if the GUI will consume the input events.
-     */
-    public boolean isConsumingInput() {
-        return _currentFocused != null && _currentFocused.isModal() && _currentFocused.isVisible();
     }
 
     /**
@@ -208,14 +179,8 @@ public class GUIManager implements EventHandlerSystem {
      * @param window The window reference.
      */
     public void setFocusedWindow(UIDisplayWindow window) {
-        int index = _renderer.getDisplayElements().indexOf(window);
-        
-        if (index != -1) {
-            setTopWindow(index);
-            _renderer.layout();
-        }
-        
-        setMouseMovement(isConsumingInput());
+    	renderer.setWindowFocus(window);
+    	checkMouseMovement();
     }
     
     /**
@@ -223,54 +188,45 @@ public class GUIManager implements EventHandlerSystem {
      * @param windowId The window id.
      */
     public void setFocusedWindow(String windowId) {
-        if (_windowsById == null || _windowsById.size() < 1 || !_windowsById.containsKey(windowId)) {
+        if (windowsById == null || windowsById.size() < 1 || !windowsById.containsKey(windowId)) {
             return;
         }
         
-        setFocusedWindow(_windowsById.get(windowId));
+        setFocusedWindow(windowsById.get(windowId));
     }
-    
+
     /**
-     * Set the focus to the last window which had the focus.
+     * Get the focused window.
+     * @return Returns the focused window.
      */
-    public void setLastFocused() {
-        setFocusedWindow(_lastFocused);
-    }
+	public UIDisplayWindow getFocusedWindow() {
+		return renderer.getWindowFocused();
+	}
 
-    //TODO change this parameter from index to reference.
-    private void setTopWindow(int windowPosition) {
-
-        if (_renderer.getDisplayElements().size() - 1 < windowPosition || windowPosition < 0) {
-            return;
-        }
-
-        UIDisplayWindow setTopWindow = (UIDisplayWindow) _renderer.getDisplayElements().get(windowPosition);
-
-        if (setTopWindow == null) {
-            return;
-        }
-
-        if (_currentFocused != null && _currentFocused.isVisible()) {
-            _lastFocused = _currentFocused;
-            if (_lastFocused != null && _lastFocused.isMaximized() && setTopWindow.isMaximized()) {
-                _lastFocused.setVisible(false);
-            }
-        }
-
-        _currentFocused = setTopWindow;
-        _currentFocused.setVisible(true);
-        
-        _renderer.changeElementDepth(windowPosition, _renderer.getDisplayElements().size() - 1);
-    }
-    
-    private void setMouseMovement(boolean enable) {
-        if (enable || _currentFocused == null) {
+	/**
+	 * Check whether the mouse of the current focused window is visible and can be moved on the display.
+	 */
+    public void checkMouseMovement() {
+        if (isConsumingInput() || renderer.getWindowFocused() == null) {
             Mouse.setGrabbed(false);
         } else {
             Mouse.setGrabbed(true);
         }
     }
+    
+    /**
+     * Check if the GUI will consume the input events. Input events are changes of the mouse position, mouse button, mouse wheel and keyboard input.
+     * @return Returns true if the GUI will consume the input events.
+     */
+    public boolean isConsumingInput() {
+        return renderer.getWindowFocused() != null && renderer.getWindowFocused().isModal() && renderer.getWindowFocused().isVisible();
+    }
 
+    /**
+     * Show a message dialog.
+     * @param title The title of the dialog.
+     * @param text The text of the dialog.
+     */
     public void showMessage(String title, String text) {
         UIDisplayWindow messageWindow = new UIMessageBox(title, text);
         messageWindow.setVisible(true);
@@ -293,8 +249,8 @@ public class GUIManager implements EventHandlerSystem {
      * 
      */
     private void processMouseInput(int button, boolean state, int wheelMoved) {
-        if (_currentFocused != null) {
-            _currentFocused.processMouseInput(button, state, wheelMoved);
+        if (renderer.getWindowFocused() != null) {
+        	renderer.getWindowFocused().processMouseInput(button, state, wheelMoved);
         }
     }
     
@@ -303,12 +259,12 @@ public class GUIManager implements EventHandlerSystem {
      * @param event The event of the pressed key.
      */
     private void processKeyboardInput(KeyEvent event) {
-        if (_currentFocused != null && _currentFocused.isModal() && _currentFocused.isVisible()) { //TODO change this
-            _currentFocused.processKeyboardInput(event);
+        if (renderer.getWindowFocused() != null && renderer.getWindowFocused().isModal() && renderer.getWindowFocused().isVisible()) { //TODO change this
+        	renderer.getWindowFocused().processKeyboardInput(event);
             return;
         }
 
-        List<UIDisplayElement> screens = Lists.newArrayList(_renderer.getDisplayElements());
+        List<UIDisplayElement> screens = Lists.newArrayList(renderer.getDisplayElements());
         for (UIDisplayElement screen : screens) {
             if (!((UIDisplayWindow) screen).isModal()) {
                 screen.processKeyboardInput(event);
@@ -321,8 +277,8 @@ public class GUIManager implements EventHandlerSystem {
      * @param event The event of the bind button.
      */
     private void processBindButton(BindButtonEvent event) {
-        if (_currentFocused != null && _currentFocused.isModal() && _currentFocused.isVisible()) { //TODO change this
-            _currentFocused.processBindButton(event);
+        if (renderer.getWindowFocused() != null && renderer.getWindowFocused().isModal() && renderer.getWindowFocused().isVisible()) { //TODO change this
+        	renderer.getWindowFocused().processBindButton(event);
         }
     }
     
@@ -347,8 +303,8 @@ public class GUIManager implements EventHandlerSystem {
         if (isConsumingInput()) {
             processMouseInput(-1, false, 0);
             
-            if (_currentFocused != null) {
-                if (_currentFocused.isModal()) {
+            if (renderer.getWindowFocused() != null) {
+                if (renderer.getWindowFocused().isModal()) {
                     event.consume();
                 }
             }
@@ -360,8 +316,8 @@ public class GUIManager implements EventHandlerSystem {
         if (isConsumingInput()) {
             processMouseInput(-1, false, 0);
             
-            if (_currentFocused != null) {
-                if (_currentFocused.isModal()) {
+            if (renderer.getWindowFocused() != null) {
+                if (renderer.getWindowFocused().isModal()) {
                     event.consume();
                 }
             }
@@ -374,8 +330,8 @@ public class GUIManager implements EventHandlerSystem {
         if (isConsumingInput()) {
             processMouseInput(event.getButton(), event.getState() != ButtonState.UP, 0);
             
-            if (_currentFocused != null) {
-                if (_currentFocused.isModal()) {
+            if (renderer.getWindowFocused() != null) {
+                if (renderer.getWindowFocused().isModal()) {
                     event.consume();
                 }
             }
@@ -388,8 +344,8 @@ public class GUIManager implements EventHandlerSystem {
         if (isConsumingInput()) {
             processMouseInput(-1, false, event.getWheelTurns() * 120);
             
-            if (_currentFocused != null) {
-                if (_currentFocused.isModal()) {
+            if (renderer.getWindowFocused() != null) {
+                if (renderer.getWindowFocused().isModal()) {
                     event.consume();
                 }
             }
@@ -410,9 +366,9 @@ public class GUIManager implements EventHandlerSystem {
         if (isConsumingInput()) {
             processBindButton(event);
             
-            if (_currentFocused != null) {
+            if (renderer.getWindowFocused() != null) {
                 //if modal, consume the event so it wont get caught from others
-                if (_currentFocused.isModal()) {
+                if (renderer.getWindowFocused().isModal()) {
                     event.consume();
                 }
             }

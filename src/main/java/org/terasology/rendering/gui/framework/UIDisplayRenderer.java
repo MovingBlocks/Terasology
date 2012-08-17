@@ -76,7 +76,34 @@ public class UIDisplayRenderer extends UIDisplayContainer {
         }
     }
 
-    public void changeElementDepth(int elementPosition, int forwardToPosistion) {
-        Collections.rotate(_displayElements.subList(elementPosition, forwardToPosistion + 1), -1);
+    /**
+     * Get the focused window. The focused window is the top element within the display elements array which is visible.
+     * @return The focused window.
+     */
+    public UIDisplayWindow getWindowFocused() {
+        if (_displayElements.size() > 0) {
+            
+            for (int i = _displayElements.size() - 1; i >= 0; i--) {
+                if (_displayElements.get(i).isVisible()) {
+                    return (UIDisplayWindow) _displayElements.get(i);
+                }
+			}
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Set the given window to the top position of the display element array. Therefore the window will be focused.
+     * @param window The window to focus.
+     */
+    public void setWindowFocus(UIDisplayWindow window) {
+        int windowPosition = _displayElements.indexOf(window);
+        
+        if (windowPosition != -1) {
+            Collections.rotate(_displayElements.subList(windowPosition, _displayElements.size()), -1);
+            
+            window.setVisible(true);
+        }
     }
 }
