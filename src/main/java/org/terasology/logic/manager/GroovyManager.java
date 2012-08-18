@@ -290,7 +290,12 @@ public class GroovyManager {
         public void debugCollision() {
             Config.getInstance().setDebugCollision(!Config.getInstance().isDebugCollision());
         }
-
+        public void setSpawn() {
+            EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
+            PlayerComponent spawn = playerEntity.getComponent(PlayerComponent.class);
+            spawn.spawnPosition = playerEntity.getComponent(LocationComponent.class).getWorldPosition();
+            playerEntity.saveComponent(spawn);
+        }
         public void exit() {
             CoreRegistry.get(GameEngine.class).shutdown();
         }
