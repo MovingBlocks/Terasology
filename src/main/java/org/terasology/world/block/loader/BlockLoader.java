@@ -96,6 +96,7 @@ public class BlockLoader {
 
     private BlockShape cubeShape;
     private BlockShape loweredShape;
+    private BlockShape trimmedLoweredShape;
 
     private TObjectIntMap<AssetUri> tileIndexes = new TObjectIntHashMap<AssetUri>();
     private List<Tile> tiles = Lists.newArrayList();
@@ -111,6 +112,7 @@ public class BlockLoader {
                 .create();
         cubeShape = (BlockShape) AssetManager.load(new AssetUri(AssetType.SHAPE, "engine:cube"));
         loweredShape = (BlockShape) AssetManager.load(new AssetUri(AssetType.SHAPE, "engine:loweredCube"));
+        trimmedLoweredShape = (BlockShape) AssetManager.load(new AssetUri(AssetType.SHAPE, "engine:trimmedLoweredCube"));
     }
 
     public int getAtlasSize() {
@@ -145,7 +147,7 @@ public class BlockLoader {
                         if (blockDef.liquid) {
                             blockDef.rotation = BlockDefinition.RotationType.NONE;
                             blockDef.shapes.clear();
-                            blockDef.shape = "";
+                            blockDef.shape = trimmedLoweredShape.getURI().getSimpleString();
                         }
 
                         if (blockDef.shapes.isEmpty()) {

@@ -25,7 +25,7 @@ import javax.vecmath.Vector2f;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import org.terasology.events.input.KeyEvent;
+import org.terasology.input.events.KeyEvent;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.gui.framework.events.ClickListener;

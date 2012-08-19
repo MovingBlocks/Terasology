@@ -16,7 +16,7 @@
 
 package org.terasology.input;
 
-import org.terasology.events.input.AxisEvent;
+import org.terasology.input.events.AxisEvent;
 
 /**
  * @author Immortius

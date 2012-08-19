@@ -577,13 +577,11 @@ public class Block {
         shader.enable();
         shader.setFloat("light", light);
 
-        if (mesh.isDisposed()) {
-            logger.severe("Mesh disposed");
-            return;
-        }
-
         if (mesh == null) {
             generateMesh();
+        } else if (mesh.isDisposed()) {
+            logger.severe("Mesh disposed");
+            return;
         }
 
 

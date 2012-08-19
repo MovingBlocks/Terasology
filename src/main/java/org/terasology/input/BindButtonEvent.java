@@ -16,7 +16,7 @@
 
 package org.terasology.input;
 
-import org.terasology.events.input.ButtonEvent;
+import org.terasology.input.events.ButtonEvent;
 
 /**
  * @author Immortius

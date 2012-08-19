@@ -17,8 +17,8 @@ package org.terasology.rendering.gui.framework;
 
 import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetManager;
-import org.terasology.events.input.KeyEvent;
 import org.terasology.input.BindButtonEvent;
+import org.terasology.input.events.KeyEvent;
 import org.terasology.rendering.gui.framework.style.UIStyle;
 import org.terasology.rendering.gui.framework.style.UIStyleBackgroundColor;
 import org.terasology.rendering.gui.framework.style.UIStyleBackgroundImage;

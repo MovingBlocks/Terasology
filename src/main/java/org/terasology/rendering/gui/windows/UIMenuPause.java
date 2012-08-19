@@ -17,7 +17,7 @@ package org.terasology.rendering.gui.windows;
 
 import org.lwjgl.input.Keyboard;
 import org.terasology.events.RespawnEvent;
-import org.terasology.events.input.binds.PauseButton;
+import org.terasology.input.binds.PauseButton;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.modes.StateMainMenu;

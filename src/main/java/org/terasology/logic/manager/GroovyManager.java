@@ -32,6 +32,7 @@ import javax.vecmath.Vector3f;
 import org.lwjgl.input.Keyboard;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
+import org.terasology.components.PlayerComponent;
 import org.terasology.components.SimpleAIComponent;
 import org.terasology.components.rendering.MeshComponent;
 import org.terasology.components.world.LocationComponent;
@@ -41,9 +42,9 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.entitySystem.persistence.WorldPersister;
-import org.terasology.events.input.binds.BackwardsButton;
-import org.terasology.events.input.binds.ForwardsButton;
-import org.terasology.events.input.binds.LeftStrafeButton;
+import org.terasology.input.binds.BackwardsButton;
+import org.terasology.input.binds.ForwardsButton;
+import org.terasology.input.binds.LeftStrafeButton;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
@@ -290,7 +291,12 @@ public class GroovyManager {
         public void debugCollision() {
             Config.getInstance().setDebugCollision(!Config.getInstance().isDebugCollision());
         }
-
+        public void setSpawn() {
+            EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
+            PlayerComponent spawn = playerEntity.getComponent(PlayerComponent.class);
+            spawn.spawnPosition = playerEntity.getComponent(LocationComponent.class).getWorldPosition();
+            playerEntity.saveComponent(spawn);
+        }
         public void exit() {
             CoreRegistry.get(GameEngine.class).shutdown();
         }

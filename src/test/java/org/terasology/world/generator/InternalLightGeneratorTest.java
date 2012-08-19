@@ -28,7 +28,7 @@ import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.localChunkProvider.InternalLightProcessor;
+import org.terasology.world.lighting.InternalLightProcessor;
 
 /**
  * @author Immortius
