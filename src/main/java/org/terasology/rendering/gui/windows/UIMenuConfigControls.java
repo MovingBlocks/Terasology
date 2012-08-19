@@ -18,7 +18,7 @@ package org.terasology.rendering.gui.windows;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetManager;
-import org.terasology.events.input.KeyEvent;
+import org.terasology.input.events.KeyEvent;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.InputConfig;

@@ -19,7 +19,7 @@ import javax.vecmath.Vector2f;
 
 import org.lwjgl.input.Keyboard;
 import org.terasology.asset.AssetManager;
-import org.terasology.events.input.binds.InventoryButton;
+import org.terasology.input.binds.InventoryButton;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.rendering.gui.components.UIItemContainer;

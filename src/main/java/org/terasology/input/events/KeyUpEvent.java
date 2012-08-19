@@ -13,36 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.input.events;
 
-package org.terasology.input;
+import org.terasology.input.ButtonState;
 
-import org.terasology.input.events.AxisEvent;
+public class KeyUpEvent extends KeyEvent {
 
-/**
- * @author Immortius
- */
-public class BindAxisEvent extends AxisEvent {
+    private static KeyUpEvent event = new KeyUpEvent(0, 0);
 
-    private String id;
-    private float value;
-
-    public BindAxisEvent() {
-        super(0);
+    public static KeyUpEvent create(int key, float delta) {
+        event.reset(delta);
+        event.setKey(key);
+        return event;
     }
 
-    @Override
-    public float getValue() {
-        return value;
+    private KeyUpEvent(int key, float delta) {
+        super(key, ButtonState.UP, delta);
     }
-
-    void prepare(String id, float value, float delta) {
-        reset(delta);
-        this.id = id;
-        this.value = value;
-    }
-
-    public String getId() {
-        return id;
-    }
-
 }

@@ -1,6 +1,6 @@
 package org.terasology.rendering.gui.framework.events;
 
-import org.terasology.events.input.KeyEvent;
+import org.terasology.input.events.KeyEvent;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 
 public interface KeyListener {

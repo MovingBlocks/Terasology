@@ -19,7 +19,7 @@ import javax.vecmath.Vector2f;
 
 import org.lwjgl.input.Keyboard;
 import org.terasology.asset.AssetManager;
-import org.terasology.events.input.binds.UseItemButton;
+import org.terasology.input.binds.UseItemButton;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 

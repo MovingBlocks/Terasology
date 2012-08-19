@@ -27,7 +27,7 @@ import org.terasology.world.block.BlockItemComponent;
 import org.terasology.entityFactory.DroppedBlockFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.events.input.KeyEvent;
+import org.terasology.input.events.KeyEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.asset.AssetManager;
 import org.terasology.logic.LocalPlayer;

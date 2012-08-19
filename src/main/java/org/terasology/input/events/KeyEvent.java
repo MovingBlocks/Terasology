@@ -13,39 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.input.events;
 
-package org.terasology.input;
+import org.lwjgl.input.Keyboard;
+import org.terasology.input.ButtonState;
 
-import org.terasology.input.events.ButtonEvent;
+public class KeyEvent extends ButtonEvent {
 
-/**
- * @author Immortius
- */
-public class BindButtonEvent extends ButtonEvent {
-
-    private String id;
+    private int key;
     private ButtonState state;
 
-    public BindButtonEvent() {
-        super(0);
-    }
-
-    void prepare(String id, ButtonState state, float delta) {
-        reset(delta);
-        this.id = id;
+    public KeyEvent(int key, ButtonState state, float delta) {
+        super(delta);
+        this.key = key;
         this.state = state;
     }
 
-    public String getId() {
-        return id;
+    public int getKey() {
+        return key;
     }
 
     public ButtonState getState() {
         return state;
     }
 
-    @Override
     public String getButtonName() {
-        return "bind:" + id;
+        return "key:" + getKeyName();
     }
+
+    public String getKeyName() {
+        return Keyboard.getKeyName(key);
+    }
+
+    public char getKeyCharacter() {
+        return Keyboard.getEventCharacter();
+    }
+
+    protected void setKey(int key) {
+        this.key = key;
+    }
+
 }

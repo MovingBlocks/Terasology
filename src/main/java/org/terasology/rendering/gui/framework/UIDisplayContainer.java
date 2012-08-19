@@ -16,7 +16,7 @@
 package org.terasology.rendering.gui.framework;
 
 import org.lwjgl.opengl.Display;
-import org.terasology.events.input.KeyEvent;
+import org.terasology.input.events.KeyEvent;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.rendering.gui.framework.style.UIStyle;
 

@@ -14,35 +14,24 @@
  * limitations under the License.
  */
 
-package org.terasology.input;
+package org.terasology.input.events;
 
-import org.terasology.input.events.AxisEvent;
+import org.terasology.input.ButtonState;
 
 /**
  * @author Immortius
  */
-public class BindAxisEvent extends AxisEvent {
+public abstract class ButtonEvent extends InputEvent {
 
-    private String id;
-    private float value;
-
-    public BindAxisEvent() {
-        super(0);
+    public ButtonEvent(float delta) {
+        super(delta);
     }
 
-    @Override
-    public float getValue() {
-        return value;
-    }
+    public abstract ButtonState getState();
 
-    void prepare(String id, float value, float delta) {
-        reset(delta);
-        this.id = id;
-        this.value = value;
-    }
+    public abstract String getButtonName();
 
-    public String getId() {
-        return id;
+    public boolean isDown() {
+        return getState() != ButtonState.UP;
     }
-
 }

@@ -18,7 +18,7 @@ package org.terasology.rendering.gui.windows;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.events.input.binds.FrobButton;
+import org.terasology.input.binds.FrobButton;
 import org.terasology.asset.AssetManager;
 import org.terasology.rendering.gui.components.UIItemContainer;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;

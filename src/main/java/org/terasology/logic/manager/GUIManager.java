@@ -23,11 +23,11 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.EventPriority;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.events.input.KeyEvent;
-import org.terasology.events.input.MouseButtonEvent;
-import org.terasology.events.input.MouseWheelEvent;
-import org.terasology.events.input.MouseXAxisEvent;
-import org.terasology.events.input.MouseYAxisEvent;
+import org.terasology.input.events.KeyEvent;
+import org.terasology.input.events.MouseButtonEvent;
+import org.terasology.input.events.MouseWheelEvent;
+import org.terasology.input.events.MouseXAxisEvent;
+import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.ButtonState;
 import org.terasology.rendering.gui.components.UIMessageBox;
@@ -261,6 +261,7 @@ public class GUIManager implements EventHandlerSystem {
     private void processKeyboardInput(KeyEvent event) {
         if (renderer.getWindowFocused() != null && renderer.getWindowFocused().isModal() && renderer.getWindowFocused().isVisible()) { //TODO change this
         	renderer.getWindowFocused().processKeyboardInput(event);
+            event.consume();
             return;
         }
 

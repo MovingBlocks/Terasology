@@ -13,36 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.input.binds;
 
-package org.terasology.input;
-
-import org.terasology.input.events.AxisEvent;
+import org.terasology.input.BindButtonEvent;
 
 /**
- * @author Immortius
+ * @author small-jeeper
  */
-public class BindAxisEvent extends AxisEvent {
-
-    private String id;
-    private float value;
-
-    public BindAxisEvent() {
-        super(0);
-    }
-
-    @Override
-    public float getValue() {
-        return value;
-    }
-
-    void prepare(String id, float value, float delta) {
-        reset(delta);
-        this.id = id;
-        this.value = value;
-    }
-
-    public String getId() {
-        return id;
-    }
-
+public class DropItemButton extends BindButtonEvent {
+    public static final String ID = "engine:dropItem";
 }

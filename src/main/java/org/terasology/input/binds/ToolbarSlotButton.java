@@ -14,35 +14,21 @@
  * limitations under the License.
  */
 
-package org.terasology.input;
+package org.terasology.input.binds;
 
-import org.terasology.input.events.AxisEvent;
+import org.terasology.input.BindButtonEvent;
 
 /**
  * @author Immortius
  */
-public class BindAxisEvent extends AxisEvent {
+public class ToolbarSlotButton extends BindButtonEvent {
+    private int slot;
 
-    private String id;
-    private float value;
-
-    public BindAxisEvent() {
-        super(0);
+    public ToolbarSlotButton(int slot) {
+        this.slot = slot;
     }
 
-    @Override
-    public float getValue() {
-        return value;
+    public int getSlot() {
+        return slot;
     }
-
-    void prepare(String id, float value, float delta) {
-        reset(delta);
-        this.id = id;
-        this.value = value;
-    }
-
-    public String getId() {
-        return id;
-    }
-
 }

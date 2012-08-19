@@ -21,9 +21,43 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.EventSystem;
-import org.terasology.events.input.*;
-import org.terasology.events.input.binds.*;
 import org.terasology.game.CoreRegistry;
+import org.terasology.input.events.InputEvent;
+import org.terasology.input.events.KeyDownEvent;
+import org.terasology.input.events.KeyEvent;
+import org.terasology.input.events.KeyRepeatEvent;
+import org.terasology.input.events.KeyUpEvent;
+import org.terasology.input.events.LeftMouseDownButtonEvent;
+import org.terasology.input.events.LeftMouseUpButtonEvent;
+import org.terasology.input.events.MouseAxisEvent;
+import org.terasology.input.events.MouseButtonEvent;
+import org.terasology.input.events.MouseDownButtonEvent;
+import org.terasology.input.events.MouseUpButtonEvent;
+import org.terasology.input.events.MouseWheelEvent;
+import org.terasology.input.events.MouseXAxisEvent;
+import org.terasology.input.events.MouseYAxisEvent;
+import org.terasology.input.events.RightMouseDownButtonEvent;
+import org.terasology.input.events.RightMouseUpButtonEvent;
+import org.terasology.input.binds.AttackButton;
+import org.terasology.input.binds.BackwardsButton;
+import org.terasology.input.binds.ConsoleButton;
+import org.terasology.input.binds.CrouchButton;
+import org.terasology.input.binds.DropItemButton;
+import org.terasology.input.binds.ForwardsButton;
+import org.terasology.input.binds.ForwardsMovementAxis;
+import org.terasology.input.binds.FrobButton;
+import org.terasology.input.binds.InventoryButton;
+import org.terasology.input.binds.JumpButton;
+import org.terasology.input.binds.LeftStrafeButton;
+import org.terasology.input.binds.PauseButton;
+import org.terasology.input.binds.RightStrafeButton;
+import org.terasology.input.binds.RunButton;
+import org.terasology.input.binds.StrafeMovementAxis;
+import org.terasology.input.binds.ToolbarNextButton;
+import org.terasology.input.binds.ToolbarPrevButton;
+import org.terasology.input.binds.ToolbarSlotButton;
+import org.terasology.input.binds.UseItemButton;
+import org.terasology.input.binds.VerticalMovementAxis;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
@@ -63,7 +97,7 @@ public class InputSystem implements EventHandlerSystem {
     public void initialise() {
         localPlayer = CoreRegistry.get(LocalPlayer.class);
         cameraTargetSystem = CoreRegistry.get(CameraTargetSystem.class);
-        
+
         CoreRegistry.get(EventSystem.class).registerEventHandler(GUIManager.getInstance());
 
         loadInputConfig();
@@ -164,7 +198,7 @@ public class InputSystem implements EventHandlerSystem {
                 }
             }
         }
-        
+
         //process mouse movement x axis
         int deltaX = Mouse.getDX();
         if (deltaX != 0) {
@@ -172,7 +206,7 @@ public class InputSystem implements EventHandlerSystem {
             setupTarget(event);
             localPlayer.getEntity().send(event);
         }
-        
+
         //process mouse movement y axis
         int deltaY = Mouse.getDY();
         if (deltaY != 0) {

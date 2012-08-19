@@ -37,9 +37,9 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
 import org.terasology.entitySystem.Prefab;
-import org.terasology.events.input.KeyEvent;
-import org.terasology.events.input.binds.ConsoleButton;
-import org.terasology.events.input.binds.PauseButton;
+import org.terasology.input.events.KeyEvent;
+import org.terasology.input.binds.ConsoleButton;
+import org.terasology.input.binds.PauseButton;
 import org.terasology.game.CoreRegistry;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.logic.manager.GroovyHelp;
@@ -98,13 +98,17 @@ public final class UIScreenConsole extends UIDisplayWindow {
     /**
      * Processes the given keyboard input.
      *
-     * @param key The key
+     * @param event The key event
      */
     public void processKeyboardInput(KeyEvent event) {
         super.processKeyboardInput(event);
 
         if (!isVisible())
             return;
+
+        if (!event.isDown()) {
+            return;
+        }
 
         switch (event.getKey()) {
             case Keyboard.KEY_BACK:
@@ -125,7 +129,7 @@ public final class UIScreenConsole extends UIDisplayWindow {
                 rotateRingBuffer(-1);
                 break;
             default:
-                char c = Keyboard.getEventCharacter();
+                char c = event.getKeyCharacter();
 
                 if (!Character.isISOControl(c)) {
                     _consoleInput.append(c);

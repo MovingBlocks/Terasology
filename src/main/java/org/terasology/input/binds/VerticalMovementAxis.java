@@ -14,35 +14,13 @@
  * limitations under the License.
  */
 
-package org.terasology.input;
+package org.terasology.input.binds;
 
-import org.terasology.input.events.AxisEvent;
+import org.terasology.input.BindAxisEvent;
 
 /**
  * @author Immortius
  */
-public class BindAxisEvent extends AxisEvent {
-
-    private String id;
-    private float value;
-
-    public BindAxisEvent() {
-        super(0);
-    }
-
-    @Override
-    public float getValue() {
-        return value;
-    }
-
-    void prepare(String id, float value, float delta) {
-        reset(delta);
-        this.id = id;
-        this.value = value;
-    }
-
-    public String getId() {
-        return id;
-    }
-
+public class VerticalMovementAxis extends BindAxisEvent {
+    public static final String ID = "engine:verticalMovementAxis";
 }

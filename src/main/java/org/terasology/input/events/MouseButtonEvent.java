@@ -13,39 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.input.events;
 
-package org.terasology.input;
 
-import org.terasology.input.events.ButtonEvent;
+import org.lwjgl.input.Mouse;
+import org.terasology.input.ButtonState;
 
-/**
- * @author Immortius
- */
-public class BindButtonEvent extends ButtonEvent {
+public class MouseButtonEvent extends ButtonEvent {
 
-    private String id;
+    private int button = 0;
     private ButtonState state;
 
-    public BindButtonEvent() {
-        super(0);
-    }
-
-    void prepare(String id, ButtonState state, float delta) {
-        reset(delta);
-        this.id = id;
+    public MouseButtonEvent(int button, ButtonState state, float delta) {
+        super(delta);
         this.state = state;
-    }
-
-    public String getId() {
-        return id;
+        this.button = button;
     }
 
     public ButtonState getState() {
         return state;
     }
 
-    @Override
-    public String getButtonName() {
-        return "bind:" + id;
+    public int getButton() {
+        return button;
     }
+
+    public String getMouseButtonName() {
+        return Mouse.getButtonName(button);
+    }
+
+    public String getButtonName() {
+        return "mouse:" + getMouseButtonName();
+    }
+
+    protected void setButton(int button) {
+        this.button = button;
+    }
+
 }

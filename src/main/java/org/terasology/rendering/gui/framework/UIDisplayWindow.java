@@ -16,7 +16,7 @@
 package org.terasology.rendering.gui.framework;
 
 import org.lwjgl.opengl.Display;
-import org.terasology.events.input.KeyEvent;
+import org.terasology.input.events.KeyEvent;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.framework.events.WindowListener;
@@ -140,7 +140,7 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer {
     
     /**
      * Set the bind keys which will close the window when pressed.
-     * @param binds The bind key ID. For possible bind keys see the {@link org.terasology.events.input.binds} package.
+     * @param binds The bind key ID. For possible bind keys see the {@link org.terasology.input.binds} package.
      */
     public void setCloseBinds(String[] binds) {
         this.closeBinds = binds;

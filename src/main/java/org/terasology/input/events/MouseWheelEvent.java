@@ -14,35 +14,22 @@
  * limitations under the License.
  */
 
-package org.terasology.input;
+package org.terasology.input.events;
 
-import org.terasology.input.events.AxisEvent;
 
 /**
  * @author Immortius
  */
-public class BindAxisEvent extends AxisEvent {
+public class MouseWheelEvent extends InputEvent {
 
-    private String id;
-    private float value;
+    private int wheelTurns;
 
-    public BindAxisEvent() {
-        super(0);
+    public MouseWheelEvent(int wheelTurns, float delta) {
+        super(delta);
+        this.wheelTurns = wheelTurns;
     }
 
-    @Override
-    public float getValue() {
-        return value;
+    public int getWheelTurns() {
+        return wheelTurns;
     }
-
-    void prepare(String id, float value, float delta) {
-        reset(delta);
-        this.id = id;
-        this.value = value;
-    }
-
-    public String getId() {
-        return id;
-    }
-
 }

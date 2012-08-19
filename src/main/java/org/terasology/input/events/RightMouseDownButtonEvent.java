@@ -13,36 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.input.events;
 
-package org.terasology.input;
 
-import org.terasology.input.events.AxisEvent;
 
-/**
- * @author Immortius
- */
-public class BindAxisEvent extends AxisEvent {
+public class RightMouseDownButtonEvent extends MouseDownButtonEvent {
 
-    private String id;
-    private float value;
+    private static RightMouseDownButtonEvent event = new RightMouseDownButtonEvent(0);
 
-    public BindAxisEvent() {
-        super(0);
+    public static RightMouseDownButtonEvent create(float delta) {
+        event.reset(delta);
+        return event;
     }
 
-    @Override
-    public float getValue() {
-        return value;
+    private RightMouseDownButtonEvent(float delta) {
+        super(1, delta);
     }
-
-    void prepare(String id, float value, float delta) {
-        reset(delta);
-        this.id = id;
-        this.value = value;
-    }
-
-    public String getId() {
-        return id;
-    }
-
 }
