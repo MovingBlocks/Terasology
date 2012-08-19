@@ -28,6 +28,7 @@ public class UIScreenBook extends UIDisplayWindow {
     private final UIGraphicsElement background;
 
     public UIScreenBook() {
+    	setBackgroundColor(0, 0, 0, 0.75f);
     	setModal(true);
     	setCloseBinds(new String[] {UseItemButton.ID});
     	setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});

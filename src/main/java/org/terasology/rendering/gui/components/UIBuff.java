@@ -28,8 +28,10 @@ import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
-/*
+/**
 *   For Status Effects that don't affect the hearts
+*   
+*   TODO get rid of this.. HUD window
 */
 public class UIBuff extends UIDisplayContainer {
     private final UIGraphicsElement _speedbuff;

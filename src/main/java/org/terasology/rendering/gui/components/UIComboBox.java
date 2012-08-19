@@ -35,11 +35,11 @@ import org.terasology.rendering.gui.framework.events.MouseMoveListener;
  *
  */
 public class UIComboBox extends UIDisplayContainer {
-    private UIInput  _baseInput;
-    private UIButton _baseButton;
-    private UIList   _baseList;
+    private UIInput  baseInput;
+    private UIButton baseButton;
+    private UIList   baseList;
 
-    private boolean _opened;
+    private boolean opened;
 
     /**
      * Creates a combo box with the given size.
@@ -60,7 +60,7 @@ public class UIComboBox extends UIDisplayContainer {
 
     private void initBaseItems(Vector2f size, Vector2f listSize){
         setSize(size);
-        _opened = false;
+        opened = false;
         
         addMouseButtonListener(new MouseButtonListener() {
 			@Override
@@ -70,18 +70,15 @@ public class UIComboBox extends UIDisplayContainer {
 			
 			@Override
 			public void up(UIDisplayElement element, int button, boolean intersect) {
-				if (intersect)
-					_opened = !_opened;
-				else if (!_baseList.intersects(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY())))
-					_opened = false;
+				if (intersect) {
+					opened = !opened;
+				}
+				else if (!baseList.intersects(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()))) {
+					opened = false;
+				}
 				
-		        _baseList.setVisible(_opened);
-				_baseButton.setToggleState(_opened);
-		        
-		        if (!_opened) {
-		            _baseList.getScrollBarHorizontal().resetScrollPosition();
-		            _baseList.getScrollBarVertival().resetScrollPosition();
-		        }
+		        baseList.setVisible(opened);
+				baseButton.setToggleState(opened);
 			}
 			
 			@Override
@@ -111,38 +108,41 @@ public class UIComboBox extends UIDisplayContainer {
 			}
 		});
 
-        _baseInput = new UIInput(size);
-        _baseInput.setVisible(true);
-        _baseInput.setDisabled(true);
+        baseInput = new UIInput(size);
+        baseInput.setVisible(true);
+        baseInput.setDisabled(true);
 
-        _baseButton = new UIButton(new Vector2f(18f, 18f), UIButton.eButtonType.TOGGLE);
-        _baseButton.setVisible(true);
-        _baseButton.getPosition().x = size.x   - _baseButton.getSize().x;
-        _baseButton.getPosition().y = size.y/2 - _baseButton.getSize().y/2;
-        _baseButton.getLabel().setText("");
-        _baseButton.setClassStyle("button", "background-image: engine:gui_menu 18/512 18/512 432/512 0");
-        _baseButton.setClassStyle("button-mouseover", "background-image: engine:gui_menu 18/512 18/512 432/512 0");
-        _baseButton.setClassStyle("button-mouseclick", "background-image: engine:gui_menu 18/512 18/512 432/512 18/512");
+        baseButton = new UIButton(new Vector2f(18f, 20f), UIButton.eButtonType.TOGGLE);
+        baseButton.setVisible(true);
+        baseButton.getPosition().x = size.x   - baseButton.getSize().x;
+        baseButton.getPosition().y = size.y/2 - baseButton.getSize().y/2;
+        baseButton.getLabel().setText("");
+        baseButton.setTexture("engine:gui_menu");
+        baseButton.setNormalState(new Vector2f(432f, 0f), new Vector2f(18f, 18f));
+        baseButton.setPressedState(new Vector2f(432f, 18f), new Vector2f(18f, 18f));
 
-        _baseList = new UIList(listSize);
-        _baseList.getPosition().y = size.y + 2;
-        _baseList.setVisible(false);
-        _baseList.addClickListener(new ClickListener() {	
+        baseList = new UIList(listSize);
+        baseList.setPosition(new Vector2f(1f, size.y - 1f));
+        baseList.setBorderSolid(1f, 0, 0, 0, 1.0f);
+        baseList.setBackgroundColor(0xFF, 0xFF, 0xFF, 1.0f);
+        baseList.setVisible(false);
+        baseList.addClickListener(new ClickListener() {	
 			@Override
 			public void click(UIDisplayElement element, int button) {
-				_opened = !_opened;
-				_baseList.setVisible(_opened);
-				_baseButton.setToggleState(false);
+				opened = !opened;
+				baseList.setVisible(opened);
+				baseButton.setToggleState(false);
 			}
 		});
-        _baseList.addChangedListener(new ChangedListener() {	
+        baseList.addChangedListener(new ChangedListener() {	
 			@Override
 			public void changed(UIDisplayElement element) {
-				if (_baseList.getSelectedItem() != null)
-					_baseInput.setValue(_baseList.getSelectedItem().getText());
+				if (baseList.getSelectedItem() != null)
+					baseInput.setValue(baseList.getSelectedItem().getText());
 			}
 		});
 
+        /*
         _baseList.setClassStyle("windowSkin", "border-image-top: engine:gui_menu 159/512 1/512 263/512 17/512 2");
         _baseList.setClassStyle("windowSkin", "border-image-right: engine:gui_menu 1/512 63/512 423/512 17/512 2");
         _baseList.setClassStyle("windowSkin", "border-image-bottom: engine:gui_menu 159/512 1/512 263/512 81/512 2");
@@ -154,14 +154,15 @@ public class UIComboBox extends UIDisplayContainer {
         _baseList.setClassStyle("windowSkin", "border-corner-bottomleft: engine:gui_menu 64/512 81/512");
         _baseList.setClassStyle("windowSkin", "background-image: engine:gui_menu 159/512 63/512 264/512 18/512");
         _baseList.setClassStyle("windowSkin");
+        */
 
-        addDisplayElement(_baseInput);
-        addDisplayElement(_baseButton);
-        addDisplayElement(_baseList);
+        addDisplayElement(baseInput);
+        addDisplayElement(baseButton);
+        addDisplayElement(baseList);
     }
 
     public void addItem(String text, Object value) {
-        _baseList.addItem(text, value);
+        baseList.addItem(text, value);
     }
     
     /**
@@ -169,7 +170,7 @@ public class UIComboBox extends UIDisplayContainer {
      * @param i The item to select.
      */
     public void setSelectedItemIndex(int i) {
-    	_baseList.setSelectedItemIndex(i);
+    	baseList.setSelectedItemIndex(i);
     }
     
     /**
@@ -177,7 +178,7 @@ public class UIComboBox extends UIDisplayContainer {
      * @return Returns the selected item.
      */
     public int getSelectedItemIndex() {
-		return _baseList.getSelectedItemIndex();
+		return baseList.getSelectedItemIndex();
 	}
     
     /**
@@ -186,6 +187,6 @@ public class UIComboBox extends UIDisplayContainer {
      * @see UIList
      */
     public Object getValue() {
-    	return _baseList.getValue();
+    	return baseList.getValue();
     }
 }

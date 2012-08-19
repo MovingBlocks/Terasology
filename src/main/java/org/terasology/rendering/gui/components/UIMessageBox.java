@@ -23,10 +23,10 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 
 public class UIMessageBox extends UIDialogBox {
-    private UIText _text;
-    private UIButton _buttonOk;
+    private UIText infoText;
+    private UIButton buttonOk;
 
-    private Vector2f _minSize = new Vector2f(384f, 128f);
+    private Vector2f minSize = new Vector2f(384f, 128f);
 
     public UIMessageBox(String title, String text) {
         super(title, new Vector2f());
@@ -35,41 +35,41 @@ public class UIMessageBox extends UIDialogBox {
         float width = 0f;
         float heigh = 0f;
 
-        _buttonOk = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
-        _buttonOk.getLabel().setText("Ok");
-        _buttonOk.setVisible(true);
+        buttonOk = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
+        buttonOk.getLabel().setText("Ok");
+        buttonOk.setVisible(true);
 
-        _text = new UIText(text);
-        _text.setVisible(true);
-        _text.setColor(Color.black);
+        infoText = new UIText(text);
+        infoText.setVisible(true);
+        infoText.setColor(Color.black);
 
-        width = _text.getTextWidth() + 15f > _minSize.x ? _text.getTextWidth() + 15f : _minSize.x;
-        heigh = _text.getTextHeight() + 75f > _minSize.y ? _text.getTextHeight() + 75f : _minSize.y;
+        width = infoText.getTextWidth() + 15f > minSize.x ? infoText.getTextWidth() + 15f : minSize.x;
+        heigh = infoText.getTextHeight() + 75f > minSize.y ? infoText.getTextHeight() + 75f : minSize.y;
         setSize(new Vector2f(width, heigh));
 
-        _text.setPosition(new Vector2f(getSize().x / 2 - _text.getTextWidth() / 2, getSize().y / 2 - _text.getTextHeight() / 2));
-        _buttonOk.setPosition(new Vector2f(getSize().x / 2 - _buttonOk.getSize().x / 2, getSize().y - _buttonOk.getSize().y - 10f));
+        infoText.setPosition(new Vector2f(getSize().x / 2 - infoText.getTextWidth() / 2, getSize().y / 2 - infoText.getTextHeight() / 2));
+        buttonOk.setPosition(new Vector2f(getSize().x / 2 - buttonOk.getSize().x / 2, getSize().y - buttonOk.getSize().y - 10f));
 
-        _buttonOk.addClickListener(new ClickListener() {
+        buttonOk.addClickListener(new ClickListener() {
 			@Override
 			public void click(UIDisplayElement element, int button) {
-				close(true);
+				close();
 			}
         });
 
         resize();
-        windowStyleSetup();
 
-        addDisplayElement(_text);
-        addDisplayElement(_buttonOk, "buttonOk");
+        addDisplayElement(infoText);
+        addDisplayElement(buttonOk, "buttonOk");
+        
+        layout();
     }
     
-    @Override
     /**
      * Close a window. This will remove the window from the GUIManager.
      */
-    public void close(boolean clearInputControls) {
-    	super.close(clearInputControls);
+    public void close() {
+    	super.close();
     	
     	GUIManager.getInstance().removeWindow(this);
     }

@@ -21,7 +21,6 @@ import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.gui.components.UIButton;
-import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UISlider;
 import org.terasology.rendering.gui.components.UIStateButton;
 import org.terasology.rendering.gui.components.UIText;
@@ -41,7 +40,6 @@ import javax.vecmath.Vector2f;
  */
 public class UIMenuConfigVideo extends UIDisplayWindow {
 
-    final UIImageOverlay _overlay;
     final UIGraphicsElement _title;
 
     private final UIStateButton _graphicsQualityButton;
@@ -68,6 +66,7 @@ public class UIMenuConfigVideo extends UIDisplayWindow {
     };
 
     public UIMenuConfigVideo() {
+    	setBackgroundImage("engine:loadingbackground");
     	setModal(true);
         maximize();
         
@@ -77,9 +76,6 @@ public class UIMenuConfigVideo extends UIDisplayWindow {
 
         _version = new UIText("Video Settings");
         _version.setVisible(true);
-
-        _overlay = new UIImageOverlay(AssetManager.loadTexture("engine:loadingBackground"));
-        _overlay.setVisible(true);
 
         _graphicsQualityButton = new UIStateButton(new Vector2f(256f, 32f));
         StateButtonAction graphicsQualityStateAction = new StateButtonAction() {
@@ -213,7 +209,6 @@ public class UIMenuConfigVideo extends UIDisplayWindow {
 			}
 		});
 
-        addDisplayElement(_overlay);
         addDisplayElement(_title);
         addDisplayElement(_version);
 

@@ -20,7 +20,6 @@ import org.terasology.asset.AssetManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.components.UIButton;
-import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UISlider;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -38,7 +37,6 @@ import javax.vecmath.Vector2f;
  */
 public class UIMenuConfigAudio extends UIDisplayWindow {
 
-    final UIImageOverlay _overlay;
     final UIGraphicsElement _title;
     final UIText _version;
     
@@ -47,6 +45,7 @@ public class UIMenuConfigAudio extends UIDisplayWindow {
     private final UIButton _backToConfigMenuButton;
 
     public UIMenuConfigAudio() {
+    	setBackgroundImage("engine:loadingbackground");
         setModal(true);
         setCloseBinds(new String[] {});
         setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
@@ -58,9 +57,6 @@ public class UIMenuConfigAudio extends UIDisplayWindow {
 
         _version = new UIText("Audio Settings");
         _version.setVisible(true);
-
-        _overlay = new UIImageOverlay(AssetManager.loadTexture("engine:loadingBackground"));
-        _overlay.setVisible(true);
 
         _soundOptionSlider = new UISlider(new Vector2f(256f, 32f), 0, 100);
         _soundOptionSlider.addChangedListener(new ChangedListener() {
@@ -102,7 +98,6 @@ public class UIMenuConfigAudio extends UIDisplayWindow {
             }
         });
 
-        addDisplayElement(_overlay);
         addDisplayElement(_title);
         addDisplayElement(_version);
 

@@ -19,15 +19,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.vecmath.Vector2f;
-import javax.vecmath.Vector4f;
 
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
 import org.terasology.rendering.gui.framework.IInputDataElement;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.UIScrollableDisplayContainer;
+import org.terasology.rendering.gui.framework.UIScrollableContainer;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
@@ -36,23 +33,27 @@ import org.terasology.rendering.gui.framework.events.MouseMoveListener;
  * A simple graphical List
  *
  * @author Anton Kireev <adeon.k87@gmail.com>
- * @version 0.2
+ * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
+ * @version 0.3
+ * 
+ * TODO get rid of the IInputDataElement
+ * TODO here is a bug with deleting the selected item..
  */
 
-public class UIList extends UIScrollableDisplayContainer implements IInputDataElement {
+public class UIList extends UIScrollableContainer implements IInputDataElement {
 
     private UIListItem _selectedItem = null;
     private final ArrayList<ClickListener> _doubleClickListeners = new ArrayList<ClickListener>();
 
     //List items
-    private final List<UIListItem> _items = new ArrayList<UIListItem>();
+    private final List<UIListItem> items = new ArrayList<UIListItem>();
 	private final List<ChangedListener> _changedListeners = new ArrayList<ChangedListener>();
 	
 	public class UIListItem extends UIDisplayContainer {
 	    private Object _value;
 	    private String _text;
 	    private boolean _isSelected;
-	    private Vector2f _padding = new Vector2f(5f, 15f);
+	    private Vector2f _padding = new Vector2f(5f, 10f);
 
 	    private final UIText _label;
 
@@ -74,8 +75,9 @@ public class UIList extends UIScrollableDisplayContainer implements IInputDataEl
 	        addMouseMoveListener(new MouseMoveListener() {		
 				@Override
 				public void leave(UIDisplayElement element) {
-					if(!_isSelected)
+					if(!_isSelected) {
 						_label.setColor(Color.lightGray);
+					}
 				}
 				
 				@Override
@@ -85,8 +87,9 @@ public class UIList extends UIScrollableDisplayContainer implements IInputDataEl
 				
 				@Override
 				public void enter(UIDisplayElement element) {
-					if(!_isSelected)
+					if(!_isSelected) {
 						_label.setColor(Color.orange);
+					}
 				}
 
 				@Override
@@ -96,7 +99,6 @@ public class UIList extends UIScrollableDisplayContainer implements IInputDataEl
 			});
 
 	        addDisplayElement(_label);
-
 	    }
 
 	    public Object getValue() {
@@ -124,55 +126,48 @@ public class UIList extends UIScrollableDisplayContainer implements IInputDataEl
 	        _isSelected = selected;
 
 	        if (_isSelected) {
-	            setStyle("background-color", "#e1ddd4 1");
+	        	setBackgroundColor(225, 221, 212, 1.0f);
 	            _label.setColor(Color.orange);
 	        } else {
-	            setStyle("background", "none");
+	        	removeBackgroundColor();
 	            _label.setColor(Color.lightGray);
 	        }
 	    }
 	}
 
     public UIList(Vector2f size) {
+    	super(size);
         setSize(size);
-        setCrop(true);
-        setScrollBarsPosition(getPosition(), getSize());
 
-        //ToDo Create skin for UIList
-        setClassStyle("screenSkin", "border-image-top: engine:gui_menu 159/512 18/512 264/512 0 18");
-        setClassStyle("screenSkin", "border-image-right: engine:gui_menu 9/512 63/512 423/512 18/512 9");
-        setClassStyle("screenSkin", "border-image-bottom: engine:gui_menu 159/512 9/512 264/512 81/512 9");
-        setClassStyle("screenSkin", "border-image-left: engine:gui_menu 8/512 64/512 256/512 17/512 8");
-
-        setClassStyle("screenSkin", "border-corner-topleft: engine:gui_menu 256/512 0");
-        setClassStyle("screenSkin", "border-corner-topright: engine:gui_menu 423/512 0");
-        setClassStyle("screenSkin", "border-corner-bottomright: engine:gui_menu 423/512 81/512");
-        setClassStyle("screenSkin", "border-corner-bottomleft: engine:gui_menu 256/512 81/512");
-        setClassStyle("screenSkin", "background-image: engine:gui_menu 159/512 63/512 264/512 18/512");
-
-        setClassStyle("screenSkin");
-
-        setCropMargin(new Vector4f(-15f, -15f, -15f, 0));
+        //setBackgroundImage("engine:gui_menu");
+        //setBackgroundImageSource(new Vector2f(264f, 18f), new Vector2f(159f, 63f));
+        //setBorderSolid(1, 55, 55, 55, 1.0f);
     }
 
-    /*
-    * Returns count of elements
-    */
+    /**
+     * Get the count of the elements in this list.
+     * @return Returns the count of the elements in this list.
+     */
     public int size() {
-        return _items.size();
+        return items.size();
     }
 
+    /**
+     * Add an item to the list.
+     * @param text The text of the item.
+     * @param value The value which the item holds.
+     */
     public void addItem(String text, Object value) {
 
         final UIListItem newItem = new UIListItem(new Vector2f(getSize().x, (32f)), text, value);
 
         newItem.setVisible(true);
 
-        if (_items.size() > 0) {
-            newItem.setPosition(_items.get(0).getPosition());
+        if (items.size() > 0) {
+            newItem.setPosition(items.get(0).getPosition());
         }
 
-        newItem.getPosition().y += 32f * _items.size();
+        newItem.getPosition().y += 32f * items.size();
         newItem.setFixed(false);
         newItem.addClickListener(new ClickListener() {
         	private long _lastTime = System.currentTimeMillis();
@@ -180,38 +175,104 @@ public class UIList extends UIScrollableDisplayContainer implements IInputDataEl
         	
 			@Override
 			public void click(UIDisplayElement element, int button) {
-				Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
-				if (!getScrollBarHorizontal().intersects(mousePos) && !getScrollBarVertival().intersects(mousePos)) {
-					//handle double click
-					if ((System.currentTimeMillis() - _lastTime) < 200 && _lastButton == button) {
-						notifyDoubleClickListeners();
-					}
-					_lastTime = System.currentTimeMillis();
-					_lastButton = button;
+				//Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
+				//handle double click
+				if ((System.currentTimeMillis() - _lastTime) < 200 && _lastButton == button) {
+					notifyDoubleClickListeners();
+				}
+				_lastTime = System.currentTimeMillis();
+				_lastButton = button;
+				
+				//select the clicked item
+				UIListItem item = (UIListItem) element;
+				
+				if (item != _selectedItem) {
+					if (_selectedItem != null)
+						_selectedItem.setSelected(false);
 					
-					//select the clicked item
-					UIListItem item = (UIListItem) element;
+					_selectedItem = item;
+					_selectedItem.setSelected(true);
 					
-					if (item != _selectedItem) {
-						if (_selectedItem != null)
-							_selectedItem.setSelected(false);
-						
-						_selectedItem = item;
-						_selectedItem.setSelected(true);
-						
-						notifyChangedListeners();
-					}
+					notifyChangedListeners();
 				}
 			}
 		});
 
-        _items.add(newItem);
+        //lets add the item and calculate the new content height of the scroll container
+        items.add(newItem);
         addDisplayElement(newItem);
     }
+    
+    /**
+     * Get an item by the items index.
+     * @param index The item index.
+     * @return Returns the item at the given index.
+     */
+    public UIListItem getItem(int index){
+        if(!items.isEmpty()){
+            return items.get(index);
+        } else {
+            return null;
+        }
+    }
 
-    /*
-    * Remove selected item
-    */
+    /**
+     * Select a particular item in this list.
+     * @param i The index of the item to select.
+     */
+    public void setSelectedItemIndex(int i) {
+    	if (_selectedItem != null) {
+    		_selectedItem.setSelected(false);
+    	}
+    	
+    	_selectedItem = items.get(i);
+    	_selectedItem.setSelected(true);
+    	
+    	notifyChangedListeners();
+    }
+    
+    /**
+     * Get the selected item.
+     * @return Returns the selected item.
+     */
+    public UIListItem getSelectedItem() {
+		return _selectedItem;
+    }
+    
+	/**
+	 * Get the value of the selected item.
+	 * @return Returns the value of the selected item.
+	 */
+    public Object getValue() {
+        return _selectedItem.getValue();
+    }
+    
+    /**
+     * Get the index of the selected item.
+     * @return Returns the index of the selected item.
+     */
+    public int getSelectedItemIndex() {
+    	for (int i = 0; i < items.size(); i++) {
+			if (items.get(i) == _selectedItem) {
+				return i;
+			}
+		}
+    	
+    	return -1;
+    }
+
+    /**
+     * Remove a item in the list by the items index.
+     * @param index The index of the item to remove.
+     */
+    public void removeItem(int index) {
+        removeDisplayElement(items.get(index));
+        items.remove(index);
+    }
+    
+    /**
+     * Remove the selected item.
+     */
     public void removeSelectedItem() {
 
         if (_selectedItem == null) {
@@ -220,17 +281,19 @@ public class UIList extends UIScrollableDisplayContainer implements IInputDataEl
 
         int index = getSelectedItemIndex();
         removeDisplayElement(_selectedItem);
-        _items.remove(_selectedItem);
+        items.remove(_selectedItem);
 
-        for (int i = index; i < _items.size(); i++) {
-            _items.get(i).getPosition().y -= 32f;
+        for (int i = index; i < items.size(); i++) {
+            items.get(i).getPosition().y -= 32f;
         }
 
-        if (_items.size() > 0) {
-	        if (index <= _items.size() - 1)
+        if (items.size() > 0) {
+	        if (index <= items.size() - 1) {
 	        	setSelectedItemIndex(index);
-	        else
-	        	setSelectedItemIndex(_items.size() - 1);
+	        }
+	        else {
+	        	setSelectedItemIndex(items.size() - 1);
+	        }
 
         }
         else {
@@ -238,75 +301,37 @@ public class UIList extends UIScrollableDisplayContainer implements IInputDataEl
         }
     }
 
-    public void setSelectedItemIndex(int i) {
-    	if (_selectedItem != null)
-    		_selectedItem.setSelected(false);
-    	
-    	_selectedItem = _items.get(i);
-    	_selectedItem.setSelected(true);
-    	
-    	notifyChangedListeners();
-    }
-    
-    public UIListItem getSelectedItem() {
-		return _selectedItem;
-    }
-    
-    public int getSelectedItemIndex() {
-    	for (int i = 0; i < _items.size(); i++) {
-			if (_items.get(i) == _selectedItem)
-				return i;
-		}
-    	
-    	return -1;
-    }
-
-	/*
-     * Remove all items
-     */
+	/**
+	 * Remove all items in this list.
+	 */
     public void removeAll() {
         clearData();
-        for (int i = (_items.size() - 1); i >= 0; i--) {
-            removeDisplayElement(_items.get(i));
-            _items.remove(i);
+        for (int i = (items.size() - 1); i >= 0; i--) {
+            removeDisplayElement(items.get(i));
+            items.remove(i);
         }
     }
 
-    /*
-    * Remove item by index
-    */
-    public void removeItem(int index) {
-        removeDisplayElement(_items.get(index));
-        _items.remove(index);
-    }
-
-    /*
-    * Returns the value of the selected item
-    */
-    public Object getValue() {
-        return _selectedItem.getValue();
-    }
-
-    public UIListItem getItem(int index){
-        if(!_items.isEmpty()){
-            return _items.get(index);
-        } else {
-            return null;
-        }
-    }
-
+    /**
+     * Check if the list is empty.
+     * @return Returns true if the list is empty.
+     */
     public boolean isEmpty(){
-        return _items.isEmpty();
+        return items.isEmpty();
     }
 
-    /*
-     * Reset to selected element
+    /**
+     * Clear data (?)
      */
     public void clearData() {
     	if (_selectedItem != null)
     		_selectedItem.setSelected(false);
     	_selectedItem = null;
     }
+    
+    /*
+       Event listeners
+    */
 
     private void notifyDoubleClickListeners() {
         for (int i = 0; i < _doubleClickListeners.size(); i++) {

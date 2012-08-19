@@ -23,7 +23,6 @@ import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.InputConfig;
 import org.terasology.rendering.gui.components.UIButton;
-import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UISlider;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -43,7 +42,6 @@ public class UIMenuConfigControls extends UIDisplayWindow {
 
     String editButtonCurrent = "";
     UIButton editButton = null;
-    final UIImageOverlay overlay;
     final UIGraphicsElement title;
 
     final UIText ForwardButtontext,
@@ -108,6 +106,7 @@ public class UIMenuConfigControls extends UIDisplayWindow {
     final UIText subtitle;
 
     public UIMenuConfigControls() {
+    	setBackgroundImage("engine:loadingbackground");
         setModal(true);
         maximize();
         
@@ -128,9 +127,6 @@ public class UIMenuConfigControls extends UIDisplayWindow {
 
         subtitle = new UIText("Control Settings");
         subtitle.setVisible(true);
-
-        overlay = new UIImageOverlay(AssetManager.loadTexture("engine:loadingBackground"));
-        overlay.setVisible(true);
 
         _backToConfigMenuButton = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
         _backToConfigMenuButton.getLabel().setText("Back");
@@ -308,7 +304,6 @@ public class UIMenuConfigControls extends UIDisplayWindow {
         Toolslot9Buttontext.setVisible(true);
         UsehelditemButtontext.setVisible(true);
 
-        addDisplayElement(overlay);
         addDisplayElement(title);
         addDisplayElement(subtitle);
 

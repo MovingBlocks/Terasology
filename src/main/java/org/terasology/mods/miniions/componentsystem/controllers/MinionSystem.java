@@ -82,7 +82,7 @@ public class MinionSystem implements EventHandlerSystem {
         MinionControllerComponent minionController = entity.getComponent(MinionControllerComponent.class);
         minionController.minionMode = !minionController.minionMode;
         if (!minionController.minionMode) {
-            minionBehaviourMenu.setVisible(false);
+            minionBehaviourMenu.close();
         }
         entity.saveComponent(minionController);
         event.consume();
@@ -146,7 +146,7 @@ public class MinionSystem implements EventHandlerSystem {
                     //if(GUIManager.getInstance().getWindowById("container") != null){
                     //    GUIManager.getInstance().setFocusedWindow("container");
                     //}
-                    minionBehaviourMenu.setVisible(false);
+                    minionBehaviourMenu.close();
                     updateBehaviour(entity);
                     break;
             }

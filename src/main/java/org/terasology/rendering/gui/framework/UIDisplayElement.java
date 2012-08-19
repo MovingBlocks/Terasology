@@ -44,37 +44,35 @@ public abstract class UIDisplayElement {
 	protected static UIDisplayElement _focusedElement;
 	
 	//event stuff
-	protected enum EMouseEvents {ENTER, LEAVE, HOVER, MOVE};
-    private final ArrayList<MouseMoveListener> _mouseListeners = new ArrayList<MouseMoveListener>();
-    private final ArrayList<MouseButtonListener> _mouseButtonListeners = new ArrayList<MouseButtonListener>();
-    private final ArrayList<ClickListener> _clickListeners = new ArrayList<ClickListener>();
-    private final ArrayList<FocusListener> _focusListeners = new ArrayList<FocusListener>();
+	private enum EMouseEvents {ENTER, LEAVE, HOVER, MOVE};
+    private final ArrayList<MouseMoveListener> mouseListeners = new ArrayList<MouseMoveListener>();
+    private final ArrayList<MouseButtonListener> mouseButtonListeners = new ArrayList<MouseButtonListener>();
+    private final ArrayList<ClickListener> clickListeners = new ArrayList<ClickListener>();
+    private final ArrayList<FocusListener> focusListeners = new ArrayList<FocusListener>();
     private EMouseEvents lastMouseState;
-    private boolean _mouseIsDown = false;
+    private boolean mouseIsDown = false;
     
     //layout
-    // TODO: Default this to true
-    private boolean _visible = false;
-    protected boolean _disabled = false;
-    private boolean _overlay;
-    private boolean _isFixed = true;
-    private boolean _isCroped = true;
+    private boolean visible = false;
+    private boolean overlay;
+    private boolean isFixed = true;
+    private boolean isCroped = true;
     
-    private final Vector2f _position = new Vector2f(0, 0);
-    private final Vector2f _size = new Vector2f(1, 1);
+    private final Vector2f position = new Vector2f(0, 0);
+    private final Vector2f size = new Vector2f(1, 1);
 
-    private UIDisplayElement _parent;
+    private UIDisplayElement parent;
 
     public UIDisplayElement() {
     }
 
     public UIDisplayElement(Vector2f position) {
-        _position.set(position);
+        this.position.set(position);
     }
 
     public UIDisplayElement(Vector2f position, Vector2f size) {
-        _position.set(position);
-        _size.set(size);
+    	this.position.set(position);
+    	this.size.set(size);
     }
 
     public void renderTransformed() {
@@ -89,24 +87,27 @@ public abstract class UIDisplayElement {
     }
     
     public void processBindButton(BindButtonEvent event) {
-    	
+    	//TODO process bind buttons
     }
 
     public void processKeyboardInput(KeyEvent event) {
-    	
+    	//TODO process raw keyboard
     }
 
     public void processMouseInput(int button, boolean state, int wheelMoved) {
-    	if (_mouseListeners.size() > 0 || _mouseButtonListeners.size() > 0 || _clickListeners.size() > 0) {
+    	if (!isVisible())
+    		return;
+    	
+    	if (mouseListeners.size() > 0 || mouseButtonListeners.size() > 0 || clickListeners.size() > 0) {
     		if (intersects(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()))) {
     			//mouse button listeners
-		        if (button != -1 && state && !_mouseIsDown) {			//mouse down
+		        if (button != -1 && state && !mouseIsDown) {			//mouse down
 		            notifyMouseButtonListeners(button, true, wheelMoved, true);
-		            _mouseIsDown = true;
-		        } else if (button != -1 && !state && _mouseIsDown) {	//mouse up
+		            mouseIsDown = true;
+		        } else if (button != -1 && !state && mouseIsDown) {	//mouse up
 		        	notifyClickListeners(button);
     	    		notifyMouseButtonListeners(button, false, wheelMoved, true);
-    	    		_mouseIsDown = false;
+    	    		mouseIsDown = false;
     	        }
 		        
 		        //mouse wheel listeners
@@ -128,7 +129,7 @@ public abstract class UIDisplayElement {
     	            notifyMouseButtonListeners(button, true, wheelMoved, false);
     	        } else if (button != -1 && !state) {	//mouse up
     	    		notifyMouseButtonListeners(button, false, wheelMoved, false);
-    	    		_mouseIsDown = false;
+    	    		mouseIsDown = false;
     	        }
     	        
     	        //mouse wheel listeners
@@ -145,7 +146,7 @@ public abstract class UIDisplayElement {
     	}
     	
     	//check for no changes in button presses -> this means mouse was moved
-    	if (_mouseListeners.size() > 0 && button == -1 && wheelMoved == 0) {
+    	if (mouseListeners.size() > 0 && button == -1 && wheelMoved == 0) {
     		notifyMouseListeners(EMouseEvents.MOVE);
     	}
     }
@@ -187,38 +188,38 @@ public abstract class UIDisplayElement {
     public abstract void layout();
 
     public Vector2f getPosition() {
-        return _position;
+        return position;
     }
 
     public void setPosition(Vector2f position) {
-        _position.set(position);
+    	this.position.set(position);
     }
 
     public Vector2f getSize() {
-        return _size;
+        return size;
     }
 
     public void setSize(Vector2f scale) {
-        _size.set(scale);
+    	this.size.set(scale);
     }
 
     public void setVisible(boolean visible) {
-        _visible = visible;
+        this.visible = visible;
         
-        if (_visible)
+        if (visible)
         	layout();
     }
 
     public boolean isVisible() {
-        return _visible;
+        return visible;
     }
 
     public UIDisplayElement getParent() {
-        return _parent;
+        return parent;
     }
 
     public void setParent(UIDisplayElement parent) {
-        _parent = parent;
+    	this.parent = parent;
     }
 
     /**
@@ -253,117 +254,117 @@ public abstract class UIDisplayElement {
     }
 
     public Vector2f calcAbsolutePosition() {
-        if (_parent == null) {
+        if (parent == null) {
             return getPosition();
         } else {
-            return new Vector2f(_parent.calcAbsolutePosition().x + getPosition().x, _parent.calcAbsolutePosition().y + getPosition().y);
+            return new Vector2f(parent.calcAbsolutePosition().x + getPosition().x, parent.calcAbsolutePosition().y + getPosition().y);
         }
     }
 
     public boolean isOverlay() {
-        return _overlay;
+        return overlay;
     }
 
     public void setOverlay(boolean value) {
-        _overlay = value;
+        overlay = value;
     }
 
     public void setFixed(boolean fix) {
-        _isFixed = fix;
+        isFixed = fix;
     }
 
     public boolean isFixed() {
-        return _isFixed;
+        return isFixed;
     }
 
     public void setCroped(boolean setCroped) {
-        _isCroped = setCroped;
+        isCroped = setCroped;
     }
 
     public boolean isCroped() {
-        return _isCroped;
+        return isCroped;
     }
     
     private void notifyMouseButtonListeners(int button, boolean state, int wheel, boolean intersect) {
     	if (button == -1) {
-	        for (MouseButtonListener listener : _mouseButtonListeners) {
+	        for (MouseButtonListener listener : mouseButtonListeners) {
 	        	listener.wheel(this, wheel, intersect);
 	        }
     	}
     	else if (state) {
-	        for (MouseButtonListener listener : _mouseButtonListeners) {
+	        for (MouseButtonListener listener : mouseButtonListeners) {
 	        	listener.down(this, button, intersect);
 	        }
     	}
     	else {
-	        for (MouseButtonListener listener : _mouseButtonListeners) {
+	        for (MouseButtonListener listener : mouseButtonListeners) {
 	        	listener.up(this, button, intersect);
 	        }
     	}  	
     }
     
     public void addMouseButtonListener(MouseButtonListener listener) {
-    	_mouseButtonListeners.add(listener);
+    	mouseButtonListeners.add(listener);
     }
 
     public void removeMouseButtonListener(MouseButtonListener listener) {
-    	_mouseButtonListeners.remove(listener);
+    	mouseButtonListeners.remove(listener);
     }
     
     private void notifyClickListeners(int value) {
-        for (ClickListener listener : _clickListeners) {
+        for (ClickListener listener : clickListeners) {
         	listener.click(this, value);
         }
     }
     
     public void addClickListener(ClickListener listener) {
-    	_clickListeners.add(listener);
+    	clickListeners.add(listener);
     }
 
     public void removeClickListener(ClickListener listener) {
-    	_clickListeners.remove(listener);
+    	clickListeners.remove(listener);
     }
     
     private void notifyFocusListeners(boolean focus) {
     	if (focus) {
-	        for (FocusListener listener : _focusListeners) {
+	        for (FocusListener listener : focusListeners) {
 	        	listener.focusOn(this);
 	        }
     	}
     	else {
-	        for (FocusListener listener : _focusListeners) {
+	        for (FocusListener listener : focusListeners) {
 	        	listener.focusOff(this);
 	        }
     	}
     }
     
     public void addFocusListener(FocusListener listener) {
-    	_focusListeners.add(listener);
+    	focusListeners.add(listener);
     }
 
     public void removeFocusListener(FocusListener listener) {
-    	_focusListeners.remove(listener);
+    	focusListeners.remove(listener);
     }
     
     private void notifyMouseListeners(EMouseEvents type) {
     	switch (type) {
     	case ENTER:
-    		for (MouseMoveListener listener : _mouseListeners) {
+    		for (MouseMoveListener listener : mouseListeners) {
     			listener.enter(this);
     		}
         break;
     	case LEAVE:
-    		for (MouseMoveListener listener : _mouseListeners) {
+    		for (MouseMoveListener listener : mouseListeners) {
     			listener.leave(this);
     		}
         break;
     	case HOVER:
-    		for (MouseMoveListener listener : _mouseListeners) {
+    		for (MouseMoveListener listener : mouseListeners) {
     			listener.hover(this);
     		}
         break;
     	case MOVE:
-    		for (MouseMoveListener listener : _mouseListeners) {
+    		for (MouseMoveListener listener : mouseListeners) {
     			listener.move(this);
     		}
         break;
@@ -371,10 +372,10 @@ public abstract class UIDisplayElement {
     }
     
     public void addMouseMoveListener(MouseMoveListener listener) {
-        _mouseListeners.add(listener);
+        mouseListeners.add(listener);
     }
 
     public void removeMouseMoveListener(MouseMoveListener listener) {
-    	_mouseListeners.remove(listener);
+    	mouseListeners.remove(listener);
     }
 }

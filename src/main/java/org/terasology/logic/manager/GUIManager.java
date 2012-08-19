@@ -78,22 +78,7 @@ public class GUIManager implements EventHandlerSystem {
     /**
      * Updates all visible display elements and their child's. Will update the layout if the display was resized.
      */
-    public void update() {
-    	//TODO what should the following code do?
-    	/*
-        if (_currentFocused == null) {
-            int size = _renderer.getDisplayElements().size();
-            if (size > 0) {
-                //added this check to prevent the manager from ungrabbing the mouse when the minion behaviour menu pops up
-                // TODO : better way to handle this? not link focus with grabbing / ungrabbing?
-                UIDisplayWindow tempwindow = (UIDisplayWindow) _renderer.getDisplayElements().get(size - 1);
-                if (!(tempwindow instanceof UIMinionBehaviourMenu)) {
-                    _currentFocused = tempwindow;
-                }
-            }
-        }
-        */
-        
+    public void update() {        
         renderer.update();
 
         if (Display.wasResized()) {
@@ -108,12 +93,7 @@ public class GUIManager implements EventHandlerSystem {
      * @return Returns the added window.
      */
     public <T extends UIDisplayWindow> T addWindow(T window, String windowId) {
-        if (window.isMaximized()) {
-            renderer.addtDisplayElementToPosition(0, window);
-        } else {
-            renderer.addDisplayElement(window);
-        }
-
+        renderer.addtDisplayElementToPosition(0, window);
         windowsById.put(windowId, window);
         
         if (windowsById.size() == 1) {
@@ -229,7 +209,6 @@ public class GUIManager implements EventHandlerSystem {
      */
     public void showMessage(String title, String text) {
         UIDisplayWindow messageWindow = new UIMessageBox(title, text);
-        messageWindow.setVisible(true);
         messageWindow.center();
         addWindow(messageWindow, "messageBox");
         setFocusedWindow(messageWindow);

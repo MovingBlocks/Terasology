@@ -60,14 +60,17 @@ public class UISlider extends UIDisplayContainer {
         _max = max;
         _currentValue = Integer.MAX_VALUE;
         
-        setClassStyle("slider", "background-image: engine:gui_menu 256/512 30/512 0 0");
-        setClassStyle("slider-mouseover", "background-image: engine:gui_menu 256/512 30/512 0 30/512");
-        setClassStyle("slider");
+        //default button
+        setBackgroundImage("engine:gui_menu");
+
+        //default state
+        setBackgroundImageSource(new Vector2f(0f, 0f), new Vector2f(256f, 30f));
+        setBackgroundImageTarget(new Vector2f(0f, 0f), size);
         
         addMouseMoveListener(new MouseMoveListener() {    
             @Override
             public void leave(UIDisplayElement element) {
-                setClassStyle("slider");
+            	setBackgroundImageSource(new Vector2f(0f, 0f), new Vector2f(256f, 30f));
             }
             
             @Override
@@ -78,7 +81,7 @@ public class UISlider extends UIDisplayContainer {
             @Override
             public void enter(UIDisplayElement element) {
                 AudioManager.play(new AssetUri(AssetType.SOUND, "engine:click"), 1.0f);
-                setClassStyle("slider-mouseover");
+                setBackgroundImageSource(new Vector2f(0f, 30f), null);
             }
 
             @Override
@@ -92,7 +95,7 @@ public class UISlider extends UIDisplayContainer {
         addMouseButtonListener(new MouseButtonListener() {            
             @Override
             public void up(UIDisplayElement element, int button, boolean intersect) {
-                setClassStyle("slider");
+            	setBackgroundImageSource(new Vector2f(0f, 0f), null);
             }
             
             @Override
@@ -111,8 +114,8 @@ public class UISlider extends UIDisplayContainer {
         _slider.setParent(this);
         _slider.setVisible(true);
         _slider.setPosition(new Vector2f(0, 0));
-        _slider.getTextureOrigin().set(0f, 60f / 512f);
-        _slider.getTextureSize().set(new Vector2f(256f / 512f, 30f / 512f));
+        _slider.setTextureOrigin(new Vector2f(0f, 60f));
+        _slider.setTextureSize(new Vector2f(256f, 30f));
         _slider.setSize(new Vector2f(16f, getSize().y));
         _slider.addMouseButtonListener(new MouseButtonListener() {                                    
             @Override

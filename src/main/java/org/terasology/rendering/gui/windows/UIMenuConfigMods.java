@@ -18,7 +18,6 @@ package org.terasology.rendering.gui.windows;
 import org.terasology.asset.AssetManager;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.components.UIButton;
-import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
@@ -33,7 +32,6 @@ import javax.vecmath.Vector2f;
  */
 public class UIMenuConfigMods extends UIDisplayWindow {
 
-    final UIImageOverlay _overlay;
     final UIGraphicsElement _title;
 
     private final UIButton _minionsButton,
@@ -41,15 +39,13 @@ public class UIMenuConfigMods extends UIDisplayWindow {
             _backToConfigMenuButton;
 
     public UIMenuConfigMods() {
+    	setBackgroundImage("engine:loadingbackground");
         setModal(true);
         maximize();
         
         _title = new UIGraphicsElement(AssetManager.loadTexture("engine:terasology"));
         _title.setVisible(true);
         _title.setSize(new Vector2f(512f, 128f));
-
-        _overlay = new UIImageOverlay(AssetManager.loadTexture("engine:loadingBackground"));
-        _overlay.setVisible(true);
 
         _minionsButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _minionsButton.getLabel().setText("Minions enabled : false");
@@ -69,7 +65,6 @@ public class UIMenuConfigMods extends UIDisplayWindow {
             }
         });
         
-        addDisplayElement(_overlay);
         addDisplayElement(_title);
 
         addDisplayElement(_minionsButton, "minionsButton");

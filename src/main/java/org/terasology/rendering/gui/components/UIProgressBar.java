@@ -32,15 +32,29 @@ public class UIProgressBar extends UIDisplayContainer {
     private UIText         _label;
     private int            _value;
     private UIProgressLine _progressLine;
+    
+    private class UIProgressLine extends UIDisplayContainer {
+        public UIProgressLine(Vector2f size){
+            setSize(size);
+            setCrop(true);
+            setBackgroundImage("engine:gui_menu");
+            setBackgroundImageSource(new Vector2f(0f, 190f), new Vector2f(248f, 9f));
+            setBackgroundImageTarget(new Vector2f(0, 0), getSize());
+        }
+        
+        public void updateProgress() {
+        	Vector4f size = new Vector4f(0f, -(getSize().x - getSize().x * (_value / 100f)), 0f, 0f);
+        	setCropMargin(size);
+        }
+    }
 
-    public UIProgressBar(Vector2f size) {
+    public UIProgressBar() {
 
         _value = 50;
-        setSize(size);
-        setCrop(true);
-        setStyle("background-image", "engine:gui_menu 256/512 15/512 0 175/512");
-        setCropMargin(new Vector4f(0f, -(getSize().x - getSize().x * (_value / 100f)), 0f, 0f));
-
+        setSize(new Vector2f(256f, 15f));
+        setBackgroundImage("engine:gui_menu");
+        setBackgroundImageSource(new Vector2f(0f, 175f), new Vector2f(256f, 15f));
+        
         _label = new UIText();
         _label.setVisible(true);
         _label.setColor(Color.black);
@@ -51,10 +65,10 @@ public class UIProgressBar extends UIDisplayContainer {
         _progressLine = new UIProgressLine(new Vector2f(248f, 9f));
         _progressLine.setVisible(true);
         _progressLine.setPosition(new Vector2f(4f,3f));
+        _progressLine.updateProgress();
 
         addDisplayElement(_label);
         addDisplayElement(_progressLine);
-
     }
 
     @Override
@@ -71,7 +85,8 @@ public class UIProgressBar extends UIDisplayContainer {
 
     public void setValue(int value) {
         _value = value;
-        setCropMargin(new Vector4f(0f, -(getSize().x - getSize().x * (_value/100f)), 0f, 0f));
+        
+        _progressLine.updateProgress();
     }
 
     public void setTextColor(Color color) {
@@ -83,13 +98,5 @@ public class UIProgressBar extends UIDisplayContainer {
         
         layout();
     }
-
-    private class UIProgressLine extends UIDisplayContainer {
-        public UIProgressLine(Vector2f size){
-            setSize(size);
-            setStyle("background-image", "engine:gui_menu 248/512 9/512 0 190/512");
-        }
-    }
-
 }
 

@@ -16,14 +16,18 @@
 package org.terasology.rendering.gui.framework;
 
 import org.lwjgl.opengl.Display;
+import org.terasology.asset.AssetManager;
 import org.terasology.events.input.KeyEvent;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.rendering.gui.framework.style.UIStyle;
+import org.terasology.rendering.gui.framework.style.UIStyleBackgroundColor;
+import org.terasology.rendering.gui.framework.style.UIStyleBackgroundImage;
+import org.terasology.rendering.gui.framework.style.UIStyleBorderSolid;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -31,16 +35,17 @@ import static org.lwjgl.opengl.GL11.*;
  * Composition of multiple display elements.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
 public abstract class UIDisplayContainer extends UIDisplayElement {
 
     final ArrayList<UIDisplayElement> _displayElements = new ArrayList<UIDisplayElement>();
     private boolean _crop = false;
+    
+    private final List<UIStyle> styles = new ArrayList<UIStyle>();
 
-    protected UIStyle _style = null;
-    private final HashMap<String, UIStyle> _styleClasses = new HashMap<String, UIStyle>();
-
-    protected Vector4f _cropMargin = new Vector4f(/*TOP*/    0.0f,
+    protected Vector4f _cropMargin = new Vector4f(
+    		/*TOP*/    0.0f,
             /*RIGHT*/  0.0f,
             /*BOTTOM*/ 0.0f,
             /*LEFT*/   0.0f
@@ -198,75 +203,162 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     public void setCropMargin(Vector4f margin) {
         _cropMargin = margin;
     }
-
-
-    /*
-     * Set styles for current element
-     *
-     */
-    public void setStyle(String property, String value) {
-        if (_style == null) {
-            _style = new UIStyle(getSize());
-            _style.setPosition(new Vector2f(0f, 0f));
-            _style.setVisible(true);
-            _style.setCroped(false);
-            addtDisplayElementToPosition(0, _style);
-        }
-        _style.parse(property, value);
-    }
-
-    /*
-     * Set style with tag(style class)
-     */
-    public void setClassStyle(String className, String value) {
-        UIStyle style = null;
-
-        if(_styleClasses.containsKey(className)){
-            style = _styleClasses.get(className);
-        }else{
-            style = new UIStyle(getSize());
-        }
-
-        style.setPosition(new Vector2f(0f, 0f));
-        style.setVisible(true);
-        style.setCroped(false);
-        style.parse(value);
-        _styleClasses.put(className, style);
-    }
-
-    /*
-     * If the style was marked by class, apply the class
-     */
-    public void setClassStyle(String className) {
-        if (_styleClasses.containsKey(className)) {
-            if (_style != null) {
-                removeDisplayElement(_style);
-            }
-            _style = _styleClasses.get(className);
-            addtDisplayElementToPosition(0, _style);
-        }
-        
-        layout();
-    }
-
-    /*
-     * Get Style variable
-     */
-    public UIStyle getStyle() {
-        if (_style == null) {
-            _style = new UIStyle(getSize());
-            _style.setPosition(new Vector2f(0f, 0f));
-            _style.setVisible(true);
-            _style.setCroped(false);
-            addtDisplayElementToPosition(0, _style);
-        }
-        return _style;
+    
+    private <T> T getStyle2(Class<T> style) {
+    	for (UIStyle s : styles) {
+			if (s.getClass() == style) {
+				return style.cast(s);
+			}
+		}
+    	
+    	return null;
     }
     
-    @Override
-    public void setSize(Vector2f scale) {
-    	super.setSize(scale);
+    /**
+     * Add a style.
+     * @param style The style to add.
+     * @param listStart True to add the style at the beginning of the display element list.
+     * 
+     * TODO need to put particular styles at the particular position.. (background at the beginning, border on top)
+     */
+    private void addStyle(UIStyle style, boolean listStart) {
+    	styles.add(style);
     	
-    	layout();
+    	UIDisplayElement element = (UIDisplayElement) style;
+    	if (listStart) {
+    		_displayElements.add(0, element);
+    	} else {
+    		_displayElements.add(element);
+    	}
+    	
+        element.setParent(this);
+    }
+    
+    private void removeStyle(UIStyle style) {
+    	styles.remove(style);
+    	removeDisplayElement((UIDisplayElement) style);
+    }
+    
+    /**
+     * Set the background color of this display element. The background color will fill the whole element.
+     * @param r Red value. (0-255)
+     * @param g Green value. (0-255)
+     * @param b Blue value. (0-255)
+     * @param a Alpha value. (0-1)
+     */
+    public void setBackgroundColor(int r, int g, int b, float a) {
+        UIStyleBackgroundColor style = getStyle2(UIStyleBackgroundColor.class);
+        if (style == null) {
+        	style = new UIStyleBackgroundColor(r, g, b, a);
+        	style.setSize(getSize());
+        	style.setVisible(true);
+        	addStyle(style, true);
+        } else {
+        	style.setColor(r, g, b, a);
+        }
+    }
+    
+    /**
+     * Remove the background color from this display element.
+     */
+    public void removeBackgroundColor() {
+    	UIStyleBackgroundColor style = getStyle2(UIStyleBackgroundColor.class);
+    	if (style != null) {
+    		removeStyle(style);
+    	}
+    }
+
+    /**
+     * Set the background Image for this display element.
+     * @param texture The texture to load.
+     */
+    public void setBackgroundImage(String texture) {
+        UIStyleBackgroundImage style = getStyle2(UIStyleBackgroundImage.class);
+        
+        //create the style if it not exists
+        if (style == null) {
+        	style = new UIStyleBackgroundImage(AssetManager.loadTexture(texture));
+        	style.setVisible(true);
+        	addStyle(style, true);
+        }
+        //edit the existing style
+        else {
+        	style.setTexture(AssetManager.loadTexture(texture));
+        }
+    }
+    
+    /**
+     * Set the origin and size of the background in the texture file.
+     * @param origin The origin.
+     * @param size The size.
+     */
+    public void setBackgroundImageSource(Vector2f origin, Vector2f size) {
+    	UIStyleBackgroundImage style = getStyle2(UIStyleBackgroundImage.class);
+    	
+        if (style != null) {
+	        style.setTextureOrigin(origin);
+	        style.setTextureSize(size);
+        }
+    }
+    
+    /**
+     * Set the origin and size of the background on the display element. On default the background will fill the whole display element.
+     * @param origin The origin.
+     * @param size The size.
+     */
+    public void setBackgroundImageTarget(Vector2f origin, Vector2f size) {
+    	UIStyleBackgroundImage style = getStyle2(UIStyleBackgroundImage.class);
+    	
+        if (style != null) {
+	        style.setTarget(origin, size);
+        }
+    }
+    
+    /**
+     * Remove the background image from this display element.
+     */ 
+    public void removeBackgroundImage() {
+    	UIStyleBackgroundImage style = getStyle2(UIStyleBackgroundImage.class);
+    	
+    	if (style != null) {
+    		removeStyle(style);
+    	}
+    }
+    
+    /**
+     * Set the border for this display element.
+     * @param width The width.
+     * @param r Red value. (0-255)
+     * @param g Green value. (0-255)
+     * @param b Blue value. (0-255)
+     * @param a Alpha value. (0-1)
+     */
+    public void setBorderSolid(float width, int r, int g, int b, float a) {
+    	UIStyleBorderSolid style = getStyle2(UIStyleBorderSolid.class);
+
+    	if (style == null) {
+			style = new UIStyleBorderSolid(width, r, g, b, a);
+			style.setVisible(true);
+			addStyle(style, false);
+    	} else {
+    		style.setColor(r, g, b, a);
+    		style.setWidth(width);
+    	}
+    }
+ 
+    public void removeBorderSolid() {
+    	UIStyleBorderSolid style = getStyle2(UIStyleBorderSolid.class);
+    	
+    	if (style != null) {
+    		removeStyle(style);
+    	}
+    }
+    
+    public void setBorderImage() {
+    	
+    }
+    
+    public void removeBorderImage() {
+    	
     }
 }

@@ -43,13 +43,15 @@ public class UIScreenContainer extends UIDisplayWindow {
     private final UIGraphicsElement background;
 
     public UIScreenContainer() {
+    	setBackgroundColor(0, 0, 0, 0.75f);
         setModal(true);
+        maximize();
         setCloseBinds(new String[] {FrobButton.ID});
         setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
         
         background = new UIGraphicsElement(AssetManager.loadTexture("engine:containerWindow"));
-        background.getTextureSize().set(new Vector2f(256f / 256f, 231f / 256f));
-        background.getTextureOrigin().set(new Vector2f(0.0f, 0.0f));
+        background.setTextureSize(new Vector2f(256f, 231f));
+        background.setTextureOrigin(new Vector2f(0.0f, 0.0f));
         background.setVisible(true);
         
         playerInventory = new UIItemContainer(4);

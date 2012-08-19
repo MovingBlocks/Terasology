@@ -25,7 +25,6 @@ import org.terasology.game.modes.StateMainMenu;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIText;
-import org.terasology.rendering.gui.components.UITransparentOverlay;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.events.ClickListener;
@@ -39,13 +38,13 @@ import org.terasology.rendering.gui.framework.events.WindowListener;
  */
 public class UIScreenDeath extends UIDisplayWindow {
 
-    private final UITransparentOverlay _overlay;
     private final UIText _meassage;
     private final UIButton _respawnButton;
     private final UIButton _exitButton;
     private final UIButton _mainMenuButton;
 
     public UIScreenDeath() {
+    	setBackgroundColor(70, 0, 0, 0.85f);
         setModal(true);
         setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
         maximize();
@@ -64,9 +63,6 @@ public class UIScreenDeath extends UIDisplayWindow {
         
         _meassage = new UIText("You are dead");
         _meassage.setVisible(true);
-
-        _overlay = new UITransparentOverlay(200f, 0f, 0f, 0.25f);
-        _overlay.setVisible(true);
         
         _respawnButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _respawnButton.setVisible(true);
@@ -75,7 +71,7 @@ public class UIScreenDeath extends UIDisplayWindow {
             @Override
             public void click(UIDisplayElement element, int button) {
                 respawn();
-                close(true);
+                close();
             }
         });
         
@@ -100,7 +96,6 @@ public class UIScreenDeath extends UIDisplayWindow {
             }
         });
 
-        addDisplayElement(_overlay);
         addDisplayElement(_meassage);
         addDisplayElement(_exitButton);
         addDisplayElement(_respawnButton);

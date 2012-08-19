@@ -44,6 +44,8 @@ import org.terasology.rendering.gui.framework.events.InputListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 
+import com.sun.org.apache.xml.internal.utils.NSInfo;
+
 /**
  * A simple graphical input
  *
@@ -53,6 +55,8 @@ import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 public class UIInput extends UIDisplayContainer implements IInputDataElement {
     //    TODO: Add text selection and paste from clipboard
     private final ArrayList<InputListener> _inputListeners = new ArrayList<InputListener>();
+    
+    private boolean _disabled = false;
 
     private final StringBuffer _inputValue = new StringBuffer();
     private final UIText _inputText;
@@ -98,14 +102,15 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
     public UIInput(Vector2f size) {
         setSize(size);
         setCrop(true);
-        setStyle("background-image", "engine:gui_menu 256/512 30/512 0 90/512");
+        setBackgroundImage("engine:gui_menu");
+        setBackgroundImageSource(new Vector2f(0f, 90f), new Vector2f(256f, 30f));
+        setBackgroundImageTarget(new Vector2f(0, 0), size); 
         
         addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
                 if (!isDisabled()) {
                     setFocus(_inputObj);
-                    setStyle("background-position", "0 120/512");
                     
                     if (_inputValue.length() > 0 && _inputText.getTextWidth() > 0) {
                         Vector2f absolutePosition = _inputText.calcAbsolutePosition();
@@ -145,7 +150,7 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
         addMouseMoveListener(new MouseMoveListener() {        
             @Override
             public void leave(UIDisplayElement element) {
-                setStyle("background-position", "0 90/512");
+            	
             }
             
             @Override
@@ -166,13 +171,18 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
         addFocusListener(new FocusListener() {
             @Override
             public void focusOn(UIDisplayElement element) {
-                if (!isDisabled())
+                if (!isDisabled()) {
                     _textCursor.setVisible(true);
+                }
+                
+				setBorderSolid(2, 250, 170, 0, 1.0f);
+				layout();
             }
             
             @Override
             public void focusOff(UIDisplayElement element) {
                 _textCursor.setVisible(false);
+                removeBorderSolid();
             }
         });
         
@@ -193,7 +203,7 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
     @Override
     public void update() {
         _inputText.setPosition(new Vector2f(_padding.x, getSize().y/2 - _inputText.getTextHeight()/2));
-        _textCursor.setPosition(new Vector2f(_textCursor.getPosition().x, getSize().y/2 - _textCursor.getSize().y/1.5f));
+        _textCursor.setPosition(new Vector2f(_textCursor.getPosition().x, getSize().y/2 - _textCursor.getSize().y/1.35f));
 
         updateTextShift();
         super.update();

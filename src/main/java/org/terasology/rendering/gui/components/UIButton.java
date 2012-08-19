@@ -15,6 +15,9 @@
  */
 package org.terasology.rendering.gui.components;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.vecmath.Vector2f;
 
 import org.terasology.asset.AssetType;
@@ -39,6 +42,8 @@ public class UIButton extends UIDisplayContainer {
 	public enum eButtonType {NORMAL, TOGGLE};
     private boolean _toggleState = false;
     private eButtonType _buttonType;
+    
+    private final Map<String, Vector2f[]> states = new HashMap<String, Vector2f[]>();
 
     /**
      * Create a simple button, where 2 types are possible. The normal button and the toggle button.
@@ -49,24 +54,30 @@ public class UIButton extends UIDisplayContainer {
         setSize(size);
         
         _buttonType = buttonType;
+       
+        //default button
+        setTexture("engine:gui_menu");
+        setNormalState(new Vector2f(0f, 0f), new Vector2f(256f, 30f));
+        setHoverState(new Vector2f(0f, 30f), new Vector2f(256f, 30f));
+        setPressedState(new Vector2f(0f, 60f), new Vector2f(256f, 30f));
         
-        //TODO give user of the UIButton component more styling options. deliver these styles over the constructor?
-        setClassStyle("button", "background-image: engine:gui_menu 256/512 30/512 0 0");
-        setClassStyle("button-mouseover", "background-image: engine:gui_menu 256/512 30/512 0 30/512");
-        setClassStyle("button-mouseclick", "background-image: engine:gui_menu 256/512 30/512 0 60/512");
-        setClassStyle("button");
-        
+        //default state
+        setBackgroundImageSource(states.get("normal")[0], states.get("normal")[1]);
+        setBackgroundImageTarget(new Vector2f(0f, 0f), size);
+
         addMouseMoveListener(new MouseMoveListener() {	
 			@Override
 			public void leave(UIDisplayElement element) {
 				if (_buttonType == eButtonType.TOGGLE) {
-					if (_toggleState)
-						setClassStyle("button-mouseclick");
-					else
-						setClassStyle("button");
+					if (_toggleState) {
+						setBackgroundImageSource(states.get("pressed")[0], states.get("pressed")[1]);
+					} else {
+						setBackgroundImageSource(states.get("normal")[0], states.get("normal")[1]);
+					}
 				}
-				else
-					setClassStyle("button");
+				else {
+					setBackgroundImageSource(states.get("normal")[0], states.get("normal")[1]);
+				}
 			}
 			
 			@Override
@@ -77,8 +88,9 @@ public class UIButton extends UIDisplayContainer {
 			@Override
 			public void enter(UIDisplayElement element) {
 	            AudioManager.play(new AssetUri(AssetType.SOUND, "engine:click"), 1.0f);
-	            if (_buttonType == eButtonType.NORMAL)
-	            	setClassStyle("button-mouseover");
+	            if (_buttonType == eButtonType.NORMAL) {
+	            	setBackgroundImageSource(states.get("hover")[0], states.get("hover")[1]);
+	            }
 			}
 
 			@Override
@@ -90,8 +102,9 @@ public class UIButton extends UIDisplayContainer {
         addMouseButtonListener(new MouseButtonListener() {					
 			@Override
 			public void up(UIDisplayElement element, int button, boolean intersect) {
-				if (_buttonType == eButtonType.NORMAL)
-					setClassStyle("button");
+				if (_buttonType == eButtonType.NORMAL) {
+					setBackgroundImageSource(states.get("normal")[0], states.get("normal")[1]);
+				}
 			}
 			
 			@Override
@@ -99,16 +112,15 @@ public class UIButton extends UIDisplayContainer {
 				if (intersect) {
 					if (_buttonType == eButtonType.TOGGLE) {
 						if (_toggleState) {
-							setClassStyle("button");
+							setBackgroundImageSource(states.get("normal")[0], states.get("normal")[1]);
 							_toggleState = false;
-						}
-						else {
-							setClassStyle("button-mouseclick");
+						} else {
+							setBackgroundImageSource(states.get("pressed")[0], states.get("pressed")[1]);
 							_toggleState = true;
 						}
+					} else {
+						setBackgroundImageSource(states.get("pressed")[0], states.get("pressed")[1]);
 					}
-					else
-						setClassStyle("button-mouseclick");
 				}
 			}
 			
@@ -143,6 +155,53 @@ public class UIButton extends UIDisplayContainer {
         return _label;
     }
     
+    /**
+     * Set the texture of the button. Use setNormalTexture, setHoverTexture and setPressedTexture to configure the texture origin and size of the different states.
+     * @param texture The texture to load by the AssetManager.
+     */
+    public void setTexture(String texture) {
+        setBackgroundImage(texture);
+    }
+    
+    /**
+     * Set the normal states texture origin and size. Set the texture by using setTexture.
+     * @param origin The origin.
+     * @param size The size.
+     */
+    public void setNormalState(Vector2f origin, Vector2f size) {
+    	states.remove("normal");
+    	states.put("normal", new Vector2f[] {origin, size});
+    	
+    	//set default state
+        setBackgroundImageSource(states.get("normal")[0], states.get("normal")[1]);
+    }
+    
+    /**
+     * Set the hover states texture origin and size. Set the texture by using setTexture. In toggle mode this texture will be ignored.
+     * @param origin The origin.
+     * @param size The size.
+     */
+    public void setHoverState(Vector2f origin, Vector2f size) {
+    	states.remove("hover");
+    	states.put("hover", new Vector2f[] {origin, size});
+    	
+    	//set default state
+        setBackgroundImageSource(states.get("normal")[0], states.get("normal")[1]);
+    }
+    
+    /**
+     * Set the pressed states texture origin and size. Set the texture by using setTexture.
+     * @param origin The origin.
+     * @param size The size.
+     */
+    public void setPressedState(Vector2f origin, Vector2f size) {
+    	states.remove("pressed");
+    	states.put("pressed", new Vector2f[] {origin, size});
+    	
+    	//set default state
+        setBackgroundImageSource(states.get("normal")[0], states.get("normal")[1]);
+    }
+    
     public boolean getToggleState() {
 		return _toggleState;
 	}
@@ -154,9 +213,10 @@ public class UIButton extends UIDisplayContainer {
     public void setToggleState(boolean state) {
     	_toggleState = state;
     	
-		if (_toggleState)
-			setClassStyle("button-mouseclick");
-		else
-			setClassStyle("button");
+		if (_toggleState) {
+			setBackgroundImageSource(states.get("pressed")[0], states.get("pressed")[1]);
+		} else {
+			setBackgroundImageSource(states.get("normal")[0], states.get("normal")[1]);
+		}
     }
 }

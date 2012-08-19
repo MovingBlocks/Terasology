@@ -82,7 +82,7 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
         _chunkGeneratorLabel.getSize().y = 16f;
         _chunkGeneratorLabel.setVisible(true);
 
-        _chunkGenerator = new UIComboBox(new Vector2f(176f, 22f), new Vector2f(176f, 88f));
+        _chunkGenerator = new UIComboBox(new Vector2f(176f, 22f), new Vector2f(175f, 64f));
         _chunkGenerator.addItem("Normal", new Integer(0));
         _chunkGenerator.addItem("Flat", new Integer(1));
         _chunkGenerator.setSelectedItemIndex(0);
@@ -164,7 +164,7 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
         _cancelButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                close(true);
+                close();
             }
         });
 

@@ -41,26 +41,33 @@ import java.util.logging.Logger;
  * Provides support for rendering graphical elements.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
 public class UIGraphicsElement extends UIDisplayElement {
     private Logger logger = Logger.getLogger(getClass().getName());
 
-    private final Texture texture;
+    private Texture texture;
 
-    private final Vector2f _textureOrigin = new Vector2f(0.0f, 0.0f);
-    private final Vector2f _textureSize = new Vector2f(1.0f, 1.0f);
+    private Vector2f _textureOrigin = new Vector2f(0.0f, 0.0f);
+    private Vector2f _textureSize = new Vector2f(1.0f, 1.0f);
 
     private float _rotate = 0f;
     private Mesh _mesh;
+    
+    public UIGraphicsElement() {
+    	
+    }
+    
+    public UIGraphicsElement(int r, int g, int b, float a) {
+    	setColor(r, g, b, a);
+    }
 
     public UIGraphicsElement(Texture texture) {
-        this.texture = texture;
-
-        if (_mesh == null) {
-            Tessellator tessellator = new Tessellator();
-            TessellatorHelper.addGUIQuadMesh(tessellator, new Vector4f(1f, 1f, 1f, 1f), 1.0f, 1.0f);
-            _mesh = tessellator.generateMesh();
-        }
+        setTexture(texture);
+    }
+    
+    private float RGBtoColor(int v) {
+    	return (float)v / 255.0f;
     }
 
     @Override
@@ -73,34 +80,102 @@ public class UIGraphicsElement extends UIDisplayElement {
             return;
         }
 
-        ShaderManager.getInstance().enableDefaultTextured();
-        glBindTexture(GL11.GL_TEXTURE_2D, texture != null ? texture.getId() : 0);
-
-        glMatrixMode(GL_TEXTURE);
-        glPushMatrix();
-        glTranslatef(_textureOrigin.x, _textureOrigin.y, 0.0f);
-        glScalef(_textureSize.x, _textureSize.y, 1.0f);
-        glMatrixMode(GL11.GL_MODELVIEW);
-
-        glPushMatrix();
-        if (_rotate > 0f) {
-            glRotatef(_rotate, 0f, 0f, 1f);
+        if (texture != null) {
+	        ShaderManager.getInstance().enableDefaultTextured();
+	        glBindTexture(GL11.GL_TEXTURE_2D, texture != null ? texture.getId() : 0);
+	
+	        glMatrixMode(GL_TEXTURE);
+	        glPushMatrix();
+	        glTranslatef(_textureOrigin.x, _textureOrigin.y, 0.0f);
+	        glScalef(_textureSize.x, _textureSize.y, 1.0f);
+	        glMatrixMode(GL11.GL_MODELVIEW);
+	
+	        glPushMatrix();
+	        if (_rotate > 0f) {
+	            glRotatef(_rotate, 0f, 0f, 1f);
+	        }
+	        glScalef(getSize().x, getSize().y, 1.0f);
+	        _mesh.render();
+	        glPopMatrix();
+	
+	        glMatrixMode(GL_TEXTURE);
+	        glPopMatrix();
+	        glMatrixMode(GL11.GL_MODELVIEW);
+        } else {
+            glPushMatrix();
+	        if (_rotate > 0f) {
+	            glRotatef(_rotate, 0f, 0f, 1f);
+	        }
+            glScalef(getSize().x, getSize().y, 0.0f);
+            _mesh.render();
+            glPopMatrix();
         }
-        glScalef(getSize().x, getSize().y, 1.0f);
-        _mesh.render();
-        glPopMatrix();
-
-        glMatrixMode(GL_TEXTURE);
-        glPopMatrix();
-        glMatrixMode(GL11.GL_MODELVIEW);
     }
 
+    /**
+     * Get the texture origin.
+     * @return Returns the texture origin.
+     * 
+     * @deprecated Actually this method is not deprecated. But use setTextureOrigin to set the origin instead!
+     */
     public Vector2f getTextureOrigin() {
         return _textureOrigin;
     }
+    
+    /**
+     * Set the texture origin. You don't need to divide by the texture width/height, this will be done within this method.
+     * @param origin The origin of the texture.
+     */
+    public void setTextureOrigin(Vector2f origin) {
+    	if (origin != null && texture != null) {
+    		_textureOrigin = new Vector2f(origin.x / (float)texture.getWidth(), origin.y / (float)texture.getHeight());
+    	}
+    }
 
+    /**
+     * Get the texture size.
+     * @return Returns the texture size.
+     * 
+     * @deprecated Actually this method is not deprecated. But use setTextureSize to set the size instead! (deprecated tag will be removed in the future)
+     */
     public Vector2f getTextureSize() {
         return _textureSize;
+    }
+    
+    /**
+     * Set the texture size. You don't need to divide by the texture width/height, this will be done within this method.
+     * @param size The size of the texture.
+     */
+    public void setTextureSize(Vector2f size) {
+    	if (size != null && texture != null) {
+    		_textureSize = new Vector2f(size.x / (float)texture.getWidth(), size.y / (float)texture.getHeight());
+    	}
+    }
+    
+    /**
+     * Set the texture.
+     * @param texture The texture.
+     */
+    public void setTexture(Texture texture) {    	
+		this.texture = texture;
+		
+    	if (texture != null) {
+    		setColor(255, 255, 255, 1f);
+    	}
+    }
+    
+    public void setColor(int r, int g, int b, float a) {
+    	generateMesh(r, g, b, a);
+    }
+    
+    private void generateMesh(int r, int g, int b, float a) {
+    	if (_mesh != null) {
+    		_mesh.dispose();
+    	}
+    	
+        Tessellator tessellator = new Tessellator();
+        TessellatorHelper.addGUIQuadMesh(tessellator, new Vector4f(RGBtoColor(r), RGBtoColor(g), RGBtoColor(b), a), 1.0f, 1.0f);
+        _mesh = tessellator.generateMesh();
     }
 
     @Override

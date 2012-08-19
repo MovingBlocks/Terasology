@@ -20,7 +20,6 @@ import javax.vecmath.Vector2f;
 import org.terasology.asset.AssetManager;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.components.UIButton;
-import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
@@ -35,7 +34,6 @@ import org.terasology.rendering.gui.framework.events.ClickListener;
  */
 public class UIMenuConfig extends UIDisplayWindow {
 
-    final UIImageOverlay _overlay;
     final UIGraphicsElement _title;
     final UIText _version;
 
@@ -46,6 +44,7 @@ public class UIMenuConfig extends UIDisplayWindow {
     private final UIButton _modsButton;
 
     public UIMenuConfig() {
+    	setBackgroundImage("engine:loadingbackground");
         setModal(true);
         maximize();
         
@@ -55,9 +54,6 @@ public class UIMenuConfig extends UIDisplayWindow {
 
         _version = new UIText("Settings");
         _version.setVisible(true);
-
-        _overlay = new UIImageOverlay(AssetManager.loadTexture("engine:loadingBackground"));
-        _overlay.setVisible(true);
 
         _videoButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _videoButton.getLabel().setText("Video");
@@ -109,7 +105,6 @@ public class UIMenuConfig extends UIDisplayWindow {
             }
         });
 
-        addDisplayElement(_overlay);
         addDisplayElement(_title);
         addDisplayElement(_version);
 
