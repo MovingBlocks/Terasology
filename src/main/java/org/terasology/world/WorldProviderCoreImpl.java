@@ -26,6 +26,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.lighting.LightPropagator;
 import org.terasology.world.liquid.LiquidData;
 
 /**

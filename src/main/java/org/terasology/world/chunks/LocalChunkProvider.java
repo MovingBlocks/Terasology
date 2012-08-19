@@ -37,13 +37,13 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.performanceMonitor.PerformanceMonitor;
-import org.terasology.world.LightPropagator;
+import org.terasology.world.lighting.LightPropagator;
 import org.terasology.world.WorldView;
 import org.terasology.world.generator.core.ChunkGeneratorManager;
 import org.terasology.world.localChunkProvider.AbstractChunkTask;
 import org.terasology.world.localChunkProvider.ChunkRequest;
 import org.terasology.world.localChunkProvider.ChunkTask;
-import org.terasology.world.localChunkProvider.InternalLightProcessor;
+import org.terasology.world.lighting.InternalLightProcessor;
 import org.terasology.world.localChunkProvider.ShutdownTask;
 
 import com.google.common.base.Objects;
