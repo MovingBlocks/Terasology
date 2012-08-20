@@ -16,6 +16,7 @@
 package org.terasology.rendering.gui.components;
 
 import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -76,7 +77,6 @@ public class UIDialogBox extends UIDisplayWindow {
             addDisplayElement(text);
         }
 
-
         public void setTitle(String title) {
             text.setText(title);
             text.getPosition().x = getSize().x / 2 - text.getTextWidth() / 2;
@@ -93,9 +93,9 @@ public class UIDialogBox extends UIDisplayWindow {
     public UIDialogBox(String title, Vector2f size) {
         super();
         setSize(size);
-    	setBorderSolid(2f, 150, 150, 150, 1f);
         setBackgroundImage("engine:gui_menu");
-        setBackgroundImageSource(new Vector2f(260f, 94f), new Vector2f(168f, 76f));
+        setBackgroundImageSource(new Vector2f(260f, 92f), new Vector2f(168f, 76f));
+        setBorderImage("engine:gui_menu", new Vector2f(256f, 90f), new Vector2f(175f, 88f), new Vector4f(4f, 4f, 4f, 4f));
 
         container = new UIDialogBackground(new Vector2f(getSize().x * 0.55f, 19f), title);
         container.setVisible(true);

@@ -22,6 +22,7 @@ import org.terasology.input.events.KeyEvent;
 import org.terasology.rendering.gui.framework.style.UIStyle;
 import org.terasology.rendering.gui.framework.style.UIStyleBackgroundColor;
 import org.terasology.rendering.gui.framework.style.UIStyleBackgroundImage;
+import org.terasology.rendering.gui.framework.style.UIStyleBorderImage;
 import org.terasology.rendering.gui.framework.style.UIStyleBorderSolid;
 
 import javax.vecmath.Vector2f;
@@ -345,7 +346,10 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     		style.setWidth(width);
     	}
     }
- 
+    
+    /**
+     * Remove the border from this display element.
+     */
     public void removeBorderSolid() {
     	UIStyleBorderSolid style = getStyle2(UIStyleBorderSolid.class);
     	
@@ -354,11 +358,53 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     	}
     }
     
-    public void setBorderImage() {
-    	
+	/**
+	 * Set the border from an image.
+	 * @param texture The texture.
+	 * @param origin The origin of the border in the texture.
+	 * @param size The size of the border container in the texture.
+	 * @param width The border width. x = top, y = right, z = bottom, w = left
+	 */
+    public void setBorderImage(String texture, Vector2f origin, Vector2f size, Vector4f borderSize) {
+    	UIStyleBorderImage style = getStyle2(UIStyleBorderImage.class);
+
+    	if (style == null) {
+			style = new UIStyleBorderImage(AssetManager.loadTexture(texture));
+			style.setBorderSource(origin, size, borderSize);
+			style.setVisible(true);
+			addStyle(style, false);
+    	} else {
+
+    	}
     }
     
+
+    public void setBorderImageSource() {
+    	UIStyleBorderImage style = getStyle2(UIStyleBorderImage.class);
+
+    	if (style != null) {
+    		
+    	}
+    }
+
+    /*
+    public void setBorderImageTarget(Vector2f origin, Vector2f size) {
+    	UIStyleBorderImage style = getStyle2(UIStyleBorderImage.class);
+
+    	if (style != null) {
+    		style.setBorderTarget(origin, size);
+    	}
+    }
+    */
+    
+    /**
+     * Remove the border image from this display element.
+     */
     public void removeBorderImage() {
+    	UIStyleBorderImage style = getStyle2(UIStyleBorderImage.class);
     	
+    	if (style != null) {
+    		removeStyle(style);
+    	}
     }
 }

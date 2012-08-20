@@ -229,13 +229,13 @@ public class UIItemCell extends UIDisplayContainer  {
         Texture guiTex = AssetManager.loadTexture("engine:gui");
         
         selectionRectangle = new UIGraphicsElement(guiTex);
-        selectionRectangle.getTextureSize().set(new Vector2f(24f / 256f, 24f / 256f));
-        selectionRectangle.getTextureOrigin().set(new Vector2f(0.0f, 23f / 256f));
+        selectionRectangle.setTextureSize(new Vector2f(24f, 24f));
+        selectionRectangle.setTextureOrigin(new Vector2f(0.0f, 23f));
         selectionRectangle.setSize(getSize());
         
         background = new UIGraphicsElement(guiTex);
-        background.getTextureSize().set(new Vector2f(20f / 256f, 20f / 256f));
-        background.getTextureOrigin().set(new Vector2f(1.0f / 256f, 1f / 256f));
+        background.setTextureSize(new Vector2f(20f, 20f));
+        background.setTextureOrigin(new Vector2f(1f, 1f));
         background.setSize(getSize());
         background.setVisible(true);
         background.setFixed(true);
@@ -301,8 +301,6 @@ public class UIItemCell extends UIDisplayContainer  {
                 sendToTransferSlot(null, (byte) 0);
             }
         }
-        
-        System.out.println("drop");
     }
     
     /**

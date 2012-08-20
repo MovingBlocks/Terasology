@@ -44,8 +44,6 @@ import org.terasology.rendering.gui.framework.events.InputListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 
-import com.sun.org.apache.xml.internal.utils.NSInfo;
-
 /**
  * A simple graphical input
  *

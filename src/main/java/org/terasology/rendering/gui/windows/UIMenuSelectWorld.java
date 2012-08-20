@@ -33,6 +33,8 @@ import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 
 import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -63,6 +65,7 @@ public class UIMenuSelectWorld extends UIDisplayWindow {
         list.setBorderSolid(2f, 30, 30, 30, 1.0f);
         list.setBackgroundImage("engine:gui_menu");
         list.setBackgroundImageSource(new Vector2f(264f, 18f), new Vector2f(159f, 63f));
+        list.setBorderImage("engine:gui_menu", new Vector2f(256f, 0f), new Vector2f(175f, 88f), new Vector4f(16f, 7f, 7f, 7f));
         list.addDoubleClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {

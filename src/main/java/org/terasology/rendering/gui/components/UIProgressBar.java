@@ -37,6 +37,7 @@ public class UIProgressBar extends UIDisplayContainer {
         public UIProgressLine(Vector2f size){
             setSize(size);
             setCrop(true);
+            setCroped(true);
             setBackgroundImage("engine:gui_menu");
             setBackgroundImageSource(new Vector2f(0f, 190f), new Vector2f(248f, 9f));
             setBackgroundImageTarget(new Vector2f(0, 0), getSize());
@@ -50,7 +51,7 @@ public class UIProgressBar extends UIDisplayContainer {
 
     public UIProgressBar() {
 
-        _value = 50;
+        _value = 0;
         setSize(new Vector2f(256f, 15f));
         setBackgroundImage("engine:gui_menu");
         setBackgroundImageSource(new Vector2f(0f, 175f), new Vector2f(256f, 15f));
