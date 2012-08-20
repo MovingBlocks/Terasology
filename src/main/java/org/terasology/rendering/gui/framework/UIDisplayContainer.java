@@ -386,16 +386,6 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     		
     	}
     }
-
-    /*
-    public void setBorderImageTarget(Vector2f origin, Vector2f size) {
-    	UIStyleBorderImage style = getStyle2(UIStyleBorderImage.class);
-
-    	if (style != null) {
-    		style.setBorderTarget(origin, size);
-    	}
-    }
-    */
     
     /**
      * Remove the border image from this display element.

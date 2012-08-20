@@ -16,7 +16,6 @@ public class UIStyleBackgroundImage extends UIGraphicsElement implements UIStyle
 	
 	public UIStyleBackgroundImage(Texture texture) {
 		super(texture);
-		//setCroped(false);
 	}
 	
 	@Override
