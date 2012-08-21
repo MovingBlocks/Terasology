@@ -56,15 +56,14 @@ public class UIMenuSelectWorld extends UIDisplayWindow {
     final UIButton deleteFromList;
 
     public UIMenuSelectWorld() {
-    	setBackgroundImage("engine:menubackground");
+        setBackgroundImage("engine:menubackground");
         setModal(true);
         maximize();
 
         list = new UIList(new Vector2f(512f, 256f));
         list.setVisible(true);
-        list.setBorderSolid(2f, 30, 30, 30, 1.0f);
-        list.setBackgroundImage("engine:gui_menu");
-        list.setBackgroundImageSource(new Vector2f(264f, 18f), new Vector2f(159f, 63f));
+        list.setBorderSolid(2f, 0x1E, 0x1E, 0x1E, 1.0f);
+        list.setBackgroundImage("engine:gui_menu", new Vector2f(264f, 18f), new Vector2f(159f, 63f));
         list.setBorderImage("engine:gui_menu", new Vector2f(256f, 0f), new Vector2f(175f, 88f), new Vector4f(16f, 7f, 7f, 7f));
         list.addDoubleClickListener(new ClickListener() {
             @Override

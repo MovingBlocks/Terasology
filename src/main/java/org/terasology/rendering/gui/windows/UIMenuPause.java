@@ -49,7 +49,7 @@ public class UIMenuPause extends UIDisplayWindow {
     final UIText _version;
 
     public UIMenuPause() {
-    	setBackgroundColor(0, 0, 0, 0.75f);
+        setBackgroundColor(0x00, 0x00, 0x00, 0.75f);
         setModal(true);
         setCloseBinds(new String[] {PauseButton.ID});
         setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});

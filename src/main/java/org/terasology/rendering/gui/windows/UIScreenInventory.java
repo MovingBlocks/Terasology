@@ -40,27 +40,27 @@ public class UIScreenInventory extends UIDisplayWindow {
     private UIGraphicsElement background;
 
     public UIScreenInventory() {
-    	setBackgroundColor(0, 0, 0, 0.75f);
-    	setModal(true);
-    	setCloseBinds(new String[] {InventoryButton.ID});
-    	setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
+        setBackgroundColor(0x00, 0x00, 0x00, 0.75f);
+        setModal(true);
+        setCloseBinds(new String[] {InventoryButton.ID});
+        setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
         maximize();
         
         addWindowListener(new WindowListener() {
-			@Override
-			public void open(UIDisplayElement element) {
-	            toolbar.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity(), 0, 8);
-	            inventory.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity(), 9);
-	            //TODO connect toolbar <-> inventory somehow to allow fast transfer.
-	            
-	            layout();
-			}
-			
-			@Override
-			public void close(UIDisplayElement element) {
-				
-			}
-		});
+            @Override
+            public void open(UIDisplayElement element) {
+                toolbar.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity(), 0, 8);
+                inventory.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity(), 9);
+                //TODO connect toolbar <-> inventory somehow to allow fast transfer.
+                
+                layout();
+            }
+            
+            @Override
+            public void close(UIDisplayElement element) {
+                
+            }
+        });
         
         toolbar = new UIItemContainer(9);
         toolbar.setVisible(true);

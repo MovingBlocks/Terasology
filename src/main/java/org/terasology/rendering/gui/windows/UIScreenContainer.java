@@ -43,7 +43,7 @@ public class UIScreenContainer extends UIDisplayWindow {
     private final UIGraphicsElement background;
 
     public UIScreenContainer() {
-    	setBackgroundColor(0, 0, 0, 0.75f);
+        setBackgroundColor(0x00, 0x00, 0x00, 0.75f);
         setModal(true);
         maximize();
         setCloseBinds(new String[] {FrobButton.ID});

@@ -29,12 +29,12 @@ import com.google.gson.internal.Pair;
  *
  */
 public class UIStateButton extends UIButton {
-	private final LinkedList<Pair<String, StateButtonAction>> _states = new LinkedList<Pair<String, StateButtonAction>>();
+    private final LinkedList<Pair<String, StateButtonAction>> _states = new LinkedList<Pair<String, StateButtonAction>>();
     private int _currentState = -1;
     
     public UIStateButton(Vector2f size) {
-		super(size, UIButton.eButtonType.NORMAL);
-	}
+        super(size, UIButton.eButtonType.NORMAL);
+    }
 
     /**
      * Add a new state to the button.
@@ -43,8 +43,8 @@ public class UIStateButton extends UIButton {
      * @return Returns the state ID.
      */
     public int addState(String state, StateButtonAction action) {
-    	_states.add(new Pair<String, StateButtonAction>(state, action));
-    	return _states.size() - 1;
+        _states.add(new Pair<String, StateButtonAction>(state, action));
+        return _states.size() - 1;
     }
     
     /**
@@ -52,23 +52,23 @@ public class UIStateButton extends UIButton {
      * @param stateID The id of the state.
      */
     public void removeState(int stateID) {
-    	if (_states.size() > 0)
-    	{
-	    	if (stateID < 0)
-	    		stateID = 0;
-	    	if (stateID >= _states.size())
-	    		stateID = _states.size() - 1;
-	    	
-	    	_states.remove(stateID);
-	    	
-	    	if (_states.size() == 0)
-	    	{
-	    		_currentState = -1;
-	    		getLabel().setText("");
-	    	} else {
-	    		nextState();
-	    	}
-    	}
+        if (_states.size() > 0)
+        {
+            if (stateID < 0)
+                stateID = 0;
+            if (stateID >= _states.size())
+                stateID = _states.size() - 1;
+            
+            _states.remove(stateID);
+            
+            if (_states.size() == 0)
+            {
+                _currentState = -1;
+                getLabel().setText("");
+            } else {
+                nextState();
+            }
+        }
     }
     
     /**
@@ -76,19 +76,19 @@ public class UIStateButton extends UIButton {
      * @param stateID The ID of the state.
      */
     public void setState(int stateID) {
-    	if (_states.size() > 0)
-    	{
-	    	if (stateID < 0)
-	    		stateID = 0;
-	    	if (stateID >= _states.size())
-	    		stateID = _states.size() - 1;
-	    	
-	    	getLabel().setText(_states.get(stateID).first);
-	    	_currentState = stateID;
-	    	
-	    	if (_states.get(stateID).second != null)
-	    		_states.get(stateID).second.action(this);
-    	}
+        if (_states.size() > 0)
+        {
+            if (stateID < 0)
+                stateID = 0;
+            if (stateID >= _states.size())
+                stateID = _states.size() - 1;
+            
+            getLabel().setText(_states.get(stateID).first);
+            _currentState = stateID;
+            
+            if (_states.get(stateID).second != null)
+                _states.get(stateID).second.action(this);
+        }
     }
     
     /**
@@ -96,36 +96,36 @@ public class UIStateButton extends UIButton {
      * @return Returns the current state ID or -1 if button isn't in a state.
      */
     public int getState() {
-    	return _currentState;
+        return _currentState;
     }
     
     /**
      * Change state to next state ID in the state list. As the end is reached the next state will be the first state in the list.
      */
     public void nextState() {
-    	if (_states.size() > 0)
-    	{
-	    	int nextState = _currentState + 1;
-	    	
-	    	if (nextState >= _states.size())
-	    		nextState = 0;
-	    	
-	    	setState(nextState);
-    	}
+        if (_states.size() > 0)
+        {
+            int nextState = _currentState + 1;
+            
+            if (nextState >= _states.size())
+                nextState = 0;
+            
+            setState(nextState);
+        }
     }
     
     /**
      * Change state to previous state ID in the state list. As the beginning is reached the next state will be the last state in the list.
      */
     public void previousState() {
-    	if (_states.size() > 0)
-    	{
-	    	int prevState = _currentState - 1;
-	    	
-	    	if (prevState < 0)
-	    		prevState = _states.size() - 1;
-	    	
-	    	setState(prevState);
-    	}
+        if (_states.size() > 0)
+        {
+            int prevState = _currentState - 1;
+            
+            if (prevState < 0)
+                prevState = _states.size() - 1;
+            
+            setState(prevState);
+        }
     }
 }

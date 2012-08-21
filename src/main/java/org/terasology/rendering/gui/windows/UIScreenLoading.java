@@ -34,7 +34,7 @@ public class UIScreenLoading extends UIDisplayWindow {
     final UIProgressBar _progressBar;
 
     public UIScreenLoading() {
-    	setBackgroundImage("engine:loadingbackground");
+        setBackgroundImage("engine:loadingbackground");
         setModal(true);
         maximize();
         

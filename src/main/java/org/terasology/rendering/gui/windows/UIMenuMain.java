@@ -45,7 +45,7 @@ public class UIMenuMain extends UIDisplayWindow {
     final UIText _version;
 
     public UIMenuMain() {
-    	setBackgroundImage("engine:menubackground");
+        setBackgroundImage("engine:menubackground");
         setModal(true);
         maximize();
         

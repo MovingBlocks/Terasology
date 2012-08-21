@@ -58,11 +58,11 @@ public class UIDisplayWindow extends UIDisplayContainer {
     
     @Override
     public void layout() {
-    	if (isMaximized()) {
-    		super.setSize(new Vector2f(Display.getWidth(), Display.getHeight()));
-    	}
-    	
-    	super.layout();
+        if (isMaximized()) {
+            super.setSize(new Vector2f(Display.getWidth(), Display.getHeight()));
+        }
+        
+        super.layout();
     }
 
     private void notifyWindowListeners(eWindowEvent event) {
@@ -173,7 +173,7 @@ public class UIDisplayWindow extends UIDisplayContainer {
         if (closeBinds != null) {
             for (String key : closeBinds) {
                 if (key.equals(event.getId()) && event.isDown()) {
-                	close();
+                    close();
                     event.consume();
                     
                     return;
@@ -220,6 +220,6 @@ public class UIDisplayWindow extends UIDisplayContainer {
      * Closes the window.
      */
     public void close() {
-    	setVisible(false);
+        setVisible(false);
     }
 }

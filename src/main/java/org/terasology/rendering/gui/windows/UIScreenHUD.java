@@ -157,7 +157,7 @@ public class UIScreenHUD extends UIDisplayWindow implements EventHandlerSystem {
         }
     }
     
-	private void updateHealthBar(int currentHealth, int maxHealth) {
+    private void updateHealthBar(int currentHealth, int maxHealth) {
         float healthRatio = (float) currentHealth / maxHealth;
 
         // Show/Hide hearts relatively to the available health points of the player
@@ -175,7 +175,7 @@ public class UIScreenHUD extends UIDisplayWindow implements EventHandlerSystem {
                 if (poisoned.poisonDuration >= 1)
                     _hearts[i].setTextureOrigin(new Vector2f(106f, 0.0f));
                 else
-                	_hearts[i].setTextureOrigin(new Vector2f(52f, 0.0f));
+                    _hearts[i].setTextureOrigin(new Vector2f(52f, 0.0f));
             }
             
             for (EntityRef entity : entityManager.iteratorEntities(CuredComponent.class)) {
@@ -185,25 +185,25 @@ public class UIScreenHUD extends UIDisplayWindow implements EventHandlerSystem {
                 if (cured.cureDuration >= 1)
                     _hearts[i].setTextureOrigin(new Vector2f(52f, 0.0f));
                 else
-                	_hearts[i].setTextureOrigin(new Vector2f(52f, 0.0f));
+                    _hearts[i].setTextureOrigin(new Vector2f(52f, 0.0f));
             }
         }
-	}
+    }
     
     @Override
     public void layout() {
-    	super.layout();
-    	
-    	if (toolbar != null) {
-    		toolbar.centerHorizontally();
-    		toolbar.getPosition().y = Display.getHeight() - toolbar.getSize().y;
-	        crosshair.setPosition(new Vector2f((Display.getWidth() / 2) - (crosshair.getSize().x / 2), (Display.getHeight() / 2) - (crosshair.getSize().y / 2)));
-	        
-	        for (int i = 0; i < 10; i++) {
-	        	_hearts[i].getPosition().x = toolbar.getPosition().x + i * (_hearts[i].getSize().x + 2f);
-	        	_hearts[i].getPosition().y = toolbar.getPosition().y - _hearts[i].getSize().y - 2f;
-	        }    	
-    	}
+        super.layout();
+        
+        if (toolbar != null) {
+            toolbar.centerHorizontally();
+            toolbar.getPosition().y = Display.getHeight() - toolbar.getSize().y;
+            crosshair.setPosition(new Vector2f((Display.getWidth() / 2) - (crosshair.getSize().x / 2), (Display.getHeight() / 2) - (crosshair.getSize().y / 2)));
+            
+            for (int i = 0; i < 10; i++) {
+                _hearts[i].getPosition().x = toolbar.getPosition().x + i * (_hearts[i].getSize().x + 2f);
+                _hearts[i].getPosition().y = toolbar.getPosition().y - _hearts[i].getSize().y - 2f;
+            }        
+        }
     }
     
     @Override
@@ -211,7 +211,7 @@ public class UIScreenHUD extends UIDisplayWindow implements EventHandlerSystem {
         toolbar.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity(), 0, 8);
         layout();
         
-    	super.open();
+        super.open();
     }
 
     @Override
@@ -221,7 +221,7 @@ public class UIScreenHUD extends UIDisplayWindow implements EventHandlerSystem {
 
     @Override
     public void shutdown() {
-    	
+        
     }
 
     @ReceiveEvent(components = {MinionComponent.class})
@@ -232,16 +232,16 @@ public class UIScreenHUD extends UIDisplayWindow implements EventHandlerSystem {
     @ReceiveEvent(components = LocalPlayerComponent.class)
     public void onSelectedItemChanged(ChangedComponentEvent event, EntityRef entity) {
         for (UIItemCell cell : toolbar.getCells()) {
-			cell.setSelectionRectangleEnable(false);
-		}
+            cell.setSelectionRectangleEnable(false);
+        }
         
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
         toolbar.getCells().get(localPlayerComp.selectedTool).setSelectionRectangleEnable(true);
     }
     
-	@ReceiveEvent(components = {LocalPlayerComponent.class, HealthComponent.class})
-    public void onHealthChange(HealthChangedEvent event, EntityRef entityref) {    	
-		updateHealthBar(event.getCurrentHealth(), event.getMaxHealth());
+    @ReceiveEvent(components = {LocalPlayerComponent.class, HealthComponent.class})
+    public void onHealthChange(HealthChangedEvent event, EntityRef entityref) {        
+        updateHealthBar(event.getCurrentHealth(), event.getMaxHealth());
     }
 }

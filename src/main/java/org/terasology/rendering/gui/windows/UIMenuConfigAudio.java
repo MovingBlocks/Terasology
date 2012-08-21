@@ -45,7 +45,7 @@ public class UIMenuConfigAudio extends UIDisplayWindow {
     private final UIButton _backToConfigMenuButton;
 
     public UIMenuConfigAudio() {
-    	setBackgroundImage("engine:loadingbackground");
+        setBackgroundImage("engine:loadingbackground");
         setModal(true);
         setCloseBinds(new String[] {});
         setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});

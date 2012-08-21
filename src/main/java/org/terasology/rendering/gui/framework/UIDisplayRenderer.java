@@ -87,7 +87,7 @@ public class UIDisplayRenderer extends UIDisplayContainer {
                 if (_displayElements.get(i).isVisible()) {
                     return (UIDisplayWindow) _displayElements.get(i);
                 }
-			}
+            }
         }
         
         return null;

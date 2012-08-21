@@ -30,12 +30,17 @@ import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 
-
+/**
+ * 
+ *
+ * TODO clean this up. Remove UIDialogBackground -> should use the style UIStyleBackgroundSplit
+ */
 public class UIDialogBox extends UIDisplayWindow {
     private UIDialogBackground container;
     private UIButton closeButton;
     private Vector2f prevMousePos = null;
     private boolean dragged = false;
+    private float titleWidth = 300f;
     
     private class UIDialogBackground extends UIDisplayContainer {
         private UIGraphicsElement leftBackground;
@@ -93,61 +98,60 @@ public class UIDialogBox extends UIDisplayWindow {
     public UIDialogBox(String title, Vector2f size) {
         super();
         setSize(size);
-        setBackgroundImage("engine:gui_menu");
-        setBackgroundImageSource(new Vector2f(260f, 92f), new Vector2f(168f, 76f));
+        setBackgroundImage("engine:gui_menu", new Vector2f(260f, 92f), new Vector2f(168f, 76f));
         setBorderImage("engine:gui_menu", new Vector2f(256f, 90f), new Vector2f(175f, 88f), new Vector4f(4f, 4f, 4f, 4f));
 
-        container = new UIDialogBackground(new Vector2f(getSize().x * 0.55f, 19f), title);
+        container = new UIDialogBackground(new Vector2f(titleWidth, 19f), title);
         container.setVisible(true);
         container.getPosition().set((getPosition().x + size.x / 2f) - container.getSize().x / 2, 5f);
         container.setTitle(title);
-        container.addMouseButtonListener(new MouseButtonListener() {	
-			@Override
-			public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
+        container.addMouseButtonListener(new MouseButtonListener() {    
+            @Override
+            public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
 
-			}
-			
-			@Override
-			public void up(UIDisplayElement element, int button, boolean intersect) {
-				dragged = false;
-				prevMousePos = null;
-			}
-			
-			@Override
-			public void down(UIDisplayElement element, int button, boolean intersect) {
-				if (intersect) {
-					dragged = true;
+            }
+            
+            @Override
+            public void up(UIDisplayElement element, int button, boolean intersect) {
+                dragged = false;
+                prevMousePos = null;
+            }
+            
+            @Override
+            public void down(UIDisplayElement element, int button, boolean intersect) {
+                if (intersect) {
+                    dragged = true;
                     if (prevMousePos == null) {
                         prevMousePos = new Vector2f(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()));
                     }
-				}
-			}
-		});
+                }
+            }
+        });
         container.addMouseMoveListener(new MouseMoveListener() {
-			@Override
-			public void move(UIDisplayElement element) {
-		        if (dragged) {
-			        Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
-		            drag(new Vector2f(prevMousePos.x - mousePos.x, prevMousePos.y - mousePos.y));
-		            prevMousePos = new Vector2f(mousePos);
-		        }
-			}
-			
-			@Override
-			public void leave(UIDisplayElement element) {
-				
-			}
-			
-			@Override
-			public void hover(UIDisplayElement element) {
-				
-			}
-			
-			@Override
-			public void enter(UIDisplayElement element) {
-				
-			}
-		});
+            @Override
+            public void move(UIDisplayElement element) {
+                if (dragged) {
+                    Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
+                    drag(new Vector2f(prevMousePos.x - mousePos.x, prevMousePos.y - mousePos.y));
+                    prevMousePos = new Vector2f(mousePos);
+                }
+            }
+            
+            @Override
+            public void leave(UIDisplayElement element) {
+                
+            }
+            
+            @Override
+            public void hover(UIDisplayElement element) {
+                
+            }
+            
+            @Override
+            public void enter(UIDisplayElement element) {
+                
+            }
+        });
 
         closeButton = new UIButton(new Vector2f(19f, 19f), UIButton.eButtonType.NORMAL);
         closeButton.getPosition().set(getSize().x - closeButton.getSize().x - 2, 2);
@@ -158,18 +162,18 @@ public class UIDialogBox extends UIDisplayWindow {
         closeButton.setHoverState(new Vector2f(54f, 155f), new Vector2f(19f, 19f));
         closeButton.setPressedState(new Vector2f(92f, 155f), new Vector2f(19f, 19f));
         closeButton.addClickListener(new ClickListener() {
-			@Override
-			public void click(UIDisplayElement element, int button) {
-				close();
-			}
-		});
+            @Override
+            public void click(UIDisplayElement element, int button) {
+                close();
+            }
+        });
 
         addDisplayElement(closeButton);
         addDisplayElement(container);
     }
 
     public void resize() {
-        container.setSize(new Vector2f(getSize().x * 0.55f, 19f));
+        container.setSize(new Vector2f(titleWidth, 19f));
         container.getPosition().set((getPosition().x + getSize().x / 2f) - container.getSize().x / 2, 5f);
         container.resize();
         closeButton.getPosition().set(getSize().x - closeButton.getSize().x - 2, 2);

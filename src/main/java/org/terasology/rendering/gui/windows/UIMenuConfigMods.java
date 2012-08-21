@@ -39,7 +39,7 @@ public class UIMenuConfigMods extends UIDisplayWindow {
             _backToConfigMenuButton;
 
     public UIMenuConfigMods() {
-    	setBackgroundImage("engine:loadingbackground");
+        setBackgroundImage("engine:loadingbackground");
         setModal(true);
         maximize();
         

@@ -48,7 +48,7 @@ import javax.vecmath.Vector3f;
 /**
  * A cell which can contain an item and supports drag and drop.
  * To move an item the item will be moved to a special transfer slot as item will be dragged. This slot is in the PlayerComponent class.
- * Therefore the item belongs to nobody as the transfer is ongoing and needs to be reseted as the action was interrupted.
+ * Therefore the item belongs to nobody as the transfer is ongoing and needs to be reseted if the action was interrupted.
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  * @see PlayerComponent
  */
@@ -420,6 +420,12 @@ public class UIItemCell extends UIDisplayContainer  {
             //notify component changed listeners
             targetCell.ownerEntity.saveComponent(ownerInventory);
             
+            //some items in the item cell?
+            if (targetCell.itemEntity.exists() && !targetCell.itemLabel.isVisible()) {
+                //enable the label
+                targetCell.setLabelVisibility(true);
+            }
+            
         }
     }
 
@@ -666,6 +672,12 @@ public class UIItemCell extends UIDisplayContainer  {
             //notify component changed listeners
             InventoryComponent sourceInventory = sourceCell.getOwnerEntity().getComponent(InventoryComponent.class);
             sourceCell.ownerEntity.saveComponent(sourceInventory);
+            
+            //removed all items from the item cell?
+            if (!sourceCell.itemEntity.exists() && sourceCell.itemLabel.isVisible()) {
+                //disable the label
+                sourceCell.setLabelVisibility(false);
+            }
         }
     }
     

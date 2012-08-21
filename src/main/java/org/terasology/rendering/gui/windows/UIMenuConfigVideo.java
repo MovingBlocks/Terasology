@@ -54,20 +54,20 @@ public class UIMenuConfigVideo extends UIDisplayWindow {
     final UIText _version;
     
     private final ClickListener clickAction = new ClickListener() {
-		@Override
-		public void click(UIDisplayElement element, int button) {
-        	UIStateButton b = (UIStateButton) element;
-        	
-        	if (button == 0)
-        		b.nextState();
-        	else if (button == 1)
-        		b.previousState();
-		}
+        @Override
+        public void click(UIDisplayElement element, int button) {
+            UIStateButton b = (UIStateButton) element;
+            
+            if (button == 0)
+                b.nextState();
+            else if (button == 1)
+                b.previousState();
+        }
     };
 
     public UIMenuConfigVideo() {
-    	setBackgroundImage("engine:loadingbackground");
-    	setModal(true);
+        setBackgroundImage("engine:loadingbackground");
+        setModal(true);
         maximize();
         
         _title = new UIGraphicsElement(AssetManager.loadTexture("engine:terasology"));
@@ -79,28 +79,28 @@ public class UIMenuConfigVideo extends UIDisplayWindow {
 
         _graphicsQualityButton = new UIStateButton(new Vector2f(256f, 32f));
         StateButtonAction graphicsQualityStateAction = new StateButtonAction() {
-			@Override
-			public void action(UIDisplayElement element) {
-				UIStateButton button = (UIStateButton)element;
-				switch (button.getState()) {
-				case 0:
-					Config.getInstance().setEnablePostProcessingEffects(false);
-					Config.getInstance().setFlickeringLight(false);
-					break;
-				case 1:
-					Config.getInstance().setEnablePostProcessingEffects(false);
-					Config.getInstance().setFlickeringLight(true);
-					break;
-				case 2:
-					Config.getInstance().setEnablePostProcessingEffects(true);
-					Config.getInstance().setFlickeringLight(true);
-					break;
-				}
-				
-		        ShaderManager.getInstance().recompileAllShaders();
-			}
-		};
-		_graphicsQualityButton.addState("Graphics Quality: Ugly", graphicsQualityStateAction);
+            @Override
+            public void action(UIDisplayElement element) {
+                UIStateButton button = (UIStateButton)element;
+                switch (button.getState()) {
+                case 0:
+                    Config.getInstance().setEnablePostProcessingEffects(false);
+                    Config.getInstance().setFlickeringLight(false);
+                    break;
+                case 1:
+                    Config.getInstance().setEnablePostProcessingEffects(false);
+                    Config.getInstance().setFlickeringLight(true);
+                    break;
+                case 2:
+                    Config.getInstance().setEnablePostProcessingEffects(true);
+                    Config.getInstance().setFlickeringLight(true);
+                    break;
+                }
+                
+                ShaderManager.getInstance().recompileAllShaders();
+            }
+        };
+        _graphicsQualityButton.addState("Graphics Quality: Ugly", graphicsQualityStateAction);
         _graphicsQualityButton.addState("Graphics Quality: Nice", graphicsQualityStateAction);
         _graphicsQualityButton.addState("Graphics Quality: Epic", graphicsQualityStateAction);
         _graphicsQualityButton.addClickListener(clickAction);
@@ -108,14 +108,14 @@ public class UIMenuConfigVideo extends UIDisplayWindow {
 
         _viewingDistanceButton = new UIStateButton(new Vector2f(256f, 32f));
         StateButtonAction viewingDistanceStateAction = new StateButtonAction() {
-			@Override
-			public void action(UIDisplayElement element) {
-				UIStateButton button = (UIStateButton)element;
-				Config.getInstance().setViewingDistanceById(button.getState());
-			}
-		};
+            @Override
+            public void action(UIDisplayElement element) {
+                UIStateButton button = (UIStateButton)element;
+                Config.getInstance().setViewingDistanceById(button.getState());
+            }
+        };
         _viewingDistanceButton.addState("Viewing Distance: Near", viewingDistanceStateAction);
-		_viewingDistanceButton.addState("Viewing Distance: Moderate", viewingDistanceStateAction);
+        _viewingDistanceButton.addState("Viewing Distance: Moderate", viewingDistanceStateAction);
         _viewingDistanceButton.addState("Viewing Distance: Far", viewingDistanceStateAction);
         _viewingDistanceButton.addState("Viewing Distance: Ultra", viewingDistanceStateAction);
         _viewingDistanceButton.addClickListener(clickAction);
@@ -123,60 +123,60 @@ public class UIMenuConfigVideo extends UIDisplayWindow {
 
         _fovButton = new UISlider(new Vector2f(256f, 32f), 75, 120);
         _fovButton.addChangedListener(new ChangedListener() {
-			@Override
-			public void changed(UIDisplayElement element) {
-				UISlider slider = (UISlider)element;
-				slider.setText("FOV: " + String.valueOf(slider.getValue()));
-				Config.getInstance().setFov(slider.getValue());
-			}
-		});
+            @Override
+            public void changed(UIDisplayElement element) {
+                UISlider slider = (UISlider)element;
+                slider.setText("FOV: " + String.valueOf(slider.getValue()));
+                Config.getInstance().setFov(slider.getValue());
+            }
+        });
         _fovButton.setVisible(true);
 
         _animateGrassButton = new UIStateButton(new Vector2f(256f, 32f));
         StateButtonAction animateGrassStateAction = new StateButtonAction() {
-			@Override
-			public void action(UIDisplayElement element) {
-				UIStateButton button = (UIStateButton)element;
-				if (button.getState() == 0)
-					Config.getInstance().setAnimatedGrass(false);
-				else
-					Config.getInstance().setAnimatedGrass(true);
+            @Override
+            public void action(UIDisplayElement element) {
+                UIStateButton button = (UIStateButton)element;
+                if (button.getState() == 0)
+                    Config.getInstance().setAnimatedGrass(false);
+                else
+                    Config.getInstance().setAnimatedGrass(true);
 
                 ShaderManager.getInstance().recompileAllShaders();
-			}
-		};
-		_animateGrassButton.addState("Animate Grass: Off", animateGrassStateAction);
+            }
+        };
+        _animateGrassButton.addState("Animate Grass: Off", animateGrassStateAction);
         _animateGrassButton.addState("Animate Grass: On", animateGrassStateAction);
         _animateGrassButton.addClickListener(clickAction);
         _animateGrassButton.setVisible(true);
 
         _reflectiveWaterButton = new UIStateButton(new Vector2f(256f, 32f));
         StateButtonAction reflectiveWaterStateAction = new StateButtonAction() {
-			@Override
-			public void action(UIDisplayElement element) {
-				UIStateButton button = (UIStateButton)element;
-				if (button.getState() == 0)
-					Config.getInstance().setComplexWater(false);
-				else
-					Config.getInstance().setComplexWater(true);
+            @Override
+            public void action(UIDisplayElement element) {
+                UIStateButton button = (UIStateButton)element;
+                if (button.getState() == 0)
+                    Config.getInstance().setComplexWater(false);
+                else
+                    Config.getInstance().setComplexWater(true);
 
                 ShaderManager.getInstance().recompileAllShaders();
-			}
-		};
+            }
+        };
         _reflectiveWaterButton.addState("Reflective water: Off", reflectiveWaterStateAction);
-		_reflectiveWaterButton.addState("Reflective water: On", reflectiveWaterStateAction);
+        _reflectiveWaterButton.addState("Reflective water: On", reflectiveWaterStateAction);
         _reflectiveWaterButton.addClickListener(clickAction);
         _reflectiveWaterButton.setVisible(true);
 
         _blurIntensityButton = new UIStateButton(new Vector2f(256f, 32f));
         StateButtonAction blurIntensityStateAction = new StateButtonAction() {
-			@Override
-			public void action(UIDisplayElement element) {
-				UIStateButton button = (UIStateButton)element;
-				Config.getInstance().setBlurIntensity(button.getState());
-			}
-		};
-		_blurIntensityButton.addState("Blur intensity: Off", blurIntensityStateAction);
+            @Override
+            public void action(UIDisplayElement element) {
+                UIStateButton button = (UIStateButton)element;
+                Config.getInstance().setBlurIntensity(button.getState());
+            }
+        };
+        _blurIntensityButton.addState("Blur intensity: Off", blurIntensityStateAction);
         _blurIntensityButton.addState("Blur intensity: Some", blurIntensityStateAction);
         _blurIntensityButton.addState("Blur intensity: Normal", blurIntensityStateAction);
         _blurIntensityButton.addState("Blur intensity: Max",blurIntensityStateAction);
@@ -185,16 +185,16 @@ public class UIMenuConfigVideo extends UIDisplayWindow {
 
         _bobbingButton = new UIStateButton(new Vector2f(256f, 32f));
         StateButtonAction bobbingStateAction = new StateButtonAction() {
-			@Override
-			public void action(UIDisplayElement element) {
-				UIStateButton button = (UIStateButton)element;
-				if (button.getState() == 0)
-					Config.getInstance().setCameraBobbing(false);
-				else
-					Config.getInstance().setCameraBobbing(true);
-			}
-		};
-		_bobbingButton.addState("Bobbing: Off", bobbingStateAction);
+            @Override
+            public void action(UIDisplayElement element) {
+                UIStateButton button = (UIStateButton)element;
+                if (button.getState() == 0)
+                    Config.getInstance().setCameraBobbing(false);
+                else
+                    Config.getInstance().setCameraBobbing(true);
+            }
+        };
+        _bobbingButton.addState("Bobbing: Off", bobbingStateAction);
         _bobbingButton.addState("Bobbing: On", bobbingStateAction);
         _bobbingButton.addClickListener(clickAction);
         _bobbingButton.setVisible(true);
@@ -203,11 +203,11 @@ public class UIMenuConfigVideo extends UIDisplayWindow {
         _backToConfigMenuButton.getLabel().setText("Back");
         _backToConfigMenuButton.setVisible(true);
         _backToConfigMenuButton.addClickListener(new ClickListener() {
-			@Override
-			public void click(UIDisplayElement element, int button) {
-				GUIManager.getInstance().setFocusedWindow(GUIManager.getInstance().getWindowById("menuConfig"));
-			}
-		});
+            @Override
+            public void click(UIDisplayElement element, int button) {
+                GUIManager.getInstance().setFocusedWindow(GUIManager.getInstance().getWindowById("menuConfig"));
+            }
+        });
 
         addDisplayElement(_title);
         addDisplayElement(_version);
@@ -229,38 +229,38 @@ public class UIMenuConfigVideo extends UIDisplayWindow {
         super.layout();
 
         if (_version != null) {
-	        _version.centerHorizontally();
-	        _version.getPosition().y = 230f;
-	
-	        _title.centerHorizontally();
-	        _title.getPosition().y = 128f;
-	        
-	        //row 1
-	        _graphicsQualityButton.getPosition().x = Display.getWidth() / 2 - _graphicsQualityButton.getSize().x - 10;
-	        _graphicsQualityButton.getPosition().y = 300f;
-	
-	        _viewingDistanceButton.getPosition().x = Display.getWidth() / 2 - _viewingDistanceButton.getSize().x - 10;
-	        _viewingDistanceButton.getPosition().y = 300f + 40f;
-	
-	        _fovButton.getPosition().x = Display.getWidth() / 2 - _fovButton.getSize().x - 10;
-	        _fovButton.getPosition().y = 300f + 2 * 40f;
-	        
-	        _bobbingButton.getPosition().x = Display.getWidth() / 2 - _bobbingButton.getSize().x - 10;
-	        _bobbingButton.getPosition().y = 300f + 3 * 40f;
-	
-	        //row 2
-	        _animateGrassButton.getPosition().x = Display.getWidth() / 2 + 10;
-	        _animateGrassButton.getPosition().y = 300f;
-	
-	        _reflectiveWaterButton.getPosition().x = Display.getWidth() / 2 + 10;
-	        _reflectiveWaterButton.getPosition().y = 300f + 40f;
-	
-	        _blurIntensityButton.getPosition().x = Display.getWidth() / 2 + 10;
-	        _blurIntensityButton.getPosition().y = 300f + 2 * 40f;
-	
-	        //back
-	        _backToConfigMenuButton.centerHorizontally();
-	        _backToConfigMenuButton.getPosition().y = 300f + 7 * 40f;
+            _version.centerHorizontally();
+            _version.getPosition().y = 230f;
+    
+            _title.centerHorizontally();
+            _title.getPosition().y = 128f;
+            
+            //row 1
+            _graphicsQualityButton.getPosition().x = Display.getWidth() / 2 - _graphicsQualityButton.getSize().x - 10;
+            _graphicsQualityButton.getPosition().y = 300f;
+    
+            _viewingDistanceButton.getPosition().x = Display.getWidth() / 2 - _viewingDistanceButton.getSize().x - 10;
+            _viewingDistanceButton.getPosition().y = 300f + 40f;
+    
+            _fovButton.getPosition().x = Display.getWidth() / 2 - _fovButton.getSize().x - 10;
+            _fovButton.getPosition().y = 300f + 2 * 40f;
+            
+            _bobbingButton.getPosition().x = Display.getWidth() / 2 - _bobbingButton.getSize().x - 10;
+            _bobbingButton.getPosition().y = 300f + 3 * 40f;
+    
+            //row 2
+            _animateGrassButton.getPosition().x = Display.getWidth() / 2 + 10;
+            _animateGrassButton.getPosition().y = 300f;
+    
+            _reflectiveWaterButton.getPosition().x = Display.getWidth() / 2 + 10;
+            _reflectiveWaterButton.getPosition().y = 300f + 40f;
+    
+            _blurIntensityButton.getPosition().x = Display.getWidth() / 2 + 10;
+            _blurIntensityButton.getPosition().y = 300f + 2 * 40f;
+    
+            //back
+            _backToConfigMenuButton.centerHorizontally();
+            _backToConfigMenuButton.getPosition().y = 300f + 7 * 40f;
         }
     }
     
@@ -268,13 +268,13 @@ public class UIMenuConfigVideo extends UIDisplayWindow {
         _fovButton.setValue((int)Config.getInstance().getFov());
         _viewingDistanceButton.setState(Config.getInstance().getActiveViewingDistanceId());
         _blurIntensityButton.setState(Config.getInstance().getBlurIntensity());
-    	
-    	if (Config.getInstance().isEnablePostProcessingEffects() && Config.getInstance().isFlickeringLight())
+        
+        if (Config.getInstance().isEnablePostProcessingEffects() && Config.getInstance().isFlickeringLight())
             _graphicsQualityButton.setState(2);
         else if (!Config.getInstance().isEnablePostProcessingEffects() && Config.getInstance().isFlickeringLight())
-        	_graphicsQualityButton.setState(1);
+            _graphicsQualityButton.setState(1);
         else
-        	_graphicsQualityButton.setState(0);
+            _graphicsQualityButton.setState(0);
         
         if (Config.getInstance().isAnimatedGrass()) {
             _animateGrassButton.setState(1);
@@ -293,5 +293,5 @@ public class UIMenuConfigVideo extends UIDisplayWindow {
         } else {
             _bobbingButton.setState(0);
         }
-	}
+    }
 }

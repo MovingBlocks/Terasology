@@ -44,7 +44,7 @@ public class UIMenuConfig extends UIDisplayWindow {
     private final UIButton _modsButton;
 
     public UIMenuConfig() {
-    	setBackgroundImage("engine:loadingbackground");
+        setBackgroundImage("engine:loadingbackground");
         setModal(true);
         maximize();
         

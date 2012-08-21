@@ -47,101 +47,97 @@ public class UIList extends UIScrollableContainer implements IInputDataElement {
 
     //List items
     private final List<UIListItem> items = new ArrayList<UIListItem>();
-	private final List<ChangedListener> _changedListeners = new ArrayList<ChangedListener>();
-	
-	public class UIListItem extends UIDisplayContainer {
-	    private Object _value;
-	    private String _text;
-	    private boolean _isSelected;
-	    private Vector2f _padding = new Vector2f(5f, 10f);
+    private final List<ChangedListener> _changedListeners = new ArrayList<ChangedListener>();
+    
+    public class UIListItem extends UIDisplayContainer {
+        private Object value;
+        private String text;
+        private boolean isSelected;
+        private final Vector2f padding = new Vector2f(5f, 10f);
 
-	    private final UIText _label;
+        private final UIText label;
 
-	    public UIListItem(Vector2f size, String text, Object value) {
-	        setSize(size);
-	        _text = text;
-	        _value = value;
+        public UIListItem(Vector2f size, String text, Object value) {
+            setSize(size);
+            this.text = text;
+            this.value = value;
 
-	        _label = new UIText();
-	        _label.setVisible(true);
-	        _label.setColor(Color.lightGray);
-	        _label.setPosition(new Vector2f((getPosition().x + _padding.x), (getPosition().y + _padding.y)));
-	        _label.setText(_text);
+            label = new UIText();
+            label.setVisible(true);
+            label.setColor(Color.lightGray);
+            label.setPosition(new Vector2f((getPosition().x + padding.x), (getPosition().y + padding.y)));
+            label.setText(text);
 
-	        if (getSize().x < _label.getTextWidth()) {
-	            setSize(new Vector2f(_label.getTextWidth(), getSize().y));
-	        }
-	        
-	        addMouseMoveListener(new MouseMoveListener() {		
-				@Override
-				public void leave(UIDisplayElement element) {
-					if(!_isSelected) {
-						_label.setColor(Color.lightGray);
-					}
-				}
-				
-				@Override
-				public void hover(UIDisplayElement element) {
+            if (getSize().x < label.getTextWidth()) {
+                setSize(new Vector2f(label.getTextWidth(), getSize().y));
+            }
+            
+            addMouseMoveListener(new MouseMoveListener() {        
+                @Override
+                public void leave(UIDisplayElement element) {
+                    if(!isSelected) {
+                        label.setColor(Color.lightGray);
+                    }
+                }
+                
+                @Override
+                public void hover(UIDisplayElement element) {
 
-				}
-				
-				@Override
-				public void enter(UIDisplayElement element) {
-					if(!_isSelected) {
-						_label.setColor(Color.orange);
-					}
-				}
+                }
+                
+                @Override
+                public void enter(UIDisplayElement element) {
+                    if(!isSelected) {
+                        label.setColor(Color.orange);
+                    }
+                }
 
-				@Override
-				public void move(UIDisplayElement element) {
+                @Override
+                public void move(UIDisplayElement element) {
 
-				}
-			});
+                }
+            });
 
-	        addDisplayElement(_label);
-	    }
+            addDisplayElement(label);
+        }
 
-	    public Object getValue() {
-	        return _value;
-	    }
+        public Object getValue() {
+            return value;
+        }
 
-	    public void setValue(Object value) {
-	        _value = value;
-	    }
+        public void setValue(Object value) {
+            this.value = value;
+        }
 
-	    public String getText() {
-	        return _text;
-	    }
+        public String getText() {
+            return text;
+        }
 
-	    public void setText(String text) {
-	        _label.setText(_text);
-	        _text = text;
-	    }
+        public void setText(String text) {
+            label.setText(this.text);
+            this.text = text;
+        }
 
-	    public boolean isSelected() {
-	        return _isSelected;
-	    }
+        public boolean isSelected() {
+            return isSelected;
+        }
 
-	    public void setSelected(boolean selected) {
-	        _isSelected = selected;
+        public void setSelected(boolean selected) {
+            isSelected = selected;
 
-	        if (_isSelected) {
-	        	setBackgroundColor(225, 221, 212, 1.0f);
-	            _label.setColor(Color.orange);
-	        } else {
-	        	removeBackgroundColor();
-	            _label.setColor(Color.lightGray);
-	        }
-	    }
-	}
+            if (isSelected) {
+                setBackgroundColor(0xE1, 0xDD, 0xD4, 1.0f);
+                label.setColor(Color.orange);
+            } else {
+                removeBackgroundColor();
+                label.setColor(Color.lightGray);
+            }
+        }
+    }
 
     public UIList(Vector2f size) {
-    	super(size);
+        super(size);
         setSize(size);
-
-        //setBackgroundImage("engine:gui_menu");
-        //setBackgroundImageSource(new Vector2f(264f, 18f), new Vector2f(159f, 63f));
-        //setBorderSolid(1, 55, 55, 55, 1.0f);
     }
 
     /**
@@ -170,33 +166,33 @@ public class UIList extends UIScrollableContainer implements IInputDataElement {
         newItem.getPosition().y += 32f * items.size();
         newItem.setFixed(false);
         newItem.addClickListener(new ClickListener() {
-        	private long _lastTime = System.currentTimeMillis();
-        	private int _lastButton = -1;
-        	
-			@Override
-			public void click(UIDisplayElement element, int button) {
-				//Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
-				//handle double click
-				if ((System.currentTimeMillis() - _lastTime) < 200 && _lastButton == button) {
-					notifyDoubleClickListeners();
-				}
-				_lastTime = System.currentTimeMillis();
-				_lastButton = button;
-				
-				//select the clicked item
-				UIListItem item = (UIListItem) element;
-				
-				if (item != _selectedItem) {
-					if (_selectedItem != null)
-						_selectedItem.setSelected(false);
-					
-					_selectedItem = item;
-					_selectedItem.setSelected(true);
-					
-					notifyChangedListeners();
-				}
-			}
-		});
+            private long _lastTime = System.currentTimeMillis();
+            private int _lastButton = -1;
+            
+            @Override
+            public void click(UIDisplayElement element, int button) {
+                //Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
+                //handle double click
+                if ((System.currentTimeMillis() - _lastTime) < 200 && _lastButton == button) {
+                    notifyDoubleClickListeners();
+                }
+                _lastTime = System.currentTimeMillis();
+                _lastButton = button;
+                
+                //select the clicked item
+                UIListItem item = (UIListItem) element;
+                
+                if (item != _selectedItem) {
+                    if (_selectedItem != null)
+                        _selectedItem.setSelected(false);
+                    
+                    _selectedItem = item;
+                    _selectedItem.setSelected(true);
+                    
+                    notifyChangedListeners();
+                }
+            }
+        });
 
         //lets add the item and calculate the new content height of the scroll container
         items.add(newItem);
@@ -221,14 +217,14 @@ public class UIList extends UIScrollableContainer implements IInputDataElement {
      * @param i The index of the item to select.
      */
     public void setSelectedItemIndex(int i) {
-    	if (_selectedItem != null) {
-    		_selectedItem.setSelected(false);
-    	}
-    	
-    	_selectedItem = items.get(i);
-    	_selectedItem.setSelected(true);
-    	
-    	notifyChangedListeners();
+        if (_selectedItem != null) {
+            _selectedItem.setSelected(false);
+        }
+        
+        _selectedItem = items.get(i);
+        _selectedItem.setSelected(true);
+        
+        notifyChangedListeners();
     }
     
     /**
@@ -236,13 +232,13 @@ public class UIList extends UIScrollableContainer implements IInputDataElement {
      * @return Returns the selected item.
      */
     public UIListItem getSelectedItem() {
-		return _selectedItem;
+        return _selectedItem;
     }
     
-	/**
-	 * Get the value of the selected item.
-	 * @return Returns the value of the selected item.
-	 */
+    /**
+     * Get the value of the selected item.
+     * @return Returns the value of the selected item.
+     */
     public Object getValue() {
         return _selectedItem.getValue();
     }
@@ -252,13 +248,13 @@ public class UIList extends UIScrollableContainer implements IInputDataElement {
      * @return Returns the index of the selected item.
      */
     public int getSelectedItemIndex() {
-    	for (int i = 0; i < items.size(); i++) {
-			if (items.get(i) == _selectedItem) {
-				return i;
-			}
-		}
-    	
-    	return -1;
+        for (int i = 0; i < items.size(); i++) {
+            if (items.get(i) == _selectedItem) {
+                return i;
+            }
+        }
+        
+        return -1;
     }
 
     /**
@@ -288,22 +284,22 @@ public class UIList extends UIScrollableContainer implements IInputDataElement {
         }
 
         if (items.size() > 0) {
-	        if (index <= items.size() - 1) {
-	        	setSelectedItemIndex(index);
-	        }
-	        else {
-	        	setSelectedItemIndex(items.size() - 1);
-	        }
+            if (index <= items.size() - 1) {
+                setSelectedItemIndex(index);
+            }
+            else {
+                setSelectedItemIndex(items.size() - 1);
+            }
 
         }
         else {
-        	_selectedItem = null;
+            _selectedItem = null;
         }
     }
 
-	/**
-	 * Remove all items in this list.
-	 */
+    /**
+     * Remove all items in this list.
+     */
     public void removeAll() {
         clearData();
         for (int i = (items.size() - 1); i >= 0; i--) {
@@ -324,9 +320,9 @@ public class UIList extends UIScrollableContainer implements IInputDataElement {
      * Clear data (?)
      */
     public void clearData() {
-    	if (_selectedItem != null)
-    		_selectedItem.setSelected(false);
-    	_selectedItem = null;
+        if (_selectedItem != null)
+            _selectedItem.setSelected(false);
+        _selectedItem = null;
     }
     
     /*
@@ -347,17 +343,17 @@ public class UIList extends UIScrollableContainer implements IInputDataElement {
         _doubleClickListeners.remove(listener);
     }
     
-	private void notifyChangedListeners() {
-		for (ChangedListener listener : _changedListeners) {
-			listener.changed(this);
-		}
-	}
+    private void notifyChangedListeners() {
+        for (ChangedListener listener : _changedListeners) {
+            listener.changed(this);
+        }
+    }
     
     public void addChangedListener(ChangedListener listener) {
         _changedListeners.add(listener);
     }
 
     public void removeChangedListener(ChangedListener listener) {
-    	_changedListeners.remove(listener);
+        _changedListeners.remove(listener);
     }
 }

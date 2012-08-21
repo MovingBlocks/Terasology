@@ -35,7 +35,7 @@ public class UIItemCellIcon extends UIDisplayContainer {
 
     //layout
     private Texture terrainTex;
-    private Vector2f itemCountPosition = new Vector2f(26f, 5f);
+    private final Vector2f itemCountPosition = new Vector2f(26f, 5f);
 
     public UIItemCellIcon() {
         terrainTex = AssetManager.loadTexture("engine:terrain");

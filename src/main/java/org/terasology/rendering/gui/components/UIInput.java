@@ -49,6 +49,8 @@ import org.terasology.rendering.gui.framework.events.MouseMoveListener;
  *
  * @author Anton Kireev <adeon.k87@gmail.com>
  * @version 0.23
+ * 
+ * TODO clean up..
  */
 public class UIInput extends UIDisplayContainer implements IInputDataElement {
     //    TODO: Add text selection and paste from clipboard
@@ -100,9 +102,7 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
     public UIInput(Vector2f size) {
         setSize(size);
         setCrop(true);
-        setBackgroundImage("engine:gui_menu");
-        setBackgroundImageSource(new Vector2f(0f, 90f), new Vector2f(256f, 30f));
-        setBackgroundImageTarget(new Vector2f(0, 0), size); 
+        setBackgroundImage("engine:gui_menu", new Vector2f(0f, 90f), new Vector2f(256f, 30f));
         
         addClickListener(new ClickListener() {
             @Override
@@ -148,7 +148,7 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
         addMouseMoveListener(new MouseMoveListener() {        
             @Override
             public void leave(UIDisplayElement element) {
-            	
+                
             }
             
             @Override
@@ -173,8 +173,8 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
                     _textCursor.setVisible(true);
                 }
                 
-				setBorderSolid(2, 250, 170, 0, 1.0f);
-				layout();
+                setBorderSolid(2, 0xFA, 0xAA, 0x00, 1.0f);
+                layout();
             }
             
             @Override

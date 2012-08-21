@@ -26,7 +26,7 @@ public class UIMessageBox extends UIDialogBox {
     private UIText infoText;
     private UIButton buttonOk;
 
-    private Vector2f minSize = new Vector2f(384f, 128f);
+    private final Vector2f minSize = new Vector2f(384f, 128f);
 
     public UIMessageBox(String title, String text) {
         super(title, new Vector2f());
@@ -49,19 +49,17 @@ public class UIMessageBox extends UIDialogBox {
 
         infoText.setPosition(new Vector2f(getSize().x / 2 - infoText.getTextWidth() / 2, getSize().y / 2 - infoText.getTextHeight() / 2));
         buttonOk.setPosition(new Vector2f(getSize().x / 2 - buttonOk.getSize().x / 2, getSize().y - buttonOk.getSize().y - 10f));
-
         buttonOk.addClickListener(new ClickListener() {
-			@Override
-			public void click(UIDisplayElement element, int button) {
-				close();
-			}
+            @Override
+            public void click(UIDisplayElement element, int button) {
+                close();
+            }
         });
-
-        resize();
 
         addDisplayElement(infoText);
         addDisplayElement(buttonOk, "buttonOk");
         
+        resize();
         layout();
     }
     
@@ -69,8 +67,8 @@ public class UIMessageBox extends UIDialogBox {
      * Close a window. This will remove the window from the GUIManager.
      */
     public void close() {
-    	super.close();
-    	
-    	GUIManager.getInstance().removeWindow(this);
+        super.close();
+        
+        GUIManager.getInstance().removeWindow(this);
     }
 }

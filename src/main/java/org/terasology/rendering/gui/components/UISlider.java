@@ -39,14 +39,14 @@ import org.terasology.rendering.gui.framework.events.MouseMoveListener;
  */
 public class UISlider extends UIDisplayContainer {
     
-    private final ArrayList<ChangedListener> _changedListeners = new ArrayList<ChangedListener>();
-    private final UIText _label;
-    private final UIGraphicsElement _slider;
+    private final ArrayList<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
+    private final UIText label;
+    private final UIGraphicsElement slider;
     
-    private int _currentValue;
-    private int _min;
-    private int _max;
-    private int _range;
+    private int currentValue;
+    private int minValue;
+    private int maxValue;
+    private int range;
 
     /**
      * Creates a slider.
@@ -56,21 +56,16 @@ public class UISlider extends UIDisplayContainer {
      */
     public UISlider(Vector2f size, int min, int max) {
         setSize(size);
-        _min = min;
-        _max = max;
-        _currentValue = Integer.MAX_VALUE;
-        
-        //default button
-        setBackgroundImage("engine:gui_menu");
+        this.minValue = min;
+        this.maxValue = max;
+        currentValue = Integer.MAX_VALUE;
 
-        //default state
-        setBackgroundImageSource(new Vector2f(0f, 0f), new Vector2f(256f, 30f));
-        setBackgroundImageTarget(new Vector2f(0f, 0f), size);
+        setBackgroundImage("engine:gui_menu", new Vector2f(0f, 0f), new Vector2f(256f, 30f));
         
         addMouseMoveListener(new MouseMoveListener() {    
             @Override
             public void leave(UIDisplayElement element) {
-            	setBackgroundImageSource(new Vector2f(0f, 0f), new Vector2f(256f, 30f));
+                setBackgroundImage(new Vector2f(0f, 0f), new Vector2f(256f, 30f));
             }
             
             @Override
@@ -81,7 +76,7 @@ public class UISlider extends UIDisplayContainer {
             @Override
             public void enter(UIDisplayElement element) {
                 AudioManager.play(new AssetUri(AssetType.SOUND, "engine:click"), 1.0f);
-                setBackgroundImageSource(new Vector2f(0f, 30f), null);
+                setBackgroundImage(new Vector2f(0f, 30f), null);
             }
 
             @Override
@@ -95,7 +90,7 @@ public class UISlider extends UIDisplayContainer {
         addMouseButtonListener(new MouseButtonListener() {            
             @Override
             public void up(UIDisplayElement element, int button, boolean intersect) {
-            	setBackgroundImageSource(new Vector2f(0f, 0f), null);
+                setBackgroundImage(new Vector2f(0f, 0f), null);
             }
             
             @Override
@@ -110,14 +105,14 @@ public class UISlider extends UIDisplayContainer {
             }
         });
         
-        _slider = new UIGraphicsElement(AssetManager.loadTexture("engine:gui_menu"));
-        _slider.setParent(this);
-        _slider.setVisible(true);
-        _slider.setPosition(new Vector2f(0, 0));
-        _slider.setTextureOrigin(new Vector2f(0f, 60f));
-        _slider.setTextureSize(new Vector2f(256f, 30f));
-        _slider.setSize(new Vector2f(16f, getSize().y));
-        _slider.addMouseButtonListener(new MouseButtonListener() {                                    
+        slider = new UIGraphicsElement(AssetManager.loadTexture("engine:gui_menu"));
+        slider.setParent(this);
+        slider.setVisible(true);
+        slider.setPosition(new Vector2f(0, 0));
+        slider.setTextureOrigin(new Vector2f(0f, 60f));
+        slider.setTextureSize(new Vector2f(256f, 30f));
+        slider.setSize(new Vector2f(16f, getSize().y));
+        slider.addMouseButtonListener(new MouseButtonListener() {                                    
             @Override
             public void up(UIDisplayElement element, int button, boolean intersect) {
                 setFocus(null);
@@ -136,11 +131,11 @@ public class UISlider extends UIDisplayContainer {
             }
         });
         
-        _label = new UIText("");
-        _label.setVisible(true);
+        label = new UIText("");
+        label.setVisible(true);
         
-        addDisplayElement(_slider);
-        addDisplayElement(_label);
+        addDisplayElement(slider);
+        addDisplayElement(label);
         
         calcRange();
     }
@@ -149,8 +144,8 @@ public class UISlider extends UIDisplayContainer {
     public void layout() {
         super.layout();
         
-        if (_label != null) {
-            _label.setPosition(new Vector2f(getSize().x / 2 - _label.getTextWidth() / 2, getSize().y / 2 - _label.getTextHeight() / 2));
+        if (label != null) {
+            label.setPosition(new Vector2f(getSize().x / 2 - label.getTextWidth() / 2, getSize().y / 2 - label.getTextHeight() / 2));
         }
     }
     
@@ -160,18 +155,18 @@ public class UISlider extends UIDisplayContainer {
      */
     private void changeSlider(int value)
     {
-        if (value < _min) {
-            value = _min;
+        if (value < minValue) {
+            value = minValue;
         }
-        else if (value > _max) {
-            value = _max;
+        else if (value > maxValue) {
+            value = maxValue;
         }
         
-        _slider.getPosition().set(valueToPos(value), 0);
+        slider.getPosition().set(valueToPos(value), 0);
         
-        if (value != _currentValue)
+        if (value != currentValue)
         {
-            _currentValue = value;
+            currentValue = value;
             
             notifyChangedListeners();
         }
@@ -182,22 +177,22 @@ public class UISlider extends UIDisplayContainer {
      * @param pos The position of the mouse in x direction.
      */
     private void changeSlider(float pos) {
-        float sliderPos = pos - getPosition().x - _slider.getSize().x / 2;
+        float sliderPos = pos - getPosition().x - slider.getSize().x / 2;
         if (sliderPos < 0)
         {
             sliderPos = 0;
         }
-        else if (sliderPos > (getSize().x - _slider.getSize().x))
+        else if (sliderPos > (getSize().x - slider.getSize().x))
         {
-            sliderPos = getSize().x - _slider.getSize().x;
+            sliderPos = getSize().x - slider.getSize().x;
         }
         
-        _slider.getPosition().set(sliderPos, 0);
+        slider.getPosition().set(sliderPos, 0);
         
         int newValue = posToValue(sliderPos);
-        if (newValue != _currentValue)
+        if (newValue != currentValue)
         {
-            _currentValue = newValue;
+            currentValue = newValue;
             
             notifyChangedListeners();
         }
@@ -209,15 +204,15 @@ public class UISlider extends UIDisplayContainer {
      * @return Returns the value at the given position.
      */
     private int posToValue(float pos) {
-        int value = Math.round(pos / ((getSize().x - _slider.getSize().x) / (float)_range));
+        int value = Math.round(pos / ((getSize().x - slider.getSize().x) / (float)range));
         
-        value += _min;
+        value += minValue;
         
-        if (value < _min) {
-            value = _min;
+        if (value < minValue) {
+            value = minValue;
         }
-        else if (value > _max) {
-            value = _max;
+        else if (value > maxValue) {
+            value = maxValue;
         }
         
         return value;
@@ -229,16 +224,16 @@ public class UISlider extends UIDisplayContainer {
      * @return Returns the position at the given value.
      */
     private float valueToPos(int value) {
-        if (_min < 0)
+        if (minValue < 0)
         {
-            value += -_min;
+            value += -minValue;
         }
         else
         {
-            value -= _min;
+            value -= minValue;
         }
         
-        float pos = value * ((getSize().x - _slider.getSize().x) / (float)_range);
+        float pos = value * ((getSize().x - slider.getSize().x) / (float)range);
         if (pos < 0)
         {
             pos = 0;
@@ -252,25 +247,25 @@ public class UISlider extends UIDisplayContainer {
     }
     
     private void calcRange() {
-        _range = _max - _min;
+        range = maxValue - minValue;
     }
     
     private void notifyChangedListeners() {
-        for (ChangedListener listener : _changedListeners) {
+        for (ChangedListener listener : changedListeners) {
             listener.changed(this);
         }
     }
 
     public void addChangedListener(ChangedListener listener) {
-        _changedListeners.add(listener);
+        changedListeners.add(listener);
     }
 
     public void removeChangedListener(ChangedListener listener) {
-        _changedListeners.remove(listener);
+        changedListeners.remove(listener);
     }
     
     public int getValue() {
-        return _currentValue;
+        return currentValue;
     }
 
     public void setValue(int value) {
@@ -278,30 +273,30 @@ public class UISlider extends UIDisplayContainer {
     }    
     
     public int getMax() {
-        return _max;
+        return maxValue;
     }
 
     public void setMax(int max) {
-        _max = max;
+        this.maxValue = max;
         calcRange();
     }
 
     public int getMin() {
-        return _min;
+        return minValue;
     }
 
     public void setMin(int min) {
-        _min = min;
+        this.minValue = min;
         calcRange();
     }
     
     public void setText(String text) {
-        _label.setText(text);
+        label.setText(text);
         
         layout();
     }
     
     public String getText() {
-        return _label.getText();
+        return label.getText();
     }
 }

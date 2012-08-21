@@ -21,38 +21,38 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
  *
  */
 public class UIStyleBorderSolid extends UIDisplayElement implements UIStyle {
-	
+    
     //Textured borders
     private float width;
     private Vector4f color;
     
     public UIStyleBorderSolid(float width, int r, int g, int b, float a) {
-    	this.width = width;
-    	this.color = new Vector4f(RGBtoColor(r), RGBtoColor(g), RGBtoColor(b), a);
-    	setCroped(false);
-	}
+        this.width = width;
+        this.color = new Vector4f(RGBtoColor(r), RGBtoColor(g), RGBtoColor(b), a);
+        setCroped(false);
+    }
     
     private float RGBtoColor(int v) {
-    	return (float)v / 255.0f;
+        return (float)v / 255.0f;
     }
 
-	@Override
-	public void render() {
-		renderSolid();
-	}
+    @Override
+    public void render() {
+        renderSolid();
+    }
 
-	@Override
-	public void update() {
-		
-	}
+    @Override
+    public void update() {
+        
+    }
 
-	@Override
-	public void layout() {
-		if (getParent() != null) {
-			setSize(getParent().getSize());
-		}
-	}
-	
+    @Override
+    public void layout() {
+        if (getParent() != null) {
+            setSize(getParent().getSize());
+        }
+    }
+    
     public void renderSolid() {
         glPushMatrix();
         glLoadIdentity();
@@ -74,19 +74,19 @@ public class UIStyleBorderSolid extends UIDisplayElement implements UIStyle {
         glPopMatrix();
     }
 
-	public Vector4f getColor() {
-		return color;
-	}
+    public Vector4f getColor() {
+        return color;
+    }
 
-	public void setColor(int r, int g, int b, float a) {
-		this.color = new Vector4f(RGBtoColor(r), RGBtoColor(g), RGBtoColor(b), a);
-	}
+    public void setColor(int r, int g, int b, float a) {
+        this.color = new Vector4f(RGBtoColor(r), RGBtoColor(g), RGBtoColor(b), a);
+    }
 
-	public float getWidth() {
-		return width;
-	}
+    public float getWidth() {
+        return width;
+    }
 
-	public void setWidth(float width) {
-		this.width = width;
-	}
+    public void setWidth(float width) {
+        this.width = width;
+    }
 }

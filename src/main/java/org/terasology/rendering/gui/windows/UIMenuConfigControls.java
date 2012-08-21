@@ -106,7 +106,7 @@ public class UIMenuConfigControls extends UIDisplayWindow {
     final UIText subtitle;
 
     public UIMenuConfigControls() {
-    	setBackgroundImage("engine:loadingbackground");
+        setBackgroundImage("engine:loadingbackground");
         setModal(true);
         maximize();
         

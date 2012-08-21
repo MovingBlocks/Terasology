@@ -46,7 +46,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     private final List<UIStyle> styles = new ArrayList<UIStyle>();
 
     protected Vector4f _cropMargin = new Vector4f(
-    		/*TOP*/    0.0f,
+            /*TOP*/    0.0f,
             /*RIGHT*/  0.0f,
             /*BOTTOM*/ 0.0f,
             /*LEFT*/   0.0f
@@ -126,12 +126,12 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     public void processBindButton(BindButtonEvent event) {
         if (!isVisible())
             return;
-    	
+        
         super.processBindButton(event);
         
         // Pass the bind key to all display elements
         for (int i = 0; i < _displayElements.size(); i++) {
-        	_displayElements.get(i).processBindButton(event);
+            _displayElements.get(i).processBindButton(event);
         }
     }
 
@@ -205,14 +205,14 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         _cropMargin = margin;
     }
     
-    private <T> T getStyle2(Class<T> style) {
-    	for (UIStyle s : styles) {
-			if (s.getClass() == style) {
-				return style.cast(s);
-			}
-		}
-    	
-    	return null;
+    private <T> T getStyle(Class<T> style) {
+        for (UIStyle s : styles) {
+            if (s.getClass() == style) {
+                return style.cast(s);
+            }
+        }
+        
+        return null;
     }
     
     /**
@@ -223,21 +223,21 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * TODO need to put particular styles at the particular position.. (background at the beginning, border on top)
      */
     private void addStyle(UIStyle style, boolean listStart) {
-    	styles.add(style);
-    	
-    	UIDisplayElement element = (UIDisplayElement) style;
-    	if (listStart) {
-    		_displayElements.add(0, element);
-    	} else {
-    		_displayElements.add(element);
-    	}
-    	
+        styles.add(style);
+        
+        UIDisplayElement element = (UIDisplayElement) style;
+        if (listStart) {
+            _displayElements.add(0, element);
+        } else {
+            _displayElements.add(element);
+        }
+        
         element.setParent(this);
     }
     
     private void removeStyle(UIStyle style) {
-    	styles.remove(style);
-    	removeDisplayElement((UIDisplayElement) style);
+        styles.remove(style);
+        removeDisplayElement((UIDisplayElement) style);
     }
     
     /**
@@ -248,14 +248,14 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * @param a Alpha value. (0-1)
      */
     public void setBackgroundColor(int r, int g, int b, float a) {
-        UIStyleBackgroundColor style = getStyle2(UIStyleBackgroundColor.class);
+        UIStyleBackgroundColor style = getStyle(UIStyleBackgroundColor.class);
         if (style == null) {
-        	style = new UIStyleBackgroundColor(r, g, b, a);
-        	style.setSize(getSize());
-        	style.setVisible(true);
-        	addStyle(style, true);
+            style = new UIStyleBackgroundColor(r, g, b, a);
+            style.setSize(getSize());
+            style.setVisible(true);
+            addStyle(style, true);
         } else {
-        	style.setColor(r, g, b, a);
+            style.setColor(r, g, b, a);
         }
     }
     
@@ -263,55 +263,94 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * Remove the background color from this display element.
      */
     public void removeBackgroundColor() {
-    	UIStyleBackgroundColor style = getStyle2(UIStyleBackgroundColor.class);
-    	if (style != null) {
-    		removeStyle(style);
-    	}
+        UIStyleBackgroundColor style = getStyle(UIStyleBackgroundColor.class);
+        if (style != null) {
+            removeStyle(style);
+        }
+    }
+    
+    /**
+     * Set the background image.
+     * @param texture The texture to load.
+     */
+    public void setBackgroundImage(String texture) {
+        UIStyleBackgroundImage style = getStyle(UIStyleBackgroundImage.class);
+
+        if (style == null) {
+            style = new UIStyleBackgroundImage(AssetManager.loadTexture(texture));
+            style.setTextureOrigin(new Vector2f(0f, 0f));
+            style.setTextureSize(new Vector2f(style.getTexture().getWidth(), style.getTexture().getHeight()));
+            style.setVisible(true);
+            addStyle(style, true);
+        } else {
+            //check if same texture is already loaded
+            if (!style.getTexture().getURI().toString().equals("texture:" + texture)) {
+                style.setTexture(AssetManager.loadTexture(texture));
+            }
+        }
+    }
+    
+    /**
+     * Set the origin and size of the loaded background image. If no image was loaded this won't have any effect.
+     * @param origin The origin of the texture.
+     * @param size The size of the texture.
+     */
+    public void setBackgroundImage(Vector2f origin, Vector2f size) {
+        UIStyleBackgroundImage style = getStyle(UIStyleBackgroundImage.class);
+
+        if (style != null) {            
+            style.setTextureOrigin(origin);
+            style.setTextureSize(size);
+        }
     }
 
     /**
      * Set the background Image for this display element.
      * @param texture The texture to load.
+     * @param origin The origin of the texture. Null reference will set the origin to 0,0
+     * @param size The size of the texture. Null reference will set the size to the size of the whole texture.
      */
-    public void setBackgroundImage(String texture) {
-        UIStyleBackgroundImage style = getStyle2(UIStyleBackgroundImage.class);
-        
-        //create the style if it not exists
+    public void setBackgroundImage(String texture, Vector2f origin, Vector2f size) {
+        UIStyleBackgroundImage style = getStyle(UIStyleBackgroundImage.class);
+
         if (style == null) {
-        	style = new UIStyleBackgroundImage(AssetManager.loadTexture(texture));
-        	style.setVisible(true);
-        	addStyle(style, true);
+            style = new UIStyleBackgroundImage(AssetManager.loadTexture(texture));
+            style.setTextureOrigin(origin);
+            style.setTextureSize(size);
+            style.setVisible(true);
+            addStyle(style, true);
+        } else {
+            //check if same texture is already loaded
+            if (!style.getTexture().getURI().toString().equals("texture:" + texture)) {
+                style.setTexture(AssetManager.loadTexture(texture));
+            }
+            
+            style.setTextureOrigin(origin);
+            style.setTextureSize(size);
         }
-        //edit the existing style
-        else {
-        	style.setTexture(AssetManager.loadTexture(texture));
+    }
+
+    /**
+     * Set the position of the background image. On default the background will fill the whole display element.
+     * @param position The position.
+     */
+    public void setBackgroundImagePosition(Vector2f position) {
+        UIStyleBackgroundImage style = getStyle(UIStyleBackgroundImage.class);
+        
+        if (style != null) {
+            style.setPosition(position);
         }
     }
     
     /**
-     * Set the origin and size of the background in the texture file.
-     * @param origin The origin.
-     * @param size The size.
+     * Set the size of the background image. On default the background will fill the whole display element.
+     * @param size
      */
-    public void setBackgroundImageSource(Vector2f origin, Vector2f size) {
-    	UIStyleBackgroundImage style = getStyle2(UIStyleBackgroundImage.class);
-    	
+    public void setBackgroundImageSize(Vector2f size) {
+        UIStyleBackgroundImage style = getStyle(UIStyleBackgroundImage.class);
+        
         if (style != null) {
-	        style.setTextureOrigin(origin);
-	        style.setTextureSize(size);
-        }
-    }
-    
-    /**
-     * Set the origin and size of the background on the display element. On default the background will fill the whole display element.
-     * @param origin The origin.
-     * @param size The size.
-     */
-    public void setBackgroundImageTarget(Vector2f origin, Vector2f size) {
-    	UIStyleBackgroundImage style = getStyle2(UIStyleBackgroundImage.class);
-    	
-        if (style != null) {
-	        style.setTarget(origin, size);
+            style.setSize(size);
         }
     }
     
@@ -319,82 +358,78 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * Remove the background image from this display element.
      */ 
     public void removeBackgroundImage() {
-    	UIStyleBackgroundImage style = getStyle2(UIStyleBackgroundImage.class);
-    	
-    	if (style != null) {
-    		removeStyle(style);
-    	}
+        UIStyleBackgroundImage style = getStyle(UIStyleBackgroundImage.class);
+        
+        if (style != null) {
+            removeStyle(style);
+        }
     }
     
     /**
      * Set the border for this display element.
-     * @param width The width.
+     * @param width The width of the border.
      * @param r Red value. (0-255)
      * @param g Green value. (0-255)
      * @param b Blue value. (0-255)
      * @param a Alpha value. (0-1)
      */
     public void setBorderSolid(float width, int r, int g, int b, float a) {
-    	UIStyleBorderSolid style = getStyle2(UIStyleBorderSolid.class);
+        UIStyleBorderSolid style = getStyle(UIStyleBorderSolid.class);
 
-    	if (style == null) {
-			style = new UIStyleBorderSolid(width, r, g, b, a);
-			style.setVisible(true);
-			addStyle(style, false);
-    	} else {
-    		style.setColor(r, g, b, a);
-    		style.setWidth(width);
-    	}
+        if (style == null) {
+            style = new UIStyleBorderSolid(width, r, g, b, a);
+            style.setVisible(true);
+            addStyle(style, false);
+        } else {
+            style.setColor(r, g, b, a);
+            style.setWidth(width);
+        }
     }
     
     /**
      * Remove the border from this display element.
      */
     public void removeBorderSolid() {
-    	UIStyleBorderSolid style = getStyle2(UIStyleBorderSolid.class);
-    	
-    	if (style != null) {
-    		removeStyle(style);
-    	}
+        UIStyleBorderSolid style = getStyle(UIStyleBorderSolid.class);
+        
+        if (style != null) {
+            removeStyle(style);
+        }
     }
     
-	/**
-	 * Set the border from an image.
-	 * @param texture The texture.
-	 * @param origin The origin of the border in the texture.
-	 * @param size The size of the border container in the texture.
-	 * @param width The border width. x = top, y = right, z = bottom, w = left
-	 */
+    /**
+     * Set the border from an image.
+     * @param texture The texture.
+     * @param origin The origin of the border in the texture.
+     * @param size The size of the border container in the texture.
+     * @param width The border width. x = top, y = right, z = bottom, w = left
+     */
     public void setBorderImage(String texture, Vector2f origin, Vector2f size, Vector4f borderSize) {
-    	UIStyleBorderImage style = getStyle2(UIStyleBorderImage.class);
+        UIStyleBorderImage style = getStyle(UIStyleBorderImage.class);
 
-    	if (style == null) {
-			style = new UIStyleBorderImage(AssetManager.loadTexture(texture));
-			style.setBorderSource(origin, size, borderSize);
-			style.setVisible(true);
-			addStyle(style, false);
-    	} else {
+        if (style == null) {
+            style = new UIStyleBorderImage(AssetManager.loadTexture(texture));
+            style.setBorderSource(origin, size, borderSize);
+            style.setVisible(true);
+            addStyle(style, false);
+        } else {
+            //check if same texture is already loaded
+            if (!style.getTexture().getURI().toString().equals("texture:" + texture)) {
+                style.setTexture(AssetManager.loadTexture(texture));
+            }
 
-    	}
-    }
-    
-
-    public void setBorderImageSource() {
-    	UIStyleBorderImage style = getStyle2(UIStyleBorderImage.class);
-
-    	if (style != null) {
-    		
-    	}
+            style.setBorderSource(origin, size, borderSize);
+        }
     }
     
     /**
      * Remove the border image from this display element.
      */
     public void removeBorderImage() {
-    	UIStyleBorderImage style = getStyle2(UIStyleBorderImage.class);
-    	
-    	if (style != null) {
-    		removeStyle(style);
-    	}
+        UIStyleBorderImage style = getStyle(UIStyleBorderImage.class);
+        
+        if (style != null) {
+            removeStyle(style);
+        }
     }
 }
