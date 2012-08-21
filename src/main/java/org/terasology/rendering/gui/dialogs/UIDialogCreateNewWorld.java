@@ -82,7 +82,7 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
         _chunkGeneratorLabel.getSize().y = 16f;
         _chunkGeneratorLabel.setVisible(true);
 
-        _chunkGenerator = new UIComboBox(new Vector2f(176f, 22f), new Vector2f(176f, 88f));
+        _chunkGenerator = new UIComboBox(new Vector2f(176f, 22f), new Vector2f(175f, 64f));
         _chunkGenerator.addItem("Normal", new Integer(0));
         _chunkGenerator.addItem("Flat", new Integer(1));
         _chunkGenerator.setSelectedItemIndex(0);
@@ -105,18 +105,18 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
         _okButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-            	//validation of the input
-            	if (_inputWorldTitle.getValue().isEmpty()) {
-            		GUIManager.getInstance().showMessage("Error", "Please enter a world name");
-            		
-            		return;
-            	} else if ((new File(PathManager.getInstance().getWorldSavePath(_inputWorldTitle.getValue()), WorldInfo.DEFAULT_FILE_NAME)).exists()) {
-            		GUIManager.getInstance().showMessage("Error", "A World with this name already exists");
-            		
-            		return;
-            	}
-            	
-            	//set the world settings
+                //validation of the input
+                if (_inputWorldTitle.getValue().isEmpty()) {
+                    GUIManager.getInstance().showMessage("Error", "Please enter a world name");
+                    
+                    return;
+                } else if ((new File(PathManager.getInstance().getWorldSavePath(_inputWorldTitle.getValue()), WorldInfo.DEFAULT_FILE_NAME)).exists()) {
+                    GUIManager.getInstance().showMessage("Error", "A World with this name already exists");
+                    
+                    return;
+                }
+                
+                //set the world settings
                 if (_inputSeed.getValue().length() > 0) {
                     Config.getInstance().setDefaultSeed(_inputSeed.getValue());
                 } else {
@@ -164,7 +164,7 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
         _cancelButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                close(true);
+                close();
             }
         });
 

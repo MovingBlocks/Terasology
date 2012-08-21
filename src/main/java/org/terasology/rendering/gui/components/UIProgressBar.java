@@ -26,70 +26,77 @@ import org.terasology.rendering.gui.framework.UIDisplayContainer;
  *
  * @author Anton Kireev <adeon.k87@gmail.com>
  * @version 0.23
+ * 
+ * TODO offer changed listener?
  */
 public class UIProgressBar extends UIDisplayContainer {
 
-    private UIText         _label;
-    private int            _value;
-    private UIProgressLine _progressLine;
+    private UIText         label;
+    private int            value;
+    private UIProgressLine progressLine;
+    
+    private class UIProgressLine extends UIDisplayContainer {
+        public UIProgressLine(Vector2f size){
+            setSize(size);
+            setCrop(true);
+            setCroped(true);
+            setBackgroundImage("engine:gui_menu", new Vector2f(0f, 190f), new Vector2f(248f, 9f));
+        }
+        
+        public void updateProgress() {
+            Vector4f size = new Vector4f(0f, -(getSize().x - getSize().x * (value / 100f)), 0f, 0f);
+            setCropMargin(size);
+        }
+    }
 
-    public UIProgressBar(Vector2f size) {
+    public UIProgressBar() {
 
-        _value = 50;
-        setSize(size);
-        setCrop(true);
-        setStyle("background-image", "engine:gui_menu 256/512 15/512 0 175/512");
-        setCropMargin(new Vector4f(0f, -(getSize().x - getSize().x * (_value / 100f)), 0f, 0f));
+        value = 0;
+        setSize(new Vector2f(256f, 15f));
+        setBackgroundImage("engine:gui_menu", new Vector2f(0f, 175f), new Vector2f(256f, 15f));
+        
+        label = new UIText();
+        label.setVisible(true);
+        label.setColor(Color.black);
+        label.setCroped(false);
+        label.setPosition(new Vector2f(getPosition().x, 20f));
+        label.setColor(Color.white);
 
-        _label = new UIText();
-        _label.setVisible(true);
-        _label.setColor(Color.black);
-        _label.setCroped(false);
-        _label.setPosition(new Vector2f(getPosition().x, 20f));
-        _label.setColor(Color.white);
+        progressLine = new UIProgressLine(new Vector2f(248f, 9f));
+        progressLine.setVisible(true);
+        progressLine.setPosition(new Vector2f(4f,3f));
+        progressLine.updateProgress();
 
-        _progressLine = new UIProgressLine(new Vector2f(248f, 9f));
-        _progressLine.setVisible(true);
-        _progressLine.setPosition(new Vector2f(4f,3f));
-
-        addDisplayElement(_label);
-        addDisplayElement(_progressLine);
-
+        addDisplayElement(label);
+        addDisplayElement(progressLine);
     }
 
     @Override
     public void layout() {
-    	super.layout();
-    	
-    	if (_label != null)
-    		_label.getPosition().x = (getSize().x - _label.getTextWidth())/2;
+        super.layout();
+        
+        if (label != null)
+            label.getPosition().x = (getSize().x - label.getTextWidth())/2;
     }
 
     public int getValue() {
-        return _value;
+        return value;
     }
 
     public void setValue(int value) {
-        _value = value;
-        setCropMargin(new Vector4f(0f, -(getSize().x - getSize().x * (_value/100f)), 0f, 0f));
+        this.value = value;
+        
+        progressLine.updateProgress();
     }
 
     public void setTextColor(Color color) {
-        _label.setColor(color);
+        label.setColor(color);
     }
     
     public void setText(String text){
-        _label.setText(text);
+        label.setText(text);
         
         layout();
     }
-
-    private class UIProgressLine extends UIDisplayContainer {
-        public UIProgressLine(Vector2f size){
-            setSize(size);
-            setStyle("background-image", "engine:gui_menu 248/512 9/512 0 190/512");
-        }
-    }
-
 }
 

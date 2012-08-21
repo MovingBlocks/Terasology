@@ -19,14 +19,12 @@ import org.lwjgl.opengl.Display;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.modes.StateSinglePlayer;
-import org.terasology.asset.AssetManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.world.WorldInfo;
 import org.terasology.world.WorldUtil;
 import org.terasology.rendering.gui.components.UIButton;
-import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UIInput;
 import org.terasology.rendering.gui.components.UIList;
 import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
@@ -35,6 +33,8 @@ import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 
 import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -49,7 +49,6 @@ import java.util.logging.Logger;
 public class UIMenuSelectWorld extends UIDisplayWindow {
     private Logger logger = Logger.getLogger(getClass().getName());
 
-    final UIImageOverlay overlay;
     final UIList list;
     final UIButton goToBack;
     final UIButton createNewWorld;
@@ -57,15 +56,15 @@ public class UIMenuSelectWorld extends UIDisplayWindow {
     final UIButton deleteFromList;
 
     public UIMenuSelectWorld() {
+        setBackgroundImage("engine:menubackground");
         setModal(true);
         maximize();
-        
-        overlay = new UIImageOverlay(AssetManager.loadTexture("engine:menuBackground"));
-        overlay.setVisible(true);
 
         list = new UIList(new Vector2f(512f, 256f));
         list.setVisible(true);
-
+        list.setBorderSolid(2f, 0x1E, 0x1E, 0x1E, 1.0f);
+        list.setBackgroundImage("engine:gui_menu", new Vector2f(264f, 18f), new Vector2f(159f, 63f));
+        list.setBorderImage("engine:gui_menu", new Vector2f(256f, 0f), new Vector2f(175f, 88f), new Vector4f(16f, 7f, 7f, 7f));
         list.addDoubleClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
@@ -139,7 +138,6 @@ public class UIMenuSelectWorld extends UIDisplayWindow {
 
         fillList();
 
-        addDisplayElement(overlay);
         addDisplayElement(list, "list");
         addDisplayElement(loadFromList, "loadFromListButton");
         addDisplayElement(goToBack, "goToBackButton");
@@ -157,7 +155,7 @@ public class UIMenuSelectWorld extends UIDisplayWindow {
             list.centerHorizontally();
             list.getPosition().y = 230f;
     
-            createNewWorld.getPosition().x = list.getPosition().x;
+            createNewWorld.getPosition().x = list.getPosition().x + 10;
             createNewWorld.getPosition().y = list.getPosition().y + list.getSize().y + 32f;
     
             loadFromList.getPosition().x = createNewWorld.getPosition().x + createNewWorld.getSize().x + 15f;

@@ -87,7 +87,7 @@ public class UIDisplayRenderer extends UIDisplayContainer {
                 if (_displayElements.get(i).isVisible()) {
                     return (UIDisplayWindow) _displayElements.get(i);
                 }
-			}
+            }
         }
         
         return null;
@@ -103,7 +103,7 @@ public class UIDisplayRenderer extends UIDisplayContainer {
         if (windowPosition != -1) {
             Collections.rotate(_displayElements.subList(windowPosition, _displayElements.size()), -1);
             
-            window.setVisible(true);
+            window.open();
         }
     }
 }

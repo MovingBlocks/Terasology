@@ -22,7 +22,6 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.components.UIButton;
-import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
@@ -36,7 +35,6 @@ import org.terasology.rendering.gui.framework.events.ClickListener;
  */
 public class UIMenuMain extends UIDisplayWindow {
 
-    private final UIImageOverlay _overlay;
     private final UIGraphicsElement _title;
 
 
@@ -47,6 +45,7 @@ public class UIMenuMain extends UIDisplayWindow {
     final UIText _version;
 
     public UIMenuMain() {
+        setBackgroundImage("engine:menubackground");
         setModal(true);
         maximize();
         
@@ -87,10 +86,6 @@ public class UIMenuMain extends UIDisplayWindow {
             }
         });
 
-        _overlay = new UIImageOverlay(AssetManager.loadTexture("engine:menuBackground"));
-        _overlay.setVisible(true);
-
-        addDisplayElement(_overlay);
         addDisplayElement(_title);
         addDisplayElement(_version);
         addDisplayElement(_configButton, "configButton");

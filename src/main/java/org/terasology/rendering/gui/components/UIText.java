@@ -40,8 +40,8 @@ import org.terasology.rendering.gui.framework.events.ChangedListener;
  */
 public class UIText extends UIDisplayElement {
 
-	private final ArrayList<ChangedListener> _changedListeners = new ArrayList<ChangedListener>();
-    protected String _text = "";
+    private final ArrayList<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
+    protected String text = "";
 
     private Color _shadowColor = new Color(Color.black);
     private Color _color = new Color(Color.white);
@@ -59,7 +59,7 @@ public class UIText extends UIDisplayElement {
     }
 
     public UIText(String text) {
-        _text = text;
+        this.text = text;
     }
 
     public UIText(Vector2f position) {
@@ -75,9 +75,9 @@ public class UIText extends UIDisplayElement {
         _workaroundTexture.bind();
 
         if (_shadowed)
-            _font.drawString(_shadowOffset.x, _shadowOffset.y, _text, _shadowColor);
+            _font.drawString(_shadowOffset.x, _shadowOffset.y, text, _shadowColor);
 
-        _font.drawString(0, 0, _text, _color);
+        _font.drawString(0, 0, text, _color);
 
         // TODO: Also ugly..
         glDisable(GL11.GL_TEXTURE_2D);
@@ -90,23 +90,23 @@ public class UIText extends UIDisplayElement {
 
     }
     
-	@Override
-	public void layout() {
+    @Override
+    public void layout() {
 
-	}
-	
-	private void notifyChangedListeners() {
-		for (ChangedListener listener : _changedListeners) {
-			listener.changed(this);
-		}
-	}
+    }
+    
+    private void notifyChangedListeners() {
+        for (ChangedListener listener : changedListeners) {
+            listener.changed(this);
+        }
+    }
 
     public String getText() {
-        return _text;
+        return text;
     }
 
     public void setText(String text) {
-        _text = text;
+        this.text = text;
         notifyChangedListeners();
     }
 
@@ -143,11 +143,11 @@ public class UIText extends UIDisplayElement {
     }
 
     public int getTextHeight() {
-        return _font.getHeight(_text);
+        return _font.getHeight(text);
     }
 
     public int getTextWidth() {
-        return _font.getWidth(_text);
+        return _font.getWidth(text);
     }
 
     public Vector2f calcCenterPosition() {
@@ -155,11 +155,11 @@ public class UIText extends UIDisplayElement {
         return new Vector2f(Display.getWidth() / 2 - getTextWidth() / 2, Display.getHeight() / 2 - getTextHeight());
     }
 
-	public void addChangedListener(ChangedListener listener) {
-        _changedListeners.add(listener);
+    public void addChangedListener(ChangedListener listener) {
+        changedListeners.add(listener);
     }
 
     public void removeChangedListener(ChangedListener listener) {
-    	_changedListeners.remove(listener);
+        changedListeners.remove(listener);
     }
 }

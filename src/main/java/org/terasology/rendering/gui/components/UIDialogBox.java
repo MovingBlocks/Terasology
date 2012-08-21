@@ -16,121 +16,166 @@
 package org.terasology.rendering.gui.components;
 
 import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+import org.newdawn.slick.Color;
+import org.terasology.asset.AssetManager;
+import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
+import org.terasology.rendering.gui.framework.UIGraphicsElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 
-
+/**
+ * 
+ *
+ * TODO clean this up. Remove UIDialogBackground -> should use the style UIStyleBackgroundSplit
+ */
 public class UIDialogBox extends UIDisplayWindow {
-    private UIWindowTitle _title;
-    private UIButton _close;
-    private Vector2f _prevMousePos = null;
-    private boolean _dragged = false;
+    private UIDialogBackground container;
+    private UIButton closeButton;
+    private Vector2f prevMousePos = null;
+    private boolean dragged = false;
+    private float titleWidth = 300f;
+    
+    private class UIDialogBackground extends UIDisplayContainer {
+        private UIGraphicsElement leftBackground;
+        private UIGraphicsElement centerBackground;
+        private UIGraphicsElement rightBackground;
+        private UIText text;
+
+        public UIDialogBackground(Vector2f size, String title) {
+            setSize(size);
+
+            text = new UIText(getPosition());
+            text.setColor(Color.orange);
+            text.setVisible(true);
+            
+            setTitle(title);
+
+            leftBackground = new UIGraphicsElement(AssetManager.loadTexture("engine:gui_menu"));
+            leftBackground.setSize(new Vector2f(7f, 19f));
+            leftBackground.setTextureSize(new Vector2f(7f, 19f));
+            leftBackground.setTextureOrigin(new Vector2f(111f, 155f));
+            leftBackground.setVisible(true);
+
+            centerBackground = new UIGraphicsElement(AssetManager.loadTexture("engine:gui_menu"));
+            centerBackground.setSize(new Vector2f(getSize().x - 19f, 19f));
+            centerBackground.setTextureSize(new Vector2f(51f, 19f));
+            centerBackground.setTextureOrigin(new Vector2f(118f, 155f));
+            centerBackground.getPosition().x += leftBackground.getSize().x;
+            centerBackground.setVisible(true);
+
+            rightBackground = new UIGraphicsElement(AssetManager.loadTexture("engine:gui_menu"));
+            rightBackground.setSize(new Vector2f(8f, 19f));
+            rightBackground.setTextureSize(new Vector2f(8f, 19f));
+            rightBackground.setTextureOrigin(new Vector2f(189f, 155f));
+            rightBackground.setVisible(true);
+            rightBackground.getPosition().x = centerBackground.getPosition().x + centerBackground.getSize().x;
+            addDisplayElement(leftBackground);
+            addDisplayElement(centerBackground);
+            addDisplayElement(rightBackground);
+            addDisplayElement(text);
+        }
+
+        public void setTitle(String title) {
+            text.setText(title);
+            text.getPosition().x = getSize().x / 2 - text.getTextWidth() / 2;
+        }
+
+        public void resize() {
+            centerBackground.setSize(new Vector2f(getSize().x - 19f, 19f));
+            centerBackground.getPosition().x = leftBackground.getPosition().x + leftBackground.getSize().x;
+            rightBackground.getPosition().x = centerBackground.getPosition().x + centerBackground.getSize().x;
+            text.getPosition().x = getSize().x / 2 - text.getTextWidth() / 2;
+        }
+    }
 
     public UIDialogBox(String title, Vector2f size) {
         super();
         setSize(size);
+        setBackgroundImage("engine:gui_menu", new Vector2f(260f, 92f), new Vector2f(168f, 76f));
+        setBorderImage("engine:gui_menu", new Vector2f(256f, 90f), new Vector2f(175f, 88f), new Vector4f(4f, 4f, 4f, 4f));
 
-        _title = new UIWindowTitle(new Vector2f(getSize().x * 0.55f, 19f), title);
-        _title.setVisible(true);
-        _title.getPosition().x = (getPosition().x + size.x / 2f) - _title.getSize().x / 2;
-        _title.setTitle(title);
-        _title.addMouseButtonListener(new MouseButtonListener() {	
-			@Override
-			public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
+        container = new UIDialogBackground(new Vector2f(titleWidth, 19f), title);
+        container.setVisible(true);
+        container.getPosition().set((getPosition().x + size.x / 2f) - container.getSize().x / 2, 5f);
+        container.setTitle(title);
+        container.addMouseButtonListener(new MouseButtonListener() {    
+            @Override
+            public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
 
-			}
-			
-			@Override
-			public void up(UIDisplayElement element, int button, boolean intersect) {
-				_dragged = false;
-				_prevMousePos = null;
-			}
-			
-			@Override
-			public void down(UIDisplayElement element, int button, boolean intersect) {
-				if (intersect) {
-					_dragged = true;
-                    if (_prevMousePos == null) {
-                        _prevMousePos = new Vector2f(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()));
+            }
+            
+            @Override
+            public void up(UIDisplayElement element, int button, boolean intersect) {
+                dragged = false;
+                prevMousePos = null;
+            }
+            
+            @Override
+            public void down(UIDisplayElement element, int button, boolean intersect) {
+                if (intersect) {
+                    dragged = true;
+                    if (prevMousePos == null) {
+                        prevMousePos = new Vector2f(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()));
                     }
-				}
-			}
-		});
-        _title.addMouseMoveListener(new MouseMoveListener() {
-			@Override
-			public void move(UIDisplayElement element) {
-		        if (_dragged) {
-			        Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
-		            drag(new Vector2f(_prevMousePos.x - mousePos.x, _prevMousePos.y - mousePos.y));
-		            _prevMousePos = new Vector2f(mousePos);
-		        }
-			}
-			
-			@Override
-			public void leave(UIDisplayElement element) {
-				
-			}
-			
-			@Override
-			public void hover(UIDisplayElement element) {
-				
-			}
-			
-			@Override
-			public void enter(UIDisplayElement element) {
-				
-			}
-		});
+                }
+            }
+        });
+        container.addMouseMoveListener(new MouseMoveListener() {
+            @Override
+            public void move(UIDisplayElement element) {
+                if (dragged) {
+                    Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
+                    drag(new Vector2f(prevMousePos.x - mousePos.x, prevMousePos.y - mousePos.y));
+                    prevMousePos = new Vector2f(mousePos);
+                }
+            }
+            
+            @Override
+            public void leave(UIDisplayElement element) {
+                
+            }
+            
+            @Override
+            public void hover(UIDisplayElement element) {
+                
+            }
+            
+            @Override
+            public void enter(UIDisplayElement element) {
+                
+            }
+        });
 
-        _close = new UIButton(new Vector2f(19f, 19f), UIButton.eButtonType.NORMAL);
-        _close.getPosition().x = getSize().x - 25f;
-        _close.setVisible(true);
-        _close.getLabel().setText("");
+        closeButton = new UIButton(new Vector2f(19f, 19f), UIButton.eButtonType.NORMAL);
+        closeButton.getPosition().set(getSize().x - closeButton.getSize().x - 2, 2);
+        closeButton.setVisible(true);
+        closeButton.getLabel().setText("");
+        closeButton.setTexture("engine:gui_menu");
+        closeButton.setNormalState(new Vector2f(73f, 155f), new Vector2f(19f, 19f));
+        closeButton.setHoverState(new Vector2f(54f, 155f), new Vector2f(19f, 19f));
+        closeButton.setPressedState(new Vector2f(92f, 155f), new Vector2f(19f, 19f));
+        closeButton.addClickListener(new ClickListener() {
+            @Override
+            public void click(UIDisplayElement element, int button) {
+                close();
+            }
+        });
 
-        _close.addClickListener(new ClickListener() {
-			@Override
-			public void click(UIDisplayElement element, int button) {
-				close(true);
-			}
-		});
-
-        windowStyleSetup();
-
-        addDisplayElement(_close);
-        addDisplayElement(_title);
+        addDisplayElement(closeButton);
+        addDisplayElement(container);
     }
 
     public void resize() {
-        _title.setSize(new Vector2f(getSize().x * 0.55f, 19f));
-        _title.getPosition().x = getSize().x / 2f - _title.getSize().x / 2;
-        _title.resize();
-        _style = null;
-        _close.getPosition().x = getSize().x - 25f;
-        windowStyleSetup();
+        container.setSize(new Vector2f(titleWidth, 19f));
+        container.getPosition().set((getPosition().x + getSize().x / 2f) - container.getSize().x / 2, 5f);
+        container.resize();
+        closeButton.getPosition().set(getSize().x - closeButton.getSize().x - 2, 2);
     }
-
-    public void windowStyleSetup() {
-        setStyle("border-image-top", "engine:gui_menu 168/512 5/512 260/512 89/512 5");
-        setStyle("border-image-right", "engine:gui_menu 4/512 81/512 428/512 94/512 4");
-        setStyle("border-image-bottom", "engine:gui_menu 168/512 4/512 260/512 175/512 4");
-        setStyle("border-image-left", "engine:gui_menu 4/512 81/512 256/512 94/512 4");
-
-        setStyle("border-corner-topleft", "engine:gui_menu 256/512 89/512");
-        setStyle("border-corner-topright", "engine:gui_menu 428/512 89/512");
-        setStyle("border-corner-bottomright", "engine:gui_menu 428/512 175/512");
-        setStyle("border-corner-bottomleft", "engine:gui_menu 256/512 175/512");
-
-        setStyle("background-image", "engine:gui_menu 168/512 76/512 260/512 94/512");
-
-        _close.setClassStyle("button", "background-image: engine:gui_menu 19/512 19/512 73/512 155/512");
-        _close.setClassStyle("button-mouseover", "background-image: engine:gui_menu 19/512 19/512 54/512 155/512");
-        _close.setClassStyle("button-mouseclick", "background-image: engine:gui_menu 19/512 19/512 92/512 155/512");
-    }
-
 }

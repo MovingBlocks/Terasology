@@ -25,20 +25,20 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
  */
 public interface MouseButtonListener {
 
-	/**
-	 * Mouse up event. Will be called if mouse was released anywhere in the UI.
-	 * @param element The element of the event.
-	 * @param button The button. Left = 0, Right = 1, Middle = 2.
+    /**
+     * Mouse up event. Will be called if mouse was released anywhere in the UI.
+     * @param element The element of the event.
+     * @param button The button. Left = 0, Right = 1, Middle = 2.
      * @param intersect True if the current mouse position intersects with the element.
-	 */ 
+     */ 
     public void up(UIDisplayElement element, int button, boolean intersect);
     
-	/**
-	 * Mouse down event. Will be called if mouse was pressed anywhere in the UI.
-	 * @param element The element of the event.
-	 * @param button The button. Left = 0, Right = 1, Middle = 2.
-	 * @param intersect True if the current mouse position intersects with the element.
-	 */
+    /**
+     * Mouse down event. Will be called if mouse was pressed anywhere in the UI.
+     * @param element The element of the event.
+     * @param button The button. Left = 0, Right = 1, Middle = 2.
+     * @param intersect True if the current mouse position intersects with the element.
+     */
     public void down(UIDisplayElement element, int button, boolean intersect);
     
     /**

@@ -28,9 +28,10 @@ public class UIScreenBook extends UIDisplayWindow {
     private final UIGraphicsElement background;
 
     public UIScreenBook() {
-    	setModal(true);
-    	setCloseBinds(new String[] {UseItemButton.ID});
-    	setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
+        setBackgroundColor(0x00, 0x00, 0x00, 0.75f);
+        setModal(true);
+        setCloseBinds(new String[] {UseItemButton.ID});
+        setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
         maximize();
         
         background = new UIGraphicsElement(AssetManager.loadTexture("engine:openbook"));
@@ -48,7 +49,7 @@ public class UIScreenBook extends UIDisplayWindow {
         super.layout();
         
         if (background != null) {
-        	background.center();
+            background.center();
         }
     }
 }

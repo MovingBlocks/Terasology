@@ -19,9 +19,9 @@ import javax.vecmath.Vector2f;
 
 import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetManager;
-import org.terasology.rendering.gui.components.UIImageOverlay;
 import org.terasology.rendering.gui.components.UIProgressBar;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
+import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 /**
  * Simple status screen with one sole text label usable for status notifications.
@@ -30,20 +30,21 @@ import org.terasology.rendering.gui.framework.UIDisplayWindow;
  */
 public class UIScreenLoading extends UIDisplayWindow {
 
-    final UIImageOverlay _overlay;
+    final UIGraphicsElement background;
     final UIProgressBar _progressBar;
 
     public UIScreenLoading() {
+        setBackgroundImage("engine:loadingbackground");
         setModal(true);
-        setVisible(true);
+        maximize();
         
-        _overlay = new UIImageOverlay(AssetManager.loadTexture("engine:loadingBackground"));
-        _overlay.setVisible(true);
+        background = new UIGraphicsElement(AssetManager.loadTexture("engine:menuBackground"));
+        background.setVisible(true);
 
-        _progressBar = new UIProgressBar(new Vector2f(256f, 15f));
+        _progressBar = new UIProgressBar();
         _progressBar.setVisible(true);
 
-        addDisplayElement(_overlay);
+        addDisplayElement(background);
         addDisplayElement(_progressBar);
 
         layout();

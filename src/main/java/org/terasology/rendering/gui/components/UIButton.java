@@ -15,6 +15,9 @@
  */
 package org.terasology.rendering.gui.components;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.vecmath.Vector2f;
 
 import org.terasology.asset.AssetType;
@@ -36,9 +39,11 @@ public class UIButton extends UIDisplayContainer {
 
     private final UIText _label;
     
-	public enum eButtonType {NORMAL, TOGGLE};
+    public enum eButtonType {NORMAL, TOGGLE};
     private boolean _toggleState = false;
     private eButtonType _buttonType;
+    
+    private final Map<String, Vector2f[]> states = new HashMap<String, Vector2f[]>();
 
     /**
      * Create a simple button, where 2 types are possible. The normal button and the toggle button.
@@ -49,114 +54,168 @@ public class UIButton extends UIDisplayContainer {
         setSize(size);
         
         _buttonType = buttonType;
+       
+        //default button
+        setTexture("engine:gui_menu");
+        setNormalState(new Vector2f(0f, 0f), new Vector2f(256f, 30f));
+        setHoverState(new Vector2f(0f, 30f), new Vector2f(256f, 30f));
+        setPressedState(new Vector2f(0f, 60f), new Vector2f(256f, 30f));
         
-        //TODO give user of the UIButton component more styling options. deliver these styles over the constructor?
-        setClassStyle("button", "background-image: engine:gui_menu 256/512 30/512 0 0");
-        setClassStyle("button-mouseover", "background-image: engine:gui_menu 256/512 30/512 0 30/512");
-        setClassStyle("button-mouseclick", "background-image: engine:gui_menu 256/512 30/512 0 60/512");
-        setClassStyle("button");
+        //default state
+        setBackgroundImage(states.get("normal")[0], states.get("normal")[1]);
+
+        addMouseMoveListener(new MouseMoveListener() {    
+            @Override
+            public void leave(UIDisplayElement element) {
+                if (_buttonType == eButtonType.TOGGLE) {
+                    if (_toggleState) {
+                        setBackgroundImage(states.get("pressed")[0], states.get("pressed")[1]);
+                    } else {
+                        setBackgroundImage(states.get("normal")[0], states.get("normal")[1]);
+                    }
+                }
+                else {
+                    setBackgroundImage(states.get("normal")[0], states.get("normal")[1]);
+                }
+            }
+            
+            @Override
+            public void hover(UIDisplayElement element) {
+
+            }
+            
+            @Override
+            public void enter(UIDisplayElement element) {
+                AudioManager.play(new AssetUri(AssetType.SOUND, "engine:click"), 1.0f);
+                if (_buttonType == eButtonType.NORMAL) {
+                    setBackgroundImage(states.get("hover")[0], states.get("hover")[1]);
+                }
+            }
+
+            @Override
+            public void move(UIDisplayElement element) {
+
+            }
+        });
         
-        addMouseMoveListener(new MouseMoveListener() {	
-			@Override
-			public void leave(UIDisplayElement element) {
-				if (_buttonType == eButtonType.TOGGLE) {
-					if (_toggleState)
-						setClassStyle("button-mouseclick");
-					else
-						setClassStyle("button");
-				}
-				else
-					setClassStyle("button");
-			}
-			
-			@Override
-			public void hover(UIDisplayElement element) {
+        addMouseButtonListener(new MouseButtonListener() {                    
+            @Override
+            public void up(UIDisplayElement element, int button, boolean intersect) {
+                if (_buttonType == eButtonType.NORMAL) {
+                    setBackgroundImage(states.get("normal")[0], states.get("normal")[1]);
+                }
+            }
+            
+            @Override
+            public void down(UIDisplayElement element, int button, boolean intersect) {
+                if (intersect) {
+                    if (_buttonType == eButtonType.TOGGLE) {
+                        if (_toggleState) {
+                            setBackgroundImage(states.get("normal")[0], states.get("normal")[1]);
+                            _toggleState = false;
+                        } else {
+                            setBackgroundImage(states.get("pressed")[0], states.get("pressed")[1]);
+                            _toggleState = true;
+                        }
+                    } else {
+                        setBackgroundImage(states.get("pressed")[0], states.get("pressed")[1]);
+                    }
+                }
+            }
+            
+            @Override
+            public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
 
-			}
-			
-			@Override
-			public void enter(UIDisplayElement element) {
-	            AudioManager.play(new AssetUri(AssetType.SOUND, "engine:click"), 1.0f);
-	            if (_buttonType == eButtonType.NORMAL)
-	            	setClassStyle("button-mouseover");
-			}
-
-			@Override
-			public void move(UIDisplayElement element) {
-
-			}
-		});
-        
-        addMouseButtonListener(new MouseButtonListener() {					
-			@Override
-			public void up(UIDisplayElement element, int button, boolean intersect) {
-				if (_buttonType == eButtonType.NORMAL)
-					setClassStyle("button");
-			}
-			
-			@Override
-			public void down(UIDisplayElement element, int button, boolean intersect) {
-				if (intersect) {
-					if (_buttonType == eButtonType.TOGGLE) {
-						if (_toggleState) {
-							setClassStyle("button");
-							_toggleState = false;
-						}
-						else {
-							setClassStyle("button-mouseclick");
-							_toggleState = true;
-						}
-					}
-					else
-						setClassStyle("button-mouseclick");
-				}
-			}
-			
-			@Override
-			public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
-
-			}
-		});
+            }
+        });
         
         _label = new UIText("Untitled");
         _label.setVisible(true);
         _label.addChangedListener(new ChangedListener() {
-			@Override
-			public void changed(UIDisplayElement element) {
-				layout();
-			}
-		});
+            @Override
+            public void changed(UIDisplayElement element) {
+                layout();
+            }
+        });
         
         addDisplayElement(_label);
     }
 
     @Override
     public void layout() {
-    	super.layout();
-    	
-    	if (_label != null) {
-    		_label.setPosition(new Vector2f(getSize().x / 2 - getLabel().getTextWidth() / 2, getSize().y / 2 - getLabel().getTextHeight() / 2));
-    	}
+        super.layout();
+        
+        if (_label != null) {
+            _label.setPosition(new Vector2f(getSize().x / 2 - getLabel().getTextWidth() / 2, getSize().y / 2 - getLabel().getTextHeight() / 2));
+        }
     }
 
     public UIText getLabel() {
         return _label;
     }
     
+    /**
+     * Set the texture of the button. Use setNormalTexture, setHoverTexture and setPressedTexture to configure the texture origin and size of the different states.
+     * @param texture The texture to load by the AssetManager.
+     */
+    public void setTexture(String texture) {
+        setBackgroundImage(texture);
+    }
+    
+    /**
+     * Set the normal states texture origin and size. Set the texture by using setTexture.
+     * @param origin The origin.
+     * @param size The size.
+     */
+    public void setNormalState(Vector2f origin, Vector2f size) {
+        states.remove("normal");
+        states.put("normal", new Vector2f[] {origin, size});
+        
+        //set default state
+        setBackgroundImage(states.get("normal")[0], states.get("normal")[1]);
+    }
+    
+    /**
+     * Set the hover states texture origin and size. Set the texture by using setTexture. In toggle mode this texture will be ignored.
+     * @param origin The origin.
+     * @param size The size.
+     */
+    public void setHoverState(Vector2f origin, Vector2f size) {
+        states.remove("hover");
+        states.put("hover", new Vector2f[] {origin, size});
+        
+        //set default state
+        setBackgroundImage(states.get("normal")[0], states.get("normal")[1]);
+    }
+    
+    /**
+     * Set the pressed states texture origin and size. Set the texture by using setTexture.
+     * @param origin The origin.
+     * @param size The size.
+     */
+    public void setPressedState(Vector2f origin, Vector2f size) {
+        states.remove("pressed");
+        states.put("pressed", new Vector2f[] {origin, size});
+        
+        //set default state
+        setBackgroundImage(states.get("normal")[0], states.get("normal")[1]);
+    }
+    
     public boolean getToggleState() {
-		return _toggleState;
-	}
+        return _toggleState;
+    }
     
     /**
      * Set the state of the toggle button. Only has an affect if the button was created as an toggle button.
      * @param state True to set the pressed state.
      */
     public void setToggleState(boolean state) {
-    	_toggleState = state;
-    	
-		if (_toggleState)
-			setClassStyle("button-mouseclick");
-		else
-			setClassStyle("button");
+        _toggleState = state;
+        
+        if (_toggleState) {
+            setBackgroundImage(states.get("pressed")[0], states.get("pressed")[1]);
+        } else {
+            setBackgroundImage(states.get("normal")[0], states.get("normal")[1]);
+        }
     }
 }

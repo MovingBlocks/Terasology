@@ -94,25 +94,18 @@ public class StateMainMenu implements GameState {
 
         //setup the GUI
         _mainMenu = new UIMenuMain();
-        _mainMenu.setVisible(true);
         
         _selectWorldMenu = new UIMenuSelectWorld();
-        _selectWorldMenu.setVisible(false);
         
         _configMenu = new UIMenuConfig();
-        _configMenu.setVisible(false);
         
         _configMenuVideo = new UIMenuConfigVideo();
-        _configMenuVideo.setVisible(false);
         
         _configMenuAudio = new UIMenuConfigAudio();
-        _configMenuAudio.setVisible(false);
         
         _configMenuControls = new UIMenuConfigControls();
-        _configMenuControls.setVisible(false);
         
         _configMenuMods = new UIMenuConfigMods();
-        _configMenuMods.setVisible(false);
 
         GUIManager.getInstance().addWindow(_mainMenu, "menuMain");
         GUIManager.getInstance().addWindow(_selectWorldMenu, "selectWorld");

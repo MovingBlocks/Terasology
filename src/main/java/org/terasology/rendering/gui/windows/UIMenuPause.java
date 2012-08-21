@@ -25,7 +25,6 @@ import org.terasology.logic.LocalPlayer;
 import org.terasology.asset.AssetManager;
 import org.terasology.rendering.gui.components.UIButton;
 import org.terasology.rendering.gui.components.UIText;
-import org.terasology.rendering.gui.components.UITransparentOverlay;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
@@ -40,7 +39,6 @@ import javax.vecmath.Vector2f;
  */
 public class UIMenuPause extends UIDisplayWindow {
 
-    final UITransparentOverlay _overlay;
     final UIGraphicsElement _title;
 
     final UIButton _exitButton;
@@ -51,9 +49,11 @@ public class UIMenuPause extends UIDisplayWindow {
     final UIText _version;
 
     public UIMenuPause() {
+        setBackgroundColor(0x00, 0x00, 0x00, 0.75f);
+        setModal(true);
         setCloseBinds(new String[] {PauseButton.ID});
         setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
-        setModal(true);
+        maximize();
         
         _title = new UIGraphicsElement(AssetManager.loadTexture("engine:terasology"));
         _title.setVisible(true);
@@ -82,7 +82,7 @@ public class UIMenuPause extends UIDisplayWindow {
             public void click(UIDisplayElement element, int button) {
                 CoreRegistry.get(LocalPlayer.class).getEntity().send(new RespawnEvent());
                 
-                close(true);
+                close();
             }
         });
 
@@ -96,20 +96,16 @@ public class UIMenuPause extends UIDisplayWindow {
             }
         });
 
-        _overlay = new UITransparentOverlay();
-        _overlay.setVisible(true);
-
-
         _backToGameButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _backToGameButton.getLabel().setText("Back to game");
         _backToGameButton.setVisible(true);
         _backToGameButton.addClickListener(new ClickListener() {
             public void click(UIDisplayElement element, int button) {
-                close(true);
+                close();
             }
         });
 
-        addDisplayElement(_overlay);
+
         addDisplayElement(_title);
         addDisplayElement(_version);
         addDisplayElement(_exitButton);
