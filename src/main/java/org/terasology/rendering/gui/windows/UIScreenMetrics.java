@@ -60,7 +60,6 @@ public class UIScreenMetrics extends UIDisplayWindow {
         }
 
         update();
-        setVisible(true);
         setModal(false);
     }
 

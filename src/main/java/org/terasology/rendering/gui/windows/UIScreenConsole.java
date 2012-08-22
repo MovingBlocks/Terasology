@@ -92,7 +92,6 @@ public final class UIScreenConsole extends UIDisplayWindow {
         _helpText.setVisible(true);
 
         addDisplayElement(_helpText);
-        setVisible(false);
     }
 
     /**
@@ -145,7 +144,7 @@ public final class UIScreenConsole extends UIDisplayWindow {
         }
 
         if (ConsoleButton.ID.equals(event.getId())) {
-            setVisible(false);
+            close();
             event.consume();
         }
     }
@@ -201,7 +200,7 @@ public final class UIScreenConsole extends UIDisplayWindow {
 
             addToRingBuffer();
             resetDebugConsole();
-            setVisible(false);
+            close();
         } else {
             try {
                 _helpText.loadError();

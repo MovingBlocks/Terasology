@@ -48,7 +48,7 @@ import javax.vecmath.Vector3f;
 /**
  * A cell which can contain an item and supports drag and drop.
  * To move an item the item will be moved to a special transfer slot as item will be dragged. This slot is in the PlayerComponent class.
- * Therefore the item belongs to nobody as the transfer is ongoing and needs to be reseted as the action was interrupted.
+ * Therefore the item belongs to nobody as the transfer is ongoing and needs to be reseted if the action was interrupted.
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  * @see PlayerComponent
  */
@@ -229,13 +229,13 @@ public class UIItemCell extends UIDisplayContainer  {
         Texture guiTex = AssetManager.loadTexture("engine:gui");
         
         selectionRectangle = new UIGraphicsElement(guiTex);
-        selectionRectangle.getTextureSize().set(new Vector2f(24f / 256f, 24f / 256f));
-        selectionRectangle.getTextureOrigin().set(new Vector2f(0.0f, 23f / 256f));
+        selectionRectangle.setTextureSize(new Vector2f(24f, 24f));
+        selectionRectangle.setTextureOrigin(new Vector2f(0.0f, 23f));
         selectionRectangle.setSize(getSize());
         
         background = new UIGraphicsElement(guiTex);
-        background.getTextureSize().set(new Vector2f(20f / 256f, 20f / 256f));
-        background.getTextureOrigin().set(new Vector2f(1.0f / 256f, 1f / 256f));
+        background.setTextureSize(new Vector2f(20f, 20f));
+        background.setTextureOrigin(new Vector2f(1f, 1f));
         background.setSize(getSize());
         background.setVisible(true);
         background.setFixed(true);
@@ -301,8 +301,6 @@ public class UIItemCell extends UIDisplayContainer  {
                 sendToTransferSlot(null, (byte) 0);
             }
         }
-        
-        System.out.println("drop");
     }
     
     /**
@@ -421,6 +419,12 @@ public class UIItemCell extends UIDisplayContainer  {
 
             //notify component changed listeners
             targetCell.ownerEntity.saveComponent(ownerInventory);
+            
+            //some items in the item cell?
+            if (targetCell.itemEntity.exists() && !targetCell.itemLabel.isVisible()) {
+                //enable the label
+                targetCell.setLabelVisibility(true);
+            }
             
         }
     }
@@ -668,6 +672,12 @@ public class UIItemCell extends UIDisplayContainer  {
             //notify component changed listeners
             InventoryComponent sourceInventory = sourceCell.getOwnerEntity().getComponent(InventoryComponent.class);
             sourceCell.ownerEntity.saveComponent(sourceInventory);
+            
+            //removed all items from the item cell?
+            if (!sourceCell.itemEntity.exists() && sourceCell.itemLabel.isVisible()) {
+                //disable the label
+                sourceCell.setLabelVisibility(false);
+            }
         }
     }
     

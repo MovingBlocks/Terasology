@@ -23,8 +23,10 @@ import org.terasology.input.binds.InventoryButton;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.rendering.gui.components.UIItemContainer;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import org.terasology.rendering.gui.framework.events.WindowListener;
 
 /**
  * The player's inventory.
@@ -38,10 +40,27 @@ public class UIScreenInventory extends UIDisplayWindow {
     private UIGraphicsElement background;
 
     public UIScreenInventory() {
-    	setModal(true);
-    	setCloseBinds(new String[] {InventoryButton.ID});
-    	setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
-        setSize(new Vector2f(192.0f * 2.5f, 180.0f * 2.5f));
+        setBackgroundColor(0x00, 0x00, 0x00, 0.75f);
+        setModal(true);
+        setCloseBinds(new String[] {InventoryButton.ID});
+        setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
+        maximize();
+        
+        addWindowListener(new WindowListener() {
+            @Override
+            public void open(UIDisplayElement element) {
+                toolbar.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity(), 0, 8);
+                inventory.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity(), 9);
+                //TODO connect toolbar <-> inventory somehow to allow fast transfer.
+                
+                layout();
+            }
+            
+            @Override
+            public void close(UIDisplayElement element) {
+                
+            }
+        });
         
         toolbar = new UIItemContainer(9);
         toolbar.setVisible(true);
@@ -52,8 +71,8 @@ public class UIScreenInventory extends UIDisplayWindow {
         inventory.setCellMargin(new Vector2f(1, 1));
 
         background = new UIGraphicsElement(AssetManager.loadTexture("engine:inventory"));
-        background.setSize(getSize());
-        background.getTextureSize().set(new Vector2f(176.0f / 256.0f, 167.0f / 256.0f));
+        background.setSize(new Vector2f(192.0f * 2.5f, 180.0f * 2.5f));
+        background.setTextureSize(new Vector2f(176.0f, 167.0f));
         background.setVisible(true);
         
         addDisplayElement(background);
@@ -61,19 +80,6 @@ public class UIScreenInventory extends UIDisplayWindow {
         addDisplayElement(inventory);
 
         layout();
-    }
-    
-    @Override
-    public void setVisible(boolean visible) {
-        super.setVisible(visible);
-        
-        if (visible) {
-            toolbar.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity(), 0, 8);
-            inventory.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity(), 9);
-            //TODO connect toolbar <-> inventory somehow to allow fast transfer.
-            
-            layout();
-        }
     }
 
     @Override
@@ -83,9 +89,9 @@ public class UIScreenInventory extends UIDisplayWindow {
         if (inventory != null) {
             background.center();
             toolbar.center();
-            toolbar.getPosition().y += 254;
+            toolbar.getPosition().y += 178;
             inventory.center();
-            inventory.getPosition().y += 98;
+            inventory.getPosition().y += 72;
         }
     }
 }
