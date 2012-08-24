@@ -21,6 +21,7 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
+import org.terasology.math.TeraMath;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockItemComponent;
 import org.terasology.entitySystem.EntityManager;
@@ -77,12 +78,7 @@ public class ItemSystem implements EventHandlerSystem {
         BlockItemComponent blockItem = item.getComponent(BlockItemComponent.class);
 
         Side surfaceDir = Side.inDirection(event.getHitNormal());
-
-        Vector3f attachDir = surfaceDir.reverse().getVector3i().toVector3f();
-        Vector3f rawDirection = new Vector3f(event.getDirection());
-        float dot = rawDirection.dot(attachDir);
-        rawDirection.sub(new Vector3f(dot * attachDir.x, dot * attachDir.y, dot * attachDir.z));
-        Side secondaryDirection = Side.inDirection(rawDirection.x, rawDirection.y, rawDirection.z).reverse();
+        Side secondaryDirection = TeraMath.getSecondaryPlacementDirection(event.getDirection(), event.getHitNormal());
 
         if (!placeBlock(blockItem.blockFamily, event.getTarget().getComponent(BlockComponent.class).getPosition(), surfaceDir, secondaryDirection, blockItem)) {
             event.cancel();
@@ -163,7 +159,7 @@ public class ItemSystem implements EventHandlerSystem {
         }
 
         Block adjBlock = worldProvider.getBlock(blockPos.x, blockPos.y, blockPos.z);
-        if (!adjBlock.isPenetrable() || adjBlock.isTargetable()) {
+        if (!adjBlock.isReplacementAllowed() || adjBlock.isTargetable()) {
             return false;
         }
 

@@ -25,7 +25,27 @@ import org.terasology.math.Vector3i;
  */
 public interface BlockEntityRegistry {
 
+    /**
+     * @param blockPosition
+     * @return The block entity for the location if it exists, or the null entity
+     */
+    EntityRef getBlockEntityAt(Vector3i blockPosition);
+
+    /**
+     * @param blockPosition
+     * @return The block entity for the location, creating it if it doesn't exist
+     */
+    EntityRef getOrCreateBlockEntityAt(Vector3i blockPosition);
+
+    /**
+     * @param blockPosition
+     * @return The block controller entity for this location, or block entity if it exists.
+     */
     EntityRef getEntityAt(Vector3i blockPosition);
 
+    /**
+     * @param blockPosition
+     * @return The block controller entity for this location, or block entity.
+     */
     EntityRef getOrCreateEntityAt(Vector3i blockPosition);
 }

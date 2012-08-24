@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright 2012  Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,23 @@
  * limitations under the License.
  */
 
+package org.terasology.logic.door;
+
+import org.terasology.audio.Sound;
+import org.terasology.entitySystem.Component;
+import org.terasology.math.Side;
+import org.terasology.world.block.family.BlockFamily;
+
 /**
- * General template for plant blocks
+ * @author Immortius
  */
-{
-    "template" : true,
-    "attachmentAllowed" : false,
-    "hardness" : 1,
-    "shape" : "engine:billboard",
-    "supportRequired" : true,
-    "penetrable" : true,
-    "replacementAllowed" : true,
-    "translucent" : true,
-    "doubleSided" : true,
-    "debrisOnDestroy" : false
+public class DoorComponent implements Component {
+    public BlockFamily topBlockFamily;
+    public BlockFamily bottomBlockFamily;
+    public Side closedDirection;
+    public Side openDirection;
+    public Sound openSound;
+    public Sound closeSound;
+
+    public boolean isOpen;
 }

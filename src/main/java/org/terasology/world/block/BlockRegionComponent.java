@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright 2012  Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,21 @@
  * limitations under the License.
  */
 
-{
-    "shape" : "engine:door",
-    "rotation" : "horizontal",
-    "attachmentAllowed" : false
+package org.terasology.world.block;
+
+import org.terasology.entitySystem.Component;
+import org.terasology.math.Region3i;
+
+/**
+ * @author Immortius
+ */
+public class BlockRegionComponent implements Component {
+    public Region3i region = Region3i.EMPTY;
+    public boolean overrideBlockEntities = true;
+
+    public BlockRegionComponent() {}
+
+    public BlockRegionComponent(Region3i region) {
+        this.region = region;
+    }
 }

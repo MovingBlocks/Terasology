@@ -149,6 +149,8 @@ public class Icon {
         Icon shadowingotIcon = new Icon();
         //* BOWCRAFTING & FLETCHING *//
         Icon woodshaftIcon = new Icon();
+        //* Furniture *//
+        Icon doorIcon = new Icon();
 
         //* Minion bar *//
         Icon gelcubeIcon = new Icon();
@@ -222,6 +224,8 @@ public class Icon {
         shadowingotIcon.setAtlasPosition(8, 3);
         //Resources for Bowcraft-&-Fletching Atlas
         woodshaftIcon.setAtlasPosition(9, 1);
+        // Furniture
+        doorIcon.setAtlasPosition(6, 2);
         //gel icon (Will be moved to a Minion Icon Atlas)
         gelcubeIcon.setAtlasPosition(13, 0);
         minionIcon1.setAtlasPosition(15, 0);
@@ -281,6 +285,8 @@ public class Icon {
         icons.put("book", bookIcon);
         icons.put("redbook", redBookIcon);
         icons.put("bluebook", blueBookIcon);
+
+        icons.put("door", doorIcon);
 
         icons.put("apple", appleIcon);
         icons.put("bannana", bannanaIcon);

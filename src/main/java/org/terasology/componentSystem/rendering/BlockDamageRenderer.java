@@ -37,6 +37,7 @@ import org.lwjgl.opengl.GL11;
 import org.terasology.asset.AssetManager;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.components.HealthComponent;
+import org.terasology.math.Vector3i;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -49,6 +50,7 @@ import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.block.BlockRegionComponent;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -90,30 +92,47 @@ public class BlockDamageRenderer implements RenderSystem {
 
         for (EntityRef entity : entityManager.iteratorEntities(HealthComponent.class, BlockComponent.class)) {
             HealthComponent health = entity.getComponent(HealthComponent.class);
-            if (health.currentHealth == health.maxHealth) continue;
-
+            if (health.currentHealth == health.maxHealth) {
+                continue;
+            }
             BlockComponent blockComp = entity.getComponent(BlockComponent.class);
-            if (!worldProvider.isBlockActive(blockComp.getPosition())) continue;
-
-            glPushMatrix();
-            glTranslated(blockComp.getPosition().x - cameraPosition.x, blockComp.getPosition().y - cameraPosition.y, blockComp.getPosition().z - cameraPosition.z);
-
-            float offset = java.lang.Math.round((1.0f - (float) health.currentHealth / health.maxHealth) * 10.0f) * 0.0625f;
-
-            glMatrixMode(GL_TEXTURE);
-            glPushMatrix();
-            glTranslatef(offset, 0f, 0f);
-            glMatrixMode(GL_MODELVIEW);
-
-            overlayMesh.render();
-
-            glPopMatrix();
-
-            glMatrixMode(GL_TEXTURE);
-            glPopMatrix();
-            glMatrixMode(GL_MODELVIEW);
+            renderHealth(blockComp.getPosition(), health, cameraPosition);
+        }
+        for (EntityRef entity : entityManager.iteratorEntities(BlockRegionComponent.class, HealthComponent.class)) {
+            HealthComponent health = entity.getComponent(HealthComponent.class);
+            if (health.currentHealth == health.maxHealth) {
+                continue;
+            }
+            BlockRegionComponent blockRegion = entity.getComponent(BlockRegionComponent.class);
+            for (Vector3i blockPos : blockRegion.region) {
+                renderHealth(blockPos, health, cameraPosition);
+            }
         }
         glDisable(GL11.GL_BLEND);
+    }
+
+    private void renderHealth(Vector3i blockPos, HealthComponent health, Vector3f cameraPos) {
+        if (!worldProvider.isBlockActive(blockPos)) {
+            return;
+        }
+
+        glPushMatrix();
+        glTranslated(blockPos.x - cameraPos.x, blockPos.y - cameraPos.y, blockPos.z - cameraPos.z);
+
+        float offset = java.lang.Math.round((1.0f - (float) health.currentHealth / health.maxHealth) * 10.0f) * 0.0625f;
+
+        glMatrixMode(GL_TEXTURE);
+        glPushMatrix();
+        glTranslatef(offset, 0f, 0f);
+        glMatrixMode(GL_MODELVIEW);
+
+        overlayMesh.render();
+
+        glPopMatrix();
+
+        glMatrixMode(GL_TEXTURE);
+        glPopMatrix();
+        glMatrixMode(GL_MODELVIEW);
     }
 
     @Override

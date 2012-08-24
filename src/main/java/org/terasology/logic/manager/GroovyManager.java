@@ -222,6 +222,7 @@ public class GroovyManager {
 
         private void giveItem(String itemPrefabName) {
             Prefab prefab = CoreRegistry.get(PrefabManager.class).getPrefab(itemPrefabName);
+            System.out.println("Found prefab: " + prefab);
             if (prefab != null && prefab.getComponent(ItemComponent.class) != null) {
                 EntityRef item = CoreRegistry.get(EntityManager.class).create(prefab);
                 EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();

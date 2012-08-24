@@ -19,6 +19,7 @@ import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.*;
+import org.terasology.math.Vector3i;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockItemComponent;
 import org.terasology.components.rendering.MeshComponent;
@@ -52,6 +53,7 @@ import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.cameras.DefaultCamera;
 import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import org.terasology.world.block.BlockRegionComponent;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3d;
@@ -192,12 +194,14 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         // Display the block the player is aiming at
         if (Config.getInstance().isPlacingBox()) {
             EntityRef target = cameraTargetSystem.getTarget();
+            Vector3i blockPos = cameraTargetSystem.getTargetBlockPosition();
             AABB aabb = null;
             BlockComponent blockComp = target.getComponent(BlockComponent.class);
-            if (blockComp != null) {
-                Block block = worldProvider.getBlock(blockComp.getPosition());
+            BlockRegionComponent blockRegion = target.getComponent(BlockRegionComponent.class);
+            if (blockComp != null || blockRegion != null) {
+                Block block = worldProvider.getBlock(blockPos);
                 if (block.isTargetable()) {
-                    aabb = block.getBounds(blockComp.getPosition());
+                    aabb = block.getBounds(blockPos);
                 }
             } else {
                 MeshComponent mesh = target.getComponent(MeshComponent.class);
@@ -307,7 +311,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         if (localPlayerComp.isDead) return;
 
         EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayerComp.selectedTool);
-        attack(event.getTarget(), entity, selectedItemEntity);
+        attack(event.getTarget(), entity, selectedItemEntity, event.getTargetBlockPosition());
 
         lastInteraction = timer.getTimeInMs();
         localPlayerComp.handAnimation = 0.5f;
@@ -315,7 +319,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         event.consume();
     }
 
-    private void attack(EntityRef target, EntityRef player, EntityRef selectedItemEntity) {
+    private void attack(EntityRef target, EntityRef player, EntityRef selectedItemEntity, Vector3i blockTargetPos) {
         // TODO: Should send an attack event to self, and another system common to all creatures should handle this
         int damage = 1;
         ItemComponent item = selectedItemEntity.getComponent(ItemComponent.class);
@@ -323,8 +327,9 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             damage = item.baseDamage;
 
             BlockComponent blockComp = target.getComponent(BlockComponent.class);
-            if (blockComp != null) {
-                Block block = worldProvider.getBlock(blockComp.getPosition());
+            BlockRegionComponent blockRegionComponent = target.getComponent(BlockRegionComponent.class);
+            if (blockComp != null || blockRegionComponent != null) {
+                Block block = worldProvider.getBlock(blockTargetPos);
                 if (item.getPerBlockDamageBonus().containsKey(block.getBlockFamily().getURI().toString())) {
                     damage += item.getPerBlockDamageBonus().get(block.getBlockFamily().getURI().toString());
                 }
@@ -455,10 +460,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         ItemComponent item = selectedItemEntity.getComponent(ItemComponent.class);
         if (item != null && item.usage != ItemComponent.UsageType.NONE) {
             useItem(event.getTarget(), entity, selectedItemEntity, event.getHitPosition(), event.getHitNormal());
-        } else {
-            attack(event.getTarget(), entity, selectedItemEntity);
         }
-
         lastInteraction = timer.getTimeInMs();
         localPlayerComp.handAnimation = 0.5f;
         entity.saveComponent(localPlayerComp);

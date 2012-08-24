@@ -109,22 +109,18 @@ public class CameraTargetSystem implements ComponentSystem {
             newTarget = hitInfo.getEntity();
             hitPosition = hitInfo.getHitPoint();
             hitNormal = hitInfo.getHitNormal();
-
-            BlockComponent blockComp = newTarget.getComponent(BlockComponent.class);
-            if (blockComp != null) {
-                newBlockPos = new Vector3i(blockComp.getPosition());
+            if (hitInfo.isWorldHit()) {
+                newBlockPos = new Vector3i(hitInfo.getBlockPosition());
             }
         }
         if (!Objects.equal(target, newTarget) || lostTarget) {
             EntityRef oldTarget = target;
-
-            target = newTarget;
-            targetBlockPos = newBlockPos;
-
             oldTarget.send(new CameraOutEvent());
-            target.send(new CameraOverEvent());
-            localPlayer.getEntity().send(new CameraTargetChangedEvent(oldTarget, target));
+            newTarget.send(new CameraOverEvent());
+            localPlayer.getEntity().send(new CameraTargetChangedEvent(oldTarget, newTarget));
         }
+        target = newTarget;
+        targetBlockPos = newBlockPos;
     }
 
     public String toString() {
@@ -133,5 +129,12 @@ public class CameraTargetSystem implements ComponentSystem {
             return String.format("From: %f %f %f, Dir: %f %f %f, Hit %d %d %d %f %f %f", camera.getPosition().x, camera.getPosition().y, camera.getPosition().z, camera.getViewingDirection().x, camera.getViewingDirection().y, camera.getViewingDirection().z, targetBlockPos.x, targetBlockPos.y, targetBlockPos.z, hitPosition.x, hitPosition.y, hitPosition.z);
         }
         return "";
+    }
+
+    public Vector3i getTargetBlockPosition() {
+        if (targetBlockPos != null) {
+            return new Vector3i(targetBlockPos);
+        }
+        return new Vector3i(hitPosition, 0.5f);
     }
 }

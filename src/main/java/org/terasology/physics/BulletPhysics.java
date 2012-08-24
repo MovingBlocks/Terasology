@@ -211,7 +211,7 @@ public class BulletPhysics implements EventReceiver<BlockChangedEvent> {
         closest.collisionFilterMask = filter;
         _discreteDynamicsWorld.rayTest(from, to, closest);
         if (closest.userData instanceof Vector3i) {
-            return new HitResult(blockEntityRegistry.getOrCreateEntityAt((Vector3i)closest.userData), closest.hitPointWorld, closest.hitNormalWorld);
+            return new HitResult(blockEntityRegistry.getOrCreateEntityAt((Vector3i)closest.userData), closest.hitPointWorld, closest.hitNormalWorld, (Vector3i)closest.userData);
         } else if (closest.userData instanceof EntityRef) {
             return new HitResult((EntityRef) closest.userData, closest.hitPointWorld, closest.hitNormalWorld);
         }

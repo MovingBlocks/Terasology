@@ -117,7 +117,9 @@ Soundtrack and Sound Effects
 
 * Sunrise, Afternoon and Sunset composed by Karina Kireev.
 * Dimlight, Resurface and Other Side composed and produced by Exile.
-* Sound effects created by Exile.
+* Door Open sound by Pagancow, from FreeSound.org
+* Door Close sound by Fresco, from FreeSound.org
+* Other sound effects created by Exile.
 
 Additional Notes
 ================

@@ -136,6 +136,7 @@ public class Block {
     // Overall behavioural
     private boolean liquid = false;
     private boolean attachmentAllowed = true;
+    private boolean replacementAllowed = false;
     private byte hardness = 0x3;
     private boolean supportRequired = false;
     private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<Side>(Side.class);
@@ -310,6 +311,17 @@ public class Block {
 
     public void setWaving(boolean waving) {
         this.waving = waving;
+    }
+
+    /**
+     * @return Whether this block can be replaced freely by other blocks
+     */
+    public boolean isReplacementAllowed() {
+        return replacementAllowed;
+    }
+
+    public void setReplacementAllowed(boolean replacementAllowed) {
+        this.replacementAllowed = replacementAllowed;
     }
 
     /**
@@ -605,7 +617,9 @@ public class Block {
             }
         }
         mesh = tessellator.generateMesh(new AssetUri(AssetType.MESH, uri.toString()));
-        AssetManager.getInstance().addAssetTemporary(mesh.getURI(), mesh);
+        if (mesh != null) {
+            AssetManager.getInstance().addAssetTemporary(mesh.getURI(), mesh);
+        }
     }
 
     @Override

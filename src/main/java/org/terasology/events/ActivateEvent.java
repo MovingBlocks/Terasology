@@ -66,6 +66,10 @@ public class ActivateEvent extends AbstractEvent {
         return direction;
     }
 
+    public Vector3f getHitPosition() {
+        return hitPosition;
+    }
+
     public Vector3f getHitNormal() {
         return hitNormal;
     }

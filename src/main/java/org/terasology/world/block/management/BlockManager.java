@@ -31,6 +31,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.loader.BlockLoader;
 
 import com.google.common.collect.Maps;
@@ -88,6 +89,7 @@ public class BlockManager {
         air.setInvisible(true);
         air.setTargetable(false);
         air.setPenetrable(true);
+        air.setReplacementAllowed(true);
         air.setShadowCasting(false);
         air.setAttachmentAllowed(false);
         air.setHardness((byte) 0);
@@ -97,6 +99,7 @@ public class BlockManager {
         blocksById.put(air.getId(), air);
         blocksByUri.put(air.getURI(), air);
         idByUri.put(air.getURI(), air.getId());
+        familyByUri.put(air.getURI(), new SymmetricFamily(air.getURI(), air));
     }
 
     public void load(Map<String, Byte> knownBlockMappings) {
@@ -183,8 +186,9 @@ public class BlockManager {
 
     public Block getBlock(byte id) {
         Block result = blocksById.get(id);
-        if (result == null)
+        if (result == null) {
             return blocksById.get((byte) 0);
+        }
         return result;
     }
 

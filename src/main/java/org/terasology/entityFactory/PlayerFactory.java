@@ -17,6 +17,7 @@ package org.terasology.entityFactory;
 
 import javax.vecmath.Vector3f;
 
+import org.terasology.components.ItemComponent;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.PlayerComponent;
 import org.terasology.world.block.BlockItemComponent;
@@ -87,6 +88,12 @@ public class PlayerFactory {
         chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Brick"), 99)));
         chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Ice"), 99)));
         chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Plank"), 99)));
+
+        EntityRef doorItem = entityManager.create("core:door");
+        ItemComponent doorItemComp = doorItem.getComponent(ItemComponent.class);
+        doorItemComp.stackCount = 20;
+        doorItem.saveComponent(doorItemComp);
+        chestContents.send(new ReceiveItemEvent(doorItem));
 
         // Inner goodie chest
         EntityRef innerChest = blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("core:Chest"));

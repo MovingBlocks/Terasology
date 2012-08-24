@@ -25,6 +25,7 @@ import org.terasology.game.Timer;
 import org.terasology.logic.manager.GUIManager;
 
 import com.google.common.collect.Lists;
+import org.terasology.math.Vector3i;
 
 /**
  * A BindableButton is pseudo button that is controlled by one or more actual inputs (whether keys, mouse buttons or the
@@ -142,7 +143,7 @@ public class BindableButtonImpl implements BindableButton {
      * @param guiOnly     Is the gui consuming input
      * @return Whether the button's event has been consumed
      */
-    boolean updateBindState(boolean pressed, float delta, EntityRef localPlayer, EntityRef target, Vector3f hitPosition, Vector3f hitNormal, boolean keyConsumed, boolean guiOnly) {
+    boolean updateBindState(boolean pressed, float delta, EntityRef localPlayer, EntityRef target, Vector3i targetBlockPos, Vector3f hitPosition, Vector3f hitNormal, boolean keyConsumed, boolean guiOnly) {
         if (pressed) {
             activeInputs++;
             if (activeInputs == 1 && mode.isActivatedOnPress()) {
@@ -152,7 +153,7 @@ public class BindableButtonImpl implements BindableButton {
                 }
                 if (!keyConsumed) {
                     buttonEvent.prepare(id, ButtonState.DOWN, delta);
-                    buttonEvent.setTarget(target, hitPosition, hitNormal);
+                    buttonEvent.setTarget(target, targetBlockPos, hitPosition, hitNormal);
                     localPlayer.send(buttonEvent);
                     keyConsumed = buttonEvent.isConsumed();
                 }
@@ -165,7 +166,7 @@ public class BindableButtonImpl implements BindableButton {
                 }
                 if (!keyConsumed) {
                     buttonEvent.prepare(id, ButtonState.UP, delta);
-                    buttonEvent.setTarget(target, hitPosition, hitNormal);
+                    buttonEvent.setTarget(target, targetBlockPos, hitPosition, hitNormal);
                     localPlayer.send(buttonEvent);
                     keyConsumed = buttonEvent.isConsumed();
                 }
@@ -174,7 +175,7 @@ public class BindableButtonImpl implements BindableButton {
         return keyConsumed;
     }
 
-    void update(EntityRef localPlayer, float delta, EntityRef target, Vector3f hitPosition, Vector3f hitNormal) {
+    void update(EntityRef localPlayer, float delta, EntityRef target, Vector3i targetBlockPos, Vector3f hitPosition, Vector3f hitNormal) {
         long time = timer.getTimeInMs();
         if (repeating && getState() == ButtonState.DOWN && mode.isActivatedOnPress() && time - lastActivateTime > repeatTime) {
             lastActivateTime = time;
@@ -182,7 +183,7 @@ public class BindableButtonImpl implements BindableButton {
                 boolean consumed = triggerOnRepeat(delta, target);
                 if (!consumed) {
                     buttonEvent.prepare(id, ButtonState.REPEAT, delta);
-                    buttonEvent.setTarget(target, hitPosition, hitNormal);
+                    buttonEvent.setTarget(target, targetBlockPos, hitPosition, hitNormal);
                     localPlayer.send(buttonEvent);
                 }
             }

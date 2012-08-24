@@ -36,6 +36,7 @@ public class BlockDefinition {
     public byte hardness = 0x3;
 
     public boolean attachmentAllowed = true;
+    public boolean replacementAllowed = false;
     public boolean supportRequired = false;
 
     public boolean penetrable = false;
