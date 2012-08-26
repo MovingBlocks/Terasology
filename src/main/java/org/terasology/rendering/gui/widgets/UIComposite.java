@@ -2,7 +2,7 @@ package org.terasology.rendering.gui.widgets;
 
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.layout.UICompositeLayout;
+import org.terasology.rendering.gui.layout.Layout;
 
 /**
  * Composition of multiple display elements which can be arranged in a specific manner by setting a layout type. Similar to the SWT composite class.
@@ -11,7 +11,7 @@ import org.terasology.rendering.gui.layout.UICompositeLayout;
  */
 public class UIComposite extends UIDisplayContainer {
     
-    private UICompositeLayout compositeLayout;
+    private Layout compositeLayout;
     
     private void renderLayout() {
         if (compositeLayout != null) {
@@ -53,11 +53,11 @@ public class UIComposite extends UIDisplayContainer {
         applyLayout();
     }
      
-    public UICompositeLayout getLayout() {
+    public Layout getLayout() {
         return compositeLayout;
     }
     
-    public void setLayout(UICompositeLayout layout) {
+    public void setLayout(Layout layout) {
         compositeLayout = layout;
     }
     

@@ -7,7 +7,7 @@ import org.terasology.rendering.gui.framework.UIDisplayContainer;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  *
  */
-public interface UICompositeLayout {
+public interface Layout {
     /**
      * Arranges the child elements within a UIComposite class.
      * @param elements The child elements to arrange.

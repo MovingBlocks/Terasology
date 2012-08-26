@@ -25,7 +25,7 @@ import org.terasology.rendering.gui.framework.style.UIStyle;
  * @see org.eclipse.swt.layout.GridLayout
  */
 //TODO support for horizontal/vertical span. Could be kinda tricky.
-public class GridLayout implements UICompositeLayout {
+public class GridLayout implements Layout {
     
     //layout
     private Vector2f size = new Vector2f(0, 0);
