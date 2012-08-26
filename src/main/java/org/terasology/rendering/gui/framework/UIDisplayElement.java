@@ -104,8 +104,6 @@ public abstract class UIDisplayElement {
                 render();
                 glPopMatrix();
             } else if (positionType == EPositionType.ABSOLUTE) {
-                
-                //TODO correct use of glLoadIdentity? glPushMatrix before?
                 glPushMatrix();
                 glLoadIdentity();
                 glTranslatef(getPosition().x, getPosition().y, 0);
@@ -216,10 +214,12 @@ public abstract class UIDisplayElement {
      * @return Returns true if the display element has the focus.
      */
     public boolean isFocused() {
-        if (focusedElement == this)
+        if (focusedElement == this) {
             return true;
-        else
+        }
+        else {
             return false;
+        }
     }
     
     /**
@@ -228,15 +228,18 @@ public abstract class UIDisplayElement {
      */
     public void setFocus(UIDisplayElement focus) {
         if (focusedElement != focus) {
-            if (focus == null && focusedElement != this)
+            if (focus == null && focusedElement != this) {
                 return;
+            }
             
-            if (focusedElement != null)
+            if (focusedElement != null) {
                 focusedElement.notifyFocusListeners(false);
+            }
  
             focusedElement = focus;
-            if (focusedElement != null)
+            if (focusedElement != null) {
                 focusedElement.notifyFocusListeners(true);
+            }
         }
     }
 
@@ -270,36 +273,24 @@ public abstract class UIDisplayElement {
 
         //recalculate position x relative to parent if unit is percentage
         if (unitPositionX == EUnitType.PERCENTAGE && positionType == EPositionType.RELATIVE && parent != null) {
-            
             getPosition().x += parent.getSize().x * positionOriginal.x / 100f;
-            
         } 
         //recalculate position x absolute to display if unit is percentage
         else if (unitPositionX == EUnitType.PERCENTAGE && positionType == EPositionType.ABSOLUTE) {
-            
             getPosition().x += Display.getWidth() * positionOriginal.x / 100f;
-            
         } else {
-            
             getPosition().x += positionOriginal.x;
-            
         }
         
         //recalculate position x relative to parent if unit is percentage
         if (unitPositionY == EUnitType.PERCENTAGE && positionType == EPositionType.RELATIVE && parent != null) {
-            
             getPosition().y += parent.getSize().y * positionOriginal.y / 100f;
-            
         } 
         //recalculate position x absolute to display if unit is percentage
         else if (unitPositionY == EUnitType.PERCENTAGE && positionType == EPositionType.ABSOLUTE) {
-            
             getPosition().y += Display.getHeight() * positionOriginal.y / 100f;
-            
         } else {
-            
             getPosition().y += positionOriginal.y;
-            
         }
 
         /*
@@ -308,28 +299,20 @@ public abstract class UIDisplayElement {
         
         //recalculate width relative to parent if unit is percentage
         if (unitSizeX == EUnitType.PERCENTAGE && positionType == EPositionType.RELATIVE && parent != null) {
-            
             getSize().x = parent.getSize().x * size.x / 100f;
-            
         } 
         //recalculate width absolute to display if unit is percentage
         else if (unitSizeX == EUnitType.PERCENTAGE && positionType == EPositionType.ABSOLUTE) {
-            
             getSize().x = Display.getWidth() * size.x / 100f;
-            
         }
         
         //recalculate height relative to parent if unit is percentage
         if (unitSizeY == EUnitType.PERCENTAGE && positionType == EPositionType.RELATIVE && parent != null) {
-            
             getSize().y = parent.getSize().y * size.y / 100f;
-            
         } 
         //recalculate height absolute to display if unit is percentage
         else if (unitSizeY == EUnitType.PERCENTAGE && positionType == EPositionType.ABSOLUTE) {
-            
             getSize().y = Display.getHeight() * size.y / 100f;
-            
         }
     }
     
@@ -342,25 +325,16 @@ public abstract class UIDisplayElement {
         } else if (align == EHorizontalAlign.CENTER) {
             
             if (positionType == EPositionType.RELATIVE && parent != null) {
-                
                 return parent.getSize().x / 2 - size.x / 2;
-                
             } else if (positionType == EPositionType.ABSOLUTE) {
-                
                 return Display.getWidth() / 2 - size.x / 2;
-                
             }
             
         } else if (align == EHorizontalAlign.RIGHT) {
-            
             if (positionType == EPositionType.RELATIVE && parent != null) {
-                
                 return parent.getSize().x - size.x;
-                
             } else if (positionType == EPositionType.ABSOLUTE) {
-                
                 return Display.getWidth() - size.x;
-                
             }
             
         }
@@ -371,33 +345,19 @@ public abstract class UIDisplayElement {
     private float calcVerticalAlign(EVerticalAlign align) {
         
         if (align == EVerticalAlign.TOP) {
-            
             return 0f;
-            
         } else if (align == EVerticalAlign.CENTER) {
-            
             if (positionType == EPositionType.RELATIVE && parent != null) {
-                
                 return parent.getSize().y / 2 - size.y / 2;
-                
             } else if (positionType == EPositionType.ABSOLUTE) {
-                
                 return Display.getHeight() / 2 - size.y / 2;
-                
             }
-            
         } else if (align == EVerticalAlign.BOTTOM) {
-            
             if (positionType == EPositionType.RELATIVE && parent != null) {
-                
                 return parent.getSize().y - size.y;
-                
             } else if (positionType == EPositionType.ABSOLUTE) {
-                
                 return Display.getHeight() - size.y;
-                
             }
-            
         }
         
         return 0f;

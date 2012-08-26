@@ -27,9 +27,10 @@ import java.util.HashMap;
  * A window which can contain display elements. All windows will be managed by the GUIManager.
  * 
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
- *
+ * 
+ * TODO should extend UIScrollableContainer
  */
-public abstract class UIDisplayWindow extends UIDisplayContainer {
+public class UIDisplayWindow extends UIDisplayContainer {
 
     private enum eWindowEvent {OPEN, CLOSE};
     private final ArrayList<WindowListener> _windowListeners = new ArrayList<WindowListener>();
