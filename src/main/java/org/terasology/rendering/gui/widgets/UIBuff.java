@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.components;
+package org.terasology.rendering.gui.widgets;
 
 import javax.vecmath.Vector2f;
 
@@ -26,7 +26,6 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
-import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 /**
 *   For Status Effects that don't affect the hearts
@@ -34,8 +33,8 @@ import org.terasology.rendering.gui.framework.UIGraphicsElement;
 *   TODO get rid of this.. HUD window
 */
 public class UIBuff extends UIDisplayContainer {
-    private final UIGraphicsElement _speedbuff;
-    private final UIGraphicsElement _curedbuff;
+    private final UIImage _speedbuff;
+    private final UIImage _curedbuff;
     protected EntityRef entity;
     protected EntityManager entityManager;
 
@@ -44,13 +43,13 @@ public class UIBuff extends UIDisplayContainer {
         setSize(new Vector2f(280f, 28f));
 
         // Create speed buff icon.
-        _speedbuff = new UIGraphicsElement(AssetManager.loadTexture("engine:buffs"));
+        _speedbuff = new UIImage(AssetManager.loadTexture("engine:buffs"));
         _speedbuff.getTextureSize().set(new Vector2f(16f / 256f, 16f / 256f));
         _speedbuff.getTextureOrigin().set(new Vector2f(0.0f / 256f, 16f / 256f));
         _speedbuff.setSize(new Vector2f(18f, 18f));
         _speedbuff.setPosition(new Vector2f(18f, 18f));
         // Create speed buff icon.
-        _curedbuff = new UIGraphicsElement(AssetManager.loadTexture("engine:buffs"));
+        _curedbuff = new UIImage(AssetManager.loadTexture("engine:buffs"));
         _curedbuff.getTextureSize().set(new Vector2f(16f / 256f, 16f / 256f));
         _curedbuff.getTextureOrigin().set(new Vector2f(16f / 256f, 0.0f / 256f));
         _curedbuff.setSize(new Vector2f(18f, 18f));

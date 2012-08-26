@@ -22,11 +22,13 @@ import org.terasology.asset.AssetManager;
 import org.terasology.input.binds.InventoryButton;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.rendering.gui.components.UIItemContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
-import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.WindowListener;
+import org.terasology.rendering.gui.widgets.UIImage;
+import org.terasology.rendering.gui.widgets.UIItemCell;
+import org.terasology.rendering.gui.widgets.UIItemContainer;
 
 /**
  * The player's inventory.
@@ -37,7 +39,7 @@ public class UIScreenInventory extends UIDisplayWindow {
 
     private final UIItemContainer toolbar;
     private final UIItemContainer inventory;
-    private UIGraphicsElement background;
+    private UIImage background;
 
     public UIScreenInventory() {
         setBackgroundColor(0x00, 0x00, 0x00, 0.75f);
@@ -62,36 +64,49 @@ public class UIScreenInventory extends UIDisplayWindow {
             }
         });
         
+        addMouseButtonListener(new MouseButtonListener() {
+            
+            @Override
+            public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
+                
+            }
+            
+            @Override
+            public void up(UIDisplayElement element, int button, boolean intersect) {
+                
+            }
+            
+            @Override
+            public void down(UIDisplayElement element, int button, boolean intersect) {
+                if (button == 0) {
+                    UIItemCell.reset(); //TODO drop item
+                }
+            }
+        });
+        
         toolbar = new UIItemContainer(9);
-        toolbar.setVisible(true);
         toolbar.setCellMargin(new Vector2f(1, 1));
+        toolbar.setHorizontalAlign(EHorizontalAlign.CENTER);
+        toolbar.setVerticalAlign(EVerticalAlign.CENTER);
+        toolbar.setPosition(new Vector2f(0f, 180f));
+        toolbar.setVisible(true);
         
         inventory = new UIItemContainer(9);
-        inventory.setVisible(true);
         inventory.setCellMargin(new Vector2f(1, 1));
+        inventory.setHorizontalAlign(EHorizontalAlign.CENTER);
+        inventory.setVerticalAlign(EVerticalAlign.CENTER);
+        inventory.setPosition(new Vector2f(0f, 72f));
+        inventory.setVisible(true);
 
-        background = new UIGraphicsElement(AssetManager.loadTexture("engine:inventory"));
+        background = new UIImage(AssetManager.loadTexture("engine:inventory"));
         background.setSize(new Vector2f(192.0f * 2.5f, 180.0f * 2.5f));
         background.setTextureSize(new Vector2f(176.0f, 167.0f));
+        background.setHorizontalAlign(EHorizontalAlign.CENTER);
+        background.setVerticalAlign(EVerticalAlign.CENTER);
         background.setVisible(true);
         
         addDisplayElement(background);
         addDisplayElement(toolbar);
         addDisplayElement(inventory);
-
-        layout();
-    }
-
-    @Override
-    public void layout() {
-        super.layout();
-        
-        if (inventory != null) {
-            background.center();
-            toolbar.center();
-            toolbar.getPosition().y += 178;
-            inventory.center();
-            inventory.getPosition().y += 72;
-        }
     }
 }

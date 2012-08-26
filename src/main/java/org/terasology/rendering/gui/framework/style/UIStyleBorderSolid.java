@@ -29,9 +29,14 @@ public class UIStyleBorderSolid extends UIDisplayElement implements UIStyle {
     public UIStyleBorderSolid(float width, int r, int g, int b, float a) {
         this.width = width;
         this.color = new Vector4f(RGBtoColor(r), RGBtoColor(g), RGBtoColor(b), a);
-        setCroped(false);
+        setCrop(false);
     }
     
+    public UIStyleBorderSolid(float width, String color, float a) {
+        this.width = width;
+        setColor(color, a);
+    }
+
     private float RGBtoColor(int v) {
         return (float)v / 255.0f;
     }
@@ -45,18 +50,11 @@ public class UIStyleBorderSolid extends UIDisplayElement implements UIStyle {
     public void update() {
         
     }
-
-    @Override
-    public void layout() {
-        if (getParent() != null) {
-            setSize(getParent().getSize());
-        }
-    }
     
     public void renderSolid() {
         glPushMatrix();
         glLoadIdentity();
-        glTranslatef(calcAbsolutePosition().x, calcAbsolutePosition().y, 0);
+        glTranslatef(getAbsolutePosition().x, getAbsolutePosition().y, 0);
 
         glLineWidth(width);
         glBegin(GL11.GL_LINES);
@@ -79,6 +77,26 @@ public class UIStyleBorderSolid extends UIDisplayElement implements UIStyle {
     }
 
     public void setColor(int r, int g, int b, float a) {
+        this.color = new Vector4f(RGBtoColor(r), RGBtoColor(g), RGBtoColor(b), a);
+    }
+    
+    public void setColor(String color, float a) {
+        color = color.trim().toLowerCase();
+        
+        int r = 0;
+        int g = 0;
+        int b = 0;
+        
+        if (color.matches("^#[a-f0-9]{1,6}$")) {
+            color = color.replace("#", "");
+            
+            int sum = Integer.parseInt(color, 16);
+
+            r = (sum & 0x00FF0000) >> 16;
+            g = (sum & 0x0000FF00) >> 8;
+            b = sum & 0x000000FF;
+        }
+        
         this.color = new Vector4f(RGBtoColor(r), RGBtoColor(g), RGBtoColor(b), a);
     }
 

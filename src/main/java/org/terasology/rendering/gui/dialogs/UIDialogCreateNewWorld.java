@@ -26,9 +26,9 @@ import org.terasology.game.modes.StateSinglePlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
-import org.terasology.rendering.gui.components.*;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
+import org.terasology.rendering.gui.widgets.*;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldInfo;
 import org.terasology.world.generator.core.FlatTerrainGenerator;
@@ -66,20 +66,20 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
 
         _inputWorldTitle = new UIInput(new Vector2f(256f, 30f));
         _inputWorldTitle.setVisible(true);
+        
+        _inputSeedLabel = new UIText("Enter a seed (optional):");
+        _inputSeedLabel.setColor(Color.darkGray);
+        _inputSeedLabel.setSize(new Vector2f(0f, 16f));
+        _inputSeedLabel.setVisible(true);
 
         _inputWorldTitleLabel = new UIText("Enter a world name:");
         _inputWorldTitleLabel.setColor(Color.darkGray);
-        _inputWorldTitleLabel.getSize().y = 16f;
+        _inputWorldTitleLabel.setSize(new Vector2f(0f, 16f));
         _inputWorldTitleLabel.setVisible(true);
-
-        _inputSeedLabel = new UIText("Enter a seed (optional):");
-        _inputSeedLabel.setColor(Color.darkGray);
-        _inputSeedLabel.getSize().y = 16f;
-        _inputSeedLabel.setVisible(true);
         
         _chunkGeneratorLabel = new UIText("Choose Chunk Generator:");
         _chunkGeneratorLabel.setColor(Color.darkGray);
-        _chunkGeneratorLabel.getSize().y = 16f;
+        _chunkGeneratorLabel.setSize(new Vector2f(0f, 16f));
         _chunkGeneratorLabel.setVisible(true);
 
         _chunkGenerator = new UIComboBox(new Vector2f(176f, 22f), new Vector2f(175f, 64f));

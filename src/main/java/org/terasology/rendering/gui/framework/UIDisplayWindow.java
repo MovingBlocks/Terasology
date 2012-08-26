@@ -15,13 +15,10 @@
  */
 package org.terasology.rendering.gui.framework;
 
-import org.lwjgl.opengl.Display;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.framework.events.WindowListener;
-
-import javax.vecmath.Vector2f;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,7 +29,7 @@ import java.util.HashMap;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  *
  */
-public class UIDisplayWindow extends UIDisplayContainer {
+public abstract class UIDisplayWindow extends UIDisplayContainer {
 
     private enum eWindowEvent {OPEN, CLOSE};
     private final ArrayList<WindowListener> _windowListeners = new ArrayList<WindowListener>();
@@ -42,11 +39,6 @@ public class UIDisplayWindow extends UIDisplayContainer {
     private String[] closeBinds;
     private int[] closeKeys;
 
-    protected void drag(Vector2f value) {
-        getPosition().x -= value.x;
-        getPosition().y -= value.y;
-    }
-
     public void clearInputControls() {
         for (UIDisplayElement element : getDisplayElements()) {
             if (IInputDataElement.class.isInstance(element)) {
@@ -54,15 +46,6 @@ public class UIDisplayWindow extends UIDisplayContainer {
                 inputControl.clearData();
             }
         }
-    }
-    
-    @Override
-    public void layout() {
-        if (isMaximized()) {
-            super.setSize(new Vector2f(Display.getWidth(), Display.getHeight()));
-        }
-        
-        super.layout();
     }
 
     private void notifyWindowListeners(eWindowEvent event) {
@@ -90,7 +73,7 @@ public class UIDisplayWindow extends UIDisplayContainer {
     }
 
     public void maximize() {
-        setSize(new Vector2f(Display.getWidth(), Display.getHeight()));
+        setSize("100%", "100%");
         maximized = true;
     }
 

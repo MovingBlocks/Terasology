@@ -30,13 +30,14 @@ import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.ButtonState;
-import org.terasology.rendering.gui.components.UIMessageBox;
-import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
+import org.terasology.rendering.gui.widgets.UIMessageBox;
 
 import java.util.HashMap;
 import java.util.List;
+
+import javax.vecmath.Vector2f;
 
 /**
  * First version of simple GUI manager.
@@ -82,6 +83,7 @@ public class GUIManager implements EventHandlerSystem {
         renderer.update();
 
         if (Display.wasResized()) {
+            renderer.setSize(new Vector2f(Display.getWidth(), Display.getHeight()));
             renderer.layout();
         }
     }
@@ -93,7 +95,7 @@ public class GUIManager implements EventHandlerSystem {
      * @return Returns the added window.
      */
     public <T extends UIDisplayWindow> T addWindow(T window, String windowId) {
-        renderer.addtDisplayElementToPosition(0, window);
+        renderer.addDisplayElementToPosition(0, window);
         windowsById.put(windowId, window);
         
         if (windowsById.size() == 1) {
@@ -209,7 +211,6 @@ public class GUIManager implements EventHandlerSystem {
      */
     public void showMessage(String title, String text) {
         UIDisplayWindow messageWindow = new UIMessageBox(title, text);
-        messageWindow.center();
         addWindow(messageWindow, "messageBox");
         setFocusedWindow(messageWindow);
     }
@@ -229,7 +230,7 @@ public class GUIManager implements EventHandlerSystem {
      */
     private void processMouseInput(int button, boolean state, int wheelMoved) {
         if (renderer.getWindowFocused() != null) {
-        	renderer.getWindowFocused().processMouseInput(button, state, wheelMoved);
+        	renderer.getWindowFocused().processMouseInput(button, state, wheelMoved, false);
         }
     }
     
@@ -238,17 +239,8 @@ public class GUIManager implements EventHandlerSystem {
      * @param event The event of the pressed key.
      */
     private void processKeyboardInput(KeyEvent event) {
-        if (renderer.getWindowFocused() != null && renderer.getWindowFocused().isModal() && renderer.getWindowFocused().isVisible()) { //TODO change this
+        if (renderer.getWindowFocused() != null && renderer.getWindowFocused().isModal() && renderer.getWindowFocused().isVisible()) {
         	renderer.getWindowFocused().processKeyboardInput(event);
-            event.consume();
-            return;
-        }
-
-        List<UIDisplayElement> screens = Lists.newArrayList(renderer.getDisplayElements());
-        for (UIDisplayElement screen : screens) {
-            if (!((UIDisplayWindow) screen).isModal()) {
-                screen.processKeyboardInput(event);
-            }
         }
     }
 
@@ -257,7 +249,7 @@ public class GUIManager implements EventHandlerSystem {
      * @param event The event of the bind button.
      */
     private void processBindButton(BindButtonEvent event) {
-        if (renderer.getWindowFocused() != null && renderer.getWindowFocused().isModal() && renderer.getWindowFocused().isVisible()) { //TODO change this
+        if (renderer.getWindowFocused() != null && renderer.getWindowFocused().isModal() && renderer.getWindowFocused().isVisible()) {
         	renderer.getWindowFocused().processBindButton(event);
         }
     }

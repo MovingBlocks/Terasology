@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.components;
+package org.terasology.rendering.gui.widgets;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
@@ -38,8 +38,8 @@ public class UIProgressBar extends UIDisplayContainer {
     private class UIProgressLine extends UIDisplayContainer {
         public UIProgressLine(Vector2f size){
             setSize(size);
+            setCropContainer(true);
             setCrop(true);
-            setCroped(true);
             setBackgroundImage("engine:gui_menu", new Vector2f(0f, 190f), new Vector2f(248f, 9f));
         }
         
@@ -58,7 +58,7 @@ public class UIProgressBar extends UIDisplayContainer {
         label = new UIText();
         label.setVisible(true);
         label.setColor(Color.black);
-        label.setCroped(false);
+        label.setCrop(false);
         label.setPosition(new Vector2f(getPosition().x, 20f));
         label.setColor(Color.white);
 
@@ -75,8 +75,9 @@ public class UIProgressBar extends UIDisplayContainer {
     public void layout() {
         super.layout();
         
-        if (label != null)
-            label.getPosition().x = (getSize().x - label.getTextWidth())/2;
+        if (label != null) {
+            label.setPosition(new Vector2f((getSize().x - label.getTextWidth())/2, getSize().y + 2));
+        }
     }
 
     public int getValue() {

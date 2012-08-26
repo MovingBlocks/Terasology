@@ -11,6 +11,7 @@ import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 import org.terasology.rendering.gui.framework.events.ScrollListener;
 import org.terasology.rendering.gui.framework.style.UIStyle;
+import org.terasology.rendering.gui.widgets.UIImage;
 
 /**
  * A container which will display a scrollbar if the content is to big to be displayed.
@@ -23,7 +24,7 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
     private UIDisplayContainer container;
     
     //scrollbar
-    private UIGraphicsElement scrollbar;
+    private UIImage scrollbar;
     private boolean scrolling = false;            //true if the scrollbar was pressed, this will enable scrolling
     private float scrollbarPressedOffset;        //the position on which the scrollbar was grabbed with the mouse
     
@@ -46,7 +47,7 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
     
     public UIScrollableContainer(Vector2f size) {
         setSize(size);
-        setCrop(true);
+        setCropContainer(true);
         
         enableScrolling = true;
         enableScrollbar = true;
@@ -58,8 +59,8 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
         container = new UIDisplayContainer() { };
         container.setVisible(true);
         
-        scrollbar = new UIGraphicsElement(AssetManager.loadTexture("engine:gui_menu"));
-        scrollbar.setCroped(false);
+        scrollbar = new UIImage(AssetManager.loadTexture("engine:gui_menu"));
+        scrollbar.setCrop(false);
         scrollbar.setTextureOrigin(new Vector2f(0f, 0f));
         scrollbar.setTextureSize(new Vector2f(60f, 15f));
         scrollbar.setSize(new Vector2f(15f, 60f));
@@ -116,7 +117,7 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
             @Override
             public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
                 if (wheel != 0 && enableScrolling && isScrollable && intersect) {
-                    moveScrollbar(scrollbar.calcAbsolutePosition().y - (wheel / 10));
+                    moveScrollbar(scrollbar.getAbsolutePosition().y - (wheel / 10));
                 }
             }
             
@@ -153,11 +154,10 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
         }
 
         //calculate the different in the position
-        //float scrolled = scrollbar.getPosition().y - scrollbarPos;
-        scrollbar.getPosition().y = scrollbarPos;
+        scrollbar.setPosition(new Vector2f(scrollbar.getPosition().x, scrollbarPos));
         
         //move the content
-        container.getPosition().y = -multiplier * scrollbar.getPosition().y;
+        container.setPosition(new Vector2f(container.getPosition().x, -multiplier * scrollbar.getPosition().y));
         
         notifyScrollListeners();
     }
@@ -187,25 +187,19 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
                 multiplier = (diff / getSize().y) + 1;
     
                 //set the new size of the scrollbar based on the multiplier
-                scrollbar.getSize().y = getSize().y / multiplier;
+                scrollbar.setSize(new Vector2f(scrollbar.getSize().x, getSize().y / multiplier));
                 
                 if (enableScrollbar) {
                     //enable the scrollbar
                     scrollbar.setVisible(true);
-                    
-                    //make space for the scrollbar on the right side of the container
-                    //getSize().x = originalSize.x - scrollbar.getSize().x;
                 }
                 
-                moveScrollbar(scrollbar.calcAbsolutePosition().y);
+                moveScrollbar(scrollbar.getAbsolutePosition().y);
             } else {
                 isScrollable = false;
                 
                 //disable the scrollbar
                 scrollbar.setVisible(false);
-                
-                //remove the space for the scrollbar on the right side of the container
-                //getSize().x = originalSize.x;
                 
                 moveScrollbar(0f);
             }
@@ -231,8 +225,8 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
                     calcMinMax(((UIDisplayContainer)element).getDisplayElements());
                 }
                 
-                elementMin = element.calcAbsolutePosition().y;
-                elementMax = element.calcAbsolutePosition().y + element.getSize().y;
+                elementMin = element.getAbsolutePosition().y;
+                elementMax = element.getAbsolutePosition().y + element.getSize().y;
                 
                 if (elementMin < min) {
                     min = elementMin;
@@ -248,7 +242,7 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
 
     @Override
     public void addDisplayElement(UIDisplayElement element) {
-        container._displayElements.add(element);
+        container.getDisplayElements().add(element);
         element.setParent(container);
         
         calcContentHeight();
@@ -256,7 +250,7 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
     
     @Override
     public void removeDisplayElement(UIDisplayElement element) {
-        container._displayElements.remove(element);
+        container.getDisplayElements().remove(element);
         element.setParent(null);
         
         calcContentHeight();
@@ -264,30 +258,12 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
     
     @Override
     public void removeAllDisplayElements() {
-        for (UIDisplayElement element : container._displayElements) {
+        for (UIDisplayElement element : container.getDisplayElements()) {
             element.setParent(null);
         }
-        container._displayElements.clear();
+        container.getDisplayElements().clear();
         
         calcContentHeight();
-    }
-    
-    @Override
-    public void processMouseInput(int button, boolean state, int wheelMoved) {
-        if (!isVisible())
-            return;
-        
-        //cancel the button events if the mouse is out of the cropped area
-        if (!intersects(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()))) {
-            button = -1;
-        }
-        
-        super.processMouseInput(button, state, wheelMoved);
-
-        // Pass the mouse event to all display elements
-        for (int i = 0; i < _displayElements.size(); i++) {
-            _displayElements.get(i).processMouseInput(button, state, wheelMoved);
-        }
     }
     
     /**

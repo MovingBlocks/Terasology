@@ -27,8 +27,8 @@ import java.util.TreeSet;
 import javax.vecmath.Vector2f;
 
 import org.terasology.performanceMonitor.PerformanceMonitor;
-import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
+import org.terasology.rendering.gui.widgets.UIText;
 
 /**
  * UI element that graphs performance metrics
@@ -49,12 +49,13 @@ public class UIScreenMetrics extends UIDisplayWindow {
      * Init. the HUD.
      */
     public UIScreenMetrics() {
-        setOverlay(true);
-        _headerLine = new UIText(new Vector2f(4, 70));
+        _headerLine = new UIText();
+        _headerLine.setPosition(new Vector2f(4, 70));
         addDisplayElement(_headerLine);
         _metricLines = new ArrayList<UIText>();
         for (int i = 0; i < METRIC_LINES; ++i) {
-            UIText line = new UIText(new Vector2f(4, 86 + 16 * i));
+            UIText line = new UIText();
+            line.setPosition(new Vector2f(4, 86 + 16 * i));
             _metricLines.add(line);
             addDisplayElement(line);
         }

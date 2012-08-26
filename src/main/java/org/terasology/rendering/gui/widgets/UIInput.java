@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.components;
+package org.terasology.rendering.gui.widgets;
 
 import static org.lwjgl.opengl.GL11.GL_QUADS;
 import static org.lwjgl.opengl.GL11.glBegin;
@@ -101,7 +101,7 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
 
     public UIInput(Vector2f size) {
         setSize(size);
-        setCrop(true);
+        setCropContainer(true);
         setBackgroundImage("engine:gui_menu", new Vector2f(0f, 90f), new Vector2f(256f, 30f));
         
         addClickListener(new ClickListener() {
@@ -111,7 +111,7 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
                     setFocus(_inputObj);
                     
                     if (_inputValue.length() > 0 && _inputText.getTextWidth() > 0) {
-                        Vector2f absolutePosition = _inputText.calcAbsolutePosition();
+                        Vector2f absolutePosition = _inputText.getAbsolutePosition();
                         float positionRelativeElement = absolutePosition.x + _inputText.getTextWidth() - new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()).x;
                         float averageSymbols = _inputText.getTextWidth() / _inputValue.length();
     

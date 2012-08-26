@@ -45,9 +45,9 @@ import org.terasology.input.BindButtonEvent;
 import org.terasology.logic.manager.GroovyHelp;
 import org.terasology.logic.manager.GroovyHelpManager;
 import org.terasology.logic.manager.GroovyManager;
-import org.terasology.rendering.gui.components.UIText;
-import org.terasology.rendering.gui.components.UITextWrap;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
+import org.terasology.rendering.gui.widgets.UIText;
+import org.terasology.rendering.gui.widgets.UITextWrap;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.management.BlockManager;
 
@@ -55,6 +55,8 @@ import org.terasology.world.block.management.BlockManager;
  * The debug console of Terasology.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * 
+ * TODO rewrite this. add a own class for the console which will handle commands, maybe handle "chat" in general inside the class and console commands will be special chat commands.
  */
 public final class UIScreenConsole extends UIDisplayWindow {
 

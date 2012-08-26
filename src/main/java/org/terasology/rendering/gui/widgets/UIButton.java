@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.components;
+package org.terasology.rendering.gui.widgets;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.vecmath.Vector2f;
@@ -43,6 +45,7 @@ public class UIButton extends UIDisplayContainer {
     private boolean _toggleState = false;
     private eButtonType _buttonType;
     
+    private final List<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
     private final Map<String, Vector2f[]> states = new HashMap<String, Vector2f[]>();
 
     /**
@@ -110,13 +113,7 @@ public class UIButton extends UIDisplayContainer {
             public void down(UIDisplayElement element, int button, boolean intersect) {
                 if (intersect) {
                     if (_buttonType == eButtonType.TOGGLE) {
-                        if (_toggleState) {
-                            setBackgroundImage(states.get("normal")[0], states.get("normal")[1]);
-                            _toggleState = false;
-                        } else {
-                            setBackgroundImage(states.get("pressed")[0], states.get("pressed")[1]);
-                            _toggleState = true;
-                        }
+                        setToggleState(!_toggleState);
                     } else {
                         setBackgroundImage(states.get("pressed")[0], states.get("pressed")[1]);
                     }
@@ -217,5 +214,21 @@ public class UIButton extends UIDisplayContainer {
         } else {
             setBackgroundImage(states.get("normal")[0], states.get("normal")[1]);
         }
+        
+        notifyChangedListeners();
+    }
+    
+    private void notifyChangedListeners() {
+        for (ChangedListener listener : changedListeners) {
+            listener.changed(this);
+        }
+    }
+    
+    public void addChangedListener(ChangedListener listener) {
+        changedListeners.add(listener);
+    }
+
+    public void removeChangedListener(ChangedListener listener) {
+        changedListeners.remove(listener);
     }
 }

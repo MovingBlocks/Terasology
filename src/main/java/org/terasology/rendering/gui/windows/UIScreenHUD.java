@@ -17,7 +17,6 @@ package org.terasology.rendering.gui.windows;
 
 import javax.vecmath.Vector2f;
 
-import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetManager;
 import org.terasology.components.CuredComponent;
 import org.terasology.components.HealthComponent;
@@ -40,12 +39,12 @@ import org.terasology.mods.miniions.components.MinionComponent;
 import org.terasology.mods.miniions.events.MinionMessageEvent;
 import org.terasology.mods.miniions.rendering.gui.components.UIMessageQueue;
 import org.terasology.mods.miniions.rendering.gui.components.UIMinionbar;
-import org.terasology.rendering.gui.components.UIBuff;
-import org.terasology.rendering.gui.components.UIItemCell;
-import org.terasology.rendering.gui.components.UIItemContainer;
-import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
-import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import org.terasology.rendering.gui.widgets.UIBuff;
+import org.terasology.rendering.gui.widgets.UIImage;
+import org.terasology.rendering.gui.widgets.UIItemCell;
+import org.terasology.rendering.gui.widgets.UIItemContainer;
+import org.terasology.rendering.gui.widgets.UIText;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -53,14 +52,16 @@ import org.terasology.rendering.world.WorldRenderer;
  * HUD displayed on the user's screen.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * 
+ * TODO clean up
  */
 public class UIScreenHUD extends UIDisplayWindow implements EventHandlerSystem {
 
     protected EntityManager entityManager;
 
     /* DISPLAY ELEMENTS */
-    private final UIGraphicsElement[] _hearts;
-    private final UIGraphicsElement crosshair;
+    private final UIImage[] _hearts;
+    private final UIImage crosshair;
     private final UIText debugLine1;
     private final UIText debugLine2;
     private final UIText debugLine3;
@@ -78,59 +79,64 @@ public class UIScreenHUD extends UIDisplayWindow implements EventHandlerSystem {
     public UIScreenHUD() {
         maximize();
         
-        _hearts = new UIGraphicsElement[10];
+        _hearts = new UIImage[10];
 
         // Create hearts
         for (int i = 0; i < 10; i++) {
-            _hearts[i] = new UIGraphicsElement(AssetManager.loadTexture("engine:icons"));
+            _hearts[i] = new UIImage(AssetManager.loadTexture("engine:icons"));
             _hearts[i].setVisible(true);
             _hearts[i].setTextureSize(new Vector2f(9f, 9f));
             _hearts[i].setTextureOrigin(new Vector2f(52f, 0.0f)); //106f for poison
             _hearts[i].setSize(new Vector2f(18f, 18f));
-            _hearts[i].setPosition(new Vector2f(18f * i, 18f));
+            _hearts[i].setVerticalAlign(EVerticalAlign.BOTTOM);
+            _hearts[i].setHorizontalAlign(EHorizontalAlign.CENTER);
+            _hearts[i].setPosition(new Vector2f(18f * i - 212f, -52f));
 
             addDisplayElement(_hearts[i]);
         }
         
-        crosshair = new UIGraphicsElement(AssetManager.loadTexture("engine:gui"));
+        crosshair = new UIImage(AssetManager.loadTexture("engine:gui"));
         crosshair.setTextureSize(new Vector2f(20f, 20f));
         crosshair.setTextureOrigin(new Vector2f(24f, 24f));
         crosshair.setSize(new Vector2f(40f, 40f));
+        crosshair.setHorizontalAlign(EHorizontalAlign.CENTER);
+        crosshair.setVerticalAlign(EVerticalAlign.CENTER);
         crosshair.setVisible(true);
 
-        debugLine1 = new UIText(new Vector2f(4, 4));
-        debugLine2 = new UIText(new Vector2f(4, 22));
-        debugLine3 = new UIText(new Vector2f(4, 38));
-        debugLine4 = new UIText(new Vector2f(4, 54));
+        debugLine1 = new UIText();
+        debugLine1.setPosition(new Vector2f(4, 4));
+        debugLine2 = new UIText();
+        debugLine2.setPosition(new Vector2f(4, 22));
+        debugLine3 = new UIText();
+        debugLine3.setPosition(new Vector2f(4, 38));
+        debugLine4 = new UIText();
+        debugLine4.setPosition(new Vector2f(4, 54));
+
+        toolbar = new UIItemContainer(9);
+        toolbar.setVisible(true);
+        toolbar.setHorizontalAlign(EHorizontalAlign.CENTER);
+        toolbar.setVerticalAlign(EVerticalAlign.BOTTOM);
+
+        minionbar = new UIMinionbar();
+        minionbar.setVisible(true);
+
+        messagequeue = new UIMessageQueue();
+        messagequeue.setVisible(true);
+        
+        buffBar = new UIBuff();
+        buffBar.setVisible(true);
 
         addDisplayElement(crosshair, "crosshair");
         addDisplayElement(debugLine1);
         addDisplayElement(debugLine2);
         addDisplayElement(debugLine3);
         addDisplayElement(debugLine4);
-
-        toolbar = new UIItemContainer(9);
-        toolbar.setVisible(true);
-        addDisplayElement(toolbar);
-
-        minionbar = new UIMinionbar();
-        minionbar.setVisible(true);
-        addDisplayElement(minionbar);
-
-        messagequeue = new UIMessageQueue();
-        messagequeue.setVisible(true);
-        addDisplayElement(messagequeue);
-
-        /*
-        healthBar = new UIHealthBar();
-        healthBar.setVisible(true);
-        addDisplayElement(healthBar);
-         */
         
-        buffBar = new UIBuff();
-        buffBar.setVisible(true);
+        addDisplayElement(toolbar);
+        addDisplayElement(minionbar);
+        addDisplayElement(messagequeue);
         addDisplayElement(buffBar);
-
+        
         CoreRegistry.get(EventSystem.class).registerEventHandler(this);
         
         update();
@@ -187,22 +193,6 @@ public class UIScreenHUD extends UIDisplayWindow implements EventHandlerSystem {
                 else
                     _hearts[i].setTextureOrigin(new Vector2f(52f, 0.0f));
             }
-        }
-    }
-    
-    @Override
-    public void layout() {
-        super.layout();
-        
-        if (toolbar != null) {
-            toolbar.centerHorizontally();
-            toolbar.getPosition().y = Display.getHeight() - toolbar.getSize().y;
-            crosshair.setPosition(new Vector2f((Display.getWidth() / 2) - (crosshair.getSize().x / 2), (Display.getHeight() / 2) - (crosshair.getSize().y / 2)));
-            
-            for (int i = 0; i < 10; i++) {
-                _hearts[i].getPosition().x = toolbar.getPosition().x + i * (_hearts[i].getSize().x + 2f);
-                _hearts[i].getPosition().y = toolbar.getPosition().y - _hearts[i].getSize().y - 2f;
-            }        
         }
     }
     

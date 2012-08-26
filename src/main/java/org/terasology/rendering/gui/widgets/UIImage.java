@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.framework;
+package org.terasology.rendering.gui.widgets;
 
 
 import static org.lwjgl.opengl.GL11.GL_TEXTURE;
@@ -31,6 +31,7 @@ import javax.vecmath.Vector4f;
 import org.lwjgl.opengl.GL11;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.assets.Texture;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
@@ -42,27 +43,33 @@ import java.util.logging.Logger;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
+ * 
+ * TODO rotation screws up the intersection check
  */
-public class UIGraphicsElement extends UIDisplayElement {
+public class UIImage extends UIDisplayElement {
     private Logger logger = Logger.getLogger(getClass().getName());
 
     private Texture texture;
 
-    private Vector2f _textureOrigin = new Vector2f(0.0f, 0.0f);
-    private Vector2f _textureSize = new Vector2f(1.0f, 1.0f);
+    private Vector2f textureOrigin = new Vector2f(0.0f, 0.0f);
+    private Vector2f textureSize = new Vector2f(1.0f, 1.0f);
 
-    private float _rotate = 0f;
-    private Mesh _mesh;
+    private float rotate = 0f;
+    private Mesh mesh;
     
-    public UIGraphicsElement() {
+    public UIImage() {
         
     }
     
-    public UIGraphicsElement(int r, int g, int b, float a) {
+    public UIImage(int r, int g, int b, float a) {
         setColor(r, g, b, a);
     }
+    
+    public UIImage(String color, float a) {
+        setColor(color, a);
+    }
 
-    public UIGraphicsElement(Texture texture) {
+    public UIImage(Texture texture) {
         setTexture(texture);
     }
     
@@ -72,10 +79,10 @@ public class UIGraphicsElement extends UIDisplayElement {
 
     @Override
     public void render() {
-        if (_mesh == null)
+        if (mesh == null)
             return;
 
-        if (_mesh.isDisposed()) {
+        if (mesh.isDisposed()) {
             logger.severe("Disposed mesh encountered!");
             return;
         }
@@ -86,16 +93,16 @@ public class UIGraphicsElement extends UIDisplayElement {
     
             glMatrixMode(GL_TEXTURE);
             glPushMatrix();
-            glTranslatef(_textureOrigin.x, _textureOrigin.y, 0.0f);
-            glScalef(_textureSize.x, _textureSize.y, 1.0f);
+            glTranslatef(textureOrigin.x, textureOrigin.y, 0.0f);
+            glScalef(textureSize.x, textureSize.y, 1.0f);
             glMatrixMode(GL11.GL_MODELVIEW);
     
             glPushMatrix();
-            if (_rotate > 0f) {
-                glRotatef(_rotate, 0f, 0f, 1f);
+            if (rotate > 0f) {
+                glRotatef(rotate, 0f, 0f, 1f);
             }
             glScalef(getSize().x, getSize().y, 1.0f);
-            _mesh.render();
+            mesh.render();
             glPopMatrix();
     
             glMatrixMode(GL_TEXTURE);
@@ -103,11 +110,11 @@ public class UIGraphicsElement extends UIDisplayElement {
             glMatrixMode(GL11.GL_MODELVIEW);
         } else {
             glPushMatrix();
-            if (_rotate > 0f) {
-                glRotatef(_rotate, 0f, 0f, 1f);
+            if (rotate > 0f) {
+                glRotatef(rotate, 0f, 0f, 1f);
             }
             glScalef(getSize().x, getSize().y, 0.0f);
-            _mesh.render();
+            mesh.render();
             glPopMatrix();
         }
     }
@@ -119,7 +126,7 @@ public class UIGraphicsElement extends UIDisplayElement {
      * @deprecated Actually this method is not deprecated. But use setTextureOrigin to set the origin instead!
      */
     public Vector2f getTextureOrigin() {
-        return _textureOrigin;
+        return textureOrigin;
     }
     
     /**
@@ -132,7 +139,7 @@ public class UIGraphicsElement extends UIDisplayElement {
                 origin = new Vector2f(0f, 0f);
             }
             
-            _textureOrigin = new Vector2f(origin.x / (float)texture.getWidth(), origin.y / (float)texture.getHeight());
+            textureOrigin = new Vector2f(origin.x / (float)texture.getWidth(), origin.y / (float)texture.getHeight());
         }
     }
 
@@ -143,7 +150,7 @@ public class UIGraphicsElement extends UIDisplayElement {
      * @deprecated Actually this method is not deprecated. But use setTextureSize to set the size instead! (deprecated tag will be removed in the future)
      */
     public Vector2f getTextureSize() {
-        return _textureSize;
+        return textureSize;
     }
     
     /**
@@ -156,7 +163,7 @@ public class UIGraphicsElement extends UIDisplayElement {
                 size = new Vector2f(texture.getWidth(), texture.getHeight());
             }
             
-            _textureSize = new Vector2f(size.x / (float)texture.getWidth(), size.y / (float)texture.getHeight());
+            textureSize = new Vector2f(size.x / (float)texture.getWidth(), size.y / (float)texture.getHeight());
         }
     }
     
@@ -180,33 +187,48 @@ public class UIGraphicsElement extends UIDisplayElement {
         generateMesh(r, g, b, a);
     }
     
+    public void setColor(String color, float a) {
+        color = color.trim().toLowerCase();
+        
+        int r = 0;
+        int g = 0;
+        int b = 0;
+        
+        if (color.matches("^#[a-f0-9]{1,6}$")) {
+            color = color.replace("#", "");
+            
+            int sum = Integer.parseInt(color, 16);
+
+            r = (sum & 0x00FF0000) >> 16;
+            g = (sum & 0x0000FF00) >> 8;
+            b = sum & 0x000000FF;
+        }
+        
+        setColor(r, g, b, a);
+    }
+    
     private void generateMesh(int r, int g, int b, float a) {
-        if (_mesh != null) {
-            _mesh.dispose();
+        if (mesh != null) {
+            mesh.dispose();
         }
         
         Tessellator tessellator = new Tessellator();
         TessellatorHelper.addGUIQuadMesh(tessellator, new Vector4f(RGBtoColor(r), RGBtoColor(g), RGBtoColor(b), a), 1.0f, 1.0f);
-        _mesh = tessellator.generateMesh();
+        mesh = tessellator.generateMesh();
     }
 
     @Override
     public void update() {
-    }
-    
-    @Override
-    public void layout() {
-
     }
 
     /*
      * Rotate graphics element
      */
     public void setRotateAngle(float angle) {
-        _rotate = angle;
+        rotate = angle;
     }
 
     public float getRotateAngle() {
-        return _rotate;
+        return rotate;
     }
 }
