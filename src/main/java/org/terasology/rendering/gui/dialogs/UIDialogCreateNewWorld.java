@@ -29,6 +29,7 @@ import org.terasology.logic.manager.PathManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.widgets.*;
+import org.terasology.rendering.gui.windows.UIMenuSelectWorld;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldInfo;
 import org.terasology.world.generator.core.FlatTerrainGenerator;
@@ -65,6 +66,7 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
         _inputSeed.setVisible(true);
 
         _inputWorldTitle = new UIInput(new Vector2f(256f, 30f));
+        _inputWorldTitle.setValue(getWorldName());
         _inputWorldTitle.setVisible(true);
         
         _inputSeedLabel = new UIText("Enter a seed (optional):");
@@ -168,18 +170,18 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
             }
         });
 
-        addDisplayElement(_inputWorldTitleLabel, "inputWorldTitleLabel");
-        addDisplayElement(_inputWorldTitle, "inputWorldTitle");
-        addDisplayElement(_inputSeedLabel, "inputSeedLabel");
-        addDisplayElement(_inputSeed, "inputSeed");
-        addDisplayElement(_chunkGeneratorLabel, "chunkGeneratorLabel");
-        addDisplayElement(_okButton, "okButton");
-        addDisplayElement(_cancelButton, "cancelButton");
-        addDisplayElement(_chunkGenerator, "chunkGenerator");
+        addDisplayElement(_inputWorldTitleLabel);
+        addDisplayElement(_inputWorldTitle);
+        addDisplayElement(_inputSeedLabel);
+        addDisplayElement(_inputSeed);
+        addDisplayElement(_chunkGeneratorLabel);
+        addDisplayElement(_okButton);
+        addDisplayElement(_cancelButton);
+        addDisplayElement(_chunkGenerator);
     }
 
-    public String getWorldName() {
-        UIList list = (UIList) GUIManager.getInstance().getWindowById("selectWorld").getElementById("list");
-        return "World" + (list.size() + 1);
+    private String getWorldName() {
+        UIMenuSelectWorld menu = (UIMenuSelectWorld) GUIManager.getInstance().getWindowById("selectWorld");
+        return "World" + (menu.getWorldCount() + 1);
     }
 }

@@ -73,7 +73,6 @@ public class UIComboBox extends UIDisplayContainer {
             
             @Override
             public void up(UIDisplayElement element, int button, boolean intersect) {
-                System.out.println("!");
                 if (intersect) {
                     opened = !opened;
                 }

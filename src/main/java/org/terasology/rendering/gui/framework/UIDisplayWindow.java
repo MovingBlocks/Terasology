@@ -27,18 +27,26 @@ import java.util.HashMap;
  * A window which can contain display elements. All windows will be managed by the GUIManager.
  * 
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
- * 
- * TODO should extend UIScrollableContainer
  */
-public class UIDisplayWindow extends UIDisplayContainer {
+public class UIDisplayWindow extends UIScrollableContainer {
 
+    //events
     private enum eWindowEvent {OPEN, CLOSE};
     private final ArrayList<WindowListener> _windowListeners = new ArrayList<WindowListener>();
+    
     private final HashMap<String, UIDisplayElement> _displayElementsById = new HashMap<String, UIDisplayElement>();
-    private boolean maximized = false;
-    private boolean modal = false;
+    
+    //close buttons
     private String[] closeBinds;
     private int[] closeKeys;
+    
+    //layout
+    private boolean modal = false;
+    
+    public UIDisplayWindow() {
+        setEnableScrollbar(true);
+        setEnableScrolling(true);
+    }
 
     public void clearInputControls() {
         for (UIDisplayElement element : getDisplayElements()) {
@@ -75,11 +83,6 @@ public class UIDisplayWindow extends UIDisplayContainer {
 
     public void maximize() {
         setSize("100%", "100%");
-        maximized = true;
-    }
-
-    public boolean isMaximized() {
-        return maximized;
     }
 
     /**
@@ -114,12 +117,26 @@ public class UIDisplayWindow extends UIDisplayContainer {
         this.closeKeys = keys;
     }
 
+    /**
+     * 
+     * @param element
+     * @param elementId
+     * 
+     * @deprecated don't use this. ID will be included in EACH UI element in the future.
+     */
     public void addDisplayElement(UIDisplayElement element, String elementId) {
         addDisplayElement(element);
         _displayElementsById.put(elementId, element);
         element.setParent(this);
     }
 
+    /**
+     * 
+     * @param elementId
+     * @return
+     * 
+     * @deprecated don't use this. ID will be included in EACH UI element in the future.
+     */
     public UIDisplayElement getElementById(String elementId) {
         if (!_displayElementsById.containsKey(elementId)) {
             return null;

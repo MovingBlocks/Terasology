@@ -11,6 +11,7 @@ import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 import org.terasology.rendering.gui.framework.events.ScrollListener;
 import org.terasology.rendering.gui.framework.style.UIStyle;
+import org.terasology.rendering.gui.widgets.UIComposite;
 import org.terasology.rendering.gui.widgets.UIImage;
 
 /**
@@ -21,17 +22,16 @@ import org.terasology.rendering.gui.widgets.UIImage;
 public abstract class UIScrollableContainer extends UIDisplayContainer {
     
     private final List<ScrollListener> scrollListener = new ArrayList<ScrollListener>();
-    private UIDisplayContainer container;
+    private UIComposite container;
     
     //scrollbar
     private UIImage scrollbar;
     private boolean scrolling = false;            //true if the scrollbar was pressed, this will enable scrolling
-    private float scrollbarPressedOffset;        //the position on which the scrollbar was grabbed with the mouse
+    private float scrollbarPressedOffset;         //the position on which the scrollbar was grabbed with the mouse
     
     //content
-    private float min;                            //the min position value of all child elements
     private float max;                            //the max position value of all child elements
-    private float contentHeight;                //the contents hight of all chicld elements
+    private float contentHeight;                  //the contents hight of all chicld elements
     private float multiplier = 1f;                //the multiplier of how the movement in the scrollbar will move the actual child elements
     
     //settings
@@ -47,16 +47,15 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
     
     public UIScrollableContainer(Vector2f size) {
         setSize(size);
-        setCropContainer(true);
-        
-        enableScrolling = true;
-        enableScrollbar = true;
+        setEnableScrolling(true);
+        setEnableScrollbar(true);
         
         setup();
     }
 
     private void setup() {
-        container = new UIDisplayContainer() { };
+        container = new UIComposite();
+        container.setSize("100%", "100%");
         container.setVisible(true);
         
         scrollbar = new UIImage(AssetManager.loadTexture("engine:gui_menu"));
@@ -65,7 +64,6 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
         scrollbar.setTextureSize(new Vector2f(60f, 15f));
         scrollbar.setSize(new Vector2f(15f, 60f));
         scrollbar.setVisible(false);
-        scrollbar.setPosition(new Vector2f(getSize().x - scrollbar.getSize().x, 0f));
         scrollbar.addMouseButtonListener(new MouseButtonListener() {    
             @Override
             public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
@@ -132,10 +130,8 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
             }
         });
         
-        getDisplayElements().add(container);
-        getDisplayElements().add(scrollbar);
-        container.setParent(this);
-        scrollbar.setParent(this);
+        super.addDisplayElement(container);
+        super.addDisplayElement(scrollbar);
     }
 
     /**
@@ -154,7 +150,7 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
         }
 
         //calculate the different in the position
-        scrollbar.setPosition(new Vector2f(scrollbar.getPosition().x, scrollbarPos));
+        scrollbar.setPosition(new Vector2f(getSize().x - scrollbar.getSize().x, scrollbarPos));
         
         //move the content
         container.setPosition(new Vector2f(container.getPosition().x, -multiplier * scrollbar.getPosition().y));
@@ -167,13 +163,14 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
      */
     private void calcContentHeight() {
         if (scrollbar != null) {
-            if (getDisplayElements().size() > 0) {
+            if (container.getDisplayElements().size() > 0) {
                 
-                //Lets calculate the min max values recursively
-                min = Float.MAX_VALUE;
-                max = Float.MIN_VALUE;
-                calcMinMax(container.getDisplayElements());
-                contentHeight = max - min;
+                //Lets calculate the max value recursively
+                max = 0;
+                calcMax(container.getDisplayElements());
+                contentHeight = max - getAbsolutePosition().y;
+                
+                //container.setSize(new Vector2f(getSize().x, contentHeight));
             }
             
             //check if the content is bigger than the container
@@ -184,12 +181,13 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
                 float diff = contentHeight - getSize().y;
     
                 //calculate the new multiplier based on the size which needs to be scrolled by the scrollbar
+                //TODO calculate multiplier none linear..
                 multiplier = (diff / getSize().y) + 1;
-    
-                //set the new size of the scrollbar based on the multiplier
-                scrollbar.setSize(new Vector2f(scrollbar.getSize().x, getSize().y / multiplier));
                 
                 if (enableScrollbar) {
+                    //set the new size of the scrollbar based on the multiplier
+                    scrollbar.setSize(new Vector2f(scrollbar.getSize().x, getSize().y / multiplier));
+                    
                     //enable the scrollbar
                     scrollbar.setVisible(true);
                 }
@@ -203,49 +201,40 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
                 
                 moveScrollbar(0f);
             }
-            
-            layout();
         }
     }
     
     /**
-     * Calculate the min and max values of all display elements within a display container recursively.
+     * Calculate the max value of all display elements within a display container recursively.
      * @param displayElements The display elements of a display container.
      */
-    private void calcMinMax(List<UIDisplayElement> displayElements) {
-        float elementMin;
+    private void calcMax(List<UIDisplayElement> displayElements) {
         float elementMax;
         
         //loop through all child elements
         for (UIDisplayElement element : displayElements) {
-            
             if (element.isVisible() && !(element instanceof UIStyle) && element != scrollbar) {
                 //recursive action if the element also contains child elements
                 if (element instanceof UIDisplayContainer) {
-                    calcMinMax(((UIDisplayContainer)element).getDisplayElements());
+                    calcMax(((UIDisplayContainer)element).getDisplayElements());
                 }
-                
-                elementMin = element.getAbsolutePosition().y;
+
                 elementMax = element.getAbsolutePosition().y + element.getSize().y;
-                
-                if (elementMin < min) {
-                    min = elementMin;
-                }
                 
                 if (elementMax > max) {
                     max = elementMax;
                 }
             }
-            
         }
     }
 
     @Override
     public void addDisplayElement(UIDisplayElement element) {
-        container.getDisplayElements().add(element);
-        element.setParent(container);
-        
-        calcContentHeight();
+        if (element instanceof UIStyle) {
+            super.addDisplayElement(element);
+        } else {
+            container.addDisplayElement(element);
+        }
     }
     
     @Override
@@ -280,6 +269,8 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
      */
     public void setEnableScrolling(boolean enable) {
         this.enableScrolling = enable;
+
+        setCropContainer(enable);
     }
     
     /**
@@ -287,7 +278,7 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
      * @return Returns true if the scrollbar is enabled.
      */
     public boolean isEnableScrollbar() {
-        return enableScrolling;
+        return enableScrollbar;
     }
 
     /**
@@ -295,7 +286,7 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
      * @param enable True to enable scrollbar.
      */
     public void setEnableScrollbar(boolean enable) {
-        this.enableScrolling = enable;
+        this.enableScrollbar = enable;
         
         calcContentHeight();
     }
@@ -312,5 +303,12 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
 
     public void removeScrollListener(ScrollListener listener) {
         scrollListener.remove(listener);
+    }
+    
+    @Override
+    public void layout() {
+        super.layout();
+        
+        calcContentHeight();
     }
 }

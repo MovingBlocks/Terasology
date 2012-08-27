@@ -58,13 +58,6 @@ public class UIMenuMain extends UIDisplayWindow {
         _version.setHorizontalAlign(EHorizontalAlign.CENTER);
         _version.setPosition(new Vector2f(0f, 230f));
         _version.setVisible(true);
-        _version.addClickListener(new ClickListener() {
-            
-            @Override
-            public void click(UIDisplayElement element, int button) {
-                System.out.println(_version.getSize());
-            }
-        });
 
         _exitButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _exitButton.getLabel().setText("Exit Terasology");
@@ -104,8 +97,8 @@ public class UIMenuMain extends UIDisplayWindow {
 
         addDisplayElement(_title);
         addDisplayElement(_version);
-        addDisplayElement(_configButton, "configButton");
-        addDisplayElement(_exitButton, "exitButton");
-        addDisplayElement(_singlePlayerButton, "singlePlayerButton");
+        addDisplayElement(_configButton);
+        addDisplayElement(_exitButton);
+        addDisplayElement(_singlePlayerButton);
     }
 }

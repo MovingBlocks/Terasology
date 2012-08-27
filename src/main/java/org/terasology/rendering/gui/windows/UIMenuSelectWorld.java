@@ -28,7 +28,6 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.widgets.UIButton;
-import org.terasology.rendering.gui.widgets.UIInput;
 import org.terasology.rendering.gui.widgets.UIList;
 
 import javax.vecmath.Vector2f;
@@ -131,9 +130,6 @@ public class UIMenuSelectWorld extends UIDisplayWindow {
 
                 GUIManager.getInstance().addWindow(_window, "generate_world");
                 GUIManager.getInstance().setFocusedWindow(_window);
-
-                UIInput inputWorldName = (UIInput) _window.getElementById("inputWorldTitle");
-                inputWorldName.setValue(_window.getWorldName());
             }
         });
         createNewWorld.setHorizontalAlign(EHorizontalAlign.CENTER);
@@ -142,11 +138,11 @@ public class UIMenuSelectWorld extends UIDisplayWindow {
 
         fillList();
 
-        addDisplayElement(list, "list");
-        addDisplayElement(loadFromList, "loadFromListButton");
-        addDisplayElement(goToBack, "goToBackButton");
-        addDisplayElement(createNewWorld, "createWorldButton");
-        addDisplayElement(deleteFromList, "deleteFromListButton");
+        addDisplayElement(list);
+        addDisplayElement(loadFromList);
+        addDisplayElement(goToBack);
+        addDisplayElement(createNewWorld);
+        addDisplayElement(deleteFromList);
     }
 
     private void loadSelectedWorld() {
@@ -198,5 +194,9 @@ public class UIMenuSelectWorld extends UIDisplayWindow {
                 logger.log(Level.SEVERE, "Failed reading world data object. Sorry.", e);
             }
         }
+    }
+    
+    public int getWorldCount() {
+        return list.size();
     }
 }

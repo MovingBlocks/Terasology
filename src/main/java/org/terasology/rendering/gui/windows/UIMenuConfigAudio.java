@@ -111,9 +111,9 @@ public class UIMenuConfigAudio extends UIDisplayWindow {
         addDisplayElement(_title);
         addDisplayElement(_version);
 
-        addDisplayElement(_soundOptionSlider, "soundVolumeSlider");
-        addDisplayElement(_musicOptionSlider, "musicVolumeSlider");
-        addDisplayElement(_backToConfigMenuButton, "backToConfigMenuButton");
+        addDisplayElement(_soundOptionSlider);
+        addDisplayElement(_musicOptionSlider);
+        addDisplayElement(_backToConfigMenuButton);
     }
 
     public void setup() {

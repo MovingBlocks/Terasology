@@ -231,14 +231,14 @@ public class UIMenuConfigVideo extends UIDisplayWindow {
         addDisplayElement(_title);
         addDisplayElement(_version);
 
-        addDisplayElement(_graphicsQualityButton, "graphicsQualityButton");
-        addDisplayElement(_fovButton, "fovSlider");
-        addDisplayElement(_viewingDistanceButton, "viewingDistanceButton");
-        addDisplayElement(_animateGrassButton, "animateGrassButton");
-        addDisplayElement(_reflectiveWaterButton, "reflectiveWaterButton");
-        addDisplayElement(_blurIntensityButton, "blurIntensityButton");
-        addDisplayElement(_bobbingButton, "bobbingButton");
-        addDisplayElement(_backToConfigMenuButton, "backToConfigMenuButton");
+        addDisplayElement(_graphicsQualityButton);
+        addDisplayElement(_fovButton);
+        addDisplayElement(_viewingDistanceButton);
+        addDisplayElement(_animateGrassButton);
+        addDisplayElement(_reflectiveWaterButton);
+        addDisplayElement(_blurIntensityButton);
+        addDisplayElement(_bobbingButton);
+        addDisplayElement(_backToConfigMenuButton);
     }
     
     public void setup() {

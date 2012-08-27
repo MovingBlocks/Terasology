@@ -143,7 +143,6 @@ public class UIList extends UIScrollableContainer implements IInputDataElement {
 
     public UIList(Vector2f size) {
         super(size);
-        setSize(size);
     }
 
     /**
@@ -170,7 +169,6 @@ public class UIList extends UIScrollableContainer implements IInputDataElement {
         }
 
         newItem.setPosition(new Vector2f(0f, 32f * items.size()));
-        newItem.setFixed(false);
         newItem.addClickListener(new ClickListener() {
             private long _lastTime = System.currentTimeMillis();
             private int _lastButton = -1;

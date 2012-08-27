@@ -75,8 +75,8 @@ public class UIMenuConfigMods extends UIDisplayWindow {
         
         addDisplayElement(_title);
 
-        addDisplayElement(_minionsButton, "minionsButton");
-        addDisplayElement(_minionOptionsButton, "minionOptionsButton");
-        addDisplayElement(_backToConfigMenuButton, "backToConfigMenuButton");
+        addDisplayElement(_minionsButton);
+        addDisplayElement(_minionOptionsButton);
+        addDisplayElement(_backToConfigMenuButton);
     }
 }

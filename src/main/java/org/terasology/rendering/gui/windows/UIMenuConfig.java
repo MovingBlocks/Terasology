@@ -122,10 +122,10 @@ public class UIMenuConfig extends UIDisplayWindow {
         addDisplayElement(_title);
         addDisplayElement(_version);
 
-        addDisplayElement(_videoButton, "videoButton");
-        addDisplayElement(_audioButton, "audioButton");
-        addDisplayElement(_controlsButton, "controlsButton");
-        addDisplayElement(_modsButton, "modsButton");
-        addDisplayElement(_backToMainMenuButton, "backToMainMenuButton");
+        addDisplayElement(_videoButton);
+        addDisplayElement(_audioButton);
+        addDisplayElement(_controlsButton);
+        addDisplayElement(_modsButton);
+        addDisplayElement(_backToMainMenuButton);
     }
 }
