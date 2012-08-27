@@ -19,7 +19,7 @@ import org.terasology.rendering.gui.widgets.UIImage;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  *
  */
-public abstract class UIScrollableContainer extends UIDisplayContainer {
+public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
     
     private final List<ScrollListener> scrollListener = new ArrayList<ScrollListener>();
     private UIComposite container;
@@ -41,11 +41,11 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
     //other
     private boolean isScrollable = false;
     
-    public UIScrollableContainer() {
+    public UIDisplayContainerScrollable() {
         setup();
     }
     
-    public UIScrollableContainer(Vector2f size) {
+    public UIDisplayContainerScrollable(Vector2f size) {
         setSize(size);
         setEnableScrolling(true);
         setEnableScrollbar(true);

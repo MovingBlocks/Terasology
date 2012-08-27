@@ -25,8 +25,8 @@ import org.terasology.logic.LocalPlayer;
 import org.terasology.mods.miniions.components.MinionBarComponent;
 import org.terasology.mods.miniions.components.MinionComponent;
 import org.terasology.mods.miniions.components.MinionControllerComponent;
-import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.widgets.UIImage;
+import org.terasology.rendering.gui.widgets.UIWindow;
 
 /**
  * Created with IntelliJ IDEA.
@@ -35,7 +35,7 @@ import org.terasology.rendering.gui.widgets.UIImage;
  * Time: 20:25
  * used as a dial menu without ungrabbing the mouse
  */
-public class UIMinionBehaviourMenu extends UIDisplayWindow {
+public class UIMinionBehaviourMenu extends UIWindow {
 
     //private UIButton buttonMove;
     private final UIImage background;

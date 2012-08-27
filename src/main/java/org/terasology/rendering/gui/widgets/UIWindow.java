@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.framework;
+package org.terasology.rendering.gui.widgets;
 
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.rendering.gui.framework.IInputDataElement;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.UIDisplayContainerScrollable;
 import org.terasology.rendering.gui.framework.events.WindowListener;
 
 import java.util.ArrayList;
@@ -27,8 +30,9 @@ import java.util.HashMap;
  * A window which can contain display elements. All windows will be managed by the GUIManager.
  * 
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
+ * 
  */
-public class UIDisplayWindow extends UIScrollableContainer {
+public class UIWindow extends UIDisplayContainerScrollable {
 
     //events
     private enum eWindowEvent {OPEN, CLOSE};
@@ -43,9 +47,8 @@ public class UIDisplayWindow extends UIScrollableContainer {
     //layout
     private boolean modal = false;
     
-    public UIDisplayWindow() {
-        setEnableScrollbar(true);
-        setEnableScrolling(true);
+    public UIWindow() {
+        
     }
 
     public void clearInputControls() {

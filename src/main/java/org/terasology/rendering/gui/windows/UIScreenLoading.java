@@ -18,16 +18,16 @@ package org.terasology.rendering.gui.windows;
 import javax.vecmath.Vector2f;
 
 import org.terasology.asset.AssetManager;
-import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UIProgressBar;
+import org.terasology.rendering.gui.widgets.UIWindow;
 
 /**
  * Simple status screen with one sole text label usable for status notifications.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class UIScreenLoading extends UIDisplayWindow {
+public class UIScreenLoading extends UIWindow {
 
     final UIImage background;
     final UIProgressBar _progressBar;

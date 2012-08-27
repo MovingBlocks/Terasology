@@ -20,9 +20,9 @@ import org.lwjgl.opengl.Display;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.input.binds.FrobButton;
 import org.terasology.asset.AssetManager;
-import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UIItemContainer;
+import org.terasology.rendering.gui.widgets.UIWindow;
 
 import javax.vecmath.Vector2f;
 
@@ -31,7 +31,7 @@ import javax.vecmath.Vector2f;
  *
  * @author Immortius <immortius@gmail.com>
  */
-public class UIScreenContainer extends UIDisplayWindow {
+public class UIScreenContainer extends UIWindow {
     private static final int CENTER_BORDER = 100;
     private static final int OUTER_BORDER = 50;
 

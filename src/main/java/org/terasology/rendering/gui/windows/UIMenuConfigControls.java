@@ -22,7 +22,6 @@ import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.InputConfig;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.layout.GridLayout;
@@ -31,6 +30,7 @@ import org.terasology.rendering.gui.widgets.UIComposite;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UISlider;
 import org.terasology.rendering.gui.widgets.UIText;
+import org.terasology.rendering.gui.widgets.UIWindow;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
@@ -40,7 +40,7 @@ import javax.vecmath.Vector4f;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  *         Date: 29/07/12
  */
-public class UIMenuConfigControls extends UIDisplayWindow {
+public class UIMenuConfigControls extends UIWindow {
 
     String editButtonCurrent = "";
     UIButton editButton = null;
@@ -387,16 +387,16 @@ public class UIMenuConfigControls extends UIDisplayWindow {
         group4.addDisplayElement(Toolslot1Buttontext);
         group4.addDisplayElement(Toolslot1Button);
         group4.addDisplayElement(Toolslot2Buttontext);
-        group4. addDisplayElement(Toolslot2Button);
+        group4.addDisplayElement(Toolslot2Button);
         group4.addDisplayElement(Toolslot3Buttontext);
-        group4. addDisplayElement(Toolslot3Button);
-        group4. addDisplayElement(Toolslot4Buttontext);
-        group4. addDisplayElement(Toolslot4Button);
+        group4.addDisplayElement(Toolslot3Button);
+        group4.addDisplayElement(Toolslot4Buttontext);
+        group4.addDisplayElement(Toolslot4Button);
         group4.addDisplayElement(Toolslot5Buttontext);
-        group4. addDisplayElement(Toolslot5Button);
-        group4. addDisplayElement(Toolslot6Buttontext);
+        group4.addDisplayElement(Toolslot5Button);
+        group4.addDisplayElement(Toolslot6Buttontext);
         group4.addDisplayElement(Toolslot6Button);
-        group4. addDisplayElement(Toolslot7Buttontext);
+        group4.addDisplayElement(Toolslot7Buttontext);
         group4.addDisplayElement(Toolslot7Button);
         group4.addDisplayElement(Toolslot8Buttontext);
         group4.addDisplayElement(Toolslot8Button);

@@ -22,18 +22,18 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.widgets.UIButton;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UIText;
+import org.terasology.rendering.gui.widgets.UIWindow;
 
 /**
  * Main menu screen.
  *
  * @author Anton Kireev <adeon.k87@gmail.com>
  */
-public class UIMenuMain extends UIDisplayWindow {
+public class UIMenuMain extends UIWindow {
 
     private final UIImage _title;
 

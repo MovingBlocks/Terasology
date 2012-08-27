@@ -20,7 +20,6 @@ import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.StateButtonAction;
@@ -29,6 +28,7 @@ import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UISlider;
 import org.terasology.rendering.gui.widgets.UIStateButton;
 import org.terasology.rendering.gui.widgets.UIText;
+import org.terasology.rendering.gui.widgets.UIWindow;
 
 import javax.vecmath.Vector2f;
 
@@ -37,7 +37,7 @@ import javax.vecmath.Vector2f;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  *         Date: 29/07/12
  */
-public class UIMenuConfigVideo extends UIDisplayWindow {
+public class UIMenuConfigVideo extends UIWindow {
 
     final UIImage _title;
 

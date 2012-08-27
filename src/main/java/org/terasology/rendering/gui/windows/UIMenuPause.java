@@ -24,11 +24,11 @@ import org.terasology.game.modes.StateMainMenu;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.asset.AssetManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.widgets.UIButton;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UIText;
+import org.terasology.rendering.gui.widgets.UIWindow;
 
 import javax.vecmath.Vector2f;
 
@@ -37,7 +37,7 @@ import javax.vecmath.Vector2f;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class UIMenuPause extends UIDisplayWindow {
+public class UIMenuPause extends UIWindow {
 
     final UIImage _title;
 

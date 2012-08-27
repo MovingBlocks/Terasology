@@ -20,13 +20,13 @@ import org.terasology.asset.AssetManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.widgets.UIButton;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UISlider;
 import org.terasology.rendering.gui.widgets.UIText;
+import org.terasology.rendering.gui.widgets.UIWindow;
 
 import javax.vecmath.Vector2f;
 
@@ -35,7 +35,7 @@ import javax.vecmath.Vector2f;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  *         Date: 29/07/12
  */
-public class UIMenuConfigAudio extends UIDisplayWindow {
+public class UIMenuConfigAudio extends UIWindow {
 
     final UIImage _title;
     final UIText _version;

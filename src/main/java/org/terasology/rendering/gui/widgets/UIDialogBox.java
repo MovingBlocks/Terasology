@@ -25,7 +25,6 @@ import org.terasology.asset.AssetManager;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
@@ -35,7 +34,7 @@ import org.terasology.rendering.gui.framework.events.MouseMoveListener;
  *
  * TODO clean this up. Remove UIDialogBackground -> should use the style UIStyleBackgroundSplit
  */
-public class UIDialogBox extends UIDisplayWindow {
+public class UIDialogBox extends UIWindow {
     
     private final UIImage overlay;
     private final UIDialogBackground container;

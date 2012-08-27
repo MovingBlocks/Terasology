@@ -20,11 +20,11 @@ import javax.vecmath.Vector2f;
 import org.terasology.asset.AssetManager;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.widgets.UIButton;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UIText;
+import org.terasology.rendering.gui.widgets.UIWindow;
 
 /**
  * Main menu screen.
@@ -32,7 +32,7 @@ import org.terasology.rendering.gui.widgets.UIText;
  * @author Anton Kireev <adeon.k87@gmail.com>
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
-public class UIMenuConfig extends UIDisplayWindow {
+public class UIMenuConfig extends UIWindow {
 
     final UIImage _title;
     final UIText _version;

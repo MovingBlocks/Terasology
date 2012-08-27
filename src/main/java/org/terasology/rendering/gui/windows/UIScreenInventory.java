@@ -23,19 +23,19 @@ import org.terasology.input.binds.InventoryButton;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.WindowListener;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UIItemCell;
 import org.terasology.rendering.gui.widgets.UIItemContainer;
+import org.terasology.rendering.gui.widgets.UIWindow;
 
 /**
  * The player's inventory.
  *
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
-public class UIScreenInventory extends UIDisplayWindow {
+public class UIScreenInventory extends UIWindow {
 
     private final UIItemContainer toolbar;
     private final UIItemContainer inventory;

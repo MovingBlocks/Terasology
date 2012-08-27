@@ -39,12 +39,12 @@ import org.terasology.mods.miniions.components.MinionComponent;
 import org.terasology.mods.miniions.events.MinionMessageEvent;
 import org.terasology.mods.miniions.rendering.gui.components.UIMessageQueue;
 import org.terasology.mods.miniions.rendering.gui.components.UIMinionbar;
-import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.widgets.UIBuff;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UIItemCell;
 import org.terasology.rendering.gui.widgets.UIItemContainer;
 import org.terasology.rendering.gui.widgets.UIText;
+import org.terasology.rendering.gui.widgets.UIWindow;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -55,7 +55,7 @@ import org.terasology.rendering.world.WorldRenderer;
  * 
  * TODO clean up
  */
-public class UIScreenHUD extends UIDisplayWindow implements EventHandlerSystem {
+public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
 
     protected EntityManager entityManager;
 

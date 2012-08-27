@@ -20,10 +20,10 @@ import javax.vecmath.Vector2f;
 import org.lwjgl.input.Keyboard;
 import org.terasology.asset.AssetManager;
 import org.terasology.input.binds.UseItemButton;
-import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.widgets.UIImage;
+import org.terasology.rendering.gui.widgets.UIWindow;
 
-public class UIScreenBook extends UIDisplayWindow {
+public class UIScreenBook extends UIWindow {
 
     private final UIImage background;
 

@@ -25,10 +25,10 @@ import org.terasology.world.WorldInfo;
 import org.terasology.world.WorldUtil;
 import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.widgets.UIButton;
 import org.terasology.rendering.gui.widgets.UIList;
+import org.terasology.rendering.gui.widgets.UIWindow;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
@@ -44,7 +44,7 @@ import java.util.logging.Logger;
  *
  * @author Anton Kireev <adeon.k87@gmail.com>
  */
-public class UIMenuSelectWorld extends UIDisplayWindow {
+public class UIMenuSelectWorld extends UIWindow {
     private Logger logger = Logger.getLogger(getClass().getName());
 
     final UIList list;

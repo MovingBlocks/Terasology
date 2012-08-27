@@ -24,7 +24,7 @@ import org.newdawn.slick.Color;
 import org.terasology.rendering.gui.framework.IInputDataElement;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.UIScrollableContainer;
+import org.terasology.rendering.gui.framework.UIDisplayContainerScrollable;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
@@ -40,7 +40,7 @@ import org.terasology.rendering.gui.framework.events.MouseMoveListener;
  * TODO here is a bug with deleting the selected item..
  */
 
-public class UIList extends UIScrollableContainer implements IInputDataElement {
+public class UIList extends UIDisplayContainerScrollable implements IInputDataElement {
 
     private UIListItem _selectedItem = null;
     private final ArrayList<ClickListener> _doubleClickListeners = new ArrayList<ClickListener>();

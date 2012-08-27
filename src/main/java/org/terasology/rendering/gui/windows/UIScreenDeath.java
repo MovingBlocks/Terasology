@@ -24,11 +24,11 @@ import org.terasology.game.GameEngine;
 import org.terasology.game.modes.StateMainMenu;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.WindowListener;
 import org.terasology.rendering.gui.widgets.UIButton;
 import org.terasology.rendering.gui.widgets.UIText;
+import org.terasology.rendering.gui.widgets.UIWindow;
 
 /**
  * Simple status screen with one sole text label usable for status notifications.
@@ -36,7 +36,7 @@ import org.terasology.rendering.gui.widgets.UIText;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
-public class UIScreenDeath extends UIDisplayWindow {
+public class UIScreenDeath extends UIWindow {
 
     private final UIText _meassage;
     private final UIButton _respawnButton;

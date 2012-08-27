@@ -36,7 +36,6 @@ import org.terasology.physics.ImpulseEvent;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 import org.terasology.rendering.gui.framework.events.WindowListener;
@@ -87,7 +86,7 @@ public class UIItemCell extends UIDisplayContainer  {
         
         @Override
         public void close(UIDisplayElement element) {
-            UIDisplayWindow window = (UIDisplayWindow) element;
+            UIWindow window = (UIWindow) element;
             
             //lets reset the item if the window got closed.
             reset();

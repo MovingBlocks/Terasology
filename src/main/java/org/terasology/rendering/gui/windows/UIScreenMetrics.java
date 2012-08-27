@@ -27,15 +27,15 @@ import java.util.TreeSet;
 import javax.vecmath.Vector2f;
 
 import org.terasology.performanceMonitor.PerformanceMonitor;
-import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.widgets.UIText;
+import org.terasology.rendering.gui.widgets.UIWindow;
 
 /**
  * UI element that graphs performance metrics
  *
  * @author Immortius <immortius@gmail.com>
  */
-public class UIScreenMetrics extends UIDisplayWindow {
+public class UIScreenMetrics extends UIWindow {
 
     private static final int METRIC_LINES = 10;
 
