@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.gui.framework;
 
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetManager;
 import org.terasology.input.BindButtonEvent;
@@ -142,6 +143,13 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     public boolean processMouseInput(int button, boolean state, int wheelMoved, boolean consumed) {
         if (!isVisible())
             return consumed;
+        
+        //cancel mouse click event if the click is out of the cropped area
+        if (cropContainer) {
+            if (!intersects(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()))) {
+                state = false;
+            }
+        }
 
         // Pass the mouse event to all display elements
         for (int i = displayElements.size() - 1; i >= 0; i--) {
