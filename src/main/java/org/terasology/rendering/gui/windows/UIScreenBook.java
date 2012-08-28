@@ -20,36 +20,27 @@ import javax.vecmath.Vector2f;
 import org.lwjgl.input.Keyboard;
 import org.terasology.asset.AssetManager;
 import org.terasology.input.binds.UseItemButton;
-import org.terasology.rendering.gui.framework.UIDisplayWindow;
-import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import org.terasology.rendering.gui.widgets.UIImage;
+import org.terasology.rendering.gui.widgets.UIWindow;
 
-public class UIScreenBook extends UIDisplayWindow {
+public class UIScreenBook extends UIWindow {
 
-    private final UIGraphicsElement background;
+    private final UIImage background;
 
     public UIScreenBook() {
         setBackgroundColor(0x00, 0x00, 0x00, 0.75f);
+        setHorizontalAlign(EHorizontalAlign.CENTER);
+        setVerticalAlign(EVerticalAlign.CENTER);
         setModal(true);
         setCloseBinds(new String[] {UseItemButton.ID});
         setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
         maximize();
         
-        background = new UIGraphicsElement(AssetManager.loadTexture("engine:openbook"));
+        background = new UIImage(AssetManager.loadTexture("engine:openbook"));
         background.setPosition(new Vector2f(-250, -200));
         background.setSize(new Vector2f(500, 300));
         background.setVisible(true);
         
         addDisplayElement(background);
-        
-        layout();
-    }
-
-    @Override
-    public void layout() {
-        super.layout();
-        
-        if (background != null) {
-            background.center();
-        }
     }
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.components;
+package org.terasology.rendering.gui.widgets;
 
 import java.util.ArrayList;
 
@@ -27,7 +27,6 @@ import org.terasology.asset.AssetUri;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.UIGraphicsElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
@@ -41,7 +40,7 @@ public class UISlider extends UIDisplayContainer {
     
     private final ArrayList<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
     private final UIText label;
-    private final UIGraphicsElement slider;
+    private final UIImage slider;
     
     private int currentValue;
     private int minValue;
@@ -76,7 +75,7 @@ public class UISlider extends UIDisplayContainer {
             @Override
             public void enter(UIDisplayElement element) {
                 AudioManager.play(new AssetUri(AssetType.SOUND, "engine:click"), 1.0f);
-                setBackgroundImage(new Vector2f(0f, 30f), null);
+                setBackgroundImage(new Vector2f(0f, 30f), new Vector2f(256f, 30f));
             }
 
             @Override
@@ -90,13 +89,18 @@ public class UISlider extends UIDisplayContainer {
         addMouseButtonListener(new MouseButtonListener() {            
             @Override
             public void up(UIDisplayElement element, int button, boolean intersect) {
-                setBackgroundImage(new Vector2f(0f, 0f), null);
+                setBackgroundImage(new Vector2f(0f, 0f), new Vector2f(256f, 30f));
+                setFocus(null);
             }
             
             @Override
             public void down(UIDisplayElement element, int button, boolean intersect) {
-                if (intersect)
+                if (intersect) {
                     changeSlider(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()).x);
+                    if (!isFocused()) {
+                        setFocus(UISlider.this);
+                    }
+                }
             }
             
             @Override
@@ -105,7 +109,7 @@ public class UISlider extends UIDisplayContainer {
             }
         });
         
-        slider = new UIGraphicsElement(AssetManager.loadTexture("engine:gui_menu"));
+        slider = new UIImage(AssetManager.loadTexture("engine:gui_menu"));
         slider.setParent(this);
         slider.setVisible(true);
         slider.setPosition(new Vector2f(0, 0));
@@ -132,21 +136,14 @@ public class UISlider extends UIDisplayContainer {
         });
         
         label = new UIText("");
+        label.setHorizontalAlign(EHorizontalAlign.CENTER);
+        label.setVerticalAlign(EVerticalAlign.CENTER);
         label.setVisible(true);
         
         addDisplayElement(slider);
         addDisplayElement(label);
         
         calcRange();
-    }
-    
-    @Override
-    public void layout() {
-        super.layout();
-        
-        if (label != null) {
-            label.setPosition(new Vector2f(getSize().x / 2 - label.getTextWidth() / 2, getSize().y / 2 - label.getTextHeight() / 2));
-        }
     }
     
     /**
@@ -162,7 +159,7 @@ public class UISlider extends UIDisplayContainer {
             value = maxValue;
         }
         
-        slider.getPosition().set(valueToPos(value), 0);
+        slider.setPosition(new Vector2f(valueToPos(value), 0));
         
         if (value != currentValue)
         {
@@ -187,7 +184,7 @@ public class UISlider extends UIDisplayContainer {
             sliderPos = getSize().x - slider.getSize().x;
         }
         
-        slider.getPosition().set(sliderPos, 0);
+        slider.setPosition(new Vector2f(sliderPos, 0f));
         
         int newValue = posToValue(sliderPos);
         if (newValue != currentValue)

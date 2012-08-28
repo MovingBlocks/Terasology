@@ -11,26 +11,27 @@ import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 import org.terasology.rendering.gui.framework.events.ScrollListener;
 import org.terasology.rendering.gui.framework.style.UIStyle;
+import org.terasology.rendering.gui.widgets.UIComposite;
+import org.terasology.rendering.gui.widgets.UIImage;
 
 /**
  * A container which will display a scrollbar if the content is to big to be displayed.
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  *
  */
-public abstract class UIScrollableContainer extends UIDisplayContainer {
+public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
     
     private final List<ScrollListener> scrollListener = new ArrayList<ScrollListener>();
-    private UIDisplayContainer container;
+    private UIComposite container;
     
     //scrollbar
-    private UIGraphicsElement scrollbar;
+    private UIImage scrollbar;
     private boolean scrolling = false;            //true if the scrollbar was pressed, this will enable scrolling
-    private float scrollbarPressedOffset;        //the position on which the scrollbar was grabbed with the mouse
+    private float scrollbarPressedOffset;         //the position on which the scrollbar was grabbed with the mouse
     
     //content
-    private float min;                            //the min position value of all child elements
     private float max;                            //the max position value of all child elements
-    private float contentHeight;                //the contents hight of all chicld elements
+    private float contentHeight;                  //the contents hight of all chicld elements
     private float multiplier = 1f;                //the multiplier of how the movement in the scrollbar will move the actual child elements
     
     //settings
@@ -40,31 +41,29 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
     //other
     private boolean isScrollable = false;
     
-    public UIScrollableContainer() {
+    public UIDisplayContainerScrollable() {
         setup();
     }
     
-    public UIScrollableContainer(Vector2f size) {
+    public UIDisplayContainerScrollable(Vector2f size) {
         setSize(size);
-        setCrop(true);
-        
-        enableScrolling = true;
-        enableScrollbar = true;
+        setEnableScrolling(true);
+        setEnableScrollbar(true);
         
         setup();
     }
 
     private void setup() {
-        container = new UIDisplayContainer() { };
+        container = new UIComposite();
+        container.setSize("100%", "100%");
         container.setVisible(true);
         
-        scrollbar = new UIGraphicsElement(AssetManager.loadTexture("engine:gui_menu"));
-        scrollbar.setCroped(false);
+        scrollbar = new UIImage(AssetManager.loadTexture("engine:gui_menu"));
+        scrollbar.setCrop(false);
         scrollbar.setTextureOrigin(new Vector2f(0f, 0f));
         scrollbar.setTextureSize(new Vector2f(60f, 15f));
         scrollbar.setSize(new Vector2f(15f, 60f));
         scrollbar.setVisible(false);
-        scrollbar.setPosition(new Vector2f(getSize().x - scrollbar.getSize().x, 0f));
         scrollbar.addMouseButtonListener(new MouseButtonListener() {    
             @Override
             public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
@@ -116,7 +115,7 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
             @Override
             public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
                 if (wheel != 0 && enableScrolling && isScrollable && intersect) {
-                    moveScrollbar(scrollbar.calcAbsolutePosition().y - (wheel / 10));
+                    moveScrollbar(scrollbar.getAbsolutePosition().y - (wheel / 10));
                 }
             }
             
@@ -131,10 +130,8 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
             }
         });
         
-        getDisplayElements().add(container);
-        getDisplayElements().add(scrollbar);
-        container.setParent(this);
-        scrollbar.setParent(this);
+        super.addDisplayElement(container);
+        super.addDisplayElement(scrollbar);
     }
 
     /**
@@ -153,11 +150,10 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
         }
 
         //calculate the different in the position
-        //float scrolled = scrollbar.getPosition().y - scrollbarPos;
-        scrollbar.getPosition().y = scrollbarPos;
+        scrollbar.setPosition(new Vector2f(getSize().x - scrollbar.getSize().x, scrollbarPos));
         
         //move the content
-        container.getPosition().y = -multiplier * scrollbar.getPosition().y;
+        container.setPosition(new Vector2f(container.getPosition().x, -multiplier * scrollbar.getPosition().y));
         
         notifyScrollListeners();
     }
@@ -167,13 +163,14 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
      */
     private void calcContentHeight() {
         if (scrollbar != null) {
-            if (getDisplayElements().size() > 0) {
+            if (container.getDisplayElements().size() > 0) {
                 
-                //Lets calculate the min max values recursively
-                min = Float.MAX_VALUE;
-                max = Float.MIN_VALUE;
-                calcMinMax(container.getDisplayElements());
-                contentHeight = max - min;
+                //Lets calculate the max value recursively
+                max = 0;
+                calcMax(container.getDisplayElements());
+                contentHeight = max - container.getAbsolutePosition().y;
+                
+                //container.setSize(new Vector2f(getSize().x, contentHeight));
             }
             
             //check if the content is bigger than the container
@@ -184,79 +181,65 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
                 float diff = contentHeight - getSize().y;
     
                 //calculate the new multiplier based on the size which needs to be scrolled by the scrollbar
+                //TODO calculate multiplier none linear..
                 multiplier = (diff / getSize().y) + 1;
-    
-                //set the new size of the scrollbar based on the multiplier
-                scrollbar.getSize().y = getSize().y / multiplier;
                 
                 if (enableScrollbar) {
+                    //set the new size of the scrollbar based on the multiplier
+                    scrollbar.setSize(new Vector2f(scrollbar.getSize().x, getSize().y / multiplier));
+                    
                     //enable the scrollbar
                     scrollbar.setVisible(true);
-                    
-                    //make space for the scrollbar on the right side of the container
-                    //getSize().x = originalSize.x - scrollbar.getSize().x;
                 }
                 
-                moveScrollbar(scrollbar.calcAbsolutePosition().y);
+                moveScrollbar(scrollbar.getAbsolutePosition().y);
             } else {
                 isScrollable = false;
                 
                 //disable the scrollbar
                 scrollbar.setVisible(false);
                 
-                //remove the space for the scrollbar on the right side of the container
-                //getSize().x = originalSize.x;
-                
                 moveScrollbar(0f);
             }
-            
-            layout();
         }
     }
     
     /**
-     * Calculate the min and max values of all display elements within a display container recursively.
+     * Calculate the max value of all display elements within a display container recursively.
      * @param displayElements The display elements of a display container.
      */
-    private void calcMinMax(List<UIDisplayElement> displayElements) {
-        float elementMin;
+    private void calcMax(List<UIDisplayElement> displayElements) {
         float elementMax;
         
         //loop through all child elements
         for (UIDisplayElement element : displayElements) {
-            
             if (element.isVisible() && !(element instanceof UIStyle) && element != scrollbar) {
                 //recursive action if the element also contains child elements
                 if (element instanceof UIDisplayContainer) {
-                    calcMinMax(((UIDisplayContainer)element).getDisplayElements());
+                    calcMax(((UIDisplayContainer)element).getDisplayElements());
                 }
-                
-                elementMin = element.calcAbsolutePosition().y;
-                elementMax = element.calcAbsolutePosition().y + element.getSize().y;
-                
-                if (elementMin < min) {
-                    min = elementMin;
-                }
+
+                elementMax = element.getAbsolutePosition().y + element.getSize().y;
                 
                 if (elementMax > max) {
                     max = elementMax;
                 }
             }
-            
         }
     }
 
     @Override
     public void addDisplayElement(UIDisplayElement element) {
-        container._displayElements.add(element);
-        element.setParent(container);
-        
-        calcContentHeight();
+        if (element instanceof UIStyle) {
+            super.addDisplayElement(element);
+        } else {
+            container.addDisplayElement(element);
+        }
     }
     
     @Override
     public void removeDisplayElement(UIDisplayElement element) {
-        container._displayElements.remove(element);
+        container.getDisplayElements().remove(element);
         element.setParent(null);
         
         calcContentHeight();
@@ -264,30 +247,12 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
     
     @Override
     public void removeAllDisplayElements() {
-        for (UIDisplayElement element : container._displayElements) {
+        for (UIDisplayElement element : container.getDisplayElements()) {
             element.setParent(null);
         }
-        container._displayElements.clear();
+        container.getDisplayElements().clear();
         
         calcContentHeight();
-    }
-    
-    @Override
-    public void processMouseInput(int button, boolean state, int wheelMoved) {
-        if (!isVisible())
-            return;
-        
-        //cancel the button events if the mouse is out of the cropped area
-        if (!intersects(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()))) {
-            button = -1;
-        }
-        
-        super.processMouseInput(button, state, wheelMoved);
-
-        // Pass the mouse event to all display elements
-        for (int i = 0; i < _displayElements.size(); i++) {
-            _displayElements.get(i).processMouseInput(button, state, wheelMoved);
-        }
     }
     
     /**
@@ -304,6 +269,8 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
      */
     public void setEnableScrolling(boolean enable) {
         this.enableScrolling = enable;
+
+        setCropContainer(enable);
     }
     
     /**
@@ -311,7 +278,7 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
      * @return Returns true if the scrollbar is enabled.
      */
     public boolean isEnableScrollbar() {
-        return enableScrolling;
+        return enableScrollbar;
     }
 
     /**
@@ -319,7 +286,7 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
      * @param enable True to enable scrollbar.
      */
     public void setEnableScrollbar(boolean enable) {
-        this.enableScrolling = enable;
+        this.enableScrollbar = enable;
         
         calcContentHeight();
     }
@@ -336,5 +303,12 @@ public abstract class UIScrollableContainer extends UIDisplayContainer {
 
     public void removeScrollListener(ScrollListener listener) {
         scrollListener.remove(listener);
+    }
+    
+    @Override
+    public void layout() {
+        super.layout();
+        
+        calcContentHeight();
     }
 }

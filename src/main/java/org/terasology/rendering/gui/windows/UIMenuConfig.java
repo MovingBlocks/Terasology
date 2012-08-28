@@ -19,12 +19,12 @@ import javax.vecmath.Vector2f;
 
 import org.terasology.asset.AssetManager;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.rendering.gui.components.UIButton;
-import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.UIDisplayWindow;
-import org.terasology.rendering.gui.framework.UIGraphicsElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
+import org.terasology.rendering.gui.widgets.UIButton;
+import org.terasology.rendering.gui.widgets.UIImage;
+import org.terasology.rendering.gui.widgets.UIText;
+import org.terasology.rendering.gui.widgets.UIWindow;
 
 /**
  * Main menu screen.
@@ -32,9 +32,9 @@ import org.terasology.rendering.gui.framework.events.ClickListener;
  * @author Anton Kireev <adeon.k87@gmail.com>
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
-public class UIMenuConfig extends UIDisplayWindow {
+public class UIMenuConfig extends UIWindow {
 
-    final UIGraphicsElement _title;
+    final UIImage _title;
     final UIText _version;
 
     private final UIButton _backToMainMenuButton;
@@ -48,15 +48,21 @@ public class UIMenuConfig extends UIDisplayWindow {
         setModal(true);
         maximize();
         
-        _title = new UIGraphicsElement(AssetManager.loadTexture("engine:terasology"));
+        _title = new UIImage(AssetManager.loadTexture("engine:terasology"));
+        _title.setHorizontalAlign(EHorizontalAlign.CENTER);
+        _title.setPosition(new Vector2f(0f, 128f));
         _title.setVisible(true);
         _title.setSize(new Vector2f(512f, 128f));
 
         _version = new UIText("Settings");
+        _version.setHorizontalAlign(EHorizontalAlign.CENTER);
+        _version.setPosition(new Vector2f(0f, 230f));
         _version.setVisible(true);
 
         _videoButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _videoButton.getLabel().setText("Video");
+        _videoButton.setHorizontalAlign(EHorizontalAlign.CENTER);
+        _videoButton.setPosition(new Vector2f(0f, 300f));
         _videoButton.setVisible(true);
         _videoButton.addClickListener(new ClickListener() {
             @Override
@@ -67,6 +73,8 @@ public class UIMenuConfig extends UIDisplayWindow {
 
         _audioButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _audioButton.getLabel().setText("Audio");
+        _audioButton.setHorizontalAlign(EHorizontalAlign.CENTER);
+        _audioButton.setPosition(new Vector2f(0f, 300f + 40f));
         _audioButton.setVisible(true);
         _audioButton.addClickListener(new ClickListener() {
             @Override
@@ -77,6 +85,8 @@ public class UIMenuConfig extends UIDisplayWindow {
 
         _controlsButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _controlsButton.getLabel().setText("Controls");
+        _controlsButton.setHorizontalAlign(EHorizontalAlign.CENTER);
+        _controlsButton.setPosition(new Vector2f(0f, 300f + 2 * 40f));
         _controlsButton.setVisible(true);
         _controlsButton.addClickListener(new ClickListener() {
             @Override
@@ -87,6 +97,8 @@ public class UIMenuConfig extends UIDisplayWindow {
 
         _modsButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _modsButton.getLabel().setText("Mods");
+        _modsButton.setHorizontalAlign(EHorizontalAlign.CENTER);
+        _modsButton.setPosition(new Vector2f(0f, 300f + 3 * 40f));
         _modsButton.setVisible(true);
         _modsButton.addClickListener(new ClickListener() {
             @Override
@@ -97,6 +109,8 @@ public class UIMenuConfig extends UIDisplayWindow {
 
         _backToMainMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _backToMainMenuButton.getLabel().setText("Return to Main Menu");
+        _backToMainMenuButton.setHorizontalAlign(EHorizontalAlign.CENTER);
+        _backToMainMenuButton.setPosition(new Vector2f(0f, 300f + 7 * 40f));
         _backToMainMenuButton.setVisible(true);
         _backToMainMenuButton.addClickListener(new ClickListener() {
             @Override
@@ -108,40 +122,10 @@ public class UIMenuConfig extends UIDisplayWindow {
         addDisplayElement(_title);
         addDisplayElement(_version);
 
-        addDisplayElement(_videoButton, "videoButton");
-        addDisplayElement(_audioButton, "audioButton");
-        addDisplayElement(_controlsButton, "controlsButton");
-        addDisplayElement(_modsButton, "modsButton");
-        addDisplayElement(_backToMainMenuButton, "backToMainMenuButton");
-
-        layout();
-    }
-    
-    @Override
-    public void layout() {
-        super.layout();
-        
-        if (_version != null) {
-            _version.centerHorizontally();
-            _version.getPosition().y = 230f;
-    
-            _videoButton.centerHorizontally();
-            _videoButton.getPosition().y = 300f;
-    
-            _audioButton.centerHorizontally();
-            _audioButton.getPosition().y = 300f + 40f;
-    
-            _controlsButton.centerHorizontally();
-            _controlsButton.getPosition().y = 300f + 2 * 40f;
-    
-            _modsButton.centerHorizontally();
-            _modsButton.getPosition().y = 300f + 3 * 40f;
-    
-            _backToMainMenuButton.centerHorizontally();
-            _backToMainMenuButton.getPosition().y = 300f + 7 * 40f;
-    
-            _title.centerHorizontally();
-            _title.getPosition().y = 128f;
-        }
+        addDisplayElement(_videoButton);
+        addDisplayElement(_audioButton);
+        addDisplayElement(_controlsButton);
+        addDisplayElement(_modsButton);
+        addDisplayElement(_backToMainMenuButton);
     }
 }

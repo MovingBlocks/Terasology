@@ -1,4 +1,4 @@
-package org.terasology.rendering.gui.components;
+package org.terasology.rendering.gui.widgets;
 
 import java.util.ArrayList;
 import java.util.List;
