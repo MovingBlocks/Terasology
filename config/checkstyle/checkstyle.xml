@@ -4,6 +4,10 @@
           "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
 
 <module name="Checker">
+    <module name="SuppressionFilter">
+        <property name="file" value="config/checkstyle/suppressions.xml"/>
+    </module>
+
     <!-- Checks whether files end with a new line.                        -->
     <!-- See http://checkstyle.sourceforge.net/config_misc.html#NewlineAtEndOfFile -->
     <module name="NewlineAtEndOfFile"/>
@@ -40,14 +44,19 @@
         <!-- Checks that there are no import statements that use the * notation. -->
         <!-- See http://checkstyle.sourceforge.net/config_imports.html#AvoidStarImport -->
         <module name="AvoidStarImport">
+            <property name="severity" value="warning"/>
             <property name="allowStaticMemberImports" value="true"/> <!-- allow starred static member imports -->
         </module>
         <!-- Checks for redundant import statements. -->
         <!-- See http://checkstyle.sourceforge.net/config_imports.html#RedundantImport -->
-        <module name="RedundantImport"/>
+        <module name="RedundantImport">
+            <property name="severity" value="warning"/>
+        </module>
         <!-- Checks for unused import statements. -->
         <!-- See http://checkstyle.sourceforge.net/config_imports.html#UnusedImports -->
-        <module name="UnusedImports"/>
+        <module name="UnusedImports">
+            <property name="severity" value="warning"/>
+        </module>
 
         <!-- Modifier Checks -->
         <!-- *************** -->
@@ -56,7 +65,9 @@
         <module name="ModifierOrder"/>
         <!-- Checks for redundant modifiers -->
         <!-- See http://checkstyle.sourceforge.net/config_modifier.html#RedundantModifier -->
-        <module name="RedundantModifier"/>
+        <module name="RedundantModifier">
+            <property name="severity" value="warning"/>
+        </module>
 
         <!-- Checks for blocks. You know, those {}'s -->
         <!-- *************************************** -->
@@ -65,7 +76,9 @@
         <module name="AvoidNestedBlocks"/>
         <!-- Checks for empty blocks. -->
         <!-- See http://checkstyle.sourceforge.net/config_blocks.html#EmptyBlock -->
-        <module name="EmptyBlock"/>
+        <module name="EmptyBlock">
+            <property name="severity" value="warning"/>
+        </module>
         <!-- Checks for the placement of left curly braces ('{') for code blocks. Default: eol -->
         <!-- See http://checkstyle.sourceforge.net/config_blocks.html#LeftCurly -->
         <module name="LeftCurly"/>
@@ -80,10 +93,14 @@
         <!-- *************************** -->
         <!-- Checks the style of array type definitions. -->
         <!-- See http://checkstyle.sourceforge.net/config_misc.html#ArrayTypeStyle -->
-        <module name="ArrayTypeStyle"/>
+        <module name="ArrayTypeStyle">
+            <property name="severity" value="warning"/>
+        </module>
         <!-- Checks correct indentation of Java Code. -->
         <!-- See http://checkstyle.sourceforge.net/config_misc.html#Indentation -->
-        <module name="Indentation"/>
+        <module name="Indentation">
+            <property name="severity" value="warning"/>
+        </module>
         <!-- Checks that long constants are defined with an upper ell. That is ' L' and not 'l'. -->
         <!-- See http://checkstyle.sourceforge.net/config_misc.html#UpperEll -->
         <module name="UpperEll"/>
