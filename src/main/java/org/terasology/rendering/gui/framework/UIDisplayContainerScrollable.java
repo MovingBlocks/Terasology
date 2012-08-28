@@ -168,7 +168,7 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
                 //Lets calculate the max value recursively
                 max = 0;
                 calcMax(container.getDisplayElements());
-                contentHeight = max - getAbsolutePosition().y;
+                contentHeight = max - container.getAbsolutePosition().y;
                 
                 //container.setSize(new Vector2f(getSize().x, contentHeight));
             }
