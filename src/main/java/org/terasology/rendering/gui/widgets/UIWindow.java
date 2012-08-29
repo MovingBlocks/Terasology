@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.framework;
+package org.terasology.rendering.gui.widgets;
 
-import org.lwjgl.opengl.Display;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.rendering.gui.framework.IInputDataElement;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.UIDisplayContainerScrollable;
 import org.terasology.rendering.gui.framework.events.WindowListener;
-
-import javax.vecmath.Vector2f;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,21 +30,25 @@ import java.util.HashMap;
  * A window which can contain display elements. All windows will be managed by the GUIManager.
  * 
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
- *
+ * 
  */
-public class UIDisplayWindow extends UIDisplayContainer {
+public class UIWindow extends UIDisplayContainerScrollable {
 
+    //events
     private enum eWindowEvent {OPEN, CLOSE};
     private final ArrayList<WindowListener> _windowListeners = new ArrayList<WindowListener>();
+    
     private final HashMap<String, UIDisplayElement> _displayElementsById = new HashMap<String, UIDisplayElement>();
-    private boolean maximized = false;
-    private boolean modal = false;
+    
+    //close buttons
     private String[] closeBinds;
     private int[] closeKeys;
-
-    protected void drag(Vector2f value) {
-        getPosition().x -= value.x;
-        getPosition().y -= value.y;
+    
+    //layout
+    private boolean modal = false;
+    
+    public UIWindow() {
+        
     }
 
     public void clearInputControls() {
@@ -54,15 +58,6 @@ public class UIDisplayWindow extends UIDisplayContainer {
                 inputControl.clearData();
             }
         }
-    }
-    
-    @Override
-    public void layout() {
-        if (isMaximized()) {
-            super.setSize(new Vector2f(Display.getWidth(), Display.getHeight()));
-        }
-        
-        super.layout();
     }
 
     private void notifyWindowListeners(eWindowEvent event) {
@@ -90,12 +85,7 @@ public class UIDisplayWindow extends UIDisplayContainer {
     }
 
     public void maximize() {
-        setSize(new Vector2f(Display.getWidth(), Display.getHeight()));
-        maximized = true;
-    }
-
-    public boolean isMaximized() {
-        return maximized;
+        setSize("100%", "100%");
     }
 
     /**
@@ -130,12 +120,26 @@ public class UIDisplayWindow extends UIDisplayContainer {
         this.closeKeys = keys;
     }
 
+    /**
+     * 
+     * @param element
+     * @param elementId
+     * 
+     * @deprecated don't use this. ID will be included in EACH UI element in the future.
+     */
     public void addDisplayElement(UIDisplayElement element, String elementId) {
         addDisplayElement(element);
         _displayElementsById.put(elementId, element);
         element.setParent(this);
     }
 
+    /**
+     * 
+     * @param elementId
+     * @return
+     * 
+     * @deprecated don't use this. ID will be included in EACH UI element in the future.
+     */
     public UIDisplayElement getElementById(String elementId) {
         if (!_displayElementsById.containsKey(elementId)) {
             return null;

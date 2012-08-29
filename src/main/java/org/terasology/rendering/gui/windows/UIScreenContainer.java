@@ -20,9 +20,9 @@ import org.lwjgl.opengl.Display;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.input.binds.FrobButton;
 import org.terasology.asset.AssetManager;
-import org.terasology.rendering.gui.components.UIItemContainer;
-import org.terasology.rendering.gui.framework.UIDisplayWindow;
-import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import org.terasology.rendering.gui.widgets.UIImage;
+import org.terasology.rendering.gui.widgets.UIItemContainer;
+import org.terasology.rendering.gui.widgets.UIWindow;
 
 import javax.vecmath.Vector2f;
 
@@ -31,7 +31,7 @@ import javax.vecmath.Vector2f;
  *
  * @author Immortius <immortius@gmail.com>
  */
-public class UIScreenContainer extends UIDisplayWindow {
+public class UIScreenContainer extends UIWindow {
     private static final int CENTER_BORDER = 100;
     private static final int OUTER_BORDER = 50;
 
@@ -40,7 +40,7 @@ public class UIScreenContainer extends UIDisplayWindow {
 
     private final UIItemContainer playerInventory;
     private final UIItemContainer containerInventory;
-    private final UIGraphicsElement background;
+    private final UIImage background;
 
     public UIScreenContainer() {
         setBackgroundColor(0x00, 0x00, 0x00, 0.75f);
@@ -49,15 +49,21 @@ public class UIScreenContainer extends UIDisplayWindow {
         setCloseBinds(new String[] {FrobButton.ID});
         setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
         
-        background = new UIGraphicsElement(AssetManager.loadTexture("engine:containerWindow"));
+        background = new UIImage(AssetManager.loadTexture("engine:containerWindow"));
         background.setTextureSize(new Vector2f(256f, 231f));
         background.setTextureOrigin(new Vector2f(0.0f, 0.0f));
+        background.setHorizontalAlign(EHorizontalAlign.CENTER);
+        background.setVerticalAlign(EVerticalAlign.CENTER);
         background.setVisible(true);
         
         playerInventory = new UIItemContainer(4);
+        playerInventory.setHorizontalAlign(EHorizontalAlign.CENTER);
+        playerInventory.setVerticalAlign(EVerticalAlign.CENTER);
         playerInventory.setVisible(true);
 
         containerInventory = new UIItemContainer(4);
+        containerInventory.setHorizontalAlign(EHorizontalAlign.CENTER);
+        containerInventory.setVerticalAlign(EVerticalAlign.CENTER);
         containerInventory.setVisible(true);
         
         addDisplayElement(background);
@@ -75,16 +81,9 @@ public class UIScreenContainer extends UIDisplayWindow {
         
         playerInventory.setConnected(container);
         containerInventory.setConnected(creature);
-    }
-
-    @Override
-    public void layout() {
-        super.layout();
-        playerInventory.setPosition(new Vector2f(0.5f * Display.getWidth() - CENTER_BORDER - playerInventory.getSize().x, 0));
-        playerInventory.centerVertically();
-        containerInventory.setPosition(new Vector2f(0.5f * Display.getWidth() + CENTER_BORDER, 0));
-        containerInventory.centerVertically();
+        
         background.setSize(new Vector2f(2 * (CENTER_BORDER + OUTER_BORDER) + playerInventory.getSize().x + containerInventory.getSize().x, 0.8f * Display.getHeight()));
-        background.center();
+        containerInventory.setPosition(new Vector2f(CENTER_BORDER + containerInventory.getSize().x / 2, 0f));
+        playerInventory.setPosition(new Vector2f(-(CENTER_BORDER + playerInventory.getSize().x / 2), 0f));
     }
 }

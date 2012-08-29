@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.components;
+package org.terasology.rendering.gui.widgets;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,7 @@ import org.newdawn.slick.Color;
 import org.terasology.rendering.gui.framework.IInputDataElement;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.UIScrollableContainer;
+import org.terasology.rendering.gui.framework.UIDisplayContainerScrollable;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
@@ -40,7 +40,7 @@ import org.terasology.rendering.gui.framework.events.MouseMoveListener;
  * TODO here is a bug with deleting the selected item..
  */
 
-public class UIList extends UIScrollableContainer implements IInputDataElement {
+public class UIList extends UIDisplayContainerScrollable implements IInputDataElement {
 
     private UIListItem _selectedItem = null;
     private final ArrayList<ClickListener> _doubleClickListeners = new ArrayList<ClickListener>();
@@ -133,11 +133,16 @@ public class UIList extends UIScrollableContainer implements IInputDataElement {
                 label.setColor(Color.lightGray);
             }
         }
+        
+        @Override
+        public void render() {
+            // TODO Auto-generated method stub
+            super.render();
+        }
     }
 
     public UIList(Vector2f size) {
         super(size);
-        setSize(size);
     }
 
     /**
@@ -163,8 +168,7 @@ public class UIList extends UIScrollableContainer implements IInputDataElement {
             newItem.setPosition(items.get(0).getPosition());
         }
 
-        newItem.getPosition().y += 32f * items.size();
-        newItem.setFixed(false);
+        newItem.setPosition(new Vector2f(0f, 32f * items.size()));
         newItem.addClickListener(new ClickListener() {
             private long _lastTime = System.currentTimeMillis();
             private int _lastButton = -1;
@@ -182,15 +186,13 @@ public class UIList extends UIScrollableContainer implements IInputDataElement {
                 //select the clicked item
                 UIListItem item = (UIListItem) element;
                 
-                if (item != _selectedItem) {
-                    if (_selectedItem != null)
-                        _selectedItem.setSelected(false);
-                    
-                    _selectedItem = item;
-                    _selectedItem.setSelected(true);
-                    
-                    notifyChangedListeners();
-                }
+                if (_selectedItem != null)
+                    _selectedItem.setSelected(false);
+                
+                _selectedItem = item;
+                _selectedItem.setSelected(true);
+                
+                notifyChangedListeners();
             }
         });
 
@@ -280,7 +282,7 @@ public class UIList extends UIScrollableContainer implements IInputDataElement {
         items.remove(_selectedItem);
 
         for (int i = index; i < items.size(); i++) {
-            items.get(i).getPosition().y -= 32f;
+            items.get(i).setPosition(new Vector2f(0f, items.get(i).getPosition().y - 32f));
         }
 
         if (items.size() > 0) {

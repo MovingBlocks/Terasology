@@ -51,7 +51,7 @@ import org.terasology.physics.ImpulseEvent;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.cameras.DefaultCamera;
-import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import org.terasology.rendering.gui.widgets.UIImage;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3d;
@@ -364,7 +364,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
         if (localPlayerComp.isDead) return;
 
-        UIGraphicsElement crossHair = (UIGraphicsElement)GUIManager.getInstance().getWindowById("engine:hud").getElementById("crosshair");
+        UIImage crossHair = (UIImage)GUIManager.getInstance().getWindowById("engine:hud").getElementById("crosshair");
 
         crossHair.getTextureSize().set(new Vector2f(22f / 256f, 22f / 256f));
 

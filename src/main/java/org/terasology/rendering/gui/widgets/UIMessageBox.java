@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.components;
+package org.terasology.rendering.gui.widgets;
 
 import javax.vecmath.Vector2f;
 
 import org.newdawn.slick.Color;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 
@@ -46,6 +45,7 @@ public class UIMessageBox extends UIDialogBox {
         width = infoText.getTextWidth() + 15f > minSize.x ? infoText.getTextWidth() + 15f : minSize.x;
         heigh = infoText.getTextHeight() + 75f > minSize.y ? infoText.getTextHeight() + 75f : minSize.y;
         setSize(new Vector2f(width, heigh));
+        resetPosition();
 
         infoText.setPosition(new Vector2f(getSize().x / 2 - infoText.getTextWidth() / 2, getSize().y / 2 - infoText.getTextHeight() / 2));
         buttonOk.setPosition(new Vector2f(getSize().x / 2 - buttonOk.getSize().x / 2, getSize().y - buttonOk.getSize().y - 10f));
@@ -58,17 +58,5 @@ public class UIMessageBox extends UIDialogBox {
 
         addDisplayElement(infoText);
         addDisplayElement(buttonOk, "buttonOk");
-        
-        resize();
-        layout();
-    }
-    
-    /**
-     * Close a window. This will remove the window from the GUIManager.
-     */
-    public void close() {
-        super.close();
-        
-        GUIManager.getInstance().removeWindow(this);
     }
 }

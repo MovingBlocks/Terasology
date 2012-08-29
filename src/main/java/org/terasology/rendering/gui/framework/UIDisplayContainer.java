@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.gui.framework;
 
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetManager;
 import org.terasology.input.BindButtonEvent;
@@ -40,32 +41,20 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public abstract class UIDisplayContainer extends UIDisplayElement {
 
-    final ArrayList<UIDisplayElement> _displayElements = new ArrayList<UIDisplayElement>();
-    private boolean _crop = false;
-    
+    //child elements
+    private final ArrayList<UIDisplayElement> displayElements = new ArrayList<UIDisplayElement>();
     private final List<UIStyle> styles = new ArrayList<UIStyle>();
-
-    protected Vector4f _cropMargin = new Vector4f(
-            /*TOP*/    0.0f,
-            /*RIGHT*/  0.0f,
-            /*BOTTOM*/ 0.0f,
-            /*LEFT*/   0.0f
-    );
+    
+    //cropping
+    private boolean cropContainer = false;
+    protected Vector4f cropMargin = new Vector4f(0.0f, 0.0f,0.0f, 0.0f);
 
     public UIDisplayContainer() {
         super();
     }
 
-    public UIDisplayContainer(Vector2f position) {
-        super(position);
-    }
-
-    public UIDisplayContainer(Vector2f position, Vector2f size) {
-        super(position, size);
-    }
-
     public void render() {
-        boolean testCrop = false;
+        boolean allowsCrop = false;
         int cropX = 0;
         int cropY = 0;
         int cropWidth = 0;
@@ -75,29 +64,29 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             return;
 
         //Cut the elements
-        if (_crop) {
-            cropX = (int) calcAbsolutePosition().x - (int) (_cropMargin.w);
-            cropY = Display.getHeight() - (int) calcAbsolutePosition().y - (int) getSize().y - (int) _cropMargin.z;
-            cropWidth = (int) getSize().x + (int) _cropMargin.y;
-            cropHeight = (int) getSize().y + (int) _cropMargin.x;
+        if (cropContainer) {
+            cropX = (int) getAbsolutePosition().x - (int) (cropMargin.w);
+            cropY = Display.getHeight() - (int) getAbsolutePosition().y - (int) getSize().y - (int) cropMargin.z;
+            cropWidth = (int) getSize().x + (int) cropMargin.y;
+            cropHeight = (int) getSize().y + (int) cropMargin.x;
             glEnable(GL_SCISSOR_TEST);
             glScissor(cropX, cropY, cropWidth, cropHeight);
         }
 
         // Render all display elements
-        for (int i = 0; i < _displayElements.size(); i++) {
-            testCrop = _crop && !_displayElements.get(i).isCroped();
-            if (testCrop) {
+        for (int i = 0; i < displayElements.size(); i++) {
+            allowsCrop = cropContainer && !displayElements.get(i).isCrop();
+            if (allowsCrop) {
                 glDisable(GL_SCISSOR_TEST);
             }
-            _displayElements.get(i).renderTransformed();
-            if (testCrop) {
+            displayElements.get(i).renderTransformed();
+            if (allowsCrop) {
                 glEnable(GL_SCISSOR_TEST);
                 glScissor(cropX, cropY, cropWidth, cropHeight);
             }
         }
 
-        if (_crop) {
+        if (cropContainer) {
             glDisable(GL_SCISSOR_TEST);
         }
     }
@@ -107,18 +96,20 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             return;
 
         // Update all display elements
-        for (int i = 0; i < _displayElements.size(); i++) {
-            _displayElements.get(i).update();
+        for (int i = 0; i < displayElements.size(); i++) {
+            displayElements.get(i).update();
         }
     }
     
     public void layout() {
         if (!isVisible())
             return;
+        
+        super.layout();
 
         // Update layout of all display elements
-        for (int i = 0; i < _displayElements.size(); i++) {
-            _displayElements.get(i).layout();
+        for (int i = 0; i < displayElements.size(); i++) {
+            displayElements.get(i).layout();
         }
     }
     
@@ -130,8 +121,8 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         super.processBindButton(event);
         
         // Pass the bind key to all display elements
-        for (int i = 0; i < _displayElements.size(); i++) {
-            _displayElements.get(i).processBindButton(event);
+        for (int i = 0; i < displayElements.size(); i++) {
+            displayElements.get(i).processBindButton(event);
         }
     }
 
@@ -143,68 +134,116 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         super.processKeyboardInput(event);
 
         // Pass the pressed key to all display elements
-        for (int i = 0; i < _displayElements.size(); i++) {
-            _displayElements.get(i).processKeyboardInput(event);
+        for (int i = 0; i < displayElements.size(); i++) {
+            displayElements.get(i).processKeyboardInput(event);
         }
     }
 
     @Override
-    public void processMouseInput(int button, boolean state, int wheelMoved) {
+    public boolean processMouseInput(int button, boolean state, int wheelMoved, boolean consumed) {
         if (!isVisible())
-            return;
-
-        super.processMouseInput(button, state, wheelMoved);
+            return consumed;
+        
+        //cancel mouse click event if the click is out of the cropped area
+        if (cropContainer) {
+            if (!intersects(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()))) {
+                state = false;
+            }
+        }
 
         // Pass the mouse event to all display elements
-        for (int i = 0; i < _displayElements.size(); i++) {
-            _displayElements.get(i).processMouseInput(button, state, wheelMoved);
+        for (int i = displayElements.size() - 1; i >= 0; i--) {
+            consumed = displayElements.get(i).processMouseInput(button, state, wheelMoved, consumed);
         }
-    }
-
-    public void addDisplayElement(UIDisplayElement element) {
-        _displayElements.add(element);
-        element.setParent(this);
-    }
-
-    public void addtDisplayElementToPosition(int position, UIDisplayElement element) {
-        _displayElements.add(position, element);
-        element.setParent(this);
-    }
-
-    public void removeDisplayElement(UIDisplayElement element) {
-        _displayElements.remove(element);
-        element.setParent(null);
-    }
-
-    public void removeAllDisplayElements() {
-        for (UIDisplayElement element : _displayElements) {
-            element.setParent(null);
-        }
-        _displayElements.clear();
-    }
-
-    public ArrayList<UIDisplayElement> getDisplayElements() {
-        return _displayElements;
-    }
-
-    /*
-     * Set the option for cut elements
-     */
-    public void setCrop(boolean crop) {
-        _crop = crop;
-    }
-
-    /*
-     * set crop margin for container where
-     * x - top
-     * y - right
-     * z - bottom
-     * w - left
-     */
-    public void setCropMargin(Vector4f margin) {
-        _cropMargin = margin;
+        
+        consumed = super.processMouseInput(button, state, wheelMoved, consumed);
+        
+        return consumed;
     }
     
+    /**
+     * Set whether the child elements will be cropped to the size of the display container. To exclude particular child elements from cropping, use the setCrop method.
+     * @param crop True to crop all child elements.
+     */
+    public void setCropContainer(boolean crop) {
+        this.cropContainer = crop;
+    }
+
+    /**
+     * Set crop margin for this container.
+     * @param margin The margin where x = top, y = right, z = bottom, w = left
+     */
+    public void setCropMargin(Vector4f margin) {
+        cropMargin = margin;
+    }
+    
+    /*
+       Methods to add or remove child elements of the container
+    */
+
+    /**
+     * Add a new display element to the display container.
+     * @param element The element to add.
+     */
+    public void addDisplayElement(UIDisplayElement element) {
+        displayElements.add(element);
+        element.setParent(this);
+        
+        layout();
+    }
+
+    /**
+     * Add a new display element to the display container at a particular position.
+     * @param element The element to add.
+     */
+    public void addDisplayElementToPosition(int position, UIDisplayElement element) {
+        displayElements.add(position, element);
+        element.setParent(this);
+        
+        layout();
+    }
+
+    /**
+     * Remove a display element.
+     * @param element The element to remove.
+     */
+    public void removeDisplayElement(UIDisplayElement element) {
+        displayElements.remove(element);
+        element.setParent(null);
+        
+        layout();
+    }
+
+    /**
+     * Remove all display elements.
+     */
+    public void removeAllDisplayElements() {
+        for (UIDisplayElement element : displayElements) {
+            element.setParent(null);
+        }
+        displayElements.clear();
+        
+        layout();
+    }
+
+    /**
+     * Get the list of all display elements of the display container.
+     * @return Returns the list of all display elements.
+     */
+    public ArrayList<UIDisplayElement> getDisplayElements() {        
+        return displayElements;
+    }
+    
+    /*
+       Styling System
+       Styles are just special child display elements of the container which offer a function which is commonly used, such as a background image
+    */
+    
+    /**
+     * Get a style by its class.
+     * @param style The style class.
+     * @return Returns the style class if one was added to the display container. Null if none was added.
+     */
     private <T> T getStyle(Class<T> style) {
         for (UIStyle s : styles) {
             if (s.getClass() == style) {
@@ -220,19 +259,20 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * @param style The style to add.
      * @param listStart True to add the style at the beginning of the display element list.
      * 
-     * TODO need to put particular styles at the particular position.. (background at the beginning, border on top)
+     * TODO need to put particular styles at the particular position.. (background at the beginning, border on top) -> don't add styles to the display element list
      */
     private void addStyle(UIStyle style, boolean listStart) {
         styles.add(style);
         
         UIDisplayElement element = (UIDisplayElement) style;
         if (listStart) {
-            _displayElements.add(0, element);
+            displayElements.add(0, element);
         } else {
-            _displayElements.add(element);
+            displayElements.add(element);
         }
         
         element.setParent(this);
+        layout();
     }
     
     private void removeStyle(UIStyle style) {
@@ -251,11 +291,21 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         UIStyleBackgroundColor style = getStyle(UIStyleBackgroundColor.class);
         if (style == null) {
             style = new UIStyleBackgroundColor(r, g, b, a);
-            style.setSize(getSize());
             style.setVisible(true);
             addStyle(style, true);
         } else {
             style.setColor(r, g, b, a);
+        }
+    }
+    
+    public void setBackgroundColor(String color, float a) {
+        UIStyleBackgroundColor style = getStyle(UIStyleBackgroundColor.class);
+        if (style == null) {
+            style = new UIStyleBackgroundColor(color, a);;
+            style.setVisible(true);
+            addStyle(style, true);
+        } else {
+            style.setColor(color, a);
         }
     }
     
@@ -343,6 +393,19 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     }
     
     /**
+     * Set the position of the background image including its unit. The unit can be pixel (px) or percentage (%). If no unit is given the default unit pixel will be used.
+     * @param x The x position to set including the unit.
+     * @param y The y position to set including the unit.
+     */
+    public void setBackgroundImagePosition(String x, String y) {
+        UIStyleBackgroundImage style = getStyle(UIStyleBackgroundImage.class);
+        
+        if (style != null) {
+            style.setPosition(x, y);
+        }
+    }
+    
+    /**
      * Set the size of the background image. On default the background will fill the whole display element.
      * @param size
      */
@@ -351,6 +414,19 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         
         if (style != null) {
             style.setSize(size);
+        }
+    }
+    
+    /**
+     * Set the size of the background image including its unit. The unit can be pixel (px) or percentage (%). If no unit is given the default unit pixel will be used.
+     * @param width The width to set including the unit.
+     * @param height The height to set including the unit.
+     */
+    public void setBackgroundImageSize(String width, String height) {
+        UIStyleBackgroundImage style = getStyle(UIStyleBackgroundImage.class);
+        
+        if (style != null) {
+            style.setSize(width, height);
         }
     }
     
@@ -378,10 +454,31 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
 
         if (style == null) {
             style = new UIStyleBorderSolid(width, r, g, b, a);
+            style.setSize("100%", "100%");
             style.setVisible(true);
             addStyle(style, false);
         } else {
             style.setColor(r, g, b, a);
+            style.setWidth(width);
+        }
+    }
+    
+    /**
+     * Set the border for this display element.
+     * @param width The width of the border.
+     * @param color The hex color value. (#FFFFFF)
+     * @param a Alpha value. (0-1)
+     */
+    public void setBorderSolid(float width, String color, float a) {
+        UIStyleBorderSolid style = getStyle(UIStyleBorderSolid.class);
+
+        if (style == null) {
+            style = new UIStyleBorderSolid(width, color, a);
+            style.setSize("100%", "100%");
+            style.setVisible(true);
+            addStyle(style, false);
+        } else {
+            style.setColor(color, a);
             style.setWidth(width);
         }
     }

@@ -22,7 +22,7 @@ import java.util.Map;
 import javax.vecmath.Vector2f;
 
 import org.terasology.asset.AssetManager;
-import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import org.terasology.rendering.gui.widgets.UIImage;
 
 /*
  * @author bi0hax
@@ -30,12 +30,12 @@ import org.terasology.rendering.gui.framework.UIGraphicsElement;
  */
 public class BuffIcon {
     private static Map<String, BuffIcon> bufficons;
-    private UIGraphicsElement _element;
+    private UIImage _element;
     private int _x;
     private int _y;
 
     public BuffIcon() {
-        _element = new UIGraphicsElement(AssetManager.loadTexture("engine:buffs"));
+        _element = new UIImage(AssetManager.loadTexture("engine:buffs"));
         _element.setSize(new Vector2f(32, 32));
         _element.getTextureSize().set(new Vector2f(0.0624f, 0.0624f));
         _element.setVisible(true);

@@ -1,4 +1,4 @@
-package org.terasology.rendering.gui.components;
+package org.terasology.rendering.gui.widgets;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL11.glClear;

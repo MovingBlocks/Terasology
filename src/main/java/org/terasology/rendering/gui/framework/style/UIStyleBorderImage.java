@@ -8,7 +8,7 @@ import javax.vecmath.Vector4f;
 
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
-import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import org.terasology.rendering.gui.widgets.UIImage;
 
 /**
  * 
@@ -25,12 +25,12 @@ public class UIStyleBorderImage extends UIDisplayContainer implements UIStyle {
     private Vector2f targetOrigin = new Vector2f(0f, 0f);
     private Vector2f targetSize = new Vector2f(0f, 0f);
     
-    private final Map<String, UIGraphicsElement> frames = new HashMap<String, UIGraphicsElement>();
-    private final Map<String, UIGraphicsElement> corners = new HashMap<String, UIGraphicsElement>();
+    private final Map<String, UIImage> frames = new HashMap<String, UIImage>();
+    private final Map<String, UIImage> corners = new HashMap<String, UIImage>();
 
     public UIStyleBorderImage(Texture texture) {        
         this.texture = texture;
-        setCroped(false);
+        setCrop(false);
     }
 
     /**
@@ -42,12 +42,12 @@ public class UIStyleBorderImage extends UIDisplayContainer implements UIStyle {
             return;
         }
         
-        UIGraphicsElement frame;
+        UIImage frame;
         
         if (frames.containsKey(side)) {
             frame = frames.get(side);
         } else {
-            frame = new UIGraphicsElement(texture);
+            frame = new UIImage(texture);
         }
 
         if (side.equals("top")) {
@@ -81,7 +81,7 @@ public class UIStyleBorderImage extends UIDisplayContainer implements UIStyle {
      * @param side The side.
      */
     private void targetFrame(String side) {
-        UIGraphicsElement frame = frames.get(side);
+        UIImage frame = frames.get(side);
         
         if (frame == null) {
             return;
@@ -123,12 +123,12 @@ public class UIStyleBorderImage extends UIDisplayContainer implements UIStyle {
             return;
         }
         
-        UIGraphicsElement corner;
+        UIImage corner;
         
         if (corners.containsKey(side)) {
             corner = corners.get(side);
         } else {
-            corner = new UIGraphicsElement(texture);
+            corner = new UIImage(texture);
         }
         
         if (side.equals("top-left")) {
@@ -162,7 +162,7 @@ public class UIStyleBorderImage extends UIDisplayContainer implements UIStyle {
      * @param side The side.
      */
     private void targetCorner(String side) {
-        UIGraphicsElement corner = corners.get(side);
+        UIImage corner = corners.get(side);
         
         if (corner == null) {
             return;

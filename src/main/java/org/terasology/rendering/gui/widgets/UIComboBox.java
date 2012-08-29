@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.rendering.gui.components;
+package org.terasology.rendering.gui.widgets;
 
 import javax.vecmath.Vector2f;
 
@@ -26,7 +26,6 @@ import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
-import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 
@@ -63,7 +62,10 @@ public class UIComboBox extends UIDisplayContainer {
         setSize(size);
         opened = false;
         
-        addMouseButtonListener(new MouseButtonListener() {
+        baseInput = new UIInput(size);
+        baseInput.setVisible(true);
+        baseInput.setDisabled(true);
+        baseInput.addMouseButtonListener(new MouseButtonListener() {
             @Override
             public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
 
@@ -87,7 +89,7 @@ public class UIComboBox extends UIDisplayContainer {
     
             }
         });
-        addMouseMoveListener(new MouseMoveListener() {
+        baseInput.addMouseMoveListener(new MouseMoveListener() {
             @Override
             public void leave(UIDisplayElement element) {
 
@@ -109,37 +111,35 @@ public class UIComboBox extends UIDisplayContainer {
             }
         });
 
-        baseInput = new UIInput(size);
-        baseInput.setVisible(true);
-        baseInput.setDisabled(true);
-
         baseButton = new UIButton(new Vector2f(18f, 20f), UIButton.eButtonType.TOGGLE);
         baseButton.setVisible(true);
-        baseButton.getPosition().x = size.x   - baseButton.getSize().x;
-        baseButton.getPosition().y = size.y/2 - baseButton.getSize().y/2;
+        baseButton.setPosition(new Vector2f(size.x   - baseButton.getSize().x, size.y/2 - baseButton.getSize().y/2));
         baseButton.getLabel().setText("");
         baseButton.setTexture("engine:gui_menu");
         baseButton.setNormalState(new Vector2f(432f, 0f), new Vector2f(18f, 18f));
         baseButton.setPressedState(new Vector2f(432f, 18f), new Vector2f(18f, 18f));
+        baseButton.addChangedListener(new ChangedListener() {
+            @Override
+            public void changed(UIDisplayElement element) {
+                opened = baseButton.getToggleState();
+                baseList.setVisible(opened);
+            }
+        });
 
         baseList = new UIList(listSize);
         baseList.setPosition(new Vector2f(1f, size.y - 1f));
         baseList.setBorderSolid(1f, 0x00, 0x00, 0x00, 1.0f);
         baseList.setBackgroundColor(0xFF, 0xFF, 0xFF, 1.0f);
         baseList.setVisible(false);
-        baseList.addClickListener(new ClickListener() {    
-            @Override
-            public void click(UIDisplayElement element, int button) {
-                opened = !opened;
-                baseList.setVisible(opened);
-                baseButton.setToggleState(false);
-            }
-        });
         baseList.addChangedListener(new ChangedListener() {    
             @Override
             public void changed(UIDisplayElement element) {
-                if (baseList.getSelectedItem() != null)
+                if (baseList.getSelectedItem() != null) {
                     baseInput.setValue(baseList.getSelectedItem().getText());
+                }
+                opened = false;
+                baseList.setVisible(opened);
+                baseButton.setToggleState(false);
             }
         });
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.components;
+package org.terasology.rendering.gui.widgets;
 
 import java.io.File;
 import java.io.FileReader;
@@ -21,8 +21,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
-
-import javax.vecmath.Vector2f;
 
 import org.lwjgl.opengl.Display;
 import org.terasology.logic.manager.PathManager;
@@ -55,11 +53,6 @@ public class UITextWrap extends UIText {
         super(text);
         setup();
 
-    }
-
-    public UITextWrap(Vector2f position) {
-        super(position);
-        setup();
     }
     
     private void setup() {
