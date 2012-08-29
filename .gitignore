@@ -12,6 +12,7 @@ Terasology.iws
 .classpath
 .project
 .settings
+.checkstyle
 .gradle
 bin
 data/console/consolelog.json

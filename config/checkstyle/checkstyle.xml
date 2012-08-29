@@ -5,7 +5,7 @@
 
 <module name="Checker">
     <module name="SuppressionFilter">
-        <property name="file" value="config/checkstyle/suppressions.xml"/>
+        <property name="file" value="${samedir}/suppressions.xml"/>
     </module>
 
     <!-- Checks whether files end with a new line.                        -->
