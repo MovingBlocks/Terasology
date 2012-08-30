@@ -58,7 +58,7 @@ public class MaterialLoader implements AssetLoader<Material> {
         MaterialMetadata metadata = gson.fromJson(new InputStreamReader(stream), MaterialMetadata.class);
 
         Shader shader = AssetManager.load(new AssetUri(AssetType.SHADER, metadata.shader), Shader.class);
-        if (shader == null) return null;
+        if (shader == null) { return null;}
 
         Material result = new Material(uri, shader);
 

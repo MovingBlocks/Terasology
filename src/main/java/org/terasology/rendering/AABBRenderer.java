@@ -45,8 +45,8 @@ import org.terasology.rendering.world.WorldRenderer;
  * Renderer for an AABB.
  * @author Immortius
  */
-public class AABBRenderer
-{
+public class AABBRenderer{
+	
     private int displayListWire = -1;
     private int displayListSolid = -1;
 

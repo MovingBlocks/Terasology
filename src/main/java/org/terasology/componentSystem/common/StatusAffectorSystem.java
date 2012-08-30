@@ -129,9 +129,7 @@ public class StatusAffectorSystem implements EventHandlerSystem, UpdateSubscribe
             //While Immune:
             if (curedEffect.cureDuration >= 1) {
                 entity.saveComponent(curedEffect);
-            }
-            //Remove Poison Immunity Status
-            else entity.removeComponent(CuredComponent.class);
+            } else { entity.removeComponent(CuredComponent.class); } //Remove Poison Immunity Status
         }
     }
 }

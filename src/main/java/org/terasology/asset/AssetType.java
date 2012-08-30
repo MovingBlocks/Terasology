@@ -163,7 +163,7 @@ public enum AssetType {
     public static void registerAssetTypes() {
         for(AssetType type : AssetType.values()) {
             AssetLoader loader = type.getAssetLoader();
-            if(loader == null) continue; // No loader has been assigned to this AssetType
+            if(loader == null) {continue;} // No loader has been assigned to this AssetType
 
             AssetManager.getInstance().register(
                     type,
