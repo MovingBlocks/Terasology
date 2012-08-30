@@ -195,7 +195,6 @@ public class UIMenuSelectWorld extends UIWindow {
             }
         }
     }
-    
     public int getWorldCount() {
         return list.size();
     }

@@ -47,7 +47,7 @@ public class UIMenuMain extends UIWindow {
         setBackgroundImage("engine:menubackground");
         setModal(true);
         maximize();
-        
+
         _title = new UIImage(AssetManager.loadTexture("engine:terasology"));
         _title.setSize(new Vector2f(512f, 128f));
         _title.setHorizontalAlign(EHorizontalAlign.CENTER);
@@ -70,7 +70,7 @@ public class UIMenuMain extends UIWindow {
         _exitButton.setHorizontalAlign(EHorizontalAlign.CENTER);
         _exitButton.setPosition(new Vector2f(0f, 300f + 4 * 40f));
         _exitButton.setVisible(true);
-        
+
         _configButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _configButton.getLabel().setText("Settings");
         _configButton.addClickListener(new ClickListener() {
