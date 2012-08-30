@@ -23,7 +23,7 @@ import java.util.Set;
 import org.terasology.logic.manager.SoundManager;
 
 public class BasicSoundPool implements SoundPool {
-    private final static int DEFAULT_POOL_SIZE = 32;
+    private static final int DEFAULT_POOL_SIZE = 32;
 
     protected Map<SoundSource, Integer> soundSources;
 

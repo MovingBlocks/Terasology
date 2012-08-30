@@ -90,7 +90,7 @@ public class NullEntityRef extends EntityRef {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
+        if (this == o) { return true; }
         if (o instanceof EntityRef) {
             return !((EntityRef) o).exists();
         }

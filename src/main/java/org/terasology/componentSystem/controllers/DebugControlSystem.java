@@ -108,7 +108,6 @@ public class DebugControlSystem implements EventHandlerSystem {
                 	} else {
                 		GUIManager.getInstance().getWindowById("engine:hud").open();
                 	}
-                	
                     event.consume();
                     break;
             }

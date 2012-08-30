@@ -25,7 +25,7 @@ import org.lwjgl.openal.AL10;
 import org.terasology.asset.AssetUri;
 
 public abstract class AbstractStreamingSound implements Sound {
-    private final static int BUFFER_POOL_SIZE = 3;
+    private static final int BUFFER_POOL_SIZE = 3;
 
     private final AssetUri uri;
     protected final URL audioSource;

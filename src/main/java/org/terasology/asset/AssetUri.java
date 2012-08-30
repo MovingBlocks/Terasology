@@ -98,8 +98,7 @@ public class AssetUri {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this)
-            return true;
+        if (obj == this) {return true;}
         if (obj instanceof AssetUri) {
             AssetUri other = (AssetUri) obj;
             return Objects.equal(type, other.type) && Objects.equal(packageName, other.packageName) && Objects.equal(assetName, other.assetName);

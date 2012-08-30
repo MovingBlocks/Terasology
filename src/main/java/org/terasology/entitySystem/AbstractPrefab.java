@@ -34,7 +34,7 @@ public abstract class AbstractPrefab implements Prefab {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
+        if (this == o) { return true; }
         if (o instanceof Prefab) {
             return Objects.equal(name, ((Prefab) o).getName());
         }

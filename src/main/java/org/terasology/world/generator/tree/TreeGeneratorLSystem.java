@@ -86,10 +86,11 @@ public class TreeGeneratorLSystem extends TreeGenerator {
 
                 double rValue = (rand.randomDouble() + 1.0) / 2.0;
 
-                if (ruleSet.containsKey(c) && probabilities.get(c) > (1.0 - rValue))
+                if (ruleSet.containsKey(c) && probabilities.get(c) > (1.0 - rValue)) {
                     temp += ruleSet.get(c);
-                else
+                } else {
                     temp += c;
+                }
             }
 
             axiom = temp;
@@ -125,8 +126,7 @@ public class TreeGeneratorLSystem extends TreeGenerator {
                         for (int x = -size; x <= size; x++) {
                             for (int y = -size; y <= size; y++) {
                                 for (int z = -size; z <= size; z++) {
-                                    if (Math.abs(x) == size && Math.abs(y) == size && Math.abs(z) == size)
-                                        continue;
+                                    if (Math.abs(x) == size && Math.abs(y) == size && Math.abs(z) == size) { continue; }
 
                                     view.setBlock(posX + (int) position.x + x + 1, posY + (int) position.y + y, posZ + z + (int) position.z, leafType, air);
                                     view.setBlock(posX + (int) position.x + x - 1, posY + (int) position.y + y, posZ + z + (int) position.z, leafType, air);
