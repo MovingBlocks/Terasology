@@ -63,8 +63,7 @@ public class AddMiniatureBlockAction implements EventHandlerSystem {
 
             comp.blockGrid.addGridPosition(targetPos, worldProvider.getBlock(targetPos).getId());
             entity.saveComponent(comp);
-        }
-        else {
+        } else {
 
             MiniatureChunk chunk = new MiniatureChunk();
 
@@ -75,8 +74,9 @@ public class AddMiniatureBlockAction implements EventHandlerSystem {
                         Vector3i globalPos = new Vector3i(x,y,z);
                         localPos.sub(globalPos, grid.getMinBounds());
 
-                        if (localPos.x >= MiniatureChunk.SIZE_X || localPos.y >= MiniatureChunk.SIZE_Y || localPos.z >= MiniatureChunk.SIZE_Z || localPos.x < 0 || localPos.y < 0 || localPos.z < 0)
+                        if (localPos.x >= MiniatureChunk.SIZE_X || localPos.y >= MiniatureChunk.SIZE_Y || localPos.z >= MiniatureChunk.SIZE_Z || localPos.x < 0 || localPos.y < 0 || localPos.z < 0){
                             continue;
+                        }
 
                         chunk.setSunlight(localPos, worldProvider.getSunlight(globalPos));
                         chunk.setLight(localPos, worldProvider.getLight(globalPos));

@@ -93,7 +93,7 @@ public class MenuControlSystem implements EventHandlerSystem {
                 break;
         }
     }
-    
+
     @ReceiveEvent(components = {LocalPlayerComponent.class})
     public void onDeath(NoHealthEvent event, EntityRef entity) {
     	GUIManager.getInstance().setFocusedWindow("engine:death");

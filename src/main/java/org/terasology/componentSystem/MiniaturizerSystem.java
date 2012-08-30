@@ -54,8 +54,7 @@ public class MiniaturizerSystem implements UpdateSubscriberSystem, RenderSystem 
         for (EntityRef entity : entityManager.iteratorEntities(MiniaturizerComponent.class)) {
             MiniaturizerComponent min = entity.getComponent(MiniaturizerComponent.class);
 
-            if (min.chunkMesh == null && min.miniatureChunk != null)
-            {
+            if (min.chunkMesh == null && min.miniatureChunk != null) {
                 min.chunkMesh = worldRenderer.getChunkTesselator().generateMinaturizedMesh(min.miniatureChunk);
                 min.chunkMesh.generateVBOs();
                 min.chunkMesh._vertexElements = null;
@@ -72,8 +71,7 @@ public class MiniaturizerSystem implements UpdateSubscriberSystem, RenderSystem 
 
             min.blockGrid.render();
 
-            if (min.chunkMesh == null || min.renderPosition == null)
-                continue;
+            if (min.chunkMesh == null || min.renderPosition == null) { continue; }
 
             glPushMatrix();
             Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();

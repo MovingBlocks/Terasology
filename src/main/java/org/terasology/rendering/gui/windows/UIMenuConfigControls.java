@@ -509,10 +509,9 @@ public class UIMenuConfigControls extends UIWindow {
             editButton.getLabel().setText(editButtonCurrent);
             return;
         }
-        
         editButton.getLabel().setText(keyToStrShort(key));
     }
- 
+
     private String keyToStrShort(int key) {
         if (key < 256) {
             //replace the names of the buttons which are to long with shorter names here.. i am just to lazy :D

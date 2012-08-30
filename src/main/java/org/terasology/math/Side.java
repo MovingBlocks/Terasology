@@ -152,7 +152,7 @@ public enum Side {
     }
 
     public Side rotateClockwise(int steps) {
-        if (!isHorizontal()) return this;
+        if (!isHorizontal()) { return this;}
         if (steps < 0) {
             steps = -steps + 2;
         }

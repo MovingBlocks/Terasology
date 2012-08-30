@@ -56,7 +56,7 @@ public class BasicSoundSource implements SoundSource {
 
     protected boolean absolutePosition = false;
 
-    protected boolean _playing = false;
+    protected boolean isplaying = false;
 
     public BasicSoundSource() {
         sourceId = alGenSources();
@@ -75,7 +75,7 @@ public class BasicSoundSource implements SoundSource {
     public SoundSource play() {
         if (!isPlaying()) {
             AL10.alSourcePlay(getSourceId());
-            _playing = true;
+            isplaying = true;
         }
 
         return this;
@@ -95,7 +95,7 @@ public class BasicSoundSource implements SoundSource {
 
         OpenALException.checkState("Stop playback");
 
-        _playing = false;
+        isplaying = false;
 
         return this;
     }
@@ -107,7 +107,7 @@ public class BasicSoundSource implements SoundSource {
 
             OpenALException.checkState("Pause playback");
 
-            _playing = false;
+            isplaying = false;
         }
 
         return this;
@@ -115,7 +115,7 @@ public class BasicSoundSource implements SoundSource {
 
     @Override
     public boolean isPlaying() {
-        return alGetSourcei(sourceId, AL_SOURCE_STATE) == AL_PLAYING || _playing;
+        return alGetSourcei(sourceId, AL_SOURCE_STATE) == AL_PLAYING || isplaying;
     }
 
     @Override
@@ -130,8 +130,8 @@ public class BasicSoundSource implements SoundSource {
     }
 
     protected void updateState() {
-        if (_playing && alGetSourcei(sourceId, AL_SOURCE_STATE) != AL_PLAYING) {
-            _playing = false; // sound stop playing
+        if (isplaying && alGetSourcei(sourceId, AL_SOURCE_STATE) != AL_PLAYING) {
+            isplaying = false; // sound stop playing
         }
     }
 
