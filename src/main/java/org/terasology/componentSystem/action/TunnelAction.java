@@ -41,7 +41,7 @@ import org.terasology.world.block.management.BlockManager;
 @RegisterComponentSystem
 public class TunnelAction implements EventHandlerSystem {
 
-    private static int MAX_DESTROYED_BLOCKS = 100;
+    private static int MAXDESTROYEDBLOCKS = 100;
 
     private WorldProvider worldProvider;
     private FastRandom random = new FastRandom();
@@ -68,7 +68,7 @@ public class TunnelAction implements EventHandlerSystem {
         Vector3f origin = new Vector3f(event.getOrigin());
         Vector3i blockPos = new Vector3i();
 
-        int blockCounter = MAX_DESTROYED_BLOCKS;
+        int blockCounter = MAXDESTROYEDBLOCKS;
         for (int s = 4; s <= 10000; s += 30) {
             origin.add(dir);
 
@@ -89,8 +89,7 @@ public class TunnelAction implements EventHandlerSystem {
 
                     Block currentBlock = worldProvider.getBlock(blockPos);
 
-                    if (currentBlock.getId() == 0x0)
-                        continue;
+                    if (currentBlock.getId() == 0x0) { continue; }
 
                     if (currentBlock.isDestructible()) {
                         worldProvider.setBlock(blockPos, BlockManager.getInstance().getAir(), currentBlock);
@@ -106,8 +105,7 @@ public class TunnelAction implements EventHandlerSystem {
                         blockCounter--;
                     }
 
-                    if (blockCounter <= 0)
-                        return;
+                    if (blockCounter <= 0) { return; }
                 }
             }
         }

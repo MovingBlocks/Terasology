@@ -19,7 +19,6 @@ package org.terasology.componentSystem.action;
 import javax.vecmath.Vector3f;
 
 import org.terasology.components.actions.SpawnPrefabActionComponent;
-import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;

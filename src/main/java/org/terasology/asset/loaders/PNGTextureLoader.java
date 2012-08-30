@@ -68,8 +68,8 @@ public class PNGTextureLoader implements AssetLoader<Texture> {
                 try {
                     reader = new InputStreamReader(url.openStream());
                     TextureMetadata metadata = gson.fromJson(reader, TextureMetadata.class);
-                    if (metadata.filterMode != null) filterMode = metadata.filterMode;
-                    if (metadata.wrapMode != null) wrapMode = metadata.wrapMode;
+                    if (metadata.filterMode != null) { filterMode = metadata.filterMode;}
+                    if (metadata.wrapMode != null) { wrapMode = metadata.wrapMode;}
                 } finally {
                     // JAVA7: Replace with new handling
                     if (reader != null) {

@@ -57,14 +57,14 @@ public class DrinkPotionAction implements EventHandlerSystem {
     public PotionComponent potion;
     public PoisonedComponent poisoned;
     public EntityRef item;
-    public CoreRegistry CoreRegister;
+    public CoreRegistry coreregister;
 
 
     @ReceiveEvent(components = {PotionComponent.class})
     public void onActivate(ActivateEvent event, EntityRef entity) {
         potion = entity.getComponent(PotionComponent.class);
         poisoned = entity.getComponent(PoisonedComponent.class);
-        EntityManager entityManager = CoreRegister.get(EntityManager.class);
+        EntityManager entityManager = coreregister.get(EntityManager.class);
 
         HealthComponent health = event.getTarget().getComponent(HealthComponent.class);
         ItemComponent itemComp = entity.getComponent(ItemComponent.class);
