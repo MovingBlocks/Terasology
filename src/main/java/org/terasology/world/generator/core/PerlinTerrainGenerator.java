@@ -124,26 +124,24 @@ public class PerlinTerrainGenerator implements ChunkGenerator {
                     if ((dens >= 0 && dens < 32)) {
 
                         // Some block was set...
-                        if (firstBlockHeight == -1)
-                            firstBlockHeight = y;
+                        if (firstBlockHeight == -1) { firstBlockHeight = y; }
 
-                        if (calcCaveDensity(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z)) > -0.7)
+                        if (calcCaveDensity(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z)) > -0.7) {
                             GenerateOuterLayer(x, y, z, firstBlockHeight, c, type);
-                        else
+                        } else{
                             c.setBlock(x, y, z, air);
-
+                        }
                         continue;
                     } else if (dens >= 32) {
 
                         // Some block was set...
-                        if (firstBlockHeight == -1)
-                            firstBlockHeight = y;
+                        if (firstBlockHeight == -1) { firstBlockHeight = y; }
 
-                        if (calcCaveDensity(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z)) > -0.6)
+                        if (calcCaveDensity(c.getBlockWorldPosX(x), y, c.getBlockWorldPosZ(z)) > -0.6) {
                             GenerateInnerLayer(x, y, z, c, type);
-                        else
+                        } else {
                             c.setBlock(x, y, z, air);
-
+                        }
                         continue;
                     }
 

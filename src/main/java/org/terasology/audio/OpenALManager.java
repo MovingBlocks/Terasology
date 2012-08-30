@@ -40,7 +40,7 @@ public class OpenALManager extends AudioManager {
     /**
      * For faster distance check *
      */
-    private final static float MAX_DISTANCE_SQUARED = (float) Math.pow(MAX_DISTANCE, 2);
+    private static final float MAX_DISTANCE_SQUARED = (float) Math.pow(MAX_DISTANCE, 2);
 
     public static OpenALManager getInstance() {
         return (OpenALManager) AudioManager.getInstance();

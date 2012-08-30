@@ -64,7 +64,7 @@ public class ArchiveSource extends AbstractSource {
             if (entryPath.startsWith(basePath)) {
                 String key = entryPath.substring(basePath.length());
                 AssetUri uri = getUri(key);
-                if (uri == null || !uri.isValid()) continue;
+                if (uri == null || !uri.isValid()) { continue;}
 
                 logger.info("Discovered resource " + uri);
 

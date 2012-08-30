@@ -81,10 +81,10 @@ public class AssetManager {
 
     private Asset loadAsset(AssetUri uri, boolean logErrors) {
 
-        if (!uri.isValid()) return null;
+        if (!uri.isValid()) {return null;}
 
         Asset asset = assetCache.get(uri);
-        if (asset != null) return asset;
+        if (asset != null) {return asset;}
 
         List<URL> urls = getAssetURLs(uri);
         if (urls.size() == 0) {
@@ -100,10 +100,10 @@ public class AssetManager {
 
             String extension = url.toString().substring(extensionIndex + 1).toLowerCase(Locale.ENGLISH);
             Map<String, AssetLoader> extensionMap = assetLoaders.get(uri.getAssetType());
-            if (extensionMap == null) continue;
+            if (extensionMap == null) {continue;}
 
             AssetLoader loader = extensionMap.get(extension);
-            if (loader == null) continue;
+            if (loader == null) {continue;}
 
             InputStream stream = null;
             try {

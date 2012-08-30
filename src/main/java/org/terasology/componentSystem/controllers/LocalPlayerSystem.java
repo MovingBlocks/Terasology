@@ -101,17 +101,14 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
     @Override
     public void update(float delta) {
-        if (!localPlayer.isValid())
-            return;
+        if (!localPlayer.isValid()) { return; }
 
         EntityRef entity = localPlayer.getEntity();
         LocalPlayerComponent localPlayerComponent = entity.getComponent(LocalPlayerComponent.class);
         CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
         LocationComponent location = entity.getComponent(LocationComponent.class);
 
-        if (localPlayerComponent.isDead) {
-            return;
-        }
+        if (localPlayerComponent.isDead) { return; }
 
         updateMovement(localPlayerComponent, characterMovementComponent, location);
 
@@ -262,7 +259,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             QuaternionUtil.quatRotate(location.getLocalRotation(), relMove, relMove);
         }
         float lengthSquared = relMove.lengthSquared();
-        if (lengthSquared > 1) relMove.normalize();
+        if (lengthSquared > 1) { relMove.normalize(); }
         characterMovementComponent.setDrive(relMove);
     }
 
@@ -304,7 +301,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
         LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
         InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
-        if (localPlayerComp.isDead) return;
+        if (localPlayerComp.isDead) { return; }
 
         EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayerComp.selectedTool);
         attack(event.getTarget(), entity, selectedItemEntity);
@@ -340,7 +337,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         }
 
         LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
-        if (localPlayerComp.isDead) return;
+        if (localPlayerComp.isDead) { return; }
 
         event.getTarget().send(new ActivateEvent(entity, entity, playerCamera.getPosition(), playerCamera.getViewingDirection(), event.getHitPosition(), event.getHitNormal()));
         event.consume();
@@ -362,7 +359,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             return;
         }
 
-        if (localPlayerComp.isDead) return;
+        if (localPlayerComp.isDead) { return; }
 
         UIImage crossHair = (UIImage)GUIManager.getInstance().getWindowById("engine:hud").getElementById("crosshair");
 
@@ -448,7 +445,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
         LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
         InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
-        if (localPlayerComp.isDead) return;
+        if (localPlayerComp.isDead) { return; }
 
         EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayerComp.selectedTool);
 

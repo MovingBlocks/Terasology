@@ -80,7 +80,7 @@ public class BlockDamageRenderer implements RenderSystem {
 
     @Override
     public void renderOverlay() {
-        if (effectsTexture == null) return;
+        if (effectsTexture == null) { return; }
 
         ShaderManager.getInstance().enableDefaultTextured();
         glBindTexture(GL11.GL_TEXTURE_2D, effectsTexture.getId());
@@ -90,10 +90,10 @@ public class BlockDamageRenderer implements RenderSystem {
 
         for (EntityRef entity : entityManager.iteratorEntities(HealthComponent.class, BlockComponent.class)) {
             HealthComponent health = entity.getComponent(HealthComponent.class);
-            if (health.currentHealth == health.maxHealth) continue;
+            if (health.currentHealth == health.maxHealth) { continue; }
 
             BlockComponent blockComp = entity.getComponent(BlockComponent.class);
-            if (!worldProvider.isBlockActive(blockComp.getPosition())) continue;
+            if (!worldProvider.isBlockActive(blockComp.getPosition())) { continue; }
 
             glPushMatrix();
             glTranslated(blockComp.getPosition().x - cameraPosition.x, blockComp.getPosition().y - cameraPosition.y, blockComp.getPosition().z - cameraPosition.z);

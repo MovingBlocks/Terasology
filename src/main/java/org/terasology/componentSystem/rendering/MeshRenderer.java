@@ -162,7 +162,7 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
         for (EntityRef entity : gelatinous) {
             MeshComponent meshComp = entity.getComponent(MeshComponent.class);
             LocationComponent location = entity.getComponent(LocationComponent.class);
-            if (location == null) continue;
+            if (location == null) { continue; }
 
             Quat4f worldRot = location.getWorldRotation();
             Vector3f worldPos = location.getWorldPosition();
@@ -262,7 +262,7 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
                     // Batching
                     MeshComponent meshComp = entity.getComponent(MeshComponent.class);
                     LocationComponent location = entity.getComponent(LocationComponent.class);
-                    if (location == null) continue;
+                    if (location == null) { continue; }
 
                     location.getWorldRotation(worldRot);
                     location.getWorldPosition(worldPos);
@@ -277,8 +277,7 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
                         indexOffset = meshComp.mesh.addToBatch(trans, normTrans, vertexData, indexData, indexOffset);
                     }
 
-                    if (indexOffset > 100)
-                    {
+                    if (indexOffset > 100) {
                         renderBatch(vertexData, indexData);
                         vertexData.clear();
                         indexData.clear();
@@ -331,7 +330,7 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
     }
 
     private void renderBatch(TFloatList vertexData, TIntList indexData) {
-        if (vertexData.size() == 0 || indexData.size() == 0) return;
+        if (vertexData.size() == 0 || indexData.size() == 0) { return; }
 
         PerformanceMonitor.startActivity("BatchRenderMesh");
         FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(vertexData.size());

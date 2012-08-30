@@ -129,15 +129,14 @@ public class ObjMeshLoader implements AssetLoader<Mesh> {
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
                 lineNum++;
-                if (line.isEmpty())
-                    continue;
+                if (line.isEmpty()){continue;}
                 String[] prefixSplit = line.trim().split("\\s+", 2);
                 String prefix = prefixSplit[0];
 
                 // Comment
-                if ("#".equals(prefix))
+                if ("#".equals(prefix)){
                     continue;
-
+                }
                 if (prefixSplit.length < 2) {
                     throw new IOException(String.format("Incomplete statement"));
                 }
@@ -146,44 +145,32 @@ public class ObjMeshLoader implements AssetLoader<Mesh> {
                 // Object name
                 if ("o".equals(prefix)) {
                     // Just skip the name
-                }
-                // Vertex position
-                else if ("v".equals(prefix)) {
+                } else if ("v".equals(prefix)) { // Vertex position
                     String[] floats = prefixSplit[1].trim().split("\\s+", 4);
                     if (floats.length != 3) {
                         throw new IOException("Bad statement");
                     }
                     rawVertices.add(new Vector3f(Float.parseFloat(floats[0]), Float.parseFloat(floats[1]), Float.parseFloat(floats[2])));
-                }
-                // Vertex texture coords
-                else if ("vt".equals(prefix)) {
+                } else if ("vt".equals(prefix)) {  // Vertex texture coords
                     String[] floats = prefixSplit[1].trim().split("\\s+", 4);
                     if (floats.length < 2 || floats.length > 3) {
                         throw new IOException("Bad statement");
                     }
                     // Need to flip v coord, apparently
                     rawTexCoords.add(new Vector2f(Float.parseFloat(floats[0]), 1 - Float.parseFloat(floats[1])));
-                }
-                // Vertex normal
-                else if ("vn".equals(prefix)) {
+                } else if ("vn".equals(prefix)) { // Vertex normal
                     String[] floats = prefixSplit[1].trim().split("\\s+", 4);
                     if (floats.length != 3) {
                         throw new IOException("Bad statement");
                     }
                     rawNormals.add(new Vector3f(Float.parseFloat(floats[0]), Float.parseFloat(floats[1]), Float.parseFloat(floats[2])));
-                }
-                // Material name (ignored)
-                else if ("usemtl".equals(prefix)) {
+                } else if ("usemtl".equals(prefix)) {// Material name (ignored)
                     continue;
-                }
-                // Smoothing group (not supported)
-                else if ("s".equals(prefix)) {
+                } else if ("s".equals(prefix)) {// Smoothing group (not supported)
                     if (!"off".equals(prefixSplit[1]) && !"0".equals(prefixSplit[1])) {
                         logger.warning("Smoothing groups not supported in obj import yet");
                     }
-                }
-                // Face (polygon)
-                else if ("f".equals(prefix)) {
+                } else if ("f".equals(prefix)) {// Face (polygon)
                     String[] elements = prefixSplit[1].trim().split("\\s+");
                     Tuple3i[] result = new Tuple3i[elements.length];
                     for (int i = 0; i < elements.length; ++i) {

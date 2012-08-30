@@ -63,11 +63,10 @@ public class InventorySystem implements EventHandlerSystem {
     public void onReceiveItem(ReceiveItemEvent event, EntityRef entity) {
         InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
         ItemComponent item = event.getItem().getComponent(ItemComponent.class);
-        if (inventory == null || item == null)
-            return;
+        if (inventory == null || item == null) { return; }
 
         boolean itemChanged = false;
-        
+
         //place slot in the inventory automatically
         if (event.getSlot() == -1) {
 	        // First check for existing alike stacks in the target inventory
@@ -113,11 +112,10 @@ public class InventorySystem implements EventHandlerSystem {
 	            entity.saveComponent(inventory);
 	            return;
 	        } // If there are no free slots we do nothing, but may still save if part of the stack was merged in
+        } else {
+
         }
-        else {
-        	
-        }
-        
+
         if (itemChanged) {
             event.getItem().saveComponent(item);
         }

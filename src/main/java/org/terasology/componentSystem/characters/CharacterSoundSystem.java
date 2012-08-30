@@ -48,7 +48,7 @@ public class CharacterSoundSystem implements EventHandlerSystem {
 
     @ReceiveEvent(components = {CharacterSoundComponent.class})
     public void footstep(FootstepEvent event, EntityRef entity) {
-        if (random == null) return;
+        if (random == null) { return; }
 
         LocationComponent location = entity.getComponent(LocationComponent.class);
         if (location != null) {
@@ -62,7 +62,7 @@ public class CharacterSoundSystem implements EventHandlerSystem {
 
     @ReceiveEvent(components = {CharacterSoundComponent.class})
     public void jump(JumpEvent event, EntityRef entity) {
-        if (random == null) return;
+        if (random == null) { return; }
 
         LocationComponent location = entity.getComponent(LocationComponent.class);
         if (location != null) {
@@ -76,7 +76,7 @@ public class CharacterSoundSystem implements EventHandlerSystem {
 
     @ReceiveEvent(components = {CharacterSoundComponent.class})
     public void landed(VerticalCollisionEvent event, EntityRef entity) {
-        if (random == null || event.getVelocity().y > 0f) return;
+        if (random == null || event.getVelocity().y > 0f) { return; }
 
 
         CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
