@@ -4,10 +4,6 @@ import java.io.File;
 
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkStore;
-import org.terasology.world.chunks.store.ChunkStoreDeflate;
-import org.terasology.world.chunks.store.ChunkStoreFileSystem;
-import org.terasology.world.chunks.store.ChunkStoreGZip;
-import org.terasology.world.chunks.store.ChunkStoreUncompressed;
 
 public final class ChunkCachePerformanceTest {
 
