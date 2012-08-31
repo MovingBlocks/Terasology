@@ -18,24 +18,25 @@ package org.terasology.world;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
 
-import org.terasology.world.WorldBiomeProvider;
-import org.terasology.world.WorldBiomeProviderImpl;
+import org.terasology.TerasologyDevelopment;
 import org.terasology.world.block.Block;
 import org.terasology.world.generator.core.PerlinTerrainGenerator;
 
 /**
- * Simple preview generator. Generates heightmap images using the terrain generator.
- *
+ * Simple preview generator. Generates heightmap images using the terrain
+ * generator.
+ * 
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class TerrainPreviewGenerator {
+public final class TerrainPreviewGenerator {
+
+    private static final String SEED = "rAtAiWyKgDlEeFjKiSsPzKaOuKhRrWqV";
 
     private enum MapStyle {
         BIOMES, FOLIAGE_LUT, COLOR_LUT
@@ -45,34 +46,34 @@ public class TerrainPreviewGenerator {
     private static final int ZOOM_FACTOR = 8;
     private static final Vector2f POSITION = new Vector2f(0.0f, 0.0f);
 
-    private WorldBiomeProvider biomeProvider;
+    private final WorldBiomeProvider biomeProvider;
     PerlinTerrainGenerator generator;
 
-    public static void main(String[] args) {
-        TerrainPreviewGenerator gen = new TerrainPreviewGenerator("rAtAiWyKgDlEeFjKiSsPzKaOuKhRrWqV");
+    public static void main(final String[] args) {
+        final TerrainPreviewGenerator gen = new TerrainPreviewGenerator(SEED);
 
         gen.generateMap(MapStyle.BIOMES, "Biomes.png");
         gen.generateMap(MapStyle.COLOR_LUT, "ColorLut.png");
         gen.generateMap(MapStyle.FOLIAGE_LUT, "FoliageLut.png");
     }
 
-    public TerrainPreviewGenerator(String seed) {
-        this.biomeProvider = new WorldBiomeProviderImpl(seed);
+    public TerrainPreviewGenerator(final String seed) {
+        biomeProvider = new WorldBiomeProviderImpl(seed);
         generator = new PerlinTerrainGenerator();
         generator.setWorldSeed(seed);
         generator.setWorldBiomeProvider(biomeProvider);
     }
 
-    public void generateMap(MapStyle mapStyle, String fileName) {
-        BufferedImage image = new BufferedImage(256, 256, BufferedImage.TYPE_INT_RGB);
-        Graphics2D g = image.createGraphics();
+    public void generateMap(final MapStyle mapStyle, final String fileName) {
+        final BufferedImage image = new BufferedImage(256, 256, BufferedImage.TYPE_INT_RGB);
+        final Graphics2D g = image.createGraphics();
 
         int counter = 0;
         for (int x = -128; x < 128; x++) {
             for (int z = -128; z < 128; z++) {
                 switch (mapStyle) {
                     case BIOMES:
-                        WorldBiomeProvider.Biome bt = biomeProvider.getBiomeAt(x * ZOOM_FACTOR + (int) POSITION.x, z * ZOOM_FACTOR + (int) POSITION.y);
+                        final WorldBiomeProvider.Biome bt = biomeProvider.getBiomeAt((x * ZOOM_FACTOR) + (int) POSITION.x, (z * ZOOM_FACTOR) + (int) POSITION.y);
 
                         Color color = Color.BLACK;
 
@@ -95,13 +96,14 @@ public class TerrainPreviewGenerator {
                         }
 
                         for (int height = 256; height > 0; height -= 4) {
-                            double n = generator.calcDensity(x * ZOOM_FACTOR + (int) POSITION.x, height - 1, z * ZOOM_FACTOR + (int) POSITION.y);
+                            final double n = generator.calcDensity((x * ZOOM_FACTOR) + (int) POSITION.x, height - 1, (z * ZOOM_FACTOR) + (int) POSITION.y);
 
                             if (n >= 0) {
-                                if (height > 32)
+                                if (height > 32) {
                                     g.setColor(new Color(Math.min(height + color.getRed(), 255), Math.min(height + color.getGreen(), 255), Math.min(height + color.getBlue(), 255)));
-                                else
-                                    g.setColor(new Color(0, 0, (int) (255.0 * (32.0 - (32.0 - height)) / 32.0)));
+                                } else {
+                                    g.setColor(new Color(0, 0, (int) ((255.0 * (32.0 - (32.0 - height))) / 32.0)));
+                                }
 
                                 g.fillRect(x + 128, z + 128, 1, 1);
                                 break;
@@ -110,19 +112,20 @@ public class TerrainPreviewGenerator {
                         break;
                     case COLOR_LUT:
                     case FOLIAGE_LUT:
-                        float humidity = biomeProvider.getHumidityAt(x * ZOOM_FACTOR + (int) POSITION.x, z * ZOOM_FACTOR + (int) POSITION.y);
-                        float temp = biomeProvider.getTemperatureAt(x * ZOOM_FACTOR + (int) POSITION.x, z * ZOOM_FACTOR + (int) POSITION.y);
+                        float humidity = biomeProvider.getHumidityAt((x * ZOOM_FACTOR) + (int) POSITION.x, (z * ZOOM_FACTOR) + (int) POSITION.y);
+                        final float temp = biomeProvider.getTemperatureAt((x * ZOOM_FACTOR) + (int) POSITION.x, (z * ZOOM_FACTOR) + (int) POSITION.y);
                         humidity *= temp;
 
                         Vector4f vecCol = new Vector4f();
 
-                        if (mapStyle == MapStyle.COLOR_LUT)
+                        if (mapStyle == MapStyle.COLOR_LUT) {
                             vecCol = Block.ColorSource.COLOR_LUT.calcColor(temp, humidity);
-                        else if (mapStyle == MapStyle.FOLIAGE_LUT)
+                        } else if (mapStyle == MapStyle.FOLIAGE_LUT) {
                             vecCol = Block.ColorSource.FOLIAGE_LUT.calcColor(temp, humidity);
+                        }
 
                         for (int height = 256; height > 0; height -= 4) {
-                            double n = generator.calcDensity(x * ZOOM_FACTOR + (int) POSITION.x, height - 1, z * ZOOM_FACTOR + (int) POSITION.y);
+                            final double n = generator.calcDensity((x * ZOOM_FACTOR) + (int) POSITION.x, height - 1, (z * ZOOM_FACTOR) + (int) POSITION.y);
 
                             if (n >= 0) {
                                 g.setColor(new Color(vecCol.x, vecCol.y, vecCol.z));
@@ -136,14 +139,15 @@ public class TerrainPreviewGenerator {
 
                 counter++;
 
-                if (counter % 1024 == 0)
+                if ((counter % 1024) == 0) {
                     System.out.printf("%.2f %%\n", (counter / (256.0 * 256.0)) * 100.0);
+                }
             }
         }
 
         try {
-            ImageIO.write(image, "png", new File(fileName));
-        } catch (IOException e) {
+            ImageIO.write(image, "png", TerasologyDevelopment.getOutputFolder(fileName));
+        } catch (final IOException e) {
             e.printStackTrace();
         }
     }

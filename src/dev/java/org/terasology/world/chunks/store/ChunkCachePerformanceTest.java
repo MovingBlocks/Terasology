@@ -52,7 +52,7 @@ public final class ChunkCachePerformanceTest {
         }
     }
 
-    public static final void main(final String[] args) {
+    public static void main(final String[] args) {
         try {
             final ChunkCachePerformanceTest chunkCachePerformanceTest = new ChunkCachePerformanceTest(SIZE);
             chunkCachePerformanceTest.testChunkCash();
