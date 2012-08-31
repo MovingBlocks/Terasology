@@ -1,4 +1,4 @@
-package org.terasology.world;
+package org.terasology.world.chunks.store;
 
 import java.io.File;
 
