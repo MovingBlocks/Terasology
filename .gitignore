@@ -1,9 +1,10 @@
-SAVED_WORLDS
-screens
-logs
-out
-target
-build
+/SAVED_WORLDS
+/screens
+/logs
+/out
+/target
+/build
+/dev
 .DS_Store
 Terasology.iml
 Terasology.ipr
@@ -16,7 +17,6 @@ Terasology.iws
 .gradle
 bin
 data/console/consolelog.json
-benchmark-temp
 *~
 
 # Ignore error logs 
