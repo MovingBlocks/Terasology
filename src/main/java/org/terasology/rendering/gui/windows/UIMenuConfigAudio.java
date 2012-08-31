@@ -19,15 +19,14 @@ import org.lwjgl.input.Keyboard;
 import org.terasology.asset.AssetManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.rendering.gui.components.UIButton;
-import org.terasology.rendering.gui.components.UIImageOverlay;
-import org.terasology.rendering.gui.components.UISlider;
-import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.UIDisplayWindow;
-import org.terasology.rendering.gui.framework.UIGraphicsElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.ClickListener;
+import org.terasology.rendering.gui.widgets.UIButton;
+import org.terasology.rendering.gui.widgets.UIImage;
+import org.terasology.rendering.gui.widgets.UISlider;
+import org.terasology.rendering.gui.widgets.UIText;
+import org.terasology.rendering.gui.widgets.UIWindow;
 
 import javax.vecmath.Vector2f;
 
@@ -36,10 +35,9 @@ import javax.vecmath.Vector2f;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  *         Date: 29/07/12
  */
-public class UIMenuConfigAudio extends UIDisplayWindow {
+public class UIMenuConfigAudio extends UIWindow {
 
-    final UIImageOverlay _overlay;
-    final UIGraphicsElement _title;
+    final UIImage _title;
     final UIText _version;
     
     private final UISlider _soundOptionSlider;
@@ -47,20 +45,22 @@ public class UIMenuConfigAudio extends UIDisplayWindow {
     private final UIButton _backToConfigMenuButton;
 
     public UIMenuConfigAudio() {
+        setBackgroundImage("engine:loadingbackground");
         setModal(true);
         setCloseBinds(new String[] {});
         setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
         maximize();
 
-        _title = new UIGraphicsElement(AssetManager.loadTexture("engine:terasology"));
+        _title = new UIImage(AssetManager.loadTexture("engine:terasology"));
+        _title.setHorizontalAlign(EHorizontalAlign.CENTER);
+        _title.setPosition(new Vector2f(0f, 128f));
         _title.setVisible(true);
         _title.setSize(new Vector2f(512f, 128f));
 
         _version = new UIText("Audio Settings");
+        _version.setHorizontalAlign(EHorizontalAlign.CENTER);
+        _version.setPosition(new Vector2f(0f, 230f));
         _version.setVisible(true);
-
-        _overlay = new UIImageOverlay(AssetManager.loadTexture("engine:loadingBackground"));
-        _overlay.setVisible(true);
 
         _soundOptionSlider = new UISlider(new Vector2f(256f, 32f), 0, 100);
         _soundOptionSlider.addChangedListener(new ChangedListener() {
@@ -75,6 +75,8 @@ public class UIMenuConfigAudio extends UIDisplayWindow {
                 Config.getInstance().setSoundVolume(slider.getValue());
             }
         });
+        _soundOptionSlider.setHorizontalAlign(EHorizontalAlign.CENTER);
+        _soundOptionSlider.setPosition(new Vector2f(0f, 300f));
         _soundOptionSlider.setVisible(true);
 
         _musicOptionSlider = new UISlider(new Vector2f(256f, 32f), 0, 100);
@@ -90,49 +92,28 @@ public class UIMenuConfigAudio extends UIDisplayWindow {
                 Config.getInstance().setMusicVolume(slider.getValue());
             }
         });
+        _musicOptionSlider.setHorizontalAlign(EHorizontalAlign.CENTER);
+        _musicOptionSlider.setPosition(new Vector2f(0f, 300f + 40f));
         _musicOptionSlider.setVisible(true);
 
         _backToConfigMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _backToConfigMenuButton.getLabel().setText("Back");
-        _backToConfigMenuButton.setVisible(true);
         _backToConfigMenuButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
                 GUIManager.getInstance().setFocusedWindow(GUIManager.getInstance().getWindowById("menuConfig"));
             }
         });
+        _backToConfigMenuButton.setHorizontalAlign(EHorizontalAlign.CENTER);
+        _backToConfigMenuButton.setPosition(new Vector2f(0f, 300f + 7 * 40f));
+        _backToConfigMenuButton.setVisible(true);
 
-        addDisplayElement(_overlay);
         addDisplayElement(_title);
         addDisplayElement(_version);
 
-        addDisplayElement(_soundOptionSlider, "soundVolumeSlider");
-        addDisplayElement(_musicOptionSlider, "musicVolumeSlider");
-        addDisplayElement(_backToConfigMenuButton, "backToConfigMenuButton");
-        
-        layout();
-    }
-
-    @Override
-    public void layout() {
-        super.layout();
-        
-        if (_version != null) {
-            _version.centerHorizontally();
-            _version.getPosition().y = 230f;
-    
-            _soundOptionSlider.centerHorizontally();
-            _soundOptionSlider.getPosition().y = 300f;
-    
-            _musicOptionSlider.centerHorizontally();
-            _musicOptionSlider.getPosition().y = 300f + 40f;
-    
-            _backToConfigMenuButton.centerHorizontally();
-            _backToConfigMenuButton.getPosition().y = 300f + 7 * 40f;
-    
-            _title.centerHorizontally();
-            _title.getPosition().y = 128f;
-        }
+        addDisplayElement(_soundOptionSlider);
+        addDisplayElement(_musicOptionSlider);
+        addDisplayElement(_backToConfigMenuButton);
     }
 
     public void setup() {

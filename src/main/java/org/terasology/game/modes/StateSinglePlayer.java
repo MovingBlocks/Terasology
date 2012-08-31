@@ -296,10 +296,6 @@ public class StateSinglePlayer implements GameState {
         prepareWorld();
     }
 
-    private boolean screenHasFocus() {
-        return GUIManager.getInstance().getFocusedWindow() != null && GUIManager.getInstance().getFocusedWindow().isModal() && GUIManager.getInstance().getFocusedWindow().isVisible();
-    }
-
     private boolean shouldUpdateWorld() {
         return !pauseGame;
     }

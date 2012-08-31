@@ -27,7 +27,7 @@ import javax.vecmath.Vector2f;
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.AssetManager;
 import org.terasology.rendering.assets.Texture;
-import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.family.BlockFamily;
 
@@ -37,7 +37,7 @@ import org.terasology.world.block.family.BlockFamily;
 public class Icon {
     private static Map<String, Icon> icons;
 
-    private UIGraphicsElement _element;
+    private UIImage _element;
     private BlockFamily _blockFamily;
     private int _x;
     private int _y;
@@ -59,7 +59,7 @@ public class Icon {
      * Creates an Icon for a non-BlockFamily class
      */
     public Icon() {
-        _element = new UIGraphicsElement(AssetManager.loadTexture("engine:items"));
+        _element = new UIImage(AssetManager.loadTexture("engine:items"));
         _blockFamily = null;
 
         _element.setSize(new Vector2f(32, 32));

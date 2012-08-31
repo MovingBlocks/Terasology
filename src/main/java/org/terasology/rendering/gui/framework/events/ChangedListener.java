@@ -18,5 +18,5 @@ package org.terasology.rendering.gui.framework.events;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 
 public interface ChangedListener {
-	public void changed(UIDisplayElement element);
+    public void changed(UIDisplayElement element);
 }

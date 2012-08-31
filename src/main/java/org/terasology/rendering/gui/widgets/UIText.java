@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.components;
+package org.terasology.rendering.gui.widgets;
 
 import static org.lwjgl.opengl.GL11.glDisable;
 
@@ -21,7 +21,6 @@ import java.util.ArrayList;
 
 import javax.vecmath.Vector2f;
 
-import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.AngelCodeFont;
 import org.newdawn.slick.Color;
@@ -40,30 +39,26 @@ import org.terasology.rendering.gui.framework.events.ChangedListener;
  */
 public class UIText extends UIDisplayElement {
 
-	private final ArrayList<ChangedListener> _changedListeners = new ArrayList<ChangedListener>();
-    protected String _text = "";
+    private final ArrayList<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
+    protected String text = "";
 
-    private Color _shadowColor = new Color(Color.black);
-    private Color _color = new Color(Color.white);
+    private Color shadowColor = new Color(Color.black);
+    private Color color = new Color(Color.white);
 
-    private AngelCodeFont _font = FontManager.getInstance().getFont("default");
-    private boolean _shadowed = true;
+    private AngelCodeFont font = FontManager.getInstance().getFont("default");
+    private boolean shadowed = true;
 
     // TODO HACK
     private Texture _workaroundTexture = new TextureImpl("abc", 0, 0);
 
-    private final Vector2f _shadowOffset = new Vector2f(-1, 0);
+    private final Vector2f _shadowOffset = new Vector2f(1, 0);
 
     public UIText() {
         super();
     }
 
     public UIText(String text) {
-        _text = text;
-    }
-
-    public UIText(Vector2f position) {
-        super(position);
+        setText(text);
     }
 
     public void render() {
@@ -74,10 +69,10 @@ public class UIText extends UIDisplayElement {
         // TODO HACK: Workaround because the internal Slick texture mechanism is never used
         _workaroundTexture.bind();
 
-        if (_shadowed)
-            _font.drawString(_shadowOffset.x, _shadowOffset.y, _text, _shadowColor);
+        if (shadowed)
+            font.drawString(_shadowOffset.x, _shadowOffset.y, text, shadowColor);
 
-        _font.drawString(0, 0, _text, _color);
+        font.drawString(0, 0, text, color);
 
         // TODO: Also ugly..
         glDisable(GL11.GL_TEXTURE_2D);
@@ -90,76 +85,67 @@ public class UIText extends UIDisplayElement {
 
     }
     
-	@Override
-	public void layout() {
-
-	}
-	
-	private void notifyChangedListeners() {
-		for (ChangedListener listener : _changedListeners) {
-			listener.changed(this);
-		}
-	}
+    private void notifyChangedListeners() {
+        for (ChangedListener listener : changedListeners) {
+            listener.changed(this);
+        }
+    }
 
     public String getText() {
-        return _text;
+        return text;
     }
 
     public void setText(String text) {
-        _text = text;
+        this.text = text;
+        setSize(new Vector2f(getTextWidth(), getTextHeight()));
         notifyChangedListeners();
     }
 
     public Color getColor() {
-        return _color;
+        return color;
     }
 
     public void setColor(Color color) {
-        _color = color;
+        this.color = color;
     }
 
     public Color getShadowColor() {
-        return _shadowColor;
+        return shadowColor;
     }
 
     public void setShadowColor(Color shadowColor) {
-        _shadowColor = shadowColor;
+        this.shadowColor = shadowColor;
     }
 
     public void setShadowed(boolean shadowed) {
-        _shadowed = shadowed;
+        this.shadowed = shadowed;
     }
 
     public boolean isShadowed() {
-        return _shadowed;
+        return shadowed;
     }
 
     public AngelCodeFont getFont() {
-        return _font;
+        return font;
     }
 
     public void setFont(AngelCodeFont font) {
-        _font = font;
+        this.font = font;
     }
 
     public int getTextHeight() {
-        return _font.getHeight(_text);
+        return font.getHeight(text);
     }
 
     public int getTextWidth() {
-        return _font.getWidth(_text);
+        return font.getWidth(text);
     }
 
-    public Vector2f calcCenterPosition() {
-        // This has to be calculated separately since the width of the text depends on the selected font
-        return new Vector2f(Display.getWidth() / 2 - getTextWidth() / 2, Display.getHeight() / 2 - getTextHeight());
-    }
-
-	public void addChangedListener(ChangedListener listener) {
-        _changedListeners.add(listener);
+    public void addChangedListener(ChangedListener listener) {
+        changedListeners.add(listener);
     }
 
     public void removeChangedListener(ChangedListener listener) {
-    	_changedListeners.remove(listener);
+        changedListeners.remove(listener);
     }
 }

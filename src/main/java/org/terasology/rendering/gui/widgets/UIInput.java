@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.components;
+package org.terasology.rendering.gui.widgets;
 
 import static org.lwjgl.opengl.GL11.GL_QUADS;
 import static org.lwjgl.opengl.GL11.glBegin;
@@ -49,10 +49,14 @@ import org.terasology.rendering.gui.framework.events.MouseMoveListener;
  *
  * @author Anton Kireev <adeon.k87@gmail.com>
  * @version 0.23
+ * 
+ * TODO clean up..
  */
 public class UIInput extends UIDisplayContainer implements IInputDataElement {
     //    TODO: Add text selection and paste from clipboard
     private final ArrayList<InputListener> _inputListeners = new ArrayList<InputListener>();
+    
+    private boolean _disabled = false;
 
     private final StringBuffer _inputValue = new StringBuffer();
     private final UIText _inputText;
@@ -97,18 +101,17 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
 
     public UIInput(Vector2f size) {
         setSize(size);
-        setCrop(true);
-        setStyle("background-image", "engine:gui_menu 256/512 30/512 0 90/512");
+        setCropContainer(true);
+        setBackgroundImage("engine:gui_menu", new Vector2f(0f, 90f), new Vector2f(256f, 30f));
         
         addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
                 if (!isDisabled()) {
                     setFocus(_inputObj);
-                    setStyle("background-position", "0 120/512");
                     
                     if (_inputValue.length() > 0 && _inputText.getTextWidth() > 0) {
-                        Vector2f absolutePosition = _inputText.calcAbsolutePosition();
+                        Vector2f absolutePosition = _inputText.getAbsolutePosition();
                         float positionRelativeElement = absolutePosition.x + _inputText.getTextWidth() - new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()).x;
                         float averageSymbols = _inputText.getTextWidth() / _inputValue.length();
     
@@ -145,7 +148,7 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
         addMouseMoveListener(new MouseMoveListener() {        
             @Override
             public void leave(UIDisplayElement element) {
-                setStyle("background-position", "0 90/512");
+                
             }
             
             @Override
@@ -166,13 +169,18 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
         addFocusListener(new FocusListener() {
             @Override
             public void focusOn(UIDisplayElement element) {
-                if (!isDisabled())
+                if (!isDisabled()) {
                     _textCursor.setVisible(true);
+                }
+                
+                setBorderSolid(2, 0xFA, 0xAA, 0x00, 1.0f);
+                layout();
             }
             
             @Override
             public void focusOff(UIDisplayElement element) {
                 _textCursor.setVisible(false);
+                removeBorderSolid();
             }
         });
         
@@ -193,7 +201,7 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
     @Override
     public void update() {
         _inputText.setPosition(new Vector2f(_padding.x, getSize().y/2 - _inputText.getTextHeight()/2));
-        _textCursor.setPosition(new Vector2f(_textCursor.getPosition().x, getSize().y/2 - _textCursor.getSize().y/1.5f));
+        _textCursor.setPosition(new Vector2f(_textCursor.getPosition().x, getSize().y/2 - _textCursor.getSize().y/1.35f));
 
         updateTextShift();
         super.update();

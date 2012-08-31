@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.components;
+package org.terasology.rendering.gui.widgets;
 
 import java.io.File;
 import java.io.FileReader;
@@ -21,8 +21,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
-
-import javax.vecmath.Vector2f;
 
 import org.lwjgl.opengl.Display;
 import org.terasology.logic.manager.PathManager;
@@ -56,44 +54,39 @@ public class UITextWrap extends UIText {
         setup();
 
     }
-
-    public UITextWrap(Vector2f position) {
-        super(position);
-        setup();
-    }
     
     private void setup() {
-    	addMouseButtonListener(new MouseButtonListener() {
-			@Override
-			public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
-				if (wheel != 0) {
-					if (wheel > 0)
-						currentpos++;
-					else
-						currentpos--;
-					
-					try {
-						showFromJson();	//TODO something buggy here :D scroll causes help blockList to be displayed.
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			}
-			
-			@Override
-			public void up(UIDisplayElement element, int button, boolean intersect) {
-				
-			}
-			
-			@Override
-			public void down(UIDisplayElement element, int button, boolean intersect) {
-				
-			}
-		});
+        addMouseButtonListener(new MouseButtonListener() {
+            @Override
+            public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
+                if (wheel != 0) {
+                    if (wheel > 0)
+                        currentpos++;
+                    else
+                        currentpos--;
+                    
+                    try {
+                        showFromJson();    //TODO something buggy here :D scroll causes help blockList to be displayed.
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            
+            @Override
+            public void up(UIDisplayElement element, int button, boolean intersect) {
+                
+            }
+            
+            @Override
+            public void down(UIDisplayElement element, int button, boolean intersect) {
+                
+            }
+        });
     }
 
     public void setText(String text) {
-        _text = text;
+        this.text = text;
     }
 
     public void showFromJson() throws IOException {
@@ -118,10 +111,10 @@ public class UITextWrap extends UIText {
         String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data" + File.separator + "console" + File.separator + "consolelog.json";
         JsonReader reader = new JsonReader(new FileReader(helpFile));
         reader.beginArray();
-        _text = "";
+        text = "";
         while (reader.hasNext()) {
             if (counter > beginpos && counter < endpos) {
-                _text += gson.fromJson(reader, String.class);
+                text += gson.fromJson(reader, String.class);
             } else {
                 gson.fromJson(reader, String.class);
             }
@@ -137,9 +130,9 @@ public class UITextWrap extends UIText {
         String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data" + File.separator + "console" + File.separator + "help.json";
         JsonReader reader = new JsonReader(new FileReader(helpFile));
         reader.beginArray();
-        _text = "";
+        text = "";
         while (reader.hasNext()) {
-            _text += gson.fromJson(reader, String.class) + newLine;
+            text += gson.fromJson(reader, String.class) + newLine;
         }
         reader.endArray();
         reader.close();
@@ -150,9 +143,9 @@ public class UITextWrap extends UIText {
         String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data" + File.separator + "console" + File.separator + "error.json";
         JsonReader reader = new JsonReader(new FileReader(helpFile));
         reader.beginArray();
-        _text = "";
+        text = "";
         while (reader.hasNext()) {
-            _text += gson.fromJson(reader, String.class) + newLine;
+            text += gson.fromJson(reader, String.class) + newLine;
         }
         reader.endArray();
         reader.close();

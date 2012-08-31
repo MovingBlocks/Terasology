@@ -26,9 +26,10 @@ import org.terasology.game.modes.StateSinglePlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
-import org.terasology.rendering.gui.components.*;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
+import org.terasology.rendering.gui.widgets.*;
+import org.terasology.rendering.gui.windows.UIMenuSelectWorld;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldInfo;
 import org.terasology.world.generator.core.FlatTerrainGenerator;
@@ -65,24 +66,25 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
         _inputSeed.setVisible(true);
 
         _inputWorldTitle = new UIInput(new Vector2f(256f, 30f));
+        _inputWorldTitle.setValue(getWorldName());
         _inputWorldTitle.setVisible(true);
+        
+        _inputSeedLabel = new UIText("Enter a seed (optional):");
+        _inputSeedLabel.setColor(Color.darkGray);
+        _inputSeedLabel.setSize(new Vector2f(0f, 16f));
+        _inputSeedLabel.setVisible(true);
 
         _inputWorldTitleLabel = new UIText("Enter a world name:");
         _inputWorldTitleLabel.setColor(Color.darkGray);
-        _inputWorldTitleLabel.getSize().y = 16f;
+        _inputWorldTitleLabel.setSize(new Vector2f(0f, 16f));
         _inputWorldTitleLabel.setVisible(true);
-
-        _inputSeedLabel = new UIText("Enter a seed (optional):");
-        _inputSeedLabel.setColor(Color.darkGray);
-        _inputSeedLabel.getSize().y = 16f;
-        _inputSeedLabel.setVisible(true);
         
         _chunkGeneratorLabel = new UIText("Choose Chunk Generator:");
         _chunkGeneratorLabel.setColor(Color.darkGray);
-        _chunkGeneratorLabel.getSize().y = 16f;
+        _chunkGeneratorLabel.setSize(new Vector2f(0f, 16f));
         _chunkGeneratorLabel.setVisible(true);
 
-        _chunkGenerator = new UIComboBox(new Vector2f(176f, 22f), new Vector2f(176f, 88f));
+        _chunkGenerator = new UIComboBox(new Vector2f(176f, 22f), new Vector2f(175f, 64f));
         _chunkGenerator.addItem("Normal", new Integer(0));
         _chunkGenerator.addItem("Flat", new Integer(1));
         _chunkGenerator.setSelectedItemIndex(0);
@@ -105,18 +107,18 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
         _okButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-            	//validation of the input
-            	if (_inputWorldTitle.getValue().isEmpty()) {
-            		GUIManager.getInstance().showMessage("Error", "Please enter a world name");
-            		
-            		return;
-            	} else if ((new File(PathManager.getInstance().getWorldSavePath(_inputWorldTitle.getValue()), WorldInfo.DEFAULT_FILE_NAME)).exists()) {
-            		GUIManager.getInstance().showMessage("Error", "A World with this name already exists");
-            		
-            		return;
-            	}
-            	
-            	//set the world settings
+                //validation of the input
+                if (_inputWorldTitle.getValue().isEmpty()) {
+                    GUIManager.getInstance().showMessage("Error", "Please enter a world name");
+                    
+                    return;
+                } else if ((new File(PathManager.getInstance().getWorldSavePath(_inputWorldTitle.getValue()), WorldInfo.DEFAULT_FILE_NAME)).exists()) {
+                    GUIManager.getInstance().showMessage("Error", "A World with this name already exists");
+                    
+                    return;
+                }
+                
+                //set the world settings
                 if (_inputSeed.getValue().length() > 0) {
                     Config.getInstance().setDefaultSeed(_inputSeed.getValue());
                 } else {
@@ -164,22 +166,22 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
         _cancelButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                close(true);
+                close();
             }
         });
 
-        addDisplayElement(_inputWorldTitleLabel, "inputWorldTitleLabel");
-        addDisplayElement(_inputWorldTitle, "inputWorldTitle");
-        addDisplayElement(_inputSeedLabel, "inputSeedLabel");
-        addDisplayElement(_inputSeed, "inputSeed");
-        addDisplayElement(_chunkGeneratorLabel, "chunkGeneratorLabel");
-        addDisplayElement(_okButton, "okButton");
-        addDisplayElement(_cancelButton, "cancelButton");
-        addDisplayElement(_chunkGenerator, "chunkGenerator");
+        addDisplayElement(_inputWorldTitleLabel);
+        addDisplayElement(_inputWorldTitle);
+        addDisplayElement(_inputSeedLabel);
+        addDisplayElement(_inputSeed);
+        addDisplayElement(_chunkGeneratorLabel);
+        addDisplayElement(_okButton);
+        addDisplayElement(_cancelButton);
+        addDisplayElement(_chunkGenerator);
     }
 
-    public String getWorldName() {
-        UIList list = (UIList) GUIManager.getInstance().getWindowById("selectWorld").getElementById("list");
-        return "World" + (list.size() + 1);
+    private String getWorldName() {
+        UIMenuSelectWorld menu = (UIMenuSelectWorld) GUIManager.getInstance().getWindowById("selectWorld");
+        return "World" + (menu.getWorldCount() + 1);
     }
 }

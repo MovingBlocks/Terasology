@@ -17,46 +17,37 @@ package org.terasology.rendering.gui.windows;
 
 import javax.vecmath.Vector2f;
 
-import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetManager;
-import org.terasology.rendering.gui.components.UIImageOverlay;
-import org.terasology.rendering.gui.components.UIProgressBar;
-import org.terasology.rendering.gui.framework.UIDisplayWindow;
+import org.terasology.rendering.gui.widgets.UIImage;
+import org.terasology.rendering.gui.widgets.UIProgressBar;
+import org.terasology.rendering.gui.widgets.UIWindow;
 
 /**
  * Simple status screen with one sole text label usable for status notifications.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class UIScreenLoading extends UIDisplayWindow {
+public class UIScreenLoading extends UIWindow {
 
-    final UIImageOverlay _overlay;
+    final UIImage background;
     final UIProgressBar _progressBar;
 
     public UIScreenLoading() {
+        setBackgroundImage("engine:loadingbackground");
         setModal(true);
-        setVisible(true);
+        maximize();
         
-        _overlay = new UIImageOverlay(AssetManager.loadTexture("engine:loadingBackground"));
-        _overlay.setVisible(true);
+        background = new UIImage(AssetManager.loadTexture("engine:menuBackground"));
+        background.setVisible(true);
 
-        _progressBar = new UIProgressBar(new Vector2f(256f, 15f));
+        _progressBar = new UIProgressBar();
+        _progressBar.setHorizontalAlign(EHorizontalAlign.CENTER);
+        _progressBar.setVerticalAlign(EVerticalAlign.BOTTOM);
+        _progressBar.setPosition(new Vector2f(0f, -80f));
         _progressBar.setVisible(true);
 
-        addDisplayElement(_overlay);
+        addDisplayElement(background);
         addDisplayElement(_progressBar);
-
-        layout();
-
-    }
-
-    @Override
-    public void layout() {
-        super.layout();
-
-        if (_progressBar != null) {
-            _progressBar.setPosition(new Vector2f(_progressBar.calcCenterPosition().x, Display.getHeight() - 84.0f));
-        }
     }
 
     public void updateStatus(String string, float percent) {

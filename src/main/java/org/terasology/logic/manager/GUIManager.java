@@ -30,13 +30,14 @@ import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.ButtonState;
-import org.terasology.rendering.gui.components.UIMessageBox;
-import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
-import org.terasology.rendering.gui.framework.UIDisplayWindow;
+import org.terasology.rendering.gui.widgets.UIMessageBox;
+import org.terasology.rendering.gui.widgets.UIWindow;
 
 import java.util.HashMap;
 import java.util.List;
+
+import javax.vecmath.Vector2f;
 
 /**
  * First version of simple GUI manager.
@@ -50,7 +51,7 @@ import java.util.List;
 public class GUIManager implements EventHandlerSystem {
     
     private static GUIManager instance;
-    private HashMap<String, UIDisplayWindow> windowsById = new HashMap<String, UIDisplayWindow>();
+    private HashMap<String, UIWindow> windowsById = new HashMap<String, UIWindow>();
     
     //renderer
     private UIDisplayRenderer renderer;
@@ -78,25 +79,11 @@ public class GUIManager implements EventHandlerSystem {
     /**
      * Updates all visible display elements and their child's. Will update the layout if the display was resized.
      */
-    public void update() {
-    	//TODO what should the following code do?
-    	/*
-        if (_currentFocused == null) {
-            int size = _renderer.getDisplayElements().size();
-            if (size > 0) {
-                //added this check to prevent the manager from ungrabbing the mouse when the minion behaviour menu pops up
-                // TODO : better way to handle this? not link focus with grabbing / ungrabbing?
-                UIDisplayWindow tempwindow = (UIDisplayWindow) _renderer.getDisplayElements().get(size - 1);
-                if (!(tempwindow instanceof UIMinionBehaviourMenu)) {
-                    _currentFocused = tempwindow;
-                }
-            }
-        }
-        */
-        
+    public void update() {        
         renderer.update();
 
         if (Display.wasResized()) {
+            renderer.setSize(new Vector2f(Display.getWidth(), Display.getHeight()));
             renderer.layout();
         }
     }
@@ -107,13 +94,8 @@ public class GUIManager implements EventHandlerSystem {
      * @param windowId The id of the window, to access windows by id.
      * @return Returns the added window.
      */
-    public <T extends UIDisplayWindow> T addWindow(T window, String windowId) {
-        if (window.isMaximized()) {
-            renderer.addtDisplayElementToPosition(0, window);
-        } else {
-            renderer.addDisplayElement(window);
-        }
-
+    public <T extends UIWindow> T addWindow(T window, String windowId) {
+        renderer.addDisplayElementToPosition(0, window);
         windowsById.put(windowId, window);
         
         if (windowsById.size() == 1) {
@@ -137,7 +119,7 @@ public class GUIManager implements EventHandlerSystem {
      * Close the given window and remove it from the GUIManager. Therefore it won't be updated or rendered anymore.
      * @param window The window by reference to remove.
      */
-    public void removeWindow(UIDisplayWindow window) {
+    public void removeWindow(UIWindow window) {
         
         if (window == null) {
             return;
@@ -166,7 +148,7 @@ public class GUIManager implements EventHandlerSystem {
      * @param windowId The window id.
      * @return Returns the reference of the window with the given id or null if there is none with this id.
      */
-    public UIDisplayWindow getWindowById(String windowId) {
+    public UIWindow getWindowById(String windowId) {
         if (windowsById.containsKey(windowId)) {
             return windowsById.get(windowId);
         } else {
@@ -178,7 +160,7 @@ public class GUIManager implements EventHandlerSystem {
      * Set the focus to the given window by its reference. The focused window will be set on the top of the layer.
      * @param window The window reference.
      */
-    public void setFocusedWindow(UIDisplayWindow window) {
+    public void setFocusedWindow(UIWindow window) {
     	renderer.setWindowFocus(window);
     	checkMouseMovement();
     }
@@ -199,7 +181,7 @@ public class GUIManager implements EventHandlerSystem {
      * Get the focused window.
      * @return Returns the focused window.
      */
-	public UIDisplayWindow getFocusedWindow() {
+	public UIWindow getFocusedWindow() {
 		return renderer.getWindowFocused();
 	}
 
@@ -228,9 +210,7 @@ public class GUIManager implements EventHandlerSystem {
      * @param text The text of the dialog.
      */
     public void showMessage(String title, String text) {
-        UIDisplayWindow messageWindow = new UIMessageBox(title, text);
-        messageWindow.setVisible(true);
-        messageWindow.center();
+        UIWindow messageWindow = new UIMessageBox(title, text);
         addWindow(messageWindow, "messageBox");
         setFocusedWindow(messageWindow);
     }
@@ -250,7 +230,7 @@ public class GUIManager implements EventHandlerSystem {
      */
     private void processMouseInput(int button, boolean state, int wheelMoved) {
         if (renderer.getWindowFocused() != null) {
-        	renderer.getWindowFocused().processMouseInput(button, state, wheelMoved);
+        	renderer.getWindowFocused().processMouseInput(button, state, wheelMoved, false);
         }
     }
     
@@ -259,17 +239,8 @@ public class GUIManager implements EventHandlerSystem {
      * @param event The event of the pressed key.
      */
     private void processKeyboardInput(KeyEvent event) {
-        if (renderer.getWindowFocused() != null && renderer.getWindowFocused().isModal() && renderer.getWindowFocused().isVisible()) { //TODO change this
+        if (renderer.getWindowFocused() != null && renderer.getWindowFocused().isModal() && renderer.getWindowFocused().isVisible()) {
         	renderer.getWindowFocused().processKeyboardInput(event);
-            event.consume();
-            return;
-        }
-
-        List<UIDisplayElement> screens = Lists.newArrayList(renderer.getDisplayElements());
-        for (UIDisplayElement screen : screens) {
-            if (!((UIDisplayWindow) screen).isModal()) {
-                screen.processKeyboardInput(event);
-            }
         }
     }
 
@@ -278,7 +249,7 @@ public class GUIManager implements EventHandlerSystem {
      * @param event The event of the bind button.
      */
     private void processBindButton(BindButtonEvent event) {
-        if (renderer.getWindowFocused() != null && renderer.getWindowFocused().isModal() && renderer.getWindowFocused().isVisible()) { //TODO change this
+        if (renderer.getWindowFocused() != null && renderer.getWindowFocused().isModal() && renderer.getWindowFocused().isVisible()) {
         	renderer.getWindowFocused().processBindButton(event);
         }
     }

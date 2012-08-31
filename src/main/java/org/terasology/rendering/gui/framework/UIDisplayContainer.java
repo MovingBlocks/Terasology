@@ -15,15 +15,21 @@
  */
 package org.terasology.rendering.gui.framework;
 
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import org.terasology.input.events.KeyEvent;
+import org.terasology.asset.AssetManager;
 import org.terasology.input.BindButtonEvent;
+import org.terasology.input.events.KeyEvent;
 import org.terasology.rendering.gui.framework.style.UIStyle;
+import org.terasology.rendering.gui.framework.style.UIStyleBackgroundColor;
+import org.terasology.rendering.gui.framework.style.UIStyleBackgroundImage;
+import org.terasology.rendering.gui.framework.style.UIStyleBorderImage;
+import org.terasology.rendering.gui.framework.style.UIStyleBorderSolid;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -31,35 +37,24 @@ import static org.lwjgl.opengl.GL11.*;
  * Composition of multiple display elements.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
 public abstract class UIDisplayContainer extends UIDisplayElement {
 
-    final ArrayList<UIDisplayElement> _displayElements = new ArrayList<UIDisplayElement>();
-    private boolean _crop = false;
-
-    protected UIStyle _style = null;
-    private final HashMap<String, UIStyle> _styleClasses = new HashMap<String, UIStyle>();
-
-    protected Vector4f _cropMargin = new Vector4f(/*TOP*/    0.0f,
-            /*RIGHT*/  0.0f,
-            /*BOTTOM*/ 0.0f,
-            /*LEFT*/   0.0f
-    );
+    //child elements
+    private final ArrayList<UIDisplayElement> displayElements = new ArrayList<UIDisplayElement>();
+    private final List<UIStyle> styles = new ArrayList<UIStyle>();
+    
+    //cropping
+    private boolean cropContainer = false;
+    protected Vector4f cropMargin = new Vector4f(0.0f, 0.0f,0.0f, 0.0f);
 
     public UIDisplayContainer() {
         super();
     }
 
-    public UIDisplayContainer(Vector2f position) {
-        super(position);
-    }
-
-    public UIDisplayContainer(Vector2f position, Vector2f size) {
-        super(position, size);
-    }
-
     public void render() {
-        boolean testCrop = false;
+        boolean allowsCrop = false;
         int cropX = 0;
         int cropY = 0;
         int cropWidth = 0;
@@ -69,29 +64,29 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             return;
 
         //Cut the elements
-        if (_crop) {
-            cropX = (int) calcAbsolutePosition().x - (int) (_cropMargin.w);
-            cropY = Display.getHeight() - (int) calcAbsolutePosition().y - (int) getSize().y - (int) _cropMargin.z;
-            cropWidth = (int) getSize().x + (int) _cropMargin.y;
-            cropHeight = (int) getSize().y + (int) _cropMargin.x;
+        if (cropContainer) {
+            cropX = (int) getAbsolutePosition().x - (int) (cropMargin.w);
+            cropY = Display.getHeight() - (int) getAbsolutePosition().y - (int) getSize().y - (int) cropMargin.z;
+            cropWidth = (int) getSize().x + (int) cropMargin.y;
+            cropHeight = (int) getSize().y + (int) cropMargin.x;
             glEnable(GL_SCISSOR_TEST);
             glScissor(cropX, cropY, cropWidth, cropHeight);
         }
 
         // Render all display elements
-        for (int i = 0; i < _displayElements.size(); i++) {
-            testCrop = _crop && !_displayElements.get(i).isCroped();
-            if (testCrop) {
+        for (int i = 0; i < displayElements.size(); i++) {
+            allowsCrop = cropContainer && !displayElements.get(i).isCrop();
+            if (allowsCrop) {
                 glDisable(GL_SCISSOR_TEST);
             }
-            _displayElements.get(i).renderTransformed();
-            if (testCrop) {
+            displayElements.get(i).renderTransformed();
+            if (allowsCrop) {
                 glEnable(GL_SCISSOR_TEST);
                 glScissor(cropX, cropY, cropWidth, cropHeight);
             }
         }
 
-        if (_crop) {
+        if (cropContainer) {
             glDisable(GL_SCISSOR_TEST);
         }
     }
@@ -101,18 +96,20 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             return;
 
         // Update all display elements
-        for (int i = 0; i < _displayElements.size(); i++) {
-            _displayElements.get(i).update();
+        for (int i = 0; i < displayElements.size(); i++) {
+            displayElements.get(i).update();
         }
     }
     
     public void layout() {
         if (!isVisible())
             return;
+        
+        super.layout();
 
         // Update layout of all display elements
-        for (int i = 0; i < _displayElements.size(); i++) {
-            _displayElements.get(i).layout();
+        for (int i = 0; i < displayElements.size(); i++) {
+            displayElements.get(i).layout();
         }
     }
     
@@ -120,12 +117,12 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     public void processBindButton(BindButtonEvent event) {
         if (!isVisible())
             return;
-    	
+        
         super.processBindButton(event);
         
         // Pass the bind key to all display elements
-        for (int i = 0; i < _displayElements.size(); i++) {
-        	_displayElements.get(i).processBindButton(event);
+        for (int i = 0; i < displayElements.size(); i++) {
+            displayElements.get(i).processBindButton(event);
         }
     }
 
@@ -137,136 +134,399 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         super.processKeyboardInput(event);
 
         // Pass the pressed key to all display elements
-        for (int i = 0; i < _displayElements.size(); i++) {
-            _displayElements.get(i).processKeyboardInput(event);
+        for (int i = 0; i < displayElements.size(); i++) {
+            displayElements.get(i).processKeyboardInput(event);
         }
     }
 
     @Override
-    public void processMouseInput(int button, boolean state, int wheelMoved) {
+    public boolean processMouseInput(int button, boolean state, int wheelMoved, boolean consumed) {
         if (!isVisible())
-            return;
-
-        super.processMouseInput(button, state, wheelMoved);
+            return consumed;
+        
+        //cancel mouse click event if the click is out of the cropped area
+        if (cropContainer) {
+            if (!intersects(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()))) {
+                state = false;
+            }
+        }
 
         // Pass the mouse event to all display elements
-        for (int i = 0; i < _displayElements.size(); i++) {
-            _displayElements.get(i).processMouseInput(button, state, wheelMoved);
+        for (int i = displayElements.size() - 1; i >= 0; i--) {
+            consumed = displayElements.get(i).processMouseInput(button, state, wheelMoved, consumed);
         }
+        
+        consumed = super.processMouseInput(button, state, wheelMoved, consumed);
+        
+        return consumed;
     }
-
-    public void addDisplayElement(UIDisplayElement element) {
-        _displayElements.add(element);
-        element.setParent(this);
-    }
-
-    public void addtDisplayElementToPosition(int position, UIDisplayElement element) {
-        _displayElements.add(position, element);
-        element.setParent(this);
-    }
-
-    public void removeDisplayElement(UIDisplayElement element) {
-        _displayElements.remove(element);
-        element.setParent(null);
-    }
-
-    public void removeAllDisplayElements() {
-        for (UIDisplayElement element : _displayElements) {
-            element.setParent(null);
-        }
-        _displayElements.clear();
-    }
-
-    public ArrayList<UIDisplayElement> getDisplayElements() {
-        return _displayElements;
-    }
-
-    /*
-     * Set the option for cut elements
+    
+    /**
+     * Set whether the child elements will be cropped to the size of the display container. To exclude particular child elements from cropping, use the setCrop method.
+     * @param crop True to crop all child elements.
      */
-    public void setCrop(boolean crop) {
-        _crop = crop;
+    public void setCropContainer(boolean crop) {
+        this.cropContainer = crop;
     }
 
-    /*
-     * set crop margin for container where
-     * x - top
-     * y - right
-     * z - bottom
-     * w - left
+    /**
+     * Set crop margin for this container.
+     * @param margin The margin where x = top, y = right, z = bottom, w = left
      */
     public void setCropMargin(Vector4f margin) {
-        _cropMargin = margin;
+        cropMargin = margin;
     }
-
-
+    
     /*
-     * Set styles for current element
-     *
+       Methods to add or remove child elements of the container
+    */
+
+    /**
+     * Add a new display element to the display container.
+     * @param element The element to add.
      */
-    public void setStyle(String property, String value) {
-        if (_style == null) {
-            _style = new UIStyle(getSize());
-            _style.setPosition(new Vector2f(0f, 0f));
-            _style.setVisible(true);
-            _style.setCroped(false);
-            addtDisplayElementToPosition(0, _style);
-        }
-        _style.parse(property, value);
-    }
-
-    /*
-     * Set style with tag(style class)
-     */
-    public void setClassStyle(String className, String value) {
-        UIStyle style = null;
-
-        if(_styleClasses.containsKey(className)){
-            style = _styleClasses.get(className);
-        }else{
-            style = new UIStyle(getSize());
-        }
-
-        style.setPosition(new Vector2f(0f, 0f));
-        style.setVisible(true);
-        style.setCroped(false);
-        style.parse(value);
-        _styleClasses.put(className, style);
-    }
-
-    /*
-     * If the style was marked by class, apply the class
-     */
-    public void setClassStyle(String className) {
-        if (_styleClasses.containsKey(className)) {
-            if (_style != null) {
-                removeDisplayElement(_style);
-            }
-            _style = _styleClasses.get(className);
-            addtDisplayElementToPosition(0, _style);
-        }
+    public void addDisplayElement(UIDisplayElement element) {
+        displayElements.add(element);
+        element.setParent(this);
         
         layout();
     }
 
-    /*
-     * Get Style variable
+    /**
+     * Add a new display element to the display container at a particular position.
+     * @param element The element to add.
      */
-    public UIStyle getStyle() {
-        if (_style == null) {
-            _style = new UIStyle(getSize());
-            _style.setPosition(new Vector2f(0f, 0f));
-            _style.setVisible(true);
-            _style.setCroped(false);
-            addtDisplayElementToPosition(0, _style);
+    public void addDisplayElementToPosition(int position, UIDisplayElement element) {
+        displayElements.add(position, element);
+        element.setParent(this);
+        
+        layout();
+    }
+
+    /**
+     * Remove a display element.
+     * @param element The element to remove.
+     */
+    public void removeDisplayElement(UIDisplayElement element) {
+        displayElements.remove(element);
+        element.setParent(null);
+        
+        layout();
+    }
+
+    /**
+     * Remove all display elements.
+     */
+    public void removeAllDisplayElements() {
+        for (UIDisplayElement element : displayElements) {
+            element.setParent(null);
         }
-        return _style;
+        displayElements.clear();
+        
+        layout();
+    }
+
+    /**
+     * Get the list of all display elements of the display container.
+     * @return Returns the list of all display elements.
+     */
+    public ArrayList<UIDisplayElement> getDisplayElements() {        
+        return displayElements;
     }
     
-    @Override
-    public void setSize(Vector2f scale) {
-    	super.setSize(scale);
-    	
-    	layout();
+    /*
+       Styling System
+       Styles are just special child display elements of the container which offer a function which is commonly used, such as a background image
+    */
+    
+    /**
+     * Get a style by its class.
+     * @param style The style class.
+     * @return Returns the style class if one was added to the display container. Null if none was added.
+     */
+    private <T> T getStyle(Class<T> style) {
+        for (UIStyle s : styles) {
+            if (s.getClass() == style) {
+                return style.cast(s);
+            }
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Add a style.
+     * @param style The style to add.
+     * @param listStart True to add the style at the beginning of the display element list.
+     * 
+     * TODO need to put particular styles at the particular position.. (background at the beginning, border on top) -> don't add styles to the display element list
+     */
+    private void addStyle(UIStyle style, boolean listStart) {
+        styles.add(style);
+        
+        UIDisplayElement element = (UIDisplayElement) style;
+        if (listStart) {
+            displayElements.add(0, element);
+        } else {
+            displayElements.add(element);
+        }
+        
+        element.setParent(this);
+        layout();
+    }
+    
+    private void removeStyle(UIStyle style) {
+        styles.remove(style);
+        removeDisplayElement((UIDisplayElement) style);
+    }
+    
+    /**
+     * Set the background color of this display element. The background color will fill the whole element.
+     * @param r Red value. (0-255)
+     * @param g Green value. (0-255)
+     * @param b Blue value. (0-255)
+     * @param a Alpha value. (0-1)
+     */
+    public void setBackgroundColor(int r, int g, int b, float a) {
+        UIStyleBackgroundColor style = getStyle(UIStyleBackgroundColor.class);
+        if (style == null) {
+            style = new UIStyleBackgroundColor(r, g, b, a);
+            style.setVisible(true);
+            addStyle(style, true);
+        } else {
+            style.setColor(r, g, b, a);
+        }
+    }
+    
+    public void setBackgroundColor(String color, float a) {
+        UIStyleBackgroundColor style = getStyle(UIStyleBackgroundColor.class);
+        if (style == null) {
+            style = new UIStyleBackgroundColor(color, a);;
+            style.setVisible(true);
+            addStyle(style, true);
+        } else {
+            style.setColor(color, a);
+        }
+    }
+    
+    /**
+     * Remove the background color from this display element.
+     */
+    public void removeBackgroundColor() {
+        UIStyleBackgroundColor style = getStyle(UIStyleBackgroundColor.class);
+        if (style != null) {
+            removeStyle(style);
+        }
+    }
+    
+    /**
+     * Set the background image.
+     * @param texture The texture to load.
+     */
+    public void setBackgroundImage(String texture) {
+        UIStyleBackgroundImage style = getStyle(UIStyleBackgroundImage.class);
+
+        if (style == null) {
+            style = new UIStyleBackgroundImage(AssetManager.loadTexture(texture));
+            style.setTextureOrigin(new Vector2f(0f, 0f));
+            style.setTextureSize(new Vector2f(style.getTexture().getWidth(), style.getTexture().getHeight()));
+            style.setVisible(true);
+            addStyle(style, true);
+        } else {
+            //check if same texture is already loaded
+            if (!style.getTexture().getURI().toString().equals("texture:" + texture)) {
+                style.setTexture(AssetManager.loadTexture(texture));
+            }
+        }
+    }
+    
+    /**
+     * Set the origin and size of the loaded background image. If no image was loaded this won't have any effect.
+     * @param origin The origin of the texture.
+     * @param size The size of the texture.
+     */
+    public void setBackgroundImage(Vector2f origin, Vector2f size) {
+        UIStyleBackgroundImage style = getStyle(UIStyleBackgroundImage.class);
+
+        if (style != null) {            
+            style.setTextureOrigin(origin);
+            style.setTextureSize(size);
+        }
+    }
+
+    /**
+     * Set the background Image for this display element.
+     * @param texture The texture to load.
+     * @param origin The origin of the texture. Null reference will set the origin to 0,0
+     * @param size The size of the texture. Null reference will set the size to the size of the whole texture.
+     */
+    public void setBackgroundImage(String texture, Vector2f origin, Vector2f size) {
+        UIStyleBackgroundImage style = getStyle(UIStyleBackgroundImage.class);
+
+        if (style == null) {
+            style = new UIStyleBackgroundImage(AssetManager.loadTexture(texture));
+            style.setTextureOrigin(origin);
+            style.setTextureSize(size);
+            style.setVisible(true);
+            addStyle(style, true);
+        } else {
+            //check if same texture is already loaded
+            if (!style.getTexture().getURI().toString().equals("texture:" + texture)) {
+                style.setTexture(AssetManager.loadTexture(texture));
+            }
+            
+            style.setTextureOrigin(origin);
+            style.setTextureSize(size);
+        }
+    }
+
+    /**
+     * Set the position of the background image. On default the background will fill the whole display element.
+     * @param position The position.
+     */
+    public void setBackgroundImagePosition(Vector2f position) {
+        UIStyleBackgroundImage style = getStyle(UIStyleBackgroundImage.class);
+        
+        if (style != null) {
+            style.setPosition(position);
+        }
+    }
+    
+    /**
+     * Set the position of the background image including its unit. The unit can be pixel (px) or percentage (%). If no unit is given the default unit pixel will be used.
+     * @param x The x position to set including the unit.
+     * @param y The y position to set including the unit.
+     */
+    public void setBackgroundImagePosition(String x, String y) {
+        UIStyleBackgroundImage style = getStyle(UIStyleBackgroundImage.class);
+        
+        if (style != null) {
+            style.setPosition(x, y);
+        }
+    }
+    
+    /**
+     * Set the size of the background image. On default the background will fill the whole display element.
+     * @param size
+     */
+    public void setBackgroundImageSize(Vector2f size) {
+        UIStyleBackgroundImage style = getStyle(UIStyleBackgroundImage.class);
+        
+        if (style != null) {
+            style.setSize(size);
+        }
+    }
+    
+    /**
+     * Set the size of the background image including its unit. The unit can be pixel (px) or percentage (%). If no unit is given the default unit pixel will be used.
+     * @param width The width to set including the unit.
+     * @param height The height to set including the unit.
+     */
+    public void setBackgroundImageSize(String width, String height) {
+        UIStyleBackgroundImage style = getStyle(UIStyleBackgroundImage.class);
+        
+        if (style != null) {
+            style.setSize(width, height);
+        }
+    }
+    
+    /**
+     * Remove the background image from this display element.
+     */ 
+    public void removeBackgroundImage() {
+        UIStyleBackgroundImage style = getStyle(UIStyleBackgroundImage.class);
+        
+        if (style != null) {
+            removeStyle(style);
+        }
+    }
+    
+    /**
+     * Set the border for this display element.
+     * @param width The width of the border.
+     * @param r Red value. (0-255)
+     * @param g Green value. (0-255)
+     * @param b Blue value. (0-255)
+     * @param a Alpha value. (0-1)
+     */
+    public void setBorderSolid(float width, int r, int g, int b, float a) {
+        UIStyleBorderSolid style = getStyle(UIStyleBorderSolid.class);
+
+        if (style == null) {
+            style = new UIStyleBorderSolid(width, r, g, b, a);
+            style.setSize("100%", "100%");
+            style.setVisible(true);
+            addStyle(style, false);
+        } else {
+            style.setColor(r, g, b, a);
+            style.setWidth(width);
+        }
+    }
+    
+    /**
+     * Set the border for this display element.
+     * @param width The width of the border.
+     * @param color The hex color value. (#FFFFFF)
+     * @param a Alpha value. (0-1)
+     */
+    public void setBorderSolid(float width, String color, float a) {
+        UIStyleBorderSolid style = getStyle(UIStyleBorderSolid.class);
+
+        if (style == null) {
+            style = new UIStyleBorderSolid(width, color, a);
+            style.setSize("100%", "100%");
+            style.setVisible(true);
+            addStyle(style, false);
+        } else {
+            style.setColor(color, a);
+            style.setWidth(width);
+        }
+    }
+    
+    /**
+     * Remove the border from this display element.
+     */
+    public void removeBorderSolid() {
+        UIStyleBorderSolid style = getStyle(UIStyleBorderSolid.class);
+        
+        if (style != null) {
+            removeStyle(style);
+        }
+    }
+    
+    /**
+     * Set the border from an image.
+     * @param texture The texture.
+     * @param origin The origin of the border in the texture.
+     * @param size The size of the border container in the texture.
+     * @param width The border width. x = top, y = right, z = bottom, w = left
+     */
+    public void setBorderImage(String texture, Vector2f origin, Vector2f size, Vector4f borderSize) {
+        UIStyleBorderImage style = getStyle(UIStyleBorderImage.class);
+
+        if (style == null) {
+            style = new UIStyleBorderImage(AssetManager.loadTexture(texture));
+            style.setBorderSource(origin, size, borderSize);
+            style.setVisible(true);
+            addStyle(style, false);
+        } else {
+            //check if same texture is already loaded
+            if (!style.getTexture().getURI().toString().equals("texture:" + texture)) {
+                style.setTexture(AssetManager.loadTexture(texture));
+            }
+
+            style.setBorderSource(origin, size, borderSize);
+        }
+    }
+    
+    /**
+     * Remove the border image from this display element.
+     */
+    public void removeBorderImage() {
+        UIStyleBorderImage style = getStyle(UIStyleBorderImage.class);
+        
+        if (style != null) {
+            removeStyle(style);
+        }
     }
 }

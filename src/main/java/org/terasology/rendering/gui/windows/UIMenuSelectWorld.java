@@ -15,26 +15,24 @@
  */
 package org.terasology.rendering.gui.windows;
 
-import org.lwjgl.opengl.Display;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.modes.StateSinglePlayer;
-import org.terasology.asset.AssetManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.world.WorldInfo;
 import org.terasology.world.WorldUtil;
-import org.terasology.rendering.gui.components.UIButton;
-import org.terasology.rendering.gui.components.UIImageOverlay;
-import org.terasology.rendering.gui.components.UIInput;
-import org.terasology.rendering.gui.components.UIList;
 import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.events.ClickListener;
+import org.terasology.rendering.gui.widgets.UIButton;
+import org.terasology.rendering.gui.widgets.UIList;
+import org.terasology.rendering.gui.widgets.UIWindow;
 
 import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -46,10 +44,9 @@ import java.util.logging.Logger;
  *
  * @author Anton Kireev <adeon.k87@gmail.com>
  */
-public class UIMenuSelectWorld extends UIDisplayWindow {
+public class UIMenuSelectWorld extends UIWindow {
     private Logger logger = Logger.getLogger(getClass().getName());
 
-    final UIImageOverlay overlay;
     final UIList list;
     final UIButton goToBack;
     final UIButton createNewWorld;
@@ -57,60 +54,50 @@ public class UIMenuSelectWorld extends UIDisplayWindow {
     final UIButton deleteFromList;
 
     public UIMenuSelectWorld() {
+        setBackgroundImage("engine:menubackground");
         setModal(true);
         maximize();
-        
-        overlay = new UIImageOverlay(AssetManager.loadTexture("engine:menuBackground"));
-        overlay.setVisible(true);
 
         list = new UIList(new Vector2f(512f, 256f));
-        list.setVisible(true);
-
+        list.setBorderSolid(2f, 0x1E, 0x1E, 0x1E, 1.0f);
+        list.setBackgroundImage("engine:gui_menu", new Vector2f(264f, 18f), new Vector2f(159f, 63f));
+        list.setBorderImage("engine:gui_menu", new Vector2f(256f, 0f), new Vector2f(175f, 88f), new Vector4f(16f, 7f, 7f, 7f));
         list.addDoubleClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
                 loadSelectedWorld();
             }
         });
+        list.setHorizontalAlign(EHorizontalAlign.CENTER);
+        list.setPosition(new Vector2f(0f, 230f));
+        list.setVisible(true);
 
         goToBack = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
-        goToBack.getLabel().setText("Go back");
-        goToBack.setVisible(true);
+        goToBack.getLabel().setText("Back");
         goToBack.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
                 GUIManager.getInstance().setFocusedWindow(GUIManager.getInstance().getWindowById("menuMain"));
             }
         });
+        goToBack.setHorizontalAlign(EHorizontalAlign.CENTER);
+        goToBack.setPosition(new Vector2f(0f, 600f));
+        goToBack.setVisible(true);
 
         loadFromList = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
         loadFromList.getLabel().setText("Load");
+        loadFromList.addClickListener(new ClickListener() {
+            @Override
+            public void click(UIDisplayElement element, int button) {
+                loadSelectedWorld();
+            }
+        });
+        loadFromList.setHorizontalAlign(EHorizontalAlign.CENTER);
+        loadFromList.setPosition(new Vector2f(30f, 505f));
         loadFromList.setVisible(true);
-
-        createNewWorld = new UIButton(new Vector2f(192f, 32f), UIButton.eButtonType.NORMAL);
-        createNewWorld.getLabel().setText("Create new world");
-        createNewWorld.setVisible(true);
 
         deleteFromList = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
         deleteFromList.getLabel().setText("Delete");
-        deleteFromList.setVisible(true);
-
-        createNewWorld.addClickListener(new ClickListener() {
-            @Override
-            public void click(UIDisplayElement element, int button) {
-
-                UIDialogCreateNewWorld _window = new UIDialogCreateNewWorld("Create new world", new Vector2f(512f, 320f));
-                _window.center();
-                _window.clearInputControls();
-
-                GUIManager.getInstance().addWindow(_window, "generate_world");
-                GUIManager.getInstance().setFocusedWindow(_window);
-
-                UIInput inputWorldName = (UIInput) _window.getElementById("inputWorldTitle");
-                inputWorldName.setValue(_window.getWorldName());
-            }
-        });
-
         deleteFromList.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
@@ -129,48 +116,33 @@ public class UIMenuSelectWorld extends UIDisplayWindow {
                 }
             }
         });
+        deleteFromList.setHorizontalAlign(EHorizontalAlign.CENTER);
+        deleteFromList.setPosition(new Vector2f(196f, 505f));
+        deleteFromList.setVisible(true);
 
-        loadFromList.addClickListener(new ClickListener() {
+        createNewWorld = new UIButton(new Vector2f(192f, 32f), UIButton.eButtonType.NORMAL);
+        createNewWorld.getLabel().setText("Create new world");
+        createNewWorld.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                loadSelectedWorld();
+
+                UIDialogCreateNewWorld _window = new UIDialogCreateNewWorld("Create new world", new Vector2f(512f, 320f));
+
+                GUIManager.getInstance().addWindow(_window, "generate_world");
+                GUIManager.getInstance().setFocusedWindow(_window);
             }
         });
+        createNewWorld.setHorizontalAlign(EHorizontalAlign.CENTER);
+        createNewWorld.setPosition(new Vector2f(-166f, 505f));
+        createNewWorld.setVisible(true);
 
         fillList();
 
-        addDisplayElement(overlay);
-        addDisplayElement(list, "list");
-        addDisplayElement(loadFromList, "loadFromListButton");
-        addDisplayElement(goToBack, "goToBackButton");
-        addDisplayElement(createNewWorld, "createWorldButton");
-        addDisplayElement(deleteFromList, "deleteFromListButton");
-        
-        layout();
-    }
-
-    @Override
-    public void layout() {
-        super.layout();
-        
-        if (list != null) {
-            list.centerHorizontally();
-            list.getPosition().y = 230f;
-    
-            createNewWorld.getPosition().x = list.getPosition().x;
-            createNewWorld.getPosition().y = list.getPosition().y + list.getSize().y + 32f;
-    
-            loadFromList.getPosition().x = createNewWorld.getPosition().x + createNewWorld.getSize().x + 15f;
-            loadFromList.getPosition().y = createNewWorld.getPosition().y;
-    
-            deleteFromList.getPosition().x = loadFromList.getPosition().x + loadFromList.getSize().x + 15f;
-            deleteFromList.getPosition().y = loadFromList.getPosition().y;
-    
-    
-            goToBack.centerHorizontally();
-    
-            goToBack.getPosition().y = Display.getHeight() - goToBack.getSize().y - 32f;
-        }
+        addDisplayElement(list);
+        addDisplayElement(loadFromList);
+        addDisplayElement(goToBack);
+        addDisplayElement(createNewWorld);
+        addDisplayElement(deleteFromList);
     }
 
     private void loadSelectedWorld() {
@@ -222,5 +194,9 @@ public class UIMenuSelectWorld extends UIDisplayWindow {
                 logger.log(Level.SEVERE, "Failed reading world data object. Sorry.", e);
             }
         }
+    }
+    
+    public int getWorldCount() {
+        return list.size();
     }
 }

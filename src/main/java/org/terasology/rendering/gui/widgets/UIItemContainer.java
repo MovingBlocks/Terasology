@@ -1,4 +1,4 @@
-package org.terasology.rendering.gui.components;
+package org.terasology.rendering.gui.widgets;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +52,6 @@ public class UIItemContainer extends UIDisplayContainer implements EventHandlerS
             
             //add new cells
             setVisible(true);
-            setSize(new Vector2f(cols * (cellSize.x + cellMargin.x), (entityInventory.itemSlots.size() / cols) * (cellSize.y + cellMargin.y)));
 
             int start = 0;
             int end = entityInventory.itemSlots.size();
@@ -77,6 +76,8 @@ public class UIItemContainer extends UIDisplayContainer implements EventHandlerS
                 cells.add(cell);
                 addDisplayElement(cell);
             }
+            
+            setSize(new Vector2f(cols * (cellSize.x + cellMargin.x), (cells.size() / cols) * (cellSize.y + cellMargin.y)));
         }
     }
     

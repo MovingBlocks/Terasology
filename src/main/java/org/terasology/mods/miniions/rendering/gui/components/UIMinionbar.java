@@ -24,7 +24,6 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 
 import javax.vecmath.Vector2f;
 
-import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.AssetManager;
 import org.terasology.entitySystem.EntityRef;
@@ -34,10 +33,10 @@ import org.terasology.model.inventory.Icon;
 import org.terasology.mods.miniions.components.MinionBarComponent;
 import org.terasology.mods.miniions.components.MinionComponent;
 import org.terasology.mods.miniions.components.MinionControllerComponent;
-import org.terasology.rendering.gui.components.UIText;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import org.terasology.rendering.gui.widgets.UIImage;
+import org.terasology.rendering.gui.widgets.UIText;
 
 /**
  * A small toolbar placed at the right of the screen.
@@ -45,13 +44,13 @@ import org.terasology.rendering.gui.framework.UIGraphicsElement;
  * @author Overdhose copied from toolbar
  */
 public class UIMinionbar extends UIDisplayContainer {
-    private final UIGraphicsElement backgroundTexture;
+    private final UIImage backgroundTexture;
     private final UIMinionbarCell[] cells;
     //private int prevSelected = 0;
     
     private class UIMinionbarCell extends UIDisplayElement {
 
-        private final UIGraphicsElement selectionRectangle;
+        private final UIImage selectionRectangle;
         private final UIText label;
 
         private int id;
@@ -62,9 +61,9 @@ public class UIMinionbar extends UIDisplayContainer {
 
             setSize(new Vector2f(48f, 48f));
 
-            selectionRectangle = new UIGraphicsElement(AssetManager.loadTexture("engine:gui"));
-            selectionRectangle.getTextureSize().set(new Vector2f(24f / 256f, 24f / 256f));
-            selectionRectangle.getTextureOrigin().set(new Vector2f(0.0f, 24f / 256f));
+            selectionRectangle = new UIImage(AssetManager.loadTexture("engine:gui"));
+            selectionRectangle.setTextureSize(new Vector2f(24f, 24f));
+            selectionRectangle.setTextureOrigin(new Vector2f(0.0f, 24f));
             selectionRectangle.setSize(new Vector2f(48f, 48f));
 
             label = new UIText();
@@ -156,11 +155,13 @@ public class UIMinionbar extends UIDisplayContainer {
 
     public UIMinionbar() {
         setSize(new Vector2f(44f, 364f));
+        setHorizontalAlign(EHorizontalAlign.RIGHT);
+        setVerticalAlign(EVerticalAlign.CENTER);
 
-        backgroundTexture = new UIGraphicsElement(AssetManager.loadTexture("engine:guiMinion"));
+        backgroundTexture = new UIImage(AssetManager.loadTexture("engine:guiMinion"));
         backgroundTexture.setVisible(true);
-        backgroundTexture.getTextureSize().set(new Vector2f(22f / 256f, 182f / 256f));
-        backgroundTexture.getTextureOrigin().set(new Vector2f(0.0f, 0.0f));
+        backgroundTexture.setTextureSize(new Vector2f(22f, 182f));
+        backgroundTexture.setTextureOrigin(new Vector2f(0.0f, 0.0f));
         backgroundTexture.setSize(getSize());
 
         addDisplayElement(backgroundTexture);
@@ -182,14 +183,6 @@ public class UIMinionbar extends UIDisplayContainer {
         //CoreRegistry.get(EventSystem.class).registerEventHandler(this);
         
         layout();
-    }
-
-    @Override
-    public void layout() {
-        super.layout();
-
-        centerVertically();
-        getPosition().x = Display.getWidth() - getSize().x;
     }
     
     /*

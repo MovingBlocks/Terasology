@@ -1,4 +1,4 @@
-package org.terasology.rendering.gui.components;
+package org.terasology.rendering.gui.widgets;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL11.glClear;
@@ -35,7 +35,7 @@ public class UIItemCellIcon extends UIDisplayContainer {
 
     //layout
     private Texture terrainTex;
-    private Vector2f itemCountPosition = new Vector2f(26f, 5f);
+    private final Vector2f itemCountPosition = new Vector2f(26f, 5f);
 
     public UIItemCellIcon() {
         terrainTex = AssetManager.loadTexture("engine:terrain");

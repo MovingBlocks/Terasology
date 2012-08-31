@@ -13,51 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.framework;
+package org.terasology.rendering.gui.widgets;
 
-import org.lwjgl.opengl.Display;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.rendering.gui.framework.IInputDataElement;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.UIDisplayContainerScrollable;
 import org.terasology.rendering.gui.framework.events.WindowListener;
-
-import javax.vecmath.Vector2f;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static org.lwjgl.opengl.GL11.*;
+/**
+ * A window which can contain display elements. All windows will be managed by the GUIManager.
+ * 
+ * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
+ * 
+ */
+public class UIWindow extends UIDisplayContainerScrollable {
 
-public class UIDisplayWindow extends UIScrollableDisplayContainer {
-
+    //events
     private enum eWindowEvent {OPEN, CLOSE};
     private final ArrayList<WindowListener> _windowListeners = new ArrayList<WindowListener>();
+    
     private final HashMap<String, UIDisplayElement> _displayElementsById = new HashMap<String, UIDisplayElement>();
-    private boolean _maximized = false;
-    private boolean _modal = false;
+    
+    //close buttons
     private String[] closeBinds;
     private int[] closeKeys;
-
-    protected void drag(Vector2f value) {
-        getPosition().x -= value.x;
-        getPosition().y -= value.y;
-    }
-
-    /**
-     * Close a window. This will just make the window invisible, it will not be removed from the GUIManager.
-     * @param clearInputControls
-     */
-    public void close(boolean clearInputControls) {
-        setVisible(false);
-        setFocus(null);
-        if (clearInputControls) {
-            clearInputControls();
-        }
-    }
-
-    public void show() {
-        setVisible(true);
-        setFocus(this);
+    
+    //layout
+    private boolean modal = false;
+    
+    public UIWindow() {
+        
     }
 
     public void clearInputControls() {
@@ -69,26 +60,6 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer {
         }
     }
 
-    public void render() {
-        if (isModal()) {
-            renderOverlay();
-        }
-        super.render();
-    }
-
-    public void renderOverlay() {
-        glPushMatrix();
-        glLoadIdentity();
-        glColor4f(0, 0, 0, 0.75f);
-        glBegin(GL_QUADS);
-        glVertex2f(0f, 0f);
-        glVertex2f((float) Display.getWidth(), 0f);
-        glVertex2f((float) Display.getWidth(), (float) Display.getHeight());
-        glVertex2f(0f, (float) Display.getHeight());
-        glEnd();
-        glPopMatrix();
-    }
-    
     private void notifyWindowListeners(eWindowEvent event) {
         //we copy the list so the listener can remove itself within the close/open method call (see UIItemCell). Otherwise ConcurrentModificationException.
         //TODO other solution?
@@ -114,12 +85,7 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer {
     }
 
     public void maximize() {
-        setSize(new Vector2f(Display.getWidth(), Display.getHeight()));
-        _maximized = true;
-    }
-
-    public boolean isMaximized() {
-        return _maximized;
+        setSize("100%", "100%");
     }
 
     /**
@@ -127,7 +93,7 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer {
      * @return Returns true if the window is modal.
      */
     public boolean isModal() {
-        return _modal;
+        return modal;
     }
 
     /**
@@ -135,7 +101,7 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer {
      * @param modal True for modal.
      */
     public void setModal(boolean modal) {
-        _modal = modal;
+        this.modal = modal;
     }
     
     /**
@@ -154,12 +120,26 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer {
         this.closeKeys = keys;
     }
 
+    /**
+     * 
+     * @param element
+     * @param elementId
+     * 
+     * @deprecated don't use this. ID will be included in EACH UI element in the future.
+     */
     public void addDisplayElement(UIDisplayElement element, String elementId) {
         addDisplayElement(element);
         _displayElementsById.put(elementId, element);
         element.setParent(this);
     }
 
+    /**
+     * 
+     * @param elementId
+     * @return
+     * 
+     * @deprecated don't use this. ID will be included in EACH UI element in the future.
+     */
     public UIDisplayElement getElementById(String elementId) {
         if (!_displayElementsById.containsKey(elementId)) {
             return null;
@@ -171,13 +151,13 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer {
     @Override
     public void processKeyboardInput(KeyEvent event) {
         
-        if (!isVisible() || !_modal)
+        if (!isVisible() || !modal)
             return;
         
         if (closeKeys != null) {
             for (int key : closeKeys) {
                 if (key == event.getKey() && event.isDown()) {
-                    close(true);
+                    close();
                     event.consume();
                     
                     return;
@@ -191,13 +171,13 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer {
     @Override
     public void processBindButton(BindButtonEvent event) {
         
-        if (!isVisible() || !_modal)
+        if (!isVisible() || !modal)
             return;
         
         if (closeBinds != null) {
             for (String key : closeBinds) {
                 if (key.equals(event.getId()) && event.isDown()) {
-                    close(true);
+                    close();
                     event.consume();
                     
                     return;
@@ -208,16 +188,42 @@ public class UIDisplayWindow extends UIScrollableDisplayContainer {
         super.processBindButton(event);
     }
     
-    @Override
+    /**
+     * Set the visibility of the window. Use the open and close methods for windows instead.
+     * @param visible True to set the window visible.
+     */
     public void setVisible(boolean visible) {        
         if (visible && !isVisible()) {
             notifyWindowListeners(eWindowEvent.OPEN);
+            setFocus(null);
+            clearInputControls();
         } else if (!visible && isVisible()) {
             notifyWindowListeners(eWindowEvent.CLOSE);
         }
         
         super.setVisible(visible);
         
+        if (visible) {
+            setFocus(null);
+            clearInputControls();
+        } else {
+            setFocus(this);
+        }
+        
         GUIManager.getInstance().checkMouseMovement();
+    }
+    
+    /**
+     * Opens the window.
+     */
+    public void open() {
+        setVisible(true);
+    }
+    
+    /**
+     * Closes the window.
+     */
+    public void close() {
+        setVisible(false);
     }
 }
