@@ -6,17 +6,17 @@
 /build
 /dev
 .DS_Store
-Terasology.iml
-Terasology.ipr
-Terasology.iws
-.idea
-.classpath
-.project
-.settings
-.checkstyle
-.gradle
-bin
-data/console/consolelog.json
+/Terasology.iml
+/Terasology.ipr
+/Terasology.iws
+/.idea
+/.classpath
+/.project
+/.settings
+/.checkstyle
+/.gradle
+/bin
+/data/console/consolelog.json
 *~
 
 # Ignore error logs 
