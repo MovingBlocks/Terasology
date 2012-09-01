@@ -53,7 +53,7 @@ import org.terasology.rendering.world.WorldRenderer;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * 
- * TODO clean up
+ * TODO clean up -> remove debug stuff, move to debug window together with metrics
  */
 public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
 
@@ -77,6 +77,7 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
      * Init. the HUD.
      */
     public UIScreenHUD() {
+        setId("hud");
         maximize();
         
         _hearts = new UIImage[10];
@@ -96,6 +97,7 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
         }
         
         crosshair = new UIImage(AssetManager.loadTexture("engine:gui"));
+        crosshair.setId("crosshair");
         crosshair.setTextureSize(new Vector2f(20f, 20f));
         crosshair.setTextureOrigin(new Vector2f(24f, 24f));
         crosshair.setSize(new Vector2f(40f, 40f));
@@ -126,7 +128,7 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
         buffBar = new UIBuff();
         buffBar.setVisible(true);
 
-        addDisplayElement(crosshair, "crosshair");
+        addDisplayElement(crosshair);
         addDisplayElement(debugLine1);
         addDisplayElement(debugLine2);
         addDisplayElement(debugLine3);

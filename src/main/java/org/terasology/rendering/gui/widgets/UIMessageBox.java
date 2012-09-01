@@ -57,6 +57,6 @@ public class UIMessageBox extends UIDialogBox {
         });
 
         addDisplayElement(infoText);
-        addDisplayElement(buttonOk, "buttonOk");
+        addDisplayElement(buttonOk);
     }
 }

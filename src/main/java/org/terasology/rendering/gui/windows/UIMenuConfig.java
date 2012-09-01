@@ -44,6 +44,7 @@ public class UIMenuConfig extends UIWindow {
     private final UIButton _modsButton;
 
     public UIMenuConfig() {
+        setId("config");
         setBackgroundImage("engine:loadingbackground");
         setModal(true);
         maximize();
@@ -67,7 +68,7 @@ public class UIMenuConfig extends UIWindow {
         _videoButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().setFocusedWindow(GUIManager.getInstance().getWindowById("menuConfigVideo"));
+                GUIManager.getInstance().openWindow("config:video");
             }
         });
 
@@ -79,7 +80,7 @@ public class UIMenuConfig extends UIWindow {
         _audioButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().setFocusedWindow(GUIManager.getInstance().getWindowById("menuConfigAudio"));
+                GUIManager.getInstance().openWindow("config:audio");
             }
         });
 
@@ -91,7 +92,7 @@ public class UIMenuConfig extends UIWindow {
         _controlsButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().setFocusedWindow(GUIManager.getInstance().getWindowById("menuConfigControls"));
+                GUIManager.getInstance().openWindow("config:controls");
             }
         });
 
@@ -103,7 +104,7 @@ public class UIMenuConfig extends UIWindow {
         _modsButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().setFocusedWindow(GUIManager.getInstance().getWindowById("menuConfigMods"));
+                GUIManager.getInstance().openWindow("config:mods");
             }
         });
 
@@ -115,7 +116,7 @@ public class UIMenuConfig extends UIWindow {
         _backToMainMenuButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().setFocusedWindow(GUIManager.getInstance().getWindowById("menuMain"));
+                GUIManager.getInstance().openWindow("main");
             }
         });
 

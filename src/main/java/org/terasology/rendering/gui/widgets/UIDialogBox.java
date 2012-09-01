@@ -22,7 +22,6 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
 import org.terasology.asset.AssetManager;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
@@ -195,15 +194,6 @@ public class UIDialogBox extends UIWindow {
         pos.x -= pressedOffset.x;
         pos.y -= pressedOffset.y;
         setPosition(pos);
-    }
-    
-    /**
-     * Close a window. This will remove the window from the GUIManager.
-     */
-    public void close() {
-        super.close();
-        
-        GUIManager.getInstance().removeWindow(this);
     }
     
     public void resetPosition() {

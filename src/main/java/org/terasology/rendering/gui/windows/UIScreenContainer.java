@@ -43,6 +43,7 @@ public class UIScreenContainer extends UIWindow {
     private final UIImage background;
 
     public UIScreenContainer() {
+        setId("container");
         setBackgroundColor(0x00, 0x00, 0x00, 0.75f);
         setModal(true);
         maximize();

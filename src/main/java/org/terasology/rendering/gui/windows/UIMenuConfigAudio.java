@@ -45,6 +45,7 @@ public class UIMenuConfigAudio extends UIWindow {
     private final UIButton _backToConfigMenuButton;
 
     public UIMenuConfigAudio() {
+        setId("config:audio");
         setBackgroundImage("engine:loadingbackground");
         setModal(true);
         setCloseBinds(new String[] {});
@@ -101,7 +102,7 @@ public class UIMenuConfigAudio extends UIWindow {
         _backToConfigMenuButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().setFocusedWindow(GUIManager.getInstance().getWindowById("menuConfig"));
+                GUIManager.getInstance().openWindow("config");
             }
         });
         _backToConfigMenuButton.setHorizontalAlign(EHorizontalAlign.CENTER);

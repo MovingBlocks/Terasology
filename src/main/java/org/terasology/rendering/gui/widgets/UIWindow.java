@@ -35,10 +35,11 @@ import java.util.HashMap;
 public class UIWindow extends UIDisplayContainerScrollable {
 
     //events
-    private enum eWindowEvent {OPEN, CLOSE};
-    private final ArrayList<WindowListener> _windowListeners = new ArrayList<WindowListener>();
+    private static enum EWindowEvent {OPEN, CLOSE};
+    private final ArrayList<WindowListener> windowListeners = new ArrayList<WindowListener>();
     
-    private final HashMap<String, UIDisplayElement> _displayElementsById = new HashMap<String, UIDisplayElement>();
+    //elements by id
+    private final HashMap<String, UIDisplayElement> displayElementsById = new HashMap<String, UIDisplayElement>();
     
     //close buttons
     private String[] closeBinds;
@@ -60,16 +61,16 @@ public class UIWindow extends UIDisplayContainerScrollable {
         }
     }
 
-    private void notifyWindowListeners(eWindowEvent event) {
+    private void notifyWindowListeners(EWindowEvent event) {
         //we copy the list so the listener can remove itself within the close/open method call (see UIItemCell). Otherwise ConcurrentModificationException.
         //TODO other solution?
-        ArrayList<WindowListener> listeners = (ArrayList<WindowListener>) _windowListeners.clone();
+        ArrayList<WindowListener> listeners = (ArrayList<WindowListener>) windowListeners.clone();
         
-        if (event == eWindowEvent.OPEN) {
+        if (event == EWindowEvent.OPEN) {
             for (WindowListener listener : listeners) {
                 listener.open(this);
             }
-        } else if (event == eWindowEvent.CLOSE) {
+        } else if (event == EWindowEvent.CLOSE) {
             for (WindowListener listener : listeners) {
                 listener.close(this);
             }
@@ -77,11 +78,11 @@ public class UIWindow extends UIDisplayContainerScrollable {
     }
     
     public void addWindowListener(WindowListener listener) {
-        _windowListeners.add(listener);
+        windowListeners.add(listener);
     }
 
     public void removeWindowListener(WindowListener listener) {
-        _windowListeners.remove(listener);
+        windowListeners.remove(listener);
     }
 
     public void maximize() {
@@ -118,34 +119,6 @@ public class UIWindow extends UIDisplayContainerScrollable {
      */
     public void setCloseKeys(int[] keys) {
         this.closeKeys = keys;
-    }
-
-    /**
-     * 
-     * @param element
-     * @param elementId
-     * 
-     * @deprecated don't use this. ID will be included in EACH UI element in the future.
-     */
-    public void addDisplayElement(UIDisplayElement element, String elementId) {
-        addDisplayElement(element);
-        _displayElementsById.put(elementId, element);
-        element.setParent(this);
-    }
-
-    /**
-     * 
-     * @param elementId
-     * @return
-     * 
-     * @deprecated don't use this. ID will be included in EACH UI element in the future.
-     */
-    public UIDisplayElement getElementById(String elementId) {
-        if (!_displayElementsById.containsKey(elementId)) {
-            return null;
-        }
-
-        return _displayElementsById.get(elementId);
     }
     
     @Override
@@ -189,41 +162,30 @@ public class UIWindow extends UIDisplayContainerScrollable {
     }
     
     /**
-     * Set the visibility of the window. Use the open and close methods for windows instead.
-     * @param visible True to set the window visible.
-     */
-    public void setVisible(boolean visible) {        
-        if (visible && !isVisible()) {
-            notifyWindowListeners(eWindowEvent.OPEN);
-            setFocus(null);
-            clearInputControls();
-        } else if (!visible && isVisible()) {
-            notifyWindowListeners(eWindowEvent.CLOSE);
-        }
-        
-        super.setVisible(visible);
-        
-        if (visible) {
-            setFocus(null);
-            clearInputControls();
-        } else {
-            setFocus(this);
-        }
-        
-        GUIManager.getInstance().checkMouseMovement();
-    }
-    
-    /**
-     * Opens the window.
+     * Opens the window. This will focus the window.
      */
     public void open() {
+        if (!isVisible()) {
+            notifyWindowListeners(EWindowEvent.OPEN);
+            setFocus(null);
+            clearInputControls();
+        }
+        
         setVisible(true);
+        
+        GUIManager.getInstance().checkMouseGrabbing();
     }
     
     /**
-     * Closes the window.
+     * Closes the window. This will remove the window from the GUIManager.
      */
     public void close() {
-        setVisible(false);
+        setFocus(null);
+        clearInputControls();
+        
+        notifyWindowListeners(EWindowEvent.CLOSE);
+        
+        GUIManager.getInstance().closeWindow(this);
+        GUIManager.getInstance().checkMouseGrabbing();
     }
 }

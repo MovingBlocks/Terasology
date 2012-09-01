@@ -57,15 +57,6 @@ public class StateMainMenu implements GameState {
     private InputSystem inputSystem;
     private ComponentSystemManager componentSystemManager;
     private CameraTargetSystem cameraTargetSystem;
-    
-    //SCREENS
-    private UIMenuMain _mainMenu;
-    private UIMenuConfig _configMenu;
-    private UIMenuConfigVideo _configMenuVideo;
-    private UIMenuConfigAudio _configMenuAudio;
-    private UIMenuConfigControls _configMenuControls;
-    private UIMenuConfigMods _configMenuMods;
-    private UIMenuSelectWorld _selectWorldMenu;
 
     @Override
     public void init(GameEngine gameEngine) {
@@ -91,29 +82,6 @@ public class StateMainMenu implements GameState {
         entityManager.create(localPlayerComp);
         
         CoreRegistry.put(LocalPlayer.class, new LocalPlayer(EntityRef.NULL));
-
-        //setup the GUI
-        _mainMenu = new UIMenuMain();
-        
-        _selectWorldMenu = new UIMenuSelectWorld();
-        
-        _configMenu = new UIMenuConfig();
-        
-        _configMenuVideo = new UIMenuConfigVideo();
-        
-        _configMenuAudio = new UIMenuConfigAudio();
-        
-        _configMenuControls = new UIMenuConfigControls();
-        
-        _configMenuMods = new UIMenuConfigMods();
-
-        GUIManager.getInstance().addWindow(_mainMenu, "menuMain");
-        GUIManager.getInstance().addWindow(_selectWorldMenu, "selectWorld");
-        GUIManager.getInstance().addWindow(_configMenu, "menuConfig");;
-        GUIManager.getInstance().addWindow(_configMenuVideo, "menuConfigVideo");
-        GUIManager.getInstance().addWindow(_configMenuAudio, "menuConfigAudio");
-        GUIManager.getInstance().addWindow(_configMenuControls, "menuConfigControls");
-        GUIManager.getInstance().addWindow(_configMenuMods, "menuConfigMods");
     }
     
     @Override
@@ -128,12 +96,8 @@ public class StateMainMenu implements GameState {
         }
         
         playBackgroundMusic();
-
-        _configMenuVideo.setup();
-        _configMenuAudio.setup();
-        _configMenuControls.setup();
         
-        GUIManager.getInstance().setFocusedWindow("menuMain");
+        GUIManager.getInstance().openWindow("main");
     }
 
     @Override
@@ -145,7 +109,7 @@ public class StateMainMenu implements GameState {
         }
         
         stopBackgroundMusic();
-        GUIManager.getInstance().removeAllWindows();
+        GUIManager.getInstance().closeAllWindows();
         
         entityManager.clear();
     }

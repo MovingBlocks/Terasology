@@ -73,6 +73,7 @@ public final class UIScreenConsole extends UIWindow {
      * Init. a new Terasology console.
      */
     public UIScreenConsole() {
+        setId("console");
         setModal(true);
         setCloseBinds(new String[] {ConsoleButton.ID});
         setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});

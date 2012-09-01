@@ -54,6 +54,7 @@ public class UIMenuSelectWorld extends UIWindow {
     final UIButton deleteFromList;
 
     public UIMenuSelectWorld() {
+        setId("selectWorld");
         setBackgroundImage("engine:menubackground");
         setModal(true);
         maximize();
@@ -77,7 +78,7 @@ public class UIMenuSelectWorld extends UIWindow {
         goToBack.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().setFocusedWindow(GUIManager.getInstance().getWindowById("menuMain"));
+                GUIManager.getInstance().openWindow("main");
             }
         });
         goToBack.setHorizontalAlign(EHorizontalAlign.CENTER);
@@ -125,11 +126,7 @@ public class UIMenuSelectWorld extends UIWindow {
         createNewWorld.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-
-                UIDialogCreateNewWorld _window = new UIDialogCreateNewWorld("Create new world", new Vector2f(512f, 320f));
-
-                GUIManager.getInstance().addWindow(_window, "generate_world");
-                GUIManager.getInstance().setFocusedWindow(_window);
+                GUIManager.getInstance().openWindow("createWorld");
             }
         });
         createNewWorld.setHorizontalAlign(EHorizontalAlign.CENTER);

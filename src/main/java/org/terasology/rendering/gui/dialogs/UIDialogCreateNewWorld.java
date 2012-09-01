@@ -58,8 +58,8 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
     private UIText _chunkGeneratorLabel;
     private UIComboBox _chunkGenerator;
 
-    public UIDialogCreateNewWorld(String title, Vector2f size) {
-        super(title, size);
+    public UIDialogCreateNewWorld() {
+        super("Create new world", new Vector2f(512f, 320f));
         setModal(true);
 
         _inputSeed = new UIInput(new Vector2f(256f, 30f));
@@ -101,7 +101,7 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
 
         _okButton = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
         _okButton.getLabel().setText("Play");
-        _okButton.setPosition(new Vector2f(size.x / 2 - _okButton.getSize().x - 16f, size.y - _okButton.getSize().y - 10));
+        _okButton.setPosition(new Vector2f(getSize().x / 2 - _okButton.getSize().x - 16f, getSize().y - _okButton.getSize().y - 10));
         _okButton.setVisible(true);
 
         _okButton.addClickListener(new ClickListener() {

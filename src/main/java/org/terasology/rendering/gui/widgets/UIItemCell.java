@@ -645,7 +645,7 @@ public class UIItemCell extends UIDisplayContainer  {
         //enable/disable transfer item
         if (getFromTransferSlot().exists()) {
             GUIManager.getInstance().getFocusedWindow().removeDisplayElement(transferIcon);
-            GUIManager.getInstance().getFocusedWindow().addDisplayElement(transferIcon, "transferIcon");
+            GUIManager.getInstance().getFocusedWindow().addDisplayElement(transferIcon);
             GUIManager.getInstance().getFocusedWindow().removeWindowListener(windowListener);
             GUIManager.getInstance().getFocusedWindow().addWindowListener(windowListener);
             transferIcon.setItemEntity(getFromTransferSlot());

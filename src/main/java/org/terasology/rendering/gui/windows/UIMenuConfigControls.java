@@ -112,6 +112,7 @@ public class UIMenuConfigControls extends UIWindow {
     final UIText subtitle;
 
     public UIMenuConfigControls() {
+        setId("config:controls");
         setBackgroundImage("engine:loadingbackground");
         setModal(true);
         maximize();
@@ -146,7 +147,7 @@ public class UIMenuConfigControls extends UIWindow {
         _backToConfigMenuButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().setFocusedWindow(GUIManager.getInstance().getWindowById("menuConfig"));
+                GUIManager.getInstance().openWindow("config");
             }
         });
 

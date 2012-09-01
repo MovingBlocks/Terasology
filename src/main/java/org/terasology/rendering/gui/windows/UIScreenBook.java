@@ -28,6 +28,7 @@ public class UIScreenBook extends UIWindow {
     private final UIImage background;
 
     public UIScreenBook() {
+        setId("book");
         setBackgroundColor(0x00, 0x00, 0x00, 0.75f);
         setHorizontalAlign(EHorizontalAlign.CENTER);
         setVerticalAlign(EVerticalAlign.CENTER);

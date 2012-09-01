@@ -34,6 +34,8 @@ import org.terasology.rendering.gui.widgets.UIWindow;
  * UI element that graphs performance metrics
  *
  * @author Immortius <immortius@gmail.com>
+ * 
+ * TODO create a debug window
  */
 public class UIScreenMetrics extends UIWindow {
 
@@ -49,6 +51,8 @@ public class UIScreenMetrics extends UIWindow {
      * Init. the HUD.
      */
     public UIScreenMetrics() {
+        setId("metrics");
+        setSize(new Vector2f(100, 300));
         _headerLine = new UIText();
         _headerLine.setPosition(new Vector2f(4, 70));
         addDisplayElement(_headerLine);
@@ -76,7 +80,7 @@ public class UIScreenMetrics extends UIWindow {
     @Override
     public void update() {
         super.update();
-
+        
         _headerLine.setVisible(_currentMode.visible);
         _headerLine.setText(_currentMode.displayText);
         _currentMode.updateLines(_metricLines);

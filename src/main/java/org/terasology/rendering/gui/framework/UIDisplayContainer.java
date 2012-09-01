@@ -233,6 +233,29 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     public ArrayList<UIDisplayElement> getDisplayElements() {        
         return displayElements;
     }
+
+    /**
+     * 
+     * @param elementId
+     * @return
+     */
+    public UIDisplayElement getElementById(String elementId) {
+        UIDisplayElement ret = null;
+        for (UIDisplayElement element : getDisplayElements()) {
+            if (element.getId().equals(elementId)) {
+                ret = element;
+                break;
+            }
+            
+            if (element instanceof UIDisplayContainer) {
+                if ((ret = ((UIDisplayContainer)element).getElementById(elementId)) != null) {
+                    break;
+                }
+            }
+        }
+        
+        return ret;
+    }
     
     /*
        Styling System

@@ -65,6 +65,7 @@ public class UIMenuConfigVideo extends UIWindow {
     };
 
     public UIMenuConfigVideo() {
+        setId("config:video");
         setBackgroundImage("engine:loadingbackground");
         setModal(true);
         maximize();
@@ -224,7 +225,7 @@ public class UIMenuConfigVideo extends UIWindow {
         _backToConfigMenuButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().setFocusedWindow(GUIManager.getInstance().getWindowById("menuConfig"));
+                GUIManager.getInstance().openWindow("config");
             }
         });
 

@@ -60,14 +60,13 @@ public class MinionSystem implements EventHandlerSystem {
 
     private static final int PRIORITY_LOCAL_PLAYER_OVERRIDE = 160;
     private static final int POPUP_ENTRIES = 9;
-    private static final String BEHAVIOUR_MENU = "minionbehaviour";
+    private static final String BEHAVIOUR_MENU = "minionBehaviour";
 
-    private UIMinionBehaviourMenu minionBehaviourMenu;
+    private UIMinionBehaviourMenu minionMenu;
     private MiniionFactory minionFactory;
 
     @Override
     public void initialise() {
-        minionBehaviourMenu = GUIManager.getInstance().addWindow(new UIMinionBehaviourMenu(), BEHAVIOUR_MENU);
         minionFactory = new MiniionFactory();
         minionFactory.setEntityManager(CoreRegistry.get(EntityManager.class));
         minionFactory.setRandom(new FastRandom());
@@ -82,7 +81,7 @@ public class MinionSystem implements EventHandlerSystem {
         MinionControllerComponent minionController = entity.getComponent(MinionControllerComponent.class);
         minionController.minionMode = !minionController.minionMode;
         if (!minionController.minionMode) {
-            minionBehaviourMenu.close();
+            GUIManager.getInstance().closeWindow(BEHAVIOUR_MENU);
         }
         entity.saveComponent(minionController);
         event.consume();
@@ -113,8 +112,7 @@ public class MinionSystem implements EventHandlerSystem {
 
     @ReceiveEvent(components = {LocalPlayerComponent.class, MinionControllerComponent.class})
     public void onMouseWheel(MouseWheelEvent wheelEvent, EntityRef entity) {
-        MinionControllerComponent minionController = entity.getComponent(MinionControllerComponent.class);
-        if (minionBehaviourMenu.isVisible()) {
+        if (minionMenu != null && minionMenu.isVisible()) {
             menuScroll(wheelEvent.getWheelTurns(), entity);
             wheelEvent.consume();
         }
@@ -140,14 +138,13 @@ public class MinionSystem implements EventHandlerSystem {
         if (minionController.minionMode) {
             switch (event.getState()) {
                 case DOWN:
-                    GUIManager.getInstance().setFocusedWindow(minionBehaviourMenu);
+                    minionMenu = (UIMinionBehaviourMenu) GUIManager.getInstance().openWindow(BEHAVIOUR_MENU);
                     break;
                 case UP:
-                    //if(GUIManager.getInstance().getWindowById("container") != null){
-                    //    GUIManager.getInstance().setFocusedWindow("container");
-                    //}
-                    minionBehaviourMenu.close();
+                    minionMenu.setVisible(false);
                     updateBehaviour(entity);
+                    break;
+                default:
                     break;
             }
             event.consume();
@@ -189,6 +186,8 @@ public class MinionSystem implements EventHandlerSystem {
                 minion.destroy();
                 break;
             }
+            default:
+                break;
         }
     }
 
@@ -271,6 +270,8 @@ public class MinionSystem implements EventHandlerSystem {
                 minion.saveComponent(minionai);
                 break;
             }
+            default:
+                break;
         }
     }
 

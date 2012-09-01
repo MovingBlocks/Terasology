@@ -45,7 +45,9 @@ import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 public abstract class UIDisplayElement {
 
     protected static UIDisplayElement focusedElement;
+    
     private UIDisplayElement parent;
+    private String id = "";
     
     //events
     private final ArrayList<MouseMoveListener> mouseListeners = new ArrayList<MouseMoveListener>();
@@ -83,15 +85,7 @@ public abstract class UIDisplayElement {
     private final Vector2f sizeOriginal = new Vector2f(0, 0);
     
     public UIDisplayElement() {
-    }
-
-    public UIDisplayElement(Vector2f position) {
-        this.position.set(position);
-    }
-
-    public UIDisplayElement(Vector2f position, Vector2f size) {
-        this.position.set(position);
-        this.size.set(size);
+        
     }
 
     public void renderTransformed() {
@@ -598,6 +592,22 @@ public abstract class UIDisplayElement {
      */
     public void setParent(UIDisplayElement parent) {
         this.parent = parent;
+    }
+    
+    /**
+     * Get the ID of the display element.
+     * @return Returns the ID.
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * Set the ID of the display element ID.
+     * @param id The ID.
+     */
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**

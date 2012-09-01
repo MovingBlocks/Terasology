@@ -28,6 +28,7 @@ import org.terasology.input.events.KeyEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.windows.UIScreenMetrics;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
@@ -45,8 +46,6 @@ public class DebugControlSystem implements EventHandlerSystem {
 
     @Override
     public void initialise() {
-        metrics = new UIScreenMetrics();
-        GUIManager.getInstance().addWindow(metrics, "engine:metrics");
         world = CoreRegistry.get(WorldProvider.class);
         worldRenderer = CoreRegistry.get(WorldRenderer.class);
     }
@@ -103,11 +102,9 @@ public class DebugControlSystem implements EventHandlerSystem {
                     entity.send(new DamageEvent(9999, null));
                     break;
                 case Keyboard.KEY_H:
-                	if (GUIManager.getInstance().getWindowById("engine:hud").isVisible()) {
-                		GUIManager.getInstance().getWindowById("engine:hud").close();
-                	} else {
-                		GUIManager.getInstance().getWindowById("engine:hud").open();
-                	}
+                	for (UIDisplayElement element : GUIManager.getInstance().getWindowById("hud").getDisplayElements()) {
+                        element.setVisible(!element.isVisible());
+                    }
                 	
                     event.consume();
                     break;
@@ -124,6 +121,7 @@ public class DebugControlSystem implements EventHandlerSystem {
                 event.consume();
                 break;
             case Keyboard.KEY_F4:
+                metrics = (UIScreenMetrics) GUIManager.getInstance().openWindow("metrics");
                 metrics.toggleMode();
                 event.consume();
                 break;

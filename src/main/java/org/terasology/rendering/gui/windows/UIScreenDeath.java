@@ -44,6 +44,7 @@ public class UIScreenDeath extends UIWindow {
     private final UIButton _mainMenuButton;
 
     public UIScreenDeath() {
+        setId("death");
         setBackgroundColor(0x46, 0x00, 0x00, 0.85f);
         setModal(true);
         setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});

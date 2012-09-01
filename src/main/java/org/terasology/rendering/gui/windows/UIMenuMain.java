@@ -44,6 +44,7 @@ public class UIMenuMain extends UIWindow {
     final UIText _version;
 
     public UIMenuMain() {
+        setId("main");
         setBackgroundImage("engine:menubackground");
         setModal(true);
         maximize();
@@ -76,7 +77,7 @@ public class UIMenuMain extends UIWindow {
         _configButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().setFocusedWindow(GUIManager.getInstance().getWindowById("menuConfig"));
+                GUIManager.getInstance().openWindow("config");
             }
         });
         _configButton.setHorizontalAlign(EHorizontalAlign.CENTER);
@@ -88,7 +89,7 @@ public class UIMenuMain extends UIWindow {
         _singlePlayerButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().setFocusedWindow(GUIManager.getInstance().getWindowById("selectWorld"));
+                GUIManager.getInstance().openWindow("selectWorld");
             }
         });
         _singlePlayerButton.setHorizontalAlign(EHorizontalAlign.CENTER);
