@@ -38,9 +38,6 @@ public class UIWindow extends UIDisplayContainerScrollable {
     private static enum EWindowEvent {OPEN, CLOSE};
     private final ArrayList<WindowListener> windowListeners = new ArrayList<WindowListener>();
     
-    //elements by id
-    private final HashMap<String, UIDisplayElement> displayElementsById = new HashMap<String, UIDisplayElement>();
-    
     //close buttons
     private String[] closeBinds;
     private int[] closeKeys;

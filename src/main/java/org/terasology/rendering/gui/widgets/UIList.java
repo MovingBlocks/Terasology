@@ -49,6 +49,8 @@ public class UIList extends UIDisplayContainerScrollable implements IInputDataEl
     private final List<UIListItem> items = new ArrayList<UIListItem>();
     private final List<ChangedListener> _changedListeners = new ArrayList<ChangedListener>();
     
+    private float listItemHeight = 32f;
+    
     public class UIListItem extends UIDisplayContainer {
         private Object value;
         private String text;
@@ -57,8 +59,8 @@ public class UIList extends UIDisplayContainerScrollable implements IInputDataEl
 
         private final UIText label;
 
-        public UIListItem(Vector2f size, String text, Object value) {
-            setSize(size);
+        public UIListItem(float height, String text, Object value) {
+            setSize("100%", height + "px");
             this.text = text;
             this.value = value;
 
@@ -68,8 +70,8 @@ public class UIList extends UIDisplayContainerScrollable implements IInputDataEl
             label.setPosition(new Vector2f((getPosition().x + padding.x), (getPosition().y + padding.y)));
             label.setText(text);
 
-            if (getSize().x < label.getTextWidth()) {
-                setSize(new Vector2f(label.getTextWidth(), getSize().y));
+            if (getSize().x < label.getSize().x) {
+                setSize(new Vector2f(label.getSize().x, getSize().y));
             }
             
             addMouseMoveListener(new MouseMoveListener() {        
@@ -160,7 +162,7 @@ public class UIList extends UIDisplayContainerScrollable implements IInputDataEl
      */
     public void addItem(String text, Object value) {
 
-        final UIListItem newItem = new UIListItem(new Vector2f(getSize().x, (32f)), text, value);
+        final UIListItem newItem = new UIListItem(listItemHeight, text, value);
 
         newItem.setVisible(true);
 
@@ -168,7 +170,7 @@ public class UIList extends UIDisplayContainerScrollable implements IInputDataEl
             newItem.setPosition(items.get(0).getPosition());
         }
 
-        newItem.setPosition(new Vector2f(0f, 32f * items.size()));
+        newItem.setPosition(new Vector2f(0f, listItemHeight * items.size()));
         newItem.addClickListener(new ClickListener() {
             private long _lastTime = System.currentTimeMillis();
             private int _lastButton = -1;
@@ -196,7 +198,7 @@ public class UIList extends UIDisplayContainerScrollable implements IInputDataEl
             }
         });
 
-        //lets add the item and calculate the new content height of the scroll container
+        //lets add the item
         items.add(newItem);
         addDisplayElement(newItem);
     }
@@ -282,7 +284,7 @@ public class UIList extends UIDisplayContainerScrollable implements IInputDataEl
         items.remove(_selectedItem);
 
         for (int i = index; i < items.size(); i++) {
-            items.get(i).setPosition(new Vector2f(0f, items.get(i).getPosition().y - 32f));
+            items.get(i).setPosition(new Vector2f(0f, items.get(i).getPosition().y - listItemHeight));
         }
 
         if (items.size() > 0) {

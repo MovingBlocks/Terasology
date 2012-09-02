@@ -127,24 +127,17 @@ public class UIButton extends UIDisplayContainer {
         });
         
         _label = new UIText("Untitled");
-        _label.setVisible(true);
         _label.addChangedListener(new ChangedListener() {
             @Override
             public void changed(UIDisplayElement element) {
                 layout();
             }
         });
+        _label.setHorizontalAlign(EHorizontalAlign.CENTER);
+        _label.setVerticalAlign(EVerticalAlign.CENTER);
+        _label.setVisible(true);
         
         addDisplayElement(_label);
-    }
-
-    @Override
-    public void layout() {
-        super.layout();
-        
-        if (_label != null) {
-            _label.setPosition(new Vector2f(getSize().x / 2 - getLabel().getTextWidth() / 2, getSize().y / 2 - getLabel().getTextHeight() / 2));
-        }
     }
 
     public UIText getLabel() {

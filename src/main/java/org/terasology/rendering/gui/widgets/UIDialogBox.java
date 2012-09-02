@@ -84,14 +84,14 @@ public class UIDialogBox extends UIWindow {
 
         public void setTitle(String title) {
             text.setText(title);
-            text.setPosition(new Vector2f(getSize().x / 2 - text.getTextWidth() / 2, 0f));
+            text.setPosition(new Vector2f(getSize().x / 2 - text.getSize().x / 2, 0f));
         }
 
         public void resize() {
             centerBackground.setSize(new Vector2f(getSize().x - 19f, 19f));
             centerBackground.setPosition(new Vector2f(leftBackground.getPosition().x + leftBackground.getSize().x, 0f));
             rightBackground.setPosition(new Vector2f(centerBackground.getPosition().x + centerBackground.getSize().x, 0f));
-            text.setPosition(new Vector2f(getSize().x / 2 - text.getTextWidth() / 2, 0f));
+            text.setPosition(new Vector2f(getSize().x / 2 - text.getSize().x / 2, 0f));
         }
     }
 

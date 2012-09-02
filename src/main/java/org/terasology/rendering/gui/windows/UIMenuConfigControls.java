@@ -415,6 +415,8 @@ public class UIMenuConfigControls extends UIWindow {
         addDisplayElement(MouseSensitivity);
         addDisplayElement(defaultButton);
         addDisplayElement(_backToConfigMenuButton);
+        
+        setup();
     }
     
     @Override

@@ -240,6 +240,8 @@ public class UIMenuConfigVideo extends UIWindow {
         addDisplayElement(_blurIntensityButton);
         addDisplayElement(_bobbingButton);
         addDisplayElement(_backToConfigMenuButton);
+        
+        setup();
     }
     
     public void setup() {

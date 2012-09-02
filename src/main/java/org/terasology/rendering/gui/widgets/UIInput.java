@@ -110,10 +110,10 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
                 if (!isDisabled()) {
                     setFocus(_inputObj);
                     
-                    if (_inputValue.length() > 0 && _inputText.getTextWidth() > 0) {
+                    if (_inputValue.length() > 0 && _inputText.getSize().x > 0) {
                         Vector2f absolutePosition = _inputText.getAbsolutePosition();
-                        float positionRelativeElement = absolutePosition.x + _inputText.getTextWidth() - new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()).x;
-                        float averageSymbols = _inputText.getTextWidth() / _inputValue.length();
+                        float positionRelativeElement = absolutePosition.x + _inputText.getSize().x - new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()).x;
+                        float averageSymbols = _inputText.getSize().x / _inputValue.length();
     
                         int pos = Math.abs((int) (positionRelativeElement / averageSymbols) - _inputValue.length());
     
@@ -200,7 +200,7 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
 
     @Override
     public void update() {
-        _inputText.setPosition(new Vector2f(_padding.x, getSize().y/2 - _inputText.getTextHeight()/2));
+        _inputText.setPosition(new Vector2f(_padding.x, getSize().y/2 - _inputText.getSize().y/2));
         _textCursor.setPosition(new Vector2f(_textCursor.getPosition().x, getSize().y/2 - _textCursor.getSize().y/1.35f));
 
         updateTextShift();
@@ -298,7 +298,7 @@ public class UIInput extends UIDisplayContainer implements IInputDataElement {
     */
     private void updateTextShift() {
         float cursorPos = 0f;
-        _textWidthInContainer = _inputText.getTextWidth() + _padding.x + _inputText.getPosition().x;
+        _textWidthInContainer = _inputText.getSize().x + _padding.x + _inputText.getPosition().x;
         if (_textWidthInContainer > getPosition().x + getSize().x || getPosition().x + _inputText.getPosition().x < 0) {
             _inputText.setPosition(new Vector2f(_inputText.getPosition().x + (getPosition().x + getSize().x - _textWidthInContainer), _inputText.getPosition().y));
         }
