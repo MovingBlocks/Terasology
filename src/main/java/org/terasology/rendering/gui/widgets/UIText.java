@@ -49,7 +49,7 @@ public class UIText extends UIDisplayContainer {
     private Color color = new Color(Color.white);
     
     //shadow
-    private boolean shadowed = true;
+    private boolean enableShadow = true;
     private Color shadowColor = new Color(Color.black);
     private final Vector2f shadowOffset = new Vector2f(1, 0);
     
@@ -58,6 +58,7 @@ public class UIText extends UIDisplayContainer {
 
     public UIText() {
         super();
+        setText("");
     }
 
     public UIText(String text) {
@@ -74,7 +75,7 @@ public class UIText extends UIDisplayContainer {
         // TODO HACK: Workaround because the internal Slick texture mechanism is never used
         workaroundTexture.bind();
 
-        if (shadowed) {
+        if (enableShadow) {
             font.drawString(shadowOffset.x, shadowOffset.y, text.toString(), shadowColor);
         }
         
@@ -87,7 +88,11 @@ public class UIText extends UIDisplayContainer {
     }
 
     private int getTextHeight() {
-        return font.getHeight(text.toString());
+        if (text.toString().trim().length() == 0) {
+            return font.getHeight("t");
+        } else {
+            return font.getHeight(text.toString());
+        }
     }
 
     private int getTextWidth() {
@@ -135,6 +140,13 @@ public class UIText extends UIDisplayContainer {
         
         notifyChangedListeners();
     }
+    
+    public void replaceText(int start, int end, String text) {
+        this.text.replace(start, end, text);
+        setSize(new Vector2f(getTextWidth(), getTextHeight()));
+        
+        notifyChangedListeners();
+    }
 
     /**
      * Get the text color.
@@ -172,16 +184,16 @@ public class UIText extends UIDisplayContainer {
      * Check whether the text has a shadow.
      * @return Returns true if the text has a shadow.
      */
-    public boolean isShadowed() {
-        return shadowed;
+    public boolean isEnableShadow() {
+        return enableShadow;
     }
     
     /**
      * Set whether the text has a color.
-     * @param shadowed True to enable the shadow of the text.
+     * @param enable True to enable the shadow of the text.
      */
-    public void setShadowed(boolean shadowed) {
-        this.shadowed = shadowed;
+    public void setEnableShadow(boolean enable) {
+        this.enableShadow = enable;
     }
 
     /**

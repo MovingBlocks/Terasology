@@ -24,13 +24,12 @@ public class UITextWrapNew extends UIDisplayContainerScrollable {
 
     public UITextWrapNew(Vector2f size) {
         setSize(size);
-        setBorderSolid(1, 0, 0, 0, 1f);
-        setBackgroundColor(55, 55, 55, 1f);
-        setMargin(new Vector4f(5f, 5f, 5f, 5f));
+        setPadding(new Vector4f(5f, 5f, 5f, 5f));
         setEnableScrolling(true);
         setEnableScrollbar(true);
         
         text = new UIText();
+        text.setColor(Color.black);
         text.setVisible(true);
         
         addDisplayElement(text);
@@ -183,16 +182,16 @@ public class UITextWrapNew extends UIDisplayContainerScrollable {
      * Check whether the text has a shadow.
      * @return Returns true if the text has a shadow.
      */
-    public boolean isShadowed() {
-        return text.isShadowed();
+    public boolean isEnableShadow() {
+        return this.text.isEnableShadow();
     }
     
     /**
      * Set whether the text has a color.
-     * @param shadowed True to enable the shadow of the text.
+     * @param enable True to enable the shadow of the text.
      */
-    public void setShadowed(boolean shadowed) {
-        text.setShadowed(shadowed);
+    public void setEnableShadow(boolean enable) {
+        this.text.setEnableShadow(enable);
     }
 
     /**

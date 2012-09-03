@@ -30,7 +30,7 @@ public class GridLayout implements Layout {
     //layout
     private Vector2f size = new Vector2f(0, 0);
     private int columns;
-    private Vector4f margin = new Vector4f(0, 0, 0, 0); //top, right, bottom, left
+    private Vector4f padding = new Vector4f(0, 0, 0, 0); //top, right, bottom, left
     private float minCellWidth = 0f;
     private float minCellHeight = 0f;
     private float[] cellWidth;
@@ -109,11 +109,11 @@ public class GridLayout implements Layout {
                 
                 //horizontal align
                 if (horizontalCellAlign == EHorizontalAlign.LEFT) {
-                    x += margin.w;
+                    x += padding.w;
                 } else if (horizontalCellAlign == EHorizontalAlign.CENTER) {
                     x += cellWidth[i % columns] / 2 - elements.get(i).getSize().x / 2;
                 } else if (horizontalCellAlign == EHorizontalAlign.RIGHT) {
-                    x += cellWidth[i % columns] - elements.get(i).getSize().x + margin.y;
+                    x += cellWidth[i % columns] - elements.get(i).getSize().x + padding.y;
                 }
                 
                 //calculate y position
@@ -124,11 +124,11 @@ public class GridLayout implements Layout {
                 
                 //vertical align
                 if (verticalCellAlign == EVerticalAlign.TOP) {
-                    y += margin.x;
+                    y += padding.x;
                 } else if (verticalCellAlign == EVerticalAlign.CENTER) {
                     y += cellHeight[(int) Math.floor(i / columns)] / 2 - elements.get(i).getSize().y / 2;
                 } else if (verticalCellAlign == EVerticalAlign.BOTTOM) {
-                    y += cellHeight[(int) Math.floor(i / columns)] - elements.get(i).getSize().y - margin.z;
+                    y += cellHeight[(int) Math.floor(i / columns)] - elements.get(i).getSize().y - padding.z;
                 }
                 
                 elements.get(i).setPosition(new Vector2f(x, y));
@@ -149,9 +149,9 @@ public class GridLayout implements Layout {
             }
         }
         
-        //add margin
+        //add padding
         for (int i = 0; i < width.length; i++) {
-            width[i] += (margin.w + margin.y);
+            width[i] += (padding.w + padding.y);
         }
         
         //min cell width
@@ -199,9 +199,9 @@ public class GridLayout implements Layout {
             }
         }
         
-        //add margin
+        //add padding
         for (int i = 0; i < height.length; i++) {
-            height[i] += (margin.x + margin.z);
+            height[i] += (padding.x + padding.z);
         }
         
         //custom cell height
@@ -255,19 +255,19 @@ public class GridLayout implements Layout {
     }
 
     /**
-     * Get the margin of each cell.
-     * @return Returns the margin.
+     * Get the padding of each cell.
+     * @return Returns the padding.
      */
-    public Vector4f getMargin() {
-        return margin;
+    public Vector4f getPadding() {
+        return padding;
     }
 
     /**
-     * Set the margin of each cell. 
-     * @param margin The margin, where x = top, y = right, z = bottom and w = left.
+     * Set the padding of each cell. 
+     * @param padding The padding, where x = top, y = right, z = bottom and w = left.
      */
-    public void setMargin(Vector4f margin) {
-        this.margin = margin;
+    public void setPadding(Vector4f padding) {
+        this.padding = padding;
     }
 
     /**

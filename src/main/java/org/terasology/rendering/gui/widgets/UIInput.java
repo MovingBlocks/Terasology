@@ -50,7 +50,7 @@ import org.terasology.rendering.gui.framework.events.MouseMoveListener;
  * @author Anton Kireev <adeon.k87@gmail.com>
  * @version 0.23
  * 
- * TODO clean up..
+ * @deprecated
  */
 public class UIInput extends UIDisplayContainer implements IInputDataElement {
     //    TODO: Add text selection and paste from clipboard

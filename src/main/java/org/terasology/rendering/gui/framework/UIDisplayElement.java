@@ -403,6 +403,8 @@ public abstract class UIDisplayElement {
         
         this.position.set(position);
         this.positionOriginal.set(position);
+        
+        layout();
     }
     
     /**
@@ -449,6 +451,8 @@ public abstract class UIDisplayElement {
         
         this.size.set(posX, posY);
         this.sizeOriginal.set(posX, posY);
+        
+        layout();
     }
 
     /**

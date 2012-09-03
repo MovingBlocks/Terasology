@@ -41,7 +41,7 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
     
     //layout
     private final float scrollbarWidth = 15f;
-    private Vector4f margin = new Vector4f(0f, 0f, 0f, 0f); //top, right, bottom, left
+    private Vector4f padding = new Vector4f(0f, 0f, 0f, 0f); //top, right, bottom, left
     
     //other
     private boolean isScrollable = false;
@@ -157,7 +157,7 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
         scrollbar.setPosition(new Vector2f(getSize().x - scrollbar.getSize().x, scrollbarPos));
         
         //move the content
-        container.setPosition(new Vector2f(margin.w, -multiplier * scrollbar.getPosition().y + margin.x));
+        container.setPosition(new Vector2f(padding.w, -multiplier * scrollbar.getPosition().y + padding.x));
         
         notifyScrollListeners();
     }
@@ -174,7 +174,7 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
                 //Lets calculate the max value recursively
                 max = 0;
                 calcMax(container.getDisplayElements());
-                contentHeight = max - container.getAbsolutePosition().y + margin.x + margin.z;
+                contentHeight = max - container.getAbsolutePosition().y + padding.x + padding.z;
             }
             
             //check if the content is bigger than the container
@@ -301,31 +301,31 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
     }
     
     /**
-     * Get the margin of the text within the text container.
-     * @return Returns the margin.
+     * Get the padding of the text within the text container.
+     * @return Returns the padding.
      */
-    public Vector4f getMargin() {
-        return margin;
+    public Vector4f getPadding() {
+        return padding;
     }
 
     /**
-     * Set the margin of the text within the text container.
-     * @param margin The margin, where x = top, y = right, z = bottom and w = left.
+     * Set the padding of the text within the text container.
+     * @param padding The padding, where x = top, y = right, z = bottom and w = left.
      */
-    public void setMargin(Vector4f margin) {
-        this.margin = margin;
+    public void setPadding(Vector4f padding) {
+        this.padding = padding;
         
-        container.setPosition(new Vector2f(margin.w, margin.x));
+        container.setPosition(new Vector2f(padding.w, padding.x));
         
         calcContentHeight();
     }
     
     /**
-     * Get the size of the area which will be scrolled, excluding the margin and the scrollbar width. This will be the actual displayed area of the display element.
+     * Get the size of the area which will be scrolled, excluding the padding and the scrollbar width. This will be the actual displayed area of the display element.
      * @return Returns the scroll container size.
      */
     public Vector2f getScrollContainerSize() {
-        return new Vector2f(container.getSize().x - margin.y - margin.w, container.getSize().y - margin.x - margin.z);
+        return new Vector2f(container.getSize().x - padding.y - padding.w, container.getSize().y - padding.x - padding.z);
     }
     
     public Vector2f getScrollbarSize() {
