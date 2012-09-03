@@ -119,21 +119,26 @@ public final class UIScreenConsole extends UIWindow {
                     length = 0;
                 }
                 _consoleInput.setLength(length);
+                event.consume();
                 break;
             case Keyboard.KEY_RETURN:
                 processConsoleString();
+                event.consume();
                 break;
             case Keyboard.KEY_UP:
                 rotateRingBuffer(1);
+                event.consume();
                 break;
             case Keyboard.KEY_DOWN:
                 rotateRingBuffer(-1);
+                event.consume();
                 break;
             default:
                 char c = event.getKeyCharacter();
 
                 if (!Character.isISOControl(c)) {
                     _consoleInput.append(c);
+                    event.consume();
                 }
                 break;
         }
