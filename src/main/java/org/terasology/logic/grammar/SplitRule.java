@@ -66,9 +66,9 @@ public class SplitRule extends ComplexRule {
      */
     private List<Shape> getWallElements(Shape shape) {
         // the origin of the bounding box
-        int px = position.x;
-        int py = position.y;
-        int pz = position.z;
+        /* int px = position.x;
+     int py = position.y;
+     int pz = position.z;*/
         // the original dimensions of the _split_ command
         int dx = dimension.x;
         int dy = dimension.y;
