@@ -141,6 +141,12 @@ public class UIText extends UIDisplayContainer {
         notifyChangedListeners();
     }
     
+    /**
+     * Replace a string defined by its start and end index. 
+     * @param start The start index.
+     * @param end The end index.
+     * @param text The text to replace with.
+     */
     public void replaceText(int start, int end, String text) {
         this.text.replace(start, end, text);
         setSize(new Vector2f(getTextWidth(), getTextHeight()));

@@ -265,6 +265,18 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
     }
     
     /**
+     * Scroll to the given position.
+     * @param pos The position where to scroll to.
+     */
+    public void scrollTo(float pos) {
+        moveScrollbar(getPosition().y + pos / multiplier);
+    }
+    
+    public float getScrollPosition() {
+        return scrollbar.getPosition().y * multiplier;
+    }
+    
+    /**
      * Check if scrolling is enabled.
      * @return Returns true if scrolling is enabled.
      */

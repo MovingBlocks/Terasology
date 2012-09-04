@@ -1,3 +1,18 @@
+/*
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.terasology.rendering.gui.widgets;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -9,8 +24,10 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -19,7 +36,7 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.AngelCodeFont;
 import org.newdawn.slick.Color;
 import org.terasology.input.events.KeyEvent;
-import org.terasology.rendering.gui.framework.UIDisplayContainer;
+import org.terasology.rendering.gui.framework.UIDisplayContainerScrollable;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
@@ -27,16 +44,19 @@ import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 import org.terasology.rendering.gui.framework.events.SelectionChangedListener;
 
 /**
- * A one line input box which supports text highlighting and copy & paste.
+ * A text area which can be used as a single line input box, multi line input box or for just displaying large texts.
+ * The constant is scrollable and it also supports text wrapping in multi line mode. Moreover it supports the usual text editing, like selecting text and copy & paste.
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  *
  */
-public class UIInputNew extends UIDisplayContainer {
-    
+public class UIInputNew extends UIDisplayContainerScrollable {
+       
     //events
     private final ArrayList<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
     private final ArrayList<SelectionChangedListener> selectionListeners = new ArrayList<SelectionChangedListener>();
-        
+    
+    private final List<Integer> wrapPosition = new ArrayList<Integer>();
+    
     //selection
     private int cursorPosition = -1;
     private boolean selection = false;
@@ -53,9 +73,10 @@ public class UIInputNew extends UIDisplayContainer {
     
     //options
     private char[] specialCharacters = new char[] {' ', '_', '.', ',', '!', '-','(', ')', '"', '\'', ';', '+'};
-    private final Vector2f cursorSize = new Vector2f(1f, 18f);
-    private Vector2f padding = new Vector2f(5f, 5f);
+    private final Vector2f cursorSize = new Vector2f(2f, 18f);
+    private int maxLength = 0;
     private boolean disabled;
+    private boolean multiLine = false;
 
     /**
      * A text cursor.
@@ -73,7 +94,7 @@ public class UIInputNew extends UIDisplayContainer {
             if (!isVisible()) {
                 return;
             }
-
+            
             glPushMatrix();
             glColor4f(color.r, color.g, color.b, color.a);
             glLineWidth(getSize().x);
@@ -83,9 +104,9 @@ public class UIInputNew extends UIDisplayContainer {
             glEnd();
             glPopMatrix();
         }
-
+        
         public void update() {
-
+            
         }
         
         public void setColor(Color color) {
@@ -125,10 +146,10 @@ public class UIInputNew extends UIDisplayContainer {
             if (start != end) {
                 Vector2f startPos = toDisplayPosition(start);
                 Vector2f endPos = toDisplayPosition(end);
-                Vector2f size = new Vector2f(endPos.x - startPos.x, cursor.getSize().y);
+                startPos.y -= cursor.getSize().y / 2;
+                Vector2f size = new Vector2f((endPos.x - startPos.x) * 2, (endPos.y - startPos.y) * 2);
                 
-                startPos.y = cursor.getPosition().y;
-                startPos.x = startPos.x / 2;
+
                 
                 selectionRectangle.setPosition(startPos);
                 selectionRectangle.setSize(size);
@@ -154,7 +175,9 @@ public class UIInputNew extends UIDisplayContainer {
     public UIInputNew(Vector2f size) {       
         setSize(size);
         setCropContainer(true);
+        setPadding(new Vector4f(5f, 5f, 5f, 5f));
         
+        //mouse button listener to detect mouse clicks on the text and moving the cursor
         addMouseButtonListener(new MouseButtonListener() {
             @Override
             public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
@@ -186,6 +209,7 @@ public class UIInputNew extends UIDisplayContainer {
             }
         });
         
+        //mouse move listener to update position of cursor if mouse is pressed
         addMouseMoveListener(new MouseMoveListener() {
             @Override
             public void move(UIDisplayElement element) {
@@ -211,6 +235,7 @@ public class UIInputNew extends UIDisplayContainer {
             }
         });
         
+        //update of the selection rectangle
         addSelectionChangedListener(new SelectionChangedListener() {
             @Override
             public void changed(UIDisplayElement element) {
@@ -219,7 +244,6 @@ public class UIInputNew extends UIDisplayContainer {
         });
         
         text = new UIText();
-        text.setPosition(new Vector2f(5f, 0f));
         text.setVerticalAlign(EVerticalAlign.CENTER);
         text.setColor(Color.black);
         text.setVisible(true);
@@ -248,8 +272,9 @@ public class UIInputNew extends UIDisplayContainer {
                     }
                     //delete at cursor position
                     else if (cursorPosition > 0) {
-                        text.replaceText(cursorPosition - 1, cursorPosition, "");
-                    
+                        int pos = getWrapOffset(cursorPosition);
+                        replaceText(pos - 1, pos, "");
+                        
                         setCursorToTextPosition(cursorPosition - 1);
                     }
                 }
@@ -263,7 +288,8 @@ public class UIInputNew extends UIDisplayContainer {
                     }
                     //delete at cursor position
                     else if (cursorPosition < text.getText().length()) {
-                        text.replaceText(cursorPosition, cursorPosition + 1, "");
+                        int pos = getWrapOffset(cursorPosition);
+                        replaceText(pos, pos + 1, "");
                     
                         setCursorToTextPosition(cursorPosition);
                     }
@@ -272,7 +298,7 @@ public class UIInputNew extends UIDisplayContainer {
             //move cursor left
             else if (event.getKey() == Keyboard.KEY_LEFT && event.isDown()) {
                 if (ctrlKeyPressed) {
-                    setCursorToTextPosition(getNextSpace(true));
+                    setCursorToTextPosition(findNextChar(cursorPosition, ' ', true));
                 } else {
                     setCursorToTextPosition(cursorPosition - 1);
                 }
@@ -280,7 +306,7 @@ public class UIInputNew extends UIDisplayContainer {
             //move cursor right
             else if (event.getKey() == Keyboard.KEY_RIGHT && event.isDown()) {
                 if (ctrlKeyPressed) {
-                    setCursorToTextPosition(getNextSpace(false));
+                    setCursorToTextPosition(findNextChar(cursorPosition, ' ', false));
                 } else {
                     setCursorToTextPosition(cursorPosition + 1);
                 }
@@ -305,7 +331,7 @@ public class UIInputNew extends UIDisplayContainer {
                 }
                 
                 String clipboard = removeUnsupportedChars(getClipboard());
-                text.insertText(cursorPosition, clipboard);
+                insertText(getWrapOffset(cursorPosition), clipboard);
                 setCursorToTextPosition(cursorPosition + clipboard.length());
             }
             //select all
@@ -321,7 +347,7 @@ public class UIInputNew extends UIDisplayContainer {
                         deleteSelection();
                     }
                     
-                    text.insertText(cursorPosition, String.valueOf(c));
+                    insertText(getWrapOffset(cursorPosition), String.valueOf(c));
                     
                     setCursorToTextPosition(cursorPosition + 1);
                 }
@@ -331,58 +357,106 @@ public class UIInputNew extends UIDisplayContainer {
     
     /**
      * Set the cursor position to the given position in the text.
-     * @param pos The text position to set the cursor to.
+     * @param index The text position (index) to set the cursor to.
      */
-    private void setCursorToTextPosition(int pos) {
-        if (pos < 0) {
-            pos = 0;
-        } else if (pos > getText().length()) {
-            pos = getText().length();
+    private void setCursorToTextPosition(int index) {
+        if (index < 0) {
+            index = 0;
+        } else if (index > text.getText().length()) {
+            index = text.getText().length();
         }
         
         //calculate the display position of the cursor from text position
-        if (pos != cursorPosition) {
-            Vector2f newPos = new Vector2f((calcTextWidth(text.getText().substring(0, pos))) / 2f, -1f);
+        if (index != cursorPosition) {
+            Vector2f newPos = toDisplayPosition(index);
+            newPos.y = newPos.y - cursorSize.y / 2;
             cursor.setPosition(newPos);
 
-            //cursor is right from input area
-            if ((cursor.getPosition().x + text.getPosition().x / 2 + padding.y) > (getSize().x / 2f)) {
-                moveText(-(cursor.getPosition().x * 2 - getSize().x + padding.y + padding.y));
-            }
-            //cursor is left from input area
-            else if ((cursor.getPosition().x + text.getPosition().x / 2) < 0) {
-                moveText(-cursor.getPosition().x * 2);
+            if (isMultiLine()) {
+                //cursor is below of the input area
+                if ((cursor.getSize().y + cursor.getPosition().y - getScrollPosition() / 2) > (getSize().y / 2f)) {
+                    float additionalSpacing = getPadding().z + getPadding().x;
+                    scrollTo(getScrollPosition() - (getSize().y / 2 - (cursor.getSize().y / 2 + cursor.getPosition().y - getScrollPosition() / 2)) + additionalSpacing);
+                }
+                //cursor is on top of the input area
+                else if (cursor.getPosition().y + text.getParent().getPosition().y / 2 < 0) {
+                    float additionalSpacing = getPadding().x;
+                    scrollTo(getScrollPosition() + cursor.getPosition().y + text.getParent().getPosition().y / 2 - additionalSpacing);
+                }
+            } else {
+                //cursor is right from input area
+                if ((cursor.getPosition().x + text.getPosition().x / 2 + getPadding().y) > (getSize().x / 2f)) {
+                    text.setPosition(new Vector2f(-(cursor.getPosition().x * 2 - getSize().x + getPadding().y + getPadding().w), 0f));
+                }
+                //cursor is left from input area
+                else if ((cursor.getPosition().x + text.getPosition().x / 2) < 0) {
+                    text.setPosition(new Vector2f(-cursor.getPosition().x * 2, 0f));
+                }
             }
 
-            cursorPosition = pos;
+            cursorPosition = index;
             
             notifySelectionChangedListeners();
         }
     }
 
     /**
-     * Get the cursor position at the current mouse position.
-     * @return Returns the text position of the cursor.
+     * Get the cursor position at the given display position.
+     * @return Returns the text position (index) of the cursor.
      */
     private int toTextPosition(Vector2f mousePos) {
         Vector2f textAbsPos = text.getAbsolutePosition();
         mousePos = new Vector2f(Math.max(mousePos.x, textAbsPos.x), Math.max(mousePos.y, textAbsPos.y));
         Vector2f relative = new Vector2f(mousePos.x - textAbsPos.x, mousePos.y - textAbsPos.y);
         
-        //clicked right from text
-        if (mousePos.x >= (textAbsPos.x + text.getSize().x)) {
-            return text.getText().length();
-        }
-        //clicked left from text
-        else if (mousePos.x <= textAbsPos.x) {
-            return 0;
-        }
-        //clicked somewhere on the text
-        else {            
+        //multi line
+        if (isMultiLine()) {
+            relative.x = relative.x - getPadding().y - getPadding().w;
+            //clicked bottom of text container
+            //TODO if scrolling down is jumping (when mouse button is pressed), it could be caused by the following line
+            if (mousePos.y >= (textAbsPos.y + getSize().y + getScrollPosition())) {
+                return text.getText().length();
+            }
+            //clicked top of text container
+            else if (mousePos.y <= textAbsPos.y) {
+                return 0;
+            }
             //calculate the cursor position
-            for (int i = 0; i <= text.getText().length(); i++) {
-                if (calcTextWidth(text.getText().substring(0, i)) >= relative.x) {
-                    return i;
+            else {
+                for (int i = 0; i < text.getText().length();) {
+                    //first calculate the height
+                    if (calcTextHeight(text.getText().substring(0, i)) >= relative.y) {
+                        for (int j = i; j < text.getText().length(); j++) {
+                            //than calculate the width
+                            if (calcTextWidth(text.getText().substring(i, j)) > relative.x || text.getText().charAt(j) == '\n' || j == text.getText().length() - 1) {
+                                return j;
+                            }
+                        }
+                    }
+                    
+                    i = findNextChar(i, '\n', false);
+                }
+
+                return text.getText().length();
+            }
+        }
+        //single line
+        else {
+            //clicked right from text
+            if (mousePos.x >= (textAbsPos.x + text.getSize().x)) {
+                return text.getText().length();
+            }
+            //clicked left from text
+            else if (mousePos.x <= textAbsPos.x) {
+                return 0;
+            }
+            //clicked somewhere on the text
+            else {            
+                //calculate the cursor position
+                for (int i = 0; i <= text.getText().length(); i++) {
+                    if (calcTextWidth(text.getText().substring(0, i)) >= relative.x) {
+                        return i;
+                    }
                 }
             }
         }
@@ -392,23 +466,24 @@ public class UIInputNew extends UIDisplayContainer {
     
     /**
      * Get the position on the display at the given position in the text.
-     * @param pos The position in the text. From 0 to the length of the text.
+     * @param index The position in the text. From 0 to the length of the text.
      * @return Returns the display position.
      */
-    private Vector2f toDisplayPosition(int pos) {
+    private Vector2f toDisplayPosition(int index) {
         Vector2f displayPos = new Vector2f();
         
-        displayPos.x = calcTextWidth(text.getText().substring(0, pos));
+        String substr = text.getText().substring(0, index);
+        String lastLine = substr;
+        
+        int indexLastLine = substr.lastIndexOf('\n');
+        if (indexLastLine != -1) {
+            lastLine = substr.substring(indexLastLine, substr.length());
+        }
+
+        displayPos.x = calcTextWidth(lastLine) / 2;
+        displayPos.y = calcTextHeight(substr) / 2;
         
         return displayPos;
-    }
-    
-    /**
-     * Move the text to a specific location.
-     * @param pos The position to move the text to.
-     */
-    private void moveText(float pos) {
-        text.setPosition(new Vector2f(pos + padding.x, 0f));
     }
 
     /**
@@ -416,8 +491,27 @@ public class UIInputNew extends UIDisplayContainer {
      * @param text The text to calculate the width.
      * @return Returns the width of the given text.
      */
-    private int calcTextWidth(String text) {
+    private int calcTextWidth(String text) {        
         return this.text.getFont().getWidth(text);
+    }
+    
+    /**
+     * Calculate the height of the given text.
+     * @param text The text to calculate the height.
+     * @return Returns the height of the given text.
+     */
+    private int calcTextHeight(String text) {
+        //if the string is empty calculate the height by using any character, otherwise a space would have a height of 0.. 
+        if (text.trim().isEmpty()) {
+            text = "t";
+        }
+        
+        //and another fix because the slick library is calculating the height of text wrong if the last character is a new line..
+        if (text.charAt(text.length() - 1) == '\n') {
+            text += "t";
+        }
+        
+        return this.text.getFont().getHeight(text);
     }
     
     /**
@@ -467,15 +561,15 @@ public class UIInputNew extends UIDisplayContainer {
     /**
      * Get the next or previous space in the text from the current cursor position.
      * @param reverse True to search backwards.
-     * @return Returns the text position where the next or previous space was found.
+     * @return Returns the text position (index) where the next or previous space was found.
      */
-    private int getNextSpace(boolean reverse) {
+    private int findNextChar(int index, char ch, boolean reverse) {
         StringBuilder str = new StringBuilder(text.getText());
         
         //backwards search
         if (reverse) {
-            for (int i = cursorPosition - 1; i >= 0; i--) {
-                if (str.charAt(i) == ' ' && i != cursorPosition - 1) {
+            for (int i = index - 1; i >= 0; i--) {
+                if (str.charAt(i) == ch && i != index - 1) {
                     return i + 1;
                 } else if (i == 0) {
                     return i;
@@ -484,14 +578,14 @@ public class UIInputNew extends UIDisplayContainer {
         }
         //forward search
         else {
-            for (int i = cursorPosition; i < str.length(); i++) {
-                if ((str.charAt(i) == ' ' && i != cursorPosition) || i == (str.length() - 1)) {
+            for (int i = index; i < str.length(); i++) {
+                if ((str.charAt(i) == ch && i != index) || i == (str.length() - 1)) {
                     return i + 1;
                 }
             }
         }
         
-        return cursorPosition;
+        return index;
     }
     
     /**
@@ -526,11 +620,78 @@ public class UIInputNew extends UIDisplayContainer {
     }
     
     /**
+     * Wraps the text to the size of the container.
+     * @param text The text to wrap.
+     * @return Returns the wrapped text.
+     */
+    private String wrapText(String text) {
+        //multi line
+        if (isMultiLine()) {
+            int lastSpace = 0;
+            int lastWrap = 0;
+            StringBuilder wrapText = new StringBuilder(text + " ");
+            
+            wrapPosition.clear();
+            
+            //loop through whole text
+            for (int i = 0; i < wrapText.length(); i++) {
+                
+                //check if character is a space -> text can only be wrapped at spaces
+                if (wrapText.charAt(i) == ' ') {
+                    //check if the string (from the beginning of the new line) is bigger than the container width
+                    if (calcTextWidth(wrapText.substring(lastWrap, i)) > getScrollContainerSize().x) {
+                        //than wrap the text at the previous space
+                        wrapText.insert(lastSpace + 1, '\n');
+                        wrapPosition.add(new Integer(lastSpace + 1));
+                        
+                        lastWrap = lastSpace + 1;
+                    }
+                    
+                    lastSpace = i;
+                } else if (wrapText.charAt(i) == '\n') {
+                    lastSpace = i;
+                    lastWrap = i;
+                }
+            }
+            
+            wrapText.replace(wrapText.length() - 1, wrapText.length(), "");
+            
+            return wrapText.toString();
+        }
+        //single line
+        else {
+            return text;
+        }
+    }
+    
+    /**
+     * Get the offset in text length which happened due to the additional new line characters at text wrapping.
+     * @param index The offset will be calculated to this index.
+     * @return Returns the offset in text length.
+     */
+    private int getWrapOffset(int index) {
+        for (int i = 0; i < wrapPosition.size(); i++) {
+            if (wrapPosition.get(i) >= index) {
+                return index - i;
+            } else if (i == wrapPosition.size() - 1) {
+                return index - i - 1;
+            }
+        }
+        
+        return index;
+    }
+    
+    /**
      * Get the displayed text.
      * @return Returns the text.
      */
     public String getText() {
-        return text.getText();
+        StringBuilder str = new StringBuilder(text.getText());
+        for (int i = 0; i < wrapPosition.size(); i++) {
+            str.replace(wrapPosition.get(i) - i, wrapPosition.get(i) + 1 - i, "");
+        }
+        
+        return str.toString();
     }
     
     /**
@@ -538,8 +699,17 @@ public class UIInputNew extends UIDisplayContainer {
      * @param text The text to set.
      */
     public void setText(String text) {
-        this.text.setText(text);
+        boolean scrollbarVisibility = isScrollbarVisible();
+
+        this.text.setText(wrapText(text));
+
+        calcContentHeight();
         
+        //if the visibility of the scrollbar changed, recalculate the content
+        if (scrollbarVisibility != isScrollbarVisible()) {
+            setText(getText());
+        }
+    
         notifyChangedListeners();
     }
     
@@ -548,7 +718,16 @@ public class UIInputNew extends UIDisplayContainer {
      * @param text The text to append.
      */
     public void appendText(String text) {
-        this.text.appendText(text);
+        boolean scrollbarVisibility = isScrollbarVisible();
+
+        setText(getText() + text);
+        
+        calcContentHeight();
+        
+        //if the visibility of the scrollbar changed, recalculate the content
+        if (scrollbarVisibility != isScrollbarVisible()) {
+            setText(getText());
+        }
         
         notifyChangedListeners();
     }
@@ -558,8 +737,42 @@ public class UIInputNew extends UIDisplayContainer {
      * @param offset The offset, where to insert the text at.
      * @param text The text to insert.
      */
-    public void insertText(int offset, String text) {
-        this.text.insertText(offset, text);
+    public void insertText(int offset, String text) {        
+
+        boolean scrollbarVisibility = isScrollbarVisible();
+        
+        StringBuilder str = new StringBuilder(getText());
+        setText(str.insert(offset, text).toString());
+        
+        calcContentHeight();
+        
+        //if the visibility of the scrollbar changed, recalculate the content
+        if (scrollbarVisibility != isScrollbarVisible()) {
+            setText(getText());
+        }
+        
+        notifyChangedListeners();
+    }
+    
+    /**
+     * Replace a string defined by its start and end index. 
+     * @param start The start index.
+     * @param end The end index.
+     * @param text The text to replace with.
+     */
+    public void replaceText(int start, int end, String text) {
+
+        boolean scrollbarVisibility = isScrollbarVisible();
+        
+        StringBuilder str = new StringBuilder(getText());
+        setText(str.replace(start, end, text).toString());
+        
+        calcContentHeight();
+        
+        //if the visibility of the scrollbar changed, recalculate the content
+        if (scrollbarVisibility != isScrollbarVisible()) {
+            setText(getText());
+        }
         
         notifyChangedListeners();
     }
@@ -584,6 +797,7 @@ public class UIInputNew extends UIDisplayContainer {
      */
     public String getSelection() {
         if (selectionStart != selectionEnd) {
+            //TODO probably not correct. need to get the original string by getText()
             return text.getText().substring(Math.min(selectionStart, selectionEnd), Math.max(selectionStart, selectionEnd));
         }
         
@@ -605,7 +819,7 @@ public class UIInputNew extends UIDisplayContainer {
      */
     public void deleteSelection() {
         if (selectionStart != selectionEnd) {
-            text.replaceText(Math.min(selectionStart, selectionEnd), Math.max(selectionStart, selectionEnd), "");
+            replaceText(Math.min(getWrapOffset(selectionStart), getWrapOffset(selectionEnd)), Math.max(getWrapOffset(selectionStart), getWrapOffset(selectionEnd)), "");
             selectionEnd = selectionStart;
             selectionRectangle.updateSelection(selectionStart, selectionEnd);
             setCursorToTextPosition(Math.min(selectionStart, selectionEnd));
@@ -703,6 +917,50 @@ public class UIInputNew extends UIDisplayContainer {
     public boolean isDisabled() {
         return disabled;
     }
+    
+    /**
+     * Get the maximum of characters the text element can hold.
+     * @return Returns the maximum characters.
+     */
+    public int getMaxLength() {
+        return maxLength;
+    }
+
+    /**
+     * Set the maximum of characters the text element can hold.
+     * @param maxLength The maximum characters.
+     */
+    public void setMaxLength(int maxLength) {
+        this.maxLength = maxLength;
+    }
+    
+    /**
+     * Check whether the text element is a multi line text element.
+     * @return Returns true if the text element is a multi line text element.
+     */
+    public boolean isMultiLine() {
+        return multiLine;
+    }
+
+    /**
+     * Set whether the text element is a multi line text element.
+     * @param enable True to enable multi line support.
+     */
+    public void setMultiLine(boolean enable) {
+        this.multiLine = enable;
+                
+        if (enable) {
+            setEnableScrolling(true);
+            setEnableScrollbar(true);
+            text.setVerticalAlign(EVerticalAlign.TOP);
+        } else {
+            setEnableScrolling(false);
+            setEnableScrollbar(false);
+            setCropContainer(true);
+            text.setVerticalAlign(EVerticalAlign.CENTER);
+            setText(getText().replaceAll("\n|\r", ""));
+        }
+    }
 
     /**
      * Set whether the element is disabled. There can't be written anything in a disabled element. 
@@ -717,22 +975,6 @@ public class UIInputNew extends UIDisplayContainer {
             resetSelection();
             selectionRectangle.setVisible(false);
         }
-    }
-    
-    /**
-     * Get the padding of the text from the left and right side.
-     * @return Returns the padding.
-     */
-    public Vector2f getPadding() {
-        return padding;
-    }
-
-    /**
-     * Set the padding of the text from the left and right side.
-     * @param padding The padding, where x = left, y = right.
-     */
-    public void setPadding(Vector2f padding) {
-        this.padding = padding;
     }
     
     private void notifySelectionChangedListeners() {

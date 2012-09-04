@@ -21,10 +21,10 @@ import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.framework.IInputDataElement;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayContainerScrollable;
+import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.WindowListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * A window which can contain display elements. All windows will be managed by the GUIManager.
@@ -46,7 +46,12 @@ public class UIWindow extends UIDisplayContainerScrollable {
     private boolean modal = false;
     
     public UIWindow() {
-        
+        addClickListener(new ClickListener() {
+            @Override
+            public void click(UIDisplayElement element, int button) {
+                setFocus(UIWindow.this);
+            }
+        });
     }
 
     public void clearInputControls() {
