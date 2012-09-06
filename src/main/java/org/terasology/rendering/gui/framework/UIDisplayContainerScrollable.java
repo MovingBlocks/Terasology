@@ -272,6 +272,10 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
         moveScrollbar(getPosition().y + pos / multiplier);
     }
     
+    /**
+     * Get the current scroll position.
+     * @return Returns the scroll position.
+     */
     public float getScrollPosition() {
         return scrollbar.getPosition().y * multiplier;
     }
