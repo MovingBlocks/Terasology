@@ -35,7 +35,7 @@ import org.terasology.rendering.gui.framework.events.MouseMoveListener;
  */
 public class UIComboBox extends UIDisplayContainer {
     
-    private UIInput  baseInput;
+    private UIInputNew baseInput;
     private UIButton baseButton;
     private UIList   baseList;
 
@@ -62,8 +62,10 @@ public class UIComboBox extends UIDisplayContainer {
         setSize(size);
         opened = false;
         
-        baseInput = new UIInput(size);
+        baseInput = new UIInputNew(size);
         baseInput.setVisible(true);
+        baseInput.setBackgroundColor(0xFF, 0xFF, 0xFF, 1.0f);
+        baseInput.setBorderSolid(1, 0x00, 0x00, 0x00, 1.0f);
         baseInput.setDisabled(true);
         baseInput.addMouseButtonListener(new MouseButtonListener() {
             @Override
@@ -86,9 +88,10 @@ public class UIComboBox extends UIDisplayContainer {
             
             @Override
             public void down(UIDisplayElement element, int button, boolean intersect) {
-    
+                
             }
         });
+        
         baseInput.addMouseMoveListener(new MouseMoveListener() {
             @Override
             public void leave(UIDisplayElement element) {
@@ -111,9 +114,9 @@ public class UIComboBox extends UIDisplayContainer {
             }
         });
 
-        baseButton = new UIButton(new Vector2f(18f, 20f), UIButton.eButtonType.TOGGLE);
+        baseButton = new UIButton(new Vector2f(20f, 22f), UIButton.eButtonType.TOGGLE);
         baseButton.setVisible(true);
-        baseButton.setPosition(new Vector2f(size.x   - baseButton.getSize().x, size.y/2 - baseButton.getSize().y/2));
+        baseButton.setPosition(new Vector2f(size.x - baseButton.getSize().x, size.y / 2 - baseButton.getSize().y / 2));
         baseButton.getLabel().setText("");
         baseButton.setTexture("engine:gui_menu");
         baseButton.setNormalState(new Vector2f(432f, 0f), new Vector2f(18f, 18f));
@@ -123,11 +126,12 @@ public class UIComboBox extends UIDisplayContainer {
             public void changed(UIDisplayElement element) {
                 opened = baseButton.getToggleState();
                 baseList.setVisible(opened);
+                setFocus(UIComboBox.this);
             }
         });
 
         baseList = new UIList(listSize);
-        baseList.setPosition(new Vector2f(1f, size.y - 1f));
+        baseList.setPosition(new Vector2f(0f, size.y));
         baseList.setBorderSolid(1f, 0x00, 0x00, 0x00, 1.0f);
         baseList.setBackgroundColor(0xFF, 0xFF, 0xFF, 1.0f);
         baseList.setVisible(false);
@@ -135,7 +139,7 @@ public class UIComboBox extends UIDisplayContainer {
             @Override
             public void changed(UIDisplayElement element) {
                 if (baseList.getSelectedItem() != null) {
-                    baseInput.setValue(baseList.getSelectedItem().getText());
+                    baseInput.setText(baseList.getSelectedItem().getText());
                 }
                 opened = false;
                 baseList.setVisible(opened);

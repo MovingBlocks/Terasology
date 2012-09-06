@@ -200,15 +200,17 @@ public class UIButton extends UIDisplayContainer {
      * @param state True to set the pressed state.
      */
     public void setToggleState(boolean state) {
-        _toggleState = state;
-        
-        if (_toggleState) {
-            setBackgroundImage(states.get("pressed")[0], states.get("pressed")[1]);
-        } else {
-            setBackgroundImage(states.get("normal")[0], states.get("normal")[1]);
+        if (_toggleState != state) {
+            _toggleState = state;
+            
+            if (_toggleState) {
+                setBackgroundImage(states.get("pressed")[0], states.get("pressed")[1]);
+            } else {
+                setBackgroundImage(states.get("normal")[0], states.get("normal")[1]);
+            }
+            
+            notifyChangedListeners();
         }
-        
-        notifyChangedListeners();
     }
     
     private void notifyChangedListeners() {

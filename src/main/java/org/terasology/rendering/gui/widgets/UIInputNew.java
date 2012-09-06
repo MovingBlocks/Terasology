@@ -39,6 +39,7 @@ import org.terasology.input.events.KeyEvent;
 import org.terasology.rendering.gui.framework.UIDisplayContainerScrollable;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
+import org.terasology.rendering.gui.framework.events.FocusListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 import org.terasology.rendering.gui.framework.events.SelectionChangedListener;
@@ -101,7 +102,7 @@ public class UIInputNew extends UIDisplayContainerScrollable {
     private final UISelection selectionRectangle;
     
     //options
-    private final Vector2f cursorSize = new Vector2f(1f, 17f);
+    private final Vector2f cursorSize = new Vector2f(1f, 16f);
     private int maxLength = 0;
     private boolean disabled;
     private boolean multiLine = false;
@@ -112,7 +113,7 @@ public class UIInputNew extends UIDisplayContainerScrollable {
      *
      */
     private class UITextCursor extends UIDisplayElement {
-        private Color color = new Color(Color.white);
+        private Color color = new Color(Color.black);
 
         public UITextCursor(Vector2f size){
             setSize(size);
@@ -148,8 +149,9 @@ public class UIInputNew extends UIDisplayContainerScrollable {
      *
      */
     private class UISelection extends UIDisplayElement {
-        private Color color = new Color(Color.white);
+        private Color color = new Color(Color.gray);
         private final List<Vector2f[]> rectangles = new ArrayList<Vector2f[]>();
+        private boolean fade = false;
         
         public void render() {
             if (!isVisible() || rectangles.size() == 0) {
@@ -157,7 +159,14 @@ public class UIInputNew extends UIDisplayContainerScrollable {
             }
             
             glPushMatrix();
-            glColor4f(color.r, color.g, color.b, color.a);
+            
+            float alpha = color.a;
+            if (fade) {
+                
+                alpha = Math.max(0, alpha - 0.5f); 
+            }
+            glColor4f(color.r, color.g, color.b, alpha);
+            
             glBegin(GL_QUADS);
             
             for (Vector2f[] rect : rectangles) {
@@ -201,6 +210,10 @@ public class UIInputNew extends UIDisplayContainerScrollable {
             }
         }
         
+        public void fadeSelection(boolean fade) {
+            this.fade = fade;
+        }
+        
         public void setColor(Color color) {
             this.color = color;
         }
@@ -233,7 +246,6 @@ public class UIInputNew extends UIDisplayContainerScrollable {
                 if (intersect && !isDisabled()) {
                     selectionEnd = toTextPosition(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()));
                     setCursorToTextPosition(toTextPosition(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY())));
-                    setFocus(UIInputNew.this);
                 }
             }
             
@@ -247,6 +259,7 @@ public class UIInputNew extends UIDisplayContainerScrollable {
                     
                     selectionRectangle.updateSelection(Math.min(selectionStart, selectionEnd), Math.max(selectionStart, selectionEnd));
                     setCursorToTextPosition(toTextPosition(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY())));
+                    setFocus(UIInputNew.this);
                 }
             }
         });
@@ -285,14 +298,29 @@ public class UIInputNew extends UIDisplayContainerScrollable {
             }
         });
         
+        //focus listener for hiding/displaying the cursor
+        addFocusListener(new FocusListener() {
+            @Override
+            public void focusOn(UIDisplayElement element) {
+                if (!isDisabled()) {
+                    cursor.setVisible(true);
+                    selectionRectangle.fadeSelection(false);
+                }
+            }
+            
+            @Override
+            public void focusOff(UIDisplayElement element) {
+                cursor.setVisible(false);
+                selectionRectangle.fadeSelection(true);
+            }
+        });
+        
         text = new UIText();
         text.setVerticalAlign(EVerticalAlign.CENTER);
         text.setColor(Color.black);
         text.setVisible(true);
         
-        cursor = new UITextCursor(cursorSize);
-        cursor.setVisible(true);
-        
+        cursor = new UITextCursor(cursorSize);        
         selectionRectangle = new UISelection();
         
         addDisplayElement(text);

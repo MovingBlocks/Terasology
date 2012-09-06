@@ -52,9 +52,9 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
     private UIButton _cancelButton;
 
     private UIText _inputSeedLabel;
-    private UIInput _inputSeed;
+    private UIInputNew _inputSeed;
     private UIText _inputWorldTitleLabel;
-    private UIInput _inputWorldTitle;
+    private UIInputNew _inputWorldTitle;
     private UIText _chunkGeneratorLabel;
     private UIComboBox _chunkGenerator;
 
@@ -62,11 +62,17 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
         super("Create new world", new Vector2f(512f, 320f));
         setModal(true);
 
-        _inputSeed = new UIInput(new Vector2f(256f, 30f));
+        _inputSeed = new UIInputNew(new Vector2f(256f, 30f));
+        //_inputSeed.setBackgroundImage("engine:gui_menu", new Vector2f(0f, 90f), new Vector2f(256f, 30f));
+        _inputSeed.setBackgroundColor(0xFF, 0xFF, 0xFF, 1.0f);
+        _inputSeed.setBorderSolid(1, 0x00, 0x00, 0x00, 1.0f);
         _inputSeed.setVisible(true);
 
-        _inputWorldTitle = new UIInput(new Vector2f(256f, 30f));
-        _inputWorldTitle.setValue(getWorldName());
+        _inputWorldTitle = new UIInputNew(new Vector2f(256f, 30f));
+        //_inputWorldTitle.setBackgroundImage("engine:gui_menu", new Vector2f(0f, 90f), new Vector2f(256f, 30f));
+        _inputWorldTitle.setBackgroundColor(0xFF, 0xFF, 0xFF, 1.0f);
+        _inputWorldTitle.setBorderSolid(1, 0x00, 0x00, 0x00, 1.0f);
+        _inputWorldTitle.setText(getWorldName());
         _inputWorldTitle.setVisible(true);
         
         _inputSeedLabel = new UIText("Enter a seed (optional):");
@@ -84,7 +90,7 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
         _chunkGeneratorLabel.setSize(new Vector2f(0f, 16f));
         _chunkGeneratorLabel.setVisible(true);
 
-        _chunkGenerator = new UIComboBox(new Vector2f(176f, 22f), new Vector2f(175f, 64f));
+        _chunkGenerator = new UIComboBox(new Vector2f(176f, 22f), new Vector2f(176f, 64f));
         _chunkGenerator.addItem("Normal", new Integer(0));
         _chunkGenerator.addItem("Flat", new Integer(1));
         _chunkGenerator.setSelectedItemIndex(0);
@@ -108,26 +114,26 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
             @Override
             public void click(UIDisplayElement element, int button) {
                 //validation of the input
-                if (_inputWorldTitle.getValue().isEmpty()) {
+                if (_inputWorldTitle.getText().isEmpty()) {
                     GUIManager.getInstance().showMessage("Error", "Please enter a world name");
                     
                     return;
-                } else if ((new File(PathManager.getInstance().getWorldSavePath(_inputWorldTitle.getValue()), WorldInfo.DEFAULT_FILE_NAME)).exists()) {
+                } else if ((new File(PathManager.getInstance().getWorldSavePath(_inputWorldTitle.getText()), WorldInfo.DEFAULT_FILE_NAME)).exists()) {
                     GUIManager.getInstance().showMessage("Error", "A World with this name already exists");
                     
                     return;
                 }
                 
                 //set the world settings
-                if (_inputSeed.getValue().length() > 0) {
-                    Config.getInstance().setDefaultSeed(_inputSeed.getValue());
+                if (_inputSeed.getText().length() > 0) {
+                    Config.getInstance().setDefaultSeed(_inputSeed.getText());
                 } else {
                     FastRandom random = new FastRandom();
                     Config.getInstance().setDefaultSeed(random.randomCharacterString(32));
                 }
 
-                if (_inputWorldTitle.getValue().length() > 0) {
-                    Config.getInstance().setWorldTitle(_inputWorldTitle.getValue());
+                if (_inputWorldTitle.getText().length() > 0) {
+                    Config.getInstance().setWorldTitle(_inputWorldTitle.getText());
                 } else {
                     Config.getInstance().setWorldTitle(getWorldName());
                 }
