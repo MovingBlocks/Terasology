@@ -43,7 +43,7 @@ import org.terasology.rendering.gui.widgets.UIBuff;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UIItemCell;
 import org.terasology.rendering.gui.widgets.UIItemContainer;
-import org.terasology.rendering.gui.widgets.UIText;
+import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIWindow;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.world.WorldRenderer;
@@ -62,10 +62,10 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
     /* DISPLAY ELEMENTS */
     private final UIImage[] _hearts;
     private final UIImage crosshair;
-    private final UIText debugLine1;
-    private final UIText debugLine2;
-    private final UIText debugLine3;
-    private final UIText debugLine4;
+    private final UILabel debugLine1;
+    private final UILabel debugLine2;
+    private final UILabel debugLine3;
+    private final UILabel debugLine4;
 
     private final UIItemContainer toolbar;
     private final UIMinionbar minionbar;
@@ -105,13 +105,13 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
         crosshair.setVerticalAlign(EVerticalAlign.CENTER);
         crosshair.setVisible(true);
 
-        debugLine1 = new UIText();
+        debugLine1 = new UILabel();
         debugLine1.setPosition(new Vector2f(4, 4));
-        debugLine2 = new UIText();
+        debugLine2 = new UILabel();
         debugLine2.setPosition(new Vector2f(4, 22));
-        debugLine3 = new UIText();
+        debugLine3 = new UILabel();
         debugLine3.setPosition(new Vector2f(4, 38));
-        debugLine4 = new UIText();
+        debugLine4 = new UILabel();
         debugLine4.setPosition(new Vector2f(4, 54));
 
         toolbar = new UIItemContainer(9);

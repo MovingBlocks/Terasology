@@ -27,7 +27,7 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.widgets.UIButton;
 import org.terasology.rendering.gui.widgets.UIImage;
-import org.terasology.rendering.gui.widgets.UIText;
+import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIWindow;
 
 import javax.vecmath.Vector2f;
@@ -46,7 +46,7 @@ public class UIMenuPause extends UIWindow {
     final UIButton _respawnButton;
     final UIButton _backToGameButton;
 
-    final UIText _version;
+    final UILabel _version;
 
     public UIMenuPause() {
         setId("pause");
@@ -62,7 +62,7 @@ public class UIMenuPause extends UIWindow {
         _title.setPosition(new Vector2f(0f, 128f));
         _title.setVisible(true);
 
-        _version = new UIText("Pre Alpha");
+        _version = new UILabel("Pre Alpha");
         _version.setHorizontalAlign(EHorizontalAlign.CENTER);
         _version.setPosition(new Vector2f(0f, 230f));
         _version.setVisible(true);

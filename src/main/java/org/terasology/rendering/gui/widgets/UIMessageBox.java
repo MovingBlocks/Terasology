@@ -22,7 +22,7 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 
 public class UIMessageBox extends UIDialogBox {
-    private UIText infoText;
+    private UILabel infoText;
     private UIButton buttonOk;
 
     private final Vector2f minSize = new Vector2f(384f, 128f);
@@ -38,7 +38,7 @@ public class UIMessageBox extends UIDialogBox {
         buttonOk.getLabel().setText("Ok");
         buttonOk.setVisible(true);
 
-        infoText = new UIText(text);
+        infoText = new UILabel(text);
         infoText.setVisible(true);
         infoText.setColor(Color.black);
 

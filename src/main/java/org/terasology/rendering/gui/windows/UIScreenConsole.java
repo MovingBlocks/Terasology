@@ -47,7 +47,8 @@ import org.terasology.logic.console.GroovyHelp;
 import org.terasology.logic.console.GroovyHelpManager;
 import org.terasology.logic.console.GroovyManager;
 import org.terasology.rendering.gui.widgets.UIText;
-import org.terasology.rendering.gui.widgets.UITextWrap;
+import org.terasology.rendering.gui.widgets.UILabel;
+import org.terasology.rendering.gui.widgets.UILabelWrap;
 import org.terasology.rendering.gui.widgets.UIWindow;
 import org.terasology.utilities.StringConstants;
 
@@ -61,8 +62,9 @@ import org.terasology.utilities.StringConstants;
 public final class UIScreenConsole extends UIWindow {
 
     private Logger logger = Logger.getLogger(getClass().getName());
-    private final UIText _consoleText;
-    private final UITextWrap _helpText;
+    private final UILabel _consoleText;
+    private final UILabelWrap _helpText;
+    public final String newLine = System.getProperty("line.separator");
 
     private final StringBuffer _consoleInput = new StringBuffer();
     private final ArrayList<String> _ringBuffer = new ArrayList<String>();
@@ -84,11 +86,11 @@ public final class UIScreenConsole extends UIWindow {
 
         //setScrollBarsPosition(new Vector2f(Display.getWidth() / 2,Display.getHeight() / 2),new Vector2f(0.5f,0.5f));
 
-        _consoleText = new UIText();
+        _consoleText = new UILabel();
         _consoleText.setVisible(true);
         addDisplayElement(_consoleText);
 
-        _helpText = new UITextWrap();
+        _helpText = new UILabelWrap();
         _helpText.setColor(Color.green);
         //_helpText.setSize(new Vector2f(0.5f,0.5f));
         _helpText.setVisible(true);

@@ -29,7 +29,7 @@ import org.terasology.rendering.gui.widgets.UIButton;
 import org.terasology.rendering.gui.widgets.UIComposite;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UISlider;
-import org.terasology.rendering.gui.widgets.UIText;
+import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIWindow;
 
 import javax.vecmath.Vector2f;
@@ -46,7 +46,7 @@ public class UIMenuConfigControls extends UIWindow {
     UIButton editButton = null;
     final UIImage title;
 
-    final UIText ForwardButtontext,
+    final UILabel ForwardButtontext,
             BackwardButtontext,
             AttackButtontext,
             ConsoleButtontext,
@@ -109,7 +109,7 @@ public class UIMenuConfigControls extends UIWindow {
     final UIComposite group4;
     
     final UISlider MouseSensitivity;
-    final UIText subtitle;
+    final UILabel subtitle;
 
     public UIMenuConfigControls() {
         setId("config:controls");
@@ -134,7 +134,7 @@ public class UIMenuConfigControls extends UIWindow {
         title.setPosition(new Vector2f(0f, 28f));
         title.setVisible(true);
 
-        subtitle = new UIText("Control Settings");
+        subtitle = new UILabel("Control Settings");
         subtitle.setHorizontalAlign(EHorizontalAlign.CENTER);
         subtitle.setPosition(new Vector2f(0f, 128f));
         subtitle.setVisible(true);
@@ -259,60 +259,60 @@ public class UIMenuConfigControls extends UIWindow {
         });
 
         //labels
-        ForwardButtontext = new UIText("Forward");
+        ForwardButtontext = new UILabel("Forward");
         ForwardButtontext.setVisible(true);
-        BackwardButtontext = new UIText("Backward");
+        BackwardButtontext = new UILabel("Backward");
         BackwardButtontext.setVisible(true);
-        RightButtontext = new UIText("Right");
+        RightButtontext = new UILabel("Right");
         RightButtontext.setVisible(true);
-        LeftButtontext = new UIText("Left");
+        LeftButtontext = new UILabel("Left");
         LeftButtontext.setVisible(true);
 
-        UsehelditemButtontext = new UIText("Use Item");
+        UsehelditemButtontext = new UILabel("Use Item");
         UsehelditemButtontext.setVisible(true);
-        AttackButtontext = new UIText("Attack");
+        AttackButtontext = new UILabel("Attack");
         AttackButtontext.setVisible(true);
-        ToolnextButtontext = new UIText("Next Item");
+        ToolnextButtontext = new UILabel("Next Item");
         ToolnextButtontext.setVisible(true);
-        ToolprevButtontext = new UIText("Previous Item");
+        ToolprevButtontext = new UILabel("Previous Item");
         ToolprevButtontext.setVisible(true);
 
-        ActivateButtontext = new UIText("Activate");    // (frob)
+        ActivateButtontext = new UILabel("Activate");    // (frob)
         ActivateButtontext.setVisible(true);            // (frob)
-        JumpButtontext = new UIText("Jump");
+        JumpButtontext = new UILabel("Jump");
         JumpButtontext.setVisible(true);
-        RunButtontext = new UIText("Run");
+        RunButtontext = new UILabel("Run");
         RunButtontext.setVisible(true);
-        CrouchButtontext = new UIText("Crouch");
+        CrouchButtontext = new UILabel("Crouch");
         CrouchButtontext.setVisible(true);
-        InventoryButtontext = new UIText("Inventory");
+        InventoryButtontext = new UILabel("Inventory");
         InventoryButtontext.setVisible(true);
-        PauseButtontext = new UIText("Pause");
+        PauseButtontext = new UILabel("Pause");
         PauseButtontext.setVisible(true);
-        HideguiButtontext = new UIText("Hide HUD");
+        HideguiButtontext = new UILabel("Hide HUD");
         HideguiButtontext.setVisible(true);
-        MinionmodeButtontext = new UIText("Minion mode");
+        MinionmodeButtontext = new UILabel("Minion mode");
         MinionmodeButtontext.setVisible(true);
-        ConsoleButtontext = new UIText("Console");
+        ConsoleButtontext = new UILabel("Console");
         ConsoleButtontext.setVisible(true);
 
-        Toolslot1Buttontext = new UIText("Hotkey 1");
+        Toolslot1Buttontext = new UILabel("Hotkey 1");
         Toolslot1Buttontext.setVisible(true);
-        Toolslot2Buttontext = new UIText("Hotkey 2");
+        Toolslot2Buttontext = new UILabel("Hotkey 2");
         Toolslot2Buttontext.setVisible(true);
-        Toolslot3Buttontext = new UIText("Hotkey 3");
+        Toolslot3Buttontext = new UILabel("Hotkey 3");
         Toolslot3Buttontext.setVisible(true);
-        Toolslot4Buttontext = new UIText("Hotkey 4");
+        Toolslot4Buttontext = new UILabel("Hotkey 4");
         Toolslot4Buttontext.setVisible(true);
-        Toolslot5Buttontext = new UIText("Hotkey 5");
+        Toolslot5Buttontext = new UILabel("Hotkey 5");
         Toolslot5Buttontext.setVisible(true);
-        Toolslot6Buttontext = new UIText("Hotkey 6");
+        Toolslot6Buttontext = new UILabel("Hotkey 6");
         Toolslot6Buttontext.setVisible(true);
-        Toolslot7Buttontext = new UIText("Hotkey 7");
+        Toolslot7Buttontext = new UILabel("Hotkey 7");
         Toolslot7Buttontext.setVisible(true);
-        Toolslot8Buttontext = new UIText("Hotkey 8");
+        Toolslot8Buttontext = new UILabel("Hotkey 8");
         Toolslot8Buttontext.setVisible(true);
-        Toolslot9Buttontext = new UIText("Hotkey 9");
+        Toolslot9Buttontext = new UILabel("Hotkey 9");
         Toolslot9Buttontext.setVisible(true);
         
         GridLayout layout = new GridLayout(4);

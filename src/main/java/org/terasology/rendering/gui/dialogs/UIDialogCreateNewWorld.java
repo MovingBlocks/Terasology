@@ -51,41 +51,41 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
     private UIButton _okButton;
     private UIButton _cancelButton;
 
-    private UIText _inputSeedLabel;
-    private UIInputNew _inputSeed;
-    private UIText _inputWorldTitleLabel;
-    private UIInputNew _inputWorldTitle;
-    private UIText _chunkGeneratorLabel;
+    private UILabel _inputSeedLabel;
+    private UIText _inputSeed;
+    private UILabel _inputWorldTitleLabel;
+    private UIText _inputWorldTitle;
+    private UILabel _chunkGeneratorLabel;
     private UIComboBox _chunkGenerator;
 
     public UIDialogCreateNewWorld() {
         super("Create new world", new Vector2f(512f, 320f));
         setModal(true);
 
-        _inputSeed = new UIInputNew(new Vector2f(256f, 30f));
+        _inputSeed = new UIText(new Vector2f(256f, 30f));
         //_inputSeed.setBackgroundImage("engine:gui_menu", new Vector2f(0f, 90f), new Vector2f(256f, 30f));
         _inputSeed.setBackgroundColor(0xFF, 0xFF, 0xFF, 1.0f);
         _inputSeed.setBorderSolid(1, 0x00, 0x00, 0x00, 1.0f);
         _inputSeed.setVisible(true);
 
-        _inputWorldTitle = new UIInputNew(new Vector2f(256f, 30f));
+        _inputWorldTitle = new UIText(new Vector2f(256f, 30f));
         //_inputWorldTitle.setBackgroundImage("engine:gui_menu", new Vector2f(0f, 90f), new Vector2f(256f, 30f));
         _inputWorldTitle.setBackgroundColor(0xFF, 0xFF, 0xFF, 1.0f);
         _inputWorldTitle.setBorderSolid(1, 0x00, 0x00, 0x00, 1.0f);
         _inputWorldTitle.setText(getWorldName());
         _inputWorldTitle.setVisible(true);
         
-        _inputSeedLabel = new UIText("Enter a seed (optional):");
+        _inputSeedLabel = new UILabel("Enter a seed (optional):");
         _inputSeedLabel.setColor(Color.darkGray);
         _inputSeedLabel.setSize(new Vector2f(0f, 16f));
         _inputSeedLabel.setVisible(true);
 
-        _inputWorldTitleLabel = new UIText("Enter a world name:");
+        _inputWorldTitleLabel = new UILabel("Enter a world name:");
         _inputWorldTitleLabel.setColor(Color.darkGray);
         _inputWorldTitleLabel.setSize(new Vector2f(0f, 16f));
         _inputWorldTitleLabel.setVisible(true);
         
-        _chunkGeneratorLabel = new UIText("Choose Chunk Generator:");
+        _chunkGeneratorLabel = new UILabel("Choose Chunk Generator:");
         _chunkGeneratorLabel.setColor(Color.darkGray);
         _chunkGeneratorLabel.setSize(new Vector2f(0f, 16f));
         _chunkGeneratorLabel.setVisible(true);

@@ -57,14 +57,14 @@ public class UIList extends UIDisplayContainerScrollable implements IInputDataEl
         private boolean isSelected;
         private final Vector2f padding = new Vector2f(5f, 10f);
 
-        private final UIText label;
+        private final UILabel label;
 
         public UIListItem(float height, String text, Object value) {
             setSize("100%", height + "px");
             this.text = text;
             this.value = value;
 
-            label = new UIText();
+            label = new UILabel();
             label.setVisible(true);
             label.setColor(Color.lightGray);
             label.setPosition(new Vector2f((getPosition().x + padding.x), (getPosition().y + padding.y)));

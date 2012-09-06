@@ -46,12 +46,12 @@ public class UIDialogBox extends UIWindow {
         private UIImage leftBackground;
         private UIImage centerBackground;
         private UIImage rightBackground;
-        private UIText text;
+        private UILabel text;
 
         public UIDialogBackground(Vector2f size, String title) {
             setSize(size);
             
-            text = new UIText();
+            text = new UILabel();
             text.setColor(Color.orange);
             text.setVisible(true);
             

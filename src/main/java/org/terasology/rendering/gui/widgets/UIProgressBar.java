@@ -31,7 +31,7 @@ import org.terasology.rendering.gui.framework.UIDisplayContainer;
  */
 public class UIProgressBar extends UIDisplayContainer {
 
-    private UIText         label;
+    private UILabel         label;
     private int            value;
     private UIProgressLine progressLine;
     
@@ -55,7 +55,7 @@ public class UIProgressBar extends UIDisplayContainer {
         setSize(new Vector2f(256f, 15f));
         setBackgroundImage("engine:gui_menu", new Vector2f(0f, 175f), new Vector2f(256f, 15f));
         
-        label = new UIText();
+        label = new UILabel();
         label.setColor(Color.black);
         label.setCrop(false);
         label.setHorizontalAlign(EHorizontalAlign.CENTER);

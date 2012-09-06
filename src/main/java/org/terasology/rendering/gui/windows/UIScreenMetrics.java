@@ -27,7 +27,7 @@ import java.util.TreeSet;
 import javax.vecmath.Vector2f;
 
 import org.terasology.performanceMonitor.PerformanceMonitor;
-import org.terasology.rendering.gui.widgets.UIText;
+import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIWindow;
 
 /**
@@ -44,8 +44,8 @@ public class UIScreenMetrics extends UIWindow {
     private Mode _currentMode = Mode.Off;
 
     /* DISPLAY ELEMENTS */
-    private final UIText _headerLine;
-    private final List<UIText> _metricLines;
+    private final UILabel _headerLine;
+    private final List<UILabel> _metricLines;
 
     /**
      * Init. the HUD.
@@ -53,12 +53,12 @@ public class UIScreenMetrics extends UIWindow {
     public UIScreenMetrics() {
         setId("metrics");
         setSize(new Vector2f(100, 300));
-        _headerLine = new UIText();
+        _headerLine = new UILabel();
         _headerLine.setPosition(new Vector2f(4, 70));
         addDisplayElement(_headerLine);
-        _metricLines = new ArrayList<UIText>();
+        _metricLines = new ArrayList<UILabel>();
         for (int i = 0; i < METRIC_LINES; ++i) {
-            UIText line = new UIText();
+            UILabel line = new UILabel();
             line.setPosition(new Vector2f(4, 86 + 16 * i));
             _metricLines.add(line);
             addDisplayElement(line);
@@ -94,8 +94,8 @@ public class UIScreenMetrics extends UIWindow {
     private enum Mode {
         Off("", false) {
             @Override
-            public void updateLines(List<UIText> lines) {
-                for (UIText line : lines) {
+            public void updateLines(List<UILabel> lines) {
+                for (UILabel line : lines) {
                     line.setVisible(false);
                 }
             }
@@ -103,19 +103,19 @@ public class UIScreenMetrics extends UIWindow {
 
         RunningMean("Running Means", true) {
             @Override
-            public void updateLines(List<UIText> lines) {
+            public void updateLines(List<UILabel> lines) {
                 displayMetrics(PerformanceMonitor.getRunningMean(), lines);
             }
         },
         DecayingSpikes("Spikes", true) {
             @Override
-            public void updateLines(List<UIText> lines) {
+            public void updateLines(List<UILabel> lines) {
                 displayMetrics(PerformanceMonitor.getDecayingSpikes(), lines);
             }
         },
         RunningThreads("Running Threads", true) {
             @Override
-            public void updateLines(List<UIText> lines) {
+            public void updateLines(List<UILabel> lines) {
                 final SortedSet<String> threads = new TreeSet<String>();
                 PerformanceMonitor.getRunningThreads().forEachEntry(new TObjectIntProcedure<String>() {
                     public boolean execute(String s, int i) {
@@ -144,7 +144,7 @@ public class UIScreenMetrics extends UIWindow {
             this.visible = visible;
         }
 
-        public abstract void updateLines(List<UIText> lines);
+        public abstract void updateLines(List<UILabel> lines);
 
         public static Mode nextMode(Mode current) {
             switch (current) {
@@ -159,13 +159,13 @@ public class UIScreenMetrics extends UIWindow {
             }
         }
 
-        private static void displayMetrics(TObjectDoubleMap<String> metrics, List<UIText> lines) {
+        private static void displayMetrics(TObjectDoubleMap<String> metrics, List<UILabel> lines) {
             final List<String> activities = new ArrayList<String>();
             final List<Double> values = new ArrayList<Double>();
             sortMetrics(metrics, activities, values);
 
             for (int i = 0; i < lines.size() && i < activities.size(); ++i) {
-                UIText line = lines.get(i);
+                UILabel line = lines.get(i);
                 line.setVisible(true);
                 line.setText(String.format("%s: %.2fms", activities.get(i), values.get(i)));
             }

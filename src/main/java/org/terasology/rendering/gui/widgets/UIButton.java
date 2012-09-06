@@ -39,7 +39,7 @@ import org.terasology.rendering.gui.framework.events.MouseMoveListener;
  */
 public class UIButton extends UIDisplayContainer {
 
-    private final UIText _label;
+    private final UILabel _label;
     
     public enum eButtonType {NORMAL, TOGGLE};
     private boolean _toggleState = false;
@@ -126,7 +126,7 @@ public class UIButton extends UIDisplayContainer {
             }
         });
         
-        _label = new UIText("Untitled");
+        _label = new UILabel("Untitled");
         _label.addChangedListener(new ChangedListener() {
             @Override
             public void changed(UIDisplayElement element) {
@@ -140,7 +140,7 @@ public class UIButton extends UIDisplayContainer {
         addDisplayElement(_label);
     }
 
-    public UIText getLabel() {
+    public UILabel getLabel() {
         return _label;
     }
     

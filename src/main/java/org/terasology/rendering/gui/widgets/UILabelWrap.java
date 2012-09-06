@@ -41,16 +41,16 @@ import org.terasology.utilities.StringConstants;
  * TODO this is directly bind to the debug console? If so it should not work this way. Make an abstract widget out of this, which can also be used in other places.
  * @deprecated
  */
-public class UITextWrap extends UIText {
+public class UILabelWrap extends UILabel {
 
     private long currentpos = 0;
 
-    public UITextWrap() {
+    public UILabelWrap() {
         super();
         setup();
     }
 
-    public UITextWrap(String text) {
+    public UILabelWrap(String text) {
         super(text);
         setup();
 

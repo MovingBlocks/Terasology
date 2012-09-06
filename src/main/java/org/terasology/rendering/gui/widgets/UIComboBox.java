@@ -35,7 +35,7 @@ import org.terasology.rendering.gui.framework.events.MouseMoveListener;
  */
 public class UIComboBox extends UIDisplayContainer {
     
-    private UIInputNew baseInput;
+    private UIText baseInput;
     private UIButton baseButton;
     private UIList   baseList;
 
@@ -62,7 +62,7 @@ public class UIComboBox extends UIDisplayContainer {
         setSize(size);
         opened = false;
         
-        baseInput = new UIInputNew(size);
+        baseInput = new UIText(size);
         baseInput.setVisible(true);
         baseInput.setBackgroundColor(0xFF, 0xFF, 0xFF, 1.0f);
         baseInput.setBorderSolid(1, 0x00, 0x00, 0x00, 1.0f);

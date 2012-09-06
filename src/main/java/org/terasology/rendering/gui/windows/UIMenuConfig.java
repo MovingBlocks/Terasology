@@ -23,7 +23,7 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.widgets.UIButton;
 import org.terasology.rendering.gui.widgets.UIImage;
-import org.terasology.rendering.gui.widgets.UIText;
+import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIWindow;
 
 /**
@@ -35,7 +35,7 @@ import org.terasology.rendering.gui.widgets.UIWindow;
 public class UIMenuConfig extends UIWindow {
 
     final UIImage _title;
-    final UIText _version;
+    final UILabel _version;
 
     private final UIButton _backToMainMenuButton;
     private final UIButton _videoButton;
@@ -55,7 +55,7 @@ public class UIMenuConfig extends UIWindow {
         _title.setVisible(true);
         _title.setSize(new Vector2f(512f, 128f));
 
-        _version = new UIText("Settings");
+        _version = new UILabel("Settings");
         _version.setHorizontalAlign(EHorizontalAlign.CENTER);
         _version.setPosition(new Vector2f(0f, 230f));
         _version.setVisible(true);

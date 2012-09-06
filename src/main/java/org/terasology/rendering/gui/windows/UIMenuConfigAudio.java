@@ -25,7 +25,7 @@ import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.widgets.UIButton;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UISlider;
-import org.terasology.rendering.gui.widgets.UIText;
+import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIWindow;
 
 import javax.vecmath.Vector2f;
@@ -38,7 +38,7 @@ import javax.vecmath.Vector2f;
 public class UIMenuConfigAudio extends UIWindow {
 
     final UIImage _title;
-    final UIText _version;
+    final UILabel _version;
     
     private final UISlider _soundOptionSlider;
     private final UISlider _musicOptionSlider;
@@ -58,7 +58,7 @@ public class UIMenuConfigAudio extends UIWindow {
         _title.setVisible(true);
         _title.setSize(new Vector2f(512f, 128f));
 
-        _version = new UIText("Audio Settings");
+        _version = new UILabel("Audio Settings");
         _version.setHorizontalAlign(EHorizontalAlign.CENTER);
         _version.setPosition(new Vector2f(0f, 230f));
         _version.setVisible(true);

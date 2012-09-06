@@ -27,7 +27,7 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.WindowListener;
 import org.terasology.rendering.gui.widgets.UIButton;
-import org.terasology.rendering.gui.widgets.UIText;
+import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIWindow;
 
 /**
@@ -38,7 +38,7 @@ import org.terasology.rendering.gui.widgets.UIWindow;
  */
 public class UIScreenDeath extends UIWindow {
 
-    private final UIText _meassage;
+    private final UILabel _meassage;
     private final UIButton _respawnButton;
     private final UIButton _exitButton;
     private final UIButton _mainMenuButton;
@@ -62,7 +62,7 @@ public class UIScreenDeath extends UIWindow {
             }
         });
         
-        _meassage = new UIText("You are dead");
+        _meassage = new UILabel("You are dead");
         _meassage.setHorizontalAlign(EHorizontalAlign.CENTER);
         _meassage.setPosition(new Vector2f(0f, 300f));
         _meassage.setVisible(true);
