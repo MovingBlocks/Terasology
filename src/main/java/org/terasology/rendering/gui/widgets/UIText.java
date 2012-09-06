@@ -46,7 +46,7 @@ import org.terasology.rendering.gui.framework.events.SelectionChangedListener;
 
 /**
  * A text area which can be used as a single line input box, multi line input box or for just displaying large texts.
- * The constant is scrollable and it also supports text wrapping in multi line mode. Moreover it supports the usual text editing, like selecting text and copy & paste.
+ * The content is scrollable and it also supports text wrapping in multi line mode. Moreover it supports the usual text editing, like selecting text and copy & paste.
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
 public class UIText extends UIDisplayContainerScrollable {
@@ -58,9 +58,9 @@ public class UIText extends UIDisplayContainerScrollable {
         is an actual position on the display where things get drawn. The 'text position' is an index of the string which is displayed. The methods 
         'toDisplayPosition' and 'toTextPosition' can convert one position into the other.
         
-        The 'toDisplayPosition' method simply uses the 'calcTextHeight' and 'calcTextWidth' methods to calculate the position.
-        The 'toTextPosition' also uses 'calcTextHeight' and 'calcTextWidth' and loops through the whole, or just to a part of the text which is
-        displayed and checks if the right position is reached.
+        The 'toDisplayPosition' method simply uses the 'calcTextHeight' and 'calcTextWidth' methods to calculate the display position.
+        The 'toTextPosition' also uses 'calcTextHeight' and 'calcTextWidth' to calculate the text position by looping through the whole, 
+        or just to a part of the text which is displayed and checks if the right position is reached.
        
        2. Explanation of text wrapping
        
