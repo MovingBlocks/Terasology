@@ -1,4 +1,5 @@
 {
     "id" : "minerals",
-    "displayName" : "Metouto's Mineral Pack"
+    "displayName" : "Metouto's Mineral Pack",
+    "author" : "Metouto"
 }

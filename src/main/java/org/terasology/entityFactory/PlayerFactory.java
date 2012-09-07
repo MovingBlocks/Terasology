@@ -60,15 +60,15 @@ public class PlayerFactory {
         chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("core:Tnt"), 99)));
         chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("core:Bookcase"), 1)));
 
-        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:ClaySlope"), 99)));
-        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:ClaySteepSlope"), 99)));
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:clay:engine:slope"), 99)));
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:clay:engine:steepslope"), 99)));
         chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:StoneStair"), 99)));
-        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:MarbleStair"), 99)));
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:marble:engine:stair"), 99)));
 
         chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:Marble"), 99)));
-        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:MarbleSphere"), 99)));
-        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:MarbleSlope"), 99)));
-        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:MarbleSteepSlope"), 99)));
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:marble:engine:testsphere"), 99)));
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:marble:engine:slope"), 99)));
+        chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:marble:engine:steepslope"), 99)));
 
         chestContents.send(new ReceiveItemEvent(entityManager.create("core:purplepotion")));
         chestContents.send(new ReceiveItemEvent(entityManager.create("core:greenpotion")));
