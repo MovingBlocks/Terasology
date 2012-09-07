@@ -33,7 +33,7 @@ ext {
     mainClassName = 'org.terasology.game.Terasology'
     jarFileName = 'Terasology.jar'
     env = System.getenv() // read environment variables, including variables passed by jenking continuous integration server
-    versionInfoFile = new File(sourceSets.main.output.resourcesDir, 'org/terasology/versionInfo.properties')
+    versionInfoFile = new File(sourceSets.main.output.resourcesDir, 'org/terasology/version/versionInfo.properties')
 }
 
 repositories {
