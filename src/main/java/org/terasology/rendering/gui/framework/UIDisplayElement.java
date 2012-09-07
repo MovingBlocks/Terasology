@@ -234,8 +234,6 @@ public abstract class UIDisplayElement {
             if (focusedElement != null) {
                 focusedElement.notifyFocusListeners(true);
             }
-            
-            System.out.println(focusedElement);
         }
     }
 
