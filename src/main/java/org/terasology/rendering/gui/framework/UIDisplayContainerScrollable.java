@@ -244,6 +244,8 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
         } else {
             container.addDisplayElement(element);
         }
+        
+        layout();
     }
     
     @Override
@@ -251,7 +253,7 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
         container.getDisplayElements().remove(element);
         element.setParent(null);
         
-        calcContentHeight();
+        layout();
     }
     
     @Override
@@ -261,7 +263,7 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
         }
         container.getDisplayElements().clear();
         
-        calcContentHeight();
+        layout();
     }
     
     /**
@@ -313,7 +315,7 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
     public void setEnableScrollbar(boolean enable) {
         this.enableScrollbar = enable;
         
-        calcContentHeight();
+        layout();
     }
     
     /**
@@ -333,7 +335,7 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
         
         container.setPosition(new Vector2f(padding.w, padding.x));
         
-        calcContentHeight();
+        layout();
     }
     
     /**

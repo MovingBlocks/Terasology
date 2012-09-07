@@ -23,7 +23,6 @@ import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.world.WorldInfo;
 import org.terasology.world.WorldUtil;
-import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.widgets.UIButton;
@@ -59,7 +58,8 @@ public class UIMenuSelectWorld extends UIWindow {
         setModal(true);
         maximize();
 
-        list = new UIList(new Vector2f(512f, 256f));
+        list = new UIList();
+        list.setSize(new Vector2f(512f, 256f));
         list.setBorderSolid(2f, 0x1E, 0x1E, 0x1E, 1.0f);
         list.setBackgroundImage("engine:gui_menu", new Vector2f(264f, 18f), new Vector2f(159f, 63f));
         list.setBorderImage("engine:gui_menu", new Vector2f(256f, 0f), new Vector2f(175f, 88f), new Vector4f(16f, 7f, 7f, 7f));
@@ -102,16 +102,16 @@ public class UIMenuSelectWorld extends UIWindow {
         deleteFromList.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                if (list.getSelectedItem() == null) {
+                if (list.getSelection() == null) {
                     GUIManager.getInstance().showMessage("Error", "Please choose a world first.");
                     return;
                 }
 
                 try {
-                    WorldInfo worldInfo = (WorldInfo) list.getSelectedItem().getValue();
+                    WorldInfo worldInfo = (WorldInfo) list.getSelection().getValue();
                     File world = PathManager.getInstance().getWorldSavePath(worldInfo.getTitle());
                     WorldUtil.deleteWorld(world);
-                    list.removeSelectedItem();
+                    list.removeItem(list.getSelectionIndex());
                 } catch (Exception e) {
                     GUIManager.getInstance().showMessage("Error", "Failed deleting world data object. Sorry.");
                 }
@@ -144,18 +144,18 @@ public class UIMenuSelectWorld extends UIWindow {
 
     private void loadSelectedWorld() {
 
-        if (list.size() < 1) {
+        if (list.getItemCount() < 1) {
             GUIManager.getInstance().showMessage("Error", "You did not create a world yet!");
             return;
         }
 
-        if (list.getSelectedItem() == null) {
+        if (list.getSelection() == null) {
             GUIManager.getInstance().showMessage("Error", "Please choose a world!");
             return;
         }
 
         try {
-            WorldInfo info = (WorldInfo) list.getSelectedItem().getValue();
+            WorldInfo info = (WorldInfo) list.getSelection().getValue();
             Config.getInstance().setDefaultSeed(info.getSeed());
             Config.getInstance().setWorldTitle(info.getTitle());
             Config.getInstance().setChunkGenerator(info.getChunkGenerators());
@@ -194,6 +194,6 @@ public class UIMenuSelectWorld extends UIWindow {
     }
     
     public int getWorldCount() {
-        return list.size();
+        return list.getItemCount();
     }
 }

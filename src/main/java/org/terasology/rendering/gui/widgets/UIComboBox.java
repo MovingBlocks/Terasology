@@ -130,7 +130,8 @@ public class UIComboBox extends UIDisplayContainer {
             }
         });
 
-        baseList = new UIList(listSize);
+        baseList = new UIList();
+        baseList.setSize(listSize);
         baseList.setPosition(new Vector2f(0f, size.y));
         baseList.setBorderSolid(1f, 0x00, 0x00, 0x00, 1.0f);
         baseList.setBackgroundColor(0xFF, 0xFF, 0xFF, 1.0f);
@@ -138,8 +139,8 @@ public class UIComboBox extends UIDisplayContainer {
         baseList.addChangedListener(new ChangedListener() {    
             @Override
             public void changed(UIDisplayElement element) {
-                if (baseList.getSelectedItem() != null) {
-                    baseInput.setText(baseList.getSelectedItem().getText());
+                if (baseList.getSelection() != null) {
+                    baseInput.setText(baseList.getSelection().getText());
                 }
                 opened = false;
                 baseList.setVisible(opened);
@@ -158,10 +159,10 @@ public class UIComboBox extends UIDisplayContainer {
     
     /**
      * Select an specific item in the list.
-     * @param i The item to select.
+     * @param index The item to select.
      */
-    public void setSelectedItemIndex(int i) {
-        baseList.setSelectedItemIndex(i);
+    public void setSelectedItemIndex(int index) {
+        baseList.select(index);
     }
     
     /**
@@ -169,7 +170,7 @@ public class UIComboBox extends UIDisplayContainer {
      * @return Returns the selected item.
      */
     public int getSelectedItemIndex() {
-        return baseList.getSelectedItemIndex();
+        return baseList.getSelectionIndex();
     }
     
     /**
@@ -178,6 +179,10 @@ public class UIComboBox extends UIDisplayContainer {
      * @see UIList
      */
     public Object getValue() {
-        return baseList.getValue();
+        if (baseList.getSelection() != null) {
+            return baseList.getSelection().getValue();
+        }
+        
+        return null;
     }
 }
