@@ -37,9 +37,9 @@ import com.google.common.base.Objects;
  * @author Immortius
  */
 public class BlockUri implements Comparable<BlockUri> {
-    private static final String PACKAGE_SEPARATOR = ":";
-    private static final String IDENTIFIER_SEPARATOR = ".";
-    private static final String IDENTIFIER_SEPARATOR_REGEX = "\\.";
+    public static final String PACKAGE_SEPARATOR = ":";
+    public static final String IDENTIFIER_SEPARATOR = ".";
+    public static final String IDENTIFIER_SEPARATOR_REGEX = "\\.";
 
     private String packageName = "";
     private String familyName = "";

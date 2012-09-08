@@ -24,8 +24,8 @@ import com.google.common.base.Objects;
  * @author Immortius
  */
 public final class AssetUri implements Comparable<AssetUri> {
-    private static final String TYPE_SPLIT = ":";
-    private static final String PACKAGE_SPLIT = ":";
+    public static final String TYPE_SEPARATOR = ":";
+    public static final String PACKAGE_SEPARATOR = ":";
 
     private AssetType type;
     private String packageName = "";
@@ -42,7 +42,7 @@ public final class AssetUri implements Comparable<AssetUri> {
 
     public AssetUri(AssetType type, String simpleUri) {
         this.type = type;
-        String[] split = simpleUri.toLowerCase(Locale.ENGLISH).split(PACKAGE_SPLIT, 2);
+        String[] split = simpleUri.toLowerCase(Locale.ENGLISH).split(PACKAGE_SEPARATOR, 2);
         if (split.length > 1) {
             packageName = split[0];
             assetName = split[1];
@@ -51,10 +51,10 @@ public final class AssetUri implements Comparable<AssetUri> {
 
     public AssetUri(String uri) {
         // TODO: handle incomplete/relative uris?
-        String[] typeSplit = uri.split(TYPE_SPLIT, 2);
+        String[] typeSplit = uri.split(TYPE_SEPARATOR, 2);
         if (typeSplit.length > 1) {
             type = AssetType.getTypeForId(typeSplit[0]);
-            String[] packageSplit = typeSplit[1].split(PACKAGE_SPLIT, 2);
+            String[] packageSplit = typeSplit[1].split(PACKAGE_SEPARATOR, 2);
             if (packageSplit.length > 1) {
                 packageName = packageSplit[0];
                 assetName = packageSplit[1];
@@ -83,7 +83,7 @@ public final class AssetUri implements Comparable<AssetUri> {
         if (!isValid()) {
             return "";
         }
-        return type.getTypeId() + TYPE_SPLIT + packageName + PACKAGE_SPLIT + assetName;
+        return type.getTypeId() + TYPE_SEPARATOR + packageName + PACKAGE_SEPARATOR + assetName;
     }
 
     /**
@@ -93,7 +93,7 @@ public final class AssetUri implements Comparable<AssetUri> {
         if (!isValid()) {
             return "";
         }
-        return packageName + PACKAGE_SPLIT + assetName;
+        return packageName + PACKAGE_SEPARATOR + assetName;
     }
 
     @Override
