@@ -19,5 +19,5 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 
 
 public interface StateButtonAction {
-    public void action(UIDisplayElement element);
+	public void action(UIDisplayElement element);
 }

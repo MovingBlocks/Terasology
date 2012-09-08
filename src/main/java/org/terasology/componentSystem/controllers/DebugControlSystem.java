@@ -103,12 +103,7 @@ public class DebugControlSystem implements EventHandlerSystem {
                     entity.send(new DamageEvent(9999, null));
                     break;
                 case Keyboard.KEY_H:
-                	if (GUIManager.getInstance().getWindowById("engine:hud").isVisible()) {
-                		GUIManager.getInstance().getWindowById("engine:hud").close();
-                	} else {
-                		GUIManager.getInstance().getWindowById("engine:hud").open();
-                	}
-                	
+                    GUIManager.getInstance().getWindowById("engine:hud").setVisible(!GUIManager.getInstance().getWindowById("engine:hud").isVisible());
                     event.consume();
                     break;
             }

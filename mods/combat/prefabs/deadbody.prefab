@@ -1,0 +1,18 @@
+{
+    "name" : "combat:deadbody",
+    "BoxShape" : {
+        "extents" : [1, 1, 1]
+    }, "Location" : {},
+    
+    "RigidBody" : {
+        "mass" : 40,
+        "restitution" : 1,
+        "friction" : 1,
+        "velocity" : 0.00125f;
+        "collisionGroup" : "engine:world",
+        "collidesWith" : ["engine:world","engine:debris","engine:sensor","engine:character","engine:static"]       
+    },
+    "Lifespan" : {
+        "lifespan" : 30
+    }
+}

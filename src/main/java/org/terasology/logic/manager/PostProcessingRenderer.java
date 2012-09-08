@@ -127,9 +127,8 @@ public class PostProcessingRenderer {
     public PostProcessingRenderer() {
         _extensionsAvailable = GLContext.getCapabilities().GL_ARB_framebuffer_object;
 
-        if (_extensionsAvailable) {
+        if (_extensionsAvailable)
             initialize();
-        }
     }
 
     public void initialize() {
@@ -180,12 +179,10 @@ public class PostProcessingRenderer {
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
 
-        if (hdr) {
+        if (hdr)
             GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, ARBTextureFloat.GL_RGBA16F_ARB, width, height, 0, GL11.GL_RGBA, ARBHalfFloatPixel.GL_HALF_FLOAT_ARB, (java.nio.ByteBuffer) null);
-        }
-        else {
+        else
             GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (java.nio.ByteBuffer) null);
-        }
 
         if (depth) {
             // Generate the depth texture
@@ -243,28 +240,23 @@ public class PostProcessingRenderer {
 
         }
 
-        if (_sceneLuminance > 0.0f) {// No division by zero
+        if (_sceneLuminance > 0.0f) // No division by zero
             _exposure = (float) TeraMath.lerp(_exposure, TARGET_LUMINANCE / _sceneLuminance, ADJUSTMENT_SPEED);
-        }
 
         float maxExposure = MAX_EXPOSURE;
 
-        if (CoreRegistry.get(WorldRenderer.class).getSkysphere().getDaylight() == 0.0) {
+        if (CoreRegistry.get(WorldRenderer.class).getSkysphere().getDaylight() == 0.0)
             maxExposure = MAX_EXPOSURE_NIGHT;
-        }
 
-        if (_exposure > maxExposure) {
+        if (_exposure > maxExposure)
             _exposure = maxExposure;
-        }
-        if (_exposure < MIN_EXPOSURE) {
+        if (_exposure < MIN_EXPOSURE)
             _exposure = MIN_EXPOSURE;
-        }
     }
 
     public void beginRenderScene() {
-        if (!_extensionsAvailable) {
+        if (!_extensionsAvailable)
             return;
-        }
 
         getFBO("scene").bind();
 
@@ -272,9 +264,8 @@ public class PostProcessingRenderer {
     }
 
     public void beginRenderReflectedScene() {
-        if (!_extensionsAvailable) {
+        if (!_extensionsAvailable)
             return;
-        }
 
         getFBO("sceneReflected").bind();
 
@@ -283,17 +274,15 @@ public class PostProcessingRenderer {
     }
 
     public void endRenderScene() {
-        if (!_extensionsAvailable) {
+        if (!_extensionsAvailable)
             return;
-        }
 
         getFBO("scene").unbind();
     }
 
     public void endRenderReflectedScene() {
-        if (!_extensionsAvailable) {
+        if (!_extensionsAvailable)
             return;
-        }
 
         getFBO("sceneReflected").unbind();
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
@@ -304,9 +293,8 @@ public class PostProcessingRenderer {
      * of the viewport changes.
      */
     public void renderScene() {
-        if (!_extensionsAvailable) {
+        if (!_extensionsAvailable)
             return;
-        }
 
         if (Config.getInstance().isEnablePostProcessingEffects()) {
             generateDownsampledScene();
@@ -395,12 +383,10 @@ public class PostProcessingRenderer {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        if (id == 0) {
+        if (id == 0)
             PostProcessingRenderer.getInstance().getFBO("sceneTonemapped").bindTexture();
-        }
-        else {
+        else
             PostProcessingRenderer.getInstance().getFBO("sceneBlur" + (id - 1)).bindTexture();
-        }
 
         renderFullQuad();
 
@@ -420,12 +406,10 @@ public class PostProcessingRenderer {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        if (id == 0) {
+        if (id == 0)
             PostProcessingRenderer.getInstance().getFBO("sceneHighPass").bindTexture();
-        }
-        else {
+        else
             PostProcessingRenderer.getInstance().getFBO("sceneBloom" + (id - 1)).bindTexture();
-        }
 
         renderFullQuad();
 
@@ -449,12 +433,10 @@ public class PostProcessingRenderer {
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            if (i == 4) {
+            if (i == 4)
                 PostProcessingRenderer.getInstance().getFBO("scene").bindTexture();
-            }
-            else {
+            else
                 PostProcessingRenderer.getInstance().getFBO("scene" + sizePrev).bindTexture();
-            }
 
             renderFullQuad();
 

@@ -1,0 +1,17 @@
+{
+    "name" : "combat:bloodsplash",
+   "blockParticleEffect" : {
+        "blockType" : "Arsenic",
+        "spawnCount" : 16,
+        "initialVelocityRange" : [0.05,0.05,0.05],
+        "spawnRange" : [0.01,0.01,0.01],
+        "destroyEntityOnCompletion" : true,
+        "minSize" : 0.005,
+        "maxSize" : 0.01,
+        "minLifespan" : 0.25,
+        "maxLifespan" : 1,
+        "targetVelocity" : [0.5,0.5,0.5],
+        "acceleration" : [20,20,20],
+        "collideWithBlocks" : true
+    }
+}

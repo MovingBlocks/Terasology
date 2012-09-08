@@ -42,7 +42,6 @@ import org.terasology.collection.EnumBooleanMap;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.AABB;
 import org.terasology.math.Side;
-import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
@@ -53,7 +52,6 @@ import org.terasology.world.block.shapes.BlockMeshPart;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.Maps;
-import org.terasology.world.chunks.Chunk;
 
 /**
  * Stores all information for a specific block type.
@@ -138,7 +136,6 @@ public class Block {
     // Overall behavioural
     private boolean liquid = false;
     private boolean attachmentAllowed = true;
-    private boolean replacementAllowed = false;
     private byte hardness = 0x3;
     private boolean supportRequired = false;
     private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<Side>(Side.class);
@@ -316,17 +313,6 @@ public class Block {
     }
 
     /**
-     * @return Whether this block can be replaced freely by other blocks
-     */
-    public boolean isReplacementAllowed() {
-        return replacementAllowed;
-    }
-
-    public void setReplacementAllowed(boolean replacementAllowed) {
-        this.replacementAllowed = replacementAllowed;
-    }
-
-    /**
      * @return Whether blocks can be attached to this block
      */
     public boolean isAttachmentAllowed() {
@@ -420,7 +406,7 @@ public class Block {
     }
 
     public void setLuminance(byte luminance) {
-        this.luminance = (byte) TeraMath.clamp(luminance, 0, Chunk.MAX_LIGHT);
+        this.luminance = luminance;
     }
 
     /**
@@ -619,9 +605,7 @@ public class Block {
             }
         }
         mesh = tessellator.generateMesh(new AssetUri(AssetType.MESH, uri.toString()));
-        if (mesh != null) {
-            AssetManager.getInstance().addAssetTemporary(mesh.getURI(), mesh);
-        }
+        AssetManager.getInstance().addAssetTemporary(mesh.getURI(), mesh);
     }
 
     @Override

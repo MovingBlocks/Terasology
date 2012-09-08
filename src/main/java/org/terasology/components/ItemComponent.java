@@ -90,6 +90,12 @@ public final class ItemComponent implements Component {
      */
     private Map<String, Integer> perBlockDamageBonus = Maps.newHashMap();
 
+    /**
+     * Range of the Item in Blockmeters, The Item can only interact within the defined Range.
+     */
+    public float range = 1;
+
+
     public Map<String, Integer> getPerBlockDamageBonus() {
 
         return perBlockDamageBonus;

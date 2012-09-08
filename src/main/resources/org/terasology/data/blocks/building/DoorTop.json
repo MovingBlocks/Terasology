@@ -16,6 +16,5 @@
 
 {
     "shape" : "engine:door",
-    "rotation" : "horizontal",
-    "attachmentAllowed" : false
+    "rotation" : "horizontal"
 }

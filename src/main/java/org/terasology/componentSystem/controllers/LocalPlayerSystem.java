@@ -15,14 +15,18 @@
  */
 package org.terasology.componentSystem.controllers;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3d;
+import javax.vecmath.Vector3f;
+
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.components.*;
-import org.terasology.math.Vector3i;
-import org.terasology.rendering.gui.widgets.UIImage;
-import org.terasology.world.block.BlockComponent;
-import org.terasology.world.block.BlockItemComponent;
+import org.terasology.components.HealthComponent;
+import org.terasology.components.InventoryComponent;
+import org.terasology.components.ItemComponent;
+import org.terasology.components.LocalPlayerComponent;
+import org.terasology.components.PlayerComponent;
 import org.terasology.components.rendering.MeshComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entityFactory.DroppedBlockFactory;
@@ -35,30 +39,40 @@ import org.terasology.events.DamageEvent;
 import org.terasology.events.HealthChangedEvent;
 import org.terasology.events.NoHealthEvent;
 import org.terasology.events.RespawnEvent;
-import org.terasology.input.events.MouseXAxisEvent;
-import org.terasology.input.events.MouseYAxisEvent;
-import org.terasology.input.binds.*;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.input.ButtonState;
 import org.terasology.input.CameraTargetSystem;
+import org.terasology.input.binds.AttackButton;
+import org.terasology.input.binds.DropItemButton;
+import org.terasology.input.binds.ForwardsMovementAxis;
+import org.terasology.input.binds.FrobButton;
+import org.terasology.input.binds.JumpButton;
+import org.terasology.input.binds.RunButton;
+import org.terasology.input.binds.StrafeMovementAxis;
+import org.terasology.input.binds.ToolbarNextButton;
+import org.terasology.input.binds.ToolbarPrevButton;
+import org.terasology.input.binds.ToolbarSlotButton;
+import org.terasology.input.binds.UseItemButton;
+import org.terasology.input.binds.VerticalMovementAxis;
+import org.terasology.input.events.MouseXAxisEvent;
+import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.world.WorldProvider;
-import org.terasology.math.TeraMath;
-import org.terasology.world.block.Block;
 import org.terasology.math.AABB;
+import org.terasology.math.TeraMath;
 import org.terasology.physics.ImpulseEvent;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.cameras.DefaultCamera;
-import org.terasology.world.block.BlockRegionComponent;
+import org.terasology.rendering.gui.framework.UIGraphicsElement;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.BlockItemComponent;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3d;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector2f;
+import com.bulletphysics.linearmath.QuaternionUtil;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -194,14 +208,12 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         // Display the block the player is aiming at
         if (Config.getInstance().isPlacingBox()) {
             EntityRef target = cameraTargetSystem.getTarget();
-            Vector3i blockPos = cameraTargetSystem.getTargetBlockPosition();
             AABB aabb = null;
             BlockComponent blockComp = target.getComponent(BlockComponent.class);
-            BlockRegionComponent blockRegion = target.getComponent(BlockRegionComponent.class);
-            if (blockComp != null || blockRegion != null) {
-                Block block = worldProvider.getBlock(blockPos);
+            if (blockComp != null) {
+                Block block = worldProvider.getBlock(blockComp.getPosition());
                 if (block.isTargetable()) {
-                    aabb = block.getBounds(blockPos);
+                    aabb = block.getBounds(blockComp.getPosition());
                 }
             } else {
                 MeshComponent mesh = target.getComponent(MeshComponent.class);
@@ -311,7 +323,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         if (localPlayerComp.isDead) return;
 
         EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayerComp.selectedTool);
-        attack(event.getTarget(), entity, selectedItemEntity, event.getTargetBlockPosition());
+        attack(event.getTarget(), entity, selectedItemEntity);
 
         lastInteraction = timer.getTimeInMs();
         localPlayerComp.handAnimation = 0.5f;
@@ -319,7 +331,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         event.consume();
     }
 
-    private void attack(EntityRef target, EntityRef player, EntityRef selectedItemEntity, Vector3i blockTargetPos) {
+    private void attack(EntityRef target, EntityRef player, EntityRef selectedItemEntity) {
         // TODO: Should send an attack event to self, and another system common to all creatures should handle this
         int damage = 1;
         ItemComponent item = selectedItemEntity.getComponent(ItemComponent.class);
@@ -327,9 +339,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             damage = item.baseDamage;
 
             BlockComponent blockComp = target.getComponent(BlockComponent.class);
-            BlockRegionComponent blockRegionComponent = target.getComponent(BlockRegionComponent.class);
-            if (blockComp != null || blockRegionComponent != null) {
-                Block block = worldProvider.getBlock(blockTargetPos);
+            if (blockComp != null) {
+                Block block = worldProvider.getBlock(blockComp.getPosition());
                 if (item.getPerBlockDamageBonus().containsKey(block.getBlockFamily().getURI().toString())) {
                     damage += item.getPerBlockDamageBonus().get(block.getBlockFamily().getURI().toString());
                 }
@@ -369,7 +380,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
         if (localPlayerComp.isDead) return;
 
-        UIImage crossHair = (UIImage)GUIManager.getInstance().getWindowById("engine:hud").getElementById("crosshair");
+        UIGraphicsElement crossHair = (UIGraphicsElement)GUIManager.getInstance().getWindowById("engine:hud").getElementById("crosshair");
 
         crossHair.getTextureSize().set(new Vector2f(22f / 256f, 22f / 256f));
 
@@ -460,7 +471,10 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         ItemComponent item = selectedItemEntity.getComponent(ItemComponent.class);
         if (item != null && item.usage != ItemComponent.UsageType.NONE) {
             useItem(event.getTarget(), entity, selectedItemEntity, event.getHitPosition(), event.getHitNormal());
+        } else {
+            attack(event.getTarget(), entity, selectedItemEntity);
         }
+
         lastInteraction = timer.getTimeInMs();
         localPlayerComp.handAnimation = 0.5f;
         entity.saveComponent(localPlayerComp);

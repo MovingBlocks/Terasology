@@ -27,8 +27,6 @@ import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.lighting.LightPropagator;
-import org.terasology.world.lighting.LightingUtil;
-import org.terasology.world.lighting.PropagationComparison;
 import org.terasology.world.liquid.LiquidData;
 
 /**
@@ -126,8 +124,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     public boolean setBlock(int x, int y, int z, Block type, Block oldType) {
         Vector3i blockPos = new Vector3i(x, y, z);
         WorldView worldView;
-
-        if (LightingUtil.compareLightingPropagation(type, oldType) != PropagationComparison.IDENTICAL || type.getLuminance() != oldType.getLuminance()) {
+        if (type.isTranslucent() != oldType.isTranslucent() || type.getLuminance() != oldType.getLuminance()) {
             worldView = WorldView.createSubviewAroundBlock(blockPos, Chunk.MAX_LIGHT + 1, chunkProvider);
         } else {
             worldView = WorldView.createSubviewAroundBlock(blockPos, 1, chunkProvider);

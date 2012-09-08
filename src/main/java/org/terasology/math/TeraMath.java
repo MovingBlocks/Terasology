@@ -20,7 +20,6 @@ import static org.lwjgl.opengl.GL11.glGetFloat;
 import java.nio.FloatBuffer;
 
 import javax.vecmath.Matrix4f;
-import javax.vecmath.Vector3f;
 
 import org.lwjgl.BufferUtils;
 import org.terasology.world.chunks.Chunk;
@@ -372,14 +371,5 @@ public final class TeraMath {
 
         matrixBuffer.flip();
         return matrixBuffer;
-    }
-
-    public static Side getSecondaryPlacementDirection(Vector3f direction, Vector3f normal) {
-        Side surfaceDir = Side.inDirection(normal);
-        Vector3f attachDir = surfaceDir.reverse().getVector3i().toVector3f();
-        Vector3f rawDirection = new Vector3f(direction);
-        float dot = rawDirection.dot(attachDir);
-        rawDirection.sub(new Vector3f(dot * attachDir.x, dot * attachDir.y, dot * attachDir.z));
-        return Side.inDirection(rawDirection.x, rawDirection.y, rawDirection.z).reverse();
     }
 }

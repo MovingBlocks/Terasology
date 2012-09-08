@@ -1,0 +1,17 @@
+{
+    "name" : "combat:blooddropdown",
+    "blockParticleEffect" : {
+        "blockType" : "Lava",
+        "spawnCount" : 64,
+        "initialVelocityRange" : [0.01,-5.0,0.01],
+        "spawnRange" : [0.0,0.0,0.0],
+        "destroyEntityOnCompletion" : true,
+        "minSize" : 0.01,
+        "maxSize" : 0.05,
+        "minLifespan" : 10.0,
+        "maxLifespan" : 30.0,
+        "targetVelocity" : [30.0,-5.0,30.0],
+        "acceleration" : [0.0,40.0,0.0],
+        "collideWithBlocks" : true
+    }
+}

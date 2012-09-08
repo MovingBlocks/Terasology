@@ -39,5 +39,10 @@
         0
       ]
     },
-    "AccessInventoryAction": {}
+    "AccessInventoryAction": {},
+    "Health" : {},
+    "HitDetection" : {},
+     "Trigger" : { 
+     	"detectGroups" : ["engine:world"]
+     }
 }

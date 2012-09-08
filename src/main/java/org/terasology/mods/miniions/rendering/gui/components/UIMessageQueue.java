@@ -28,7 +28,7 @@ import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.mods.miniions.minionenum.MinionMessagePriority;
 import org.terasology.mods.miniions.utilities.MinionMessage;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
-import org.terasology.rendering.gui.widgets.UIImage;
+import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 /**
  * Created with IntelliJ IDEA.
@@ -42,12 +42,12 @@ public class UIMessageQueue extends UIDisplayContainer implements EventHandlerSy
     private static final float ICON_SIZE = 32.0f;
 
     private Queue<MinionMessage> messageQueue;
-    private ArrayList<UIImage> elements;
+    private ArrayList<UIGraphicsElement> elements;
     static int messageCounter = 0;
-    private UIImage _messageTex;
+    private UIGraphicsElement _messageTex;
 
     public UIMessageQueue() {
-        elements = new ArrayList<UIImage>();
+        elements = new ArrayList<UIGraphicsElement>();
         messageQueue = new PriorityQueue<MinionMessage>();
         float height = Display.getHeight() / 2;
         setSize(new Vector2f(ICON_SIZE, height));
@@ -74,8 +74,8 @@ public class UIMessageQueue extends UIDisplayContainer implements EventHandlerSy
         }
     }
 
-    private UIImage getMessageIcon(MinionMessagePriority minionMessagePriority, int counter) {
-        UIImage _messageTexture = new UIImage(AssetManager.loadTexture("engine:items"));
+    private UIGraphicsElement getMessageIcon(MinionMessagePriority minionMessagePriority, int counter) {
+        UIGraphicsElement _messageTexture = new UIGraphicsElement(AssetManager.loadTexture("engine:items"));
         _messageTexture.getTextureSize().set(new Vector2f(16f / 256f, 16f / 256f));
         float originStart = 0;
         switch (minionMessagePriority) {

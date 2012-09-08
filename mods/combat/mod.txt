@@ -1,0 +1,4 @@
+{
+    "id" : "combat",
+    "displayName" : "Combat Gameplay"
+}

@@ -1,0 +1,14 @@
+{
+    "name" : "combat:bow",
+    "Item" : {
+        "name" : "Bow",
+        "icon" : "Bow",
+        "usage" : "IN_DIRECTION",
+        "renderWithIcon" : true,
+        "baseDamage" : 10
+    },"LaunchEntity" : {
+    	"entity" : "combat:testprojectile",
+    	"maxSpeed" : 500,
+    	"spawnDistance" : 0.0f 
+    }  
+}

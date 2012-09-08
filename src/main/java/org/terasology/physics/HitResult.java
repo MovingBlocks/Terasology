@@ -19,7 +19,6 @@ package org.terasology.physics;
 import javax.vecmath.Vector3f;
 
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.math.Vector3i;
 
 /**
  * @author Immortius
@@ -29,13 +28,10 @@ public class HitResult {
     private EntityRef entity;
     private Vector3f hitPoint;
     private Vector3f hitNormal;
-    private Vector3i blockPosition;
-    private final boolean worldHit;
 
     public HitResult() {
         hit = false;
         entity = EntityRef.NULL;
-        worldHit = false;
     }
 
     public HitResult(EntityRef entity, Vector3f hitPoint, Vector3f hitNormal) {
@@ -43,17 +39,6 @@ public class HitResult {
         this.entity = entity;
         this.hitPoint = hitPoint;
         this.hitNormal = hitNormal;
-        this.blockPosition = new Vector3i(hitPoint, 0.5f);
-        this.worldHit = false;
-    }
-
-    public HitResult(EntityRef entity, Vector3f hitPoint, Vector3f hitNormal, Vector3i blockPos) {
-        this.hit = true;
-        this.entity = entity;
-        this.hitPoint = hitPoint;
-        this.hitNormal = hitNormal;
-        this.blockPosition = blockPos;
-        this.worldHit = true;
     }
 
     public boolean isHit() {
@@ -70,13 +55,5 @@ public class HitResult {
 
     public Vector3f getHitNormal() {
         return hitNormal;
-    }
-
-    public Vector3i getBlockPosition() {
-        return blockPosition;
-    }
-
-    public boolean isWorldHit() {
-        return worldHit;
     }
 }

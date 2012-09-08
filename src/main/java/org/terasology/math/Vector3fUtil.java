@@ -77,4 +77,13 @@ public final class Vector3fUtil {
         out.z = Math.max(a.z, b.z);
         return out;
     }
+    
+    public static double calcdist(Vector3f v1, Vector3f v2)
+    {
+    	Vector3f distance = new Vector3f(); 
+    	distance.x = v1.x - v2.x;
+    	distance.y = v1.y - v2.y;
+    	distance.z = v1.z - v2.z;
+    	return Math.sqrt(distance.x*distance.x + distance.y*distance.y + distance.z*distance.z);
+    }
 }

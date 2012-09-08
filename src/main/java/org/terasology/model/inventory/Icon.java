@@ -27,7 +27,7 @@ import javax.vecmath.Vector2f;
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.AssetManager;
 import org.terasology.rendering.assets.Texture;
-import org.terasology.rendering.gui.widgets.UIImage;
+import org.terasology.rendering.gui.framework.UIGraphicsElement;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.family.BlockFamily;
 
@@ -37,7 +37,7 @@ import org.terasology.world.block.family.BlockFamily;
 public class Icon {
     private static Map<String, Icon> icons;
 
-    private UIImage _element;
+    private UIGraphicsElement _element;
     private BlockFamily _blockFamily;
     private int _x;
     private int _y;
@@ -59,7 +59,7 @@ public class Icon {
      * Creates an Icon for a non-BlockFamily class
      */
     public Icon() {
-        _element = new UIImage(AssetManager.loadTexture("engine:items"));
+        _element = new UIGraphicsElement(AssetManager.loadTexture("engine:items"));
         _blockFamily = null;
 
         _element.setSize(new Vector2f(32, 32));
@@ -149,8 +149,6 @@ public class Icon {
         Icon shadowingotIcon = new Icon();
         //* BOWCRAFTING & FLETCHING *//
         Icon woodshaftIcon = new Icon();
-        //* Furniture *//
-        Icon doorIcon = new Icon();
 
         //* Minion bar *//
         Icon gelcubeIcon = new Icon();
@@ -224,8 +222,6 @@ public class Icon {
         shadowingotIcon.setAtlasPosition(8, 3);
         //Resources for Bowcraft-&-Fletching Atlas
         woodshaftIcon.setAtlasPosition(9, 1);
-        // Furniture
-        doorIcon.setAtlasPosition(6, 2);
         //gel icon (Will be moved to a Minion Icon Atlas)
         gelcubeIcon.setAtlasPosition(13, 0);
         minionIcon1.setAtlasPosition(15, 0);
@@ -285,8 +281,6 @@ public class Icon {
         icons.put("book", bookIcon);
         icons.put("redbook", redBookIcon);
         icons.put("bluebook", blueBookIcon);
-
-        icons.put("door", doorIcon);
 
         icons.put("apple", appleIcon);
         icons.put("bannana", bannanaIcon);

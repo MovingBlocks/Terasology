@@ -33,10 +33,7 @@ import static org.lwjgl.opengl.GL11.glPushMatrix;
 
 import java.util.Collections;
 
-import javax.vecmath.Vector2f;
-
 import org.lwjgl.opengl.Display;
-import org.terasology.rendering.gui.widgets.UIWindow;
 
 /**
  * Extends UIDisplayContainer to transparently init. OpenGL for 2D rendering.
@@ -44,10 +41,6 @@ import org.terasology.rendering.gui.widgets.UIWindow;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class UIDisplayRenderer extends UIDisplayContainer {
-    
-    public UIDisplayRenderer() {
-        setSize(new Vector2f(Display.getWidth(), Display.getHeight()));
-    }
 
     @Override
     public void renderTransformed() {
@@ -87,14 +80,14 @@ public class UIDisplayRenderer extends UIDisplayContainer {
      * Get the focused window. The focused window is the top element within the display elements array which is visible.
      * @return The focused window.
      */
-    public UIWindow getWindowFocused() {
-        if (getDisplayElements().size() > 0) {
+    public UIDisplayWindow getWindowFocused() {
+        if (_displayElements.size() > 0) {
             
-            for (int i = getDisplayElements().size() - 1; i >= 0; i--) {
-                if (getDisplayElements().get(i).isVisible()) {
-                    return (UIWindow) getDisplayElements().get(i);
+            for (int i = _displayElements.size() - 1; i >= 0; i--) {
+                if (_displayElements.get(i).isVisible()) {
+                    return (UIDisplayWindow) _displayElements.get(i);
                 }
-            }
+			}
         }
         
         return null;
@@ -104,13 +97,13 @@ public class UIDisplayRenderer extends UIDisplayContainer {
      * Set the given window to the top position of the display element array. Therefore the window will be focused.
      * @param window The window to focus.
      */
-    public void setWindowFocus(UIWindow window) {
-        int windowPosition = getDisplayElements().indexOf(window);
+    public void setWindowFocus(UIDisplayWindow window) {
+        int windowPosition = _displayElements.indexOf(window);
         
         if (windowPosition != -1) {
-            Collections.rotate(getDisplayElements().subList(windowPosition, getDisplayElements().size()), -1);
+            Collections.rotate(_displayElements.subList(windowPosition, _displayElements.size()), -1);
             
-            window.open();
+            window.setVisible(true);
         }
     }
 }

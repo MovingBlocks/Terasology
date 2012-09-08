@@ -1,5 +1,0 @@
-{
-    "id" : "soils",
-    "displayName" : "Soil Pack",
-    "author" : "Metouto (fancy), Eleazzaar (matrix soils under auto)"
-}

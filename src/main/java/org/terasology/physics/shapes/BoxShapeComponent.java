@@ -25,4 +25,5 @@ import org.terasology.entitySystem.Component;
  */
 public class BoxShapeComponent implements Component {
     public Vector3f extents = new Vector3f(1,1,1);
+    float margin = 0.04f;
 }

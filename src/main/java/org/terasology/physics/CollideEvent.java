@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
+
 package org.terasology.physics;
+
+import javax.vecmath.Vector3f;
 
 import org.terasology.entitySystem.AbstractEvent;
 import org.terasology.entitySystem.EntityRef;
@@ -24,12 +27,25 @@ import org.terasology.entitySystem.EntityRef;
  */
 public class CollideEvent extends AbstractEvent {
     private EntityRef otherEntity;
-
-    public CollideEvent(EntityRef other) {
+    private Vector3f hitPoint;
+    private Vector3f hitNormal;
+    
+    public CollideEvent(EntityRef other, Vector3f point, Vector3f normal) {
         otherEntity = other;
+        hitPoint = point;
+        hitNormal = normal;
     }
 
     public EntityRef getOtherEntity() {
         return otherEntity;
     }
+
+	public Vector3f getHitPoint() {
+		return hitPoint;
+	}
+
+	public Vector3f getHitNormal() {
+		return hitNormal;
+	}
+    
 }

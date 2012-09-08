@@ -23,12 +23,13 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.modes.StateMainMenu;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.rendering.gui.components.UIButton;
+import org.terasology.rendering.gui.components.UIText;
+import org.terasology.rendering.gui.components.UITransparentOverlay;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.UIDisplayWindow;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.WindowListener;
-import org.terasology.rendering.gui.widgets.UIButton;
-import org.terasology.rendering.gui.widgets.UIText;
-import org.terasology.rendering.gui.widgets.UIWindow;
 
 /**
  * Simple status screen with one sole text label usable for status notifications.
@@ -36,15 +37,15 @@ import org.terasology.rendering.gui.widgets.UIWindow;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
-public class UIScreenDeath extends UIWindow {
+public class UIScreenDeath extends UIDisplayWindow {
 
+    private final UITransparentOverlay _overlay;
     private final UIText _meassage;
     private final UIButton _respawnButton;
     private final UIButton _exitButton;
     private final UIButton _mainMenuButton;
 
     public UIScreenDeath() {
-        setBackgroundColor(0x46, 0x00, 0x00, 0.85f);
         setModal(true);
         setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
         maximize();
@@ -62,54 +63,77 @@ public class UIScreenDeath extends UIWindow {
         });
         
         _meassage = new UIText("You are dead");
-        _meassage.setHorizontalAlign(EHorizontalAlign.CENTER);
-        _meassage.setPosition(new Vector2f(0f, 300f));
         _meassage.setVisible(true);
+
+        _overlay = new UITransparentOverlay(200f, 0f, 0f, 0.25f);
+        _overlay.setVisible(true);
         
         _respawnButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
+        _respawnButton.setVisible(true);
         _respawnButton.getLabel().setText("Respawn");
         _respawnButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
                 respawn();
-                close();
+                close(true);
             }
         });
-        _respawnButton.setHorizontalAlign(EHorizontalAlign.CENTER);
-        _respawnButton.setPosition(new Vector2f(0f, 300f + 32f + 24f));
-        _respawnButton.setVisible(true);
         
         _mainMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _mainMenuButton.getLabel().setText("Return to Main Menu");
+        _mainMenuButton.setVisible(true);
         _mainMenuButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
                 CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu());
             }
         });
-        _mainMenuButton.setHorizontalAlign(EHorizontalAlign.CENTER);
-        _mainMenuButton.setPosition(new Vector2f(0f, 300f + 2 * 32f + 24f + 4f));
-        _mainMenuButton.setVisible(true);
+
 
         _exitButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
         _exitButton.getLabel().setText("Exit Terasology");
+        _exitButton.setVisible(true);
         _exitButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
                 CoreRegistry.get(GameEngine.class).shutdown();
             }
         });
-        _exitButton.setHorizontalAlign(EHorizontalAlign.CENTER);
-        _exitButton.setPosition(new Vector2f(0f, 300f + 3 * 32f + 24f + 8f));
-        _exitButton.setVisible(true);
-        
+
+        addDisplayElement(_overlay);
         addDisplayElement(_meassage);
         addDisplayElement(_exitButton);
         addDisplayElement(_respawnButton);
         addDisplayElement(_mainMenuButton);
+
+        layout();
     }
     
     private void respawn() {
         CoreRegistry.get(LocalPlayer.class).getEntity().send(new RespawnEvent());
+    }
+
+    @Override
+    public void layout() {
+        super.layout();
+
+        if (_meassage != null) {
+            _meassage.center();
+            _meassage.getPosition().y -= 100;
+            
+            _respawnButton.centerHorizontally();
+            _respawnButton.getPosition().y = 300f + 32f + 24f;
+    
+            _mainMenuButton.centerHorizontally();
+            _mainMenuButton.getPosition().y = 300f + 2 * 32f + 24f + 4f;
+    
+            _exitButton.centerHorizontally();
+            _exitButton.getPosition().y = 300f + 3 * 32f + 24f + 8f;
+        }
+    }
+
+    public void updateStatus(String string) {
+        _meassage.setText(string);
+        layout();
     }
 }

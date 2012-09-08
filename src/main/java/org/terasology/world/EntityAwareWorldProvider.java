@@ -24,8 +24,6 @@ import java.util.logging.Logger;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.world.LocationComponent;
-import org.terasology.entitySystem.event.ChangedComponentEvent;
-import org.terasology.math.Region3i;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -41,7 +39,8 @@ import org.terasology.world.block.Block;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
-import org.terasology.world.block.BlockRegionComponent;
+
+import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius
@@ -54,9 +53,6 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     // TODO: Perhaps a better datastructure for spatial lookups
     // TODO: Or perhaps a build in indexing system for entities
     private Map<Vector3i, EntityRef> blockComponentLookup = Maps.newHashMap();
-
-    private Map<Vector3i, EntityRef> blockRegionLookup = Maps.newHashMap();
-    private Map<EntityRef, Region3i> blockRegions = Maps.newHashMap();
 
     private List<EntityRef> tempBlocks = Lists.newArrayList();
 
@@ -106,15 +102,15 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     }
 
     @Override
-    public EntityRef getBlockEntityAt(Vector3i blockPosition) {
+    public EntityRef getEntityAt(Vector3i blockPosition) {
         EntityRef result = blockComponentLookup.get(blockPosition);
         return (result == null) ? EntityRef.NULL : result;
     }
 
     @Override
-    public EntityRef getOrCreateBlockEntityAt(Vector3i blockPosition) {
-        EntityRef blockEntity = getBlockEntityAt(blockPosition);
-        if (!blockEntity.exists()) {
+    public EntityRef getOrCreateEntityAt(Vector3i blockPosition) {
+        EntityRef blockEntity = blockComponentLookup.get(blockPosition);
+        if (blockEntity == null || !blockEntity.exists()) {
             Block block = getBlock(blockPosition.x, blockPosition.y, blockPosition.z);
             blockEntity = entityManager.create(block.getEntityPrefab());
             if (block.isEntityTemporary()) {
@@ -130,24 +126,6 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         return blockEntity;
     }
 
-    @Override
-    public EntityRef getEntityAt(Vector3i blockPosition) {
-        EntityRef result = blockRegionLookup.get(blockPosition);
-        if (result == null) {
-            return getBlockEntityAt(blockPosition);
-        }
-        return result;
-    }
-
-    @Override
-    public EntityRef getOrCreateEntityAt(Vector3i blockPosition) {
-        EntityRef entity = getEntityAt(blockPosition);
-        if (!entity.exists()) {
-            return getOrCreateBlockEntityAt(blockPosition);
-        }
-        return entity;
-    }
-
     @ReceiveEvent(components = {BlockComponent.class})
     public void onCreate(AddComponentEvent event, EntityRef entity) {
         BlockComponent block = entity.getComponent(BlockComponent.class);
@@ -158,37 +136,6 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     public void onDestroy(RemovedComponentEvent event, EntityRef entity) {
         BlockComponent block = entity.getComponent(BlockComponent.class);
         blockComponentLookup.remove(new Vector3i(block.getPosition()));
-    }
-
-    @ReceiveEvent(components = {BlockRegionComponent.class})
-    public void onNewBlockRegion(AddComponentEvent event, EntityRef entity) {
-        BlockRegionComponent regionComp = entity.getComponent(BlockRegionComponent.class);
-        blockRegions.put(entity, regionComp.region);
-        for (Vector3i pos : regionComp.region) {
-            blockRegionLookup.put(pos, entity);
-        }
-    }
-
-    @ReceiveEvent(components = {BlockRegionComponent.class})
-    public void onBlockRegionChanged(ChangedComponentEvent event, EntityRef entity) {
-        Region3i oldRegion = blockRegions.get(entity);
-        for (Vector3i pos : oldRegion) {
-            blockRegionLookup.remove(pos);
-        }
-        BlockRegionComponent regionComp = entity.getComponent(BlockRegionComponent.class);
-        blockRegions.put(entity, regionComp.region);
-        for (Vector3i pos : regionComp.region) {
-            blockRegionLookup.put(pos, entity);
-        }
-    }
-
-    @ReceiveEvent(components = {BlockRegionComponent.class})
-    public void onBlockRegionRemoved(RemovedComponentEvent event, EntityRef entity) {
-        Region3i oldRegion = blockRegions.get(entity);
-        for (Vector3i pos : oldRegion) {
-            blockRegionLookup.remove(pos);
-        }
-        blockRegions.remove(entity);
     }
 
     @Override
