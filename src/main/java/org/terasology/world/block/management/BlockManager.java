@@ -198,7 +198,15 @@ public class BlockManager {
     }
 
     public void addBlockFamily(BlockFamily family) {
-        partiallyRegisteredFamilies.put(family.getURI(), family);
+        addBlockFamily(family, false);
+    }
+
+    public void addBlockFamily(BlockFamily family, boolean forceRegister) {
+        if (forceRegister) {
+            registerBlockFamily(family);
+        } else {
+            partiallyRegisteredFamilies.put(family.getURI(), family);
+        }
     }
 
     public void addShapelessBlockFamily(BlockUri family) {
