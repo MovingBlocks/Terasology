@@ -23,7 +23,7 @@ import com.google.common.base.Objects;
 /**
  * @author Immortius
  */
-public class AssetUri {
+public final class AssetUri implements Comparable<AssetUri> {
     private static final String TYPE_SPLIT = ":";
     private static final String PACKAGE_SPLIT = ":";
 
@@ -110,5 +110,10 @@ public class AssetUri {
     @Override
     public int hashCode() {
         return Objects.hashCode(type, packageName, assetName);
+    }
+
+    @Override
+    public int compareTo(AssetUri o) {
+        return toString().compareTo(o.toString());
     }
 }

@@ -111,7 +111,11 @@ public class BlockManager {
 
         BlockLoader.LoadBlockDefinitionResults blockDefinitions = blockLoader.loadBlockDefinitions();
         for (BlockFamily family : blockDefinitions.families) {
-            registerBlockFamily(family);
+            if (knownBlockMappings.containsKey(family.getURI().toString())) {
+                registerBlockFamily(family);
+            } else {
+                addBlockFamily(family);
+            }
         }
         for (BlockUri shapelessFamily : blockDefinitions.shapelessDefinitions) {
             shapelessBlockDefinition.add(shapelessFamily);
@@ -218,8 +222,36 @@ public class BlockManager {
         }
     }
 
-    public Iterable<BlockFamily> listBlockFamilies() {
+    /**
+     * @return An iterator over the registered block families
+     */
+    public Iterable<BlockUri> listRegisteredBlockUris() {
+        return familyByUri.keySet();
+    }
+
+    /**
+     * @return An iterator over the registered block families
+     */
+    public Iterable<BlockFamily> listRegisteredBlockFamilies() {
         return familyByUri.values();
+    }
+
+    /**
+     * @return An iterator over the shapeless block types available
+     */
+    public Iterable<BlockUri> listShapelessBlockUris() {
+        return shapelessBlockDefinition;
+    }
+
+    /**
+     * @return An iterator over unused but available block families
+     */
+    public Iterable<BlockFamily> listAvailableBlockFamilies() {
+        return partiallyRegisteredFamilies.values();
+    }
+
+    public Iterable<BlockUri> listAvailableBlockUris() {
+        return partiallyRegisteredFamilies.keySet();
     }
 
     public int getBlockFamilyCount() {

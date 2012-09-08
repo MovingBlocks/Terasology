@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.manager;
+package org.terasology.logic.console;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import groovy.util.GroovyScriptEngine;
@@ -24,12 +26,18 @@ import groovy.util.ScriptException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.SortedSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.vecmath.Vector3f;
 
 import org.lwjgl.input.Keyboard;
+import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.PlayerComponent;
@@ -50,11 +58,15 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.manager.Config;
+import org.terasology.logic.manager.PathManager;
+import org.terasology.utilities.StringConstants;
 import org.terasology.world.block.BlockPickupComponent;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.management.BlockManager;
 
@@ -120,9 +132,9 @@ public class GroovyManager {
      * Executes the given command with Groovy.
      *
      * @param consoleString Contains what the user entered into the console
-     * @return boolean indicating command success or not
+     * @return a ConsoleResult indicating command success and any display string
      */
-    public boolean runGroovyShell(String consoleString) {
+    public ConsoleResult runGroovyShell(String consoleString) {
         logger.log(Level.INFO, "Groovy console about to execute command: " + consoleString);
         // Lets mess with the consoleString!
         consoleString = consoleString.trim();
@@ -136,24 +148,83 @@ public class GroovyManager {
         GroovyShell shell = new GroovyShell(_bind);
         try {
             Object result = shell.evaluate(consoleString);
+            if (result instanceof ConsoleResult) {
+                return (ConsoleResult) result;
+            }
             if (result != null) {
                 logger.log(Level.INFO, "Result [" + result + "] from '" + consoleString + "'");
+                return new ConsoleResult(true, result.toString());
             }
-            return true;
+            return new ConsoleResult(true);
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return new ConsoleResult(false);
         }
     }
 
+    // TODO: Better implementation for commands
     public static class CommandHelper {
-        public void giveBlock(int blockId) {
-            giveBlock(blockId, 16);
+
+        public String listBlocks() {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("Used Blocks");
+            stringBuilder.append(StringConstants.NEW_LINE);
+            stringBuilder.append("-----------");
+            stringBuilder.append(StringConstants.NEW_LINE);
+            List<BlockUri> registeredBlocks = sortItems(BlockManager.getInstance().listRegisteredBlockUris());
+            for (BlockUri blockUri : registeredBlocks) {
+                stringBuilder.append(blockUri.toString());
+                stringBuilder.append(StringConstants.NEW_LINE);
+            }
+            stringBuilder.append(StringConstants.NEW_LINE);
+
+            stringBuilder.append("Available Blocks");
+            stringBuilder.append(StringConstants.NEW_LINE);
+            stringBuilder.append("----------------");
+            stringBuilder.append(StringConstants.NEW_LINE);
+            List<BlockUri> availableBlocks = sortItems(BlockManager.getInstance().listAvailableBlockUris());
+            for (BlockUri blockUri : availableBlocks) {
+                stringBuilder.append(blockUri.toString());
+                stringBuilder.append(StringConstants.NEW_LINE);
+            }
+            return stringBuilder.toString();
         }
 
-        public void giveBlock(int blockId, int quantity) {
-            BlockFamily blockFamily = BlockManager.getInstance().getBlock((byte) blockId).getBlockFamily();
-            giveBlock(blockFamily, quantity);
+        public String listShapes() {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("Shapes");
+            stringBuilder.append(StringConstants.NEW_LINE);
+            stringBuilder.append("-----------");
+            stringBuilder.append(StringConstants.NEW_LINE);
+            List<AssetUri> sortedUris = sortItems(AssetManager.list(AssetType.SHAPE));
+            for (AssetUri uri : sortedUris) {
+                stringBuilder.append(uri.getSimpleString());
+                stringBuilder.append(StringConstants.NEW_LINE);
+            }
+            return stringBuilder.toString();
+        }
+
+        public String listFreeShapeBlocks() {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("Free Shape Blocks");
+            stringBuilder.append(StringConstants.NEW_LINE);
+            stringBuilder.append("-----------------");
+            stringBuilder.append(StringConstants.NEW_LINE);
+            List<BlockUri> sortedUris = sortItems(BlockManager.getInstance().listShapelessBlockUris());
+            for (BlockUri uri : sortedUris) {
+                stringBuilder.append(uri.toString());
+                stringBuilder.append(StringConstants.NEW_LINE);
+            }
+            return stringBuilder.toString();
+        }
+
+        private <T extends Comparable<T>> List<T> sortItems(Iterable<T> items) {
+            List<T> result = Lists.newArrayList();
+            for (T item : items) {
+                result.add(item);
+            }
+            Collections.sort(result);
+            return result;
         }
 
         public void giveBlock(String title) {

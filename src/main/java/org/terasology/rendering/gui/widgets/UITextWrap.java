@@ -30,6 +30,7 @@ import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import org.terasology.utilities.StringConstants;
 
 /**
  * Simple text element supporting text shadowing.
@@ -41,7 +42,6 @@ import com.google.gson.stream.JsonWriter;
  */
 public class UITextWrap extends UIText {
 
-    public final String newLine = System.getProperty("line.separator");
     private long currentpos = 0;
 
     public UITextWrap() {
@@ -132,7 +132,7 @@ public class UITextWrap extends UIText {
         reader.beginArray();
         text = "";
         while (reader.hasNext()) {
-            text += gson.fromJson(reader, String.class) + newLine;
+            text += gson.fromJson(reader, String.class) + StringConstants.NEW_LINE;
         }
         reader.endArray();
         reader.close();
@@ -145,7 +145,7 @@ public class UITextWrap extends UIText {
         reader.beginArray();
         text = "";
         while (reader.hasNext()) {
-            text += gson.fromJson(reader, String.class) + newLine;
+            text += gson.fromJson(reader, String.class) + StringConstants.NEW_LINE;
         }
         reader.endArray();
         reader.close();
@@ -158,7 +158,7 @@ public class UITextWrap extends UIText {
     public void addText(String addtext) throws IOException {
         String wrappedtext = "";
         int linecounter = 0;
-        String[] parts = addtext.split(newLine);
+        String[] parts = addtext.split(StringConstants.NEW_LINE);
         ArrayList<String> finaltext = new ArrayList<String>();
         int width = Display.getWidth() - 8;
         int charCount = (int) (width / 7);
@@ -185,18 +185,18 @@ public class UITextWrap extends UIText {
                             }
                         }
                     }
-                    finaltext.add(parts[i].substring(beginpoint, endpoint) + newLine);
+                    finaltext.add(parts[i].substring(beginpoint, endpoint) + StringConstants.NEW_LINE);
                     linecounter++;
                     beginpoint = endpoint + 1;
                     endpoint = beginpoint + charCount;
                     if (endpoint > parts[i].length() - 1) {
-                        finaltext.add(parts[i].substring(beginpoint, parts[i].length()) + newLine);
+                        finaltext.add(parts[i].substring(beginpoint, parts[i].length()) + StringConstants.NEW_LINE);
                         linecounter++;
                         endpoint = -1;
                     }
                 }
             } else {
-                finaltext.add(parts[i] + newLine);
+                finaltext.add(parts[i] + StringConstants.NEW_LINE);
                 linecounter++;
             }
         }

@@ -175,7 +175,7 @@ public class StateSinglePlayer implements GameState {
     }
 
     private void cacheBlockMesh() {
-        for (BlockFamily family : BlockManager.getInstance().listBlockFamilies()) {
+        for (BlockFamily family : BlockManager.getInstance().listRegisteredBlockFamilies()) {
             if (!family.getArchetypeBlock().isInvisible()) {
                 family.getArchetypeBlock().getMesh();
             }

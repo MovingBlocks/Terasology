@@ -36,7 +36,7 @@ import com.google.common.base.Objects;
  *
  * @author Immortius
  */
-public class BlockUri {
+public class BlockUri implements Comparable<BlockUri> {
     private static final String PACKAGE_SEPARATOR = ":";
     private static final String IDENTIFIER_SEPARATOR = ".";
     private static final String IDENTIFIER_SEPARATOR_REGEX = "\\.";
@@ -168,5 +168,10 @@ public class BlockUri {
 
     public boolean hasShape() {
         return !shapePackageName.isEmpty() || !shapeName.isEmpty();
+    }
+
+    @Override
+    public int compareTo(BlockUri o) {
+        return toString().compareTo(o.toString());
     }
 }
