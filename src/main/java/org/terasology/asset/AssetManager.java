@@ -15,6 +15,12 @@
  */
 package org.terasology.asset;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import org.terasology.entitySystem.common.NullIterator;
+import org.terasology.rendering.assets.Shader;
+import org.terasology.rendering.assets.Texture;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -25,13 +31,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.terasology.entitySystem.common.NullIterator;
-import org.terasology.rendering.assets.Shader;
-import org.terasology.rendering.assets.Texture;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 public class AssetManager {
 
@@ -173,6 +172,10 @@ public class AssetManager {
         };
     }
 
+    public Iterable<String> listPackageNames() {
+        return assetSources.keySet();
+    }
+
     public List<URL> getAssetURLs(AssetUri uri) {
         AssetSource source = assetSources.get(uri.getPackage());
         if (source != null) {
@@ -202,6 +205,10 @@ public class AssetManager {
 
     public static Iterable<AssetUri> list(AssetType type) {
         return getInstance().listAssets(type);
+    }
+
+    public static Iterable<String> listPackages() {
+        return getInstance().listPackageNames();
     }
 
     public static Asset load(AssetUri uri) {

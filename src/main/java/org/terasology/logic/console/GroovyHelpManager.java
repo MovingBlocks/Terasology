@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.manager;
+package org.terasology.logic.console;
 
 import java.io.File;
 import java.io.FileReader;
@@ -32,6 +32,7 @@ import org.terasology.game.CoreRegistry;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
+import org.terasology.logic.manager.PathManager;
 
 /**
  * Created with IntelliJ IDEA.

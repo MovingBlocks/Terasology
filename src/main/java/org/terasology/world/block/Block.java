@@ -42,6 +42,7 @@ import org.terasology.collection.EnumBooleanMap;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.AABB;
 import org.terasology.math.Side;
+import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
@@ -52,6 +53,7 @@ import org.terasology.world.block.shapes.BlockMeshPart;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.Maps;
+import org.terasology.world.chunks.Chunk;
 
 /**
  * Stores all information for a specific block type.
@@ -418,7 +420,7 @@ public class Block {
     }
 
     public void setLuminance(byte luminance) {
-        this.luminance = luminance;
+        this.luminance = (byte) TeraMath.clamp(luminance, 0, Chunk.MAX_LIGHT);
     }
 
     /**
