@@ -38,6 +38,7 @@ public final class TerasologyVersion {
     private static final String BUILD_URL = "buildUrl";
     private static final String GIT_BRANCH = "gitBranch";
     private static final String GIT_COMMIT = "gitCommit";
+    private static final String DATE_TIME = "dateTime";
 
     private static final String DEFAULT_VALUE = "";
 
@@ -47,6 +48,7 @@ public final class TerasologyVersion {
     private final String buildUrl;
     private final String gitBranch;
     private final String gitCommit;
+    private final String dateTime;
     private final String toString;
 
     private TerasologyVersion() {
@@ -75,6 +77,7 @@ public final class TerasologyVersion {
         buildUrl = properties.getProperty(BUILD_URL, DEFAULT_VALUE);
         gitBranch = properties.getProperty(GIT_BRANCH, DEFAULT_VALUE);
         gitCommit = properties.getProperty(GIT_COMMIT, DEFAULT_VALUE);
+        dateTime = properties.getProperty(DATE_TIME, DEFAULT_VALUE);
 
         final StringBuilder toStringBuilder = new StringBuilder();
         toStringBuilder.append(this.getClass().getName());
@@ -102,6 +105,10 @@ public final class TerasologyVersion {
         toStringBuilder.append(GIT_COMMIT);
         toStringBuilder.append("=");
         toStringBuilder.append(gitCommit);
+        toStringBuilder.append(", ");
+        toStringBuilder.append(DATE_TIME);
+        toStringBuilder.append("=");
+        toStringBuilder.append(dateTime);
         toStringBuilder.append("]");
         toString = toStringBuilder.toString();
     }
@@ -137,8 +144,13 @@ public final class TerasologyVersion {
         return gitCommit;
     }
 
+    public String getDateTime() {
+        return dateTime;
+    }
+
     @Override
     public String toString() {
         return toString;
     }
+
 }

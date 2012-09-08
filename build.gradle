@@ -118,8 +118,8 @@ dependencies {
 }
 
 task createVersionInfoFile << {
-    versionInfoFileDir.mkdirs()
     if (env.BUILD_NUMBER != null) {
+        versionInfoFileDir.mkdirs()
         ant.propertyfile (file: versionInfoFile) {
             ant.entry(key:'buildNumber',value:env.BUILD_NUMBER)
             ant.entry(key:'buildId',value:env.BUILD_ID)
@@ -127,6 +127,7 @@ task createVersionInfoFile << {
             ant.entry(key:'buildUrl',value:env.BUILD_URL)
             ant.entry(key:'gitBranch',value:env.GIT_BRANCH)
             ant.entry(key:'gitCommit',value:env.GIT_COMMIT)
+            ant.entry(key:'dateTime',value:startDateTimeString)
         }
     }
 }
