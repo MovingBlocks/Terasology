@@ -33,7 +33,8 @@ ext {
     mainClassName = 'org.terasology.game.Terasology'
     jarFileName = 'Terasology.jar'
     env = System.getenv() // read environment variables, including variables passed by jenking continuous integration server
-    versionInfoFile = new File(sourceSets.main.output.resourcesDir, 'org/terasology/version/versionInfo.properties')
+    versionInfoFileDir = new File(sourceSets.main.output.resourcesDir, 'org/terasology/version')
+    versionInfoFile = new File(versionInfoFileDir, 'versionInfo.properties')
 }
 
 repositories {
@@ -117,6 +118,7 @@ dependencies {
 }
 
 task createVersionInfoFile << {
+    versionInfoFileDir.mkdirs()
     if (env.BUILD_NUMBER != null) {
         ant.propertyfile (file: versionInfoFile) {
             ant.entry(key:'buildNumber',value:env.BUILD_NUMBER)
