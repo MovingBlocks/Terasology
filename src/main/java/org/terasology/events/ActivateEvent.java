@@ -66,15 +66,15 @@ public class ActivateEvent extends AbstractEvent {
         return direction;
     }
 
-    public Vector3f getHitPosition() {
-        return hitPosition;
-    }
-
     public Vector3f getHitNormal() {
         return hitNormal;
     }
+    
+    public Vector3f getHitPosition() {
+		return hitPosition;
+	}
 
-    public Vector3f getTargetLocation() {
+	public Vector3f getTargetLocation() {
         LocationComponent loc = target.getComponent(LocationComponent.class);
         if (loc != null) {
             return loc.getWorldPosition();
@@ -89,4 +89,5 @@ public class ActivateEvent extends AbstractEvent {
         }
         return new Vector3f();
     }
+    
 }

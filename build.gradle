@@ -86,16 +86,11 @@ sourceCompatibility = 1.6
 compileJava.enabled = false
 sourceSets.main.java.srcDirs.each { sourceSets.main.groovy.srcDirs it }
 
-sourceSets {
-    dev
-}
-
 configurations {
     compile {
         exclude module: 'lwjgl-platform'
         exclude module: 'jinput-platform'
     }
-    devCompile.extendsFrom compile
 }
 
 dependencies {
@@ -113,7 +108,6 @@ dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
     testCompile group: 'junit', name: 'junit', version: '4.10'
     testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.0'
-    devCompile sourceSets.main.output
 }
 
 task createVersionInfoFile << {
@@ -170,7 +164,6 @@ test {
 
 /* Check ------------------------------------------------------------------- */
 checkstyle.ignoreFailures = true
-checkstyle.configProperties.samedir = checkstyle.configFile.parentFile
 /* Optional check plugins
 apply plugin: 'codenarc'
 apply plugin: 'findbugs'
@@ -181,6 +174,26 @@ codenarc.ignoreFailures = true
 findbugs.ignoreFailures = true
 pmd.ignoreFailures = true
 */
+
+/* perfTest ----------------------------------------------------------------- */
+sourceSets {
+    perfTest
+}
+
+configurations {
+    perfTestCompile.extendsFrom compile
+}
+
+dependencies {
+    perfTestCompile sourceSets.main.output
+}
+
+task runChunkCachePerformanceTest(type:JavaExec) {
+    description = "Run 'ChunkCachePerformanceTest'"
+    main = 'org.terasology.world.ChunkCachePerformanceTest'
+    classpath sourceSets.perfTest.runtimeClasspath
+    jvmArgs '-Xms512m', '-Xmx1024m', '-XX:MaxPermSize=128m'
+}
 
 /* Misc tasks ------------------------------------------------------------------- */
 task assembleMainOutput(type:Sync) {

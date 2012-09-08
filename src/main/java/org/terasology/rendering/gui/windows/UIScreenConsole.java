@@ -42,27 +42,26 @@ import org.terasology.input.binds.ConsoleButton;
 import org.terasology.input.binds.PauseButton;
 import org.terasology.game.CoreRegistry;
 import org.terasology.input.BindButtonEvent;
-import org.terasology.logic.console.ConsoleResult;
-import org.terasology.logic.console.GroovyHelp;
-import org.terasology.logic.console.GroovyHelpManager;
-import org.terasology.logic.console.GroovyManager;
-import org.terasology.rendering.gui.widgets.UIText;
-import org.terasology.rendering.gui.widgets.UITextWrap;
-import org.terasology.rendering.gui.widgets.UIWindow;
-import org.terasology.utilities.StringConstants;
+import org.terasology.logic.manager.GroovyHelp;
+import org.terasology.logic.manager.GroovyHelpManager;
+import org.terasology.logic.manager.GroovyManager;
+import org.terasology.rendering.gui.components.UIText;
+import org.terasology.rendering.gui.components.UITextWrap;
+import org.terasology.rendering.gui.framework.UIDisplayWindow;
+import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.management.BlockManager;
 
 /**
  * The debug console of Terasology.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
- * 
- * TODO rewrite this. add a own class for the console which will handle commands, maybe handle "chat" in general inside the class and console commands will be special chat commands.
  */
-public final class UIScreenConsole extends UIWindow {
+public final class UIScreenConsole extends UIDisplayWindow {
 
     private Logger logger = Logger.getLogger(getClass().getName());
     private final UIText _consoleText;
     private final UITextWrap _helpText;
+    public final String newLine = System.getProperty("line.separator");
 
     private final StringBuffer _consoleInput = new StringBuffer();
     private final ArrayList<String> _ringBuffer = new ArrayList<String>();
@@ -93,6 +92,7 @@ public final class UIScreenConsole extends UIWindow {
         _helpText.setVisible(true);
 
         addDisplayElement(_helpText);
+        setVisible(false);
     }
 
     /**
@@ -145,7 +145,7 @@ public final class UIScreenConsole extends UIWindow {
         }
 
         if (ConsoleButton.ID.equals(event.getId())) {
-            close();
+            setVisible(false);
             event.consume();
         }
     }
@@ -191,24 +191,24 @@ public final class UIScreenConsole extends UIWindow {
                 resetDebugConsole();
                 return;
             } else {
-                ConsoleResult result = CoreRegistry.get(GroovyManager.class).runGroovyShell(_consoleInput.toString());
-                if (result.isSuccess()) {
-                    setHelpText(result.getDisplayString());
-                    logger.log(Level.INFO, "Console command \"{0}\" accepted.", _consoleInput);
-
-                    addToRingBuffer();
-                    resetDebugConsole();
-                } else {
-                    try {
-                        _helpText.loadError();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    logger.log(Level.WARNING, "Console command \"{0}\" is invalid.", _consoleInput);
-                }
+                success = CoreRegistry.get(GroovyManager.class).runGroovyShell(_consoleInput.toString());
             }
         } catch (Exception e) {
             logger.log(Level.INFO, e.getMessage());
+        }
+        if (success) {
+            logger.log(Level.INFO, "Console command \"{0}\" accepted.", _consoleInput);
+
+            addToRingBuffer();
+            resetDebugConsole();
+            setVisible(false);
+        } else {
+            try {
+                _helpText.loadError();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            logger.log(Level.WARNING, "Console command \"{0}\" is invalid.", _consoleInput);
         }
     }
 
@@ -219,12 +219,12 @@ public final class UIScreenConsole extends UIWindow {
             if (split[1].equals("commandList")) {
                 HashMap<String, String> commandhelp = groovyhelpmanager.getHelpCommands();
                 String[] commandlist = groovyhelpmanager.getGroovyCommands();
-                String retval = "Available commands :" + StringConstants.NEW_LINE + StringConstants.NEW_LINE;
+                String retval = "Available commands :" + newLine + newLine;
                 for (int i = 0; i < commandlist.length; i++) {
                     if (commandhelp.containsKey(commandlist[i])) {
-                        retval += commandlist[i].toString() + " \t: " + commandhelp.get(commandlist[i]).toString() + StringConstants.NEW_LINE;
+                        retval += commandlist[i].toString() + " \t: " + commandhelp.get(commandlist[i]).toString() + newLine;
                     } else {
-                        retval += commandlist[i].toString() + " : undocumented" + StringConstants.NEW_LINE;
+                        retval += commandlist[i].toString() + " : undocumented" + newLine;
                     }
                 }
                 setHelpText(retval);
@@ -241,9 +241,20 @@ public final class UIScreenConsole extends UIWindow {
                 ArrayList<Prefab> prefabs = groovyhelpmanager.getItems();
                 Iterator<Prefab> it = prefabs.iterator();
                 while (it.hasNext()) {
-                    tempval += "item = " + it.next().getName() + StringConstants.NEW_LINE;
+                    tempval += "item = " + it.next().getName() + newLine;
                 }
                 setHelpText(tempval);
+                return;
+            }
+            if (split[1].equals("blockList")) {
+                StringBuilder stringBuilder = new StringBuilder();
+                for (BlockFamily blockFamily : BlockManager.getInstance().listBlockFamilies()) {
+                    stringBuilder.append(blockFamily.getDisplayName());
+                    stringBuilder.append(" - ");
+                    stringBuilder.append(blockFamily.getURI().toString());
+                    stringBuilder.append(newLine);
+                }
+                setHelpText(stringBuilder.toString());
                 return;
             }
             showError();
@@ -270,21 +281,21 @@ public final class UIScreenConsole extends UIWindow {
 
     public void setHelpText(GroovyHelp groovyhelp) throws IOException {
         String tempstring = "";
-        tempstring += groovyhelp.getCommandName() + " : " + groovyhelp.getCommandDesc() + StringConstants.NEW_LINE;
+        tempstring += groovyhelp.getCommandName() + " : " + groovyhelp.getCommandDesc() + newLine;
         if (groovyhelp.getParameters().length > 0) {
-            String parameters = "accepted parameters :" + StringConstants.NEW_LINE;
+            String parameters = "accepted parameters :" + newLine;
             for (int i = 0; i < groovyhelp.getParameters().length; i++) {
-                parameters += groovyhelp.getParameters()[i] + StringConstants.NEW_LINE;
+                parameters += groovyhelp.getParameters()[i] + newLine;
             }
-            tempstring += parameters + StringConstants.NEW_LINE;
+            tempstring += parameters + newLine;
         }
-        tempstring += "detailed help : " + groovyhelp.getCommandHelp() + StringConstants.NEW_LINE;
+        tempstring += "detailed help : " + groovyhelp.getCommandHelp() + newLine;
         if (groovyhelp.getExamples().length > 0) {
-            String examples = "Example(s) :" + StringConstants.NEW_LINE;
+            String examples = "Example(s) :" + newLine;
             for (int i = 0; i < groovyhelp.getExamples().length; i++) {
-                examples += groovyhelp.getExamples()[i] + StringConstants.NEW_LINE;
+                examples += groovyhelp.getExamples()[i] + newLine;
             }
-            tempstring += examples + StringConstants.NEW_LINE;
+            tempstring += examples + newLine;
             _helpText.addText(tempstring);
             _helpText.showFromJson();
         }

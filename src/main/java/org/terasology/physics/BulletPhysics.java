@@ -33,6 +33,7 @@ import org.terasology.entitySystem.EventReceiver;
 import org.terasology.entitySystem.EventSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.AABB;
+import org.terasology.math.Vector3fUtil;
 import org.terasology.math.Vector3i;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.world.BlockChangedEvent;
@@ -51,6 +52,8 @@ import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
 import com.bulletphysics.collision.dispatch.GhostObject;
 import com.bulletphysics.collision.dispatch.GhostPairCallback;
 import com.bulletphysics.collision.dispatch.PairCachingGhostObject;
+import com.bulletphysics.collision.dispatch.CollisionWorld.ConvexResultCallback;
+import com.bulletphysics.collision.dispatch.CollisionWorld.LocalConvexResult;
 import com.bulletphysics.collision.shapes.BoxShape;
 import com.bulletphysics.collision.shapes.ConvexShape;
 import com.bulletphysics.collision.shapes.voxel.VoxelWorldShape;
@@ -87,20 +90,21 @@ public class BulletPhysics implements EventReceiver<BlockChangedEvent> {
 
     public BulletPhysics(WorldProvider world) {
         collisionGroupManager = CoreRegistry.get(CollisionGroupManager.class);
-
+        //TODO Maybe we need another Broaphase here ?
         _broadphase = new DbvtBroadphase();
         _broadphase.getOverlappingPairCache().setInternalGhostPairCallback(new GhostPairCallback());
         _defaultCollisionConfiguration = new DefaultCollisionConfiguration();
         _dispatcher = new CollisionDispatcher(_defaultCollisionConfiguration);
         _sequentialImpulseConstraintSolver = new SequentialImpulseConstraintSolver();
+       
         _discreteDynamicsWorld = new DiscreteDynamicsWorld(_dispatcher, _broadphase, _sequentialImpulseConstraintSolver, _defaultCollisionConfiguration);
         _discreteDynamicsWorld.setGravity(new Vector3f(0f, -15f, 0f));
+        _discreteDynamicsWorld.getDispatchInfo().allowedCcdPenetration = 0;//This is needed for sweep test
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
         CoreRegistry.get(EventSystem.class).registerEventReceiver(this, BlockChangedEvent.class, BlockComponent.class);
-
+        
         PhysicsWorldWrapper wrapper = new PhysicsWorldWrapper(world);
         VoxelWorldShape worldShape = new VoxelWorldShape(wrapper);
-
         Matrix3f rot = new Matrix3f();
         rot.setIdentity();
         DefaultMotionState blockMotionState = new DefaultMotionState(new Transform(new Matrix4f(rot, new Vector3f(0, 0, 0), 1.0f)));
@@ -108,8 +112,9 @@ public class BulletPhysics implements EventReceiver<BlockChangedEvent> {
         RigidBody rigidBody = new RigidBody(blockConsInf);
         rigidBody.setCollisionFlags(CollisionFlags.STATIC_OBJECT | rigidBody.getCollisionFlags());
         _discreteDynamicsWorld.addRigidBody(rigidBody, combineGroups(StandardCollisionGroup.WORLD), (short)(CollisionFilterGroups.ALL_FILTER ^ CollisionFilterGroups.STATIC_FILTER));
+   
     }
-
+   
     public DynamicsWorld getWorld() {
         return _discreteDynamicsWorld;
     }
@@ -182,7 +187,7 @@ public class BulletPhysics implements EventReceiver<BlockChangedEvent> {
         removeCollider(scanObject);
         return result;
     }
-
+    
     public HitResult rayTrace(Vector3f from, Vector3f direction, float distance) {
         Vector3f to = new Vector3f(direction);
         to.scale(distance);
@@ -199,6 +204,27 @@ public class BulletPhysics implements EventReceiver<BlockChangedEvent> {
         return new HitResult();
     }
 
+    public float convexSweepTest(CollisionObject colObj) {
+    	float closestHitFraction = 0;
+    	Transform from = new Transform();
+    	Transform to = new Transform();
+    	from.setIdentity();
+    	to.setIdentity();
+    	colObj.getWorldTransform(from);
+    	colObj.getWorldTransform(to);
+    	Vector3f linearVelocity = new Vector3f();
+    	colObj.getInterpolationLinearVelocity(linearVelocity);
+    	to.origin.add(linearVelocity);
+    	CollisionWorld.ClosestConvexResultCallback closest = new CollisionWorld.ClosestConvexResultCallback(from.origin, to.origin);
+    	closest.collisionFilterGroup = colObj.getBroadphaseHandle().collisionFilterGroup;
+    	closest.collisionFilterMask = colObj.getBroadphaseHandle().collisionFilterMask;
+    	_discreteDynamicsWorld.convexSweepTest((ConvexShape)colObj.getCollisionShape(), from, to, closest);
+    	if (closest.hasHit()) {
+    		closestHitFraction = closest.closestHitFraction;
+    	}
+    	return closestHitFraction;
+    }
+
     public HitResult rayTrace(Vector3f from, Vector3f direction, float distance, CollisionGroup ... collisionGroups) {
         Vector3f to = new Vector3f(direction);
         to.scale(distance);
@@ -211,7 +237,7 @@ public class BulletPhysics implements EventReceiver<BlockChangedEvent> {
         closest.collisionFilterMask = filter;
         _discreteDynamicsWorld.rayTest(from, to, closest);
         if (closest.userData instanceof Vector3i) {
-            return new HitResult(blockEntityRegistry.getOrCreateEntityAt((Vector3i)closest.userData), closest.hitPointWorld, closest.hitNormalWorld, (Vector3i)closest.userData);
+            return new HitResult(blockEntityRegistry.getOrCreateEntityAt((Vector3i)closest.userData), closest.hitPointWorld, closest.hitNormalWorld);
         } else if (closest.userData instanceof EntityRef) {
             return new HitResult((EntityRef) closest.userData, closest.hitPointWorld, closest.hitNormalWorld);
         }
@@ -226,12 +252,62 @@ public class BulletPhysics implements EventReceiver<BlockChangedEvent> {
         max.add(new Vector3f(0.6f, 0.6f, 0.6f));
         _discreteDynamicsWorld.awakenRigidBodiesInArea(min, max);
     }
-
+       
+	int substep = 1;
+	
+	private void setTimeStep(float delta){
+		Vector3f velocity = new Vector3f();
+    	float distanceVelocity = 0;
+    	CollisionObject fastest = null;
+    	float distance = 0;
+    	//Determine fastest moving Object
+		for(CollisionObject colObj : _discreteDynamicsWorld.getCollisionObjectArray()){
+			colObj.getInterpolationLinearVelocity(velocity);
+         	distanceVelocity = velocity.length();
+         	if(distanceVelocity > distance){
+         		distance = distanceVelocity;
+         		fastest = colObj;
+         	}
+		}
+		if(fastest != null){
+			Vector3f center = new Vector3f();
+			float[] radius = new float[1];
+			fastest.getCollisionShape().getBoundingSphere(center, radius);
+			if(distance > radius[0]){//Stepping change needed ?
+				Transform transform = new Transform();
+				fastest.getWorldTransform(transform);
+				CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD, StandardCollisionGroup.STATIC};
+				HitResult hitResult = rayTrace(transform.origin, velocity, distance,filter);    		
+				if(hitResult.isHit()){ 
+					//Calculate the minimum amount of substeps needed for collision detection//rounded to the next bigger integer
+					//use raycast
+					//double distanceHit = Vector3fUtil.calcdist(transform.origin,hitResult.getHitPoint());
+					//use sweepTest
+					double hitFraction = convexSweepTest(fastest);
+					double distanceHit = distance * hitFraction;
+					if(distanceHit < radius[0]){
+						substep = (int) Math.round((distance/radius[0])+0.5f);
+					}else{
+						substep = (int) Math.round((distance/distanceHit)+0.5f);
+					}   	    	         			
+				}
+			}else{//reset substep
+        	 substep = 1;
+			}
+		}else{
+			 substep = 1;
+		}
+	}
+	
     public void update(float delta) {
         processQueuedBodies();
         try {
             PerformanceMonitor.startActivity("Step Simulation");
-            _discreteDynamicsWorld.stepSimulation(delta, 1);
+            setTimeStep(delta);
+            System.out.println("substep"+substep);
+            //timeste < substeps*fixedTimeStep
+            _discreteDynamicsWorld.stepSimulation(delta,substep, delta/substep);
+            // _discreteDynamicsWorld.stepSimulation(delta,1);
             PerformanceMonitor.endActivity();
         } catch (Exception e) {
             _logger.log(Level.WARNING, "Somehow Bullet Physics managed to throw an exception again.", e);
@@ -261,5 +337,6 @@ public class BulletPhysics implements EventReceiver<BlockChangedEvent> {
             this.filter = filter;
         }
     }
+    
 
 }

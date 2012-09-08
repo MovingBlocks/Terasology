@@ -175,10 +175,8 @@ public class StateSinglePlayer implements GameState {
     }
 
     private void cacheBlockMesh() {
-        for (BlockFamily family : BlockManager.getInstance().listRegisteredBlockFamilies()) {
-            if (!family.getArchetypeBlock().isInvisible()) {
-                family.getArchetypeBlock().getMesh();
-            }
+        for (BlockFamily family : BlockManager.getInstance().listBlockFamilies()) {
+            family.getArchetypeBlock().getMesh();
         }
     }
 
@@ -294,6 +292,10 @@ public class StateSinglePlayer implements GameState {
         }
 
         prepareWorld();
+    }
+
+    private boolean screenHasFocus() {
+        return GUIManager.getInstance().getFocusedWindow() != null && GUIManager.getInstance().getFocusedWindow().isModal() && GUIManager.getInstance().getFocusedWindow().isVisible();
     }
 
     private boolean shouldUpdateWorld() {

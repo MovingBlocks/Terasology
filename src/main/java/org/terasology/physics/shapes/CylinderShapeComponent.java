@@ -24,4 +24,6 @@ import org.terasology.entitySystem.Component;
 public class CylinderShapeComponent implements Component {
     public float radius = 0.5f;
     public float height = 1.0f;
+    float margin = 0.04f;
+
 }

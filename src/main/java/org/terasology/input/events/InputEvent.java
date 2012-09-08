@@ -19,7 +19,6 @@ import javax.vecmath.Vector3f;
 
 import org.terasology.entitySystem.AbstractEvent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.math.Vector3i;
 
 
 public abstract class InputEvent extends AbstractEvent {
@@ -27,7 +26,6 @@ public abstract class InputEvent extends AbstractEvent {
     private float delta;
 
     private EntityRef target = EntityRef.NULL;
-    private Vector3i targetBlockPosition;
     private Vector3f hitPosition;
     private Vector3f hitNormal;
 
@@ -35,9 +33,8 @@ public abstract class InputEvent extends AbstractEvent {
         this.delta = delta;
     }
 
-    public void setTarget(EntityRef target, Vector3i targetBlockPos, Vector3f hitPosition, Vector3f hitNormal) {
+    public void setTarget(EntityRef target, Vector3f hitPosition, Vector3f hitNormal) {
         this.target = target;
-        this.targetBlockPosition = targetBlockPos;
         this.hitPosition = hitPosition;
         this.hitNormal = hitNormal;
     }
@@ -52,10 +49,6 @@ public abstract class InputEvent extends AbstractEvent {
 
     public Vector3f getHitNormal() {
         return hitNormal;
-    }
-
-    public Vector3i getTargetBlockPosition() {
-        return targetBlockPosition;
     }
 
     public float getDelta() {

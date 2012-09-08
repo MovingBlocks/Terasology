@@ -24,7 +24,6 @@
     "shape" : "engine:billboard",
     "supportRequired" : true,
     "penetrable" : true,
-    "replacementAllowed" : true,
     "translucent" : true,
     "doubleSided" : true,
     "debrisOnDestroy" : false

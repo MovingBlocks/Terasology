@@ -1,0 +1,8 @@
+{
+    "shader" : "engine:genericMesh",
+    "params" : {
+        "diffuse" : "engine:arrow",
+        "colorOffset" : [1.0, 1.0, 1.0],
+        "textured" : true
+    }
+}

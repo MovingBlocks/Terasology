@@ -55,7 +55,7 @@ import org.terasology.game.modes.GameState;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.FontManager;
-import org.terasology.logic.console.GroovyManager;
+import org.terasology.logic.manager.GroovyManager;
 import org.terasology.logic.manager.InputConfig;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.manager.ShaderManager;

@@ -1,0 +1,9 @@
+
+newmtl Material.000001
+Ka 1 1 1
+Kd 1 1 1
+Ks 0 0 0
+d 1
+Ns 10
+map_Kd textures\weapons\roseofsithis.dds
+

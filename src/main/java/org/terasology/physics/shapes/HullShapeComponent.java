@@ -24,4 +24,6 @@ import org.terasology.rendering.primitives.Mesh;
  */
 public class HullShapeComponent implements Component {
     public Mesh sourceMesh;
+    float margin = 0.04f;
+
 }

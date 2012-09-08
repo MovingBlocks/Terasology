@@ -1,0 +1,32 @@
+{
+  "name": "combat:testprojectile",
+    "CylinderShape" : {
+    "radius" : 0.5f,
+    "height" : 1.0f
+    },
+     "Item" : {
+        "name" : "TestProjectile",
+        "icon" : "Sword",
+        "usage" : "IN_DIRECTION",
+        "renderWithIcon" : false,
+        "baseDamage" : 10
+    },
+    "Mesh" : {
+    	"mesh" : "engine:arrow",
+    	"material" : "engine:arrow"
+    },
+    "RigidBody" : {
+        "mass" : 0.025f,
+        "ccdMotionThreshold" : 0.04f,
+        "ccdSweptSphereRadius" : 0.2f,
+        "collisionGroup" : "engine:default",
+        "collidesWith" : ["engine:world","engine:sensor"]       
+    },"HitDetection" : {},
+    "Lifespan" : {
+        "lifespan" : 10
+    },
+    "Projectile" : { 
+    	"piercing" : true
+    }
+
+ }

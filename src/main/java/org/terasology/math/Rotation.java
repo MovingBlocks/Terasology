@@ -100,6 +100,7 @@ public enum Rotation {
     private static Quat4f getQuaternionForHorizRot(int steps) {
         Quat4f rotation = new Quat4f();
         rotation.set(new AxisAngle4f(new Vector3f(0, -1, 0), (float) (0.5f * Math.PI * steps)));
+      
         return rotation;
     }
 

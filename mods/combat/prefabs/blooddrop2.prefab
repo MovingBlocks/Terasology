@@ -1,0 +1,17 @@
+{
+    "name" : "combat:blooddrop2",
+    "blockParticleEffect" : {
+        "blockType" : "Lava",
+        "spawnCount" : 64,
+        "initialVelocityRange" : [4,4,4],
+        "spawnRange" : [0.3,0.3,0.3],
+        "destroyEntityOnCompletion" : true,
+        "minSize" : 0.05,
+        "maxSize" : 0.1,
+        "minLifespan" : 10,
+        "maxLifespan" : 15,
+        "targetVelocity" : [1,2,1],
+        "acceleration" : [2,2,2],
+        "collideWithBlocks" : true
+    }
+}

@@ -92,7 +92,9 @@ public class LightPropagator {
      * @return The region affected by the light update
      */
     public Region3i update(int x, int y, int z, Block type, Block oldType) {
-        return Region3i.createEncompassing(updateSunlight(x, y, z, type, oldType), updateLight(x, y, z, type, oldType));
+        Region3i reg = Region3i.createEncompassing(updateSunlight(x, y, z, type, oldType), updateLight(x, y, z, type, oldType));
+        logger.info("Lighting region changed: " + reg);
+        return reg;
     }
 
     private Region3i updateSunlight(int x, int y, int z, Block type, Block oldType) {
@@ -121,7 +123,7 @@ public class LightPropagator {
 
         if (changeType == PropagationComparison.MORE_RESTRICTED || (lum < oldType.getLuminance() && currentLight == oldType.getLuminance())) {
             // If some light might be blocked or reduced, do a full rebuild of the area
-            return clearLight(x, y, z, currentLight, type);
+            return clearLight(x, y, z, currentLight);
         } else if (changeType == PropagationComparison.MORE_PERMISSIVE) {
             // Light level can only increase, pull in light and push it out
             byte newLight = pullLight(x, y, z, lum, type);
@@ -304,10 +306,12 @@ public class LightPropagator {
     private Region3i clearSunlight(int x, int y, int z) {
         byte oldSunlight = worldView.getSunlight(x, y, z);
         if (oldSunlight == Chunk.MAX_LIGHT) {
+            //logger.log(Level.INFO, "Full Recalculating sunlight");
             worldView.setSunlight(x, y, z, (byte) 0);
             fullRecalculateSunlightAround(x, y, z);
             return Region3i.createFromMinAndSize(new Vector3i(x - Chunk.MAX_LIGHT + 1, 0, z - Chunk.MAX_LIGHT + 1), new Vector3i(2 * Chunk.MAX_LIGHT - 1, Chunk.SIZE_Y, 2 * Chunk.MAX_LIGHT - 1));
         } else if (oldSunlight > 1) {
+            //logger.log(Level.INFO, "Local Recalculating sunlight");
             localRecalculateSunlightAround(x, y, z, oldSunlight);
             return Region3i.createFromCenterExtents(new Vector3i(x, y, z), oldSunlight - 1);
         } else if (oldSunlight > 0) {
@@ -317,7 +321,7 @@ public class LightPropagator {
         return Region3i.EMPTY;
     }
 
-    private Region3i clearLight(int x, int y, int z, int oldLightLevel, Block type) {
+    private Region3i clearLight(int x, int y, int z, int oldLightLevel) {
         int checkExtent = (oldLightLevel > 0) ? oldLightLevel - 1 : 0;
         List<Vector3i> lightSources = Lists.newArrayList();
         Region3i region = Region3i.createFromCenterExtents(new Vector3i(x, y, z), checkExtent);
@@ -340,7 +344,6 @@ public class LightPropagator {
         // Draw in light from surrounding area
         for (Vector3i pos : Diamond3iIterator.iterateAtDistance(new Vector3i(x, y, z), checkExtent + 1)) {
             byte lightLevel = worldView.getLight(pos);
-            lightLevel = pullLight(pos.x, pos.y, pos.z, lightLevel, type);
             if (lightLevel > 1) {
                 pushLight(pos.x, pos.y, pos.z, lightLevel);
             }

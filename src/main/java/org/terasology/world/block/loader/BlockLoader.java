@@ -500,7 +500,6 @@ public class BlockLoader {
         block.setLiquid(def.liquid);
         block.setHardness(def.hardness);
         block.setAttachmentAllowed(def.attachmentAllowed);
-        block.setReplacementAllowed(def.replacementAllowed);
         block.setSupportRequired(def.supportRequired);
         block.setPenetrable(def.penetrable);
         block.setTargetable(def.targetable);

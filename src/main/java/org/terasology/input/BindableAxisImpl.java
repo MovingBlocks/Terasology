@@ -24,7 +24,6 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.logic.manager.GUIManager;
 
 import com.google.common.collect.Lists;
-import org.terasology.math.Vector3i;
 
 /**
  * A Bind Axis is an simulated analog input axis, maintaining a value between -1 and 1.  It is linked to
@@ -80,7 +79,7 @@ public class BindableAxisImpl implements BindableAxis {
         return value;
     }
 
-    void update(EntityRef localPlayer, float delta, EntityRef target, Vector3i targetBlockPos, Vector3f hitPosition, Vector3f hitNormal) {
+    void update(EntityRef localPlayer, float delta, EntityRef target, Vector3f hitPosition, Vector3f hitNormal) {
         boolean posInput = positiveInput.getState() == ButtonState.DOWN;
         boolean negInput = negativeInput.getState() == ButtonState.DOWN;
 
@@ -100,7 +99,7 @@ public class BindableAxisImpl implements BindableAxis {
 
         if (sendEventMode.shouldSendEvent(value, newValue)) {
             event.prepare(id, newValue, delta);
-            event.setTarget(target, targetBlockPos, hitPosition, hitNormal);
+            event.setTarget(target, hitPosition, hitNormal);
             localPlayer.send(event);
             sendEventToSubscribers(delta, target);
         }

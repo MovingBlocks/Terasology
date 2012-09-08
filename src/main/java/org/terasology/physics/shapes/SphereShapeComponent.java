@@ -23,4 +23,5 @@ import org.terasology.entitySystem.Component;
  */
 public class SphereShapeComponent implements Component {
     public float radius = 0.5f;
+    float margin = 0.04f;
 }

@@ -25,8 +25,8 @@ import org.terasology.logic.LocalPlayer;
 import org.terasology.mods.miniions.components.MinionBarComponent;
 import org.terasology.mods.miniions.components.MinionComponent;
 import org.terasology.mods.miniions.components.MinionControllerComponent;
-import org.terasology.rendering.gui.widgets.UIImage;
-import org.terasology.rendering.gui.widgets.UIWindow;
+import org.terasology.rendering.gui.framework.UIDisplayWindow;
+import org.terasology.rendering.gui.framework.UIGraphicsElement;
 
 /**
  * Created with IntelliJ IDEA.
@@ -35,23 +35,23 @@ import org.terasology.rendering.gui.widgets.UIWindow;
  * Time: 20:25
  * used as a dial menu without ungrabbing the mouse
  */
-public class UIMinionBehaviourMenu extends UIWindow {
+public class UIMinionBehaviourMenu extends UIDisplayWindow {
 
     //private UIButton buttonMove;
-    private final UIImage background;
-    private final UIImage selectionrectangle;
+    private final UIGraphicsElement background;
+    private final UIGraphicsElement selectionrectangle;
 
     public UIMinionBehaviourMenu() {
 
         setSize(new Vector2f(60f, 180f));
-        background = new UIImage(AssetManager.loadTexture("engine:guiMinion"));
+        background = new UIGraphicsElement(AssetManager.loadTexture("engine:guiMinion"));
         background.getTextureSize().set(new Vector2f(60f / 256f, 180f / 256f));
         background.getTextureOrigin().set(new Vector2f(30.0f / 256f, 20.0f / 256f));
         background.setSize(getSize());
         addDisplayElement(background);
         background.setVisible(true);
 
-        selectionrectangle = new UIImage(AssetManager.loadTexture("engine:guiMinion"));
+        selectionrectangle = new UIGraphicsElement(AssetManager.loadTexture("engine:guiMinion"));
         selectionrectangle.getTextureSize().set(new Vector2f(60f / 256f, 20f / 256f));
         selectionrectangle.getTextureOrigin().set(new Vector2f(30f / 256, 0.0f));
         selectionrectangle.setSize(new Vector2f(60f, 20f));

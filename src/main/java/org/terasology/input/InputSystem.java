@@ -183,7 +183,7 @@ public class InputSystem implements EventHandlerSystem {
 
                 BindableButtonImpl bind = mouseButtonBinds.get(button);
                 if (bind != null) {
-                    bind.updateBindState(buttonDown, delta, localPlayer.getEntity(), cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, GUIManager.getInstance().isConsumingInput());
+                    bind.updateBindState(buttonDown, delta, localPlayer.getEntity(), cameraTargetSystem.getTarget(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, GUIManager.getInstance().isConsumingInput());
                 }
             }
             //mouse wheel
@@ -193,8 +193,8 @@ public class InputSystem implements EventHandlerSystem {
 
                 BindableButtonImpl bind = (wheelMoved > 0) ? mouseWheelUpBind : mouseWheelDownBind;
                 if (bind != null) {
-                    bind.updateBindState(true, delta, localPlayer.getEntity(), cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, GUIManager.getInstance().isConsumingInput());
-                    bind.updateBindState(false, delta, localPlayer.getEntity(), cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, GUIManager.getInstance().isConsumingInput());
+                    bind.updateBindState(true, delta, localPlayer.getEntity(), cameraTargetSystem.getTarget(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, GUIManager.getInstance().isConsumingInput());
+                    bind.updateBindState(false, delta, localPlayer.getEntity(), cameraTargetSystem.getTarget(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, GUIManager.getInstance().isConsumingInput());
                 }
             }
         }
@@ -218,7 +218,7 @@ public class InputSystem implements EventHandlerSystem {
 
     private void setupTarget(InputEvent event) {
         if (cameraTargetSystem.isTargetAvailable() && !GUIManager.getInstance().isConsumingInput()) {
-            event.setTarget(cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal());
+            event.setTarget(cameraTargetSystem.getTarget(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal());
         }
     }
 
@@ -233,20 +233,20 @@ public class InputSystem implements EventHandlerSystem {
             // Update bind
             BindableButtonImpl bind = keyBinds.get(key);
             if (bind != null && !Keyboard.isRepeatEvent()) {
-                bind.updateBindState(Keyboard.getEventKeyState(), delta, localPlayer.getEntity(), cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, guiConsumingInput);
+                bind.updateBindState(Keyboard.getEventKeyState(), delta, localPlayer.getEntity(), cameraTargetSystem.getTarget(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, guiConsumingInput);
             }
         }
     }
 
     private void processBindAxis(float delta) {
         for (BindableAxisImpl axis : axisBinds) {
-            axis.update(localPlayer.getEntity(), delta, cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal());
+            axis.update(localPlayer.getEntity(), delta, cameraTargetSystem.getTarget(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal());
         }
     }
 
     private void processBindRepeats(float delta) {
         for (BindableButtonImpl button : buttonBinds) {
-            button.update(localPlayer.getEntity(), delta, cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal());
+            button.update(localPlayer.getEntity(), delta, cameraTargetSystem.getTarget(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal());
         }
     }
 
