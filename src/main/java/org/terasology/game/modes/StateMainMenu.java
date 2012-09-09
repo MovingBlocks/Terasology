@@ -98,7 +98,6 @@ public class StateMainMenu implements GameState {
         playBackgroundMusic();
         
         GUIManager.getInstance().openWindow("main");
-        GUIManager.getInstance().openWindow("chat");
     }
 
     @Override

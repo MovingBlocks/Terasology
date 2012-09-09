@@ -21,6 +21,7 @@ package org.terasology.logic.console;
  * Date: 29/04/12
  * Time: 13:54
  * To change this template use File | Settings | File Templates.
+ * @deprecated
  */
 public class GroovyHelp {
 
