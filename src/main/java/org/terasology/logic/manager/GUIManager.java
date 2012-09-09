@@ -15,7 +15,9 @@
  */
 package org.terasology.logic.manager;
 
-import com.google.common.collect.Lists;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.components.LocalPlayerComponent;
@@ -30,19 +32,33 @@ import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.ButtonState;
+import org.terasology.mods.miniions.rendering.gui.components.UIMinionBehaviourMenu;
+import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.widgets.UIMessageBox;
 import org.terasology.rendering.gui.widgets.UIWindow;
-
-import java.util.HashMap;
-import java.util.List;
+import org.terasology.rendering.gui.windows.UIMenuConfig;
+import org.terasology.rendering.gui.windows.UIMenuConfigAudio;
+import org.terasology.rendering.gui.windows.UIMenuConfigControls;
+import org.terasology.rendering.gui.windows.UIMenuConfigMods;
+import org.terasology.rendering.gui.windows.UIMenuConfigVideo;
+import org.terasology.rendering.gui.windows.UIMenuMain;
+import org.terasology.rendering.gui.windows.UIMenuPause;
+import org.terasology.rendering.gui.windows.UIMenuSelectWorld;
+import org.terasology.rendering.gui.windows.UIScreenBook;
+import org.terasology.rendering.gui.windows.UIScreenChat;
+import org.terasology.rendering.gui.windows.UIScreenContainer;
+import org.terasology.rendering.gui.windows.UIScreenDeath;
+import org.terasology.rendering.gui.windows.UIScreenHUD;
+import org.terasology.rendering.gui.windows.UIScreenInventory;
+import org.terasology.rendering.gui.windows.UIScreenLoading;
+import org.terasology.rendering.gui.windows.UIScreenMetrics;
 
 import javax.vecmath.Vector2f;
 
 /**
- * First version of simple GUI manager.
- * ToDo Init styles here
- * ToDo Add GUI manager to single player
+ * The GUI manager handles all windows within the UI.
  *
  * @author Kireev Anton <adeon.k87@gmail.com>
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
@@ -50,13 +66,11 @@ import javax.vecmath.Vector2f;
 
 public class GUIManager implements EventHandlerSystem {
     
+    private Logger logger = Logger.getLogger(getClass().getName());   
     private static GUIManager instance;
-    private HashMap<String, UIWindow> windowsById = new HashMap<String, UIWindow>();
-    
-    //renderer
     private UIDisplayRenderer renderer;
 
-    public GUIManager() {
+    private GUIManager() {
         renderer = new UIDisplayRenderer();
         renderer.setVisible(true);
     }
@@ -91,90 +105,180 @@ public class GUIManager implements EventHandlerSystem {
     /**
      * Add an window to the UI. Therefore it can be rendered and updated.
      * @param window The window to add.
-     * @param windowId The id of the window, to access windows by id.
      * @return Returns the added window.
      */
-    public <T extends UIWindow> T addWindow(T window, String windowId) {
-        renderer.addDisplayElementToPosition(0, window);
-        windowsById.put(windowId, window);
+    private UIWindow addWindow(UIWindow window) {
+        if (window != null) {
+            logger.log(Level.INFO, "GUIManager: Add window with ID \"" + window.getId() + "\"");
+            
+            renderer.addDisplayElementToPosition(0, window);
+        }
+
+        return window;
+    }
+    
+    private void removeWindow(UIWindow window) {
+        if (window == null) {
+            logger.log(Level.INFO, "GUIManager: Can't remove null reference");
+        } else {
+            logger.log(Level.INFO, "GUIManager: Remove window by reference with ID \"" + window.getId() + "\"");
+            
+            renderer.removeDisplayElement(window);
+        }
+    }
+    
+    private void removeAllWindows() {
+        logger.log(Level.INFO, "GUIManager: Remove all windows");
         
-        if (windowsById.size() == 1) {
-            setFocusedWindow(windowsById.get(0));
+        renderer.removeAllDisplayElements();
+    }
+
+    /**
+     * Close the given window by reference and remove it from the GUIManager. Therefore it won't be updated or rendered anymore.
+     * @param window The window by reference to remove.
+     */
+    public void closeWindow(UIWindow window) {
+        if (window == null) {
+            logger.log(Level.INFO, "GUIManager: Can't close window by null reference");
+        } else {
+            logger.log(Level.INFO, "GUIManager: Close window by reference with ID \"" + window.getId() + "\"");
+            
+            removeWindow(window);
+        }
+    }
+    
+    /**
+     * Close the window by ID and remove it from the GUIManager. Therefore it won't be updated or rendered anymore.
+     * @param windowId The window by ID to remove.
+     */
+    public void closeWindow(String windowId) {
+        logger.log(Level.INFO, "GUIManager: Close window by ID \"" + windowId + "\"");
+        
+        closeWindow(getWindowById(windowId));
+    }
+
+    /**
+     * Close all windows and remove them from the GUIManager. Therefore they won't be updated or rendered anymore.
+     */
+    public void closeAllWindows() {
+        logger.log(Level.INFO, "GUIManager: Close all windows");
+        
+        removeAllWindows();
+    }
+
+    /**
+     * Open and focus a window by reference.
+     * @param window The window to open and focus.
+     * @return Returns the reference of the window which was opened and focused.
+     */
+    public UIWindow openWindow(UIWindow window) {
+        if (window == null) {
+            logger.log(Level.INFO, "GUIManager: Can't open window by null reference");
+        } else {
+            if (!renderer.getDisplayElements().contains(window)) {
+                addWindow(window);
+            }
+            
+            logger.log(Level.INFO, "GUIManager: Open and focus window by reference with ID \"" + window.getId() + "\"");
+            
+            renderer.setWindowFocus(window);
         }
         
         return window;
     }
-
+    
     /**
-     * Close all windows which where added and remove them from the GUIManager. Therefore they won't be updated or rendered anymore.
+     * Open and focus a window by ID. If the window isn't loaded, it will try to load the window.
+     * @param windowId The ID of the window to open and focus.
+     * @return Returns the reference of the window which was opened and focused. If a window can't be loaded a null reference will be returned.
      */
-    public void removeAllWindows() {
-        List<String> windowIds = Lists.newArrayList(windowsById.keySet());
-        for (String windowId : windowIds) {
-            removeWindow(windowId);
-        }
-    }
-
-    /**
-     * Close the given window and remove it from the GUIManager. Therefore it won't be updated or rendered anymore.
-     * @param window The window by reference to remove.
-     */
-    public void removeWindow(UIWindow window) {
+    public UIWindow openWindow(String windowId) {
+        logger.log(Level.INFO, "GUIManager: Open and foucs window by ID \"" + windowId + "\"");
+        
+        UIWindow window = getWindowById(windowId);
         
         if (window == null) {
-            return;
-        }
-        
-        renderer.removeDisplayElement(window);
-
-        for (String key : windowsById.keySet()) {
-            if (windowsById.get(key).equals(window)) {
-                windowsById.remove(key);
-                break;
-            }
+            return openWindow(loadWindow(windowId));
+        } else {
+            return openWindow(window);
         }
     }
     
     /**
-     * Close the given window and remove it from the GUIManager. Therefore it won't be updated or rendered anymore.
-     * @param windowId The window by id to remove.
+     * Load a window by ID and add it to the UI.
+     * @param windowId The id of the window to load.
+     * @return Returns the reference of the loaded window or null if the window couldn't be loaded.
      */
-    public void removeWindow(String windowId) {
-        removeWindow(getWindowById(windowId));
+    public UIWindow loadWindow(String windowId) {
+        UIWindow window = getWindowById(windowId);
+        
+        if (window != null) {
+            logger.log(Level.INFO, "GUIManager: Window with ID \"" + windowId + "\" already loaded.");
+            
+            return getWindowById(windowId);
+        }
+                
+        //TODO parser action here! this is temporary
+        if (windowId.equals("main")) {
+            window = new UIMenuMain();
+        } else if (windowId.equals("selectWorld")) {
+            window = new UIMenuSelectWorld();
+        } else if (windowId.equals("config")) {
+            window = new UIMenuConfig();
+        } else if (windowId.equals("config:video")) {
+            window = new UIMenuConfigVideo();
+        } else if (windowId.equals("config:audio")) {
+            window = new UIMenuConfigAudio();
+        } else if (windowId.equals("config:controls")) {
+            window = new UIMenuConfigControls();
+        } else if (windowId.equals("config:mods")) {
+            window = new UIMenuConfigMods();
+        } else if (windowId.equals("loading")) {
+            window = new UIScreenLoading();
+        } else if (windowId.equals("book")) {
+            window = new UIScreenBook();
+        } else if (windowId.equals("container")) {
+            window = new UIScreenContainer();
+        } else if (windowId.equals("createWorld")) {
+            window = new UIDialogCreateNewWorld();
+        } else if (windowId.equals("metrics")) {
+            window = new UIScreenMetrics();
+        } else if (windowId.equals("death")) {
+            window = new UIScreenDeath();
+        } else if (windowId.equals("pause")) {
+            window = new UIMenuPause();
+        } else if (windowId.equals("inventory")) {
+            window = new UIScreenInventory();
+        } else if (windowId.equals("chat")) {
+            window = new UIScreenChat();
+        } else if (windowId.equals("hud")) {
+            window = new UIScreenHUD();
+        } else if (windowId.equals("minionBehaviour")) {
+            window = new UIMinionBehaviourMenu();
+        }
+        
+        if (window == null) {
+            logger.log(Level.INFO, "GUIManager: Couldn't load window by ID \"" + windowId + "\"");
+        } else {
+            logger.log(Level.INFO, "GUIManager: Loaded window of type " + window.getClass().getName());
+        }
+        
+        return addWindow(window);
     }
 
     /**
-     * Get a window reference which was added to the GUIManager through their id.
+     * Get a window reference, which was added to the GUIManager by id.
      * @param windowId The window id.
      * @return Returns the reference of the window with the given id or null if there is none with this id.
      */
-    public UIWindow getWindowById(String windowId) {
-        if (windowsById.containsKey(windowId)) {
-            return windowsById.get(windowId);
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Set the focus to the given window by its reference. The focused window will be set on the top of the layer.
-     * @param window The window reference.
-     */
-    public void setFocusedWindow(UIWindow window) {
-    	renderer.setWindowFocus(window);
-    	checkMouseMovement();
-    }
-    
-    /**
-     * Set the focus to the given window by its id. The focused window will be set on the top of the layer.
-     * @param windowId The window id.
-     */
-    public void setFocusedWindow(String windowId) {
-        if (windowsById == null || windowsById.size() < 1 || !windowsById.containsKey(windowId)) {
-            return;
+    public UIWindow getWindowById(String windowId) {        
+        for (UIDisplayElement window : renderer.getDisplayElements()) {
+            if (window.getId().equals(windowId)) {
+                return (UIWindow) window;
+            }
         }
         
-        setFocusedWindow(windowsById.get(windowId));
+        return null;
     }
 
     /**
@@ -188,7 +292,7 @@ public class GUIManager implements EventHandlerSystem {
 	/**
 	 * Check whether the mouse of the current focused window is visible and can be moved on the display.
 	 */
-    public void checkMouseMovement() {
+    public void checkMouseGrabbing() {
         if (isConsumingInput() || renderer.getWindowFocused() == null) {
             Mouse.setGrabbed(false);
         } else {
@@ -211,8 +315,8 @@ public class GUIManager implements EventHandlerSystem {
      */
     public void showMessage(String title, String text) {
         UIWindow messageWindow = new UIMessageBox(title, text);
-        addWindow(messageWindow, "messageBox");
-        setFocusedWindow(messageWindow);
+        addWindow(messageWindow);
+        openWindow(messageWindow);
     }
     
     

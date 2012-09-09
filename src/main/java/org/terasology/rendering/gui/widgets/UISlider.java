@@ -39,7 +39,7 @@ import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 public class UISlider extends UIDisplayContainer {
     
     private final ArrayList<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
-    private final UIText label;
+    private final UILabel label;
     private final UIImage slider;
     
     private int currentValue;
@@ -135,7 +135,7 @@ public class UISlider extends UIDisplayContainer {
             }
         });
         
-        label = new UIText("");
+        label = new UILabel("");
         label.setHorizontalAlign(EHorizontalAlign.CENTER);
         label.setVerticalAlign(EVerticalAlign.CENTER);
         label.setVisible(true);

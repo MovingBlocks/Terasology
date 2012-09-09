@@ -29,8 +29,10 @@ import org.lwjgl.opengl.Display;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.logic.manager.ShaderManager;
+import org.terasology.rendering.gui.framework.events.BindKeyListener;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.FocusListener;
+import org.terasology.rendering.gui.framework.events.KeyListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 
@@ -45,13 +47,17 @@ import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 public abstract class UIDisplayElement {
 
     protected static UIDisplayElement focusedElement;
+    
     private UIDisplayElement parent;
+    private String id = "";
     
     //events
     private final ArrayList<MouseMoveListener> mouseListeners = new ArrayList<MouseMoveListener>();
     private final ArrayList<MouseButtonListener> mouseButtonListeners = new ArrayList<MouseButtonListener>();
     private final ArrayList<ClickListener> clickListeners = new ArrayList<ClickListener>();
     private final ArrayList<FocusListener> focusListeners = new ArrayList<FocusListener>();
+    private final ArrayList<KeyListener> keyListeners = new ArrayList<KeyListener>();
+    private final ArrayList<BindKeyListener> bindKeyListeners = new ArrayList<BindKeyListener>();
     private static enum EMouseEvents {ENTER, LEAVE, HOVER, MOVE};
     private EMouseEvents lastMouseState;
     private boolean mouseIsDown = false;
@@ -69,29 +75,21 @@ public abstract class UIDisplayElement {
     
     //position and size
     public static enum EUnitType {PIXEL, PERCENTAGE};
-    private EUnitType unitPositionX = EUnitType.PIXEL;
-    private EUnitType unitPositionY = EUnitType.PIXEL;
-    private EUnitType unitSizeX = EUnitType.PIXEL;
-    private EUnitType unitSizeY = EUnitType.PIXEL;
+    protected EUnitType unitPositionX = EUnitType.PIXEL;
+    protected EUnitType unitPositionY = EUnitType.PIXEL;
+    protected EUnitType unitSizeX = EUnitType.PIXEL;
+    protected EUnitType unitSizeY = EUnitType.PIXEL;
     
     public static enum EPositionType {ABSOLUTE, RELATIVE};
-    private EPositionType positionType = EPositionType.RELATIVE;
+    protected EPositionType positionType = EPositionType.RELATIVE;
     private final Vector2f position = new Vector2f(0, 0);
-    private final Vector2f positionOriginal  = new Vector2f(0, 0);
+    protected final Vector2f positionOriginal  = new Vector2f(0, 0);
     
     private final Vector2f size = new Vector2f(0, 0);
-    private final Vector2f sizeOriginal = new Vector2f(0, 0);
+    protected final Vector2f sizeOriginal = new Vector2f(0, 0);
     
     public UIDisplayElement() {
-    }
-
-    public UIDisplayElement(Vector2f position) {
-        this.position.set(position);
-    }
-
-    public UIDisplayElement(Vector2f position, Vector2f size) {
-        this.position.set(position);
-        this.size.set(size);
+        
     }
 
     public void renderTransformed() {
@@ -118,7 +116,7 @@ public abstract class UIDisplayElement {
      * @param event The event which contains all necessary information.
      */
     public void processBindButton(BindButtonEvent event) {
-        //TODO process bind buttons
+        notifyBindKeyListeners(event);
     }
 
     /**
@@ -126,7 +124,7 @@ public abstract class UIDisplayElement {
      * @param event The event which contains all necessary information.
      */
     public void processKeyboardInput(KeyEvent event) {
-        //TODO process raw keyboard
+        notifyKeyListeners(event);
     }
 
     /**
@@ -388,8 +386,8 @@ public abstract class UIDisplayElement {
     }
 
     /**
-     * Set the position of the display element.
-     * @return
+     * Get the position of the display element.
+     * @return Returns the position.
      */
     public Vector2f getPosition() {
         return position;
@@ -409,6 +407,8 @@ public abstract class UIDisplayElement {
         
         this.position.set(position);
         this.positionOriginal.set(position);
+        
+        layout();
     }
     
     /**
@@ -455,6 +455,16 @@ public abstract class UIDisplayElement {
         
         this.size.set(posX, posY);
         this.sizeOriginal.set(posX, posY);
+        
+        layout();
+    }
+    
+    public EUnitType getUnitPositionX() {
+        return unitPositionX;
+    }
+
+    public EUnitType getUnitPositionY() {
+        return unitPositionY;
     }
 
     /**
@@ -492,43 +502,55 @@ public abstract class UIDisplayElement {
         width = width.replace(" ", "").toLowerCase();
         height = height.replace(" ", "").toLowerCase();
         
-        float widthValue = 0;
-        float heightValue = 0;
+        float widthValue = sizeOriginal.x;
+        float heightValue = sizeOriginal.x;
         
-        try {
-            if (width.matches("^\\d+(\\.\\d+)?%$")) {
-                widthValue = Float.valueOf(width.substring(0, width.length() - 1));
-                unitSizeX = EUnitType.PERCENTAGE;
-            } else if (width.matches("^\\d+(\\.\\d+)?px$")) {
-                widthValue = Float.valueOf(width.substring(0, width.length() - 2));
-                unitSizeX = EUnitType.PIXEL;
-            } else if (width.matches("^\\d+(\\.\\d+)?$")) {
-                widthValue = Float.valueOf(width);
-                unitSizeX = EUnitType.PIXEL;
+        if (width != null) {
+            try {
+                if (width.matches("^\\d+(\\.\\d+)?%$")) {
+                    widthValue = Float.valueOf(width.substring(0, width.length() - 1));
+                    unitSizeX = EUnitType.PERCENTAGE;
+                } else if (width.matches("^\\d+(\\.\\d+)?px$")) {
+                    widthValue = Float.valueOf(width.substring(0, width.length() - 2));
+                    unitSizeX = EUnitType.PIXEL;
+                } else if (width.matches("^\\d+(\\.\\d+)?$")) {
+                    widthValue = Float.valueOf(width);
+                    unitSizeX = EUnitType.PIXEL;
+                }
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
             }
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
         }
         
-        try {
-            if (height.matches("^\\d+(\\.\\d+)?%$")) {
-                heightValue = Float.valueOf(height.substring(0, height.length() - 1));
-                unitSizeY = EUnitType.PERCENTAGE;
-            } else if (height.matches("^\\d+(\\.\\d+)?px$")) {
-                heightValue = Float.valueOf(height.substring(0, height.length() - 2));
-                unitSizeY = EUnitType.PIXEL;
-            } else if (height.matches("^\\d+(\\.\\d+)?$")) {
-                heightValue = Float.valueOf(height);
-                unitSizeY = EUnitType.PIXEL;
+        if (height != null) {
+            try {
+                if (height.matches("^\\d+(\\.\\d+)?%$")) {
+                    heightValue = Float.valueOf(height.substring(0, height.length() - 1));
+                    unitSizeY = EUnitType.PERCENTAGE;
+                } else if (height.matches("^\\d+(\\.\\d+)?px$")) {
+                    heightValue = Float.valueOf(height.substring(0, height.length() - 2));
+                    unitSizeY = EUnitType.PIXEL;
+                } else if (height.matches("^\\d+(\\.\\d+)?$")) {
+                    heightValue = Float.valueOf(height);
+                    unitSizeY = EUnitType.PIXEL;
+                }
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
             }
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
         }
         
         this.size.set(widthValue, heightValue);
         this.sizeOriginal.set(widthValue, heightValue);
         
         layout();
+    }
+
+    public EUnitType getUnitSizeX() {
+        return unitSizeX;
+    }
+
+    public EUnitType getUnitSizeY() {
+        return unitSizeY;
     }
     
     /**
@@ -598,6 +620,22 @@ public abstract class UIDisplayElement {
      */
     public void setParent(UIDisplayElement parent) {
         this.parent = parent;
+    }
+    
+    /**
+     * Get the ID of the display element.
+     * @return Returns the ID.
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * Set the ID of the display element ID.
+     * @param id The ID.
+     */
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**
@@ -670,6 +708,34 @@ public abstract class UIDisplayElement {
 
     public void removeClickListener(ClickListener listener) {
         clickListeners.remove(listener);
+    }
+    
+    private void notifyKeyListeners(KeyEvent event) {
+        for (KeyListener listener : keyListeners) {
+            listener.key(this, event);
+        }
+    }
+    
+    public void addKeyListener(KeyListener listener) {
+        keyListeners.add(listener);
+    }
+
+    public void removeKeyListener(KeyListener listener) {
+        keyListeners.remove(listener);
+    }
+    
+    private void notifyBindKeyListeners(BindButtonEvent event) {
+        for (BindKeyListener listener : bindKeyListeners) {
+            listener.key(this, event);
+        }
+    }
+    
+    public void addBindKeyListener(BindKeyListener listener) {
+        bindKeyListeners.add(listener);
+    }
+
+    public void removeBindKeyListener(BindKeyListener listener) {
+        bindKeyListeners.remove(listener);
     }
     
     private void notifyFocusListeners(boolean focus) {

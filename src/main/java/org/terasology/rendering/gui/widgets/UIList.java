@@ -18,344 +18,245 @@ package org.terasology.rendering.gui.widgets;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
 
-import org.newdawn.slick.Color;
-import org.terasology.rendering.gui.framework.IInputDataElement;
-import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayContainerScrollable;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.ClickListener;
-import org.terasology.rendering.gui.framework.events.MouseMoveListener;
+import org.terasology.rendering.gui.layout.GridLayout;
+import org.terasology.rendering.gui.widgets.list.UIListItem;
 
 /**
  * A simple graphical List
- *
- * @author Anton Kireev <adeon.k87@gmail.com>
- * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
- * @version 0.3
  * 
- * TODO get rid of the IInputDataElement
- * TODO here is a bug with deleting the selected item..
+ * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
+ * @author Anton Kireev <adeon.k87@gmail.com>
+ * 
+ * TODO should this really be a widget? -> the user should decide what UIEelements he want to add to the list
  */
-
-public class UIList extends UIDisplayContainerScrollable implements IInputDataElement {
-
-    private UIListItem _selectedItem = null;
-    private final ArrayList<ClickListener> _doubleClickListeners = new ArrayList<ClickListener>();
-
-    //List items
-    private final List<UIListItem> items = new ArrayList<UIListItem>();
-    private final List<ChangedListener> _changedListeners = new ArrayList<ChangedListener>();
+public class UIList extends UIDisplayContainerScrollable {
     
-    public class UIListItem extends UIDisplayContainer {
-        private Object value;
-        private String text;
-        private boolean isSelected;
-        private final Vector2f padding = new Vector2f(5f, 10f);
-
-        private final UIText label;
-
-        public UIListItem(Vector2f size, String text, Object value) {
-            setSize(size);
-            this.text = text;
-            this.value = value;
-
-            label = new UIText();
-            label.setVisible(true);
-            label.setColor(Color.lightGray);
-            label.setPosition(new Vector2f((getPosition().x + padding.x), (getPosition().y + padding.y)));
-            label.setText(text);
-
-            if (getSize().x < label.getTextWidth()) {
-                setSize(new Vector2f(label.getTextWidth(), getSize().y));
-            }
-            
-            addMouseMoveListener(new MouseMoveListener() {        
-                @Override
-                public void leave(UIDisplayElement element) {
-                    if(!isSelected) {
-                        label.setColor(Color.lightGray);
-                    }
-                }
-                
-                @Override
-                public void hover(UIDisplayElement element) {
-
-                }
-                
-                @Override
-                public void enter(UIDisplayElement element) {
-                    if(!isSelected) {
-                        label.setColor(Color.orange);
-                    }
-                }
-
-                @Override
-                public void move(UIDisplayElement element) {
-
-                }
-            });
-
-            addDisplayElement(label);
-        }
-
-        public Object getValue() {
-            return value;
-        }
-
-        public void setValue(Object value) {
-            this.value = value;
-        }
-
-        public String getText() {
-            return text;
-        }
-
-        public void setText(String text) {
-            label.setText(this.text);
-            this.text = text;
-        }
-
-        public boolean isSelected() {
-            return isSelected;
-        }
-
-        public void setSelected(boolean selected) {
-            isSelected = selected;
-
-            if (isSelected) {
-                setBackgroundColor(0xE1, 0xDD, 0xD4, 1.0f);
-                label.setColor(Color.orange);
-            } else {
-                removeBackgroundColor();
-                label.setColor(Color.lightGray);
-            }
-        }
+    //selection
+    private UIListItem selection = null;
+    
+    //events
+    private final List<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
+    private final ArrayList<ClickListener> doubleClickListeners = new ArrayList<ClickListener>();
+    
+    //child elements
+    private final UIComposite list;
+    
+    //options
+    private boolean isDisabled = false;
+    
+    public UIList() {     
+        setEnableScrolling(true);
+        setEnableScrollbar(true);
         
-        @Override
-        public void render() {
-            // TODO Auto-generated method stub
-            super.render();
-        }
+        list = new UIComposite();
+        list.setSize("100%", "100%");
+        list.setLayout(new GridLayout(1));
+        list.setVisible(true);
+        
+        addDisplayElement(list);
     }
-
-    public UIList(Vector2f size) {
-        super(size);
+    
+    @Override
+    //TODO change behavior of list widget with padding
+    public void setPadding(Vector4f padding) {
+        
     }
-
+    
     /**
-     * Get the count of the elements in this list.
-     * @return Returns the count of the elements in this list.
+     * Add an item to a specific location in the list.
+     * @param index The index, where the item should be added.
+     * @param item The item to add.
      */
-    public int size() {
-        return items.size();
-    }
-
-    /**
-     * Add an item to the list.
-     * @param text The text of the item.
-     * @param value The value which the item holds.
-     */
-    public void addItem(String text, Object value) {
-
-        final UIListItem newItem = new UIListItem(new Vector2f(getSize().x, (32f)), text, value);
-
-        newItem.setVisible(true);
-
-        if (items.size() > 0) {
-            newItem.setPosition(items.get(0).getPosition());
-        }
-
-        newItem.setPosition(new Vector2f(0f, 32f * items.size()));
-        newItem.addClickListener(new ClickListener() {
-            private long _lastTime = System.currentTimeMillis();
-            private int _lastButton = -1;
+    public void addItem(int index, final UIListItem item) {        
+        item.addClickListener(new ClickListener() {
+            private long lastTime = System.currentTimeMillis();
+            private int lastButton = -1;
             
             @Override
             public void click(UIDisplayElement element, int button) {
-                //Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
-                //handle double click
-                if ((System.currentTimeMillis() - _lastTime) < 200 && _lastButton == button) {
-                    notifyDoubleClickListeners();
+                if (!isDisabled) {
+                    //check double click
+                    if ((System.currentTimeMillis() - lastTime) < 200 && lastButton == button) {
+                        notifyDoubleClickListeners();
+                    }
+                    lastTime = System.currentTimeMillis();
+                    lastButton = button;
+                    
+                    //select the item
+                    select(getItemIndex(item));
                 }
-                _lastTime = System.currentTimeMillis();
-                _lastButton = button;
-                
-                //select the clicked item
-                UIListItem item = (UIListItem) element;
-                
-                if (_selectedItem != null)
-                    _selectedItem.setSelected(false);
-                
-                _selectedItem = item;
-                _selectedItem.setSelected(true);
-                
-                notifyChangedListeners();
             }
         });
-
-        //lets add the item and calculate the new content height of the scroll container
-        items.add(newItem);
-        addDisplayElement(newItem);
+        item.setDisabled(isDisabled);
+        item.setVisible(true);
+        
+        list.addDisplayElementToPosition(index, item);
+        
+        layout();
     }
     
     /**
-     * Get an item by the items index.
-     * @param index The item index.
-     * @return Returns the item at the given index.
+     * Add an item to the list.
+     * @param item The item to add.
      */
-    public UIListItem getItem(int index){
-        if(!items.isEmpty()){
-            return items.get(index);
-        } else {
-            return null;
-        }
+    public void addItem(UIListItem item) {
+        addItem(getItemCount(), item);
     }
-
+    
     /**
-     * Select a particular item in this list.
-     * @param i The index of the item to select.
+     * Remove an item at a specific location.
+     * @param index The index of the item to remove.
      */
-    public void setSelectedItemIndex(int i) {
-        if (_selectedItem != null) {
-            _selectedItem.setSelected(false);
+    public void removeItem(int index) {
+        list.removeDisplayElement(getItems().get(index));
+        
+        //select next item
+        if (index < getItemCount()) {
+            select(index);
+        } else if (index > 0) {
+            select(index - 1);
         }
         
-        _selectedItem = items.get(i);
-        _selectedItem.setSelected(true);
+        layout();
+    }
+    
+    /**
+     * Remove all items.
+     */
+    public void removeAll() {
+        list.removeAllDisplayElements();
         
-        notifyChangedListeners();
+        layout();
     }
     
     /**
      * Get the selected item.
-     * @return Returns the selected item.
+     * @return Returns the selected item or null if none is selected.
      */
-    public UIListItem getSelectedItem() {
-        return _selectedItem;
+    public UIListItem getSelection() {
+        return selection;
     }
     
     /**
-     * Get the value of the selected item.
-     * @return Returns the value of the selected item.
+     * Get the selected item index.
+     * @return Returns the selected item index of -1 if none is selected.
      */
-    public Object getValue() {
-        return _selectedItem.getValue();
+    public int getSelectionIndex() {
+        return getItemIndex(selection);
     }
     
     /**
-     * Get the index of the selected item.
-     * @return Returns the index of the selected item.
+     * Select a specific item in the list.
+     * @param index The item index to select.
      */
-    public int getSelectedItemIndex() {
-        for (int i = 0; i < items.size(); i++) {
-            if (items.get(i) == _selectedItem) {
+    public void select(int index) {
+        if (index != getItemIndex(selection) && !isDisabled) {
+            if (selection != null) {
+                selection.setSelected(false);
+            }
+            
+            getItem(index).setSelected(true);
+            selection = getItem(index);
+            
+            notifyChangedListeners();
+        }
+    }
+    
+    /**
+     * Get the size of the list.
+     * @return Returns the number of items in the list.
+     */
+    public int getItemCount() {
+        return getItems().size();
+    }
+    
+    /**
+     * Get the index of the given item.
+     * @param item The item reference to get the index from.
+     * @return Returns the item index or -1 if item is not in the list.
+     */
+    public int getItemIndex(UIListItem item) {
+        List<UIListItem> list = getItems();
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i) == item) {
                 return i;
             }
         }
         
         return -1;
     }
-
+    
     /**
-     * Remove a item in the list by the items index.
-     * @param index The index of the item to remove.
+     * Get an item at a specific location.
+     * @param index The index of the item.
+     * @return Returns the item at this index.
      */
-    public void removeItem(int index) {
-        removeDisplayElement(items.get(index));
-        items.remove(index);
+    public UIListItem getItem(int index) {
+        return getItems().get(index);
     }
     
     /**
-     * Remove the selected item.
+     * Get all items in the list.
+     * @return Returns the list of all items.
      */
-    public void removeSelectedItem() {
-
-        if (_selectedItem == null) {
-            return;
-        }
-
-        int index = getSelectedItemIndex();
-        removeDisplayElement(_selectedItem);
-        items.remove(_selectedItem);
-
-        for (int i = index; i < items.size(); i++) {
-            items.get(i).setPosition(new Vector2f(0f, items.get(i).getPosition().y - 32f));
-        }
-
-        if (items.size() > 0) {
-            if (index <= items.size() - 1) {
-                setSelectedItemIndex(index);
+    public List<UIListItem> getItems() {
+        List<UIListItem> items = new ArrayList<UIListItem>();
+        for (UIDisplayElement element : list.getDisplayElements()) {
+            if (element instanceof UIListItem) {
+                items.add((UIListItem) element);
             }
-            else {
-                setSelectedItemIndex(items.size() - 1);
-            }
-
         }
-        else {
-            _selectedItem = null;
-        }
+        
+        return items;
+    }
+    
+    public boolean isDisabled() {
+        return isDisabled;
     }
 
-    /**
-     * Remove all items in this list.
-     */
-    public void removeAll() {
-        clearData();
-        for (int i = (items.size() - 1); i >= 0; i--) {
-            removeDisplayElement(items.get(i));
-            items.remove(i);
+    public void setDisabled(boolean disabled) {
+        this.isDisabled = disabled;
+        
+        for (UIListItem item : getItems()) {
+            item.setDisabled(disabled);
         }
-    }
-
-    /**
-     * Check if the list is empty.
-     * @return Returns true if the list is empty.
-     */
-    public boolean isEmpty(){
-        return items.isEmpty();
-    }
-
-    /**
-     * Clear data (?)
-     */
-    public void clearData() {
-        if (_selectedItem != null)
-            _selectedItem.setSelected(false);
-        _selectedItem = null;
     }
     
     /*
        Event listeners
     */
-
+    
     private void notifyDoubleClickListeners() {
-        for (int i = 0; i < _doubleClickListeners.size(); i++) {
-            _doubleClickListeners.get(i).click(this, 0);
+        for (int i = 0; i < doubleClickListeners.size(); i++) {
+            doubleClickListeners.get(i).click(this, 0);
         }
     }
-    
+     
     public void addDoubleClickListener(ClickListener listener) {
-        _doubleClickListeners.add(listener);
-    }
-
-    public void removeDoubleClickListener(ClickListener listener) {
-        _doubleClickListeners.remove(listener);
+        doubleClickListeners.add(listener);
     }
     
+    public void removeDoubleClickListener(ClickListener listener) {
+        doubleClickListeners.remove(listener);
+    }
+     
     private void notifyChangedListeners() {
-        for (ChangedListener listener : _changedListeners) {
+        for (ChangedListener listener : changedListeners) {
             listener.changed(this);
         }
     }
-    
+     
     public void addChangedListener(ChangedListener listener) {
-        _changedListeners.add(listener);
+        changedListeners.add(listener);
     }
-
+    
     public void removeChangedListener(ChangedListener listener) {
-        _changedListeners.remove(listener);
+        changedListeners.remove(listener);
     }
 }

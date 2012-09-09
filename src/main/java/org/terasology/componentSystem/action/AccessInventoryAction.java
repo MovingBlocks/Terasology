@@ -33,10 +33,8 @@ import org.terasology.rendering.gui.windows.UIScreenContainer;
 @RegisterComponentSystem(authorativeOnly = true)
 public class AccessInventoryAction implements EventHandlerSystem {
 
-    private UIScreenContainer containerScreen;
-
     public void initialise() {
-        containerScreen = GUIManager.getInstance().addWindow(new UIScreenContainer(), "container");
+
     }
 
     @Override
@@ -51,8 +49,8 @@ public class AccessInventoryAction implements EventHandlerSystem {
     @ReceiveEvent(components = {LocalPlayerComponent.class, InventoryComponent.class})
     public void onOpenContainer(OpenInventoryEvent event, EntityRef entity) {
         if (event.getContainer().hasComponent(InventoryComponent.class)) {
+            UIScreenContainer containerScreen = (UIScreenContainer)GUIManager.getInstance().openWindow("container");
             containerScreen.openContainer(event.getContainer(), entity);
-            GUIManager.getInstance().setFocusedWindow(containerScreen);
         }
     }
 

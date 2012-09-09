@@ -39,6 +39,7 @@ public class UIMenuConfigMods extends UIWindow {
             _backToConfigMenuButton;
 
     public UIMenuConfigMods() {
+        setId("config:mods");
         setBackgroundImage("engine:loadingbackground");
         setModal(true);
         maximize();
@@ -66,7 +67,7 @@ public class UIMenuConfigMods extends UIWindow {
         _backToConfigMenuButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().setFocusedWindow(GUIManager.getInstance().getWindowById("menuConfig"));
+                GUIManager.getInstance().openWindow("config");
             }
         });
         _backToConfigMenuButton.setHorizontalAlign(EHorizontalAlign.CENTER);

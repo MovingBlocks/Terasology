@@ -42,7 +42,7 @@ public class UIMinionBehaviourMenu extends UIWindow {
     private final UIImage selectionrectangle;
 
     public UIMinionBehaviourMenu() {
-
+        setId("minionBehaviour");
         setSize(new Vector2f(60f, 180f));
         background = new UIImage(AssetManager.loadTexture("engine:guiMinion"));
         background.getTextureSize().set(new Vector2f(60f / 256f, 180f / 256f));

@@ -39,17 +39,18 @@ import org.terasology.utilities.StringConstants;
  * 
  * TODO clean this up / write from scratch.
  * TODO this is directly bind to the debug console? If so it should not work this way. Make an abstract widget out of this, which can also be used in other places.
+ * @deprecated
  */
-public class UITextWrap extends UIText {
+public class UILabelWrap extends UILabel {
 
     private long currentpos = 0;
 
-    public UITextWrap() {
+    public UILabelWrap() {
         super();
         setup();
     }
 
-    public UITextWrap(String text) {
+    public UILabelWrap(String text) {
         super(text);
         setup();
 
@@ -85,10 +86,6 @@ public class UITextWrap extends UIText {
         });
     }
 
-    public void setText(String text) {
-        this.text = text;
-    }
-
     public void showFromJson() throws IOException {
         int maxlines = getLineCount();
         int screenlines = getScreenLines();
@@ -111,10 +108,10 @@ public class UITextWrap extends UIText {
         String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data" + File.separator + "console" + File.separator + "consolelog.json";
         JsonReader reader = new JsonReader(new FileReader(helpFile));
         reader.beginArray();
-        text = "";
+        text = new StringBuilder();
         while (reader.hasNext()) {
             if (counter > beginpos && counter < endpos) {
-                text += gson.fromJson(reader, String.class);
+                text.append(gson.fromJson(reader, String.class));
             } else {
                 gson.fromJson(reader, String.class);
             }
@@ -130,9 +127,9 @@ public class UITextWrap extends UIText {
         String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data" + File.separator + "console" + File.separator + "help.json";
         JsonReader reader = new JsonReader(new FileReader(helpFile));
         reader.beginArray();
-        text = "";
+        text = new StringBuilder();;
         while (reader.hasNext()) {
-            text += gson.fromJson(reader, String.class) + StringConstants.NEW_LINE;
+            text.append(gson.fromJson(reader, String.class) + "\n");
         }
         reader.endArray();
         reader.close();
@@ -143,9 +140,9 @@ public class UITextWrap extends UIText {
         String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data" + File.separator + "console" + File.separator + "error.json";
         JsonReader reader = new JsonReader(new FileReader(helpFile));
         reader.beginArray();
-        text = "";
+        text = new StringBuilder();
         while (reader.hasNext()) {
-            text += gson.fromJson(reader, String.class) + StringConstants.NEW_LINE;
+            text.append(gson.fromJson(reader, String.class) + "\n");
         }
         reader.endArray();
         reader.close();

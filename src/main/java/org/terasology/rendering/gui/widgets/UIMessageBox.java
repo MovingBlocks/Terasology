@@ -22,7 +22,7 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 
 public class UIMessageBox extends UIDialogBox {
-    private UIText infoText;
+    private UILabel infoText;
     private UIButton buttonOk;
 
     private final Vector2f minSize = new Vector2f(384f, 128f);
@@ -38,16 +38,16 @@ public class UIMessageBox extends UIDialogBox {
         buttonOk.getLabel().setText("Ok");
         buttonOk.setVisible(true);
 
-        infoText = new UIText(text);
+        infoText = new UILabel(text);
         infoText.setVisible(true);
         infoText.setColor(Color.black);
 
-        width = infoText.getTextWidth() + 15f > minSize.x ? infoText.getTextWidth() + 15f : minSize.x;
-        heigh = infoText.getTextHeight() + 75f > minSize.y ? infoText.getTextHeight() + 75f : minSize.y;
+        width = infoText.getSize().x + 15f > minSize.x ? infoText.getSize().x + 15f : minSize.x;
+        heigh = infoText.getSize().y + 75f > minSize.y ? infoText.getSize().y + 75f : minSize.y;
         setSize(new Vector2f(width, heigh));
         resetPosition();
 
-        infoText.setPosition(new Vector2f(getSize().x / 2 - infoText.getTextWidth() / 2, getSize().y / 2 - infoText.getTextHeight() / 2));
+        infoText.setPosition(new Vector2f(getSize().x / 2 - infoText.getSize().x / 2, getSize().y / 2 - infoText.getSize().y / 2));
         buttonOk.setPosition(new Vector2f(getSize().x / 2 - buttonOk.getSize().x / 2, getSize().y - buttonOk.getSize().y - 10f));
         buttonOk.addClickListener(new ClickListener() {
             @Override
@@ -57,6 +57,6 @@ public class UIMessageBox extends UIDialogBox {
         });
 
         addDisplayElement(infoText);
-        addDisplayElement(buttonOk, "buttonOk");
+        addDisplayElement(buttonOk);
     }
 }
