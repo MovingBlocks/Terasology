@@ -62,6 +62,7 @@ import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.VertexBufferObjectManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.physics.CollisionGroupManager;
+import org.terasology.version.TerasologyVersion;
 
 import com.google.common.collect.Lists;
 
@@ -86,10 +87,12 @@ public class TerasologyEngine implements GameEngine {
 
     @Override
     public void init() {
-        if (initialised)
+        if (initialised) {
             return;
+        }
         initLogger();
         logger.log(Level.INFO, "Initializing Terasology...");
+        logger.log(Level.INFO, TerasologyVersion.getInstance().toString());
 
         initNativeLibs();
         initDisplay();
@@ -234,18 +237,20 @@ public class TerasologyEngine implements GameEngine {
                 break;
             case LWJGLUtil.PLATFORM_LINUX:
                 addLibraryPath(new File(PathManager.getInstance().getDataPath(), "natives/linux"));
-                if (System.getProperty("os.arch").contains("64"))
+                if (System.getProperty("os.arch").contains("64")) {
                     System.loadLibrary("openal64");
-                else
+                } else {
                     System.loadLibrary("openal");
+                }
                 break;
             case LWJGLUtil.PLATFORM_WINDOWS:
                 addLibraryPath(new File(PathManager.getInstance().getDataPath(), "natives/windows"));
 
-                if (System.getProperty("os.arch").contains("64"))
+                if (System.getProperty("os.arch").contains("64")) {
                     System.loadLibrary("OpenAL64");
-                else
+                } else {
                     System.loadLibrary("OpenAL32");
+                }
                 break;
             default:
                 logger.log(Level.SEVERE, "Unsupported operating system: " + LWJGLUtil.getPlatformName());
@@ -271,7 +276,7 @@ public class TerasologyEngine implements GameEngine {
                 return;
             }
 
-            paths.add(0, libPath.getAbsolutePath());  // Add to beginning, to override system libraries
+            paths.add(0, libPath.getAbsolutePath()); // Add to beginning, to override system libraries
 
             usrPathsField.set(null, paths.toArray(new String[paths.size()]));
         } catch (Exception e) {
@@ -430,8 +435,9 @@ public class TerasologyEngine implements GameEngine {
             PerformanceMonitor.rollCycle();
             PerformanceMonitor.startActivity("Other");
 
-            if (Display.wasResized())
+            if (Display.wasResized()) {
                 resizeViewport();
+            }
         }
         PerformanceMonitor.endActivity();
         running = false;
