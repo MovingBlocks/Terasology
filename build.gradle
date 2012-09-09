@@ -33,7 +33,8 @@ ext {
     mainClassName = 'org.terasology.game.Terasology'
     jarFileName = 'Terasology.jar'
     env = System.getenv() // read environment variables, including variables passed by jenking continuous integration server
-    versionInfoFile = new File(sourceSets.main.output.resourcesDir, 'org/terasology/versionInfo.properties')
+    versionInfoFileDir = new File(sourceSets.main.output.resourcesDir, 'org/terasology/version')
+    versionInfoFile = new File(versionInfoFileDir, 'versionInfo.properties')
 }
 
 repositories {
@@ -118,6 +119,7 @@ dependencies {
 
 task createVersionInfoFile << {
     if (env.BUILD_NUMBER != null) {
+        versionInfoFileDir.mkdirs()
         ant.propertyfile (file: versionInfoFile) {
             ant.entry(key:'buildNumber',value:env.BUILD_NUMBER)
             ant.entry(key:'buildId',value:env.BUILD_ID)
@@ -125,6 +127,7 @@ task createVersionInfoFile << {
             ant.entry(key:'buildUrl',value:env.BUILD_URL)
             ant.entry(key:'gitBranch',value:env.GIT_BRANCH)
             ant.entry(key:'gitCommit',value:env.GIT_COMMIT)
+            ant.entry(key:'dateTime',value:startDateTimeString)
         }
     }
 }
