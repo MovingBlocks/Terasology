@@ -1,4 +1,48 @@
-[ 
+[
+    {
+        "controller" : "org.terasology.logic.commands.Commands",
+        "permission" : 0,
+        "name" : "listBlocks",
+        "parameter" : [],
+        "shortDescription" : "List all available blocks",
+        "longDescription" : "",
+        "examples" : [
+        
+        ]
+    },
+    {
+        "controller" : "org.terasology.logic.commands.Commands",
+        "permission" : 0,
+        "name" : "listItems",
+        "parameter" : [],
+        "shortDescription" : "List all available items",
+        "longDescription" : "",
+        "examples" : [
+        
+        ]
+    }, 
+    {
+        "controller" : "org.terasology.logic.commands.Commands",
+        "permission" : 0,
+        "name" : "listShapes",
+        "parameter" : [],
+        "shortDescription" : "List all available shapes",
+        "longDescription" : "",
+        "examples" : [
+        
+        ]
+    },
+    {
+        "controller" : "org.terasology.logic.commands.Commands",
+        "permission" : 0,
+        "name" : "listFreeShapeBlocks",
+        "parameter" : [],
+        "shortDescription" : "List all available free shape blocks",
+        "longDescription" : "",
+        "examples" : [
+        
+        ]
+    },
     {
         "controller" : "org.terasology.logic.commands.Commands",
         "permission" : 0,
@@ -31,7 +75,7 @@
         "shortDescription" : "Add the amount of health to the player",
         "longDescription" : "",
         "examples" : [
-			"<health>",
+            "<health>",
             "<health 10>"
         ]
     },
@@ -113,7 +157,7 @@
         
         ]
     },
-	{
+    {
         "controller" : "org.terasology.logic.commands.Commands",
         "permission" : 0,
         "name" : "spawnPrefab",
@@ -124,7 +168,7 @@
             
         ]
     },
-	{
+    {
         "controller" : "org.terasology.logic.commands.Commands",
         "permission" : 0,
         "name" : "destroyAI",
@@ -135,7 +179,7 @@
             
         ]
     },
-	{
+    {
         "controller" : "org.terasology.logic.commands.Commands",
         "permission" : 0,
         "name" : "stepHeight",
@@ -146,7 +190,7 @@
             
         ]
     },
-	{
+    {
         "controller" : "org.terasology.logic.commands.Commands",
         "permission" : 0,
         "name" : "spawnBlock",
@@ -157,7 +201,7 @@
             
         ]
     },
-	{
+    {
         "controller" : "org.terasology.logic.commands.Commands",
         "permission" : 0,
         "name" : "sleigh",
@@ -168,7 +212,7 @@
             
         ]
     },
-	{
+    {
         "controller" : "org.terasology.logic.commands.Commands",
         "permission" : 0,
         "name" : "setSpawn",
@@ -190,7 +234,7 @@
         
         ]
     },   
-	{
+    {
         "controller" : "org.terasology.logic.commands.Commands",
         "permission" : 0,
         "name" : "exit",

@@ -283,13 +283,18 @@ public class CommandManager {
         //get the parameters
         String[] params = str.split(" (?=([^\"]*\"[^\"]*\")*[^\"]*$)");
         String paramsStr = "";
-        int paramsCount = params.length - 1;
+        int paramsCount = 0;
         
         for (String s : params) {
+            if (s.trim().isEmpty()) {
+                continue;
+            }
+            
             if (!paramsStr.isEmpty()) {
                 paramsStr += ",";
             }
             paramsStr += s;
+            paramsCount++;
         }
         
         if (paramsCount == 0) {
@@ -323,6 +328,7 @@ public class CommandManager {
             
             return true;
         } catch (Exception e) {
+            //TODO better error handling and error message
             ChatManager.getInstance().addMessage(cmd.getUseMessage());
             ChatManager.getInstance().addMessage("Error executing command '" + commandName + "'.");
             e.printStackTrace();

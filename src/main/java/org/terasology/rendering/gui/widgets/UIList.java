@@ -156,7 +156,7 @@ public class UIList extends UIDisplayContainerScrollable {
      * @param index The item index to select.
      */
     public void select(int index) {
-        if (index != getItemIndex(selection)) {
+        if (index != getItemIndex(selection) && !isDisabled) {
             if (selection != null) {
                 selection.setSelected(false);
             }

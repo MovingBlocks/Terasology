@@ -29,6 +29,7 @@ import org.terasology.input.events.KeyEvent;
 import org.terasology.logic.manager.ChatManager;
 import org.terasology.logic.manager.CommandManager;
 import org.terasology.logic.manager.ChatManager.ChatSubscription;
+import org.terasology.logic.manager.ChatManager.Message;
 import org.terasology.logic.manager.CommandManager.Command;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.KeyListener;
@@ -36,7 +37,6 @@ import org.terasology.rendering.gui.framework.events.WindowListener;
 import org.terasology.rendering.gui.widgets.UIList;
 import org.terasology.rendering.gui.widgets.UIText;
 import org.terasology.rendering.gui.widgets.UIWindow;
-import org.terasology.rendering.gui.widgets.list.UIListItem;
 import org.terasology.rendering.gui.widgets.list.UIListItemText;
 
 /**
@@ -51,23 +51,26 @@ public class UIScreenChat extends UIWindow {
     
     //history
     private final List<String> history = new ArrayList<String>();
-    private final int historyMax = 20;
+    private final int historyMax = 30;
     private int historyPosition = 0;
     
     private final UIText inputBox;
-    //private final UIText textBox;
     private final UIList messageList;
     
     private final ChatSubscription chatSubscription = new ChatSubscription() {
         @Override
-        public void message(String message) {            
+        public void message(Message message) {
             boolean scroll = messageList.isScrolledToBottom();
             boolean scrollable = messageList.isScrollable();
             
-            UIListItemText item = new UIListItemText(message, null);
+            UIListItemText item = new UIListItemText(message.getMessage(), null);
             item.setPadding(new Vector4f(0f, 5f, 0f, 5f));
             item.setColor(Color.black);
             messageList.addItem(item);
+            
+            if (messageList.getItemCount() > historyMax) {
+                messageList.removeItem(0);
+            }
 
             if (scroll || messageList.isScrollable() != scrollable) {
                 messageList.scrollToBottom();
@@ -99,10 +102,10 @@ public class UIScreenChat extends UIWindow {
         
         inputBox = new UIText();
         inputBox.setSize(new Vector2f(900f, 28f));
-        inputBox.setBackgroundColor(255, 255, 255, 0.7f);
+        inputBox.setBackgroundColor(255, 255, 255, 0.8f);
         inputBox.setBorderSolid(1, 0, 0, 0, 1f);
         inputBox.setVerticalAlign(EVerticalAlign.BOTTOM);
-        inputBox.setSelectionColor(Color.white);
+        inputBox.setSelectionColor(Color.gray);
         inputBox.setPosition(new Vector2f(2, -2));
         inputBox.setVisible(true);
         inputBox.addKeyListener(new KeyListener() {
@@ -176,7 +179,7 @@ public class UIScreenChat extends UIWindow {
         
         messageList = new UIList();
         messageList.setSize(new Vector2f(900f, 400f));
-        messageList.setBackgroundColor(255, 255, 255, 0.7f);
+        messageList.setBackgroundColor(255, 255, 255, 0.8f);
         messageList.setBorderSolid(1, 0, 0, 0, 1f);
         messageList.setVerticalAlign(EVerticalAlign.BOTTOM);
         messageList.setPosition(new Vector2f(2, -32));
@@ -186,8 +189,14 @@ public class UIScreenChat extends UIWindow {
         
         addDisplayElement(inputBox);
         addDisplayElement(messageList);
+        
+        startMessage();
     }
     
+    private void startMessage() {
+        ChatManager.getInstance().addMessage("Welcome to the wonderfull world of Terasology!\n\nType '/help' to see a list with available commands.\nTo see a detailed command description try '/help \"<commandName>\"'.");
+    }
+
     private void addHistory(String message) {
         history.add(0, message);
         historyPosition = -1;

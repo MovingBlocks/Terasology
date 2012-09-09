@@ -12,7 +12,7 @@ import java.util.List;
 public class ChatManager {
     
     private static ChatManager instance;
-    private static enum EChatScope {PRIVATE, PUBLIC, GROUP};
+    public static enum EChatScope {PRIVATE, PUBLIC, GROUP};
     private final List<ChatSubscription> subscribers = new ArrayList<ChatSubscription>();
     
     //log
@@ -53,7 +53,7 @@ public class ChatManager {
      *
      */
     public interface ChatSubscription {
-        void message(String message);
+        void message(Message message);
     }
     
     private ChatManager() {
@@ -69,26 +69,39 @@ public class ChatManager {
     }
     
     /**
-     * Add a message to the chat in public scope.
-     * @param message
+     * Add a message to the chat.
+     * @param message The message.
      */
-    public void addMessage(String message) {
-        addMessage(message, EChatScope.PUBLIC);
-    }
-    
-    public void addMessage(String message, EChatScope scope) {
-        if (!message.trim().isEmpty()) {
-            log.add(0, new Message(message, scope));
+    public void addMessage(Message message) {
+        if (!message.getMessage().isEmpty()) {
+            log.add(0, message);
             
             if (log.size() > logMax) {
                 log.remove(log.size() - 1);
             }
             
-            notifiySubscribers(message);
+            notifySubscribers(message);
         }
     }
     
-    private void notifiySubscribers(String message) {
+    /**
+     * Add a message to the chat in public scope.
+     * @param message The chat message.
+     */
+    public void addMessage(String message) {
+        addMessage(message, EChatScope.PUBLIC);
+    }
+    
+    /**
+     * Add a message to the chat in a specific scope.
+     * @param message The chat message.
+     * @param scope The scope.
+     */
+    public void addMessage(String message, EChatScope scope) {
+        addMessage(new Message(message, scope));
+    }
+    
+    private void notifySubscribers(Message message) {
         for (ChatSubscription subscriber : subscribers) {
             subscriber.message(message);
         }

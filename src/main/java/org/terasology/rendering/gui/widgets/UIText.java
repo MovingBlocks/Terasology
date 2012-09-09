@@ -95,7 +95,7 @@ public class UIText extends UIDisplayContainerScrollable {
     private int selectionEnd;
     
     //characters
-    private final char[] specialCharacters = new char[] {' ', '_', '.', ',', '/', '!', '-','(', ')', '"', '\'', ';', '+'};
+    private final char[] specialCharacters = new char[] {' ', '_', '.', ',', '/', '!', '-','(', ')', '"', '\'', ';', ':', '+'};
     private final char[] multiLineSecialCharacters = new char[] {'\n'};
     private boolean ctrlKeyPressed = false;
     
@@ -130,6 +130,8 @@ public class UIText extends UIDisplayContainerScrollable {
                             setCursorToTextPosition(cursorPosition - 1);
                         }
                     }
+                    
+                    event.consume();
                 }
                 //delete
                 if (event.getKey() == Keyboard.KEY_DELETE && event.isDown()) {
@@ -146,6 +148,8 @@ public class UIText extends UIDisplayContainerScrollable {
                             setCursorToTextPosition(cursorPosition);
                         }
                     }
+                    
+                    event.consume();
                 }
                 //move cursor left
                 else if (event.getKey() == Keyboard.KEY_LEFT && event.isDown()) {
@@ -155,6 +159,8 @@ public class UIText extends UIDisplayContainerScrollable {
                     } else {
                         setCursorToTextPosition(cursorPosition - 1);
                     }
+                    
+                    event.consume();
                 }
                 //move cursor right
                 else if (event.getKey() == Keyboard.KEY_RIGHT && event.isDown()) {
@@ -173,6 +179,8 @@ public class UIText extends UIDisplayContainerScrollable {
                     Vector2f pos = cursor.getAbsolutePosition();
                     pos = new Vector2f(pos.x + cursor.getPosition().x, pos.y + cursor.getPosition().y - cursorSize.y / 2);
                     setCursorToTextPosition(toTextPosition(pos));
+                    
+                    event.consume();
                 }
                 //move cursor down
                 else if (event.getKey() == Keyboard.KEY_DOWN && event.isDown()) {
@@ -182,19 +190,27 @@ public class UIText extends UIDisplayContainerScrollable {
                     Vector2f pos = cursor.getAbsolutePosition();
                     pos = new Vector2f(pos.x + cursor.getPosition().x, pos.y + cursor.getPosition().y + cursorSize.y + cursorSize.y / 2);
                     setCursorToTextPosition(toTextPosition(pos));
+                    
+                    event.consume();
                 }
                 //left/right control pressed
                 else if (event.getKey() == Keyboard.KEY_LCONTROL || event.getKey() == Keyboard.KEY_RCONTROL) {
                     ctrlKeyPressed = event.isDown();
+                    
+                    event.consume();
                 }
                 //cut selection
                 else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_X && event.isDown()) {
                     setClipboard(getSelection());
                     deleteSelection();
+                    
+                    event.consume();
                 }
                 //copy selection
                 else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_C && event.isDown()) {
                     setClipboard(getSelection());
+                    
+                    event.consume();
                 }
                 //paste selection
                 else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_V && event.isDown()) {
@@ -207,10 +223,14 @@ public class UIText extends UIDisplayContainerScrollable {
                     int num = insertText(getWrapOffset(cursorPosition), clipboard);
                     
                     setCursorToTextPosition(cursorPosition + num);
+                    
+                    event.consume();
                 }
                 //select all
                 else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_A && event.isDown()) {
                     setSelection(0, text.getText().length());
+                    
+                    event.consume();
                 }
                 //add character
                 else if (event.isDown()) {
@@ -230,6 +250,8 @@ public class UIText extends UIDisplayContainerScrollable {
                         
                         setCursorToTextPosition(cursorPosition + num);
                     }
+                    
+                    event.consume();
                 }
             }
         }

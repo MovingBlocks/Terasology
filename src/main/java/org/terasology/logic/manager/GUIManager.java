@@ -255,8 +255,6 @@ public class GUIManager implements EventHandlerSystem {
             window = new UIScreenHUD();
         } else if (windowId.equals("minionBehaviour")) {
             window = new UIMinionBehaviourMenu();
-        } else if (windowId.equals("chat")) {
-            window = new UIScreenChat();
         }
         
         if (window == null) {
