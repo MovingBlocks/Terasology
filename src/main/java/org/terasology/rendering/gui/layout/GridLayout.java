@@ -15,6 +15,7 @@ import org.lwjgl.opengl.GL11;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayElement.EHorizontalAlign;
+import org.terasology.rendering.gui.framework.UIDisplayElement.EUnitType;
 import org.terasology.rendering.gui.framework.UIDisplayElement.EVerticalAlign;
 import org.terasology.rendering.gui.framework.style.UIStyle;
 
@@ -119,7 +120,7 @@ public class GridLayout implements Layout {
                 //calculate y position
                 float y = 0;
                 for (int j = 0; j < (int) Math.floor(i / columns); j++) {
-                    y += cellHeight[(int) Math.floor(i / columns)];
+                    y += cellHeight[(int) Math.floor(j / columns)];
                 }
                 
                 //vertical align
@@ -130,13 +131,20 @@ public class GridLayout implements Layout {
                 } else if (verticalCellAlign == EVerticalAlign.BOTTOM) {
                     y += cellHeight[(int) Math.floor(i / columns)] - elements.get(i).getSize().y - padding.z;
                 }
+
                 
                 elements.get(i).setPosition(new Vector2f(x, y));
                 elements.get(i).setVisible(true);                   //TODO remove
             }
         }
-        
-        container.setSize(size);
+
+        if (container.getUnitSizeX() != EUnitType.PIXEL) {
+            
+            container.setSize("", size.y + "px");
+            
+        } else {
+            container.setSize(size);
+        }
     }
     
     private float[] calcCellWidth(List<UIDisplayElement> elements) {

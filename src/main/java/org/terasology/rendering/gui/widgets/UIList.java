@@ -18,16 +18,14 @@ package org.terasology.rendering.gui.widgets;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
 
-import org.newdawn.slick.Color;
-import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayContainerScrollable;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.ClickListener;
-import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 import org.terasology.rendering.gui.layout.GridLayout;
+import org.terasology.rendering.gui.widgets.list.UIListItem;
 
 /**
  * A simple graphical List
@@ -49,105 +47,10 @@ public class UIList extends UIDisplayContainerScrollable {
     //child elements
     private final UIComposite list;
     
-    /**
-     * A list item.
-     * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
-     *
-     */
-    public class UIListItem extends UIDisplayContainer {
-        
-        //text/value
-        private Object value;
-        private final UILabel label;
-        
-        //options
-        private Color color = Color.lightGray;
-        private boolean isSelected = false;
-
-        public UIListItem(String text, Object value) {
-            setSize("100%", "32px");
-            this.value = value;
-            
-            //TODO remove this once styling system is in place
-            addMouseMoveListener(new MouseMoveListener() {        
-                @Override
-                public void leave(UIDisplayElement element) {
-                    if(!isSelected) {
-                        label.setColor(color);
-                    }
-                }
-                
-                @Override
-                public void hover(UIDisplayElement element) {
-
-                }
-                
-                @Override
-                public void enter(UIDisplayElement element) {
-                    if(!isSelected) {
-                        label.setColor(Color.orange);
-                    }
-                }
-
-                @Override
-                public void move(UIDisplayElement element) {
-
-                }
-            });
-            
-            label = new UILabel();
-            label.setPosition(new Vector2f(5f, 0f));
-            label.setColor(color);
-            label.setVerticalAlign(EVerticalAlign.CENTER);
-            label.setText(text);
-            label.setVisible(true);
-
-            addDisplayElement(label);
-        }
-
-        public String getText() {
-            return label.getText();
-        }
-
-        public void setText(String text) {
-            label.setText(text);
-        }
-
-        public Object getValue() {
-            return value;
-        }
-
-        public void setValue(Object value) {
-            this.value = value;
-        }
-        
-        public Color getColor() {
-            return color;
-        }
-
-        public void setColor(Color color) {
-            this.color = color;
-        }
-        
-        public boolean isSelected() {
-            return isSelected;
-        }
-
-        public void setSelected(boolean selected) {
-            isSelected = selected;
-            
-            if (isSelected) {
-                setBackgroundColor(0xE1, 0xDD, 0xD4, 1.0f);
-                label.setColor(Color.orange);
-            } else {
-                removeBackgroundColor();
-                label.setColor(Color.lightGray);
-            }
-        }
-    }
+    //options
+    private boolean isDisabled = false;
     
     public UIList() {     
-        
         setEnableScrolling(true);
         setEnableScrollbar(true);
         
@@ -159,46 +62,51 @@ public class UIList extends UIDisplayContainerScrollable {
         addDisplayElement(list);
     }
     
+    @Override
+    //TODO change behavior of list widget with padding
+    public void setPadding(Vector4f padding) {
+        
+    }
+    
     /**
      * Add an item to a specific location in the list.
-     * @param index The location of the item.
-     * @param text The text of the item.
-     * @param value The value of the item. Can be null.
+     * @param index The index, where the item should be added.
+     * @param item The item to add.
      */
-    public void addItem(int index, String text, Object value) {        
-        final UIListItem item = new UIListItem(text, value);
+    public void addItem(int index, final UIListItem item) {        
         item.addClickListener(new ClickListener() {
             private long lastTime = System.currentTimeMillis();
             private int lastButton = -1;
             
             @Override
             public void click(UIDisplayElement element, int button) {
-                //check double click
-                if ((System.currentTimeMillis() - lastTime) < 200 && lastButton == button) {
-                    notifyDoubleClickListeners();
+                if (!isDisabled) {
+                    //check double click
+                    if ((System.currentTimeMillis() - lastTime) < 200 && lastButton == button) {
+                        notifyDoubleClickListeners();
+                    }
+                    lastTime = System.currentTimeMillis();
+                    lastButton = button;
+                    
+                    //select the item
+                    select(getItemIndex(item));
                 }
-                lastTime = System.currentTimeMillis();
-                lastButton = button;
-                
-                //select the item
-                select(getItemIndex(item));
             }
         });
+        item.setDisabled(isDisabled);
         item.setVisible(true);
         
         list.addDisplayElementToPosition(index, item);
-        list.setSize("100%", "100%");
         
         layout();
     }
     
     /**
      * Add an item to the list.
-     * @param text The text of the item.
-     * @param value The value of the item. Can be null.
+     * @param item The item to add.
      */
-    public void addItem(String text, Object value) {
-        addItem(getItemCount(), text, value);
+    public void addItem(UIListItem item) {
+        addItem(getItemCount(), item);
     }
     
     /**
@@ -306,6 +214,18 @@ public class UIList extends UIDisplayContainerScrollable {
         }
         
         return items;
+    }
+    
+    public boolean isDisabled() {
+        return isDisabled;
+    }
+
+    public void setDisabled(boolean disabled) {
+        this.isDisabled = disabled;
+        
+        for (UIListItem item : getItems()) {
+            item.setDisabled(disabled);
+        }
     }
     
     /*

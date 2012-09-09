@@ -30,11 +30,6 @@ import org.terasology.input.binds.PauseButton;
 import org.terasology.game.CoreRegistry;
 import org.terasology.input.ButtonState;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.rendering.gui.windows.UIScreenConsole;
-import org.terasology.rendering.gui.windows.UIScreenHUD;
-import org.terasology.rendering.gui.windows.UIScreenInventory;
-import org.terasology.rendering.gui.windows.UIMenuPause;
-import org.terasology.rendering.gui.windows.UIScreenDeath;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
@@ -45,7 +40,7 @@ public class MenuControlSystem implements EventHandlerSystem {
 
     public static final String PAUSE_MENU = "pause";
     public static final String INVENTORY = "inventory";
-    public static final String CONSOLE = "console";
+    public static final String CHAT = "chat";
 	public static final String HUD = "hud";
 
     @Override
@@ -60,7 +55,7 @@ public class MenuControlSystem implements EventHandlerSystem {
     @ReceiveEvent(components = LocalPlayerComponent.class)
     public void onToggleConsole(ConsoleButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
-        	GUIManager.getInstance().openWindow(CONSOLE);
+        	GUIManager.getInstance().openWindow(CHAT);
             event.consume();
         }
     }

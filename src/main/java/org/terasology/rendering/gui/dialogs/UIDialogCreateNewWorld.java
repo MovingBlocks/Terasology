@@ -62,13 +62,15 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
         super("Create new world", new Vector2f(512f, 320f));
         setModal(true);
 
-        _inputSeed = new UIText(new Vector2f(256f, 30f));
+        _inputSeed = new UIText();
+        _inputSeed.setSize(new Vector2f(256f, 30f));
         //_inputSeed.setBackgroundImage("engine:gui_menu", new Vector2f(0f, 90f), new Vector2f(256f, 30f));
         _inputSeed.setBackgroundColor(0xFF, 0xFF, 0xFF, 1.0f);
         _inputSeed.setBorderSolid(1, 0x00, 0x00, 0x00, 1.0f);
         _inputSeed.setVisible(true);
 
-        _inputWorldTitle = new UIText(new Vector2f(256f, 30f));
+        _inputWorldTitle = new UIText();
+        _inputWorldTitle.setSize(new Vector2f(256f, 30f));
         //_inputWorldTitle.setBackgroundImage("engine:gui_menu", new Vector2f(0f, 90f), new Vector2f(256f, 30f));
         _inputWorldTitle.setBackgroundColor(0xFF, 0xFF, 0xFF, 1.0f);
         _inputWorldTitle.setBorderSolid(1, 0x00, 0x00, 0x00, 1.0f);

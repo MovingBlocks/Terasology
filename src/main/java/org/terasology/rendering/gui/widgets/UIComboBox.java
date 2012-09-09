@@ -17,6 +17,7 @@
 package org.terasology.rendering.gui.widgets;
 
 import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -28,6 +29,7 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
+import org.terasology.rendering.gui.widgets.list.UIListItemText;
 
 /**
  * A combo box.
@@ -62,7 +64,8 @@ public class UIComboBox extends UIDisplayContainer {
         setSize(size);
         opened = false;
         
-        baseInput = new UIText(size);
+        baseInput = new UIText();
+        baseInput.setSize(size);
         baseInput.setVisible(true);
         baseInput.setBackgroundColor(0xFF, 0xFF, 0xFF, 1.0f);
         baseInput.setBorderSolid(1, 0x00, 0x00, 0x00, 1.0f);
@@ -140,7 +143,7 @@ public class UIComboBox extends UIDisplayContainer {
             @Override
             public void changed(UIDisplayElement element) {
                 if (baseList.getSelection() != null) {
-                    baseInput.setText(baseList.getSelection().getText());
+                    baseInput.setText(((UIListItemText)baseList.getSelection()).getText());
                 }
                 opened = false;
                 baseList.setVisible(opened);
@@ -154,7 +157,9 @@ public class UIComboBox extends UIDisplayContainer {
     }
 
     public void addItem(String text, Object value) {
-        baseList.addItem(text, value);
+        UIListItemText item = new UIListItemText(text, value);
+        item.setPadding(new Vector4f(5f, 5f, 5f, 5f));
+        baseList.addItem(item);
     }
     
     /**

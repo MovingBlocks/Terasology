@@ -73,7 +73,7 @@ public class UIScreenDeath extends UIWindow {
             @Override
             public void click(UIDisplayElement element, int button) {
                 respawn();
-                close();
+                setVisible(false);
             }
         });
         _respawnButton.setHorizontalAlign(EHorizontalAlign.CENTER);

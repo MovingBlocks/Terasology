@@ -28,6 +28,8 @@ import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.widgets.UIButton;
 import org.terasology.rendering.gui.widgets.UIList;
 import org.terasology.rendering.gui.widgets.UIWindow;
+import org.terasology.rendering.gui.widgets.list.UIListItem;
+import org.terasology.rendering.gui.widgets.list.UIListItemText;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
@@ -60,6 +62,7 @@ public class UIMenuSelectWorld extends UIWindow {
 
         list = new UIList();
         list.setSize(new Vector2f(512f, 256f));
+        list.setPadding(new Vector4f(10f, 5f, 10f, 5f));
         list.setBorderSolid(2f, 0x1E, 0x1E, 0x1E, 1.0f);
         list.setBackgroundImage("engine:gui_menu", new Vector2f(264f, 18f), new Vector2f(159f, 63f));
         list.setBorderImage("engine:gui_menu", new Vector2f(256f, 0f), new Vector2f(175f, 88f), new Vector4f(16f, 7f, 7f, 7f));
@@ -185,7 +188,9 @@ public class UIMenuSelectWorld extends UIWindow {
             try {
                 WorldInfo info = WorldInfo.load(worldManifest);
                 if (!info.getTitle().isEmpty()) {
-                    list.addItem(info.getTitle(), info);
+                    UIListItemText item = new UIListItemText(info.getTitle(), info);
+                    item.setPadding(new Vector4f(10f, 5f, 10f, 5f));
+                    list.addItem(item);
                 }
             } catch (IOException e) {
                 logger.log(Level.SEVERE, "Failed reading world data object. Sorry.", e);

@@ -18,9 +18,12 @@ package org.terasology.rendering.gui.widgets;
 import static org.lwjgl.opengl.GL11.glDisable;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
 
+import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.AngelCodeFont;
 import org.newdawn.slick.Color;
@@ -44,6 +47,10 @@ public class UILabel extends UIDisplayContainer {
     
     protected StringBuilder text = new StringBuilder();
     
+    //wrapping
+    private final List<Integer> wrapPosition = new ArrayList<Integer>();
+    private boolean isWrap = false;
+
     //font
     private AngelCodeFont font = FontManager.getInstance().getFont("default");
     private Color color = new Color(Color.white);
@@ -53,8 +60,13 @@ public class UILabel extends UIDisplayContainer {
     private Color shadowColor = new Color(Color.black);
     private final Vector2f shadowOffset = new Vector2f(1, 0);
     
+    //other
+    private Vector2f lastSize = new Vector2f(0f, 0f);
+    private Vector4f margin = new Vector4f(0f, 0f, 0f, 0f);
+    
     // TODO HACK
     private Texture workaroundTexture = new TextureImpl("abc", 0, 0);
+
 
     public UILabel() {
         super();
@@ -74,29 +86,117 @@ public class UILabel extends UIDisplayContainer {
 
         // TODO HACK: Workaround because the internal Slick texture mechanism is never used
         workaroundTexture.bind();
-
+        
         if (enableShadow) {
-            font.drawString(shadowOffset.x, shadowOffset.y, text.toString(), shadowColor);
+            font.drawString(shadowOffset.x + margin.w, shadowOffset.y + margin.x, text.toString(), shadowColor);
         }
         
-        font.drawString(0, 0, text.toString(), color);
+        font.drawString(margin.w, margin.x, text.toString(), color);
 
         // TODO: Also ugly..
         glDisable(GL11.GL_TEXTURE_2D);
 
         PerformanceMonitor.endActivity();
     }
+    
+    /**
+     * Calculate the width of the given text.
+     * @param text The text to calculate the width.
+     * @return Returns the width of the given text.
+     */
+    private int calcTextWidth(String text) {        
+        return font.getWidth(text);
+    }
+    
+    /**
+     * Calculate the height of the given text.
+     * @param text The text to calculate the height.
+     * @return Returns the height of the given text.
+     */
+    private int calcTextHeight(String text) {        
+        //fix because the slick library is calculating the height of text wrong if the last/first character is a new line..
+        if (!text.isEmpty() && (text.charAt(text.length() - 1) == '\n' || text.charAt(text.length() - 1) == ' ')) {
+            text += "i";
+        }
 
-    private int getTextHeight() {
-        if (text.toString().trim().length() == 0) {
-            return font.getHeight("t");
-        } else {
-            return font.getHeight(text.toString());
+        if (!text.isEmpty() && text.charAt(0) == '\n') {
+            text = "i" + text;
+        }
+        
+        if (text.isEmpty()) {
+            text = "i";
+        }
+        
+        return font.getHeight(text);
+    }
+    
+    @Override
+    public void layout() {
+        super.layout();
+        
+        //so the wrapped label will calculate the wrap position again if the parent or display was resized
+        if (isWrap) {
+            if (positionType == EPositionType.RELATIVE && getParent() != null) {
+                if (lastSize.x != getParent().getSize().x || lastSize.y != getParent().getSize().y) {
+                    lastSize.x = getParent().getSize().x;
+                    lastSize.y = getParent().getSize().y;
+                    setText(getText());
+                }
+            } else if (positionType == EPositionType.ABSOLUTE) {
+                if (lastSize.x != Display.getWidth() || lastSize.y != Display.getHeight()) {
+                    lastSize.x = Display.getWidth();
+                    lastSize.y = Display.getHeight();
+                    setText(getText());
+                }
+            }
         }
     }
+    
+    /**
+     * Wraps the text to the with of the wrapWidth.
+     * @param text The text to wrap.
+     * @return Returns the wrapped text.
+     */
+    private String wrapText(String text) {
+        //wrap text
+        if (isWrap()) {
+            int lastSpace = 0;
+            int lastWrap = 0;
+            StringBuilder wrapText = new StringBuilder(text + " ");
+            
+            wrapPosition.clear();
+            
+            float wrapWidth = getSize().x - margin.y - margin.w;
 
-    private int getTextWidth() {
-        return font.getWidth(text.toString());
+            //loop through whole text
+            for (int i = 0; i < wrapText.length(); i++) {
+                
+                //check if character is a space -> text can only be wrapped at spaces
+                if (wrapText.charAt(i) == ' ') {
+                    //check if the string (from the beginning of the new line) is bigger than the container width
+                    if (calcTextWidth(wrapText.substring(lastWrap, i)) > wrapWidth) {
+                        //than wrap the text at the previous space
+                        wrapText.insert(lastSpace + 1, '\n');
+                        wrapPosition.add(new Integer(lastSpace + 1));
+                        
+                        lastWrap = lastSpace + 1;
+                    }
+                    
+                    lastSpace = i;
+                } else if (wrapText.charAt(i) == '\n') {
+                    lastSpace = i;
+                    lastWrap = i;
+                }
+            }
+            
+            wrapText.replace(wrapText.length() - 1, wrapText.length(), "");
+            
+            return wrapText.toString();
+        }
+        //no wrap
+        else {
+            return text;
+        }
     }
 
     /**
@@ -104,16 +204,31 @@ public class UILabel extends UIDisplayContainer {
      * @return Returns the text.
      */
     public String getText() {
-        return text.toString();
+        StringBuilder str = new StringBuilder(text.toString());
+        for (int i = 0; i < wrapPosition.size(); i++) {
+            str.replace(wrapPosition.get(i) - i, wrapPosition.get(i) + 1 - i, "");
+        }
+        
+        return str.toString();
     }
-
+    
     /**
      * Set the text of the label.
      * @param text The text to set.
      */
     public void setText(String text) {
-        this.text = new StringBuilder(text);
-        setSize(new Vector2f(getTextWidth(), getTextHeight()));
+        this.text = new StringBuilder(wrapText(text));
+        
+        if (isWrap) {
+            String unitX = "px";
+            if (unitSizeX == EUnitType.PERCENTAGE) {
+                unitX = "%";
+            }
+            
+            setSize(sizeOriginal.x + unitX, (calcTextHeight(this.text.toString()) + margin.x + margin.z) + "px");
+        } else {
+            setSize(new Vector2f(calcTextWidth(this.text.toString()) + margin.y + margin.w, calcTextHeight(this.text.toString()) + margin.x + margin.z));
+        }
         
         notifyChangedListeners();
     }
@@ -123,10 +238,7 @@ public class UILabel extends UIDisplayContainer {
      * @param text The text to append.
      */
     public void appendText(String text) {
-        this.text.append(text);
-        setSize(new Vector2f(getTextWidth(), getTextHeight()));
-        
-        notifyChangedListeners();
+        setText(getText() + text);
     }
     
     /**
@@ -134,11 +246,11 @@ public class UILabel extends UIDisplayContainer {
      * @param offset The offset, where to insert the text at.
      * @param text The text to insert.
      */
-    public void insertText(int offset, String text) {
-        this.text.insert(offset, text);
-        setSize(new Vector2f(getTextWidth(), getTextHeight()));
+    public void insertText(int offset, String text) {        
+        StringBuilder builder = new StringBuilder(getText());
+        builder.insert(offset, text);
         
-        notifyChangedListeners();
+        setText(builder.toString());
     }
     
     /**
@@ -148,10 +260,10 @@ public class UILabel extends UIDisplayContainer {
      * @param text The text to replace with.
      */
     public void replaceText(int start, int end, String text) {
-        this.text.replace(start, end, text);
-        setSize(new Vector2f(getTextWidth(), getTextHeight()));
+        StringBuilder builder = new StringBuilder(getText());
+        builder.replace(start, end, text);
         
-        notifyChangedListeners();
+        setText(builder.toString());;
     }
 
     /**
@@ -218,6 +330,30 @@ public class UILabel extends UIDisplayContainer {
         this.font = font;
     }
     
+    public Vector4f getMargin() {
+        return margin;
+    }
+
+    public void setMargin(Vector4f margin) {
+        this.margin = margin;
+    }
+    
+    /**
+     * Check whether the text will be wrapped. The width where the text will be wrapped can be set by using setWrapWidth().
+     * @return Returns Returns true if the text will be wrapped.
+     */
+    public boolean isWrap() {
+        return isWrap;
+    }
+
+    /**
+     * Set whether the text will be wrapped. The width where the text will be wrapped can be set by using setWrapWidth().
+     * @param isWrap True to enable text wrapping.
+     */
+    public void setWrap(boolean isWrap) {
+        this.isWrap = isWrap;
+    }
+
     private void notifyChangedListeners() {
         for (ChangedListener listener : changedListeners) {
             listener.changed(this);

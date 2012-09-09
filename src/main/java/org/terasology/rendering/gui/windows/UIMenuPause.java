@@ -86,7 +86,7 @@ public class UIMenuPause extends UIWindow {
             public void click(UIDisplayElement element, int button) {
                 CoreRegistry.get(LocalPlayer.class).getEntity().send(new RespawnEvent());
                 
-                close();
+                setVisible(false);
             }
         });
         _respawnButton.setHorizontalAlign(EHorizontalAlign.CENTER);
@@ -109,7 +109,7 @@ public class UIMenuPause extends UIWindow {
         _backToGameButton.getLabel().setText("Back to game");
         _backToGameButton.addClickListener(new ClickListener() {
             public void click(UIDisplayElement element, int button) {
-                close();
+                setVisible(false);
             }
         });
         _backToGameButton.setHorizontalAlign(EHorizontalAlign.CENTER);

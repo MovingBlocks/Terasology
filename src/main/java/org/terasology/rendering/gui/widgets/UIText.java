@@ -40,6 +40,7 @@ import org.terasology.rendering.gui.framework.UIDisplayContainerScrollable;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.FocusListener;
+import org.terasology.rendering.gui.framework.events.KeyListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 import org.terasology.rendering.gui.framework.events.SelectionChangedListener;
@@ -48,6 +49,8 @@ import org.terasology.rendering.gui.framework.events.SelectionChangedListener;
  * A text area which can be used as a single line input box, multi line input box or for just displaying large texts.
  * The content is scrollable and it also supports text wrapping in multi line mode. Moreover it supports the usual text editing, like selecting text and copy & paste.
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
+ * 
+ * TODO remove text wrapping, the UILabel widget can do this.
  */
 public class UIText extends UIDisplayContainerScrollable {
     
@@ -92,7 +95,7 @@ public class UIText extends UIDisplayContainerScrollable {
     private int selectionEnd;
     
     //characters
-    private final char[] specialCharacters = new char[] {' ', '_', '.', ',', '!', '-','(', ')', '"', '\'', ';', '+'};
+    private final char[] specialCharacters = new char[] {' ', '_', '.', ',', '/', '!', '-','(', ')', '"', '\'', ';', '+'};
     private final char[] multiLineSecialCharacters = new char[] {'\n'};
     private boolean ctrlKeyPressed = false;
     
@@ -106,6 +109,131 @@ public class UIText extends UIDisplayContainerScrollable {
     private int maxLength = 0;
     private boolean disabled;
     private boolean multiLine = false;
+    
+    //key listener
+    private KeyListener keyListener = new KeyListener() {
+        @Override
+        public void key(UIDisplayElement element, KeyEvent event) {
+            if (isFocused()) {
+                //delete
+                if (event.getKey() == Keyboard.KEY_BACK && event.isDown()) {
+                    if (text.getText().length() > 0) {
+                        //delete selection
+                        if (selectionStart != selectionEnd) {
+                            deleteSelection();
+                        }
+                        //delete at cursor position
+                        else if (cursorPosition > 0) {
+                            int pos = getWrapOffset(cursorPosition);
+                            replaceText(pos - 1, pos, "");
+                            
+                            setCursorToTextPosition(cursorPosition - 1);
+                        }
+                    }
+                }
+                //delete
+                if (event.getKey() == Keyboard.KEY_DELETE && event.isDown()) {
+                    if (text.getText().length() > 0) {
+                        //delete selection
+                        if (selectionStart != selectionEnd) {
+                            deleteSelection();
+                        }
+                        //delete at cursor position
+                        else if (cursorPosition < text.getText().length()) {
+                            int pos = getWrapOffset(cursorPosition);
+                            replaceText(pos, pos + 1, "");
+                        
+                            setCursorToTextPosition(cursorPosition);
+                        }
+                    }
+                }
+                //move cursor left
+                else if (event.getKey() == Keyboard.KEY_LEFT && event.isDown()) {
+                    clearSelection();
+                    if (ctrlKeyPressed) {
+                        setCursorToTextPosition(findNextChar(cursorPosition, ' ', true));
+                    } else {
+                        setCursorToTextPosition(cursorPosition - 1);
+                    }
+                }
+                //move cursor right
+                else if (event.getKey() == Keyboard.KEY_RIGHT && event.isDown()) {
+                    clearSelection();
+                    if (ctrlKeyPressed) {
+                        setCursorToTextPosition(findNextChar(cursorPosition, ' ', false));
+                    } else {
+                        setCursorToTextPosition(cursorPosition + 1);
+                    }
+                }
+                //move cursor up
+                else if (event.getKey() == Keyboard.KEY_UP && event.isDown()) {
+                    //TODO better solution here the behavior is kinda wrong
+                    clearSelection();
+                    
+                    Vector2f pos = cursor.getAbsolutePosition();
+                    pos = new Vector2f(pos.x + cursor.getPosition().x, pos.y + cursor.getPosition().y - cursorSize.y / 2);
+                    setCursorToTextPosition(toTextPosition(pos));
+                }
+                //move cursor down
+                else if (event.getKey() == Keyboard.KEY_DOWN && event.isDown()) {
+                    //TODO better solution here the behavior is kinda wrong
+                    clearSelection();
+
+                    Vector2f pos = cursor.getAbsolutePosition();
+                    pos = new Vector2f(pos.x + cursor.getPosition().x, pos.y + cursor.getPosition().y + cursorSize.y + cursorSize.y / 2);
+                    setCursorToTextPosition(toTextPosition(pos));
+                }
+                //left/right control pressed
+                else if (event.getKey() == Keyboard.KEY_LCONTROL || event.getKey() == Keyboard.KEY_RCONTROL) {
+                    ctrlKeyPressed = event.isDown();
+                }
+                //cut selection
+                else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_X && event.isDown()) {
+                    setClipboard(getSelection());
+                    deleteSelection();
+                }
+                //copy selection
+                else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_C && event.isDown()) {
+                    setClipboard(getSelection());
+                }
+                //paste selection
+                else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_V && event.isDown()) {
+                    if (selectionStart != selectionEnd) {
+                        deleteSelection();
+                    }
+                    
+                    String clipboard = removeUnsupportedChars(getClipboard());
+                    
+                    int num = insertText(getWrapOffset(cursorPosition), clipboard);
+                    
+                    setCursorToTextPosition(cursorPosition + num);
+                }
+                //select all
+                else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_A && event.isDown()) {
+                    setSelection(0, text.getText().length());
+                }
+                //add character
+                else if (event.isDown()) {
+                    char c = Keyboard.getEventCharacter();
+                    
+                    if (c == '\r') {
+                        c = '\n';
+                    }
+                    
+                    if (validateChar(c)) {
+                        //delete selection
+                        if (selectionStart != selectionEnd) {
+                            deleteSelection();
+                        }
+                        
+                        int num = insertText(getWrapOffset(cursorPosition), String.valueOf(c));
+                        
+                        setCursorToTextPosition(cursorPosition + num);
+                    }
+                }
+            }
+        }
+    };
 
     /**
      * A text cursor.
@@ -223,14 +351,9 @@ public class UIText extends UIDisplayContainerScrollable {
         }
     }
     
-    /**
-     * Create a one line input box which supports text highlighting and copy & paste.
-     * @param size The size of the element.
-     */
-    public UIText(Vector2f size) {       
-        setSize(size);
-        setCropContainer(true);
-        setPadding(new Vector4f(0f, 5f, 0f, 5f));
+    public UIText() {        
+        //key listener for processing the input
+        addKeyListener(keyListener);
         
         //mouse button listener to detect mouse clicks on the text and moving the cursor
         addMouseButtonListener(new MouseButtonListener() {
@@ -305,6 +428,7 @@ public class UIText extends UIDisplayContainerScrollable {
                 if (!isDisabled()) {
                     cursor.setVisible(true);
                     selectionRectangle.fadeSelection(false);
+                    setCursorPosition(cursorPosition);
                 }
             }
             
@@ -327,131 +451,11 @@ public class UIText extends UIDisplayContainerScrollable {
         text.addDisplayElement(selectionRectangle);
         text.addDisplayElement(cursor);
         
-        setCursorToTextPosition(cursorPosition);
+        setPadding(new Vector4f(0f, 5f, 0f, 5f));
+        setMultiLine(false);
+        setBackgroundColor(150, 0, 0, 0.3f);
     }
-    
-    @Override
-    public void processKeyboardInput(KeyEvent event) {
-        if (isFocused()) {
-            //delete
-            if (event.getKey() == Keyboard.KEY_BACK && event.isDown()) {
-                if (text.getText().length() > 0) {
-                    //delete selection
-                    if (selectionStart != selectionEnd) {
-                        deleteSelection();
-                    }
-                    //delete at cursor position
-                    else if (cursorPosition > 0) {
-                        int pos = getWrapOffset(cursorPosition);
-                        replaceText(pos - 1, pos, "");
-                        
-                        setCursorToTextPosition(cursorPosition - 1);
-                    }
-                }
-            }
-            //delete
-            if (event.getKey() == Keyboard.KEY_DELETE && event.isDown()) {
-                if (text.getText().length() > 0) {
-                    //delete selection
-                    if (selectionStart != selectionEnd) {
-                        deleteSelection();
-                    }
-                    //delete at cursor position
-                    else if (cursorPosition < text.getText().length()) {
-                        int pos = getWrapOffset(cursorPosition);
-                        replaceText(pos, pos + 1, "");
-                    
-                        setCursorToTextPosition(cursorPosition);
-                    }
-                }
-            }
-            //move cursor left
-            else if (event.getKey() == Keyboard.KEY_LEFT && event.isDown()) {
-                resetSelection();
-                if (ctrlKeyPressed) {
-                    setCursorToTextPosition(findNextChar(cursorPosition, ' ', true));
-                } else {
-                    setCursorToTextPosition(cursorPosition - 1);
-                }
-            }
-            //move cursor right
-            else if (event.getKey() == Keyboard.KEY_RIGHT && event.isDown()) {
-                resetSelection();
-                if (ctrlKeyPressed) {
-                    setCursorToTextPosition(findNextChar(cursorPosition, ' ', false));
-                } else {
-                    setCursorToTextPosition(cursorPosition + 1);
-                }
-            }
-            //move cursor up
-            else if (event.getKey() == Keyboard.KEY_UP && event.isDown()) {
-                //TODO better solution here the behavior is kinda wrong
-                resetSelection();
-                
-                Vector2f pos = cursor.getAbsolutePosition();
-                pos = new Vector2f(pos.x + cursor.getPosition().x, pos.y + cursor.getPosition().y - cursorSize.y / 2);
-                setCursorToTextPosition(toTextPosition(pos));
-            }
-            //move cursor down
-            else if (event.getKey() == Keyboard.KEY_DOWN && event.isDown()) {
-                //TODO better solution here the behavior is kinda wrong
-                resetSelection();
 
-                Vector2f pos = cursor.getAbsolutePosition();
-                pos = new Vector2f(pos.x + cursor.getPosition().x, pos.y + cursor.getPosition().y + cursorSize.y + cursorSize.y / 2);
-                setCursorToTextPosition(toTextPosition(pos));
-            }
-            //left/right control pressed
-            else if (event.getKey() == Keyboard.KEY_LCONTROL || event.getKey() == Keyboard.KEY_RCONTROL) {
-                ctrlKeyPressed = event.isDown();
-            }
-            //cut selection
-            else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_X && event.isDown()) {
-                setClipboard(getSelection());
-                deleteSelection();
-            }
-            //copy selection
-            else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_C && event.isDown()) {
-                setClipboard(getSelection());
-            }
-            //paste selection
-            else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_V && event.isDown()) {
-                if (selectionStart != selectionEnd) {
-                    deleteSelection();
-                }
-                
-                String clipboard = removeUnsupportedChars(getClipboard());
-                
-                int num = insertText(getWrapOffset(cursorPosition), clipboard);
-                
-                setCursorToTextPosition(cursorPosition + num);
-            }
-            //select all
-            else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_A && event.isDown()) {
-                setSelection(0, text.getText().length());
-            }
-            //add character
-            else if (event.isDown()) {
-                char c = Keyboard.getEventCharacter();
-                
-                if (c == '\r') {
-                    c = '\n';
-                }
-                
-                if (validateChar(c)) {
-                    //delete selection
-                    if (selectionStart != selectionEnd) {
-                        deleteSelection();
-                    }
-                    
-                    int num = insertText(getWrapOffset(cursorPosition), String.valueOf(c));
-                    
-                    setCursorToTextPosition(cursorPosition + num);
-                }
-            }
-        }
-    }
-    
     /**
      * Set the cursor position to the given position in the text.
      * @param index The text position (index) to set the cursor to.
@@ -462,7 +466,7 @@ public class UIText extends UIDisplayContainerScrollable {
         } else if (index > text.getText().length()) {
             index = text.getText().length();
         }
-
+        
         //calculate the display position of the cursor from text position
         if (index != cursorPosition) {
             Vector2f newPos = toDisplayPosition(index);
@@ -507,7 +511,7 @@ public class UIText extends UIDisplayContainerScrollable {
         Vector2f relative = new Vector2f(mousePos.x - textAbsPos.x, mousePos.y - textAbsPos.y);
         
         //multi line
-        if (isMultiLine()) {
+        //if (isMultiLine()) {
             //relative.x = relative.x - getPadding().y - getPadding().w;
             //clicked bottom of text container
             if (mousePos.y >= (textAbsPos.y + getSize().y + getScrollPosition())) {
@@ -542,6 +546,7 @@ public class UIText extends UIDisplayContainerScrollable {
                 }
                 return text.getText().length();
             }
+            /*
         }
         //single line
         else {
@@ -565,6 +570,7 @@ public class UIText extends UIDisplayContainerScrollable {
         }
         
         return 0;
+        */
     }
     
     /**
@@ -832,7 +838,7 @@ public class UIText extends UIDisplayContainerScrollable {
         if (scrollbarVisibility != isScrollbarVisible()) {
             setText(getText());
         }
-    
+        
         notifyChangedListeners();
         
         return text.length();
@@ -916,6 +922,15 @@ public class UIText extends UIDisplayContainerScrollable {
     }
     
     /**
+     * Delete the whole text.
+     */
+    public void deleteText() {
+        setText("");
+        clearSelection();
+        setCursorToTextPosition(0);
+    }
+    
+    /**
      * Replace a string defined by its start and end index. 
      * @param start The start index.
      * @param end The end index.
@@ -936,6 +951,22 @@ public class UIText extends UIDisplayContainerScrollable {
         }
     }
     
+    public int getCursorPosition() {
+        return cursorPosition;
+    }
+    
+    public void setCursorPosition(int position) {
+        setCursorToTextPosition(position);
+    }
+    
+    public void setCursorStart() {
+        setCursorToTextPosition(0);
+    }
+    
+    public void setCursorEnd() {
+        setCursorToTextPosition(text.getText().length());
+    }
+    
     /**
      * Select a text.
      * @param start The start index of the selection.
@@ -946,6 +977,8 @@ public class UIText extends UIDisplayContainerScrollable {
         selectionEnd = end;
         
         selectionRectangle.updateSelection(start, end);
+        
+        setCursorToTextPosition(selectionEnd);
         
         notifySelectionChangedListeners();
     }
@@ -966,9 +999,11 @@ public class UIText extends UIDisplayContainerScrollable {
     /**
      * Reset the selection.
      */
-    public void resetSelection() {
+    public void clearSelection() {
         selectionStart = 0;
         selectionEnd = 0;
+        
+        selectionRectangle.updateSelection(selectionStart, selectionEnd);
         
         notifySelectionChangedListeners();
     }
@@ -1131,7 +1166,7 @@ public class UIText extends UIDisplayContainerScrollable {
         if (disabled) {
             setFocus(null);
             cursor.setVisible(false);
-            resetSelection();
+            clearSelection();
             selectionRectangle.setVisible(false);
         }
     }

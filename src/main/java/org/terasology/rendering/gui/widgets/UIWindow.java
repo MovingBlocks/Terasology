@@ -21,7 +21,9 @@ import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.framework.IInputDataElement;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayContainerScrollable;
+import org.terasology.rendering.gui.framework.events.BindKeyListener;
 import org.terasology.rendering.gui.framework.events.ClickListener;
+import org.terasology.rendering.gui.framework.events.KeyListener;
 import org.terasology.rendering.gui.framework.events.WindowListener;
 
 import java.util.ArrayList;
@@ -31,6 +33,7 @@ import java.util.ArrayList;
  * 
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  * 
+ * TODO closeBinds/closeKeys needs to be handled in another way.. (its not really a close -> setVisible(false))
  */
 public class UIWindow extends UIDisplayContainerScrollable {
 
@@ -52,15 +55,38 @@ public class UIWindow extends UIDisplayContainerScrollable {
                 setFocus(UIWindow.this);
             }
         });
-    }
-
-    public void clearInputControls() {
-        for (UIDisplayElement element : getDisplayElements()) {
-            if (IInputDataElement.class.isInstance(element)) {
-                IInputDataElement inputControl = (IInputDataElement) element;
-                inputControl.clearData();
+        
+        addKeyListener(new KeyListener() {
+            @Override
+            public void key(UIDisplayElement element, KeyEvent event) {
+                if (closeKeys != null) {
+                    for (int key : closeKeys) {
+                        if (key == event.getKey() && event.isDown()) {
+                            setVisible(false);
+                            event.consume();
+                            
+                            return;
+                        }
+                    }
+                }
             }
-        }
+        });
+        
+        addBindKeyListener(new BindKeyListener() {
+            @Override
+            public void key(UIDisplayElement element, BindButtonEvent event) {
+                if (closeBinds != null) {
+                    for (String key : closeBinds) {
+                        if (key.equals(event.getId()) && event.isDown()) {
+                            setVisible(false);
+                            event.consume();
+                            
+                            return;
+                        }
+                    }
+                }
+            }
+        });
     }
 
     private void notifyWindowListeners(EWindowEvent event) {
@@ -124,43 +150,14 @@ public class UIWindow extends UIDisplayContainerScrollable {
     }
     
     @Override
-    public void processKeyboardInput(KeyEvent event) {
-        
-        if (!isVisible() || !modal)
-            return;
-        
-        if (closeKeys != null) {
-            for (int key : closeKeys) {
-                if (key == event.getKey() && event.isDown()) {
-                    close();
-                    event.consume();
-                    
-                    return;
-                }
-            }
+    public void setVisible(boolean visible) {
+        if (!visible && isVisible()) {
+            setFocus(null);
         }
         
-        super.processKeyboardInput(event);
-    }
-    
-    @Override
-    public void processBindButton(BindButtonEvent event) {
+        super.setVisible(visible);
         
-        if (!isVisible() || !modal)
-            return;
-        
-        if (closeBinds != null) {
-            for (String key : closeBinds) {
-                if (key.equals(event.getId()) && event.isDown()) {
-                    close();
-                    event.consume();
-                    
-                    return;
-                }
-            }
-        }
-        
-        super.processBindButton(event);
+        GUIManager.getInstance().checkMouseGrabbing();
     }
     
     /**
@@ -170,7 +167,6 @@ public class UIWindow extends UIDisplayContainerScrollable {
         if (!isVisible()) {
             notifyWindowListeners(EWindowEvent.OPEN);
             setFocus(null);
-            clearInputControls();
         }
         
         setVisible(true);
@@ -183,7 +179,6 @@ public class UIWindow extends UIDisplayContainerScrollable {
      */
     public void close() {
         setFocus(null);
-        clearInputControls();
         
         notifyWindowListeners(EWindowEvent.CLOSE);
         

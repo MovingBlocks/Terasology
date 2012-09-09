@@ -275,6 +275,48 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
     }
     
     /**
+     * Scroll to top.
+     */
+    public void scrollToTop() {
+        if (isScrollable) {
+            moveScrollbar(getPosition().y);
+        }
+    }
+    
+    /**
+     * Check whether the content is scrolled to the top.
+     * @return Returns true if the content is scrolled to the top.
+     */
+    public boolean isScrolledToTop() {
+        if (scrollbar.getPosition().y <= 0) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Scroll to bottom.
+     */
+    public void scrollToBottom() {
+        if (isScrollable) {
+            moveScrollbar(getPosition().y + getSize().y - scrollbar.getSize().y + 1f);
+        }
+    }
+    
+    /**
+     * Check whether the content is scrolled to the bottom.
+     * @return Returns true if the content is scrolled to the bottom.
+     */
+    public boolean isScrolledToBottom() {
+        if (scrollbar.getPosition().y >= getSize().y - scrollbar.getSize().y) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
      * Get the current scroll position.
      * @return Returns the scroll position.
      */
@@ -346,8 +388,20 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
         return new Vector2f(container.getSize().x - padding.y - padding.w, container.getSize().y - padding.x - padding.z);
     }
     
+    /**
+     * Get the size of the scrollbar.
+     * @return Returns the size of the scrollbar.
+     */
     public Vector2f getScrollbarSize() {
         return scrollbar.getSize();
+    }
+    
+    /**
+     * Check whether the content of the scroll container is to big and will be scrolled.
+     * @return Returns true if to content will be scrolled.
+     */
+    public boolean isScrollable() {
+        return isScrollable;
     }
     
     /**

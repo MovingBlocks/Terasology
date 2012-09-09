@@ -47,7 +47,7 @@ import org.terasology.rendering.gui.windows.UIMenuMain;
 import org.terasology.rendering.gui.windows.UIMenuPause;
 import org.terasology.rendering.gui.windows.UIMenuSelectWorld;
 import org.terasology.rendering.gui.windows.UIScreenBook;
-import org.terasology.rendering.gui.windows.UIScreenConsole;
+import org.terasology.rendering.gui.windows.UIScreenChat;
 import org.terasology.rendering.gui.windows.UIScreenContainer;
 import org.terasology.rendering.gui.windows.UIScreenDeath;
 import org.terasology.rendering.gui.windows.UIScreenHUD;
@@ -249,12 +249,14 @@ public class GUIManager implements EventHandlerSystem {
             window = new UIMenuPause();
         } else if (windowId.equals("inventory")) {
             window = new UIScreenInventory();
-        } else if (windowId.equals("console")) {
-            window = new UIScreenConsole();
+        } else if (windowId.equals("chat")) {
+            window = new UIScreenChat();
         } else if (windowId.equals("hud")) {
             window = new UIScreenHUD();
         } else if (windowId.equals("minionBehaviour")) {
             window = new UIMinionBehaviourMenu();
+        } else if (windowId.equals("chat")) {
+            window = new UIScreenChat();
         }
         
         if (window == null) {
