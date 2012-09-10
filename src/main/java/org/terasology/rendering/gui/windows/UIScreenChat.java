@@ -26,10 +26,10 @@ import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.Color;
 import org.terasology.input.binds.ConsoleButton;
 import org.terasology.input.events.KeyEvent;
-import org.terasology.logic.manager.ChatManager;
+import org.terasology.logic.manager.MessageManager;
 import org.terasology.logic.manager.CommandManager;
-import org.terasology.logic.manager.ChatManager.ChatSubscription;
-import org.terasology.logic.manager.ChatManager.Message;
+import org.terasology.logic.manager.MessageManager.ChatSubscription;
+import org.terasology.logic.manager.MessageManager.Message;
 import org.terasology.logic.manager.CommandManager.Command;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.KeyListener;
@@ -80,7 +80,7 @@ public class UIScreenChat extends UIWindow {
     
     public UIScreenChat() {
         commandManager = CommandManager.getInstance();
-        ChatManager.getInstance().subscribe(chatSubscription);
+        MessageManager.getInstance().subscribe(chatSubscription);
         
         setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
         setCloseBinds(new String[] {ConsoleButton.ID});
@@ -117,7 +117,7 @@ public class UIScreenChat extends UIWindow {
                         String message = inputBox.getText().trim();
                         inputBox.deleteText();
     
-                        ChatManager.getInstance().addMessage(message);
+                        MessageManager.getInstance().addMessage(message);
                         addHistory(message);
     
                         // check if message is a command
@@ -169,7 +169,7 @@ public class UIScreenChat extends UIWindow {
                                     
                                     commandMatches += cmd.getName();
                                 }
-                                ChatManager.getInstance().addMessage(commandMatches);
+                                MessageManager.getInstance().addMessage(commandMatches);
                             }
                         }
                     }
@@ -194,7 +194,7 @@ public class UIScreenChat extends UIWindow {
     }
     
     private void startMessage() {
-        ChatManager.getInstance().addMessage("Welcome to the wonderfull world of Terasology!\n\nType '/help' to see a list with available commands.\nTo see a detailed command description try '/help \"<commandName>\"'.");
+        MessageManager.getInstance().addMessage("Welcome to the wonderfull world of Terasology!\n\nType '/help' to see a list with available commands.\nTo see a detailed command description try '/help \"<commandName>\"'.");
     }
 
     private void addHistory(String message) {

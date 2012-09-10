@@ -306,15 +306,15 @@ public class CommandManager {
         
         //check if the command is loaded
         if (cmd == null) {
-            ChatManager.getInstance().addMessage("Unknown command '" + commandName + "'");
+            MessageManager.getInstance().addMessage("Unknown command '" + commandName + "'");
             
             return false;
         }
         
         //verify the number of parameters
         if (paramsCount > cmd.getParameter().length) {
-            ChatManager.getInstance().addMessage(cmd.getUseMessage());
-            ChatManager.getInstance().addMessage("To many parameters for command '" + commandName + "'");
+            MessageManager.getInstance().addMessage(cmd.getUseMessage());
+            MessageManager.getInstance().addMessage("To many parameters for command '" + commandName + "'");
             
             return false;
         }
@@ -329,8 +329,8 @@ public class CommandManager {
             return true;
         } catch (Exception e) {
             //TODO better error handling and error message
-            ChatManager.getInstance().addMessage(cmd.getUseMessage());
-            ChatManager.getInstance().addMessage("Error executing command '" + commandName + "'.");
+            MessageManager.getInstance().addMessage(cmd.getUseMessage());
+            MessageManager.getInstance().addMessage("Error executing command '" + commandName + "'.");
             e.printStackTrace();
             
             return false;

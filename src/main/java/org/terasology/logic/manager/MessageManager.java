@@ -3,15 +3,17 @@ package org.terasology.logic.manager;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.newdawn.slick.Color;
+
 /**
- * First draft for a chat manager. All chat message will get passed to this manager.
- * Objects can subscribe/unsubscribe to get notified if a new chat message was added.
+ * First draft for a message manager to display messages on the in-game chat. All chat message will get passed to this manager.
+ * Objects can subscribe/unsubscribe to get notified if a new message was added.
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  *
  */
-public class ChatManager {
+public class MessageManager {
     
-    private static ChatManager instance;
+    private static MessageManager instance;
     public static enum EChatScope {PRIVATE, PUBLIC, GROUP};
     private final List<ChatSubscription> subscribers = new ArrayList<ChatSubscription>();
     
@@ -31,6 +33,7 @@ public class ChatManager {
         
         private String message;
         private EChatScope scope;
+        private Color color;
         //...
 
         public Message(String message, EChatScope scope) {
@@ -45,6 +48,10 @@ public class ChatManager {
         public EChatScope getScope() {
             return scope;
         }
+        
+        public Color getColor() {
+            return color;
+        }
     }
     
     /**
@@ -56,13 +63,13 @@ public class ChatManager {
         void message(Message message);
     }
     
-    private ChatManager() {
+    private MessageManager() {
         
     }
 
-    public static ChatManager getInstance() {
+    public static MessageManager getInstance() {
         if (instance == null) {
-            instance = new ChatManager();
+            instance = new MessageManager();
         }
         
         return instance;
