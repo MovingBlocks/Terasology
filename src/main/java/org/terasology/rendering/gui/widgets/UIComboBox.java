@@ -29,6 +29,7 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
+import org.terasology.rendering.gui.widgets.list.UIListItem;
 import org.terasology.rendering.gui.widgets.list.UIListItemText;
 
 /**
@@ -155,10 +156,8 @@ public class UIComboBox extends UIDisplayContainer {
         addDisplayElement(baseButton);
         addDisplayElement(baseList);
     }
-
-    public void addItem(String text, Object value) {
-        UIListItemText item = new UIListItemText(text, value);
-        item.setPadding(new Vector4f(5f, 5f, 5f, 5f));
+    
+    public void addItem(UIListItem item) {
         baseList.addItem(item);
     }
     

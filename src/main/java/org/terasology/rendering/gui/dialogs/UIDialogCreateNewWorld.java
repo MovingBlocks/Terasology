@@ -29,6 +29,7 @@ import org.terasology.logic.manager.PathManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.widgets.*;
+import org.terasology.rendering.gui.widgets.list.UIListItemText;
 import org.terasology.rendering.gui.windows.UIMenuSingleplayer;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldInfo;
@@ -39,6 +40,7 @@ import org.terasology.world.generator.core.PerlinTerrainGenerator;
 import org.terasology.world.liquid.LiquidsGenerator;
 
 import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
 
 /*
  * Dialog for generate new world
@@ -92,9 +94,15 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
         _chunkGeneratorLabel.setSize(new Vector2f(0f, 16f));
         _chunkGeneratorLabel.setVisible(true);
 
-        _chunkGenerator = new UIComboBox(new Vector2f(176f, 22f), new Vector2f(176f, 64f));
-        _chunkGenerator.addItem("Normal", new Integer(0));
-        _chunkGenerator.addItem("Flat", new Integer(1));
+        _chunkGenerator = new UIComboBox(new Vector2f(176f, 22f), new Vector2f(176f, 48f));
+        UIListItemText item = new UIListItemText("Normal", new Integer(0));
+        item.setColor(Color.black);
+        item.setPadding(new Vector4f(5f, 5f, 5f, 5f));
+        _chunkGenerator.addItem(item);
+        item = new UIListItemText("Flat", new Integer(1));
+        item.setColor(Color.black);
+        item.setPadding(new Vector4f(5f, 5f, 5f, 5f));
+        _chunkGenerator.addItem(item);
         _chunkGenerator.setSelectedItemIndex(0);
         _chunkGenerator.setVisible(true);
 
