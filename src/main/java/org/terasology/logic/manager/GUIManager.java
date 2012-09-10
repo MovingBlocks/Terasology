@@ -45,7 +45,7 @@ import org.terasology.rendering.gui.windows.UIMenuConfigMods;
 import org.terasology.rendering.gui.windows.UIMenuConfigVideo;
 import org.terasology.rendering.gui.windows.UIMenuMain;
 import org.terasology.rendering.gui.windows.UIMenuPause;
-import org.terasology.rendering.gui.windows.UIMenuSelectWorld;
+import org.terasology.rendering.gui.windows.UIMenuSingleplayer;
 import org.terasology.rendering.gui.windows.UIScreenBook;
 import org.terasology.rendering.gui.windows.UIScreenChat;
 import org.terasology.rendering.gui.windows.UIScreenContainer;
@@ -221,8 +221,8 @@ public class GUIManager implements EventHandlerSystem {
         //TODO parser action here! this is temporary
         if (windowId.equals("main")) {
             window = new UIMenuMain();
-        } else if (windowId.equals("selectWorld")) {
-            window = new UIMenuSelectWorld();
+        } else if (windowId.equals("singleplayer")) {
+            window = new UIMenuSingleplayer();
         } else if (windowId.equals("config")) {
             window = new UIMenuConfig();
         } else if (windowId.equals("config:video")) {

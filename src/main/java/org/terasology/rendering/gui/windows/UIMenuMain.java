@@ -89,7 +89,7 @@ public class UIMenuMain extends UIWindow {
         _singlePlayerButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().openWindow("selectWorld");
+                GUIManager.getInstance().openWindow("singleplayer");
             }
         });
         _singlePlayerButton.setHorizontalAlign(EHorizontalAlign.CENTER);

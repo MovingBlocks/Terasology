@@ -29,7 +29,7 @@ import org.terasology.logic.manager.PathManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.widgets.*;
-import org.terasology.rendering.gui.windows.UIMenuSelectWorld;
+import org.terasology.rendering.gui.windows.UIMenuSingleplayer;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldInfo;
 import org.terasology.world.generator.core.FlatTerrainGenerator;
@@ -189,7 +189,7 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
     }
 
     private String getWorldName() {
-        UIMenuSelectWorld menu = (UIMenuSelectWorld) GUIManager.getInstance().getWindowById("selectWorld");
+        UIMenuSingleplayer menu = (UIMenuSingleplayer) GUIManager.getInstance().getWindowById("singleplayer");
         return "World" + (menu.getWorldCount() + 1);
     }
 }
