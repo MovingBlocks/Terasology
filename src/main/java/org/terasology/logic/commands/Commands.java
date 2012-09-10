@@ -50,7 +50,7 @@ import org.terasology.input.binds.ForwardsButton;
 import org.terasology.input.binds.LeftStrafeButton;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.MessageManager;
-import org.terasology.logic.manager.MessageManager.EChatScope;
+import org.terasology.logic.manager.MessageManager.EMessageScope;
 import org.terasology.logic.manager.CommandManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PathManager;
@@ -152,7 +152,7 @@ public class Commands implements CommandController {
             stringBuilder.append(StringConstants.NEW_LINE);
         }
         
-        MessageManager.getInstance().addMessage(stringBuilder.toString(), EChatScope.PRIVATE);
+        MessageManager.getInstance().addMessage(stringBuilder.toString(), EMessageScope.PRIVATE);
     }
     
     public void listItems() {
@@ -167,7 +167,7 @@ public class Commands implements CommandController {
             items.append(prefab.getName());
         }
         
-        MessageManager.getInstance().addMessage(items.toString(), EChatScope.PRIVATE);
+        MessageManager.getInstance().addMessage(items.toString(), EMessageScope.PRIVATE);
     }
 
     public void listShapes() {
@@ -182,7 +182,7 @@ public class Commands implements CommandController {
             stringBuilder.append(StringConstants.NEW_LINE);
         }
 
-        MessageManager.getInstance().addMessage(stringBuilder.toString(), EChatScope.PRIVATE);
+        MessageManager.getInstance().addMessage(stringBuilder.toString(), EMessageScope.PRIVATE);
     }
 
     public void listFreeShapeBlocks() {
@@ -197,7 +197,7 @@ public class Commands implements CommandController {
             stringBuilder.append(StringConstants.NEW_LINE);
         }
 
-        MessageManager.getInstance().addMessage(stringBuilder.toString(), EChatScope.PRIVATE);
+        MessageManager.getInstance().addMessage(stringBuilder.toString(), EMessageScope.PRIVATE);
     }
     
     public void giveBlock(String uri) {
@@ -217,14 +217,14 @@ public class Commands implements CommandController {
             
             return;
         } else if (matchingUris.isEmpty()) {
-            MessageManager.getInstance().addMessage("No block found for '" + uri + "'", EChatScope.PRIVATE);
+            MessageManager.getInstance().addMessage("No block found for '" + uri + "'", EMessageScope.PRIVATE);
             
             return;
         } else {
             StringBuilder builder = new StringBuilder();
             builder.append("Non-unique block name, possible matches: ");
             Joiner.on(", ").appendTo(builder, matchingUris);
-            MessageManager.getInstance().addMessage(builder.toString(), EChatScope.PRIVATE);
+            MessageManager.getInstance().addMessage(builder.toString(), EMessageScope.PRIVATE);
             
             return;
         }
@@ -233,20 +233,20 @@ public class Commands implements CommandController {
     public void giveBlock(String uri, String shapeUri, int quantity) {
         List<BlockUri> resolvedBlockUris = resolveBlockUri(uri);
         if (resolvedBlockUris.isEmpty()) {
-            MessageManager.getInstance().addMessage("No block found for '" + uri + "'", EChatScope.PRIVATE);
+            MessageManager.getInstance().addMessage("No block found for '" + uri + "'", EMessageScope.PRIVATE);
             
             return;
         } else if (resolvedBlockUris.size() > 1) {
             StringBuilder builder = new StringBuilder();
             builder.append("Non-unique block name, possible matches: ");
             Joiner.on(", ").appendTo(builder, resolvedBlockUris);
-            MessageManager.getInstance().addMessage(builder.toString(), EChatScope.PRIVATE);
+            MessageManager.getInstance().addMessage(builder.toString(), EMessageScope.PRIVATE);
             
             return;
         }
         List<AssetUri> resolvedShapeUris = resolveShapeUri(shapeUri);
         if (resolvedShapeUris.isEmpty()) {
-            MessageManager.getInstance().addMessage("No shape found for '" + shapeUri + "'", EChatScope.PRIVATE);
+            MessageManager.getInstance().addMessage("No shape found for '" + shapeUri + "'", EMessageScope.PRIVATE);
             
             return;
         } else if (resolvedShapeUris.size() > 1) {
@@ -270,12 +270,12 @@ public class Commands implements CommandController {
             return;
         }
         
-        MessageManager.getInstance().addMessage("Invalid block or shape", EChatScope.PRIVATE);
+        MessageManager.getInstance().addMessage("Invalid block or shape", EMessageScope.PRIVATE);
     }
 
     private void giveBlock(BlockFamily blockFamily, int quantity) {
         if (quantity < 1) {
-            MessageManager.getInstance().addMessage("Here, have these zero (0) items just like you wanted", EChatScope.PRIVATE);
+            MessageManager.getInstance().addMessage("Here, have these zero (0) items just like you wanted", EMessageScope.PRIVATE);
             
             return;
         }
@@ -283,7 +283,7 @@ public class Commands implements CommandController {
         BlockItemFactory factory = new BlockItemFactory(CoreRegistry.get(EntityManager.class));
         EntityRef item = factory.newInstance(blockFamily, quantity);
         if (!item.exists()) {
-            MessageManager.getInstance().addMessage("Unknown block or item", EChatScope.PRIVATE);
+            MessageManager.getInstance().addMessage("Unknown block or item", EMessageScope.PRIVATE);
             
             return;
         }
@@ -440,13 +440,13 @@ public class Commands implements CommandController {
             }
             msg.append(cmd.getName() + " - " + cmd.getShortDescription());
         }
-        MessageManager.getInstance().addMessage(msg.toString(), EChatScope.PRIVATE);
+        MessageManager.getInstance().addMessage(msg.toString(), EMessageScope.PRIVATE);
     }
     
     public void help(String command) {
         Command cmd = CommandManager.getInstance().getCommand(command);
         if (cmd == null) {
-            MessageManager.getInstance().addMessage("No help available for command '" + command + "'. Unknown command.", EChatScope.PRIVATE);
+            MessageManager.getInstance().addMessage("No help available for command '" + command + "'. Unknown command.", EMessageScope.PRIVATE);
         } else {
             StringBuilder msg = new StringBuilder();
             
@@ -472,7 +472,7 @@ public class Commands implements CommandController {
             
             msg.append("\n=====================================================================================================================");
             
-            MessageManager.getInstance().addMessage(msg.toString(), EChatScope.PRIVATE);
+            MessageManager.getInstance().addMessage(msg.toString(), EMessageScope.PRIVATE);
         }
     }
     

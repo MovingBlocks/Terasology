@@ -28,7 +28,7 @@ import org.terasology.input.binds.ConsoleButton;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.logic.manager.MessageManager;
 import org.terasology.logic.manager.CommandManager;
-import org.terasology.logic.manager.MessageManager.ChatSubscription;
+import org.terasology.logic.manager.MessageManager.MessageSubscription;
 import org.terasology.logic.manager.MessageManager.Message;
 import org.terasology.logic.manager.CommandManager.Command;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -57,7 +57,7 @@ public class UIScreenChat extends UIWindow {
     private final UIText inputBox;
     private final UIList messageList;
     
-    private final ChatSubscription chatSubscription = new ChatSubscription() {
+    private final MessageSubscription chatSubscription = new MessageSubscription() {
         @Override
         public void message(Message message) {
             boolean scroll = messageList.isScrolledToBottom();

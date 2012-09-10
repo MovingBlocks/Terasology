@@ -14,8 +14,8 @@ import org.newdawn.slick.Color;
 public class MessageManager {
     
     private static MessageManager instance;
-    public static enum EChatScope {PRIVATE, PUBLIC, GROUP};
-    private final List<ChatSubscription> subscribers = new ArrayList<ChatSubscription>();
+    public static enum EMessageScope {PRIVATE, PUBLIC, GROUP};
+    private final List<MessageSubscription> subscribers = new ArrayList<MessageSubscription>();
     
     //log
     private final List<Message> log = new ArrayList<Message>();
@@ -32,11 +32,11 @@ public class MessageManager {
     public class Message {
         
         private String message;
-        private EChatScope scope;
+        private EMessageScope scope;
         private Color color;
         //...
 
-        public Message(String message, EChatScope scope) {
+        public Message(String message, EMessageScope scope) {
             this.message = message;
             this.scope = scope;
         }
@@ -45,7 +45,7 @@ public class MessageManager {
             return message;
         }
 
-        public EChatScope getScope() {
+        public EMessageScope getScope() {
             return scope;
         }
         
@@ -59,7 +59,7 @@ public class MessageManager {
      * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
      *
      */
-    public interface ChatSubscription {
+    public interface MessageSubscription {
         void message(Message message);
     }
     
@@ -96,7 +96,7 @@ public class MessageManager {
      * @param message The chat message.
      */
     public void addMessage(String message) {
-        addMessage(message, EChatScope.PUBLIC);
+        addMessage(message, EMessageScope.PUBLIC);
     }
     
     /**
@@ -104,21 +104,21 @@ public class MessageManager {
      * @param message The chat message.
      * @param scope The scope.
      */
-    public void addMessage(String message, EChatScope scope) {
+    public void addMessage(String message, EMessageScope scope) {
         addMessage(new Message(message, scope));
     }
     
     private void notifySubscribers(Message message) {
-        for (ChatSubscription subscriber : subscribers) {
+        for (MessageSubscription subscriber : subscribers) {
             subscriber.message(message);
         }
     }
     
-    public void subscribe(ChatSubscription subscription) {
+    public void subscribe(MessageSubscription subscription) {
         subscribers.add(subscription);
     }
     
-    public void unsubscribe(ChatSubscription subscription) {
+    public void unsubscribe(MessageSubscription subscription) {
         subscribers.remove(subscription);
     }
 }
