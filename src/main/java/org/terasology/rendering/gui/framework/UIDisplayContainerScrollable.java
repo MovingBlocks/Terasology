@@ -26,6 +26,7 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
     private UIComposite container;
     
     //scrollbar
+    private UIImage scrollbarBackground;
     private UIImage scrollbar;
     private boolean scrolling = false;            //true if the scrollbar was pressed, this will enable scrolling
     private float scrollbarPressedOffset;         //the position on which the scrollbar was grabbed with the mouse
@@ -62,6 +63,10 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
         container = new UIComposite();
         container.setSize("100%", "100%");
         container.setVisible(true);
+        
+        scrollbarBackground = new UIImage(60, 60, 60, 0.7f);
+        scrollbarBackground.setHorizontalAlign(EHorizontalAlign.RIGHT);
+        scrollbarBackground.setSize((scrollbarWidth + 1) + "px", "100%");
         
         scrollbar = new UIImage(AssetManager.loadTexture("engine:gui_menu"));
         scrollbar.setCrop(false);
@@ -135,6 +140,7 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
         });
         
         super.addDisplayElement(container);
+        super.addDisplayElement(scrollbarBackground);
         super.addDisplayElement(scrollbar);
     }
 
@@ -194,6 +200,7 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
                 if (enableScrollbar) {                    
                     //enable the scrollbar
                     scrollbar.setVisible(true);
+                    scrollbarBackground.setVisible(true);
                     
                     //setCropMargin(new Vector4f(0f, -scrollbarWidth, 0f, 0f));
                     container.setSize(new Vector2f(container.getSize().x - scrollbarWidth, container.getSize().y));
@@ -205,6 +212,7 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
                 
                 //disable the scrollbar
                 scrollbar.setVisible(false);
+                scrollbarBackground.setVisible(false);
                 
                 moveScrollbar(0f);
                 

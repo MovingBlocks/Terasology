@@ -217,7 +217,7 @@ public class GUIManager implements EventHandlerSystem {
             
             return getWindowById(windowId);
         }
-                
+         
         //TODO parser action here! this is temporary
         if (windowId.equals("main")) {
             window = new UIMenuMain();

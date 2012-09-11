@@ -27,8 +27,8 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.widgets.UIButton;
 import org.terasology.rendering.gui.widgets.UIList;
+import org.terasology.rendering.gui.widgets.UIListItem;
 import org.terasology.rendering.gui.widgets.UIWindow;
-import org.terasology.rendering.gui.widgets.list.UIListItemText;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
@@ -187,7 +187,7 @@ public class UIMenuSingleplayer extends UIWindow {
             try {
                 WorldInfo info = WorldInfo.load(worldManifest);
                 if (!info.getTitle().isEmpty()) {
-                    UIListItemText item = new UIListItemText(info.getTitle(), info);
+                    UIListItem item = new UIListItem(info.getTitle(), info);
                     item.setPadding(new Vector4f(10f, 5f, 10f, 5f));
                     list.addItem(item);
                 }

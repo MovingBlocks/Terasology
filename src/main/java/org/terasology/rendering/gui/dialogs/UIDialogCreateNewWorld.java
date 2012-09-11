@@ -29,7 +29,6 @@ import org.terasology.logic.manager.PathManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.widgets.*;
-import org.terasology.rendering.gui.widgets.list.UIListItemText;
 import org.terasology.rendering.gui.windows.UIMenuSingleplayer;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldInfo;
@@ -95,15 +94,15 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
         _chunkGeneratorLabel.setVisible(true);
 
         _chunkGenerator = new UIComboBox(new Vector2f(176f, 22f), new Vector2f(176f, 48f));
-        UIListItemText item = new UIListItemText("Normal", new Integer(0));
-        item.setColor(Color.black);
+        UIListItem item = new UIListItem("Normal", new Integer(0));
+        item.setTextColor(Color.black);
         item.setPadding(new Vector4f(5f, 5f, 5f, 5f));
         _chunkGenerator.addItem(item);
-        item = new UIListItemText("Flat", new Integer(1));
-        item.setColor(Color.black);
+        item = new UIListItem("Flat", new Integer(1));
+        item.setTextColor(Color.black);
         item.setPadding(new Vector4f(5f, 5f, 5f, 5f));
         _chunkGenerator.addItem(item);
-        _chunkGenerator.setSelectedItemIndex(0);
+        _chunkGenerator.select(0);
         _chunkGenerator.setVisible(true);
 
 
@@ -149,7 +148,7 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
                 }
                 
                 List<String> chunkList = new ArrayList<String>();
-                switch (_chunkGenerator.getSelectedItemIndex()) {
+                switch (_chunkGenerator.getSelectionIndex()) {
                 case 1:   //flat
                     chunkList.add(FlatTerrainGenerator.class.getName());
                     //if (checkboxFlora == selected) ... (pseudo code)

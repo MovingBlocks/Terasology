@@ -35,9 +35,9 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.KeyListener;
 import org.terasology.rendering.gui.framework.events.WindowListener;
 import org.terasology.rendering.gui.widgets.UIList;
+import org.terasology.rendering.gui.widgets.UIListItem;
 import org.terasology.rendering.gui.widgets.UIText;
 import org.terasology.rendering.gui.widgets.UIWindow;
-import org.terasology.rendering.gui.widgets.list.UIListItemText;
 
 /**
  * The in-game chat.
@@ -63,9 +63,9 @@ public class UIScreenChat extends UIWindow {
             boolean scroll = messageList.isScrolledToBottom();
             boolean scrollable = messageList.isScrollable();
             
-            UIListItemText item = new UIListItemText(message.getMessage(), null);
+            UIListItem item = new UIListItem(message.getMessage(), null);
             item.setPadding(new Vector4f(0f, 5f, 0f, 5f));
-            item.setColor(Color.black);
+            item.setTextColor(Color.black);
             messageList.addItem(item);
             
             if (messageList.getItemCount() > historyMax) {

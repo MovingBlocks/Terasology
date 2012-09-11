@@ -8,6 +8,8 @@ import org.terasology.rendering.gui.layout.Layout;
  * Composition of multiple display elements which can be arranged in a specific manner by setting a layout type. Similar to the SWT composite class.
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  * @see org.eclipse.swt.widgets.Composite
+ * 
+ * TODO calculate height/width if no layout is applied. See UIListItem.
  */
 public class UIComposite extends UIDisplayContainer {
     

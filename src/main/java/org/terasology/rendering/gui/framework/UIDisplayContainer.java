@@ -188,6 +188,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     public void addDisplayElement(UIDisplayElement element) {
         displayElements.add(element);
         element.setParent(this);
+        //element.setVisible(true);
         
         layout();
     }
@@ -199,6 +200,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     public void addDisplayElementToPosition(int position, UIDisplayElement element) {
         displayElements.add(position, element);
         element.setParent(this);
+        //element.setVisible(true);
         
         layout();
     }

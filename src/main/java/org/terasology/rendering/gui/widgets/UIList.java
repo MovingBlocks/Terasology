@@ -20,20 +20,18 @@ import java.util.List;
 
 import javax.vecmath.Vector4f;
 
-import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayContainerScrollable;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.ClickListener;
+import org.terasology.rendering.gui.framework.events.SelectionChangedListener;
 import org.terasology.rendering.gui.layout.GridLayout;
-import org.terasology.rendering.gui.widgets.list.UIListItem;
 
 /**
  * A simple graphical List
  * 
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  * @author Anton Kireev <adeon.k87@gmail.com>
- * 
- * TODO should this really be a widget? -> the user should decide what UIEelements he want to add to the list
  */
 public class UIList extends UIDisplayContainerScrollable {
     
@@ -41,7 +39,8 @@ public class UIList extends UIDisplayContainerScrollable {
     private UIListItem selection = null;
     
     //events
-    private final List<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
+    private final ArrayList<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
+    private final List<SelectionChangedListener> selectionChangedListeners = new ArrayList<SelectionChangedListener>();
     private final ArrayList<ClickListener> doubleClickListeners = new ArrayList<ClickListener>();
     
     //child elements
@@ -99,6 +98,8 @@ public class UIList extends UIDisplayContainerScrollable {
         list.addDisplayElementToPosition(index, item);
         
         layout();
+        
+        notifyChangedListeners();
     }
     
     /**
@@ -124,6 +125,8 @@ public class UIList extends UIDisplayContainerScrollable {
         }
         
         layout();
+        
+        notifyChangedListeners();
     }
     
     /**
@@ -133,6 +136,8 @@ public class UIList extends UIDisplayContainerScrollable {
         list.removeAllDisplayElements();
         
         layout();
+        
+        notifyChangedListeners();
     }
     
     /**
@@ -164,7 +169,7 @@ public class UIList extends UIDisplayContainerScrollable {
             getItem(index).setSelected(true);
             selection = getItem(index);
             
-            notifyChangedListeners();
+            notifySelectionChangedListeners();
         }
     }
     
@@ -246,16 +251,30 @@ public class UIList extends UIDisplayContainerScrollable {
         doubleClickListeners.remove(listener);
     }
      
+    private void notifySelectionChangedListeners() {
+        for (SelectionChangedListener listener : selectionChangedListeners) {
+            listener.changed(this);
+        }
+    }
+     
+    public void addSelectionChangedListener(SelectionChangedListener listener) {
+        selectionChangedListeners.add(listener);
+    }
+    
+    public void removeSelectionChangedListener(SelectionChangedListener listener) {
+        selectionChangedListeners.remove(listener);
+    }
+    
     private void notifyChangedListeners() {
         for (ChangedListener listener : changedListeners) {
             listener.changed(this);
         }
     }
-     
+
     public void addChangedListener(ChangedListener listener) {
         changedListeners.add(listener);
     }
-    
+
     public void removeChangedListener(ChangedListener listener) {
         changedListeners.remove(listener);
     }
