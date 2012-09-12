@@ -31,7 +31,7 @@ import org.terasology.rendering.gui.framework.UIDisplayContainer;
  */
 public class UIProgressBar extends UIDisplayContainer {
 
-    private UIText         label;
+    private UILabel         label;
     private int            value;
     private UIProgressLine progressLine;
     
@@ -55,12 +55,13 @@ public class UIProgressBar extends UIDisplayContainer {
         setSize(new Vector2f(256f, 15f));
         setBackgroundImage("engine:gui_menu", new Vector2f(0f, 175f), new Vector2f(256f, 15f));
         
-        label = new UIText();
-        label.setVisible(true);
+        label = new UILabel();
         label.setColor(Color.black);
         label.setCrop(false);
-        label.setPosition(new Vector2f(getPosition().x, 20f));
+        label.setHorizontalAlign(EHorizontalAlign.CENTER);
+        label.setPosition(new Vector2f(0f, getSize().y + 2));
         label.setColor(Color.white);
+        label.setVisible(true);
 
         progressLine = new UIProgressLine(new Vector2f(248f, 9f));
         progressLine.setVisible(true);
@@ -69,15 +70,6 @@ public class UIProgressBar extends UIDisplayContainer {
 
         addDisplayElement(label);
         addDisplayElement(progressLine);
-    }
-
-    @Override
-    public void layout() {
-        super.layout();
-        
-        if (label != null) {
-            label.setPosition(new Vector2f((getSize().x - label.getTextWidth())/2, getSize().y + 2));
-        }
     }
 
     public int getValue() {

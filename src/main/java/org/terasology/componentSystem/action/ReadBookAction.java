@@ -34,10 +34,8 @@ import org.terasology.rendering.gui.windows.UIScreenBook;
 @RegisterComponentSystem
 public class ReadBookAction implements EventHandlerSystem {
 
-    private UIWindow bookScreen;
-
     public void initialise() {
-        bookScreen = GUIManager.getInstance().addWindow(new UIScreenBook(), "engine:bookScreen");
+
     }
 
     @Override
@@ -49,7 +47,6 @@ public class ReadBookAction implements EventHandlerSystem {
 
     @ReceiveEvent(components = {BookComponent.class})
     public void onActivate(ActivateEvent event, EntityRef entity) {
-        GUIManager.getInstance().setFocusedWindow(bookScreen);
-
+        GUIManager.getInstance().openWindow("book");
     }
 }

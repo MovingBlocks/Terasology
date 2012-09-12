@@ -39,7 +39,7 @@ import org.terasology.rendering.gui.framework.events.MouseMoveListener;
  */
 public class UIButton extends UIDisplayContainer {
 
-    private final UIText _label;
+    private final UILabel _label;
     
     public enum eButtonType {NORMAL, TOGGLE};
     private boolean _toggleState = false;
@@ -126,28 +126,21 @@ public class UIButton extends UIDisplayContainer {
             }
         });
         
-        _label = new UIText("Untitled");
-        _label.setVisible(true);
+        _label = new UILabel("Untitled");
         _label.addChangedListener(new ChangedListener() {
             @Override
             public void changed(UIDisplayElement element) {
                 layout();
             }
         });
+        _label.setHorizontalAlign(EHorizontalAlign.CENTER);
+        _label.setVerticalAlign(EVerticalAlign.CENTER);
+        _label.setVisible(true);
         
         addDisplayElement(_label);
     }
 
-    @Override
-    public void layout() {
-        super.layout();
-        
-        if (_label != null) {
-            _label.setPosition(new Vector2f(getSize().x / 2 - getLabel().getTextWidth() / 2, getSize().y / 2 - getLabel().getTextHeight() / 2));
-        }
-    }
-
-    public UIText getLabel() {
+    public UILabel getLabel() {
         return _label;
     }
     
@@ -207,15 +200,17 @@ public class UIButton extends UIDisplayContainer {
      * @param state True to set the pressed state.
      */
     public void setToggleState(boolean state) {
-        _toggleState = state;
-        
-        if (_toggleState) {
-            setBackgroundImage(states.get("pressed")[0], states.get("pressed")[1]);
-        } else {
-            setBackgroundImage(states.get("normal")[0], states.get("normal")[1]);
+        if (_toggleState != state) {
+            _toggleState = state;
+            
+            if (_toggleState) {
+                setBackgroundImage(states.get("pressed")[0], states.get("pressed")[1]);
+            } else {
+                setBackgroundImage(states.get("normal")[0], states.get("normal")[1]);
+            }
+            
+            notifyChangedListeners();
         }
-        
-        notifyChangedListeners();
     }
     
     private void notifyChangedListeners() {

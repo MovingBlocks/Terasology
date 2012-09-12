@@ -27,7 +27,7 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.widgets.UIButton;
 import org.terasology.rendering.gui.widgets.UIImage;
-import org.terasology.rendering.gui.widgets.UIText;
+import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIWindow;
 
 import javax.vecmath.Vector2f;
@@ -46,9 +46,10 @@ public class UIMenuPause extends UIWindow {
     final UIButton _respawnButton;
     final UIButton _backToGameButton;
 
-    final UIText _version;
+    final UILabel _version;
 
     public UIMenuPause() {
+        setId("pause");
         setBackgroundColor(0x00, 0x00, 0x00, 0.75f);
         setModal(true);
         setCloseBinds(new String[] {PauseButton.ID});
@@ -61,7 +62,7 @@ public class UIMenuPause extends UIWindow {
         _title.setPosition(new Vector2f(0f, 128f));
         _title.setVisible(true);
 
-        _version = new UIText("Pre Alpha");
+        _version = new UILabel("Pre Alpha");
         _version.setHorizontalAlign(EHorizontalAlign.CENTER);
         _version.setPosition(new Vector2f(0f, 230f));
         _version.setVisible(true);
@@ -85,7 +86,7 @@ public class UIMenuPause extends UIWindow {
             public void click(UIDisplayElement element, int button) {
                 CoreRegistry.get(LocalPlayer.class).getEntity().send(new RespawnEvent());
                 
-                close();
+                setVisible(false);
             }
         });
         _respawnButton.setHorizontalAlign(EHorizontalAlign.CENTER);
@@ -108,7 +109,7 @@ public class UIMenuPause extends UIWindow {
         _backToGameButton.getLabel().setText("Back to game");
         _backToGameButton.addClickListener(new ClickListener() {
             public void click(UIDisplayElement element, int button) {
-                close();
+                setVisible(false);
             }
         });
         _backToGameButton.setHorizontalAlign(EHorizontalAlign.CENTER);

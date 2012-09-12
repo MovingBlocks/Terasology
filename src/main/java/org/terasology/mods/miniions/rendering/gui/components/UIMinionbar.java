@@ -36,7 +36,7 @@ import org.terasology.mods.miniions.components.MinionControllerComponent;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.widgets.UIImage;
-import org.terasology.rendering.gui.widgets.UIText;
+import org.terasology.rendering.gui.widgets.UILabel;
 
 /**
  * A small toolbar placed at the right of the screen.
@@ -51,7 +51,7 @@ public class UIMinionbar extends UIDisplayContainer {
     private class UIMinionbarCell extends UIDisplayElement {
 
         private final UIImage selectionRectangle;
-        private final UIText label;
+        private final UILabel label;
 
         private int id;
         private boolean selected = false;
@@ -66,7 +66,7 @@ public class UIMinionbar extends UIDisplayContainer {
             selectionRectangle.setTextureOrigin(new Vector2f(0.0f, 24f));
             selectionRectangle.setSize(new Vector2f(48f, 48f));
 
-            label = new UIText();
+            label = new UILabel();
             label.setVisible(true);
             label.setPosition(new Vector2f(30f, 20f));
             
@@ -147,7 +147,7 @@ public class UIMinionbar extends UIDisplayContainer {
             return selected;
         }
 
-        public UIText getLabel() {
+        public UILabel getLabel() {
             return label;
         }
     }

@@ -23,7 +23,7 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.widgets.UIButton;
 import org.terasology.rendering.gui.widgets.UIImage;
-import org.terasology.rendering.gui.widgets.UIText;
+import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIWindow;
 
 /**
@@ -35,7 +35,7 @@ import org.terasology.rendering.gui.widgets.UIWindow;
 public class UIMenuConfig extends UIWindow {
 
     final UIImage _title;
-    final UIText _version;
+    final UILabel _version;
 
     private final UIButton _backToMainMenuButton;
     private final UIButton _videoButton;
@@ -44,6 +44,7 @@ public class UIMenuConfig extends UIWindow {
     private final UIButton _modsButton;
 
     public UIMenuConfig() {
+        setId("config");
         setBackgroundImage("engine:loadingbackground");
         setModal(true);
         maximize();
@@ -54,7 +55,7 @@ public class UIMenuConfig extends UIWindow {
         _title.setVisible(true);
         _title.setSize(new Vector2f(512f, 128f));
 
-        _version = new UIText("Settings");
+        _version = new UILabel("Settings");
         _version.setHorizontalAlign(EHorizontalAlign.CENTER);
         _version.setPosition(new Vector2f(0f, 230f));
         _version.setVisible(true);
@@ -67,7 +68,7 @@ public class UIMenuConfig extends UIWindow {
         _videoButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().setFocusedWindow(GUIManager.getInstance().getWindowById("menuConfigVideo"));
+                GUIManager.getInstance().openWindow("config:video");
             }
         });
 
@@ -79,7 +80,7 @@ public class UIMenuConfig extends UIWindow {
         _audioButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().setFocusedWindow(GUIManager.getInstance().getWindowById("menuConfigAudio"));
+                GUIManager.getInstance().openWindow("config:audio");
             }
         });
 
@@ -91,7 +92,7 @@ public class UIMenuConfig extends UIWindow {
         _controlsButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().setFocusedWindow(GUIManager.getInstance().getWindowById("menuConfigControls"));
+                GUIManager.getInstance().openWindow("config:controls");
             }
         });
 
@@ -103,7 +104,7 @@ public class UIMenuConfig extends UIWindow {
         _modsButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().setFocusedWindow(GUIManager.getInstance().getWindowById("menuConfigMods"));
+                GUIManager.getInstance().openWindow("config:mods");
             }
         });
 
@@ -115,7 +116,7 @@ public class UIMenuConfig extends UIWindow {
         _backToMainMenuButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().setFocusedWindow(GUIManager.getInstance().getWindowById("menuMain"));
+                GUIManager.getInstance().openWindow("main");
             }
         });
 

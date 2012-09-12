@@ -27,7 +27,7 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.WindowListener;
 import org.terasology.rendering.gui.widgets.UIButton;
-import org.terasology.rendering.gui.widgets.UIText;
+import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIWindow;
 
 /**
@@ -38,12 +38,13 @@ import org.terasology.rendering.gui.widgets.UIWindow;
  */
 public class UIScreenDeath extends UIWindow {
 
-    private final UIText _meassage;
+    private final UILabel _meassage;
     private final UIButton _respawnButton;
     private final UIButton _exitButton;
     private final UIButton _mainMenuButton;
 
     public UIScreenDeath() {
+        setId("death");
         setBackgroundColor(0x46, 0x00, 0x00, 0.85f);
         setModal(true);
         setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
@@ -61,7 +62,7 @@ public class UIScreenDeath extends UIWindow {
             }
         });
         
-        _meassage = new UIText("You are dead");
+        _meassage = new UILabel("You are dead");
         _meassage.setHorizontalAlign(EHorizontalAlign.CENTER);
         _meassage.setPosition(new Vector2f(0f, 300f));
         _meassage.setVisible(true);
@@ -72,7 +73,7 @@ public class UIScreenDeath extends UIWindow {
             @Override
             public void click(UIDisplayElement element, int button) {
                 respawn();
-                close();
+                setVisible(false);
             }
         });
         _respawnButton.setHorizontalAlign(EHorizontalAlign.CENTER);

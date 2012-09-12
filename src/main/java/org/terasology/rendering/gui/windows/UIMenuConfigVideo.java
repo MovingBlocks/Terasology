@@ -27,7 +27,7 @@ import org.terasology.rendering.gui.widgets.UIButton;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UISlider;
 import org.terasology.rendering.gui.widgets.UIStateButton;
-import org.terasology.rendering.gui.widgets.UIText;
+import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIWindow;
 
 import javax.vecmath.Vector2f;
@@ -50,7 +50,7 @@ public class UIMenuConfigVideo extends UIWindow {
     private final UIStateButton _bobbingButton;
     private final UIButton _backToConfigMenuButton;
 
-    final UIText _version;
+    final UILabel _version;
     
     private final ClickListener clickAction = new ClickListener() {
         @Override
@@ -65,6 +65,7 @@ public class UIMenuConfigVideo extends UIWindow {
     };
 
     public UIMenuConfigVideo() {
+        setId("config:video");
         setBackgroundImage("engine:loadingbackground");
         setModal(true);
         maximize();
@@ -75,7 +76,7 @@ public class UIMenuConfigVideo extends UIWindow {
         _title.setVisible(true);
         _title.setSize(new Vector2f(512f, 128f));
 
-        _version = new UIText("Video Settings");
+        _version = new UILabel("Video Settings");
         _version.setHorizontalAlign(EHorizontalAlign.CENTER);
         _version.setPosition(new Vector2f(0f, 230f));
         _version.setVisible(true);
@@ -224,7 +225,7 @@ public class UIMenuConfigVideo extends UIWindow {
         _backToConfigMenuButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().setFocusedWindow(GUIManager.getInstance().getWindowById("menuConfig"));
+                GUIManager.getInstance().openWindow("config");
             }
         });
 
@@ -239,6 +240,8 @@ public class UIMenuConfigVideo extends UIWindow {
         addDisplayElement(_blurIntensityButton);
         addDisplayElement(_bobbingButton);
         addDisplayElement(_backToConfigMenuButton);
+        
+        setup();
     }
     
     public void setup() {

@@ -194,7 +194,7 @@ public class StateSinglePlayer implements GameState {
         for (ComponentSystem system : componentSystemManager.iterateAll()) {
             system.shutdown();
         }
-        GUIManager.getInstance().removeAllWindows();
+        GUIManager.getInstance().closeAllWindows();
         try {
             CoreRegistry.get(WorldPersister.class).save(new File(PathManager.getInstance().getWorldSavePath(CoreRegistry.get(WorldProvider.class).getTitle()), ENTITY_DATA_FILE), WorldPersister.SaveFormat.Binary);
         } catch (IOException e) {
@@ -302,8 +302,7 @@ public class StateSinglePlayer implements GameState {
 
     // TODO: Should have its own state
     private void prepareWorld() {
-        UIScreenLoading loadingScreen = GUIManager.getInstance().addWindow(new UIScreenLoading(), "engine:loadingScreen");
-        GUIManager.getInstance().setFocusedWindow(loadingScreen);
+        UIScreenLoading loadingScreen = (UIScreenLoading) GUIManager.getInstance().openWindow("loading");
         Display.update();
 
         Timer timer = CoreRegistry.get(Timer.class);
@@ -355,8 +354,8 @@ public class StateSinglePlayer implements GameState {
             playerEntity.send(new RespawnEvent());
         }
 
-        GUIManager.getInstance().removeWindow(loadingScreen);
-        GUIManager.getInstance().setFocusedWindow(MenuControlSystem.HUD);
+        GUIManager.getInstance().closeWindow(loadingScreen);
+        GUIManager.getInstance().openWindow(MenuControlSystem.HUD);
 
         // Create the first Portal if it doesn't exist yet
         worldRenderer.initPortal();

@@ -73,6 +73,7 @@ import java.util.logging.Logger;
  * Manages everything related to using Groovy from within Java.
  *
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
+ * @deprecated
  */
 public class GroovyManager {
     /**

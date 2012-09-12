@@ -16,6 +16,9 @@
 
 package org.terasology.rendering.gui.widgets;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.vecmath.Vector2f;
 
 import org.lwjgl.input.Mouse;
@@ -28,6 +31,7 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
+import org.terasology.rendering.gui.framework.events.SelectionChangedListener;
 
 /**
  * A combo box.
@@ -35,9 +39,13 @@ import org.terasology.rendering.gui.framework.events.MouseMoveListener;
  */
 public class UIComboBox extends UIDisplayContainer {
     
-    private UIInput  baseInput;
+    //events
+    private final ArrayList<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
+    private final ArrayList<SelectionChangedListener> selectionListeners = new ArrayList<SelectionChangedListener>();
+    
+    private UIText baseInput;
     private UIButton baseButton;
-    private UIList   baseList;
+    private UIList baseList;
 
     private boolean opened;
 
@@ -62,8 +70,11 @@ public class UIComboBox extends UIDisplayContainer {
         setSize(size);
         opened = false;
         
-        baseInput = new UIInput(size);
+        baseInput = new UIText();
+        baseInput.setSize(size);
         baseInput.setVisible(true);
+        baseInput.setBackgroundColor(0xFF, 0xFF, 0xFF, 1.0f);
+        baseInput.setBorderSolid(1, 0x00, 0x00, 0x00, 1.0f);
         baseInput.setDisabled(true);
         baseInput.addMouseButtonListener(new MouseButtonListener() {
             @Override
@@ -86,9 +97,10 @@ public class UIComboBox extends UIDisplayContainer {
             
             @Override
             public void down(UIDisplayElement element, int button, boolean intersect) {
-    
+                
             }
         });
+        
         baseInput.addMouseMoveListener(new MouseMoveListener() {
             @Override
             public void leave(UIDisplayElement element) {
@@ -111,9 +123,9 @@ public class UIComboBox extends UIDisplayContainer {
             }
         });
 
-        baseButton = new UIButton(new Vector2f(18f, 20f), UIButton.eButtonType.TOGGLE);
+        baseButton = new UIButton(new Vector2f(20f, 22f), UIButton.eButtonType.TOGGLE);
         baseButton.setVisible(true);
-        baseButton.setPosition(new Vector2f(size.x   - baseButton.getSize().x, size.y/2 - baseButton.getSize().y/2));
+        baseButton.setPosition(new Vector2f(size.x - baseButton.getSize().x, size.y / 2 - baseButton.getSize().y / 2));
         baseButton.getLabel().setText("");
         baseButton.setTexture("engine:gui_menu");
         baseButton.setNormalState(new Vector2f(432f, 0f), new Vector2f(18f, 18f));
@@ -123,23 +135,33 @@ public class UIComboBox extends UIDisplayContainer {
             public void changed(UIDisplayElement element) {
                 opened = baseButton.getToggleState();
                 baseList.setVisible(opened);
+                setFocus(UIComboBox.this);
             }
         });
 
-        baseList = new UIList(listSize);
-        baseList.setPosition(new Vector2f(1f, size.y - 1f));
+        baseList = new UIList();
+        baseList.setSize(listSize);
+        baseList.setPosition(new Vector2f(0f, size.y));
         baseList.setBorderSolid(1f, 0x00, 0x00, 0x00, 1.0f);
         baseList.setBackgroundColor(0xFF, 0xFF, 0xFF, 1.0f);
         baseList.setVisible(false);
-        baseList.addChangedListener(new ChangedListener() {    
+        baseList.addSelectionChangedListener(new SelectionChangedListener() {    
             @Override
             public void changed(UIDisplayElement element) {
-                if (baseList.getSelectedItem() != null) {
-                    baseInput.setValue(baseList.getSelectedItem().getText());
+                if (baseList.getSelection() != null) {
+                    baseInput.setText((baseList.getSelection()).getText());
                 }
                 opened = false;
                 baseList.setVisible(opened);
                 baseButton.setToggleState(false);
+                
+                notifySelectionChangedListeners();
+            }
+        });
+        baseList.addChangedListener(new ChangedListener() {
+            @Override
+            public void changed(UIDisplayElement element) {
+                notifyChangedListeners();
             }
         });
 
@@ -147,33 +169,122 @@ public class UIComboBox extends UIDisplayContainer {
         addDisplayElement(baseButton);
         addDisplayElement(baseList);
     }
-
-    public void addItem(String text, Object value) {
-        baseList.addItem(text, value);
+    
+    /**
+     * Add an item to a specific location in the list.
+     * @param index The index, where the item should be added.
+     * @param item The item to add.
+     */
+    public void addItem(int index, UIListItem item) {        
+        baseList.addItem(index, item);
     }
     
     /**
-     * Select an specific item in the list.
-     * @param i The item to select.
+     * Add an item to the list.
+     * @param item The item to add.
      */
-    public void setSelectedItemIndex(int i) {
-        baseList.setSelectedItemIndex(i);
+    public void addItem(UIListItem item) {
+        baseList.addItem(item);
     }
     
+    /**
+     * Remove an item at a specific location.
+     * @param index The index of the item to remove.
+     */
+    public void removeItem(int index) {
+        baseList.removeItem(index);
+    }
+    
+    /**
+     * Remove all items.
+     */
+    public void removeAll() {
+        baseList.removeAll();
+    }
+    
+    /**
+     * Get the selected item.
+     * @return Returns the selected item or null if none is selected.
+     */
+    public UIListItem getSelection() {
+        return baseList.getSelection();
+    }
+
     /**
      * Get the selected item in the list.
      * @return Returns the selected item.
      */
-    public int getSelectedItemIndex() {
-        return baseList.getSelectedItemIndex();
+    public int getSelectionIndex() {
+        return baseList.getSelectionIndex();
     }
     
     /**
-     * Get the value of the selected item in the combo box list.
-     * @return Returns the value of the selected item. If no data is attached to the list entry null will be returned.
-     * @see UIList
+     * Select an specific item in the list.
+     * @param index The item to select.
      */
-    public Object getValue() {
-        return baseList.getValue();
+    public void select(int index) {
+        baseList.select(index);
+    }
+    
+    /**
+     * Get the size of the list.
+     * @return Returns the number of items in the list.
+     */
+    public int getItemCount() {
+        return baseList.getItemCount();
+    }
+    
+    /**
+     * Get the index of the given item.
+     * @param item The item reference to get the index from.
+     * @return Returns the item index or -1 if item is not in the list.
+     */
+    public int getItemIndex(UIListItem item) {
+        return baseList.getItemIndex(item);
+    }
+    
+    /**
+     * Get an item at a specific location.
+     * @param index The index of the item.
+     * @return Returns the item at this index.
+     */
+    public UIListItem getItem(int index) {
+        return baseList.getItem(index);
+    }
+    
+    /**
+     * Get all items in the list.
+     * @return Returns the list of all items.
+     */ 
+    public List<UIListItem> getItems() {
+        return baseList.getItems();
+    }
+    
+    private void notifySelectionChangedListeners() {
+        for (SelectionChangedListener listener : selectionListeners) {
+            listener.changed(this);
+        }
+    }
+
+    public void addSelectionChangedListener(SelectionChangedListener listener) {
+        selectionListeners.add(listener);
+    }
+
+    public void removeSelectionChangedListener(SelectionChangedListener listener) {
+        selectionListeners.remove(listener);
+    }
+    
+    private void notifyChangedListeners() {
+        for (ChangedListener listener : changedListeners) {
+            listener.changed(this);
+        }
+    }
+
+    public void addChangedListener(ChangedListener listener) {
+        changedListeners.add(listener);
+    }
+
+    public void removeChangedListener(ChangedListener listener) {
+        changedListeners.remove(listener);
     }
 }

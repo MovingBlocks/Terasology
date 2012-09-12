@@ -15,15 +15,26 @@
  */
 package org.terasology.rendering.gui.widgets;
 
+import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glTranslatef;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
 import org.terasology.componentSystem.items.InventorySystem;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.PlayerComponent;
+import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockItemComponent;
+import org.terasology.world.block.family.BlockFamily;
 import org.terasology.entityFactory.DroppedBlockFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -32,6 +43,7 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.asset.AssetManager;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.model.inventory.Icon;
 import org.terasology.physics.ImpulseEvent;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
@@ -67,7 +79,7 @@ public class UIItemCell extends UIDisplayContainer  {
     //sub elements
     private final UIImage selectionRectangle;
     private final UIImage background;
-    private final UIText itemLabel;
+    private final UILabel itemLabel;
     private UIItemCellIcon icon;
     
     //layout
@@ -124,6 +136,7 @@ public class UIItemCell extends UIDisplayContainer  {
             moveTransferIcon();
         }
     };
+    
     private MouseButtonListener mouseButtonListener = new MouseButtonListener() {        
         @Override
         public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
@@ -214,6 +227,122 @@ public class UIItemCell extends UIDisplayContainer  {
             }
         }
     };
+    
+    /**
+     * Displays a little icon and item count for an item cell.
+     *
+     * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
+     */
+    public class UIItemCellIcon extends UIDisplayContainer {
+        //entity
+        private EntityRef itemEntity = EntityRef.NULL;
+
+        //sub elements
+        private final UILabel itemCount;
+
+        //layout
+        private Texture terrainTex;
+        private final Vector2f itemCountPosition = new Vector2f(26f, 5f);
+
+        public UIItemCellIcon() {
+            terrainTex = AssetManager.loadTexture("engine:terrain");
+
+            itemCount = new UILabel();
+            itemCount.setVisible(false);
+            itemCount.setPosition(itemCountPosition);
+
+            addDisplayElement(itemCount);
+        }
+
+        @Override
+        public void layout() {
+
+        }
+
+        @Override
+        public void update() {
+            ItemComponent itemComponent = itemEntity.getComponent(ItemComponent.class);
+            //item count visibility
+            if (itemComponent != null) {
+                if (itemComponent.stackCount > 1) {
+                    itemCount.setVisible(true);
+                    itemCount.setText(Integer.toString(itemComponent.stackCount));
+                } else {
+                    itemCount.setVisible(false);
+                }
+            }
+        }
+
+        @Override
+        public void render() {
+            ItemComponent itemComponent = itemEntity.getComponent(ItemComponent.class);
+            if (itemComponent == null)
+                return;
+
+            //render icon
+            if (itemComponent.icon.isEmpty()) {
+                BlockItemComponent blockItem = itemEntity.getComponent(BlockItemComponent.class);
+                if (blockItem != null) {
+                    renderBlockIcon(blockItem.blockFamily);
+                }
+            } else {
+                Icon icon = Icon.get(itemComponent.icon);
+                if (icon != null) {
+                    renderIcon(icon);
+                }
+            }
+
+            super.render();
+        }
+
+        private void renderIcon(Icon icon) {
+            glEnable(GL11.GL_DEPTH_TEST);
+            glClear(GL11.GL_DEPTH_BUFFER_BIT);
+            glPushMatrix();
+            glTranslatef(20f, 20f, 0f);
+            icon.render();
+            glPopMatrix();
+            glDisable(GL11.GL_DEPTH_TEST);
+        }
+
+        private void renderBlockIcon(BlockFamily blockFamily) {
+            if (blockFamily == null) {
+                renderIcon(Icon.get("questionmark"));
+                return;
+            }
+
+            glEnable(GL11.GL_DEPTH_TEST);
+            glClear(GL11.GL_DEPTH_BUFFER_BIT);
+            glPushMatrix();
+
+            glTranslatef(20f, 20f, 0f);
+
+            GL11.glEnable(GL11.GL_TEXTURE_2D);
+            GL11.glPushMatrix();
+            glTranslatef(4f, 0f, 0f);
+            GL11.glScalef(20f, 20f, 20f);
+            GL11.glRotatef(170f, 1f, 0f, 0f);
+            GL11.glRotatef(-16f, 0f, 1f, 0f);
+            glBindTexture(GL11.GL_TEXTURE_2D, terrainTex.getId());
+
+            Block block = blockFamily.getArchetypeBlock();
+            block.renderWithLightValue(1.0f);
+
+            GL11.glPopMatrix();
+
+            GL11.glDisable(GL11.GL_TEXTURE_2D);
+            glPopMatrix();
+            glDisable(GL11.GL_DEPTH_TEST);
+        }
+
+        public EntityRef getItemEntity() {
+            return itemEntity;
+        }
+
+        public void setItemEntity(EntityRef itemEntity) {
+            this.itemEntity = itemEntity;
+        }
+    }
 
     /**
      * Create a single item cell which is capable of holding an item.
@@ -239,7 +368,7 @@ public class UIItemCell extends UIDisplayContainer  {
         background.setVisible(true);
         background.setFixed(true);
         
-        itemLabel = new UIText();
+        itemLabel = new UILabel();
         itemLabel.setVisible(false);
         itemLabel.setPosition(itemLabelPosition);
         
@@ -645,7 +774,7 @@ public class UIItemCell extends UIDisplayContainer  {
         //enable/disable transfer item
         if (getFromTransferSlot().exists()) {
             GUIManager.getInstance().getFocusedWindow().removeDisplayElement(transferIcon);
-            GUIManager.getInstance().getFocusedWindow().addDisplayElement(transferIcon, "transferIcon");
+            GUIManager.getInstance().getFocusedWindow().addDisplayElement(transferIcon);
             GUIManager.getInstance().getFocusedWindow().removeWindowListener(windowListener);
             GUIManager.getInstance().getFocusedWindow().addWindowListener(windowListener);
             transferIcon.setItemEntity(getFromTransferSlot());

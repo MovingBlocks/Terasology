@@ -22,7 +22,6 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
 import org.terasology.asset.AssetManager;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
@@ -47,12 +46,12 @@ public class UIDialogBox extends UIWindow {
         private UIImage leftBackground;
         private UIImage centerBackground;
         private UIImage rightBackground;
-        private UIText text;
+        private UILabel text;
 
         public UIDialogBackground(Vector2f size, String title) {
             setSize(size);
             
-            text = new UIText();
+            text = new UILabel();
             text.setColor(Color.orange);
             text.setVisible(true);
             
@@ -85,14 +84,14 @@ public class UIDialogBox extends UIWindow {
 
         public void setTitle(String title) {
             text.setText(title);
-            text.setPosition(new Vector2f(getSize().x / 2 - text.getTextWidth() / 2, 0f));
+            text.setPosition(new Vector2f(getSize().x / 2 - text.getSize().x / 2, 0f));
         }
 
         public void resize() {
             centerBackground.setSize(new Vector2f(getSize().x - 19f, 19f));
             centerBackground.setPosition(new Vector2f(leftBackground.getPosition().x + leftBackground.getSize().x, 0f));
             rightBackground.setPosition(new Vector2f(centerBackground.getPosition().x + centerBackground.getSize().x, 0f));
-            text.setPosition(new Vector2f(getSize().x / 2 - text.getTextWidth() / 2, 0f));
+            text.setPosition(new Vector2f(getSize().x / 2 - text.getSize().x / 2, 0f));
         }
     }
 
@@ -195,15 +194,6 @@ public class UIDialogBox extends UIWindow {
         pos.x -= pressedOffset.x;
         pos.y -= pressedOffset.y;
         setPosition(pos);
-    }
-    
-    /**
-     * Close a window. This will remove the window from the GUIManager.
-     */
-    public void close() {
-        super.close();
-        
-        GUIManager.getInstance().removeWindow(this);
     }
     
     public void resetPosition() {
