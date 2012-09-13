@@ -22,6 +22,7 @@ import com.bulletphysics.linearmath.QuaternionUtil;
 public class LocationComponentTest {
 
     LocationComponent loc;
+    EntityRef entity;
     Vector3f pos1 = new Vector3f(1,2,3);
     Vector3f pos2 = new Vector3f(2,3,4);
     Vector3f pos1plus2 = new Vector3f(3,5,7);
@@ -32,6 +33,9 @@ public class LocationComponentTest {
     @Before
     public void setup() {
         loc = new LocationComponent();
+        entity = mock(EntityRef.class);
+        when(entity.getComponent(LocationComponent.class)).thenReturn(loc);
+        when(entity.exists()).thenReturn(true);
         QuaternionUtil.setEuler(yawRotation, TeraMath.DEG_TO_RAD * 90, 0, 0);
         QuaternionUtil.setEuler(pitchRotation, 0, TeraMath.DEG_TO_RAD * 45, 0);
         pitchYaw.mul(yawRotation, pitchRotation);
@@ -194,7 +198,8 @@ public class LocationComponentTest {
         LocationComponent parent = new LocationComponent();
         EntityRef parentEntity = mock(EntityRef.class);
         when(parentEntity.getComponent(LocationComponent.class)).thenReturn(parent);
-        location.parent = parentEntity;
+        when(parentEntity.exists()).thenReturn(true);
+        parent.addChild(entity, parentEntity);
         return parent;
     }
 }

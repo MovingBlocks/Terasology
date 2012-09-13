@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.asset.loaders;
+package org.terasology.rendering.assetLoaders;
 
 import java.io.IOException;
 import java.io.InputStream;

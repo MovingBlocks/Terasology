@@ -19,12 +19,13 @@ package org.terasology.asset;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.terasology.asset.loaders.GLSLShaderLoader;
-import org.terasology.asset.loaders.MaterialLoader;
-import org.terasology.asset.loaders.ObjMeshLoader;
+import org.terasology.rendering.assetLoaders.GLSLShaderLoader;
+import org.terasology.rendering.assetLoaders.MaterialLoader;
+import org.terasology.rendering.assetLoaders.ObjMeshLoader;
 import org.terasology.asset.loaders.OggSoundLoader;
 import org.terasology.asset.loaders.OggStreamingSoundLoader;
-import org.terasology.asset.loaders.PNGTextureLoader;
+import org.terasology.rendering.assetLoaders.PNGTextureLoader;
+import org.terasology.rendering.assets.skeletalmesh.MD5SkeletonLoader;
 import org.terasology.world.block.loader.TileLoader;
 import org.terasology.world.block.shapes.JsonBlockShapeLoader;
 
@@ -63,7 +64,8 @@ public enum AssetType {
     },
     MATERIAL("material", "materials", "mat", new MaterialLoader()),
     BLOCK_DEFINITION("blockdef", "blocks", null, null),
-    BLOCK_TILE("blocktile", "blockTiles", "png", new TileLoader());
+    BLOCK_TILE("blocktile", "blockTiles", "png", new TileLoader()),
+    SKELETON_MESH("skeletalmesh", "skeletalMesh", "md5mesh", new MD5SkeletonLoader());
 
 
 

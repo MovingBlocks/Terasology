@@ -1,0 +1,8 @@
+{
+    "name" : "testmod:skeleton",
+    "location" : {},
+    "skeletalmesh" : {
+        "mesh" : "engine:character",
+        "material" : "engine:default"
+    }
+}
