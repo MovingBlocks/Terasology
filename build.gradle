@@ -35,6 +35,7 @@ ext {
     env = System.getenv() // read environment variables, including variables passed by jenking continuous integration server
     versionInfoFileDir = new File(sourceSets.main.output.resourcesDir, 'org/terasology/version')
     versionInfoFile = new File(versionInfoFileDir, 'versionInfo.properties')
+    versionMarkdownFileName = 'VERSION.markdown'
 }
 
 repositories {
@@ -226,6 +227,15 @@ task runProtobufWindows(type:Exec) {
 }
 
 /* Distributions: Application/Applet ----------------------------------------*/
+task createVersionMarkdownFile(type: Copy) {
+    inputs.property('dateTime', startDateTimeString)
+    from 'src/template'
+    into "$buildDir"
+    include versionMarkdownFileName
+    onlyIf { env.BUILD_URL != null }
+    expand(buildUrl: env.BUILD_URL, gitBranch: env.GIT_BRANCH, dateTime: startDateTimeString)
+}
+
 task distMods {
     file('mods').listFiles().each { File mod ->
         if (mod.isDirectory() ) {
@@ -300,15 +310,19 @@ task distModsZip(type:Zip) {
 task distApplicationZip(type:Zip) {
     description = "Creates an Application ZIP file from '$buildDir/$destDirApplication'"
     dependsOn distApplication
+    dependsOn createVersionMarkdownFile
     //appendix 'Application'
     from "$buildDir/$destDirApplication"
+    from "$buildDir/$versionMarkdownFileName"
 }
 
 task distAppletZip(type:Zip) {
     description = "Creates an Applet ZIP file from '$buildDir/$destDirApplet'"
     dependsOn distApplet
+    dependsOn createVersionMarkdownFile
     appendix 'Applet'
     from "$buildDir/$destDirApplet"
+    from "$buildDir/$versionMarkdownFileName"
 }
 
 /* IDE --------------------------------------------------------------------- */
