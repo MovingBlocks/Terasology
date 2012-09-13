@@ -84,6 +84,7 @@ public class UIItemCell extends UIDisplayContainer  {
     
     //layout
     private Vector2f itemLabelPosition = new Vector2f(0f, -14f);
+    private Vector2f iconPosition      = new Vector2f(2f, 2f);
     
     //settings
     private boolean enableDrag = true;
@@ -357,13 +358,13 @@ public class UIItemCell extends UIDisplayContainer  {
         Texture guiTex = AssetManager.loadTexture("engine:gui");
         
         selectionRectangle = new UIImage(guiTex);
-        selectionRectangle.setTextureSize(new Vector2f(24f, 24f));
-        selectionRectangle.setTextureOrigin(new Vector2f(0.0f, 23f));
-        selectionRectangle.setSize(getSize());
-        
-        background = new UIImage(guiTex);
-        background.setTextureSize(new Vector2f(20f, 20f));
-        background.setTextureOrigin(new Vector2f(1f, 1f));
+        selectionRectangle.setTextureSize(new Vector2f(22f, 22f));
+        selectionRectangle.setTextureOrigin(new Vector2f(1f, 23f));
+        selectionRectangle.setSize(new Vector2f(getSize().x, getSize().y));
+
+        background = new UIImage(AssetManager.loadTexture("engine:inventory"));
+        background.setTextureSize(new Vector2f(19f, 19f));
+        background.setTextureOrigin(new Vector2f(3f, 146f));
         background.setSize(getSize());
         background.setVisible(true);
         background.setFixed(true);
@@ -373,6 +374,7 @@ public class UIItemCell extends UIDisplayContainer  {
         itemLabel.setPosition(itemLabelPosition);
         
         icon = new UIItemCellIcon();
+        icon.setPosition(iconPosition);
         icon.setVisible(true);
         
         if (transferIcon == null) {

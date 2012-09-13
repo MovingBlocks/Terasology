@@ -217,10 +217,6 @@ public class UIImage extends UIDisplayElement {
         mesh = tessellator.generateMesh();
     }
 
-    @Override
-    public void update() {
-    }
-
     /*
      * Rotate graphics element
      */

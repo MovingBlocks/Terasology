@@ -16,6 +16,7 @@
 package org.terasology.rendering.gui.windows;
 
 import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
 
 import org.terasology.asset.AssetManager;
 import org.terasology.components.CuredComponent;
@@ -39,6 +40,7 @@ import org.terasology.mods.miniions.components.MinionComponent;
 import org.terasology.mods.miniions.events.MinionMessageEvent;
 import org.terasology.mods.miniions.rendering.gui.components.UIMessageQueue;
 import org.terasology.mods.miniions.rendering.gui.components.UIMinionbar;
+import org.terasology.rendering.gui.animation.AnimateRotateOn;
 import org.terasology.rendering.gui.widgets.UIBuff;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UIItemCell;
@@ -72,6 +74,9 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
     private final UIMessageQueue messagequeue;
     //private final UIHealthBar healthBar;
     private final UIBuff buffBar;
+
+    private final UIImage leftGearWheel;
+    private final UIImage rightGearWheel;
 
     /**
      * Init. the HUD.
@@ -119,6 +124,10 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
         toolbar.setHorizontalAlign(EHorizontalAlign.CENTER);
         toolbar.setVerticalAlign(EVerticalAlign.BOTTOM);
 
+        toolbar.setVisible(true);
+        toolbar.setCellMargin(new Vector2f(0f, 0f));
+        toolbar.setBorderImage("engine:inventory", new Vector2f(0f, 84f), new Vector2f(169f, 83f), new Vector4f(4f, 4f, 4f, 4f));
+
         minionbar = new UIMinionbar();
         minionbar.setVisible(true);
 
@@ -128,12 +137,31 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
         buffBar = new UIBuff();
         buffBar.setVisible(true);
 
+
         addDisplayElement(crosshair);
+
+        leftGearWheel = new UIImage(AssetManager.loadTexture("engine:inventory"));
+        leftGearWheel.setSize(new Vector2f(36f, 36f));
+        leftGearWheel.setTextureOrigin(new Vector2f(121.0f, 168.0f));
+        leftGearWheel.setTextureSize(new Vector2f(27.0f, 27.0f));
+        leftGearWheel.setVisible(true);
+        leftGearWheel.setId("leftGearWheel");
+
+        rightGearWheel = new UIImage(AssetManager.loadTexture("engine:inventory"));
+        rightGearWheel.setSize(new Vector2f(36f, 36f));
+        rightGearWheel.setTextureOrigin(new Vector2f(121.0f, 168.0f));
+        rightGearWheel.setTextureSize(new Vector2f(27.0f, 27.0f));
+        rightGearWheel.setVisible(true);
+        rightGearWheel.setId("rightGearWheel");
+
+        addDisplayElement(rightGearWheel);
+        addDisplayElement(leftGearWheel);
+
         addDisplayElement(debugLine1);
         addDisplayElement(debugLine2);
         addDisplayElement(debugLine3);
         addDisplayElement(debugLine4);
-        
+
         addDisplayElement(toolbar);
         addDisplayElement(minionbar);
         addDisplayElement(messagequeue);
@@ -163,6 +191,18 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
             debugLine3.setText(String.format("%s", CoreRegistry.get(WorldRenderer.class)));
             debugLine4.setText(String.format("total vus: %s | active threads: %s", ChunkTessellator.getVertexArrayUpdateCount(), CoreRegistry.get(GameEngine.class).getActiveTaskCount()));
         }
+
+        if(leftGearWheel != null && rightGearWheel != null){
+            leftGearWheel.setPosition(new Vector2f(
+                    toolbar.getPosition().x - leftGearWheel.getSize().x/2,
+                    toolbar.getPosition().y)
+            );
+            rightGearWheel.setPosition(new Vector2f(
+                    toolbar.getPosition().x + toolbar.getSize().x - rightGearWheel.getSize().x/2,
+                    toolbar.getPosition().y)
+            );
+        }
+
     }
     
     private void updateHealthBar(int currentHealth, int maxHealth) {
@@ -201,8 +241,9 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
     @Override
     public void open() {
         toolbar.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity(), 0, 8);
+        leftGearWheel.setVisible(true);
+        rightGearWheel.setVisible(true);
         layout();
-        
         super.open();
     }
 

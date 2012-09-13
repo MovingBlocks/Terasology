@@ -21,6 +21,7 @@ import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.vecmath.Vector2f;
 
@@ -29,6 +30,7 @@ import org.lwjgl.opengl.Display;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.logic.manager.ShaderManager;
+import org.terasology.rendering.gui.animation.Animation;
 import org.terasology.rendering.gui.framework.events.BindKeyListener;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.FocusListener;
@@ -86,8 +88,12 @@ public abstract class UIDisplayElement {
     protected final Vector2f positionOriginal  = new Vector2f(0, 0);
     
     private final Vector2f size = new Vector2f(0, 0);
+
     protected final Vector2f sizeOriginal = new Vector2f(0, 0);
-    
+
+    //animation
+    private final List<Animation> animations = new ArrayList<Animation>();
+
     public UIDisplayElement() {
         
     }
@@ -96,6 +102,13 @@ public abstract class UIDisplayElement {
         ShaderManager.getInstance().enableDefault();
 
         if (isVisible()) {
+
+            for(Animation animation: animations){
+                if(animation.isStarted()){
+                    animation.renderBegin();
+                }
+            }
+
             if (positionType == EPositionType.RELATIVE) {
                 glPushMatrix();
                 glTranslatef(getPosition().x, getPosition().y, 0);
@@ -108,6 +121,13 @@ public abstract class UIDisplayElement {
                 render();
                 glPopMatrix();
             }
+
+            for(Animation animation: animations){
+                if(animation.isStarted()){
+                    animation.renderEnd();
+                }
+            }
+
         }
     }
     
@@ -251,7 +271,13 @@ public abstract class UIDisplayElement {
      * 
      * TODO remove? isn't really needed anymore.
      */
-    public abstract void update();
+    public void update(){
+        for(Animation animation: animations){
+            if(animation.isStarted()){
+                animation.update();
+            }
+        }
+    };
     
     /**
      * Set the layout of the child elements here. Will be executed if the display or a parent window was resized.
@@ -790,5 +816,31 @@ public abstract class UIDisplayElement {
 
     public void removeMouseMoveListener(MouseMoveListener listener) {
         mouseListeners.remove(listener);
+    }
+
+
+    public void setAnimation(Animation newAnimation){
+        Animation animation = getAnimation(newAnimation.getClass());
+
+        newAnimation.setTarget(this);
+
+        if(animation != null){
+            if(animation.isStarted()){
+                animation.stop();
+            }
+            animations.remove(animation);
+        }
+
+        animations.add(newAnimation);
+    }
+
+    public <T> T getAnimation(Class<T> animation) {
+        for (Animation s : animations) {
+            if (s.getClass() == animation) {
+                return animation.cast(s);
+            }
+        }
+
+        return null;
     }
 }

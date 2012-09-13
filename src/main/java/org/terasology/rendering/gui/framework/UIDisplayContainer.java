@@ -44,7 +44,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     //child elements
     private final ArrayList<UIDisplayElement> displayElements = new ArrayList<UIDisplayElement>();
     private final List<UIStyle> styles = new ArrayList<UIStyle>();
-    
+
     //cropping
     private boolean cropContainer = false;
     protected Vector4f cropMargin = new Vector4f(0.0f, 0.0f,0.0f, 0.0f);
@@ -59,7 +59,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         int cropY = 0;
         int cropWidth = 0;
         int cropHeight = 0;
-
+        
         if (!isVisible())
             return;
 
@@ -99,6 +99,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         for (int i = 0; i < displayElements.size(); i++) {
             displayElements.get(i).update();
         }
+        super.update();
     }
     
     public void layout() {
@@ -543,7 +544,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             style.setBorderSource(origin, size, borderSize);
         }
     }
-    
+
     /**
      * Remove the border image from this display element.
      */
