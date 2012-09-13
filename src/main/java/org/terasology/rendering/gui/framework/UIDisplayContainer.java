@@ -188,6 +188,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     public void addDisplayElement(UIDisplayElement element) {
         displayElements.add(element);
         element.setParent(this);
+        //element.setVisible(true);
         
         layout();
     }
@@ -199,6 +200,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     public void addDisplayElementToPosition(int position, UIDisplayElement element) {
         displayElements.add(position, element);
         element.setParent(this);
+        //element.setVisible(true);
         
         layout();
     }
@@ -232,6 +234,29 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      */
     public ArrayList<UIDisplayElement> getDisplayElements() {        
         return displayElements;
+    }
+
+    /**
+     * 
+     * @param elementId
+     * @return
+     */
+    public UIDisplayElement getElementById(String elementId) {
+        UIDisplayElement ret = null;
+        for (UIDisplayElement element : getDisplayElements()) {
+            if (element.getId().equals(elementId)) {
+                ret = element;
+                break;
+            }
+            
+            if (element instanceof UIDisplayContainer) {
+                if ((ret = ((UIDisplayContainer)element).getElementById(elementId)) != null) {
+                    break;
+                }
+            }
+        }
+        
+        return ret;
     }
     
     /*

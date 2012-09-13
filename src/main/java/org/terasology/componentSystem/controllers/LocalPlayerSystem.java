@@ -369,7 +369,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
         if (localPlayerComp.isDead) return;
 
-        UIImage crossHair = (UIImage)GUIManager.getInstance().getWindowById("engine:hud").getElementById("crosshair");
+        UIImage crossHair = (UIImage)GUIManager.getInstance().getWindowById("hud").getElementById("crosshair");
 
         crossHair.getTextureSize().set(new Vector2f(22f / 256f, 22f / 256f));
 

@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -15,7 +16,7 @@ import org.terasology.rendering.gui.widgets.UIComposite;
 import org.terasology.rendering.gui.widgets.UIImage;
 
 /**
- * A container which will display a scrollbar if the content is to big to be displayed.
+ * A container where the contant can be scrolled if the content is to big to be displayed.
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  *
  */
@@ -25,6 +26,7 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
     private UIComposite container;
     
     //scrollbar
+    private UIImage scrollbarBackground;
     private UIImage scrollbar;
     private boolean scrolling = false;            //true if the scrollbar was pressed, this will enable scrolling
     private float scrollbarPressedOffset;         //the position on which the scrollbar was grabbed with the mouse
@@ -37,6 +39,10 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
     //settings
     private boolean enableScrolling = false;
     private boolean enableScrollbar = false;
+    
+    //layout
+    private final float scrollbarWidth = 15f;
+    private Vector4f padding = new Vector4f(0f, 0f, 0f, 0f); //top, right, bottom, left
     
     //other
     private boolean isScrollable = false;
@@ -58,11 +64,15 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
         container.setSize("100%", "100%");
         container.setVisible(true);
         
+        scrollbarBackground = new UIImage(60, 60, 60, 0.7f);
+        scrollbarBackground.setHorizontalAlign(EHorizontalAlign.RIGHT);
+        scrollbarBackground.setSize((scrollbarWidth + 1) + "px", "100%");
+        
         scrollbar = new UIImage(AssetManager.loadTexture("engine:gui_menu"));
         scrollbar.setCrop(false);
         scrollbar.setTextureOrigin(new Vector2f(0f, 0f));
         scrollbar.setTextureSize(new Vector2f(60f, 15f));
-        scrollbar.setSize(new Vector2f(15f, 60f));
+        scrollbar.setSize(new Vector2f(0f, 0f));
         scrollbar.setVisible(false);
         scrollbar.addMouseButtonListener(new MouseButtonListener() {    
             @Override
@@ -111,7 +121,6 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
         });
         
         addMouseButtonListener(new MouseButtonListener() {
-            
             @Override
             public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
                 if (wheel != 0 && enableScrolling && isScrollable && intersect) {
@@ -131,6 +140,7 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
         });
         
         super.addDisplayElement(container);
+        super.addDisplayElement(scrollbarBackground);
         super.addDisplayElement(scrollbar);
     }
 
@@ -153,7 +163,7 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
         scrollbar.setPosition(new Vector2f(getSize().x - scrollbar.getSize().x, scrollbarPos));
         
         //move the content
-        container.setPosition(new Vector2f(container.getPosition().x, -multiplier * scrollbar.getPosition().y));
+        container.setPosition(new Vector2f(padding.w, -multiplier * scrollbar.getPosition().y + padding.x));
         
         notifyScrollListeners();
     }
@@ -161,20 +171,20 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
     /**
      * Calculate the high of the content based on the child elements within this container.
      */
-    private void calcContentHeight() {
+    protected void calcContentHeight() {
         if (scrollbar != null) {
+            container.setSize(getSize());
+            
             if (container.getDisplayElements().size() > 0) {
                 
                 //Lets calculate the max value recursively
                 max = 0;
                 calcMax(container.getDisplayElements());
-                contentHeight = max - container.getAbsolutePosition().y;
-                
-                //container.setSize(new Vector2f(getSize().x, contentHeight));
+                contentHeight = max - container.getAbsolutePosition().y + padding.x + padding.z;
             }
             
             //check if the content is bigger than the container
-            if (contentHeight > getSize().y) {
+            if (enableScrolling && contentHeight > getSize().y) {
                 isScrollable = true;
                 
                 //calculate how much space needs to be scrolled by the scrollbar
@@ -184,12 +194,16 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
                 //TODO calculate multiplier none linear..
                 multiplier = (diff / getSize().y) + 1;
                 
-                if (enableScrollbar) {
-                    //set the new size of the scrollbar based on the multiplier
-                    scrollbar.setSize(new Vector2f(scrollbar.getSize().x, getSize().y / multiplier));
-                    
+                //set the new size of the scrollbar based on the multiplier
+                scrollbar.setSize(new Vector2f(scrollbarWidth, getSize().y / multiplier));
+                
+                if (enableScrollbar) {                    
                     //enable the scrollbar
                     scrollbar.setVisible(true);
+                    scrollbarBackground.setVisible(true);
+                    
+                    //setCropMargin(new Vector4f(0f, -scrollbarWidth, 0f, 0f));
+                    container.setSize(new Vector2f(container.getSize().x - scrollbarWidth, container.getSize().y));
                 }
                 
                 moveScrollbar(scrollbar.getAbsolutePosition().y);
@@ -198,8 +212,11 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
                 
                 //disable the scrollbar
                 scrollbar.setVisible(false);
+                scrollbarBackground.setVisible(false);
                 
                 moveScrollbar(0f);
+                
+                //setCropMargin(new Vector4f(0f, 0f, 0f, 0f));
             }
         }
     }
@@ -235,6 +252,8 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
         } else {
             container.addDisplayElement(element);
         }
+        
+        layout();
     }
     
     @Override
@@ -242,7 +261,7 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
         container.getDisplayElements().remove(element);
         element.setParent(null);
         
-        calcContentHeight();
+        layout();
     }
     
     @Override
@@ -252,7 +271,65 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
         }
         container.getDisplayElements().clear();
         
-        calcContentHeight();
+        layout();
+    }
+    
+    /**
+     * Scroll to the given position.
+     * @param pos The position where to scroll to.
+     */
+    public void scrollTo(float pos) {
+        moveScrollbar(getPosition().y + pos / multiplier);
+    }
+    
+    /**
+     * Scroll to top.
+     */
+    public void scrollToTop() {
+        if (isScrollable) {
+            moveScrollbar(getPosition().y);
+        }
+    }
+    
+    /**
+     * Check whether the content is scrolled to the top.
+     * @return Returns true if the content is scrolled to the top.
+     */
+    public boolean isScrolledToTop() {
+        if (scrollbar.getPosition().y <= 0) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Scroll to bottom.
+     */
+    public void scrollToBottom() {
+        if (isScrollable) {
+            moveScrollbar(getPosition().y + getSize().y - scrollbar.getSize().y + 1f);
+        }
+    }
+    
+    /**
+     * Check whether the content is scrolled to the bottom.
+     * @return Returns true if the content is scrolled to the bottom.
+     */
+    public boolean isScrolledToBottom() {
+        if (scrollbar.getPosition().y >= getSize().y - scrollbar.getSize().y) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Get the current scroll position.
+     * @return Returns the scroll position.
+     */
+    public float getScrollPosition() {
+        return scrollbar.getPosition().y * multiplier;
     }
     
     /**
@@ -288,7 +365,59 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
     public void setEnableScrollbar(boolean enable) {
         this.enableScrollbar = enable;
         
-        calcContentHeight();
+        layout();
+    }
+    
+    /**
+     * Get the padding of the text within the text container.
+     * @return Returns the padding.
+     */
+    public Vector4f getPadding() {
+        return padding;
+    }
+
+    /**
+     * Set the padding of the text within the text container.
+     * @param padding The padding, where x = top, y = right, z = bottom and w = left.
+     */
+    public void setPadding(Vector4f padding) {
+        this.padding = padding;
+        
+        container.setPosition(new Vector2f(padding.w, padding.x));
+        
+        layout();
+    }
+    
+    /**
+     * Get the size of the area which will be scrolled, excluding the padding and the scrollbar width. This will be the actual displayed area of the display element.
+     * @return Returns the scroll container size.
+     */
+    public Vector2f getScrollContainerSize() {
+        return new Vector2f(container.getSize().x - padding.y - padding.w, container.getSize().y - padding.x - padding.z);
+    }
+    
+    /**
+     * Get the size of the scrollbar.
+     * @return Returns the size of the scrollbar.
+     */
+    public Vector2f getScrollbarSize() {
+        return scrollbar.getSize();
+    }
+    
+    /**
+     * Check whether the content of the scroll container is to big and will be scrolled.
+     * @return Returns true if to content will be scrolled.
+     */
+    public boolean isScrollable() {
+        return isScrollable;
+    }
+    
+    /**
+     * Check whether the scrollbar is visible or not.
+     * @return Returns true if the scrollabr is visible.
+     */
+    public boolean isScrollbarVisible() {
+        return scrollbar.isVisible();
     }
     
     private void notifyScrollListeners() {

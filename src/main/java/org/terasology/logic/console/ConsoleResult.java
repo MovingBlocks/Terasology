@@ -19,6 +19,7 @@ package org.terasology.logic.console;
 /**
  * Result from a console command
  * @author Immortius
+ * @deprecated
  */
 public class ConsoleResult {
     private boolean success = false;

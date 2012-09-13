@@ -42,6 +42,7 @@ public class UIScreenInventory extends UIWindow {
     private UIImage background;
 
     public UIScreenInventory() {
+        setId("inventory");
         setBackgroundColor(0x00, 0x00, 0x00, 0.75f);
         setModal(true);
         setCloseBinds(new String[] {InventoryButton.ID});

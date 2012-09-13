@@ -18,27 +18,27 @@ package org.terasology.rendering.gui.widgets;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.rendering.gui.framework.IInputDataElement;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayContainerScrollable;
+import org.terasology.rendering.gui.framework.events.BindKeyListener;
+import org.terasology.rendering.gui.framework.events.ClickListener;
+import org.terasology.rendering.gui.framework.events.KeyListener;
 import org.terasology.rendering.gui.framework.events.WindowListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * A window which can contain display elements. All windows will be managed by the GUIManager.
  * 
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  * 
+ * TODO closeBinds/closeKeys needs to be handled in another way.. (its not really a close -> setVisible(false))
  */
 public class UIWindow extends UIDisplayContainerScrollable {
 
     //events
-    private enum eWindowEvent {OPEN, CLOSE};
-    private final ArrayList<WindowListener> _windowListeners = new ArrayList<WindowListener>();
-    
-    private final HashMap<String, UIDisplayElement> _displayElementsById = new HashMap<String, UIDisplayElement>();
+    private static enum EWindowEvent {OPEN, CLOSE};
+    private final ArrayList<WindowListener> windowListeners = new ArrayList<WindowListener>();
     
     //close buttons
     private String[] closeBinds;
@@ -48,28 +48,56 @@ public class UIWindow extends UIDisplayContainerScrollable {
     private boolean modal = false;
     
     public UIWindow() {
-        
-    }
-
-    public void clearInputControls() {
-        for (UIDisplayElement element : getDisplayElements()) {
-            if (IInputDataElement.class.isInstance(element)) {
-                IInputDataElement inputControl = (IInputDataElement) element;
-                inputControl.clearData();
+        addClickListener(new ClickListener() {
+            @Override
+            public void click(UIDisplayElement element, int button) {
+                setFocus(UIWindow.this);
             }
-        }
+        });
+        
+        addKeyListener(new KeyListener() {
+            @Override
+            public void key(UIDisplayElement element, KeyEvent event) {
+                if (closeKeys != null) {
+                    for (int key : closeKeys) {
+                        if (key == event.getKey() && event.isDown()) {
+                            setVisible(false);
+                            event.consume();
+                            
+                            return;
+                        }
+                    }
+                }
+            }
+        });
+        
+        addBindKeyListener(new BindKeyListener() {
+            @Override
+            public void key(UIDisplayElement element, BindButtonEvent event) {
+                if (closeBinds != null) {
+                    for (String key : closeBinds) {
+                        if (key.equals(event.getId()) && event.isDown()) {
+                            setVisible(false);
+                            event.consume();
+                            
+                            return;
+                        }
+                    }
+                }
+            }
+        });
     }
 
-    private void notifyWindowListeners(eWindowEvent event) {
+    private void notifyWindowListeners(EWindowEvent event) {
         //we copy the list so the listener can remove itself within the close/open method call (see UIItemCell). Otherwise ConcurrentModificationException.
         //TODO other solution?
-        ArrayList<WindowListener> listeners = (ArrayList<WindowListener>) _windowListeners.clone();
+        ArrayList<WindowListener> listeners = (ArrayList<WindowListener>) windowListeners.clone();
         
-        if (event == eWindowEvent.OPEN) {
+        if (event == EWindowEvent.OPEN) {
             for (WindowListener listener : listeners) {
                 listener.open(this);
             }
-        } else if (event == eWindowEvent.CLOSE) {
+        } else if (event == EWindowEvent.CLOSE) {
             for (WindowListener listener : listeners) {
                 listener.close(this);
             }
@@ -77,11 +105,11 @@ public class UIWindow extends UIDisplayContainerScrollable {
     }
     
     public void addWindowListener(WindowListener listener) {
-        _windowListeners.add(listener);
+        windowListeners.add(listener);
     }
 
     public void removeWindowListener(WindowListener listener) {
-        _windowListeners.remove(listener);
+        windowListeners.remove(listener);
     }
 
     public void maximize() {
@@ -119,111 +147,41 @@ public class UIWindow extends UIDisplayContainerScrollable {
     public void setCloseKeys(int[] keys) {
         this.closeKeys = keys;
     }
-
-    /**
-     * 
-     * @param element
-     * @param elementId
-     * 
-     * @deprecated don't use this. ID will be included in EACH UI element in the future.
-     */
-    public void addDisplayElement(UIDisplayElement element, String elementId) {
-        addDisplayElement(element);
-        _displayElementsById.put(elementId, element);
-        element.setParent(this);
-    }
-
-    /**
-     * 
-     * @param elementId
-     * @return
-     * 
-     * @deprecated don't use this. ID will be included in EACH UI element in the future.
-     */
-    public UIDisplayElement getElementById(String elementId) {
-        if (!_displayElementsById.containsKey(elementId)) {
-            return null;
-        }
-
-        return _displayElementsById.get(elementId);
-    }
     
     @Override
-    public void processKeyboardInput(KeyEvent event) {
-        
-        if (!isVisible() || !modal)
-            return;
-        
-        if (closeKeys != null) {
-            for (int key : closeKeys) {
-                if (key == event.getKey() && event.isDown()) {
-                    close();
-                    event.consume();
-                    
-                    return;
-                }
-            }
-        }
-        
-        super.processKeyboardInput(event);
-    }
-    
-    @Override
-    public void processBindButton(BindButtonEvent event) {
-        
-        if (!isVisible() || !modal)
-            return;
-        
-        if (closeBinds != null) {
-            for (String key : closeBinds) {
-                if (key.equals(event.getId()) && event.isDown()) {
-                    close();
-                    event.consume();
-                    
-                    return;
-                }
-            }
-        }
-        
-        super.processBindButton(event);
-    }
-    
-    /**
-     * Set the visibility of the window. Use the open and close methods for windows instead.
-     * @param visible True to set the window visible.
-     */
-    public void setVisible(boolean visible) {        
-        if (visible && !isVisible()) {
-            notifyWindowListeners(eWindowEvent.OPEN);
+    public void setVisible(boolean visible) {
+        if (!visible && isVisible()) {
             setFocus(null);
-            clearInputControls();
-        } else if (!visible && isVisible()) {
-            notifyWindowListeners(eWindowEvent.CLOSE);
         }
         
         super.setVisible(visible);
         
-        if (visible) {
-            setFocus(null);
-            clearInputControls();
-        } else {
-            setFocus(this);
-        }
-        
-        GUIManager.getInstance().checkMouseMovement();
+        GUIManager.getInstance().checkMouseGrabbing();
     }
     
     /**
-     * Opens the window.
+     * Opens the window. This will focus the window.
      */
     public void open() {
+        if (!isVisible()) {
+            notifyWindowListeners(EWindowEvent.OPEN);
+            setFocus(null);
+        }
+        
         setVisible(true);
+        
+        GUIManager.getInstance().checkMouseGrabbing();
     }
     
     /**
-     * Closes the window.
+     * Closes the window. This will remove the window from the GUIManager.
      */
     public void close() {
-        setVisible(false);
+        setFocus(null);
+        
+        notifyWindowListeners(EWindowEvent.CLOSE);
+        
+        GUIManager.getInstance().closeWindow(this);
+        GUIManager.getInstance().checkMouseGrabbing();
     }
 }

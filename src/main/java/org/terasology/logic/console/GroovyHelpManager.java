@@ -40,6 +40,7 @@ import org.terasology.logic.manager.PathManager;
  * Date: 29/04/12
  * Time: 13:53
  * To change this template use File | Settings | File Templates.
+ * @deprecated
  */
 public class GroovyHelpManager {
 
