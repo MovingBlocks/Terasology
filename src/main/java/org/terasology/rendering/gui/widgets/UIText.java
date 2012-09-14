@@ -45,6 +45,7 @@ import org.terasology.rendering.gui.framework.events.KeyListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 import org.terasology.rendering.gui.framework.events.SelectionChangedListener;
+import org.terasology.rendering.gui.framework.style.UIStyleShadow.EShadowDirection;
 
 /**
  * A text area which can be used as a single line input box, multi line input box or for just displaying large texts.
@@ -490,8 +491,9 @@ public class UIText extends UIDisplayContainerScrollable {
         text.addDisplayElement(cursor);
         
         setPadding(new Vector4f(0f, 5f, 0f, 5f));
+        setBackgroundColor(new Color(255, 255, 255));
+        setShadow(new Vector4f(0f, 3f, 3f, 0f), EShadowDirection.OUTSIDE, 1f);
         setMultiLine(false);
-        setBackgroundColor(150, 0, 0, 0.3f);
     }
 
     /**
@@ -1115,7 +1117,7 @@ public class UIText extends UIDisplayContainerScrollable {
      * @return Returns true if the text has a shadow.
      */
     public boolean isEnableShadow() {
-        return this.text.isEnableShadow();
+        return this.text.isShadow();
     }
     
     /**
@@ -1123,7 +1125,7 @@ public class UIText extends UIDisplayContainerScrollable {
      * @param enable True to enable the shadow of the text.
      */
     public void setEnableShadow(boolean enable) {
-        this.text.setEnableShadow(enable);
+        this.text.setShadow(enable);
     }
 
     /**

@@ -13,6 +13,7 @@ import static org.lwjgl.opengl.GL11.glVertex2f;
 import javax.vecmath.Vector4f;
 
 import org.lwjgl.opengl.GL11;
+import org.newdawn.slick.Color;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 
 /**
@@ -23,18 +24,18 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 public class UIStyleBorderSolid extends UIDisplayElement implements UIStyle {
     
     //Textured borders
-    private float width;
-    private Vector4f color;
+    private Vector4f width = new Vector4f(1, 1, 1, 1);
+    private Color color;
     
-    public UIStyleBorderSolid(float width, int r, int g, int b, float a) {
+    public UIStyleBorderSolid(Vector4f width, Color color) {
         this.width = width;
-        this.color = new Vector4f(RGBtoColor(r), RGBtoColor(g), RGBtoColor(b), a);
+        this.color = color;
         setCrop(false);
     }
     
-    public UIStyleBorderSolid(float width, String color, float a) {
+    public UIStyleBorderSolid(Vector4f width, String color) {
         this.width = width;
-        setColor(color, a);
+        setColor(color);
     }
 
     private float RGBtoColor(int v) {
@@ -43,7 +44,45 @@ public class UIStyleBorderSolid extends UIDisplayElement implements UIStyle {
 
     @Override
     public void render() {
-        renderSolid();
+        glPushMatrix();
+        glLoadIdentity();
+        glTranslatef(getAbsolutePosition().x, getAbsolutePosition().y, 0);
+        
+        glColor4f(color.r, color.g, color.b, color.a);
+        
+        if (width.x > 0) {
+            glLineWidth(width.x);
+            glBegin(GL11.GL_LINES);
+            glVertex2f(getPosition().x + width.w, getPosition().y + width.x / 2f);
+            glVertex2f(getPosition().x + getSize().x - width.y, getPosition().y + width.x / 2f);
+            glEnd();
+        }
+        
+        if (width.y > 0) {
+            glLineWidth(width.y);
+            glBegin(GL11.GL_LINES);
+            glVertex2f(getPosition().x + getSize().x - width.y / 2f, getPosition().y + width.y % 2);                  // %2 to adjust position if width is not multiple of 2
+            glVertex2f(getPosition().x + getSize().x - width.y / 2f, getPosition().y + getSize().y + width.y % 2);    // %2 to adjust position if width is not multiple of 2
+            glEnd();
+        }
+        
+        if (width.z > 0) {
+            glLineWidth(width.x);
+            glBegin(GL11.GL_LINES);
+            glVertex2f(getPosition().x + width.w, getPosition().y + getSize().y - width.z / 2f);
+            glVertex2f(getPosition().x + getSize().x - width.y, getPosition().y + getSize().y - width.z / 2f);
+            glEnd();
+        }
+        
+        if (width.w > 0) {
+            glLineWidth(width.w);
+            glBegin(GL11.GL_LINES);
+            glVertex2f(getPosition().x + width.w / 2f, getPosition().y + width.z % 2);                 // %2 to adjust position if width is not multiple of 2
+            glVertex2f(getPosition().x + width.w / 2f, getPosition().y + getSize().y + width.z % 2);   // %2 to adjust position if width is not multiple of 2
+            glEnd();
+        }
+        
+        glPopMatrix();
     }
 
     @Override
@@ -51,60 +90,41 @@ public class UIStyleBorderSolid extends UIDisplayElement implements UIStyle {
         
     }
     
-    public void renderSolid() {
-        glPushMatrix();
-        glLoadIdentity();
-        glTranslatef(getAbsolutePosition().x, getAbsolutePosition().y, 0);
-
-        glLineWidth(width);
-        glBegin(GL11.GL_LINES);
-        glColor4f(color.x, color.y, color.z, color.w);
-        glVertex2f(getPosition().x, getPosition().y);
-        glVertex2f(getPosition().x + getSize().x, getPosition().y);
-        glVertex2f(getPosition().x + getSize().x, getPosition().y);
-        glVertex2f(getPosition().x + getSize().x, getPosition().y + getSize().y);
-        glVertex2f(getPosition().x + getSize().x, getPosition().y + getSize().y);
-        glVertex2f(getPosition().x, getPosition().y + getSize().y);
-        glVertex2f(getPosition().x, getPosition().y + getSize().y);
-        glVertex2f(getPosition().x, getPosition().y);
-        glEnd();
-
-        glPopMatrix();
-    }
-
-    public Vector4f getColor() {
+    public Color getColor() {
         return color;
     }
-
-    public void setColor(int r, int g, int b, float a) {
-        this.color = new Vector4f(RGBtoColor(r), RGBtoColor(g), RGBtoColor(b), a);
+    
+    public void setColor(Color color) {
+        this.color = color;
     }
     
-    public void setColor(String color, float a) {
+    public void setColor(String color) {
         color = color.trim().toLowerCase();
         
         int r = 0;
         int g = 0;
         int b = 0;
+        int a = 255;
         
-        if (color.matches("^#[a-f0-9]{1,6}$")) {
+        if (color.matches("^#[a-f0-9]{1,8}$")) {
             color = color.replace("#", "");
             
             int sum = Integer.parseInt(color, 16);
-
+            
+            a = (sum & 0xFF000000) >> 24;
             r = (sum & 0x00FF0000) >> 16;
             g = (sum & 0x0000FF00) >> 8;
             b = sum & 0x000000FF;
         }
         
-        this.color = new Vector4f(RGBtoColor(r), RGBtoColor(g), RGBtoColor(b), a);
+        this.color = new Color(RGBtoColor(r), RGBtoColor(g), RGBtoColor(b), RGBtoColor(a));
     }
 
-    public float getWidth() {
+    public Vector4f getWidth() {
         return width;
     }
 
-    public void setWidth(float width) {
+    public void setWidth(Vector4f width) {
         this.width = width;
     }
 }

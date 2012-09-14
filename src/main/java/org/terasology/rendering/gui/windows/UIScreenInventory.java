@@ -20,6 +20,7 @@ import javax.vecmath.Vector4f;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
+import org.newdawn.slick.Color;
 import org.terasology.asset.AssetManager;
 import org.terasology.input.binds.InventoryButton;
 import org.terasology.game.CoreRegistry;
@@ -55,7 +56,7 @@ public class UIScreenInventory extends UIWindow {
 
     public UIScreenInventory() {
         setId("inventory");
-        setBackgroundColor(0x00, 0x00, 0x00, 0.75f);
+        setBackgroundColor(new Color(0, 0, 0, 200));
         setModal(true);
         setCloseBinds(new String[] {InventoryButton.ID});
         setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});

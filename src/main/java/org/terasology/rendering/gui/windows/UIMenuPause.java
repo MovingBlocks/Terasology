@@ -16,6 +16,7 @@
 package org.terasology.rendering.gui.windows;
 
 import org.lwjgl.input.Keyboard;
+import org.newdawn.slick.Color;
 import org.terasology.events.RespawnEvent;
 import org.terasology.input.binds.PauseButton;
 import org.terasology.game.CoreRegistry;
@@ -50,7 +51,7 @@ public class UIMenuPause extends UIWindow {
 
     public UIMenuPause() {
         setId("pause");
-        setBackgroundColor(0x00, 0x00, 0x00, 0.75f);
+        setBackgroundColor(new Color(0, 0, 0, 200));
         setModal(true);
         setCloseBinds(new String[] {PauseButton.ID});
         setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});

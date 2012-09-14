@@ -27,7 +27,7 @@ public class UIListItem extends UIDisplayContainer {
     //options
     private Color textColor = Color.white;
     private Color textSelectionColor = Color.orange;
-    private Color selectionColor = new Color(0xE1 / 255f, 0xDD / 255f, 0xD4 / 255f, 1.0f);
+    private Color selectionColor = new Color(0xE1, 0xDD, 0xD4);
     
     public UIListItem(Object value) {
         setup("", value);
@@ -148,7 +148,7 @@ public class UIListItem extends UIDisplayContainer {
         isSelected = selected;
         
         if (isSelected) {
-            setBackgroundColor((int)(selectionColor.r * 255), (int)(selectionColor.g * 255), (int)(selectionColor.b * 255), selectionColor.a);
+            setBackgroundColor(selectionColor);
             label.setColor(textSelectionColor);
         } else {
             label.setColor(textColor);

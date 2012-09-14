@@ -48,6 +48,7 @@ import org.terasology.physics.ImpulseEvent;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.events.KeyListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 import org.terasology.rendering.gui.framework.events.WindowListener;
@@ -134,6 +135,9 @@ public class UIItemCell extends UIDisplayContainer  {
 
         @Override
         public void move(UIDisplayElement element) {
+            if (!enableDrag)
+                return;
+            
             moveTransferIcon();
         }
     };
@@ -142,6 +146,8 @@ public class UIItemCell extends UIDisplayContainer  {
         @Override
         public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
             if (intersect) {
+                if (!enableDrag)
+                    return;
                 
                 byte amount = 1;
                 if (fastPressed) {
@@ -229,6 +235,19 @@ public class UIItemCell extends UIDisplayContainer  {
         }
     };
     
+    private KeyListener keyListener = new KeyListener() {
+        @Override
+        public void key(UIDisplayElement element, KeyEvent event) {
+            if (event.getKey() == Keyboard.KEY_LSHIFT) {
+                fastTransferPressed = event.isDown();
+            }
+            
+            if (event.getKey() == Keyboard.KEY_LCONTROL) {
+                fastPressed = event.isDown();
+            }
+        }
+    };
+    
     /**
      * Displays a little icon and item count for an item cell.
      *
@@ -244,6 +263,7 @@ public class UIItemCell extends UIDisplayContainer  {
         //layout
         private Texture terrainTex;
         private final Vector2f itemCountPosition = new Vector2f(26f, 5f);
+        private boolean displayItemCount = true;
 
         public UIItemCellIcon() {
             terrainTex = AssetManager.loadTexture("engine:terrain");
@@ -265,7 +285,7 @@ public class UIItemCell extends UIDisplayContainer  {
             ItemComponent itemComponent = itemEntity.getComponent(ItemComponent.class);
             //item count visibility
             if (itemComponent != null) {
-                if (itemComponent.stackCount > 1) {
+                if (itemComponent.stackCount > 1 && displayItemCount) {
                     itemCount.setVisible(true);
                     itemCount.setText(Integer.toString(itemComponent.stackCount));
                 } else {
@@ -343,6 +363,14 @@ public class UIItemCell extends UIDisplayContainer  {
         public void setItemEntity(EntityRef itemEntity) {
             this.itemEntity = itemEntity;
         }
+
+        public boolean isDisplayItemCount() {
+            return displayItemCount;
+        }
+
+        public void setDisplayItemCount(boolean enable) {
+            displayItemCount = enable;
+        }
     }
 
     /**
@@ -385,6 +413,7 @@ public class UIItemCell extends UIDisplayContainer  {
         
         addMouseMoveListener(mouseMoveListener);
         addMouseButtonListener(mouseButtonListener);
+        addKeyListener(keyListener);
         
         addDisplayElement(background);
         addDisplayElement(icon);
@@ -842,19 +871,6 @@ public class UIItemCell extends UIDisplayContainer  {
         }
     }
     
-    @Override
-    public void processKeyboardInput(KeyEvent event) {
-        super.processKeyboardInput(event);
-        
-        if (event.getKey() == Keyboard.KEY_LSHIFT) {
-            fastTransferPressed = event.isDown();
-        }
-        
-        if (event.getKey() == Keyboard.KEY_LCONTROL) {
-            fastPressed = event.isDown();
-        }
-    }
-    
     /**
      * Set the item which this item cell contains.
      * @param itemEntity The item.
@@ -902,7 +918,7 @@ public class UIItemCell extends UIDisplayContainer  {
      * Check if the cell has an selection rectangle as the mouse is over.
      * @return True if the cell has an selection rectangle as the mouse is over.
      */
-    public boolean isSelectionRectangle() {
+    public boolean isDisplaySelection() {
         return enableSelectionRectangle;
     }
 
@@ -910,16 +926,42 @@ public class UIItemCell extends UIDisplayContainer  {
      * Set if the cell will show a selection rectangle as the mouse is over.
      * @param enable True to enable the selection rectangle as the mouse is over.
      */
-    public void setSelectionRectangle(boolean enable) {
+    public void setDisplaySelection(boolean enable) {
         this.enableSelectionRectangle = enable;
+    }
+    
+    /**
+     * Check if the cell shows an item count.
+     * @return Returns true if the cell shows an item count.
+     */
+    public boolean isDisplayItemCount() {
+        return icon.isDisplayItemCount();
+    }
+    
+    /**
+     * Set if the cell shows an item count.
+     * @param enable True to display an item count.
+     */
+    public void setDisplayItemCount(boolean enable) {
+        icon.setDisplayItemCount(enable);
+    }
+    
+    /**
+     * Check whether the selection rectangle is shown.
+     * @return Returns true if the selection rectangle is shown.
+     */
+    public boolean getSelection() {
+        return selectionRectangle.isVisible();
     }
     
     /**
      * Set the visibility of the selection rectangle.
      * @param enable True to enable the selection rectangle.
      */
-    public void setSelectionRectangleEnable(boolean enable) {
-        selectionRectangle.setVisible(enable);
+    public void setSelection(boolean enable) {
+        if (enableSelectionRectangle) {
+            selectionRectangle.setVisible(enable);
+        }
     }
     
     /**

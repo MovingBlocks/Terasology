@@ -355,6 +355,7 @@ public class StateSinglePlayer implements GameState {
         }
 
         GUIManager.getInstance().closeWindow(loadingScreen);
+        GUIManager.getInstance().loadWindow("itemList");            //we preload the item list, because it takes some time to create all block entities
         GUIManager.getInstance().openWindow(MenuControlSystem.HUD);
 
         // Create the first Portal if it doesn't exist yet

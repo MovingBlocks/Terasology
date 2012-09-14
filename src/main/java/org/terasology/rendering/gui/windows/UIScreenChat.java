@@ -34,6 +34,7 @@ import org.terasology.logic.manager.CommandManager.Command;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.KeyListener;
 import org.terasology.rendering.gui.framework.events.WindowListener;
+import org.terasology.rendering.gui.framework.style.UIStyleShadow.EShadowDirection;
 import org.terasology.rendering.gui.widgets.UIList;
 import org.terasology.rendering.gui.widgets.UIListItem;
 import org.terasology.rendering.gui.widgets.UIText;
@@ -102,8 +103,8 @@ public class UIScreenChat extends UIWindow {
         
         inputBox = new UIText();
         inputBox.setSize(new Vector2f(900f, 28f));
-        inputBox.setBackgroundColor(255, 255, 255, 0.8f);
-        inputBox.setBorderSolid(1, 0, 0, 0, 1f);
+        inputBox.setBackgroundColor(new Color(255, 255, 255, 200));
+        inputBox.setBorderSolid(new Vector4f(1f, 1f, 1f, 1f), new Color(0, 0, 0));
         inputBox.setVerticalAlign(EVerticalAlign.BOTTOM);
         inputBox.setSelectionColor(Color.gray);
         inputBox.setPosition(new Vector2f(2, -2));
@@ -179,8 +180,9 @@ public class UIScreenChat extends UIWindow {
         
         messageList = new UIList();
         messageList.setSize(new Vector2f(900f, 400f));
-        messageList.setBackgroundColor(255, 255, 255, 0.8f);
-        messageList.setBorderSolid(1, 0, 0, 0, 1f);
+        messageList.setBackgroundColor(new Color(255, 255, 255, 200));
+        messageList.setShadow(new Vector4f(0f, 3f, 3f, 0f), EShadowDirection.OUTSIDE, 1f);
+        messageList.setBorderSolid(new Vector4f(1f, 1f, 1f, 1f), new Color(0, 0, 0));
         messageList.setVerticalAlign(EVerticalAlign.BOTTOM);
         messageList.setPosition(new Vector2f(2, -32));
         messageList.setPadding(new Vector4f(0f, 5f, 0f, 5f));

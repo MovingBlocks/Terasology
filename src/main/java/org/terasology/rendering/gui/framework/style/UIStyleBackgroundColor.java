@@ -1,5 +1,6 @@
 package org.terasology.rendering.gui.framework.style;
 
+import org.newdawn.slick.Color;
 import org.terasology.rendering.gui.widgets.UIImage;
 
 /**
@@ -9,13 +10,13 @@ import org.terasology.rendering.gui.widgets.UIImage;
  */
 public class UIStyleBackgroundColor extends UIImage implements UIStyle {
 
-    public UIStyleBackgroundColor(int r, int g, int b, float a) {
-        super(r, g, b, a);
+    public UIStyleBackgroundColor(Color color) {
+        super(color);
         setSize("100%", "100%");
     }
     
-    public UIStyleBackgroundColor(String color, float a) {
-        super(color, a);
+    public UIStyleBackgroundColor(String color) {
+        super(color);
         setSize("100%", "100%");
     }
 }
