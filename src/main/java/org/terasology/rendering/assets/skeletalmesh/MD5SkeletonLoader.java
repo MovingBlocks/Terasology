@@ -65,7 +65,7 @@ public class MD5SkeletonLoader implements AssetLoader<SkeletalMesh> {
             List<Bone> bones = Lists.newArrayListWithCapacity(md5.numJoints);
             for (int i = 0; i < md5.numJoints; ++i) {
                 MD5Joint joint = md5.joints[i];
-                Bone bone = new Bone(joint.name, joint.position, joint.orientation);
+                Bone bone = new Bone(i, joint.name, joint.position, joint.orientation);
                 bones.add(bone);
                 if (joint.parent != -1) {
                     bones.get(joint.parent).addChild(bone);
@@ -183,7 +183,7 @@ public class MD5SkeletonLoader implements AssetLoader<SkeletalMesh> {
             MD5Weight weight = new MD5Weight();
             weight.jointIndex = Integer.parseInt(matcher.group(2));
             weight.bias = Float.parseFloat(matcher.group(3));
-            weight.position = new Vector3f(Float.parseFloat(matcher.group(4)), Float.parseFloat(matcher.group(5)), Float.parseFloat(matcher.group(6)));
+            weight.position = new Vector3f(-Float.parseFloat(matcher.group(4)), Float.parseFloat(matcher.group(6)), Float.parseFloat(matcher.group(5)));
             mesh.weightList[weightIndex] = weight;
         }
         return mesh;
@@ -200,8 +200,8 @@ public class MD5SkeletonLoader implements AssetLoader<SkeletalMesh> {
             MD5Joint joint = new MD5Joint();
             joint.name = matcher.group(1);
             joint.parent = Integer.parseInt(matcher.group(2));
-            joint.position = new Vector3f(Float.parseFloat(matcher.group(3)), Float.parseFloat(matcher.group(4)), Float.parseFloat(matcher.group(5)));
-            joint.orientation = completeQuat4f(Float.parseFloat(matcher.group(6)), Float.parseFloat(matcher.group(7)), Float.parseFloat(matcher.group(8)));
+            joint.position = new Vector3f(-Float.parseFloat(matcher.group(3)), Float.parseFloat(matcher.group(5)), Float.parseFloat(matcher.group(4)));
+            joint.orientation = completeQuat4f(-Float.parseFloat(matcher.group(6)), Float.parseFloat(matcher.group(8)), Float.parseFloat(matcher.group(7)));
             md5.joints[i] = joint;
             logger.log(Level.INFO, "Read joint: " + joint.name);
         }

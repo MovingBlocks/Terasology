@@ -29,13 +29,15 @@ import java.util.List;
  */
 public class Bone {
     private String name;
+    private int index;
     private Vector3f objectSpacePos = new Vector3f();
     private Quat4f rotation = new Quat4f(0,0,0,1);
 
     private Bone parent;
     private List<Bone> children = Lists.newArrayList();
 
-    public Bone(String name, Vector3f position, Quat4f rotation) {
+    public Bone(int index, String name, Vector3f position, Quat4f rotation) {
+        this.index = index;
         this.name = name;
         this.objectSpacePos.set(position);
         this.rotation.set(rotation);
@@ -43,6 +45,10 @@ public class Bone {
 
     public String getName() {
         return name;
+    }
+
+    public int getIndex() {
+        return index;
     }
 
     public Vector3f getObjectPosition() {
@@ -53,13 +59,25 @@ public class Bone {
         Vector3f pos = new Vector3f(objectSpacePos);
         if (parent != null) {
             pos.sub(parent.getObjectPosition());
-            return pos;
+            Quat4f inverseParentRot = new Quat4f();
+            inverseParentRot.inverse(parent.getObjectRotation());
+            QuaternionUtil.quatRotate(inverseParentRot, pos, pos);
         }
         return pos;
     }
 
     public Quat4f getObjectRotation() {
         return rotation;
+    }
+
+    public Quat4f getLocalRotation() {
+        Quat4f rot = new Quat4f(rotation);
+        if (parent != null) {
+            Quat4f inverseParentRot = new Quat4f();
+            inverseParentRot.inverse(parent.getObjectRotation());
+            rot.mul(inverseParentRot, rot);
+        }
+        return rot;
     }
 
     public Bone getParent() {

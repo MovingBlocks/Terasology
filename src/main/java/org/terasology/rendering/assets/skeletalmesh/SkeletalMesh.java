@@ -29,6 +29,7 @@ import org.terasology.asset.Asset;
 import org.terasology.asset.AssetUri;
 import org.terasology.logic.manager.VertexBufferObjectManager;
 
+import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 import java.nio.FloatBuffer;
@@ -85,6 +86,10 @@ public class SkeletalMesh implements Asset {
         bones.add(bone);
     }
 
+    public Collection<Bone> bones() {
+        return bones;
+    }
+
     public void setIndices(TIntList indices) {
         this.indices = new TIntArrayList(indices);
 
@@ -126,16 +131,25 @@ public class SkeletalMesh implements Asset {
     }
 
     public List<Vector3f> getBindPoseVertexPositions() {
+        List<Vector3f> positions = Lists.newArrayListWithCapacity(bones.size());
+        List<Quat4f> rotations = Lists.newArrayListWithCapacity(bones().size());
+        for (Bone bone : bones) {
+            positions.add(bone.getObjectPosition());
+            rotations.add(bone.getObjectRotation());
+        }
+        return getVertexPositions(positions, rotations);
+    }
+
+    public List<Vector3f> getVertexPositions(List<Vector3f> bonePositions, List<Quat4f> boneRotations) {
         List<Vector3f> results = Lists.newArrayList();
         for (int i = 0; i < vertexStartWeights.size(); ++i) {
             Vector3f vertexPos = new Vector3f();
             for (int weightIndexOffset = 0; weightIndexOffset < vertexWeightCounts.get(i); ++weightIndexOffset) {
                 int weightIndex = vertexStartWeights.get(i) + weightIndexOffset;
                 BoneWeight weight = weights.get(weightIndex);
-                Bone bone = bones.get(weight.getBoneIndex());
 
-                Vector3f current = QuaternionUtil.quatRotate(bone.getObjectRotation(), weight.getPosition(), new Vector3f());
-                current.add(bone.getObjectPosition());
+                Vector3f current = QuaternionUtil.quatRotate(boneRotations.get(weight.getBoneIndex()), weight.getPosition(), new Vector3f());
+                current.add(bonePositions.get(weight.getBoneIndex()));
                 current.scale(weight.getBias());
                 vertexPos.add(current);
             }
@@ -169,8 +183,7 @@ public class SkeletalMesh implements Asset {
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
-    public void doRender() {
-        List<Vector3f> verts = getBindPoseVertexPositions();
+    public void doRender(List<Vector3f> verts) {
         FloatBuffer vertBuffer = BufferUtils.createFloatBuffer(verts.size() * 3);
         for (Vector3f vert : verts) {
             vertBuffer.put(vert.x);
@@ -190,7 +203,17 @@ public class SkeletalMesh implements Asset {
 
     public void render() {
         preRender();
-        doRender();
+        doRender(getBindPoseVertexPositions());
         postRender();
+    }
+
+    public void render(List<Vector3f> bonePositions, List<Quat4f> boneRotations) {
+        preRender();
+        doRender(getVertexPositions(bonePositions, boneRotations));
+        postRender();
+    }
+
+    public int getVertexCount() {
+        return vertexStartWeights.size();
     }
 }

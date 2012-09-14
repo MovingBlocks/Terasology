@@ -22,6 +22,7 @@ import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Immortius
@@ -29,6 +30,6 @@ import java.util.List;
 public class SkeletalMeshComponent implements Component {
     public SkeletalMesh mesh;
     public Material material;
-    public List<EntityRef> boneEntities;
+    public Map<String, EntityRef> boneEntities;
     public EntityRef rootBone = EntityRef.NULL;
 }
