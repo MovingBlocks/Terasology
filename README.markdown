@@ -27,6 +27,7 @@ Note that these instructions are meant for the stable release. The latest develo
 
 * [W,A,S,D] - Movement
 * [E] - Activate (Chest, TNT, etc)
+* [Q] - Throw held (block) item (hold down to charge for a longer throw!)
 * [Space] - Jump
 * [Double Space] - God mode (fly / no-clip)
 * [Shift] - Hold to run
@@ -35,6 +36,7 @@ Note that these instructions are meant for the stable release. The latest develo
 * [Mouse wheel up/down] - Cycle through toolbar slots
 * [1..0] - Change the active toolbar slot
 * [I] - Toggle inventory screen
+* [H] - Hide user interface
 * [F] - Toggle viewing distance (near, moderate, far, ultra)
 * [Tab] - Toggle developer console
 * [Escape] - Show/hide the game menu screen
@@ -80,15 +82,6 @@ Press Tab to toggle the in-game console
 * gotoWorld "GhostTown" - Loads the world "GhostTown" if present, otherwise initializes a new world "GhostTown" with a randomized seed value
 * gotoWorld "GhostTown", "Pie!" - Loads the world "GhostTown" if present, otherwise initializes a new world "GhostTown" with the seed value "Pie!"
 
-Options
---------
-
-* Graphics Quality        - Defaults to support somewhat low-end computers, can be bumped up for very snazzy effects (possibly even _too_ shiny!)
-* Viewing Distance        - How many chunks to load around the player for display
-* Field of View           - Special effect related to distance and visual warping (more distant with greater value)
-
-Many more options are available via config file but not yet exposed in the GUI
-
 Building and running source
 --------
 
@@ -103,20 +96,23 @@ You may also need to tweak IDE settings further for your convenience. See [Dev S
 Credits
 --------
 
-(Big note: Pending overhaul! Lots more great contributors since last)
-
 This is an incomplete list and the team is constantly growing. See [Dev Team](https://github.com/MovingBlocks/Terasology/wiki/Dev-team) in the wiki for the latest updates
+
+Apologies in advance for any omisions, contact [Cervator](http://forum.movingblocks.net/members/cervator.2/) on the forum if you believe you've been missed :-)
 
 Contributors
 --------
 
-* Benjamin "begla" Glatzel
-* Anton "small-jeeper" Kireev
-* Rasmus "Cervator" Praestholm
-* Immortius
-* Richard "rapodaca" Apodaca
-* Kai Kratz
-* t3hk0d3
+(Listed by primary team)
+
+* Architects: Benjamin 'begla' Glatzel, Immortius, Kai Kratz, Ironchefpython, Andre Herber
+* Art Team: Glasz, A'nW, basilix, Double_A, eleazzaar, metouto, Perdemot, RampageMode, SuperSnark, Wolfghard, zproc
+* Design Team: Rasmus 'Cervator' Praestholm, Overdhose, Woodspeople, Mooncalf, Dei
+* General: Janred, Josh, MrBarsack, Philaxx, Stuthulhu, t3hk0d3
+* GUI Team: Anton "small-jeeper" Kireev, miniME89, x3ro
+* Logistics Team: AlbireoX, Mathias Kalb, Richard "rapodaca" Apodaca, Stellarfirefly
+* World Team: B!0HAX, ddr2, Nym Traveel, Skaldarnar, Tenson
+
 
 Soundtrack and Sound Effects
 --------
@@ -126,6 +122,7 @@ Soundtrack and Sound Effects
 * Door Open sound by Pagancow, from FreeSound.org
 * Door Close sound by Fresco, from FreeSound.org
 * Other sound effects created by Exile.
+* Additional music by ChrisK
 
 Additional Notes
 --------
