@@ -293,6 +293,8 @@ public class Commands implements CommandController {
         if (itemComp != null && !itemComp.container.exists()) {
             item.destroy();
         }
+        
+        MessageManager.getInstance().addMessage("You received " + quantity +" blocks of " + blockFamily.getDisplayName(), EMessageScope.PRIVATE);
     }
 
     public void giveItem(String itemPrefabName) {
@@ -306,6 +308,7 @@ public class Commands implements CommandController {
             if (itemComp != null && !itemComp.container.exists()) {
                 item.destroy();
             }
+            MessageManager.getInstance().addMessage("You received an item of " + prefab.getName(), EMessageScope.PRIVATE);
         } else {
             giveBlock(itemPrefabName);
         }
