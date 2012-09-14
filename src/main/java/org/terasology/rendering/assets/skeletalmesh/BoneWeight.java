@@ -25,6 +25,7 @@ public class BoneWeight {
     private Vector3f position = new Vector3f();
     private float bias;
     private int boneIndex;
+    private Vector3f normal = new Vector3f();
 
     public BoneWeight(Vector3f position, float bias, int boneIndex) {
         this.position.set(position);
@@ -43,4 +44,13 @@ public class BoneWeight {
     public int getBoneIndex() {
         return boneIndex;
     }
+
+    public Vector3f getNormal() {
+        return normal;
+    }
+
+    public void setNormal(Vector3f normal) {
+        this.normal.set(normal);
+    }
 }
+

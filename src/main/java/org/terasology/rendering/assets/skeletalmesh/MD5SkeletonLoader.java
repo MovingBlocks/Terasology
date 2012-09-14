@@ -98,8 +98,8 @@ public class MD5SkeletonLoader implements AssetLoader<SkeletalMesh> {
                     indices.add(mesh.indexList[i * 3 + 1]);
                 }
                 skeleton.setIndices(indices);
+                skeleton.calculateNormals();
             }
-
 
             return skeleton;
         } catch (NumberFormatException e) {
@@ -149,7 +149,7 @@ public class MD5SkeletonLoader implements AssetLoader<SkeletalMesh> {
             }
             int index = Integer.parseInt(matcher.group(1));
             MD5Vertex vert = new MD5Vertex();
-            vert.uv = new Vector2f(Float.parseFloat(matcher.group(2)), Float.parseFloat(matcher.group(3)));
+            vert.uv = new Vector2f(Float.parseFloat(matcher.group(2)), 1.0f - Float.parseFloat(matcher.group(3)));
             vert.startWeight = Integer.parseInt(matcher.group(4));
             vert.countWeight = Integer.parseInt(matcher.group(5));
             mesh.vertexList[index] = vert;
