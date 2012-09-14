@@ -157,8 +157,6 @@ public class UIWindow extends UIDisplayContainerScrollable {
         
         if (!isVisible() && visible) {
             notifyWindowListeners(EWindowEvent.OPEN);
-            setAnimation(new AnimateOpacity(0f, 1f, 5f));
-            getAnimation(AnimateOpacity.class).start();
         } else if (isVisible() && !visible) {
             notifyWindowListeners(EWindowEvent.CLOSE);
         }
@@ -174,6 +172,8 @@ public class UIWindow extends UIDisplayContainerScrollable {
     public void open() {        
         setVisible(true);
         setFocus(this);
+        setAnimation(new AnimateOpacity(0f, 1f, 10f));
+        getAnimation(AnimateOpacity.class).start();
         
         GUIManager.getInstance().openWindow(this);
         GUIManager.getInstance().checkMouseGrabbing();

@@ -28,9 +28,8 @@ import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.animation.AnimateMoveTo;
 import org.terasology.rendering.gui.animation.AnimateRotateOn;
-import org.terasology.rendering.gui.animation.AnimationStartNotify;
-import org.terasology.rendering.gui.animation.AnimationStopNotify;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.events.AnimationListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.WindowListener;
 import org.terasology.rendering.gui.widgets.UIImage;
@@ -165,12 +164,23 @@ public class UIScreenInventory extends UIWindow {
         }
         if(!visible){
             inventory.setAnimation(new AnimateMoveTo(new Vector2f(inventory.getPosition().x, Display.getHeight() + 5f), 20f));
-            inventory.getAnimation(AnimateMoveTo.class).addNotifyListeners(new AnimationStopNotify() {
+            inventory.addAnimationListener(AnimateMoveTo.class, new AnimationListener() {
+                
                 @Override
-                public void action(UIDisplayElement target) {
-                        GUIManager.getInstance().getWindowById("hud").getElementById("leftGearWheel").setVisible(true);
-                        GUIManager.getInstance().getWindowById("hud").getElementById("rightGearWheel").setVisible(true);
-                        target.getParent().getParent().setVisible(false);
+                public void stop(UIDisplayElement element) {
+                    
+                }
+                
+                @Override
+                public void start(UIDisplayElement element) {
+                    GUIManager.getInstance().getWindowById("hud").getElementById("leftGearWheel").setVisible(true);
+                    GUIManager.getInstance().getWindowById("hud").getElementById("rightGearWheel").setVisible(true);
+                    element.getParent().getParent().setVisible(false);
+                }
+                
+                @Override
+                public void repeat(UIDisplayElement element) {
+                    
                 }
             });
             setVisible = false;

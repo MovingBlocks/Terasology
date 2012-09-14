@@ -16,24 +16,33 @@
 package org.terasology.rendering.gui.animation;
 
 import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.events.AnimationListener;
 
 import java.util.ArrayList;
 
+/**
+ * 
+ * TODO notification for repeat event
+ */
 public abstract class Animation {
+    
+    //events
+    private enum EAnimationEvents {START, STOP, REPEAT};
+    private final ArrayList<AnimationListener> animationListeners = new ArrayList<AnimationListener>();
+    
     private boolean started = false;
     private boolean repeat  = false;
     protected UIDisplayElement target;
-    private final ArrayList<AnimationStartNotify> notifyStartElements = new ArrayList<AnimationStartNotify>();
-    private final ArrayList<AnimationStopNotify> notifyStopElements = new ArrayList<AnimationStopNotify>();
+
 
     public void start(){
         started = true;
-        notifyStartListners();
+        notifyAnimationListeners(EAnimationEvents.START);
     };
 
     public void stop(){
         started = false;
-        notifyStopListners();
+        notifyAnimationListeners(EAnimationEvents.STOP);
     };
 
     public boolean isStarted(){
@@ -51,29 +60,35 @@ public abstract class Animation {
     public boolean isRepeat(){
         return repeat;
     }
-
-    public void addNotifyListeners(AnimationNotify notify){
-        if(notify instanceof AnimationStartNotify){
-            notifyStartElements.add((AnimationStartNotify) notify);
-        }else if(notify instanceof AnimationStopNotify){
-            notifyStopElements.add((AnimationStopNotify) notify);
+    
+    public abstract void renderBegin();
+    
+    public abstract void renderEnd();
+    
+    public abstract void update();
+    
+    public void addAnimationListener(AnimationListener listener) {
+        animationListeners.add(listener);
+    }
+    
+    public void removeAnimationListener(AnimationListener listener) {
+        animationListeners.remove(listener);
+    }
+    
+    private void notifyAnimationListeners(EAnimationEvents event) {
+        if (event == EAnimationEvents.START) {
+            for (AnimationListener listener : animationListeners) {
+                listener.start(target);
+            }
+        } else if (event == EAnimationEvents.STOP) {
+            for (AnimationListener listener : animationListeners) {
+                listener.stop(target);
+            }
+        } else if (event == EAnimationEvents.REPEAT) {
+            for (AnimationListener listener : animationListeners) {
+                listener.repeat(target);
+            }
         }
     }
-
-    private void notifyStartListners(){
-        for(AnimationStartNotify notify:notifyStartElements){
-            notify.action(target);
-        }
-    }
-
-    private void notifyStopListners(){
-        for(AnimationStopNotify notify:notifyStopElements){
-            notify.action(target);
-        }
-    }
-
-    public void renderBegin(){};
-    public void renderEnd(){};
-    public void update(){};
 
 }

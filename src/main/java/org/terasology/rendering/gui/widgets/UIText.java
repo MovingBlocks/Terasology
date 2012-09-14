@@ -53,6 +53,7 @@ import org.terasology.rendering.gui.framework.style.UIStyleShadow.EShadowDirecti
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  * 
  * TODO remove text wrapping, the UILabel widget can do this.
+ * TODO clean up
  */
 public class UIText extends UIDisplayContainerScrollable {
     
@@ -479,8 +480,8 @@ public class UIText extends UIDisplayContainerScrollable {
         //_textCursor.setPosition(new Vector2f(getPosition().x + _padding.x, getPosition().y));
 
         cursor = new UIImage();
-        cursor.setSize(new Vector2f(2, 16f));
-        cursor.setColor(0, 0, 0, 1);
+        cursor.setSize(new Vector2f(1, 16f));
+        cursor.setColor(new Color(0, 0, 0));
         cursor.setPosition(new Vector2f(getPosition().x, getPosition().y));
         cursor.setVisible(false);
         cursor.setAnimation(new AnimateOpacity(0f, 1f, 5f));
@@ -1077,7 +1078,7 @@ public class UIText extends UIDisplayContainerScrollable {
      */
     public void setColor(Color color) {
         text.setColor(color);
-        cursor.setColor((int)color.r, (int)color.g, (int)color.b, color.a);
+        cursor.setColor(color);
     }
     
     /**

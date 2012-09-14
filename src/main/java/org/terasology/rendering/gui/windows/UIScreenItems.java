@@ -64,7 +64,7 @@ public class UIScreenItems extends UIWindow {
         container.setHorizontalAlign(EHorizontalAlign.CENTER);
         container.setVerticalAlign(EVerticalAlign.CENTER);
         container.setSize(new Vector2f(608, 600));
-        container.setBackgroundColor(new Color(100, 100, 100, 200));
+        container.setBackgroundColor(new Color(120, 116, 91, 200));
         container.setBorderSolid(new Vector4f(1f, 1f, 1f, 1f), new Color(0, 0, 0));
         container.setEnableScrolling(true);
         container.setEnableScrollbar(true);

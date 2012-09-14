@@ -56,4 +56,14 @@ public class AnimateMoveTo extends Animation {
             }
         }
     }
+
+    @Override
+    public void renderBegin() {
+        
+    }
+
+    @Override
+    public void renderEnd() {
+        
+    }
 }

@@ -31,6 +31,7 @@ import org.terasology.input.events.KeyEvent;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.gui.animation.Animation;
+import org.terasology.rendering.gui.framework.events.AnimationListener;
 import org.terasology.rendering.gui.framework.events.BindKeyListener;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.FocusListener;
@@ -45,6 +46,7 @@ import org.terasology.rendering.gui.framework.events.MouseMoveListener;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  * 
  * TODO improve z-order for click events
+ * TODO remove this class, move this to UIDisplayContainer
  */
 public abstract class UIDisplayElement {
 
@@ -691,6 +693,31 @@ public abstract class UIDisplayElement {
         
         return position;
     }
+    
+    public void setAnimation(Animation newAnimation){
+        Animation animation = getAnimation(newAnimation.getClass());
+
+        newAnimation.setTarget(this);
+
+        if(animation != null){
+            if(animation.isStarted()){
+                animation.stop();
+            }
+            animations.remove(animation);
+        }
+
+        animations.add(newAnimation);
+    }
+
+    public <T> T getAnimation(Class<T> animation) {
+        for (Animation s : animations) {
+            if (s.getClass() == animation) {
+                return animation.cast(s);
+            }
+        }
+
+        return null;
+    }
 
     /*
        The event listeners which every display element in the UI supports
@@ -817,30 +844,19 @@ public abstract class UIDisplayElement {
     public void removeMouseMoveListener(MouseMoveListener listener) {
         mouseListeners.remove(listener);
     }
-
-
-    public void setAnimation(Animation newAnimation){
-        Animation animation = getAnimation(newAnimation.getClass());
-
-        newAnimation.setTarget(this);
-
-        if(animation != null){
-            if(animation.isStarted()){
-                animation.stop();
-            }
-            animations.remove(animation);
+    
+    public <T extends Animation> void addAnimationListener(Class<T> animation, AnimationListener listener) {
+        Animation animationClass = getAnimation(animation);
+        if (animationClass != null) {
+            animationClass.addAnimationListener(listener);
         }
-
-        animations.add(newAnimation);
     }
-
-    public <T> T getAnimation(Class<T> animation) {
-        for (Animation s : animations) {
-            if (s.getClass() == animation) {
-                return animation.cast(s);
-            }
+    
+    public <T extends Animation> void removeAnimationListener(Class<T> animation, AnimationListener listener) {
+        Animation animationClass = getAnimation(animation);
+        if (animationClass != null) {
+            animationClass.removeAnimationListener(listener);
         }
-
-        return null;
     }
+    
 }
