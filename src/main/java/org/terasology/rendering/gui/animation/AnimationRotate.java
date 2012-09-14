@@ -27,7 +27,7 @@ import javax.vecmath.Vector4f;
 
 import static org.lwjgl.opengl.GL11.*;
 
-public class AnimateRotateOn extends Animation {
+public class AnimationRotate extends Animation {
     private float angle;
     private float speed;
     private int   factor;
@@ -38,7 +38,7 @@ public class AnimateRotateOn extends Animation {
     private String id = null;
 
 
-    public AnimateRotateOn(float angle, float speed){
+    public AnimationRotate(float angle, float speed){
         this.angle = angle;
         this.speed = speed;
         this.id = generateId();

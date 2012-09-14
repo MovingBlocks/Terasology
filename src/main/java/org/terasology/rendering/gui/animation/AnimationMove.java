@@ -17,12 +17,12 @@ package org.terasology.rendering.gui.animation;
 
 import javax.vecmath.Vector2f;
 
-public class AnimateMoveTo extends Animation {
+public class AnimationMove extends Animation {
     private Vector2f moveFrom;
     private Vector2f distination;
     private float    speed;
 
-    public AnimateMoveTo(Vector2f moveTo, float speed){
+    public AnimationMove(Vector2f moveTo, float speed){
         this.distination = moveTo;
         this.speed       = speed;
         this.moveFrom    = null;

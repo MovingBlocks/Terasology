@@ -30,7 +30,7 @@ import org.terasology.rendering.gui.widgets.UIImage;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  *
  */
-public class UIStyleBorderImage extends UIDisplayContainer implements UIStyle {
+public class StyleBorderImage extends UIDisplayContainer implements Style {
 
     private Texture texture;
     private Vector4f width = new Vector4f(0f, 0f, 0f, 0f);
@@ -43,7 +43,7 @@ public class UIStyleBorderImage extends UIDisplayContainer implements UIStyle {
     private final Map<String, UIImage> frames = new HashMap<String, UIImage>();
     private final Map<String, UIImage> corners = new HashMap<String, UIImage>();
 
-    public UIStyleBorderImage(Texture texture) {        
+    public StyleBorderImage(Texture texture) {        
         this.texture = texture;
         setCrop(false);
     }

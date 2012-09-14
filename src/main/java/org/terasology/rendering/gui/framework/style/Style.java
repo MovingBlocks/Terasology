@@ -15,13 +15,11 @@
  */
 package org.terasology.rendering.gui.framework.style;
 
-import org.terasology.rendering.gui.framework.UIDisplayContainer;
-
 /**
  * 
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
- * TODO implement
+ *
  */
-public class UIStyleBackgroundSplit extends UIDisplayContainer implements UIStyle {
+public interface Style {
 
 }

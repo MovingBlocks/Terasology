@@ -33,7 +33,7 @@ import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayElement.EHorizontalAlign;
 import org.terasology.rendering.gui.framework.UIDisplayElement.EVerticalAlign;
-import org.terasology.rendering.gui.framework.style.UIStyle;
+import org.terasology.rendering.gui.framework.style.Style;
 
 /**
  * The GridLayout positions display elements within a UIComposite container in a grid depending on the number of columns the grid has.
@@ -116,7 +116,7 @@ public class GridLayout implements Layout {
         List<UIDisplayElement> elements = new ArrayList<UIDisplayElement>();
         
         for (UIDisplayElement element : allElements) {
-            if (!(element instanceof UIStyle)) {
+            if (!(element instanceof Style)) {
                 elements.add(element);
             }
         }

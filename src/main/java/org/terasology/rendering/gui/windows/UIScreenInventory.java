@@ -26,8 +26,8 @@ import org.terasology.input.binds.InventoryButton;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.rendering.gui.animation.AnimateMoveTo;
-import org.terasology.rendering.gui.animation.AnimateRotateOn;
+import org.terasology.rendering.gui.animation.AnimationMove;
+import org.terasology.rendering.gui.animation.AnimationRotate;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.AnimationListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
@@ -72,12 +72,12 @@ public class UIScreenInventory extends UIWindow {
                 GUIManager.getInstance().getWindowById("hud").getElementById("rightGearWheel").setVisible(false);
 
                 inventory.setPosition(new Vector2f(toolbar.getAbsolutePosition().x, Display.getHeight() + 5f));
-                inventory.setAnimation(new AnimateMoveTo(new Vector2f(Display.getWidth() / 2 - inventory.getSize().x / 2, Display.getHeight() - 192f), 20f));
-                inventory.getAnimation(AnimateMoveTo.class).start();
-                leftGearWheel.setAnimation(new AnimateRotateOn(-120f,10f));
-                leftGearWheel.getAnimation(AnimateRotateOn.class).start();
-                rightGearWheel.setAnimation(new AnimateRotateOn(120f,10f));
-                rightGearWheel.getAnimation(AnimateRotateOn.class).start();
+                inventory.setAnimation(new AnimationMove(new Vector2f(Display.getWidth() / 2 - inventory.getSize().x / 2, Display.getHeight() - 192f), 20f));
+                inventory.getAnimation(AnimationMove.class).start();
+                leftGearWheel.setAnimation(new AnimationRotate(-120f,10f));
+                leftGearWheel.getAnimation(AnimationRotate.class).start();
+                rightGearWheel.setAnimation(new AnimationRotate(120f,10f));
+                rightGearWheel.getAnimation(AnimationRotate.class).start();
                 layout();
             }
             
@@ -163,8 +163,8 @@ public class UIScreenInventory extends UIWindow {
             return;
         }
         if(!visible){
-            inventory.setAnimation(new AnimateMoveTo(new Vector2f(inventory.getPosition().x, Display.getHeight() + 5f), 20f));
-            inventory.addAnimationListener(AnimateMoveTo.class, new AnimationListener() {
+            inventory.setAnimation(new AnimationMove(new Vector2f(inventory.getPosition().x, Display.getHeight() + 5f), 20f));
+            inventory.addAnimationListener(AnimationMove.class, new AnimationListener() {
                 
                 @Override
                 public void stop(UIDisplayElement element) {
@@ -184,11 +184,11 @@ public class UIScreenInventory extends UIWindow {
                 }
             });
             setVisible = false;
-            inventory.getAnimation(AnimateMoveTo.class).start();
-            leftGearWheel.setAnimation(new AnimateRotateOn(360f,10f));
-            leftGearWheel.getAnimation(AnimateRotateOn.class).start();
-            rightGearWheel.setAnimation(new AnimateRotateOn(-360f,10f));
-            rightGearWheel.getAnimation(AnimateRotateOn.class).start();
+            inventory.getAnimation(AnimationMove.class).start();
+            leftGearWheel.setAnimation(new AnimationRotate(360f,10f));
+            leftGearWheel.getAnimation(AnimationRotate.class).start();
+            rightGearWheel.setAnimation(new AnimationRotate(-360f,10f));
+            rightGearWheel.getAnimation(AnimationRotate.class).start();
         }else{
             super.setVisible(true);
         }

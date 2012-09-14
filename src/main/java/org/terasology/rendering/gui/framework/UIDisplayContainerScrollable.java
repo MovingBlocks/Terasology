@@ -12,8 +12,8 @@ import org.terasology.asset.AssetManager;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 import org.terasology.rendering.gui.framework.events.ScrollListener;
-import org.terasology.rendering.gui.framework.style.UIStyle;
-import org.terasology.rendering.gui.framework.style.UIStyleShadow.EShadowDirection;
+import org.terasology.rendering.gui.framework.style.Style;
+import org.terasology.rendering.gui.framework.style.StyleShadow.EShadowDirection;
 import org.terasology.rendering.gui.widgets.UIComposite;
 import org.terasology.rendering.gui.widgets.UIImage;
 
@@ -235,7 +235,7 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
         
         //loop through all child elements
         for (UIDisplayElement element : displayElements) {
-            if (element.isVisible() && !(element instanceof UIStyle) && element != scrollbar) {
+            if (element.isVisible() && !(element instanceof Style) && element != scrollbar) {
                 //recursive action if the element also contains child elements
                 if (element instanceof UIDisplayContainer) {
                     calcMax(((UIDisplayContainer)element).getDisplayElements());
@@ -252,7 +252,7 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
 
     @Override
     public void addDisplayElement(UIDisplayElement element) {
-        if (element instanceof UIStyle) {
+        if (element instanceof Style) {
             super.addDisplayElement(element);
         } else {
             container.addDisplayElement(element);

@@ -36,7 +36,7 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.AngelCodeFont;
 import org.newdawn.slick.Color;
 import org.terasology.input.events.KeyEvent;
-import org.terasology.rendering.gui.animation.AnimateOpacity;
+import org.terasology.rendering.gui.animation.AnimationOpacity;
 import org.terasology.rendering.gui.framework.UIDisplayContainerScrollable;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
@@ -45,7 +45,7 @@ import org.terasology.rendering.gui.framework.events.KeyListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 import org.terasology.rendering.gui.framework.events.SelectionChangedListener;
-import org.terasology.rendering.gui.framework.style.UIStyleShadow.EShadowDirection;
+import org.terasology.rendering.gui.framework.style.StyleShadow.EShadowDirection;
 
 /**
  * A text area which can be used as a single line input box, multi line input box or for just displaying large texts.
@@ -452,7 +452,7 @@ public class UIText extends UIDisplayContainerScrollable {
             public void focusOn(UIDisplayElement element) {
                 if (!isDisabled()) {
                     cursor.setVisible(true);
-                    cursor.getAnimation(AnimateOpacity.class).start();
+                    cursor.getAnimation(AnimationOpacity.class).start();
                     selectionRectangle.fadeSelection(false);
                     setCursorPosition(cursorPosition);
                 }
@@ -461,7 +461,7 @@ public class UIText extends UIDisplayContainerScrollable {
             @Override
             public void focusOff(UIDisplayElement element) {
                 cursor.setVisible(false);
-                cursor.getAnimation(AnimateOpacity.class).stop();
+                cursor.getAnimation(AnimationOpacity.class).stop();
                 selectionRectangle.fadeSelection(true);
             }
         });
@@ -484,8 +484,8 @@ public class UIText extends UIDisplayContainerScrollable {
         cursor.setColor(new Color(0, 0, 0));
         cursor.setPosition(new Vector2f(getPosition().x, getPosition().y));
         cursor.setVisible(false);
-        cursor.setAnimation(new AnimateOpacity(0f, 1f, 5f));
-        cursor.getAnimation(AnimateOpacity.class).setRepeat(true);
+        cursor.setAnimation(new AnimationOpacity(0f, 1f, 5f));
+        cursor.getAnimation(AnimationOpacity.class).setRepeat(true);
 
         addDisplayElement(text);
         text.addDisplayElement(selectionRectangle);

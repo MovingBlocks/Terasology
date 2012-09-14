@@ -36,19 +36,19 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  *
  */
-public class UIStyleBorderSolid extends UIDisplayElement implements UIStyle {
+public class StyleBorderSolid extends UIDisplayElement implements Style {
     
     //Textured borders
     private Vector4f width = new Vector4f(1, 1, 1, 1);
     private Color color;
     
-    public UIStyleBorderSolid(Vector4f width, Color color) {
+    public StyleBorderSolid(Vector4f width, Color color) {
         this.width = width;
         this.color = color;
         setCrop(false);
     }
     
-    public UIStyleBorderSolid(Vector4f width, String color) {
+    public StyleBorderSolid(Vector4f width, String color) {
         this.width = width;
         setColor(color);
     }

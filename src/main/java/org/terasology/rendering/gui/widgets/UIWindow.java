@@ -18,7 +18,7 @@ package org.terasology.rendering.gui.widgets;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.rendering.gui.animation.AnimateOpacity;
+import org.terasology.rendering.gui.animation.AnimationOpacity;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayContainerScrollable;
 import org.terasology.rendering.gui.framework.events.BindKeyListener;
@@ -172,8 +172,8 @@ public class UIWindow extends UIDisplayContainerScrollable {
     public void open() {        
         setVisible(true);
         setFocus(this);
-        setAnimation(new AnimateOpacity(0f, 1f, 10f));
-        getAnimation(AnimateOpacity.class).start();
+        setAnimation(new AnimationOpacity(0f, 1f, 10f));
+        getAnimation(AnimationOpacity.class).start();
         
         GUIManager.getInstance().openWindow(this);
         GUIManager.getInstance().checkMouseGrabbing();

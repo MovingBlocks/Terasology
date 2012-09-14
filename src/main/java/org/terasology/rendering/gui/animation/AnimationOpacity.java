@@ -30,7 +30,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 
-public class AnimateOpacity extends Animation {
+public class AnimationOpacity extends Animation {
     private float toOpacity;
     private float fromOpacity;
     private float currentOpacity;
@@ -42,7 +42,7 @@ public class AnimateOpacity extends Animation {
     private String id = null;
 
 
-    public AnimateOpacity(float fromOpacity, float toOpacity, float speed){
+    public AnimationOpacity(float fromOpacity, float toOpacity, float speed){
         this.fromOpacity = fromOpacity;
         this.toOpacity = toOpacity;
         this.speed = speed;

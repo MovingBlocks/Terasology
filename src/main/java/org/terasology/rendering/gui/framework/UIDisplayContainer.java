@@ -21,13 +21,13 @@ import org.newdawn.slick.Color;
 import org.terasology.asset.AssetManager;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.events.KeyEvent;
-import org.terasology.rendering.gui.framework.style.UIStyle;
-import org.terasology.rendering.gui.framework.style.UIStyleBackgroundColor;
-import org.terasology.rendering.gui.framework.style.UIStyleBackgroundImage;
-import org.terasology.rendering.gui.framework.style.UIStyleBorderImage;
-import org.terasology.rendering.gui.framework.style.UIStyleBorderSolid;
-import org.terasology.rendering.gui.framework.style.UIStyleShadow;
-import org.terasology.rendering.gui.framework.style.UIStyleShadow.EShadowDirection;
+import org.terasology.rendering.gui.framework.style.Style;
+import org.terasology.rendering.gui.framework.style.StyleBackgroundColor;
+import org.terasology.rendering.gui.framework.style.StyleBackgroundImage;
+import org.terasology.rendering.gui.framework.style.StyleBorderImage;
+import org.terasology.rendering.gui.framework.style.StyleBorderSolid;
+import org.terasology.rendering.gui.framework.style.StyleShadow;
+import org.terasology.rendering.gui.framework.style.StyleShadow.EShadowDirection;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
@@ -46,7 +46,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
 
     //child elements
     private final ArrayList<UIDisplayElement> displayElements = new ArrayList<UIDisplayElement>();
-    private final List<UIStyle> styles = new ArrayList<UIStyle>();
+    private final List<Style> styles = new ArrayList<Style>();
 
     //cropping
     private boolean cropContainer = false;
@@ -274,7 +274,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * @return Returns the style class if one was added to the display container or null if none was added.
      */
     private <T> T getStyle(Class<T> style) {
-        for (UIStyle s : styles) {
+        for (Style s : styles) {
             if (s.getClass() == style) {
                 return style.cast(s);
             }
@@ -290,7 +290,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * 
      * TODO need to put particular styles at the particular position.. (background at the beginning, border on top) -> don't add styles to the display element list
      */
-    private void addStyle(UIStyle style, boolean listStart) {
+    private void addStyle(Style style, boolean listStart) {
         styles.add(style);
         
         UIDisplayElement element = (UIDisplayElement) style;
@@ -308,7 +308,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * Removes a style.
      * @param style The style to remove.
      */
-    private void removeStyle(UIStyle style) {
+    private void removeStyle(Style style) {
         styles.remove(style);
         removeDisplayElement((UIDisplayElement) style);
     }
@@ -321,9 +321,9 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * @param a Alpha value. (0-1)
      */
     public void setBackgroundColor(Color color) {
-        UIStyleBackgroundColor style = getStyle(UIStyleBackgroundColor.class);
+        StyleBackgroundColor style = getStyle(StyleBackgroundColor.class);
         if (style == null) {
-            style = new UIStyleBackgroundColor(color);
+            style = new StyleBackgroundColor(color);
             style.setVisible(true);
             addStyle(style, true);
         } else {
@@ -336,9 +336,9 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * @param color The hex color value. #FFFFFFFF = ARGB
      */
     public void setBackgroundColor(String color) {
-        UIStyleBackgroundColor style = getStyle(UIStyleBackgroundColor.class);
+        StyleBackgroundColor style = getStyle(StyleBackgroundColor.class);
         if (style == null) {
-            style = new UIStyleBackgroundColor(color);;
+            style = new StyleBackgroundColor(color);;
             style.setVisible(true);
             addStyle(style, true);
         } else {
@@ -350,7 +350,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * Remove the background color.
      */
     public void removeBackgroundColor() {
-        UIStyleBackgroundColor style = getStyle(UIStyleBackgroundColor.class);
+        StyleBackgroundColor style = getStyle(StyleBackgroundColor.class);
         if (style != null) {
             removeStyle(style);
         }
@@ -361,10 +361,10 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * @param texture The texture to load.
      */
     public void setBackgroundImage(String texture) {
-        UIStyleBackgroundImage style = getStyle(UIStyleBackgroundImage.class);
+        StyleBackgroundImage style = getStyle(StyleBackgroundImage.class);
 
         if (style == null) {
-            style = new UIStyleBackgroundImage(AssetManager.loadTexture(texture));
+            style = new StyleBackgroundImage(AssetManager.loadTexture(texture));
             style.setTextureOrigin(new Vector2f(0f, 0f));
             style.setTextureSize(new Vector2f(style.getTexture().getWidth(), style.getTexture().getHeight()));
             style.setVisible(true);
@@ -384,10 +384,10 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * @param size The size of the texture.
      */
     public void setBackgroundImage(String texture, Vector2f origin, Vector2f size) {
-        UIStyleBackgroundImage style = getStyle(UIStyleBackgroundImage.class);
+        StyleBackgroundImage style = getStyle(StyleBackgroundImage.class);
 
         if (style == null) {
-            style = new UIStyleBackgroundImage(AssetManager.loadTexture(texture));
+            style = new StyleBackgroundImage(AssetManager.loadTexture(texture));
             style.setTextureOrigin(origin);
             style.setTextureSize(size);
             style.setVisible(true);
@@ -409,7 +409,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * @param size The size of the texture.
      */
     public void setBackgroundImage(Vector2f origin, Vector2f size) {
-        UIStyleBackgroundImage style = getStyle(UIStyleBackgroundImage.class);
+        StyleBackgroundImage style = getStyle(StyleBackgroundImage.class);
 
         if (style != null) {            
             style.setTextureOrigin(origin);
@@ -422,7 +422,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * @param position The position.
      */
     public void setBackgroundImagePosition(Vector2f position) {
-        UIStyleBackgroundImage style = getStyle(UIStyleBackgroundImage.class);
+        StyleBackgroundImage style = getStyle(StyleBackgroundImage.class);
         
         if (style != null) {
             style.setPosition(position);
@@ -435,7 +435,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * @param y The y position to set including the unit.
      */
     public void setBackgroundImagePosition(String x, String y) {
-        UIStyleBackgroundImage style = getStyle(UIStyleBackgroundImage.class);
+        StyleBackgroundImage style = getStyle(StyleBackgroundImage.class);
         
         if (style != null) {
             style.setPosition(x, y);
@@ -447,7 +447,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * @param size
      */
     public void setBackgroundImageSize(Vector2f size) {
-        UIStyleBackgroundImage style = getStyle(UIStyleBackgroundImage.class);
+        StyleBackgroundImage style = getStyle(StyleBackgroundImage.class);
         
         if (style != null) {
             style.setSize(size);
@@ -460,7 +460,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * @param height The height to set including the unit.
      */
     public void setBackgroundImageSize(String width, String height) {
-        UIStyleBackgroundImage style = getStyle(UIStyleBackgroundImage.class);
+        StyleBackgroundImage style = getStyle(StyleBackgroundImage.class);
         
         if (style != null) {
             style.setSize(width, height);
@@ -471,7 +471,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * Remove the background image.
      */ 
     public void removeBackgroundImage() {
-        UIStyleBackgroundImage style = getStyle(UIStyleBackgroundImage.class);
+        StyleBackgroundImage style = getStyle(StyleBackgroundImage.class);
         
         if (style != null) {
             removeStyle(style);
@@ -484,10 +484,10 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * @param color The color.
      */
     public void setBorderSolid(Vector4f width, Color color) {
-        UIStyleBorderSolid style = getStyle(UIStyleBorderSolid.class);
+        StyleBorderSolid style = getStyle(StyleBorderSolid.class);
 
         if (style == null) {
-            style = new UIStyleBorderSolid(width, color);
+            style = new StyleBorderSolid(width, color);
             style.setSize("100%", "100%");
             style.setVisible(true);
             addStyle(style, false);
@@ -503,10 +503,10 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * @param color The hex color value. #FFFFFFFF = ARGB
      */
     public void setBorderSolid(Vector4f width, String color) {
-        UIStyleBorderSolid style = getStyle(UIStyleBorderSolid.class);
+        StyleBorderSolid style = getStyle(StyleBorderSolid.class);
 
         if (style == null) {
-            style = new UIStyleBorderSolid(width, color);
+            style = new StyleBorderSolid(width, color);
             style.setSize("100%", "100%");
             style.setVisible(true);
             addStyle(style, false);
@@ -520,7 +520,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * Remove the border.
      */
     public void removeBorderSolid() {
-        UIStyleBorderSolid style = getStyle(UIStyleBorderSolid.class);
+        StyleBorderSolid style = getStyle(StyleBorderSolid.class);
         
         if (style != null) {
             removeStyle(style);
@@ -535,10 +535,10 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * @param width The border width for each side. x = top, y = right, z = bottom, w = left
      */
     public void setBorderImage(String texture, Vector2f origin, Vector2f size, Vector4f borderSize) {
-        UIStyleBorderImage style = getStyle(UIStyleBorderImage.class);
+        StyleBorderImage style = getStyle(StyleBorderImage.class);
 
         if (style == null) {
-            style = new UIStyleBorderImage(AssetManager.loadTexture(texture));
+            style = new StyleBorderImage(AssetManager.loadTexture(texture));
             style.setBorderSource(origin, size, borderSize);
             style.setVisible(true);
             addStyle(style, false);
@@ -556,7 +556,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * Remove the border image.
      */
     public void removeBorderImage() {
-        UIStyleBorderImage style = getStyle(UIStyleBorderImage.class);
+        StyleBorderImage style = getStyle(StyleBorderImage.class);
         
         if (style != null) {
             removeStyle(style);
@@ -570,10 +570,10 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * @param opacity The opacity of the shadow. 0-1
      */
     public void setShadow(Vector4f width, EShadowDirection direction, float opacity) {
-        UIStyleShadow style = getStyle(UIStyleShadow.class);
+        StyleShadow style = getStyle(StyleShadow.class);
         
         if (style == null) {
-            style = new UIStyleShadow(width, direction, opacity);
+            style = new StyleShadow(width, direction, opacity);
             style.setSize("100%", "100%");
             style.setVisible(true);
             addStyle(style, false);
@@ -588,7 +588,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * Remove the shadow.
      */
     public void removeShadow() {
-        UIStyleShadow style = getStyle(UIStyleShadow.class);
+        StyleShadow style = getStyle(StyleShadow.class);
         
         if (style != null) {
             removeStyle(style);

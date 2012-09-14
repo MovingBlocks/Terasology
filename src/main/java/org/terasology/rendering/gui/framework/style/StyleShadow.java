@@ -41,7 +41,7 @@ import org.terasology.rendering.primitives.TessellatorHelper;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  * 
  */
-public class UIStyleShadow extends UIDisplayElement implements UIStyle {
+public class StyleShadow extends UIDisplayElement implements Style {
     
     /*
        TODO add to gui_menu.png?
@@ -80,7 +80,7 @@ public class UIStyleShadow extends UIDisplayElement implements UIStyle {
                                            0, 0,        //bottom    (left end - right end)
                                            0, 0};       //left      (top end - bottom end)
         
-    public UIStyleShadow(Vector4f width, EShadowDirection direction, float opacity) {
+    public StyleShadow(Vector4f width, EShadowDirection direction, float opacity) {
         shadow = AssetManager.loadTexture(textureUrl);
         createMesh(opacity);
         

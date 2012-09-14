@@ -22,7 +22,7 @@ import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
-import org.terasology.rendering.gui.framework.style.UIStyle;
+import org.terasology.rendering.gui.framework.style.Style;
 
 /**
  * A list item. As default the list item contains a UIlabel to display a text.
@@ -102,7 +102,7 @@ public class UIListItem extends UIDisplayContainer {
         float max = 0;
         float maxElement = 0;
         for (UIDisplayElement element : getDisplayElements()) {
-            if (element instanceof UIStyle || !element.isVisible()) {
+            if (element instanceof Style || !element.isVisible()) {
                 continue;
             }
             

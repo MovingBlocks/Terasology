@@ -34,7 +34,7 @@ import org.terasology.logic.manager.CommandManager.Command;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.KeyListener;
 import org.terasology.rendering.gui.framework.events.WindowListener;
-import org.terasology.rendering.gui.framework.style.UIStyleShadow.EShadowDirection;
+import org.terasology.rendering.gui.framework.style.StyleShadow.EShadowDirection;
 import org.terasology.rendering.gui.widgets.UIList;
 import org.terasology.rendering.gui.widgets.UIListItem;
 import org.terasology.rendering.gui.widgets.UIText;
