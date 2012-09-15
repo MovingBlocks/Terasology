@@ -20,16 +20,16 @@ import javax.vecmath.Vector4f;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
+import org.newdawn.slick.Color;
 import org.terasology.asset.AssetManager;
 import org.terasology.input.binds.InventoryButton;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.rendering.gui.animation.AnimateMoveTo;
-import org.terasology.rendering.gui.animation.AnimateRotateOn;
-import org.terasology.rendering.gui.animation.AnimationStartNotify;
-import org.terasology.rendering.gui.animation.AnimationStopNotify;
+import org.terasology.rendering.gui.animation.AnimationMove;
+import org.terasology.rendering.gui.animation.AnimationRotate;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.events.AnimationListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.WindowListener;
 import org.terasology.rendering.gui.widgets.UIImage;
@@ -55,7 +55,7 @@ public class UIScreenInventory extends UIWindow {
 
     public UIScreenInventory() {
         setId("inventory");
-        setBackgroundColor(0x00, 0x00, 0x00, 0.75f);
+        setBackgroundColor(new Color(0, 0, 0, 200));
         setModal(true);
         setCloseBinds(new String[] {InventoryButton.ID});
         setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
@@ -72,12 +72,12 @@ public class UIScreenInventory extends UIWindow {
                 GUIManager.getInstance().getWindowById("hud").getElementById("rightGearWheel").setVisible(false);
 
                 inventory.setPosition(new Vector2f(toolbar.getAbsolutePosition().x, Display.getHeight() + 5f));
-                inventory.setAnimation(new AnimateMoveTo(new Vector2f(Display.getWidth() / 2 - inventory.getSize().x / 2, Display.getHeight() - 192f), 20f));
-                inventory.getAnimation(AnimateMoveTo.class).start();
-                leftGearWheel.setAnimation(new AnimateRotateOn(-120f,10f));
-                leftGearWheel.getAnimation(AnimateRotateOn.class).start();
-                rightGearWheel.setAnimation(new AnimateRotateOn(120f,10f));
-                rightGearWheel.getAnimation(AnimateRotateOn.class).start();
+                inventory.setAnimation(new AnimationMove(new Vector2f(Display.getWidth() / 2 - inventory.getSize().x / 2, Display.getHeight() - 192f), 20f));
+                inventory.getAnimation(AnimationMove.class).start();
+                leftGearWheel.setAnimation(new AnimationRotate(-120f,10f));
+                leftGearWheel.getAnimation(AnimationRotate.class).start();
+                rightGearWheel.setAnimation(new AnimationRotate(120f,10f));
+                rightGearWheel.getAnimation(AnimationRotate.class).start();
                 layout();
             }
             
@@ -163,21 +163,32 @@ public class UIScreenInventory extends UIWindow {
             return;
         }
         if(!visible){
-            inventory.setAnimation(new AnimateMoveTo(new Vector2f(inventory.getPosition().x, Display.getHeight() + 5f), 20f));
-            inventory.getAnimation(AnimateMoveTo.class).addNotifyListeners(new AnimationStopNotify() {
+            inventory.setAnimation(new AnimationMove(new Vector2f(inventory.getPosition().x, Display.getHeight() + 5f), 20f));
+            inventory.addAnimationListener(AnimationMove.class, new AnimationListener() {
+                
                 @Override
-                public void action(UIDisplayElement target) {
-                        GUIManager.getInstance().getWindowById("hud").getElementById("leftGearWheel").setVisible(true);
-                        GUIManager.getInstance().getWindowById("hud").getElementById("rightGearWheel").setVisible(true);
-                        target.getParent().getParent().setVisible(false);
+                public void stop(UIDisplayElement element) {
+                    
+                }
+                
+                @Override
+                public void start(UIDisplayElement element) {
+                    GUIManager.getInstance().getWindowById("hud").getElementById("leftGearWheel").setVisible(true);
+                    GUIManager.getInstance().getWindowById("hud").getElementById("rightGearWheel").setVisible(true);
+                    element.getParent().getParent().setVisible(false);
+                }
+                
+                @Override
+                public void repeat(UIDisplayElement element) {
+                    
                 }
             });
             setVisible = false;
-            inventory.getAnimation(AnimateMoveTo.class).start();
-            leftGearWheel.setAnimation(new AnimateRotateOn(360f,10f));
-            leftGearWheel.getAnimation(AnimateRotateOn.class).start();
-            rightGearWheel.setAnimation(new AnimateRotateOn(-360f,10f));
-            rightGearWheel.getAnimation(AnimateRotateOn.class).start();
+            inventory.getAnimation(AnimationMove.class).start();
+            leftGearWheel.setAnimation(new AnimationRotate(360f,10f));
+            leftGearWheel.getAnimation(AnimationRotate.class).start();
+            rightGearWheel.setAnimation(new AnimationRotate(-360f,10f));
+            rightGearWheel.getAnimation(AnimationRotate.class).start();
         }else{
             super.setVisible(true);
         }

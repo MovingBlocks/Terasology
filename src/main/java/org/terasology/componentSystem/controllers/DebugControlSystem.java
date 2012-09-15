@@ -125,6 +125,10 @@ public class DebugControlSystem implements EventHandlerSystem {
                 metrics.toggleMode();
                 event.consume();
                 break;
+            case Keyboard.KEY_F5:
+                GUIManager.getInstance().openWindow("itemList");
+                event.consume();
+                break;
         }
     }
 

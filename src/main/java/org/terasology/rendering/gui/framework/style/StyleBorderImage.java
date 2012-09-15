@@ -1,3 +1,18 @@
+/*
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.terasology.rendering.gui.framework.style;
 
 import java.util.HashMap;
@@ -15,7 +30,7 @@ import org.terasology.rendering.gui.widgets.UIImage;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  *
  */
-public class UIStyleBorderImage extends UIDisplayContainer implements UIStyle {
+public class StyleBorderImage extends UIDisplayContainer implements Style {
 
     private Texture texture;
     private Vector4f width = new Vector4f(0f, 0f, 0f, 0f);
@@ -28,7 +43,7 @@ public class UIStyleBorderImage extends UIDisplayContainer implements UIStyle {
     private final Map<String, UIImage> frames = new HashMap<String, UIImage>();
     private final Map<String, UIImage> corners = new HashMap<String, UIImage>();
 
-    public UIStyleBorderImage(Texture texture) {        
+    public StyleBorderImage(Texture texture) {        
         this.texture = texture;
         setCrop(false);
     }

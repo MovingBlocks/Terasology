@@ -7,11 +7,13 @@ import javax.vecmath.Vector4f;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+import org.newdawn.slick.Color;
 import org.terasology.asset.AssetManager;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 import org.terasology.rendering.gui.framework.events.ScrollListener;
-import org.terasology.rendering.gui.framework.style.UIStyle;
+import org.terasology.rendering.gui.framework.style.Style;
+import org.terasology.rendering.gui.framework.style.StyleShadow.EShadowDirection;
 import org.terasology.rendering.gui.widgets.UIComposite;
 import org.terasology.rendering.gui.widgets.UIImage;
 
@@ -33,7 +35,7 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
     
     //content
     private float max;                            //the max position value of all child elements
-    private float contentHeight;                  //the contents hight of all chicld elements
+    private float contentHeight;                  //the contents height of all child elements
     private float multiplier = 1f;                //the multiplier of how the movement in the scrollbar will move the actual child elements
     
     //settings
@@ -64,11 +66,14 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
         container.setSize("100%", "100%");
         container.setVisible(true);
         
-        scrollbarBackground = new UIImage(60, 60, 60, 0.7f);
+        scrollbarBackground = new UIImage(new Color(110, 110, 110, 220));
         scrollbarBackground.setHorizontalAlign(EHorizontalAlign.RIGHT);
+        scrollbarBackground.setShadow(new Vector4f(0f, 0f, 0f, 3f), EShadowDirection.INSIDE, 1f);
         scrollbarBackground.setSize((scrollbarWidth + 1) + "px", "100%");
         
         scrollbar = new UIImage(AssetManager.loadTexture("engine:gui_menu"));
+        scrollbar.setShadow(new Vector4f(0f, 3f, 0f, 3f), EShadowDirection.INSIDE, 1f);
+        scrollbar.setHorizontalAlign(EHorizontalAlign.RIGHT);
         scrollbar.setCrop(false);
         scrollbar.setTextureOrigin(new Vector2f(0f, 0f));
         scrollbar.setTextureSize(new Vector2f(60f, 15f));
@@ -160,7 +165,7 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
         }
 
         //calculate the different in the position
-        scrollbar.setPosition(new Vector2f(getSize().x - scrollbar.getSize().x, scrollbarPos));
+        scrollbar.setPosition(new Vector2f(0f, scrollbarPos));
         
         //move the content
         container.setPosition(new Vector2f(padding.w, -multiplier * scrollbar.getPosition().y + padding.x));
@@ -203,7 +208,7 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
                     scrollbarBackground.setVisible(true);
                     
                     //setCropMargin(new Vector4f(0f, -scrollbarWidth, 0f, 0f));
-                    container.setSize(new Vector2f(container.getSize().x - scrollbarWidth, container.getSize().y));
+                    container.setSize(new Vector2f(container.getSize().x - scrollbarWidth, contentHeight));
                 }
                 
                 moveScrollbar(scrollbar.getAbsolutePosition().y);
@@ -230,7 +235,7 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
         
         //loop through all child elements
         for (UIDisplayElement element : displayElements) {
-            if (element.isVisible() && !(element instanceof UIStyle) && element != scrollbar) {
+            if (element.isVisible() && !(element instanceof Style) && element != scrollbar) {
                 //recursive action if the element also contains child elements
                 if (element instanceof UIDisplayContainer) {
                     calcMax(((UIDisplayContainer)element).getDisplayElements());
@@ -247,7 +252,7 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
 
     @Override
     public void addDisplayElement(UIDisplayElement element) {
-        if (element instanceof UIStyle) {
+        if (element instanceof Style) {
             super.addDisplayElement(element);
         } else {
             container.addDisplayElement(element);
@@ -272,6 +277,11 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
         container.getDisplayElements().clear();
         
         layout();
+    }
+    
+    @Override
+    public ArrayList<UIDisplayElement> getDisplayElements() {
+        return container.getDisplayElements();
     }
     
     /**

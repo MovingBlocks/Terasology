@@ -1,3 +1,18 @@
+/*
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.terasology.rendering.gui.layout;
 
 import static org.lwjgl.opengl.GL11.glBegin;
@@ -6,18 +21,19 @@ import static org.lwjgl.opengl.GL11.glEnd;
 import static org.lwjgl.opengl.GL11.glLineWidth;
 import static org.lwjgl.opengl.GL11.glVertex2f;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
 
 import org.lwjgl.opengl.GL11;
+import org.newdawn.slick.Color;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayElement.EHorizontalAlign;
-import org.terasology.rendering.gui.framework.UIDisplayElement.EUnitType;
 import org.terasology.rendering.gui.framework.UIDisplayElement.EVerticalAlign;
-import org.terasology.rendering.gui.framework.style.UIStyle;
+import org.terasology.rendering.gui.framework.style.Style;
 
 /**
  * The GridLayout positions display elements within a UIComposite container in a grid depending on the number of columns the grid has.
@@ -44,7 +60,7 @@ public class GridLayout implements Layout {
     //options
     private boolean enableBorder = false;
     private float borderWidth = 1f;
-    private Vector4f borderColor = new Vector4f(0f, 0f, 0f, 1f);
+    private Color borderColor = Color.black;
     private boolean equalWidth = false;
 
     public GridLayout(int columns) {
@@ -66,7 +82,7 @@ public class GridLayout implements Layout {
         if (enableBorder) {
             glLineWidth(borderWidth);
             glBegin(GL11.GL_LINES);
-            glColor4f(borderColor.x, borderColor.y, borderColor.z, borderColor.w);
+            glColor4f(borderColor.r, borderColor.g, borderColor.b, borderColor.a);
             
             for (int i = 1; i < cellWidth.length; i++) {
                 //calculate x position
@@ -95,54 +111,56 @@ public class GridLayout implements Layout {
     }
     
     @Override
-    public void layout(UIDisplayContainer container) {
-        List<UIDisplayElement> elements = container.getDisplayElements();
+    public void layout(UIDisplayContainer container, boolean fitSize) {
+        List<UIDisplayElement> allElements = container.getDisplayElements();
+        List<UIDisplayElement> elements = new ArrayList<UIDisplayElement>();
+        
+        for (UIDisplayElement element : allElements) {
+            if (!(element instanceof Style)) {
+                elements.add(element);
+            }
+        }
+        
         cellWidth = calcCellWidth(elements);
         cellHeight = calcCellHeight(elements);
         
         for (int i = 0; i < elements.size(); i++) {
-            if (!(elements.get(i) instanceof UIStyle)) {
-                //calculate x position
-                float x = 0;
-                for (int j = 0; (j < (i % columns)); j++) {
-                    x += cellWidth[j % columns];
-                }
-                
-                //horizontal align
-                if (horizontalCellAlign == EHorizontalAlign.LEFT) {
-                    x += padding.w;
-                } else if (horizontalCellAlign == EHorizontalAlign.CENTER) {
-                    x += cellWidth[i % columns] / 2 - elements.get(i).getSize().x / 2;
-                } else if (horizontalCellAlign == EHorizontalAlign.RIGHT) {
-                    x += cellWidth[i % columns] - elements.get(i).getSize().x + padding.y;
-                }
-                
-                //calculate y position
-                float y = 0;
-                for (int j = 0; j < (int) Math.floor(i / columns); j++) {
-                    y += cellHeight[(int) Math.floor(j / columns)];
-                }
-                
-                //vertical align
-                if (verticalCellAlign == EVerticalAlign.TOP) {
-                    y += padding.x;
-                } else if (verticalCellAlign == EVerticalAlign.CENTER) {
-                    y += cellHeight[(int) Math.floor(i / columns)] / 2 - elements.get(i).getSize().y / 2;
-                } else if (verticalCellAlign == EVerticalAlign.BOTTOM) {
-                    y += cellHeight[(int) Math.floor(i / columns)] - elements.get(i).getSize().y - padding.z;
-                }
-
-                
-                elements.get(i).setPosition(new Vector2f(x, y));
-                elements.get(i).setVisible(true);                   //TODO remove
+            //calculate x position
+            float x = 0;
+            for (int j = 0; (j < (i % columns)); j++) {
+                x += cellWidth[j % columns];
             }
-        }
+            
+            //horizontal align
+            if (horizontalCellAlign == EHorizontalAlign.LEFT) {
+                x += padding.w;
+            } else if (horizontalCellAlign == EHorizontalAlign.CENTER) {
+                x += cellWidth[i % columns] / 2 - elements.get(i).getSize().x / 2;
+            } else if (horizontalCellAlign == EHorizontalAlign.RIGHT) {
+                x += cellWidth[i % columns] - elements.get(i).getSize().x + padding.y;
+            }
+            
+            //calculate y position
+            float y = 0;
+            for (int j = 0; j < (int) Math.floor(i / columns); j++) {
+                y += cellHeight[(int) Math.floor(j / columns)];
+            }
+            
+            //vertical align
+            if (verticalCellAlign == EVerticalAlign.TOP) {
+                y += padding.x;
+            } else if (verticalCellAlign == EVerticalAlign.CENTER) {
+                y += cellHeight[(int) Math.floor(i / columns)] / 2 - elements.get(i).getSize().y / 2;
+            } else if (verticalCellAlign == EVerticalAlign.BOTTOM) {
+                y += cellHeight[(int) Math.floor(i / columns)] - elements.get(i).getSize().y - padding.z;
+            }
 
-        if (container.getUnitSizeX() != EUnitType.PIXEL) {
             
-            container.setSize("", size.y + "px");
-            
-        } else {
+            elements.get(i).setPosition(new Vector2f(x, y));
+            elements.get(i).setVisible(true);                   //TODO remove
+        }
+        
+        if (fitSize) {
             container.setSize(size);
         }
     }
@@ -152,9 +170,7 @@ public class GridLayout implements Layout {
         
         //calculate width of each column
         for (int i = 0; i < elements.size(); i++) {
-            if (!(elements.get(i) instanceof UIStyle)) {
-                width[i % columns] = Math.max(width[i % columns], elements.get(i).getSize().x);
-            }
+            width[i % columns] = Math.max(width[i % columns], elements.get(i).getSize().x);
         }
         
         //add padding
@@ -202,9 +218,7 @@ public class GridLayout implements Layout {
  
         //calculate height of each row
         for (int i = 0; i < elements.size(); i++) {
-            if (!(elements.get(i) instanceof UIStyle)) {
-                height[(int) Math.floor(i / columns)] = Math.max(height[(int) Math.floor(i / columns)], elements.get(i).getSize().y);
-            }
+            height[(int) Math.floor(i / columns)] = Math.max(height[(int) Math.floor(i / columns)], elements.get(i).getSize().y);
         }
         
         //add padding
@@ -378,21 +392,15 @@ public class GridLayout implements Layout {
      * Get the border color for the borders of the grid.
      * @return Returns the border color.
      */
-    public Vector4f getBorderColor() {
+    public Color getBorderColor() {
         return borderColor;
     }
     
     /**
      * Set the border color for the borders of the grid.
-     * @param r Red value. (0-255)
-     * @param g Green value. (0-255)
-     * @param b Blue value. (0-255)
-     * @param a Alpha value. (0-1)
+     * @param color The border color.
      */
-    public void setBorderColor(Vector4f color) {
-        color.x /= 255f;
-        color.y /= 255f;
-        color.z /= 255f;
+    public void setBorderColor(Color color) {
         this.borderColor = color;
     }
 }

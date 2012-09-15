@@ -18,7 +18,7 @@ package org.terasology.rendering.gui.widgets;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.rendering.gui.animation.AnimateOpacity;
+import org.terasology.rendering.gui.animation.AnimationOpacity;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayContainerScrollable;
 import org.terasology.rendering.gui.framework.events.BindKeyListener;
@@ -155,6 +155,12 @@ public class UIWindow extends UIDisplayContainerScrollable {
             setFocus(null);
         }
         
+        if (!isVisible() && visible) {
+            notifyWindowListeners(EWindowEvent.OPEN);
+        } else if (isVisible() && !visible) {
+            notifyWindowListeners(EWindowEvent.CLOSE);
+        }
+        
         super.setVisible(visible);
         
         GUIManager.getInstance().checkMouseGrabbing();
@@ -163,14 +169,13 @@ public class UIWindow extends UIDisplayContainerScrollable {
     /**
      * Opens the window. This will focus the window.
      */
-    public void open() {
-        if (!isVisible()) {
-            notifyWindowListeners(EWindowEvent.OPEN);
-            setFocus(null);
-        }
+    public void open() {        
         setVisible(true);
-        setAnimation(new AnimateOpacity(0f, 1f, 5f));
-        getAnimation(AnimateOpacity.class).start();
+        setFocus(this);
+        setAnimation(new AnimationOpacity(0f, 1f, 10f));
+        getAnimation(AnimationOpacity.class).start();
+        
+        GUIManager.getInstance().openWindow(this);
         GUIManager.getInstance().checkMouseGrabbing();
     }
     
@@ -178,8 +183,7 @@ public class UIWindow extends UIDisplayContainerScrollable {
      * Closes the window. This will remove the window from the GUIManager.
      */
     public void close() {
-        setFocus(null);
-        notifyWindowListeners(EWindowEvent.CLOSE);
+        setVisible(false);
         GUIManager.getInstance().closeWindow(this);
         GUIManager.getInstance().checkMouseGrabbing();
     }
