@@ -85,22 +85,27 @@ public class UIScreenItems extends UIWindow {
         cells.clear();
         
         EntityManager entityManager = CoreRegistry.get(EntityManager.class);
+        EntityRef entity;
         
         PrefabManager prefMan = CoreRegistry.get(PrefabManager.class);
         Iterator<Prefab> it = prefMan.listPrefabs().iterator();
+        ItemComponent itemComp;
         while (it.hasNext()) {
             Prefab prefab = it.next();
-            EntityRef entity = entityManager.create(prefab);
-            if (entity.exists() && entity.getComponent(ItemComponent.class) != null) {
-                UIItemCell cell = new UIItemCell(null, cellSize);
-                cell.setDrag(false);
-                cell.setItem(entity, 0);
-                cell.setDisplayItemCount(false);
-                cell.setVisible(true);
-                cell.addClickListener(clickListener);
-                
-                cells.add(cell);
-                container.addDisplayElement(cell);
+            itemComp = prefab.getComponent(ItemComponent.class);
+            if (itemComp != null) {
+                entity = entityManager.create(itemComp);
+                if (entity.exists() && entity.getComponent(ItemComponent.class) != null) {
+                    UIItemCell cell = new UIItemCell(null, cellSize);
+                    cell.setDrag(false);
+                    cell.setItemEntity(entity, 0);
+                    cell.setDisplayItemCount(false);
+                    cell.setVisible(true);
+                    cell.addClickListener(clickListener);
+                    
+                    cells.add(cell);
+                    container.addDisplayElement(cell);
+                }
             }
         }
         
@@ -112,11 +117,11 @@ public class UIScreenItems extends UIWindow {
         
         for (List<BlockUri> blockList : blocks) {
             for (BlockUri block : blockList) {
-                EntityRef entity = blockFactory.newInstance(BlockManager.getInstance().getBlockFamily(block.getFamilyUri()), 99);
+                entity = blockFactory.newInstance(BlockManager.getInstance().getBlockFamily(block.getFamilyUri()), 99);
                 if (entity.exists()) {
                     UIItemCell cell = new UIItemCell(null, cellSize);
                     cell.setDrag(false);
-                    cell.setItem(entity, 0);
+                    cell.setItemEntity(entity, 0);
                     cell.setDisplayItemCount(false);
                     cell.setVisible(true);
                     cell.addClickListener(clickListener);
@@ -135,6 +140,14 @@ public class UIScreenItems extends UIWindow {
         }
         Collections.sort(result);
         return result;
+    }
+    
+    @Override
+    protected void finalize() throws Throwable {
+        for (UIItemCell item : cells) {
+            
+        }
+        super.finalize();
     }
     
 }

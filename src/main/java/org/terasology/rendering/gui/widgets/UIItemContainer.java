@@ -82,7 +82,7 @@ public class UIItemContainer extends UIDisplayContainer implements EventHandlerS
             for (int i = start; i < end; ++i)
             {
                 UIItemCell cell = new UIItemCell(entity, cellSize);
-                cell.setItem(entityInventory.itemSlots.get(i), i);
+                cell.setItemEntity(entityInventory.itemSlots.get(i), i);
                 cell.setSize(cellSize);
                 cell.setConnected(connectedEntity);
                 cell.setPosition(new Vector2f(((i - start) % cols) * (cellSize.x + cellMargin.x), ((i - start) / cols) * (cellSize.y + cellMargin.y)));
@@ -101,7 +101,7 @@ public class UIItemContainer extends UIDisplayContainer implements EventHandlerS
             int start = Math.max(slotStart, 0);
             for (int i = 0; i < cells.size(); ++i)
             {
-                cells.get(i).setItem(entityInventory.itemSlots.get(start), start);
+                cells.get(i).setItemEntity(entityInventory.itemSlots.get(start), start);
                 start++;
             }
         }

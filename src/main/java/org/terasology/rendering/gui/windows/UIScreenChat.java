@@ -162,6 +162,7 @@ public class UIScreenChat extends UIWindow {
                             }
                             //multiple matches found
                             else if (matches.size() > 1) {
+                                //add list of available commands
                                 String commandMatches = "";
                                 for (Command cmd : matches) {
                                     if (!commandMatches.isEmpty()) {
@@ -171,6 +172,9 @@ public class UIScreenChat extends UIWindow {
                                     commandMatches += cmd.getName();
                                 }
                                 MessageManager.getInstance().addMessage(commandMatches);
+                                
+                                //complete input
+                                
                             }
                         }
                     }

@@ -75,7 +75,7 @@ public class UIItemCell extends UIDisplayContainer  {
     
     //connected inventory entity
     private EntityRef connectedEntity = EntityRef.NULL;
-    private boolean fastTransferPressed = false;
+    private boolean instantTransferKeyPressed = false;
     
     //sub elements
     private final UIImage selectionRectangle;
@@ -90,7 +90,7 @@ public class UIItemCell extends UIDisplayContainer  {
     //settings
     private boolean enableDrag = true;
     private boolean enableSelectionRectangle = true;
-    private boolean fastPressed = false;
+    private boolean multiplierKeyPressed = false;
     
     private static WindowListener windowListener = new WindowListener() {
         @Override
@@ -150,7 +150,7 @@ public class UIItemCell extends UIDisplayContainer  {
                     return;
                 
                 byte amount = 1;
-                if (fastPressed) {
+                if (multiplierKeyPressed) {
                     amount = 2;
                 }
                 
@@ -193,7 +193,7 @@ public class UIItemCell extends UIDisplayContainer  {
                             //move item to the transfer slot
                             sendToTransferSlot(UIItemCell.this, (byte) 0);
                             
-                            if (fastTransferPressed && connectedEntity.exists()) {
+                            if (instantTransferKeyPressed && connectedEntity.exists()) {
                                 moveItemAutomatic(connectedEntity, false);
                             }
                             
@@ -207,7 +207,7 @@ public class UIItemCell extends UIDisplayContainer  {
                         if (getFromTransferSlot().exists()) {
                          
                             byte amount = 1;
-                            if (fastPressed) {
+                            if (multiplierKeyPressed) {
                                 amount = 2;
                             }
                             
@@ -239,11 +239,11 @@ public class UIItemCell extends UIDisplayContainer  {
         @Override
         public void key(UIDisplayElement element, KeyEvent event) {
             if (event.getKey() == Keyboard.KEY_LSHIFT) {
-                fastTransferPressed = event.isDown();
+                instantTransferKeyPressed = event.isDown();
             }
             
             if (event.getKey() == Keyboard.KEY_LCONTROL) {
-                fastPressed = event.isDown();
+                multiplierKeyPressed = event.isDown();
             }
         }
     };
@@ -872,22 +872,22 @@ public class UIItemCell extends UIDisplayContainer  {
     }
     
     /**
-     * Set the item which this item cell contains.
-     * @param itemEntity The item.
-     * @param slot The slot number in the inventory of the owner.
-     */
-    public void setItem(EntityRef itemEntity, int slot) {
-        this.itemEntity = itemEntity;
-        icon.setItemEntity(itemEntity);
-        this.slot = slot;
-    }
-    
-    /**
      * Get the owner of this cell.
      * @return The owner entity.
      */
     public EntityRef getOwnerEntity() {
         return ownerEntity;
+    }
+    
+    /**
+     * Set the item which this item cell contains.
+     * @param itemEntity The item.
+     * @param slot The slot number in the inventory of the owner.
+     */
+    public void setItemEntity(EntityRef itemEntity, int slot) {
+        this.itemEntity = itemEntity;
+        icon.setItemEntity(itemEntity);
+        this.slot = slot;
     }
     
     /**
