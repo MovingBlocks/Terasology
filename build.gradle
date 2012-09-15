@@ -35,7 +35,7 @@ ext {
     env = System.getenv() // read environment variables, including variables passed by jenking continuous integration server
     versionInfoFileDir = new File(sourceSets.main.output.resourcesDir, 'org/terasology/version')
     versionInfoFile = new File(versionInfoFileDir, 'versionInfo.properties')
-    versionMarkdownFileName = 'VERSION.markdown'
+    versionFileName = 'VERSION.txt'
 }
 
 repositories {
@@ -117,23 +117,6 @@ dependencies {
     testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.0'
     devCompile sourceSets.main.output
 }
-
-task createVersionInfoFile << {
-    if (env.BUILD_NUMBER != null) {
-        versionInfoFileDir.mkdirs()
-        ant.propertyfile (file: versionInfoFile) {
-            ant.entry(key:'buildNumber',value:env.BUILD_NUMBER)
-            ant.entry(key:'buildId',value:env.BUILD_ID)
-            ant.entry(key:'buildTag',value:env.BUILD_TAG)
-            ant.entry(key:'buildUrl',value:env.BUILD_URL)
-            ant.entry(key:'gitBranch',value:env.GIT_BRANCH)
-            ant.entry(key:'gitCommit',value:env.GIT_COMMIT)
-            ant.entry(key:'dateTime',value:startDateTimeString)
-        }
-    }
-}
-createVersionInfoFile.dependsOn processResources
-classes.dependsOn createVersionInfoFile
 
 jar {
     archiveName = jarFileName
@@ -227,13 +210,32 @@ task runProtobufWindows(type:Exec) {
 }
 
 /* Distributions: Application/Applet ----------------------------------------*/
-task createVersionMarkdownFile(type: Copy) {
+task createVersionInfoFile {
     inputs.property('dateTime', startDateTimeString)
+    onlyIf { env.BUILD_URL != null }
+    doLast {
+        versionInfoFileDir.mkdirs()
+        ant.propertyfile (file: versionInfoFile) {
+            ant.entry(key:'buildNumber',value:env.BUILD_NUMBER)
+            ant.entry(key:'buildId',value:env.BUILD_ID)
+            ant.entry(key:'buildTag',value:env.BUILD_TAG)
+            ant.entry(key:'buildUrl',value:env.BUILD_URL)
+            ant.entry(key:'gitBranch',value:env.GIT_BRANCH)
+            ant.entry(key:'gitCommit',value:env.GIT_COMMIT)
+            ant.entry(key:'dateTime',value:startDateTimeString)
+        }
+    }
+}
+createVersionInfoFile.dependsOn processResources
+jar.dependsOn createVersionInfoFile
+
+task createVersionFile(type: Copy) {
+    inputs.property('dateTime', startDateTimeString)
+    onlyIf { env.BUILD_URL != null }
     from 'src/template'
     into "$buildDir"
-    include versionMarkdownFileName
-    onlyIf { env.BUILD_URL != null }
-    expand(buildUrl: env.BUILD_URL, gitBranch: env.GIT_BRANCH, dateTime: startDateTimeString)
+    include versionFileName
+    expand(buildNumber: env.BUILD_NUMBER, buildUrl: env.BUILD_URL, gitBranch: env.GIT_BRANCH, dateTime: startDateTimeString)
 }
 
 task distMods {
@@ -310,19 +312,21 @@ task distModsZip(type:Zip) {
 task distApplicationZip(type:Zip) {
     description = "Creates an Application ZIP file from '$buildDir/$destDirApplication'"
     dependsOn distApplication
-    dependsOn createVersionMarkdownFile
+    dependsOn createVersionInfoFile
+    dependsOn createVersionFile
     //appendix 'Application'
     from "$buildDir/$destDirApplication"
-    from "$buildDir/$versionMarkdownFileName"
+    from "$buildDir/$versionFileName"
 }
 
 task distAppletZip(type:Zip) {
     description = "Creates an Applet ZIP file from '$buildDir/$destDirApplet'"
     dependsOn distApplet
-    dependsOn createVersionMarkdownFile
+    dependsOn createVersionInfoFile
+    dependsOn createVersionFile
     appendix 'Applet'
     from "$buildDir/$destDirApplet"
-    from "$buildDir/$versionMarkdownFileName"
+    from "$buildDir/$versionFileName"
 }
 
 /* IDE --------------------------------------------------------------------- */

@@ -2,5 +2,6 @@ Terasology
 ==========
 
 GIT branch: ${gitBranch}
+Jenkins Build number: ${buildNumber}
 Jenkins URL: ${buildUrl}
 Created at: ${dateTime}
