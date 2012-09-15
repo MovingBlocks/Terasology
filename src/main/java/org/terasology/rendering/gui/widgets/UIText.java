@@ -36,6 +36,7 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.AngelCodeFont;
 import org.newdawn.slick.Color;
 import org.terasology.input.events.KeyEvent;
+import org.terasology.rendering.gui.animation.AnimateOpacity;
 import org.terasology.rendering.gui.framework.UIDisplayContainerScrollable;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
@@ -101,7 +102,7 @@ public class UIText extends UIDisplayContainerScrollable {
     
     //child elements
     private final UILabel text;
-    private final UITextCursor cursor;
+    private final UIImage cursor;
     private final UISelection selectionRectangle;
     
     //options
@@ -449,6 +450,7 @@ public class UIText extends UIDisplayContainerScrollable {
             public void focusOn(UIDisplayElement element) {
                 if (!isDisabled()) {
                     cursor.setVisible(true);
+                    cursor.getAnimation(AnimateOpacity.class).start();
                     selectionRectangle.fadeSelection(false);
                     setCursorPosition(cursorPosition);
                 }
@@ -457,6 +459,7 @@ public class UIText extends UIDisplayContainerScrollable {
             @Override
             public void focusOff(UIDisplayElement element) {
                 cursor.setVisible(false);
+                cursor.getAnimation(AnimateOpacity.class).stop();
                 selectionRectangle.fadeSelection(true);
             }
         });
@@ -466,9 +469,22 @@ public class UIText extends UIDisplayContainerScrollable {
         text.setColor(Color.black);
         text.setVisible(true);
         
-        cursor = new UITextCursor(cursorSize);        
+        /*cursor = new UITextCursor(cursorSize);
+        selectionRectangle = new UISelection();   */
         selectionRectangle = new UISelection();
-        
+        //cursor = new UIImage(cursorSize);
+        //_textCursor.setSize(new Vector2f(2, 16f));
+        //_textCursor.setColor(0, 0, 0, 1);
+        //_textCursor.setPosition(new Vector2f(getPosition().x + _padding.x, getPosition().y));
+
+        cursor = new UIImage();
+        cursor.setSize(new Vector2f(2, 16f));
+        cursor.setColor(0, 0, 0, 1);
+        cursor.setPosition(new Vector2f(getPosition().x, getPosition().y));
+        cursor.setVisible(false);
+        cursor.setAnimation(new AnimateOpacity(0f, 1f, 5f));
+        cursor.getAnimation(AnimateOpacity.class).setRepeat(true);
+
         addDisplayElement(text);
         text.addDisplayElement(selectionRectangle);
         text.addDisplayElement(cursor);
@@ -508,12 +524,12 @@ public class UIText extends UIDisplayContainerScrollable {
                 }
             } else {
                 //cursor is right from input area
-                if ((cursor.getPosition().x + text.getPosition().x / 2 + getPadding().y) > (getSize().x / 2f)) {
-                    text.setPosition(new Vector2f(-(cursor.getPosition().x * 2 - getSize().x + getPadding().y + getPadding().w), 0f));
+                if ((cursor.getPosition().x + text.getPosition().x + getPadding().y) > (getSize().x)) {
+                    text.setPosition(new Vector2f(-(cursor.getPosition().x - getSize().x + getPadding().y + getPadding().w), 0f));
                 }
                 //cursor is left from input area
-                else if ((cursor.getPosition().x + text.getPosition().x / 2) < 0) {
-                    text.setPosition(new Vector2f(-cursor.getPosition().x * 2, 0f));
+                else if ((cursor.getPosition().x + text.getPosition().x) < 0) {
+                    text.setPosition(new Vector2f(-cursor.getPosition().x, 0f));
                 }
             }
             
@@ -611,7 +627,7 @@ public class UIText extends UIDisplayContainerScrollable {
             lastLine = substr.substring(indexLastLine, substr.length());
         }
 
-        displayPos.x = calcTextWidth(lastLine) / 2;
+        displayPos.x = calcTextWidth(lastLine);
         displayPos.y = calcTextHeight(substr) / 2;
         
         return displayPos;
@@ -1059,7 +1075,7 @@ public class UIText extends UIDisplayContainerScrollable {
      */
     public void setColor(Color color) {
         text.setColor(color);
-        cursor.setColor(color);
+        cursor.setColor((int)color.r, (int)color.g, (int)color.b, color.a);
     }
     
     /**
