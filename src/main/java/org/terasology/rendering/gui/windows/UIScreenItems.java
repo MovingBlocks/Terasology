@@ -94,7 +94,7 @@ public class UIScreenItems extends UIWindow {
             Prefab prefab = it.next();
             itemComp = prefab.getComponent(ItemComponent.class);
             if (itemComp != null) {
-                entity = entityManager.create(itemComp);
+                entity = entityManager.create(prefab.listComponents());
                 if (entity.exists() && entity.getComponent(ItemComponent.class) != null) {
                     UIItemCell cell = new UIItemCell(null, cellSize);
                     cell.setDrag(false);
