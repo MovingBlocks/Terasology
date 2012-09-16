@@ -1,0 +1,11 @@
+Terasology - Version
+====================
+
+Jenkins:
+  URL: ${buildUrl}
+  Build number: ${buildNumber}
+GIT branch: ${gitBranch}
+Created at: ${dateTime}
+
+https://github.com/MovingBlocks/Terasology
+http://forum.movingblocks.net/
