@@ -167,25 +167,27 @@ public class UILabel extends UIDisplayContainer {
             wrapPosition.clear();
             
             float wrapWidth = getSize().x - margin.y - margin.w;
-
-            //loop through whole text
-            for (int i = 0; i < wrapText.length(); i++) {
-                
-                //check if character is a space -> text can only be wrapped at spaces
-                if (wrapText.charAt(i) == ' ') {
-                    //check if the string (from the beginning of the new line) is bigger than the container width
-                    if (calcTextWidth(wrapText.substring(lastWrap, i)) > wrapWidth) {
-                        //than wrap the text at the previous space
-                        wrapText.insert(lastSpace + 1, '\n');
-                        wrapPosition.add(new Integer(lastSpace + 1));
-                        
-                        lastWrap = lastSpace + 1;
-                    }
+            
+            if (wrapWidth > 0) {
+                //loop through whole text
+                for (int i = 0; i < wrapText.length(); i++) {
                     
-                    lastSpace = i;
-                } else if (wrapText.charAt(i) == '\n') {
-                    lastSpace = i;
-                    lastWrap = i;
+                    //check if character is a space -> text can only be wrapped at spaces
+                    if (wrapText.charAt(i) == ' ') {
+                        //check if the string (from the beginning of the new line) is bigger than the container width
+                        if (calcTextWidth(wrapText.substring(lastWrap, i)) > wrapWidth) {
+                            //than wrap the text at the previous space
+                            wrapText.insert(lastSpace + 1, '\n');
+                            wrapPosition.add(new Integer(lastSpace + 1));
+                            
+                            lastWrap = lastSpace + 1;
+                        }
+                        
+                        lastSpace = i;
+                    } else if (wrapText.charAt(i) == '\n') {
+                        lastSpace = i;
+                        lastWrap = i;
+                    }
                 }
             }
             
@@ -302,7 +304,7 @@ public class UILabel extends UIDisplayContainer {
      * Check whether the text has a shadow.
      * @return Returns true if the text has a shadow.
      */
-    public boolean isEnableShadow() {
+    public boolean isShadow() {
         return enableShadow;
     }
     
@@ -310,7 +312,7 @@ public class UILabel extends UIDisplayContainer {
      * Set whether the text has a color.
      * @param enable True to enable the shadow of the text.
      */
-    public void setEnableShadow(boolean enable) {
+    public void setShadow(boolean enable) {
         this.enableShadow = enable;
     }
 

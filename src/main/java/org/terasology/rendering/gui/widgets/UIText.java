@@ -36,7 +36,7 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.AngelCodeFont;
 import org.newdawn.slick.Color;
 import org.terasology.input.events.KeyEvent;
-import org.terasology.rendering.gui.animation.AnimateOpacity;
+import org.terasology.rendering.gui.animation.AnimationOpacity;
 import org.terasology.rendering.gui.framework.UIDisplayContainerScrollable;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
@@ -45,6 +45,7 @@ import org.terasology.rendering.gui.framework.events.KeyListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 import org.terasology.rendering.gui.framework.events.SelectionChangedListener;
+import org.terasology.rendering.gui.framework.style.StyleShadow.EShadowDirection;
 
 /**
  * A text area which can be used as a single line input box, multi line input box or for just displaying large texts.
@@ -52,6 +53,7 @@ import org.terasology.rendering.gui.framework.events.SelectionChangedListener;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  * 
  * TODO remove text wrapping, the UILabel widget can do this.
+ * TODO clean up
  */
 public class UIText extends UIDisplayContainerScrollable {
     
@@ -450,7 +452,7 @@ public class UIText extends UIDisplayContainerScrollable {
             public void focusOn(UIDisplayElement element) {
                 if (!isDisabled()) {
                     cursor.setVisible(true);
-                    cursor.getAnimation(AnimateOpacity.class).start();
+                    cursor.getAnimation(AnimationOpacity.class).start();
                     selectionRectangle.fadeSelection(false);
                     setCursorPosition(cursorPosition);
                 }
@@ -459,7 +461,7 @@ public class UIText extends UIDisplayContainerScrollable {
             @Override
             public void focusOff(UIDisplayElement element) {
                 cursor.setVisible(false);
-                cursor.getAnimation(AnimateOpacity.class).stop();
+                cursor.getAnimation(AnimationOpacity.class).stop();
                 selectionRectangle.fadeSelection(true);
             }
         });
@@ -478,20 +480,21 @@ public class UIText extends UIDisplayContainerScrollable {
         //_textCursor.setPosition(new Vector2f(getPosition().x + _padding.x, getPosition().y));
 
         cursor = new UIImage();
-        cursor.setSize(new Vector2f(2, 16f));
-        cursor.setColor(0, 0, 0, 1);
+        cursor.setSize(new Vector2f(1, 16f));
+        cursor.setColor(new Color(0, 0, 0));
         cursor.setPosition(new Vector2f(getPosition().x, getPosition().y));
         cursor.setVisible(false);
-        cursor.setAnimation(new AnimateOpacity(0f, 1f, 5f));
-        cursor.getAnimation(AnimateOpacity.class).setRepeat(true);
+        cursor.setAnimation(new AnimationOpacity(0f, 1f, 5f));
+        cursor.getAnimation(AnimationOpacity.class).setRepeat(true);
 
         addDisplayElement(text);
         text.addDisplayElement(selectionRectangle);
         text.addDisplayElement(cursor);
         
         setPadding(new Vector4f(0f, 5f, 0f, 5f));
+        setBackgroundColor(new Color(255, 255, 255));
+        setShadow(new Vector4f(0f, 3f, 3f, 0f), EShadowDirection.OUTSIDE, 1f);
         setMultiLine(false);
-        setBackgroundColor(150, 0, 0, 0.3f);
     }
 
     /**
@@ -1075,7 +1078,7 @@ public class UIText extends UIDisplayContainerScrollable {
      */
     public void setColor(Color color) {
         text.setColor(color);
-        cursor.setColor((int)color.r, (int)color.g, (int)color.b, color.a);
+        cursor.setColor(color);
     }
     
     /**
@@ -1115,7 +1118,7 @@ public class UIText extends UIDisplayContainerScrollable {
      * @return Returns true if the text has a shadow.
      */
     public boolean isEnableShadow() {
-        return this.text.isEnableShadow();
+        return this.text.isShadow();
     }
     
     /**
@@ -1123,7 +1126,7 @@ public class UIText extends UIDisplayContainerScrollable {
      * @param enable True to enable the shadow of the text.
      */
     public void setEnableShadow(boolean enable) {
-        this.text.setEnableShadow(enable);
+        this.text.setShadow(enable);
     }
 
     /**

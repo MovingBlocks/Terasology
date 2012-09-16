@@ -109,8 +109,6 @@ public class UIDisplayRenderer extends UIDisplayContainer {
         
         if (windowPosition != -1) {
             Collections.rotate(getDisplayElements().subList(windowPosition, getDisplayElements().size()), -1);
-            
-            window.open();
         }
     }
 }

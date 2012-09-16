@@ -18,6 +18,7 @@ package org.terasology.rendering.gui.windows;
 import javax.vecmath.Vector2f;
 
 import org.lwjgl.input.Keyboard;
+import org.newdawn.slick.Color;
 import org.terasology.events.RespawnEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
@@ -45,7 +46,7 @@ public class UIScreenDeath extends UIWindow {
 
     public UIScreenDeath() {
         setId("death");
-        setBackgroundColor(0x46, 0x00, 0x00, 0.85f);
+        setBackgroundColor(new Color(70, 0, 0, 200));
         setModal(true);
         setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
         maximize();

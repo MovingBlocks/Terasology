@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.framework.events;
+package org.terasology.rendering.gui.framework.style;
 
-import org.terasology.input.BindButtonEvent;
-import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.UIDisplayContainer;
 
 /**
  * 
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
- *
+ * TODO implement
  */
-public interface BindKeyListener {
-    void key(UIDisplayElement element, BindButtonEvent event);
+public class StyleBackgroundSplit extends UIDisplayContainer implements Style {
+
 }

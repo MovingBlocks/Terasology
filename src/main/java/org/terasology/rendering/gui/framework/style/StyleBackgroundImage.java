@@ -13,16 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.framework.events;
+package org.terasology.rendering.gui.framework.style;
 
-import org.terasology.input.BindButtonEvent;
-import org.terasology.rendering.gui.framework.UIDisplayElement;
+import javax.vecmath.Vector2f;
+
+import org.terasology.rendering.assets.Texture;
+import org.terasology.rendering.gui.widgets.UIImage;
 
 /**
  * 
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  *
  */
-public interface BindKeyListener {
-    void key(UIDisplayElement element, BindButtonEvent event);
+public class StyleBackgroundImage extends UIImage implements Style {
+
+    public StyleBackgroundImage(Texture texture) {
+        super(texture);
+        setSize("100%", "100%");
+    }
+    
+    @Override
+    public void setPosition(Vector2f position) {
+
+    }    
 }

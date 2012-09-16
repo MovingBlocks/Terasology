@@ -18,6 +18,7 @@ package org.terasology.rendering.gui.windows;
 import javax.vecmath.Vector2f;
 
 import org.lwjgl.input.Keyboard;
+import org.newdawn.slick.Color;
 import org.terasology.asset.AssetManager;
 import org.terasology.input.binds.UseItemButton;
 import org.terasology.rendering.gui.widgets.UIImage;
@@ -29,7 +30,7 @@ public class UIScreenBook extends UIWindow {
 
     public UIScreenBook() {
         setId("book");
-        setBackgroundColor(0x00, 0x00, 0x00, 0.75f);
+        setBackgroundColor(new Color(0, 0, 0, 200));
         setHorizontalAlign(EHorizontalAlign.CENTER);
         setVerticalAlign(EVerticalAlign.CENTER);
         setModal(true);

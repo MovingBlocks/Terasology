@@ -13,16 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.framework.events;
+package org.terasology.rendering.gui.framework.style;
 
-import org.terasology.input.BindButtonEvent;
-import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.newdawn.slick.Color;
+import org.terasology.rendering.gui.widgets.UIImage;
 
 /**
  * 
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  *
  */
-public interface BindKeyListener {
-    void key(UIDisplayElement element, BindButtonEvent event);
+public class StyleBackgroundColor extends UIImage implements Style {
+
+    public StyleBackgroundColor(Color color) {
+        super(color);
+        setSize("100%", "100%");
+    }
+    
+    public StyleBackgroundColor(String color) {
+        super(color);
+        setSize("100%", "100%");
+    }
 }
