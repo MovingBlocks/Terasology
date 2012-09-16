@@ -21,6 +21,7 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
+import org.terasology.rendering.gui.framework.events.WindowListener;
 import org.terasology.rendering.gui.layout.GridLayout;
 import org.terasology.rendering.gui.widgets.UICompositeScrollable;
 import org.terasology.rendering.gui.widgets.UIItemCell;
@@ -71,6 +72,24 @@ public class UIScreenItems extends UIWindow {
         container.setLayout(layout);
         container.setPadding(new Vector4f(12f, 12f, 12f, 12f));
         container.setVisible(true);
+        
+        addWindowListener(new WindowListener() {
+            @Override
+            public void shutdown(UIDisplayElement element) {
+                EntityRef item;
+                for (UIItemCell cell : cells) {
+                    item = cell.getItemEntity();
+                    if (item.exists()) {
+                        item.destroy();
+                    }
+                }
+            }
+            
+            @Override
+            public void initialise(UIDisplayElement element) {
+                
+            }
+        });
         
         fillInventoryCells();
         
@@ -141,13 +160,4 @@ public class UIScreenItems extends UIWindow {
         Collections.sort(result);
         return result;
     }
-    
-    @Override
-    protected void finalize() throws Throwable {
-        for (UIItemCell item : cells) {
-            
-        }
-        super.finalize();
-    }
-    
 }

@@ -33,7 +33,7 @@ import org.terasology.logic.manager.MessageManager.Message;
 import org.terasology.logic.manager.CommandManager.Command;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.KeyListener;
-import org.terasology.rendering.gui.framework.events.WindowListener;
+import org.terasology.rendering.gui.framework.events.VisibilityListener;
 import org.terasology.rendering.gui.framework.style.StyleShadow.EShadowDirection;
 import org.terasology.rendering.gui.widgets.UIList;
 import org.terasology.rendering.gui.widgets.UIListItem;
@@ -89,15 +89,12 @@ public class UIScreenChat extends UIWindow {
         setModal(true);
         maximize();
 
-        addWindowListener(new WindowListener() {
+        addVisibilityListener(new VisibilityListener() {
             @Override
-            public void open(UIDisplayElement element) {
-                setFocus(inputBox);
-            }
-            
-            @Override
-            public void close(UIDisplayElement element) {
-                
+            public void changed(UIDisplayElement element, boolean visibility) {
+                if (visibility) {
+                    setFocus(inputBox);
+                }
             }
         });
         
