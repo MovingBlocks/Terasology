@@ -41,6 +41,9 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.entitySystem.persistence.WorldPersister;
+import org.terasology.events.FullHealthEvent;
+import org.terasology.events.HealthChangedEvent;
+import org.terasology.events.NoHealthEvent;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
@@ -318,13 +321,24 @@ public class Commands implements CommandController {
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
         health.currentHealth = health.maxHealth;
+        localPlayer.getEntity().send(new HealthChangedEvent(localPlayer.getEntity(), health.currentHealth, health.maxHealth));
         localPlayer.getEntity().saveComponent(health);
     }
     
     public void health(int amount) {
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
-        health.currentHealth += amount;
+        health.currentHealth = amount;
+        if (health.currentHealth >= health.maxHealth) {
+            health.currentHealth = health.maxHealth;
+            localPlayer.getEntity().send(new FullHealthEvent(localPlayer.getEntity(), health.maxHealth));
+        } else if (health.currentHealth <= 0) {
+            health.currentHealth = 0;
+            localPlayer.getEntity().send(new NoHealthEvent(localPlayer.getEntity(), health.maxHealth));
+        } else {
+            localPlayer.getEntity().send(new HealthChangedEvent(localPlayer.getEntity(), health.currentHealth, health.maxHealth));
+        }
+        
         localPlayer.getEntity().saveComponent(health);
     }
 
