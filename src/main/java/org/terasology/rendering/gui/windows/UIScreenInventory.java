@@ -31,7 +31,7 @@ import org.terasology.rendering.gui.animation.AnimationRotate;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.AnimationListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
-import org.terasology.rendering.gui.framework.events.WindowListener;
+import org.terasology.rendering.gui.framework.events.VisibilityListener;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UIItemCell;
 import org.terasology.rendering.gui.widgets.UIItemContainer;
@@ -61,29 +61,26 @@ public class UIScreenInventory extends UIWindow {
         setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
         maximize();
         
-        addWindowListener(new WindowListener() {
+        addVisibilityListener(new VisibilityListener() {
             @Override
-            public void open(UIDisplayElement element) {
-                toolbar.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity(), 0, 8);
-                inventory.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity(), 9);
-                //TODO connect toolbar <-> inventory somehow to allow fast transfer.
+            public void changed(UIDisplayElement element, boolean visibility) {
+                if (visibility) {
+                    toolbar.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity(), 0, 8);
+                    inventory.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity(), 9);
+                    //TODO connect toolbar <-> inventory somehow to allow fast transfer.
 
-                GUIManager.getInstance().getWindowById("hud").getElementById("leftGearWheel").setVisible(false);
-                GUIManager.getInstance().getWindowById("hud").getElementById("rightGearWheel").setVisible(false);
+                    GUIManager.getInstance().getWindowById("hud").getElementById("leftGearWheel").setVisible(false);
+                    GUIManager.getInstance().getWindowById("hud").getElementById("rightGearWheel").setVisible(false);
 
-                inventory.setPosition(new Vector2f(toolbar.getAbsolutePosition().x, Display.getHeight() + 5f));
-                inventory.setAnimation(new AnimationMove(new Vector2f(Display.getWidth() / 2 - inventory.getSize().x / 2, Display.getHeight() - 192f), 20f));
-                inventory.getAnimation(AnimationMove.class).start();
-                leftGearWheel.setAnimation(new AnimationRotate(-120f,10f));
-                leftGearWheel.getAnimation(AnimationRotate.class).start();
-                rightGearWheel.setAnimation(new AnimationRotate(120f,10f));
-                rightGearWheel.getAnimation(AnimationRotate.class).start();
-                layout();
-            }
-            
-            @Override
-            public void close(UIDisplayElement element) {
-
+                    inventory.setPosition(new Vector2f(toolbar.getAbsolutePosition().x, Display.getHeight() + 5f));
+                    inventory.setAnimation(new AnimationMove(new Vector2f(Display.getWidth() / 2 - inventory.getSize().x / 2, Display.getHeight() - 192f), 20f));
+                    inventory.getAnimation(AnimationMove.class).start();
+                    leftGearWheel.setAnimation(new AnimationRotate(-120f,10f));
+                    leftGearWheel.getAnimation(AnimationRotate.class).start();
+                    rightGearWheel.setAnimation(new AnimationRotate(120f,10f));
+                    rightGearWheel.getAnimation(AnimationRotate.class).start();
+                    layout();
+                }
             }
         });
         

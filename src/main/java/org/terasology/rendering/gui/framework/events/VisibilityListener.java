@@ -22,10 +22,8 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  *
  */
-public interface WindowListener {
+public interface VisibilityListener {
     
-    public void initialise(UIDisplayElement element);
-    
-    public void shutdown(UIDisplayElement element);
+    public void changed(UIDisplayElement element, boolean visibility);
     
 }
