@@ -418,6 +418,7 @@ public class UIItemCell extends UIDisplayContainer  {
     
     /**
      * Update the transfer icon position to the current mouse position.
+     * TODO all item cells with the same ownerEntity are updating the position -> just the dragged (source) item cell should update the position
      */
     private void moveTransferIcon() {
         if (ownerEntity.getComponent(InventoryComponent.class) != null) {
@@ -622,6 +623,7 @@ public class UIItemCell extends UIDisplayContainer  {
             //no items in transfer slot left
             else {
                 //place whole stack
+                sourceItem.container = targetCell.ownerEntity;
                 targetInventory.itemSlots.set(targetCell.slot, item);
                 
                 //remove item from transfer slot
