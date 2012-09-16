@@ -38,6 +38,7 @@ import org.terasology.rendering.gui.framework.events.FocusListener;
 import org.terasology.rendering.gui.framework.events.KeyListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
+import org.terasology.rendering.gui.framework.events.VisibilityListener;
 
 /**
  * Base class for all displayable UI elements.
@@ -56,6 +57,7 @@ public abstract class UIDisplayElement {
     private String id = "";
     
     //events
+    private final ArrayList<VisibilityListener> visibilityListeners = new ArrayList<VisibilityListener>();
     private final ArrayList<MouseMoveListener> mouseListeners = new ArrayList<MouseMoveListener>();
     private final ArrayList<MouseButtonListener> mouseButtonListeners = new ArrayList<MouseButtonListener>();
     private final ArrayList<ClickListener> clickListeners = new ArrayList<ClickListener>();
@@ -593,7 +595,13 @@ public abstract class UIDisplayElement {
      * Set the visibility of the display element.
      * @param visible True to set the element visible.
      */
-    public void setVisible(boolean visible) {
+    public void setVisible(boolean visible) {        
+        if (!isVisible && visible) {
+            notifyVisibilityListeners(visible);
+        } else if (isVisible && !visible) {
+            notifyVisibilityListeners(visible);
+        }
+        
         this.isVisible = visible;
         
         if (visible) {
@@ -722,6 +730,24 @@ public abstract class UIDisplayElement {
     /*
        The event listeners which every display element in the UI supports
     */
+
+    private void notifyVisibilityListeners(boolean visible) {
+        //we copy the list so the listener can remove itself within the close/open method call (see UIItemCell). Otherwise ConcurrentModificationException.
+        //TODO other solution?
+        ArrayList<VisibilityListener> listeners = (ArrayList<VisibilityListener>) visibilityListeners.clone();
+        
+        for (VisibilityListener listener : listeners) {
+            listener.changed(this, visible);
+        }
+    }
+    
+    public void addVisibilityListener(VisibilityListener listener) {
+        visibilityListeners.add(listener);
+    }
+    
+    public void removeVisibilityListener(VisibilityListener listener) {
+        visibilityListeners.remove(listener);
+    }
     
     private void notifyMouseButtonListeners(int button, boolean state, int wheel, boolean intersect) {
         if (button == -1) {

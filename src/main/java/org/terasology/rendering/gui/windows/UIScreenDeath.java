@@ -26,7 +26,7 @@ import org.terasology.game.modes.StateMainMenu;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
-import org.terasology.rendering.gui.framework.events.WindowListener;
+import org.terasology.rendering.gui.framework.events.VisibilityListener;
 import org.terasology.rendering.gui.widgets.UIButton;
 import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIWindow;
@@ -51,15 +51,13 @@ public class UIScreenDeath extends UIWindow {
         setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
         maximize();
         
-        addWindowListener(new WindowListener() {
-            @Override
-            public void open(UIDisplayElement element) {
-
-            }
+        addVisibilityListener(new VisibilityListener() {
             
             @Override
-            public void close(UIDisplayElement element) {
-                respawn();
+            public void changed(UIDisplayElement element, boolean visibility) {
+                if (!visibility) {
+                    respawn();
+                }
             }
         });
         

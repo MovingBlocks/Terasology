@@ -51,7 +51,7 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.KeyListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
-import org.terasology.rendering.gui.framework.events.WindowListener;
+import org.terasology.rendering.gui.framework.events.VisibilityListener;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
@@ -92,20 +92,15 @@ public class UIItemCell extends UIDisplayContainer  {
     private boolean enableSelectionRectangle = true;
     private boolean multiplierKeyPressed = false;
     
-    private static WindowListener windowListener = new WindowListener() {
+    private static VisibilityListener visibilityListener = new VisibilityListener() {
         @Override
-        public void open(UIDisplayElement element) {
-            
-        }
-        
-        @Override
-        public void close(UIDisplayElement element) {
+        public void changed(UIDisplayElement element, boolean visibility) {
             UIWindow window = (UIWindow) element;
             
             //lets reset the item if the window got closed.
             reset();
             
-            window.removeWindowListener(windowListener);
+            window.removeVisibilityListener(visibilityListener);
         }
     };
 
@@ -806,8 +801,8 @@ public class UIItemCell extends UIDisplayContainer  {
         if (getFromTransferSlot().exists()) {
             GUIManager.getInstance().getFocusedWindow().removeDisplayElement(transferIcon);
             GUIManager.getInstance().getFocusedWindow().addDisplayElement(transferIcon);
-            GUIManager.getInstance().getFocusedWindow().removeWindowListener(windowListener);
-            GUIManager.getInstance().getFocusedWindow().addWindowListener(windowListener);
+            GUIManager.getInstance().getFocusedWindow().removeVisibilityListener(visibilityListener);
+            GUIManager.getInstance().getFocusedWindow().addVisibilityListener(visibilityListener);
             transferIcon.setItemEntity(getFromTransferSlot());
             transferIcon.setVisible(true);
         }

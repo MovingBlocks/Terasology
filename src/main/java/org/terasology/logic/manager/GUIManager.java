@@ -67,7 +67,7 @@ import javax.vecmath.Vector2f;
 
 public class GUIManager implements EventHandlerSystem {
     
-    private Logger logger = Logger.getLogger(getClass().getName());   
+    private Logger logger = Logger.getLogger(getClass().getName());
     private static GUIManager instance;
     private UIDisplayRenderer renderer;
 
@@ -113,6 +113,7 @@ public class GUIManager implements EventHandlerSystem {
             logger.log(Level.INFO, "GUIManager: Add window with ID \"" + window.getId() + "\"");
             
             renderer.addDisplayElementToPosition(0, window);
+            window.initialise();
         }
 
         return window;
@@ -125,11 +126,18 @@ public class GUIManager implements EventHandlerSystem {
             logger.log(Level.INFO, "GUIManager: Remove window by reference with ID \"" + window.getId() + "\"");
             
             renderer.removeDisplayElement(window);
+            window.shutdown();
         }
     }
     
     private void removeAllWindows() {
         logger.log(Level.INFO, "GUIManager: Remove all windows");
+        
+        for (UIDisplayElement window : renderer.getDisplayElements()) {
+            if (window instanceof UIWindow) {
+                ((UIWindow)window).shutdown();
+            }
+        }
         
         renderer.removeAllDisplayElements();
     }
