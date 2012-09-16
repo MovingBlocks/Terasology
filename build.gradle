@@ -122,7 +122,7 @@ jar {
     archiveName = jarFileName
     manifest {
         def manifestClasspath = "$subDirLibs/"+configurations.runtime.collect { it.getName() }.join(" $subDirLibs/") 
-        attributes("Implementation-Title": project.name, "Main-Class": mainClassName, "Class-Path" : manifestClasspath)
+        attributes("Main-Class": mainClassName, "Class-Path" : manifestClasspath, "Implementation-Title": project.name, "Implementation-Version": env.BUILD_NUMBER + " " + env.GIT_BRANCH + " " + env.BUILD_ID)
     }
 }
 
