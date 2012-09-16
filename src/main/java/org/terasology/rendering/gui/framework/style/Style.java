@@ -13,16 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.framework.events;
-
-import org.terasology.input.BindButtonEvent;
-import org.terasology.rendering.gui.framework.UIDisplayElement;
+package org.terasology.rendering.gui.framework.style;
 
 /**
  * 
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  *
  */
-public interface BindKeyListener {
-    void key(UIDisplayElement element, BindButtonEvent event);
+public interface Style {
+
 }

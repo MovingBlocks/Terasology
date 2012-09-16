@@ -23,6 +23,7 @@ import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.world.WorldInfo;
 import org.terasology.world.WorldUtil;
+import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.widgets.UIButton;
@@ -62,7 +63,6 @@ public class UIMenuSingleplayer extends UIWindow {
         list = new UIList();
         list.setSize(new Vector2f(512f, 256f));
         list.setPadding(new Vector4f(10f, 5f, 10f, 5f));
-        list.setBorderSolid(2f, 0x1E, 0x1E, 0x1E, 1.0f);
         list.setBackgroundImage("engine:gui_menu", new Vector2f(264f, 18f), new Vector2f(159f, 63f));
         list.setBorderImage("engine:gui_menu", new Vector2f(256f, 0f), new Vector2f(175f, 88f), new Vector4f(16f, 7f, 7f, 7f));
         list.addDoubleClickListener(new ClickListener() {
@@ -128,7 +128,8 @@ public class UIMenuSingleplayer extends UIWindow {
         createNewWorld.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().openWindow("createWorld");
+                UIDialogCreateNewWorld dialog = new UIDialogCreateNewWorld();
+                dialog.open();
             }
         });
         createNewWorld.setHorizontalAlign(EHorizontalAlign.CENTER);

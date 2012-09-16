@@ -31,7 +31,6 @@ import org.terasology.input.InputSystem;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.rendering.gui.windows.*;
 
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;

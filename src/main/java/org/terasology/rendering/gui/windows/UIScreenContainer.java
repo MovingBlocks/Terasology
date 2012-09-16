@@ -17,6 +17,7 @@ package org.terasology.rendering.gui.windows;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
+import org.newdawn.slick.Color;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.input.binds.FrobButton;
 import org.terasology.asset.AssetManager;
@@ -44,7 +45,7 @@ public class UIScreenContainer extends UIWindow {
 
     public UIScreenContainer() {
         setId("container");
-        setBackgroundColor(0x00, 0x00, 0x00, 0.75f);
+        setBackgroundColor(new Color(0, 0, 0, 200));
         setModal(true);
         maximize();
         setCloseBinds(new String[] {FrobButton.ID});

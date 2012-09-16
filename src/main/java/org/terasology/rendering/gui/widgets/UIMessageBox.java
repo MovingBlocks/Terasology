@@ -28,7 +28,8 @@ public class UIMessageBox extends UIDialogBox {
     private final Vector2f minSize = new Vector2f(384f, 128f);
 
     public UIMessageBox(String title, String text) {
-        super(title, new Vector2f());
+        super(new Vector2f());
+        setTitle(title);
         setModal(true);
 
         float width = 0f;

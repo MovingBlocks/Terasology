@@ -40,7 +40,7 @@ import org.terasology.mods.miniions.components.MinionComponent;
 import org.terasology.mods.miniions.events.MinionMessageEvent;
 import org.terasology.mods.miniions.rendering.gui.components.UIMessageQueue;
 import org.terasology.mods.miniions.rendering.gui.components.UIMinionbar;
-import org.terasology.rendering.gui.animation.AnimateRotateOn;
+import org.terasology.rendering.gui.animation.AnimationRotate;
 import org.terasology.rendering.gui.widgets.UIBuff;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UIItemCell;
@@ -265,12 +265,12 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
     @ReceiveEvent(components = LocalPlayerComponent.class)
     public void onSelectedItemChanged(ChangedComponentEvent event, EntityRef entity) {
         for (UIItemCell cell : toolbar.getCells()) {
-            cell.setSelectionRectangleEnable(false);
+            cell.setSelection(false);
         }
         
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
-        toolbar.getCells().get(localPlayerComp.selectedTool).setSelectionRectangleEnable(true);
+        toolbar.getCells().get(localPlayerComp.selectedTool).setSelection(true);
     }
     
     @ReceiveEvent(components = {LocalPlayerComponent.class, HealthComponent.class})

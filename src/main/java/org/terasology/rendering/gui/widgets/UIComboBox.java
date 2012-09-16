@@ -20,9 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+import org.newdawn.slick.Color;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.logic.manager.AudioManager;
@@ -73,8 +75,7 @@ public class UIComboBox extends UIDisplayContainer {
         baseInput = new UIText();
         baseInput.setSize(size);
         baseInput.setVisible(true);
-        baseInput.setBackgroundColor(0xFF, 0xFF, 0xFF, 1.0f);
-        baseInput.setBorderSolid(1, 0x00, 0x00, 0x00, 1.0f);
+        baseInput.setBorderSolid(new Vector4f(1f, 1f, 1f, 1f), new Color(0, 0, 0));
         baseInput.setDisabled(true);
         baseInput.addMouseButtonListener(new MouseButtonListener() {
             @Override
@@ -142,8 +143,8 @@ public class UIComboBox extends UIDisplayContainer {
         baseList = new UIList();
         baseList.setSize(listSize);
         baseList.setPosition(new Vector2f(0f, size.y));
-        baseList.setBorderSolid(1f, 0x00, 0x00, 0x00, 1.0f);
-        baseList.setBackgroundColor(0xFF, 0xFF, 0xFF, 1.0f);
+        baseList.setBorderSolid(new Vector4f(1f, 1f, 1f, 1f), new Color(0, 0, 0));
+        baseList.setBackgroundColor(new Color(255, 255, 255));
         baseList.setVisible(false);
         baseList.addSelectionChangedListener(new SelectionChangedListener() {    
             @Override
