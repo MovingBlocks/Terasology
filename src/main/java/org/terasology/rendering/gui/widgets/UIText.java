@@ -44,7 +44,7 @@ import org.terasology.rendering.gui.framework.events.FocusListener;
 import org.terasology.rendering.gui.framework.events.KeyListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
-import org.terasology.rendering.gui.framework.events.SelectionChangedListener;
+import org.terasology.rendering.gui.framework.events.SelectionListener;
 import org.terasology.rendering.gui.framework.style.StyleShadow.EShadowDirection;
 
 /**
@@ -86,7 +86,7 @@ public class UIText extends UIDisplayContainerScrollable {
     
     //events
     private final ArrayList<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
-    private final ArrayList<SelectionChangedListener> selectionListeners = new ArrayList<SelectionChangedListener>();
+    private final ArrayList<SelectionListener> selectionListeners = new ArrayList<SelectionListener>();
     
     //wrapping
     private final List<Integer> wrapPosition = new ArrayList<Integer>();
@@ -439,7 +439,7 @@ public class UIText extends UIDisplayContainerScrollable {
         });
         
         //update of the selection rectangle
-        addSelectionChangedListener(new SelectionChangedListener() {
+        addSelectionChangedListener(new SelectionListener() {
             @Override
             public void changed(UIDisplayElement element) {
                 selectionRectangle.updateSelection(Math.min(selectionStart, selectionEnd), Math.max(selectionStart, selectionEnd));
@@ -1213,16 +1213,16 @@ public class UIText extends UIDisplayContainerScrollable {
     }
     
     private void notifySelectionChangedListeners() {
-        for (SelectionChangedListener listener : selectionListeners) {
+        for (SelectionListener listener : selectionListeners) {
             listener.changed(this);
         }
     }
 
-    public void addSelectionChangedListener(SelectionChangedListener listener) {
+    public void addSelectionChangedListener(SelectionListener listener) {
         selectionListeners.add(listener);
     }
 
-    public void removeSelectionChangedListener(SelectionChangedListener listener) {
+    public void removeSelectionChangedListener(SelectionListener listener) {
         selectionListeners.remove(listener);
     }
     

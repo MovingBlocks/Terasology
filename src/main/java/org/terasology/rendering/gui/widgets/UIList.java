@@ -24,7 +24,7 @@ import org.terasology.rendering.gui.framework.UIDisplayContainerScrollable;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.ClickListener;
-import org.terasology.rendering.gui.framework.events.SelectionChangedListener;
+import org.terasology.rendering.gui.framework.events.SelectionListener;
 import org.terasology.rendering.gui.layout.GridLayout;
 
 /**
@@ -40,7 +40,7 @@ public class UIList extends UIDisplayContainerScrollable {
     
     //events
     private final ArrayList<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
-    private final List<SelectionChangedListener> selectionChangedListeners = new ArrayList<SelectionChangedListener>();
+    private final List<SelectionListener> selectionChangedListeners = new ArrayList<SelectionListener>();
     private final ArrayList<ClickListener> doubleClickListeners = new ArrayList<ClickListener>();
     
     //child elements
@@ -252,16 +252,16 @@ public class UIList extends UIDisplayContainerScrollable {
     }
      
     private void notifySelectionChangedListeners() {
-        for (SelectionChangedListener listener : selectionChangedListeners) {
+        for (SelectionListener listener : selectionChangedListeners) {
             listener.changed(this);
         }
     }
      
-    public void addSelectionChangedListener(SelectionChangedListener listener) {
+    public void addSelectionChangedListener(SelectionListener listener) {
         selectionChangedListeners.add(listener);
     }
     
-    public void removeSelectionChangedListener(SelectionChangedListener listener) {
+    public void removeSelectionChangedListener(SelectionListener listener) {
         selectionChangedListeners.remove(listener);
     }
     

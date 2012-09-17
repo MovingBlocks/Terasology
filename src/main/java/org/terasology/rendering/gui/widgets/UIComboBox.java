@@ -33,7 +33,7 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
-import org.terasology.rendering.gui.framework.events.SelectionChangedListener;
+import org.terasology.rendering.gui.framework.events.SelectionListener;
 
 /**
  * A combo box.
@@ -43,7 +43,7 @@ public class UIComboBox extends UIDisplayContainer {
     
     //events
     private final ArrayList<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
-    private final ArrayList<SelectionChangedListener> selectionListeners = new ArrayList<SelectionChangedListener>();
+    private final ArrayList<SelectionListener> selectionListeners = new ArrayList<SelectionListener>();
     
     private UIText baseInput;
     private UIButton baseButton;
@@ -146,7 +146,7 @@ public class UIComboBox extends UIDisplayContainer {
         baseList.setBorderSolid(new Vector4f(1f, 1f, 1f, 1f), new Color(0, 0, 0));
         baseList.setBackgroundColor(new Color(255, 255, 255));
         baseList.setVisible(false);
-        baseList.addSelectionChangedListener(new SelectionChangedListener() {    
+        baseList.addSelectionChangedListener(new SelectionListener() {    
             @Override
             public void changed(UIDisplayElement element) {
                 if (baseList.getSelection() != null) {
@@ -262,16 +262,16 @@ public class UIComboBox extends UIDisplayContainer {
     }
     
     private void notifySelectionChangedListeners() {
-        for (SelectionChangedListener listener : selectionListeners) {
+        for (SelectionListener listener : selectionListeners) {
             listener.changed(this);
         }
     }
 
-    public void addSelectionChangedListener(SelectionChangedListener listener) {
+    public void addSelectionChangedListener(SelectionListener listener) {
         selectionListeners.add(listener);
     }
 
-    public void removeSelectionChangedListener(SelectionChangedListener listener) {
+    public void removeSelectionChangedListener(SelectionListener listener) {
         selectionListeners.remove(listener);
     }
     
