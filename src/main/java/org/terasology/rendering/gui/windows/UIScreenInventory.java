@@ -22,6 +22,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
 import org.terasology.asset.AssetManager;
+import org.terasology.game.types.GameType;
 import org.terasology.input.binds.InventoryButton;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
@@ -65,8 +66,8 @@ public class UIScreenInventory extends UIWindow {
             @Override
             public void changed(UIDisplayElement element, boolean visibility) {
                 if (visibility) {
-                    toolbar.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity(), 0, 8);
-                    inventory.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity(), 9);
+                    toolbar.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity(), 0, 9);
+                    inventory.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity(), 10);
                     //TODO connect toolbar <-> inventory somehow to allow fast transfer.
 
                     GUIManager.getInstance().getWindowById("hud").getElementById("leftGearWheel").setVisible(false);
@@ -83,19 +84,19 @@ public class UIScreenInventory extends UIWindow {
                 }
             }
         });
-        
+
         addMouseButtonListener(new MouseButtonListener() {
-            
+
             @Override
             public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
-                
+
             }
-            
+
             @Override
             public void up(UIDisplayElement element, int button, boolean intersect) {
-                
+
             }
-            
+
             @Override
             public void down(UIDisplayElement element, int button, boolean intersect) {
                 if (button == 0) {
@@ -104,16 +105,16 @@ public class UIScreenInventory extends UIWindow {
             }
         });
 
+        CoreRegistry.get(GameType.class).onCreateInventoryHook(this);
 
-        toolbar = new UIItemContainer(9);
+        toolbar = new UIItemContainer(10);
         toolbar.setVisible(true);
         toolbar.setHorizontalAlign(EHorizontalAlign.CENTER);
         toolbar.setVerticalAlign(EVerticalAlign.BOTTOM);
         toolbar.setCellMargin(new Vector2f(0f, 0f));
         toolbar.setBorderImage("engine:inventory", new Vector2f(0f, 84f), new Vector2f(169f, 83f), new Vector4f(4f, 4f, 4f, 4f));
 
-        inventory = new UIItemContainer(9);
-        inventory.setPosition(new Vector2f(0f, Display.getHeight() + 5f));
+        inventory = new UIItemContainer(10);
         inventory.setVisible(true);
         inventory.setCellMargin(new Vector2f(0f, 0f));
         inventory.setBorderImage("engine:inventory", new Vector2f(0f, 84f), new Vector2f(169f, 61f), new Vector4f(5f, 4f, 3f, 4f));
@@ -137,7 +138,8 @@ public class UIScreenInventory extends UIWindow {
     }
 
     @Override
-    public void update(){
+    public void layout(){
+        super.layout();
         if(leftGearWheel != null && rightGearWheel != null){
             leftGearWheel.setPosition(new Vector2f(
                     toolbar.getPosition().x - leftGearWheel.getSize().x/2,
@@ -148,46 +150,8 @@ public class UIScreenInventory extends UIWindow {
                     toolbar.getPosition().y)
             );
         }
-        inventory.setPosition(new Vector2f(Display.getWidth()/2 - inventory.getSize().x/2, inventory.getPosition().y));
-        super.update();
-    }
-
-    @Override
-    public void setVisible(boolean visible){
-        if(!setVisible){
-            super.setVisible(false);
-            setVisible = true;
-            return;
-        }
-        if(!visible){
-            inventory.setAnimation(new AnimationMove(new Vector2f(inventory.getPosition().x, Display.getHeight() + 5f), 20f));
-            inventory.addAnimationListener(AnimationMove.class, new AnimationListener() {
-                
-                @Override
-                public void stop(UIDisplayElement element) {
-                    
-                }
-                
-                @Override
-                public void start(UIDisplayElement element) {
-                    GUIManager.getInstance().getWindowById("hud").getElementById("leftGearWheel").setVisible(true);
-                    GUIManager.getInstance().getWindowById("hud").getElementById("rightGearWheel").setVisible(true);
-                    element.getParent().getParent().setVisible(false);
-                }
-                
-                @Override
-                public void repeat(UIDisplayElement element) {
-                    
-                }
-            });
-            setVisible = false;
-            inventory.getAnimation(AnimationMove.class).start();
-            leftGearWheel.setAnimation(new AnimationRotate(360f,10f));
-            leftGearWheel.getAnimation(AnimationRotate.class).start();
-            rightGearWheel.setAnimation(new AnimationRotate(-360f,10f));
-            rightGearWheel.getAnimation(AnimationRotate.class).start();
-        }else{
-            super.setVisible(true);
+        if(inventory != null){
+            inventory.setPosition(new Vector2f(Display.getWidth()/2 - inventory.getSize().x/2, inventory.getPosition().y));
         }
     }
 }

@@ -119,7 +119,7 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
         debugLine4 = new UILabel();
         debugLine4.setPosition(new Vector2f(4, 54));
 
-        toolbar = new UIItemContainer(9);
+        toolbar = new UIItemContainer(10);
         toolbar.setVisible(true);
         toolbar.setHorizontalAlign(EHorizontalAlign.CENTER);
         toolbar.setVerticalAlign(EVerticalAlign.BOTTOM);
@@ -173,6 +173,7 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
         layout();
     }
 
+    @Override
     public void update() {
         super.update();
         
@@ -191,7 +192,11 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
             debugLine3.setText(String.format("%s", CoreRegistry.get(WorldRenderer.class)));
             debugLine4.setText(String.format("total vus: %s | active threads: %s", ChunkTessellator.getVertexArrayUpdateCount(), CoreRegistry.get(GameEngine.class).getActiveTaskCount()));
         }
+    }
 
+    @Override
+    public void layout(){
+        super.layout();
         if(leftGearWheel != null && rightGearWheel != null){
             leftGearWheel.setPosition(new Vector2f(
                     toolbar.getPosition().x - leftGearWheel.getSize().x/2,
@@ -202,7 +207,6 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
                     toolbar.getPosition().y)
             );
         }
-
     }
     
     private void updateHealthBar(int currentHealth, int maxHealth) {
@@ -240,7 +244,7 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
     
     @Override
     public void open() {
-        toolbar.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity(), 0, 8);
+        toolbar.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity(), 0, 9);
         leftGearWheel.setVisible(true);
         rightGearWheel.setVisible(true);
         layout();

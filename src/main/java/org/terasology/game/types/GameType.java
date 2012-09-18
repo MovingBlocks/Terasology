@@ -13,13 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.game.types;
 
-uniform sampler2D bindTexture;
-uniform float alpha;
-void main(){
-    vec4 color = texture2D(bindTexture, gl_TexCoord[0].xy);
-    if(color.a>alpha && color.a>0){
-          color.a = alpha;
+import org.terasology.components.HealthComponent;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.rendering.gui.widgets.UIWindow;
+
+public abstract class GameType {
+    private String name = "";
+
+    public String getName(){
+        return name;
+    };
+
+    protected void setName(String name){
+        this.name = name;
     }
-    gl_FragColor = color;
+
+    public void onCreateInventoryHook(UIWindow parent){};
+    public void onPlayerDamageHook(EntityRef entity, HealthComponent health, int damageAmount, EntityRef instigator){};
 }
