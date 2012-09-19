@@ -34,4 +34,9 @@ public class StyleBackgroundColor extends UIImage implements Style {
         super(color);
         setSize("100%", "100%");
     }
+
+    @Override
+    public int getLayer() {
+        return 0;
+    }
 }

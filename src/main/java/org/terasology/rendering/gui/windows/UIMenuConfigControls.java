@@ -316,7 +316,7 @@ public class UIMenuConfigControls extends UIWindow {
         Toolslot9Buttontext.setVisible(true);
         
         GridLayout layout = new GridLayout(4);
-        layout.setPadding(new Vector4f(0f, 20f, 0f, 20f));
+        layout.setCellPadding(new Vector4f(0f, 20f, 0f, 20f));
         
         container = new UIComposite();
         container.setHorizontalAlign(EHorizontalAlign.CENTER);
@@ -325,7 +325,7 @@ public class UIMenuConfigControls extends UIWindow {
         container.setVisible(true);
         
         layout = new GridLayout(2);
-        layout.setPadding(new Vector4f(5f, 5f, 5f, 5f));
+        layout.setCellPadding(new Vector4f(5f, 5f, 5f, 5f));
         layout.setVerticalCellAlign(EVerticalAlign.CENTER);
         
         //group 1

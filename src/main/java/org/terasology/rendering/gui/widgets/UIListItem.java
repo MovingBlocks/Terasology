@@ -32,8 +32,8 @@ import org.terasology.rendering.gui.framework.style.Style;
  */
 public class UIListItem extends UIDisplayContainer {
     
+    private UIList list;
     private Object value;
-    private boolean isDisabled = false;
     private boolean isSelected = false;
     
     //child elements
@@ -71,7 +71,7 @@ public class UIListItem extends UIDisplayContainer {
             
             @Override
             public void enter(UIDisplayElement element) {
-                if(!isSelected() && !isDisabled()) {
+                if(!isSelected() && !getList().isDisabled()) {
                     label.setColor(textSelectionColor);
                 }
             }
@@ -147,14 +147,6 @@ public class UIListItem extends UIDisplayContainer {
         this.value = value;
     }
     
-    public boolean isDisabled() {
-        return isDisabled;
-    }
-
-    public void setDisabled(boolean isDisabled) {
-        this.isDisabled = isDisabled;
-    }
-        
     public boolean isSelected() {
         return isSelected;
     }
@@ -216,5 +208,13 @@ public class UIListItem extends UIDisplayContainer {
     
     public Vector4f getPadding() {
         return label.getMargin();
+    }
+
+    public UIList getList() {
+        return list;
+    }
+
+    public void setList(UIList list) {
+        this.list = list;
     }
 }

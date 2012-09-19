@@ -683,6 +683,21 @@ public abstract class UIDisplayElement {
     public boolean intersects(Vector2f point) {
         return (point.x >= getAbsolutePosition().x && point.y >= getAbsolutePosition().y && point.x <= getAbsolutePosition().x + getSize().x && point.y <= getAbsolutePosition().y + getSize().y);
     }
+    
+    /**
+     * Debug command. Prints the stack of all parent display elements.
+     */
+    public void printParents() {
+        UIDisplayElement parent = this;
+        while (parent != null) {
+            if (parent != this) {
+                System.out.print(" -> ");
+            }
+            System.out.print(parent.getClass().getSimpleName() + " (id: " + parent.getId() + ")");
+            parent = parent.getParent();
+        }
+        System.out.println();
+    }
 
     /**
      * Calculate the absolute position of the display element.

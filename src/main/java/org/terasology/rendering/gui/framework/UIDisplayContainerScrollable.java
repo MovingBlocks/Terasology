@@ -97,7 +97,7 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
                     scrolling = true;
                     
                     //calculate the press point on the scrollbar
-                    scrollbarPressedOffset = Display.getHeight() - Mouse.getY() - scrollbar.getPosition().y - getPosition().y;
+                    scrollbarPressedOffset = Display.getHeight() - Mouse.getY() - scrollbar.getPosition().y - getAbsolutePosition().y;
                 }
             }
         });
@@ -154,7 +154,7 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
      * @param pos The position (y direction) where to move the scrollbar.
      */
     private void moveScrollbar(float pos) {
-        float scrollbarPos = pos - getPosition().y - scrollbarPressedOffset;
+        float scrollbarPos = pos - getAbsolutePosition().y - scrollbarPressedOffset;
         
         if (scrollbarPos < 0) {
             scrollbarPos = 0;
@@ -214,6 +214,8 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
                 moveScrollbar(scrollbar.getAbsolutePosition().y);
             } else {
                 isScrollable = false;
+                
+                multiplier = 1.0f;
                 
                 //disable the scrollbar
                 scrollbar.setVisible(false);

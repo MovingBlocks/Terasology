@@ -32,7 +32,7 @@ import org.terasology.rendering.gui.framework.style.StyleShadow.EShadowDirection
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -46,12 +46,12 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
 
     //child elements
     private final ArrayList<UIDisplayElement> displayElements = new ArrayList<UIDisplayElement>();
-    private final List<Style> styles = new ArrayList<Style>();
+    private final ArrayList<Style> styles = new ArrayList<Style>();
 
     //cropping
     private boolean cropContainer = false;
     protected Vector4f cropMargin = new Vector4f(0.0f, 0.0f,0.0f, 0.0f);
-
+    
     public UIDisplayContainer() {
         super();
     }
@@ -75,7 +75,21 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             glEnable(GL_SCISSOR_TEST);
             glScissor(cropX, cropY, cropWidth, cropHeight);
         }
-
+        
+        UIDisplayElement styleElement;
+        for (Style style : styles) {
+            styleElement = ((UIDisplayElement)style);
+            allowsCrop = cropContainer && !styleElement.isCrop();
+            if (allowsCrop) {
+                glDisable(GL_SCISSOR_TEST);
+            }
+            styleElement.renderTransformed();
+            if (allowsCrop) {
+                glEnable(GL_SCISSOR_TEST);
+                glScissor(cropX, cropY, cropWidth, cropHeight);
+            }
+        }
+        
         // Render all display elements
         for (int i = 0; i < displayElements.size(); i++) {
             allowsCrop = cropContainer && !displayElements.get(i).isCrop();
@@ -89,6 +103,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             }
         }
 
+
         if (cropContainer) {
             glDisable(GL_SCISSOR_TEST);
         }
@@ -97,12 +112,18 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     public void update() {
         if (!isVisible())
             return;
+        
+        super.update();
+        
+        //update styles
+        for (Style style : styles) {
+            ((UIDisplayElement)style).update();
+        }
 
         // Update all display elements
         for (int i = 0; i < displayElements.size(); i++) {
             displayElements.get(i).update();
         }
-        super.update();
     }
     
     public void layout() {
@@ -110,6 +131,11 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             return;
         
         super.layout();
+        
+        //update layout styles
+        for (Style style : styles) {
+            ((UIDisplayElement)style).layout();
+        }
 
         // Update layout of all display elements
         for (int i = 0; i < displayElements.size(); i++) {
@@ -231,6 +257,39 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         
         layout();
     }
+    
+    /**
+     * 
+     * @param element
+     * @param index
+     */
+    public void orderDisplayElement(UIDisplayElement element, int index) {
+        //TODO implement
+    }
+    
+    /**
+     * Change the z-order of the given display element. Move it to the top, over all other display elements.
+     * @param element The element to change the z-order.
+     */
+    public void orderDisplayElementTop(UIDisplayElement element) {
+        int pos = getDisplayElements().indexOf(element);
+        
+        if (pos != -1) {
+            Collections.rotate(getDisplayElements().subList(pos, getDisplayElements().size()), -1);
+        }
+    }
+    
+    /**
+     * Change the z-order of the given display element. Move it to the bottom, under all other display elements.
+     * @param element The element to change the z-order.
+     */
+    public void orderDisplayElementBottom(UIDisplayElement element) {
+        int pos = getDisplayElements().indexOf(element);
+        
+        if (pos != -1) {
+            Collections.rotate(getDisplayElements().subList(pos, getDisplayElements().size()), 1);
+        }
+    }
 
     /**
      * Get the list of all display elements of the display container.
@@ -273,7 +332,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * @param style The style class.
      * @return Returns the style class if one was added to the display container or null if none was added.
      */
-    private <T> T getStyle(Class<T> style) {
+    public <T> T getStyle(Class<T> style) {
         for (Style s : styles) {
             if (s.getClass() == style) {
                 return style.cast(s);
@@ -286,21 +345,24 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     /**
      * Add a style.
      * @param style The style to add.
-     * @param listStart True to add the style at the beginning of the display element list.
-     * 
-     * TODO need to put particular styles at the particular position.. (background at the beginning, border on top) -> don't add styles to the display element list
      */
-    private void addStyle(Style style, boolean listStart) {
-        styles.add(style);
-        
-        UIDisplayElement element = (UIDisplayElement) style;
-        if (listStart) {
-            displayElements.add(0, element);
-        } else {
-            displayElements.add(element);
+    protected void addStyle(Style style) {        
+        boolean added = false;
+        for (int i = 0; i < styles.size(); i++) {
+            if (styles.get(i).getLayer() > style.getLayer()) {
+                styles.add(i, style);
+                added = true;
+                
+                break;
+            }
         }
         
-        element.setParent(this);
+        if (!added) {
+            styles.add(style);
+        }
+        
+        ((UIDisplayElement) style).setParent(this);
+        
         layout();
     }
     
@@ -308,9 +370,8 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
      * Removes a style.
      * @param style The style to remove.
      */
-    private void removeStyle(Style style) {
+    protected void removeStyle(Style style) {
         styles.remove(style);
-        removeDisplayElement((UIDisplayElement) style);
     }
     
     /**
@@ -325,7 +386,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         if (style == null) {
             style = new StyleBackgroundColor(color);
             style.setVisible(true);
-            addStyle(style, true);
+            addStyle(style);
         } else {
             style.setColor(color);
         }
@@ -340,7 +401,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         if (style == null) {
             style = new StyleBackgroundColor(color);;
             style.setVisible(true);
-            addStyle(style, true);
+            addStyle(style);
         } else {
             style.setColor(color);
         }
@@ -368,7 +429,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             style.setTextureOrigin(new Vector2f(0f, 0f));
             style.setTextureSize(new Vector2f(style.getTexture().getWidth(), style.getTexture().getHeight()));
             style.setVisible(true);
-            addStyle(style, true);
+            addStyle(style);
         } else {
             //check if same texture is already loaded
             if (!style.getTexture().getURI().toString().equals("texture:" + texture)) {
@@ -391,7 +452,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             style.setTextureOrigin(origin);
             style.setTextureSize(size);
             style.setVisible(true);
-            addStyle(style, true);
+            addStyle(style);
         } else {
             //check if same texture is already loaded
             if (!style.getTexture().getURI().toString().equals("texture:" + texture)) {
@@ -490,7 +551,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             style = new StyleBorderSolid(width, color);
             style.setSize("100%", "100%");
             style.setVisible(true);
-            addStyle(style, false);
+            addStyle(style);
         } else {
             style.setColor(color);
             style.setWidth(width);
@@ -509,7 +570,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             style = new StyleBorderSolid(width, color);
             style.setSize("100%", "100%");
             style.setVisible(true);
-            addStyle(style, false);
+            addStyle(style);
         } else {
             style.setColor(color);
             style.setWidth(width);
@@ -541,7 +602,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             style = new StyleBorderImage(AssetManager.loadTexture(texture));
             style.setBorderSource(origin, size, borderSize);
             style.setVisible(true);
-            addStyle(style, false);
+            addStyle(style);
         } else {
             //check if same texture is already loaded
             if (!style.getTexture().getURI().toString().equals("texture:" + texture)) {
@@ -576,7 +637,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
             style = new StyleShadow(width, direction, opacity);
             style.setSize("100%", "100%");
             style.setVisible(true);
-            addStyle(style, false);
+            addStyle(style);
         } else {
             style.setWidth(width);
             style.setDirection(direction);

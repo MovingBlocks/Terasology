@@ -180,8 +180,7 @@ public class UIDialogBox extends UIWindow {
         closeButton.setHorizontalAlign(EHorizontalAlign.RIGHT);
         closeButton.setPosition(new Vector2f(-2, 0f));
         closeButton.setVisible(true);
-
-        addDisplayElementToPosition(0, overlay);
+        
         addDisplayElement(closeButton);
         addDisplayElement(container);
     }

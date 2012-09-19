@@ -34,6 +34,11 @@ public class StyleBackgroundImage extends UIImage implements Style {
     
     @Override
     public void setPosition(Vector2f position) {
-
-    }    
+        //TODO implement
+    }
+    
+    @Override
+    public int getLayer() {
+        return 1;
+    }
 }

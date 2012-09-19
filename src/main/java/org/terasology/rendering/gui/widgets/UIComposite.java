@@ -19,13 +19,14 @@ import javax.vecmath.Vector2f;
 
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.style.Style;
 import org.terasology.rendering.gui.layout.Layout;
 
 /**
  * Composition of multiple display elements which can be arranged in a specific manner by setting a layout type. Similar to the SWT composite class.
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  * @see org.eclipse.swt.widgets.Composite
- * 
+ * TODO Adding a lot of display elements in a loop is inefficient.
  */
 public class UIComposite extends UIDisplayContainer {
     
@@ -45,9 +46,20 @@ public class UIComposite extends UIDisplayContainer {
     }
     
     @Override
+    public void setSize(String width, String height) {
+        super.setSize(width, height);
+        customSize = true;
+    }
+    
+    @Override
+    public void setSize(Vector2f size) {
+        super.setSize(size);
+        customSize = true;
+    }
+    
+    @Override
     public void addDisplayElement(UIDisplayElement element) {
         super.addDisplayElement(element);
-        
         applyLayout();
     }
 
@@ -73,17 +85,17 @@ public class UIComposite extends UIDisplayContainer {
     }
     
     @Override
-    public void setSize(String width, String height) {
-        super.setSize(width, height);
-        customSize = true;
+    protected void addStyle(Style style) {
+        //we override this to access it in the UITabFolder
+        super.addStyle(style);
     }
     
     @Override
-    public void setSize(Vector2f size) {
-        super.setSize(size);
-        customSize = true;
+    protected void removeStyle(Style style) {
+        //we override this to access it in the UITabFolder
+        super.removeStyle(style);
     }
-     
+    
     public Layout getLayout() {
         return compositeLayout;
     }

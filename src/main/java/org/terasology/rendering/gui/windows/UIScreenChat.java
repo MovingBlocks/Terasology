@@ -101,7 +101,6 @@ public class UIScreenChat extends UIWindow {
         inputBox = new UIText();
         inputBox.setSize(new Vector2f(900f, 28f));
         inputBox.setBackgroundColor(new Color(255, 255, 255, 200));
-        inputBox.setBorderSolid(new Vector4f(1f, 1f, 1f, 1f), new Color(0, 0, 0));
         inputBox.setVerticalAlign(EVerticalAlign.BOTTOM);
         inputBox.setSelectionColor(Color.gray);
         inputBox.setPosition(new Vector2f(2, -2));

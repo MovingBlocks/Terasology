@@ -49,7 +49,8 @@ import java.util.logging.Logger;
  */
 public class UIImage extends UIDisplayContainer {
     private Logger logger = Logger.getLogger(getClass().getName());
-
+    
+    private Color color;
     private Texture texture;
 
     private Vector2f textureOrigin = new Vector2f(0.0f, 0.0f);
@@ -186,6 +187,10 @@ public class UIImage extends UIDisplayContainer {
         return texture;
     }
     
+    public Color getColor() {
+        return color;
+    }
+    
     public void setColor(Color color) {
         generateMesh(color);
     }
@@ -216,6 +221,8 @@ public class UIImage extends UIDisplayContainer {
         if (mesh != null) {
             mesh.dispose();
         }
+        
+        this.color = color;
         
         Tessellator tessellator = new Tessellator();
         TessellatorHelper.addGUIQuadMesh(tessellator, new Vector4f(color.r, color.g, color.b, color.a), 1.0f, 1.0f);

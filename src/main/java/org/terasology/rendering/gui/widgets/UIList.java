@@ -40,7 +40,7 @@ public class UIList extends UIDisplayContainerScrollable {
     
     //events
     private final ArrayList<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
-    private final List<SelectionListener> selectionChangedListeners = new ArrayList<SelectionListener>();
+    private final List<SelectionListener> selectionListeners = new ArrayList<SelectionListener>();
     private final ArrayList<ClickListener> doubleClickListeners = new ArrayList<ClickListener>();
     
     //child elements
@@ -88,14 +88,14 @@ public class UIList extends UIDisplayContainerScrollable {
                     lastButton = button;
                     
                     //select the item
-                    select(getItemIndex(item));
+                    select(getItem(item));
                 }
             }
         });
-        item.setDisabled(isDisabled);
         item.setVisible(true);
         
         list.addDisplayElementToPosition(index, item);
+        item.setList(this);
         
         layout();
         
@@ -111,22 +111,39 @@ public class UIList extends UIDisplayContainerScrollable {
     }
     
     /**
+     * Remove an item from the list.
+     * @param item Reference of the item to remove.
+     */
+    public void removeItem(UIListItem item) {
+        List<UIListItem> items = getItems();
+        if (items.contains(item)) {
+            int selectionIndex = -1;
+            if (item == selection) {
+                selectionIndex = getSelectionIndex();
+            }
+            
+            list.removeDisplayElement(item);
+            
+            layout();
+            
+            notifyChangedListeners();
+            
+            if (selectionIndex != -1) {
+                if (selectionIndex < getItemCount()) {
+                    select(selectionIndex);
+                } else if (selectionIndex > 0) {
+                    select(selectionIndex - 1);
+                }
+            }
+        }
+    }
+    
+    /**
      * Remove an item at a specific location.
      * @param index The index of the item to remove.
      */
     public void removeItem(int index) {
-        list.removeDisplayElement(getItems().get(index));
-        
-        //select next item
-        if (index < getItemCount()) {
-            select(index);
-        } else if (index > 0) {
-            select(index - 1);
-        }
-        
-        layout();
-        
-        notifyChangedListeners();
+        removeItem(getItem(index));
     }
     
     /**
@@ -153,7 +170,27 @@ public class UIList extends UIDisplayContainerScrollable {
      * @return Returns the selected item index of -1 if none is selected.
      */
     public int getSelectionIndex() {
-        return getItemIndex(selection);
+        return getItem(selection);
+    }
+    
+    /**
+     * Select a specific item in the list.
+     * @param item The reference of the item to select.
+     */
+    public void select(UIListItem item) {
+        List<UIListItem> items = getItems();
+        if (items.contains(item)) {
+            if (item != selection && !isDisabled) {
+                if (selection != null) {
+                    selection.setSelected(false);
+                }
+                
+                item.setSelected(true);
+                selection = item;
+                
+                notifySelectionListeners();
+            }
+        }
     }
     
     /**
@@ -161,16 +198,7 @@ public class UIList extends UIDisplayContainerScrollable {
      * @param index The item index to select.
      */
     public void select(int index) {
-        if (index != getItemIndex(selection) && !isDisabled) {
-            if (selection != null) {
-                selection.setSelected(false);
-            }
-            
-            getItem(index).setSelected(true);
-            selection = getItem(index);
-            
-            notifySelectionChangedListeners();
-        }
+        select(getItem(index));
     }
     
     /**
@@ -186,7 +214,7 @@ public class UIList extends UIDisplayContainerScrollable {
      * @param item The item reference to get the index from.
      * @return Returns the item index or -1 if item is not in the list.
      */
-    public int getItemIndex(UIListItem item) {
+    public int getItem(UIListItem item) {
         List<UIListItem> list = getItems();
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i) == item) {
@@ -227,10 +255,6 @@ public class UIList extends UIDisplayContainerScrollable {
 
     public void setDisabled(boolean disabled) {
         this.isDisabled = disabled;
-        
-        for (UIListItem item : getItems()) {
-            item.setDisabled(disabled);
-        }
     }
     
     /*
@@ -251,18 +275,18 @@ public class UIList extends UIDisplayContainerScrollable {
         doubleClickListeners.remove(listener);
     }
      
-    private void notifySelectionChangedListeners() {
-        for (SelectionListener listener : selectionChangedListeners) {
+    private void notifySelectionListeners() {
+        for (SelectionListener listener : selectionListeners) {
             listener.changed(this);
         }
     }
      
-    public void addSelectionChangedListener(SelectionListener listener) {
-        selectionChangedListeners.add(listener);
+    public void addSelectionListener(SelectionListener listener) {
+        selectionListeners.add(listener);
     }
     
-    public void removeSelectionChangedListener(SelectionListener listener) {
-        selectionChangedListeners.remove(listener);
+    public void removeSelectionListener(SelectionListener listener) {
+        selectionListeners.remove(listener);
     }
     
     private void notifyChangedListeners() {
