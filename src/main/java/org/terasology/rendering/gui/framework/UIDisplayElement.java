@@ -166,6 +166,11 @@ public abstract class UIDisplayElement {
         if (mouseListeners.size() > 0 || mouseButtonListeners.size() > 0 || clickListeners.size() > 0) {
             if (intersects(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()))) {
                 if (!croped) {
+                    if (lastMouseState == EMouseEvents.ENTER && (consumed || croped)) {
+                        notifyMouseListeners(EMouseEvents.LEAVE, consumed);
+                        lastMouseState = EMouseEvents.LEAVE;
+                    }
+                    
                     //mouse button listeners
                     if (button != -1 && state && !mouseIsDown) {            //mouse down
                         notifyMouseButtonListeners(button, true, wheelMoved, true, consumed);
@@ -186,9 +191,6 @@ public abstract class UIDisplayElement {
                         }
                     }
                     
-                    //mouse position listeners
-                    notifyMouseListeners(EMouseEvents.HOVER, consumed);
-                    
                     if (lastMouseState == EMouseEvents.LEAVE || lastMouseState == null) {
                         notifyMouseListeners(EMouseEvents.ENTER, consumed);
                         if (!consumed) {
@@ -198,11 +200,22 @@ public abstract class UIDisplayElement {
                                 consumed = true;
                             }
                         }
-                    }
+                    } 
                     
                     //mouse wheel listeners
                     if (wheelMoved != 0) {
                         notifyMouseButtonListeners(-1, false, wheelMoved, true, consumed);
+                    }
+                    
+                    //mouse position listeners
+                    notifyMouseListeners(EMouseEvents.HOVER, consumed);
+                    
+                    if (!consumed) {
+                        lastMouseState = EMouseEvents.ENTER;
+                        if (consumeEvents) {
+                            //System.out.println("consumed mouse hover event: " + this);
+                            consumed = true;
+                        }
                     }
                 } else {
                     if (lastMouseState == EMouseEvents.ENTER) {
@@ -792,10 +805,8 @@ public abstract class UIDisplayElement {
     
     private void notifyMouseButtonListeners(int button, boolean state, int wheel, boolean intersect, boolean consumed) {
         if (button == -1) {
-            if (!consumed) {
-                for (MouseButtonListener listener : mouseButtonListeners) {
-                    listener.wheel(this, wheel, intersect);
-                }
+            for (MouseButtonListener listener : mouseButtonListeners) {
+                listener.wheel(this, wheel, intersect);
             }
         }
         else if (state) {
