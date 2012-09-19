@@ -170,23 +170,23 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
     }
 
     @Override
-    public boolean processMouseInput(int button, boolean state, int wheelMoved, boolean consumed) {
+    public boolean processMouseInput(int button, boolean state, int wheelMoved, boolean consumed, boolean croped) {
         if (!isVisible())
             return consumed;
         
         //cancel mouse click event if the click is out of the cropped area
         if (cropContainer) {
             if (!intersects(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()))) {
-                state = false;
+                croped = true;
             }
         }
 
         // Pass the mouse event to all display elements
         for (int i = displayElements.size() - 1; i >= 0; i--) {
-            consumed = displayElements.get(i).processMouseInput(button, state, wheelMoved, consumed);
+            consumed = displayElements.get(i).processMouseInput(button, state, wheelMoved, consumed, croped);
         }
         
-        consumed = super.processMouseInput(button, state, wheelMoved, consumed);
+        consumed = super.processMouseInput(button, state, wheelMoved, consumed, croped);
         
         return consumed;
     }

@@ -24,6 +24,8 @@ import org.terasology.logic.manager.InputConfig;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.ClickListener;
+import org.terasology.rendering.gui.framework.events.KeyListener;
+import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.layout.GridLayout;
 import org.terasology.rendering.gui.widgets.UIButton;
 import org.terasology.rendering.gui.widgets.UIComposite;
@@ -116,6 +118,57 @@ public class UIMenuConfigControls extends UIWindow {
         setBackgroundImage("engine:loadingbackground");
         setModal(true);
         maximize();
+        
+        addMouseButtonListener(new MouseButtonListener() {
+            @Override
+            public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
+                if (editButton != null) {
+                    int key = -1;
+                    if (wheel > 0)
+                        key = 259;
+                    else if (wheel < 0)
+                        key = 260;
+                    
+                    if (key != -1) {
+                        changeButton(editButton, key);
+                        editButton = null;
+                    }
+                }
+            }
+            
+            @Override
+            public void up(UIDisplayElement element, int button, boolean intersect) {
+                
+            }
+            
+            @Override
+            public void down(UIDisplayElement element, int button, boolean intersect) {
+                if (editButton != null) {
+                    int key = -1;
+                    if (button == 0)
+                        key = 256;
+                    else if (button == 1)
+                        key = 257;
+                    else if (button == 2)
+                        key = 258;
+                    
+                    if (key != -1) {
+                        changeButton(editButton, key);
+                        editButton = null;
+                    }
+                }
+            }
+        });
+        
+        addKeyListener(new KeyListener() {
+            @Override
+            public void key(UIDisplayElement element, KeyEvent event) {
+                if (editButton != null) {
+                    changeButton(editButton, event.getKey());
+                    editButton = null;
+                }
+            }
+        });
         
         ClickListener editButtonClick = new ClickListener() {
             @Override
@@ -417,42 +470,6 @@ public class UIMenuConfigControls extends UIWindow {
         addDisplayElement(_backToConfigMenuButton);
         
         setup();
-    }
-    
-    @Override
-    public void processKeyboardInput(KeyEvent event) {
-        super.processKeyboardInput(event);
-        
-        if (editButton != null) {
-            changeButton(editButton, event.getKey());
-            editButton = null;
-        }
-    }
-
-    @Override
-    public boolean processMouseInput(int button, boolean state, int wheelMoved, boolean consumed) {
-        if (editButton != null) {
-            int key = -1;
-            if (button == 0)
-                key = 256;
-            else if (button == 1)
-                key = 257;
-            else if (button == 2)
-                key = 258;
-            else if (wheelMoved > 0)
-                key = 259;
-            else if (wheelMoved < 0)
-                key = 260;
-            
-            if (key != -1) {
-                changeButton(editButton, key);
-                editButton = null;
-            }
-        }
-        
-        consumed = super.processMouseInput(button, state, wheelMoved, consumed);
-        
-        return consumed;
     }
     
     private void changeButton(UIButton button, int key) {
