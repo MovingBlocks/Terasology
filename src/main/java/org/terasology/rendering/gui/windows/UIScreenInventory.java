@@ -33,10 +33,8 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.AnimationListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.VisibilityListener;
-import org.terasology.rendering.gui.widgets.UIImage;
-import org.terasology.rendering.gui.widgets.UIItemCell;
-import org.terasology.rendering.gui.widgets.UIItemContainer;
-import org.terasology.rendering.gui.widgets.UIWindow;
+import org.terasology.rendering.gui.layout.GridLayout;
+import org.terasology.rendering.gui.widgets.*;
 
 /**
  * The player's inventory.
@@ -72,15 +70,18 @@ public class UIScreenInventory extends UIWindow {
 
                     GUIManager.getInstance().getWindowById("hud").getElementById("leftGearWheel").setVisible(false);
                     GUIManager.getInstance().getWindowById("hud").getElementById("rightGearWheel").setVisible(false);
-
-                    inventory.setPosition(new Vector2f(toolbar.getAbsolutePosition().x, Display.getHeight() + 5f));
+                    layout();
+                    inventory.setPosition(new Vector2f(Display.getWidth()/2 - inventory.getSize().x/2, Display.getHeight() + 5f));
                     inventory.setAnimation(new AnimationMove(new Vector2f(Display.getWidth() / 2 - inventory.getSize().x / 2, Display.getHeight() - 192f), 20f));
                     inventory.getAnimation(AnimationMove.class).start();
+
                     leftGearWheel.setAnimation(new AnimationRotate(-120f,10f));
                     leftGearWheel.getAnimation(AnimationRotate.class).start();
                     rightGearWheel.setAnimation(new AnimationRotate(120f,10f));
                     rightGearWheel.getAnimation(AnimationRotate.class).start();
-                    layout();
+                }else{
+                    GUIManager.getInstance().getWindowById("hud").getElementById("leftGearWheel").setVisible(true);
+                    GUIManager.getInstance().getWindowById("hud").getElementById("rightGearWheel").setVisible(true);
                 }
             }
         });
@@ -125,33 +126,29 @@ public class UIScreenInventory extends UIWindow {
         leftGearWheel.setTextureSize(new Vector2f(27.0f, 27.0f));
         leftGearWheel.setVisible(true);
 
+        leftGearWheel.setHorizontalAlign(EHorizontalAlign.CENTER);
+        leftGearWheel.setVerticalAlign(EVerticalAlign.BOTTOM);
+        leftGearWheel.setPosition(new Vector2f(
+                leftGearWheel.getPosition().x - 240f,
+                leftGearWheel.getPosition().y - 4f)
+        );
+
         rightGearWheel = new UIImage(AssetManager.loadTexture("engine:inventory"));
         rightGearWheel.setSize(new Vector2f(36f, 36f));
         rightGearWheel.setTextureOrigin(new Vector2f(121.0f, 168.0f));
         rightGearWheel.setTextureSize(new Vector2f(27.0f, 27.0f));
         rightGearWheel.setVisible(true);
 
+        rightGearWheel.setHorizontalAlign(EHorizontalAlign.CENTER);
+        rightGearWheel.setVerticalAlign(EVerticalAlign.BOTTOM);
+        rightGearWheel.setPosition(new Vector2f(
+                rightGearWheel.getPosition().x + 240f,
+                rightGearWheel.getPosition().y - 4f)
+        );
+
         addDisplayElement(rightGearWheel);
         addDisplayElement(leftGearWheel);
         addDisplayElement(inventory);
         addDisplayElement(toolbar);
-    }
-
-    @Override
-    public void layout(){
-        super.layout();
-        if(leftGearWheel != null && rightGearWheel != null){
-            leftGearWheel.setPosition(new Vector2f(
-                    toolbar.getPosition().x - leftGearWheel.getSize().x/2,
-                    toolbar.getPosition().y)
-            );
-            rightGearWheel.setPosition(new Vector2f(
-                    toolbar.getPosition().x + toolbar.getSize().x - rightGearWheel.getSize().x/2,
-                    toolbar.getPosition().y)
-            );
-        }
-        if(inventory != null){
-            inventory.setPosition(new Vector2f(Display.getWidth()/2 - inventory.getSize().x/2, inventory.getPosition().y));
-        }
     }
 }

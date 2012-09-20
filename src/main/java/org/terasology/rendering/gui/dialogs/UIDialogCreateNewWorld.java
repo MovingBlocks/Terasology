@@ -97,7 +97,7 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
         typeOfGameLabel.setSize(new Vector2f(0f, 16f));
         typeOfGameLabel.setVisible(true);
 
-        typeOfGame = new UIComboBox(new Vector2f(176f, 22f), new Vector2f(176f, 48f));
+        typeOfGame = new UIComboBox(new Vector2f(176f, 22f), new Vector2f(176f, 50f));
         UIListItem item = new UIListItem(new SurvivalType().getName(), new SurvivalType());
         item.setTextColor(Color.black);
         item.setPadding(new Vector4f(5f, 5f, 5f, 5f));

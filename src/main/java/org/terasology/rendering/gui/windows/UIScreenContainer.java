@@ -19,11 +19,15 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.game.CoreRegistry;
 import org.terasology.input.binds.FrobButton;
 import org.terasology.asset.AssetManager;
+import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.animation.AnimationMove;
 import org.terasology.rendering.gui.animation.AnimationRotate;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.events.VisibilityListener;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UIItemContainer;
 import org.terasology.rendering.gui.widgets.UIWindow;
@@ -56,6 +60,16 @@ public class UIScreenContainer extends UIWindow {
         setCloseBinds(new String[] {FrobButton.ID});
         setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
 
+        addVisibilityListener(new VisibilityListener() {
+            @Override
+            public void changed(UIDisplayElement element, boolean visibility) {
+                if (!visibility) {
+                    GUIManager.getInstance().getWindowById("hud").getElementById("leftGearWheel").setVisible(true);
+                    GUIManager.getInstance().getWindowById("hud").getElementById("rightGearWheel").setVisible(true);
+                }
+            }
+        });
+
         playerToolbar = new UIItemContainer(10);
         playerToolbar.setVisible(true);
         playerToolbar.setHorizontalAlign(EHorizontalAlign.CENTER);
@@ -80,11 +94,25 @@ public class UIScreenContainer extends UIWindow {
         leftGearWheel.setTextureSize(new Vector2f(27.0f, 27.0f));
         leftGearWheel.setVisible(true);
 
+        leftGearWheel.setHorizontalAlign(EHorizontalAlign.CENTER);
+        leftGearWheel.setVerticalAlign(EVerticalAlign.BOTTOM);
+        leftGearWheel.setPosition(new Vector2f(
+                leftGearWheel.getPosition().x - 240f,
+                leftGearWheel.getPosition().y - 4f)
+        );
+
         rightGearWheel = new UIImage(AssetManager.loadTexture("engine:inventory"));
         rightGearWheel.setSize(new Vector2f(36f, 36f));
         rightGearWheel.setTextureOrigin(new Vector2f(121.0f, 168.0f));
         rightGearWheel.setTextureSize(new Vector2f(27.0f, 27.0f));
         rightGearWheel.setVisible(true);
+
+        rightGearWheel.setHorizontalAlign(EHorizontalAlign.CENTER);
+        rightGearWheel.setVerticalAlign(EVerticalAlign.BOTTOM);
+        rightGearWheel.setPosition(new Vector2f(
+                rightGearWheel.getPosition().x + 240f,
+                rightGearWheel.getPosition().y - 4f)
+        );
 
         addDisplayElement(rightGearWheel);
         addDisplayElement(leftGearWheel);
@@ -94,29 +122,6 @@ public class UIScreenContainer extends UIWindow {
         addDisplayElement(containerInventory);
 
         layout();
-    }
-
-
-    @Override
-    public void layout(){
-        super.layout();
-        if(leftGearWheel != null && rightGearWheel != null){
-            leftGearWheel.setPosition(new Vector2f(
-                    playerToolbar.getPosition().x - leftGearWheel.getSize().x/2,
-                    playerToolbar.getPosition().y)
-            );
-            rightGearWheel.setPosition(new Vector2f(
-                    playerToolbar.getPosition().x + playerToolbar.getSize().x - rightGearWheel.getSize().x/2,
-                    playerToolbar.getPosition().y)
-            );
-        }
-        if(playerInventory != null){
-            playerInventory.setPosition(new Vector2f(Display.getWidth()/2 - playerInventory.getSize().x/2, playerInventory.getPosition().y));
-        }
-
-        if(containerInventory != null){
-            containerInventory.setPosition(new Vector2f(0f, Display.getHeight() - 212f - containerInventory.getSize().y));
-        }
     }
 
     public void openContainer(EntityRef container, EntityRef creature) {
@@ -135,6 +140,7 @@ public class UIScreenContainer extends UIWindow {
         GUIManager.getInstance().getWindowById("hud").getElementById("leftGearWheel").setVisible(false);
         GUIManager.getInstance().getWindowById("hud").getElementById("rightGearWheel").setVisible(false);
         layout();
+
         playerInventory.setPosition(new Vector2f(Display.getWidth()/2 - playerInventory.getSize().x/2, Display.getHeight() + 5f));
         playerInventory.setAnimation(new AnimationMove(new Vector2f(Display.getWidth() / 2 - playerInventory.getSize().x / 2, Display.getHeight() - 192f), 20f));
         playerInventory.getAnimation(AnimationMove.class).start();

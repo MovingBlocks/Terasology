@@ -70,7 +70,7 @@ public class FreeStyleType extends GameType {
     public void onCreateInventoryHook(UIWindow parent) {
 
         inventoryParent = parent;
-        GridLayout layout = new GridLayout(11);
+        GridLayout layout = new GridLayout(10);
         //layout.setPadding(new Vector4f(0f, 2f, 2f, 2f));
 
         inventoryContainer = new UICompositeScrollable();
