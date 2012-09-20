@@ -85,6 +85,7 @@ public class UIScreenContainer extends UIWindow {
         containerInventory = new UIItemContainer(10);
         containerInventory.setVisible(true);
         containerInventory.setHorizontalAlign(EHorizontalAlign.CENTER);
+        containerInventory.setVerticalAlign(EVerticalAlign.CENTER);
         containerInventory.setCellMargin(new Vector2f(0f, 0f));
         containerInventory.setBorderImage("engine:inventory", new Vector2f(0f, 84f), new Vector2f(169f, 61f), new Vector4f(5f, 4f, 3f, 4f));
 
