@@ -24,6 +24,7 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 import com.google.gson.GsonBuilder;
+import org.terasology.game.types.GameType;
 
 /**
  * Summary information on a world.
@@ -39,11 +40,11 @@ public class WorldInfo {
     private long time = 0;
     private Map<String, Byte> blockIdMap = Maps.newHashMap();
     private String[] chunkGenerators = new String[] {};
-
+    private String gameType = null;
     public WorldInfo() {
     }
 
-    public WorldInfo(String title, String seed, long time, String[] chunkGenerators) {
+    public WorldInfo(String title, String seed, long time, String[] chunkGenerators, String gameType) {
         if (title != null) {
             this.title = title;
         }
@@ -54,6 +55,7 @@ public class WorldInfo {
         	this.chunkGenerators = chunkGenerators;
         }
         this.time = time;
+        this.gameType = gameType;
     }
 
     public static void save(File toFile, WorldInfo worldInfo) throws IOException {
@@ -101,6 +103,10 @@ public class WorldInfo {
 
     public void setTime(long time) {
         this.time = time;
+    }
+
+    public String getGameType(){
+        return gameType;
     }
 
     public Map<String, Byte> getBlockIdMap() {
