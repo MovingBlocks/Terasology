@@ -203,28 +203,19 @@ public class UIText extends UIDisplayContainerScrollable {
                 }
                 //cut selection
                 else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_X && event.isDown()) {
-                    setClipboard(getSelection());
-                    deleteSelection();
+                    cut();
                     
                     event.consume();
                 }
                 //copy selection
                 else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_C && event.isDown()) {
-                    setClipboard(getSelection());
+                    copy();
                     
                     event.consume();
                 }
                 //paste selection
                 else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_V && event.isDown()) {
-                    if (selectionStart != selectionEnd) {
-                        deleteSelection();
-                    }
-                    
-                    String clipboard = removeUnsupportedChars(getClipboard());
-                    
-                    int num = insertText(getWrapOffset(cursorPosition), clipboard);
-                    
-                    setCursorToTextPosition(cursorPosition + num);
+                    paste();
                     
                     event.consume();
                 }
@@ -993,7 +984,22 @@ public class UIText extends UIDisplayContainerScrollable {
     }
     
     /**
-     * Select a text.
+     * Sets the selection.
+     * @param start The start of the selection.
+     */
+    public void setSelection(int start) {
+        selectionStart = start;
+        selectionEnd = getText().length();
+        
+        selectionRectangle.updateSelection(start, selectionEnd);
+        
+        setCursorToTextPosition(selectionEnd);
+        
+        notifySelectionListeners();
+    }
+    
+    /**
+     * Sets the selection to the range specified by the given start and end indices.
      * @param start The start index of the selection.
      * @param end The end index of the selection.
      */
@@ -1046,6 +1052,27 @@ public class UIText extends UIDisplayContainerScrollable {
             
             notifySelectionListeners();
         }
+    }
+    
+    public void copy() {
+        setClipboard(getSelection());
+    }
+    
+    public void cut() {
+        setClipboard(getSelection());
+        deleteSelection();
+    }
+    
+    public void paste() {
+        if (selectionStart != selectionEnd) {
+            deleteSelection();
+        }
+        
+        String clipboard = removeUnsupportedChars(getClipboard());
+        
+        int num = insertText(getWrapOffset(cursorPosition), clipboard);
+        
+        setCursorToTextPosition(cursorPosition + num);
     }
     
     /**
