@@ -58,7 +58,6 @@ public class UITabItem extends UIDisplayContainerScrollable {
         
         private UITab(UITabItem tabItem) {
             this.tabItem = tabItem;
-            setBackgroundColor(new Color(200, 200, 150));
             select(false);
             
             addClickListener(new ClickListener() {

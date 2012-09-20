@@ -103,9 +103,9 @@ public class UITabFolder extends UIDisplayContainer {
     }
     
     /**
-     * 
-     * @param index
-     * @param item
+     * Add an tab item to a specific location in the tab folder.
+     * @param index The index, where the tab item should be added.
+     * @param item The tab item to add.
      */
     public void addItem(int index, UITabItem item) {
         item.setPosition(new Vector2f(0f, 0f));
@@ -126,16 +126,16 @@ public class UITabFolder extends UIDisplayContainer {
     }
     
     /**
-     * 
-     * @param item
+     * Add an tab item to the tab folder.
+     * @param item The item to add.
      */
     public void addItem(UITabItem item) {
         addItem(getItemCount(), item);
     }
     
     /**
-     * 
-     * @param item
+     * Remove an tab item from the tab folder.
+     * @param item Reference of the tab item to remove.
      */
     public void removeItem(UITabItem item) {
         tabsBar.removeDisplayElement(item.getTab());
@@ -145,15 +145,15 @@ public class UITabFolder extends UIDisplayContainer {
     }
     
     /**
-     * 
-     * @param index
+     * Remove an tab item.
+     * @param index The index of the tab item to remove.
      */
     public void removeItem(int index) {
         removeItem(getItem(index));
     }
     
     /**
-     * 
+     * Remove all items.
      */
     public void removeAll() {
         tabsBar.removeAllDisplayElements();
@@ -163,24 +163,24 @@ public class UITabFolder extends UIDisplayContainer {
     }
     
     /**
-     * 
-     * @return
+     * Get the selected tab item.
+     * @return Returns the selected tab item or null if none is selected.
      */
     public UITabItem getSelection() {
         return selection;
     }
     
     /**
-     * 
-     * @return
+     * Get the selected tab item index.
+     * @return Returns the selected tab item index of -1 if none is selected.
      */
     public int getSelectionIndex() {
         return getItem(selection);
     }
     
     /**
-     * 
-     * @param item
+     * Select a specific tab item in the list.
+     * @param item The reference of the tab item to select.
      */
     public void select(UITabItem item) {
         List<UITabItem> items = getItems();
@@ -201,25 +201,25 @@ public class UITabFolder extends UIDisplayContainer {
     }
     
     /**
-     * 
-     * @param index
+     * Select a specific tab item in the list.
+     * @param index The tab item index to select.
      */
     public void select(int index) {
         select(getItem(index));
     }
     
     /**
-     * 
-     * @return
+     * Get the number of tabs in the tab folder.
+     * @return Returns the number of tabs in the tab folder.
      */
     public int getItemCount() {
         return getItems().size();
     }
     
     /**
-     * 
-     * @param item
-     * @return
+     * Get the index of the given tab item.
+     * @param item The tab item reference to get the index from.
+     * @return Returns the tab item index or -1 if the tab item is not in the list.
      */
     public int getItem(UITabItem item) {
         List<UITabItem> list = getItems();
@@ -233,17 +233,17 @@ public class UITabFolder extends UIDisplayContainer {
     }
     
     /**
-     * 
-     * @param index
-     * @return
+     * Get an tab item at a specific location.
+     * @param index The index of the tab item.
+     * @return Returns the tab item at this index.
      */
     public UITabItem getItem(int index) {
         return getItems().get(index);
     }
     
     /**
-     * 
-     * @return
+     * Get all items in the list.
+     * @return Returns the list of all items.
      */
     public List<UITabItem> getItems() {
         List<UITabItem> items = new ArrayList<UITabItem>();
@@ -257,16 +257,16 @@ public class UITabFolder extends UIDisplayContainer {
     }
     
     /**
-     * 
-     * @return
+     * Get the spacing between each tab in the tab bar.
+     * @return Returns the spacing.
      */
     public float getTabSpacing() {
         return ((RowLayout)tabsBar.getLayout()).getSpacingHorizontal();
     }
     
     /**
-     * 
-     * @param tabSpacing
+     * Set the spacing between each tab in the tab bar.
+     * @param tabSpacing The spacing.
      */
     public void setTabSpacing(float tabSpacing) {
         ((RowLayout)tabsBar.getLayout()).setSpacingHorizontal(tabSpacing);
