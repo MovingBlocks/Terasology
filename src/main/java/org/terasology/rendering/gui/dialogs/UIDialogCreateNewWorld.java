@@ -23,6 +23,9 @@ import org.newdawn.slick.Color;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.modes.StateSinglePlayer;
+import org.terasology.game.types.FreeStyleType;
+import org.terasology.game.types.GameType;
+import org.terasology.game.types.SurvivalType;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
@@ -58,9 +61,11 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
     private UIText _inputWorldTitle;
     private UILabel _chunkGeneratorLabel;
     private UIComboBox _chunkGenerator;
+    private UIComboBox typeOfGame;
+    private UILabel typeOfGameLabel;
 
     public UIDialogCreateNewWorld() {
-        super(new Vector2f(512f, 320f));
+        super(new Vector2f(512f, 376f));
         setModal(true);
         setTitle("Create new world");
 
@@ -76,7 +81,7 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
         _inputWorldTitle.setBorderSolid(new Vector4f(1f, 1f, 1f, 1f), new Color(0, 0, 0));
         _inputWorldTitle.setText(getWorldName());
         _inputWorldTitle.setVisible(true);
-        
+
         _inputSeedLabel = new UILabel("Enter a seed (optional):");
         _inputSeedLabel.setColor(Color.darkGray);
         _inputSeedLabel.setSize(new Vector2f(0f, 16f));
@@ -86,14 +91,32 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
         _inputWorldTitleLabel.setColor(Color.darkGray);
         _inputWorldTitleLabel.setSize(new Vector2f(0f, 16f));
         _inputWorldTitleLabel.setVisible(true);
-        
+
+        typeOfGameLabel = new UILabel("Choose type of game:");
+        typeOfGameLabel.setColor(Color.darkGray);
+        typeOfGameLabel.setSize(new Vector2f(0f, 16f));
+        typeOfGameLabel.setVisible(true);
+
+        typeOfGame = new UIComboBox(new Vector2f(176f, 22f), new Vector2f(176f, 50f));
+        UIListItem item = new UIListItem(new SurvivalType().getName(), new SurvivalType());
+        item.setTextColor(Color.black);
+        item.setPadding(new Vector4f(5f, 5f, 5f, 5f));
+        typeOfGame.addItem(item);
+
+        item = new UIListItem(new FreeStyleType().getName(), new FreeStyleType());
+        item.setTextColor(Color.black);
+        item.setPadding(new Vector4f(5f, 5f, 5f, 5f));
+        typeOfGame.addItem(item);
+        typeOfGame.select(0);
+        typeOfGame.setVisible(true);
+
         _chunkGeneratorLabel = new UILabel("Choose Chunk Generator:");
         _chunkGeneratorLabel.setColor(Color.darkGray);
         _chunkGeneratorLabel.setSize(new Vector2f(0f, 16f));
         _chunkGeneratorLabel.setVisible(true);
 
         _chunkGenerator = new UIComboBox(new Vector2f(176f, 22f), new Vector2f(176f, 48f));
-        UIListItem item = new UIListItem("Normal", new Integer(0));
+        item = new UIListItem("Normal", new Integer(0));
         item.setTextColor(Color.black);
         item.setPadding(new Vector4f(5f, 5f, 5f, 5f));
         _chunkGenerator.addItem(item);
@@ -109,8 +132,11 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
         _inputWorldTitle.setPosition(new Vector2f(_inputWorldTitleLabel.getPosition().x, _inputWorldTitleLabel.getPosition().y + _inputWorldTitleLabel.getSize().y + 8f));
         _inputSeedLabel.setPosition(new Vector2f(_inputWorldTitle.getPosition().x, _inputWorldTitle.getPosition().y + _inputWorldTitle.getSize().y + 16f));
         _inputSeed.setPosition(new Vector2f(_inputSeedLabel.getPosition().x, _inputSeedLabel.getPosition().y + _inputSeedLabel.getSize().y + 8f));
-        
-        _chunkGeneratorLabel.setPosition(new Vector2f(_inputSeed.getPosition().x, _inputSeed.getPosition().y + _inputSeed.getSize().y + 16f));
+
+        typeOfGameLabel.setPosition(new Vector2f(_inputSeed.getPosition().x, _inputSeed.getPosition().y + _inputSeed.getSize().y + 16f));
+        typeOfGame.setPosition(new Vector2f(typeOfGameLabel.getPosition().x, typeOfGameLabel.getPosition().y + typeOfGameLabel.getSize().y + 8f));
+
+        _chunkGeneratorLabel.setPosition(new Vector2f(typeOfGame.getPosition().x, typeOfGame.getPosition().y + typeOfGame.getSize().y + 16f));
         _chunkGenerator.setPosition(new Vector2f(_chunkGeneratorLabel.getPosition().x, _chunkGeneratorLabel.getPosition().y + _chunkGeneratorLabel.getSize().y + 8f));
 
         _okButton = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
@@ -124,14 +150,16 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
                 //validation of the input
                 if (_inputWorldTitle.getText().isEmpty()) {
                     GUIManager.getInstance().showMessage("Error", "Please enter a world name");
-                    
+
                     return;
                 } else if ((new File(PathManager.getInstance().getWorldSavePath(_inputWorldTitle.getText()), WorldInfo.DEFAULT_FILE_NAME)).exists()) {
                     GUIManager.getInstance().showMessage("Error", "A World with this name already exists");
-                    
+
                     return;
                 }
-                
+
+                CoreRegistry.put(GameType.class, (GameType)typeOfGame.getSelection().getValue());
+
                 //set the world settings
                 if (_inputSeed.getText().length() > 0) {
                     Config.getInstance().setDefaultSeed(_inputSeed.getText());
@@ -145,7 +173,7 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
                 } else {
                     Config.getInstance().setWorldTitle(getWorldName());
                 }
-                
+
                 List<String> chunkList = new ArrayList<String>();
                 switch (_chunkGenerator.getSelectionIndex()) {
                 case 1:   //flat
@@ -163,11 +191,11 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
                     chunkList.add(ForestGenerator.class.getName());
                     break;
                 }
-                
+
                 String[] chunksListArr = chunkList.toArray(new String[chunkList.size()]);
                 Config.getInstance().setChunkGenerator(chunksListArr);
-                
-                CoreRegistry.get(GameEngine.class).changeState(new StateSinglePlayer(new WorldInfo(Config.getInstance().getWorldTitle(), Config.getInstance().getDefaultSeed(), Config.getInstance().getDayNightLengthInMs() / 4, chunksListArr)));
+
+                CoreRegistry.get(GameEngine.class).changeState(new StateSinglePlayer(new WorldInfo(Config.getInstance().getWorldTitle(), Config.getInstance().getDefaultSeed(), Config.getInstance().getDayNightLengthInMs() / 4, chunksListArr, CoreRegistry.get(GameType.class).getClass().toString())));
             }
         });
 
@@ -184,6 +212,7 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
             }
         });
 
+
         addDisplayElement(_inputWorldTitleLabel);
         addDisplayElement(_inputWorldTitle);
         addDisplayElement(_inputSeedLabel);
@@ -192,6 +221,8 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
         addDisplayElement(_okButton);
         addDisplayElement(_cancelButton);
         addDisplayElement(_chunkGenerator);
+        addDisplayElement(typeOfGame);
+        addDisplayElement(typeOfGameLabel);
     }
 
     private String getWorldName() {
