@@ -28,6 +28,7 @@ import org.terasology.events.HealthChangedEvent;
 import org.terasology.events.NoHealthEvent;
 import org.terasology.events.VerticalCollisionEvent;
 import org.terasology.game.CoreRegistry;
+import org.terasology.game.types.GameType;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -89,15 +90,6 @@ public class HealthSystem implements EventHandlerSystem, UpdateSubscriberSystem 
     }
 
     private void applyDamage(EntityRef entity, HealthComponent health, int damageAmount, EntityRef instigator) {
-        if (health.currentHealth <= 0) return;
-
-        health.timeSinceLastDamage = 0;
-        health.currentHealth -= damageAmount;
-        if (health.currentHealth <= 0) {
-            entity.send(new NoHealthEvent(instigator, health.maxHealth));
-        } else {
-            entity.send(new HealthChangedEvent(instigator, health.currentHealth, health.maxHealth));
-        }
-        entity.saveComponent(health);
+        CoreRegistry.get(GameType.class).onPlayerDamageHook(entity, health, damageAmount, instigator);
     }
 }

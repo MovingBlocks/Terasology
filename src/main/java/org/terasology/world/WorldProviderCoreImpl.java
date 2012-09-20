@@ -18,6 +18,7 @@ package org.terasology.world;
 
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
+import org.terasology.game.types.GameType;
 import org.terasology.logic.manager.Config;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
@@ -87,7 +88,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public WorldInfo getWorldInfo() {
-        WorldInfo worldInfo = new WorldInfo(title, seed, getTime(), chunkGenerators);
+        WorldInfo worldInfo = new WorldInfo(title, seed, getTime(), chunkGenerators, CoreRegistry.get(GameType.class).getClass().toString());
         worldInfo.setBlockIdMap(BlockManager.getInstance().getBlockIdMap());
         return worldInfo;
     }

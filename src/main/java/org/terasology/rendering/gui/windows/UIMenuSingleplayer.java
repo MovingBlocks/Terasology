@@ -18,9 +18,13 @@ package org.terasology.rendering.gui.windows;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.modes.StateSinglePlayer;
+import org.terasology.game.types.FreeStyleType;
+import org.terasology.game.types.GameType;
+import org.terasology.game.types.SurvivalType;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
+import org.terasology.rendering.gui.framework.events.WindowListener;
 import org.terasology.world.WorldInfo;
 import org.terasology.world.WorldUtil;
 import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
@@ -37,6 +41,12 @@ import javax.vecmath.Vector4f;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -159,6 +169,13 @@ public class UIMenuSingleplayer extends UIWindow {
 
         try {
             WorldInfo info = (WorldInfo) list.getSelection().getValue();
+
+            try{
+                CoreRegistry.put(GameType.class, (GameType)Class.forName(info.getGameType().substring(6)).newInstance());
+            }catch (Exception e){
+                CoreRegistry.put(GameType.class, new SurvivalType());
+            }
+
             Config.getInstance().setDefaultSeed(info.getSeed());
             Config.getInstance().setWorldTitle(info.getTitle());
             Config.getInstance().setChunkGenerator(info.getChunkGenerators());
@@ -170,10 +187,10 @@ public class UIMenuSingleplayer extends UIWindow {
 
     public void fillList() {
         list.removeAll();
-
+        String typeGame = "";
         File worldCatalog = PathManager.getInstance().getWorldPath();
 
-        for (File file : worldCatalog.listFiles(new FileFilter() {
+        File[] listFiles = worldCatalog.listFiles(new FileFilter() {
             public boolean accept(File file) {
                 if (file.isDirectory()) {
                     return true;
@@ -181,14 +198,38 @@ public class UIMenuSingleplayer extends UIWindow {
                     return false;
                 }
             }
-        })) {
+        });
+
+        Arrays.sort( listFiles, new Comparator()
+        {
+            public int compare(Object o1, Object o2) {
+                if(((File)o1).isDirectory() && ((File)o2).isDirectory()){
+                   File f1 = new File(((File)o1).getAbsolutePath(), "entity.dat");
+                   File f2 = new File(((File)o2).getAbsolutePath(), "entity.dat");
+                   if (f1.lastModified() > f2.lastModified()) {
+                    return -1;
+                   } else if (f1.lastModified() < f2.lastModified()) {
+                    return +1;
+                   }
+                }
+
+                return 0;
+            }
+        });
+
+        DateFormat date = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+
+        for (File file : listFiles) {
             File worldManifest = new File(file, WorldInfo.DEFAULT_FILE_NAME);
             if (!worldManifest.exists())
                 continue;
             try {
                 WorldInfo info = WorldInfo.load(worldManifest);
                 if (!info.getTitle().isEmpty()) {
-                    UIListItem item = new UIListItem(info.getTitle(), info);
+                    try{
+                        typeGame = ((GameType)Class.forName(info.getGameType().substring(6)).newInstance()).getName();
+                    }catch(Exception e){}
+                    UIListItem item = new UIListItem(info.getTitle() + "("  + typeGame + ")\n" + date.format(new java.util.Date(new File(file.getAbsolutePath(), "entity.dat").lastModified())).toString() , info);
                     item.setPadding(new Vector4f(10f, 5f, 10f, 5f));
                     list.addItem(item);
                 }
