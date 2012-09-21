@@ -22,8 +22,10 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
+import com.bulletphysics.linearmath.QuaternionUtil;
 import org.lwjgl.input.Keyboard;
 import org.terasology.asset.Asset;
 import org.terasology.asset.AssetManager;
@@ -33,7 +35,7 @@ import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.PlayerComponent;
 import org.terasology.components.SimpleAIComponent;
-import org.terasology.components.rendering.MeshComponent;
+import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.EntityManager;
@@ -384,13 +386,14 @@ public class Commands implements CommandController {
     public void spawnPrefab(String prefabName) {
         Camera camera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
         Vector3f spawnPos = camera.getPosition();
-        Vector3f offset = camera.getViewingDirection();
-        offset.scale(3);
+        Vector3f offset = new Vector3f(camera.getViewingDirection());
+        offset.scale(2);
         spawnPos.add(offset);
+        Quat4f rotation = QuaternionUtil.shortestArcQuat(new Vector3f(0,0,1), camera.getViewingDirection() , new Quat4f());
 
         Prefab prefab = CoreRegistry.get(PrefabManager.class).getPrefab(prefabName);
         if (prefab != null && prefab.getComponent(LocationComponent.class) != null) {
-            CoreRegistry.get(EntityManager.class).create(prefab, spawnPos);
+            CoreRegistry.get(EntityManager.class).create(prefab, spawnPos, rotation);
         }
     }
     

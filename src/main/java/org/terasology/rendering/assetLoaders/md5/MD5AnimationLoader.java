@@ -1,0 +1,272 @@
+/*
+ * Copyright 2012  Benjamin Glatzel <benjamin.glatzel@me.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.terasology.rendering.assetLoaders.md5;
+
+import com.google.common.collect.Lists;
+import org.terasology.asset.AssetLoader;
+import org.terasology.asset.AssetUri;
+import org.terasology.math.AABB;
+import org.terasology.rendering.assets.animation.MeshAnimation;
+import org.terasology.rendering.assets.animation.MeshAnimationFrame;
+
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.List;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * @author Immortius
+ */
+public class MD5AnimationLoader implements AssetLoader<MeshAnimation> {
+
+    private static String INTEGER_PATTERN = "((?:[\\+-]?\\d+)(?:[eE][\\+-]?\\d+)?)";
+    private static String FLOAT_PATTERN = "((?:[\\+-]?\\d(?:\\.\\d*)?|\\.\\d+)(?:[eE][\\+-]?(?:\\d(?:\\.\\d*)?|\\.\\d+))?)";
+    private static String VECTOR3_PATTERN = "\\(\\s*" + FLOAT_PATTERN + "\\s+" + FLOAT_PATTERN + "\\s+" + FLOAT_PATTERN + "\\s+\\)";
+    private static String VECTOR2_PATTERN = "\\(\\s*" + FLOAT_PATTERN + "\\s+" + FLOAT_PATTERN + "\\s+\\)";
+
+    private static int POSITION_X_FLAG = 0x1;
+    private static int POSITION_Y_FLAG = 0x2;
+    private static int POSITION_Z_FLAG = 0x4;
+    private static int ORIENTATION_X_FLAG = 0x8;
+    private static int ORIENTATION_Y_FLAG = 0x10;
+    private static int ORIENTATION_Z_FLAG = 0x20;
+
+    private Logger logger = Logger.getLogger(getClass().getName());
+
+    private Pattern commandLinePattern = Pattern.compile("commandline \"(.*)\".*");
+    private Pattern jointPattern = Pattern.compile("\"(.*)\"\\s+" + INTEGER_PATTERN + "\\s*" + INTEGER_PATTERN + "\\s*" + INTEGER_PATTERN);
+    private Pattern doubleVectorPattern = Pattern.compile(VECTOR3_PATTERN + "\\s*" + VECTOR3_PATTERN);
+    private Pattern frameStartPattern = Pattern.compile("frame " + INTEGER_PATTERN + " \\{");
+
+    @Override
+    public MeshAnimation load(InputStream stream, AssetUri uri, List<URL> urls) throws IOException {
+        try {
+            MD5 md5 = parse(stream);
+            return createAnimation(uri, md5);
+        } catch (NumberFormatException e) {
+            throw new IOException("Error parsing " + uri.toString(), e);
+        }
+    }
+
+    private MeshAnimation createAnimation(AssetUri uri, MD5 md5) {
+        MeshAnimation animation = new MeshAnimation(uri);
+        String[] boneNames = new String[md5.numJoints];
+        int[] boneParents = new int[md5.numJoints];
+        for (int i = 0; i < md5.numJoints; ++i) {
+            boneNames[i] = md5.joints[i].name;
+            boneParents[i] = md5.joints[i].parent;
+        }
+        animation.setBones(boneNames, boneParents);
+        animation.setTimePerFrame(1.0f / md5.frameRate);
+
+        for (int frameIndex = 0; frameIndex < md5.numFrames; ++frameIndex) {
+            MD5Frame frame = md5.frames[frameIndex];
+            List<Vector3f> positions = Lists.newArrayListWithExpectedSize(md5.numJoints);
+            List<Vector3f> rawRotations = Lists.newArrayListWithExpectedSize(md5.numJoints);
+            for (int i = 0; i < md5.numJoints; ++i) {
+                positions.add(new Vector3f(md5.baseFramePosition[i]));
+                rawRotations.add(new Vector3f(md5.baseFrameOrientation[i]));
+            }
+
+            for (int jointIndex = 0; jointIndex < md5.numJoints; ++jointIndex) {
+                int compIndex = 0;
+                if ((md5.joints[jointIndex].flags & POSITION_X_FLAG) != 0) {
+                    positions.get(jointIndex).x = frame.components[md5.joints[jointIndex].startIndex + compIndex];
+                    compIndex++;
+                }
+                if ((md5.joints[jointIndex].flags & POSITION_Y_FLAG) != 0) {
+                    positions.get(jointIndex).y = frame.components[md5.joints[jointIndex].startIndex + compIndex];
+                    compIndex++;
+                }
+                if ((md5.joints[jointIndex].flags & POSITION_Z_FLAG) != 0) {
+                    positions.get(jointIndex).z = frame.components[md5.joints[jointIndex].startIndex + compIndex];
+                    compIndex++;
+                }
+                if ((md5.joints[jointIndex].flags & ORIENTATION_X_FLAG) != 0) {
+                    rawRotations.get(jointIndex).x = frame.components[md5.joints[jointIndex].startIndex + compIndex];
+                    compIndex++;
+                }
+                if ((md5.joints[jointIndex].flags & ORIENTATION_Y_FLAG) != 0) {
+                    rawRotations.get(jointIndex).y = frame.components[md5.joints[jointIndex].startIndex + compIndex];
+                    compIndex++;
+                }
+                if ((md5.joints[jointIndex].flags & ORIENTATION_Z_FLAG) != 0) {
+                    rawRotations.get(jointIndex).z = frame.components[md5.joints[jointIndex].startIndex + compIndex];
+                    compIndex++;
+                }
+            }
+
+            List<Quat4f> rotations = Lists.newArrayListWithCapacity(rawRotations.size());
+            for (Vector3f rot : rawRotations) {
+                rotations.add(MD5ParserCommon.completeQuat4f(rot.x, rot.y, rot.z));
+            }
+            // Rotate just the root bone to correct for coordinate system differences
+            rotations.set(0, MD5ParserCommon.correctQuat4f(rotations.get(0)));
+
+            animation.addFrame(new MeshAnimationFrame(positions, rotations));
+
+        }
+
+        return animation;
+    }
+
+
+    private MD5 parse(InputStream stream) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+        MD5 md5 = new MD5();
+        String line = MD5ParserCommon.readToLine(reader, "MD5Version ");
+        md5.version = Integer.parseInt(line.split(" ", 3)[1]);
+
+        line = MD5ParserCommon.readToLine(reader, "commandline ");
+        Matcher commandlineMatch = commandLinePattern.matcher(line);
+        if (commandlineMatch.matches()) {
+            md5.commandline = commandlineMatch.group(1);
+        }
+
+        line = MD5ParserCommon.readToLine(reader, "numFrames ");
+        md5.numFrames = Integer.parseInt(line.split(" ", 3)[1]);
+        line = MD5ParserCommon.readToLine(reader, "numJoints ");
+        md5.numJoints = Integer.parseInt(line.split(" ", 3)[1]);
+        line = MD5ParserCommon.readToLine(reader, "frameRate ");
+        md5.frameRate = Integer.parseInt(line.split(" ", 3)[1]);
+        line = MD5ParserCommon.readToLine(reader, "numAnimatedComponents ");
+        md5.numAnimatedComponents = Integer.parseInt(line.split(" ", 3)[1]);
+
+        MD5ParserCommon.readToLine(reader, "hierarchy {");
+        readHierarchy(reader, md5);
+
+        MD5ParserCommon.readToLine(reader, "bounds {");
+        readBounds(reader, md5);
+
+        MD5ParserCommon.readToLine(reader, "baseframe {");
+        readBaseFrames(reader, md5);
+
+        readFrames(reader, md5);
+
+        return md5;
+    }
+
+    private void readFrames(BufferedReader reader, MD5 md5) throws IOException {
+        md5.frames = new MD5Frame[md5.numFrames];
+        for (int i = 0; i < md5.numFrames; ++i) {
+            String frameStart = MD5ParserCommon.readToLine(reader, "frame ");
+            Matcher frameStartMatcher = frameStartPattern.matcher(frameStart);
+            if (!frameStartMatcher.find()) {
+                throw new IOException("Invalid frame line: \"" + frameStart + "\"");
+            }
+            int frameIndex = Integer.parseInt(frameStartMatcher.group(1));
+
+            MD5Frame frame = new MD5Frame();
+            frame.components = new float[md5.numAnimatedComponents];
+            int componentsRead = 0;
+            while (componentsRead < md5.numAnimatedComponents) {
+                String line = MD5ParserCommon.readNextLine(reader);
+                String[] components = line.trim().split("\\s+");
+                for (String component : components) {
+                    frame.components[componentsRead++] = Float.parseFloat(component);
+                }
+            }
+            md5.frames[frameIndex] = frame;
+        }
+    }
+
+    private void readBaseFrames(BufferedReader reader, MD5 md5) throws IOException {
+        md5.baseFramePosition = new Vector3f[md5.numJoints];
+        md5.baseFrameOrientation = new Vector3f[md5.numJoints];
+        for (int i = 0; i < md5.numJoints; ++i) {
+            String line = MD5ParserCommon.readNextLine(reader);
+            Matcher matcher = doubleVectorPattern.matcher(line);
+            if (!matcher.find()) {
+                throw new IOException("Invalid base frame line: \"" + line + "\"");
+            }
+            md5.baseFramePosition[i] = MD5ParserCommon.readVector3f(matcher.group(1), matcher.group(2), matcher.group(3));
+            md5.baseFrameOrientation[i] = MD5ParserCommon.readVector3f(matcher.group(4), matcher.group(5), matcher.group(6));
+        }
+    }
+
+    private void readBounds(BufferedReader reader, MD5 md5) throws IOException {
+        md5.bounds = new AABB[md5.numFrames];
+        for (int i = 0; i < md5.numFrames; ++i) {
+            String line = MD5ParserCommon.readNextLine(reader);
+            Matcher matcher = doubleVectorPattern.matcher(line);
+            if (!matcher.find()) {
+                throw new IOException("Invalid bounds line: \"" + line + "\"");
+            }
+            Vector3f a = MD5ParserCommon.readVector3fAndCorrect(matcher.group(1), matcher.group(2), matcher.group(3));
+            Vector3f b = MD5ParserCommon.readVector3fAndCorrect(matcher.group(4), matcher.group(5), matcher.group(6));
+            Vector3f min = new Vector3f();
+            min.x = Math.min(a.x, b.x);
+            min.y = Math.min(a.y, b.y);
+            min.z = Math.min(a.z, b.z);
+            Vector3f max = new Vector3f();
+            max.x = Math.max(a.x, b.x);
+            max.y = Math.max(a.y, b.y);
+            max.z = Math.max(a.z, b.z);
+            md5.bounds[i] = AABB.createMinMax(min, max);
+        }
+    }
+
+    private void readHierarchy(BufferedReader reader, MD5 md5) throws IOException {
+        md5.joints = new MD5Joint[md5.numJoints];
+        for (int i = 0; i < md5.numJoints; ++i) {
+            String line = MD5ParserCommon.readNextLine(reader);
+            Matcher matcher = jointPattern.matcher(line);
+            if (!matcher.find()) {
+                throw new IOException("Invalid joint line: \"" + line + "\"");
+            }
+            MD5Joint joint = new MD5Joint();
+            joint.name = matcher.group(1);
+            joint.parent = Integer.parseInt(matcher.group(2));
+            joint.flags = Integer.parseInt(matcher.group(3));
+            joint.startIndex = Integer.parseInt(matcher.group(4));
+            md5.joints[i] = joint;
+        }
+    }
+
+    private static class MD5 {
+        public int version;
+        public String commandline;
+        public int numFrames;
+        public int numJoints;
+        public int frameRate;
+        public int numAnimatedComponents;
+
+        public MD5Joint[] joints;
+        public AABB[] bounds;
+        public Vector3f[] baseFramePosition;
+        public Vector3f[] baseFrameOrientation;
+        public MD5Frame[] frames;
+    }
+
+    public static class MD5Joint {
+        public String name;
+        public int parent;
+        public int flags;
+        public int startIndex;
+    }
+
+    public static class MD5Frame {
+        public float[] components;
+    }
+}

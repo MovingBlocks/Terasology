@@ -29,6 +29,7 @@ import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
 import org.terasology.components.world.LocationComponent;
@@ -130,6 +131,22 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
             return create(prefab, position);
         }
         return create();
+    }
+
+    @Override
+    public EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation) {
+        List<Component> components = Lists.newArrayList();
+        for (Component component : prefab.listComponents()) {
+            Component newComp = componentLibrary.copy(component);
+            components.add(newComp);
+            if (newComp instanceof LocationComponent) {
+                LocationComponent loc = (LocationComponent) newComp;
+                loc.setWorldPosition(position);
+                loc.setWorldRotation(rotation);
+            }
+        }
+        components.add(new EntityInfoComponent(prefab.getName()));
+        return create(components);
     }
 
     @Override

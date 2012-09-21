@@ -208,8 +208,11 @@ public class UIScreenChat extends UIWindow {
         }
     }
     
-    public String getHistory() {        
-        return history.get(historyPosition);
+    public String getHistory() {
+        if (!history.isEmpty()) {
+            return history.get(historyPosition);
+        }
+        return "";
     }
     
     private void moveHistory(int i) {

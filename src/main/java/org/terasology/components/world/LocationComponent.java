@@ -18,10 +18,15 @@ package org.terasology.components.world;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
+import com.google.common.collect.Lists;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
+import org.terasology.entitySystem.metadata.core.ListTypeHandler;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Component represent the location and facing of an entity in the world
@@ -35,7 +40,8 @@ public final class LocationComponent implements Component {
     private float scale = 1.0f;
 
     // Relative to
-    public EntityRef parent = EntityRef.NULL;
+    private EntityRef parent = EntityRef.NULL;
+    private List<EntityRef> children = Lists.newArrayList();
 
     public LocationComponent() {
     }
@@ -138,6 +144,28 @@ public final class LocationComponent implements Component {
         LocationComponent parentLoc = parent.getComponent(LocationComponent.class);
         if (parentLoc != null) {
             this.scale /= parentLoc.getWorldScale();
+        }
+    }
+
+    public EntityRef getParent() {
+        return parent;
+    }
+
+    public Collection<EntityRef> getChildren() {
+        return children;
+    }
+
+    public void addChild(EntityRef child, EntityRef self) {
+        LocationComponent childLoc = child.getComponent(LocationComponent.class);
+        if (childLoc != null && !childLoc.getParent().equals(self)) {
+            LocationComponent oldParentLoc = childLoc.getParent().getComponent(LocationComponent.class);
+            if (oldParentLoc != null) {
+                oldParentLoc.children.remove(child);
+                childLoc.getParent().saveComponent(oldParentLoc);
+            }
+            childLoc.parent = self;
+            child.saveComponent(childLoc);
+            children.add(child);
         }
     }
 

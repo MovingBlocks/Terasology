@@ -1,0 +1,10 @@
+{
+    "name" : "testmod:pony",
+    "location" : {},
+    "skeletalmesh" : {
+        "mesh" : "testmod:pony",
+        "material" : "testmod:pony",
+        "animation" : "testmod:pony-gallop",
+        "loop" : true
+    }
+}

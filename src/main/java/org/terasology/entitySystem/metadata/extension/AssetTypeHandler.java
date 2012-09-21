@@ -41,7 +41,10 @@ public class AssetTypeHandler<T extends Asset> implements TypeHandler<T> {
 
     @Override
     public EntityData.Value serialize(T value) {
-        return EntityData.Value.newBuilder().addString(value.getURI().getSimpleString()).build();
+        if (value != null && value.getURI() != null) {
+            return EntityData.Value.newBuilder().addString(value.getURI().getSimpleString()).build();
+        }
+        return null;
     }
 
     @Override

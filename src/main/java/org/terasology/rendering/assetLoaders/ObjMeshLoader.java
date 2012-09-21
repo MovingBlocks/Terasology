@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.asset.loaders;
+package org.terasology.rendering.assetLoaders;
 
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;

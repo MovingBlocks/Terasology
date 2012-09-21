@@ -52,6 +52,7 @@ import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.assets.Texture;
+import org.terasology.utilities.gson.Vector4fHandler;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.BlockUri;
@@ -65,7 +66,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -645,22 +645,6 @@ public class BlockLoader {
                 BlockDefinition.ColorOffsets result = new BlockDefinition.ColorOffsets();
                 deserializeBlockPartMap(result.map, json.getAsJsonObject(), Vector4f.class, context);
                 return result;
-            }
-            return null;
-        }
-    }
-
-    private static class Vector4fHandler implements JsonDeserializer<Vector4f> {
-
-        @Override
-        public Vector4f deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            if (json.isJsonArray()) {
-                JsonArray array = json.getAsJsonArray();
-                if (array.size() == 4) {
-                    return new Vector4f(array.get(0).getAsFloat(), array.get(1).getAsFloat(), array.get(2).getAsFloat(), array.get(3).getAsFloat());
-                } else if (array.size() == 3) {
-                    return new Vector4f(array.get(0).getAsFloat(), array.get(1).getAsFloat(), array.get(2).getAsFloat(), 1);
-                }
             }
             return null;
         }

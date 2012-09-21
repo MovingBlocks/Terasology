@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright 2012  Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,33 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.components.rendering;
 
-import javax.vecmath.Color4f;
+package org.terasology.rendering.logic;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.rendering.assets.Material;
-import org.terasology.rendering.primitives.Mesh;
+import org.terasology.rendering.assets.animation.MeshAnimation;
+import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
+
+import java.util.Map;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
-public final class MeshComponent implements Component {
-
-    // Temporary render details
-    public enum RenderType {
-        Normal,
-        GelatinousCube
-    }
-
-    public RenderType renderType = RenderType.Normal;
-    public Mesh mesh;
+public class SkeletalMeshComponent implements Component {
+    public SkeletalMesh mesh;
     public Material material;
+    public MeshAnimation animation;
+    public boolean loop = false;
+    public float animationRate = 1.0f;
 
-    // TODO: Some sort of Texture + Shader type?
-    //public String material;
-
-    // This should be elsewhere I think, probably in the material
-    public Color4f color = new Color4f(0, 0, 0, 1);
+    public Map<String, EntityRef> boneEntities;
+    public EntityRef rootBone = EntityRef.NULL;
+    public float animationTime = 0;
 
 }
