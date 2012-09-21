@@ -262,4 +262,9 @@ public class StyleBorderImage extends UIDisplayContainer implements Style {
     public Texture getTexture() {
         return texture;
     }
+
+    @Override
+    public int getLayer() {
+        return 3;
+    }
 }

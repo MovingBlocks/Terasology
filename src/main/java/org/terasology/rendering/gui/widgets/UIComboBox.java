@@ -33,7 +33,7 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
-import org.terasology.rendering.gui.framework.events.SelectionChangedListener;
+import org.terasology.rendering.gui.framework.events.SelectionListener;
 
 /**
  * A combo box.
@@ -43,7 +43,7 @@ public class UIComboBox extends UIDisplayContainer {
     
     //events
     private final ArrayList<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
-    private final ArrayList<SelectionChangedListener> selectionListeners = new ArrayList<SelectionChangedListener>();
+    private final ArrayList<SelectionListener> selectionListeners = new ArrayList<SelectionListener>();
     
     private UIText baseInput;
     private UIButton baseButton;
@@ -75,7 +75,6 @@ public class UIComboBox extends UIDisplayContainer {
         baseInput = new UIText();
         baseInput.setSize(size);
         baseInput.setVisible(true);
-        baseInput.setBorderSolid(new Vector4f(1f, 1f, 1f, 1f), new Color(0, 0, 0));
         baseInput.setDisabled(true);
         baseInput.addMouseButtonListener(new MouseButtonListener() {
             @Override
@@ -124,7 +123,7 @@ public class UIComboBox extends UIDisplayContainer {
             }
         });
 
-        baseButton = new UIButton(new Vector2f(20f, 22f), UIButton.eButtonType.TOGGLE);
+        baseButton = new UIButton(new Vector2f(23f, 23f), UIButton.eButtonType.TOGGLE);
         baseButton.setVisible(true);
         baseButton.setPosition(new Vector2f(size.x - baseButton.getSize().x, size.y / 2 - baseButton.getSize().y / 2));
         baseButton.getLabel().setText("");
@@ -146,7 +145,7 @@ public class UIComboBox extends UIDisplayContainer {
         baseList.setBorderSolid(new Vector4f(1f, 1f, 1f, 1f), new Color(0, 0, 0));
         baseList.setBackgroundColor(new Color(255, 255, 255));
         baseList.setVisible(false);
-        baseList.addSelectionChangedListener(new SelectionChangedListener() {    
+        baseList.addSelectionListener(new SelectionListener() {    
             @Override
             public void changed(UIDisplayElement element) {
                 if (baseList.getSelection() != null) {
@@ -156,7 +155,7 @@ public class UIComboBox extends UIDisplayContainer {
                 baseList.setVisible(opened);
                 baseButton.setToggleState(false);
                 
-                notifySelectionChangedListeners();
+                notifySelectionListeners();
             }
         });
         baseList.addChangedListener(new ChangedListener() {
@@ -186,6 +185,14 @@ public class UIComboBox extends UIDisplayContainer {
      */
     public void addItem(UIListItem item) {
         baseList.addItem(item);
+    }
+    
+    /**
+     * Remove an item from the list.
+     * @param item Reference of the item to remove.
+     */
+    public void removeItem(UIListItem item) {
+        baseList.removeItem(item);
     }
     
     /**
@@ -220,6 +227,14 @@ public class UIComboBox extends UIDisplayContainer {
     }
     
     /**
+     * Select a specific item in the list.
+     * @param item The reference of the item to select.
+     */
+    public void select(UIListItem item) {
+        baseList.select(item);
+    }
+    
+    /**
      * Select an specific item in the list.
      * @param index The item to select.
      */
@@ -240,8 +255,8 @@ public class UIComboBox extends UIDisplayContainer {
      * @param item The item reference to get the index from.
      * @return Returns the item index or -1 if item is not in the list.
      */
-    public int getItemIndex(UIListItem item) {
-        return baseList.getItemIndex(item);
+    public int getItem(UIListItem item) {
+        return baseList.getItem(item);
     }
     
     /**
@@ -261,17 +276,17 @@ public class UIComboBox extends UIDisplayContainer {
         return baseList.getItems();
     }
     
-    private void notifySelectionChangedListeners() {
-        for (SelectionChangedListener listener : selectionListeners) {
+    private void notifySelectionListeners() {
+        for (SelectionListener listener : selectionListeners) {
             listener.changed(this);
         }
     }
 
-    public void addSelectionChangedListener(SelectionChangedListener listener) {
+    public void addSelectionListener(SelectionListener listener) {
         selectionListeners.add(listener);
     }
 
-    public void removeSelectionChangedListener(SelectionChangedListener listener) {
+    public void removeSelectionListener(SelectionListener listener) {
         selectionListeners.remove(listener);
     }
     

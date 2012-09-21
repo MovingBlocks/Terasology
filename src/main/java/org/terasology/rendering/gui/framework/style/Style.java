@@ -21,5 +21,11 @@ package org.terasology.rendering.gui.framework.style;
  *
  */
 public interface Style {
-
+    
+    /**
+     * Get the layer on which the style should be drawn. Higher number styles will be drawn on top of lower number styles.
+     * @return Returns the layer.
+     */
+    public int getLayer();
+    
 }

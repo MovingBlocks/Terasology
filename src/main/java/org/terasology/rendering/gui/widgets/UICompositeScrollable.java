@@ -23,7 +23,7 @@ import org.terasology.rendering.gui.layout.Layout;
  * Scrollable Composition of multiple display elements which can be arranged in a specific manner by setting a layout type. Similar to the SWT composite class.
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  * @see org.eclipse.swt.widgets.Composite
- * 
+ * TODO Adding a lot of display elements in a loop is inefficient.
  */
 public class UICompositeScrollable extends UIDisplayContainerScrollable {
     
@@ -68,7 +68,7 @@ public class UICompositeScrollable extends UIDisplayContainerScrollable {
         
         applyLayout();
     }
-     
+    
     public Layout getLayout() {
         return compositeLayout;
     }
@@ -82,5 +82,4 @@ public class UICompositeScrollable extends UIDisplayContainerScrollable {
             compositeLayout.layout(this, false);
         }
     }
-
 }

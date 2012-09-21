@@ -48,7 +48,7 @@ public class UIDialogServer extends UIDialogBox {
         //form
         containerForm = new UIComposite();
         GridLayout layout = new GridLayout(1);
-        layout.setPadding(new Vector4f(5f, 5f, 5f, 10f));
+        layout.setCellPadding(new Vector4f(5f, 5f, 5f, 10f));
         containerForm.setLayout(layout);
         containerForm.setSize("100%", "100%");
         containerForm.setPosition(new Vector2f(0f, 30f));
@@ -63,7 +63,6 @@ public class UIDialogServer extends UIDialogBox {
             inputName.setText(server.getName());
         }
         inputName.setSize(new Vector2f(380f, 30f));
-        inputName.setBorderSolid(new Vector4f(1f, 1f, 1f, 1f), new Color(0, 0, 0));
         inputName.setVisible(true);
         
         labelIp = new UILabel("Address:");
@@ -75,13 +74,12 @@ public class UIDialogServer extends UIDialogBox {
             inputIp.setText(server.getIp());
         }
         inputIp.setSize(new Vector2f(380f, 30f));
-        inputIp.setBorderSolid(new Vector4f(1f, 1f, 1f, 1f), new Color(0, 0, 0));
         inputIp.setVisible(true);
         
         //buttons
         containerButtons = new UIComposite();
         layout = new GridLayout(2);
-        layout.setPadding(new Vector4f(0f, 5f, 0f, 5f));
+        layout.setCellPadding(new Vector4f(0f, 5f, 0f, 5f));
         containerButtons.setLayout(layout);
         containerButtons.setHorizontalAlign(EHorizontalAlign.CENTER);
         containerButtons.setVerticalAlign(EVerticalAlign.BOTTOM);

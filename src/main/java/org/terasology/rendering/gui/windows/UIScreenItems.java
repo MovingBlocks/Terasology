@@ -59,7 +59,7 @@ public class UIScreenItems extends UIWindow {
         maximize();
         
         GridLayout layout = new GridLayout(11);
-        layout.setPadding(new Vector4f(2f, 2f, 2f, 2f));
+        layout.setCellPadding(new Vector4f(2f, 2f, 2f, 2f));
         
         container = new UICompositeScrollable();
         container.setHorizontalAlign(EHorizontalAlign.CENTER);

@@ -23,5 +23,9 @@ import org.terasology.rendering.gui.framework.UIDisplayContainer;
  * TODO implement
  */
 public class StyleBackgroundSplit extends UIDisplayContainer implements Style {
-
+    
+    @Override
+    public int getLayer() {
+        return 1;
+    }
 }

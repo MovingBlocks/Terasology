@@ -47,7 +47,7 @@ public class GridLayout implements Layout {
     //layout
     private Vector2f size = new Vector2f(0, 0);
     private int columns;
-    private Vector4f padding = new Vector4f(0, 0, 0, 0); //top, right, bottom, left
+    private Vector4f cellPadding = new Vector4f(0, 0, 0, 0); //top, right, bottom, left
     private float minCellWidth = 0f;
     private float minCellHeight = 0f;
     private float[] cellWidth;
@@ -116,7 +116,7 @@ public class GridLayout implements Layout {
         List<UIDisplayElement> elements = new ArrayList<UIDisplayElement>();
         
         for (UIDisplayElement element : allElements) {
-            if (!(element instanceof Style)) {
+            if (element.isVisible() && !(element instanceof Style)) {
                 elements.add(element);
             }
         }
@@ -133,11 +133,11 @@ public class GridLayout implements Layout {
             
             //horizontal align
             if (horizontalCellAlign == EHorizontalAlign.LEFT) {
-                x += padding.w;
+                x += cellPadding.w;
             } else if (horizontalCellAlign == EHorizontalAlign.CENTER) {
                 x += cellWidth[i % columns] / 2 - elements.get(i).getSize().x / 2;
             } else if (horizontalCellAlign == EHorizontalAlign.RIGHT) {
-                x += cellWidth[i % columns] - elements.get(i).getSize().x + padding.y;
+                x += cellWidth[i % columns] - elements.get(i).getSize().x + cellPadding.y;
             }
             
             //calculate y position
@@ -148,11 +148,11 @@ public class GridLayout implements Layout {
             
             //vertical align
             if (verticalCellAlign == EVerticalAlign.TOP) {
-                y += padding.x;
+                y += cellPadding.x;
             } else if (verticalCellAlign == EVerticalAlign.CENTER) {
                 y += cellHeight[(int) Math.floor(i / columns)] / 2 - elements.get(i).getSize().y / 2;
             } else if (verticalCellAlign == EVerticalAlign.BOTTOM) {
-                y += cellHeight[(int) Math.floor(i / columns)] - elements.get(i).getSize().y - padding.z;
+                y += cellHeight[(int) Math.floor(i / columns)] - elements.get(i).getSize().y - cellPadding.z;
             }
 
             
@@ -175,7 +175,7 @@ public class GridLayout implements Layout {
         
         //add padding
         for (int i = 0; i < width.length; i++) {
-            width[i] += (padding.w + padding.y);
+            width[i] += (cellPadding.w + cellPadding.y);
         }
         
         //min cell width
@@ -223,7 +223,7 @@ public class GridLayout implements Layout {
         
         //add padding
         for (int i = 0; i < height.length; i++) {
-            height[i] += (padding.x + padding.z);
+            height[i] += (cellPadding.x + cellPadding.z);
         }
         
         //custom cell height
@@ -280,16 +280,16 @@ public class GridLayout implements Layout {
      * Get the padding of each cell.
      * @return Returns the padding.
      */
-    public Vector4f getPadding() {
-        return padding;
+    public Vector4f getCellPadding() {
+        return cellPadding;
     }
 
     /**
      * Set the padding of each cell. 
      * @param padding The padding, where x = top, y = right, z = bottom and w = left.
      */
-    public void setPadding(Vector4f padding) {
-        this.padding = padding;
+    public void setCellPadding(Vector4f padding) {
+        this.cellPadding = padding;
     }
 
     /**
@@ -360,7 +360,7 @@ public class GridLayout implements Layout {
      * Check whether the grid has a border.
      * @return Returns true if the grid has a border.
      */
-    public boolean isEnableBorder() {
+    public boolean isBorder() {
         return enableBorder;
     }
 
@@ -368,7 +368,7 @@ public class GridLayout implements Layout {
      * Set whether the grid will have a border.
      * @param enable True to enable the border.
      */
-    public void setEnableBorder(boolean enable) {
+    public void setBorder(boolean enable) {
         this.enableBorder = enable;
     }
 

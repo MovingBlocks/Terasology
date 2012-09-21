@@ -39,8 +39,8 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 public class StyleBorderSolid extends UIDisplayElement implements Style {
     
     //Textured borders
-    private Vector4f width = new Vector4f(1, 1, 1, 1);
-    private Color color;
+    private Vector4f width = new Vector4f(0, 0, 0, 0);
+    private Color color = Color.black;
     
     public StyleBorderSolid(Vector4f width, Color color) {
         this.width = width;
@@ -51,6 +51,7 @@ public class StyleBorderSolid extends UIDisplayElement implements Style {
     public StyleBorderSolid(Vector4f width, String color) {
         this.width = width;
         setColor(color);
+        setCrop(false);
     }
 
     private float RGBtoColor(int v) {
@@ -68,32 +69,32 @@ public class StyleBorderSolid extends UIDisplayElement implements Style {
         if (width.x > 0) {
             glLineWidth(width.x);
             glBegin(GL11.GL_LINES);
-            glVertex2f(getPosition().x + width.w, getPosition().y + width.x / 2f);
-            glVertex2f(getPosition().x + getSize().x - width.y, getPosition().y + width.x / 2f);
+            glVertex2f(getPosition().x, getPosition().y - width.x / 2f);
+            glVertex2f(getPosition().x + getSize().x, getPosition().y - width.x / 2f);
             glEnd();
         }
         
         if (width.y > 0) {
             glLineWidth(width.y);
             glBegin(GL11.GL_LINES);
-            glVertex2f(getPosition().x + getSize().x - width.y / 2f, getPosition().y + width.y % 2);                  // %2 to adjust position if width is not multiple of 2
-            glVertex2f(getPosition().x + getSize().x - width.y / 2f, getPosition().y + getSize().y + width.y % 2);    // %2 to adjust position if width is not multiple of 2
+            glVertex2f(getPosition().x + getSize().x + width.y / 2f, getPosition().y - width.x + width.y % 2f);
+            glVertex2f(getPosition().x + getSize().x + width.y / 2f, getPosition().y + getSize().y + width.z + width.y % 2f - width.z % 2);
             glEnd();
         }
         
         if (width.z > 0) {
-            glLineWidth(width.x);
+            glLineWidth(width.z);
             glBegin(GL11.GL_LINES);
-            glVertex2f(getPosition().x + width.w, getPosition().y + getSize().y - width.z / 2f);
-            glVertex2f(getPosition().x + getSize().x - width.y, getPosition().y + getSize().y - width.z / 2f);
+            glVertex2f(getPosition().x, getPosition().y + getSize().y + width.z / 2f - width.z % 2f);
+            glVertex2f(getPosition().x + getSize().x, getPosition().y + getSize().y + width.z / 2f - width.z % 2f);
             glEnd();
         }
         
         if (width.w > 0) {
             glLineWidth(width.w);
             glBegin(GL11.GL_LINES);
-            glVertex2f(getPosition().x + width.w / 2f, getPosition().y + width.z % 2);                 // %2 to adjust position if width is not multiple of 2
-            glVertex2f(getPosition().x + width.w / 2f, getPosition().y + getSize().y + width.z % 2);   // %2 to adjust position if width is not multiple of 2
+            glVertex2f(getPosition().x - width.w / 2f, getPosition().y - width.x + width.w % 2f);
+            glVertex2f(getPosition().x - width.w / 2f, getPosition().y + getSize().y + width.z + width.w % 2f - width.z % 2);
             glEnd();
         }
         
@@ -141,5 +142,10 @@ public class StyleBorderSolid extends UIDisplayElement implements Style {
 
     public void setWidth(Vector4f width) {
         this.width = width;
+    }
+    
+    @Override
+    public int getLayer() {
+        return 2;
     }
 }
