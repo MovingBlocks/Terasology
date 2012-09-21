@@ -25,8 +25,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.net.URL;
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 import java.util.List;
 import java.util.Locale;
 
@@ -37,6 +35,8 @@ import javax.vecmath.Vector3f;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetUri;
 import org.terasology.math.Rotation;
+import org.terasology.utilities.gson.Vector2fHandler;
+import org.terasology.utilities.gson.Vector3fHandler;
 import org.terasology.world.block.BlockPart;
 
 import com.bulletphysics.collision.shapes.BoxShape;
@@ -310,19 +310,4 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShape> {
         }
     }
 
-    private class Vector3fHandler implements JsonDeserializer<Vector3f> {
-        @Override
-        public Vector3f deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            JsonArray jsonArray = json.getAsJsonArray();
-            return new Vector3f(jsonArray.get(0).getAsFloat(), jsonArray.get(1).getAsFloat(), jsonArray.get(2).getAsFloat());
-        }
-    }
-
-    private class Vector2fHandler implements JsonDeserializer<Vector2f> {
-        @Override
-        public Vector2f deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            JsonArray jsonArray = json.getAsJsonArray();
-            return new Vector2f(jsonArray.get(0).getAsFloat(), jsonArray.get(1).getAsFloat());
-        }
-    }
 }

@@ -1,12 +1,6 @@
 package org.terasology.components;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
-
+import com.bulletphysics.linearmath.QuaternionUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.components.world.LocationComponent;
@@ -14,7 +8,12 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.math.TeraMath;
 import org.terasology.testUtil.TeraAssert;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -22,21 +21,25 @@ import com.bulletphysics.linearmath.QuaternionUtil;
 public class LocationComponentTest {
 
     LocationComponent loc;
-    Vector3f pos1 = new Vector3f(1,2,3);
-    Vector3f pos2 = new Vector3f(2,3,4);
-    Vector3f pos1plus2 = new Vector3f(3,5,7);
-    Quat4f yawRotation = new Quat4f(0,0,0,1);
-    Quat4f pitchRotation = new Quat4f(0,0,0,1);
-    Quat4f pitchYaw = new Quat4f(0,0,0,1);
+    EntityRef entity;
+    Vector3f pos1 = new Vector3f(1, 2, 3);
+    Vector3f pos2 = new Vector3f(2, 3, 4);
+    Vector3f pos1plus2 = new Vector3f(3, 5, 7);
+    Quat4f yawRotation = new Quat4f(0, 0, 0, 1);
+    Quat4f pitchRotation = new Quat4f(0, 0, 0, 1);
+    Quat4f yawPitch = new Quat4f(0, 0, 0, 1);
 
     @Before
     public void setup() {
         loc = new LocationComponent();
+        entity = mock(EntityRef.class);
+        when(entity.getComponent(LocationComponent.class)).thenReturn(loc);
+        when(entity.exists()).thenReturn(true);
         QuaternionUtil.setEuler(yawRotation, TeraMath.DEG_TO_RAD * 90, 0, 0);
         QuaternionUtil.setEuler(pitchRotation, 0, TeraMath.DEG_TO_RAD * 45, 0);
-        pitchYaw.mul(yawRotation, pitchRotation);
+        QuaternionUtil.setEuler(yawPitch, TeraMath.DEG_TO_RAD * 90, TeraMath.DEG_TO_RAD * 45, 0);
     }
-    
+
     @Test
     public void setLocalPosition() {
         loc.setLocalPosition(pos1);
@@ -54,7 +57,7 @@ public class LocationComponentTest {
         loc.setLocalPosition(pos1);
         assertEquals(loc.getLocalPosition(), loc.getWorldPosition());
     }
-    
+
     @Test
     public void offsetParentAddsToWorldLocation() {
         LocationComponent parent = giveParent(loc);
@@ -77,7 +80,7 @@ public class LocationComponentTest {
         loc.setLocalPosition(pos1);
         parent.setLocalScale(2.0f);
 
-        assertEquals(new Vector3f(2,4,6), loc.getWorldPosition());
+        assertEquals(new Vector3f(2, 4, 6), loc.getWorldPosition());
     }
 
     @Test
@@ -102,7 +105,7 @@ public class LocationComponentTest {
         LocationComponent parent = giveParent(loc);
         loc.setLocalRotation(pitchRotation);
         parent.setLocalRotation(yawRotation);
-        assertEquals(pitchYaw, loc.getWorldRotation());
+        assertEquals(yawPitch, loc.getWorldRotation());
     }
 
     @Test
@@ -151,6 +154,35 @@ public class LocationComponentTest {
     }
 
     @Test
+    public void setWorldPositionWorksWithNestedRotatedParent() {
+        LocationComponent first = new LocationComponent();
+        EntityRef firstEntity = mock(EntityRef.class);
+        when(firstEntity.getComponent(LocationComponent.class)).thenReturn(first);
+        when(firstEntity.exists()).thenReturn(true);
+
+        LocationComponent second = new LocationComponent();
+        EntityRef secondEntity = mock(EntityRef.class);
+        when(secondEntity.getComponent(LocationComponent.class)).thenReturn(second);
+        when(secondEntity.exists()).thenReturn(true);
+
+        LocationComponent third = new LocationComponent();
+        EntityRef thirdEntity = mock(EntityRef.class);
+        when(thirdEntity.getComponent(LocationComponent.class)).thenReturn(third);
+        when(thirdEntity.exists()).thenReturn(true);
+
+        first.setLocalRotation(yawRotation);
+        second.setLocalPosition(new Vector3f(1, 0, 0));
+        first.addChild(secondEntity, firstEntity);
+        TeraAssert.assertEquals(new Vector3f(0, 0, -1), second.getWorldPosition(), 0.000001f);
+        second.setLocalRotation(pitchRotation);
+        second.addChild(thirdEntity, secondEntity);
+        TeraAssert.assertEquals(new Vector3f(0, 0, -1), third.getWorldPosition(), 0.000001f);
+        third.setLocalPosition(new Vector3f(0, 0, 1));
+        TeraAssert.assertEquals(new Vector3f(0.5f * (float) Math.sqrt(2), -0.5f * (float) Math.sqrt(2), -1), third.getWorldPosition(), 0.000001f);
+
+    }
+
+    @Test
     public void setWorldPositionWorksWithComplexParent() {
         LocationComponent parent = giveParent(loc);
         parent.setLocalRotation(yawRotation);
@@ -186,15 +218,16 @@ public class LocationComponentTest {
     public void setWorldRotationWithRotatedParent() {
         LocationComponent parent = giveParent(loc);
         parent.setLocalRotation(yawRotation);
-        loc.setWorldRotation(pitchYaw);
-        TeraAssert.assertEquals(pitchYaw, loc.getWorldRotation(), 0.0000001f);
+        loc.setWorldRotation(yawPitch);
+        TeraAssert.assertEquals(yawPitch, loc.getWorldRotation(), 0.0000001f);
     }
 
     private LocationComponent giveParent(LocationComponent location) {
         LocationComponent parent = new LocationComponent();
         EntityRef parentEntity = mock(EntityRef.class);
         when(parentEntity.getComponent(LocationComponent.class)).thenReturn(parent);
-        location.parent = parentEntity;
+        when(parentEntity.exists()).thenReturn(true);
+        parent.addChild(entity, parentEntity);
         return parent;
     }
 }

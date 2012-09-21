@@ -32,7 +32,7 @@ import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.PlayerComponent;
 import org.terasology.components.SimpleAIComponent;
-import org.terasology.components.rendering.MeshComponent;
+import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.EntityManager;
