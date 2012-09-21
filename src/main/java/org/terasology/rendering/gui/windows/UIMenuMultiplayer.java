@@ -106,7 +106,7 @@ public class UIMenuMultiplayer extends UIWindow {
         
         buttonContainer = new UIComposite();
         GridLayout layout = new GridLayout(3);
-        layout.setPadding(new Vector4f(5f, 5f, 5f, 5f));
+        layout.setCellPadding(new Vector4f(5f, 5f, 5f, 5f));
         buttonContainer.setLayout(layout);
         buttonContainer.setHorizontalAlign(EHorizontalAlign.CENTER);
         buttonContainer.setPosition(new Vector2f(0f, 500f));
@@ -230,7 +230,7 @@ public class UIMenuMultiplayer extends UIWindow {
         UIListItem item = new UIListItem("", server);
         
         GridLayout layout = new GridLayout(1);
-        layout.setPadding(new Vector4f(5f, 5f, 5f, 10f));
+        layout.setCellPadding(new Vector4f(5f, 5f, 5f, 10f));
         
         UIComposite composite = new UIComposite();
         composite.setSize("100%", "0px");

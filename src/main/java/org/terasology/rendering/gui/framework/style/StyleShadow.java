@@ -426,4 +426,9 @@ public class StyleShadow extends UIDisplayElement implements Style {
         this.opacity = opacity;
         createMesh(opacity);
     }
+
+    @Override
+    public int getLayer() {
+        return 4;
+    }
 }

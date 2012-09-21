@@ -67,6 +67,7 @@ public abstract class UIDisplayElement {
     private static enum EMouseEvents {ENTER, LEAVE, HOVER, MOVE};
     private EMouseEvents lastMouseState;
     private boolean mouseIsDown = false;
+    private boolean consumeEvents = true;
     
     //layout
     private boolean isVisible = false;
@@ -156,68 +157,90 @@ public abstract class UIDisplayElement {
      * @param button The button. 0 = left, 1 = right, 2 = middle. If no button was pressed the value will be -1.
      * @param state The state of the button. True if the button is pressed.
      * @param wheelMoved The value of how much the mouse wheel was moved. If the value is greater than 0, the mouse wheel was moved up. If lower than 0 the mouse wheel was moved down.
+     * @param consumed True if the input event was already consumed by another widget.
      */
-    public boolean processMouseInput(int button, boolean state, int wheelMoved, boolean consumed) {
+    public boolean processMouseInput(int button, boolean state, int wheelMoved, boolean consumed, boolean croped) {
         if (!isVisible())
             return consumed;
 
         if (mouseListeners.size() > 0 || mouseButtonListeners.size() > 0 || clickListeners.size() > 0) {
             if (intersects(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()))) {
-                if (!consumed) {
+                if (!croped) {
+                    if (lastMouseState == EMouseEvents.ENTER && (consumed || croped)) {
+                        notifyMouseListeners(EMouseEvents.LEAVE, consumed);
+                        lastMouseState = EMouseEvents.LEAVE;
+                    }
+                    
                     //mouse button listeners
                     if (button != -1 && state && !mouseIsDown) {            //mouse down
-                        notifyMouseButtonListeners(button, true, wheelMoved, true);
-                        mouseIsDown = true;
+                        notifyMouseButtonListeners(button, true, wheelMoved, true, consumed);
+                        if (!consumed) {
+                            mouseIsDown = true;
+                            if (consumeEvents) {
+                                //System.out.println("consumed mouse down event (intersect): " + this);
+                                consumed = true;
+                            }
+                        }
                     } else if (button != -1 && !state && mouseIsDown) {    //mouse up
-                        notifyClickListeners(button);
-                        notifyMouseButtonListeners(button, false, wheelMoved, true);
+                        notifyClickListeners(button, consumed);
+                        notifyMouseButtonListeners(button, false, wheelMoved, true, consumed);
                         mouseIsDown = false;
+                        if (!consumed && consumeEvents) {
+                            //System.out.println("consumed mouse up/click event (intersect): " + this);
+                            consumed = true;
+                        }
+                    }
+                    
+                    if (lastMouseState == EMouseEvents.LEAVE || lastMouseState == null) {
+                        notifyMouseListeners(EMouseEvents.ENTER, consumed);
+                        if (!consumed) {
+                            lastMouseState = EMouseEvents.ENTER;
+                            if (consumeEvents) {
+                                //System.out.println("consumed mouse enter event: " + this);
+                                consumed = true;
+                            }
+                        }
+                    } 
+                    
+                    //mouse wheel listeners
+                    if (wheelMoved != 0) {
+                        notifyMouseButtonListeners(-1, false, wheelMoved, true, consumed);
                     }
                     
                     //mouse position listeners
-                    notifyMouseListeners(EMouseEvents.HOVER);
+                    notifyMouseListeners(EMouseEvents.HOVER, consumed);
                     
-                    if (lastMouseState == EMouseEvents.LEAVE || lastMouseState == null) {
-                        notifyMouseListeners(EMouseEvents.ENTER);
+                    if (!consumed) {
                         lastMouseState = EMouseEvents.ENTER;
+                        if (consumeEvents) {
+                            //System.out.println("consumed mouse hover event: " + this);
+                            consumed = true;
+                        }
                     }
-                    
-                    consumed = true;
                 } else {
-                    if (button != -1 && !state && mouseIsDown) {    //mouse up
-                        notifyClickListeners(button);
-                        notifyMouseButtonListeners(button, false, wheelMoved, true);
-                        mouseIsDown = false;
-                    }
-                    
-                    if (lastMouseState == EMouseEvents.ENTER || lastMouseState == null) {
-                        notifyMouseListeners(EMouseEvents.LEAVE);
+                    if (lastMouseState == EMouseEvents.ENTER) {
+                        notifyMouseListeners(EMouseEvents.LEAVE, consumed);
                         lastMouseState = EMouseEvents.LEAVE;
                     }
-                }
-                
-                //mouse wheel listeners
-                if (wheelMoved != 0) {
-                    notifyMouseButtonListeners(-1, false, wheelMoved, true);
                 }
             }
             else {
                 //mouse button listeners
                 if (button != -1 && state && !mouseIsDown) {            //mouse down
-                    notifyMouseButtonListeners(button, true, wheelMoved, false);
+                    notifyMouseButtonListeners(button, true, wheelMoved, false, consumed);
                 } else if (button != -1 && !state) {    //mouse up
-                    notifyMouseButtonListeners(button, false, wheelMoved, false);
+                    notifyMouseButtonListeners(button, false, wheelMoved, false, consumed);
                     mouseIsDown = false;
                 }
                 
                 //mouse wheel listeners
                 if (wheelMoved != 0) {
-                    notifyMouseButtonListeners(-1, false, wheelMoved, false);
+                    notifyMouseButtonListeners(-1, false, wheelMoved, false, consumed);
                 }
                 
                 //mouse position listeners
                 if (lastMouseState == EMouseEvents.ENTER || lastMouseState == null) {
-                    notifyMouseListeners(EMouseEvents.LEAVE);
+                    notifyMouseListeners(EMouseEvents.LEAVE, consumed);
                     lastMouseState = EMouseEvents.LEAVE;
                 }
             }
@@ -225,7 +248,7 @@ public abstract class UIDisplayElement {
         
         //check for no changes in button presses -> this means mouse was moved
         if (mouseListeners.size() > 0 && button == -1 && wheelMoved == 0) {
-            notifyMouseListeners(EMouseEvents.MOVE);
+            notifyMouseListeners(EMouseEvents.MOVE, consumed);
         }
         
         return consumed;
@@ -584,6 +607,22 @@ public abstract class UIDisplayElement {
     }
     
     /**
+     * 
+     * @return
+     */
+    public boolean isConsumeEvents() {
+        return consumeEvents;
+    }
+    
+    /**
+     * 
+     * @param consumeEvents
+     */
+    public void setConsumeEvents(boolean consumeEvents) {
+        this.consumeEvents = consumeEvents;
+    }
+    
+    /**
      * Check whether the display element is visible.
      * @return
      */
@@ -683,6 +722,21 @@ public abstract class UIDisplayElement {
     public boolean intersects(Vector2f point) {
         return (point.x >= getAbsolutePosition().x && point.y >= getAbsolutePosition().y && point.x <= getAbsolutePosition().x + getSize().x && point.y <= getAbsolutePosition().y + getSize().y);
     }
+    
+    /**
+     * Debug command. Prints the stack of all parent display elements.
+     */
+    public void printParents() {
+        UIDisplayElement parent = this;
+        while (parent != null) {
+            if (parent != this) {
+                System.out.print(" -> ");
+            }
+            System.out.print(parent.getClass().getSimpleName() + " (id: " + parent.getId() + ")");
+            parent = parent.getParent();
+        }
+        System.out.println();
+    }
 
     /**
      * Calculate the absolute position of the display element.
@@ -749,15 +803,17 @@ public abstract class UIDisplayElement {
         visibilityListeners.remove(listener);
     }
     
-    private void notifyMouseButtonListeners(int button, boolean state, int wheel, boolean intersect) {
+    private void notifyMouseButtonListeners(int button, boolean state, int wheel, boolean intersect, boolean consumed) {
         if (button == -1) {
             for (MouseButtonListener listener : mouseButtonListeners) {
                 listener.wheel(this, wheel, intersect);
             }
         }
         else if (state) {
-            for (MouseButtonListener listener : mouseButtonListeners) {
-                listener.down(this, button, intersect);
+            if (!consumed) {
+                for (MouseButtonListener listener : mouseButtonListeners) {
+                    listener.down(this, button, intersect);
+                }
             }
         }
         else {
@@ -775,9 +831,11 @@ public abstract class UIDisplayElement {
         mouseButtonListeners.remove(listener);
     }
     
-    private void notifyClickListeners(int value) {
-        for (ClickListener listener : clickListeners) {
-            listener.click(this, value);
+    private void notifyClickListeners(int value, boolean consumed) {
+        if (!consumed) {
+            for (ClickListener listener : clickListeners) {
+                listener.click(this, value);
+            }
         }
     }
     
@@ -838,11 +896,13 @@ public abstract class UIDisplayElement {
         focusListeners.remove(listener);
     }
     
-    private void notifyMouseListeners(EMouseEvents type) {
+    private void notifyMouseListeners(EMouseEvents type, boolean consumed) {
         switch (type) {
         case ENTER:
-            for (MouseMoveListener listener : mouseListeners) {
-                listener.enter(this);
+            if (!consumed) {
+                for (MouseMoveListener listener : mouseListeners) {
+                    listener.enter(this);
+                }
             }
         break;
         case LEAVE:
@@ -851,8 +911,10 @@ public abstract class UIDisplayElement {
             }
         break;
         case HOVER:
-            for (MouseMoveListener listener : mouseListeners) {
-                listener.hover(this);
+            if (!consumed) {
+                for (MouseMoveListener listener : mouseListeners) {
+                    listener.hover(this);
+                }
             }
         break;
         case MOVE:

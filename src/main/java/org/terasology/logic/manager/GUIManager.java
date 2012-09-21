@@ -350,7 +350,7 @@ public class GUIManager implements EventHandlerSystem {
      */
     private void processMouseInput(int button, boolean state, int wheelMoved) {
         if (renderer.getWindowFocused() != null) {
-        	renderer.getWindowFocused().processMouseInput(button, state, wheelMoved, false);
+        	renderer.getWindowFocused().processMouseInput(button, state, wheelMoved, false, false);
         }
     }
     
