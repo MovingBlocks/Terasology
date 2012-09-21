@@ -23,6 +23,7 @@ import com.google.common.collect.Maps;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.terasology.componentSystem.RenderSystem;
+import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.rendering.SkeletalMeshComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
@@ -33,6 +34,8 @@ import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.manager.ShaderManager;
+import org.terasology.rendering.assets.animation.MeshAnimationFrame;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -44,7 +47,11 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import static org.lwjgl.opengl.GL11.glBegin;
+import static org.lwjgl.opengl.GL11.glColor4f;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glEnd;
+import static org.lwjgl.opengl.GL11.glLineWidth;
 import static org.lwjgl.opengl.GL11.glMultMatrix;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
@@ -55,7 +62,7 @@ import static org.lwjgl.opengl.GL11.glVertex3f;
  * @author Immortius
  */
 @RegisterComponentSystem
-public class SkeletonRenderer implements RenderSystem, EventHandlerSystem {
+public class SkeletonRenderer implements RenderSystem, EventHandlerSystem, UpdateSubscriberSystem {
 
     private Logger logger = Logger.getLogger(getClass().getName());
     private EntityManager entityManager;
@@ -98,6 +105,46 @@ public class SkeletonRenderer implements RenderSystem, EventHandlerSystem {
             entity.saveComponent(skeleton);
         }
 
+    }
+
+    @Override
+    public void update(float delta) {
+        Vector3f newPos = new Vector3f();
+        Quat4f newRot = new Quat4f();
+
+        for (EntityRef entity : entityManager.iteratorEntities(SkeletalMeshComponent.class, LocationComponent.class)) {
+            SkeletalMeshComponent skeletalMeshComp = entity.getComponent(SkeletalMeshComponent.class);
+            LocationComponent loc = entity.getComponent(LocationComponent.class);
+            if (skeletalMeshComp.animation != null && skeletalMeshComp.animation.getFrameCount() > 0) {
+                skeletalMeshComp.animationTime += delta * skeletalMeshComp.animationRate;
+                float framePos = skeletalMeshComp.animationTime / skeletalMeshComp.animation.getTimePerFrame();
+                while ((int) framePos >= skeletalMeshComp.animation.getFrameCount()) {
+                    framePos -= skeletalMeshComp.animation.getFrameCount();
+                }
+                int frameId = (int) framePos;
+                MeshAnimationFrame frameA = skeletalMeshComp.animation.getFrame(frameId);
+                MeshAnimationFrame frameB = skeletalMeshComp.animation.getFrame((frameId + 1) % skeletalMeshComp.animation.getFrameCount());
+                float interpolationVal = framePos - frameId;
+
+                for (int i = 0; i < skeletalMeshComp.animation.getBoneCount(); ++i) {
+                    EntityRef boneEntity = skeletalMeshComp.boneEntities.get(skeletalMeshComp.animation.getBoneName(i));
+                    if (boneEntity == null) {
+                        continue;
+                    }
+                    LocationComponent boneLoc = boneEntity.getComponent(LocationComponent.class);
+                    if (boneLoc != null) {
+
+                        newPos.interpolate(frameA.getPosition(i), frameB.getPosition(i), interpolationVal);
+                        boneLoc.setLocalPosition(newPos);
+                        newRot.interpolate(frameA.getRotation(i), frameB.getRotation(i), interpolationVal);
+                        newRot.normalize();
+                        boneLoc.setLocalRotation(newRot);
+                        boneEntity.saveComponent(boneLoc);
+                    }
+                }
+                entity.saveComponent(skeletalMeshComp);
+            }
+        }
     }
 
     @Override
@@ -246,6 +293,5 @@ public class SkeletonRenderer implements RenderSystem, EventHandlerSystem {
     @Override
     public void renderFirstPerson() {
     }
-
 
 }

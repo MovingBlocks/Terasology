@@ -49,6 +49,7 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.math.Vector3i;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.rendering.assets.Material;
+import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.world.block.family.BlockFamily;
@@ -84,6 +85,7 @@ public class EntitySystemBuilder {
         library.registerTypeHandler(Sound.class, new AssetTypeHandler(AssetType.SOUND, Sound.class));
         library.registerTypeHandler(Material.class, new AssetTypeHandler(AssetType.MATERIAL, Material.class));
         library.registerTypeHandler(SkeletalMesh.class, new AssetTypeHandler(AssetType.SKELETON_MESH, SkeletalMesh.class));
+        library.registerTypeHandler(MeshAnimation.class, new AssetTypeHandler(AssetType.ANIMATION, MeshAnimation.class));
         library.registerTypeHandler(Vector3f.class, new Vector3fTypeHandler());
         library.registerTypeHandler(Vector2f.class, new Vector2fTypeHandler());
         library.registerTypeHandler(Vector3i.class, new Vector3iTypeHandler());

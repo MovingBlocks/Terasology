@@ -290,4 +290,8 @@ public class SkeletalMesh implements Asset {
     public int getVertexCount() {
         return vertexStartWeights.size();
     }
+
+    public Bone getBone(String name) {
+        return boneLookup.get(name);
+    }
 }

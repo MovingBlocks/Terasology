@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package org.terasology.rendering.assets.skeletalmesh;
+package org.terasology.rendering.assetLoaders.md5;
 
 import com.google.common.collect.Lists;
-import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetUri;
-import org.terasology.rendering.primitives.Mesh;
+import org.terasology.rendering.assets.skeletalmesh.Bone;
+import org.terasology.rendering.assets.skeletalmesh.BoneWeight;
+import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
@@ -110,26 +110,26 @@ public class MD5SkeletonLoader implements AssetLoader<SkeletalMesh> {
     private MD5 parse(InputStream stream) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
         MD5 md5 = new MD5();
-        String line = readToLine(reader, "MD5Version ");
+        String line = MD5ParserCommon.readToLine(reader, "MD5Version ");
         md5.version = Integer.parseInt(line.split(" ", 3)[1]);
 
-        line = readToLine(reader, "commandline ");
+        line = MD5ParserCommon.readToLine(reader, "commandline ");
         Matcher commandlineMatch = commandLinePattern.matcher(line);
         if (commandlineMatch.matches()) {
             md5.commandline = commandlineMatch.group(1);
         }
 
-        line = readToLine(reader, "numJoints ");
+        line = MD5ParserCommon.readToLine(reader, "numJoints ");
         md5.numJoints = Integer.parseInt(line.split(" ", 3)[1]);
-        line = readToLine(reader, "numMeshes ");
+        line = MD5ParserCommon.readToLine(reader, "numMeshes ");
         md5.numMeshes = Integer.parseInt(line.split(" ", 3)[1]);
 
-        readToLine(reader, "joints {");
+        MD5ParserCommon.readToLine(reader, "joints {");
         readJoints(reader, md5);
 
         md5.meshes = new MD5Mesh[md5.numMeshes];
         for (int i = 0; i < md5.numMeshes; ++i) {
-            readToLine(reader, "mesh {");
+            MD5ParserCommon.readToLine(reader, "mesh {");
             md5.meshes[i] = readMesh(reader, md5);
         }
 
@@ -138,28 +138,28 @@ public class MD5SkeletonLoader implements AssetLoader<SkeletalMesh> {
 
     private MD5Mesh readMesh(BufferedReader reader, MD5 md5) throws IOException  {
         MD5Mesh mesh = new MD5Mesh();
-        String line = readToLine(reader, "numverts ");
+        String line = MD5ParserCommon.readToLine(reader, "numverts ");
         mesh.numVertices = Integer.parseInt(line.trim().split(" ", 3)[1]);
         mesh.vertexList = new MD5Vertex[mesh.numVertices];
         for (int i = 0; i < mesh.numVertices; ++i) {
-            line = readNextLine(reader);
+            line = MD5ParserCommon.readNextLine(reader);
             Matcher matcher = vertPatten.matcher(line);
             if (!matcher.find()) {
                 throw new IOException("Invalid vertex line \"" + line + "\"");
             }
             int index = Integer.parseInt(matcher.group(1));
             MD5Vertex vert = new MD5Vertex();
-            vert.uv = new Vector2f(Float.parseFloat(matcher.group(2)), 1.0f - Float.parseFloat(matcher.group(3)));
+            vert.uv = MD5ParserCommon.readUV(matcher.group(2), matcher.group(3));
             vert.startWeight = Integer.parseInt(matcher.group(4));
             vert.countWeight = Integer.parseInt(matcher.group(5));
             mesh.vertexList[index] = vert;
         }
 
-        line = readToLine(reader, "numtris ");
+        line = MD5ParserCommon.readToLine(reader, "numtris ");
         mesh.numTriangles = Integer.parseInt(line.trim().split(" ", 3)[1]);
         mesh.indexList = new int[mesh.numTriangles * 3];
         for (int i = 0; i < mesh.numTriangles; ++i) {
-            line = readNextLine(reader);
+            line = MD5ParserCommon.readNextLine(reader);
             Matcher matcher = triPattern.matcher(line);
             if (!matcher.find()) {
                 throw new IOException("Invalid triangle line \"" + line + "\"");
@@ -170,11 +170,11 @@ public class MD5SkeletonLoader implements AssetLoader<SkeletalMesh> {
             mesh.indexList[3 * triIndex + 2] = Integer.parseInt(matcher.group(4));
         }
 
-        line = readToLine(reader, "numweights ");
+        line = MD5ParserCommon.readToLine(reader, "numweights ");
         mesh.numWeights = Integer.parseInt(line.trim().split(" ", 3)[1]);
         mesh.weightList = new MD5Weight[mesh.numWeights];
         for (int i = 0; i < mesh.numWeights; ++i) {
-            line = readNextLine(reader);
+            line = MD5ParserCommon.readNextLine(reader);
             Matcher matcher = weightPattern.matcher(line);
             if (!matcher.find()) {
                 throw new IOException("Invalid weight line \"" + line + "\"");
@@ -183,7 +183,7 @@ public class MD5SkeletonLoader implements AssetLoader<SkeletalMesh> {
             MD5Weight weight = new MD5Weight();
             weight.jointIndex = Integer.parseInt(matcher.group(2));
             weight.bias = Float.parseFloat(matcher.group(3));
-            weight.position = new Vector3f(-Float.parseFloat(matcher.group(4)), Float.parseFloat(matcher.group(6)), Float.parseFloat(matcher.group(5)));
+            weight.position = MD5ParserCommon.readVector3f(matcher.group(4), matcher.group(5), matcher.group(6));
             mesh.weightList[weightIndex] = weight;
         }
         return mesh;
@@ -192,7 +192,7 @@ public class MD5SkeletonLoader implements AssetLoader<SkeletalMesh> {
     private void readJoints(BufferedReader reader, MD5 md5) throws IOException {
         md5.joints = new MD5Joint[md5.numJoints];
         for (int i = 0; i < md5.numJoints; ++i) {
-            String line = readNextLine(reader);
+            String line = MD5ParserCommon.readNextLine(reader);
             Matcher matcher = jointPattern.matcher(line);
             if (!matcher.find()) {
                 throw new IOException("Invalid joint line: \"" + line + "\"");
@@ -200,39 +200,11 @@ public class MD5SkeletonLoader implements AssetLoader<SkeletalMesh> {
             MD5Joint joint = new MD5Joint();
             joint.name = matcher.group(1);
             joint.parent = Integer.parseInt(matcher.group(2));
-            joint.position = new Vector3f(-Float.parseFloat(matcher.group(3)), Float.parseFloat(matcher.group(5)), Float.parseFloat(matcher.group(4)));
-            joint.orientation = completeQuat4f(-Float.parseFloat(matcher.group(6)), Float.parseFloat(matcher.group(8)), Float.parseFloat(matcher.group(7)));
+            joint.position = MD5ParserCommon.readVector3fAndCorrect(matcher.group(3), matcher.group(4), matcher.group(5));
+            joint.orientation = MD5ParserCommon.readQuat4f(matcher.group(6), matcher.group(7), matcher.group(8));
             md5.joints[i] = joint;
-            logger.log(Level.INFO, "Read joint: " + joint.name);
+            logger.log(Level.FINE, "Read joint: " + joint.name);
         }
-    }
-
-    private Quat4f completeQuat4f(float x, float y, float z) {
-        float t = 1.0f - (x * x) - (y * y) - (z * z);
-        float w = 0;
-        if (t > 0.0f) {
-            w = (float) -Math.sqrt(t);
-        }
-        return new Quat4f(x, y, z, w);
-    }
-
-    private String readToLine(BufferedReader reader, String startsWith) throws IOException {
-        String line = readNextLine(reader);
-        while (line != null && !line.trim().startsWith(startsWith)) {
-            line = readNextLine(reader);
-        }
-        if (line == null) {
-            throw new IOException("Failed to find expected line: \"" + startsWith + "\"");
-        }
-        return line;
-    }
-
-    private String readNextLine(BufferedReader reader) throws IOException {
-        String line = reader.readLine();
-        while (line != null && (line.isEmpty() || line.trim().startsWith("//"))) {
-            line = reader.readLine();
-        }
-        return line;
     }
 
     private static class MD5 {

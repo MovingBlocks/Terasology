@@ -16,9 +16,11 @@
 
 package org.terasology.components.rendering;
 
+import org.newdawn.slick.Animation;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.rendering.assets.Material;
+import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 
 import java.util.List;
@@ -30,6 +32,12 @@ import java.util.Map;
 public class SkeletalMeshComponent implements Component {
     public SkeletalMesh mesh;
     public Material material;
+    public MeshAnimation animation;
+    public boolean loop = false;
+    public float animationRate = 1.0f;
+
     public Map<String, EntityRef> boneEntities;
     public EntityRef rootBone = EntityRef.NULL;
+    public float animationTime = 0;
+
 }

@@ -25,7 +25,8 @@ import org.terasology.rendering.assetLoaders.ObjMeshLoader;
 import org.terasology.asset.loaders.OggSoundLoader;
 import org.terasology.asset.loaders.OggStreamingSoundLoader;
 import org.terasology.rendering.assetLoaders.PNGTextureLoader;
-import org.terasology.rendering.assets.skeletalmesh.MD5SkeletonLoader;
+import org.terasology.rendering.assetLoaders.md5.MD5AnimationLoader;
+import org.terasology.rendering.assetLoaders.md5.MD5SkeletonLoader;
 import org.terasology.world.block.loader.TileLoader;
 import org.terasology.world.block.shapes.JsonBlockShapeLoader;
 
@@ -65,7 +66,8 @@ public enum AssetType {
     MATERIAL("material", "materials", "mat", new MaterialLoader()),
     BLOCK_DEFINITION("blockdef", "blocks", null, null),
     BLOCK_TILE("blocktile", "blockTiles", "png", new TileLoader()),
-    SKELETON_MESH("skeletalmesh", "skeletalMesh", "md5mesh", new MD5SkeletonLoader());
+    SKELETON_MESH("skeletalmesh", "skeletalMesh", "md5mesh", new MD5SkeletonLoader()),
+    ANIMATION("animation", "animations", "md5anim", new MD5AnimationLoader());
 
 
 
