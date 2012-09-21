@@ -43,7 +43,8 @@ import org.terasology.rendering.gui.framework.events.FocusListener;
 import org.terasology.rendering.gui.framework.events.KeyListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
-import org.terasology.rendering.gui.framework.events.SelectionChangedListener;
+import org.terasology.rendering.gui.framework.events.SelectionListener;
+import org.terasology.rendering.gui.framework.style.StyleShadow.EShadowDirection;
 
 /**
  * A text area which can be used as a single line input box, multi line input box or for just displaying large texts.
@@ -51,6 +52,7 @@ import org.terasology.rendering.gui.framework.events.SelectionChangedListener;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  * 
  * TODO remove text wrapping, the UILabel widget can do this.
+ * TODO clean up
  */
 public class UIText extends UIDisplayContainerScrollable {
     
@@ -77,13 +79,13 @@ public class UIText extends UIDisplayContainerScrollable {
                off the proper position at some characters. There is room for improvement there to calculate the >correct< text size. Thats why there 
                are a few workarounds in the 'calcTextHeight' method.
        
-       Note 2: There is some dividing by the factor of 2 going on when setting the position or size of the character. This is needs to be done, 
+       Note 2: There is some dividing by the factor of 2 going on when setting the position or size of the character. This needs to be done, 
                otherwise the cursor will be at the wrong position. I can't explain this behavior.
     */
     
     //events
     private final ArrayList<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
-    private final ArrayList<SelectionChangedListener> selectionListeners = new ArrayList<SelectionChangedListener>();
+    private final ArrayList<SelectionListener> selectionListeners = new ArrayList<SelectionListener>();
     
     //wrapping
     private final List<Integer> wrapPosition = new ArrayList<Integer>();
@@ -201,28 +203,19 @@ public class UIText extends UIDisplayContainerScrollable {
                 }
                 //cut selection
                 else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_X && event.isDown()) {
-                    setClipboard(getSelection());
-                    deleteSelection();
+                    cut();
                     
                     event.consume();
                 }
                 //copy selection
                 else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_C && event.isDown()) {
-                    setClipboard(getSelection());
+                    copy();
                     
                     event.consume();
                 }
                 //paste selection
                 else if (ctrlKeyPressed && event.getKey() == Keyboard.KEY_V && event.isDown()) {
-                    if (selectionStart != selectionEnd) {
-                        deleteSelection();
-                    }
-                    
-                    String clipboard = removeUnsupportedChars(getClipboard());
-                    
-                    int num = insertText(getWrapOffset(cursorPosition), clipboard);
-                    
-                    setCursorToTextPosition(cursorPosition + num);
+                    paste();
                     
                     event.consume();
                 }
@@ -260,7 +253,6 @@ public class UIText extends UIDisplayContainerScrollable {
     /**
      * A text cursor.
      * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
-     *
      */
     private class UITextCursor extends UIDisplayElement {
         private Color color = new Color(Color.black);
@@ -436,7 +428,7 @@ public class UIText extends UIDisplayContainerScrollable {
         });
         
         //update of the selection rectangle
-        addSelectionChangedListener(new SelectionChangedListener() {
+        addSelectionListener(new SelectionListener() {
             @Override
             public void changed(UIDisplayElement element) {
                 selectionRectangle.updateSelection(Math.min(selectionStart, selectionEnd), Math.max(selectionStart, selectionEnd));
@@ -466,16 +458,18 @@ public class UIText extends UIDisplayContainerScrollable {
         text.setColor(Color.black);
         text.setVisible(true);
         
-        cursor = new UITextCursor(cursorSize);        
-        selectionRectangle = new UISelection();
+        cursor = new UITextCursor(cursorSize);
+        selectionRectangle = new UISelection();   
         
         addDisplayElement(text);
         text.addDisplayElement(selectionRectangle);
         text.addDisplayElement(cursor);
         
         setPadding(new Vector4f(0f, 5f, 0f, 5f));
+        setBackgroundColor(new Color(255, 255, 255));
+        setShadow(new Vector4f(0f, 4f, 4f, 0f), EShadowDirection.OUTSIDE, 1f);
+        setBorderSolid(new Vector4f(1f, 1f, 1f, 1f), new Color(0, 0, 0));
         setMultiLine(false);
-        setBackgroundColor(150, 0, 0, 0.3f);
     }
 
     /**
@@ -519,7 +513,7 @@ public class UIText extends UIDisplayContainerScrollable {
             
             cursorPosition = index;
             
-            notifySelectionChangedListeners();
+            notifySelectionListeners();
         }
     }
 
@@ -610,7 +604,7 @@ public class UIText extends UIDisplayContainerScrollable {
         if (indexLastLine != -1) {
             lastLine = substr.substring(indexLastLine, substr.length());
         }
-
+        
         displayPos.x = calcTextWidth(lastLine) / 2;
         displayPos.y = calcTextHeight(substr) / 2;
         
@@ -990,7 +984,22 @@ public class UIText extends UIDisplayContainerScrollable {
     }
     
     /**
-     * Select a text.
+     * Sets the selection.
+     * @param start The start of the selection.
+     */
+    public void setSelection(int start) {
+        selectionStart = start;
+        selectionEnd = getText().length();
+        
+        selectionRectangle.updateSelection(start, selectionEnd);
+        
+        setCursorToTextPosition(selectionEnd);
+        
+        notifySelectionListeners();
+    }
+    
+    /**
+     * Sets the selection to the range specified by the given start and end indices.
      * @param start The start index of the selection.
      * @param end The end index of the selection.
      */
@@ -1002,7 +1011,7 @@ public class UIText extends UIDisplayContainerScrollable {
         
         setCursorToTextPosition(selectionEnd);
         
-        notifySelectionChangedListeners();
+        notifySelectionListeners();
     }
     
     /**
@@ -1027,7 +1036,7 @@ public class UIText extends UIDisplayContainerScrollable {
         
         selectionRectangle.updateSelection(selectionStart, selectionEnd);
         
-        notifySelectionChangedListeners();
+        notifySelectionListeners();
     }
     
     /**
@@ -1041,8 +1050,29 @@ public class UIText extends UIDisplayContainerScrollable {
             selectionRectangle.updateSelection(selectionStart, selectionEnd);
             setCursorToTextPosition(cursorTo);
             
-            notifySelectionChangedListeners();
+            notifySelectionListeners();
         }
+    }
+    
+    public void copy() {
+        setClipboard(getSelection());
+    }
+    
+    public void cut() {
+        setClipboard(getSelection());
+        deleteSelection();
+    }
+    
+    public void paste() {
+        if (selectionStart != selectionEnd) {
+            deleteSelection();
+        }
+        
+        String clipboard = removeUnsupportedChars(getClipboard());
+        
+        int num = insertText(getWrapOffset(cursorPosition), clipboard);
+        
+        setCursorToTextPosition(cursorPosition + num);
     }
     
     /**
@@ -1099,7 +1129,7 @@ public class UIText extends UIDisplayContainerScrollable {
      * @return Returns true if the text has a shadow.
      */
     public boolean isEnableShadow() {
-        return this.text.isEnableShadow();
+        return this.text.isShadow();
     }
     
     /**
@@ -1107,7 +1137,7 @@ public class UIText extends UIDisplayContainerScrollable {
      * @param enable True to enable the shadow of the text.
      */
     public void setEnableShadow(boolean enable) {
-        this.text.setEnableShadow(enable);
+        this.text.setShadow(enable);
     }
 
     /**
@@ -1193,17 +1223,17 @@ public class UIText extends UIDisplayContainerScrollable {
         }
     }
     
-    private void notifySelectionChangedListeners() {
-        for (SelectionChangedListener listener : selectionListeners) {
+    private void notifySelectionListeners() {
+        for (SelectionListener listener : selectionListeners) {
             listener.changed(this);
         }
     }
 
-    public void addSelectionChangedListener(SelectionChangedListener listener) {
+    public void addSelectionListener(SelectionListener listener) {
         selectionListeners.add(listener);
     }
 
-    public void removeSelectionChangedListener(SelectionChangedListener listener) {
+    public void removeSelectionListener(SelectionListener listener) {
         selectionListeners.remove(listener);
     }
     

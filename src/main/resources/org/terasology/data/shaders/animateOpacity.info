@@ -1,0 +1,6 @@
+{
+    "params" : [
+        { "name" : "bindTexture",
+          "type" : "sampler2D" }
+    ]
+}

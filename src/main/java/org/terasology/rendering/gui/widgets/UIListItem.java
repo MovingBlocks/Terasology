@@ -1,3 +1,18 @@
+/*
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.terasology.rendering.gui.widgets;
 
 import javax.vecmath.Vector4f;
@@ -7,7 +22,7 @@ import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
-import org.terasology.rendering.gui.framework.style.UIStyle;
+import org.terasology.rendering.gui.framework.style.Style;
 
 /**
  * A list item. As default the list item contains a UIlabel to display a text.
@@ -17,8 +32,8 @@ import org.terasology.rendering.gui.framework.style.UIStyle;
  */
 public class UIListItem extends UIDisplayContainer {
     
+    private UIList list;
     private Object value;
-    private boolean isDisabled = false;
     private boolean isSelected = false;
     
     //child elements
@@ -27,7 +42,7 @@ public class UIListItem extends UIDisplayContainer {
     //options
     private Color textColor = Color.white;
     private Color textSelectionColor = Color.orange;
-    private Color selectionColor = new Color(0xE1 / 255f, 0xDD / 255f, 0xD4 / 255f, 1.0f);
+    private Color selectionColor = new Color(0xE1, 0xDD, 0xD4);
     
     public UIListItem(Object value) {
         setup("", value);
@@ -56,7 +71,7 @@ public class UIListItem extends UIDisplayContainer {
             
             @Override
             public void enter(UIDisplayElement element) {
-                if(!isSelected() && !isDisabled()) {
+                if(!isSelected() && !getList().isDisabled()) {
                     label.setColor(textSelectionColor);
                 }
             }
@@ -87,7 +102,7 @@ public class UIListItem extends UIDisplayContainer {
         float max = 0;
         float maxElement = 0;
         for (UIDisplayElement element : getDisplayElements()) {
-            if (element instanceof UIStyle || !element.isVisible()) {
+            if (element instanceof Style || !element.isVisible()) {
                 continue;
             }
             
@@ -132,14 +147,6 @@ public class UIListItem extends UIDisplayContainer {
         this.value = value;
     }
     
-    public boolean isDisabled() {
-        return isDisabled;
-    }
-
-    public void setDisabled(boolean isDisabled) {
-        this.isDisabled = isDisabled;
-    }
-        
     public boolean isSelected() {
         return isSelected;
     }
@@ -148,7 +155,7 @@ public class UIListItem extends UIDisplayContainer {
         isSelected = selected;
         
         if (isSelected) {
-            setBackgroundColor((int)(selectionColor.r * 255), (int)(selectionColor.g * 255), (int)(selectionColor.b * 255), selectionColor.a);
+            setBackgroundColor(selectionColor);
             label.setColor(textSelectionColor);
         } else {
             label.setColor(textColor);
@@ -201,5 +208,13 @@ public class UIListItem extends UIDisplayContainer {
     
     public Vector4f getPadding() {
         return label.getMargin();
+    }
+
+    public UIList getList() {
+        return list;
+    }
+
+    public void setList(UIList list) {
+        this.list = list;
     }
 }

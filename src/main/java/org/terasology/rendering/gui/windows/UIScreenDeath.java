@@ -18,6 +18,7 @@ package org.terasology.rendering.gui.windows;
 import javax.vecmath.Vector2f;
 
 import org.lwjgl.input.Keyboard;
+import org.newdawn.slick.Color;
 import org.terasology.events.RespawnEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
@@ -25,7 +26,7 @@ import org.terasology.game.modes.StateMainMenu;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
-import org.terasology.rendering.gui.framework.events.WindowListener;
+import org.terasology.rendering.gui.framework.events.VisibilityListener;
 import org.terasology.rendering.gui.widgets.UIButton;
 import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIWindow;
@@ -45,20 +46,18 @@ public class UIScreenDeath extends UIWindow {
 
     public UIScreenDeath() {
         setId("death");
-        setBackgroundColor(0x46, 0x00, 0x00, 0.85f);
+        setBackgroundColor(new Color(70, 0, 0, 200));
         setModal(true);
         setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
         maximize();
         
-        addWindowListener(new WindowListener() {
-            @Override
-            public void open(UIDisplayElement element) {
-
-            }
+        addVisibilityListener(new VisibilityListener() {
             
             @Override
-            public void close(UIDisplayElement element) {
-                respawn();
+            public void changed(UIDisplayElement element, boolean visibility) {
+                if (!visibility) {
+                    respawn();
+                }
             }
         });
         

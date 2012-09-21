@@ -16,7 +16,9 @@
 package org.terasology.rendering.gui.windows;
 
 import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
 
+import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetManager;
 import org.terasology.components.CuredComponent;
 import org.terasology.components.HealthComponent;
@@ -35,10 +37,15 @@ import org.terasology.game.Timer;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
+import org.terasology.logic.manager.GUIManager;
 import org.terasology.mods.miniions.components.MinionComponent;
 import org.terasology.mods.miniions.events.MinionMessageEvent;
 import org.terasology.mods.miniions.rendering.gui.components.UIMessageQueue;
 import org.terasology.mods.miniions.rendering.gui.components.UIMinionbar;
+import org.terasology.rendering.gui.animation.AnimationMove;
+import org.terasology.rendering.gui.animation.AnimationRotate;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.events.VisibilityListener;
 import org.terasology.rendering.gui.widgets.UIBuff;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UIItemCell;
@@ -73,13 +80,25 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
     //private final UIHealthBar healthBar;
     private final UIBuff buffBar;
 
+    private final UIImage leftGearWheel;
+    private final UIImage rightGearWheel;
+
     /**
      * Init. the HUD.
      */
     public UIScreenHUD() {
         setId("hud");
         maximize();
-        
+
+        addVisibilityListener(new VisibilityListener() {
+            @Override
+            public void changed(UIDisplayElement element, boolean visibility) {
+                if (visibility) {
+                    toolbar.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity(), 0, 9);
+                }
+            }
+        });
+
         _hearts = new UIImage[10];
 
         // Create hearts
@@ -114,10 +133,14 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
         debugLine4 = new UILabel();
         debugLine4.setPosition(new Vector2f(4, 54));
 
-        toolbar = new UIItemContainer(9);
+        toolbar = new UIItemContainer(10);
         toolbar.setVisible(true);
         toolbar.setHorizontalAlign(EHorizontalAlign.CENTER);
         toolbar.setVerticalAlign(EVerticalAlign.BOTTOM);
+
+        toolbar.setVisible(true);
+        toolbar.setCellMargin(new Vector2f(0f, 0f));
+        toolbar.setBorderImage("engine:inventory", new Vector2f(0f, 84f), new Vector2f(169f, 83f), new Vector4f(4f, 4f, 4f, 4f));
 
         minionbar = new UIMinionbar();
         minionbar.setVisible(true);
@@ -128,12 +151,45 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
         buffBar = new UIBuff();
         buffBar.setVisible(true);
 
+
         addDisplayElement(crosshair);
+
+        leftGearWheel = new UIImage(AssetManager.loadTexture("engine:inventory"));
+        leftGearWheel.setSize(new Vector2f(36f, 36f));
+        leftGearWheel.setTextureOrigin(new Vector2f(121.0f, 168.0f));
+        leftGearWheel.setTextureSize(new Vector2f(27.0f, 27.0f));
+        leftGearWheel.setId("leftGearWheel");
+        leftGearWheel.setVisible(true);
+
+        leftGearWheel.setHorizontalAlign(EHorizontalAlign.CENTER);
+        leftGearWheel.setVerticalAlign(EVerticalAlign.BOTTOM);
+        leftGearWheel.setPosition(new Vector2f(
+                leftGearWheel.getPosition().x - 240f,
+                leftGearWheel.getPosition().y - 4f)
+        );
+
+        rightGearWheel = new UIImage(AssetManager.loadTexture("engine:inventory"));
+        rightGearWheel.setSize(new Vector2f(36f, 36f));
+        rightGearWheel.setTextureOrigin(new Vector2f(121.0f, 168.0f));
+        rightGearWheel.setTextureSize(new Vector2f(27.0f, 27.0f));
+        rightGearWheel.setId("rightGearWheel");
+        rightGearWheel.setVisible(true);
+
+        rightGearWheel.setHorizontalAlign(EHorizontalAlign.CENTER);
+        rightGearWheel.setVerticalAlign(EVerticalAlign.BOTTOM);
+        rightGearWheel.setPosition(new Vector2f(
+                rightGearWheel.getPosition().x + 240f,
+                rightGearWheel.getPosition().y - 4f)
+        );
+
+        addDisplayElement(rightGearWheel);
+        addDisplayElement(leftGearWheel);
+
         addDisplayElement(debugLine1);
         addDisplayElement(debugLine2);
         addDisplayElement(debugLine3);
         addDisplayElement(debugLine4);
-        
+
         addDisplayElement(toolbar);
         addDisplayElement(minionbar);
         addDisplayElement(messagequeue);
@@ -145,6 +201,7 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
         layout();
     }
 
+    @Override
     public void update() {
         super.update();
         
@@ -164,7 +221,7 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
             debugLine4.setText(String.format("total vus: %s | active threads: %s", ChunkTessellator.getVertexArrayUpdateCount(), CoreRegistry.get(GameEngine.class).getActiveTaskCount()));
         }
     }
-    
+
     private void updateHealthBar(int currentHealth, int maxHealth) {
         float healthRatio = (float) currentHealth / maxHealth;
 
@@ -197,14 +254,6 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
             }
         }
     }
-    
-    @Override
-    public void open() {
-        toolbar.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity(), 0, 8);
-        layout();
-        
-        super.open();
-    }
 
     @Override
     public void initialise() {
@@ -224,12 +273,12 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
     @ReceiveEvent(components = LocalPlayerComponent.class)
     public void onSelectedItemChanged(ChangedComponentEvent event, EntityRef entity) {
         for (UIItemCell cell : toolbar.getCells()) {
-            cell.setSelectionRectangleEnable(false);
+            cell.setSelection(false);
         }
         
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
-        toolbar.getCells().get(localPlayerComp.selectedTool).setSelectionRectangleEnable(true);
+        toolbar.getCells().get(localPlayerComp.selectedTool).setSelection(true);
     }
     
     @ReceiveEvent(components = {LocalPlayerComponent.class, HealthComponent.class})

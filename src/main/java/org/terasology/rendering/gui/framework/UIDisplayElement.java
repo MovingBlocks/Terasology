@@ -21,6 +21,7 @@ import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.vecmath.Vector2f;
 
@@ -29,12 +30,15 @@ import org.lwjgl.opengl.Display;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.logic.manager.ShaderManager;
+import org.terasology.rendering.gui.animation.Animation;
+import org.terasology.rendering.gui.framework.events.AnimationListener;
 import org.terasology.rendering.gui.framework.events.BindKeyListener;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.FocusListener;
 import org.terasology.rendering.gui.framework.events.KeyListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
+import org.terasology.rendering.gui.framework.events.VisibilityListener;
 
 /**
  * Base class for all displayable UI elements.
@@ -43,6 +47,7 @@ import org.terasology.rendering.gui.framework.events.MouseMoveListener;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  * 
  * TODO improve z-order for click events
+ * TODO remove this class, move this to UIDisplayContainer
  */
 public abstract class UIDisplayElement {
 
@@ -52,6 +57,7 @@ public abstract class UIDisplayElement {
     private String id = "";
     
     //events
+    private final ArrayList<VisibilityListener> visibilityListeners = new ArrayList<VisibilityListener>();
     private final ArrayList<MouseMoveListener> mouseListeners = new ArrayList<MouseMoveListener>();
     private final ArrayList<MouseButtonListener> mouseButtonListeners = new ArrayList<MouseButtonListener>();
     private final ArrayList<ClickListener> clickListeners = new ArrayList<ClickListener>();
@@ -61,6 +67,7 @@ public abstract class UIDisplayElement {
     private static enum EMouseEvents {ENTER, LEAVE, HOVER, MOVE};
     private EMouseEvents lastMouseState;
     private boolean mouseIsDown = false;
+    private boolean consumeEvents = true;
     
     //layout
     private boolean isVisible = false;
@@ -86,8 +93,12 @@ public abstract class UIDisplayElement {
     protected final Vector2f positionOriginal  = new Vector2f(0, 0);
     
     private final Vector2f size = new Vector2f(0, 0);
+
     protected final Vector2f sizeOriginal = new Vector2f(0, 0);
-    
+
+    //animation
+    private final List<Animation> animations = new ArrayList<Animation>();
+
     public UIDisplayElement() {
         
     }
@@ -96,6 +107,13 @@ public abstract class UIDisplayElement {
         ShaderManager.getInstance().enableDefault();
 
         if (isVisible()) {
+
+            for(Animation animation: animations){
+                if(animation.isStarted()){
+                    animation.renderBegin();
+                }
+            }
+
             if (positionType == EPositionType.RELATIVE) {
                 glPushMatrix();
                 glTranslatef(getPosition().x, getPosition().y, 0);
@@ -108,6 +126,13 @@ public abstract class UIDisplayElement {
                 render();
                 glPopMatrix();
             }
+
+            for(Animation animation: animations){
+                if(animation.isStarted()){
+                    animation.renderEnd();
+                }
+            }
+
         }
     }
     
@@ -132,68 +157,90 @@ public abstract class UIDisplayElement {
      * @param button The button. 0 = left, 1 = right, 2 = middle. If no button was pressed the value will be -1.
      * @param state The state of the button. True if the button is pressed.
      * @param wheelMoved The value of how much the mouse wheel was moved. If the value is greater than 0, the mouse wheel was moved up. If lower than 0 the mouse wheel was moved down.
+     * @param consumed True if the input event was already consumed by another widget.
      */
-    public boolean processMouseInput(int button, boolean state, int wheelMoved, boolean consumed) {
+    public boolean processMouseInput(int button, boolean state, int wheelMoved, boolean consumed, boolean croped) {
         if (!isVisible())
             return consumed;
 
         if (mouseListeners.size() > 0 || mouseButtonListeners.size() > 0 || clickListeners.size() > 0) {
             if (intersects(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()))) {
-                if (!consumed) {
+                if (!croped) {
+                    if (lastMouseState == EMouseEvents.ENTER && (consumed || croped)) {
+                        notifyMouseListeners(EMouseEvents.LEAVE, consumed);
+                        lastMouseState = EMouseEvents.LEAVE;
+                    }
+                    
                     //mouse button listeners
                     if (button != -1 && state && !mouseIsDown) {            //mouse down
-                        notifyMouseButtonListeners(button, true, wheelMoved, true);
-                        mouseIsDown = true;
+                        notifyMouseButtonListeners(button, true, wheelMoved, true, consumed);
+                        if (!consumed) {
+                            mouseIsDown = true;
+                            if (consumeEvents) {
+                                //System.out.println("consumed mouse down event (intersect): " + this);
+                                consumed = true;
+                            }
+                        }
                     } else if (button != -1 && !state && mouseIsDown) {    //mouse up
-                        notifyClickListeners(button);
-                        notifyMouseButtonListeners(button, false, wheelMoved, true);
+                        notifyClickListeners(button, consumed);
+                        notifyMouseButtonListeners(button, false, wheelMoved, true, consumed);
                         mouseIsDown = false;
+                        if (!consumed && consumeEvents) {
+                            //System.out.println("consumed mouse up/click event (intersect): " + this);
+                            consumed = true;
+                        }
+                    }
+                    
+                    if (lastMouseState == EMouseEvents.LEAVE || lastMouseState == null) {
+                        notifyMouseListeners(EMouseEvents.ENTER, consumed);
+                        if (!consumed) {
+                            lastMouseState = EMouseEvents.ENTER;
+                            if (consumeEvents) {
+                                //System.out.println("consumed mouse enter event: " + this);
+                                consumed = true;
+                            }
+                        }
+                    } 
+                    
+                    //mouse wheel listeners
+                    if (wheelMoved != 0) {
+                        notifyMouseButtonListeners(-1, false, wheelMoved, true, consumed);
                     }
                     
                     //mouse position listeners
-                    notifyMouseListeners(EMouseEvents.HOVER);
+                    notifyMouseListeners(EMouseEvents.HOVER, consumed);
                     
-                    if (lastMouseState == EMouseEvents.LEAVE || lastMouseState == null) {
-                        notifyMouseListeners(EMouseEvents.ENTER);
+                    if (!consumed) {
                         lastMouseState = EMouseEvents.ENTER;
+                        if (consumeEvents) {
+                            //System.out.println("consumed mouse hover event: " + this);
+                            consumed = true;
+                        }
                     }
-                    
-                    consumed = true;
                 } else {
-                    if (button != -1 && !state && mouseIsDown) {    //mouse up
-                        notifyClickListeners(button);
-                        notifyMouseButtonListeners(button, false, wheelMoved, true);
-                        mouseIsDown = false;
-                    }
-                    
-                    if (lastMouseState == EMouseEvents.ENTER || lastMouseState == null) {
-                        notifyMouseListeners(EMouseEvents.LEAVE);
+                    if (lastMouseState == EMouseEvents.ENTER) {
+                        notifyMouseListeners(EMouseEvents.LEAVE, consumed);
                         lastMouseState = EMouseEvents.LEAVE;
                     }
-                }
-                
-                //mouse wheel listeners
-                if (wheelMoved != 0) {
-                    notifyMouseButtonListeners(-1, false, wheelMoved, true);
                 }
             }
             else {
                 //mouse button listeners
                 if (button != -1 && state && !mouseIsDown) {            //mouse down
-                    notifyMouseButtonListeners(button, true, wheelMoved, false);
+                    notifyMouseButtonListeners(button, true, wheelMoved, false, consumed);
                 } else if (button != -1 && !state) {    //mouse up
-                    notifyMouseButtonListeners(button, false, wheelMoved, false);
+                    notifyMouseButtonListeners(button, false, wheelMoved, false, consumed);
                     mouseIsDown = false;
                 }
                 
                 //mouse wheel listeners
                 if (wheelMoved != 0) {
-                    notifyMouseButtonListeners(-1, false, wheelMoved, false);
+                    notifyMouseButtonListeners(-1, false, wheelMoved, false, consumed);
                 }
                 
                 //mouse position listeners
                 if (lastMouseState == EMouseEvents.ENTER || lastMouseState == null) {
-                    notifyMouseListeners(EMouseEvents.LEAVE);
+                    notifyMouseListeners(EMouseEvents.LEAVE, consumed);
                     lastMouseState = EMouseEvents.LEAVE;
                 }
             }
@@ -201,7 +248,7 @@ public abstract class UIDisplayElement {
         
         //check for no changes in button presses -> this means mouse was moved
         if (mouseListeners.size() > 0 && button == -1 && wheelMoved == 0) {
-            notifyMouseListeners(EMouseEvents.MOVE);
+            notifyMouseListeners(EMouseEvents.MOVE, consumed);
         }
         
         return consumed;
@@ -251,7 +298,13 @@ public abstract class UIDisplayElement {
      * 
      * TODO remove? isn't really needed anymore.
      */
-    public abstract void update();
+    public void update(){
+        for(Animation animation: animations){
+            if(animation.isStarted()){
+                animation.update();
+            }
+        }
+    };
     
     /**
      * Set the layout of the child elements here. Will be executed if the display or a parent window was resized.
@@ -554,6 +607,22 @@ public abstract class UIDisplayElement {
     }
     
     /**
+     * 
+     * @return
+     */
+    public boolean isConsumeEvents() {
+        return consumeEvents;
+    }
+    
+    /**
+     * 
+     * @param consumeEvents
+     */
+    public void setConsumeEvents(boolean consumeEvents) {
+        this.consumeEvents = consumeEvents;
+    }
+    
+    /**
      * Check whether the display element is visible.
      * @return
      */
@@ -565,7 +634,13 @@ public abstract class UIDisplayElement {
      * Set the visibility of the display element.
      * @param visible True to set the element visible.
      */
-    public void setVisible(boolean visible) {
+    public void setVisible(boolean visible) {        
+        if (!isVisible && visible) {
+            notifyVisibilityListeners(visible);
+        } else if (isVisible && !visible) {
+            notifyVisibilityListeners(visible);
+        }
+        
         this.isVisible = visible;
         
         if (visible) {
@@ -647,6 +722,21 @@ public abstract class UIDisplayElement {
     public boolean intersects(Vector2f point) {
         return (point.x >= getAbsolutePosition().x && point.y >= getAbsolutePosition().y && point.x <= getAbsolutePosition().x + getSize().x && point.y <= getAbsolutePosition().y + getSize().y);
     }
+    
+    /**
+     * Debug command. Prints the stack of all parent display elements.
+     */
+    public void printParents() {
+        UIDisplayElement parent = this;
+        while (parent != null) {
+            if (parent != this) {
+                System.out.print(" -> ");
+            }
+            System.out.print(parent.getClass().getSimpleName() + " (id: " + parent.getId() + ")");
+            parent = parent.getParent();
+        }
+        System.out.println();
+    }
 
     /**
      * Calculate the absolute position of the display element.
@@ -665,20 +755,65 @@ public abstract class UIDisplayElement {
         
         return position;
     }
+    
+    public void setAnimation(Animation newAnimation){
+        Animation animation = getAnimation(newAnimation.getClass());
+
+        newAnimation.setTarget(this);
+
+        if(animation != null){
+            if(animation.isStarted()){
+                animation.stop();
+            }
+            animations.remove(animation);
+        }
+
+        animations.add(newAnimation);
+    }
+
+    public <T> T getAnimation(Class<T> animation) {
+        for (Animation s : animations) {
+            if (s.getClass() == animation) {
+                return animation.cast(s);
+            }
+        }
+
+        return null;
+    }
 
     /*
        The event listeners which every display element in the UI supports
     */
+
+    private void notifyVisibilityListeners(boolean visible) {
+        //we copy the list so the listener can remove itself within the close/open method call (see UIItemCell). Otherwise ConcurrentModificationException.
+        //TODO other solution?
+        ArrayList<VisibilityListener> listeners = (ArrayList<VisibilityListener>) visibilityListeners.clone();
+        
+        for (VisibilityListener listener : listeners) {
+            listener.changed(this, visible);
+        }
+    }
     
-    private void notifyMouseButtonListeners(int button, boolean state, int wheel, boolean intersect) {
+    public void addVisibilityListener(VisibilityListener listener) {
+        visibilityListeners.add(listener);
+    }
+    
+    public void removeVisibilityListener(VisibilityListener listener) {
+        visibilityListeners.remove(listener);
+    }
+    
+    private void notifyMouseButtonListeners(int button, boolean state, int wheel, boolean intersect, boolean consumed) {
         if (button == -1) {
             for (MouseButtonListener listener : mouseButtonListeners) {
                 listener.wheel(this, wheel, intersect);
             }
         }
         else if (state) {
-            for (MouseButtonListener listener : mouseButtonListeners) {
-                listener.down(this, button, intersect);
+            if (!consumed) {
+                for (MouseButtonListener listener : mouseButtonListeners) {
+                    listener.down(this, button, intersect);
+                }
             }
         }
         else {
@@ -696,9 +831,11 @@ public abstract class UIDisplayElement {
         mouseButtonListeners.remove(listener);
     }
     
-    private void notifyClickListeners(int value) {
-        for (ClickListener listener : clickListeners) {
-            listener.click(this, value);
+    private void notifyClickListeners(int value, boolean consumed) {
+        if (!consumed) {
+            for (ClickListener listener : clickListeners) {
+                listener.click(this, value);
+            }
         }
     }
     
@@ -759,11 +896,13 @@ public abstract class UIDisplayElement {
         focusListeners.remove(listener);
     }
     
-    private void notifyMouseListeners(EMouseEvents type) {
+    private void notifyMouseListeners(EMouseEvents type, boolean consumed) {
         switch (type) {
         case ENTER:
-            for (MouseMoveListener listener : mouseListeners) {
-                listener.enter(this);
+            if (!consumed) {
+                for (MouseMoveListener listener : mouseListeners) {
+                    listener.enter(this);
+                }
             }
         break;
         case LEAVE:
@@ -772,8 +911,10 @@ public abstract class UIDisplayElement {
             }
         break;
         case HOVER:
-            for (MouseMoveListener listener : mouseListeners) {
-                listener.hover(this);
+            if (!consumed) {
+                for (MouseMoveListener listener : mouseListeners) {
+                    listener.hover(this);
+                }
             }
         break;
         case MOVE:
@@ -791,4 +932,19 @@ public abstract class UIDisplayElement {
     public void removeMouseMoveListener(MouseMoveListener listener) {
         mouseListeners.remove(listener);
     }
+    
+    public <T extends Animation> void addAnimationListener(Class<T> animation, AnimationListener listener) {
+        Animation animationClass = getAnimation(animation);
+        if (animationClass != null) {
+            animationClass.addAnimationListener(listener);
+        }
+    }
+    
+    public <T extends Animation> void removeAnimationListener(Class<T> animation, AnimationListener listener) {
+        Animation animationClass = getAnimation(animation);
+        if (animationClass != null) {
+            animationClass.removeAnimationListener(listener);
+        }
+    }
+    
 }

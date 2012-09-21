@@ -92,6 +92,7 @@ public class UIMenuMain extends UIWindow {
                 GUIManager.getInstance().openWindow("singleplayer");
             }
         });
+
         _singlePlayerButton.setHorizontalAlign(EHorizontalAlign.CENTER);
         _singlePlayerButton.setPosition(new Vector2f(0f, 300f + 40f));
         _singlePlayerButton.setVisible(true);

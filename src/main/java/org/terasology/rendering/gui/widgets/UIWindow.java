@@ -18,6 +18,7 @@ package org.terasology.rendering.gui.widgets;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.rendering.gui.animation.AnimationOpacity;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayContainerScrollable;
 import org.terasology.rendering.gui.framework.events.BindKeyListener;
@@ -26,6 +27,8 @@ import org.terasology.rendering.gui.framework.events.KeyListener;
 import org.terasology.rendering.gui.framework.events.WindowListener;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A window which can contain display elements. All windows will be managed by the GUIManager.
@@ -35,9 +38,11 @@ import java.util.ArrayList;
  * TODO closeBinds/closeKeys needs to be handled in another way.. (its not really a close -> setVisible(false))
  */
 public class UIWindow extends UIDisplayContainerScrollable {
+    
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     //events
-    private static enum EWindowEvent {OPEN, CLOSE};
+    private static enum EWindowEvent {INITIALISE, SHUTDOWN};
     private final ArrayList<WindowListener> windowListeners = new ArrayList<WindowListener>();
     
     //close buttons
@@ -89,17 +94,13 @@ public class UIWindow extends UIDisplayContainerScrollable {
     }
 
     private void notifyWindowListeners(EWindowEvent event) {
-        //we copy the list so the listener can remove itself within the close/open method call (see UIItemCell). Otherwise ConcurrentModificationException.
-        //TODO other solution?
-        ArrayList<WindowListener> listeners = (ArrayList<WindowListener>) windowListeners.clone();
-        
-        if (event == EWindowEvent.OPEN) {
-            for (WindowListener listener : listeners) {
-                listener.open(this);
+        if (event == EWindowEvent.INITIALISE) {
+            for (WindowListener listener : windowListeners) {
+                listener.initialise(this);
             }
-        } else if (event == EWindowEvent.CLOSE) {
-            for (WindowListener listener : listeners) {
-                listener.close(this);
+        } else if (event == EWindowEvent.SHUTDOWN) {
+            for (WindowListener listener : windowListeners) {
+                listener.shutdown(this);
             }
         }
     }
@@ -162,14 +163,13 @@ public class UIWindow extends UIDisplayContainerScrollable {
     /**
      * Opens the window. This will focus the window.
      */
-    public void open() {
-        if (!isVisible()) {
-            notifyWindowListeners(EWindowEvent.OPEN);
-            setFocus(null);
-        }
-        
+    public void open() { 
+        setFocus(this);
         setVisible(true);
+        setAnimation(new AnimationOpacity(0f, 1f, 10f));
+        getAnimation(AnimationOpacity.class).start();
         
+        GUIManager.getInstance().openWindow(this);
         GUIManager.getInstance().checkMouseGrabbing();
     }
     
@@ -177,11 +177,27 @@ public class UIWindow extends UIDisplayContainerScrollable {
      * Closes the window. This will remove the window from the GUIManager.
      */
     public void close() {
-        setFocus(null);
-        
-        notifyWindowListeners(EWindowEvent.CLOSE);
+        setVisible(false);
         
         GUIManager.getInstance().closeWindow(this);
         GUIManager.getInstance().checkMouseGrabbing();
+    }
+    
+    /**
+     * Will be executed through the GUIManager once the window was added. All initialize tasks are executed here. 
+     * To be notified when the window is initialized use addWindowListener.
+     */
+    public void initialise() {
+        logger.log(Level.INFO, "Initialise window with with ID \"" + getId() + "\"");
+        notifyWindowListeners(EWindowEvent.INITIALISE);
+    }
+    
+    /**
+     * Will be executed through the GUIManager once the window was removed. All shutdown tasks are executed here. 
+     * To be notified when the window shuts down use addWindowListener.
+     */
+    public void shutdown() {
+        logger.log(Level.INFO, "Shutdown window with with ID \"" + getId() + "\"");
+        notifyWindowListeners(EWindowEvent.SHUTDOWN);
     }
 }

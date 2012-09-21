@@ -33,7 +33,6 @@ import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.ButtonState;
 import org.terasology.mods.miniions.rendering.gui.components.UIMinionBehaviourMenu;
-import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.widgets.UIMessageBox;
@@ -44,8 +43,10 @@ import org.terasology.rendering.gui.windows.UIMenuConfigControls;
 import org.terasology.rendering.gui.windows.UIMenuConfigMods;
 import org.terasology.rendering.gui.windows.UIMenuConfigVideo;
 import org.terasology.rendering.gui.windows.UIMenuMain;
+import org.terasology.rendering.gui.windows.UIMenuMultiplayer;
 import org.terasology.rendering.gui.windows.UIMenuPause;
 import org.terasology.rendering.gui.windows.UIMenuSingleplayer;
+import org.terasology.rendering.gui.windows.UIScreenItems;
 import org.terasology.rendering.gui.windows.UIScreenBook;
 import org.terasology.rendering.gui.windows.UIScreenChat;
 import org.terasology.rendering.gui.windows.UIScreenContainer;
@@ -66,7 +67,7 @@ import javax.vecmath.Vector2f;
 
 public class GUIManager implements EventHandlerSystem {
     
-    private Logger logger = Logger.getLogger(getClass().getName());   
+    private Logger logger = Logger.getLogger(getClass().getName());
     private static GUIManager instance;
     private UIDisplayRenderer renderer;
 
@@ -112,6 +113,7 @@ public class GUIManager implements EventHandlerSystem {
             logger.log(Level.INFO, "GUIManager: Add window with ID \"" + window.getId() + "\"");
             
             renderer.addDisplayElementToPosition(0, window);
+            window.initialise();
         }
 
         return window;
@@ -124,11 +126,18 @@ public class GUIManager implements EventHandlerSystem {
             logger.log(Level.INFO, "GUIManager: Remove window by reference with ID \"" + window.getId() + "\"");
             
             renderer.removeDisplayElement(window);
+            window.shutdown();
         }
     }
     
     private void removeAllWindows() {
         logger.log(Level.INFO, "GUIManager: Remove all windows");
+        
+        for (UIDisplayElement window : renderer.getDisplayElements()) {
+            if (window instanceof UIWindow) {
+                ((UIWindow)window).shutdown();
+            }
+        }
         
         renderer.removeAllDisplayElements();
     }
@@ -198,10 +207,16 @@ public class GUIManager implements EventHandlerSystem {
         UIWindow window = getWindowById(windowId);
         
         if (window == null) {
-            return openWindow(loadWindow(windowId));
+            window = loadWindow(windowId);
+            
+            if (window != null) {
+                window.open();
+            }
         } else {
-            return openWindow(window);
+            window.open();
         }
+        
+        return window;
     }
     
     /**
@@ -223,6 +238,8 @@ public class GUIManager implements EventHandlerSystem {
             window = new UIMenuMain();
         } else if (windowId.equals("singleplayer")) {
             window = new UIMenuSingleplayer();
+        } else if (windowId.equals("multiplayer")) {
+            window = new UIMenuMultiplayer();
         } else if (windowId.equals("config")) {
             window = new UIMenuConfig();
         } else if (windowId.equals("config:video")) {
@@ -239,8 +256,6 @@ public class GUIManager implements EventHandlerSystem {
             window = new UIScreenBook();
         } else if (windowId.equals("container")) {
             window = new UIScreenContainer();
-        } else if (windowId.equals("createWorld")) {
-            window = new UIDialogCreateNewWorld();
         } else if (windowId.equals("metrics")) {
             window = new UIScreenMetrics();
         } else if (windowId.equals("death")) {
@@ -255,6 +270,8 @@ public class GUIManager implements EventHandlerSystem {
             window = new UIScreenHUD();
         } else if (windowId.equals("minionBehaviour")) {
             window = new UIMinionBehaviourMenu();
+        } else if (windowId.equals("itemList")) {
+            window = new UIScreenItems();
         }
         
         if (window == null) {
@@ -315,8 +332,7 @@ public class GUIManager implements EventHandlerSystem {
      */
     public void showMessage(String title, String text) {
         UIWindow messageWindow = new UIMessageBox(title, text);
-        addWindow(messageWindow);
-        openWindow(messageWindow);
+        messageWindow.open();
     }
     
     
@@ -334,7 +350,7 @@ public class GUIManager implements EventHandlerSystem {
      */
     private void processMouseInput(int button, boolean state, int wheelMoved) {
         if (renderer.getWindowFocused() != null) {
-        	renderer.getWindowFocused().processMouseInput(button, state, wheelMoved, false);
+        	renderer.getWindowFocused().processMouseInput(button, state, wheelMoved, false, false);
         }
     }
     

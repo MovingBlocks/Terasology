@@ -422,7 +422,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     @ReceiveEvent(components = {LocalPlayerComponent.class})
     public void onNextItem(ToolbarNextButton event, EntityRef entity) {
         LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
-        localPlayerComp.selectedTool = (localPlayerComp.selectedTool + 1) % 9;
+        localPlayerComp.selectedTool = (localPlayerComp.selectedTool + 1) % 10;
         localPlayer.getEntity().saveComponent(localPlayerComp);
         event.consume();
     }
@@ -430,9 +430,9 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     @ReceiveEvent(components = {LocalPlayerComponent.class})
     public void onPrevItem(ToolbarPrevButton event, EntityRef entity) {
         LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
-        localPlayerComp.selectedTool = (localPlayerComp.selectedTool - 1) % 9;
+        localPlayerComp.selectedTool = (localPlayerComp.selectedTool - 1) % 10;
         if (localPlayerComp.selectedTool < 0) {
-            localPlayerComp.selectedTool = 9 + localPlayerComp.selectedTool;
+            localPlayerComp.selectedTool = 10 + localPlayerComp.selectedTool;
         }
         localPlayer.getEntity().saveComponent(localPlayerComp);
         event.consume();

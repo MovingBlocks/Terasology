@@ -29,9 +29,10 @@ import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
 
 import org.lwjgl.opengl.GL11;
+import org.newdawn.slick.Color;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.assets.Texture;
-import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
@@ -46,9 +47,10 @@ import java.util.logging.Logger;
  * 
  * TODO rotation screws up the intersection check
  */
-public class UIImage extends UIDisplayElement {
+public class UIImage extends UIDisplayContainer {
     private Logger logger = Logger.getLogger(getClass().getName());
-
+    
+    private Color color;
     private Texture texture;
 
     private Vector2f textureOrigin = new Vector2f(0.0f, 0.0f);
@@ -61,12 +63,12 @@ public class UIImage extends UIDisplayElement {
         
     }
     
-    public UIImage(int r, int g, int b, float a) {
-        setColor(r, g, b, a);
+    public UIImage(Color color) {
+        setColor(color);
     }
     
-    public UIImage(String color, float a) {
-        setColor(color, a);
+    public UIImage(String color) {
+        setColor(color);
     }
 
     public UIImage(Texture texture) {
@@ -117,6 +119,8 @@ public class UIImage extends UIDisplayElement {
             mesh.render();
             glPopMatrix();
         }
+        
+        super.render();
     }
 
     /**
@@ -175,7 +179,7 @@ public class UIImage extends UIDisplayElement {
         this.texture = texture;
         
         if (texture != null) {
-            setColor(255, 255, 255, 1f);
+            setColor(new Color(1f, 1f, 1f, 1f));
         }
     }
     
@@ -183,44 +187,48 @@ public class UIImage extends UIDisplayElement {
         return texture;
     }
     
-    public void setColor(int r, int g, int b, float a) {
-        generateMesh(r, g, b, a);
+    public Color getColor() {
+        return color;
     }
     
-    public void setColor(String color, float a) {
+    public void setColor(Color color) {
+        generateMesh(color);
+    }
+    
+    public void setColor(String color) {
         color = color.trim().toLowerCase();
         
         int r = 0;
         int g = 0;
         int b = 0;
+        int a = 255;
         
-        if (color.matches("^#[a-f0-9]{1,6}$")) {
+        if (color.matches("^#[a-f0-9]{1,8}$")) {
             color = color.replace("#", "");
             
             int sum = Integer.parseInt(color, 16);
-
+            
+            a = (sum & 0xFF000000) >> 24;
             r = (sum & 0x00FF0000) >> 16;
             g = (sum & 0x0000FF00) >> 8;
             b = sum & 0x000000FF;
         }
         
-        setColor(r, g, b, a);
+        setColor(new Color(RGBtoColor(r), RGBtoColor(g), RGBtoColor(b), RGBtoColor(a)));
     }
     
-    private void generateMesh(int r, int g, int b, float a) {
+    private void generateMesh(Color color) {
         if (mesh != null) {
             mesh.dispose();
         }
         
+        this.color = color;
+        
         Tessellator tessellator = new Tessellator();
-        TessellatorHelper.addGUIQuadMesh(tessellator, new Vector4f(RGBtoColor(r), RGBtoColor(g), RGBtoColor(b), a), 1.0f, 1.0f);
+        TessellatorHelper.addGUIQuadMesh(tessellator, new Vector4f(color.r, color.g, color.b, color.a), 1.0f, 1.0f);
         mesh = tessellator.generateMesh();
     }
-
-    @Override
-    public void update() {
-    }
-
+    
     /*
      * Rotate graphics element
      */
