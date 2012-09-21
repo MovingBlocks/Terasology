@@ -18,7 +18,7 @@ package org.terasology.entityFactory;
 
 import javax.vecmath.Vector3f;
 
-import org.terasology.components.rendering.MeshComponent;
+import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.components.utility.LifespanComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;

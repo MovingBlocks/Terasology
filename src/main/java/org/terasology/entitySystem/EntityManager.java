@@ -17,6 +17,7 @@ package org.terasology.entitySystem;
 
 import java.util.Map;
 
+import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
 import org.terasology.entitySystem.metadata.ComponentLibrary;
@@ -70,6 +71,8 @@ public interface EntityManager {
      * @return A new entity, based on the given prefab, at the desired position
      */
     EntityRef create(Prefab prefab, Vector3f position);
+
+    EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation);
 
     /**
      * @param other

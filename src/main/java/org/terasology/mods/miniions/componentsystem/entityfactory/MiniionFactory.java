@@ -17,7 +17,7 @@ package org.terasology.mods.miniions.componentsystem.entityfactory;
 
 import javax.vecmath.Vector3f;
 
-import org.terasology.components.rendering.MeshComponent;
+import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;

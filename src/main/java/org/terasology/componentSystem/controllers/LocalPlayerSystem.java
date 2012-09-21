@@ -23,7 +23,7 @@ import org.terasology.math.Vector3i;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockItemComponent;
-import org.terasology.components.rendering.MeshComponent;
+import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entityFactory.DroppedBlockFactory;
 import org.terasology.entitySystem.EntityManager;

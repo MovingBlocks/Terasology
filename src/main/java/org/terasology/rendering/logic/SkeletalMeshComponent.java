@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.components.rendering;
+package org.terasology.rendering.logic;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;

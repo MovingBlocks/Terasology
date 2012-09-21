@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.components.rendering;
+package org.terasology.rendering.logic;
 
 import javax.vecmath.Color4f;
 
