@@ -16,8 +16,6 @@
 
 package org.terasology.rendering.assetLoaders.md5;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
-
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
@@ -33,11 +31,12 @@ public final class MD5ParserCommon {
     public static final Matrix3f CORRECTION_MATRIX;
     public static final Quat4f CORRECTION_QUATERNION;
 
-    private MD5ParserCommon() {}
+    private MD5ParserCommon() {
+    }
 
     static {
-        CORRECTION_MATRIX = new Matrix3f(-1,0,0,0,0,1,0,1,0);
-        CORRECTION_QUATERNION = new Quat4f(0,0,0,1);
+        CORRECTION_MATRIX = new Matrix3f(-1, 0, 0, 0, 0, 1, 0, 1, 0);
+        CORRECTION_QUATERNION = new Quat4f(0, 0, 0, 1);
         CORRECTION_QUATERNION.set(CORRECTION_MATRIX);
     }
 
@@ -68,7 +67,7 @@ public final class MD5ParserCommon {
         if (t > 0.0f) {
             w = (float) -Math.sqrt(t);
         }
-        Quat4f result =  new Quat4f(x, y, z, w);
+        Quat4f result = new Quat4f(x, y, z, w);
         result.normalize();
         return result;
     }

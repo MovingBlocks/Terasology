@@ -136,7 +136,7 @@ public class MD5SkeletonLoader implements AssetLoader<SkeletalMesh> {
         return md5;
     }
 
-    private MD5Mesh readMesh(BufferedReader reader, MD5 md5) throws IOException  {
+    private MD5Mesh readMesh(BufferedReader reader, MD5 md5) throws IOException {
         MD5Mesh mesh = new MD5Mesh();
         String line = MD5ParserCommon.readToLine(reader, "numverts ");
         mesh.numVertices = Integer.parseInt(line.trim().split(" ", 3)[1]);

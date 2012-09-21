@@ -24,7 +24,6 @@ import org.terasology.asset.AssetUri;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -52,7 +51,8 @@ public class MeshAnimation implements Asset {
 
     /**
      * Sets up the bone hierarchy for this animation
-     * @param names The names of each bone
+     *
+     * @param names   The names of each bone
      * @param parents The index of the parent of each bone, -1 for no parent
      * @throws IllegalArgumentException If the names.length != parents.length
      */

@@ -16,7 +16,6 @@
 
 package org.terasology.rendering.assetLoaders.md5;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
 import com.google.common.collect.Lists;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetUri;
@@ -24,7 +23,6 @@ import org.terasology.math.AABB;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.assets.animation.MeshAnimationFrame;
 
-import javax.swing.*;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.io.BufferedReader;
