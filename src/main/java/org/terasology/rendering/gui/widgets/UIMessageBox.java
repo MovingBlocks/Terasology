@@ -21,7 +21,12 @@ import org.newdawn.slick.Color;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 
-public class UIMessageBox extends UIDialogBox {
+/**
+ * 
+ * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
+ * TODO needs some work.
+ */
+public class UIMessageBox extends UIDialog {
     private UILabel infoText;
     private UIButton buttonOk;
 

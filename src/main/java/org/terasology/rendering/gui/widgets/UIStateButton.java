@@ -26,7 +26,9 @@ import com.google.gson.internal.Pair;
 /**
  * This class extends the UIButton and adds functionality to add states to a button. Each state will be assigned a label and a action to execute as the button enters the state.
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
- *
+ * 
+ * TODO integrate into UIButton
+ * @deprecated
  */
 public class UIStateButton extends UIButton {
     private final LinkedList<Pair<String, StateButtonAction>> _states = new LinkedList<Pair<String, StateButtonAction>>();

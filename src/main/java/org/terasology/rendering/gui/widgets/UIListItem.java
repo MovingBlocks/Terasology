@@ -28,21 +28,26 @@ import org.terasology.rendering.gui.framework.style.Style;
  * A list item. As default the list item contains a UIlabel to display a text.
  * Fancy list items can be achieved by adding child elements to the list item.
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
- *
+ * @see UIList
  */
 public class UIListItem extends UIDisplayContainer {
     
+    //options
+    private boolean isSelected = false;
+    private Color textColor = Color.white;
+    private Color textSelectionColor = Color.orange;
+    private Color selectionColor = new Color(0xE1, 0xDD, 0xD4);
+    
+    //other
     private UIList list;
     private Object value;
-    private boolean isSelected = false;
     
     //child elements
     private UILabel label;
     
-    //options
-    private Color textColor = Color.white;
-    private Color textSelectionColor = Color.orange;
-    private Color selectionColor = new Color(0xE1, 0xDD, 0xD4);
+    public UIListItem() {
+        setup("", null);
+    }
     
     public UIListItem(Object value) {
         setup("", value);

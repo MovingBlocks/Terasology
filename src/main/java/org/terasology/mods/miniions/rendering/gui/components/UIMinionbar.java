@@ -48,7 +48,7 @@ public class UIMinionbar extends UIDisplayContainer {
     private final UIMinionbarCell[] cells;
     //private int prevSelected = 0;
     
-    private class UIMinionbarCell extends UIDisplayElement {
+    private class UIMinionbarCell extends UIDisplayContainer {
 
         private final UIImage selectionRectangle;
         private final UILabel label;

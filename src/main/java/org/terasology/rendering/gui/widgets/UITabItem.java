@@ -36,6 +36,7 @@ import org.terasology.rendering.gui.layout.RowLayout;
  */
 public class UITabItem extends UIDisplayContainerScrollable {
     
+    //child elements
     private UITabFolder tabFolder;
     private final UITab tab;
     

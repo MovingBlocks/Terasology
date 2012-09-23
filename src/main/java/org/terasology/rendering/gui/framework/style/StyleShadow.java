@@ -31,6 +31,7 @@ import org.lwjgl.opengl.GL11;
 import org.terasology.asset.AssetManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.assets.Texture;
+import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
@@ -41,7 +42,7 @@ import org.terasology.rendering.primitives.TessellatorHelper;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  * 
  */
-public class StyleShadow extends UIDisplayElement implements Style {
+public class StyleShadow extends UIDisplayContainer implements Style {
     
     /*
        TODO add to gui_menu.png?

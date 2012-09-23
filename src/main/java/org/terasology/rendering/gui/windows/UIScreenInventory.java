@@ -72,12 +72,12 @@ public class UIScreenInventory extends UIWindow {
                     GUIManager.getInstance().getWindowById("hud").getElementById("rightGearWheel").setVisible(false);
                     layout();
                     inventory.setPosition(new Vector2f(Display.getWidth()/2 - inventory.getSize().x/2, Display.getHeight() + 5f));
-                    inventory.setAnimation(new AnimationMove(new Vector2f(Display.getWidth() / 2 - inventory.getSize().x / 2, Display.getHeight() - 192f), 20f));
+                    inventory.addAnimation(new AnimationMove(new Vector2f(Display.getWidth() / 2 - inventory.getSize().x / 2, Display.getHeight() - 192f), 20f));
                     inventory.getAnimation(AnimationMove.class).start();
 
-                    leftGearWheel.setAnimation(new AnimationRotate(-120f,10f));
+                    leftGearWheel.addAnimation(new AnimationRotate(-120f,10f));
                     leftGearWheel.getAnimation(AnimationRotate.class).start();
-                    rightGearWheel.setAnimation(new AnimationRotate(120f,10f));
+                    rightGearWheel.addAnimation(new AnimationRotate(120f,10f));
                     rightGearWheel.getAnimation(AnimationRotate.class).start();
                 }else{
                     GUIManager.getInstance().getWindowById("hud").getElementById("leftGearWheel").setVisible(true);

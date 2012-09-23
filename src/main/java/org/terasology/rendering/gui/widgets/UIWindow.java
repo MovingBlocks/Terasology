@@ -39,8 +39,6 @@ import java.util.logging.Logger;
  */
 public class UIWindow extends UIDisplayContainerScrollable {
     
-    private Logger logger = Logger.getLogger(getClass().getName());
-
     //events
     private static enum EWindowEvent {INITIALISE, SHUTDOWN};
     private final ArrayList<WindowListener> windowListeners = new ArrayList<WindowListener>();
@@ -51,6 +49,9 @@ public class UIWindow extends UIDisplayContainerScrollable {
     
     //layout
     private boolean modal = false;
+    
+    //other
+    private Logger logger = Logger.getLogger(getClass().getName());
     
     public UIWindow() {
         addClickListener(new ClickListener() {
@@ -92,27 +93,10 @@ public class UIWindow extends UIDisplayContainerScrollable {
             }
         });
     }
-
-    private void notifyWindowListeners(EWindowEvent event) {
-        if (event == EWindowEvent.INITIALISE) {
-            for (WindowListener listener : windowListeners) {
-                listener.initialise(this);
-            }
-        } else if (event == EWindowEvent.SHUTDOWN) {
-            for (WindowListener listener : windowListeners) {
-                listener.shutdown(this);
-            }
-        }
-    }
     
-    public void addWindowListener(WindowListener listener) {
-        windowListeners.add(listener);
-    }
-
-    public void removeWindowListener(WindowListener listener) {
-        windowListeners.remove(listener);
-    }
-
+    /**
+     * Maximize the window.
+     */
     public void maximize() {
         setSize("100%", "100%");
     }
@@ -166,7 +150,7 @@ public class UIWindow extends UIDisplayContainerScrollable {
     public void open() { 
         setFocus(this);
         setVisible(true);
-        setAnimation(new AnimationOpacity(0f, 1f, 10f));
+        addAnimation(new AnimationOpacity(0f, 1f, 10f));
         getAnimation(AnimationOpacity.class).start();
         
         GUIManager.getInstance().openWindow(this);
@@ -199,5 +183,29 @@ public class UIWindow extends UIDisplayContainerScrollable {
     public void shutdown() {
         logger.log(Level.INFO, "Shutdown window with with ID \"" + getId() + "\"");
         notifyWindowListeners(EWindowEvent.SHUTDOWN);
+    }
+    
+    /*
+       Event listeners
+    */
+    
+    private void notifyWindowListeners(EWindowEvent event) {
+        if (event == EWindowEvent.INITIALISE) {
+            for (WindowListener listener : windowListeners) {
+                listener.initialise(this);
+            }
+        } else if (event == EWindowEvent.SHUTDOWN) {
+            for (WindowListener listener : windowListeners) {
+                listener.shutdown(this);
+            }
+        }
+    }
+    
+    public void addWindowListener(WindowListener listener) {
+        windowListeners.add(listener);
+    }
+
+    public void removeWindowListener(WindowListener listener) {
+        windowListeners.remove(listener);
     }
 }

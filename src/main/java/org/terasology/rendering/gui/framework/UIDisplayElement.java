@@ -39,6 +39,7 @@ import org.terasology.rendering.gui.framework.events.KeyListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 import org.terasology.rendering.gui.framework.events.VisibilityListener;
+import org.terasology.rendering.gui.widgets.UIWindow;
 
 /**
  * Base class for all displayable UI elements.
@@ -46,26 +47,32 @@ import org.terasology.rendering.gui.framework.events.VisibilityListener;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  * 
- * TODO improve z-order for click events
  * TODO remove this class, move this to UIDisplayContainer
  */
 public abstract class UIDisplayElement {
 
     protected static UIDisplayElement focusedElement;
     
+    private UIWindow window;
     private UIDisplayElement parent;
     private String id = "";
     
     //events
     private final ArrayList<VisibilityListener> visibilityListeners = new ArrayList<VisibilityListener>();
-    private final ArrayList<MouseMoveListener> mouseListeners = new ArrayList<MouseMoveListener>();
+    private final ArrayList<MouseMoveListener> mouseMoveListeners = new ArrayList<MouseMoveListener>();
     private final ArrayList<MouseButtonListener> mouseButtonListeners = new ArrayList<MouseButtonListener>();
     private final ArrayList<ClickListener> clickListeners = new ArrayList<ClickListener>();
+    private final ArrayList<ClickListener> doubleClickListeners = new ArrayList<ClickListener>();
     private final ArrayList<FocusListener> focusListeners = new ArrayList<FocusListener>();
     private final ArrayList<KeyListener> keyListeners = new ArrayList<KeyListener>();
     private final ArrayList<BindKeyListener> bindKeyListeners = new ArrayList<BindKeyListener>();
     private static enum EMouseEvents {ENTER, LEAVE, HOVER, MOVE};
     private EMouseEvents lastMouseState;
+    
+    private final long doubleClickTimeout = 200;
+    private long lastTime = 0;
+    private int lastButton = -1;
+    
     private boolean mouseIsDown = false;
     private boolean consumeEvents = true;
     
@@ -80,22 +87,23 @@ public abstract class UIDisplayElement {
     private EVerticalAlign verticalAlign = EVerticalAlign.TOP;
     private EHorizontalAlign horizontalAlign = EHorizontalAlign.LEFT;
     
+    //position type
+    public static enum EPositionType {ABSOLUTE, RELATIVE};
+    protected EPositionType positionType = EPositionType.RELATIVE;
+    
     //position and size
+    private final Vector2f position = new Vector2f(0, 0);
+    protected final Vector2f positionOriginal  = new Vector2f(0, 0);
+    private final Vector2f size = new Vector2f(0, 0);
+    protected final Vector2f sizeOriginal = new Vector2f(0, 0);
+    
+    //position and size unit
     public static enum EUnitType {PIXEL, PERCENTAGE};
     protected EUnitType unitPositionX = EUnitType.PIXEL;
     protected EUnitType unitPositionY = EUnitType.PIXEL;
     protected EUnitType unitSizeX = EUnitType.PIXEL;
     protected EUnitType unitSizeY = EUnitType.PIXEL;
     
-    public static enum EPositionType {ABSOLUTE, RELATIVE};
-    protected EPositionType positionType = EPositionType.RELATIVE;
-    private final Vector2f position = new Vector2f(0, 0);
-    protected final Vector2f positionOriginal  = new Vector2f(0, 0);
-    
-    private final Vector2f size = new Vector2f(0, 0);
-
-    protected final Vector2f sizeOriginal = new Vector2f(0, 0);
-
     //animation
     private final List<Animation> animations = new ArrayList<Animation>();
 
@@ -163,11 +171,11 @@ public abstract class UIDisplayElement {
         if (!isVisible())
             return consumed;
 
-        if (mouseListeners.size() > 0 || mouseButtonListeners.size() > 0 || clickListeners.size() > 0) {
+        if (mouseMoveListeners.size() > 0 || mouseButtonListeners.size() > 0 || clickListeners.size() > 0 || doubleClickListeners.size() > 0) {
             if (intersects(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()))) {
                 if (!croped) {
                     if (lastMouseState == EMouseEvents.ENTER && (consumed || croped)) {
-                        notifyMouseListeners(EMouseEvents.LEAVE, consumed);
+                        notifyMouseMoveListeners(EMouseEvents.LEAVE, consumed);
                         lastMouseState = EMouseEvents.LEAVE;
                     }
                     
@@ -185,6 +193,15 @@ public abstract class UIDisplayElement {
                         notifyClickListeners(button, consumed);
                         notifyMouseButtonListeners(button, false, wheelMoved, true, consumed);
                         mouseIsDown = false;
+                        
+                        //check double click
+                        if ((System.currentTimeMillis() - lastTime) < doubleClickTimeout && lastButton == button) {
+                            notifyDoubleClickListeners(button);
+                            System.out.println("double click! " + this);
+                        }
+                        lastTime = System.currentTimeMillis();
+                        lastButton = button;
+                        
                         if (!consumed && consumeEvents) {
                             //System.out.println("consumed mouse up/click event (intersect): " + this);
                             consumed = true;
@@ -192,7 +209,7 @@ public abstract class UIDisplayElement {
                     }
                     
                     if (lastMouseState == EMouseEvents.LEAVE || lastMouseState == null) {
-                        notifyMouseListeners(EMouseEvents.ENTER, consumed);
+                        notifyMouseMoveListeners(EMouseEvents.ENTER, consumed);
                         if (!consumed) {
                             lastMouseState = EMouseEvents.ENTER;
                             if (consumeEvents) {
@@ -208,7 +225,7 @@ public abstract class UIDisplayElement {
                     }
                     
                     //mouse position listeners
-                    notifyMouseListeners(EMouseEvents.HOVER, consumed);
+                    notifyMouseMoveListeners(EMouseEvents.HOVER, consumed);
                     
                     if (!consumed) {
                         lastMouseState = EMouseEvents.ENTER;
@@ -219,7 +236,7 @@ public abstract class UIDisplayElement {
                     }
                 } else {
                     if (lastMouseState == EMouseEvents.ENTER) {
-                        notifyMouseListeners(EMouseEvents.LEAVE, consumed);
+                        notifyMouseMoveListeners(EMouseEvents.LEAVE, consumed);
                         lastMouseState = EMouseEvents.LEAVE;
                     }
                 }
@@ -240,15 +257,15 @@ public abstract class UIDisplayElement {
                 
                 //mouse position listeners
                 if (lastMouseState == EMouseEvents.ENTER || lastMouseState == null) {
-                    notifyMouseListeners(EMouseEvents.LEAVE, consumed);
+                    notifyMouseMoveListeners(EMouseEvents.LEAVE, consumed);
                     lastMouseState = EMouseEvents.LEAVE;
                 }
             }
         }
         
         //check for no changes in button presses -> this means mouse was moved
-        if (mouseListeners.size() > 0 && button == -1 && wheelMoved == 0) {
-            notifyMouseListeners(EMouseEvents.MOVE, consumed);
+        if (mouseMoveListeners.size() > 0 && button == -1 && wheelMoved == 0) {
+            notifyMouseMoveListeners(EMouseEvents.MOVE, consumed);
         }
         
         return consumed;
@@ -295,8 +312,6 @@ public abstract class UIDisplayElement {
 
     /**
      * Update the display element. For tasks which needs continuously updates. Will be executed every tick and needs to be avoided.
-     * 
-     * TODO remove? isn't really needed anymore.
      */
     public void update(){
         for(Animation animation: animations){
@@ -370,24 +385,19 @@ public abstract class UIDisplayElement {
     private float calcHorizontalAlign(EHorizontalAlign align) {
         
         if (align == EHorizontalAlign.LEFT) {
-            
             return 0f;
-            
         } else if (align == EHorizontalAlign.CENTER) {
-            
             if (positionType == EPositionType.RELATIVE && parent != null) {
                 return parent.getSize().x / 2 - size.x / 2;
             } else if (positionType == EPositionType.ABSOLUTE) {
                 return Display.getWidth() / 2 - size.x / 2;
             }
-            
         } else if (align == EHorizontalAlign.RIGHT) {
             if (positionType == EPositionType.RELATIVE && parent != null) {
                 return parent.getSize().x - size.x;
             } else if (positionType == EPositionType.ABSOLUTE) {
                 return Display.getWidth() - size.x;
             }
-            
         }
         
         return 0f;
@@ -414,26 +424,54 @@ public abstract class UIDisplayElement {
         return 0f;
     }
     
+    /**
+     * Get the position type which can be RELATIVE or ABSOLUTE.
+     * @return Returns the position type.
+     */
     public EPositionType getPositionType() {
         return positionType;
     }
-
+    
+    /**
+     * Set the position type which can be RELATIVE or ABSOLUTE.
+     * @param positionType
+     */
     public void setPositionType(EPositionType positionType) {
         this.positionType = positionType;
     }
     
+    /**
+     * Get the vertical align which describes the position of the element in its parent element or on the display, depending on the position type (<i>RELATIVE</i> or <i>ABSOLUTE</i>).
+     * The position will be added as an offset to the the <i>TOP</i>, <i>CENTER</i> or <i>BOTTOM</i> align.
+     * @return Returns the vertical align.
+     */
     public EVerticalAlign getVerticalAlign() {
         return verticalAlign;
     }
-
+    
+    /**
+     * Set the vertical align which describes the position of the element in its parent element or on the display, depending on the position type (<i>RELATIVE</i> or <i>ABSOLUTE</i>).
+     * The position will be added as an offset to the the <i>TOP</i>, <i>CENTER</i> or <i>BOTTOM</i> align.
+     * @param verticalAlign The vertical align.
+     */
     public void setVerticalAlign(EVerticalAlign verticalAlign) {
         this.verticalAlign = verticalAlign;
     }
-
+    
+    /**
+     * Get the horizontal align which describes the position of the element in its parent element or on the display, depending on the position type (<i>RELATIVE</i> or <i>ABSOLUTE</i>).
+     * The position will be added as an offset to the the <i>LEFT</i>, <i>CENTER</i> or <i>RIGHT</i> align.
+     * @return Returns the horizontal align.
+     */
     public EHorizontalAlign getHorizontalAlign() {
         return horizontalAlign;
     }
-
+    
+    /**
+     * Set the horizontal align which describes the position of the element in its parent element or on the display, depending on the position type (<i>RELATIVE</i> or <i>ABSOLUTE</i>).
+     * The position will be added as an offset to the the <i>LEFT</i>, <i>CENTER</i> or <i>RIGHT</i> align.
+     * @param horizontalAlign The horizontal align.
+     */
     public void setHorizontalAlign(EHorizontalAlign horizontalAlign) {
         this.horizontalAlign = horizontalAlign;
     }
@@ -512,10 +550,18 @@ public abstract class UIDisplayElement {
         layout();
     }
     
+    /**
+     * Get the unit of the position in y direction, which can be <i>PIXEL</i> or <i>PERCENTAGE</i>
+     * @return Returns the unit.
+     */
     public EUnitType getUnitPositionX() {
         return unitPositionX;
     }
-
+    
+    /**
+     * Get the unit of the position in y direction, which can be <i>PIXEL</i> or <i>PERCENTAGE</i>
+     * @return Returns the unit.
+     */
     public EUnitType getUnitPositionY() {
         return unitPositionY;
     }
@@ -597,26 +643,36 @@ public abstract class UIDisplayElement {
         
         layout();
     }
-
+    
+    /**
+     * Get the unit of the size in x direction, which can be <i>PIXEL</i> or <i>PERCENTAGE</i>
+     * @return Returns the unit.
+     */
     public EUnitType getUnitSizeX() {
         return unitSizeX;
     }
-
+    
+    /**
+     * Get the unit of the size in y direction, which can be <i>PIXEL</i> or <i>PERCENTAGE</i>
+     * @return Returns the unit.
+     */
     public EUnitType getUnitSizeY() {
         return unitSizeY;
     }
     
     /**
-     * 
-     * @return
+     * Check whether the display element consumes the mouse events. On default all display elements consume the mouse events. 
+     * If a display element doesn't consume the mouse events, the z-ordering of will have no effect if the display element is on top of another.
+     * @return Returns true when the display element consumes the mouse events.
      */
     public boolean isConsumeEvents() {
         return consumeEvents;
     }
     
     /**
-     * 
-     * @param consumeEvents
+     * Check whether the display element consumes the mouse events. On default all display elements consume the mouse events. 
+     * If a display element doesn't consume the mouse events, the z-ordering of will have no effect if the display element is on top of another.
+     * @param consumeEvents True to consume the mouse events.
      */
     public void setConsumeEvents(boolean consumeEvents) {
         this.consumeEvents = consumeEvents;
@@ -624,7 +680,7 @@ public abstract class UIDisplayElement {
     
     /**
      * Check whether the display element is visible.
-     * @return
+     * @return Returns true if the display element is visible.
      */
     public boolean isVisible() {
         return isVisible;
@@ -667,7 +723,7 @@ public abstract class UIDisplayElement {
     
     /**
      * Check whether the element can be cropped.
-     * @return
+     * @return Returns true if the element can be cropped.
      */
     public boolean isCrop() {
         return isCrop;
@@ -680,7 +736,23 @@ public abstract class UIDisplayElement {
     public void setCrop(boolean crop) {
         isCrop = crop;
     }
-
+    
+    /**
+     * Get the window where the display element belongs to.
+     * @return Returns the window where the display element belongs to. If the element itself is an instance of UIWindow, a null reference will be returned.
+     */
+    public UIWindow getWindow() {
+        return window;
+    }
+    
+    /**
+     * Set the window where the display element belongs to. Will be set in setParent.
+     * @param window The window.
+     */
+    protected void setWindow(UIWindow window) {
+        this.window = window;
+    }
+    
     /**
      * Get the parent of the display element.
      * @return Returns the parent of the display element or null if no parent was assigned.
@@ -693,8 +765,18 @@ public abstract class UIDisplayElement {
      * Set the parent of the display element.
      * @param parent The parent to set.
      */
-    public void setParent(UIDisplayElement parent) {
+    protected void setParent(UIDisplayElement parent) {
         this.parent = parent;
+        
+        while (!(parent instanceof UIWindow)) {
+            if (parent == null) {
+                break;
+            }
+            
+            parent = parent.getWindow();
+        }
+        
+        setWindow((UIWindow) parent);
     }
     
     /**
@@ -712,7 +794,7 @@ public abstract class UIDisplayElement {
     public void setId(String id) {
         this.id = id;
     }
-
+    
     /**
      * Returns true if the given point intersects the display element.
      *
@@ -726,7 +808,7 @@ public abstract class UIDisplayElement {
     /**
      * Debug command. Prints the stack of all parent display elements.
      */
-    public void printParents() {
+    public void printParentStack() {
         UIDisplayElement parent = this;
         while (parent != null) {
             if (parent != this) {
@@ -756,7 +838,11 @@ public abstract class UIDisplayElement {
         return position;
     }
     
-    public void setAnimation(Animation newAnimation){
+    /**
+     * Add an animation, such as the rotation, movement or opacity animation. Every display element can only have one object of a specific class animation. To get an animation use the getAnimation method.
+     * @param newAnimation The animation to add.
+     */
+    public void addAnimation(Animation newAnimation){
         Animation animation = getAnimation(newAnimation.getClass());
 
         newAnimation.setTarget(this);
@@ -770,7 +856,12 @@ public abstract class UIDisplayElement {
 
         animations.add(newAnimation);
     }
-
+    
+    /**
+     * Get a specific animation which was added through the addAnimation method.
+     * @param animation The animation class.
+     * @return Returns the animation of the given class. If no animation of this class is added a null reference will be returned.
+     */
     public <T> T getAnimation(Class<T> animation) {
         for (Animation s : animations) {
             if (s.getClass() == animation) {
@@ -784,10 +875,15 @@ public abstract class UIDisplayElement {
     /*
        The event listeners which every display element in the UI supports
     */
-
-    private void notifyVisibilityListeners(boolean visible) {
+    
+    /**
+     * Notify the visibility listeners which will be notified when the elements visibility will be changed.
+     * @param visible
+     */
+    protected void notifyVisibilityListeners(boolean visible) {
         //we copy the list so the listener can remove itself within the close/open method call (see UIItemCell). Otherwise ConcurrentModificationException.
         //TODO other solution?
+        @SuppressWarnings("unchecked")
         ArrayList<VisibilityListener> listeners = (ArrayList<VisibilityListener>) visibilityListeners.clone();
         
         for (VisibilityListener listener : listeners) {
@@ -795,15 +891,31 @@ public abstract class UIDisplayElement {
         }
     }
     
+    /**
+     * Add a visibility listener which will be notified when the elements visibility will be changed.
+     * @param listener The listener to add.
+     */
     public void addVisibilityListener(VisibilityListener listener) {
         visibilityListeners.add(listener);
     }
     
+    /**
+     * Remove a visibility listener which will be notified when the elements visibility will be changed.
+     * @param listener The listener to remove.
+     */
     public void removeVisibilityListener(VisibilityListener listener) {
         visibilityListeners.remove(listener);
     }
     
-    private void notifyMouseButtonListeners(int button, boolean state, int wheel, boolean intersect, boolean consumed) {
+    /**
+     * Notify the mouse button listeners which will be notified when the left, right or middle mouse buttons state changes or the mouse wheel will be moved.
+     * @param button
+     * @param state
+     * @param wheel
+     * @param intersect
+     * @param consumed
+     */
+    protected void notifyMouseButtonListeners(int button, boolean state, int wheel, boolean intersect, boolean consumed) {
         if (button == -1) {
             for (MouseButtonListener listener : mouseButtonListeners) {
                 listener.wheel(this, wheel, intersect);
@@ -823,15 +935,28 @@ public abstract class UIDisplayElement {
         }      
     }
     
+    /**
+     * Add a mouse button listener which will be notified when the left, right or middle mouse buttons state changes or the mouse wheel will be moved.
+     * @param listener The listener to add.
+     */
     public void addMouseButtonListener(MouseButtonListener listener) {
         mouseButtonListeners.add(listener);
     }
-
+    
+    /**
+     * Remove a mouse button listener which will be notified when the left, right or middle mouse buttons state changes or the mouse wheel will be moved.
+     * @param listener The listener to remove.
+     */
     public void removeMouseButtonListener(MouseButtonListener listener) {
         mouseButtonListeners.remove(listener);
     }
     
-    private void notifyClickListeners(int value, boolean consumed) {
+    /**
+     * Notify the click listeners which will be notified if the element was clicked on.
+     * @param value
+     * @param consumed
+     */
+    protected void notifyClickListeners(int value, boolean consumed) {
         if (!consumed) {
             for (ClickListener listener : clickListeners) {
                 listener.click(this, value);
@@ -839,43 +964,105 @@ public abstract class UIDisplayElement {
         }
     }
     
+    /**
+     * Add a click listener which will be notified if the element was clicked on.
+     * @param listener The listener to add.
+     */
     public void addClickListener(ClickListener listener) {
         clickListeners.add(listener);
     }
-
+    
+    /**
+     * Remove a click listener which will be notified if the element was clicked on.
+     * @param listener The listener to remove.
+     */
     public void removeClickListener(ClickListener listener) {
         clickListeners.remove(listener);
     }
     
-    private void notifyKeyListeners(KeyEvent event) {
+    /**
+     * Notify the double click listeners which will be notified if the element was double clicked on.
+     * @param button
+     */
+    protected void notifyDoubleClickListeners(int button) {
+        for (int i = 0; i < doubleClickListeners.size(); i++) {
+            doubleClickListeners.get(i).click(this, button);
+        }
+    }
+    
+    /**
+     * Add a double click listener which will be notified if the element was double clicked on.
+     * @param listener The listener to add.
+     */
+    public void addDoubleClickListener(ClickListener listener) {
+        doubleClickListeners.add(listener);
+    }
+    
+    /**
+     * Remove a double click listener which will be notified if the element was double clicked on.
+     * @param listener The listener to remove.
+     */
+    public void removeDoubleClickListener(ClickListener listener) {
+        doubleClickListeners.remove(listener);
+    }
+    
+    /**
+     * Notify the key listeners which will be notified with raw keyboard input data when the state of a key changes.
+     * @param event
+     */
+    protected void notifyKeyListeners(KeyEvent event) {
         for (KeyListener listener : keyListeners) {
             listener.key(this, event);
         }
     }
     
+    /**
+     * Add a key listener which will be notified with raw keyboard input data when the state of a key changes.
+     * @param listener The listener to add.
+     */
     public void addKeyListener(KeyListener listener) {
         keyListeners.add(listener);
     }
-
+    
+    /**
+     * Remove a key listener which will be notified with raw keyboard input data when the state of a key changes.
+     * @param listener The listener to remove.
+     */
     public void removeKeyListener(KeyListener listener) {
         keyListeners.remove(listener);
     }
     
-    private void notifyBindKeyListeners(BindButtonEvent event) {
+    /**
+     * Notify the bind key listeners which will be notified if a special key was pressed, which is bind to a specific action.
+     * @param event
+     */
+    protected void notifyBindKeyListeners(BindButtonEvent event) {
         for (BindKeyListener listener : bindKeyListeners) {
             listener.key(this, event);
         }
     }
     
+    /**
+     * Add a bind key listener which will be notified if a special key was pressed, which is bind to a specific action.
+     * @param listener The listener to add.
+     */
     public void addBindKeyListener(BindKeyListener listener) {
         bindKeyListeners.add(listener);
     }
-
+    
+    /**
+     * Remove a bind key listener which will be notified if a special key was pressed, which is bind to a specific action.
+     * @param listener The listener to remove.
+     */
     public void removeBindKeyListener(BindKeyListener listener) {
         bindKeyListeners.remove(listener);
     }
     
-    private void notifyFocusListeners(boolean focus) {
+    /**
+     * Notify the focus listeners which will be notified if the element gains or loses the focus.
+     * @param focus
+     */
+    protected void notifyFocusListeners(boolean focus) {
         if (focus) {
             for (FocusListener listener : focusListeners) {
                 listener.focusOn(this);
@@ -888,51 +1075,77 @@ public abstract class UIDisplayElement {
         }
     }
     
+    /**
+     * Add a focus listener which will be notified if the element gains or loses the focus.
+     * @param listener The listener to add.
+     */
     public void addFocusListener(FocusListener listener) {
         focusListeners.add(listener);
     }
-
+    
+    /**
+     * Remove a focus listener which will be notified if the element gains or loses the focus.
+     * @param listener The listener to remove.
+     */
     public void removeFocusListener(FocusListener listener) {
         focusListeners.remove(listener);
     }
     
-    private void notifyMouseListeners(EMouseEvents type, boolean consumed) {
+    /**
+     * Notify the mouse move listeners which will be notified on raw mouse move actions, as the mouse enters or leaves the element or the mouse is over the element.
+     * @param type
+     * @param consumed
+     */
+    protected void notifyMouseMoveListeners(EMouseEvents type, boolean consumed) {
         switch (type) {
         case ENTER:
             if (!consumed) {
-                for (MouseMoveListener listener : mouseListeners) {
+                for (MouseMoveListener listener : mouseMoveListeners) {
                     listener.enter(this);
                 }
             }
         break;
         case LEAVE:
-            for (MouseMoveListener listener : mouseListeners) {
+            for (MouseMoveListener listener : mouseMoveListeners) {
                 listener.leave(this);
             }
         break;
         case HOVER:
             if (!consumed) {
-                for (MouseMoveListener listener : mouseListeners) {
+                for (MouseMoveListener listener : mouseMoveListeners) {
                     listener.hover(this);
                 }
             }
         break;
         case MOVE:
-            for (MouseMoveListener listener : mouseListeners) {
+            for (MouseMoveListener listener : mouseMoveListeners) {
                 listener.move(this);
             }
         break;
         }
     }
     
+    /**
+     * Add a mouse move listener which will be notified on raw mouse move actions, as the mouse enters or leaves the element or the mouse is over the element.
+     * @param listener The listener to add.
+     */
     public void addMouseMoveListener(MouseMoveListener listener) {
-        mouseListeners.add(listener);
-    }
-
-    public void removeMouseMoveListener(MouseMoveListener listener) {
-        mouseListeners.remove(listener);
+        mouseMoveListeners.add(listener);
     }
     
+    /**
+     * Remove a mouse move listener which will be notified on raw mouse move actions, as the mouse enters or leaves the element or the mouse is over the element.
+     * @param listener The listener to remove.
+     */
+    public void removeMouseMoveListener(MouseMoveListener listener) {
+        mouseMoveListeners.remove(listener);
+    }
+    
+    /**
+     * Add a animation listener to a specific animation which will be notified when the animation start, stops or repeats.
+     * @param animation The class of the animation.
+     * @param listener The listener to add.
+     */
     public <T extends Animation> void addAnimationListener(Class<T> animation, AnimationListener listener) {
         Animation animationClass = getAnimation(animation);
         if (animationClass != null) {
@@ -940,6 +1153,11 @@ public abstract class UIDisplayElement {
         }
     }
     
+    /**
+     * Remove a animation listener of a specific animation.
+     * @param animation The class of the animation.
+     * @param listener The listener to remove.
+     */
     public <T extends Animation> void removeAnimationListener(Class<T> animation, AnimationListener listener) {
         Animation animationClass = getAnimation(animation);
         if (animationClass != null) {
