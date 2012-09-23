@@ -36,6 +36,8 @@ import org.terasology.rendering.gui.framework.events.MouseMoveListener;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
+ * 
+ * TODO program from scratch -> integrate state button here -> implement radio button?
  */
 public class UIButton extends UIDisplayContainer {
 

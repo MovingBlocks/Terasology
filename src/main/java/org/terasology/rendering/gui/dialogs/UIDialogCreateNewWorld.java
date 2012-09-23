@@ -29,6 +29,7 @@ import org.terasology.game.types.SurvivalType;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
+import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.widgets.*;
@@ -51,7 +52,7 @@ import javax.vecmath.Vector4f;
  * @version 0.1
  */
 
-public class UIDialogCreateNewWorld extends UIDialogBox {
+public class UIDialogCreateNewWorld extends UIDialog {
     private UIButton _okButton;
     private UIButton _cancelButton;
 
@@ -65,10 +66,12 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
     private UILabel typeOfGameLabel;
 
     public UIDialogCreateNewWorld() {
-        super(new Vector2f(512f, 376f));
-        setModal(true);
+        super(new Vector2f(512f, 356f));
         setTitle("Create new world");
-
+    }
+    
+    @Override
+    protected void createDialogArea(UIDisplayContainer parent) {
         _inputSeed = new UIText();
         _inputSeed.setSize(new Vector2f(256f, 30f));
         //_inputSeed.setBackgroundImage("engine:gui_menu", new Vector2f(0f, 90f), new Vector2f(256f, 30f));
@@ -136,7 +139,19 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
 
         _chunkGeneratorLabel.setPosition(new Vector2f(typeOfGame.getPosition().x, typeOfGame.getPosition().y + typeOfGame.getSize().y + 16f));
         _chunkGenerator.setPosition(new Vector2f(_chunkGeneratorLabel.getPosition().x, _chunkGeneratorLabel.getPosition().y + _chunkGeneratorLabel.getSize().y + 8f));
-
+        
+        parent.addDisplayElement(_inputWorldTitleLabel);
+        parent.addDisplayElement(_inputWorldTitle);
+        parent.addDisplayElement(_inputSeedLabel);
+        parent.addDisplayElement(_inputSeed);
+        parent.addDisplayElement(_chunkGeneratorLabel);
+        parent.addDisplayElement(_chunkGenerator);
+        parent.addDisplayElement(typeOfGame);
+        parent.addDisplayElement(typeOfGameLabel);
+    }
+    
+    @Override
+    protected void createButtons(UIDisplayContainer parent) {
         _okButton = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
         _okButton.getLabel().setText("Play");
         _okButton.setPosition(new Vector2f(getSize().x / 2 - _okButton.getSize().x - 16f, getSize().y - _okButton.getSize().y - 10));
@@ -209,18 +224,9 @@ public class UIDialogCreateNewWorld extends UIDialogBox {
                 close();
             }
         });
-
-
-        addDisplayElement(_inputWorldTitleLabel);
-        addDisplayElement(_inputWorldTitle);
-        addDisplayElement(_inputSeedLabel);
-        addDisplayElement(_inputSeed);
-        addDisplayElement(_chunkGeneratorLabel);
-        addDisplayElement(_okButton);
-        addDisplayElement(_cancelButton);
-        addDisplayElement(_chunkGenerator);
-        addDisplayElement(typeOfGame);
-        addDisplayElement(typeOfGameLabel);
+        
+        parent.addDisplayElement(_okButton);
+        parent.addDisplayElement(_cancelButton);
     }
 
     private String getWorldName() {

@@ -42,6 +42,7 @@ public class UIScreenLoading extends UIWindow {
         background.setVisible(true);
 
         _progressBar = new UIProgressBar();
+        _progressBar.setSize(new Vector2f(256f, 15f));
         _progressBar.setHorizontalAlign(EHorizontalAlign.CENTER);
         _progressBar.setVerticalAlign(EVerticalAlign.BOTTOM);
         _progressBar.setPosition(new Vector2f(0f, -80f));

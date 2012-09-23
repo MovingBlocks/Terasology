@@ -13,18 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.rendering.gui.framework.events;
+package org.terasology.rendering.gui.layout;
 
-import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.widgets.UIDialog.EReturnCode;
+import org.terasology.rendering.gui.framework.UIDisplayContainer;
 
 /**
  * 
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
- *
+ *  TODO implement
  */
-public interface DialogListener {
-    
-    public void close(UIDisplayElement dialog, EReturnCode returnCode, Object returnValue);
-    
+public class ColumnLayout implements Layout {
+
+    @Override
+    public void layout(UIDisplayContainer container, boolean fitSize) {
+        
+    }
+
+    @Override
+    public void render() {
+        
+    }
+
 }

@@ -288,7 +288,7 @@ public class UILabel extends UIDisplayContainer {
      * Get the shadow color.
      * @return Returns the shadow color.
      */
-    public Color getShadowColor() {
+    public Color getTextShadowColor() {
         return shadowColor;
     }
 
@@ -296,7 +296,7 @@ public class UILabel extends UIDisplayContainer {
      * Set the shadow color.
      * @param shadowColor The shadow color to set.
      */
-    public void setShadowColor(Color shadowColor) {
+    public void setTextShadowColor(Color shadowColor) {
         this.shadowColor = shadowColor;
     }
 
@@ -304,7 +304,7 @@ public class UILabel extends UIDisplayContainer {
      * Check whether the text has a shadow.
      * @return Returns true if the text has a shadow.
      */
-    public boolean isShadow() {
+    public boolean isTextShadow() {
         return enableShadow;
     }
     
@@ -312,7 +312,7 @@ public class UILabel extends UIDisplayContainer {
      * Set whether the text has a color.
      * @param enable True to enable the shadow of the text.
      */
-    public void setShadow(boolean enable) {
+    public void setTextShadow(boolean enable) {
         this.enableShadow = enable;
     }
 
@@ -332,10 +332,18 @@ public class UILabel extends UIDisplayContainer {
         this.font = font;
     }
     
+    /**
+     * Get the margin which will be around the text.
+     * @return Returns the margin.
+     */
     public Vector4f getMargin() {
         return margin;
     }
-
+    
+    /**
+     * Set the margin which will be around the text.
+     * @param margin The margin.
+     */
     public void setMargin(Vector4f margin) {
         this.margin = margin;
     }
@@ -355,7 +363,11 @@ public class UILabel extends UIDisplayContainer {
     public void setWrap(boolean isWrap) {
         this.isWrap = isWrap;
     }
-
+    
+    /*
+       Event listeners
+    */
+    
     private void notifyChangedListeners() {
         for (ChangedListener listener : changedListeners) {
             listener.changed(this);

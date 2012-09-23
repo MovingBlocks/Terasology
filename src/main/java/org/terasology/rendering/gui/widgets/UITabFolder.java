@@ -37,12 +37,12 @@ import org.terasology.rendering.gui.layout.StackLayout;
  */
 public class UITabFolder extends UIDisplayContainer {
     
-    //selection
-    private UITabItem selection = null;
-    
     //events
     private final ArrayList<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
     private final List<SelectionListener> selectionListeners = new ArrayList<SelectionListener>();
+    
+    //selection
+    private UITabItem selection = null;
     
     //child elements
     private final UIComposite container;
@@ -275,6 +275,7 @@ public class UITabFolder extends UIDisplayContainer {
     /*
         Event listeners
     */
+    
     private void notifySelectionListeners() {
         for (SelectionListener listener : selectionListeners) {
             listener.changed(this);

@@ -36,6 +36,7 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.AngelCodeFont;
 import org.newdawn.slick.Color;
 import org.terasology.input.events.KeyEvent;
+import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayContainerScrollable;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
@@ -101,16 +102,16 @@ public class UIText extends UIDisplayContainerScrollable {
     private final char[] multiLineSecialCharacters = new char[] {'\n'};
     private boolean ctrlKeyPressed = false;
     
-    //child elements
-    private final UILabel text;
-    private final UITextCursor cursor;
-    private final UISelection selectionRectangle;
-    
     //options
     private final Vector2f cursorSize = new Vector2f(1f, 16f);
     private int maxLength = 0;
     private boolean disabled;
     private boolean multiLine = false;
+    
+    //child elements
+    private final UILabel text;
+    private final UITextCursor cursor;
+    private final UISelection selectionRectangle;
     
     //key listener
     private KeyListener keyListener = new KeyListener() {
@@ -254,7 +255,7 @@ public class UIText extends UIDisplayContainerScrollable {
      * A text cursor.
      * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
      */
-    private class UITextCursor extends UIDisplayElement {
+    private class UITextCursor extends UIDisplayContainer {
         private Color color = new Color(Color.black);
 
         public UITextCursor(Vector2f size){
@@ -290,7 +291,7 @@ public class UIText extends UIDisplayContainerScrollable {
      * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
      *
      */
-    private class UISelection extends UIDisplayElement {
+    private class UISelection extends UIDisplayContainer {
         private Color color = new Color(Color.gray);
         private final List<Vector2f[]> rectangles = new ArrayList<Vector2f[]>();
         private boolean fade = false;
@@ -1054,15 +1055,24 @@ public class UIText extends UIDisplayContainerScrollable {
         }
     }
     
+    /**
+     * Copy the selection.
+     */
     public void copy() {
         setClipboard(getSelection());
     }
     
+    /**
+     * Cut the selection.
+     */
     public void cut() {
         setClipboard(getSelection());
         deleteSelection();
     }
     
+    /**
+     * Pastes text from clipboard.
+     */
     public void paste() {
         if (selectionStart != selectionEnd) {
             deleteSelection();
@@ -1113,7 +1123,7 @@ public class UIText extends UIDisplayContainerScrollable {
      * @return Returns the shadow color.
      */
     public Color getShadowColor() {
-        return text.getShadowColor();
+        return text.getTextShadowColor();
     }
 
     /**
@@ -1121,7 +1131,7 @@ public class UIText extends UIDisplayContainerScrollable {
      * @param shadowColor The shadow color to set.
      */
     public void setShadowColor(Color shadowColor) {
-        text.setShadowColor(shadowColor);
+        text.setTextShadowColor(shadowColor);
     }
 
     /**
@@ -1129,7 +1139,7 @@ public class UIText extends UIDisplayContainerScrollable {
      * @return Returns true if the text has a shadow.
      */
     public boolean isEnableShadow() {
-        return this.text.isShadow();
+        return this.text.isTextShadow();
     }
     
     /**
@@ -1137,7 +1147,7 @@ public class UIText extends UIDisplayContainerScrollable {
      * @param enable True to enable the shadow of the text.
      */
     public void setEnableShadow(boolean enable) {
-        this.text.setShadow(enable);
+        this.text.setTextShadow(enable);
     }
 
     /**
@@ -1222,6 +1232,10 @@ public class UIText extends UIDisplayContainerScrollable {
             selectionRectangle.setVisible(false);
         }
     }
+    
+    /*
+       Event listeners
+    */
     
     private void notifySelectionListeners() {
         for (SelectionListener listener : selectionListeners) {

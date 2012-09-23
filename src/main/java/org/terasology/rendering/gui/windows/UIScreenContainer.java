@@ -143,11 +143,11 @@ public class UIScreenContainer extends UIWindow {
         layout();
 
         playerInventory.setPosition(new Vector2f(Display.getWidth()/2 - playerInventory.getSize().x/2, Display.getHeight() + 5f));
-        playerInventory.setAnimation(new AnimationMove(new Vector2f(Display.getWidth() / 2 - playerInventory.getSize().x / 2, Display.getHeight() - 192f), 20f));
+        playerInventory.addAnimation(new AnimationMove(new Vector2f(Display.getWidth() / 2 - playerInventory.getSize().x / 2, Display.getHeight() - 192f), 20f));
         playerInventory.getAnimation(AnimationMove.class).start();
-        leftGearWheel.setAnimation(new AnimationRotate(-120f,10f));
+        leftGearWheel.addAnimation(new AnimationRotate(-120f,10f));
         leftGearWheel.getAnimation(AnimationRotate.class).start();
-        rightGearWheel.setAnimation(new AnimationRotate(120f,10f));
+        rightGearWheel.addAnimation(new AnimationRotate(120f,10f));
         rightGearWheel.getAnimation(AnimationRotate.class).start();
     }
 }
