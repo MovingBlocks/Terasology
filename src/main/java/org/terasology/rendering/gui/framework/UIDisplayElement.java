@@ -197,7 +197,7 @@ public abstract class UIDisplayElement {
                         //check double click
                         if ((System.currentTimeMillis() - lastTime) < doubleClickTimeout && lastButton == button) {
                             notifyDoubleClickListeners(button);
-                            System.out.println("double click! " + this);
+                            //System.out.println("double click! " + this);
                         }
                         lastTime = System.currentTimeMillis();
                         lastButton = button;

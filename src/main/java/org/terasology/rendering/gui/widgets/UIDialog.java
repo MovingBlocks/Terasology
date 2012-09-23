@@ -193,7 +193,6 @@ public class UIDialog extends UIWindow {
             
             @Override
             public void down(UIDisplayElement element, int button, boolean intersect) {
-                System.out.println(intersect);
                 if (intersect) {
                     dragged = true;
                     Vector2f mousePos = new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY());
