@@ -105,11 +105,22 @@ public class PhysicsSystem implements EventHandlerSystem, UpdateSubscriberSystem
             RigidBodyConstructionInfo info = new RigidBodyConstructionInfo(rigidBody.mass, new EntityMotionState(entity), shape, fallInertia);
             RigidBody collider = new RigidBody(info);
             collider.setUserPointer(entity);
+            updateKinematicSettings(rigidBody, collider);
             RigidBody oldBody = entityRigidBodies.put(entity, collider);
             physics.addRigidBody(collider, Lists.<CollisionGroup>newArrayList(rigidBody.collisionGroup), rigidBody.collidesWith);
             if (oldBody != null) {
                 physics.removeRigidBody(oldBody);
             }
+        }
+    }
+
+    private void updateKinematicSettings(RigidBodyComponent rigidBody, RigidBody collider) {
+        if (rigidBody.kinematic) {
+            collider.setCollisionFlags(collider.getCollisionFlags() | CollisionFlags.KINEMATIC_OBJECT);
+            collider.setActivationState(CollisionObject.DISABLE_DEACTIVATION);
+        } else {
+            collider.setCollisionFlags(collider.getCollisionFlags() & ~CollisionFlags.KINEMATIC_OBJECT);
+            collider.setActivationState(CollisionObject.ACTIVE_TAG);
         }
     }
 
@@ -185,6 +196,8 @@ public class PhysicsSystem implements EventHandlerSystem, UpdateSubscriberSystem
                 physics.removeRigidBody(rigidBody);
                 createRigidBody(entity);
             }
+
+            updateKinematicSettings(entity.getComponent(RigidBodyComponent.class), rigidBody);
         }
 
         // TODO: update if mass or collision groups change
