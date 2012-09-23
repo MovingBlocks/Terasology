@@ -389,7 +389,14 @@ public class Commands implements CommandController {
         Vector3f offset = new Vector3f(camera.getViewingDirection());
         offset.scale(2);
         spawnPos.add(offset);
-        Quat4f rotation = QuaternionUtil.shortestArcQuat(new Vector3f(0,0,1), camera.getViewingDirection() , new Quat4f());
+        Vector3f dir = new Vector3f(camera.getViewingDirection());
+        dir.y = 0;
+        if (dir.lengthSquared() > 0.001f) {
+            dir.normalize();
+        } else {
+            dir.set(0,0,1);
+        }
+        Quat4f rotation = QuaternionUtil.shortestArcQuat(new Vector3f(0,0,1), dir, new Quat4f());
 
         Prefab prefab = CoreRegistry.get(PrefabManager.class).getPrefab(prefabName);
         if (prefab != null && prefab.getComponent(LocationComponent.class) != null) {

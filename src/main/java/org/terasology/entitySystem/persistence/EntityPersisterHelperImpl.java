@@ -19,6 +19,8 @@ import com.google.common.base.Objects;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Maps;
+import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.procedure.TIntProcedure;
 
 import java.lang.reflect.InvocationTargetException;
@@ -71,7 +73,6 @@ public class EntityPersisterHelperImpl implements EntityPersisterHelper {
     @Override
     public EntityData.World serializeWorld() {
         final EntityData.World.Builder world = EntityData.World.newBuilder();
-        writeIdInfo(world);
 
         if (isUsingLookupTables()) {
             writeComponentTypeTable(world);
@@ -81,9 +82,16 @@ public class EntityPersisterHelperImpl implements EntityPersisterHelper {
             world.addPrefab(serializePrefab(prefab));
         }
 
+        TIntList nonPersistedIds = new TIntArrayList();
         for (EntityRef entity : entityManager.iteratorEntities()) {
-            world.addEntity(serializeEntity(entity));
+            if (entity.isPersisted()) {
+                world.addEntity(serializeEntity(entity));
+            } else {
+                nonPersistedIds.add(entity.getId());
+            }
         }
+
+        writeIdInfo(world, nonPersistedIds);
         return world.build();
     }
 
@@ -105,6 +113,7 @@ public class EntityPersisterHelperImpl implements EntityPersisterHelper {
         for (Prefab parent : prefab.getParents()) {
             prefabData.addParentName(parent.getName());
         }
+        prefabData.setPersisted(prefab.isPersisted());
 
         for (Component component : prefab.listOwnComponents()) {
             EntityData.Component componentData = serializeComponent(component);
@@ -184,7 +193,7 @@ public class EntityPersisterHelperImpl implements EntityPersisterHelper {
                     componentMap.put(component.getClass(), componentLibrary.copy(component));
                 }
             }
-            componentMap.put(EntityInfoComponent.class, new EntityInfoComponent(entityData.getParentPrefab()));
+            componentMap.put(EntityInfoComponent.class, new EntityInfoComponent(entityData.getParentPrefab(), true));
         }
         for (EntityData.Component componentData : entityData.getComponentList()) {
             Class<? extends Component> componentClass = getComponentClass(componentData);
@@ -213,6 +222,7 @@ public class EntityPersisterHelperImpl implements EntityPersisterHelper {
         }
 
         Prefab prefab = prefabManager.createPrefab(name);
+        prefab.setPersisted(prefabData.getPersisted());
         for (String parentName : prefabData.getParentNameList()) {
             int packageSplit = parentName.indexOf(':');
             if (packageSplit == -1) {
@@ -329,9 +339,15 @@ public class EntityPersisterHelperImpl implements EntityPersisterHelper {
         }
     }
 
-    private void writeIdInfo(final EntityData.World.Builder world) {
+    private void writeIdInfo(final EntityData.World.Builder world, TIntList nonPersistedIds) {
         world.setNextEntityId(entityManager.getNextId());
         entityManager.getFreedIds().forEach(new TIntProcedure() {
+            public boolean execute(int i) {
+                world.addFreedEntityId(i);
+                return true;
+            }
+        });
+        nonPersistedIds.forEach(new TIntProcedure() {
             public boolean execute(int i) {
                 world.addFreedEntityId(i);
                 return true;

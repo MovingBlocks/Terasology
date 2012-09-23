@@ -145,7 +145,7 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
                 loc.setWorldRotation(rotation);
             }
         }
-        components.add(new EntityInfoComponent(prefab.getName()));
+        components.add(new EntityInfoComponent(prefab.getName(), prefab.isPersisted()));
         return create(components);
     }
 
@@ -160,7 +160,7 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
                 loc.setWorldPosition(position);
             }
         }
-        components.add(new EntityInfoComponent(prefab.getName()));
+        components.add(new EntityInfoComponent(prefab.getName(), prefab.isPersisted()));
         return create(components);
     }
 
@@ -170,7 +170,7 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
         for (Component component : prefab.listComponents()) {
             components.add(componentLibrary.copy(component));
         }
-        components.add(new EntityInfoComponent(prefab.getName()));
+        components.add(new EntityInfoComponent(prefab.getName(), prefab.isPersisted()));
         return create(components);
     }
 

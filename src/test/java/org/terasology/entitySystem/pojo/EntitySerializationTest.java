@@ -298,6 +298,18 @@ public class EntitySerializationTest {
     }
 
     @Test
+    public void testNotPersistedIfFlagedOtherwise() throws Exception {
+        EntityRef entity = entityManager.create();
+        entity.setPersisted(false);
+        int id = entity.getId();
+
+        EntityData.World worldData = entityPersisterHelper.serializeWorld();
+        assertEquals(0, worldData.getEntityCount());
+        assertEquals(1, worldData.getFreedEntityIdCount());
+        assertEquals(id, worldData.getFreedEntityId(0));
+    }
+
+    @Test
     public void testMappedTypeHandling() throws Exception {
         componentLibrary.registerComponentClass(MappedTypeComponent.class);
 

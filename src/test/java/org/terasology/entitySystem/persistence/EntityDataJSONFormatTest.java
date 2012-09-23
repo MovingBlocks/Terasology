@@ -275,6 +275,13 @@ public class EntityDataJSONFormatTest {
         assertPersist(worldBuilder);
     }
 
+    @Test
+    public void testPersistPersistableFlag() throws Exception {
+        prefabBuilder.setPersisted(false);
+        worldBuilder.addPrefab(prefabBuilder);
+        assertPersist(worldBuilder);
+    }
+
     private void assertPersist(EntityData.World.Builder worldBuilder) throws IOException{
         EntityData.World world = worldBuilder.build();
         EntityData.World newWorld = persistAndRetrieve(world);

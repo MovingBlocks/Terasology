@@ -16,6 +16,7 @@
 package org.terasology.entitySystem.pojo;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.EntityInfoComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Event;
 import org.terasology.entitySystem.common.NullIterator;
@@ -35,6 +36,45 @@ public class PojoEntityRef extends EntityRef {
     @Override
     public int getId() {
         return id;
+    }
+
+    @Override
+    public boolean isPersisted() {
+        if (exists()) {
+            EntityInfoComponent info = getComponent(EntityInfoComponent.class);
+            if (info == null) {
+                info = new EntityInfoComponent();
+                addComponent(info);
+            }
+            return info.persisted;
+        }
+        return false;
+    }
+
+    @Override
+    public void setPersisted(boolean persisted) {
+        if (exists()) {
+            EntityInfoComponent info = getComponent(EntityInfoComponent.class);
+            if (info == null) {
+                info = new EntityInfoComponent();
+                info.persisted = persisted;
+                addComponent(info);
+            } else if (info.persisted != persisted) {
+                info.persisted = persisted;
+                saveComponent(info);
+            }
+        }
+    }
+
+    @Override
+    public String getParentPrefab() {
+        if (exists()) {
+            EntityInfoComponent info = getComponent(EntityInfoComponent.class);
+            if (info != null) {
+                return info.parentPrefab;
+            }
+        }
+        return "";
     }
 
     @Override

@@ -82,6 +82,20 @@ public class NullEntityRef extends EntityRef {
     }
 
     @Override
+    public boolean isPersisted() {
+        return false;
+    }
+
+    @Override
+    public void setPersisted(boolean persisted) {
+    }
+
+    @Override
+    public String getParentPrefab() {
+        return "";
+    }
+
+    @Override
     public String toString() {
         return "EntityRef{" +
                 "id=" + PojoEntityManager.NULL_ID +

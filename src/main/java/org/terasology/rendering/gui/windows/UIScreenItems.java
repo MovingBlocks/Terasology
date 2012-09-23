@@ -114,6 +114,7 @@ public class UIScreenItems extends UIWindow {
             itemComp = prefab.getComponent(ItemComponent.class);
             if (itemComp != null) {
                 entity = entityManager.create(prefab.listComponents());
+                entity.setPersisted(false);
                 if (entity.exists() && entity.getComponent(ItemComponent.class) != null) {
                     UIItemCell cell = new UIItemCell(null, cellSize);
                     cell.setDrag(false);
@@ -137,6 +138,7 @@ public class UIScreenItems extends UIWindow {
         for (List<BlockUri> blockList : blocks) {
             for (BlockUri block : blockList) {
                 entity = blockFactory.newInstance(BlockManager.getInstance().getBlockFamily(block.getFamilyUri()), 99);
+                entity.setPersisted(false);
                 if (entity.exists()) {
                     UIItemCell cell = new UIItemCell(null, cellSize);
                     cell.setDrag(false);

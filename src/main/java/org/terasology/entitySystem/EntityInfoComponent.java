@@ -21,12 +21,14 @@ package org.terasology.entitySystem;
  * @author Immortius <immortius@gmail.com>
  */
 public class EntityInfoComponent implements Component {
-    public String parentPrefab;
+    public String parentPrefab = "";
+    public boolean persisted = true;
 
     public EntityInfoComponent() {
     }
 
-    public EntityInfoComponent(String parentPrefab) {
+    public EntityInfoComponent(String parentPrefab, boolean persisted) {
         this.parentPrefab = parentPrefab;
+        this.persisted = persisted;
     }
 }

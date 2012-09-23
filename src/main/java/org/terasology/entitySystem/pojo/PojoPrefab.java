@@ -37,6 +37,8 @@ public class PojoPrefab extends AbstractPrefab implements Prefab {
 
     private List<Prefab> parents;
 
+    private boolean persisted = true;
+
     private transient Map<Class<? extends Component>, Component> componentCache;
 
     protected PojoPrefab(String name, ComponentLibrary componentLibrary) {
@@ -100,6 +102,16 @@ public class PojoPrefab extends AbstractPrefab implements Prefab {
     public void removeParent(Prefab parent) {
         this.parents.remove(parent);
         invalidateComponentCache();
+    }
+
+    @Override
+    public boolean isPersisted() {
+        return persisted;
+    }
+
+    @Override
+    public void setPersisted(boolean persisted) {
+        this.persisted = persisted;
     }
 
     private void checkComponentCache() {

@@ -90,4 +90,10 @@ public abstract class EntityRef {
      */
     public abstract int getId();
 
+    public abstract boolean isPersisted();
+
+    public abstract void setPersisted(boolean persisted);
+
+    public abstract String getParentPrefab();
+
 }

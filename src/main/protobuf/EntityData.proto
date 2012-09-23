@@ -54,6 +54,7 @@ message Prefab {
     optional sint32 name_index = 1;
     repeated Component component = 2;
     repeated sint32 parent_index = 3 [packed=true];
+    optional bool persisted = 4 [default=true];
     optional string name = 15;
     repeated string parent_name = 16;
 

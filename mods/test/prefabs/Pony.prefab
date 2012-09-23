@@ -1,5 +1,6 @@
 {
     "name" : "testmod:pony",
+    "persisted" : false,
     "location" : {},
     "skeletalmesh" : {
         "mesh" : "testmod:pony",

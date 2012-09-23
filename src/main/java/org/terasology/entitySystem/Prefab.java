@@ -73,4 +73,8 @@ public interface Prefab {
 
     public void removeParent(Prefab parent);
 
+    public boolean isPersisted();
+
+    public void setPersisted(boolean persisted);
+
 }

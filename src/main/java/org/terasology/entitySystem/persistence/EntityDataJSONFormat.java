@@ -226,6 +226,9 @@ public class EntityDataJSONFormat {
             if (src.getParentNameCount() > 0) {
                 result.add("parent", context.serialize(src.getParentNameList()));
             }
+            if (src.hasPersisted()) {
+                result.addProperty("persisted", src.getPersisted());
+            }
             for (EntityData.Component component : src.getComponentList()) {
                 result.add(component.getType(), context.serialize(component));
             }
@@ -251,7 +254,9 @@ public class EntityDataJSONFormat {
                             prefab.addParentName(element.getAsString());
                         }
                     }
-                } else {
+                } else if (name.equals("persisted")) {
+                    prefab.setPersisted(entry.getValue().getAsBoolean());
+                } else if (entry.getValue().isJsonObject()) {
                     EntityData.Component.Builder component = context.deserialize(entry.getValue(), EntityData.Component.Builder.class);
                     component.setType(entry.getKey());
                     prefab.addComponent(component);

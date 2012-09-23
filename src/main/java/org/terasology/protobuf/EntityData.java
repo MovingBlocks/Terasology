@@ -3866,6 +3866,10 @@ public final class EntityData {
     int getParentIndexCount();
     int getParentIndex(int index);
     
+    // optional bool persisted = 4 [default = true];
+    boolean hasPersisted();
+    boolean getPersisted();
+    
     // optional string name = 15;
     boolean hasName();
     String getName();
@@ -3950,11 +3954,21 @@ public final class EntityData {
     }
     private int parentIndexMemoizedSerializedSize = -1;
     
+    // optional bool persisted = 4 [default = true];
+    public static final int PERSISTED_FIELD_NUMBER = 4;
+    private boolean persisted_;
+    public boolean hasPersisted() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    public boolean getPersisted() {
+      return persisted_;
+    }
+    
     // optional string name = 15;
     public static final int NAME_FIELD_NUMBER = 15;
     private java.lang.Object name_;
     public boolean hasName() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
+      return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     public String getName() {
       java.lang.Object ref = name_;
@@ -4000,6 +4014,7 @@ public final class EntityData {
       nameIndex_ = 0;
       component_ = java.util.Collections.emptyList();
       parentIndex_ = java.util.Collections.emptyList();;
+      persisted_ = true;
       name_ = "";
       parentName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
     }
@@ -4042,6 +4057,9 @@ public final class EntityData {
         output.writeSInt32NoTag(parentIndex_.get(i));
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeBool(4, persisted_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeBytes(15, getNameBytes());
       }
       for (int i = 0; i < parentName_.size(); i++) {
@@ -4080,6 +4098,10 @@ public final class EntityData {
         parentIndexMemoizedSerializedSize = dataSize;
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(4, persisted_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(15, getNameBytes());
       }
@@ -4228,10 +4250,12 @@ public final class EntityData {
         }
         parentIndex_ = java.util.Collections.emptyList();;
         bitField0_ = (bitField0_ & ~0x00000004);
-        name_ = "";
+        persisted_ = true;
         bitField0_ = (bitField0_ & ~0x00000008);
-        parentName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        name_ = "";
         bitField0_ = (bitField0_ & ~0x00000010);
+        parentName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000020);
         return this;
       }
       
@@ -4291,11 +4315,15 @@ public final class EntityData {
         if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
           to_bitField0_ |= 0x00000002;
         }
+        result.persisted_ = persisted_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000004;
+        }
         result.name_ = name_;
-        if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        if (((bitField0_ & 0x00000020) == 0x00000020)) {
           parentName_ = new com.google.protobuf.UnmodifiableLazyStringList(
               parentName_);
-          bitField0_ = (bitField0_ & ~0x00000010);
+          bitField0_ = (bitField0_ & ~0x00000020);
         }
         result.parentName_ = parentName_;
         result.bitField0_ = to_bitField0_;
@@ -4353,13 +4381,16 @@ public final class EntityData {
           }
           onChanged();
         }
+        if (other.hasPersisted()) {
+          setPersisted(other.getPersisted());
+        }
         if (other.hasName()) {
           setName(other.getName());
         }
         if (!other.parentName_.isEmpty()) {
           if (parentName_.isEmpty()) {
             parentName_ = other.parentName_;
-            bitField0_ = (bitField0_ & ~0x00000010);
+            bitField0_ = (bitField0_ & ~0x00000020);
           } else {
             ensureParentNameIsMutable();
             parentName_.addAll(other.parentName_);
@@ -4433,8 +4464,13 @@ public final class EntityData {
               input.popLimit(limit);
               break;
             }
-            case 122: {
+            case 32: {
               bitField0_ |= 0x00000008;
+              persisted_ = input.readBool();
+              break;
+            }
+            case 122: {
+              bitField0_ |= 0x00000010;
               name_ = input.readBytes();
               break;
             }
@@ -4701,10 +4737,31 @@ public final class EntityData {
         return this;
       }
       
+      // optional bool persisted = 4 [default = true];
+      private boolean persisted_ = true;
+      public boolean hasPersisted() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      public boolean getPersisted() {
+        return persisted_;
+      }
+      public Builder setPersisted(boolean value) {
+        bitField0_ |= 0x00000008;
+        persisted_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearPersisted() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        persisted_ = true;
+        onChanged();
+        return this;
+      }
+      
       // optional string name = 15;
       private java.lang.Object name_ = "";
       public boolean hasName() {
-        return ((bitField0_ & 0x00000008) == 0x00000008);
+        return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       public String getName() {
         java.lang.Object ref = name_;
@@ -4720,19 +4777,19 @@ public final class EntityData {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000008;
+  bitField0_ |= 0x00000010;
         name_ = value;
         onChanged();
         return this;
       }
       public Builder clearName() {
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000010);
         name_ = getDefaultInstance().getName();
         onChanged();
         return this;
       }
       void setName(com.google.protobuf.ByteString value) {
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000010;
         name_ = value;
         onChanged();
       }
@@ -4740,9 +4797,9 @@ public final class EntityData {
       // repeated string parent_name = 16;
       private com.google.protobuf.LazyStringList parentName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       private void ensureParentNameIsMutable() {
-        if (!((bitField0_ & 0x00000010) == 0x00000010)) {
+        if (!((bitField0_ & 0x00000020) == 0x00000020)) {
           parentName_ = new com.google.protobuf.LazyStringArrayList(parentName_);
-          bitField0_ |= 0x00000010;
+          bitField0_ |= 0x00000020;
          }
       }
       public java.util.List<String>
@@ -4783,7 +4840,7 @@ public final class EntityData {
       }
       public Builder clearParentName() {
         parentName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-        bitField0_ = (bitField0_ & ~0x00000010);
+        bitField0_ = (bitField0_ & ~0x00000020);
         onChanged();
         return this;
       }
@@ -6118,16 +6175,16 @@ public final class EntityData {
       "\350\007\020\320\017\"\222\001\n\006Entity\022\n\n\002id\030\001 \001(\021\022\035\n\tcomponen",
       "t\030\002 \003(\0132\n.Component\022#\n\027removed_component" +
       "_index\030\003 \003(\021B\002\020\001\022\025\n\rparent_prefab\030\004 \001(\t\022" +
-      "\031\n\021removed_component\030\017 \003(\t*\006\010\350\007\020\320\017\"\200\001\n\006P" +
+      "\031\n\021removed_component\030\017 \003(\t*\006\010\350\007\020\320\017\"\231\001\n\006P" +
       "refab\022\022\n\nname_index\030\001 \001(\021\022\035\n\tcomponent\030\002" +
       " \003(\0132\n.Component\022\030\n\014parent_index\030\003 \003(\021B\002" +
-      "\020\001\022\014\n\004name\030\017 \001(\t\022\023\n\013parent_name\030\020 \003(\t*\006\010" +
-      "\350\007\020\320\017\"\244\001\n\005World\022\027\n\006entity\030\001 \003(\0132\007.Entity" +
-      "\022\027\n\006prefab\030\002 \003(\0132\007.Prefab\022\027\n\017component_c" +
-      "lass\030\017 \003(\t\022\026\n\016next_entity_id\030\020 \001(\021\022\033\n\017fr" +
-      "eed_entity_id\030\021 \003(\021B\002\020\001\022\023\n\013prefab_name\030\022",
-      " \003(\t*\006\010\350\007\020\320\017B\'\n\027org.terasology.protobufB" +
-      "\nEntityDataH\001"
+      "\020\001\022\027\n\tpersisted\030\004 \001(\010:\004true\022\014\n\004name\030\017 \001(" +
+      "\t\022\023\n\013parent_name\030\020 \003(\t*\006\010\350\007\020\320\017\"\244\001\n\005World" +
+      "\022\027\n\006entity\030\001 \003(\0132\007.Entity\022\027\n\006prefab\030\002 \003(" +
+      "\0132\007.Prefab\022\027\n\017component_class\030\017 \003(\t\022\026\n\016n" +
+      "ext_entity_id\030\020 \001(\021\022\033\n\017freed_entity_id\030\021",
+      " \003(\021B\002\020\001\022\023\n\013prefab_name\030\022 \003(\t*\006\010\350\007\020\320\017B\'\n" +
+      "\027org.terasology.protobufB\nEntityDataH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -6171,7 +6228,7 @@ public final class EntityData {
           internal_static_Prefab_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_Prefab_descriptor,
-              new java.lang.String[] { "NameIndex", "Component", "ParentIndex", "Name", "ParentName", },
+              new java.lang.String[] { "NameIndex", "Component", "ParentIndex", "Persisted", "Name", "ParentName", },
               org.terasology.protobuf.EntityData.Prefab.class,
               org.terasology.protobuf.EntityData.Prefab.Builder.class);
           internal_static_World_descriptor =
