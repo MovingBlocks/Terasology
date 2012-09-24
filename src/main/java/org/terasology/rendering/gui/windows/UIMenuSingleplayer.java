@@ -18,13 +18,11 @@ package org.terasology.rendering.gui.windows;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.modes.StateSinglePlayer;
-import org.terasology.game.types.FreeStyleType;
 import org.terasology.game.types.GameType;
 import org.terasology.game.types.SurvivalType;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
-import org.terasology.rendering.gui.framework.events.WindowListener;
 import org.terasology.world.WorldInfo;
 import org.terasology.world.WorldUtil;
 import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
@@ -43,10 +41,8 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -199,7 +195,8 @@ public class UIMenuSingleplayer extends UIWindow {
                 }
             }
         });
-
+        
+        //TODO type safety!
         Arrays.sort( listFiles, new Comparator()
         {
             public int compare(Object o1, Object o2) {

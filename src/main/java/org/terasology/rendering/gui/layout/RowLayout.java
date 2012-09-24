@@ -116,6 +116,8 @@ public class RowLayout implements Layout {
                     size.y = Math.max(size.y, cellSize[i].y);
                 }
                 
+                size.x -= spacingHorizontal;
+                
                 container.setSize(size);
             }
         }

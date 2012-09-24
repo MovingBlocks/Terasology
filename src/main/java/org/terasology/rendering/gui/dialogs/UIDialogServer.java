@@ -9,7 +9,7 @@ import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.layout.GridLayout;
 import org.terasology.rendering.gui.widgets.UIButton;
 import org.terasology.rendering.gui.widgets.UIComposite;
-import org.terasology.rendering.gui.widgets.UIDialogBox;
+import org.terasology.rendering.gui.widgets.UIDialog;
 import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIText;
 import org.terasology.rendering.gui.windows.UIMenuMultiplayer.Server;
@@ -19,7 +19,7 @@ import org.terasology.rendering.gui.windows.UIMenuMultiplayer.Server;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  *
  */
-public class UIDialogServer extends UIDialogBox {
+public class UIDialogServer extends UIDialog {
     
     private UIComposite containerButtons;
     private UIButton okButton;
@@ -94,9 +94,7 @@ public class UIDialogServer extends UIDialogBox {
             public void click(UIDisplayElement element, int button) {
                 server.setName(inputName.getText());
                 server.setIp(inputIp.getText());
-                
-                setReturnValue(server);
-                close();
+                closeDialog(EReturnCode.OK, server);
             }
         });
         
@@ -106,8 +104,7 @@ public class UIDialogServer extends UIDialogBox {
         cancelButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                setReturnValue(null);
-                close();
+                closeDialog(EReturnCode.CANCEL, null);
             }
         });
         

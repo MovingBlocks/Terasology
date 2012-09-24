@@ -28,26 +28,27 @@ import org.terasology.rendering.gui.framework.events.SelectionListener;
 import org.terasology.rendering.gui.layout.GridLayout;
 
 /**
- * A simple graphical List
+ * A simple graphical List.
  * 
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  * @author Anton Kireev <adeon.k87@gmail.com>
+ * 
+ * TODO maybe integrate the double click listener into the base class, to support double click in all display elements
  */
 public class UIList extends UIDisplayContainerScrollable {
-    
-    //selection
-    private UIListItem selection = null;
     
     //events
     private final ArrayList<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
     private final List<SelectionListener> selectionListeners = new ArrayList<SelectionListener>();
-    private final ArrayList<ClickListener> doubleClickListeners = new ArrayList<ClickListener>();
     
-    //child elements
-    private final UIComposite list;
+    //selection
+    private UIListItem selection = null;
     
     //options
     private boolean isDisabled = false;
+    
+    //child elements
+    private final UIComposite list;
     
     public UIList() {     
         setEnableScrolling(true);
@@ -74,28 +75,24 @@ public class UIList extends UIDisplayContainerScrollable {
      */
     public void addItem(int index, final UIListItem item) {        
         item.addClickListener(new ClickListener() {
-            private long lastTime = System.currentTimeMillis();
-            private int lastButton = -1;
-            
             @Override
             public void click(UIDisplayElement element, int button) {
                 if (!isDisabled) {
-                    //check double click
-                    if ((System.currentTimeMillis() - lastTime) < 200 && lastButton == button) {
-                        notifyDoubleClickListeners();
-                    }
-                    lastTime = System.currentTimeMillis();
-                    lastButton = button;
-                    
                     //select the item
                     select(getItem(item));
                 }
             }
         });
+        item.addDoubleClickListener(new ClickListener() {
+            @Override
+            public void click(UIDisplayElement element, int button) {
+                notifyDoubleClickListeners(button);
+            }
+        });
+        item.setList(this);
         item.setVisible(true);
         
         list.addDisplayElementToPosition(index, item);
-        item.setList(this);
         
         layout();
         
@@ -261,20 +258,6 @@ public class UIList extends UIDisplayContainerScrollable {
        Event listeners
     */
     
-    private void notifyDoubleClickListeners() {
-        for (int i = 0; i < doubleClickListeners.size(); i++) {
-            doubleClickListeners.get(i).click(this, 0);
-        }
-    }
-     
-    public void addDoubleClickListener(ClickListener listener) {
-        doubleClickListeners.add(listener);
-    }
-    
-    public void removeDoubleClickListener(ClickListener listener) {
-        doubleClickListeners.remove(listener);
-    }
-     
     private void notifySelectionListeners() {
         for (SelectionListener listener : selectionListeners) {
             listener.changed(this);

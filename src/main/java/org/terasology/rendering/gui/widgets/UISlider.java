@@ -38,14 +38,18 @@ import org.terasology.rendering.gui.framework.events.MouseMoveListener;
  */
 public class UISlider extends UIDisplayContainer {
     
+    //events
     private final ArrayList<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
-    private final UILabel label;
-    private final UIImage slider;
     
+    //value
     private int currentValue;
     private int minValue;
     private int maxValue;
     private int range;
+    
+    //child elements
+    private final UILabel label;
+    private final UIImage slider;
 
     /**
      * Creates a slider.
@@ -110,7 +114,6 @@ public class UISlider extends UIDisplayContainer {
         });
         
         slider = new UIImage(AssetManager.loadTexture("engine:gui_menu"));
-        slider.setParent(this);
         slider.setVisible(true);
         slider.setPosition(new Vector2f(0, 0));
         slider.setTextureOrigin(new Vector2f(0f, 60f));
@@ -247,6 +250,78 @@ public class UISlider extends UIDisplayContainer {
         range = maxValue - minValue;
     }
     
+    /**
+     * Get the value which the slider currently has.
+     * @return Returns the value.
+     */
+    public int getValue() {
+        return currentValue;
+    }
+    
+    /**
+     * Set the value which the slider should have.
+     * @param value The value. The range of the value should be greater or equal than the minimum value and lower or equal than the maximum value.
+     */
+    public void setValue(int value) {
+        changeSlider(value);
+    }   
+    
+    /**
+     * Get the the maximum value which will be allowed.
+     * @return Returns the maximum value.
+     */
+    public int getMax() {
+        return maxValue;
+    }
+
+    /**
+     * Set the maximum value which will be allowed.
+     * @param max The maximum value. A minimum value greater than the maximum value results in unspecified behavior.
+     */
+    public void setMax(int max) {
+        this.maxValue = max;
+        calcRange();
+    }
+    
+    /**
+     * Get the the minimum value which will be allowed.
+     * @return Returns the minimum value.
+     */
+    public int getMin() {
+        return minValue;
+    }
+    
+    /**
+     * Set the minimum value which will be allowed.
+     * @param min The minimum value. A minimum value greater than the maximum value results in unspecified behavior.
+     */
+    public void setMin(int min) {
+        this.minValue = min;
+        calcRange();
+    }
+    
+    /**
+     * Set the text of the slider label.
+     * @param text The text.
+     */
+    public void setText(String text) {
+        label.setText(text);
+        
+        layout();
+    }
+    
+    /**
+     * Get the text of the slider label.
+     * @return Returns the text.
+     */
+    public String getText() {
+        return label.getText();
+    }
+    
+    /*
+       Event listeners
+    */
+    
     private void notifyChangedListeners() {
         for (ChangedListener listener : changedListeners) {
             listener.changed(this);
@@ -259,41 +334,5 @@ public class UISlider extends UIDisplayContainer {
 
     public void removeChangedListener(ChangedListener listener) {
         changedListeners.remove(listener);
-    }
-    
-    public int getValue() {
-        return currentValue;
-    }
-
-    public void setValue(int value) {
-        changeSlider(value);
-    }    
-    
-    public int getMax() {
-        return maxValue;
-    }
-
-    public void setMax(int max) {
-        this.maxValue = max;
-        calcRange();
-    }
-
-    public int getMin() {
-        return minValue;
-    }
-
-    public void setMin(int min) {
-        this.minValue = min;
-        calcRange();
-    }
-    
-    public void setText(String text) {
-        label.setText(text);
-        
-        layout();
-    }
-    
-    public String getText() {
-        return label.getText();
     }
 }

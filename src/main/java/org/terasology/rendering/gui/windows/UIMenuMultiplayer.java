@@ -26,6 +26,7 @@ import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIList;
 import org.terasology.rendering.gui.widgets.UIListItem;
 import org.terasology.rendering.gui.widgets.UIWindow;
+import org.terasology.rendering.gui.widgets.UIDialog.EReturnCode;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -120,8 +121,8 @@ public class UIMenuMultiplayer extends UIWindow {
                 UIDialogServer dialog = new UIDialogServer(new Server());
                 dialog.addDialogListener(new DialogListener() {
                     @Override
-                    public void close(UIDisplayElement dialog, Object returnValue) {
-                        if (returnValue != null) {
+                    public void close(UIDisplayElement dialog, EReturnCode returnCode, Object returnValue) {
+                        if (returnCode == EReturnCode.OK && returnValue != null) {
                             add((Server) returnValue);
                         }
                     }
@@ -143,8 +144,8 @@ public class UIMenuMultiplayer extends UIWindow {
                     UIDialogServer dialog = new UIDialogServer((Server) item.getValue());
                     dialog.addDialogListener(new DialogListener() {
                         @Override
-                        public void close(UIDisplayElement dialog, Object returnValue) {
-                            if (returnValue != null) {
+                        public void close(UIDisplayElement dialog, EReturnCode returnCode, Object returnValue) {
+                            if (returnCode == EReturnCode.OK && returnValue != null) {
                                 Server server = (Server) returnValue;
                                 item.setValue(server);
                                 ((UILabel)item.getElementById("serverName")).setText(server.getName());

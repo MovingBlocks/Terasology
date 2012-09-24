@@ -29,14 +29,14 @@ import javax.vecmath.Vector4f;
 
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
-import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.UIDisplayContainer;
 
 /**
  * 
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  *
  */
-public class StyleBorderSolid extends UIDisplayElement implements Style {
+public class StyleBorderSolid extends UIDisplayContainer implements Style {
     
     //Textured borders
     private Vector4f width = new Vector4f(0, 0, 0, 0);
