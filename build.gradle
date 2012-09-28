@@ -21,7 +21,6 @@ task wrapper(type: Wrapper) {
 ext {
     startDateTimeString = new Date().format("yyyy-MM-dd_HH-mm-ss")
     dirApplet = 'applet'
-    dirData = 'data'
     dirNatives = 'natives'
     dirSavedWorlds = 'SAVED_WORLDS'
     subDirLibs = 'libs'
@@ -267,9 +266,6 @@ task distApplication(type:Sync) {
     }
     into(dirNatives) {
         from dirNatives
-    }
-    into(dirData) {
-        from dirData
     }
     into(subDirMods) {
         from "$buildDir/$destDirMods"
