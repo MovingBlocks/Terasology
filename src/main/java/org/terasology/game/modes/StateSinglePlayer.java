@@ -43,6 +43,7 @@ import org.terasology.game.bootstrap.EntitySystemBuilder;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.manager.CommandManager;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.mod.Mod;
@@ -144,6 +145,8 @@ public class StateSinglePlayer implements GameState {
         CoreRegistry.put(WorldPersister.class, new WorldPersister(entityManager));
 
         loadPrefabs();
+
+        CoreRegistry.put(CommandManager.class, new CommandManager());
     }
 
     private void loadPrefabs() {

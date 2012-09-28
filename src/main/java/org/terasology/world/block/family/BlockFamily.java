@@ -62,5 +62,16 @@ public interface BlockFamily {
     /**
      * @return An iterator over the blocks in this family
      */
-    Iterable<Block> listBlocks();
+    Iterable<Block> getBlocks();
+
+    /**
+     * @return An iterator over the categories this block family belongs to
+     */
+    Iterable<String> getCategories();
+
+    /**
+     * @param category
+     * @return Whether this block family belongs to the given category (case-insensitive)
+     */
+    boolean hasCategory(String category);
 }

@@ -19,6 +19,7 @@
  * Unlike Grass, it might be possible to have a SnowBlock as well
  */
 {
+    "categories" : ["soil"],
     "tiles" : {
         "sides" : "engine:SnowSide",
         "bottom" : "engine:dirt"

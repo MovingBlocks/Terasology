@@ -15,6 +15,7 @@
  */
 package org.terasology.world.block.family;
 
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
 
@@ -36,9 +37,10 @@ public class HorizontalBlockFamily extends AbstractBlockFamily {
     /**
      * @param uri   The asset uri for the block group.
      * @param blocks The set of blocks that make up the group. Front, Back, Left and Right must be provided - the rest is ignored.
+     * @param categories The set of categories this block family belongs to
      */
-    public HorizontalBlockFamily(BlockUri uri, Map<Side, Block> blocks) {
-        super(uri);
+    public HorizontalBlockFamily(BlockUri uri, Map<Side, Block> blocks, String ... categories) {
+        super(uri, Arrays.asList(categories));
         for (Side side : Side.horizontalSides()) {
             Block block = blocks.get(side);
             if (block == null) {
@@ -78,7 +80,7 @@ public class HorizontalBlockFamily extends AbstractBlockFamily {
     }
 
     @Override
-    public Iterable<Block> listBlocks() {
+    public Iterable<Block> getBlocks() {
         return blocks.values();
     }
 }

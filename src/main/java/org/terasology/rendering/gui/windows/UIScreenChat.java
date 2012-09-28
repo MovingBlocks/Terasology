@@ -24,13 +24,14 @@ import javax.vecmath.Vector4f;
 
 import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.Color;
+import org.terasology.game.CoreRegistry;
 import org.terasology.input.binds.ConsoleButton;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.logic.manager.MessageManager;
 import org.terasology.logic.manager.CommandManager;
 import org.terasology.logic.manager.MessageManager.MessageSubscription;
 import org.terasology.logic.manager.MessageManager.Message;
-import org.terasology.logic.manager.CommandManager.Command;
+import org.terasology.logic.manager.CommandManager.CommandInfo;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.KeyListener;
 import org.terasology.rendering.gui.framework.events.VisibilityListener;
@@ -80,7 +81,7 @@ public class UIScreenChat extends UIWindow {
     };
     
     public UIScreenChat() {
-        commandManager = CommandManager.getInstance();
+        commandManager = CoreRegistry.get(CommandManager.class);
         MessageManager.getInstance().subscribe(chatSubscription);
         
         setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
@@ -141,11 +142,11 @@ public class UIScreenChat extends UIWindow {
                         String message = inputBox.getText().trim();
                         if (message.startsWith(commandPrefix)) {
                             String commandName = message.substring(1);
-                            List<Command> commands = commandManager.getCommandList();
-                            List<Command> matches = new ArrayList<Command>();
+                            List<CommandInfo> commands = commandManager.getCommandList();
+                            List<CommandInfo> matches = new ArrayList<CommandInfo>();
                             
                             //check for matching commands
-                            for (Command cmd : commands) {
+                            for (CommandInfo cmd : commands) {
                                 if (cmd.getName().regionMatches(0, commandName, 0, commandName.length())) {
                                     matches.add(cmd);
                                 }
@@ -160,7 +161,7 @@ public class UIScreenChat extends UIWindow {
                             else if (matches.size() > 1) {
                                 //add list of available commands
                                 String commandMatches = "";
-                                for (Command cmd : matches) {
+                                for (CommandInfo cmd : matches) {
                                     if (!commandMatches.isEmpty()) {
                                         commandMatches += " ";
                                     }

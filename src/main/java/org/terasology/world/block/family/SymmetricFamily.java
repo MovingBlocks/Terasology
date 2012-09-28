@@ -30,8 +30,8 @@ public class SymmetricFamily extends AbstractBlockFamily {
 
     private Block block;
 
-    public SymmetricFamily(BlockUri uri, Block block) {
-        super(uri);
+    public SymmetricFamily(BlockUri uri, Block block, String ... categories) {
+        super(uri, Arrays.asList(categories));
         this.block = block;
         block.setBlockFamily(this);
         block.setUri(uri);
@@ -56,7 +56,7 @@ public class SymmetricFamily extends AbstractBlockFamily {
     }
 
     @Override
-    public Iterable<Block> listBlocks() {
+    public Iterable<Block> getBlocks() {
         return Arrays.asList(block);
     }
 

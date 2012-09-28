@@ -15,6 +15,7 @@
  */
 package org.terasology.world.block.family;
 
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
 
@@ -35,8 +36,8 @@ public class AlignToSurfaceFamily extends AbstractBlockFamily {
      * @param uri   The uri for the block group.
      * @param blocks The set of blocks that make up the group. Front, Back, Left and Right must be provided - the rest is ignored.
      */
-    public AlignToSurfaceFamily(BlockUri uri, Map<Side, Block> blocks) {
-        super(uri);
+    public AlignToSurfaceFamily(BlockUri uri, Map<Side, Block> blocks, String ... categories) {
+        super(uri, Arrays.asList(categories));
         for (Side side : Side.values()) {
             Block block = blocks.get(side);
             if (block != null) {
@@ -76,7 +77,7 @@ public class AlignToSurfaceFamily extends AbstractBlockFamily {
     }
 
     @Override
-    public Iterable<Block> listBlocks() {
+    public Iterable<Block> getBlocks() {
         return blocks.values();
     }
 

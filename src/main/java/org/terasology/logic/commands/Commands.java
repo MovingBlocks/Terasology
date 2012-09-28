@@ -16,16 +16,9 @@
 
 package org.terasology.logic.commands;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
-
 import com.bulletphysics.linearmath.QuaternionUtil;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import org.lwjgl.input.Keyboard;
 import org.terasology.asset.Asset;
 import org.terasology.asset.AssetManager;
@@ -35,7 +28,6 @@ import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.PlayerComponent;
 import org.terasology.components.SimpleAIComponent;
-import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.EntityManager;
@@ -54,14 +46,14 @@ import org.terasology.input.binds.BackwardsButton;
 import org.terasology.input.binds.ForwardsButton;
 import org.terasology.input.binds.LeftStrafeButton;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.manager.CommandManager;
+import org.terasology.logic.manager.CommandManager.CommandInfo;
 import org.terasology.logic.manager.MessageManager;
 import org.terasology.logic.manager.MessageManager.EMessageScope;
-import org.terasology.logic.manager.CommandManager;
-import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PathManager;
-import org.terasology.logic.manager.CommandManager.Command;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.StringConstants;
 import org.terasology.world.block.Block;
@@ -70,16 +62,22 @@ import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.management.BlockManager;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * The controller class for all commands which can be executed through the in-game chat.
  * To add a command there needs to be an entry in the JSON file under "/data/console/commands.json" with a corresponding public method in this class.
- * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  *
+ * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
-public class Commands implements CommandController {
+public class Commands implements CommandProvider {
 
     //==============================
     //        Helper Methods
@@ -121,7 +119,7 @@ public class Commands implements CommandController {
         }
         return matches;
     }
-    
+
     private <T extends Comparable<T>> List<T> sortItems(Iterable<T> items) {
         List<T> result = Lists.newArrayList();
         for (T item : items) {
@@ -130,10 +128,11 @@ public class Commands implements CommandController {
         Collections.sort(result);
         return result;
     }
-    
+
     //==============================
     //          Commands
     //==============================
+    @Command(shortDescription = "List all available blocks")
     public void listBlocks() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Used Blocks");
@@ -156,10 +155,29 @@ public class Commands implements CommandController {
             stringBuilder.append(blockUri.toString());
             stringBuilder.append(StringConstants.NEW_LINE);
         }
-        
+
         MessageManager.getInstance().addMessage(stringBuilder.toString(), EMessageScope.PRIVATE);
     }
-    
+
+    @Command(shortDescription = "Lists all blocks by category")
+    public void listBlocksByCategory() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String category : BlockManager.getInstance().getBlockCategories()) {
+            stringBuilder.append(category);
+            stringBuilder.append(StringConstants.NEW_LINE);
+            stringBuilder.append("-----------");
+            stringBuilder.append(StringConstants.NEW_LINE);
+            List<BlockUri> categoryBlocks = sortItems(BlockManager.getInstance().getBlockFamiliesWithCategory(category));
+            for (BlockUri uri : categoryBlocks) {
+                stringBuilder.append(uri.toString());
+                stringBuilder.append(StringConstants.NEW_LINE);
+            }
+            stringBuilder.append(StringConstants.NEW_LINE);
+        }
+        MessageManager.getInstance().addMessage(stringBuilder.toString(), EMessageScope.PRIVATE);
+    }
+
+    @Command(shortDescription = "Lists all available items")
     public void listItems() {
         StringBuilder items = new StringBuilder();
         PrefabManager prefMan = CoreRegistry.get(PrefabManager.class);
@@ -171,10 +189,11 @@ public class Commands implements CommandController {
             }
             items.append(prefab.getName());
         }
-        
+
         MessageManager.getInstance().addMessage(items.toString(), EMessageScope.PRIVATE);
     }
 
+    @Command(shortDescription = "Lists all available shapes")
     public void listShapes() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Shapes");
@@ -190,6 +209,7 @@ public class Commands implements CommandController {
         MessageManager.getInstance().addMessage(stringBuilder.toString(), EMessageScope.PRIVATE);
     }
 
+    @Command(shortDescription = "Lists available free shape blocks", helpText = "Lists all the available free shape blocks. These blocks can be created with any shape.")
     public void listFreeShapeBlocks() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Free Shape Blocks");
@@ -204,55 +224,59 @@ public class Commands implements CommandController {
 
         MessageManager.getInstance().addMessage(stringBuilder.toString(), EMessageScope.PRIVATE);
     }
-    
-    public void giveBlock(String uri) {
+
+    @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts 16 of the given block into your inventory")
+    public void giveBlock(@CommandParam(name="blockId") String uri) {
         giveBlock(uri, 16);
     }
 
-    public void giveBlock(String uri, String shapeUri) {
+    @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts 16 blocks of the given block, with the given shape, into your inventory")
+    public void giveBlock(@CommandParam(name="blockId") String uri, @CommandParam(name="shapeId") String shapeUri) {
         giveBlock(uri, shapeUri, 16);
     }
 
-    public void giveBlock(String uri, int quantity) {
+    @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts a desired number of the given block into your inventory")
+    public void giveBlock(@CommandParam(name="blockId") String uri, @CommandParam(name="quantity") int quantity) {
         List<BlockUri> matchingUris = resolveBlockUri(uri);
         if (matchingUris.size() == 1) {
             BlockFamily blockFamily = BlockManager.getInstance().getBlockFamily(matchingUris.get(0));
-            
+
             giveBlock(blockFamily, quantity);
-            
+
             return;
         } else if (matchingUris.isEmpty()) {
             MessageManager.getInstance().addMessage("No block found for '" + uri + "'", EMessageScope.PRIVATE);
-            
+
             return;
         } else {
             StringBuilder builder = new StringBuilder();
             builder.append("Non-unique block name, possible matches: ");
             Joiner.on(", ").appendTo(builder, matchingUris);
             MessageManager.getInstance().addMessage(builder.toString(), EMessageScope.PRIVATE);
-            
+
             return;
         }
     }
 
-    public void giveBlock(String uri, String shapeUri, int quantity) {
+    @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts a desired number of the given block with the give shape into your inventory")
+    public void giveBlock(@CommandParam(name="blockId") String uri, @CommandParam(name="shapeId") String shapeUri, @CommandParam(name="quantity") int quantity) {
         List<BlockUri> resolvedBlockUris = resolveBlockUri(uri);
         if (resolvedBlockUris.isEmpty()) {
             MessageManager.getInstance().addMessage("No block found for '" + uri + "'", EMessageScope.PRIVATE);
-            
+
             return;
         } else if (resolvedBlockUris.size() > 1) {
             StringBuilder builder = new StringBuilder();
             builder.append("Non-unique block name, possible matches: ");
             Joiner.on(", ").appendTo(builder, resolvedBlockUris);
             MessageManager.getInstance().addMessage(builder.toString(), EMessageScope.PRIVATE);
-            
+
             return;
         }
         List<AssetUri> resolvedShapeUris = resolveShapeUri(shapeUri);
         if (resolvedShapeUris.isEmpty()) {
             MessageManager.getInstance().addMessage("No shape found for '" + shapeUri + "'", EMessageScope.PRIVATE);
-            
+
             return;
         } else if (resolvedShapeUris.size() > 1) {
             StringBuilder builder = new StringBuilder();
@@ -264,24 +288,24 @@ public class Commands implements CommandController {
                     builder.append(", ");
                 }
             }
-            
+
             return;
         }
 
         BlockUri blockUri = new BlockUri(resolvedBlockUris.get(0).toString() + BlockUri.PACKAGE_SEPARATOR + resolvedShapeUris.get(0).getSimpleString());
         if (blockUri.isValid()) {
             giveBlock(BlockManager.getInstance().getBlockFamily(blockUri), quantity);
-            
+
             return;
         }
-        
+
         MessageManager.getInstance().addMessage("Invalid block or shape", EMessageScope.PRIVATE);
     }
 
     private void giveBlock(BlockFamily blockFamily, int quantity) {
         if (quantity < 1) {
             MessageManager.getInstance().addMessage("Here, have these zero (0) items just like you wanted", EMessageScope.PRIVATE);
-            
+
             return;
         }
 
@@ -289,7 +313,7 @@ public class Commands implements CommandController {
         EntityRef item = factory.newInstance(blockFamily, quantity);
         if (!item.exists()) {
             MessageManager.getInstance().addMessage("Unknown block or item", EMessageScope.PRIVATE);
-            
+
             return;
         }
         EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
@@ -298,11 +322,12 @@ public class Commands implements CommandController {
         if (itemComp != null && !itemComp.container.exists()) {
             item.destroy();
         }
-        
-        MessageManager.getInstance().addMessage("You received " + quantity +" blocks of " + blockFamily.getDisplayName(), EMessageScope.PRIVATE);
+
+        MessageManager.getInstance().addMessage("You received " + quantity + " blocks of " + blockFamily.getDisplayName(), EMessageScope.PRIVATE);
     }
 
-    public void giveItem(String itemPrefabName) {
+    @Command(shortDescription = "Adds an item to your inventory")
+    public void giveItem(@CommandParam(name="prefabId or blockId") String itemPrefabName) {
         Prefab prefab = CoreRegistry.get(PrefabManager.class).getPrefab(itemPrefabName);
         System.out.println("Found prefab: " + prefab);
         if (prefab != null && prefab.getComponent(ItemComponent.class) != null) {
@@ -318,16 +343,18 @@ public class Commands implements CommandController {
             giveBlock(itemPrefabName);
         }
     }
-    
+
+    @Command(shortDescription = "Restores your health to max")
     public void health() {
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
         health.currentHealth = health.maxHealth;
-        localPlayer.getEntity().send(new HealthChangedEvent(localPlayer.getEntity(), health.currentHealth, health.maxHealth));
+        localPlayer.getEntity().send(new FullHealthEvent(localPlayer.getEntity(), health.maxHealth));
         localPlayer.getEntity().saveComponent(health);
     }
-    
-    public void health(int amount) {
+
+    @Command(shortDescription = "Restores your health by an amount")
+    public void health(@CommandParam(name="amount") int amount) {
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
         health.currentHealth = amount;
@@ -340,11 +367,12 @@ public class Commands implements CommandController {
         } else {
             localPlayer.getEntity().send(new HealthChangedEvent(localPlayer.getEntity(), health.currentHealth, health.maxHealth));
         }
-        
+
         localPlayer.getEntity().saveComponent(health);
     }
 
-    public void teleport(float x, float y, float z) {
+    @Command(shortDescription = "Teleports you to a location")
+    public void teleport(@CommandParam(name="x") float x, @CommandParam(name="y") float y, @CommandParam(name="z") float z) {
         LocalPlayer player = CoreRegistry.get(LocalPlayer.class);
         if (player != null) {
             LocationComponent location = player.getEntity().getComponent(LocationComponent.class);
@@ -353,28 +381,19 @@ public class Commands implements CommandController {
             }
         }
     }
-    
-    public void loadWorld(String worldName, String seed) {
-        
-    }
 
+    @Command(shortDescription = "Writes out information on all entities to a text file for debugging")
     public void dumpEntities() throws IOException {
         CoreRegistry.get(WorldPersister.class).save(new File(PathManager.getInstance().getDataPath(), "entityDump.txt"), WorldPersister.SaveFormat.JSON);
     }
 
-    public void collision() {
-        Config.getInstance().setDebugCollision(!Config.getInstance().isDebugCollision());
-    }
-    
-    public void spawnLoot() {
-        
-    }
-
-    public void bindKey(String key, String bind) {
+    @Command(shortDescription = "Maps a key to a function")
+    public void bindKey(@CommandParam(name="key") String key, @CommandParam(name="function") String bind) {
         InputSystem input = CoreRegistry.get(InputSystem.class);
         input.linkBindButtonToKey(Keyboard.getKeyIndex(key), bind);
     }
-    
+
+    @Command(shortDescription = "Switches to typical key binds for AZERTY")
     public void AZERTY() {
         InputSystem input = CoreRegistry.get(InputSystem.class);
         input.linkBindButtonToKey(Keyboard.KEY_Z, ForwardsButton.ID);
@@ -382,8 +401,9 @@ public class Commands implements CommandController {
         input.linkBindButtonToKey(Keyboard.KEY_Q, LeftStrafeButton.ID);
 
     }
-    
-    public void spawnPrefab(String prefabName) {
+
+    @Command(shortDescription = "Spawns an instance of a prefab in the world")
+    public void spawnPrefab(@CommandParam(name="prefabId") String prefabName) {
         Camera camera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
         Vector3f spawnPos = camera.getPosition();
         Vector3f offset = new Vector3f(camera.getViewingDirection());
@@ -394,30 +414,33 @@ public class Commands implements CommandController {
         if (dir.lengthSquared() > 0.001f) {
             dir.normalize();
         } else {
-            dir.set(0,0,1);
+            dir.set(0, 0, 1);
         }
-        Quat4f rotation = QuaternionUtil.shortestArcQuat(new Vector3f(0,0,1), dir, new Quat4f());
+        Quat4f rotation = QuaternionUtil.shortestArcQuat(new Vector3f(0, 0, 1), dir, new Quat4f());
 
         Prefab prefab = CoreRegistry.get(PrefabManager.class).getPrefab(prefabName);
         if (prefab != null && prefab.getComponent(LocationComponent.class) != null) {
             CoreRegistry.get(EntityManager.class).create(prefab, spawnPos, rotation);
         }
     }
-    
+
+    @Command(shortDescription = "Destroys all AI in the world")
     public void destroyAI() {
         EntityManager entityManager = CoreRegistry.get(EntityManager.class);
         for (EntityRef ref : entityManager.iteratorEntities(SimpleAIComponent.class)) {
             ref.destroy();
         }
     }
-    
-    public void stepHeight(float amount) {
+
+    @Command(shortDescription = "Sets the height the player can step up")
+    public void stepHeight(@CommandParam(name="height") float amount) {
         EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
         CharacterMovementComponent comp = playerEntity.getComponent(CharacterMovementComponent.class);
         comp.stepHeight = amount;
     }
-    
-    public void spawnBlock(String blockName) {
+
+    @Command(shortDescription = "Spawns a block in front of the player")
+    public void spawnBlock(@CommandParam(name="blockId") String blockName) {
         Camera camera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
         Vector3f spawnPos = camera.getPosition();
         Vector3f offset = camera.getViewingDirection();
@@ -439,6 +462,7 @@ public class Commands implements CommandController {
         }
     }
 
+    @Command(shortDescription = "Toggles the maximum slope the player can walk up")
     public void sleigh() {
         LocalPlayer player = CoreRegistry.get(LocalPlayer.class);
         if (player != null) {
@@ -450,59 +474,61 @@ public class Commands implements CommandController {
             }
         }
     }
-    
+
+    @Command(shortDescription = "Sets the respawn position of the player")
     public void setSpawn() {
         EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
         PlayerComponent spawn = playerEntity.getComponent(PlayerComponent.class);
         spawn.spawnPosition = playerEntity.getComponent(LocationComponent.class).getWorldPosition();
         playerEntity.saveComponent(spawn);
     }
-    
+
+    @Command(shortDescription = "General help")
     public void help() {
         StringBuilder msg = new StringBuilder();
-        List<Command> commands = CommandManager.getInstance().getCommandList();
-        for (Command cmd : commands) {
+        List<CommandInfo> commands = CoreRegistry.get(CommandManager.class).getCommandList();
+        for (CommandInfo cmd : commands) {
             if (!msg.toString().isEmpty()) {
                 msg.append("\n");
             }
-            msg.append(cmd.getName() + " - " + cmd.getShortDescription());
+            msg.append(cmd.getUsageMessage() + " - " + cmd.getShortDescription());
         }
         MessageManager.getInstance().addMessage(msg.toString(), EMessageScope.PRIVATE);
     }
-    
-    public void help(String command) {
-        Command cmd = CommandManager.getInstance().getCommand(command);
-        if (cmd == null) {
+
+    @Command(shortDescription = "Detailed help on a command")
+    public void help(@CommandParam(name="command") String command) {
+        Collection<CommandInfo> cmdCollection = CoreRegistry.get(CommandManager.class).getCommand(command);
+        if (cmdCollection.isEmpty()) {
             MessageManager.getInstance().addMessage("No help available for command '" + command + "'. Unknown command.", EMessageScope.PRIVATE);
         } else {
             StringBuilder msg = new StringBuilder();
-            
-            msg.append("=====================================================================================================================");
-            msg.append("\n" + cmd.getName());
-            for (String param : cmd.getParameter()) {
-                msg.append(" <" + param + ">");
-            }
-            if (!cmd.getShortDescription().isEmpty()) {
-                msg.append(" - " + cmd.getShortDescription());
-            }
-            
-            if (!cmd.getLongDescription().isEmpty()) {
-                msg.append("\n\n" + cmd.getLongDescription());
-            }
-            
-            if (cmd.getExamples().length > 0) {
-                msg.append("\n\nExamples:");
-                for (String example : cmd.getExamples()) {
-                    msg.append("\n" + example);
+
+            for (CommandInfo cmd : cmdCollection) {
+                msg.append("=====================================================================================================================");
+                msg.append(StringConstants.NEW_LINE);
+                msg.append(cmd.getUsageMessage());
+                msg.append(StringConstants.NEW_LINE);
+                msg.append("=====================================================================================================================");
+                msg.append(StringConstants.NEW_LINE);
+                if (!cmd.getHelpText().isEmpty()) {
+                    msg.append(cmd.getHelpText());
+                    msg.append(StringConstants.NEW_LINE);
+                    msg.append("=====================================================================================================================");
+                    msg.append(StringConstants.NEW_LINE);
+                } else if (!cmd.getShortDescription().isEmpty()) {
+                    msg.append(cmd.getShortDescription());
+                    msg.append(StringConstants.NEW_LINE);
+                    msg.append("=====================================================================================================================");
+                    msg.append(StringConstants.NEW_LINE);
                 }
+                msg.append(StringConstants.NEW_LINE);
             }
-            
-            msg.append("\n=====================================================================================================================");
-            
             MessageManager.getInstance().addMessage(msg.toString(), EMessageScope.PRIVATE);
         }
     }
-    
+
+    @Command(shortDescription = "Exits the game")
     public void exit() {
         CoreRegistry.get(GameEngine.class).shutdown();
     }
