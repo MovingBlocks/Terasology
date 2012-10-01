@@ -16,13 +16,27 @@
 
 package org.terasology.game;
 
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_LEQUAL;
-import static org.lwjgl.opengl.GL11.GL_NORMALIZE;
-import static org.lwjgl.opengl.GL11.glDepthFunc;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glViewport;
+import com.google.common.collect.Lists;
+import org.lwjgl.LWJGLException;
+import org.lwjgl.LWJGLUtil;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GLContext;
+import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.sources.ClasspathSource;
+import org.terasology.game.modes.GameState;
+import org.terasology.logic.manager.AudioManager;
+import org.terasology.logic.manager.Config;
+import org.terasology.logic.manager.FontManager;
+import org.terasology.logic.manager.InputConfig;
+import org.terasology.logic.manager.PathManager;
+import org.terasology.logic.manager.ShaderManager;
+import org.terasology.logic.manager.VertexBufferObjectManager;
+import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.physics.CollisionGroupManager;
+import org.terasology.version.TerasologyVersion;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,29 +56,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-import org.lwjgl.LWJGLException;
-import org.lwjgl.LWJGLUtil;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GLContext;
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.sources.ClasspathSource;
-import org.terasology.game.modes.GameState;
-import org.terasology.logic.manager.AudioManager;
-import org.terasology.logic.manager.Config;
-import org.terasology.logic.manager.FontManager;
-import org.terasology.logic.console.GroovyManager;
-import org.terasology.logic.manager.InputConfig;
-import org.terasology.logic.manager.PathManager;
-import org.terasology.logic.manager.ShaderManager;
-import org.terasology.logic.manager.VertexBufferObjectManager;
-import org.terasology.performanceMonitor.PerformanceMonitor;
-import org.terasology.physics.CollisionGroupManager;
-import org.terasology.version.TerasologyVersion;
-
-import com.google.common.collect.Lists;
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_LEQUAL;
+import static org.lwjgl.opengl.GL11.GL_NORMALIZE;
+import static org.lwjgl.opengl.GL11.glDepthFunc;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glViewport;
 
 /**
  * @author Immortius
@@ -353,10 +351,9 @@ public class TerasologyEngine implements GameEngine {
 
     private void initManagers() {
         CoreRegistry.put(CollisionGroupManager.class, new CollisionGroupManager());
-        CoreRegistry.put(GroovyManager.class, new GroovyManager());
 
         AssetType.registerAssetTypes();
-        AssetManager.getInstance().addAssetSource(new ClasspathSource("engine", getClass().getProtectionDomain().getCodeSource(), "org/terasology/data"));
+        AssetManager.getInstance().addAssetSource(new ClasspathSource("engine", getClass().getProtectionDomain().getCodeSource(), "assets"));
 
         ShaderManager.getInstance();
         VertexBufferObjectManager.getInstance();

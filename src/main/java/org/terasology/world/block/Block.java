@@ -121,8 +121,8 @@ public class Block {
         DIRECTION_LIT_LEVEL.put(BlockPart.RIGHT, 0.75f);
         DIRECTION_LIT_LEVEL.put(BlockPart.CENTER, 0.8f);
         try {
-            colorLut = ImageIO.read(ResourceLoader.getResource("org/terasology/data/textures/grasscolor.png").openStream());
-            foliageLut = ImageIO.read(ResourceLoader.getResource("org/terasology/data/textures/foliagecolor.png").openStream());
+            colorLut = ImageIO.read(ResourceLoader.getResource("assets/textures/grasscolor.png").openStream());
+            foliageLut = ImageIO.read(ResourceLoader.getResource("assets/textures/foliagecolor.png").openStream());
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.toString(), e);
         }

@@ -13,23 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.components;
+package org.terasology.core;
 
 import org.terasology.entitySystem.Component;
 
+
 /**
- * Books are Knowledge
- *
- * @author bi0hax
+ * This is used for the BookshelfHandler to only allow books in it.
  */
-public class BookComponent implements Component {
-    public enum BookType {
-        Blank,
-        WContents,
-        Recipe         // Not yet implemented
+public class BookshelfComponent implements Component {
+
+    public BookshelfComponent() {
     }
-
-    public BookType type;
-
 
 }

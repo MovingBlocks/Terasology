@@ -33,9 +33,11 @@ import org.terasology.asset.AssetUri;
 public class ArchiveSource extends AbstractSource {
 
     private Logger logger = Logger.getLogger(getClass().getName());
+    private String basePath;
 
-    public ArchiveSource(String sourceId, File archive) {
+    public ArchiveSource(String sourceId, File archive, String basePath) {
         super(sourceId);
+        this.basePath = basePath;
 
         try {
             scanArchive(archive);
@@ -46,11 +48,9 @@ public class ArchiveSource extends AbstractSource {
 
     protected void scanArchive(File file) throws IOException {
         ZipFile archive;
-        String basePath = "";
 
         if (file.getName().endsWith(".jar")) {
             archive = new JarFile(file, false);
-            basePath = "org/terasology/data/";
         } else {
             archive = new ZipFile(file);
         }

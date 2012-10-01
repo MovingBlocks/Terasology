@@ -45,6 +45,8 @@ import com.google.gson.JsonIOException;
  */
 public class ModManager {
 
+    private static final String ASSETS_SUBDIRECTORY = "assets";
+
     private Logger logger = Logger.getLogger(getClass().getName());
     private Map<String, Mod> mods = Maps.newHashMap();
 
@@ -64,12 +66,12 @@ public class ModManager {
                 return pathname.isDirectory();
             }
         })) {
-            File modInfoFile = new File(modFile.getPath(), "mod.txt");
+            File modInfoFile = new File(modFile, "mod.txt");
             if (modInfoFile.exists()) {
                 try {
                     ModInfo modInfo = gson.fromJson(new FileReader(modInfoFile), ModInfo.class);
                     if (!mods.containsKey(modInfo.getId())) {
-                        mods.put(modInfo.getId(), new Mod(modFile, modInfo, new DirectorySource(modInfo.getId(), modFile)));
+                        mods.put(modInfo.getId(), new Mod(modFile, modInfo, new DirectorySource(modInfo.getId(), new File(modFile, ASSETS_SUBDIRECTORY))));
                         logger.info("Discovered mod: " + modInfo.getDisplayName());
                     } else {
                         logger.info("Discovered duplicate mod: " + modInfo.getDisplayName() + ", skipping");
@@ -86,7 +88,7 @@ public class ModManager {
         for (File modFile : modPath.listFiles(new FileFilter() {
             @Override
             public boolean accept(File pathname) {
-                return pathname.isFile() && pathname.getName().endsWith(".zip");
+                return pathname.isFile() && (pathname.getName().endsWith(".zip") || pathname.getName().endsWith(".jar"));
             }
         })) {
             try {
@@ -96,7 +98,7 @@ public class ModManager {
                     try {
                         ModInfo modInfo = gson.fromJson(new InputStreamReader(zipFile.getInputStream(modInfoEntry)), ModInfo.class);
                         if (!mods.containsKey(modInfo.getId())) {
-                            mods.put(modInfo.getId(), new Mod(modFile, modInfo, new ArchiveSource(modInfo.getId(), modFile)));
+                            mods.put(modInfo.getId(), new Mod(modFile, modInfo, new ArchiveSource(modInfo.getId(), modFile, ASSETS_SUBDIRECTORY)));
                             logger.info("Discovered mod: " + modInfo.getDisplayName());
                         } else {
                             logger.info("Discovered duplicate mod: " + modInfo.getDisplayName() + ", skipping");

@@ -13,17 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.componentSystem.action;
+package org.terasology.core;
 
-import org.terasology.components.BookComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.rendering.gui.widgets.UIWindow;
-import org.terasology.rendering.gui.windows.UIScreenBook;
 
 
 /**

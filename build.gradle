@@ -154,6 +154,56 @@ test {
     jvmArgs '-Xms512m', '-Xmx1024m', '-XX:MaxPermSize=128m'
 }
 
+/* Mods -------------------------------------------------------------------- */
+
+subprojects {
+    if (name != 'mods') {
+		apply plugin: 'java'
+		apply plugin: 'eclipse'
+		apply plugin: 'idea'
+		sourceSets {
+			main {
+				java {
+					output.classesDir 'classes'
+				}
+			}
+		}
+		task syncAssets(type: Sync) {
+			from 'assets'
+			into 'classes/assets'
+		}
+		jar.doFirst {
+			copy {
+				from 'mod.txt'
+				into 'classes'
+			}
+		}
+		jar.dependsOn syncAssets
+		idea {
+			module {
+				inheritOutputDirs = false
+				outputDir = file('classes')
+				testOutputDir = file('testClasses')
+				iml {
+					generateTo = file('.idea')
+				}
+			}
+		}
+		eclipse {
+			classpath {
+				defaultOutputDir = file('classes')
+			}
+		}
+		repositories {
+			mavenCentral()
+		}
+		dependencies {
+			compile project(':')
+		}
+	}
+}
+
+	
 /* Check ------------------------------------------------------------------- */
 checkstyle.ignoreFailures = true
 checkstyle.configProperties.samedir = checkstyle.configFile.parentFile
@@ -174,10 +224,28 @@ task assembleMainOutput(type:Sync) {
     into "$buildDir/$destDirMainOutput"
 }
 
+task modClasses {
+    subprojects.each { project -> 
+		if (project.name != 'mods') {
+			modClasses.dependsOn project.tasks['classes']
+		}
+	}	
+}
+
+task modAssemble {
+    subprojects.each { project -> 
+		if (project.name != 'mods') {
+			modAssemble.dependsOn project.tasks['assemble']
+		}
+	}	
+}
+
 task run(type:JavaExec) {
     description = "Run 'Terasology'"
+
     dependsOn extractNatives
     dependsOn assembleMainOutput
+	dependsOn modClasses
     main = mainClassName
     classpath "$buildDir/$destDirMainOutput"
     classpath configurations.runtime
@@ -238,16 +306,16 @@ task createVersionFile(type: Copy) {
 }
 
 task distMods {
-    file('mods').listFiles().each { File mod ->
-        if (mod.isDirectory() ) {
-            task('distMod-' + mod.getName(), type: Zip) {
-                from (mod)
-                archiveName = mod.getName() + '.zip'
-                destinationDir = file("$buildDir/$destDirMods")
-            }
-            distMods.dependsOn tasks['distMod-' + mod.getName()]
-        }
-    }
+	dependsOn modAssemble
+	subprojects.each { project -> 
+		if (project.name != 'mods') {
+			project.task('dist', type: Copy) {
+				from (project.libsDir)
+				into "$buildDir/$destDirMods"
+			}
+			distMods.dependsOn project.tasks['dist']
+		}
+	}
 }
 
 task distApplication(type:Sync) {
@@ -293,6 +361,10 @@ task distApplet(type:Sync) {
 distApplet.doLast {
     ant.signjar(jar: "$buildDir/$destDirApplet/$jarFileName", keystore: "$dirApplet/tera.keystore", alias: 'Terasology', storepass: 'Terasology')
     file("$buildDir/$destDirApplet/$subDirLibs").listFiles().each {
+        if (it.getName().endsWith(".jar"))
+            ant.signjar(jar: it, keystore: "$dirApplet/tera.keystore", alias: 'Terasology', storepass: 'Terasology')
+    }
+	file("$buildDir/$destDirApplet/$subDirMods").listFiles().each {
         if (it.getName().endsWith(".jar"))
             ant.signjar(jar: it, keystore: "$dirApplet/tera.keystore", alias: 'Terasology', storepass: 'Terasology')
     }
