@@ -17,6 +17,9 @@
 package org.terasology.logic.mod;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetSource;
@@ -29,11 +32,13 @@ public class Mod {
     private File modRoot;
     private AssetSource modSource;
     private boolean enabled;
+    private ClassLoader classLoader;
 
     public Mod(File modRoot, ModInfo info, AssetSource modSource) {
         this.modInfo = info;
         this.modRoot = modRoot;
         this.modSource = modSource;
+        this.classLoader = new URLClassLoader(new URL[] {getModClasspathUrl()}, getClass().getClassLoader());
     }
 
     public boolean isEnabled() {
@@ -53,6 +58,22 @@ public class Mod {
 
     public File getModRoot() {
         return modRoot;
+    }
+
+    public URL getModClasspathUrl() {
+        try {
+            if (modRoot.isDirectory()) {
+                return new File(modRoot, "classes").toURI().toURL();
+            } else {
+                return modRoot.toURI().toURL();
+            }
+        } catch (MalformedURLException e) {
+            return null;
+        }
+    }
+
+    public ClassLoader getClassLoader() {
+        return classLoader;
     }
 
     public ModInfo getModInfo() {

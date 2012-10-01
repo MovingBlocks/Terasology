@@ -120,6 +120,8 @@ public class StateSinglePlayer implements GameState {
             mod.setEnabled(true);
         }
         modManager.saveModSelectionToConfig();
+        CoreRegistry.put(ModManager.class, modManager);
+
         AssetManager.getInstance().clear();
         BlockManager.getInstance().load(worldInfo.getBlockIdMap());
         cacheTextures();

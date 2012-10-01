@@ -19,6 +19,8 @@ package org.terasology.logic.manager;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
@@ -28,13 +30,17 @@ import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
+import org.terasology.game.CoreRegistry;
 import org.terasology.logic.commands.Command;
 import org.terasology.logic.commands.CommandParam;
 import org.terasology.logic.commands.CommandProvider;
+import org.terasology.logic.mod.Mod;
+import org.terasology.logic.mod.ModManager;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -150,13 +156,18 @@ public class CommandManager {
      * Load all default and mod commands from the JSON files.
      */
     private void loadCommands() {
-        Predicate<String> filter = new FilterBuilder().include(".*");
+        Set<URL> classpathURLs = Sets.newHashSet();
+        List<ClassLoader> classLoaders = Lists.newArrayList();
+        classpathURLs.add(ClasspathHelper.forClass(CommandManager.class));
+        for (Mod mod : CoreRegistry.get(ModManager.class).getActiveMods()) {
+            classpathURLs.add(mod.getModClasspathUrl());
+            classLoaders.add(mod.getClassLoader());
+        }
         Reflections reflections = new Reflections(new ConfigurationBuilder()
-                .filterInputsBy(filter)
                 .setScanners(
-                        new SubTypesScanner().filterResultsBy(filter),
-                        new MethodAnnotationsScanner().filterResultsBy(filter))
-                .setUrls(Arrays.asList(ClasspathHelper.forClass(CommandManager.class))));
+                        new SubTypesScanner(),
+                        new MethodAnnotationsScanner())
+                .setUrls(classpathURLs).addClassLoaders(classLoaders));
         for (Class<? extends CommandProvider> providerClass : reflections.getSubTypesOf(CommandProvider.class)) {
             try {
                 CommandProvider provider = providerClass.newInstance();

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.jar.JarFile;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -60,9 +61,10 @@ public class ArchiveSource extends AbstractSource {
         while (lister.hasMoreElements()) {
             ZipEntry entry = lister.nextElement();
             String entryPath = entry.getName();
+            logger.log(Level.INFO,  "Found " + entryPath);
 
             if (entryPath.startsWith(basePath)) {
-                String key = entryPath.substring(basePath.length());
+                String key = entryPath.substring(basePath.length() + 1);
                 AssetUri uri = getUri(key);
                 if (uri == null || !uri.isValid()) continue;
 
