@@ -156,18 +156,10 @@ public class CommandManager {
      * Load all default and mod commands from the JSON files.
      */
     private void loadCommands() {
-        Set<URL> classpathURLs = Sets.newHashSet();
-        List<ClassLoader> classLoaders = Lists.newArrayList();
-        classpathURLs.add(ClasspathHelper.forClass(CommandManager.class));
-        for (Mod mod : CoreRegistry.get(ModManager.class).getActiveMods()) {
-            classpathURLs.add(mod.getModClasspathUrl());
-            classLoaders.add(mod.getClassLoader());
-        }
-        Reflections reflections = new Reflections(new ConfigurationBuilder()
-                .setScanners(
-                        new SubTypesScanner(),
-                        new MethodAnnotationsScanner())
-                .setUrls(classpathURLs).addClassLoaders(classLoaders));
+        ModManager modManager = CoreRegistry.get(ModManager.class);
+        Reflections reflections = new Reflections(modManager.configurationForActiveMods()
+                        .setScanners(new SubTypesScanner(), new MethodAnnotationsScanner()));
+
         for (Class<? extends CommandProvider> providerClass : reflections.getSubTypesOf(CommandProvider.class)) {
             try {
                 CommandProvider provider = providerClass.newInstance();

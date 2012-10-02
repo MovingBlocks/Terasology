@@ -60,7 +60,7 @@ public class StateMainMenu implements GameState {
     @Override
     public void init(GameEngine gameEngine) {
         _gameInstance = gameEngine;
-        
+
         //lets get the entity event system running
         entityManager = new EntitySystemBuilder().build();
         eventSystem = CoreRegistry.get(EventSystem.class);

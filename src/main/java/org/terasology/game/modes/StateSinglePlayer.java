@@ -16,6 +16,8 @@
 package org.terasology.game.modes;
 
 import org.lwjgl.opengl.Display;
+import org.reflections.Reflections;
+import org.reflections.util.ConfigurationBuilder;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
@@ -142,7 +144,9 @@ public class StateSinglePlayer implements GameState {
         componentSystemManager.register(inputSystem, "engine:InputSystem");
 
         componentSystemManager.loadEngineSystems();
-        componentSystemManager.loadSystems("miniions", "org.terasology.mods.miniions");
+        for (Mod mod : modManager.getActiveMods()) {
+            componentSystemManager.loadModSystems(mod);
+        }
 
         CoreRegistry.put(WorldPersister.class, new WorldPersister(entityManager));
 

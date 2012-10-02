@@ -38,7 +38,5 @@
   "PlaySoundAction" : {
     sounds = "click"
   },
-  "AccessInventoryAction": {},
-  "BookshelfHandler": {}
-
+  "AccessInventoryAction": {}
 }
