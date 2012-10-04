@@ -18,6 +18,8 @@ task wrapper(type: Wrapper) {
 }
 */
 
+import org.apache.tools.ant.filters.FixCrLfFilter;
+
 ext {
     startDateTimeString = new Date().format("yyyy-MM-dd_HH-mm-ss")
     dirApplet = 'applet'
@@ -236,6 +238,7 @@ task createVersionFile(type: Copy) {
     into "$buildDir"
     include versionFileName
     expand(buildNumber: env.BUILD_NUMBER, buildUrl: env.BUILD_URL, gitBranch: env.GIT_BRANCH, dateTime: startDateTimeString)
+    filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
 }
 
 task distMods {
@@ -256,8 +259,15 @@ task distApplication(type:Sync) {
     dependsOn extractNatives
     dependsOn distMods
     into("$buildDir/$destDirApplication")
-    from 'README.markdown'
-    from 'LICENSE.txt'
+    from ('README.markdown') {
+        filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
+    }
+    from ('LICENSE.txt') {
+        filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
+    }
+    from ('NOTICE') {
+        filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
+    }
     from jar
     from('launchScripts') {
         exclude('Launcher.xml')
@@ -280,8 +290,15 @@ task distApplet(type:Sync) {
     description = "Creates an Applet folder"
     dependsOn distMods
     into("$buildDir/$destDirApplet")
-    from 'README.markdown'
-    from 'LICENSE.txt'
+    from ('README.markdown') {
+        filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
+    }
+    from ('LICENSE.txt') {
+        filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
+    }
+    from ('NOTICE') {
+        filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
+    }
     from jar
     from(dirApplet) {
         exclude '*.keystore'
