@@ -16,11 +16,16 @@
 
 package org.terasology.input.binds;
 
+import org.terasology.input.ActivateMode;
 import org.terasology.input.BindButtonEvent;
+import org.terasology.input.DefaultBinding;
+import org.terasology.input.InputType;
+import org.terasology.input.RegisterBindButton;
 
 /**
  * @author Immortius
  */
+@RegisterBindButton(id = "toolbarPrev", description = "Previous Toolbar Item", mode = ActivateMode.PRESS)
+@DefaultBinding(type = InputType.MOUSE_WHEEL, id = -1)
 public class ToolbarPrevButton extends BindButtonEvent {
-    public static final String ID = "engine:toolbarPrevButton";
 }

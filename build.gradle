@@ -400,3 +400,13 @@ task distAppletZip(type:Zip) {
 /* IDE --------------------------------------------------------------------- */
 ideaModule.dependsOn extractNatives
 eclipseClasspath.dependsOn extractNatives
+
+idea { 
+	module.excludeDirs += file('bin')
+	module.excludeDirs += file('logs') 
+	module.excludeDirs += file('natives')
+	module.excludeDirs += file('protobuf')
+	module.excludeDirs += file('SAVED_WORLDS')
+	module.excludeDirs += file('screens')
+}
+	

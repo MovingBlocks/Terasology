@@ -56,7 +56,7 @@ public class UIScreenInventory extends UIWindow {
         setId("inventory");
         setBackgroundColor(new Color(0, 0, 0, 200));
         setModal(true);
-        setCloseBinds(new String[] {InventoryButton.ID});
+        setCloseBinds(new String[] {"engine:inventory"});
         setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
         maximize();
         

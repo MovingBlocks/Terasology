@@ -396,9 +396,9 @@ public class Commands implements CommandProvider {
     @Command(shortDescription = "Switches to typical key binds for AZERTY")
     public void AZERTY() {
         InputSystem input = CoreRegistry.get(InputSystem.class);
-        input.linkBindButtonToKey(Keyboard.KEY_Z, ForwardsButton.ID);
-        input.linkBindButtonToKey(Keyboard.KEY_S, BackwardsButton.ID);
-        input.linkBindButtonToKey(Keyboard.KEY_Q, LeftStrafeButton.ID);
+        input.linkBindButtonToKey(Keyboard.KEY_Z, "engine:forwards");
+        input.linkBindButtonToKey(Keyboard.KEY_S, "engine:backwards");
+        input.linkBindButtonToKey(Keyboard.KEY_Q, "engine:left");
 
     }
 

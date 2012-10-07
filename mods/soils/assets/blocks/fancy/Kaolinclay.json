@@ -20,5 +20,5 @@
  * to crops to deter insect damage, and in the case of apples, to prevent sun scald.
  */
  {
-    "tile" : "minerals:kaoloniteClay"
+    "tile" : "soils:kaoloniteClay"
  }

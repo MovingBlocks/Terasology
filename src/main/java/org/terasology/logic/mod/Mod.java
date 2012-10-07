@@ -38,7 +38,8 @@ public class Mod {
         this.modInfo = info;
         this.modRoot = modRoot;
         this.modSource = modSource;
-        this.classLoader = new URLClassLoader(new URL[] {getModClasspathUrl()}, getClass().getClassLoader());
+
+        this.classLoader = URLClassLoader.newInstance(new URL[] {getModClasspathUrl()}, getClass().getClassLoader());
     }
 
     public boolean isEnabled() {

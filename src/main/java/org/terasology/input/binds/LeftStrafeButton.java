@@ -16,11 +16,16 @@
 
 package org.terasology.input.binds;
 
+import org.lwjgl.input.Keyboard;
 import org.terasology.input.BindButtonEvent;
+import org.terasology.input.DefaultBinding;
+import org.terasology.input.InputType;
+import org.terasology.input.RegisterBindButton;
 
 /**
  * @author Immortius
  */
+@RegisterBindButton(id = "left", description = "Strafe Left")
+@DefaultBinding(type = InputType.KEY, id = Keyboard.KEY_A)
 public class LeftStrafeButton extends BindButtonEvent {
-    public static final String ID = "engine:leftStrafeButton";
 }

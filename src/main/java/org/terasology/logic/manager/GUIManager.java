@@ -15,9 +15,11 @@
  */
 package org.terasology.logic.manager;
 
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.google.common.collect.Maps;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.components.LocalPlayerComponent;
@@ -32,7 +34,6 @@ import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.ButtonState;
-import org.terasology.mods.miniions.rendering.gui.components.UIMinionBehaviourMenu;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.widgets.UIMessageBox;
@@ -47,7 +48,6 @@ import org.terasology.rendering.gui.windows.UIMenuMultiplayer;
 import org.terasology.rendering.gui.windows.UIMenuPause;
 import org.terasology.rendering.gui.windows.UIMenuSingleplayer;
 import org.terasology.rendering.gui.windows.UIScreenItems;
-import org.terasology.rendering.gui.windows.UIScreenBook;
 import org.terasology.rendering.gui.windows.UIScreenChat;
 import org.terasology.rendering.gui.windows.UIScreenContainer;
 import org.terasology.rendering.gui.windows.UIScreenDeath;
@@ -70,10 +70,35 @@ public class GUIManager implements EventHandlerSystem {
     private Logger logger = Logger.getLogger(getClass().getName());
     private static GUIManager instance;
     private UIDisplayRenderer renderer;
+    private Map<String, Class<? extends UIWindow>> registeredWindows = Maps.newHashMap();
 
     private GUIManager() {
         renderer = new UIDisplayRenderer();
         renderer.setVisible(true);
+
+        // TODO: Remove this
+        registerWindows();
+    }
+
+    private void registerWindows() {
+        //TODO parser action here! this is temporary
+        registeredWindows.put("main", UIMenuMain.class);
+        registeredWindows.put("singleplayer", UIMenuSingleplayer.class);
+        registeredWindows.put("multiplayer", UIMenuMultiplayer.class);
+        registeredWindows.put("config", UIMenuConfig.class);
+        registeredWindows.put("config:video", UIMenuConfigVideo.class);
+        registeredWindows.put("config:audio", UIMenuConfigAudio.class);
+        registeredWindows.put("config:controls", UIMenuConfigControls.class);
+        registeredWindows.put("config:mods", UIMenuConfigMods.class);
+        registeredWindows.put("loading", UIScreenLoading.class);
+        registeredWindows.put("container", UIScreenContainer.class);
+        registeredWindows.put("metrics", UIScreenMetrics.class);
+        registeredWindows.put("death", UIScreenDeath.class);
+        registeredWindows.put("pause", UIMenuPause.class);
+        registeredWindows.put("inventory", UIScreenInventory.class);
+        registeredWindows.put("chat", UIScreenChat.class);
+        registeredWindows.put("hud", UIScreenHUD.class);
+        registeredWindows.put("itemList", UIScreenItems.class);
     }
 
     public static GUIManager getInstance() {
@@ -218,6 +243,10 @@ public class GUIManager implements EventHandlerSystem {
         
         return window;
     }
+
+    public void registerWindow(String windowId, Class<? extends UIWindow> windowClass) {
+        registeredWindows.put(windowId, windowClass);
+    }
     
     /**
      * Load a window by ID and add it to the UI.
@@ -229,58 +258,23 @@ public class GUIManager implements EventHandlerSystem {
         
         if (window != null) {
             logger.log(Level.INFO, "GUIManager: Window with ID \"" + windowId + "\" already loaded.");
-            
-            return getWindowById(windowId);
+            return window;
         }
-         
-        //TODO parser action here! this is temporary
-        if (windowId.equals("main")) {
-            window = new UIMenuMain();
-        } else if (windowId.equals("singleplayer")) {
-            window = new UIMenuSingleplayer();
-        } else if (windowId.equals("multiplayer")) {
-            window = new UIMenuMultiplayer();
-        } else if (windowId.equals("config")) {
-            window = new UIMenuConfig();
-        } else if (windowId.equals("config:video")) {
-            window = new UIMenuConfigVideo();
-        } else if (windowId.equals("config:audio")) {
-            window = new UIMenuConfigAudio();
-        } else if (windowId.equals("config:controls")) {
-            window = new UIMenuConfigControls();
-        } else if (windowId.equals("config:mods")) {
-            window = new UIMenuConfigMods();
-        } else if (windowId.equals("loading")) {
-            window = new UIScreenLoading();
-        } else if (windowId.equals("book")) {
-            window = new UIScreenBook();
-        } else if (windowId.equals("container")) {
-            window = new UIScreenContainer();
-        } else if (windowId.equals("metrics")) {
-            window = new UIScreenMetrics();
-        } else if (windowId.equals("death")) {
-            window = new UIScreenDeath();
-        } else if (windowId.equals("pause")) {
-            window = new UIMenuPause();
-        } else if (windowId.equals("inventory")) {
-            window = new UIScreenInventory();
-        } else if (windowId.equals("chat")) {
-            window = new UIScreenChat();
-        } else if (windowId.equals("hud")) {
-            window = new UIScreenHUD();
-        } else if (windowId.equals("minionBehaviour")) {
-            window = new UIMinionBehaviourMenu();
-        } else if (windowId.equals("itemList")) {
-            window = new UIScreenItems();
+
+        Class<? extends UIWindow> windowClass = registeredWindows.get(windowId);
+        if (windowClass != null) {
+            logger.log(Level.INFO, "GUIManager: Loading window with ID \"" + windowId + "\".");
+
+            try {
+                return addWindow(windowClass.newInstance());
+            } catch (InstantiationException e) {
+                logger.severe("Failed to load window " + windowId + ", no default constructor");
+            } catch (IllegalAccessException e) {
+                logger.severe("Failed to load window " + windowId + ", no default constructor");
+            }
         }
-        
-        if (window == null) {
-            logger.log(Level.INFO, "GUIManager: Couldn't load window by ID \"" + windowId + "\"");
-        } else {
-            logger.log(Level.INFO, "GUIManager: Loaded window of type " + window.getClass().getName());
-        }
-        
-        return addWindow(window);
+        logger.warning("Unable to load window \"" + windowId + "\", unknown id");
+        return null;
     }
 
     /**

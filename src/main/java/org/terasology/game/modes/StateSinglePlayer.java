@@ -15,8 +15,10 @@
  */
 package org.terasology.game.modes;
 
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.reflections.Reflections;
+import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ConfigurationBuilder;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
@@ -42,8 +44,16 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.Timer;
 import org.terasology.game.bootstrap.EntitySystemBuilder;
+import org.terasology.input.BindAxisEvent;
+import org.terasology.input.BindButtonEvent;
+import org.terasology.input.BindableAxis;
+import org.terasology.input.BindableButton;
 import org.terasology.input.CameraTargetSystem;
+import org.terasology.input.DefaultBinding;
 import org.terasology.input.InputSystem;
+import org.terasology.input.RegisterBindAxis;
+import org.terasology.input.RegisterBindButton;
+import org.terasology.input.binds.ToolbarSlotButton;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.CommandManager;
 import org.terasology.logic.manager.GUIManager;
@@ -73,8 +83,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -139,9 +151,7 @@ public class StateSinglePlayer implements GameState {
         cameraTargetSystem = new CameraTargetSystem();
         CoreRegistry.put(CameraTargetSystem.class, cameraTargetSystem);
         componentSystemManager.register(cameraTargetSystem, "engine:CameraTargetSystem");
-        inputSystem = new InputSystem();
-        CoreRegistry.put(InputSystem.class, inputSystem);
-        componentSystemManager.register(inputSystem, "engine:InputSystem");
+        initInput(modManager);
 
         componentSystemManager.loadEngineSystems();
         for (Mod mod : modManager.getActiveMods()) {
@@ -153,6 +163,98 @@ public class StateSinglePlayer implements GameState {
         loadPrefabs();
 
         CoreRegistry.put(CommandManager.class, new CommandManager());
+    }
+
+    private void initInput(ModManager modManager) {
+        inputSystem = new InputSystem();
+        CoreRegistry.put(InputSystem.class, inputSystem);
+        componentSystemManager.register(inputSystem, "engine:InputSystem");
+
+        Reflections engineReflection = new Reflections("org.terasology");
+        registerButtonBinds("engine", engineReflection.getTypesAnnotatedWith(RegisterBindButton.class));
+        registerAxisBinds("engine", engineReflection.getTypesAnnotatedWith(RegisterBindAxis.class));
+        for (Mod mod : modManager.getActiveMods()) {
+            Reflections reflections = new Reflections(new ConfigurationBuilder().addClassLoader(mod.getClassLoader()).addUrls(mod.getModClasspathUrl()).setScanners(new TypeAnnotationsScanner()));
+            registerButtonBinds(mod.getModInfo().getId(), reflections.getTypesAnnotatedWith(RegisterBindButton.class));
+            registerAxisBinds(mod.getModInfo().getId(), engineReflection.getTypesAnnotatedWith(RegisterBindAxis.class));
+        }
+
+        // Manually register toolbar shortcut keys
+        // TODO: Put this elsewhere? (Maybe under gametype) And give mods a similar opportunity
+        for (int i = 0; i < 9; ++i) {
+            String inventorySlotBind = "engine:toolbarSlot" + i;
+            inputSystem.registerBindButton(inventorySlotBind, "Inventory Slot " + (i + 1), new ToolbarSlotButton(i));
+            inputSystem.linkBindButtonToKey(Keyboard.KEY_1 + i, inventorySlotBind);
+        }
+    }
+
+    private void registerAxisBinds(String packageName, Iterable<Class<?>> classes) {
+        String prefix = packageName.toLowerCase(Locale.ENGLISH) + ":";
+        for (Class registerBindClass : classes) {
+            RegisterBindAxis info = (RegisterBindAxis) registerBindClass.getAnnotation(RegisterBindAxis.class);
+            String id = prefix + info.id();
+            if (BindAxisEvent.class.isAssignableFrom(registerBindClass)) {
+                BindableButton positiveButton = inputSystem.getBindButton(info.positiveButton());
+                BindableButton negativeButton = inputSystem.getBindButton(info.negativeButton());
+                if (positiveButton == null) {
+                    logger.log(Level.WARNING, "Failed to register axis \"" + id + "\", missing positive button \"" + info.positiveButton() + "\"");
+                    continue;
+                }
+                if (negativeButton == null) {
+                    logger.log(Level.WARNING, "Failed to register axis \"" + id + "\", missing negative button \"" + info.negativeButton() + "\"");
+                    continue;
+                }
+                try {
+                    BindableAxis bindAxis = inputSystem.registerBindAxis(id, (BindAxisEvent)registerBindClass.newInstance(), positiveButton, negativeButton);
+                    bindAxis.setSendEventMode(info.eventMode());
+                    logger.log(Level.INFO, "Registered axis bind: " + id);
+                } catch (InstantiationException e) {
+                    logger.log(Level.SEVERE, "Failed to register axis bind \"" + id + "\"", e);
+                } catch (IllegalAccessException e) {
+                    logger.log(Level.SEVERE, "Failed to register axis bind \"" + id + "\"", e);
+                }
+            } else {
+                logger.log(Level.WARNING, "Failed to register axis bind \"" + id + "\", does not extend BindAxisEvent");
+            }
+        }
+    }
+
+    private void registerButtonBinds(String packageName, Iterable<Class<?>> classes) {
+        String prefix = packageName.toLowerCase(Locale.ENGLISH) + ":";
+        for (Class registerBindClass : classes) {
+            RegisterBindButton info = (RegisterBindButton) registerBindClass.getAnnotation(RegisterBindButton.class);
+            String id = prefix + info.id();
+            if (BindButtonEvent.class.isAssignableFrom(registerBindClass)) {
+                try {
+                    BindableButton bindButton = inputSystem.registerBindButton(id, info.description(), (BindButtonEvent)registerBindClass.newInstance());
+                    bindButton.setMode(info.mode());
+                    bindButton.setRepeating(info.repeating());
+                    for (Annotation annotation : registerBindClass.getAnnotations()) {
+                        if (annotation instanceof DefaultBinding) {
+                            DefaultBinding defaultBinding = (DefaultBinding) annotation;
+                            switch (defaultBinding.type()) {
+                                case KEY:
+                                    inputSystem.linkBindButtonToKey(defaultBinding.id(), id);
+                                    break;
+                                case MOUSE_BUTTON:
+                                    inputSystem.linkBindButtonToMouse(defaultBinding.id(), id);
+                                    break;
+                                case MOUSE_WHEEL:
+                                    inputSystem.linkBindButtonToMouseWheel(defaultBinding.id(), id);
+                                    break;
+                            }
+                        }
+                    }
+                    logger.log(Level.INFO, "Registered button bind: " + id);
+                } catch (InstantiationException e) {
+                    logger.log(Level.SEVERE, "Failed to register button bind \"" + id + "\"", e);
+                } catch (IllegalAccessException e) {
+                    logger.log(Level.SEVERE, "Failed to register button bind \"" + id + "\"", e);
+                }
+            } else {
+                logger.log(Level.WARNING, "Failed to register button bind \"" + id + "\", does not extend BindButtonEvent");
+            }
+        }
     }
 
     private void loadPrefabs() {

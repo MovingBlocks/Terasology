@@ -85,7 +85,7 @@ public class UIScreenChat extends UIWindow {
         MessageManager.getInstance().subscribe(chatSubscription);
         
         setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
-        setCloseBinds(new String[] {ConsoleButton.ID});
+        setCloseBinds(new String[] {"engine:console"});
         setId("chat");
         setModal(true);
         maximize();

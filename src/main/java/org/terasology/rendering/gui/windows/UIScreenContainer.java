@@ -57,7 +57,7 @@ public class UIScreenContainer extends UIWindow {
         setBackgroundColor(new Color(0, 0, 0, 200));
         setModal(true);
         maximize();
-        setCloseBinds(new String[] {FrobButton.ID});
+        setCloseBinds(new String[] {"engine:frob"});
         setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
 
         addVisibilityListener(new VisibilityListener() {

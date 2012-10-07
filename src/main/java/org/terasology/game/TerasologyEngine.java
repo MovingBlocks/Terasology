@@ -23,6 +23,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GLContext;
+import org.reflections.Reflections;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.sources.ClasspathSource;
@@ -30,10 +31,12 @@ import org.terasology.game.modes.GameState;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.FontManager;
+import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.InputConfig;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.VertexBufferObjectManager;
+import org.terasology.logic.mod.ModSecurityManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.version.TerasologyVersion;
@@ -99,7 +102,17 @@ public class TerasologyEngine implements GameEngine {
         initControls();
         initManagers();
         initTimer(); // Dependant on LWJGL
+        initSecurity();
         initialised = true;
+    }
+
+    private void initSecurity() {
+        // TODO: More work on security
+        ModSecurityManager modSecurityManager = new ModSecurityManager();
+        //System.setSecurityManager(modSecurityManager);
+        modSecurityManager.addModAvailableClass(GUIManager.class);
+        // TODO: Add in mod available classes
+
     }
 
     private void initLogger() {
