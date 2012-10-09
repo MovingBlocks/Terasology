@@ -21,6 +21,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.util.ConfigurationBuilder;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetSource;
 
@@ -33,6 +37,7 @@ public class Mod {
     private AssetSource modSource;
     private boolean enabled;
     private ClassLoader classLoader;
+    private Reflections reflections;
 
     public Mod(File modRoot, ModInfo info, AssetSource modSource) {
         this.modInfo = info;
@@ -73,8 +78,19 @@ public class Mod {
         }
     }
 
+    public Reflections getReflections() {
+        if (reflections == null) {
+            reflections = new Reflections(new ConfigurationBuilder().addClassLoader(classLoader).addUrls(getModClasspathUrl()).setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()));
+        }
+        return reflections;
+    }
+
     public ClassLoader getClassLoader() {
         return classLoader;
+    }
+
+    void setClassLoader(ClassLoader classLoader) {
+        this.classLoader = classLoader;
     }
 
     public ModInfo getModInfo() {

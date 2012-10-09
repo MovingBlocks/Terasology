@@ -129,12 +129,12 @@ public class StateSinglePlayer implements GameState {
 
     public void init(GameEngine engine) {
         // TODO: Change to better mod support, should be enabled via config
-        ModManager modManager = new ModManager();
+        ModManager modManager = CoreRegistry.get(ModManager.class);
         for (Mod mod : modManager.getMods()) {
             mod.setEnabled(true);
         }
         modManager.saveModSelectionToConfig();
-        CoreRegistry.put(ModManager.class, modManager);
+        modManager.applyActiveMods();
 
         AssetManager.getInstance().clear();
         BlockManager.getInstance().load(worldInfo.getBlockIdMap());
@@ -153,9 +153,9 @@ public class StateSinglePlayer implements GameState {
         componentSystemManager.register(cameraTargetSystem, "engine:CameraTargetSystem");
         initInput(modManager);
 
-        componentSystemManager.loadEngineSystems();
+        componentSystemManager.loadSystems("engine", modManager.getEngineReflections());
         for (Mod mod : modManager.getActiveMods()) {
-            componentSystemManager.loadModSystems(mod);
+            componentSystemManager.loadSystems(mod.getModInfo().getId(), mod.getReflections());
         }
 
         CoreRegistry.put(WorldPersister.class, new WorldPersister(entityManager));
@@ -170,13 +170,11 @@ public class StateSinglePlayer implements GameState {
         CoreRegistry.put(InputSystem.class, inputSystem);
         componentSystemManager.register(inputSystem, "engine:InputSystem");
 
-        Reflections engineReflection = new Reflections("org.terasology");
-        registerButtonBinds("engine", engineReflection.getTypesAnnotatedWith(RegisterBindButton.class));
-        registerAxisBinds("engine", engineReflection.getTypesAnnotatedWith(RegisterBindAxis.class));
+        registerButtonBinds("engine", modManager.getEngineReflections().getTypesAnnotatedWith(RegisterBindButton.class));
+        registerAxisBinds("engine", modManager.getEngineReflections().getTypesAnnotatedWith(RegisterBindAxis.class));
         for (Mod mod : modManager.getActiveMods()) {
-            Reflections reflections = new Reflections(new ConfigurationBuilder().addClassLoader(mod.getClassLoader()).addUrls(mod.getModClasspathUrl()).setScanners(new TypeAnnotationsScanner()));
-            registerButtonBinds(mod.getModInfo().getId(), reflections.getTypesAnnotatedWith(RegisterBindButton.class));
-            registerAxisBinds(mod.getModInfo().getId(), reflections.getTypesAnnotatedWith(RegisterBindAxis.class));
+            registerButtonBinds(mod.getModInfo().getId(), mod.getReflections().getTypesAnnotatedWith(RegisterBindButton.class));
+            registerAxisBinds(mod.getModInfo().getId(), mod.getReflections().getTypesAnnotatedWith(RegisterBindAxis.class));
         }
 
         // Manually register toolbar shortcut keys

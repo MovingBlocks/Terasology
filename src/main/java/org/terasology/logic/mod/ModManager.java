@@ -21,6 +21,9 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.terasology.asset.sources.ArchiveSource;
@@ -35,6 +38,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -53,9 +57,29 @@ public class ModManager {
 
     private Logger logger = Logger.getLogger(getClass().getName());
     private Map<String, Mod> mods = Maps.newHashMap();
+    private ClassLoader activeModClassLoader;
+
+    private Reflections engineReflections;
+    private Reflections activeModReflections;
 
     public ModManager() {
+        engineReflections = new Reflections(
+                new ConfigurationBuilder()
+                        .addClassLoader(getClass().getClassLoader())
+                        .addUrls(ClasspathHelper.forClassLoader(getClass().getClassLoader()))
+                        .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()));
         refresh();
+    }
+
+    public Reflections getEngineReflections() {
+        return engineReflections;
+    }
+
+    public Reflections getActiveModReflections() {
+        if (activeModReflections != null) {
+            return activeModReflections;
+        }
+        return engineReflections;
     }
 
     public void refresh() {
@@ -123,17 +147,24 @@ public class ModManager {
                 mod.setEnabled(true);
             }
         }
+
+        activeModClassLoader = null;
     }
 
-    public ConfigurationBuilder configurationForActiveMods() {
-        Set<URL> classpathURLs = Sets.newHashSet();
-        List<ClassLoader> classLoaders = Lists.newArrayList();
-        classpathURLs.add(ClasspathHelper.forClass(getClass()));
+    public void applyActiveMods() {
+        List<URL> urls = Lists.newArrayList();
         for (Mod mod : getActiveMods()) {
-            classpathURLs.add(mod.getModClasspathUrl());
-            classLoaders.add(mod.getClassLoader());
+            urls.add(mod.getModClasspathUrl());
         }
-        return new ConfigurationBuilder().addClassLoaders(classLoaders).addUrls(classpathURLs);
+        activeModClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]));
+        for (Mod mod : getActiveMods()) {
+            mod.setClassLoader(activeModClassLoader);
+        }
+        activeModReflections = new Reflections(new ConfigurationBuilder().addClassLoader(getClass().getClassLoader()).addClassLoader(activeModClassLoader));
+        activeModReflections.merge(getEngineReflections());
+        for (Mod mod : getActiveMods()) {
+            activeModReflections.merge(mod.getReflections());
+        }
     }
 
     public Collection<Mod> getMods() {

@@ -157,8 +157,7 @@ public class CommandManager {
      */
     private void loadCommands() {
         ModManager modManager = CoreRegistry.get(ModManager.class);
-        Reflections reflections = new Reflections(modManager.configurationForActiveMods()
-                        .setScanners(new SubTypesScanner(), new MethodAnnotationsScanner()));
+        Reflections reflections = modManager.getActiveModReflections();
 
         for (Class<? extends CommandProvider> providerClass : reflections.getSubTypesOf(CommandProvider.class)) {
             try {

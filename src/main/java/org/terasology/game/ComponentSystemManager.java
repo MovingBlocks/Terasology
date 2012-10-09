@@ -55,15 +55,7 @@ public class ComponentSystemManager {
     public ComponentSystemManager() {
     }
 
-    public void loadEngineSystems() {
-        loadSystems("engine", new Reflections(new ConfigurationBuilder().setScanners(new TypeAnnotationsScanner()).addUrls(ClasspathHelper.forClass(getClass()))));
-    }
-
-    public void loadModSystems(Mod mod) {
-        loadSystems(mod.getModInfo().getId(), new Reflections(new ConfigurationBuilder().addUrls(mod.getModClasspathUrl()).addClassLoader(mod.getClassLoader()).setScanners(new TypeAnnotationsScanner())));
-    }
-
-    private void loadSystems(String packageName, Reflections reflections) {
+    public void loadSystems(String packageName, Reflections reflections) {
         Set<Class<?>> systems = reflections.getTypesAnnotatedWith(RegisterComponentSystem.class);
         for (Class<?> system : systems) {
             if (!ComponentSystem.class.isAssignableFrom(system)) {

@@ -99,12 +99,8 @@ public class EntitySystemBuilder {
 
     private void registerComponents(ComponentLibrary library) {
         ModManager modManager = CoreRegistry.get(ModManager.class);
-        Reflections reflections = null;
-        if (modManager != null) {
-            reflections = new Reflections(modManager.configurationForActiveMods().setScanners(new SubTypesScanner()));
-        } else {
-            reflections = new Reflections(new ConfigurationBuilder().setScanners(new SubTypesScanner()));
-        }
+        Reflections reflections = modManager.getActiveModReflections();
+
         Set<Class<? extends Component>> componentTypes = reflections.getSubTypesOf(Component.class);
         for (Class<? extends Component> componentType : componentTypes) {
             library.registerComponentClass(componentType);
@@ -112,14 +108,10 @@ public class EntitySystemBuilder {
     }
 
     private void registerEvents(EventSystem eventSystem) {
-        // Engine
-        registerEvents("engine", eventSystem, new Reflections("org.terasology"));
         ModManager modManager = CoreRegistry.get(ModManager.class);
-        if (modManager != null) {
-            for (Mod mod : modManager.getActiveMods()) {
-                Reflections reflections = new Reflections(new ConfigurationBuilder().addClassLoader(mod.getClassLoader()).addUrls(mod.getModClasspathUrl()));
-                registerEvents(mod.getModInfo().getId(), eventSystem, reflections);
-            }
+        registerEvents("engine", eventSystem, modManager.getEngineReflections());
+        for (Mod mod : modManager.getActiveMods()) {
+            registerEvents(mod.getModInfo().getId(), eventSystem, mod.getReflections());
         }
     }
 

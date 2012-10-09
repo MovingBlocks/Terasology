@@ -36,6 +36,7 @@ import org.terasology.logic.manager.InputConfig;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.VertexBufferObjectManager;
+import org.terasology.logic.mod.ModManager;
 import org.terasology.logic.mod.ModSecurityManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.physics.CollisionGroupManager;
@@ -364,6 +365,7 @@ public class TerasologyEngine implements GameEngine {
 
     private void initManagers() {
         CoreRegistry.put(CollisionGroupManager.class, new CollisionGroupManager());
+        CoreRegistry.put(ModManager.class, new ModManager());
 
         AssetType.registerAssetTypes();
         AssetManager.getInstance().addAssetSource(new ClasspathSource("engine", getClass().getProtectionDomain().getCodeSource(), "assets"));
