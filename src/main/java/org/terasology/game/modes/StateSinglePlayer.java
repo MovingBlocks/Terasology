@@ -176,7 +176,7 @@ public class StateSinglePlayer implements GameState {
         for (Mod mod : modManager.getActiveMods()) {
             Reflections reflections = new Reflections(new ConfigurationBuilder().addClassLoader(mod.getClassLoader()).addUrls(mod.getModClasspathUrl()).setScanners(new TypeAnnotationsScanner()));
             registerButtonBinds(mod.getModInfo().getId(), reflections.getTypesAnnotatedWith(RegisterBindButton.class));
-            registerAxisBinds(mod.getModInfo().getId(), engineReflection.getTypesAnnotatedWith(RegisterBindAxis.class));
+            registerAxisBinds(mod.getModInfo().getId(), reflections.getTypesAnnotatedWith(RegisterBindAxis.class));
         }
 
         // Manually register toolbar shortcut keys

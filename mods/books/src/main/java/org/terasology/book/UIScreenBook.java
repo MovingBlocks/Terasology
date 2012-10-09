@@ -34,7 +34,7 @@ public class UIScreenBook extends UIWindow {
         setHorizontalAlign(EHorizontalAlign.CENTER);
         setVerticalAlign(EVerticalAlign.CENTER);
         setModal(true);
-        setCloseBinds(new String[]{UseItemButton.ID});
+        setCloseBinds(new String[]{"engine:useHeldItem"});
         setCloseKeys(new int[]{Keyboard.KEY_ESCAPE});
         maximize();
 
