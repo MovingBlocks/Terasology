@@ -37,7 +37,7 @@ ext {
     env = System.getenv() // read environment variables, including variables passed by jenking continuous integration server
     versionInfoFileDir = new File(sourceSets.main.output.resourcesDir, 'org/terasology/version')
     versionInfoFile = new File(versionInfoFileDir, 'versionInfo.properties')
-    versionFileName = 'VERSION.txt'
+    versionFileName = 'VERSION'
 }
 
 repositories {
@@ -261,8 +261,9 @@ task distApplication(type:Sync) {
     into("$buildDir/$destDirApplication")
     from ('README.markdown') {
         filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
+        rename('README.markdown', 'README')
     }
-    from ('LICENSE.txt') {
+    from ('LICENSE') {
         filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
     }
     from ('NOTICE') {
@@ -292,8 +293,9 @@ task distApplet(type:Sync) {
     into("$buildDir/$destDirApplet")
     from ('README.markdown') {
         filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
+        rename('README.markdown', 'README')
     }
-    from ('LICENSE.txt') {
+    from ('LICENSE') {
         filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
     }
     from ('NOTICE') {
