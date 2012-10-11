@@ -46,7 +46,7 @@ public class PlayerFactory {
         location.setWorldPosition(spawnPosition);
         player.saveComponent(location);
         PlayerComponent playerComponent = player.getComponent(PlayerComponent.class);
-        playerComponent.spawnPosition.set(spawnPosition);
+        playerComponent.initialSpawn(spawnPosition);
         player.saveComponent(playerComponent);
         player.addComponent(new LocalPlayerComponent());
 

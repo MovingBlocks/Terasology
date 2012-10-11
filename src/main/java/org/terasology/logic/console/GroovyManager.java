@@ -457,7 +457,7 @@ public class GroovyManager {
         public void setSpawn() {
             EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
             PlayerComponent spawn = playerEntity.getComponent(PlayerComponent.class);
-            spawn.spawnPosition = playerEntity.getComponent(LocationComponent.class).getWorldPosition();
+            spawn.setSpawnPosition(playerEntity.getComponent(LocationComponent.class).getWorldPosition());
             playerEntity.saveComponent(spawn);
         }
 

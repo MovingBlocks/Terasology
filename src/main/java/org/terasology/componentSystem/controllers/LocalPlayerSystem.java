@@ -236,7 +236,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
         PlayerComponent playerComponent = entity.getComponent(PlayerComponent.class);
         if (playerComponent != null && locationComponent != null) {
-            locationComponent.setWorldPosition(playerComponent.spawnPosition);
+            locationComponent.setWorldPosition(playerComponent.respawn());
             entity.saveComponent(locationComponent);
         }
 
