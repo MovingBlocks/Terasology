@@ -745,7 +745,7 @@ public final class WorldRenderer {
             return;
         PlayerComponent player = _player.getEntity().getComponent(PlayerComponent.class);
 
-        Vector3f cameraPosition = new Vector3f(player.spawnPosition);
+        Vector3f cameraPosition = new Vector3f(player.getSpawnPosition());
         cameraPosition.y += 32;
         cameraPosition.x += Math.sin(getTick() * 0.0005f) * 32f;
         cameraPosition.z += Math.cos(getTick() * 0.0005f) * 32f;
@@ -757,7 +757,7 @@ public final class WorldRenderer {
         Vector3f cameraDirection = new Vector3f();
 
         if (distanceToPlayer > 64.0) {
-            cameraDirection.sub(player.spawnPosition, cameraPosition);
+            cameraDirection.sub(player.getSpawnPosition(), cameraPosition);
         } else {
             cameraDirection.set(playerToCamera);
         }

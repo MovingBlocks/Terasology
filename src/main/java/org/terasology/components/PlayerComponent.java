@@ -22,10 +22,50 @@ import org.terasology.entitySystem.EntityRef;
 
 /**
  * Player information that is shared across the network
- *
+ * 
  * @author Immortius <immortius@gmail.com>
  */
 public final class PlayerComponent implements Component {
-    public Vector3f spawnPosition = new Vector3f();
+
+    private Vector3f spawnPositionFirst = new Vector3f();
+    private Vector3f spawnPositionLast = new Vector3f();
+    private Vector3f spawnPosition = new Vector3f();
+
     public EntityRef transferSlot = EntityRef.NULL;
+
+    public void initialSpawn(final Vector3f initialSpawnPosition) {
+        spawnPositionFirst = initialSpawnPosition;
+        spawnPositionLast = initialSpawnPosition;
+        spawnPosition = initialSpawnPosition;
+    }
+
+    public Vector3f respawn() {
+        spawnPositionLast = spawnPosition;
+        return spawnPosition;
+    }
+
+    public Vector3f getSpawnPositionFirst() {
+        return spawnPositionFirst;
+    }
+
+    public void setSpawnPositionFirst(final Vector3f spawnPositionFirst) {
+        this.spawnPositionFirst = spawnPositionFirst;
+    }
+
+    public Vector3f getSpawnPositionLast() {
+        return spawnPositionLast;
+    }
+
+    public void setSpawnPositionLast(final Vector3f spawnPositionLast) {
+        this.spawnPositionLast = spawnPositionLast;
+    }
+
+    public Vector3f getSpawnPosition() {
+        return spawnPosition;
+    }
+
+    public void setSpawnPosition(final Vector3f spawnPosition) {
+        this.spawnPosition = spawnPosition;
+    }
+
 }
