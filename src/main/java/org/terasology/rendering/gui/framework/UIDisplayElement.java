@@ -107,6 +107,9 @@ public abstract class UIDisplayElement {
     //animation
     private final List<Animation> animations = new ArrayList<Animation>();
 
+    //
+    private Object userData;
+
     public UIDisplayElement() {
         
     }
@@ -1123,6 +1126,14 @@ public abstract class UIDisplayElement {
             }
         break;
         }
+    }
+
+    public Object getUserData() {
+        return userData;
+    }
+
+    public void setUserData(Object userData) {
+        this.userData = userData;
     }
     
     /**

@@ -21,9 +21,12 @@ import org.lwjgl.input.Keyboard;
 import java.util.Locale;
 
 /**
+ * The description of an input, whether key, mouse button or mouse wheel.
+ * Immutable.
+ *
  * @author Immortius
  */
-public class Input {
+public final class Input {
     private InputType type;
     private int id;
 
@@ -58,6 +61,17 @@ public class Input {
 
     public int getId() {
         return id;
+    }
+
+    public String toShortString() {
+        switch (type) {
+            case KEY:
+                return Keyboard.getKeyName(id);
+            case MOUSE_BUTTON:
+            case MOUSE_WHEEL:
+                return MouseInput.getInputFor(type, id).toShortString();
+        }
+        return "";
     }
 
     public String toString() {

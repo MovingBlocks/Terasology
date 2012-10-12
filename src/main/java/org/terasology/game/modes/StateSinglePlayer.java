@@ -183,7 +183,7 @@ public class StateSinglePlayer implements GameState {
 
         // Manually register toolbar shortcut keys
         // TODO: Put this elsewhere? (Maybe under gametype) And give mods a similar opportunity
-        for (int i = 0; i < 9; ++i) {
+        for (int i = 0; i < 10; ++i) {
             String inventorySlotBind = "engine:toolbarSlot" + i;
             inputSystem.registerBindButton(inventorySlotBind, "Inventory Slot " + (i + 1), new ToolbarSlotButton(i));
             if (inputConfig.hasInputs(inventorySlotBind)) {

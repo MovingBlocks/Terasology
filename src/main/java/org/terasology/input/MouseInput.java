@@ -20,23 +20,25 @@ package org.terasology.input;
  * @author Immortius
  */
 public enum MouseInput {
-    MOUSE_NONE(InputType.MOUSE_BUTTON, -1),
-    MOUSE_LEFT(InputType.MOUSE_BUTTON, 0),
-    MOUSE_RIGHT(InputType.MOUSE_BUTTON, 1),
-    MOUSE_1(InputType.MOUSE_BUTTON, 0),
-    MOUSE_2(InputType.MOUSE_BUTTON, 1),
-    MOUSE_3(InputType.MOUSE_BUTTON, 2),
-    MOUSE_4(InputType.MOUSE_BUTTON, 3),
-    MOUSE_5(InputType.MOUSE_BUTTON, 4),
-    MOUSE_WHEEL_UP(InputType.MOUSE_WHEEL, 1),
-    MOUSE_WHEEL_DOWN(InputType.MOUSE_WHEEL, -1);
+    MOUSE_NONE(InputType.MOUSE_BUTTON, -1, ""),
+    MOUSE_LEFT(InputType.MOUSE_BUTTON, 0, "M_Left"),
+    MOUSE_RIGHT(InputType.MOUSE_BUTTON, 1, "M_Right"),
+    MOUSE_1(InputType.MOUSE_BUTTON, 0, "M_1"),
+    MOUSE_2(InputType.MOUSE_BUTTON, 1, "M_2"),
+    MOUSE_3(InputType.MOUSE_BUTTON, 2, "M_3"),
+    MOUSE_4(InputType.MOUSE_BUTTON, 3, "M_4"),
+    MOUSE_5(InputType.MOUSE_BUTTON, 4, "M_5"),
+    MOUSE_WHEEL_UP(InputType.MOUSE_WHEEL, 1, "MWheel_Up"),
+    MOUSE_WHEEL_DOWN(InputType.MOUSE_WHEEL, -1, "MWheel_Down");
 
     private InputType type;
     private int id;
+    private String shortString;
 
-    private MouseInput(InputType type, int id) {
+    private MouseInput(InputType type, int id, String shortString) {
         this.type = type;
         this.id = id;
+        this.shortString =shortString;
     }
 
     public InputType getType() {
@@ -48,6 +50,10 @@ public enum MouseInput {
     }
     public Input getInput() {
         return new Input(type, id);
+    }
+
+    public String toShortString() {
+        return shortString;
     }
 
     public static MouseInput parse(String id) {
