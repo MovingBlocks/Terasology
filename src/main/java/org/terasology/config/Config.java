@@ -30,11 +30,14 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Immortius
  */
 public class Config {
+    private static Logger logger = Logger.getLogger(Config.class.getName());
     private InputConfig input = new InputConfig();
 
     public Config() {
@@ -42,6 +45,18 @@ public class Config {
 
     public InputConfig getInputConfig() {
         return input;
+    }
+
+    public void save() {
+        try {
+            save(getConfigFile(), this);
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "Failed to save config", e);
+        }
+    }
+
+    public static File getConfigFile() {
+        return new File(PathManager.getInstance().getWorldPath(), "config.cfg");
     }
 
     public static void save(File toFile, Config config) throws IOException {

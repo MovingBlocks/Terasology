@@ -29,6 +29,8 @@ import org.terasology.componentSystem.controllers.MenuControlSystem;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.components.world.WorldComponent;
+import org.terasology.config.Config;
+import org.terasology.config.InputConfig;
 import org.terasology.entityFactory.PlayerFactory;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
@@ -50,6 +52,7 @@ import org.terasology.input.BindableAxis;
 import org.terasology.input.BindableButton;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.DefaultBinding;
+import org.terasology.input.Input;
 import org.terasology.input.InputSystem;
 import org.terasology.input.RegisterBindAxis;
 import org.terasology.input.RegisterBindButton;
@@ -167,13 +170,14 @@ public class StateSinglePlayer implements GameState {
 
     private void initInput(ModManager modManager) {
         inputSystem = new InputSystem();
+        InputConfig inputConfig = CoreRegistry.get(Config.class).getInputConfig();
         CoreRegistry.put(InputSystem.class, inputSystem);
         componentSystemManager.register(inputSystem, "engine:InputSystem");
 
-        registerButtonBinds(ModManager.ENGINE_PACKAGE, modManager.getEngineReflections().getTypesAnnotatedWith(RegisterBindButton.class));
+        registerButtonBinds(ModManager.ENGINE_PACKAGE, modManager.getEngineReflections().getTypesAnnotatedWith(RegisterBindButton.class), inputConfig);
         registerAxisBinds(ModManager.ENGINE_PACKAGE, modManager.getEngineReflections().getTypesAnnotatedWith(RegisterBindAxis.class));
         for (Mod mod : modManager.getActiveMods()) {
-            registerButtonBinds(mod.getModInfo().getId(), mod.getReflections().getTypesAnnotatedWith(RegisterBindButton.class));
+            registerButtonBinds(mod.getModInfo().getId(), mod.getReflections().getTypesAnnotatedWith(RegisterBindButton.class), inputConfig);
             registerAxisBinds(mod.getModInfo().getId(), mod.getReflections().getTypesAnnotatedWith(RegisterBindAxis.class));
         }
 
@@ -182,7 +186,13 @@ public class StateSinglePlayer implements GameState {
         for (int i = 0; i < 9; ++i) {
             String inventorySlotBind = "engine:toolbarSlot" + i;
             inputSystem.registerBindButton(inventorySlotBind, "Inventory Slot " + (i + 1), new ToolbarSlotButton(i));
-            inputSystem.linkBindButtonToKey(Keyboard.KEY_1 + i, inventorySlotBind);
+            if (inputConfig.hasInputs(inventorySlotBind)) {
+                for (Input input : inputConfig.getInputs(inventorySlotBind)) {
+                    inputSystem.linkBindButtonToInput(input, inventorySlotBind);
+                }
+            } else {
+                inputSystem.linkBindButtonToKey(Keyboard.KEY_1 + i, inventorySlotBind);
+            }
         }
     }
 
@@ -217,7 +227,7 @@ public class StateSinglePlayer implements GameState {
         }
     }
 
-    private void registerButtonBinds(String packageName, Iterable<Class<?>> classes) {
+    private void registerButtonBinds(String packageName, Iterable<Class<?>> classes, InputConfig config) {
         String prefix = packageName.toLowerCase(Locale.ENGLISH) + ":";
         for (Class registerBindClass : classes) {
             RegisterBindButton info = (RegisterBindButton) registerBindClass.getAnnotation(RegisterBindButton.class);
@@ -227,22 +237,11 @@ public class StateSinglePlayer implements GameState {
                     BindableButton bindButton = inputSystem.registerBindButton(id, info.description(), (BindButtonEvent)registerBindClass.newInstance());
                     bindButton.setMode(info.mode());
                     bindButton.setRepeating(info.repeating());
-                    for (Annotation annotation : registerBindClass.getAnnotations()) {
-                        if (annotation instanceof DefaultBinding) {
-                            DefaultBinding defaultBinding = (DefaultBinding) annotation;
-                            switch (defaultBinding.type()) {
-                                case KEY:
-                                    inputSystem.linkBindButtonToKey(defaultBinding.id(), id);
-                                    break;
-                                case MOUSE_BUTTON:
-                                    inputSystem.linkBindButtonToMouse(defaultBinding.id(), id);
-                                    break;
-                                case MOUSE_WHEEL:
-                                    inputSystem.linkBindButtonToMouseWheel(defaultBinding.id(), id);
-                                    break;
-                            }
-                        }
+
+                    for (Input input : config.getInputs(id)) {
+                        inputSystem.linkBindButtonToInput(input, id);
                     }
+
                     logger.log(Level.INFO, "Registered button bind: " + id);
                 } catch (InstantiationException e) {
                     logger.log(Level.SEVERE, "Failed to register button bind \"" + id + "\"", e);

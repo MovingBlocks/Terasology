@@ -98,6 +98,20 @@ public class InputSystem implements EventHandlerSystem {
         return buttonLookup.get(bindId);
     }
 
+    public void linkBindButtonToInput(Input input, String bindId) {
+        switch (input.getType()) {
+            case KEY:
+                linkBindButtonToKey(input.getId(), bindId);
+                break;
+            case MOUSE_BUTTON:
+                linkBindButtonToMouse(input.getId(), bindId);
+                break;
+            case MOUSE_WHEEL:
+                linkBindButtonToMouseWheel(input.getId(), bindId);
+                break;
+        }
+    }
+
     public void linkBindButtonToInput(InputEvent input, String bindId) {
         if (input instanceof KeyEvent) {
             linkBindButtonToKey(((KeyEvent) input).getKey(), bindId);
