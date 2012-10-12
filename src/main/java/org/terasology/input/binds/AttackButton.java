@@ -25,6 +25,6 @@ import org.terasology.input.RegisterBindButton;
  * @author Immortius
  */
 @RegisterBindButton(id = "attack", description = "Attack", repeating = true)
-@DefaultBinding(type = InputType.MOUSE_BUTTON, id = 1)
+@DefaultBinding(type = InputType.MOUSE_BUTTON, id = 0)
 public class AttackButton extends BindButtonEvent {
 }

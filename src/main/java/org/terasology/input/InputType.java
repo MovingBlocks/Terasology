@@ -20,6 +20,7 @@ package org.terasology.input;
  * @author Immortius
  */
 public enum InputType {
+    NONE,
     KEY,
     MOUSE_BUTTON,
     MOUSE_WHEEL

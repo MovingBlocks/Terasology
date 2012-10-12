@@ -24,6 +24,7 @@ import gnu.trove.iterator.TObjectByteIterator;
 import gnu.trove.map.hash.TByteObjectHashMap;
 import gnu.trove.map.hash.TObjectByteHashMap;
 import org.lwjgl.BufferUtils;
+import org.terasology.logic.mod.ModManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.BlockUri;
@@ -99,7 +100,7 @@ public class BlockManager {
         air.setHardness((byte) 0);
         air.setId((byte) 0);
         air.setDisplayName("Air");
-        air.setUri(new BlockUri("engine", "air"));
+        air.setUri(new BlockUri(ModManager.ENGINE_PACKAGE, "air"));
         blocksById.put(air.getId(), air);
         blocksByUri.put(air.getURI(), air);
         idByUri.put(air.getURI(), air.getId());

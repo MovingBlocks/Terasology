@@ -18,7 +18,6 @@ package org.terasology.logic.mod;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import org.reflections.Reflections;
@@ -42,23 +41,28 @@ import java.net.URLClassLoader;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 /**
+ * This manager handles the available mods, which ones are active and access to their assets and code
+ *
  * @author Immortius
  */
 public class ModManager {
 
-    private static final String ASSETS_SUBDIRECTORY = "assets";
+    public static final String ENGINE_PACKAGE = "engine";
+
+    public static final String ASSETS_SUBDIRECTORY = "assets";
 
     private Logger logger = Logger.getLogger(getClass().getName());
     private Map<String, Mod> mods = Maps.newHashMap();
     private ClassLoader activeModClassLoader;
+    private ClassLoader allModClassLoader;
 
+    private Reflections allReflections;
     private Reflections engineReflections;
     private Reflections activeModReflections;
 
@@ -82,6 +86,33 @@ public class ModManager {
         return engineReflections;
     }
 
+    /**
+     * Provides the ability to reflect over the engine and all mods, not just active mods.  This should be used sparingly,
+     * and classes retrieved from it should not be instantiated and used - this uses a different classloader than the
+     * rest of the system.
+     * @return Reflections over the engine and all available mods
+     */
+    public Reflections getAllReflections() {
+        if (allReflections == null) {
+            List<URL> urls = Lists.newArrayList();
+            for (Mod mod : getMods()) {
+                urls.add(mod.getModClasspathUrl());
+            }
+            allReflections = new Reflections(new ConfigurationBuilder()
+                    .addUrls(urls)
+                    .addClassLoader(allModClassLoader)
+                    .addClassLoader(getClass().getClassLoader()));
+            allReflections.merge(getEngineReflections());
+            for (Mod mod : getMods()) {
+                allReflections.merge(mod.getReflections());
+            }
+        }
+        return allReflections;
+    }
+
+    /**
+     * Rescans for mods.  This should not be done while a game is running, as it drops the mod classloader.
+     */
     public void refresh() {
         mods.clear();
         Gson gson = new Gson();
@@ -141,14 +172,25 @@ public class ModManager {
                 logger.log(Level.SEVERE, "Invalid mod file: " + modFile, e);
             }
         }
+        List<URL> urls = Lists.newArrayList();
+        for (Mod mod : getMods()) {
+            urls.add(mod.getModClasspathUrl());
+        }
+        allModClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]));
+        for (Mod mod : getMods()) {
+            mod.setInactiveClassLoader(allModClassLoader);
+        }
+
+        activeModClassLoader = null;
+        allReflections = null;
+
+        //TODO: Remove this from here
         for (String activeModId : Config.getInstance().getActiveMods()) {
             Mod mod = mods.get(activeModId);
             if (mod != null) {
                 mod.setEnabled(true);
             }
         }
-
-        activeModClassLoader = null;
     }
 
     public void applyActiveMods() {
@@ -158,7 +200,7 @@ public class ModManager {
         }
         activeModClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]));
         for (Mod mod : getActiveMods()) {
-            mod.setClassLoader(activeModClassLoader);
+            mod.setActiveClassLoader(activeModClassLoader);
         }
         activeModReflections = new Reflections(new ConfigurationBuilder().addClassLoader(getClass().getClassLoader()).addClassLoader(activeModClassLoader));
         activeModReflections.merge(getEngineReflections());

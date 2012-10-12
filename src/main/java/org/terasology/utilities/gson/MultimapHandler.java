@@ -76,6 +76,8 @@ public class MultimapHandler<V> implements JsonDeserializer<Multimap<String, V>>
                 result.add(key, array);
             } else if (values.size() == 1) {
                 result.add(key, context.serialize(values.iterator().next()));
+            } else {
+                result.add(key, context.serialize(""));
             }
         }
         return result;

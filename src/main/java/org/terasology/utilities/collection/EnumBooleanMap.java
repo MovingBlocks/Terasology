@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.collection;
+package org.terasology.utilities.collection;
 
 import java.util.EnumSet;
 

@@ -153,7 +153,7 @@ public class StateSinglePlayer implements GameState {
         componentSystemManager.register(cameraTargetSystem, "engine:CameraTargetSystem");
         initInput(modManager);
 
-        componentSystemManager.loadSystems("engine", modManager.getEngineReflections());
+        componentSystemManager.loadSystems(ModManager.ENGINE_PACKAGE, modManager.getEngineReflections());
         for (Mod mod : modManager.getActiveMods()) {
             componentSystemManager.loadSystems(mod.getModInfo().getId(), mod.getReflections());
         }
@@ -170,8 +170,8 @@ public class StateSinglePlayer implements GameState {
         CoreRegistry.put(InputSystem.class, inputSystem);
         componentSystemManager.register(inputSystem, "engine:InputSystem");
 
-        registerButtonBinds("engine", modManager.getEngineReflections().getTypesAnnotatedWith(RegisterBindButton.class));
-        registerAxisBinds("engine", modManager.getEngineReflections().getTypesAnnotatedWith(RegisterBindAxis.class));
+        registerButtonBinds(ModManager.ENGINE_PACKAGE, modManager.getEngineReflections().getTypesAnnotatedWith(RegisterBindButton.class));
+        registerAxisBinds(ModManager.ENGINE_PACKAGE, modManager.getEngineReflections().getTypesAnnotatedWith(RegisterBindAxis.class));
         for (Mod mod : modManager.getActiveMods()) {
             registerButtonBinds(mod.getModInfo().getId(), mod.getReflections().getTypesAnnotatedWith(RegisterBindButton.class));
             registerAxisBinds(mod.getModInfo().getId(), mod.getReflections().getTypesAnnotatedWith(RegisterBindAxis.class));

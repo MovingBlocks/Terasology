@@ -25,6 +25,6 @@ import org.terasology.input.RegisterBindButton;
  * @author Immortius
  */
 @RegisterBindButton(id = "useItem", description = "Use Held Item", repeating = true)
-@DefaultBinding(type = InputType.MOUSE_BUTTON, id = 0)
+@DefaultBinding(type = InputType.MOUSE_BUTTON, id = 1)
 public class UseItemButton extends BindButtonEvent {
 }

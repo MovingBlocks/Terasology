@@ -36,15 +36,14 @@ public class Mod {
     private File modRoot;
     private AssetSource modSource;
     private boolean enabled;
-    private ClassLoader classLoader;
+    private ClassLoader inactiveClassLoader;
+    private ClassLoader activeClassLoader;
     private Reflections reflections;
 
     public Mod(File modRoot, ModInfo info, AssetSource modSource) {
         this.modInfo = info;
         this.modRoot = modRoot;
         this.modSource = modSource;
-
-        this.classLoader = URLClassLoader.newInstance(new URL[] {getModClasspathUrl()}, getClass().getClassLoader());
     }
 
     public boolean isEnabled() {
@@ -80,17 +79,28 @@ public class Mod {
 
     public Reflections getReflections() {
         if (reflections == null) {
-            reflections = new Reflections(new ConfigurationBuilder().addClassLoader(classLoader).addUrls(getModClasspathUrl()).setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()));
+            ConfigurationBuilder configurationBuilder = new ConfigurationBuilder().addUrls(getModClasspathUrl()).setScanners(new TypeAnnotationsScanner(), new SubTypesScanner());
+            if (activeClassLoader != null) {
+                configurationBuilder.addClassLoader(activeClassLoader);
+            } else {
+                configurationBuilder.addClassLoader(inactiveClassLoader);
+            }
+            reflections = new Reflections(configurationBuilder);
         }
         return reflections;
     }
 
-    public ClassLoader getClassLoader() {
-        return classLoader;
+    public ClassLoader getActiveClassLoader() {
+        return activeClassLoader;
     }
 
-    void setClassLoader(ClassLoader classLoader) {
-        this.classLoader = classLoader;
+    void setActiveClassLoader(ClassLoader activeClassLoader) {
+        this.activeClassLoader = activeClassLoader;
+        reflections = null;
+    }
+
+    void setInactiveClassLoader(ClassLoader inactiveClassLoader) {
+        this.inactiveClassLoader = inactiveClassLoader;
     }
 
     public ModInfo getModInfo() {

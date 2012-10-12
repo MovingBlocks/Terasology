@@ -109,7 +109,7 @@ public class EntitySystemBuilder {
 
     private void registerEvents(EventSystem eventSystem) {
         ModManager modManager = CoreRegistry.get(ModManager.class);
-        registerEvents("engine", eventSystem, modManager.getEngineReflections());
+        registerEvents(ModManager.ENGINE_PACKAGE, eventSystem, modManager.getEngineReflections());
         for (Mod mod : modManager.getActiveMods()) {
             registerEvents(mod.getModInfo().getId(), eventSystem, mod.getReflections());
         }
