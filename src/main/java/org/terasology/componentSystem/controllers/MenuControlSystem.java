@@ -55,7 +55,7 @@ public class MenuControlSystem implements EventHandlerSystem {
     @ReceiveEvent(components = LocalPlayerComponent.class)
     public void onToggleConsole(ConsoleButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
-        	GUIManager.getInstance().openWindow(CHAT);
+            CoreRegistry.get(GUIManager.class).openWindow(CHAT);
             event.consume();
         }
     }
@@ -63,7 +63,7 @@ public class MenuControlSystem implements EventHandlerSystem {
     @ReceiveEvent(components = LocalPlayerComponent.class)
     public void onToggleInventory(InventoryButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
-        	GUIManager.getInstance().openWindow(INVENTORY);
+            CoreRegistry.get(GUIManager.class).openWindow(INVENTORY);
             event.consume();
         }
     }
@@ -71,7 +71,7 @@ public class MenuControlSystem implements EventHandlerSystem {
     @ReceiveEvent(components = LocalPlayerComponent.class)
     public void onTogglePause(PauseButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
-        	GUIManager.getInstance().openWindow(PAUSE_MENU);
+            CoreRegistry.get(GUIManager.class).openWindow(PAUSE_MENU);
             event.consume();
         }
     }
@@ -87,7 +87,7 @@ public class MenuControlSystem implements EventHandlerSystem {
     
     @ReceiveEvent(components = {LocalPlayerComponent.class})
     public void onDeath(NoHealthEvent event, EntityRef entity) {
-    	GUIManager.getInstance().openWindow("death");
+        CoreRegistry.get(GUIManager.class).openWindow("death");
     }
 
 }

@@ -22,6 +22,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.reflections.Reflections;
+import org.reflections.scanners.Scanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.entitySystem.ComponentSystem;
@@ -31,6 +35,7 @@ import org.terasology.entitySystem.RegisterComponentSystem;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.terasology.logic.mod.Mod;
 
 /**
  * Simple manager for component systems.
@@ -50,13 +55,7 @@ public class ComponentSystemManager {
     public ComponentSystemManager() {
     }
 
-    // TODO: Mod support
-    public void loadEngineSystems() {
-        loadSystems("engine", "org.terasology");
-    }
-
-    public void loadSystems(String packageName, String rootPackagePath) {
-        Reflections reflections = new Reflections(rootPackagePath);
+    public void loadSystems(String packageName, Reflections reflections) {
         Set<Class<?>> systems = reflections.getTypesAnnotatedWith(RegisterComponentSystem.class);
         for (Class<?> system : systems) {
             if (!ComponentSystem.class.isAssignableFrom(system)) {

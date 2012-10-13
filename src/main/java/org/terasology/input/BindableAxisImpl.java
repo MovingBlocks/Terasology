@@ -21,6 +21,7 @@ import java.util.List;
 import javax.vecmath.Vector3f;
 
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.GUIManager;
 
 import com.google.common.collect.Lists;
@@ -85,7 +86,7 @@ public class BindableAxisImpl implements BindableAxis {
         boolean negInput = negativeInput.getState() == ButtonState.DOWN;
 
         float targetValue = 0;
-        if (!GUIManager.getInstance().isConsumingInput()) {
+        if (!CoreRegistry.get(GUIManager.class).isConsumingInput()) {
             if (posInput) {
                 targetValue += 1.0f;
             }

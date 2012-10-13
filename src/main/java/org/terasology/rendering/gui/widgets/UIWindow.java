@@ -140,8 +140,8 @@ public class UIWindow extends UIDisplayContainerScrollable {
         }
         
         super.setVisible(visible);
-        
-        GUIManager.getInstance().checkMouseGrabbing();
+
+        getGUIManager().checkMouseGrabbing();
     }
     
     /**
@@ -152,9 +152,9 @@ public class UIWindow extends UIDisplayContainerScrollable {
         setVisible(true);
         addAnimation(new AnimationOpacity(0f, 1f, 10f));
         getAnimation(AnimationOpacity.class).start();
-        
-        GUIManager.getInstance().openWindow(this);
-        GUIManager.getInstance().checkMouseGrabbing();
+
+        getGUIManager().openWindow(this);
+        getGUIManager().checkMouseGrabbing();
     }
     
     /**
@@ -162,9 +162,9 @@ public class UIWindow extends UIDisplayContainerScrollable {
      */
     public void close() {
         setVisible(false);
-        
-        GUIManager.getInstance().closeWindow(this);
-        GUIManager.getInstance().checkMouseGrabbing();
+
+        getGUIManager().closeWindow(this);
+        getGUIManager().checkMouseGrabbing();
     }
     
     /**

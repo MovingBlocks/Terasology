@@ -207,7 +207,7 @@ public class UIMenuMultiplayer extends UIWindow {
         backButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().openWindow("main");
+                getGUIManager().openWindow("main");
             }
         });
         backButton.setHorizontalAlign(EHorizontalAlign.CENTER);

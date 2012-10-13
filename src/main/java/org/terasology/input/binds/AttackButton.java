@@ -17,10 +17,14 @@
 package org.terasology.input.binds;
 
 import org.terasology.input.BindButtonEvent;
+import org.terasology.input.DefaultBinding;
+import org.terasology.input.InputType;
+import org.terasology.input.RegisterBindButton;
 
 /**
  * @author Immortius
  */
+@RegisterBindButton(id = "attack", description = "Attack", repeating = true)
+@DefaultBinding(type = InputType.MOUSE_BUTTON, id = 0)
 public class AttackButton extends BindButtonEvent {
-    public static final String ID = "engine:attackButton";
 }

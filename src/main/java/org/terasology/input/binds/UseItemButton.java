@@ -17,10 +17,14 @@
 package org.terasology.input.binds;
 
 import org.terasology.input.BindButtonEvent;
+import org.terasology.input.DefaultBinding;
+import org.terasology.input.InputType;
+import org.terasology.input.RegisterBindButton;
 
 /**
  * @author Immortius
  */
+@RegisterBindButton(id = "useItem", description = "Use Held Item", repeating = true)
+@DefaultBinding(type = InputType.MOUSE_BUTTON, id = 1)
 public class UseItemButton extends BindButtonEvent {
-    public static final String ID = "engine:useItemButton";
 }

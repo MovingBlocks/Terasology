@@ -15,7 +15,11 @@
  */
 package org.terasology.game.modes;
 
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
+import org.reflections.Reflections;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.util.ConfigurationBuilder;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
@@ -25,6 +29,8 @@ import org.terasology.componentSystem.controllers.MenuControlSystem;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.components.world.WorldComponent;
+import org.terasology.config.Config;
+import org.terasology.config.InputConfig;
 import org.terasology.entityFactory.PlayerFactory;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
@@ -40,9 +46,19 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.Timer;
 import org.terasology.game.bootstrap.EntitySystemBuilder;
+import org.terasology.input.BindAxisEvent;
+import org.terasology.input.BindButtonEvent;
+import org.terasology.input.BindableAxis;
+import org.terasology.input.BindableButton;
 import org.terasology.input.CameraTargetSystem;
+import org.terasology.input.DefaultBinding;
+import org.terasology.input.Input;
 import org.terasology.input.InputSystem;
+import org.terasology.input.RegisterBindAxis;
+import org.terasology.input.RegisterBindButton;
+import org.terasology.input.binds.ToolbarSlotButton;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.manager.CommandManager;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.mod.Mod;
@@ -70,8 +86,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -104,6 +122,7 @@ public class StateSinglePlayer implements GameState {
     private LocalPlayerSystem localPlayerSys;
     private CameraTargetSystem cameraTargetSystem;
     private InputSystem inputSystem;
+    private GUIManager guiManager;
 
     /* GAME LOOP */
     private boolean pauseGame = false;
@@ -114,11 +133,13 @@ public class StateSinglePlayer implements GameState {
 
     public void init(GameEngine engine) {
         // TODO: Change to better mod support, should be enabled via config
-        ModManager modManager = new ModManager();
+        ModManager modManager = CoreRegistry.get(ModManager.class);
         for (Mod mod : modManager.getMods()) {
             mod.setEnabled(true);
         }
         modManager.saveModSelectionToConfig();
+        modManager.applyActiveMods();
+
         AssetManager.getInstance().clear();
         BlockManager.getInstance().load(worldInfo.getBlockIdMap());
         cacheTextures();
@@ -127,6 +148,9 @@ public class StateSinglePlayer implements GameState {
         entityManager = new EntitySystemBuilder().build();
         eventSystem = CoreRegistry.get(EventSystem.class);
 
+        guiManager = new GUIManager();
+        CoreRegistry.put(GUIManager.class, guiManager);
+
         componentSystemManager = new ComponentSystemManager();
         CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);
         localPlayerSys = new LocalPlayerSystem();
@@ -134,16 +158,104 @@ public class StateSinglePlayer implements GameState {
         cameraTargetSystem = new CameraTargetSystem();
         CoreRegistry.put(CameraTargetSystem.class, cameraTargetSystem);
         componentSystemManager.register(cameraTargetSystem, "engine:CameraTargetSystem");
-        inputSystem = new InputSystem();
-        CoreRegistry.put(InputSystem.class, inputSystem);
-        componentSystemManager.register(inputSystem, "engine:InputSystem");
+        initInput(modManager);
 
-        componentSystemManager.loadEngineSystems();
-        componentSystemManager.loadSystems("miniions", "org.terasology.mods.miniions");
+        componentSystemManager.loadSystems(ModManager.ENGINE_PACKAGE, modManager.getEngineReflections());
+        for (Mod mod : modManager.getActiveMods()) {
+            componentSystemManager.loadSystems(mod.getModInfo().getId(), mod.getReflections());
+        }
 
         CoreRegistry.put(WorldPersister.class, new WorldPersister(entityManager));
 
         loadPrefabs();
+
+        CoreRegistry.put(CommandManager.class, new CommandManager());
+    }
+
+    private void initInput(ModManager modManager) {
+        inputSystem = new InputSystem();
+        InputConfig inputConfig = CoreRegistry.get(Config.class).getInputConfig();
+        CoreRegistry.put(InputSystem.class, inputSystem);
+        componentSystemManager.register(inputSystem, "engine:InputSystem");
+
+        registerButtonBinds(ModManager.ENGINE_PACKAGE, modManager.getEngineReflections().getTypesAnnotatedWith(RegisterBindButton.class), inputConfig);
+        registerAxisBinds(ModManager.ENGINE_PACKAGE, modManager.getEngineReflections().getTypesAnnotatedWith(RegisterBindAxis.class));
+        for (Mod mod : modManager.getActiveMods()) {
+            registerButtonBinds(mod.getModInfo().getId(), mod.getReflections().getTypesAnnotatedWith(RegisterBindButton.class), inputConfig);
+            registerAxisBinds(mod.getModInfo().getId(), mod.getReflections().getTypesAnnotatedWith(RegisterBindAxis.class));
+        }
+
+        // Manually register toolbar shortcut keys
+        // TODO: Put this elsewhere? (Maybe under gametype) And give mods a similar opportunity
+        for (int i = 0; i < 10; ++i) {
+            String inventorySlotBind = "engine:toolbarSlot" + i;
+            inputSystem.registerBindButton(inventorySlotBind, "Inventory Slot " + (i + 1), new ToolbarSlotButton(i));
+            if (inputConfig.hasInputs(inventorySlotBind)) {
+                for (Input input : inputConfig.getInputs(inventorySlotBind)) {
+                    inputSystem.linkBindButtonToInput(input, inventorySlotBind);
+                }
+            } else {
+                inputSystem.linkBindButtonToKey(Keyboard.KEY_1 + i, inventorySlotBind);
+            }
+        }
+    }
+
+    private void registerAxisBinds(String packageName, Iterable<Class<?>> classes) {
+        String prefix = packageName.toLowerCase(Locale.ENGLISH) + ":";
+        for (Class registerBindClass : classes) {
+            RegisterBindAxis info = (RegisterBindAxis) registerBindClass.getAnnotation(RegisterBindAxis.class);
+            String id = prefix + info.id();
+            if (BindAxisEvent.class.isAssignableFrom(registerBindClass)) {
+                BindableButton positiveButton = inputSystem.getBindButton(info.positiveButton());
+                BindableButton negativeButton = inputSystem.getBindButton(info.negativeButton());
+                if (positiveButton == null) {
+                    logger.log(Level.WARNING, "Failed to register axis \"" + id + "\", missing positive button \"" + info.positiveButton() + "\"");
+                    continue;
+                }
+                if (negativeButton == null) {
+                    logger.log(Level.WARNING, "Failed to register axis \"" + id + "\", missing negative button \"" + info.negativeButton() + "\"");
+                    continue;
+                }
+                try {
+                    BindableAxis bindAxis = inputSystem.registerBindAxis(id, (BindAxisEvent)registerBindClass.newInstance(), positiveButton, negativeButton);
+                    bindAxis.setSendEventMode(info.eventMode());
+                    logger.log(Level.INFO, "Registered axis bind: " + id);
+                } catch (InstantiationException e) {
+                    logger.log(Level.SEVERE, "Failed to register axis bind \"" + id + "\"", e);
+                } catch (IllegalAccessException e) {
+                    logger.log(Level.SEVERE, "Failed to register axis bind \"" + id + "\"", e);
+                }
+            } else {
+                logger.log(Level.WARNING, "Failed to register axis bind \"" + id + "\", does not extend BindAxisEvent");
+            }
+        }
+    }
+
+    private void registerButtonBinds(String packageName, Iterable<Class<?>> classes, InputConfig config) {
+        String prefix = packageName.toLowerCase(Locale.ENGLISH) + ":";
+        for (Class registerBindClass : classes) {
+            RegisterBindButton info = (RegisterBindButton) registerBindClass.getAnnotation(RegisterBindButton.class);
+            String id = prefix + info.id();
+            if (BindButtonEvent.class.isAssignableFrom(registerBindClass)) {
+                try {
+                    BindableButton bindButton = inputSystem.registerBindButton(id, info.description(), (BindButtonEvent)registerBindClass.newInstance());
+                    bindButton.setMode(info.mode());
+                    bindButton.setRepeating(info.repeating());
+
+                    for (Input input : config.getInputs(id)) {
+                        inputSystem.linkBindButtonToInput(input, id);
+                    }
+
+                    logger.log(Level.INFO, "Registered button bind: " + id);
+                } catch (InstantiationException e) {
+                    logger.log(Level.SEVERE, "Failed to register button bind \"" + id + "\"", e);
+                } catch (IllegalAccessException e) {
+                    logger.log(Level.SEVERE, "Failed to register button bind \"" + id + "\"", e);
+                }
+            } else {
+                logger.log(Level.WARNING, "Failed to register button bind \"" + id + "\", does not extend BindButtonEvent");
+            }
+        }
     }
 
     private void loadPrefabs() {
@@ -194,7 +306,7 @@ public class StateSinglePlayer implements GameState {
         for (ComponentSystem system : componentSystemManager.iterateAll()) {
             system.shutdown();
         }
-        GUIManager.getInstance().closeAllWindows();
+        guiManager.closeAllWindows();
         try {
             CoreRegistry.get(WorldPersister.class).save(new File(PathManager.getInstance().getWorldSavePath(CoreRegistry.get(WorldProvider.class).getTitle()), ENTITY_DATA_FILE), WorldPersister.SaveFormat.Binary);
         } catch (IOException e) {
@@ -262,16 +374,6 @@ public class StateSinglePlayer implements GameState {
         worldRenderer = new WorldRenderer(worldInfo, chunkGeneratorManager, entityManager, localPlayerSys);
         CoreRegistry.put(WorldRenderer.class, worldRenderer);
 
-        // Create the world entity
-        Iterator<EntityRef> worldEntityIterator = entityManager.iteratorEntities(WorldComponent.class).iterator();
-        if (worldEntityIterator.hasNext()) {
-            worldRenderer.getChunkProvider().setWorldEntity(worldEntityIterator.next());
-        } else {
-            EntityRef worldEntity = entityManager.create();
-            worldEntity.addComponent(new WorldComponent());
-            worldRenderer.getChunkProvider().setWorldEntity(worldEntity);
-        }
-
         CoreRegistry.put(WorldRenderer.class, worldRenderer);
         CoreRegistry.put(WorldProvider.class, worldRenderer.getWorldProvider());
         CoreRegistry.put(LocalPlayer.class, new LocalPlayer(EntityRef.NULL));
@@ -293,6 +395,16 @@ public class StateSinglePlayer implements GameState {
             }
         }
 
+        // Create the world entity
+        Iterator<EntityRef> worldEntityIterator = entityManager.iteratorEntities(WorldComponent.class).iterator();
+        if (worldEntityIterator.hasNext()) {
+            worldRenderer.getChunkProvider().setWorldEntity(worldEntityIterator.next());
+        } else {
+            EntityRef worldEntity = entityManager.create();
+            worldEntity.addComponent(new WorldComponent());
+            worldRenderer.getChunkProvider().setWorldEntity(worldEntity);
+        }
+
         prepareWorld();
     }
 
@@ -302,7 +414,7 @@ public class StateSinglePlayer implements GameState {
 
     // TODO: Should have its own state
     private void prepareWorld() {
-        UIScreenLoading loadingScreen = (UIScreenLoading) GUIManager.getInstance().openWindow("loading");
+        UIScreenLoading loadingScreen = (UIScreenLoading)guiManager.openWindow("loading");
         Display.update();
 
         Timer timer = CoreRegistry.get(Timer.class);
@@ -354,9 +466,9 @@ public class StateSinglePlayer implements GameState {
             playerEntity.send(new RespawnEvent());
         }
 
-        GUIManager.getInstance().closeWindow(loadingScreen);
+        guiManager.closeWindow(loadingScreen);
         //GUIManager.getInstance().loadWindow("itemList");            //we preload the item list, because it takes some time to create all block entities
-        GUIManager.getInstance().openWindow(MenuControlSystem.HUD);
+        guiManager.openWindow(MenuControlSystem.HUD);
 
         // Create the first Portal if it doesn't exist yet
         worldRenderer.initPortal();
@@ -378,11 +490,11 @@ public class StateSinglePlayer implements GameState {
     }
 
     public void renderUserInterface() {
-        GUIManager.getInstance().render();
+        guiManager.render();
     }
 
     private void updateUserInterface() {
-        GUIManager.getInstance().update();
+        guiManager.update();
     }
 
     public WorldRenderer getWorldRenderer() {

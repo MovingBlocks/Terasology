@@ -16,12 +16,28 @@
 
 package org.terasology.logic.mod;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+import org.terasology.asset.sources.ArchiveSource;
+import org.terasology.asset.sources.DirectorySource;
+import org.terasology.logic.manager.Config;
+import org.terasology.logic.manager.PathManager;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -30,28 +46,73 @@ import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.terasology.asset.sources.ArchiveSource;
-import org.terasology.asset.sources.DirectorySource;
-import org.terasology.logic.manager.Config;
-import org.terasology.logic.manager.PathManager;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.gson.JsonIOException;
-
 /**
+ * This manager handles the available mods, which ones are active and access to their assets and code
+ *
  * @author Immortius
  */
 public class ModManager {
 
+    public static final String ENGINE_PACKAGE = "engine";
+
+    public static final String ASSETS_SUBDIRECTORY = "assets";
+
     private Logger logger = Logger.getLogger(getClass().getName());
     private Map<String, Mod> mods = Maps.newHashMap();
+    private ClassLoader activeModClassLoader;
+    private ClassLoader allModClassLoader;
+
+    private Reflections allReflections;
+    private Reflections engineReflections;
+    private Reflections activeModReflections;
 
     public ModManager() {
+        engineReflections = new Reflections(
+                new ConfigurationBuilder()
+                        .addClassLoader(getClass().getClassLoader())
+                        .addUrls(ClasspathHelper.forClassLoader(getClass().getClassLoader()))
+                        .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()));
         refresh();
     }
 
+    public Reflections getEngineReflections() {
+        return engineReflections;
+    }
+
+    public Reflections getActiveModReflections() {
+        if (activeModReflections != null) {
+            return activeModReflections;
+        }
+        return engineReflections;
+    }
+
+    /**
+     * Provides the ability to reflect over the engine and all mods, not just active mods.  This should be used sparingly,
+     * and classes retrieved from it should not be instantiated and used - this uses a different classloader than the
+     * rest of the system.
+     * @return Reflections over the engine and all available mods
+     */
+    public Reflections getAllReflections() {
+        if (allReflections == null) {
+            List<URL> urls = Lists.newArrayList();
+            for (Mod mod : getMods()) {
+                urls.add(mod.getModClasspathUrl());
+            }
+            allReflections = new Reflections(new ConfigurationBuilder()
+                    .addUrls(urls)
+                    .addClassLoader(allModClassLoader)
+                    .addClassLoader(getClass().getClassLoader()));
+            allReflections.merge(getEngineReflections());
+            for (Mod mod : getMods()) {
+                allReflections.merge(mod.getReflections());
+            }
+        }
+        return allReflections;
+    }
+
+    /**
+     * Rescans for mods.  This should not be done while a game is running, as it drops the mod classloader.
+     */
     public void refresh() {
         mods.clear();
         Gson gson = new Gson();
@@ -64,12 +125,12 @@ public class ModManager {
                 return pathname.isDirectory();
             }
         })) {
-            File modInfoFile = new File(modFile.getPath(), "mod.txt");
+            File modInfoFile = new File(modFile, "mod.txt");
             if (modInfoFile.exists()) {
                 try {
                     ModInfo modInfo = gson.fromJson(new FileReader(modInfoFile), ModInfo.class);
                     if (!mods.containsKey(modInfo.getId())) {
-                        mods.put(modInfo.getId(), new Mod(modFile, modInfo, new DirectorySource(modInfo.getId(), modFile)));
+                        mods.put(modInfo.getId(), new Mod(modFile, modInfo, new DirectorySource(modInfo.getId(), new File(modFile, ASSETS_SUBDIRECTORY))));
                         logger.info("Discovered mod: " + modInfo.getDisplayName());
                     } else {
                         logger.info("Discovered duplicate mod: " + modInfo.getDisplayName() + ", skipping");
@@ -86,7 +147,7 @@ public class ModManager {
         for (File modFile : modPath.listFiles(new FileFilter() {
             @Override
             public boolean accept(File pathname) {
-                return pathname.isFile() && pathname.getName().endsWith(".zip");
+                return pathname.isFile() && (pathname.getName().endsWith(".zip") || pathname.getName().endsWith(".jar"));
             }
         })) {
             try {
@@ -96,7 +157,7 @@ public class ModManager {
                     try {
                         ModInfo modInfo = gson.fromJson(new InputStreamReader(zipFile.getInputStream(modInfoEntry)), ModInfo.class);
                         if (!mods.containsKey(modInfo.getId())) {
-                            mods.put(modInfo.getId(), new Mod(modFile, modInfo, new ArchiveSource(modInfo.getId(), modFile)));
+                            mods.put(modInfo.getId(), new Mod(modFile, modInfo, new ArchiveSource(modInfo.getId(), modFile, ASSETS_SUBDIRECTORY)));
                             logger.info("Discovered mod: " + modInfo.getDisplayName());
                         } else {
                             logger.info("Discovered duplicate mod: " + modInfo.getDisplayName() + ", skipping");
@@ -111,11 +172,40 @@ public class ModManager {
                 logger.log(Level.SEVERE, "Invalid mod file: " + modFile, e);
             }
         }
+        List<URL> urls = Lists.newArrayList();
+        for (Mod mod : getMods()) {
+            urls.add(mod.getModClasspathUrl());
+        }
+        allModClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]));
+        for (Mod mod : getMods()) {
+            mod.setInactiveClassLoader(allModClassLoader);
+        }
+
+        activeModClassLoader = null;
+        allReflections = null;
+
+        //TODO: Remove this from here
         for (String activeModId : Config.getInstance().getActiveMods()) {
             Mod mod = mods.get(activeModId);
             if (mod != null) {
                 mod.setEnabled(true);
             }
+        }
+    }
+
+    public void applyActiveMods() {
+        List<URL> urls = Lists.newArrayList();
+        for (Mod mod : getActiveMods()) {
+            urls.add(mod.getModClasspathUrl());
+        }
+        activeModClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]));
+        for (Mod mod : getActiveMods()) {
+            mod.setActiveClassLoader(activeModClassLoader);
+        }
+        activeModReflections = new Reflections(new ConfigurationBuilder().addClassLoader(getClass().getClassLoader()).addClassLoader(activeModClassLoader));
+        activeModReflections.merge(getEngineReflections());
+        for (Mod mod : getActiveMods()) {
+            activeModReflections.merge(mod.getReflections());
         }
     }
 

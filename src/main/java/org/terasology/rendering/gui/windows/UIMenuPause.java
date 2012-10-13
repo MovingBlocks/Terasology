@@ -53,7 +53,7 @@ public class UIMenuPause extends UIWindow {
         setId("pause");
         setBackgroundColor(new Color(0, 0, 0, 200));
         setModal(true);
-        setCloseBinds(new String[] {PauseButton.ID});
+        setCloseBinds(new String[] {"engine:pause"});
         setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
         maximize();
         

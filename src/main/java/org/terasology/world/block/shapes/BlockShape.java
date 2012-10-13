@@ -21,7 +21,7 @@ import javax.vecmath.Vector3f;
 
 import org.terasology.asset.Asset;
 import org.terasology.asset.AssetUri;
-import org.terasology.collection.EnumBooleanMap;
+import org.terasology.utilities.collection.EnumBooleanMap;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.world.block.BlockPart;

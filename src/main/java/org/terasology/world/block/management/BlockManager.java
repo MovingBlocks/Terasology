@@ -15,12 +15,16 @@
  */
 package org.terasology.world.block.management;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import gnu.trove.iterator.TObjectByteIterator;
 import gnu.trove.map.hash.TByteObjectHashMap;
 import gnu.trove.map.hash.TObjectByteHashMap;
 import org.lwjgl.BufferUtils;
+import org.terasology.logic.mod.ModManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.BlockUri;
@@ -30,6 +34,7 @@ import org.terasology.world.block.loader.BlockLoader;
 
 import javax.vecmath.Vector2f;
 import java.nio.FloatBuffer;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -59,6 +64,8 @@ public class BlockManager {
     private final Map<BlockUri, BlockFamily> partiallyRegisteredFamilies = Maps.newHashMap();
     private final Map<BlockUri, BlockFamily> familyByUri = Maps.newHashMapWithExpectedSize(128);
 
+    private final Multimap<String, BlockUri> categoryLookup = HashMultimap.create();
+
     public static BlockManager getInstance() {
         if (instance == null)
             instance = new BlockManager();
@@ -80,6 +87,7 @@ public class BlockManager {
         shapelessBlockDefinition.clear();
         nextId = 1;
         blockLoader = new BlockLoader();
+        categoryLookup.clear();
 
         Block air = new Block();
         air.setTranslucent(true);
@@ -92,7 +100,7 @@ public class BlockManager {
         air.setHardness((byte) 0);
         air.setId((byte) 0);
         air.setDisplayName("Air");
-        air.setUri(new BlockUri("engine", "air"));
+        air.setUri(new BlockUri(ModManager.ENGINE_PACKAGE, "air"));
         blocksById.put(air.getId(), air);
         blocksByUri.put(air.getURI(), air);
         idByUri.put(air.getURI(), air.getId());
@@ -109,13 +117,13 @@ public class BlockManager {
         BlockLoader.LoadBlockDefinitionResults blockDefinitions = blockLoader.loadBlockDefinitions();
         for (BlockFamily family : blockDefinitions.families) {
             if (knownBlockMappings.containsKey(family.getURI().toString())) {
-                registerBlockFamily(family);
+                addBlockFamily(family, true);
             } else {
                 addBlockFamily(family);
             }
         }
-        for (BlockUri shapelessFamily : blockDefinitions.shapelessDefinitions) {
-            shapelessBlockDefinition.add(shapelessFamily);
+        for (BlockLoader.ShapelessFamily shapelessFamily : blockDefinitions.shapelessDefinitions) {
+            addShapelessBlockFamily(shapelessFamily.uri, shapelessFamily.categories);
         }
         blockLoader.buildAtlas();
         bindBlocks(knownBlockMappings);
@@ -138,6 +146,14 @@ public class BlockManager {
             result.put(iterator.key().toString(), iterator.value());
         }
         return result;
+    }
+
+    public Iterable<BlockUri> getBlockFamiliesWithCategory(String category) {
+        return categoryLookup.get(category.toLowerCase(Locale.ENGLISH));
+    }
+
+    public Iterable<String> getBlockCategories() {
+        return categoryLookup.keySet();
     }
 
     public BlockFamily getBlockFamily(String uri) {
@@ -202,6 +218,9 @@ public class BlockManager {
     }
 
     public void addBlockFamily(BlockFamily family, boolean forceRegister) {
+        for (String category : family.getCategories()) {
+            categoryLookup.put(category, family.getURI());
+        }
         if (forceRegister) {
             registerBlockFamily(family);
         } else {
@@ -209,13 +228,16 @@ public class BlockManager {
         }
     }
 
-    public void addShapelessBlockFamily(BlockUri family) {
+    public void addShapelessBlockFamily(BlockUri family, String ... categories) {
         shapelessBlockDefinition.add(family);
+        for (String category : categories) {
+            categoryLookup.put(category, family);
+        }
     }
 
     private void registerBlockFamily(BlockFamily family) {
         familyByUri.put(family.getURI(), family);
-        for (Block block : family.listBlocks()) {
+        for (Block block : family.getBlocks()) {
             byte id = idByUri.get(block.getURI());
             if (id == 0) {
                 id = (byte) nextId++;

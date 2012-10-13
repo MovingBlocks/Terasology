@@ -162,11 +162,11 @@ public class UIDialogCreateNewWorld extends UIDialog {
             public void click(UIDisplayElement element, int button) {
                 //validation of the input
                 if (_inputWorldTitle.getText().isEmpty()) {
-                    GUIManager.getInstance().showMessage("Error", "Please enter a world name");
+                    getGUIManager().showMessage("Error", "Please enter a world name");
 
                     return;
                 } else if ((new File(PathManager.getInstance().getWorldSavePath(_inputWorldTitle.getText()), WorldInfo.DEFAULT_FILE_NAME)).exists()) {
-                    GUIManager.getInstance().showMessage("Error", "A World with this name already exists");
+                    getGUIManager().showMessage("Error", "A World with this name already exists");
 
                     return;
                 }
@@ -230,7 +230,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
     }
 
     private String getWorldName() {
-        UIMenuSingleplayer menu = (UIMenuSingleplayer) GUIManager.getInstance().getWindowById("singleplayer");
+        UIMenuSingleplayer menu = (UIMenuSingleplayer) getGUIManager().getWindowById("singleplayer");
         return "World" + (menu.getWorldCount() + 1);
     }
 }

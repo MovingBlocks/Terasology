@@ -42,9 +42,9 @@ public class ClasspathSource implements AssetSource {
         try {
             File codePath = new File(url.toURI());
             if (codePath.isFile()) {
-                source = new ArchiveSource(id, codePath);
+                source = new ArchiveSource(id, codePath, basePath);
             } else {
-                source = new DirectorySource(id, new File(codePath, "org/terasology/data"));
+                source = new DirectorySource(id, new File(codePath, basePath));
             }
         } catch (Throwable e) {
             throw new IllegalStateException("Error loading assets: " + e.getMessage(), e);

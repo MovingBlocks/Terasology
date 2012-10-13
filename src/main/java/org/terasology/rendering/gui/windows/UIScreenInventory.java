@@ -56,7 +56,7 @@ public class UIScreenInventory extends UIWindow {
         setId("inventory");
         setBackgroundColor(new Color(0, 0, 0, 200));
         setModal(true);
-        setCloseBinds(new String[] {InventoryButton.ID});
+        setCloseBinds(new String[] {"engine:inventory"});
         setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
         maximize();
         
@@ -68,8 +68,8 @@ public class UIScreenInventory extends UIWindow {
                     inventory.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity(), 10);
                     //TODO connect toolbar <-> inventory somehow to allow fast transfer.
 
-                    GUIManager.getInstance().getWindowById("hud").getElementById("leftGearWheel").setVisible(false);
-                    GUIManager.getInstance().getWindowById("hud").getElementById("rightGearWheel").setVisible(false);
+                    getGUIManager().getWindowById("hud").getElementById("leftGearWheel").setVisible(false);
+                    getGUIManager().getWindowById("hud").getElementById("rightGearWheel").setVisible(false);
                     layout();
                     inventory.setPosition(new Vector2f(Display.getWidth()/2 - inventory.getSize().x/2, Display.getHeight() + 5f));
                     inventory.addAnimation(new AnimationMove(new Vector2f(Display.getWidth() / 2 - inventory.getSize().x / 2, Display.getHeight() - 192f), 20f));
@@ -80,8 +80,8 @@ public class UIScreenInventory extends UIWindow {
                     rightGearWheel.addAnimation(new AnimationRotate(120f,10f));
                     rightGearWheel.getAnimation(AnimationRotate.class).start();
                 }else{
-                    GUIManager.getInstance().getWindowById("hud").getElementById("leftGearWheel").setVisible(true);
-                    GUIManager.getInstance().getWindowById("hud").getElementById("rightGearWheel").setVisible(true);
+                    getGUIManager().getWindowById("hud").getElementById("leftGearWheel").setVisible(true);
+                    getGUIManager().getWindowById("hud").getElementById("rightGearWheel").setVisible(true);
                 }
             }
         });

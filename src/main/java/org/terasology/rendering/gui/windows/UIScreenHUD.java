@@ -15,15 +15,9 @@
  */
 package org.terasology.rendering.gui.windows;
 
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector4f;
-
-import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetManager;
-import org.terasology.components.CuredComponent;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.LocalPlayerComponent;
-import org.terasology.components.PoisonedComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
@@ -37,16 +31,8 @@ import org.terasology.game.Timer;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
-import org.terasology.logic.manager.GUIManager;
-import org.terasology.mods.miniions.components.MinionComponent;
-import org.terasology.mods.miniions.events.MinionMessageEvent;
-import org.terasology.mods.miniions.rendering.gui.components.UIMessageQueue;
-import org.terasology.mods.miniions.rendering.gui.components.UIMinionbar;
-import org.terasology.rendering.gui.animation.AnimationMove;
-import org.terasology.rendering.gui.animation.AnimationRotate;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.VisibilityListener;
-import org.terasology.rendering.gui.widgets.UIBuff;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UIItemCell;
 import org.terasology.rendering.gui.widgets.UIItemContainer;
@@ -55,12 +41,15 @@ import org.terasology.rendering.gui.widgets.UIWindow;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.world.WorldRenderer;
 
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
+
 /**
  * HUD displayed on the user's screen.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
- * 
- * TODO clean up -> remove debug stuff, move to debug window together with metrics
+ *         <p/>
+ *         TODO clean up -> remove debug stuff, move to debug window together with metrics
  */
 public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
 
@@ -75,10 +64,6 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
     private final UILabel debugLine4;
 
     private final UIItemContainer toolbar;
-    private final UIMinionbar minionbar;
-    private final UIMessageQueue messagequeue;
-    //private final UIHealthBar healthBar;
-    private final UIBuff buffBar;
 
     private final UIImage leftGearWheel;
     private final UIImage rightGearWheel;
@@ -114,7 +99,7 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
 
             addDisplayElement(_hearts[i]);
         }
-        
+
         crosshair = new UIImage(AssetManager.loadTexture("engine:gui"));
         crosshair.setId("crosshair");
         crosshair.setTextureSize(new Vector2f(20f, 20f));
@@ -141,16 +126,6 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
         toolbar.setVisible(true);
         toolbar.setCellMargin(new Vector2f(0f, 0f));
         toolbar.setBorderImage("engine:inventory", new Vector2f(0f, 84f), new Vector2f(169f, 83f), new Vector4f(4f, 4f, 4f, 4f));
-
-        minionbar = new UIMinionbar();
-        minionbar.setVisible(true);
-
-        messagequeue = new UIMessageQueue();
-        messagequeue.setVisible(true);
-        
-        buffBar = new UIBuff();
-        buffBar.setVisible(true);
-
 
         addDisplayElement(crosshair);
 
@@ -191,12 +166,9 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
         addDisplayElement(debugLine4);
 
         addDisplayElement(toolbar);
-        addDisplayElement(minionbar);
-        addDisplayElement(messagequeue);
-        addDisplayElement(buffBar);
-        
+
         CoreRegistry.get(EventSystem.class).registerEventHandler(this);
-        
+
         update();
         layout();
     }
@@ -204,7 +176,7 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
     @Override
     public void update() {
         super.update();
-        
+
         boolean enableDebug = Config.getInstance().isDebug();
         debugLine1.setVisible(enableDebug);
         debugLine2.setVisible(enableDebug);
@@ -233,8 +205,9 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
             else
                 _hearts[i].setVisible(false);
 
+            // TODO: Need to reimplement this in some way, maybe expose a method to change the health icon
             //Show Poisoned Status with Green Hearts:
-            PoisonedComponent poisoned = CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(PoisonedComponent.class);
+            /*PoisonedComponent poisoned = CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(PoisonedComponent.class);
             entityManager = CoreRegistry.get(EntityManager.class);
             for (EntityRef entity : entityManager.iteratorEntities(PoisonedComponent.class)) {
                 if (poisoned.poisonDuration >= 1)
@@ -251,7 +224,7 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
                     _hearts[i].setTextureOrigin(new Vector2f(52f, 0.0f));
                 else
                     _hearts[i].setTextureOrigin(new Vector2f(52f, 0.0f));
-            }
+            }*/
         }
     }
 
@@ -262,27 +235,22 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
 
     @Override
     public void shutdown() {
-        
+
     }
 
-    @ReceiveEvent(components = {MinionComponent.class})
-    public void onMessageReceived(MinionMessageEvent event, EntityRef entityref) {
-        messagequeue.addIconToQueue(event.getMinionMessage());
-    }
-    
     @ReceiveEvent(components = LocalPlayerComponent.class)
     public void onSelectedItemChanged(ChangedComponentEvent event, EntityRef entity) {
         for (UIItemCell cell : toolbar.getCells()) {
             cell.setSelection(false);
         }
-        
+
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
         toolbar.getCells().get(localPlayerComp.selectedTool).setSelection(true);
     }
-    
+
     @ReceiveEvent(components = {LocalPlayerComponent.class, HealthComponent.class})
-    public void onHealthChange(HealthChangedEvent event, EntityRef entityref) {        
+    public void onHealthChange(HealthChangedEvent event, EntityRef entityref) {
         updateHealthBar(event.getCurrentHealth(), event.getMaxHealth());
     }
 }

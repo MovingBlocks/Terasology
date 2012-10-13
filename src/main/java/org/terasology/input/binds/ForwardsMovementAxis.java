@@ -17,10 +17,12 @@
 package org.terasology.input.binds;
 
 import org.terasology.input.BindAxisEvent;
+import org.terasology.input.RegisterBindAxis;
+import org.terasology.input.SendEventMode;
 
 /**
  * @author Immortius
  */
+@RegisterBindAxis(id = "forwardsMovement", positiveButton = "engine:forwards", negativeButton = "engine:backwards", eventMode = SendEventMode.WHEN_CHANGED)
 public class ForwardsMovementAxis extends BindAxisEvent {
-    public static final String ID = "engine:forwardsMovementAxis";
 }
