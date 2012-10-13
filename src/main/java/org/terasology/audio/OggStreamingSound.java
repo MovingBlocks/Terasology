@@ -18,18 +18,19 @@ package org.terasology.audio;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.ByteBuffer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetUri;
 import org.terasology.utilities.OggReader;
 
 
 public class OggStreamingSound extends AbstractStreamingSound {
 
+    private static final Logger logger = LoggerFactory.getLogger(OggStreamingSound.class);
     private ByteBuffer dataBuffer = ByteBuffer.allocateDirect(4096 * 8);
     private OggReader file = null;
-    private Logger logger = Logger.getLogger(getClass().getName());
+
 
     public OggStreamingSound(AssetUri uri, URL source) {
         super(uri, source);
@@ -61,14 +62,14 @@ public class OggStreamingSound extends AbstractStreamingSound {
             try {
                 file.close();
             } catch (IOException e) {
-                logger.log(Level.WARNING, "Failed to close streaming sound: " + getURI(), e);
+                logger.warn("Failed to close streaming sound: {}", getURI(), e);
             }
         }
 
         try {
             file = new OggReader(audioSource.openStream());
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Failed to load streaming sound: " + getURI(), e);
+            logger.error("Failed to load streaming sound: {}", getURI(), e);
         }
     }
 

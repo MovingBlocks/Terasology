@@ -21,9 +21,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
@@ -47,7 +47,7 @@ import com.google.common.collect.Queues;
 @RegisterComponentSystem
 public class GrowthSimulator implements EventHandlerSystem {
 
-    private Logger logger = Logger.getLogger(getClass().getName());
+    private static final Logger logger = LoggerFactory.getLogger(GrowthSimulator.class);
 
     private WorldProvider world;
     private Block air;
@@ -81,7 +81,7 @@ public class GrowthSimulator implements EventHandlerSystem {
                             }
                         }
                     } catch (InterruptedException e) {
-                        logger.log(Level.INFO, "Interrupted");
+                        logger.debug("Thread Interrupted", e);
                     }
                 }
             }
@@ -95,7 +95,7 @@ public class GrowthSimulator implements EventHandlerSystem {
         try {
             executor.awaitTermination(1, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
-            logger.log(Level.SEVERE, "Interrupted awaiting shutdown");
+            logger.error("Interrupted awaiting shutdown", e);
         }
         if (blockQueue.isEmpty()) {
             executor.shutdownNow();

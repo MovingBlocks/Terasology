@@ -16,24 +16,24 @@
 
 package org.terasology.asset.sources;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.asset.AssetUri;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.jar.JarFile;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-
-import org.terasology.asset.AssetUri;
 
 /**
  * @author Immortius
  */
 public class ArchiveSource extends AbstractSource {
 
-    private Logger logger = Logger.getLogger(getClass().getName());
+    private final Logger logger = LoggerFactory.getLogger(ArchiveSource.class);
     private String basePath;
 
     public ArchiveSource(String sourceId, File archive, String basePath) {
@@ -61,14 +61,16 @@ public class ArchiveSource extends AbstractSource {
         while (lister.hasMoreElements()) {
             ZipEntry entry = lister.nextElement();
             String entryPath = entry.getName();
-            logger.log(Level.INFO,  "Found " + entryPath);
+            logger.debug("Found {}", entryPath);
 
             if (entryPath.startsWith(basePath)) {
                 String key = entryPath.substring(basePath.length() + 1);
                 AssetUri uri = getUri(key);
-                if (uri == null || !uri.isValid()) continue;
+                if (uri == null || !uri.isValid()) {
+                    continue;
+                }
 
-                logger.info("Discovered resource " + uri);
+                logger.debug("Discovered resource {}", uri);
 
                 // @todo avoid this risky approach
                 // Using a jar protocol for zip files, because cannot register new protocols for the applet

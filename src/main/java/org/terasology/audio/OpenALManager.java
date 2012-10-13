@@ -29,6 +29,8 @@ import org.lwjgl.openal.ALC10;
 import org.lwjgl.openal.ALC11;
 import org.lwjgl.openal.ALCcontext;
 import org.lwjgl.openal.ALCdevice;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AudioManager;
@@ -36,6 +38,8 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 
 public class OpenALManager extends AudioManager {
+
+    private static final Logger logger = LoggerFactory.getLogger(OpenALManager.class);
 
     /**
      * For faster distance check *
@@ -57,27 +61,27 @@ public class OpenALManager extends AudioManager {
 
         AL10.alGetError();
 
-        logger.info("OpenAL " + AL10.alGetString(AL10.AL_VERSION) + " initialized!");
+        logger.info("OpenAL {} initialized!", AL10.alGetString(AL10.AL_VERSION));
 
         ALCcontext context = ALC10.alcGetCurrentContext();
         ALCdevice device = ALC10.alcGetContextsDevice(context);
 
-        logger.info("Using OpenAL: " + AL10.alGetString(AL10.AL_RENDERER) + " by " + AL10.alGetString(AL10.AL_VENDOR));
-        logger.info("Using device: " + ALC10.alcGetString(device, ALC10.ALC_DEVICE_SPECIFIER));
-        logger.info("Available AL extensions: " + AL10.alGetString(AL10.AL_EXTENSIONS));
-        logger.info("Available ALC extensions: " + ALC10.alcGetString(device, ALC10.ALC_EXTENSIONS));
+        logger.info("Using OpenAL: {} by {}", AL10.alGetString(AL10.AL_RENDERER), AL10.alGetString(AL10.AL_VENDOR));
+        logger.info("Using device: {}", ALC10.alcGetString(device, ALC10.ALC_DEVICE_SPECIFIER));
+        logger.info("Available AL extensions: {}", AL10.alGetString(AL10.AL_EXTENSIONS));
+        logger.info("Available ALC extensions: {}", ALC10.alcGetString(device, ALC10.ALC_EXTENSIONS));
 
         IntBuffer buffer = BufferUtils.createIntBuffer(1);
         ALC10.alcGetInteger(device, ALC11.ALC_MONO_SOURCES, buffer);
-        logger.info("Max mono sources: " + buffer.get(0));
+        logger.info("Max mono sources: {}", buffer.get(0));
         buffer.rewind();
 
         ALC10.alcGetInteger(device, ALC11.ALC_STEREO_SOURCES, buffer);
-        logger.info("Max stereo sources: " + buffer.get(0));
+        logger.info("Max stereo sources: {}", buffer.get(0));
         buffer.rewind();
 
         ALC10.alcGetInteger(device, ALC10.ALC_FREQUENCY, buffer);
-        logger.info("Mixer frequency: " + buffer.get(0));
+        logger.info("Mixer frequency: {}", buffer.get(0));
         buffer.rewind();
 
         AL10.alDistanceModel(AL10.AL_INVERSE_DISTANCE_CLAMPED);

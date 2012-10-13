@@ -35,6 +35,8 @@ import com.google.gson.stream.JsonWriter;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import org.newdawn.slick.opengl.PNGDecoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
@@ -72,8 +74,6 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author Immortius
@@ -82,11 +82,12 @@ public class BlockLoader {
     private static final int MAX_TILES = 256;
     public static final String AUTO_BLOCK_URL_FRAGMENT = "/auto/";
 
+    private static final Logger logger = LoggerFactory.getLogger(BlockLoader.class);
+
     // TODO: for now these are fixed (constant in the chunk shader)
     private int atlasSize = 256;
     private int tileSize = 16;
 
-    private Logger logger = Logger.getLogger(getClass().getName());
     private JsonParser parser;
     private Gson gson;
 
@@ -120,7 +121,7 @@ public class BlockLoader {
     }
 
     public LoadBlockDefinitionResults loadBlockDefinitions() {
-        logger.log(Level.INFO, "Loading Blocks...");
+        logger.info("Loading Blocks...");
         LoadBlockDefinitionResults result = new LoadBlockDefinitionResults();
         for (AssetUri blockDefUri : AssetManager.list(AssetType.BLOCK_DEFINITION)) {
             try {
@@ -132,7 +133,7 @@ public class BlockLoader {
                     if (blockDefJson.has("template") && blockDefJson.get("template").getAsBoolean()) {
                         continue;
                     }
-                    logger.log(Level.INFO, "Loading " + blockDefUri);
+                    logger.debug("Loading {}", blockDefUri);
 
                     BlockDefinition blockDef = loadBlockDefinition(inheritData(blockDefUri, blockDefJson));
 
@@ -166,9 +167,9 @@ public class BlockLoader {
 
                 }
             } catch (JsonParseException e) {
-                logger.log(Level.SEVERE, "Failed to load block '" + blockDefUri + "'", e);
+                logger.error("Failed to load block '{}'", blockDefUri, e);
             } catch (NullPointerException e) {
-                logger.log(Level.SEVERE, "Failed to load block '" + blockDefUri + "'", e);
+                logger.error("Failed to load block '{}'", blockDefUri, e);
             }
         }
         result.shapelessDefinitions.addAll(loadAutoBlocks());
@@ -216,7 +217,7 @@ public class BlockLoader {
                 try {
                     ImageIO.write(image, "png", new File(PathManager.getInstance().getScreensPath(), "tiles.png"));
                 } catch (IOException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    logger.warn("Failed to write atlas");
                 }
             }
 
@@ -230,7 +231,7 @@ public class BlockLoader {
                 buf.flip();
                 data[i] = buf;
             } catch (IOException e) {
-                logger.severe("Failed to write in-memory image");
+                logger.error("Failed to create atlas texture");
             }
         }
 
@@ -252,7 +253,7 @@ public class BlockLoader {
         Graphics g = result.getGraphics();
 
         if (tiles.size() > MAX_TILES) {
-            logger.severe("Too many tiles, culling overflow");
+            logger.error("Too many tiles, culling overflow");
         }
 
         for (int index = 0; index < tiles.size() && index < MAX_TILES; ++index) {
@@ -267,7 +268,7 @@ public class BlockLoader {
     }
 
     private List<ShapelessFamily> loadAutoBlocks() {
-        logger.log(Level.INFO, "Loading Auto Blocks...");
+        logger.debug("Loading Auto Blocks...");
         List<ShapelessFamily> result = Lists.newArrayList();
         for (AssetUri blockTileUri : AssetManager.list(AssetType.BLOCK_TILE)) {
             if (AssetManager.getInstance().getAssetURLs(blockTileUri).get(0).getPath().contains(AUTO_BLOCK_URL_FRAGMENT)) {
@@ -289,10 +290,10 @@ public class BlockLoader {
         while (parentObj.has("basedOn")) {
             AssetUri parentUri = new AssetUri(AssetType.BLOCK_DEFINITION, parentObj.get("basedOn").getAsString());
             if (rootAssetUri.equals(parentUri)) {
-                logger.severe("Circular inheritance detected in " + rootAssetUri);
+                logger.error("Circular inheritance detected in {}", rootAssetUri);
                 break;
             } else if (!parentUri.isValid()) {
-                logger.severe(rootAssetUri + " based on invalid uri: " + parentObj.get("basedOn").getAsString());
+                logger.error("{} based on invalid uri: {}", rootAssetUri, parentObj.get("basedOn").getAsString());
                 break;
             }
             JsonObject parent = readJson(parentUri).getAsJsonObject();
@@ -579,7 +580,7 @@ public class BlockLoader {
             tileIndexes.put(uri, index);
             return index;
         } else if (warnOnError) {
-            logger.warning("Unable to resolve block tile '" + uri + "'");
+            logger.warn("Unable to resolve block tile '{}'", uri);
         }
         return 0;
     }
@@ -592,19 +593,19 @@ public class BlockLoader {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
                 return parser.parse(reader);
             } else {
-                logger.severe("Failed to load block definition '" + blockDefUri + "'");
+                logger.error("Failed to load block definition '{}'", blockDefUri);
             }
         } catch (JsonParseException e) {
-            logger.log(Level.WARNING, "Failed to parse block definition '" + blockDefUri + "'", e);
+            logger.error("Failed to parse block definition '{}'", blockDefUri, e);
         } catch (IOException e) {
-            logger.log(Level.WARNING, "Failed to load block definition '" + blockDefUri + "'", e);
+            logger.error("Failed to load block definition '{}'", blockDefUri, e);
         } finally {
             // JAVA7: Clean up closing
             if (stream != null) {
                 try {
                     stream.close();
                 } catch (IOException e) {
-                    logger.log(Level.SEVERE, "Failed to close stream", e);
+                    logger.error("Failed to close stream", e);
                 }
             }
         }

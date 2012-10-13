@@ -25,9 +25,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.PersistableEntityManager;
 import org.terasology.protobuf.EntityData;
@@ -88,7 +88,7 @@ public class WorldPersister {
         abstract EntityData.World load(InputStream in) throws IOException;
     }
 
-    private Logger logger = Logger.getLogger(getClass().getName());
+    private static final Logger logger = LoggerFactory.getLogger(WorldPersister.class);
     private EntityManager entityManager;
     private EntityPersisterHelper persisterHelper;
 
@@ -102,7 +102,9 @@ public class WorldPersister {
 
         File parentFile = file.getParentFile();
         if (parentFile != null) {
-            parentFile.mkdirs();
+            if (!parentFile.mkdirs()) {
+                logger.error("Failed to create world save directory {}", parentFile);
+            }
         }
         FileOutputStream out = new FileOutputStream(file);
 
@@ -113,7 +115,7 @@ public class WorldPersister {
             try {
                 out.close();
             } catch (IOException e) {
-                logger.log(Level.SEVERE, "Failed to close file", e);
+                logger.error("Failed to close file", e);
             }
         }
     }
@@ -130,7 +132,7 @@ public class WorldPersister {
             try {
                 in.close();
             } catch (IOException e) {
-                logger.log(Level.SEVERE, "Failed to close file", e);
+                logger.error("Failed to close file", e);
             }
         }
 

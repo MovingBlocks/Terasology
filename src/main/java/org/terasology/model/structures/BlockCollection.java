@@ -17,9 +17,9 @@ package org.terasology.model.structures;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.world.BlockUpdate;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
@@ -36,7 +36,8 @@ import com.google.common.collect.Lists;
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
 public class BlockCollection {
-    private static Logger logger = Logger.getLogger(BlockCollection.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(BlockCollection.class);
+
     // TODO: Can this integrate better with BlockSelection, rather than need its keyset constructed into a BlockSelection for utility?
 
     /**
@@ -113,7 +114,7 @@ public class BlockCollection {
      */
     public BlockSelection build(WorldProvider provider, BlockPosition position, BlockCollection buildingBlocks) {
         BlockSelection result = new BlockSelection();
-        logger.log(Level.INFO, "Going to build this collection into the world at " + position + ", attaching at relative " + _attachPos);
+        logger.debug("Going to build this collection into the world at {}, attaching at relative {}", position, _attachPos);
         //System.out.println(toString());
 
         List<BlockUpdate> updates = Lists.newArrayListWithCapacity(buildingBlocks.getBlocks().size());
@@ -158,7 +159,7 @@ public class BlockCollection {
      */
     public BlockSelection getLocalizedSelection(BlockPosition localPos) {
         BlockSelection result = new BlockSelection();
-        logger.log(Level.INFO, "Going to localize this BlockCollection to position" + localPos);
+        logger.debug("Going to localize this BlockCollection to position {}", localPos);
         for (BlockPosition pos : _blocks.keySet()) {
             //System.out.println("Processing block " + getBlock(pos) + " relative position " + pos);
             int x = localPos.x + pos.x - _attachPos.x;

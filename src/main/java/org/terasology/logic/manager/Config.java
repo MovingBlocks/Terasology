@@ -21,13 +21,13 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.vecmath.Vector2f;
 
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.PixelFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.game.CoreRegistry;
 import org.terasology.protobuf.Configuration;
 import org.terasology.rendering.world.WorldRenderer;
@@ -39,7 +39,7 @@ import com.google.protobuf.TextFormat;
  * @author Kai Kratz <kaikratz@googlemail.com>
  */
 public final class Config {
-    private Logger logger = Logger.getLogger(getClass().getName());
+    private static final Logger logger = LoggerFactory.getLogger(Config.class);
     private final static Config _instance = new Config();
     private Configuration.Setting.Builder _setting;
 
@@ -66,14 +66,14 @@ public final class Config {
 
         Configuration.Setting.Builder setting = Configuration.Setting.newBuilder();
         if (file.exists()) {
-            logger.log(Level.INFO, "Using config file: " + file);
+            logger.debug("Using config file: {}", file);
             try {
                 FileInputStream fis = new FileInputStream(file);
                 InputStreamReader isr = new InputStreamReader(fis);
                 TextFormat.merge(isr, setting);
                 isr.close();
             } catch (Exception e) {
-                logger.log(Level.WARNING, "Could not load config file " + file, e);
+                logger.error("Could not load config file {}", file, e);
                 return false;
             }
         }
@@ -83,13 +83,13 @@ public final class Config {
 
     public void saveConfig(File file) {
         try {
-            logger.log(Level.INFO, "Using config file: " + file);
+            logger.debug("Using config file: {}", file);
             FileOutputStream fos = new FileOutputStream(file);
             OutputStreamWriter osw = new OutputStreamWriter(fos);
             TextFormat.print(_setting.build(), osw);
             osw.close();
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Could not write " + file, e);
+            logger.error("Could not write {}", file, e);
         }
     }
 

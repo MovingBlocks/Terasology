@@ -18,9 +18,9 @@ package org.terasology.world.lighting;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.math.Diamond3iIterator;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
@@ -36,8 +36,8 @@ import com.google.common.collect.Lists;
  * @author Immortius
  */
 public class LightPropagator {
+    private static final Logger logger = LoggerFactory.getLogger(LightPropagator.class);
 
-    private Logger logger = Logger.getLogger(getClass().getName());
     private WorldView worldView;
 
     public LightPropagator(WorldView worldView) {
@@ -254,7 +254,7 @@ public class LightPropagator {
                             }
                         }
                     } catch (ArrayIndexOutOfBoundsException e) {
-                        logger.log(Level.SEVERE, String.format("Pushing Light %s %d %s failed", new Vector3i(x, y, z), lightLevel, worldView.getChunkRegion()), e);
+                        logger.error("Pushing Light {} {} {} failed", new Vector3i(x, y, z), lightLevel, worldView.getChunkRegion(), e);
                     }
                 }
             }

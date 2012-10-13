@@ -1,5 +1,5 @@
 {
-    "name" : "core:emptyvial",
+    "name" : "potions:emptyvial",
     "Item" : {
         "name" : "EmptyVial",
         "icon" : "EmptyVial",

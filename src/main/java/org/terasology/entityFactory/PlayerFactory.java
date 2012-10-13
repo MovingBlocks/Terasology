@@ -70,14 +70,14 @@ public class PlayerFactory {
         chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:marble:engine:slope"), 99)));
         chestContents.send(new ReceiveItemEvent(blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:marble:engine:steepslope"), 99)));
 
-        chestContents.send(new ReceiveItemEvent(entityManager.create("core:purplepotion")));
-        chestContents.send(new ReceiveItemEvent(entityManager.create("core:greenpotion")));
-        chestContents.send(new ReceiveItemEvent(entityManager.create("core:orangepotion")));
-        chestContents.send(new ReceiveItemEvent(entityManager.create("core:redpotion")));
+        chestContents.send(new ReceiveItemEvent(entityManager.create("potions:purplepotion")));
+        chestContents.send(new ReceiveItemEvent(entityManager.create("potions:greenpotion")));
+        chestContents.send(new ReceiveItemEvent(entityManager.create("potions:orangepotion")));
+        chestContents.send(new ReceiveItemEvent(entityManager.create("potions:redpotion")));
 
-        chestContents.send(new ReceiveItemEvent(entityManager.create("core:book")));
-        chestContents.send(new ReceiveItemEvent(entityManager.create("core:bluebook")));
-        chestContents.send(new ReceiveItemEvent(entityManager.create("core:redbook")));
+        chestContents.send(new ReceiveItemEvent(entityManager.create("books:book")));
+        chestContents.send(new ReceiveItemEvent(entityManager.create("books:bluebook")));
+        chestContents.send(new ReceiveItemEvent(entityManager.create("books:redbook")));
         chestContents.send(new ReceiveItemEvent(entityManager.create("core:railgunTool")));
 
         chestContents.send(new ReceiveItemEvent(entityManager.create("core:mrbarsack")));

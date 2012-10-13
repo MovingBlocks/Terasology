@@ -26,12 +26,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityInfoComponent;
@@ -59,7 +59,7 @@ import com.google.common.collect.Lists;
 public class PojoEntityManager implements EntityManager, PersistableEntityManager {
     public static final int NULL_ID = 0;
 
-    private static Logger logger = Logger.getLogger(PojoEntityManager.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(PojoEntityManager.class);
 
     private int nextEntityId = 1;
     private TIntList freedIds = new TIntArrayList();
@@ -116,7 +116,7 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
         if (prefabName != null && !prefabName.isEmpty()) {
             Prefab prefab = prefabManager.getPrefab(prefabName);
             if (prefab == null) {
-                logger.log(Level.WARNING, "Unable to instantiate unknown prefab: \"" + prefabName + "\"");
+                logger.warn("Unable to instantiate unknown prefab: \"{}\"", prefabName);
                 return EntityRef.NULL;
             }
             return create(prefab);

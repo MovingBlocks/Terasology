@@ -44,7 +44,6 @@ import org.terasology.logic.manager.GUIManager;
 
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  * This system processes input, sending it out as events against the LocalPlayer entity.
@@ -53,7 +52,6 @@ import java.util.logging.Logger;
  * to one or more inputs.
  */
 public class InputSystem implements EventHandlerSystem {
-    private Logger logger = Logger.getLogger(getClass().getName());
 
     private float mouseSensitivity = (float) Config.getInstance().getMouseSens();
 

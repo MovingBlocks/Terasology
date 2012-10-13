@@ -31,7 +31,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,19 +39,16 @@ import java.util.regex.Pattern;
  */
 public class MD5AnimationLoader implements AssetLoader<MeshAnimation> {
 
-    private static String INTEGER_PATTERN = "((?:[\\+-]?\\d+)(?:[eE][\\+-]?\\d+)?)";
-    private static String FLOAT_PATTERN = "((?:[\\+-]?\\d(?:\\.\\d*)?|\\.\\d+)(?:[eE][\\+-]?(?:\\d(?:\\.\\d*)?|\\.\\d+))?)";
-    private static String VECTOR3_PATTERN = "\\(\\s*" + FLOAT_PATTERN + "\\s+" + FLOAT_PATTERN + "\\s+" + FLOAT_PATTERN + "\\s+\\)";
-    private static String VECTOR2_PATTERN = "\\(\\s*" + FLOAT_PATTERN + "\\s+" + FLOAT_PATTERN + "\\s+\\)";
+    private final static String INTEGER_PATTERN = "((?:[\\+-]?\\d+)(?:[eE][\\+-]?\\d+)?)";
+    private final static String FLOAT_PATTERN = "((?:[\\+-]?\\d(?:\\.\\d*)?|\\.\\d+)(?:[eE][\\+-]?(?:\\d(?:\\.\\d*)?|\\.\\d+))?)";
+    private final static String VECTOR3_PATTERN = "\\(\\s*" + FLOAT_PATTERN + "\\s+" + FLOAT_PATTERN + "\\s+" + FLOAT_PATTERN + "\\s+\\)";
 
-    private static int POSITION_X_FLAG = 0x1;
-    private static int POSITION_Y_FLAG = 0x2;
-    private static int POSITION_Z_FLAG = 0x4;
-    private static int ORIENTATION_X_FLAG = 0x8;
-    private static int ORIENTATION_Y_FLAG = 0x10;
-    private static int ORIENTATION_Z_FLAG = 0x20;
-
-    private Logger logger = Logger.getLogger(getClass().getName());
+    private static final int POSITION_X_FLAG = 0x1;
+    private static final int POSITION_Y_FLAG = 0x2;
+    private static final int POSITION_Z_FLAG = 0x4;
+    private static final int ORIENTATION_X_FLAG = 0x8;
+    private static final int ORIENTATION_Y_FLAG = 0x10;
+    private static final int ORIENTATION_Z_FLAG = 0x20;
 
     private Pattern commandLinePattern = Pattern.compile("commandline \"(.*)\".*");
     private Pattern jointPattern = Pattern.compile("\"(.*)\"\\s+" + INTEGER_PATTERN + "\\s*" + INTEGER_PATTERN + "\\s*" + INTEGER_PATTERN);

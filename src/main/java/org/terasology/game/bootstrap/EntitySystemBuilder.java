@@ -24,9 +24,6 @@ import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 
 import org.reflections.Reflections;
-import org.reflections.scanners.Scanner;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.util.ConfigurationBuilder;
 import org.terasology.asset.AssetType;
 import org.terasology.audio.Sound;
 import org.terasology.entitySystem.Component;
@@ -73,7 +70,7 @@ public class EntitySystemBuilder {
         CoreRegistry.put(PrefabManager.class, prefabManager);
 
         PersistableEntityManager entityManager = new PojoEntityManager(library, prefabManager);
-        entityManager.setEventSystem(new PojoEventSystem(entityManager));
+        entityManager.setEventSystem(new PojoEventSystem());
         CoreRegistry.put(EntityManager.class, entityManager);
         CoreRegistry.put(EventSystem.class, entityManager.getEventSystem());
 

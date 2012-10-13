@@ -20,6 +20,8 @@ import org.lwjgl.opengl.Display;
 import org.reflections.Reflections;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ConfigurationBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
@@ -90,8 +92,6 @@ import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -108,7 +108,7 @@ import static org.lwjgl.opengl.GL11.glLoadIdentity;
 public class StateSinglePlayer implements GameState {
 
     public static final String ENTITY_DATA_FILE = "entity.dat";
-    private Logger logger = Logger.getLogger(getClass().getName());
+    private static final Logger logger = LoggerFactory.getLogger(StateSinglePlayer.class);
 
     private WorldInfo worldInfo;
 
@@ -209,24 +209,24 @@ public class StateSinglePlayer implements GameState {
                 BindableButton positiveButton = inputSystem.getBindButton(info.positiveButton());
                 BindableButton negativeButton = inputSystem.getBindButton(info.negativeButton());
                 if (positiveButton == null) {
-                    logger.log(Level.WARNING, "Failed to register axis \"" + id + "\", missing positive button \"" + info.positiveButton() + "\"");
+                    logger.warn("Failed to register axis \"{}\", missing positive button \"{}\"", id, info.positiveButton());
                     continue;
                 }
                 if (negativeButton == null) {
-                    logger.log(Level.WARNING, "Failed to register axis \"" + id + "\", missing negative button \"" + info.negativeButton() + "\"");
+                    logger.warn("Failed to register axis \"{}\", missing negative button \"{}\"", id, info.negativeButton());
                     continue;
                 }
                 try {
                     BindableAxis bindAxis = inputSystem.registerBindAxis(id, (BindAxisEvent)registerBindClass.newInstance(), positiveButton, negativeButton);
                     bindAxis.setSendEventMode(info.eventMode());
-                    logger.log(Level.INFO, "Registered axis bind: " + id);
+                    logger.debug("Registered axis bind: {}", id);
                 } catch (InstantiationException e) {
-                    logger.log(Level.SEVERE, "Failed to register axis bind \"" + id + "\"", e);
+                    logger.error("Failed to register axis bind \"{}\"", id, e);
                 } catch (IllegalAccessException e) {
-                    logger.log(Level.SEVERE, "Failed to register axis bind \"" + id + "\"", e);
+                    logger.error("Failed to register axis bind \"{}\"", id, e);
                 }
             } else {
-                logger.log(Level.WARNING, "Failed to register axis bind \"" + id + "\", does not extend BindAxisEvent");
+                logger.error("Failed to register axis bind \"{}\", does not extend BindAxisEvent", id);
             }
         }
     }
@@ -246,14 +246,14 @@ public class StateSinglePlayer implements GameState {
                         inputSystem.linkBindButtonToInput(input, id);
                     }
 
-                    logger.log(Level.INFO, "Registered button bind: " + id);
+                    logger.debug("Registered button bind: {}", id);
                 } catch (InstantiationException e) {
-                    logger.log(Level.SEVERE, "Failed to register button bind \"" + id + "\"", e);
+                    logger.error("Failed to register button bind \"{}\"", e);
                 } catch (IllegalAccessException e) {
-                    logger.log(Level.SEVERE, "Failed to register button bind \"" + id + "\"", e);
+                    logger.error("Failed to register button bind \"{}\"", e);
                 }
             } else {
-                logger.log(Level.WARNING, "Failed to register button bind \"" + id + "\", does not extend BindButtonEvent");
+                logger.error("Failed to register button bind \"{}\", does not extend BindButtonEvent", id);
             }
         }
     }
@@ -261,7 +261,7 @@ public class StateSinglePlayer implements GameState {
     private void loadPrefabs() {
         EntityPersisterHelper persisterHelper = new EntityPersisterHelperImpl(entityManager);
         for (AssetUri prefabURI : AssetManager.list(AssetType.PREFAB)) {
-            logger.info("Loading prefab " + prefabURI);
+            logger.debug("Loading prefab " + prefabURI);
             try {
                 InputStream stream = AssetManager.assetStream(prefabURI);
                 if (stream != null) {
@@ -272,10 +272,10 @@ public class StateSinglePlayer implements GameState {
                         persisterHelper.deserializePrefab(prefabData, prefabURI.getPackage());
                     }
                 } else {
-                    logger.severe("Failed to load prefab '" + prefabURI + "'");
+                    logger.warn("Failed to load prefab '{}'", prefabURI);
                 }
             } catch (IOException e) {
-                logger.log(Level.WARNING, "Failed to load prefab '" + prefabURI + "'", e);
+                logger.error("Failed to load prefab '{}'", prefabURI, e);
             }
         }
     }
@@ -310,7 +310,7 @@ public class StateSinglePlayer implements GameState {
         try {
             CoreRegistry.get(WorldPersister.class).save(new File(PathManager.getInstance().getWorldSavePath(CoreRegistry.get(WorldProvider.class).getTitle()), ENTITY_DATA_FILE), WorldPersister.SaveFormat.Binary);
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Failed to save entities", e);
+            logger.error("Failed to save entities", e);
         }
         dispose();
         entityManager.clear();
@@ -363,7 +363,7 @@ public class StateSinglePlayer implements GameState {
             worldInfo.setSeed(random.randomCharacterString(16));
         }
 
-        logger.log(Level.INFO, "World seed: \"{0}\"", worldInfo.getSeed());
+        logger.info("World seed: \"{}\"", worldInfo.getSeed());
 
         // Init ChunkGeneratorManager
         ChunkGeneratorManager chunkGeneratorManager = ChunkGeneratorManagerImpl.buildChunkGenerator(Arrays.asList(worldInfo.getChunkGenerators()));
@@ -391,7 +391,7 @@ public class StateSinglePlayer implements GameState {
             try {
                 CoreRegistry.get(WorldPersister.class).load(entityDataFile, WorldPersister.SaveFormat.Binary);
             } catch (IOException e) {
-                logger.log(Level.SEVERE, "Failed to load entity data", e);
+                logger.error("Failed to load entity data", e);
             }
         }
 

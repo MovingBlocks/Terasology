@@ -17,8 +17,9 @@ package org.terasology.world.generator.core;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
@@ -39,7 +40,7 @@ public class FlatTerrainGenerator implements ChunkGenerator {
     public static final int MIN_HEIGHT = 0;
     public static final int DEFAULT_HEIGHT = 50;
 
-    private final Logger logger = Logger.getLogger(getClass().getName());
+    private static final Logger logger = LoggerFactory.getLogger(FlatTerrainGenerator.class);
 
     private WorldBiomeProvider biomeProvider;
     private int height;
@@ -106,7 +107,7 @@ public class FlatTerrainGenerator implements ChunkGenerator {
                 try {
                     setHeight(Integer.parseInt(heightStr));
                 } catch (final NumberFormatException e) {
-                    logger.severe("Cannot set initParameters! " + initParameters);
+                    logger.error("Cannot set initParameters to {}! ", initParameters, e);
                     // TODO Improved exception handling
                 }
             }

@@ -21,11 +21,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetUri;
 
@@ -35,8 +35,9 @@ import org.terasology.asset.AssetUri;
  */
 public class TileLoader implements AssetLoader<Tile> {
 
-    private Logger logger = Logger.getLogger(getClass().getName());
     private static final int TILE_SIZE = 16;
+
+    private static final Logger logger = LoggerFactory.getLogger(TileLoader.class);
 
     public TileLoader() {
     }
@@ -47,7 +48,7 @@ public class TileLoader implements AssetLoader<Tile> {
         if (image.getHeight() == TILE_SIZE && image.getWidth() == TILE_SIZE) {
             return new Tile(uri, image);
         }
-        logger.log(Level.SEVERE, "Invalid tile '" + uri + "', tiles must be 16x16");
+        logger.error("Invalid tile '{}', tiles must be 16x16", uri);
         return null;
     }
 }

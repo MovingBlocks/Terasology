@@ -19,12 +19,12 @@ import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.shader.IShaderParameters;
@@ -44,9 +44,8 @@ import org.terasology.rendering.shader.ShaderProgram;
  */
 public class ShaderManager {
 
+    private static final Logger logger = LoggerFactory.getLogger(ShaderManager.class);
     private static ShaderManager _instance = null;
-
-    private Logger logger = Logger.getLogger(getClass().getName());
 
     private final HashMap<String, ShaderProgram> _shaderPrograms = new HashMap<String, ShaderProgram>(16);
 
@@ -67,10 +66,10 @@ public class ShaderManager {
     }
 
     private ShaderManager() {
-        logger.log(Level.INFO, "Loading Terasology shader manager...");
-        logger.log(Level.INFO, "GL_VERSION: {0}", GL11.glGetString(GL11.GL_VERSION));
-        logger.log(Level.INFO, "SHADING_LANGUAGE VERSION: {0}", GL11.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION));
-        logger.log(Level.INFO, "EXTENSIONS: {0}", GL11.glGetString(GL11.GL_EXTENSIONS));
+        logger.info("Loading Terasology shader manager...");
+        logger.info("GL_VERSION: {}", GL11.glGetString(GL11.GL_VERSION));
+        logger.info("SHADING_LANGUAGE VERSION: {}", GL11.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION));
+        logger.info("EXTENSIONS: {}", GL11.glGetString(GL11.GL_EXTENSIONS));
 
         initShaders();
     }

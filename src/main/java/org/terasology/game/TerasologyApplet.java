@@ -24,9 +24,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.game.modes.StateMainMenu;
 import org.terasology.logic.manager.PathManager;
 
@@ -36,6 +36,7 @@ import org.terasology.logic.manager.PathManager;
  */
 @SuppressWarnings("serial")
 public final class TerasologyApplet extends Applet {
+    private static final Logger logger = LoggerFactory.getLogger(TerasologyApplet.class);
     private TerasologyEngine engine;
     private Thread gameThread;
 
@@ -62,11 +63,11 @@ public final class TerasologyApplet extends Applet {
                 }
                 fos.close();
             } catch (MalformedURLException e) {
-                Logger.getLogger(TerasologyApplet.class.getName()).log(Level.SEVERE, "Unable to obtain mod '" + mod + "'", e);
+                logger.error("Unable to obtain mod '{}'", mod, e);
             } catch (FileNotFoundException e) {
-                Logger.getLogger(TerasologyApplet.class.getName()).log(Level.SEVERE, "Unable to obtain mod '" + mod + "'", e);
+                logger.error("Unable to obtain mod '{}'", mod, e);
             } catch (IOException e) {
-                Logger.getLogger(TerasologyApplet.class.getName()).log(Level.SEVERE, "Unable to obtain mod '" + mod + "'", e);
+                logger.error("Unable to obtain mod '{}'", mod, e);
             }
         }
     }
@@ -80,7 +81,7 @@ public final class TerasologyApplet extends Applet {
                     engine.run(new StateMainMenu());
                     engine.dispose();
                 } catch (Exception e) {
-                    Logger.getLogger(TerasologyApplet.class.getName()).log(Level.SEVERE, e.toString(), e);
+                    logger.error(e.toString(), e);
                 }
             }
         };
@@ -105,7 +106,7 @@ public final class TerasologyApplet extends Applet {
         try {
             gameThread.join();
         } catch (InterruptedException e) {
-            Logger.getLogger(getClass().getName()).severe("Failed to cleanly shut down engine");
+            logger.error("Failed to cleanly shut down engine");
         }
 
         super.destroy();

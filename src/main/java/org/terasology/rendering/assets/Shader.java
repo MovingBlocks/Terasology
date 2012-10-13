@@ -23,12 +23,12 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.asset.Asset;
 import org.terasology.asset.AssetUri;
 import org.terasology.logic.manager.Config;
@@ -47,6 +47,8 @@ public class Shader implements Asset {
     private static final String PreProcessorPreamble = "#version 120 \n float TEXTURE_OFFSET = " + Block.TEXTURE_OFFSET + "; \n";
     private static String IncludedFunctionsVertex = "", IncludedFunctionsFragment = "";
 
+    private static final Logger logger = LoggerFactory.getLogger(Shader.class);
+
     private final AssetUri uri;
     private String vertShader;
     private String fragShader;
@@ -56,7 +58,6 @@ public class Shader implements Asset {
     private boolean valid = false;
     private Map<String, ParamType> params = Maps.newHashMap();
 
-    private Logger logger = Logger.getLogger(getClass().getName());
 
     public Shader(AssetUri uri, String vertShader, String fragShader, ShaderMetadata metadata) {
         this.uri = uri;
@@ -77,14 +78,14 @@ public class Shader implements Asset {
     }
 
     public void recompile() {
-        logger.log(Level.INFO, "Recompiling shader {0}.", uri);
+        logger.debug("Recompiling shader {}.", uri);
 
         dispose();
         compileShaderProgram();
     }
 
     public void dispose() {
-        logger.log(Level.INFO, "Disposing shader {0}.", uri);
+        logger.debug("Disposing shader {}.", uri);
 
         GL20.glDeleteProgram(fragmentProgram);
         fragmentProgram = 0;
@@ -142,13 +143,13 @@ public class Shader implements Asset {
         GL20.glAttachShader(shaderProgram, vertexProgram);
         GL20.glLinkProgram(shaderProgram);
         if (GL20.glGetProgram(shaderProgram, GL20.GL_LINK_STATUS) == GL11.GL_FALSE) {
-            logger.log(Level.WARNING, "Failed to link shader {0}.", GL20.glGetProgramInfoLog(shaderProgram, GL20.GL_LINK_STATUS));
+            logger.error("Failed to link shader {}.", GL20.glGetProgramInfoLog(shaderProgram, GL20.GL_LINK_STATUS));
             GL20.glDeleteProgram(shaderProgram);
             return 0;
         }
         GL20.glValidateProgram(shaderProgram);
         if (GL20.glGetProgram(shaderProgram, GL20.GL_VALIDATE_STATUS) == GL11.GL_FALSE) {
-            logger.log(Level.WARNING, "Failed to validate shader {0}.", GL20.glGetProgramInfoLog(shaderProgram, GL20.GL_VALIDATE_STATUS));
+            logger.error("Failed to validate shader {}.", GL20.glGetProgramInfoLog(shaderProgram, GL20.GL_VALIDATE_STATUS));
             GL20.glDeleteProgram(shaderProgram);
             return 0;
         }
@@ -201,7 +202,7 @@ public class Shader implements Asset {
         byte[] infoBytes = new byte[actualLength];
         infoBuffer.get(infoBytes);
 
-        logger.log(Level.INFO, "{0}", new String(infoBytes));
+        logger.debug("{}", new String(infoBytes));
     }
 
     public static StringBuilder createShaderBuilder() {
@@ -233,18 +234,18 @@ public class Shader implements Asset {
             IncludedFunctionsVertex = CharStreams.toString(new InputStreamReader(vertStream));
             IncludedFunctionsFragment = CharStreams.toString(new InputStreamReader(fragStream));
         } catch (IOException e) {
-            Logger.getLogger(Shader.class.getName()).severe("Failed to load Include shader resources");
+            logger.error("Failed to load Include shader resources");
         } finally {
             // JAVA7: Clean up
             try {
                 vertStream.close();
             } catch (IOException e) {
-                Logger.getLogger(Shader.class.getName()).severe("Failed to close globalFunctionsVertIncl.glsl stream");
+                logger.error("Failed to close globalFunctionsVertIncl.glsl stream");
             }
             try {
                 fragStream.close();
             } catch (IOException e) {
-                Logger.getLogger(Shader.class.getName()).severe("Failed to close globalFunctionsFragIncl.glsl stream");
+                logger.error("Failed to close globalFunctionsFragIncl.glsl stream");
             }
         }
     }

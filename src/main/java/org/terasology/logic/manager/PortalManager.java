@@ -16,11 +16,11 @@
 package org.terasology.logic.manager;
 
 import java.util.HashSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.vecmath.Vector3f;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.components.SimpleAIComponent;
 import org.terasology.entityFactory.GelatinousCubeFactory;
 import org.terasology.entitySystem.EntityManager;
@@ -34,6 +34,9 @@ import org.terasology.utilities.FastRandom;
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
 public class PortalManager {
+
+    private static final Logger logger = LoggerFactory.getLogger(PortalManager.class);
+
     /**
      * Set that contains Portals
      */
@@ -43,7 +46,6 @@ public class PortalManager {
     private final FastRandom _random = new FastRandom();
     private EntityManager _entityManager;
     private GelatinousCubeFactory factory;
-    private Logger logger = Logger.getLogger(getClass().getName());
 
     public PortalManager(EntityManager entityManager) {
         _entityManager = entityManager;
@@ -78,7 +80,7 @@ public class PortalManager {
         if (spawn) {
             Vector3f pos = new Vector3f((float) p.getBlockLocation().x, (float) p.getBlockLocation().y - 1, (float) p.getBlockLocation().z);
             factory.generateGelatinousCube(pos);
-            logger.log(Level.INFO, "Spawning local GelatinousCube at " + pos);
+            logger.debug("Spawning local GelatinousCube at {}", pos);
         }
         return spawn;
     }
@@ -99,7 +101,7 @@ public class PortalManager {
             Vector3f pos = new Vector3f(_random.randomFloat(), 0, _random.randomFloat());
             pos.scale(256);
             factory.generateGelatinousCube(pos);
-            logger.log(Level.INFO, "Spawning wild GelatinousCube at " + pos);
+            logger.debug("Spawning wild GelatinousCube at {}", pos);
         }
         return spawn;
     }

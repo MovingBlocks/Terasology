@@ -40,8 +40,6 @@ import gnu.trove.list.array.TIntArrayList;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Matrix4f;
@@ -54,6 +52,8 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.components.world.LocationComponent;
@@ -91,8 +91,8 @@ import com.google.common.collect.Sets;
  */
 @RegisterComponentSystem(headedOnly = true)
 public class MeshRenderer implements RenderSystem, EventHandlerSystem {
-    private Logger logger = Logger.getLogger(getClass().getName());
-    private EntityManager manager;
+    private static final Logger logger = LoggerFactory.getLogger(MeshRenderer.class);
+
     private Mesh gelatinousCubeMesh;
     private WorldRenderer worldRenderer;
 
@@ -109,7 +109,6 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
 
     @Override
     public void initialise() {
-        manager = CoreRegistry.get(EntityManager.class);
         worldRenderer = CoreRegistry.get(WorldRenderer.class);
 
         Tessellator tessellator = new Tessellator();
@@ -228,7 +227,7 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
                         continue;
                     }
                     if (meshComp.mesh.isDisposed()) {
-                        logger.log(Level.SEVERE, "Found disposed mesh");
+                        logger.error("Attempted to render disposed mesh");
                         continue;
                     }
 

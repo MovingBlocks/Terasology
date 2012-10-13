@@ -17,19 +17,19 @@
 package org.terasology.logic.mod;
 
 import com.google.common.collect.Sets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.security.AccessControlException;
 import java.security.Permission;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.logging.LoggingPermission;
 
 /**
  * @author Immortius
  */
 public class ModSecurityManager extends SecurityManager {
-    private Logger logger = Logger.getLogger(getClass().getName());
+    private static final Logger logger = LoggerFactory.getLogger(ModSecurityManager.class);
 
     private Set<ClassLoader> modClassLoaders = Sets.newHashSet();
     private Set<Class> modAvailableClasses = Sets.newHashSet();
@@ -53,7 +53,7 @@ public class ModSecurityManager extends SecurityManager {
                 if (modAvailableClasses.contains(classes[i - 1])) {
                     return;
                 }
-                logger.log(Level.INFO, "Mod calling into " + classes[i - 1].getName() + " requiring " + perm.toString());
+                logger.debug("Mod calling into {} requiring {}", classes[i - 1].getName(), perm);
                 throw new AccessControlException("Mod attempted protected action " + perm.toString());
             }
         }

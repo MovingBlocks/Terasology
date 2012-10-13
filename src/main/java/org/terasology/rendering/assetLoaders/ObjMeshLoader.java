@@ -26,12 +26,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.vecmath.Tuple3i;
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetUri;
 import org.terasology.math.Vector3i;
@@ -47,7 +48,7 @@ import com.google.common.collect.Lists;
 
 public class ObjMeshLoader implements AssetLoader<Mesh> {
 
-    private Logger logger = Logger.getLogger(getClass().getName());
+    private static final Logger logger = LoggerFactory.getLogger(ObjMeshLoader.class);
 
     @Override
     public Mesh load(InputStream stream, AssetUri uri, List<URL> urls) throws IOException {
@@ -179,7 +180,7 @@ public class ObjMeshLoader implements AssetLoader<Mesh> {
                 // Smoothing group (not supported)
                 else if ("s".equals(prefix)) {
                     if (!"off".equals(prefixSplit[1]) && !"0".equals(prefixSplit[1])) {
-                        logger.warning("Smoothing groups not supported in obj import yet");
+                        logger.warn("Smoothing groups not supported in obj import yet");
                     }
                 }
                 // Face (polygon)
@@ -201,7 +202,7 @@ public class ObjMeshLoader implements AssetLoader<Mesh> {
                     }
                     rawIndices.add(result);
                 } else {
-                    logger.warning(String.format("Skipping unsupported obj statement on line %d:\"%s\"", lineNum, line));
+                    logger.warn("Skipping unsupported obj statement on line {}:\"{}\"", lineNum, line);
                 }
             }
         } catch (Exception e) {

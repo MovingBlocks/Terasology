@@ -48,8 +48,6 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.vecmath.Vector3f;
@@ -57,6 +55,8 @@ import javax.vecmath.Vector3f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.controllers.LocalPlayerSystem;
 import org.terasology.rendering.logic.MeshRenderer;
@@ -121,11 +121,12 @@ public final class WorldRenderer {
     public static final int MAX_BILLBOARD_CHUNKS = 64;
     public static final int VERTICAL_SEGMENTS = Config.getInstance().getVerticalChunkMeshSegments();
 
+    private static final Logger logger = LoggerFactory.getLogger(WorldRenderer.class);
+
     /* WORLD PROVIDER */
     private final WorldProvider _worldProvider;
     private ChunkProvider _chunkProvider;
     private ChunkStore chunkStore;
-    private Logger _logger = Logger.getLogger(getClass().getName());
 
     /* PLAYER */
     private LocalPlayer _player;
@@ -834,7 +835,7 @@ public final class WorldRenderer {
     }
 
     public void changeViewDistance(int viewingDistance) {
-        _logger.log(Level.INFO, "New Viewing Distance: " + viewingDistance);
+        logger.debug("New Viewing Distance: {}", viewingDistance);
         if (_player != null) {
             _chunkProvider.addRegionEntity(_player.getEntity(), viewingDistance);
         }
@@ -851,7 +852,7 @@ public final class WorldRenderer {
     public void initPortal() {
         if (!_portalManager.hasPortal()) {
             Vector3f loc = new Vector3f(getPlayerPosition().x, getPlayerPosition().y + 4, getPlayerPosition().z);
-            _logger.log(Level.INFO, "Portal location is" + loc);
+            logger.debug("Portal location is {}", loc);
             Vector3i pos = new Vector3i(loc.x, loc.y, loc.z, 0.5f);
             while (true) {
                 Block oldBlock = _worldProvider.getBlock(pos);
@@ -874,7 +875,7 @@ public final class WorldRenderer {
         try {
             WorldInfo.save(new File(PathManager.getInstance().getWorldSavePath(worldInfo.getTitle()), WorldInfo.DEFAULT_FILE_NAME), worldInfo);
         } catch (IOException e) {
-            _logger.log(Level.SEVERE, "Failed to save world manifest");
+            logger.error("Failed to save world manifest", e);
         }
 
         AudioManager.getInstance().stopAllSounds();
@@ -892,7 +893,7 @@ public final class WorldRenderer {
             bos.close();
             fileOut.close();
         } catch (IOException e) {
-            _logger.log(Level.SEVERE, "Error saving chunks", e);
+            logger.error("Error saving chunks", e);
         }
     }
 
@@ -973,7 +974,7 @@ public final class WorldRenderer {
                 try {
                     ImageIO.write(image, "png", file);
                 } catch (IOException e) {
-                    _logger.log(Level.WARNING, "Could not save image!", e);
+                    logger.warn("Could not save screenshot!", e);
                 }
             }
         };

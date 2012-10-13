@@ -22,10 +22,10 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.nio.FloatBuffer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.lwjgl.opengl.GL20;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.asset.Asset;
 import org.terasology.asset.AssetUri;
 import org.terasology.logic.manager.ShaderManager;
@@ -35,9 +35,10 @@ import org.terasology.rendering.assets.metadata.ParamMetadata;
  * @author Immortius
  */
 public class Material implements Asset {
-    private final AssetUri uri;
 
-    private Logger logger = Logger.getLogger(getClass().getName());
+    private static final Logger logger = LoggerFactory.getLogger(Material.class);
+
+    private final AssetUri uri;
 
     private Shader shader;
     private int shaderProgram;
@@ -52,7 +53,7 @@ public class Material implements Asset {
     }
 
     public void dispose() {
-        logger.log(Level.INFO, "Disposing material {0}.", uri);
+        logger.debug("Disposing material {}.", uri);
 
         GL20.glDeleteShader(shaderProgram);
         shaderProgram = 0;

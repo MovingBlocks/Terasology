@@ -19,9 +19,9 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.components.world.WorldComponent;
 import org.terasology.entitySystem.EntityRef;
@@ -56,7 +56,7 @@ public class LiquidSimulator implements EventHandlerSystem {
     private static byte MAX_LIQUID_DEPTH = 0x7;
     public static final int PROPAGATION_DELAY = 200;
 
-    private Logger logger = Logger.getLogger(getClass().getName());
+    private static final Logger logger = LoggerFactory.getLogger(LiquidSimulator.class);
 
     private WorldProvider world;
     private Block air;
@@ -94,9 +94,9 @@ public class LiquidSimulator implements EventHandlerSystem {
                             }
                             task.run();
                         } catch (InterruptedException e) {
-                            logger.log(Level.INFO, "Interrupted");
+                            logger.debug("Interrupted");
                         } catch (Exception e) {
-                            logger.log(Level.SEVERE, "Error in water simulation", e);
+                            logger.error("Error in water simulation", e);
                         }
                     }
                 }
@@ -122,7 +122,7 @@ public class LiquidSimulator implements EventHandlerSystem {
         try {
             executor.awaitTermination(1, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
-            logger.log(Level.SEVERE, "Interrupted awaiting shutdown");
+            logger.error("Interrupted awaiting shutdown");
         }
         if (blockQueue.isEmpty()) {
             executor.shutdownNow();

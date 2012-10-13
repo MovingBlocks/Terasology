@@ -18,8 +18,6 @@ package org.terasology.network;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;
@@ -28,6 +26,8 @@ import org.jboss.netty.channel.group.ChannelGroup;
 import org.jboss.netty.channel.group.ChannelGroupFuture;
 import org.jboss.netty.channel.group.DefaultChannelGroup;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Immortius
@@ -35,8 +35,7 @@ import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 public class Server {
 
     static final ChannelGroup allChannels = new DefaultChannelGroup("tera-server");
-
-    private Logger logger = Logger.getLogger(getClass().getName());
+    private static final Logger logger = LoggerFactory.getLogger(Server.class);
 
     private ChannelFactory factory;
     private Channel listenChannel;
@@ -55,7 +54,7 @@ public class Server {
         ChannelGroupFuture future = allChannels.close();
         future.awaitUninterruptibly();
         factory.releaseExternalResources();
-        logger.log(Level.INFO, "Server shutdown");
+        logger.info("Server shutdown");
     }
 
 

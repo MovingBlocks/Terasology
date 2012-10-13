@@ -15,16 +15,15 @@
  */
 package org.terasology.rendering.gui.windows;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.modes.StateSinglePlayer;
 import org.terasology.game.types.GameType;
 import org.terasology.game.types.SurvivalType;
 import org.terasology.logic.manager.Config;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
-import org.terasology.world.WorldInfo;
-import org.terasology.world.WorldUtil;
 import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
@@ -32,10 +31,11 @@ import org.terasology.rendering.gui.widgets.UIButton;
 import org.terasology.rendering.gui.widgets.UIList;
 import org.terasology.rendering.gui.widgets.UIListItem;
 import org.terasology.rendering.gui.widgets.UIWindow;
+import org.terasology.world.WorldInfo;
+import org.terasology.world.WorldUtil;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -43,8 +43,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Select world menu screen.
@@ -52,7 +50,7 @@ import java.util.logging.Logger;
  * @author Anton Kireev <adeon.k87@gmail.com>
  */
 public class UIMenuSingleplayer extends UIWindow {
-    private Logger logger = Logger.getLogger(getClass().getName());
+    private static final Logger logger = LoggerFactory.getLogger(UIMenuSingleplayer.class);
 
     final UIList list;
     final UIButton goToBack;
@@ -166,9 +164,9 @@ public class UIMenuSingleplayer extends UIWindow {
         try {
             WorldInfo info = (WorldInfo) list.getSelection().getValue();
 
-            try{
-                CoreRegistry.put(GameType.class, (GameType)Class.forName(info.getGameType().substring(6)).newInstance());
-            }catch (Exception e){
+            try {
+                CoreRegistry.put(GameType.class, (GameType) Class.forName(info.getGameType().substring(6)).newInstance());
+            } catch (Exception e) {
                 CoreRegistry.put(GameType.class, new SurvivalType());
             }
 
@@ -195,19 +193,18 @@ public class UIMenuSingleplayer extends UIWindow {
                 }
             }
         });
-        
+
         //TODO type safety!
-        Arrays.sort( listFiles, new Comparator()
-        {
+        Arrays.sort(listFiles, new Comparator() {
             public int compare(Object o1, Object o2) {
-                if(((File)o1).isDirectory() && ((File)o2).isDirectory()){
-                   File f1 = new File(((File)o1).getAbsolutePath(), "entity.dat");
-                   File f2 = new File(((File)o2).getAbsolutePath(), "entity.dat");
-                   if (f1.lastModified() > f2.lastModified()) {
-                    return -1;
-                   } else if (f1.lastModified() < f2.lastModified()) {
-                    return +1;
-                   }
+                if (((File) o1).isDirectory() && ((File) o2).isDirectory()) {
+                    File f1 = new File(((File) o1).getAbsolutePath(), "entity.dat");
+                    File f2 = new File(((File) o2).getAbsolutePath(), "entity.dat");
+                    if (f1.lastModified() > f2.lastModified()) {
+                        return -1;
+                    } else if (f1.lastModified() < f2.lastModified()) {
+                        return +1;
+                    }
                 }
 
                 return 0;
@@ -223,19 +220,24 @@ public class UIMenuSingleplayer extends UIWindow {
             try {
                 WorldInfo info = WorldInfo.load(worldManifest);
                 if (!info.getTitle().isEmpty()) {
-                    try{
-                        typeGame = ((GameType)Class.forName(info.getGameType().substring(6)).newInstance()).getName();
-                    }catch(Exception e){}
-                    UIListItem item = new UIListItem(info.getTitle() + "("  + typeGame + ")\n" + date.format(new java.util.Date(new File(file.getAbsolutePath(), "entity.dat").lastModified())).toString() , info);
+                    typeGame = ((GameType) Class.forName(info.getGameType().substring(6)).newInstance()).getName();
+                    UIListItem item = new UIListItem(info.getTitle() + "(" + typeGame + ")\n" + date.format(new java.util.Date(new File(file.getAbsolutePath(), "entity.dat").lastModified())).toString(), info);
                     item.setPadding(new Vector4f(10f, 5f, 10f, 5f));
                     list.addItem(item);
                 }
             } catch (IOException e) {
-                logger.log(Level.SEVERE, "Failed reading world data object. Sorry.", e);
+                logger.error("Failed reading world data object.", e);
+            } catch (ClassNotFoundException e) {
+                logger.error("Failed reading world data object.", e);
+            } catch (IllegalAccessException e) {
+                logger.error("Failed reading world data object.", e);
+            } catch (InstantiationException e) {
+                logger.error("Failed reading world data object.", e);
             }
+
         }
     }
-    
+
     public int getWorldCount() {
         return list.getItemCount();
     }

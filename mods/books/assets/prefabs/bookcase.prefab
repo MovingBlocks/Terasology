@@ -1,5 +1,5 @@
 {
-  "name": "core:bookcase",
+  "name": "books:bookcase",
   "Bookshelf": {},
   "Inventory": {
     "itemSlots": [

@@ -27,11 +27,11 @@ import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.vecmath.Vector3f;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.math.Region3i;
@@ -59,7 +59,8 @@ public class LocalChunkProvider implements ChunkProvider {
     private static final int CHUNK_PROCESSING_THREADS = 8;
     private static final Vector3i LOCAL_REGION_EXTENTS = new Vector3i(1, 0, 1);
 
-    private Logger logger = Logger.getLogger(getClass().getName());
+    private static final Logger logger = LoggerFactory.getLogger(LocalChunkProvider.class);
+
     private ChunkStore farStore;
 
     private BlockingQueue<ChunkTask> chunkTasksQueue;
@@ -109,12 +110,12 @@ public class LocalChunkProvider implements ChunkProvider {
                                     break;
                             }
                         } catch (InterruptedException e) {
-                            logger.log(Level.SEVERE, "Thread interrupted", e);
+                            logger.error("Thread interrupted", e);
                         } catch (Exception e) {
-                            logger.log(Level.SEVERE, "Error in thread", e);
+                            logger.error("Error in thread", e);
                         }
                     }
-                    logger.log(Level.INFO, "Thread shutdown safely");
+                    logger.debug("Thread shutdown safely");
                 }
             });
         }
@@ -136,12 +137,12 @@ public class LocalChunkProvider implements ChunkProvider {
                             }
                             request.enact();
                         } catch (InterruptedException e) {
-                            logger.log(Level.SEVERE, "Thread interrupted", e);
+                            logger.error("Thread interrupted", e);
                         } catch (Exception e) {
-                            logger.log(Level.SEVERE, "Error in thread", e);
+                            logger.error("Error in thread", e);
                         }
                     }
-                    logger.log(Level.INFO, "Thread shutdown safely");
+                    logger.debug("Thread shutdown safely");
                 }
             });
         }
@@ -188,7 +189,7 @@ public class LocalChunkProvider implements ChunkProvider {
 
             PerformanceMonitor.startActivity("Review cache size");
             if (nearCache.size() > CACHE_SIZE) {
-                logger.log(Level.INFO, "Compacting cache");
+                logger.debug("Compacting cache");
                 Iterator<Vector3i> iterator = nearCache.keySet().iterator();
                 while (iterator.hasNext()) {
                     Vector3i pos = iterator.next();
@@ -250,13 +251,13 @@ public class LocalChunkProvider implements ChunkProvider {
         chunkProcessingThreads.shutdown();
         try {
             if (!reviewThreads.awaitTermination(1, TimeUnit.SECONDS)) {
-                logger.log(Level.WARNING, "Timed out awaiting chunk review thread termination");
+                logger.warn("Timed out awaiting chunk review thread termination");
             }
             if (!chunkProcessingThreads.awaitTermination(1, TimeUnit.SECONDS)) {
-                logger.log(Level.WARNING, "Timed out awaiting chunk processing thread termination");
+                logger.warn("Timed out awaiting chunk processing thread termination");
             }
         } catch (InterruptedException e) {
-            logger.log(Level.WARNING, "Interrupted awaiting chunk thread termination");
+            logger.warn("Interrupted awaiting chunk thread termination");
         }
 
         for (Chunk chunk : nearCache.values()) {
@@ -344,7 +345,7 @@ public class LocalChunkProvider implements ChunkProvider {
                     }
                 }
             }
-            logger.log(Level.FINE, "Queueing for adjacency generation " + pos);
+            logger.debug("Queueing for adjacency generation {}", pos);
             chunkTasksQueue.offer(new AbstractChunkTask(pos, this) {
                 @Override
                 public void enact() {
@@ -384,7 +385,7 @@ public class LocalChunkProvider implements ChunkProvider {
                     }
                 }
             }
-            logger.log(Level.FINE, "Queueing for internal light generation " + pos);
+            logger.debug("Queueing for internal light generation {}", pos);
             chunkTasksQueue.offer(new AbstractChunkTask(pos, this) {
                 @Override
                 public void enact() {
@@ -420,7 +421,7 @@ public class LocalChunkProvider implements ChunkProvider {
                     }
                 }
             }
-            logger.log(Level.FINE, "Queueing for light propagation pass " + pos);
+            logger.debug("Queueing for light propagation pass {}", pos);
             chunkTasksQueue.offer(new AbstractChunkTask(pos, this) {
                 @Override
                 public void enact() {
@@ -460,7 +461,7 @@ public class LocalChunkProvider implements ChunkProvider {
                     }
                 }
             }
-            logger.log(Level.FINE, "Now complete " + pos);
+            logger.debug("Now complete {}", pos);
             chunk.setChunkState(Chunk.State.COMPLETE);
             for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, LOCAL_REGION_EXTENTS)) {
                 checkChunkReady(adjPos);

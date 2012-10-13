@@ -103,6 +103,7 @@ configurations {
 
 dependencies {
     groovy group: 'org.codehaus.groovy', name: 'groovy', version: '1.8.7'
+	compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.2'
     compile group: 'com.google.guava', name: 'guava', version: '13.0.1'
     compile group: 'com.google.code.gson', name: 'gson', version: '2.1'
     compile group: 'com.google.protobuf', name: 'protobuf-java', version: '2.4.1'
@@ -116,6 +117,7 @@ dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
     testCompile group: 'junit', name: 'junit', version: '4.10'
     testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.0'
+	runtime group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.2'
     devCompile sourceSets.main.output
 }
 
