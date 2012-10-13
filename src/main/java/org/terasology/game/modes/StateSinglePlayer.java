@@ -145,7 +145,7 @@ public class StateSinglePlayer implements GameState {
         cacheTextures();
         cacheBlockMesh();
 
-        entityManager = new EntitySystemBuilder().build();
+        entityManager = new EntitySystemBuilder().build(modManager);
         eventSystem = CoreRegistry.get(EventSystem.class);
 
         guiManager = new GUIManager();

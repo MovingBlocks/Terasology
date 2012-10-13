@@ -64,7 +64,7 @@ import org.terasology.world.block.family.BlockFamily;
  */
 public class EntitySystemBuilder {
 
-    public PersistableEntityManager build() {
+    public PersistableEntityManager build(ModManager modManager) {
         ComponentLibrary library = new ComponentLibraryImpl();
         registerTypeHandlers(library);
         CoreRegistry.put(ComponentLibrary.class, library);
@@ -77,8 +77,8 @@ public class EntitySystemBuilder {
         CoreRegistry.put(EntityManager.class, entityManager);
         CoreRegistry.put(EventSystem.class, entityManager.getEventSystem());
 
-        registerComponents(library);
-        registerEvents(entityManager.getEventSystem());
+        registerComponents(library, modManager);
+        registerEvents(entityManager.getEventSystem(), modManager);
         return entityManager;
     }
 
@@ -97,8 +97,7 @@ public class EntitySystemBuilder {
         library.registerTypeHandler(CollisionGroup.class, new CollisionGroupTypeHandler());
     }
 
-    private void registerComponents(ComponentLibrary library) {
-        ModManager modManager = CoreRegistry.get(ModManager.class);
+    private void registerComponents(ComponentLibrary library, ModManager modManager) {
         Reflections reflections = modManager.getActiveModReflections();
 
         Set<Class<? extends Component>> componentTypes = reflections.getSubTypesOf(Component.class);
@@ -107,8 +106,7 @@ public class EntitySystemBuilder {
         }
     }
 
-    private void registerEvents(EventSystem eventSystem) {
-        ModManager modManager = CoreRegistry.get(ModManager.class);
+    private void registerEvents(EventSystem eventSystem, ModManager modManager) {
         registerEvents(ModManager.ENGINE_PACKAGE, eventSystem, modManager.getEngineReflections());
         for (Mod mod : modManager.getActiveMods()) {
             registerEvents(mod.getModInfo().getId(), eventSystem, mod.getReflections());
