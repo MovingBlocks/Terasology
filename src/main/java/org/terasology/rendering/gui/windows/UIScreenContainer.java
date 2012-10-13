@@ -64,8 +64,8 @@ public class UIScreenContainer extends UIWindow {
             @Override
             public void changed(UIDisplayElement element, boolean visibility) {
                 if (!visibility) {
-                    GUIManager.getInstance().getWindowById("hud").getElementById("leftGearWheel").setVisible(true);
-                    GUIManager.getInstance().getWindowById("hud").getElementById("rightGearWheel").setVisible(true);
+                    getGUIManager().getWindowById("hud").getElementById("leftGearWheel").setVisible(true);
+                    getGUIManager().getWindowById("hud").getElementById("rightGearWheel").setVisible(true);
                 }
             }
         });
@@ -138,8 +138,8 @@ public class UIScreenContainer extends UIWindow {
         containerInventory.setConnected(creature);
         //TODO connect toolbar <-> inventory somehow to allow fast transfer.
 
-        GUIManager.getInstance().getWindowById("hud").getElementById("leftGearWheel").setVisible(false);
-        GUIManager.getInstance().getWindowById("hud").getElementById("rightGearWheel").setVisible(false);
+        getGUIManager().getWindowById("hud").getElementById("leftGearWheel").setVisible(false);
+        getGUIManager().getWindowById("hud").getElementById("rightGearWheel").setVisible(false);
         layout();
 
         playerInventory.setPosition(new Vector2f(Display.getWidth()/2 - playerInventory.getSize().x/2, Display.getHeight() + 5f));

@@ -177,7 +177,7 @@ public final class UIMenuConfigControls extends UIWindow {
         backToConfigMenuButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().openWindow("config");
+                getGUIManager().openWindow("config");
             }
         });
 

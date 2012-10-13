@@ -71,12 +71,14 @@ public class InputSystem implements EventHandlerSystem {
 
     private LocalPlayer localPlayer;
     private CameraTargetSystem cameraTargetSystem;
+    private GUIManager guiManager;
 
     public void initialise() {
         localPlayer = CoreRegistry.get(LocalPlayer.class);
         cameraTargetSystem = CoreRegistry.get(CameraTargetSystem.class);
+        guiManager = CoreRegistry.get(GUIManager.class);
 
-        CoreRegistry.get(EventSystem.class).registerEventHandler(GUIManager.getInstance());
+        CoreRegistry.get(EventSystem.class).registerEventHandler(guiManager);
     }
 
     @Override
@@ -173,7 +175,7 @@ public class InputSystem implements EventHandlerSystem {
 
                 BindableButtonImpl bind = mouseButtonBinds.get(button);
                 if (bind != null) {
-                    bind.updateBindState(buttonDown, delta, localPlayer.getEntity(), cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, GUIManager.getInstance().isConsumingInput());
+                    bind.updateBindState(buttonDown, delta, localPlayer.getEntity(), cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, guiManager.isConsumingInput());
                 }
             }
             //mouse wheel
@@ -183,8 +185,8 @@ public class InputSystem implements EventHandlerSystem {
 
                 BindableButtonImpl bind = (wheelMoved > 0) ? mouseWheelUpBind : mouseWheelDownBind;
                 if (bind != null) {
-                    bind.updateBindState(true, delta, localPlayer.getEntity(), cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, GUIManager.getInstance().isConsumingInput());
-                    bind.updateBindState(false, delta, localPlayer.getEntity(), cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, GUIManager.getInstance().isConsumingInput());
+                    bind.updateBindState(true, delta, localPlayer.getEntity(), cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, guiManager.isConsumingInput());
+                    bind.updateBindState(false, delta, localPlayer.getEntity(), cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, guiManager.isConsumingInput());
                 }
             }
         }
@@ -207,13 +209,13 @@ public class InputSystem implements EventHandlerSystem {
     }
 
     private void setupTarget(InputEvent event) {
-        if (cameraTargetSystem.isTargetAvailable() && !GUIManager.getInstance().isConsumingInput()) {
+        if (cameraTargetSystem.isTargetAvailable() && !guiManager.isConsumingInput()) {
             event.setTarget(cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal());
         }
     }
 
     private void processKeyboardInput(float delta) {
-        boolean guiConsumingInput = GUIManager.getInstance().isConsumingInput();
+        boolean guiConsumingInput = guiManager.isConsumingInput();
         while (Keyboard.next()) {
             int key = Keyboard.getEventKey();
 

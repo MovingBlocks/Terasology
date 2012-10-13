@@ -17,6 +17,7 @@ package org.terasology.potions;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.HealthComponent;
+import org.terasology.components.world.WorldComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
@@ -26,6 +27,7 @@ import org.terasology.events.HealthChangedEvent;
 import org.terasology.events.NoHealthEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.physics.character.CharacterMovementComponent;
+import org.terasology.rendering.gui.events.UIWindowOpenedEvent;
 
 /**
  * Status Affector System : Different Effect Handling [Affecting the player]
@@ -40,6 +42,17 @@ public class StatusAffectorSystem implements EventHandlerSystem, UpdateSubscribe
 
     @Override
     public void shutdown() {
+    }
+
+    @ReceiveEvent(components = WorldComponent.class)
+    public void onHudOpen(UIWindowOpenedEvent event, EntityRef entity) {
+        if (event.getWindow().getId().equals("hud")) {
+            UIBuff buff = new UIBuff();
+            buff.setVisible(true);
+            event.getWindow().addDisplayElement(buff);
+            event.getWindow().update();
+            event.getWindow().layout();
+        }
     }
 
     @ReceiveEvent(components = {HealthComponent.class})

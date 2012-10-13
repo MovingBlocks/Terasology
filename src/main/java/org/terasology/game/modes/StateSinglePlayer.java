@@ -122,6 +122,7 @@ public class StateSinglePlayer implements GameState {
     private LocalPlayerSystem localPlayerSys;
     private CameraTargetSystem cameraTargetSystem;
     private InputSystem inputSystem;
+    private GUIManager guiManager;
 
     /* GAME LOOP */
     private boolean pauseGame = false;
@@ -146,6 +147,9 @@ public class StateSinglePlayer implements GameState {
 
         entityManager = new EntitySystemBuilder().build();
         eventSystem = CoreRegistry.get(EventSystem.class);
+
+        guiManager = new GUIManager();
+        CoreRegistry.put(GUIManager.class, guiManager);
 
         componentSystemManager = new ComponentSystemManager();
         CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);
@@ -302,7 +306,7 @@ public class StateSinglePlayer implements GameState {
         for (ComponentSystem system : componentSystemManager.iterateAll()) {
             system.shutdown();
         }
-        GUIManager.getInstance().closeAllWindows();
+        guiManager.closeAllWindows();
         try {
             CoreRegistry.get(WorldPersister.class).save(new File(PathManager.getInstance().getWorldSavePath(CoreRegistry.get(WorldProvider.class).getTitle()), ENTITY_DATA_FILE), WorldPersister.SaveFormat.Binary);
         } catch (IOException e) {
@@ -370,16 +374,6 @@ public class StateSinglePlayer implements GameState {
         worldRenderer = new WorldRenderer(worldInfo, chunkGeneratorManager, entityManager, localPlayerSys);
         CoreRegistry.put(WorldRenderer.class, worldRenderer);
 
-        // Create the world entity
-        Iterator<EntityRef> worldEntityIterator = entityManager.iteratorEntities(WorldComponent.class).iterator();
-        if (worldEntityIterator.hasNext()) {
-            worldRenderer.getChunkProvider().setWorldEntity(worldEntityIterator.next());
-        } else {
-            EntityRef worldEntity = entityManager.create();
-            worldEntity.addComponent(new WorldComponent());
-            worldRenderer.getChunkProvider().setWorldEntity(worldEntity);
-        }
-
         CoreRegistry.put(WorldRenderer.class, worldRenderer);
         CoreRegistry.put(WorldProvider.class, worldRenderer.getWorldProvider());
         CoreRegistry.put(LocalPlayer.class, new LocalPlayer(EntityRef.NULL));
@@ -401,6 +395,16 @@ public class StateSinglePlayer implements GameState {
             }
         }
 
+        // Create the world entity
+        Iterator<EntityRef> worldEntityIterator = entityManager.iteratorEntities(WorldComponent.class).iterator();
+        if (worldEntityIterator.hasNext()) {
+            worldRenderer.getChunkProvider().setWorldEntity(worldEntityIterator.next());
+        } else {
+            EntityRef worldEntity = entityManager.create();
+            worldEntity.addComponent(new WorldComponent());
+            worldRenderer.getChunkProvider().setWorldEntity(worldEntity);
+        }
+
         prepareWorld();
     }
 
@@ -410,7 +414,7 @@ public class StateSinglePlayer implements GameState {
 
     // TODO: Should have its own state
     private void prepareWorld() {
-        UIScreenLoading loadingScreen = (UIScreenLoading) GUIManager.getInstance().openWindow("loading");
+        UIScreenLoading loadingScreen = (UIScreenLoading)guiManager.openWindow("loading");
         Display.update();
 
         Timer timer = CoreRegistry.get(Timer.class);
@@ -462,9 +466,9 @@ public class StateSinglePlayer implements GameState {
             playerEntity.send(new RespawnEvent());
         }
 
-        GUIManager.getInstance().closeWindow(loadingScreen);
+        guiManager.closeWindow(loadingScreen);
         //GUIManager.getInstance().loadWindow("itemList");            //we preload the item list, because it takes some time to create all block entities
-        GUIManager.getInstance().openWindow(MenuControlSystem.HUD);
+        guiManager.openWindow(MenuControlSystem.HUD);
 
         // Create the first Portal if it doesn't exist yet
         worldRenderer.initPortal();
@@ -486,11 +490,11 @@ public class StateSinglePlayer implements GameState {
     }
 
     public void renderUserInterface() {
-        GUIManager.getInstance().render();
+        guiManager.render();
     }
 
     private void updateUserInterface() {
-        GUIManager.getInstance().update();
+        guiManager.update();
     }
 
     public WorldRenderer getWorldRenderer() {

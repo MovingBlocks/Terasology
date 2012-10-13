@@ -102,7 +102,7 @@ public class DebugControlSystem implements EventHandlerSystem {
                     entity.send(new DamageEvent(9999, null));
                     break;
                 case Keyboard.KEY_H:
-                	for (UIDisplayElement element : GUIManager.getInstance().getWindowById("hud").getDisplayElements()) {
+                	for (UIDisplayElement element : CoreRegistry.get(GUIManager.class).getWindowById("hud").getDisplayElements()) {
                         element.setVisible(!element.isVisible());
                     }
                 	
@@ -121,12 +121,12 @@ public class DebugControlSystem implements EventHandlerSystem {
                 event.consume();
                 break;
             case Keyboard.KEY_F4:
-                metrics = (UIScreenMetrics) GUIManager.getInstance().openWindow("metrics");
+                metrics = (UIScreenMetrics) CoreRegistry.get(GUIManager.class).openWindow("metrics");
                 metrics.toggleMode();
                 event.consume();
                 break;
             case Keyboard.KEY_F5:
-                GUIManager.getInstance().openWindow("itemList");
+                CoreRegistry.get(GUIManager.class).openWindow("itemList");
                 event.consume();
                 break;
         }

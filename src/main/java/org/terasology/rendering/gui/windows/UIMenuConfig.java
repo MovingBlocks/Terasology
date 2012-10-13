@@ -70,7 +70,7 @@ public class UIMenuConfig extends UIWindow {
         videoButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().openWindow("config:video");
+                getGUIManager().openWindow("config:video");
             }
         });
 
@@ -82,7 +82,7 @@ public class UIMenuConfig extends UIWindow {
         audioButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().openWindow("config:audio");
+                getGUIManager().openWindow("config:audio");
             }
         });
 
@@ -94,7 +94,7 @@ public class UIMenuConfig extends UIWindow {
         controlsButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().openWindow("config:controls");
+                getGUIManager().openWindow("config:controls");
             }
         });
 
@@ -106,7 +106,7 @@ public class UIMenuConfig extends UIWindow {
         modsButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().openWindow("config:mods");
+                getGUIManager().openWindow("config:mods");
             }
         });
 
@@ -119,7 +119,7 @@ public class UIMenuConfig extends UIWindow {
             @Override
             public void click(UIDisplayElement element, int button) {
                 CoreRegistry.get(Config.class).save();
-                GUIManager.getInstance().openWindow("main");
+                getGUIManager().openWindow("main");
             }
         });
 

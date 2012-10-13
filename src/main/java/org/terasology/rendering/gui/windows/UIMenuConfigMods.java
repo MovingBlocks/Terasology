@@ -16,6 +16,7 @@
 package org.terasology.rendering.gui.windows;
 
 import org.terasology.asset.AssetManager;
+import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
@@ -67,7 +68,7 @@ public class UIMenuConfigMods extends UIWindow {
         _backToConfigMenuButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().openWindow("config");
+                getGUIManager().openWindow("config");
             }
         });
         _backToConfigMenuButton.setHorizontalAlign(EHorizontalAlign.CENTER);

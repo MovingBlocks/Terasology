@@ -801,15 +801,15 @@ public class UIItemCell extends UIDisplayContainer  {
         
         //enable/disable transfer item
         if (getFromTransferSlot().exists()) {
-            GUIManager.getInstance().getFocusedWindow().removeDisplayElement(transferIcon);
-            GUIManager.getInstance().getFocusedWindow().addDisplayElement(transferIcon);
-            GUIManager.getInstance().getFocusedWindow().removeVisibilityListener(visibilityListener);
-            GUIManager.getInstance().getFocusedWindow().addVisibilityListener(visibilityListener);
+            getGUIManager().getFocusedWindow().removeDisplayElement(transferIcon);
+            getGUIManager().getFocusedWindow().addDisplayElement(transferIcon);
+            getGUIManager().getFocusedWindow().removeVisibilityListener(visibilityListener);
+            getGUIManager().getFocusedWindow().addVisibilityListener(visibilityListener);
             transferIcon.setItemEntity(getFromTransferSlot());
             transferIcon.setVisible(true);
         }
         else {
-            GUIManager.getInstance().getFocusedWindow().removeDisplayElement(transferIcon);
+            getGUIManager().getFocusedWindow().removeDisplayElement(transferIcon);
             transferIcon.setItemEntity(EntityRef.NULL);
             transferIcon.setVisible(false);
         }

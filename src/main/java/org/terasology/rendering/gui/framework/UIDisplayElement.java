@@ -27,8 +27,10 @@ import javax.vecmath.Vector2f;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+import org.terasology.game.CoreRegistry;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.BindButtonEvent;
+import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.gui.animation.Animation;
 import org.terasology.rendering.gui.framework.events.AnimationListener;
@@ -1174,6 +1176,10 @@ public abstract class UIDisplayElement {
         if (animationClass != null) {
             animationClass.removeAnimationListener(listener);
         }
+    }
+
+    public static final GUIManager getGUIManager() {
+        return CoreRegistry.get(GUIManager.class);
     }
     
 }

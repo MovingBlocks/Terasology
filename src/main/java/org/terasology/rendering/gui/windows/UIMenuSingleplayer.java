@@ -86,7 +86,7 @@ public class UIMenuSingleplayer extends UIWindow {
         goToBack.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().openWindow("main");
+                getGUIManager().openWindow("main");
             }
         });
         goToBack.setHorizontalAlign(EHorizontalAlign.CENTER);
@@ -111,7 +111,7 @@ public class UIMenuSingleplayer extends UIWindow {
             @Override
             public void click(UIDisplayElement element, int button) {
                 if (list.getSelection() == null) {
-                    GUIManager.getInstance().showMessage("Error", "Please choose a world first.");
+                    getGUIManager().showMessage("Error", "Please choose a world first.");
                     return;
                 }
 
@@ -121,7 +121,7 @@ public class UIMenuSingleplayer extends UIWindow {
                     WorldUtil.deleteWorld(world);
                     list.removeItem(list.getSelectionIndex());
                 } catch (Exception e) {
-                    GUIManager.getInstance().showMessage("Error", "Failed deleting world data object. Sorry.");
+                    getGUIManager().showMessage("Error", "Failed deleting world data object. Sorry.");
                 }
             }
         });
@@ -154,12 +154,12 @@ public class UIMenuSingleplayer extends UIWindow {
     private void loadSelectedWorld() {
 
         if (list.getItemCount() < 1) {
-            GUIManager.getInstance().showMessage("Error", "You did not create a world yet!");
+            getGUIManager().showMessage("Error", "You did not create a world yet!");
             return;
         }
 
         if (list.getSelection() == null) {
-            GUIManager.getInstance().showMessage("Error", "Please choose a world!");
+            getGUIManager().showMessage("Error", "Please choose a world!");
             return;
         }
 
@@ -177,7 +177,7 @@ public class UIMenuSingleplayer extends UIWindow {
             Config.getInstance().setChunkGenerator(info.getChunkGenerators());
             CoreRegistry.get(GameEngine.class).changeState(new StateSinglePlayer(info));
         } catch (Exception e) {
-            GUIManager.getInstance().showMessage("Error", "Failed reading world data object. Sorry.");
+            getGUIManager().showMessage("Error", "Failed reading world data object. Sorry.");
         }
     }
 

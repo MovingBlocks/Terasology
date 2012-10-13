@@ -64,10 +64,6 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
     private final UILabel debugLine4;
 
     private final UIItemContainer toolbar;
-    //private final UIMinionbar minionbar;
-    //private final UIMessageQueue messagequeue;
-    //private final UIHealthBar healthBar;
-    //private final UIBuff buffBar;
 
     private final UIImage leftGearWheel;
     private final UIImage rightGearWheel;
@@ -131,16 +127,6 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
         toolbar.setCellMargin(new Vector2f(0f, 0f));
         toolbar.setBorderImage("engine:inventory", new Vector2f(0f, 84f), new Vector2f(169f, 83f), new Vector4f(4f, 4f, 4f, 4f));
 
-        //minionbar = new UIMinionbar();
-        //minionbar.setVisible(true);
-
-       // messagequeue = new UIMessageQueue();
-        //messagequeue.setVisible(true);
-
-        //buffBar = new UIBuff();
-        //buffBar.setVisible(true);
-
-
         addDisplayElement(crosshair);
 
         leftGearWheel = new UIImage(AssetManager.loadTexture("engine:inventory"));
@@ -180,9 +166,6 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
         addDisplayElement(debugLine4);
 
         addDisplayElement(toolbar);
-        ///addDisplayElement(minionbar);
-        //addDisplayElement(messagequeue);
-        //addDisplayElement(buffBar);
 
         CoreRegistry.get(EventSystem.class).registerEventHandler(this);
 
@@ -222,7 +205,7 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
             else
                 _hearts[i].setVisible(false);
 
-            // TODO: Need to reimplement this in some way, maybe
+            // TODO: Need to reimplement this in some way, maybe expose a method to change the health icon
             //Show Poisoned Status with Green Hearts:
             /*PoisonedComponent poisoned = CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(PoisonedComponent.class);
             entityManager = CoreRegistry.get(EntityManager.class);
@@ -254,11 +237,6 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
     public void shutdown() {
 
     }
-
-    //@ReceiveEvent(components = {MinionComponent.class})
-    //public void onMessageReceived(MinionMessageEvent event, EntityRef entityref) {
-    //    messagequeue.addIconToQueue(event.getMinionMessage());
-    //}
 
     @ReceiveEvent(components = LocalPlayerComponent.class)
     public void onSelectedItemChanged(ChangedComponentEvent event, EntityRef entity) {

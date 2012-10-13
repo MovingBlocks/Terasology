@@ -18,6 +18,10 @@ package org.terasology.miniion.componentsystem.controllers;
 import javax.vecmath.Vector3f;
 
 import org.terasology.components.LocalPlayerComponent;
+import org.terasology.components.world.WorldComponent;
+import org.terasology.miniion.components.UIMessageQueue;
+import org.terasology.miniion.components.UIMinionbar;
+import org.terasology.rendering.gui.events.UIWindowOpenedEvent;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -62,15 +66,39 @@ public class MinionSystem implements EventHandlerSystem {
     private static final int POPUP_ENTRIES = 9;
     private static final String BEHAVIOUR_MENU = "minionBehaviour";
 
+    private GUIManager guiManager;
     private UIMinionBehaviourMenu minionMenu;
     private MiniionFactory minionFactory;
+    private UIMessageQueue messageQueue;
 
     @Override
     public void initialise() {
+        guiManager = CoreRegistry.get(GUIManager.class);
         minionFactory = new MiniionFactory();
         minionFactory.setEntityManager(CoreRegistry.get(EntityManager.class));
         minionFactory.setRandom(new FastRandom());
-        GUIManager.getInstance().registerWindow("minionBehaviour", UIMinionBehaviourMenu.class);
+        guiManager.registerWindow("minionBehaviour", UIMinionBehaviourMenu.class);
+    }
+
+    @ReceiveEvent(components = {WorldComponent.class})
+    public void onWindowOpened(UIWindowOpenedEvent event, EntityRef entity) {
+        if (event.getWindow().getId().equals("hud")) {
+            UIMinionbar bar = new UIMinionbar();
+            bar.setVisible(true);
+            event.getWindow().addDisplayElement(bar);
+            messageQueue = new UIMessageQueue();
+            messageQueue.setVisible(true);
+            event.getWindow().addDisplayElement(messageQueue);
+            event.getWindow().update();
+            event.getWindow().layout();
+        }
+    }
+
+    @ReceiveEvent(components = {MinionComponent.class})
+    public void onMessageReceived(MinionMessageEvent event, EntityRef entityref) {
+        if (messageQueue != null) {
+            messageQueue.addIconToQueue(event.getMinionMessage());
+        }
     }
 
     @Override
@@ -82,7 +110,7 @@ public class MinionSystem implements EventHandlerSystem {
         MinionControllerComponent minionController = entity.getComponent(MinionControllerComponent.class);
         minionController.minionMode = !minionController.minionMode;
         if (!minionController.minionMode) {
-            GUIManager.getInstance().closeWindow(BEHAVIOUR_MENU);
+            guiManager.closeWindow(BEHAVIOUR_MENU);
         }
         entity.saveComponent(minionController);
         event.consume();
@@ -139,7 +167,7 @@ public class MinionSystem implements EventHandlerSystem {
         if (minionController.minionMode) {
             switch (event.getState()) {
                 case DOWN:
-                    minionMenu = (UIMinionBehaviourMenu) GUIManager.getInstance().openWindow(BEHAVIOUR_MENU);
+                    minionMenu = (UIMinionBehaviourMenu) guiManager.openWindow(BEHAVIOUR_MENU);
                     break;
                 case UP:
                     minionMenu.setVisible(false);

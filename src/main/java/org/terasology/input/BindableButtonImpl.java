@@ -179,7 +179,7 @@ public class BindableButtonImpl implements BindableButton {
         long time = timer.getTimeInMs();
         if (repeating && getState() == ButtonState.DOWN && mode.isActivatedOnPress() && time - lastActivateTime > repeatTime) {
             lastActivateTime = time;
-            if (!GUIManager.getInstance().isConsumingInput()) {
+            if (!CoreRegistry.get(GUIManager.class).isConsumingInput()) {
                 boolean consumed = triggerOnRepeat(delta, target);
                 if (!consumed) {
                     buttonEvent.prepare(id, ButtonState.REPEAT, delta);

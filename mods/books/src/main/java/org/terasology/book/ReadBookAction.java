@@ -20,6 +20,7 @@ import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.ActivateEvent;
+import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.GUIManager;
 
 
@@ -32,7 +33,7 @@ import org.terasology.logic.manager.GUIManager;
 public class ReadBookAction implements EventHandlerSystem {
 
     public void initialise() {
-        GUIManager.getInstance().registerWindow("book", UIScreenBook.class);
+        CoreRegistry.get(GUIManager.class).registerWindow("book", UIScreenBook.class);
     }
 
     @Override
@@ -44,6 +45,6 @@ public class ReadBookAction implements EventHandlerSystem {
 
     @ReceiveEvent(components = {BookComponent.class})
     public void onActivate(ActivateEvent event, EntityRef entity) {
-        GUIManager.getInstance().openWindow("book");
+        CoreRegistry.get(GUIManager.class).openWindow("book");
     }
 }

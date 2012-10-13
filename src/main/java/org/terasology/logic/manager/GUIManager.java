@@ -23,10 +23,14 @@ import com.google.common.collect.Maps;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.terasology.components.LocalPlayerComponent;
+import org.terasology.components.world.WorldComponent;
+import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.EventPriority;
+import org.terasology.entitySystem.EventSystem;
 import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.game.CoreRegistry;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
@@ -34,6 +38,7 @@ import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.ButtonState;
+import org.terasology.rendering.gui.events.UIWindowOpenedEvent;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.widgets.UIMessageBox;
@@ -68,11 +73,10 @@ import javax.vecmath.Vector2f;
 public class GUIManager implements EventHandlerSystem {
     
     private Logger logger = Logger.getLogger(getClass().getName());
-    private static GUIManager instance;
     private UIDisplayRenderer renderer;
     private Map<String, Class<? extends UIWindow>> registeredWindows = Maps.newHashMap();
 
-    private GUIManager() {
+    public GUIManager() {
         renderer = new UIDisplayRenderer();
         renderer.setVisible(true);
 
@@ -99,14 +103,6 @@ public class GUIManager implements EventHandlerSystem {
         registeredWindows.put("chat", UIScreenChat.class);
         registeredWindows.put("hud", UIScreenHUD.class);
         registeredWindows.put("itemList", UIScreenItems.class);
-    }
-
-    public static GUIManager getInstance() {
-        if (instance == null) {
-            instance = new GUIManager();
-            
-        }
-        return instance;
     }
 
     /**
@@ -139,6 +135,9 @@ public class GUIManager implements EventHandlerSystem {
             
             renderer.addDisplayElementToPosition(0, window);
             window.initialise();
+            for (EntityRef worldEntity : CoreRegistry.get(EntityManager.class).iteratorEntities(WorldComponent.class)) {
+                worldEntity.send(new UIWindowOpenedEvent(window));
+            }
         }
 
         return window;
