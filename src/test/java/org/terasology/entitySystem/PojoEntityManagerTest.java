@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.ChangedComponentEvent;
@@ -27,6 +28,7 @@ import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.game.bootstrap.EntitySystemBuilder;
 
 import com.google.common.collect.Lists;
+import org.terasology.logic.mod.ModManager;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -34,12 +36,19 @@ import com.google.common.collect.Lists;
 public class PojoEntityManagerTest {
 
     PersistableEntityManager entityManager;
-    
+
+    private static ModManager modManager;
+
+    @BeforeClass
+    public static void setupClass() {
+        modManager = new ModManager();
+    }
+
     @Before
     public void setup() {
         EntitySystemBuilder builder = new EntitySystemBuilder();
 
-        entityManager = builder.build();
+        entityManager = builder.build(modManager);
     }
     
     @Test

@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.vecmath.Vector3f;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityInfoComponent;
@@ -30,6 +31,7 @@ import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.MappedTypeComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.game.bootstrap.EntitySystemBuilder;
+import org.terasology.logic.mod.ModManager;
 import org.terasology.protobuf.EntityData;
 
 import com.google.common.collect.Lists;
@@ -40,16 +42,22 @@ import com.google.common.collect.Maps;
  */
 public class EntitySerializationTest {
 
-	ComponentLibrary componentLibrary;
-    PersistableEntityManager entityManager;
-    EntityPersisterHelper entityPersisterHelper;
-    PrefabManager prefabManager;
+	private ComponentLibrary componentLibrary;
+    private PersistableEntityManager entityManager;
+    private EntityPersisterHelper entityPersisterHelper;
+    private PrefabManager prefabManager;
+    private static ModManager modManager;
+
+    @BeforeClass
+    public static void setupClass() {
+        modManager = new ModManager();
+    }
 
     @Before
     public void setup() {
 
         EntitySystemBuilder builder = new EntitySystemBuilder();
-        entityManager = builder.build();
+        entityManager = builder.build(modManager);
         entityManager.getComponentLibrary().registerComponentClass(GetterSetterComponent.class);
         entityManager.getComponentLibrary().registerComponentClass(StringComponent.class);
         entityManager.getComponentLibrary().registerComponentClass(IntegerComponent.class);
