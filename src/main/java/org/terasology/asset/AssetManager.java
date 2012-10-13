@@ -18,6 +18,7 @@ package org.terasology.asset;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.terasology.entitySystem.common.NullIterator;
+import org.terasology.logic.mod.ModManager;
 import org.terasology.rendering.assets.Shader;
 import org.terasology.rendering.assets.Texture;
 
@@ -137,7 +138,7 @@ public class AssetManager {
         while (iterator.hasNext()) {
             Asset asset = iterator.next();
             // Don't dispose engine assets, all sorts of systems have references to them
-            if (!asset.getURI().getPackage().equals("engine")) {
+            if (!asset.getURI().getPackage().equals(ModManager.ENGINE_PACKAGE)) {
                 asset.dispose();
                 iterator.remove();
             }

@@ -24,6 +24,9 @@ import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 
 import org.reflections.Reflections;
+import org.reflections.scanners.Scanner;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ConfigurationBuilder;
 import org.terasology.asset.AssetType;
 import org.terasology.audio.Sound;
 import org.terasology.entitySystem.Component;
@@ -46,6 +49,8 @@ import org.terasology.entitySystem.pojo.PojoEntityManager;
 import org.terasology.entitySystem.pojo.PojoEventSystem;
 import org.terasology.entitySystem.pojo.PojoPrefabManager;
 import org.terasology.game.CoreRegistry;
+import org.terasology.logic.mod.Mod;
+import org.terasology.logic.mod.ModManager;
 import org.terasology.math.Vector3i;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.rendering.assets.Material;
@@ -93,7 +98,9 @@ public class EntitySystemBuilder {
     }
 
     private void registerComponents(ComponentLibrary library) {
-        Reflections reflections = new Reflections("org.terasology");
+        ModManager modManager = CoreRegistry.get(ModManager.class);
+        Reflections reflections = modManager.getActiveModReflections();
+
         Set<Class<? extends Component>> componentTypes = reflections.getSubTypesOf(Component.class);
         for (Class<? extends Component> componentType : componentTypes) {
             library.registerComponentClass(componentType);
@@ -101,10 +108,17 @@ public class EntitySystemBuilder {
     }
 
     private void registerEvents(EventSystem eventSystem) {
-        Reflections reflections = new Reflections("org.terasology");
+        ModManager modManager = CoreRegistry.get(ModManager.class);
+        registerEvents(ModManager.ENGINE_PACKAGE, eventSystem, modManager.getEngineReflections());
+        for (Mod mod : modManager.getActiveMods()) {
+            registerEvents(mod.getModInfo().getId(), eventSystem, mod.getReflections());
+        }
+    }
+
+    private void registerEvents(String packageName, EventSystem eventSystem, Reflections reflections) {
         Set<Class<? extends Event>> eventTypes = reflections.getSubTypesOf(Event.class);
         for (Class<? extends Event> eventType : eventTypes) {
-            eventSystem.registerEvent("engine:" + eventType.getSimpleName(), eventType);
+            eventSystem.registerEvent(packageName + ":" + eventType.getSimpleName(), eventType);
         }
     }
 }

@@ -17,7 +17,14 @@
 package org.terasology.logic.mod;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.util.ConfigurationBuilder;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetSource;
 
@@ -29,6 +36,9 @@ public class Mod {
     private File modRoot;
     private AssetSource modSource;
     private boolean enabled;
+    private ClassLoader inactiveClassLoader;
+    private ClassLoader activeClassLoader;
+    private Reflections reflections;
 
     public Mod(File modRoot, ModInfo info, AssetSource modSource) {
         this.modInfo = info;
@@ -53,6 +63,44 @@ public class Mod {
 
     public File getModRoot() {
         return modRoot;
+    }
+
+    public URL getModClasspathUrl() {
+        try {
+            if (modRoot.isDirectory()) {
+                return new File(modRoot, "classes").toURI().toURL();
+            } else {
+                return modRoot.toURI().toURL();
+            }
+        } catch (MalformedURLException e) {
+            return null;
+        }
+    }
+
+    public Reflections getReflections() {
+        if (reflections == null) {
+            ConfigurationBuilder configurationBuilder = new ConfigurationBuilder().addUrls(getModClasspathUrl()).setScanners(new TypeAnnotationsScanner(), new SubTypesScanner());
+            if (activeClassLoader != null) {
+                configurationBuilder.addClassLoader(activeClassLoader);
+            } else {
+                configurationBuilder.addClassLoader(inactiveClassLoader);
+            }
+            reflections = new Reflections(configurationBuilder);
+        }
+        return reflections;
+    }
+
+    public ClassLoader getActiveClassLoader() {
+        return activeClassLoader;
+    }
+
+    void setActiveClassLoader(ClassLoader activeClassLoader) {
+        this.activeClassLoader = activeClassLoader;
+        reflections = null;
+    }
+
+    void setInactiveClassLoader(ClassLoader inactiveClassLoader) {
+        this.inactiveClassLoader = inactiveClassLoader;
     }
 
     public ModInfo getModInfo() {

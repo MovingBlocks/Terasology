@@ -27,6 +27,7 @@ import com.google.common.collect.Lists;
  */
 public class RigidBodyComponent implements Component {
     public float mass = 10.0f;
+    public boolean kinematic = false;
 
     public CollisionGroup collisionGroup = StandardCollisionGroup.DEFAULT;
     public List<CollisionGroup> collidesWith = Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD, StandardCollisionGroup.KINEMATIC);

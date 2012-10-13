@@ -102,7 +102,7 @@ public class UIMenuConfigAudio extends UIWindow {
         _backToConfigMenuButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().openWindow("config");
+                getGUIManager().openWindow("config");
             }
         });
         _backToConfigMenuButton.setHorizontalAlign(EHorizontalAlign.CENTER);

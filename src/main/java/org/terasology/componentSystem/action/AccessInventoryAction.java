@@ -24,6 +24,7 @@ import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.events.OpenInventoryEvent;
+import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.windows.UIScreenContainer;
 
@@ -49,7 +50,7 @@ public class AccessInventoryAction implements EventHandlerSystem {
     @ReceiveEvent(components = {LocalPlayerComponent.class, InventoryComponent.class})
     public void onOpenContainer(OpenInventoryEvent event, EntityRef entity) {
         if (event.getContainer().hasComponent(InventoryComponent.class)) {
-            UIScreenContainer containerScreen = (UIScreenContainer)GUIManager.getInstance().openWindow("container");
+            UIScreenContainer containerScreen = (UIScreenContainer) CoreRegistry.get(GUIManager.class).openWindow("container");
             containerScreen.openContainer(event.getContainer(), entity);
         }
     }

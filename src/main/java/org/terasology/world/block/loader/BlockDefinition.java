@@ -50,6 +50,8 @@ public class BlockDefinition {
 
     public byte luminance = 0;
 
+    public List<String> categories = Lists.newArrayList();
+
     public String tile = "";
     public Tiles tiles;
 

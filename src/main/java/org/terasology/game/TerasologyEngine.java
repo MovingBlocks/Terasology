@@ -16,13 +16,30 @@
 
 package org.terasology.game;
 
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_LEQUAL;
-import static org.lwjgl.opengl.GL11.GL_NORMALIZE;
-import static org.lwjgl.opengl.GL11.glDepthFunc;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glViewport;
+import com.google.common.collect.Lists;
+import org.lwjgl.LWJGLException;
+import org.lwjgl.LWJGLUtil;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GLContext;
+import org.terasology.asset.AssetManager;
+import org.terasology.asset.AssetType;
+import org.terasology.asset.sources.ClasspathSource;
+import org.terasology.config.InputConfig;
+import org.terasology.game.modes.GameState;
+import org.terasology.logic.manager.AudioManager;
+import org.terasology.logic.manager.Config;
+import org.terasology.logic.manager.FontManager;
+import org.terasology.logic.manager.GUIManager;
+import org.terasology.logic.manager.PathManager;
+import org.terasology.logic.manager.ShaderManager;
+import org.terasology.logic.manager.VertexBufferObjectManager;
+import org.terasology.logic.mod.ModManager;
+import org.terasology.logic.mod.ModSecurityManager;
+import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.physics.CollisionGroupManager;
+import org.terasology.version.TerasologyVersion;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,29 +59,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-import org.lwjgl.LWJGLException;
-import org.lwjgl.LWJGLUtil;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GLContext;
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.sources.ClasspathSource;
-import org.terasology.game.modes.GameState;
-import org.terasology.logic.manager.AudioManager;
-import org.terasology.logic.manager.Config;
-import org.terasology.logic.manager.FontManager;
-import org.terasology.logic.console.GroovyManager;
-import org.terasology.logic.manager.InputConfig;
-import org.terasology.logic.manager.PathManager;
-import org.terasology.logic.manager.ShaderManager;
-import org.terasology.logic.manager.VertexBufferObjectManager;
-import org.terasology.performanceMonitor.PerformanceMonitor;
-import org.terasology.physics.CollisionGroupManager;
-import org.terasology.version.TerasologyVersion;
-
-import com.google.common.collect.Lists;
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_LEQUAL;
+import static org.lwjgl.opengl.GL11.GL_NORMALIZE;
+import static org.lwjgl.opengl.GL11.glDepthFunc;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glViewport;
 
 /**
  * @author Immortius
@@ -94,14 +95,49 @@ public class TerasologyEngine implements GameEngine {
         logger.log(Level.INFO, "Initializing Terasology...");
         logger.log(Level.INFO, TerasologyVersion.getInstance().toString());
 
+        initConfig();
+
         initNativeLibs();
         initDisplay();
         initOpenGL();
         initOpenAL();
         initControls();
         initManagers();
-        initTimer(); // Dependant on LWJGL
+        updateInputConfig();
+        initTimer(); // Dependent on LWJGL
+        initSecurity();
         initialised = true;
+    }
+
+    private void initSecurity() {
+        // TODO: More work on security
+        ModSecurityManager modSecurityManager = new ModSecurityManager();
+        //System.setSecurityManager(modSecurityManager);
+        modSecurityManager.addModAvailableClass(GUIManager.class);
+        // TODO: Add in mod available classes
+
+    }
+
+    private void initConfig() {
+        if (org.terasology.config.Config.getConfigFile().exists()) {
+            org.terasology.config.Config config;
+            try {
+                config = org.terasology.config.Config.load(org.terasology.config.Config.getConfigFile());
+
+            } catch (IOException e) {
+                logger.log(Level.SEVERE, "Failed to load config", e);
+                config = new org.terasology.config.Config();
+            }
+            CoreRegistry.put(org.terasology.config.Config.class, config);
+        } else {
+            CoreRegistry.put(org.terasology.config.Config.class, new org.terasology.config.Config());
+        }
+    }
+
+    private void updateInputConfig() {
+        org.terasology.config.Config config = CoreRegistry.get(org.terasology.config.Config.class);
+        InputConfig.updateForChangedMods(config.getInputConfig());
+        config.save();
     }
 
     private void initLogger() {
@@ -272,7 +308,7 @@ public class TerasologyEngine implements GameEngine {
 
             List<String> paths = new ArrayList<String>(Arrays.asList((String[]) usrPathsField.get(null)));
 
-            if (paths.contains(libPath)) {
+            if (paths.contains(libPath.getAbsolutePath())) {
                 return;
             }
 
@@ -353,10 +389,10 @@ public class TerasologyEngine implements GameEngine {
 
     private void initManagers() {
         CoreRegistry.put(CollisionGroupManager.class, new CollisionGroupManager());
-        CoreRegistry.put(GroovyManager.class, new GroovyManager());
+        CoreRegistry.put(ModManager.class, new ModManager());
 
         AssetType.registerAssetTypes();
-        AssetManager.getInstance().addAssetSource(new ClasspathSource("engine", getClass().getProtectionDomain().getCodeSource(), "org/terasology/data"));
+        AssetManager.getInstance().addAssetSource(new ClasspathSource(ModManager.ENGINE_PACKAGE, getClass().getProtectionDomain().getCodeSource(), ModManager.ASSETS_SUBDIRECTORY));
 
         ShaderManager.getInstance();
         VertexBufferObjectManager.getInstance();
@@ -371,7 +407,6 @@ public class TerasologyEngine implements GameEngine {
     private void cleanup() {
         logger.log(Level.INFO, "Shutting down Terasology...");
         Config.getInstance().saveConfig(new File(PathManager.getInstance().getWorldPath(), "last.cfg"));
-        InputConfig.getInstance().saveConfig(new File(PathManager.getInstance().getWorldPath(), "lastinput.cfg"));
         doPurgeStates();
         terminateThreads();
     }
@@ -388,7 +423,7 @@ public class TerasologyEngine implements GameEngine {
     private void mainLoop() {
         PerformanceMonitor.startActivity("Other");
         // MAIN GAME LOOP
-        GameState state = null;
+        GameState state;
         while (running && !Display.isCloseRequested()) {
 
             // Only process rendering and updating once a second

@@ -17,6 +17,9 @@
 /.gradle
 /bin
 /data/console/consolelog.json
+/mods/*/classes
+/mods/*/build
+/mods/*/.*
 *~
 
 # Ignore error logs 

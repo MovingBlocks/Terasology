@@ -49,7 +49,7 @@ public class FontManager {
 
     private void initFonts() {
         try {
-            _fonts.put("default", new AngelCodeFont("Font", ResourceLoader.getResource("org/terasology/data/fonts/default.fnt").openStream(), ResourceLoader.getResource("org/terasology/data/fonts/default_0.png").openStream()));
+            _fonts.put("default", new AngelCodeFont("Font", ResourceLoader.getResource("assets/fonts/default.fnt").openStream(), ResourceLoader.getResource("assets/fonts/default_0.png").openStream()));
         } catch (SlickException e) {
             logger.log(Level.SEVERE, "Couldn't load fonts. Sorry. " + e.toString(), e);
         } catch (IOException e) {

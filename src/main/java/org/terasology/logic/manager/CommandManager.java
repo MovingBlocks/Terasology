@@ -16,256 +16,192 @@
 
 package org.terasology.logic.manager;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import com.google.common.collect.Table;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
+import org.reflections.Reflections;
+import org.reflections.scanners.MethodAnnotationsScanner;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+import org.reflections.util.FilterBuilder;
+import org.terasology.game.CoreRegistry;
+import org.terasology.logic.commands.Command;
+import org.terasology.logic.commands.CommandParam;
+import org.terasology.logic.commands.CommandProvider;
+import org.terasology.logic.mod.Mod;
+import org.terasology.logic.mod.ModManager;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.terasology.logic.commands.CommandController;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.annotations.SerializedName;
+import static org.reflections.ReflectionUtils.withAnnotation;
+import static org.reflections.ReflectionUtils.withModifier;
 
 /**
  * The command manager handles the loading of commands which can be executed through the in-game chat.
+ *
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
- * 
  */
 public class CommandManager {
-    
-    private static CommandManager instance;
-    private final Map<String, CommandController> controllers = new HashMap<String, CommandController>();
-    private final List<Command> commands = new ArrayList<Command>();
     private final Logger logger = Logger.getLogger(getClass().getName());
-    private final String bindName = "command";
-    
+
+    private final List<CommandInfo> commands = new ArrayList<CommandInfo>();
+    private final Table<String, Integer, CommandInfo> commandLookup = HashBasedTable.create();
+
+    private final static String bindName = "command";
+
     /**
      * Defines a command which can be executed through the in-game chat.
-     * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
      *
+     * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
      */
-    public class Command {
-        @SerializedName("controller")
-        private String controller;
-        
-        private CommandController controllerInstance;
-        
-        @SerializedName("premission")
-        private int premission = -1;
-        
-        @SerializedName("name")
+    public class CommandInfo {
+        private CommandProvider provider;
+
         private String name;
-        
-        @SerializedName("parameter")
-        private String[] parameter;
-        
-        @SerializedName("shortDescription")
+        private String[] parameterNames;
         private String shortDescription;
-        
-        @SerializedName("longDescription")
-        private String longDescription;
-        
-        @SerializedName("examples")
-        private String[] examples;
-        
-        public String getController() {
-            return controller;
+        private String helpText;
+
+        public CommandInfo(Method method, CommandProvider provider) {
+            this.provider = provider;
+            this.name = method.getName();
+            this.parameterNames = new String[method.getParameterTypes().length];
+            for (int i = 0; i < method.getParameterTypes().length; ++i) {
+                parameterNames[i] = method.getParameterTypes()[i].toString();
+                for (Annotation paramAnnot : method.getParameterAnnotations()[i]) {
+                    if (paramAnnot instanceof CommandParam) {
+                        parameterNames[i] = ((CommandParam)paramAnnot).name();
+                        break;
+                    }
+                }
+            }
+            Command commandAnnotation = method.getAnnotation(Command.class);
+            this.shortDescription = commandAnnotation.shortDescription();
+            this.helpText = commandAnnotation.helpText();
         }
-        
-        public int getPremission() {
-            return premission;
-        }
-        
+
         public String getName() {
             return name;
         }
-        
-        public String[] getParameter() {
-            return parameter;
+
+        public String[] getParameterNames() {
+            return parameterNames;
+        }
+
+        public int getParameterCount() {
+            return parameterNames.length;
         }
 
         public String getShortDescription() {
             return shortDescription;
         }
-        
-        public String getLongDescription() {
-            return longDescription;
+
+        public String getHelpText() {
+            return helpText;
         }
-        
-        public String[] getExamples() {
-            return examples;
-        }
-        
-        public String getUseMessage() {
-            String use = name;
-            
-            for (String param : parameter) {
-                use += " <" + param + ">";
+
+        public String getUsageMessage() {
+            StringBuilder builder = new StringBuilder(name);
+            for (String param : parameterNames) {
+                builder.append(" <");
+                builder.append(param);
+                builder.append(">");
             }
-            
-            return use;
+
+            return builder.toString();
         }
-        
-        /**
-         * Load the controller object. If a similar controller object  already exists in the controllers map, it will use the existing one.
-         * If no instance of this class exist, it will try to create one.
-         * @return
-         */
-        public boolean loadController(Map<String, CommandController> controllers) {
-            //check if object of the controller already exists
-            if (controllers.containsKey(controller)) {
-                controllerInstance = controllers.get(controller);
-                
-                return true;
-            }
-            //load controller object
-            else {
-                try {
-                    //load the class
-                    Class<?> c = Class.forName(controller);
-                    
-                    //create an instance
-                    Object instance = c.newInstance();
-                    if (instance instanceof CommandController) {
-                        controllerInstance = (CommandController) instance;
-                        controllers.put(controller, controllerInstance);
-                    }
-                    
-                    return true;
-                    
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
-            
-            return false;
-        }
-        
-        /**
-         * Verify that a method with the command name exists in the controller class. It doesn't verify overloaded methods or the parameters in any way.
-         * @return Returns true if a method with the command name exists.
-         */
-        public boolean methodExists() {
-            Method[] methods = controllerInstance.getClass().getDeclaredMethods();
-            for (Method method : methods) {
-                if (method.getName().equals(name)) {
-                    return true;
-                }
-            }
-            
-            return false;
-        }
-        
+
         /**
          * Execute the method which is assigned to the command.
-         * @param param 
+         *
+         * @param params
          */
-        public void methodExecute(String cmd) {
-            
+        public void methodExecute(String params) {
+
             Binding bind = new Binding();
-            bind.setVariable(bindName, controllerInstance);
+            bind.setVariable(bindName, provider);
             GroovyShell shell = new GroovyShell(bind);
 
-            shell.evaluate(cmd);
+            logger.log(Level.INFO, bindName + "." + name + "(" + params + ")");
+            shell.evaluate(bindName + "." + name + "(" + params + ")");
         }
     }
-    
-    /**
-     * Get the only instance of this class.
-     * @return Returns the only instance of this class.
-     */
-    public static CommandManager getInstance() {
-        if (instance == null) {
-            instance = new CommandManager();
-        }
-        
-        return instance;
-    }
-    
+
     /**
      * Create an instance of the CommandManager which will load all commands.
      */
-    private CommandManager() {
+    public CommandManager() {
         loadCommands();
     }
-    
+
     /**
      * Load all default and mod commands from the JSON files.
      */
     private void loadCommands() {
-        //Load default commands
-        try {
-            String helpFile = PathManager.getInstance().getDataPath() + File.separator + "data" + File.separator + "chat" + File.separator + "commands.json";
-            FileReader reader = new FileReader(helpFile);
-            
-            Gson gson = new Gson();
-            JsonParser parser = new JsonParser();
-            JsonArray Jarray = parser.parse(reader).getAsJsonArray();
+        ModManager modManager = CoreRegistry.get(ModManager.class);
+        Reflections reflections = modManager.getActiveModReflections();
 
-            Command cmd;
-            for (JsonElement obj : Jarray)
-            {
-                cmd = gson.fromJson(obj , Command.class);
-                //validate the JSON content
-                if (!cmd.getController().isEmpty() && cmd.getPremission() != -1 && !cmd.getName().isEmpty()) {
-                    //load the controller object
-                    if (cmd.loadController(controllers)) {
-                        //verify that a method with the command name exists in the controller class
-                        if (cmd.methodExists()) {
-                            commands.add(cmd);
-                        }
-                    }
+        for (Class<? extends CommandProvider> providerClass : reflections.getSubTypesOf(CommandProvider.class)) {
+            try {
+                CommandProvider provider = providerClass.newInstance();
+
+                Predicate<? super Method> predicate = Predicates.<Method>and(withModifier(Modifier.PUBLIC), withAnnotation(Command.class));
+                Set<Method> commandMethods = Reflections.getAllMethods(providerClass, predicate);
+                for (Method method : commandMethods) {
+                    CommandInfo command = new CommandInfo(method, provider);
+                    commands.add(command);
+                    commandLookup.put(command.getName(), command.getParameterCount(), command);
                 }
+            } catch (InstantiationException e) {
+                logger.log(Level.SEVERE, "Failed to instantiate command provider " + providerClass.getName(), e);
+            } catch (IllegalAccessException e) {
+                logger.log(Level.SEVERE, "Failed to instantiate command provider " + providerClass.getName(), e);
             }
-        } catch (JsonSyntaxException e) {
-            e.printStackTrace();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         }
-        
-        //=============================
-        // TODO load mod commands here
-        //=============================
-        
-        //sort commands by there names
-        Comparator<Command> comp = new Comparator<CommandManager.Command>() {
+
+        //sort commands by their names
+        Comparator<CommandInfo> comp = new Comparator<CommandInfo>() {
             @Override
-            public int compare(Command o1, Command o2) {
-                return o1.getName().compareTo(o2.getName());
+            public int compare(CommandInfo o1, CommandInfo o2) {
+                int nameComp = o1.getName().compareTo(o2.getName());
+                if (nameComp == 0) {
+                    return o1.getParameterCount() - o2.getParameterCount();
+                }
+                return nameComp;
             }
         };
-        
+
         Collections.sort(commands, comp);
     }
-    
+
     /**
      * Execute a command.
+     *
      * @param str The whole string of the command including the command name and the optional parameters. Without "/" at the beginning.
      * @return Returns true if the command was executed successfully.
      */
     public boolean execute(String str) {
         //remove double spaces
         str = str.replaceAll("\\s+", " ");
-        
+
         //get the command name
         int commandEndIndex = str.indexOf(" ");
         String commandName;
@@ -276,87 +212,76 @@ public class CommandManager {
             str = "";
             commandEndIndex = 0;
         }
-        
+
         //remove command name from string
         str = str.substring(commandEndIndex).trim();
-        
+
         //get the parameters
         String[] params = str.split(" (?=([^\"]*\"[^\"]*\")*[^\"]*$)");
         String paramsStr = "";
         int paramsCount = 0;
-        
+
         for (String s : params) {
             if (s.trim().isEmpty()) {
                 continue;
             }
-            
+
             if (!paramsStr.isEmpty()) {
                 paramsStr += ",";
             }
             paramsStr += s;
             paramsCount++;
         }
-        
-        if (paramsCount == 0) {
-            paramsStr = "()";
-        }
-        
+
         //get the command
-        Command cmd = getCommand(commandName);
-        
+        CommandInfo cmd = commandLookup.get(commandName, paramsCount);
+
         //check if the command is loaded
         if (cmd == null) {
-            MessageManager.getInstance().addMessage("Unknown command '" + commandName + "'");
-            
+            /* TODO: The direct dependency between the command manager and a message manager singleton is not a good idea,
+               would suggest returning it as part of the result instead (need less singletons!) */
+            if (commandLookup.containsRow(commandName)) {
+                MessageManager.getInstance().addMessage("Incorrect number of parameters");
+            } else {
+                MessageManager.getInstance().addMessage("Unknown command '" + commandName + "'");
+            }
+
             return false;
         }
-        
-        //verify the number of parameters
-        if (paramsCount > cmd.getParameter().length) {
-            MessageManager.getInstance().addMessage(cmd.getUseMessage());
-            MessageManager.getInstance().addMessage("To many parameters for command '" + commandName + "'");
-            
-            return false;
-        }
-        
-        String executeString = bindName + "." + cmd.getName() + " " + paramsStr;
-        logger.log(Level.INFO, "Execute command '" + executeString + "'");
-        
+        String executeString = paramsStr;
+        logger.log(Level.INFO, "Execute command with params '" + paramsStr + "'");
+
         try {
             //execute the command
-            cmd.methodExecute(executeString);
-            
+            cmd.methodExecute(paramsStr);
+
             return true;
         } catch (Exception e) {
             //TODO better error handling and error message
-            MessageManager.getInstance().addMessage(cmd.getUseMessage());
+            MessageManager.getInstance().addMessage(cmd.getUsageMessage());
             MessageManager.getInstance().addMessage("Error executing command '" + commandName + "'.");
-            e.printStackTrace();
-            
+            logger.log(Level.WARNING, "Failed to run command", e);
+
             return false;
         }
     }
-    
+
     /**
-     * Get a command by its name.
+     * Get a group of commands by their name. These will vary by the number of parameters they accept
+     *
      * @param name The name of the command.
-     * @return Returns the command or null if no command with the given name was loaded.
+     * @return An iterator over the commands.
      */
-    public Command getCommand(String name) {
-        for (Command cmd : commands) {
-            if (cmd.getName().equals(name)) {
-                return cmd;
-            }
-        }
-        
-        return null;
+    public Collection<CommandInfo> getCommand(String name) {
+        return commandLookup.row(name).values();
     }
-    
+
     /**
      * Get the list of all loaded commands.
+     *
      * @return Returns the command list.
      */
-    public List<Command> getCommandList() {
+    public List<CommandInfo> getCommandList() {
         return commands;
     }
 }

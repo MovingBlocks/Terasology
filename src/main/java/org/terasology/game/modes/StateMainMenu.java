@@ -56,14 +56,18 @@ public class StateMainMenu implements GameState {
     private InputSystem inputSystem;
     private ComponentSystemManager componentSystemManager;
     private CameraTargetSystem cameraTargetSystem;
+    private GUIManager guiManager;
 
     @Override
     public void init(GameEngine gameEngine) {
         _gameInstance = gameEngine;
-        
+
         //lets get the entity event system running
         entityManager = new EntitySystemBuilder().build();
         eventSystem = CoreRegistry.get(EventSystem.class);
+
+        guiManager = new GUIManager();
+        CoreRegistry.put(GUIManager.class, guiManager);
 
         componentSystemManager = new ComponentSystemManager();
         CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);
@@ -71,11 +75,11 @@ public class StateMainMenu implements GameState {
         cameraTargetSystem = new CameraTargetSystem();
         CoreRegistry.put(CameraTargetSystem.class, cameraTargetSystem);
         componentSystemManager.register(cameraTargetSystem, "engine:CameraTargetSystem");
-        
+
         inputSystem = new InputSystem();
         CoreRegistry.put(InputSystem.class, inputSystem);
         componentSystemManager.register(inputSystem, "engine:InputSystem");
-        
+
         LocalPlayerComponent localPlayerComp = new LocalPlayerComponent();
         CoreRegistry.put(LocalPlayerComponent.class, localPlayerComp);
         entityManager.create(localPlayerComp);
@@ -96,7 +100,7 @@ public class StateMainMenu implements GameState {
         
         playBackgroundMusic();
         
-        GUIManager.getInstance().openWindow("main");
+        guiManager.openWindow("main");
     }
 
     @Override
@@ -108,7 +112,7 @@ public class StateMainMenu implements GameState {
         }
         
         stopBackgroundMusic();
-        GUIManager.getInstance().closeAllWindows();
+        guiManager.closeAllWindows();
         
         entityManager.clear();
     }
@@ -147,10 +151,10 @@ public class StateMainMenu implements GameState {
     }
 
     public void renderUserInterface() {
-        GUIManager.getInstance().render();
+        guiManager.render();
     }
 
     private void updateUserInterface() {
-        GUIManager.getInstance().update();
+        guiManager.update();
     }
 }

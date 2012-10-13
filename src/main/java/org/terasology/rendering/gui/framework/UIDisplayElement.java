@@ -27,8 +27,10 @@ import javax.vecmath.Vector2f;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+import org.terasology.game.CoreRegistry;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.BindButtonEvent;
+import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.gui.animation.Animation;
 import org.terasology.rendering.gui.framework.events.AnimationListener;
@@ -106,6 +108,9 @@ public abstract class UIDisplayElement {
     
     //animation
     private final List<Animation> animations = new ArrayList<Animation>();
+
+    //
+    private Object userData;
 
     public UIDisplayElement() {
         
@@ -1124,6 +1129,14 @@ public abstract class UIDisplayElement {
         break;
         }
     }
+
+    public Object getUserData() {
+        return userData;
+    }
+
+    public void setUserData(Object userData) {
+        this.userData = userData;
+    }
     
     /**
      * Add a mouse move listener which will be notified on raw mouse move actions, as the mouse enters or leaves the element or the mouse is over the element.
@@ -1163,6 +1176,10 @@ public abstract class UIDisplayElement {
         if (animationClass != null) {
             animationClass.removeAnimationListener(listener);
         }
+    }
+
+    public static final GUIManager getGUIManager() {
+        return CoreRegistry.get(GUIManager.class);
     }
     
 }

@@ -18,6 +18,8 @@ package org.terasology.rendering.gui.windows;
 import javax.vecmath.Vector2f;
 
 import org.terasology.asset.AssetManager;
+import org.terasology.config.Config;
+import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
@@ -34,14 +36,14 @@ import org.terasology.rendering.gui.widgets.UIWindow;
  */
 public class UIMenuConfig extends UIWindow {
 
-    final UIImage _title;
-    final UILabel _version;
+    final UIImage title;
+    final UILabel version;
 
-    private final UIButton _backToMainMenuButton;
-    private final UIButton _videoButton;
-    private final UIButton _audioButton;
-    private final UIButton _controlsButton;
-    private final UIButton _modsButton;
+    private final UIButton backToMainMenuButton;
+    private final UIButton videoButton;
+    private final UIButton audioButton;
+    private final UIButton controlsButton;
+    private final UIButton modsButton;
 
     public UIMenuConfig() {
         setId("config");
@@ -49,84 +51,85 @@ public class UIMenuConfig extends UIWindow {
         setModal(true);
         maximize();
         
-        _title = new UIImage(AssetManager.loadTexture("engine:terasology"));
-        _title.setHorizontalAlign(EHorizontalAlign.CENTER);
-        _title.setPosition(new Vector2f(0f, 128f));
-        _title.setVisible(true);
-        _title.setSize(new Vector2f(512f, 128f));
+        title = new UIImage(AssetManager.loadTexture("engine:terasology"));
+        title.setHorizontalAlign(EHorizontalAlign.CENTER);
+        title.setPosition(new Vector2f(0f, 128f));
+        title.setVisible(true);
+        title.setSize(new Vector2f(512f, 128f));
 
-        _version = new UILabel("Settings");
-        _version.setHorizontalAlign(EHorizontalAlign.CENTER);
-        _version.setPosition(new Vector2f(0f, 230f));
-        _version.setVisible(true);
+        version = new UILabel("Settings");
+        version.setHorizontalAlign(EHorizontalAlign.CENTER);
+        version.setPosition(new Vector2f(0f, 230f));
+        version.setVisible(true);
 
-        _videoButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
-        _videoButton.getLabel().setText("Video");
-        _videoButton.setHorizontalAlign(EHorizontalAlign.CENTER);
-        _videoButton.setPosition(new Vector2f(0f, 300f));
-        _videoButton.setVisible(true);
-        _videoButton.addClickListener(new ClickListener() {
+        videoButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
+        videoButton.getLabel().setText("Video");
+        videoButton.setHorizontalAlign(EHorizontalAlign.CENTER);
+        videoButton.setPosition(new Vector2f(0f, 300f));
+        videoButton.setVisible(true);
+        videoButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().openWindow("config:video");
+                getGUIManager().openWindow("config:video");
             }
         });
 
-        _audioButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
-        _audioButton.getLabel().setText("Audio");
-        _audioButton.setHorizontalAlign(EHorizontalAlign.CENTER);
-        _audioButton.setPosition(new Vector2f(0f, 300f + 40f));
-        _audioButton.setVisible(true);
-        _audioButton.addClickListener(new ClickListener() {
+        audioButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
+        audioButton.getLabel().setText("Audio");
+        audioButton.setHorizontalAlign(EHorizontalAlign.CENTER);
+        audioButton.setPosition(new Vector2f(0f, 300f + 40f));
+        audioButton.setVisible(true);
+        audioButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().openWindow("config:audio");
+                getGUIManager().openWindow("config:audio");
             }
         });
 
-        _controlsButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
-        _controlsButton.getLabel().setText("Controls");
-        _controlsButton.setHorizontalAlign(EHorizontalAlign.CENTER);
-        _controlsButton.setPosition(new Vector2f(0f, 300f + 2 * 40f));
-        _controlsButton.setVisible(true);
-        _controlsButton.addClickListener(new ClickListener() {
+        controlsButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
+        controlsButton.getLabel().setText("Controls");
+        controlsButton.setHorizontalAlign(EHorizontalAlign.CENTER);
+        controlsButton.setPosition(new Vector2f(0f, 300f + 2 * 40f));
+        controlsButton.setVisible(true);
+        controlsButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().openWindow("config:controls");
+                getGUIManager().openWindow("config:controls");
             }
         });
 
-        _modsButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
-        _modsButton.getLabel().setText("Mods");
-        _modsButton.setHorizontalAlign(EHorizontalAlign.CENTER);
-        _modsButton.setPosition(new Vector2f(0f, 300f + 3 * 40f));
-        _modsButton.setVisible(true);
-        _modsButton.addClickListener(new ClickListener() {
+        modsButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
+        modsButton.getLabel().setText("Mods");
+        modsButton.setHorizontalAlign(EHorizontalAlign.CENTER);
+        modsButton.setPosition(new Vector2f(0f, 300f + 3 * 40f));
+        modsButton.setVisible(true);
+        modsButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().openWindow("config:mods");
+                getGUIManager().openWindow("config:mods");
             }
         });
 
-        _backToMainMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
-        _backToMainMenuButton.getLabel().setText("Return to Main Menu");
-        _backToMainMenuButton.setHorizontalAlign(EHorizontalAlign.CENTER);
-        _backToMainMenuButton.setPosition(new Vector2f(0f, 300f + 7 * 40f));
-        _backToMainMenuButton.setVisible(true);
-        _backToMainMenuButton.addClickListener(new ClickListener() {
+        backToMainMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
+        backToMainMenuButton.getLabel().setText("Return to Main Menu");
+        backToMainMenuButton.setHorizontalAlign(EHorizontalAlign.CENTER);
+        backToMainMenuButton.setPosition(new Vector2f(0f, 300f + 7 * 40f));
+        backToMainMenuButton.setVisible(true);
+        backToMainMenuButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().openWindow("main");
+                CoreRegistry.get(Config.class).save();
+                getGUIManager().openWindow("main");
             }
         });
 
-        addDisplayElement(_title);
-        addDisplayElement(_version);
+        addDisplayElement(title);
+        addDisplayElement(version);
 
-        addDisplayElement(_videoButton);
-        addDisplayElement(_audioButton);
-        addDisplayElement(_controlsButton);
-        addDisplayElement(_modsButton);
-        addDisplayElement(_backToMainMenuButton);
+        addDisplayElement(videoButton);
+        addDisplayElement(audioButton);
+        addDisplayElement(controlsButton);
+        addDisplayElement(modsButton);
+        addDisplayElement(backToMainMenuButton);
     }
 }

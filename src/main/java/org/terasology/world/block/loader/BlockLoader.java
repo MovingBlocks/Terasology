@@ -16,32 +16,24 @@
 
 package org.terasology.world.block.loader;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
+import com.google.gson.TypeAdapter;
+import com.google.gson.TypeAdapterFactory;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
+import com.google.gson.stream.JsonWriter;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
-
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.Type;
-import java.nio.ByteBuffer;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.imageio.ImageIO;
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector4f;
-
 import org.newdawn.slick.opengl.PNGDecoder;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
@@ -62,22 +54,26 @@ import org.terasology.world.block.family.HorizontalBlockFamily;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.shapes.BlockShape;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
-import com.google.gson.TypeAdapter;
-import com.google.gson.TypeAdapterFactory;
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
-import com.google.gson.stream.JsonWriter;
+import javax.imageio.ImageIO;
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
+import java.nio.ByteBuffer;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Immortius
@@ -142,7 +138,7 @@ public class BlockLoader {
 
                     if (isShapelessBlockFamily(blockDef)) {
                         indexTile(getDefaultTile(blockDef, blockDefUri), true);
-                        result.shapelessDefinitions.add(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()));
+                        result.shapelessDefinitions.add(new ShapelessFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), getCategories(blockDef)));
                     } else {
                         if (blockDef.liquid) {
                             blockDef.rotation = BlockDefinition.RotationType.NONE;
@@ -203,11 +199,11 @@ public class BlockLoader {
         def.shape = (shape.getURI().getSimpleString());
         if (shape.isCollisionSymmetric()) {
             Block block = constructSingleBlock(blockDefUri, def);
-            return new SymmetricFamily(uri, block);
+            return new SymmetricFamily(uri, block, getCategories(def));
         } else {
             Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
             constructHorizontalBlocks(blockDefUri, def, blockMap);
-            return new HorizontalBlockFamily(uri, blockMap);
+            return new HorizontalBlockFamily(uri, blockMap, getCategories(def));
         }
     }
 
@@ -270,13 +266,13 @@ public class BlockLoader {
         return result;
     }
 
-    private List<BlockUri> loadAutoBlocks() {
+    private List<ShapelessFamily> loadAutoBlocks() {
         logger.log(Level.INFO, "Loading Auto Blocks...");
-        List<BlockUri> result = Lists.newArrayList();
+        List<ShapelessFamily> result = Lists.newArrayList();
         for (AssetUri blockTileUri : AssetManager.list(AssetType.BLOCK_TILE)) {
             if (AssetManager.getInstance().getAssetURLs(blockTileUri).get(0).getPath().contains(AUTO_BLOCK_URL_FRAGMENT)) {
                 BlockUri uri = new BlockUri(blockTileUri.getPackage(), blockTileUri.getAssetName());
-                result.add(uri);
+                result.add(new ShapelessFamily(uri));
                 getTileIndex(blockTileUri, true);
             }
         }
@@ -321,11 +317,11 @@ public class BlockLoader {
                 blockDef.shape = shapeString;
                 if (shape.isCollisionSymmetric()) {
                     Block block = constructSingleBlock(blockDefUri, blockDef);
-                    result.add(new SymmetricFamily(familyUri, block));
+                    result.add(new SymmetricFamily(familyUri, block, getCategories(blockDef)));
                 } else {
                     Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
                     constructHorizontalBlocks(blockDefUri, blockDef, blockMap);
-                    result.add(new HorizontalBlockFamily(familyUri, blockMap));
+                    result.add(new HorizontalBlockFamily(familyUri, blockMap, getCategories(blockDef)));
                 }
             }
         }
@@ -334,12 +330,14 @@ public class BlockLoader {
 
     private BlockFamily processAlignToSurfaceFamily(AssetUri blockDefUri, JsonObject blockDefJson) {
         Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
+        String[] categories = new String[0];
         if (blockDefJson.has("top")) {
             JsonObject topDefJson = blockDefJson.getAsJsonObject("top");
             blockDefJson.remove("top");
             mergeJsonInto(blockDefJson, topDefJson);
             BlockDefinition topDef = loadBlockDefinition(topDefJson);
             blockMap.put(Side.TOP, constructSingleBlock(blockDefUri, topDef));
+            categories = getCategories(topDef);
         }
         if (blockDefJson.has("sides")) {
             JsonObject sideDefJson = blockDefJson.getAsJsonObject("sides");
@@ -347,6 +345,7 @@ public class BlockLoader {
             mergeJsonInto(blockDefJson, sideDefJson);
             BlockDefinition sideDef = loadBlockDefinition(sideDefJson);
             constructHorizontalBlocks(blockDefUri, sideDef, blockMap);
+            categories = getCategories(sideDef);
         }
         if (blockDefJson.has("bottom")) {
             JsonObject bottomDefJson = blockDefJson.getAsJsonObject("bottom");
@@ -354,16 +353,17 @@ public class BlockLoader {
             mergeJsonInto(blockDefJson, bottomDefJson);
             BlockDefinition bottomDef = loadBlockDefinition(bottomDefJson);
             blockMap.put(Side.BOTTOM, constructSingleBlock(blockDefUri, bottomDef));
+            categories = getCategories(bottomDef);
         }
-        return new AlignToSurfaceFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap);
+        return new AlignToSurfaceFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap, categories);
     }
 
     private void mergeJsonInto(JsonObject from, JsonObject to) {
         for (Map.Entry<String, JsonElement> entry : from.entrySet()) {
             if (entry.getValue().isJsonObject()) {
-               if (!to.has(entry.getKey())) {
-                   to.add(entry.getKey(), entry.getValue());
-               }
+                if (!to.has(entry.getKey())) {
+                    to.add(entry.getKey(), entry.getValue());
+                }
             } else {
                 if (!to.has(entry.getKey())) {
                     to.add(entry.getKey(), entry.getValue());
@@ -375,7 +375,7 @@ public class BlockLoader {
     private BlockFamily processSingleBlockFamily(AssetUri blockDefUri, BlockDefinition blockDef) {
         Block block = constructSingleBlock(blockDefUri, blockDef);
 
-        return new SymmetricFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), block);
+        return new SymmetricFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), block, getCategories(blockDef));
     }
 
     private Block constructSingleBlock(AssetUri blockDefUri, BlockDefinition blockDef) {
@@ -403,7 +403,7 @@ public class BlockLoader {
         Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
         constructHorizontalBlocks(blockDefUri, blockDef, blockMap);
 
-        return new HorizontalBlockFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap);
+        return new HorizontalBlockFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap, getCategories(blockDef));
     }
 
     private void constructHorizontalBlocks(AssetUri blockDefUri, BlockDefinition blockDef, Map<Side, Block> blockMap) {
@@ -550,6 +550,10 @@ public class BlockLoader {
             }
         }
         return tileUris;
+    }
+
+    private String[] getCategories(BlockDefinition def) {
+        return def.categories.toArray(new String[def.categories.size()]);
     }
 
     private AssetUri getDefaultTile(BlockDefinition blockDef, AssetUri uri) {
@@ -743,7 +747,22 @@ public class BlockLoader {
 
     public static class LoadBlockDefinitionResults {
         public List<BlockFamily> families = Lists.newArrayList();
-        public List<BlockUri> shapelessDefinitions = Lists.newArrayList();
+        public List<ShapelessFamily> shapelessDefinitions = Lists.newArrayList();
+    }
+
+    public static class ShapelessFamily {
+        public BlockUri uri;
+        public String[] categories = new String[0];
+
+        public ShapelessFamily(BlockUri uri) {
+            this.uri = uri;
+        }
+
+        public ShapelessFamily(BlockUri uri, String[] categories) {
+            this(uri);
+            this.categories = categories;
+        }
+
     }
 
 }

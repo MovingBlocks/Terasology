@@ -130,7 +130,7 @@ public class ShaderProgram {
     private String readShader(String filename) {
         String line, code = "";
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(ResourceLoader.getResource("org/terasology/data/shaders/" + filename).openStream()));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(ResourceLoader.getResource("assets/shaders/" + filename).openStream()));
             while ((line = reader.readLine()) != null) {
                 code += line + "\n";
             }

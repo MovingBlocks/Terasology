@@ -77,7 +77,7 @@ public class UIMenuMain extends UIWindow {
         _configButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().openWindow("config");
+                getGUIManager().openWindow("config");
             }
         });
         _configButton.setHorizontalAlign(EHorizontalAlign.CENTER);
@@ -89,7 +89,7 @@ public class UIMenuMain extends UIWindow {
         _singlePlayerButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                GUIManager.getInstance().openWindow("singleplayer");
+                getGUIManager().openWindow("singleplayer");
             }
         });
 

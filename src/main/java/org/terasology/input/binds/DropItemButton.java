@@ -15,11 +15,17 @@
  */
 package org.terasology.input.binds;
 
+import org.lwjgl.input.Keyboard;
 import org.terasology.input.BindButtonEvent;
+import org.terasology.input.DefaultBinding;
+import org.terasology.input.InputType;
+import org.terasology.input.RegisterBindButton;
 
 /**
  * @author small-jeeper
  */
+
+@RegisterBindButton(id = "dropItem", description = "Drop Item", repeating = true)
+@DefaultBinding(type = InputType.KEY, id = Keyboard.KEY_Q)
 public class DropItemButton extends BindButtonEvent {
-    public static final String ID = "engine:dropItem";
 }

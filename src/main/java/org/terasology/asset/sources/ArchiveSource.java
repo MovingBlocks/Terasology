@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.jar.JarFile;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -33,9 +34,11 @@ import org.terasology.asset.AssetUri;
 public class ArchiveSource extends AbstractSource {
 
     private Logger logger = Logger.getLogger(getClass().getName());
+    private String basePath;
 
-    public ArchiveSource(String sourceId, File archive) {
+    public ArchiveSource(String sourceId, File archive, String basePath) {
         super(sourceId);
+        this.basePath = basePath;
 
         try {
             scanArchive(archive);
@@ -46,11 +49,9 @@ public class ArchiveSource extends AbstractSource {
 
     protected void scanArchive(File file) throws IOException {
         ZipFile archive;
-        String basePath = "";
 
         if (file.getName().endsWith(".jar")) {
             archive = new JarFile(file, false);
-            basePath = "org/terasology/data/";
         } else {
             archive = new ZipFile(file);
         }
@@ -60,9 +61,10 @@ public class ArchiveSource extends AbstractSource {
         while (lister.hasMoreElements()) {
             ZipEntry entry = lister.nextElement();
             String entryPath = entry.getName();
+            logger.log(Level.INFO,  "Found " + entryPath);
 
             if (entryPath.startsWith(basePath)) {
-                String key = entryPath.substring(basePath.length());
+                String key = entryPath.substring(basePath.length() + 1);
                 AssetUri uri = getUri(key);
                 if (uri == null || !uri.isValid()) continue;
 

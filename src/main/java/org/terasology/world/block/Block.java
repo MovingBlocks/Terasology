@@ -38,7 +38,7 @@ import org.newdawn.slick.util.ResourceLoader;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.collection.EnumBooleanMap;
+import org.terasology.utilities.collection.EnumBooleanMap;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.AABB;
 import org.terasology.math.Side;
@@ -121,8 +121,8 @@ public class Block {
         DIRECTION_LIT_LEVEL.put(BlockPart.RIGHT, 0.75f);
         DIRECTION_LIT_LEVEL.put(BlockPart.CENTER, 0.8f);
         try {
-            colorLut = ImageIO.read(ResourceLoader.getResource("org/terasology/data/textures/grasscolor.png").openStream());
-            foliageLut = ImageIO.read(ResourceLoader.getResource("org/terasology/data/textures/foliagecolor.png").openStream());
+            colorLut = ImageIO.read(ResourceLoader.getResource("assets/textures/grasscolor.png").openStream());
+            foliageLut = ImageIO.read(ResourceLoader.getResource("assets/textures/foliagecolor.png").openStream());
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.toString(), e);
         }
