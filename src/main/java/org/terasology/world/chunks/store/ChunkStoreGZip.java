@@ -43,6 +43,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 
 public class ChunkStoreGZip implements ChunkStore, Serializable {
+    static final long serialVersionUID = -8168985892342356264L;
+
     private static final int NUM_DISPOSAL_THREADS = 2;
 
     private static final Logger logger = LoggerFactory.getLogger(ChunkStoreGZip.class);

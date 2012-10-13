@@ -261,7 +261,7 @@ public class StateSinglePlayer implements GameState {
     private void loadPrefabs() {
         EntityPersisterHelper persisterHelper = new EntityPersisterHelperImpl(entityManager);
         for (AssetUri prefabURI : AssetManager.list(AssetType.PREFAB)) {
-            logger.info("Loading prefab " + prefabURI);
+            logger.debug("Loading prefab " + prefabURI);
             try {
                 InputStream stream = AssetManager.assetStream(prefabURI);
                 if (stream != null) {
@@ -363,7 +363,7 @@ public class StateSinglePlayer implements GameState {
             worldInfo.setSeed(random.randomCharacterString(16));
         }
 
-        logger.info("World seed: \"{0}\"", worldInfo.getSeed());
+        logger.info("World seed: \"{}\"", worldInfo.getSeed());
 
         // Init ChunkGeneratorManager
         ChunkGeneratorManager chunkGeneratorManager = ChunkGeneratorManagerImpl.buildChunkGenerator(Arrays.asList(worldInfo.getChunkGenerators()));

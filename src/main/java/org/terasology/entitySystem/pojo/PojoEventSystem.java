@@ -57,7 +57,6 @@ public class PojoEventSystem implements EventSystem {
 
     private static final Logger logger = LoggerFactory.getLogger(PojoEventSystem.class);
 
-    private EntityManager entitySystem;
     private Map<Class<? extends Event>, Multimap<Class<? extends Component>, EventHandlerInfo>> componentSpecificHandlers = Maps.newHashMap();
     private Comparator<EventHandlerInfo> priorityComparator = new EventHandlerPriorityComparator();
 
@@ -68,8 +67,7 @@ public class PojoEventSystem implements EventSystem {
     private Thread mainThread;
     private BlockingQueue<PendingEvent>  pendingEvents = Queues.newLinkedBlockingQueue();
 
-    public PojoEventSystem(EntityManager entitySystem) {
-        this.entitySystem = entitySystem;
+    public PojoEventSystem() {
         this.mainThread = Thread.currentThread();
     }
 
@@ -105,7 +103,7 @@ public class PojoEventSystem implements EventSystem {
             return;
         }
 
-        logger.info("Registering event handler " + handlerClass.getName());
+        logger.debug("Registering event handler " + handlerClass.getName());
         for (Method method : handlerClass.getMethods()) {
             ReceiveEvent receiveEventAnnotation = method.getAnnotation(ReceiveEvent.class);
             if (receiveEventAnnotation != null) {
@@ -115,7 +113,7 @@ public class PojoEventSystem implements EventSystem {
                 Class<?>[] types = method.getParameterTypes();
 
                 if (types.length == 2 && Event.class.isAssignableFrom(types[0]) && EntityRef.class.isAssignableFrom(types[1])) {
-                    logger.info("Found method: " + method.toString());
+                    logger.debug("Found method: " + method.toString());
                     ReflectedEventHandlerInfo handlerInfo = new ReflectedEventHandlerInfo(handler, method, receiveEventAnnotation.priority(), receiveEventAnnotation.components());
                     for (Class<? extends Component> c : receiveEventAnnotation.components()) {
                         addEventHandler((Class<? extends Event>) types[0], handlerInfo, c);

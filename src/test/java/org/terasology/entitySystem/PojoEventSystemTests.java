@@ -32,7 +32,7 @@ public class PojoEventSystemTests {
 
         compLibrary = new ComponentLibraryImpl();
         entityManager = new PojoEntityManager(compLibrary, new PojoPrefabManager(compLibrary));
-        eventSystem = new PojoEventSystem(entityManager);
+        eventSystem = new PojoEventSystem();
         entityManager.setEventSystem(eventSystem);
         entity = entityManager.create();
     }

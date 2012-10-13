@@ -81,7 +81,7 @@ public class GrowthSimulator implements EventHandlerSystem {
                             }
                         }
                     } catch (InterruptedException e) {
-                        logger.error("Thread Interrupted", e);
+                        logger.debug("Thread Interrupted", e);
                     }
                 }
             }

@@ -71,7 +71,7 @@ public class ModManager {
         engineReflections = new Reflections(
                 new ConfigurationBuilder()
                         .addClassLoader(getClass().getClassLoader())
-                        .addUrls(ClasspathHelper.forClassLoader(getClass().getClassLoader()))
+                        .addUrls(ClasspathHelper.forPackage("org.terasology", getClass().getClassLoader()))
                         .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()));
         refresh();
     }
@@ -101,6 +101,7 @@ public class ModManager {
             }
             allReflections = new Reflections(new ConfigurationBuilder()
                     .addUrls(urls)
+                    .addUrls(ClasspathHelper.forPackage("org.terasology", getClass().getClassLoader()))
                     .addClassLoader(allModClassLoader)
                     .addClassLoader(getClass().getClassLoader()));
             allReflections.merge(getEngineReflections());
@@ -132,9 +133,9 @@ public class ModManager {
                     ModInfo modInfo = gson.fromJson(new FileReader(modInfoFile), ModInfo.class);
                     if (!mods.containsKey(modInfo.getId())) {
                         mods.put(modInfo.getId(), new Mod(modFile, modInfo, new DirectorySource(modInfo.getId(), new File(modFile, ASSETS_SUBDIRECTORY))));
-                        logger.info("Discovered mod: " + modInfo.getDisplayName());
+                        logger.info("Discovered mod: {}", modInfo.getDisplayName());
                     } else {
-                        logger.info("Discovered duplicate mod: " + modInfo.getDisplayName() + ", skipping");
+                        logger.info("Discovered duplicate mod: {}, skipping", modInfo.getDisplayName());
                     }
                 } catch (FileNotFoundException e) {
                     logger.warn("Failed to load mod manifest for mod at {}", modFile, e);
@@ -177,7 +178,7 @@ public class ModManager {
         for (Mod mod : getMods()) {
             urls.add(mod.getModClasspathUrl());
         }
-        allModClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]));
+        allModClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]), getClass().getClassLoader());
         for (Mod mod : getMods()) {
             mod.setInactiveClassLoader(allModClassLoader);
         }
@@ -199,7 +200,7 @@ public class ModManager {
         for (Mod mod : getActiveMods()) {
             urls.add(mod.getModClasspathUrl());
         }
-        activeModClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]));
+        activeModClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]), getClass().getClassLoader());
         for (Mod mod : getActiveMods()) {
             mod.setActiveClassLoader(activeModClassLoader);
         }

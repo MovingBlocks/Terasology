@@ -1,5 +1,5 @@
 {
-    "name" : "core:bluebook",
+    "name" : "books:bluebook",
     "Item" : {
         "name" : "BlueBook",
         "icon" : "BlueBook",
