@@ -25,6 +25,8 @@ import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.asset.sources.ArchiveSource;
 import org.terasology.asset.sources.DirectorySource;
 import org.terasology.logic.manager.Config;
@@ -41,8 +43,6 @@ import java.net.URLClassLoader;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -57,7 +57,8 @@ public class ModManager {
 
     public static final String ASSETS_SUBDIRECTORY = "assets";
 
-    private Logger logger = Logger.getLogger(getClass().getName());
+    private static final Logger logger = LoggerFactory.getLogger(ModManager.class);
+
     private Map<String, Mod> mods = Maps.newHashMap();
     private ClassLoader activeModClassLoader;
     private ClassLoader allModClassLoader;
@@ -136,9 +137,9 @@ public class ModManager {
                         logger.info("Discovered duplicate mod: " + modInfo.getDisplayName() + ", skipping");
                     }
                 } catch (FileNotFoundException e) {
-                    logger.log(Level.WARNING, "Failed to load mod manifest for mod at " + modFile, e);
+                    logger.warn("Failed to load mod manifest for mod at {}", modFile, e);
                 } catch (JsonIOException e) {
-                    logger.log(Level.WARNING, "Failed to load mod manifest for mod at " + modFile, e);
+                    logger.warn("Failed to load mod manifest for mod at {}", modFile, e);
                 }
             }
         }
@@ -163,13 +164,13 @@ public class ModManager {
                             logger.info("Discovered duplicate mod: " + modInfo.getDisplayName() + ", skipping");
                         }
                     } catch (FileNotFoundException e) {
-                        logger.log(Level.WARNING, "Failed to load mod manifest for mod at " + modFile, e);
+                        logger.warn("Failed to load mod manifest for mod at {}", modFile, e);
                     } catch (JsonIOException e) {
-                        logger.log(Level.WARNING, "Failed to load mod manifest for mod at " + modFile, e);
+                        logger.warn("Failed to load mod manifest for mod at {}", modFile, e);
                     }
                 }
             } catch (IOException e) {
-                logger.log(Level.SEVERE, "Invalid mod file: " + modFile, e);
+                logger.error("Invalid mod file: {}", modFile, e);
             }
         }
         List<URL> urls = Lists.newArrayList();

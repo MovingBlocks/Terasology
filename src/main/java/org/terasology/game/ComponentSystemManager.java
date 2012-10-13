@@ -15,17 +15,11 @@
  */
 package org.terasology.game;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.reflections.Reflections;
-import org.reflections.scanners.Scanner;
-import org.reflections.scanners.TypeAnnotationsScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.entitySystem.ComponentSystem;
@@ -33,9 +27,9 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.RegisterComponentSystem;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import org.terasology.logic.mod.Mod;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Simple manager for component systems.
@@ -45,7 +39,7 @@ import org.terasology.logic.mod.Mod;
  */
 public class ComponentSystemManager {
 
-    private Logger logger = Logger.getLogger(getClass().getName());
+    private static final Logger logger = LoggerFactory.getLogger(ComponentSystemManager.class);
 
     private Map<String, ComponentSystem> namedLookup = Maps.newHashMap();
     private List<UpdateSubscriberSystem> updateSubscribers = Lists.newArrayList();
@@ -59,7 +53,7 @@ public class ComponentSystemManager {
         Set<Class<?>> systems = reflections.getTypesAnnotatedWith(RegisterComponentSystem.class);
         for (Class<?> system : systems) {
             if (!ComponentSystem.class.isAssignableFrom(system)) {
-                logger.log(Level.WARNING, String.format("Cannot load %s, must be a subclass of ComponentSystem", system.getSimpleName()));
+                logger.error("Cannot load {}, must be a subclass of ComponentSystem", system.getSimpleName());
                 continue;
             }
 
@@ -69,11 +63,11 @@ public class ComponentSystemManager {
             try {
                 ComponentSystem newSystem = (ComponentSystem) system.newInstance();
                 register(newSystem, id);
-                logger.log(Level.INFO, "Loaded " + id);
+                logger.debug("Loaded system {}", id);
             } catch (InstantiationException e) {
-                logger.log(Level.SEVERE, "Failed to load system " + id, e);
+                logger.error("Failed to load system {}", id, e);
             } catch (IllegalAccessException e) {
-                logger.log(Level.SEVERE, "Failed to load system " + id, e);
+                logger.error("Failed to load system {}", id, e);
             }
         }
 

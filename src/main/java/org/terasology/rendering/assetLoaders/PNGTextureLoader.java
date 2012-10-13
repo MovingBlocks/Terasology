@@ -22,10 +22,10 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.newdawn.slick.opengl.PNGDecoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetUri;
 import org.terasology.rendering.assets.Texture;
@@ -36,12 +36,14 @@ import com.google.gson.Gson;
  * @author Immortius
  */
 public class PNGTextureLoader implements AssetLoader<Texture> {
+
     private static class TextureMetadata {
         Texture.FilterMode filterMode;
         Texture.WrapMode wrapMode;
     }
 
-    private Logger logger = Logger.getLogger(getClass().getName());
+    private static final Logger logger = LoggerFactory.getLogger(PNGTextureLoader.class);
+
     private Gson gson;
 
     public PNGTextureLoader() {
@@ -76,7 +78,7 @@ public class PNGTextureLoader implements AssetLoader<Texture> {
                         try {
                             reader.close();
                         } catch (IOException e) {
-                            logger.log(Level.SEVERE, "Error closing " + url.toString(), e);
+                            logger.error("Error closing {}", url.toString(), e);
                         }
                     }
                 }

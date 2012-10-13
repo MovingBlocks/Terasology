@@ -15,10 +15,11 @@
  */
 package org.terasology.model.structures;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * A selection of block positions, which may be relative (within a BlockCollection) or absolute (placed in a world)
@@ -28,7 +29,7 @@ import java.util.logging.Logger;
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
 public class BlockSelection {
-    private static Logger logger = Logger.getLogger(BlockSelection.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(BlockSelection.class);
 
     protected HashSet<BlockPosition> _positions = new HashSet<BlockPosition>();
 
@@ -221,7 +222,7 @@ public class BlockSelection {
         for (BlockPosition myPos : _positions) {
             for (BlockPosition targetPos : otherSelection.positions()) {
                 if (myPos.equals(targetPos)) {
-                    logger.log(Level.INFO, "Selections overlap at " + myPos + ", maybe more, returning true");
+                    logger.debug("Selections overlap at {}, maybe more, returning true", myPos);
                     return true;
                 }
             }
@@ -253,7 +254,7 @@ public class BlockSelection {
             }
 
             if (!contained) {
-                logger.log(Level.INFO, "Position " + otherPos + "was not contained in this selection, returning false");
+                logger.debug("Position {} was not contained in this selection, returning false", otherPos);
                 return false;
             }
         }
@@ -270,17 +271,17 @@ public class BlockSelection {
     public boolean possiblyOverlaps(BlockSelection otherSelection) {
         // See if the entirety of the BlockSelections are completely out of bounds versus each other, nice short way to test
         if (calcMinX() > otherSelection.calcMaxX() || otherSelection.calcMinX() > calcMaxX()) {
-            logger.log(Level.INFO, "Selections have no overlap at all along X axis, returning false");
+            logger.debug("Selections have no overlap at all along X axis, returning false");
             return false;
         }
 
         if (calcMinY() > otherSelection.calcMaxY() || otherSelection.calcMinY() > calcMaxY()) {
-            logger.log(Level.INFO, "Selections have no overlap at all along Y axis, returning false");
+            logger.debug("Selections have no overlap at all along Y axis, returning false");
             return false;
         }
 
         if (calcMinZ() > otherSelection.calcMaxZ() || otherSelection.calcMinZ() > calcMaxZ()) {
-            logger.log(Level.INFO, "Selections have no overlap at all along Z axis, returning false");
+            logger.debug("Selections have no overlap at all along Z axis, returning false");
             return false;
         }
         return true;

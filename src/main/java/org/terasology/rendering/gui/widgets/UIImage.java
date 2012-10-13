@@ -30,14 +30,14 @@ import javax.vecmath.Vector4f;
 
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
-
-import java.util.logging.Logger;
 
 /**
  * Provides support for rendering graphical elements.
@@ -48,8 +48,9 @@ import java.util.logging.Logger;
  * TODO rotation screws up the intersection check
  */
 public class UIImage extends UIDisplayContainer {
-    private Logger logger = Logger.getLogger(getClass().getName());
-    
+
+    private static final Logger logger = LoggerFactory.getLogger(UIImage.class);
+
     private Color color;
     private Texture texture;
 
@@ -85,7 +86,7 @@ public class UIImage extends UIDisplayContainer {
             return;
 
         if (mesh.isDisposed()) {
-            logger.severe("Disposed mesh encountered!");
+            logger.error("Disposed mesh encountered!");
             return;
         }
 

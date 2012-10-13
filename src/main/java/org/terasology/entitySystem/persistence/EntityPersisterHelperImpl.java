@@ -27,9 +27,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityInfoComponent;
 import org.terasology.entitySystem.EntityRef;
@@ -50,7 +50,7 @@ import com.google.common.collect.HashBiMap;
  * @author Immortius <immortius@gmail.com>
  */
 public class EntityPersisterHelperImpl implements EntityPersisterHelper {
-    private Logger logger = Logger.getLogger(getClass().getName());
+    private static final Logger logger = LoggerFactory.getLogger(EntityPersisterHelperImpl.class);
 
     private ComponentLibrary componentLibrary;
     private PrefabManager prefabManager;
@@ -128,7 +128,7 @@ public class EntityPersisterHelperImpl implements EntityPersisterHelper {
     public EntityData.Component serializeComponent(Component component) {
         ComponentMetadata<?> componentMetadata = componentLibrary.getMetadata(component.getClass());
         if (componentMetadata == null) {
-            logger.log(Level.SEVERE, "Unregistered component type: " + component.getClass());
+            logger.error("Unregistered component type: {}", component.getClass());
             return null;
         }
         EntityData.Component.Builder componentMessage = EntityData.Component.newBuilder();
@@ -148,9 +148,9 @@ public class EntityPersisterHelperImpl implements EntityPersisterHelper {
 
                 componentMessage.addField(EntityData.NameValue.newBuilder().setName(field.getName()).setValue(value).build());
             } catch (IllegalAccessException e) {
-                logger.log(Level.SEVERE, "Exception during serializing component type: " + component.getClass(), e);
+                logger.error("Exception during serializing component type: {}", component.getClass(), e);
             } catch (InvocationTargetException e) {
-                logger.log(Level.SEVERE, "Exception during serializing component type: " + component.getClass(), e);
+                logger.error("Exception during serializing component type: {}", component.getClass(), e);
             }
         }
 
@@ -231,7 +231,7 @@ public class EntityPersisterHelperImpl implements EntityPersisterHelper {
             Prefab parent = prefabManager.getPrefab(parentName);
 
             if (parent == null) {
-                logger.log(Level.SEVERE, "Missing parent prefab (need to fix parent serialization)");
+                logger.error("Missing parent prefab (need to fix parent serialization)");
             } else {
                 prefab.addParent(parent);
             }
@@ -253,7 +253,7 @@ public class EntityPersisterHelperImpl implements EntityPersisterHelper {
         for (String parentName : prefabData.getParentNameList()) {
             Prefab parent = prefabManager.getPrefab(parentName);
             if (parent == null) {
-                logger.log(Level.SEVERE, "Missing parent prefab (need to fix parent serialization)");
+                logger.error("Missing parent prefab (need to fix parent serialization)");
             } else {
                 prefab.addParent(parent);
             }
@@ -275,7 +275,7 @@ public class EntityPersisterHelperImpl implements EntityPersisterHelper {
             Component component = componentMetadata.newInstance();
             return deserializeOnto(component, componentData, componentMetadata);
         } else {
-            logger.log(Level.WARNING, "Unable to deserialise unknown component type: " + componentData.getType());
+            logger.warn("Unable to deserialise unknown component type: {}", componentData.getType());
         }
         return null;
     }
@@ -359,19 +359,19 @@ public class EntityPersisterHelperImpl implements EntityPersisterHelper {
         if (componentData.hasTypeIndex()) {
             ComponentMetadata metadata = componentLibrary.getMetadata(componentIdTable.get(componentData.getTypeIndex()));
             if (metadata == null) {
-                logger.log(Level.WARNING, "Unable to deserialise unknown component with id: " + componentData.getTypeIndex());
+                logger.warn("Unable to deserialise unknown component with id: {}", componentData.getTypeIndex());
                 return null;
             }
             return metadata.getType();
         } else if (componentData.hasType()) {
             ComponentMetadata metadata = componentLibrary.getMetadata(componentData.getType().toLowerCase(Locale.ENGLISH));
             if (metadata == null) {
-                logger.log(Level.WARNING, "Unable to deserialise unknown component type: " + componentData.getType());
+                logger.warn("Unable to deserialise unknown component type: {}", componentData.getType());
                 return null;
             }
             return metadata.getType();
         }
-        logger.log(Level.WARNING, "Unable to deserialise component, no type provided.");
+        logger.warn("Unable to deserialise component, no type provided.");
 
         return null;
     }
@@ -422,7 +422,7 @@ public class EntityPersisterHelperImpl implements EntityPersisterHelper {
     private EntityData.Component serializeComponent(Component base, Component delta) {
         ComponentMetadata<?> componentMetadata = componentLibrary.getMetadata(base.getClass());
         if (componentMetadata == null) {
-            logger.log(Level.SEVERE, "Unregistered component type: " + base.getClass());
+            logger.error("Unregistered component type: {}", base.getClass());
             return null;
         }
 
@@ -445,13 +445,13 @@ public class EntityPersisterHelperImpl implements EntityPersisterHelper {
                         componentMessage.addField(EntityData.NameValue.newBuilder().setName(field.getName()).setValue(value).build());
                         changed = true;
                     } else {
-                        logger.log(Level.SEVERE, "Exception serializing component type: " + base.getClass() + ", field: " + field.getName() + " - returned null");
+                        logger.error("Exception serializing component type: {}, field: {} - returned null", base.getClass(), field.getName());
                     }
                 }
             } catch (IllegalAccessException e) {
-                logger.log(Level.SEVERE, "Exception during serializing component type: " + base.getClass(), e);
+                logger.error("Exception during serializing component type: {}", base.getClass(), e);
             } catch (InvocationTargetException e) {
-                logger.log(Level.SEVERE, "Exception during serializing component type: " + base.getClass(), e);
+                logger.error("Exception during serializing component type: {}", base.getClass(), e);
             }
         }
         if (changed) {
@@ -466,7 +466,7 @@ public class EntityPersisterHelperImpl implements EntityPersisterHelper {
             ComponentMetadata componentMetadata = componentLibrary.getMetadata(componentClass);
             return deserializeOnto(component, componentData, componentMetadata);
         } else {
-            logger.log(Level.WARNING, "Unable to deserialise unknown component type: " + componentData.getType());
+            logger.warn("Unable to deserialise unknown component type: {}", componentData.getType());
         }
         return null;
     }
@@ -485,9 +485,9 @@ public class EntityPersisterHelperImpl implements EntityPersisterHelper {
             }
             return component;
         } catch (InvocationTargetException e) {
-            logger.log(Level.SEVERE, "Exception during serializing component type: " + component.getClass(), e);
+            logger.error("Exception during serializing component type: {}", component.getClass(), e);
         } catch (IllegalAccessException e) {
-            logger.log(Level.SEVERE, "Exception during serializing component type: " + component.getClass(), e);
+            logger.error("Exception during serializing component type: {}", component.getClass(), e);
         }
         return null;
     }

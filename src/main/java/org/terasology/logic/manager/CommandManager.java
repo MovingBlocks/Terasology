@@ -30,6 +30,8 @@ import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.commands.Command;
 import org.terasology.logic.commands.CommandParam;
@@ -48,8 +50,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.reflections.ReflectionUtils.withModifier;
@@ -60,7 +60,7 @@ import static org.reflections.ReflectionUtils.withModifier;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
 public class CommandManager {
-    private final Logger logger = Logger.getLogger(getClass().getName());
+    private static final Logger logger = LoggerFactory.getLogger(CommandManager.class);
 
     private final List<CommandInfo> commands = new ArrayList<CommandInfo>();
     private final Table<String, Integer, CommandInfo> commandLookup = HashBasedTable.create();
@@ -140,7 +140,7 @@ public class CommandManager {
             bind.setVariable(bindName, provider);
             GroovyShell shell = new GroovyShell(bind);
 
-            logger.log(Level.INFO, bindName + "." + name + "(" + params + ")");
+            logger.debug("Executing command {}.{}({})", bindName, name, params);
             shell.evaluate(bindName + "." + name + "(" + params + ")");
         }
     }
@@ -171,9 +171,9 @@ public class CommandManager {
                     commandLookup.put(command.getName(), command.getParameterCount(), command);
                 }
             } catch (InstantiationException e) {
-                logger.log(Level.SEVERE, "Failed to instantiate command provider " + providerClass.getName(), e);
+                logger.error("Failed to instantiate command provider {}", providerClass.getName(), e);
             } catch (IllegalAccessException e) {
-                logger.log(Level.SEVERE, "Failed to instantiate command provider " + providerClass.getName(), e);
+                logger.error("Failed to instantiate command provider {}", providerClass.getName(), e);
             }
         }
 
@@ -249,7 +249,7 @@ public class CommandManager {
             return false;
         }
         String executeString = paramsStr;
-        logger.log(Level.INFO, "Execute command with params '" + paramsStr + "'");
+        logger.debug("Execute command with params '{}'");
 
         try {
             //execute the command
@@ -260,7 +260,7 @@ public class CommandManager {
             //TODO better error handling and error message
             MessageManager.getInstance().addMessage(cmd.getUsageMessage());
             MessageManager.getInstance().addMessage("Error executing command '" + commandName + "'.");
-            logger.log(Level.WARNING, "Failed to run command", e);
+            logger.warn("Failed to execute command", e);
 
             return false;
         }

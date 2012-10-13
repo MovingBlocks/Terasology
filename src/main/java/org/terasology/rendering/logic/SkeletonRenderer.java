@@ -22,6 +22,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.rendering.assets.animation.MeshAnimation;
@@ -44,7 +46,6 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.nio.FloatBuffer;
 import java.util.List;
-import java.util.logging.Logger;
 
 import static org.lwjgl.opengl.GL11.glBegin;
 import static org.lwjgl.opengl.GL11.glEnd;
@@ -60,7 +61,8 @@ import static org.lwjgl.opengl.GL11.glVertex3f;
 @RegisterComponentSystem
 public class SkeletonRenderer implements RenderSystem, EventHandlerSystem, UpdateSubscriberSystem {
 
-    private Logger logger = Logger.getLogger(getClass().getName());
+    private static final Logger logger = LoggerFactory.getLogger(SkeletonRenderer.class);
+
     private EntityManager entityManager;
     private WorldRenderer worldRenderer;
 
@@ -220,7 +222,7 @@ public class SkeletonRenderer implements RenderSystem, EventHandlerSystem, Updat
                     rot.mul(inverseWorldRot, boneLocation.getWorldRotation());
                     boneRotations.add(rot);
                 } else {
-                    logger.warning("Unable to resolve bone \"" + bone.getName() + "\"");
+                    logger.warn("Unable to resolve bone \"{}\"", bone.getName());
                     bonePositions.add(new Vector3f());
                     boneRotations.add(new Quat4f());
                 }

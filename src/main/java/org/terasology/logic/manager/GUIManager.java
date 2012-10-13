@@ -16,12 +16,12 @@
 package org.terasology.logic.manager;
 
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.google.common.collect.Maps;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.world.WorldComponent;
 import org.terasology.entitySystem.EntityManager;
@@ -71,8 +71,8 @@ import javax.vecmath.Vector2f;
  */
 
 public class GUIManager implements EventHandlerSystem {
-    
-    private Logger logger = Logger.getLogger(getClass().getName());
+
+    private static final Logger logger = LoggerFactory.getLogger(GUIManager.class);
     private UIDisplayRenderer renderer;
     private Map<String, Class<? extends UIWindow>> registeredWindows = Maps.newHashMap();
 
@@ -131,7 +131,7 @@ public class GUIManager implements EventHandlerSystem {
      */
     private UIWindow addWindow(UIWindow window) {
         if (window != null) {
-            logger.log(Level.INFO, "GUIManager: Add window with ID \"" + window.getId() + "\"");
+            logger.debug("Added window with ID \"{}\"", window.getId());
             
             renderer.addDisplayElementToPosition(0, window);
             window.initialise();
@@ -145,9 +145,9 @@ public class GUIManager implements EventHandlerSystem {
     
     private void removeWindow(UIWindow window) {
         if (window == null) {
-            logger.log(Level.INFO, "GUIManager: Can't remove null reference");
+            logger.warn("Can't remove null window");
         } else {
-            logger.log(Level.INFO, "GUIManager: Remove window by reference with ID \"" + window.getId() + "\"");
+            logger.debug("Removed window by reference with ID \"{}\"");
             
             renderer.removeDisplayElement(window);
             window.shutdown();
@@ -155,7 +155,7 @@ public class GUIManager implements EventHandlerSystem {
     }
     
     private void removeAllWindows() {
-        logger.log(Level.INFO, "GUIManager: Remove all windows");
+        logger.debug("Removed all windows");
         
         for (UIDisplayElement window : renderer.getDisplayElements()) {
             if (window instanceof UIWindow) {
@@ -172,9 +172,9 @@ public class GUIManager implements EventHandlerSystem {
      */
     public void closeWindow(UIWindow window) {
         if (window == null) {
-            logger.log(Level.INFO, "GUIManager: Can't close window by null reference");
+            logger.warn("Can't close null window");
         } else {
-            logger.log(Level.INFO, "GUIManager: Close window by reference with ID \"" + window.getId() + "\"");
+            logger.debug("Closed window by reference with ID \"{}\"", window.getId());
             
             removeWindow(window);
         }
@@ -185,7 +185,7 @@ public class GUIManager implements EventHandlerSystem {
      * @param windowId The window by ID to remove.
      */
     public void closeWindow(String windowId) {
-        logger.log(Level.INFO, "GUIManager: Close window by ID \"" + windowId + "\"");
+        logger.debug("Closde window by ID \"{}\"", windowId);
         
         closeWindow(getWindowById(windowId));
     }
@@ -194,7 +194,7 @@ public class GUIManager implements EventHandlerSystem {
      * Close all windows and remove them from the GUIManager. Therefore they won't be updated or rendered anymore.
      */
     public void closeAllWindows() {
-        logger.log(Level.INFO, "GUIManager: Close all windows");
+        logger.debug("GUIManager: Closed all windows");
         
         removeAllWindows();
     }
@@ -206,13 +206,13 @@ public class GUIManager implements EventHandlerSystem {
      */
     public UIWindow openWindow(UIWindow window) {
         if (window == null) {
-            logger.log(Level.INFO, "GUIManager: Can't open window by null reference");
+            logger.warn("Can't open window: null");
         } else {
             if (!renderer.getDisplayElements().contains(window)) {
                 addWindow(window);
             }
             
-            logger.log(Level.INFO, "GUIManager: Open and focus window by reference with ID \"" + window.getId() + "\"");
+            logger.debug("Open and focus window by reference with ID \"{}\"");
             
             renderer.setWindowFocus(window);
         }
@@ -226,7 +226,7 @@ public class GUIManager implements EventHandlerSystem {
      * @return Returns the reference of the window which was opened and focused. If a window can't be loaded a null reference will be returned.
      */
     public UIWindow openWindow(String windowId) {
-        logger.log(Level.INFO, "GUIManager: Open and foucs window by ID \"" + windowId + "\"");
+        logger.debug("Open and foucs window by ID \"{}\"", windowId);
         
         UIWindow window = getWindowById(windowId);
         
@@ -256,23 +256,23 @@ public class GUIManager implements EventHandlerSystem {
         UIWindow window = getWindowById(windowId);
         
         if (window != null) {
-            logger.log(Level.INFO, "GUIManager: Window with ID \"" + windowId + "\" already loaded.");
+            logger.warn("Window with ID \"{}\" already loaded.", windowId);
             return window;
         }
 
         Class<? extends UIWindow> windowClass = registeredWindows.get(windowId);
         if (windowClass != null) {
-            logger.log(Level.INFO, "GUIManager: Loading window with ID \"" + windowId + "\".");
+            logger.debug("Loading window with ID \"{}\".", windowId);
 
             try {
                 return addWindow(windowClass.newInstance());
             } catch (InstantiationException e) {
-                logger.severe("Failed to load window " + windowId + ", no default constructor");
+                logger.error("Failed to load window {}, no default constructor", windowId);
             } catch (IllegalAccessException e) {
-                logger.severe("Failed to load window " + windowId + ", no default constructor");
+                logger.error("Failed to load window {}, no default constructor", windowId);
             }
         }
-        logger.warning("Unable to load window \"" + windowId + "\", unknown id");
+        logger.warn("Unable to load window \"{}\", unknown id", windowId);
         return null;
     }
 

@@ -17,7 +17,6 @@ package org.terasology.logic.manager;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3d;
@@ -44,8 +43,6 @@ import com.bulletphysics.linearmath.QuaternionUtil;
  * @author t3hk0d3 <contact@tehkode.ru>
  */
 public abstract class AudioManager implements SoundManager {
-
-    protected Logger logger = Logger.getLogger(this.getClass().getCanonicalName());
 
     private static AudioManager _instance = null;
 

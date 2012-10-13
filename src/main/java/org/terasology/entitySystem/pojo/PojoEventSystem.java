@@ -25,10 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.reflections.Reflections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.AbstractEvent;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityManager;
@@ -55,7 +55,7 @@ import com.google.common.collect.Sets;
  */
 public class PojoEventSystem implements EventSystem {
 
-    private Logger logger = Logger.getLogger(getClass().getName());
+    private static final Logger logger = LoggerFactory.getLogger(PojoEventSystem.class);
 
     private EntityManager entitySystem;
     private Map<Class<? extends Event>, Multimap<Class<? extends Component>, EventHandlerInfo>> componentSpecificHandlers = Maps.newHashMap();
@@ -88,7 +88,7 @@ public class PojoEventSystem implements EventSystem {
         if (name != null && !name.isEmpty()) {
             eventIdMap.put(name, eventType);
         }
-        logger.fine("Registering event " + eventType.getSimpleName());
+        logger.debug("Registering event {}", eventType.getSimpleName());
         for (Class parent : Reflections.getAllSuperTypes(eventType, Predicates.assignableFrom(Event.class))) {
             if (!AbstractEvent.class.equals(parent) && !Event.class.equals(parent)) {
                 childEvents.put(parent, eventType);
@@ -101,7 +101,7 @@ public class PojoEventSystem implements EventSystem {
         Class handlerClass = handler.getClass();
         // TODO: Support private methods
         if (!Modifier.isPublic(handlerClass.getModifiers())) {
-            logger.warning(String.format("Cannot register handler %s, must be public", handler.getClass().getName()));
+            logger.error("Cannot register handler {}, must be public", handler.getClass().getName());
             return;
         }
 
@@ -124,7 +124,7 @@ public class PojoEventSystem implements EventSystem {
                         }
                     }
                 } else {
-                    logger.warning("Invalid event handler method: " + method.getName());
+                    logger.error("Invalid event handler method: {}", method.getName());
                 }
             }
         }
@@ -252,11 +252,11 @@ public class PojoEventSystem implements EventSystem {
             try {
                 method.invoke(handler, event, entity);
             } catch (IllegalAccessException ex) {
-                logger.log(Level.SEVERE, "Failed to invoke event", ex);
+                logger.error("Failed to invoke event", ex);
             } catch (IllegalArgumentException ex) {
-                logger.log(Level.SEVERE, "Failed to invoke event", ex);
+                logger.error("Failed to invoke event", ex);
             } catch (InvocationTargetException ex) {
-                logger.log(Level.SEVERE, "Failed to invoke event", ex);
+                logger.error("Failed to invoke event", ex);
             }
         }
 

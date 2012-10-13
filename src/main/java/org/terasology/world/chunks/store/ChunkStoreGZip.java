@@ -30,11 +30,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.math.Vector3i;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkStore;
@@ -43,10 +43,10 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 
 public class ChunkStoreGZip implements ChunkStore, Serializable {
-
     private static final int NUM_DISPOSAL_THREADS = 2;
 
-    private transient Logger logger;
+    private static final Logger logger = LoggerFactory.getLogger(ChunkStoreGZip.class);
+
     private transient ConcurrentMap<Vector3i, Chunk> modifiedChunks;
     private transient ExecutorService compressionThreads = null;
     private transient BlockingQueue<Chunk> compressionQueue;
@@ -63,7 +63,6 @@ public class ChunkStoreGZip implements ChunkStore, Serializable {
             in = new ObjectInputStream(fileIn);
 
             ChunkStoreGZip cache = (ChunkStoreGZip) in.readObject();
-            cache.logger = Logger.getLogger(ChunkStoreGZip.class.getName());
             cache.compressionQueue = Queues.newLinkedBlockingDeque();
             cache.modifiedChunks = Maps.newConcurrentMap();
             cache.setupThreads();
@@ -77,21 +76,20 @@ public class ChunkStoreGZip implements ChunkStore, Serializable {
                 try {
                     in.close();
                 } catch (IOException e) {
-                    Logger.getLogger(ChunkStoreGZip.class.getName()).log(Level.SEVERE, "Failed to close input stream", e);
+                    logger.error("Failed to close input stream", e);
                 }
             }
             if (fileIn != null) {
                 try {
                     fileIn.close();
                 } catch (IOException e) {
-                    Logger.getLogger(ChunkStoreGZip.class.getName()).log(Level.SEVERE, "Failed to close input stream", e);
+                    logger.error("Failed to close input stream", e);
                 }
             }
         }
     }
 
     public ChunkStoreGZip() {
-        logger = Logger.getLogger(getClass().getName());
         modifiedChunks = Maps.newConcurrentMap();
         compressionQueue = Queues.newLinkedBlockingDeque();
         setupThreads();
@@ -114,9 +112,9 @@ public class ChunkStoreGZip implements ChunkStore, Serializable {
                                 }
 
                             } catch (InterruptedException e) {
-                                logger.log(Level.SEVERE, "Thread interrupted", e);
+                                logger.error("Thread interrupted", e);
                             } catch (Exception e) {
-                                logger.log(Level.SEVERE, "Error in thread", e);
+                                logger.error("Error in thread", e);
                             }
                         }
                         boolean remaining = true;
@@ -128,7 +126,7 @@ public class ChunkStoreGZip implements ChunkStore, Serializable {
                                 remaining = false;
                             }
                         } while (remaining);
-                        logger.log(Level.INFO, "Thread shutdown safely");
+                        logger.debug("Thread shutdown safely");
                     }
                 });
             }
@@ -152,10 +150,9 @@ public class ChunkStoreGZip implements ChunkStore, Serializable {
             c = (Chunk) objectIn.readObject();
             objectIn.close();
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Error loading chunk: ", e);
-            ;
+            logger.error("Error loading chunk", e);
         } catch (ClassNotFoundException e) {
-            logger.log(Level.SEVERE, "Error loading chunk: ", e);
+            logger.error("Error loading chunk", e);
         }
         return c;
     }
@@ -163,7 +160,7 @@ public class ChunkStoreGZip implements ChunkStore, Serializable {
     public void put(Chunk c) {
         modifiedChunks.put(c.getPos(), c);
         if (!compressionQueue.offer(c)) {
-            logger.log(Level.SEVERE, "Failed to add chunk to compression queue");
+            logger.error("Failed to add chunk to compression queue");
         }
     }
 
@@ -182,7 +179,7 @@ public class ChunkStoreGZip implements ChunkStore, Serializable {
         try {
             compressionThreads.awaitTermination(30, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            logger.log(Level.SEVERE, "Interrupted while awaiting thread disposal");
+            logger.error("Interrupted while awaiting thread disposal");
         }
     }
 
@@ -198,7 +195,7 @@ public class ChunkStoreGZip implements ChunkStore, Serializable {
             compressedChunks.put(c.getPos(), b);
             modifiedChunks.remove(c.getPos(), c);
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Error saving chunk: ", e);
+            logger.error("Error saving chunk", e);
         }
     }
 }

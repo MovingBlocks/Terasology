@@ -17,6 +17,8 @@ package org.terasology.asset;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.common.NullIterator;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.rendering.assets.Shader;
@@ -30,11 +32,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class AssetManager {
 
+    private static final Logger logger = LoggerFactory.getLogger(AssetManager.class);
     private static AssetManager instance = null;
 
     public static AssetManager getInstance() {
@@ -45,7 +46,6 @@ public class AssetManager {
         return instance;
     }
 
-    private Logger logger = Logger.getLogger(this.getClass().getCanonicalName());
     private Map<String, AssetSource> assetSources = Maps.newHashMap();
     private EnumMap<AssetType, Map<String, AssetLoader>> assetLoaders = Maps.newEnumMap(AssetType.class);
     private Map<AssetUri, Asset> assetCache = Maps.newHashMap();
@@ -89,7 +89,7 @@ public class AssetManager {
         List<URL> urls = getAssetURLs(uri);
         if (urls.size() == 0) {
             if (logErrors) {
-                logger.log(Level.WARNING, "Unable to resolve asset: " + uri);
+                logger.warn("Unable to resolve asset: {}", uri);
             }
             return null;
         }
@@ -114,22 +114,22 @@ public class AssetManager {
                 if (asset != null) {
                     assetCache.put(uri, asset);
                 }
-                logger.log(Level.INFO, "Loaded " + uri);
+                logger.debug("Loaded {}", uri);
                 return asset;
             } catch (IOException ioe) {
-                logger.log(Level.SEVERE, "Error reading asset " + uri, ioe);
+                logger.error("Error reading asset {}", uri, ioe);
                 return null;
             } finally {
                 if (stream != null) {
                     try {
                         stream.close();
                     } catch (IOException innerException) {
-                        logger.log(Level.SEVERE, "Error closing stream for " + uri, innerException);
+                        logger.error("Error closing stream for {}", uri, innerException);
                     }
                 }
             }
         }
-        logger.log(Level.WARNING, "Unable to resolve asset: " + uri);
+        logger.warn("Unable to resolve asset: {}", uri);
         return null;
     }
 

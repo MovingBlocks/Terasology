@@ -16,7 +16,6 @@
 package org.terasology.world.block.management;
 
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
@@ -24,6 +23,8 @@ import gnu.trove.iterator.TObjectByteIterator;
 import gnu.trove.map.hash.TByteObjectHashMap;
 import gnu.trove.map.hash.TObjectByteHashMap;
 import org.lwjgl.BufferUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockPart;
@@ -37,7 +38,6 @@ import java.nio.FloatBuffer;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 
 /**
  * Provides access to blocks by block id or block title.
@@ -46,9 +46,10 @@ import java.util.logging.Logger;
  */
 public class BlockManager {
 
+    private static final Logger logger = LoggerFactory.getLogger(BlockManager.class);
+
     /* SINGLETON */
     private static BlockManager instance;
-    private Logger logger = Logger.getLogger(getClass().getName());
 
     private BlockLoader blockLoader;
 
@@ -133,7 +134,7 @@ public class BlockManager {
         for (String blockUri : knownBlockMappings.keySet()) {
             Block block = getBlock(new BlockUri(blockUri));
             if (block == null) {
-                logger.warning("Block " + blockUri + " no longer available");
+                logger.warn("Block {} no longer available", blockUri);
             }
         }
     }
@@ -174,7 +175,7 @@ public class BlockManager {
                     if (family != null) {
                         registerBlockFamily(family);
                     } else {
-                        logger.severe("Failed to load shapeless def: " + uri);
+                        logger.error("Failed to load shapeless def: {}", uri);
                     }
                 }
             }

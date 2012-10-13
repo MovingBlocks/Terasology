@@ -18,9 +18,9 @@ package org.terasology.entitySystem.metadata.core;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Locale;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.metadata.AbstractTypeHandler;
 import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.protobuf.EntityData;
@@ -32,7 +32,7 @@ import com.google.common.collect.Maps;
  */
 public class MappedContainerTypeHandler<T> extends AbstractTypeHandler<T> {
 
-    private static Logger logger = Logger.getLogger(MappedContainerTypeHandler.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(MappedContainerTypeHandler.class);
 
     private Class<T> clazz;
     private Map<String, FieldMetadata> fields = Maps.newHashMap();
@@ -62,9 +62,9 @@ public class MappedContainerTypeHandler<T> extends AbstractTypeHandler<T> {
                 }
             }
         } catch (IllegalAccessException e) {
-            logger.log(Level.SEVERE, "Unable to serialize field of " + value.getClass(), e);
+            logger.error("Unable to serialize field of {}", value.getClass(), e);
         } catch (InvocationTargetException e) {
-            logger.log(Level.SEVERE, "Unable to serialize field of " + value.getClass(), e);
+            logger.error("Unable to serialize field of {}", value.getClass(), e);
         }
         return result.build();
     }
@@ -83,7 +83,7 @@ public class MappedContainerTypeHandler<T> extends AbstractTypeHandler<T> {
             }
             return result;
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Unable to deserialize " + value, e);
+            logger.error("Unable to deserialize {}", value, e);
         }
         return null;
     }
@@ -97,11 +97,11 @@ public class MappedContainerTypeHandler<T> extends AbstractTypeHandler<T> {
                 }
                 return result;
             } catch (InstantiationException e) {
-                logger.log(Level.SEVERE, "Unable to clone " + value.getClass(), e);
+                logger.error("Unable to clone {}", value.getClass(), e);
             } catch (IllegalAccessException e) {
-                logger.log(Level.SEVERE, "Unable to clone " + value.getClass(), e);
+                logger.error("Unable to clone {}", value.getClass(), e);
             } catch (InvocationTargetException e) {
-                logger.log(Level.SEVERE, "Unable to clone " + value.getClass(), e);
+                logger.error("Unable to clone {}", value.getClass(), e);
             }
         }
         return null;

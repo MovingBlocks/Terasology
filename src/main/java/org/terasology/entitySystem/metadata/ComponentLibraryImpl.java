@@ -24,9 +24,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.metadata.core.BooleanTypeHandler;
 import org.terasology.entitySystem.metadata.core.ByteTypeHandler;
@@ -48,8 +48,8 @@ import com.google.common.collect.Maps;
  */
 public final class ComponentLibraryImpl implements ComponentLibrary {
     private static final int MAX_SERIALIZATION_DEPTH = 1;
+    private static final Logger logger = LoggerFactory.getLogger(ComponentLibraryImpl.class);
 
-    private Logger logger = Logger.getLogger(getClass().getName());
     private Map<Class<? extends Component>, ComponentMetadata> componentSerializationLookup = Maps.newHashMap();
     private Map<String, Class<? extends Component>> componentTypeLookup = Maps.newHashMap();
     private Map<Class<?>, TypeHandler<?>> typeHandlers = Maps.newHashMap();
@@ -80,7 +80,7 @@ public final class ComponentLibraryImpl implements ComponentLibrary {
             // Check if constructor exists
             componentClass.getConstructor();
         } catch (NoSuchMethodException e) {
-            logger.log(Level.SEVERE, String.format("Unable to register component class %s: Default Constructor Required", componentClass.getSimpleName()));
+            logger.error("Unable to register component class {}: Default Constructor Required", componentClass.getSimpleName());
             return;
         }
 
@@ -91,7 +91,7 @@ public final class ComponentLibraryImpl implements ComponentLibrary {
             field.setAccessible(true);
             TypeHandler typeHandler = getHandlerFor(field.getGenericType(), 0);
             if (typeHandler == null) {
-                logger.log(Level.SEVERE, "Unsupported field type in component type " + componentClass.getSimpleName() + ", " + field.getName() + " : " + field.getGenericType());
+                logger.error("Unsupported field type in component type {}, {} : {}", componentClass.getSimpleName(), field.getName(), field.getGenericType());
             } else {
                 info.addField(new FieldMetadata(field, componentClass, typeHandler));
             }
@@ -137,7 +137,7 @@ public final class ComponentLibraryImpl implements ComponentLibrary {
         } else if (type instanceof ParameterizedType) {
             typeClass = (Class) ((ParameterizedType) type).getRawType();
         } else {
-            logger.log(Level.SEVERE, "Cannot obtain class for type " + type);
+            logger.error("Cannot obtain class for type {}", type);
             return null;
         }
 
@@ -153,7 +153,7 @@ public final class ComponentLibraryImpl implements ComponentLibrary {
                     return new ListTypeHandler(innerHandler);
                 }
             }
-            logger.log(Level.SEVERE, "List field is not parameterized, or holds unsupported type");
+            logger.error("List field is not parameterized, or holds unsupported type");
             return null;
         }
         // For Maps, createEntityRef the handler for the value type (and maybe key too?)
@@ -168,7 +168,7 @@ public final class ComponentLibraryImpl implements ComponentLibrary {
                     }
                 }
             }
-            logger.log(Level.SEVERE, "Map field is not parameterized, does not have a String key, or holds unsupported values");
+            logger.error("Map field is not parameterized, does not have a String key, or holds unsupported values");
         }
         // For know types, just use the handler
         else if (typeHandlers.containsKey(typeClass)) {
@@ -181,11 +181,11 @@ public final class ComponentLibraryImpl implements ComponentLibrary {
                 Constructor constructor = typeClass.getConstructor();
 
             } catch (NoSuchMethodException e) {
-                logger.log(Level.SEVERE, String.format("Unable to register field of type %s: no publicly accessible default constructor", typeClass.getSimpleName()));
+                logger.error("Unable to register field of type {}: no publicly accessible default constructor", typeClass.getSimpleName());
                 return null;
             }
 
-            logger.log(Level.WARNING, "Handling serialization of type " + typeClass + " via MappedContainer");
+            logger.warn("Handling serialization of type {} via MappedContainer", typeClass);
             MappedContainerTypeHandler mappedHandler = new MappedContainerTypeHandler(typeClass);
             for (Field field : typeClass.getDeclaredFields()) {
                 if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers()))
@@ -194,7 +194,7 @@ public final class ComponentLibraryImpl implements ComponentLibrary {
                 field.setAccessible(true);
                 TypeHandler handler = getHandlerFor(field.getGenericType(), depth + 1);
                 if (handler == null) {
-                    logger.log(Level.SEVERE, "Unsupported field type in component type " + typeClass.getSimpleName() + ", " + field.getName() + " : " + field.getGenericType());
+                    logger.error("Unsupported field type in component type {}, {} : {}", typeClass.getSimpleName(), field.getName(), field.getGenericType());
                 } else {
                     mappedHandler.addField(new FieldMetadata(field, typeClass, handler));
                 }

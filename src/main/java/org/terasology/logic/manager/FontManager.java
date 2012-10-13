@@ -17,12 +17,12 @@ package org.terasology.logic.manager;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.newdawn.slick.AngelCodeFont;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.util.ResourceLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides global access to fonts.
@@ -31,16 +31,17 @@ import org.newdawn.slick.util.ResourceLoader;
  */
 public class FontManager {
 
-    private Logger logger = Logger.getLogger(getClass().getName());
-    private final HashMap<String, AngelCodeFont> _fonts = new HashMap<String, AngelCodeFont>();
-    private static FontManager _instance = null;
+    private static final Logger logger = LoggerFactory.getLogger(FontManager.class);
+
+    private final HashMap<String, AngelCodeFont> fonts = new HashMap<String, AngelCodeFont>();
+    private static FontManager instance = null;
 
     public static FontManager getInstance() {
-        if (_instance == null) {
-            _instance = new FontManager();
+        if (instance == null) {
+            instance = new FontManager();
         }
 
-        return _instance;
+        return instance;
     }
 
     private FontManager() {
@@ -49,15 +50,15 @@ public class FontManager {
 
     private void initFonts() {
         try {
-            _fonts.put("default", new AngelCodeFont("Font", ResourceLoader.getResource("assets/fonts/default.fnt").openStream(), ResourceLoader.getResource("assets/fonts/default_0.png").openStream()));
+            fonts.put("default", new AngelCodeFont("Font", ResourceLoader.getResource("assets/fonts/default.fnt").openStream(), ResourceLoader.getResource("assets/fonts/default_0.png").openStream()));
         } catch (SlickException e) {
-            logger.log(Level.SEVERE, "Couldn't load fonts. Sorry. " + e.toString(), e);
+            logger.error("Couldn't load fonts.", e);
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Couldn't load fonts. Sorry. " + e.toString(), e);
+            logger.error("Couldn't load fonts.", e);
         }
     }
 
     public AngelCodeFont getFont(String s) {
-        return _fonts.get(s);
+        return fonts.get(s);
     }
 }

@@ -19,14 +19,14 @@ import java.util.Arrays;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventReceiver;
@@ -71,8 +71,8 @@ import com.google.common.collect.Lists;
 // TODO: Merge this with Physics System
 public class BulletPhysics implements EventReceiver<BlockChangedEvent> {
 
-    private Logger _logger = Logger.getLogger(getClass().getName());
-
+    private static final Logger logger = LoggerFactory.getLogger(BulletPhysics.class);
+    
     private final Deque<RigidBodyRequest> _insertionQueue = new LinkedList<RigidBodyRequest>();
     private final Deque<RigidBody> _removalQueue = new LinkedList<RigidBody>();
 
@@ -234,7 +234,7 @@ public class BulletPhysics implements EventReceiver<BlockChangedEvent> {
             _discreteDynamicsWorld.stepSimulation(delta, 1);
             PerformanceMonitor.endActivity();
         } catch (Exception e) {
-            _logger.log(Level.WARNING, "Somehow Bullet Physics managed to throw an exception again.", e);
+            logger.error("Error running simulation step.", e);
         }
     }
 

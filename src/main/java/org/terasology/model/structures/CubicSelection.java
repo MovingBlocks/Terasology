@@ -15,8 +15,9 @@
  */
 package org.terasology.model.structures;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A specialized version of a BlockSelection, specifically a rectangular cuboid made up by exactly two BlockPositions
@@ -26,7 +27,7 @@ import java.util.logging.Logger;
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
 public class CubicSelection extends BlockSelection {
-    private static Logger logger = Logger.getLogger(CubicSelection.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(CubicSelection.class);
 
     //TODO: Make factory methods instead of public constructors - that way Cubic can be more picky and not allow default ctor
     //TODO: Add more validation to make sure _positions contains exactly 2 BlockPositions
@@ -55,8 +56,8 @@ public class CubicSelection extends BlockSelection {
     public CubicSelection(BlockPosition anchor, int width, int height, int depth) {
         BlockPosition topLeftFront = new BlockPosition(anchor.x - width / 2, anchor.y - height / 2, anchor.z - depth / 2);
         BlockPosition bottomRightBack = new BlockPosition(anchor.x + width, anchor.y + height, anchor.z + depth);
-        logger.log(Level.INFO, "Creating CubicSelection around anchor " + anchor + " with width " + width + ", height " + height + ", depth " + depth);
-        logger.log(Level.INFO, "Calculated topLeftFront is " + topLeftFront + ", bottomRightBack is " + bottomRightBack);
+        logger.trace("Creating CubicSelection around anchor {} with width {}, height {}, depth {}", anchor, width, height, depth);
+        logger.trace("Calculated topLeftFront is {}, bottomRightBack is {}", topLeftFront, bottomRightBack);
         _positions.add(topLeftFront);
         _positions.add(bottomRightBack);
     }
@@ -89,7 +90,7 @@ public class CubicSelection extends BlockSelection {
                     && targetPos.y >= minY
                     && targetPos.z <= maxZ
                     && targetPos.z >= minZ) {
-                logger.log(Level.INFO, "Selections overlap at " + targetPos + ", maybe more, returning true");
+                logger.trace("Selections overlap at {}, maybe more, returning true", targetPos);
                 return true;
             }
         }

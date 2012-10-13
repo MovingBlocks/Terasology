@@ -15,9 +15,8 @@
  */
 package org.terasology.game;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.game.modes.StateMainMenu;
 import org.terasology.logic.manager.PathManager;
 
@@ -32,7 +31,7 @@ import org.terasology.logic.manager.PathManager;
 public final class Terasology {
     private static TerasologyEngine engine = new TerasologyEngine();
 
-    private final static Logger logger = Logger.getLogger("Terasology");
+    private static final Logger logger = LoggerFactory.getLogger(Terasology.class);
 
     private Terasology() {
     }
@@ -44,7 +43,7 @@ public final class Terasology {
             engine.run(new StateMainMenu());
             engine.dispose();
         } catch (Throwable t) {
-            Logger.getLogger(Terasology.class.getName()).log(Level.SEVERE, "Uncaught Exception", t);
+            logger.error("Uncaught Exception", t);
         }
         System.exit(0);
     }

@@ -19,7 +19,6 @@ package org.terasology.world;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
-import java.util.logging.Logger;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.HealthComponent;
@@ -47,8 +46,6 @@ import org.terasology.world.block.BlockRegionComponent;
  * @author Immortius
  */
 public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator implements BlockEntityRegistry, EventHandlerSystem, UpdateSubscriberSystem {
-
-    private Logger logger = Logger.getLogger(getClass().getName());
     private EntityManager entityManager;
 
     // TODO: Perhaps a better datastructure for spatial lookups
@@ -197,7 +194,6 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         PerformanceMonitor.startActivity("BlockChangedEventQueue");
         BlockChangedEvent event = eventQueue.poll();
         while (event != null) {
-            logger.finer(String.format("%s: %s -> %s", event.getBlockPosition(), event.getOldType().getBlockFamily(), event.getNewType().getBlockFamily()));
             getOrCreateEntityAt(event.getBlockPosition()).send(event);
             if (processed++ >= 4) {
                 break;
