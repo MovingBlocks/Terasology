@@ -47,7 +47,6 @@ import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
-import java.util.logging.Logger;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -82,8 +81,6 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
     public static final float GHOST_INERTIA = 4f;
 
     private static final float CHECK_FORWARD_DIST = 0.05f;
-
-    private Logger logger = Logger.getLogger(getClass().getName());
 
     private EntityManager entityManager;
     private WorldProvider worldProvider;

@@ -1,5 +1,5 @@
 {
-    "name" : "core:greenpotion",
+    "name" : "potions:greenpotion",
     "Item" : {
         "name" : "GreenPotion",
         "icon" : "GreenVial",

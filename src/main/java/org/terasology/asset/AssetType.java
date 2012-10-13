@@ -16,22 +16,19 @@
 
 package org.terasology.asset;
 
-import java.util.Map;
-import java.util.logging.Logger;
-
+import com.google.common.collect.Maps;
+import org.terasology.asset.loaders.OggSoundLoader;
+import org.terasology.asset.loaders.OggStreamingSoundLoader;
 import org.terasology.rendering.assetLoaders.GLSLShaderLoader;
 import org.terasology.rendering.assetLoaders.MaterialLoader;
 import org.terasology.rendering.assetLoaders.ObjMeshLoader;
-import org.terasology.asset.loaders.OggSoundLoader;
-import org.terasology.asset.loaders.OggStreamingSoundLoader;
 import org.terasology.rendering.assetLoaders.PNGTextureLoader;
 import org.terasology.rendering.assetLoaders.md5.MD5AnimationLoader;
 import org.terasology.rendering.assetLoaders.md5.MD5SkeletonLoader;
 import org.terasology.world.block.loader.TileLoader;
 import org.terasology.world.block.shapes.JsonBlockShapeLoader;
 
-import com.google.common.collect.Maps;
-
+import java.util.Map;
 
 
 /**
@@ -70,10 +67,9 @@ public enum AssetType {
     ANIMATION("animation", "animations", "md5anim", new MD5AnimationLoader());
 
 
-
     /* ============
-     * Class fields
-     * ============ */
+  * Class fields
+  * ============ */
 
     private String typeId;
 
@@ -95,8 +91,6 @@ public enum AssetType {
      */
     private AssetLoader assetLoader;
 
-    private Logger logger = Logger.getLogger(getClass().getName());
-
     static {
         typeIdLookup = Maps.newHashMap();
         subDirLookup = Maps.newHashMap();
@@ -108,10 +102,9 @@ public enum AssetType {
     }
 
 
-
     /* ==========
-     * Public API
-     * ========== */
+  * Public API
+  * ========== */
 
     private AssetType(String typeId, String subDir, String fileExtension, AssetLoader assetLoader) {
         this.typeId = typeId;
@@ -147,10 +140,9 @@ public enum AssetType {
     }
 
 
-
     /* ==========
-     * Static API
-     * ========== */
+  * Static API
+  * ========== */
 
     public static AssetType getTypeForId(String id) {
         return typeIdLookup.get(id);
@@ -165,9 +157,11 @@ public enum AssetType {
      * class associated with them.
      */
     public static void registerAssetTypes() {
-        for(AssetType type : AssetType.values()) {
+        for (AssetType type : AssetType.values()) {
             AssetLoader loader = type.getAssetLoader();
-            if(loader == null) continue; // No loader has been assigned to this AssetType
+            if (loader == null) {
+                continue; // No loader has been assigned to this AssetType
+            }
 
             AssetManager.getInstance().register(
                     type,

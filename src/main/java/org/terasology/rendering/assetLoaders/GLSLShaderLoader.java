@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetUri;
 import org.terasology.rendering.assets.Shader;
@@ -44,6 +45,7 @@ import com.google.gson.JsonParseException;
  * @author Immortius
  */
 public class GLSLShaderLoader implements AssetLoader<Shader> {
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(GLSLShaderLoader.class);
 
     private Gson gson;
 
@@ -83,7 +85,7 @@ public class GLSLShaderLoader implements AssetLoader<Shader> {
             try {
                 reader.close();
             } catch (IOException e) {
-                Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Failed to close stream", e);
+                logger.error("Failed to close stream", e);
             }
         }
     }
@@ -97,7 +99,7 @@ public class GLSLShaderLoader implements AssetLoader<Shader> {
             try {
                 reader.close();
             } catch (IOException e) {
-                Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Failed to close stream", e);
+                logger.error("Failed to close stream", e);
             }
         }
     }

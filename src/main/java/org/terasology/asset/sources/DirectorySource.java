@@ -16,19 +16,20 @@
 
 package org.terasology.asset.sources;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.asset.AssetUri;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.logging.Logger;
-
-import org.terasology.asset.AssetUri;
 
 /**
  * @author Immortius
  */
 public class DirectorySource extends AbstractSource {
 
-    private Logger logger = Logger.getLogger(getClass().getName());
+    private static final Logger logger = LoggerFactory.getLogger(DirectorySource.class);
 
     public DirectorySource(String id, File rootDirectory) {
         super(id);
@@ -64,7 +65,7 @@ public class DirectorySource extends AbstractSource {
                         try {
                             addItem(uri, child.toURI().toURL());
                         } catch (MalformedURLException e) {
-                            logger.warning("Failed to load asset " + key + " - " + e.getMessage());
+                            logger.warn("Failed to load asset {}", key, e.getMessage());
                         }
                     }
                 }

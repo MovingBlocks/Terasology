@@ -16,8 +16,6 @@
 
 package org.terasology.world;
 
-import java.util.logging.Logger;
-
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
@@ -31,7 +29,6 @@ import org.terasology.world.liquid.LiquidData;
  * @author Immortius
  */
 public class WorldView {
-    private static Logger logger = Logger.getLogger(WorldView.class.getName());
 
     private Vector3i offset;
     private Region3i chunkRegion;
@@ -54,7 +51,7 @@ public class WorldView {
 
     public static WorldView createSubviewAroundChunk(Vector3i chunkPos, ChunkProvider chunkProvider) {
         Region3i region = Region3i.createFromCenterExtents(chunkPos, new Vector3i(1, 0, 1));
-        return createWorldView(region, new Vector3i(-region.min().x, 0, - region.min().z), chunkProvider);
+        return createWorldView(region, new Vector3i(-region.min().x, 0, -region.min().z), chunkProvider);
     }
 
     public static WorldView createWorldView(Region3i region, Vector3i offset, ChunkProvider chunkProvider) {

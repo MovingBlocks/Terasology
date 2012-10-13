@@ -18,15 +18,17 @@ package org.terasology.version;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Mathias Kalb
  */
 public final class TerasologyVersion {
 
-    private static Logger logger = Logger.getLogger(TerasologyVersion.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(TerasologyVersion.class);
 
     private static TerasologyVersion instance;
 
@@ -58,7 +60,7 @@ public final class TerasologyVersion {
             try {
                 properties.load(inStream);
             } catch (final IOException e) {
-                logger.log(Level.SEVERE, "Loading " + VERSION_INFO_FILE, e);
+                logger.error("Loading {} failed", VERSION_INFO_FILE, e);
             } finally {
                 // JAVA7 : cleanup
                 try {
@@ -66,7 +68,7 @@ public final class TerasologyVersion {
                         inStream.close();
                     }
                 } catch (final IOException e) {
-                    logger.log(Level.SEVERE, "Closing " + VERSION_INFO_FILE, e);
+                    logger.error("Closing {} failed", VERSION_INFO_FILE, e);
                 }
             }
         }
@@ -80,7 +82,6 @@ public final class TerasologyVersion {
         dateTime = properties.getProperty(DATE_TIME, DEFAULT_VALUE);
 
         final StringBuilder toStringBuilder = new StringBuilder();
-        toStringBuilder.append(this.getClass().getName());
         toStringBuilder.append("[");
         toStringBuilder.append(BUILD_NUMBER);
         toStringBuilder.append("=");

@@ -15,30 +15,16 @@
  */
 package org.terasology.world.block;
 
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glIsEnabled;
-
-import java.awt.Color;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.util.EnumMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.imageio.ImageIO;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
-
+import com.bulletphysics.collision.shapes.CollisionShape;
+import com.bulletphysics.linearmath.Transform;
+import com.google.common.collect.Maps;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.util.ResourceLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.utilities.collection.EnumBooleanMap;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.AABB;
 import org.terasology.math.Side;
@@ -47,13 +33,25 @@ import org.terasology.math.Vector3i;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.shader.ShaderProgram;
+import org.terasology.utilities.collection.EnumBooleanMap;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.shapes.BlockMeshPart;
-
-import com.bulletphysics.collision.shapes.CollisionShape;
-import com.bulletphysics.linearmath.Transform;
-import com.google.common.collect.Maps;
 import org.terasology.world.chunks.Chunk;
+
+import javax.imageio.ImageIO;
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.EnumMap;
+
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glIsEnabled;
 
 /**
  * Stores all information for a specific block type.
@@ -62,11 +60,10 @@ import org.terasology.world.chunks.Chunk;
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
 public class Block {
-
-    private static final Logger logger = Logger.getLogger(Block.class.getName());
-
     public static final float TEXTURE_OFFSET = 0.0625f;
     public static final float TEXTURE_OFFSET_WIDTH = 0.0624f;
+
+    private static final Logger logger = LoggerFactory.getLogger(Block.class);
 
     // TODO: Use directional light(s) when rendering instead of this
     private static final EnumMap<BlockPart, Float> DIRECTION_LIT_LEVEL = new EnumMap<BlockPart, Float>(BlockPart.class);
@@ -124,7 +121,7 @@ public class Block {
             colorLut = ImageIO.read(ResourceLoader.getResource("assets/textures/grasscolor.png").openStream());
             foliageLut = ImageIO.read(ResourceLoader.getResource("assets/textures/foliagecolor.png").openStream());
         } catch (IOException e) {
-            logger.log(Level.SEVERE, e.toString(), e);
+            logger.error("Failed to load LUTs", e);
         }
     }
 
@@ -237,6 +234,7 @@ public class Block {
 
     /**
      * A liquid has some special handling around shape
+     *
      * @return Whether this block is a liquid
      */
     public boolean isLiquid() {
@@ -271,6 +269,7 @@ public class Block {
 
     /**
      * A block is penetrable if it does not block solid objects.
+     *
      * @return Whether this block allows solid objects to pass through it.
      */
     public boolean isPenetrable() {
@@ -365,9 +364,10 @@ public class Block {
 
     /**
      * Whether it is safe to throw away the block's entity between interactions.
-     *
+     * <p/>
      * For efficiency, when possible entities created for blocks are removed when they are no longer needed.
      * But if a block's entity needs to persist some state (like a chest's contents), then the entity must remain.
+     *
      * @return Whether the entity for this block can be thrown away after use
      */
     public boolean isEntityTemporary() {
@@ -460,7 +460,7 @@ public class Block {
         return colorOffset.get(part);
     }
 
-    public void setColorOffset(BlockPart part, Vector4f color)  {
+    public void setColorOffset(BlockPart part, Vector4f color) {
         colorOffset.put(part, color);
     }
 
@@ -559,7 +559,7 @@ public class Block {
     public void setCollision(Vector3f offset, CollisionShape shape) {
         collisionShape = shape;
         collisionOffset = offset;
-        Transform t = new Transform(new Matrix4f(new Quat4f(0,0,0,1), offset, 1.0f));
+        Transform t = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), offset, 1.0f));
         Vector3f min = new Vector3f();
         Vector3f max = new Vector3f();
         shape.getAabb(t, min, max);
@@ -594,7 +594,7 @@ public class Block {
         if (mesh == null) {
             generateMesh();
         } else if (mesh.isDisposed()) {
-            logger.severe("Mesh disposed");
+            logger.error("Cannot render disposed mesh");
             return;
         }
 

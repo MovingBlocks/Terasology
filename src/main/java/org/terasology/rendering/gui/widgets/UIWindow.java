@@ -15,9 +15,10 @@
  */
 package org.terasology.rendering.gui.widgets;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.BindButtonEvent;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.animation.AnimationOpacity;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayContainerScrollable;
@@ -27,8 +28,6 @@ import org.terasology.rendering.gui.framework.events.KeyListener;
 import org.terasology.rendering.gui.framework.events.WindowListener;
 
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * A window which can contain display elements. All windows will be managed by the GUIManager.
@@ -38,7 +37,9 @@ import java.util.logging.Logger;
  * TODO closeBinds/closeKeys needs to be handled in another way.. (its not really a close -> setVisible(false))
  */
 public class UIWindow extends UIDisplayContainerScrollable {
-    
+
+    private static final Logger logger = LoggerFactory.getLogger(UIWindow.class);
+
     //events
     private static enum EWindowEvent {INITIALISE, SHUTDOWN};
     private final ArrayList<WindowListener> windowListeners = new ArrayList<WindowListener>();
@@ -49,10 +50,7 @@ public class UIWindow extends UIDisplayContainerScrollable {
     
     //layout
     private boolean modal = false;
-    
-    //other
-    private Logger logger = Logger.getLogger(getClass().getName());
-    
+
     public UIWindow() {
         addClickListener(new ClickListener() {
             @Override
@@ -172,7 +170,7 @@ public class UIWindow extends UIDisplayContainerScrollable {
      * To be notified when the window is initialized use addWindowListener.
      */
     public void initialise() {
-        logger.log(Level.INFO, "Initialise window with with ID \"" + getId() + "\"");
+        logger.debug("Initialise window with with ID \"{}\"", getId());
         notifyWindowListeners(EWindowEvent.INITIALISE);
     }
     
@@ -181,7 +179,7 @@ public class UIWindow extends UIDisplayContainerScrollable {
      * To be notified when the window shuts down use addWindowListener.
      */
     public void shutdown() {
-        logger.log(Level.INFO, "Shutdown window with with ID \"" + getId() + "\"");
+        logger.debug("Shutdown window with with ID \"{}\"", getId());
         notifyWindowListeners(EWindowEvent.SHUTDOWN);
     }
     

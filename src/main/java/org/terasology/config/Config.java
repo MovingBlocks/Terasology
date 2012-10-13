@@ -18,6 +18,8 @@ package org.terasology.config;
 
 import com.google.common.collect.Multimap;
 import com.google.gson.GsonBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.input.Input;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.utilities.gson.InputHandler;
@@ -27,8 +29,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Terasology user config. Holds the various global configuration information that the user can modify. It can be saved
@@ -37,7 +37,7 @@ import java.util.logging.Logger;
  * @author Immortius
  */
 public final class Config {
-    private static Logger logger = Logger.getLogger(Config.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(Config.class);
     private InputConfig input = new InputConfig();
 
     /**
@@ -60,7 +60,7 @@ public final class Config {
         try {
             save(getConfigFile(), this);
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Failed to save config", e);
+            logger.error("Failed to save config", e);
         }
     }
 

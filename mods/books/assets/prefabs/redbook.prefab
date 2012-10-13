@@ -1,5 +1,5 @@
 {
-    "name" : "core:redbook",
+    "name" : "books:redbook",
     "Item" : {
         "name" : "RedBook",
         "icon" : "RedBook",

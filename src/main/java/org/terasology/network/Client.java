@@ -18,20 +18,21 @@ package org.terasology.network;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFactory;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Immortius
  */
 public class Client {
-    private Logger logger = Logger.getLogger(getClass().getName());
+
+    private static final Logger logger = LoggerFactory.getLogger(Client.class);
 
     private ChannelFactory factory;
     private Channel clientChannel;
@@ -45,7 +46,7 @@ public class Client {
         ChannelFuture connectCheck = bootstrap.connect(new InetSocketAddress(host, port));
         connectCheck.awaitUninterruptibly();
         if (!connectCheck.isSuccess()) {
-            logger.log(Level.SEVERE, "Failed to connect to server", connectCheck.getCause());
+            logger.warn("Failed to connect to server", connectCheck.getCause());
             connectCheck.getChannel().getCloseFuture().awaitUninterruptibly();
             factory.releaseExternalResources();
         }

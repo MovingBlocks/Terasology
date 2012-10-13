@@ -16,13 +16,13 @@
 
 package org.terasology.network;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.protobuf.NetData;
 
 /**
@@ -30,17 +30,17 @@ import org.terasology.protobuf.NetData;
  */
 public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
 
-    private Logger logger = Logger.getLogger(getClass().getName());
+    private static final Logger logger = LoggerFactory.getLogger(TerasologyClientHandler.class);
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
         NetData.ServerMessage message = (NetData.ServerMessage) e.getMessage();
-        logger.log(Level.INFO, "Received message: " + message.getConnection().getName());
+        logger.trace("Received message: {}", message.getConnection().getName());
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
-        logger.log(Level.WARNING, "Unexpected exception from client", e.getCause());
+        logger.warn("Unexpected exception from client", e.getCause());
         e.getChannel().close();
     }
 }

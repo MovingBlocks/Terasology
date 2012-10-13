@@ -20,15 +20,17 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.math.Vector3i;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkStore;
 
 public class ChunkStoreFileSystem implements ChunkStore {
-    private Logger logger = Logger.getLogger(getClass().getName());
+
+    private static final Logger logger = LoggerFactory.getLogger(ChunkStoreFileSystem.class);
+
     private File worldPath;
 
     public ChunkStoreFileSystem(File worldPath) {
@@ -66,7 +68,7 @@ public class ChunkStoreFileSystem implements ChunkStore {
     public void put(Chunk c) {
         if (!worldPath.exists()) {
             if (!worldPath.mkdirs()) {
-                logger.log(Level.SEVERE, "Could not create save directory.");
+                logger.error("Failed to create save directory, aborting save.");
                 return;
             }
         }

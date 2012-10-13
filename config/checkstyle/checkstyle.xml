@@ -21,7 +21,10 @@
         <!-- See http://checkstyle.sourceforge.net/config_naming.html -->
         <!-- ***************************** -->
         <!-- constants (static, final fields) : ^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$ -->
-        <module name="ConstantName"/>
+		<!-- Unfortunately this modules is too inclusive - static final fields are not necessarily constants! -->
+        <module name="ConstantName">
+			<property name="format" value="^([A-Z][A-Z0-9]*(_[A-Z0-9]+)*|logger)$"/> 
+		</module>
         <!-- local, final variables, including catch parameters : ^[a-z][a-zA-Z0-9]*$ -->
         <module name="LocalFinalVariableName"/>
         <!-- local, non-final variables, including catch parameters : ^[a-z][a-zA-Z0-9]*$ -->

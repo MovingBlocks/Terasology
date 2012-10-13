@@ -1,5 +1,5 @@
 {
-    "name" : "core:orangepotion",
+    "name" : "potions:orangepotion",
     "Item" : {
         "name" : "OrangePotion",
         "icon" : "OrangeVial",
