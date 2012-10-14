@@ -90,15 +90,13 @@ public class StateMainMenu implements GameState {
     
     @Override
     public void activate() {
-        for (ComponentSystem system : componentSystemManager.iterateAll()) {
-            system.initialise();
-        }
-        
         Iterator<EntityRef> iterator = entityManager.iteratorEntities(LocalPlayerComponent.class).iterator();
         if (iterator.hasNext()) {
             CoreRegistry.get(LocalPlayer.class).setEntity(iterator.next());
         }
-        
+
+        componentSystemManager.initialise();
+
         playBackgroundMusic();
         
         guiManager.openWindow("main");

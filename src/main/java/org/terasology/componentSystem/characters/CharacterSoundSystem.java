@@ -39,6 +39,7 @@ public class CharacterSoundSystem implements EventHandlerSystem {
 
     private FastRandom random = new FastRandom();
 
+    @Override
     public void initialise() {
     }
 

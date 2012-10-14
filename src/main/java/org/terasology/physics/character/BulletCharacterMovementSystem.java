@@ -30,6 +30,7 @@ import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
@@ -37,7 +38,6 @@ import org.terasology.events.FootstepEvent;
 import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.events.JumpEvent;
 import org.terasology.events.VerticalCollisionEvent;
-import org.terasology.game.CoreRegistry;
 import org.terasology.math.Vector3fUtil;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.physics.CollisionGroup;
@@ -82,8 +82,13 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
 
     private static final float CHECK_FORWARD_DIST = 0.05f;
 
+    @In
     private EntityManager entityManager;
+
+    @In
     private WorldProvider worldProvider;
+
+    @In
     private BulletPhysics physics;
 
     // Processing state variables
@@ -92,10 +97,8 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
     private boolean stepped = false;
 
 
+    @Override
     public void initialise() {
-        entityManager = CoreRegistry.get(EntityManager.class);
-        worldProvider = CoreRegistry.get(WorldProvider.class);
-        physics = CoreRegistry.get(BulletPhysics.class);
     }
 
     @Override

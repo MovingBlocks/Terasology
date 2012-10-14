@@ -380,9 +380,7 @@ public class StateSinglePlayer implements GameState {
         CoreRegistry.put(Camera.class, worldRenderer.getActiveCamera());
         CoreRegistry.put(BulletPhysics.class, worldRenderer.getBulletRenderer());
 
-        for (ComponentSystem system : componentSystemManager.iterateAll()) {
-            system.initialise();
-        }
+        componentSystemManager.initialise();
 
         // TODO: Should probably not use the world title as a path?
         File entityDataFile = new File(PathManager.getInstance().getWorldSavePath(worldInfo.getTitle()), ENTITY_DATA_FILE);
