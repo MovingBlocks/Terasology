@@ -1,5 +1,4 @@
 {
-    "name" : "testmod:splashgun",
     "item" : {
         "name" : "Splash Gun",
         "renderWithIcon" : false,

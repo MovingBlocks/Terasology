@@ -1,5 +1,4 @@
 {
-    "name" : "testmod:lavaSplash",
     "location" : {},
     "blockParticleEffect" : {
         "blockType" : "Lava",

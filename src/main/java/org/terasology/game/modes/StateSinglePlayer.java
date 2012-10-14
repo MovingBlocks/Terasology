@@ -269,7 +269,7 @@ public class StateSinglePlayer implements GameState {
                     EntityData.Prefab prefabData = EntityDataJSONFormat.readPrefab(reader);
                     stream.close();
                     if (prefabData != null) {
-                        persisterHelper.deserializePrefab(prefabData, prefabURI.getPackage());
+                        persisterHelper.deserializePrefab(prefabData, prefabURI);
                     }
                 } else {
                     logger.warn("Failed to load prefab '{}'", prefabURI);

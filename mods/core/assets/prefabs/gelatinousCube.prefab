@@ -1,5 +1,4 @@
 {
-  "name": "core:gelatinousCube",
   "Location" : {},
   "Mesh" : {
     "renderType" : "GelatinousCube"

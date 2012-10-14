@@ -17,6 +17,7 @@ package org.terasology.entitySystem.persistence;
 
 import java.util.Map;
 
+import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -72,10 +73,10 @@ public interface EntityPersisterHelper {
      * package context if necessary.
      *
      * @param prefabData
-     * @param packageContext
+     * @param uri
      * @return The deserialized prefab
      */
-    Prefab deserializePrefab(EntityData.Prefab prefabData, String packageContext);
+    Prefab deserializePrefab(EntityData.Prefab prefabData, AssetUri uri);
 
     Component deserializeComponent(EntityData.Component componentData);
 
