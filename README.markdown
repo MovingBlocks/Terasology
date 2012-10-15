@@ -42,6 +42,7 @@ Note that these instructions are meant for the stable release. The latest develo
 * [Escape] - Show/hide the game menu screen
 * [F3] - Toggle debug mode and information
 * [F4] - Different debug metrics
+* [F5] - Show block picker GUI element
 
 Debug Features
 --------
@@ -67,29 +68,32 @@ May move slot or disappear as development continues
 Console Commands
 --------
 
-Press Tab to toggle the in-game console
+Press Tab to toggle the in-game console. Block names and some other things are not capital sensitive. Copy paste is supported and up/down arrow will cycle through commands you've used before
 
-* giveBlock "Water" - Gives 16 water blocks
-* giveBlock "IronPyrites", 42 - Gives 42 Iron Pyrite (Fool's Gold) blocks
-* giveBlock "Clay", "Slope" - Gives you 16 clay blocks that are sloped
-* giveBlock "Chest" - Gives you a Chest block you can place, activate ('E'), put stuff in, destroy, pick up, place elsewhere, find same stuff in it!
-* giveBlock "Tnt" - Gives you 16 TNT blocks you can place and activate ('E') to blow up
-* listBlocks - Lists all actively used blocks (have been loaded for the world)
-* listFreeShapeBlocks - Lists all blocks that can be requested in any known shape
-* listShapes - Lists the available shapes
-* teleport 42 42 42 - Warps the player to x = 42, y = 42, z = 42
-* fullHealth - Fully restores the player's health
-* gotoWorld "GhostTown" - Loads the world "GhostTown" if present, otherwise initializes a new world "GhostTown" with a randomized seed value
-* gotoWorld "GhostTown", "Pie!" - Loads the world "GhostTown" if present, otherwise initializes a new world "GhostTown" with the seed value "Pie!"
+* /help - Show in-game help (more thorough)
+* /help "giveBlock" - Shows detailed help on the "giveBlock" command
+* /giveBlock "Water" - Gives 16 water blocks
+* /giveBlock "Rutile" 42 - Gives 42 Rutile blocks (colorful mineral)
+* /giveBlock "Clay" "Slope" - Gives you 16 clay blocks in the "slope" shape
+* /giveBlock "Marble" "Stair" 99 - Gives you 99 marble stair blocks
+* /giveBlock "Chest" - Gives you a Chest block you can place, activate ('E'), put stuff in, destroy, pick up, place elsewhere, find same stuff in it!
+* /giveBlock "TNT" - Gives you 16 TNT blocks you can place and activate ('E') to blow up
+* /listBlocks - Lists all actively used blocks (have been loaded for the world)
+* /listFreeShapeBlocks - Lists all blocks that can be requested in any known shape
+* /listShapes - Lists the available shapes
+* /teleport 42 42 42 - Warps the player to x = 42, y = 42, z = 42
+* /fullHealth - Fully restores the player's health
 
 Building and running source
 --------
 
+Run any commands in the project root directory
+
 *  Download / clone the source from GitHub
-*  To prepare for IntelliJ run: $ gradlew idea
-*  To prepare for Eclipse run: $ gradlew eclipse
-*  To run from the command line: $ gradlew run
-*  For more tasks: $ gradlew tasks
+*  To prepare for IntelliJ run: `gradlew idea`
+*  To prepare for Eclipse run: `gradlew eclipse`
+*  To run from the command line: `gradlew run`
+*  For more tasks: `gradlew tasks`
 
 You may also need to tweak IDE settings further for your convenience. See [Dev Setup](https://github.com/MovingBlocks/Terasology/wiki/Dev-Setup) in our wiki for more details.
 
@@ -106,7 +110,7 @@ Contributors
 (Listed by primary team)
 
 * Architects: Benjamin 'begla' Glatzel, Immortius, Kai Kratz, Ironchefpython, Andre Herber
-* Art Team: Glasz, A'nW, basilix, Double_A, eleazzaar, metouto, Perdemot, RampageMode, SuperSnark, Wolfghard, zproc
+* Art Team: Glasz, A'nW, basilix, Double_A, eleazzaar, metouto, Perdemot, RampageMode, SuperSnark, Wolfghard, zproc, Chrisk
 * Design Team: Rasmus 'Cervator' Praestholm, Overdhose, Woodspeople, Mooncalf, Dei
 * General: Janred, Josh, MrBarsack, Philaxx, Stuthulhu, t3hk0d3
 * GUI Team: Anton "small-jeeper" Kireev, miniME89, x3ro
