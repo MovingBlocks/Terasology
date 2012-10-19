@@ -1,4 +1,5 @@
 {
     "id" : "books",
-    "displayName" : "Books and Bookcases"
+    "displayName" : "Books and Bookcases",
+    "description" : "This mod introduces books and bookcases"
 }

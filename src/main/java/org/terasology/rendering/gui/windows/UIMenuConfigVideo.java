@@ -216,7 +216,7 @@ public class UIMenuConfigVideo extends UIWindow {
         blurIntensityButton.setPosition(new Vector2f(blurIntensityButton.getSize().x / 2f, 300f + 2 * 40f));
         blurIntensityButton.setVisible(true);
         
-        backToConfigMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
+        backToConfigMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
         backToConfigMenuButton.getLabel().setText("Back");
         backToConfigMenuButton.setHorizontalAlign(EHorizontalAlign.CENTER);
         backToConfigMenuButton.setPosition(new Vector2f(0f, 300f + 7 * 40f));

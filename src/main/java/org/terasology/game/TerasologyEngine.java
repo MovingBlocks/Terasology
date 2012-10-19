@@ -131,13 +131,17 @@ public class TerasologyEngine implements GameEngine {
             org.terasology.config.Config config;
             try {
                 config = org.terasology.config.Config.load(org.terasology.config.Config.getConfigFile());
+                config.getDefaultModConfig().addMod("core");
 
             } catch (IOException e) {
                 logger.error("Failed to load config", e);
                 config = new org.terasology.config.Config();
+                config.getDefaultModConfig().addMod("core");
             }
             CoreRegistry.put(org.terasology.config.Config.class, config);
         } else {
+            org.terasology.config.Config config = new org.terasology.config.Config();
+            config.getDefaultModConfig().addMod("core");
             CoreRegistry.put(org.terasology.config.Config.class, new org.terasology.config.Config());
         }
     }

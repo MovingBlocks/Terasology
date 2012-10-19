@@ -232,7 +232,7 @@ public class UIDialog extends UIWindow {
         topBar.setVisible(true);
         
         /*
-        closeButton = new UIButton(new Vector2f(19f, 19f), UIButton.eButtonType.NORMAL);
+        closeButton = new UIButton(new Vector2f(19f, 19f), UIButton.ButtonType.NORMAL);
         closeButton.setPosition(new Vector2f(getSize().x - closeButton.getSize().x - 2, 2));
         closeButton.getLabel().setText("");
         closeButton.setTexture("engine:gui_menu");

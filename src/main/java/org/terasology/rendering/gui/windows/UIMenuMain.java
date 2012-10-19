@@ -20,7 +20,6 @@ import javax.vecmath.Vector2f;
 import org.terasology.asset.AssetManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.widgets.UIButton;
@@ -60,7 +59,7 @@ public class UIMenuMain extends UIWindow {
         _version.setPosition(new Vector2f(0f, 230f));
         _version.setVisible(true);
 
-        _exitButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
+        _exitButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
         _exitButton.getLabel().setText("Exit Terasology");
         _exitButton.addClickListener(new ClickListener() {
             @Override
@@ -72,7 +71,7 @@ public class UIMenuMain extends UIWindow {
         _exitButton.setPosition(new Vector2f(0f, 300f + 4 * 40f));
         _exitButton.setVisible(true);
         
-        _configButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
+        _configButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
         _configButton.getLabel().setText("Settings");
         _configButton.addClickListener(new ClickListener() {
             @Override
@@ -84,7 +83,7 @@ public class UIMenuMain extends UIWindow {
         _configButton.setPosition(new Vector2f(0f, 300f + 2 * 40f));
         _configButton.setVisible(true);
 
-        _singlePlayerButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
+        _singlePlayerButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
         _singlePlayerButton.getLabel().setText("Single player");
         _singlePlayerButton.addClickListener(new ClickListener() {
             @Override

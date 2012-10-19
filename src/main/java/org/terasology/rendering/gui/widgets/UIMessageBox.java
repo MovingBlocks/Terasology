@@ -40,7 +40,7 @@ public class UIMessageBox extends UIDialog {
         float width = 0f;
         float heigh = 0f;
 
-        buttonOk = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
+        buttonOk = new UIButton(new Vector2f(128f, 32f), UIButton.ButtonType.NORMAL);
         buttonOk.getLabel().setText("Ok");
         buttonOk.setVisible(true);
 

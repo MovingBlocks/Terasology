@@ -66,7 +66,7 @@ public class UIScreenDeath extends UIWindow {
         _meassage.setPosition(new Vector2f(0f, 300f));
         _meassage.setVisible(true);
         
-        _respawnButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
+        _respawnButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
         _respawnButton.getLabel().setText("Respawn");
         _respawnButton.addClickListener(new ClickListener() {
             @Override
@@ -79,7 +79,7 @@ public class UIScreenDeath extends UIWindow {
         _respawnButton.setPosition(new Vector2f(0f, 300f + 32f + 24f));
         _respawnButton.setVisible(true);
         
-        _mainMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
+        _mainMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
         _mainMenuButton.getLabel().setText("Return to Main Menu");
         _mainMenuButton.addClickListener(new ClickListener() {
             @Override
@@ -91,7 +91,7 @@ public class UIScreenDeath extends UIWindow {
         _mainMenuButton.setPosition(new Vector2f(0f, 300f + 2 * 32f + 24f + 4f));
         _mainMenuButton.setVisible(true);
 
-        _exitButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
+        _exitButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
         _exitButton.getLabel().setText("Exit Terasology");
         _exitButton.addClickListener(new ClickListener() {
             @Override
