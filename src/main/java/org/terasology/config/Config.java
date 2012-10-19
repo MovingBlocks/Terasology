@@ -39,6 +39,7 @@ import java.io.IOException;
 public final class Config {
     private static final Logger logger = LoggerFactory.getLogger(Config.class);
     private InputConfig input = new InputConfig();
+    private ModConfig defaultModConfig = new ModConfig();
 
     /**
      * Create a new, empty config
@@ -51,6 +52,10 @@ public final class Config {
      */
     public InputConfig getInputConfig() {
         return input;
+    }
+
+    public ModConfig getDefaultModConfig() {
+        return defaultModConfig;
     }
 
     /**

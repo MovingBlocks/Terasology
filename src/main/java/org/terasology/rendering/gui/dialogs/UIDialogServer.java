@@ -86,7 +86,7 @@ public class UIDialogServer extends UIDialog {
         containerButtons.setPosition(new Vector2f(0f, -20f));
         containerButtons.setVisible(true);
         
-        okButton = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
+        okButton = new UIButton(new Vector2f(128f, 32f), UIButton.ButtonType.NORMAL);
         okButton.getLabel().setText("Ok");
         okButton.setVisible(true);
         okButton.addClickListener(new ClickListener() {
@@ -98,7 +98,7 @@ public class UIDialogServer extends UIDialog {
             }
         });
         
-        cancelButton = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
+        cancelButton = new UIButton(new Vector2f(128f, 32f), UIButton.ButtonType.NORMAL);
         cancelButton.getLabel().setText("Cancel");
         cancelButton.setVisible(true);
         cancelButton.addClickListener(new ClickListener() {

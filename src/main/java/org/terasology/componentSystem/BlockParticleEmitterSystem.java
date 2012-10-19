@@ -45,6 +45,7 @@ import org.terasology.components.BlockParticleEffectComponent.Particle;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.ShaderManager;
@@ -66,18 +67,20 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
     private static final int PARTICLES_PER_UPDATE = 32;
     private static final float TEX_SIZE = Block.TEXTURE_OFFSET / 4f;
 
+    @In
     private EntityManager entityManager;
+
+    @In
     private WorldProvider worldProvider;
+
     // TODO: lose dependency on worldRenderer?
+    @In
     private WorldRenderer worldRenderer;
 
     private FastRandom random = new FastRandom();
     private TObjectIntMap displayLists;
 
     public void initialise() {
-        entityManager = CoreRegistry.get(EntityManager.class);
-        worldProvider = CoreRegistry.get(WorldProvider.class);
-        worldRenderer = CoreRegistry.get(WorldRenderer.class);
         displayLists = new TObjectIntHashMap(BlockManager.getInstance().getBlockFamilyCount());
     }
 

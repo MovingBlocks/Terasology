@@ -18,6 +18,7 @@ package org.terasology.componentSystem.action;
 import javax.vecmath.Vector3f;
 
 import org.terasology.components.actions.ExplosionActionComponent;
+import org.terasology.entitySystem.In;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entityFactory.DroppedBlockFactory;
@@ -43,17 +44,17 @@ import org.terasology.world.block.management.BlockManager;
 @RegisterComponentSystem(authorativeOnly = true)
 public class ExplosionAction implements EventHandlerSystem {
 
+    @In
     private WorldProvider worldProvider;
-    private FastRandom random = new FastRandom();
-    private BulletPhysics physicsRenderer;
+
+    @In
     private BlockEntityRegistry blockEntityRegistry;
+
+    private FastRandom random = new FastRandom();
     private DroppedBlockFactory droppedBlockFactory;
 
     @Override
     public void initialise() {
-        worldProvider = CoreRegistry.get(WorldProvider.class);
-        physicsRenderer = CoreRegistry.get(BulletPhysics.class);
-        blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
         droppedBlockFactory = new DroppedBlockFactory(CoreRegistry.get(EntityManager.class));
     }
 

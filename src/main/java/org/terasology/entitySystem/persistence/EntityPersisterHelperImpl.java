@@ -30,6 +30,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityInfoComponent;
 import org.terasology.entitySystem.EntityRef;
@@ -211,22 +212,15 @@ public class EntityPersisterHelperImpl implements EntityPersisterHelper {
     }
 
     @Override
-    public Prefab deserializePrefab(EntityData.Prefab prefabData, String packageContext) {
-        String name = prefabData.getName();
-        if (!prefabData.getName().startsWith(packageContext + ":")) {
-            int existingPackageName = name.lastIndexOf(':');
-            if (existingPackageName != -1) {
-                name = name.substring(existingPackageName + 1);
-            }
-            name = packageContext + ":" + name;
-        }
+    public Prefab deserializePrefab(EntityData.Prefab prefabData, AssetUri uri) {
+        String name = uri.getSimpleString();
 
         Prefab prefab = prefabManager.createPrefab(name);
         prefab.setPersisted(prefabData.getPersisted());
         for (String parentName : prefabData.getParentNameList()) {
             int packageSplit = parentName.indexOf(':');
             if (packageSplit == -1) {
-                parentName = packageContext + ":" + parentName;
+                parentName = uri.getPackage() + ":" + parentName;
             }
             Prefab parent = prefabManager.getPrefab(parentName);
 

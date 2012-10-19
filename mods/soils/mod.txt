@@ -1,5 +1,6 @@
 {
     "id" : "soils",
     "displayName" : "Soil Pack",
-    "author" : "Metouto (fancy), Eleazzaar (matrix soils under auto)"
+    "author" : "Metouto (fancy), Eleazzaar (matrix soils under auto)",
+    "description" : "This mod introduces a number of new soil types"
 }

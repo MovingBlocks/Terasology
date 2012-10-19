@@ -25,8 +25,10 @@ import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.RegisterComponentSystem;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -85,6 +87,23 @@ public class ComponentSystemManager {
             CoreRegistry.get(EntityManager.class).getEventSystem().registerEventHandler((EventHandlerSystem) object);
         }
         namedLookup.put(name, object);
+    }
+
+    public void initialise() {
+        for (ComponentSystem system : iterateAll()) {
+            for (Field field : Reflections.getAllFields(system.getClass(), Reflections.withAnnotation(In.class))) {
+                Object value = CoreRegistry.get(field.getType());
+                if (value != null) {
+                    try {
+                        field.setAccessible(true);
+                        field.set(system, value);
+                    } catch (IllegalAccessException e) {
+                        logger.error("Failed to inject value {} into field {} of system {}", value, field, system, e);
+                    }
+                }
+            }
+            system.initialise();
+        }
     }
 
     // TODO: unregister?

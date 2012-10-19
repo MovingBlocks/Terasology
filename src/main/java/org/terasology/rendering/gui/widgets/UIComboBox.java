@@ -16,12 +16,6 @@
 
 package org.terasology.rendering.gui.widgets;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector4f;
-
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
@@ -35,16 +29,20 @@ import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 import org.terasology.rendering.gui.framework.events.SelectionListener;
 
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A combo box.
- *
  */
 public class UIComboBox extends UIDisplayContainer {
-    
+
     //events
     private final ArrayList<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
     private final ArrayList<SelectionListener> selectionListeners = new ArrayList<SelectionListener>();
-    
+
     private UIText baseInput;
     private UIButton baseButton;
     private UIList baseList;
@@ -53,25 +51,27 @@ public class UIComboBox extends UIDisplayContainer {
 
     /**
      * Creates a combo box with the given size.
+     *
      * @param size
      */
-    public UIComboBox(Vector2f size){
-        initBaseItems(size, new Vector2f(size.x - 2, size.x + size.x/2 - 2));
+    public UIComboBox(Vector2f size) {
+        initBaseItems(size, new Vector2f(size.x - 2, size.x + size.x / 2 - 2));
     }
-    
+
     /**
      * Creates a combo box with the given size for the combo box size and the list size.
-     * @param size The size of the combo box (without the list).
+     *
+     * @param size     The size of the combo box (without the list).
      * @param listSize The size of the list.
      */
-    public UIComboBox(Vector2f size, Vector2f listSize){
+    public UIComboBox(Vector2f size, Vector2f listSize) {
         initBaseItems(size, listSize);
     }
 
-    private void initBaseItems(Vector2f size, Vector2f listSize){
+    private void initBaseItems(Vector2f size, Vector2f listSize) {
         setSize(size);
         opened = false;
-        
+
         baseInput = new UIText();
         baseInput.setSize(size);
         baseInput.setVisible(true);
@@ -81,37 +81,36 @@ public class UIComboBox extends UIDisplayContainer {
             public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
 
             }
-            
+
             @Override
             public void up(UIDisplayElement element, int button, boolean intersect) {
                 if (intersect) {
                     opened = !opened;
-                }
-                else if (!baseList.intersects(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()))) {
+                } else if (!baseList.intersects(new Vector2f(Mouse.getX(), Display.getHeight() - Mouse.getY()))) {
                     opened = false;
                 }
-                
+
                 baseList.setVisible(opened);
                 baseButton.setToggleState(opened);
             }
-            
+
             @Override
             public void down(UIDisplayElement element, int button, boolean intersect) {
-                
+
             }
         });
-        
+
         baseInput.addMouseMoveListener(new MouseMoveListener() {
             @Override
             public void leave(UIDisplayElement element) {
 
             }
-            
+
             @Override
             public void hover(UIDisplayElement element) {
 
             }
-            
+
             @Override
             public void enter(UIDisplayElement element) {
                 AudioManager.play(new AssetUri(AssetType.SOUND, "engine:PlaceBlock"));
@@ -123,7 +122,7 @@ public class UIComboBox extends UIDisplayContainer {
             }
         });
 
-        baseButton = new UIButton(new Vector2f(23f, 23f), UIButton.eButtonType.TOGGLE);
+        baseButton = new UIButton(new Vector2f(23f, 23f), UIButton.ButtonType.TOGGLE);
         baseButton.setVisible(true);
         baseButton.setPosition(new Vector2f(size.x - baseButton.getSize().x, size.y / 2 - baseButton.getSize().y / 2));
         baseButton.getLabel().setText("");
@@ -145,7 +144,7 @@ public class UIComboBox extends UIDisplayContainer {
         baseList.setBorderSolid(new Vector4f(1f, 1f, 1f, 1f), new Color(0, 0, 0));
         baseList.setBackgroundColor(new Color(255, 255, 255));
         baseList.setVisible(false);
-        baseList.addSelectionListener(new SelectionListener() {    
+        baseList.addSelectionListener(new SelectionListener() {
             @Override
             public void changed(UIDisplayElement element) {
                 if (baseList.getSelection() != null) {
@@ -154,7 +153,7 @@ public class UIComboBox extends UIDisplayContainer {
                 opened = false;
                 baseList.setVisible(opened);
                 baseButton.setToggleState(false);
-                
+
                 notifySelectionListeners();
             }
         });
@@ -169,49 +168,54 @@ public class UIComboBox extends UIDisplayContainer {
         addDisplayElement(baseButton);
         addDisplayElement(baseList);
     }
-    
+
     /**
      * Add an item to a specific location in the list.
+     *
      * @param index The index, where the item should be added.
-     * @param item The item to add.
+     * @param item  The item to add.
      */
-    public void addItem(int index, UIListItem item) {        
+    public void addItem(int index, UIListItem item) {
         baseList.addItem(index, item);
     }
-    
+
     /**
      * Add an item to the list.
+     *
      * @param item The item to add.
      */
     public void addItem(UIListItem item) {
         baseList.addItem(item);
     }
-    
+
     /**
      * Remove an item from the list.
+     *
      * @param item Reference of the item to remove.
      */
     public void removeItem(UIListItem item) {
         baseList.removeItem(item);
     }
-    
+
     /**
      * Remove an item at a specific location.
+     *
      * @param index The index of the item to remove.
      */
     public void removeItem(int index) {
         baseList.removeItem(index);
     }
-    
+
     /**
      * Remove all items.
      */
     public void removeAll() {
         baseList.removeAll();
     }
-    
+
     /**
      * Get the selected item.
+     *
      * @return Returns the selected item or null if none is selected.
      */
     public UIListItem getSelection() {
@@ -220,62 +224,69 @@ public class UIComboBox extends UIDisplayContainer {
 
     /**
      * Get the selected item in the list.
+     *
      * @return Returns the selected item.
      */
     public int getSelectionIndex() {
         return baseList.getSelectionIndex();
     }
-    
+
     /**
      * Select a specific item in the list.
+     *
      * @param item The reference of the item to select.
      */
     public void select(UIListItem item) {
         baseList.select(item);
     }
-    
+
     /**
      * Select an specific item in the list.
+     *
      * @param index The item to select.
      */
     public void select(int index) {
         baseList.select(index);
     }
-    
+
     /**
      * Get the size of the list.
+     *
      * @return Returns the number of items in the list.
      */
     public int getItemCount() {
         return baseList.getItemCount();
     }
-    
+
     /**
      * Get the index of the given item.
+     *
      * @param item The item reference to get the index from.
      * @return Returns the item index or -1 if item is not in the list.
      */
     public int getItem(UIListItem item) {
         return baseList.getItem(item);
     }
-    
+
     /**
      * Get an item at a specific location.
+     *
      * @param index The index of the item.
      * @return Returns the item at this index.
      */
     public UIListItem getItem(int index) {
         return baseList.getItem(index);
     }
-    
+
     /**
      * Get all items in the list.
+     *
      * @return Returns the list of all items.
-     */ 
+     */
     public List<UIListItem> getItems() {
         return baseList.getItems();
     }
-    
+
     private void notifySelectionListeners() {
         for (SelectionListener listener : selectionListeners) {
             listener.changed(this);
@@ -289,7 +300,7 @@ public class UIComboBox extends UIDisplayContainer {
     public void removeSelectionListener(SelectionListener listener) {
         selectionListeners.remove(listener);
     }
-    
+
     private void notifyChangedListeners() {
         for (ChangedListener listener : changedListeners) {
             listener.changed(this);

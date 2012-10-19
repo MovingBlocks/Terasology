@@ -15,6 +15,30 @@
  */
 package org.terasology.componentSystem.rendering;
 
+import org.lwjgl.opengl.GL11;
+import org.terasology.asset.AssetManager;
+import org.terasology.componentSystem.RenderSystem;
+import org.terasology.components.HealthComponent;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.In;
+import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.game.CoreRegistry;
+import org.terasology.logic.manager.ShaderManager;
+import org.terasology.math.Vector3i;
+import org.terasology.rendering.assets.Texture;
+import org.terasology.rendering.primitives.Mesh;
+import org.terasology.rendering.primitives.Tessellator;
+import org.terasology.rendering.primitives.TessellatorHelper;
+import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.BlockRegionComponent;
+
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
+
 import static org.lwjgl.opengl.GL11.GL_DST_COLOR;
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE;
@@ -29,37 +53,17 @@ import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glTranslated;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
-
-import org.lwjgl.opengl.GL11;
-import org.terasology.asset.AssetManager;
-import org.terasology.componentSystem.RenderSystem;
-import org.terasology.components.HealthComponent;
-import org.terasology.math.Vector3i;
-import org.terasology.world.block.BlockComponent;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.RegisterComponentSystem;
-import org.terasology.game.CoreRegistry;
-import org.terasology.logic.manager.ShaderManager;
-import org.terasology.rendering.assets.Texture;
-import org.terasology.rendering.primitives.Mesh;
-import org.terasology.rendering.primitives.Tessellator;
-import org.terasology.rendering.primitives.TessellatorHelper;
-import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.block.BlockRegionComponent;
-
 /**
  * @author Immortius <immortius@gmail.com>
  */
 @RegisterComponentSystem(headedOnly = true)
 public class BlockDamageRenderer implements RenderSystem {
 
+    @In
     private EntityManager entityManager;
+    @In
     private WorldProvider worldProvider;
+
     private Mesh overlayMesh;
     private Texture effectsTexture;
 

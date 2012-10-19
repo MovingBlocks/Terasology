@@ -24,6 +24,7 @@ package org.terasology.logic.mod;
 public class ModInfo {
     private String id;
     private String displayName;
+    private String description;
 
     public String getId() {
         return id;
@@ -39,5 +40,13 @@ public class ModInfo {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

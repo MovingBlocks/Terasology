@@ -27,6 +27,7 @@ import org.terasology.entitySystem.EntityInfoComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.ActivateEvent;
@@ -52,13 +53,13 @@ import javax.vecmath.Vector3f;
  */
 @RegisterComponentSystem
 public class DoorSystem implements EventHandlerSystem {
+    @In
     private WorldProvider worldProvider;
+    @In
     private EntityManager entityManager;
 
     @Override
     public void initialise() {
-        worldProvider = CoreRegistry.get(WorldProvider.class);
-        entityManager = CoreRegistry.get(EntityManager.class);
     }
 
     @Override

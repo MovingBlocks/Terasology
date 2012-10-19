@@ -15,21 +15,20 @@
  */
 package org.terasology.componentSystem.action;
 
-import java.util.HashSet;
-
-import javax.vecmath.Vector3f;
-
 import org.terasology.components.actions.MiniaturizerComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.ActivateEvent;
-import org.terasology.game.CoreRegistry;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.world.BlockGrid;
 import org.terasology.world.MiniatureChunk;
 import org.terasology.world.WorldProvider;
+
+import javax.vecmath.Vector3f;
+import java.util.HashSet;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
@@ -37,11 +36,11 @@ import org.terasology.world.WorldProvider;
 @RegisterComponentSystem
 public class AddMiniatureBlockAction implements EventHandlerSystem {
 
+    @In
     private WorldProvider worldProvider;
 
     @Override
     public void initialise() {
-        worldProvider = CoreRegistry.get(WorldProvider.class);
     }
 
     @Override
@@ -53,7 +52,6 @@ public class AddMiniatureBlockAction implements EventHandlerSystem {
         MiniaturizerComponent comp = entity.getComponent(MiniaturizerComponent.class);
         BlockGrid grid = comp.blockGrid;
 
-
         HashSet<BlockGrid.GridPosition> gridPositions = grid.getGridPositions();
 
         if (gridPositions.size() < 2) {
@@ -63,16 +61,15 @@ public class AddMiniatureBlockAction implements EventHandlerSystem {
 
             comp.blockGrid.addGridPosition(targetPos, worldProvider.getBlock(targetPos).getId());
             entity.saveComponent(comp);
-        }
-        else {
+        } else {
 
             MiniatureChunk chunk = new MiniatureChunk();
 
-            for (int x=grid.getMinBounds().x; x<=grid.getMaxBounds().x; ++x) {
-                for (int y=grid.getMinBounds().y; y<=grid.getMaxBounds().y; ++y) {
-                    for (int z=grid.getMinBounds().z; z<=grid.getMaxBounds().z; ++z) {
+            for (int x = grid.getMinBounds().x; x <= grid.getMaxBounds().x; ++x) {
+                for (int y = grid.getMinBounds().y; y <= grid.getMaxBounds().y; ++y) {
+                    for (int z = grid.getMinBounds().z; z <= grid.getMaxBounds().z; ++z) {
                         Vector3i localPos = new Vector3i();
-                        Vector3i globalPos = new Vector3i(x,y,z);
+                        Vector3i globalPos = new Vector3i(x, y, z);
                         localPos.sub(globalPos, grid.getMinBounds());
 
                         if (localPos.x >= MiniatureChunk.SIZE_X || localPos.y >= MiniatureChunk.SIZE_Y || localPos.z >= MiniatureChunk.SIZE_Z || localPos.x < 0 || localPos.y < 0 || localPos.z < 0)

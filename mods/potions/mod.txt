@@ -1,4 +1,5 @@
 {
     "id" : "potions",
-    "displayName" : "Potion Pack"
+    "displayName" : "Potion Pack",
+    "description" : "A small collection of potions"
 }
