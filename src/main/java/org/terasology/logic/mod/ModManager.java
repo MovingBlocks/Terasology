@@ -215,13 +215,8 @@ public class ModManager {
         return mods.values();
     }
 
-    public void saveModSelectionToConfig() {
-        List<String> activeModIds = Lists.newArrayList();
-        for (Mod mod : mods.values()) {
-            if (mod.isEnabled()) {
-                activeModIds.add(mod.getModInfo().getId());
-            }
-        }
+    public Mod getMod(String modName) {
+        return mods.get(modName);
     }
 
     public Iterable<Mod> getActiveMods() {

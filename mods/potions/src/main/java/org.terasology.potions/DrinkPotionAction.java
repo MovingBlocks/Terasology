@@ -39,6 +39,7 @@ import org.terasology.logic.manager.AudioManager;
 @RegisterComponentSystem
 public class DrinkPotionAction implements EventHandlerSystem {
 
+    @Override
     public void initialise() {
     }
 

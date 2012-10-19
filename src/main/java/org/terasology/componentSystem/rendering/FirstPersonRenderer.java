@@ -41,6 +41,7 @@ import org.terasology.componentSystem.RenderSystem;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LocalPlayerComponent;
+import org.terasology.entitySystem.In;
 import org.terasology.world.block.BlockItemComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterComponentSystem;
@@ -70,8 +71,11 @@ import com.google.common.collect.Maps;
 @RegisterComponentSystem(headedOnly = true)
 public class FirstPersonRenderer implements RenderSystem {
 
+    @In
     private WorldProvider worldProvider;
+    @In
     private LocalPlayer localPlayer;
+    @In
     private WorldRenderer worldRenderer;
     private Mesh handMesh;
     private Texture handTex;
@@ -80,10 +84,6 @@ public class FirstPersonRenderer implements RenderSystem {
 
     @Override
     public void initialise() {
-        localPlayer = CoreRegistry.get(LocalPlayer.class);
-        worldProvider = CoreRegistry.get(WorldProvider.class);
-        worldRenderer = CoreRegistry.get(WorldRenderer.class);
-
         Vector2f texPos = new Vector2f(40.0f * 0.015625f, 32.0f * 0.03125f);
         Vector2f texWidth = new Vector2f(4.0f * 0.015625f, -12.0f * 0.03125f);
 

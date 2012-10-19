@@ -79,7 +79,7 @@ public class UIMenuSingleplayer extends UIWindow {
         list.setPosition(new Vector2f(0f, 230f));
         list.setVisible(true);
 
-        goToBack = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
+        goToBack = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
         goToBack.getLabel().setText("Back");
         goToBack.addClickListener(new ClickListener() {
             @Override
@@ -91,7 +91,7 @@ public class UIMenuSingleplayer extends UIWindow {
         goToBack.setPosition(new Vector2f(0f, 600f));
         goToBack.setVisible(true);
 
-        loadFromList = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
+        loadFromList = new UIButton(new Vector2f(128f, 32f), UIButton.ButtonType.NORMAL);
         loadFromList.getLabel().setText("Load");
         loadFromList.addClickListener(new ClickListener() {
             @Override
@@ -103,7 +103,7 @@ public class UIMenuSingleplayer extends UIWindow {
         loadFromList.setPosition(new Vector2f(30f, 505f));
         loadFromList.setVisible(true);
 
-        deleteFromList = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
+        deleteFromList = new UIButton(new Vector2f(128f, 32f), UIButton.ButtonType.NORMAL);
         deleteFromList.getLabel().setText("Delete");
         deleteFromList.addClickListener(new ClickListener() {
             @Override
@@ -127,7 +127,7 @@ public class UIMenuSingleplayer extends UIWindow {
         deleteFromList.setPosition(new Vector2f(196f, 505f));
         deleteFromList.setVisible(true);
 
-        createNewWorld = new UIButton(new Vector2f(192f, 32f), UIButton.eButtonType.NORMAL);
+        createNewWorld = new UIButton(new Vector2f(192f, 32f), UIButton.ButtonType.NORMAL);
         createNewWorld.getLabel().setText("Create new world");
         createNewWorld.addClickListener(new ClickListener() {
             @Override

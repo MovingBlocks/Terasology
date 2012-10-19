@@ -16,10 +16,13 @@
 
 package org.terasology.world;
 
+import org.terasology.config.ModConfig;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.game.types.GameType;
 import org.terasology.logic.manager.Config;
+import org.terasology.logic.mod.Mod;
+import org.terasology.logic.mod.ModManager;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
@@ -88,7 +91,11 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     @Override
     public WorldInfo getWorldInfo() {
-        WorldInfo worldInfo = new WorldInfo(title, seed, getTime(), chunkGenerators, CoreRegistry.get(GameType.class).getClass().toString());
+        ModConfig modConfig = new ModConfig();
+        for (Mod mod : CoreRegistry.get(ModManager.class).getActiveMods()) {
+            modConfig.addMod(mod.getModInfo().getId());
+        }
+        WorldInfo worldInfo = new WorldInfo(title, seed, getTime(), chunkGenerators, CoreRegistry.get(GameType.class).getClass().toString(), modConfig);
         worldInfo.setBlockIdMap(BlockManager.getInstance().getBlockIdMap());
         return worldInfo;
     }

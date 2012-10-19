@@ -1,5 +1,4 @@
 {
-    "name" : "potions:redpotion",
     "Item" : {
         "name" : "RedPotion",
         "icon" : "RedVial",

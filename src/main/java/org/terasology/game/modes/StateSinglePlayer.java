@@ -132,13 +132,7 @@ public class StateSinglePlayer implements GameState {
     }
 
     public void init(GameEngine engine) {
-        // TODO: Change to better mod support, should be enabled via config
-        ModManager modManager = CoreRegistry.get(ModManager.class);
-        for (Mod mod : modManager.getMods()) {
-            mod.setEnabled(true);
-        }
-        modManager.saveModSelectionToConfig();
-        modManager.applyActiveMods();
+        ModManager modManager = initModManager();
 
         AssetManager.getInstance().clear();
         BlockManager.getInstance().load(worldInfo.getBlockIdMap());
@@ -170,6 +164,21 @@ public class StateSinglePlayer implements GameState {
         loadPrefabs();
 
         CoreRegistry.put(CommandManager.class, new CommandManager());
+    }
+
+    private ModManager initModManager() {
+        ModManager modManager = CoreRegistry.get(ModManager.class);
+        for (Mod mod : modManager.getMods()) {
+            mod.setEnabled(false);
+        }
+        for (String modName : worldInfo.getModConfiguration().listMods()) {
+            Mod mod = modManager.getMod(modName);
+            if (mod != null) {
+                mod.setEnabled(true);
+            }
+        }
+        modManager.applyActiveMods();
+        return modManager;
     }
 
     private void initInput(ModManager modManager) {
@@ -269,7 +278,7 @@ public class StateSinglePlayer implements GameState {
                     EntityData.Prefab prefabData = EntityDataJSONFormat.readPrefab(reader);
                     stream.close();
                     if (prefabData != null) {
-                        persisterHelper.deserializePrefab(prefabData, prefabURI.getPackage());
+                        persisterHelper.deserializePrefab(prefabData, prefabURI);
                     }
                 } else {
                     logger.warn("Failed to load prefab '{}'", prefabURI);
@@ -380,9 +389,7 @@ public class StateSinglePlayer implements GameState {
         CoreRegistry.put(Camera.class, worldRenderer.getActiveCamera());
         CoreRegistry.put(BulletPhysics.class, worldRenderer.getBulletRenderer());
 
-        for (ComponentSystem system : componentSystemManager.iterateAll()) {
-            system.initialise();
-        }
+        componentSystemManager.initialise();
 
         // TODO: Should probably not use the world title as a path?
         File entityDataFile = new File(PathManager.getInstance().getWorldSavePath(worldInfo.getTitle()), ENTITY_DATA_FILE);

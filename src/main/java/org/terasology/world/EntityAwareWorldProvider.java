@@ -23,6 +23,7 @@ import java.util.concurrent.BlockingQueue;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.world.LocationComponent;
+import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.event.ChangedComponentEvent;
 import org.terasology.math.Region3i;
 import org.terasology.world.block.BlockComponent;
@@ -46,6 +47,7 @@ import org.terasology.world.block.BlockRegionComponent;
  * @author Immortius
  */
 public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator implements BlockEntityRegistry, EventHandlerSystem, UpdateSubscriberSystem {
+    @In
     private EntityManager entityManager;
 
     // TODO: Perhaps a better datastructure for spatial lookups
@@ -67,7 +69,6 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     @Override
     public void initialise() {
-        this.entityManager = CoreRegistry.get(EntityManager.class);
         for (EntityRef blockComp : entityManager.iteratorEntities(BlockComponent.class)) {
             BlockComponent comp = blockComp.getComponent(BlockComponent.class);
             blockComponentLookup.put(new Vector3i(comp.getPosition()), blockComp);

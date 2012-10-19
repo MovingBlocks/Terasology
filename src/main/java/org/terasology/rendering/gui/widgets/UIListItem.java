@@ -46,18 +46,14 @@ public class UIListItem extends UIDisplayContainer {
     private UILabel label;
     
     public UIListItem() {
-        setup("", null);
+        this("", null);
     }
     
     public UIListItem(Object value) {
-        setup("", value);
+        this("", value);
     }
 
     public UIListItem(String text, Object value) {
-        setup(text, value);
-    }
-    
-    private void setup(String text, Object value) {
         setValue(value);
         
         //TODO remove this once styling system is in place
