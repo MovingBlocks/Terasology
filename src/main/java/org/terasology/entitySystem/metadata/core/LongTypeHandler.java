@@ -18,6 +18,7 @@ package org.terasology.entitySystem.metadata.core;
 import java.util.List;
 
 import org.terasology.entitySystem.metadata.TypeHandler;
+import org.terasology.math.TeraMath;
 import org.terasology.protobuf.EntityData;
 
 import com.google.common.collect.Lists;
@@ -34,6 +35,12 @@ public class LongTypeHandler implements TypeHandler<Long> {
     public Long deserialize(EntityData.Value value) {
         if (value.getLongCount() > 0) {
             return value.getLong(0);
+        } else if (value.getIntegerCount() > 0) {
+            return (long) value.getInteger(0);
+        } else if (value.getFloatCount() > 0) {
+            return (long) TeraMath.floorToInt(value.getFloat(0));
+        } else if (value.getDoubleCount() > 0) {
+            return (long) TeraMath.floorToInt((float)value.getDouble(0));
         }
         return null;
     }
@@ -47,6 +54,27 @@ public class LongTypeHandler implements TypeHandler<Long> {
     }
 
     public List<Long> deserializeList(EntityData.Value value) {
-        return Lists.newArrayList(value.getLongList());
+        if (value.getLongCount() > 0) {
+            return Lists.newArrayList(value.getLongList());
+        } else if (value.getIntegerCount() > 0) {
+            List<Long> result = Lists.newArrayListWithCapacity(value.getIntegerCount());
+            for (int i = 0; i < value.getIntegerCount(); ++i) {
+                result.add((long)value.getInteger(i));
+            }
+            return result;
+        } else if (value.getDoubleCount() > 0) {
+            List<Long> result = Lists.newArrayListWithCapacity(value.getDoubleCount());
+            for (int i = 0; i < value.getDoubleCount(); ++i) {
+                result.add((long)TeraMath.floorToInt((float)value.getDouble(i)));
+            }
+            return result;
+        } else if (value.getFloatCount() > 0) {
+            List<Long> result = Lists.newArrayListWithCapacity(value.getFloatCount());
+            for (int i = 0; i < value.getFloatCount(); ++i) {
+                result.add((long)TeraMath.floorToInt(value.getFloat(i)));
+            }
+            return result;
+        }
+        return Lists.newArrayList();
     }
 }

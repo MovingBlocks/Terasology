@@ -15,15 +15,16 @@
  */
 package org.terasology.entitySystem.metadata.core;
 
-import java.util.List;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.components.ItemComponent;
 import org.terasology.entitySystem.metadata.TypeHandler;
 import org.terasology.protobuf.EntityData;
 
-import com.google.common.collect.Lists;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -32,9 +33,13 @@ public class EnumTypeHandler<T extends Enum> implements TypeHandler<T> {
 
     private static final Logger logger = LoggerFactory.getLogger(EnumTypeHandler.class);
     private Class<T> enumType;
+    private Map<String, T> caseInsensitiveLookup = Maps.newHashMap();
 
     public EnumTypeHandler(Class<T> enumType) {
         this.enumType = enumType;
+        for (T value : enumType.getEnumConstants()) {
+            caseInsensitiveLookup.put(value.toString().toLowerCase(Locale.ENGLISH), value);
+        }
     }
 
     public EntityData.Value serialize(T value) {
@@ -43,12 +48,11 @@ public class EnumTypeHandler<T extends Enum> implements TypeHandler<T> {
 
     public T deserialize(EntityData.Value value) {
         if (value.getStringCount() > 0) {
-            try {
-                Enum resultValue = Enum.valueOf(enumType, value.getString(0));
-                return enumType.cast(resultValue);
-            } catch (IllegalArgumentException iae) {
-                logger.warn("Unable to deserialize enum {}", enumType, iae);
+            T result = caseInsensitiveLookup.get(value.getString(0).toLowerCase(Locale.ENGLISH));
+            if (result == null) {
+                logger.warn("Unknown enum value: '{}' for enum {}", value.getString(0), enumType.getSimpleName());
             }
+            return result;
         }
         return null;
     }
@@ -60,7 +64,7 @@ public class EnumTypeHandler<T extends Enum> implements TypeHandler<T> {
     public EntityData.Value serialize(Iterable<T> value) {
         EntityData.Value.Builder result = EntityData.Value.newBuilder();
         for (T item : value) {
-            result.addString(value.toString());
+            result.addString(item.toString());
         }
         return result.build();
     }
@@ -68,11 +72,11 @@ public class EnumTypeHandler<T extends Enum> implements TypeHandler<T> {
     public List<T> deserializeList(EntityData.Value value) {
         List<T> result = Lists.newArrayListWithCapacity(value.getStringCount());
         for (String item : value.getStringList()) {
-            try {
-                Enum resultValue = Enum.valueOf(enumType, item);
-                result.add(enumType.cast(resultValue));
-            } catch (IllegalArgumentException iae) {
-                logger.warn("Unable to deserialize enum {}", enumType, iae);
+            T enumItem = caseInsensitiveLookup.get(item.toLowerCase(Locale.ENGLISH));
+            if (enumItem == null) {
+                logger.warn("Unknown enum value: '{}' for enum {}", item, enumType.getSimpleName());
+            } else {
+                result.add(enumItem);
             }
         }
         return result;

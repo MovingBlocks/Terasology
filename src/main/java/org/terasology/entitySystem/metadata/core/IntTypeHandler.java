@@ -18,6 +18,7 @@ package org.terasology.entitySystem.metadata.core;
 import java.util.List;
 
 import org.terasology.entitySystem.metadata.TypeHandler;
+import org.terasology.math.TeraMath;
 import org.terasology.protobuf.EntityData;
 
 import com.google.common.collect.Lists;
@@ -34,6 +35,12 @@ public class IntTypeHandler implements TypeHandler<Integer> {
     public Integer deserialize(EntityData.Value value) {
         if (value.getIntegerCount() > 0) {
             return value.getInteger(0);
+        } else if (value.getLongCount() > 0) {
+            return (int) value.getLong(0);
+        } else if (value.getFloatCount() > 0) {
+            return TeraMath.floorToInt(value.getFloat(0));
+        } else if (value.getDoubleCount() > 0) {
+            return TeraMath.floorToInt((float)value.getDouble(0));
         }
         return null;
     }
@@ -47,6 +54,27 @@ public class IntTypeHandler implements TypeHandler<Integer> {
     }
 
     public List<Integer> deserializeList(EntityData.Value value) {
-        return Lists.newArrayList(value.getIntegerList());
+        if (value.getIntegerCount() > 0) {
+            return Lists.newArrayList(value.getIntegerList());
+        } else if (value.getLongCount() > 0) {
+            List<Integer> result = Lists.newArrayListWithCapacity(value.getLongCount());
+            for (int i = 0; i < value.getLongCount(); ++i) {
+                result.add((int)value.getLong(i));
+            }
+            return result;
+        } else if (value.getDoubleCount() > 0) {
+            List<Integer> result = Lists.newArrayListWithCapacity(value.getDoubleCount());
+            for (int i = 0; i < value.getDoubleCount(); ++i) {
+                result.add(TeraMath.floorToInt((float)value.getDouble(i)));
+            }
+            return result;
+        } else if (value.getFloatCount() > 0) {
+            List<Integer> result = Lists.newArrayListWithCapacity(value.getFloatCount());
+            for (int i = 0; i < value.getFloatCount(); ++i) {
+                result.add(TeraMath.floorToInt(value.getFloat(i)));
+            }
+            return result;
+        }
+        return Lists.newArrayList();
     }
 }

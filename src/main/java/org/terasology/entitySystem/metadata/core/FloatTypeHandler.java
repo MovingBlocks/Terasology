@@ -34,6 +34,12 @@ public class FloatTypeHandler implements TypeHandler<Float> {
     public Float deserialize(EntityData.Value value) {
         if (value.getFloatCount() > 0) {
             return value.getFloat(0);
+        } else if (value.getDoubleCount() > 0) {
+            return (float) value.getDouble(0);
+        } else if (value.getIntegerCount() > 0) {
+            return (float) value.getInteger(0);
+        } else if (value.getLongCount() > 0) {
+            return (float) value.getLong(0);
         }
         return null;
     }
@@ -47,6 +53,27 @@ public class FloatTypeHandler implements TypeHandler<Float> {
     }
 
     public List<Float> deserializeList(EntityData.Value value) {
-        return Lists.newArrayList(value.getFloatList());
+        if (value.getFloatCount() > 0) {
+            return Lists.newArrayList(value.getFloatList());
+        } else if (value.getDoubleCount() > 0) {
+            List<Float> result = Lists.newArrayListWithCapacity(value.getDoubleCount());
+            for (int i = 0; i < value.getDoubleCount(); ++i) {
+                result.add((float) value.getDouble(i));
+            }
+            return result;
+        } else if (value.getIntegerCount() > 0) {
+            List<Float> result = Lists.newArrayListWithCapacity(value.getIntegerCount());
+            for (int i = 0; i < value.getIntegerCount(); ++i) {
+                result.add((float) value.getInteger(i));
+            }
+            return result;
+        } else if (value.getLongCount() > 0) {
+            List<Float> result = Lists.newArrayListWithCapacity(value.getLongCount());
+            for (int i = 0; i < value.getLongCount(); ++i) {
+                result.add((float) value.getLong(i));
+            }
+            return result;
+        }
+        return Lists.newArrayList();
     }
 }
