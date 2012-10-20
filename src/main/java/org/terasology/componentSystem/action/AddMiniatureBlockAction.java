@@ -29,6 +29,7 @@ import org.terasology.world.WorldProvider;
 
 import javax.vecmath.Vector3f;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
@@ -52,7 +53,7 @@ public class AddMiniatureBlockAction implements EventHandlerSystem {
         MiniaturizerComponent comp = entity.getComponent(MiniaturizerComponent.class);
         BlockGrid grid = comp.blockGrid;
 
-        HashSet<BlockGrid.GridPosition> gridPositions = grid.getGridPositions();
+        Set<BlockGrid.GridPosition> gridPositions = grid.getGridPositions();
 
         if (gridPositions.size() < 2) {
             comp.reset();

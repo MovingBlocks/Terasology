@@ -39,6 +39,7 @@ import org.terasology.entitySystem.metadata.extension.BlockFamilyTypeHandler;
 import org.terasology.entitySystem.metadata.extension.CollisionGroupTypeHandler;
 import org.terasology.entitySystem.metadata.extension.Color4fTypeHandler;
 import org.terasology.entitySystem.metadata.extension.Quat4fTypeHandler;
+import org.terasology.entitySystem.metadata.extension.Region3iTypeHandler;
 import org.terasology.entitySystem.metadata.extension.Vector2fTypeHandler;
 import org.terasology.entitySystem.metadata.extension.Vector3fTypeHandler;
 import org.terasology.entitySystem.metadata.extension.Vector3iTypeHandler;
@@ -48,6 +49,7 @@ import org.terasology.entitySystem.pojo.PojoPrefabManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
+import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.rendering.assets.Material;
@@ -90,8 +92,10 @@ public class EntitySystemBuilder {
         library.registerTypeHandler(MeshAnimation.class, new AssetTypeHandler(AssetType.ANIMATION, MeshAnimation.class));
         library.registerTypeHandler(Vector3f.class, new Vector3fTypeHandler());
         library.registerTypeHandler(Vector2f.class, new Vector2fTypeHandler());
-        library.registerTypeHandler(Vector3i.class, new Vector3iTypeHandler());
+        Vector3iTypeHandler vector3iHandler = new Vector3iTypeHandler();
+        library.registerTypeHandler(Vector3i.class, vector3iHandler);
         library.registerTypeHandler(CollisionGroup.class, new CollisionGroupTypeHandler());
+        library.registerTypeHandler(Region3i.class, new Region3iTypeHandler(vector3iHandler));
     }
 
     private void registerComponents(ComponentLibrary library, ModManager modManager) {

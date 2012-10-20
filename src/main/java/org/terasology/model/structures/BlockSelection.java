@@ -31,7 +31,7 @@ import java.util.Set;
 public class BlockSelection {
     private static final Logger logger = LoggerFactory.getLogger(BlockSelection.class);
 
-    protected HashSet<BlockPosition> _positions = new HashSet<BlockPosition>();
+    protected Set<BlockPosition> _positions = new HashSet<BlockPosition>();
 
     /**
      * Default constructor for an empty selection
