@@ -102,8 +102,10 @@ public class WorldPersister {
 
         File parentFile = file.getParentFile();
         if (parentFile != null) {
-            if (!parentFile.mkdirs()) {
-                logger.error("Failed to create world save directory {}", parentFile);
+            if (!parentFile.exists()) {
+                if (!parentFile.mkdirs()) {
+                    logger.error("Failed to create world save directory {}", parentFile);
+                }
             }
         }
         FileOutputStream out = new FileOutputStream(file);

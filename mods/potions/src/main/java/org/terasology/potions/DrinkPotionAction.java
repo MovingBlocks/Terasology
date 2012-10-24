@@ -65,7 +65,7 @@ public class DrinkPotionAction implements EventHandlerSystem {
         ItemComponent itemComp = entity.getComponent(ItemComponent.class);
 
 
-        EntityRef item = entityManager.create("core:emptyVial");
+        EntityRef item = entityManager.create("potions:emptyVial");
 
         switch (potion.type) {
             case Red:
