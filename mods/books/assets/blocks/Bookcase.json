@@ -23,7 +23,7 @@
         "topBottom" : "core:ChestTopBottom"
     },
     "entity" : {
-        "prefab" : "core:bookcase"
+        "prefab" : "books:bookcase"
     },
     "inventory" : {
         "stackable" : false,

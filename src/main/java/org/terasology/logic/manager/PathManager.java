@@ -63,7 +63,7 @@ public final class PathManager {
                     rootPath = new File(System.getProperty("user.home") + "/.terasology");
             }
         } else {
-            rootPath = new File(".").getAbsoluteFile();
+            rootPath = new File("").getAbsoluteFile();
         }
         updateDirs();
     }
