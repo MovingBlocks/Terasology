@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,7 @@ import org.terasology.entitySystem.metadata.core.ListTypeHandler;
 import org.terasology.entitySystem.metadata.core.LongTypeHandler;
 import org.terasology.entitySystem.metadata.core.MappedContainerTypeHandler;
 import org.terasology.entitySystem.metadata.core.NumberTypeHandler;
+import org.terasology.entitySystem.metadata.core.SetTypeHandler;
 import org.terasology.entitySystem.metadata.core.StringMapTypeHandler;
 import org.terasology.entitySystem.metadata.core.StringTypeHandler;
 
@@ -146,9 +148,9 @@ public final class ComponentLibraryImpl implements ComponentLibrary {
         }
         // For lists, createEntityRef the handler for the contained type and wrap in a list type handler
         else if (List.class.isAssignableFrom(typeClass)) {
-            // TODO - Improve parameter lookup
-            if (type instanceof ParameterizedType && ((ParameterizedType) type).getActualTypeArguments().length > 0) {
-                TypeHandler innerHandler = getHandlerFor(((ParameterizedType) type).getActualTypeArguments()[0], depth);
+            Type parameter = getTypeParameter(type, 0);
+            if (parameter != null) {
+                TypeHandler innerHandler = getHandlerFor(parameter, depth);
                 if (innerHandler != null) {
                     return new ListTypeHandler(innerHandler);
                 }
@@ -156,16 +158,26 @@ public final class ComponentLibraryImpl implements ComponentLibrary {
             logger.error("List field is not parameterized, or holds unsupported type");
             return null;
         }
+        // For sets:
+        else if (Set.class.isAssignableFrom(typeClass)) {
+            Type parameter = getTypeParameter(type, 0);
+            if (parameter != null) {
+                TypeHandler innerHandler = getHandlerFor(parameter, depth);
+                if (innerHandler != null) {
+                    return new SetTypeHandler(innerHandler);
+                }
+            }
+            logger.error("Set field is not parameterized, or holds unsupported type");
+            return null;
+        }
         // For Maps, createEntityRef the handler for the value type (and maybe key too?)
         else if (Map.class.isAssignableFrom(typeClass)) {
-            if (type instanceof ParameterizedType) {
-                // TODO - Improve parameter lookup
-                Type[] types = ((ParameterizedType) type).getActualTypeArguments();
-                if (types.length > 1 && String.class.equals(types[0])) {
-                    TypeHandler valueHandler = getHandlerFor(types[1], depth);
-                    if (valueHandler != null) {
-                        return new StringMapTypeHandler(valueHandler);
-                    }
+            Type keyParameter = getTypeParameter(type, 0);
+            Type contentsParameter = getTypeParameter(type, 1);
+            if (keyParameter != null && contentsParameter != null && String.class == keyParameter) {
+                TypeHandler valueHandler = getHandlerFor(contentsParameter, depth);
+                if (valueHandler != null) {
+                    return new StringMapTypeHandler(valueHandler);
                 }
             }
             logger.error("Map field is not parameterized, does not have a String key, or holds unsupported values");
@@ -178,8 +190,7 @@ public final class ComponentLibraryImpl implements ComponentLibrary {
         else if (depth <= MAX_SERIALIZATION_DEPTH && !Modifier.isAbstract(typeClass.getModifiers()) && !typeClass.isLocalClass() && !(typeClass.isMemberClass() && !Modifier.isStatic(typeClass.getModifiers()))) {
             try {
                 // Check if constructor exists
-                Constructor constructor = typeClass.getConstructor();
-
+                typeClass.getConstructor();
             } catch (NoSuchMethodException e) {
                 logger.error("Unable to register field of type {}: no publicly accessible default constructor", typeClass.getSimpleName());
                 return null;
@@ -203,5 +214,17 @@ public final class ComponentLibraryImpl implements ComponentLibrary {
         }
 
         return null;
+    }
+
+    // TODO - Improve parameter lookup to go up the inheritance tree more
+    private Type getTypeParameter(Type type, int parameter) {
+        if (!(type instanceof ParameterizedType)) {
+            return null;
+        }
+        ParameterizedType parameterizedType = (ParameterizedType) type;
+        if (parameterizedType.getActualTypeArguments().length < parameter + 1) {
+            return null;
+        }
+        return parameterizedType.getActualTypeArguments()[parameter];
     }
 }

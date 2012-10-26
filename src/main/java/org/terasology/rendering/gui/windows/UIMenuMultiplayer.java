@@ -12,7 +12,6 @@ import javax.vecmath.Vector4f;
 
 import org.newdawn.slick.Color;
 import org.terasology.asset.AssetManager;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.rendering.gui.dialogs.UIDialogServer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -113,7 +112,7 @@ public class UIMenuMultiplayer extends UIWindow {
         buttonContainer.setPosition(new Vector2f(0f, 500f));
         buttonContainer.setVisible(true);
         
-        addServerButton = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
+        addServerButton = new UIButton(new Vector2f(128f, 32f), UIButton.ButtonType.NORMAL);
         addServerButton.getLabel().setText("Add");
         addServerButton.addClickListener(new ClickListener() {
             @Override
@@ -134,7 +133,7 @@ public class UIMenuMultiplayer extends UIWindow {
         });
         addServerButton.setVisible(true);
         
-        editServerButton = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
+        editServerButton = new UIButton(new Vector2f(128f, 32f), UIButton.ButtonType.NORMAL);
         editServerButton.getLabel().setText("Edit");
         editServerButton.addClickListener(new ClickListener() {
             @Override
@@ -161,7 +160,7 @@ public class UIMenuMultiplayer extends UIWindow {
         });
         editServerButton.setVisible(true);
         
-        deleteServerButton = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
+        deleteServerButton = new UIButton(new Vector2f(128f, 32f), UIButton.ButtonType.NORMAL);
         deleteServerButton.getLabel().setText("Delete");
         deleteServerButton.addClickListener(new ClickListener() {
             @Override
@@ -172,7 +171,7 @@ public class UIMenuMultiplayer extends UIWindow {
         });
         deleteServerButton.setVisible(true);
         
-        joinServerButton = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
+        joinServerButton = new UIButton(new Vector2f(128f, 32f), UIButton.ButtonType.NORMAL);
         joinServerButton.getLabel().setText("Join");
         joinServerButton.addClickListener(new ClickListener() {
             @Override
@@ -182,7 +181,7 @@ public class UIMenuMultiplayer extends UIWindow {
         });
         joinServerButton.setVisible(true);
         
-        directjoinServerButton = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
+        directjoinServerButton = new UIButton(new Vector2f(128f, 32f), UIButton.ButtonType.NORMAL);
         directjoinServerButton.getLabel().setText("Direct Join");
         directjoinServerButton.addClickListener(new ClickListener() {
             @Override
@@ -192,7 +191,7 @@ public class UIMenuMultiplayer extends UIWindow {
         });
         directjoinServerButton.setVisible(true);
         
-        refreshServerButton = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
+        refreshServerButton = new UIButton(new Vector2f(128f, 32f), UIButton.ButtonType.NORMAL);
         refreshServerButton.getLabel().setText("Refresh");
         refreshServerButton.addClickListener(new ClickListener() {
             @Override
@@ -202,7 +201,7 @@ public class UIMenuMultiplayer extends UIWindow {
         });
         refreshServerButton.setVisible(true);
         
-        backButton = new UIButton(new Vector2f(160f, 32f), UIButton.eButtonType.NORMAL);
+        backButton = new UIButton(new Vector2f(160f, 32f), UIButton.ButtonType.NORMAL);
         backButton.getLabel().setText("Back");
         backButton.addClickListener(new ClickListener() {
             @Override

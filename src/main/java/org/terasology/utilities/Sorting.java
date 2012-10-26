@@ -19,6 +19,7 @@ import java.util.List;
 
 // TODO: This class is needs to be refactored, with non-single character variable names
 // TODO: Also someone check that we can actually use this, license-wise
+// TODO: Are there some metrics suggesting this is better than java's built in sorting algorithms?
 public final class Sorting {
     // Prevent instantiation
     private Sorting() {

@@ -101,7 +101,7 @@ public class WorldPersister {
         final EntityData.World world = persisterHelper.serializeWorld();
 
         File parentFile = file.getParentFile();
-        if (parentFile != null) {
+        if (parentFile != null && !parentFile.exists()) {
             if (!parentFile.mkdirs()) {
                 logger.error("Failed to create world save directory {}", parentFile);
             }

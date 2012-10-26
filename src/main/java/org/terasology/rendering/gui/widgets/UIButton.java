@@ -43,9 +43,9 @@ public class UIButton extends UIDisplayContainer {
 
     private final UILabel _label;
     
-    public enum eButtonType {NORMAL, TOGGLE};
+    public enum ButtonType {NORMAL, TOGGLE};
     private boolean _toggleState = false;
-    private eButtonType _buttonType;
+    private ButtonType _buttonType;
     
     private final List<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
     private final Map<String, Vector2f[]> states = new HashMap<String, Vector2f[]>();
@@ -55,7 +55,7 @@ public class UIButton extends UIDisplayContainer {
      * @param size The size of the button.
      * @param buttonType The type of the button which can be normal or toggle.
      */
-    public UIButton(Vector2f size, eButtonType buttonType) {
+    public UIButton(Vector2f size, ButtonType buttonType) {
         setSize(size);
         
         _buttonType = buttonType;
@@ -72,7 +72,7 @@ public class UIButton extends UIDisplayContainer {
         addMouseMoveListener(new MouseMoveListener() {    
             @Override
             public void leave(UIDisplayElement element) {
-                if (_buttonType == eButtonType.TOGGLE) {
+                if (_buttonType == ButtonType.TOGGLE) {
                     if (_toggleState) {
                         setBackgroundImage(states.get("pressed")[0], states.get("pressed")[1]);
                     } else {
@@ -92,7 +92,7 @@ public class UIButton extends UIDisplayContainer {
             @Override
             public void enter(UIDisplayElement element) {
                 AudioManager.play(new AssetUri(AssetType.SOUND, "engine:click"), 1.0f);
-                if (_buttonType == eButtonType.NORMAL) {
+                if (_buttonType == ButtonType.NORMAL) {
                     setBackgroundImage(states.get("hover")[0], states.get("hover")[1]);
                 }
             }
@@ -106,7 +106,7 @@ public class UIButton extends UIDisplayContainer {
         addMouseButtonListener(new MouseButtonListener() {                    
             @Override
             public void up(UIDisplayElement element, int button, boolean intersect) {
-                if (_buttonType == eButtonType.NORMAL) {
+                if (_buttonType == ButtonType.NORMAL) {
                     setBackgroundImage(states.get("normal")[0], states.get("normal")[1]);
                 }
             }
@@ -114,7 +114,7 @@ public class UIButton extends UIDisplayContainer {
             @Override
             public void down(UIDisplayElement element, int button, boolean intersect) {
                 if (intersect) {
-                    if (_buttonType == eButtonType.TOGGLE) {
+                    if (_buttonType == ButtonType.TOGGLE) {
                         setToggleState(!_toggleState);
                     } else {
                         setBackgroundImage(states.get("pressed")[0], states.get("pressed")[1]);

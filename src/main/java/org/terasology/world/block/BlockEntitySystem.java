@@ -27,6 +27,7 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.EventPriority;
+import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.DamageEvent;
@@ -48,16 +49,18 @@ import org.terasology.world.block.management.BlockManager;
 @RegisterComponentSystem
 public class BlockEntitySystem implements EventHandlerSystem {
 
+    @In
     private WorldProvider worldProvider;
+
+    @In
     private EntityManager entityManager;
+
     private BlockItemFactory blockItemFactory;
     private DroppedBlockFactory droppedBlockFactory;
     private FastRandom random;
 
     @Override
     public void initialise() {
-        entityManager = CoreRegistry.get(EntityManager.class);
-        worldProvider = CoreRegistry.get(WorldProvider.class);
         blockItemFactory = new BlockItemFactory(entityManager);
         droppedBlockFactory = new DroppedBlockFactory(entityManager);
         random = new FastRandom();

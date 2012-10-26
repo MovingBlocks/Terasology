@@ -15,13 +15,6 @@
  */
 package org.terasology.rendering.world;
 
-import static org.lwjgl.opengl.GL11.glColorMask;
-
-import java.util.HashSet;
-
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
-
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.ShaderManager;
@@ -30,6 +23,13 @@ import org.terasology.model.structures.BlockPosition;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
+
+import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.lwjgl.opengl.GL11.glColorMask;
 
 /**
  * Renderable block grid. Can be used for displaying a set of block selection boxes.
@@ -51,7 +51,7 @@ public class BlockGrid {
     /* CONST */
     private final Mesh _mesh;
 
-    private final HashSet<GridPosition> _gridPositions = new HashSet<GridPosition>();
+    private final Set<GridPosition> _gridPositions = new HashSet<GridPosition>();
     private Vector3i _minBounds = new Vector3i(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
     private Vector3i _maxBounds = new Vector3i(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
 
@@ -122,7 +122,7 @@ public class BlockGrid {
         _gridPositions.remove(gridPosition);
     }
 
-    public HashSet<GridPosition> getGridPositions() {
+    public Set<GridPosition> getGridPositions() {
         return _gridPositions;
     }
 

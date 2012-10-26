@@ -46,7 +46,6 @@ import org.terasology.rendering.gui.widgets.UIWindow;
 import org.terasology.rendering.gui.windows.UIMenuConfig;
 import org.terasology.rendering.gui.windows.UIMenuConfigAudio;
 import org.terasology.rendering.gui.windows.UIMenuConfigControls;
-import org.terasology.rendering.gui.windows.UIMenuConfigMods;
 import org.terasology.rendering.gui.windows.UIMenuConfigVideo;
 import org.terasology.rendering.gui.windows.UIMenuMain;
 import org.terasology.rendering.gui.windows.UIMenuMultiplayer;
@@ -93,7 +92,6 @@ public class GUIManager implements EventHandlerSystem {
         registeredWindows.put("config:video", UIMenuConfigVideo.class);
         registeredWindows.put("config:audio", UIMenuConfigAudio.class);
         registeredWindows.put("config:controls", UIMenuConfigControls.class);
-        registeredWindows.put("config:mods", UIMenuConfigMods.class);
         registeredWindows.put("loading", UIScreenLoading.class);
         registeredWindows.put("container", UIScreenContainer.class);
         registeredWindows.put("metrics", UIScreenMetrics.class);

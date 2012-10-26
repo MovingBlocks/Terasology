@@ -23,7 +23,6 @@ import org.terasology.input.Input;
 import org.terasology.input.InputType;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.logic.manager.Config;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.ClickListener;
@@ -169,7 +168,7 @@ public final class UIMenuConfigControls extends UIWindow {
         subtitle.setPosition(new Vector2f(0f, 128f));
         subtitle.setVisible(true);
 
-        backToConfigMenuButton = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
+        backToConfigMenuButton = new UIButton(new Vector2f(128f, 32f), UIButton.ButtonType.NORMAL);
         backToConfigMenuButton.getLabel().setText("Back");
         backToConfigMenuButton.setHorizontalAlign(EHorizontalAlign.CENTER);
         backToConfigMenuButton.setPosition(new Vector2f(306f, 570f));
@@ -192,7 +191,7 @@ public final class UIMenuConfigControls extends UIWindow {
         }
 
         for (ButtonDefinition def : buttonDefs) {
-            UIButton button = new UIButton(new Vector2f(96f, 32f), UIButton.eButtonType.NORMAL);
+            UIButton button = new UIButton(new Vector2f(96f, 32f), UIButton.ButtonType.NORMAL);
             button.setUserData(def.bindId);
             button.addClickListener(editButtonClick);
             button.setVisible(true);
@@ -218,7 +217,7 @@ public final class UIMenuConfigControls extends UIWindow {
             }
         });
         mouseSensitivity.setValue((int) (Config.getInstance().getMouseSens() * 1000));
-        defaultButton = new UIButton(new Vector2f(128f, 32f), UIButton.eButtonType.NORMAL);
+        defaultButton = new UIButton(new Vector2f(128f, 32f), UIButton.ButtonType.NORMAL);
         defaultButton.getLabel().setText("Default");
         defaultButton.setHorizontalAlign(EHorizontalAlign.CENTER);
         defaultButton.setPosition(new Vector2f(-30f, 570f));

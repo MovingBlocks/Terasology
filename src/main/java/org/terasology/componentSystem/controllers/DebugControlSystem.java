@@ -20,6 +20,7 @@ import org.lwjgl.input.Keyboard;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.DamageEvent;
@@ -41,13 +42,14 @@ import org.terasology.world.WorldProvider;
 public class DebugControlSystem implements EventHandlerSystem {
 
     private UIScreenMetrics metrics;
+
+    @In
     private WorldProvider world;
+    @In
     private WorldRenderer worldRenderer;
 
     @Override
     public void initialise() {
-        world = CoreRegistry.get(WorldProvider.class);
-        worldRenderer = CoreRegistry.get(WorldRenderer.class);
     }
 
     @Override

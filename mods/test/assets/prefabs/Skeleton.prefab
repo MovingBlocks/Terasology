@@ -1,5 +1,4 @@
 {
-    "name" : "testmod:skeleton",
     "location" : {},
     "skeletalmesh" : {
         "mesh" : "testmod:character",

@@ -1,4 +1,5 @@
 {
     "id" : "core",
-    "displayName" : "Core Gameplay"
+    "displayName" : "Core Gameplay",
+    "description" : "This mod introduces the core Terasology mechanics"
 }

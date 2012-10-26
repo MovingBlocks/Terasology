@@ -18,7 +18,6 @@ package org.terasology.rendering.gui.windows;
 import org.lwjgl.input.Keyboard;
 import org.terasology.asset.AssetManager;
 import org.terasology.logic.manager.Config;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.ClickListener;
@@ -97,7 +96,7 @@ public class UIMenuConfigAudio extends UIWindow {
         _musicOptionSlider.setPosition(new Vector2f(0f, 300f + 40f));
         _musicOptionSlider.setVisible(true);
 
-        _backToConfigMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
+        _backToConfigMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
         _backToConfigMenuButton.getLabel().setText("Back");
         _backToConfigMenuButton.addClickListener(new ClickListener() {
             @Override

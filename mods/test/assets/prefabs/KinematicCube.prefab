@@ -1,5 +1,4 @@
 {
-    "name" : "testmod:KinematicCube",
     "location" : {},
     "RigidBody" : {
         "kinematic" : true,

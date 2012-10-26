@@ -1,5 +1,4 @@
 {
-    "name" : "core:miniaturizer",
     "Item" : {
         "name" : "Miniaturizer",
         "icon" : "scissors",

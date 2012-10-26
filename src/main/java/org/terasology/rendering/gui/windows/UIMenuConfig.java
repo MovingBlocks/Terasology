@@ -20,7 +20,6 @@ import javax.vecmath.Vector2f;
 import org.terasology.asset.AssetManager;
 import org.terasology.config.Config;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.widgets.UIButton;
@@ -43,7 +42,6 @@ public class UIMenuConfig extends UIWindow {
     private final UIButton videoButton;
     private final UIButton audioButton;
     private final UIButton controlsButton;
-    private final UIButton modsButton;
 
     public UIMenuConfig() {
         setId("config");
@@ -62,7 +60,7 @@ public class UIMenuConfig extends UIWindow {
         version.setPosition(new Vector2f(0f, 230f));
         version.setVisible(true);
 
-        videoButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
+        videoButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
         videoButton.getLabel().setText("Video");
         videoButton.setHorizontalAlign(EHorizontalAlign.CENTER);
         videoButton.setPosition(new Vector2f(0f, 300f));
@@ -74,7 +72,7 @@ public class UIMenuConfig extends UIWindow {
             }
         });
 
-        audioButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
+        audioButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
         audioButton.getLabel().setText("Audio");
         audioButton.setHorizontalAlign(EHorizontalAlign.CENTER);
         audioButton.setPosition(new Vector2f(0f, 300f + 40f));
@@ -86,7 +84,7 @@ public class UIMenuConfig extends UIWindow {
             }
         });
 
-        controlsButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
+        controlsButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
         controlsButton.getLabel().setText("Controls");
         controlsButton.setHorizontalAlign(EHorizontalAlign.CENTER);
         controlsButton.setPosition(new Vector2f(0f, 300f + 2 * 40f));
@@ -98,19 +96,7 @@ public class UIMenuConfig extends UIWindow {
             }
         });
 
-        modsButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
-        modsButton.getLabel().setText("Mods");
-        modsButton.setHorizontalAlign(EHorizontalAlign.CENTER);
-        modsButton.setPosition(new Vector2f(0f, 300f + 3 * 40f));
-        modsButton.setVisible(true);
-        modsButton.addClickListener(new ClickListener() {
-            @Override
-            public void click(UIDisplayElement element, int button) {
-                getGUIManager().openWindow("config:mods");
-            }
-        });
-
-        backToMainMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
+        backToMainMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
         backToMainMenuButton.getLabel().setText("Return to Main Menu");
         backToMainMenuButton.setHorizontalAlign(EHorizontalAlign.CENTER);
         backToMainMenuButton.setPosition(new Vector2f(0f, 300f + 7 * 40f));
@@ -129,7 +115,6 @@ public class UIMenuConfig extends UIWindow {
         addDisplayElement(videoButton);
         addDisplayElement(audioButton);
         addDisplayElement(controlsButton);
-        addDisplayElement(modsButton);
         addDisplayElement(backToMainMenuButton);
     }
 }

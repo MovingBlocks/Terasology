@@ -1,5 +1,4 @@
 {
-    "name" : "books:book",
     "Item" : {
         "name" : "Book",
         "icon" : "Book",

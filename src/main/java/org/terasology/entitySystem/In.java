@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright 2012  Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
+package org.terasology.entitySystem;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 /**
- * A bookcase only has books on the front. Well, at least this one does, for now
+ * @author Immortius
  */
-{
-    // Graphics
-    "tiles" : {
-        "topBottom" : "core:ChestTopBottom"
-    },
-    "entity" : {
-        "prefab" : "books:bookcase"
-    },
-    "inventory" : {
-        "stackable" : false,
-        "directPickup" : true
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+public @interface In {
 }

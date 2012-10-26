@@ -1,5 +1,4 @@
 {
-    "name" : "core:explodeTool",
     "Item" : {
         "name" : "Explode Tool",
         "icon" : "Dynamite",

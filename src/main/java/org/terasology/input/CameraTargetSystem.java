@@ -16,13 +16,10 @@
 
 package org.terasology.input;
 
-import java.util.Arrays;
-
-import javax.vecmath.Vector3f;
-
-import org.terasology.world.block.BlockComponent;
+import com.google.common.base.Objects;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.In;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.math.Vector3i;
@@ -34,7 +31,8 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.BlockEntityRegistry;
 
-import com.google.common.base.Objects;
+import javax.vecmath.Vector3f;
+import java.util.Arrays;
 
 /**
  * @author Immortius
@@ -44,8 +42,11 @@ public class CameraTargetSystem implements ComponentSystem {
     // TODO: This should come from somewhere, probably player entity?
     public static final float TARGET_DISTANCE = 5f;
 
+    @In
     private LocalPlayer localPlayer;
+    @In
     private BlockEntityRegistry blockRegistry;
+
     private EntityRef target = EntityRef.NULL;
     private Vector3i targetBlockPos = null;
     private Vector3f hitPosition = new Vector3f();
@@ -53,8 +54,6 @@ public class CameraTargetSystem implements ComponentSystem {
     private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD};
 
     public void initialise() {
-        localPlayer = CoreRegistry.get(LocalPlayer.class);
-        blockRegistry = CoreRegistry.get(BlockEntityRegistry.class);
     }
 
     @Override
@@ -81,7 +80,7 @@ public class CameraTargetSystem implements ComponentSystem {
 
     }
 
-    public void setFilter(CollisionGroup ... filter) {
+    public void setFilter(CollisionGroup... filter) {
         this.filter = Arrays.copyOf(filter, filter.length);
     }
 

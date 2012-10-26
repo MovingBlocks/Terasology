@@ -18,7 +18,6 @@ package org.terasology.rendering.gui.windows;
 import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.Color;
 import org.terasology.events.RespawnEvent;
-import org.terasology.input.binds.PauseButton;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.modes.StateMainMenu;
@@ -68,7 +67,7 @@ public class UIMenuPause extends UIWindow {
         _version.setPosition(new Vector2f(0f, 230f));
         _version.setVisible(true);
 
-        _exitButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
+        _exitButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
         _exitButton.getLabel().setText("Exit Terasology");
         _exitButton.addClickListener(new ClickListener() {
             @Override
@@ -80,7 +79,7 @@ public class UIMenuPause extends UIWindow {
         _exitButton.setPosition(new Vector2f(0f, 300f + 3 * 32f + 24f + 8f));
         _exitButton.setVisible(true);
         
-        _respawnButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
+        _respawnButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
         _respawnButton.getLabel().setText("Respawn");
         _respawnButton.addClickListener(new ClickListener() {
             @Override
@@ -94,7 +93,7 @@ public class UIMenuPause extends UIWindow {
         _respawnButton.setPosition(new Vector2f(0f, 300f + 32f + 24f));
         _respawnButton.setVisible(true);
 
-        _mainMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
+        _mainMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
         _mainMenuButton.getLabel().setText("Return to Main Menu");
         _mainMenuButton.addClickListener(new ClickListener() {
             @Override
@@ -106,7 +105,7 @@ public class UIMenuPause extends UIWindow {
         _mainMenuButton.setPosition(new Vector2f(0f, 300f + 2 * 32f + 24f + 4f));
         _mainMenuButton.setVisible(true);
 
-        _backToGameButton = new UIButton(new Vector2f(256f, 32f), UIButton.eButtonType.NORMAL);
+        _backToGameButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
         _backToGameButton.getLabel().setText("Back to game");
         _backToGameButton.addClickListener(new ClickListener() {
             public void click(UIDisplayElement element, int button) {
