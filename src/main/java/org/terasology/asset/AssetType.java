@@ -16,9 +16,13 @@
 
 package org.terasology.asset;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Table;
 import org.terasology.asset.loaders.OggSoundLoader;
 import org.terasology.asset.loaders.OggStreamingSoundLoader;
+import org.terasology.rendering.assetLoaders.FontLoader;
 import org.terasology.rendering.assetLoaders.GLSLShaderLoader;
 import org.terasology.rendering.assetLoaders.MaterialLoader;
 import org.terasology.rendering.assetLoaders.ObjMeshLoader;
@@ -28,6 +32,10 @@ import org.terasology.rendering.assetLoaders.md5.MD5SkeletonLoader;
 import org.terasology.world.block.loader.TileLoader;
 import org.terasology.world.block.shapes.JsonBlockShapeLoader;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 
@@ -38,45 +46,41 @@ import java.util.Map;
  * @author Lucas Jenss <public@x3ro.de>
  */
 public enum AssetType {
-    PREFAB("prefab", "prefabs", null, null),
+    PREFAB("prefab", "prefabs", "prefab", null),
     SOUND("sound", "sounds", "ogg", new OggSoundLoader()),
     MUSIC("music", "music", "ogg", new OggStreamingSoundLoader()),
     SHAPE("shape", "shapes", "json", new JsonBlockShapeLoader()),
     MESH("mesh", "mesh", "obj", new ObjMeshLoader()),
-    TEXTURE("texture", "textures", "png", new PNGTextureLoader()),
+    TEXTURE("texture", new String[] {"textures", "fonts"}, "png", new PNGTextureLoader()),
     SHADER("shader", "shaders", "glsl", new GLSLShaderLoader()) {
         @Override
         public AssetUri getUri(String sourceId, String item) {
-            int index = item.lastIndexOf("_frag.glsl");
-            if (index == -1) {
-                index = item.lastIndexOf("_vert.glsl");
+            if (item.endsWith("_frag")) {
+                item = item.substring(0, item.length() - "_frag".length());
+            } else if (item.endsWith("_vert")) {
+                item = item.substring(0, item.length() - "_vert".length());
             }
-            if (index == -1) {
-                index = item.lastIndexOf(".");
-            }
-            if (index != -1) {
-                return new AssetUri(this, sourceId, item.substring(0, index));
-            }
-            return null;
+            return new AssetUri(this, sourceId, item);
         }
     },
     MATERIAL("material", "materials", "mat", new MaterialLoader()),
-    BLOCK_DEFINITION("blockdef", "blocks", null, null),
+    BLOCK_DEFINITION("blockdef", "blocks", "json", null),
     BLOCK_TILE("blocktile", "blockTiles", "png", new TileLoader()),
     SKELETON_MESH("skeletalmesh", "skeletalMesh", "md5mesh", new MD5SkeletonLoader()),
-    ANIMATION("animation", "animations", "md5anim", new MD5AnimationLoader());
+    ANIMATION("animation", "animations", "md5anim", new MD5AnimationLoader()),
+    FONT("font", "fonts", "fnt", new FontLoader());
 
 
     /* ============
-  * Class fields
-  * ============ */
+     * Class fields
+     * ============ */
 
     private String typeId;
 
     /**
      * The sub-directory from which assets of this type can be loaded from.
      */
-    private String subDir;
+    private List<String> subDirs = Lists.newArrayList();
 
     /**
      * The file extension for assets of this type.
@@ -84,7 +88,7 @@ public enum AssetType {
     private String fileExtension;
 
     private static Map<String, AssetType> typeIdLookup;
-    private static Map<String, AssetType> subDirLookup;
+    private static Table<String, String, AssetType> subDirLookup;
 
     /**
      * An instance of the asset loader for the current asset type.
@@ -93,22 +97,30 @@ public enum AssetType {
 
     static {
         typeIdLookup = Maps.newHashMap();
-        subDirLookup = Maps.newHashMap();
+        subDirLookup = HashBasedTable.create();
         for (AssetType type : AssetType.values()) {
             typeIdLookup.put(type.getTypeId(), type);
-            subDirLookup.put(type.getSubDir(), type);
+            for (String dir : type.getSubDirs()) {
+                subDirLookup.put(dir, type.fileExtension, type);
+            }
         }
-
     }
 
 
     /* ==========
-  * Public API
-  * ========== */
+     * Public API
+     * ========== */
 
     private AssetType(String typeId, String subDir, String fileExtension, AssetLoader assetLoader) {
         this.typeId = typeId;
-        this.subDir = subDir;
+        this.subDirs.add(subDir);
+        this.fileExtension = fileExtension;
+        this.assetLoader = assetLoader;
+    }
+
+    private AssetType(String typeId, String[] subDirs, String fileExtension, AssetLoader assetLoader) {
+        this.typeId = typeId;
+        this.subDirs.addAll(Arrays.asList(subDirs));
         this.fileExtension = fileExtension;
         this.assetLoader = assetLoader;
     }
@@ -117,8 +129,8 @@ public enum AssetType {
         return typeId;
     }
 
-    public String getSubDir() {
-        return subDir;
+    public Collection<String> getSubDirs() {
+        return subDirs;
     }
 
     public String getFileExtension() {
@@ -133,23 +145,20 @@ public enum AssetType {
     }
 
     public AssetUri getUri(String sourceId, String item) {
-        if (item.contains(".")) {
-            return new AssetUri(this, sourceId, item.substring(0, item.lastIndexOf('.')));
-        }
-        return null;
+        return new AssetUri(this, sourceId, item);
     }
 
 
     /* ==========
-  * Static API
-  * ========== */
+     * Static API
+     * ========== */
 
     public static AssetType getTypeForId(String id) {
         return typeIdLookup.get(id);
     }
 
-    public static AssetType getTypeForSubDir(String dir) {
-        return subDirLookup.get(dir);
+    public static AssetType getTypeFor(String dir, String extension) {
+        return subDirLookup.get(dir, extension);
     }
 
     /**

@@ -22,6 +22,7 @@ import javax.vecmath.Vector4f;
 
 import org.newdawn.slick.AngelCodeFont;
 import org.newdawn.slick.Color;
+import org.terasology.rendering.assets.Font;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 
@@ -191,7 +192,7 @@ public class UIProgressBar extends UIDisplayContainer {
      * Get the font.
      * @return Returns the font.
      */
-    public AngelCodeFont getFont() {
+    public Font getFont() {
         return label.getFont();
     }
     
@@ -199,7 +200,7 @@ public class UIProgressBar extends UIDisplayContainer {
      * Set the font.
      * @param font The font to set.
      */
-    public void setFont(AngelCodeFont font) {
+    public void setFont(Font font) {
         label.setFont(font);
     }
     

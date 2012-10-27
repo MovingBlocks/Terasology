@@ -64,18 +64,6 @@ public interface GameEngine {
      */
     void changeState(GameState newState);
 
-    /**
-     * Deactivates the current state, and activates newState (putting it on top of the stack
-     *
-     * @param newState
-     */
-    void pushState(GameState newState);
-
-    /**
-     * Disposes the current state, re-activating the previous state if any
-     */
-    void popState();
-
     // TODO: Move task system elsewhere? Need to support saving queued/unfinished tasks too, when the world
     // shuts down
 

@@ -138,6 +138,7 @@ public class UIButton extends UIDisplayContainer {
         _label.setHorizontalAlign(EHorizontalAlign.CENTER);
         _label.setVerticalAlign(EVerticalAlign.CENTER);
         _label.setVisible(true);
+        _label.setTextShadow(true);
         
         addDisplayElement(_label);
     }

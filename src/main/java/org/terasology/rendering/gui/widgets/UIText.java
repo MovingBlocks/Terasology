@@ -33,9 +33,9 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
-import org.newdawn.slick.AngelCodeFont;
 import org.newdawn.slick.Color;
 import org.terasology.input.events.KeyEvent;
+import org.terasology.rendering.assets.Font;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayContainerScrollable;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -1154,7 +1154,7 @@ public class UIText extends UIDisplayContainerScrollable {
      * Get the font.
      * @return Returns the font.
      */
-    public AngelCodeFont getFont() {
+    public Font getFont() {
         return text.getFont();
     }
 
@@ -1162,7 +1162,7 @@ public class UIText extends UIDisplayContainerScrollable {
      * Set the font.
      * @param font The font to set.
      */
-    public void setFont(AngelCodeFont font) {
+    public void setFont(Font font) {
         text.setFont(font);
     }
     

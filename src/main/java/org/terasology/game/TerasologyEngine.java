@@ -16,7 +16,6 @@
 
 package org.terasology.game;
 
-import com.google.common.collect.Lists;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.LWJGLUtil;
 import org.lwjgl.input.Keyboard;
@@ -32,7 +31,6 @@ import org.terasology.config.InputConfig;
 import org.terasology.game.modes.GameState;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.Config;
-import org.terasology.logic.manager.FontManager;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.manager.ShaderManager;
@@ -51,11 +49,9 @@ import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Deque;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
@@ -81,11 +77,11 @@ public class TerasologyEngine implements GameEngine {
 
     private static final Logger logger = LoggerFactory.getLogger(TerasologyEngine.class);
 
-    private Deque<GameState> stateStack = new ArrayDeque<GameState>();
+    private GameState currentState;
     private boolean initialised;
     private boolean running;
     private boolean disposed;
-    private List<StateChangeFunction> pendingStateChanges = Lists.newArrayList();
+    private GameState pendingState;
 
     private Timer timer;
     private final ThreadPoolExecutor threadPool = (ThreadPoolExecutor) Executors.newCachedThreadPool();
@@ -273,28 +269,9 @@ public class TerasologyEngine implements GameEngine {
     @Override
     public void changeState(GameState newState) {
         if (running) {
-            pendingStateChanges.add(new ChangeState(newState));
+            pendingState = newState;
         } else {
-            doPurgeStates();
-            doPushState(newState);
-        }
-    }
-
-    @Override
-    public void pushState(GameState newState) {
-        if (running) {
-            pendingStateChanges.add(new PushState(newState));
-        } else {
-            doPushState(newState);
-        }
-    }
-
-    @Override
-    public void popState() {
-        if (running) {
-            pendingStateChanges.add(new PopState());
-        } else {
-            doPopState();
+            switchState(newState);
         }
     }
 
@@ -451,7 +428,6 @@ public class TerasologyEngine implements GameEngine {
 
         ShaderManager.getInstance();
         VertexBufferObjectManager.getInstance();
-        FontManager.getInstance();
     }
 
     private void initTimer() {
@@ -462,7 +438,10 @@ public class TerasologyEngine implements GameEngine {
     private void cleanup() {
         logger.info("Shutting down Terasology...");
         Config.getInstance().saveConfig(new File(PathManager.getInstance().getWorldPath(), "last.cfg"));
-        doPurgeStates();
+        if (currentState != null) {
+            currentState.dispose();
+            currentState = null;
+        }
         terminateThreads();
     }
 
@@ -478,7 +457,6 @@ public class TerasologyEngine implements GameEngine {
     private void mainLoop() {
         PerformanceMonitor.startActivity("Other");
         // MAIN GAME LOOP
-        GameState state;
         while (running && !Display.isCloseRequested()) {
 
             // Only process rendering and updating once a second
@@ -495,9 +473,8 @@ public class TerasologyEngine implements GameEngine {
             }
 
             processStateChanges();
-            state = stateStack.peek();
 
-            if (state == null) {
+            if (currentState == null) {
                 shutdown();
                 break;
             }
@@ -505,17 +482,17 @@ public class TerasologyEngine implements GameEngine {
             timer.tick();
 
             PerformanceMonitor.startActivity("Main Update");
-            state.update(timer.getDelta());
+            currentState.update(timer.getDelta());
             PerformanceMonitor.endActivity();
 
             PerformanceMonitor.startActivity("Render");
-            state.render();
+            currentState.render();
             Display.update();
             Display.sync(60);
             PerformanceMonitor.endActivity();
 
             PerformanceMonitor.startActivity("Input");
-            state.handleInput(timer.getDelta());
+            currentState.handleInput(timer.getDelta());
             PerformanceMonitor.endActivity();
 
             PerformanceMonitor.startActivity("Audio");
@@ -534,75 +511,17 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void processStateChanges() {
-        for (StateChangeFunction func : pendingStateChanges) {
-            func.enact();
-        }
-        pendingStateChanges.clear();
-    }
-
-    private void doPurgeStates() {
-        while (!stateStack.isEmpty()) {
-            doPopState();
+        if (pendingState != null) {
+            switchState(pendingState);
+            pendingState = null;
         }
     }
 
-    private void doPopState() {
-        GameState oldState = stateStack.pop();
-        oldState.deactivate();
-        oldState.dispose();
-        if (!stateStack.isEmpty()) {
-            stateStack.peek().activate();
+    private void switchState(GameState newState) {
+        if (currentState != null) {
+            currentState.dispose();
         }
-    }
-
-    private void doPushState(GameState newState) {
-        if (!stateStack.isEmpty()) {
-            stateStack.peek().deactivate();
-        }
-        stateStack.push(newState);
+        currentState = newState;
         newState.init(this);
-        newState.activate();
-    }
-
-    private interface StateChangeFunction {
-        void enact();
-    }
-
-    private class ChangeState implements StateChangeFunction {
-        public GameState newState;
-
-        public ChangeState(GameState newState) {
-            this.newState = newState;
-        }
-
-        @Override
-        public void enact() {
-            doPurgeStates();
-            doPushState(newState);
-        }
-    }
-
-    private class PushState implements StateChangeFunction {
-        public GameState newState;
-
-        public PushState(GameState newState) {
-            this.newState = newState;
-        }
-
-        @Override
-        public void enact() {
-            doPushState(newState);
-        }
-    }
-
-    private class PopState implements StateChangeFunction {
-
-        public PopState() {
-        }
-
-        @Override
-        public void enact() {
-            doPopState();
-        }
     }
 }

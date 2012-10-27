@@ -34,6 +34,8 @@ import java.nio.ByteBuffer;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.asset.Asset;
 import org.terasology.asset.AssetUri;
 
@@ -77,6 +79,8 @@ public class Texture implements Asset {
         }
     }
 
+    private static final Logger logger = LoggerFactory.getLogger(Texture.class);
+
     private AssetUri uri;
     private int id;
     private int width;
@@ -99,6 +103,7 @@ public class Texture implements Asset {
         this.data = data;
 
         id = glGenTextures();
+        logger.debug("Bound texture '{}' - {}", uri, id);
         glBindTexture(GL11.GL_TEXTURE_2D, id);
 
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode.getGLMode());

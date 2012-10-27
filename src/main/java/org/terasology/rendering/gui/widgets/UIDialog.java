@@ -72,6 +72,7 @@ public class UIDialog extends UIWindow {
             text = new UILabel();
             text.setColor(Color.orange);
             text.setVisible(true);
+            text.setTextShadow(true);
 
             leftBackground = new UIImage(AssetManager.loadTexture("engine:gui_menu"));
             leftBackground.setSize(new Vector2f(7f, 19f));

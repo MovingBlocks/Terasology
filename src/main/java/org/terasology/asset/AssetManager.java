@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.common.NullIterator;
 import org.terasology.logic.mod.ModManager;
+import org.terasology.rendering.assets.Font;
 import org.terasology.rendering.assets.Shader;
 import org.terasology.rendering.assets.Texture;
 
@@ -139,8 +140,9 @@ public class AssetManager {
             Asset asset = iterator.next();
             // Don't dispose engine assets, all sorts of systems have references to them
             if (!asset.getURI().getPackage().equals(ModManager.ENGINE_PACKAGE)) {
-                asset.dispose();
-                iterator.remove();
+                // TODO: Fix disposal
+                //asset.dispose();
+                //iterator.remove();
             }
         }
     }
@@ -234,8 +236,16 @@ public class AssetManager {
         return load(new AssetUri(AssetType.TEXTURE, simpleUri), Texture.class);
     }
 
+    public static Texture loadTexture(String packageName, String assetName) {
+        return load(new AssetUri(AssetType.TEXTURE, packageName, assetName), Texture.class);
+    }
+
     public static Shader loadShader(String simpleUri) {
         return load(new AssetUri(AssetType.SHADER, simpleUri), Shader.class);
+    }
+
+    public static Font loadFont(String simpleUri) {
+        return load(new AssetUri(AssetType.FONT, simpleUri), Font.class);
     }
 
     private class AllAssetIterator implements Iterator<AssetUri> {

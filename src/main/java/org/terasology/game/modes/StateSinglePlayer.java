@@ -164,6 +164,8 @@ public class StateSinglePlayer implements GameState {
         loadPrefabs();
 
         CoreRegistry.put(CommandManager.class, new CommandManager());
+
+        initWorld();
     }
 
     private ModManager initModManager() {
@@ -304,12 +306,7 @@ public class StateSinglePlayer implements GameState {
     }
 
     @Override
-    public void activate() {
-        initWorld();
-    }
-
-    @Override
-    public void deactivate() {
+    public void dispose() {
         // TODO: Shutdown background threads
         eventSystem.process();
         for (ComponentSystem system : componentSystemManager.iterateAll()) {
@@ -321,12 +318,7 @@ public class StateSinglePlayer implements GameState {
         } catch (IOException e) {
             logger.error("Failed to save entities", e);
         }
-        dispose();
         entityManager.clear();
-    }
-
-    @Override
-    public void dispose() {
         if (worldRenderer != null) {
             worldRenderer.dispose();
             worldRenderer = null;
@@ -422,7 +414,6 @@ public class StateSinglePlayer implements GameState {
     // TODO: Should have its own state
     private void prepareWorld() {
         UIScreenLoading loadingScreen = (UIScreenLoading)guiManager.openWindow("loading");
-        Display.update();
 
         Timer timer = CoreRegistry.get(Timer.class);
         long startTime = timer.getTimeInMs();

@@ -58,6 +58,7 @@ public class UIMenuMain extends UIWindow {
         _version.setHorizontalAlign(EHorizontalAlign.CENTER);
         _version.setPosition(new Vector2f(0f, 230f));
         _version.setVisible(true);
+        _version.setTextShadow(true);
 
         _exitButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
         _exitButton.getLabel().setText("Exit Terasology");

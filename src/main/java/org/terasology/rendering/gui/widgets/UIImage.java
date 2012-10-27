@@ -16,8 +16,14 @@
 package org.terasology.rendering.gui.widgets;
 
 
+import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE;
 import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
@@ -93,7 +99,8 @@ public class UIImage extends UIDisplayContainer {
         if (texture != null) {
             ShaderManager.getInstance().enableDefaultTextured();
             glBindTexture(GL11.GL_TEXTURE_2D, texture != null ? texture.getId() : 0);
-    
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             glMatrixMode(GL_TEXTURE);
             glPushMatrix();
             glTranslatef(textureOrigin.x, textureOrigin.y, 0.0f);
@@ -111,6 +118,7 @@ public class UIImage extends UIDisplayContainer {
             glMatrixMode(GL_TEXTURE);
             glPopMatrix();
             glMatrixMode(GL11.GL_MODELVIEW);
+            glDisable(GL_BLEND);
         } else {
             glPushMatrix();
             if (rotate > 0f) {

@@ -75,9 +75,14 @@ public abstract class AbstractSource implements AssetSource {
             if (lastSepIndex != -1) {
                 parts[1] = parts[1].substring(lastSepIndex + 1);
             }
-            AssetType assetType = AssetType.getTypeForSubDir(parts[0]);
-            if (assetType != null) {
-                return assetType.getUri(sourceId, parts[1]);
+            int extensionSeparator = parts[1].lastIndexOf(".");
+            if (extensionSeparator != -1) {
+                String name = parts[1].substring(0, extensionSeparator);
+                String extension = parts[1].substring(extensionSeparator + 1);
+                AssetType assetType = AssetType.getTypeFor(parts[0], extension);
+                if (assetType != null) {
+                    return assetType.getUri(sourceId, name);
+                }
             }
         }
         return null;

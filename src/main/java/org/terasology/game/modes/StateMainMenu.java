@@ -86,10 +86,7 @@ public class StateMainMenu implements GameState {
         entityManager.create(localPlayerComp);
         
         CoreRegistry.put(LocalPlayer.class, new LocalPlayer(EntityRef.NULL));
-    }
-    
-    @Override
-    public void activate() {
+
         Iterator<EntityRef> iterator = entityManager.iteratorEntities(LocalPlayerComponent.class).iterator();
         if (iterator.hasNext()) {
             CoreRegistry.get(LocalPlayer.class).setEntity(iterator.next());
@@ -98,27 +95,22 @@ public class StateMainMenu implements GameState {
         componentSystemManager.initialise();
 
         playBackgroundMusic();
-        
-        guiManager.openWindow("main");
-    }
 
-    @Override
-    public void deactivate() {
-        eventSystem.process();
-        
-        for (ComponentSystem system : componentSystemManager.iterateAll()) {
-            system.shutdown();
-        }
-        
-        stopBackgroundMusic();
-        guiManager.closeAllWindows();
-        
-        entityManager.clear();
+        guiManager.openWindow("main");
     }
     
     @Override
     public void dispose() {
-        // Nothing to do here.
+        eventSystem.process();
+
+        for (ComponentSystem system : componentSystemManager.iterateAll()) {
+            system.shutdown();
+        }
+
+        stopBackgroundMusic();
+        guiManager.closeAllWindows();
+
+        entityManager.clear();
     }
 
     private void playBackgroundMusic() {
