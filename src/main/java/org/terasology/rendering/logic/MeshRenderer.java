@@ -85,7 +85,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
 /**
- * TODO: This should be made generic (no explicit shader or mesh) and ported directly into WorldRenderer?
+ * TODO: This should be made generic (no explicit shader or mesh) and ported directly into WorldRenderer? Later note: some GelCube functionality moved to a mod
  *
  * @author Immortius <immortius@gmail.com>
  */

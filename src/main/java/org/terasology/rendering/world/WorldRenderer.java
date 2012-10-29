@@ -70,7 +70,6 @@ import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PathManager;
-import org.terasology.logic.manager.PortalManager;
 import org.terasology.logic.manager.PostProcessingRenderer;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.WorldTimeEventManager;
@@ -153,9 +152,6 @@ public final class WorldRenderer {
     private final PriorityQueue<Chunk> _renderQueueChunksSortedWater = new PriorityQueue<Chunk>(16 * 16, new ChunkProximityComparator());
     private final PriorityQueue<Chunk> _renderQueueChunksSortedBillboards = new PriorityQueue<Chunk>(16 * 16, new ChunkProximityComparator());
 
-    /* CORE GAME OBJECTS */
-    private final PortalManager _portalManager;
-
     /* HORIZON */
     private final Skysphere _skysphere;
 
@@ -217,7 +213,6 @@ public final class WorldRenderer {
         _skysphere = new Skysphere(this);
         _chunkUpdateManager = new ChunkUpdateManager(_chunkTesselator, _worldProvider);
         _worldTimeEventManager = new WorldTimeEventManager(_worldProvider);
-        _portalManager = new PortalManager(manager);
         _blockGrid = new BlockGrid();
 
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
@@ -770,23 +765,10 @@ public final class WorldRenderer {
     }
 
     /**
-     * Performs and maintains tick-based logic. If the game is paused this logic is not executed
-     * First effect: update the _tick variable that animation is based on
-     * Secondary effect: Trigger spawning (via PortalManager) once every second
-     * Tertiary effect: Trigger socializing (via MobManager) once every 10 seconds
+     * Updates the _tick variable that animation is based on
      */
     private void updateTick(float delta) {
-        // Update the animation tick
         _tick += delta * 1000;
-
-        // This block is based on seconds or less frequent timings
-        if (_timer.getTimeInMs() - _lastTick >= 1000) {
-            _tickTock++;
-            _lastTick = _timer.getTimeInMs();
-
-            // PortalManager ticks for spawning once a second
-            _portalManager.tickSpawn();
-        }
     }
 
     /**
@@ -844,26 +826,6 @@ public final class WorldRenderer {
 
     public ChunkProvider getChunkProvider() {
         return _chunkProvider;
-    }
-
-    /**
-     * Creates the first Portal if it doesn't exist yet
-     */
-    public void initPortal() {
-        if (!_portalManager.hasPortal()) {
-            Vector3f loc = new Vector3f(getPlayerPosition().x, getPlayerPosition().y + 4, getPlayerPosition().z);
-            logger.debug("Portal location is {}", loc);
-            Vector3i pos = new Vector3i(loc.x, loc.y, loc.z, 0.5f);
-            while (true) {
-                Block oldBlock = _worldProvider.getBlock(pos);
-                if (_worldProvider.setBlock(pos, BlockManager.getInstance().getBlock("engine:portal"), oldBlock)) {
-                    break;
-                }
-                // TODO: keep trying, but make sure chunk is loaded.
-                return;
-            }
-            _portalManager.addPortal(loc);
-        }
     }
 
     /**

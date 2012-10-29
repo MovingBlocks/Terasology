@@ -15,34 +15,45 @@
  */
 package org.terasology.entitySystem.pojo;
 
-import java.util.Collections;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Observable;
-import java.util.Observer;
-
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 
+import com.google.common.collect.Sets;
 import com.google.common.collect.Maps;
 
+import java.util.Collection;
+import java.util.Locale;
+import java.util.Map;
+
 /**
+ * Basic implementation of PrefabManager.
+ *
+ * @see PrefabManager
+ *
  * @author Immortius <immortius@gmail.com>
+ * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
 public class PojoPrefabManager implements PrefabManager {
 
-    protected final static String OBSERVER_EVENT_DESTROYED = "destroyed";
-    protected final static String OBSERVER_EVENT_RENAMED = "rename";
+    /** Library for available components (passed in). */
+    private ComponentLibrary componentLibrary;
 
-    ComponentLibrary componentLibrary;
-    Map<String, Prefab> prefabTable = Maps.newHashMap();
+    /** Map that stores the loaded Prefabs. */
+    private Map<String, Prefab> prefabTable = Maps.newHashMap();
 
-    public PojoPrefabManager(ComponentLibrary componentLibrary) {
-        this.componentLibrary = componentLibrary;
+    /**
+     * Constructor requiring a ComponentLibrary to be passed in.
+     * @param library The library of Components to use
+     */
+    public PojoPrefabManager(ComponentLibrary library) {
+        componentLibrary = library;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Prefab createPrefab(String name) {
         String normalisedName = normalizeName(name);
         if (exists(normalisedName)) {
@@ -52,16 +63,25 @@ public class PojoPrefabManager implements PrefabManager {
         return this.registerPrefab(new PojoPrefab(name, componentLibrary));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Prefab getPrefab(String name) {
         String normalisedName = normalizeName(name);
         return exists(normalisedName) ? prefabTable.get(normalisedName) : null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean exists(String name) {
         String normalisedName = normalizeName(name);
         return prefabTable.containsKey(normalisedName);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Prefab registerPrefab(Prefab prefab) {
         String normalisedName = normalizeName(prefab.getName());
         if (prefabTable.containsKey(normalisedName)) {
@@ -73,47 +93,34 @@ public class PojoPrefabManager implements PrefabManager {
         return prefab;
     }
 
-    public Iterable<Prefab> listPrefabs() {
-        return Collections.unmodifiableCollection(prefabTable.values());
+    /**
+     * {@inheritDoc}
+     */
+    public Collection<Prefab> listPrefabs() {
+        return prefabTable.values();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public Collection<Prefab> listPrefabs(Class<? extends Component> comp) {
+        Collection<Prefab> prefabs = Sets.newHashSet();
+
+        for (Prefab p : prefabTable.values()) {
+            if (p.getComponent(comp) != null) {
+                prefabs.add(p);
+            }
+        }
+
+        return prefabs;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public void removePrefab(String name) {
         String normalisedName = normalizeName(name);
         prefabTable.remove(normalisedName);
-    }
-
-    public <T extends Component> T getComponent(String name, Class<T> componentClass) {
-        if (!exists(name)) {
-            return null;
-        }
-
-        String normalisedName = normalizeName(name);
-        return getPrefab(normalisedName).getComponent(componentClass);
-    }
-
-    public <T extends Component> T setComponent(String name, T component) {
-        if (!exists(name)) {
-            throw new IllegalArgumentException("No prefab exists with name: " + name);
-        }
-
-        String normalisedName = normalizeName(name);
-        return getPrefab(normalisedName).setComponent(component);
-    }
-
-    public <T extends Component> void removeComponent(String name, Class<T> componentClass) {
-        if (!exists(name)) {
-            throw new IllegalArgumentException("No prefab exists with name: " + name);
-        }
-
-        String normalisedName = normalizeName(name);
-        getPrefab(normalisedName).removeComponent(componentClass);
-    }
-
-    protected class PrefabObserver implements Observer {
-
-        public void update(Observable o, Object arg) {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
     }
 
     private String normalizeName(String name) {
