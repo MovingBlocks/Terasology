@@ -207,7 +207,7 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
         moveDelta.scale(delta);
 
         // Note: No stepping underwater, no issue with slopes
-        MoveResult moveResult = move(location.getWorldPosition(), moveDelta, 0, 0, -1, movementComp.collider);
+        MoveResult moveResult = move(location.getWorldPosition(), moveDelta, 0, -1, movementComp.collider);
         Vector3f distanceMoved = new Vector3f(moveResult.finalPosition);
         distanceMoved.sub(location.getWorldPosition());
 
@@ -284,7 +284,7 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
         Vector3f moveDelta = new Vector3f(movementComp.getVelocity());
         moveDelta.scale(delta);
 
-        MoveResult moveResult = move(location.getWorldPosition(), moveDelta, movementComp.stepHeight, (movementComp.isGrounded) ? movementComp.stepHeight : 0, movementComp.slopeFactor, movementComp.collider);
+        MoveResult moveResult = move(location.getWorldPosition(), moveDelta, (movementComp.isGrounded) ? movementComp.stepHeight : 0, movementComp.slopeFactor, movementComp.collider);
         Vector3f distanceMoved = new Vector3f(moveResult.finalPosition);
         distanceMoved.sub(location.getWorldPosition());
 
@@ -338,7 +338,7 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
         public boolean hitTop = false;
     }
 
-    private MoveResult move(Vector3f startPosition, Vector3f moveDelta, float stepHeight, float stepDownHeight, float slopeFactor, PairCachingGhostObject collider) {
+    private MoveResult move(Vector3f startPosition, Vector3f moveDelta, float stepHeight, float slopeFactor, PairCachingGhostObject collider) {
         steppedUpDist = 0;
         stepped = false;
 
@@ -356,9 +356,9 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
             dist -= steppedUpDist;
             result.hitBottom = moveDown(dist, slopeFactor, collider, position);
         }
-        if (!result.hitBottom && stepDownHeight > 0) {
+        if (!result.hitBottom && stepHeight > 0) {
             Vector3f tempPos = new Vector3f(position);
-            result.hitBottom = moveDown(-stepDownHeight, slopeFactor, collider, tempPos);
+            result.hitBottom = moveDown(-stepHeight, slopeFactor, collider, tempPos);
             // Don't apply step down if nothing to step onto
             if (result.hitBottom) {
                 position.set(tempPos);

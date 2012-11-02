@@ -14,7 +14,8 @@
         "maxGroundSpeed" : 3,
         "distanceBetweenFootsteps" : 1.5,
         "height" : 1.6,
-        "radius" : 0.3
+        "radius" : 0.3,
+        "jumpSpeed" : 12
     },
     "BoxShape" : {
         "extents" : [1.5, 1.6, 1.5]
