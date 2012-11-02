@@ -161,7 +161,7 @@ public class Block {
 
     // Entity integration
     private String entityPrefab = "";
-    private boolean entityTemporary = false;
+    private BlockEntityMode entityMode = BlockEntityMode.PERSISTENT;
 
     // Inventory settings
     private boolean directPickup = false;
@@ -363,20 +363,15 @@ public class Block {
         entityPrefab = (value == null) ? "" : value;
     }
 
-    /**
-     * Whether it is safe to throw away the block's entity between interactions.
-     * <p/>
-     * For efficiency, when possible entities created for blocks are removed when they are no longer needed.
-     * But if a block's entity needs to persist some state (like a chest's contents), then the entity must remain.
-     *
-     * @return Whether the entity for this block can be thrown away after use
-     */
-    public boolean isEntityTemporary() {
-        return entityTemporary || entityPrefab.isEmpty();
+    public BlockEntityMode getEntityMode() {
+        if (stackable && entityMode == BlockEntityMode.PERSISTENT) {
+            return BlockEntityMode.WHILE_PLACED;
+        }
+        return entityMode;
     }
 
-    public void setEntityTemporary(boolean temporary) {
-        entityTemporary = temporary;
+    public void setEntityMode(BlockEntityMode entityMode) {
+        this.entityMode = entityMode;
     }
 
     /**

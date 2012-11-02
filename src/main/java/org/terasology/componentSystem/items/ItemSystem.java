@@ -136,13 +136,9 @@ public class ItemSystem implements EventHandlerSystem {
             return false;
 
         if (canPlaceBlock(block, targetBlock, placementPos)) {
-            if (worldProvider.setBlock(placementPos, block, worldProvider.getBlock(placementPos))) {
+            if (blockEntityRegistry.setBlock(placementPos, block, worldProvider.getBlock(placementPos), blockItem.placedEntity)) {
                 AudioManager.play(new AssetUri(AssetType.SOUND, "engine:PlaceBlock"), 0.5f);
                 if (blockItem.placedEntity.exists()) {
-                    // Establish a block entity
-                    blockItem.placedEntity.addComponent(new BlockComponent(placementPos, false));
-                    // TODO: Get regen and wait from block config?
-                    blockItem.placedEntity.addComponent(new HealthComponent(type.getArchetypeBlock().getHardness(), 2.0f, 1.0f));
                     blockItem.placedEntity = EntityRef.NULL;
                 }
                 return true;

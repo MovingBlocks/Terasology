@@ -73,6 +73,7 @@ public class BlockEntitySystem implements EventHandlerSystem {
     @ReceiveEvent(components = {BlockComponent.class})
     public void onDestroyed(NoHealthEvent event, EntityRef entity) {
         if (worldProvider == null) return;
+
         BlockComponent blockComp = entity.getComponent(BlockComponent.class);
         Block oldBlock = worldProvider.getBlock(blockComp.getPosition());
         worldProvider.setBlock(blockComp.getPosition(), BlockManager.getInstance().getAir(), oldBlock);
@@ -87,11 +88,17 @@ public class BlockEntitySystem implements EventHandlerSystem {
         // TODO: Configurable via block definition
         AudioManager.play(new AssetUri(AssetType.SOUND, "engine:RemoveBlock"), 0.6f);
 
-        if ((oldBlock.isDirectPickup() || !oldBlock.isEntityTemporary()) && event.getInstigator().exists()) {
-            EntityRef item = blockItemFactory.newInstance(oldBlock.getBlockFamily(), entity);
-            if (!oldBlock.isEntityTemporary()) {
-                entity.removeComponent(HealthComponent.class);
-                entity.removeComponent(BlockComponent.class);
+        if (oldBlock.getEntityMode() == BlockEntityMode.PERSISTENT) {
+            entity.removeComponent(HealthComponent.class);
+            entity.removeComponent(BlockComponent.class);
+        }
+
+        if ((oldBlock.isDirectPickup()) && event.getInstigator().exists()) {
+            EntityRef item;
+            if (oldBlock.getEntityMode() == BlockEntityMode.PERSISTENT) {
+                item = blockItemFactory.newInstance(oldBlock.getBlockFamily(), entity);
+            } else {
+                item = blockItemFactory.newInstance(oldBlock.getBlockFamily());
             }
             event.getInstigator().send(new ReceiveItemEvent(item));
             ItemComponent itemComp = item.getComponent(ItemComponent.class);
@@ -103,11 +110,16 @@ public class BlockEntitySystem implements EventHandlerSystem {
             }
         } else {
             /* PHYSICS */
-            EntityRef block = droppedBlockFactory.newInstance(blockComp.getPosition().toVector3f(), oldBlock.getBlockFamily(), 20);
+            EntityRef block;
+            if (oldBlock.getEntityMode() == BlockEntityMode.PERSISTENT) {
+                block = droppedBlockFactory.newInstance(blockComp.getPosition().toVector3f(), oldBlock.getBlockFamily(), 20, entity);
+            } else {
+                block = droppedBlockFactory.newInstance(blockComp.getPosition().toVector3f(), oldBlock.getBlockFamily(), 20);
+            }
             block.send(new ImpulseEvent(random.randomVector3f(30)));
         }
 
-        if (oldBlock.isEntityTemporary()) {
+        if (oldBlock.getEntityMode() != BlockEntityMode.PERSISTENT) {
             entity.destroy();
         }
     }

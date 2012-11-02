@@ -16,39 +16,38 @@
 
 package org.terasology.world;
 
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.BlockingQueue;
-
-import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.components.HealthComponent;
-import org.terasology.components.world.LocationComponent;
-import org.terasology.entitySystem.In;
-import org.terasology.entitySystem.event.ChangedComponentEvent;
-import org.terasology.math.Region3i;
-import org.terasology.world.block.BlockComponent;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.event.AddComponentEvent;
-import org.terasology.entitySystem.event.RemovedComponentEvent;
-import org.terasology.game.CoreRegistry;
-import org.terasology.math.Vector3i;
-import org.terasology.performanceMonitor.PerformanceMonitor;
-import org.terasology.world.block.Block;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+import org.terasology.componentSystem.UpdateSubscriberSystem;
+import org.terasology.components.HealthComponent;
+import org.terasology.components.world.LocationComponent;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.In;
+import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.event.AddComponentEvent;
+import org.terasology.entitySystem.event.ChangedComponentEvent;
+import org.terasology.entitySystem.event.RemovedComponentEvent;
+import org.terasology.math.Region3i;
+import org.terasology.math.Vector3i;
+import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.BlockEntityMode;
 import org.terasology.world.block.BlockRegionComponent;
+
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.BlockingQueue;
 
 /**
  * @author Immortius
  */
 public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator implements BlockEntityRegistry, EventHandlerSystem, UpdateSubscriberSystem {
     @In
-    private EntityManager entityManager;
+    EntityManager entityManager;
 
     // TODO: Perhaps a better datastructure for spatial lookups
     // TODO: Or perhaps a build in indexing system for entities
@@ -115,17 +114,21 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         if (!blockEntity.exists()) {
             Block block = getBlock(blockPosition.x, blockPosition.y, blockPosition.z);
             blockEntity = entityManager.create(block.getEntityPrefab());
-            if (block.isEntityTemporary()) {
+            if (block.getEntityMode() == BlockEntityMode.ON_INTERACTION) {
                 tempBlocks.add(blockEntity);
             }
-            blockEntity.addComponent(new LocationComponent(blockPosition.toVector3f()));
-            blockEntity.addComponent(new BlockComponent(blockPosition, block.isEntityTemporary()));
-            // TODO: Get regen and wait from block config?
-            if (block.isDestructible()) {
-                blockEntity.addComponent(new HealthComponent(block.getHardness(), 2.0f, 1.0f));
-            }
+            setupBlockEntity(blockPosition, blockEntity, block);
         }
         return blockEntity;
+    }
+
+    private void setupBlockEntity(Vector3i blockPosition, EntityRef blockEntity, Block block) {
+        blockEntity.addComponent(new LocationComponent(blockPosition.toVector3f()));
+        blockEntity.addComponent(new BlockComponent(blockPosition, block.getEntityMode() == BlockEntityMode.ON_INTERACTION));
+        // TODO: Get regen and wait from block config?
+        if (block.isDestructible()) {
+            blockEntity.addComponent(new HealthComponent(block.getHardness(), 2.0f, 1.0f));
+        }
     }
 
     @Override
@@ -144,6 +147,33 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
             return getOrCreateBlockEntityAt(blockPosition);
         }
         return entity;
+    }
+
+    @Override
+    public void replaceEntityAt(Vector3i blockPosition, EntityRef entity) {
+        replaceEntityAt(blockPosition, entity, getBlock(blockPosition.x, blockPosition.y, blockPosition.z));
+    }
+
+    private void replaceEntityAt(Vector3i blockPosition, EntityRef entity, Block blockType) {
+        EntityRef oldEntity = blockComponentLookup.put(blockPosition, entity);
+        if (oldEntity != null) {
+            oldEntity.destroy();
+        }
+        setupBlockEntity(blockPosition, entity, blockType);
+    }
+
+    @Override
+    public boolean setBlock(int x, int y, int z, Block type, Block oldType, EntityRef entity) {
+        return setBlock(new Vector3i(x, y, z), type, oldType, entity);
+    }
+
+    @Override
+    public boolean setBlock(Vector3i pos, Block type, Block oldType, EntityRef entity) {
+        if (super.setBlock(pos.x, pos.y, pos.z, type, oldType)) {
+            replaceEntityAt(pos, entity, type);
+            return true;
+        }
+        return false;
     }
 
     @ReceiveEvent(components = {BlockComponent.class})

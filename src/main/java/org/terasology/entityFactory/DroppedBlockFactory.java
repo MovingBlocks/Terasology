@@ -44,7 +44,7 @@ public class DroppedBlockFactory {
         return newInstance(location, blockFamily, lifespan, EntityRef.NULL);
     }
 
-    private EntityRef newInstance(Vector3f location, BlockFamily blockFamily, float lifespan, EntityRef placedEntity) {
+    public EntityRef newInstance(Vector3f location, BlockFamily blockFamily, float lifespan, EntityRef placedEntity) {
         if (!blockFamily.getArchetypeBlock().isDebrisOnDestroy()) {
             return EntityRef.NULL;
         }

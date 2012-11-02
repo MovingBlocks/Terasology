@@ -22,6 +22,7 @@ import java.util.List;
 import javax.vecmath.Vector4f;
 
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockEntityMode;
 import org.terasology.world.block.BlockPart;
 
 import com.google.common.collect.Lists;
@@ -91,7 +92,7 @@ public class BlockDefinition {
 
     public static class Entity {
         public String prefab = "";
-        public boolean temporary = false;
+        public BlockEntityMode mode = BlockEntityMode.PERSISTENT;
     }
 
     public static class Inventory {

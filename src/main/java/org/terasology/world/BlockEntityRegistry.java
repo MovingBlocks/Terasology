@@ -17,6 +17,7 @@ package org.terasology.world;
 
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.math.Vector3i;
+import org.terasology.world.block.Block;
 
 /**
  * Manages creation and lookup of entities linked to blocks
@@ -48,4 +49,39 @@ public interface BlockEntityRegistry {
      * @return The block controller entity for this location, or block entity.
      */
     EntityRef getOrCreateEntityAt(Vector3i blockPosition);
+
+    /**
+     * Replaces the entity at the given block position, destroying the old one (if it exists)
+     * The entity will be given block-entity related components.
+     * @param blockPosition
+     */
+    void replaceEntityAt(Vector3i blockPosition, EntityRef entity);
+
+    /**
+     * Places a block of a specific type at a given position and refreshes the
+     * corresponding light values. Additionally sets the entity for this block position if successful.
+     * Block-entity related components will be added to the entity.
+     *
+     * @param x    The X-coordinate
+     * @param y    The Y-coordinate
+     * @param z    The Z-coordinate
+     * @param type The type of the block to set
+     * @param oldType The old type of the block
+     * @param entity T
+     * @return True if a block was set/replaced. Will fail of oldType != the current type, or if the underlying chunk is not available
+     */
+    public boolean setBlock(int x, int y, int z, Block type, Block oldType, EntityRef entity);
+
+    /**
+     * Places a block of a specific type at a given position and refreshes the
+     * corresponding light values. Additionally sets the entity for this block position if successful.
+     * Block-entity related components will be added to the entity.
+     *
+     * @param pos
+     * @param type The type of the block to set
+     * @param oldType The old type of the block
+     * @param entity T
+     * @return True if a block was set/replaced. Will fail of oldType != the current type, or if the underlying chunk is not available
+     */
+    public boolean setBlock(Vector3i pos, Block type, Block oldType, EntityRef entity);
 }

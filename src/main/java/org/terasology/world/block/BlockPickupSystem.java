@@ -41,7 +41,7 @@ public class BlockPickupSystem implements EventHandlerSystem {
     @ReceiveEvent(components=BlockPickupComponent.class)
     public void onBump(CollideEvent event, EntityRef entity) {
         BlockPickupComponent blockPickupComponent = entity.getComponent(BlockPickupComponent.class);
-        EntityRef blockItem = blockItemFactory.newInstance(blockPickupComponent.blockFamily);
+        EntityRef blockItem = blockItemFactory.newInstance(blockPickupComponent.blockFamily, blockPickupComponent.placedEntity);
         ReceiveItemEvent giveItemEvent = new ReceiveItemEvent(blockItem);
         event.getOtherEntity().send(giveItemEvent);
 

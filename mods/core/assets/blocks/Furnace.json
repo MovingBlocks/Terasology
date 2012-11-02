@@ -24,6 +24,7 @@
         "topBottom" : "core:FurnaceTopBottom"
     },
     "entity" : {
-        "prefab" : "core:chest"
+        "prefab" : "core:chest",
+        "mode" : "persistent"
     }
 }

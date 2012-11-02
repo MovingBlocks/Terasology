@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright 2012  Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
+package org.terasology.world.block;
+
 /**
- * Tnt is a block that can go boom
+ * @author Immortius
  */
-{
-    "tiles" : {
-        "top" : "core:TntTop",
-        "bottom" : "core:TntBottom"
-    },
-    "entity" : {
-        "prefab" : "core:TNT",
-        "mode" : "on_interaction"
-    }
+public enum BlockEntityMode {
+    ON_INTERACTION,
+    WHILE_PLACED,
+    PERSISTENT
 }

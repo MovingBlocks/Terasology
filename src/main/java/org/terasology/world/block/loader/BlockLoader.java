@@ -522,7 +522,7 @@ public class BlockLoader {
 
         if (def.entity != null) {
             block.setEntityPrefab(def.entity.prefab);
-            block.setEntityTemporary(def.entity.temporary);
+            block.setEntityMode(def.entity.mode);
         }
 
         if (def.inventory != null) {

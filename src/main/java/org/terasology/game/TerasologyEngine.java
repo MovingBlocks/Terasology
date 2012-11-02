@@ -138,7 +138,7 @@ public class TerasologyEngine implements GameEngine {
         } else {
             org.terasology.config.Config config = new org.terasology.config.Config();
             config.getDefaultModConfig().addMod("core");
-            CoreRegistry.put(org.terasology.config.Config.class, new org.terasology.config.Config());
+            CoreRegistry.put(org.terasology.config.Config.class, config);
         }
     }
 

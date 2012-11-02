@@ -17,6 +17,7 @@ package org.terasology.entityFactory;
 
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LightComponent;
+import org.terasology.world.block.BlockEntityMode;
 import org.terasology.world.block.BlockItemComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -33,7 +34,7 @@ public class BlockItemFactory {
     }
 
     public EntityRef newInstance(BlockFamily blockFamily) {
-        return newInstance(blockFamily, 1, null);
+        return newInstance(blockFamily, 1, EntityRef.NULL);
     }
 
     public EntityRef newInstance(BlockFamily blockFamily, EntityRef placedEntity) {
@@ -41,7 +42,7 @@ public class BlockItemFactory {
     }
 
     public EntityRef newInstance(BlockFamily blockFamily, int quantity) {
-        return newInstance(blockFamily, quantity, null);
+        return newInstance(blockFamily, quantity, EntityRef.NULL);
     }
 
     private EntityRef newInstance(BlockFamily blockFamily, int quantity, EntityRef placedEntity) {
@@ -64,8 +65,8 @@ public class BlockItemFactory {
 
         BlockItemComponent blockItem = new BlockItemComponent(blockFamily);
 
-        if (!blockFamily.getArchetypeBlock().isEntityTemporary()) {
-            if (placedEntity == null || !placedEntity.exists()) {
+        if (blockFamily.getArchetypeBlock().getEntityMode() == BlockEntityMode.PERSISTENT) {
+            if (!placedEntity.exists()) {
                 placedEntity = entityManager.create(blockFamily.getArchetypeBlock().getEntityPrefab());
             }
             blockItem.placedEntity = placedEntity;

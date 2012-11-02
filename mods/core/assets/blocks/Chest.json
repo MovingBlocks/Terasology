@@ -26,7 +26,8 @@
         "topBottom" : "core:ChestTopBottom"
     },
     "entity" : {
-        "prefab" : "core:chest"
+        "prefab" : "core:chest",
+        "mode" : "persistent"
     },
     "inventory" : {
         "stackable" : false,
