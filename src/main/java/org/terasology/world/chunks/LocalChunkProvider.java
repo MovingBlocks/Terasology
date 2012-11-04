@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.math.Region3i;
+import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.world.lighting.LightPropagator;
@@ -80,7 +81,6 @@ public class LocalChunkProvider implements ChunkProvider {
     public LocalChunkProvider(ChunkStore farStore, ChunkGeneratorManager generator) {
         this.farStore = farStore;
         this.generator = generator;
-
 
         reviewChunkQueue = new PriorityBlockingQueue<ChunkRequest>(32);
         reviewThreads = Executors.newFixedThreadPool(REQUEST_CHUNK_THREADS);
@@ -527,7 +527,7 @@ public class LocalChunkProvider implements ChunkProvider {
         public Region3i getRegion() {
             LocationComponent loc = entity.getComponent(LocationComponent.class);
             if (loc != null) {
-                return Region3i.createFromCenterExtents(worldToChunkPos(loc.getWorldPosition()), new Vector3i(distance / 2, 0, distance / 2));
+                return Region3i.createFromCenterExtents(worldToChunkPos(loc.getWorldPosition()), new Vector3i(TeraMath.ceilToInt(distance / 2.0f), 0, TeraMath.ceilToInt(distance / 2)));
             }
             return Region3i.EMPTY;
         }

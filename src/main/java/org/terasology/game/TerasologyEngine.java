@@ -422,6 +422,7 @@ public class TerasologyEngine implements GameEngine {
     private void initManagers() {
         CoreRegistry.put(CollisionGroupManager.class, new CollisionGroupManager());
         CoreRegistry.put(ModManager.class, new ModManager());
+        CoreRegistry.put(ComponentSystemManager.class, new ComponentSystemManager());
 
         AssetType.registerAssetTypes();
         AssetManager.getInstance().addAssetSource(new ClasspathSource(ModManager.ENGINE_PACKAGE, getClass().getProtectionDomain().getCodeSource(), ModManager.ASSETS_SUBDIRECTORY));
