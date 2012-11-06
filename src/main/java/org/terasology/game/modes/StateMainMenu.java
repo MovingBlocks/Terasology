@@ -114,7 +114,7 @@ public class StateMainMenu implements GameState {
     }
 
     private void playBackgroundMusic() {
-        AudioManager.playMusic("engine:resurface");
+        AudioManager.playMusic("engine:MenuTheme");
     }
 
     private void stopBackgroundMusic() {
