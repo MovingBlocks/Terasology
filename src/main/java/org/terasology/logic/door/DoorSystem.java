@@ -16,6 +16,8 @@
 
 package org.terasology.logic.door;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.audio.Sound;
@@ -53,6 +55,8 @@ import javax.vecmath.Vector3f;
  */
 @RegisterComponentSystem
 public class DoorSystem implements EventHandlerSystem {
+    private static final Logger logger = LoggerFactory.getLogger(DoorSystem.class);
+
     @In
     private WorldProvider worldProvider;
     @In
@@ -123,8 +127,13 @@ public class DoorSystem implements EventHandlerSystem {
             return;
         }
 
-        worldProvider.setBlock(bottomBlockPos, door.bottomBlockFamily.getBlockFor(facingDir.reverse(), Side.TOP), bottomBlock);
-        worldProvider.setBlock(topBlockPos, door.topBlockFamily.getBlockFor(facingDir.reverse(), Side.TOP), topBlock);
+        Side closedSide = facingDir.reverse();
+        if (closedSide == attachSide || closedSide.reverse() == attachSide) {
+            closedSide = attachSide.rotateClockwise(1);
+        }
+
+        worldProvider.setBlock(bottomBlockPos, door.bottomBlockFamily.getBlockFor(closedSide, Side.TOP), bottomBlock);
+        worldProvider.setBlock(topBlockPos, door.topBlockFamily.getBlockFor(closedSide, Side.TOP), topBlock);
 
         EntityRef newDoor = entityManager.copy(entity);
         newDoor.addComponent(new BlockRegionComponent(Region3i.createBounded(bottomBlockPos, topBlockPos)));
@@ -132,12 +141,14 @@ public class DoorSystem implements EventHandlerSystem {
         doorCenter.y += 0.5f;
         newDoor.addComponent(new LocationComponent(doorCenter));
         DoorComponent newDoorComp = newDoor.getComponent(DoorComponent.class);
-        newDoorComp.closedDirection = facingDir.reverse();
+        newDoorComp.closedDirection = closedSide;
         newDoorComp.openDirection = attachSide.reverse();
         newDoorComp.isOpen = false;
         newDoor.saveComponent(newDoorComp);
         newDoor.removeComponent(ItemComponent.class);
         AudioManager.play(new AssetUri(AssetType.SOUND, "engine:PlaceBlock"), 0.5f);
+        logger.info("Closed Direction: {}", newDoorComp.closedDirection);
+        logger.info("Open Direction: {}", newDoorComp.openDirection);
     }
 
     private Side determineAttachSide(Side facingDir, Side offsetDir, Vector3i bottomBlockPos, Vector3i topBlockPos) {
