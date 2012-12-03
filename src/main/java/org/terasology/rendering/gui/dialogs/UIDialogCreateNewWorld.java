@@ -218,7 +218,6 @@ public class UIDialogCreateNewWorld extends UIDialog {
                 List<String> chunkList = new ArrayList<String>();
                 switch (chunkGenerator.getSelectionIndex()) {
                     case 1:   //flat
-                    	System.out.print("hello world+1\n");
                         chunkList.add(FlatTerrainGenerator.class.getName());
                         //if (checkboxFlora == selected) ... (pseudo code)
                         chunkList.add(FloraGenerator.class.getName());
@@ -227,16 +226,13 @@ public class UIDialogCreateNewWorld extends UIDialog {
                         break;
                         
                     case 2:   //multiworld
-                    	System.out.print("hello world\n");
                         chunkList.add(MultiTerrainGenerator.class.getName());
-                        //if (checkboxFlora == selected) ... (pseudo code)
                         chunkList.add(FloraGenerator.class.getName());
                         chunkList.add(LiquidsGenerator.class.getName());
                         chunkList.add(ForestGenerator.class.getName());
                         break;
 
                     default:  //normal
-                    	System.out.print("hello world-1\n");
                         chunkList.add(PerlinTerrainGenerator.class.getName());
                         chunkList.add(FloraGenerator.class.getName());
                         chunkList.add(LiquidsGenerator.class.getName());

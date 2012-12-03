@@ -34,6 +34,7 @@ import org.terasology.world.liquid.LiquidType;
 
 /**
  * Uses multiple different methods to generate world
+ * 
  * @author Esa-Petri
  */
 public class MultiTerrainGenerator implements ChunkGenerator {
@@ -54,38 +55,45 @@ public class MultiTerrainGenerator implements ChunkGenerator {
 	private Block snow = BlockManager.getInstance().getBlock("engine:Snow");
 	private Block dirt = BlockManager.getInstance().getBlock("engine:Dirt");
 
+	// for making some parts change now and then
+	private static int counter;
+	private static final int maxInt = Integer.MAX_VALUE;
+
 	@Override
 	public void setWorldSeed(String seed) {
 		if (seed != null) {
 			// base
-			_pGen1 = new EPNoise(seed.hashCode() + 1,-1, false);
+			_pGen1 = new EPNoise(seed.hashCode() + 1, 2, false);
 			// _pGen1 =new VornoiNoise(seed.hashCode() + 1, false, 1, 1);
-			//_pGen1 = new WhiteNoise(seed.hashCode() + 1, 1);
-			//_pGen1 = new DiamondSquareNoise(seed.hashCode() + 1, 3, 3);
+			// _pGen1 = new WhiteNoise(seed.hashCode() + 1, 1);
+			// _pGen1 = new DiamondSquareNoise(seed.hashCode() + 1, 3, 3);
 			_pGen1.setOctaves(8);
 
 			// ocean
-			_pGen2 = new EPNoise(seed.hashCode() + 2, -1,false);
-			//_pGen2 = new WhiteNoise(seed.hashCode() + 2, 1);
+			_pGen2 = new EPNoise(seed.hashCode() + 2, 6, false);
+			// _pGen2 = new WhiteNoise(seed.hashCode() + 2, 1);
 			_pGen2.setOctaves(10);
 
 			// river
-			_pGen3 = new EPNoise(seed.hashCode() + 3, -1,false);//2
-			//_pGen3 = new WhiteNoise(seed.hashCode() + 3, 1);
+			_pGen3 = new EPNoise(seed.hashCode() + 3, 2, false);
+			// _pGen3 = new WhiteNoise(seed.hashCode() + 3, 1);
 			_pGen3.setOctaves(8);
 
 			// mountain //6 ok
-			_pGen4 = new EPNoise(seed.hashCode() + 4, -1, false);
-			//_pGen4 = new WhiteNoise(seed.hashCode() + 4, 1);
-			
+			_pGen4 = new EPNoise(seed.hashCode() + 4, 0, false);
+			// _pGen4 = new WhiteNoise(seed.hashCode() + 4, 1);
+
 			// hill
-			//_pGen5 = new WhiteNoise(seed.hashCode() + 5, 1);
-			_pGen5 = new EPNoise(seed.hashCode() + 5, -1,false);//2
+			// _pGen5 = new WhiteNoise(seed.hashCode() + 5, 1);
+			_pGen5 = new EPNoise(seed.hashCode() + 5, 1, false);// 2
 			// _pGen5 = new VornoiNoise(seed.hashCode() + 5, false, 1, 1);
-			//_pGen5 = new DiamondSquareNoise(seed.hashCode() + 5, 5, 20);
-			
+			// _pGen5 = new DiamondSquareNoise(seed.hashCode() + 5, 5, 20);
+
 			// cave
-			_pGen8 = new EPNoise(seed.hashCode() + 7, -1,false);
+			_pGen8 = new EPNoise(seed.hashCode() + 7, 0, false);
+
+			
+			counter = Integer.MIN_VALUE;
 		}
 	}
 
@@ -304,13 +312,42 @@ public class MultiTerrainGenerator implements ChunkGenerator {
 		double densityMountains = calcMountainDensity(x, y, z) * mIntens;
 		double densityHills = calcHillDensity(x, y, z) * (1.0 - mIntens);
 
-		// edited not inter mixable whit orginal
-		 //int plateauArea = Chunk.SIZE_Y - Chunk.SIZE_Y /10;
-		 //double flatten = (1.0/(plateauArea*plateauArea))*(y-plateauArea)*(y-plateauArea);
+		int plateauArea;
+		double flatten, f1, f2;
 
-		// orginal
-		int plateauArea = (int) (Chunk.SIZE_Y * 0.10);
-		double flatten = TeraMath.clamp(((Chunk.SIZE_Y - 16) - y) / plateauArea);
+		// this generates ruin like structures
+		/*
+		 * if(counter%12==1){ plateauArea = (int) (Chunk.SIZE_Y * 0.70); flatten
+		 * = TeraMath.clamp(((Chunk.SIZE_Y - 16) - y) / plateauArea); }else if
+		 * (counter < -64 || counter > 0 && counter < 64) { // edited not inter
+		 * mixable whit orginal plateauArea = Chunk.SIZE_Y - Chunk.SIZE_Y / 10;
+		 * flatten = (1.0 / (plateauArea * plateauArea)) * (y - plateauArea) (y
+		 * - plateauArea); } else { // Original plateauArea = (int)
+		 * (Chunk.SIZE_Y * 0.10); flatten = TeraMath.clamp(((Chunk.SIZE_Y - 16)
+		 * - y) / plateauArea); }
+		 */
+
+		//TODO make so that walking REALY big circle(about 12km) doesn't create cut between plains and mountains 
+		int ratio = (counter / maxInt);
+		// edited version by Champi
+		plateauArea = Chunk.SIZE_Y - Chunk.SIZE_Y
+				/ (10* ((1 - TeraMath.fastAbs(ratio)) * 8) );//to add some real plains
+		f1 = (1.0 / (plateauArea * plateauArea)) * (y - plateauArea)
+				* (y - plateauArea);
+
+		// Original
+		plateauArea = (int) (Chunk.SIZE_Y * 0.10);
+		f2 = TeraMath.clamp(((Chunk.SIZE_Y - 16) - y) / plateauArea);
+
+		// some randomization between two of these
+		//around 0 f1 is strong
+		//near 1 or -1 f2 is strong
+		if (ratio < 0)
+			flatten = f1 * (1 + ratio) + f2 * -ratio;
+		else
+			flatten = f1 * (1 - ratio) + f2 * ratio;
+
+		counter++;
 
 		return -y
 				+ (((32.0 + height * 32.0) * TeraMath.clamp(river + 0.25) * TeraMath

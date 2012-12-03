@@ -35,7 +35,7 @@ public class EPNoise implements Noise {
 	private boolean _recomputeSpectralWeights = true;
 	private int _octaves = 9;
 	private boolean on;
-	static final boolean verbose = false;
+	//static final boolean verbose = false;
 
 	/**
 	 * Init. a new generator with a given seed value.
@@ -135,10 +135,10 @@ public class EPNoise implements Noise {
 				break;
 			}
 
-			if (verbose && type != -1) {
+			/*if (verbose && type != -1) {
 				System.out.print("noise generator type:" + type + "\n");
 				System.out.print("value:" + j + "\n");
-			}
+			}*/
 
 			if (j > 255 || j < 0) {
 				System.out
