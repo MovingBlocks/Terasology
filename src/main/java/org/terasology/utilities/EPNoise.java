@@ -123,10 +123,10 @@ public class EPNoise implements Noise {
 			 * = (int) Math.atan((double) j) % 256; break;
 			 */
 
-			case -2:// fill array whit zeros
+			case -2:// fill array whit zeros, for debug purposes
 				on = false;
 				break;
-			case -1:// oddly it works
+			case -1:// oddly this works, and generates something watchable
 				break;
 			case 0:
 			default: // orginal

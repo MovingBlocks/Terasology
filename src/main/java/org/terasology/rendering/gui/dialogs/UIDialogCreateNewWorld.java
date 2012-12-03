@@ -41,6 +41,7 @@ import org.terasology.world.generator.core.FlatTerrainGenerator;
 import org.terasology.world.generator.core.FloraGenerator;
 import org.terasology.world.generator.core.ForestGenerator;
 import org.terasology.world.generator.core.PerlinTerrainGenerator;
+import org.terasology.world.generator.core.MultiTerrainGenerator;
 import org.terasology.world.liquid.LiquidsGenerator;
 
 import javax.vecmath.Vector2f;
@@ -126,7 +127,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
         chunkGeneratorLabel.setVisible(true);
 
         chunkGenerator = new UIComboBox(new Vector2f(176f, 22f), new Vector2f(176f, 48f));
-        item = new UIListItem("Normal", new Integer(0));
+        item = new UIListItem("Perlin", new Integer(0));
         item.setTextColor(Color.black);
         item.setPadding(new Vector4f(5f, 5f, 5f, 5f));
         chunkGenerator.addItem(item);
@@ -134,7 +135,11 @@ public class UIDialogCreateNewWorld extends UIDialog {
         item.setTextColor(Color.black);
         item.setPadding(new Vector4f(5f, 5f, 5f, 5f));
         chunkGenerator.addItem(item);
-        chunkGenerator.select(0);
+        item = new UIListItem("Multi", new Integer(2));
+        item.setTextColor(Color.cyan);
+        item.setPadding(new Vector4f(5f, 5f, 5f, 5f));
+        chunkGenerator.addItem(item);
+        chunkGenerator.select(2);
         chunkGenerator.setVisible(true);
 
 
@@ -151,7 +156,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
 
 
         UIButton modButton = new UIButton(new Vector2f(80, 30), UIButton.ButtonType.NORMAL);
-        modButton.setPosition(new Vector2f(chunkGenerator.getPosition().x, chunkGenerator.getPosition().y + chunkGenerator.getSize().y + 16f));
+        modButton.setPosition(new Vector2f(chunkGenerator.getPosition().x, chunkGenerator.getPosition().y + chunkGenerator.getSize().y + 58f));
         modButton.setVisible(true);
         modButton.getLabel().setText("Mods...");
         modButton.addClickListener(new ClickListener() {
@@ -213,7 +218,17 @@ public class UIDialogCreateNewWorld extends UIDialog {
                 List<String> chunkList = new ArrayList<String>();
                 switch (chunkGenerator.getSelectionIndex()) {
                     case 1:   //flat
+                    	System.out.print("hello world+1\n");
                         chunkList.add(FlatTerrainGenerator.class.getName());
+                        //if (checkboxFlora == selected) ... (pseudo code)
+                        chunkList.add(FloraGenerator.class.getName());
+                        chunkList.add(LiquidsGenerator.class.getName());
+                        chunkList.add(ForestGenerator.class.getName());
+                        break;
+                        
+                    case 2:   //multiworld
+                    	System.out.print("hello world\n");
+                        chunkList.add(MultiTerrainGenerator.class.getName());
                         //if (checkboxFlora == selected) ... (pseudo code)
                         chunkList.add(FloraGenerator.class.getName());
                         chunkList.add(LiquidsGenerator.class.getName());
@@ -221,6 +236,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
                         break;
 
                     default:  //normal
+                    	System.out.print("hello world-1\n");
                         chunkList.add(PerlinTerrainGenerator.class.getName());
                         chunkList.add(FloraGenerator.class.getName());
                         chunkList.add(LiquidsGenerator.class.getName());

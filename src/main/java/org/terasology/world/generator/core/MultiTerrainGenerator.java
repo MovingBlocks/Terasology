@@ -33,7 +33,8 @@ import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
 
 /**
- * @author Immortius
+ * Uses multiple different methods to generate world
+ * @author Esa-Petri
  */
 public class MultiTerrainGenerator implements ChunkGenerator {
 	private static final int SAMPLE_RATE_3D_HOR = 4;
@@ -57,34 +58,34 @@ public class MultiTerrainGenerator implements ChunkGenerator {
 	public void setWorldSeed(String seed) {
 		if (seed != null) {
 			// base
-			//_pGen1 = new EPNoise(seed.hashCode() + 1, 2, false);
+			_pGen1 = new EPNoise(seed.hashCode() + 1,-1, false);
 			// _pGen1 =new VornoiNoise(seed.hashCode() + 1, false, 1, 1);
-			_pGen1 = new WhiteNoise(seed.hashCode() + 1, 1);
+			//_pGen1 = new WhiteNoise(seed.hashCode() + 1, 1);
 			//_pGen1 = new DiamondSquareNoise(seed.hashCode() + 1, 3, 3);
-			//_pGen1.setOctaves(8);
+			_pGen1.setOctaves(8);
 
 			// ocean
-			_pGen2 = new EPNoise(seed.hashCode() + 2, 0,false);
+			_pGen2 = new EPNoise(seed.hashCode() + 2, -1,false);
 			//_pGen2 = new WhiteNoise(seed.hashCode() + 2, 1);
 			_pGen2.setOctaves(10);
 
 			// river
-			_pGen3 = new EPNoise(seed.hashCode() + 3, 2,false);
+			_pGen3 = new EPNoise(seed.hashCode() + 3, -1,false);//2
 			//_pGen3 = new WhiteNoise(seed.hashCode() + 3, 1);
 			_pGen3.setOctaves(8);
 
 			// mountain //6 ok
-			_pGen4 = new EPNoise(seed.hashCode() + 4, 0, false);
+			_pGen4 = new EPNoise(seed.hashCode() + 4, -1, false);
 			//_pGen4 = new WhiteNoise(seed.hashCode() + 4, 1);
 			
 			// hill
 			//_pGen5 = new WhiteNoise(seed.hashCode() + 5, 1);
-			_pGen5 = new EPNoise(seed.hashCode() + 5, 2,false);
+			_pGen5 = new EPNoise(seed.hashCode() + 5, -1,false);//2
 			// _pGen5 = new VornoiNoise(seed.hashCode() + 5, false, 1, 1);
 			//_pGen5 = new DiamondSquareNoise(seed.hashCode() + 5, 5, 20);
 			
 			// cave
-			_pGen8 = new EPNoise(seed.hashCode() + 7, 0,false);
+			_pGen8 = new EPNoise(seed.hashCode() + 7, -1,false);
 		}
 	}
 
@@ -304,12 +305,12 @@ public class MultiTerrainGenerator implements ChunkGenerator {
 		double densityHills = calcHillDensity(x, y, z) * (1.0 - mIntens);
 
 		// edited not inter mixable whit orginal
-		 int plateauArea = Chunk.SIZE_Y - Chunk.SIZE_Y /10;
-		 double flatten = (1.0/(plateauArea*plateauArea))*(y-plateauArea)*(y-plateauArea);
+		 //int plateauArea = Chunk.SIZE_Y - Chunk.SIZE_Y /10;
+		 //double flatten = (1.0/(plateauArea*plateauArea))*(y-plateauArea)*(y-plateauArea);
 
 		// orginal
-		//int plateauArea = (int) (Chunk.SIZE_Y * 0.10);
-		//double flatten = TeraMath.clamp(((Chunk.SIZE_Y - 16) - y) / plateauArea);
+		int plateauArea = (int) (Chunk.SIZE_Y * 0.10);
+		double flatten = TeraMath.clamp(((Chunk.SIZE_Y - 16) - y) / plateauArea);
 
 		return -y
 				+ (((32.0 + height * 32.0) * TeraMath.clamp(river + 0.25) * TeraMath
