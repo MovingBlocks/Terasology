@@ -346,7 +346,7 @@ public final class WorldRenderer {
             @Override
             public void run() {
             	if(getPlayerPosition().z<50)
-            		AudioManager.playMusic("engine:OrcFortress");
+            		AudioManager.playMusic("engine:SpacialWinds");
             	else if(getPlayerPosition().z>175)
             		AudioManager.playMusic("engine:Heaven");
             	else
@@ -362,7 +362,7 @@ public final class WorldRenderer {
             	if(getPlayerPosition().z<50)
             		AudioManager.playMusic("engine:DwarfForge");
             	else if(getPlayerPosition().z>175)
-            		AudioManager.playMusic("engine:Afternoon");
+            		AudioManager.playMusic("engine:SpaceExplorers");
             	else
                 AudioManager.playMusic("engine:Afternoon");
             }
