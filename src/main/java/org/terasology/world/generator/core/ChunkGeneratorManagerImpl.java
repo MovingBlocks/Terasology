@@ -21,7 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.terasology.logic.generators.DefaultGenerators;
+//import org.terasology.logic.generators.DefaultGenerators;
 import org.terasology.math.Vector3i;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.WorldView;
@@ -54,7 +54,7 @@ public class ChunkGeneratorManagerImpl implements ChunkGeneratorManager {
 		chunkGeneratorManager.registerChunkGenerator(new FloraGenerator());
 		chunkGeneratorManager.registerChunkGenerator(new LiquidsGenerator());
 		final ForestGenerator forestGen = new ForestGenerator();
-		new DefaultGenerators(forestGen);
+		// new DefaultGenerators(forestGen);
 		chunkGeneratorManager.registerChunkGenerator(forestGen);
 
 		return chunkGeneratorManager;
@@ -75,7 +75,7 @@ public class ChunkGeneratorManagerImpl implements ChunkGeneratorManager {
 				chunkGenerator = (BaseChunkGenerator) c.newInstance(objectParm);
 
 				if (chunkGenerator instanceof ForestGenerator) {
-					new DefaultGenerators((ForestGenerator) chunkGenerator);
+					// new DefaultGenerators((ForestGenerator) chunkGenerator);
 				}
 
 				chunkGeneratorManager.registerChunkGenerator(chunkGenerator);

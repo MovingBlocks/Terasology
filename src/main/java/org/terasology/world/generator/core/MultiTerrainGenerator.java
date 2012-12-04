@@ -93,7 +93,7 @@ public class MultiTerrainGenerator implements ChunkGenerator {
 			_pGen8 = new EPNoise(seed.hashCode() + 7, 0, false);
 
 			
-			counter = Integer.MIN_VALUE;
+			counter = 0;//Integer.MIN_VALUE;
 		}
 	}
 
@@ -312,7 +312,7 @@ public class MultiTerrainGenerator implements ChunkGenerator {
 		double densityMountains = calcMountainDensity(x, y, z) * mIntens;
 		double densityHills = calcHillDensity(x, y, z) * (1.0 - mIntens);
 
-		int plateauArea;
+		double plateauArea;
 		double flatten, f1, f2;
 
 		// this generates ruin like structures
@@ -328,10 +328,15 @@ public class MultiTerrainGenerator implements ChunkGenerator {
 		 */
 
 		//TODO make so that walking REALY big circle(about 12km) doesn't create cut between plains and mountains 
-		int ratio = (counter / maxInt);
+		double ratio = (counter / maxInt);
+		if(ratio ==0 || ratio == -1)
+			ratio+=0.000000001;
+		else if(ratio ==1) 
+			ratio-=0.000000001;
+		
 		// edited version by Champi
 		plateauArea = Chunk.SIZE_Y - Chunk.SIZE_Y
-				/ (10* ((1 - TeraMath.fastAbs(ratio)) * 8) );//to add some real plains
+				/ (10* ((TeraMath.fastAbs(ratio)) * 8) );//to add some real plains
 		f1 = (1.0 / (plateauArea * plateauArea)) * (y - plateauArea)
 				* (y - plateauArea);
 
