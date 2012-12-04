@@ -179,6 +179,8 @@ public final class WorldRenderer {
 
     /* OTHER SETTINGS */
     private boolean _wireframe;
+    //for soundtrack
+    private static short playround; 
 
     private ComponentSystemManager _systemManager;
 
@@ -218,7 +220,7 @@ public final class WorldRenderer {
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
         localPlayerSystem.setPlayerCamera(_defaultCamera);
         _systemManager = CoreRegistry.get(ComponentSystemManager.class);
-
+        
 
         initTimeEvents();
     }
@@ -338,11 +340,17 @@ public final class WorldRenderer {
      * Creates the world time events to play the game's soundtrack at specific times.
      */
     public void initTimeEvents() {
+    	
         // SUNRISE
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.1, true) {
             @Override
             public void run() {
-                AudioManager.playMusic("engine:Sunrise");
+            	if(getPlayerPosition().z<50)
+            		AudioManager.playMusic("engine:OrcFortress");
+            	else if(getPlayerPosition().z>175)
+            		AudioManager.playMusic("engine:Heaven");
+            	else
+            		AudioManager.playMusic("engine:Sunrise");
             }
         });
 
@@ -350,6 +358,12 @@ public final class WorldRenderer {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.25, true) {
             @Override
             public void run() {
+            	//TODO get beter tck instead afternoon
+            	if(getPlayerPosition().z<50)
+            		AudioManager.playMusic("engine:DwarfForge");
+            	else if(getPlayerPosition().z>175)
+            		AudioManager.playMusic("engine:Afternoon");
+            	else
                 AudioManager.playMusic("engine:Afternoon");
             }
         });
@@ -358,7 +372,12 @@ public final class WorldRenderer {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.4, true) {
             @Override
             public void run() {
-                AudioManager.playMusic("engine:Sunset");
+            	if(getPlayerPosition().z<50)
+            		AudioManager.playMusic("engine:OrcFortress");
+            	else if(getPlayerPosition().z>175)
+            		AudioManager.playMusic("engine:PeacefulWorld");
+            	else
+            		AudioManager.playMusic("engine:Sunset");
             }
         });
 
@@ -366,7 +385,12 @@ public final class WorldRenderer {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.6, true) {
             @Override
             public void run() {
-                AudioManager.playMusic("engine:Dimlight");
+            	if(getPlayerPosition().z<50)
+            		AudioManager.playMusic("engine:CreepyCaves");
+            	else if(getPlayerPosition().z>175)
+            		AudioManager.playMusic("engine:ShootingStars");
+            	else
+            		AudioManager.playMusic("engine:Dimlight");
             }
         });
 
@@ -374,7 +398,12 @@ public final class WorldRenderer {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.75, true) {
             @Override
             public void run() {
-                AudioManager.playMusic("engine:OtherSide");
+            	if(getPlayerPosition().z<50)
+            		AudioManager.playMusic("engine:CreepyCaves");
+            	else if(getPlayerPosition().z>175)
+            		AudioManager.playMusic("engine:NightTheme");
+            	else
+            		AudioManager.playMusic("engine:OtherSide");
             }
         });
 
@@ -382,7 +411,12 @@ public final class WorldRenderer {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.9, true) {
             @Override
             public void run() {
-                AudioManager.playMusic("engine:Resurface");
+            	if(getPlayerPosition().z<50)
+            		AudioManager.playMusic("engine:CreepyCaves");
+            	else if(getPlayerPosition().z>175)
+            		AudioManager.playMusic("engine:Heroes");
+            	else
+            		AudioManager.playMusic("engine:Resurface");
             }
         });
     }
