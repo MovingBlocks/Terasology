@@ -63,31 +63,30 @@ public class MultiTerrainGenerator implements ChunkGenerator {
 	public void setWorldSeed(String seed) {
 		if (seed != null) {
 			// base
-			_pGen1 = new EPNoise(seed.hashCode() + 1, 2, false);
+			_pGen1 = new EPNoise(seed.hashCode() + 1, 1, false);
 			// _pGen1 =new VornoiNoise(seed.hashCode() + 1, false, 1, 1);
 			// _pGen1 = new WhiteNoise(seed.hashCode() + 1, 1);
 			// _pGen1 = new DiamondSquareNoise(seed.hashCode() + 1, 3, 3);
 			_pGen1.setOctaves(8);
 
 			// ocean
-			_pGen2 = new EPNoise(seed.hashCode() + 2, 6, false);
 			// _pGen2 = new WhiteNoise(seed.hashCode() + 2, 1);
+			_pGen2 = new EPNoise(seed.hashCode() + 2, 6, false);
 			_pGen2.setOctaves(10);
 
 			// river
-			_pGen3 = new EPNoise(seed.hashCode() + 3, 2, false);
 			// _pGen3 = new WhiteNoise(seed.hashCode() + 3, 1);
+			_pGen3 = new EPNoise(seed.hashCode() + 3, 2, false);
 			_pGen3.setOctaves(8);
 
 			// mountain //6 ok
-			_pGen4 = new EPNoise(seed.hashCode() + 4, 0, false);
 			// _pGen4 = new WhiteNoise(seed.hashCode() + 4, 1);
+			_pGen4 = new EPNoise(seed.hashCode() + 4, 0, false);
+			
 
 			// hill
 			// _pGen5 = new WhiteNoise(seed.hashCode() + 5, 1);
-			_pGen5 = new EPNoise(seed.hashCode() + 5, 1, false);// 2
-			// _pGen5 = new VornoiNoise(seed.hashCode() + 5, false, 1, 1);
-			// _pGen5 = new DiamondSquareNoise(seed.hashCode() + 5, 5, 20);
+			_pGen5 = new EPNoise(seed.hashCode() + 5, 2, false);
 
 			// cave
 			_pGen8 = new EPNoise(seed.hashCode() + 7, 0, false);
@@ -199,7 +198,7 @@ public class MultiTerrainGenerator implements ChunkGenerator {
 
 	private void GenerateOuterLayer(int x, int y, int z, int firstBlockHeight,
 			Chunk c, WorldBiomeProvider.Biome type) {
-		// TODO Add more comlicated layer
+		// TODO Add more complicated layers
 		// And we need more biomes
 		int depth = (firstBlockHeight - y);
 
@@ -306,16 +305,16 @@ public class MultiTerrainGenerator implements ChunkGenerator {
 				humidity - 0.35f);
 
 		double mIntens = TeraMath
-				.clamp(1.0 - distanceToMountainBiome.length() * 3.0);// edited
-																		// from
-																		// 3
+				.clamp(1.0 - distanceToMountainBiome.length() * 3.0);
+
+		
 		double densityMountains = calcMountainDensity(x, y, z) * mIntens;
 		double densityHills = calcHillDensity(x, y, z) * (1.0 - mIntens);
 
 		double plateauArea;
 		double flatten, f1, f2;
 
-		// this generates ruin like structures
+		// this generates ruin like structures, just as reminder howto create them
 		/*
 		 * if(counter%12==1){ plateauArea = (int) (Chunk.SIZE_Y * 0.70); flatten
 		 * = TeraMath.clamp(((Chunk.SIZE_Y - 16) - y) / plateauArea); }else if
