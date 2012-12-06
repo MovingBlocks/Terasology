@@ -19,6 +19,7 @@ import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.*;
+import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.world.block.BlockComponent;

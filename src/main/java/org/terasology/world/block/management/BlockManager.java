@@ -264,6 +264,10 @@ public class BlockManager {
         return familyByUri.values();
     }
 
+    public int registeredBlockFamiliesCount() {
+        return familyByUri.size();
+    }
+
     /**
      * @return An iterator over the shapeless block types available
      */
