@@ -161,7 +161,9 @@ public final class InputConfig {
         InputConfig config = new InputConfig();
         addDefaultsFor(ModManager.ENGINE_PACKAGE, modManager.getEngineReflections().getTypesAnnotatedWith(RegisterBindButton.class), config);
         for (Mod mod : modManager.getMods()) {
-            addDefaultsFor(mod.getModInfo().getId(), mod.getReflections().getTypesAnnotatedWith(RegisterBindButton.class), config);
+            if (mod.isCodeMod()) {
+                addDefaultsFor(mod.getModInfo().getId(), mod.getReflections().getTypesAnnotatedWith(RegisterBindButton.class), config);
+            }
         }
         return config;
     }
@@ -174,7 +176,9 @@ public final class InputConfig {
         ModManager modManager = CoreRegistry.get(ModManager.class);
         updateInputsFor(ModManager.ENGINE_PACKAGE, modManager.getEngineReflections().getTypesAnnotatedWith(RegisterBindButton.class), config );
         for (Mod mod : modManager.getMods()) {
-            updateInputsFor(mod.getModInfo().getId(), mod.getReflections().getTypesAnnotatedWith(RegisterBindButton.class), config);
+            if (mod.isCodeMod()) {
+                updateInputsFor(mod.getModInfo().getId(), mod.getReflections().getTypesAnnotatedWith(RegisterBindButton.class), config);
+            }
         }
         // TODO: Better way to handle toolbar slots? Might be easiest just to make them separate classes.
         for (int i = 0; i < 10; ++i) {

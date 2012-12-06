@@ -38,7 +38,9 @@ public class RegisterSystems implements LoadProcess {
 
         componentSystemManager.loadSystems(ModManager.ENGINE_PACKAGE, modManager.getEngineReflections());
         for (Mod mod : modManager.getActiveMods()) {
-            componentSystemManager.loadSystems(mod.getModInfo().getId(), mod.getReflections());
+            if (mod.isCodeMod()) {
+                componentSystemManager.loadSystems(mod.getModInfo().getId(), mod.getReflections());
+            }
         }
         return true;
     }

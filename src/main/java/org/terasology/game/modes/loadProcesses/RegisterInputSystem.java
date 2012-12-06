@@ -73,8 +73,10 @@ public class RegisterInputSystem implements LoadProcess {
         registerButtonBinds(inputSystem, ModManager.ENGINE_PACKAGE, modManager.getEngineReflections().getTypesAnnotatedWith(RegisterBindButton.class), inputConfig);
         registerAxisBinds(inputSystem, ModManager.ENGINE_PACKAGE, modManager.getEngineReflections().getTypesAnnotatedWith(RegisterBindAxis.class));
         for (Mod mod : modManager.getActiveMods()) {
-            registerButtonBinds(inputSystem, mod.getModInfo().getId(), mod.getReflections().getTypesAnnotatedWith(RegisterBindButton.class), inputConfig);
-            registerAxisBinds(inputSystem, mod.getModInfo().getId(), mod.getReflections().getTypesAnnotatedWith(RegisterBindAxis.class));
+            if (mod.isCodeMod()) {
+                registerButtonBinds(inputSystem, mod.getModInfo().getId(), mod.getReflections().getTypesAnnotatedWith(RegisterBindButton.class), inputConfig);
+                registerAxisBinds(inputSystem, mod.getModInfo().getId(), mod.getReflections().getTypesAnnotatedWith(RegisterBindAxis.class));
+            }
         }
 
         registerToolbarShortcuts(inputSystem, inputConfig);
