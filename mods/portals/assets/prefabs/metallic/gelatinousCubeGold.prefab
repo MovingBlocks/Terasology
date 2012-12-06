@@ -1,7 +1,8 @@
 {
   "Location" : {},
   "Mesh" : {
-    "renderType" : "GelatinousCube"
+    "renderType" : "GelatinousCube",
+    "color" : [1, 0.84, 0, 1]
   },
   "CharacterMovement" : {
     "height" : 1,
@@ -13,5 +14,8 @@
   "CharacterSound" : {
     "footstepSounds" : ["engine:Slime1", "engine:Slime2", "engine:Slime3", "engine:Slime4", "engine:Slime5"],
     "footstepVolume" : 0.7
+  },
+  "Spawnable" : {
+    "type" : "metallicgelcube"
   }
 }

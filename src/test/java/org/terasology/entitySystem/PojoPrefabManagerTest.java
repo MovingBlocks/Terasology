@@ -1,11 +1,5 @@
 package org.terasology.entitySystem;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
@@ -19,14 +13,19 @@ import org.terasology.entitySystem.metadata.extension.Vector3fTypeHandler;
 import org.terasology.entitySystem.pojo.PojoPrefabManager;
 import org.terasology.entitySystem.stubs.StringComponent;
 
+import java.util.Iterator;
+
+import static org.junit.Assert.*;
+
 /**
  * @author Immortius <immortius@gmail.com>
+ * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
 public class PojoPrefabManagerTest {
 
     public static final String PrefabName = "Test";
-    ComponentLibrary componentLibrary = new ComponentLibraryImpl();
-    PojoPrefabManager prefabManager;
+    private ComponentLibrary componentLibrary = new ComponentLibraryImpl();
+    private PojoPrefabManager prefabManager;
 
     @Before
     public void setup() {
@@ -96,6 +95,36 @@ public class PojoPrefabManagerTest {
 
         assertNotSame(testComponent.getLocalPosition(),  prefab.getComponent(testComponent.getClass()).getLocalPosition());
         assertEquals(new Vector3f(0,0,0), testComponent.getLocalPosition());
+    }
+
+    @Test
+    public void testListPrefabs() {
+        Prefab prefab = prefabManager.createPrefab(PrefabName + "1");
+        prefab.setComponent(new StringComponent());
+        Prefab prefab2 = prefabManager.createPrefab(PrefabName + "2");
+        prefab2.setComponent(new StringComponent());
+        Prefab prefab3 = prefabManager.createPrefab(PrefabName + "3");
+        prefab3.setComponent(new StringComponent());
+        Prefab prefab4 = prefabManager.createPrefab(PrefabName + "4");
+        prefab4.setComponent(new LocationComponent());
+        Prefab prefab5 = prefabManager.createPrefab(PrefabName + "5");
+        prefab5.setComponent(new LocationComponent());
+
+        long i = 0;
+        Iterator it = prefabManager.listPrefabs().iterator();
+        while (it.hasNext()) {
+            i++;
+            it.next();
+        }
+        assertEquals(5, i);
+
+        it = prefabManager.listPrefabs(LocationComponent.class).iterator();
+        i = 0;
+        while (it.hasNext()) {
+            i++;
+            it.next();
+        }
+        assertEquals(2, i);
     }
 
 }

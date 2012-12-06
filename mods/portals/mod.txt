@@ -1,0 +1,6 @@
+{
+    "id" : "portals",
+    "displayName" : "World portals for creature spawning",
+    "author" : "Cervator",
+    "description" : "Allows portals to be created in the world, responsible for spawning assorted creatures"
+}

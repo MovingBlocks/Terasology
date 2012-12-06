@@ -13,9 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.portals;
+
+import org.terasology.entitySystem.Component;
 
 /**
- * A PortalBlock will be tied to the central game concept of the same name. Temporarily not indestructible!
+ * Component that enables an entity to be spawned by something
+ *
+ * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
-{
+public class SpawnableComponent implements Component {
+
+    /** What category is this spawnable */
+    public String type = "undefined";
 }

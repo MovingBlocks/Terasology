@@ -469,7 +469,7 @@ public class StateSinglePlayer implements GameState {
         guiManager.openWindow(MenuControlSystem.HUD);
 
         // Create the first Portal if it doesn't exist yet
-        worldRenderer.initPortal();
+        //worldRenderer.initPortal();
         worldRenderer.getWorldProvider().setTime(worldInfo.getTime());
     }
 
