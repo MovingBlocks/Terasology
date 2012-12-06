@@ -15,12 +15,11 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.ChangedComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
-import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.metadata.ComponentLibraryImpl;
-import org.terasology.entitySystem.pojo.PojoEntityManager;
+import org.terasology.entitySystem.pojo.PojoPrefab;
 import org.terasology.entitySystem.pojo.PojoPrefabManager;
 import org.terasology.entitySystem.stubs.EntityRefComponent;
 import org.terasology.entitySystem.stubs.IntegerComponent;
@@ -260,6 +259,35 @@ public class PojoEntityManagerTest {
         assertFalse(main.exists());
         assertFalse(refComp.entityRef.exists());
 
+    }
+
+    @Test
+    public void prefabCopiedCorrectly() {
+        PrefabManager manager = new PojoPrefabManager(entityManager.getComponentLibrary());
+        Prefab prefab = manager.createPrefab("myprefab");
+        prefab.setComponent(new StringComponent("Test"));
+        EntityRef entity1 = entityManager.create(prefab);
+        StringComponent comp = entity1.getComponent(StringComponent.class);
+        assertEquals("Test", comp.value);
+        comp.value = "One";
+        entity1.saveComponent(comp);
+        assertEquals("Test", prefab.getComponent(StringComponent.class).value);
+        EntityRef entity2 = entityManager.create(prefab);
+        assertEquals("Test", prefab.getComponent(StringComponent.class).value);
+        assertEquals("One", entity1.getComponent(StringComponent.class).value);
+        assertEquals("Test", entity2.getComponent(StringComponent.class).value);
+    }
+
+    @Test
+    public void prefabCopiedCorrectly2() {
+        PrefabManager prefabManager = entityManager.getPrefabManager();
+        Prefab prefab = prefabManager.createPrefab("myprefab");
+        StringComponent testComponent = new StringComponent();
+        prefab.setComponent(testComponent);
+        EntityRef test1 = entityManager.create("myprefab");
+        EntityRef test2 = entityManager.create("myprefab");
+        //This returns true because the Objectids are Identical.
+        assertFalse(test1.getComponent(StringComponent.class) == (test2.getComponent(StringComponent.class)));
     }
 
 }
