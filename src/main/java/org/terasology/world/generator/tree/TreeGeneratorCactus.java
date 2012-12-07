@@ -17,6 +17,7 @@ package org.terasology.world.generator.tree;
 
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldView;
+import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
 
 /**
@@ -31,5 +32,10 @@ public class TreeGeneratorCactus extends TreeGenerator {
         for (int y = posY; y < posY + 3; y++) {
             view.setBlock(posX, y, posZ, BlockManager.getInstance().getBlock("engine:Cactus"), view.getBlock(posX, y, posZ));
         }
+    }
+
+    @Override
+    public TreeGenerator setBarkType(Block b) {
+        return this;
     }
 }

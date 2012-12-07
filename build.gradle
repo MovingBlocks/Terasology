@@ -6,7 +6,6 @@
  */
 
 apply plugin: 'java'
-apply plugin: 'groovy'
 apply plugin: 'project-report'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
@@ -82,12 +81,8 @@ task extractNatives {
     dependsOn extractMacOSXNatives
 }
 
-/* Java/Groovy ------------------------------------------------------------- */
+/* Java ------------------------------------------------------------- */
 sourceCompatibility = 1.6
-
-// Compiles everything as groovy, due to java<->groovy interdependencies
-compileJava.enabled = false
-sourceSets.main.java.srcDirs.each { sourceSets.main.groovy.srcDirs it }
 
 sourceSets {
     dev
@@ -102,7 +97,7 @@ configurations {
 }
 
 dependencies {
-    groovy group: 'org.codehaus.groovy', name: 'groovy', version: '1.8.7'
+    compile group: 'org.codehaus.groovy', name: 'groovy', version: '1.8.7'
 	compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.2'
     compile group: 'com.google.guava', name: 'guava', version: '13.0.1'
     compile group: 'com.google.code.gson', name: 'gson', version: '2.1'
@@ -130,7 +125,7 @@ jar {
 }
 
 task sourceJar(type: Jar) {
-    description = "Create a JAR with all sources (main: java, groovy, resources)"
+    description = "Create a JAR with all sources (main: java, resources)"
     manifest.attributes("Implementation-Title": project.name)
     classifier = 'sources'
     from sourceSets.main.output
@@ -141,13 +136,6 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     manifest.attributes("Implementation-Title": project.name)
     classifier = 'javadoc'
     from javadoc.destinationDir
-}
-
-task groovydocJar(type: Jar, dependsOn: groovydoc) {
-    description = "Create a JAR with the GroovyDoc for the groovy and java sources"
-    manifest.attributes("Implementation-Title": project.name)
-    classifier = 'groovydoc'
-    from groovydoc.destinationDir
 }
 
 test {

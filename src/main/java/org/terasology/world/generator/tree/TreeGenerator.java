@@ -18,6 +18,7 @@ package org.terasology.world.generator.tree;
 
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldView;
+import org.terasology.world.block.Block;
 
 /**
  * Object generators are used to generate objects like trees etc.
@@ -46,4 +47,6 @@ public abstract class TreeGenerator {
         this.generationProbability = genProbability;
         return this;
     }
+
+    public abstract TreeGenerator setBarkType(Block b);
 }

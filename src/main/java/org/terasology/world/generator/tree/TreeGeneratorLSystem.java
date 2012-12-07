@@ -16,6 +16,7 @@
 package org.terasology.world.generator.tree;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 
 import javax.vecmath.AxisAngle4f;
@@ -45,8 +46,8 @@ public class TreeGeneratorLSystem extends TreeGenerator {
 
     /* RULES */
     private final String initialAxiom;
-    private final HashMap<String, String> ruleSet;
-    private final HashMap<String, Double> probabilities;
+    private final Map<String, String> ruleSet;
+    private final Map<String, Double> probabilities;
 
     /**
      * Init. a new L-System based tree generator.
@@ -57,7 +58,7 @@ public class TreeGeneratorLSystem extends TreeGenerator {
      * @param iterations    The amount of iterations to execute
      * @param angle         The angle
      */
-    public TreeGeneratorLSystem(String initialAxiom, HashMap<String, String> ruleSet, HashMap<String, Double> probabilities, int iterations, int angle) {
+    public TreeGeneratorLSystem(String initialAxiom, Map<String, String> ruleSet, Map<String, Double> probabilities, int iterations, int angle) {
         angleInDegree = angle;
         this.iterations = iterations;
         air = BlockManager.getInstance().getAir();
