@@ -91,6 +91,7 @@ public class ModManager {
      * Provides the ability to reflect over the engine and all mods, not just active mods.  This should be used sparingly,
      * and classes retrieved from it should not be instantiated and used - this uses a different classloader than the
      * rest of the system.
+     *
      * @return Reflections over the engine and all available mods
      */
     public Reflections getAllReflections() {
@@ -164,8 +165,9 @@ public class ModManager {
                     try {
                         ModInfo modInfo = gson.fromJson(new InputStreamReader(zipFile.getInputStream(modInfoEntry)), ModInfo.class);
                         if (!mods.containsKey(modInfo.getId())) {
-                            mods.put(modInfo.getId(), new Mod(modFile, modInfo, new ArchiveSource(modInfo.getId(), modFile, ASSETS_SUBDIRECTORY)));
-                            logger.info("Discovered mod: " + modInfo.getDisplayName());
+                            Mod mod = new Mod(modFile, modInfo, new ArchiveSource(modInfo.getId(), modFile, ASSETS_SUBDIRECTORY));
+                            mods.put(modInfo.getId(), mod);
+                            logger.info("Discovered mod: {} (hasCode = {})", modInfo.getDisplayName(), mod.isCodeMod());
                         } else {
                             logger.info("Discovered duplicate mod: " + modInfo.getDisplayName() + ", skipping");
                         }
