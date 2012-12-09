@@ -311,46 +311,9 @@ public class MultiTerrainGenerator implements ChunkGenerator {
 		double densityMountains = calcMountainDensity(x, y, z) * mIntens;
 		double densityHills = calcHillDensity(x, y, z) * (1.0 - mIntens);
 
-		double plateauArea;
-		double flatten, f1, f2;
-
-		// this generates ruin like structures, just as reminder howto create them
-		/*
-		 * if(counter%12==1){ plateauArea = (int) (Chunk.SIZE_Y * 0.70); flatten
-		 * = TeraMath.clamp(((Chunk.SIZE_Y - 16) - y) / plateauArea); }else if
-		 * (counter < -64 || counter > 0 && counter < 64) { // edited not inter
-		 * mixable whit orginal plateauArea = Chunk.SIZE_Y - Chunk.SIZE_Y / 10;
-		 * flatten = (1.0 / (plateauArea * plateauArea)) * (y - plateauArea) (y
-		 * - plateauArea); } else { // Original plateauArea = (int)
-		 * (Chunk.SIZE_Y * 0.10); flatten = TeraMath.clamp(((Chunk.SIZE_Y - 16)
-		 * - y) / plateauArea); }
-		 */
-
-		//TODO make so that walking REALY big circle(about 12km) doesn't create cut between plains and mountains 
-		double ratio = (counter / maxInt);
-		if(ratio ==0 || ratio == -1)
-			ratio+=0.000000001;
-		else if(ratio ==1) 
-			ratio-=0.000000001;
-		
-		// edited version by Champi
-		plateauArea = Chunk.SIZE_Y - Chunk.SIZE_Y
-				/ (10* ((TeraMath.fastAbs(ratio)) * 8) );//to add some real plains
-		f1 = (1.0 / (plateauArea * plateauArea)) * (y - plateauArea)
-				* (y - plateauArea);
-
-		// Original
-		plateauArea = (int) (Chunk.SIZE_Y * 0.10);
-		f2 = TeraMath.clamp(((Chunk.SIZE_Y - 16) - y) / plateauArea);
-
-		// some randomization between two of these
-		//around 0 f1 is strong
-		//near 1 or -1 f2 is strong
-		if (ratio < 0)
-			flatten = f1 * (1 + ratio) + f2 * -ratio;
-		else
-			flatten = f1 * (1 - ratio) + f2 * ratio;
-
+		//returned to original
+        int plateauArea = (int) (Chunk.SIZE_Y * 0.10);
+        double flatten = TeraMath.clamp(((Chunk.SIZE_Y - 16) - y) / plateauArea);
 		counter++;
 
 		return -y
