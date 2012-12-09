@@ -471,13 +471,10 @@ public class LocalChunkProvider implements ChunkProvider {
 
     private void checkChunkReady(Vector3i pos) {
         if (worldEntity.exists()) {
-            for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, LOCAL_REGION_EXTENTS)) {
-                Chunk chunk = getChunk(adjPos);
-                if (chunk == null || chunk.getChunkState() != Chunk.State.COMPLETE) {
-                    return;
-                }
+            Chunk chunk = getChunk(pos);
+            if (chunk != null && chunk.getChunkState() == Chunk.State.COMPLETE) {
+                worldEntity.send(new ChunkReadyEvent(pos));
             }
-            worldEntity.send(new ChunkReadyEvent(pos));
         }
     }
 
