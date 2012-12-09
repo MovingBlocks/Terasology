@@ -27,11 +27,12 @@ import org.terasology.logic.manager.Config;
 import org.terasology.math.AABB;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
-import org.terasology.model.structures.TeraArray;
-import org.terasology.model.structures.TeraSmartArray;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
+import org.terasology.world.chunks.blockdata.TeraArray;
+import org.terasology.world.chunks.blockdata.TeraByteArray4Bit;
+import org.terasology.world.chunks.blockdata.TeraByteArray8Bit;
 import org.terasology.world.liquid.LiquidData;
 
 import com.google.common.base.Objects;
@@ -75,10 +76,10 @@ public class Chunk implements Externalizable {
 
     private final Vector3i pos = new Vector3i();
 
-    private final TeraArray blocks;
-    private final TeraSmartArray sunlight;
-    private final TeraSmartArray light;
-    private final TeraSmartArray liquid;
+    private TeraArray blocks;
+    private TeraArray sunlight;
+    private TeraArray light;
+    private TeraArray liquid;
 
     private State chunkState = State.ADJACENCY_GENERATION_PENDING;
     private boolean dirty;
@@ -95,10 +96,10 @@ public class Chunk implements Externalizable {
 
 
     public Chunk() {
-        blocks = new TeraArray(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        sunlight = new TeraSmartArray(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        light = new TeraSmartArray(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        liquid = new TeraSmartArray(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        blocks = new TeraByteArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        sunlight = new TeraByteArray4Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        light = new TeraByteArray4Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        liquid = new TeraByteArray4Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
 
         setDirty(true);
     }
@@ -116,10 +117,10 @@ public class Chunk implements Externalizable {
 
     public Chunk(Chunk other) {
         pos.set(other.pos);
-        blocks = new TeraArray(other.blocks);
-        sunlight = new TeraSmartArray(other.sunlight);
-        light = new TeraSmartArray(other.light);
-        liquid = new TeraSmartArray(other.liquid);
+        blocks = other.blocks.copy();
+        sunlight = other.sunlight.copy();
+        light = other.light.copy();
+        liquid = other.liquid.copy();
         chunkState = other.chunkState;
         dirty = true;
     }
@@ -166,15 +167,15 @@ public class Chunk implements Externalizable {
     }
 
     public Block getBlock(Vector3i pos) {
-        return BlockManager.getInstance().getBlock(blocks.get(pos.x, pos.y, pos.z));
+        return BlockManager.getInstance().getBlock((byte)blocks.get(pos.x, pos.y, pos.z));
     }
 
     public Block getBlock(int x, int y, int z) {
-        return BlockManager.getInstance().getBlock(blocks.get(x, y, z));
+        return BlockManager.getInstance().getBlock((byte)blocks.get(x, y, z));
     }
 
     public boolean setBlock(int x, int y, int z, Block block) {
-        byte oldValue = blocks.set(x, y, z, block.getId());
+        int oldValue = blocks.set(x, y, z, block.getId());
         if (oldValue != block.getId()) {
             if (!block.isLiquid()) {
                 setLiquid(x, y, z, new LiquidData());
@@ -205,11 +206,11 @@ public class Chunk implements Externalizable {
     }
 
     public byte getSunlight(Vector3i pos) {
-        return sunlight.get(pos.x, pos.y, pos.z);
+        return (byte) sunlight.get(pos.x, pos.y, pos.z);
     }
 
     public byte getSunlight(int x, int y, int z) {
-        return sunlight.get(x, y, z);
+        return (byte) sunlight.get(x, y, z);
     }
 
     public boolean setSunlight(Vector3i pos, byte amount) {
@@ -217,16 +218,16 @@ public class Chunk implements Externalizable {
     }
 
     public boolean setSunlight(int x, int y, int z, byte amount) {
-        byte oldValue = sunlight.set(x, y, z, amount);
+        byte oldValue = (byte) sunlight.set(x, y, z, amount);
         return oldValue != amount;
     }
 
     public byte getLight(Vector3i pos) {
-        return light.get(pos.x, pos.y, pos.z);
+        return (byte) light.get(pos.x, pos.y, pos.z);
     }
 
     public byte getLight(int x, int y, int z) {
-        return light.get(x, y, z);
+        return (byte) light.get(x, y, z);
     }
 
     public boolean setLight(Vector3i pos, byte amount) {
@@ -234,7 +235,7 @@ public class Chunk implements Externalizable {
     }
 
     public boolean setLight(int x, int y, int z, byte amount) {
-        byte oldValue = light.set(x, y, z, amount);
+        byte oldValue = (byte) light.set(x, y, z, amount);
         return (oldValue != amount);
     }
 
@@ -245,7 +246,7 @@ public class Chunk implements Externalizable {
     public boolean setLiquid(int x, int y, int z, LiquidData newState, LiquidData oldState) {
         byte expected = oldState.toByte();
         byte newValue = newState.toByte();
-        return liquid.set(x, y, z, newValue, expected) == expected;
+        return liquid.set(x, y, z, newValue, expected);
     }
 
     public void setLiquid(int x, int y, int z, LiquidData newState) {
@@ -258,7 +259,7 @@ public class Chunk implements Externalizable {
     }
 
     public LiquidData getLiquid(int x, int y, int z) {
-        return new LiquidData((liquid.get(x, y, z)));
+        return new LiquidData((byte) liquid.get(x, y, z));
     }
 
     public Vector3i getChunkWorldPos() {
@@ -312,42 +313,25 @@ public class Chunk implements Externalizable {
         out.writeInt(pos.x);
         out.writeInt(pos.y);
         out.writeInt(pos.z);
-
         out.writeObject(chunkState);
-
-        for (int i = 0; i < blocks.size(); i++)
-            out.writeByte(blocks.getRawByte(i));
-
-        for (int i = 0; i < sunlight.sizePacked(); i++)
-            out.writeByte(sunlight.getRawByte(i));
-
-        for (int i = 0; i < light.sizePacked(); i++)
-            out.writeByte(light.getRawByte(i));
-
-        for (int i = 0; i < liquid.sizePacked(); i++)
-            out.writeByte(liquid.getRawByte(i));
+        out.writeObject(blocks);
+        out.writeObject(sunlight);
+        out.writeObject(light);
+        out.writeObject(liquid);
     }
 
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         pos.x = in.readInt();
         pos.y = in.readInt();
         pos.z = in.readInt();
-
-        // Parse the flags...
+        
         setDirty(true);
+
         chunkState = (State) in.readObject();
-
-        for (int i = 0; i < blocks.size(); i++)
-            blocks.setRawByte(i, in.readByte());
-
-        for (int i = 0; i < sunlight.sizePacked(); i++)
-            sunlight.setRawByte(i, in.readByte());
-
-        for (int i = 0; i < light.sizePacked(); i++)
-            light.setRawByte(i, in.readByte());
-
-        for (int i = 0; i < liquid.sizePacked(); i++)
-            liquid.setRawByte(i, in.readByte());
+        blocks = (TeraArray) in.readObject();
+        sunlight = (TeraArray) in.readObject();
+        light = (TeraArray) in.readObject();
+        liquid = (TeraArray) in.readObject();
     }
 
     @Override
