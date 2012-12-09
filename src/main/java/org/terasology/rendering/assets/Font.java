@@ -73,8 +73,6 @@ public class Font implements Asset {
 
     public void drawString(int x, int y, String text, Color color) {
         ShaderManager.getInstance().enableDefaultTextured();
-        glEnable(GL11.GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         Texture bound = null;
 
@@ -112,7 +110,6 @@ public class Font implements Asset {
                 }
             }
         }
-        glDisable(GL11.GL_BLEND);
     }
 
     public int getWidth(String text) {

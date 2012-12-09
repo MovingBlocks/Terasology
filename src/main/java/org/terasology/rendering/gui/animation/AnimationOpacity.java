@@ -80,8 +80,6 @@ public class AnimationOpacity extends Animation {
         program.setFloat("alpha", currentOpacity);
         program.enable();
         PostProcessingRenderer.getInstance().getFBO(id).bindTexture();
-        glEnable(GL11.GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glMatrixMode(GL_TEXTURE);
         glPushMatrix();
         glLoadIdentity();

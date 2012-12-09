@@ -17,7 +17,7 @@
 package org.terasology.asset;
 
 import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 import org.terasology.asset.loaders.OggSoundLoader;
@@ -32,9 +32,7 @@ import org.terasology.rendering.assetLoaders.md5.MD5SkeletonLoader;
 import org.terasology.world.block.loader.TileLoader;
 import org.terasology.world.block.shapes.JsonBlockShapeLoader;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -51,8 +49,8 @@ public enum AssetType {
     MUSIC("music", "music", "ogg", new OggStreamingSoundLoader()),
     SHAPE("shape", "shapes", "json", new JsonBlockShapeLoader()),
     MESH("mesh", "mesh", "obj", new ObjMeshLoader()),
-    TEXTURE("texture", new String[] {"textures", "fonts"}, "png", new PNGTextureLoader()),
-    SHADER("shader", "shaders", "glsl", new GLSLShaderLoader()) {
+    TEXTURE("texture", new String[]{"textures", "fonts"}, "png", new PNGTextureLoader()),
+    SHADER("shader", "shaders", new String[]{"glsl", "info"}, new GLSLShaderLoader()) {
         @Override
         public AssetUri getUri(String sourceId, String item) {
             if (item.endsWith("_frag")) {
@@ -80,12 +78,12 @@ public enum AssetType {
     /**
      * The sub-directory from which assets of this type can be loaded from.
      */
-    private List<String> subDirs = Lists.newArrayList();
+    private List<String> subDirs;
 
     /**
      * The file extension for assets of this type.
      */
-    private String fileExtension;
+    private List<String> fileExtensions;
 
     private static Map<String, AssetType> typeIdLookup;
     private static Table<String, String, AssetType> subDirLookup;
@@ -101,7 +99,9 @@ public enum AssetType {
         for (AssetType type : AssetType.values()) {
             typeIdLookup.put(type.getTypeId(), type);
             for (String dir : type.getSubDirs()) {
-                subDirLookup.put(dir, type.fileExtension, type);
+                for (String extension : type.getFileExtension()) {
+                    subDirLookup.put(dir, extension, type);
+                }
             }
         }
     }
@@ -113,15 +113,29 @@ public enum AssetType {
 
     private AssetType(String typeId, String subDir, String fileExtension, AssetLoader assetLoader) {
         this.typeId = typeId;
-        this.subDirs.add(subDir);
-        this.fileExtension = fileExtension;
+        this.subDirs = ImmutableList.of(subDir);
+        this.fileExtensions = ImmutableList.of(fileExtension);
+        this.assetLoader = assetLoader;
+    }
+
+    private AssetType(String typeId, String[] subDirs, String[] fileExtensions, AssetLoader assetLoader) {
+        this.typeId = typeId;
+        this.subDirs = ImmutableList.copyOf(subDirs);
+        this.fileExtensions = ImmutableList.copyOf(fileExtensions);
+        this.assetLoader = assetLoader;
+    }
+
+    private AssetType(String typeId, String subDir, String[] fileExtensions, AssetLoader assetLoader) {
+        this.typeId = typeId;
+        this.subDirs = ImmutableList.of(subDir);
+        this.fileExtensions = ImmutableList.copyOf(fileExtensions);
         this.assetLoader = assetLoader;
     }
 
     private AssetType(String typeId, String[] subDirs, String fileExtension, AssetLoader assetLoader) {
         this.typeId = typeId;
-        this.subDirs.addAll(Arrays.asList(subDirs));
-        this.fileExtension = fileExtension;
+        this.subDirs = ImmutableList.copyOf(subDirs);
+        this.fileExtensions = ImmutableList.of(fileExtension);
         this.assetLoader = assetLoader;
     }
 
@@ -133,8 +147,8 @@ public enum AssetType {
         return subDirs;
     }
 
-    public String getFileExtension() {
-        return fileExtension;
+    public Collection<String> getFileExtension() {
+        return fileExtensions;
     }
 
     /**
@@ -172,11 +186,13 @@ public enum AssetType {
                 continue; // No loader has been assigned to this AssetType
             }
 
-            AssetManager.getInstance().register(
-                    type,
-                    type.getFileExtension(),
-                    loader
-            );
+            for (String extension : type.getFileExtension()) {
+                AssetManager.getInstance().register(
+                        type,
+                        extension,
+                        loader
+                );
+            }
         }
     }
 }

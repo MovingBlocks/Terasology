@@ -71,8 +71,6 @@ public class AnimationRotate extends Animation {
     public void renderEnd(){
         PostProcessingRenderer.getInstance().getFBO(id).unbind();
         PostProcessingRenderer.getInstance().getFBO(id).bindTexture();
-        glEnable(GL11.GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glMatrixMode(GL_TEXTURE);
         glPushMatrix();
             glLoadIdentity();

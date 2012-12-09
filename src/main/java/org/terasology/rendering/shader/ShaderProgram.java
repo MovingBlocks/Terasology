@@ -167,8 +167,6 @@ public class ShaderProgram {
 
         if (activeProgram != this) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
-            glBindTexture(GL11.GL_TEXTURE_2D, 0);
-
             GL20.glUseProgram(shaderProgram);
 
             // Make sure the shader manager knows that this program is currently active
