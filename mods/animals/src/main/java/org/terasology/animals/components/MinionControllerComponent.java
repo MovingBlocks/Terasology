@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,15 @@
  * limitations under the License.
  */
 
+package org.terasology.miniion.components;
+
+import org.terasology.entitySystem.Component;
+
 /**
- * Force Field
+ * @author Immortius
  */
-{
-    "attachmentAllowed" : false,
-    "supportRequired" : true,
-    "shape" : "engine:billboard",
-    "replacementAllowed" : true,
-    "doubleSided" : true,
-    "penetrable" : true,
-    "translucent" : true,
-    "shadowCasting" : false,
-    "luminance" : 30,
-    "hardness" : 1,
-    "waving" : true,
-    "penetrable" : true,
-    "targetable" : true,
-    "debrisOnDestroy" : false
+public final class MinionControllerComponent implements Component {
+
+    public boolean minionMode = false;
+    public int selectedMinion = 0;
 }

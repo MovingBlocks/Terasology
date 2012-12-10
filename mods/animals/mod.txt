@@ -1,0 +1,5 @@
+{
+    "id" : "animals",
+    "displayName" : "animals",
+    "description" : "Simple animals, whit simple AI"
+}

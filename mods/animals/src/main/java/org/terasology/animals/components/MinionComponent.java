@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.miniion.components;
+
+import org.terasology.entitySystem.Component;
+import org.terasology.miniion.minionenum.MinionBehaviour;
 
 /**
- * Force Field
+ * Allows an entity to store items
+ *
+ * @author Immortius <immortius@gmail.com>
  */
-{
-    "attachmentAllowed" : false,
-    "supportRequired" : true,
-    "shape" : "engine:billboard",
-    "replacementAllowed" : true,
-    "doubleSided" : true,
-    "penetrable" : true,
-    "translucent" : true,
-    "shadowCasting" : false,
-    "luminance" : 30,
-    "hardness" : 1,
-    "waving" : true,
-    "penetrable" : true,
-    "targetable" : true,
-    "debrisOnDestroy" : false
+public final class MinionComponent implements Component {
+
+    public String icon = "";
+    public MinionBehaviour minionBehaviour = MinionBehaviour.Stay;
+
+    public MinionComponent() {
+    }
+
 }
