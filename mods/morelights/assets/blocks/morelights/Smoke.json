@@ -15,14 +15,14 @@
  */
 
 /**
- * liquid Darkness
+ * Force Field
  */
 {
-    "liquid" : true,
     "translucent" : true,
     "shadowCasting" : false,
-    "luminance" : 1,
-    "hardness" : 10,
+    "luminance" : 2,
+    "hardness" : 1,
+    "waving" : true,
     "penetrable" : true,
     "targetable" : true
 }
