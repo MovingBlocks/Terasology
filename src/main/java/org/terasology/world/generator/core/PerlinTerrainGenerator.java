@@ -101,7 +101,7 @@ public class PerlinTerrainGenerator implements ChunkGenerator {
                 WorldBiomeProvider.Biome type = biomeProvider.getBiomeAt(c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
                 int firstBlockHeight = -1;
 
-                for (int y = Chunk.SIZE_Y; y >= 0; y--) {
+                for (int y = Chunk.SIZE_Y-1; y >= 0; y--) {
 
                     if (y == 0) { // The very deepest layer of the world is an indestructible mantle
                         c.setBlock(x, y, z, mantle);

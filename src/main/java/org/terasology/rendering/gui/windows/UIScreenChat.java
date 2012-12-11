@@ -197,7 +197,7 @@ public class UIScreenChat extends UIWindow {
     }
     
     private void startMessage() {
-        MessageManager.getInstance().addMessage("Welcome to the wonderfull world of Terasology!\n\nType '/help' to see a list with available commands.\nTo see a detailed command description try '/help \"<commandName>\"'.");
+        MessageManager.getInstance().addMessage("Welcome to the wonderful world of Terasology!\n\nType '/help' to see a list with available commands.\nTo see a detailed command description try '/help \"<commandName>\"'.\nBe sure to surround text type parameters in quotes.\nNo commas needed for multiple parameters.\nCommands are case-sensitive, block names and such are not.");
     }
 
     private void addHistory(String message) {

@@ -68,26 +68,37 @@ public class Mod {
     public URL getModClasspathUrl() {
         try {
             if (modRoot.isDirectory()) {
-                return new File(modRoot, "classes").toURI().toURL();
+                File classesDir = new File(modRoot, "classes");
+                if (classesDir.exists() && classesDir.isDirectory()) {
+                    return classesDir.toURI().toURL();
+                }
             } else {
                 return modRoot.toURI().toURL();
             }
         } catch (MalformedURLException e) {
             return null;
         }
+        return null;
     }
 
     public Reflections getReflections() {
         if (reflections == null) {
-            ConfigurationBuilder configurationBuilder = new ConfigurationBuilder().addUrls(getModClasspathUrl()).setScanners(new TypeAnnotationsScanner(), new SubTypesScanner());
-            if (activeClassLoader != null) {
-                configurationBuilder.addClassLoader(activeClassLoader);
-            } else {
-                configurationBuilder.addClassLoader(inactiveClassLoader);
+            URL url = getModClasspathUrl();
+            if (url != null) {
+                ConfigurationBuilder configurationBuilder = new ConfigurationBuilder().addUrls(url).setScanners(new TypeAnnotationsScanner(), new SubTypesScanner());
+                if (activeClassLoader != null) {
+                    configurationBuilder.addClassLoader(activeClassLoader);
+                } else {
+                    configurationBuilder.addClassLoader(inactiveClassLoader);
+                }
+                reflections = new Reflections(configurationBuilder);
             }
-            reflections = new Reflections(configurationBuilder);
         }
         return reflections;
+    }
+
+    public boolean isCodeMod() {
+        return getModClasspathUrl() != null;
     }
 
     public ClassLoader getActiveClassLoader() {

@@ -20,6 +20,7 @@ import org.terasology.config.Config;
 import org.terasology.config.ModConfig;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
+import org.terasology.game.modes.StateLoading;
 import org.terasology.game.modes.StateSinglePlayer;
 import org.terasology.game.types.FreeStyleType;
 import org.terasology.game.types.GameType;
@@ -245,7 +246,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
                 CoreRegistry.get(Config.class).getDefaultModConfig().copy(modConfig);
                 CoreRegistry.get(Config.class).save();
 
-                CoreRegistry.get(GameEngine.class).changeState(new StateSinglePlayer(new WorldInfo(org.terasology.logic.manager.Config.getInstance().getWorldTitle(), org.terasology.logic.manager.Config.getInstance().getDefaultSeed(), org.terasology.logic.manager.Config.getInstance().getDayNightLengthInMs() / 4, chunksListArr, CoreRegistry.get(GameType.class).getClass().toString(), modConfig)));
+                CoreRegistry.get(GameEngine.class).changeState(new StateLoading(new WorldInfo(org.terasology.logic.manager.Config.getInstance().getWorldTitle(), org.terasology.logic.manager.Config.getInstance().getDefaultSeed(), org.terasology.logic.manager.Config.getInstance().getDayNightLengthInMs() / 4, chunksListArr, CoreRegistry.get(GameType.class).getClass().toString(), modConfig)));
             }
         });
 

@@ -91,13 +91,16 @@ public class ModManager {
      * Provides the ability to reflect over the engine and all mods, not just active mods.  This should be used sparingly,
      * and classes retrieved from it should not be instantiated and used - this uses a different classloader than the
      * rest of the system.
+     *
      * @return Reflections over the engine and all available mods
      */
     public Reflections getAllReflections() {
         if (allReflections == null) {
             List<URL> urls = Lists.newArrayList();
             for (Mod mod : getMods()) {
-                urls.add(mod.getModClasspathUrl());
+                if (mod.isCodeMod()) {
+                    urls.add(mod.getModClasspathUrl());
+                }
             }
             allReflections = new Reflections(new ConfigurationBuilder()
                     .addUrls(urls)
@@ -106,7 +109,9 @@ public class ModManager {
                     .addClassLoader(getClass().getClassLoader()));
             allReflections.merge(getEngineReflections());
             for (Mod mod : getMods()) {
-                allReflections.merge(mod.getReflections());
+                if (mod.isCodeMod()) {
+                    allReflections.merge(mod.getReflections());
+                }
             }
         }
         return allReflections;
@@ -132,8 +137,9 @@ public class ModManager {
                 try {
                     ModInfo modInfo = gson.fromJson(new FileReader(modInfoFile), ModInfo.class);
                     if (!mods.containsKey(modInfo.getId())) {
-                        mods.put(modInfo.getId(), new Mod(modFile, modInfo, new DirectorySource(modInfo.getId(), new File(modFile, ASSETS_SUBDIRECTORY))));
-                        logger.info("Discovered mod: {}", modInfo.getDisplayName());
+                        Mod mod = new Mod(modFile, modInfo, new DirectorySource(modInfo.getId(), new File(modFile, ASSETS_SUBDIRECTORY)));
+                        mods.put(modInfo.getId(), mod);
+                        logger.info("Discovered mod: {} (hasCode = {})", modInfo.getDisplayName(), mod.isCodeMod());
                     } else {
                         logger.info("Discovered duplicate mod: {}, skipping", modInfo.getDisplayName());
                     }
@@ -159,8 +165,9 @@ public class ModManager {
                     try {
                         ModInfo modInfo = gson.fromJson(new InputStreamReader(zipFile.getInputStream(modInfoEntry)), ModInfo.class);
                         if (!mods.containsKey(modInfo.getId())) {
-                            mods.put(modInfo.getId(), new Mod(modFile, modInfo, new ArchiveSource(modInfo.getId(), modFile, ASSETS_SUBDIRECTORY)));
-                            logger.info("Discovered mod: " + modInfo.getDisplayName());
+                            Mod mod = new Mod(modFile, modInfo, new ArchiveSource(modInfo.getId(), modFile, ASSETS_SUBDIRECTORY));
+                            mods.put(modInfo.getId(), mod);
+                            logger.info("Discovered mod: {} (hasCode = {})", modInfo.getDisplayName(), mod.isCodeMod());
                         } else {
                             logger.info("Discovered duplicate mod: " + modInfo.getDisplayName() + ", skipping");
                         }
@@ -176,7 +183,9 @@ public class ModManager {
         }
         List<URL> urls = Lists.newArrayList();
         for (Mod mod : getMods()) {
-            urls.add(mod.getModClasspathUrl());
+            if (mod.isCodeMod()) {
+                urls.add(mod.getModClasspathUrl());
+            }
         }
         allModClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]), getClass().getClassLoader());
         for (Mod mod : getMods()) {
@@ -198,7 +207,9 @@ public class ModManager {
     public void applyActiveMods() {
         List<URL> urls = Lists.newArrayList();
         for (Mod mod : getActiveMods()) {
-            urls.add(mod.getModClasspathUrl());
+            if (mod.isCodeMod()) {
+                urls.add(mod.getModClasspathUrl());
+            }
         }
         activeModClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]), getClass().getClassLoader());
         for (Mod mod : getActiveMods()) {
@@ -207,7 +218,9 @@ public class ModManager {
         activeModReflections = new Reflections(new ConfigurationBuilder().addClassLoader(getClass().getClassLoader()).addClassLoader(activeModClassLoader));
         activeModReflections.merge(getEngineReflections());
         for (Mod mod : getActiveMods()) {
-            activeModReflections.merge(mod.getReflections());
+            if (mod.isCodeMod()) {
+                activeModReflections.merge(mod.getReflections());
+            }
         }
     }
 

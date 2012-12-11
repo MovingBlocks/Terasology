@@ -21,8 +21,6 @@ import javax.vecmath.Vector2f;
 
 import org.terasology.rendering.gui.framework.events.StateButtonAction;
 
-import com.google.gson.internal.Pair;
-
 /**
  * This class extends the UIButton and adds functionality to add states to a button. Each state will be assigned a label and a action to execute as the button enters the state.
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
@@ -31,8 +29,20 @@ import com.google.gson.internal.Pair;
  * @deprecated
  */
 public class UIStateButton extends UIButton {
-    private final LinkedList<Pair<String, StateButtonAction>> _states = new LinkedList<Pair<String, StateButtonAction>>();
-    private int _currentState = -1;
+    private final LinkedList<ButtonState> states = new LinkedList<ButtonState>();
+    private int currentState = -1;
+
+    private class ButtonState
+    {
+        String name;
+        StateButtonAction action;
+
+        public ButtonState(String name, StateButtonAction action) {
+            this.name = name;
+            this.action = action;
+        }
+
+    }
     
     public UIStateButton(Vector2f size) {
         super(size, ButtonType.NORMAL);
@@ -45,8 +55,8 @@ public class UIStateButton extends UIButton {
      * @return Returns the state ID.
      */
     public int addState(String state, StateButtonAction action) {
-        _states.add(new Pair<String, StateButtonAction>(state, action));
-        return _states.size() - 1;
+        states.add(new ButtonState(state, action));
+        return states.size() - 1;
     }
     
     /**
@@ -54,18 +64,18 @@ public class UIStateButton extends UIButton {
      * @param stateID The id of the state.
      */
     public void removeState(int stateID) {
-        if (_states.size() > 0)
+        if (states.size() > 0)
         {
             if (stateID < 0)
                 stateID = 0;
-            if (stateID >= _states.size())
-                stateID = _states.size() - 1;
+            if (stateID >= states.size())
+                stateID = states.size() - 1;
             
-            _states.remove(stateID);
+            states.remove(stateID);
             
-            if (_states.size() == 0)
+            if (states.size() == 0)
             {
-                _currentState = -1;
+                currentState = -1;
                 getLabel().setText("");
             } else {
                 nextState();
@@ -78,18 +88,18 @@ public class UIStateButton extends UIButton {
      * @param stateID The ID of the state.
      */
     public void setState(int stateID) {
-        if (_states.size() > 0)
+        if (states.size() > 0)
         {
             if (stateID < 0)
                 stateID = 0;
-            if (stateID >= _states.size())
-                stateID = _states.size() - 1;
+            if (stateID >= states.size())
+                stateID = states.size() - 1;
             
-            getLabel().setText(_states.get(stateID).first);
-            _currentState = stateID;
+            getLabel().setText(states.get(stateID).name);
+            currentState = stateID;
             
-            if (_states.get(stateID).second != null)
-                _states.get(stateID).second.action(this);
+            if (states.get(stateID).action != null)
+                states.get(stateID).action.action(this);
         }
     }
     
@@ -98,18 +108,18 @@ public class UIStateButton extends UIButton {
      * @return Returns the current state ID or -1 if button isn't in a state.
      */
     public int getState() {
-        return _currentState;
+        return currentState;
     }
     
     /**
      * Change state to next state ID in the state list. As the end is reached the next state will be the first state in the list.
      */
     public void nextState() {
-        if (_states.size() > 0)
+        if (states.size() > 0)
         {
-            int nextState = _currentState + 1;
+            int nextState = currentState + 1;
             
-            if (nextState >= _states.size())
+            if (nextState >= states.size())
                 nextState = 0;
             
             setState(nextState);
@@ -120,12 +130,12 @@ public class UIStateButton extends UIButton {
      * Change state to previous state ID in the state list. As the beginning is reached the next state will be the last state in the list.
      */
     public void previousState() {
-        if (_states.size() > 0)
+        if (states.size() > 0)
         {
-            int prevState = _currentState - 1;
+            int prevState = currentState - 1;
             
             if (prevState < 0)
-                prevState = _states.size() - 1;
+                prevState = states.size() - 1;
             
             setState(prevState);
         }

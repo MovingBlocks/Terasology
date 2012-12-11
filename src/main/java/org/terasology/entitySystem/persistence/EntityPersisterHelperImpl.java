@@ -65,6 +65,11 @@ public class EntityPersisterHelperImpl implements EntityPersisterHelper {
         this.componentLibrary = componentLibrary;
     }
 
+    public EntityPersisterHelperImpl(ComponentLibrary componentLibrary, PrefabManager prefabManager) {
+        this.componentLibrary = componentLibrary;
+        this.prefabManager = prefabManager;
+    }
+
     public EntityPersisterHelperImpl(PersistableEntityManager entityManager) {
         this.componentLibrary = entityManager.getComponentLibrary();
         this.entityManager = entityManager;

@@ -6,7 +6,6 @@
  */
 
 apply plugin: 'java'
-apply plugin: 'groovy'
 apply plugin: 'project-report'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
@@ -49,7 +48,7 @@ configurations {
 }
 
 dependencies {
-    natives group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: '2.8.4'
+    natives group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: '2.8.5'
 }
 
 task extractWindowsNatives(type:Sync) {
@@ -82,12 +81,8 @@ task extractNatives {
     dependsOn extractMacOSXNatives
 }
 
-/* Java/Groovy ------------------------------------------------------------- */
+/* Java ------------------------------------------------------------- */
 sourceCompatibility = 1.6
-
-// Compiles everything as groovy, due to java<->groovy interdependencies
-compileJava.enabled = false
-sourceSets.main.java.srcDirs.each { sourceSets.main.groovy.srcDirs it }
 
 sourceSets {
     dev
@@ -102,16 +97,16 @@ configurations {
 }
 
 dependencies {
-    groovy group: 'org.codehaus.groovy', name: 'groovy', version: '1.8.7'
+    compile group: 'org.codehaus.groovy', name: 'groovy', version: '1.8.7'
 	compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.2'
     compile group: 'com.google.guava', name: 'guava', version: '13.0.1'
-    compile group: 'com.google.code.gson', name: 'gson', version: '2.1'
+    compile group: 'com.google.code.gson', name: 'gson', version: '2.2.2'
     compile group: 'com.google.protobuf', name: 'protobuf-java', version: '2.4.1'
-    compile group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.2'
+    compile group: 'net.sf.trove4j', name: 'trove4j', version: '3.0.3'
     compile group: 'com.projectdarkstar.ext.jorbis', name: 'jorbis', version: '0.0.17'
-    compile group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: '2.8.4'
-    compile group: 'org.lwjgl.lwjgl', name: 'lwjgl_util', version: '2.8.4'
-    compile group: 'io.netty', name: 'netty', version: '3.5.8.Final'
+    compile group: 'org.lwjgl.lwjgl', name: 'lwjgl', version: '2.8.5'
+    compile group: 'org.lwjgl.lwjgl', name: 'lwjgl_util', version: '2.8.5'
+    compile group: 'io.netty', name: 'netty', version: '3.5.11.Final'
     compile group: 'org.reflections', name: 'reflections', version: '0.9.8'
     compile group: 'java3d', name: 'vecmath', version: '1.3.1'
     compile fileTree(dir: 'libs', include: '*.jar')
@@ -130,7 +125,7 @@ jar {
 }
 
 task sourceJar(type: Jar) {
-    description = "Create a JAR with all sources (main: java, groovy, resources)"
+    description = "Create a JAR with all sources (main: java, resources)"
     manifest.attributes("Implementation-Title": project.name)
     classifier = 'sources'
     from sourceSets.main.output
@@ -141,13 +136,6 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     manifest.attributes("Implementation-Title": project.name)
     classifier = 'javadoc'
     from javadoc.destinationDir
-}
-
-task groovydocJar(type: Jar, dependsOn: groovydoc) {
-    description = "Create a JAR with the GroovyDoc for the groovy and java sources"
-    manifest.attributes("Implementation-Title": project.name)
-    classifier = 'groovydoc'
-    from groovydoc.destinationDir
 }
 
 test {
@@ -353,6 +341,14 @@ task distApplication(type:Sync) {
     }
 }
 
+configurations {
+    applet
+}
+
+dependencies {
+    applet group: 'org.lwjgl.lwjgl', name: 'lwjgl_util_applet', version: '2.8.5'
+}
+
 task distApplet(type:Sync) {
     description = "Creates an Applet folder"
     dependsOn distMods
@@ -371,16 +367,20 @@ task distApplet(type:Sync) {
     from(dirApplet) {
         exclude '*.keystore'
     }
+	from configurations.applet
     into(subDirLibs) {
         from configurations.runtime
-        exclude { details -> details.file.name.contains("lwjgl") || details.file.name.contains("jinput") }
+		from configurations.natives
     }
     into(subDirMods) {
         from "$buildDir/$destDirMods"
     }
 }
 distApplet.doLast {
-    ant.signjar(jar: "$buildDir/$destDirApplet/$jarFileName", keystore: "$dirApplet/tera.keystore", alias: 'Terasology', storepass: 'Terasology')
+	file("$buildDir/$destDirApplet").listFiles().each {
+        if (it.getName().endsWith(".jar"))
+            ant.signjar(jar: it, keystore: "$dirApplet/tera.keystore", alias: 'Terasology', storepass: 'Terasology')
+    }
     file("$buildDir/$destDirApplet/$subDirLibs").listFiles().each {
         if (it.getName().endsWith(".jar"))
             ant.signjar(jar: it, keystore: "$dirApplet/tera.keystore", alias: 'Terasology', storepass: 'Terasology')

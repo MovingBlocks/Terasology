@@ -42,9 +42,6 @@ import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.input.InputSystem;
-import org.terasology.input.binds.BackwardsButton;
-import org.terasology.input.binds.ForwardsButton;
-import org.terasology.input.binds.LeftStrafeButton;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.CommandManager;
 import org.terasology.logic.manager.CommandManager.CommandInfo;
@@ -56,6 +53,7 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.StringConstants;
+import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockPickupComponent;
 import org.terasology.world.block.BlockUri;
@@ -73,7 +71,6 @@ import java.util.List;
 
 /**
  * The controller class for all commands which can be executed through the in-game chat.
- * To add a command there needs to be an entry in the JSON file under "/data/console/commands.json" with a corresponding public method in this class.
  *
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
@@ -228,40 +225,34 @@ public class Commands implements CommandProvider {
     }
 
     @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts 16 of the given block into your inventory")
-    public void giveBlock(@CommandParam(name="blockId") String uri) {
+    public void giveBlock(@CommandParam(name = "blockName") String uri) {
         giveBlock(uri, 16);
     }
 
     @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts 16 blocks of the given block, with the given shape, into your inventory")
-    public void giveBlock(@CommandParam(name="blockId") String uri, @CommandParam(name="shapeId") String shapeUri) {
+    public void giveBlock(@CommandParam(name = "blockName") String uri, @CommandParam(name = "shapeName") String shapeUri) {
         giveBlock(uri, shapeUri, 16);
     }
 
     @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts a desired number of the given block into your inventory")
-    public void giveBlock(@CommandParam(name="blockId") String uri, @CommandParam(name="quantity") int quantity) {
+    public void giveBlock(@CommandParam(name = "blockName") String uri, @CommandParam(name = "quantity") int quantity) {
         List<BlockUri> matchingUris = resolveBlockUri(uri);
         if (matchingUris.size() == 1) {
             BlockFamily blockFamily = BlockManager.getInstance().getBlockFamily(matchingUris.get(0));
 
             giveBlock(blockFamily, quantity);
-
-            return;
         } else if (matchingUris.isEmpty()) {
             MessageManager.getInstance().addMessage("No block found for '" + uri + "'", EMessageScope.PRIVATE);
-
-            return;
         } else {
             StringBuilder builder = new StringBuilder();
             builder.append("Non-unique block name, possible matches: ");
             Joiner.on(", ").appendTo(builder, matchingUris);
             MessageManager.getInstance().addMessage(builder.toString(), EMessageScope.PRIVATE);
-
-            return;
         }
     }
 
     @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts a desired number of the given block with the give shape into your inventory")
-    public void giveBlock(@CommandParam(name="blockId") String uri, @CommandParam(name="shapeId") String shapeUri, @CommandParam(name="quantity") int quantity) {
+    public void giveBlock(@CommandParam(name = "blockName") String uri, @CommandParam(name = "shapeName") String shapeUri, @CommandParam(name = "quantity") int quantity) {
         List<BlockUri> resolvedBlockUris = resolveBlockUri(uri);
         if (resolvedBlockUris.isEmpty()) {
             MessageManager.getInstance().addMessage("No block found for '" + uri + "'", EMessageScope.PRIVATE);
@@ -329,7 +320,7 @@ public class Commands implements CommandProvider {
     }
 
     @Command(shortDescription = "Adds an item to your inventory")
-    public void giveItem(@CommandParam(name="prefabId or blockId") String itemPrefabName) {
+    public void giveItem(@CommandParam(name = "prefabId or blockName") String itemPrefabName) {
         Prefab prefab = CoreRegistry.get(PrefabManager.class).getPrefab(itemPrefabName);
         System.out.println("Found prefab: " + prefab);
         if (prefab != null && prefab.getComponent(ItemComponent.class) != null) {
@@ -356,7 +347,7 @@ public class Commands implements CommandProvider {
     }
 
     @Command(shortDescription = "Restores your health by an amount")
-    public void health(@CommandParam(name="amount") int amount) {
+    public void health(@CommandParam(name = "amount") int amount) {
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
         health.currentHealth = amount;
@@ -399,7 +390,7 @@ public class Commands implements CommandProvider {
     }
     
     @Command(shortDescription = "Teleports you to a location")
-    public void teleport(@CommandParam(name="x") float x, @CommandParam(name="y") float y, @CommandParam(name="z") float z) {
+    public void teleport(@CommandParam(name = "x") float x, @CommandParam(name = "y") float y, @CommandParam(name = "z") float z) {
         LocalPlayer player = CoreRegistry.get(LocalPlayer.class);
         if (player != null) {
             LocationComponent location = player.getEntity().getComponent(LocationComponent.class);
@@ -415,7 +406,7 @@ public class Commands implements CommandProvider {
     }
 
     @Command(shortDescription = "Maps a key to a function")
-    public void bindKey(@CommandParam(name="key") String key, @CommandParam(name="function") String bind) {
+    public void bindKey(@CommandParam(name = "key") String key, @CommandParam(name = "function") String bind) {
         InputSystem input = CoreRegistry.get(InputSystem.class);
         input.linkBindButtonToKey(Keyboard.getKeyIndex(key), bind);
     }
@@ -426,11 +417,21 @@ public class Commands implements CommandProvider {
         input.linkBindButtonToKey(Keyboard.KEY_Z, "engine:forwards");
         input.linkBindButtonToKey(Keyboard.KEY_S, "engine:backwards");
         input.linkBindButtonToKey(Keyboard.KEY_Q, "engine:left");
+    }
 
+    @Command(shortDescription = "Switches to typical key binds for NEO 2 keyboard layout")
+    public void NEO() {
+        InputSystem input = CoreRegistry.get(InputSystem.class);
+        input.linkBindButtonToKey(Keyboard.KEY_V, "engine:forwards");
+        input.linkBindButtonToKey(Keyboard.KEY_I, "engine:backwards");
+        input.linkBindButtonToKey(Keyboard.KEY_U, "engine:left");
+        input.linkBindButtonToKey(Keyboard.KEY_A, "engine:right");
+        input.linkBindButtonToKey(Keyboard.KEY_L, "engine:useItem");
+        input.linkBindButtonToKey(Keyboard.KEY_G, "engine:inventory");
     }
 
     @Command(shortDescription = "Spawns an instance of a prefab in the world")
-    public void spawnPrefab(@CommandParam(name="prefabId") String prefabName) {
+    public void spawnPrefab(@CommandParam(name = "prefabId") String prefabName) {
         Camera camera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
         Vector3f spawnPos = camera.getPosition();
         Vector3f offset = new Vector3f(camera.getViewingDirection());
@@ -460,14 +461,14 @@ public class Commands implements CommandProvider {
     }
 
     @Command(shortDescription = "Sets the height the player can step up")
-    public void stepHeight(@CommandParam(name="height") float amount) {
+    public void stepHeight(@CommandParam(name = "height") float amount) {
         EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
         CharacterMovementComponent comp = playerEntity.getComponent(CharacterMovementComponent.class);
         comp.stepHeight = amount;
     }
 
     @Command(shortDescription = "Spawns a block in front of the player")
-    public void spawnBlock(@CommandParam(name="blockId") String blockName) {
+    public void spawnBlock(@CommandParam(name = "blockName") String blockName) {
         Camera camera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
         Vector3f spawnPos = camera.getPosition();
         Vector3f offset = camera.getViewingDirection();
@@ -486,6 +487,24 @@ public class Commands implements CommandProvider {
             blockMesh.mesh = block.getMesh();
             blockEntity.saveComponent(blockMesh);
             blockEntity.saveComponent(blockPickup);
+        }
+    }
+
+    @Command(shortDescription = "Places a block in front of the player")
+    public void placeBlock(@CommandParam(name = "blockName") String blockName) {
+        Camera camera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
+        Vector3f spawnPos = camera.getPosition();
+        Vector3f offset = camera.getViewingDirection();
+        offset.scale(3);
+        spawnPos.add(offset);
+
+        Block block = BlockManager.getInstance().getBlock(blockName);
+        if (block == null) return;
+
+        WorldProvider provider = CoreRegistry.get(WorldProvider.class);
+        if (provider != null) {
+            Block oldBlock = provider.getBlock(spawnPos);
+            provider.setBlock((int) spawnPos.x, (int) spawnPos.y, (int) spawnPos.z, block, oldBlock);
         }
     }
 
@@ -524,7 +543,7 @@ public class Commands implements CommandProvider {
     }
 
     @Command(shortDescription = "Detailed help on a command")
-    public void help(@CommandParam(name="command") String command) {
+    public void help(@CommandParam(name = "command") String command) {
         Collection<CommandInfo> cmdCollection = CoreRegistry.get(CommandManager.class).getCommand(command);
         if (cmdCollection.isEmpty()) {
             MessageManager.getInstance().addMessage("No help available for command '" + command + "'. Unknown command.", EMessageScope.PRIVATE);
