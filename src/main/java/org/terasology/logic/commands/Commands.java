@@ -471,13 +471,30 @@ public class Commands implements CommandProvider {
         offset.scale(3);
         spawnPos.add(offset);
 
-        Block block = BlockManager.getInstance().getBlock(blockName);
-        if (block == null) return;
+        BlockFamily blockFamily;
+
+        List<BlockUri> matchingUris = resolveBlockUri(blockName);
+        if (matchingUris.size() == 1) {
+            blockFamily = BlockManager.getInstance().getBlockFamily(matchingUris.get(0));
+
+            //return;
+        } else if (matchingUris.isEmpty()) {
+            MessageManager.getInstance().addMessage("No block found for '" + blockName + "'", EMessageScope.PRIVATE);
+
+            return;
+        } else {
+            StringBuilder builder = new StringBuilder();
+            builder.append("Non-unique block name, possible matches: ");
+            Joiner.on(", ").appendTo(builder, matchingUris);
+            MessageManager.getInstance().addMessage(builder.toString(), EMessageScope.PRIVATE);
+
+            return;
+        }
 
         WorldProvider provider = CoreRegistry.get(WorldProvider.class);
         if (provider != null) {
-            Block oldBlock = provider.getBlock(spawnPos);
-            provider.setBlock((int) spawnPos.x, (int) spawnPos.y, (int) spawnPos.z, block, oldBlock);
+            Block oldBlock = provider.getBlock((int) spawnPos.x, (int) spawnPos.y, (int) spawnPos.z);
+            provider.setBlock((int) spawnPos.x, (int) spawnPos.y, (int) spawnPos.z, blockFamily.getArchetypeBlock(), oldBlock);
         }
     }
 
