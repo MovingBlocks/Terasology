@@ -128,7 +128,7 @@ public class UIMenuConfigVideo extends UIWindow {
         viewingDistanceButton.setPosition(new Vector2f(-viewingDistanceButton.getSize().x / 2f - 10f, 300f + 40f));
         viewingDistanceButton.setVisible(true);
 
-        fovButton = new UISlider(new Vector2f(256f, 32f), 75, 120);
+        fovButton = new UISlider(new Vector2f(256f, 32f), 75, 360);
         fovButton.addChangedListener(new ChangedListener() {
             @Override
             public void changed(UIDisplayElement element) {
