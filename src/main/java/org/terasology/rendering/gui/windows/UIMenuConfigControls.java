@@ -204,7 +204,7 @@ public final class UIMenuConfigControls extends UIWindow {
             buttonGroups[def.group].addDisplayElement(button);
         }
 
-        mouseSensitivity = new UISlider(new Vector2f(256f, 32f), 20, 500);
+        mouseSensitivity = new UISlider(new Vector2f(256f, 32f), 20, 1000);
         mouseSensitivity.setHorizontalAlign(EHorizontalAlign.CENTER);
         mouseSensitivity.setPosition(new Vector2f(-245f, 570f));
         mouseSensitivity.setVisible(true);
