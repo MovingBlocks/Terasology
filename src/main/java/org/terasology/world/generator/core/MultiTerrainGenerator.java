@@ -41,7 +41,7 @@ public class MultiTerrainGenerator implements ChunkGenerator {
 	private static final int SAMPLE_RATE_3D_HOR = 4;
 	private static final int SAMPLE_RATE_3D_VERT = 4;
 
-	private Noise _pGen1, _pGen2, _pGen3, _pGen4, _pGen5, _pGen8;
+	private Noise pGen1, pGen2, pGen3, pGen4, pGen5, pGen8;
 	private WorldBiomeProvider biomeProvider;
 
 	private Block air = BlockManager.getInstance().getAir();
@@ -63,33 +63,33 @@ public class MultiTerrainGenerator implements ChunkGenerator {
 	public void setWorldSeed(String seed) {
 		if (seed != null) {
 			// base
-			_pGen1 = new EPNoise(seed.hashCode() + 1, 1, false);
+			pGen1 = new EPNoise(seed.hashCode() + 1, 1, false);
 			// _pGen1 =new VornoiNoise(seed.hashCode() + 1, false, 1, 1);
 			// _pGen1 = new WhiteNoise(seed.hashCode() + 1, 1);
 			// _pGen1 = new DiamondSquareNoise(seed.hashCode() + 1, 3, 3);
-			_pGen1.setOctaves(8);
+			pGen1.setOctaves(8);
 
 			// ocean
 			// _pGen2 = new WhiteNoise(seed.hashCode() + 2, 1);
-			_pGen2 = new EPNoise(seed.hashCode() + 2, 6, false);
-			_pGen2.setOctaves(10);
+			pGen2 = new EPNoise(seed.hashCode() + 2, 6, false);
+			pGen2.setOctaves(10);
 
 			// river
 			// _pGen3 = new WhiteNoise(seed.hashCode() + 3, 1);
-			_pGen3 = new EPNoise(seed.hashCode() + 3, 2, false);
-			_pGen3.setOctaves(8);
+			pGen3 = new EPNoise(seed.hashCode() + 3, 2, false);
+			pGen3.setOctaves(8);
 
 			// mountain //6 ok
 			// _pGen4 = new WhiteNoise(seed.hashCode() + 4, 1);
-			_pGen4 = new EPNoise(seed.hashCode() + 4, 0, false);
+			pGen4 = new EPNoise(seed.hashCode() + 4, 0, false);
 			
 
 			// hill
 			// _pGen5 = new WhiteNoise(seed.hashCode() + 5, 1);
-			_pGen5 = new EPNoise(seed.hashCode() + 5, 2, false);
+			pGen5 = new EPNoise(seed.hashCode() + 5, 2, false);
 
 			// cave
-			_pGen8 = new EPNoise(seed.hashCode() + 7, 0, false);
+			pGen8 = new EPNoise(seed.hashCode() + 7, 0, false);
 
 			
 			counter = 0;//Integer.MIN_VALUE;
@@ -324,15 +324,15 @@ public class MultiTerrainGenerator implements ChunkGenerator {
 
 	private double calcBaseTerrain(double x, double z) {
 		return TeraMath
-				.clamp((_pGen1.fBm(0.004 * x, 0, 0.004 * z) + 1.0) / 2.0);
+				.clamp((pGen1.fBm(0.004 * x, 0, 0.004 * z) + 1.0) / 2.0);
 	}
 
 	private double calcOceanTerrain(double x, double z) {
-		return TeraMath.clamp(_pGen2.fBm(0.0009 * x, 0, 0.0009 * z) * 8.0);
+		return TeraMath.clamp(pGen2.fBm(0.0009 * x, 0, 0.0009 * z) * 8.0);
 	}
 
 	private double calcRiverTerrain(double x, double z) {
-		return TeraMath.clamp((java.lang.Math.sqrt(java.lang.Math.abs(_pGen3
+		return TeraMath.clamp((java.lang.Math.sqrt(java.lang.Math.abs(pGen3
 				.fBm(0.0008 * x, 0, 0.0008 * z))) - 0.1) * 7.0);
 	}
 
@@ -342,7 +342,7 @@ public class MultiTerrainGenerator implements ChunkGenerator {
 		y1 = y * 0.001;
 		z1 = z * 0.002;
 
-		double result = _pGen4.fBm(x1, y1, z1);
+		double result = pGen4.fBm(x1, y1, z1);
 		return result > 0.0 ? result : 0;
 	}
 
@@ -352,12 +352,12 @@ public class MultiTerrainGenerator implements ChunkGenerator {
 		y1 = y * 0.006;
 		z1 = z * 0.008;
 
-		double result = _pGen5.fBm(x1, y1, z1) - 0.1;
+		double result = pGen5.fBm(x1, y1, z1) - 0.1;
 		return result > 0.0 ? result : 0;
 	}
 
 	private double calcCaveDensity(double x, double y, double z) {
-		return _pGen8.fBm(x * 0.02, y * 0.02, z * 0.02);
+		return pGen8.fBm(x * 0.02, y * 0.02, z * 0.02);
 	}
 
 	@Override

@@ -130,6 +130,7 @@ public class Commands implements CommandProvider {
         return result;
     }
 
+    //TODO  Add multiplayer commands, when ready for that
     //==============================
     //          Commands
     //==============================
@@ -372,6 +373,31 @@ public class Commands implements CommandProvider {
         localPlayer.getEntity().saveComponent(health);
     }
 
+    @Command(shortDescription = "Kill Yourself")
+    public void kill() {
+    	LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+        HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
+    	localPlayer.getEntity().send(new NoHealthEvent(localPlayer.getEntity(), health.maxHealth));
+    }
+    
+    @Command(shortDescription = "Damage you by an amount")
+    public void damage(@CommandParam(name="amount") int amount) {
+        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+        HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
+        health.currentHealth -= amount;
+        if (health.currentHealth >= health.maxHealth) {
+            health.currentHealth = health.maxHealth;
+            localPlayer.getEntity().send(new FullHealthEvent(localPlayer.getEntity(), health.maxHealth));
+        } else if (health.currentHealth <= 0) {
+            health.currentHealth = 0;
+            localPlayer.getEntity().send(new NoHealthEvent(localPlayer.getEntity(), health.maxHealth));
+        } else {
+            localPlayer.getEntity().send(new HealthChangedEvent(localPlayer.getEntity(), health.currentHealth, health.maxHealth));
+        }
+
+        localPlayer.getEntity().saveComponent(health);
+    }
+    
     @Command(shortDescription = "Teleports you to a location")
     public void teleport(@CommandParam(name="x") float x, @CommandParam(name="y") float y, @CommandParam(name="z") float z) {
         LocalPlayer player = CoreRegistry.get(LocalPlayer.class);

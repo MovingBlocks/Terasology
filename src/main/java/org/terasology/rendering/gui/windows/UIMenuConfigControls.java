@@ -171,7 +171,7 @@ public final class UIMenuConfigControls extends UIWindow {
         backToConfigMenuButton = new UIButton(new Vector2f(128f, 32f), UIButton.ButtonType.NORMAL);
         backToConfigMenuButton.getLabel().setText("Back");
         backToConfigMenuButton.setHorizontalAlign(EHorizontalAlign.CENTER);
-        backToConfigMenuButton.setPosition(new Vector2f(306f, 570f));
+        backToConfigMenuButton.setPosition(new Vector2f(200f, 570f));
         backToConfigMenuButton.setVisible(true);
         backToConfigMenuButton.addClickListener(new ClickListener() {
             @Override
