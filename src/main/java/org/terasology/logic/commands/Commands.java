@@ -70,8 +70,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * The controller class for all commands which can be executed through the in-game chat. To add a command there needs to
- * be an entry in the JSON file under "/data/console/commands.json" with a corresponding public method in this class.
+ * The controller class for all commands which can be executed through the in-game chat.
  *
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
@@ -224,40 +223,34 @@ public class Commands implements CommandProvider {
     }
 
     @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts 16 of the given block into your inventory")
-    public void giveBlock(@CommandParam(name = "blockId") String uri) {
+    public void giveBlock(@CommandParam(name = "blockName") String uri) {
         giveBlock(uri, 16);
     }
 
     @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts 16 blocks of the given block, with the given shape, into your inventory")
-    public void giveBlock(@CommandParam(name = "blockId") String uri, @CommandParam(name = "shapeId") String shapeUri) {
+    public void giveBlock(@CommandParam(name = "blockName") String uri, @CommandParam(name = "shapeName") String shapeUri) {
         giveBlock(uri, shapeUri, 16);
     }
 
     @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts a desired number of the given block into your inventory")
-    public void giveBlock(@CommandParam(name = "blockId") String uri, @CommandParam(name = "quantity") int quantity) {
+    public void giveBlock(@CommandParam(name = "blockName") String uri, @CommandParam(name = "quantity") int quantity) {
         List<BlockUri> matchingUris = resolveBlockUri(uri);
         if (matchingUris.size() == 1) {
             BlockFamily blockFamily = BlockManager.getInstance().getBlockFamily(matchingUris.get(0));
 
             giveBlock(blockFamily, quantity);
-
-            return;
         } else if (matchingUris.isEmpty()) {
             MessageManager.getInstance().addMessage("No block found for '" + uri + "'", EMessageScope.PRIVATE);
-
-            return;
         } else {
             StringBuilder builder = new StringBuilder();
             builder.append("Non-unique block name, possible matches: ");
             Joiner.on(", ").appendTo(builder, matchingUris);
             MessageManager.getInstance().addMessage(builder.toString(), EMessageScope.PRIVATE);
-
-            return;
         }
     }
 
     @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts a desired number of the given block with the give shape into your inventory")
-    public void giveBlock(@CommandParam(name = "blockId") String uri, @CommandParam(name = "shapeId") String shapeUri, @CommandParam(name = "quantity") int quantity) {
+    public void giveBlock(@CommandParam(name = "blockName") String uri, @CommandParam(name = "shapeName") String shapeUri, @CommandParam(name = "quantity") int quantity) {
         List<BlockUri> resolvedBlockUris = resolveBlockUri(uri);
         if (resolvedBlockUris.isEmpty()) {
             MessageManager.getInstance().addMessage("No block found for '" + uri + "'", EMessageScope.PRIVATE);
@@ -325,7 +318,7 @@ public class Commands implements CommandProvider {
     }
 
     @Command(shortDescription = "Adds an item to your inventory")
-    public void giveItem(@CommandParam(name = "prefabId or blockId") String itemPrefabName) {
+    public void giveItem(@CommandParam(name = "prefabId or blockName") String itemPrefabName) {
         Prefab prefab = CoreRegistry.get(PrefabManager.class).getPrefab(itemPrefabName);
         System.out.println("Found prefab: " + prefab);
         if (prefab != null && prefab.getComponent(ItemComponent.class) != null) {
@@ -448,7 +441,7 @@ public class Commands implements CommandProvider {
     }
 
     @Command(shortDescription = "Spawns a block in front of the player")
-    public void spawnBlock(@CommandParam(name = "blockId") String blockName) {
+    public void spawnBlock(@CommandParam(name = "blockName") String blockName) {
         Camera camera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
         Vector3f spawnPos = camera.getPosition();
         Vector3f offset = camera.getViewingDirection();
@@ -471,7 +464,7 @@ public class Commands implements CommandProvider {
     }
 
     @Command(shortDescription = "Places a block in front of the player")
-    public void placeBlock(@CommandParam(name = "blockId") String blockName) {
+    public void placeBlock(@CommandParam(name = "blockName") String blockName) {
         Camera camera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
         Vector3f spawnPos = camera.getPosition();
         Vector3f offset = camera.getViewingDirection();
