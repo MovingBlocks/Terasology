@@ -37,7 +37,7 @@ public class PerlinTerrainGenerator implements ChunkGenerator {
     private static final int SAMPLE_RATE_3D_HOR = 4;
     private static final int SAMPLE_RATE_3D_VERT = 4;
 
-    private PerlinNoise _pGen1, _pGen2, _pGen3, _pGen4, _pGen5, _pGen8;
+    private PerlinNoise pGen1, pGen2, pGen3, pGen4, pGen5, pGen8;
     private WorldBiomeProvider biomeProvider;
 
     private Block air = BlockManager.getInstance().getAir();
@@ -53,18 +53,18 @@ public class PerlinTerrainGenerator implements ChunkGenerator {
     @Override
     public void setWorldSeed(String seed) {
         if (seed != null) {
-            _pGen1 = new PerlinNoise(seed.hashCode());
-            _pGen1.setOctaves(8);
+            pGen1 = new PerlinNoise(seed.hashCode());
+            pGen1.setOctaves(8);
 
-            _pGen2 = new PerlinNoise(seed.hashCode() + 1);
-            _pGen2.setOctaves(8);
+            pGen2 = new PerlinNoise(seed.hashCode() + 1);
+            pGen2.setOctaves(8);
 
-            _pGen3 = new PerlinNoise(seed.hashCode() + 2);
-            _pGen3.setOctaves(8);
+            pGen3 = new PerlinNoise(seed.hashCode() + 2);
+            pGen3.setOctaves(8);
 
-            _pGen4 = new PerlinNoise(seed.hashCode() + 3);
-            _pGen5 = new PerlinNoise(seed.hashCode() + 4);
-            _pGen8 = new PerlinNoise(seed.hashCode() + 7);
+            pGen4 = new PerlinNoise(seed.hashCode() + 3);
+            pGen5 = new PerlinNoise(seed.hashCode() + 4);
+            pGen8 = new PerlinNoise(seed.hashCode() + 7);
         }
     }
 
@@ -247,22 +247,22 @@ public class PerlinTerrainGenerator implements ChunkGenerator {
     }
 
     private double calcBaseTerrain(double x, double z) {
-        return TeraMath.clamp((_pGen1.fBm(0.004 * x, 0, 0.004 * z) + 1.0) / 2.0);
+        return TeraMath.clamp((pGen1.fBm(0.004 * x, 0, 0.004 * z) + 1.0) / 2.0);
     }
 
     private double calcOceanTerrain(double x, double z) {
-        return TeraMath.clamp(_pGen2.fBm(0.0009 * x, 0, 0.0009 * z) * 8.0);
+        return TeraMath.clamp(pGen2.fBm(0.0009 * x, 0, 0.0009 * z) * 8.0);
     }
 
     private double calcRiverTerrain(double x, double z) {
-        return TeraMath.clamp((java.lang.Math.sqrt(java.lang.Math.abs(_pGen3.fBm(0.0008 * x, 0, 0.0008 * z))) - 0.1) * 7.0);
+        return TeraMath.clamp((java.lang.Math.sqrt(java.lang.Math.abs(pGen3.fBm(0.0008 * x, 0, 0.0008 * z))) - 0.1) * 7.0);
     }
 
     private double calcMountainDensity(double x, double y, double z) {
         double x1, y1, z1;
         x1 = x * 0.002;y1 = y * 0.001; z1 = z * 0.002;
 
-        double result = _pGen4.fBm(x1, y1, z1);
+        double result = pGen4.fBm(x1, y1, z1);
         return result > 0.0 ? result : 0;
     }
 
@@ -270,12 +270,12 @@ public class PerlinTerrainGenerator implements ChunkGenerator {
         double x1, y1, z1;
         x1 = x * 0.008; y1 = y * 0.006; z1 = z * 0.008;
 
-        double result = _pGen5.fBm(x1, y1, z1) - 0.1;
+        double result = pGen5.fBm(x1, y1, z1) - 0.1;
         return result > 0.0 ? result : 0;
     }
 
     private double calcCaveDensity(double x, double y, double z) {
-        return _pGen8.fBm(x * 0.02, y * 0.02, z * 0.02);
+        return pGen8.fBm(x * 0.02, y * 0.02, z * 0.02);
     }
 
     @Override

@@ -26,7 +26,7 @@ import org.terasology.math.TeraMath;
  */
 public class FastRandom {
 
-    private long _seed = System.currentTimeMillis();
+    private long seed = System.currentTimeMillis();
 
     /**
      * Initializes a new instance of the random number generator using
@@ -34,8 +34,8 @@ public class FastRandom {
      *
      * @param seed The seed to use
      */
-    public FastRandom(long seed) {
-        this._seed = seed;
+    public FastRandom(long seed1) {
+        this.seed = seed1;
     }
 
     /**
@@ -51,10 +51,10 @@ public class FastRandom {
      * @return Random value
      */
     long randomLong() {
-        _seed ^= (_seed << 21);
-        _seed ^= (_seed >>> 35);
-        _seed ^= (_seed << 4);
-        return _seed;
+        seed ^= (seed << 21);
+        seed ^= (seed >>> 35);
+        seed ^= (seed << 4);
+        return seed;
     }
 
     /**

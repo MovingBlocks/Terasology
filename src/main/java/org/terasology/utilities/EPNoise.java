@@ -29,11 +29,11 @@ public class EPNoise implements Noise {
 	private static final double LACUNARITY = 2.1379201;
 	private static final double H = 0.836281;
 
-	private double[] _spectralWeights;
+	private double[] spectralWeights;
 
-	private final int[] _noisePermutations;
-	private boolean _recomputeSpectralWeights = true;
-	private int _octaves = 9;
+	private final int[] noisePermutations;
+	private boolean recomputeSpectralWeights = true;
+	private int octaves = 9;
 	private boolean on;
 	//static final boolean verbose = false;
 
@@ -61,15 +61,15 @@ public class EPNoise implements Noise {
 		FastRandom rand = new FastRandom(seed);
 		on = true;
 
-		_noisePermutations = new int[512];
-		int[] _noiseTable = new int[256];
+		noisePermutations = new int[512];
+		int[] noiseTable = new int[256];
 
 		// Init. the noise table
 		for (int i = 0; i < 256; i++)
 			if (random)
-				_noiseTable[i] = (int) (rand.randomDouble() % 256);
+				noiseTable[i] = (int) (rand.randomDouble() % 256);
 			else
-				_noiseTable[i] = i;
+				noiseTable[i] = i;
 
 		// Shuffle the array
 		for (int i = 0; i < 256; i++) {
@@ -148,16 +148,16 @@ public class EPNoise implements Noise {
 			}
 
 			if (type != -1) {
-				int swap = _noiseTable[i];
-				_noiseTable[i] = _noiseTable[j];
-				_noiseTable[j] = swap;
+				int swap = noiseTable[i];
+				noiseTable[i] = noiseTable[j];
+				noiseTable[j] = swap;
 			}
 		}
 
 		// Finally replicate the noise permutations in the remaining 256 index
 		// positions
 		for (int i = 0; i < 256; i++)
-			_noisePermutations[i] = _noisePermutations[i + 256] = _noiseTable[i];
+			noisePermutations[i] = noisePermutations[i + 256] = noiseTable[i];
 	}
 
 	/**
@@ -180,26 +180,26 @@ public class EPNoise implements Noise {
 		z -= TeraMath.fastFloor(z);
 
 		double u = fade(x), v = fade(y), w = fade(z);
-		int A = _noisePermutations[X] + Y, AA = _noisePermutations[A] + Z, AB = _noisePermutations[(A + 1)]
-				+ Z, B = _noisePermutations[(X + 1)] + Y, BA = _noisePermutations[B]
-				+ Z, BB = _noisePermutations[(B + 1)] + Z;
+		int A = noisePermutations[X] + Y, AA = noisePermutations[A] + Z, AB = noisePermutations[(A + 1)]
+				+ Z, B = noisePermutations[(X + 1)] + Y, BA = noisePermutations[B]
+				+ Z, BB = noisePermutations[(B + 1)] + Z;
 
 		return lerp(
 				w,
 				lerp(v,
-						lerp(u, grad(_noisePermutations[AA], x, y, z),
-								grad(_noisePermutations[BA], x - 1, y, z)),
-						lerp(u, grad(_noisePermutations[AB], x, y - 1, z),
-								grad(_noisePermutations[BB], x - 1, y - 1, z))),
+						lerp(u, grad(noisePermutations[AA], x, y, z),
+								grad(noisePermutations[BA], x - 1, y, z)),
+						lerp(u, grad(noisePermutations[AB], x, y - 1, z),
+								grad(noisePermutations[BB], x - 1, y - 1, z))),
 				lerp(v,
 						lerp(u,
-								grad(_noisePermutations[(AA + 1)], x, y, z - 1),
-								grad(_noisePermutations[(BA + 1)], x - 1, y,
+								grad(noisePermutations[(AA + 1)], x, y, z - 1),
+								grad(noisePermutations[(BA + 1)], x - 1, y,
 										z - 1)),
 						lerp(u,
-								grad(_noisePermutations[(AB + 1)], x, y - 1,
+								grad(noisePermutations[(AB + 1)], x, y - 1,
 										z - 1),
-								grad(_noisePermutations[(BB + 1)], x - 1,
+								grad(noisePermutations[(BB + 1)], x - 1,
 										y - 1, z - 1))));
 	}
 
@@ -218,18 +218,18 @@ public class EPNoise implements Noise {
 		double result = 0.0;
 
 		if (on) {
-			if (_recomputeSpectralWeights) {
-				_spectralWeights = new double[_octaves];
+			if (recomputeSpectralWeights) {
+				spectralWeights = new double[octaves];
 
-				for (int i = 0; i < _octaves; i++)
-					_spectralWeights[i] = java.lang.Math
+				for (int i = 0; i < octaves; i++)
+					spectralWeights[i] = java.lang.Math
 							.pow(LACUNARITY, -H * i);
 
-				_recomputeSpectralWeights = false;
+				recomputeSpectralWeights = false;
 			}
 
-			for (int i = 0; i < _octaves; i++) {
-				result += noise(x, y, z) * _spectralWeights[i];
+			for (int i = 0; i < octaves; i++) {
+				result += noise(x, y, z) * spectralWeights[i];
 				
 				x *= LACUNARITY;
 				y *= LACUNARITY;
@@ -253,12 +253,12 @@ public class EPNoise implements Noise {
 		return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
 	}
 
-	public void setOctaves(int octaves) {
-		_octaves = octaves;
-		_recomputeSpectralWeights = true;
+	public void setOctaves(int octaves1) {
+		octaves = octaves1;
+		recomputeSpectralWeights = true;
 	}
 
 	public int getOctaves() {
-		return _octaves;
+		return octaves;
 	}
 }
