@@ -27,6 +27,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
+import org.terasology.asset.Assets;
 import org.terasology.componentSystem.items.InventorySystem;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
@@ -40,9 +41,7 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.asset.AssetManager;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.model.inventory.Icon;
 import org.terasology.physics.ImpulseEvent;
 import org.terasology.rendering.assets.Texture;
@@ -261,7 +260,7 @@ public class UIItemCell extends UIDisplayContainer  {
         private boolean displayItemCount = true;
 
         public UIItemCellIcon() {
-            terrainTex = AssetManager.loadTexture("engine:terrain");
+            terrainTex = Assets.getTexture("engine:terrain");
 
             itemCount = new UILabel();
             itemCount.setVisible(false);
@@ -378,14 +377,14 @@ public class UIItemCell extends UIDisplayContainer  {
         
         setSize(size);
 
-        Texture guiTex = AssetManager.loadTexture("engine:gui");
+        Texture guiTex = Assets.getTexture("engine:gui");
         
         selectionRectangle = new UIImage(guiTex);
         selectionRectangle.setTextureSize(new Vector2f(22f, 22f));
         selectionRectangle.setTextureOrigin(new Vector2f(1f, 23f));
         selectionRectangle.setSize(new Vector2f(getSize().x, getSize().y));
 
-        background = new UIImage(AssetManager.loadTexture("engine:inventory"));
+        background = new UIImage(Assets.getTexture("engine:inventory"));
         background.setTextureSize(new Vector2f(19f, 19f));
         background.setTextureOrigin(new Vector2f(3f, 146f));
         background.setSize(getSize());

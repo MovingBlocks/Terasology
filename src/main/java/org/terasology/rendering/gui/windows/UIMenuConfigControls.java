@@ -16,7 +16,7 @@
 package org.terasology.rendering.gui.windows;
 
 import com.google.common.collect.Lists;
-import org.terasology.asset.AssetManager;
+import org.terasology.asset.Assets;
 import org.terasology.config.InputConfig;
 import org.terasology.game.CoreRegistry;
 import org.terasology.input.Input;
@@ -157,7 +157,7 @@ public final class UIMenuConfigControls extends UIWindow {
             }
         };
 
-        title = new UIImage(AssetManager.loadTexture("engine:terasology"));
+        title = new UIImage(Assets.getTexture("engine:terasology"));
         title.setSize(new Vector2f(512f, 128f));
         title.setHorizontalAlign(EHorizontalAlign.CENTER);
         title.setPosition(new Vector2f(0f, 28f));

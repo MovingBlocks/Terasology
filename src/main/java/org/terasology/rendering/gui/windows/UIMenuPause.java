@@ -17,12 +17,12 @@ package org.terasology.rendering.gui.windows;
 
 import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.Color;
+import org.terasology.asset.Assets;
 import org.terasology.events.RespawnEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.modes.StateMainMenu;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.asset.AssetManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.widgets.UIButton;
@@ -56,7 +56,7 @@ public class UIMenuPause extends UIWindow {
         setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
         maximize();
         
-        _title = new UIImage(AssetManager.loadTexture("engine:terasology"));
+        _title = new UIImage(Assets.getTexture("engine:terasology"));
         _title.setSize(new Vector2f(512f, 128f));
         _title.setHorizontalAlign(EHorizontalAlign.CENTER);
         _title.setPosition(new Vector2f(0f, 128f));

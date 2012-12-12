@@ -25,7 +25,7 @@ import java.util.Map;
 import javax.vecmath.Vector2f;
 
 import org.lwjgl.opengl.GL11;
-import org.terasology.asset.AssetManager;
+import org.terasology.asset.Assets;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.world.block.Block;
@@ -52,14 +52,14 @@ public class Icon {
         _element = null;
         _blockFamily = blockFamily;
         setAtlasPosition(0, 0);
-        terrainTex = AssetManager.loadTexture("engine:terrain");
+        terrainTex = Assets.getTexture("engine:terrain");
     }
 
     /**
      * Creates an Icon for a non-BlockFamily class
      */
     public Icon() {
-        _element = new UIImage(AssetManager.loadTexture("engine:items"));
+        _element = new UIImage(Assets.getTexture("engine:items"));
         _blockFamily = null;
 
         _element.setSize(new Vector2f(32, 32));

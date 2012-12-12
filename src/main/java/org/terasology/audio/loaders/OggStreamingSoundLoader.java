@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.asset.loaders;
+package org.terasology.audio.loaders;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,7 +31,7 @@ import org.terasology.audio.Sound;
  */
 public class OggStreamingSoundLoader implements AssetLoader<Sound> {
     @Override
-    public Sound load(InputStream stream, AssetUri uri, List<URL> urls) throws IOException {
+    public Sound load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
         return new OggStreamingSound(uri, urls.get(0));
     }
 }

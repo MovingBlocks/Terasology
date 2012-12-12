@@ -22,14 +22,13 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
-import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
 import org.terasology.audio.OpenALManager;
 import org.terasology.audio.Sound;
 import org.terasology.audio.SoundPool;
 import org.terasology.audio.SoundSource;
-import org.terasology.world.block.BlockComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.physics.character.CharacterMovementComponent;
@@ -81,7 +80,7 @@ public abstract class AudioManager implements SoundManager {
 
     @Override
     public SoundSource getSoundSource(String pool, AssetUri soundUri, int priority) {
-        Sound sound = (Sound) AssetManager.load(soundUri);
+        Sound sound = (Sound) Assets.get(soundUri);
         if (sound != null) {
             return getSoundPool(pool).getSource(sound, priority);
         }
@@ -332,7 +331,7 @@ public abstract class AudioManager implements SoundManager {
 
         pool.stopAll();
 
-        Sound sound = (Sound) AssetManager.load(uri);
+        Sound sound = (Sound) Assets.get(uri);
         if (sound == null)
             return null;
 

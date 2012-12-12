@@ -25,7 +25,7 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 import javax.vecmath.Vector2f;
 
 import org.lwjgl.opengl.GL11;
-import org.terasology.asset.AssetManager;
+import org.terasology.asset.Assets;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
@@ -57,7 +57,7 @@ public class UIMinionbar extends UIDisplayContainer {
 
             setSize(new Vector2f(48f, 48f));
 
-            selectionRectangle = new UIImage(AssetManager.loadTexture("engine:gui"));
+            selectionRectangle = new UIImage(Assets.getTexture("engine:gui"));
             selectionRectangle.setTextureSize(new Vector2f(24f, 24f));
             selectionRectangle.setTextureOrigin(new Vector2f(0.0f, 24f));
             selectionRectangle.setSize(new Vector2f(48f, 48f));
@@ -154,7 +154,7 @@ public class UIMinionbar extends UIDisplayContainer {
         setHorizontalAlign(EHorizontalAlign.RIGHT);
         setVerticalAlign(EVerticalAlign.CENTER);
 
-        backgroundTexture = new UIImage(AssetManager.loadTexture("engine:guiMinion"));
+        backgroundTexture = new UIImage(Assets.getTexture("engine:guiMinion"));
         backgroundTexture.setVisible(true);
         backgroundTexture.setTextureSize(new Vector2f(22f, 182f));
         backgroundTexture.setTextureOrigin(new Vector2f(0.0f, 0.0f));

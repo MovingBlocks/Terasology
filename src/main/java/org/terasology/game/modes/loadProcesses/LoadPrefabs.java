@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.persistence.EntityDataJSONFormat;
@@ -76,7 +77,7 @@ public class LoadPrefabs implements LoadProcess {
     @Override
     public int begin() {
         persisterHelper = new EntityPersisterHelperImpl(CoreRegistry.get(ComponentLibrary.class), CoreRegistry.get(PrefabManager.class));
-        prefabs = AssetManager.list(AssetType.PREFAB).iterator();
-        return Lists.newArrayList(AssetManager.list(AssetType.PREFAB)).size();
+        prefabs = Assets.list(AssetType.PREFAB).iterator();
+        return Lists.newArrayList(Assets.list(AssetType.PREFAB)).size();
     }
 }

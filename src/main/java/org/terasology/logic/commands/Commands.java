@@ -24,6 +24,7 @@ import org.terasology.asset.Asset;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.PlayerComponent;
@@ -88,7 +89,7 @@ public class Commands implements CommandProvider {
                 matches.add(straightUri);
             }
         } else {
-            for (String packageName : AssetManager.listPackages()) {
+            for (String packageName : Assets.listModules()) {
                 BlockUri modUri = new BlockUri(packageName, uri);
                 if (BlockManager.getInstance().hasBlockFamily(modUri)) {
                     matches.add(modUri);
@@ -102,12 +103,12 @@ public class Commands implements CommandProvider {
         List<AssetUri> matches = Lists.newArrayList();
         AssetUri straightUri = new AssetUri(AssetType.SHAPE, uri);
         if (straightUri.isValid()) {
-            Asset asset = AssetManager.load(straightUri);
+            Asset asset = Assets.get(straightUri);
             if (asset != null) {
                 matches.add(straightUri);
             }
         } else {
-            for (String packageName : AssetManager.listPackages()) {
+            for (String packageName : Assets.listModules()) {
                 AssetUri modUri = new AssetUri(AssetType.SHAPE, packageName, uri);
                 Asset asset = AssetManager.tryLoad(modUri);
                 if (asset != null) {
@@ -199,7 +200,7 @@ public class Commands implements CommandProvider {
         stringBuilder.append(StringConstants.NEW_LINE);
         stringBuilder.append("-----------");
         stringBuilder.append(StringConstants.NEW_LINE);
-        List<AssetUri> sortedUris = sortItems(AssetManager.list(AssetType.SHAPE));
+        List<AssetUri> sortedUris = sortItems(Assets.list(AssetType.SHAPE));
         for (AssetUri uri : sortedUris) {
             stringBuilder.append(uri.getSimpleString());
             stringBuilder.append(StringConstants.NEW_LINE);

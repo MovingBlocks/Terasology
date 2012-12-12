@@ -51,7 +51,7 @@ public class PNGTextureLoader implements AssetLoader<Texture> {
     }
 
     @Override
-    public Texture load(InputStream stream, AssetUri uri, List<URL> urls) throws IOException {
+    public Texture load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
         PNGDecoder decoder = new PNGDecoder(stream);
 
         ByteBuffer buf = ByteBuffer.allocateDirect(4 * decoder.getWidth() * decoder.getHeight());

@@ -21,19 +21,15 @@ import javax.vecmath.Vector4f;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
-import org.terasology.asset.AssetManager;
+import org.terasology.asset.Assets;
 import org.terasology.game.types.GameType;
-import org.terasology.input.binds.InventoryButton;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.animation.AnimationMove;
 import org.terasology.rendering.gui.animation.AnimationRotate;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.events.AnimationListener;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.VisibilityListener;
-import org.terasology.rendering.gui.layout.GridLayout;
 import org.terasology.rendering.gui.widgets.*;
 
 /**
@@ -120,7 +116,7 @@ public class UIScreenInventory extends UIWindow {
         inventory.setCellMargin(new Vector2f(0f, 0f));
         inventory.setBorderImage("engine:inventory", new Vector2f(0f, 84f), new Vector2f(169f, 61f), new Vector4f(5f, 4f, 3f, 4f));
 
-        leftGearWheel = new UIImage(AssetManager.loadTexture("engine:inventory"));
+        leftGearWheel = new UIImage(Assets.getTexture("engine:inventory"));
         leftGearWheel.setSize(new Vector2f(36f, 36f));
         leftGearWheel.setTextureOrigin(new Vector2f(121.0f, 168.0f));
         leftGearWheel.setTextureSize(new Vector2f(27.0f, 27.0f));
@@ -133,7 +129,7 @@ public class UIScreenInventory extends UIWindow {
                 leftGearWheel.getPosition().y - 4f)
         );
 
-        rightGearWheel = new UIImage(AssetManager.loadTexture("engine:inventory"));
+        rightGearWheel = new UIImage(Assets.getTexture("engine:inventory"));
         rightGearWheel.setSize(new Vector2f(36f, 36f));
         rightGearWheel.setTextureOrigin(new Vector2f(121.0f, 168.0f));
         rightGearWheel.setTextureSize(new Vector2f(27.0f, 27.0f));

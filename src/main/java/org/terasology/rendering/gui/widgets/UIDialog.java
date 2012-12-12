@@ -23,7 +23,7 @@ import javax.vecmath.Vector4f;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
-import org.terasology.asset.AssetManager;
+import org.terasology.asset.Assets;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.DialogListener;
@@ -74,20 +74,20 @@ public class UIDialog extends UIWindow {
             text.setVisible(true);
             text.setTextShadow(true);
 
-            leftBackground = new UIImage(AssetManager.loadTexture("engine:gui_menu"));
+            leftBackground = new UIImage(Assets.getTexture("engine:gui_menu"));
             leftBackground.setSize(new Vector2f(7f, 19f));
             leftBackground.setTextureSize(new Vector2f(7f, 19f));
             leftBackground.setTextureOrigin(new Vector2f(111f, 155f));
             leftBackground.setVisible(true);
 
-            centerBackground = new UIImage(AssetManager.loadTexture("engine:gui_menu"));
+            centerBackground = new UIImage(Assets.getTexture("engine:gui_menu"));
             centerBackground.setSize(new Vector2f(getSize().x - 19f, 19f));
             centerBackground.setTextureSize(new Vector2f(51f, 19f));
             centerBackground.setTextureOrigin(new Vector2f(118f, 155f));
             centerBackground.setPosition(new Vector2f(centerBackground.getPosition().x + leftBackground.getSize().x, 0f));
             centerBackground.setVisible(true);
 
-            rightBackground = new UIImage(AssetManager.loadTexture("engine:gui_menu"));
+            rightBackground = new UIImage(Assets.getTexture("engine:gui_menu"));
             rightBackground.setSize(new Vector2f(8f, 19f));
             rightBackground.setTextureSize(new Vector2f(8f, 19f));
             rightBackground.setTextureOrigin(new Vector2f(189f, 155f));

@@ -17,7 +17,7 @@ package org.terasology.rendering.gui.windows;
 
 import javax.vecmath.Vector2f;
 
-import org.terasology.asset.AssetManager;
+import org.terasology.asset.Assets;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UIProgressBar;
 import org.terasology.rendering.gui.widgets.UIWindow;
@@ -38,7 +38,7 @@ public class UIScreenLoading extends UIWindow {
         setModal(true);
         maximize();
         
-        background = new UIImage(AssetManager.loadTexture("engine:menuBackground"));
+        background = new UIImage(Assets.getTexture("engine:menuBackground"));
         background.setVisible(true);
 
         _progressBar = new UIProgressBar();

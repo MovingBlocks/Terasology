@@ -19,7 +19,7 @@ import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
 
 import org.newdawn.slick.Color;
-import org.terasology.asset.AssetManager;
+import org.terasology.asset.Assets;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayContainerScrollable;
@@ -151,7 +151,7 @@ public class UITabItem extends UIDisplayContainerScrollable {
          * @param textureSize The size of the texture.
          */
         public void setImage(String texture, Vector2f textureOrigin, Vector2f textureSize) {
-            Texture tex = AssetManager.loadTexture(texture);
+            Texture tex = Assets.getTexture(texture);
             if (tex != null) {
                 image.setVisible(true);
                 image.setTexture(tex);

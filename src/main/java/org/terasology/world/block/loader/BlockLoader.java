@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
@@ -107,9 +108,9 @@ public class BlockLoader {
                 .registerTypeAdapter(BlockDefinition.ColorOffsets.class, new BlockColorOffsetDefinitionHandler())
                 .registerTypeAdapter(Vector4f.class, new Vector4fHandler())
                 .create();
-        cubeShape = (BlockShape) AssetManager.load(new AssetUri(AssetType.SHAPE, "engine:cube"));
-        loweredShape = (BlockShape) AssetManager.load(new AssetUri(AssetType.SHAPE, "engine:loweredCube"));
-        trimmedLoweredShape = (BlockShape) AssetManager.load(new AssetUri(AssetType.SHAPE, "engine:trimmedLoweredCube"));
+        cubeShape = (BlockShape) Assets.get(new AssetUri(AssetType.SHAPE, "engine:cube"));
+        loweredShape = (BlockShape) Assets.get(new AssetUri(AssetType.SHAPE, "engine:loweredCube"));
+        trimmedLoweredShape = (BlockShape) Assets.get(new AssetUri(AssetType.SHAPE, "engine:trimmedLoweredCube"));
     }
 
     public int getAtlasSize() {
@@ -123,7 +124,7 @@ public class BlockLoader {
     public LoadBlockDefinitionResults loadBlockDefinitions() {
         logger.info("Loading Blocks...");
         LoadBlockDefinitionResults result = new LoadBlockDefinitionResults();
-        for (AssetUri blockDefUri : AssetManager.list(AssetType.BLOCK_DEFINITION)) {
+        for (AssetUri blockDefUri : Assets.list(AssetType.BLOCK_DEFINITION)) {
             try {
                 JsonElement rawJson = readJson(blockDefUri);
                 if (rawJson != null) {
@@ -183,7 +184,7 @@ public class BlockLoader {
             if (!shapeUri.isValid()) {
                 return null;
             }
-            shape = (BlockShape) AssetManager.load(shapeUri);
+            shape = (BlockShape) Assets.get(shapeUri);
             if (shape == null) {
                 return null;
             }
@@ -237,7 +238,7 @@ public class BlockLoader {
 
         Texture terrainTex = new Texture(data, atlasSize, atlasSize, Texture.WrapMode.Clamp, Texture.FilterMode.Nearest);
         AssetManager.getInstance().addAssetTemporary(new AssetUri(AssetType.TEXTURE, "engine:terrain"), terrainTex);
-        Material terrainMat = new Material(new AssetUri(AssetType.MATERIAL, "engine:terrain"), AssetManager.loadShader("engine:block"));
+        Material terrainMat = new Material(new AssetUri(AssetType.MATERIAL, "engine:terrain"), Assets.getShader("engine:block"));
         terrainMat.setTexture("textureAtlas", terrainTex);
         terrainMat.setFloat3("colorOffset", 1, 1, 1);
         terrainMat.setInt("textured", 1);
@@ -270,7 +271,7 @@ public class BlockLoader {
     private List<ShapelessFamily> loadAutoBlocks() {
         logger.debug("Loading Auto Blocks...");
         List<ShapelessFamily> result = Lists.newArrayList();
-        for (AssetUri blockTileUri : AssetManager.list(AssetType.BLOCK_TILE)) {
+        for (AssetUri blockTileUri : Assets.list(AssetType.BLOCK_TILE)) {
             if (AssetManager.getInstance().getAssetURLs(blockTileUri).get(0).getPath().contains(AUTO_BLOCK_URL_FRAGMENT)) {
                 BlockUri uri = new BlockUri(blockTileUri.getPackage(), blockTileUri.getAssetName());
                 result.add(new ShapelessFamily(uri));
@@ -307,7 +308,7 @@ public class BlockLoader {
         List<BlockFamily> result = Lists.newArrayList();
         for (String shapeString : blockDef.shapes) {
             AssetUri shapeUri = new AssetUri(AssetType.SHAPE, shapeString);
-            BlockShape shape = (BlockShape) AssetManager.load(shapeUri);
+            BlockShape shape = (BlockShape) Assets.get(shapeUri);
             if (shape != null) {
                 BlockUri familyUri;
                 if (shape.equals(cubeShape)) {
@@ -459,7 +460,7 @@ public class BlockLoader {
     private BlockShape getShape(BlockDefinition blockDef) {
         BlockShape shape = null;
         if (!blockDef.shape.isEmpty()) {
-            shape = (BlockShape) AssetManager.load(new AssetUri(AssetType.SHAPE, blockDef.shape));
+            shape = (BlockShape) Assets.get(new AssetUri(AssetType.SHAPE, blockDef.shape));
         }
         if (shape == null) {
             return cubeShape;

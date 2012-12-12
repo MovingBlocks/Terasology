@@ -19,7 +19,7 @@ import java.nio.ByteBuffer;
 
 import javax.vecmath.Vector4f;
 
-import org.terasology.asset.AssetManager;
+import org.terasology.asset.Assets;
 import org.terasology.rendering.assets.Texture;
 
 public class MeshFactory {
@@ -39,7 +39,7 @@ public class MeshFactory {
     }
 
     public Mesh generateItemMesh(int posX, int posY) {
-        Texture tex = AssetManager.loadTexture("engine:items");
+        Texture tex = Assets.getTexture("engine:items");
         ByteBuffer buffer = tex.getImageData(0);
 
         posX *= 16;
