@@ -1,0 +1,6 @@
+{
+    "id" : "morelights",
+    "displayName" : "Esa-Petri's lights",
+    "author" : "Esa-Petri",
+    "description" : "This mod adds lights. suchs as flora,blocks,artificial"
+}
