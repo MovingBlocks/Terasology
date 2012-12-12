@@ -12,10 +12,10 @@
   },
   "HierarcialAI" : {
   	"hectic" : 2,
-  	"straightLined": 2,
+  	"straightLined" : 2,
   	"playerdistance" :3,
   	"hunter" : true,
-  	"playerSense" : 40,
+  	"playerSense" : 40
   },
   "CharacterSound" : {
     "footstepSounds" : ["engine:Slime1", "engine:Slime2", "engine:Slime3", "engine:Slime4", "engine:Slime5"],
