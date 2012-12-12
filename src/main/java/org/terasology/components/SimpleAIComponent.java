@@ -28,4 +28,6 @@ public final class SimpleAIComponent implements Component {
     public Vector3f movementTarget = new Vector3f();
     public boolean followingPlayer = false;
 
+    //how well this ai finds player, or anything
+    public int playerSense = 7;
 }

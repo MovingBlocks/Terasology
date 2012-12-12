@@ -10,7 +10,10 @@
     "stepHeight" : 0,
     "faceMovementDirection" : true
   },
-  "SimpleAI" : {},
+  "HierarcialAI" : {
+  	"hunter" : true,
+  	"playerSense" : 150
+  	},
   "CharacterSound" : {
     "footstepSounds" : ["engine:Slime1", "engine:Slime2", "engine:Slime3", "engine:Slime4", "engine:Slime5"],
     "footstepVolume" : 0.7

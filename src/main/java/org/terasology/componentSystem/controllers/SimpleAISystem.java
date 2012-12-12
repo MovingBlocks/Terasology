@@ -76,8 +76,9 @@ public class SimpleAISystem implements EventHandlerSystem, UpdateSubscriberSyste
                 Vector3f dist = new Vector3f(worldPos);
                 dist.sub(localPlayer.getPosition());
                 double distanceToPlayer = dist.lengthSquared();
-
-                if (distanceToPlayer > 6 && distanceToPlayer < 16) {
+                
+                //TODO make cubes to attack if too near
+                if (distanceToPlayer > 6 && distanceToPlayer < ai.playerSense) {
                     // Head to player
                     ai.movementTarget.set(localPlayer.getPosition());
                     ai.followingPlayer = true;
