@@ -25,7 +25,7 @@ import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.components.HealthComponent;
-import org.terasology.components.HierarcialAIComponent;
+import org.terasology.components.HierarchicalAIComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.PlayerComponent;
 import org.terasology.components.SimpleAIComponent;
@@ -459,7 +459,7 @@ public class Commands implements CommandProvider {
         for (EntityRef ref : entityManager.iteratorEntities(SimpleAIComponent.class)) {
             ref.destroy();
         }
-        for (EntityRef ref : entityManager.iteratorEntities(HierarcialAIComponent.class)) {
+        for (EntityRef ref : entityManager.iteratorEntities(HierarchicalAIComponent.class)) {
             ref.destroy();
         }
     }

@@ -10,8 +10,8 @@
     "stepHeight" : 0,
     "faceMovementDirection" : true
   },
-  "HierarcialAI" : {
-  	"hunter" : true,
+  "HierarchicalAI" : {
+  	"aggressive" : true,
   	"playerSense" : 150
   	},
   "CharacterSound" : {

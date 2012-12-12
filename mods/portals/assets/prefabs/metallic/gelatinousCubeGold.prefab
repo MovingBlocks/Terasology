@@ -10,11 +10,11 @@
     "stepHeight" : 0,
     "faceMovementDirection" : true
   },
-  "HierarcialAI" : {
+  "HierarchicalAI" : {
   	"hectic" : 4,
   	"straightLined": 6,
   	"playerdistance" :3,
-  	"hunter" : true,
+  	"aggressive" : true,
   	"playerSense" : 300,
   	"moveUpdateTime": 800,
   	"idlingUpdateTime" :700
