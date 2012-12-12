@@ -15,7 +15,7 @@
  */
 package org.terasology.potions;
 
-import org.terasology.asset.AssetManager;
+import org.terasology.asset.Assets;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
@@ -42,13 +42,13 @@ public class UIBuff extends UIDisplayContainer {
         setSize(new Vector2f(280f, 28f));
 
         // Create speed buff icon.
-        speedbuff = new UIImage(AssetManager.loadTexture("engine:buffs"));
+        speedbuff = new UIImage(Assets.getTexture("engine:buffs"));
         speedbuff.getTextureSize().set(new Vector2f(16f / 256f, 16f / 256f));
         speedbuff.getTextureOrigin().set(new Vector2f(0.0f / 256f, 16f / 256f));
         speedbuff.setSize(new Vector2f(18f, 18f));
         speedbuff.setPosition(new Vector2f(18f, 18f));
         // Create speed buff icon.
-        curedbuff = new UIImage(AssetManager.loadTexture("engine:buffs"));
+        curedbuff = new UIImage(Assets.getTexture("engine:buffs"));
         curedbuff.getTextureSize().set(new Vector2f(16f / 256f, 16f / 256f));
         curedbuff.getTextureOrigin().set(new Vector2f(16f / 256f, 0.0f / 256f));
         curedbuff.setSize(new Vector2f(18f, 18f));

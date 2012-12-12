@@ -14,18 +14,23 @@
  * limitations under the License.
  */
 
-package org.terasology.asset;
+package org.terasology.world.generator.building;
+
+import org.terasology.asset.AssetLoader;
+import org.terasology.asset.AssetUri;
+import org.terasology.logic.grammar.assets.Grammar;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.List;
 
 /**
- * Interface common to all assets.
- *
- * An asset is some data that is used by the game - a texture, sound, block definition and the like. These are typically
- * loaded from a module, although they can also be created at runtime. Each asset is identified by a URI that uniquely
- * identifies it and can be used to obtain it. This uri provides a lightweight way to serialize a reference to an Asset.
- *
- * @author Immortius
+ * @author skaldarnar
  */
-public interface Asset {
-    public AssetUri getURI();
-    public void dispose();
+public class GrammarLoader implements AssetLoader<Grammar> {
+    @Override
+    public Grammar load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

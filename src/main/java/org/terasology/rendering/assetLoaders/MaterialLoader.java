@@ -25,9 +25,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.terasology.asset.AssetLoader;
-import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
 import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.assets.Shader;
 import org.terasology.rendering.assets.Texture;
@@ -54,10 +54,10 @@ public class MaterialLoader implements AssetLoader<Material> {
     }
 
     @Override
-    public Material load(InputStream stream, AssetUri uri, List<URL> urls) throws IOException {
+    public Material load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
         MaterialMetadata metadata = gson.fromJson(new InputStreamReader(stream), MaterialMetadata.class);
 
-        Shader shader = AssetManager.load(new AssetUri(AssetType.SHADER, metadata.shader), Shader.class);
+        Shader shader = Assets.get(new AssetUri(AssetType.SHADER, metadata.shader), Shader.class);
         if (shader == null) return null;
 
         Material result = new Material(uri, shader);
@@ -118,7 +118,7 @@ public class MaterialLoader implements AssetLoader<Material> {
                 for (Map.Entry<String, JsonElement> prop : params.entrySet()) {
                     if (prop.getValue().isJsonPrimitive()) {
                         if (prop.getValue().getAsJsonPrimitive().isString()) {
-                            Texture texture = AssetManager.loadTexture(prop.getValue().getAsString());
+                            Texture texture = Assets.getTexture(prop.getValue().getAsString());
                             if (texture != null) {
                                 metadata.textures.put(prop.getKey(), texture);
                             }

@@ -20,8 +20,8 @@ import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
-import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
 import org.terasology.rendering.assets.Font;
 import org.terasology.rendering.assets.FontCharacter;
 import org.terasology.rendering.assets.Texture;
@@ -87,7 +87,7 @@ public class FontLoader implements AssetLoader<Font> {
             "chnl=" + INTEGER_PATTERN + "\\s*");
 
     @Override
-    public Font load(InputStream stream, AssetUri uri, List<URL> urls) throws IOException {
+    public Font load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
         FontHeader header = parseHeader(uri, reader.readLine());
         FontCommon common = parseCommon(uri, reader.readLine());
@@ -105,7 +105,7 @@ public class FontLoader implements AssetLoader<Font> {
 
         List<Texture> textures = Lists.newArrayListWithCapacity(common.pages);
         for (FontPage page : pages) {
-            textures.add(AssetManager.loadTexture(uri.getPackage(), page.textureFile.substring(0, page.textureFile.lastIndexOf('.'))));
+            textures.add(Assets.getTexture(uri.getPackage(), page.textureFile.substring(0, page.textureFile.lastIndexOf('.'))));
         }
 
         Font result = new Font(uri);

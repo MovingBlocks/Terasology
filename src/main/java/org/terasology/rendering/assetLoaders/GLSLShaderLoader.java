@@ -23,8 +23,6 @@ import java.io.Reader;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
@@ -56,7 +54,7 @@ public class GLSLShaderLoader implements AssetLoader<Shader> {
     }
 
     @Override
-    public Shader load(InputStream stream, AssetUri uri, List<URL> urls) throws IOException {
+    public Shader load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
         String vertProgram = null;
         String fragProgram = null;
         ShaderMetadata metadata = new ShaderMetadata();

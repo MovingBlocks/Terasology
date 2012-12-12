@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.asset.loaders;
+package org.terasology.audio.loaders;
 
 import static org.lwjgl.openal.AL10.alGenBuffers;
 
@@ -40,7 +40,7 @@ import org.terasology.utilities.OggReader;
 public class OggSoundLoader implements AssetLoader<Sound> {
 
     @Override
-    public Sound load(InputStream stream, AssetUri uri, List<URL> urls) throws IOException {
+    public Sound load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
         try {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             OggReader reader = new OggReader(stream);

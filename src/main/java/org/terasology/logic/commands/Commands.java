@@ -24,6 +24,7 @@ import org.terasology.asset.Asset;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.HierarchicalAIComponent;
 import org.terasology.components.ItemComponent;
@@ -89,7 +90,7 @@ public class Commands implements CommandProvider {
                 matches.add(straightUri);
             }
         } else {
-            for (String packageName : AssetManager.listPackages()) {
+            for (String packageName : Assets.listModules()) {
                 BlockUri modUri = new BlockUri(packageName, uri);
                 if (BlockManager.getInstance().hasBlockFamily(modUri)) {
                     matches.add(modUri);
@@ -103,12 +104,12 @@ public class Commands implements CommandProvider {
         List<AssetUri> matches = Lists.newArrayList();
         AssetUri straightUri = new AssetUri(AssetType.SHAPE, uri);
         if (straightUri.isValid()) {
-            Asset asset = AssetManager.load(straightUri);
+            Asset asset = Assets.get(straightUri);
             if (asset != null) {
                 matches.add(straightUri);
             }
         } else {
-            for (String packageName : AssetManager.listPackages()) {
+            for (String packageName : Assets.listModules()) {
                 AssetUri modUri = new AssetUri(AssetType.SHAPE, packageName, uri);
                 Asset asset = AssetManager.tryLoad(modUri);
                 if (asset != null) {
@@ -200,7 +201,7 @@ public class Commands implements CommandProvider {
         stringBuilder.append(StringConstants.NEW_LINE);
         stringBuilder.append("-----------");
         stringBuilder.append(StringConstants.NEW_LINE);
-        List<AssetUri> sortedUris = sortItems(AssetManager.list(AssetType.SHAPE));
+        List<AssetUri> sortedUris = sortItems(Assets.list(AssetType.SHAPE));
         for (AssetUri uri : sortedUris) {
             stringBuilder.append(uri.getSimpleString());
             stringBuilder.append(StringConstants.NEW_LINE);
@@ -502,13 +503,30 @@ public class Commands implements CommandProvider {
         offset.scale(3);
         spawnPos.add(offset);
 
-        Block block = BlockManager.getInstance().getBlock(blockName);
-        if (block == null) return;
+        BlockFamily blockFamily;
+
+        List<BlockUri> matchingUris = resolveBlockUri(blockName);
+        if (matchingUris.size() == 1) {
+            blockFamily = BlockManager.getInstance().getBlockFamily(matchingUris.get(0));
+
+            //return;
+        } else if (matchingUris.isEmpty()) {
+            MessageManager.getInstance().addMessage("No block found for '" + blockName + "'", EMessageScope.PRIVATE);
+
+            return;
+        } else {
+            StringBuilder builder = new StringBuilder();
+            builder.append("Non-unique block name, possible matches: ");
+            Joiner.on(", ").appendTo(builder, matchingUris);
+            MessageManager.getInstance().addMessage(builder.toString(), EMessageScope.PRIVATE);
+
+            return;
+        }
 
         WorldProvider provider = CoreRegistry.get(WorldProvider.class);
         if (provider != null) {
-            Block oldBlock = provider.getBlock(spawnPos);
-            provider.setBlock((int) spawnPos.x, (int) spawnPos.y, (int) spawnPos.z, block, oldBlock);
+            Block oldBlock = provider.getBlock((int) spawnPos.x, (int) spawnPos.y, (int) spawnPos.z);
+            provider.setBlock((int) spawnPos.x, (int) spawnPos.y, (int) spawnPos.z, blockFamily.getArchetypeBlock(), oldBlock);
         }
     }
 

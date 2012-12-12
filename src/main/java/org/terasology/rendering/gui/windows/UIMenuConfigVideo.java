@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.gui.windows;
 
-import org.terasology.asset.AssetManager;
+import org.terasology.asset.Assets;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -69,7 +69,7 @@ public class UIMenuConfigVideo extends UIWindow {
         setModal(true);
         maximize();
         
-        title = new UIImage(AssetManager.loadTexture("engine:terasology"));
+        title = new UIImage(Assets.getTexture("engine:terasology"));
         title.setHorizontalAlign(EHorizontalAlign.CENTER);
         title.setPosition(new Vector2f(0f, 128f));
         title.setVisible(true);

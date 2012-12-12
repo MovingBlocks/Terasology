@@ -18,7 +18,7 @@ package org.terasology.rendering.gui.framework;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
-import org.terasology.asset.AssetManager;
+import org.terasology.asset.Assets;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.rendering.gui.framework.style.Style;
@@ -425,7 +425,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         StyleBackgroundImage style = getStyle(StyleBackgroundImage.class);
 
         if (style == null) {
-            style = new StyleBackgroundImage(AssetManager.loadTexture(texture));
+            style = new StyleBackgroundImage(Assets.getTexture(texture));
             style.setTextureOrigin(new Vector2f(0f, 0f));
             style.setTextureSize(new Vector2f(style.getTexture().getWidth(), style.getTexture().getHeight()));
             style.setVisible(true);
@@ -433,7 +433,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         } else {
             //check if same texture is already loaded
             if (!style.getTexture().getURI().toString().equals("texture:" + texture)) {
-                style.setTexture(AssetManager.loadTexture(texture));
+                style.setTexture(Assets.getTexture(texture));
             }
         }
     }
@@ -448,7 +448,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         StyleBackgroundImage style = getStyle(StyleBackgroundImage.class);
 
         if (style == null) {
-            style = new StyleBackgroundImage(AssetManager.loadTexture(texture));
+            style = new StyleBackgroundImage(Assets.getTexture(texture));
             style.setTextureOrigin(origin);
             style.setTextureSize(size);
             style.setVisible(true);
@@ -456,7 +456,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         } else {
             //check if same texture is already loaded
             if (!style.getTexture().getURI().toString().equals("texture:" + texture)) {
-                style.setTexture(AssetManager.loadTexture(texture));
+                style.setTexture(Assets.getTexture(texture));
             }
             
             style.setTextureOrigin(origin);
@@ -599,14 +599,14 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
         StyleBorderImage style = getStyle(StyleBorderImage.class);
 
         if (style == null) {
-            style = new StyleBorderImage(AssetManager.loadTexture(texture));
+            style = new StyleBorderImage(Assets.getTexture(texture));
             style.setBorderSource(origin, size, borderSize);
             style.setVisible(true);
             addStyle(style);
         } else {
             //check if same texture is already loaded
             if (!style.getTexture().getURI().toString().equals("texture:" + texture)) {
-                style.setTexture(AssetManager.loadTexture(texture));
+                style.setTexture(Assets.getTexture(texture));
             }
 
             style.setBorderSource(origin, size, borderSize);

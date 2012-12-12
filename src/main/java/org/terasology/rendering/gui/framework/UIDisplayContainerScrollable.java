@@ -8,7 +8,7 @@ import javax.vecmath.Vector4f;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
-import org.terasology.asset.AssetManager;
+import org.terasology.asset.Assets;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.MouseMoveListener;
 import org.terasology.rendering.gui.framework.events.ScrollListener;
@@ -71,7 +71,7 @@ public abstract class UIDisplayContainerScrollable extends UIDisplayContainer {
         scrollbarBackground.setShadow(new Vector4f(0f, 0f, 0f, 3f), EShadowDirection.INSIDE, 1f);
         scrollbarBackground.setSize((scrollbarWidth + 1) + "px", "100%");
         
-        scrollbar = new UIImage(AssetManager.loadTexture("engine:gui_menu"));
+        scrollbar = new UIImage(Assets.getTexture("engine:gui_menu"));
         scrollbar.setShadow(new Vector4f(0f, 3f, 0f, 3f), EShadowDirection.INSIDE, 1f);
         scrollbar.setHorizontalAlign(EHorizontalAlign.RIGHT);
         scrollbar.setCrop(false);

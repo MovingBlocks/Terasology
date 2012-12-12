@@ -76,7 +76,7 @@ public class JsonBlockShapeLoader implements AssetLoader<BlockShape> {
 
 
     @Override
-    public BlockShape load(InputStream stream, AssetUri uri, List<URL> urls) throws IOException {
+    public BlockShape load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
         BlockShape shape = gson.fromJson(new InputStreamReader(stream), BlockShape.class);
         shape.setURI(uri);
         return shape;

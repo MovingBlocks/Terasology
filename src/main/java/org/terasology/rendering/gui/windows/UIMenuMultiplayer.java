@@ -11,7 +11,7 @@ import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
 
 import org.newdawn.slick.Color;
-import org.terasology.asset.AssetManager;
+import org.terasology.asset.Assets;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.rendering.gui.dialogs.UIDialogServer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -248,7 +248,7 @@ public class UIMenuMultiplayer extends UIWindow {
         label.setVisible(true);
         composite.addDisplayElement(label);
         
-        UIImage connectionImage = new UIImage(AssetManager.loadTexture("engine:icons"));
+        UIImage connectionImage = new UIImage(Assets.getTexture("engine:icons"));
         connectionImage.setTextureOrigin(new Vector2f(0f, 56f)); //15f
         connectionImage.setTextureSize(new Vector2f(9f, 7f));
         connectionImage.setSize(new Vector2f(27f, 21f));

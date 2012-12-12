@@ -17,8 +17,7 @@ package org.terasology.book;
 
 import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.Color;
-import org.terasology.asset.AssetManager;
-import org.terasology.input.binds.UseItemButton;
+import org.terasology.asset.Assets;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UIWindow;
 
@@ -38,7 +37,7 @@ public class UIScreenBook extends UIWindow {
         setCloseKeys(new int[]{Keyboard.KEY_ESCAPE});
         maximize();
 
-        background = new UIImage(AssetManager.loadTexture("engine:openbook"));
+        background = new UIImage(Assets.getTexture("engine:openbook"));
         background.setPosition(new Vector2f(-250, -200));
         background.setSize(new Vector2f(500, 300));
         background.setVisible(true);

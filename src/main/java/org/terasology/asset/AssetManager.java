@@ -34,6 +34,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+// TODO: Split out static methods to an Assets static class
+// TODO: Split out an interface, possibly two with one for loading and adding assets, the other with disposal and other more management methods
+// TODO: No more AssetManager singleton
 public class AssetManager {
 
     private static final Logger logger = LoggerFactory.getLogger(AssetManager.class);
@@ -52,6 +55,15 @@ public class AssetManager {
     private Map<AssetUri, Asset> assetCache = Maps.newHashMap();
 
     protected AssetManager() {
+    }
+
+    // Static syntax sugar
+    public static InputStream assetStream(AssetUri uri) throws IOException {
+        return getInstance().getAssetStream(uri);
+    }
+
+    public static Asset tryLoad(AssetUri uri) {
+        return getInstance().tryLoadAsset(uri);
     }
 
     public void register(AssetType type, String extension, AssetLoader loader) {
@@ -111,7 +123,7 @@ public class AssetManager {
                 stream = url.openStream();
                 urls.remove(url);
                 urls.add(0, url);
-                asset = loader.load(stream, uri, urls);
+                asset = loader.load(uri, stream, urls);
                 if (asset != null) {
                     assetCache.put(uri, asset);
                 }
@@ -175,7 +187,7 @@ public class AssetManager {
         };
     }
 
-    public Iterable<String> listPackageNames() {
+    public Iterable<String> listModuleNames() {
         return assetSources.keySet();
     }
 
@@ -195,57 +207,6 @@ public class AssetManager {
         }
 
         return assetURLs.get(0).openStream();
-    }
-
-    // Static syntax sugar
-    public static InputStream assetStream(AssetUri uri) throws IOException {
-        return getInstance().getAssetStream(uri);
-    }
-
-    public static Iterable<AssetUri> list() {
-        return getInstance().listAssets();
-    }
-
-    public static Iterable<AssetUri> list(AssetType type) {
-        return getInstance().listAssets(type);
-    }
-
-    public static Iterable<String> listPackages() {
-        return getInstance().listPackageNames();
-    }
-
-    public static Asset load(AssetUri uri) {
-        return getInstance().loadAsset(uri);
-    }
-
-    public static Asset tryLoad(AssetUri uri) {
-        return getInstance().tryLoadAsset(uri);
-    }
-
-    public static <T extends Asset> T load(AssetUri uri, Class<T> assetClass) {
-        Asset result = load(uri);
-        if (result != null && assetClass.isAssignableFrom(result.getClass())) {
-            return assetClass.cast(result);
-        }
-        return null;
-    }
-
-    // Some ease-of-use helper methods
-
-    public static Texture loadTexture(String simpleUri) {
-        return load(new AssetUri(AssetType.TEXTURE, simpleUri), Texture.class);
-    }
-
-    public static Texture loadTexture(String packageName, String assetName) {
-        return load(new AssetUri(AssetType.TEXTURE, packageName, assetName), Texture.class);
-    }
-
-    public static Shader loadShader(String simpleUri) {
-        return load(new AssetUri(AssetType.SHADER, simpleUri), Shader.class);
-    }
-
-    public static Font loadFont(String simpleUri) {
-        return load(new AssetUri(AssetType.FONT, simpleUri), Font.class);
     }
 
     private class AllAssetIterator implements Iterator<AssetUri> {

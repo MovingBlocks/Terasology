@@ -51,7 +51,7 @@ public class ObjMeshLoader implements AssetLoader<Mesh> {
     private static final Logger logger = LoggerFactory.getLogger(ObjMeshLoader.class);
 
     @Override
-    public Mesh load(InputStream stream, AssetUri uri, List<URL> urls) throws IOException {
+    public Mesh load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 
         List<Vector3f> rawVertices = Lists.newArrayList();

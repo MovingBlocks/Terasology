@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.gui.windows;
 
-import org.terasology.asset.AssetManager;
+import org.terasology.asset.Assets;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.entitySystem.EntityManager;
@@ -88,7 +88,7 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
 
         // Create hearts
         for (int i = 0; i < 10; i++) {
-            _hearts[i] = new UIImage(AssetManager.loadTexture("engine:icons"));
+            _hearts[i] = new UIImage(Assets.getTexture("engine:icons"));
             _hearts[i].setVisible(true);
             _hearts[i].setTextureSize(new Vector2f(9f, 9f));
             _hearts[i].setTextureOrigin(new Vector2f(52f, 0.0f)); //106f for poison
@@ -100,7 +100,7 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
             addDisplayElement(_hearts[i]);
         }
 
-        crosshair = new UIImage(AssetManager.loadTexture("engine:gui"));
+        crosshair = new UIImage(Assets.getTexture("engine:gui"));
         crosshair.setId("crosshair");
         crosshair.setTextureSize(new Vector2f(20f, 20f));
         crosshair.setTextureOrigin(new Vector2f(24f, 24f));
@@ -129,7 +129,7 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
 
         addDisplayElement(crosshair);
 
-        leftGearWheel = new UIImage(AssetManager.loadTexture("engine:inventory"));
+        leftGearWheel = new UIImage(Assets.getTexture("engine:inventory"));
         leftGearWheel.setSize(new Vector2f(36f, 36f));
         leftGearWheel.setTextureOrigin(new Vector2f(121.0f, 168.0f));
         leftGearWheel.setTextureSize(new Vector2f(27.0f, 27.0f));
@@ -143,7 +143,7 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
                 leftGearWheel.getPosition().y - 4f)
         );
 
-        rightGearWheel = new UIImage(AssetManager.loadTexture("engine:inventory"));
+        rightGearWheel = new UIImage(Assets.getTexture("engine:inventory"));
         rightGearWheel.setSize(new Vector2f(36f, 36f));
         rightGearWheel.setTextureOrigin(new Vector2f(121.0f, 168.0f));
         rightGearWheel.setTextureSize(new Vector2f(27.0f, 27.0f));
