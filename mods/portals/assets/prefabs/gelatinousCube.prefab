@@ -10,7 +10,8 @@
     "faceMovementDirection" : true
   },
   "HierarchicalAI" : {
-  	"aggressive" : true
+  	"aggressive" : true,
+  	"hunter" : true
   	},
   "CharacterSound" : {
     "footstepSounds" : ["engine:Slime1", "engine:Slime2", "engine:Slime3", "engine:Slime4", "engine:Slime5"],
