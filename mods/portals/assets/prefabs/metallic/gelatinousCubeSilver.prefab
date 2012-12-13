@@ -12,6 +12,7 @@
   },
   "HierarchicalAI" : {
   	"aggressive" : true,
+  	"hunter":true,
   	"playerSense" : 150
   	},
   "CharacterSound" : {

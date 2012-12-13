@@ -15,6 +15,7 @@
   	"straightLined" : 2,
   	"playerdistance" :3,
   	"aggressive" : true,
+  	"hunter":true,
   	"playerSense" : 40
   },
   "CharacterSound" : {

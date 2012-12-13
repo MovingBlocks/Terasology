@@ -15,6 +15,7 @@
   	"straightLined": 3,
   	"playerdistance" :3,
   	"aggressive" : true,
+  	"hunter":true,
   	"playerSense" : 150,
   	"moveUpdateTime": 1000,
   	"directionUpdateTime":1600,
