@@ -1,0 +1,6 @@
+{
+	"shadowCasting" : "false",
+	"rotation" : "Horizontal",
+	"shape" : "fences:cheeseWheel",
+	"tile" : "fences:Cheese"
+}
