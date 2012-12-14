@@ -347,6 +347,13 @@ public class Commands implements CommandProvider {
         localPlayer.getEntity().send(new FullHealthEvent(localPlayer.getEntity(), health.maxHealth));
         localPlayer.getEntity().saveComponent(health);
     }
+    
+    @Command(shortDescription = "Show your health")
+    public void showHealth() {
+        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+        HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
+        MessageManager.getInstance().addMessage("Your healt:" + health.currentHealth+ " max:"+ health.maxHealth+" regen:"+health.partialRegen, EMessageScope.PRIVATE);
+    }
 
     @Command(shortDescription = "Restores your health by an amount")
     public void health(@CommandParam(name = "amount") int amount) {
@@ -454,15 +461,36 @@ public class Commands implements CommandProvider {
         }
     }
 
-    @Command(shortDescription = "Destroys all AI in the world")
+    @Command(shortDescription = "Destroys all AIs in the world")
     public void destroyAI() {
         EntityManager entityManager = CoreRegistry.get(EntityManager.class);
+        int i=0;
         for (EntityRef ref : entityManager.iteratorEntities(SimpleAIComponent.class)) {
             ref.destroy();
+            i++;
         }
+        i=0;
+        MessageManager.getInstance().addMessage("Simple AIs ("+i+") Destroyed ", EMessageScope.PUBLIC);
         for (EntityRef ref : entityManager.iteratorEntities(HierarchicalAIComponent.class)) {
             ref.destroy();
+            i++;
         }
+        MessageManager.getInstance().addMessage("Hierarhcial AIs ("+i+") Destroyed ", EMessageScope.PUBLIC);
+    }
+    
+    @Command(shortDescription = "Count all AIs in the world")
+    public void countAI() {
+        EntityManager entityManager = CoreRegistry.get(EntityManager.class);
+        int i=0;
+        for (EntityRef ref : entityManager.iteratorEntities(SimpleAIComponent.class)) {
+            i++;
+        }
+        i=0;
+        MessageManager.getInstance().addMessage("Simple AIs: "+i, EMessageScope.PRIVATE);
+        for (EntityRef ref : entityManager.iteratorEntities(HierarchicalAIComponent.class)) {
+            i++;
+        }
+        MessageManager.getInstance().addMessage("Hierarhcial AIs: "+i, EMessageScope.PRIVATE);
     }
 
     @Command(shortDescription = "Sets the height the player can step up")
