@@ -4,11 +4,9 @@ import java.io.File;
 import java.util.Scanner;
 
 /**
- * Created with IntelliJ IDEA.
- * User: Florian
- * Date: 13.12.12
- * Time: 00:05
- * To change this template use File | Settings | File Templates.
+ * Reads a heightmap encoded in a textfile
+ *
+ * @author Nym Traveel
  */
 public class HeightmapFileReader {
 
@@ -30,7 +28,6 @@ public class HeightmapFileReader {
         float min=0;
         float max=0;
         float[][] theMap = new float[512][512];
-        long start = System.currentTimeMillis();
 
         while ((thisLine = myInput.readLine()) != null) {
 
@@ -38,7 +35,6 @@ public class HeightmapFileReader {
             java.util.StringTokenizer st = new java.util.StringTokenizer(thisLine, delimiter);
             float a = Float.valueOf(st.nextToken());
             theMap[index/512][index%512] = a;
-            //if (a>8) System.out.println(a + " at " +index%513 + " " + index/513);
             index++;
             min = a<min ? a:min;
             max = a>max ? a:max;

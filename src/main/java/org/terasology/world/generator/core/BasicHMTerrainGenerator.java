@@ -14,8 +14,9 @@ import org.terasology.world.generator.ChunkGenerator;
 import org.terasology.world.liquid.LiquidData;
 import org.terasology.world.liquid.LiquidType;
 /**
- * User: Nym
- * Date: 12.12.12
+ * Generates a terrain based on a provided heightmap
+ *
+ * @author Nym Traveel
  */
 public class BasicHMTerrainGenerator implements ChunkGenerator {
 
@@ -34,7 +35,7 @@ public class BasicHMTerrainGenerator implements ChunkGenerator {
 
     @Override
     public void setWorldSeed(String seed) {
-        System.out.println("Initialising World");
+        System.out.println("Initialising World"); //Why is this methode called twice?
         try{  heightmap = HeightmapFileReader.readFile("Heightmap.txt", "\n");}
         catch (Exception e){
             e.printStackTrace();
@@ -43,6 +44,7 @@ public class BasicHMTerrainGenerator implements ChunkGenerator {
         //try also other combinations with shift and rotate
         //heightmap = rotateArray(heightmap);
 
+        //initialize Climate/humiditymap
         //climate = new ClimateSimulator(heightmap);
 
     }
@@ -74,10 +76,12 @@ public class BasicHMTerrainGenerator implements ChunkGenerator {
         int hm_x = (((c.getChunkWorldPosX()/Chunk.SIZE_X)%512)+512)%512;
         int hm_z = (((c.getChunkWorldPosZ()/Chunk.SIZE_Z)%512)+512)%512;
 
-        double p00 = heightmap[hm_x][hm_z]*0.05*Chunk.SIZE_Y;
-        double p10 = heightmap[(hm_x-1+512)%512][(hm_z)%512]*0.05*Chunk.SIZE_Y;
-        double p11 = heightmap[(hm_x-1+512)%512][(hm_z+1+512)%512]*0.05*Chunk.SIZE_Y;
-        double p01 = heightmap[(hm_x)%512][(hm_z+1+512)%512]*0.05*Chunk.SIZE_Y;
+        double scaleFactor = 0.05*Chunk.SIZE_Y;
+
+        double p00 = heightmap[hm_x][hm_z]*scaleFactor;
+        double p10 = heightmap[(hm_x-1+512)%512][(hm_z)%512]*scaleFactor;
+        double p11 = heightmap[(hm_x-1+512)%512][(hm_z+1+512)%512]*scaleFactor;
+        double p01 = heightmap[(hm_x)%512][(hm_z+1+512)%512]*scaleFactor;
 
         for (int x = 0; x < Chunk.SIZE_X; x++) {
             for (int z = 0; z < Chunk.SIZE_Z; z++) {
@@ -85,13 +89,11 @@ public class BasicHMTerrainGenerator implements ChunkGenerator {
                         c.getBlockWorldPosX(x), c.getBlockWorldPosZ(z));
 
                 //calculate avg height
-                double interpolatedHeight;
-                interpolatedHeight = lerp(x/(double)Chunk.SIZE_X,lerp(z/(double)Chunk.SIZE_Z,p10,p11), lerp(z/(double)Chunk.SIZE_Z,p00,p01));
+                double interpolatedHeight = lerp(x/(double)Chunk.SIZE_X,lerp(z/(double)Chunk.SIZE_Z,p10,p11), lerp(z/(double)Chunk.SIZE_Z,p00,p01));
 
 
                 //Scale the height to fit one chunk (suppose we have max height 20 on the Heigthmap
                 //ToDo: Change this formula in later implementation of vertical chunks
-                //interpolatedHeight = center;
                 double threshold = Math.floor(interpolatedHeight);
 
                 for (int y = Chunk.SIZE_Y; y >= 0; y--) {
@@ -124,14 +126,7 @@ public class BasicHMTerrainGenerator implements ChunkGenerator {
         }
     }
 
-    private void GenerateInnerLayer(int x, int y, int z, Chunk c,
-                                    WorldBiomeProvider.Biome type) {
-        // TODO: GENERATE MINERALS HERE - config waiting at
-        // org\terasology\logic\manager\DefaultConfig.groovy 2012/01/22
-        c.setBlock(x, y, z, stone);
-    }
-
-    //helper functions for the Mapdesign until real map is in
+    //helper functions for the Mapdesign until real mapGen is in
     public static float[][] rotateArray(float[][] array) {
         float[][] newArray = new float[array[0].length][array.length];
         for (int i=0; i<newArray.length; i++) {
@@ -154,7 +149,7 @@ public class BasicHMTerrainGenerator implements ChunkGenerator {
     }
 
     private static double lerp(double t, double a, double b) {
-        return a + fade(t) * (b - a);
+        return a + fade(t) * (b - a);  //not sure if i should fade t, needs a bit longer to generate chunks but is definately nicer
     }
     private static double fade(double t) {
         return t * t * t * (t * (t * 6 - 15) + 10);
