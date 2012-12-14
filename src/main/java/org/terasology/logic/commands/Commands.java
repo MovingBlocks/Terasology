@@ -347,13 +347,6 @@ public class Commands implements CommandProvider {
         localPlayer.getEntity().send(new FullHealthEvent(localPlayer.getEntity(), health.maxHealth));
         localPlayer.getEntity().saveComponent(health);
     }
-    
-    @Command(shortDescription = "Show your health")
-    public void showHealth() {
-        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-        HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
-        MessageManager.getInstance().addMessage("Your healt:" + health.currentHealth+ " max:"+ health.maxHealth+" regen:"+health.partialRegen, EMessageScope.PRIVATE);
-    }
 
     @Command(shortDescription = "Restores your health by an amount")
     public void health(@CommandParam(name = "amount") int amount) {
@@ -372,7 +365,73 @@ public class Commands implements CommandProvider {
 
         localPlayer.getEntity().saveComponent(health);
     }
-
+    
+    @Command(shortDescription = "Set max health")
+    public void setMaxHealth(@CommandParam(name = "max") int max) {
+        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+        HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
+        health.maxHealth=max;
+        health.currentHealth = health.maxHealth;
+        localPlayer.getEntity().send(new FullHealthEvent(localPlayer.getEntity(), health.maxHealth));
+        localPlayer.getEntity().saveComponent(health);
+    }
+    
+    @Command(shortDescription = "Set regen rate")
+    public void setRegenRaterate(@CommandParam(name = "rate") float rate) {
+        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+        HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
+        health.regenRate=rate;
+        localPlayer.getEntity().saveComponent(health);
+    }
+    
+    @Command(shortDescription = "Show your health")
+    public void showHealth() {
+        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+        HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
+        MessageManager.getInstance().addMessage("Your healt:" + health.currentHealth+ " max:"+ health.maxHealth+" regen:"+health.regenRate+" partRegen:"+health.partialRegen, EMessageScope.PRIVATE);
+    }
+    
+    @Command( shortDescription = "Set ground friction" )
+    public void setGroundFriction(@CommandParam(name = "ammount") float ammount) {
+    	LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+        CharacterMovementComponent move = localPlayer.getEntity().getComponent(CharacterMovementComponent.class);
+        move.groundFriction=ammount;
+        localPlayer.getEntity().saveComponent(move);
+    }
+    
+    @Command( shortDescription = "Set max ground speed", helpText = "Set maxGroundSpeed" )
+    public void setMaxGroundSpeed(@CommandParam(name = "ammount") float ammount) {
+    	LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+        CharacterMovementComponent move = localPlayer.getEntity().getComponent(CharacterMovementComponent.class);
+        move.maxGroundSpeed=ammount;
+        localPlayer.getEntity().saveComponent(move);
+    }
+    
+    @Command( shortDescription = "Set max ghost speed")
+    public void setMaxGhostSpeed(@CommandParam(name = "ammount") float ammount) {
+    	LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+        CharacterMovementComponent move = localPlayer.getEntity().getComponent(CharacterMovementComponent.class);
+        move.maxGhostSpeed=ammount;
+        localPlayer.getEntity().saveComponent(move);
+    }
+    
+    @Command( shortDescription = "Set jump speed")
+    public void setJumpSpeed(@CommandParam(name = "ammount") float ammount) {
+    	LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+        CharacterMovementComponent move = localPlayer.getEntity().getComponent(CharacterMovementComponent.class);
+        move.jumpSpeed=ammount;
+        localPlayer.getEntity().saveComponent(move);
+    }
+    
+    @Command(shortDescription = "Show your Movement stats")
+    public void showMovement() {
+        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+        CharacterMovementComponent move = localPlayer.getEntity().getComponent(CharacterMovementComponent.class);
+        MessageManager.getInstance().addMessage("Your groundFriction:" + move.groundFriction + " maxGroudspeed:"+ move.maxGroundSpeed +" JumpSpeed:"
+        		+ move.jumpSpeed +" maxWaterSpeed:" + move.maxWaterSpeed +" maxGhostSpeed:"+move.maxGhostSpeed +" SlopeFactor:"
+        		+ move.slopeFactor +" runFactor:" + move.runFactor, EMessageScope.PRIVATE);
+    }
+    
     @Command(shortDescription = "Kill Yourself")
     public void kill() {
     	LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
