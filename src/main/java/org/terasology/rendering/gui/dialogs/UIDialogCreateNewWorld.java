@@ -38,11 +38,7 @@ import org.terasology.rendering.gui.widgets.UIText;
 import org.terasology.rendering.gui.windows.UIMenuSingleplayer;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldInfo;
-import org.terasology.world.generator.core.FlatTerrainGenerator;
-import org.terasology.world.generator.core.FloraGenerator;
-import org.terasology.world.generator.core.ForestGenerator;
-import org.terasology.world.generator.core.PerlinTerrainGenerator;
-import org.terasology.world.generator.core.MultiTerrainGenerator;
+import org.terasology.world.generator.core.*;
 import org.terasology.world.liquid.LiquidsGenerator;
 
 import javax.vecmath.Vector2f;
@@ -140,7 +136,11 @@ public class UIDialogCreateNewWorld extends UIDialog {
         item.setTextColor(Color.cyan);
         item.setPadding(new Vector4f(5f, 5f, 5f, 5f));
         chunkGenerator.addItem(item);
-        chunkGenerator.select(2);
+        item = new UIListItem("Heigthmap Generator", new Integer(3));
+        item.setTextColor(Color.black);
+        item.setPadding(new Vector4f(5f, 5f, 5f, 5f));
+        chunkGenerator.addItem(item);
+        chunkGenerator.select(3);
         chunkGenerator.setVisible(true);
 
 
@@ -225,9 +225,15 @@ public class UIDialogCreateNewWorld extends UIDialog {
                         chunkList.add(LiquidsGenerator.class.getName());
                         chunkList.add(ForestGenerator.class.getName());
                         break;
-                        
+
                     case 2:   //multiworld
                         chunkList.add(MultiTerrainGenerator.class.getName());
+                        chunkList.add(FloraGenerator.class.getName());
+                        chunkList.add(LiquidsGenerator.class.getName());
+                        chunkList.add(ForestGenerator.class.getName());
+                        break;
+                    case 3:   //Nym
+                        chunkList.add(BasicHMTerrainGenerator.class.getName());
                         chunkList.add(FloraGenerator.class.getName());
                         chunkList.add(LiquidsGenerator.class.getName());
                         chunkList.add(ForestGenerator.class.getName());
