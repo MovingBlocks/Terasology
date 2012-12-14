@@ -454,15 +454,36 @@ public class Commands implements CommandProvider {
         }
     }
 
-    @Command(shortDescription = "Destroys all AI in the world")
+    @Command(shortDescription = "Destroys all AIs in the world")
     public void destroyAI() {
         EntityManager entityManager = CoreRegistry.get(EntityManager.class);
+        int i=0;
         for (EntityRef ref : entityManager.iteratorEntities(SimpleAIComponent.class)) {
             ref.destroy();
+            i++;
         }
+        i=0;
+        MessageManager.getInstance().addMessage("Simple AIs ("+i+") Destroyed ", EMessageScope.PUBLIC);
         for (EntityRef ref : entityManager.iteratorEntities(HierarchicalAIComponent.class)) {
             ref.destroy();
+            i++;
         }
+        MessageManager.getInstance().addMessage("Hierarhcial AIs ("+i+") Destroyed ", EMessageScope.PUBLIC);
+    }
+    
+    @Command(shortDescription = "Count all AIs in the world")
+    public void countAI() {
+        EntityManager entityManager = CoreRegistry.get(EntityManager.class);
+        int i=0;
+        for (EntityRef ref : entityManager.iteratorEntities(SimpleAIComponent.class)) {
+            i++;
+        }
+        i=0;
+        MessageManager.getInstance().addMessage("Simple AIs: "+i, EMessageScope.PRIVATE);
+        for (EntityRef ref : entityManager.iteratorEntities(HierarchicalAIComponent.class)) {
+            i++;
+        }
+        MessageManager.getInstance().addMessage("Hierarhcial AIs: "+i, EMessageScope.PRIVATE);
     }
 
     @Command(shortDescription = "Sets the height the player can step up")
