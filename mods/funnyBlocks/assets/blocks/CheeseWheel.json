@@ -1,0 +1,6 @@
+{
+	"shadowCasting" : "false",
+	"rotation" : "Horizontal",
+	"shape" : "funnyBlocks:cheeseWheel",
+	"tile" : "funnyBlocks:Cheese"
+}

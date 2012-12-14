@@ -1,7 +1,7 @@
 {
 	"id" : "fences",
-	"displayName" : "A'nW's Block Pack",
+	"displayName" : "Fence Pack",
 	"author" : "A'nW",
 	"description" :
-	"This mod adds some cool new blocks."
+	"A mod adding fence blocks."
 }
