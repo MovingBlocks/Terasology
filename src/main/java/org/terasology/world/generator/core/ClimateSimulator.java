@@ -1,11 +1,9 @@
 package org.terasology.world.generator.core;
 
 /**
- * Created with IntelliJ IDEA.
- * User: Florian
- * Date: 13.12.12
- * Time: 00:01
- * To change this template use File | Settings | File Templates.
+ * Climate simulation based on weighted distances
+ *
+ * @author Nym Traveel
  */
 public class ClimateSimulator {
     private float[][] heightmap,climate,humidity;
@@ -93,9 +91,9 @@ public class ClimateSimulator {
                         if (distArr[(width+1)%size][height]+(heightmap[(width+1)%size][height]-currHeight)*heightInfluence-currentDistance <= 0 ||
                                 distArr[width][(height+1)%size]+(heightmap[width][(height+1)%size]-currHeight)*heightInfluence-currentDistance <= 0 ||
                                 distArr[(width-1+size)%size][height]+(heightmap[(width-1+size)%size][height]-currHeight)*heightInfluence-currentDistance <= 0||
-                                distArr[width][(height-1+size)%size]+(heightmap[width][(height-1+size)%size]-currHeight)*heightInfluence-currentDistance <= 0){
-
-                            //System.out.println("In case 1");
+                                distArr[width][(height-1+size)%size]+(heightmap[width][(height-1+size)%size]-currHeight)*heightInfluence-currentDistance <= 0)
+                        {
+                            //Updates over an edge
                             distArr[width][height]= currentDistance+1;
                         }
                         else if (
@@ -104,14 +102,13 @@ public class ClimateSimulator {
                                         distArr[(width+1)%size][(height-1+size)%size]+(heightmap[(width+1)%size][(height-1+size)%size]-currHeight)*heightInfluence-(currentDistance+0.41421) <= 0||
                                         distArr[(width-1+size)%size][(height-1+size)%size]+(heightmap[(width-1+size)%size][(height-1+size)%size]-currHeight)*heightInfluence-(currentDistance+0.41421 ) <= 0)
                         {
+                            //Updates over the corner
                             distArr[width][height] = currentDistance+1.41421f;
-                            //System.out.println("In case 2");
                         }
                     }
                 }
             }
             currentDistance++;
-            //System.out.println("I was here " + currentDistance + " times");
         }
 
         //normalize Array
