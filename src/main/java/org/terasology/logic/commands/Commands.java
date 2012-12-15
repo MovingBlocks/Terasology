@@ -118,7 +118,7 @@ public class Commands implements CommandProvider {
      *
      * @param uri the uri pattern to match
      *
-     * @return a lsit of matching asset uris
+     * @return a list of matching asset uris
      */
     private List<AssetUri> resolveShapeUri(String uri) {
         List<AssetUri> matches = Lists.newArrayList();
@@ -391,14 +391,14 @@ public class Commands implements CommandProvider {
         localPlayer.getEntity().saveComponent(health);
     }
 
-    @Command(shortDescription = "Kill Yourself")
+    @Command(shortDescription = "Reduce the player's health to zero")
     public void kill() {
     	LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
     	localPlayer.getEntity().send(new NoHealthEvent(localPlayer.getEntity(), health.maxHealth));
     }
     
-    @Command(shortDescription = "Damage you by an amount")
+    @Command(shortDescription = "Reduce the player's health by an amount")
     public void damage(@CommandParam(name="amount") int amount) {
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
