@@ -10,17 +10,7 @@
     "stepHeight" : 0,
     "faceMovementDirection" : true
   },
-  "HierarchicalAI" : {
-  	"hectic" : 3,
-  	"straightLined": 2,
-  	"playerdistance" :4,
-  	"aggressive" : true,
-  	"hunter":true,
-  	"playerSense" : 150,
-  	"moveUpdateTime": 500,
-  	"directionUpdateTime":600,
-  	"idlingUpdateTime" :500
-  },
+  "simpleAI" : {},
   "CharacterSound" : {
     "footstepSounds" : ["engine:Slime1", "engine:Slime2", "engine:Slime3", "engine:Slime4", "engine:Slime5"],
     "footstepVolume" : 0.7

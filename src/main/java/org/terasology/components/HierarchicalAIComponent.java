@@ -45,7 +45,7 @@ public final class HierarchicalAIComponent implements Component {
     public int dangerUpdateTime=100;
     
     public boolean dieIfPlayerFar=true;
-    public int dieDistance=1000;
+    public int dieDistance=2000;
 
     //define type of AI 
     public boolean hunter = false;
@@ -81,6 +81,7 @@ public final class HierarchicalAIComponent implements Component {
     
     //TODO remove this when fight system is ready!!!
     public int damage=50;
+    public int damageFrequency=500;
     
     
     

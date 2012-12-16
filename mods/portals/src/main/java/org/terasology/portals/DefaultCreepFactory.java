@@ -30,17 +30,27 @@ import org.terasology.utilities.FastRandom;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class GelatinousCubeFactory {
+public class DefaultCreepFactory {
 
     private static final Vector3f[] COLORS = {new Vector3f(1.0f, 1.0f, 0.2f), new Vector3f(1.0f, 0.2f, 0.2f), new Vector3f(0.2f, 1.0f, 0.2f), new Vector3f(1.0f, 1.0f, 0.2f)};
 
     private static final Logger logger = LoggerFactory.getLogger(SpawnerSystem.class);
 
+    /*random*/
     private FastRandom random;
+    /*for geting entitys*/
     private EntityManager entityManager;
 
-    public EntityRef generateGelatinousCube(Vector3f position, Prefab gelCube) {
-        EntityRef entity = entityManager.create(gelCube.getName());
+    /**
+     * generates creep
+     * @param position
+     * @param creep
+     * @return enitity
+     */
+    public EntityRef generate(Vector3f position, Prefab creep) {
+    	/*Create new creep*/
+        EntityRef entity = entityManager.create(creep.getName());
+        /*for changing location*/
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc != null) {
             loc.setWorldPosition(position);
@@ -48,9 +58,10 @@ public class GelatinousCubeFactory {
             entity.saveComponent(loc);
         }
 
+        /*set mesh*/
         MeshComponent mesh = entity.getComponent(MeshComponent.class);
         if (mesh != null) {
-            logger.info("Creating a {} with color {} - if default/black then will overwrite with a random color", gelCube.getName(), mesh.color);
+            logger.info("Creating a {} with color {} - if default/black then will overwrite with a random color", creep.getName(), mesh.color);
             // For uninitialized (technically black) GelCubes we just come up with a random color. Well, small list. For now.
             if (mesh.color.equals(new Color4f(0, 0, 0, 1))) {
                 int colorId = Math.abs(random.randomInt()) % COLORS.length;

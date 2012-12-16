@@ -20,6 +20,7 @@ import javax.vecmath.Vector3f;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.HierarchicalAIComponent;
+import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -28,6 +29,7 @@ import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.HorizontalCollisionEvent;
+import org.terasology.events.NoHealthEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
@@ -98,6 +100,8 @@ public class HierarchicalAISystem implements EventHandlerSystem,
 		CharacterMovementComponent moveComp = entity
 				.getComponent(CharacterMovementComponent.class);
 		long tempTime = CoreRegistry.get(Timer.class).getTimeInMs();
+		//TODO remove next
+		long lastAttack=0;
 
 		// skip update if set to skip them
 		if (tempTime - ai.lastProgressedUpdateAt < ai.updateFrequency) {
@@ -138,8 +142,11 @@ public class HierarchicalAISystem implements EventHandlerSystem,
 			if (ai.aggressive)
 				// TODO fix this to proper attacking
 				if (distanceToPlayer <= ai.attackDistance) {
-					localPlayer.getEntity().send(
-							new DamageEvent(ai.damage, entity));
+					if (  tempTime-lastAttack > ai.damageFrequency){
+						localPlayer.getEntity().send(
+								new DamageEvent(ai.damage, entity));
+						lastAttack=	CoreRegistry.get(Timer.class).getTimeInMs();
+					}
 				}
 			
 			//update 
@@ -294,4 +301,10 @@ public class HierarchicalAISystem implements EventHandlerSystem,
 			entity.saveComponent(moveComp);
 		}
 	}
+	
+	//Destroy AI on death
+    //@ReceiveEvent(components = {LocalPlayerComponent.class})
+    //public void onDeath(NoHealthEvent event, EntityRef entity) {
+    //	entity.destroy();
+    //}
 }
