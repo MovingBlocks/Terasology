@@ -8,14 +8,26 @@
     "height" : 1,
     "radius" : 0.5,
     "stepHeight" : 0,
-    "faceMovementDirection" : true
+    "faceMovementDirection" : true,
+    "maxGroundSpeed" : 2.6,
+    "groundFriction" = 3
   },
-  "simpleAI" : {},
+  "HierarchicalAI" : {
+  	"hectic" : 3,
+  	"straightLined" : 1,
+  	"playerdistance" : 1,
+  	"aggressive" : true,
+  	"hunter": true,
+  	"playerSense" : 90,
+        "attackDistance" : 3,
+	"damage" : 5,
+        "damageFrequency" : 175
+  },
   "CharacterSound" : {
     "footstepSounds" : ["engine:Slime1", "engine:Slime2", "engine:Slime3", "engine:Slime4", "engine:Slime5"],
     "footstepVolume" : 0.7
   },
   "Spawnable" : {
-    "type" : "chromaticgelcube"
+    "type" : "dgelcube"
   }
 }

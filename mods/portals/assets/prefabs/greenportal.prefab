@@ -13,21 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.components;
-
-import javax.vecmath.Vector3f;
-
-import org.terasology.entitySystem.Component;
-
-/**
- * @author Immortius <immortius@gmail.com>
- */
-public final class SimpleAIComponent implements Component {
-
-    public long lastChangeOfDirectionAt = 0;
-    public Vector3f movementTarget = new Vector3f();
-    public boolean followingPlayer = false;
-
-    //how well this ai finds player, or anything
-    public int playerSense = 7;
+{
+    "Portal" : {
+    },
+    "Spawner" : {
+        "types" : ["dgelcube"],
+	"timeBetweenSpawns" : 5000,
+ 	"maxMobsPerSpawner" : 5,
+	"rangedSpawning" : true,
+ 	"range" : 25,
+ 	"needsPlayer" : true,
+        "playerNeedRange" :1000
+    },
+    "PlaySoundAction" : {
+        sounds = "portals:spawn"
+    }
 }

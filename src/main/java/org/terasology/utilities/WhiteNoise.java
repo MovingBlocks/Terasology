@@ -25,10 +25,10 @@ public class WhiteNoise implements Noise{
     private static final double LACUNARITY = 2.1379201;
     private static final double H = 0.836281;
 
-    private double[] _spectralWeights;
+    private double[] spectralWeights;
 
-    private boolean _recomputeSpectralWeights = true;
-    private int _octaves = 9;
+    private boolean recomputeSpectralWeights = true;
+    private int octaves = 9;
     private FastRandom rand;
     private double amplitude;
 
@@ -69,17 +69,17 @@ public class WhiteNoise implements Noise{
     public double fBm(double x, double y, double z) {
         double result = 0.0;
 
-        if (_recomputeSpectralWeights) {
-            _spectralWeights = new double[_octaves];
+        if (recomputeSpectralWeights) {
+            spectralWeights = new double[octaves];
 
-            for (int i = 0; i < _octaves; i++)
-                _spectralWeights[i] = java.lang.Math.pow(LACUNARITY, -H * i);
+            for (int i = 0; i < octaves; i++)
+                spectralWeights[i] = java.lang.Math.pow(LACUNARITY, -H * i);
 
-            _recomputeSpectralWeights = false;
+            recomputeSpectralWeights = false;
         }
 
-        for (int i = 0; i < _octaves; i++) {
-            result += noise(x, y, z) * _spectralWeights[i];
+        for (int i = 0; i < octaves; i++) {
+            result += noise(x, y, z) * spectralWeights[i];
 
             x *= LACUNARITY;
             y *= LACUNARITY;
@@ -89,12 +89,12 @@ public class WhiteNoise implements Noise{
         return result;
     }
 
-    public void setOctaves(int octaves) {
-        _octaves = octaves;
-        _recomputeSpectralWeights = true;
+    public void setOctaves(int octaves1) {
+        octaves = octaves1;
+        recomputeSpectralWeights = true;
     }
 
     public int getOctaves() {
-        return _octaves;
+        return octaves;
     }
 }

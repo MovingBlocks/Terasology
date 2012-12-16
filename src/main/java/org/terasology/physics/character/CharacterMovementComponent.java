@@ -57,7 +57,7 @@ public final class CharacterMovementComponent implements Component {
     // Current movement mode
     // TODO: Use enum?
     public boolean isGhosting = false;
-    public boolean isSwimming = false;
+	public boolean isSwimming = false;
     public boolean isGrounded = false;
     public boolean isRunning = false;
 
@@ -90,5 +90,4 @@ public final class CharacterMovementComponent implements Component {
     public void setDrive(Vector3f newDrive) {
         drive.set(newDrive);
     }
-
 }
