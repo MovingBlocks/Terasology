@@ -316,6 +316,7 @@ task distApplication(type:Sync) {
     dependsOn extractNatives
     dependsOn distMods
     into("$buildDir/$destDirApplication")
+    from ('Heightmap.txt') {}
     from ('README.markdown') {
         filter(FixCrLfFilter, eol:FixCrLfFilter.CrLf.newInstance("crlf"))
         rename('README.markdown', 'README')

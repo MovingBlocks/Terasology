@@ -27,8 +27,10 @@ import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.AssetSource;
 import org.terasology.asset.sources.ArchiveSource;
 import org.terasology.asset.sources.DirectorySource;
+import org.terasology.asset.sources.NullSource;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PathManager;
 
@@ -137,7 +139,14 @@ public class ModManager {
                 try {
                     ModInfo modInfo = gson.fromJson(new FileReader(modInfoFile), ModInfo.class);
                     if (!mods.containsKey(modInfo.getId())) {
-                        Mod mod = new Mod(modFile, modInfo, new DirectorySource(modInfo.getId(), new File(modFile, ASSETS_SUBDIRECTORY)));
+                        File assetLocation = new File(modFile, ASSETS_SUBDIRECTORY);
+                        AssetSource source;
+                        if (assetLocation.exists() && assetLocation.isDirectory()) {
+                            source = new DirectorySource(modInfo.getId(), assetLocation);
+                        } else {
+                            source = new NullSource(modInfo.getId());
+                        }
+                        Mod mod = new Mod(modFile, modInfo, source);
                         mods.put(modInfo.getId(), mod);
                         logger.info("Discovered mod: {} (hasCode = {})", modInfo.getDisplayName(), mod.isCodeMod());
                     } else {

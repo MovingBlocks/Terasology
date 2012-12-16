@@ -1,2 +1,2 @@
 rootProject.name = 'Terasology'
-include 'mods:core', 'mods:minerals', 'mods:miniion', 'mods:soils', 'mods:test', 'mods:books', 'mods:potions', 'mods:portals', 'mods:morelights'
+include 'mods:funnyBlocks', 'mods:fences', 'mods:core', 'mods:minerals', 'mods:miniion', 'mods:soils', 'mods:test', 'mods:books', 'mods:potions', 'mods:portals', 'mods:morelights'
