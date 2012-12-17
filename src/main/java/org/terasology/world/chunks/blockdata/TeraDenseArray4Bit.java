@@ -6,7 +6,7 @@ import java.io.ObjectInput;
 import com.google.common.base.Preconditions;
 
 
-public class TeraByteArray4Bit extends TeraByteArray {
+public class TeraDenseArray4Bit extends TeraDenseArrayByte {
 
     protected int sizeXYZHalf;
 
@@ -16,11 +16,11 @@ public class TeraByteArray4Bit extends TeraByteArray {
         sizeXYZHalf = sizeXYZ / 2;
     }
 
-    public TeraByteArray4Bit() {
+    public TeraDenseArray4Bit() {
         data = new byte[0];
     }
 
-    public TeraByteArray4Bit(int sizeX, int sizeY, int sizeZ) {
+    public TeraDenseArray4Bit(int sizeX, int sizeY, int sizeZ) {
         super(sizeX, sizeY, sizeZ, 4);
         Preconditions.checkArgument(sizeXYZ % 2 == 0, String.format("The total size has to be a multiple of 2 (%d)", sizeXYZ));
         sizeXYZHalf = sizeXYZ / 2;
@@ -34,7 +34,7 @@ public class TeraByteArray4Bit extends TeraByteArray {
 
     @Override
     public TeraArray copy() {
-        TeraByteArray result = new TeraByteArray4Bit(sizeX, sizeY, sizeZ);
+        TeraDenseArrayByte result = new TeraDenseArray4Bit(sizeX, sizeY, sizeZ);
         System.arraycopy(data, 0, result.data, 0, data.length);
         return result;
     }

@@ -4,25 +4,16 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-public abstract class TeraByteArray extends TeraArray {
+public abstract class TeraDenseArrayByte extends TeraDenseArray {
 
     protected byte[] data; 
 
-    protected final int pos(int x, int y, int z) {
-        return y * sizeXZ + z * sizeX + x;
-    }
-
-    public TeraByteArray() {
+    public TeraDenseArrayByte() {
         super();
     }
 
-    public TeraByteArray(int sizeX, int sizeY, int sizeZ, int sizeOfElementInBit) {
+    public TeraDenseArrayByte(int sizeX, int sizeY, int sizeZ, int sizeOfElementInBit) {
         super(sizeX, sizeY, sizeZ, sizeOfElementInBit);
-    }
-
-    @Override
-    public boolean isPacked() {
-        return false;
     }
 
     @Override

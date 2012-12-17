@@ -1,12 +1,12 @@
 package org.terasology.world.chunks.blockdata;
 
-public class TeraByteArray8Bit extends TeraByteArray { 
+public class TeraDenseArray8Bit extends TeraDenseArrayByte { 
 
-    public TeraByteArray8Bit() {
+    public TeraDenseArray8Bit() {
         this.data = new byte[0];
     }
 
-    public TeraByteArray8Bit(int sizeX, int sizeY, int sizeZ) {
+    public TeraDenseArray8Bit(int sizeX, int sizeY, int sizeZ) {
         super(sizeX, sizeY, sizeZ, 8);
         this.data = new byte[sizeXYZ];
     }
@@ -43,7 +43,7 @@ public class TeraByteArray8Bit extends TeraByteArray {
 
     @Override
     public TeraArray copy() {
-        TeraByteArray result = new TeraByteArray8Bit(sizeX, sizeY, sizeZ);
+        TeraDenseArrayByte result = new TeraDenseArray8Bit(sizeX, sizeY, sizeZ);
         System.arraycopy(data, 0, result.data, 0, data.length);
         return result;
     }

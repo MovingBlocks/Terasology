@@ -31,8 +31,8 @@ import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.blockdata.TeraArray;
-import org.terasology.world.chunks.blockdata.TeraByteArray4Bit;
-import org.terasology.world.chunks.blockdata.TeraByteArray8Bit;
+import org.terasology.world.chunks.blockdata.TeraDenseArray4Bit;
+import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
 import org.terasology.world.liquid.LiquidData;
 
 import com.google.common.base.Objects;
@@ -97,10 +97,10 @@ public class Chunk implements Externalizable {
 
 
     public Chunk() {
-        blocks = new TeraByteArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        sunlight = new TeraByteArray4Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        light = new TeraByteArray4Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        liquid = new TeraByteArray4Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        blocks = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        sunlight = new TeraDenseArray4Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        light = new TeraDenseArray4Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        liquid = new TeraDenseArray4Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
 
         setDirty(true);
     }
