@@ -19,6 +19,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.text.DecimalFormat;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.vecmath.Vector3f;
@@ -339,12 +340,14 @@ public class Chunk implements Externalizable {
         liquid = (TeraArray) in.readObject();
     }
     
+    private static DecimalFormat fpercent = new DecimalFormat("0.##");
     public void pack() {
         lock();
         try {
             TeraArray packed = blocks.pack();
             if (packed != blocks) {
-                System.out.println(String.format("packed chunk (%d, %d, %d), before=%d, after=%d", pos.x, pos.y, pos.z, blocks.getEstimatedMemoryConsumptionInBytes(), packed.getEstimatedMemoryConsumptionInBytes()));
+                double bp = 100d - (100d / blocks.getEstimatedMemoryConsumptionInBytes() * packed.getEstimatedMemoryConsumptionInBytes());
+                System.out.println(String.format("packed chunk (%d, %d, %d), blocks-reduced-by=%s%%", pos.x, pos.y, pos.z, fpercent.format(bp)));
                 blocks = packed;
             }
         } finally {
