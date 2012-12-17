@@ -12,7 +12,7 @@ public class TeraDenseArray8Bit extends TeraDenseArrayByte {
     }
 
     @Override
-    public TeraArray pack() {
+    public TeraArray deflate() {
         byte[][] inflated = new byte[sizeY][];
         byte[] deflated = new byte[sizeY];
         int packed = 0;
@@ -35,10 +35,27 @@ public class TeraDenseArray8Bit extends TeraDenseArrayByte {
                 inflated[y] = tmp;
             }
         }
-        if (packed >= 5) {
+        if (packed == sizeY) {
+            byte first = deflated[0];
+            boolean packable = true;
+            for (int i = 1; i < sizeY; i++) {
+                if (deflated[i] != first) {
+                    packable = false;
+                    break;
+                }
+            }
+            if (packable)
+                return new TeraSparseArray8Bit(sizeX, sizeY, sizeZ, first);
+        }
+        if (packed >= 4) {
             return new TeraSparseArray8Bit(sizeX, sizeY, sizeZ, inflated, deflated);
         }
         return this;
+    }
+    
+    @Override
+    public TeraArray inflate() {
+        throw new UnsupportedOperationException();
     }
 
     @Override

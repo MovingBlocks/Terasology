@@ -16,43 +16,55 @@ public class TeraSparseArray8Bit extends TeraSparseArrayByte {
         super(sizeX, sizeY, sizeZ, 8, inflated, deflated);
     }
 
+    public TeraSparseArray8Bit(int sizeX, int sizeY, int sizeZ, byte fill) {
+        super(sizeX, sizeY, sizeZ, 8, fill);
+    }
+    
     @Override
-    public TeraArray pack() {
-        byte[][] inf = new byte[sizeY][];
-        byte[] def = new byte[sizeY];
-        int alreadyPacked = 0, newPacked = 0;
-        System.arraycopy(deflated, 0, def, 0, sizeY);
-        for (int y = 0; y < sizeY; y++) {
-            byte[] values = inflated[y];
-            if (values != null) {
-                byte first = values[0];
-                boolean packable = true;
-                for (int i = 1; i < sizeXZ; i++) {
-                    if (values[i] != first) {
-                        packable = false;
-                        break;
-                    }
-                }
-                if (packable) {
-                    def[y] = first;
-                    ++newPacked;
-                } else {
-                    inf[y] = new byte[sizeY];
-                    System.arraycopy(values, 0, inf[y], 0, sizeXZ);
-                    def[y] = 0;
-                }
-            } else {
-                ++alreadyPacked;
-            }
-        }
-        if (newPacked > 0) 
-            return new TeraSparseArray8Bit(sizeX, sizeY, sizeZ, inf, def);
-        return this;
+    public TeraArray deflate() {
+        throw new UnsupportedOperationException();
+//        byte[][] inf = new byte[sizeY][];
+//        byte[] def = new byte[sizeY];
+//        int alreadyPacked = 0, newPacked = 0;
+//        System.arraycopy(deflated, 0, def, 0, sizeY);
+//        for (int y = 0; y < sizeY; y++) {
+//            byte[] values = inflated[y];
+//            if (values != null) {
+//                byte first = values[0];
+//                boolean packable = true;
+//                for (int i = 1; i < sizeXZ; i++) {
+//                    if (values[i] != first) {
+//                        packable = false;
+//                        break;
+//                    }
+//                }
+//                if (packable) {
+//                    def[y] = first;
+//                    ++newPacked;
+//                } else {
+//                    inf[y] = new byte[sizeY];
+//                    System.arraycopy(values, 0, inf[y], 0, sizeXZ);
+//                    def[y] = 0;
+//                }
+//            } else {
+//                ++alreadyPacked;
+//            }
+//        }
+//        if (newPacked > 0) 
+//            return new TeraSparseArray8Bit(sizeX, sizeY, sizeZ, inf, def);
+//        return this;
         // TODO switch back to dense array if necessary
+    }
+    
+    @Override
+    public TeraArray inflate() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public TeraArray copy() {
+        if (inflated == null) 
+            return new TeraSparseArray8Bit(sizeX, sizeY, sizeZ, fill);
         byte[][] inf = new byte[sizeY][];
         byte[] def = new byte[sizeY];
         for (int y = 0; y < sizeY; y++) {
@@ -68,6 +80,8 @@ public class TeraSparseArray8Bit extends TeraSparseArrayByte {
     @Override
     public int get(int x, int y, int z) {
         if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
+        if (inflated == null) 
+            return fill;
         byte[] data = inflated[y];
         if (data != null) 
             return data[z * sizeX + x];
@@ -78,6 +92,15 @@ public class TeraSparseArray8Bit extends TeraSparseArrayByte {
     public int set(int x, int y, int z, int value) {
         if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
         if (value < -128 || value > 127) throw new IllegalArgumentException("Parameter 'value' has to be in the range of -128 - 127 (" + value + ")");
+        if (inflated == null) {
+            if (value == fill)
+                return fill;
+            else {
+                this.inflated = new byte[sizeY][];
+                this.deflated = new byte[sizeY];
+                Arrays.fill(deflated, fill);
+            }
+        }
         byte[] data = inflated[y];
         int pos = z * sizeX + x;
         if (data != null) {
@@ -102,6 +125,15 @@ public class TeraSparseArray8Bit extends TeraSparseArrayByte {
         if (value < -128 || value > 127) throw new IllegalArgumentException("Parameter 'value' has to be in the range of -128 - 127 (" + value + ")");
         if (expected < -128 || expected > 127) throw new IllegalArgumentException("Parameter 'expected' has to be in the range of -128 - 127 (" + value + ")");
         if (value == expected) return true;
+        if (inflated == null) {
+            if (value == fill)
+                return value == expected;
+            else {
+                this.inflated = new byte[sizeY][];
+                this.deflated = new byte[sizeY];
+                Arrays.fill(deflated, fill);
+            }
+        }
         byte[] data = inflated[y];
         int pos = z * sizeX + x;
         if (data != null) {

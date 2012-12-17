@@ -28,7 +28,12 @@ public class TeraDenseArray4Bit extends TeraDenseArrayByte {
     }
 
     @Override
-    public TeraArray pack() {
+    public TeraArray deflate() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public TeraArray inflate() {
         throw new UnsupportedOperationException();
     }
 
@@ -52,7 +57,7 @@ public class TeraDenseArray4Bit extends TeraDenseArrayByte {
             int raw = data[pos] & 0xFF;
             return (byte) ((raw & 0x0F) & 0xFF);
         }
-        int raw = data[pos % sizeXYZHalf] & 0xFF;
+        int raw = data[pos - sizeXYZHalf] & 0xFF;
         return (byte) (raw >> 4);
     }
 
@@ -68,10 +73,11 @@ public class TeraDenseArray4Bit extends TeraDenseArrayByte {
             data[pos] = (byte) ((tmp & 0x0F) | (raw & 0xF0));
             return old;
         }
-        int raw = data[pos % sizeXYZHalf] & 0xFF;
+        pos = pos - sizeXYZHalf;
+        int raw = data[pos] & 0xFF;
         int tmp = value & 0xFF;
         byte old = (byte) (raw >> 4);
-        data[pos % sizeXYZHalf] = (byte) ((raw & 0x0F) | (tmp << 4) & 0xFF);
+        data[pos] = (byte) ((raw & 0x0F) | (tmp << 4) & 0xFF);
         return old;
     }
 

@@ -15,7 +15,7 @@ public abstract class TeraDenseArray extends TeraArray {
     }
 
     @Override
-    public boolean isPacked() {
+    public boolean isSparse() {
         return false;
     }
 

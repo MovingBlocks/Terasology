@@ -71,9 +71,11 @@ public abstract class TeraArray implements Externalizable {
         return (x >= 0 && x < sizeX && y >= 0 && y < sizeY && z >= 0 && z < sizeZ);
     }
 
-    public abstract boolean isPacked();
+    public abstract boolean isSparse();
 
-    public abstract TeraArray pack();
+    public abstract TeraArray deflate();
+    
+    public abstract TeraArray inflate();
 
     public abstract TeraArray copy();
 

@@ -10,6 +10,7 @@ public abstract class TeraSparseArrayByte extends TeraSparseArray {
 
     protected byte[][] inflated;
     protected byte[] deflated;
+    protected byte fill;
     
     public TeraSparseArrayByte() {
         super();
@@ -28,10 +29,19 @@ public abstract class TeraSparseArrayByte extends TeraSparseArray {
         Preconditions.checkArgument(inflated.length == sizeY);
         Preconditions.checkArgument(deflated.length == sizeY);
     }
+    
+    public TeraSparseArrayByte(int sizeX, int sizeY, int sizeZ, int sizeOfElementInBit, byte fill) {
+        super(sizeX, sizeY, sizeZ, sizeOfElementInBit);
+        this.inflated = null;
+        this.deflated = null;
+        this.fill = fill;
+    }
 
     @Override
     public int getEstimatedMemoryConsumptionInBytes() {
-        int result = sizeY + sizeY * 16;
+        if (inflated == null)
+            return 9;
+        int result = 9 + sizeY + (sizeY * 16);
         for (int i = 0; i < sizeY; i++) {
             if (inflated[i] != null)
                 result += sizeXZ;
@@ -42,6 +52,12 @@ public abstract class TeraSparseArrayByte extends TeraSparseArray {
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         writeExternalHeader(out);
+        if (inflated == null) {
+            out.writeBoolean(false);
+            out.writeByte(fill);
+            return;
+        } 
+        out.writeBoolean(true);
         int count = 0;
         for (int y = 0; y < sizeY; y++) {
             if (inflated[y] != null)
@@ -68,6 +84,12 @@ public abstract class TeraSparseArrayByte extends TeraSparseArray {
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         readExternalHeader(in);
+        if (!in.readBoolean()) {
+            inflated = null;
+            deflated = null;
+            fill = in.readByte();
+            return;
+        }
         inflated = new byte[sizeY][];
         deflated = new byte[sizeY];
         int count = in.readInt();

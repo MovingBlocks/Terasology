@@ -24,6 +24,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.vecmath.Vector3f;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.logic.manager.Config;
 import org.terasology.math.AABB;
 import org.terasology.math.TeraMath;
@@ -32,7 +34,6 @@ import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.blockdata.TeraArray;
-import org.terasology.world.chunks.blockdata.TeraDenseArray4Bit;
 import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
 import org.terasology.world.liquid.LiquidData;
 
@@ -50,6 +51,8 @@ import com.google.common.base.Preconditions;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class Chunk implements Externalizable {
+    protected static final Logger logger = LoggerFactory.getLogger(Chunk.class);
+    
     public static final long serialVersionUID = 79881925217704826L;
 
     public enum State {
@@ -78,9 +81,7 @@ public class Chunk implements Externalizable {
 
     private final Vector3i pos = new Vector3i();
 
-    private TeraArray blocks;
-    private TeraArray light;
-    private TeraArray liquid;
+    private TeraArray blocks, sunlight, light, liquid;
 
     private State chunkState = State.ADJACENCY_GENERATION_PENDING;
     private boolean dirty;
@@ -98,8 +99,9 @@ public class Chunk implements Externalizable {
 
     public Chunk() {
         blocks = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        sunlight = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         light = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        liquid = new TeraDenseArray4Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        liquid = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         setDirty(true);
     }
 
@@ -117,6 +119,7 @@ public class Chunk implements Externalizable {
     public Chunk(Chunk other) {
         pos.set(other.pos);
         blocks = other.blocks.copy();
+        sunlight = other.sunlight.copy();
         light = other.light.copy();
         liquid = other.liquid.copy();
         chunkState = other.chunkState;
@@ -150,7 +153,7 @@ public class Chunk implements Externalizable {
     public void setChunkState(State chunkState) {
         Preconditions.checkNotNull(chunkState);
         if (chunkState != getChunkState() && chunkState == State.COMPLETE) {
-            pack();
+            deflate();
         }
         this.chunkState = chunkState;
     }
@@ -174,14 +177,6 @@ public class Chunk implements Externalizable {
 
     public Block getBlock(int x, int y, int z) {
         return BlockManager.getInstance().getBlock((byte)blocks.get(x, y, z));
-    }
-
-    public int getBlockRaw(int x, int y, int z) {
-        return blocks.get(x, y, z);
-    }
-    
-    public int getLightRaw(int x, int y, int z) {
-        return light.get(x, y, z);
     }
 
     public boolean setBlock(int x, int y, int z, Block block) {
@@ -220,8 +215,7 @@ public class Chunk implements Externalizable {
     }
 
     public byte getSunlight(int x, int y, int z) {
-        int raw = light.get(x, y, z);
-        return (byte) ((raw & 0xF0) >> 4);
+        return (byte) sunlight.get(x, y, z);
     }
 
     public boolean setSunlight(Vector3i pos, byte amount) {
@@ -229,13 +223,8 @@ public class Chunk implements Externalizable {
     }
 
     public boolean setSunlight(int x, int y, int z, byte amount) {
-        Preconditions.checkArgument(amount >= 0 && amount < 16);
-        int raw = light.get(x, y, z);
-        int old = raw >> 4;
-        if (old == amount) return false;
-        int val = (byte)((raw & 0x0F) | (amount << 4));
-        light.set(x, y, z, val);
-        return true;
+        Preconditions.checkArgument(amount >= 0 && amount <= 15);
+        return sunlight.set(x, y, z, amount) != amount;
     }
 
     public byte getLight(Vector3i pos) {
@@ -243,8 +232,7 @@ public class Chunk implements Externalizable {
     }
 
     public byte getLight(int x, int y, int z) {
-        int raw = light.get(x, y, z);
-        return (byte) (raw & 0x0F);
+        return (byte) light.get(x, y, z);
     }
 
     public boolean setLight(Vector3i pos, byte amount) {
@@ -252,13 +240,8 @@ public class Chunk implements Externalizable {
     }
 
     public boolean setLight(int x, int y, int z, byte amount) {
-        Preconditions.checkArgument(amount >= 0 && amount < 16);
-        int raw = light.get(x, y, z);
-        int old = raw & 0x0F;
-        if (old == amount) return false;
-        int val = (byte)(raw & 0xF0) | (amount & 0x0F);
-        light.set(x, y, z, val);
-        return true;
+        Preconditions.checkArgument(amount >= 0 && amount <= 15);
+        return light.set(x, y, z, amount) != amount;
     }
 
     public boolean setLiquid(Vector3i pos, LiquidData newState, LiquidData oldState) {
@@ -337,6 +320,7 @@ public class Chunk implements Externalizable {
         out.writeInt(pos.z);
         out.writeObject(chunkState);
         out.writeObject(blocks);
+        out.writeObject(sunlight);
         out.writeObject(light);
         out.writeObject(liquid);
     }
@@ -348,25 +332,43 @@ public class Chunk implements Externalizable {
         setDirty(true);
         chunkState = (State) in.readObject();
         blocks = (TeraArray) in.readObject();
+        sunlight = (TeraArray) in.readObject();
         light = (TeraArray) in.readObject();
         liquid = (TeraArray) in.readObject();
     }
     
     private static DecimalFormat fpercent = new DecimalFormat("0.##");
-    public void pack() {
+    public void deflate() {
         lock();
         try {
-            TeraArray packedBlocks = blocks.pack();
-            TeraArray packedLight = light.pack();
-            if (packedBlocks != blocks || packedLight != light) {
-                double bp = 100d - (100d / blocks.getEstimatedMemoryConsumptionInBytes() * packedBlocks.getEstimatedMemoryConsumptionInBytes());
-                double bl = 100d - (100d / light.getEstimatedMemoryConsumptionInBytes() * packedLight.getEstimatedMemoryConsumptionInBytes());
-                System.out.println(String.format("chunk (%d, %d, %d) was packed: blocks-reduced-by=%s%%, light-reduced-by=%s%%", pos.x, pos.y, pos.z, fpercent.format(bp), fpercent.format(bl)));
-                blocks = packedBlocks;
-                light = packedLight;
-            } else {
-                System.out.println(String.format("chunk (%d, %d, %d) was not packed", pos.x, pos.y, pos.z));
-            }
+            int blocksSize = blocks.getEstimatedMemoryConsumptionInBytes();
+            int sunlightSize = sunlight.getEstimatedMemoryConsumptionInBytes();
+            int lightSize = light.getEstimatedMemoryConsumptionInBytes();
+            int liquidSize = liquid.getEstimatedMemoryConsumptionInBytes();
+            
+            blocks = blocks.deflate();
+            sunlight = sunlight.deflate();
+            light = light.deflate();
+            liquid = liquid.deflate();
+            
+            double blocksPercent = 100d - (100d / blocksSize * blocks.getEstimatedMemoryConsumptionInBytes());
+            double sunlightPercent = 100d - (100d / sunlightSize * sunlight.getEstimatedMemoryConsumptionInBytes());
+            double lightPercent = 100d - (100d / lightSize * light.getEstimatedMemoryConsumptionInBytes());
+            double liquidPercent = 100d - (100d / liquidSize * liquid.getEstimatedMemoryConsumptionInBytes());
+
+            logger.info(String.format("chunk (%d, %d, %d) was deflated: blocks-deflated-by=%s%%, sunlight-deflated-by=%s%%, light-deflated-by=%s%%, liquid-deflated-by=%s%%", pos.x, pos.y, pos.z, fpercent.format(blocksPercent), fpercent.format(sunlightPercent), fpercent.format(lightPercent), fpercent.format(liquidPercent)));
+        } finally {
+            unlock();
+        }
+    }
+    
+    public void inflate() {
+        lock();
+        try {
+            blocks = blocks.inflate();
+            sunlight = sunlight.inflate();
+            light = light.inflate();
+            liquid = liquid.inflate();
         } finally {
             unlock();
         }
