@@ -36,6 +36,7 @@ import org.terasology.world.chunks.blockdata.TeraByteArray8Bit;
 import org.terasology.world.liquid.LiquidData;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 /**
  * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks
@@ -150,6 +151,10 @@ public class Chunk implements Externalizable {
     }
 
     public void setChunkState(State chunkState) {
+        Preconditions.checkNotNull(chunkState);
+        if (chunkState != getChunkState() && chunkState == State.COMPLETE) {
+            pack();
+        }
         this.chunkState = chunkState;
     }
 
@@ -332,6 +337,19 @@ public class Chunk implements Externalizable {
         sunlight = (TeraArray) in.readObject();
         light = (TeraArray) in.readObject();
         liquid = (TeraArray) in.readObject();
+    }
+    
+    public void pack() {
+        lock();
+        try {
+            TeraArray packed = blocks.pack();
+            if (packed != blocks) {
+                System.out.println(String.format("packed chunk (%d, %d, %d), before=%d, after=%d", pos.x, pos.y, pos.z, blocks.estimatedMemoryConsumptionInBytes(), packed.estimatedMemoryConsumptionInBytes()));
+                blocks = packed;
+            }
+        } finally {
+            unlock();
+        }
     }
 
     @Override
