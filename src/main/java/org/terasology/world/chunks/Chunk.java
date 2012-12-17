@@ -344,7 +344,7 @@ public class Chunk implements Externalizable {
         try {
             TeraArray packed = blocks.pack();
             if (packed != blocks) {
-                System.out.println(String.format("packed chunk (%d, %d, %d), before=%d, after=%d", pos.x, pos.y, pos.z, blocks.estimatedMemoryConsumptionInBytes(), packed.estimatedMemoryConsumptionInBytes()));
+                System.out.println(String.format("packed chunk (%d, %d, %d), before=%d, after=%d", pos.x, pos.y, pos.z, blocks.getEstimatedMemoryConsumptionInBytes(), packed.getEstimatedMemoryConsumptionInBytes()));
                 blocks = packed;
             }
         } finally {

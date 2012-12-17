@@ -30,7 +30,7 @@ public abstract class TeraSparseArrayByte extends TeraSparseArray {
     }
 
     @Override
-    public int estimatedMemoryConsumptionInBytes() {
+    public int getEstimatedMemoryConsumptionInBytes() {
         int result = sizeY + sizeY * 16;
         for (int i = 0; i < sizeY; i++) {
             if (inflated[i] != null)

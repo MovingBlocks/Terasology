@@ -40,7 +40,7 @@ public class TeraDenseArray4Bit extends TeraDenseArrayByte {
     }
 
     @Override
-    public int estimatedMemoryConsumptionInBytes() {
+    public int getEstimatedMemoryConsumptionInBytes() {
         return data.length;
     }
 
