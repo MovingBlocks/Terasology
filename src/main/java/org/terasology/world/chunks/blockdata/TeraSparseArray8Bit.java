@@ -67,7 +67,7 @@ public class TeraSparseArray8Bit extends TeraSparseArrayByte {
 
     @Override
     public int get(int x, int y, int z) {
-        if (!contains(x, y, z)) throw new IndexOutOfBoundsException();
+        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
         byte[] data = inflated[y];
         if (data != null) 
             return data[z * sizeX + x];
@@ -76,12 +76,12 @@ public class TeraSparseArray8Bit extends TeraSparseArrayByte {
 
     @Override
     public int set(int x, int y, int z, int value) {
-        if (!contains(x, y, z)) throw new IndexOutOfBoundsException();
-        if (value < 0 || value > 255) throw new IllegalArgumentException();
+        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
+        if (value < -128 || value > 127) throw new IllegalArgumentException("Parameter 'value' has to be in the range of -128 - 127 (" + value + ")");
         byte[] data = inflated[y];
         int pos = z * sizeX + x;
         if (data != null) {
-            int old = data[pos] & 0xFF;
+            int old = data[pos];
             data[pos] = (byte) value;
             return old;
         }
@@ -98,13 +98,14 @@ public class TeraSparseArray8Bit extends TeraSparseArrayByte {
 
     @Override
     public boolean set(int x, int y, int z, int value, int expected) {
-        if (!contains(x, y, z)) throw new IndexOutOfBoundsException();
-        if (value < 0 || value > 255 || expected < 0 || expected > 255) throw new IllegalArgumentException();
+        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
+        if (value < -128 || value > 127) throw new IllegalArgumentException("Parameter 'value' has to be in the range of -128 - 127 (" + value + ")");
+        if (expected < -128 || expected > 127) throw new IllegalArgumentException("Parameter 'expected' has to be in the range of -128 - 127 (" + value + ")");
         if (value == expected) return true;
         byte[] data = inflated[y];
         int pos = z * sizeX + x;
         if (data != null) {
-            int old = data[pos] & 0xFF;
+            int old = data[pos];
             if (old == expected)
                 data[pos] = (byte) value;
             return old == expected;

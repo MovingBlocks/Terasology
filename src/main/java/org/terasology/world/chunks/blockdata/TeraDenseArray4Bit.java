@@ -46,7 +46,7 @@ public class TeraDenseArray4Bit extends TeraDenseArrayByte {
 
     @Override
     public int get(int x, int y, int z) {
-        if (!contains(x, y, z)) throw new IndexOutOfBoundsException();
+        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
         int pos = pos(x, y, z);
         if (pos < sizeXYZHalf) {
             int raw = data[pos] & 0xFF;
@@ -58,8 +58,8 @@ public class TeraDenseArray4Bit extends TeraDenseArrayByte {
 
     @Override
     public int set(int x, int y, int z, int value) {
-        if (!contains(x, y, z)) throw new IndexOutOfBoundsException();
-        if (value < 0 || value > 15) throw new IllegalArgumentException();
+        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
+        if (value < 0 || value > 15) throw new IllegalArgumentException("Parameter 'value' has to be in the range 0 - 15 (" + value + ")");
         int pos = pos(x, y, z);
         if (pos < sizeXYZHalf) {
             int raw = data[pos] & 0xFF;
@@ -77,8 +77,9 @@ public class TeraDenseArray4Bit extends TeraDenseArrayByte {
 
     @Override
     public boolean set(int x, int y, int z, int value, int expected) {
-        if (!contains(x, y, z)) throw new IndexOutOfBoundsException();
-        if (value < 0 || value > 15 || expected < 0 || expected > 15) throw new IllegalArgumentException();
+        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
+        if (value < 0 || value > 15) throw new IllegalArgumentException("Parameter 'value' has to be in the range 0 - 15 (" + value + ")");
+        if (expected < 0 || expected > 15) throw new IllegalArgumentException("Parameter 'expected' has to be in the range 0 - 15 (" + value + ")");
         int pos = pos(x, y, z);
         if (pos < sizeXYZHalf) {
             int raw = data[pos] & 0xFF;

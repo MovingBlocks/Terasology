@@ -79,7 +79,6 @@ public class Chunk implements Externalizable {
     private final Vector3i pos = new Vector3i();
 
     private TeraArray blocks;
-    private TeraArray sunlight;
     private TeraArray light;
     private TeraArray liquid;
 
@@ -99,10 +98,8 @@ public class Chunk implements Externalizable {
 
     public Chunk() {
         blocks = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        sunlight = new TeraDenseArray4Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        light = new TeraDenseArray4Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        light = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         liquid = new TeraDenseArray4Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-
         setDirty(true);
     }
 
@@ -120,7 +117,6 @@ public class Chunk implements Externalizable {
     public Chunk(Chunk other) {
         pos.set(other.pos);
         blocks = other.blocks.copy();
-        sunlight = other.sunlight.copy();
         light = other.light.copy();
         liquid = other.liquid.copy();
         chunkState = other.chunkState;
@@ -180,6 +176,14 @@ public class Chunk implements Externalizable {
         return BlockManager.getInstance().getBlock((byte)blocks.get(x, y, z));
     }
 
+    public int getBlockRaw(int x, int y, int z) {
+        return blocks.get(x, y, z);
+    }
+    
+    public int getLightRaw(int x, int y, int z) {
+        return light.get(x, y, z);
+    }
+
     public boolean setBlock(int x, int y, int z, Block block) {
         int oldValue = blocks.set(x, y, z, block.getId());
         if (oldValue != block.getId()) {
@@ -212,11 +216,12 @@ public class Chunk implements Externalizable {
     }
 
     public byte getSunlight(Vector3i pos) {
-        return (byte) sunlight.get(pos.x, pos.y, pos.z);
+        return getSunlight(pos.x, pos.y, pos.z);
     }
 
     public byte getSunlight(int x, int y, int z) {
-        return (byte) sunlight.get(x, y, z);
+        int raw = light.get(x, y, z);
+        return (byte) ((raw & 0xF0) >> 4);
     }
 
     public boolean setSunlight(Vector3i pos, byte amount) {
@@ -224,16 +229,22 @@ public class Chunk implements Externalizable {
     }
 
     public boolean setSunlight(int x, int y, int z, byte amount) {
-        byte oldValue = (byte) sunlight.set(x, y, z, amount);
-        return oldValue != amount;
+        Preconditions.checkArgument(amount >= 0 && amount < 16);
+        int raw = light.get(x, y, z);
+        int old = raw >> 4;
+        if (old == amount) return false;
+        int val = (byte)((raw & 0x0F) | (amount << 4));
+        light.set(x, y, z, val);
+        return true;
     }
 
     public byte getLight(Vector3i pos) {
-        return (byte) light.get(pos.x, pos.y, pos.z);
+        return getLight(pos.x, pos.y, pos.z);
     }
 
     public byte getLight(int x, int y, int z) {
-        return (byte) light.get(x, y, z);
+        int raw = light.get(x, y, z);
+        return (byte) (raw & 0x0F);
     }
 
     public boolean setLight(Vector3i pos, byte amount) {
@@ -241,8 +252,13 @@ public class Chunk implements Externalizable {
     }
 
     public boolean setLight(int x, int y, int z, byte amount) {
-        byte oldValue = (byte) light.set(x, y, z, amount);
-        return (oldValue != amount);
+        Preconditions.checkArgument(amount >= 0 && amount < 16);
+        int raw = light.get(x, y, z);
+        int old = raw & 0x0F;
+        if (old == amount) return false;
+        int val = (byte)(raw & 0xF0) | (amount & 0x0F);
+        light.set(x, y, z, val);
+        return true;
     }
 
     public boolean setLiquid(Vector3i pos, LiquidData newState, LiquidData oldState) {
@@ -321,7 +337,6 @@ public class Chunk implements Externalizable {
         out.writeInt(pos.z);
         out.writeObject(chunkState);
         out.writeObject(blocks);
-        out.writeObject(sunlight);
         out.writeObject(light);
         out.writeObject(liquid);
     }
@@ -330,12 +345,9 @@ public class Chunk implements Externalizable {
         pos.x = in.readInt();
         pos.y = in.readInt();
         pos.z = in.readInt();
-        
         setDirty(true);
-
         chunkState = (State) in.readObject();
         blocks = (TeraArray) in.readObject();
-        sunlight = (TeraArray) in.readObject();
         light = (TeraArray) in.readObject();
         liquid = (TeraArray) in.readObject();
     }
@@ -344,11 +356,16 @@ public class Chunk implements Externalizable {
     public void pack() {
         lock();
         try {
-            TeraArray packed = blocks.pack();
-            if (packed != blocks) {
-                double bp = 100d - (100d / blocks.getEstimatedMemoryConsumptionInBytes() * packed.getEstimatedMemoryConsumptionInBytes());
-                System.out.println(String.format("packed chunk (%d, %d, %d), blocks-reduced-by=%s%%", pos.x, pos.y, pos.z, fpercent.format(bp)));
-                blocks = packed;
+            TeraArray packedBlocks = blocks.pack();
+            TeraArray packedLight = light.pack();
+            if (packedBlocks != blocks || packedLight != light) {
+                double bp = 100d - (100d / blocks.getEstimatedMemoryConsumptionInBytes() * packedBlocks.getEstimatedMemoryConsumptionInBytes());
+                double bl = 100d - (100d / light.getEstimatedMemoryConsumptionInBytes() * packedLight.getEstimatedMemoryConsumptionInBytes());
+                System.out.println(String.format("chunk (%d, %d, %d) was packed: blocks-reduced-by=%s%%, light-reduced-by=%s%%", pos.x, pos.y, pos.z, fpercent.format(bp), fpercent.format(bl)));
+                blocks = packedBlocks;
+                light = packedLight;
+            } else {
+                System.out.println(String.format("chunk (%d, %d, %d) was not packed", pos.x, pos.y, pos.z));
             }
         } finally {
             unlock();
