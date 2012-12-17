@@ -2,7 +2,7 @@ package org.terasology.world.chunks.blockdata;
 
 import java.util.Arrays;
 
-public class TeraSparseArray8Bit extends TeraSparseArray {
+public class TeraSparseArray8Bit extends TeraSparseArrayByte {
 
     public TeraSparseArray8Bit() {
         super();
