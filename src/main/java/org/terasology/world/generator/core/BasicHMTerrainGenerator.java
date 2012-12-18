@@ -96,7 +96,7 @@ public class BasicHMTerrainGenerator implements ChunkGenerator {
                 //ToDo: Change this formula in later implementation of vertical chunks
                 double threshold = Math.floor(interpolatedHeight);
 
-                for (int y = Chunk.SIZE_Y; y >= 0; y--) {
+                for (int y = Chunk.SIZE_Y-1; y >= 0; y--) {
                     if (y == 0) { // The very deepest layer of the world is an
                         // indestructible mantle
                         c.setBlock(x, y, z, mantle);
