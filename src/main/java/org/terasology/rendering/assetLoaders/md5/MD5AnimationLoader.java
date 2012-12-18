@@ -56,7 +56,7 @@ public class MD5AnimationLoader implements AssetLoader<MeshAnimation> {
     private Pattern frameStartPattern = Pattern.compile("frame " + INTEGER_PATTERN + " \\{");
 
     @Override
-    public MeshAnimation load(InputStream stream, AssetUri uri, List<URL> urls) throws IOException {
+    public MeshAnimation load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
         try {
             MD5 md5 = parse(stream);
             return createAnimation(uri, md5);

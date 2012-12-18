@@ -21,7 +21,7 @@ import javax.vecmath.Vector3f;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
-import org.terasology.asset.AssetManager;
+import org.terasology.asset.Assets;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
@@ -39,7 +39,7 @@ import org.terasology.world.block.Block;
  */
 public class ShaderParametersPost implements IShaderParameters {
 
-    Texture texture = AssetManager.loadTexture("engine:vignette");
+    Texture texture = Assets.getTexture("engine:vignette");
 
     @Override
     public void applyParameters(ShaderProgram program) {

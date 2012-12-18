@@ -16,7 +16,7 @@
 package org.terasology.componentSystem.rendering;
 
 import org.lwjgl.opengl.GL11;
-import org.terasology.asset.AssetManager;
+import org.terasology.asset.Assets;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.components.HealthComponent;
 import org.terasology.entitySystem.EntityManager;
@@ -71,7 +71,7 @@ public class BlockDamageRenderer implements RenderSystem {
     public void initialise() {
         this.entityManager = CoreRegistry.get(EntityManager.class);
         this.worldProvider = CoreRegistry.get(WorldProvider.class);
-        this.effectsTexture = AssetManager.loadTexture("engine:effects");
+        this.effectsTexture = Assets.getTexture("engine:effects");
         Vector2f texPos = new Vector2f(0.0f, 0.0f);
         Vector2f texWidth = new Vector2f(0.0624f, 0.0624f);
 

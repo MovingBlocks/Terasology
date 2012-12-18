@@ -73,7 +73,9 @@ public class Mod {
                     return classesDir.toURI().toURL();
                 }
             } else {
-                return modRoot.toURI().toURL();
+                if (modRoot.getAbsolutePath().endsWith(".jar")) {
+                    return modRoot.toURI().toURL();
+                }
             }
         } catch (MalformedURLException e) {
             return null;

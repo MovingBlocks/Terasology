@@ -96,13 +96,13 @@ public class SpawnerSystem implements UpdateSubscriberSystem {
             return;
         }
 
-        logger.info("Going to do stuff");
+        //logger.info("Going to do stuff");
         lastTick = tick;
 
         // Make sure we don't spawn too much stuff. Not very robust yet
         int maxMobs = entityManager.getComponentCount(SpawnerComponent.class) * maxMobsPerSpawner + maxMobsPerSpawner;
         int currentMobs = entityManager.getComponentCount(SimpleAIComponent.class);
-        logger.info("Mob count: {}/{}", currentMobs, maxMobs);
+        //logger.info("Mob count: {}/{}", currentMobs, maxMobs);
 
         // Probably need something better to base this threshold on eventually
         if ( currentMobs >= maxMobs) {
@@ -111,7 +111,7 @@ public class SpawnerSystem implements UpdateSubscriberSystem {
         }
 
         // Go through entities that are spawners. Only accept block-based spawners for now (due to location need)
-        logger.info("Count of entities with a SpawnerComponent: {}", entityManager.getComponentCount(SpawnerComponent.class));
+        //logger.info("Count of entities with a SpawnerComponent: {}", entityManager.getComponentCount(SpawnerComponent.class));
         for (EntityRef entity : entityManager.iteratorEntities(SpawnerComponent.class, BlockComponent.class)) {
             logger.info("Found a spawner: {}", entity);
             SpawnerComponent spawnComp = entity.getComponent(SpawnerComponent.class);
@@ -130,7 +130,7 @@ public class SpawnerSystem implements UpdateSubscriberSystem {
 
                 String chosenSpawnerType = spawnComp.types.get(random.randomIntAbs(spawnComp.types.size()));
                 Set randomType = typeLists.get(chosenSpawnerType);
-                logger.info("Picked random type {} which returned {} prefabs", chosenSpawnerType, randomType.size());
+                //logger.info("Picked random type {} which returned {} prefabs", chosenSpawnerType, randomType.size());
                 if (randomType.size() == 0) {
                     logger.warn("That type wasn't found, sad :-( Won't spawn anything this time");
                     return;

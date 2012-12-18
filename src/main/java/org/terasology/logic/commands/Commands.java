@@ -24,6 +24,7 @@ import org.terasology.asset.Asset;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.PlayerComponent;
@@ -42,9 +43,6 @@ import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.input.InputSystem;
-import org.terasology.input.binds.BackwardsButton;
-import org.terasology.input.binds.ForwardsButton;
-import org.terasology.input.binds.LeftStrafeButton;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.CommandManager;
 import org.terasology.logic.manager.CommandManager.CommandInfo;
@@ -56,6 +54,7 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.StringConstants;
+import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockPickupComponent;
 import org.terasology.world.block.BlockUri;
@@ -72,16 +71,27 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * The controller class for all commands which can be executed through the in-game chat.
- * To add a command there needs to be an entry in the JSON file under "/data/console/commands.json" with a corresponding public method in this class.
+ * The controller class for all commands which can be executed through the in-game chat. To add a command there needs to
+ * be a public method in this class.
  *
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
+ * @author Tobias 'skaldarnar' Nett <skaldarnar@googlemail.com>
  */
 public class Commands implements CommandProvider {
 
     //==============================
     //        Helper Methods
     //==============================
+
+    /**
+     * Retrieve all {@code BlockUri}s that match the given string.
+     * <p/>
+     * In order to resolve the {@code BlockUri}s, every package is searched for the given uri pattern.
+     *
+     * @param uri the uri pattern to match
+     *
+     * @return a list of matching block uris
+     */
     private List<BlockUri> resolveBlockUri(String uri) {
         List<BlockUri> matches = Lists.newArrayList();
         BlockUri straightUri = new BlockUri(uri);
@@ -90,7 +100,7 @@ public class Commands implements CommandProvider {
                 matches.add(straightUri);
             }
         } else {
-            for (String packageName : AssetManager.listPackages()) {
+            for (String packageName : Assets.listModules()) {
                 BlockUri modUri = new BlockUri(packageName, uri);
                 if (BlockManager.getInstance().hasBlockFamily(modUri)) {
                     matches.add(modUri);
@@ -100,16 +110,26 @@ public class Commands implements CommandProvider {
         return matches;
     }
 
+    /**
+     * Retrieve all {@code AssetUri}s that match the given string pattern.
+     * <p/>
+     * In order to find all fitting shapes, all asset packages are searched and a list of matching asset uris is
+     * returned.
+     *
+     * @param uri the uri pattern to match
+     *
+     * @return a list of matching asset uris
+     */
     private List<AssetUri> resolveShapeUri(String uri) {
         List<AssetUri> matches = Lists.newArrayList();
         AssetUri straightUri = new AssetUri(AssetType.SHAPE, uri);
         if (straightUri.isValid()) {
-            Asset asset = AssetManager.load(straightUri);
+            Asset asset = Assets.get(straightUri);
             if (asset != null) {
                 matches.add(straightUri);
             }
         } else {
-            for (String packageName : AssetManager.listPackages()) {
+            for (String packageName : Assets.listModules()) {
                 AssetUri modUri = new AssetUri(AssetType.SHAPE, packageName, uri);
                 Asset asset = AssetManager.tryLoad(modUri);
                 if (asset != null) {
@@ -129,6 +149,7 @@ public class Commands implements CommandProvider {
         return result;
     }
 
+    //TODO  Add multiplayer commands, when ready for that
     //==============================
     //          Commands
     //==============================
@@ -200,7 +221,7 @@ public class Commands implements CommandProvider {
         stringBuilder.append(StringConstants.NEW_LINE);
         stringBuilder.append("-----------");
         stringBuilder.append(StringConstants.NEW_LINE);
-        List<AssetUri> sortedUris = sortItems(AssetManager.list(AssetType.SHAPE));
+        List<AssetUri> sortedUris = sortItems(Assets.list(AssetType.SHAPE));
         for (AssetUri uri : sortedUris) {
             stringBuilder.append(uri.getSimpleString());
             stringBuilder.append(StringConstants.NEW_LINE);
@@ -226,40 +247,33 @@ public class Commands implements CommandProvider {
     }
 
     @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts 16 of the given block into your inventory")
-    public void giveBlock(@CommandParam(name="blockId") String uri) {
+    public void giveBlock(@CommandParam(name = "blockName") String uri) {
         giveBlock(uri, 16);
     }
 
     @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts 16 blocks of the given block, with the given shape, into your inventory")
-    public void giveBlock(@CommandParam(name="blockId") String uri, @CommandParam(name="shapeId") String shapeUri) {
+    public void giveBlock(@CommandParam(name = "blockName") String uri, @CommandParam(name = "shapeName") String shapeUri) {
         giveBlock(uri, shapeUri, 16);
     }
 
     @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts a desired number of the given block into your inventory")
-    public void giveBlock(@CommandParam(name="blockId") String uri, @CommandParam(name="quantity") int quantity) {
+    public void giveBlock(@CommandParam(name = "blockName") String uri, @CommandParam(name = "quantity") int quantity) {
         List<BlockUri> matchingUris = resolveBlockUri(uri);
         if (matchingUris.size() == 1) {
             BlockFamily blockFamily = BlockManager.getInstance().getBlockFamily(matchingUris.get(0));
-
             giveBlock(blockFamily, quantity);
-
-            return;
         } else if (matchingUris.isEmpty()) {
             MessageManager.getInstance().addMessage("No block found for '" + uri + "'", EMessageScope.PRIVATE);
-
-            return;
         } else {
             StringBuilder builder = new StringBuilder();
             builder.append("Non-unique block name, possible matches: ");
             Joiner.on(", ").appendTo(builder, matchingUris);
             MessageManager.getInstance().addMessage(builder.toString(), EMessageScope.PRIVATE);
-
-            return;
         }
     }
 
     @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts a desired number of the given block with the give shape into your inventory")
-    public void giveBlock(@CommandParam(name="blockId") String uri, @CommandParam(name="shapeId") String shapeUri, @CommandParam(name="quantity") int quantity) {
+    public void giveBlock(@CommandParam(name = "blockName") String uri, @CommandParam(name = "shapeName") String shapeUri, @CommandParam(name = "quantity") int quantity) {
         List<BlockUri> resolvedBlockUris = resolveBlockUri(uri);
         if (resolvedBlockUris.isEmpty()) {
             MessageManager.getInstance().addMessage("No block found for '" + uri + "'", EMessageScope.PRIVATE);
@@ -302,6 +316,12 @@ public class Commands implements CommandProvider {
         MessageManager.getInstance().addMessage("Invalid block or shape", EMessageScope.PRIVATE);
     }
 
+    /**
+     * Actual implementation of the giveBlock command.
+     *
+     * @param blockFamily the block family of the queried block
+     * @param quantity    the number of blocks that are queried
+     */
     private void giveBlock(BlockFamily blockFamily, int quantity) {
         if (quantity < 1) {
             MessageManager.getInstance().addMessage("Here, have these zero (0) items just like you wanted", EMessageScope.PRIVATE);
@@ -327,7 +347,7 @@ public class Commands implements CommandProvider {
     }
 
     @Command(shortDescription = "Adds an item to your inventory")
-    public void giveItem(@CommandParam(name="prefabId or blockId") String itemPrefabName) {
+    public void giveItem(@CommandParam(name = "prefabId or blockName") String itemPrefabName) {
         Prefab prefab = CoreRegistry.get(PrefabManager.class).getPrefab(itemPrefabName);
         System.out.println("Found prefab: " + prefab);
         if (prefab != null && prefab.getComponent(ItemComponent.class) != null) {
@@ -354,7 +374,7 @@ public class Commands implements CommandProvider {
     }
 
     @Command(shortDescription = "Restores your health by an amount")
-    public void health(@CommandParam(name="amount") int amount) {
+    public void health(@CommandParam(name = "amount") int amount) {
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
         health.currentHealth = amount;
@@ -371,8 +391,33 @@ public class Commands implements CommandProvider {
         localPlayer.getEntity().saveComponent(health);
     }
 
+    @Command(shortDescription = "Reduce the player's health to zero")
+    public void kill() {
+    	LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+        HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
+    	localPlayer.getEntity().send(new NoHealthEvent(localPlayer.getEntity(), health.maxHealth));
+    }
+    
+    @Command(shortDescription = "Reduce the player's health by an amount")
+    public void damage(@CommandParam(name="amount") int amount) {
+        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+        HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
+        health.currentHealth -= amount;
+        if (health.currentHealth >= health.maxHealth) {
+            health.currentHealth = health.maxHealth;
+            localPlayer.getEntity().send(new FullHealthEvent(localPlayer.getEntity(), health.maxHealth));
+        } else if (health.currentHealth <= 0) {
+            health.currentHealth = 0;
+            localPlayer.getEntity().send(new NoHealthEvent(localPlayer.getEntity(), health.maxHealth));
+        } else {
+            localPlayer.getEntity().send(new HealthChangedEvent(localPlayer.getEntity(), health.currentHealth, health.maxHealth));
+        }
+
+        localPlayer.getEntity().saveComponent(health);
+    }
+    
     @Command(shortDescription = "Teleports you to a location")
-    public void teleport(@CommandParam(name="x") float x, @CommandParam(name="y") float y, @CommandParam(name="z") float z) {
+    public void teleport(@CommandParam(name = "x") float x, @CommandParam(name = "y") float y, @CommandParam(name = "z") float z) {
         LocalPlayer player = CoreRegistry.get(LocalPlayer.class);
         if (player != null) {
             LocationComponent location = player.getEntity().getComponent(LocationComponent.class);
@@ -382,15 +427,20 @@ public class Commands implements CommandProvider {
         }
     }
 
-    @Command(shortDescription = "Writes out information on all entities to a text file for debugging")
+    @Command(shortDescription = "Writes out information on all entities to a text file for debugging",
+            helpText = "Writes entity information out into a file named \"entityDump.txt\".")
     public void dumpEntities() throws IOException {
         CoreRegistry.get(WorldPersister.class).save(new File(PathManager.getInstance().getDataPath(), "entityDump.txt"), WorldPersister.SaveFormat.JSON);
     }
 
     @Command(shortDescription = "Maps a key to a function")
-    public void bindKey(@CommandParam(name="key") String key, @CommandParam(name="function") String bind) {
+    public void bindKey(@CommandParam(name = "key") String key, @CommandParam(name = "function") String bind) {
         InputSystem input = CoreRegistry.get(InputSystem.class);
         input.linkBindButtonToKey(Keyboard.getKeyIndex(key), bind);
+        StringBuilder builder = new StringBuilder();
+        builder.append("Mapped ").append(Keyboard.getKeyName(Keyboard.getKeyIndex(key))).append(" to action ");
+        builder.append(bind);
+        MessageManager.getInstance().addMessage(builder.toString());
     }
 
     @Command(shortDescription = "Switches to typical key binds for AZERTY")
@@ -400,10 +450,24 @@ public class Commands implements CommandProvider {
         input.linkBindButtonToKey(Keyboard.KEY_S, "engine:backwards");
         input.linkBindButtonToKey(Keyboard.KEY_Q, "engine:left");
 
+        MessageManager.getInstance().addMessage("Changed key bindings to AZERTY keyboard layout.");
+    }
+
+    @Command(shortDescription = "Switches to typical key binds for NEO 2 keyboard layout")
+    public void NEO() {
+        InputSystem input = CoreRegistry.get(InputSystem.class);
+        input.linkBindButtonToKey(Keyboard.KEY_V, "engine:forwards");
+        input.linkBindButtonToKey(Keyboard.KEY_I, "engine:backwards");
+        input.linkBindButtonToKey(Keyboard.KEY_U, "engine:left");
+        input.linkBindButtonToKey(Keyboard.KEY_A, "engine:right");
+        input.linkBindButtonToKey(Keyboard.KEY_L, "engine:useItem");
+        input.linkBindButtonToKey(Keyboard.KEY_G, "engine:inventory");
+
+        MessageManager.getInstance().addMessage("Changed key bindings to NEO 2 keyboard layout.");
     }
 
     @Command(shortDescription = "Spawns an instance of a prefab in the world")
-    public void spawnPrefab(@CommandParam(name="prefabId") String prefabName) {
+    public void spawnPrefab(@CommandParam(name = "prefabId") String prefabName) {
         Camera camera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
         Vector3f spawnPos = camera.getPosition();
         Vector3f offset = new Vector3f(camera.getViewingDirection());
@@ -433,14 +497,15 @@ public class Commands implements CommandProvider {
     }
 
     @Command(shortDescription = "Sets the height the player can step up")
-    public void stepHeight(@CommandParam(name="height") float amount) {
+    public void stepHeight(@CommandParam(name = "height") float amount) {
         EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
         CharacterMovementComponent comp = playerEntity.getComponent(CharacterMovementComponent.class);
         comp.stepHeight = amount;
     }
 
-    @Command(shortDescription = "Spawns a block in front of the player")
-    public void spawnBlock(@CommandParam(name="blockId") String blockName) {
+    @Command(shortDescription = "Spawns a block in front of the player", helpText = "Spawns the specified block as a " +
+            "item in front of the player. You can simply pick it up.")
+    public void spawnBlock(@CommandParam(name = "blockName") String blockName) {
         Camera camera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
         Vector3f spawnPos = camera.getPosition();
         Vector3f offset = camera.getViewingDirection();
@@ -459,7 +524,54 @@ public class Commands implements CommandProvider {
             blockMesh.mesh = block.getMesh();
             blockEntity.saveComponent(blockMesh);
             blockEntity.saveComponent(blockPickup);
+
+            MessageManager.getInstance().addMessage("Spawned block.");
         }
+    }
+
+    @Command(shortDescription = "Places a block in front of the player", helpText = "Places the specified block in " +
+            "front of the player. The block is set directly into the world and might override existing blocks. After " +
+            "placement the block can be destroyed like any regular placed block.")
+    public void placeBlock(@CommandParam(name = "blockName") String blockName) {
+        Camera camera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
+        Vector3f spawnPos = camera.getPosition();
+        Vector3f offset = camera.getViewingDirection();
+        offset.scale(3);
+        spawnPos.add(offset);
+
+        BlockFamily blockFamily;
+
+        List<BlockUri> matchingUris = resolveBlockUri(blockName);
+        if (matchingUris.size() == 1) {
+            blockFamily = BlockManager.getInstance().getBlockFamily(matchingUris.get(0));
+
+            //return;
+        } else if (matchingUris.isEmpty()) {
+            MessageManager.getInstance().addMessage("No block found for '" + blockName + "'", EMessageScope.PRIVATE);
+
+            return;
+        } else {
+            StringBuilder builder = new StringBuilder();
+            builder.append("Non-unique block name, possible matches: ");
+            Joiner.on(", ").appendTo(builder, matchingUris);
+            MessageManager.getInstance().addMessage(builder.toString(), EMessageScope.PRIVATE);
+
+            return;
+        }
+
+        WorldProvider provider = CoreRegistry.get(WorldProvider.class);
+        if (provider != null) {
+            Block oldBlock = provider.getBlock((int) spawnPos.x, (int) spawnPos.y, (int) spawnPos.z);
+            provider.setBlock((int) spawnPos.x, (int) spawnPos.y, (int) spawnPos.z, blockFamily.getArchetypeBlock(), oldBlock);
+
+            StringBuilder builder = new StringBuilder();
+            builder.append(blockFamily.getArchetypeBlock());
+            builder.append(" block placed at position (");
+            builder.append((int) spawnPos.x).append((int) spawnPos.y).append((int) spawnPos.z).append(")");
+            MessageManager.getInstance().addMessage(builder.toString());
+            return;
+        }
+        MessageManager.getInstance().addMessage("Sorry, something went wrong!");
     }
 
     @Command(shortDescription = "Toggles the maximum slope the player can walk up")
@@ -472,10 +584,11 @@ public class Commands implements CommandProvider {
             } else {
                 moveComp.slopeFactor = 0.9f;
             }
+            MessageManager.getInstance().addMessage("Slope factor is now " + moveComp.slopeFactor);
         }
     }
 
-    @Command(shortDescription = "Sets the respawn position of the player")
+    @Command(shortDescription = "Sets the spawn position of the player")
     public void setSpawn() {
         EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
         PlayerComponent spawn = playerEntity.getComponent(PlayerComponent.class);
@@ -483,7 +596,7 @@ public class Commands implements CommandProvider {
         playerEntity.saveComponent(spawn);
     }
 
-    @Command(shortDescription = "General help")
+    @Command(shortDescription = "General help", helpText = "Prints out short descriptions for all available commands.")
     public void help() {
         StringBuilder msg = new StringBuilder();
         List<CommandInfo> commands = CoreRegistry.get(CommandManager.class).getCommandList();
@@ -491,13 +604,13 @@ public class Commands implements CommandProvider {
             if (!msg.toString().isEmpty()) {
                 msg.append("\n");
             }
-            msg.append(cmd.getUsageMessage() + " - " + cmd.getShortDescription());
+            msg.append(cmd.getUsageMessage()).append(" - ").append(cmd.getShortDescription());
         }
         MessageManager.getInstance().addMessage(msg.toString(), EMessageScope.PRIVATE);
     }
 
     @Command(shortDescription = "Detailed help on a command")
-    public void help(@CommandParam(name="command") String command) {
+    public void help(@CommandParam(name = "command") String command) {
         Collection<CommandInfo> cmdCollection = CoreRegistry.get(CommandManager.class).getCommand(command);
         if (cmdCollection.isEmpty()) {
             MessageManager.getInstance().addMessage("No help available for command '" + command + "'. Unknown command.", EMessageScope.PRIVATE);

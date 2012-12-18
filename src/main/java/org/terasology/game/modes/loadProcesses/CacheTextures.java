@@ -17,9 +17,9 @@
 package org.terasology.game.modes.loadProcesses;
 
 import com.google.common.collect.Lists;
-import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
 import org.terasology.game.modes.LoadProcess;
 
 import java.util.Iterator;
@@ -37,14 +37,14 @@ public class CacheTextures implements LoadProcess {
 
     @Override
     public int begin() {
-        uris = AssetManager.list(AssetType.TEXTURE).iterator();
-        return Lists.newArrayList(AssetManager.list(AssetType.TEXTURE)).size();
+        uris = Assets.list(AssetType.TEXTURE).iterator();
+        return Lists.newArrayList(Assets.list(AssetType.TEXTURE)).size();
     }
 
     @Override
     public boolean step() {
         AssetUri textureURI = uris.next();
-        AssetManager.load(textureURI);
+        Assets.get(textureURI);
         return !uris.hasNext();
     }
 }

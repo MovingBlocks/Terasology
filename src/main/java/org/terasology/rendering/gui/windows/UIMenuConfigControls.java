@@ -16,7 +16,7 @@
 package org.terasology.rendering.gui.windows;
 
 import com.google.common.collect.Lists;
-import org.terasology.asset.AssetManager;
+import org.terasology.asset.Assets;
 import org.terasology.config.InputConfig;
 import org.terasology.game.CoreRegistry;
 import org.terasology.input.Input;
@@ -157,7 +157,7 @@ public final class UIMenuConfigControls extends UIWindow {
             }
         };
 
-        title = new UIImage(AssetManager.loadTexture("engine:terasology"));
+        title = new UIImage(Assets.getTexture("engine:terasology"));
         title.setSize(new Vector2f(512f, 128f));
         title.setHorizontalAlign(EHorizontalAlign.CENTER);
         title.setPosition(new Vector2f(0f, 28f));
@@ -171,7 +171,7 @@ public final class UIMenuConfigControls extends UIWindow {
         backToConfigMenuButton = new UIButton(new Vector2f(128f, 32f), UIButton.ButtonType.NORMAL);
         backToConfigMenuButton.getLabel().setText("Back");
         backToConfigMenuButton.setHorizontalAlign(EHorizontalAlign.CENTER);
-        backToConfigMenuButton.setPosition(new Vector2f(306f, 570f));
+        backToConfigMenuButton.setPosition(new Vector2f(200f, 570f));
         backToConfigMenuButton.setVisible(true);
         backToConfigMenuButton.addClickListener(new ClickListener() {
             @Override
@@ -204,7 +204,7 @@ public final class UIMenuConfigControls extends UIWindow {
             buttonGroups[def.group].addDisplayElement(button);
         }
 
-        mouseSensitivity = new UISlider(new Vector2f(256f, 32f), 20, 150);
+        mouseSensitivity = new UISlider(new Vector2f(256f, 32f), 20, 1000);
         mouseSensitivity.setHorizontalAlign(EHorizontalAlign.CENTER);
         mouseSensitivity.setPosition(new Vector2f(-245f, 570f));
         mouseSensitivity.setVisible(true);

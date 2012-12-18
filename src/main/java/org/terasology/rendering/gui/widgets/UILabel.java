@@ -18,7 +18,7 @@ package org.terasology.rendering.gui.widgets;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
-import org.terasology.asset.AssetManager;
+import org.terasology.asset.Assets;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.TeraMath;
 import org.terasology.performanceMonitor.PerformanceMonitor;
@@ -50,7 +50,7 @@ public class UILabel extends UIDisplayContainer {
     private boolean isWrap = false;
 
     //font
-    private Font font = AssetManager.loadFont("engine:default");
+    private Font font = Assets.getFont("engine:default");
     private Color color = new Color(Color.white);
 
     //shadow

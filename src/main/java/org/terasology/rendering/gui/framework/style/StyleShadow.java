@@ -28,11 +28,10 @@ import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
 
 import org.lwjgl.opengl.GL11;
-import org.terasology.asset.AssetManager;
+import org.terasology.asset.Assets;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
-import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
@@ -82,7 +81,7 @@ public class StyleShadow extends UIDisplayContainer implements Style {
                                            0, 0};       //left      (top end - bottom end)
         
     public StyleShadow(Vector4f width, EShadowDirection direction, float opacity) {
-        shadow = AssetManager.loadTexture(textureUrl);
+        shadow = Assets.getTexture(textureUrl);
         createMesh(opacity);
         
         this.opacity = opacity;

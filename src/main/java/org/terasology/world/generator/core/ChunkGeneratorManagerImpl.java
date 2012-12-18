@@ -57,43 +57,43 @@ public class ChunkGeneratorManagerImpl implements ChunkGeneratorManager {
 
         return chunkGeneratorManager;
     }
-    
-    public static ChunkGeneratorManagerImpl buildChunkGenerator(List<String> list) {
-    	final ChunkGeneratorManagerImpl chunkGeneratorManager = new ChunkGeneratorManagerImpl();
-    	
-    	for (String generator : list) {
-			try {
-				BaseChunkGenerator chunkGenerator = null;
-				Class<?> [] classParm = null;
-				Object [] objectParm = null;
-				
-				Constructor<?> c = Class.forName(generator).getConstructor(classParm);
-				chunkGenerator = (BaseChunkGenerator) c.newInstance(objectParm);
-				
-				if (chunkGenerator instanceof ForestGenerator) {
-					new DefaultGenerators((ForestGenerator) chunkGenerator);
-				}
-				
-				chunkGeneratorManager.registerChunkGenerator(chunkGenerator);
-				
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			} catch (NoSuchMethodException e) {
-				e.printStackTrace();
-			} catch (SecurityException e) {
-				e.printStackTrace();
-			} catch (InstantiationException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				e.printStackTrace();
-			}
-		}
 
-    	return chunkGeneratorManager;
+    public static ChunkGeneratorManagerImpl buildChunkGenerator(List<String> list) {
+        final ChunkGeneratorManagerImpl chunkGeneratorManager = new ChunkGeneratorManagerImpl();
+
+        for (String generator : list) {
+            try {
+                BaseChunkGenerator chunkGenerator = null;
+                Class<?>[] classParm = null;
+                Object[] objectParm = null;
+
+                Constructor<?> c = Class.forName(generator).getConstructor(classParm);
+                chunkGenerator = (BaseChunkGenerator) c.newInstance(objectParm);
+
+                if (chunkGenerator instanceof ForestGenerator) {
+                    new DefaultGenerators((ForestGenerator) chunkGenerator);
+                }
+
+                chunkGeneratorManager.registerChunkGenerator(chunkGenerator);
+
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (SecurityException e) {
+                e.printStackTrace();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return chunkGeneratorManager;
     }
 
     @Override

@@ -22,7 +22,7 @@ import org.terasology.math.TeraMath;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class PerlinNoise {
+public class PerlinNoise implements Noise{
 
     private static final double LACUNARITY = 2.1379201;
     private static final double H = 0.836281;

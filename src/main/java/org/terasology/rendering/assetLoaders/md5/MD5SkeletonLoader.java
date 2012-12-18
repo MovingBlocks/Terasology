@@ -58,7 +58,7 @@ public class MD5SkeletonLoader implements AssetLoader<SkeletalMesh> {
     private Pattern weightPattern = Pattern.compile("weight\\s+" + INTEGER_PATTERN + "\\s+" + INTEGER_PATTERN + "\\s+" + FLOAT_PATTERN + "\\s+" + VECTOR3_PATTERN);
 
     @Override
-    public SkeletalMesh load(InputStream stream, AssetUri uri, List<URL> urls) throws IOException {
+    public SkeletalMesh load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
         try {
             MD5 md5 = parse(stream);
             SkeletalMesh skeleton = new SkeletalMesh(uri);

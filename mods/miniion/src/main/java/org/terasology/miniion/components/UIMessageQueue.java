@@ -23,7 +23,7 @@ import java.util.Queue;
 import javax.vecmath.Vector2f;
 
 import org.lwjgl.opengl.Display;
-import org.terasology.asset.AssetManager;
+import org.terasology.asset.Assets;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.miniion.minionenum.MinionMessagePriority;
 import org.terasology.miniion.utilities.MinionMessage;
@@ -75,7 +75,7 @@ public class UIMessageQueue extends UIDisplayContainer implements EventHandlerSy
     }
 
     private UIImage getMessageIcon(MinionMessagePriority minionMessagePriority, int counter) {
-        UIImage _messageTexture = new UIImage(AssetManager.loadTexture("engine:items"));
+        UIImage _messageTexture = new UIImage(Assets.getTexture("engine:items"));
         _messageTexture.getTextureSize().set(new Vector2f(16f / 256f, 16f / 256f));
         float originStart = 0;
         switch (minionMessagePriority) {

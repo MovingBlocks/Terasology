@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.gui.windows;
 
-import org.terasology.asset.AssetManager;
+import org.terasology.asset.Assets;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -69,7 +69,7 @@ public class UIMenuConfigVideo extends UIWindow {
         setModal(true);
         maximize();
         
-        title = new UIImage(AssetManager.loadTexture("engine:terasology"));
+        title = new UIImage(Assets.getTexture("engine:terasology"));
         title.setHorizontalAlign(EHorizontalAlign.CENTER);
         title.setPosition(new Vector2f(0f, 128f));
         title.setVisible(true);
@@ -128,7 +128,7 @@ public class UIMenuConfigVideo extends UIWindow {
         viewingDistanceButton.setPosition(new Vector2f(-viewingDistanceButton.getSize().x / 2f - 10f, 300f + 40f));
         viewingDistanceButton.setVisible(true);
 
-        fovButton = new UISlider(new Vector2f(256f, 32f), 75, 120);
+        fovButton = new UISlider(new Vector2f(256f, 32f), 75, 130);
         fovButton.addChangedListener(new ChangedListener() {
             @Override
             public void changed(UIDisplayElement element) {

@@ -110,9 +110,10 @@ public class ShaderManager {
         if (activateMaterial != null && !activateMaterial.isDisposed()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + slot);
             // TODO: Need to be cubemap aware, only need to clear bind when switching from cubemap to 2D and vice versa,
-            // don't bind if already bound to the same
+            // TODO: Don't bind if already bound to the same
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getId());
+            GL13.glActiveTexture(GL13.GL_TEXTURE0);
         }
     }
 

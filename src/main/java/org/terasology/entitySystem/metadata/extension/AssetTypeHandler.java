@@ -19,9 +19,9 @@ package org.terasology.entitySystem.metadata.extension;
 import java.util.List;
 
 import org.terasology.asset.Asset;
-import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
 import org.terasology.entitySystem.metadata.TypeHandler;
 import org.terasology.protobuf.EntityData;
 
@@ -52,7 +52,7 @@ public class AssetTypeHandler<T extends Asset> implements TypeHandler<T> {
         if (value.getStringCount() > 0) {
             AssetUri uri = new AssetUri(type, value.getString(0));
             if (uri.isValid()) {
-                Asset asset = AssetManager.load(uri);
+                Asset asset = Assets.get(uri);
                 if (asset != null && assetClass.isAssignableFrom(asset.getClass())) {
                     return assetClass.cast(asset);
                 }
@@ -81,7 +81,7 @@ public class AssetTypeHandler<T extends Asset> implements TypeHandler<T> {
         for (String item : value.getStringList()) {
             AssetUri uri = new AssetUri(type, item);
             if (uri.isValid()) {
-                Asset asset = AssetManager.load(uri);
+                Asset asset = Assets.get(uri);
                 if (asset != null && assetClass.isAssignableFrom(asset.getClass())) {
                     result.add(assetClass.cast(asset));
                 }

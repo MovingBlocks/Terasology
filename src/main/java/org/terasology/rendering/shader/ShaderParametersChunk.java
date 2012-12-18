@@ -19,7 +19,7 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
-import org.terasology.asset.AssetManager;
+import org.terasology.asset.Assets;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.PostProcessingRenderer;
@@ -34,12 +34,12 @@ import org.terasology.world.block.management.BlockManager;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class ShaderParametersChunk implements IShaderParameters {
-    private Texture lava = AssetManager.loadTexture("engine:custom_lava_still");
-    private Texture water = AssetManager.loadTexture("engine:water_normal");
-    private Texture effects = AssetManager.loadTexture("engine:effects");
+    private Texture lava = Assets.getTexture("engine:custom_lava_still");
+    private Texture water = Assets.getTexture("engine:water_normal");
+    private Texture effects = Assets.getTexture("engine:effects");
 
     public void applyParameters(ShaderProgram program) {
-        Texture terrain = AssetManager.loadTexture("engine:terrain");
+        Texture terrain = Assets.getTexture("engine:terrain");
         if (terrain == null) {
             return;
         }

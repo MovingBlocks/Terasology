@@ -16,7 +16,7 @@
 package org.terasology.rendering.gui.windows;
 
 import org.lwjgl.input.Keyboard;
-import org.terasology.asset.AssetManager;
+import org.terasology.asset.Assets;
 import org.terasology.logic.manager.Config;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
@@ -51,7 +51,7 @@ public class UIMenuConfigAudio extends UIWindow {
         setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
         maximize();
 
-        _title = new UIImage(AssetManager.loadTexture("engine:terasology"));
+        _title = new UIImage(Assets.getTexture("engine:terasology"));
         _title.setHorizontalAlign(EHorizontalAlign.CENTER);
         _title.setPosition(new Vector2f(0f, 128f));
         _title.setVisible(true);

@@ -21,9 +21,9 @@ import javax.vecmath.Vector2f;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -113,7 +113,7 @@ public class UISlider extends UIDisplayContainer {
             }
         });
         
-        slider = new UIImage(AssetManager.loadTexture("engine:gui_menu"));
+        slider = new UIImage(Assets.getTexture("engine:gui_menu"));
         slider.setVisible(true);
         slider.setPosition(new Vector2f(0, 0));
         slider.setTextureOrigin(new Vector2f(0f, 60f));

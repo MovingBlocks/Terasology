@@ -39,7 +39,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.util.glu.Sphere;
-import org.terasology.asset.AssetManager;
+import org.terasology.asset.Assets;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.shader.ShaderProgram;
@@ -89,7 +89,7 @@ public class Skysphere {
 
         for (int i = 0; i < 6; i++) {
 
-            ByteBuffer data = AssetManager.loadTexture("engine:"+ name + (i + 1)).getImageData(0);
+            ByteBuffer data = Assets.getTexture("engine:" + name + (i + 1)).getImageData(0);
 
             GL11.glTexImage2D(GL13.GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, size, size,
                     0, format, GL11.GL_UNSIGNED_BYTE, data);
