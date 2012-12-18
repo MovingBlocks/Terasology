@@ -22,6 +22,7 @@ import java.util.Arrays;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
+@Deprecated
 public class TeraArray {
 
     private final byte _array[];
