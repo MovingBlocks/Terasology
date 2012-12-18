@@ -27,11 +27,11 @@ public final class TeraDenseArray4Bit extends TeraDenseArrayByte {
     }
 
     public TeraDenseArray4Bit(int sizeX, int sizeY, int sizeZ) {
-        super(sizeX, sizeY, sizeZ, 4);
+        super(sizeX, sizeY, sizeZ);
     }
 
     public TeraDenseArray4Bit(int sizeX, int sizeY, int sizeZ, byte[] data) {
-        super(sizeX, sizeY, sizeZ, sizeZ, data);
+        super(sizeX, sizeY, sizeZ, data);
     }
 
     @Override

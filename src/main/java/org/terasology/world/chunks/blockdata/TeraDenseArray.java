@@ -14,8 +14,8 @@ public abstract class TeraDenseArray extends TeraArray {
         super();
     }
 
-    public TeraDenseArray(int sizeX, int sizeY, int sizeZ, int sizeOfElementInBit) {
-        super(sizeX, sizeY, sizeZ, sizeOfElementInBit);
+    public TeraDenseArray(int sizeX, int sizeY, int sizeZ) {
+        super(sizeX, sizeY, sizeZ);
     }
 
     @Override

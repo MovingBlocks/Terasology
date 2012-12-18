@@ -29,20 +29,20 @@ public abstract class TeraSparseArrayByte extends TeraSparseArray {
         super();
     }
 
-    public TeraSparseArrayByte(int sizeX, int sizeY, int sizeZ, int sizeOfElementInBit) {
-        super(sizeX, sizeY, sizeZ, sizeOfElementInBit);
+    public TeraSparseArrayByte(int sizeX, int sizeY, int sizeZ) {
+        super(sizeX, sizeY, sizeZ);
     }
 
-    public TeraSparseArrayByte(int sizeX, int sizeY, int sizeZ, int sizeOfElementInBit, byte[][] inflated, byte[] deflated) {
-        super(sizeX, sizeY, sizeZ, sizeOfElementInBit);
+    public TeraSparseArrayByte(int sizeX, int sizeY, int sizeZ, byte[][] inflated, byte[] deflated) {
+        super(sizeX, sizeY, sizeZ);
         this.inflated = Preconditions.checkNotNull(inflated);
         this.deflated = Preconditions.checkNotNull(deflated);
         Preconditions.checkArgument(inflated.length == sizeY);
         Preconditions.checkArgument(deflated.length == sizeY);
     }
     
-    public TeraSparseArrayByte(int sizeX, int sizeY, int sizeZ, int sizeOfElementInBit, byte fill) {
-        super(sizeX, sizeY, sizeZ, sizeOfElementInBit);
+    public TeraSparseArrayByte(int sizeX, int sizeY, int sizeZ, byte fill) {
+        super(sizeX, sizeY, sizeZ);
         this.fill = fill;
     }
 

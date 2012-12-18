@@ -40,14 +40,14 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
     }
 
     public TeraSparseArray8Bit(int sizeX, int sizeY, int sizeZ) {
-        super(sizeX, sizeY, sizeZ, 8);
+        super(sizeX, sizeY, sizeZ);
     }
 
     public TeraSparseArray8Bit(int sizeX, int sizeY, int sizeZ, byte[][] inflated, byte[] deflated) {
-        super(sizeX, sizeY, sizeZ, 8, inflated, deflated);
+        super(sizeX, sizeY, sizeZ, inflated, deflated);
     }
 
     public TeraSparseArray8Bit(int sizeX, int sizeY, int sizeZ, byte fill) {
-        super(sizeX, sizeY, sizeZ, 8, fill);
+        super(sizeX, sizeY, sizeZ, fill);
     }
 }

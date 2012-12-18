@@ -6,8 +6,8 @@ public abstract class TeraSparseArray extends TeraArray {
         super();
     }
 
-    public TeraSparseArray(int sizeX, int sizeY, int sizeZ, int sizeOfElementInBit) {
-        super(sizeX, sizeY, sizeZ, sizeOfElementInBit);
+    public TeraSparseArray(int sizeX, int sizeY, int sizeZ) {
+        super(sizeX, sizeY, sizeZ);
     }
 
     @Override

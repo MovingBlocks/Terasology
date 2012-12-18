@@ -10,20 +10,18 @@ import com.google.common.base.Preconditions;
 
 public abstract class TeraArray implements Externalizable {
 
-    private int sizeX, sizeY, sizeZ, sizeOfElementInBit, sizeXZ, sizeXZHalf, sizeXYZ, sizeXYZHalf;
+    private int sizeX, sizeY, sizeZ, sizeXZ, sizeXZHalf, sizeXYZ, sizeXYZHalf;
 
     protected final void writeExternalHeader(ObjectOutput out) throws IOException {
         out.writeInt(sizeX);
         out.writeInt(sizeY);
         out.writeInt(sizeZ); 
-        out.writeInt(sizeOfElementInBit);
     }
 
     protected final void readExternalHeader(ObjectInput in) throws IOException {
         sizeX = in.readInt();
         sizeY = in.readInt();
         sizeZ = in.readInt();
-        sizeOfElementInBit = in.readInt();
         sizeXZ = sizeX * sizeZ;
         sizeXZHalf = sizeXZ / 2;
         sizeXYZ = sizeY * sizeXZ;
@@ -32,15 +30,13 @@ public abstract class TeraArray implements Externalizable {
 
     public TeraArray() {}
 
-    public TeraArray(int sizeX, int sizeY, int sizeZ, int sizeOfElementInBit) {
+    public TeraArray(int sizeX, int sizeY, int sizeZ) {
         Preconditions.checkArgument(sizeX > 0);
         Preconditions.checkArgument(sizeY > 0);
         Preconditions.checkArgument(sizeZ > 0);
-        Preconditions.checkArgument(sizeOfElementInBit > 0 && sizeOfElementInBit <= 32);
         this.sizeX = sizeX;
         this.sizeY = sizeY;
         this.sizeZ = sizeZ;
-        this.sizeOfElementInBit = sizeOfElementInBit;
         sizeXZ = sizeX * sizeZ;
         sizeXZHalf = sizeXZ / 2;
         sizeXYZ = sizeY * sizeXZ;
@@ -59,10 +55,6 @@ public abstract class TeraArray implements Externalizable {
 
     public final int getSizeZ() {
         return sizeZ;
-    }
-
-    public final int getSizeOfElementInBit() {
-        return sizeOfElementInBit;
     }
 
     public final int getSizeXZ() {

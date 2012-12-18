@@ -26,13 +26,13 @@ public abstract class TeraDenseArrayByte extends TeraDenseArray {
         super();
     }
 
-    public TeraDenseArrayByte(int sizeX, int sizeY, int sizeZ, int sizeOfElementInBit) {
-        super(sizeX, sizeY, sizeZ, sizeOfElementInBit);
+    public TeraDenseArrayByte(int sizeX, int sizeY, int sizeZ) {
+        super(sizeX, sizeY, sizeZ);
         this.data = new byte[dataSize()];
     }
     
-    public TeraDenseArrayByte(int sizeX, int sizeY, int sizeZ, int sizeOfElementInBit, byte[] data) {
-        super(sizeX, sizeY, sizeZ, sizeOfElementInBit);
+    public TeraDenseArrayByte(int sizeX, int sizeY, int sizeZ, byte[] data) {
+        super(sizeX, sizeY, sizeZ);
         this.data = Preconditions.checkNotNull(data);
         Preconditions.checkArgument(data.length == dataSize(), "The length of the parameter 'data' has to be " + dataSize() + " (" + data.length + ")");
     }

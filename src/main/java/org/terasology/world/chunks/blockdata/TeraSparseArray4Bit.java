@@ -58,15 +58,15 @@ public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
     }
 
     public TeraSparseArray4Bit(int sizeX, int sizeY, int sizeZ) {
-        super(sizeX, sizeY, sizeZ, 4);
+        super(sizeX, sizeY, sizeZ);
     }
 
     public TeraSparseArray4Bit(int sizeX, int sizeY, int sizeZ, byte[][] inflated, byte[] deflated) {
-        super(sizeX, sizeY, sizeZ, 4, inflated, deflated);
+        super(sizeX, sizeY, sizeZ, inflated, deflated);
     }
 
     public TeraSparseArray4Bit(int sizeX, int sizeY, int sizeZ, byte fill) {
-        super(sizeX, sizeY, sizeZ, 4, fill);
+        super(sizeX, sizeY, sizeZ, fill);
         Preconditions.checkArgument(fill >= 0 && fill <= 15, "Parameter 'fill' has to be in the range 0 - 15 (" + fill + ")");
     }
 }
