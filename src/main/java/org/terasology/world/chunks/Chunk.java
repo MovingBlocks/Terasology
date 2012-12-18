@@ -34,6 +34,7 @@ import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.blockdata.TeraArray;
+import org.terasology.world.chunks.blockdata.TeraDenseArray4Bit;
 import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
 import org.terasology.world.liquid.LiquidData;
 
@@ -99,9 +100,9 @@ public class Chunk implements Externalizable {
 
     public Chunk() {
         blocks = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        sunlight = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        light = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        liquid = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        sunlight = new TeraDenseArray4Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        light = new TeraDenseArray4Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        liquid = new TeraDenseArray4Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         setDirty(true);
     }
 
@@ -345,18 +346,26 @@ public class Chunk implements Externalizable {
             int sunlightSize = sunlight.getEstimatedMemoryConsumptionInBytes();
             int lightSize = light.getEstimatedMemoryConsumptionInBytes();
             int liquidSize = liquid.getEstimatedMemoryConsumptionInBytes();
+            int totalSize = blocksSize + sunlightSize + lightSize + liquidSize;
             
             blocks = blocks.deflate();
             sunlight = sunlight.deflate();
             light = light.deflate();
             liquid = liquid.deflate();
             
-            double blocksPercent = 100d - (100d / blocksSize * blocks.getEstimatedMemoryConsumptionInBytes());
-            double sunlightPercent = 100d - (100d / sunlightSize * sunlight.getEstimatedMemoryConsumptionInBytes());
-            double lightPercent = 100d - (100d / lightSize * light.getEstimatedMemoryConsumptionInBytes());
-            double liquidPercent = 100d - (100d / liquidSize * liquid.getEstimatedMemoryConsumptionInBytes());
-
-            logger.info(String.format("chunk (%d, %d, %d) was deflated: blocks-deflated-by=%s%%, sunlight-deflated-by=%s%%, light-deflated-by=%s%%, liquid-deflated-by=%s%%", pos.x, pos.y, pos.z, fpercent.format(blocksPercent), fpercent.format(sunlightPercent), fpercent.format(lightPercent), fpercent.format(liquidPercent)));
+            int blocksReduced = blocks.getEstimatedMemoryConsumptionInBytes();
+            int sunlightReduced = sunlight.getEstimatedMemoryConsumptionInBytes();
+            int lightReduced = light.getEstimatedMemoryConsumptionInBytes();
+            int liquidReduced = liquid.getEstimatedMemoryConsumptionInBytes();
+            int totalReduced = blocksReduced + sunlightReduced + lightReduced + liquidReduced;
+            
+            double blocksPercent = 100d - (100d / blocksSize * blocksReduced);
+            double sunlightPercent = 100d - (100d / sunlightSize * sunlightReduced);
+            double lightPercent = 100d - (100d / lightSize * lightReduced);
+            double liquidPercent = 100d - (100d / liquidSize * liquidReduced);
+            double totalPercent = 100d - (100d / totalSize * totalReduced);
+            
+            logger.info(String.format("chunk (%d, %d, %d): total-deflated-by: %s%%, blocks-deflated-by=%s%%, sunlight-deflated-by=%s%%, light-deflated-by=%s%%, liquid-deflated-by=%s%%", pos.x, pos.y, pos.z, fpercent.format(totalPercent), fpercent.format(blocksPercent), fpercent.format(sunlightPercent), fpercent.format(lightPercent), fpercent.format(liquidPercent)));
         } finally {
             unlock();
         }

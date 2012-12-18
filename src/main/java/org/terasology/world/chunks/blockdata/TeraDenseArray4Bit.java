@@ -1,107 +1,88 @@
 package org.terasology.world.chunks.blockdata;
 
-import java.io.IOException;
-import java.io.ObjectInput;
-
-import com.google.common.base.Preconditions;
-
-
-public class TeraDenseArray4Bit extends TeraDenseArrayByte {
-
-    protected int sizeXYZHalf;
+public final class TeraDenseArray4Bit extends TeraDenseArrayByte {
 
     @Override
-    protected void readExternalHeader(ObjectInput in) throws IOException {
-        super.readExternalHeader(in);
-        sizeXYZHalf = sizeXYZ / 2;
+    protected final TeraArray createSparse(byte fill) {
+        return new TeraSparseArray4Bit(getSizeX(), getSizeY(), getSizeZ(), fill);
+    }
+
+    @Override
+    protected final TeraArray createSparse(byte[][] inflated, byte[] deflated) {
+        return new TeraSparseArray4Bit(getSizeX(), getSizeY(), getSizeZ(), inflated, deflated);
+    }
+
+    @Override
+    protected final TeraArray createDense(byte[] data) {
+        return new TeraDenseArray4Bit(getSizeX(), getSizeY(), getSizeZ(), data);
+    }
+
+    @Override
+    protected final int rowSize() {
+        return getSizeXZHalf();
     }
 
     public TeraDenseArray4Bit() {
-        data = new byte[0];
+        super();
     }
 
     public TeraDenseArray4Bit(int sizeX, int sizeY, int sizeZ) {
         super(sizeX, sizeY, sizeZ, 4);
-        Preconditions.checkArgument(sizeXYZ % 2 == 0, String.format("The total size has to be a multiple of 2 (%d)", sizeXYZ));
-        sizeXYZHalf = sizeXYZ / 2;
-        data = new byte[sizeXYZHalf];
+    }
+
+    public TeraDenseArray4Bit(int sizeX, int sizeY, int sizeZ, byte[] data) {
+        super(sizeX, sizeY, sizeZ, sizeZ, data);
     }
 
     @Override
-    public TeraArray deflate() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public TeraArray inflate() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public TeraArray copy() {
-        TeraDenseArrayByte result = new TeraDenseArray4Bit(sizeX, sizeY, sizeZ);
-        System.arraycopy(data, 0, result.data, 0, data.length);
-        return result;
-    }
-
-    @Override
-    public int getEstimatedMemoryConsumptionInBytes() {
-        return data.length;
-    }
-
-    @Override
-    public int get(int x, int y, int z) {
+    public final int get(int x, int y, int z) {
         if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
-        int pos = pos(x, y, z);
-        if (pos < sizeXYZHalf) {
-            int raw = data[pos] & 0xFF;
-            return (byte) ((raw & 0x0F) & 0xFF);
+        int row = y * getSizeXZHalf(), pos = pos(x, z);
+        if (pos < getSizeXZHalf()) {
+            return TeraArrays.getHi(data[row + pos]);
         }
-        int raw = data[pos - sizeXYZHalf] & 0xFF;
-        return (byte) (raw >> 4);
+        pos = pos - getSizeXZHalf();
+        return TeraArrays.getLo(data[row + pos]);
     }
 
     @Override
-    public int set(int x, int y, int z, int value) {
+    public final int set(int x, int y, int z, int value) {
         if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
         if (value < 0 || value > 15) throw new IllegalArgumentException("Parameter 'value' has to be in the range 0 - 15 (" + value + ")");
-        int pos = pos(x, y, z);
-        if (pos < sizeXYZHalf) {
-            int raw = data[pos] & 0xFF;
-            int tmp = value & 0xFF;
-            byte old = (byte) ((raw & 0x0F) & 0xFF);
-            data[pos] = (byte) ((tmp & 0x0F) | (raw & 0xF0));
+        int row = y * getSizeXZHalf(), pos = pos(x, z);
+        if (pos < getSizeXZHalf()) {
+            byte raw = data[row + pos];
+            byte old = TeraArrays.getHi(raw);
+            data[row + pos] = TeraArrays.setHi(raw, value);
             return old;
         }
-        pos = pos - sizeXYZHalf;
-        int raw = data[pos] & 0xFF;
-        int tmp = value & 0xFF;
-        byte old = (byte) (raw >> 4);
-        data[pos] = (byte) ((raw & 0x0F) | (tmp << 4) & 0xFF);
+        pos = pos - getSizeXZHalf();
+        byte raw = data[row + pos];
+        byte old = TeraArrays.getLo(raw);
+        data[row + pos] = TeraArrays.setLo(raw, value);
         return old;
     }
 
     @Override
-    public boolean set(int x, int y, int z, int value, int expected) {
+    public final boolean set(int x, int y, int z, int value, int expected) {
         if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
         if (value < 0 || value > 15) throw new IllegalArgumentException("Parameter 'value' has to be in the range 0 - 15 (" + value + ")");
         if (expected < 0 || expected > 15) throw new IllegalArgumentException("Parameter 'expected' has to be in the range 0 - 15 (" + value + ")");
-        int pos = pos(x, y, z);
-        if (pos < sizeXYZHalf) {
-            int raw = data[pos] & 0xFF;
-            byte old = (byte) ((raw & 0x0F) & 0xFF);
+        int row = y * getSizeXZHalf(), pos = pos(x, z);
+        if (pos < getSizeXZHalf()) {
+            byte raw = data[row + pos];
+            byte old = TeraArrays.getHi(raw);
             if (old == expected) {
-                int tmp = value & 0xFF;
-                data[pos] = (byte) ((tmp & 0x0F) | (raw & 0xF0));
+                data[row + pos] = TeraArrays.setHi(raw, value);
                 return true;
             }
             return false;
         }
-        int raw = data[pos % sizeXYZHalf] & 0xFF;
-        byte old = (byte) (raw >> 4);
+        pos = pos - getSizeXZHalf();
+        byte raw = data[row + pos];
+        byte old = TeraArrays.getLo(raw);
         if (old == expected) {
-            int tmp = value & 0xFF;
-            data[pos % sizeXYZHalf] = (byte) ((raw & 0x0F) | (tmp << 4) & 0xFF);
+            data[row + pos] = TeraArrays.setLo(raw, value);
             return true;
         }
         return false;

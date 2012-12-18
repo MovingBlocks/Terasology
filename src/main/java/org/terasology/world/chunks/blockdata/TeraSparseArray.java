@@ -11,7 +11,7 @@ public abstract class TeraSparseArray extends TeraArray {
     }
 
     @Override
-    public boolean isSparse() {
+    public final boolean isSparse() {
         return true;
     }
 }

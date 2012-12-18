@@ -1,8 +1,39 @@
 package org.terasology.world.chunks.blockdata;
 
-import java.util.Arrays;
+public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
 
-public class TeraSparseArray8Bit extends TeraSparseArrayByte {
+    @Override
+    protected final TeraArray createSparse(byte fill) {
+        return new TeraSparseArray8Bit(getSizeX(), getSizeY(), getSizeZ(), fill);
+    }
+
+    @Override
+    protected final TeraArray createSparse(byte[][] inflated, byte[] deflated) {
+        return new TeraSparseArray8Bit(getSizeX(), getSizeY(), getSizeZ(), inflated, deflated);
+    }
+
+    @Override
+    protected final int rowSize() {
+        return getSizeXZ();
+    }
+
+    @Override
+    protected final int rowGet(int x, int z, byte value) {
+        return value;
+    }
+
+    @Override
+    protected final int rowGet(byte[] row, int x, int z) {
+        return row[z * getSizeX() + x];
+    }
+
+    @Override
+    protected final int rowSet(byte[] row, int x, int z, int value) {
+        int pos = z * getSizeX() + x;
+        int old = row[pos];
+        row[pos] = (byte) value;
+        return old;
+    }
 
     public TeraSparseArray8Bit() {
         super();
@@ -19,138 +50,4 @@ public class TeraSparseArray8Bit extends TeraSparseArrayByte {
     public TeraSparseArray8Bit(int sizeX, int sizeY, int sizeZ, byte fill) {
         super(sizeX, sizeY, sizeZ, 8, fill);
     }
-    
-    @Override
-    public TeraArray deflate() {
-        throw new UnsupportedOperationException();
-//        byte[][] inf = new byte[sizeY][];
-//        byte[] def = new byte[sizeY];
-//        int alreadyPacked = 0, newPacked = 0;
-//        System.arraycopy(deflated, 0, def, 0, sizeY);
-//        for (int y = 0; y < sizeY; y++) {
-//            byte[] values = inflated[y];
-//            if (values != null) {
-//                byte first = values[0];
-//                boolean packable = true;
-//                for (int i = 1; i < sizeXZ; i++) {
-//                    if (values[i] != first) {
-//                        packable = false;
-//                        break;
-//                    }
-//                }
-//                if (packable) {
-//                    def[y] = first;
-//                    ++newPacked;
-//                } else {
-//                    inf[y] = new byte[sizeY];
-//                    System.arraycopy(values, 0, inf[y], 0, sizeXZ);
-//                    def[y] = 0;
-//                }
-//            } else {
-//                ++alreadyPacked;
-//            }
-//        }
-//        if (newPacked > 0) 
-//            return new TeraSparseArray8Bit(sizeX, sizeY, sizeZ, inf, def);
-//        return this;
-        // TODO switch back to dense array if necessary
-    }
-    
-    @Override
-    public TeraArray inflate() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public TeraArray copy() {
-        if (inflated == null) 
-            return new TeraSparseArray8Bit(sizeX, sizeY, sizeZ, fill);
-        byte[][] inf = new byte[sizeY][];
-        byte[] def = new byte[sizeY];
-        for (int y = 0; y < sizeY; y++) {
-            if (inflated[y] != null) {
-                inf[y] = new byte[sizeXZ];
-                System.arraycopy(inflated[y], 0, inf[y], 0, sizeXZ);
-            }
-        }
-        System.arraycopy(deflated, 0, def, 0, sizeY);
-        return new TeraSparseArray8Bit(sizeX, sizeY, sizeZ, inf, def);
-    }
-
-    @Override
-    public int get(int x, int y, int z) {
-        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
-        if (inflated == null) 
-            return fill;
-        byte[] data = inflated[y];
-        if (data != null) 
-            return data[z * sizeX + x];
-        return deflated[y];
-    }
-
-    @Override
-    public int set(int x, int y, int z, int value) {
-        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
-        if (value < -128 || value > 127) throw new IllegalArgumentException("Parameter 'value' has to be in the range of -128 - 127 (" + value + ")");
-        if (inflated == null) {
-            if (value == fill)
-                return fill;
-            else {
-                this.inflated = new byte[sizeY][];
-                this.deflated = new byte[sizeY];
-                Arrays.fill(deflated, fill);
-            }
-        }
-        byte[] data = inflated[y];
-        int pos = z * sizeX + x;
-        if (data != null) {
-            int old = data[pos];
-            data[pos] = (byte) value;
-            return old;
-        }
-        byte old = deflated[y];
-        if (old == (byte) value) {
-            return value;
-        }
-        data = new byte[sizeXZ];
-        Arrays.fill(data, old);
-        data[pos] = (byte) value;
-        inflated[y] = data;
-        return old;
-    }
-
-    @Override
-    public boolean set(int x, int y, int z, int value, int expected) {
-        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
-        if (value < -128 || value > 127) throw new IllegalArgumentException("Parameter 'value' has to be in the range of -128 - 127 (" + value + ")");
-        if (expected < -128 || expected > 127) throw new IllegalArgumentException("Parameter 'expected' has to be in the range of -128 - 127 (" + value + ")");
-        if (value == expected) return true;
-        if (inflated == null) {
-            if (value == fill)
-                return value == expected;
-            else {
-                this.inflated = new byte[sizeY][];
-                this.deflated = new byte[sizeY];
-                Arrays.fill(deflated, fill);
-            }
-        }
-        byte[] data = inflated[y];
-        int pos = z * sizeX + x;
-        if (data != null) {
-            int old = data[pos];
-            if (old == expected)
-                data[pos] = (byte) value;
-            return old == expected;
-        }
-        byte old = deflated[y];
-        if (old == (byte) expected) {
-            data = new byte[sizeXZ];
-            Arrays.fill(data, old);
-            data[pos] = (byte) value;
-            inflated[y] = data;
-            return true;
-        }
-        return false;
-    }
-
 }

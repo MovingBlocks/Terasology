@@ -3,7 +3,11 @@ package org.terasology.world.chunks.blockdata;
 public abstract class TeraDenseArray extends TeraArray {
 
     protected final int pos(int x, int y, int z) {
-        return y * sizeXZ + z * sizeX + x;
+        return y * getSizeXZ() + z * getSizeX() + x;
+    }
+
+    protected final int pos(int x, int z) {
+        return z * getSizeX() + x;
     }
 
     public TeraDenseArray() {
@@ -15,7 +19,7 @@ public abstract class TeraDenseArray extends TeraArray {
     }
 
     @Override
-    public boolean isSparse() {
+    public final boolean isSparse() {
         return false;
     }
 

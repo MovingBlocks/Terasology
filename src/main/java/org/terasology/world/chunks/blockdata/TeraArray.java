@@ -10,22 +10,24 @@ import com.google.common.base.Preconditions;
 
 public abstract class TeraArray implements Externalizable {
 
-    protected int sizeX, sizeY, sizeZ, sizeOfElementInBit, sizeXZ, sizeXYZ;
+    private int sizeX, sizeY, sizeZ, sizeOfElementInBit, sizeXZ, sizeXZHalf, sizeXYZ, sizeXYZHalf;
 
-    protected void writeExternalHeader(ObjectOutput out) throws IOException {
+    protected final void writeExternalHeader(ObjectOutput out) throws IOException {
         out.writeInt(sizeX);
         out.writeInt(sizeY);
         out.writeInt(sizeZ); 
         out.writeInt(sizeOfElementInBit);
     }
 
-    protected void readExternalHeader(ObjectInput in) throws IOException {
+    protected final void readExternalHeader(ObjectInput in) throws IOException {
         sizeX = in.readInt();
         sizeY = in.readInt();
         sizeZ = in.readInt();
         sizeOfElementInBit = in.readInt();
         sizeXZ = sizeX * sizeZ;
+        sizeXZHalf = sizeXZ / 2;
         sizeXYZ = sizeY * sizeXZ;
+        sizeXYZHalf = sizeXYZ / 2;
     }
 
     public TeraArray() {}
@@ -39,8 +41,12 @@ public abstract class TeraArray implements Externalizable {
         this.sizeY = sizeY;
         this.sizeZ = sizeZ;
         this.sizeOfElementInBit = sizeOfElementInBit;
-        this.sizeXZ = sizeX * sizeZ;
-        this.sizeXYZ = sizeY * sizeXZ;
+        sizeXZ = sizeX * sizeZ;
+        sizeXZHalf = sizeXZ / 2;
+        sizeXYZ = sizeY * sizeXZ;
+        sizeXYZHalf = sizeXYZ / 2;
+        Preconditions.checkArgument(getSizeXYZ() % 2 == 0, "The product of the parameters 'sizeX', 'sizeY' and 'sizeZ' has to be a multiple of 2 (" + getSizeXYZ() + ")");
+        Preconditions.checkArgument(getSizeXZ() % 2 == 0, "The product of the parameters 'sizeX' and 'sizeZ' has to be a multiple of 2 (" + getSizeXZ() + ")");
     }
 
     public final int getSizeX() {
@@ -62,9 +68,17 @@ public abstract class TeraArray implements Externalizable {
     public final int getSizeXZ() {
         return sizeXZ;
     }
+    
+    public final int getSizeXZHalf() {
+        return sizeXZHalf;
+    }
 
     public final int getSizeXYZ() {
         return sizeXYZ;
+    }
+    
+    public final int getSizeXYZHalf() {
+        return sizeXYZHalf;
     }
 
     public final boolean contains(int x, int y, int z) {
