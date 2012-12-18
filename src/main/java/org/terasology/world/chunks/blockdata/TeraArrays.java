@@ -1,5 +1,12 @@
 package org.terasology.world.chunks.blockdata;
 
+
+/**
+ * TeraArrays is a utility class. Its methods are used in the implementation of specialized TeraArray's.
+ * 
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
+ *
+ */
 public final class TeraArrays {
 
     private TeraArrays() {}

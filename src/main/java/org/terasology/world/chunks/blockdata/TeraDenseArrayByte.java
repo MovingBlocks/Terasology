@@ -6,6 +6,13 @@ import java.io.ObjectOutput;
 
 import com.google.common.base.Preconditions;
 
+
+/**
+ * TeraDenseArrayByte is the base class used to implement dense arrays with elements of size 4 bit or 8 bit.
+ * 
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
+ *
+ */
 public abstract class TeraDenseArrayByte extends TeraDenseArray {
 
     protected byte[] data; 

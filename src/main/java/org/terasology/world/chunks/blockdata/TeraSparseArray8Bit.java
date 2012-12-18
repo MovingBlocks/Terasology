@@ -1,5 +1,14 @@
 package org.terasology.world.chunks.blockdata;
 
+
+/**
+ * TeraSparseArray8Bit implements a sparse array with elements of 8 bit size.
+ * Its elements are in the range -128 through +127 and it stores one element per byte.
+ * It can reduce memory consumption through sparse memory allocation.
+ * 
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
+ *
+ */
 public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
 
     @Override

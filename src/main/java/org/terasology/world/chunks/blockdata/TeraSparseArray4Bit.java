@@ -2,6 +2,15 @@ package org.terasology.world.chunks.blockdata;
 
 import com.google.common.base.Preconditions;
 
+
+/**
+ * TeraSparseArray4Bit implements a sparse array with elements of 4 bit size.
+ * Its elements are in the range 0 - 15 and it increases memory efficiency by storing two elements per byte.
+ * It can further reduce memory consumption through sparse memory allocation.
+ * 
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
+ *
+ */
 public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
 
     @Override

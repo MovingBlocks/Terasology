@@ -1,5 +1,12 @@
 package org.terasology.world.chunks.blockdata;
 
+
+/**
+ * TeraDenseArray is the base class used to implement dense arrays.
+ * 
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
+ *
+ */
 public abstract class TeraDenseArray extends TeraArray {
 
     protected final int pos(int x, int y, int z) {
