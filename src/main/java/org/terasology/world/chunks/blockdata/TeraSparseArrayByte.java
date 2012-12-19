@@ -66,16 +66,6 @@ public abstract class TeraSparseArrayByte extends TeraSparseArray {
     }
 
     @Override
-    public final TeraArray deflate() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public final TeraArray inflate() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public final TeraArray copy() {
         if (inflated == null) 
             return createSparse(fill);

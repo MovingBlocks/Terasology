@@ -85,10 +85,6 @@ public abstract class TeraArray implements Externalizable {
 
     public abstract boolean isSparse();
 
-    public abstract TeraArray deflate();
-    
-    public abstract TeraArray inflate();
-
     public abstract TeraArray copy();
 
     public abstract int getEstimatedMemoryConsumptionInBytes();
