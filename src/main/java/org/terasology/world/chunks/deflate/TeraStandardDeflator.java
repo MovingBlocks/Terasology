@@ -106,48 +106,4 @@ public class TeraStandardDeflator extends TeraAdvancedDeflator {
     public TeraArray deflateDefault(TeraArray in) {
         return null;
     }
-
-
-//    @Override
-//    public final TeraArray deflate() {
-//        final int rowsize = rowSize();
-//        final byte[][] inflated = new byte[getSizeY()][];
-//        final byte[] deflated = new byte[getSizeY()];
-//        int packed = 0;
-//        for (int y = 0; y < getSizeY(); y++) {
-//            final int start = y * rowsize;
-//            final byte first = data[start];
-//            boolean packable = true;
-//            for (int i = 1; i < rowsize; i++) {
-//                if (data[start + i] != first) {
-//                    packable = false;
-//                    break;
-//                }
-//            }
-//            if (packable) {
-//                deflated[y] = first;
-//                ++packed;
-//            } else {
-//                byte[] tmp = new byte[rowsize];
-//                System.arraycopy(data, start, tmp, 0, rowsize);
-//                inflated[y] = tmp;
-//            }
-//        }
-//        if (packed == getSizeY()) {
-//            final byte first = deflated[0];
-//            boolean packable = true;
-//            for (int i = 1; i < getSizeY(); i++) {
-//                if (deflated[i] != first) {
-//                    packable = false;
-//                    break;
-//                }
-//            }
-//            if (packable)
-//                return createSparse(first);
-//        }
-//        if (packed >= 4) {
-//            return createSparse(inflated, deflated);
-//        }
-//        return this;
-//    }
 }
