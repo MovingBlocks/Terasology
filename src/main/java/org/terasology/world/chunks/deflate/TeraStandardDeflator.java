@@ -6,6 +6,30 @@ import org.terasology.world.chunks.blockdata.TeraSparseArray8Bit;
 
 public class TeraStandardDeflator extends TeraAdvancedDeflator {
     
+    /*
+     *  8-bit variant
+     *  =============
+     *  
+     *  dense chunk  : 4 + 12 + 65536                                                   = 65552
+     *  sparse chunk : (4 + 12 + 256) + (4 + 12 + (256 × 4)) + ((12 + 256) × 256)       = 69920
+     *  difference   : 69920 - 65552                                                    =  4368
+     *  min. deflate : 4368 / (12 + 256)                                                =    16.3
+     *  
+     *  
+     *  4-bit variant
+     *  =============
+     *  
+     *  dense chunk  : 4 + 12 + (65536 / 2)                                             = 32784
+     *  sparse chunk : (4 + 12 + 256) + (4 + 12 + (256 × 4)) + ((12 + (256 / 2)) × 256) = 37152
+     *  difference   : 37152 - 32784                                                    =  4368
+     *  min. deflate : 4368 / (12 + (256 / 2))                                          =    31.2
+     *  
+     */
+
+    // TODO dynamically calculate DEFLATE_MINIMUM_8BIT and DEFLATE_MINIMUM_4BIT, they only work for chunks with dimension 16x256x16
+    protected final static int DEFLATE_MINIMUM_8BIT = 16;
+    protected final static int DEFLATE_MINIMUM_4BIT = 31;
+    
     public TeraStandardDeflator() {}
 
     @Override
@@ -44,7 +68,7 @@ public class TeraStandardDeflator extends TeraAdvancedDeflator {
           if (packable)
               return new TeraSparseArray8Bit(sizeX, sizeY, sizeZ, first);
       }
-      if (packed >= 4) {
+      if (packed > DEFLATE_MINIMUM_8BIT) {
           return new TeraSparseArray8Bit(sizeX, sizeY, sizeZ, inflated, deflated);
       }
       return null;
@@ -86,7 +110,7 @@ public class TeraStandardDeflator extends TeraAdvancedDeflator {
             if (packable)
                 return new TeraSparseArray4Bit(sizeX, sizeY, sizeZ, first);
         }
-        if (packed >= 4) {
+        if (packed > DEFLATE_MINIMUM_4BIT) {
             return new TeraSparseArray4Bit(sizeX, sizeY, sizeZ, inflated, deflated);
         }
         return null;
@@ -102,8 +126,4 @@ public class TeraStandardDeflator extends TeraAdvancedDeflator {
         return null;
     }
 
-    @Override
-    public TeraArray deflateDefault(TeraArray in) {
-        return null;
-    }
 }

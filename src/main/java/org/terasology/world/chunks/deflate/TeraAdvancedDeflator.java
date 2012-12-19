@@ -9,7 +9,7 @@ public abstract class TeraAdvancedDeflator extends TeraDeflator {
     public TeraAdvancedDeflator() {}
 
     @Override
-    public final TeraArray deflate(TeraArray in) {
+    public final TeraArray deflate(final TeraArray in) {
         TeraArray result = Preconditions.checkNotNull(in).deflate(this);
         if (result != null)
             return result;
@@ -23,6 +23,5 @@ public abstract class TeraAdvancedDeflator extends TeraDeflator {
     public abstract TeraArray deflateSparseArray8Bit(final byte[][] inflated, final byte[] deflated, final byte fill, final int rowSize, final int sizeX, final int sizeY, final int sizeZ);
     
     public abstract TeraArray deflateSparseArray4Bit(final byte[][] inflated, final byte[] deflated, final byte fill, final int rowSize, final int sizeX, final int sizeY, final int sizeZ);
-    
-    public abstract TeraArray deflateDefault(final TeraArray in);
+
 }
