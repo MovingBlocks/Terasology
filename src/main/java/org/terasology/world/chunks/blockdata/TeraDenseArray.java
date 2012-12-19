@@ -37,6 +37,7 @@ public abstract class TeraDenseArray extends TeraArray {
         Preconditions.checkArgument(getSizeX() == in.getSizeX(), "Tera arrays have to be of equal size (this.getSizeX() = " + getSizeX() + ", in.getSizeX() = " + in.getSizeX() + ")");
         Preconditions.checkArgument(getSizeY() == in.getSizeY(), "Tera arrays have to be of equal size (this.getSizeY() = " + getSizeY() + ", in.getSizeY() = " + in.getSizeY() + ")");
         Preconditions.checkArgument(getSizeZ() == in.getSizeZ(), "Tera arrays have to be of equal size (this.getSizeZ() = " + getSizeZ() + ", in.getSizeZ() = " + in.getSizeZ() + ")");
+        Preconditions.checkArgument(getElementSizeInBits() >= in.getElementSizeInBits(), "Tera arrays are incompatible (this.getElementSizeInBits() = " + getElementSizeInBits() + ", in.getElementSizeInBits() = " + in.getElementSizeInBits() + ")");
         for (int y = 0; y < getSizeY(); y++) {
             for (int x = 0; x < getSizeX(); x++) {
                 for (int z = 0; z < getSizeZ(); z++) {

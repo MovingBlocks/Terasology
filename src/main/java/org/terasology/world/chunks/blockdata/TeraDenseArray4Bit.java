@@ -45,6 +45,11 @@ public final class TeraDenseArray4Bit extends TeraDenseArrayByte {
     public TeraDenseArray4Bit(TeraArray in) {
         super(in);
     }
+
+    @Override
+    public int getElementSizeInBits() {
+        return 4;
+    }
     
     @Override
     public final int get(int x, int y, int z) {

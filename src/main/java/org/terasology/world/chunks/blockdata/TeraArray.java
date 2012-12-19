@@ -88,6 +88,8 @@ public abstract class TeraArray implements Externalizable {
     public abstract TeraArray copy();
 
     public abstract int getEstimatedMemoryConsumptionInBytes();
+    
+    public abstract int getElementSizeInBits();
 
     public abstract int get(int x, int y, int z);
 

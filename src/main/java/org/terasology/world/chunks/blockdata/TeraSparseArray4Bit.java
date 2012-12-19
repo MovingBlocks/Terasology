@@ -78,4 +78,9 @@ public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
         super(sizeX, sizeY, sizeZ, fill);
         Preconditions.checkArgument(fill >= 0 && fill <= 15, "Parameter 'fill' has to be in the range 0 - 15 (" + fill + ")");
     }
+
+    @Override
+    public int getElementSizeInBits() {
+        return 4;
+    }
 }

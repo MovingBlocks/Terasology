@@ -59,4 +59,9 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
     public TeraSparseArray8Bit(int sizeX, int sizeY, int sizeZ, byte fill) {
         super(sizeX, sizeY, sizeZ, fill);
     }
+
+    @Override
+    public int getElementSizeInBits() {
+        return 8;
+    }
 }

@@ -47,6 +47,11 @@ public final class TeraDenseArray8Bit extends TeraDenseArrayByte {
     }
 
     @Override
+    public int getElementSizeInBits() {
+        return 8;
+    }
+
+    @Override
     public final int get(int x, int y, int z) {
         if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
         int pos = pos(x, y, z);
