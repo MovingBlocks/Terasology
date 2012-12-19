@@ -1,5 +1,7 @@
 package org.terasology.world.chunks.blockdata;
 
+import org.terasology.world.chunks.deflate.TeraAdvancedDeflator;
+
 import com.google.common.base.Preconditions;
 
 
@@ -77,6 +79,11 @@ public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
     public TeraSparseArray4Bit(int sizeX, int sizeY, int sizeZ, byte fill) {
         super(sizeX, sizeY, sizeZ, fill);
         Preconditions.checkArgument(fill >= 0 && fill <= 15, "Parameter 'fill' has to be in the range 0 - 15 (" + fill + ")");
+    }
+
+    @Override
+    public TeraArray deflate(TeraAdvancedDeflator deflator) {
+        return Preconditions.checkNotNull(deflator).deflateSparseArray4Bit(inflated, deflated, fill, rowSize(), getSizeX(), getSizeY(), getSizeZ());
     }
 
     @Override

@@ -1,5 +1,9 @@
 package org.terasology.world.chunks.blockdata;
 
+import org.terasology.world.chunks.deflate.TeraAdvancedDeflator;
+
+import com.google.common.base.Preconditions;
+
 
 /**
  * TeraSparseArray8Bit implements a sparse array with elements of 8 bit size.
@@ -58,6 +62,11 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
 
     public TeraSparseArray8Bit(int sizeX, int sizeY, int sizeZ, byte fill) {
         super(sizeX, sizeY, sizeZ, fill);
+    }
+
+    @Override
+    public TeraArray deflate(TeraAdvancedDeflator deflator) {
+        return Preconditions.checkNotNull(deflator).deflateSparseArray8Bit(inflated, deflated, fill, rowSize(), getSizeX(), getSizeY(), getSizeZ());
     }
 
     @Override

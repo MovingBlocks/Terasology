@@ -1,5 +1,9 @@
 package org.terasology.world.chunks.blockdata;
 
+import org.terasology.world.chunks.deflate.TeraAdvancedDeflator;
+
+import com.google.common.base.Preconditions;
+
 
 /**
  * TeraDenseArray4Bit implements a dense array with elements of 4 bit size.
@@ -46,6 +50,11 @@ public final class TeraDenseArray4Bit extends TeraDenseArrayByte {
         super(in);
     }
 
+    @Override
+    public TeraArray deflate(TeraAdvancedDeflator deflator) {
+        return Preconditions.checkNotNull(deflator).deflateDenseArray4Bit(data, rowSize(), getSizeX(), getSizeY(), getSizeZ());
+    }
+    
     @Override
     public int getElementSizeInBits() {
         return 4;

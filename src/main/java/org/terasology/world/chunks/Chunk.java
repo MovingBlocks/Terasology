@@ -36,6 +36,8 @@ import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.blockdata.TeraArray;
 import org.terasology.world.chunks.blockdata.TeraDenseArray4Bit;
 import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
+import org.terasology.world.chunks.deflate.TeraStandardDeflator;
+import org.terasology.world.chunks.deflate.TeraDeflator;
 import org.terasology.world.liquid.LiquidData;
 
 import com.google.common.base.Objects;
@@ -351,10 +353,12 @@ public class Chunk implements Externalizable {
             int liquidSize = liquid.getEstimatedMemoryConsumptionInBytes();
             int totalSize = blocksSize + sunlightSize + lightSize + liquidSize;
             
-            blocks = blocks.deflate();
-            sunlight = sunlight.deflate();
-            light = light.deflate();
-            liquid = liquid.deflate();
+            final TeraDeflator def = new TeraStandardDeflator();
+            
+            blocks = def.deflate(blocks);
+            sunlight = def.deflate(sunlight);
+            light = def.deflate(light);
+            liquid = def.deflate(liquid);
             
             int blocksReduced = blocks.getEstimatedMemoryConsumptionInBytes();
             int sunlightReduced = sunlight.getEstimatedMemoryConsumptionInBytes();
@@ -377,10 +381,14 @@ public class Chunk implements Externalizable {
     public void inflate() {
         lock();
         try {
-            blocks = blocks.inflate();
-            sunlight = sunlight.inflate();
-            light = light.inflate();
-            liquid = liquid.inflate();
+            if (!(blocks instanceof TeraDenseArray8Bit))
+                blocks = new TeraDenseArray8Bit(blocks);
+            if (!(sunlight instanceof TeraDenseArray4Bit))
+                sunlight = new TeraDenseArray4Bit(sunlight);
+            if (!(light instanceof TeraDenseArray4Bit))
+                light = new TeraDenseArray4Bit(light);
+            if (!(liquid instanceof TeraDenseArray4Bit))
+                liquid = new TeraDenseArray4Bit(liquid);
         } finally {
             unlock();
         }

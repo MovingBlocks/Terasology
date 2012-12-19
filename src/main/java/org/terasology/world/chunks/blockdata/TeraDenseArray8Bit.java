@@ -1,5 +1,9 @@
 package org.terasology.world.chunks.blockdata;
 
+import org.terasology.world.chunks.deflate.TeraAdvancedDeflator;
+
+import com.google.common.base.Preconditions;
+
 
 /**
  * TeraDenseArray8Bit implements a dense array with elements of 8 bit size.
@@ -44,6 +48,11 @@ public final class TeraDenseArray8Bit extends TeraDenseArrayByte {
     
     public TeraDenseArray8Bit(TeraArray in) {
         super(in);
+    }
+
+    @Override
+    public TeraArray deflate(TeraAdvancedDeflator deflator) {
+        return Preconditions.checkNotNull(deflator).deflateDenseArray8Bit(data, rowSize(), getSizeX(), getSizeY(), getSizeZ());
     }
 
     @Override

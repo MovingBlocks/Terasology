@@ -50,7 +50,10 @@ public abstract class TeraDenseArrayByte extends TeraDenseArray {
 
     @Override
     public final int getEstimatedMemoryConsumptionInBytes() {
-        return 16 + dataSize();
+        if (data == null)
+            return 4;
+        else
+            return 16 + data.length;
     }
 
     @Override
