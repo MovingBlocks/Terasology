@@ -82,7 +82,10 @@ public class Chunk implements Externalizable {
 
     private final Vector3i pos = new Vector3i();
 
-    private TeraArray blocks, sunlight, light, liquid;
+    private TeraArray blocks;
+    private TeraArray sunlight;
+    private TeraArray light;
+    private TeraArray liquid;
 
     private State chunkState = State.ADJACENCY_GENERATION_PENDING;
     private boolean dirty;
