@@ -43,6 +43,10 @@ public abstract class TeraDenseArrayByte extends TeraDenseArray {
         this.data = Preconditions.checkNotNull(data);
         Preconditions.checkArgument(data.length == dataSize(), "The length of the parameter 'data' has to be " + dataSize() + " (" + data.length + ")");
     }
+    
+    public TeraDenseArrayByte(TeraArray in) {
+        super(in);
+    }
 
     @Override
     public final int getEstimatedMemoryConsumptionInBytes() {

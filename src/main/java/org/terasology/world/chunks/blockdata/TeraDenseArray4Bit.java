@@ -42,6 +42,10 @@ public final class TeraDenseArray4Bit extends TeraDenseArrayByte {
         super(sizeX, sizeY, sizeZ, data);
     }
 
+    public TeraDenseArray4Bit(TeraArray in) {
+        super(in);
+    }
+    
     @Override
     public final int get(int x, int y, int z) {
         if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
