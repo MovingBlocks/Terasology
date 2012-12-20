@@ -1,0 +1,6 @@
+{
+    "id" : "locomotive",
+    "displayName" : "Train locomotive",
+    "author" : "Pencilcheck",
+    "description" : "Allow blocks to be turned into locomotive"
+}
