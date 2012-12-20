@@ -108,7 +108,7 @@ public class Chunk implements Externalizable {
         sunlight = new TeraDenseArray4Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         light = new TeraDenseArray4Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         liquid = new TeraDenseArray4Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        setDirty(true);
+        dirty = true;
     }
 
     public Chunk(int x, int y, int z) {
@@ -129,6 +129,15 @@ public class Chunk implements Externalizable {
         light = other.light.copy();
         liquid = other.liquid.copy();
         chunkState = other.chunkState;
+        dirty = true;
+    }
+    
+    public Chunk(Vector3i pos, TeraArray blocks, TeraArray sunlight, TeraArray light, TeraArray liquid) {
+        this.pos.set(Preconditions.checkNotNull(pos));
+        this.blocks = Preconditions.checkNotNull(blocks);
+        this.sunlight = Preconditions.checkNotNull(sunlight);
+        this.light = Preconditions.checkNotNull(light);
+        this.liquid = Preconditions.checkNotNull(liquid);
         dirty = true;
     }
 
@@ -175,6 +184,10 @@ public class Chunk implements Externalizable {
         } finally {
             unlock();
         }
+    }
+    
+    public int getEstimatedMemoryConsumptionInBytes() {
+        return blocks.getEstimatedMemoryConsumptionInBytes() + sunlight.getEstimatedMemoryConsumptionInBytes() + light.getEstimatedMemoryConsumptionInBytes() + liquid.getEstimatedMemoryConsumptionInBytes();
     }
 
     public Block getBlock(Vector3i pos) {
