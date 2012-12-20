@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright 2012 Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,19 @@
  */
 
 /**
- * Portal blocks are used in portals!
+ * WhiteShroom
  */
 {
+    "attachmentAllowed" : false,
+    "supportRequired" : true,
+    "shape" : "engine:billboard",
+    "replacementAllowed" : true,
+    "doubleSided" : true,
+    "penetrable" : true,
     "shadowCasting" : false,
     "luminance" : 10,
-    "hardness" : 10,
+    "hardness" : 2,
     "penetrable" : true,
-    "entity" : {
-        "prefab" : "portals:portal"
-    }
+    "targetable" : true,
+    "debrisOnDestroy" : false
 }
