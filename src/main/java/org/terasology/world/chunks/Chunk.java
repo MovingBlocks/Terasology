@@ -15,26 +15,26 @@
  */
 package org.terasology.world.chunks;
 
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
-import java.util.concurrent.locks.ReentrantLock;
-
-import javax.vecmath.Vector3f;
-
+import com.google.common.base.Objects;
 import org.terasology.logic.manager.Config;
 import org.terasology.math.AABB;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.model.structures.TeraArray;
 import org.terasology.model.structures.TeraSmartArray;
+import org.terasology.network.NetworkUtil;
+import org.terasology.protobuf.NetData;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.liquid.LiquidData;
 
-import com.google.common.base.Objects;
+import javax.vecmath.Vector3f;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks
@@ -101,6 +101,16 @@ public class Chunk implements Externalizable {
         liquid = new TeraSmartArray(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
 
         setDirty(true);
+    }
+
+    public Chunk(Vector3i pos, TeraArray blocks, TeraSmartArray sunlight, TeraSmartArray light, TeraSmartArray liquid) {
+        this.blocks = new TeraArray(blocks);
+        this.sunlight = new TeraSmartArray(sunlight);
+        this.light = new TeraSmartArray(light);
+        this.liquid = new TeraSmartArray(liquid);
+        this.pos.set(pos);
+        setDirty(true);
+        setChunkState(State.COMPLETE);
     }
 
     public Chunk(int x, int y, int z) {
@@ -425,5 +435,14 @@ public class Chunk implements Externalizable {
 
     public int getChunkSizeZ() {
         return SIZE_Z;
+    }
+
+    public NetData.ChunkMessage getChunkData() {
+        NetData.ChunkMessage.Builder chunkBuilder = NetData.ChunkMessage.newBuilder();
+        return chunkBuilder.setBlockData(blocks.getByteString())
+                .setLightData(light.getByteString())
+                .setSunlightData(sunlight.getByteString())
+                .setLiquidData(liquid.getByteString())
+                .setPos(NetworkUtil.convert(pos)).build();
     }
 }

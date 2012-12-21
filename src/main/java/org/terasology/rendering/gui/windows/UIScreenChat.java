@@ -32,6 +32,7 @@ import org.terasology.logic.manager.CommandManager;
 import org.terasology.logic.manager.MessageManager.MessageSubscription;
 import org.terasology.logic.manager.MessageManager.Message;
 import org.terasology.logic.manager.CommandManager.CommandInfo;
+import org.terasology.network.NetworkSystem;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.KeyListener;
 import org.terasology.rendering.gui.framework.events.VisibilityListener;
@@ -123,6 +124,8 @@ public class UIScreenChat extends UIWindow {
                             // execute the command
                             message = message.substring(1);
                             commandManager.execute(message);
+                        } else {
+                            CoreRegistry.get(NetworkSystem.class).sendChatMessage(message);
                         }
                     }
                     //message history previous

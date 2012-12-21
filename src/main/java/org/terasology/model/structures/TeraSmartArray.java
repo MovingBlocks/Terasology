@@ -15,6 +15,8 @@
  */
 package org.terasology.model.structures;
 
+import com.google.protobuf.ByteString;
+
 import java.util.Arrays;
 
 /**
@@ -38,6 +40,17 @@ public class TeraSmartArray {
 
         _size = _lX * _lY * _lZ;
         _array = new byte[_halfSize = _size / 2];
+    }
+
+    public TeraSmartArray(int x, int y, int z, byte[] data) {
+        _lX = x;
+        _lY = y;
+        _lZ = z;
+
+        _size = _lX * _lY * _lZ;
+        _halfSize = _size / 2;
+        assert data.length == _halfSize;
+        _array = Arrays.copyOf(data, data.length);
     }
 
     public TeraSmartArray(TeraSmartArray other) {
@@ -147,5 +160,9 @@ public class TeraSmartArray {
      */
     public int sizePacked() {
         return _halfSize;
+    }
+
+    public ByteString getByteString() {
+        return ByteString.copyFrom(_array);
     }
 }

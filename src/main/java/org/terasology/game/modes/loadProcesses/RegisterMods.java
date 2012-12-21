@@ -20,6 +20,8 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.modes.LoadProcess;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
+import org.terasology.network.NetworkSystem;
+import org.terasology.protobuf.NetData;
 import org.terasology.world.WorldInfo;
 
 /**
@@ -44,12 +46,16 @@ public class RegisterMods implements LoadProcess {
         for (Mod mod : modManager.getMods()) {
             mod.setEnabled(false);
         }
+
         for (String modName : worldInfo.getModConfiguration().listMods()) {
             Mod mod = modManager.getMod(modName);
             if (mod != null) {
                 mod.setEnabled(true);
+            } else {
+                // TODO: Fail if mod not available (means the server has it, client doesn't)
             }
         }
+
         modManager.applyActiveMods();
         return true;
     }

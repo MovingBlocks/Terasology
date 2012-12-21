@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 
+import com.google.common.base.Objects;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -149,6 +150,20 @@ public class PojoEventSystem implements EventSystem {
             addEventHandler(eventClass, info, c);
             for (Class<? extends Event> childType : childEvents.get(eventClass)) {
                 addEventHandler(childType, info, c);
+            }
+        }
+    }
+
+    @Override
+    public <T extends Event> void unregisterEventReceiver(EventReceiver<T> eventReceiver, Class<T> eventClass, Class<? extends Component>... componentTypes) {
+        Multimap<Class<? extends Component>, EventHandlerInfo> eventHandlerMap = componentSpecificHandlers.get(eventClass);
+        if (eventHandlerMap != null) {
+            ReceiverEventHandlerInfo testReceiver = new ReceiverEventHandlerInfo<T>(eventReceiver, 0, componentTypes);
+            for (Class<? extends Component> c : componentTypes) {
+                eventHandlerMap.remove(c, testReceiver);
+                for (Class<? extends Event> childType : childEvents.get(eventClass)) {
+                    eventHandlerMap.remove(childType, testReceiver);
+                }
             }
         }
     }
@@ -292,6 +307,25 @@ public class PojoEventSystem implements EventSystem {
         @Override
         public int getPriority() {
             return priority;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) {
+                return true;
+            }
+            if (obj instanceof ReceiverEventHandlerInfo) {
+                ReceiverEventHandlerInfo other = (ReceiverEventHandlerInfo) obj;
+                if (Objects.equal(receiver, other.receiver)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(receiver);
         }
     }
 }

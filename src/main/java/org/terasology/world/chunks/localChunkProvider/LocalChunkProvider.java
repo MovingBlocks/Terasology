@@ -14,8 +14,39 @@
  * limitations under the License.
  */
 
-package org.terasology.world.chunks;
+package org.terasology.world.chunks.localChunkProvider;
 
+import com.google.common.base.Objects;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.components.world.LocationComponent;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.game.CoreRegistry;
+import org.terasology.logic.manager.PathManager;
+import org.terasology.math.Region3i;
+import org.terasology.math.TeraMath;
+import org.terasology.math.Vector3i;
+import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.WorldView;
+import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.ChunkReadyEvent;
+import org.terasology.world.chunks.ChunkRegionListener;
+import org.terasology.world.chunks.ChunkStore;
+import org.terasology.world.chunks.ChunkUnloadedEvent;
+import org.terasology.world.generator.core.ChunkGeneratorManager;
+import org.terasology.world.lighting.InternalLightProcessor;
+import org.terasology.world.lighting.LightPropagator;
+
+import javax.vecmath.Vector3f;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Set;
@@ -27,29 +58,6 @@ import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import javax.vecmath.Vector3f;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.components.world.LocationComponent;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.math.Region3i;
-import org.terasology.math.TeraMath;
-import org.terasology.math.Vector3i;
-import org.terasology.performanceMonitor.PerformanceMonitor;
-import org.terasology.world.lighting.LightPropagator;
-import org.terasology.world.WorldView;
-import org.terasology.world.generator.core.ChunkGeneratorManager;
-import org.terasology.world.localChunkProvider.AbstractChunkTask;
-import org.terasology.world.localChunkProvider.ChunkRequest;
-import org.terasology.world.localChunkProvider.ChunkTask;
-import org.terasology.world.lighting.InternalLightProcessor;
-import org.terasology.world.localChunkProvider.ShutdownTask;
-
-import com.google.common.base.Objects;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 /**
  * @author Immortius
@@ -154,13 +162,27 @@ public class LocalChunkProvider implements ChunkProvider {
 
     @Override
     public void addRegionEntity(EntityRef entity, int distance) {
+        addRegionEntity(entity, distance, null);
+    }
+
+    @Override
+    public void addRegionEntity(EntityRef entity, int distance, ChunkRegionListener listener) {
         CacheRegion region = new CacheRegion(entity, distance);
+        region.setListener(listener);
         regionLock.writeLock().lock();
         try {
             regions.remove(region);
             regions.add(region);
-        } finally  {
+        } finally {
             regionLock.writeLock().unlock();
+        }
+        if (listener != null) {
+            for (Vector3i pos : region.getRegion()) {
+                if (isChunkReady(pos)) {
+                    logger.info("Notifying chunk ready {}", pos);
+                    listener.onChunkReady(pos, getChunk(pos));
+                }
+            }
         }
         reviewChunkQueue.offer(new ChunkRequest(ChunkRequest.RequestType.PRODUCE, region.getRegion().expand(new Vector3i(2, 0, 2))));
     }
@@ -214,6 +236,7 @@ public class LocalChunkProvider implements ChunkProvider {
                         } finally {
                             chunk.unlock();
                         }
+                        worldEntity.send(new ChunkUnloadedEvent(pos));
                     }
 
                 }
@@ -265,6 +288,22 @@ public class LocalChunkProvider implements ChunkProvider {
             chunk.dispose();
         }
         nearCache.clear();
+
+        farStore.dispose();
+        String title = CoreRegistry.get(WorldProvider.class).getTitle();
+        File chunkFile = new File(PathManager.getInstance().getWorldSavePath(title), title + ".dat");
+        try {
+            FileOutputStream fileOut = new FileOutputStream(chunkFile);
+            BufferedOutputStream bos = new BufferedOutputStream(fileOut);
+            ObjectOutputStream out = new ObjectOutputStream(bos);
+            out.writeObject(farStore);
+            out.close();
+            bos.flush();
+            bos.close();
+            fileOut.close();
+        } catch (IOException e) {
+            logger.error("Error saving chunks", e);
+        }
     }
 
     @Override
@@ -469,15 +508,28 @@ public class LocalChunkProvider implements ChunkProvider {
         }
     }
 
+    private boolean isChunkReady(Vector3i pos) {
+        Chunk chunk = getChunk(pos);
+        if (chunk == null || chunk.getChunkState() != Chunk.State.COMPLETE) {
+            return false;
+        }
+        for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, LOCAL_REGION_EXTENTS)) {
+            Chunk adjChunk = getChunk(adjPos);
+            if (adjChunk == null || adjChunk.getChunkState() != Chunk.State.COMPLETE) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private void checkChunkReady(Vector3i pos) {
-        if (worldEntity.exists()) {
-            for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, LOCAL_REGION_EXTENTS)) {
-                Chunk chunk = getChunk(adjPos);
-                if (chunk == null || chunk.getChunkState() != Chunk.State.COMPLETE) {
-                    return;
+        if (worldEntity.exists() && isChunkReady(pos)) {
+            worldEntity.send(new ChunkReadyEvent(pos));
+            for (CacheRegion region : regions) {
+                if (region.getRegion().encompasses(pos)) {
+                    region.sendChunkReady(getChunk(pos));
                 }
             }
-            worldEntity.send(new ChunkReadyEvent(pos));
         }
     }
 
@@ -486,6 +538,7 @@ public class LocalChunkProvider implements ChunkProvider {
         private int distance;
         private boolean dirty;
         private Vector3i center = new Vector3i();
+        private ChunkRegionListener listener;
 
         public CacheRegion(EntityRef entity, int distance) {
             this.entity = entity;
@@ -547,6 +600,16 @@ public class LocalChunkProvider implements ChunkProvider {
             return new Vector3i(worldPos);
         }
 
+        public void setListener(ChunkRegionListener listener) {
+            this.listener = listener;
+        }
+
+        public void sendChunkReady(Chunk chunk) {
+            if (listener != null) {
+                listener.onChunkReady(chunk.getPos(), chunk);
+            }
+        }
+
         @Override
         public boolean equals(Object o) {
             if (o == this) return true;
@@ -561,6 +624,8 @@ public class LocalChunkProvider implements ChunkProvider {
         public int hashCode() {
             return Objects.hashCode(entity);
         }
+
+
     }
 
     private class ChunkTaskRelevanceComparator implements Comparator<ChunkTask> {

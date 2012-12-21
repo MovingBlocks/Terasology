@@ -25,17 +25,17 @@ public class TestNetwork {
 
     @Test
     public void testNetwork() throws InterruptedException {
-        Server server = new Server();
-        server.start(7777);
+        NetworkSystem server = new NetworkSystem();
+        server.host(7777);
 
         Thread.sleep(500);
 
-        Client client = new Client();
+        NetworkSystem client = new NetworkSystem();
         client.join("localhost", 7777);
 
         Thread.sleep(500);
 
         server.shutdown();
-        client.disconnect();
+        client.shutdown();
     }
 }

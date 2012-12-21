@@ -27,8 +27,10 @@ import org.terasology.game.modes.loadProcesses.CacheTextures;
 import org.terasology.game.modes.loadProcesses.CreateWorldEntity;
 import org.terasology.game.modes.loadProcesses.InitialiseCommandSystem;
 import org.terasology.game.modes.loadProcesses.InitialiseEntitySystem;
+import org.terasology.game.modes.loadProcesses.InitialiseRemoteWorld;
 import org.terasology.game.modes.loadProcesses.InitialiseSystems;
 import org.terasology.game.modes.loadProcesses.InitialiseWorld;
+import org.terasology.game.modes.loadProcesses.JoinServer;
 import org.terasology.game.modes.loadProcesses.LoadEntities;
 import org.terasology.game.modes.loadProcesses.LoadPrefabs;
 import org.terasology.game.modes.loadProcesses.PrepareLocalWorld;
@@ -38,7 +40,9 @@ import org.terasology.game.modes.loadProcesses.RegisterInputSystem;
 import org.terasology.game.modes.loadProcesses.RegisterMods;
 import org.terasology.game.modes.loadProcesses.RegisterSystems;
 import org.terasology.game.modes.loadProcesses.RespawnPlayer;
+import org.terasology.game.modes.loadProcesses.StartServer;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.network.NetworkMode;
 import org.terasology.rendering.gui.windows.UIScreenLoading;
 import org.terasology.world.WorldInfo;
 
@@ -52,6 +56,7 @@ public class StateLoading implements GameState {
     private static final Logger logger = LoggerFactory.getLogger(StateLoading.class);
 
     private WorldInfo worldInfo;
+    private NetworkMode netMode;
     private Queue<LoadProcess> loadProcesses = Queues.newArrayDeque();
     private LoadProcess current;
     private int currentExpectedSteps = 0;
@@ -61,13 +66,51 @@ public class StateLoading implements GameState {
 
     private UIScreenLoading loadingScreen;
 
-    public StateLoading(WorldInfo worldInfo) {
+    public StateLoading(WorldInfo worldInfo, NetworkMode netMode) {
         this.worldInfo = worldInfo;
         this.guiManager = CoreRegistry.get(GUIManager.class);
+        this.netMode = netMode;
     }
 
     @Override
     public void init(GameEngine engine) {
+        switch (netMode) {
+            case CLIENT:
+                initClient();
+                break;
+            default:
+                initHost();
+                break;
+        }
+
+        popStep();
+        GUIManager guiManager = CoreRegistry.get(GUIManager.class);
+        loadingScreen = (UIScreenLoading) guiManager.openWindow("loading");
+        loadingScreen.updateStatus(current.getMessage(), completedSteps / (currentExpectedSteps * 100f));
+    }
+
+    private void initClient() {
+        loadProcesses.add(new JoinServer(worldInfo));
+        loadProcesses.add(new RegisterMods(worldInfo));
+        loadProcesses.add(new CacheTextures());
+        loadProcesses.add(new RegisterBlocks(worldInfo));
+        loadProcesses.add(new CacheBlocks());
+        loadProcesses.add(new InitialiseEntitySystem());
+        loadProcesses.add(new LoadPrefabs());
+        loadProcesses.add(new RegisterInputSystem());
+        loadProcesses.add(new RegisterSystems());
+        loadProcesses.add(new InitialiseCommandSystem());
+        loadProcesses.add(new InitialiseRemoteWorld(worldInfo));
+        // Up to here
+        loadProcesses.add(new InitialiseSystems());
+        loadProcesses.add(new LoadEntities(worldInfo));
+        loadProcesses.add(new CreateWorldEntity());
+        loadProcesses.add(new PrepareLocalWorld());
+        loadProcesses.add(new PrepareWorld());
+        loadProcesses.add(new RespawnPlayer());
+    }
+
+    private void initHost() {
         loadProcesses.add(new RegisterMods(worldInfo));
         loadProcesses.add(new CacheTextures());
         loadProcesses.add(new RegisterBlocks(worldInfo));
@@ -81,14 +124,12 @@ public class StateLoading implements GameState {
         loadProcesses.add(new InitialiseSystems());
         loadProcesses.add(new LoadEntities(worldInfo));
         loadProcesses.add(new CreateWorldEntity());
+        if (netMode == NetworkMode.SERVER) {
+            loadProcesses.add(new StartServer());
+        }
         loadProcesses.add(new PrepareLocalWorld());
         loadProcesses.add(new PrepareWorld());
         loadProcesses.add(new RespawnPlayer());
-
-        popStep();
-        GUIManager guiManager = CoreRegistry.get(GUIManager.class);
-        loadingScreen = (UIScreenLoading) guiManager.openWindow("loading");
-        loadingScreen.updateStatus(current.getMessage(), completedSteps / (currentExpectedSteps * 100f));
     }
 
     private void popStep() {

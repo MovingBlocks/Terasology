@@ -23,7 +23,18 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.protobuf.NetData;
+import org.terasology.game.CoreRegistry;
+import org.terasology.logic.manager.MessageManager;
+import org.terasology.logic.mod.Mod;
+import org.terasology.logic.mod.ModManager;
+import static org.terasology.protobuf.NetData.*;
+
+import org.terasology.world.WorldProvider;
+import org.terasology.world.block.management.BlockManager;
+import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.localChunkProvider.LocalChunkProvider;
+
+import java.util.Map;
 
 /**
  * @author Immortius
@@ -31,21 +42,62 @@ import org.terasology.protobuf.NetData;
 public class TerasologyServerHandler extends SimpleChannelUpstreamHandler {
     private static final Logger logger = LoggerFactory.getLogger(TerasologyServerHandler.class);
 
+    private NetworkSystem networkSystem;
+    private ClientPlayer client;
+
+    public TerasologyServerHandler(NetworkSystem networkSystem) {
+        this.networkSystem = networkSystem;
+    }
+
     @Override
     public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e) {
-        Server.allChannels.add(e.getChannel());
+        networkSystem.registerChannel(e.getChannel());
     }
 
     @Override
     public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-        NetData.ClientMessage message = NetData.ClientMessage.newBuilder().setConnection(NetData.ConnectMessage.newBuilder().setName("Test Send To Client")).build();
-        e.getChannel().write(message);
+        client = new ClientPlayer(e.getChannel());
+    }
+
+    @Override
+    public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+        MessageManager.getInstance().addMessage("Client disconnected: " + client.getName());
+        networkSystem.removeClient(client);
+        client.disconnect();
     }
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
-        NetData.ClientMessage message = (NetData.ClientMessage) e.getMessage();
-        logger.trace("Received message: {}", message.getConnection().getName());
+        NetMessage message = (NetMessage) e.getMessage();
+        switch(message.getType()) {
+            case CLIENT_CONNECT:
+                receivedConnect(message.getClientConnect());
+                break;
+            case CONSOLE:
+                networkSystem.sendChatMessage(message.getConsole().getMessage());
+                MessageManager.getInstance().addMessage(message.getConsole().getMessage(), MessageManager.EMessageScope.PRIVATE);
+                break;
+        }
+        logger.debug("Received message: {}", message.getType());
+    }
+
+    private void receivedConnect(ClientConnectMessage message) {
+        MessageManager.getInstance().addMessage("Client connected: " + message.getName());
+        client.setConnected();
+        client.setName(message.getName());
+        ServerInfoMessage.Builder serverInfoMessageBuilder = ServerInfoMessage.newBuilder();
+        WorldProvider world = CoreRegistry.get(WorldProvider.class);
+        serverInfoMessageBuilder.setTime(world.getTime());
+        serverInfoMessageBuilder.setWorldName(world.getTitle());
+        for (Mod mod : CoreRegistry.get(ModManager.class).getActiveMods()) {
+            serverInfoMessageBuilder.addModule(ModuleInfo.newBuilder().setModuleId(mod.getModInfo().getId()).build());
+        }
+        for (Map.Entry<String, Byte> blockMapping : BlockManager.getInstance().getBlockIdMap().entrySet()) {
+            serverInfoMessageBuilder.addBlockMapping(BlockMapping.newBuilder().setBlockId(blockMapping.getValue()).setBlockName(blockMapping.getKey()));
+        }
+        client.send(NetMessage.newBuilder().setType(NetMessage.Type.SERVER_INFO).setServerInfo(serverInfoMessageBuilder.build()).build());
+
+        networkSystem.addClient(client);
     }
 
     @Override

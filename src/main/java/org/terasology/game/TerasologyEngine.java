@@ -37,6 +37,8 @@ import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.VertexBufferObjectManager;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.logic.mod.ModSecurityManager;
+import org.terasology.network.NetworkMode;
+import org.terasology.network.NetworkSystem;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.version.TerasologyVersion;
@@ -178,6 +180,7 @@ public class TerasologyEngine implements GameEngine {
         try {
             java.util.logging.Logger.getLogger("").getHandlers()[0].setLevel(Level.FINE);
             java.util.logging.Logger.getLogger("org.terasology").setLevel(Level.INFO);
+            java.util.logging.Logger.getLogger("org.terasology.network").setLevel(Level.FINE);
             java.util.logging.Logger.getLogger("").getHandlers()[0].setFormatter(new Formatter() {
                 DateFormat dateFormat = new SimpleDateFormat("MM-dd HH:mm:ss");
 
@@ -423,6 +426,7 @@ public class TerasologyEngine implements GameEngine {
         CoreRegistry.put(CollisionGroupManager.class, new CollisionGroupManager());
         CoreRegistry.put(ModManager.class, new ModManager());
         CoreRegistry.put(ComponentSystemManager.class, new ComponentSystemManager());
+        CoreRegistry.put(NetworkSystem.class, new NetworkSystem());
 
         AssetType.registerAssetTypes();
         AssetManager.getInstance().addAssetSource(new ClasspathSource(ModManager.ENGINE_PACKAGE, getClass().getProtectionDomain().getCodeSource(), ModManager.ASSETS_SUBDIRECTORY));
@@ -456,13 +460,15 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void mainLoop() {
+        NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
+
         PerformanceMonitor.startActivity("Other");
         // MAIN GAME LOOP
         while (running && !Display.isCloseRequested()) {
 
             // Only process rendering and updating once a second
             // TODO: Add debug config setting to run even if display inactive
-            if (!Display.isActive()) {
+            if (!Display.isActive() && CoreRegistry.get(NetworkSystem.class).getMode() == NetworkMode.NONE) {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -481,6 +487,10 @@ public class TerasologyEngine implements GameEngine {
             }
 
             timer.tick();
+
+            PerformanceMonitor.startActivity("Network Update");
+            networkSystem.update();
+            PerformanceMonitor.endActivity();
 
             PerformanceMonitor.startActivity("Main Update");
             currentState.update(timer.getDelta());

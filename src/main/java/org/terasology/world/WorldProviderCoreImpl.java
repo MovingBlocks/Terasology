@@ -21,6 +21,7 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.game.types.GameType;
 import org.terasology.logic.manager.Config;
+import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.math.Region3i;
@@ -34,6 +35,12 @@ import org.terasology.world.lighting.LightPropagator;
 import org.terasology.world.lighting.LightingUtil;
 import org.terasology.world.lighting.PropagationComparison;
 import org.terasology.world.liquid.LiquidData;
+
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 
 /**
  * @author Immortius
@@ -63,6 +70,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         this.chunkGenerators = chunkGenerators;
         this.biomeProvider = new WorldBiomeProviderImpl(seed);
         this.chunkProvider = chunkProvider;
+        CoreRegistry.put(ChunkProvider.class, chunkProvider);
 
         Timer timer = CoreRegistry.get(Timer.class);
         if (timer != null) {
@@ -263,5 +271,6 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     @Override
     public void dispose() {
         chunkProvider.dispose();
+
     }
 }

@@ -112,7 +112,7 @@ public class MessageManager {
      * @param message The chat message.
      */
     public void addMessage(String message) {
-        addMessage(message, EMessageScope.PUBLIC);
+        addMessage(message, EMessageScope.PRIVATE);
     }
 
     /**

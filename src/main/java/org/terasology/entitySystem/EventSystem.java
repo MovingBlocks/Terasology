@@ -61,6 +61,8 @@ public interface EventSystem {
      */
     <T extends Event> void registerEventReceiver(EventReceiver<T> eventReceiver, Class<T> eventClass, int priority, Class<? extends Component>... componentTypes);
 
+    <T extends Event> void unregisterEventReceiver(EventReceiver<T> eventReceiver, Class<T> eventClass, Class<? extends Component>... componentTypes);
+
     /**
      * Sends an event to all handlers for an entity's components
      *

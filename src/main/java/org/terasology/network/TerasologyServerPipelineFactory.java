@@ -31,14 +31,20 @@ import org.terasology.protobuf.NetData;
  */
 public class TerasologyServerPipelineFactory implements ChannelPipelineFactory {
 
+    private NetworkSystem networkSystem;
+
+    public TerasologyServerPipelineFactory(NetworkSystem networkSystem) {
+        this.networkSystem = networkSystem;
+    }
+
     @Override
     public ChannelPipeline getPipeline() throws Exception {
         ChannelPipeline p = pipeline();
         p.addLast("frameDecoder", new ProtobufVarint32FrameDecoder());
-        p.addLast("protobufDecoder", new ProtobufDecoder(NetData.ClientMessage.getDefaultInstance()));
+        p.addLast("protobufDecoder", new ProtobufDecoder(NetData.NetMessage.getDefaultInstance()));
         p.addLast("frameEncoder", new ProtobufVarint32LengthFieldPrepender());
         p.addLast("protobufEncoder", new ProtobufEncoder());
-        p.addLast("handler", new TerasologyServerHandler());
+        p.addLast("handler", new TerasologyServerHandler(networkSystem));
         return p;
     }
 }

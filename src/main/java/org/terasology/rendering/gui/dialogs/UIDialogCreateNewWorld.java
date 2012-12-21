@@ -26,6 +26,7 @@ import org.terasology.game.types.FreeStyleType;
 import org.terasology.game.types.GameType;
 import org.terasology.game.types.SurvivalType;
 import org.terasology.logic.manager.PathManager;
+import org.terasology.network.NetworkMode;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
@@ -252,7 +253,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
                 CoreRegistry.get(Config.class).getDefaultModConfig().copy(modConfig);
                 CoreRegistry.get(Config.class).save();
 
-                CoreRegistry.get(GameEngine.class).changeState(new StateLoading(new WorldInfo(org.terasology.logic.manager.Config.getInstance().getWorldTitle(), org.terasology.logic.manager.Config.getInstance().getDefaultSeed(), org.terasology.logic.manager.Config.getInstance().getDayNightLengthInMs() / 4, chunksListArr, CoreRegistry.get(GameType.class).getClass().toString(), modConfig)));
+                CoreRegistry.get(GameEngine.class).changeState(new StateLoading(new WorldInfo(org.terasology.logic.manager.Config.getInstance().getWorldTitle(), org.terasology.logic.manager.Config.getInstance().getDefaultSeed(), org.terasology.logic.manager.Config.getInstance().getDayNightLengthInMs() / 4, chunksListArr, CoreRegistry.get(GameType.class).getClass().toString(), modConfig), NetworkMode.SERVER));
             }
         });
 

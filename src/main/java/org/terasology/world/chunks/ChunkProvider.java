@@ -39,6 +39,15 @@ public interface ChunkProvider {
     public void addRegionEntity(EntityRef entity, int distance);
 
     /**
+     * Requests that a region around the given entity be maintained in near cache
+     *
+     * @param entity
+     * @param distance The region (in chunks) around the entity that should be near cached
+     * @param listener
+     */
+    public void addRegionEntity(EntityRef entity, int distance, ChunkRegionListener listener);
+
+    /**
      * Removes an entity from producing a caching region
      *
      * @param entity

@@ -6,20 +6,69 @@ option java_package = "org.terasology.protobuf";
 option java_outer_classname = "NetData";
 option optimize_for = SPEED;
 
-message ServerMessage {
-    optional ConnectMessage connection = 15; // Index of the type, if contained in a world with component_classes table
+message NetMessage {
+    enum Type { CLIENT_CONNECT = 1; CONSOLE = 2; SERVER_INFO = 3; CHUNK = 4; INVALIDATE_CHUNK = 5;}
+    required Type type = 1;
+    optional ChunkMessage chunkInfo = 2;
+    optional InvalidateChunkMessage invalidateChunk = 3;
+    optional ClientConnectMessage clientConnect = 15;
+    optional ConsoleMessage console = 16;
+    optional ServerInfoMessage serverInfo = 17;
 
-    extensions 1000 to 1999;
+    extensions 5000 to max;
 }
 
-message ClientMessage {
-    optional ConnectMessage connection = 15; // Index of the type, if contained in a world with component_classes table
-
-    extensions 1000 to 1999;
+message ChunkMessage {
+    optional Vector3iData pos = 1;
+    optional bytes blockData = 2;
+    optional bytes liquidData = 3;
+    optional bytes sunlightData = 15;
+    optional bytes lightData = 16;
 }
 
-message ConnectMessage {
+message InvalidateChunkMessage {
+    optional Vector3iData pos = 1;
+}
+
+message Vector3iData {
+    optional int32 x = 1;
+    optional int32 y = 2;
+    optional int32 z = 3;
+}
+
+message ClientConnectMessage {
     optional string name = 1;
+    optional string version = 2;
 
-    extensions 1000 to 1999;
+    extensions 5000 to max;
+}
+
+message ServerInfoMessage {
+    repeated ModuleInfo module = 1;
+    repeated BlockMapping blockMapping = 2;
+    optional int64 time = 3;
+
+    optional string version = 15;
+    optional string worldName = 16;
+
+    extensions 5000 to max;
+}
+
+message ConsoleMessage {
+    optional string message = 1;
+
+    extensions 5000 to max;
+}
+
+message BlockMapping {
+    optional string blockName = 1;
+    optional int32 blockId = 2;
+
+    extensions 5000 to max;
+}
+
+message ModuleInfo {
+    optional string moduleId = 1;
+
+    extensions 5000 to max;
 }

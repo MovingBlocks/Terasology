@@ -15,6 +15,8 @@
  */
 package org.terasology.model.structures;
 
+import com.google.protobuf.ByteString;
+
 import java.util.Arrays;
 
 /**
@@ -38,6 +40,16 @@ public class TeraArray {
 
         _size = _lX * _lY * _lZ;
         _array = new byte[_size];
+    }
+
+    public TeraArray(int x, int y, int z, byte[] data) {
+        _lX = x;
+        _lY = y;
+        _lZ = z;
+
+        _size = _lX * _lY * _lZ;
+        assert data.length == _size;
+        _array = Arrays.copyOf(data, data.length);
     }
 
     public TeraArray(TeraArray other) {
@@ -123,5 +135,9 @@ public class TeraArray {
      */
     public int size() {
         return _size;
+    }
+
+    public ByteString getByteString() {
+        return ByteString.copyFrom(_array);
     }
 }

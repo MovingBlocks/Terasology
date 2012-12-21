@@ -25,13 +25,13 @@ public interface LoadProcess {
 
     /**
      *
-     * @return A message describing the state of the step
+     * @return A message describing the state of the process
      */
     String getMessage();
 
     /**
      * Runs a single step.
-     * @return Whether the overall step is finished
+     * @return Whether the overall process is finished
      */
     boolean step();
 

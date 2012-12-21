@@ -18,14 +18,28 @@ package org.terasology.rendering.gui.windows;
 import javax.vecmath.Vector2f;
 
 import org.terasology.asset.Assets;
+import org.terasology.config.ModConfig;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
+import org.terasology.game.modes.StateLoading;
+import org.terasology.game.types.GameType;
+import org.terasology.game.types.SurvivalType;
+import org.terasology.logic.manager.Config;
+import org.terasology.network.NetworkMode;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.widgets.UIButton;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIWindow;
+import org.terasology.world.WorldInfo;
+import org.terasology.world.generator.core.FloraGenerator;
+import org.terasology.world.generator.core.ForestGenerator;
+import org.terasology.world.generator.core.PerlinTerrainGenerator;
+import org.terasology.world.liquid.LiquidsGenerator;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Main menu screen.
@@ -34,13 +48,14 @@ import org.terasology.rendering.gui.widgets.UIWindow;
  */
 public class UIMenuMain extends UIWindow {
 
-    private final UIImage _title;
+    private final UIImage title;
 
-    private final UIButton _exitButton;
-    private final UIButton _singlePlayerButton;
-    private final UIButton _configButton;
+    private final UIButton exitButton;
+    private final UIButton singlePlayerButton;
+    private final UIButton configButton;
+    private final UIButton joinButton;
 
-    final UILabel _version;
+    final UILabel version;
 
     public UIMenuMain() {
         setId("main");
@@ -48,59 +63,89 @@ public class UIMenuMain extends UIWindow {
         setModal(true);
         maximize();
         
-        _title = new UIImage(Assets.getTexture("engine:terasology"));
-        _title.setSize(new Vector2f(512f, 128f));
-        _title.setHorizontalAlign(EHorizontalAlign.CENTER);
-        _title.setPosition(new Vector2f(0f, 128f));
-        _title.setVisible(true);
+        title = new UIImage(Assets.getTexture("engine:terasology"));
+        title.setSize(new Vector2f(512f, 128f));
+        title.setHorizontalAlign(EHorizontalAlign.CENTER);
+        title.setPosition(new Vector2f(0f, 128f));
+        title.setVisible(true);
 
-        _version = new UILabel("Pre Alpha");
-        _version.setHorizontalAlign(EHorizontalAlign.CENTER);
-        _version.setPosition(new Vector2f(0f, 230f));
-        _version.setVisible(true);
-        _version.setTextShadow(true);
+        version = new UILabel("Pre Alpha");
+        version.setHorizontalAlign(EHorizontalAlign.CENTER);
+        version.setPosition(new Vector2f(0f, 230f));
+        version.setVisible(true);
+        version.setTextShadow(true);
 
-        _exitButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
-        _exitButton.getLabel().setText("Exit Terasology");
-        _exitButton.addClickListener(new ClickListener() {
+        exitButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
+        exitButton.getLabel().setText("Exit Terasology");
+        exitButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
                 CoreRegistry.get(GameEngine.class).shutdown();
             }
         });
-        _exitButton.setHorizontalAlign(EHorizontalAlign.CENTER);
-        _exitButton.setPosition(new Vector2f(0f, 300f + 4 * 40f));
-        _exitButton.setVisible(true);
+        exitButton.setHorizontalAlign(EHorizontalAlign.CENTER);
+        exitButton.setPosition(new Vector2f(0f, 300f + 5 * 40f));
+        exitButton.setVisible(true);
         
-        _configButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
-        _configButton.getLabel().setText("Settings");
-        _configButton.addClickListener(new ClickListener() {
+        configButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
+        configButton.getLabel().setText("Settings");
+        configButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
                 getGUIManager().openWindow("config");
             }
         });
-        _configButton.setHorizontalAlign(EHorizontalAlign.CENTER);
-        _configButton.setPosition(new Vector2f(0f, 300f + 2 * 40f));
-        _configButton.setVisible(true);
+        configButton.setHorizontalAlign(EHorizontalAlign.CENTER);
+        configButton.setPosition(new Vector2f(0f, 300f + 3 * 40f));
+        configButton.setVisible(true);
 
-        _singlePlayerButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
-        _singlePlayerButton.getLabel().setText("Single player");
-        _singlePlayerButton.addClickListener(new ClickListener() {
+        singlePlayerButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
+        singlePlayerButton.getLabel().setText("Single player");
+        singlePlayerButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
                 getGUIManager().openWindow("singleplayer");
             }
         });
 
-        _singlePlayerButton.setHorizontalAlign(EHorizontalAlign.CENTER);
-        _singlePlayerButton.setPosition(new Vector2f(0f, 300f + 40f));
-        _singlePlayerButton.setVisible(true);
+        singlePlayerButton.setHorizontalAlign(EHorizontalAlign.CENTER);
+        singlePlayerButton.setPosition(new Vector2f(0f, 300f + 40f));
+        singlePlayerButton.setVisible(true);
 
-        addDisplayElement(_title);
-        addDisplayElement(_version);
-        addDisplayElement(_configButton);
-        addDisplayElement(_exitButton);
-        addDisplayElement(_singlePlayerButton);
+        joinButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
+        joinButton.getLabel().setText("Join Game");
+        joinButton.setHorizontalAlign(EHorizontalAlign.CENTER);
+        joinButton.setPosition(new Vector2f(0f, 300f + 2 * 40f));
+        joinButton.setVisible(true);
+        joinButton.addClickListener(new ClickListener() {
+            @Override
+            public void click(UIDisplayElement element, int button) {
+
+                ModConfig modConfig = new ModConfig();
+                modConfig.copy(CoreRegistry.get(org.terasology.config.Config.class).getDefaultModConfig());
+
+                String[] chunkList = new String[] {
+                PerlinTerrainGenerator.class.getName(),
+                FloraGenerator.class.getName(),
+                LiquidsGenerator.class.getName(),
+                ForestGenerator.class.getName()};
+
+                WorldInfo info = new WorldInfo("JoinWorld", org.terasology.logic.manager.Config.getInstance().getDefaultSeed(), org.terasology.logic.manager.Config.getInstance().getDayNightLengthInMs() / 4, chunkList, SurvivalType.class.toString(), modConfig);
+
+                CoreRegistry.put(GameType.class, new SurvivalType());
+
+                Config.getInstance().setDefaultSeed(info.getSeed());
+                Config.getInstance().setWorldTitle(info.getTitle());
+                Config.getInstance().setChunkGenerator(info.getChunkGenerators());
+                CoreRegistry.get(GameEngine.class).changeState(new StateLoading(info, NetworkMode.CLIENT));
+            }
+        });
+
+        addDisplayElement(title);
+        addDisplayElement(version);
+        addDisplayElement(configButton);
+        addDisplayElement(exitButton);
+        addDisplayElement(singlePlayerButton);
+        addDisplayElement(joinButton);
     }
 }
