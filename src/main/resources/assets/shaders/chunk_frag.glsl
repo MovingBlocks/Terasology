@@ -94,10 +94,8 @@ void main(){
 
         color = texture2D(textureWaterReflection, projectedPos + normalWater.xy * WATER_REFRACTION) * vec4(REFLECTION_COLOR);
 
-        float ndot = dot(normalize(eyeVec), vec3(0.0, 1.0, 0.0));
-        float fresnel= 1.0 - clamp(0.5 + ndot * ndot * 0.5, 0.0, 1.0);
-        // Fresnel
-        //color = vec4(vec3(fresnel), 1.0);
+        float fDot = dot(normalize(eyeVec), vec3(0.0, 1.0, 0.0));
+        float fresnel= 1.0 - clamp(fDot, 0.0, 1.0);
         color = mix(vec4(WATER_COLOR), color, fresnel);
 #else
         color = vec4(WATER_COLOR);
