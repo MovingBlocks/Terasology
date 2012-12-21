@@ -1,5 +1,7 @@
 package org.terasology.world.chunks.blockdata;
 
+import java.util.Arrays;
+
 import org.terasology.world.chunks.deflate.TeraAdvancedDeflator;
 
 import com.google.common.base.Preconditions;
@@ -30,24 +32,6 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
         return getSizeXZ();
     }
 
-    @Override
-    protected final int rowGet(int x, int z, byte value) {
-        return value;
-    }
-
-    @Override
-    protected final int rowGet(byte[] row, int x, int z) {
-        return row[z * getSizeX() + x];
-    }
-
-    @Override
-    protected final int rowSet(byte[] row, int x, int z, int value) {
-        int pos = z * getSizeX() + x;
-        int old = row[pos];
-        row[pos] = (byte) value;
-        return old;
-    }
-
     public TeraSparseArray8Bit() {
         super();
     }
@@ -72,5 +56,83 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
     @Override
     public int getElementSizeInBits() {
         return 8;
+    }
+
+    @Override
+    public final int get(int x, int y, int z) {
+//        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
+        if (inflated == null) 
+            return fill;
+        byte[] row = inflated[y];
+        if (row != null)
+            return row[pos(x, z)];
+        return deflated[y];
+    }
+
+    @Override
+    public final int set(int x, int y, int z, int value) {
+//        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
+//        if (value < -128 || value > 127) throw new IllegalArgumentException("Parameter 'value' has to be in the range of -128 - 127 (" + value + ")");
+        if (inflated == null) {
+            int old = fill;
+            if (old == value)
+                return old;
+            else {
+                this.inflated = new byte[getSizeY()][];
+                this.deflated = new byte[getSizeY()];
+                Arrays.fill(deflated, fill);
+            }
+        }
+        byte[] row = inflated[y];
+        if (row != null) {
+            int pos = pos(x, z);
+            int old = row[pos];
+            row[pos] = (byte) value;
+            return old;
+        }
+        int old = deflated[y];
+        if (old == value)
+            return old;
+        row = inflated[y] = new byte[rowSize()];
+        Arrays.fill(row, deflated[y]);
+        int pos = pos(x, z);
+        row[pos] = (byte) value;
+        return deflated[y];
+    }
+
+    @Override
+    public final boolean set(int x, int y, int z, int value, int expected) {
+//        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
+//        if (value < -128 || value > 127) throw new IllegalArgumentException("Parameter 'value' has to be in the range of -128 - 127 (" + value + ")");
+//        if (expected < -128 || expected > 127) throw new IllegalArgumentException("Parameter 'expected' has to be in the range of -128 - 127 (" + value + ")");
+        if (value == expected) return true;
+        if (inflated == null) {
+            int old = fill;
+            if (old == value)
+                return true;
+            else {
+                this.inflated = new byte[getSizeY()][];
+                this.deflated = new byte[getSizeY()];
+                Arrays.fill(deflated, fill);
+            }
+        }
+        int pos = pos(x, z);
+        byte[] row = inflated[y];
+        if (row != null) {
+            int old = row[pos];
+            if (old == expected) {
+                row[pos] = (byte) value;
+                return true;
+            }
+            return false;
+        }
+        int old = deflated[y];
+        if (old == expected) {
+            row = inflated[y] = new byte[rowSize()];
+            Arrays.fill(row, deflated[y]);
+            row[pos] = (byte) value;
+            return true;
+        }
+        return false;
     }
 }

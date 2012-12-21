@@ -1,5 +1,7 @@
 package org.terasology.world.chunks.blockdata;
 
+import java.util.Arrays;
+
 import org.terasology.world.chunks.deflate.TeraAdvancedDeflator;
 
 import com.google.common.base.Preconditions;
@@ -30,27 +32,32 @@ public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
         return getSizeXZHalf();
     }
 
-    @Override
-    protected final int rowGet(int x, int z, byte value) {
-        int pos = z * getSizeX() + x;
+    private final int rowGet(int pos, byte value) {
         if (pos < getSizeXZHalf()) {
             return TeraArrays.getHi(value);
         }
         return TeraArrays.getLo(value);
     }
 
-    @Override
-    protected final int rowGet(byte[] row, int x, int z) {
-        int pos = z * getSizeX() + x;
+    private final int rowGet(byte[] row, int pos) {
         if (pos < getSizeXZHalf()) {
             return TeraArrays.getHi(row[pos]);
         }
         return TeraArrays.getLo(row[pos - getSizeXZHalf()]);
     }
 
-    @Override
-    protected final int rowSet(byte[] row, int x, int z, int value) {
-        int pos = z * getSizeX() + x;
+    private final void rowSet(byte[] row, int pos, int value) {
+        if (pos < getSizeXZHalf()) {
+            byte raw = row[pos];
+            row[pos] = TeraArrays.setHi(raw, value);
+            return;
+        }
+        pos = pos - getSizeXZHalf();
+        byte raw = row[pos];
+        row[pos] = TeraArrays.setLo(raw, value);
+    }
+
+    private final int rowSetGetOld(byte[] row, int pos, int value) {
         if (pos < getSizeXZHalf()) {
             byte raw = row[pos];
             byte old = TeraArrays.getHi(raw);
@@ -90,4 +97,79 @@ public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
     public int getElementSizeInBits() {
         return 4;
     }
+
+    @Override
+    public final int get(int x, int y, int z) {
+        //        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
+        int pos = pos(x, z);
+        if (inflated == null) 
+            return rowGet(pos, fill);
+        byte[] row = inflated[y];
+        if (row != null)
+            return rowGet(row, pos);
+        return rowGet(pos, deflated[y]);
+    }
+
+    @Override
+    public final int set(int x, int y, int z, int value) {
+        //        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
+        //        if (value < -128 || value > 127) throw new IllegalArgumentException("Parameter 'value' has to be in the range of -128 - 127 (" + value + ")");
+        int pos = pos(x, z);
+        if (inflated == null) {
+            int old = rowGet(pos, fill);
+            if (old == value)
+                return old;
+            else {
+                this.inflated = new byte[getSizeY()][];
+                this.deflated = new byte[getSizeY()];
+                Arrays.fill(deflated, fill);
+            }
+        }
+        byte[] row = inflated[y];
+        if (row != null)
+            return rowSetGetOld(row, pos, value);
+        int old = rowGet(pos, deflated[y]);
+        if (old == value)
+            return old;
+        row = inflated[y] = new byte[rowSize()];
+        Arrays.fill(row, deflated[y]);
+        return rowSetGetOld(row, pos, value);
+    }
+
+    @Override
+    public final boolean set(int x, int y, int z, int value, int expected) {
+//                if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
+        //        if (value < -128 || value > 127) throw new IllegalArgumentException("Parameter 'value' has to be in the range of -128 - 127 (" + value + ")");
+        //        if (expected < -128 || expected > 127) throw new IllegalArgumentException("Parameter 'expected' has to be in the range of -128 - 127 (" + value + ")");
+        if (value == expected) return true;
+        int pos = pos(x, z);
+        if (inflated == null) {
+            int old = rowGet(pos, fill);
+            if (old == value)
+                return true;
+            else {
+                this.inflated = new byte[getSizeY()][];
+                this.deflated = new byte[getSizeY()];
+                Arrays.fill(deflated, fill);
+            }
+        }
+        byte[] row = inflated[y];
+        if (row != null) {
+            int old = rowGet(row, pos);
+            if (old == expected) {
+                rowSet(row, pos, value);
+                return true;
+            }
+            return false;
+        }
+        int old = rowGet(pos, deflated[y]);
+        if (old == expected) {
+            row = inflated[y] = new byte[rowSize()];
+            Arrays.fill(row, deflated[y]);
+            rowSet(row, pos, value);
+            return true;
+        }
+        return false;
+    }
+
 }

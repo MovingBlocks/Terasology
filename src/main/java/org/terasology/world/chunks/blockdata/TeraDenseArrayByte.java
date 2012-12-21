@@ -17,10 +17,6 @@ public abstract class TeraDenseArrayByte extends TeraDenseArray {
 
     protected byte[] data; 
     
-    protected abstract TeraArray createSparse(byte fill);
-    
-    protected abstract TeraArray createSparse(byte[][] inflated, byte[] deflated);
-
     protected abstract TeraArray createDense(byte[] data);
     
     protected abstract int rowSize();
