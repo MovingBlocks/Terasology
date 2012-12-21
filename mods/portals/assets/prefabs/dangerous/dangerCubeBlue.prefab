@@ -28,6 +28,6 @@
     "footstepVolume" : 0.7
   },
   "Spawnable" : {
-    "type" : "dgelcube"
+    "type" : "dangercube"
   }
 }

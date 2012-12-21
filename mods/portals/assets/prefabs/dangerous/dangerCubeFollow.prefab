@@ -2,34 +2,36 @@
   "Location" : {},
   "Mesh" : {
     "renderType" : "GelatinousCube",
-    "color" : [1, 0, 0, 1]
-  },  
+    "color" : [0.40, 0.40, 0.40, 1]
+  },
+  "Lifespan" :{
+	"lifespan" : 540
+	},
   "CharacterMovement" : {
     "height" : 1,
     "radius" : 0.5,
     "stepHeight" : 0,
     "faceMovementDirection" : true,
-    "maxGroundSpeed" : 15.0,
-    "groundFriction" = 0.8
+    "maxGroundSpeed" : 2.6,
+    "groundFriction" = 3
   },
   "HierarchicalAI" : {
-  	"hectic" : 1,
+	"dieIfPlayerFar"=false,
+  	"hectic" : 3,
   	"straightLined" : 1,
-  	"playerdistance" : 2,
-	"directionUpdateTime" :1500,
-	"idlingUpdateTime" :100,
+  	"playerdistance" : 1,
   	"aggressive" : true,
   	"hunter": true,
-  	"playerSense" : 50,
+  	"playerSense" : 1000,
         "attackDistance" : 3,
 	"damage" : 50,
-        "damageFrequency" : 100
+        "damageFrequency" : 500
   },
   "CharacterSound" : {
     "footstepSounds" : ["engine:Slime1", "engine:Slime2", "engine:Slime3", "engine:Slime4", "engine:Slime5"],
     "footstepVolume" : 0.7
   },
   "Spawnable" : {
-    "type" : "dgelcube"
+    "type" : "dangercube"
   }
 }

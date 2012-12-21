@@ -27,9 +27,8 @@ public class SpawnableComponent implements Component {
     /** What category is this spawnable */
     public String type = "undefined";
     
-    /*how common creature is, prefeable between 1-75*/
-    public int commoness=75;
+    /** Weight for how common the spawnable is, from 0-255 with 0 meaning unspawnable and 255 being the most common */
+    public short probability = 1;
     
-    //TODO add darkness level and biome
-    //when map generation has reached beter level
+    //TODO add darkness level and biome when map generation has reached better level
 }

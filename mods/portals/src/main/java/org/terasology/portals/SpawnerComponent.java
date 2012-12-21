@@ -33,14 +33,16 @@ public class SpawnerComponent implements Component {
     
     public long lastTick=0;
     
-    public int timeBetweenSpawns = 25000; //orginal 5000
-    //TODO: Refactor later when UpdateSubscriberSystem has a better way to trigger at arbitrary intervals int timeBetweenSpawns = 5000; // TODO: Refactor later when UpdateSubscriberSystem has a better way to trigger at arbitrary intervals
+    public int timeBetweenSpawns = 5000;
+
     public int maxMobsPerSpawner = 16;
     
     public boolean rangedSpawning = false;
+
     public int range=1000;
     
     public boolean needsPlayer = false;
+
     public int playerNeedRange=10000;
     
 }

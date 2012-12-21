@@ -17,7 +17,7 @@
     "Portal" : {
     },
     "Spawner" : {
-        "types" : ["dgelcube"],
+        "types" : ["dangercube"],
 	"timeBetweenSpawns" : 5000,
  	"maxMobsPerSpawner" : 5,
 	"rangedSpawning" : true,

@@ -22,7 +22,6 @@ import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.SimpleAIComponent;
 import org.terasology.components.HierarchicalAIComponent;
 import org.terasology.entitySystem.*;
-import org.terasology.portals.factories.DefaultMobFactory;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.utilities.FastRandom;
@@ -46,7 +45,7 @@ public class SpawnerSystem implements UpdateSubscriberSystem {
     private DefaultMobFactory factory;
 
     private long tick = 0;
-    //private long classLastTick = 0;
+    private long classLastTick = 0;
 
     private static final Logger logger = LoggerFactory.getLogger(SpawnerSystem.class);
 
@@ -92,113 +91,91 @@ public class SpawnerSystem implements UpdateSubscriberSystem {
         // Keep a ms counter handy, delta is in seconds
         tick += delta * 1000;
       
-        /*if (tick - classLastTick < 250) {
+        if (tick - classLastTick < 1000) {
             return;
         }
-        classLastTick=tick;*/
+        classLastTick = tick;
         
         
         // Go through entities that are spawners. Only accept block-based spawners for now (due to location need)
         //logger.info("Count of entities with a SpawnerComponent: {}", entityManager.getComponentCount(SpawnerComponent.class));
-		for (EntityRef entity : entityManager.iteratorEntities(
-				SpawnerComponent.class, BlockComponent.class)) {
-			//logger.info("Found a spawner: {}", entity);
-			SpawnerComponent spawnComp = entity
-					.getComponent(SpawnerComponent.class);
-			
-			if(spawnComp.lastTick>tick)
-				spawnComp.lastTick=tick;
+        for (EntityRef entity : entityManager.iteratorEntities(SpawnerComponent.class, BlockComponent.class)) {
+            //logger.info("Found a spawner: {}", entity);
+            SpawnerComponent spawnComp = entity.getComponent(SpawnerComponent.class);
+            
+            if(spawnComp.lastTick > tick) {
+                spawnComp.lastTick = tick;
+            }
 
-			//logger.info("tick is " + tick + ", lastTick is " + spawnComp.lastTick);
-			if (tick - spawnComp.lastTick < spawnComp.timeBetweenSpawns) {
-				return;
-			}
+            //logger.info("tick is " + tick + ", lastTick is " + spawnComp.lastTick);
+            if (tick - spawnComp.lastTick < spawnComp.timeBetweenSpawns) {
+                return;
+            }
 
-			// logger.info("Going to do stuff");
-			spawnComp.lastTick = tick;
+             //logger.info("Going to do stuff");
+            spawnComp.lastTick = tick;
 
-			// TODO Make sure we don't spawn too much stuff. Not very robust yet
-			int maxMobs = entityManager
-					.getComponentCount(SpawnerComponent.class)
-					* spawnComp.maxMobsPerSpawner + spawnComp.maxMobsPerSpawner;
-			int currentMobs = entityManager
-					.getComponentCount(SimpleAIComponent.class)
-					+ entityManager
-							.getComponentCount(HierarchicalAIComponent.class);
+            // TODO Make sure we don't spawn too much stuff. Not very robust yet and doesn't tie mobs to their spawner of origin right
+            int maxMobs = entityManager.getComponentCount(SpawnerComponent.class) * spawnComp.maxMobsPerSpawner;
+            int currentMobs = entityManager.getComponentCount(SimpleAIComponent.class) + entityManager.getComponentCount(HierarchicalAIComponent.class);
 
-			// logger.info("Mob count: {}/{}", currentMobs, maxMobs);
+            logger.info("Mob count: {}/{}", currentMobs, maxMobs);
 
-			// TODO Probably need something better to base this threshold on
-			// eventually
-			if (currentMobs >= maxMobs) {
-				logger.info("Too many mobs! Returning early");
-				return;
-			}
+            // TODO Probably need something better to base this threshold on eventually
+            if (currentMobs >= maxMobs) {
+                logger.info("Too many mobs! Returning early");
+                return;
+            }
 
-			int spawnTypes = spawnComp.types.size();
-			if (spawnTypes == 0) {
-				logger.warn("Spawner has no types, sad - stopping this loop iteration early :-(");
-				continue;
-			}
+            int spawnTypes = spawnComp.types.size();
+            if (spawnTypes == 0) {
+                logger.warn("Spawner has no types, sad - stopping this loop iteration early :-(");
+                continue;
+            }
 
-			BlockComponent blockComp = entity
-					.getComponent(BlockComponent.class);
-			Vector3f pos = blockComp.getPosition().toVector3f();
+            BlockComponent blockComp = entity.getComponent(BlockComponent.class);
+            Vector3f pos = blockComp.getPosition().toVector3f();
 
-			// find player position
-			// TODO: shouldn't use local player, need some way to find nearest
-			// player
-			if (spawnComp.needsPlayer) {
-				LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-				if (localPlayer != null) {
-					Vector3f dist = new Vector3f(pos);
-					dist.sub(localPlayer.getPosition());
-					double distanceToPlayer = dist.lengthSquared();
+            // find player position
+            // TODO: shouldn't use local player, need some way to find nearest player
+            if (spawnComp.needsPlayer) {
+                LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+                if (localPlayer != null) {
+                    Vector3f dist = new Vector3f(pos);
+                    dist.sub(localPlayer.getPosition());
+                    double distanceToPlayer = dist.lengthSquared();
 
-					if (distanceToPlayer > spawnComp.playerNeedRange) {
-						// logger.warn("Spawner too far from player");
-						continue;
-					}
+                    if (distanceToPlayer > spawnComp.playerNeedRange) {
+                        logger.warn("Spawner too far from player");
+                        continue;
+                    }
 
-				}
-			}
+                }
+            }
 
-			if (currentMobs < maxMobs) {
+            if (currentMobs < maxMobs) {
 
-				if (spawnComp.rangedSpawning) {
-					pos = new Vector3f(pos.x + random.randomFloat()
-							* spawnComp.range, pos.y, pos.z
-							+ random.randomFloat() * spawnComp.range);
-				}
+                if (spawnComp.rangedSpawning) {
+                    pos = new Vector3f(pos.x + random.randomFloat() * spawnComp.range, pos.y, pos.z + random.randomFloat() * spawnComp.range);
+                }
 
-				logger.info("Going to spawn something at {}", pos);
+                String chosenSpawnerType = spawnComp.types.get(random.randomIntAbs(spawnComp.types.size()));
+                Set randomType = typeLists.get(chosenSpawnerType);
+                logger.info("Picked random type {} which returned {} prefabs", chosenSpawnerType, randomType.size());
+                if (randomType.size() == 0) {
+                    logger.warn("Type {} wasn't found, sad :-( Won't spawn anything this time", chosenSpawnerType);
+                    return;
+                }
+                int anotherRandomIndex = random.randomIntAbs(randomType.size());
+                Object[] randomPrefabs = randomType.toArray();
+                Prefab chosenPrefab = (Prefab) randomPrefabs[anotherRandomIndex];
+                logger.info("Picked index {} of types {} which is a {}, to spawn at {}", anotherRandomIndex, chosenSpawnerType, chosenPrefab, pos);
 
-				String chosenSpawnerType = spawnComp.types.get(random
-						.randomIntAbs(spawnComp.types.size()));
-				Set randomType = typeLists.get(chosenSpawnerType);
-				// logger.info("Picked random type {} which returned {} prefabs",
-				// chosenSpawnerType, randomType.size());
-				if (randomType.size() == 0) {
-					logger.warn("That type wasn't found, sad :-( Won't spawn anything this time");
-					return;
-				}
-				int anotherRandomIndex = random.randomIntAbs(randomType.size());
-				Object[] randomPrefabs = randomType.toArray();
-				Prefab chosenPrefab = (Prefab) randomPrefabs[anotherRandomIndex];
-				logger.info("Picked index {} of types {} which is a {}",
-						anotherRandomIndex, chosenSpawnerType, chosenPrefab);
+                factory.generate(pos, chosenPrefab);
+            }
 
-				// TODO: Currently assuming all Spawnables are GelCubes, who
-				// have their own factory. Won't be the case long-term
-				factory.generate(pos, chosenPrefab);
-				currentMobs++;
-			}
-
-			// TODO: Use some sort of parent/inheritance thing with gelcubes ->
-			// specialized gelcubes
-			// TODO: Introduce a ranged spawning option for portals (old
-			// "wild gelcubes")
-			// TODO: Introduce proper probability-based spawning
-		}
-	}
+            // TODO: Use some sort of parent/inheritance thing with gelcubes -> specialized gelcubes
+            // TODO: Introduce proper probability-based spawning
+        }
+    }
 }
