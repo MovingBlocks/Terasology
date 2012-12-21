@@ -52,6 +52,16 @@ public class AbstractWorldProviderDecorator implements WorldProviderCore {
     }
 
     @Override
+    public void registerListener(WorldChangeListener listener) {
+        base.registerListener(listener);
+    }
+
+    @Override
+    public void unregisterListener(WorldChangeListener listener) {
+        base.unregisterListener(listener);
+    }
+
+    @Override
     public WorldView getLocalView(Vector3i chunk) {
         return base.getLocalView(chunk);
     }

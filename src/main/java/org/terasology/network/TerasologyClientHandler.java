@@ -28,9 +28,13 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.MessageManager;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
+import org.terasology.math.Vector3i;
 import org.terasology.model.structures.TeraArray;
 import org.terasology.model.structures.TeraSmartArray;
 import org.terasology.protobuf.NetData;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
 
 import static org.terasology.protobuf.NetData.*;
@@ -72,9 +76,20 @@ public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
             case INVALIDATE_CHUNK:
                 invalidateChunk(message.getInvalidateChunk());
                 break;
+            case BLOCK_CHANGED:
+                blockChanged(message.getBlockChange());
+                break;
 
         }
         logger.debug("Received message: {}", message.getType());
+    }
+
+    private void blockChanged(BlockChangeMessage blockChange) {
+        // TODO: Store changes to blocks that aren't ready to be modified (the surrounding chunks aren't available)
+        WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
+        Vector3i pos = NetworkUtil.convert(blockChange.getPos());
+        Block oldBlock = worldProvider.getBlock(pos);
+        worldProvider.setBlock(pos, BlockManager.getInstance().getBlock((byte) blockChange.getNewBlock()), oldBlock);
     }
 
     // TODO: Threading (need to deal with this coming from a background thread correctly)

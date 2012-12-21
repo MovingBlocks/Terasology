@@ -98,4 +98,14 @@ public class WorldProviderWrapper extends AbstractWorldProviderDecorator impleme
     public byte getTotalLight(Vector3i pos) {
         return core.getTotalLight(pos.x, pos.y, pos.z);
     }
+
+    @Override
+    public void registerListener(WorldChangeListener listener) {
+        core.registerListener(listener);
+    }
+
+    @Override
+    public void unregisterListener(WorldChangeListener listener) {
+        core.unregisterListener(listener);
+    }
 }

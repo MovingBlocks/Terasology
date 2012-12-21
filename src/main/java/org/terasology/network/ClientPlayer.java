@@ -12,8 +12,13 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventReceiver;
 import org.terasology.entitySystem.EventSystem;
 import org.terasology.game.CoreRegistry;
+import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.protobuf.NetData;
+import org.terasology.world.WorldChangeListener;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.WorldUtil;
+import org.terasology.world.block.Block;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.ChunkRegionListener;
@@ -24,7 +29,7 @@ import java.util.Set;
 /**
  * @author Immortius
  */
-public class ClientPlayer implements ChunkRegionListener, EventReceiver<ChunkUnloadedEvent> {
+public class ClientPlayer implements ChunkRegionListener, WorldChangeListener, EventReceiver<ChunkUnloadedEvent> {
     private static final Logger logger = LoggerFactory.getLogger(ClientPlayer.class);
 
     private EntityRef playerEntity;
@@ -39,6 +44,7 @@ public class ClientPlayer implements ChunkRegionListener, EventReceiver<ChunkUnl
         this.channel = channel;
         this.chunkProvider = CoreRegistry.get(ChunkProvider.class);
         playerEntity = CoreRegistry.get(EntityManager.class).create("engine:client");
+        CoreRegistry.get(WorldProvider.class).registerListener(this);
 
     }
 
@@ -72,6 +78,7 @@ public class ClientPlayer implements ChunkRegionListener, EventReceiver<ChunkUnl
     public void disconnect() {
         playerEntity.destroy();
         CoreRegistry.get(EventSystem.class).unregisterEventReceiver(this, ChunkUnloadedEvent.class, WorldComponent.class);
+        CoreRegistry.get(WorldProvider.class).unregisterListener(this);
     }
 
     public void send(NetData.NetMessage data) {
@@ -96,6 +103,20 @@ public class ClientPlayer implements ChunkRegionListener, EventReceiver<ChunkUnl
                     setInvalidateChunk(NetData.InvalidateChunkMessage.newBuilder().
                             setPos(NetworkUtil.convert(event.getChunkPos())).build()).
                     build();
+            channel.write(message);
+        }
+    }
+
+    @Override
+    public void onBlockChanged(Vector3i pos, Block newBlock, Block originalBlock) {
+        Vector3i chunkPos = TeraMath.calcChunkPos(pos);
+        if (relevantChunks.contains(chunkPos)) {
+            NetData.NetMessage message = NetData.NetMessage.newBuilder()
+                    .setType(NetData.NetMessage.Type.BLOCK_CHANGED)
+                    .setBlockChange(NetData.BlockChangeMessage.newBuilder()
+                            .setPos(NetworkUtil.convert(pos))
+                            .setNewBlock(newBlock.getId())
+                            .build()).build();
             channel.write(message);
         }
     }

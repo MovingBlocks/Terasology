@@ -51,6 +51,14 @@ public interface WorldProviderCore {
     public WorldBiomeProvider getBiomeProvider();
 
     /**
+     *
+     * @param listener
+     */
+    public void registerListener(WorldChangeListener listener);
+
+    public void unregisterListener(WorldChangeListener listener);
+
+    /**
      * @param chunk
      * @return A world view centered on the desired chunk, with the surrounding chunks present.
      */

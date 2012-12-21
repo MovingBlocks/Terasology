@@ -16,6 +16,7 @@
 
 package org.terasology.world;
 
+import com.google.common.collect.Lists;
 import org.terasology.config.ModConfig;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
@@ -41,6 +42,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.List;
 
 /**
  * @author Immortius
@@ -56,6 +58,8 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     private ChunkProvider chunkProvider;
 
     private long timeOffset;
+
+    private List<WorldChangeListener> listeners = Lists.newArrayList();
 
     public WorldProviderCoreImpl(String title, String seed, String[] chunkGenerators, ChunkProvider chunkProvider) {
         if (seed == null || seed.isEmpty()) {
@@ -114,6 +118,20 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     }
 
     @Override
+    public void registerListener(WorldChangeListener listener) {
+        synchronized (listeners) {
+            listeners.add(listener);
+        }
+    }
+
+    @Override
+    public void unregisterListener(WorldChangeListener listener) {
+        synchronized (listeners) {
+            listeners.remove(listener);
+        }
+    }
+
+    @Override
     public WorldView getLocalView(Vector3i chunk) {
         return WorldView.createLocalView(chunk, chunkProvider);
     }
@@ -161,12 +179,24 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
                 } else {
                     worldView.setDirtyAround(affected);
                 }
+
+                notifyBlockChanged(x, y, z, type, oldType);
+
                 return true;
             } finally {
                 worldView.unlock();
             }
         }
         return false;
+    }
+
+    private void notifyBlockChanged(int x, int y, int z, Block type, Block oldType) {
+        Vector3i pos = new Vector3i(x, y, z);
+        synchronized (listeners) {
+            for (WorldChangeListener listener : listeners) {
+                listener.onBlockChanged(pos, type, oldType);
+            }
+        }
     }
 
     @Override

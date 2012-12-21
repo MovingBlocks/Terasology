@@ -20,6 +20,7 @@ import com.google.common.collect.Maps;
 import org.terasology.math.Vector3i;
 import org.terasology.world.BlockUpdate;
 import org.terasology.world.WorldBiomeProvider;
+import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldInfo;
 import org.terasology.world.WorldProviderCore;
 import org.terasology.world.WorldView;
@@ -58,6 +59,16 @@ public class WorldProviderCoreStub implements WorldProviderCore {
     @Override
     public WorldBiomeProvider getBiomeProvider() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void registerListener(WorldChangeListener listener) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void unregisterListener(WorldChangeListener listener) {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override

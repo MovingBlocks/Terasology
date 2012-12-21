@@ -7,13 +7,15 @@ option java_outer_classname = "NetData";
 option optimize_for = SPEED;
 
 message NetMessage {
-    enum Type { CLIENT_CONNECT = 1; CONSOLE = 2; SERVER_INFO = 3; CHUNK = 4; INVALIDATE_CHUNK = 5;}
+    enum Type { CLIENT_CONNECT = 1; CONSOLE = 2; SERVER_INFO = 3; CHUNK = 4; INVALIDATE_CHUNK = 5; BLOCK_CHANGED = 6;}
     required Type type = 1;
     optional ChunkMessage chunkInfo = 2;
     optional InvalidateChunkMessage invalidateChunk = 3;
+    optional BlockChangeMessage blockChange = 4;
     optional ClientConnectMessage clientConnect = 15;
     optional ConsoleMessage console = 16;
     optional ServerInfoMessage serverInfo = 17;
+
 
     extensions 5000 to max;
 }
@@ -28,6 +30,11 @@ message ChunkMessage {
 
 message InvalidateChunkMessage {
     optional Vector3iData pos = 1;
+}
+
+message BlockChangeMessage {
+    optional Vector3iData pos = 1;
+    optional int32 newBlock = 2;
 }
 
 message Vector3iData {
