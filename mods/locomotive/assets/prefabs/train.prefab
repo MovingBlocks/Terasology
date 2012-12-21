@@ -12,5 +12,7 @@
     "BoxShape" : {
         "extents" : [1, 1, 1]
     },
-    "Locomotive" : {}
+    "Locomotive" : {
+        "maximumSpeed" : 4
+    }
 }
