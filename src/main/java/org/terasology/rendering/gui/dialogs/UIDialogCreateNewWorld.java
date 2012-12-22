@@ -140,7 +140,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
         item.setTextColor(Color.black);
         item.setPadding(new Vector4f(5f, 5f, 5f, 5f));
         chunkGenerator.addItem(item);
-        chunkGenerator.select(3);
+        chunkGenerator.select(0);
         chunkGenerator.setVisible(true);
 
 

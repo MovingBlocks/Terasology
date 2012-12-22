@@ -13,22 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.portals;
-
-import org.terasology.entitySystem.Component;
-
-/**
- * Component that enables an entity to be spawned by something
- *
- * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
- */
-public class SpawnableComponent implements Component {
-
-    /** What category is this spawnable */
-    public String type = "undefined";
-    
-    /** Weight for how common the spawnable is, from 0-255 with 0 meaning unspawnable and 255 being the most common */
-    public short probability = 1;
-    
-    //TODO add darkness level and biome when map generation has reached better level
+{
+    "Portal" : {
+    },
+    "Spawner" : {
+        "types" : ["hopper"],
+	"timeBetweenSpawns" : 5000,
+ 	"maxMobsPerSpawner" : 2,
+	"rangedSpawning" : true,
+ 	"range" : 30,
+ 	"needsPlayer" : true,
+        "playerNeedRange" :1000
+    },
+    "PlaySoundAction" : {
+        sounds = "portals:spawn"
+    }
 }
