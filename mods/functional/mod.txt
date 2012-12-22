@@ -1,0 +1,6 @@
+{
+    "id" : "functional",
+    "displayName" : "Functional blocks (e.g. locomotive)",
+    "author" : "Pencilcheck",
+    "description" : "Build blocks that does things :)"
+}

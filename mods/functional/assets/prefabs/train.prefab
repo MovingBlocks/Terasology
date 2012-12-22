@@ -2,7 +2,7 @@
     "Location" : {},
     "Mesh" : {
         "mesh" : "engine:cube",
-        "material" : "locomotive:train"
+        "material" : "functional:train"
     },
     "RigidBody" : {
         "kinematic" : true,
@@ -13,6 +13,7 @@
         "extents" : [1, 1, 1]
     },
     "Locomotive" : {
+        "id" : 0,
         "maximumSpeed" : 4
     }
 }
