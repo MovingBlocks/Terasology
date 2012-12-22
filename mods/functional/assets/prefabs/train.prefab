@@ -1,4 +1,9 @@
 {
+    "Item" : {
+        "name" : "Train",
+        "icon" : "gelcube",
+        "usage" : "IN_DIRECTION"
+    },
     "Location" : {},
     "Mesh" : {
         "mesh" : "engine:cube",
@@ -12,8 +17,9 @@
     "BoxShape" : {
         "extents" : [1, 1, 1]
     },
-    "Locomotive" : {
+    "Functional" : {
         "id" : 0,
+        "functionalFamily" : "Locomotive",
         "maximumSpeed" : 4
     }
 }

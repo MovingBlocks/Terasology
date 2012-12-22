@@ -15,6 +15,9 @@
  */
 package org.terasology.componentSystem.items;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.spi.LocationAwareLogger;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.entitySystem.EntityRef;
@@ -34,6 +37,8 @@ public class InventorySystem implements EventHandlerSystem {
 
     // TODO: differ per item?
     public static final byte MAX_STACK = (byte) 99;
+
+    private static final Logger logger = LoggerFactory.getLogger(InventorySystem.class);
 
     @Override
     public void initialise() {
@@ -65,6 +70,8 @@ public class InventorySystem implements EventHandlerSystem {
         ItemComponent item = event.getItem().getComponent(ItemComponent.class);
         if (inventory == null || item == null)
             return;
+
+        logger.info("Receiving item {} for toolbar", item.name);
 
         boolean itemChanged = false;
         

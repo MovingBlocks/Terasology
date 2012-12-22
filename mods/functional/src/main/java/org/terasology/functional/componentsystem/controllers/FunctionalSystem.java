@@ -20,7 +20,12 @@ import com.bulletphysics.collision.dispatch.*;
 import com.bulletphysics.collision.shapes.BoxShape;
 import com.bulletphysics.collision.shapes.ConvexShape;
 import com.bulletphysics.linearmath.Transform;
-import org.terasology.functional.components.LocomotiveComponent;
+import org.terasology.components.ItemComponent;
+import org.terasology.events.inventory.ReceiveItemEvent;
+import org.terasology.functional.components.FunctionalComponent;
+import org.terasology.functional.componentsystem.entityfactory.LocomotiveFactory;
+import org.terasology.math.Side;
+import org.terasology.math.TeraMath;
 import org.terasology.physics.HitResult;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
@@ -34,6 +39,7 @@ import org.terasology.logic.LocalPlayer;
 import org.terasology.math.Vector3fUtil;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.physics.CollisionGroup;
+import org.terasology.physics.ImpulseEvent;
 import org.terasology.physics.shapes.BoxShapeComponent;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
@@ -44,7 +50,7 @@ import javax.vecmath.*;
  * @author Pencilcheck <pennsu@gmail.com>
  */
 @RegisterComponentSystem
-public final class LocomotiveSystem implements UpdateSubscriberSystem, EventHandlerSystem {
+public final class FunctionalSystem implements UpdateSubscriberSystem, EventHandlerSystem {
     @In
     private LocalPlayer localPlayer;
 
@@ -56,8 +62,6 @@ public final class LocomotiveSystem implements UpdateSubscriberSystem, EventHand
 
     @In
     private BulletPhysics physics;
-
-    private static final Logger logger = LoggerFactory.getLogger(LocomotiveSystem.class);
 
 
     /**
@@ -88,37 +92,108 @@ public final class LocomotiveSystem implements UpdateSubscriberSystem, EventHand
 
     private static final float CHECK_FORWARD_DIST = 0.05f;
 
+    LocomotiveFactory locomotiveFactory;
 
     private float steppedUpDist = 0;
     private boolean stepped = false;
 
+    private static final Logger logger = LoggerFactory.getLogger(FunctionalSystem.class);
+
     @Override
     public void initialise() {
+        locomotiveFactory = new LocomotiveFactory();
+        locomotiveFactory.setEntityManager(entityManager);
     }
 
     @Override
     public void shutdown() {
     }
 
-    @ReceiveEvent(components = {LocomotiveComponent.class, LocationComponent.class})
-    public void onActivate(ActivateEvent event, EntityRef entity) {
-        logger.info("Activating Locomotive System");
+    @ReceiveEvent(components = {FunctionalComponent.class, ItemComponent.class}, priority = EventPriority.PRIORITY_HIGH)
+    public void onPlaceFunctional(ActivateEvent event, EntityRef item) {
+        FunctionalComponent functionalItem = item.getComponent(FunctionalComponent.class);
 
-        LocomotiveComponent loco = entity.getComponent(LocomotiveComponent.class);
-        loco.toggle();
-        entity.saveComponent(loco);
+        Side surfaceDir = Side.inDirection(event.getHitNormal());
+        Side secondaryDirection = TeraMath.getSecondaryPlacementDirection(event.getDirection(), event.getHitNormal());
+
+        logger.info("Placing Functional objects");
+
+        Vector3f newPosition = new Vector3f(localPlayer.getPosition().x + localPlayer.getViewDirection().x*1.5f,
+                localPlayer.getPosition().y + localPlayer.getViewDirection().y*1.5f,
+                localPlayer.getPosition().z + localPlayer.getViewDirection().z*1.5f
+        );
+        /*event.getTarget().getComponent(LocationComponent.class).getWorldPosition()*/
+        EntityRef functionalEntity = locomotiveFactory.generateLocomotiveCube(newPosition, functionalItem.getId());
+
+        functionalEntity.send(new ImpulseEvent(new Vector3f(localPlayer.getViewDirection().x, localPlayer.getViewDirection().y, localPlayer.getViewDirection().z)));
+
+        /*
+        if (!placeBlock(functionalItem.functionalFamily, event.getTarget().getComponent(BlockComponent.class).getPosition(), surfaceDir, secondaryDirection, functionalItem)) {
+            event.cancel();
+        }
+        */
     }
 
-    @ReceiveEvent(components = {LocomotiveComponent.class, LocationComponent.class})
+    /**
+     * Places a block of a given type in front of the player.
+     *
+     * @param type The type of the block
+     * @return True if a block was placed
+     */
+    /*
+    private boolean placeBlock(BlockFamily type, Vector3i targetBlock, Side surfaceDirection, Side secondaryDirection, BlockItemComponent blockItem) {
+        if (type == null)
+            return true;
+
+        Vector3i placementPos = new Vector3i(targetBlock);
+        placementPos.add(surfaceDirection.getVector3i());
+
+        Block block = type.getBlockFor(surfaceDirection, secondaryDirection);
+        if (block == null)
+            return false;
+
+        if (canPlaceBlock(block, targetBlock, placementPos)) {
+            if (blockEntityRegistry.setBlock(placementPos, block, worldProvider.getBlock(placementPos), blockItem.placedEntity)) {
+                AudioManager.play(new AssetUri(AssetType.SOUND, "engine:PlaceBlock"), 0.5f);
+                if (blockItem.placedEntity.exists()) {
+                    blockItem.placedEntity = EntityRef.NULL;
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean canPlaceBlock(Block block, Vector3i targetBlock, Vector3i blockPos) {
+        Block centerBlock = worldProvider.getBlock(targetBlock.x, targetBlock.y, targetBlock.z);
+
+        if (!centerBlock.isAttachmentAllowed()) {
+            return false;
+        }
+
+        Block adjBlock = worldProvider.getBlock(blockPos.x, blockPos.y, blockPos.z);
+        if (!adjBlock.isReplacementAllowed() || adjBlock.isTargetable()) {
+            return false;
+        }
+
+        // Prevent players from placing blocks inside their bounding boxes
+        if (!block.isPenetrable()) {
+            return !CoreRegistry.get(BulletPhysics.class).scanArea(block.getBounds(blockPos), Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.DEFAULT, StandardCollisionGroup.CHARACTER)).iterator().hasNext();
+        }
+        return true;
+    }
+    */
+
+    @ReceiveEvent(components = {FunctionalComponent.class, LocationComponent.class})
     public void onDestroy(final RemovedComponentEvent event, final EntityRef entity) {
-        LocomotiveComponent comp = entity.getComponent(LocomotiveComponent.class);
+        FunctionalComponent comp = entity.getComponent(FunctionalComponent.class);
         if (comp.collider != null) {
             physics.removeCollider(comp.collider);
         }
     }
 
     public void update(float delta) {
-        for (EntityRef entity : entityManager.iteratorEntities(LocomotiveComponent.class, LocationComponent.class)) {
+        for (EntityRef entity : entityManager.iteratorEntities(FunctionalComponent.class, LocationComponent.class)) {
             LocationComponent location = entity.getComponent(LocationComponent.class);
             Vector3f worldPos = location.getWorldPosition();
 
@@ -127,7 +202,7 @@ public final class LocomotiveSystem implements UpdateSubscriberSystem, EventHand
                 continue;
             }
 
-            LocomotiveComponent loco = entity.getComponent(LocomotiveComponent.class);
+            FunctionalComponent loco = entity.getComponent(FunctionalComponent.class);
 
             if (loco.collider == null) {
                 BoxShapeComponent shape  = entity.getComponent(BoxShapeComponent.class);
@@ -140,10 +215,10 @@ public final class LocomotiveSystem implements UpdateSubscriberSystem, EventHand
             if (!localPlayer.isValid())
                 return;
 
-            if (loco.locomotiveType == LocomotiveComponent.LocomotiveType.Boat) {
+            if (loco.locomotiveType == FunctionalComponent.LocomotiveType.Boat) {
                 goodToFloat(entity, location, loco);
                 floating(delta, entity, location, loco);
-            } else if (loco.locomotiveType == LocomotiveComponent.LocomotiveType.Train) {
+            } else if (loco.locomotiveType == FunctionalComponent.LocomotiveType.Train) {
                 goodToSlide(entity, location, loco);
                 sliding(delta, entity, location, loco);
             }
@@ -160,7 +235,7 @@ public final class LocomotiveSystem implements UpdateSubscriberSystem, EventHand
         return standingOn;
     }
 
-    public void updatePositions(Vector3f distanceMoved, EntityRef entity, LocationComponent location, LocationComponent player_location, LocomotiveComponent loco) {
+    public void updatePositions(Vector3f distanceMoved, EntityRef entity, LocationComponent location, LocationComponent player_location, FunctionalComponent loco) {
         Vector3f position = location.getWorldPosition();
         position.add(distanceMoved);
         location.setWorldPosition(position);
@@ -175,7 +250,7 @@ public final class LocomotiveSystem implements UpdateSubscriberSystem, EventHand
         }
     }
 
-    public boolean goodToFloat(EntityRef entity, LocationComponent location, LocomotiveComponent loco) {
+    public boolean goodToFloat(EntityRef entity, LocationComponent location, FunctionalComponent loco) {
         Vector3f top_position = location.getWorldPosition();
         Vector3f bottom_position = location.getWorldPosition();
         top_position.y += .12f;
@@ -209,7 +284,7 @@ public final class LocomotiveSystem implements UpdateSubscriberSystem, EventHand
         return loco.shouldMove;
     }
 
-    public void floating(float delta, EntityRef entity, LocationComponent location, LocomotiveComponent loco) {
+    public void floating(float delta, EntityRef entity, LocationComponent location, FunctionalComponent loco) {
         if (loco.shouldMove) {
             // Move forward
             Vector3f movementDirection = localPlayer.getViewDirection();
@@ -264,7 +339,7 @@ public final class LocomotiveSystem implements UpdateSubscriberSystem, EventHand
         updatePositions(distanceMoved, entity, location, localPlayer.getEntity().getComponent(LocationComponent.class), loco);
     }
 
-    public boolean goodToSlide(EntityRef entity, LocationComponent location, LocomotiveComponent loco) {
+    public boolean goodToSlide(EntityRef entity, LocationComponent location, FunctionalComponent loco) {
         Vector3f top_position = location.getWorldPosition();
         Vector3f middle_position = location.getWorldPosition();
         Vector3f bottom_position = location.getWorldPosition();
@@ -276,13 +351,13 @@ public final class LocomotiveSystem implements UpdateSubscriberSystem, EventHand
         Block bottom_block = worldProvider.getBlock(bottom_position);
 
         loco.shouldMove = top_block.isPenetrable() && middle_block.isPenetrable() && standingOn(entity);
-        logger.info("Train shouldMove {}, penetrable: top {}, middle {}, bottom {}", loco.shouldMove, top_block.isPenetrable(), middle_block.isPenetrable(), bottom_block.isPenetrable());
+        //logger.info("Train shouldMove {}, penetrable: top {}, middle {}, bottom {}", loco.shouldMove, top_block.isPenetrable(), middle_block.isPenetrable(), bottom_block.isPenetrable());
 
         if (!loco.shouldMove) {
             loco.currentVelocity.x = 0;
             loco.currentVelocity.y = 0;
             loco.currentVelocity.z = 0;
-            logger.info("Train resetting");
+            //logger.info("Train resetting");
         }
 
         // Try to fix it
@@ -291,7 +366,7 @@ public final class LocomotiveSystem implements UpdateSubscriberSystem, EventHand
             loco.currentVelocity.y = 1f;
             loco.currentVelocity.z = 0;
             loco.shouldMove = false;
-            logger.info("Train fixing");
+            //logger.info("Train fixing");
         }
 
         return loco.shouldMove;
@@ -309,7 +384,7 @@ public final class LocomotiveSystem implements UpdateSubscriberSystem, EventHand
         */
     }
 
-    public void sliding(float delta, EntityRef entity, LocationComponent location, LocomotiveComponent loco) {
+    public void sliding(float delta, EntityRef entity, LocationComponent location, FunctionalComponent loco) {
 
         if (loco.shouldMove) {
             // Move forward
@@ -344,7 +419,7 @@ public final class LocomotiveSystem implements UpdateSubscriberSystem, EventHand
         if (!loco.shouldMove) {
             distanceMoved = new Vector3f(loco.currentVelocity);
         }
-        logger.info("Distance moved {}", distanceMoved);
+        //logger.info("Distance moved {}", distanceMoved);
 
         loco.collider.setWorldTransform(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), moveResult.finalPosition, 1.0f)));
 

@@ -6,7 +6,6 @@ import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Prefab;
-import org.terasology.functional.componentsystem.controllers.FunctionalSystem;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.utilities.FastRandom;
 
@@ -24,7 +23,7 @@ public class LocomotiveFactory {
 
     private static final Vector3f[] COLORS = {new Vector3f(1.0f, 1.0f, 0.2f), new Vector3f(1.0f, 0.2f, 0.2f), new Vector3f(0.2f, 1.0f, 0.2f), new Vector3f(1.0f, 1.0f, 0.2f)};
 
-    private static final Logger logger = LoggerFactory.getLogger(FunctionalSystem.class);
+    private static final Logger logger = LoggerFactory.getLogger(LocomotiveFactory.class);
 
     private FastRandom random;
     private EntityManager entityManager;

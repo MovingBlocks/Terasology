@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * @author Pencilcheck <pennsu@gmail.com>
  */
-public final class LocomotiveComponent implements Component {
+public final class FunctionalComponent implements Component {
 
     public enum LocomotiveType {
         Train,
@@ -54,14 +54,7 @@ public final class LocomotiveComponent implements Component {
 
     public boolean shouldMove = false;
 
-    public boolean activated = false;
-
-    public void toggle() {
-        if(activated) activated = false;
-        else activated = true;
-    }
-
-    public float getId() {
+    public int getId() {
         return id;
     }
 
