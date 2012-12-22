@@ -21,12 +21,14 @@ import com.bulletphysics.collision.shapes.BoxShape;
 import com.bulletphysics.collision.shapes.ConvexShape;
 import com.bulletphysics.linearmath.Transform;
 import org.terasology.components.ItemComponent;
+import org.terasology.components.LocalPlayerComponent;
+import org.terasology.entitySystem.event.ChangedComponentEvent;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.functional.components.FunctionalComponent;
 import org.terasology.functional.componentsystem.entityfactory.LocomotiveFactory;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
-import org.terasology.physics.HitResult;
+import org.terasology.physics.*;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,9 +39,7 @@ import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.events.*;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.math.Vector3fUtil;
-import org.terasology.physics.BulletPhysics;
-import org.terasology.physics.CollisionGroup;
-import org.terasology.physics.ImpulseEvent;
+import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.physics.shapes.BoxShapeComponent;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
@@ -118,20 +118,25 @@ public final class FunctionalSystem implements UpdateSubscriberSystem, EventHand
 
         logger.info("Placing Functional objects");
 
+        // TODO: Check whether it is possible to place it (boat cannot be placed on land)
+
         Vector3f newPosition = new Vector3f(localPlayer.getPosition().x + localPlayer.getViewDirection().x*1.5f,
                 localPlayer.getPosition().y + localPlayer.getViewDirection().y*1.5f,
                 localPlayer.getPosition().z + localPlayer.getViewDirection().z*1.5f
         );
-        /*event.getTarget().getComponent(LocationComponent.class).getWorldPosition()*/
-        EntityRef functionalEntity = locomotiveFactory.generateLocomotiveCube(newPosition, functionalItem.getId());
 
-        functionalEntity.send(new ImpulseEvent(new Vector3f(localPlayer.getViewDirection().x, localPlayer.getViewDirection().y, localPlayer.getViewDirection().z)));
+        if (worldProvider.getBlock(newPosition).isPenetrable()) {
+            /*event.getTarget().getComponent(LocationComponent.class).getWorldPosition()*/
+            EntityRef functionalEntity = locomotiveFactory.generateLocomotiveCube(newPosition, functionalItem.getId());
 
-        /*
-        if (!placeBlock(functionalItem.functionalFamily, event.getTarget().getComponent(BlockComponent.class).getPosition(), surfaceDir, secondaryDirection, functionalItem)) {
-            event.cancel();
+            //functionalEntity.send(new ImpulseEvent(new Vector3f(localPlayer.getViewDirection().x, localPlayer.getViewDirection().y, localPlayer.getViewDirection().z)));
+
+            /*
+            if (!placeBlock(functionalItem.functionalFamily, event.getTarget().getComponent(BlockComponent.class).getPosition(), surfaceDir, secondaryDirection, functionalItem)) {
+                event.cancel();
+            }
+            */
         }
-        */
     }
 
     /**
@@ -203,7 +208,8 @@ public final class FunctionalSystem implements UpdateSubscriberSystem, EventHand
             }
 
             FunctionalComponent loco = entity.getComponent(FunctionalComponent.class);
-
+            logger.info("loco {}", loco.getLocomotiveType());
+            /*
             if (loco.collider == null) {
                 BoxShapeComponent shape  = entity.getComponent(BoxShapeComponent.class);
                 BoxShape box = new BoxShape(shape.extents);
@@ -211,10 +217,11 @@ public final class FunctionalSystem implements UpdateSubscriberSystem, EventHand
                 loco.collider.setUserPointer(entity);
                 continue;
             }
+            */
 
             if (!localPlayer.isValid())
                 return;
-
+            /*
             if (loco.locomotiveType == FunctionalComponent.LocomotiveType.Boat) {
                 goodToFloat(entity, location, loco);
                 floating(delta, entity, location, loco);
@@ -222,17 +229,53 @@ public final class FunctionalSystem implements UpdateSubscriberSystem, EventHand
                 goodToSlide(entity, location, loco);
                 sliding(delta, entity, location, loco);
             }
+            */
 
             entity.saveComponent(loco);
+
+            // Test 1 - using character movement
+            if (standingOn(entity)) {
+                logger.info("Player standing on functional");
+
+                Vector3f movementDirection = localPlayer.getViewDirection();
+                float speed = movementDirection.length();
+                movementDirection = new Vector3f(movementDirection.x, 0, movementDirection.z);
+                movementDirection.normalize();
+                movementDirection.scale(speed);
+
+                Vector3f desiredVelocity = new Vector3f(movementDirection);
+                desiredVelocity.scale(loco.getMaximumSpeed());
+
+                CharacterMovementComponent movement = entity.getComponent(CharacterMovementComponent.class);
+                movement.setDrive(desiredVelocity);
+                entity.saveComponent(movement);
+            } else {
+                logger.info("Player left functional");
+
+                CharacterMovementComponent movement = entity.getComponent(CharacterMovementComponent.class);
+                movement.setDrive(new Vector3f(0, 0, 0));
+                entity.saveComponent(movement);
+            }
+        }
+    }
+
+    @ReceiveEvent(components = {LocationComponent.class, FunctionalComponent.class})
+    public void onMove(MovedEvent event, EntityRef entity) {
+        if (standingOn(entity)) {
+            // update player position
+            LocationComponent player_location = localPlayer.getEntity().getComponent(LocationComponent.class);
+            Vector3f location = player_location.getWorldPosition();
+            location.add(event.getDelta());
+            player_location.setWorldPosition(location);
+            localPlayer.getEntity().saveComponent(player_location);
         }
     }
 
     public boolean standingOn(EntityRef entity) {
+        BoxShapeComponent boxshape = localPlayer.getEntity().getComponent(BoxShapeComponent.class);
         // Only move when someone is standing on it
-        HitResult hit = physics.rayTrace(localPlayer.getPosition(), new Vector3f(0, -1, 0), 1.6f * 0.25f);
-        boolean standingOn = hit.isHit() && hit.getEntity() == entity;
-        //logger.info("Player standing on functional {}", standingOn);
-        return standingOn;
+        HitResult hit = physics.rayTrace(localPlayer.getPosition(), new Vector3f(0, -1, 0), boxshape.extents.y);
+        return hit.isHit() && hit.getEntity() == entity;
     }
 
     public void updatePositions(Vector3f distanceMoved, EntityRef entity, LocationComponent location, LocationComponent player_location, FunctionalComponent loco) {
