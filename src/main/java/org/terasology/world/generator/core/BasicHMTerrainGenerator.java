@@ -5,6 +5,8 @@ package org.terasology.world.generator.core;
 import java.util.Map;
 
 import javassist.bytecode.stackmap.TypeData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.utilities.HeightmapFileReader;
 import org.terasology.world.block.Block;
@@ -19,7 +21,7 @@ import org.terasology.world.liquid.LiquidType;
  * @author Nym Traveel
  */
 public class BasicHMTerrainGenerator implements ChunkGenerator {
-
+    private static final Logger logger = LoggerFactory.getLogger(BasicHMTerrainGenerator.class);
 
     private WorldBiomeProvider biomeProvider;
     private Block air = BlockManager.getInstance().getAir();
@@ -35,7 +37,7 @@ public class BasicHMTerrainGenerator implements ChunkGenerator {
 
     @Override
     public void setWorldSeed(String seed) {
-        System.out.println("Initialising World"); //Why is this methode called twice?
+        logger.info("Initialising World"); //Why is this methode called twice?
         try{  heightmap = HeightmapFileReader.readFile("Heightmap.txt", "\n");}
         catch (Exception e){
             e.printStackTrace();

@@ -30,4 +30,19 @@ public class SpawnerComponent implements Component {
 
     /** Types of Spawnables this Spawner can spawn */
     public List<String> types = Lists.newArrayList();
+    
+    public long lastTick=0;
+    
+    public int timeBetweenSpawns = 5000;
+
+    public int maxMobsPerSpawner = 16;
+    
+    public boolean rangedSpawning = false;
+
+    public int range=1000;
+    
+    public boolean needsPlayer = false;
+
+    public int playerNeedRange=10000;
+    
 }

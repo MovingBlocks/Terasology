@@ -34,6 +34,7 @@ import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
+import org.codehaus.groovy.tools.groovydoc.SimpleGroovyExecutableMemberDoc;
 import org.newdawn.slick.opengl.PNGDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -338,7 +339,9 @@ public class BlockLoader {
             blockDefJson.remove("top");
             mergeJsonInto(blockDefJson, topDefJson);
             BlockDefinition topDef = loadBlockDefinition(topDefJson);
-            blockMap.put(Side.TOP, constructSingleBlock(blockDefUri, topDef));
+            Block block = constructSingleBlock(blockDefUri, topDef);
+            block.setDirection(Side.TOP);
+            blockMap.put(Side.TOP, block);
             categories = getCategories(topDef);
         }
         if (blockDefJson.has("sides")) {
@@ -354,7 +357,9 @@ public class BlockLoader {
             blockDefJson.remove("bottom");
             mergeJsonInto(blockDefJson, bottomDefJson);
             BlockDefinition bottomDef = loadBlockDefinition(bottomDefJson);
-            blockMap.put(Side.BOTTOM, constructSingleBlock(blockDefUri, bottomDef));
+            Block block = constructSingleBlock(blockDefUri, bottomDef);
+            block.setDirection(Side.BOTTOM);
+            blockMap.put(Side.BOTTOM, block);
             categories = getCategories(bottomDef);
         }
         return new AlignToSurfaceFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap, categories);
@@ -416,6 +421,7 @@ public class BlockLoader {
 
         for (Rotation rot : Rotation.horizontalRotations()) {
             Block block = createRawBlock(blockDef, properCase(blockDefUri.getAssetName()));
+            block.setDirection(rot.rotate(Side.FRONT));
             applyShape(block, shape, tileUris, rot);
 
             for (BlockPart part : BlockPart.values()) {

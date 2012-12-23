@@ -49,7 +49,7 @@ public enum AssetType {
     MUSIC("music", "music", "ogg", new OggStreamingSoundLoader()),
     SHAPE("shape", "shapes", "json", new JsonBlockShapeLoader()),
     MESH("mesh", "mesh", "obj", new ObjMeshLoader()),
-    TEXTURE("texture", new String[]{"textures", "fonts"}, "png", new PNGTextureLoader()),
+    TEXTURE("texture", new String[]{"textures", "fonts"}, new String[]{"png", "json"}, new PNGTextureLoader()),
     SHADER("shader", "shaders", new String[]{"glsl", "info"}, new GLSLShaderLoader()) {
         @Override
         public AssetUri getUri(String sourceId, String item) {

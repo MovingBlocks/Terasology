@@ -1,0 +1,44 @@
+{
+  "Location" : {},
+  "Mesh" : {
+    "renderType" : "GelatinousCube",
+    "color" : [0.58, 0.47, 0.33, 1]
+  },  
+  "Health" : {
+        "currentHealth" : 10,
+        "maxHealth" : 10,
+        "regenRate" : 0.1,
+        "waitBeforeRegen" : 10,
+        "excessSpeedDamageMultiplier" : 5,
+        "fallingDamageSpeedThreshold" : 15
+    },
+  "CharacterMovement" : {
+    "height" : 1,
+    "radius" : 0.5,
+    "stepHeight" : 0.4,
+    "faceMovementDirection" : true,
+    "maxGroundSpeed" : 5.0,
+    "groundFriction" = 8,
+    "jumpSpeed" = 25
+  },
+  "HierarchicalAI" : {
+  	"hectic" : 1,
+  	"straightLined" : 1,
+  	"playerdistance" : 2,
+	"directionUpdateTime" :1500,
+	"idlingUpdateTime" :100,
+  	"aggressive" : true,
+  	"hunter": true,
+  	"playerSense" : 40,
+        "attackDistance" : 3,
+	"damage" : 3,
+        "damageFrequency" : 100
+  },
+  "CharacterSound" : {
+    "footstepSounds" : ["engine:Slime1", "engine:Slime2", "engine:Slime3", "engine:Slime4", "engine:Slime5"],
+    "footstepVolume" : 0.7
+  },
+  "Spawnable" : {
+    "type" : "hopper"
+  }
+}
