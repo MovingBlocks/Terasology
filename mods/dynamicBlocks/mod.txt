@@ -1,0 +1,6 @@
+{
+    "id" : "dynamicBlocks",
+    "displayName" : "Dynamic Blocks (e.g. locomotive, vehicular, mechanisms)",
+    "author" : "Pencilcheck",
+    "description" : "Blocks that are locomotive, that have mechanisms"
+}

@@ -7,7 +7,7 @@
     "Location" : {},
     "Mesh" : {
         "mesh" : "engine:cube",
-        "material" : "functional:boat"
+        "material" : "dynamicBlocks:boat"
     },
     "RigidBody" : {
         "kinematic" : true,
@@ -23,9 +23,8 @@
         "stepHeight" : 0,
         "faceMovementDirection" : true
     },
-    "Functional" : {
-        "id" : 1,
-        "functionalFamily" : "Locomotive",
+    "DynamicBlock" : {
+        "dynamicType" : "Boat",
         "maximumSpeed" : 2
     }
 }

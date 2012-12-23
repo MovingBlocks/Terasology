@@ -1,7 +1,7 @@
 {
     "shader" : "engine:genericMesh",
     "params" : {
-        "diffuse" : "functional:ice",
+        "diffuse" : "dynamicBlocks:ice",
         "colorOffset" : [1.0, 1.0, 1.0],
         "textured" : true
     }

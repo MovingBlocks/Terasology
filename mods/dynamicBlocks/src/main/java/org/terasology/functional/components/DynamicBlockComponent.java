@@ -27,19 +27,17 @@ import java.util.List;
 /**
  * @author Pencilcheck <pennsu@gmail.com>
  */
-public final class FunctionalComponent implements Component {
+public final class DynamicBlockComponent implements Component {
 
-    public enum LocomotiveType {
+    public enum DynamicType {
         Train,
         Boat
     }
 
-    public int id;
-
     public CollisionGroup collisionGroup = StandardCollisionGroup.CHARACTER;
     public List<CollisionGroup> collidesWith = Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.WORLD, StandardCollisionGroup.SENSOR);
 
-    public LocomotiveType locomotiveType = LocomotiveType.Train;
+    public DynamicType dynamicType = DynamicType.Train;
 
     public Vector3f currentVelocity = new Vector3f();
 
@@ -54,20 +52,12 @@ public final class FunctionalComponent implements Component {
 
     public boolean shouldMove = false;
 
-    public int getId() {
-        return id;
+    public DynamicType getDynamicType() {
+        return dynamicType;
     }
 
-    public void setId(int new_id) {
-        id = new_id;
-    }
-
-    public LocomotiveType getLocomotiveType() {
-        return locomotiveType;
-    }
-
-    public void setLocomotiveType(LocomotiveType new_locomotiveType) {
-        locomotiveType = new_locomotiveType;
+    public void setDynamicType(DynamicType new_type) {
+        dynamicType = new_type;
     }
 
     public float getMaximumSpeed() {

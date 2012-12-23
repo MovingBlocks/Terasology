@@ -7,7 +7,7 @@
     "Location" : {},
     "Mesh" : {
         "mesh" : "engine:cube",
-        "material" : "functional:train"
+        "material" : "dynamicBlocks:train"
     },
     "RigidBody" : {
         "kinematic" : true,
@@ -23,9 +23,8 @@
         "stepHeight" : 0,
         "faceMovementDirection" : true
     },
-    "Functional" : {
-        "id" : 0,
-        "functionalFamily" : "Locomotive",
+    "DynamicBlock" : {
+        "dynamicType" : "Train",
         "maximumSpeed" : 4
     }
 }

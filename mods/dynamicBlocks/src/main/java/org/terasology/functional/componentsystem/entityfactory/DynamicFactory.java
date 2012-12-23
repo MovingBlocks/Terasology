@@ -5,11 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.Prefab;
-import org.terasology.rendering.logic.MeshComponent;
+import org.terasology.functional.components.DynamicBlockComponent;
 import org.terasology.utilities.FastRandom;
 
-import javax.vecmath.Color4f;
 import javax.vecmath.Vector3f;
 
 /**
@@ -19,32 +17,29 @@ import javax.vecmath.Vector3f;
  * Time: 6:14 AM
  * To change this template use File | Settings | File Templates.
  */
-public class LocomotiveFactory {
+public class DynamicFactory {
 
-    private static final Vector3f[] COLORS = {new Vector3f(1.0f, 1.0f, 0.2f), new Vector3f(1.0f, 0.2f, 0.2f), new Vector3f(0.2f, 1.0f, 0.2f), new Vector3f(1.0f, 1.0f, 0.2f)};
+    private static final Logger logger = LoggerFactory.getLogger(DynamicFactory.class);
 
-    private static final Logger logger = LoggerFactory.getLogger(LocomotiveFactory.class);
-
-    private FastRandom random;
     private EntityManager entityManager;
 
-    public EntityRef generateLocomotiveCube(Vector3f position, int index) {
+    public EntityRef generateDynamicBlock(Vector3f position, DynamicBlockComponent.DynamicType type) {
         EntityRef entity = null;
-        switch (index) {
-            case 0: {
+        switch (type) {
+            case Train: {
                 entity = entityManager.create("functional:train");
                 break;
             }
-            case 1: {
+            case Boat: {
                 entity = entityManager.create("functional:boat");
                 break;
             }
             default:
                 entity = entityManager.create("functional:train");
         }
-        if (entity == null) {
+        if (entity == null)
             return null;
-        }
+
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc != null) {
             loc.setWorldPosition(position);
@@ -52,10 +47,6 @@ public class LocomotiveFactory {
         }
 
         return entity;
-    }
-
-    public void setRandom(FastRandom random) {
-        this.random = random;
     }
 
     public void setEntityManager(EntityManager entityManager) {
