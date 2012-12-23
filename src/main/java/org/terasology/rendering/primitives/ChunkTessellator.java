@@ -271,8 +271,11 @@ public final class ChunkTessellator {
             // Draw horizontal sides if visible from below
             for (Side side : Side.horizontalSides()) {
                 Vector3i offset = side.getVector3i();
-                Block blockToCheck = view.getBlock(x + offset.x, y - 1, z + offset.z);
-                drawDir[side.ordinal()] |= isSideVisibleForBlockTypes(blockToCheck, block, side);
+                Block adjacentBelow = view.getBlock(x + offset.x, y - 1, z + offset.z);
+                Block adjacent = view.getBlock(x + offset.x, y, z + offset.z);
+                Block below = view.getBlock(x, y - 1, z);
+
+                drawDir[side.ordinal()] |= (isSideVisibleForBlockTypes(adjacentBelow, block, side) && !isSideVisibleForBlockTypes(below, adjacent, side.reverse()));
             }
 
             // Draw the top if below a non-lowered block
@@ -311,7 +314,6 @@ public final class ChunkTessellator {
         if (currentBlock.getMeshPart(BlockPart.fromSide(side)) == null) return false;
 
         // Liquids can be transparent but there should be no visible adjacent faces
-        // !!! In comparison to leaves !!!
         if (currentBlock.isLiquid() && blockToCheck.isLiquid()) return false;
 
         return blockToCheck.getId() == 0x0 ||
