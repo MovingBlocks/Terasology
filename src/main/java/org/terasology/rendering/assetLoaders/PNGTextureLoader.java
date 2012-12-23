@@ -52,47 +52,65 @@ public class PNGTextureLoader implements AssetLoader<Texture> {
 
     @Override
     public Texture load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
-        PNGDecoder decoder = new PNGDecoder(stream);
-
-        ByteBuffer buf = ByteBuffer.allocateDirect(4 * decoder.getWidth() * decoder.getHeight());
-        decoder.decode(buf, decoder.getWidth() * 4, PNGDecoder.RGBA);
-        buf.flip();
-
-        ByteBuffer data = buf;
-        int height = decoder.getHeight();
-        int width = decoder.getWidth();
-
-        Texture.FilterMode filterMode = Texture.FilterMode.Nearest;
-        Texture.WrapMode wrapMode = Texture.WrapMode.Clamp;
-
-        // TODO: Change asset loader setup so that the default filter mode can be set per asset location
-        if (urls.get(0).toString().contains("/fonts/")) {
-            filterMode = Texture.FilterMode.Linear;
-        }
-
-
-        for (URL url : urls) {
-            if (url.toString().endsWith(".json")) {
-                InputStreamReader reader = null;
-                try {
-                    reader = new InputStreamReader(url.openStream());
-                    TextureMetadata metadata = gson.fromJson(reader, TextureMetadata.class);
-                    if (metadata.filterMode != null) filterMode = metadata.filterMode;
-                    if (metadata.wrapMode != null) wrapMode = metadata.wrapMode;
-                } finally {
-                    // JAVA7: Replace with new handling
-                    if (reader != null) {
-                        try {
-                            reader.close();
-                        } catch (IOException e) {
-                            logger.error("Error closing {}", url.toString(), e);
-                        }
-                    }
+        InputStream pngStream = null;
+        if (urls.get(0).toString().endsWith(".png")) {
+            pngStream = stream;
+        } else {
+            for (URL url : urls) {
+                if (url.toString().endsWith(".png")) {
+                    pngStream = url.openStream();
+                    break;
                 }
-                break;
             }
         }
+        if (pngStream == null) {
+            throw new IOException("Missing png to go with texture json");
+        }
+        try {
+            PNGDecoder decoder = new PNGDecoder(stream);
 
-        return new Texture(uri, new ByteBuffer[]{data}, width, height, wrapMode, filterMode);
+            ByteBuffer buf = ByteBuffer.allocateDirect(4 * decoder.getWidth() * decoder.getHeight());
+            decoder.decode(buf, decoder.getWidth() * 4, PNGDecoder.RGBA);
+            buf.flip();
+
+            ByteBuffer data = buf;
+            int height = decoder.getHeight();
+            int width = decoder.getWidth();
+
+            Texture.FilterMode filterMode = Texture.FilterMode.Nearest;
+            Texture.WrapMode wrapMode = Texture.WrapMode.Clamp;
+
+            // TODO: Change asset loader setup so that the default filter mode can be set per asset location
+            if (urls.get(0).toString().contains("/fonts/")) {
+                filterMode = Texture.FilterMode.Linear;
+            }
+
+
+            for (URL url : urls) {
+                if (url.toString().endsWith(".json")) {
+                    InputStreamReader reader = null;
+                    try {
+                        reader = new InputStreamReader(url.openStream());
+                        TextureMetadata metadata = gson.fromJson(reader, TextureMetadata.class);
+                        if (metadata.filterMode != null) filterMode = metadata.filterMode;
+                        if (metadata.wrapMode != null) wrapMode = metadata.wrapMode;
+                    } finally {
+                        // JAVA7: Replace with new handling
+                        if (reader != null) {
+                            try {
+                                reader.close();
+                            } catch (IOException e) {
+                                logger.error("Error closing {}", url.toString(), e);
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+
+            return new Texture(uri, new ByteBuffer[]{data}, width, height, wrapMode, filterMode);
+        } finally {
+            pngStream.close();
+        }
     }
 }
