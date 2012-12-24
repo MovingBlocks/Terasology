@@ -3,6 +3,8 @@ package org.terasology.network;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
+import gnu.trove.map.TIntIntMap;
+import gnu.trove.map.hash.TIntIntHashMap;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;
@@ -14,6 +16,9 @@ import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.game.CoreRegistry;
 import org.terasology.protobuf.NetData;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
@@ -41,6 +46,9 @@ public class NetworkSystem {
     private NetData.ServerInfoMessage serverInfo;
     private RemoteChunkProvider remoteWorldProvider;
     private BlockingQueue<Chunk> chunkQueue = Queues.newLinkedBlockingQueue();
+    private int nextNetId = 1;
+
+    private TIntIntMap netIdToEntityId = new TIntIntHashMap();
 
     public NetworkSystem() {
     }
@@ -103,6 +111,8 @@ public class NetworkSystem {
             mode = NetworkMode.NONE;
             serverInfo = null;
             remoteWorldProvider = null;
+            nextNetId = 1;
+            netIdToEntityId.clear();
         }
     }
 
@@ -160,4 +170,46 @@ public class NetworkSystem {
     }
 
 
+    public void registerNetworkEntity(EntityRef entity) {
+        if (mode == NetworkMode.NONE) {
+            return;
+        }
+
+        NetworkComponent netComponent = entity.getComponent(NetworkComponent.class);
+        if (mode == NetworkMode.SERVER) {
+            netComponent.networkId = nextNetId++;
+            entity.saveComponent(netComponent);
+        }
+
+        netIdToEntityId.put(netComponent.networkId, entity.getId());
+
+        if (mode == NetworkMode.SERVER) {
+            for (ClientPlayer client : clientPlayerList) {
+                // replicate
+            }
+        }
+    }
+
+    public void unregisterNetworkEntity(EntityRef entity) {
+        NetworkComponent netComponent = entity.getComponent(NetworkComponent.class);
+        netIdToEntityId.remove(netComponent.networkId);
+        if (mode == NetworkMode.SERVER) {
+            NetData.NetMessage message = NetData.NetMessage.newBuilder()
+                    .setType(NetData.NetMessage.Type.REMOVE_ENTITY)
+                    .setRemoveEntity(
+                            NetData.RemoveEntityMessage.newBuilder().setNetId(netComponent.networkId).build())
+                    .build();
+            for (ClientPlayer client : clientPlayerList) {
+                client.send(message);
+            }
+        }
+    }
+
+    EntityRef getEntity(int netId) {
+        int entityId = netIdToEntityId.get(netId);
+        if (entityId != 0) {
+            return CoreRegistry.get(EntityManager.class).getEntity(entityId);
+        }
+        return EntityRef.NULL;
+    }
 }

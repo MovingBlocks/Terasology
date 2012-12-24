@@ -17,6 +17,7 @@ message Value {
     repeated Value value = 8;
     repeated NameValue name_value = 9; // For string maps
     // repeated ValuePair value_value = 10; // For other maps
+    extensions 5000 to max;
 }
 
 /*
@@ -37,7 +38,7 @@ message Component {
     optional string type = 15; // The name of the type. Not needed if index provided
     repeated NameValue field = 2;
 
-    extensions 1000 to 1999;
+    extensions 5000 to max;
 }
 
 message Entity {
@@ -47,7 +48,7 @@ message Entity {
     optional string parent_prefab = 4;
     repeated string removed_component = 15;
 
-    extensions 1000 to 1999;
+    extensions 5000 to max;
 }
 
 message Prefab {
@@ -58,7 +59,7 @@ message Prefab {
     optional string name = 15;
     repeated string parent_name = 16;
 
-    extensions 1000 to 1999;
+    extensions 5000 to max;
 }
 
 message World {
@@ -69,5 +70,5 @@ message World {
     repeated sint32 freed_entity_id = 17 [packed=true];
     repeated string prefab_name = 18; // Table of prefabs, the index of which corresponds to Prefab's type_index;
 
-    extensions 1000 to 1999;
+    extensions 5000 to max;
 }

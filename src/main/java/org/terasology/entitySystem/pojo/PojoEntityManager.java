@@ -150,6 +150,11 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
     }
 
     @Override
+    public EntityRef getEntity(int id) {
+        return createEntityRef(id);
+    }
+
+    @Override
     public EntityRef create(Prefab prefab, Vector3f position) {
         List<Component> components = Lists.newArrayList();
         for (Component component : prefab.listComponents()) {

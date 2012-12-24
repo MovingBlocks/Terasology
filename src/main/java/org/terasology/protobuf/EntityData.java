@@ -8,8 +8,9 @@ public final class EntityData {
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
   }
-  public interface ValueOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface ValueOrBuilder extends
+      com.google.protobuf.GeneratedMessage.
+          ExtendableMessageOrBuilder<Value> {
     
     // repeated double double = 1 [packed = true];
     java.util.List<java.lang.Double> getDoubleList();
@@ -66,8 +67,8 @@ public final class EntityData {
         int index);
   }
   public static final class Value extends
-      com.google.protobuf.GeneratedMessage
-      implements ValueOrBuilder {
+      com.google.protobuf.GeneratedMessage.ExtendableMessage<
+        Value> implements ValueOrBuilder {
     // Use Value.newBuilder() to construct.
     private Value(Builder builder) {
       super(builder);
@@ -251,6 +252,22 @@ public final class EntityData {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
       
+      for (int i = 0; i < getValueCount(); i++) {
+        if (!getValue(i).isInitialized()) {
+          memoizedIsInitialized = 0;
+          return false;
+        }
+      }
+      for (int i = 0; i < getNameValueCount(); i++) {
+        if (!getNameValue(i).isInitialized()) {
+          memoizedIsInitialized = 0;
+          return false;
+        }
+      }
+      if (!extensionsAreInitialized()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -258,6 +275,9 @@ public final class EntityData {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
+      com.google.protobuf.GeneratedMessage
+        .ExtendableMessage<org.terasology.protobuf.EntityData.Value>.ExtensionWriter extensionWriter =
+          newExtensionWriter();
       if (getDoubleList().size() > 0) {
         output.writeRawVarint32(10);
         output.writeRawVarint32(doubleMemoizedSerializedSize);
@@ -305,6 +325,7 @@ public final class EntityData {
       for (int i = 0; i < nameValue_.size(); i++) {
         output.writeMessage(9, nameValue_.get(i));
       }
+      extensionWriter.writeUntil(536870912, output);
       getUnknownFields().writeTo(output);
     }
     
@@ -396,6 +417,7 @@ public final class EntityData {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(9, nameValue_.get(i));
       }
+      size += extensionsSerializedSize();
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
       return size;
@@ -489,8 +511,8 @@ public final class EntityData {
       return builder;
     }
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements org.terasology.protobuf.EntityData.ValueOrBuilder {
+        com.google.protobuf.GeneratedMessage.ExtendableBuilder<
+          org.terasology.protobuf.EntityData.Value, Builder> implements org.terasology.protobuf.EntityData.ValueOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return org.terasology.protobuf.EntityData.internal_static_Value_descriptor;
@@ -770,11 +792,28 @@ public final class EntityData {
             }
           }
         }
+        this.mergeExtensionFields(other);
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
       
       public final boolean isInitialized() {
+        for (int i = 0; i < getValueCount(); i++) {
+          if (!getValue(i).isInitialized()) {
+            
+            return false;
+          }
+        }
+        for (int i = 0; i < getNameValueCount(); i++) {
+          if (!getNameValue(i).isInitialized()) {
+            
+            return false;
+          }
+        }
+        if (!extensionsAreInitialized()) {
+          
+          return false;
+        }
         return true;
       }
       
@@ -1697,6 +1736,12 @@ public final class EntityData {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
       
+      if (hasValue()) {
+        if (!getValue().isInitialized()) {
+          memoizedIsInitialized = 0;
+          return false;
+        }
+      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -1953,6 +1998,12 @@ public final class EntityData {
       }
       
       public final boolean isInitialized() {
+        if (hasValue()) {
+          if (!getValue().isInitialized()) {
+            
+            return false;
+          }
+        }
         return true;
       }
       
@@ -2286,6 +2337,12 @@ public final class EntityData {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
       
+      for (int i = 0; i < getFieldCount(); i++) {
+        if (!getField(i).isInitialized()) {
+          memoizedIsInitialized = 0;
+          return false;
+        }
+      }
       if (!extensionsAreInitialized()) {
         memoizedIsInitialized = 0;
         return false;
@@ -2309,7 +2366,7 @@ public final class EntityData {
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeBytes(15, getTypeBytes());
       }
-      extensionWriter.writeUntil(2000, output);
+      extensionWriter.writeUntil(536870912, output);
       getUnknownFields().writeTo(output);
     }
     
@@ -2576,6 +2633,12 @@ public final class EntityData {
       }
       
       public final boolean isInitialized() {
+        for (int i = 0; i < getFieldCount(); i++) {
+          if (!getField(i).isInitialized()) {
+            
+            return false;
+          }
+        }
         if (!extensionsAreInitialized()) {
           
           return false;
@@ -3086,7 +3149,7 @@ public final class EntityData {
       for (int i = 0; i < removedComponent_.size(); i++) {
         output.writeBytes(15, removedComponent_.getByteString(i));
       }
-      extensionWriter.writeUntil(2000, output);
+      extensionWriter.writeUntil(536870912, output);
       getUnknownFields().writeTo(output);
     }
     
@@ -4065,7 +4128,7 @@ public final class EntityData {
       for (int i = 0; i < parentName_.size(); i++) {
         output.writeBytes(16, parentName_.getByteString(i));
       }
-      extensionWriter.writeUntil(2000, output);
+      extensionWriter.writeUntil(536870912, output);
       getUnknownFields().writeTo(output);
     }
     
@@ -5089,7 +5152,7 @@ public final class EntityData {
       for (int i = 0; i < prefabName_.size(); i++) {
         output.writeBytes(18, prefabName_.getByteString(i));
       }
-      extensionWriter.writeUntil(2000, output);
+      extensionWriter.writeUntil(536870912, output);
       getUnknownFields().writeTo(output);
     }
     
@@ -6163,28 +6226,29 @@ public final class EntityData {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\020EntityData.proto\"\300\001\n\005Value\022\022\n\006double\030\001" +
+      "\n\020EntityData.proto\"\313\001\n\005Value\022\022\n\006double\030\001" +
       " \003(\001B\002\020\001\022\021\n\005float\030\002 \003(\002B\002\020\001\022\023\n\007integer\030\003" +
       " \003(\021B\002\020\001\022\020\n\004long\030\004 \003(\022B\002\020\001\022\023\n\007boolean\030\005 " +
       "\003(\010B\002\020\001\022\016\n\006string\030\006 \003(\t\022\r\n\005bytes\030\007 \001(\014\022\025" +
       "\n\005value\030\010 \003(\0132\006.Value\022\036\n\nname_value\030\t \003(" +
-      "\0132\n.NameValue\"D\n\tNameValue\022\014\n\004name\030\001 \001(\t" +
-      "\022\025\n\005value\030\002 \001(\0132\006.Value\022\022\n\nname_index\030\003 " +
-      "\001(\021\"P\n\tComponent\022\022\n\ntype_index\030\001 \001(\005\022\014\n\004" +
-      "type\030\017 \001(\t\022\031\n\005field\030\002 \003(\0132\n.NameValue*\006\010" +
-      "\350\007\020\320\017\"\222\001\n\006Entity\022\n\n\002id\030\001 \001(\021\022\035\n\tcomponen",
-      "t\030\002 \003(\0132\n.Component\022#\n\027removed_component" +
-      "_index\030\003 \003(\021B\002\020\001\022\025\n\rparent_prefab\030\004 \001(\t\022" +
-      "\031\n\021removed_component\030\017 \003(\t*\006\010\350\007\020\320\017\"\231\001\n\006P" +
-      "refab\022\022\n\nname_index\030\001 \001(\021\022\035\n\tcomponent\030\002" +
-      " \003(\0132\n.Component\022\030\n\014parent_index\030\003 \003(\021B\002" +
-      "\020\001\022\027\n\tpersisted\030\004 \001(\010:\004true\022\014\n\004name\030\017 \001(" +
-      "\t\022\023\n\013parent_name\030\020 \003(\t*\006\010\350\007\020\320\017\"\244\001\n\005World" +
-      "\022\027\n\006entity\030\001 \003(\0132\007.Entity\022\027\n\006prefab\030\002 \003(" +
-      "\0132\007.Prefab\022\027\n\017component_class\030\017 \003(\t\022\026\n\016n" +
-      "ext_entity_id\030\020 \001(\021\022\033\n\017freed_entity_id\030\021",
-      " \003(\021B\002\020\001\022\023\n\013prefab_name\030\022 \003(\t*\006\010\350\007\020\320\017B\'\n" +
-      "\027org.terasology.protobufB\nEntityDataH\001"
+      "\0132\n.NameValue*\t\010\210\'\020\200\200\200\200\002\"D\n\tNameValue\022\014\n" +
+      "\004name\030\001 \001(\t\022\025\n\005value\030\002 \001(\0132\006.Value\022\022\n\nna" +
+      "me_index\030\003 \001(\021\"S\n\tComponent\022\022\n\ntype_inde" +
+      "x\030\001 \001(\005\022\014\n\004type\030\017 \001(\t\022\031\n\005field\030\002 \003(\0132\n.N" +
+      "ameValue*\t\010\210\'\020\200\200\200\200\002\"\225\001\n\006Entity\022\n\n\002id\030\001 \001",
+      "(\021\022\035\n\tcomponent\030\002 \003(\0132\n.Component\022#\n\027rem" +
+      "oved_component_index\030\003 \003(\021B\002\020\001\022\025\n\rparent" +
+      "_prefab\030\004 \001(\t\022\031\n\021removed_component\030\017 \003(\t" +
+      "*\t\010\210\'\020\200\200\200\200\002\"\234\001\n\006Prefab\022\022\n\nname_index\030\001 \001" +
+      "(\021\022\035\n\tcomponent\030\002 \003(\0132\n.Component\022\030\n\014par" +
+      "ent_index\030\003 \003(\021B\002\020\001\022\027\n\tpersisted\030\004 \001(\010:\004" +
+      "true\022\014\n\004name\030\017 \001(\t\022\023\n\013parent_name\030\020 \003(\t*" +
+      "\t\010\210\'\020\200\200\200\200\002\"\247\001\n\005World\022\027\n\006entity\030\001 \003(\0132\007.E" +
+      "ntity\022\027\n\006prefab\030\002 \003(\0132\007.Prefab\022\027\n\017compon" +
+      "ent_class\030\017 \003(\t\022\026\n\016next_entity_id\030\020 \001(\021\022",
+      "\033\n\017freed_entity_id\030\021 \003(\021B\002\020\001\022\023\n\013prefab_n" +
+      "ame\030\022 \003(\t*\t\010\210\'\020\200\200\200\200\002B\'\n\027org.terasology.p" +
+      "rotobufB\nEntityDataH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {

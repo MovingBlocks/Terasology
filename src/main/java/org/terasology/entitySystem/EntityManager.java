@@ -75,6 +75,13 @@ public interface EntityManager {
     EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation);
 
     /**
+     *
+     * @param id
+     * @return The entity with the given id, or the null entity
+     */
+    EntityRef getEntity(int id);
+
+    /**
      * @param other
      * @return A new entity with a copy of each of the other entity's components
      */

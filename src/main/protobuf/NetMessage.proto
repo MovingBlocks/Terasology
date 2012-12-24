@@ -2,12 +2,14 @@
  * @author Immortius <immortius@gmail.com>
  */
 
+import "EntityData.proto";
+
 option java_package = "org.terasology.protobuf";
 option java_outer_classname = "NetData";
 option optimize_for = SPEED;
 
 message NetMessage {
-    enum Type { CLIENT_CONNECT = 1; CONSOLE = 2; SERVER_INFO = 3; CHUNK = 4; INVALIDATE_CHUNK = 5; BLOCK_CHANGED = 6;}
+    enum Type { CLIENT_CONNECT = 1; CONSOLE = 2; SERVER_INFO = 3; CHUNK = 4; INVALIDATE_CHUNK = 5; BLOCK_CHANGED = 6; CREATE_ENTITY = 7; REMOVE_ENTITY = 8;}
     required Type type = 1;
     optional ChunkMessage chunkInfo = 2;
     optional InvalidateChunkMessage invalidateChunk = 3;
@@ -15,6 +17,8 @@ message NetMessage {
     optional ClientConnectMessage clientConnect = 15;
     optional ConsoleMessage console = 16;
     optional ServerInfoMessage serverInfo = 17;
+    optional CreateEntityMessage createEntity = 18;
+    optional RemoveEntityMessage removeEntity = 19;
 
 
     extensions 5000 to max;
@@ -26,15 +30,21 @@ message ChunkMessage {
     optional bytes liquidData = 3;
     optional bytes sunlightData = 15;
     optional bytes lightData = 16;
+
+    extensions 5000 to max;
 }
 
 message InvalidateChunkMessage {
     optional Vector3iData pos = 1;
+
+    extensions 5000 to max;
 }
 
 message BlockChangeMessage {
     optional Vector3iData pos = 1;
     optional int32 newBlock = 2;
+
+    extensions 5000 to max;
 }
 
 message Vector3iData {
@@ -76,6 +86,18 @@ message BlockMapping {
 
 message ModuleInfo {
     optional string moduleId = 1;
+
+    extensions 5000 to max;
+}
+
+message CreateEntityMessage {
+    optional Entity entity = 1;
+
+    extensions 5000 to max;
+}
+
+message RemoveEntityMessage {
+    optional int32 netId = 1;
 
     extensions 5000 to max;
 }
