@@ -67,7 +67,7 @@ public class PNGTextureLoader implements AssetLoader<Texture> {
             throw new IOException("Missing png to go with texture json");
         }
         try {
-            PNGDecoder decoder = new PNGDecoder(stream);
+            PNGDecoder decoder = new PNGDecoder(pngStream);
 
             ByteBuffer buf = ByteBuffer.allocateDirect(4 * decoder.getWidth() * decoder.getHeight());
             decoder.decode(buf, decoder.getWidth() * 4, PNGDecoder.RGBA);
