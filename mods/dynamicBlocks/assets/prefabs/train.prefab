@@ -1,0 +1,30 @@
+{
+    "Item" : {
+        "name" : "Train",
+        "icon" : "gelcube",
+        "usage" : "IN_DIRECTION"
+    },
+    "Location" : {},
+    "Mesh" : {
+        "mesh" : "engine:cube",
+        "material" : "dynamicBlocks:train"
+    },
+    "RigidBody" : {
+        "kinematic" : true,
+        "collisionGroup" : "engine:world",
+        "collidesWith" : ["engine:world","engine:debris","engine:sensor","engine:character"]
+    },
+    "BoxShape" : {
+        "extents" : [1, 1, 1]
+    },
+    "CharacterMovement" : {
+        "height" : 1,
+        "radius" : 0.5,
+        "stepHeight" : 0,
+        "faceMovementDirection" : true
+    },
+    "DynamicBlock" : {
+        "dynamicType" : "Train",
+        "maximumSpeed" : 4
+    }
+}
