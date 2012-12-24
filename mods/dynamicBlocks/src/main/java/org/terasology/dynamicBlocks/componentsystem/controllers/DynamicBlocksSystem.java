@@ -13,15 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.functional.componentsystem.controllers;
+package org.terasology.dynamicBlocks.componentsystem.controllers;
 
-import com.bulletphysics.BulletGlobals;
-import com.bulletphysics.collision.dispatch.*;
-import com.bulletphysics.collision.shapes.ConvexShape;
-import com.bulletphysics.linearmath.Transform;
 import org.terasology.components.ItemComponent;
-import org.terasology.functional.components.DynamicBlockComponent;
-import org.terasology.functional.componentsystem.entityfactory.DynamicFactory;
+import org.terasology.dynamicBlocks.components.DynamicBlockComponent;
+import org.terasology.dynamicBlocks.componentsystem.entityfactory.DynamicFactory;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.physics.*;
@@ -33,11 +29,9 @@ import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.events.*;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.math.Vector3fUtil;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.physics.shapes.BoxShapeComponent;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.block.Block;
 
 import javax.vecmath.*;
 

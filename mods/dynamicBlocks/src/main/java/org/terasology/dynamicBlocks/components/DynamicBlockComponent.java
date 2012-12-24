@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.functional.components;
+package org.terasology.dynamicBlocks.components;
 
 import com.bulletphysics.collision.dispatch.PairCachingGhostObject;
 import com.google.common.collect.Lists;
