@@ -131,6 +131,9 @@ public class PlayerFactory {
         player.send(new ReceiveItemEvent(entityManager.create("core:miniaturizer")));
         player.send(new ReceiveItemEvent(chest));
 
+        player.send(new ReceiveItemEvent(entityManager.create("dynamicBlocks:train")));
+        player.send(new ReceiveItemEvent(entityManager.create("dynamicBlocks:boat")));
+
         return player;
     }
 

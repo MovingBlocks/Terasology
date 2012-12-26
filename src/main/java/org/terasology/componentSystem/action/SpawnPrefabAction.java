@@ -18,6 +18,7 @@ package org.terasology.componentSystem.action;
 
 import javax.vecmath.Vector3f;
 
+import com.bulletphysics.collision.shapes.BoxShape;
 import org.terasology.components.actions.SpawnPrefabActionComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
@@ -27,6 +28,8 @@ import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
+import org.terasology.math.Side;
+import org.terasology.physics.shapes.BoxShapeComponent;
 
 /**
  * @author Immortius
