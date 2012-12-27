@@ -37,6 +37,7 @@ import com.google.protobuf.TextFormat;
 /**
  * @author Immortius <immortius@gmail.com>
  */
+// TODO: More Javadoc
 public class WorldPersister {
 
     public enum SaveFormat {
@@ -90,11 +91,11 @@ public class WorldPersister {
 
     private static final Logger logger = LoggerFactory.getLogger(WorldPersister.class);
     private EntityManager entityManager;
-    private EntityPersisterHelper persisterHelper;
+    private WorldSerializer persisterHelper;
 
     public WorldPersister(EntityManager entityManager) {
         this.entityManager = entityManager;
-        this.persisterHelper = new EntityPersisterHelperImpl((PersistableEntityManager) entityManager);
+        this.persisterHelper = new WorldSerializerImpl((PersistableEntityManager) entityManager);
     }
 
     public void save(File file, SaveFormat format) throws IOException {

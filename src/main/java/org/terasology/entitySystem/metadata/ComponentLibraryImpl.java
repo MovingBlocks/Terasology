@@ -15,17 +15,7 @@
  */
 package org.terasology.entitySystem.metadata;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
@@ -43,7 +33,15 @@ import org.terasology.entitySystem.metadata.core.SetTypeHandler;
 import org.terasology.entitySystem.metadata.core.StringMapTypeHandler;
 import org.terasology.entitySystem.metadata.core.StringTypeHandler;
 
-import com.google.common.collect.Maps;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -103,6 +101,9 @@ public final class ComponentLibraryImpl implements ComponentLibrary {
     }
 
     public <T extends Component> ComponentMetadata<T> getMetadata(Class<T> componentClass) {
+        if (componentClass == null) {
+            return null;
+        }
         return componentSerializationLookup.get(componentClass);
     }
 

@@ -18,8 +18,10 @@ package org.terasology.entitySystem.metadata;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.Locale;
 
+import org.terasology.network.Replicate;
 import org.terasology.protobuf.EntityData;
 
 /**
@@ -30,10 +32,12 @@ public final class FieldMetadata {
     private Method getter;
     private Method setter;
     private TypeHandler serializationHandler;
+    private Replicate replicationInfo;
 
     public FieldMetadata(Field field, Class type, TypeHandler handler) {
         this.field = field;
         this.serializationHandler = handler;
+        this.replicationInfo = field.getAnnotation(Replicate.class);
         getter = findGetter(type, field);
         setter = findSetter(type, field);
     }
@@ -54,6 +58,10 @@ public final class FieldMetadata {
         return field.getName();
     }
 
+    public Class<?> getType() {
+        return field.getType();
+    }
+
     public Object getValue(Object obj) throws IllegalAccessException, InvocationTargetException {
         if (getter != null) {
             return getter.invoke(obj);
@@ -67,6 +75,14 @@ public final class FieldMetadata {
         } else {
             field.set(target, value);
         }
+    }
+
+    public boolean isReplicated() {
+        return replicationInfo != null;
+    }
+
+    public Replicate getReplicationInfo() {
+        return replicationInfo;
     }
 
     private Method findGetter(Class type, Field field) {

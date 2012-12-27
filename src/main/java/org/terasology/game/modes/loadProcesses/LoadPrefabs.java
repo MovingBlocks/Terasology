@@ -26,8 +26,7 @@ import org.terasology.asset.Assets;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.persistence.EntityDataJSONFormat;
-import org.terasology.entitySystem.persistence.EntityPersisterHelper;
-import org.terasology.entitySystem.persistence.EntityPersisterHelperImpl;
+import org.terasology.entitySystem.persistence.PrefabSerializer;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.modes.LoadProcess;
 import org.terasology.protobuf.EntityData;
@@ -45,7 +44,7 @@ public class LoadPrefabs implements LoadProcess {
     private static final Logger logger = LoggerFactory.getLogger(LoadPrefabs.class);
 
     private Iterator<AssetUri> prefabs;
-    private EntityPersisterHelper persisterHelper;
+    private PrefabSerializer prefabSerializer;
 
     @Override
     public String getMessage() {
@@ -63,7 +62,7 @@ public class LoadPrefabs implements LoadProcess {
                 EntityData.Prefab prefabData = EntityDataJSONFormat.readPrefab(reader);
                 stream.close();
                 if (prefabData != null) {
-                    persisterHelper.deserializePrefab(prefabData, prefabURI);
+                    prefabSerializer.deserialize(prefabData, prefabURI);
                 }
             } else {
                 logger.warn("Failed to load prefab '{}'", prefabURI);
@@ -76,7 +75,7 @@ public class LoadPrefabs implements LoadProcess {
 
     @Override
     public int begin() {
-        persisterHelper = new EntityPersisterHelperImpl(CoreRegistry.get(ComponentLibrary.class), CoreRegistry.get(PrefabManager.class));
+        prefabSerializer = new PrefabSerializer(CoreRegistry.get(PrefabManager.class), CoreRegistry.get(ComponentLibrary.class));
         prefabs = Assets.list(AssetType.PREFAB).iterator();
         return Lists.newArrayList(Assets.list(AssetType.PREFAB)).size();
     }

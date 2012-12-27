@@ -62,7 +62,7 @@ public interface ComponentLibrary extends Iterable<ComponentMetadata> {
     <T extends Component> T copy(T component);
 
     /**
-     * @param componentName
+     * @param componentName The name of the component. Case doesn't matter.
      * @return The metadata for the given component, or null if not registered.
      */
     ComponentMetadata<?> getMetadata(String componentName);

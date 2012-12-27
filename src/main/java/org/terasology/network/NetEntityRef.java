@@ -1,8 +1,10 @@
 package org.terasology.network;
 
+import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Event;
+import org.terasology.entitySystem.Prefab;
 
 /**
  * @author Immortius
@@ -11,6 +13,11 @@ public class NetEntityRef extends EntityRef {
 
     private int networkId;
     private NetworkSystem networkSystem;
+
+    public NetEntityRef(int networkId, NetworkSystem system) {
+        this.networkId = networkId;
+        this.networkSystem = system;
+    }
 
     private EntityRef getActualEntityRef() {
         return networkSystem.getEntity(networkId);
@@ -77,7 +84,12 @@ public class NetEntityRef extends EntityRef {
     }
 
     @Override
-    public String getParentPrefab() {
+    public Prefab getParentPrefab() {
         return getActualEntityRef().getParentPrefab();
+    }
+
+    @Override
+    public AssetUri getPrefabURI() {
+        return getActualEntityRef().getPrefabURI();
     }
 }

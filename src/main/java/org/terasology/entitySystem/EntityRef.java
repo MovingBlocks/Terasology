@@ -15,6 +15,7 @@
  */
 package org.terasology.entitySystem;
 
+import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.common.NullEntityRef;
 
 /**
@@ -94,6 +95,8 @@ public abstract class EntityRef {
 
     public abstract void setPersisted(boolean persisted);
 
-    public abstract String getParentPrefab();
+    public abstract Prefab getParentPrefab();
+
+    public abstract AssetUri getPrefabURI();
 
 }

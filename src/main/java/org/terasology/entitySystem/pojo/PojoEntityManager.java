@@ -73,7 +73,8 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
     public PojoEntityManager(ComponentLibrary componentLibrary, PrefabManager prefabManager) {
         this.componentLibrary = componentLibrary;
         this.prefabManager = prefabManager;
-        componentLibrary.registerTypeHandler(EntityRef.class, new EntityRefTypeHandler(this));
+        componentLibrary.registerTypeHandler(EntityRef.class, new EntityRefTypeHandler());
+        EntityRefTypeHandler.setEntityManagerMode(this);
         componentLibrary.registerTypeHandler(Prefab.class, new PrefabTypeHandler(prefabManager));
     }
 

@@ -15,9 +15,11 @@
  */
 package org.terasology.entitySystem.common;
 
+import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Event;
+import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.pojo.PojoEntityManager;
 
 /**
@@ -91,9 +93,15 @@ public class NullEntityRef extends EntityRef {
     }
 
     @Override
-    public String getParentPrefab() {
-        return "";
+    public Prefab getParentPrefab() {
+        return null;
     }
+
+    @Override
+    public AssetUri getPrefabURI() {
+        return null;
+    }
+
 
     @Override
     public String toString() {

@@ -15,18 +15,6 @@
  */
 package org.terasology.entitySystem.persistence;
 
-import gnu.trove.list.TByteList;
-import gnu.trove.list.array.TByteArrayList;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.Locale;
-import java.util.Map;
-
-import org.terasology.protobuf.EntityData;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -42,10 +30,28 @@ import com.google.gson.JsonSerializer;
 import com.google.gson.JsonSyntaxException;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Descriptors;
+import gnu.trove.list.TByteList;
+import gnu.trove.list.array.TByteArrayList;
+import org.terasology.protobuf.EntityData;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.Locale;
+import java.util.Map;
 
 /**
+ * Converts between the EntityData types and JSON.
+ * <p/>
+ * This means that serialization between JSON and Entities/Prefabs is a two step process, with EntityData as an
+ * intermediate step - it was done this way because it is much simpler to write gson handlers for the small number of
+ * EntityData types than to dynamically build handlers for every component type (and have gson properly handle missing
+ * types). This can be revisited in the future.
+ *
  * @author Immortius <immortius@gmail.com>
  */
+// TODO: More javadoc
 public class EntityDataJSONFormat {
 
     public static void write(EntityData.World world, BufferedWriter writer) throws IOException {
@@ -330,6 +336,7 @@ public class EntityDataJSONFormat {
                             try {
                                 byteList.add(element.getAsByte());
                             } catch (NumberFormatException nfe) {
+                                // TODO: Check whether it is a byte in advance
                             }
                         }
                     }
@@ -356,6 +363,7 @@ public class EntityDataJSONFormat {
                     value.addLong(primitive.getAsLong());
                     value.addInteger(primitive.getAsInt());
                 } catch (NumberFormatException e) {
+                    // TODO: Check whether it is a long/integer in advance
                 }
             }
             if (primitive.isBoolean()) {

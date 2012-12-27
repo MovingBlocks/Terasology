@@ -1,0 +1,113 @@
+package org.terasology.entitySystem.persistence;
+
+import com.google.common.collect.ImmutableMap;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.PersistableEntityManager;
+import org.terasology.entitySystem.metadata.ComponentLibrary;
+import org.terasology.entitySystem.metadata.ComponentMetadata;
+import org.terasology.entitySystem.metadata.FieldMetadata;
+import org.terasology.entitySystem.metadata.extension.Vector3fTypeHandler;
+import org.terasology.entitySystem.stubs.GetterSetterComponent;
+import org.terasology.entitySystem.stubs.IntegerComponent;
+import org.terasology.entitySystem.stubs.StringComponent;
+import org.terasology.game.bootstrap.EntitySystemBuilder;
+import org.terasology.logic.mod.ModManager;
+import org.terasology.protobuf.EntityData;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+/**
+ * @author Immortius
+ */
+public class ComponentSerializerTest {
+    private ComponentLibrary componentLibrary;
+    private ComponentSerializer componentSerializer;
+    private static ModManager modManager;
+
+    @BeforeClass
+    public static void setupClass() {
+        modManager = new ModManager();
+    }
+
+    @Before
+    public void setup() {
+
+        EntitySystemBuilder builder = new EntitySystemBuilder();
+        PersistableEntityManager entityManager = builder.build(modManager);
+        entityManager.getComponentLibrary().registerComponentClass(GetterSetterComponent.class);
+        entityManager.getComponentLibrary().registerComponentClass(StringComponent.class);
+        entityManager.getComponentLibrary().registerComponentClass(IntegerComponent.class);
+        componentLibrary = entityManager.getComponentLibrary();
+        componentSerializer = new ComponentSerializer(componentLibrary);
+
+    }
+
+    @Test
+    public void testGetterSetterUtilization() throws Exception {
+        ComponentMetadata info = new ComponentMetadata(GetterSetterComponent.class);
+        info.addField(new FieldMetadata(GetterSetterComponent.class.getDeclaredField("value"), GetterSetterComponent.class, new Vector3fTypeHandler()));
+
+        GetterSetterComponent comp = new GetterSetterComponent();
+        GetterSetterComponent newComp = (GetterSetterComponent) componentSerializer.deserialize(componentSerializer.serialize(comp));
+        assertTrue(comp.getterUsed);
+        assertTrue(newComp.setterUsed);
+    }
+
+    @Test
+    public void testSerializeComponentDeltas() throws Exception {
+        EntityData.Component componentData = componentSerializer.serialize(new StringComponent("Original"), new StringComponent("Delta"));
+
+        assertEquals("value", componentData.getField(0).getName());
+        assertEquals("Delta", componentData.getField(0).getValue().getString(0));
+    }
+
+    @Test
+    public void testComponentTypeIdUsedWhenLookupTableEnabled() throws Exception {
+        componentSerializer.setComponentIdMapping(ImmutableMap.<Class<? extends Component>, Integer>builder().put(StringComponent.class, 1).build());
+        Component stringComponent = new StringComponent("Test");
+        EntityData.Component compData = componentSerializer.serialize(stringComponent);
+        assertEquals(1, compData.getTypeIndex());
+        assertFalse(compData.hasType());
+    }
+
+    @Test
+    public void testComponentTypeIdUsedWhenLookupTableEnabledForComponentDeltas() throws Exception {
+        componentSerializer.setComponentIdMapping(ImmutableMap.<Class<? extends Component>, Integer>builder().put(StringComponent.class, 413).build());
+
+        EntityData.Component componentData = componentSerializer.serialize(new StringComponent("Original"), new StringComponent("Value"));
+
+        assertEquals(413, componentData.getTypeIndex());
+    }
+
+    @Test
+    public void testComponentTypeIdDeserializes() throws Exception {
+        componentSerializer.setComponentIdMapping(ImmutableMap.<Class<? extends Component>, Integer>builder().put(StringComponent.class, 1).build());
+        EntityData.Component compData = EntityData.Component.newBuilder().setTypeIndex(1).addField(EntityData.NameValue.newBuilder().setName("value").setValue(EntityData.Value.newBuilder().addString("item"))).build();
+        Component comp = componentSerializer.deserialize(compData);
+        assertTrue(comp instanceof StringComponent);
+        assertEquals("item", ((StringComponent) comp).value);
+    }
+
+    @Test
+    public void testDeltaComponentTypeIdDeserializesWithValue() throws Exception {
+        componentSerializer.setComponentIdMapping(ImmutableMap.<Class<? extends Component>, Integer>builder().put(StringComponent.class, 1).build());
+        EntityData.Component compData = EntityData.Component.newBuilder().setTypeIndex(1).addField(EntityData.NameValue.newBuilder().setName("value").setValue(EntityData.Value.newBuilder().addString("item"))).build();
+        StringComponent original = new StringComponent("test");
+        componentSerializer.deserializeOnto(original, compData);
+        assertEquals("item", original.value);
+    }
+
+    @Test
+    public void testDeltaComponentTypeIdDeserializesWithoutValue() throws Exception {
+        componentSerializer.setComponentIdMapping(ImmutableMap.<Class<? extends Component>, Integer>builder().put(StringComponent.class, 1).build());
+        EntityData.Component compData = EntityData.Component.newBuilder().setTypeIndex(1).addField(EntityData.NameValue.newBuilder().setName("value")).build();
+        StringComponent original = new StringComponent("test");
+        componentSerializer.deserializeOnto(original, compData);
+        assertEquals("test", original.value);
+    }
+}

@@ -15,10 +15,13 @@
  */
 package org.terasology.entitySystem.pojo;
 
+import org.terasology.asset.AssetType;
+import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityInfoComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Event;
+import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.common.NullIterator;
 
 /**
@@ -67,14 +70,25 @@ public class PojoEntityRef extends EntityRef {
     }
 
     @Override
-    public String getParentPrefab() {
+    public Prefab getParentPrefab() {
         if (exists()) {
             EntityInfoComponent info = getComponent(EntityInfoComponent.class);
             if (info != null) {
-                return info.parentPrefab;
+                return entityManager.getPrefabManager().getPrefab(info.parentPrefab);
             }
         }
-        return "";
+        return null;
+    }
+
+    @Override
+    public AssetUri getPrefabURI() {
+        if (exists()) {
+            EntityInfoComponent info = getComponent(EntityInfoComponent.class);
+            if (info != null && !info.parentPrefab.isEmpty()) {
+                return new AssetUri(AssetType.PREFAB, info.parentPrefab);
+            }
+        }
+        return null;
     }
 
     @Override
