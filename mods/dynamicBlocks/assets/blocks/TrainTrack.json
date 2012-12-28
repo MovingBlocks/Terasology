@@ -18,5 +18,6 @@
  * Placeholder train track by Metouto. Needs a bit more engine work for proper transparency / block shape
  */
 {
-    "rotation" : "horizontal"
+    "rotation" : "horizontal",
+    "translucent" : true
 }
