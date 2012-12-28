@@ -1,6 +1,6 @@
 {
     "id" : "dynamicBlocks",
     "displayName" : "Dynamic Blocks (e.g. locomotive, vehicular, mechanisms)",
-    "author" : "Pencilcheck",
+    "author" : "Pencilcheck (and Metouto for placeholder rail blocks)",
     "description" : "Blocks that are locomotive, that have mechanisms"
 }
