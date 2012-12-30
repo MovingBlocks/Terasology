@@ -16,11 +16,12 @@
 package org.terasology.entitySystem.metadata;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.Event;
 
 /**
- * The library for metadata about components (and their fields).
+ * The library for metadata about events (and their fields).
  *
  * @author Immortius <immortius@gmail.com>
  */
-public interface ComponentLibrary extends ClassLibrary<Component> {
+public interface EventLibrary extends ClassLibrary<Event> {
 }

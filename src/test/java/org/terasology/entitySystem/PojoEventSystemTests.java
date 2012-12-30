@@ -1,20 +1,20 @@
 package org.terasology.entitySystem;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.metadata.ComponentLibraryImpl;
+import org.terasology.entitySystem.metadata.EntitySystemLibrary;
+import org.terasology.entitySystem.metadata.internal.EntitySystemLibraryImpl;
 import org.terasology.entitySystem.pojo.PojoEntityManager;
 import org.terasology.entitySystem.pojo.PojoEventSystem;
 import org.terasology.entitySystem.pojo.PojoPrefabManager;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 
-import com.google.common.collect.Lists;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -26,12 +26,13 @@ public class PojoEventSystemTests {
     PojoEventSystem eventSystem;
     PojoEntityManager entityManager;
     EntityRef entity;
-    
+
     @Before
     public void setup() {
 
-        compLibrary = new ComponentLibraryImpl();
-        entityManager = new PojoEntityManager(compLibrary, new PojoPrefabManager(compLibrary));
+        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibraryImpl();
+        compLibrary = entitySystemLibrary.getComponentLibrary();
+        entityManager = new PojoEntityManager(entitySystemLibrary, new PojoPrefabManager(compLibrary));
         eventSystem = new PojoEventSystem();
         entityManager.setEventSystem(eventSystem);
         entity = entityManager.create();
@@ -40,17 +41,17 @@ public class PojoEventSystemTests {
     @Test
     public void testSendEventToEntity() {
         StringComponent component = entity.addComponent(new StringComponent());
-        
+
         TestEventHandler handler = new TestEventHandler();
         eventSystem.registerEventHandler(handler);
-        
+
         TestEvent event = new TestEvent();
         entity.send(event);
-        
+
         assertEquals(1, handler.receivedList.size());
         assertEquals(event, handler.receivedList.get(0).event);
         assertEquals(entity, handler.receivedList.get(0).entity);
-        
+
     }
 
     @Test
@@ -87,7 +88,7 @@ public class PojoEventSystemTests {
         assertEquals(event, handler.receivedList.get(0).event);
         assertEquals(entity, handler.receivedList.get(0).entity);
     }
-    
+
     @Test
     public void testNoReceiveEventWhenMissingComponents() {
         StringComponent component = entity.addComponent(new StringComponent());
@@ -145,20 +146,20 @@ public class PojoEventSystemTests {
         assertEquals(1, handler.childEventReceived.size());
         assertEquals(1, handler.receivedList.size());
     }
-    
+
     private static class TestEvent extends AbstractEvent {
-        
+
     }
 
     public static class TestChildEvent extends TestEvent {
 
     }
-    
+
     public static class TestEventHandler implements EventHandlerSystem {
 
         List<Received> receivedList = Lists.newArrayList();
         List<Received> childEventReceived = Lists.newArrayList();
-        
+
         @ReceiveEvent(components = StringComponent.class)
         public void handleStringEvent(TestEvent event, EntityRef entity) {
             receivedList.add(new Received(event, entity));
@@ -185,7 +186,7 @@ public class PojoEventSystemTests {
         public static class Received {
             TestEvent event;
             EntityRef entity;
-            
+
             public Received(TestEvent event, EntityRef entity) {
                 this.event = event;
                 this.entity = entity;

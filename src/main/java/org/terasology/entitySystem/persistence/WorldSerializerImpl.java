@@ -15,8 +15,6 @@
  */
 package org.terasology.entitySystem.persistence;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Maps;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
@@ -28,9 +26,9 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.PersistableEntityManager;
 import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.PrefabManager;
+import org.terasology.entitySystem.metadata.ClassMetadata;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.metadata.ComponentMetadata;
-import org.terasology.entitySystem.metadata.ComponentUtil;
+import org.terasology.entitySystem.metadata.MetadataUtil;
 import org.terasology.entitySystem.metadata.extension.EntityRefTypeHandler;
 import org.terasology.protobuf.EntityData;
 
@@ -94,7 +92,7 @@ public class WorldSerializerImpl implements WorldSerializer {
 
         Map<Class<? extends Component>, Integer> componentIdTable = Maps.newHashMap();
         for (int index = 0; index < world.getComponentClassCount(); ++index) {
-            ComponentMetadata componentMetadata = componentLibrary.getMetadata(world.getComponentClass(index));
+            ClassMetadata componentMetadata = componentLibrary.getMetadata(world.getComponentClass(index));
             if (componentMetadata != null) {
                 componentIdTable.put(componentMetadata.getType(), index);
             }
@@ -119,10 +117,10 @@ public class WorldSerializerImpl implements WorldSerializer {
 
     private void writeComponentTypeTable(EntityData.World.Builder world) {
         Map<Class<? extends Component>, Integer> componentIdTable = Maps.newHashMap();
-        for (ComponentMetadata<?> componentMetadata : componentLibrary) {
+        for (ClassMetadata<? extends Component> componentMetadata : componentLibrary) {
             int index = componentIdTable.size();
             componentIdTable.put(componentMetadata.getType(), index);
-            world.addComponentClass(ComponentUtil.getComponentClassName(componentMetadata.getType()));
+            world.addComponentClass(MetadataUtil.getComponentClassName(componentMetadata.getType()));
         }
         entitySerializer.setComponentIdMapping(componentIdTable);
         prefabSerializer.setComponentIdMapping(componentIdTable);

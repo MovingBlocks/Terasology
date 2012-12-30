@@ -62,6 +62,14 @@ message Prefab {
     extensions 5000 to max;
 }
 
+message Event {
+    optional int32 type_index = 1; // Index of the type, if contained in a world with component_classes table
+    repeated NameValue field = 2;
+    optional string type = 15; // The name of the type. Not needed if index provided
+
+    extensions 5000 to max;
+}
+
 message World {
     repeated Entity entity = 1;
     repeated Prefab prefab = 2;

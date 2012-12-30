@@ -43,9 +43,9 @@ public class EntitySerializerTest {
 
         EntitySystemBuilder builder = new EntitySystemBuilder();
         entityManager = builder.build(modManager);
-        entityManager.getComponentLibrary().registerComponentClass(GetterSetterComponent.class);
-        entityManager.getComponentLibrary().registerComponentClass(StringComponent.class);
-        entityManager.getComponentLibrary().registerComponentClass(IntegerComponent.class);
+        entityManager.getComponentLibrary().register(GetterSetterComponent.class);
+        entityManager.getComponentLibrary().register(StringComponent.class);
+        entityManager.getComponentLibrary().register(IntegerComponent.class);
         entitySerializer = new EntitySerializer(entityManager);
         componentLibrary = entityManager.getComponentLibrary();
         prefabManager = entityManager.getPrefabManager();
@@ -207,7 +207,7 @@ public class EntitySerializerTest {
 
     @Test
     public void testMappedTypeHandling() throws Exception {
-        componentLibrary.registerComponentClass(MappedTypeComponent.class);
+        componentLibrary.register(MappedTypeComponent.class);
 
         EntityRef entity = entityManager.create();
         entity.addComponent(new MappedTypeComponent());

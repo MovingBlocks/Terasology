@@ -92,4 +92,14 @@ public class NetEntityRef extends EntityRef {
     public AssetUri getPrefabURI() {
         return getActualEntityRef().getPrefabURI();
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return getActualEntityRef().equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return getActualEntityRef().hashCode();
+    }
 }

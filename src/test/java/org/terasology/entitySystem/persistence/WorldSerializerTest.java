@@ -33,9 +33,9 @@ public class WorldSerializerTest {
 
         EntitySystemBuilder builder = new EntitySystemBuilder();
         entityManager = builder.build(modManager);
-        entityManager.getComponentLibrary().registerComponentClass(GetterSetterComponent.class);
-        entityManager.getComponentLibrary().registerComponentClass(StringComponent.class);
-        entityManager.getComponentLibrary().registerComponentClass(IntegerComponent.class);
+        entityManager.getComponentLibrary().register(GetterSetterComponent.class);
+        entityManager.getComponentLibrary().register(StringComponent.class);
+        entityManager.getComponentLibrary().register(IntegerComponent.class);
         worldSerializer = new WorldSerializerImpl(entityManager);
     }
 

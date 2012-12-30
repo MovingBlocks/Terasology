@@ -56,7 +56,7 @@ public class TerasologyServerHandler extends SimpleChannelUpstreamHandler {
 
     @Override
     public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-        client = new ClientPlayer(e.getChannel());
+        client = new ClientPlayer(e.getChannel(), networkSystem);
     }
 
     @Override

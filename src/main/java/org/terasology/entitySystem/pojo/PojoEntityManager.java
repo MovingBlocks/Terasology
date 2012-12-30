@@ -15,6 +15,7 @@
  */
 package org.terasology.entitySystem.pojo;
 
+import com.google.common.collect.Sets;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.iterator.TIntObjectIterator;
 import gnu.trove.list.TIntList;
@@ -25,6 +26,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.WeakHashMap;
 
 import javax.vecmath.Quat4f;
@@ -34,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.EntityChangeSubscriber;
 import org.terasology.entitySystem.EntityInfoComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -46,6 +49,7 @@ import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.ChangedComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
+import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.metadata.extension.EntityRefTypeHandler;
 import org.terasology.entitySystem.metadata.extension.PrefabTypeHandler;
 
@@ -64,18 +68,19 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
     private int nextEntityId = 1;
     private TIntList freedIds = new TIntArrayList();
     private Map<EntityRef, PojoEntityRef> entityCache = new WeakHashMap<EntityRef, PojoEntityRef>();
+    private Set<EntityChangeSubscriber> subscribers = Sets.newLinkedHashSet();
 
     private ComponentTable store = new ComponentTable();
     private EventSystem eventSystem;
     private PrefabManager prefabManager;
     private ComponentLibrary componentLibrary;
 
-    public PojoEntityManager(ComponentLibrary componentLibrary, PrefabManager prefabManager) {
-        this.componentLibrary = componentLibrary;
+    public PojoEntityManager(EntitySystemLibrary entitySystemLibrary, PrefabManager prefabManager) {
+        this.componentLibrary = entitySystemLibrary.getComponentLibrary();
         this.prefabManager = prefabManager;
-        componentLibrary.registerTypeHandler(EntityRef.class, new EntityRefTypeHandler());
+        entitySystemLibrary.registerTypeHandler(EntityRef.class, new EntityRefTypeHandler());
         EntityRefTypeHandler.setEntityManagerMode(this);
-        componentLibrary.registerTypeHandler(Prefab.class, new PrefabTypeHandler(prefabManager));
+        entitySystemLibrary.registerTypeHandler(Prefab.class, new PrefabTypeHandler(prefabManager));
     }
 
     @Override
@@ -193,6 +198,16 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
     }
 
     @Override
+    public void subscribe(EntityChangeSubscriber subscriber) {
+        subscribers.add(subscriber);
+    }
+
+    @Override
+    public void unsubscribe(EntityChangeSubscriber subscriber) {
+        subscribers.remove(subscriber);
+    }
+
+    @Override
     public int getComponentCount(Class<? extends Component> componentClass) {
         return store.getComponentCount(componentClass);
     }
@@ -301,6 +316,7 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
                 eventSystem.send(createEntityRef(entityId), ChangedComponentEvent.newInstance(), component);
             }
         }
+        notifyChangeSubscribers(getEntity(entityId));
         return component;
     }
 
@@ -311,6 +327,7 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
                 eventSystem.send(createEntityRef(entityId), RemovedComponentEvent.newInstance(), component);
             }
             store.remove(entityId, componentClass);
+            notifyChangeSubscribers(getEntity(entityId));
         }
     }
 
@@ -354,16 +371,25 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
         return newRef;
     }
 
+    @Override
     public int getNextId() {
         return nextEntityId;
     }
 
+    @Override
     public void setNextId(int id) {
         nextEntityId = id;
     }
 
+    @Override
     public TIntList getFreedIds() {
         return freedIds;
+    }
+
+    private void notifyChangeSubscribers(EntityRef changedEntity) {
+        for (EntityChangeSubscriber subscriber : subscribers) {
+            subscriber.onEntityChange(changedEntity);
+        }
     }
 
     private static class EntityEntry<T> implements Map.Entry<EntityRef, T> {

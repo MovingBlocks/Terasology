@@ -1,6 +1,5 @@
 package org.terasology.entitySystem.persistence;
 
-import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.terasology.entitySystem.Component;
@@ -10,7 +9,7 @@ import org.terasology.entitySystem.PersistableEntityManager;
 import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.metadata.ComponentUtil;
+import org.terasology.entitySystem.metadata.MetadataUtil;
 import org.terasology.protobuf.EntityData;
 
 import java.util.List;
@@ -84,7 +83,16 @@ public class EntitySerializer {
      * @return The serialized entity
      */
     public EntityData.Entity serialize(EntityRef entityRef) {
-        return serialize(entityRef, FieldSerializeCheck.NullCheck.newInstance());
+        return serialize(entityRef, true, FieldSerializeCheck.NullCheck.newInstance());
+    }
+
+    /**
+     * @param entityRef
+     * @param deltaAgainstPrefab Whether the serialized entity should be a delta against its prefab (if any)
+     * @return The serialized entity
+     */
+    public EntityData.Entity serialize(EntityRef entityRef, boolean deltaAgainstPrefab) {
+        return serialize(entityRef, deltaAgainstPrefab, FieldSerializeCheck.NullCheck.newInstance());
     }
 
     /**
@@ -93,8 +101,17 @@ public class EntitySerializer {
      * @return The serialized entity
      */
     public EntityData.Entity serialize(EntityRef entityRef, FieldSerializeCheck fieldCheck) {
+        return serialize(entityRef, true, fieldCheck);
+    }
+
+    /**
+     * @param entityRef
+     * @param fieldCheck Used to check whether each field in each component of the entity should be serialized.
+     * @return The serialized entity
+     */
+    public EntityData.Entity serialize(EntityRef entityRef, boolean deltaAgainstPrefab, FieldSerializeCheck fieldCheck) {
         Prefab prefab = entityRef.getParentPrefab();
-        if (prefab != null) {
+        if (prefab != null && deltaAgainstPrefab) {
             return serializeEntityDelta(entityRef, prefab, fieldCheck);
         } else {
             return serializeEntityFull(entityRef, fieldCheck);
@@ -110,7 +127,7 @@ public class EntitySerializer {
         if (entityData.hasParentPrefab() && !entityData.getParentPrefab().isEmpty() && prefabManager.exists(entityData.getParentPrefab())) {
             Prefab prefab = prefabManager.getPrefab(entityData.getParentPrefab());
             for (Component component : prefab.listComponents()) {
-                String componentName = ComponentUtil.getComponentClassName(component.getClass());
+                String componentName = MetadataUtil.getComponentClassName(component.getClass());
                 // TODO: Use a set and convert to lower case
                 if (!containsIgnoreCase(componentName, entityData.getRemovedComponentList())) {
                     componentMap.put(component.getClass(), componentLibrary.copy(component));
@@ -134,6 +151,28 @@ public class EntitySerializer {
             return entityManager.create(componentMap.values());
         } else {
             return entityManager.createEntityWithId(entityData.getId(), componentMap.values());
+        }
+    }
+
+    public void deserializeOnto(EntityRef currentEntity, EntityData.Entity entityData) {
+        Set<Class<? extends Component>> presentComponents = Sets.newLinkedHashSet();
+        for (EntityData.Component componentData : entityData.getComponentList()) {
+            Class<? extends Component> componentClass = componentSerializer.getComponentClass(componentData);
+            if (componentClass == null) continue;
+            presentComponents.add(componentClass);
+
+            Component existingComponent = currentEntity.getComponent(componentClass);
+            if (existingComponent == null) {
+                currentEntity.addComponent(componentSerializer.deserialize(componentData));
+            } else {
+                componentSerializer.deserializeOnto(existingComponent, componentData);
+                currentEntity.saveComponent(existingComponent);
+            }
+        }
+        for (Component comp : currentEntity.iterateComponents()) {
+            if (!presentComponents.contains(comp) && comp.getClass() != EntityInfoComponent.class) {
+                currentEntity.removeComponent(comp.getClass());
+            }
         }
     }
 
@@ -181,7 +220,7 @@ public class EntitySerializer {
         }
         for (Component prefabComponent : prefab.listComponents()) {
             if (!presentClasses.contains(prefabComponent.getClass())) {
-                entity.addRemovedComponent(ComponentUtil.getComponentClassName(prefabComponent.getClass()));
+                entity.addRemovedComponent(MetadataUtil.getComponentClassName(prefabComponent.getClass()));
             }
         }
         return entity.build();

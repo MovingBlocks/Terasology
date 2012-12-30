@@ -9,17 +9,17 @@ option java_outer_classname = "NetData";
 option optimize_for = SPEED;
 
 message NetMessage {
-    enum Type { CLIENT_CONNECT = 1; CONSOLE = 2; SERVER_INFO = 3; CHUNK = 4; INVALIDATE_CHUNK = 5; BLOCK_CHANGED = 6; CREATE_ENTITY = 7; REMOVE_ENTITY = 8;}
+    enum Type { CLIENT_CONNECT = 1; CONSOLE = 2; SERVER_INFO = 3; CHUNK = 4; INVALIDATE_CHUNK = 5; BLOCK_CHANGED = 6; CREATE_ENTITY = 7; REMOVE_ENTITY = 8; UPDATE_ENTITY = 9;}
     required Type type = 1;
     optional ChunkMessage chunkInfo = 2;
     optional InvalidateChunkMessage invalidateChunk = 3;
     optional BlockChangeMessage blockChange = 4;
+    optional CreateEntityMessage createEntity = 5;
+    optional RemoveEntityMessage removeEntity = 6;
+    optional UpdateEntityMessage updateEntity = 7;
     optional ClientConnectMessage clientConnect = 15;
     optional ConsoleMessage console = 16;
     optional ServerInfoMessage serverInfo = 17;
-    optional CreateEntityMessage createEntity = 18;
-    optional RemoveEntityMessage removeEntity = 19;
-
 
     extensions 5000 to max;
 }
@@ -92,6 +92,13 @@ message ModuleInfo {
 
 message CreateEntityMessage {
     optional Entity entity = 1;
+
+    extensions 5000 to max;
+}
+
+message UpdateEntityMessage {
+    optional Entity entity = 1;
+    optional int32 netId = 2;
 
     extensions 5000 to max;
 }

@@ -18,13 +18,14 @@ package org.terasology.entitySystem.metadata;
 import java.util.Locale;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.Event;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class ComponentUtil {
+public final class MetadataUtil {
 
-    private ComponentUtil() {
+    private MetadataUtil() {
     }
 
     public static String getComponentClassName(Component component) {
@@ -34,6 +35,19 @@ public class ComponentUtil {
     public static String getComponentClassName(Class<? extends Component> componentClass) {
         String name = componentClass.getSimpleName();
         int index = name.toLowerCase(Locale.ENGLISH).lastIndexOf("component");
+        if (index != -1) {
+            return name.substring(0, index);
+        }
+        return name;
+    }
+
+    public static String getEventClassName(Event event) {
+        return getEventClassName(event.getClass());
+    }
+
+    public static String getEventClassName(Class<? extends Event> eventClass) {
+        String name = eventClass.getSimpleName();
+        int index = name.toLowerCase(Locale.ENGLISH).lastIndexOf("event");
         if (index != -1) {
             return name.substring(0, index);
         }

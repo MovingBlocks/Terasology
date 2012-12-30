@@ -15,27 +15,25 @@
  */
 package org.terasology.entitySystem.metadata;
 
+import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.Locale;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.Component;
-
-import com.google.common.collect.Maps;
-
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public final class ComponentMetadata<T extends Component> {
-    private static final Logger logger = LoggerFactory.getLogger(ComponentMetadata.class);
+public class ClassMetadata<T> {
+    private static final Logger logger = LoggerFactory.getLogger(ClassMetadata.class);
 
     private Map<String, FieldMetadata> fields = Maps.newHashMap();
     private Class<T> clazz;
 
-    public ComponentMetadata(Class<T> componentClass) {
-        this.clazz = componentClass;
+    public ClassMetadata(Class<T> simpleClass) {
+        this.clazz = simpleClass;
     }
 
     public Class<T> getType() {
@@ -58,9 +56,9 @@ public final class ComponentMetadata<T extends Component> {
         try {
             return clazz.newInstance();
         } catch (InstantiationException e) {
-            logger.error("Exception instantiating component type: {}", clazz, e);
+            logger.error("Exception instantiating type: {}", clazz, e);
         } catch (IllegalAccessException e) {
-            logger.error("Exception instantiating component type: {}", clazz, e);
+            logger.error("Exception instantiating type: {}", clazz, e);
         }
         return null;
     }
@@ -73,11 +71,11 @@ public final class ComponentMetadata<T extends Component> {
             }
             return result;
         } catch (InstantiationException e) {
-            logger.error("Exception during serializing component type: {}", clazz, e);
+            logger.error("Exception during serializing type: {}", clazz, e);
         } catch (IllegalAccessException e) {
-            logger.error("Exception during serializing component type: {}", clazz, e);
+            logger.error("Exception during serializing type: {}", clazz, e);
         } catch (InvocationTargetException e) {
-            logger.error("Exception during serializing component type: {}", clazz, e);
+            logger.error("Exception during serializing type: {}", clazz, e);
         }
         return null;
     }

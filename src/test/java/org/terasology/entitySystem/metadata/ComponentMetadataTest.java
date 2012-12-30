@@ -19,6 +19,7 @@ package org.terasology.entitySystem.metadata;
 import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
+import org.terasology.entitySystem.metadata.internal.EntitySystemLibraryImpl;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.entitySystem.stubs.UnsupportedTypeComponent;
 
@@ -29,17 +30,19 @@ public class ComponentMetadataTest {
 
     @Test
     public void staticFieldsIgnored() {
-        ComponentLibrary lib = new ComponentLibraryImpl();
-        lib.registerComponentClass(StringComponent.class);
-        ComponentMetadata<StringComponent> metadata = lib.getMetadata(StringComponent.class);
+        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibraryImpl();
+        ComponentLibrary lib = entitySystemLibrary.getComponentLibrary();
+        lib.register(StringComponent.class);
+        ClassMetadata<StringComponent> metadata = lib.getMetadata(StringComponent.class);
         assertNull(metadata.getField("staticValue"));
     }
 
     @Test
     public void typesWithNoPublicConstructorIgnored() {
-        ComponentLibrary lib = new ComponentLibraryImpl();
-        lib.registerComponentClass(UnsupportedTypeComponent.class);
-        ComponentMetadata<UnsupportedTypeComponent> metadata = lib.getMetadata(UnsupportedTypeComponent.class);
+        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibraryImpl();
+        ComponentLibrary lib = entitySystemLibrary.getComponentLibrary();
+        lib.register(UnsupportedTypeComponent.class);
+        ClassMetadata<UnsupportedTypeComponent> metadata = lib.getMetadata(UnsupportedTypeComponent.class);
         assertNull(metadata.getField("value"));
         assertNull(metadata.getField("value2"));
         assertNull(metadata.getField("value3"));

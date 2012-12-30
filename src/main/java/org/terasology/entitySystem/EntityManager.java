@@ -87,6 +87,10 @@ public interface EntityManager {
      */
     EntityRef copy(EntityRef other);
 
+    void subscribe(EntityChangeSubscriber subscriber);
+
+    void unsubscribe(EntityChangeSubscriber subscriber);
+
     /**
      * @param componentClass
      * @return The number of entities with this component class

@@ -6,8 +6,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.PersistableEntityManager;
+import org.terasology.entitySystem.metadata.ClassMetadata;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.entitySystem.metadata.extension.Vector3fTypeHandler;
 import org.terasology.entitySystem.stubs.GetterSetterComponent;
@@ -39,9 +39,9 @@ public class ComponentSerializerTest {
 
         EntitySystemBuilder builder = new EntitySystemBuilder();
         PersistableEntityManager entityManager = builder.build(modManager);
-        entityManager.getComponentLibrary().registerComponentClass(GetterSetterComponent.class);
-        entityManager.getComponentLibrary().registerComponentClass(StringComponent.class);
-        entityManager.getComponentLibrary().registerComponentClass(IntegerComponent.class);
+        entityManager.getComponentLibrary().register(GetterSetterComponent.class);
+        entityManager.getComponentLibrary().register(StringComponent.class);
+        entityManager.getComponentLibrary().register(IntegerComponent.class);
         componentLibrary = entityManager.getComponentLibrary();
         componentSerializer = new ComponentSerializer(componentLibrary);
 
@@ -49,7 +49,7 @@ public class ComponentSerializerTest {
 
     @Test
     public void testGetterSetterUtilization() throws Exception {
-        ComponentMetadata info = new ComponentMetadata(GetterSetterComponent.class);
+        ClassMetadata info = new ClassMetadata(GetterSetterComponent.class);
         info.addField(new FieldMetadata(GetterSetterComponent.class.getDeclaredField("value"), GetterSetterComponent.class, new Vector3fTypeHandler()));
 
         GetterSetterComponent comp = new GetterSetterComponent();

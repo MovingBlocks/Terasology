@@ -31,13 +31,18 @@ import org.terasology.logic.mod.ModManager;
 import org.terasology.math.Vector3i;
 import org.terasology.model.structures.TeraArray;
 import org.terasology.model.structures.TeraSmartArray;
-import org.terasology.protobuf.NetData;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
 
-import static org.terasology.protobuf.NetData.*;
+import static org.terasology.protobuf.NetData.BlockChangeMessage;
+import static org.terasology.protobuf.NetData.ChunkMessage;
+import static org.terasology.protobuf.NetData.ClientConnectMessage;
+import static org.terasology.protobuf.NetData.InvalidateChunkMessage;
+import static org.terasology.protobuf.NetData.ModuleInfo;
+import static org.terasology.protobuf.NetData.NetMessage;
+import static org.terasology.protobuf.NetData.ServerInfoMessage;
 
 /**
  * @author Immortius
@@ -78,6 +83,11 @@ public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
                 break;
             case BLOCK_CHANGED:
                 blockChanged(message.getBlockChange());
+                break;
+            case CREATE_ENTITY:
+            case UPDATE_ENTITY:
+            case REMOVE_ENTITY:
+                networkSystem.queueMessage(message);
                 break;
 
         }

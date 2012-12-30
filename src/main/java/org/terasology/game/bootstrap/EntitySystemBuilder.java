@@ -16,13 +16,6 @@
 
 package org.terasology.game.bootstrap;
 
-import java.util.Set;
-
-import javax.vecmath.Color4f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
-
 import org.reflections.Reflections;
 import org.terasology.asset.AssetType;
 import org.terasology.audio.Sound;
@@ -33,7 +26,8 @@ import org.terasology.entitySystem.EventSystem;
 import org.terasology.entitySystem.PersistableEntityManager;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.metadata.ComponentLibraryImpl;
+import org.terasology.entitySystem.metadata.EntitySystemLibrary;
+import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.entitySystem.metadata.extension.AssetTypeHandler;
 import org.terasology.entitySystem.metadata.extension.BlockFamilyTypeHandler;
 import org.terasology.entitySystem.metadata.extension.CollisionGroupTypeHandler;
@@ -43,6 +37,7 @@ import org.terasology.entitySystem.metadata.extension.Region3iTypeHandler;
 import org.terasology.entitySystem.metadata.extension.Vector2fTypeHandler;
 import org.terasology.entitySystem.metadata.extension.Vector3fTypeHandler;
 import org.terasology.entitySystem.metadata.extension.Vector3iTypeHandler;
+import org.terasology.entitySystem.metadata.internal.EntitySystemLibraryImpl;
 import org.terasology.entitySystem.pojo.PojoEntityManager;
 import org.terasology.entitySystem.pojo.PojoEventSystem;
 import org.terasology.entitySystem.pojo.PojoPrefabManager;
@@ -58,17 +53,25 @@ import org.terasology.rendering.assets.skeletalmesh.SkeletalMesh;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.world.block.family.BlockFamily;
 
+import javax.vecmath.Color4f;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
+import java.util.Set;
+
 /**
  * @author Immortius
  */
 public class EntitySystemBuilder {
 
     public PersistableEntityManager build(ModManager modManager) {
-        ComponentLibrary library = new ComponentLibraryImpl();
+        EntitySystemLibrary library = new EntitySystemLibraryImpl();
         registerTypeHandlers(library);
-        CoreRegistry.put(ComponentLibrary.class, library);
+        CoreRegistry.put(EntitySystemLibrary.class, library);
+        CoreRegistry.put(ComponentLibrary.class, library.getComponentLibrary());
+        CoreRegistry.put(EventLibrary.class, library.getEventLibrary());
 
-        PrefabManager prefabManager = new PojoPrefabManager(library);
+        PrefabManager prefabManager = new PojoPrefabManager(library.getComponentLibrary());
         CoreRegistry.put(PrefabManager.class, prefabManager);
 
         PersistableEntityManager entityManager = new PojoEntityManager(library, prefabManager);
@@ -76,20 +79,20 @@ public class EntitySystemBuilder {
         CoreRegistry.put(EntityManager.class, entityManager);
         CoreRegistry.put(EventSystem.class, entityManager.getEventSystem());
 
-        registerComponents(library, modManager);
+        registerComponents(library.getComponentLibrary(), modManager);
         registerEvents(entityManager.getEventSystem(), modManager);
         return entityManager;
     }
 
-    private void registerTypeHandlers(ComponentLibrary library) {
+    private void registerTypeHandlers(EntitySystemLibrary library) {
         library.registerTypeHandler(BlockFamily.class, new BlockFamilyTypeHandler());
         library.registerTypeHandler(Color4f.class, new Color4fTypeHandler());
         library.registerTypeHandler(Quat4f.class, new Quat4fTypeHandler());
-        library.registerTypeHandler(Mesh.class, new AssetTypeHandler(AssetType.MESH, Mesh.class));
-        library.registerTypeHandler(Sound.class, new AssetTypeHandler(AssetType.SOUND, Sound.class));
-        library.registerTypeHandler(Material.class, new AssetTypeHandler(AssetType.MATERIAL, Material.class));
-        library.registerTypeHandler(SkeletalMesh.class, new AssetTypeHandler(AssetType.SKELETON_MESH, SkeletalMesh.class));
-        library.registerTypeHandler(MeshAnimation.class, new AssetTypeHandler(AssetType.ANIMATION, MeshAnimation.class));
+        library.registerTypeHandler(Mesh.class, new AssetTypeHandler<Mesh>(AssetType.MESH, Mesh.class));
+        library.registerTypeHandler(Sound.class, new AssetTypeHandler<Sound>(AssetType.SOUND, Sound.class));
+        library.registerTypeHandler(Material.class, new AssetTypeHandler<Material>(AssetType.MATERIAL, Material.class));
+        library.registerTypeHandler(SkeletalMesh.class, new AssetTypeHandler<SkeletalMesh>(AssetType.SKELETON_MESH, SkeletalMesh.class));
+        library.registerTypeHandler(MeshAnimation.class, new AssetTypeHandler<MeshAnimation>(AssetType.ANIMATION, MeshAnimation.class));
         library.registerTypeHandler(Vector3f.class, new Vector3fTypeHandler());
         library.registerTypeHandler(Vector2f.class, new Vector2fTypeHandler());
         Vector3iTypeHandler vector3iHandler = new Vector3iTypeHandler();
@@ -103,7 +106,7 @@ public class EntitySystemBuilder {
 
         Set<Class<? extends Component>> componentTypes = reflections.getSubTypesOf(Component.class);
         for (Class<? extends Component> componentType : componentTypes) {
-            library.registerComponentClass(componentType);
+            library.register(componentType);
         }
     }
 

@@ -16,8 +16,12 @@ import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.EntityChangeSubscriber;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.PersistableEntityManager;
+import org.terasology.entitySystem.metadata.extension.EntityRefTypeHandler;
+import org.terasology.entitySystem.persistence.EntitySerializer;
 import org.terasology.game.CoreRegistry;
 import org.terasology.protobuf.NetData;
 import org.terasology.world.chunks.Chunk;
@@ -32,23 +36,26 @@ import java.util.concurrent.Executors;
 /**
  * @author Immortius
  */
-public class NetworkSystem {
+public class NetworkSystem implements EntityChangeSubscriber {
     private static final Logger logger = LoggerFactory.getLogger(NetworkSystem.class);
 
     private NetworkMode mode = NetworkMode.NONE;
     private Set<ClientPlayer> clientPlayerList = Sets.newLinkedHashSet();
 
     // Shared
+    private PersistableEntityManager entityManager;
     private ChannelFactory factory;
+    private TIntIntMap netIdToEntityId = new TIntIntHashMap();
+    private BlockingQueue<NetData.NetMessage> queuedMessages = Queues.newLinkedBlockingQueue();
 
     // Server only
     private ChannelGroup allChannels = new DefaultChannelGroup("tera-server");
     private NetData.ServerInfoMessage serverInfo;
-    private RemoteChunkProvider remoteWorldProvider;
-    private BlockingQueue<Chunk> chunkQueue = Queues.newLinkedBlockingQueue();
     private int nextNetId = 1;
 
-    private TIntIntMap netIdToEntityId = new TIntIntHashMap();
+    // Client only
+    private RemoteChunkProvider remoteWorldProvider;
+    private BlockingQueue<Chunk> chunkQueue = Queues.newLinkedBlockingQueue();
 
     public NetworkSystem() {
     }
@@ -125,31 +132,44 @@ public class NetworkSystem {
                     remoteWorldProvider.receiveChunk(chunk);
                 }
             }
+            for (ClientPlayer client : clientPlayerList) {
+                client.update();
+            }
+            processMessages();
         }
+    }
+
+    private void processMessages() {
+        List<NetData.NetMessage> messages = Lists.newArrayListWithExpectedSize(queuedMessages.size());
+        queuedMessages.drainTo(messages);
+        EntitySerializer serializer = new EntitySerializer(entityManager);
+        serializer.setIgnoringEntityId(true);
+        EntityRefTypeHandler.setNetworkMode(this);
+
+        for (NetData.NetMessage message : messages) {
+            switch (message.getType()) {
+                case CREATE_ENTITY:
+                    EntityRef newEntity = serializer.deserialize(message.getCreateEntity().getEntity());
+                    registerNetworkEntity(newEntity);
+                    break;
+                case UPDATE_ENTITY:
+                    EntityRef currentEntity = getEntity(message.getUpdateEntity().getNetId());
+                    serializer.deserializeOnto(currentEntity, message.getUpdateEntity().getEntity());
+                    break;
+                case REMOVE_ENTITY:
+                    int netId = message.getRemoveEntity().getNetId();
+                    EntityRef entity = getEntity(netId);
+                    unregisterNetworkEntity(entity);
+                    entity.destroy();
+                    break;
+            }
+        }
+
+        EntityRefTypeHandler.setEntityManagerMode(entityManager);
     }
 
     public NetworkMode getMode() {
         return mode;
-    }
-
-    void registerChannel(Channel channel) {
-        allChannels.add(channel);
-    }
-
-    void addClient(ClientPlayer client) {
-        synchronized (clientPlayerList) {
-            clientPlayerList.add(client);
-        }
-    }
-
-    void removeClient(ClientPlayer client) {
-        synchronized (clientPlayerList) {
-            clientPlayerList.remove(client);
-        }
-    }
-
-    void receiveChunk(Chunk chunk) {
-        chunkQueue.offer(chunk);
     }
 
     public NetData.ServerInfoMessage getServerInfo() {
@@ -185,7 +205,8 @@ public class NetworkSystem {
 
         if (mode == NetworkMode.SERVER) {
             for (ClientPlayer client : clientPlayerList) {
-                // replicate
+                // TODO: Relevance Check
+                client.setNetInitial(netComponent.networkId);
             }
         }
     }
@@ -200,7 +221,25 @@ public class NetworkSystem {
                             NetData.RemoveEntityMessage.newBuilder().setNetId(netComponent.networkId).build())
                     .build();
             for (ClientPlayer client : clientPlayerList) {
-                client.send(message);
+                client.setNetRemoved(netComponent.networkId, message);
+            }
+        }
+    }
+
+    public void setEntityManager(PersistableEntityManager entityManager) {
+        if (this.entityManager != null) {
+            this.entityManager.unsubscribe(this);
+        }
+        this.entityManager = entityManager;
+        this.entityManager.subscribe(this);
+    }
+
+    @Override
+    public void onEntityChange(EntityRef entity) {
+        NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
+        if (netComp != null) {
+            for (ClientPlayer client : clientPlayerList) {
+                client.setNetDirty(netComp.networkId);
             }
         }
     }
@@ -211,5 +250,34 @@ public class NetworkSystem {
             return CoreRegistry.get(EntityManager.class).getEntity(entityId);
         }
         return EntityRef.NULL;
+    }
+
+    void registerChannel(Channel channel) {
+        allChannels.add(channel);
+    }
+
+    void addClient(ClientPlayer client) {
+        synchronized (clientPlayerList) {
+            clientPlayerList.add(client);
+        }
+        for (EntityRef netEntity : entityManager.iteratorEntities(NetworkComponent.class)) {
+            NetworkComponent netComp = netEntity.getComponent(NetworkComponent.class);
+            // TODO: Relevance Check
+            client.setNetInitial(netComp.networkId);
+        }
+    }
+
+    void removeClient(ClientPlayer client) {
+        synchronized (clientPlayerList) {
+            clientPlayerList.remove(client);
+        }
+    }
+
+    void receiveChunk(Chunk chunk) {
+        chunkQueue.offer(chunk);
+    }
+
+    void queueMessage(NetData.NetMessage message) {
+        queuedMessages.offer(message);
     }
 }

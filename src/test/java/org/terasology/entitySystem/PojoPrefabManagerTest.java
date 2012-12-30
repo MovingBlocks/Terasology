@@ -7,9 +7,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.metadata.ComponentLibraryImpl;
+import org.terasology.entitySystem.metadata.EntitySystemLibrary;
+import org.terasology.entitySystem.metadata.internal.ComponentLibraryImpl;
 import org.terasology.entitySystem.metadata.extension.Quat4fTypeHandler;
 import org.terasology.entitySystem.metadata.extension.Vector3fTypeHandler;
+import org.terasology.entitySystem.metadata.internal.EntitySystemLibraryImpl;
 import org.terasology.entitySystem.pojo.PojoPrefabManager;
 import org.terasology.entitySystem.stubs.StringComponent;
 
@@ -24,14 +26,15 @@ import static org.junit.Assert.*;
 public class PojoPrefabManagerTest {
 
     public static final String PrefabName = "Test";
-    private ComponentLibrary componentLibrary = new ComponentLibraryImpl();
+    private EntitySystemLibrary entitySystemLibrary = new EntitySystemLibraryImpl();
+    private ComponentLibrary componentLibrary = entitySystemLibrary.getComponentLibrary();
     private PojoPrefabManager prefabManager;
 
     @Before
     public void setup() {
-        componentLibrary.registerTypeHandler(Vector3f.class, new Vector3fTypeHandler());
-        componentLibrary.registerTypeHandler(Quat4f.class, new Quat4fTypeHandler());
-        componentLibrary.registerComponentClass(LocationComponent.class);
+        entitySystemLibrary.registerTypeHandler(Vector3f.class, new Vector3fTypeHandler());
+        entitySystemLibrary.registerTypeHandler(Quat4f.class, new Quat4fTypeHandler());
+        componentLibrary.register(LocationComponent.class);
         prefabManager = new PojoPrefabManager(componentLibrary);
     }
 

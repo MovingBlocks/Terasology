@@ -1,24 +1,11 @@
-/*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.terasology.entitySystem.metadata;
+package org.terasology.entitySystem.metadata.internal;
 
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.metadata.ClassMetadata;
+import org.terasology.entitySystem.metadata.FieldMetadata;
+import org.terasology.entitySystem.metadata.TypeHandler;
 import org.terasology.entitySystem.metadata.core.BooleanTypeHandler;
 import org.terasology.entitySystem.metadata.core.ByteTypeHandler;
 import org.terasology.entitySystem.metadata.core.DoubleTypeHandler;
@@ -37,24 +24,20 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Immortius
  */
-public final class ComponentLibraryImpl implements ComponentLibrary {
+public class MetadataBuilder {
     private static final int MAX_SERIALIZATION_DEPTH = 1;
-    private static final Logger logger = LoggerFactory.getLogger(ComponentLibraryImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(MetadataBuilder.class);
 
-    private Map<Class<? extends Component>, ComponentMetadata> componentSerializationLookup = Maps.newHashMap();
-    private Map<String, Class<? extends Component>> componentTypeLookup = Maps.newHashMap();
     private Map<Class<?>, TypeHandler<?>> typeHandlers = Maps.newHashMap();
 
-    public ComponentLibraryImpl() {
+    public MetadataBuilder() {
         registerTypeHandler(Boolean.class, new BooleanTypeHandler());
         registerTypeHandler(Boolean.TYPE, new BooleanTypeHandler());
         registerTypeHandler(Byte.class, new ByteTypeHandler());
@@ -75,61 +58,33 @@ public final class ComponentLibraryImpl implements ComponentLibrary {
         typeHandlers.put(forClass, handler);
     }
 
-    public <T extends Component> void registerComponentClass(Class<T> componentClass) {
+    @SuppressWarnings("unchecked")
+    public <T> TypeHandler<? super T> getTypeHandler(Class<T> forClass) {
+        return (TypeHandler<? super T>) typeHandlers.get(forClass);
+    }
+
+    public <T> ClassMetadata<T> build(Class<T> forClass) {
         try {
             // Check if constructor exists
-            componentClass.getConstructor();
+            forClass.getConstructor();
         } catch (NoSuchMethodException e) {
-            logger.error("Unable to register component class {}: Default Constructor Required", componentClass.getSimpleName());
-            return;
+            logger.error("Unable to register class {}: Default Constructor Required", forClass.getSimpleName());
+            return null;
         }
 
-        ComponentMetadata<T> info = new ComponentMetadata<T>(componentClass);
-        for (Field field : componentClass.getDeclaredFields()) {
+        ClassMetadata<T> info = new ClassMetadata<T>(forClass);
+        for (Field field : forClass.getDeclaredFields()) {
             if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers()))
                 continue;
             field.setAccessible(true);
             TypeHandler typeHandler = getHandlerFor(field.getGenericType(), 0);
             if (typeHandler == null) {
-                logger.error("Unsupported field type in component type {}, {} : {}", componentClass.getSimpleName(), field.getName(), field.getGenericType());
+                logger.error("Unsupported field type in component type {}, {} : {}", forClass.getSimpleName(), field.getName(), field.getGenericType());
             } else {
-                info.addField(new FieldMetadata(field, componentClass, typeHandler));
+                info.addField(new FieldMetadata(field, forClass, typeHandler));
             }
         }
-        componentSerializationLookup.put(componentClass, info);
-        componentTypeLookup.put(ComponentUtil.getComponentClassName(componentClass).toLowerCase(Locale.ENGLISH), componentClass);
-    }
-
-    public <T extends Component> ComponentMetadata<T> getMetadata(Class<T> componentClass) {
-        if (componentClass == null) {
-            return null;
-        }
-        return componentSerializationLookup.get(componentClass);
-    }
-
-    @Override
-    public <T extends Component> ComponentMetadata<? extends T> getMetadata(T component) {
-        if (component != null) {
-            return componentSerializationLookup.get(component.getClass());
-        }
-        return null;
-    }
-
-    @Override
-    public <T extends Component> T copy(T component) {
-        ComponentMetadata info = getMetadata(component);
-        if (info != null) {
-            return (T) info.clone(component);
-        }
-        return null;
-    }
-
-    public ComponentMetadata<?> getMetadata(String componentName) {
-        return getMetadata(componentTypeLookup.get(componentName.toLowerCase(Locale.ENGLISH)));
-    }
-
-    public Iterator<ComponentMetadata> iterator() {
-        return componentSerializationLookup.values().iterator();
+        return info;
     }
 
     // TODO: Refactor

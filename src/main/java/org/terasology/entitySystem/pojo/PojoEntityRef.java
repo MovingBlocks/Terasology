@@ -157,10 +157,11 @@ public class PojoEntityRef extends EntityRef {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o instanceof EntityRef) {
-            if (!exists() && !((EntityRef) o).exists()) return true;
-        }
-        if (o instanceof PojoEntityRef) {
-            return id == ((PojoEntityRef) o).id;
+            EntityRef other = (EntityRef) o;
+            if (!exists() && !(other.exists())) {
+                return true;
+            }
+            return getId() == other.getId();
         }
         return false;
     }
