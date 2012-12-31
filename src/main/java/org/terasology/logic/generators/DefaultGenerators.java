@@ -60,15 +60,13 @@ public class DefaultGenerators {
 
         mngr.addTreeGenerator(WorldBiomeProvider.Biome.FOREST, oakTree);
         mngr.addTreeGenerator(WorldBiomeProvider.Biome.FOREST, pineTree);
-        mngr.addTreeGenerator(WorldBiomeProvider.Biome.FOREST, redTree);
         mngr.addTreeGenerator(WorldBiomeProvider.Biome.FOREST, oakVariationTree);
 
         mngr.addTreeGenerator(WorldBiomeProvider.Biome.SNOW, birkTree);
 
         mngr.addTreeGenerator(WorldBiomeProvider.Biome.PLAINS, redTree);
-        mngr.addTreeGenerator(WorldBiomeProvider.Biome.PLAINS, cactus);
+        mngr.addTreeGenerator(WorldBiomeProvider.Biome.PLAINS, oakTree);
 
-        mngr.addTreeGenerator(WorldBiomeProvider.Biome.DESERT, redTree);
         mngr.addTreeGenerator(WorldBiomeProvider.Biome.DESERT, cactus);
     }
 }
