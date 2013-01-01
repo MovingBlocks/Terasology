@@ -120,7 +120,7 @@ public class FlatTerrainGenerator implements ChunkGenerator {
             for (int z = 0; z < Chunk.SIZE_Z; z++) {
                 final WorldBiomeProvider.Biome type = biomeProvider.getBiomeAt(chunk.getBlockWorldPosX(x), chunk.getBlockWorldPosZ(z));
 
-                for (int y = Chunk.SIZE_Y; y >= 0; y--) {
+                for (int y = Chunk.SIZE_Y-1; y >= 0; y--) {
                     if (y == 0) {
                         // bedrock/mantle
                         chunk.setBlock(x, y, z, mantle);

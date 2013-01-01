@@ -19,22 +19,29 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.text.DecimalFormat;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.vecmath.Vector3f;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.logic.manager.Config;
 import org.terasology.math.AABB;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
-import org.terasology.model.structures.TeraArray;
-import org.terasology.model.structures.TeraSmartArray;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
+import org.terasology.world.chunks.blockdata.TeraArray;
+import org.terasology.world.chunks.blockdata.TeraDenseArray4Bit;
+import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
+import org.terasology.world.chunks.deflate.TeraStandardDeflator;
+import org.terasology.world.chunks.deflate.TeraDeflator;
 import org.terasology.world.liquid.LiquidData;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 /**
  * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks
@@ -47,6 +54,8 @@ import com.google.common.base.Objects;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class Chunk implements Externalizable {
+    protected static final Logger logger = LoggerFactory.getLogger(Chunk.class);
+    
     public static final long serialVersionUID = 79881925217704826L;
 
     public enum State {
@@ -75,10 +84,10 @@ public class Chunk implements Externalizable {
 
     private final Vector3i pos = new Vector3i();
 
-    private final TeraArray blocks;
-    private final TeraSmartArray sunlight;
-    private final TeraSmartArray light;
-    private final TeraSmartArray liquid;
+    private TeraArray blocks;
+    private TeraArray sunlight;
+    private TeraArray light;
+    private TeraArray liquid;
 
     private State chunkState = State.ADJACENCY_GENERATION_PENDING;
     private boolean dirty;
@@ -95,12 +104,11 @@ public class Chunk implements Externalizable {
 
 
     public Chunk() {
-        blocks = new TeraArray(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        sunlight = new TeraSmartArray(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        light = new TeraSmartArray(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        liquid = new TeraSmartArray(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-
-        setDirty(true);
+        blocks = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        sunlight = new TeraDenseArray4Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        light = new TeraDenseArray4Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        liquid = new TeraDenseArray4Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        dirty = true;
     }
 
     public Chunk(int x, int y, int z) {
@@ -116,11 +124,20 @@ public class Chunk implements Externalizable {
 
     public Chunk(Chunk other) {
         pos.set(other.pos);
-        blocks = new TeraArray(other.blocks);
-        sunlight = new TeraSmartArray(other.sunlight);
-        light = new TeraSmartArray(other.light);
-        liquid = new TeraSmartArray(other.liquid);
+        blocks = other.blocks.copy();
+        sunlight = other.sunlight.copy();
+        light = other.light.copy();
+        liquid = other.liquid.copy();
         chunkState = other.chunkState;
+        dirty = true;
+    }
+    
+    public Chunk(Vector3i pos, TeraArray blocks, TeraArray sunlight, TeraArray light, TeraArray liquid) {
+        this.pos.set(Preconditions.checkNotNull(pos));
+        this.blocks = Preconditions.checkNotNull(blocks);
+        this.sunlight = Preconditions.checkNotNull(sunlight);
+        this.light = Preconditions.checkNotNull(light);
+        this.liquid = Preconditions.checkNotNull(liquid);
         dirty = true;
     }
 
@@ -149,6 +166,10 @@ public class Chunk implements Externalizable {
     }
 
     public void setChunkState(State chunkState) {
+        Preconditions.checkNotNull(chunkState);
+        if (chunkState != getChunkState() && chunkState == State.COMPLETE) {
+            deflate();
+        }
         this.chunkState = chunkState;
     }
 
@@ -164,17 +185,21 @@ public class Chunk implements Externalizable {
             unlock();
         }
     }
+    
+    public int getEstimatedMemoryConsumptionInBytes() {
+        return blocks.getEstimatedMemoryConsumptionInBytes() + sunlight.getEstimatedMemoryConsumptionInBytes() + light.getEstimatedMemoryConsumptionInBytes() + liquid.getEstimatedMemoryConsumptionInBytes();
+    }
 
     public Block getBlock(Vector3i pos) {
-        return BlockManager.getInstance().getBlock(blocks.get(pos.x, pos.y, pos.z));
+        return BlockManager.getInstance().getBlock((byte)blocks.get(pos.x, pos.y, pos.z));
     }
 
     public Block getBlock(int x, int y, int z) {
-        return BlockManager.getInstance().getBlock(blocks.get(x, y, z));
+        return BlockManager.getInstance().getBlock((byte)blocks.get(x, y, z));
     }
 
     public boolean setBlock(int x, int y, int z, Block block) {
-        byte oldValue = blocks.set(x, y, z, block.getId());
+        int oldValue = blocks.set(x, y, z, block.getId());
         if (oldValue != block.getId()) {
             if (!block.isLiquid()) {
                 setLiquid(x, y, z, new LiquidData());
@@ -205,11 +230,11 @@ public class Chunk implements Externalizable {
     }
 
     public byte getSunlight(Vector3i pos) {
-        return sunlight.get(pos.x, pos.y, pos.z);
+        return getSunlight(pos.x, pos.y, pos.z);
     }
 
     public byte getSunlight(int x, int y, int z) {
-        return sunlight.get(x, y, z);
+        return (byte) sunlight.get(x, y, z);
     }
 
     public boolean setSunlight(Vector3i pos, byte amount) {
@@ -217,16 +242,16 @@ public class Chunk implements Externalizable {
     }
 
     public boolean setSunlight(int x, int y, int z, byte amount) {
-        byte oldValue = sunlight.set(x, y, z, amount);
-        return oldValue != amount;
+        Preconditions.checkArgument(amount >= 0 && amount <= 15);
+        return sunlight.set(x, y, z, amount) != amount;
     }
 
     public byte getLight(Vector3i pos) {
-        return light.get(pos.x, pos.y, pos.z);
+        return getLight(pos.x, pos.y, pos.z);
     }
 
     public byte getLight(int x, int y, int z) {
-        return light.get(x, y, z);
+        return (byte) light.get(x, y, z);
     }
 
     public boolean setLight(Vector3i pos, byte amount) {
@@ -234,8 +259,8 @@ public class Chunk implements Externalizable {
     }
 
     public boolean setLight(int x, int y, int z, byte amount) {
-        byte oldValue = light.set(x, y, z, amount);
-        return (oldValue != amount);
+        Preconditions.checkArgument(amount >= 0 && amount <= 15);
+        return light.set(x, y, z, amount) != amount;
     }
 
     public boolean setLiquid(Vector3i pos, LiquidData newState, LiquidData oldState) {
@@ -245,7 +270,7 @@ public class Chunk implements Externalizable {
     public boolean setLiquid(int x, int y, int z, LiquidData newState, LiquidData oldState) {
         byte expected = oldState.toByte();
         byte newValue = newState.toByte();
-        return liquid.set(x, y, z, newValue, expected) == expected;
+        return liquid.set(x, y, z, newValue, expected);
     }
 
     public void setLiquid(int x, int y, int z, LiquidData newState) {
@@ -258,7 +283,7 @@ public class Chunk implements Externalizable {
     }
 
     public LiquidData getLiquid(int x, int y, int z) {
-        return new LiquidData((liquid.get(x, y, z)));
+        return new LiquidData((byte) liquid.get(x, y, z));
     }
 
     public Vector3i getChunkWorldPos() {
@@ -312,42 +337,75 @@ public class Chunk implements Externalizable {
         out.writeInt(pos.x);
         out.writeInt(pos.y);
         out.writeInt(pos.z);
-
         out.writeObject(chunkState);
-
-        for (int i = 0; i < blocks.size(); i++)
-            out.writeByte(blocks.getRawByte(i));
-
-        for (int i = 0; i < sunlight.sizePacked(); i++)
-            out.writeByte(sunlight.getRawByte(i));
-
-        for (int i = 0; i < light.sizePacked(); i++)
-            out.writeByte(light.getRawByte(i));
-
-        for (int i = 0; i < liquid.sizePacked(); i++)
-            out.writeByte(liquid.getRawByte(i));
+        out.writeObject(blocks);
+        out.writeObject(sunlight);
+        out.writeObject(light);
+        out.writeObject(liquid);
     }
 
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         pos.x = in.readInt();
         pos.y = in.readInt();
         pos.z = in.readInt();
-
-        // Parse the flags...
         setDirty(true);
         chunkState = (State) in.readObject();
-
-        for (int i = 0; i < blocks.size(); i++)
-            blocks.setRawByte(i, in.readByte());
-
-        for (int i = 0; i < sunlight.sizePacked(); i++)
-            sunlight.setRawByte(i, in.readByte());
-
-        for (int i = 0; i < light.sizePacked(); i++)
-            light.setRawByte(i, in.readByte());
-
-        for (int i = 0; i < liquid.sizePacked(); i++)
-            liquid.setRawByte(i, in.readByte());
+        blocks = (TeraArray) in.readObject();
+        sunlight = (TeraArray) in.readObject();
+        light = (TeraArray) in.readObject();
+        liquid = (TeraArray) in.readObject();
+    }
+    
+    private static DecimalFormat fpercent = new DecimalFormat("0.##");
+    private static DecimalFormat fsize = new DecimalFormat("#,###");
+    public void deflate() {
+        lock();
+        try {
+            int blocksSize = blocks.getEstimatedMemoryConsumptionInBytes();
+            int sunlightSize = sunlight.getEstimatedMemoryConsumptionInBytes();
+            int lightSize = light.getEstimatedMemoryConsumptionInBytes();
+            int liquidSize = liquid.getEstimatedMemoryConsumptionInBytes();
+            int totalSize = blocksSize + sunlightSize + lightSize + liquidSize;
+            
+            final TeraDeflator def = new TeraStandardDeflator();
+            
+            blocks = def.deflate(blocks);
+            sunlight = def.deflate(sunlight);
+            light = def.deflate(light);
+            liquid = def.deflate(liquid);
+            
+            int blocksReduced = blocks.getEstimatedMemoryConsumptionInBytes();
+            int sunlightReduced = sunlight.getEstimatedMemoryConsumptionInBytes();
+            int lightReduced = light.getEstimatedMemoryConsumptionInBytes();
+            int liquidReduced = liquid.getEstimatedMemoryConsumptionInBytes();
+            int totalReduced = blocksReduced + sunlightReduced + lightReduced + liquidReduced;
+            
+            double blocksPercent = 100d - (100d / blocksSize * blocksReduced);
+            double sunlightPercent = 100d - (100d / sunlightSize * sunlightReduced);
+            double lightPercent = 100d - (100d / lightSize * lightReduced);
+            double liquidPercent = 100d - (100d / liquidSize * liquidReduced);
+            double totalPercent = 100d - (100d / totalSize * totalReduced);
+            
+            logger.info(String.format("chunk (%d, %d, %d): size-before: %s bytes, size-after: %s bytes, total-deflated-by: %s%%, blocks-deflated-by=%s%%, sunlight-deflated-by=%s%%, light-deflated-by=%s%%, liquid-deflated-by=%s%%", pos.x, pos.y, pos.z, fsize.format(totalSize), fsize.format(totalReduced), fpercent.format(totalPercent), fpercent.format(blocksPercent), fpercent.format(sunlightPercent), fpercent.format(lightPercent), fpercent.format(liquidPercent)));
+        } finally {
+            unlock();
+        }
+    }
+    
+    public void inflate() {
+        lock();
+        try {
+            if (!(blocks instanceof TeraDenseArray8Bit))
+                blocks = new TeraDenseArray8Bit(blocks);
+            if (!(sunlight instanceof TeraDenseArray4Bit))
+                sunlight = new TeraDenseArray4Bit(sunlight);
+            if (!(light instanceof TeraDenseArray4Bit))
+                light = new TeraDenseArray4Bit(light);
+            if (!(liquid instanceof TeraDenseArray4Bit))
+                liquid = new TeraDenseArray4Bit(liquid);
+        } finally {
+            unlock();
+        }
     }
 
     @Override
