@@ -64,20 +64,22 @@ public class ShaderParametersPost implements IShaderParameters {
 
         program.setFloat("viewingDistance", Config.getInstance().getActiveViewingDistance() * 8.0f);
 
+        WorldRenderer renderer = CoreRegistry.get(WorldRenderer.class);
+        float timeInDays = renderer.getWorldProvider().getTimeInDays();
+
         // Calculate the fog value based on the daylight value
         float fogLinearIntensity = 0.01f;
         float daylight = (float) CoreRegistry.get(WorldRenderer.class).getDaylight();
 
         if (daylight < 1.0 && daylight > 0.25) {
             float daylightFactor = (1.0f - daylight) / 0.75f;
-            fogLinearIntensity += 0.1f * daylightFactor;
+            fogLinearIntensity += 0.5f * daylightFactor;
         } else if (daylight <= 0.25f) {
             float daylightFactor = (0.25f - daylight) / 0.25f;
-            fogLinearIntensity += TeraMath.lerpf(0.1f, 0.0f, daylightFactor);
+            fogLinearIntensity += TeraMath.lerpf(0.5f, 0.0f, daylightFactor);
         }
 
-        WorldRenderer renderer = CoreRegistry.get(WorldRenderer.class);
-        float fogIntensity = renderer.getWorldProvider().getBiomeProvider().getFog(renderer.getWorldProvider().getTimeInDays()) * daylight;
+        float fogIntensity = renderer.getWorldProvider().getBiomeProvider().getFog(timeInDays) * 0.25f * daylight;
 
         program.setFloat("fogIntensity", fogIntensity);
         program.setFloat("fogLinearIntensity", fogLinearIntensity);

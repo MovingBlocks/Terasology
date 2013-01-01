@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-#define A 0.22
-#define B 0.30
+#define A 0.15
+#define B 0.50
 #define C 0.10
 #define D 0.20
-#define E 0.01
+#define E 0.02
 #define F 0.30
 #define W 11.2
 
@@ -49,11 +49,11 @@ float calcTorchlight(float light, vec3 lightPos) {
 }
 
 vec4 linearToSrgb(vec4 color) {
-     return vec4(pow(color.rgb, vec3(1.0 / GAMMA)), color.a);
+     return vec4(sqrt(color.rgb), color.a);
 }
 
 vec4 srgbToLinear(vec4 color) {
-    return vec4(pow(color.rgb, vec3(GAMMA)), color.a);
+    return vec4(color.rgb * color.rgb, color.a);
 }
 
 float expLightValue(float light) {

@@ -54,7 +54,7 @@ uniform vec2 grassCoordinate;
 #define TORCH_BLOCK_DIFF 1.0
 #define WATER_SPEC 2.0
 #define WATER_DIFF 1.0
-#define BLOCK_DIFF 0.25
+#define BLOCK_DIFF 0.6
 #define BLOCK_AMB 1.0
 
 #define WATER_REFRACTION 0.1
