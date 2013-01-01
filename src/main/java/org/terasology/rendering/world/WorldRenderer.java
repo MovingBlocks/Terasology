@@ -358,7 +358,6 @@ public final class WorldRenderer {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.25, true) {
             @Override
             public void run() {
-            	//TODO get beter tck instead afternoon
             	if(getPlayerPosition().y<50)
             		AudioManager.playMusic("engine:DwarfForge");
             	else if(getPlayerPosition().y>175)
@@ -569,7 +568,7 @@ public final class WorldRenderer {
         if (_wireframe)
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-        PerformanceMonitor.startActivity("RenderOpaque");
+        PerformanceMonitor.startActivity("Render Objects (Opaque)");
 
         for (RenderSystem renderer : _systemManager.iterateRenderSubscribers()) {
             renderer.renderOpaque();
@@ -578,7 +577,7 @@ public final class WorldRenderer {
 
         PerformanceMonitor.endActivity();
 
-        PerformanceMonitor.startActivity("Render ChunkOpaque");
+        PerformanceMonitor.startActivity("Render Chunks (Opaque)");
 
         /*
          * FIRST RENDER PASS: OPAQUE ELEMENTS
@@ -588,7 +587,7 @@ public final class WorldRenderer {
 
         PerformanceMonitor.endActivity();
 
-        PerformanceMonitor.startActivity("Render ChunkTransparent");
+        PerformanceMonitor.startActivity("Render Chunks (Transparent)");
 
         /*
          * SECOND RENDER PASS: BILLBOARDS
@@ -601,7 +600,7 @@ public final class WorldRenderer {
 
         PerformanceMonitor.endActivity();
 
-        PerformanceMonitor.startActivity("Render Transparent");
+        PerformanceMonitor.startActivity("Render Objects (Transparent)");
 
         for (RenderSystem renderer : _systemManager.iterateRenderSubscribers()) {
             renderer.renderTransparent();
@@ -609,7 +608,7 @@ public final class WorldRenderer {
 
         PerformanceMonitor.endActivity();
 
-        PerformanceMonitor.startActivity("Render ChunkWaterIce");
+        PerformanceMonitor.startActivity("Render Chunks (Water, Ice)");
 
         // Make sure the water surface is rendered if the player is swimming
         if (headUnderWater) {
@@ -652,7 +651,7 @@ public final class WorldRenderer {
     }
 
     public void renderWorldReflection(Camera camera) {
-        PerformanceMonitor.startActivity("Render Sky");
+        PerformanceMonitor.startActivity("Render World (Reflection)");
         camera.lookThroughNormalized();
         _skysphere.render();
 
@@ -669,9 +668,10 @@ public final class WorldRenderer {
         for (Chunk c : _renderQueueChunksSortedBillboards)
             renderChunk(c, ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT, camera);
 
-
         glDisable(GL_BLEND);
         glDisable(GL_LIGHT0);
+
+        PerformanceMonitor.endActivity();
     }
 
     private void renderChunk(Chunk chunk, ChunkMesh.RENDER_PHASE phase, Camera camera) {
