@@ -46,6 +46,7 @@ import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
+import org.terasology.network.NetworkSystem;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.assets.animation.MeshAnimation;
@@ -75,7 +76,7 @@ public class EntitySystemBuilder {
         CoreRegistry.put(PrefabManager.class, prefabManager);
 
         PersistableEntityManager entityManager = new PojoEntityManager(library, prefabManager);
-        entityManager.setEventSystem(new PojoEventSystem());
+        entityManager.setEventSystem(new PojoEventSystem(library.getEventLibrary(), CoreRegistry.get(NetworkSystem.class)));
         CoreRegistry.put(EntityManager.class, entityManager);
         CoreRegistry.put(EventSystem.class, entityManager.getEventSystem());
 

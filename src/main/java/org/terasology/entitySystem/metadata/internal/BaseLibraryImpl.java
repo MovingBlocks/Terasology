@@ -5,7 +5,6 @@ import org.terasology.entitySystem.metadata.ClassLibrary;
 import org.terasology.entitySystem.metadata.ClassMetadata;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -23,20 +22,30 @@ public abstract class BaseLibraryImpl<T> implements ClassLibrary<T> {
         this.metadataBuilder = metadataBuilder;
     }
 
-    public abstract List<String> getNamesFor(Class<? extends T> clazz);
+    public abstract String[] getNamesFor(Class<? extends T> clazz);
 
     @Override
     public void register(Class<? extends T> clazz) {
-        ClassMetadata<? extends T> metadata = metadataBuilder.build(clazz);
+        register(clazz, getNamesFor(clazz));
+    }
+
+    public void register(Class<? extends T> clazz, String ... names) {
+        ClassMetadata<? extends T> metadata = createMetadata(clazz, names);
 
         serializationLookup.put(clazz, metadata);
 
-        for (String name : getNamesFor(clazz)) {
+        for (String name : names) {
             typeLookup.put(name.toLowerCase(Locale.ENGLISH), clazz);
         }
     }
 
+    // TODO: Review this
+    protected <U extends T> ClassMetadata<U> createMetadata(Class<U> clazz, String ... names) {
+        return metadataBuilder.build(clazz);
+    }
+
     @Override
+    @SuppressWarnings("unchecked")
     public <U extends T> ClassMetadata<U> getMetadata(Class<U> clazz) {
         if (clazz == null) {
             return null;
@@ -45,9 +54,10 @@ public abstract class BaseLibraryImpl<T> implements ClassLibrary<T> {
     }
 
     @Override
-    public ClassMetadata<? extends T> getMetadata(T object) {
+    @SuppressWarnings("unchecked")
+    public <U extends T> ClassMetadata<U> getMetadata(U object) {
         if (object != null) {
-            return serializationLookup.get(object.getClass());
+            return (ClassMetadata<U>) serializationLookup.get(object.getClass());
         }
         return null;
     }

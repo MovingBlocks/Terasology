@@ -19,6 +19,7 @@ import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Locale;
 import java.util.Map;
@@ -31,9 +32,12 @@ public class ClassMetadata<T> {
 
     private Map<String, FieldMetadata> fields = Maps.newHashMap();
     private Class<T> clazz;
+    private Constructor<T> constructor;
 
-    public ClassMetadata(Class<T> simpleClass) {
+    public ClassMetadata(Class<T> simpleClass) throws NoSuchMethodException {
         this.clazz = simpleClass;
+        constructor = simpleClass.getDeclaredConstructor();
+        constructor.setAccessible(true);
     }
 
     public Class<T> getType() {
@@ -54,10 +58,12 @@ public class ClassMetadata<T> {
 
     public T newInstance() {
         try {
-            return clazz.newInstance();
+            return constructor.newInstance();
         } catch (InstantiationException e) {
             logger.error("Exception instantiating type: {}", clazz, e);
         } catch (IllegalAccessException e) {
+            logger.error("Exception instantiating type: {}", clazz, e);
+        } catch (InvocationTargetException e) {
             logger.error("Exception instantiating type: {}", clazz, e);
         }
         return null;
@@ -65,7 +71,7 @@ public class ClassMetadata<T> {
 
     public T clone(T component) {
         try {
-            T result = clazz.newInstance();
+            T result = constructor.newInstance();
             for (FieldMetadata field : fields.values()) {
                 field.setValue(result, field.copy(field.getValue(component)));
             }
@@ -80,5 +86,7 @@ public class ClassMetadata<T> {
         return null;
     }
 
-
+    public int size() {
+        return fields.size();
+    }
 }

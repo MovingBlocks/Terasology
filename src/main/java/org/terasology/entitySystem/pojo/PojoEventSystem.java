@@ -15,6 +15,38 @@
  */
 package org.terasology.entitySystem.pojo;
 
+import com.google.common.base.Objects;
+import com.google.common.base.Predicates;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Queues;
+import com.google.common.collect.Sets;
+import org.reflections.Reflections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.AbstractEvent;
+import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.Event;
+import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.EventPriority;
+import org.terasology.entitySystem.EventReceiver;
+import org.terasology.entitySystem.EventSystem;
+import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.metadata.EventLibrary;
+import org.terasology.entitySystem.metadata.EventMetadata;
+import org.terasology.network.BroadcastEvent;
+import org.terasology.network.ClientPlayer;
+import org.terasology.network.NetworkComponent;
+import org.terasology.network.NetworkMode;
+import org.terasology.network.NetworkSystem;
+import org.terasology.network.OwnerEvent;
+import org.terasology.network.ServerEvent;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -25,31 +57,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
-
-import com.google.common.base.Objects;
-import org.reflections.Reflections;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.AbstractEvent;
-import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.Event;
-import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.entitySystem.EventPriority;
-import org.terasology.entitySystem.EventReceiver;
-import org.terasology.entitySystem.EventSystem;
-import org.terasology.entitySystem.ReceiveEvent;
-
-import com.google.common.base.Predicates;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Queues;
-import com.google.common.collect.Sets;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -66,10 +73,15 @@ public class PojoEventSystem implements EventSystem {
     private Multimap<Class<? extends Event>, Class<? extends Event>> childEvents = HashMultimap.create();
 
     private Thread mainThread;
-    private BlockingQueue<PendingEvent>  pendingEvents = Queues.newLinkedBlockingQueue();
+    private BlockingQueue<PendingEvent> pendingEvents = Queues.newLinkedBlockingQueue();
 
-    public PojoEventSystem() {
+    private EventLibrary eventLibrary;
+    private NetworkSystem networkSystem;
+
+    public PojoEventSystem(EventLibrary eventLibrary, NetworkSystem networkSystem) {
         this.mainThread = Thread.currentThread();
+        this.eventLibrary = eventLibrary;
+        this.networkSystem = networkSystem;
     }
 
     public void process() {
@@ -93,6 +105,21 @@ public class PojoEventSystem implements EventSystem {
                 childEvents.put(parent, eventType);
             }
         }
+        if (shouldAddToLibrary(eventType)) {
+            eventLibrary.register(eventType, name);
+        }
+    }
+
+    /**
+     * Events are added to the event library if they have a network annotation
+     *
+     * @param eventType
+     * @return Whether the event should be added to the event library
+     */
+    private boolean shouldAddToLibrary(Class<? extends Event> eventType) {
+        return eventType.getAnnotation(ServerEvent.class) != null
+                || eventType.getAnnotation(OwnerEvent.class) != null
+                || eventType.getAnnotation(BroadcastEvent.class) != null;
     }
 
     @Override
@@ -173,6 +200,8 @@ public class PojoEventSystem implements EventSystem {
         if (Thread.currentThread() != mainThread) {
             pendingEvents.offer(new PendingEvent(entity, event));
         } else {
+            networkReplicate(entity, event);
+
             Set<EventHandlerInfo> selectedHandlersSet = selectEventHandlers(event.getClass(), entity);
             List<EventHandlerInfo> selectedHandlers = Lists.newArrayList(selectedHandlersSet);
             Collections.sort(selectedHandlers, priorityComparator);
@@ -184,6 +213,44 @@ public class PojoEventSystem implements EventSystem {
                     if (event.isCancelled())
                         return;
                 }
+            }
+        }
+    }
+
+    private void networkReplicate(EntityRef entity, Event event) {
+        EventMetadata metadata = eventLibrary.getMetadata(event);
+        if (metadata != null && metadata.isNetworkEvent()) {
+            switch (metadata.getNetworkEventType()) {
+                case BROADCAST:
+                    if (networkSystem.getMode() == NetworkMode.SERVER) {
+                        NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
+                        if (netComp != null) {
+                            for (ClientPlayer client : networkSystem.getPlayers()) {
+                                client.send(event, netComp.networkId);
+                            }
+                        }
+                    }
+                    break;
+                case OWNER:
+                    if (networkSystem.getMode() == NetworkMode.SERVER) {
+                        NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
+                        if (netComp != null) {
+                            ClientPlayer client = networkSystem.getClientFor(entity);
+                            if (client != null) {
+                                client.send(event, netComp.networkId);
+                            }
+                        }
+                    }
+                    break;
+                case SERVER:
+                    if (networkSystem.getMode() == NetworkMode.CLIENT) {
+                        NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
+                        if (netComp != null) {
+                            networkSystem.getServer().send(event, netComp.networkId);
+                        }
+                    }
+                    break;
+
             }
         }
     }
@@ -237,7 +304,6 @@ public class PojoEventSystem implements EventSystem {
 
         public int getPriority();
     }
-
 
     private class ReflectedEventHandlerInfo implements EventHandlerInfo {
         private EventHandlerSystem handler;

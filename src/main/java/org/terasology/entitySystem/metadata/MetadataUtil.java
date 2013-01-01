@@ -40,17 +40,4 @@ public final class MetadataUtil {
         }
         return name;
     }
-
-    public static String getEventClassName(Event event) {
-        return getEventClassName(event.getClass());
-    }
-
-    public static String getEventClassName(Class<? extends Event> eventClass) {
-        String name = eventClass.getSimpleName();
-        int index = name.toLowerCase(Locale.ENGLISH).lastIndexOf("event");
-        if (index != -1) {
-            return name.substring(0, index);
-        }
-        return name;
-    }
 }

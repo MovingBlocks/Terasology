@@ -8,8 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.metadata.ClassMetadata;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
-import org.terasology.entitySystem.metadata.MetadataUtil;
 import org.terasology.entitySystem.metadata.FieldMetadata;
+import org.terasology.entitySystem.metadata.MetadataUtil;
 import org.terasology.protobuf.EntityData;
 
 import java.lang.reflect.InvocationTargetException;
@@ -19,7 +19,7 @@ import java.util.Map;
  * ComponentSerializer provides the ability to serialize and deserialize between Components and the protobuf
  * EntityData.Component
  * <p/>
- * If provided with a componentIdTable, then the components will be serialized and deserialized using those ids rather
+ * If provided with a idTable, then the components will be serialized and deserialized using those ids rather
  * than the names of each component, saving some space.
  * <p/>
  * When serializing, a FieldSerializeCheck can be provided to determine whether each field should be serialized or not
@@ -31,7 +31,7 @@ public class ComponentSerializer {
     private static final Logger logger = LoggerFactory.getLogger(ComponentSerializer.class);
 
     private ComponentLibrary componentLibrary;
-    private BiMap<Class<? extends Component>, Integer> componentIdTable = ImmutableBiMap.<Class<? extends Component>, Integer>builder().build();
+    private BiMap<Class<? extends Component>, Integer> idTable = ImmutableBiMap.<Class<? extends Component>, Integer>builder().build();
 
     /**
      * Creates the component serializer.
@@ -47,16 +47,16 @@ public class ComponentSerializer {
      *
      * @param table
      */
-    public void setComponentIdMapping(Map<Class<? extends Component>, Integer> table) {
-        componentIdTable = ImmutableBiMap.copyOf(table);
+    public void setIdMapping(Map<Class<? extends Component>, Integer> table) {
+        idTable = ImmutableBiMap.copyOf(table);
     }
 
     /**
      * Clears the mapping between component classes and ids. This causes components to be serialized with their component
      * class name instead.
      */
-    public void removeComponentIdMapping() {
-        componentIdTable = ImmutableBiMap.<Class<? extends Component>, Integer>builder().build();
+    public void removeIdMapping() {
+        idTable = ImmutableBiMap.<Class<? extends Component>, Integer>builder().build();
     }
 
     /**
@@ -125,7 +125,7 @@ public class ComponentSerializer {
      * @return The serialized component, or null if it could not be serialized.
      */
     public EntityData.Component serialize(Component component) {
-        return serialize(component, FieldSerializeCheck.NullCheck.newInstance());
+        return serialize(component, FieldSerializeCheck.NullCheck.<Component>newInstance());
     }
 
     /**
@@ -135,7 +135,7 @@ public class ComponentSerializer {
      * @param check     A check to use to see if each field should be serialized.
      * @return The serialized component, or null if it could not be serialized.
      */
-    public EntityData.Component serialize(Component component, FieldSerializeCheck check) {
+    public EntityData.Component serialize(Component component, FieldSerializeCheck<Component> check) {
         ClassMetadata<?> componentMetadata = componentLibrary.getMetadata(component.getClass());
         if (componentMetadata == null) {
             logger.error("Unregistered component type: {}", component.getClass());
@@ -146,7 +146,7 @@ public class ComponentSerializer {
 
         for (FieldMetadata field : componentMetadata.iterateFields()) {
             if (check.shouldSerializeField(field, component)) {
-                EntityData.NameValue fieldData = serializeField(field, component);
+                EntityData.NameValue fieldData = field.serialize(component);
                 if (fieldData != null) {
                     componentMessage.addField(fieldData);
                 }
@@ -157,31 +157,12 @@ public class ComponentSerializer {
     }
 
     private void serializeComponentType(Component component, EntityData.Component.Builder componentMessage) {
-        Integer compId = componentIdTable.get(component.getClass());
+        Integer compId = idTable.get(component.getClass());
         if (compId != null) {
             componentMessage.setTypeIndex(compId);
         } else {
             componentMessage.setType(MetadataUtil.getComponentClassName(component));
         }
-    }
-
-    private EntityData.NameValue serializeField(FieldMetadata field, Component component) {
-        try {
-            Object rawValue = field.getValue(component);
-            if (rawValue == null) {
-                return null;
-            }
-
-            EntityData.Value value = field.serialize(rawValue);
-            if (value != null) {
-                return EntityData.NameValue.newBuilder().setName(field.getName()).setValue(value).build();
-            }
-        } catch (IllegalAccessException e) {
-            logger.error("Exception during serializing component type: {}", component.getClass(), e);
-        } catch (InvocationTargetException e) {
-            logger.error("Exception during serializing component type: {}", component.getClass(), e);
-        }
-        return null;
     }
 
     /**
@@ -192,7 +173,7 @@ public class ComponentSerializer {
      * @return The serialized component, or null if it could not be serialized
      */
     public EntityData.Component serialize(Component base, Component delta) {
-        return serialize(base, delta, FieldSerializeCheck.NullCheck.newInstance());
+        return serialize(base, delta, FieldSerializeCheck.NullCheck.<Component>newInstance());
     }
 
     /**
@@ -203,7 +184,7 @@ public class ComponentSerializer {
      * @param check A check to use to see if each field should be serialized.
      * @return The serialized component, or null if it could not be serialized
      */
-    public EntityData.Component serialize(Component base, Component delta, FieldSerializeCheck check) {
+    public EntityData.Component serialize(Component base, Component delta, FieldSerializeCheck<Component> check) {
         ClassMetadata<?> componentMetadata = componentLibrary.getMetadata(base.getClass());
         if (componentMetadata == null) {
             logger.error("Unregistered component type: {}", base.getClass());
@@ -221,7 +202,7 @@ public class ComponentSerializer {
                     Object deltaValue = field.getValue(delta);
 
                     if (!Objects.equal(origValue, deltaValue)) {
-                        EntityData.Value value = field.serialize(deltaValue);
+                        EntityData.Value value = field.serializeValue(deltaValue);
                         if (value != null) {
                             componentMessage.addField(EntityData.NameValue.newBuilder().setName(field.getName()).setValue(value).build());
                             changed = true;
@@ -253,8 +234,8 @@ public class ComponentSerializer {
     public Class<? extends Component> getComponentClass(EntityData.Component componentData) {
         if (componentData.hasTypeIndex()) {
             ClassMetadata metadata = null;
-            if (!componentIdTable.isEmpty()) {
-                Class<? extends Component> componentClass = componentIdTable.inverse().get(componentData.getTypeIndex());
+            if (!idTable.isEmpty()) {
+                Class<? extends Component> componentClass = idTable.inverse().get(componentData.getTypeIndex());
                 if (componentClass != null) {
                     metadata = componentLibrary.getMetadata(componentClass);
                 }

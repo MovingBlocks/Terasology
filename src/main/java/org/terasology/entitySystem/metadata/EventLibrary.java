@@ -24,4 +24,13 @@ import org.terasology.entitySystem.Event;
  * @author Immortius <immortius@gmail.com>
  */
 public interface EventLibrary extends ClassLibrary<Event> {
+
+    /**
+     * @param clazz
+     * @return The metadata for the given clazz, or null if not registered.
+     */
+    <T extends Event> EventMetadata<T> getMetadata(Class<T> clazz);
+
+    <T extends Event> EventMetadata<T> getMetadata(T object);
+
 }

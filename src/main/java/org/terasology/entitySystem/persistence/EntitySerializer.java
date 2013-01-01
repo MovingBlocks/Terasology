@@ -67,7 +67,7 @@ public class EntitySerializer {
      * @param table
      */
     public void setComponentIdMapping(Map<Class<? extends Component>, Integer> table) {
-        componentSerializer.setComponentIdMapping(table);
+        componentSerializer.setIdMapping(table);
     }
 
     /**
@@ -75,7 +75,7 @@ public class EntitySerializer {
      * class name instead.
      */
     public void removeComponentIdMapping() {
-        componentSerializer.removeComponentIdMapping();
+        componentSerializer.removeIdMapping();
     }
 
     /**
@@ -83,7 +83,7 @@ public class EntitySerializer {
      * @return The serialized entity
      */
     public EntityData.Entity serialize(EntityRef entityRef) {
-        return serialize(entityRef, true, FieldSerializeCheck.NullCheck.newInstance());
+        return serialize(entityRef, true, FieldSerializeCheck.NullCheck.<Component>newInstance());
     }
 
     /**
@@ -92,7 +92,7 @@ public class EntitySerializer {
      * @return The serialized entity
      */
     public EntityData.Entity serialize(EntityRef entityRef, boolean deltaAgainstPrefab) {
-        return serialize(entityRef, deltaAgainstPrefab, FieldSerializeCheck.NullCheck.newInstance());
+        return serialize(entityRef, deltaAgainstPrefab, FieldSerializeCheck.NullCheck.<Component>newInstance());
     }
 
     /**
@@ -100,7 +100,7 @@ public class EntitySerializer {
      * @param fieldCheck Used to check whether each field in each component of the entity should be serialized.
      * @return The serialized entity
      */
-    public EntityData.Entity serialize(EntityRef entityRef, FieldSerializeCheck fieldCheck) {
+    public EntityData.Entity serialize(EntityRef entityRef, FieldSerializeCheck<Component> fieldCheck) {
         return serialize(entityRef, true, fieldCheck);
     }
 
@@ -109,7 +109,7 @@ public class EntitySerializer {
      * @param fieldCheck Used to check whether each field in each component of the entity should be serialized.
      * @return The serialized entity
      */
-    public EntityData.Entity serialize(EntityRef entityRef, boolean deltaAgainstPrefab, FieldSerializeCheck fieldCheck) {
+    public EntityData.Entity serialize(EntityRef entityRef, boolean deltaAgainstPrefab, FieldSerializeCheck<Component> fieldCheck) {
         Prefab prefab = entityRef.getParentPrefab();
         if (prefab != null && deltaAgainstPrefab) {
             return serializeEntityDelta(entityRef, prefab, fieldCheck);
@@ -176,7 +176,7 @@ public class EntitySerializer {
         }
     }
 
-    private EntityData.Entity serializeEntityFull(EntityRef entityRef, FieldSerializeCheck fieldCheck) {
+    private EntityData.Entity serializeEntityFull(EntityRef entityRef, FieldSerializeCheck<Component> fieldCheck) {
         EntityData.Entity.Builder entity = EntityData.Entity.newBuilder();
         if (!ignoringEntityId) {
             entity.setId(entityRef.getId());
@@ -193,7 +193,7 @@ public class EntitySerializer {
         return entity.build();
     }
 
-    private EntityData.Entity serializeEntityDelta(EntityRef entityRef, Prefab prefab, FieldSerializeCheck fieldCheck) {
+    private EntityData.Entity serializeEntityDelta(EntityRef entityRef, Prefab prefab, FieldSerializeCheck<Component> fieldCheck) {
         EntityData.Entity.Builder entity = EntityData.Entity.newBuilder();
         if (!ignoringEntityId) {
             entity.setId(entityRef.getId());

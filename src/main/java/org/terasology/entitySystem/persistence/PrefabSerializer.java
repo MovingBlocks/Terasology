@@ -37,7 +37,7 @@ public class PrefabSerializer {
      * @param table
      */
     public void setComponentIdMapping(Map<Class<? extends Component>, Integer> table) {
-        componentSerializer.setComponentIdMapping(table);
+        componentSerializer.setIdMapping(table);
     }
 
     /**
@@ -45,7 +45,7 @@ public class PrefabSerializer {
      * class name instead.
      */
     public void removeComponentIdMapping() {
-        componentSerializer.removeComponentIdMapping();
+        componentSerializer.removeIdMapping();
     }
 
     /**

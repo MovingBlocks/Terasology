@@ -1,6 +1,9 @@
 package org.terasology.entitySystem.metadata.internal;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.Maps;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.metadata.ClassMetadata;
@@ -64,16 +67,21 @@ public class MetadataBuilder {
     }
 
     public <T> ClassMetadata<T> build(Class<T> forClass) {
+        ClassMetadata<T> info;
         try {
-            // Check if constructor exists
-            forClass.getConstructor();
+            info = new ClassMetadata<T>(forClass);
         } catch (NoSuchMethodException e) {
-            logger.error("Unable to register class {}: Default Constructor Required", forClass.getSimpleName());
+            logger.error("Unable to register class {}: Default Constructor Required", forClass.getSimpleName(), e);
             return null;
         }
 
-        ClassMetadata<T> info = new ClassMetadata<T>(forClass);
-        for (Field field : forClass.getDeclaredFields()) {
+        populateFields(forClass, info);
+        return info;
+    }
+
+
+    public <T> void populateFields(Class<T> forClass, ClassMetadata<T> info) {
+        for (Field field : Reflections.getAllFields(forClass, Predicates.alwaysTrue())) {
             if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers()))
                 continue;
             field.setAccessible(true);
@@ -84,7 +92,6 @@ public class MetadataBuilder {
                 info.addField(new FieldMetadata(field, forClass, typeHandler));
             }
         }
-        return info;
     }
 
     // TODO: Refactor

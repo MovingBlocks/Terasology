@@ -68,7 +68,7 @@ public class ComponentSerializerTest {
 
     @Test
     public void testComponentTypeIdUsedWhenLookupTableEnabled() throws Exception {
-        componentSerializer.setComponentIdMapping(ImmutableMap.<Class<? extends Component>, Integer>builder().put(StringComponent.class, 1).build());
+        componentSerializer.setIdMapping(ImmutableMap.<Class<? extends Component>, Integer>builder().put(StringComponent.class, 1).build());
         Component stringComponent = new StringComponent("Test");
         EntityData.Component compData = componentSerializer.serialize(stringComponent);
         assertEquals(1, compData.getTypeIndex());
@@ -77,7 +77,7 @@ public class ComponentSerializerTest {
 
     @Test
     public void testComponentTypeIdUsedWhenLookupTableEnabledForComponentDeltas() throws Exception {
-        componentSerializer.setComponentIdMapping(ImmutableMap.<Class<? extends Component>, Integer>builder().put(StringComponent.class, 413).build());
+        componentSerializer.setIdMapping(ImmutableMap.<Class<? extends Component>, Integer>builder().put(StringComponent.class, 413).build());
 
         EntityData.Component componentData = componentSerializer.serialize(new StringComponent("Original"), new StringComponent("Value"));
 
@@ -86,7 +86,7 @@ public class ComponentSerializerTest {
 
     @Test
     public void testComponentTypeIdDeserializes() throws Exception {
-        componentSerializer.setComponentIdMapping(ImmutableMap.<Class<? extends Component>, Integer>builder().put(StringComponent.class, 1).build());
+        componentSerializer.setIdMapping(ImmutableMap.<Class<? extends Component>, Integer>builder().put(StringComponent.class, 1).build());
         EntityData.Component compData = EntityData.Component.newBuilder().setTypeIndex(1).addField(EntityData.NameValue.newBuilder().setName("value").setValue(EntityData.Value.newBuilder().addString("item"))).build();
         Component comp = componentSerializer.deserialize(compData);
         assertTrue(comp instanceof StringComponent);
@@ -95,7 +95,7 @@ public class ComponentSerializerTest {
 
     @Test
     public void testDeltaComponentTypeIdDeserializesWithValue() throws Exception {
-        componentSerializer.setComponentIdMapping(ImmutableMap.<Class<? extends Component>, Integer>builder().put(StringComponent.class, 1).build());
+        componentSerializer.setIdMapping(ImmutableMap.<Class<? extends Component>, Integer>builder().put(StringComponent.class, 1).build());
         EntityData.Component compData = EntityData.Component.newBuilder().setTypeIndex(1).addField(EntityData.NameValue.newBuilder().setName("value").setValue(EntityData.Value.newBuilder().addString("item"))).build();
         StringComponent original = new StringComponent("test");
         componentSerializer.deserializeOnto(original, compData);
@@ -104,7 +104,7 @@ public class ComponentSerializerTest {
 
     @Test
     public void testDeltaComponentTypeIdDeserializesWithoutValue() throws Exception {
-        componentSerializer.setComponentIdMapping(ImmutableMap.<Class<? extends Component>, Integer>builder().put(StringComponent.class, 1).build());
+        componentSerializer.setIdMapping(ImmutableMap.<Class<? extends Component>, Integer>builder().put(StringComponent.class, 1).build());
         EntityData.Component compData = EntityData.Component.newBuilder().setTypeIndex(1).addField(EntityData.NameValue.newBuilder().setName("value")).build();
         StringComponent original = new StringComponent("test");
         componentSerializer.deserializeOnto(original, compData);

@@ -11,10 +11,12 @@ import org.terasology.entitySystem.pojo.PojoEventSystem;
 import org.terasology.entitySystem.pojo.PojoPrefabManager;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
+import org.terasology.network.NetworkSystem;
 
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 
 /**
@@ -33,7 +35,7 @@ public class PojoEventSystemTests {
         EntitySystemLibrary entitySystemLibrary = new EntitySystemLibraryImpl();
         compLibrary = entitySystemLibrary.getComponentLibrary();
         entityManager = new PojoEntityManager(entitySystemLibrary, new PojoPrefabManager(compLibrary));
-        eventSystem = new PojoEventSystem();
+        eventSystem = new PojoEventSystem(entitySystemLibrary.getEventLibrary(), mock(NetworkSystem.class));
         entityManager.setEventSystem(eventSystem);
         entity = entityManager.create();
     }

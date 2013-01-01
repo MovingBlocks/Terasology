@@ -17,6 +17,7 @@
 package org.terasology.game.modes.loadProcesses;
 
 import org.terasology.entitySystem.PersistableEntityManager;
+import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.bootstrap.EntitySystemBuilder;
 import org.terasology.game.modes.LoadProcess;
@@ -36,7 +37,7 @@ public class InitialiseEntitySystem implements LoadProcess {
     public boolean step() {
         ModManager modManager = CoreRegistry.get(ModManager.class);
         PersistableEntityManager entityManager = new EntitySystemBuilder().build(modManager);
-        CoreRegistry.get(NetworkSystem.class).setEntityManager(entityManager);
+        CoreRegistry.get(NetworkSystem.class).connectToEntitySystem(entityManager, CoreRegistry.get(EntitySystemLibrary.class));
         return true;
     }
 

@@ -12,12 +12,19 @@ public interface ClassLibrary<T> extends Iterable<ClassMetadata<? extends T>> {
     void register(Class<? extends T> clazz);
 
     /**
+     * Registers a class with this library
+     * @param clazz
+     * @param names The names to use to find this class
+     */
+    void register(Class<? extends T> clazz, String ... names);
+
+    /**
      * @param clazz
      * @return The metadata for the given clazz, or null if not registered.
      */
     <U extends T> ClassMetadata<U> getMetadata(Class<U> clazz);
 
-     ClassMetadata<? extends T> getMetadata(T object);
+    <U extends T> ClassMetadata<U> getMetadata(U object);
 
     /**
      * Copies registered class

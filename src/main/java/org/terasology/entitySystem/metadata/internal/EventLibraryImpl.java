@@ -1,22 +1,53 @@
 package org.terasology.entitySystem.metadata.internal;
 
 import com.google.common.collect.ImmutableList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Event;
+import org.terasology.entitySystem.metadata.ClassMetadata;
 import org.terasology.entitySystem.metadata.EventLibrary;
+import org.terasology.entitySystem.metadata.EventMetadata;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * @author Immortius
  */
 public class EventLibraryImpl extends BaseLibraryImpl<Event> implements EventLibrary {
+    private static final Logger logger = LoggerFactory.getLogger(EventLibraryImpl.class);
+    private MetadataBuilder metadataBuilder;
 
     public EventLibraryImpl(MetadataBuilder metadataBuilder) {
         super(metadataBuilder);
+        this.metadataBuilder = metadataBuilder;
     }
 
     @Override
-    public List<String> getNamesFor(Class<? extends Event> clazz) {
-        return ImmutableList.<String>builder().add(clazz.getSimpleName()).build();
+    public String[] getNamesFor(Class<? extends Event> clazz) {
+        return new String[] {clazz.getSimpleName()};
+    }
+
+    @Override
+    public <T extends Event> EventMetadata<T> getMetadata(Class<T> clazz) {
+        return (EventMetadata<T>) super.getMetadata(clazz);
+    }
+
+    public <T extends Event> EventMetadata<T> getMetadata(T object) {
+        return (EventMetadata<T>) super.getMetadata(object);
+    }
+
+    @Override
+    protected <U extends Event> ClassMetadata<U> createMetadata(Class<U> clazz, String ... names) {
+        EventMetadata<U> info;
+        try {
+            info = new EventMetadata<U>(clazz, names[0]);
+        } catch (NoSuchMethodException e) {
+            logger.error("Unable to register class {}: Default Constructor Required", clazz.getSimpleName(), e);
+            return null;
+        }
+
+        metadataBuilder.populateFields(clazz, info);
+        return info;
     }
 }

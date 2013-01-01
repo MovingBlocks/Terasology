@@ -29,6 +29,7 @@ import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
 import static org.terasology.protobuf.NetData.*;
 
+import org.terasology.protobuf.NetData;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.ChunkProvider;
@@ -73,12 +74,19 @@ public class TerasologyServerHandler extends SimpleChannelUpstreamHandler {
             case CLIENT_CONNECT:
                 receivedConnect(message.getClientConnect());
                 break;
+            case EVENT:
+                receivedEvent(message);
             case CONSOLE:
                 networkSystem.sendChatMessage(message.getConsole().getMessage());
                 MessageManager.getInstance().addMessage(message.getConsole().getMessage(), MessageManager.EMessageScope.PRIVATE);
                 break;
         }
         logger.debug("Received message: {}", message.getType());
+    }
+
+    private void receivedEvent(NetMessage message) {
+        // TODO: Ensure event allowed from this client?
+        networkSystem.queueMessage(message);
     }
 
     private void receivedConnect(ClientConnectMessage message) {

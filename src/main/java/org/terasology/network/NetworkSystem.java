@@ -1,6 +1,7 @@
 package org.terasology.network;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import gnu.trove.map.TIntIntMap;
@@ -19,9 +20,12 @@ import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.EntityChangeSubscriber;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.Event;
 import org.terasology.entitySystem.PersistableEntityManager;
+import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.metadata.extension.EntityRefTypeHandler;
 import org.terasology.entitySystem.persistence.EntitySerializer;
+import org.terasology.entitySystem.persistence.EventSerializer;
 import org.terasology.game.CoreRegistry;
 import org.terasology.protobuf.NetData;
 import org.terasology.world.chunks.Chunk;
@@ -29,6 +33,7 @@ import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 
 import java.net.InetSocketAddress;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
@@ -40,20 +45,25 @@ public class NetworkSystem implements EntityChangeSubscriber {
     private static final Logger logger = LoggerFactory.getLogger(NetworkSystem.class);
 
     private NetworkMode mode = NetworkMode.NONE;
-    private Set<ClientPlayer> clientPlayerList = Sets.newLinkedHashSet();
+    private final Set<ClientPlayer> clientPlayerList = Sets.newLinkedHashSet();
+    private Map<EntityRef, ClientPlayer> clientPlayerLookup = Maps.newHashMap();
 
     // Shared
     private PersistableEntityManager entityManager;
     private ChannelFactory factory;
     private TIntIntMap netIdToEntityId = new TIntIntHashMap();
     private BlockingQueue<NetData.NetMessage> queuedMessages = Queues.newLinkedBlockingQueue();
+    private BlockingQueue<Event> queuedEvents = Queues.newLinkedBlockingQueue();
+    private BlockingQueue<ClientPlayer> newClients = Queues.newLinkedBlockingQueue();
+    private EventSerializer eventSerializer;
 
     // Server only
-    private ChannelGroup allChannels = new DefaultChannelGroup("tera-server");
+    private ChannelGroup allChannels = new DefaultChannelGroup("tera-channels");
     private NetData.ServerInfoMessage serverInfo;
     private int nextNetId = 1;
 
     // Client only
+    private Server server;
     private RemoteChunkProvider remoteWorldProvider;
     private BlockingQueue<Chunk> chunkQueue = Queues.newLinkedBlockingQueue();
 
@@ -90,16 +100,13 @@ public class NetworkSystem implements EntityChangeSubscriber {
                 return false;
             } else {
                 allChannels.add(connectCheck.getChannel());
+                server = new Server(connectCheck.getChannel());
                 logger.info("Connected to server");
                 mode = NetworkMode.CLIENT;
                 return true;
             }
         }
         return false;
-    }
-
-    public void send(NetData data) {
-        allChannels.write(data);
     }
 
     public void sendChatMessage(String message) {
@@ -116,10 +123,13 @@ public class NetworkSystem implements EntityChangeSubscriber {
             factory.releaseExternalResources();
             logger.info("Network shutdown");
             mode = NetworkMode.NONE;
+            server = null;
             serverInfo = null;
             remoteWorldProvider = null;
             nextNetId = 1;
             netIdToEntityId.clear();
+            eventSerializer = null;
+            entityManager = null;
         }
     }
 
@@ -132,10 +142,19 @@ public class NetworkSystem implements EntityChangeSubscriber {
                     remoteWorldProvider.receiveChunk(chunk);
                 }
             }
-            for (ClientPlayer client : clientPlayerList) {
-                client.update();
+            if (entityManager != null) {
+                if (!newClients.isEmpty()) {
+                    List<ClientPlayer> newPlayers = Lists.newArrayListWithExpectedSize(newClients.size());
+                    newClients.drainTo(newPlayers);
+                    for (ClientPlayer client : newPlayers) {
+                        processNewClient(client);
+                    }
+                }
+                for (ClientPlayer client : clientPlayerList) {
+                    client.update();
+                }
+                processMessages();
             }
-            processMessages();
         }
     }
 
@@ -162,6 +181,11 @@ public class NetworkSystem implements EntityChangeSubscriber {
                     unregisterNetworkEntity(entity);
                     entity.destroy();
                     break;
+                case EVENT:
+                    Event event = eventSerializer.deserialize(message.getEvent().getEvent());
+                    EntityRef target = getEntity(message.getEvent().getTargetId());
+                    target.send(event);
+                    break;
             }
         }
 
@@ -180,6 +204,17 @@ public class NetworkSystem implements EntityChangeSubscriber {
         this.serverInfo = serverInfo;
     }
 
+    public Server getServer() {
+        return this.server;
+    }
+
+    public Iterable<ClientPlayer> getPlayers() {
+        return this.clientPlayerList;
+    }
+
+    public ClientPlayer getClientFor(EntityRef player) {
+        return clientPlayerLookup.get(player);
+    }
 
     public void setRemoteWorldProvider(RemoteChunkProvider remoteWorldProvider) {
         this.remoteWorldProvider = remoteWorldProvider;
@@ -188,7 +223,6 @@ public class NetworkSystem implements EntityChangeSubscriber {
     public RemoteChunkProvider getRemoteWorldProvider() {
         return remoteWorldProvider;
     }
-
 
     public void registerNetworkEntity(EntityRef entity) {
         if (mode == NetworkMode.NONE) {
@@ -226,13 +260,23 @@ public class NetworkSystem implements EntityChangeSubscriber {
         }
     }
 
-    public void setEntityManager(PersistableEntityManager entityManager) {
+    public void connectToEntitySystem(PersistableEntityManager entityManager, EntitySystemLibrary entitySystemLibrary) {
         if (this.entityManager != null) {
             this.entityManager.unsubscribe(this);
         }
         this.entityManager = entityManager;
         this.entityManager.subscribe(this);
+
+        eventSerializer = new EventSerializer(entitySystemLibrary.getEventLibrary());
+
+        if (server != null) {
+            server.setEventSerializer(eventSerializer);
+        }
+        for (ClientPlayer client : clientPlayerList) {
+            client.setEventSerializer(eventSerializer);
+        }
     }
+
 
     @Override
     public void onEntityChange(EntityRef entity) {
@@ -257,8 +301,14 @@ public class NetworkSystem implements EntityChangeSubscriber {
     }
 
     void addClient(ClientPlayer client) {
-        synchronized (clientPlayerList) {
-            clientPlayerList.add(client);
+        newClients.offer(client);
+    }
+
+    private void processNewClient(ClientPlayer client) {
+        clientPlayerList.add(client);
+        clientPlayerLookup.put(client.getEntity(), client);
+        if (eventSerializer != null) {
+            client.setEventSerializer(eventSerializer);
         }
         for (EntityRef netEntity : entityManager.iteratorEntities(NetworkComponent.class)) {
             NetworkComponent netComp = netEntity.getComponent(NetworkComponent.class);
@@ -280,4 +330,6 @@ public class NetworkSystem implements EntityChangeSubscriber {
     void queueMessage(NetData.NetMessage message) {
         queuedMessages.offer(message);
     }
+
+
 }

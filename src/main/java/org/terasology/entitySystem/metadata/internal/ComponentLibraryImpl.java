@@ -15,12 +15,9 @@
  */
 package org.terasology.entitySystem.metadata.internal;
 
-import com.google.common.collect.ImmutableList;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.MetadataUtil;
-
-import java.util.List;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -32,10 +29,10 @@ public final class ComponentLibraryImpl extends BaseLibraryImpl<Component> imple
     }
 
     @Override
-    public List<String> getNamesFor(Class<? extends Component> clazz) {
-        return ImmutableList.<String>builder()
-                .add(clazz.getSimpleName())
-                .add(MetadataUtil.getComponentClassName(clazz))
-                .build();
+    public String[] getNamesFor(Class<? extends Component> clazz) {
+        return new String[] {
+                clazz.getSimpleName(),
+                MetadataUtil.getComponentClassName(clazz)
+        };
     }
 }

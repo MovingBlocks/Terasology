@@ -56,7 +56,7 @@ public class MappedContainerTypeHandler<T> extends AbstractTypeHandler<T> {
                 if (rawValue == null)
                     continue;
 
-                EntityData.Value fieldValue = fieldInfo.serialize(rawValue);
+                EntityData.Value fieldValue = fieldInfo.serializeValue(rawValue);
                 if (fieldValue != null) {
                     result.addNameValue(EntityData.NameValue.newBuilder().setName(fieldInfo.getName()).setValue(fieldValue).build());
                 }

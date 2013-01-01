@@ -21,6 +21,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Locale;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.network.Replicate;
 import org.terasology.protobuf.EntityData;
 
@@ -28,6 +30,8 @@ import org.terasology.protobuf.EntityData;
  * @author Immortius <immortius@gmail.com>
  */
 public final class FieldMetadata {
+    private static final Logger logger = LoggerFactory.getLogger(FieldMetadata.class);
+
     private Field field;
     private Method getter;
     private Method setter;
@@ -40,10 +44,6 @@ public final class FieldMetadata {
         this.replicationInfo = field.getAnnotation(Replicate.class);
         getter = findGetter(type, field);
         setter = findSetter(type, field);
-    }
-
-    public EntityData.Value serialize(Object field) {
-        return serializationHandler.serialize(field);
     }
 
     public Object deserialize(EntityData.Value value) {
@@ -106,6 +106,41 @@ public final class FieldMetadata {
             return type.getMethod(methodName, parameters);
         } catch (NoSuchMethodException nsme) {
             // Not really that exceptional
+        }
+        return null;
+    }
+
+    /**
+     * Serializes the given value, that was originally obtained from this field.
+     * <p/>
+     * This is provided for performance, to avoid obtaining the same value twice via reflection.
+     * @param rawValue
+     * @return
+     */
+    public EntityData.Value serializeValue(Object rawValue) {
+        return serializationHandler.serialize(rawValue);
+    }
+
+    /**
+     * Serializes the field for the given object
+     * @param event
+     * @return
+     */
+    public EntityData.NameValue serialize(Object event) {
+        try {
+            Object rawValue = getValue(event);
+            if (rawValue == null) {
+                return null;
+            }
+
+            EntityData.Value value = serializeValue(rawValue);
+            if (value != null) {
+                return EntityData.NameValue.newBuilder().setName(field.getName()).setValue(value).build();
+            }
+        } catch (IllegalAccessException e) {
+            logger.error("Exception during serializing of {}", event.getClass(), e);
+        } catch (InvocationTargetException e) {
+            logger.error("Exception during serializing of {}", event.getClass(), e);
         }
         return null;
     }

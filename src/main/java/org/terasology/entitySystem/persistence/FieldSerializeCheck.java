@@ -7,23 +7,24 @@ import org.terasology.entitySystem.metadata.FieldMetadata;
  * Interface for providing serializers with a method to check whether a given field should be serialized.
  * @author Immortius
  */
-public interface FieldSerializeCheck {
+public interface FieldSerializeCheck<T> {
 
     /**
      * @param field The field to check
-     * @param component The component it belongs to
+     * @param object The object it belongs to
      * @return Whether the field should be serialized
      */
-    boolean shouldSerializeField(FieldMetadata field, Component component);
+    boolean shouldSerializeField(FieldMetadata field, T object);
 
     /**
      * Null implementation, returns true for all fields
      */
-    public static class NullCheck implements FieldSerializeCheck {
+    public static class NullCheck<T> implements FieldSerializeCheck<T> {
 
         private static NullCheck instance = new NullCheck();
 
-        public static NullCheck newInstance() {
+        @SuppressWarnings("unchecked")
+        public static <T> NullCheck<T> newInstance() {
             return instance;
         }
 
@@ -31,7 +32,7 @@ public interface FieldSerializeCheck {
         }
 
         @Override
-        public boolean shouldSerializeField(FieldMetadata field, Component component) {
+        public boolean shouldSerializeField(FieldMetadata field, T object) {
             return true;
         }
     }
