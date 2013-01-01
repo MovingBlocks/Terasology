@@ -357,6 +357,7 @@ public class Chunk implements Externalizable {
     }
     
     private static DecimalFormat fpercent = new DecimalFormat("0.##");
+    private static DecimalFormat fsize = new DecimalFormat("#,###");
     public void deflate() {
         lock();
         try {
@@ -385,7 +386,7 @@ public class Chunk implements Externalizable {
             double liquidPercent = 100d - (100d / liquidSize * liquidReduced);
             double totalPercent = 100d - (100d / totalSize * totalReduced);
             
-            logger.info(String.format("chunk (%d, %d, %d): total-deflated-by: %s%%, blocks-deflated-by=%s%%, sunlight-deflated-by=%s%%, light-deflated-by=%s%%, liquid-deflated-by=%s%%", pos.x, pos.y, pos.z, fpercent.format(totalPercent), fpercent.format(blocksPercent), fpercent.format(sunlightPercent), fpercent.format(lightPercent), fpercent.format(liquidPercent)));
+            logger.info(String.format("chunk (%d, %d, %d): size-before: %s bytes, size-after: %s bytes, total-deflated-by: %s%%, blocks-deflated-by=%s%%, sunlight-deflated-by=%s%%, light-deflated-by=%s%%, liquid-deflated-by=%s%%", pos.x, pos.y, pos.z, fsize.format(totalSize), fsize.format(totalReduced), fpercent.format(totalPercent), fpercent.format(blocksPercent), fpercent.format(sunlightPercent), fpercent.format(lightPercent), fpercent.format(liquidPercent)));
         } finally {
             unlock();
         }
