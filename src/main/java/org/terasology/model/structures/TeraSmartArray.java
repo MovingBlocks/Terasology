@@ -19,9 +19,14 @@ import java.util.Arrays;
 
 /**
  * A fast 3D array for efficient storage of 4-bit values.
- *
+ * </p>
+ * Note: </br>
+ * This class is deprecated and should not be used. 
+ * Its functionality is now covered by {@link org.terasology.world.chunks.blockdata.TeraDenseArray4Bit TeraDenseArray4Bit}.
+ * </p>
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
+@Deprecated
 public class TeraSmartArray {
 
     private final byte _array[];

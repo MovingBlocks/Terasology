@@ -1,0 +1,138 @@
+package org.terasology.world.chunks.blockdata;
+
+import java.util.Arrays;
+
+import org.terasology.world.chunks.deflate.TeraAdvancedDeflator;
+
+import com.google.common.base.Preconditions;
+
+
+/**
+ * TeraSparseArray8Bit implements a sparse array with elements of 8 bit size.
+ * Its elements are in the range -128 through +127 and it stores one element per byte.
+ * It can reduce memory consumption through sparse memory allocation.
+ * 
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
+ *
+ */
+public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
+
+    @Override
+    protected final TeraArray createSparse(byte fill) {
+        return new TeraSparseArray8Bit(getSizeX(), getSizeY(), getSizeZ(), fill);
+    }
+
+    @Override
+    protected final TeraArray createSparse(byte[][] inflated, byte[] deflated) {
+        return new TeraSparseArray8Bit(getSizeX(), getSizeY(), getSizeZ(), inflated, deflated);
+    }
+
+    @Override
+    protected final int rowSize() {
+        return getSizeXZ();
+    }
+
+    public TeraSparseArray8Bit() {
+        super();
+    }
+
+    public TeraSparseArray8Bit(int sizeX, int sizeY, int sizeZ) {
+        super(sizeX, sizeY, sizeZ);
+    }
+
+    public TeraSparseArray8Bit(int sizeX, int sizeY, int sizeZ, byte[][] inflated, byte[] deflated) {
+        super(sizeX, sizeY, sizeZ, inflated, deflated);
+    }
+
+    public TeraSparseArray8Bit(int sizeX, int sizeY, int sizeZ, byte fill) {
+        super(sizeX, sizeY, sizeZ, fill);
+    }
+
+    @Override
+    public TeraArray deflate(TeraAdvancedDeflator deflator) {
+        return Preconditions.checkNotNull(deflator).deflateSparseArray8Bit(inflated, deflated, fill, rowSize(), getSizeX(), getSizeY(), getSizeZ());
+    }
+
+    @Override
+    public int getElementSizeInBits() {
+        return 8;
+    }
+
+    @Override
+    public final int get(int x, int y, int z) {
+//        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
+        if (inflated == null) 
+            return fill;
+        byte[] row = inflated[y];
+        if (row != null)
+            return row[pos(x, z)];
+        return deflated[y];
+    }
+
+    @Override
+    public final int set(int x, int y, int z, int value) {
+//        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
+//        if (value < -128 || value > 127) throw new IllegalArgumentException("Parameter 'value' has to be in the range of -128 - 127 (" + value + ")");
+        if (inflated == null) {
+            int old = fill;
+            if (old == value)
+                return old;
+            else {
+                this.inflated = new byte[getSizeY()][];
+                this.deflated = new byte[getSizeY()];
+                Arrays.fill(deflated, fill);
+            }
+        }
+        byte[] row = inflated[y];
+        if (row != null) {
+            int pos = pos(x, z);
+            int old = row[pos];
+            row[pos] = (byte) value;
+            return old;
+        }
+        int old = deflated[y];
+        if (old == value)
+            return old;
+        row = inflated[y] = new byte[rowSize()];
+        Arrays.fill(row, deflated[y]);
+        int pos = pos(x, z);
+        row[pos] = (byte) value;
+        return deflated[y];
+    }
+
+    @Override
+    public final boolean set(int x, int y, int z, int value, int expected) {
+//        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
+//        if (value < -128 || value > 127) throw new IllegalArgumentException("Parameter 'value' has to be in the range of -128 - 127 (" + value + ")");
+//        if (expected < -128 || expected > 127) throw new IllegalArgumentException("Parameter 'expected' has to be in the range of -128 - 127 (" + value + ")");
+        if (value == expected) return true;
+        if (inflated == null) {
+            int old = fill;
+            if (old == value)
+                return true;
+            else {
+                this.inflated = new byte[getSizeY()][];
+                this.deflated = new byte[getSizeY()];
+                Arrays.fill(deflated, fill);
+            }
+        }
+        int pos = pos(x, z);
+        byte[] row = inflated[y];
+        if (row != null) {
+            int old = row[pos];
+            if (old == expected) {
+                row[pos] = (byte) value;
+                return true;
+            }
+            return false;
+        }
+        int old = deflated[y];
+        if (old == expected) {
+            row = inflated[y] = new byte[rowSize()];
+            Arrays.fill(row, deflated[y]);
+            row[pos] = (byte) value;
+            return true;
+        }
+        return false;
+    }
+}
