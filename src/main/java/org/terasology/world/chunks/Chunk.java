@@ -167,9 +167,6 @@ public class Chunk implements Externalizable {
 
     public void setChunkState(State chunkState) {
         Preconditions.checkNotNull(chunkState);
-        if (chunkState != getChunkState() && chunkState == State.COMPLETE) {
-            deflate();
-        }
         this.chunkState = chunkState;
     }
 

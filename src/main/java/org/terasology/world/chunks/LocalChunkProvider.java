@@ -463,6 +463,15 @@ public class LocalChunkProvider implements ChunkProvider {
             }
             logger.debug("Now complete {}", pos);
             chunk.setChunkState(Chunk.State.COMPLETE);
+            chunkTasksQueue.offer(new AbstractChunkTask(pos, this) {
+                @Override
+                public void enact() {
+                    Chunk chunk = getChunk(getPosition());
+                    if (chunk != null) {
+                        chunk.deflate();
+                    }
+                }
+            });
             for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, LOCAL_REGION_EXTENTS)) {
                 checkChunkReady(adjPos);
             }
