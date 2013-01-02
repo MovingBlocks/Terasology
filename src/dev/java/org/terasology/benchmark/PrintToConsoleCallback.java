@@ -19,6 +19,14 @@ public class PrintToConsoleCallback implements BenchmarkCallback {
     }
 
     @Override
+    public void warmup(Benchmark benchmark, boolean finished) {
+        if (finished) 
+            System.out.print("Go! ");
+        else
+            System.out.print("Warmup... ");
+    }
+
+    @Override
     public void progress(Benchmark benchmark, double percent) {
         System.out.print(pf.format(percent) + "% ");
     }

@@ -10,6 +10,8 @@ public interface BenchmarkCallback {
     
     public void begin(Benchmark benchmark, int benchmarkIndex, int benchmarkCount);
     
+    public void warmup(Benchmark benchmark, boolean finished);
+    
     public void progress(Benchmark benchmark, double percent);
     
     public void success(BenchmarkResult result);
