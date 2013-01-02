@@ -510,15 +510,13 @@ public final class WorldRenderer {
 
         updateAndQueueVisibleChunks();
 
-        if (Config.getInstance().isComplexWater()) {
-            PostProcessingRenderer.getInstance().beginRenderReflectedScene();
-            glCullFace(GL11.GL_FRONT);
-            getActiveCamera().setReflected(true);
-            renderWorldReflection(getActiveCamera());
-            getActiveCamera().setReflected(false);
-            glCullFace(GL11.GL_BACK);
-            PostProcessingRenderer.getInstance().endRenderReflectedScene();
-        }
+        PostProcessingRenderer.getInstance().beginRenderReflectedScene();
+        glCullFace(GL11.GL_FRONT);
+        getActiveCamera().setReflected(true);
+        renderWorldReflection(getActiveCamera());
+        getActiveCamera().setReflected(false);
+        glCullFace(GL11.GL_BACK);
+        PostProcessingRenderer.getInstance().endRenderReflectedScene();
 
         PostProcessingRenderer.getInstance().beginRenderScene();
         renderWorld(getActiveCamera());
@@ -655,21 +653,23 @@ public final class WorldRenderer {
         camera.lookThroughNormalized();
         _skysphere.render();
 
-        camera.lookThrough();
+        if (Config.getInstance().isComplexWater()) {
+            camera.lookThrough();
 
-        glEnable(GL_LIGHT0);
+            glEnable(GL_LIGHT0);
 
-        for (Chunk c : _renderQueueChunksOpaque)
-            renderChunk(c, ChunkMesh.RENDER_PHASE.OPAQUE, camera);
+            for (Chunk c : _renderQueueChunksOpaque)
+                renderChunk(c, ChunkMesh.RENDER_PHASE.OPAQUE, camera);
 
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        for (Chunk c : _renderQueueChunksSortedBillboards)
-            renderChunk(c, ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT, camera);
+            for (Chunk c : _renderQueueChunksSortedBillboards)
+                renderChunk(c, ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT, camera);
 
-        glDisable(GL_BLEND);
-        glDisable(GL_LIGHT0);
+            glDisable(GL_BLEND);
+            glDisable(GL_LIGHT0);
+        }
 
         PerformanceMonitor.endActivity();
     }

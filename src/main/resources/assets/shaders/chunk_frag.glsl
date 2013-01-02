@@ -45,7 +45,7 @@ uniform vec2 grassCoordinate;
 #define DAYLIGHT_AMBIENT_COLOR 0.95, 0.92, 0.91
 #define MOONLIGHT_AMBIENT_COLOR 0.8, 0.8, 1.0
 #define NIGHT_BRIGHTNESS 0.05
-#define WATER_COLOR 0.325, 0.419, 0.525, 0.5
+#define WATER_COLOR 0.5, 0.5, 0.5, 0.25
 #define REFLECTION_COLOR 0.95, 0.97, 1.0, 0.75
 
 #define TORCH_WATER_SPEC 8.0
@@ -86,7 +86,6 @@ void main(){
 
         normalWater = (texture2D(textureWaterNormal, waterOffset) * 2.0 - 1.0).xyz;
 
-#ifdef COMPLEX_WATER
         vec3 normalWaterLarge = (texture2D(textureWaterNormal, waterOffsetLarge) * 2.0 - 1.0).xyz;
 
         vec2 projectedPos = 0.5 * (vertexPos.st/vertexPos.q) + vec2(0.5);
@@ -96,10 +95,6 @@ void main(){
 
         float fDot = dot(normalize(eyeVec), vec3(0.0, 1.0, 0.0));
         float fresnel= 1.0 - clamp(fDot, 0.0, 1.0);
-        color = mix(vec4(WATER_COLOR), color, fresnel);
-#else
-        color = vec4(WATER_COLOR);
-#endif
 
         isWater = true;
     /* APPLY LAVA TEXTURE */

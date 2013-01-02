@@ -36,26 +36,36 @@ float linDepth() {
 }
 
 void main() {
-    /* BLUR */
+#ifndef NO_BLUR
     vec4 colorBlur = texture2D(texBlur, gl_TexCoord[0].xy);
+#endif
 
     float depth = linDepth();
+
+#ifndef NO_BLUR
     float blur = 0.0;
 
     if (depth > BLUR_START && !swimming)
        blur = clamp((depth - BLUR_START) / BLUR_LENGTH, 0.0, 1.0);
     else if (swimming)
        blur = 1.0;
+#endif
 
     /* COLOR AND BLOOM */
     vec4 color = texture2D(texScene, gl_TexCoord[0].xy);
     vec4 colorBloom = texture2D(texBloom, gl_TexCoord[0].xy);
 
     color = clamp(color + colorBloom, 0.0, 1.0);
+#ifndef NO_BLUR
     colorBlur = clamp(colorBlur + colorBloom, 0.0, 1.0);
+#endif
 
     /* FINAL MIX */
+#ifndef NO_BLUR
     vec4 finalColor = mix(color, colorBlur, blur);
+#else
+    vec4 finalColor = color;
+#endif
 
     if (fogIntensity > 0.0 || fogLinearIntensity > 0.0) {
         float fogDensity = depth * fogIntensity;

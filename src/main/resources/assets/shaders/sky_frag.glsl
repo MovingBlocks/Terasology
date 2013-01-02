@@ -72,5 +72,10 @@ void main () {
     vec4 skyColor = vec4(clamp(convertColor(), 0.0, 1.0) + sunHighlight, 1.0);
     skyColor += daylight * textureCube (texCubeSky, skyVec);
     skyColor += alpha * textureCube (texCubeStars, skyVecR);
+
+#ifdef NO_POST_PROCESSING
+    skyColor.rgb /= 1.5;
+#endif
+
     gl_FragColor = skyColor;
 }
