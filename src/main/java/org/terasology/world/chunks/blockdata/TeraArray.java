@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
+import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.deflate.TeraAdvancedDeflator;
 
 import com.google.common.base.Preconditions;
@@ -34,6 +35,18 @@ public abstract class TeraArray implements Externalizable {
         sizeXZHalf = sizeXZ / 2;
         sizeXYZ = sizeY * sizeXZ;
         sizeXYZHalf = sizeXYZ / 2;
+    }
+    
+    public static abstract class Factory {
+        
+        public abstract String getName();
+        
+        public abstract TeraArray create(int sizeX, int sizeY, int sizeZ);
+        
+        public final TeraArray create(Chunk chunk) {
+            Preconditions.checkNotNull(chunk);
+            return create(chunk.getChunkSizeX(), chunk.getChunkSizeY(), chunk.getChunkSizeZ());
+        }
     }
 
     public TeraArray() {}
@@ -100,5 +113,5 @@ public abstract class TeraArray implements Externalizable {
     public abstract int set(int x, int y, int z, int value);
 
     public abstract boolean set(int x, int y, int z, int value, int expected);
-
+    
 }
