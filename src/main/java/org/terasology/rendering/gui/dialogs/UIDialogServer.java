@@ -4,6 +4,7 @@ import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
 
 import org.newdawn.slick.Color;
+import org.terasology.config.ServerInfo;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.layout.GridLayout;
@@ -12,7 +13,6 @@ import org.terasology.rendering.gui.widgets.UIComposite;
 import org.terasology.rendering.gui.widgets.UIDialog;
 import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIText;
-import org.terasology.rendering.gui.windows.UIMenuMultiplayer.Server;
 
 /**
  * 
@@ -30,19 +30,20 @@ public class UIDialogServer extends UIDialog {
     private UIText inputName;
     private UILabel labelIp;
     private UIText inputIp;
-    
-    private Server server;
-    
-    public UIDialogServer(Server server) {
+
+    public UIDialogServer() {
+        this("New Server", "");
+
+    }
+
+    public UIDialogServer(String name, String address) {
         super(new Vector2f(400f, 240f));
         setTitle("Edit Server");
-        
-        this.server = server;
-        
-        setup();
+
+        setup(name, address);
     }
     
-    private void setup() {
+    private void setup(String name, String address) {
         setModal(true);
         
         //form
@@ -59,9 +60,7 @@ public class UIDialogServer extends UIDialog {
         labelName.setVisible(true);
         
         inputName = new UIText();
-        if (server != null) {
-            inputName.setText(server.getName());
-        }
+        inputName.setText(name);
         inputName.setSize(new Vector2f(380f, 30f));
         inputName.setVisible(true);
         
@@ -70,9 +69,7 @@ public class UIDialogServer extends UIDialog {
         labelIp.setVisible(true);
         
         inputIp = new UIText();
-        if (server != null) {
-            inputIp.setText(server.getIp());
-        }
+        inputIp.setText(address);
         inputIp.setSize(new Vector2f(380f, 30f));
         inputIp.setVisible(true);
         
@@ -92,9 +89,8 @@ public class UIDialogServer extends UIDialog {
         okButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                server.setName(inputName.getText());
-                server.setIp(inputIp.getText());
-                closeDialog(EReturnCode.OK, server);
+                ServerInfo serverInfo = new ServerInfo(inputName.getText(), inputIp.getText());
+                closeDialog(EReturnCode.OK, serverInfo);
             }
         });
         

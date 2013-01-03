@@ -86,10 +86,7 @@ public class StateSinglePlayer implements GameState {
     public void dispose() {
         // TODO: Shutdown background threads
         eventSystem.process();
-        for (ComponentSystem system : componentSystemManager.iterateAll()) {
-            system.shutdown();
-        }
-        componentSystemManager.clear();
+        componentSystemManager.shutdown();
         guiManager.closeAllWindows();
         try {
             CoreRegistry.get(WorldPersister.class).save(new File(PathManager.getInstance().getWorldSavePath(CoreRegistry.get(WorldProvider.class).getTitle()), TerasologyConstants.ENTITY_DATA_FILE), WorldPersister.SaveFormat.Binary);

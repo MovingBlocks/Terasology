@@ -60,6 +60,8 @@ public class UIMenuSingleplayer extends UIWindow {
     final UIButton loadFromList;
     final UIButton deleteFromList;
 
+    private boolean createServerGame = false;
+
     public UIMenuSingleplayer() {
         setId("singleplayer");
         setBackgroundImage("engine:menubackground");
@@ -134,7 +136,7 @@ public class UIMenuSingleplayer extends UIWindow {
         createNewWorld.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                UIDialogCreateNewWorld dialog = new UIDialogCreateNewWorld();
+                UIDialogCreateNewWorld dialog = new UIDialogCreateNewWorld(createServerGame);
                 dialog.open();
             }
         });
@@ -242,5 +244,9 @@ public class UIMenuSingleplayer extends UIWindow {
 
     public int getWorldCount() {
         return list.getItemCount();
+    }
+
+    public void setCreateServerGame(boolean createServerGame) {
+        this.createServerGame = createServerGame;
     }
 }

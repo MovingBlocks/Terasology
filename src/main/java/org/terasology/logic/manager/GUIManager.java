@@ -28,7 +28,6 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.EventPriority;
-import org.terasology.entitySystem.EventSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.input.events.KeyEvent;
@@ -47,8 +46,8 @@ import org.terasology.rendering.gui.windows.UIMenuConfig;
 import org.terasology.rendering.gui.windows.UIMenuConfigAudio;
 import org.terasology.rendering.gui.windows.UIMenuConfigControls;
 import org.terasology.rendering.gui.windows.UIMenuConfigVideo;
+import org.terasology.rendering.gui.windows.UIMenuJoinServer;
 import org.terasology.rendering.gui.windows.UIMenuMain;
-import org.terasology.rendering.gui.windows.UIMenuMultiplayer;
 import org.terasology.rendering.gui.windows.UIMenuPause;
 import org.terasology.rendering.gui.windows.UIMenuSingleplayer;
 import org.terasology.rendering.gui.windows.UIScreenItems;
@@ -87,7 +86,7 @@ public class GUIManager implements EventHandlerSystem {
         //TODO parser action here! this is temporary
         registeredWindows.put("main", UIMenuMain.class);
         registeredWindows.put("singleplayer", UIMenuSingleplayer.class);
-        registeredWindows.put("multiplayer", UIMenuMultiplayer.class);
+        registeredWindows.put("joinserver", UIMenuJoinServer.class);
         registeredWindows.put("config", UIMenuConfig.class);
         registeredWindows.put("config:video", UIMenuConfigVideo.class);
         registeredWindows.put("config:audio", UIMenuConfigAudio.class);

@@ -51,7 +51,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     private final long DAY_NIGHT_LENGTH_IN_MS = Config.getInstance().getDayNightLengthInMs();
 
     private String title;
-    private String seed;
+    private String seed = "";
     private String[] chunkGenerators;
 
     private WorldBiomeProvider biomeProvider;
@@ -62,9 +62,6 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
     private List<WorldChangeListener> listeners = Lists.newArrayList();
 
     public WorldProviderCoreImpl(String title, String seed, String[] chunkGenerators, ChunkProvider chunkProvider) {
-        if (seed == null || seed.isEmpty()) {
-            throw new IllegalArgumentException("No seed provided.");
-        }
         if (title == null) {
             title = seed;
         }

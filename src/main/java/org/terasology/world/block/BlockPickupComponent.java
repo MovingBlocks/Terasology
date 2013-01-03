@@ -19,12 +19,15 @@ package org.terasology.world.block;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.network.Replicate;
 import org.terasology.world.block.family.BlockFamily;
 
 /**
  * @author Immortius
  */
 public class BlockPickupComponent implements Component {
+    @Replicate
     public BlockFamily blockFamily;
+    @Replicate
     public EntityRef placedEntity = EntityRef.NULL;
 }

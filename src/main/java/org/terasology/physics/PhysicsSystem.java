@@ -332,9 +332,13 @@ public class PhysicsSystem implements EventHandlerSystem, UpdateSubscriberSystem
         public void setWorldTransform(Transform transform) {
             LocationComponent loc = entity.getComponent(LocationComponent.class);
             if (loc != null) {
-                loc.setWorldPosition(transform.origin);
-                loc.setWorldRotation(transform.getRotation(new Quat4f()));
-                entity.saveComponent(loc);
+                Quat4f rot = new Quat4f();
+                transform.getRotation(rot);
+                if (!transform.origin.equals(loc.getWorldPosition()) || !rot.equals(loc.getWorldRotation())) {
+                    loc.setWorldPosition(transform.origin);
+                    loc.setWorldRotation(transform.getRotation(new Quat4f()));
+                    entity.saveComponent(loc);
+                }
             }
         }
     }

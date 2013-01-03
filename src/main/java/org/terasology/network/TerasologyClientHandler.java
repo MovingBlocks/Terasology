@@ -130,21 +130,6 @@ public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
         if (awaitingServerInfo) {
             awaitingServerInfo = false;
             networkSystem.setServerInfo(message);
-
-            ModManager modManager = CoreRegistry.get(ModManager.class);
-            for (Mod mod : modManager.getMods()) {
-                mod.setEnabled(false);
-            }
-            for (ModuleInfo moduleInfo : message.getModuleList()) {
-                Mod mod = modManager.getMod(moduleInfo.getModuleId());
-                if (mod == null) {
-                    // Failed, disconnect
-                } else {
-                    logger.debug("Activating module: {}", moduleInfo.getModuleId());
-                    mod.setEnabled(true);
-                }
-
-            }
         }
     }
 }

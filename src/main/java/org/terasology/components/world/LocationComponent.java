@@ -24,6 +24,7 @@ import org.terasology.entitySystem.EntityRef;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.entitySystem.metadata.core.ListTypeHandler;
+import org.terasology.network.Replicate;
 
 import java.util.Collection;
 import java.util.List;
@@ -35,11 +36,15 @@ import java.util.List;
  */
 public final class LocationComponent implements Component {
     // Standard position/rotation
+    @Replicate
     private Vector3f position = new Vector3f();
+    @Replicate
     private Quat4f rotation = new Quat4f(0, 0, 0, 1);
+    @Replicate
     private float scale = 1.0f;
 
     // Relative to
+    @Replicate
     private EntityRef parent = EntityRef.NULL;
     private List<EntityRef> children = Lists.newArrayList();
 

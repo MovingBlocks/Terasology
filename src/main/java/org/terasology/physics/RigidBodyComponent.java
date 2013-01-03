@@ -21,14 +21,19 @@ import java.util.List;
 import org.terasology.entitySystem.Component;
 
 import com.google.common.collect.Lists;
+import org.terasology.network.Replicate;
 
 /**
  * @author Immortius
  */
 public class RigidBodyComponent implements Component {
+    @Replicate
     public float mass = 10.0f;
+    @Replicate
     public boolean kinematic = false;
 
+    @Replicate
     public CollisionGroup collisionGroup = StandardCollisionGroup.DEFAULT;
+    @Replicate
     public List<CollisionGroup> collidesWith = Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD, StandardCollisionGroup.KINEMATIC);
 }

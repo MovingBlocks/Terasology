@@ -70,8 +70,11 @@ public class UIDialogCreateNewWorld extends UIDialog {
 
     private ModConfig modConfig;
 
-    public UIDialogCreateNewWorld() {
+    private boolean createServerGame;
+
+    public UIDialogCreateNewWorld(boolean createServerGame) {
         super(new Vector2f(512f, 380f));
+        this.createServerGame = createServerGame;
         setTitle("Create new world");
 
         modConfig = new ModConfig();
@@ -253,7 +256,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
                 CoreRegistry.get(Config.class).getDefaultModConfig().copy(modConfig);
                 CoreRegistry.get(Config.class).save();
 
-                CoreRegistry.get(GameEngine.class).changeState(new StateLoading(new WorldInfo(org.terasology.logic.manager.Config.getInstance().getWorldTitle(), org.terasology.logic.manager.Config.getInstance().getDefaultSeed(), org.terasology.logic.manager.Config.getInstance().getDayNightLengthInMs() / 4, chunksListArr, CoreRegistry.get(GameType.class).getClass().toString(), modConfig), NetworkMode.SERVER));
+                CoreRegistry.get(GameEngine.class).changeState(new StateLoading(new WorldInfo(org.terasology.logic.manager.Config.getInstance().getWorldTitle(), org.terasology.logic.manager.Config.getInstance().getDefaultSeed(), org.terasology.logic.manager.Config.getInstance().getDayNightLengthInMs() / 4, chunksListArr, CoreRegistry.get(GameType.class).getClass().toString(), modConfig), (createServerGame) ? NetworkMode.SERVER : NetworkMode.NONE));
             }
         });
 

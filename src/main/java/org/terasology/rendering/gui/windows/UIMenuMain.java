@@ -54,6 +54,7 @@ public class UIMenuMain extends UIWindow {
     private final UIButton singlePlayerButton;
     private final UIButton configButton;
     private final UIButton joinButton;
+    private final UIButton multiplayerButton;
 
     final UILabel version;
 
@@ -84,7 +85,7 @@ public class UIMenuMain extends UIWindow {
             }
         });
         exitButton.setHorizontalAlign(EHorizontalAlign.CENTER);
-        exitButton.setPosition(new Vector2f(0f, 300f + 5 * 40f));
+        exitButton.setPosition(new Vector2f(0f, 300f + 6 * 40f));
         exitButton.setVisible(true);
         
         configButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
@@ -96,7 +97,7 @@ public class UIMenuMain extends UIWindow {
             }
         });
         configButton.setHorizontalAlign(EHorizontalAlign.CENTER);
-        configButton.setPosition(new Vector2f(0f, 300f + 3 * 40f));
+        configButton.setPosition(new Vector2f(0f, 300f + 4 * 40f));
         configButton.setVisible(true);
 
         singlePlayerButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
@@ -105,6 +106,7 @@ public class UIMenuMain extends UIWindow {
             @Override
             public void click(UIDisplayElement element, int button) {
                 getGUIManager().openWindow("singleplayer");
+                ((UIMenuSingleplayer)getGUIManager().getWindowById("singleplayer")).setCreateServerGame(false);
             }
         });
 
@@ -112,32 +114,30 @@ public class UIMenuMain extends UIWindow {
         singlePlayerButton.setPosition(new Vector2f(0f, 300f + 40f));
         singlePlayerButton.setVisible(true);
 
+        multiplayerButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
+        multiplayerButton.getLabel().setText("Host Game");
+        multiplayerButton.addClickListener(new ClickListener() {
+            @Override
+            public void click(UIDisplayElement element, int button) {
+                getGUIManager().openWindow("singleplayer");
+                ((UIMenuSingleplayer)getGUIManager().getWindowById("singleplayer")).setCreateServerGame(true);
+            }
+        });
+
+        multiplayerButton.setHorizontalAlign(EHorizontalAlign.CENTER);
+        multiplayerButton.setPosition(new Vector2f(0f, 300f + 2 * 40f));
+        multiplayerButton.setVisible(true);
+
         joinButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
         joinButton.getLabel().setText("Join Game");
         joinButton.setHorizontalAlign(EHorizontalAlign.CENTER);
-        joinButton.setPosition(new Vector2f(0f, 300f + 2 * 40f));
+        joinButton.setPosition(new Vector2f(0f, 300f + 3 * 40f));
         joinButton.setVisible(true);
         joinButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
 
-                ModConfig modConfig = new ModConfig();
-                modConfig.copy(CoreRegistry.get(org.terasology.config.Config.class).getDefaultModConfig());
-
-                String[] chunkList = new String[] {
-                PerlinTerrainGenerator.class.getName(),
-                FloraGenerator.class.getName(),
-                LiquidsGenerator.class.getName(),
-                ForestGenerator.class.getName()};
-
-                WorldInfo info = new WorldInfo("JoinWorld", org.terasology.logic.manager.Config.getInstance().getDefaultSeed(), org.terasology.logic.manager.Config.getInstance().getDayNightLengthInMs() / 4, chunkList, SurvivalType.class.toString(), modConfig);
-
-                CoreRegistry.put(GameType.class, new SurvivalType());
-
-                Config.getInstance().setDefaultSeed(info.getSeed());
-                Config.getInstance().setWorldTitle(info.getTitle());
-                Config.getInstance().setChunkGenerator(info.getChunkGenerators());
-                CoreRegistry.get(GameEngine.class).changeState(new StateLoading(info, NetworkMode.CLIENT));
+                getGUIManager().openWindow("joinserver");
             }
         });
 
@@ -146,6 +146,7 @@ public class UIMenuMain extends UIWindow {
         addDisplayElement(configButton);
         addDisplayElement(exitButton);
         addDisplayElement(singlePlayerButton);
+        addDisplayElement(multiplayerButton);
         addDisplayElement(joinButton);
     }
 }

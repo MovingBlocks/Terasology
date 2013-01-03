@@ -48,6 +48,8 @@ public class ComponentSystemManager {
     private List<RenderSystem> renderSubscribers = Lists.newArrayList();
     private List<ComponentSystem> store = Lists.newArrayList();
 
+    public boolean initialised = false;
+
     public ComponentSystemManager() {
     }
 
@@ -87,23 +89,34 @@ public class ComponentSystemManager {
             CoreRegistry.get(EntityManager.class).getEventSystem().registerEventHandler((EventHandlerSystem) object);
         }
         namedLookup.put(name, object);
+
+        if (initialised) {
+            initialiseSystem(object);
+        }
     }
 
     public void initialise() {
-        for (ComponentSystem system : iterateAll()) {
-            for (Field field : Reflections.getAllFields(system.getClass(), Reflections.withAnnotation(In.class))) {
-                Object value = CoreRegistry.get(field.getType());
-                if (value != null) {
-                    try {
-                        field.setAccessible(true);
-                        field.set(system, value);
-                    } catch (IllegalAccessException e) {
-                        logger.error("Failed to inject value {} into field {} of system {}", value, field, system, e);
-                    }
+        if (!initialised) {
+            for (ComponentSystem system : iterateAll()) {
+                initialiseSystem(system);
+            }
+            initialised = true;
+        }
+    }
+
+    private void initialiseSystem(ComponentSystem system) {
+        for (Field field : Reflections.getAllFields(system.getClass(), Reflections.withAnnotation(In.class))) {
+            Object value = CoreRegistry.get(field.getType());
+            if (value != null) {
+                try {
+                    field.setAccessible(true);
+                    field.set(system, value);
+                } catch (IllegalAccessException e) {
+                    logger.error("Failed to inject value {} into field {} of system {}", value, field, system, e);
                 }
             }
-            system.initialise();
         }
+        system.initialise();
     }
 
     // TODO: unregister?
@@ -112,11 +125,12 @@ public class ComponentSystemManager {
         return namedLookup.get(name);
     }
 
-    public void clear() {
+    private void clear() {
         namedLookup.clear();
         store.clear();
         updateSubscribers.clear();
         renderSubscribers.clear();
+        initialised = false;
     }
 
     public Iterable<ComponentSystem> iterateAll() {
@@ -129,5 +143,12 @@ public class ComponentSystemManager {
 
     public Iterable<RenderSystem> iterateRenderSubscribers() {
         return renderSubscribers;
+    }
+
+    public void shutdown() {
+        for (ComponentSystem system : iterateAll()) {
+            system.shutdown();
+        }
+        clear();
     }
 }

@@ -173,9 +173,14 @@ public class PojoEntityRef extends EntityRef {
 
     @Override
     public String toString() {
-        return "EntityRef{" +
-                "id=" + id +
-                '}';
+        AssetUri prefabUri = getPrefabURI();
+        if (prefabUri != null) {
+            return "EntityRef{id = " + id + ", prefab = '" + prefabUri.getSimpleString() + "'}";
+        } else {
+            return "EntityRef{" +
+                    "id=" + id +
+                    '}';
+        }
     }
 
     void invalidate() {

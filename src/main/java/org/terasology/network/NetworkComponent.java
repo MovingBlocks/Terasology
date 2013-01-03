@@ -8,8 +8,10 @@ import org.terasology.entitySystem.EntityRef;
  */
 public class NetworkComponent implements Component {
     // Network identifier for the entity
+    @Replicate
     public int networkId;
 
+    @Replicate
     public EntityRef owner;
 
     public enum ReplicateMode {

@@ -103,10 +103,7 @@ public class StateMainMenu implements GameState {
     public void dispose() {
         eventSystem.process();
 
-        for (ComponentSystem system : componentSystemManager.iterateAll()) {
-            system.shutdown();
-        }
-
+        componentSystemManager.shutdown();
         stopBackgroundMusic();
         guiManager.closeAllWindows();
 

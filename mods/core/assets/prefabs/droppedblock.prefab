@@ -18,5 +18,6 @@
         "lifespan" : 30
     },
     "BlockPickup" : {
-    }
+    },
+    "Network" : {}
 }

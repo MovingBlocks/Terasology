@@ -40,6 +40,7 @@ public final class Config {
     private static final Logger logger = LoggerFactory.getLogger(Config.class);
     private InputConfig input = new InputConfig();
     private ModConfig defaultModConfig = new ModConfig();
+    private ServerConfig serverConfig = new ServerConfig();
 
     /**
      * Create a new, empty config
@@ -56,6 +57,10 @@ public final class Config {
 
     public ModConfig getDefaultModConfig() {
         return defaultModConfig;
+    }
+
+    public ServerConfig getServerConfig() {
+        return serverConfig;
     }
 
     /**

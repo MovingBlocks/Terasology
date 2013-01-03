@@ -56,6 +56,8 @@ public class StateLoading implements GameState {
     private static final Logger logger = LoggerFactory.getLogger(StateLoading.class);
 
     private WorldInfo worldInfo;
+    private String serverAddress;
+    private int serverPort;
     private NetworkMode netMode;
     private Queue<LoadProcess> loadProcesses = Queues.newArrayDeque();
     private LoadProcess current;
@@ -66,10 +68,28 @@ public class StateLoading implements GameState {
 
     private UIScreenLoading loadingScreen;
 
+    /**
+     * Constructor for server or single player games
+     * @param worldInfo
+     * @param netMode
+     */
     public StateLoading(WorldInfo worldInfo, NetworkMode netMode) {
         this.worldInfo = worldInfo;
         this.guiManager = CoreRegistry.get(GUIManager.class);
         this.netMode = netMode;
+    }
+
+    /**
+     * Constructor for client games
+     * @param serverAddress
+     * @param port
+     */
+    public StateLoading(String serverAddress, int port) {
+        this.worldInfo = new WorldInfo();
+        this.serverAddress = serverAddress;
+        this.serverPort = port;
+        this.guiManager = CoreRegistry.get(GUIManager.class);
+        this.netMode = NetworkMode.CLIENT;
     }
 
     @Override
@@ -90,7 +110,7 @@ public class StateLoading implements GameState {
     }
 
     private void initClient() {
-        loadProcesses.add(new JoinServer(worldInfo));
+        loadProcesses.add(new JoinServer(serverAddress, serverPort, worldInfo));
         loadProcesses.add(new RegisterMods(worldInfo));
         loadProcesses.add(new CacheTextures());
         loadProcesses.add(new RegisterBlocks(worldInfo));

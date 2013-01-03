@@ -80,7 +80,8 @@ public class ClientPlayer implements ChunkRegionListener, WorldChangeListener, E
     }
 
     public void setNetDirty(int netId) {
-        if (!netInitial.contains(netId)) {
+        if (netRelevant.contains(netId) && !netInitial.contains(netId)) {
+            logger.debug("Marking dirty: {}" + netId);
             netDirty.add(netId);
         }
     }
@@ -195,6 +196,9 @@ public class ClientPlayer implements ChunkRegionListener, WorldChangeListener, E
                     .build();
             send(message);
         }
+
+        netInitial.clear();
+        netDirty.clear();
 
         EntityRefTypeHandler.setEntityManagerMode((PersistableEntityManager) entityManager);
     }

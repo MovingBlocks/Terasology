@@ -17,6 +17,7 @@
 package org.terasology.components.utility;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.network.Replicate;
 
 /**
  * Component describes the lifespan of an entity. When the lifespan ends the entity is destroyed.
@@ -24,6 +25,7 @@ import org.terasology.entitySystem.Component;
  */
 public class LifespanComponent implements Component {
     // Lifespan in seconds
+    @Replicate
     public float lifespan = 5;
 
     public LifespanComponent() {

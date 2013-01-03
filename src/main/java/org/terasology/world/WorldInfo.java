@@ -121,6 +121,10 @@ public class WorldInfo {
         return gameType;
     }
 
+    public void setGameType(String gameType) {
+        this.gameType = gameType;
+    }
+
     public Map<String, Byte> getBlockIdMap() {
         return blockIdMap;
     }

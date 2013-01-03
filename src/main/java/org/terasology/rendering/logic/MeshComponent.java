@@ -18,6 +18,7 @@ package org.terasology.rendering.logic;
 import javax.vecmath.Color4f;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.network.Replicate;
 import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.primitives.Mesh;
 
@@ -32,14 +33,18 @@ public final class MeshComponent implements Component {
         GelatinousCube
     }
 
+    @Replicate
     public RenderType renderType = RenderType.Normal;
+    @Replicate
     public Mesh mesh;
+    @Replicate
     public Material material;
 
     // TODO: Some sort of Texture + Shader type?
     //public String material;
 
     // This should be elsewhere I think, probably in the material
+    @Replicate
     public Color4f color = new Color4f(0, 0, 0, 1);
 
 }

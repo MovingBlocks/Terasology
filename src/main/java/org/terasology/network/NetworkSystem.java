@@ -135,14 +135,14 @@ public class NetworkSystem implements EntityChangeSubscriber {
 
     public void update() {
         if (mode != NetworkMode.NONE) {
-            if (remoteWorldProvider != null) {
-                List<Chunk> chunks = Lists.newArrayListWithExpectedSize(chunkQueue.size());
-                chunkQueue.drainTo(chunks);
-                for (Chunk chunk : chunks) {
-                    remoteWorldProvider.receiveChunk(chunk);
-                }
-            }
             if (entityManager != null) {
+                if (remoteWorldProvider != null) {
+                    List<Chunk> chunks = Lists.newArrayListWithExpectedSize(chunkQueue.size());
+                    chunkQueue.drainTo(chunks);
+                    for (Chunk chunk : chunks) {
+                        remoteWorldProvider.receiveChunk(chunk);
+                    }
+                }
                 if (!newClients.isEmpty()) {
                     List<ClientPlayer> newPlayers = Lists.newArrayListWithExpectedSize(newClients.size());
                     newClients.drainTo(newPlayers);
@@ -169,6 +169,7 @@ public class NetworkSystem implements EntityChangeSubscriber {
             switch (message.getType()) {
                 case CREATE_ENTITY:
                     EntityRef newEntity = serializer.deserialize(message.getCreateEntity().getEntity());
+                    logger.debug("Received new entity: {} with net id {}", newEntity, newEntity.getComponent(NetworkComponent.class).networkId);
                     registerNetworkEntity(newEntity);
                     break;
                 case UPDATE_ENTITY:
@@ -228,6 +229,8 @@ public class NetworkSystem implements EntityChangeSubscriber {
         if (mode == NetworkMode.NONE) {
             return;
         }
+
+        logger.debug("Registered Network Entity: {}", entity);
 
         NetworkComponent netComponent = entity.getComponent(NetworkComponent.class);
         if (mode == NetworkMode.SERVER) {
