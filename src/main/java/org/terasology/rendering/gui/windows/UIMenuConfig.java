@@ -42,6 +42,7 @@ public class UIMenuConfig extends UIWindow {
     private final UIButton videoButton;
     private final UIButton audioButton;
     private final UIButton controlsButton;
+    private final UIButton advancedButton;
 
     public UIMenuConfig() {
         setId("config");
@@ -95,6 +96,18 @@ public class UIMenuConfig extends UIWindow {
                 getGUIManager().openWindow("config:controls");
             }
         });
+        
+        advancedButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
+        advancedButton.getLabel().setText("Advanced");
+        advancedButton.setHorizontalAlign(EHorizontalAlign.CENTER);
+        advancedButton.setPosition(new Vector2f(0f, 300f + 3 * 40f));
+        advancedButton.setVisible(true);
+        advancedButton.addClickListener(new ClickListener() {
+            @Override
+            public void click(UIDisplayElement element, int button) {
+                getGUIManager().openWindow("config:advanced");
+            }
+        });
 
         backToMainMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
         backToMainMenuButton.getLabel().setText("Return to Main Menu");
@@ -115,6 +128,7 @@ public class UIMenuConfig extends UIWindow {
         addDisplayElement(videoButton);
         addDisplayElement(audioButton);
         addDisplayElement(controlsButton);
+        addDisplayElement(advancedButton);
         addDisplayElement(backToMainMenuButton);
     }
 }
