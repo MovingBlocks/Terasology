@@ -72,7 +72,7 @@ public class ShaderParametersChunk implements IShaderParameters {
 
         if (localPlayer != null) {
             // TODO: This should be whether the camera is underwater I think?
-            //program.setInt("swimming", tera.getActivePlayer().isSwimming() ? 1 : 0);
+            program.setInt("underWater", worldRenderer.isUnderWater() ? 1 : 0);
             // TODO: Should be a camera setting?
             program.setInt("carryingTorch", localPlayer.isCarryingTorch() ? 1 : 0);
         }

@@ -192,8 +192,8 @@ public class UIMenuConfigVideo extends UIWindow {
                 ShaderManager.getInstance().recompileAllShaders();
             }
         };
-        reflectiveWaterButton.addState("Reflective water: Off", reflectiveWaterStateAction);
-        reflectiveWaterButton.addState("Reflective water: On", reflectiveWaterStateAction);
+        reflectiveWaterButton.addState("Water World Reflection: Off", reflectiveWaterStateAction);
+        reflectiveWaterButton.addState("Water World Reflection: On", reflectiveWaterStateAction);
         reflectiveWaterButton.addClickListener(clickAction);
         reflectiveWaterButton.setHorizontalAlign(EHorizontalAlign.CENTER);
         reflectiveWaterButton.setPosition(new Vector2f(reflectiveWaterButton.getSize().x / 2f, 300f + 40f));
@@ -207,10 +207,10 @@ public class UIMenuConfigVideo extends UIWindow {
                 Config.getInstance().setBlurIntensity(button.getState());
             }
         };
-        blurIntensityButton.addState("Blur intensity: Off", blurIntensityStateAction);
-        blurIntensityButton.addState("Blur intensity: Some", blurIntensityStateAction);
-        blurIntensityButton.addState("Blur intensity: Normal", blurIntensityStateAction);
-        blurIntensityButton.addState("Blur intensity: Max", blurIntensityStateAction);
+        blurIntensityButton.addState("Blur Intensity: Off", blurIntensityStateAction);
+        blurIntensityButton.addState("Blur Intensity: Some", blurIntensityStateAction);
+        blurIntensityButton.addState("Blur Intensity: Normal", blurIntensityStateAction);
+        blurIntensityButton.addState("Blur Intensity: Max", blurIntensityStateAction);
         blurIntensityButton.addClickListener(clickAction);
         blurIntensityButton.setHorizontalAlign(EHorizontalAlign.CENTER);
         blurIntensityButton.setPosition(new Vector2f(blurIntensityButton.getSize().x / 2f, 300f + 2 * 40f));
