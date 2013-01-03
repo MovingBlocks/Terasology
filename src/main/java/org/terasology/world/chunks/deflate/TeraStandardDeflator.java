@@ -4,7 +4,7 @@ import org.terasology.world.chunks.blockdata.TeraArray;
 import org.terasology.world.chunks.blockdata.TeraSparseArray4Bit;
 import org.terasology.world.chunks.blockdata.TeraSparseArray8Bit;
 
-public class TeraStandardDeflator extends TeraAdvancedDeflator {
+public class TeraStandardDeflator extends TeraVisitingDeflator {
     
     /*
      *  8-bit variant

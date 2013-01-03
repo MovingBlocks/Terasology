@@ -2,7 +2,7 @@ package org.terasology.world.chunks.blockdata;
 
 import java.util.Arrays;
 
-import org.terasology.world.chunks.deflate.TeraAdvancedDeflator;
+import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
 
 import com.google.common.base.Preconditions;
 
@@ -89,7 +89,7 @@ public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
     }
 
     @Override
-    public TeraArray deflate(TeraAdvancedDeflator deflator) {
+    public TeraArray deflate(TeraVisitingDeflator deflator) {
         return Preconditions.checkNotNull(deflator).deflateSparseArray4Bit(inflated, deflated, fill, rowSize(), getSizeX(), getSizeY(), getSizeZ());
     }
 
