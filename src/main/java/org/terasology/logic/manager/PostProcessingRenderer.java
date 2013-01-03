@@ -56,7 +56,8 @@ import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
- * TODO
+ * Responsible for applying and rendering various shader based
+ * post processing effects.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
@@ -72,7 +73,6 @@ public class PostProcessingRenderer {
     private float _exposure = 16.0f;
     private float _sceneLuminance = 1.0f;
     private int _displayListQuad = -1;
-
 
     private long lastExposureUpdate;
 
@@ -229,7 +229,7 @@ public class PostProcessingRenderer {
     private void updateExposure() {
         long currentTime = CoreRegistry.get(Timer.class).getTimeInMs();
 
-        if (currentTime - lastExposureUpdate > 1000) {
+        if (currentTime - lastExposureUpdate > 250) {
             lastExposureUpdate = currentTime;
 
             FloatBuffer pixels = BufferUtils.createFloatBuffer(4);
@@ -240,10 +240,9 @@ public class PostProcessingRenderer {
             scene.unbindTexture();
 
             _sceneLuminance = 0.2126f * pixels.get(0) + 0.7152f * pixels.get(1) + 0.0722f * pixels.get(2);
-
         }
 
-        if (_sceneLuminance > 0.0f) {// No division by zero
+        if (_sceneLuminance > 0.0f) { // Avoid division by zero
             _exposure = (float) TeraMath.lerp(_exposure, TARGET_LUMINANCE / _sceneLuminance, ADJUSTMENT_SPEED);
         }
 
@@ -521,9 +520,5 @@ public class PostProcessingRenderer {
 
     public FBO getFBO(String title) {
         return _FBOs.get(title);
-    }
-
-    public boolean areExtensionsAvailable() {
-        return _extensionsAvailable;
     }
 }

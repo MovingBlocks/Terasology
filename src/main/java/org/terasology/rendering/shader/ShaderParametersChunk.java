@@ -67,18 +67,16 @@ public class ShaderParametersChunk implements IShaderParameters {
 
         program.setFloat("blockScale", 1.0f);
 
-        if (worldRenderer != null)
+        if (worldRenderer != null) {
             program.setFloat("daylight", (float) worldRenderer.getDaylight());
+        }
 
         if (localPlayer != null) {
-            // TODO: This should be whether the camera is underwater I think?
-            program.setInt("underWater", worldRenderer.isUnderWater() ? 1 : 0);
-            // TODO: Should be a camera setting?
             program.setInt("carryingTorch", localPlayer.isCarryingTorch() ? 1 : 0);
         }
 
         if (worldProvider != null) {
-            program.setFloat("time", (float) worldProvider.getTimeInDays());
+            program.setFloat("time", worldProvider.getTimeInDays());
         }
 
         program.setFloat1("wavingCoordinates", BlockManager.getInstance().calcCoordinatesForWavingBlocks());

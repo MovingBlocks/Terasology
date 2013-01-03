@@ -630,9 +630,15 @@ public final class WorldRenderer {
             }
         }
 
+        PerformanceMonitor.endActivity();
+
+        PerformanceMonitor.startActivity("Render Overlays");
+
         for (RenderSystem renderer : _systemManager.iterateRenderSubscribers()) {
             renderer.renderOverlay();
         }
+
+        PerformanceMonitor.endActivity();
 
         glDisable(GL_BLEND);
 
@@ -643,8 +649,6 @@ public final class WorldRenderer {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         glDisable(GL_LIGHT0);
-
-        PerformanceMonitor.endActivity();
     }
 
     public void renderWorldReflection(Camera camera) {
