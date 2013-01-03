@@ -26,6 +26,8 @@ import javax.vecmath.Vector3f;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.AdvancedConfig;
+import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.Config;
 import org.terasology.math.AABB;
 import org.terasology.math.TeraMath;
@@ -57,7 +59,7 @@ public class Chunk implements Externalizable {
     protected static final Logger logger = LoggerFactory.getLogger(Chunk.class);
     
     public static final long serialVersionUID = 79881925217704826L;
-
+    
     public enum State {
         ADJACENCY_GENERATION_PENDING,
         INTERNAL_LIGHT_GENERATION_PENDING,
@@ -104,10 +106,11 @@ public class Chunk implements Externalizable {
 
 
     public Chunk() {
-        blocks = new TeraDenseArray8Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        sunlight = new TeraDenseArray4Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        light = new TeraDenseArray4Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        liquid = new TeraDenseArray4Bit(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        AdvancedConfig config = CoreRegistry.get(org.terasology.config.Config.class).getAdvancedConfig();
+        blocks = config.getBlocksFactory().create(this);
+        sunlight = config.getSunlightFactory().create(this);
+        light = config.getLightFactory().create(this);
+        liquid = config.getLiquidFactory().create(this);
         dirty = true;
     }
 
@@ -356,34 +359,45 @@ public class Chunk implements Externalizable {
     private static DecimalFormat fpercent = new DecimalFormat("0.##");
     private static DecimalFormat fsize = new DecimalFormat("#,###");
     public void deflate() {
+        if (getChunkState() != State.COMPLETE) {
+            logger.warn("Before deflation the state of the chunk ({}, {}, {}) should be set to State.COMPLETE but is now State.{}", getPos().x, getPos().y, getPos().z, getChunkState().toString());
+        }
         lock();
         try {
-            int blocksSize = blocks.getEstimatedMemoryConsumptionInBytes();
-            int sunlightSize = sunlight.getEstimatedMemoryConsumptionInBytes();
-            int lightSize = light.getEstimatedMemoryConsumptionInBytes();
-            int liquidSize = liquid.getEstimatedMemoryConsumptionInBytes();
-            int totalSize = blocksSize + sunlightSize + lightSize + liquidSize;
-            
+            AdvancedConfig config = CoreRegistry.get(org.terasology.config.Config.class).getAdvancedConfig();
             final TeraDeflator def = new TeraStandardDeflator();
             
-            blocks = def.deflate(blocks);
-            sunlight = def.deflate(sunlight);
-            light = def.deflate(light);
-            liquid = def.deflate(liquid);
-            
-            int blocksReduced = blocks.getEstimatedMemoryConsumptionInBytes();
-            int sunlightReduced = sunlight.getEstimatedMemoryConsumptionInBytes();
-            int lightReduced = light.getEstimatedMemoryConsumptionInBytes();
-            int liquidReduced = liquid.getEstimatedMemoryConsumptionInBytes();
-            int totalReduced = blocksReduced + sunlightReduced + lightReduced + liquidReduced;
-            
-            double blocksPercent = 100d - (100d / blocksSize * blocksReduced);
-            double sunlightPercent = 100d - (100d / sunlightSize * sunlightReduced);
-            double lightPercent = 100d - (100d / lightSize * lightReduced);
-            double liquidPercent = 100d - (100d / liquidSize * liquidReduced);
-            double totalPercent = 100d - (100d / totalSize * totalReduced);
-            
-            logger.info(String.format("chunk (%d, %d, %d): size-before: %s bytes, size-after: %s bytes, total-deflated-by: %s%%, blocks-deflated-by=%s%%, sunlight-deflated-by=%s%%, light-deflated-by=%s%%, liquid-deflated-by=%s%%", pos.x, pos.y, pos.z, fsize.format(totalSize), fsize.format(totalReduced), fpercent.format(totalPercent), fpercent.format(blocksPercent), fpercent.format(sunlightPercent), fpercent.format(lightPercent), fpercent.format(liquidPercent)));
+            if (config.isChunkDeflationLoggingEnabled()) {
+                int blocksSize = blocks.getEstimatedMemoryConsumptionInBytes();
+                int sunlightSize = sunlight.getEstimatedMemoryConsumptionInBytes();
+                int lightSize = light.getEstimatedMemoryConsumptionInBytes();
+                int liquidSize = liquid.getEstimatedMemoryConsumptionInBytes();
+                int totalSize = blocksSize + sunlightSize + lightSize + liquidSize;
+
+                blocks = def.deflate(blocks);
+                sunlight = def.deflate(sunlight);
+                light = def.deflate(light);
+                liquid = def.deflate(liquid);
+
+                int blocksReduced = blocks.getEstimatedMemoryConsumptionInBytes();
+                int sunlightReduced = sunlight.getEstimatedMemoryConsumptionInBytes();
+                int lightReduced = light.getEstimatedMemoryConsumptionInBytes();
+                int liquidReduced = liquid.getEstimatedMemoryConsumptionInBytes();
+                int totalReduced = blocksReduced + sunlightReduced + lightReduced + liquidReduced;
+
+                double blocksPercent = 100d - (100d / blocksSize * blocksReduced);
+                double sunlightPercent = 100d - (100d / sunlightSize * sunlightReduced);
+                double lightPercent = 100d - (100d / lightSize * lightReduced);
+                double liquidPercent = 100d - (100d / liquidSize * liquidReduced);
+                double totalPercent = 100d - (100d / totalSize * totalReduced);
+
+                logger.info(String.format("chunk (%d, %d, %d): size-before: %s bytes, size-after: %s bytes, total-deflated-by: %s%%, blocks-deflated-by=%s%%, sunlight-deflated-by=%s%%, light-deflated-by=%s%%, liquid-deflated-by=%s%%", pos.x, pos.y, pos.z, fsize.format(totalSize), fsize.format(totalReduced), fpercent.format(totalPercent), fpercent.format(blocksPercent), fpercent.format(sunlightPercent), fpercent.format(lightPercent), fpercent.format(liquidPercent)));
+            } else {
+                blocks = def.deflate(blocks);
+                sunlight = def.deflate(sunlight);
+                light = def.deflate(light);
+                liquid = def.deflate(liquid);
+            }
         } finally {
             unlock();
         }

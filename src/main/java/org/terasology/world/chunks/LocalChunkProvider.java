@@ -33,7 +33,9 @@ import javax.vecmath.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.components.world.LocationComponent;
+import org.terasology.config.AdvancedConfig;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.game.CoreRegistry;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
@@ -463,15 +465,20 @@ public class LocalChunkProvider implements ChunkProvider {
             }
             logger.debug("Now complete {}", pos);
             chunk.setChunkState(Chunk.State.COMPLETE);
-            chunkTasksQueue.offer(new AbstractChunkTask(pos, this) {
-                @Override
-                public void enact() {
-                    Chunk chunk = getChunk(getPosition());
-                    if (chunk != null) {
-                        chunk.deflate();
+            AdvancedConfig config = CoreRegistry.get(org.terasology.config.Config.class).getAdvancedConfig();
+            if (config.isChunkDeflationEnabled()) {
+                if (!chunkTasksQueue.offer(new AbstractChunkTask(pos, this) {
+                    @Override
+                    public void enact() {
+                        Chunk chunk = getChunk(getPosition());
+                        if (chunk != null) {
+                            chunk.deflate();
+                        }
                     }
+                })) {
+                    logger.warn("LocalChunkProvider.chunkTasksQueue rejected deflation task for chunk {}", pos);
                 }
-            });
+            }
             for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, LOCAL_REGION_EXTENTS)) {
                 checkChunkReady(adjPos);
             }
