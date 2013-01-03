@@ -68,3 +68,8 @@ float expOccValue(float light) {
 float timeToTick(float time, float speed) {
     return time * 4000.0 * speed;
 }
+
+float fresnel(float nDotL, float fresnelBias, float fresnelPow) {
+  float facing = (1.0 - nDotL);
+  return max(fresnelBias + (1.0 - fresnelBias) * pow(facing, fresnelPow), 0.0);
+}

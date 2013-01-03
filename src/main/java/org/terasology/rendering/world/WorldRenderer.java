@@ -96,7 +96,6 @@ import org.terasology.world.WorldProviderWrapper;
 import org.terasology.world.WorldTimeEvent;
 import org.terasology.world.WorldView;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.ChunkStore;
@@ -561,7 +560,7 @@ public final class WorldRenderer {
 
         boolean headUnderWater;
 
-        headUnderWater = _cameraMode == CAMERA_MODE.PLAYER && isUnderwater();
+        headUnderWater = _cameraMode == CAMERA_MODE.PLAYER && isUnderWater();
 
         if (_wireframe)
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -764,7 +763,7 @@ public final class WorldRenderer {
         // TODO: Implement
     }
 
-    private boolean isUnderwater() {
+    public boolean isUnderWater() {
         Vector3f cameraPos = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
         Block block = CoreRegistry.get(WorldProvider.class).getBlock(new Vector3f(cameraPos));
         return block.isLiquid();

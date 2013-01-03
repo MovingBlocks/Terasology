@@ -20,8 +20,8 @@ varying vec3 normal;
 varying vec4 vertexWorldPosRaw;
 varying vec4 vertexWorldPos;
 varying vec4 vertexPos;
-varying vec3 eyeVec;
 varying vec3 lightDir;
+varying vec3 waterNormal;
 
 varying float flickering;
 varying float flickeringAlternative;
@@ -44,9 +44,9 @@ void main()
 	vertexWorldPosRaw = gl_Vertex;
 
 	vertexWorldPos = gl_ModelViewMatrix * vertexWorldPosRaw;
+	waterNormal = gl_NormalMatrix * vec3(0,1,0);
 
 	lightDir = gl_LightSource[0].position.xyz;
-	eyeVec = -vertexWorldPos.xyz;
 
     normal = gl_NormalMatrix * gl_Normal;
     gl_FrontColor = gl_Color;
@@ -75,8 +75,8 @@ void main()
     }
 
     if (gl_TexCoord[0].x >= waterCoordinate.x && gl_TexCoord[0].x < waterCoordinate.x + TEXTURE_OFFSET && gl_TexCoord[0].y >= waterCoordinate.y && gl_TexCoord[0].y < waterCoordinate.y + TEXTURE_OFFSET) {
-        vertexWorldPos.y += (smoothTriangleWave(timeToTick(time, 0.5) + vertexChunkPos.x * -0.1 + vertexChunkPos.z * 0.1) * 2.0 - 1.0) * 0.01 * blockScale
-        + (smoothTriangleWave(timeToTick(time, 0.25)  + vertexChunkPos.x * -0.25 + vertexChunkPos.z * 0.25) * 2.0 - 1.0) * 0.025 * blockScale;
+        vertexWorldPos.y += (smoothTriangleWave(timeToTick(time, 0.1) + vertexChunkPos.x * 0.05 + vertexChunkPos.z * 0.05) * 2.0 - 1.0) * 0.1 * blockScale
+        + (smoothTriangleWave(timeToTick(time, 0.25)  + vertexChunkPos.x *-0.25 + vertexChunkPos.z * 0.25) * 2.0 - 1.0) * 0.025 * blockScale;
     }
 #if 0
     else if (gl_TexCoord[0].x >= lavaCoordinate.x && gl_TexCoord[0].x < lavaCoordinate.x + TEXTURE_OFFSET && gl_TexCoord[0].y >= lavaCoordinate.y && gl_TexCoord[0].y < lavaCoordinate.y + TEXTURE_OFFSET) {
