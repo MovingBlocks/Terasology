@@ -1,6 +1,6 @@
 package org.terasology.world.chunks.blockdata;
 
-import org.terasology.world.chunks.deflate.TeraAdvancedDeflator;
+import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
 
 import com.google.common.base.Preconditions;
 
@@ -41,7 +41,7 @@ public final class TeraDenseArray4Bit extends TeraDenseArrayByte {
     }
 
     @Override
-    public TeraArray deflate(TeraAdvancedDeflator deflator) {
+    public TeraArray deflate(TeraVisitingDeflator deflator) {
         return Preconditions.checkNotNull(deflator).deflateDenseArray4Bit(data, rowSize(), getSizeX(), getSizeY(), getSizeZ());
     }
     

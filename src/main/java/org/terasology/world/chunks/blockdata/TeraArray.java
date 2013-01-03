@@ -6,7 +6,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.deflate.TeraAdvancedDeflator;
+import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
 
 import com.google.common.base.Preconditions;
 
@@ -102,7 +102,7 @@ public abstract class TeraArray implements Externalizable {
 
     public abstract TeraArray copy();
     
-    public abstract TeraArray deflate(TeraAdvancedDeflator deflator);
+    public abstract TeraArray deflate(TeraVisitingDeflator deflator);
 
     public abstract int getEstimatedMemoryConsumptionInBytes();
     

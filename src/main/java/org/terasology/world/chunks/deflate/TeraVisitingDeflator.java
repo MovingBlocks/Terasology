@@ -4,9 +4,9 @@ import org.terasology.world.chunks.blockdata.TeraArray;
 
 import com.google.common.base.Preconditions;
 
-public abstract class TeraAdvancedDeflator extends TeraDeflator {
+public abstract class TeraVisitingDeflator extends TeraDeflator {
 
-    public TeraAdvancedDeflator() {}
+    public TeraVisitingDeflator() {}
 
     @Override
     public final TeraArray deflate(final TeraArray in) {
