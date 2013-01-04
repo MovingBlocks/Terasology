@@ -188,7 +188,9 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
             double memoryUsage = ((double) Runtime.getRuntime().totalMemory() - (double) Runtime.getRuntime().freeMemory()) / 1048576.0;
             Timer timer = CoreRegistry.get(Timer.class);
             debugLine1.setText(String.format("fps: %.2f, mem usage: %.2f MB, total mem: %.2f, max mem: %.2f", timer.getFps(), memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0));
-            debugLine2.setText(String.format("%s", cameraTarget.toString()));
+            if (entityManager != null) {
+                debugLine2.setText(String.format("Active Entities: %s, Current Target: %s", entityManager.getActiveEntities(), cameraTarget.toString()));
+            }
             debugLine3.setText(String.format("%s", CoreRegistry.get(WorldRenderer.class)));
             debugLine4.setText(String.format("total vus: %s | active threads: %s", ChunkTessellator.getVertexArrayUpdateCount(), CoreRegistry.get(GameEngine.class).getActiveTaskCount()));
         }

@@ -104,4 +104,6 @@ public interface EntityManager {
 
     ComponentLibrary getComponentLibrary();
 
+    int getActiveEntities();
+
 }

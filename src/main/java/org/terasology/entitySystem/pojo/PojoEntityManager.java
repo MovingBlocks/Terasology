@@ -15,21 +15,12 @@
  */
 package org.terasology.entitySystem.pojo;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.MapMaker;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.iterator.TIntObjectIterator;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
-
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.components.world.LocationComponent;
@@ -49,7 +40,13 @@ import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.extension.EntityRefTypeHandler;
 import org.terasology.entitySystem.metadata.extension.PrefabTypeHandler;
 
-import com.google.common.collect.Lists;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Prototype entity manager. Not intended for final use, but a stand in for experimentation.
@@ -63,7 +60,7 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
 
     private int nextEntityId = 1;
     private TIntList freedIds = new TIntArrayList();
-    private Map<EntityRef, PojoEntityRef> entityCache = new WeakHashMap<EntityRef, PojoEntityRef>();
+    private Map<Integer, EntityRef> entityCache = new MapMaker().concurrencyLevel(4).weakValues().makeMap();
 
     private ComponentTable store = new ComponentTable();
     private EventSystem eventSystem;
@@ -88,7 +85,7 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
     @Override
     public EntityRef create() {
         if (!freedIds.isEmpty()) {
-            createEntityRef(freedIds.removeAt(freedIds.size() - 1));
+            return createEntityRef(freedIds.removeAt(freedIds.size() - 1));
         }
         if (nextEntityId == NULL_ID) nextEntityId++;
         return createEntityRef(nextEntityId++);
@@ -273,7 +270,7 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
         if (eventSystem != null) {
             eventSystem.send(ref, RemovedComponentEvent.newInstance());
         }
-        entityCache.remove(ref);
+        entityCache.remove(entityId);
         freedIds.add(entityId);
         if (ref instanceof PojoEntityRef) {
             ((PojoEntityRef) ref).invalidate();
@@ -339,12 +336,12 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
         if (entityId == NULL_ID) {
             return EntityRef.NULL;
         }
-        PojoEntityRef newRef = new PojoEntityRef(this, entityId);
-        PojoEntityRef existing = entityCache.get(newRef);
+        EntityRef existing = entityCache.get(entityId);
         if (existing != null) {
             return existing;
         }
-        entityCache.put(newRef, newRef);
+        PojoEntityRef newRef = new PojoEntityRef(this, entityId);
+        entityCache.put(entityId, newRef);
         return newRef;
     }
 
@@ -358,6 +355,10 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
 
     public TIntList getFreedIds() {
         return freedIds;
+    }
+
+    public int getActiveEntities() {
+        return entityCache.size();
     }
 
     private static class EntityEntry<T> implements Map.Entry<EntityRef, T> {
