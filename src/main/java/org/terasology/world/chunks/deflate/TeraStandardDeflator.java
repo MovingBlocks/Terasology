@@ -5,6 +5,14 @@ import org.terasology.world.chunks.blockdata.TeraSparseArray16Bit;
 import org.terasology.world.chunks.blockdata.TeraSparseArray4Bit;
 import org.terasology.world.chunks.blockdata.TeraSparseArray8Bit;
 
+/**
+ * TeraStandardDeflator implements a simple deflation algorithm for 4, 8 and 16-bit dense and sparse arrays.
+ * 
+ * @note Currently it is optimized for chunks of size 16x256x16 blocks.
+ * @todo Implement deflation for sparse arrays.
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
+ *
+ */
 public class TeraStandardDeflator extends TeraVisitingDeflator {
     
     /*
