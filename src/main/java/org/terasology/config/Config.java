@@ -41,6 +41,7 @@ public final class Config {
     private InputConfig input = new InputConfig();
     private ModConfig defaultModConfig = new ModConfig();
     private ServerConfig serverConfig = new ServerConfig();
+    private PlayerConfig playerConfig = new PlayerConfig();
 
     /**
      * Create a new, empty config
@@ -61,6 +62,10 @@ public final class Config {
 
     public ServerConfig getServerConfig() {
         return serverConfig;
+    }
+
+    public PlayerConfig getPlayerConfig() {
+        return playerConfig;
     }
 
     /**

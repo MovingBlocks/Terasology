@@ -24,6 +24,7 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.Config;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.MessageManager;
 import org.terasology.logic.mod.Mod;
@@ -62,8 +63,11 @@ public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
 
     @Override
     public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-        // TODO: Name here
-        e.getChannel().write(NetMessage.newBuilder().setType(NetMessage.Type.CLIENT_CONNECT).setClientConnect(ClientConnectMessage.newBuilder().setName("Client").build()).build());
+        e.getChannel().write(NetMessage.newBuilder()
+                .setType(NetMessage.Type.CLIENT_CONNECT)
+                .setClientConnect(ClientConnectMessage.newBuilder()
+                        .setName(CoreRegistry.get(Config.class).getPlayerConfig().getName()))
+                .build());
     }
 
     @Override

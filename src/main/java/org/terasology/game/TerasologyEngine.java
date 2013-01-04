@@ -178,9 +178,9 @@ public class TerasologyEngine implements GameEngine {
         }
 
         try {
-            java.util.logging.Logger.getLogger("").getHandlers()[0].setLevel(Level.FINE);
-            java.util.logging.Logger.getLogger("org.terasology").setLevel(Level.INFO);
-            java.util.logging.Logger.getLogger("org.terasology.network").setLevel(Level.FINE);
+            java.util.logging.Logger.getLogger("").getHandlers()[0].setLevel(Level.FINEST);
+            java.util.logging.Logger.getLogger("org.terasology").setLevel(Level.FINEST);
+            java.util.logging.Logger.getLogger("org.terasology.network").setLevel(Level.FINEST);
             java.util.logging.Logger.getLogger("").getHandlers()[0].setFormatter(new Formatter() {
                 DateFormat dateFormat = new SimpleDateFormat("MM-dd HH:mm:ss");
 
