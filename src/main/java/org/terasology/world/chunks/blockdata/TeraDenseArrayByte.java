@@ -1,5 +1,7 @@
 package org.terasology.world.chunks.blockdata;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
@@ -28,6 +30,32 @@ public abstract class TeraDenseArrayByte extends TeraDenseArray {
     @Override
     protected void initialize() {
         this.data = new byte[dataSize()];
+    }
+    
+    protected static abstract class SerializationHandler<T extends TeraDenseArrayByte> extends TeraArray.SerializationHandler<T> {
+        @Override
+        protected void internalSerialize(T array, DataOutputStream out) throws IOException {
+            final byte[] data = array.data;
+            if (data == null)
+                out.writeInt(0);
+            else {
+                out.writeInt(data.length);
+                for (byte b : data) {
+                    out.writeByte(b);
+                }
+            }
+        }
+        @Override
+        protected void internalDeserialize(T array, DataInputStream in) throws IOException {
+            final byte[] data = array.data;
+            final int length = in.readInt();
+            Preconditions.checkNotNull(data);
+            if (data.length != length)
+                throw new IOException("The size of the array (" + data.length + ") does not match the size of the stored data (" + length + ")");
+            for (int i = 0; i < length; i++) {
+                data[i] = in.readByte();
+            }
+        }
     }
     
     protected TeraDenseArrayByte() {
@@ -74,4 +102,5 @@ public abstract class TeraDenseArrayByte extends TeraDenseArray {
         readExternalHeader(in);
         data = (byte[]) in.readObject();
     }
+    
 }

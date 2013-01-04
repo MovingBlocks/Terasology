@@ -1,5 +1,7 @@
 package org.terasology.world.chunks.blockdata;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
@@ -25,6 +27,85 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
     
     @Override
     protected void initialize() {}
+
+    public static class SerializationHandler extends TeraArray.SerializationHandler<TeraSparseArray16Bit> {
+        @Override
+        public Class<TeraSparseArray16Bit> getArrayClass() {
+            return TeraSparseArray16Bit.class;
+        }
+        @Override
+        protected void internalSerialize(TeraSparseArray16Bit array, DataOutputStream out) throws IOException {
+            final short[][] inflated = array.inflated;
+            if (inflated == null) {
+                out.writeBoolean(false);
+                out.writeShort(array.fill);
+            } else {
+                final short[] deflated = array.deflated;
+                final int sizeY = array.getSizeY();
+                final int rowlen = array.getSizeXZ();
+                out.writeBoolean(true);
+                int rows = 0;
+                for (final short[] row : inflated) {if (row != null) rows++;}
+                out.writeInt(rows);
+                for (int index = 0; index < sizeY; index++) {
+                    final short[] row = inflated[index];
+                    if (row == null) {
+                        continue;
+                    }
+                    Preconditions.checkState(row.length == rowlen, "Unexpected row length in sparse array of type " + array.getClass().getName() + ", should be " + rowlen + " but is " + row.length);
+                    out.writeInt(index);
+                    for (final short b : row) {
+                        out.writeShort(b);
+                    }
+                }
+                for (int index = 0; index < sizeY; index++) {
+                    if (inflated[index] == null)
+                        out.writeShort(deflated[index]);
+                    else 
+                        out.writeShort(0);
+                }
+            }
+        }
+        @Override
+        protected void internalDeserialize(TeraSparseArray16Bit array, DataInputStream in) throws IOException {
+            Preconditions.checkState(array.inflated == null, "The internal array 'inflated' of type 'short[][]' is expected to be null");
+            Preconditions.checkState(array.deflated == null, "The internal array 'deflated' of type 'short[]' is expected to be null");
+            if (in.readBoolean()) {
+                final int sizeY = array.getSizeY();
+                final int rowlen = array.getSizeXZ();
+                final short[][] inflated = array.inflated = new short[sizeY][];
+                final int rows = in.readInt();
+                for (int i = 0; i < rows; i++) {
+                    final int index = in.readInt();
+                    final short[] row = inflated[index] = new short[rowlen];
+                    for (int j = 0; j < rowlen; j++) {
+                        row[j] = in.readShort();
+                    }
+                }
+                final short[] deflated = array.deflated = new short[sizeY];
+                for (int i = 0; i < sizeY; i++) {
+                    deflated[i] = in.readShort();
+                }
+            } else {
+                array.fill = in.readShort();
+            }
+        }
+    }
+
+    public static class Factory implements TeraArrayFactory<TeraSparseArray16Bit> {
+        @Override
+        public Class<TeraSparseArray16Bit> getArrayClass() {
+            return TeraSparseArray16Bit.class;
+        }
+        @Override
+        public TeraSparseArray16Bit create() {
+            return new TeraSparseArray16Bit();
+        }
+        @Override
+        public TeraSparseArray16Bit create(int sizeX, int sizeY, int sizeZ) {
+            return new TeraSparseArray16Bit(sizeX, sizeY, sizeZ);
+        }
+    }
 
     public TeraSparseArray16Bit() {
         super();
