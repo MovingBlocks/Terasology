@@ -34,7 +34,17 @@ public final class Benchmarks {
             result.addError(BenchmarkError.Type.Setup, e);
             if (callback != null) callback.error(BenchmarkError.Type.Setup, e, result);
             return result;
-        } 
+        }
+        
+        try {
+            if (callback != null) callback.warmup(benchmark, false);
+            benchmark.run(-1, benchmark.getWarmupRepetitions(), result);
+            if (callback != null) callback.warmup(benchmark, true);
+        } catch (Exception e) {
+            result.addError(BenchmarkError.Type.Warmup, e);
+            if (callback != null) callback.error(BenchmarkError.Type.Warmup, e, result);
+            return result;
+        }
         
         int repsTotal = 0, repsSoFar = 0;
         for (int reps : repetitions) {

@@ -40,6 +40,7 @@ public final class Config {
     private static final Logger logger = LoggerFactory.getLogger(Config.class);
     private InputConfig input = new InputConfig();
     private ModConfig defaultModConfig = new ModConfig();
+    private AdvancedConfig advanced = AdvancedConfig.createDefault();
 
     /**
      * Create a new, empty config
@@ -56,6 +57,10 @@ public final class Config {
 
     public ModConfig getDefaultModConfig() {
         return defaultModConfig;
+    }
+    
+    public AdvancedConfig getAdvancedConfig() {
+        return advanced;
     }
 
     /**
@@ -89,6 +94,7 @@ public final class Config {
                     .registerTypeAdapter(InputConfig.class, new InputConfig.Handler())
                     .registerTypeAdapter(Multimap.class, new MultimapHandler<Input>(Input.class))
                     .registerTypeAdapter(Input.class, new InputHandler())
+                    .registerTypeAdapter(AdvancedConfig.class, new AdvancedConfig.Handler())
                     .setPrettyPrinting().create().toJson(config, writer);
         } finally {
             // JAVA7: better closing support
@@ -109,6 +115,7 @@ public final class Config {
                     .registerTypeAdapter(InputConfig.class, new InputConfig.Handler())
                     .registerTypeAdapter(Multimap.class, new MultimapHandler<Input>(Input.class))
                     .registerTypeAdapter(Input.class, new InputHandler())
+                    .registerTypeAdapter(AdvancedConfig.class, new AdvancedConfig.Handler())
                     .create().fromJson(reader, Config.class);
         } finally {
             reader.close();

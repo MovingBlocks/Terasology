@@ -12,6 +12,8 @@ public abstract class Benchmark {
 
     public abstract String getTitle();
     
+    public abstract int getWarmupRepetitions();
+    
     public abstract int[] getRepetitions();
     
     public abstract BenchmarkResult createResult();

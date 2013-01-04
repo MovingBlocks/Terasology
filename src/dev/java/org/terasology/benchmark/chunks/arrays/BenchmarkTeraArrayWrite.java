@@ -26,7 +26,7 @@ public class BenchmarkTeraArrayWrite extends BenchmarkTeraArray {
             for (int y = 0; y < array.getSizeY(); y++) {
                 for (int z = 0; z < array.getSizeZ(); z++) {
                     for (int x = 0; x < array.getSizeX(); x++) {
-                        array.set(x, y, z, index);
+                        array.set(x, y, z, 1);
                     }
                 }
             }

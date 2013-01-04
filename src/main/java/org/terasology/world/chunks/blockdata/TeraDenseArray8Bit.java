@@ -80,4 +80,5 @@ public final class TeraDenseArray8Bit extends TeraDenseArrayByte {
         }
         return false;
     }
+
 }
