@@ -9,6 +9,14 @@ import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
 
 import com.google.common.base.Preconditions;
 
+/**
+ * TeraDenseArray16Bit implements a sparse array with elements of 16 bit size.
+ * Its elements are in the range -32'768 through +32'767 and it internally uses the short type to store its elements.
+ * It can reduce memory consumption through sparse memory allocation.
+ * 
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
+ *
+ */
 public class TeraSparseArray16Bit extends TeraSparseArray {
 
     protected short[][] inflated;

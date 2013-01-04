@@ -25,7 +25,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 /**
- *  
+ * Allows to configure internal details of the Terasology engine.
  * 
  * @author Manuel Brotz <manu.brotz@gmx.ch>
  *
