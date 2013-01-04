@@ -83,10 +83,12 @@ void main() {
     /* VIGNETTE */
     float vig = texture2D(texVignette, gl_TexCoord[0].xy).x;
 
-    if (!swimming)
+    if (!swimming) {
         finalColor.rgb *= vig;
-    else
-        finalColor.rgb *= vig / 12.0;
+    } else {
+        finalColor.rgb *= vig * vig * vig;
+        finalColor.rgb *= vec3(0.1, 0.2, 0.2);
+    }
 
     gl_FragColor = finalColor;
 }
