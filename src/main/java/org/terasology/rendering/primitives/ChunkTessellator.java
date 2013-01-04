@@ -228,7 +228,7 @@ public final class ChunkTessellator {
             }
         }
 
-        double resultAmbientOcclusion = (Math.pow(0.40, occCounter) + Math.pow(0.90, occCounterBillboard)) / 2.0;
+        double resultAmbientOcclusion = (Math.pow(0.40, occCounter) + Math.pow(0.80, occCounterBillboard)) / 2.0;
 
         if (counterLight == 0)
             output[0] = 0;

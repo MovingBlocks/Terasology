@@ -22,9 +22,8 @@ uniform sampler2D textureWaterReflection;
 
 uniform float time;
 uniform float daylight = 1.0;
-uniform bool swimming;
 uniform bool carryingTorch;
-uniform bool underWater;
+uniform bool swimming;
 
 uniform float clipHeight = 0.0;
 
@@ -46,8 +45,9 @@ uniform vec2 grassCoordinate;
 #define DAYLIGHT_AMBIENT_COLOR 0.95, 0.92, 0.91
 #define MOONLIGHT_AMBIENT_COLOR 0.8, 0.8, 1.0
 #define NIGHT_BRIGHTNESS 0.05
-#define WATER_COLOR 0.6, 0.6, 0.7, 0.85
-#define REFLECTION_COLOR 0.95, 0.95, 1.0, 1.0
+#define WATER_COLOR_SWIMMING 0.8, 1.0, 1.0, 0.975
+#define WATER_COLOR 0.8, 1.0, 1.0, 0.75
+#define REFLECTION_COLOR 1.0, 1.0, 1.0, 1.0
 
 #define TORCH_WATER_SPEC 8.0
 #define TORCH_WATER_DIFF 0.7
@@ -61,7 +61,7 @@ uniform vec2 grassCoordinate;
 #define WATER_REFRACTION 0.1
 
 void main(){
-	if (clipHeight > 0.0 && vertexWorldPosRaw.y < clipHeight) {
+	if (clipHeight > 0.0 && vertexWorldPosRaw.y < clipHeight && !swimming) {
         discard;
 	}
 
@@ -74,7 +74,7 @@ void main(){
     vec3 finalLightDir = lightDir;
 
     /* DAYLIGHT BECOMES... MOONLIGHT! */
-    /* Now featuring linear interpolation to make the transition more smoothly... :-) */
+    /* Now featuring linear interpolation to make the transition smoother... :-) */
     if (daylight < 0.1)
         finalLightDir = mix(finalLightDir * -1.0, finalLightDir, daylight / 0.1);
 
@@ -83,19 +83,21 @@ void main(){
     /* APPLY WATER TEXTURE */
     if (texCoord.x >= waterCoordinate.x && texCoord.x < waterCoordinate.x + TEXTURE_OFFSET && texCoord.y >= waterCoordinate.y && texCoord.y < waterCoordinate.y + TEXTURE_OFFSET) {
         vec2 waterOffset = vec2(vertexWorldPosRaw.x + timeToTick(time, 0.1), vertexWorldPosRaw.z + timeToTick(time, 0.1)) / 8.0;
-
         normalWater.xyz = texture2D(textureWaterNormal, waterOffset).xyz * 2.0 - 1.0;
-        vec2 projectedPos = 0.5 * (vertexPos.st/vertexPos.q) + vec2(0.5);
 
-        if (!underWater)
-        {
+       // Enable reflection only when not swimming and for blocks on sea level
+        if (!swimming && vertexWorldPosRaw.y < 32.5 && vertexWorldPosRaw.y > 31.5) {
+            vec2 projectedPos = 0.5 * (vertexPos.st/vertexPos.q) + vec2(0.5);
+
             // Fresnel
             float refractionFactor = WATER_REFRACTION * clamp(1.0 - length(vertexWorldPos.xyz) / 50.0, 0.25, 1.0);
             vec4 reflectionColor = vec4(texture2D(textureWaterReflection, projectedPos + normalWater.xy * refractionFactor).xyz, 1.0);
             float f = fresnel(max(dot(normalizedVPos, waterNormal), 0.0), 0.1, 5.0);
             color = mix(reflectionColor * vec4(WATER_COLOR), reflectionColor * vec4(REFLECTION_COLOR), f);
-        } else {
+        } else if (!swimming && (vertexWorldPosRaw.y >= 32.5 || vertexWorldPosRaw.y <= 31.5)) {
             color = vec4(WATER_COLOR);
+        } else {
+            color = vec4(WATER_COLOR_SWIMMING);
         }
 
         isWater = true;
@@ -111,7 +113,7 @@ void main(){
         color = texture2D(textureAtlas, texCoord.xy);
     }
 
-    if (color.a < 0.5 && !isWater)
+    if (color.a < 0.5)
         discard;
 
     /* APPLY OVERALL BIOME COLOR OFFSET */
@@ -156,7 +158,7 @@ void main(){
     if (carryingTorch) {
         if (isWater)
             torchlight = calcTorchlight(calcLambLight(normalWater, normalizedVPos) * TORCH_WATER_DIFF
-            + TORCH_WATER_SPEC * calcSpecLightWithOffset(normal, normalizedVPos, normalizedVPos, 64.0, normalWater), vertexWorldPos.xyz);
+            + TORCH_WATER_SPEC * calcSpecLightWithOffset(normal, normalizedVPos, normalizedVPos, 16.0, normalWater), vertexWorldPos.xyz);
         else
             torchlight = calcTorchlight(calcLambLight(normal, normalizedVPos) * TORCH_BLOCK_DIFF
             + TORCH_BLOCK_SPEC * calcSpecLight(normal, normalizedVPos, normalizedVPos, 32.0), vertexWorldPos.xyz);
