@@ -37,6 +37,16 @@ public abstract class TeraArray implements Externalizable {
         sizeXYZHalf = sizeXYZ / 2;
     }
     
+    protected final int pos(int x, int y, int z) {
+        return y * getSizeXZ() + z * getSizeX() + x;
+    }
+
+    protected final int pos(int x, int z) {
+        return z * getSizeX() + x;
+    }
+    
+    protected abstract void initialize();
+    
     public static abstract class Factory {
         
         public abstract String getName();
@@ -49,9 +59,9 @@ public abstract class TeraArray implements Externalizable {
         }
     }
 
-    public TeraArray() {}
+    protected TeraArray() {}
 
-    public TeraArray(int sizeX, int sizeY, int sizeZ) {
+    protected TeraArray(int sizeX, int sizeY, int sizeZ, boolean initialize) {
         Preconditions.checkArgument(sizeX > 0);
         Preconditions.checkArgument(sizeY > 0);
         Preconditions.checkArgument(sizeZ > 0);
@@ -64,6 +74,7 @@ public abstract class TeraArray implements Externalizable {
         sizeXYZHalf = sizeXYZ / 2;
         Preconditions.checkArgument(getSizeXYZ() % 2 == 0, "The product of the parameters 'sizeX', 'sizeY' and 'sizeZ' has to be a multiple of 2 (" + getSizeXYZ() + ")");
         Preconditions.checkArgument(getSizeXZ() % 2 == 0, "The product of the parameters 'sizeX' and 'sizeZ' has to be a multiple of 2 (" + getSizeXZ() + ")");
+        if (initialize) initialize();
     }
 
     public final int getSizeX() {

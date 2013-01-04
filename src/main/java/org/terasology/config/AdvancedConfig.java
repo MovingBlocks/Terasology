@@ -6,8 +6,10 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.world.chunks.blockdata.TeraArray;
+import org.terasology.world.chunks.blockdata.TeraDenseArray16Bit;
 import org.terasology.world.chunks.blockdata.TeraDenseArray4Bit;
 import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
+import org.terasology.world.chunks.blockdata.TeraSparseArray16Bit;
 import org.terasology.world.chunks.blockdata.TeraSparseArray4Bit;
 import org.terasology.world.chunks.blockdata.TeraSparseArray8Bit;
 import org.terasology.world.chunks.blockdata.TeraArray.Factory;
@@ -22,6 +24,12 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
+/**
+ *  
+ * 
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
+ *
+ */
 public final class AdvancedConfig {
     
     private static final Logger logger = LoggerFactory.getLogger(AdvancedConfig.class);
@@ -201,6 +209,14 @@ public final class AdvancedConfig {
         });
         registerTeraArrayFactory(new Factory() {
             @Override
+            public String getName() {return TeraDenseArray16Bit.class.getName();}
+            @Override
+            public TeraArray create(int sizeX, int sizeY, int sizeZ) {
+                return new TeraDenseArray16Bit(sizeX, sizeY, sizeZ);
+            }
+        });
+        registerTeraArrayFactory(new Factory() {
+            @Override
             public String getName() {return TeraSparseArray4Bit.class.getName();}
             @Override
             public TeraArray create(int sizeX, int sizeY, int sizeZ) {
@@ -213,6 +229,14 @@ public final class AdvancedConfig {
             @Override
             public TeraArray create(int sizeX, int sizeY, int sizeZ) {
                 return new TeraSparseArray8Bit(sizeX, sizeY, sizeZ);
+            }
+        });
+        registerTeraArrayFactory(new Factory() {
+            @Override
+            public String getName() {return TeraSparseArray16Bit.class.getName();}
+            @Override
+            public TeraArray create(int sizeX, int sizeY, int sizeZ) {
+                return new TeraSparseArray16Bit(sizeX, sizeY, sizeZ);
             }
         });
     }

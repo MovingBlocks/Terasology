@@ -25,28 +25,27 @@ public abstract class TeraSparseArrayByte extends TeraSparseArray {
 
     protected abstract int rowSize();
     
-    protected final int pos(int x, int z) {
-        return z * getSizeX() + x;
-    }
-
-    public TeraSparseArrayByte() {
+    @Override
+    protected void initialize() {}
+    
+    protected TeraSparseArrayByte() {
         super();
     }
 
-    public TeraSparseArrayByte(int sizeX, int sizeY, int sizeZ) {
-        super(sizeX, sizeY, sizeZ);
+    protected TeraSparseArrayByte(int sizeX, int sizeY, int sizeZ) {
+        super(sizeX, sizeY, sizeZ, false);
     }
 
-    public TeraSparseArrayByte(int sizeX, int sizeY, int sizeZ, byte[][] inflated, byte[] deflated) {
-        super(sizeX, sizeY, sizeZ);
+    protected TeraSparseArrayByte(int sizeX, int sizeY, int sizeZ, byte[][] inflated, byte[] deflated) {
+        super(sizeX, sizeY, sizeZ, false);
         this.inflated = Preconditions.checkNotNull(inflated);
         this.deflated = Preconditions.checkNotNull(deflated);
-        Preconditions.checkArgument(inflated.length == sizeY);
-        Preconditions.checkArgument(deflated.length == sizeY);
+        Preconditions.checkArgument(inflated.length == sizeY, "The length of parameter 'inflated' has to be " + sizeY + " but is " + inflated.length);
+        Preconditions.checkArgument(deflated.length == sizeY, "The length of parameter 'deflated' has to be " + sizeY + " but is " + deflated.length);
     }
     
-    public TeraSparseArrayByte(int sizeX, int sizeY, int sizeZ, byte fill) {
-        super(sizeX, sizeY, sizeZ);
+    protected TeraSparseArrayByte(int sizeX, int sizeY, int sizeZ, byte fill) {
+        super(sizeX, sizeY, sizeZ, false);
         this.fill = fill;
     }
 

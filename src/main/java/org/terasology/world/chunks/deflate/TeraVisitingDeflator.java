@@ -9,19 +9,24 @@ public abstract class TeraVisitingDeflator extends TeraDeflator {
     public TeraVisitingDeflator() {}
 
     @Override
-    public final TeraArray deflate(final TeraArray in) {
+    public final TeraArray deflate(TeraArray in) {
         TeraArray result = Preconditions.checkNotNull(in).deflate(this);
         if (result != null)
             return result;
         return in;
     }
 
-    public abstract TeraArray deflateDenseArray8Bit(final byte[] data, final int rowSize, final int sizeX, final int sizeY, final int sizeZ);
+    public abstract TeraArray deflateDenseArray16Bit(short[] data, int rowSize, int sizeX, int sizeY, int sizeZ);
     
-    public abstract TeraArray deflateDenseArray4Bit(final byte[] data, final int rowSize, final int sizeX, final int sizeY, final int sizeZ);
+    public abstract TeraArray deflateDenseArray8Bit(byte[] data, int rowSize, int sizeX, int sizeY, int sizeZ);
     
-    public abstract TeraArray deflateSparseArray8Bit(final byte[][] inflated, final byte[] deflated, final byte fill, final int rowSize, final int sizeX, final int sizeY, final int sizeZ);
+    public abstract TeraArray deflateDenseArray4Bit(byte[] data, int rowSize, int sizeX, int sizeY, int sizeZ);
     
-    public abstract TeraArray deflateSparseArray4Bit(final byte[][] inflated, final byte[] deflated, final byte fill, final int rowSize, final int sizeX, final int sizeY, final int sizeZ);
+    
+    public abstract TeraArray deflateSparseArray16Bit(short[][] inflated, short[] deflated, short fill, int rowSize, int sizeX, int sizeY, int sizeZ);
+    
+    public abstract TeraArray deflateSparseArray8Bit(byte[][] inflated, byte[] deflated, byte fill, int rowSize, int sizeX, int sizeY, int sizeZ);
+    
+    public abstract TeraArray deflateSparseArray4Bit(byte[][] inflated, byte[] deflated, byte fill, int rowSize, int sizeX, int sizeY, int sizeZ);
 
 }
