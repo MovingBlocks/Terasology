@@ -54,6 +54,7 @@ import com.google.common.base.Preconditions;
  * which are then used for the actual rendering process.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
  */
 public class Chunk implements Externalizable {
     protected static final Logger logger = LoggerFactory.getLogger(Chunk.class);

@@ -4,6 +4,13 @@ import org.terasology.world.chunks.blockdata.TeraArray;
 
 import com.google.common.base.Preconditions;
 
+/**
+ * TeraVisitingDeflator uses the visitor pattern to gain access to the internal implementation details of specific
+ * TeraArrays. This allows to implement fast deflation algorithms.
+ * 
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
+ *
+ */
 public abstract class TeraVisitingDeflator extends TeraDeflator {
 
     public TeraVisitingDeflator() {}

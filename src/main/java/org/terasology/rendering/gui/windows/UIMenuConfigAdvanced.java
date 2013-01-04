@@ -21,6 +21,13 @@ import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIListItem;
 import org.terasology.rendering.gui.widgets.UIWindow;
 
+/**
+ * Exposes internal configurable details of the Terasology engine to the user.
+ * 
+ * @see org.terasology.config.AdvancedConfig
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
+ *
+ */
 public class UIMenuConfigAdvanced extends UIWindow {
 
     private final UIImage title;
