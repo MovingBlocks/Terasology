@@ -32,6 +32,28 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
         return getSizeXZ();
     }
 
+    public static class SerializationHandler extends TeraSparseArrayByte.SerializationHandler<TeraSparseArray8Bit> {
+        @Override
+        public Class<TeraSparseArray8Bit> getArrayClass() {
+            return TeraSparseArray8Bit.class;
+        }
+    }
+    
+    public static class Factory implements TeraArrayFactory<TeraSparseArray8Bit> {
+        @Override
+        public Class<TeraSparseArray8Bit> getArrayClass() {
+            return TeraSparseArray8Bit.class;
+        }
+        @Override
+        public TeraSparseArray8Bit create() {
+            return new TeraSparseArray8Bit();
+        }
+        @Override
+        public TeraSparseArray8Bit create(int sizeX, int sizeY, int sizeZ) {
+            return new TeraSparseArray8Bit(sizeX, sizeY, sizeZ);
+        }
+    }
+
     public TeraSparseArray8Bit() {
         super();
     }

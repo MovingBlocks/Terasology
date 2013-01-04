@@ -1,11 +1,14 @@
 package org.terasology.world.chunks.blockdata;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.Externalizable;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.io.OutputStream;
 
-import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
 
 import com.google.common.base.Preconditions;
@@ -47,16 +50,55 @@ public abstract class TeraArray implements Externalizable {
     
     protected abstract void initialize();
     
-    public static abstract class Factory {
+    
+    /**
+     * Extending this class is the recommended way to implement serialization handlers for tera arrays.
+     * Tera arrays should implement their serialization handlers as a static subclass called SerializationHandler.
+     * 
+     * @author Manuel Brotz <manu.brotz@gmx.ch>
+     * @see org.terasology.world.chunks.blockdata.TeraDenseArray16Bit.SerializationHandler
+     * @see org.terasology.world.chunks.blockdata.TeraDenseArray16Bit.Factory
+     *
+     */
+    protected static abstract class SerializationHandler<T extends TeraArray> implements TeraArraySerializationHandler<T> {
+
+        protected abstract void internalSerialize(T array, DataOutputStream out) throws IOException;
         
-        public abstract String getName();
-        
-        public abstract TeraArray create(int sizeX, int sizeY, int sizeZ);
-        
-        public final TeraArray create(Chunk chunk) {
-            Preconditions.checkNotNull(chunk);
-            return create(chunk.getChunkSizeX(), chunk.getChunkSizeY(), chunk.getChunkSizeZ());
+        protected abstract void internalDeserialize(T array, DataInputStream in) throws IOException;
+
+        @Override
+        public final void serialize(T array, OutputStream out) throws IOException {
+            Preconditions.checkNotNull(array, "The parameter 'array' must not be null");
+            Preconditions.checkNotNull(out, "The parameter 'out' must not be null");
+            final DataOutputStream dout = new DataOutputStream(out);
+            try {
+                dout.writeInt(array.sizeX);
+                dout.writeInt(array.sizeY);
+                dout.writeInt(array.sizeZ);
+                internalSerialize(array, dout);
+                dout.flush();
+            } finally {
+                dout.close();
+            }
         }
+
+        @Override
+        public final T deserialize(TeraArrayFactory<T> factory, InputStream in) throws IOException {
+            Preconditions.checkNotNull(factory, "The parameter 'factory' must not be null");
+            Preconditions.checkNotNull(in, "The parameter 'in' must not be null");
+            final DataInputStream din = new DataInputStream(in);
+            try {
+                int sizeX = din.readInt();
+                int sizeY = din.readInt();
+                int sizeZ = din.readInt();
+                T array = Preconditions.checkNotNull(factory.create(sizeX, sizeY, sizeZ), "TeraArrayFactory<T>:create(int, int, int) must not return null");
+                internalDeserialize(array, din);
+                return array;
+            } finally {
+                din.close();
+            }
+        }
+        
     }
 
     protected TeraArray() {}
