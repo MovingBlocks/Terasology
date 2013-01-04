@@ -307,7 +307,9 @@ public class PostProcessingRenderer {
 
             for (int i = 0; i < 2; i++) {
                 generateBloom(i);
-                generateBlur(i);
+                if (Config.getInstance().getBlurIntensity() != 0) {
+                    generateBlur(i);
+                }
             }
 
             generateHighPass();
@@ -376,9 +378,6 @@ public class PostProcessingRenderer {
     }
 
     private void generateBlur(int id) {
-        if (Config.getInstance().getBlurIntensity() == 0)
-            return;
-
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("blur");
 
         shader.enable();
