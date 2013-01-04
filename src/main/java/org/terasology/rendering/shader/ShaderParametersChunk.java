@@ -69,6 +69,7 @@ public class ShaderParametersChunk implements IShaderParameters {
 
         if (worldRenderer != null) {
             program.setFloat("daylight", (float) worldRenderer.getDaylight());
+            program.setFloat("swimming", worldRenderer.isUnderWater() ? 1.0f : 0.0f);
         }
 
         if (localPlayer != null) {
@@ -84,5 +85,4 @@ public class ShaderParametersChunk implements IShaderParameters {
         program.setFloat2("waterCoordinate", BlockManager.getInstance().calcCoordinate("engine:water"));
         program.setFloat2("lavaCoordinate", BlockManager.getInstance().calcCoordinate("engine:lava"));
     }
-
 }
