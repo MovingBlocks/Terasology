@@ -108,10 +108,10 @@ public class Chunk implements Externalizable {
 
     public Chunk() {
         AdvancedConfig config = CoreRegistry.get(org.terasology.config.Config.class).getAdvancedConfig();
-        blocks = config.getBlocksFactory().create(this);
-        sunlight = config.getSunlightFactory().create(this);
-        light = config.getLightFactory().create(this);
-        liquid = config.getLiquidFactory().create(this);
+        blocks = config.getBlocksFactory().create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        sunlight = config.getSunlightFactory().create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        light = config.getLightFactory().create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        liquid = config.getLiquidFactory().create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         dirty = true;
     }
 

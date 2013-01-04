@@ -71,6 +71,28 @@ public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
         return old;
     }
 
+    public static class SerializationHandler extends TeraSparseArrayByte.SerializationHandler<TeraSparseArray4Bit> {
+        @Override
+        public Class<TeraSparseArray4Bit> getArrayClass() {
+            return TeraSparseArray4Bit.class;
+        }
+    }
+    
+    public static class Factory implements TeraArrayFactory<TeraSparseArray4Bit> {
+        @Override
+        public Class<TeraSparseArray4Bit> getArrayClass() {
+            return TeraSparseArray4Bit.class;
+        }
+        @Override
+        public TeraSparseArray4Bit create() {
+            return new TeraSparseArray4Bit();
+        }
+        @Override
+        public TeraSparseArray4Bit create(int sizeX, int sizeY, int sizeZ) {
+            return new TeraSparseArray4Bit(sizeX, sizeY, sizeZ);
+        }
+    }
+    
     public TeraSparseArray4Bit() {
         super();
     }
