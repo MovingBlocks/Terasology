@@ -11,24 +11,16 @@ import com.google.common.base.Preconditions;
  */
 public abstract class TeraDenseArray extends TeraArray {
 
-    protected final int pos(int x, int y, int z) {
-        return y * getSizeXZ() + z * getSizeX() + x;
-    }
-
-    protected final int pos(int x, int z) {
-        return z * getSizeX() + x;
-    }
-    
-    public TeraDenseArray() {
+    protected TeraDenseArray() {
         super();
     }
 
-    public TeraDenseArray(int sizeX, int sizeY, int sizeZ) {
-        super(sizeX, sizeY, sizeZ);
+    protected TeraDenseArray(int sizeX, int sizeY, int sizeZ, boolean initialize) {
+        super(sizeX, sizeY, sizeZ, initialize);
     }
     
-    public TeraDenseArray(TeraArray in) {
-        super(Preconditions.checkNotNull(in).getSizeX(), in.getSizeY(), in.getSizeZ());
+    protected TeraDenseArray(TeraArray in) {
+        super(Preconditions.checkNotNull(in).getSizeX(), in.getSizeY(), in.getSizeZ(), true);
         copyFrom(in);
     }
 
