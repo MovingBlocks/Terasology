@@ -301,9 +301,9 @@ public class PostProcessingRenderer {
 
         if (Config.getInstance().isEnablePostProcessingEffects()) {
             generateDownsampledScene();
-            updateExposure();
 
             generateTonemappedScene();
+            generateHighPass();
 
             for (int i = 0; i < 2; i++) {
                 generateBloom(i);
@@ -312,8 +312,8 @@ public class PostProcessingRenderer {
                 }
             }
 
-            generateHighPass();
             renderFinalScene();
+            updateExposure();
         } else {
             PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("scene");
 
@@ -382,7 +382,7 @@ public class PostProcessingRenderer {
 
         shader.enable();
 
-        shader.setFloat("radius", 1.0f * Config.getInstance().getBlurIntensity());
+        shader.setFloat("radius", 1.5f * Config.getInstance().getBlurIntensity());
 
         PostProcessingRenderer.getInstance().getFBO("sceneBlur" + id).bind();
         glViewport(0, 0, 512, 512);
