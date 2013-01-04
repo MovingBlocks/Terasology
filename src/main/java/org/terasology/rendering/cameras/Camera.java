@@ -128,7 +128,7 @@ public abstract class Camera {
 
     public float getClipHeight() {
         if (_reflected)
-            return 31.5f;
+            return 32.0f;
         return 0;
     }
 }

@@ -530,7 +530,7 @@ public final class WorldRenderer {
             glClear(GL_DEPTH_BUFFER_BIT);
             glPushMatrix();
             glLoadIdentity();
-            _activeCamera.loadProjectionMatrix(80f);
+            _activeCamera.loadProjectionMatrix(90f);
 
             PerformanceMonitor.startActivity("Render First Person");
             for (RenderSystem renderer : _systemManager.iterateRenderSubscribers()) {
@@ -558,9 +558,7 @@ public final class WorldRenderer {
 
         glEnable(GL_LIGHT0);
 
-        boolean headUnderWater;
-
-        headUnderWater = _cameraMode == CAMERA_MODE.PLAYER && isUnderWater();
+        boolean headUnderWater =_cameraMode == CAMERA_MODE.PLAYER && isUnderWater();
 
         if (_wireframe)
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -570,7 +568,6 @@ public final class WorldRenderer {
         for (RenderSystem renderer : _systemManager.iterateRenderSubscribers()) {
             renderer.renderOpaque();
         }
-
 
         PerformanceMonitor.endActivity();
 
@@ -630,9 +627,15 @@ public final class WorldRenderer {
             }
         }
 
+        PerformanceMonitor.endActivity();
+
+        PerformanceMonitor.startActivity("Render Overlays");
+
         for (RenderSystem renderer : _systemManager.iterateRenderSubscribers()) {
             renderer.renderOverlay();
         }
+
+        PerformanceMonitor.endActivity();
 
         glDisable(GL_BLEND);
 
@@ -643,8 +646,6 @@ public final class WorldRenderer {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         glDisable(GL_LIGHT0);
-
-        PerformanceMonitor.endActivity();
     }
 
     public void renderWorldReflection(Camera camera) {

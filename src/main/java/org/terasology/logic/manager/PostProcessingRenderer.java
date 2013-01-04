@@ -56,25 +56,23 @@ import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
- * TODO
+ * Responsible for applying and rendering various shader based
+ * post processing effects.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class PostProcessingRenderer {
 
-    public static final float MAX_EXPOSURE = 4.0f;
-    public static final float MAX_EXPOSURE_NIGHT = 2.0f;
+    public static final float MAX_EXPOSURE = 6.0f;
+    public static final float MAX_EXPOSURE_NIGHT = 0.5f;
     public static final float MIN_EXPOSURE = 0.5f;
     public static final float TARGET_LUMINANCE = 1.0f;
-    public static final float ADJUSTMENT_SPEED = 0.025f;
+    public static final float ADJUSTMENT_SPEED = 0.05f;
 
     private static PostProcessingRenderer _instance = null;
     private float _exposure = 16.0f;
     private float _sceneLuminance = 1.0f;
     private int _displayListQuad = -1;
-
-
-    private long lastExposureUpdate;
 
     private boolean _extensionsAvailable = false;
 
@@ -227,23 +225,16 @@ public class PostProcessingRenderer {
     }
 
     private void updateExposure() {
-        long currentTime = CoreRegistry.get(Timer.class).getTimeInMs();
+        FloatBuffer pixels = BufferUtils.createFloatBuffer(4);
+        FBO scene = PostProcessingRenderer.getInstance().getFBO("scene1");
 
-        if (currentTime - lastExposureUpdate > 1000) {
-            lastExposureUpdate = currentTime;
+        scene.bindTexture();
+        glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL12.GL_BGRA, GL11.GL_FLOAT, pixels);
+        scene.unbindTexture();
 
-            FloatBuffer pixels = BufferUtils.createFloatBuffer(4);
-            FBO scene = PostProcessingRenderer.getInstance().getFBO("scene1");
+        _sceneLuminance = 0.2126f * pixels.get(2) + 0.7152f * pixels.get(1) + 0.0722f * pixels.get(0);
 
-            scene.bindTexture();
-            glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, GL11.GL_FLOAT, pixels);
-            scene.unbindTexture();
-
-            _sceneLuminance = 0.2126f * pixels.get(0) + 0.7152f * pixels.get(1) + 0.0722f * pixels.get(2);
-
-        }
-
-        if (_sceneLuminance > 0.0f) {// No division by zero
+        if (_sceneLuminance > 0.0f) { // Avoid division by zero
             _exposure = (float) TeraMath.lerp(_exposure, TARGET_LUMINANCE / _sceneLuminance, ADJUSTMENT_SPEED);
         }
 
@@ -521,9 +512,5 @@ public class PostProcessingRenderer {
 
     public FBO getFBO(String title) {
         return _FBOs.get(title);
-    }
-
-    public boolean areExtensionsAvailable() {
-        return _extensionsAvailable;
     }
 }
