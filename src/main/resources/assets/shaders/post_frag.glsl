@@ -86,7 +86,7 @@ void main() {
     if (!swimming)
         finalColor.rgb *= vig;
     else
-        finalColor.rgb *= vig / 16.0;
+        finalColor.rgb *= vig / 12.0;
 
     gl_FragColor = finalColor;
 }
