@@ -22,6 +22,11 @@ public abstract class BenchmarkTeraArray extends Benchmark {
     }
 
     @Override
+    public int getWarmupRepetitions() {
+        return 10000;
+    }
+    
+    @Override
     public int[] getRepetitions() {
         return new int[] {500, 5000, 50000, 100000};
     }

@@ -12,7 +12,7 @@ import com.google.common.base.Preconditions;
 public class BenchmarkError {
     
     public static enum Type {
-        Setup(true), PreRun(true), Run(true), PostRun(true), Finish(false);
+        Setup(true), Warmup(true), PreRun(true), Run(true), PostRun(true), Finish(false);
 
         public final boolean abort;
 

@@ -12,6 +12,11 @@ public class BenchmarkChunkCache extends Benchmark {
     public String getTitle() {
         return null;
     }
+
+    @Override
+    public int getWarmupRepetitions() {
+        return 1;
+    }
     
     @Override
     public int[] getRepetitions() {
