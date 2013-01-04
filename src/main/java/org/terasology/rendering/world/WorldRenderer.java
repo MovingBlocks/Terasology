@@ -713,13 +713,11 @@ public final class WorldRenderer {
     }
 
     public float getRenderingLightValueAt(Vector3f pos) {
-        float lightValueSun = _worldProvider.getSunlight(pos);
-        lightValueSun /= 15.0f;
+        float lightValueSun = (float) Math.pow(0.76, 16 - _worldProvider.getSunlight(pos));
         lightValueSun *= getDaylight();
-        float lightValueBlock = _worldProvider.getLight(pos);
-        lightValueBlock /= 15f;
+        float lightValueBlock = (float) Math.pow(0.76, 16 - _worldProvider.getLight(pos));
 
-        return (float) TeraMath.clamp(lightValueSun + lightValueBlock * (1.0 - lightValueSun));
+        return (lightValueSun + lightValueBlock * (1.0f - lightValueSun)) + (1.0f - (float) getDaylight()) * 0.05f;
     }
 
     public void update(float delta) {

@@ -37,12 +37,12 @@ void main(){
     float torchlight = 0.0;
 
     // Apply torchlight
-    if (carryingTorch)
+    if (carryingTorch) {
         torchlight = calcTorchlight(calcLambLight(normal, -normalize(vertexWorldPos.xyz)), vertexWorldPos.xyz);
+    }
 
     // Apply light
-    float lightValue = expLightValue(light);
-    color.rgb *= clamp(lightValue + torchlight, 0.0, 1.0);
+    color.rgb *= clamp(light + torchlight, 0.0, 1.0);
 
     if (textured) {
         color.rgb *= colorOffset.rgb;
