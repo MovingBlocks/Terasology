@@ -47,8 +47,10 @@ public class ShaderParametersPost implements IShaderParameters {
 
         GL13.glActiveTexture(GL13.GL_TEXTURE1);
         PostProcessingRenderer.getInstance().getFBO("sceneBloom1").bindTexture();
-        GL13.glActiveTexture(GL13.GL_TEXTURE2);
-        PostProcessingRenderer.getInstance().getFBO("sceneBlur1").bindTexture();
+        if (Config.getInstance().getBlurIntensity() != 0) {
+            GL13.glActiveTexture(GL13.GL_TEXTURE2);
+            PostProcessingRenderer.getInstance().getFBO("sceneBlur1").bindTexture();
+        }
         GL13.glActiveTexture(GL13.GL_TEXTURE3);
         glBindTexture(GL11.GL_TEXTURE_2D, texture.getId());
         GL13.glActiveTexture(GL13.GL_TEXTURE4);
@@ -58,7 +60,9 @@ public class ShaderParametersPost implements IShaderParameters {
 
         program.setInt("texScene", 0);
         program.setInt("texBloom", 1);
-        program.setInt("texBlur", 2);
+        if (Config.getInstance().getBlurIntensity() != 0) {
+            program.setInt("texBlur", 2);
+        }
         program.setInt("texVignette", 3);
         program.setInt("texDepth", 4);
 

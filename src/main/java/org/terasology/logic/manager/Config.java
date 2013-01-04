@@ -458,7 +458,6 @@ public final class Config {
     }
 
     /* MODS */
-
     public List<String> getActiveMods() {
         return _setting.getActiveModList();
     }
@@ -484,7 +483,6 @@ public final class Config {
         return _setting.getSystemBuilder().getActiveViewingDistanceId();
     }
 
-    //todo remove this from the config
     public void setViewingDistanceById(int viewingDistance) {
         _setting.getSystemBuilder().setActiveViewingDistanceId(viewingDistance);
 

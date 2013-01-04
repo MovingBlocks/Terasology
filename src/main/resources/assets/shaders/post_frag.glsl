@@ -16,7 +16,9 @@
 
 uniform sampler2D texScene;
 uniform sampler2D texBloom;
+#ifndef NO_BLUR
 uniform sampler2D texBlur;
+#endif
 uniform sampler2D texVignette;
 uniform sampler2D texDepth;
 

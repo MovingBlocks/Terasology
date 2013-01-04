@@ -205,6 +205,7 @@ public class UIMenuConfigVideo extends UIWindow {
             public void action(UIDisplayElement element) {
                 UIStateButton button = (UIStateButton)element;
                 Config.getInstance().setBlurIntensity(button.getState());
+                ShaderManager.getInstance().recompileAllShaders();
             }
         };
         blurIntensityButton.addState("Blur Intensity: Off", blurIntensityStateAction);
