@@ -15,29 +15,7 @@
  */
 package org.terasology.logic.manager;
 
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
-import static org.lwjgl.opengl.GL11.GL_PROJECTION;
-import static org.lwjgl.opengl.GL11.GL_QUADS;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glCallList;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glColor4f;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glEndList;
-import static org.lwjgl.opengl.GL11.glGenLists;
-import static org.lwjgl.opengl.GL11.glGetTexImage;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
-import static org.lwjgl.opengl.GL11.glNewList;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glTexCoord2d;
-import static org.lwjgl.opengl.GL11.glVertex3i;
-import static org.lwjgl.opengl.GL11.glViewport;
-
-import java.nio.FloatBuffer;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 
 import org.lwjgl.BufferUtils;
@@ -50,10 +28,11 @@ import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL14;
 import org.lwjgl.opengl.GLContext;
 import org.terasology.game.CoreRegistry;
-import org.terasology.game.Timer;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
+
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Responsible for applying and rendering various shader based
@@ -66,7 +45,7 @@ public class PostProcessingRenderer {
     public static final float MAX_EXPOSURE = 6.0f;
     public static final float MAX_EXPOSURE_NIGHT = 0.5f;
     public static final float MIN_EXPOSURE = 0.5f;
-    public static final float TARGET_LUMINANCE = 1.0f;
+    public static final float TARGET_LUMINANCE = 0.72f;
     public static final float ADJUSTMENT_SPEED = 0.05f;
 
     private static PostProcessingRenderer _instance = null;
@@ -225,14 +204,14 @@ public class PostProcessingRenderer {
     }
 
     private void updateExposure() {
-        FloatBuffer pixels = BufferUtils.createFloatBuffer(4);
+        ByteBuffer pixels = BufferUtils.createByteBuffer(4);
         FBO scene = PostProcessingRenderer.getInstance().getFBO("scene1");
 
-        scene.bindTexture();
-        glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL12.GL_BGRA, GL11.GL_FLOAT, pixels);
-        scene.unbindTexture();
+        scene.bind();
+        glReadPixels(0, 0, 1, 1, GL12.GL_BGRA, GL11.GL_BYTE, pixels);
+        scene.unbind();
 
-        _sceneLuminance = 0.2126f * pixels.get(2) + 0.7152f * pixels.get(1) + 0.0722f * pixels.get(0);
+        _sceneLuminance = 0.2126f * pixels.get(2) / 255.f + 0.7152f * pixels.get(1) / 255.f + 0.0722f * pixels.get(0) / 255.f;
 
         if (_sceneLuminance > 0.0f) { // Avoid division by zero
             _exposure = (float) TeraMath.lerp(_exposure, TARGET_LUMINANCE / _sceneLuminance, ADJUSTMENT_SPEED);
