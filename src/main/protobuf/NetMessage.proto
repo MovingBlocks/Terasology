@@ -19,8 +19,7 @@ message NetMessage {
     optional UpdateEntityMessage updateEntity = 7;
     optional EventMessage event = 8;
     optional ClientConnectMessage clientConnect = 15;
-    optional ConsoleMessage console = 16;
-    optional ServerInfoMessage serverInfo = 17;
+    optional ServerInfoMessage serverInfo = 16;
 
     extensions 5000 to max;
 }
@@ -68,12 +67,7 @@ message ServerInfoMessage {
 
     optional string version = 15;
     optional string worldName = 16;
-
-    extensions 5000 to max;
-}
-
-message ConsoleMessage {
-    optional string message = 1;
+    optional int32 clientId = 17;
 
     extensions 5000 to max;
 }

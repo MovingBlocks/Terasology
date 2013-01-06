@@ -1,4 +1,4 @@
-package org.terasology.network;
+package org.terasology.network.serialization;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.metadata.FieldMetadata;

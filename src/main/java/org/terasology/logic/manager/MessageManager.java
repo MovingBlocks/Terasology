@@ -3,6 +3,7 @@ package org.terasology.logic.manager;
 import org.newdawn.slick.Color;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -11,32 +12,19 @@ import java.util.List;
  *
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
-public class MessageManager {
+public class MessageManager implements Iterable<MessageManager.Message> {
 
     private static MessageManager instance;
 
-    public static enum EMessageScope
-    {
-        /**
-         * Won't get passed to others than the local player. For messages from mods or something
-         */
-        PRIVATE,
-        /**
-         * Will get passed to all other players
-         */
-        PUBLIC,
-        /**
-         * (Could be passed to a specific group, which would be nice to have :P)
-         */
-        GROUP
-    }
-
-
     private final List<MessageSubscription> subscribers = new ArrayList<MessageSubscription>();
 
-    //log
     private final List<Message> log = new ArrayList<Message>();
     private final int logMax = 100;
+
+    @Override
+    public Iterator<Message> iterator() {
+        return log.iterator();
+    }
 
     /**
      * A chat message which is defined by its actual message and a scope.
@@ -46,21 +34,14 @@ public class MessageManager {
     public class Message {
 
         private String message;
-        private EMessageScope scope;
         private Color color;
-        //...
 
-        public Message(String message, EMessageScope scope) {
+        public Message(String message) {
             this.message = message;
-            this.scope = scope;
         }
 
         public String getMessage() {
             return message;
-        }
-
-        public EMessageScope getScope() {
-            return scope;
         }
 
         public Color getColor() {
@@ -107,22 +88,12 @@ public class MessageManager {
     }
 
     /**
-     * Add a message to the chat in public scope.
+     * Add a message to the chat.
      *
      * @param message The chat message.
      */
     public void addMessage(String message) {
-        addMessage(message, EMessageScope.PRIVATE);
-    }
-
-    /**
-     * Add a message to the chat in a specific scope.
-     *
-     * @param message The chat message.
-     * @param scope   The scope.
-     */
-    public void addMessage(String message, EMessageScope scope) {
-        addMessage(new Message(message, scope));
+        addMessage(new Message(message));
     }
 
     private void notifySubscribers(Message message) {

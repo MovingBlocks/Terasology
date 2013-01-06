@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.network;
+package org.terasology.network.pipelineFactory;
 
 import static org.jboss.netty.channel.Channels.pipeline;
 
@@ -24,6 +24,8 @@ import org.jboss.netty.handler.codec.protobuf.ProtobufDecoder;
 import org.jboss.netty.handler.codec.protobuf.ProtobufEncoder;
 import org.jboss.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import org.jboss.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
+import org.terasology.network.NetworkSystem;
+import org.terasology.network.TerasologyClientHandler;
 import org.terasology.protobuf.NetData;
 
 /**

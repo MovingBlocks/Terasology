@@ -24,9 +24,11 @@ import javax.vecmath.Vector4f;
 
 import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.Color;
+import org.terasology.events.messaging.SendChatMessage;
 import org.terasology.game.CoreRegistry;
 import org.terasology.input.binds.ConsoleButton;
 import org.terasology.input.events.KeyEvent;
+import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.MessageManager;
 import org.terasology.logic.manager.CommandManager;
 import org.terasology.logic.manager.MessageManager.MessageSubscription;
@@ -83,8 +85,7 @@ public class UIScreenChat extends UIWindow {
     
     public UIScreenChat() {
         commandManager = CoreRegistry.get(CommandManager.class);
-        MessageManager.getInstance().subscribe(chatSubscription);
-        
+
         setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
         setCloseBinds(new String[] {"engine:console"});
         setId("chat");
@@ -115,8 +116,7 @@ public class UIScreenChat extends UIWindow {
                     if (event.getKey() == Keyboard.KEY_RETURN) {
                         String message = inputBox.getText().trim();
                         inputBox.deleteText();
-    
-                        MessageManager.getInstance().addMessage(message);
+
                         addHistory(message);
     
                         // check if message is a command
@@ -125,7 +125,7 @@ public class UIScreenChat extends UIWindow {
                             message = message.substring(1);
                             commandManager.execute(message);
                         } else {
-                            CoreRegistry.get(NetworkSystem.class).sendChatMessage(message);
+                            CoreRegistry.get(LocalPlayer.class).getClientEntity().send(new SendChatMessage(message));
                         }
                     }
                     //message history previous
@@ -195,6 +195,11 @@ public class UIScreenChat extends UIWindow {
         
         addDisplayElement(inputBox);
         addDisplayElement(messageList);
+
+        for (Message message : MessageManager.getInstance()) {
+            addHistory(message.getMessage());
+        }
+        MessageManager.getInstance().subscribe(chatSubscription);
         
         startMessage();
     }

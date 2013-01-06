@@ -39,7 +39,7 @@ public class InitialiseRemoteWorld implements LoadProcess {
         CoreRegistry.put(WorldProvider.class, worldRenderer.getWorldProvider());
 
         // TODO: These shouldn't be done here, nor so strongly tied to the world renderer
-        CoreRegistry.put(LocalPlayer.class, new LocalPlayer(EntityRef.NULL));
+        CoreRegistry.put(LocalPlayer.class, new LocalPlayer());
         CoreRegistry.put(Camera.class, worldRenderer.getActiveCamera());
         CoreRegistry.put(BulletPhysics.class, worldRenderer.getBulletRenderer());
 

@@ -56,11 +56,13 @@ public class WorldSerializerImpl implements WorldSerializer {
     }
 
     @Override
-    public EntityData.World serializeWorld() {
+    public EntityData.World serializeWorld(boolean verbose) {
         final EntityData.World.Builder world = EntityData.World.newBuilder();
         EntityRefTypeHandler.setEntityManagerMode(entityManager);
 
-        writeComponentTypeTable(world);
+        if (!verbose) {
+            writeComponentTypeTable(world);
+        }
 
         for (Prefab prefab : prefabManager.listPrefabs()) {
             world.addPrefab(prefabSerializer.serialize(prefab));
@@ -68,7 +70,7 @@ public class WorldSerializerImpl implements WorldSerializer {
 
         TIntList nonPersistedIds = new TIntArrayList();
         for (EntityRef entity : entityManager.iteratorEntities()) {
-            if (entity.isPersisted()) {
+            if (verbose || entity.isPersisted()) {
                 world.addEntity(entitySerializer.serialize(entity));
             } else {
                 nonPersistedIds.add(entity.getId());

@@ -4,5 +4,8 @@
         "name" : "Connecting client",
         "description" : "A player"
     },
-    "Client" : {}
+    "Client" : {},
+    "Network" : {
+        "replicateMode" : "OWNER"
+    }
 }

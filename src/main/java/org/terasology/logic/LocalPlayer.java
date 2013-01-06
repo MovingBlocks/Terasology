@@ -24,6 +24,7 @@ import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.PlayerComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.network.ClientComponent;
 import org.terasology.physics.character.CharacterMovementComponent;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
@@ -34,13 +35,22 @@ import com.bulletphysics.linearmath.QuaternionUtil;
 public class LocalPlayer {
 
     private EntityRef entity = EntityRef.NULL;
+    private EntityRef clientEntity = EntityRef.NULL;
 
-    public LocalPlayer(EntityRef playerEntity) {
-        this.entity = playerEntity;
+    public LocalPlayer() {
     }
 
     public void setEntity(EntityRef newEntity) {
         this.entity = (newEntity == null) ? EntityRef.NULL : newEntity;
+    }
+
+    public void setClientEntity(EntityRef entity) {
+        this.clientEntity = entity;
+        ClientComponent clientComp = entity.getComponent(ClientComponent.class);
+        if (clientComp != null) {
+            clientComp.local = true;
+            entity.saveComponent(clientComp);
+        }
     }
 
     public boolean isValid() {
@@ -100,5 +110,9 @@ public class LocalPlayer {
 
     public String toString() {
         return String.format("player (x: %.2f, y: %.2f, z: %.2f | x: %.2f, y: %.2f, z: %.2f)", getPosition().x, getPosition().y, getPosition().z, getViewDirection().x, getViewDirection().y, getViewDirection().z);
+    }
+
+    public EntityRef getClientEntity() {
+        return clientEntity;
     }
 }

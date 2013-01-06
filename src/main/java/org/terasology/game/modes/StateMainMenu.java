@@ -85,7 +85,7 @@ public class StateMainMenu implements GameState {
         CoreRegistry.put(LocalPlayerComponent.class, localPlayerComp);
         entityManager.create(localPlayerComp);
         
-        CoreRegistry.put(LocalPlayer.class, new LocalPlayer(EntityRef.NULL));
+        CoreRegistry.put(LocalPlayer.class, new LocalPlayer());
 
         Iterator<EntityRef> iterator = entityManager.iteratorEntities(LocalPlayerComponent.class).iterator();
         if (iterator.hasNext()) {

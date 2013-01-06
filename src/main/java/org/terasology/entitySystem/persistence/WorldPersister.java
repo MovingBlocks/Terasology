@@ -41,7 +41,7 @@ import com.google.protobuf.TextFormat;
 public class WorldPersister {
 
     public enum SaveFormat {
-        Binary {
+        Binary (false) {
             @Override
             void save(OutputStream out, EntityData.World world) throws IOException {
                 world.writeTo(out);
@@ -53,7 +53,7 @@ public class WorldPersister {
                 return EntityData.World.parseFrom(in);
             }
         },
-        Text {
+        Text (true) {
             @Override
             void save(OutputStream out, EntityData.World world) throws IOException {
                 BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(out));
@@ -69,7 +69,7 @@ public class WorldPersister {
                 return builder.build();
             }
         },
-        JSON {
+        JSON (true) {
             @Override
             void save(OutputStream out, EntityData.World world) throws IOException {
                 BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(out));
@@ -84,9 +84,19 @@ public class WorldPersister {
             }
         };
 
+        private boolean verbose = false;
+
+        private SaveFormat(boolean verbose) {
+            this.verbose = verbose;
+        }
+
         abstract void save(OutputStream out, EntityData.World world) throws IOException;
 
         abstract EntityData.World load(InputStream in) throws IOException;
+
+        public boolean isVerbose() {
+            return verbose;
+        }
     }
 
     private static final Logger logger = LoggerFactory.getLogger(WorldPersister.class);
@@ -99,7 +109,7 @@ public class WorldPersister {
     }
 
     public void save(File file, SaveFormat format) throws IOException {
-        final EntityData.World world = persisterHelper.serializeWorld();
+        final EntityData.World world = persisterHelper.serializeWorld(format.isVerbose());
 
         File parentFile = file.getParentFile();
         if (parentFile != null && !parentFile.exists()) {

@@ -21,6 +21,7 @@
 /mods/*/build
 /mods/*/.*
 *~
+entityDump.txt
 
 # Ignore error logs 
 *.log

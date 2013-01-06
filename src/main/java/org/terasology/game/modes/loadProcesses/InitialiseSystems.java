@@ -16,9 +16,13 @@
 
 package org.terasology.game.modes.loadProcesses;
 
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.PersistableEntityManager;
+import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.modes.LoadProcess;
+import org.terasology.network.NetworkSystem;
 
 /**
  * @author Immortius
@@ -31,6 +35,7 @@ public class InitialiseSystems implements LoadProcess {
 
     @Override
     public boolean step() {
+        CoreRegistry.get(NetworkSystem.class).connectToEntitySystem((PersistableEntityManager)CoreRegistry.get(EntityManager.class), CoreRegistry.get(EntitySystemLibrary.class));
         CoreRegistry.get(ComponentSystemManager.class).initialise();
         return true;
     }

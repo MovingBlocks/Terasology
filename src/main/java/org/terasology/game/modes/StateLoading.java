@@ -40,6 +40,8 @@ import org.terasology.game.modes.loadProcesses.RegisterInputSystem;
 import org.terasology.game.modes.loadProcesses.RegisterMods;
 import org.terasology.game.modes.loadProcesses.RegisterSystems;
 import org.terasology.game.modes.loadProcesses.RespawnPlayer;
+import org.terasology.game.modes.loadProcesses.SetupLocalPlayer;
+import org.terasology.game.modes.loadProcesses.SetupRemotePlayer;
 import org.terasology.game.modes.loadProcesses.StartServer;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.network.NetworkMode;
@@ -127,6 +129,7 @@ public class StateLoading implements GameState {
         loadProcesses.add(new CreateWorldEntity());
         loadProcesses.add(new PrepareLocalWorld());
         loadProcesses.add(new PrepareWorld());
+        loadProcesses.add(new SetupRemotePlayer());
         loadProcesses.add(new RespawnPlayer());
     }
 
@@ -149,6 +152,7 @@ public class StateLoading implements GameState {
         }
         loadProcesses.add(new PrepareLocalWorld());
         loadProcesses.add(new PrepareWorld());
+        loadProcesses.add(new SetupLocalPlayer());
         loadProcesses.add(new RespawnPlayer());
     }
 

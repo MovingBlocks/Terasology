@@ -220,6 +220,7 @@ public class PojoEventSystem implements EventSystem {
     private void networkReplicate(EntityRef entity, Event event) {
         EventMetadata metadata = eventLibrary.getMetadata(event);
         if (metadata != null && metadata.isNetworkEvent()) {
+            logger.info("Replicating event: {}", event);
             switch (metadata.getNetworkEventType()) {
                 case BROADCAST:
                     if (networkSystem.getMode() == NetworkMode.SERVER) {

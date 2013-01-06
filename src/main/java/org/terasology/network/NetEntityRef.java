@@ -102,4 +102,9 @@ public class NetEntityRef extends EntityRef {
     public int hashCode() {
         return getActualEntityRef().hashCode();
     }
+
+    @Override
+    public String toString() {
+        return "NetEntityRef(netId = " + networkId + ")" + getActualEntityRef().toString();
+    }
 }

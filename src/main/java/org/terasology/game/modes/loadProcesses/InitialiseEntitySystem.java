@@ -37,7 +37,6 @@ public class InitialiseEntitySystem implements LoadProcess {
     public boolean step() {
         ModManager modManager = CoreRegistry.get(ModManager.class);
         PersistableEntityManager entityManager = new EntitySystemBuilder().build(modManager);
-        CoreRegistry.get(NetworkSystem.class).connectToEntitySystem(entityManager, CoreRegistry.get(EntitySystemLibrary.class));
         return true;
     }
 

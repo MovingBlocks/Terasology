@@ -27,7 +27,7 @@ public interface WorldSerializer {
     /**
      * @return The serialized form of the current EntityManager's and PrefabManager's data
      */
-    EntityData.World serializeWorld();
+    EntityData.World serializeWorld(boolean verbose);
 
     /**
      * Deserializes a world message, applying it to the current EntityManager

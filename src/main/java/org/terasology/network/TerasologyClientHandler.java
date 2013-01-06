@@ -26,13 +26,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.manager.MessageManager;
-import org.terasology.logic.mod.Mod;
-import org.terasology.logic.mod.ModManager;
 import org.terasology.math.Vector3i;
 import org.terasology.model.structures.TeraArray;
 import org.terasology.model.structures.TeraSmartArray;
-import org.terasology.protobuf.NetData;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
@@ -42,7 +38,6 @@ import static org.terasology.protobuf.NetData.BlockChangeMessage;
 import static org.terasology.protobuf.NetData.ChunkMessage;
 import static org.terasology.protobuf.NetData.ClientConnectMessage;
 import static org.terasology.protobuf.NetData.InvalidateChunkMessage;
-import static org.terasology.protobuf.NetData.ModuleInfo;
 import static org.terasology.protobuf.NetData.NetMessage;
 import static org.terasology.protobuf.NetData.ServerInfoMessage;
 
@@ -54,8 +49,8 @@ public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
     private static final Logger logger = LoggerFactory.getLogger(TerasologyClientHandler.class);
 
     private NetworkSystem networkSystem;
+    private Server server;
     private boolean awaitingServerInfo = true;
-
 
     public TerasologyClientHandler(NetworkSystem networkSystem) {
         this.networkSystem = networkSystem;
@@ -63,6 +58,8 @@ public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
 
     @Override
     public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+        this.server = new Server(networkSystem, e.getChannel());
+        networkSystem.setServer(server);
         e.getChannel().write(NetMessage.newBuilder()
                 .setType(NetMessage.Type.CLIENT_CONNECT)
                 .setClientConnect(ClientConnectMessage.newBuilder()
@@ -77,9 +74,6 @@ public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
             case SERVER_INFO:
                 receivedServerInfo(message.getServerInfo());
                 break;
-            case CONSOLE:
-                MessageManager.getInstance().addMessage(message.getConsole().getMessage());
-                break;
             case CHUNK:
                 receivedChunk(message.getChunkInfo());
                 break;
@@ -92,8 +86,10 @@ public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
             case CREATE_ENTITY:
             case UPDATE_ENTITY:
             case REMOVE_ENTITY:
-            case EVENT:
                 networkSystem.queueMessage(message);
+                break;
+            case EVENT:
+                server.queueEvent(message.getEvent());
                 break;
         }
         logger.debug("Received message: {}", message.getType());

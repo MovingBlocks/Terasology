@@ -1,0 +1,11 @@
+{
+    // TODO: This should be persisted, but the Network component is removed while the client is disconnected
+    "persisted" : false,
+    "DisplayInformation" : {
+        "name" : "Unknown",
+        "description" : "A player"
+    },
+    "Network" : {
+        "replicateMode" : "ALWAYS"
+    }
+}

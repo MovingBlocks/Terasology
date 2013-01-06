@@ -47,7 +47,6 @@ import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.CommandManager;
 import org.terasology.logic.manager.CommandManager.CommandInfo;
 import org.terasology.logic.manager.MessageManager;
-import org.terasology.logic.manager.MessageManager.EMessageScope;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.cameras.Camera;
@@ -89,7 +88,6 @@ public class Commands implements CommandProvider {
      * In order to resolve the {@code BlockUri}s, every package is searched for the given uri pattern.
      *
      * @param uri the uri pattern to match
-     *
      * @return a list of matching block uris
      */
     private List<BlockUri> resolveBlockUri(String uri) {
@@ -117,7 +115,6 @@ public class Commands implements CommandProvider {
      * returned.
      *
      * @param uri the uri pattern to match
-     *
      * @return a list of matching asset uris
      */
     private List<AssetUri> resolveShapeUri(String uri) {
@@ -177,7 +174,7 @@ public class Commands implements CommandProvider {
             stringBuilder.append(StringConstants.NEW_LINE);
         }
 
-        MessageManager.getInstance().addMessage(stringBuilder.toString(), EMessageScope.PRIVATE);
+        MessageManager.getInstance().addMessage(stringBuilder.toString());
     }
 
     @Command(shortDescription = "Lists all blocks by category")
@@ -195,7 +192,7 @@ public class Commands implements CommandProvider {
             }
             stringBuilder.append(StringConstants.NEW_LINE);
         }
-        MessageManager.getInstance().addMessage(stringBuilder.toString(), EMessageScope.PRIVATE);
+        MessageManager.getInstance().addMessage(stringBuilder.toString());
     }
 
     @Command(shortDescription = "Lists all available items")
@@ -211,7 +208,7 @@ public class Commands implements CommandProvider {
             items.append(prefab.getName());
         }
 
-        MessageManager.getInstance().addMessage(items.toString(), EMessageScope.PRIVATE);
+        MessageManager.getInstance().addMessage(items.toString());
     }
 
     @Command(shortDescription = "Lists all available shapes")
@@ -227,7 +224,7 @@ public class Commands implements CommandProvider {
             stringBuilder.append(StringConstants.NEW_LINE);
         }
 
-        MessageManager.getInstance().addMessage(stringBuilder.toString(), EMessageScope.PRIVATE);
+        MessageManager.getInstance().addMessage(stringBuilder.toString());
     }
 
     @Command(shortDescription = "Lists available free shape blocks", helpText = "Lists all the available free shape blocks. These blocks can be created with any shape.")
@@ -243,7 +240,7 @@ public class Commands implements CommandProvider {
             stringBuilder.append(StringConstants.NEW_LINE);
         }
 
-        MessageManager.getInstance().addMessage(stringBuilder.toString(), EMessageScope.PRIVATE);
+        MessageManager.getInstance().addMessage(stringBuilder.toString());
     }
 
     @Command(shortDescription = "Adds a block to your inventory", helpText = "Puts 16 of the given block into your inventory")
@@ -263,12 +260,12 @@ public class Commands implements CommandProvider {
             BlockFamily blockFamily = BlockManager.getInstance().getBlockFamily(matchingUris.get(0));
             giveBlock(blockFamily, quantity);
         } else if (matchingUris.isEmpty()) {
-            MessageManager.getInstance().addMessage("No block found for '" + uri + "'", EMessageScope.PRIVATE);
+            MessageManager.getInstance().addMessage("No block found for '" + uri + "'");
         } else {
             StringBuilder builder = new StringBuilder();
             builder.append("Non-unique block name, possible matches: ");
             Joiner.on(", ").appendTo(builder, matchingUris);
-            MessageManager.getInstance().addMessage(builder.toString(), EMessageScope.PRIVATE);
+            MessageManager.getInstance().addMessage(builder.toString());
         }
     }
 
@@ -276,20 +273,20 @@ public class Commands implements CommandProvider {
     public void giveBlock(@CommandParam(name = "blockName") String uri, @CommandParam(name = "shapeName") String shapeUri, @CommandParam(name = "quantity") int quantity) {
         List<BlockUri> resolvedBlockUris = resolveBlockUri(uri);
         if (resolvedBlockUris.isEmpty()) {
-            MessageManager.getInstance().addMessage("No block found for '" + uri + "'", EMessageScope.PRIVATE);
+            MessageManager.getInstance().addMessage("No block found for '" + uri + "'");
 
             return;
         } else if (resolvedBlockUris.size() > 1) {
             StringBuilder builder = new StringBuilder();
             builder.append("Non-unique block name, possible matches: ");
             Joiner.on(", ").appendTo(builder, resolvedBlockUris);
-            MessageManager.getInstance().addMessage(builder.toString(), EMessageScope.PRIVATE);
+            MessageManager.getInstance().addMessage(builder.toString());
 
             return;
         }
         List<AssetUri> resolvedShapeUris = resolveShapeUri(shapeUri);
         if (resolvedShapeUris.isEmpty()) {
-            MessageManager.getInstance().addMessage("No shape found for '" + shapeUri + "'", EMessageScope.PRIVATE);
+            MessageManager.getInstance().addMessage("No shape found for '" + shapeUri + "'");
 
             return;
         } else if (resolvedShapeUris.size() > 1) {
@@ -313,7 +310,7 @@ public class Commands implements CommandProvider {
             return;
         }
 
-        MessageManager.getInstance().addMessage("Invalid block or shape", EMessageScope.PRIVATE);
+        MessageManager.getInstance().addMessage("Invalid block or shape");
     }
 
     /**
@@ -324,7 +321,7 @@ public class Commands implements CommandProvider {
      */
     private void giveBlock(BlockFamily blockFamily, int quantity) {
         if (quantity < 1) {
-            MessageManager.getInstance().addMessage("Here, have these zero (0) items just like you wanted", EMessageScope.PRIVATE);
+            MessageManager.getInstance().addMessage("Here, have these zero (0) items just like you wanted");
 
             return;
         }
@@ -332,7 +329,7 @@ public class Commands implements CommandProvider {
         BlockItemFactory factory = new BlockItemFactory(CoreRegistry.get(EntityManager.class));
         EntityRef item = factory.newInstance(blockFamily, quantity);
         if (!item.exists()) {
-            MessageManager.getInstance().addMessage("Unknown block or item", EMessageScope.PRIVATE);
+            MessageManager.getInstance().addMessage("Unknown block or item");
 
             return;
         }
@@ -343,7 +340,7 @@ public class Commands implements CommandProvider {
             item.destroy();
         }
 
-        MessageManager.getInstance().addMessage("You received " + quantity + " blocks of " + blockFamily.getDisplayName(), EMessageScope.PRIVATE);
+        MessageManager.getInstance().addMessage("You received " + quantity + " blocks of " + blockFamily.getDisplayName());
     }
 
     @Command(shortDescription = "Adds an item to your inventory")
@@ -358,7 +355,7 @@ public class Commands implements CommandProvider {
             if (itemComp != null && !itemComp.container.exists()) {
                 item.destroy();
             }
-            MessageManager.getInstance().addMessage("You received an item of " + prefab.getName(), EMessageScope.PRIVATE);
+            MessageManager.getInstance().addMessage("You received an item of " + prefab.getName());
         } else {
             giveBlock(itemPrefabName);
         }
@@ -393,13 +390,13 @@ public class Commands implements CommandProvider {
 
     @Command(shortDescription = "Reduce the player's health to zero")
     public void kill() {
-    	LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
-    	localPlayer.getEntity().send(new NoHealthEvent(localPlayer.getEntity(), health.maxHealth));
+        localPlayer.getEntity().send(new NoHealthEvent(localPlayer.getEntity(), health.maxHealth));
     }
-    
+
     @Command(shortDescription = "Reduce the player's health by an amount")
-    public void damage(@CommandParam(name="amount") int amount) {
+    public void damage(@CommandParam(name = "amount") int amount) {
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
         health.currentHealth -= amount;
@@ -415,7 +412,7 @@ public class Commands implements CommandProvider {
 
         localPlayer.getEntity().saveComponent(health);
     }
-    
+
     @Command(shortDescription = "Teleports you to a location")
     public void teleport(@CommandParam(name = "x") float x, @CommandParam(name = "y") float y, @CommandParam(name = "z") float z) {
         LocalPlayer player = CoreRegistry.get(LocalPlayer.class);
@@ -547,14 +544,14 @@ public class Commands implements CommandProvider {
 
             //return;
         } else if (matchingUris.isEmpty()) {
-            MessageManager.getInstance().addMessage("No block found for '" + blockName + "'", EMessageScope.PRIVATE);
+            MessageManager.getInstance().addMessage("No block found for '" + blockName + "'");
 
             return;
         } else {
             StringBuilder builder = new StringBuilder();
             builder.append("Non-unique block name, possible matches: ");
             Joiner.on(", ").appendTo(builder, matchingUris);
-            MessageManager.getInstance().addMessage(builder.toString(), EMessageScope.PRIVATE);
+            MessageManager.getInstance().addMessage(builder.toString());
 
             return;
         }
@@ -606,14 +603,14 @@ public class Commands implements CommandProvider {
             }
             msg.append(cmd.getUsageMessage()).append(" - ").append(cmd.getShortDescription());
         }
-        MessageManager.getInstance().addMessage(msg.toString(), EMessageScope.PRIVATE);
+        MessageManager.getInstance().addMessage(msg.toString());
     }
 
     @Command(shortDescription = "Detailed help on a command")
     public void help(@CommandParam(name = "command") String command) {
         Collection<CommandInfo> cmdCollection = CoreRegistry.get(CommandManager.class).getCommand(command);
         if (cmdCollection.isEmpty()) {
-            MessageManager.getInstance().addMessage("No help available for command '" + command + "'. Unknown command.", EMessageScope.PRIVATE);
+            MessageManager.getInstance().addMessage("No help available for command '" + command + "'. Unknown command.");
         } else {
             StringBuilder msg = new StringBuilder();
 
@@ -637,7 +634,7 @@ public class Commands implements CommandProvider {
                 }
                 msg.append(StringConstants.NEW_LINE);
             }
-            MessageManager.getInstance().addMessage(msg.toString(), EMessageScope.PRIVATE);
+            MessageManager.getInstance().addMessage(msg.toString());
         }
     }
 

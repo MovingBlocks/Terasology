@@ -290,4 +290,14 @@ public class PojoEntityManagerTest {
         assertFalse(test1.getComponent(StringComponent.class) == (test2.getComponent(StringComponent.class)));
     }
 
+    @Test
+    public void prefabPersistedRetainedCorrectly() {
+        PrefabManager manager = new PojoPrefabManager(entityManager.getComponentLibrary());
+        Prefab prefab = manager.createPrefab("myprefab");
+        prefab.setPersisted(false);
+        prefab.setComponent(new StringComponent("Test"));
+        EntityRef entity1 = entityManager.create(prefab);
+        assertFalse(entity1.isPersisted());
+    }
+
 }

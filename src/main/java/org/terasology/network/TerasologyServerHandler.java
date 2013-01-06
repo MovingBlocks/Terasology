@@ -27,15 +27,17 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.MessageManager;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
-import static org.terasology.protobuf.NetData.*;
-
 import org.terasology.protobuf.NetData;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.management.BlockManager;
-import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.chunks.localChunkProvider.LocalChunkProvider;
 
 import java.util.Map;
+
+import static org.terasology.protobuf.NetData.BlockMapping;
+import static org.terasology.protobuf.NetData.ClientConnectMessage;
+import static org.terasology.protobuf.NetData.ModuleInfo;
+import static org.terasology.protobuf.NetData.NetMessage;
+import static org.terasology.protobuf.NetData.ServerInfoMessage;
 
 /**
  * @author Immortius
@@ -70,42 +72,26 @@ public class TerasologyServerHandler extends SimpleChannelUpstreamHandler {
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
         NetMessage message = (NetMessage) e.getMessage();
-        switch(message.getType()) {
+        switch (message.getType()) {
             case CLIENT_CONNECT:
                 receivedConnect(message.getClientConnect());
                 break;
             case EVENT:
-                receivedEvent(message);
-            case CONSOLE:
-                networkSystem.sendChatMessage(message.getConsole().getMessage());
-                MessageManager.getInstance().addMessage(message.getConsole().getMessage(), MessageManager.EMessageScope.PRIVATE);
+                receivedEvent(message.getEvent());
                 break;
         }
         logger.debug("Received message: {}", message.getType());
     }
 
-    private void receivedEvent(NetMessage message) {
-        // TODO: Ensure event allowed from this client?
-        networkSystem.queueMessage(message);
+    private void receivedEvent(NetData.EventMessage message) {
+        client.queueEvent(message);
     }
 
     private void receivedConnect(ClientConnectMessage message) {
-        MessageManager.getInstance().addMessage("Client connected: " + message.getName());
-        client.setConnected();
-        client.setName(message.getName());
-        ServerInfoMessage.Builder serverInfoMessageBuilder = ServerInfoMessage.newBuilder();
-        WorldProvider world = CoreRegistry.get(WorldProvider.class);
-        serverInfoMessageBuilder.setTime(world.getTime());
-        serverInfoMessageBuilder.setWorldName(world.getTitle());
-        for (Mod mod : CoreRegistry.get(ModManager.class).getActiveMods()) {
-            serverInfoMessageBuilder.addModule(ModuleInfo.newBuilder().setModuleId(mod.getModInfo().getId()).build());
+        if (client.isAwaitingConnectMessage()) {
+            client.setName(message.getName());
+            networkSystem.addClient(client);
         }
-        for (Map.Entry<String, Byte> blockMapping : BlockManager.getInstance().getBlockIdMap().entrySet()) {
-            serverInfoMessageBuilder.addBlockMapping(BlockMapping.newBuilder().setBlockId(blockMapping.getValue()).setBlockName(blockMapping.getKey()));
-        }
-        client.send(NetMessage.newBuilder().setType(NetMessage.Type.SERVER_INFO).setServerInfo(serverInfoMessageBuilder.build()).build());
-
-        networkSystem.addClient(client);
     }
 
     @Override

@@ -209,7 +209,7 @@ public class GUIManager implements EventHandlerSystem {
                 addWindow(window);
             }
             
-            logger.debug("Open and focus window by reference with ID \"{}\"");
+            logger.debug("Open and focus window by reference with ID \"{}\"", window.getId());
             
             renderer.setWindowFocus(window);
         }
