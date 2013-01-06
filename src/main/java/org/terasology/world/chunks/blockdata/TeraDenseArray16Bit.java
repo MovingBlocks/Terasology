@@ -1,10 +1,10 @@
 package org.terasology.world.chunks.blockdata;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.nio.ByteBuffer;
+import java.nio.ShortBuffer;
 
 import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
 
@@ -26,45 +26,61 @@ public class TeraDenseArray16Bit extends TeraDenseArray {
         this.data = new short[getSizeXYZ()];
     }
 
-    public static class SerializationHandler extends TeraArray.SerializationHandler<TeraDenseArray16Bit> {
+    public static class SerializationHandler extends TeraArray.BasicSerializationHandler<TeraDenseArray16Bit> {
+
         @Override
-        public Class<TeraDenseArray16Bit> getArrayClass() {
-            return TeraDenseArray16Bit.class;
+        public boolean canHandle(Class<?> clazz) {
+            return TeraDenseArray16Bit.class.equals(clazz);
         }
+
         @Override
-        protected void internalSerialize(TeraDenseArray16Bit array, DataOutputStream out) throws IOException {
+        protected int internalComputeMinimumBufferSize(TeraDenseArray16Bit array) {
+            final short[] data = array.data;
+            if (data == null)
+                return 4;
+            else 
+                return 4 + data.length;
+        }
+
+        @Override
+        protected void internalSerialize(TeraDenseArray16Bit array, ByteBuffer buffer) {
             final short[] data = array.data;
             if (data == null) 
-                out.writeInt(0);
+                buffer.putInt(0);
             else {
-                out.writeInt(data.length);
-                for (short s : data) {
-                    out.writeShort(s);
-                }
+                buffer.putInt(data.length);
+                final ShortBuffer sbuffer = buffer.asShortBuffer();
+                sbuffer.put(data);
+                buffer.position(buffer.position() + data.length * 2);
             }
         }
+
         @Override
-        protected void internalDeserialize(TeraDenseArray16Bit array, DataInputStream in) throws IOException {
-            final short[] data = array.data;
-            final int length = in.readInt();
-            Preconditions.checkNotNull(data);
-            if (data.length != length)
-                throw new IOException("The size of the array (" + data.length + ") does not match the size of the stored data (" + length + ")");
-            for (int i = 0; i < length; i++) {
-                data[i] = in.readShort();
+        protected TeraDenseArray16Bit internalDeserialize(int sizeX, int sizeY, int sizeZ, ByteBuffer buffer) {
+            final int length = buffer.getInt();
+            if (length > 0) {
+                final short[] data = new short[length];
+                final ShortBuffer sbuffer = buffer.asShortBuffer();
+                sbuffer.get(data, 0, length);
+                buffer.position(buffer.position() + length * 2);
+                return new TeraDenseArray16Bit(sizeX, sizeY, sizeZ, data);
             }
+            return new TeraDenseArray16Bit(sizeX, sizeY, sizeZ);
         }
     }
     
-    public static class Factory implements TeraArrayFactory<TeraDenseArray16Bit> {
+    public static class Factory implements TeraArray.Factory<TeraDenseArray16Bit> {
+        
         @Override
         public Class<TeraDenseArray16Bit> getArrayClass() {
             return TeraDenseArray16Bit.class;
         }
+        
         @Override
         public TeraDenseArray16Bit create() {
             return new TeraDenseArray16Bit();
         }
+        
         @Override
         public TeraDenseArray16Bit create(int sizeX, int sizeY, int sizeZ) {
             return new TeraDenseArray16Bit(sizeX, sizeY, sizeZ);
