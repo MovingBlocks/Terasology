@@ -1,0 +1,32 @@
+/**
+ * Protobuf messages for TeraArrays.
+ *
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
+ */
+
+option java_package = "org.terasology.protobuf";
+option java_outer_classname = "ChunksProtobuf";
+option optimize_for = SPEED;
+
+enum Type {
+    DenseArray4Bit   = 1;
+    DenseArray8Bit   = 2;
+    DenseArray16Bit  = 3;
+    SparseArray4Bit  = 4;
+    SparseArray8Bit  = 5;
+    SparseArray16Bit = 6;
+}
+
+message TeraArray {
+    required Type  type = 1;
+    optional bytes data = 2;
+}
+
+message Chunk {
+    optional TeraArray block    = 1;
+    optional TeraArray sunlight = 2;
+    optional TeraArray light    = 3;
+    optional TeraArray liquid   = 4;
+    
+    extensions 100 to 1000;
+}

@@ -1,10 +1,9 @@
 package org.terasology.world.chunks.blockdata;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.nio.ByteBuffer;
 
 import com.google.common.base.Preconditions;
 
@@ -30,66 +29,74 @@ public abstract class TeraSparseArrayByte extends TeraSparseArray {
     @Override
     protected void initialize() {}
     
-    protected static abstract class SerializationHandler<T extends TeraSparseArrayByte> extends TeraArray.SerializationHandler<T> {
+    protected static abstract class SerializationHandler<T extends TeraSparseArrayByte> extends TeraArray.BasicSerializationHandler<T> {
+
+        protected abstract T createArray(int sizeX, int sizeY, int sizeZ);
+
         @Override
-        protected void internalSerialize(T array, DataOutputStream out) throws IOException {
-            final byte[][] inflated = array.inflated;
-            if (inflated == null) {
-                out.writeBoolean(false);
-                out.writeByte(array.fill);
-            } else {
-                final byte[] deflated = array.deflated;
-                final int sizeY = array.getSizeY();
-                final int rowlen = array.rowSize();
-                out.writeBoolean(true);
-                int rows = 0;
-                for (final byte[] row : inflated) {if (row != null) rows++;}
-                out.writeInt(rows);
-                for (int index = 0; index < sizeY; index++) {
-                    final byte[] row = inflated[index];
-                    if (row == null) {
-                        continue;
-                    }
-                    Preconditions.checkState(row.length == rowlen, "Unexpected row length in sparse array of type " + array.getClass().getName() + ", should be " + rowlen + " but is " + row.length);
-                    out.writeInt(index);
-                    for (final byte b : row) {
-                        out.writeByte(b);
-                    }
-                }
-                for (int index = 0; index < sizeY; index++) {
-                    if (inflated[index] == null)
-                        out.writeByte(deflated[index]);
+        protected int internalComputeMinimumBufferSize(T array) {
+            final byte[][] inf = array.inflated;
+            if (inf == null) 
+                return 2;
+            else {
+                final int sizeY = array.getSizeY(), rowSize = array.rowSize();
+                int result = 1;
+                for (int y = 0; y < sizeY; y++)
+                    if (inf[y] == null) 
+                        result += 2;
                     else 
-                        out.writeByte(0);
+                        result += 1 + rowSize;
+                return result;
+            }
+        }
+
+        @Override
+        protected void internalSerialize(T array, ByteBuffer buffer) {
+            final byte[][] inf = array.inflated;
+            if (inf == null) {
+                buffer.put((byte) 0);
+                buffer.put(array.fill);
+            } else {
+                buffer.put((byte) 1);
+                final int sizeY = array.getSizeY(), rowSize = array.rowSize();
+                final byte[] def = array.deflated;
+                for (int y = 0; y < sizeY; y++) {
+                    final byte[] row = inf[y];
+                    if (row == null) {
+                        buffer.put((byte) 0);
+                        buffer.put(def[y]);
+                    } else {
+                        buffer.put((byte) 1);
+                        buffer.put(row, 0, rowSize);
+                    }
                 }
             }
         }
+
         @Override
-        protected void internalDeserialize(T array, DataInputStream in) throws IOException {
-            Preconditions.checkState(array.inflated == null, "The internal array 'inflated' of type 'byte[][]' is expected to be null");
-            Preconditions.checkState(array.deflated == null, "The internal array 'deflated' of type 'byte[]' is expected to be null");
-            if (in.readBoolean()) {
-                final int sizeY = array.getSizeY();
-                final int rowlen = array.rowSize();
-                final byte[][] inflated = array.inflated = new byte[sizeY][];
-                final int rows = in.readInt();
-                for (int i = 0; i < rows; i++) {
-                    final int index = in.readInt();
-                    final byte[] row = inflated[index] = new byte[rowlen];
-                    for (int j = 0; j < rowlen; j++) {
-                        row[j] = in.readByte();
-                    }
-                }
-                final byte[] deflated = array.deflated = new byte[sizeY];
-                for (int i = 0; i < sizeY; i++) {
-                    deflated[i] = in.readByte();
-                }
-            } else {
-                array.fill = in.readByte();
+        protected T internalDeserialize(int sizeX, int sizeY, int sizeZ, ByteBuffer buffer) {
+            final byte hasData = buffer.get();
+            final T array = createArray(sizeX, sizeY, sizeZ);
+            if (hasData == 0) {
+                array.fill = buffer.get();
+                return array;
             }
+            final int rowSize = array.rowSize();
+            final byte[][] inf = array.inflated = new byte[sizeY][];
+            final byte[] def = array.deflated = new byte[sizeY];
+            for (int y = 0; y < sizeY; y++) {
+                final byte hasRow = buffer.get();
+                if (hasRow == 0)
+                    def[y] = buffer.get();
+                else {
+                    final byte[] row = inf[y] = new byte[rowSize];
+                    buffer.get(row, 0, rowSize);
+                }
+            }
+            return array;
         }
     }
-
+    
     protected TeraSparseArrayByte() {
         super();
     }

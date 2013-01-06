@@ -1,10 +1,9 @@
 package org.terasology.world.chunks.blockdata;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.nio.ByteBuffer;
 
 import com.google.common.base.Preconditions;
 
@@ -32,29 +31,39 @@ public abstract class TeraDenseArrayByte extends TeraDenseArray {
         this.data = new byte[dataSize()];
     }
     
-    protected static abstract class SerializationHandler<T extends TeraDenseArrayByte> extends TeraArray.SerializationHandler<T> {
+    protected static abstract class SerializationHandler<T extends TeraDenseArrayByte> extends TeraArray.BasicSerializationHandler<T> {
+        
+        protected abstract T createArray(int sizeX, int sizeY, int sizeZ, byte[] data);
+        
         @Override
-        protected void internalSerialize(T array, DataOutputStream out) throws IOException {
+        protected int internalComputeMinimumBufferSize(T array) {
             final byte[] data = array.data;
             if (data == null)
-                out.writeInt(0);
+                return 4;
+            else 
+                return 4 + data.length;
+        }
+        
+        @Override
+        protected void internalSerialize(T array, ByteBuffer buffer) {
+            final byte[] data = array.data;
+            if (data == null)
+                buffer.putInt(0);
             else {
-                out.writeInt(data.length);
-                for (byte b : data) {
-                    out.writeByte(b);
-                }
+                buffer.putInt(data.length);
+                buffer.put(data);
             }
         }
+        
         @Override
-        protected void internalDeserialize(T array, DataInputStream in) throws IOException {
-            final byte[] data = array.data;
-            final int length = in.readInt();
-            Preconditions.checkNotNull(data);
-            if (data.length != length)
-                throw new IOException("The size of the array (" + data.length + ") does not match the size of the stored data (" + length + ")");
-            for (int i = 0; i < length; i++) {
-                data[i] = in.readByte();
+        protected T internalDeserialize(int sizeX, int sizeY, int sizeZ, ByteBuffer buffer) {
+            final int length = buffer.getInt();
+            if (length > 0) {
+                final byte[] data = new byte[length];
+                buffer.get(data, 0, length);
+                return createArray(sizeX, sizeY, sizeZ, data);
             }
+            return createArray(sizeX, sizeY, sizeZ, null);
         }
     }
     
