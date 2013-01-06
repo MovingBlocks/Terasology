@@ -25,21 +25,33 @@ public final class TeraDenseArray4Bit extends TeraDenseArrayByte {
     }
 
     public static class SerializationHandler extends TeraDenseArrayByte.SerializationHandler<TeraDenseArray4Bit> {
+
         @Override
-        public Class<TeraDenseArray4Bit> getArrayClass() {
-            return TeraDenseArray4Bit.class;
+        public boolean canHandle(Class<?> clazz) {
+            return TeraDenseArray4Bit.class.equals(clazz);
+        }
+
+        @Override
+        protected TeraDenseArray4Bit createArray(int sizeX, int sizeY, int sizeZ, byte[] data) {
+            if (data == null) 
+                return new TeraDenseArray4Bit(sizeX, sizeY, sizeZ);
+            else
+                return new TeraDenseArray4Bit(sizeX, sizeY, sizeZ, data);
         }
     }
     
-    public static class Factory implements TeraArrayFactory<TeraDenseArray4Bit> {
+    public static class Factory implements TeraArray.Factory<TeraDenseArray4Bit> {
+        
         @Override
         public Class<TeraDenseArray4Bit> getArrayClass() {
             return TeraDenseArray4Bit.class;
         }
+        
         @Override
         public TeraDenseArray4Bit create() {
             return new TeraDenseArray4Bit();
         }
+        
         @Override
         public TeraDenseArray4Bit create(int sizeX, int sizeY, int sizeZ) {
             return new TeraDenseArray4Bit(sizeX, sizeY, sizeZ);

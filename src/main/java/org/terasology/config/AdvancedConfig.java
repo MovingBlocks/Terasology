@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.world.chunks.blockdata.TeraArrayFactory;
+import org.terasology.world.chunks.blockdata.TeraArray;
 import org.terasology.world.chunks.blockdata.TeraDenseArray16Bit;
 import org.terasology.world.chunks.blockdata.TeraDenseArray4Bit;
 import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
@@ -34,7 +34,7 @@ import com.google.gson.JsonSerializer;
 public final class AdvancedConfig {
     
     private static final Logger logger = LoggerFactory.getLogger(AdvancedConfig.class);
-    private static final Map<String, TeraArrayFactory> teraArrayRegistry; 
+    private static final Map<String, TeraArray.Factory> teraArrayRegistry; 
 
     private String blocksFactory, sunlightFactory, lightFactory, liquidFactory;
     private boolean chunkDeflationEnabled, chunkDeflationLoggingEnabled;
@@ -45,7 +45,7 @@ public final class AdvancedConfig {
         return blocksFactory;
     }
     
-    public TeraArrayFactory getBlocksFactory() {
+    public TeraArray.Factory getBlocksFactory() {
         return requireTeraArrayFactory(blocksFactory);
     }
     
@@ -68,7 +68,7 @@ public final class AdvancedConfig {
         return sunlightFactory;
     }
     
-    public TeraArrayFactory getSunlightFactory() {
+    public TeraArray.Factory getSunlightFactory() {
         return requireTeraArrayFactory(sunlightFactory);
     }
     
@@ -91,7 +91,7 @@ public final class AdvancedConfig {
         return lightFactory;
     }
     
-    public TeraArrayFactory getLightFactory() {
+    public TeraArray.Factory getLightFactory() {
         return requireTeraArrayFactory(lightFactory);
     }
     
@@ -114,7 +114,7 @@ public final class AdvancedConfig {
         return liquidFactory;
     }
     
-    public TeraArrayFactory getLiquidFactory() {
+    public TeraArray.Factory getLiquidFactory() {
         return requireTeraArrayFactory(liquidFactory);
     }
     
@@ -200,12 +200,12 @@ public final class AdvancedConfig {
         registerTeraArrayFactory(new TeraSparseArray16Bit.Factory());
     }
     
-    public static TeraArrayFactory getTeraArrayFactory(String factory) {
+    public static TeraArray.Factory getTeraArrayFactory(String factory) {
         Preconditions.checkNotNull(factory, "The parameter 'factory' must not be null");
         return teraArrayRegistry.get(factory);
     }
     
-    public static TeraArrayFactory requireTeraArrayFactory(String factory) {
+    public static TeraArray.Factory requireTeraArrayFactory(String factory) {
         Preconditions.checkNotNull(factory, "Parameter 'factory' must no be null");
         return Preconditions.checkNotNull(teraArrayRegistry.get(factory), "Factory does not exist: '" + factory + "'");
     }
@@ -230,7 +230,7 @@ public final class AdvancedConfig {
         return factories;
     }
     
-    public static void registerTeraArrayFactory(TeraArrayFactory factory) {
+    public static void registerTeraArrayFactory(TeraArray.Factory factory) {
         Preconditions.checkNotNull(factory, "Parameter 'factory' must not be null");
         final String name = factory.getArrayClass().getName();
         Preconditions.checkNotNull(name, "Factory:getName() must not return null");
