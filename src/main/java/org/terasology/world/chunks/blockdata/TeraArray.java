@@ -186,6 +186,11 @@ public abstract class TeraArray implements Externalizable {
     public final boolean contains(int x, int y, int z) {
         return (x >= 0 && x < sizeX && y >= 0 && y < sizeY && z >= 0 && z < sizeZ);
     }
+    
+    @Override
+    public String toString() {
+        return getClass().getName() + "(" + getSizeX() + ", " + getSizeY() + ", " + getSizeZ() + ", " + (isSparse() ? "sparse" : "dense") + ", " + getElementSizeInBits() + "bit, " + getEstimatedMemoryConsumptionInBytes() + "byte)";  
+    }
 
     public abstract boolean isSparse();
 

@@ -39,7 +39,7 @@ public class TeraDenseArray16Bit extends TeraDenseArray {
             if (data == null)
                 return 4;
             else 
-                return 4 + data.length;
+                return 4 + data.length * 2;
         }
 
         @Override
