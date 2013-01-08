@@ -10,14 +10,16 @@ public final class ChunksProtobuf {
   }
   public enum Type
       implements com.google.protobuf.ProtocolMessageEnum {
-    DenseArray4Bit(0, 1),
-    DenseArray8Bit(1, 2),
-    DenseArray16Bit(2, 3),
-    SparseArray4Bit(3, 4),
-    SparseArray8Bit(4, 5),
-    SparseArray16Bit(5, 6),
+    Unknown(0, 0),
+    DenseArray4Bit(1, 1),
+    DenseArray8Bit(2, 2),
+    DenseArray16Bit(3, 3),
+    SparseArray4Bit(4, 4),
+    SparseArray8Bit(5, 5),
+    SparseArray16Bit(6, 6),
     ;
     
+    public static final int Unknown_VALUE = 0;
     public static final int DenseArray4Bit_VALUE = 1;
     public static final int DenseArray8Bit_VALUE = 2;
     public static final int DenseArray16Bit_VALUE = 3;
@@ -30,6 +32,7 @@ public final class ChunksProtobuf {
     
     public static Type valueOf(int value) {
       switch (value) {
+        case 0: return Unknown;
         case 1: return DenseArray4Bit;
         case 2: return DenseArray8Bit;
         case 3: return DenseArray16Bit;
@@ -66,7 +69,7 @@ public final class ChunksProtobuf {
     }
     
     private static final Type[] VALUES = {
-      DenseArray4Bit, DenseArray8Bit, DenseArray16Bit, SparseArray4Bit, SparseArray8Bit, SparseArray16Bit, 
+      Unknown, DenseArray4Bit, DenseArray8Bit, DenseArray16Bit, SparseArray4Bit, SparseArray8Bit, SparseArray16Bit, 
     };
     
     public static Type valueOf(
@@ -96,7 +99,11 @@ public final class ChunksProtobuf {
     boolean hasType();
     org.terasology.protobuf.ChunksProtobuf.Type getType();
     
-    // optional bytes data = 2;
+    // optional string class_name = 2;
+    boolean hasClassName();
+    String getClassName();
+    
+    // optional bytes data = 3;
     boolean hasData();
     com.google.protobuf.ByteString getData();
   }
@@ -139,18 +146,51 @@ public final class ChunksProtobuf {
       return type_;
     }
     
-    // optional bytes data = 2;
-    public static final int DATA_FIELD_NUMBER = 2;
+    // optional string class_name = 2;
+    public static final int CLASS_NAME_FIELD_NUMBER = 2;
+    private java.lang.Object className_;
+    public boolean hasClassName() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    public String getClassName() {
+      java.lang.Object ref = className_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          className_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getClassNameBytes() {
+      java.lang.Object ref = className_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        className_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // optional bytes data = 3;
+    public static final int DATA_FIELD_NUMBER = 3;
     private com.google.protobuf.ByteString data_;
     public boolean hasData() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
+      return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     public com.google.protobuf.ByteString getData() {
       return data_;
     }
     
     private void initFields() {
-      type_ = org.terasology.protobuf.ChunksProtobuf.Type.DenseArray4Bit;
+      type_ = org.terasology.protobuf.ChunksProtobuf.Type.Unknown;
+      className_ = "";
       data_ = com.google.protobuf.ByteString.EMPTY;
     }
     private byte memoizedIsInitialized = -1;
@@ -173,7 +213,10 @@ public final class ChunksProtobuf {
         output.writeEnum(1, type_.getNumber());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeBytes(2, data_);
+        output.writeBytes(2, getClassNameBytes());
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeBytes(3, data_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -190,7 +233,11 @@ public final class ChunksProtobuf {
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(2, data_);
+          .computeBytesSize(2, getClassNameBytes());
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(3, data_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -316,10 +363,12 @@ public final class ChunksProtobuf {
       
       public Builder clear() {
         super.clear();
-        type_ = org.terasology.protobuf.ChunksProtobuf.Type.DenseArray4Bit;
+        type_ = org.terasology.protobuf.ChunksProtobuf.Type.Unknown;
         bitField0_ = (bitField0_ & ~0x00000001);
-        data_ = com.google.protobuf.ByteString.EMPTY;
+        className_ = "";
         bitField0_ = (bitField0_ & ~0x00000002);
+        data_ = com.google.protobuf.ByteString.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000004);
         return this;
       }
       
@@ -365,6 +414,10 @@ public final class ChunksProtobuf {
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
         }
+        result.className_ = className_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
         result.data_ = data_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
@@ -384,6 +437,9 @@ public final class ChunksProtobuf {
         if (other == org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance()) return this;
         if (other.hasType()) {
           setType(other.getType());
+        }
+        if (other.hasClassName()) {
+          setClassName(other.getClassName());
         }
         if (other.hasData()) {
           setData(other.getData());
@@ -436,6 +492,11 @@ public final class ChunksProtobuf {
             }
             case 18: {
               bitField0_ |= 0x00000002;
+              className_ = input.readBytes();
+              break;
+            }
+            case 26: {
+              bitField0_ |= 0x00000004;
               data_ = input.readBytes();
               break;
             }
@@ -446,7 +507,7 @@ public final class ChunksProtobuf {
       private int bitField0_;
       
       // required .Type type = 1;
-      private org.terasology.protobuf.ChunksProtobuf.Type type_ = org.terasology.protobuf.ChunksProtobuf.Type.DenseArray4Bit;
+      private org.terasology.protobuf.ChunksProtobuf.Type type_ = org.terasology.protobuf.ChunksProtobuf.Type.Unknown;
       public boolean hasType() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
@@ -464,15 +525,51 @@ public final class ChunksProtobuf {
       }
       public Builder clearType() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        type_ = org.terasology.protobuf.ChunksProtobuf.Type.DenseArray4Bit;
+        type_ = org.terasology.protobuf.ChunksProtobuf.Type.Unknown;
         onChanged();
         return this;
       }
       
-      // optional bytes data = 2;
+      // optional string class_name = 2;
+      private java.lang.Object className_ = "";
+      public boolean hasClassName() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      public String getClassName() {
+        java.lang.Object ref = className_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          className_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setClassName(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000002;
+        className_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearClassName() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        className_ = getDefaultInstance().getClassName();
+        onChanged();
+        return this;
+      }
+      void setClassName(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00000002;
+        className_ = value;
+        onChanged();
+      }
+      
+      // optional bytes data = 3;
       private com.google.protobuf.ByteString data_ = com.google.protobuf.ByteString.EMPTY;
       public boolean hasData() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
+        return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       public com.google.protobuf.ByteString getData() {
         return data_;
@@ -481,13 +578,13 @@ public final class ChunksProtobuf {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000002;
+  bitField0_ |= 0x00000004;
         data_ = value;
         onChanged();
         return this;
       }
       public Builder clearData() {
-        bitField0_ = (bitField0_ & ~0x00000002);
+        bitField0_ = (bitField0_ & ~0x00000004);
         data_ = getDefaultInstance().getData();
         onChanged();
         return this;
@@ -1439,16 +1536,17 @@ public final class ChunksProtobuf {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\014Chunks.proto\".\n\tTeraArray\022\023\n\004type\030\001 \002(" +
-      "\0162\005.Type\022\014\n\004data\030\002 \001(\014\"~\n\005Chunk\022\031\n\005block" +
-      "\030\001 \001(\0132\n.TeraArray\022\034\n\010sunlight\030\002 \001(\0132\n.T" +
-      "eraArray\022\031\n\005light\030\003 \001(\0132\n.TeraArray\022\032\n\006l" +
-      "iquid\030\004 \001(\0132\n.TeraArray*\005\010d\020\351\007*\203\001\n\004Type\022" +
-      "\022\n\016DenseArray4Bit\020\001\022\022\n\016DenseArray8Bit\020\002\022" +
-      "\023\n\017DenseArray16Bit\020\003\022\023\n\017SparseArray4Bit\020" +
-      "\004\022\023\n\017SparseArray8Bit\020\005\022\024\n\020SparseArray16B" +
-      "it\020\006B+\n\027org.terasology.protobufB\016ChunksP" +
-      "rotobufH\001"
+      "\n\014Chunks.proto\"B\n\tTeraArray\022\023\n\004type\030\001 \002(" +
+      "\0162\005.Type\022\022\n\nclass_name\030\002 \001(\t\022\014\n\004data\030\003 \001" +
+      "(\014\"~\n\005Chunk\022\031\n\005block\030\001 \001(\0132\n.TeraArray\022\034" +
+      "\n\010sunlight\030\002 \001(\0132\n.TeraArray\022\031\n\005light\030\003 " +
+      "\001(\0132\n.TeraArray\022\032\n\006liquid\030\004 \001(\0132\n.TeraAr" +
+      "ray*\005\010d\020\351\007*\220\001\n\004Type\022\013\n\007Unknown\020\000\022\022\n\016Dens" +
+      "eArray4Bit\020\001\022\022\n\016DenseArray8Bit\020\002\022\023\n\017Dens" +
+      "eArray16Bit\020\003\022\023\n\017SparseArray4Bit\020\004\022\023\n\017Sp" +
+      "arseArray8Bit\020\005\022\024\n\020SparseArray16Bit\020\006B+\n" +
+      "\027org.terasology.protobufB\016ChunksProtobuf",
+      "H\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -1460,7 +1558,7 @@ public final class ChunksProtobuf {
           internal_static_TeraArray_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_TeraArray_descriptor,
-              new java.lang.String[] { "Type", "Data", },
+              new java.lang.String[] { "Type", "ClassName", "Data", },
               org.terasology.protobuf.ChunksProtobuf.TeraArray.class,
               org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder.class);
           internal_static_Chunk_descriptor =
