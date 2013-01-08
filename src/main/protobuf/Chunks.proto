@@ -24,11 +24,25 @@ message TeraArray {
     optional bytes  data       = 3;
 }
 
+enum State {
+    ADJACENCY_GENERATION_PENDING      = 0;
+    INTERNAL_LIGHT_GENERATION_PENDING = 1;
+    LIGHT_PROPAGATION_PENDING         = 2;
+    FULL_LIGHT_CONNECTIVITY_PENDING   = 3;
+    COMPLETE                          = 4;
+}
+
 message Chunk {
-    optional TeraArray block    = 1;
-    optional TeraArray sunlight = 2;
-    optional TeraArray light    = 3;
-    optional TeraArray liquid   = 4;
+    required sint32    x        = 1;
+    required sint32    y        = 2;
+    required sint32    z        = 3;
+
+    required State     state    = 4;
+    
+    optional TeraArray block    = 5;
+    optional TeraArray sunlight = 6;
+    optional TeraArray light    = 7;
+    optional TeraArray liquid   = 8;
     
     extensions 100 to 1000;
 }

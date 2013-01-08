@@ -92,6 +92,84 @@ public final class ChunksProtobuf {
     // @@protoc_insertion_point(enum_scope:Type)
   }
   
+  public enum State
+      implements com.google.protobuf.ProtocolMessageEnum {
+    ADJACENCY_GENERATION_PENDING(0, 0),
+    INTERNAL_LIGHT_GENERATION_PENDING(1, 1),
+    LIGHT_PROPAGATION_PENDING(2, 2),
+    FULL_LIGHT_CONNECTIVITY_PENDING(3, 3),
+    COMPLETE(4, 4),
+    ;
+    
+    public static final int ADJACENCY_GENERATION_PENDING_VALUE = 0;
+    public static final int INTERNAL_LIGHT_GENERATION_PENDING_VALUE = 1;
+    public static final int LIGHT_PROPAGATION_PENDING_VALUE = 2;
+    public static final int FULL_LIGHT_CONNECTIVITY_PENDING_VALUE = 3;
+    public static final int COMPLETE_VALUE = 4;
+    
+    
+    public final int getNumber() { return value; }
+    
+    public static State valueOf(int value) {
+      switch (value) {
+        case 0: return ADJACENCY_GENERATION_PENDING;
+        case 1: return INTERNAL_LIGHT_GENERATION_PENDING;
+        case 2: return LIGHT_PROPAGATION_PENDING;
+        case 3: return FULL_LIGHT_CONNECTIVITY_PENDING;
+        case 4: return COMPLETE;
+        default: return null;
+      }
+    }
+    
+    public static com.google.protobuf.Internal.EnumLiteMap<State>
+        internalGetValueMap() {
+      return internalValueMap;
+    }
+    private static com.google.protobuf.Internal.EnumLiteMap<State>
+        internalValueMap =
+          new com.google.protobuf.Internal.EnumLiteMap<State>() {
+            public State findValueByNumber(int number) {
+              return State.valueOf(number);
+            }
+          };
+    
+    public final com.google.protobuf.Descriptors.EnumValueDescriptor
+        getValueDescriptor() {
+      return getDescriptor().getValues().get(index);
+    }
+    public final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptorForType() {
+      return getDescriptor();
+    }
+    public static final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptor() {
+      return org.terasology.protobuf.ChunksProtobuf.getDescriptor().getEnumTypes().get(1);
+    }
+    
+    private static final State[] VALUES = {
+      ADJACENCY_GENERATION_PENDING, INTERNAL_LIGHT_GENERATION_PENDING, LIGHT_PROPAGATION_PENDING, FULL_LIGHT_CONNECTIVITY_PENDING, COMPLETE, 
+    };
+    
+    public static State valueOf(
+        com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+      if (desc.getType() != getDescriptor()) {
+        throw new java.lang.IllegalArgumentException(
+          "EnumValueDescriptor is not for this type.");
+      }
+      return VALUES[desc.getIndex()];
+    }
+    
+    private final int index;
+    private final int value;
+    
+    private State(int index, int value) {
+      this.index = index;
+      this.value = value;
+    }
+    
+    // @@protoc_insertion_point(enum_scope:State)
+  }
+  
   public interface TeraArrayOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
     
@@ -605,22 +683,38 @@ public final class ChunksProtobuf {
       com.google.protobuf.GeneratedMessage.
           ExtendableMessageOrBuilder<Chunk> {
     
-    // optional .TeraArray block = 1;
+    // required sint32 x = 1;
+    boolean hasX();
+    int getX();
+    
+    // required sint32 y = 2;
+    boolean hasY();
+    int getY();
+    
+    // required sint32 z = 3;
+    boolean hasZ();
+    int getZ();
+    
+    // required .State state = 4;
+    boolean hasState();
+    org.terasology.protobuf.ChunksProtobuf.State getState();
+    
+    // optional .TeraArray block = 5;
     boolean hasBlock();
     org.terasology.protobuf.ChunksProtobuf.TeraArray getBlock();
     org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder getBlockOrBuilder();
     
-    // optional .TeraArray sunlight = 2;
+    // optional .TeraArray sunlight = 6;
     boolean hasSunlight();
     org.terasology.protobuf.ChunksProtobuf.TeraArray getSunlight();
     org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder getSunlightOrBuilder();
     
-    // optional .TeraArray light = 3;
+    // optional .TeraArray light = 7;
     boolean hasLight();
     org.terasology.protobuf.ChunksProtobuf.TeraArray getLight();
     org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder getLightOrBuilder();
     
-    // optional .TeraArray liquid = 4;
+    // optional .TeraArray liquid = 8;
     boolean hasLiquid();
     org.terasology.protobuf.ChunksProtobuf.TeraArray getLiquid();
     org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder getLiquidOrBuilder();
@@ -654,11 +748,51 @@ public final class ChunksProtobuf {
     }
     
     private int bitField0_;
-    // optional .TeraArray block = 1;
-    public static final int BLOCK_FIELD_NUMBER = 1;
+    // required sint32 x = 1;
+    public static final int X_FIELD_NUMBER = 1;
+    private int x_;
+    public boolean hasX() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    public int getX() {
+      return x_;
+    }
+    
+    // required sint32 y = 2;
+    public static final int Y_FIELD_NUMBER = 2;
+    private int y_;
+    public boolean hasY() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    public int getY() {
+      return y_;
+    }
+    
+    // required sint32 z = 3;
+    public static final int Z_FIELD_NUMBER = 3;
+    private int z_;
+    public boolean hasZ() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    public int getZ() {
+      return z_;
+    }
+    
+    // required .State state = 4;
+    public static final int STATE_FIELD_NUMBER = 4;
+    private org.terasology.protobuf.ChunksProtobuf.State state_;
+    public boolean hasState() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    public org.terasology.protobuf.ChunksProtobuf.State getState() {
+      return state_;
+    }
+    
+    // optional .TeraArray block = 5;
+    public static final int BLOCK_FIELD_NUMBER = 5;
     private org.terasology.protobuf.ChunksProtobuf.TeraArray block_;
     public boolean hasBlock() {
-      return ((bitField0_ & 0x00000001) == 0x00000001);
+      return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     public org.terasology.protobuf.ChunksProtobuf.TeraArray getBlock() {
       return block_;
@@ -667,11 +801,11 @@ public final class ChunksProtobuf {
       return block_;
     }
     
-    // optional .TeraArray sunlight = 2;
-    public static final int SUNLIGHT_FIELD_NUMBER = 2;
+    // optional .TeraArray sunlight = 6;
+    public static final int SUNLIGHT_FIELD_NUMBER = 6;
     private org.terasology.protobuf.ChunksProtobuf.TeraArray sunlight_;
     public boolean hasSunlight() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
+      return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     public org.terasology.protobuf.ChunksProtobuf.TeraArray getSunlight() {
       return sunlight_;
@@ -680,11 +814,11 @@ public final class ChunksProtobuf {
       return sunlight_;
     }
     
-    // optional .TeraArray light = 3;
-    public static final int LIGHT_FIELD_NUMBER = 3;
+    // optional .TeraArray light = 7;
+    public static final int LIGHT_FIELD_NUMBER = 7;
     private org.terasology.protobuf.ChunksProtobuf.TeraArray light_;
     public boolean hasLight() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
+      return ((bitField0_ & 0x00000040) == 0x00000040);
     }
     public org.terasology.protobuf.ChunksProtobuf.TeraArray getLight() {
       return light_;
@@ -693,11 +827,11 @@ public final class ChunksProtobuf {
       return light_;
     }
     
-    // optional .TeraArray liquid = 4;
-    public static final int LIQUID_FIELD_NUMBER = 4;
+    // optional .TeraArray liquid = 8;
+    public static final int LIQUID_FIELD_NUMBER = 8;
     private org.terasology.protobuf.ChunksProtobuf.TeraArray liquid_;
     public boolean hasLiquid() {
-      return ((bitField0_ & 0x00000008) == 0x00000008);
+      return ((bitField0_ & 0x00000080) == 0x00000080);
     }
     public org.terasology.protobuf.ChunksProtobuf.TeraArray getLiquid() {
       return liquid_;
@@ -707,6 +841,10 @@ public final class ChunksProtobuf {
     }
     
     private void initFields() {
+      x_ = 0;
+      y_ = 0;
+      z_ = 0;
+      state_ = org.terasology.protobuf.ChunksProtobuf.State.ADJACENCY_GENERATION_PENDING;
       block_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
       sunlight_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
       light_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
@@ -717,6 +855,22 @@ public final class ChunksProtobuf {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
       
+      if (!hasX()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasY()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasZ()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasState()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
       if (hasBlock()) {
         if (!getBlock().isInitialized()) {
           memoizedIsInitialized = 0;
@@ -756,16 +910,28 @@ public final class ChunksProtobuf {
         .ExtendableMessage<org.terasology.protobuf.ChunksProtobuf.Chunk>.ExtensionWriter extensionWriter =
           newExtensionWriter();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeMessage(1, block_);
+        output.writeSInt32(1, x_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeMessage(2, sunlight_);
+        output.writeSInt32(2, y_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeMessage(3, light_);
+        output.writeSInt32(3, z_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeMessage(4, liquid_);
+        output.writeEnum(4, state_.getNumber());
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeMessage(5, block_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeMessage(6, sunlight_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        output.writeMessage(7, light_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        output.writeMessage(8, liquid_);
       }
       extensionWriter.writeUntil(1001, output);
       getUnknownFields().writeTo(output);
@@ -779,19 +945,35 @@ public final class ChunksProtobuf {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, block_);
+          .computeSInt32Size(1, x_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, sunlight_);
+          .computeSInt32Size(2, y_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(3, light_);
+          .computeSInt32Size(3, z_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(4, liquid_);
+          .computeEnumSize(4, state_.getNumber());
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(5, block_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(6, sunlight_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(7, light_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(8, liquid_);
       }
       size += extensionsSerializedSize();
       size += getUnknownFields().getSerializedSize();
@@ -922,30 +1104,38 @@ public final class ChunksProtobuf {
       
       public Builder clear() {
         super.clear();
+        x_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        y_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        z_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        state_ = org.terasology.protobuf.ChunksProtobuf.State.ADJACENCY_GENERATION_PENDING;
+        bitField0_ = (bitField0_ & ~0x00000008);
         if (blockBuilder_ == null) {
           block_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
         } else {
           blockBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000001);
+        bitField0_ = (bitField0_ & ~0x00000010);
         if (sunlightBuilder_ == null) {
           sunlight_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
         } else {
           sunlightBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000002);
+        bitField0_ = (bitField0_ & ~0x00000020);
         if (lightBuilder_ == null) {
           light_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
         } else {
           lightBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000004);
+        bitField0_ = (bitField0_ & ~0x00000040);
         if (liquidBuilder_ == null) {
           liquid_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
         } else {
           liquidBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000080);
         return this;
       }
       
@@ -987,29 +1177,45 @@ public final class ChunksProtobuf {
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
           to_bitField0_ |= 0x00000001;
         }
+        result.x_ = x_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.y_ = y_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.z_ = z_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.state_ = state_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
+        }
         if (blockBuilder_ == null) {
           result.block_ = block_;
         } else {
           result.block_ = blockBuilder_.build();
         }
-        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
-          to_bitField0_ |= 0x00000002;
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+          to_bitField0_ |= 0x00000020;
         }
         if (sunlightBuilder_ == null) {
           result.sunlight_ = sunlight_;
         } else {
           result.sunlight_ = sunlightBuilder_.build();
         }
-        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
-          to_bitField0_ |= 0x00000004;
+        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+          to_bitField0_ |= 0x00000040;
         }
         if (lightBuilder_ == null) {
           result.light_ = light_;
         } else {
           result.light_ = lightBuilder_.build();
         }
-        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
-          to_bitField0_ |= 0x00000008;
+        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+          to_bitField0_ |= 0x00000080;
         }
         if (liquidBuilder_ == null) {
           result.liquid_ = liquid_;
@@ -1032,6 +1238,18 @@ public final class ChunksProtobuf {
       
       public Builder mergeFrom(org.terasology.protobuf.ChunksProtobuf.Chunk other) {
         if (other == org.terasology.protobuf.ChunksProtobuf.Chunk.getDefaultInstance()) return this;
+        if (other.hasX()) {
+          setX(other.getX());
+        }
+        if (other.hasY()) {
+          setY(other.getY());
+        }
+        if (other.hasZ()) {
+          setZ(other.getZ());
+        }
+        if (other.hasState()) {
+          setState(other.getState());
+        }
         if (other.hasBlock()) {
           mergeBlock(other.getBlock());
         }
@@ -1050,6 +1268,22 @@ public final class ChunksProtobuf {
       }
       
       public final boolean isInitialized() {
+        if (!hasX()) {
+          
+          return false;
+        }
+        if (!hasY()) {
+          
+          return false;
+        }
+        if (!hasZ()) {
+          
+          return false;
+        }
+        if (!hasState()) {
+          
+          return false;
+        }
         if (hasBlock()) {
           if (!getBlock().isInitialized()) {
             
@@ -1104,7 +1338,33 @@ public final class ChunksProtobuf {
               }
               break;
             }
-            case 10: {
+            case 8: {
+              bitField0_ |= 0x00000001;
+              x_ = input.readSInt32();
+              break;
+            }
+            case 16: {
+              bitField0_ |= 0x00000002;
+              y_ = input.readSInt32();
+              break;
+            }
+            case 24: {
+              bitField0_ |= 0x00000004;
+              z_ = input.readSInt32();
+              break;
+            }
+            case 32: {
+              int rawValue = input.readEnum();
+              org.terasology.protobuf.ChunksProtobuf.State value = org.terasology.protobuf.ChunksProtobuf.State.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(4, rawValue);
+              } else {
+                bitField0_ |= 0x00000008;
+                state_ = value;
+              }
+              break;
+            }
+            case 42: {
               org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder subBuilder = org.terasology.protobuf.ChunksProtobuf.TeraArray.newBuilder();
               if (hasBlock()) {
                 subBuilder.mergeFrom(getBlock());
@@ -1113,7 +1373,7 @@ public final class ChunksProtobuf {
               setBlock(subBuilder.buildPartial());
               break;
             }
-            case 18: {
+            case 50: {
               org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder subBuilder = org.terasology.protobuf.ChunksProtobuf.TeraArray.newBuilder();
               if (hasSunlight()) {
                 subBuilder.mergeFrom(getSunlight());
@@ -1122,7 +1382,7 @@ public final class ChunksProtobuf {
               setSunlight(subBuilder.buildPartial());
               break;
             }
-            case 26: {
+            case 58: {
               org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder subBuilder = org.terasology.protobuf.ChunksProtobuf.TeraArray.newBuilder();
               if (hasLight()) {
                 subBuilder.mergeFrom(getLight());
@@ -1131,7 +1391,7 @@ public final class ChunksProtobuf {
               setLight(subBuilder.buildPartial());
               break;
             }
-            case 34: {
+            case 66: {
               org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder subBuilder = org.terasology.protobuf.ChunksProtobuf.TeraArray.newBuilder();
               if (hasLiquid()) {
                 subBuilder.mergeFrom(getLiquid());
@@ -1146,12 +1406,99 @@ public final class ChunksProtobuf {
       
       private int bitField0_;
       
-      // optional .TeraArray block = 1;
+      // required sint32 x = 1;
+      private int x_ ;
+      public boolean hasX() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      public int getX() {
+        return x_;
+      }
+      public Builder setX(int value) {
+        bitField0_ |= 0x00000001;
+        x_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearX() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        x_ = 0;
+        onChanged();
+        return this;
+      }
+      
+      // required sint32 y = 2;
+      private int y_ ;
+      public boolean hasY() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      public int getY() {
+        return y_;
+      }
+      public Builder setY(int value) {
+        bitField0_ |= 0x00000002;
+        y_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearY() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        y_ = 0;
+        onChanged();
+        return this;
+      }
+      
+      // required sint32 z = 3;
+      private int z_ ;
+      public boolean hasZ() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      public int getZ() {
+        return z_;
+      }
+      public Builder setZ(int value) {
+        bitField0_ |= 0x00000004;
+        z_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearZ() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        z_ = 0;
+        onChanged();
+        return this;
+      }
+      
+      // required .State state = 4;
+      private org.terasology.protobuf.ChunksProtobuf.State state_ = org.terasology.protobuf.ChunksProtobuf.State.ADJACENCY_GENERATION_PENDING;
+      public boolean hasState() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      public org.terasology.protobuf.ChunksProtobuf.State getState() {
+        return state_;
+      }
+      public Builder setState(org.terasology.protobuf.ChunksProtobuf.State value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00000008;
+        state_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearState() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        state_ = org.terasology.protobuf.ChunksProtobuf.State.ADJACENCY_GENERATION_PENDING;
+        onChanged();
+        return this;
+      }
+      
+      // optional .TeraArray block = 5;
       private org.terasology.protobuf.ChunksProtobuf.TeraArray block_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.terasology.protobuf.ChunksProtobuf.TeraArray, org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder, org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder> blockBuilder_;
       public boolean hasBlock() {
-        return ((bitField0_ & 0x00000001) == 0x00000001);
+        return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       public org.terasology.protobuf.ChunksProtobuf.TeraArray getBlock() {
         if (blockBuilder_ == null) {
@@ -1170,7 +1517,7 @@ public final class ChunksProtobuf {
         } else {
           blockBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000001;
+        bitField0_ |= 0x00000010;
         return this;
       }
       public Builder setBlock(
@@ -1181,12 +1528,12 @@ public final class ChunksProtobuf {
         } else {
           blockBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000001;
+        bitField0_ |= 0x00000010;
         return this;
       }
       public Builder mergeBlock(org.terasology.protobuf.ChunksProtobuf.TeraArray value) {
         if (blockBuilder_ == null) {
-          if (((bitField0_ & 0x00000001) == 0x00000001) &&
+          if (((bitField0_ & 0x00000010) == 0x00000010) &&
               block_ != org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance()) {
             block_ =
               org.terasology.protobuf.ChunksProtobuf.TeraArray.newBuilder(block_).mergeFrom(value).buildPartial();
@@ -1197,7 +1544,7 @@ public final class ChunksProtobuf {
         } else {
           blockBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000001;
+        bitField0_ |= 0x00000010;
         return this;
       }
       public Builder clearBlock() {
@@ -1207,11 +1554,11 @@ public final class ChunksProtobuf {
         } else {
           blockBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000001);
+        bitField0_ = (bitField0_ & ~0x00000010);
         return this;
       }
       public org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder getBlockBuilder() {
-        bitField0_ |= 0x00000001;
+        bitField0_ |= 0x00000010;
         onChanged();
         return getBlockFieldBuilder().getBuilder();
       }
@@ -1236,12 +1583,12 @@ public final class ChunksProtobuf {
         return blockBuilder_;
       }
       
-      // optional .TeraArray sunlight = 2;
+      // optional .TeraArray sunlight = 6;
       private org.terasology.protobuf.ChunksProtobuf.TeraArray sunlight_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.terasology.protobuf.ChunksProtobuf.TeraArray, org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder, org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder> sunlightBuilder_;
       public boolean hasSunlight() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
+        return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       public org.terasology.protobuf.ChunksProtobuf.TeraArray getSunlight() {
         if (sunlightBuilder_ == null) {
@@ -1260,7 +1607,7 @@ public final class ChunksProtobuf {
         } else {
           sunlightBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000020;
         return this;
       }
       public Builder setSunlight(
@@ -1271,12 +1618,12 @@ public final class ChunksProtobuf {
         } else {
           sunlightBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000020;
         return this;
       }
       public Builder mergeSunlight(org.terasology.protobuf.ChunksProtobuf.TeraArray value) {
         if (sunlightBuilder_ == null) {
-          if (((bitField0_ & 0x00000002) == 0x00000002) &&
+          if (((bitField0_ & 0x00000020) == 0x00000020) &&
               sunlight_ != org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance()) {
             sunlight_ =
               org.terasology.protobuf.ChunksProtobuf.TeraArray.newBuilder(sunlight_).mergeFrom(value).buildPartial();
@@ -1287,7 +1634,7 @@ public final class ChunksProtobuf {
         } else {
           sunlightBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000020;
         return this;
       }
       public Builder clearSunlight() {
@@ -1297,11 +1644,11 @@ public final class ChunksProtobuf {
         } else {
           sunlightBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000002);
+        bitField0_ = (bitField0_ & ~0x00000020);
         return this;
       }
       public org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder getSunlightBuilder() {
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000020;
         onChanged();
         return getSunlightFieldBuilder().getBuilder();
       }
@@ -1326,12 +1673,12 @@ public final class ChunksProtobuf {
         return sunlightBuilder_;
       }
       
-      // optional .TeraArray light = 3;
+      // optional .TeraArray light = 7;
       private org.terasology.protobuf.ChunksProtobuf.TeraArray light_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.terasology.protobuf.ChunksProtobuf.TeraArray, org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder, org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder> lightBuilder_;
       public boolean hasLight() {
-        return ((bitField0_ & 0x00000004) == 0x00000004);
+        return ((bitField0_ & 0x00000040) == 0x00000040);
       }
       public org.terasology.protobuf.ChunksProtobuf.TeraArray getLight() {
         if (lightBuilder_ == null) {
@@ -1350,7 +1697,7 @@ public final class ChunksProtobuf {
         } else {
           lightBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000040;
         return this;
       }
       public Builder setLight(
@@ -1361,12 +1708,12 @@ public final class ChunksProtobuf {
         } else {
           lightBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000040;
         return this;
       }
       public Builder mergeLight(org.terasology.protobuf.ChunksProtobuf.TeraArray value) {
         if (lightBuilder_ == null) {
-          if (((bitField0_ & 0x00000004) == 0x00000004) &&
+          if (((bitField0_ & 0x00000040) == 0x00000040) &&
               light_ != org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance()) {
             light_ =
               org.terasology.protobuf.ChunksProtobuf.TeraArray.newBuilder(light_).mergeFrom(value).buildPartial();
@@ -1377,7 +1724,7 @@ public final class ChunksProtobuf {
         } else {
           lightBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000040;
         return this;
       }
       public Builder clearLight() {
@@ -1387,11 +1734,11 @@ public final class ChunksProtobuf {
         } else {
           lightBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000004);
+        bitField0_ = (bitField0_ & ~0x00000040);
         return this;
       }
       public org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder getLightBuilder() {
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000040;
         onChanged();
         return getLightFieldBuilder().getBuilder();
       }
@@ -1416,12 +1763,12 @@ public final class ChunksProtobuf {
         return lightBuilder_;
       }
       
-      // optional .TeraArray liquid = 4;
+      // optional .TeraArray liquid = 8;
       private org.terasology.protobuf.ChunksProtobuf.TeraArray liquid_ = org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.terasology.protobuf.ChunksProtobuf.TeraArray, org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder, org.terasology.protobuf.ChunksProtobuf.TeraArrayOrBuilder> liquidBuilder_;
       public boolean hasLiquid() {
-        return ((bitField0_ & 0x00000008) == 0x00000008);
+        return ((bitField0_ & 0x00000080) == 0x00000080);
       }
       public org.terasology.protobuf.ChunksProtobuf.TeraArray getLiquid() {
         if (liquidBuilder_ == null) {
@@ -1440,7 +1787,7 @@ public final class ChunksProtobuf {
         } else {
           liquidBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000080;
         return this;
       }
       public Builder setLiquid(
@@ -1451,12 +1798,12 @@ public final class ChunksProtobuf {
         } else {
           liquidBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000080;
         return this;
       }
       public Builder mergeLiquid(org.terasology.protobuf.ChunksProtobuf.TeraArray value) {
         if (liquidBuilder_ == null) {
-          if (((bitField0_ & 0x00000008) == 0x00000008) &&
+          if (((bitField0_ & 0x00000080) == 0x00000080) &&
               liquid_ != org.terasology.protobuf.ChunksProtobuf.TeraArray.getDefaultInstance()) {
             liquid_ =
               org.terasology.protobuf.ChunksProtobuf.TeraArray.newBuilder(liquid_).mergeFrom(value).buildPartial();
@@ -1467,7 +1814,7 @@ public final class ChunksProtobuf {
         } else {
           liquidBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000080;
         return this;
       }
       public Builder clearLiquid() {
@@ -1477,11 +1824,11 @@ public final class ChunksProtobuf {
         } else {
           liquidBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000080);
         return this;
       }
       public org.terasology.protobuf.ChunksProtobuf.TeraArray.Builder getLiquidBuilder() {
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000080;
         onChanged();
         return getLiquidFieldBuilder().getBuilder();
       }
@@ -1538,15 +1885,20 @@ public final class ChunksProtobuf {
     java.lang.String[] descriptorData = {
       "\n\014Chunks.proto\"B\n\tTeraArray\022\023\n\004type\030\001 \002(" +
       "\0162\005.Type\022\022\n\nclass_name\030\002 \001(\t\022\014\n\004data\030\003 \001" +
-      "(\014\"~\n\005Chunk\022\031\n\005block\030\001 \001(\0132\n.TeraArray\022\034" +
-      "\n\010sunlight\030\002 \001(\0132\n.TeraArray\022\031\n\005light\030\003 " +
-      "\001(\0132\n.TeraArray\022\032\n\006liquid\030\004 \001(\0132\n.TeraAr" +
-      "ray*\005\010d\020\351\007*\220\001\n\004Type\022\013\n\007Unknown\020\000\022\022\n\016Dens" +
-      "eArray4Bit\020\001\022\022\n\016DenseArray8Bit\020\002\022\023\n\017Dens" +
-      "eArray16Bit\020\003\022\023\n\017SparseArray4Bit\020\004\022\023\n\017Sp" +
-      "arseArray8Bit\020\005\022\024\n\020SparseArray16Bit\020\006B+\n" +
-      "\027org.terasology.protobufB\016ChunksProtobuf",
-      "H\001"
+      "(\014\"\266\001\n\005Chunk\022\t\n\001x\030\001 \002(\021\022\t\n\001y\030\002 \002(\021\022\t\n\001z\030" +
+      "\003 \002(\021\022\025\n\005state\030\004 \002(\0162\006.State\022\031\n\005block\030\005 " +
+      "\001(\0132\n.TeraArray\022\034\n\010sunlight\030\006 \001(\0132\n.Tera" +
+      "Array\022\031\n\005light\030\007 \001(\0132\n.TeraArray\022\032\n\006liqu" +
+      "id\030\010 \001(\0132\n.TeraArray*\005\010d\020\351\007*\220\001\n\004Type\022\013\n\007" +
+      "Unknown\020\000\022\022\n\016DenseArray4Bit\020\001\022\022\n\016DenseAr" +
+      "ray8Bit\020\002\022\023\n\017DenseArray16Bit\020\003\022\023\n\017Sparse" +
+      "Array4Bit\020\004\022\023\n\017SparseArray8Bit\020\005\022\024\n\020Spar",
+      "seArray16Bit\020\006*\242\001\n\005State\022 \n\034ADJACENCY_GE" +
+      "NERATION_PENDING\020\000\022%\n!INTERNAL_LIGHT_GEN" +
+      "ERATION_PENDING\020\001\022\035\n\031LIGHT_PROPAGATION_P" +
+      "ENDING\020\002\022#\n\037FULL_LIGHT_CONNECTIVITY_PEND" +
+      "ING\020\003\022\014\n\010COMPLETE\020\004B+\n\027org.terasology.pr" +
+      "otobufB\016ChunksProtobufH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -1566,7 +1918,7 @@ public final class ChunksProtobuf {
           internal_static_Chunk_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_Chunk_descriptor,
-              new java.lang.String[] { "Block", "Sunlight", "Light", "Liquid", },
+              new java.lang.String[] { "X", "Y", "Z", "State", "Block", "Sunlight", "Light", "Liquid", },
               org.terasology.protobuf.ChunksProtobuf.Chunk.class,
               org.terasology.protobuf.ChunksProtobuf.Chunk.Builder.class);
           return null;
