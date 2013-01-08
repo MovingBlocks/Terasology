@@ -33,6 +33,7 @@ varying vec4 vertexPos;
 varying vec3 lightDir;
 varying vec3 normal;
 varying vec3 waterNormal;
+varying float isUpside;
 
 varying float flickering;
 varying float flickeringAlternative;
@@ -86,7 +87,7 @@ void main(){
         normalWater.xyz = texture2D(textureWaterNormal, waterOffset).xyz * 2.0 - 1.0;
 
        // Enable reflection only when not swimming and for blocks on sea level
-        if (!swimming && vertexWorldPosRaw.y < 32.5 && vertexWorldPosRaw.y > 31.5) {
+        if (!swimming && isUpside == 1.0 && vertexWorldPosRaw.y < 32.5 && vertexWorldPosRaw.y > 31.5) {
             vec2 projectedPos = 0.5 * (vertexPos.st/vertexPos.q) + vec2(0.5);
 
             // Fresnel

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- #define WAVING_COORDINATE_COUNT 32
+#define WAVING_COORDINATE_COUNT 32
 
 varying vec3 normal;
 varying vec4 vertexWorldPosRaw;
@@ -25,6 +25,8 @@ varying vec3 waterNormal;
 
 varying float flickering;
 varying float flickeringAlternative;
+
+varying float isUpside;
 
 uniform float blockScale = 1.0;
 
@@ -45,6 +47,12 @@ void main()
 
 	vertexWorldPos = gl_ModelViewMatrix * vertexWorldPosRaw;
 	waterNormal = gl_NormalMatrix * vec3(0,1,0);
+
+	if (gl_Normal.y == 1.0) {
+	    isUpside = 1.0;
+	} else {
+	    isUpside = 0.0;
+	}
 
 	lightDir = gl_LightSource[0].position.xyz;
 
