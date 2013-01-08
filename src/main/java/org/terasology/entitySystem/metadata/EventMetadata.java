@@ -14,7 +14,7 @@ public class EventMetadata<T extends Event> extends ClassMetadata<T> {
     private String uri;
 
     public EventMetadata(Class<T> simpleClass, String uri) throws NoSuchMethodException {
-        super(simpleClass);
+        super(simpleClass, uri);
         this.uri = uri;
         if (simpleClass.getAnnotation(ServerEvent.class) != null) {
             networkEventType = NetworkEventType.SERVER;

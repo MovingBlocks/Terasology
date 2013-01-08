@@ -45,7 +45,7 @@ public class WorldSerializerTest {
         entity.setPersisted(false);
         int id = entity.getId();
 
-        EntityData.World worldData = worldSerializer.serializeWorld(true);
+        EntityData.World worldData = worldSerializer.serializeWorld(false);
         assertEquals(0, worldData.getEntityCount());
         assertEquals(1, worldData.getFreedEntityIdCount());
         assertEquals(id, worldData.getFreedEntityId(0));

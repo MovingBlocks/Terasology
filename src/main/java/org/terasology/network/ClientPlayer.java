@@ -17,8 +17,6 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Event;
 import org.terasology.entitySystem.EventReceiver;
 import org.terasology.entitySystem.EventSystem;
-import org.terasology.entitySystem.PersistableEntityManager;
-import org.terasology.entitySystem.metadata.extension.EntityRefTypeHandler;
 import org.terasology.entitySystem.persistence.EntitySerializer;
 import org.terasology.entitySystem.persistence.EventSerializer;
 import org.terasology.game.CoreRegistry;
@@ -53,12 +51,11 @@ public class ClientPlayer implements ChunkRegionListener, WorldChangeListener, E
     private static final NetworkEventFieldCheck EVENT_FIELD_CHECK = new NetworkEventFieldCheck();
 
     private NetworkSystem networkSystem;
-    private PersistableEntityManager entityManager;
     private EntityRef playerEntity = EntityRef.NULL;
     private Channel channel;
     private ChunkProvider chunkProvider;
-    private EventSerializer eventSerializer;
     private EntitySerializer entitySerializer;
+    private EventSerializer eventSerializer;
 
     private Set<Vector3i> relevantChunks = Sets.newHashSet();
     private TIntSet netInitial = new TIntHashSet();
@@ -75,9 +72,6 @@ public class ClientPlayer implements ChunkRegionListener, WorldChangeListener, E
         this.channel = channel;
         this.networkSystem = networkSystem;
         this.chunkProvider = CoreRegistry.get(ChunkProvider.class);
-        this.entityManager = (PersistableEntityManager) CoreRegistry.get(EntityManager.class);
-        this.entitySerializer = new EntitySerializer(entityManager);
-        entitySerializer.setIgnoringEntityId(true);
         CoreRegistry.get(WorldProvider.class).registerListener(this);
     }
 
@@ -117,9 +111,12 @@ public class ClientPlayer implements ChunkRegionListener, WorldChangeListener, E
         }
     }
 
-    public void setConnected() {
+    public void connected(EntityManager entityManager, EntitySerializer entitySerializer, EventSerializer eventSerializer) {
         if (awaitingConnectMessage) {
             awaitingConnectMessage = false;
+
+            this.entitySerializer = entitySerializer;
+            this.eventSerializer = eventSerializer;
 
             // Create player entity
             playerEntity = entityManager.create("engine:client");
@@ -171,7 +168,6 @@ public class ClientPlayer implements ChunkRegionListener, WorldChangeListener, E
 
     public void send(Event event, int targetId) {
         if (netRelevant.contains(targetId)) {
-            EntityRefTypeHandler.setNetworkMode(networkSystem);
             logger.info("Sending: {}", event);
             NetData.NetMessage message = NetData.NetMessage.newBuilder()
                     .setType(NetData.NetMessage.Type.EVENT)
@@ -180,7 +176,6 @@ public class ClientPlayer implements ChunkRegionListener, WorldChangeListener, E
                             .setEvent(eventSerializer.serialize(event, EVENT_FIELD_CHECK)))
                     .build();
             channel.write(message);
-            EntityRefTypeHandler.setEntityManagerMode(entityManager);
         }
     }
 
@@ -225,8 +220,6 @@ public class ClientPlayer implements ChunkRegionListener, WorldChangeListener, E
     }
 
     public void update() {
-        EntityRefTypeHandler.setNetworkMode(networkSystem);
-
         // For now, send everything all at once
         TIntIterator initialIterator = netInitial.iterator();
         while (initialIterator.hasNext()) {
@@ -257,11 +250,9 @@ public class ClientPlayer implements ChunkRegionListener, WorldChangeListener, E
         netDirty.clear();
 
         processEvents();
-
-        EntityRefTypeHandler.setEntityManagerMode(entityManager);
     }
 
-    void processEvents() {
+    private void processEvents() {
         List<NetData.EventMessage> messages = Lists.newArrayListWithExpectedSize(queuedEvents.size());
         queuedEvents.drainTo(messages);
 
@@ -277,10 +268,6 @@ public class ClientPlayer implements ChunkRegionListener, WorldChangeListener, E
                 queuedEvents.offer(message);
             }
         }
-    }
-
-    void setEventSerializer(EventSerializer eventSerializer) {
-        this.eventSerializer = eventSerializer;
     }
 
     public EntityRef getEntity() {

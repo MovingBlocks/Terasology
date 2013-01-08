@@ -3,6 +3,7 @@ package org.terasology.entitySystem.metadata.internal;
 import com.google.common.collect.Maps;
 import org.terasology.entitySystem.metadata.ClassLibrary;
 import org.terasology.entitySystem.metadata.ClassMetadata;
+import org.terasology.entitySystem.metadata.TypeHandlerLibrary;
 
 import java.util.Iterator;
 import java.util.Locale;
@@ -16,9 +17,9 @@ public abstract class BaseLibraryImpl<T> implements ClassLibrary<T> {
     private Map<Class<? extends T>, ClassMetadata<? extends T>> serializationLookup = Maps.newHashMap();
     private Map<String, Class<? extends T>> typeLookup = Maps.newHashMap();
 
-    private MetadataBuilder metadataBuilder;
+    private TypeHandlerLibrary metadataBuilder;
 
-    public BaseLibraryImpl(MetadataBuilder metadataBuilder) {
+    public BaseLibraryImpl(TypeHandlerLibrary metadataBuilder) {
         this.metadataBuilder = metadataBuilder;
     }
 
@@ -41,7 +42,7 @@ public abstract class BaseLibraryImpl<T> implements ClassLibrary<T> {
 
     // TODO: Review this
     protected <U extends T> ClassMetadata<U> createMetadata(Class<U> clazz, String ... names) {
-        return metadataBuilder.build(clazz);
+        return metadataBuilder.build(clazz, names);
     }
 
     @Override

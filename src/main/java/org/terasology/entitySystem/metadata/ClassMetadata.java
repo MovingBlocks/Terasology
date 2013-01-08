@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
 
@@ -33,11 +34,17 @@ public class ClassMetadata<T> {
     private Map<String, FieldMetadata> fields = Maps.newHashMap();
     private Class<T> clazz;
     private Constructor<T> constructor;
+    private String[] names;
 
-    public ClassMetadata(Class<T> simpleClass) throws NoSuchMethodException {
+    public ClassMetadata(Class<T> simpleClass, String ... names) throws NoSuchMethodException {
         this.clazz = simpleClass;
+        this.names = Arrays.copyOf(names, names.length);
         constructor = simpleClass.getDeclaredConstructor();
         constructor.setAccessible(true);
+    }
+
+    public String[] getNames() {
+        return Arrays.copyOf(names, names.length);
     }
 
     public Class<T> getType() {

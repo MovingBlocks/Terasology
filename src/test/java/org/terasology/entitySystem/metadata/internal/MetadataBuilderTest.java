@@ -4,6 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.terasology.entitySystem.metadata.ClassMetadata;
 import org.terasology.entitySystem.metadata.FieldMetadata;
+import org.terasology.entitySystem.metadata.TypeHandlerLibrary;
+import org.terasology.entitySystem.metadata.TypeHandlerLibraryBuilder;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -15,11 +17,11 @@ import static org.junit.Assert.assertTrue;
  */
 public class MetadataBuilderTest {
 
-    private MetadataBuilder metadataBuilder;
+    private TypeHandlerLibrary metadataBuilder;
 
     @Before
     public void setup() {
-        this.metadataBuilder = new MetadataBuilder();
+        this.metadataBuilder = new TypeHandlerLibraryBuilder().build();
     }
 
     @Test

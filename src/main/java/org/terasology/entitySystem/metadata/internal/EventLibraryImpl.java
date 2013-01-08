@@ -1,24 +1,21 @@
 package org.terasology.entitySystem.metadata.internal;
 
-import com.google.common.collect.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Event;
 import org.terasology.entitySystem.metadata.ClassMetadata;
 import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
-
-import java.util.List;
-import java.util.Locale;
+import org.terasology.entitySystem.metadata.TypeHandlerLibrary;
 
 /**
  * @author Immortius
  */
 public class EventLibraryImpl extends BaseLibraryImpl<Event> implements EventLibrary {
     private static final Logger logger = LoggerFactory.getLogger(EventLibraryImpl.class);
-    private MetadataBuilder metadataBuilder;
+    private TypeHandlerLibrary metadataBuilder;
 
-    public EventLibraryImpl(MetadataBuilder metadataBuilder) {
+    public EventLibraryImpl(TypeHandlerLibrary metadataBuilder) {
         super(metadataBuilder);
         this.metadataBuilder = metadataBuilder;
     }

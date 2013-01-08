@@ -1,32 +1,21 @@
-package org.terasology.entitySystem.metadata.internal;
+package org.terasology.entitySystem.metadata;
 
-import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import com.google.common.collect.Maps;
+import com.google.common.collect.ImmutableMap;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.entitySystem.metadata.ClassMetadata;
-import org.terasology.entitySystem.metadata.FieldMetadata;
-import org.terasology.entitySystem.metadata.TypeHandler;
-import org.terasology.entitySystem.metadata.core.BooleanTypeHandler;
-import org.terasology.entitySystem.metadata.core.ByteTypeHandler;
-import org.terasology.entitySystem.metadata.core.DoubleTypeHandler;
 import org.terasology.entitySystem.metadata.core.EnumTypeHandler;
-import org.terasology.entitySystem.metadata.core.FloatTypeHandler;
-import org.terasology.entitySystem.metadata.core.IntTypeHandler;
 import org.terasology.entitySystem.metadata.core.ListTypeHandler;
-import org.terasology.entitySystem.metadata.core.LongTypeHandler;
 import org.terasology.entitySystem.metadata.core.MappedContainerTypeHandler;
-import org.terasology.entitySystem.metadata.core.NumberTypeHandler;
 import org.terasology.entitySystem.metadata.core.SetTypeHandler;
 import org.terasology.entitySystem.metadata.core.StringMapTypeHandler;
-import org.terasology.entitySystem.metadata.core.StringTypeHandler;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,31 +23,14 @@ import java.util.Set;
 /**
  * @author Immortius
  */
-public class MetadataBuilder {
+public class TypeHandlerLibrary implements Iterable<Map.Entry<Class<?>, TypeHandler<?>>> {
     private static final int MAX_SERIALIZATION_DEPTH = 1;
-    private static final Logger logger = LoggerFactory.getLogger(MetadataBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(TypeHandlerLibrary.class);
 
-    private Map<Class<?>, TypeHandler<?>> typeHandlers = Maps.newHashMap();
+    private Map<Class<?>, TypeHandler<?>> typeHandlers;
 
-    public MetadataBuilder() {
-        registerTypeHandler(Boolean.class, new BooleanTypeHandler());
-        registerTypeHandler(Boolean.TYPE, new BooleanTypeHandler());
-        registerTypeHandler(Byte.class, new ByteTypeHandler());
-        registerTypeHandler(Byte.TYPE, new ByteTypeHandler());
-        registerTypeHandler(Double.class, new DoubleTypeHandler());
-        registerTypeHandler(Double.TYPE, new DoubleTypeHandler());
-        registerTypeHandler(Float.class, new FloatTypeHandler());
-        registerTypeHandler(Float.TYPE, new FloatTypeHandler());
-        registerTypeHandler(Integer.class, new IntTypeHandler());
-        registerTypeHandler(Integer.TYPE, new IntTypeHandler());
-        registerTypeHandler(Long.class, new LongTypeHandler());
-        registerTypeHandler(Long.TYPE, new LongTypeHandler());
-        registerTypeHandler(String.class, new StringTypeHandler());
-        registerTypeHandler(Number.class, new NumberTypeHandler());
-    }
-
-    public <T> void registerTypeHandler(Class<? extends T> forClass, TypeHandler<T> handler) {
-        typeHandlers.put(forClass, handler);
+    public TypeHandlerLibrary(Map<Class<?>, TypeHandler<?>> typeHandlers) {
+        this.typeHandlers = ImmutableMap.copyOf(typeHandlers);
     }
 
     @SuppressWarnings("unchecked")
@@ -66,10 +38,10 @@ public class MetadataBuilder {
         return (TypeHandler<? super T>) typeHandlers.get(forClass);
     }
 
-    public <T> ClassMetadata<T> build(Class<T> forClass) {
+    public <T> ClassMetadata<T> build(Class<T> forClass, String ... names) {
         ClassMetadata<T> info;
         try {
-            info = new ClassMetadata<T>(forClass);
+            info = new ClassMetadata<T>(forClass, names);
         } catch (NoSuchMethodException e) {
             logger.error("Unable to register class {}: Default Constructor Required", forClass.getSimpleName(), e);
             return null;
@@ -189,5 +161,10 @@ public class MetadataBuilder {
             return null;
         }
         return parameterizedType.getActualTypeArguments()[parameter];
+    }
+
+    @Override
+    public Iterator<Map.Entry<Class<?>, TypeHandler<?>>> iterator() {
+        return typeHandlers.entrySet().iterator();
     }
 }

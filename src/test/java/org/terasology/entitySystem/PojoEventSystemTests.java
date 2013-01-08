@@ -5,6 +5,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
+import org.terasology.entitySystem.metadata.TypeHandlerLibrary;
+import org.terasology.entitySystem.metadata.TypeHandlerLibraryBuilder;
 import org.terasology.entitySystem.metadata.internal.EntitySystemLibraryImpl;
 import org.terasology.entitySystem.pojo.PojoEntityManager;
 import org.terasology.entitySystem.pojo.PojoEventSystem;
@@ -31,10 +33,13 @@ public class PojoEventSystemTests {
 
     @Before
     public void setup() {
+        TypeHandlerLibrary lib = new TypeHandlerLibraryBuilder().build();
 
-        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibraryImpl();
+        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibraryImpl(lib);
         compLibrary = entitySystemLibrary.getComponentLibrary();
-        entityManager = new PojoEntityManager(entitySystemLibrary, new PojoPrefabManager(compLibrary));
+        entityManager = new PojoEntityManager();
+        entityManager.setEntitySystemLibrary(entitySystemLibrary);
+        entityManager.setPrefabManager(new PojoPrefabManager(compLibrary));
         eventSystem = new PojoEventSystem(entitySystemLibrary.getEventLibrary(), mock(NetworkSystem.class));
         entityManager.setEventSystem(eventSystem);
         entity = entityManager.create();

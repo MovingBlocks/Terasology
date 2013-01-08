@@ -86,7 +86,7 @@ public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
             case CREATE_ENTITY:
             case UPDATE_ENTITY:
             case REMOVE_ENTITY:
-                networkSystem.queueMessage(message);
+                server.queueMessage(message);
                 break;
             case EVENT:
                 server.queueEvent(message.getEvent());
@@ -108,7 +108,7 @@ public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
 
     // TODO: Threading (need to deal with this coming from a background thread correctly)
     private void invalidateChunk(InvalidateChunkMessage invalidateChunk) {
-        networkSystem.getRemoteWorldProvider().invalidateChunks(NetworkUtil.convert(invalidateChunk.getPos()));
+        server.invalidateChunks(NetworkUtil.convert(invalidateChunk.getPos()));
     }
 
     private void receivedChunk(ChunkMessage chunkInfo) {
@@ -117,7 +117,7 @@ public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
         TeraSmartArray light = new TeraSmartArray(Chunk.SIZE_X, Chunk.SIZE_Y, Chunk.SIZE_Z, chunkInfo.getLightData().toByteArray());
         TeraSmartArray liquid = new TeraSmartArray(Chunk.SIZE_X, Chunk.SIZE_Y, Chunk.SIZE_Z, chunkInfo.getLiquidData().toByteArray());
         Chunk chunk = new Chunk(NetworkUtil.convert(chunkInfo.getPos()), blocks, sunlight, light, liquid);
-        networkSystem.receiveChunk(chunk);
+        server.receiveChunk(chunk);
     }
 
     @Override
@@ -129,7 +129,7 @@ public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
     private void receivedServerInfo(ServerInfoMessage message) {
         if (awaitingServerInfo) {
             awaitingServerInfo = false;
-            networkSystem.setServerInfo(message);
+            server.setServerInfo(message);
         }
     }
 }

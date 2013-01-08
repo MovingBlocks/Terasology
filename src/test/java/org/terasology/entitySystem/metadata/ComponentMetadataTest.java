@@ -30,7 +30,7 @@ public class ComponentMetadataTest {
 
     @Test
     public void staticFieldsIgnored() {
-        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibraryImpl();
+        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibraryImpl(new TypeHandlerLibraryBuilder().build());
         ComponentLibrary lib = entitySystemLibrary.getComponentLibrary();
         lib.register(StringComponent.class);
         ClassMetadata<StringComponent> metadata = lib.getMetadata(StringComponent.class);
@@ -39,7 +39,7 @@ public class ComponentMetadataTest {
 
     @Test
     public void typesWithNoPublicConstructorIgnored() {
-        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibraryImpl();
+        EntitySystemLibrary entitySystemLibrary = new EntitySystemLibraryImpl(new TypeHandlerLibraryBuilder().build());
         ComponentLibrary lib = entitySystemLibrary.getComponentLibrary();
         lib.register(UnsupportedTypeComponent.class);
         ClassMetadata<UnsupportedTypeComponent> metadata = lib.getMetadata(UnsupportedTypeComponent.class);

@@ -18,13 +18,14 @@ package org.terasology.entitySystem.metadata.internal;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.MetadataUtil;
+import org.terasology.entitySystem.metadata.TypeHandlerLibrary;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
 public final class ComponentLibraryImpl extends BaseLibraryImpl<Component> implements ComponentLibrary {
 
-    public ComponentLibraryImpl(MetadataBuilder metadataBuilder) {
+    public ComponentLibraryImpl(TypeHandlerLibrary metadataBuilder) {
         super(metadataBuilder);
     }
 

@@ -39,6 +39,10 @@ public class EntitySerializer {
      * @param entityManager The entityManager that deserialized entities will be placed in.
      */
     public EntitySerializer(PersistableEntityManager entityManager) {
+        this(entityManager, entityManager.getComponentLibrary());
+    }
+
+    public EntitySerializer(PersistableEntityManager entityManager, ComponentLibrary componentLibrary) {
         this.entityManager = entityManager;
         this.prefabManager = entityManager.getPrefabManager();
         this.componentLibrary = entityManager.getComponentLibrary();
@@ -170,7 +174,7 @@ public class EntitySerializer {
             }
         }
         for (Component comp : currentEntity.iterateComponents()) {
-            if (!presentComponents.contains(comp) && comp.getClass() != EntityInfoComponent.class) {
+            if (!presentComponents.contains(comp.getClass()) && comp.getClass() != EntityInfoComponent.class) {
                 currentEntity.removeComponent(comp.getClass());
             }
         }

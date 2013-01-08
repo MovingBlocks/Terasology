@@ -3,15 +3,21 @@ package org.terasology.entitySystem.metadata.internal;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.metadata.EventLibrary;
-import org.terasology.entitySystem.metadata.TypeHandler;
+import org.terasology.entitySystem.metadata.TypeHandlerLibrary;
 
 /**
  * @author Immortius
  */
 public class EntitySystemLibraryImpl implements EntitySystemLibrary {
-    private MetadataBuilder metadataBuilder = new MetadataBuilder();
-    private ComponentLibrary componentLibrary = new ComponentLibraryImpl(metadataBuilder);
-    private EventLibrary eventLibrary = new EventLibraryImpl(metadataBuilder);
+    private final TypeHandlerLibrary typeHandlerLibrary;
+    private final ComponentLibrary componentLibrary;
+    private final EventLibrary eventLibrary;
+
+    public EntitySystemLibraryImpl(TypeHandlerLibrary typeHandlerLibrary) {
+        this.typeHandlerLibrary = typeHandlerLibrary;
+        this.componentLibrary = new ComponentLibraryImpl(typeHandlerLibrary);
+        this.eventLibrary = new EventLibraryImpl(typeHandlerLibrary);
+    }
 
     @Override
     public ComponentLibrary getComponentLibrary() {
@@ -24,12 +30,8 @@ public class EntitySystemLibraryImpl implements EntitySystemLibrary {
     }
 
     @Override
-    public <T> void registerTypeHandler(Class<? extends T> forClass, TypeHandler<T> handler) {
-        metadataBuilder.registerTypeHandler(forClass, handler);
+    public TypeHandlerLibrary getTypeHandlerLibrary() {
+        return typeHandlerLibrary;
     }
 
-    @Override
-    public <T> TypeHandler<? super T> getTypeHandler(Class<T> forClass) {
-        return metadataBuilder.getTypeHandler(forClass);
-    }
 }

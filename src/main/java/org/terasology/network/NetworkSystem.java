@@ -17,18 +17,25 @@ import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityChangeSubscriber;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Event;
 import org.terasology.entitySystem.PersistableEntityManager;
+import org.terasology.entitySystem.metadata.ClassMetadata;
+import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
-import org.terasology.entitySystem.metadata.extension.EntityRefTypeHandler;
+import org.terasology.entitySystem.metadata.EventLibrary;
+import org.terasology.entitySystem.metadata.TypeHandler;
+import org.terasology.entitySystem.metadata.TypeHandlerLibraryBuilder;
+import org.terasology.entitySystem.metadata.internal.EntitySystemLibraryImpl;
 import org.terasology.entitySystem.persistence.EntitySerializer;
 import org.terasology.entitySystem.persistence.EventSerializer;
 import org.terasology.game.CoreRegistry;
 import org.terasology.network.pipelineFactory.TerasologyClientPipelineFactory;
 import org.terasology.network.pipelineFactory.TerasologyServerPipelineFactory;
+import org.terasology.network.serialization.NetEntityRefTypeHandler;
 import org.terasology.protobuf.NetData;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
@@ -46,27 +53,25 @@ import java.util.concurrent.Executors;
 public class NetworkSystem implements EntityChangeSubscriber {
     private static final Logger logger = LoggerFactory.getLogger(NetworkSystem.class);
 
-    private NetworkMode mode = NetworkMode.NONE;
-    private final Set<ClientPlayer> clientPlayerList = Sets.newLinkedHashSet();
-    private Map<EntityRef, ClientPlayer> clientPlayerLookup = Maps.newHashMap();
-
     // Shared
+    private NetworkMode mode = NetworkMode.NONE;
     private PersistableEntityManager entityManager;
+    private EntitySystemLibrary entitySystemLibrary;
+    private EventSerializer eventSerializer;
+    private EntitySerializer entitySerializer;
+
     private ChannelFactory factory;
     private TIntIntMap netIdToEntityId = new TIntIntHashMap();
-    private BlockingQueue<NetData.NetMessage> queuedMessages = Queues.newLinkedBlockingQueue();
-    private BlockingQueue<ClientPlayer> newClients = Queues.newLinkedBlockingQueue();
-    private EventSerializer eventSerializer;
 
     // Server only
     private ChannelGroup allChannels = new DefaultChannelGroup("tera-channels");
-    private NetData.ServerInfoMessage serverInfo;
+    private BlockingQueue<ClientPlayer> newClients = Queues.newLinkedBlockingQueue();
     private int nextNetId = 1;
+    private final Set<ClientPlayer> clientPlayerList = Sets.newLinkedHashSet();
+    private Map<EntityRef, ClientPlayer> clientPlayerLookup = Maps.newHashMap();
 
     // Client only
     private Server server;
-    private RemoteChunkProvider remoteWorldProvider;
-    private BlockingQueue<Chunk> chunkQueue = Queues.newLinkedBlockingQueue();
 
     public NetworkSystem() {
     }
@@ -116,25 +121,18 @@ public class NetworkSystem implements EntityChangeSubscriber {
             logger.info("Network shutdown");
             mode = NetworkMode.NONE;
             server = null;
-            serverInfo = null;
-            remoteWorldProvider = null;
             nextNetId = 1;
             netIdToEntityId.clear();
-            eventSerializer = null;
             entityManager = null;
+            entitySystemLibrary = null;
+            eventSerializer = null;
+            entitySerializer = null;
         }
     }
 
     public void update() {
         if (mode != NetworkMode.NONE) {
             if (entityManager != null) {
-                if (remoteWorldProvider != null) {
-                    List<Chunk> chunks = Lists.newArrayListWithExpectedSize(chunkQueue.size());
-                    chunkQueue.drainTo(chunks);
-                    for (Chunk chunk : chunks) {
-                        remoteWorldProvider.receiveChunk(chunk);
-                    }
-                }
                 if (!newClients.isEmpty()) {
                     List<ClientPlayer> newPlayers = Lists.newArrayListWithExpectedSize(newClients.size());
                     newClients.drainTo(newPlayers);
@@ -148,56 +146,12 @@ public class NetworkSystem implements EntityChangeSubscriber {
                 if (server != null) {
                     server.update();
                 }
-                processMessages();
             }
         }
-    }
-
-    private void processMessages() {
-        List<NetData.NetMessage> messages = Lists.newArrayListWithExpectedSize(queuedMessages.size());
-        queuedMessages.drainTo(messages);
-        EntitySerializer serializer = new EntitySerializer(entityManager);
-        serializer.setIgnoringEntityId(true);
-        EntityRefTypeHandler.setNetworkMode(this);
-
-        for (NetData.NetMessage message : messages) {
-            switch (message.getType()) {
-                case CREATE_ENTITY:
-                    EntityRef newEntity = serializer.deserialize(message.getCreateEntity().getEntity());
-                    logger.info("Received new entity: {} with net id {}", newEntity, newEntity.getComponent(NetworkComponent.class).networkId);
-                    registerNetworkEntity(newEntity);
-                    break;
-                case UPDATE_ENTITY:
-                    EntityRef currentEntity = getEntity(message.getUpdateEntity().getNetId());
-                    serializer.deserializeOnto(currentEntity, message.getUpdateEntity().getEntity());
-                    break;
-                case REMOVE_ENTITY:
-                    int netId = message.getRemoveEntity().getNetId();
-                    EntityRef entity = getEntity(netId);
-                    unregisterNetworkEntity(entity);
-                    entity.destroy();
-                    break;
-                case EVENT:
-                    Event event = eventSerializer.deserialize(message.getEvent().getEvent());
-                    EntityRef target = getEntity(message.getEvent().getTargetId());
-                    target.send(event);
-                    break;
-            }
-        }
-
-        EntityRefTypeHandler.setEntityManagerMode(entityManager);
     }
 
     public NetworkMode getMode() {
         return mode;
-    }
-
-    public NetData.ServerInfoMessage getServerInfo() {
-        return serverInfo;
-    }
-
-    public void setServerInfo(NetData.ServerInfoMessage serverInfo) {
-        this.serverInfo = serverInfo;
     }
 
     public Server getServer() {
@@ -213,12 +167,9 @@ public class NetworkSystem implements EntityChangeSubscriber {
     }
 
     public void setRemoteWorldProvider(RemoteChunkProvider remoteWorldProvider) {
-        this.remoteWorldProvider = remoteWorldProvider;
+        server.setRemoteWorldProvider(remoteWorldProvider);
     }
 
-    public RemoteChunkProvider getRemoteWorldProvider() {
-        return remoteWorldProvider;
-    }
 
     public void registerNetworkEntity(EntityRef entity) {
         if (mode == NetworkMode.NONE) {
@@ -256,34 +207,51 @@ public class NetworkSystem implements EntityChangeSubscriber {
 
     public void unregisterNetworkEntity(EntityRef entity) {
         NetworkComponent netComponent = entity.getComponent(NetworkComponent.class);
-        netIdToEntityId.remove(netComponent.networkId);
-        if (mode == NetworkMode.SERVER) {
-            NetData.NetMessage message = NetData.NetMessage.newBuilder()
-                    .setType(NetData.NetMessage.Type.REMOVE_ENTITY)
-                    .setRemoveEntity(
-                            NetData.RemoveEntityMessage.newBuilder().setNetId(netComponent.networkId).build())
-                    .build();
-            for (ClientPlayer client : clientPlayerList) {
-                client.setNetRemoved(netComponent.networkId, message);
+        if (netComponent != null) {
+            netIdToEntityId.remove(netComponent.networkId);
+            if (mode == NetworkMode.SERVER) {
+                NetData.NetMessage message = NetData.NetMessage.newBuilder()
+                        .setType(NetData.NetMessage.Type.REMOVE_ENTITY)
+                        .setRemoveEntity(
+                                NetData.RemoveEntityMessage.newBuilder().setNetId(netComponent.networkId).build())
+                        .build();
+                for (ClientPlayer client : clientPlayerList) {
+                    client.setNetRemoved(netComponent.networkId, message);
+                }
             }
         }
     }
 
-    public void connectToEntitySystem(PersistableEntityManager entityManager, EntitySystemLibrary entitySystemLibrary) {
+    public void connectToEntitySystem(PersistableEntityManager entityManager, EntitySystemLibrary library) {
         if (this.entityManager != null) {
             this.entityManager.unsubscribe(this);
         }
         this.entityManager = entityManager;
         this.entityManager.subscribe(this);
 
-        eventSerializer = new EventSerializer(entitySystemLibrary.getEventLibrary());
+        TypeHandlerLibraryBuilder builder = new TypeHandlerLibraryBuilder();
+        for (Map.Entry<Class<?>, TypeHandler<?>> entry : library.getTypeHandlerLibrary()) {
+            builder.addRaw(entry.getKey(), entry.getValue());
+        }
+        builder.add(EntityRef.class, new NetEntityRefTypeHandler(this));
+        // TODO: Add network override types here
+
+        this.entitySystemLibrary = new EntitySystemLibraryImpl(builder.build());
+        EventLibrary eventLibrary = entitySystemLibrary.getEventLibrary();
+        for (ClassMetadata<? extends Event> eventMetadata : library.getEventLibrary()) {
+            eventLibrary.register(eventMetadata.getType(), eventMetadata.getNames());
+        }
+        ComponentLibrary componentLibrary = entitySystemLibrary.getComponentLibrary();
+        for (ClassMetadata<? extends Component> componentMetadata : library.getComponentLibrary()) {
+            componentLibrary.register(componentMetadata.getType(), componentMetadata.getNames());
+        }
+
+        eventSerializer = new EventSerializer(eventLibrary);
+        entitySerializer = new EntitySerializer(entityManager, componentLibrary);
+        entitySerializer.setIgnoringEntityId(true);
 
         if (server != null) {
-            server.setEventSerializer(eventSerializer);
-            server.setEntityManager(entityManager);
-        }
-        for (ClientPlayer client : clientPlayerList) {
-            client.setEventSerializer(eventSerializer);
+            server.connectToEntitySystem(entityManager, entitySerializer, eventSerializer);
         }
     }
 
@@ -316,13 +284,10 @@ public class NetworkSystem implements EntityChangeSubscriber {
 
     private void processNewClient(ClientPlayer client) {
         logger.info("New client connected: {}", client.getName());
-        client.setConnected();
+        client.connected(entityManager, entitySerializer, eventSerializer);
         logger.info("New client entity: {}", client.getEntity());
         clientPlayerList.add(client);
         clientPlayerLookup.put(client.getEntity(), client);
-        if (eventSerializer != null) {
-            client.setEventSerializer(eventSerializer);
-        }
         for (EntityRef netEntity : entityManager.iteratorEntities(NetworkComponent.class)) {
             NetworkComponent netComp = netEntity.getComponent(NetworkComponent.class);
             switch (netComp.replicateMode) {
@@ -345,16 +310,8 @@ public class NetworkSystem implements EntityChangeSubscriber {
         }
     }
 
-    void receiveChunk(Chunk chunk) {
-        chunkQueue.offer(chunk);
-    }
-
-    void queueMessage(NetData.NetMessage message) {
-        queuedMessages.offer(message);
-    }
-
-
     void setServer(Server server) {
         this.server = server;
     }
+
 }

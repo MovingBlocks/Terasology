@@ -58,7 +58,6 @@ public class WorldSerializerImpl implements WorldSerializer {
     @Override
     public EntityData.World serializeWorld(boolean verbose) {
         final EntityData.World.Builder world = EntityData.World.newBuilder();
-        EntityRefTypeHandler.setEntityManagerMode(entityManager);
 
         if (!verbose) {
             writeComponentTypeTable(world);

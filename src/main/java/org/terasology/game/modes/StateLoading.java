@@ -125,8 +125,6 @@ public class StateLoading implements GameState {
         loadProcesses.add(new InitialiseRemoteWorld(worldInfo));
         // Up to here
         loadProcesses.add(new InitialiseSystems());
-        loadProcesses.add(new LoadEntities(worldInfo));
-        loadProcesses.add(new CreateWorldEntity());
         loadProcesses.add(new PrepareLocalWorld());
         loadProcesses.add(new PrepareWorld());
         loadProcesses.add(new SetupRemotePlayer());

@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.ModConfig;
 import org.terasology.game.CoreRegistry;
-import org.terasology.game.TerasologyConstants;
 import org.terasology.game.modes.LoadProcess;
 import org.terasology.game.types.SurvivalType;
 import org.terasology.logic.mod.Mod;
@@ -40,19 +39,19 @@ public class JoinServer implements LoadProcess {
 
     @Override
     public boolean step() {
-        if (networkSystem.getServerInfo() != null) {
-            worldInfo.setTitle(networkSystem.getServerInfo().getWorldName());
+        if (networkSystem.getServer().getInfo() != null) {
+            worldInfo.setTitle(networkSystem.getServer().getInfo().getWorldName());
             Map<String, Byte> blockMap = Maps.newHashMap();
-            for (NetData.BlockMapping mapping : networkSystem.getServerInfo().getBlockMappingList()) {
+            for (NetData.BlockMapping mapping : networkSystem.getServer().getInfo().getBlockMappingList()) {
                 blockMap.put(mapping.getBlockName(), (byte)mapping.getBlockId());
             }
             worldInfo.setBlockIdMap(blockMap);
-            worldInfo.setTime(networkSystem.getServerInfo().getTime());
+            worldInfo.setTime(networkSystem.getServer().getInfo().getTime());
             worldInfo.setGameType(SurvivalType.class.getName());
 
             ModConfig modConfig = worldInfo.getModConfiguration();
             ModManager modManager = CoreRegistry.get(ModManager.class);
-            for (NetData.ModuleInfo moduleInfo : networkSystem.getServerInfo().getModuleList()) {
+            for (NetData.ModuleInfo moduleInfo : networkSystem.getServer().getInfo().getModuleList()) {
                 Mod mod = modManager.getMod(moduleInfo.getModuleId());
                 if (mod == null) {
                     // TODO: Missing module, fail and disconnect

@@ -427,7 +427,8 @@ public class Commands implements CommandProvider {
     @Command(shortDescription = "Writes out information on all entities to a text file for debugging",
             helpText = "Writes entity information out into a file named \"entityDump.txt\".")
     public void dumpEntities() throws IOException {
-        CoreRegistry.get(WorldPersister.class).save(new File(PathManager.getInstance().getDataPath(), "entityDump.txt"), WorldPersister.SaveFormat.JSON);
+        WorldPersister worldPersister = new WorldPersister(CoreRegistry.get(EntityManager.class));
+        worldPersister.save(new File(PathManager.getInstance().getDataPath(), "entityDump.txt"), WorldPersister.SaveFormat.JSON);
     }
 
     @Command(shortDescription = "Maps a key to a function")
