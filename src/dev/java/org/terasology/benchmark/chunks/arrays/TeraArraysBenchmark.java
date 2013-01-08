@@ -45,11 +45,12 @@ public final class TeraArraysBenchmark {
 
         final List<Benchmark> benchmarks = new LinkedList<Benchmark>();
         
-//        benchmarks.add(new BenchmarkTeraArraySerializeObject(new TeraDenseArray8Bit.SerializationHandler(), new TeraDenseArray8Bit(16, 256, 16)));
-//        benchmarks.add(new BenchmarkTeraArraySerializeToBuffer(new TeraDenseArray8Bit.SerializationHandler(), new TeraDenseArray8Bit(16, 256, 16)));
-//        benchmarks.add(new BenchmarkTeraArraySerializeToStreamViaByteArray(new TeraDenseArray8Bit.SerializationHandler(), new TeraDenseArray8Bit(16, 256, 16)));
-//        benchmarks.add(new BenchmarkTeraArraySerializeToStreamViaChannel(new TeraDenseArray8Bit.SerializationHandler(), new TeraDenseArray8Bit(16, 256, 16)));
-//
+        benchmarks.add(new BenchmarkTeraArraySerializeObject(new TeraDenseArray8Bit.SerializationHandler(), new TeraDenseArray8Bit(16, 256, 16)));
+        benchmarks.add(new BenchmarkTeraArraySerializeToBuffer(new TeraDenseArray8Bit.SerializationHandler(), new TeraDenseArray8Bit(16, 256, 16)));
+        benchmarks.add(new BenchmarkTeraArraySerializeToByteString(new TeraDenseArray8Bit.SerializationHandler(), new TeraDenseArray8Bit(16, 256, 16)));
+        benchmarks.add(new BenchmarkTeraArraySerializeToStreamViaByteArray(new TeraDenseArray8Bit.SerializationHandler(), new TeraDenseArray8Bit(16, 256, 16)));
+        benchmarks.add(new BenchmarkTeraArraySerializeToStreamViaChannel(new TeraDenseArray8Bit.SerializationHandler(), new TeraDenseArray8Bit(16, 256, 16)));
+
 //        benchmarks.add(new BenchmarkTeraArrayDeserializeFromBuffer(new TeraDenseArray8Bit.SerializationHandler(), new TeraDenseArray8Bit(16, 256, 16)));
 //
 //
