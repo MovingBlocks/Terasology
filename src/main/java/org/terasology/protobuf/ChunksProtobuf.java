@@ -173,7 +173,7 @@ public final class ChunksProtobuf {
   public interface TeraArrayOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
     
-    // required .Type type = 1;
+    // optional .Type type = 1;
     boolean hasType();
     org.terasology.protobuf.ChunksProtobuf.Type getType();
     
@@ -214,7 +214,7 @@ public final class ChunksProtobuf {
     }
     
     private int bitField0_;
-    // required .Type type = 1;
+    // optional .Type type = 1;
     public static final int TYPE_FIELD_NUMBER = 1;
     private org.terasology.protobuf.ChunksProtobuf.Type type_;
     public boolean hasType() {
@@ -276,10 +276,6 @@ public final class ChunksProtobuf {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
       
-      if (!hasType()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -527,10 +523,6 @@ public final class ChunksProtobuf {
       }
       
       public final boolean isInitialized() {
-        if (!hasType()) {
-          
-          return false;
-        }
         return true;
       }
       
@@ -584,7 +576,7 @@ public final class ChunksProtobuf {
       
       private int bitField0_;
       
-      // required .Type type = 1;
+      // optional .Type type = 1;
       private org.terasology.protobuf.ChunksProtobuf.Type type_ = org.terasology.protobuf.ChunksProtobuf.Type.Unknown;
       public boolean hasType() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
@@ -683,19 +675,19 @@ public final class ChunksProtobuf {
       com.google.protobuf.GeneratedMessage.
           ExtendableMessageOrBuilder<Chunk> {
     
-    // required sint32 x = 1;
+    // optional sint32 x = 1;
     boolean hasX();
     int getX();
     
-    // required sint32 y = 2;
+    // optional sint32 y = 2;
     boolean hasY();
     int getY();
     
-    // required sint32 z = 3;
+    // optional sint32 z = 3;
     boolean hasZ();
     int getZ();
     
-    // required .State state = 4;
+    // optional .State state = 4;
     boolean hasState();
     org.terasology.protobuf.ChunksProtobuf.State getState();
     
@@ -748,7 +740,7 @@ public final class ChunksProtobuf {
     }
     
     private int bitField0_;
-    // required sint32 x = 1;
+    // optional sint32 x = 1;
     public static final int X_FIELD_NUMBER = 1;
     private int x_;
     public boolean hasX() {
@@ -758,7 +750,7 @@ public final class ChunksProtobuf {
       return x_;
     }
     
-    // required sint32 y = 2;
+    // optional sint32 y = 2;
     public static final int Y_FIELD_NUMBER = 2;
     private int y_;
     public boolean hasY() {
@@ -768,7 +760,7 @@ public final class ChunksProtobuf {
       return y_;
     }
     
-    // required sint32 z = 3;
+    // optional sint32 z = 3;
     public static final int Z_FIELD_NUMBER = 3;
     private int z_;
     public boolean hasZ() {
@@ -778,7 +770,7 @@ public final class ChunksProtobuf {
       return z_;
     }
     
-    // required .State state = 4;
+    // optional .State state = 4;
     public static final int STATE_FIELD_NUMBER = 4;
     private org.terasology.protobuf.ChunksProtobuf.State state_;
     public boolean hasState() {
@@ -855,46 +847,6 @@ public final class ChunksProtobuf {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
       
-      if (!hasX()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasY()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasZ()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasState()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (hasBlock()) {
-        if (!getBlock().isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
-      if (hasSunlight()) {
-        if (!getSunlight().isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
-      if (hasLight()) {
-        if (!getLight().isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
-      if (hasLiquid()) {
-        if (!getLiquid().isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
       if (!extensionsAreInitialized()) {
         memoizedIsInitialized = 0;
         return false;
@@ -1268,46 +1220,6 @@ public final class ChunksProtobuf {
       }
       
       public final boolean isInitialized() {
-        if (!hasX()) {
-          
-          return false;
-        }
-        if (!hasY()) {
-          
-          return false;
-        }
-        if (!hasZ()) {
-          
-          return false;
-        }
-        if (!hasState()) {
-          
-          return false;
-        }
-        if (hasBlock()) {
-          if (!getBlock().isInitialized()) {
-            
-            return false;
-          }
-        }
-        if (hasSunlight()) {
-          if (!getSunlight().isInitialized()) {
-            
-            return false;
-          }
-        }
-        if (hasLight()) {
-          if (!getLight().isInitialized()) {
-            
-            return false;
-          }
-        }
-        if (hasLiquid()) {
-          if (!getLiquid().isInitialized()) {
-            
-            return false;
-          }
-        }
         if (!extensionsAreInitialized()) {
           
           return false;
@@ -1406,7 +1318,7 @@ public final class ChunksProtobuf {
       
       private int bitField0_;
       
-      // required sint32 x = 1;
+      // optional sint32 x = 1;
       private int x_ ;
       public boolean hasX() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
@@ -1427,7 +1339,7 @@ public final class ChunksProtobuf {
         return this;
       }
       
-      // required sint32 y = 2;
+      // optional sint32 y = 2;
       private int y_ ;
       public boolean hasY() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
@@ -1448,7 +1360,7 @@ public final class ChunksProtobuf {
         return this;
       }
       
-      // required sint32 z = 3;
+      // optional sint32 z = 3;
       private int z_ ;
       public boolean hasZ() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
@@ -1469,7 +1381,7 @@ public final class ChunksProtobuf {
         return this;
       }
       
-      // required .State state = 4;
+      // optional .State state = 4;
       private org.terasology.protobuf.ChunksProtobuf.State state_ = org.terasology.protobuf.ChunksProtobuf.State.ADJACENCY_GENERATION_PENDING;
       public boolean hasState() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
@@ -1883,10 +1795,10 @@ public final class ChunksProtobuf {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\014Chunks.proto\"B\n\tTeraArray\022\023\n\004type\030\001 \002(" +
+      "\n\014Chunks.proto\"B\n\tTeraArray\022\023\n\004type\030\001 \001(" +
       "\0162\005.Type\022\022\n\nclass_name\030\002 \001(\t\022\014\n\004data\030\003 \001" +
-      "(\014\"\266\001\n\005Chunk\022\t\n\001x\030\001 \002(\021\022\t\n\001y\030\002 \002(\021\022\t\n\001z\030" +
-      "\003 \002(\021\022\025\n\005state\030\004 \002(\0162\006.State\022\031\n\005block\030\005 " +
+      "(\014\"\266\001\n\005Chunk\022\t\n\001x\030\001 \001(\021\022\t\n\001y\030\002 \001(\021\022\t\n\001z\030" +
+      "\003 \001(\021\022\025\n\005state\030\004 \001(\0162\006.State\022\031\n\005block\030\005 " +
       "\001(\0132\n.TeraArray\022\034\n\010sunlight\030\006 \001(\0132\n.Tera" +
       "Array\022\031\n\005light\030\007 \001(\0132\n.TeraArray\022\032\n\006liqu" +
       "id\030\010 \001(\0132\n.TeraArray*\005\010d\020\351\007*\220\001\n\004Type\022\013\n\007" +
