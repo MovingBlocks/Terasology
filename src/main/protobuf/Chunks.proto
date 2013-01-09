@@ -19,7 +19,7 @@ enum Type {
 }
 
 message TeraArray {
-    required Type   type       = 1;
+    optional Type   type       = 1;
     optional string class_name = 2;
     optional bytes  data       = 3;
 }
@@ -33,11 +33,11 @@ enum State {
 }
 
 message Chunk {
-    required sint32    x        = 1;
-    required sint32    y        = 2;
-    required sint32    z        = 3;
+    optional sint32    x        = 1;
+    optional sint32    y        = 2;
+    optional sint32    z        = 3;
 
-    required State     state    = 4;
+    optional State     state    = 4;
     
     optional TeraArray block    = 5;
     optional TeraArray sunlight = 6;
