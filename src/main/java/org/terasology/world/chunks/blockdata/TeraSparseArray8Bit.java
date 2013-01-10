@@ -51,7 +51,12 @@ public final class TeraSparseArray8Bit extends TeraSparseArrayByte {
         public Class<TeraSparseArray8Bit> getArrayClass() {
             return TeraSparseArray8Bit.class;
         }
-        
+
+        @Override
+        public SerializationHandler createSerializationHandler() {
+            return new SerializationHandler();
+        }
+       
         @Override
         public TeraSparseArray8Bit create() {
             return new TeraSparseArray8Bit();

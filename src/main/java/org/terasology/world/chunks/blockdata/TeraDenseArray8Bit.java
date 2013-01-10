@@ -46,6 +46,11 @@ public final class TeraDenseArray8Bit extends TeraDenseArrayByte {
         public Class<TeraDenseArray8Bit> getArrayClass() {
             return TeraDenseArray8Bit.class;
         }
+
+        @Override
+        public SerializationHandler createSerializationHandler() {
+            return new SerializationHandler();
+        }
         
         @Override
         public TeraDenseArray8Bit create() {

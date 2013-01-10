@@ -2,20 +2,14 @@ package org.terasology.config;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.world.chunks.blockdata.TeraArray;
-import org.terasology.world.chunks.blockdata.TeraDenseArray16Bit;
-import org.terasology.world.chunks.blockdata.TeraDenseArray4Bit;
+import org.terasology.world.chunks.blockdata.TeraArrays;
 import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
-import org.terasology.world.chunks.blockdata.TeraSparseArray16Bit;
-import org.terasology.world.chunks.blockdata.TeraSparseArray4Bit;
-import org.terasology.world.chunks.blockdata.TeraSparseArray8Bit;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -34,7 +28,6 @@ import com.google.gson.JsonSerializer;
 public final class AdvancedConfig {
     
     private static final Logger logger = LoggerFactory.getLogger(AdvancedConfig.class);
-    private static final Map<String, TeraArray.Factory> teraArrayRegistry; 
 
     private String blocksFactory, sunlightFactory, lightFactory, liquidFactory;
     private boolean chunkDeflationEnabled, chunkDeflationLoggingEnabled;
@@ -190,55 +183,35 @@ public final class AdvancedConfig {
         
     }
     
-    static {
-        teraArrayRegistry = Maps.newHashMap();
-        registerTeraArrayFactory(new TeraDenseArray4Bit.Factory());
-        registerTeraArrayFactory(new TeraDenseArray8Bit.Factory());
-        registerTeraArrayFactory(new TeraDenseArray16Bit.Factory());
-        registerTeraArrayFactory(new TeraSparseArray4Bit.Factory());
-        registerTeraArrayFactory(new TeraSparseArray8Bit.Factory());
-        registerTeraArrayFactory(new TeraSparseArray16Bit.Factory());
-    }
-    
     public static TeraArray.Factory getTeraArrayFactory(String factory) {
         Preconditions.checkNotNull(factory, "The parameter 'factory' must not be null");
-        return teraArrayRegistry.get(factory);
+        final TeraArrays.Entry entry = TeraArrays.get(factory);
+        if (entry != null)
+            return entry.factory;
+        return null;
     }
     
     public static TeraArray.Factory requireTeraArrayFactory(String factory) {
         Preconditions.checkNotNull(factory, "Parameter 'factory' must no be null");
-        return Preconditions.checkNotNull(teraArrayRegistry.get(factory), "Factory does not exist: '" + factory + "'");
+        return Preconditions.checkNotNull(getTeraArrayFactory(factory), "Factory does not exist: '" + factory + "'");
     }
     
     public static void checkContainsTeraArrayFactory(String factory) {
         Preconditions.checkNotNull(factory, "Parameter 'factory' must not be null");
-        Preconditions.checkState(teraArrayRegistry.containsKey(factory), "Factory does not exist: '" + factory + "'");
+        Preconditions.checkState(containsTeraArrayFactory(factory), "Factory does not exist: '" + factory + "'");
     }
     
     public static boolean containsTeraArrayFactory(String factory) {
-        if (factory == null) return false;
-        return teraArrayRegistry.containsKey(factory);
+        return factory != null && getTeraArrayFactory(factory) != null;
     }
     
     public static String[] getTeraArrayFactories() {
-        String[] factories = new String[teraArrayRegistry.size()];
-        int i = 0;
-        for (String factory : teraArrayRegistry.keySet()) {
-            factories[i++] = factory;
+        final TeraArrays.Entry[] entries = TeraArrays.getCoreArrayEntries();
+        final String[] factories = new String[entries.length];
+        for (int i = 0; i < entries.length; i++) {
+            factories[i] = entries[i].arrayClassName;
         }
         Arrays.sort(factories);
         return factories;
     }
-    
-    public static void registerTeraArrayFactory(TeraArray.Factory factory) {
-        Preconditions.checkNotNull(factory, "Parameter 'factory' must not be null");
-        final String name = factory.getArrayClass().getName();
-        Preconditions.checkNotNull(name, "Factory:getName() must not return null");
-        Preconditions.checkArgument(!name.isEmpty(), "Factory:getName() must not return an empty string");
-        Preconditions.checkArgument(name.equals(name.trim()), "Factory:getName() contains illegal whitespaces ('" + name + "')");
-        Preconditions.checkState(!teraArrayRegistry.containsKey(name), "A factory named '" + name + "' already exists");
-        teraArrayRegistry.put(name, factory);
-        logger.debug("Registered tera array factory: {}", name);
-    }
-    
 }
