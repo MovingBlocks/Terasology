@@ -34,40 +34,40 @@ public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
 
     private final int rowGet(int pos, byte value) {
         if (pos < getSizeXZHalf()) {
-            return TeraArrays.getHi(value);
+            return TeraArrayUtils.getHi(value);
         }
-        return TeraArrays.getLo(value);
+        return TeraArrayUtils.getLo(value);
     }
 
     private final int rowGet(byte[] row, int pos) {
         if (pos < getSizeXZHalf()) {
-            return TeraArrays.getHi(row[pos]);
+            return TeraArrayUtils.getHi(row[pos]);
         }
-        return TeraArrays.getLo(row[pos - getSizeXZHalf()]);
+        return TeraArrayUtils.getLo(row[pos - getSizeXZHalf()]);
     }
 
     private final void rowSet(byte[] row, int pos, int value) {
         if (pos < getSizeXZHalf()) {
             byte raw = row[pos];
-            row[pos] = TeraArrays.setHi(raw, value);
+            row[pos] = TeraArrayUtils.setHi(raw, value);
             return;
         }
         pos = pos - getSizeXZHalf();
         byte raw = row[pos];
-        row[pos] = TeraArrays.setLo(raw, value);
+        row[pos] = TeraArrayUtils.setLo(raw, value);
     }
 
     private final int rowSetGetOld(byte[] row, int pos, int value) {
         if (pos < getSizeXZHalf()) {
             byte raw = row[pos];
-            byte old = TeraArrays.getHi(raw);
-            row[pos] = TeraArrays.setHi(raw, value);
+            byte old = TeraArrayUtils.getHi(raw);
+            row[pos] = TeraArrayUtils.setHi(raw, value);
             return old;
         }
         pos = pos - getSizeXZHalf();
         byte raw = row[pos];
-        byte old = TeraArrays.getLo(raw);
-        row[pos] = TeraArrays.setLo(raw, value);
+        byte old = TeraArrayUtils.getLo(raw);
+        row[pos] = TeraArrayUtils.setLo(raw, value);
         return old;
     }
 
@@ -89,6 +89,11 @@ public final class TeraSparseArray4Bit extends TeraSparseArrayByte {
         @Override
         public Class<TeraSparseArray4Bit> getArrayClass() {
             return TeraSparseArray4Bit.class;
+        }
+
+        @Override
+        public SerializationHandler createSerializationHandler() {
+            return new SerializationHandler();
         }
         
         @Override

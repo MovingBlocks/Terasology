@@ -46,6 +46,11 @@ public final class TeraDenseArray4Bit extends TeraDenseArrayByte {
         public Class<TeraDenseArray4Bit> getArrayClass() {
             return TeraDenseArray4Bit.class;
         }
+
+        @Override
+        public SerializationHandler createSerializationHandler() {
+            return new SerializationHandler();
+        }
         
         @Override
         public TeraDenseArray4Bit create() {
@@ -89,10 +94,10 @@ public final class TeraDenseArray4Bit extends TeraDenseArrayByte {
 //        if (!contains(x, y, z)) throw new IndexOutOfBoundsException("Index out of bounds (" + x + ", " + y + ", " + z + ")");
         int row = y * getSizeXZHalf(), pos = pos(x, z);
         if (pos < getSizeXZHalf()) {
-            return TeraArrays.getHi(data[row + pos]);
+            return TeraArrayUtils.getHi(data[row + pos]);
         }
         pos = pos - getSizeXZHalf();
-        return TeraArrays.getLo(data[row + pos]);
+        return TeraArrayUtils.getLo(data[row + pos]);
     }
 
     @Override
@@ -102,14 +107,14 @@ public final class TeraDenseArray4Bit extends TeraDenseArrayByte {
         int row = y * getSizeXZHalf(), pos = pos(x, z);
         if (pos < getSizeXZHalf()) {
             byte raw = data[row + pos];
-            byte old = TeraArrays.getHi(raw);
-            data[row + pos] = TeraArrays.setHi(raw, value);
+            byte old = TeraArrayUtils.getHi(raw);
+            data[row + pos] = TeraArrayUtils.setHi(raw, value);
             return old;
         }
         pos = pos - getSizeXZHalf();
         byte raw = data[row + pos];
-        byte old = TeraArrays.getLo(raw);
-        data[row + pos] = TeraArrays.setLo(raw, value);
+        byte old = TeraArrayUtils.getLo(raw);
+        data[row + pos] = TeraArrayUtils.setLo(raw, value);
         return old;
     }
 
@@ -121,18 +126,18 @@ public final class TeraDenseArray4Bit extends TeraDenseArrayByte {
         int row = y * getSizeXZHalf(), pos = pos(x, z);
         if (pos < getSizeXZHalf()) {
             byte raw = data[row + pos];
-            byte old = TeraArrays.getHi(raw);
+            byte old = TeraArrayUtils.getHi(raw);
             if (old == expected) {
-                data[row + pos] = TeraArrays.setHi(raw, value);
+                data[row + pos] = TeraArrayUtils.setHi(raw, value);
                 return true;
             }
             return false;
         }
         pos = pos - getSizeXZHalf();
         byte raw = data[row + pos];
-        byte old = TeraArrays.getLo(raw);
+        byte old = TeraArrayUtils.getLo(raw);
         if (old == expected) {
-            data[row + pos] = TeraArrays.setLo(raw, value);
+            data[row + pos] = TeraArrayUtils.setLo(raw, value);
             return true;
         }
         return false;
