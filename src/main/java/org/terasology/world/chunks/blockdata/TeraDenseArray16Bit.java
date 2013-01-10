@@ -75,6 +75,11 @@ public class TeraDenseArray16Bit extends TeraDenseArray {
         public Class<TeraDenseArray16Bit> getArrayClass() {
             return TeraDenseArray16Bit.class;
         }
+
+        @Override
+        public SerializationHandler createSerializationHandler() {
+            return new SerializationHandler();
+        }
         
         @Override
         public TeraDenseArray16Bit create() {

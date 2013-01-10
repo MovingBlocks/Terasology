@@ -117,6 +117,11 @@ public class TeraSparseArray16Bit extends TeraSparseArray {
         public Class<TeraSparseArray16Bit> getArrayClass() {
             return TeraSparseArray16Bit.class;
         }
+
+        @Override
+        public SerializationHandler createSerializationHandler() {
+            return new SerializationHandler();
+        }
         
         @Override
         public TeraSparseArray16Bit create() {
