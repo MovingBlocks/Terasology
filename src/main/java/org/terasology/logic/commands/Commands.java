@@ -20,16 +20,8 @@ import com.bulletphysics.linearmath.QuaternionUtil;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import org.lwjgl.input.Keyboard;
-import org.terasology.asset.Asset;
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
-import org.terasology.asset.Assets;
-import org.terasology.components.HealthComponent;
-import org.terasology.components.HierarchicalAIComponent;
-import org.terasology.components.ItemComponent;
-import org.terasology.components.PlayerComponent;
-import org.terasology.components.SimpleAIComponent;
+import org.terasology.asset.*;
+import org.terasology.components.*;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.EntityManager;
@@ -72,8 +64,8 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * The controller class for all commands which can be executed through the in-game chat. To add a command there needs to
- * be a public method in this class.
+ * The controller class for all commands which can be executed through the in-game chat. To add a command there needs to be a public method
+ * in this class.
  *
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  * @author Tobias 'skaldarnar' Nett <skaldarnar@googlemail.com>
@@ -94,7 +86,7 @@ public class Commands implements CommandProvider {
      *
      * @return a list of matching block uris
      */
-    private List<BlockUri> resolveBlockUri(String uri) {
+    public static List<BlockUri> resolveBlockUri(String uri) {
         List<BlockUri> matches = Lists.newArrayList();
         BlockUri straightUri = new BlockUri(uri);
         if (straightUri.isValid()) {
@@ -115,8 +107,7 @@ public class Commands implements CommandProvider {
     /**
      * Retrieve all {@code AssetUri}s that match the given string pattern.
      * <p/>
-     * In order to find all fitting shapes, all asset packages are searched and a list of matching asset uris is
-     * returned.
+     * In order to find all fitting shapes, all asset packages are searched and a list of matching asset uris is returned.
      *
      * @param uri the uri pattern to match
      *
@@ -398,7 +389,7 @@ public class Commands implements CommandProvider {
     public void setMaxHealth(@CommandParam(name = "max") int max) {
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
-        health.maxHealth=max;
+        health.maxHealth = max;
         health.currentHealth = health.maxHealth;
         localPlayer.getEntity().send(new FullHealthEvent(localPlayer.getEntity(), health.maxHealth));
         localPlayer.getEntity().saveComponent(health);
@@ -408,7 +399,7 @@ public class Commands implements CommandProvider {
     public void setRegenRaterate(@CommandParam(name = "rate") float rate) {
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
-        health.regenRate=rate;
+        health.regenRate = rate;
         localPlayer.getEntity().saveComponent(health);
     }
 
@@ -416,38 +407,38 @@ public class Commands implements CommandProvider {
     public void showHealth() {
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
-        MessageManager.getInstance().addMessage("Your health:" + health.currentHealth+ " max:"+ health.maxHealth+" regen:"+health.regenRate+" partRegen:"+health.partialRegen, EMessageScope.PRIVATE);
+        MessageManager.getInstance().addMessage("Your health:" + health.currentHealth + " max:" + health.maxHealth + " regen:" + health.regenRate + " partRegen:" + health.partialRegen, EMessageScope.PRIVATE);
     }
 
-    @Command( shortDescription = "Set ground friction" )
+    @Command(shortDescription = "Set ground friction")
     public void setGroundFriction(@CommandParam(name = "amount") float amount) {
-    	LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         CharacterMovementComponent move = localPlayer.getEntity().getComponent(CharacterMovementComponent.class);
-        move.groundFriction=amount;
+        move.groundFriction = amount;
         localPlayer.getEntity().saveComponent(move);
     }
 
-    @Command( shortDescription = "Set max ground speed", helpText = "Set maxGroundSpeed" )
+    @Command(shortDescription = "Set max ground speed", helpText = "Set maxGroundSpeed")
     public void setMaxGroundSpeed(@CommandParam(name = "amount") float amount) {
-    	LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         CharacterMovementComponent move = localPlayer.getEntity().getComponent(CharacterMovementComponent.class);
-        move.maxGroundSpeed=amount;
+        move.maxGroundSpeed = amount;
         localPlayer.getEntity().saveComponent(move);
     }
 
-    @Command( shortDescription = "Set max ghost speed")
+    @Command(shortDescription = "Set max ghost speed")
     public void setMaxGhostSpeed(@CommandParam(name = "amount") float amount) {
-    	LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         CharacterMovementComponent move = localPlayer.getEntity().getComponent(CharacterMovementComponent.class);
-        move.maxGhostSpeed=amount;
+        move.maxGhostSpeed = amount;
         localPlayer.getEntity().saveComponent(move);
     }
 
-    @Command( shortDescription = "Set jump speed")
+    @Command(shortDescription = "Set jump speed")
     public void setJumpSpeed(@CommandParam(name = "amount") float amount) {
-    	LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         CharacterMovementComponent move = localPlayer.getEntity().getComponent(CharacterMovementComponent.class);
-        move.jumpSpeed=amount;
+        move.jumpSpeed = amount;
         localPlayer.getEntity().saveComponent(move);
     }
 
@@ -455,42 +446,42 @@ public class Commands implements CommandProvider {
     public void showMovement() {
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         CharacterMovementComponent move = localPlayer.getEntity().getComponent(CharacterMovementComponent.class);
-        MessageManager.getInstance().addMessage("Your groundFriction:" + move.groundFriction + " maxGroudspeed:"+ move.maxGroundSpeed +" JumpSpeed:"
-        		+ move.jumpSpeed +" maxWaterSpeed:" + move.maxWaterSpeed +" maxGhostSpeed:"+move.maxGhostSpeed +" SlopeFactor:"
-        		+ move.slopeFactor +" runFactor:" + move.runFactor, EMessageScope.PRIVATE);
+        MessageManager.getInstance().addMessage("Your groundFriction:" + move.groundFriction + " maxGroudspeed:" + move.maxGroundSpeed + " JumpSpeed:"
+                + move.jumpSpeed + " maxWaterSpeed:" + move.maxWaterSpeed + " maxGhostSpeed:" + move.maxGhostSpeed + " SlopeFactor:"
+                + move.slopeFactor + " runFactor:" + move.runFactor, EMessageScope.PRIVATE);
     }
 
-    @Command( shortDescription = "Go really fast")
+    @Command(shortDescription = "Go really fast")
     public void hspeed() {
-    	LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         CharacterMovementComponent move = localPlayer.getEntity().getComponent(CharacterMovementComponent.class);
-        move.maxGhostSpeed=50f;
-        move.jumpSpeed=24f;
-        move.maxGroundSpeed=20f;
-        move.maxWaterSpeed=12f;
+        move.maxGhostSpeed = 50f;
+        move.jumpSpeed = 24f;
+        move.maxGroundSpeed = 20f;
+        move.maxWaterSpeed = 12f;
         localPlayer.getEntity().saveComponent(move);
     }
 
-    @Command( shortDescription = "Jump really high")
+    @Command(shortDescription = "Jump really high")
     public void hjump() {
-    	LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-	HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
+        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+        HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
         CharacterMovementComponent move = localPlayer.getEntity().getComponent(CharacterMovementComponent.class);
-        move.jumpSpeed=75f;
+        move.jumpSpeed = 75f;
         health.fallingDamageSpeedThreshold = 85f;
         health.excessSpeedDamageMultiplier = 2f;
         localPlayer.getEntity().saveComponent(health);
         localPlayer.getEntity().saveComponent(move);
     }
 
-    @Command( shortDescription = "Restore normal speed values")
+    @Command(shortDescription = "Restore normal speed values")
     public void restoreSpeed() {
-    	LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         CharacterMovementComponent move = localPlayer.getEntity().getComponent(CharacterMovementComponent.class);
-        move.maxGhostSpeed=3f;
-        move.jumpSpeed=12f;
-        move.maxGroundSpeed=5f;
-        move.maxWaterSpeed=2f;
+        move.maxGhostSpeed = 3f;
+        move.jumpSpeed = 12f;
+        move.maxGroundSpeed = 5f;
+        move.maxWaterSpeed = 2f;
         move.runFactor = 1.5f;
         move.stepHeight = 0.35f;
         move.slopeFactor = 0.6f;
@@ -501,14 +492,14 @@ public class Commands implements CommandProvider {
 
     @Command(shortDescription = "Reduce the player's health to zero")
     public void kill() {
-    	LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
-    	localPlayer.getEntity().send(new NoHealthEvent(localPlayer.getEntity(), health.maxHealth));
+        localPlayer.getEntity().send(new NoHealthEvent(localPlayer.getEntity(), health.maxHealth));
         localPlayer.getEntity().saveComponent(health);
     }
-    
+
     @Command(shortDescription = "Reduce the player's health by an amount")
-    public void damage(@CommandParam(name="amount") int amount) {
+    public void damage(@CommandParam(name = "amount") int amount) {
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
         health.currentHealth -= amount;
@@ -524,7 +515,7 @@ public class Commands implements CommandProvider {
 
         localPlayer.getEntity().saveComponent(health);
     }
-    
+
     @Command(shortDescription = "Teleports you to a location")
     public void teleport(@CommandParam(name = "x") float x, @CommandParam(name = "y") float y, @CommandParam(name = "z") float z) {
         LocalPlayer player = CoreRegistry.get(LocalPlayer.class);
@@ -597,36 +588,36 @@ public class Commands implements CommandProvider {
         }
     }
 
-   @Command(shortDescription = "Destroys all AIs in the world")
+    @Command(shortDescription = "Destroys all AIs in the world")
     public void destroyAI() {
         EntityManager entityManager = CoreRegistry.get(EntityManager.class);
-        int i=0;
+        int i = 0;
         for (EntityRef ref : entityManager.iteratorEntities(SimpleAIComponent.class)) {
             ref.destroy();
             i++;
         }
-        MessageManager.getInstance().addMessage("Simple AIs ("+i+") Destroyed ", EMessageScope.PUBLIC);
-        i=0;
+        MessageManager.getInstance().addMessage("Simple AIs (" + i + ") Destroyed ", EMessageScope.PUBLIC);
+        i = 0;
         for (EntityRef ref : entityManager.iteratorEntities(HierarchicalAIComponent.class)) {
             ref.destroy();
             i++;
         }
-        MessageManager.getInstance().addMessage("Hierarchical AIs ("+i+") Destroyed ", EMessageScope.PUBLIC);
+        MessageManager.getInstance().addMessage("Hierarchical AIs (" + i + ") Destroyed ", EMessageScope.PUBLIC);
     }
 
     @Command(shortDescription = "Count all AIs in the world")
     public void countAI() {
         EntityManager entityManager = CoreRegistry.get(EntityManager.class);
-        int i=0;
+        int i = 0;
         for (EntityRef ref : entityManager.iteratorEntities(SimpleAIComponent.class)) {
             i++;
         }
-        MessageManager.getInstance().addMessage("Simple AIs: "+i, EMessageScope.PRIVATE);
-        i=0;
+        MessageManager.getInstance().addMessage("Simple AIs: " + i, EMessageScope.PRIVATE);
+        i = 0;
         for (EntityRef ref : entityManager.iteratorEntities(HierarchicalAIComponent.class)) {
             i++;
         }
-        MessageManager.getInstance().addMessage("Hierarchical AIs: "+i, EMessageScope.PRIVATE);
+        MessageManager.getInstance().addMessage("Hierarchical AIs: " + i, EMessageScope.PRIVATE);
     }
 
     @Command(shortDescription = "Sets the height the player can step up")
@@ -678,7 +669,6 @@ public class Commands implements CommandProvider {
         if (matchingUris.size() == 1) {
             blockFamily = BlockManager.getInstance().getBlockFamily(matchingUris.get(0));
 
-            //return;
         } else if (matchingUris.isEmpty()) {
             MessageManager.getInstance().addMessage("No block found for '" + blockName + "'", EMessageScope.PRIVATE);
 
