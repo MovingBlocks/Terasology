@@ -17,8 +17,6 @@ package org.terasology.world.chunks.store;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -57,47 +55,7 @@ public class ChunkStoreGZip implements ChunkStore, Serializable {
     private AtomicInteger sizeInByte = new AtomicInteger(0);
     private AtomicBoolean running = new AtomicBoolean(true);
 
-    public static ChunkStoreGZip load(File file) throws IOException {
-        FileInputStream fileIn = null;
-        ObjectInputStream in = null;
-        try {
-            fileIn = new FileInputStream(file);
-            in = new ObjectInputStream(fileIn);
-
-            ChunkStoreGZip cache = (ChunkStoreGZip) in.readObject();
-            cache.compressionQueue = Queues.newLinkedBlockingDeque();
-            cache.modifiedChunks = Maps.newConcurrentMap();
-            cache.setupThreads();
-            return cache;
-
-        } catch (ClassNotFoundException e) {
-            throw new IOException("Unable to load chunk cache", e);
-        } finally {
-            // JAVA7 : cleanup
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    logger.error("Failed to close input stream", e);
-                }
-            }
-            if (fileIn != null) {
-                try {
-                    fileIn.close();
-                } catch (IOException e) {
-                    logger.error("Failed to close input stream", e);
-                }
-            }
-        }
-    }
-
-    public ChunkStoreGZip() {
-        modifiedChunks = Maps.newConcurrentMap();
-        compressionQueue = Queues.newLinkedBlockingDeque();
-        setupThreads();
-    }
-
-    public void setupThreads() {
+    protected void setupThreads() {
         if (compressionThreads == null) {
             running.set(true);
             compressionThreads = Executors.newFixedThreadPool(NUM_DISPOSAL_THREADS);
@@ -133,6 +91,16 @@ public class ChunkStoreGZip implements ChunkStore, Serializable {
                 });
             }
         }
+    }
+
+    public ChunkStoreGZip() {
+        setup();
+    }
+    
+    public void setup() {
+        modifiedChunks = Maps.newConcurrentMap();
+        compressionQueue = Queues.newLinkedBlockingDeque();
+        setupThreads();
     }
 
     public Chunk get(Vector3i id) {

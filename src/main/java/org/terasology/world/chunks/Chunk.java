@@ -137,10 +137,11 @@ public class Chunk implements Externalizable {
 
 
     public Chunk() {
-        blockData = Chunks.getBlockDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        sunlightData = Chunks.getSunlightDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        lightData = Chunks.getLightDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
-        extraData = Chunks.getExtraDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        final Chunks c = Chunks.getInstance();
+        blockData = c.getBlockDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        sunlightData = c.getSunlightDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        lightData = c.getLightDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
+        extraData = c.getExtraDataEntry().factory.create(getChunkSizeX(), getChunkSizeY(), getChunkSizeZ());
         dirty = true;
     }
 
@@ -175,18 +176,26 @@ public class Chunk implements Externalizable {
         dirty = true;
     }
     
+    /**
+     * ProtobufHandler implements support for encoding/decoding chunks into/from protobuf messages.
+     * 
+     * @author Manuel Brotz <manu.brotz@gmx.ch>
+     * @todo Add support for chunk data extensions.
+     *
+     */
     public static class ProtobufHandler implements org.terasology.io.ProtobufHandler<Chunk, ChunksProtobuf.Chunk> {
 
         @Override
         public ChunksProtobuf.Chunk encode(Chunk chunk) {
             Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
+            final TeraArrays t = TeraArrays.getInstance();
             final ChunksProtobuf.Chunk.Builder b = ChunksProtobuf.Chunk.newBuilder()
                     .setX(chunk.pos.x).setY(chunk.pos.y).setZ(chunk.pos.z)
                     .setState(chunk.chunkState.protobufState)
-                    .setBlockData(TeraArrays.encode(chunk.blockData))
-                    .setSunlightData(TeraArrays.encode(chunk.sunlightData))
-                    .setLightData(TeraArrays.encode(chunk.lightData))
-                    .setExtraData(TeraArrays.encode(chunk.extraData));
+                    .setBlockData(t.encode(chunk.blockData))
+                    .setSunlightData(t.encode(chunk.sunlightData))
+                    .setLightData(t.encode(chunk.lightData))
+                    .setExtraData(t.encode(chunk.extraData));
             return b.build(); 
         }
 
@@ -211,10 +220,11 @@ public class Chunk implements Externalizable {
                 throw new IllegalArgumentException("Illformed protobuf message. Missing light data.");
             if (!message.hasExtraData())
                 throw new IllegalArgumentException("Illformed protobuf message. Missing extra data.");
-            final TeraArray blockData = TeraArrays.decode(message.getBlockData());
-            final TeraArray sunlightData = TeraArrays.decode(message.getSunlightData());
-            final TeraArray lightData = TeraArrays.decode(message.getLightData());
-            final TeraArray extraData = TeraArrays.decode(message.getExtraData());
+            final TeraArrays t = TeraArrays.getInstance();
+            final TeraArray blockData = t.decode(message.getBlockData());
+            final TeraArray sunlightData = t.decode(message.getSunlightData());
+            final TeraArray lightData = t.decode(message.getLightData());
+            final TeraArray extraData = t.decode(message.getExtraData());
             return new Chunk(pos, state, blockData, sunlightData, lightData, extraData);
         }
     }
