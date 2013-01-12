@@ -132,10 +132,10 @@ public class UIMenuConfigAdvanced extends UIWindow {
                 config.setLightFactory((String)((UIComboBox)element).getSelection().getValue());
             }
         }));
-        comp.addDisplayElement(initFactoryCombo("Default class for liquid data", "liquid", config.getLiquidFactoryName(), new SelectionListener() {
+        comp.addDisplayElement(initFactoryCombo("Default class for liquid data", "liquid", config.getExtraFactoryName(), new SelectionListener() {
             @Override
             public void changed(UIDisplayElement element) {
-                config.setLiquidFactory((String)((UIComboBox)element).getSelection().getValue());
+                config.setExtraFactory((String)((UIComboBox)element).getSelection().getValue());
             }
         }));
         
