@@ -1,8 +1,8 @@
-package org.terasology.logic.grammar;
+package org.terasology.logic.grammar.shapes.complex;
 
-/**
- * @author Tobias 'skaldarnar' Nett
- */
+import org.terasology.logic.grammar.shapes.Shape;
+
+/** @author Tobias 'skaldarnar' Nett */
 public class SplitArg {
     public enum SplitType {
         WALLS, INNER;

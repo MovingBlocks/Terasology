@@ -1,24 +1,21 @@
 package org.terasology.world.generator.building;
 
-import org.terasology.logic.grammar.Shape;
+import org.terasology.logic.grammar.shapes.Shape;
 import org.terasology.model.structures.BlockCollection;
 
 import java.util.List;
 
 /**
- * Created with IntelliJ IDEA.
- * User: tobias
- * Date: 28.08.12
- * Time: 18:33
- * To change this template use File | Settings | File Templates.
+ * @author Tobias 'Skaldarnar' Nett
+ *         <p/>
+ *         A basic composite pattern for derivation trees.
  */
-public interface Tree {
-    public BlockCollection derive();
+public abstract class Tree {
+    public abstract BlockCollection derive();
 
-    public void setParent(Tree parent);
+    public abstract void setParent(Tree parent);
 
-    public Shape getShape();
+    public abstract Shape getShape();
 
-    public List<TreeNode> findActiveNodes();
-    //public ShapeSymbol getShapeSymbol();
+    public abstract List<TreeNode> findActiveNodes();
 }
