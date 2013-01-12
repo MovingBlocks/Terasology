@@ -1,6 +1,6 @@
 package org.terasology.world.generator.building;
 
-import org.terasology.logic.grammar.Shape;
+import org.terasology.logic.grammar.shapes.Shape;
 import org.terasology.model.structures.BlockCollection;
 
 import java.util.ArrayList;
@@ -8,13 +8,12 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Created with IntelliJ IDEA.
- * User: tobias
- * Date: 28.08.12
- * Time: 18:35
- * To change this template use File | Settings | File Templates.
+ * @author Tobias 'Skaldarnar' Nett
+ * @version 0.1
+ *          <p/>
+ *          A TreeNode consists of a ComplexShape object and zero or more successor elements.
  */
-public class TreeNode implements Tree {
+public class TreeNode extends Tree {
     private Tree parent = null;
     private boolean active = true;
     private List<Tree> children = new ArrayList<Tree>();
@@ -28,7 +27,8 @@ public class TreeNode implements Tree {
     public BlockCollection derive() {
         BlockCollection c = new BlockCollection();
         for (Tree child : children) {
-            Shape s = child.getShape();
+            BlockCollection childCollection = child.derive();
+            c.merge(childCollection);
         }
         return c;
     }

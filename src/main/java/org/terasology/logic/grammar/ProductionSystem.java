@@ -1,22 +1,25 @@
 package org.terasology.logic.grammar;
 
+import org.terasology.logic.grammar.shapes.Shape;
+import org.terasology.logic.grammar.shapes.ShapeSymbol;
+
 import java.util.List;
 import java.util.Map;
 
 /**
- * Created with IntelliJ IDEA.
- * User: tobias
- * Date: 26.08.12
- * Time: 23:43
- * To change this template use File | Settings | File Templates.
+ * @author Tobias 'Skaldarnar' Nett
+ * @version 0.3 Date: 26.08.12
+ *          <p/>
+ *          A ProductionSystem consists of a mapping from ShapeSymbols to a list of successor shapes and an initial axiom. The initial axiom
+ *          defines where to start a derivation process.
  */
 public class ProductionSystem {
-    // A map with rules. Keys have to be non terminal symbols.
-    private Map<ShapeSymbol, List<Shape>> rules;
-    // initial axiom to start with
+    /** Map with rule mappings from names to shape. */
+    private Map<String, List<Shape>> rules;
+    /** The initial axiom to start with. */
     private ShapeSymbol initialAxiom;
 
-    public ProductionSystem(Map<ShapeSymbol, List<Shape>> rules, ShapeSymbol initialAxiom) {
+    public ProductionSystem(Map<String, List<Shape>> rules, ShapeSymbol initialAxiom) {
         // JAVA7 : Object.requireNonNull(…);
         if (rules == null || initialAxiom == null) {
             throw new IllegalArgumentException("no null params allowed.");
@@ -29,18 +32,18 @@ public class ProductionSystem {
         return initialAxiom;
     }
 
-    public Map<ShapeSymbol, List<Shape>> getRules() {
+    public Map<String, List<Shape>> getRules() {
         return rules;
     }
 
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        for (ShapeSymbol key : rules.keySet()) {
+        for (String key : rules.keySet()) {
             List<Shape> l = rules.get(key);
-            builder.append(key.toString() + " ::- ");
+            builder.append(key).append(" ::- ");
             builder.append(l.get(0).toString());
             for (int i = 1; i < l.size(); i++) {
-                builder.append(" | " + l.get(i).toString());
+                builder.append(" | ").append(l.get(i).toString());
             }
             builder.append("\n");
         }

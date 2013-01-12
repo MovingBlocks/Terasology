@@ -1,8 +1,8 @@
-package org.terasology.logic.grammar;
+package org.terasology.logic.grammar.shapes.complex;
 
-/**
- * @author Tobias 'skaldarnar' Nett
- */
+import org.terasology.logic.grammar.shapes.Shape;
+
+/** @author Tobias 'skaldarnar' Nett */
 public class DivideArg {
     private Size size;
     private Shape symbol;
@@ -10,6 +10,11 @@ public class DivideArg {
     public DivideArg(Size size, Shape symbol) {
         this.size = size;
         this.symbol = symbol;
+    }
+
+    public DivideArg(DivideArg arg) {
+        this.size = arg.size;
+        this.symbol = arg.symbol;
     }
 
     public Size getSize() {
@@ -31,5 +36,9 @@ public class DivideArg {
         builder.append("] \t");
         builder.append(symbol.toString());
         return builder.toString();
+    }
+
+    public DivideArg clone() {
+        return new DivideArg(size, symbol);
     }
 }
