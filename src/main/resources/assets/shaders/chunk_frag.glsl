@@ -87,7 +87,7 @@ void main(){
         normalWater.xyz = texture2D(textureWaterNormal, waterOffset).xyz * 2.0 - 1.0;
 
        // Enable reflection only when not swimming and for blocks on sea level
-        if (!swimming && isUpside == 1.0 && vertexWorldPosRaw.y < 32.5 && vertexWorldPosRaw.y > 31.5) {
+        if (!swimming && isUpside > 0.99 && vertexWorldPosRaw.y < 32.5 && vertexWorldPosRaw.y > 31.5) {
             vec2 projectedPos = 0.5 * (vertexPos.st/vertexPos.q) + vec2(0.5);
 
             // Fresnel
