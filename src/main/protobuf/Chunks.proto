@@ -24,6 +24,11 @@ message TeraArray {
     optional bytes  data       = 3;
 }
 
+message ModData {
+    optional string    id   = 1;
+    optional TeraArray data = 2;
+}
+
 enum State {
     ADJACENCY_GENERATION_PENDING      = 0;
     INTERNAL_LIGHT_GENERATION_PENDING = 1;
@@ -33,16 +38,18 @@ enum State {
 }
 
 message Chunk {
-    optional sint32    x        = 1;
-    optional sint32    y        = 2;
-    optional sint32    z        = 3;
+    optional sint32    x             = 1;
+    optional sint32    y             = 2;
+    optional sint32    z             = 3;
 
-    optional State     state    = 4;
+    optional State     state         = 4;
     
-    optional TeraArray block    = 5;
-    optional TeraArray sunlight = 6;
-    optional TeraArray light    = 7;
-    optional TeraArray liquid   = 8;
+    optional TeraArray block_data    = 5;
+    optional TeraArray sunlight_data = 6;
+    optional TeraArray light_data    = 7;
+    optional TeraArray extra_data    = 8;
+    
+    repeated ModData   mod_data      = 9;
     
     extensions 100 to 1000;
 }

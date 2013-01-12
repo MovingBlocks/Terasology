@@ -101,6 +101,7 @@ import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.ChunkStore;
 import org.terasology.world.chunks.LocalChunkProvider;
 import org.terasology.world.chunks.store.ChunkStoreGZip;
+import org.terasology.world.chunks.store.ChunkStoreProtobuf;
 import org.terasology.world.generator.core.ChunkGeneratorManager;
 
 import com.google.common.collect.Lists;
@@ -193,7 +194,7 @@ public final class WorldRenderer {
         File f = new File(PathManager.getInstance().getWorldSavePath(worldInfo.getTitle()), worldInfo.getTitle() + ".dat");
         if (f.exists()) {
             try {
-                chunkStore = ChunkStoreGZip.load(f);
+                chunkStore = ChunkStoreProtobuf.load(f);
             } catch (IOException e) {
                 /* TODO: We really should expose this error via UI so player knows that there is an issue with their world
                    (don't have the game continue or we risk overwriting their game)
@@ -202,7 +203,7 @@ public final class WorldRenderer {
             }
         }
         if (chunkStore == null) {
-            chunkStore = new ChunkStoreGZip();
+            chunkStore = new ChunkStoreProtobuf();
         }
         _chunkProvider = new LocalChunkProvider(chunkStore, chunkGeneratorManager);
         EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(worldInfo, _chunkProvider));
