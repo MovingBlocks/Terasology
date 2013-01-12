@@ -10,7 +10,6 @@ import org.jboss.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.components.DisplayInformationComponent;
-import org.terasology.components.world.LocationComponent;
 import org.terasology.components.world.WorldComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -24,9 +23,8 @@ import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
-import org.terasology.network.events.ConnectedEvent;
-import org.terasology.network.serialization.ServerComponentFieldCheck;
 import org.terasology.network.serialization.NetworkEventFieldCheck;
+import org.terasology.network.serialization.ServerComponentFieldCheck;
 import org.terasology.protobuf.EntityData;
 import org.terasology.protobuf.NetData;
 import org.terasology.world.WorldChangeListener;
@@ -42,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Immortius
@@ -69,6 +68,12 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
 
     private BlockingQueue<NetData.EventMessage> queuedEvents = Queues.newLinkedBlockingQueue();
     private BlockingQueue<NetData.UpdateEntityMessage> queuedEntityUpdates = Queues.newLinkedBlockingQueue();
+
+    // Metrics
+    private AtomicInteger receivedMessages = new AtomicInteger();
+    private AtomicInteger receivedBytes = new AtomicInteger();
+    private AtomicInteger sentMessages = new AtomicInteger();
+    private AtomicInteger sentBytes = new AtomicInteger();
 
     public Client(Channel channel, NetworkSystem networkSystem) {
         this.channel = channel;
@@ -175,11 +180,13 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
                             .setTargetId(targetId)
                             .setEvent(eventSerializer.serialize(event, EVENT_FIELD_CHECK)))
                     .build();
-            channel.write(message);
+            send(message) ;
         }
     }
 
     private void send(NetData.NetMessage data) {
+        sentMessages.incrementAndGet();
+        sentBytes.addAndGet(data.getSerializedSize());
         channel.write(data);
     }
 
@@ -189,7 +196,7 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
             logger.debug("Sending chunk: {}", pos);
             // TODO: probably need to queue and dripfeed these to prevent flooding
             NetData.NetMessage message = NetData.NetMessage.newBuilder().setType(NetData.NetMessage.Type.CHUNK).setChunkInfo(chunk.getChunkData()).build();
-            channel.write(message);
+            send(message);
         }
     }
 
@@ -201,7 +208,7 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
                     setInvalidateChunk(NetData.InvalidateChunkMessage.newBuilder().
                             setPos(NetworkUtil.convert(event.getChunkPos())).build()).
                     build();
-            channel.write(message);
+            send(message);
         }
     }
 
@@ -215,7 +222,7 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
                             .setPos(NetworkUtil.convert(pos))
                             .setNewBlock(newBlock.getId())
                             .build()).build();
-            channel.write(message);
+            send(message);
         }
     }
 
@@ -302,6 +309,26 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
 
     public void queueEntityUpdate(NetData.UpdateEntityMessage message) {
         queuedEntityUpdates.offer(message);
+    }
 
+    public void receivedMessageWithSize(int serializedSize) {
+        receivedBytes.addAndGet(serializedSize);
+        receivedMessages.incrementAndGet();
+    }
+
+    public int getReceivedMessagesSinceLastCall() {
+        return receivedMessages.getAndSet(0);
+    }
+
+    public int getReceivedBytesSinceLastCall() {
+        return receivedBytes.getAndSet(0);
+    }
+
+    public int getSentMessagesSinceLastCall() {
+        return sentMessages.getAndSet(0);
+    }
+
+    public int getSentBytesSinceLastCall() {
+        return sentBytes.getAndSet(0);
     }
 }

@@ -19,7 +19,7 @@ public class ServerComponentFieldCheck implements FieldSerializeCheck<Component>
     public boolean shouldSerializeField(FieldMetadata field, Component component) {
         return field.isReplicated()
                 && (field.getReplicationInfo().value() == ReplicateDirection.SERVER_TO_CLIENT
-                || (field.getReplicationInfo().value() == ReplicateDirection.OWNER_TO_SERVER && !owned));
+                || (field.getReplicationInfo().value().isReplicateFromOwner() && !owned));
     }
 
     @Override

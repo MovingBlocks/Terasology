@@ -70,6 +70,7 @@ public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
         NetMessage message = (NetMessage) e.getMessage();
+        server.receivedMessageWithSize(message.getSerializedSize());
         switch (message.getType()) {
             case SERVER_INFO:
                 receivedServerInfo(message.getServerInfo());

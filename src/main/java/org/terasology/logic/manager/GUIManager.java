@@ -22,7 +22,6 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.world.WorldComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -58,7 +57,7 @@ import org.terasology.rendering.gui.windows.UIScreenDeath;
 import org.terasology.rendering.gui.windows.UIScreenHUD;
 import org.terasology.rendering.gui.windows.UIScreenInventory;
 import org.terasology.rendering.gui.windows.UIScreenLoading;
-import org.terasology.rendering.gui.windows.UIScreenMetrics;
+import org.terasology.rendering.gui.windows.metricsScreen.UIScreenMetrics;
 
 import javax.vecmath.Vector2f;
 

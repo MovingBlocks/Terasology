@@ -30,7 +30,7 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.windows.UIScreenMetrics;
+import org.terasology.rendering.gui.windows.metricsScreen.UIScreenMetrics;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 

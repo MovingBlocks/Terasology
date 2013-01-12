@@ -23,6 +23,7 @@ import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Used to interact with a remote server (from client end)
@@ -47,6 +48,11 @@ public class Server {
     private TIntSet netDirty = new TIntHashSet();
 
     private EntityRef clientEntity = EntityRef.NULL;
+
+    private AtomicInteger receivedMessages = new AtomicInteger();
+    private AtomicInteger receivedBytes = new AtomicInteger();
+    private AtomicInteger sentMessages = new AtomicInteger();
+    private AtomicInteger sentBytes = new AtomicInteger();
 
     public Server(NetworkSystem system, Channel channel) {
         this.channel = channel;
@@ -75,7 +81,7 @@ public class Server {
                         .setEvent(eventSerializer.serialize(event))
                         .setTargetId(targetId))
                 .build();
-        channel.write(message);
+        send(message);
     }
 
     public void update() {
@@ -94,6 +100,8 @@ public class Server {
     }
 
     private void send(NetData.NetMessage data) {
+        sentMessages.incrementAndGet();
+        sentBytes.addAndGet(data.getSerializedSize());
         channel.write(data);
     }
 
@@ -200,6 +208,27 @@ public class Server {
 
     public void setNetDirty(int netId) {
         netDirty.add(netId);
+    }
+
+    public void receivedMessageWithSize(int serializedSize) {
+        receivedBytes.addAndGet(serializedSize);
+        receivedMessages.incrementAndGet();
+    }
+
+    public int getReceivedMessagesSinceLastCall() {
+        return receivedMessages.getAndSet(0);
+    }
+
+    public int getReceivedBytesSinceLastCall() {
+        return receivedBytes.getAndSet(0);
+    }
+
+    public int getSentMessagesSinceLastCall() {
+        return sentMessages.getAndSet(0);
+    }
+
+    public int getSentBytesSinceLastCall() {
+        return sentBytes.getAndSet(0);
     }
 }
 

@@ -277,6 +277,80 @@ public class NetworkSystem implements EntityChangeSubscriber {
         }
     }
 
+    /**
+     * @return The number of received messages since last request
+     */
+    public int getIncomingMessagesDelta() {
+        switch (mode) {
+            case SERVER:
+                int total = 0;
+                for (Client client : clientList) {
+                    total += client.getReceivedMessagesSinceLastCall();
+                }
+                return total;
+            case CLIENT:
+                if (server != null) {
+                    return server.getReceivedMessagesSinceLastCall();
+                }
+            default:
+                return 0;
+        }
+    }
+
+    /**
+     * @return The number of received bytes since last request
+     */
+    public int getIncomingBytesDelta() {
+        switch (mode) {
+            case SERVER:
+                int total = 0;
+                for (Client client : clientList) {
+                    total += client.getReceivedBytesSinceLastCall();
+                }
+                return total;
+            case CLIENT:
+                if (server != null) {
+                    return server.getReceivedBytesSinceLastCall();
+                }
+            default:
+                return 0;
+        }
+    }
+
+    public int getOutgoingMessagesDelta() {
+        switch (mode) {
+            case SERVER:
+                int total = 0;
+                for (Client client : clientList) {
+                    total += client.getSentMessagesSinceLastCall();
+                }
+                return total;
+            case CLIENT:
+                if (server != null) {
+                    return server.getSentMessagesSinceLastCall();
+                }
+            default:
+                return 0;
+        }
+    }
+
+    public int getOutgoingBytesDelta() {
+        switch (mode) {
+            case SERVER:
+                int total = 0;
+                for (Client client : clientList) {
+                    total += client.getSentBytesSinceLastCall();
+                }
+                return total;
+            case CLIENT:
+                if (server != null) {
+                    return server.getSentBytesSinceLastCall();
+                }
+            default:
+                return 0;
+        }
+    }
+
     EntityRef getEntity(int netId) {
         int entityId = netIdToEntityId.get(netId);
         if (entityId != 0) {
