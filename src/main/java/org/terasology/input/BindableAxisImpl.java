@@ -81,7 +81,7 @@ public class BindableAxisImpl implements BindableAxis {
         return value;
     }
 
-    void update(EntityRef localPlayer, float delta, EntityRef target, Vector3i targetBlockPos, Vector3f hitPosition, Vector3f hitNormal) {
+    void update(EntityRef[] inputEntities, float delta, EntityRef target, Vector3i targetBlockPos, Vector3f hitPosition, Vector3f hitNormal) {
         boolean posInput = positiveInput.getState() == ButtonState.DOWN;
         boolean negInput = negativeInput.getState() == ButtonState.DOWN;
 
@@ -102,7 +102,9 @@ public class BindableAxisImpl implements BindableAxis {
         if (sendEventMode.shouldSendEvent(value, newValue)) {
             event.prepare(id, newValue, delta);
             event.setTarget(target, targetBlockPos, hitPosition, hitNormal);
-            localPlayer.send(event);
+            for (EntityRef entity : inputEntities) {
+                entity.send(event);
+            }
             sendEventToSubscribers(delta, target);
         }
         value = newValue;

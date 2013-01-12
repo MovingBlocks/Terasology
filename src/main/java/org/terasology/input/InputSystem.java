@@ -19,6 +19,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.EventSystem;
 import org.terasology.game.CoreRegistry;
@@ -38,7 +39,7 @@ import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.input.events.RightMouseDownButtonEvent;
 import org.terasology.input.events.RightMouseUpButtonEvent;
-import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 
@@ -173,7 +174,7 @@ public class InputSystem implements EventHandlerSystem {
 
                 BindableButtonImpl bind = mouseButtonBinds.get(button);
                 if (bind != null) {
-                    bind.updateBindState(buttonDown, delta, localPlayer.getEntity(), cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, guiManager.isConsumingInput());
+                    bind.updateBindState(buttonDown, delta, getInputEntities(), cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, guiManager.isConsumingInput());
                 }
             }
             //mouse wheel
@@ -183,8 +184,8 @@ public class InputSystem implements EventHandlerSystem {
 
                 BindableButtonImpl bind = (wheelMoved > 0) ? mouseWheelUpBind : mouseWheelDownBind;
                 if (bind != null) {
-                    bind.updateBindState(true, delta, localPlayer.getEntity(), cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, guiManager.isConsumingInput());
-                    bind.updateBindState(false, delta, localPlayer.getEntity(), cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, guiManager.isConsumingInput());
+                    bind.updateBindState(true, delta, getInputEntities(), cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, guiManager.isConsumingInput());
+                    bind.updateBindState(false, delta, getInputEntities(), cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, guiManager.isConsumingInput());
                 }
             }
         }
@@ -194,7 +195,9 @@ public class InputSystem implements EventHandlerSystem {
         if (deltaX != 0) {
             MouseAxisEvent event = new MouseXAxisEvent(deltaX * mouseSensitivity, delta);
             setupTarget(event);
-            localPlayer.getEntity().send(event);
+            for (EntityRef entity : getInputEntities()) {
+                entity.send(event);
+            }
         }
 
         //process mouse movement y axis
@@ -202,7 +205,9 @@ public class InputSystem implements EventHandlerSystem {
         if (deltaY != 0) {
             MouseAxisEvent event = new MouseYAxisEvent(deltaY * mouseSensitivity, delta);
             setupTarget(event);
-            localPlayer.getEntity().send(event);
+            for (EntityRef entity : getInputEntities()) {
+                entity.send(event);
+            }
         }
     }
 
@@ -223,20 +228,20 @@ public class InputSystem implements EventHandlerSystem {
             // Update bind
             BindableButtonImpl bind = keyBinds.get(key);
             if (bind != null && !Keyboard.isRepeatEvent()) {
-                bind.updateBindState(Keyboard.getEventKeyState(), delta, localPlayer.getEntity(), cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, guiConsumingInput);
+                bind.updateBindState(Keyboard.getEventKeyState(), delta, getInputEntities(), cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal(), consumed, guiConsumingInput);
             }
         }
     }
 
     private void processBindAxis(float delta) {
         for (BindableAxisImpl axis : axisBinds) {
-            axis.update(localPlayer.getEntity(), delta, cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal());
+            axis.update(getInputEntities(), delta, cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal());
         }
     }
 
     private void processBindRepeats(float delta) {
         for (BindableButtonImpl button : buttonBinds) {
-            button.update(localPlayer.getEntity(), delta, cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal());
+            button.update(getInputEntities(), delta, cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal());
         }
     }
 
@@ -263,7 +268,10 @@ public class InputSystem implements EventHandlerSystem {
                 return false;
         }
         setupTarget(event);
-        localPlayer.getEntity().send(event);
+        for (EntityRef entity : getInputEntities()) {
+            entity.send(event);
+        }
+
         return event.isConsumed();
     }
 
@@ -283,15 +291,23 @@ public class InputSystem implements EventHandlerSystem {
                 break;
         }
         setupTarget(event);
-        localPlayer.getEntity().send(event);
+        for (EntityRef entity : getInputEntities()) {
+            entity.send(event);
+        }
         return event.isConsumed();
     }
 
     private boolean sendMouseWheelEvent(int wheelTurns, float delta) {
         MouseWheelEvent mouseWheelEvent = new MouseWheelEvent(wheelTurns, delta);
         setupTarget(mouseWheelEvent);
-        localPlayer.getEntity().send(mouseWheelEvent);
+        for (EntityRef entity : getInputEntities()) {
+            entity.send(mouseWheelEvent);
+        }
         return mouseWheelEvent.isConsumed();
+    }
+
+    private EntityRef[] getInputEntities() {
+        return new EntityRef[] {localPlayer.getClientEntity(), localPlayer.getCharacterEntity()};
     }
 
 }

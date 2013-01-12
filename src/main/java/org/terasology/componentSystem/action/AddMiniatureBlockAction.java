@@ -21,6 +21,7 @@ import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.RegisterMode;
 import org.terasology.events.ActivateEvent;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.world.BlockGrid;
@@ -34,7 +35,8 @@ import java.util.Set;
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-@RegisterComponentSystem
+// TODO: Network
+@RegisterComponentSystem()
 public class AddMiniatureBlockAction implements EventHandlerSystem {
 
     @In

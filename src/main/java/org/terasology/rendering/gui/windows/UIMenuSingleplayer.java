@@ -177,7 +177,7 @@ public class UIMenuSingleplayer extends UIWindow {
             Config.getInstance().setDefaultSeed(info.getSeed());
             Config.getInstance().setWorldTitle(info.getTitle());
             Config.getInstance().setChunkGenerator(info.getChunkGenerators());
-            CoreRegistry.get(GameEngine.class).changeState(new StateLoading(info, NetworkMode.SERVER));
+            CoreRegistry.get(GameEngine.class).changeState(new StateLoading(info, (createServerGame) ? NetworkMode.SERVER : NetworkMode.NONE));
         } catch (Exception e) {
             getGUIManager().showMessage("Error", "Failed reading world data object. Sorry.");
         }

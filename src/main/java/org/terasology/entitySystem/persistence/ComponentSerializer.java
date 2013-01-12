@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.metadata.ClassMetadata;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
+import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.entitySystem.metadata.MetadataUtil;
 import org.terasology.protobuf.EntityData;
@@ -64,11 +65,10 @@ public class ComponentSerializer {
      * @return The component described by the componentData, or null if it couldn't be deserialized
      */
     public Component deserialize(EntityData.Component componentData) {
-        Class<? extends Component> componentClass = getComponentClass(componentData);
-        if (componentClass != null) {
-            ClassMetadata<? extends Component> componentMetadata = componentLibrary.getMetadata(componentClass);
+        ComponentMetadata<? extends Component> componentMetadata = getComponentMetadata(componentData);
+        if (componentMetadata != null) {
             Component component = componentMetadata.newInstance();
-            return deserializeOnto(component, componentData, componentMetadata);
+            return deserializeOnto(component, componentData, componentMetadata, FieldSerializeCheck.NullCheck.<Component>newInstance());
         } else {
             logger.warn("Unable to deserialize unknown component type: {}", componentData.getType());
         }
@@ -84,10 +84,22 @@ public class ComponentSerializer {
      * @return The target component.
      */
     public Component deserializeOnto(Component target, EntityData.Component componentData) {
-        Class<? extends Component> componentClass = getComponentClass(componentData);
-        if (componentClass != null) {
-            ClassMetadata componentMetadata = componentLibrary.getMetadata(componentClass);
-            return deserializeOnto(target, componentData, componentMetadata);
+        return deserializeOnto(target, componentData, FieldSerializeCheck.NullCheck.<Component>newInstance());
+    }
+
+    /**
+     * Deserializes the componentData on top of the target component. Any fields that are not present in the componentData,
+     * or which cannot be deserialized, are left unaltered.
+     *
+     * @param target
+     * @param componentData
+     * @param fieldCheck
+     * @return The target component.
+     */
+    public Component deserializeOnto(Component target, EntityData.Component componentData, FieldSerializeCheck<Component> fieldCheck) {
+        ComponentMetadata<? extends Component> componentMetadata = getComponentMetadata(componentData);
+        if (componentMetadata != null) {
+            return deserializeOnto(target, componentData, componentMetadata, fieldCheck);
         } else {
             logger.warn("Unable to deserialize unknown component type: {}", componentData.getType());
         }
@@ -95,11 +107,11 @@ public class ComponentSerializer {
     }
 
 
-    private Component deserializeOnto(Component targetComponent, EntityData.Component componentData, ClassMetadata componentMetadata) {
+    private Component deserializeOnto(Component targetComponent, EntityData.Component componentData, ClassMetadata componentMetadata, FieldSerializeCheck<Component> fieldCheck) {
         try {
             for (EntityData.NameValue field : componentData.getFieldList()) {
                 FieldMetadata fieldInfo = componentMetadata.getField(field.getName());
-                if (fieldInfo == null) {
+                if (fieldInfo == null || !fieldCheck.shouldDeserializeField(fieldInfo)) {
                     continue;
                 }
 
@@ -231,9 +243,9 @@ public class ComponentSerializer {
      * @param componentData
      * @return The component class the given componentData describes, or null if it is unknown.
      */
-    public Class<? extends Component> getComponentClass(EntityData.Component componentData) {
+    public ComponentMetadata<? extends Component> getComponentMetadata(EntityData.Component componentData) {
         if (componentData.hasTypeIndex()) {
-            ClassMetadata metadata = null;
+            ComponentMetadata<? extends Component> metadata = null;
             if (!idTable.isEmpty()) {
                 Class<? extends Component> componentClass = idTable.inverse().get(componentData.getTypeIndex());
                 if (componentClass != null) {
@@ -244,14 +256,14 @@ public class ComponentSerializer {
                 logger.warn("Unable to deserialize unknown component with id: {}", componentData.getTypeIndex());
                 return null;
             }
-            return (Class<? extends Component>) metadata.getType();
+            return metadata;
         } else if (componentData.hasType()) {
-            ClassMetadata metadata = componentLibrary.getMetadata(componentData.getType());
+            ComponentMetadata<? extends Component> metadata = componentLibrary.getMetadata(componentData.getType());
             if (metadata == null) {
                 logger.warn("Unable to deserialize unknown component type: {}", componentData.getType());
                 return null;
             }
-            return (Class<? extends Component>) metadata.getType();
+            return metadata;
         }
         logger.warn("Unable to deserialize component, no type provided.");
 

@@ -40,7 +40,7 @@ import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
 import org.terasology.network.BroadcastEvent;
-import org.terasology.network.ClientPlayer;
+import org.terasology.network.Client;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
@@ -226,7 +226,7 @@ public class PojoEventSystem implements EventSystem {
                     if (networkSystem.getMode() == NetworkMode.SERVER) {
                         NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
                         if (netComp != null) {
-                            for (ClientPlayer client : networkSystem.getPlayers()) {
+                            for (Client client : networkSystem.getPlayers()) {
                                 client.send(event, netComp.networkId);
                             }
                         }
@@ -236,7 +236,7 @@ public class PojoEventSystem implements EventSystem {
                     if (networkSystem.getMode() == NetworkMode.SERVER) {
                         NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
                         if (netComp != null) {
-                            ClientPlayer client = networkSystem.getClientFor(entity);
+                            Client client = networkSystem.getOwner(entity);
                             if (client != null) {
                                 client.send(event, netComp.networkId);
                             }

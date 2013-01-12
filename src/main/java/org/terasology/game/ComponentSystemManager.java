@@ -27,6 +27,7 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.network.NetworkMode;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -53,7 +54,7 @@ public class ComponentSystemManager {
     public ComponentSystemManager() {
     }
 
-    public void loadSystems(String packageName, Reflections reflections) {
+    public void loadSystems(String packageName, Reflections reflections, NetworkMode netMode) {
         Set<Class<?>> systems = reflections.getTypesAnnotatedWith(RegisterComponentSystem.class);
         for (Class<?> system : systems) {
             if (!ComponentSystem.class.isAssignableFrom(system)) {
@@ -62,19 +63,33 @@ public class ComponentSystemManager {
             }
 
             RegisterComponentSystem registerInfo = system.getAnnotation(RegisterComponentSystem.class);
-            // TODO: filter registrations
-            String id = packageName + ":" + system.getSimpleName();
-            try {
-                ComponentSystem newSystem = (ComponentSystem) system.newInstance();
-                register(newSystem, id);
-                logger.debug("Loaded system {}", id);
-            } catch (InstantiationException e) {
-                logger.error("Failed to load system {}", id, e);
-            } catch (IllegalAccessException e) {
-                logger.error("Failed to load system {}", id, e);
+            if (shouldRegister(registerInfo, netMode)) {
+                String id = packageName + ":" + system.getSimpleName();
+                try {
+                    ComponentSystem newSystem = (ComponentSystem) system.newInstance();
+                    register(newSystem, id);
+                    logger.debug("Loaded system {}", id);
+                } catch (InstantiationException e) {
+                    logger.error("Failed to load system {}", id, e);
+                } catch (IllegalAccessException e) {
+                    logger.error("Failed to load system {}", id, e);
+                }
             }
         }
 
+    }
+
+    private boolean shouldRegister(RegisterComponentSystem registerInfo, NetworkMode netMode) {
+        switch (registerInfo.value()) {
+            case AUTHORITY:
+                return netMode.isAuthority();
+            case SERVER:
+                return netMode == NetworkMode.SERVER;
+            case CLIENT:
+                return netMode == NetworkMode.CLIENT;
+            default:
+                return true;
+        }
     }
 
     public <T extends ComponentSystem> void register(ComponentSystem object, String name) {

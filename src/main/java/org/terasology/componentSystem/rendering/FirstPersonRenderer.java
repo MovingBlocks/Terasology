@@ -45,7 +45,7 @@ import org.terasology.entitySystem.In;
 import org.terasology.world.block.BlockItemComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.RegisterComponentSystem;
-import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.TeraMath;
 import org.terasology.model.inventory.Icon;
@@ -67,7 +67,7 @@ import com.google.common.collect.Maps;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-@RegisterComponentSystem(headedOnly = true)
+@RegisterComponentSystem(whenHeadless = false)
 public class FirstPersonRenderer implements RenderSystem {
 
     @In
@@ -108,12 +108,12 @@ public class FirstPersonRenderer implements RenderSystem {
 
     @Override
     public void renderFirstPerson() {
-        CharacterMovementComponent charMoveComp = localPlayer.getEntity().getComponent(CharacterMovementComponent.class);
+        CharacterMovementComponent charMoveComp = localPlayer.getCharacterEntity().getComponent(CharacterMovementComponent.class);
         float bobOffset = calcBobbingOffset(charMoveComp.footstepDelta / charMoveComp.distanceBetweenFootsteps, (float) java.lang.Math.PI / 8f, 0.05f, 1f);
-        float handMovementAnimationOffset = localPlayer.getEntity().getComponent(LocalPlayerComponent.class).handAnimation;
+        float handMovementAnimationOffset = localPlayer.getCharacterEntity().getComponent(LocalPlayerComponent.class).handAnimation;
 
-        int invSlotIndex = localPlayer.getEntity().getComponent(LocalPlayerComponent.class).selectedTool;
-        EntityRef heldItem = localPlayer.getEntity().getComponent(InventoryComponent.class).itemSlots.get(invSlotIndex);
+        int invSlotIndex = localPlayer.getCharacterEntity().getComponent(LocalPlayerComponent.class).selectedTool;
+        EntityRef heldItem = localPlayer.getCharacterEntity().getComponent(InventoryComponent.class).itemSlots.get(invSlotIndex);
         ItemComponent heldItemComp = heldItem.getComponent(ItemComponent.class);
         BlockItemComponent blockItem = heldItem.getComponent(BlockItemComponent.class);
         if (blockItem != null && blockItem.blockFamily != null) {

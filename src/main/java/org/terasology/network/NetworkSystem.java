@@ -33,11 +33,12 @@ import org.terasology.entitySystem.metadata.internal.EntitySystemLibraryImpl;
 import org.terasology.entitySystem.persistence.EntitySerializer;
 import org.terasology.entitySystem.persistence.EventSerializer;
 import org.terasology.game.CoreRegistry;
+import org.terasology.network.events.ConnectedEvent;
 import org.terasology.network.pipelineFactory.TerasologyClientPipelineFactory;
 import org.terasology.network.pipelineFactory.TerasologyServerPipelineFactory;
+import org.terasology.network.serialization.NetComponentSerializeCheck;
 import org.terasology.network.serialization.NetEntityRefTypeHandler;
 import org.terasology.protobuf.NetData;
-import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 
 import java.net.InetSocketAddress;
@@ -65,10 +66,10 @@ public class NetworkSystem implements EntityChangeSubscriber {
 
     // Server only
     private ChannelGroup allChannels = new DefaultChannelGroup("tera-channels");
-    private BlockingQueue<ClientPlayer> newClients = Queues.newLinkedBlockingQueue();
+    private BlockingQueue<Client> newClients = Queues.newLinkedBlockingQueue();
     private int nextNetId = 1;
-    private final Set<ClientPlayer> clientPlayerList = Sets.newLinkedHashSet();
-    private Map<EntityRef, ClientPlayer> clientPlayerLookup = Maps.newHashMap();
+    private final Set<Client> clientList = Sets.newLinkedHashSet();
+    private Map<EntityRef, Client> clientPlayerLookup = Maps.newHashMap();
 
     // Client only
     private Server server;
@@ -134,13 +135,13 @@ public class NetworkSystem implements EntityChangeSubscriber {
         if (mode != NetworkMode.NONE) {
             if (entityManager != null) {
                 if (!newClients.isEmpty()) {
-                    List<ClientPlayer> newPlayers = Lists.newArrayListWithExpectedSize(newClients.size());
+                    List<Client> newPlayers = Lists.newArrayListWithExpectedSize(newClients.size());
                     newClients.drainTo(newPlayers);
-                    for (ClientPlayer client : newPlayers) {
+                    for (Client client : newPlayers) {
                         processNewClient(client);
                     }
                 }
-                for (ClientPlayer client : clientPlayerList) {
+                for (Client client : clientList) {
                     client.update();
                 }
                 if (server != null) {
@@ -158,18 +159,24 @@ public class NetworkSystem implements EntityChangeSubscriber {
         return this.server;
     }
 
-    public Iterable<ClientPlayer> getPlayers() {
-        return this.clientPlayerList;
+    public Iterable<Client> getPlayers() {
+        return this.clientList;
     }
 
-    public ClientPlayer getClientFor(EntityRef player) {
-        return clientPlayerLookup.get(player);
+    public Client getOwner(EntityRef entity) {
+        Client result = clientPlayerLookup.get(entity);
+        if (result == null) {
+            NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
+            if (netComp != null && netComp.owner.exists()) {
+                result = clientPlayerLookup.get(netComp.owner);
+            }
+        }
+        return result;
     }
 
     public void setRemoteWorldProvider(RemoteChunkProvider remoteWorldProvider) {
         server.setRemoteWorldProvider(remoteWorldProvider);
     }
-
 
     public void registerNetworkEntity(EntityRef entity) {
         if (mode == NetworkMode.NONE) {
@@ -189,13 +196,13 @@ public class NetworkSystem implements EntityChangeSubscriber {
         if (mode == NetworkMode.SERVER) {
             switch (netComponent.replicateMode) {
                 case OWNER:
-                    ClientPlayer clientPlayer = getClientFor(entity);
+                    Client clientPlayer = getOwner(entity);
                     if (clientPlayer != null) {
                         clientPlayer.setNetInitial(netComponent.networkId);
                     }
                     break;
                 default:
-                    for (ClientPlayer client : clientPlayerList) {
+                    for (Client client : clientList) {
                         // TODO: Relevance Check
                         client.setNetInitial(netComponent.networkId);
                     }
@@ -215,7 +222,7 @@ public class NetworkSystem implements EntityChangeSubscriber {
                         .setRemoveEntity(
                                 NetData.RemoveEntityMessage.newBuilder().setNetId(netComponent.networkId).build())
                         .build();
-                for (ClientPlayer client : clientPlayerList) {
+                for (Client client : clientList) {
                     client.setNetRemoved(netComponent.networkId, message);
                 }
             }
@@ -249,6 +256,7 @@ public class NetworkSystem implements EntityChangeSubscriber {
         eventSerializer = new EventSerializer(eventLibrary);
         entitySerializer = new EntitySerializer(entityManager, componentLibrary);
         entitySerializer.setIgnoringEntityId(true);
+        entitySerializer.setComponentSerializeCheck(new NetComponentSerializeCheck());
 
         if (server != null) {
             server.connectToEntitySystem(entityManager, entitySerializer, eventSerializer);
@@ -260,8 +268,11 @@ public class NetworkSystem implements EntityChangeSubscriber {
     public void onEntityChange(EntityRef entity) {
         NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
         if (netComp != null) {
-            for (ClientPlayer client : clientPlayerList) {
+            for (Client client : clientList) {
                 client.setNetDirty(netComp.networkId);
+            }
+            if (server != null) {
+                server.setNetDirty(netComp.networkId);
             }
         }
     }
@@ -278,21 +289,22 @@ public class NetworkSystem implements EntityChangeSubscriber {
         allChannels.add(channel);
     }
 
-    void addClient(ClientPlayer client) {
+    void addClient(Client client) {
         newClients.offer(client);
     }
 
-    private void processNewClient(ClientPlayer client) {
+    private void processNewClient(Client client) {
         logger.info("New client connected: {}", client.getName());
         client.connected(entityManager, entitySerializer, eventSerializer);
-        logger.info("New client entity: {}", client.getEntity());
-        clientPlayerList.add(client);
+        clientList.add(client);
         clientPlayerLookup.put(client.getEntity(), client);
+        client.getEntity().send(new ConnectedEvent());
+        logger.info("New client entity: {}", client.getEntity());
         for (EntityRef netEntity : entityManager.iteratorEntities(NetworkComponent.class)) {
             NetworkComponent netComp = netEntity.getComponent(NetworkComponent.class);
             switch (netComp.replicateMode) {
                 case OWNER:
-                    if (client.equals(getClientFor(netEntity))) {
+                    if (client.equals(getOwner(netEntity))) {
                         client.setNetInitial(netComp.networkId);
                     }
                     break;
@@ -304,9 +316,9 @@ public class NetworkSystem implements EntityChangeSubscriber {
         }
     }
 
-    void removeClient(ClientPlayer client) {
-        synchronized (clientPlayerList) {
-            clientPlayerList.remove(client);
+    void removeClient(Client client) {
+        synchronized (clientList) {
+            clientList.remove(client);
         }
     }
 

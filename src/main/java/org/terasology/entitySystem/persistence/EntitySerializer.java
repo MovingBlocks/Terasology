@@ -9,6 +9,7 @@ import org.terasology.entitySystem.PersistableEntityManager;
 import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
+import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.metadata.MetadataUtil;
 import org.terasology.protobuf.EntityData;
 
@@ -33,6 +34,7 @@ public class EntitySerializer {
     private ComponentLibrary componentLibrary;
     private ComponentSerializer componentSerializer;
 
+    private ComponentSerializeCheck componentSerializeCheck = ComponentSerializeCheck.NullCheck.create();
     private boolean ignoringEntityId = false;
 
     /**
@@ -54,6 +56,10 @@ public class EntitySerializer {
      */
     public boolean isIgnoringEntityId() {
         return ignoringEntityId;
+    }
+
+    public void setComponentSerializeCheck(ComponentSerializeCheck check) {
+        this.componentSerializeCheck = check;
     }
 
     /**
@@ -140,15 +146,17 @@ public class EntitySerializer {
             componentMap.put(EntityInfoComponent.class, new EntityInfoComponent(entityData.getParentPrefab(), true));
         }
         for (EntityData.Component componentData : entityData.getComponentList()) {
-            Class<? extends Component> componentClass = componentSerializer.getComponentClass(componentData);
-            if (componentClass == null) continue;
+            ComponentMetadata<? extends Component> metadata = componentSerializer.getComponentMetadata(componentData);
+            if (metadata == null || !componentSerializeCheck.serialize(metadata)) {
+                continue;
+            }
 
-            Component existingComponent = componentMap.get(componentClass);
+            Component existingComponent = componentMap.get(metadata.getType());
             if (existingComponent == null) {
                 Component newComponent = componentSerializer.deserialize(componentData);
-                componentMap.put(componentClass, newComponent);
+                componentMap.put(metadata.getType(), newComponent);
             } else {
-                componentSerializer.deserializeOnto(existingComponent, componentData);
+                componentSerializer.deserializeOnto(existingComponent, componentData, FieldSerializeCheck.NullCheck.<Component>newInstance());
             }
         }
         if (ignoringEntityId) {
@@ -159,23 +167,32 @@ public class EntitySerializer {
     }
 
     public void deserializeOnto(EntityRef currentEntity, EntityData.Entity entityData) {
+        deserializeOnto(currentEntity, entityData, true, FieldSerializeCheck.NullCheck.<Component>newInstance());
+    }
+
+    public void deserializeOnto(EntityRef currentEntity, EntityData.Entity entityData, boolean removeMissingComponents, FieldSerializeCheck<Component> fieldCheck) {
         Set<Class<? extends Component>> presentComponents = Sets.newLinkedHashSet();
         for (EntityData.Component componentData : entityData.getComponentList()) {
-            Class<? extends Component> componentClass = componentSerializer.getComponentClass(componentData);
-            if (componentClass == null) continue;
-            presentComponents.add(componentClass);
+            ComponentMetadata<? extends Component> metadata = componentSerializer.getComponentMetadata(componentData);
+            if (metadata == null || !componentSerializeCheck.serialize(metadata)) {
+                continue;
+            }
 
-            Component existingComponent = currentEntity.getComponent(componentClass);
+            presentComponents.add(metadata.getType());
+
+            Component existingComponent = currentEntity.getComponent(metadata.getType());
             if (existingComponent == null) {
                 currentEntity.addComponent(componentSerializer.deserialize(componentData));
             } else {
-                componentSerializer.deserializeOnto(existingComponent, componentData);
+                componentSerializer.deserializeOnto(existingComponent, componentData, fieldCheck);
                 currentEntity.saveComponent(existingComponent);
             }
         }
-        for (Component comp : currentEntity.iterateComponents()) {
-            if (!presentComponents.contains(comp.getClass()) && comp.getClass() != EntityInfoComponent.class) {
-                currentEntity.removeComponent(comp.getClass());
+        if (removeMissingComponents) {
+            for (Component comp : currentEntity.iterateComponents()) {
+                if (!presentComponents.contains(comp.getClass()) && componentSerializeCheck.serialize(componentLibrary.getMetadata(comp.getClass())) ) {
+                    currentEntity.removeComponent(comp.getClass());
+                }
             }
         }
     }
@@ -186,8 +203,9 @@ public class EntitySerializer {
             entity.setId(entityRef.getId());
         }
         for (Component component : entityRef.iterateComponents()) {
-            if (component.getClass().equals(EntityInfoComponent.class))
+            if (!componentSerializeCheck.serialize(componentLibrary.getMetadata(component.getClass()))) {
                 continue;
+            }
 
             EntityData.Component componentData = componentSerializer.serialize(component, fieldCheck);
             if (componentData != null) {
@@ -205,8 +223,9 @@ public class EntitySerializer {
         entity.setParentPrefab(prefab.getName());
         Set<Class<? extends Component>> presentClasses = Sets.newHashSet();
         for (Component component : entityRef.iterateComponents()) {
-            if (component.getClass().equals(EntityInfoComponent.class))
+            if (!componentSerializeCheck.serialize(componentLibrary.getMetadata(component.getClass()))) {
                 continue;
+            }
 
             presentClasses.add(component.getClass());
 
@@ -223,7 +242,7 @@ public class EntitySerializer {
             }
         }
         for (Component prefabComponent : prefab.listComponents()) {
-            if (!presentClasses.contains(prefabComponent.getClass())) {
+            if (!presentClasses.contains(prefabComponent.getClass()) && componentSerializeCheck.serialize(componentLibrary.getMetadata(prefabComponent.getClass()))) {
                 entity.addRemovedComponent(MetadataUtil.getComponentClassName(prefabComponent.getClass()));
             }
         }

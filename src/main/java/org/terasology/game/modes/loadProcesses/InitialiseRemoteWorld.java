@@ -1,10 +1,9 @@
 package org.terasology.game.modes.loadProcesses;
 
 import org.terasology.componentSystem.controllers.LocalPlayerSystem;
-import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.modes.LoadProcess;
-import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.rendering.cameras.Camera;

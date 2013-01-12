@@ -28,7 +28,7 @@ import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.Timer;
-import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PathManager;
@@ -61,17 +61,12 @@ import org.terasology.world.WorldView;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.chunks.ChunkStore;
-import org.terasology.world.chunks.store.ChunkStoreGZip;
 
 import javax.imageio.ImageIO;
 import javax.vecmath.Vector3f;
 import java.awt.image.BufferedImage;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -751,7 +746,7 @@ public final class WorldRenderer {
     private void animateSpawnCamera(double delta) {
         if (player == null || !player.isValid())
             return;
-        PlayerComponent player = this.player.getEntity().getComponent(PlayerComponent.class);
+        PlayerComponent player = this.player.getCharacterEntity().getComponent(PlayerComponent.class);
 
         Vector3f cameraPosition = new Vector3f(player.spawnPosition);
         cameraPosition.y += 32;
@@ -824,14 +819,13 @@ public final class WorldRenderer {
      */
     public void setPlayer(LocalPlayer p) {
         player = p;
-        chunkProvider.addRegionEntity(p.getEntity(), Config.getInstance().getActiveViewingDistance());
         updateChunksInProximity(true);
     }
 
     public void changeViewDistance(int viewingDistance) {
         logger.debug("New Viewing Distance: {}", viewingDistance);
         if (player != null) {
-            chunkProvider.addRegionEntity(player.getEntity(), viewingDistance);
+            chunkProvider.addRegionEntity(player.getCharacterEntity(), viewingDistance);
         }
         updateChunksInProximity(true);
     }

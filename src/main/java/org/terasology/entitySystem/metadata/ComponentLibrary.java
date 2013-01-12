@@ -16,6 +16,7 @@
 package org.terasology.entitySystem.metadata;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.Event;
 
 /**
  * The library for metadata about components (and their fields).
@@ -23,4 +24,14 @@ import org.terasology.entitySystem.Component;
  * @author Immortius <immortius@gmail.com>
  */
 public interface ComponentLibrary extends ClassLibrary<Component> {
+
+    /**
+     * @param clazz
+     * @return The metadata for the given clazz, or null if not registered.
+     */
+    <T extends Component> ComponentMetadata<T> getMetadata(Class<T> clazz);
+
+    <T extends Component> ComponentMetadata<T> getMetadata(T object);
+
+    ComponentMetadata<? extends Component> getMetadata(String className);
 }

@@ -1,6 +1,10 @@
 {
+    "persisted" : false,
     "Location" : {},
     "Player" : {},
+    "Network" : {
+        "replicateMode" : "ALWAYS"
+    },
     "Health" : {
         "currentHealth" : 255,
         "maxHealth" : 255,
@@ -16,6 +20,10 @@
         "height" : 1.6,
         "radius" : 0.3,
         "jumpSpeed" : 12
+    },
+    "Mesh" : {
+        "mesh" : "engine:testmonkey",
+        "material" : "engine:monkeyHead1"
     },
     "BoxShape" : {
         "extents" : [1.5, 1.6, 1.5]
@@ -33,9 +41,5 @@
               0,0,0,0,0,0,0,0,0,0,
               0,0,0,0,0,0,0,0,0,0
             ]
-    },
-    "MinionBar" : {
-        "minionSlots" : [0,0,0,0,0,0,0,0,0]
-    },
-    "MinionController" : {}
+    }
 }

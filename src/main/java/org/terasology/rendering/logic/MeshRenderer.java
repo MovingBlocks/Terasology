@@ -55,9 +55,7 @@ import org.lwjgl.opengl.GL15;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.componentSystem.RenderSystem;
-import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.components.world.LocationComponent;
-import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
@@ -65,7 +63,7 @@ import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.VertexBufferObjectManager;
 import org.terasology.math.AABB;
@@ -89,7 +87,7 @@ import com.google.common.collect.Sets;
  *
  * @author Immortius <immortius@gmail.com>
  */
-@RegisterComponentSystem(headedOnly = true)
+@RegisterComponentSystem(whenHeadless = false)
 public class MeshRenderer implements RenderSystem, EventHandlerSystem {
     private static final Logger logger = LoggerFactory.getLogger(MeshRenderer.class);
 

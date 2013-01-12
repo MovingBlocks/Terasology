@@ -23,7 +23,7 @@ import org.terasology.events.RespawnEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.modes.StateMainMenu;
-import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.VisibilityListener;
@@ -110,6 +110,6 @@ public class UIScreenDeath extends UIWindow {
     }
     
     private void respawn() {
-        CoreRegistry.get(LocalPlayer.class).getEntity().send(new RespawnEvent());
+        CoreRegistry.get(LocalPlayer.class).getCharacterEntity().send(new RespawnEvent());
     }
 }

@@ -2,6 +2,9 @@ package org.terasology.network;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
 import org.jboss.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +14,9 @@ import org.terasology.entitySystem.PersistableEntityManager;
 import org.terasology.entitySystem.persistence.EntitySerializer;
 import org.terasology.entitySystem.persistence.EventSerializer;
 import org.terasology.math.Vector3i;
+import org.terasology.network.serialization.ClientComponentFieldCheck;
+import org.terasology.network.serialization.ServerComponentFieldCheck;
+import org.terasology.protobuf.EntityData;
 import org.terasology.protobuf.NetData;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
@@ -38,6 +44,9 @@ public class Server {
 
     private RemoteChunkProvider remoteWorldProvider;
     private BlockingQueue<Chunk> chunkQueue = Queues.newLinkedBlockingQueue();
+    private TIntSet netDirty = new TIntHashSet();
+
+    private EntityRef clientEntity = EntityRef.NULL;
 
     public Server(NetworkSystem system, Channel channel) {
         this.channel = channel;
@@ -52,6 +61,7 @@ public class Server {
 
     void setServerInfo(NetData.ServerInfoMessage serverInfo) {
         this.serverInfo = serverInfo;
+        clientEntity = new NetEntityRef(serverInfo.getClientId(), networkSystem);
     }
 
     public NetData.ServerInfoMessage getInfo() {
@@ -77,10 +87,45 @@ public class Server {
             }
         }
         if (entityManager != null) {
+            processEntities();
             processMessages();
             processEvents();
         }
     }
+
+    private void send(NetData.NetMessage data) {
+        channel.write(data);
+    }
+
+    private void processEntities() {
+        TIntIterator dirtyIterator = netDirty.iterator();
+        while (dirtyIterator.hasNext()) {
+            int netId = dirtyIterator.next();
+            EntityRef entity = networkSystem.getEntity(netId);
+            if (isOwned(entity)) {
+                EntityData.Entity entityData = entitySerializer.serialize(entity, false, new ClientComponentFieldCheck());
+                NetData.NetMessage message = NetData.NetMessage.newBuilder()
+                        .setType(NetData.NetMessage.Type.UPDATE_ENTITY)
+                        .setUpdateEntity(NetData.UpdateEntityMessage.newBuilder().setEntity(entityData).setNetId(netId))
+                        .build();
+                send(message);
+            }
+        }
+        netDirty.clear();
+    }
+
+    private boolean isOwned(EntityRef entity) {
+        if (entity.equals(clientEntity)) {
+            return true;
+        }
+        // TODO: Recursive
+        NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
+        if (netComp != null) {
+            return netComp.owner.equals(clientEntity);
+        }
+        return false;
+    }
+
 
     private void processEvents() {
         List<NetData.EventMessage> messages = Lists.newArrayListWithExpectedSize(queuedEvents.size());
@@ -151,6 +196,10 @@ public class Server {
 
     public void queueMessage(NetData.NetMessage message) {
         queuedMessages.offer(message);
+    }
+
+    public void setNetDirty(int netId) {
+        netDirty.add(netId);
     }
 }
 

@@ -41,7 +41,7 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.model.inventory.Icon;
 import org.terasology.physics.ImpulseEvent;
 import org.terasology.rendering.assets.Texture;
@@ -704,7 +704,7 @@ public class UIItemCell extends UIDisplayContainer  {
      * @return Returns the item in the transfer slot.
      */
     private static EntityRef getFromTransferSlot() {
-        return CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(PlayerComponent.class).transferSlot;
+        return CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(PlayerComponent.class).transferSlot;
     }
     
     /**
@@ -716,7 +716,7 @@ public class UIItemCell extends UIDisplayContainer  {
         
         //delete the item in transfer slot
         if (sourceCell == null) {
-            CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(PlayerComponent.class).transferSlot = EntityRef.NULL;
+            CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(PlayerComponent.class).transferSlot = EntityRef.NULL;
         }
         else {
             EntityRef target = getFromTransferSlot();
@@ -778,14 +778,14 @@ public class UIItemCell extends UIDisplayContainer  {
                         
                         //move the created item to the transfer slot
                         copyItem.container = sourceCell.ownerEntity;
-                        CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(PlayerComponent.class).transferSlot = copy;
+                        CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(PlayerComponent.class).transferSlot = copy;
                         
                     }
                     //no items in transfer slot left
                     else {
                         
                         //place whole stack in transfer slot
-                        CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(PlayerComponent.class).transferSlot = sourceCell.itemEntity;
+                        CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(PlayerComponent.class).transferSlot = sourceCell.itemEntity;
                         
                         //remove item from the owners inventory slot
                         InventoryComponent sourceInventory = sourceCell.getOwnerEntity().getComponent(InventoryComponent.class);
@@ -841,7 +841,7 @@ public class UIItemCell extends UIDisplayContainer  {
                 int dropPower = 6;
                 EntityManager entityManager = CoreRegistry.get(EntityManager.class);
                 LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-                LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
+                LocalPlayerComponent localPlayerComp = localPlayer.getCharacterEntity().getComponent(LocalPlayerComponent.class);
                 DroppedBlockFactory droppedBlockFactory = new DroppedBlockFactory(entityManager);
                 EntityRef droppedBlock = droppedBlockFactory.newInstance(new Vector3f(localPlayer.getPosition().x + localPlayer.getViewDirection().x * 1.5f, localPlayer.getPosition().y + localPlayer.getViewDirection().y * 1.5f, localPlayer.getPosition().z + localPlayer.getViewDirection().z * 1.5f), blockItem.blockFamily, 20);
                 

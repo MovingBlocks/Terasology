@@ -22,6 +22,7 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.RegisterMode;
 import org.terasology.events.ActivateEvent;
 import org.terasology.events.OpenInventoryEvent;
 import org.terasology.game.CoreRegistry;
@@ -31,7 +32,8 @@ import org.terasology.rendering.gui.windows.UIScreenContainer;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-@RegisterComponentSystem(authorativeOnly = true)
+// TODO: Network
+@RegisterComponentSystem(RegisterMode.AUTHORITY)
 public class AccessInventoryAction implements EventHandlerSystem {
 
     public void initialise() {

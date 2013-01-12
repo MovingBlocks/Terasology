@@ -13,4 +13,9 @@ public class NetworkEventFieldCheck implements FieldSerializeCheck<Event> {
     public boolean shouldSerializeField(FieldMetadata field, Event event) {
         return field.isReplicated();
     }
+
+    @Override
+    public boolean shouldDeserializeField(FieldMetadata field) {
+        return field.isReplicated();
+    }
 }

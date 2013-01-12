@@ -21,7 +21,7 @@ import org.lwjgl.opengl.Display;
 import org.terasology.asset.Assets;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UIWindow;
 
@@ -64,12 +64,12 @@ public class UIMinionBehaviourMenu extends UIWindow {
     	
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         if (localPlayer != null) {
-            MinionBarComponent inventory = localPlayer.getEntity().getComponent(MinionBarComponent.class);
+            MinionBarComponent inventory = localPlayer.getCharacterEntity().getComponent(MinionBarComponent.class);
             if (inventory == null) {
                 return;
             }
             
-            MinionControllerComponent minionController = localPlayer.getEntity().getComponent(MinionControllerComponent.class);
+            MinionControllerComponent minionController = localPlayer.getCharacterEntity().getComponent(MinionControllerComponent.class);
             if (minionController != null) {
 	            int selectedMinion = minionController.selectedMinion;
 	            EntityRef minion = inventory.minionSlots.get(selectedMinion);

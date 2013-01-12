@@ -19,7 +19,6 @@ import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.*;
-import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.world.block.BlockComponent;
@@ -43,7 +42,7 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.input.ButtonState;
 import org.terasology.input.CameraTargetSystem;
-import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.world.WorldProvider;
@@ -107,7 +106,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         if (!localPlayer.isValid())
             return;
 
-        EntityRef entity = localPlayer.getEntity();
+        EntityRef entity = localPlayer.getCharacterEntity();
         LocalPlayerComponent localPlayerComponent = entity.getComponent(LocalPlayerComponent.class);
         CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
         LocationComponent location = entity.getComponent(LocationComponent.class);
@@ -422,20 +421,20 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
     @ReceiveEvent(components = {LocalPlayerComponent.class})
     public void onNextItem(ToolbarNextButton event, EntityRef entity) {
-        LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
+        LocalPlayerComponent localPlayerComp = localPlayer.getCharacterEntity().getComponent(LocalPlayerComponent.class);
         localPlayerComp.selectedTool = (localPlayerComp.selectedTool + 1) % 10;
-        localPlayer.getEntity().saveComponent(localPlayerComp);
+        localPlayer.getCharacterEntity().saveComponent(localPlayerComp);
         event.consume();
     }
 
     @ReceiveEvent(components = {LocalPlayerComponent.class})
     public void onPrevItem(ToolbarPrevButton event, EntityRef entity) {
-        LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
+        LocalPlayerComponent localPlayerComp = localPlayer.getCharacterEntity().getComponent(LocalPlayerComponent.class);
         localPlayerComp.selectedTool = (localPlayerComp.selectedTool - 1) % 10;
         if (localPlayerComp.selectedTool < 0) {
             localPlayerComp.selectedTool = 10 + localPlayerComp.selectedTool;
         }
-        localPlayer.getEntity().saveComponent(localPlayerComp);
+        localPlayer.getCharacterEntity().saveComponent(localPlayerComp);
         event.consume();
     }
 
@@ -443,7 +442,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     public void onSlotButton(ToolbarSlotButton event, EntityRef entity) {
         LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
         localPlayerComp.selectedTool = event.getSlot();
-        localPlayer.getEntity().saveComponent(localPlayerComp);
+        localPlayer.getCharacterEntity().saveComponent(localPlayerComp);
     }
 
     @ReceiveEvent(components = {LocalPlayerComponent.class, InventoryComponent.class})

@@ -56,7 +56,7 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-@RegisterComponentSystem(headedOnly = true)
+@RegisterComponentSystem(whenHeadless = false)
 public class BlockDamageRenderer implements RenderSystem {
 
     @In

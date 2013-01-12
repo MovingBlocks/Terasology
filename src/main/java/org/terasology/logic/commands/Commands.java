@@ -43,7 +43,7 @@ import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.input.InputSystem;
-import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.manager.CommandManager;
 import org.terasology.logic.manager.CommandManager.CommandInfo;
 import org.terasology.logic.manager.MessageManager;
@@ -333,7 +333,7 @@ public class Commands implements CommandProvider {
 
             return;
         }
-        EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
+        EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getCharacterEntity();
         playerEntity.send(new ReceiveItemEvent(item));
         ItemComponent itemComp = item.getComponent(ItemComponent.class);
         if (itemComp != null && !itemComp.container.exists()) {
@@ -349,7 +349,7 @@ public class Commands implements CommandProvider {
         System.out.println("Found prefab: " + prefab);
         if (prefab != null && prefab.getComponent(ItemComponent.class) != null) {
             EntityRef item = CoreRegistry.get(EntityManager.class).create(prefab);
-            EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
+            EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getCharacterEntity();
             playerEntity.send(new ReceiveItemEvent(item));
             ItemComponent itemComp = item.getComponent(ItemComponent.class);
             if (itemComp != null && !itemComp.container.exists()) {
@@ -364,60 +364,60 @@ public class Commands implements CommandProvider {
     @Command(shortDescription = "Restores your health to max")
     public void health() {
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-        HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
+        HealthComponent health = localPlayer.getCharacterEntity().getComponent(HealthComponent.class);
         health.currentHealth = health.maxHealth;
-        localPlayer.getEntity().send(new FullHealthEvent(localPlayer.getEntity(), health.maxHealth));
-        localPlayer.getEntity().saveComponent(health);
+        localPlayer.getCharacterEntity().send(new FullHealthEvent(localPlayer.getCharacterEntity(), health.maxHealth));
+        localPlayer.getCharacterEntity().saveComponent(health);
     }
 
     @Command(shortDescription = "Restores your health by an amount")
     public void health(@CommandParam(name = "amount") int amount) {
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-        HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
+        HealthComponent health = localPlayer.getCharacterEntity().getComponent(HealthComponent.class);
         health.currentHealth = amount;
         if (health.currentHealth >= health.maxHealth) {
             health.currentHealth = health.maxHealth;
-            localPlayer.getEntity().send(new FullHealthEvent(localPlayer.getEntity(), health.maxHealth));
+            localPlayer.getCharacterEntity().send(new FullHealthEvent(localPlayer.getCharacterEntity(), health.maxHealth));
         } else if (health.currentHealth <= 0) {
             health.currentHealth = 0;
-            localPlayer.getEntity().send(new NoHealthEvent(localPlayer.getEntity(), health.maxHealth));
+            localPlayer.getCharacterEntity().send(new NoHealthEvent(localPlayer.getCharacterEntity(), health.maxHealth));
         } else {
-            localPlayer.getEntity().send(new HealthChangedEvent(localPlayer.getEntity(), health.currentHealth, health.maxHealth));
+            localPlayer.getCharacterEntity().send(new HealthChangedEvent(localPlayer.getCharacterEntity(), health.currentHealth, health.maxHealth));
         }
 
-        localPlayer.getEntity().saveComponent(health);
+        localPlayer.getCharacterEntity().saveComponent(health);
     }
 
     @Command(shortDescription = "Reduce the player's health to zero")
     public void kill() {
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-        HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
-        localPlayer.getEntity().send(new NoHealthEvent(localPlayer.getEntity(), health.maxHealth));
+        HealthComponent health = localPlayer.getCharacterEntity().getComponent(HealthComponent.class);
+        localPlayer.getCharacterEntity().send(new NoHealthEvent(localPlayer.getCharacterEntity(), health.maxHealth));
     }
 
     @Command(shortDescription = "Reduce the player's health by an amount")
     public void damage(@CommandParam(name = "amount") int amount) {
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-        HealthComponent health = localPlayer.getEntity().getComponent(HealthComponent.class);
+        HealthComponent health = localPlayer.getCharacterEntity().getComponent(HealthComponent.class);
         health.currentHealth -= amount;
         if (health.currentHealth >= health.maxHealth) {
             health.currentHealth = health.maxHealth;
-            localPlayer.getEntity().send(new FullHealthEvent(localPlayer.getEntity(), health.maxHealth));
+            localPlayer.getCharacterEntity().send(new FullHealthEvent(localPlayer.getCharacterEntity(), health.maxHealth));
         } else if (health.currentHealth <= 0) {
             health.currentHealth = 0;
-            localPlayer.getEntity().send(new NoHealthEvent(localPlayer.getEntity(), health.maxHealth));
+            localPlayer.getCharacterEntity().send(new NoHealthEvent(localPlayer.getCharacterEntity(), health.maxHealth));
         } else {
-            localPlayer.getEntity().send(new HealthChangedEvent(localPlayer.getEntity(), health.currentHealth, health.maxHealth));
+            localPlayer.getCharacterEntity().send(new HealthChangedEvent(localPlayer.getCharacterEntity(), health.currentHealth, health.maxHealth));
         }
 
-        localPlayer.getEntity().saveComponent(health);
+        localPlayer.getCharacterEntity().saveComponent(health);
     }
 
     @Command(shortDescription = "Teleports you to a location")
     public void teleport(@CommandParam(name = "x") float x, @CommandParam(name = "y") float y, @CommandParam(name = "z") float z) {
         LocalPlayer player = CoreRegistry.get(LocalPlayer.class);
         if (player != null) {
-            LocationComponent location = player.getEntity().getComponent(LocationComponent.class);
+            LocationComponent location = player.getCharacterEntity().getComponent(LocationComponent.class);
             if (location != null) {
                 location.setWorldPosition(new Vector3f(x, y, z));
             }
@@ -496,7 +496,7 @@ public class Commands implements CommandProvider {
 
     @Command(shortDescription = "Sets the height the player can step up")
     public void stepHeight(@CommandParam(name = "height") float amount) {
-        EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
+        EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getCharacterEntity();
         CharacterMovementComponent comp = playerEntity.getComponent(CharacterMovementComponent.class);
         comp.stepHeight = amount;
     }
@@ -576,7 +576,7 @@ public class Commands implements CommandProvider {
     public void sleigh() {
         LocalPlayer player = CoreRegistry.get(LocalPlayer.class);
         if (player != null) {
-            CharacterMovementComponent moveComp = player.getEntity().getComponent(CharacterMovementComponent.class);
+            CharacterMovementComponent moveComp = player.getCharacterEntity().getComponent(CharacterMovementComponent.class);
             if (moveComp.slopeFactor > 0.7f) {
                 moveComp.slopeFactor = 0.6f;
             } else {
@@ -588,7 +588,7 @@ public class Commands implements CommandProvider {
 
     @Command(shortDescription = "Sets the spawn position of the player")
     public void setSpawn() {
-        EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
+        EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getCharacterEntity();
         PlayerComponent spawn = playerEntity.getComponent(PlayerComponent.class);
         spawn.spawnPosition = playerEntity.getComponent(LocationComponent.class).getWorldPosition();
         playerEntity.saveComponent(spawn);

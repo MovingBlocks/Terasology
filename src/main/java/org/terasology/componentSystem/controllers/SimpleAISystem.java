@@ -26,10 +26,11 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.RegisterMode;
 import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
-import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldProvider;
@@ -37,7 +38,7 @@ import org.terasology.world.WorldProvider;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-@RegisterComponentSystem(authorativeOnly = true)
+@RegisterComponentSystem(RegisterMode.AUTHORITY)
 public class SimpleAISystem implements EventHandlerSystem, UpdateSubscriberSystem {
 
     private WorldProvider worldProvider;

@@ -21,7 +21,7 @@ import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector3i;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.physics.CollisionGroup;
@@ -116,7 +116,7 @@ public class CameraTargetSystem implements ComponentSystem {
             EntityRef oldTarget = target;
             oldTarget.send(new CameraOutEvent());
             newTarget.send(new CameraOverEvent());
-            localPlayer.getEntity().send(new CameraTargetChangedEvent(oldTarget, newTarget));
+            localPlayer.getCharacterEntity().send(new CameraTargetChangedEvent(oldTarget, newTarget));
         }
         target = newTarget;
         targetBlockPos = newBlockPos;

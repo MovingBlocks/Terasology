@@ -24,7 +24,7 @@ import org.newdawn.slick.Color;
 import org.terasology.asset.Assets;
 import org.terasology.game.types.GameType;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.rendering.gui.animation.AnimationMove;
 import org.terasology.rendering.gui.animation.AnimationRotate;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -60,8 +60,8 @@ public class UIScreenInventory extends UIWindow {
             @Override
             public void changed(UIDisplayElement element, boolean visibility) {
                 if (visibility) {
-                    toolbar.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity(), 0, 9);
-                    inventory.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity(), 10);
+                    toolbar.setEntity(CoreRegistry.get(LocalPlayer.class).getCharacterEntity(), 0, 9);
+                    inventory.setEntity(CoreRegistry.get(LocalPlayer.class).getCharacterEntity(), 10);
                     //TODO connect toolbar <-> inventory somehow to allow fast transfer.
 
                     getGUIManager().getWindowById("hud").getElementById("leftGearWheel").setVisible(false);

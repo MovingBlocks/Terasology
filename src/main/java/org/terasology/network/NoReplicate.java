@@ -6,10 +6,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Annotation to mark components that are not replicated, and are not removed from clients if removed on the server
  * @author Immortius
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD})
-public @interface Replicate {
-    public ReplicateDirection value() default ReplicateDirection.SERVER_TO_CLIENT;
+@Target({ElementType.TYPE})
+public @interface NoReplicate {
 }

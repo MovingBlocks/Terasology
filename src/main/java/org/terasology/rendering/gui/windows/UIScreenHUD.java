@@ -29,7 +29,7 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.Timer;
 import org.terasology.input.CameraTargetSystem;
-import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.VisibilityListener;
@@ -79,7 +79,7 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
             @Override
             public void changed(UIDisplayElement element, boolean visibility) {
                 if (visibility) {
-                    toolbar.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity(), 0, 9);
+                    toolbar.setEntity(CoreRegistry.get(LocalPlayer.class).getCharacterEntity(), 0, 9);
                 }
             }
         });
@@ -207,7 +207,7 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
 
             // TODO: Need to reimplement this in some way, maybe expose a method to change the health icon
             //Show Poisoned Status with Green Hearts:
-            /*PoisonedComponent poisoned = CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(PoisonedComponent.class);
+            /*PoisonedComponent poisoned = CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(PoisonedComponent.class);
             entityManager = CoreRegistry.get(EntityManager.class);
             for (EntityRef entity : entityManager.iteratorEntities(PoisonedComponent.class)) {
                 if (poisoned.poisonDuration >= 1)
@@ -218,7 +218,7 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
             
             for (EntityRef entity : entityManager.iteratorEntities(CuredComponent.class)) {
                 //For fixing the Green > Red hearts when cured:
-                CuredComponent cured = CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(CuredComponent.class);
+                CuredComponent cured = CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(CuredComponent.class);
                 entityManager = CoreRegistry.get(EntityManager.class);
                 if (cured.cureDuration >= 1)
                     _hearts[i].setTextureOrigin(new Vector2f(52f, 0.0f));
@@ -245,7 +245,7 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
         }
 
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-        LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
+        LocalPlayerComponent localPlayerComp = localPlayer.getCharacterEntity().getComponent(LocalPlayerComponent.class);
         toolbar.getCells().get(localPlayerComp.selectedTool).setSelection(true);
     }
 

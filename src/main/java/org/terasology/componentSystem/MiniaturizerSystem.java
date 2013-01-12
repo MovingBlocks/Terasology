@@ -35,7 +35,7 @@ import org.terasology.rendering.world.WorldRenderer;
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-@RegisterComponentSystem(headedOnly = true)
+@RegisterComponentSystem(whenHeadless = false)
 public class MiniaturizerSystem implements UpdateSubscriberSystem, RenderSystem {
 
     private EntityManager entityManager;

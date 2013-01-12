@@ -12,7 +12,7 @@ public class NetworkComponent implements Component {
     public int networkId;
 
     @Replicate
-    public EntityRef owner;
+    public EntityRef owner = EntityRef.NULL;
 
     public enum ReplicateMode {
         ALWAYS, // Always replicate this entity to all clients

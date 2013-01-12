@@ -92,7 +92,7 @@ public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
                 server.queueEvent(message.getEvent());
                 break;
         }
-        logger.debug("Received message: {}", message.getType());
+        logger.trace("Received message: {}", message.getType());
     }
 
     private void blockChanged(BlockChangeMessage blockChange) {
@@ -112,6 +112,7 @@ public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
     }
 
     private void receivedChunk(ChunkMessage chunkInfo) {
+        logger.debug("Received chunk {}", NetworkUtil.convert(chunkInfo.getPos()));
         TeraArray blocks = new TeraArray(Chunk.SIZE_X, Chunk.SIZE_Y, Chunk.SIZE_Z, chunkInfo.getBlockData().toByteArray());
         TeraSmartArray sunlight = new TeraSmartArray(Chunk.SIZE_X, Chunk.SIZE_Y, Chunk.SIZE_Z, chunkInfo.getSunlightData().toByteArray());
         TeraSmartArray light = new TeraSmartArray(Chunk.SIZE_X, Chunk.SIZE_Y, Chunk.SIZE_Z, chunkInfo.getLightData().toByteArray());

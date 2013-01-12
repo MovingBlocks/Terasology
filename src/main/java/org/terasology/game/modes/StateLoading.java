@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
+import org.terasology.game.modes.loadProcesses.AwaitCharacterSpawn;
 import org.terasology.game.modes.loadProcesses.CacheBlocks;
 import org.terasology.game.modes.loadProcesses.CacheTextures;
 import org.terasology.game.modes.loadProcesses.CreateWorldEntity;
@@ -33,13 +34,11 @@ import org.terasology.game.modes.loadProcesses.InitialiseWorld;
 import org.terasology.game.modes.loadProcesses.JoinServer;
 import org.terasology.game.modes.loadProcesses.LoadEntities;
 import org.terasology.game.modes.loadProcesses.LoadPrefabs;
-import org.terasology.game.modes.loadProcesses.PrepareLocalWorld;
 import org.terasology.game.modes.loadProcesses.PrepareWorld;
 import org.terasology.game.modes.loadProcesses.RegisterBlocks;
 import org.terasology.game.modes.loadProcesses.RegisterInputSystem;
 import org.terasology.game.modes.loadProcesses.RegisterMods;
 import org.terasology.game.modes.loadProcesses.RegisterSystems;
-import org.terasology.game.modes.loadProcesses.RespawnPlayer;
 import org.terasology.game.modes.loadProcesses.SetupLocalPlayer;
 import org.terasology.game.modes.loadProcesses.SetupRemotePlayer;
 import org.terasology.game.modes.loadProcesses.StartServer;
@@ -72,6 +71,7 @@ public class StateLoading implements GameState {
 
     /**
      * Constructor for server or single player games
+     *
      * @param worldInfo
      * @param netMode
      */
@@ -83,6 +83,7 @@ public class StateLoading implements GameState {
 
     /**
      * Constructor for client games
+     *
      * @param serverAddress
      * @param port
      */
@@ -120,15 +121,13 @@ public class StateLoading implements GameState {
         loadProcesses.add(new InitialiseEntitySystem());
         loadProcesses.add(new LoadPrefabs());
         loadProcesses.add(new RegisterInputSystem());
-        loadProcesses.add(new RegisterSystems());
+        loadProcesses.add(new RegisterSystems(netMode));
         loadProcesses.add(new InitialiseCommandSystem());
         loadProcesses.add(new InitialiseRemoteWorld(worldInfo));
-        // Up to here
         loadProcesses.add(new InitialiseSystems());
-        loadProcesses.add(new PrepareLocalWorld());
-        loadProcesses.add(new PrepareWorld());
         loadProcesses.add(new SetupRemotePlayer());
-        loadProcesses.add(new RespawnPlayer());
+        loadProcesses.add(new AwaitCharacterSpawn());
+        loadProcesses.add(new PrepareWorld());
     }
 
     private void initHost() {
@@ -139,7 +138,7 @@ public class StateLoading implements GameState {
         loadProcesses.add(new InitialiseEntitySystem());
         loadProcesses.add(new LoadPrefabs());
         loadProcesses.add(new RegisterInputSystem());
-        loadProcesses.add(new RegisterSystems());
+        loadProcesses.add(new RegisterSystems(netMode));
         loadProcesses.add(new InitialiseCommandSystem());
         loadProcesses.add(new InitialiseWorld(worldInfo));
         loadProcesses.add(new InitialiseSystems());
@@ -148,10 +147,9 @@ public class StateLoading implements GameState {
         if (netMode == NetworkMode.SERVER) {
             loadProcesses.add(new StartServer());
         }
-        loadProcesses.add(new PrepareLocalWorld());
-        loadProcesses.add(new PrepareWorld());
         loadProcesses.add(new SetupLocalPlayer());
-        loadProcesses.add(new RespawnPlayer());
+        loadProcesses.add(new AwaitCharacterSpawn());
+        loadProcesses.add(new PrepareWorld());
     }
 
     private void popStep() {

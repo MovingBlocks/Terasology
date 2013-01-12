@@ -16,46 +16,47 @@
 
 package org.terasology.game.modes.loadProcesses;
 
+import org.terasology.componentSystem.UpdateSubscriberSystem;
+import org.terasology.components.LocalPlayerComponent;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.modes.LoadProcess;
-import org.terasology.logic.mod.Mod;
-import org.terasology.logic.mod.ModManager;
-import org.terasology.network.NetworkMode;
-import org.terasology.network.NetworkSystem;
+import org.terasology.logic.players.LocalPlayer;
+import org.terasology.network.ClientComponent;
+import org.terasology.rendering.world.WorldRenderer;
 
 /**
  * @author Immortius
  */
-public class RegisterSystems implements LoadProcess {
-    private NetworkMode netMode;
+public class AwaitCharacterSpawn implements LoadProcess {
 
-    public RegisterSystems(NetworkMode netMode) {
-        this.netMode = netMode;
-    }
+    private WorldRenderer worldRenderer;
 
     @Override
     public String getMessage() {
-        return "Registering systems...";
+        return "Awaiting Character Spawn...";
     }
 
     @Override
     public boolean step() {
-
         ComponentSystemManager componentSystemManager = CoreRegistry.get(ComponentSystemManager.class);
-        ModManager modManager = CoreRegistry.get(ModManager.class);
-
-        componentSystemManager.loadSystems(ModManager.ENGINE_PACKAGE, modManager.getEngineReflections(), netMode);
-        for (Mod mod : modManager.getActiveMods()) {
-            if (mod.isCodeMod()) {
-                componentSystemManager.loadSystems(mod.getModInfo().getId(), mod.getReflections(), netMode);
-            }
+        for (UpdateSubscriberSystem updater : componentSystemManager.iterateUpdateSubscribers()) {
+            updater.update(0.0f);
         }
-        return true;
+        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+        ClientComponent client = localPlayer.getClientEntity().getComponent(ClientComponent.class);
+        if (client != null && client.character.exists()) {
+            client.character.addComponent(new LocalPlayerComponent());
+            worldRenderer.setPlayer(CoreRegistry.get(LocalPlayer.class));
+            return true;
+        }
+        return false;
     }
 
     @Override
     public int begin() {
-        return 1;
+        worldRenderer = CoreRegistry.get(WorldRenderer.class);
+        return UNKNOWN_STEPS;
     }
+
 }

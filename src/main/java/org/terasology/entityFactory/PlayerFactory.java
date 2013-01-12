@@ -48,7 +48,6 @@ public class PlayerFactory {
         PlayerComponent playerComponent = player.getComponent(PlayerComponent.class);
         playerComponent.spawnPosition.set(spawnPosition);
         player.saveComponent(playerComponent);
-        player.addComponent(new LocalPlayerComponent());
 
         // Goodie chest
         EntityRef chest = blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("core:chest"));

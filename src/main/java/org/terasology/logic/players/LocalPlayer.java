@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic;
+package org.terasology.logic.players;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
-
+import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.LightComponent;
 import org.terasology.components.LocalPlayerComponent;
@@ -27,21 +25,17 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.network.ClientComponent;
 import org.terasology.physics.character.CharacterMovementComponent;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
 public class LocalPlayer {
 
-    private EntityRef entity = EntityRef.NULL;
     private EntityRef clientEntity = EntityRef.NULL;
 
     public LocalPlayer() {
-    }
-
-    public void setEntity(EntityRef newEntity) {
-        this.entity = (newEntity == null) ? EntityRef.NULL : newEntity;
     }
 
     public void setClientEntity(EntityRef entity) {
@@ -54,11 +48,11 @@ public class LocalPlayer {
     }
 
     public boolean isValid() {
-        return entity.exists() && entity.hasComponent(LocationComponent.class) && entity.hasComponent(LocalPlayerComponent.class) && entity.hasComponent(PlayerComponent.class);
+        return getCharacterEntity().exists() && getCharacterEntity().hasComponent(LocationComponent.class) && getCharacterEntity().hasComponent(LocalPlayerComponent.class) && getCharacterEntity().hasComponent(PlayerComponent.class);
     }
 
     public Vector3f getPosition() {
-        LocationComponent location = entity.getComponent(LocationComponent.class);
+        LocationComponent location = getCharacterEntity().getComponent(LocationComponent.class);
         if (location == null) {
             return new Vector3f();
         }
@@ -66,7 +60,7 @@ public class LocalPlayer {
     }
 
     public Quat4f getRotation() {
-        LocationComponent location = entity.getComponent(LocationComponent.class);
+        LocationComponent location = getCharacterEntity().getComponent(LocationComponent.class);
         if (location == null) {
             return new Quat4f(0, 0, 0, 1);
         }
@@ -75,20 +69,24 @@ public class LocalPlayer {
 
     public boolean isCarryingTorch() {
 
-        InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
-        LocalPlayerComponent localPlayer = entity.getComponent(LocalPlayerComponent.class);
+        InventoryComponent inventory = getCharacterEntity().getComponent(InventoryComponent.class);
+        LocalPlayerComponent localPlayer = getCharacterEntity().getComponent(LocalPlayerComponent.class);
         if (inventory == null || localPlayer == null)
             return false;
 
         return inventory.itemSlots.get(localPlayer.selectedTool).hasComponent(LightComponent.class);
     }
 
-    public EntityRef getEntity() {
-        return entity;
+    public EntityRef getCharacterEntity() {
+        ClientComponent client = clientEntity.getComponent(ClientComponent.class);
+        if (client != null) {
+            return client.character;
+        }
+        return EntityRef.NULL;
     }
 
     public Vector3f getVelocity() {
-        CharacterMovementComponent movement = entity.getComponent(CharacterMovementComponent.class);
+        CharacterMovementComponent movement = getCharacterEntity().getComponent(CharacterMovementComponent.class);
         if (movement != null) {
             return new Vector3f(movement.getVelocity());
         }
@@ -96,7 +94,7 @@ public class LocalPlayer {
     }
 
     public Vector3f getViewDirection() {
-        LocalPlayerComponent localPlayer = entity.getComponent(LocalPlayerComponent.class);
+        LocalPlayerComponent localPlayer = getCharacterEntity().getComponent(LocalPlayerComponent.class);
         if (localPlayer == null) {
             return new Vector3f(0, 0, -1);
         }

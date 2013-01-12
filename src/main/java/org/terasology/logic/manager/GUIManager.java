@@ -37,6 +37,7 @@ import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.ButtonState;
+import org.terasology.network.ClientComponent;
 import org.terasology.rendering.gui.events.UIWindowOpenedEvent;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.UIDisplayRenderer;
@@ -380,7 +381,7 @@ public class GUIManager implements EventHandlerSystem {
     */
     
     //mouse movement events
-    @ReceiveEvent(components = LocalPlayerComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void onMouseX(MouseXAxisEvent event, EntityRef entity) {
         if (isConsumingInput()) {
             processMouseInput(-1, false, 0);
@@ -393,7 +394,7 @@ public class GUIManager implements EventHandlerSystem {
         }
     }
     
-    @ReceiveEvent(components = LocalPlayerComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void onMouseY(MouseYAxisEvent event, EntityRef entity) {
         if (isConsumingInput()) {
             processMouseInput(-1, false, 0);
@@ -407,7 +408,7 @@ public class GUIManager implements EventHandlerSystem {
     }
     
     //mouse button events
-    @ReceiveEvent(components = LocalPlayerComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void mouseButtonEvent(MouseButtonEvent event, EntityRef entity) {
         if (isConsumingInput()) {
             processMouseInput(event.getButton(), event.getState() != ButtonState.UP, 0);
@@ -421,7 +422,7 @@ public class GUIManager implements EventHandlerSystem {
     }
 
     //mouse wheel events
-    @ReceiveEvent(components = LocalPlayerComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void mouseWheelEvent(MouseWheelEvent event, EntityRef entity) {
         if (isConsumingInput()) {
             processMouseInput(-1, false, event.getWheelTurns() * 120);
@@ -435,7 +436,7 @@ public class GUIManager implements EventHandlerSystem {
     }
 
     //raw input events
-    @ReceiveEvent(components = LocalPlayerComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void keyEvent(KeyEvent event, EntityRef entity) {
         if (isConsumingInput()) {
             processKeyboardInput(event);
@@ -443,7 +444,7 @@ public class GUIManager implements EventHandlerSystem {
     }
     
     //bind input events (will be send after raw input events, if a bind button was pressed and the raw input event hasn't consumed the event)
-    @ReceiveEvent(components = LocalPlayerComponent.class, priority = EventPriority.PRIORITY_HIGH)
+    @ReceiveEvent(components = ClientComponent.class, priority = EventPriority.PRIORITY_HIGH)
     public void bindEvent(BindButtonEvent event, EntityRef entity) {
         if (isConsumingInput()) {
             processBindButton(event);

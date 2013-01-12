@@ -35,7 +35,7 @@ import org.terasology.input.binds.ToolbarNextButton;
 import org.terasology.input.binds.ToolbarPrevButton;
 import org.terasology.input.binds.UseItemButton;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.math.Vector3i;
 import org.terasology.miniion.components.MinionBarComponent;
@@ -207,7 +207,7 @@ public class MinionSystem implements EventHandlerSystem {
             case Test: {
                 LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
                 if (localPlayer == null) return;
-                MinionMessage messagetosend = new MinionMessage(MinionMessagePriority.Debug, "test", "testdesc", "testcont", minion, localPlayer.getEntity());
+                MinionMessage messagetosend = new MinionMessage(MinionMessagePriority.Debug, "test", "testdesc", "testcont", minion, localPlayer.getCharacterEntity());
                 minion.send(new MinionMessageEvent(messagetosend));
                 break;
             }

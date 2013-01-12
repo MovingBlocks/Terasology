@@ -23,6 +23,7 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.RegisterMode;
 import org.terasology.events.ActivateEvent;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.SoundManager;
@@ -31,7 +32,7 @@ import org.terasology.utilities.FastRandom;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-@RegisterComponentSystem
+@RegisterComponentSystem(RegisterMode.ALWAYS)
 public class PlaySoundAction implements EventHandlerSystem {
 
     private FastRandom random = new FastRandom();

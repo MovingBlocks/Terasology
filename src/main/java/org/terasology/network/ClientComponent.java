@@ -12,4 +12,6 @@ public class ClientComponent implements Component {
     @Replicate
     public EntityRef clientInfo = EntityRef.NULL;
 
+    @Replicate
+    public EntityRef character = EntityRef.NULL;
 }

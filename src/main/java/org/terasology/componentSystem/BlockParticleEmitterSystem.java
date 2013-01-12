@@ -62,7 +62,7 @@ import org.terasology.world.block.management.BlockManager;
  */
 // TODO: Generalise for non-block particles
 // TODO: Dispose display lists
-@RegisterComponentSystem(headedOnly = true)
+@RegisterComponentSystem(whenHeadless = false)
 public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, RenderSystem {
     private static final int PARTICLES_PER_UPDATE = 32;
     private static final float TEX_SIZE = Block.TEXTURE_OFFSET / 4f;

@@ -18,7 +18,7 @@ import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.WindowListener;
@@ -47,7 +47,7 @@ public class UIScreenItems extends UIWindow {
         public void click(UIDisplayElement element, int button) {
             UIItemCell item = (UIItemCell) element;
             EntityManager entityManager = CoreRegistry.get(EntityManager.class);
-            EntityRef player = CoreRegistry.get(LocalPlayer.class).getEntity();
+            EntityRef player = CoreRegistry.get(LocalPlayer.class).getCharacterEntity();
             player.send(new ReceiveItemEvent(entityManager.copy(item.getItemEntity())));
         }
     };

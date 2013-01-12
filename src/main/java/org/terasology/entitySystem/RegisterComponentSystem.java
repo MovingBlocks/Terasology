@@ -27,11 +27,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface RegisterComponentSystem {
-    boolean headedOnly() default false;
-
-    boolean headlessOnly() default false;
-
-    boolean authorativeOnly() default false;
-
-    boolean multiplayerOnly() default false;
+    RegisterMode value() default RegisterMode.ALWAYS;
+    boolean whenHeadless() default true;
 }

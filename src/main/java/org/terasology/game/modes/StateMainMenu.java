@@ -18,7 +18,6 @@ package org.terasology.game.modes;
 import java.util.Iterator;
 
 import org.terasology.components.LocalPlayerComponent;
-import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventSystem;
 import org.terasology.entitySystem.PersistableEntityManager;
@@ -28,10 +27,11 @@ import org.terasology.game.GameEngine;
 import org.terasology.game.bootstrap.EntitySystemBuilder;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.InputSystem;
-import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.mod.ModManager;
+import org.terasology.network.ClientComponent;
 
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -81,16 +81,10 @@ public class StateMainMenu implements GameState {
         CoreRegistry.put(InputSystem.class, inputSystem);
         componentSystemManager.register(inputSystem, "engine:InputSystem");
 
-        LocalPlayerComponent localPlayerComp = new LocalPlayerComponent();
-        CoreRegistry.put(LocalPlayerComponent.class, localPlayerComp);
-        entityManager.create(localPlayerComp);
-        
-        CoreRegistry.put(LocalPlayer.class, new LocalPlayer());
+        EntityRef localPlayerEntity = entityManager.create(new ClientComponent());
 
-        Iterator<EntityRef> iterator = entityManager.iteratorEntities(LocalPlayerComponent.class).iterator();
-        if (iterator.hasNext()) {
-            CoreRegistry.get(LocalPlayer.class).setEntity(iterator.next());
-        }
+        LocalPlayer localPlayer = CoreRegistry.put(LocalPlayer.class, new LocalPlayer());
+        localPlayer.setClientEntity(localPlayerEntity);
 
         componentSystemManager.initialise();
 

@@ -25,6 +25,7 @@ import org.terasology.entitySystem.EntityRef;
 import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.entitySystem.metadata.core.ListTypeHandler;
 import org.terasology.network.Replicate;
+import org.terasology.network.ReplicateDirection;
 
 import java.util.Collection;
 import java.util.List;
@@ -36,9 +37,9 @@ import java.util.List;
  */
 public final class LocationComponent implements Component {
     // Standard position/rotation
-    @Replicate
+    @Replicate(ReplicateDirection.OWNER_TO_SERVER_TO_CLIENT)
     private Vector3f position = new Vector3f();
-    @Replicate
+    @Replicate(ReplicateDirection.OWNER_TO_SERVER_TO_CLIENT)
     private Quat4f rotation = new Quat4f(0, 0, 0, 1);
     @Replicate
     private float scale = 1.0f;

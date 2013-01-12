@@ -34,8 +34,9 @@ public class CoreRegistry {
      * @param object The system itself
      * @param <T>
      */
-    public static <T> void put(Class<T> type, T object) {
+    public static <T> T put(Class<T> type, T object) {
         store.put(type, object);
+        return object;
     }
 
     /**

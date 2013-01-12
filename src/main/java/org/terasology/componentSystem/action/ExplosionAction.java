@@ -19,6 +19,7 @@ import javax.vecmath.Vector3f;
 
 import org.terasology.components.actions.ExplosionActionComponent;
 import org.terasology.entitySystem.In;
+import org.terasology.entitySystem.RegisterMode;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entityFactory.DroppedBlockFactory;
@@ -41,7 +42,7 @@ import org.terasology.world.block.management.BlockManager;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-@RegisterComponentSystem(authorativeOnly = true)
+@RegisterComponentSystem(RegisterMode.AUTHORITY)
 public class ExplosionAction implements EventHandlerSystem {
 
     @In

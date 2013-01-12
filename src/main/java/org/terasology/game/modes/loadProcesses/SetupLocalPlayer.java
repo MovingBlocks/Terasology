@@ -6,8 +6,9 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.modes.LoadProcess;
-import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
+import org.terasology.network.events.ConnectedEvent;
 
 /**
  * @author Immortius
@@ -34,6 +35,7 @@ public class SetupLocalPlayer implements LoadProcess {
             clientComp.clientInfo = clientInfo;
             client.saveComponent(clientComp);
         }
+        client.send(new ConnectedEvent());
         return true;
     }
 

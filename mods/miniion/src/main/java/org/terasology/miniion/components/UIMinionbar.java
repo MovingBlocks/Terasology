@@ -28,7 +28,7 @@ import org.lwjgl.opengl.GL11;
 import org.terasology.asset.Assets;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.model.inventory.Icon;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.widgets.UIImage;
@@ -76,12 +76,12 @@ public class UIMinionbar extends UIDisplayContainer {
             selectionRectangle.setVisible(selected);
             setPosition(new Vector2f(2f, (getSize().y - 8f) * id - 2f));
 
-            MinionBarComponent inventory = localPlayer.getEntity().getComponent(MinionBarComponent.class);
+            MinionBarComponent inventory = localPlayer.getCharacterEntity().getComponent(MinionBarComponent.class);
             if (inventory == null) {
                 return;
             }
             if (inventory.minionSlots.size() > id) {
-                MinionControllerComponent minionController = localPlayer.getEntity().getComponent(MinionControllerComponent.class);
+                MinionControllerComponent minionController = localPlayer.getCharacterEntity().getComponent(MinionControllerComponent.class);
                 if (minionController != null) {
                     setSelected(minionController.selectedMinion == id);
                 }
@@ -98,7 +98,7 @@ public class UIMinionbar extends UIDisplayContainer {
 
             selectionRectangle.renderTransformed();
 
-            MinionBarComponent inventory = CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(MinionBarComponent.class);
+            MinionBarComponent inventory = CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(MinionBarComponent.class);
             if (inventory == null) {
                 return;
             }
@@ -172,7 +172,7 @@ public class UIMinionbar extends UIDisplayContainer {
         }
         
         //load init value of MinionControllerComponent here
-        //MinionControllerComponent minionController = CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(MinionControllerComponent.class);
+        //MinionControllerComponent minionController = CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(MinionControllerComponent.class);
         //cells[minionController.selectedMinion].setSelected(true);
         //cells[0].setSelected(true);
         

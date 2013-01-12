@@ -23,21 +23,11 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.MessageManager;
-import org.terasology.logic.mod.Mod;
-import org.terasology.logic.mod.ModManager;
 import org.terasology.protobuf.NetData;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.block.management.BlockManager;
 
-import java.util.Map;
-
-import static org.terasology.protobuf.NetData.BlockMapping;
 import static org.terasology.protobuf.NetData.ClientConnectMessage;
-import static org.terasology.protobuf.NetData.ModuleInfo;
 import static org.terasology.protobuf.NetData.NetMessage;
-import static org.terasology.protobuf.NetData.ServerInfoMessage;
 
 /**
  * @author Immortius
@@ -46,7 +36,7 @@ public class TerasologyServerHandler extends SimpleChannelUpstreamHandler {
     private static final Logger logger = LoggerFactory.getLogger(TerasologyServerHandler.class);
 
     private NetworkSystem networkSystem;
-    private ClientPlayer client;
+    private Client client;
 
     public TerasologyServerHandler(NetworkSystem networkSystem) {
         this.networkSystem = networkSystem;
@@ -59,7 +49,7 @@ public class TerasologyServerHandler extends SimpleChannelUpstreamHandler {
 
     @Override
     public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-        client = new ClientPlayer(e.getChannel(), networkSystem);
+        client = new Client(e.getChannel(), networkSystem);
     }
 
     @Override
@@ -79,8 +69,15 @@ public class TerasologyServerHandler extends SimpleChannelUpstreamHandler {
             case EVENT:
                 receivedEvent(message.getEvent());
                 break;
+            case UPDATE_ENTITY:
+                receivedEntityUpdate(message.getUpdateEntity());
+                break;
         }
-        logger.debug("Received message: {}", message.getType());
+        logger.trace("Received message: {}", message.getType());
+    }
+
+    private void receivedEntityUpdate(NetData.UpdateEntityMessage message) {
+        client.queueEntityUpdate(message);
     }
 
     private void receivedEvent(NetData.EventMessage message) {

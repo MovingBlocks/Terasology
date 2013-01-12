@@ -19,7 +19,7 @@ import org.terasology.asset.Assets;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.widgets.UIImage;
@@ -62,9 +62,9 @@ public class UIBuff extends UIDisplayContainer {
     public void update() {
         //TODO do this with events instead.
         super.update();
-        SpeedBoostComponent speed = CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(SpeedBoostComponent.class);
-        CharacterMovementComponent charmov = CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(CharacterMovementComponent.class);
-        CuredComponent cured = CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(CuredComponent.class);
+        SpeedBoostComponent speed = CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(SpeedBoostComponent.class);
+        CharacterMovementComponent charmov = CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(CharacterMovementComponent.class);
+        CuredComponent cured = CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(CuredComponent.class);
         entityManager = CoreRegistry.get(EntityManager.class);
         //Speed Boost
         for (EntityRef entity : entityManager.iteratorEntities(SpeedBoostComponent.class)) {

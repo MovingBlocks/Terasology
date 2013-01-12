@@ -15,8 +15,14 @@
  */
 package org.terasology.entitySystem.metadata.internal;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.Event;
+import org.terasology.entitySystem.metadata.ClassMetadata;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
+import org.terasology.entitySystem.metadata.ComponentMetadata;
+import org.terasology.entitySystem.metadata.EventMetadata;
 import org.terasology.entitySystem.metadata.MetadataUtil;
 import org.terasology.entitySystem.metadata.TypeHandlerLibrary;
 
@@ -24,9 +30,13 @@ import org.terasology.entitySystem.metadata.TypeHandlerLibrary;
  * @author Immortius <immortius@gmail.com>
  */
 public final class ComponentLibraryImpl extends BaseLibraryImpl<Component> implements ComponentLibrary {
+    private static final Logger logger = LoggerFactory.getLogger(ComponentLibraryImpl.class);
+
+    private TypeHandlerLibrary metadataBuilder;
 
     public ComponentLibraryImpl(TypeHandlerLibrary metadataBuilder) {
         super(metadataBuilder);
+        this.metadataBuilder = metadataBuilder;
     }
 
     @Override
@@ -35,5 +45,34 @@ public final class ComponentLibraryImpl extends BaseLibraryImpl<Component> imple
                 clazz.getSimpleName(),
                 MetadataUtil.getComponentClassName(clazz)
         };
+    }
+
+    @Override
+    public <T extends Component> ComponentMetadata<T> getMetadata(Class<T> clazz) {
+        return (ComponentMetadata<T>) super.getMetadata(clazz);
+    }
+
+    @Override
+    public <T extends Component> ComponentMetadata<T> getMetadata(T object) {
+        return (ComponentMetadata<T>) super.getMetadata(object);
+    }
+
+    @Override
+    public ComponentMetadata<? extends Component> getMetadata(String className) {
+        return (ComponentMetadata<? extends Component>) super.getMetadata(className);
+    }
+
+    @Override
+    protected <U extends Component> ClassMetadata<U> createMetadata(Class<U> clazz, String ... names) {
+        ComponentMetadata<U> info;
+        try {
+            info = new ComponentMetadata<U>(clazz, names);
+        } catch (NoSuchMethodException e) {
+            logger.error("Unable to register class {}: Default Constructor Required", clazz.getSimpleName(), e);
+            return null;
+        }
+
+        metadataBuilder.populateFields(clazz, info);
+        return info;
     }
 }

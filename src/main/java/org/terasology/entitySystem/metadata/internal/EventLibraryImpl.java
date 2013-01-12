@@ -30,6 +30,7 @@ public class EventLibraryImpl extends BaseLibraryImpl<Event> implements EventLib
         return (EventMetadata<T>) super.getMetadata(clazz);
     }
 
+    @Override
     public <T extends Event> EventMetadata<T> getMetadata(T object) {
         return (EventMetadata<T>) super.getMetadata(object);
     }

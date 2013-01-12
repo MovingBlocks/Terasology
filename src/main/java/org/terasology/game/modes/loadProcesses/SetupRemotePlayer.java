@@ -3,7 +3,7 @@ package org.terasology.game.modes.loadProcesses;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.modes.LoadProcess;
-import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.NetEntityRef;
 import org.terasology.network.NetworkSystem;
 

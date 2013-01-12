@@ -31,7 +31,7 @@ import org.terasology.events.DamageEvent;
 import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
-import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Vector3i;
 import org.terasology.miniion.components.MinionComponent;
 import org.terasology.miniion.components.SimpleMinionAIComponent;
@@ -239,7 +239,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                 ai.pathTargets = aStarPathing.findPath(worldPos, new Vector3f(currentTarget));
                 if (ai.pathTargets == null) {
                     MinionSystem minionSystem = new MinionSystem();
-                    MinionMessage messagetosend = new MinionMessage(MinionMessagePriority.Debug, "test", "testdesc", "testcont", entity, localPlayer.getEntity());
+                    MinionMessage messagetosend = new MinionMessage(MinionMessagePriority.Debug, "test", "testdesc", "testcont", entity, localPlayer.getCharacterEntity());
                     entity.send(new MinionMessageEvent(messagetosend));
                     ai.movementTargets.remove(0);
                 }

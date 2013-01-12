@@ -114,6 +114,7 @@ public class StateSinglePlayer implements GameState {
         for (UpdateSubscriberSystem updater : componentSystemManager.iterateUpdateSubscribers()) {
             PerformanceMonitor.startActivity(updater.getClass().getSimpleName());
             updater.update(delta);
+            PerformanceMonitor.endActivity();
         }
 
         if (worldRenderer != null && shouldUpdateWorld()) {
