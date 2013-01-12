@@ -15,9 +15,7 @@
  */
 package org.terasology.model.structures;
 
-import java.util.HashMap;
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.world.BlockUpdate;
@@ -25,13 +23,14 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 
-import com.google.common.collect.Lists;
+import java.util.HashMap;
+import java.util.List;
 
 
 /**
- * A collection of actual blocks and their relative positions, usually _not_ absolute positions in an existing world
- * Can also store a specific position that the collection should be oriented around rather than always a specific corner
- * Useful for for blueprints and other things that apply a particular set of expectations on a spot in a world
+ * A collection of actual blocks and their relative positions, usually _not_ absolute positions in an existing world Can also store a
+ * specific position that the collection should be oriented around rather than always a specific corner Useful for for blueprints and other
+ * things that apply a particular set of expectations on a spot in a world
  *
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
@@ -40,14 +39,10 @@ public class BlockCollection {
 
     // TODO: Can this integrate better with BlockSelection, rather than need its keyset constructed into a BlockSelection for utility?
 
-    /**
-     * Map of what blocks are in which positions
-     */
+    /** Map of what blocks are in which positions */
     private final HashMap<BlockPosition, Block> _blocks = new HashMap<BlockPosition, Block>();
 
-    /**
-     * A specific position to use for attaching to a spot in the world - for a tree this could be the bottom trunk block.
-     */
+    /** A specific position to use for attaching to a spot in the world - for a tree this could be the bottom trunk block. */
     private BlockPosition _attachPos = new BlockPosition(0, 0, 0);
 
     /**
@@ -63,6 +58,7 @@ public class BlockCollection {
      * Get the Block that matches the given position
      *
      * @param pos The position we care about
+     *
      * @return The block at the position
      */
     public Block getBlock(BlockPosition pos) {
@@ -83,6 +79,7 @@ public class BlockCollection {
      *
      * @param provider The world to build the collection in
      * @param position The position to build the collection at (using the collection's attachment position)
+     *
      * @return A BlockSelection containing the final positions the blocks were built at
      */
     public BlockSelection build(WorldProvider provider, BlockPosition position) {
@@ -92,9 +89,10 @@ public class BlockCollection {
     /**
      * Builds and returns only the blocks in the collection that matches the blockName
      *
-     * @param provider  The world to build the collection in
-     * @param position  The position to build the collection at (using the collection's attachment position)
-     * @param blockUri  The uri of the blocks we want to filter by
+     * @param provider The world to build the collection in
+     * @param position The position to build the collection at (using the collection's attachment position)
+     * @param blockUri The uri of the blocks we want to filter by
+     *
      * @return The BlockSelection for the built blocks matching the filter
      */
     public BlockSelection buildWithFilter(WorldProvider provider, BlockPosition position, BlockUri blockUri) {
@@ -103,13 +101,14 @@ public class BlockCollection {
     }
 
     /**
-     * Create the contents of the collection at a specific position in the world, returning the absolute BlockPositions.
-     * This can thus be used to for instance build a blueprint, then optionally sort out what was built where so different
-     * block types can be made reactive to subsequent input (say a PortalComponent storing what's frame and what's portal)
+     * Create the contents of the collection at a specific position in the world, returning the absolute BlockPositions. This can thus be
+     * used to for instance build a blueprint, then optionally sort out what was built where so different block types can be made reactive
+     * to subsequent input (say a PortalComponent storing what's frame and what's portal)
      *
      * @param provider       The world to build the collection in
      * @param position       The position to build the collection at (using the collection's attachment position)
      * @param buildingBlocks The BlockCollection we are using to build with, which could be filtered or the main one here
+     *
      * @return A BlockSelection containing the final positions the blocks were built at
      */
     public BlockSelection build(WorldProvider provider, BlockPosition position, BlockCollection buildingBlocks) {
@@ -136,6 +135,7 @@ public class BlockCollection {
      * Returns a filtered BlockCollection only including Blocks matching the supplied name
      *
      * @param blockUri The uri of the Block we're interested in
+     *
      * @return A BlockCollection only containing the interesting blocks
      */
     public BlockCollection filter(BlockUri blockUri) {
@@ -151,10 +151,11 @@ public class BlockCollection {
     }
 
     /**
-     * TODO: Can this be used by build to not duplicate code? Maybe a static version that takes a BlockCollection param?
-     * Calculates a localized version of the BlockSelection in this Collection's map as per a given position
+     * TODO: Can this be used by build to not duplicate code? Maybe a static version that takes a BlockCollection param? Calculates a
+     * localized version of the BlockSelection in this Collection's map as per a given position
      *
      * @param localPos The local position we're going to localize against
+     *
      * @return The localized BlockSelection
      */
     public BlockSelection getLocalizedSelection(BlockPosition localPos) {
@@ -218,5 +219,38 @@ public class BlockCollection {
         }
         result = result.substring(0, result.length() - 2) + "],attachPos:" + _attachPos;
         return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof BlockCollection)) return false;
+
+        BlockCollection that = (BlockCollection) o;
+
+        if (_attachPos != null ? !_attachPos.equals(that._attachPos) : that._attachPos != null) return false;
+        if (_blocks != null ? !_blocks.equals(that._blocks) : that._blocks != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = _blocks != null ? _blocks.hashCode() : 0;
+        result = 31 * result + (_attachPos != null ? _attachPos.hashCode() : 0);
+        return result;
+    }
+
+    public void merge(BlockCollection collection2) {
+        // Calculate offset regarding the attach position
+        int dx = _attachPos.x - collection2._attachPos.x;
+        int dy = _attachPos.y - collection2._attachPos.y;
+        int dz = _attachPos.z - collection2._attachPos.z;
+
+        HashMap<BlockPosition, Block> map = collection2.getBlocks();
+        for (BlockPosition pos : map.keySet()) {
+            _blocks.put(new BlockPosition(pos.x + dx, pos.y + dy, pos.z + dz), map.get(pos));
+        }
+        logger.debug("Merging completed.");
     }
 }
