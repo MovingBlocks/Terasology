@@ -191,7 +191,7 @@ public final class AdvancedConfig {
     
     public static TeraArray.Factory getTeraArrayFactory(String factory) {
         Preconditions.checkNotNull(factory, "The parameter 'factory' must not be null");
-        final TeraArrays.Entry entry = TeraArrays.getEntry(factory);
+        final TeraArrays.Entry entry = TeraArrays.getInstance().getEntry(factory);
         if (entry != null)
             return entry.factory;
         return null;
@@ -212,7 +212,7 @@ public final class AdvancedConfig {
     }
     
     public static String[] getTeraArrayFactories() {
-        final TeraArrays.Entry[] entries = TeraArrays.getCoreArrayEntries();
+        final TeraArrays.Entry[] entries = TeraArrays.getInstance().getCoreArrayEntries();
         final String[] factories = new String[entries.length];
         for (int i = 0; i < entries.length; i++) {
             factories[i] = entries[i].arrayClassName;

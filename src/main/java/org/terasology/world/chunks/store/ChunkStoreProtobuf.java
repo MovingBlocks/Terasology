@@ -17,10 +17,6 @@ package org.terasology.world.chunks.store;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentMap;
@@ -45,6 +41,13 @@ import com.google.common.collect.Queues;
 import com.google.protobuf.CodedInputStream;
 import com.google.protobuf.CodedOutputStream;
 
+/**
+ * Implements a chunk store using protobuf internally. This is just copied and adapted from {@code ChunkStoreGZip}.
+ * 
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
+ * @see org.terasology.world.chunks.store.ChunkStoreGZip
+ *
+ */
 public class ChunkStoreProtobuf implements ChunkStore, Serializable {
     static final long serialVersionUID = -8168985892342356264L;
 
@@ -60,47 +63,7 @@ public class ChunkStoreProtobuf implements ChunkStore, Serializable {
     private AtomicInteger sizeInByte = new AtomicInteger(0);
     private AtomicBoolean running = new AtomicBoolean(true);
 
-    public static ChunkStoreProtobuf load(File file) throws IOException {
-        FileInputStream fileIn = null;
-        ObjectInputStream in = null;
-        try {
-            fileIn = new FileInputStream(file);
-            in = new ObjectInputStream(fileIn);
-
-            ChunkStoreProtobuf cache = (ChunkStoreProtobuf) in.readObject();
-            cache.compressionQueue = Queues.newLinkedBlockingDeque();
-            cache.modifiedChunks = Maps.newConcurrentMap();
-            cache.setupThreads();
-            return cache;
-
-        } catch (ClassNotFoundException e) {
-            throw new IOException("Unable to load chunk cache", e);
-        } finally {
-            // JAVA7 : cleanup
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    logger.error("Failed to close input stream", e);
-                }
-            }
-            if (fileIn != null) {
-                try {
-                    fileIn.close();
-                } catch (IOException e) {
-                    logger.error("Failed to close input stream", e);
-                }
-            }
-        }
-    }
-
-    public ChunkStoreProtobuf() {
-        modifiedChunks = Maps.newConcurrentMap();
-        compressionQueue = Queues.newLinkedBlockingDeque();
-        setupThreads();
-    }
-
-    public void setupThreads() {
+    protected void setupThreads() {
         if (compressionThreads == null) {
             running.set(true);
             compressionThreads = Executors.newFixedThreadPool(NUM_DISPOSAL_THREADS);
@@ -138,6 +101,16 @@ public class ChunkStoreProtobuf implements ChunkStore, Serializable {
         }
     }
 
+    public ChunkStoreProtobuf() {
+        setup();
+    }
+    
+    public void setup() {
+        modifiedChunks = Maps.newConcurrentMap();
+        compressionQueue = Queues.newLinkedBlockingDeque();
+        setupThreads();
+    }
+
     public Chunk get(Vector3i id) {
         Chunk c = modifiedChunks.get(id);
         if (c != null) {
@@ -151,7 +124,7 @@ public class ChunkStoreProtobuf implements ChunkStore, Serializable {
             final GZIPInputStream gzIn = new GZIPInputStream(baIn);
             final CodedInputStream cIn = CodedInputStream.newInstance(gzIn);
             final ChunksProtobuf.Chunk message = ChunksProtobuf.Chunk.parseFrom(cIn);
-            c = Chunks.decode(message); 
+            c = Chunks.getInstance().decode(message); 
         } catch (Exception e) {
             logger.error("Error loading chunk", e);
         }
@@ -186,7 +159,7 @@ public class ChunkStoreProtobuf implements ChunkStore, Serializable {
 
     private void saveChunk(Chunk c) {
         try {
-            final ChunksProtobuf.Chunk message = Chunks.encode(c);
+            final ChunksProtobuf.Chunk message = Chunks.getInstance().encode(c);
             final ByteArrayOutputStream baOut = new ByteArrayOutputStream();
             final GZIPOutputStream gzOut = new GZIPOutputStream(baOut);
             final CodedOutputStream cOut = CodedOutputStream.newInstance(gzOut);
