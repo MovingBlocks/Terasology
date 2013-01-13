@@ -20,9 +20,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.modes.StateLoading;
-import org.terasology.game.modes.StateSinglePlayer;
-import org.terasology.game.types.GameType;
-import org.terasology.game.types.SurvivalType;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.network.NetworkMode;
@@ -168,12 +165,6 @@ public class UIMenuSingleplayer extends UIWindow {
         try {
             WorldInfo info = (WorldInfo) list.getSelection().getValue();
 
-            try {
-                CoreRegistry.put(GameType.class, (GameType) Class.forName(info.getGameType().substring(6)).newInstance());
-            } catch (Exception e) {
-                CoreRegistry.put(GameType.class, new SurvivalType());
-            }
-
             Config.getInstance().setDefaultSeed(info.getSeed());
             Config.getInstance().setWorldTitle(info.getTitle());
             Config.getInstance().setChunkGenerator(info.getChunkGenerators());
@@ -185,7 +176,6 @@ public class UIMenuSingleplayer extends UIWindow {
 
     public void fillList() {
         list.removeAll();
-        String typeGame = "";
         File worldCatalog = PathManager.getInstance().getWorldPath();
 
         File[] listFiles = worldCatalog.listFiles(new FileFilter() {
@@ -224,18 +214,11 @@ public class UIMenuSingleplayer extends UIWindow {
             try {
                 WorldInfo info = WorldInfo.load(worldManifest);
                 if (!info.getTitle().isEmpty()) {
-                    typeGame = ((GameType) Class.forName(info.getGameType().substring(6)).newInstance()).getName();
-                    UIListItem item = new UIListItem(info.getTitle() + "(" + typeGame + ")\n" + date.format(new java.util.Date(new File(file.getAbsolutePath(), "entity.dat").lastModified())).toString(), info);
+                    UIListItem item = new UIListItem(info.getTitle() + "\n" + date.format(new java.util.Date(new File(file.getAbsolutePath(), "entity.dat").lastModified())).toString(), info);
                     item.setPadding(new Vector4f(10f, 5f, 10f, 5f));
                     list.addItem(item);
                 }
             } catch (IOException e) {
-                logger.error("Failed reading world data object.", e);
-            } catch (ClassNotFoundException e) {
-                logger.error("Failed reading world data object.", e);
-            } catch (IllegalAccessException e) {
-                logger.error("Failed reading world data object.", e);
-            } catch (InstantiationException e) {
                 logger.error("Failed reading world data object.", e);
             }
 

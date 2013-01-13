@@ -23,6 +23,7 @@ import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.events.inventory.ReceiveItemEvent;
+import org.terasology.network.NetworkComponent;
 
 /**
  * System providing inventory related functionality
@@ -81,7 +82,7 @@ public class InventorySystem implements EventHandlerSystem {
 	                        int amountToTransfer = Math.min(stackSpace, item.stackCount);
 	                        stackComp.stackCount += amountToTransfer;
 	                        item.stackCount -= amountToTransfer;
-	                        itemStack.saveComponent(stackComp); //TODO: Duping chance between here and entity.saveComponent(inventory); ?
+	                        itemStack.saveComponent(stackComp);
 	                        itemChanged = true;
 	
 	                        // If we consumed the whole remainder of the incoming item stack then destroy its entity entirely (we "merged" the entities)
@@ -111,6 +112,11 @@ public class InventorySystem implements EventHandlerSystem {
 	            item.container = entity;
 	            event.getItem().saveComponent(item);
 	            entity.saveComponent(inventory);
+                // Fix item ownership
+                NetworkComponent networkComponent = event.getItem().getComponent(NetworkComponent.class);
+                if (networkComponent != null) {
+                    networkComponent.owner = entity;
+                }
 	            return;
 	        } // If there are no free slots we do nothing, but may still save if part of the stack was merged in
         }

@@ -10,15 +10,18 @@ import org.terasology.network.ReplicateDirection;
  */
 public class ServerComponentFieldCheck implements FieldSerializeCheck<Component> {
     private boolean owned = false;
+    private boolean initial = false;
 
-    public ServerComponentFieldCheck(boolean owned) {
+    public ServerComponentFieldCheck(boolean owned, boolean initial) {
         this.owned = owned;
+        this.initial = initial;
     }
 
     @Override
     public boolean shouldSerializeField(FieldMetadata field, Component component) {
-        return field.isReplicated()
-                && (field.getReplicationInfo().value() == ReplicateDirection.SERVER_TO_CLIENT
+        return field.isReplicated() && (initial
+                || field.getReplicationInfo().value() == ReplicateDirection.SERVER_TO_CLIENT
+                || (field.getReplicationInfo().value() == ReplicateDirection.SERVER_TO_OWNER && owned)
                 || (field.getReplicationInfo().value().isReplicateFromOwner() && !owned));
     }
 

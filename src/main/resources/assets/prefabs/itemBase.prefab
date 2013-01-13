@@ -1,0 +1,7 @@
+{
+    "Item" : {
+    },
+    "Network" : {
+        "replicateMode" : "OWNER"
+    }
+}

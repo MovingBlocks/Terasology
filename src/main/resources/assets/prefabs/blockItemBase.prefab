@@ -1,0 +1,11 @@
+{
+    "parent" : "engine:itemBase",
+    "DisplayInformation" : {
+    },
+    "Item" : {
+        "consumedOnUse" : true,
+        "usage" : "ON_BLOCK"
+    },
+    "BlockItem" : {
+    }
+}

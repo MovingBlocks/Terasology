@@ -123,15 +123,8 @@ public class Server {
     }
 
     private boolean isOwned(EntityRef entity) {
-        if (entity.equals(clientEntity)) {
-            return true;
-        }
-        // TODO: Recursive
-        NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
-        if (netComp != null) {
-            return netComp.owner.equals(clientEntity);
-        }
-        return false;
+        EntityRef owner = networkSystem.getOwnerEntity(entity);
+        return clientEntity.equals(owner);
     }
 
 

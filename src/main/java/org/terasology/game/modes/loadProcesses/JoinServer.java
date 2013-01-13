@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.config.ModConfig;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.modes.LoadProcess;
-import org.terasology.game.types.SurvivalType;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.network.NetworkSystem;
@@ -47,7 +46,6 @@ public class JoinServer implements LoadProcess {
             }
             worldInfo.setBlockIdMap(blockMap);
             worldInfo.setTime(networkSystem.getServer().getInfo().getTime());
-            worldInfo.setGameType(SurvivalType.class.getName());
 
             ModConfig modConfig = worldInfo.getModConfiguration();
             ModManager modManager = CoreRegistry.get(ModManager.class);

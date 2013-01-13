@@ -53,6 +53,7 @@ import java.util.concurrent.Executors;
  */
 public class NetworkSystem implements EntityChangeSubscriber {
     private static final Logger logger = LoggerFactory.getLogger(NetworkSystem.class);
+    public static final int OWNER_DEPTH_LIMIT = 50;
 
     // Shared
     private NetworkMode mode = NetworkMode.NONE;
@@ -164,14 +165,24 @@ public class NetworkSystem implements EntityChangeSubscriber {
     }
 
     public Client getOwner(EntityRef entity) {
-        Client result = clientPlayerLookup.get(entity);
-        if (result == null) {
-            NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
-            if (netComp != null && netComp.owner.exists()) {
-                result = clientPlayerLookup.get(netComp.owner);
+        EntityRef owner = getOwnerEntity(entity);
+        return clientPlayerLookup.get(owner);
+    }
+
+    public EntityRef getOwnerEntity(EntityRef entity) {
+        EntityRef owner = entity;
+        NetworkComponent ownerNetComp = entity.getComponent(NetworkComponent.class);
+        int i = 0;
+        while (ownerNetComp != null && i++ < OWNER_DEPTH_LIMIT) {
+            NetworkComponent netComp = ownerNetComp.owner.getComponent(NetworkComponent.class);
+            if (netComp != null) {
+                owner = ownerNetComp.owner;
+                ownerNetComp = netComp;
+            } else {
+                ownerNetComp = null;
             }
         }
-        return result;
+        return owner;
     }
 
     public void setRemoteWorldProvider(RemoteChunkProvider remoteWorldProvider) {

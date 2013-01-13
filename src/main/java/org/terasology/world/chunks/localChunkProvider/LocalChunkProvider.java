@@ -535,10 +535,15 @@ public class LocalChunkProvider implements ChunkProvider {
     private void checkChunkReady(Vector3i pos) {
         if (worldEntity.exists() && isChunkReady(pos)) {
             worldEntity.send(new ChunkReadyEvent(pos));
-            for (CacheRegion region : regions) {
-                if (region.getRegion().encompasses(pos)) {
-                    region.sendChunkReady(getChunk(pos));
+            regionLock.readLock().lock();
+            try {
+                for (CacheRegion region : regions) {
+                    if (region.getRegion().encompasses(pos)) {
+                        region.sendChunkReady(getChunk(pos));
+                    }
                 }
+            } finally {
+                regionLock.readLock().unlock();
             }
         }
     }

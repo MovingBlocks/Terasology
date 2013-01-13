@@ -22,9 +22,6 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.modes.StateLoading;
 import org.terasology.game.modes.StateSinglePlayer;
-import org.terasology.game.types.FreeStyleType;
-import org.terasology.game.types.GameType;
-import org.terasology.game.types.SurvivalType;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.network.NetworkMode;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
@@ -65,8 +62,6 @@ public class UIDialogCreateNewWorld extends UIDialog {
     private UIText inputWorldTitle;
     private UILabel chunkGeneratorLabel;
     private UIComboBox chunkGenerator;
-    private UIComboBox typeOfGame;
-    private UILabel typeOfGameLabel;
 
     private ModConfig modConfig;
 
@@ -104,29 +99,12 @@ public class UIDialogCreateNewWorld extends UIDialog {
         inputWorldTitleLabel.setSize(new Vector2f(0f, 16f));
         inputWorldTitleLabel.setVisible(true);
 
-        typeOfGameLabel = new UILabel("Choose type of game:");
-        typeOfGameLabel.setColor(Color.darkGray);
-        typeOfGameLabel.setSize(new Vector2f(0f, 16f));
-        typeOfGameLabel.setVisible(true);
-
-        typeOfGame = new UIComboBox(new Vector2f(176f, 22f), new Vector2f(176f, 50f));
-        UIListItem item = new UIListItem(new SurvivalType().getName(), new SurvivalType());
-        item.setTextColor(Color.black);
-        item.setPadding(new Vector4f(5f, 5f, 5f, 5f));
-        typeOfGame.addItem(item);
-
-        item = new UIListItem(new FreeStyleType().getName(), new FreeStyleType());
-        item.setTextColor(Color.black);
-        item.setPadding(new Vector4f(5f, 5f, 5f, 5f));
-        typeOfGame.addItem(item);
-        typeOfGame.select(0);
-        typeOfGame.setVisible(true);
-
         chunkGeneratorLabel = new UILabel("Choose Chunk Generator:");
         chunkGeneratorLabel.setColor(Color.darkGray);
         chunkGeneratorLabel.setSize(new Vector2f(0f, 16f));
         chunkGeneratorLabel.setVisible(true);
 
+        UIListItem item;
         chunkGenerator = new UIComboBox(new Vector2f(176f, 22f), new Vector2f(176f, 48f));
         item = new UIListItem("Perlin", new Integer(0));
         item.setTextColor(Color.black);
@@ -153,10 +131,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
         inputSeedLabel.setPosition(new Vector2f(inputWorldTitle.getPosition().x, inputWorldTitle.getPosition().y + inputWorldTitle.getSize().y + 16f));
         inputSeed.setPosition(new Vector2f(inputSeedLabel.getPosition().x, inputSeedLabel.getPosition().y + inputSeedLabel.getSize().y + 8f));
 
-        typeOfGameLabel.setPosition(new Vector2f(inputSeed.getPosition().x, inputSeed.getPosition().y + inputSeed.getSize().y + 16f));
-        typeOfGame.setPosition(new Vector2f(typeOfGameLabel.getPosition().x, typeOfGameLabel.getPosition().y + typeOfGameLabel.getSize().y + 8f));
-
-        chunkGeneratorLabel.setPosition(new Vector2f(typeOfGame.getPosition().x, typeOfGame.getPosition().y + typeOfGame.getSize().y + 16f));
+        chunkGeneratorLabel.setPosition(new Vector2f(inputSeed.getPosition().x, inputSeed.getPosition().y + inputSeed.getSize().y + 16f));
         chunkGenerator.setPosition(new Vector2f(chunkGeneratorLabel.getPosition().x, chunkGeneratorLabel.getPosition().y + chunkGeneratorLabel.getSize().y + 8f));
 
 
@@ -177,8 +152,6 @@ public class UIDialogCreateNewWorld extends UIDialog {
         parent.addDisplayElement(inputSeed);
         parent.addDisplayElement(chunkGeneratorLabel);
         parent.addDisplayElement(chunkGenerator);
-        parent.addDisplayElement(typeOfGame);
-        parent.addDisplayElement(typeOfGameLabel);
         parent.addDisplayElement(modButton);
         parent.layout();
     }
@@ -203,8 +176,6 @@ public class UIDialogCreateNewWorld extends UIDialog {
 
                     return;
                 }
-
-                CoreRegistry.put(GameType.class, (GameType) typeOfGame.getSelection().getValue());
 
                 //set the world settings
                 if (inputSeed.getText().length() > 0) {
@@ -256,7 +227,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
                 CoreRegistry.get(Config.class).getDefaultModConfig().copy(modConfig);
                 CoreRegistry.get(Config.class).save();
 
-                CoreRegistry.get(GameEngine.class).changeState(new StateLoading(new WorldInfo(org.terasology.logic.manager.Config.getInstance().getWorldTitle(), org.terasology.logic.manager.Config.getInstance().getDefaultSeed(), org.terasology.logic.manager.Config.getInstance().getDayNightLengthInMs() / 4, chunksListArr, CoreRegistry.get(GameType.class).getClass().toString(), modConfig), (createServerGame) ? NetworkMode.SERVER : NetworkMode.NONE));
+                CoreRegistry.get(GameEngine.class).changeState(new StateLoading(new WorldInfo(org.terasology.logic.manager.Config.getInstance().getWorldTitle(), org.terasology.logic.manager.Config.getInstance().getDefaultSeed(), org.terasology.logic.manager.Config.getInstance().getDayNightLengthInMs() / 4, chunksListArr, modConfig), (createServerGame) ? NetworkMode.SERVER : NetworkMode.NONE));
             }
         });
 

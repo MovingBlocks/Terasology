@@ -20,9 +20,7 @@ import com.google.common.collect.Lists;
 import org.terasology.config.ModConfig;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
-import org.terasology.game.types.GameType;
 import org.terasology.logic.manager.Config;
-import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.math.Region3i;
@@ -37,11 +35,6 @@ import org.terasology.world.lighting.LightingUtil;
 import org.terasology.world.lighting.PropagationComparison;
 import org.terasology.world.liquid.LiquidData;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.List;
 
 /**
@@ -104,7 +97,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         for (Mod mod : CoreRegistry.get(ModManager.class).getActiveMods()) {
             modConfig.addMod(mod.getModInfo().getId());
         }
-        WorldInfo worldInfo = new WorldInfo(title, seed, getTime(), chunkGenerators, CoreRegistry.get(GameType.class).getClass().toString(), modConfig);
+        WorldInfo worldInfo = new WorldInfo(title, seed, getTime(), chunkGenerators, modConfig);
         worldInfo.setBlockIdMap(BlockManager.getInstance().getBlockIdMap());
         return worldInfo;
     }

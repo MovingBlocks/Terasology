@@ -1,4 +1,5 @@
 {
+    "parent" : "engine:itemBase",
     "Item" : {
         "name" : "Explode Tool",
         "icon" : "Dynamite",

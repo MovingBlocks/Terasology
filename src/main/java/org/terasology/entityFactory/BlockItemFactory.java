@@ -49,30 +49,29 @@ public class BlockItemFactory {
         if (blockFamily == null) {
             return EntityRef.NULL;
         }
-        EntityRef entity = entityManager.create();
+
+        EntityRef entity = entityManager.create("engine:blockItemBase");
         if (blockFamily.getArchetypeBlock().getLuminance() > 0) {
             entity.addComponent(new LightComponent());
         }
-        ItemComponent item = new ItemComponent();
+
+        ItemComponent item = entity.getComponent(ItemComponent.class);
         item.name = blockFamily.getDisplayName();
-        item.consumedOnUse = true;
         if (blockFamily.getArchetypeBlock().isStackable()) {
             item.stackId = "block:" + blockFamily.getURI().toString();
             item.stackCount = (byte) quantity;
         }
-        item.usage = ItemComponent.UsageType.ON_BLOCK;
-        entity.addComponent(item);
+        entity.saveComponent(item);
 
-        BlockItemComponent blockItem = new BlockItemComponent(blockFamily);
-
+        BlockItemComponent blockItem = entity.getComponent(BlockItemComponent.class);
+        blockItem.blockFamily = blockFamily;
         if (blockFamily.getArchetypeBlock().getEntityMode() == BlockEntityMode.PERSISTENT) {
             if (!placedEntity.exists()) {
                 placedEntity = entityManager.create(blockFamily.getArchetypeBlock().getEntityPrefab());
             }
             blockItem.placedEntity = placedEntity;
         }
-
-        entity.addComponent(blockItem);
+        entity.saveComponent(blockItem);
 
         return entity;
     }

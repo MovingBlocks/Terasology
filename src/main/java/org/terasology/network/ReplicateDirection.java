@@ -5,6 +5,7 @@ package org.terasology.network;
  */
 public enum ReplicateDirection {
     SERVER_TO_CLIENT(false),
+    SERVER_TO_OWNER(false),
     OWNER_TO_SERVER(true),
     OWNER_TO_SERVER_TO_CLIENT(true);
 

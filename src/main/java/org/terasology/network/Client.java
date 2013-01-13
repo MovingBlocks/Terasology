@@ -243,7 +243,7 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
 
             EntityRef currentEntity = networkSystem.getEntity(message.getNetId());
             if (networkSystem.getOwner(currentEntity) == this) {
-                entitySerializer.deserializeOnto(currentEntity, message.getEntity(), false, new ServerComponentFieldCheck(true));
+                entitySerializer.deserializeOnto(currentEntity, message.getEntity(), false, new ServerComponentFieldCheck(false, true));
             }
         }
 
@@ -255,7 +255,7 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
             int netId = dirtyIterator.next();
             EntityRef entity = networkSystem.getEntity(netId);
             boolean isOwner = networkSystem.getOwner(entity) == this;
-            EntityData.Entity entityData = entitySerializer.serialize(entity, false, new ServerComponentFieldCheck(isOwner));
+            EntityData.Entity entityData = entitySerializer.serialize(entity, false, new ServerComponentFieldCheck(isOwner, false));
             NetData.NetMessage message = NetData.NetMessage.newBuilder()
                     .setType(NetData.NetMessage.Type.UPDATE_ENTITY)
                     .setUpdateEntity(NetData.UpdateEntityMessage.newBuilder().setEntity(entityData).setNetId(netId))
@@ -271,7 +271,7 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
             netRelevant.add(netId);
             EntityRef entity = networkSystem.getEntity(netId);
             // Note: Always send all variables on initial replication
-            EntityData.Entity entityData = entitySerializer.serialize(entity, new ServerComponentFieldCheck(false));
+            EntityData.Entity entityData = entitySerializer.serialize(entity, new ServerComponentFieldCheck(false, true));
             NetData.NetMessage message = NetData.NetMessage.newBuilder()
                     .setType(NetData.NetMessage.Type.CREATE_ENTITY)
                     .setCreateEntity(NetData.CreateEntityMessage.newBuilder().setEntity(entityData))
