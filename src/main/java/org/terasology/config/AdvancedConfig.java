@@ -1,19 +1,15 @@
 package org.terasology.config;
 
 import java.lang.reflect.Type;
-import java.util.Map;
+import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.world.chunks.blockdata.TeraArray;
-import org.terasology.world.chunks.blockdata.TeraDenseArray4Bit;
+import org.terasology.world.chunks.blockdata.TeraArrays;
 import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
-import org.terasology.world.chunks.blockdata.TeraSparseArray4Bit;
-import org.terasology.world.chunks.blockdata.TeraSparseArray8Bit;
-import org.terasology.world.chunks.blockdata.TeraArray.Factory;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -22,12 +18,18 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
+/**
+ * Allows to configure internal details of the Terasology engine.
+ * 
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
+ *
+ */
+@SuppressWarnings("rawtypes")
 public final class AdvancedConfig {
     
     private static final Logger logger = LoggerFactory.getLogger(AdvancedConfig.class);
-    private static final Map<String, TeraArray.Factory> teraArrayRegistry; 
 
-    private String blocksFactory, sunlightFactory, lightFactory, liquidFactory;
+    private String blocksFactory, sunlightFactory, lightFactory, extraFactory;
     private boolean chunkDeflationEnabled, chunkDeflationLoggingEnabled;
     
     private AdvancedConfig() {}
@@ -36,7 +38,7 @@ public final class AdvancedConfig {
         return blocksFactory;
     }
     
-    public Factory getBlocksFactory() {
+    public TeraArray.Factory getBlocksFactory() {
         return requireTeraArrayFactory(blocksFactory);
     }
     
@@ -59,7 +61,7 @@ public final class AdvancedConfig {
         return sunlightFactory;
     }
     
-    public Factory getSunlightFactory() {
+    public TeraArray.Factory getSunlightFactory() {
         return requireTeraArrayFactory(sunlightFactory);
     }
     
@@ -82,7 +84,7 @@ public final class AdvancedConfig {
         return lightFactory;
     }
     
-    public Factory getLightFactory() {
+    public TeraArray.Factory getLightFactory() {
         return requireTeraArrayFactory(lightFactory);
     }
     
@@ -101,23 +103,23 @@ public final class AdvancedConfig {
         return this;
     }
     
-    public String getLiquidFactoryName() {
-        return liquidFactory;
+    public String getExtraFactoryName() {
+        return extraFactory;
     }
     
-    public Factory getLiquidFactory() {
-        return requireTeraArrayFactory(liquidFactory);
+    public TeraArray.Factory getExtraFactory() {
+        return requireTeraArrayFactory(extraFactory);
     }
     
-    public AdvancedConfig setLiquidFactory(String factory) {
+    public AdvancedConfig setExtraFactory(String factory) {
         checkContainsTeraArrayFactory(factory);
-        liquidFactory = factory;
+        extraFactory = factory;
         return this;
     }
     
-    public AdvancedConfig setLiquidFactoryDontThrow(String factory) {
+    public AdvancedConfig setExtraFactoryDontThrow(String factory) {
         if (containsTeraArrayFactory(factory)) {
-            liquidFactory = factory;
+            extraFactory = factory;
         } else {
             logger.warn("TeraArray factory does not exist: '{}'", factory);
         }
@@ -147,7 +149,7 @@ public final class AdvancedConfig {
         .setBlocksFactory(TeraDenseArray8Bit.class.getName())
         .setSunlightFactory(TeraDenseArray8Bit.class.getName())
         .setLightFactory(TeraDenseArray8Bit.class.getName())
-        .setLiquidFactory(TeraDenseArray8Bit.class.getName())
+        .setExtraFactory(TeraDenseArray8Bit.class.getName())
         .setChunkDeflationEnabled(true)
         .setChunkDeflationLoggingEnabled(false);
     }
@@ -158,12 +160,18 @@ public final class AdvancedConfig {
         public AdvancedConfig deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             AdvancedConfig config = AdvancedConfig.createDefault();
             JsonObject input = json.getAsJsonObject();
-            config.setBlocksFactoryDontThrow(input.get("blocksFactory").getAsString())
-            .setSunlightFactoryDontThrow(input.get("sunlightFactory").getAsString())
-            .setLightFactoryDontThrow(input.get("lightFactory").getAsString())
-            .setLiquidFactoryDontThrow(input.get("liquidFactory").getAsString())
-            .setChunkDeflationEnabled(input.get("chunkDeflationEnabled").getAsBoolean())
-            .setChunkDeflationLoggingEnabled(input.get("chunkDeflationLoggingEnabled").getAsBoolean());
+            if (input.has("blocksFactory")) 
+                config.setBlocksFactoryDontThrow(input.get("blocksFactory").getAsString());
+            if (input.has("sunlightFactory")) 
+                config.setSunlightFactoryDontThrow(input.get("sunlightFactory").getAsString());
+            if (input.has("lightFactory")) 
+                config.setLightFactoryDontThrow(input.get("lightFactory").getAsString());
+            if (input.has("extraFactory")) 
+                config.setExtraFactoryDontThrow(input.get("extraFactory").getAsString());
+            if (input.has("chunkDeflationEnabled")) 
+                config.setChunkDeflationEnabled(input.get("chunkDeflationEnabled").getAsBoolean());
+            if (input.has("chunkDeflationLoggingEnabled")) 
+                config.setChunkDeflationLoggingEnabled(input.get("chunkDeflationLoggingEnabled").getAsBoolean());
             return config;
         }
 
@@ -173,7 +181,7 @@ public final class AdvancedConfig {
             result.addProperty("blocksFactory", src.blocksFactory);
             result.addProperty("sunlightFactory", src.sunlightFactory);
             result.addProperty("lightFactory", src.lightFactory);
-            result.addProperty("liquidFactory", src.liquidFactory);
+            result.addProperty("extraFactory", src.extraFactory);
             result.addProperty("chunkDeflationEnabled", src.chunkDeflationEnabled);
             result.addProperty("chunkDeflationLoggingEnabled", src.chunkDeflationLoggingEnabled);
             return result;
@@ -181,80 +189,35 @@ public final class AdvancedConfig {
         
     }
     
-    static {
-        teraArrayRegistry = Maps.newHashMap();
-        registerTeraArrayFactory(new Factory() {
-            @Override
-            public String getName() {return TeraDenseArray4Bit.class.getName();}
-            @Override
-            public TeraArray create(int sizeX, int sizeY, int sizeZ) {
-                return new TeraDenseArray4Bit(sizeX, sizeY, sizeZ);
-            }
-        });
-        registerTeraArrayFactory(new Factory() {
-            @Override
-            public String getName() {return TeraDenseArray8Bit.class.getName();}
-            @Override
-            public TeraArray create(int sizeX, int sizeY, int sizeZ) {
-                return new TeraDenseArray8Bit(sizeX, sizeY, sizeZ);
-            }
-        });
-        registerTeraArrayFactory(new Factory() {
-            @Override
-            public String getName() {return TeraSparseArray4Bit.class.getName();}
-            @Override
-            public TeraArray create(int sizeX, int sizeY, int sizeZ) {
-                return new TeraSparseArray4Bit(sizeX, sizeY, sizeZ);
-            }
-        });
-        registerTeraArrayFactory(new Factory() {
-            @Override
-            public String getName() {return TeraSparseArray8Bit.class.getName();}
-            @Override
-            public TeraArray create(int sizeX, int sizeY, int sizeZ) {
-                return new TeraSparseArray8Bit(sizeX, sizeY, sizeZ);
-            }
-        });
-    }
-    
-    public static Factory getTeraArrayFactory(String factory) {
+    public static TeraArray.Factory getTeraArrayFactory(String factory) {
         Preconditions.checkNotNull(factory, "The parameter 'factory' must not be null");
-        return teraArrayRegistry.get(factory);
+        final TeraArrays.Entry entry = TeraArrays.getInstance().getEntry(factory);
+        if (entry != null)
+            return entry.factory;
+        return null;
     }
     
-    public static Factory requireTeraArrayFactory(String factory) {
+    public static TeraArray.Factory requireTeraArrayFactory(String factory) {
         Preconditions.checkNotNull(factory, "Parameter 'factory' must no be null");
-        return Preconditions.checkNotNull(teraArrayRegistry.get(factory), "Factory does not exist: '" + factory + "'");
+        return Preconditions.checkNotNull(getTeraArrayFactory(factory), "Factory does not exist: '" + factory + "'");
     }
     
     public static void checkContainsTeraArrayFactory(String factory) {
         Preconditions.checkNotNull(factory, "Parameter 'factory' must not be null");
-        Preconditions.checkState(teraArrayRegistry.containsKey(factory), "Factory does not exist: '" + factory + "'");
+        Preconditions.checkState(containsTeraArrayFactory(factory), "Factory does not exist: '" + factory + "'");
     }
     
     public static boolean containsTeraArrayFactory(String factory) {
-        if (factory == null) return false;
-        return teraArrayRegistry.containsKey(factory);
+        return factory != null && getTeraArrayFactory(factory) != null;
     }
     
     public static String[] getTeraArrayFactories() {
-        String[] factories = new String[teraArrayRegistry.size()];
-        int i = 0;
-        for (String factory : teraArrayRegistry.keySet()) {
-            factories[i++] = factory;
+        final TeraArrays.Entry[] entries = TeraArrays.getInstance().getCoreArrayEntries();
+        final String[] factories = new String[entries.length];
+        for (int i = 0; i < entries.length; i++) {
+            factories[i] = entries[i].arrayClassName;
         }
+        Arrays.sort(factories);
         return factories;
     }
-    
-    public static void registerTeraArrayFactory(TeraArray.Factory factory) {
-        Preconditions.checkNotNull(factory, "Parameter 'factory' must not be null");
-        final String name = factory.getName();
-        Preconditions.checkNotNull(name, "Factory:getName() must not return null");
-        Preconditions.checkArgument(!name.isEmpty(), "Factory:getName() must not return an empty string");
-        Preconditions.checkArgument(name.equals(name.trim()), "Factory:getName() contains illegal whitespaces ('" + name + "')");
-        Preconditions.checkState(!teraArrayRegistry.containsKey(name), "A factory named '" + name + "' already exists");
-        teraArrayRegistry.put(name, factory);
-        logger.debug("Registered tera array factory: {}", name);
-    }
-    
 }
