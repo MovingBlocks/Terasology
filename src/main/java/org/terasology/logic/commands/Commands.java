@@ -35,10 +35,12 @@ import org.terasology.events.NoHealthEvent;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
+import org.terasology.game.TerasologyEngine;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.CommandManager;
 import org.terasology.logic.manager.CommandManager.CommandInfo;
+import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.MessageManager;
 import org.terasology.logic.manager.MessageManager.EMessageScope;
 import org.terasology.logic.manager.PathManager;
@@ -767,5 +769,17 @@ public class Commands implements CommandProvider {
     @Command(shortDescription = "Exits the game")
     public void exit() {
         CoreRegistry.get(GameEngine.class).shutdown();
+    }
+
+    @Command(shortDescription = "Fullscreen mode")
+    public void fullscreen() {
+        TerasologyEngine te = (TerasologyEngine) CoreRegistry.get(GameEngine.class);
+
+        if (Config.getInstance().isFullscreen()) {
+            MessageManager.getInstance().addMessage("returning to desktop size", EMessageScope.PRIVATE);
+        } else {
+            MessageManager.getInstance().addMessage("switching to fullscreen mode", EMessageScope.PRIVATE);
+        }
+        te.setFullscreen(!Config.getInstance().isFullscreen());
     }
 }
