@@ -141,6 +141,13 @@ public class Region3i implements Iterable<Vector3i> {
         return createFromMinMax(min, max);
     }
 
+    /**
+     * @param other
+     * @return An iterator over the positions in this region that aren't in other
+     */
+    public Iterator<Vector3i> subtract(Region3i other) {
+        return new SubtractiveIterator(other);
+    }
 
     /**
      * Creates a new region that is the same as this region but expanded in all directions by the given amount
@@ -217,7 +224,7 @@ public class Region3i implements Iterable<Vector3i> {
 
     @Override
     public Iterator<Vector3i> iterator() {
-        return new Region3iIterator(this);
+        return new Region3iIterator();
     }
 
     @Override
@@ -245,9 +252,8 @@ public class Region3i implements Iterable<Vector3i> {
 
     private class Region3iIterator implements Iterator<Vector3i> {
         Vector3i pos;
-        Vector3i result = new Vector3i();
 
-        public Region3iIterator(Region3i region) {
+        public Region3iIterator() {
             this.pos = new Vector3i();
         }
 
@@ -274,6 +280,45 @@ public class Region3i implements Iterable<Vector3i> {
         @Override
         public void remove() {
             throw new UnsupportedOperationException("Not supported.");
+        }
+    }
+
+    private class SubtractiveIterator implements Iterator<Vector3i> {
+        private Iterator<Vector3i> innerIterator;
+        private Vector3i next;
+        private Region3i other;
+
+        public SubtractiveIterator(Region3i other) {
+            this.other = other;
+            innerIterator = iterator();
+            updateNext();
+        }
+
+        private void updateNext() {
+            while (innerIterator.hasNext()) {
+                next = innerIterator.next();
+                if (!other.encompasses(next)) {
+                    return;
+                }
+            }
+            next = null;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return next != null;
+        }
+
+        @Override
+        public Vector3i next() {
+            Vector3i result = new Vector3i(next);
+            updateNext();
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
         }
     }
 }

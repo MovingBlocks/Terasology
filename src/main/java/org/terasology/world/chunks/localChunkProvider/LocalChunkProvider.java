@@ -204,7 +204,17 @@ public class LocalChunkProvider implements ChunkProvider {
             for (CacheRegion cacheRegion : regions) {
                 cacheRegion.update();
                 if (cacheRegion.isDirty()) {
+                    Region3i previousRegion = cacheRegion.getCurrentRegion();
+                    Region3i newRegion = cacheRegion.getRegion();
                     cacheRegion.setUpToDate();
+                    Iterator<Vector3i> chunkIterator = newRegion.subtract(previousRegion);
+                    while (chunkIterator.hasNext()) {
+                        Vector3i pos = chunkIterator.next();
+                        Chunk chunk = getChunk(pos);
+                        if (chunk != null && getChunk(pos).getChunkState() == Chunk.State.COMPLETE) {
+                            cacheRegion.sendChunkReady(chunk);
+                        }
+                    }
                     reviewChunkQueue.offer(new ChunkRequest(ChunkRequest.RequestType.PRODUCE, cacheRegion.getRegion().expand(new Vector3i(2, 0, 2))));
                 }
             }
@@ -539,6 +549,7 @@ public class LocalChunkProvider implements ChunkProvider {
         private boolean dirty;
         private Vector3i center = new Vector3i();
         private ChunkRegionListener listener;
+        private Region3i currentRegion = Region3i.EMPTY;
 
         public CacheRegion(EntityRef entity, int distance) {
             this.entity = entity;
@@ -563,6 +574,11 @@ public class LocalChunkProvider implements ChunkProvider {
 
         public void setUpToDate() {
             dirty = false;
+            currentRegion = getRegion();
+        }
+
+        public Region3i getCurrentRegion() {
+            return currentRegion;
         }
 
         public void update() {
