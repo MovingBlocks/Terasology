@@ -1,5 +1,4 @@
 {
-    "parent" : "engine:itemBase",
     "DisplayInformation" : {
     },
     "Item" : {
@@ -7,5 +6,8 @@
         "usage" : "ON_BLOCK"
     },
     "BlockItem" : {
+    },
+    "Network" : {
+        "replicateMode" : "OWNER"
     }
 }

@@ -75,13 +75,13 @@ public class PojoPrefab extends AbstractPrefab implements Prefab {
         this.invalidateComponentCache();
     }
 
-    public Iterable<Component> listComponents() {
+    public Iterable<Component> iterateComponents() {
         checkComponentCache();
 
         return Collections.unmodifiableCollection(componentCache.values());
     }
 
-    public Iterable<Component> listOwnComponents() {
+    public Iterable<Component> iterateOwnedComponents() {
         return Collections.unmodifiableCollection(components.values());
     }
 
@@ -136,7 +136,7 @@ public class PojoPrefab extends AbstractPrefab implements Prefab {
 
         // 1) Fill inherited components
         for (Prefab ref : this.getParents()) {
-            for (Component component : ref.listComponents()) {
+            for (Component component : ref.iterateComponents()) {
                 componentCache.put(component.getClass(), componentLibrary.copy(component));
             }
         }

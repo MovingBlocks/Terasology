@@ -60,7 +60,7 @@ public class PrefabSerializer {
         }
         prefabData.setPersisted(prefab.isPersisted());
 
-        for (Component component : prefab.listOwnComponents()) {
+        for (Component component : prefab.iterateOwnedComponents()) {
             EntityData.Component componentData = componentSerializer.serialize(component);
             if (componentData != null) {
                 prefabData.addComponent(componentData);

@@ -15,38 +15,17 @@
  */
 package org.terasology.game;
 
-import org.lwjgl.Sys;
+/**
+ * @author Immortius
+ */
+public interface Timer {
+    void tick();
 
-public final class Timer {
-    private final float decayRate = 0.95f;
-    private final float oneMinusDecayRate = 1.0f - decayRate;
-    private long last = 0;
-    private long delta = 0;
-    private float avgDelta = 0;
+    float getDelta();
 
-    public Timer() {
-    }
+    double getDeltaInMS();
 
-    public void tick() {
-        long now = getTimeInMs();
-        delta = now - last;
-        last = now;
-        avgDelta = avgDelta * decayRate + delta * oneMinusDecayRate;
-    }
+    double getFps();
 
-    public float getDelta() {
-        return (delta >= 100) ? 0.1f : delta / 1000f;
-    }
-
-    public double getDeltaInMS() {
-        return (delta >= 100) ? 100 : delta;
-    }
-
-    public double getFps() {
-        return 1000.0f / avgDelta;
-    }
-
-    public long getTimeInMs() {
-        return (Sys.getTime() * 1000) / Sys.getTimerResolution();
-    }
+    long getTimeInMs();
 }

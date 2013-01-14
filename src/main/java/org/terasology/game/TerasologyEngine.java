@@ -99,9 +99,9 @@ public class TerasologyEngine implements GameEngine {
         initOpenGL();
         initOpenAL();
         initControls();
+        initTimer(); // Dependent on LWJGL
         initManagers();
         updateInputConfig();
-        initTimer(); // Dependent on LWJGL
         initSecurity();
         initialised = true;
     }
@@ -362,7 +362,7 @@ public class TerasologyEngine implements GameEngine {
         CoreRegistry.put(CollisionGroupManager.class, new CollisionGroupManager());
         CoreRegistry.put(ModManager.class, new ModManager());
         CoreRegistry.put(ComponentSystemManager.class, new ComponentSystemManager());
-        CoreRegistry.put(NetworkSystem.class, new NetworkSystem());
+        CoreRegistry.put(NetworkSystem.class, new NetworkSystem(timer));
 
         AssetType.registerAssetTypes();
         AssetManager.getInstance().addAssetSource(new ClasspathSource(ModManager.ENGINE_PACKAGE, getClass().getProtectionDomain().getCodeSource(), ModManager.ASSETS_SUBDIRECTORY));
@@ -372,7 +372,7 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void initTimer() {
-        timer = new Timer();
+        timer = new TimerLwjgl();
         CoreRegistry.put(Timer.class, timer);
     }
 

@@ -50,8 +50,6 @@ import org.terasology.entitySystem.event.ChangedComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
-import org.terasology.entitySystem.metadata.extension.EntityRefTypeHandler;
-import org.terasology.entitySystem.metadata.extension.PrefabTypeHandler;
 
 import com.google.common.collect.Lists;
 
@@ -147,7 +145,7 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
     @Override
     public EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation) {
         List<Component> components = Lists.newArrayList();
-        for (Component component : prefab.listComponents()) {
+        for (Component component : prefab.iterateComponents()) {
             Component newComp = componentLibrary.copy(component);
             components.add(newComp);
             if (newComp instanceof LocationComponent) {
@@ -168,7 +166,7 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
     @Override
     public EntityRef create(Prefab prefab, Vector3f position) {
         List<Component> components = Lists.newArrayList();
-        for (Component component : prefab.listComponents()) {
+        for (Component component : prefab.iterateComponents()) {
             Component newComp = componentLibrary.copy(component);
             components.add(newComp);
             if (newComp instanceof LocationComponent) {
@@ -183,7 +181,7 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
     @Override
     public EntityRef create(Prefab prefab) {
         List<Component> components = Lists.newArrayList();
-        for (Component component : prefab.listComponents()) {
+        for (Component component : prefab.iterateComponents()) {
             components.add(componentLibrary.copy(component));
         }
         components.add(new EntityInfoComponent(prefab.getName(), prefab.isPersisted()));

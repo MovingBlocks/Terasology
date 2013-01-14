@@ -113,7 +113,7 @@ public class UIScreenItems extends UIWindow {
             Prefab prefab = it.next();
             itemComp = prefab.getComponent(ItemComponent.class);
             if (itemComp != null) {
-                entity = entityManager.create(prefab.listComponents());
+                entity = entityManager.create(prefab.iterateComponents());
                 entity.setPersisted(false);
                 if (entity.exists() && entity.getComponent(ItemComponent.class) != null) {
                     UIItemCell cell = new UIItemCell(null, cellSize);

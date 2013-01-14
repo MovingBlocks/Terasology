@@ -52,7 +52,7 @@ public interface Prefab {
      *
      * @return
      */
-    public Iterable<Component> listComponents();
+    public Iterable<Component> iterateComponents();
 
     /**
      * Iterate only over OWN components, excluding inheritance.
@@ -60,7 +60,7 @@ public interface Prefab {
      *
      * @return
      */
-    public Iterable<Component> listOwnComponents();
+    public Iterable<Component> iterateOwnedComponents();
 
     /**
      * Return parents prefabs

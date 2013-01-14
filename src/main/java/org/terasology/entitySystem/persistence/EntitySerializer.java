@@ -136,7 +136,7 @@ public class EntitySerializer {
         Map<Class<? extends Component>, Component> componentMap = Maps.newHashMap();
         if (entityData.hasParentPrefab() && !entityData.getParentPrefab().isEmpty() && prefabManager.exists(entityData.getParentPrefab())) {
             Prefab prefab = prefabManager.getPrefab(entityData.getParentPrefab());
-            for (Component component : prefab.listComponents()) {
+            for (Component component : prefab.iterateComponents()) {
                 String componentName = MetadataUtil.getComponentClassName(component.getClass());
                 // TODO: Use a set and convert to lower case
                 if (!containsIgnoreCase(componentName, entityData.getRemovedComponentList())) {
@@ -241,7 +241,7 @@ public class EntitySerializer {
                 entity.addComponent(componentData);
             }
         }
-        for (Component prefabComponent : prefab.listComponents()) {
+        for (Component prefabComponent : prefab.iterateComponents()) {
             if (!presentClasses.contains(prefabComponent.getClass()) && componentSerializeCheck.serialize(componentLibrary.getMetadata(prefabComponent.getClass()))) {
                 entity.addRemovedComponent(MetadataUtil.getComponentClassName(prefabComponent.getClass()));
             }

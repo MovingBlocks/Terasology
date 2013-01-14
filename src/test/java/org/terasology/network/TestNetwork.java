@@ -1,11 +1,11 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright 2013 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *       http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,6 +17,9 @@
 package org.terasology.network;
 
 import org.junit.Test;
+import org.terasology.game.Timer;
+
+import static org.mockito.Mockito.mock;
 
 /**
  * @author Immortius
@@ -25,12 +28,13 @@ public class TestNetwork {
 
     @Test
     public void testNetwork() throws InterruptedException {
-        NetworkSystem server = new NetworkSystem();
+        Timer timer = mock(Timer.class);
+        NetworkSystem server = new NetworkSystem(timer);
         server.host(7777);
 
         Thread.sleep(500);
 
-        NetworkSystem client = new NetworkSystem();
+        NetworkSystem client = new NetworkSystem(timer);
         client.join("localhost", 7777);
 
         Thread.sleep(500);

@@ -33,6 +33,7 @@ import org.terasology.entitySystem.metadata.internal.EntitySystemLibraryImpl;
 import org.terasology.entitySystem.persistence.EntitySerializer;
 import org.terasology.entitySystem.persistence.EventSerializer;
 import org.terasology.game.CoreRegistry;
+import org.terasology.game.Timer;
 import org.terasology.network.events.ConnectedEvent;
 import org.terasology.network.pipelineFactory.TerasologyClientPipelineFactory;
 import org.terasology.network.pipelineFactory.TerasologyServerPipelineFactory;
@@ -54,6 +55,7 @@ import java.util.concurrent.Executors;
 public class NetworkSystem implements EntityChangeSubscriber {
     private static final Logger logger = LoggerFactory.getLogger(NetworkSystem.class);
     public static final int OWNER_DEPTH_LIMIT = 50;
+    private static final int NET_TICK_RATE = 50;
 
     // Shared
     private NetworkMode mode = NetworkMode.NONE;
@@ -65,6 +67,9 @@ public class NetworkSystem implements EntityChangeSubscriber {
     private ChannelFactory factory;
     private TIntIntMap netIdToEntityId = new TIntIntHashMap();
 
+    private Timer timer;
+    private long nextNetworkTick = 0;
+
     // Server only
     private ChannelGroup allChannels = new DefaultChannelGroup("tera-channels");
     private BlockingQueue<Client> newClients = Queues.newLinkedBlockingQueue();
@@ -75,7 +80,8 @@ public class NetworkSystem implements EntityChangeSubscriber {
     // Client only
     private Server server;
 
-    public NetworkSystem() {
+    public NetworkSystem(Timer timer) {
+        this.timer = timer;
     }
 
     public void host(int port) {
@@ -89,6 +95,7 @@ public class NetworkSystem implements EntityChangeSubscriber {
             allChannels.add(listenChannel);
             logger.info("Started server");
             mode = NetworkMode.SERVER;
+            nextNetworkTick = timer.getTimeInMs();
         }
     }
 
@@ -110,6 +117,7 @@ public class NetworkSystem implements EntityChangeSubscriber {
                 allChannels.add(connectCheck.getChannel());
                 logger.info("Connected to server");
                 mode = NetworkMode.CLIENT;
+                nextNetworkTick = timer.getTimeInMs();
                 return true;
             }
         }
@@ -142,11 +150,15 @@ public class NetworkSystem implements EntityChangeSubscriber {
                         processNewClient(client);
                     }
                 }
-                for (Client client : clientList) {
-                    client.update();
-                }
-                if (server != null) {
-                    server.update();
+                long currentTimer = timer.getTimeInMs();
+                if (currentTimer > nextNetworkTick) {
+                    nextNetworkTick += NET_TICK_RATE;
+                    for (Client client : clientList) {
+                        client.update();
+                    }
+                    if (server != null) {
+                        server.update();
+                    }
                 }
             }
         }

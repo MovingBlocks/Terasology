@@ -49,6 +49,6 @@ public abstract class AbstractPrefab implements Prefab {
 
     @Override
     public String toString() {
-        return "Prefab(" + name + "){ components: " + this.listOwnComponents() + ", parents: " + this.getParents() + " }";
+        return "Prefab(" + name + "){ components: " + this.iterateOwnedComponents() + ", parents: " + this.getParents() + " }";
     }
 }
