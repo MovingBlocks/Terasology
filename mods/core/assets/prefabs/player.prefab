@@ -10,8 +10,8 @@
         "fallingDamageSpeedThreshold" : 15
     },
     "Hunger" : {
-        "currentContentment" : 100,
-        "maxContentment" : 100,
+        "currentContentment" : 200,
+        "maxContentment" : 200,
         "deregenRate" : 0.4,
         "waitBeforeDeregen" : 10,
 	"waitBeetweenDamage" : 12
