@@ -238,7 +238,7 @@ public class UIMenuConfigVideo extends UIWindow {
         fullscreenButton.addState("Fullscreen: On", fullscreenStateAction);
         fullscreenButton.addClickListener(clickAction);
         fullscreenButton.setHorizontalAlign(EHorizontalAlign.CENTER);
-        fullscreenButton.setPosition(new Vector2f(fullscreenButton.getSize().x / 2f, 300f));
+        fullscreenButton.setPosition(new Vector2f(fullscreenButton.getSize().x / 2f, 300f + 3 * 40f));
         fullscreenButton.setVisible(true);
         
         backToConfigMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
