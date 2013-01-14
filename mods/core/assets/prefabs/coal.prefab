@@ -1,0 +1,8 @@
+{
+    "Item" : {
+        "name" : "Coal",
+        "icon" : "Coal",
+        "renderWithIcon" : true,
+        "stackId" : "core:coal"
+    }
+}

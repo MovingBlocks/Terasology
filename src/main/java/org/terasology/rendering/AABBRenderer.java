@@ -16,30 +16,16 @@
 
 package org.terasology.rendering;
 
-import static org.lwjgl.opengl.GL11.GL_LINE_LOOP;
-import static org.lwjgl.opengl.GL11.GL_QUADS;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glCallList;
-import static org.lwjgl.opengl.GL11.glColor4f;
-import static org.lwjgl.opengl.GL11.glDeleteLists;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glEndList;
-import static org.lwjgl.opengl.GL11.glGenLists;
-import static org.lwjgl.opengl.GL11.glLineWidth;
-import static org.lwjgl.opengl.GL11.glNewList;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glScalef;
-import static org.lwjgl.opengl.GL11.glTranslated;
-import static org.lwjgl.opengl.GL11.glVertex3f;
-
 import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
 
 import org.lwjgl.opengl.GL11;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.AABB;
 import org.terasology.rendering.world.WorldRenderer;
+
+import static org.lwjgl.opengl.GL11.*;
 
 /**
  * Renderer for an AABB.
@@ -49,6 +35,7 @@ public class AABBRenderer
 {
     private int displayListWire = -1;
     private int displayListSolid = -1;
+    private Vector4f solidColor = new Vector4f(1f, 1f, 1f, 1f);
 
     private AABB aabb;
 
@@ -74,6 +61,10 @@ public class AABBRenderer
         }
     }
 
+    public void setSolidColor(Vector4f color){
+        solidColor = color;
+    }
+
     /**
      * Renders this AABB.
      * <p/>
@@ -88,6 +79,18 @@ public class AABBRenderer
         glTranslated(aabb.getCenter().x - cameraPosition.x, -cameraPosition.y, aabb.getCenter().z - cameraPosition.z);
 
         renderLocally(lineThickness);
+
+        glPopMatrix();
+    }
+
+    public void renderSolid(){
+        ShaderManager.getInstance().enableDefault();
+
+        glPushMatrix();
+        Vector3f cameraPosition = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
+        glTranslated(aabb.getCenter().x - cameraPosition.x, -cameraPosition.y, aabb.getCenter().z - cameraPosition.z);
+
+        renderSolidLocally();
 
         glPopMatrix();
     }
@@ -114,7 +117,7 @@ public class AABBRenderer
         if (displayListSolid == -1) {
             generateDisplayListSolid();
         }
-
+        glEnable(GL_BLEND);
         glPushMatrix();
 
         glTranslated(0f, aabb.getCenter().y, 0f);
@@ -123,6 +126,7 @@ public class AABBRenderer
         glCallList(displayListSolid);
 
         glPopMatrix();
+        glDisable(GL_BLEND);
     }
 
     private void generateDisplayListSolid() {
@@ -130,7 +134,7 @@ public class AABBRenderer
 
         glNewList(displayListSolid, GL11.GL_COMPILE);
         glBegin(GL_QUADS);
-        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        glColor4f(solidColor.x, solidColor.y, solidColor.z, solidColor.w);
 
         Vector3f dimensions = aabb.getExtents();
 
@@ -226,5 +230,9 @@ public class AABBRenderer
         glVertex3f(+dimensions.x + offset, +dimensions.y + offset, -dimensions.z - offset);
         glEnd();
         glEndList();
+    }
+    
+    public AABB getAABB(){
+        return aabb;
     }
 }

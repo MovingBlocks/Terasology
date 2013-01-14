@@ -25,6 +25,7 @@ import gnu.trove.map.hash.TObjectByteHashMap;
 import org.lwjgl.BufferUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.Prefab;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockPart;
@@ -54,7 +55,8 @@ public class BlockManager {
     private BlockLoader blockLoader;
 
     /* BLOCKS */
-    private final Map<BlockUri, Block> blocksByUri = Maps.newHashMapWithExpectedSize(256);
+    private final Map<BlockUri, Block> blocksByUri     = Maps.newHashMapWithExpectedSize(256);
+    private final Map<String, Block> blocksByPrefabName  = Maps.newHashMapWithExpectedSize(256);
     private final TByteObjectHashMap<Block> blocksById = new TByteObjectHashMap<Block>(256);
 
     private int nextId = 1;
@@ -81,6 +83,7 @@ public class BlockManager {
 
     public void reset() {
         blocksById.clear();
+        blocksByPrefabName.clear();
         blocksByUri.clear();
         familyByUri.clear();
         idByUri.clear();
@@ -202,6 +205,11 @@ public class BlockManager {
         return block;
     }
 
+    public Block getBlock(Prefab prefab){
+        Block result = blocksByPrefabName.get(prefab.getName());
+        return result;
+    }
+
     public Block getBlock(byte id) {
         Block result = blocksById.get(id);
         if (result == null) {
@@ -247,6 +255,10 @@ public class BlockManager {
             block.setId(id);
             blocksById.put(block.getId(), block);
             blocksByUri.put(block.getURI(), block);
+
+            if( block.getEntityPrefab().length() > 0 ){
+                blocksByPrefabName.put(block.getEntityPrefab(), block);
+            }
         }
     }
 

@@ -15,14 +15,24 @@
  */
 
 /**
- * Plank material stairs
+ * A chest is interesting for two reasons: It is asymmetrical (front texture differs) and should store stuff
  */
 {
     "rotation" : "horizontal",
-    "tile" : "engine:Plank",
-    "shape" : "engine:stair",
+    "translucent" : true,
+    "shadowCasting" : false,
+    "penetrable" : true,
+    "tiles" : {
+        "sides" : "core:CraftTile",
+        "front" : "core:CraftTile",
+        "topBottom" : "core:CraftTile"
+    },
     "entity" : {
-        "prefab" : "core:plankstair",
+        "prefab" : "core:craft",
         "mode" : "persistent"
+    },
+    "inventory" : {
+        "stackable" : false,
+        "directPickup" : true
     }
 }

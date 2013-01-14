@@ -29,7 +29,9 @@ public final class MeshComponent implements Component {
     // Temporary render details
     public enum RenderType {
         Normal,
-        GelatinousCube
+        GelatinousCube,
+        Extrude,
+        Billboard
     }
 
     public RenderType renderType = RenderType.Normal;

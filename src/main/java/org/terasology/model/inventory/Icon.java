@@ -142,6 +142,10 @@ public class Icon {
         Icon bannanaIcon = new Icon();
         Icon emptyJarIcon = new Icon();
         Icon waterJarIcon = new Icon();
+        Icon coal = new Icon();
+        Icon stick = new Icon();
+        Icon refinementrock = new Icon();
+
         //* INGOTS *//
         Icon ironingotIcon = new Icon();
         Icon copperingotIcon = new Icon();
@@ -217,6 +221,10 @@ public class Icon {
         bannanaIcon.setAtlasPosition(6, 1);
         emptyJarIcon.setAtlasPosition(7, 0);
         waterJarIcon.setAtlasPosition(7, 1);
+        coal.setAtlasPosition(9,0);
+        stick.setAtlasPosition(9,2);
+        refinementrock.setAtlasPosition(10,0);
+
         //Ingot Atlas
         ironingotIcon.setAtlasPosition(8, 0);
         copperingotIcon.setAtlasPosition(8, 1);
@@ -316,6 +324,10 @@ public class Icon {
         icons.put("minion8", minionIcon8);
         icons.put("minion9", minionIcon9);
         icons.put("minioncommand", minioncommandIcon);
+        
+        icons.put("coal", coal);
+        icons.put("stick", stick);
+        icons.put("refinementrock", refinementrock);
     }
 
     /**

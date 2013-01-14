@@ -1,0 +1,20 @@
+{
+    "Location" : {
+        "scale" : 0.3
+    },
+    "BoxShape" : {
+        "extents" : [1, 1, 1]
+    },
+    "DroppedItemType": {
+    },
+    "RigidBody" : {
+        "mass" : 1000f,
+        "collisionGroup" : "engine:debris",
+        "collidesWith" : ["engine:world","engine:debris","engine:sensor"]
+    },
+    "Mesh" : {
+    },
+    "Lifespan" : {
+        "lifespan" : 30
+    }
+}

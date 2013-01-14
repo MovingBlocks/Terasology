@@ -49,6 +49,7 @@ public class ShaderParametersBlock implements IShaderParameters {
 
         program.setFloat3("colorOffset", 1.0f, 1.0f, 1.0f);
         program.setInt("textured", 1);
+        program.setFloat("necessarilyAlpha", 0.0f);
     }
 
 }

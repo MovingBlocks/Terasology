@@ -20,6 +20,7 @@ uniform float light;
 uniform vec3 colorOffset;
 uniform bool textured;
 uniform bool carryingTorch;
+uniform float necessarilyAlpha;
 
 varying vec3 normal;
 varying vec4 vertexWorldPos;
@@ -43,6 +44,10 @@ void main(){
 
     // Apply light
     color.rgb *= clamp(light + torchlight, 0.0, 1.0);
+
+    if( necessarilyAlpha > 0.0){
+        color.a = necessarilyAlpha;
+    }
 
     if (textured) {
         color.rgb *= colorOffset.rgb;

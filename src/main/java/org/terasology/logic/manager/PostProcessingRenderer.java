@@ -438,7 +438,7 @@ public class PostProcessingRenderer {
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
 
-    private void renderFullQuad() {
+    public void renderFullQuad() {
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
         glLoadIdentity();
