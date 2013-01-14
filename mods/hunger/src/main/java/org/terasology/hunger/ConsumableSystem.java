@@ -17,11 +17,14 @@ package org.terasology.hunger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.components.ItemComponent;
+import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.game.CoreRegistry;
 import org.terasology.hunger.events.*;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
@@ -35,6 +38,7 @@ import org.terasology.world.block.management.BlockManager;
  */
 @RegisterComponentSystem
 public class ConsumableSystem implements EventHandlerSystem {
+	 protected EntityManager entityManager;
     private static final Logger logger = LoggerFactory.getLogger(ConsumableSystem.class);
 
     @In
@@ -43,6 +47,8 @@ public class ConsumableSystem implements EventHandlerSystem {
     @Override
     public void initialise() {
     	logger.info("initializing tummy");
+        entityManager = CoreRegistry.get(EntityManager.class);
+        // register a hook for after the world has been created to check for and place an initial portal
     }
 
     @Override
@@ -53,7 +59,9 @@ public class ConsumableSystem implements EventHandlerSystem {
     public void onActivate(ActivateEvent event, EntityRef entity) {
         logger.info("Eating food: "+entity.getId());
         //TODO make to recognize if object is item
+        if (!entity.hasComponent(ItemComponent.class)) {
         BlockComponent block = entity.getComponent(BlockComponent.class);
+        }
         ConsumableComponent consum = entity.getComponent(ConsumableComponent.class);
         EntityRef player =event.getInstigator();
         
@@ -66,9 +74,12 @@ public class ConsumableSystem implements EventHandlerSystem {
         
         //destroy it no more uses
         if(consum.uses<=0){
+        	
+            if (!entity.hasComponent(ItemComponent.class)) {
         	Block currentBlock = worldProvider.getBlock(block.getPosition());
         	worldProvider.setBlock(block.getPosition(), BlockManager.getInstance().getAir(), currentBlock);
-        	entity.destroy();
+            }
+            entity.destroy();
         }
         
     }

@@ -36,8 +36,9 @@ import org.terasology.game.types.GameType;
 
 /**
  * @author Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
+ * (authorativeOnly = true)
  */
-@RegisterComponentSystem(authorativeOnly = true)
+@RegisterComponentSystem
 public class HungerSystem implements EventHandlerSystem, UpdateSubscriberSystem {
 	private static final Logger logger = LoggerFactory.getLogger(HungerSystem.class);
     private EntityManager entityManager;

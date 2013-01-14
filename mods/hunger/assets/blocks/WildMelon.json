@@ -19,7 +19,7 @@
     "tiles" : {                 
         "sides" : "hunger:WildMelonSide",     
         "bottom" : "hunger:WildMelonBot",
-	"top" : "hunger:WildMelonTop"        
+		"top" : "hunger:WildMelonTop"        
     },
     "colorSource" : "color_lut",
     "hardness" : 2,
