@@ -323,7 +323,7 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
         }
 
         if (moveResult.hitHoriz) {
-            entity.send(new HorizontalCollisionEvent());
+            entity.send(new HorizontalCollisionEvent(location.getWorldPosition(),movementComp.getVelocity()));
         }
 
         if (movementComp.isGrounded) {

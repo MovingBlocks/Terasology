@@ -248,6 +248,13 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             entity.saveComponent(healthComponent);
         }
 
+        HungerComponent hungerComponent = entity.getComponent(HungerComponent.class);
+        if (hungerComponent != null) {
+        	hungerComponent.currentContentment = hungerComponent.maxContentment;
+            entity.send(new HealthChangedEvent(entity, hungerComponent.currentContentment, hungerComponent.maxContentment));
+            entity.saveComponent(hungerComponent);
+        }
+        
         CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
         if (characterMovementComponent != null) {
             characterMovementComponent.setVelocity(new Vector3f(0, 0, 0));
