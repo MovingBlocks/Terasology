@@ -4,10 +4,17 @@
     "Health" : {
         "currentHealth" : 255,
         "maxHealth" : 255,
-        "regenRate" : 5,
-        "waitBeforeRegen" : 2,
+        "regenRate" : 3,
+        "waitBeforeRegen" : 10,
         "excessSpeedDamageMultiplier" : 20,
         "fallingDamageSpeedThreshold" : 15
+    },
+    "Hunger" : {
+        "currentContentment" : 100,
+        "maxContentment" : 100,
+        "deregenRate" : 0.4,
+        "waitBeforeDeregen" : 10,
+	"waitBeetweenDamage" : 12
     },
     "CharacterMovement" : {
         "groundFriction" : 16,

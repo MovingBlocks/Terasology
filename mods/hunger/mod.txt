@@ -1,0 +1,5 @@
+{
+    "id" : "hunger",
+    "displayName" : "hunger",
+    "description" : "This mod makes you to die starvation"
+}
