@@ -539,6 +539,7 @@ public class TerasologyEngine implements GameEngine {
         if (Config.getInstance().isFullscreen() != state) {
             Config.getInstance().setFullscreen(state);
             setDisplayMode();
+            resizeViewport();
             CoreRegistry.get(GUIManager.class).update(true);
         }
     }
