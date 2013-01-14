@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.events;
+package org.terasology.hunger.events;
 
 import org.terasology.entitySystem.AbstractEvent;
 import org.terasology.entitySystem.EntityRef;

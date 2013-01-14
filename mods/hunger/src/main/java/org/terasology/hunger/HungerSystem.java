@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.componentSystem.common;
+package org.terasology.hunger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,16 +27,10 @@ import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.DamageEvent;
-import org.terasology.events.EatEvent;
+import org.terasology.hunger.events.*;
 import org.terasology.events.FullHealthEvent;
-import org.terasology.events.HealthChangedEvent;
 import org.terasology.events.NoHealthEvent;
-import org.terasology.events.ContentmentChangedEvent;
-import org.terasology.events.FullContentmentEvent;
-import org.terasology.events.NoContentmentEvent;
 import org.terasology.events.RespawnEvent;
-import org.terasology.events.StarvationEvent;
-import org.terasology.events.VerticalCollisionEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.types.GameType;
 
@@ -57,6 +51,7 @@ public class HungerSystem implements EventHandlerSystem, UpdateSubscriberSystem 
     }
 
     public void update(float delta) {
+    	logger.info("hello tummy");
         for (EntityRef entity : entityManager.iteratorEntities(HungerComponent.class, HealthComponent.class)) {
         	HungerComponent hunger = entity.getComponent(HungerComponent.class);
         	HealthComponent health = entity.getComponent(HealthComponent.class);

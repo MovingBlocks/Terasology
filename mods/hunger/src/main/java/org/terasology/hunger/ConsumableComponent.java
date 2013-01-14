@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.components;
+package org.terasology.hunger;
 
 import org.terasology.entitySystem.Component;
 
@@ -27,6 +27,7 @@ public final class ConsumableComponent implements Component {
 	
 	//add effects here when bodycombonent is ready
     public ConsumableComponent() {
+    	System.out.print("tummy component\n\n\n\n");
     }
 
 }

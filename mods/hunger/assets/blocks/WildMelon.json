@@ -17,13 +17,13 @@
 
 {
     "tiles" : {                 
-        "sides" : "foods:WildMelonSide",     
-        "bottom" : "foods:WildMelonBot",
-	"top" : "foods:WildMelonTop"        
+        "sides" : "hunger:WildMelonSide",     
+        "bottom" : "hunger:WildMelonBot",
+	"top" : "hunger:WildMelonTop"        
     },
     "colorSource" : "color_lut",
     "hardness" : 2,
     "entity" : {
-        "prefab" : "foods:WildMelon"
+        "prefab" : "hunger:WildMelon"
     }
 }    

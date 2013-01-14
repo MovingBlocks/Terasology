@@ -13,18 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.componentSystem.items;
+package org.terasology.hunger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.components.ConsumableComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
-import org.terasology.events.ActivateEvent;
-import org.terasology.events.EatEvent;
+import org.terasology.hunger.events.*;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
@@ -44,6 +42,7 @@ public class ConsumableSystem implements EventHandlerSystem {
     
     @Override
     public void initialise() {
+    	logger.info("initializing tummy");
     }
 
     @Override
