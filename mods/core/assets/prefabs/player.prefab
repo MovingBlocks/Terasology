@@ -12,7 +12,7 @@
     "Hunger" : {
         "currentContentment" : 100,
         "maxContentment" : 100,
-        "deregenRate" : 0.8,
+        "deregenRate" : 0.4,
         "waitBeforeDeregen" : 10,
 	"waitBeetweenDamage" : 12
     },

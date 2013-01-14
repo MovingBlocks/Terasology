@@ -15,7 +15,10 @@
  */
 package org.terasology.componentSystem.common;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
+import org.terasology.componentSystem.items.ConsumableSystem;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.HungerComponent;
 import org.terasology.entitySystem.EntityManager;
@@ -41,7 +44,7 @@ import org.terasology.game.types.GameType;
  */
 @RegisterComponentSystem(authorativeOnly = true)
 public class HungerSystem implements EventHandlerSystem, UpdateSubscriberSystem {
-
+	private static final Logger logger = LoggerFactory.getLogger(HungerSystem.class);
     private EntityManager entityManager;
 
     public void initialise() {
@@ -58,7 +61,7 @@ public class HungerSystem implements EventHandlerSystem, UpdateSubscriberSystem 
         	HealthComponent health = entity.getComponent(HealthComponent.class);
             if(hunger.currentContentment < 0 && hunger.timeSinceLastDamage >= hunger.waitBeetweenDamage ){
             	hunger.timeSinceLastDamage=0;
-            	System.out.print("Starvating for "+health.maxHealth/((11+hunger.currentContentment)*10) +"\n");
+            	logger.info("Starvating " +entity.getId()+" for "+health.maxHealth/((11+hunger.currentContentment)*10) +"\n");
             	onStarvation(new StarvationEvent(health.maxHealth/((11+hunger.currentContentment)*10) ),entity);
             }else{
             	hunger.timeSinceLastDamage += delta;
@@ -101,7 +104,6 @@ public class HungerSystem implements EventHandlerSystem, UpdateSubscriberSystem 
     
     @ReceiveEvent(components = {HungerComponent.class})
     public void onEat(EatEvent event, EntityRef entity) {
-    	System.out.print("eating\n");
     	HungerComponent hunger = entity.getComponent(HungerComponent.class);
     	hunger.timeSinceLastEat=0;
     	hunger.currentContentment+=event.getAmount();

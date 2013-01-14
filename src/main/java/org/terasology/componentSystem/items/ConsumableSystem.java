@@ -52,13 +52,14 @@ public class ConsumableSystem implements EventHandlerSystem {
 
     @ReceiveEvent(components = {ConsumableComponent.class})
     public void onActivate(ActivateEvent event, EntityRef entity) {
-        logger.info("Activating food");
+        logger.info("Eating food: "+entity.getId());
         BlockComponent block = entity.getComponent(BlockComponent.class);
         ConsumableComponent consum = entity.getComponent(ConsumableComponent.class);
         EntityRef player =event.getInstigator();
         
         //reduce blocks uses
         consum.uses-=1;
+        logger.info("Food uses:"+consum.uses+"\n");
         
         //eat it
         player.send(new EatEvent(player,consum.filling));

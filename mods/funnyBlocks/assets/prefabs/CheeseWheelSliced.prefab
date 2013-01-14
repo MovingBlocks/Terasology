@@ -15,7 +15,7 @@
  */
 {
 	"Consumable": {
-        	"filling" : "7",
-	 	"uses" : "8"
+        	"filling" : 7,
+	 	"uses" : 8
     	}
 }
