@@ -27,7 +27,6 @@ public final class ConsumableComponent implements Component {
 	
 	//add effects here when bodycombonent is ready
     public ConsumableComponent() {
-    	System.out.print("tummy component\n\n\n\n");
     }
 
 }

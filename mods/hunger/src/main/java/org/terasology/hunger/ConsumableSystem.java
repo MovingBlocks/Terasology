@@ -30,6 +30,7 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.management.BlockManager;
+import org.terasology.events.ActivateEvent;
 
 /**
  * System providing inventory related functionality
@@ -59,8 +60,9 @@ public class ConsumableSystem implements EventHandlerSystem {
     public void onActivate(ActivateEvent event, EntityRef entity) {
         logger.info("Eating food: "+entity.getId());
         //TODO make to recognize if object is item
+        BlockComponent block = new BlockComponent();
         if (!entity.hasComponent(ItemComponent.class)) {
-        BlockComponent block = entity.getComponent(BlockComponent.class);
+        	block = entity.getComponent(BlockComponent.class);
         }
         ConsumableComponent consum = entity.getComponent(ConsumableComponent.class);
         EntityRef player =event.getInstigator();
