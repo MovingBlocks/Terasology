@@ -15,27 +15,13 @@
  */
 package org.terasology.events;
 
-import javax.vecmath.Vector3f;
-
-import org.terasology.entitySystem.AbstractEvent;
+import org.terasology.entitySystem.EntityRef;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class HorizontalCollisionEvent extends AbstractEvent {
-    private Vector3f velocity;
-    private Vector3f location;
-
-    public HorizontalCollisionEvent(Vector3f velocity, Vector3f location) {
-        this.velocity = new Vector3f(velocity);
-        this.location = new Vector3f(location);
-    }
-
-    public Vector3f getVelocity() {
-        return velocity;
-    }
-
-    public Vector3f getLocation() {
-        return location;
+public class NoContentmentEvent extends ContentmentChangedEvent {
+    public NoContentmentEvent(EntityRef instigator, int maxContentment) {
+        super(instigator, 0, maxContentment);
     }
 }

@@ -5,13 +5,13 @@
     "color" : [0.70, 0.50, 0.40, 1]
   },  
   "Health" : {
-        "currentHealth" : 10,
-        "maxHealth" : 10,
-        "regenRate" : 0.1,
-        "waitBeforeRegen" : 10,
-        "excessSpeedDamageMultiplier" : 5,
-        "fallingDamageSpeedThreshold" : 15
-    },
+        "currentHealth" : 25,
+        "maxHealth" : 50,
+        "regenRate" : 5,
+        "waitBeforeRegen" : 2,
+        "excessSpeedDamageMultiplier" : 2,
+        "fallingDamageSpeedThreshold" : 30
+  },
   "CharacterMovement" : {
     "height" : 1,
     "radius" : 0.5,

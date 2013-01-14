@@ -358,6 +358,12 @@ public class Commands implements CommandProvider {
         }
     }
 
+    @Command(shortDescription = "Fast forfard time by ammount of ticks")
+    public void time(@CommandParam(name = "amount") int amount) {
+
+    	//TODO code here
+    }
+    
     @Command(shortDescription = "Restores your health to max")
     public void health() {
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
@@ -427,6 +433,7 @@ public class Commands implements CommandProvider {
     }
 
     @Command(shortDescription = "Set max ghost speed")
+
     public void setMaxGhostSpeed(@CommandParam(name = "amount") float amount) {
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
         CharacterMovementComponent move = localPlayer.getEntity().getComponent(CharacterMovementComponent.class);
@@ -450,6 +457,7 @@ public class Commands implements CommandProvider {
                 + move.jumpSpeed + " maxWaterSpeed:" + move.maxWaterSpeed + " maxGhostSpeed:" + move.maxGhostSpeed + " SlopeFactor:"
                 + move.slopeFactor + " runFactor:" + move.runFactor, EMessageScope.PRIVATE);
     }
+
 
     @Command(shortDescription = "Go really fast")
     public void hspeed() {
@@ -603,6 +611,7 @@ public class Commands implements CommandProvider {
             i++;
         }
         MessageManager.getInstance().addMessage("Hierarchical AIs (" + i + ") Destroyed ", EMessageScope.PUBLIC);
+
     }
 
     @Command(shortDescription = "Count all AIs in the world")

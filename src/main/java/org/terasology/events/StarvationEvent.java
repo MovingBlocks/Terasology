@@ -15,27 +15,31 @@
  */
 package org.terasology.events;
 
-import javax.vecmath.Vector3f;
-
 import org.terasology.entitySystem.AbstractEvent;
+import org.terasology.entitySystem.EntityRef;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
-public class HorizontalCollisionEvent extends AbstractEvent {
-    private Vector3f velocity;
-    private Vector3f location;
+public class StarvationEvent extends AbstractEvent {
+    private int amount;
+    private EntityRef instigator;
 
-    public HorizontalCollisionEvent(Vector3f velocity, Vector3f location) {
-        this.velocity = new Vector3f(velocity);
-        this.location = new Vector3f(location);
+    public StarvationEvent(int amount) {
+        this.amount = amount;
+        instigator = EntityRef.NULL;
     }
 
-    public Vector3f getVelocity() {
-        return velocity;
+    public StarvationEvent(int amount, EntityRef instigator) {
+        this.amount = amount;
+        this.instigator = instigator;
     }
 
-    public Vector3f getLocation() {
-        return location;
+    public int getAmount() {
+        return amount;
+    }
+
+    public EntityRef getInstigator() {
+        return instigator;
     }
 }
