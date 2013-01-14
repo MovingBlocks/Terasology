@@ -21,6 +21,8 @@ import org.terasology.entitySystem.AbstractEvent;
 
 /**
  * @author Immortius <immortius@gmail.com>
+ * @author Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
+ * 
  */
 public class HorizontalCollisionEvent extends AbstractEvent {
     private Vector3f velocity;

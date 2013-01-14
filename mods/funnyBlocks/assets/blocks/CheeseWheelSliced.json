@@ -18,5 +18,8 @@
 	"shadowCasting" : "false",
 	"rotation" : "Horizontal",
 	"shape" : "funnyBlocks:cheeseWheelSliced",
-	"tile" : "funnyBlocks:Cheese"
+	"tile" : "funnyBlocks:Cheese",
+	"entity" : {
+        	"prefab" : "funnyBlocks:CheeseWheelSliced"
+    	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright 2012 Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.types.GameType;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
  */
 @RegisterComponentSystem(authorativeOnly = true)
 public class HungerSystem implements EventHandlerSystem, UpdateSubscriberSystem {
@@ -101,6 +101,7 @@ public class HungerSystem implements EventHandlerSystem, UpdateSubscriberSystem 
     
     @ReceiveEvent(components = {HungerComponent.class})
     public void onEat(EatEvent event, EntityRef entity) {
+    	System.out.print("eating\n");
     	HungerComponent hunger = entity.getComponent(HungerComponent.class);
     	hunger.timeSinceLastEat=0;
     	hunger.currentContentment+=event.getAmount();
@@ -109,6 +110,9 @@ public class HungerSystem implements EventHandlerSystem, UpdateSubscriberSystem 
     		entity.send(new NoContentmentEvent(entity, hunger.maxContentment));
     		}else{
     			if(hunger.currentContentment >= hunger.maxContentment){
+    				//over eating is unhealthy
+    				//TODO add fancy overEating sound here
+    				entity.send(new StarvationEvent((hunger.maxContentment-hunger.currentContentment)/10));
     				entity.send(new FullContentmentEvent(entity, hunger.maxContentment));
     			}else entity.send(new ContentmentChangedEvent(entity, hunger.currentContentment, hunger.maxContentment));
     		}

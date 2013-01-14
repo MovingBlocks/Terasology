@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright 2012 Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package org.terasology.events;
 import org.terasology.entitySystem.EntityRef;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * @author Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
  */
 public class FullContentmentEvent extends ContentmentChangedEvent {
     public FullContentmentEvent(EntityRef instigator, int maxContentment) {

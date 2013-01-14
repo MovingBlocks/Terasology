@@ -13,33 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.events;
+package org.terasology.components;
 
-import org.terasology.entitySystem.AbstractEvent;
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.Component;
 
 /**
  * @author Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
  */
-public class StarvationEvent extends AbstractEvent {
-    private int amount;
-    private EntityRef instigator;
-
-    public StarvationEvent(int amount) {
-        this.amount = amount;
-        instigator = EntityRef.NULL;
+public final class ConsumableComponent implements Component {
+    // Configuration options
+	public int filling=1;
+	public int uses=1;
+	
+	//add effects here when bodycombonent is ready
+    public ConsumableComponent() {
     }
 
-    public StarvationEvent(int amount, EntityRef instigator) {
-        this.amount = amount;
-        this.instigator = instigator;
-    }
-
-    public int getAmount() {
-        return amount;
-    }
-
-    public EntityRef getInstigator() {
-        return instigator;
-    }
 }
