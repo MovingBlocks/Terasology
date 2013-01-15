@@ -4,5 +4,12 @@
         "icon" : "Coal",
         "renderWithIcon" : true,
         "stackId" : "core:coal"
+    },
+    "CraftRecipe" : {
+        "refinement": {
+             "instigator": "coalore",
+             "target":     "coalore"
+         },
+         "resultCount": 4
     }
 }

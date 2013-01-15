@@ -13,10 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-/**
- * A chest is interesting for two reasons: It is asymmetrical (front texture differs) and should store stuff
- */
 {
     "rotation" : "horizontal",
     "translucent" : true,
