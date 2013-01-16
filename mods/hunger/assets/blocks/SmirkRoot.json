@@ -14,16 +14,24 @@
  * limitations under the License.
  */
 
+/**
+ * GooseGrass
+ */
 {
-"Item" : {
-        "name" : "Banana",
-        "icon" : "banana",
-        "usage" : "ON_USER",
-        "consumedOnUse" : true,
-        "renderWithIcon" : true
-    },
-	"Consumable": {
-        	"filling" : 20,
-	 	"uses" : 1
-    	} 
+    "attachmentAllowed" : false,
+    "supportRequired" : true,
+    "shape" : "engine:billboard",
+    "replacementAllowed" : true,
+    "doubleSided" : true,
+    "penetrable" : true,
+    "shadowCasting" : false,
+    "hardness" : 1,
+    "waving" : true,
+    "penetrable" : true,
+    "targetable" : true,
+    "debrisOnDestroy" : true,
+    "luminance" : 10,
+    "entity" : {
+        "prefab" : "hunger:SmirkRoot"
+    }
 }

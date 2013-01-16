@@ -1,4 +1,4 @@
-/*
+ /*
  * Copyright 2012 Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 {
 	"Consumable": {
-        	"filling" : 30,
-	 	"uses" : 1
-    	} 
+		"filling" : -100,
+	 	"uses" : 5
+   	}
 }

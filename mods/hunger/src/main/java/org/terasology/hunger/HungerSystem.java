@@ -109,7 +109,7 @@ public class HungerSystem implements EventHandlerSystem, UpdateSubscriberSystem 
     			if(hunger.currentContentment >= hunger.maxContentment){
     				//over eating is unhealthy
     				//TODO add fancy overEating sound here
-    				entity.send(new StarvationEvent((hunger.maxContentment-hunger.currentContentment)/10));
+    				entity.send(new StarvationEvent((hunger.currentContentment-hunger.maxContentment)/10));
     				entity.send(new FullContentmentEvent(entity, hunger.maxContentment));
     			}else entity.send(new ContentmentChangedEvent(entity, hunger.currentContentment, hunger.maxContentment));
     		}

@@ -69,7 +69,7 @@ public class ConsumableSystem implements EventHandlerSystem {
         
         //reduce blocks uses
         consum.uses-=1;
-        logger.info("Food uses:"+consum.uses+"\n");
+        logger.info("Food uses:"+consum.uses+" filling :"+ consum.filling);
         
         //eat it
         player.send(new EatEvent(player,consum.filling));

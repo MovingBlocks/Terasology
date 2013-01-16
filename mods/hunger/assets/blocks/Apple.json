@@ -14,9 +14,23 @@
  * limitations under the License.
  */
 
+/**
+ * Apple
+ */
 {
-	"Consumable": {
-        	"filling" : 30,
-	 	"uses" : 1
-    	} 
+    "attachmentAllowed" : false,
+    "supportRequired" : false,
+    "shape" : "engine:billboard",
+    "replacementAllowed" : true,
+    "doubleSided" : true,
+    "penetrable" : true,
+    "shadowCasting" : false,
+    "hardness" : 1,
+    "waving" : false,
+    "penetrable" : true,
+    "targetable" : true,
+    "debrisOnDestroy" : true,
+    "entity" : {
+        "prefab" : "hunger:Apple"
+    }
 }
