@@ -125,6 +125,18 @@ public class GUIManager implements EventHandlerSystem {
     }
 
     /**
+     * Updates all visible display elements and their child's. Will update the layout if force is set to true.
+     */
+    public void update(boolean force) {
+        renderer.update();
+
+        if (Display.wasResized() || force) {
+            renderer.setSize(new Vector2f(Display.getWidth(), Display.getHeight()));
+            renderer.layout();
+        }
+    }
+
+    /**
      * Add an window to the UI. Therefore it can be rendered and updated.
      * @param window The window to add.
      * @return Returns the added window.
