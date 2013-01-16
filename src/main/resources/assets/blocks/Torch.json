@@ -33,7 +33,7 @@
     "hardness" : 1,
     "entity" : {
         "prefab" : "core:torch",
-        "mode" : "persistent"
+        "mode" : "on_interaction"
     },
     "inventory" : {
         "directPickup" : true

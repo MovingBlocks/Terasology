@@ -256,7 +256,7 @@ public class BlockManager {
             blocksById.put(block.getId(), block);
             blocksByUri.put(block.getURI(), block);
 
-            if( block.getEntityPrefab().length() > 0 ){
+            if( !block.getEntityPrefab().isEmpty() ){
                 blocksByPrefabName.put(block.getEntityPrefab(), block);
             }
         }

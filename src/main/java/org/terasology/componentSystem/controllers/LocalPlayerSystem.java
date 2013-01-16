@@ -443,7 +443,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
             if( !currentBlock.isInvisible()  &&
                 !currentBlock.isLiquid()     &&
-                !currentBlock.isPenetrable()
+                !currentBlock.isPenetrable() &&
+                 currentBlock.isCraftPlace()
               ){
                 InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
                 if (localPlayerComp.isDead) return;
@@ -467,7 +468,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
                 EntityRef placedEntity = blockItemComponent.placedEntity;
 
-                if( !craftEntity.equals(EntityRef.NULL) ){
+                if( craftEntity.exists() ){
                     craftEntity.send(new ActivateEvent(target, selectedItemEntity, new Vector3f(playerCamera.getPosition()), new Vector3f(playerCamera.getViewingDirection()), event.getHitPosition(), event.getHitNormal()));
                     placedEntity.send(new ActivateEvent(target, selectedItemEntity, new Vector3f(playerCamera.getPosition()), new Vector3f(playerCamera.getViewingDirection()), event.getHitPosition(), event.getHitNormal()));
                     craftEntity.destroy();

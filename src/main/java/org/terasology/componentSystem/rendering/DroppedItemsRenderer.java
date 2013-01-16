@@ -54,16 +54,10 @@ public class DroppedItemsRenderer  implements RenderSystem, EventHandlerSystem {
     private static final Logger logger = LoggerFactory.getLogger(MeshRenderer.class);
     private WorldRenderer worldRenderer;
     private Set< EntityRef> itemMesh = Sets.newHashSet();
-    private Set<EntityRef>  billBoardMesh = Sets.newHashSet();
-    private PostProcessingRenderer.FBO fbo = null;
-    public int lastRendered;
-    private String fboId;
 
     @Override
     public void initialise() {
         worldRenderer = CoreRegistry.get(WorldRenderer.class);
-        fboId = "dropped_items_id";
-        fbo = PostProcessingRenderer.getInstance().createFBO(fboId, Display.getWidth(), Display.getHeight(), false, false);
     }
 
 
@@ -74,15 +68,6 @@ public class DroppedItemsRenderer  implements RenderSystem, EventHandlerSystem {
         if( item != null){
             MeshComponent meshComponent = entity.getComponent(MeshComponent.class);
             itemMesh.add(entity);
-            /*switch(meshComponent.renderType){
-
-                case Extrude:
-                    itemMesh.put(meshComponent.material, entity);
-                    break;
-                case Billboard:
-                    billBoardMesh.add(entity);
-                    break;
-            }                                            */
         }
     }
 
@@ -92,14 +77,7 @@ public class DroppedItemsRenderer  implements RenderSystem, EventHandlerSystem {
 
         if( item != null){
             MeshComponent meshComponent = entity.getComponent(MeshComponent.class);
-            switch(meshComponent.renderType){
-                case Extrude:
-                    itemMesh.remove(entity);
-                    break;
-                case Billboard:
-                    billBoardMesh.remove(entity);
-                    break;
-            }
+            itemMesh.remove(entity);
         }
     }
 

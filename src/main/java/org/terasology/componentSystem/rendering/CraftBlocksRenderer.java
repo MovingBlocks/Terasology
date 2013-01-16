@@ -221,7 +221,7 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
         shader.setFloat3("colorOffset", color.x, color.y, color.z);
 
         if(notCurrentLevel){
-            shader.setFloat("necessarilyAlpha", 0.3f);
+            shader.setFloat("alpha", 0.3f);
         }
 
         shader.setInt("textured", 1);
@@ -246,7 +246,7 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
         }
         glDisable(GL11.GL_BLEND);
         if(notCurrentLevel){
-            shader.setFloat("necessarilyAlpha", 0.0f);
+            shader.setFloat("alpha", 1.0f);
         }
     }
 
@@ -255,7 +255,7 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
         shader.enable();
 
         if(notCurrentLevel){
-            shader.setFloat("necessarilyAlpha", 0.3f);
+            shader.setFloat("alpha", 0.3f);
         }
 
         shader.setInt("textured", 0);

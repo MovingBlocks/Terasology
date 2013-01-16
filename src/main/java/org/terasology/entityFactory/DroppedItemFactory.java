@@ -78,7 +78,6 @@ public class DroppedItemFactory {
             itemEntity.addComponent(hull);*/
             //HullShapeComponent
             itemMeshComponent.mesh = itemMesh;
-            itemMeshComponent.renderType = MeshComponent.RenderType.Extrude;
             itemEntity.saveComponent(itemMeshComponent);
 
             LifespanComponent lifespanComp = itemEntity.getComponent(LifespanComponent.class);

@@ -10,7 +10,9 @@ import javax.vecmath.Vector4f;
 
 import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.Color;
+import org.terasology.componentSystem.items.InventorySystem;
 import org.terasology.components.ItemComponent;
+import org.terasology.components.PlayerComponent;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -19,12 +21,14 @@ import org.terasology.entitySystem.PrefabManager;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.WindowListener;
 import org.terasology.rendering.gui.layout.GridLayout;
 import org.terasology.rendering.gui.widgets.UICompositeScrollable;
 import org.terasology.rendering.gui.widgets.UIItemCell;
+import org.terasology.rendering.gui.widgets.UIItemContainer;
 import org.terasology.rendering.gui.widgets.UIWindow;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.management.BlockManager;
@@ -45,10 +49,23 @@ public class UIScreenItems extends UIWindow {
     private ClickListener clickListener = new ClickListener() {
         @Override
         public void click(UIDisplayElement element, int button) {
-            UIItemCell item = (UIItemCell) element;
-            EntityManager entityManager = CoreRegistry.get(EntityManager.class);
-            EntityRef player = CoreRegistry.get(LocalPlayer.class).getEntity();
-            player.send(new ReceiveItemEvent(entityManager.copy(item.getItemEntity())));
+            if( CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(PlayerComponent.class).transferSlot.exists() ){
+                CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(PlayerComponent.class).transferSlot.destroy();
+                UIItemContainer inventory = (UIItemContainer)CoreRegistry.get(GUIManager.class).getWindowById("inventory").getElementById("inventory");
+
+                for(UIItemCell cell : inventory.getCells()){
+                    if(cell.getTransferItemIcon().isVisible()){
+                        cell.getTransferItemIcon().setVisible(false);
+                        break;
+                    }
+                }
+
+            }else{
+                UIItemCell item = (UIItemCell) element;
+                EntityManager entityManager = CoreRegistry.get(EntityManager.class);
+                EntityRef player = CoreRegistry.get(LocalPlayer.class).getEntity();
+                player.send(new ReceiveItemEvent(entityManager.copy(item.getItemEntity())));
+            }
         }
     };
     
@@ -119,7 +136,17 @@ public class UIScreenItems extends UIWindow {
                     UIItemCell cell = new UIItemCell(null, cellSize);
                     cell.setDrag(false);
                     cell.setItemEntity(entity, 0);
-                    cell.setDisplayItemCount(false);
+
+                    ItemComponent itemComponent = entity.getComponent(ItemComponent.class);
+
+                    if ( !itemComponent.stackId.isEmpty() ){
+                        itemComponent.stackCount = InventorySystem.MAX_STACK;
+                        cell.setDisplayItemCount(true);
+                        entity.saveComponent(itemComponent);
+                    }else{
+                        cell.setDisplayItemCount(false);
+                    }
+
                     cell.setVisible(true);
                     cell.addClickListener(clickListener);
                     

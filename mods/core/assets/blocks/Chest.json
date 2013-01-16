@@ -19,6 +19,7 @@
  */
 {
     "rotation" : "horizontal",
+    "craftPlace" : false,
     // Graphics
     "tiles" : {
         "sides" : "core:ChestSides",

@@ -19,6 +19,7 @@ import com.google.common.collect.Lists;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LocalPlayerComponent;
+import org.terasology.components.PlayerComponent;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -29,11 +30,13 @@ import org.terasology.events.NoHealthEvent;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.layout.GridLayout;
 import org.terasology.rendering.gui.widgets.UICompositeScrollable;
 import org.terasology.rendering.gui.widgets.UIItemCell;
+import org.terasology.rendering.gui.widgets.UIItemContainer;
 import org.terasology.rendering.gui.widgets.UIWindow;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.management.BlockManager;
@@ -59,10 +62,24 @@ public class FreeStyleType extends GameType {
     private ClickListener         inventoryClickListener = new ClickListener() {
         @Override
         public void click(UIDisplayElement element, int button) {
-            UIItemCell item = (UIItemCell) element;
-            EntityManager entityManager = CoreRegistry.get(EntityManager.class);
-            EntityRef player = CoreRegistry.get(LocalPlayer.class).getEntity();
-            player.send(new ReceiveItemEvent(entityManager.copy(item.getItemEntity())));
+
+            if( CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(PlayerComponent.class).transferSlot.exists() ){
+                CoreRegistry.get(LocalPlayer.class).getEntity().getComponent(PlayerComponent.class).transferSlot.destroy();
+                UIItemContainer inventory = (UIItemContainer)CoreRegistry.get(GUIManager.class).getWindowById("inventory").getElementById("inventory");
+
+                for(UIItemCell cell : inventory.getCells()){
+                    if(cell.getTransferItemIcon().isVisible()){
+                        cell.getTransferItemIcon().setVisible(false);
+                        break;
+                    }
+                }
+
+            }else{
+                UIItemCell item = (UIItemCell) element;
+                EntityManager entityManager = CoreRegistry.get(EntityManager.class);
+                EntityRef player = CoreRegistry.get(LocalPlayer.class).getEntity();
+                player.send(new ReceiveItemEvent(entityManager.copy(item.getItemEntity())));
+            }
         }
     };
 

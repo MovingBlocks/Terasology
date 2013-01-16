@@ -241,6 +241,10 @@ public class UIItemCell extends UIDisplayContainer  {
             }
         }
     };
+
+    public UIItemCellIcon getTransferItemIcon(){
+        return transferIcon;
+    }
     
     /**
      * Displays a little icon and item count for an item cell.
