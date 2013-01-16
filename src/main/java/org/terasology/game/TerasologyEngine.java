@@ -361,13 +361,7 @@ public class TerasologyEngine implements GameEngine {
 
     private void initDisplay() {
         try {
-            if (Config.getInstance().isFullscreen()) {
-                Display.setDisplayMode(Display.getDesktopDisplayMode());
-                Display.setFullscreen(true);
-            } else {
-                Display.setDisplayMode(Config.getInstance().getDisplayMode());
-                Display.setResizable(true);
-            }
+            setDisplayMode();
 
             Display.setTitle("Terasology" + " | " + "Pre Alpha");
             Display.create(Config.getInstance().getPixelFormat());
@@ -525,5 +519,29 @@ public class TerasologyEngine implements GameEngine {
         }
         currentState = newState;
         newState.init(this);
+    }
+
+    private void setDisplayMode() {
+        try {
+            if (Config.getInstance().isFullscreen()) {
+                Display.setDisplayMode(Display.getDesktopDisplayMode());
+                Display.setFullscreen(true);
+            } else {
+                Display.setDisplayMode(Config.getInstance().getDisplayMode());
+                Display.setResizable(true);
+            }
+        } catch (LWJGLException e) {
+            logger.error("Can not initialize graphics device.", e);
+            System.exit(1);
+        }
+    }
+
+    public void setFullscreen(Boolean state) {
+        if (Config.getInstance().isFullscreen() != state) {
+            Config.getInstance().setFullscreen(state);
+            setDisplayMode();
+            resizeViewport();
+            CoreRegistry.get(GUIManager.class).update(true);
+        }
     }
 }
