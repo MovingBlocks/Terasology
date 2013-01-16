@@ -17,5 +17,6 @@
 {
     "shape" : "engine:door",
     "rotation" : "horizontal",
-    "attachmentAllowed" : false
+    "attachmentAllowed" : false,
+    "craftPlace" : false
 }

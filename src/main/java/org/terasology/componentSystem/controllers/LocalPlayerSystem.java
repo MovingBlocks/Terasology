@@ -19,18 +19,27 @@ import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.*;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.components.actions.CraftingActionComponent;
+import org.terasology.components.utility.DroppedItemTypeComponent;
+import org.terasology.entityFactory.BlockItemFactory;
+import org.terasology.entityFactory.DroppedItemFactory;
+import org.terasology.entitySystem.*;
+import org.terasology.events.crafting.AddItemEvent;
+import org.terasology.events.crafting.ChangeLevelEvent;
+import org.terasology.events.crafting.CheckRefinementEvent;
+import org.terasology.events.crafting.DeleteItemEvent;
+import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
+import org.terasology.rendering.CraftingGrid;
+import org.terasology.rendering.gui.framework.UIDisplayContainer;
+import org.terasology.rendering.gui.layout.ChooseRowLayout;
+import org.terasology.rendering.gui.widgets.UICompositeScrollable;
 import org.terasology.rendering.gui.widgets.UIImage;
-import org.terasology.world.block.BlockComponent;
-import org.terasology.world.block.BlockItemComponent;
+import org.terasology.rendering.gui.widgets.UIItemContainer;
+import org.terasology.world.block.*;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entityFactory.DroppedBlockFactory;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.ActivateEvent;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.HealthChangedEvent;
@@ -48,13 +57,12 @@ import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.world.WorldProvider;
 import org.terasology.math.TeraMath;
-import org.terasology.world.block.Block;
 import org.terasology.math.AABB;
 import org.terasology.physics.ImpulseEvent;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.cameras.DefaultCamera;
-import org.terasology.world.block.BlockRegionComponent;
+import org.terasology.world.block.management.BlockManager;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3d;
@@ -76,7 +84,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     private DefaultCamera playerCamera;
 
     private long lastTimeSpacePressed;
-    private long lastInteraction, lastTimeThrowInteraction;
+    private long lastInteraction, lastTimeThrowInteraction, lastTimeShowInventory;
 
     private boolean cameraBobbing = Config.getInstance().isCameraBobbing();
     private float bobFactor = 0;
@@ -85,6 +93,18 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     private Vector3f relativeMovement = new Vector3f();
 
     private AABBRenderer aabbRenderer = new AABBRenderer(AABB.createEmpty());
+
+    //Crafting
+    private boolean useButtonPushed = false;
+    private boolean toolbarChanged     = false;
+    private boolean itsCraftActionTime = false;
+
+    private CraftingGrid craftingGridRenderer = new CraftingGrid();
+
+    private int verticalStep = 0;
+    private final int maxVerticalStep = 2;
+    private int craftIncreaseDecreaseSpeed = 1;
+    private boolean dontDrop = false;
 
     @Override
     public void initialise() {
@@ -128,6 +148,18 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
         entity.saveComponent(characterMovementComponent);
         entity.saveComponent(localPlayerComponent);
+
+        if(toolbarChanged && cameraTargetSystem.getTarget().getComponent(CraftingActionComponent.class) == null){
+            UIItemContainer toolbar = (UIItemContainer)CoreRegistry.get(GUIManager.class).getWindowById("hud").getElementById("toolbar");
+            toolbar.setEntity(localPlayer.getEntity(), 0, 9);
+            toolbarChanged = false;
+        }
+
+        UIDisplayContainer inventory = (UIDisplayContainer)CoreRegistry.get(GUIManager.class).getWindowById("hud").getElementById("hud:inventory");
+
+        if( inventory.isVisible() && timer.getTimeInMs() - lastTimeShowInventory >= 1500){
+            inventory.setVisible(false);
+        }
     }
 
     @ReceiveEvent(components = LocalPlayerComponent.class)
@@ -136,6 +168,11 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         localPlayer.viewYaw = (localPlayer.viewYaw - event.getValue()) % 360;
         entity.saveComponent(localPlayer);
         LocationComponent loc = entity.getComponent(LocationComponent.class);
+
+        if( event.getTarget().hasComponent(CraftingActionComponent.class) ){
+            event.getTarget().send(new CheckRefinementEvent(event.getTarget(), entity) );
+        }
+
         if (loc != null) {
             QuaternionUtil.setEuler(loc.getLocalRotation(), TeraMath.DEG_TO_RAD * localPlayer.viewYaw, 0, 0);
             entity.saveComponent(loc);
@@ -146,9 +183,25 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     @ReceiveEvent(components = LocalPlayerComponent.class)
     public void onMouseY(MouseYAxisEvent event, EntityRef entity) {
         LocalPlayerComponent localPlayer = entity.getComponent(LocalPlayerComponent.class);
-        localPlayer.viewPitch = TeraMath.clamp(localPlayer.viewPitch - event.getValue(), -89, 89);
-        entity.saveComponent(localPlayer);
-        event.consume();
+
+        if( event.getTarget().hasComponent(CraftingActionComponent.class) ){
+            event.getTarget().send(new CheckRefinementEvent(event.getTarget(), entity) );
+        }
+
+        if(itsCraftActionTime){
+            craftIncreaseDecreaseSpeed += event.getValue();
+            if(craftIncreaseDecreaseSpeed > 32){
+                craftIncreaseDecreaseSpeed = 32;
+            }
+
+            if( craftIncreaseDecreaseSpeed < 1){
+                craftIncreaseDecreaseSpeed = 1;
+            }
+        }else{
+            localPlayer.viewPitch = TeraMath.clamp(localPlayer.viewPitch - event.getValue(), -89, 89);
+            entity.saveComponent(localPlayer);
+            event.consume();
+        }
     }
 
     @ReceiveEvent(components = {LocalPlayerComponent.class, CharacterMovementComponent.class})
@@ -213,8 +266,14 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
                 }
             }
             if (aabb != null) {
-                aabbRenderer.setAABB(aabb);
-                aabbRenderer.render(2f);
+                if( target.getComponent(CraftingActionComponent.class) != null){
+                    craftingGridRenderer.setAABB(aabb, target.getComponent(CraftingActionComponent.class).getCurrentLevel());
+                    craftingGridRenderer.render();
+                }else{
+                    aabbRenderer.setAABB(aabb);
+                    aabbRenderer.render(2f);
+                }
+
             }
         }
     }
@@ -303,7 +362,32 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
     @ReceiveEvent(components = {LocalPlayerComponent.class, InventoryComponent.class})
     public void onAttackRequest(AttackButton event, EntityRef entity) {
-        if (!event.isDown() || timer.getTimeInMs() - lastInteraction < 200) {
+        if (!event.isDown() || timer.getTimeInMs() - lastInteraction < 200/craftIncreaseDecreaseSpeed) {
+            if(!event.isDown()){
+                craftIncreaseDecreaseSpeed = 1;
+                itsCraftActionTime = false;
+                CraftingActionComponent craftingComponent = event.getTarget().getComponent(CraftingActionComponent.class);
+                if(craftingComponent != null && entity.getComponent(CharacterMovementComponent.class).isRunning){
+                    event.getTarget().send(new ChangeLevelEvent(-1, entity));
+                    return;
+                }
+            }
+            return;
+        }
+
+        CraftingActionComponent craftingComponent = event.getTarget().getComponent(CraftingActionComponent.class);
+
+        if (craftingComponent != null) {
+             if(!entity.getComponent(CharacterMovementComponent.class).isRunning && timer.getTimeInMs() - lastInteraction > (200/craftIncreaseDecreaseSpeed)){
+                 LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
+                 if (localPlayerComp.isDead) return;
+                 float dropPower  = getDropPower();
+                 event.getTarget().send(new DeleteItemEvent( dropPower/6));
+                 dontDrop = true;
+                 resetDropMark();
+                 lastInteraction = timer.getTimeInMs();
+                 itsCraftActionTime = true;
+             }
             return;
         }
 
@@ -348,6 +432,61 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
         if (localPlayerComp.isDead) return;
 
+        EntityRef target = event.getTarget();
+
+        BlockComponent block = target.getComponent(BlockComponent.class);
+
+        if(block != null){
+            Block currentBlock = worldProvider.getBlock(block.getPosition());
+
+            EntityManager entityManager = CoreRegistry.get(EntityManager.class);
+
+            if( !currentBlock.isInvisible()  &&
+                !currentBlock.isLiquid()     &&
+                !currentBlock.isPenetrable() &&
+                 currentBlock.isCraftPlace()
+              ){
+                InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
+                if (localPlayerComp.isDead) return;
+
+                EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayerComp.selectedTool);
+
+                ItemComponent item  = selectedItemEntity.getComponent(ItemComponent.class);
+
+                if(item == null){
+                    return;
+                }
+
+                BlockItemFactory blockFactory = new BlockItemFactory(entityManager);
+                EntityRef craftEntity = blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("core:craft"));
+
+                BlockItemComponent blockItemComponent = craftEntity.getComponent(BlockItemComponent.class);
+
+                if(!blockItemComponent.placedEntity.hasComponent(CraftingActionComponent.class)){
+                    blockItemComponent.placedEntity.addComponent(new CraftingActionComponent());
+                }
+
+                EntityRef placedEntity = blockItemComponent.placedEntity;
+
+                if( craftEntity.exists() ){
+                    craftEntity.send(new ActivateEvent(target, selectedItemEntity, new Vector3f(playerCamera.getPosition()), new Vector3f(playerCamera.getViewingDirection()), event.getHitPosition(), event.getHitNormal()));
+                    placedEntity.send(new ActivateEvent(target, selectedItemEntity, new Vector3f(playerCamera.getPosition()), new Vector3f(playerCamera.getViewingDirection()), event.getHitPosition(), event.getHitNormal()));
+                    craftEntity.destroy();
+
+                    if(item.stackCount<=0){
+                        selectedItemEntity.destroy();
+                    }
+
+                }
+                lastInteraction = timer.getTimeInMs();
+                localPlayerComp.handAnimation = 0.5f;
+                entity.saveComponent(localPlayerComp);
+                event.consume();
+                return;
+            }
+
+         }
+
         event.getTarget().send(new ActivateEvent(entity, entity, playerCamera.getPosition(), playerCamera.getViewingDirection(), event.getHitPosition(), event.getHitNormal()));
         event.consume();
     }
@@ -358,8 +497,9 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
         EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayerComp.selectedTool);
         BlockItemComponent block = selectedItemEntity.getComponent(BlockItemComponent.class);
+        CraftingActionComponent craftingComponent = event.getTarget().getComponent(CraftingActionComponent.class);
 
-        if(!selectedItemEntity.hasComponent(BlockItemComponent.class) || block.blockFamily.getArchetypeBlock().isPenetrable()){
+        if( selectedItemEntity.equals(EntityRef.NULL) && craftingComponent == null ){
             return;
         }
 
@@ -374,46 +514,61 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
         crossHair.getTextureSize().set(new Vector2f(22f / 256f, 22f / 256f));
 
-        float dropPower  = (float)Math.floor((timer.getTimeInMs() - lastTimeThrowInteraction)/200);
-
-        if(dropPower>6){
-            dropPower = 6;
-        }
+        float dropPower  = getDropPower();
 
         crossHair.getTextureOrigin().set(new Vector2f((46f + 22f*dropPower) / 256f, 23f / 256f));
 
         if(event.getState() == ButtonState.UP){
-            dropPower *= 25f;
 
-            EntityManager entityManager = CoreRegistry.get(EntityManager.class);
-            DroppedBlockFactory droppedBlockFactory = new DroppedBlockFactory(entityManager);
-
-            Vector3f newPosition = new Vector3f(playerCamera.getPosition().x + playerCamera.getViewingDirection().x*1.5f,
-                                                playerCamera.getPosition().y + playerCamera.getViewingDirection().y*1.5f,
-                                                playerCamera.getPosition().z + playerCamera.getViewingDirection().z*1.5f
-                                               );
-
-            EntityRef droppedBlock = droppedBlockFactory.newInstance(new Vector3f(newPosition), block.blockFamily, 20);
-
-            if(!droppedBlock.equals(EntityRef.NULL)){
-
-                droppedBlock.send(new ImpulseEvent(new Vector3f(playerCamera.getViewingDirection().x*dropPower, playerCamera.getViewingDirection().y*dropPower, playerCamera.getViewingDirection().z*dropPower)));
-
-                ItemComponent item  = selectedItemEntity.getComponent(ItemComponent.class);
-                item.stackCount--;
-
-                if(item.stackCount<=0){
-                    selectedItemEntity.destroy();
-                }
-
-                localPlayerComp.handAnimation = 0.5f;
+            if(dontDrop){
+                resetDropMark();
+                dontDrop = false;
+                return;
             }
 
-            lastTimeThrowInteraction = 0;
-            crossHair.getTextureSize().set(new Vector2f(20f / 256f, 20f / 256f));
-            crossHair.getTextureOrigin().set(new Vector2f(24f / 256f, 24f / 256f));
+            dropPower *= 25f;
+
+            if( craftingComponent == null ){
+
+                EntityManager entityManager = CoreRegistry.get(EntityManager.class);
+                ItemComponent item  = selectedItemEntity.getComponent(ItemComponent.class);
+
+                Vector3f newPosition = new Vector3f(playerCamera.getPosition().x + playerCamera.getViewingDirection().x*1.5f,
+                                                    playerCamera.getPosition().y + playerCamera.getViewingDirection().y*1.5f,
+                                                    playerCamera.getPosition().z + playerCamera.getViewingDirection().z*1.5f
+                                                   );
+
+                boolean changed = false;
+                if(!selectedItemEntity.hasComponent(BlockItemComponent.class)){
+                    DroppedItemFactory droppedItemFactory = new DroppedItemFactory(entityManager);
+                    EntityRef droppedItem = droppedItemFactory.newInstance(new Vector3f(newPosition), item.icon, 200, selectedItemEntity);
+
+                    if(!droppedItem.equals(EntityRef.NULL)){
+                        droppedItem.send(new ImpulseEvent(new Vector3f(playerCamera.getViewingDirection().x*dropPower, playerCamera.getViewingDirection().y*dropPower, playerCamera.getViewingDirection().z*dropPower)));
+                        changed = true;
+                    }
+                }else{
+                    DroppedBlockFactory droppedBlockFactory = new DroppedBlockFactory(entityManager);
+                    EntityRef droppedBlock = droppedBlockFactory.newInstance(new Vector3f(newPosition), block.blockFamily, 20);
+                    if(!droppedBlock.equals(EntityRef.NULL)){
+                        droppedBlock.send(new ImpulseEvent(new Vector3f(playerCamera.getViewingDirection().x*dropPower, playerCamera.getViewingDirection().y*dropPower, playerCamera.getViewingDirection().z*dropPower)));
+                        changed = true;
+                    }
+                }
 
 
+
+                if(changed){
+                    item.stackCount--;
+
+                    if(item.stackCount<=0){
+                        selectedItemEntity.destroy();
+                    }
+
+                    localPlayerComp.handAnimation = 0.5f;
+                }
+            }
+            resetDropMark();
         }
 
         entity.saveComponent(localPlayerComp);
@@ -423,19 +578,77 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     @ReceiveEvent(components = {LocalPlayerComponent.class})
     public void onNextItem(ToolbarNextButton event, EntityRef entity) {
         LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
-        localPlayerComp.selectedTool = (localPlayerComp.selectedTool + 1) % 10;
+        CharacterMovementComponent characterMovement = localPlayer.getEntity().getComponent(CharacterMovementComponent.class);
+
+        if(characterMovement.isRunning && cameraTargetSystem.getTarget().getComponent(CraftingActionComponent.class) != null){
+            InventoryComponent inventory = localPlayer.getEntity().getComponent(InventoryComponent.class);
+            UIItemContainer toolbar = (UIItemContainer)CoreRegistry.get(GUIManager.class).getWindowById("hud").getElementById("toolbar");
+
+            int slotStart = toolbar.getSlotStart();
+            int slotEnd   = toolbar.getSlotEnd();
+
+            slotStart += 10;
+            slotEnd   += 10;
+
+            if( slotEnd > inventory.itemSlots.size() - 1 ){
+                slotStart = 0;
+                slotEnd   = 9;
+            }
+
+            toolbar.setEntity(localPlayer.getEntity(), slotStart, slotEnd);
+            toolbarChanged = true;
+            showSmallInventory((slotEnd + 1)/10);
+        }else{
+            localPlayerComp.selectedTool = (localPlayerComp.selectedTool + 1) % 10;
+        }
         localPlayer.getEntity().saveComponent(localPlayerComp);
+
+        if( cameraTargetSystem.getTarget().hasComponent(CraftingActionComponent.class) ){
+            cameraTargetSystem.getTarget().send(new CheckRefinementEvent(cameraTargetSystem.getTarget(), entity) );
+        }
+
         event.consume();
     }
 
     @ReceiveEvent(components = {LocalPlayerComponent.class})
     public void onPrevItem(ToolbarPrevButton event, EntityRef entity) {
         LocalPlayerComponent localPlayerComp = localPlayer.getEntity().getComponent(LocalPlayerComponent.class);
-        localPlayerComp.selectedTool = (localPlayerComp.selectedTool - 1) % 10;
-        if (localPlayerComp.selectedTool < 0) {
-            localPlayerComp.selectedTool = 10 + localPlayerComp.selectedTool;
+        CharacterMovementComponent characterMovement = localPlayer.getEntity().getComponent(CharacterMovementComponent.class);
+
+        if(characterMovement.isRunning && cameraTargetSystem.getTarget().getComponent(CraftingActionComponent.class) != null){
+            InventoryComponent inventory = localPlayer.getEntity().getComponent(InventoryComponent.class);
+            UIItemContainer toolbar = (UIItemContainer)CoreRegistry.get(GUIManager.class).getWindowById("hud").getElementById("toolbar");
+
+            int slotStart = toolbar.getSlotStart();
+            int slotEnd   = toolbar.getSlotEnd();
+
+            slotStart -= 10;
+            slotEnd   -= 10;
+
+            if( slotStart < -1 ){
+                slotStart = inventory.itemSlots.size() - 10;
+                slotEnd   = inventory.itemSlots.size() - 1;
+            }
+
+            if( slotStart < 0){
+                slotStart = 0;
+            }
+
+            toolbar.setEntity(localPlayer.getEntity(), slotStart, slotEnd);
+            toolbarChanged = true;
+            showSmallInventory((slotEnd + 1)/10);
+        }else{
+            localPlayerComp.selectedTool = (localPlayerComp.selectedTool - 1) % 10;
+            if (localPlayerComp.selectedTool < 0) {
+                localPlayerComp.selectedTool = 10 + localPlayerComp.selectedTool;
+            }
         }
         localPlayer.getEntity().saveComponent(localPlayerComp);
+
+        if( cameraTargetSystem.getTarget().hasComponent(CraftingActionComponent.class) ){
+            cameraTargetSystem.getTarget().send(new CheckRefinementEvent(cameraTargetSystem.getTarget(), entity) );
+        }
+
         event.consume();
     }
 
@@ -448,7 +661,42 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
     @ReceiveEvent(components = {LocalPlayerComponent.class, InventoryComponent.class})
     public void onUseItemRequest(UseItemButton event, EntityRef entity) {
-        if (!event.isDown() || timer.getTimeInMs() - lastInteraction < 200) {
+        if (!event.isDown() || timer.getTimeInMs() - lastInteraction < 200/craftIncreaseDecreaseSpeed) {
+            if(!event.isDown()){
+                useButtonPushed = false;
+                itsCraftActionTime = false;
+                craftIncreaseDecreaseSpeed = 1;
+                CraftingActionComponent craftingComponent = event.getTarget().getComponent(CraftingActionComponent.class);
+                if(craftingComponent != null && entity.getComponent(CharacterMovementComponent.class).isRunning){
+                    event.getTarget().send(new ChangeLevelEvent( 1, entity));
+                    return;
+                }
+            }
+            return;
+        }
+
+        CraftingActionComponent craftingComponent = event.getTarget().getComponent(CraftingActionComponent.class);
+
+        if (craftingComponent != null) {
+            useButtonPushed = true;
+            if( timer.getTimeInMs() - lastInteraction > ( 200/craftIncreaseDecreaseSpeed ) &&
+                !entity.getComponent(CharacterMovementComponent.class).isRunning )
+            {
+                LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
+                if (localPlayerComp.isDead) return;
+                InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
+                UIItemContainer toolbar = (UIItemContainer)CoreRegistry.get(GUIManager.class).getWindowById("hud").getElementById("toolbar");
+
+                EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayerComp.selectedTool + toolbar.getSlotStart());
+
+                if( !selectedItemEntity.equals(EntityRef.NULL) ){
+                    float dropPower  = getDropPower();
+                    itsCraftActionTime = true;
+                    event.getTarget().send(new AddItemEvent(event.getTarget(), selectedItemEntity, dropPower/6));
+                    resetDropMark();
+                    lastInteraction = timer.getTimeInMs();
+                }
+            }
             return;
         }
 
@@ -462,6 +710,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         if (item != null && item.usage != ItemComponent.UsageType.NONE) {
             useItem(event.getTarget(), entity, selectedItemEntity, event.getHitPosition(), event.getHitNormal());
         }
+
+
         lastInteraction = timer.getTimeInMs();
         localPlayerComp.handAnimation = 0.5f;
         entity.saveComponent(localPlayerComp);
@@ -480,6 +730,32 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         return (float) java.lang.Math.sin(bobFactor * frequency + phaseOffset) * amplitude;
     }
 
+    private void showSmallInventory(int position){
+        UICompositeScrollable inventory = (UICompositeScrollable)CoreRegistry.get(GUIManager.class).getWindowById("hud").getElementById("hud:inventory");
+        inventory.setVisible(true);
+        ((ChooseRowLayout)inventory.getLayout()).getPosition().y = (position - 1) * 36f;
+        lastTimeShowInventory = timer.getTimeInMs();
+    }
+
+    private void resetDropMark(){
+        UIImage crossHair = (UIImage)CoreRegistry.get(GUIManager.class).getWindowById("hud").getElementById("crosshair");
+        lastTimeThrowInteraction = 0;
+        crossHair.getTextureSize().set(new Vector2f(20f / 256f, 20f / 256f));
+        crossHair.getTextureOrigin().set(new Vector2f(24f / 256f, 24f / 256f));
+    }
+
+    private float getDropPower(){
+        if(lastTimeThrowInteraction == 0){
+            return 0;
+        }
+        float dropPower  = (float)Math.floor((timer.getTimeInMs() - lastTimeThrowInteraction)/200);
+
+        if(dropPower>6){
+            dropPower = 6;
+        }
+
+        return dropPower;
+    }
 
     @Override
     public void renderOpaque() {

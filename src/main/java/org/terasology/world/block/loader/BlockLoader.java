@@ -518,6 +518,7 @@ public class BlockLoader {
         block.setShadowCasting(def.shadowCasting);
         block.setWaving(def.waving);
         block.setLuminance(def.luminance);
+        block.setCraftPlace(def.craftPlace);
         if (!def.displayName.isEmpty()) {
             block.setDisplayName(def.displayName);
         } else {

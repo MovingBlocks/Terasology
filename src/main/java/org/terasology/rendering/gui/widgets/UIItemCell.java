@@ -84,7 +84,7 @@ public class UIItemCell extends UIDisplayContainer  {
     
     //layout
     private Vector2f itemLabelPosition = new Vector2f(0f, -14f);
-    private Vector2f iconPosition      = new Vector2f(2f, 2f);
+    private static Vector2f iconPosition      = new Vector2f(2f, 2f);
     
     //settings
     private boolean enableDrag = true;
@@ -241,6 +241,10 @@ public class UIItemCell extends UIDisplayContainer  {
             }
         }
     };
+
+    public UIItemCellIcon getTransferItemIcon(){
+        return transferIcon;
+    }
     
     /**
      * Displays a little icon and item count for an item cell.
@@ -367,12 +371,17 @@ public class UIItemCell extends UIDisplayContainer  {
         }
     }
 
+    public UIItemCell(EntityRef owner, Vector2f size) {
+        this(owner, size, iconPosition);
+    }
+
     /**
      * Create a single item cell which is capable of holding an item.
      * @param owner The owner of this item.
      * @param size The size of the icon cell.
+     * @param iconPosition The position of the icon cell.
      */
-    public UIItemCell(EntityRef owner, Vector2f size) {
+    public UIItemCell(EntityRef owner, Vector2f size, Vector2f iconPosition) {
         this.ownerEntity = owner;
         
         setSize(size);

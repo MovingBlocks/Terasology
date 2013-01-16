@@ -22,6 +22,7 @@
     "tiles" : {
         "topBottom" : "core:ChestTopBottom"
     },
+    "craftPlace" : false,
     "entity" : {
         "prefab" : "books:bookcase"
     },

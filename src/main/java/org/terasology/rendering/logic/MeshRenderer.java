@@ -55,6 +55,7 @@ import org.lwjgl.opengl.GL15;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.componentSystem.RenderSystem;
+import org.terasology.components.utility.DroppedItemTypeComponent;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
@@ -133,6 +134,9 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
 
     @ReceiveEvent(components = {MeshComponent.class})
     public void onNewMesh(AddComponentEvent event, EntityRef entity) {
+        if(entity.getComponent(DroppedItemTypeComponent.class) != null){
+            return;
+        }
         MeshComponent meshComp = entity.getComponent(MeshComponent.class);
         if (meshComp.renderType == MeshComponent.RenderType.GelatinousCube) {
             gelatinous.add(entity);
@@ -143,6 +147,9 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
 
     @ReceiveEvent(components = {MeshComponent.class})
     public void onDestroyMesh(RemovedComponentEvent event, EntityRef entity) {
+        if(entity.getComponent(DroppedItemTypeComponent.class) != null){
+            return;
+        }
         MeshComponent meshComponent = entity.getComponent(MeshComponent.class);
         if (meshComponent.renderType == MeshComponent.RenderType.GelatinousCube) {
             gelatinous.remove(entity);

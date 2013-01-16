@@ -16,6 +16,7 @@
 package org.terasology.rendering.gui.windows;
 
 import org.terasology.asset.Assets;
+import org.newdawn.slick.Color;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.entitySystem.EntityManager;
@@ -33,11 +34,8 @@ import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.VisibilityListener;
-import org.terasology.rendering.gui.widgets.UIImage;
-import org.terasology.rendering.gui.widgets.UIItemCell;
-import org.terasology.rendering.gui.widgets.UIItemContainer;
-import org.terasology.rendering.gui.widgets.UILabel;
-import org.terasology.rendering.gui.widgets.UIWindow;
+import org.terasology.rendering.gui.layout.ChooseRowLayout;
+import org.terasology.rendering.gui.widgets.*;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -67,6 +65,14 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
 
     private final UIImage leftGearWheel;
     private final UIImage rightGearWheel;
+
+    /*Craft UI*/
+    private UIItemContainer inventory;
+    private UIImage craftingCloudBackground;
+    private UIImage craftingResultBackground;
+    private UIImage craftingArrow;
+    private UICompositeScrollable miniInventory;
+    private UIItemContainer craftElement;
 
     /**
      * Init. the HUD.
@@ -119,6 +125,7 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
         debugLine4.setPosition(new Vector2f(4, 54));
 
         toolbar = new UIItemContainer(10);
+        toolbar.setId("toolbar");
         toolbar.setVisible(true);
         toolbar.setHorizontalAlign(EHorizontalAlign.CENTER);
         toolbar.setVerticalAlign(EVerticalAlign.BOTTOM);
@@ -127,9 +134,8 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
         toolbar.setCellMargin(new Vector2f(0f, 0f));
         toolbar.setBorderImage("engine:inventory", new Vector2f(0f, 84f), new Vector2f(169f, 83f), new Vector4f(4f, 4f, 4f, 4f));
 
-        addDisplayElement(crosshair);
-
         leftGearWheel = new UIImage(Assets.getTexture("engine:inventory"));
+
         leftGearWheel.setSize(new Vector2f(36f, 36f));
         leftGearWheel.setTextureOrigin(new Vector2f(121.0f, 168.0f));
         leftGearWheel.setTextureSize(new Vector2f(27.0f, 27.0f));
@@ -157,8 +163,15 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
                 rightGearWheel.getPosition().y - 4f)
         );
 
+        initCraftUI();
+
+        addDisplayElement(crosshair);
+        addDisplayElement(craftingCloudBackground);
+        addDisplayElement(craftingResultBackground);
+        addDisplayElement(craftingArrow);
         addDisplayElement(rightGearWheel);
         addDisplayElement(leftGearWheel);
+        addDisplayElement(miniInventory);
 
         addDisplayElement(debugLine1);
         addDisplayElement(debugLine2);
@@ -166,11 +179,74 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
         addDisplayElement(debugLine4);
 
         addDisplayElement(toolbar);
+        addDisplayElement(craftElement);
 
         CoreRegistry.get(EventSystem.class).registerEventHandler(this);
 
         update();
         layout();
+    }
+
+    private void initCraftUI(){
+
+
+        miniInventory = new UICompositeScrollable();
+        miniInventory.setId("hud:inventory");
+        miniInventory.setSize(new Vector2f(360f, 152f));
+        miniInventory.setLayout(new ChooseRowLayout(new Vector2f(0f,-152f), new Vector2f(360f, 36f), new Color(255f, 0f, 0f), 4f));
+        miniInventory.setHorizontalAlign(EHorizontalAlign.CENTER);
+        miniInventory.setVerticalAlign(EVerticalAlign.BOTTOM);
+        miniInventory.setPosition(new Vector2f(0f, -44f));
+        miniInventory.setVisible(false);
+
+        inventory = new UIItemContainer(10);
+        inventory.setIconPosition(new Vector2f(-4f, -4f));
+        inventory.setVisible(true);
+        inventory.setCellMargin(new Vector2f(0, 0));
+        inventory.setBorderImage("engine:inventory", new Vector2f(0f, 84f), new Vector2f(169f, 61f), new Vector4f(5f, 4f, 3f, 4f));
+        inventory.setCellSize(new Vector2f(36f, 36f));
+        inventory.setEntity(CoreRegistry.get(LocalPlayer.class).getEntity(), 0);
+        miniInventory.addDisplayElement(inventory);
+
+        craftElement = new UIItemContainer(1);
+        craftElement.setId("craftElement");
+        craftElement.setHorizontalAlign(EHorizontalAlign.CENTER);
+        craftElement.setVerticalAlign(EVerticalAlign.TOP);
+        craftElement.setCellMargin(new Vector2f(0f,0f));
+        craftElement.setPosition(new Vector2f(55f, 60f));
+        craftElement.setIconPosition(new Vector2f(-4f, -4f));
+        craftElement.setCellSize(new Vector2f(36f, 36f));
+        craftElement.setVisible(false);
+
+        craftingArrow  = new UIImage(Assets.getTexture("engine:gui_craft"));
+        craftingArrow.setSize(new Vector2f(70f, 33f));
+        craftingArrow.setTextureOrigin(new Vector2f(186f, 0f));
+        craftingArrow.setTextureSize(new Vector2f(70f, 33f));
+        craftingArrow.setId("craftingArrow");
+        craftingArrow.setHorizontalAlign(EHorizontalAlign.CENTER);
+        craftingArrow.setVerticalAlign(EVerticalAlign.TOP);
+        craftingArrow.setPosition(new Vector2f(-5f, 60f));
+        craftingArrow.setVisible(false);
+
+        craftingResultBackground  = new UIImage(Assets.getTexture("engine:gui_craft"));
+        craftingResultBackground.setSize(new Vector2f(40f, 40f));
+        craftingResultBackground.setTextureOrigin(new Vector2f(111f, 0f));
+        craftingResultBackground.setTextureSize(new Vector2f(75f, 75f));
+        craftingResultBackground.setId("craftingResultBackground");
+        craftingResultBackground.setHorizontalAlign(EHorizontalAlign.CENTER);
+        craftingResultBackground.setVerticalAlign(EVerticalAlign.TOP);
+        craftingResultBackground.setPosition(new Vector2f(-70f, 60f));
+        craftingResultBackground.setVisible(false);
+
+        craftingCloudBackground  = new UIImage(Assets.getTexture("engine:gui_craft"));
+        craftingCloudBackground.setSize(new Vector2f(222f, 134f));
+        craftingCloudBackground.setTextureOrigin(new Vector2f(0f, 92f));
+        craftingCloudBackground.setTextureSize(new Vector2f(111f, 67f));
+        craftingCloudBackground.setId("craftingCloudBackground");
+        craftingCloudBackground.setHorizontalAlign(EHorizontalAlign.CENTER);
+        craftingCloudBackground.setVerticalAlign(EVerticalAlign.TOP);
+        craftingCloudBackground.setPosition(new Vector2f(0f, 0f));
+        craftingCloudBackground.setVisible(false);
     }
 
     @Override

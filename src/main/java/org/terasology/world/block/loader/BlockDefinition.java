@@ -34,6 +34,7 @@ import com.google.common.collect.Maps;
 public class BlockDefinition {
     public String displayName = "";
     public boolean liquid = false;
+    public boolean craftPlace = true;
     public byte hardness = 0x3;
 
     public boolean attachmentAllowed = true;
