@@ -1,6 +1,6 @@
 package org.terasology.world.chunks.blockdata;
 
-import org.terasology.world.chunks.deflate.TeraAdvancedDeflator;
+import org.terasology.world.chunks.deflate.TeraVisitingDeflator;
 
 import com.google.common.base.Preconditions;
 
@@ -24,6 +24,45 @@ public final class TeraDenseArray8Bit extends TeraDenseArrayByte {
         return getSizeXZ();
     }
 
+    public static class SerializationHandler extends TeraDenseArrayByte.SerializationHandler<TeraDenseArray8Bit> {
+
+        @Override
+        public boolean canHandle(Class<?> clazz) {
+            return TeraDenseArray8Bit.class.equals(clazz);
+        }
+
+        @Override
+        protected TeraDenseArray8Bit createArray(int sizeX, int sizeY, int sizeZ, byte[] data) {
+            if (data == null)
+                return new TeraDenseArray8Bit(sizeX, sizeY, sizeZ);
+            else
+                return new TeraDenseArray8Bit(sizeX, sizeY, sizeZ, data);
+        }
+    }
+    
+    public static class Factory implements TeraArray.Factory<TeraDenseArray8Bit> {
+        
+        @Override
+        public Class<TeraDenseArray8Bit> getArrayClass() {
+            return TeraDenseArray8Bit.class;
+        }
+
+        @Override
+        public SerializationHandler createSerializationHandler() {
+            return new SerializationHandler();
+        }
+        
+        @Override
+        public TeraDenseArray8Bit create() {
+            return new TeraDenseArray8Bit();
+        }
+        
+        @Override
+        public TeraDenseArray8Bit create(int sizeX, int sizeY, int sizeZ) {
+            return new TeraDenseArray8Bit(sizeX, sizeY, sizeZ);
+        }
+    }
+    
     public TeraDenseArray8Bit() {
         super();
     }
@@ -41,7 +80,7 @@ public final class TeraDenseArray8Bit extends TeraDenseArrayByte {
     }
 
     @Override
-    public TeraArray deflate(TeraAdvancedDeflator deflator) {
+    public TeraArray deflate(TeraVisitingDeflator deflator) {
         return Preconditions.checkNotNull(deflator).deflateDenseArray8Bit(data, rowSize(), getSizeX(), getSizeY(), getSizeZ());
     }
 

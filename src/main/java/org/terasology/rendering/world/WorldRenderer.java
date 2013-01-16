@@ -37,8 +37,10 @@ import static org.lwjgl.opengl.GL11.glPushMatrix;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
@@ -76,7 +78,6 @@ import org.terasology.logic.manager.WorldTimeEventManager;
 import org.terasology.math.AABB;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
-import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.physics.BulletPhysics;
@@ -101,6 +102,7 @@ import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.ChunkStore;
 import org.terasology.world.chunks.LocalChunkProvider;
 import org.terasology.world.chunks.store.ChunkStoreGZip;
+import org.terasology.world.chunks.store.ChunkStoreProtobuf;
 import org.terasology.world.generator.core.ChunkGeneratorManager;
 
 import com.google.common.collect.Lists;
@@ -182,6 +184,45 @@ public final class WorldRenderer {
     private static short playround; 
 
     private ComponentSystemManager _systemManager;
+    
+    private ChunkStore loadChunkStore(File file) throws IOException {
+        FileInputStream fileIn = null;
+        ObjectInputStream in = null;
+        try {
+            fileIn = new FileInputStream(file);
+            in = new ObjectInputStream(fileIn);
+
+            ChunkStore cache = (ChunkStore) in.readObject();
+            if (cache instanceof ChunkStoreGZip) {
+                ((ChunkStoreGZip) cache).setup();
+                logger.info("Using old chunk store implementation without protobuf support for compatibility.");
+            } else if (cache instanceof ChunkStoreProtobuf)
+                ((ChunkStoreProtobuf) cache).setup();
+            else
+                logger.warn("Chunk store might not have been initialized: {}", cache.getClass().getName());
+            
+            return cache;
+
+        } catch (ClassNotFoundException e) {
+            throw new IOException("Unable to load chunk cache", e);
+        } finally {
+            // JAVA7 : cleanup
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    logger.error("Failed to close input stream", e);
+                }
+            }
+            if (fileIn != null) {
+                try {
+                    fileIn.close();
+                } catch (IOException e) {
+                    logger.error("Failed to close input stream", e);
+                }
+            }
+        }
+    }
 
     /**
      * Initializes a new (local) world for the single player mode.
@@ -193,7 +234,7 @@ public final class WorldRenderer {
         File f = new File(PathManager.getInstance().getWorldSavePath(worldInfo.getTitle()), worldInfo.getTitle() + ".dat");
         if (f.exists()) {
             try {
-                chunkStore = ChunkStoreGZip.load(f);
+                chunkStore = loadChunkStore(f);
             } catch (IOException e) {
                 /* TODO: We really should expose this error via UI so player knows that there is an issue with their world
                    (don't have the game continue or we risk overwriting their game)
@@ -202,7 +243,7 @@ public final class WorldRenderer {
             }
         }
         if (chunkStore == null) {
-            chunkStore = new ChunkStoreGZip();
+            chunkStore = new ChunkStoreProtobuf();
         }
         _chunkProvider = new LocalChunkProvider(chunkStore, chunkGeneratorManager);
         EntityAwareWorldProvider entityWorldProvider = new EntityAwareWorldProvider(new WorldProviderCoreImpl(worldInfo, _chunkProvider));

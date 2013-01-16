@@ -1,12 +1,30 @@
 package org.terasology.world.chunks.deflate;
 
 import org.terasology.world.chunks.blockdata.TeraArray;
+import org.terasology.world.chunks.blockdata.TeraSparseArray16Bit;
 import org.terasology.world.chunks.blockdata.TeraSparseArray4Bit;
 import org.terasology.world.chunks.blockdata.TeraSparseArray8Bit;
 
-public class TeraStandardDeflator extends TeraAdvancedDeflator {
+/**
+ * TeraStandardDeflator implements a simple deflation algorithm for 4, 8 and 16-bit dense and sparse arrays.
+ * 
+ * @note Currently it is optimized for chunks of size 16x256x16 blocks.
+ * @todo Implement deflation for sparse arrays.
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
+ *
+ */
+public class TeraStandardDeflator extends TeraVisitingDeflator {
     
     /*
+     *  16-bit variant
+     *  ==============
+     *  
+     *  dense chunk  : 4 + 12 + (65536 * 2)                                                   = 131088
+     *  sparse chunk : (4 + 12 + (256 * 2)) + (4 + 12 + (256 × 4)) + ((12 + (256 * 2)) × 256) = 135712
+     *  difference   : 135712 - 131088                                                        =   4624
+     *  min. deflate : 4624 / (12 + (256 * 2))                                                =      8.8
+     *  
+     *  
      *  8-bit variant
      *  =============
      *  
@@ -26,11 +44,54 @@ public class TeraStandardDeflator extends TeraAdvancedDeflator {
      *  
      */
 
-    // TODO dynamically calculate DEFLATE_MINIMUM_8BIT and DEFLATE_MINIMUM_4BIT, they only work for chunks with dimension 16x256x16
+    // TODO dynamically calculate DEFLATE_MINIMUM_*, they only work for chunks with dimension 16x256x16
+    protected final static int DEFLATE_MINIMUM_16BIT = 8;
     protected final static int DEFLATE_MINIMUM_8BIT = 16;
     protected final static int DEFLATE_MINIMUM_4BIT = 31;
     
     public TeraStandardDeflator() {}
+
+    @Override
+    public TeraArray deflateDenseArray16Bit(short[] data, int rowSize, int sizeX, int sizeY, int sizeZ) {
+        final short[][] inflated = new short[sizeY][];
+        final short[] deflated = new short[sizeY];
+        int packed = 0;
+        for (int y = 0; y < sizeY; y++) {
+            final int start = y * rowSize;
+            final short first = data[start];
+            boolean packable = true;
+            for (int i = 1; i < rowSize; i++) {
+                if (data[start + i] != first) {
+                    packable = false;
+                    break;
+                }
+            }
+            if (packable) {
+                deflated[y] = first;
+                ++packed;
+            } else {
+                short[] tmp = new short[rowSize];
+                System.arraycopy(data, start, tmp, 0, rowSize);
+                inflated[y] = tmp;
+            }
+        }
+        if (packed == sizeY) {
+            final short first = deflated[0];
+            boolean packable = true;
+            for (int i = 1; i < sizeY; i++) {
+                if (deflated[i] != first) {
+                    packable = false;
+                    break;
+                }
+            }
+            if (packable)
+                return new TeraSparseArray16Bit(sizeX, sizeY, sizeZ, first);
+        }
+        if (packed > DEFLATE_MINIMUM_16BIT) {
+            return new TeraSparseArray16Bit(sizeX, sizeY, sizeZ, inflated, deflated);
+        }
+        return null;
+    }
 
     @Override
     public TeraArray deflateDenseArray8Bit(final byte[] data, final int rowSize, final int sizeX, final int sizeY, final int sizeZ) {
@@ -113,6 +174,11 @@ public class TeraStandardDeflator extends TeraAdvancedDeflator {
         if (packed > DEFLATE_MINIMUM_4BIT) {
             return new TeraSparseArray4Bit(sizeX, sizeY, sizeZ, inflated, deflated);
         }
+        return null;
+    }
+
+    @Override
+    public TeraArray deflateSparseArray16Bit(short[][] inflated, short[] deflated, short fill, int rowSize, int sizeX, int sizeY, int sizeZ) {
         return null;
     }
 

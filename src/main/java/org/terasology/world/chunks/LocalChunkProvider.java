@@ -83,6 +83,8 @@ public class LocalChunkProvider implements ChunkProvider {
     public LocalChunkProvider(ChunkStore farStore, ChunkGeneratorManager generator) {
         this.farStore = farStore;
         this.generator = generator;
+        
+        logger.info("CACHE_SIZE = {} for nearby chunks", CACHE_SIZE);
 
         reviewChunkQueue = new PriorityBlockingQueue<ChunkRequest>(32);
         reviewThreads = Executors.newFixedThreadPool(REQUEST_CHUNK_THREADS);

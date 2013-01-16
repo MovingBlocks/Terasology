@@ -17,9 +17,6 @@ package org.terasology.world.chunks.store;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentMap;
@@ -34,24 +31,35 @@ import java.util.zip.GZIPOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.Vector3i;
+import org.terasology.protobuf.ChunksProtobuf;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkStore;
+import org.terasology.world.chunks.Chunks;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+import com.google.protobuf.CodedInputStream;
+import com.google.protobuf.CodedOutputStream;
 
-public class ChunkStoreGZip implements ChunkStore, Serializable {
+/**
+ * Implements a chunk store using protobuf internally. This is just copied and adapted from {@code ChunkStoreGZip}.
+ * 
+ * @author Manuel Brotz <manu.brotz@gmx.ch>
+ * @see org.terasology.world.chunks.store.ChunkStoreGZip
+ *
+ */
+public class ChunkStoreProtobuf implements ChunkStore, Serializable {
     static final long serialVersionUID = -8168985892342356264L;
 
     private static final int NUM_DISPOSAL_THREADS = 2;
 
-    private static final Logger logger = LoggerFactory.getLogger(ChunkStoreGZip.class);
+    private static final Logger logger = LoggerFactory.getLogger(ChunkStoreProtobuf.class);
 
     private transient ConcurrentMap<Vector3i, Chunk> modifiedChunks;
     private transient ExecutorService compressionThreads = null;
     private transient BlockingQueue<Chunk> compressionQueue;
 
-    private ConcurrentMap<Vector3i, byte[]> compressedChunks = Maps.newConcurrentMap();
+    private ConcurrentMap<Vector3i, byte[]> serializedChunks = Maps.newConcurrentMap();
     private AtomicInteger sizeInByte = new AtomicInteger(0);
     private AtomicBoolean running = new AtomicBoolean(true);
 
@@ -93,7 +101,7 @@ public class ChunkStoreGZip implements ChunkStore, Serializable {
         }
     }
 
-    public ChunkStoreGZip() {
+    public ChunkStoreProtobuf() {
         setup();
     }
     
@@ -104,24 +112,20 @@ public class ChunkStoreGZip implements ChunkStore, Serializable {
     }
 
     public Chunk get(Vector3i id) {
-        Chunk c;
-        c = modifiedChunks.get(id);
+        Chunk c = modifiedChunks.get(id);
         if (c != null) {
             return new Chunk(c);
         }
 
         try {
-            byte[] b = compressedChunks.get(id);
-            if (b == null)
-                return null;
-            ByteArrayInputStream bais = new ByteArrayInputStream(b);
-            GZIPInputStream gzipIn = new GZIPInputStream(bais);
-            ObjectInputStream objectIn = new ObjectInputStream(gzipIn);
-            c = (Chunk) objectIn.readObject();
-            objectIn.close();
-        } catch (IOException e) {
-            logger.error("Error loading chunk", e);
-        } catch (ClassNotFoundException e) {
+            final byte[] b = serializedChunks.get(id);
+            if (b == null) return null;
+            final ByteArrayInputStream baIn = new ByteArrayInputStream(b);
+            final GZIPInputStream gzIn = new GZIPInputStream(baIn);
+            final CodedInputStream cIn = CodedInputStream.newInstance(gzIn);
+            final ChunksProtobuf.Chunk message = ChunksProtobuf.Chunk.parseFrom(cIn);
+            c = Chunks.getInstance().decode(message); 
+        } catch (Exception e) {
             logger.error("Error loading chunk", e);
         }
         return c;
@@ -136,7 +140,7 @@ public class ChunkStoreGZip implements ChunkStore, Serializable {
 
     @Override
     public boolean contains(Vector3i position) {
-        return modifiedChunks.containsKey(position) || compressedChunks.containsKey(position);
+        return modifiedChunks.containsKey(position) || serializedChunks.containsKey(position);
     }
 
     public float size() {
@@ -155,17 +159,19 @@ public class ChunkStoreGZip implements ChunkStore, Serializable {
 
     private void saveChunk(Chunk c) {
         try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            GZIPOutputStream gzipOut = new GZIPOutputStream(baos);
-            ObjectOutputStream objectOut = new ObjectOutputStream(gzipOut);
-            objectOut.writeObject(c);
-            objectOut.close();
-            byte[] b = baos.toByteArray();
-            sizeInByte.addAndGet(b.length);
-            compressedChunks.put(c.getPos(), b);
-            modifiedChunks.remove(c.getPos(), c);
-        } catch (IOException e) {
-            logger.error("Error saving chunk", e);
+            final ChunksProtobuf.Chunk message = Chunks.getInstance().encode(c);
+            final ByteArrayOutputStream baOut = new ByteArrayOutputStream();
+            final GZIPOutputStream gzOut = new GZIPOutputStream(baOut);
+            final CodedOutputStream cOut = CodedOutputStream.newInstance(gzOut);
+            message.writeTo(cOut);
+            cOut.flush();
+            gzOut.close();
+            final byte[] serialized = baOut.toByteArray();
+            sizeInByte.addAndGet(serialized.length);
+            serializedChunks.put(c.getPos(), serialized);
+            modifiedChunks.remove(c.getPos(), c); // TODO Does that actually work???
+        } catch (Exception e) {
+            logger.error("Failed saving chunk", e);
         }
     }
 }
