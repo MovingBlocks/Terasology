@@ -3,6 +3,14 @@
   "Mesh" : {
     "renderType" : "GelatinousCube",
     "color" : [1, 0, 0, 1]
+  },
+  "Health" : {
+        "currentHealth" : 25,
+        "maxHealth" : 50,
+        "regenRate" : 5,
+        "waitBeforeRegen" : 2,
+        "excessSpeedDamageMultiplier" : 20,
+        "fallingDamageSpeedThreshold" : 15
   },  
   "CharacterMovement" : {
     "height" : 1,

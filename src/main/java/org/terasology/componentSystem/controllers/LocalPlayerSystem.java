@@ -306,7 +306,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             entity.send(new HealthChangedEvent(entity, healthComponent.currentHealth, healthComponent.maxHealth));
             entity.saveComponent(healthComponent);
         }
-
+        
         CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
         if (characterMovementComponent != null) {
             characterMovementComponent.setVelocity(new Vector3f(0, 0, 0));

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright 2012 Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.hunger.events;
 
-{
-	"shadowCasting" : "false",
-	"rotation" : "Horizontal",
-	"shape" : "funnyBlocks:cheeseWheelSliced",
-	"tile" : "funnyBlocks:Cheese",
-	"entity" : {
-        	"prefab" : "funnyBlocks:CheeseWheelSliced"
-    	}
+import org.terasology.entitySystem.EntityRef;
+
+/**
+ * @author Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
+ */
+public class FullContentmentEvent extends ContentmentChangedEvent {
+    public FullContentmentEvent(EntityRef instigator, int maxContentment) {
+        super(instigator, maxContentment, maxContentment);
+    }
 }

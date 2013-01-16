@@ -1,0 +1,6 @@
+{
+    "id" : "hunger",
+    "displayName" : "Hunger and consumables",
+    "author" : "Esapetri",
+    "description" : "This mod makes you to die starvation"
+}
