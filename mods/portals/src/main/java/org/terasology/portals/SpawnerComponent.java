@@ -39,7 +39,8 @@ public class SpawnerComponent implements Component {
     
     public boolean rangedSpawning = false;
 
-    public int range=1000;
+    public int range=20;
+    public int minDistance=0;
     
     public boolean needsPlayer = false;
 
