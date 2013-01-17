@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright 2012 Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,8 @@
  */
 
 {
-	"shadowCasting" : "false",
-	"rotation" : "Horizontal",
-	"shape" : "funnyBlocks:cheeseWheelSliced",
-	"tile" : "funnyBlocks:Cheese",
-	"entity" : {
-        	"prefab" : "funnyBlocks:CheeseWheelSliced"
-    	}
+	"Consumable": {
+        	"filling" : 30,
+	 	"uses" : 1
+    	} 
 }

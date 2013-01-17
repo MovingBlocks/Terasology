@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright 2012 Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.hunger;
 
-{
-	"shadowCasting" : "false",
-	"rotation" : "Horizontal",
-	"shape" : "funnyBlocks:cheeseWheelSliced",
-	"tile" : "funnyBlocks:Cheese",
-	"entity" : {
-        	"prefab" : "funnyBlocks:CheeseWheelSliced"
-    	}
+import org.terasology.entitySystem.Component;
+
+/**
+ * @author Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
+ */
+public final class ConsumableComponent implements Component {
+    // Configuration options
+	public int filling=1;
+	public int uses=1;
+	
+	//add effects here when bodycombonent is ready
+    public ConsumableComponent() {
+    }
+
 }

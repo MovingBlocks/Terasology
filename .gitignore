@@ -25,3 +25,6 @@
 # Ignore error logs 
 *.log
 
+#Ignore linux directory files
+*.directory
+
