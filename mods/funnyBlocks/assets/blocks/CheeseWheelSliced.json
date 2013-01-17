@@ -15,7 +15,8 @@
  */
 
 {
-	"shadowCasting" : "false",
+    "attachmentAllowed" : false,
+	"shadowCasting" : false,
 	"rotation" : "Horizontal",
 	"shape" : "funnyBlocks:cheeseWheelSliced",
 	"tile" : "funnyBlocks:Cheese",
