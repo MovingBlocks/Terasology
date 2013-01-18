@@ -15,31 +15,17 @@
  */
 package org.terasology.rendering.gui.windows;
 
-import javax.vecmath.Vector2f;
-
 import org.terasology.asset.Assets;
-import org.terasology.config.ModConfig;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
-import org.terasology.game.modes.StateLoading;
-import org.terasology.game.types.GameType;
-import org.terasology.game.types.SurvivalType;
-import org.terasology.logic.manager.Config;
-import org.terasology.network.NetworkMode;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.widgets.UIButton;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UILabel;
 import org.terasology.rendering.gui.widgets.UIWindow;
-import org.terasology.world.WorldInfo;
-import org.terasology.world.generator.core.FloraGenerator;
-import org.terasology.world.generator.core.ForestGenerator;
-import org.terasology.world.generator.core.PerlinTerrainGenerator;
-import org.terasology.world.liquid.LiquidsGenerator;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.vecmath.Vector2f;
 
 /**
  * Main menu screen.
@@ -63,7 +49,7 @@ public class UIMenuMain extends UIWindow {
         setBackgroundImage("engine:menubackground");
         setModal(true);
         maximize();
-        
+
         title = new UIImage(Assets.getTexture("engine:terasology"));
         title.setSize(new Vector2f(512f, 128f));
         title.setHorizontalAlign(EHorizontalAlign.CENTER);
@@ -87,7 +73,7 @@ public class UIMenuMain extends UIWindow {
         exitButton.setHorizontalAlign(EHorizontalAlign.CENTER);
         exitButton.setPosition(new Vector2f(0f, 300f + 6 * 40f));
         exitButton.setVisible(true);
-        
+
         configButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
         configButton.getLabel().setText("Settings");
         configButton.addClickListener(new ClickListener() {
@@ -106,7 +92,7 @@ public class UIMenuMain extends UIWindow {
             @Override
             public void click(UIDisplayElement element, int button) {
                 getGUIManager().openWindow("singleplayer");
-                ((UIMenuSingleplayer)getGUIManager().getWindowById("singleplayer")).setCreateServerGame(false);
+                ((UIMenuSingleplayer) getGUIManager().getWindowById("singleplayer")).setCreateServerGame(false);
             }
         });
 
@@ -120,7 +106,7 @@ public class UIMenuMain extends UIWindow {
             @Override
             public void click(UIDisplayElement element, int button) {
                 getGUIManager().openWindow("singleplayer");
-                ((UIMenuSingleplayer)getGUIManager().getWindowById("singleplayer")).setCreateServerGame(true);
+                ((UIMenuSingleplayer) getGUIManager().getWindowById("singleplayer")).setCreateServerGame(true);
             }
         });
 

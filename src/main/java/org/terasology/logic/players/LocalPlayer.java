@@ -18,10 +18,9 @@ package org.terasology.logic.players;
 import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.LightComponent;
-import org.terasology.components.LocalPlayerComponent;
-import org.terasology.components.PlayerComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.network.ClientComponent;
 import org.terasology.physics.character.CharacterMovementComponent;
 
@@ -48,7 +47,7 @@ public class LocalPlayer {
     }
 
     public boolean isValid() {
-        return getCharacterEntity().exists() && getCharacterEntity().hasComponent(LocationComponent.class) && getCharacterEntity().hasComponent(LocalPlayerComponent.class) && getCharacterEntity().hasComponent(PlayerComponent.class);
+        return getCharacterEntity().exists() && getCharacterEntity().hasComponent(LocationComponent.class) && getCharacterEntity().hasComponent(LocalPlayerComponent.class) && getCharacterEntity().hasComponent(CharacterComponent.class);
     }
 
     public Vector3f getPosition() {

@@ -18,6 +18,7 @@
     </appender>
 
     <logger name="org.terasology" level="INFO"/>
+    <logger name="org.terasology.network" level="DEBUG"/>
 
     <root level="debug">
         <appender-ref ref="CONSOLE" />

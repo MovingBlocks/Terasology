@@ -6429,6 +6429,11 @@ public final class NetData {
     boolean hasEntity();
     org.terasology.protobuf.EntityData.Entity getEntity();
     org.terasology.protobuf.EntityData.EntityOrBuilder getEntityOrBuilder();
+    
+    // optional .Vector3iData blockPos = 2;
+    boolean hasBlockPos();
+    org.terasology.protobuf.NetData.Vector3iData getBlockPos();
+    org.terasology.protobuf.NetData.Vector3iDataOrBuilder getBlockPosOrBuilder();
   }
   public static final class CreateEntityMessage extends
       com.google.protobuf.GeneratedMessage.ExtendableMessage<
@@ -6472,8 +6477,22 @@ public final class NetData {
       return entity_;
     }
     
+    // optional .Vector3iData blockPos = 2;
+    public static final int BLOCKPOS_FIELD_NUMBER = 2;
+    private org.terasology.protobuf.NetData.Vector3iData blockPos_;
+    public boolean hasBlockPos() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    public org.terasology.protobuf.NetData.Vector3iData getBlockPos() {
+      return blockPos_;
+    }
+    public org.terasology.protobuf.NetData.Vector3iDataOrBuilder getBlockPosOrBuilder() {
+      return blockPos_;
+    }
+    
     private void initFields() {
       entity_ = org.terasology.protobuf.EntityData.Entity.getDefaultInstance();
+      blockPos_ = org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -6503,6 +6522,9 @@ public final class NetData {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeMessage(1, entity_);
       }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeMessage(2, blockPos_);
+      }
       extensionWriter.writeUntil(536870912, output);
       getUnknownFields().writeTo(output);
     }
@@ -6516,6 +6538,10 @@ public final class NetData {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(1, entity_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, blockPos_);
       }
       size += extensionsSerializedSize();
       size += getUnknownFields().getSerializedSize();
@@ -6635,6 +6661,7 @@ public final class NetData {
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
           getEntityFieldBuilder();
+          getBlockPosFieldBuilder();
         }
       }
       private static Builder create() {
@@ -6649,6 +6676,12 @@ public final class NetData {
           entityBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000001);
+        if (blockPosBuilder_ == null) {
+          blockPos_ = org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance();
+        } else {
+          blockPosBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000002);
         return this;
       }
       
@@ -6695,6 +6728,14 @@ public final class NetData {
         } else {
           result.entity_ = entityBuilder_.build();
         }
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        if (blockPosBuilder_ == null) {
+          result.blockPos_ = blockPos_;
+        } else {
+          result.blockPos_ = blockPosBuilder_.build();
+        }
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -6713,6 +6754,9 @@ public final class NetData {
         if (other == org.terasology.protobuf.NetData.CreateEntityMessage.getDefaultInstance()) return this;
         if (other.hasEntity()) {
           mergeEntity(other.getEntity());
+        }
+        if (other.hasBlockPos()) {
+          mergeBlockPos(other.getBlockPos());
         }
         this.mergeExtensionFields(other);
         this.mergeUnknownFields(other.getUnknownFields());
@@ -6763,6 +6807,15 @@ public final class NetData {
               }
               input.readMessage(subBuilder, extensionRegistry);
               setEntity(subBuilder.buildPartial());
+              break;
+            }
+            case 18: {
+              org.terasology.protobuf.NetData.Vector3iData.Builder subBuilder = org.terasology.protobuf.NetData.Vector3iData.newBuilder();
+              if (hasBlockPos()) {
+                subBuilder.mergeFrom(getBlockPos());
+              }
+              input.readMessage(subBuilder, extensionRegistry);
+              setBlockPos(subBuilder.buildPartial());
               break;
             }
           }
@@ -6859,6 +6912,96 @@ public final class NetData {
           entity_ = null;
         }
         return entityBuilder_;
+      }
+      
+      // optional .Vector3iData blockPos = 2;
+      private org.terasology.protobuf.NetData.Vector3iData blockPos_ = org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance();
+      private com.google.protobuf.SingleFieldBuilder<
+          org.terasology.protobuf.NetData.Vector3iData, org.terasology.protobuf.NetData.Vector3iData.Builder, org.terasology.protobuf.NetData.Vector3iDataOrBuilder> blockPosBuilder_;
+      public boolean hasBlockPos() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      public org.terasology.protobuf.NetData.Vector3iData getBlockPos() {
+        if (blockPosBuilder_ == null) {
+          return blockPos_;
+        } else {
+          return blockPosBuilder_.getMessage();
+        }
+      }
+      public Builder setBlockPos(org.terasology.protobuf.NetData.Vector3iData value) {
+        if (blockPosBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          blockPos_ = value;
+          onChanged();
+        } else {
+          blockPosBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000002;
+        return this;
+      }
+      public Builder setBlockPos(
+          org.terasology.protobuf.NetData.Vector3iData.Builder builderForValue) {
+        if (blockPosBuilder_ == null) {
+          blockPos_ = builderForValue.build();
+          onChanged();
+        } else {
+          blockPosBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000002;
+        return this;
+      }
+      public Builder mergeBlockPos(org.terasology.protobuf.NetData.Vector3iData value) {
+        if (blockPosBuilder_ == null) {
+          if (((bitField0_ & 0x00000002) == 0x00000002) &&
+              blockPos_ != org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance()) {
+            blockPos_ =
+              org.terasology.protobuf.NetData.Vector3iData.newBuilder(blockPos_).mergeFrom(value).buildPartial();
+          } else {
+            blockPos_ = value;
+          }
+          onChanged();
+        } else {
+          blockPosBuilder_.mergeFrom(value);
+        }
+        bitField0_ |= 0x00000002;
+        return this;
+      }
+      public Builder clearBlockPos() {
+        if (blockPosBuilder_ == null) {
+          blockPos_ = org.terasology.protobuf.NetData.Vector3iData.getDefaultInstance();
+          onChanged();
+        } else {
+          blockPosBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000002);
+        return this;
+      }
+      public org.terasology.protobuf.NetData.Vector3iData.Builder getBlockPosBuilder() {
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return getBlockPosFieldBuilder().getBuilder();
+      }
+      public org.terasology.protobuf.NetData.Vector3iDataOrBuilder getBlockPosOrBuilder() {
+        if (blockPosBuilder_ != null) {
+          return blockPosBuilder_.getMessageOrBuilder();
+        } else {
+          return blockPos_;
+        }
+      }
+      private com.google.protobuf.SingleFieldBuilder<
+          org.terasology.protobuf.NetData.Vector3iData, org.terasology.protobuf.NetData.Vector3iData.Builder, org.terasology.protobuf.NetData.Vector3iDataOrBuilder> 
+          getBlockPosFieldBuilder() {
+        if (blockPosBuilder_ == null) {
+          blockPosBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              org.terasology.protobuf.NetData.Vector3iData, org.terasology.protobuf.NetData.Vector3iData.Builder, org.terasology.protobuf.NetData.Vector3iDataOrBuilder>(
+                  blockPos_,
+                  getParentForChildren(),
+                  isClean());
+          blockPos_ = null;
+        }
+        return blockPosBuilder_;
       }
       
       // @@protoc_insertion_point(builder_scope:CreateEntityMessage)
@@ -8347,15 +8490,15 @@ public final class NetData {
       "\t\022\021\n\tworldName\030\020 \001(\t\022\020\n\010clientId\030\021 \001(\005*\t",
       "\010\210\'\020\200\200\200\200\002\"=\n\014BlockMapping\022\021\n\tblockName\030\001" +
       " \001(\t\022\017\n\007blockId\030\002 \001(\005*\t\010\210\'\020\200\200\200\200\002\")\n\nModu" +
-      "leInfo\022\020\n\010moduleId\030\001 \001(\t*\t\010\210\'\020\200\200\200\200\002\"9\n\023C" +
+      "leInfo\022\020\n\010moduleId\030\001 \001(\t*\t\010\210\'\020\200\200\200\200\002\"Z\n\023C" +
       "reateEntityMessage\022\027\n\006entity\030\001 \001(\0132\007.Ent" +
-      "ity*\t\010\210\'\020\200\200\200\200\002\"H\n\023UpdateEntityMessage\022\027\n" +
-      "\006entity\030\001 \001(\0132\007.Entity\022\r\n\005netId\030\002 \001(\005*\t\010" +
-      "\210\'\020\200\200\200\200\002\"/\n\023RemoveEntityMessage\022\r\n\005netId" +
-      "\030\001 \001(\005*\t\010\210\'\020\200\200\200\200\002\"B\n\014EventMessage\022\020\n\010tar" +
-      "getId\030\001 \001(\005\022\025\n\005event\030\002 \001(\0132\006.Event*\t\010\210\'\020" +
-      "\200\200\200\200\002B$\n\027org.terasology.protobufB\007NetDat",
-      "aH\001"
+      "ity\022\037\n\010blockPos\030\002 \001(\0132\r.Vector3iData*\t\010\210" +
+      "\'\020\200\200\200\200\002\"H\n\023UpdateEntityMessage\022\027\n\006entity" +
+      "\030\001 \001(\0132\007.Entity\022\r\n\005netId\030\002 \001(\005*\t\010\210\'\020\200\200\200\200" +
+      "\002\"/\n\023RemoveEntityMessage\022\r\n\005netId\030\001 \001(\005*" +
+      "\t\010\210\'\020\200\200\200\200\002\"B\n\014EventMessage\022\020\n\010targetId\030\001" +
+      " \001(\005\022\025\n\005event\030\002 \001(\0132\006.Event*\t\010\210\'\020\200\200\200\200\002B$",
+      "\n\027org.terasology.protobufB\007NetDataH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -8439,7 +8582,7 @@ public final class NetData {
           internal_static_CreateEntityMessage_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_CreateEntityMessage_descriptor,
-              new java.lang.String[] { "Entity", },
+              new java.lang.String[] { "Entity", "BlockPos", },
               org.terasology.protobuf.NetData.CreateEntityMessage.class,
               org.terasology.protobuf.NetData.CreateEntityMessage.Builder.class);
           internal_static_UpdateEntityMessage_descriptor =

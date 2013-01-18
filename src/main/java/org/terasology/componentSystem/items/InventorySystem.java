@@ -21,6 +21,7 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.network.NetworkComponent;
@@ -30,7 +31,7 @@ import org.terasology.network.NetworkComponent;
  *
  * @author Immortius <immortius@gmail.com>
  */
-@RegisterComponentSystem
+@RegisterComponentSystem(RegisterMode.AUTHORITY)
 public class InventorySystem implements EventHandlerSystem {
 
     // TODO: differ per item?

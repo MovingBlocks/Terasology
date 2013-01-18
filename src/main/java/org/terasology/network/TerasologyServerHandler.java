@@ -73,8 +73,9 @@ public class TerasologyServerHandler extends SimpleChannelUpstreamHandler {
             case UPDATE_ENTITY:
                 receivedEntityUpdate(message.getUpdateEntity());
                 break;
+            default:
+                logger.warn("Received unexpected message: {}", message.getType());
         }
-        logger.trace("Received message: {}", message.getType());
     }
 
     private void receivedEntityUpdate(NetData.UpdateEntityMessage message) {

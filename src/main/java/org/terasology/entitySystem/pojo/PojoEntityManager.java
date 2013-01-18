@@ -15,6 +15,7 @@
  */
 package org.terasology.entitySystem.pojo;
 
+import com.google.common.collect.MapMaker;
 import com.google.common.collect.Sets;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.iterator.TIntObjectIterator;
@@ -65,7 +66,7 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
 
     private int nextEntityId = 1;
     private TIntList freedIds = new TIntArrayList();
-    private Map<EntityRef, PojoEntityRef> entityCache = new WeakHashMap<EntityRef, PojoEntityRef>();
+    private Map<Integer, EntityRef> entityCache = new MapMaker().concurrencyLevel(4).weakValues().makeMap();
     private Set<EntityChangeSubscriber> subscribers = Sets.newLinkedHashSet();
 
     private ComponentTable store = new ComponentTable();
@@ -97,7 +98,7 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
     @Override
     public EntityRef create() {
         if (!freedIds.isEmpty()) {
-            createEntityRef(freedIds.removeAt(freedIds.size() - 1));
+            return createEntityRef(freedIds.removeAt(freedIds.size() - 1));
         }
         if (nextEntityId == NULL_ID) nextEntityId++;
         return createEntityRef(nextEntityId++);
@@ -297,7 +298,7 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
         if (eventSystem != null) {
             eventSystem.send(ref, RemovedComponentEvent.newInstance());
         }
-        entityCache.remove(ref);
+        entityCache.remove(entityId);
         freedIds.add(entityId);
         if (ref instanceof PojoEntityRef) {
             ((PojoEntityRef) ref).invalidate();
@@ -365,12 +366,12 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
         if (entityId == NULL_ID) {
             return EntityRef.NULL;
         }
-        PojoEntityRef newRef = new PojoEntityRef(this, entityId);
-        PojoEntityRef existing = entityCache.get(newRef);
+        EntityRef existing = entityCache.get(entityId);
         if (existing != null) {
             return existing;
         }
-        entityCache.put(newRef, newRef);
+        PojoEntityRef newRef = new PojoEntityRef(this, entityId);
+        entityCache.put(entityId, newRef);
         return newRef;
     }
 

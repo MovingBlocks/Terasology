@@ -30,6 +30,7 @@ import org.terasology.protobuf.NetData;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
@@ -97,7 +98,7 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
 
     public void setNetDirty(int netId) {
         if (netRelevant.contains(netId) && !netInitial.contains(netId)) {
-            logger.trace("Marking dirty: {}", netId);
+            logger.trace("Marking dirty: {}", networkSystem.getEntity(netId));
             netDirty.add(netId);
         }
     }
@@ -270,11 +271,16 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
             int netId = initialIterator.next();
             netRelevant.add(netId);
             EntityRef entity = networkSystem.getEntity(netId);
-            // Note: Always send all variables on initial replication
+            // Note: Send owner->server fields on initial create
             EntityData.Entity entityData = entitySerializer.serialize(entity, new ServerComponentFieldCheck(false, true));
+            NetData.CreateEntityMessage.Builder createMessage = NetData.CreateEntityMessage.newBuilder().setEntity(entityData);
+            BlockComponent blockComponent = entity.getComponent(BlockComponent.class);
+            if (blockComponent != null) {
+                createMessage.setBlockPos(NetworkUtil.convert(blockComponent.getPosition()));
+            }
             NetData.NetMessage message = NetData.NetMessage.newBuilder()
                     .setType(NetData.NetMessage.Type.CREATE_ENTITY)
-                    .setCreateEntity(NetData.CreateEntityMessage.newBuilder().setEntity(entityData))
+                    .setCreateEntity(createMessage)
                     .build();
             send(message);
         }
@@ -289,10 +295,14 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
             Event event = eventSerializer.deserialize(message.getEvent());
             EntityRef target = networkSystem.getEntity(message.getTargetId());
             if (target.exists()) {
-                if (event instanceof NetworkEvent) {
-                    ((NetworkEvent) event).setClient(clientEntity);
+                if (networkSystem.getOwner(target).equals(this)) {
+                    if (event instanceof NetworkEvent) {
+                        ((NetworkEvent) event).setClient(clientEntity);
+                    }
+                    target.send(event);
+                } else {
+                    logger.warn("Received event {} for non-owned entity {} from {}", event, target, this);
                 }
-                target.send(event);
             } else {
                 queuedEvents.offer(message);
             }

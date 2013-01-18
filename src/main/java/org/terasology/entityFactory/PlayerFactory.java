@@ -18,8 +18,7 @@ package org.terasology.entityFactory;
 import javax.vecmath.Vector3f;
 
 import org.terasology.components.ItemComponent;
-import org.terasology.components.LocalPlayerComponent;
-import org.terasology.components.PlayerComponent;
+import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.world.block.BlockItemComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
@@ -45,7 +44,7 @@ public class PlayerFactory {
         LocationComponent location = player.getComponent(LocationComponent.class);
         location.setWorldPosition(spawnPosition);
         player.saveComponent(location);
-        PlayerComponent playerComponent = player.getComponent(PlayerComponent.class);
+        CharacterComponent playerComponent = player.getComponent(CharacterComponent.class);
         playerComponent.spawnPosition.set(spawnPosition);
         player.saveComponent(playerComponent);
 

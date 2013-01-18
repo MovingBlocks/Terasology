@@ -17,7 +17,7 @@ package org.terasology.rendering.gui.windows;
 
 import org.terasology.asset.Assets;
 import org.terasology.components.HealthComponent;
-import org.terasology.components.LocalPlayerComponent;
+import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;

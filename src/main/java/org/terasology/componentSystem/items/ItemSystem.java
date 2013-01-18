@@ -21,6 +21,8 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
+import org.terasology.entitySystem.In;
+import org.terasology.entitySystem.RegisterMode;
 import org.terasology.math.TeraMath;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockItemComponent;
@@ -51,17 +53,16 @@ import com.google.common.collect.Lists;
  *
  * @author Immortius <immortius@gmail.com>
  */
-@RegisterComponentSystem
+@RegisterComponentSystem(RegisterMode.AUTHORITY)
 public class ItemSystem implements EventHandlerSystem {
-    private EntityManager entityManager;
+    @In
     private WorldProvider worldProvider;
+
+    @In
     private BlockEntityRegistry blockEntityRegistry;
 
     @Override
     public void initialise() {
-        entityManager = CoreRegistry.get(EntityManager.class);
-        worldProvider = CoreRegistry.get(WorldProvider.class);
-        blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
     }
 
     @Override

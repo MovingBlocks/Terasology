@@ -17,6 +17,7 @@ package org.terasology.entityFactory;
 
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LightComponent;
+import org.terasology.network.NetworkComponent;
 import org.terasology.world.block.BlockEntityMode;
 import org.terasology.world.block.BlockItemComponent;
 import org.terasology.entitySystem.EntityManager;
@@ -68,6 +69,7 @@ public class BlockItemFactory {
         if (blockFamily.getArchetypeBlock().getEntityMode() == BlockEntityMode.PERSISTENT) {
             if (!placedEntity.exists()) {
                 placedEntity = entityManager.create(blockFamily.getArchetypeBlock().getEntityPrefab());
+                placedEntity.addComponent(new NetworkComponent());
             }
             blockItem.placedEntity = placedEntity;
         }

@@ -16,22 +16,30 @@
 package org.terasology.components;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.network.Replicate;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
 public final class HealthComponent implements Component {
     // Configuration options
+    @Replicate
     public int maxHealth = 20;
+    @Replicate
     public float regenRate = 0.0f;
+    @Replicate
     public float waitBeforeRegen = 0.0f;
 
+    @Replicate
     public float fallingDamageSpeedThreshold = 20;
+    @Replicate
     public float excessSpeedDamageMultiplier = 10f;
 
+    @Replicate
     public int currentHealth = 20;
 
     // Regen info
+    // TODO: Switch to a system that requires less updates
     public float timeSinceLastDamage = 0.0f;
     public float partialRegen = 0.0f;
 

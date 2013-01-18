@@ -1,6 +1,6 @@
 package org.terasology.game.modes.loadProcesses;
 
-import org.terasology.componentSystem.controllers.LocalPlayerSystem;
+import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.modes.LoadProcess;
 import org.terasology.logic.players.LocalPlayer;
@@ -8,6 +8,7 @@ import org.terasology.network.NetworkSystem;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldInfo;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;

@@ -31,8 +31,8 @@ import org.terasology.asset.Assets;
 import org.terasology.componentSystem.items.InventorySystem;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
-import org.terasology.components.LocalPlayerComponent;
-import org.terasology.components.PlayerComponent;
+import org.terasology.logic.players.LocalPlayerComponent;
+import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockItemComponent;
 import org.terasology.world.block.family.BlockFamily;
@@ -57,10 +57,10 @@ import javax.vecmath.Vector3f;
 
 /**
  * A cell which can contain an item and supports drag and drop.
- * To move an item the item will be moved to a special transfer slot as item will be dragged. This slot is in the PlayerComponent class.
+ * To move an item the item will be moved to a special transfer slot as item will be dragged. This slot is in the CharacterComponent class.
  * Therefore the item belongs to nobody as the transfer is ongoing and needs to be reseted if the action was interrupted.
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
- * @see PlayerComponent
+ * @see org.terasology.logic.characters.CharacterComponent
  */
 public class UIItemCell extends UIDisplayContainer  {
 
@@ -704,7 +704,7 @@ public class UIItemCell extends UIDisplayContainer  {
      * @return Returns the item in the transfer slot.
      */
     private static EntityRef getFromTransferSlot() {
-        return CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(PlayerComponent.class).transferSlot;
+        return CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(CharacterComponent.class).transferSlot;
     }
     
     /**
@@ -716,7 +716,7 @@ public class UIItemCell extends UIDisplayContainer  {
         
         //delete the item in transfer slot
         if (sourceCell == null) {
-            CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(PlayerComponent.class).transferSlot = EntityRef.NULL;
+            CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(CharacterComponent.class).transferSlot = EntityRef.NULL;
         }
         else {
             EntityRef target = getFromTransferSlot();
@@ -778,14 +778,14 @@ public class UIItemCell extends UIDisplayContainer  {
                         
                         //move the created item to the transfer slot
                         copyItem.container = sourceCell.ownerEntity;
-                        CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(PlayerComponent.class).transferSlot = copy;
+                        CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(CharacterComponent.class).transferSlot = copy;
                         
                     }
                     //no items in transfer slot left
                     else {
                         
                         //place whole stack in transfer slot
-                        CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(PlayerComponent.class).transferSlot = sourceCell.itemEntity;
+                        CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(CharacterComponent.class).transferSlot = sourceCell.itemEntity;
                         
                         //remove item from the owners inventory slot
                         InventoryComponent sourceInventory = sourceCell.getOwnerEntity().getComponent(InventoryComponent.class);

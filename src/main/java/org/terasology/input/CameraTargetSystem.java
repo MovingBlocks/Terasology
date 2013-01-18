@@ -53,6 +53,7 @@ public class CameraTargetSystem implements ComponentSystem {
     private Vector3f hitNormal = new Vector3f();
     private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD};
 
+    @Override
     public void initialise() {
     }
 

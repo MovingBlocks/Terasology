@@ -87,6 +87,7 @@ message ModuleInfo {
 
 message CreateEntityMessage {
     optional Entity entity = 1;
+    optional Vector3iData blockPos = 2;
 
     extensions 5000 to max;
 }

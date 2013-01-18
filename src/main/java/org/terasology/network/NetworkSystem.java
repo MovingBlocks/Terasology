@@ -40,6 +40,7 @@ import org.terasology.network.pipelineFactory.TerasologyServerPipelineFactory;
 import org.terasology.network.serialization.NetComponentSerializeCheck;
 import org.terasology.network.serialization.NetEntityRefTypeHandler;
 import org.terasology.protobuf.NetData;
+import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 
 import java.net.InetSocketAddress;
@@ -63,6 +64,7 @@ public class NetworkSystem implements EntityChangeSubscriber {
     private EntitySystemLibrary entitySystemLibrary;
     private EventSerializer eventSerializer;
     private EntitySerializer entitySerializer;
+    private BlockEntityRegistry blockEntityRegistry;
 
     private ChannelFactory factory;
     private TIntIntMap netIdToEntityId = new TIntIntHashMap();
@@ -252,7 +254,7 @@ public class NetworkSystem implements EntityChangeSubscriber {
         }
     }
 
-    public void connectToEntitySystem(PersistableEntityManager entityManager, EntitySystemLibrary library) {
+    public void connectToEntitySystem(PersistableEntityManager entityManager, EntitySystemLibrary library, BlockEntityRegistry blockEntityRegistry) {
         if (this.entityManager != null) {
             this.entityManager.unsubscribe(this);
         }
@@ -263,8 +265,8 @@ public class NetworkSystem implements EntityChangeSubscriber {
         for (Map.Entry<Class<?>, TypeHandler<?>> entry : library.getTypeHandlerLibrary()) {
             builder.addRaw(entry.getKey(), entry.getValue());
         }
-        builder.add(EntityRef.class, new NetEntityRefTypeHandler(this));
-        // TODO: Add network override types here
+        builder.add(EntityRef.class, new NetEntityRefTypeHandler(this, blockEntityRegistry));
+        // TODO: Add network override types here (that use id lookup tables)
 
         this.entitySystemLibrary = new EntitySystemLibraryImpl(builder.build());
         EventLibrary eventLibrary = entitySystemLibrary.getEventLibrary();
@@ -280,9 +282,10 @@ public class NetworkSystem implements EntityChangeSubscriber {
         entitySerializer = new EntitySerializer(entityManager, componentLibrary);
         entitySerializer.setIgnoringEntityId(true);
         entitySerializer.setComponentSerializeCheck(new NetComponentSerializeCheck());
+        this.blockEntityRegistry = blockEntityRegistry;
 
         if (server != null) {
-            server.connectToEntitySystem(entityManager, entitySerializer, eventSerializer);
+            server.connectToEntitySystem(entityManager, entitySerializer, eventSerializer, blockEntityRegistry);
         }
     }
 

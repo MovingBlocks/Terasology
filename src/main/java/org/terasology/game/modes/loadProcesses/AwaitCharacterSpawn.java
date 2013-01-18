@@ -17,7 +17,7 @@
 package org.terasology.game.modes.loadProcesses;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.components.LocalPlayerComponent;
+import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.modes.LoadProcess;

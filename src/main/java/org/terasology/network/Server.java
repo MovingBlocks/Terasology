@@ -18,6 +18,7 @@ import org.terasology.network.serialization.ClientComponentFieldCheck;
 import org.terasology.network.serialization.ServerComponentFieldCheck;
 import org.terasology.protobuf.EntityData;
 import org.terasology.protobuf.NetData;
+import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 
@@ -43,6 +44,7 @@ public class Server {
     private EntitySerializer entitySerializer;
     private EventSerializer eventSerializer;
 
+    private BlockEntityRegistry blockEntityRegistry;
     private RemoteChunkProvider remoteWorldProvider;
     private BlockingQueue<Chunk> chunkQueue = Queues.newLinkedBlockingQueue();
     private TIntSet netDirty = new TIntHashSet();
@@ -59,10 +61,11 @@ public class Server {
         this.networkSystem = system;
     }
 
-    void connectToEntitySystem(PersistableEntityManager entityManager, EntitySerializer entitySerializer, EventSerializer eventSerializer) {
+    void connectToEntitySystem(PersistableEntityManager entityManager, EntitySerializer entitySerializer, EventSerializer eventSerializer, BlockEntityRegistry blockEntityRegistry) {
         this.entityManager = entityManager;
         this.eventSerializer = eventSerializer;
         this.entitySerializer = entitySerializer;
+        this.blockEntityRegistry = blockEntityRegistry;
     }
 
     void setServerInfo(NetData.ServerInfoMessage serverInfo) {
@@ -169,9 +172,7 @@ public class Server {
         for (NetData.NetMessage message : messages) {
             switch (message.getType()) {
                 case CREATE_ENTITY:
-                    EntityRef newEntity = entitySerializer.deserialize(message.getCreateEntity().getEntity());
-                    logger.info("Received new entity: {} with net id {}", newEntity, newEntity.getComponent(NetworkComponent.class).networkId);
-                    networkSystem.registerNetworkEntity(newEntity);
+                    createEntityMessage(message.getCreateEntity());
                     break;
                 case UPDATE_ENTITY:
                     EntityRef currentEntity = networkSystem.getEntity(message.getUpdateEntity().getNetId());
@@ -193,6 +194,18 @@ public class Server {
             }
         }
 
+    }
+
+    private void createEntityMessage(NetData.CreateEntityMessage message) {
+        EntityRef newEntity;
+        if (message.hasBlockPos()) {
+            newEntity = blockEntityRegistry.getOrCreateBlockEntityAt(NetworkUtil.convert(message.getBlockPos()));
+            entitySerializer.deserializeOnto(newEntity, message.getEntity());
+        } else {
+            newEntity = entitySerializer.deserialize(message.getEntity());
+        }
+        logger.info("Received new entity: {} with net id {}", newEntity, newEntity.getComponent(NetworkComponent.class).networkId);
+        networkSystem.registerNetworkEntity(newEntity);
     }
 
     public void queueMessage(NetData.NetMessage message) {

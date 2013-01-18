@@ -16,7 +16,7 @@
 package org.terasology.componentSystem.action;
 
 import org.terasology.components.InventoryComponent;
-import org.terasology.components.LocalPlayerComponent;
+import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.components.actions.AccessInventoryActionComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;

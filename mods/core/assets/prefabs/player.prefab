@@ -1,7 +1,7 @@
 {
     "persisted" : false,
     "Location" : {},
-    "Player" : {},
+    "Character" : {},
     "Network" : {
         "replicateMode" : "ALWAYS"
     },

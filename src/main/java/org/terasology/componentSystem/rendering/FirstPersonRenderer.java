@@ -40,7 +40,7 @@ import org.terasology.asset.Assets;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
-import org.terasology.components.LocalPlayerComponent;
+import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.entitySystem.In;
 import org.terasology.world.block.BlockItemComponent;
 import org.terasology.entitySystem.EntityRef;

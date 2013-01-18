@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.components;
+package org.terasology.logic.characters;
 
 import javax.vecmath.Vector3f;
 
@@ -21,11 +21,13 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 
 /**
- * Player information that is shared across the network
+ * Information common to characters (the physical body of players and creatures)
  *
  * @author Immortius <immortius@gmail.com>
  */
-public final class PlayerComponent implements Component {
+public final class CharacterComponent implements Component {
     public Vector3f spawnPosition = new Vector3f();
     public EntityRef transferSlot = EntityRef.NULL;
+    public float eyeOffset = 0.6f;
+    public float interactionRange = 5f;
 }

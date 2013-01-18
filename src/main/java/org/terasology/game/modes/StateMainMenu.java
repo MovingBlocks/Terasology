@@ -15,9 +15,6 @@
  */
 package org.terasology.game.modes;
 
-import java.util.Iterator;
-
-import org.terasology.components.LocalPlayerComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventSystem;
 import org.terasology.entitySystem.PersistableEntityManager;

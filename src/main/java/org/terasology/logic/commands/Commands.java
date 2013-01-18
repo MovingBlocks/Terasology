@@ -27,7 +27,7 @@ import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
-import org.terasology.components.PlayerComponent;
+import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.components.SimpleAIComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entityFactory.BlockItemFactory;
@@ -589,7 +589,7 @@ public class Commands implements CommandProvider {
     @Command(shortDescription = "Sets the spawn position of the player")
     public void setSpawn() {
         EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getCharacterEntity();
-        PlayerComponent spawn = playerEntity.getComponent(PlayerComponent.class);
+        CharacterComponent spawn = playerEntity.getComponent(CharacterComponent.class);
         spawn.spawnPosition = playerEntity.getComponent(LocationComponent.class).getWorldPosition();
         playerEntity.saveComponent(spawn);
     }

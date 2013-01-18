@@ -46,6 +46,7 @@ import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.OwnerEvent;
 import org.terasology.network.ServerEvent;
+import org.terasology.world.block.BlockComponent;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

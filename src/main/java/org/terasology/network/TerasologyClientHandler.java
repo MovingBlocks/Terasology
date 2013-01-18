@@ -92,8 +92,9 @@ public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
             case EVENT:
                 server.queueEvent(message.getEvent());
                 break;
+            default:
+                logger.warn("Received unexpected message: {}", message.getType());
         }
-        logger.trace("Received message: {}", message.getType());
     }
 
     private void blockChanged(BlockChangeMessage blockChange) {

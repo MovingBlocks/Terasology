@@ -17,7 +17,7 @@ package org.terasology.miniion.componentsystem.controllers;
 
 import javax.vecmath.Vector3f;
 
-import org.terasology.components.LocalPlayerComponent;
+import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.components.world.WorldComponent;
 import org.terasology.miniion.components.UIMessageQueue;
 import org.terasology.miniion.components.UIMinionbar;

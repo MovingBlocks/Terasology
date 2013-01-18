@@ -32,6 +32,7 @@ import org.terasology.entitySystem.event.ChangedComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
+import org.terasology.network.NetworkComponent;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
@@ -125,6 +126,9 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
     private void setupBlockEntity(Vector3i blockPosition, EntityRef blockEntity, Block block) {
         blockEntity.addComponent(new LocationComponent(blockPosition.toVector3f()));
         blockEntity.addComponent(new BlockComponent(blockPosition, block.getEntityMode() == BlockEntityMode.ON_INTERACTION));
+        if (block.getEntityMode() != BlockEntityMode.ON_INTERACTION) {
+            blockEntity.addComponent(new NetworkComponent());
+        }
         // TODO: Get regen and wait from block config?
         if (block.isDestructible()) {
             blockEntity.addComponent(new HealthComponent(block.getHardness(), 2.0f, 1.0f));
@@ -235,12 +239,18 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
         PerformanceMonitor.startActivity("Temp Blocks Cleanup");
         for (EntityRef entity : tempBlocks) {
             BlockComponent blockComp = entity.getComponent(BlockComponent.class);
-            if (blockComp == null || !blockComp.temporary)
+            if (blockComp == null || !blockComp.temporary) {
+                if (blockComp != null && !entity.hasComponent(NetworkComponent.class)) {
+                    entity.addComponent(new NetworkComponent());
+                }
                 continue;
+            }
 
             HealthComponent healthComp = entity.getComponent(HealthComponent.class);
             if (healthComp == null || healthComp.currentHealth == healthComp.maxHealth) {
                 entity.destroy();
+            } else {
+                entity.addComponent(new NetworkComponent());
             }
         }
         tempBlocks.clear();

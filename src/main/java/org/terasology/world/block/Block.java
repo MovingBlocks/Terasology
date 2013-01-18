@@ -161,7 +161,7 @@ public class Block {
 
     // Entity integration
     private String entityPrefab = "";
-    private BlockEntityMode entityMode = BlockEntityMode.PERSISTENT;
+    private BlockEntityMode entityMode = BlockEntityMode.ON_INTERACTION;
 
     // Inventory settings
     private boolean directPickup = false;

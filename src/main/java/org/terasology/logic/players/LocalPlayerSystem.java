@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.componentSystem.controllers;
+package org.terasology.logic.players;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.*;
+import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.world.block.BlockComponent;
@@ -42,7 +43,6 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.input.ButtonState;
 import org.terasology.input.CameraTargetSystem;
-import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.world.WorldProvider;
@@ -109,6 +109,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         EntityRef entity = localPlayer.getCharacterEntity();
         LocalPlayerComponent localPlayerComponent = entity.getComponent(LocalPlayerComponent.class);
         CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
+        CharacterComponent characterComp = entity.getComponent(CharacterComponent.class);
         LocationComponent location = entity.getComponent(LocationComponent.class);
 
         if (localPlayerComponent.isDead) {
@@ -120,7 +121,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         // TODO: Remove, use component camera, breaks spawn camera anyway
         Quat4f lookRotation = new Quat4f();
         QuaternionUtil.setEuler(lookRotation, TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw, TeraMath.DEG_TO_RAD * localPlayerComponent.viewPitch, 0);
-        updateCamera(characterMovementComponent, location.getWorldPosition(), lookRotation);
+        updateCamera(characterComp, characterMovementComponent, location.getWorldPosition(), lookRotation);
 
         // Hand animation update
         localPlayerComponent.handAnimation = Math.max(0, localPlayerComponent.handAnimation - 2.5f * delta);
@@ -234,7 +235,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         }
 
         LocationComponent locationComponent = entity.getComponent(LocationComponent.class);
-        PlayerComponent playerComponent = entity.getComponent(PlayerComponent.class);
+        CharacterComponent playerComponent = entity.getComponent(CharacterComponent.class);
         if (playerComponent != null && locationComponent != null) {
             locationComponent.setWorldPosition(playerComponent.spawnPosition);
             entity.saveComponent(locationComponent);
@@ -270,11 +271,10 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         characterMovementComponent.setDrive(relMove);
     }
 
-    private void updateCamera(CharacterMovementComponent charMovementComp, Vector3f position, Quat4f rotation) {
+    private void updateCamera(CharacterComponent characterComponent, CharacterMovementComponent charMovementComp, Vector3f position, Quat4f rotation) {
         // The camera position is the player's position plus the eye offset
         Vector3d cameraPosition = new Vector3d();
-        // TODO: don't hardset eye position
-        cameraPosition.add(new Vector3d(position), new Vector3d(0, 0.6f, 0));
+        cameraPosition.add(new Vector3d(position), new Vector3d(0, characterComponent.eyeOffset, 0));
 
         playerCamera.getPosition().set(cameraPosition);
         Vector3f viewDir = new Vector3f(0, 0, 1);
@@ -300,43 +300,6 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         }
     }
 
-    @ReceiveEvent(components = {LocalPlayerComponent.class, InventoryComponent.class})
-    public void onAttackRequest(AttackButton event, EntityRef entity) {
-        if (!event.isDown() || timer.getTimeInMs() - lastInteraction < 200) {
-            return;
-        }
-
-        LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
-        InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
-        if (localPlayerComp.isDead) return;
-
-        EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayerComp.selectedTool);
-        attack(event.getTarget(), entity, selectedItemEntity, event.getTargetBlockPosition());
-
-        lastInteraction = timer.getTimeInMs();
-        localPlayerComp.handAnimation = 0.5f;
-        entity.saveComponent(localPlayerComp);
-        event.consume();
-    }
-
-    private void attack(EntityRef target, EntityRef player, EntityRef selectedItemEntity, Vector3i blockTargetPos) {
-        // TODO: Should send an attack event to self, and another system common to all creatures should handle this
-        int damage = 1;
-        ItemComponent item = selectedItemEntity.getComponent(ItemComponent.class);
-        if (item != null) {
-            damage = item.baseDamage;
-
-            BlockComponent blockComp = target.getComponent(BlockComponent.class);
-            BlockRegionComponent blockRegionComponent = target.getComponent(BlockRegionComponent.class);
-            if (blockComp != null || blockRegionComponent != null) {
-                Block block = worldProvider.getBlock(blockTargetPos);
-                if (item.getPerBlockDamageBonus().containsKey(block.getBlockFamily().getURI().toString())) {
-                    damage += item.getPerBlockDamageBonus().get(block.getBlockFamily().getURI().toString());
-                }
-            }
-        }
-        target.send(new DamageEvent(damage, player));
-    }
 
     @ReceiveEvent(components = {LocalPlayerComponent.class})
     public void onFrobRequest(FrobButton event, EntityRef entity) {
@@ -417,62 +380,6 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
         entity.saveComponent(localPlayerComp);
         event.consume();
-    }
-
-    @ReceiveEvent(components = {LocalPlayerComponent.class})
-    public void onNextItem(ToolbarNextButton event, EntityRef entity) {
-        LocalPlayerComponent localPlayerComp = localPlayer.getCharacterEntity().getComponent(LocalPlayerComponent.class);
-        localPlayerComp.selectedTool = (localPlayerComp.selectedTool + 1) % 10;
-        localPlayer.getCharacterEntity().saveComponent(localPlayerComp);
-        event.consume();
-    }
-
-    @ReceiveEvent(components = {LocalPlayerComponent.class})
-    public void onPrevItem(ToolbarPrevButton event, EntityRef entity) {
-        LocalPlayerComponent localPlayerComp = localPlayer.getCharacterEntity().getComponent(LocalPlayerComponent.class);
-        localPlayerComp.selectedTool = (localPlayerComp.selectedTool - 1) % 10;
-        if (localPlayerComp.selectedTool < 0) {
-            localPlayerComp.selectedTool = 10 + localPlayerComp.selectedTool;
-        }
-        localPlayer.getCharacterEntity().saveComponent(localPlayerComp);
-        event.consume();
-    }
-
-    @ReceiveEvent(components = {LocalPlayerComponent.class})
-    public void onSlotButton(ToolbarSlotButton event, EntityRef entity) {
-        LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
-        localPlayerComp.selectedTool = event.getSlot();
-        localPlayer.getCharacterEntity().saveComponent(localPlayerComp);
-    }
-
-    @ReceiveEvent(components = {LocalPlayerComponent.class, InventoryComponent.class})
-    public void onUseItemRequest(UseItemButton event, EntityRef entity) {
-        if (!event.isDown() || timer.getTimeInMs() - lastInteraction < 200) {
-            return;
-        }
-
-        LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
-        InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
-        if (localPlayerComp.isDead) return;
-
-        EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayerComp.selectedTool);
-
-        ItemComponent item = selectedItemEntity.getComponent(ItemComponent.class);
-        if (item != null && item.usage != ItemComponent.UsageType.NONE) {
-            useItem(event.getTarget(), entity, selectedItemEntity, event.getHitPosition(), event.getHitNormal());
-        }
-        lastInteraction = timer.getTimeInMs();
-        localPlayerComp.handAnimation = 0.5f;
-        entity.saveComponent(localPlayerComp);
-        event.consume();
-    }
-
-    private void useItem(EntityRef target, EntityRef player, EntityRef item, Vector3f hitPosition, Vector3f hitNormal) {
-        if (target.exists()) {
-            item.send(new ActivateEvent(target, player, new Vector3f(playerCamera.getPosition()), new Vector3f(playerCamera.getViewingDirection()), hitPosition, hitNormal));
-        } else {
-            item.send(new ActivateEvent(player, new Vector3f(playerCamera.getPosition()), new Vector3f(playerCamera.getViewingDirection())));
-        }
     }
 
     private float calcBobbingOffset(float phaseOffset, float amplitude, float frequency) {

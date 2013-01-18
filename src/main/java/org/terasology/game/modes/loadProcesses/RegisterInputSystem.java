@@ -19,7 +19,7 @@ package org.terasology.game.modes.loadProcesses;
 import org.lwjgl.input.Keyboard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.componentSystem.controllers.LocalPlayerSystem;
+import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.config.Config;
 import org.terasology.config.InputConfig;
 import org.terasology.game.ComponentSystemManager;

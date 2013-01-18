@@ -22,8 +22,8 @@ import org.lwjgl.opengl.GL11;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.componentSystem.RenderSystem;
-import org.terasology.componentSystem.controllers.LocalPlayerSystem;
-import org.terasology.components.PlayerComponent;
+import org.terasology.logic.characters.CharacterComponent;
+import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
@@ -746,7 +746,7 @@ public final class WorldRenderer {
     private void animateSpawnCamera(double delta) {
         if (player == null || !player.isValid())
             return;
-        PlayerComponent player = this.player.getCharacterEntity().getComponent(PlayerComponent.class);
+        CharacterComponent player = this.player.getCharacterEntity().getComponent(CharacterComponent.class);
 
         Vector3f cameraPosition = new Vector3f(player.spawnPosition);
         cameraPosition.y += 32;
