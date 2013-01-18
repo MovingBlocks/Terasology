@@ -13,35 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.componentSystem.action;
+package org.terasology.craft.componentSystem.action;
 
 import com.google.common.collect.Maps;
 import org.terasology.componentSystem.items.InventorySystem;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.LocalPlayerComponent;
-import org.terasology.components.actions.CraftingActionComponent;
+import org.terasology.craft.components.actions.CraftingActionComponent;
 import org.terasology.components.utility.CraftRecipeComponent;
+import org.terasology.craft.rendering.CraftingGrid;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.*;
 import org.terasology.events.ActivateEvent;
-import org.terasology.events.DamageEvent;
-import org.terasology.events.crafting.AddItemEvent;
-import org.terasology.events.crafting.ChangeLevelEvent;
-import org.terasology.events.crafting.CheckRefinementEvent;
-import org.terasology.events.crafting.DeleteItemEvent;
+import org.terasology.craft.events.crafting.AddItemEvent;
+import org.terasology.craft.events.crafting.ChangeLevelEvent;
+import org.terasology.craft.events.crafting.CheckRefinementEvent;
+import org.terasology.craft.events.crafting.DeleteItemEvent;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.math.AABB;
-import org.terasology.rendering.CraftingGrid;
 import org.terasology.rendering.gui.widgets.UIItemContainer;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.*;
 import org.terasology.world.block.management.BlockManager;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Small-Jeeper
@@ -83,8 +85,6 @@ public class CraftingAction implements EventHandlerSystem {
             }
 
         }
-        
-        System.out.print("s");
     }
 
     @Override
