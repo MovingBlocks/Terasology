@@ -19,6 +19,8 @@ package org.terasology.asset.sources;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetSource;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
@@ -30,9 +32,12 @@ import java.util.List;
  * @author Immortius
  */
 public abstract class AbstractSource implements AssetSource {
+    private static final Logger logger = LoggerFactory.getLogger(AbstractSource.class);
+
     private String sourceId;
     private Multimap<AssetUri, URL> assets = HashMultimap.create();
     private Multimap<AssetType, AssetUri> assetsByType = HashMultimap.create();
+    private Multimap<AssetUri, URL> overrides = HashMultimap.create();
 
     public AbstractSource(String id) {
         sourceId = id;
@@ -58,6 +63,16 @@ public abstract class AbstractSource implements AssetSource {
         return assetsByType.get(type);
     }
 
+    @Override
+    public List<URL> getOverride(AssetUri uri) {
+        return Lists.newArrayList(overrides.get(uri));
+    }
+
+    @Override
+    public Iterable<AssetUri> listOverrides() {
+        return overrides.keySet();
+    }
+
     protected void clear() {
         assets.clear();
         assetsByType.clear();
@@ -68,7 +83,16 @@ public abstract class AbstractSource implements AssetSource {
         assetsByType.put(uri.getAssetType(), uri);
     }
 
+    protected void addOverride(AssetUri uri, URL url) {
+        logger.debug("Adding override {} with urls {}", uri, url);
+        overrides.put(uri, url);
+    }
+
     protected AssetUri getUri(String relativePath) {
+        return getUri(sourceId, relativePath);
+    }
+
+    protected AssetUri getUri(String moduleId, String relativePath) {
         String[] parts = relativePath.split("/", 2);
         if (parts.length > 1) {
             int lastSepIndex = parts[1].lastIndexOf("/");
@@ -81,7 +105,7 @@ public abstract class AbstractSource implements AssetSource {
                 String extension = parts[1].substring(extensionSeparator + 1);
                 AssetType assetType = AssetType.getTypeFor(parts[0], extension);
                 if (assetType != null) {
-                    return assetType.getUri(sourceId, name);
+                    return assetType.getUri(moduleId, name);
                 }
             }
         }

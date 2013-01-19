@@ -274,6 +274,7 @@ public class BlockLoader {
         List<ShapelessFamily> result = Lists.newArrayList();
         for (AssetUri blockTileUri : Assets.list(AssetType.BLOCK_TILE)) {
             if (AssetManager.getInstance().getAssetURLs(blockTileUri).get(0).getPath().contains(AUTO_BLOCK_URL_FRAGMENT)) {
+                logger.debug("Loading auto block {}", blockTileUri);
                 BlockUri uri = new BlockUri(blockTileUri.getPackage(), blockTileUri.getAssetName());
                 result.add(new ShapelessFamily(uri));
                 getTileIndex(blockTileUri, true);

@@ -1,0 +1,6 @@
+{
+    "id" : "override",
+    "displayName" : "Override Test",
+    "author" : "Immortius",
+    "description" : "This is a test mod for the ability to override assets"
+}

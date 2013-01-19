@@ -126,7 +126,7 @@ public class Commands implements CommandProvider {
         } else {
             for (String packageName : Assets.listModules()) {
                 AssetUri modUri = new AssetUri(AssetType.SHAPE, packageName, uri);
-                Asset asset = AssetManager.tryLoad(modUri);
+                Asset asset = Assets.get(modUri);
                 if (asset != null) {
                     matches.add(modUri);
                 }
