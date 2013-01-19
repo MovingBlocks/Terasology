@@ -32,6 +32,7 @@ import org.terasology.protobuf.EntityData;
 public final class FieldMetadata {
     private static final Logger logger = LoggerFactory.getLogger(FieldMetadata.class);
 
+    private int id;
     private Field field;
     private Method getter;
     private Method setter;
@@ -60,6 +61,14 @@ public final class FieldMetadata {
 
     public Class<?> getType() {
         return field.getType();
+    }
+
+    void setId(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public Object getValue(Object obj) throws IllegalAccessException, InvocationTargetException {
@@ -126,7 +135,7 @@ public final class FieldMetadata {
      * @param event
      * @return
      */
-    public EntityData.NameValue serialize(Object event) {
+    public EntityData.NameValue serialize(Object event, boolean usingFieldIds) {
         try {
             Object rawValue = getValue(event);
             if (rawValue == null) {
@@ -135,7 +144,11 @@ public final class FieldMetadata {
 
             EntityData.Value value = serializeValue(rawValue);
             if (value != null) {
-                return EntityData.NameValue.newBuilder().setName(field.getName()).setValue(value).build();
+                if (usingFieldIds) {
+                    return EntityData.NameValue.newBuilder().setNameIndex(id).setValue(value).build();
+                } else {
+                    return EntityData.NameValue.newBuilder().setName(field.getName()).setValue(value).build();
+                }
             }
         } catch (IllegalAccessException e) {
             logger.error("Exception during serializing of {}", event.getClass(), e);

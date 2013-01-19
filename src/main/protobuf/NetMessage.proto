@@ -8,6 +8,12 @@ option java_package = "org.terasology.protobuf";
 option java_outer_classname = "NetData";
 option optimize_for = SPEED;
 
+message NetPackage {
+    repeated NetMessage message = 1;
+
+    extensions 5000 to max;
+}
+
 message NetMessage {
     enum Type { CLIENT_CONNECT = 1; CONSOLE = 2; SERVER_INFO = 3; CHUNK = 4; INVALIDATE_CHUNK = 5; BLOCK_CHANGED = 6; CREATE_ENTITY = 7; REMOVE_ENTITY = 8; UPDATE_ENTITY = 9; EVENT = 10;}
     required Type type = 1;
@@ -62,19 +68,26 @@ message ClientConnectMessage {
 
 message ServerInfoMessage {
     repeated ModuleInfo module = 1;
-    repeated BlockMapping blockMapping = 2;
-    optional int64 time = 3;
+    repeated int32 blockId = 2 [packed=true];
+    repeated string blockName = 3;
+    repeated SerializationInfo component = 4;
+    repeated SerializationInfo event = 5;
+    repeated int32 assetIds = 6 [packed=true];
+    repeated string assetUris = 7;
 
     optional string version = 15;
     optional string worldName = 16;
     optional int32 clientId = 17;
+    optional int64 time = 18;
 
     extensions 5000 to max;
 }
 
-message BlockMapping {
-    optional string blockName = 1;
-    optional int32 blockId = 2;
+message SerializationInfo {
+    optional string name = 1;
+    optional int32 id = 2;
+    repeated string fieldName = 3;
+    repeated int32 fieldId = 4 [packed=true];
 
     extensions 5000 to max;
 }

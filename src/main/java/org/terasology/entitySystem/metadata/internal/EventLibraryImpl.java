@@ -36,6 +36,11 @@ public class EventLibraryImpl extends BaseLibraryImpl<Event> implements EventLib
     }
 
     @Override
+    public EventMetadata<? extends Event> getMetadata(String className) {
+        return (EventMetadata<? extends Event>) super.getMetadata(className);
+    }
+
+    @Override
     protected <U extends Event> ClassMetadata<U> createMetadata(Class<U> clazz, String ... names) {
         EventMetadata<U> info;
         try {

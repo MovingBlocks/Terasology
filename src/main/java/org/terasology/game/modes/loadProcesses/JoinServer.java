@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.ModConfig;
+import org.terasology.config.ServerInfo;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.modes.LoadProcess;
 import org.terasology.logic.mod.Mod;
@@ -39,10 +40,12 @@ public class JoinServer implements LoadProcess {
     @Override
     public boolean step() {
         if (networkSystem.getServer().getInfo() != null) {
-            worldInfo.setTitle(networkSystem.getServer().getInfo().getWorldName());
+            NetData.ServerInfoMessage serverInfo = networkSystem.getServer().getInfo();
+            worldInfo.setTitle(serverInfo.getWorldName());
+
             Map<String, Byte> blockMap = Maps.newHashMap();
-            for (NetData.BlockMapping mapping : networkSystem.getServer().getInfo().getBlockMappingList()) {
-                blockMap.put(mapping.getBlockName(), (byte)mapping.getBlockId());
+            for (int i = 0; i < serverInfo.getBlockIdCount(); ++i) {
+                blockMap.put(serverInfo.getBlockName(i), (byte)serverInfo.getBlockId(i));
             }
             worldInfo.setBlockIdMap(blockMap);
             worldInfo.setTime(networkSystem.getServer().getInfo().getTime());

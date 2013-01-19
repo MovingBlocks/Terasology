@@ -33,4 +33,6 @@ public interface EventLibrary extends ClassLibrary<Event> {
 
     <T extends Event> EventMetadata<T> getMetadata(T object);
 
+    EventMetadata<? extends Event> getMetadata(String className);
+
 }

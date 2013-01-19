@@ -16,6 +16,8 @@
 package org.terasology.entitySystem.metadata;
 
 import com.google.common.collect.Maps;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +37,7 @@ public class ClassMetadata<T> {
     private Class<T> clazz;
     private Constructor<T> constructor;
     private String[] names;
+    private TIntObjectMap<FieldMetadata> fieldsById = new TIntObjectHashMap<FieldMetadata>();
 
     public ClassMetadata(Class<T> simpleClass, String ... names) throws NoSuchMethodException {
         this.clazz = simpleClass;
@@ -47,8 +50,23 @@ public class ClassMetadata<T> {
         return Arrays.copyOf(names, names.length);
     }
 
+    public String getName() {
+        return names[0];
+    }
+
     public Class<T> getType() {
         return clazz;
+    }
+
+    public void setFieldId(FieldMetadata field, int id) {
+        if (fields.containsValue(field)) {
+            field.setId(id);
+            fieldsById.put(id, field);
+        }
+    }
+
+    public FieldMetadata getFieldById(int id) {
+        return fieldsById.get(id);
     }
 
     public void addField(FieldMetadata fieldInfo) {

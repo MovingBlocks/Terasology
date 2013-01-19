@@ -3,6 +3,7 @@ package org.terasology.entitySystem.persistence;
 import com.google.common.base.Objects;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
+import com.google.common.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
@@ -33,6 +34,7 @@ public class ComponentSerializer {
 
     private ComponentLibrary componentLibrary;
     private BiMap<Class<? extends Component>, Integer> idTable = ImmutableBiMap.<Class<? extends Component>, Integer>builder().build();
+    private boolean usingFieldIds = false;
 
     /**
      * Creates the component serializer.
@@ -41,6 +43,14 @@ public class ComponentSerializer {
      */
     public ComponentSerializer(ComponentLibrary componentLibrary) {
         this.componentLibrary = componentLibrary;
+    }
+
+    public void setUsingFieldIds(boolean usingFieldIds) {
+        this.usingFieldIds = usingFieldIds;
+    }
+
+    public boolean isUsingFieldIds() {
+        return usingFieldIds;
     }
 
     /**
@@ -110,7 +120,12 @@ public class ComponentSerializer {
     private Component deserializeOnto(Component targetComponent, EntityData.Component componentData, ClassMetadata componentMetadata, FieldSerializeCheck<Component> fieldCheck) {
         try {
             for (EntityData.NameValue field : componentData.getFieldList()) {
-                FieldMetadata fieldInfo = componentMetadata.getField(field.getName());
+                FieldMetadata fieldInfo = null;
+                if (field.hasNameIndex()) {
+                    fieldInfo = componentMetadata.getFieldById(field.getNameIndex());
+                } else if (field.hasName()) {
+                    fieldInfo = componentMetadata.getField(field.getName());
+                }
                 if (fieldInfo == null || !fieldCheck.shouldDeserializeField(fieldInfo)) {
                     continue;
                 }
@@ -158,7 +173,7 @@ public class ComponentSerializer {
 
         for (FieldMetadata field : componentMetadata.iterateFields()) {
             if (check.shouldSerializeField(field, component)) {
-                EntityData.NameValue fieldData = field.serialize(component);
+                EntityData.NameValue fieldData = field.serialize(component, usingFieldIds);
                 if (fieldData != null) {
                     componentMessage.addField(fieldData);
                 }
@@ -216,7 +231,11 @@ public class ComponentSerializer {
                     if (!Objects.equal(origValue, deltaValue)) {
                         EntityData.Value value = field.serializeValue(deltaValue);
                         if (value != null) {
-                            componentMessage.addField(EntityData.NameValue.newBuilder().setName(field.getName()).setValue(value).build());
+                            if (usingFieldIds) {
+                                componentMessage.addField(EntityData.NameValue.newBuilder().setNameIndex(field.getId()).setValue(value).build());
+                            } else {
+                                componentMessage.addField(EntityData.NameValue.newBuilder().setName(field.getName()).setValue(value).build());
+                            }
                             changed = true;
                         } else {
                             logger.error("Exception serializing component type: {}, field: {} - returned null", base.getClass(), field.getName());
@@ -268,5 +287,12 @@ public class ComponentSerializer {
         logger.warn("Unable to deserialize component, no type provided.");
 
         return null;
+    }
+
+    /**
+     * @return An immutable copy of the id mapping
+     */
+    public Map<Class<? extends Component>, Integer> getIdMapping() {
+        return ImmutableMap.copyOf(idTable);
     }
 }

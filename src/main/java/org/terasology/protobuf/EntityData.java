@@ -1638,7 +1638,7 @@ public final class EntityData {
     org.terasology.protobuf.EntityData.Value getValue();
     org.terasology.protobuf.EntityData.ValueOrBuilder getValueOrBuilder();
     
-    // optional sint32 name_index = 3;
+    // optional int32 name_index = 3;
     boolean hasNameIndex();
     int getNameIndex();
   }
@@ -1716,7 +1716,7 @@ public final class EntityData {
       return value_;
     }
     
-    // optional sint32 name_index = 3;
+    // optional int32 name_index = 3;
     public static final int NAME_INDEX_FIELD_NUMBER = 3;
     private int nameIndex_;
     public boolean hasNameIndex() {
@@ -1756,7 +1756,7 @@ public final class EntityData {
         output.writeMessage(2, value_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeSInt32(3, nameIndex_);
+        output.writeInt32(3, nameIndex_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -1777,7 +1777,7 @@ public final class EntityData {
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(3, nameIndex_);
+          .computeInt32Size(3, nameIndex_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -2046,7 +2046,7 @@ public final class EntityData {
             }
             case 24: {
               bitField0_ |= 0x00000004;
-              nameIndex_ = input.readSInt32();
+              nameIndex_ = input.readInt32();
               break;
             }
           }
@@ -2181,7 +2181,7 @@ public final class EntityData {
         return valueBuilder_;
       }
       
-      // optional sint32 name_index = 3;
+      // optional int32 name_index = 3;
       private int nameIndex_ ;
       public boolean hasNameIndex() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
@@ -2949,7 +2949,7 @@ public final class EntityData {
       com.google.protobuf.GeneratedMessage.
           ExtendableMessageOrBuilder<Entity> {
     
-    // optional sint32 id = 1;
+    // optional int32 id = 1;
     boolean hasId();
     int getId();
     
@@ -2963,7 +2963,7 @@ public final class EntityData {
     org.terasology.protobuf.EntityData.ComponentOrBuilder getComponentOrBuilder(
         int index);
     
-    // repeated sint32 removed_component_index = 3 [packed = true];
+    // repeated int32 removed_component_index = 3 [packed = true];
     java.util.List<java.lang.Integer> getRemovedComponentIndexList();
     int getRemovedComponentIndexCount();
     int getRemovedComponentIndex(int index);
@@ -3006,7 +3006,7 @@ public final class EntityData {
     }
     
     private int bitField0_;
-    // optional sint32 id = 1;
+    // optional int32 id = 1;
     public static final int ID_FIELD_NUMBER = 1;
     private int id_;
     public boolean hasId() {
@@ -3037,7 +3037,7 @@ public final class EntityData {
       return component_.get(index);
     }
     
-    // repeated sint32 removed_component_index = 3 [packed = true];
+    // repeated int32 removed_component_index = 3 [packed = true];
     public static final int REMOVED_COMPONENT_INDEX_FIELD_NUMBER = 3;
     private java.util.List<java.lang.Integer> removedComponentIndex_;
     public java.util.List<java.lang.Integer>
@@ -3131,7 +3131,7 @@ public final class EntityData {
         .ExtendableMessage<org.terasology.protobuf.EntityData.Entity>.ExtensionWriter extensionWriter =
           newExtensionWriter();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeSInt32(1, id_);
+        output.writeInt32(1, id_);
       }
       for (int i = 0; i < component_.size(); i++) {
         output.writeMessage(2, component_.get(i));
@@ -3141,7 +3141,7 @@ public final class EntityData {
         output.writeRawVarint32(removedComponentIndexMemoizedSerializedSize);
       }
       for (int i = 0; i < removedComponentIndex_.size(); i++) {
-        output.writeSInt32NoTag(removedComponentIndex_.get(i));
+        output.writeInt32NoTag(removedComponentIndex_.get(i));
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeBytes(4, getParentPrefabBytes());
@@ -3161,7 +3161,7 @@ public final class EntityData {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(1, id_);
+          .computeInt32Size(1, id_);
       }
       for (int i = 0; i < component_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
@@ -3171,7 +3171,7 @@ public final class EntityData {
         int dataSize = 0;
         for (int i = 0; i < removedComponentIndex_.size(); i++) {
           dataSize += com.google.protobuf.CodedOutputStream
-            .computeSInt32SizeNoTag(removedComponentIndex_.get(i));
+            .computeInt32SizeNoTag(removedComponentIndex_.get(i));
         }
         size += dataSize;
         if (!getRemovedComponentIndexList().isEmpty()) {
@@ -3512,7 +3512,7 @@ public final class EntityData {
             }
             case 8: {
               bitField0_ |= 0x00000001;
-              id_ = input.readSInt32();
+              id_ = input.readInt32();
               break;
             }
             case 18: {
@@ -3523,14 +3523,14 @@ public final class EntityData {
             }
             case 24: {
               ensureRemovedComponentIndexIsMutable();
-              removedComponentIndex_.add(input.readSInt32());
+              removedComponentIndex_.add(input.readInt32());
               break;
             }
             case 26: {
               int length = input.readRawVarint32();
               int limit = input.pushLimit(length);
               while (input.getBytesUntilLimit() > 0) {
-                addRemovedComponentIndex(input.readSInt32());
+                addRemovedComponentIndex(input.readInt32());
               }
               input.popLimit(limit);
               break;
@@ -3551,7 +3551,7 @@ public final class EntityData {
       
       private int bitField0_;
       
-      // optional sint32 id = 1;
+      // optional int32 id = 1;
       private int id_ ;
       public boolean hasId() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
@@ -3758,7 +3758,7 @@ public final class EntityData {
         return componentBuilder_;
       }
       
-      // repeated sint32 removed_component_index = 3 [packed = true];
+      // repeated int32 removed_component_index = 3 [packed = true];
       private java.util.List<java.lang.Integer> removedComponentIndex_ = java.util.Collections.emptyList();;
       private void ensureRemovedComponentIndexIsMutable() {
         if (!((bitField0_ & 0x00000004) == 0x00000004)) {
@@ -3910,7 +3910,7 @@ public final class EntityData {
       com.google.protobuf.GeneratedMessage.
           ExtendableMessageOrBuilder<Prefab> {
     
-    // optional sint32 name_index = 1;
+    // optional int32 name_index = 1;
     boolean hasNameIndex();
     int getNameIndex();
     
@@ -3924,7 +3924,7 @@ public final class EntityData {
     org.terasology.protobuf.EntityData.ComponentOrBuilder getComponentOrBuilder(
         int index);
     
-    // repeated sint32 parent_index = 3 [packed = true];
+    // repeated int32 parent_index = 3 [packed = true];
     java.util.List<java.lang.Integer> getParentIndexList();
     int getParentIndexCount();
     int getParentIndex(int index);
@@ -3971,7 +3971,7 @@ public final class EntityData {
     }
     
     private int bitField0_;
-    // optional sint32 name_index = 1;
+    // optional int32 name_index = 1;
     public static final int NAME_INDEX_FIELD_NUMBER = 1;
     private int nameIndex_;
     public boolean hasNameIndex() {
@@ -4002,7 +4002,7 @@ public final class EntityData {
       return component_.get(index);
     }
     
-    // repeated sint32 parent_index = 3 [packed = true];
+    // repeated int32 parent_index = 3 [packed = true];
     public static final int PARENT_INDEX_FIELD_NUMBER = 3;
     private java.util.List<java.lang.Integer> parentIndex_;
     public java.util.List<java.lang.Integer>
@@ -4107,7 +4107,7 @@ public final class EntityData {
         .ExtendableMessage<org.terasology.protobuf.EntityData.Prefab>.ExtensionWriter extensionWriter =
           newExtensionWriter();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeSInt32(1, nameIndex_);
+        output.writeInt32(1, nameIndex_);
       }
       for (int i = 0; i < component_.size(); i++) {
         output.writeMessage(2, component_.get(i));
@@ -4117,7 +4117,7 @@ public final class EntityData {
         output.writeRawVarint32(parentIndexMemoizedSerializedSize);
       }
       for (int i = 0; i < parentIndex_.size(); i++) {
-        output.writeSInt32NoTag(parentIndex_.get(i));
+        output.writeInt32NoTag(parentIndex_.get(i));
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeBool(4, persisted_);
@@ -4140,7 +4140,7 @@ public final class EntityData {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(1, nameIndex_);
+          .computeInt32Size(1, nameIndex_);
       }
       for (int i = 0; i < component_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
@@ -4150,7 +4150,7 @@ public final class EntityData {
         int dataSize = 0;
         for (int i = 0; i < parentIndex_.size(); i++) {
           dataSize += com.google.protobuf.CodedOutputStream
-            .computeSInt32SizeNoTag(parentIndex_.get(i));
+            .computeInt32SizeNoTag(parentIndex_.get(i));
         }
         size += dataSize;
         if (!getParentIndexList().isEmpty()) {
@@ -4504,7 +4504,7 @@ public final class EntityData {
             }
             case 8: {
               bitField0_ |= 0x00000001;
-              nameIndex_ = input.readSInt32();
+              nameIndex_ = input.readInt32();
               break;
             }
             case 18: {
@@ -4515,14 +4515,14 @@ public final class EntityData {
             }
             case 24: {
               ensureParentIndexIsMutable();
-              parentIndex_.add(input.readSInt32());
+              parentIndex_.add(input.readInt32());
               break;
             }
             case 26: {
               int length = input.readRawVarint32();
               int limit = input.pushLimit(length);
               while (input.getBytesUntilLimit() > 0) {
-                addParentIndex(input.readSInt32());
+                addParentIndex(input.readInt32());
               }
               input.popLimit(limit);
               break;
@@ -4548,7 +4548,7 @@ public final class EntityData {
       
       private int bitField0_;
       
-      // optional sint32 name_index = 1;
+      // optional int32 name_index = 1;
       private int nameIndex_ ;
       public boolean hasNameIndex() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
@@ -4755,7 +4755,7 @@ public final class EntityData {
         return componentBuilder_;
       }
       
-      // repeated sint32 parent_index = 3 [packed = true];
+      // repeated int32 parent_index = 3 [packed = true];
       private java.util.List<java.lang.Integer> parentIndex_ = java.util.Collections.emptyList();;
       private void ensureParentIndexIsMutable() {
         if (!((bitField0_ & 0x00000004) == 0x00000004)) {
@@ -5685,11 +5685,11 @@ public final class EntityData {
     int getComponentClassCount();
     String getComponentClass(int index);
     
-    // optional sint32 next_entity_id = 16;
+    // optional int32 next_entity_id = 16;
     boolean hasNextEntityId();
     int getNextEntityId();
     
-    // repeated sint32 freed_entity_id = 17 [packed = true];
+    // repeated int32 freed_entity_id = 17 [packed = true];
     java.util.List<java.lang.Integer> getFreedEntityIdList();
     int getFreedEntityIdCount();
     int getFreedEntityId(int index);
@@ -5784,7 +5784,7 @@ public final class EntityData {
       return componentClass_.get(index);
     }
     
-    // optional sint32 next_entity_id = 16;
+    // optional int32 next_entity_id = 16;
     public static final int NEXT_ENTITY_ID_FIELD_NUMBER = 16;
     private int nextEntityId_;
     public boolean hasNextEntityId() {
@@ -5794,7 +5794,7 @@ public final class EntityData {
       return nextEntityId_;
     }
     
-    // repeated sint32 freed_entity_id = 17 [packed = true];
+    // repeated int32 freed_entity_id = 17 [packed = true];
     public static final int FREED_ENTITY_ID_FIELD_NUMBER = 17;
     private java.util.List<java.lang.Integer> freedEntityId_;
     public java.util.List<java.lang.Integer>
@@ -5872,14 +5872,14 @@ public final class EntityData {
         output.writeBytes(15, componentClass_.getByteString(i));
       }
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeSInt32(16, nextEntityId_);
+        output.writeInt32(16, nextEntityId_);
       }
       if (getFreedEntityIdList().size() > 0) {
         output.writeRawVarint32(138);
         output.writeRawVarint32(freedEntityIdMemoizedSerializedSize);
       }
       for (int i = 0; i < freedEntityId_.size(); i++) {
-        output.writeSInt32NoTag(freedEntityId_.get(i));
+        output.writeInt32NoTag(freedEntityId_.get(i));
       }
       for (int i = 0; i < prefabName_.size(); i++) {
         output.writeBytes(18, prefabName_.getByteString(i));
@@ -5913,13 +5913,13 @@ public final class EntityData {
       }
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeSInt32Size(16, nextEntityId_);
+          .computeInt32Size(16, nextEntityId_);
       }
       {
         int dataSize = 0;
         for (int i = 0; i < freedEntityId_.size(); i++) {
           dataSize += com.google.protobuf.CodedOutputStream
-            .computeSInt32SizeNoTag(freedEntityId_.get(i));
+            .computeInt32SizeNoTag(freedEntityId_.get(i));
         }
         size += dataSize;
         if (!getFreedEntityIdList().isEmpty()) {
@@ -6330,19 +6330,19 @@ public final class EntityData {
             }
             case 128: {
               bitField0_ |= 0x00000008;
-              nextEntityId_ = input.readSInt32();
+              nextEntityId_ = input.readInt32();
               break;
             }
             case 136: {
               ensureFreedEntityIdIsMutable();
-              freedEntityId_.add(input.readSInt32());
+              freedEntityId_.add(input.readInt32());
               break;
             }
             case 138: {
               int length = input.readRawVarint32();
               int limit = input.pushLimit(length);
               while (input.getBytesUntilLimit() > 0) {
-                addFreedEntityId(input.readSInt32());
+                addFreedEntityId(input.readInt32());
               }
               input.popLimit(limit);
               break;
@@ -6786,7 +6786,7 @@ public final class EntityData {
         onChanged();
       }
       
-      // optional sint32 next_entity_id = 16;
+      // optional int32 next_entity_id = 16;
       private int nextEntityId_ ;
       public boolean hasNextEntityId() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
@@ -6807,7 +6807,7 @@ public final class EntityData {
         return this;
       }
       
-      // repeated sint32 freed_entity_id = 17 [packed = true];
+      // repeated int32 freed_entity_id = 17 [packed = true];
       private java.util.List<java.lang.Integer> freedEntityId_ = java.util.Collections.emptyList();;
       private void ensureFreedEntityIdIsMutable() {
         if (!((bitField0_ & 0x00000010) == 0x00000010)) {
@@ -6970,22 +6970,22 @@ public final class EntityData {
       "\n\005value\030\010 \003(\0132\006.Value\022\036\n\nname_value\030\t \003(" +
       "\0132\n.NameValue*\t\010\210\'\020\200\200\200\200\002\"D\n\tNameValue\022\014\n" +
       "\004name\030\001 \001(\t\022\025\n\005value\030\002 \001(\0132\006.Value\022\022\n\nna" +
-      "me_index\030\003 \001(\021\"S\n\tComponent\022\022\n\ntype_inde" +
+      "me_index\030\003 \001(\005\"S\n\tComponent\022\022\n\ntype_inde" +
       "x\030\001 \001(\005\022\014\n\004type\030\017 \001(\t\022\031\n\005field\030\002 \003(\0132\n.N" +
       "ameValue*\t\010\210\'\020\200\200\200\200\002\"\225\001\n\006Entity\022\n\n\002id\030\001 \001",
-      "(\021\022\035\n\tcomponent\030\002 \003(\0132\n.Component\022#\n\027rem" +
-      "oved_component_index\030\003 \003(\021B\002\020\001\022\025\n\rparent" +
+      "(\005\022\035\n\tcomponent\030\002 \003(\0132\n.Component\022#\n\027rem" +
+      "oved_component_index\030\003 \003(\005B\002\020\001\022\025\n\rparent" +
       "_prefab\030\004 \001(\t\022\031\n\021removed_component\030\017 \003(\t" +
       "*\t\010\210\'\020\200\200\200\200\002\"\234\001\n\006Prefab\022\022\n\nname_index\030\001 \001" +
-      "(\021\022\035\n\tcomponent\030\002 \003(\0132\n.Component\022\030\n\014par" +
-      "ent_index\030\003 \003(\021B\002\020\001\022\027\n\tpersisted\030\004 \001(\010:\004" +
+      "(\005\022\035\n\tcomponent\030\002 \003(\0132\n.Component\022\030\n\014par" +
+      "ent_index\030\003 \003(\005B\002\020\001\022\027\n\tpersisted\030\004 \001(\010:\004" +
       "true\022\014\n\004name\030\017 \001(\t\022\023\n\013parent_name\030\020 \003(\t*" +
       "\t\010\210\'\020\200\200\200\200\002\"O\n\005Event\022\022\n\ntype_index\030\001 \001(\005\022" +
       "\031\n\005field\030\002 \003(\0132\n.NameValue\022\014\n\004type\030\017 \001(\t" +
       "*\t\010\210\'\020\200\200\200\200\002\"\247\001\n\005World\022\027\n\006entity\030\001 \003(\0132\007.",
       "Entity\022\027\n\006prefab\030\002 \003(\0132\007.Prefab\022\027\n\017compo" +
-      "nent_class\030\017 \003(\t\022\026\n\016next_entity_id\030\020 \001(\021" +
-      "\022\033\n\017freed_entity_id\030\021 \003(\021B\002\020\001\022\023\n\013prefab_" +
+      "nent_class\030\017 \003(\t\022\026\n\016next_entity_id\030\020 \001(\005" +
+      "\022\033\n\017freed_entity_id\030\021 \003(\005B\002\020\001\022\023\n\013prefab_" +
       "name\030\022 \003(\t*\t\010\210\'\020\200\200\200\200\002B\'\n\027org.terasology." +
       "protobufB\nEntityDataH\001"
     };

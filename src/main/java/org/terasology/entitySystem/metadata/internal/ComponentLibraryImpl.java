@@ -42,8 +42,8 @@ public final class ComponentLibraryImpl extends BaseLibraryImpl<Component> imple
     @Override
     public String[] getNamesFor(Class<? extends Component> clazz) {
         return new String[] {
-                clazz.getSimpleName(),
-                MetadataUtil.getComponentClassName(clazz)
+                MetadataUtil.getComponentClassName(clazz),
+                clazz.getSimpleName()
         };
     }
 

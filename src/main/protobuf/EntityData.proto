@@ -30,7 +30,7 @@ message ValuePair {
 message NameValue {
     optional string name = 1;
     optional Value value = 2;
-    optional sint32 name_index = 3;
+    optional int32 name_index = 3;
 }
 
 message Component {
@@ -42,9 +42,9 @@ message Component {
 }
 
 message Entity {
-    optional sint32 id = 1;
+    optional int32 id = 1;
     repeated Component component = 2;
-    repeated sint32 removed_component_index = 3 [packed=true];
+    repeated int32 removed_component_index = 3 [packed=true];
     optional string parent_prefab = 4;
     repeated string removed_component = 15;
 
@@ -52,9 +52,9 @@ message Entity {
 }
 
 message Prefab {
-    optional sint32 name_index = 1;
+    optional int32 name_index = 1;
     repeated Component component = 2;
-    repeated sint32 parent_index = 3 [packed=true];
+    repeated int32 parent_index = 3 [packed=true];
     optional bool persisted = 4 [default=true];
     optional string name = 15;
     repeated string parent_name = 16;
@@ -74,8 +74,8 @@ message World {
     repeated Entity entity = 1;
     repeated Prefab prefab = 2;
     repeated string component_class = 15; // Table of component classes, the index of which corresponds to Component's type_index.
-    optional sint32 next_entity_id = 16;
-    repeated sint32 freed_entity_id = 17 [packed=true];
+    optional int32 next_entity_id = 16;
+    repeated int32 freed_entity_id = 17 [packed=true];
     repeated string prefab_name = 18; // Table of prefabs, the index of which corresponds to Prefab's type_index;
 
     extensions 5000 to max;

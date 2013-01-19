@@ -8,6 +8,584 @@ public final class NetData {
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
   }
+  public interface NetPackageOrBuilder extends
+      com.google.protobuf.GeneratedMessage.
+          ExtendableMessageOrBuilder<NetPackage> {
+    
+    // repeated .NetMessage message = 1;
+    java.util.List<org.terasology.protobuf.NetData.NetMessage> 
+        getMessageList();
+    org.terasology.protobuf.NetData.NetMessage getMessage(int index);
+    int getMessageCount();
+    java.util.List<? extends org.terasology.protobuf.NetData.NetMessageOrBuilder> 
+        getMessageOrBuilderList();
+    org.terasology.protobuf.NetData.NetMessageOrBuilder getMessageOrBuilder(
+        int index);
+  }
+  public static final class NetPackage extends
+      com.google.protobuf.GeneratedMessage.ExtendableMessage<
+        NetPackage> implements NetPackageOrBuilder {
+    // Use NetPackage.newBuilder() to construct.
+    private NetPackage(Builder builder) {
+      super(builder);
+    }
+    private NetPackage(boolean noInit) {}
+    
+    private static final NetPackage defaultInstance;
+    public static NetPackage getDefaultInstance() {
+      return defaultInstance;
+    }
+    
+    public NetPackage getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+    
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.terasology.protobuf.NetData.internal_static_NetPackage_descriptor;
+    }
+    
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.terasology.protobuf.NetData.internal_static_NetPackage_fieldAccessorTable;
+    }
+    
+    // repeated .NetMessage message = 1;
+    public static final int MESSAGE_FIELD_NUMBER = 1;
+    private java.util.List<org.terasology.protobuf.NetData.NetMessage> message_;
+    public java.util.List<org.terasology.protobuf.NetData.NetMessage> getMessageList() {
+      return message_;
+    }
+    public java.util.List<? extends org.terasology.protobuf.NetData.NetMessageOrBuilder> 
+        getMessageOrBuilderList() {
+      return message_;
+    }
+    public int getMessageCount() {
+      return message_.size();
+    }
+    public org.terasology.protobuf.NetData.NetMessage getMessage(int index) {
+      return message_.get(index);
+    }
+    public org.terasology.protobuf.NetData.NetMessageOrBuilder getMessageOrBuilder(
+        int index) {
+      return message_.get(index);
+    }
+    
+    private void initFields() {
+      message_ = java.util.Collections.emptyList();
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+      
+      for (int i = 0; i < getMessageCount(); i++) {
+        if (!getMessage(i).isInitialized()) {
+          memoizedIsInitialized = 0;
+          return false;
+        }
+      }
+      if (!extensionsAreInitialized()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+    
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      com.google.protobuf.GeneratedMessage
+        .ExtendableMessage<org.terasology.protobuf.NetData.NetPackage>.ExtensionWriter extensionWriter =
+          newExtensionWriter();
+      for (int i = 0; i < message_.size(); i++) {
+        output.writeMessage(1, message_.get(i));
+      }
+      extensionWriter.writeUntil(536870912, output);
+      getUnknownFields().writeTo(output);
+    }
+    
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+    
+      size = 0;
+      for (int i = 0; i < message_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, message_.get(i));
+      }
+      size += extensionsSerializedSize();
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+    
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+    
+    public static org.terasology.protobuf.NetData.NetPackage parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static org.terasology.protobuf.NetData.NetPackage parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static org.terasology.protobuf.NetData.NetPackage parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static org.terasology.protobuf.NetData.NetPackage parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static org.terasology.protobuf.NetData.NetPackage parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static org.terasology.protobuf.NetData.NetPackage parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    public static org.terasology.protobuf.NetData.NetPackage parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static org.terasology.protobuf.NetData.NetPackage parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static org.terasology.protobuf.NetData.NetPackage parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static org.terasology.protobuf.NetData.NetPackage parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(org.terasology.protobuf.NetData.NetPackage prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+    
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.ExtendableBuilder<
+          org.terasology.protobuf.NetData.NetPackage, Builder> implements org.terasology.protobuf.NetData.NetPackageOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.terasology.protobuf.NetData.internal_static_NetPackage_descriptor;
+      }
+      
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.terasology.protobuf.NetData.internal_static_NetPackage_fieldAccessorTable;
+      }
+      
+      // Construct using org.terasology.protobuf.NetData.NetPackage.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+      
+      private Builder(BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+          getMessageFieldBuilder();
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+      
+      public Builder clear() {
+        super.clear();
+        if (messageBuilder_ == null) {
+          message_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000001);
+        } else {
+          messageBuilder_.clear();
+        }
+        return this;
+      }
+      
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+      
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.terasology.protobuf.NetData.NetPackage.getDescriptor();
+      }
+      
+      public org.terasology.protobuf.NetData.NetPackage getDefaultInstanceForType() {
+        return org.terasology.protobuf.NetData.NetPackage.getDefaultInstance();
+      }
+      
+      public org.terasology.protobuf.NetData.NetPackage build() {
+        org.terasology.protobuf.NetData.NetPackage result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+      
+      private org.terasology.protobuf.NetData.NetPackage buildParsed()
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        org.terasology.protobuf.NetData.NetPackage result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(
+            result).asInvalidProtocolBufferException();
+        }
+        return result;
+      }
+      
+      public org.terasology.protobuf.NetData.NetPackage buildPartial() {
+        org.terasology.protobuf.NetData.NetPackage result = new org.terasology.protobuf.NetData.NetPackage(this);
+        int from_bitField0_ = bitField0_;
+        if (messageBuilder_ == null) {
+          if (((bitField0_ & 0x00000001) == 0x00000001)) {
+            message_ = java.util.Collections.unmodifiableList(message_);
+            bitField0_ = (bitField0_ & ~0x00000001);
+          }
+          result.message_ = message_;
+        } else {
+          result.message_ = messageBuilder_.build();
+        }
+        onBuilt();
+        return result;
+      }
+      
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.terasology.protobuf.NetData.NetPackage) {
+          return mergeFrom((org.terasology.protobuf.NetData.NetPackage)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+      
+      public Builder mergeFrom(org.terasology.protobuf.NetData.NetPackage other) {
+        if (other == org.terasology.protobuf.NetData.NetPackage.getDefaultInstance()) return this;
+        if (messageBuilder_ == null) {
+          if (!other.message_.isEmpty()) {
+            if (message_.isEmpty()) {
+              message_ = other.message_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+            } else {
+              ensureMessageIsMutable();
+              message_.addAll(other.message_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.message_.isEmpty()) {
+            if (messageBuilder_.isEmpty()) {
+              messageBuilder_.dispose();
+              messageBuilder_ = null;
+              message_ = other.message_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+              messageBuilder_ = 
+                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                   getMessageFieldBuilder() : null;
+            } else {
+              messageBuilder_.addAllMessages(other.message_);
+            }
+          }
+        }
+        this.mergeExtensionFields(other);
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+      
+      public final boolean isInitialized() {
+        for (int i = 0; i < getMessageCount(); i++) {
+          if (!getMessage(i).isInitialized()) {
+            
+            return false;
+          }
+        }
+        if (!extensionsAreInitialized()) {
+          
+          return false;
+        }
+        return true;
+      }
+      
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder(
+            this.getUnknownFields());
+        while (true) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              this.setUnknownFields(unknownFields.build());
+              onChanged();
+              return this;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                this.setUnknownFields(unknownFields.build());
+                onChanged();
+                return this;
+              }
+              break;
+            }
+            case 10: {
+              org.terasology.protobuf.NetData.NetMessage.Builder subBuilder = org.terasology.protobuf.NetData.NetMessage.newBuilder();
+              input.readMessage(subBuilder, extensionRegistry);
+              addMessage(subBuilder.buildPartial());
+              break;
+            }
+          }
+        }
+      }
+      
+      private int bitField0_;
+      
+      // repeated .NetMessage message = 1;
+      private java.util.List<org.terasology.protobuf.NetData.NetMessage> message_ =
+        java.util.Collections.emptyList();
+      private void ensureMessageIsMutable() {
+        if (!((bitField0_ & 0x00000001) == 0x00000001)) {
+          message_ = new java.util.ArrayList<org.terasology.protobuf.NetData.NetMessage>(message_);
+          bitField0_ |= 0x00000001;
+         }
+      }
+      
+      private com.google.protobuf.RepeatedFieldBuilder<
+          org.terasology.protobuf.NetData.NetMessage, org.terasology.protobuf.NetData.NetMessage.Builder, org.terasology.protobuf.NetData.NetMessageOrBuilder> messageBuilder_;
+      
+      public java.util.List<org.terasology.protobuf.NetData.NetMessage> getMessageList() {
+        if (messageBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(message_);
+        } else {
+          return messageBuilder_.getMessageList();
+        }
+      }
+      public int getMessageCount() {
+        if (messageBuilder_ == null) {
+          return message_.size();
+        } else {
+          return messageBuilder_.getCount();
+        }
+      }
+      public org.terasology.protobuf.NetData.NetMessage getMessage(int index) {
+        if (messageBuilder_ == null) {
+          return message_.get(index);
+        } else {
+          return messageBuilder_.getMessage(index);
+        }
+      }
+      public Builder setMessage(
+          int index, org.terasology.protobuf.NetData.NetMessage value) {
+        if (messageBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureMessageIsMutable();
+          message_.set(index, value);
+          onChanged();
+        } else {
+          messageBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      public Builder setMessage(
+          int index, org.terasology.protobuf.NetData.NetMessage.Builder builderForValue) {
+        if (messageBuilder_ == null) {
+          ensureMessageIsMutable();
+          message_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          messageBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      public Builder addMessage(org.terasology.protobuf.NetData.NetMessage value) {
+        if (messageBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureMessageIsMutable();
+          message_.add(value);
+          onChanged();
+        } else {
+          messageBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      public Builder addMessage(
+          int index, org.terasology.protobuf.NetData.NetMessage value) {
+        if (messageBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureMessageIsMutable();
+          message_.add(index, value);
+          onChanged();
+        } else {
+          messageBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      public Builder addMessage(
+          org.terasology.protobuf.NetData.NetMessage.Builder builderForValue) {
+        if (messageBuilder_ == null) {
+          ensureMessageIsMutable();
+          message_.add(builderForValue.build());
+          onChanged();
+        } else {
+          messageBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      public Builder addMessage(
+          int index, org.terasology.protobuf.NetData.NetMessage.Builder builderForValue) {
+        if (messageBuilder_ == null) {
+          ensureMessageIsMutable();
+          message_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          messageBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      public Builder addAllMessage(
+          java.lang.Iterable<? extends org.terasology.protobuf.NetData.NetMessage> values) {
+        if (messageBuilder_ == null) {
+          ensureMessageIsMutable();
+          super.addAll(values, message_);
+          onChanged();
+        } else {
+          messageBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      public Builder clearMessage() {
+        if (messageBuilder_ == null) {
+          message_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000001);
+          onChanged();
+        } else {
+          messageBuilder_.clear();
+        }
+        return this;
+      }
+      public Builder removeMessage(int index) {
+        if (messageBuilder_ == null) {
+          ensureMessageIsMutable();
+          message_.remove(index);
+          onChanged();
+        } else {
+          messageBuilder_.remove(index);
+        }
+        return this;
+      }
+      public org.terasology.protobuf.NetData.NetMessage.Builder getMessageBuilder(
+          int index) {
+        return getMessageFieldBuilder().getBuilder(index);
+      }
+      public org.terasology.protobuf.NetData.NetMessageOrBuilder getMessageOrBuilder(
+          int index) {
+        if (messageBuilder_ == null) {
+          return message_.get(index);  } else {
+          return messageBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      public java.util.List<? extends org.terasology.protobuf.NetData.NetMessageOrBuilder> 
+           getMessageOrBuilderList() {
+        if (messageBuilder_ != null) {
+          return messageBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(message_);
+        }
+      }
+      public org.terasology.protobuf.NetData.NetMessage.Builder addMessageBuilder() {
+        return getMessageFieldBuilder().addBuilder(
+            org.terasology.protobuf.NetData.NetMessage.getDefaultInstance());
+      }
+      public org.terasology.protobuf.NetData.NetMessage.Builder addMessageBuilder(
+          int index) {
+        return getMessageFieldBuilder().addBuilder(
+            index, org.terasology.protobuf.NetData.NetMessage.getDefaultInstance());
+      }
+      public java.util.List<org.terasology.protobuf.NetData.NetMessage.Builder> 
+           getMessageBuilderList() {
+        return getMessageFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilder<
+          org.terasology.protobuf.NetData.NetMessage, org.terasology.protobuf.NetData.NetMessage.Builder, org.terasology.protobuf.NetData.NetMessageOrBuilder> 
+          getMessageFieldBuilder() {
+        if (messageBuilder_ == null) {
+          messageBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              org.terasology.protobuf.NetData.NetMessage, org.terasology.protobuf.NetData.NetMessage.Builder, org.terasology.protobuf.NetData.NetMessageOrBuilder>(
+                  message_,
+                  ((bitField0_ & 0x00000001) == 0x00000001),
+                  getParentForChildren(),
+                  isClean());
+          message_ = null;
+        }
+        return messageBuilder_;
+      }
+      
+      // @@protoc_insertion_point(builder_scope:NetPackage)
+    }
+    
+    static {
+      defaultInstance = new NetPackage(true);
+      defaultInstance.initFields();
+    }
+    
+    // @@protoc_insertion_point(class_scope:NetPackage)
+  }
+  
   public interface NetMessageOrBuilder extends
       com.google.protobuf.GeneratedMessage.
           ExtendableMessageOrBuilder<NetMessage> {
@@ -4430,19 +5008,45 @@ public final class NetData {
     org.terasology.protobuf.NetData.ModuleInfoOrBuilder getModuleOrBuilder(
         int index);
     
-    // repeated .BlockMapping blockMapping = 2;
-    java.util.List<org.terasology.protobuf.NetData.BlockMapping> 
-        getBlockMappingList();
-    org.terasology.protobuf.NetData.BlockMapping getBlockMapping(int index);
-    int getBlockMappingCount();
-    java.util.List<? extends org.terasology.protobuf.NetData.BlockMappingOrBuilder> 
-        getBlockMappingOrBuilderList();
-    org.terasology.protobuf.NetData.BlockMappingOrBuilder getBlockMappingOrBuilder(
+    // repeated int32 blockId = 2 [packed = true];
+    java.util.List<java.lang.Integer> getBlockIdList();
+    int getBlockIdCount();
+    int getBlockId(int index);
+    
+    // repeated string blockName = 3;
+    java.util.List<String> getBlockNameList();
+    int getBlockNameCount();
+    String getBlockName(int index);
+    
+    // repeated .SerializationInfo component = 4;
+    java.util.List<org.terasology.protobuf.NetData.SerializationInfo> 
+        getComponentList();
+    org.terasology.protobuf.NetData.SerializationInfo getComponent(int index);
+    int getComponentCount();
+    java.util.List<? extends org.terasology.protobuf.NetData.SerializationInfoOrBuilder> 
+        getComponentOrBuilderList();
+    org.terasology.protobuf.NetData.SerializationInfoOrBuilder getComponentOrBuilder(
         int index);
     
-    // optional int64 time = 3;
-    boolean hasTime();
-    long getTime();
+    // repeated .SerializationInfo event = 5;
+    java.util.List<org.terasology.protobuf.NetData.SerializationInfo> 
+        getEventList();
+    org.terasology.protobuf.NetData.SerializationInfo getEvent(int index);
+    int getEventCount();
+    java.util.List<? extends org.terasology.protobuf.NetData.SerializationInfoOrBuilder> 
+        getEventOrBuilderList();
+    org.terasology.protobuf.NetData.SerializationInfoOrBuilder getEventOrBuilder(
+        int index);
+    
+    // repeated int32 assetIds = 6 [packed = true];
+    java.util.List<java.lang.Integer> getAssetIdsList();
+    int getAssetIdsCount();
+    int getAssetIds(int index);
+    
+    // repeated string assetUris = 7;
+    java.util.List<String> getAssetUrisList();
+    int getAssetUrisCount();
+    String getAssetUris(int index);
     
     // optional string version = 15;
     boolean hasVersion();
@@ -4455,6 +5059,10 @@ public final class NetData {
     // optional int32 clientId = 17;
     boolean hasClientId();
     int getClientId();
+    
+    // optional int64 time = 18;
+    boolean hasTime();
+    long getTime();
   }
   public static final class ServerInfoMessage extends
       com.google.protobuf.GeneratedMessage.ExtendableMessage<
@@ -4506,42 +5114,111 @@ public final class NetData {
       return module_.get(index);
     }
     
-    // repeated .BlockMapping blockMapping = 2;
-    public static final int BLOCKMAPPING_FIELD_NUMBER = 2;
-    private java.util.List<org.terasology.protobuf.NetData.BlockMapping> blockMapping_;
-    public java.util.List<org.terasology.protobuf.NetData.BlockMapping> getBlockMappingList() {
-      return blockMapping_;
+    // repeated int32 blockId = 2 [packed = true];
+    public static final int BLOCKID_FIELD_NUMBER = 2;
+    private java.util.List<java.lang.Integer> blockId_;
+    public java.util.List<java.lang.Integer>
+        getBlockIdList() {
+      return blockId_;
     }
-    public java.util.List<? extends org.terasology.protobuf.NetData.BlockMappingOrBuilder> 
-        getBlockMappingOrBuilderList() {
-      return blockMapping_;
+    public int getBlockIdCount() {
+      return blockId_.size();
     }
-    public int getBlockMappingCount() {
-      return blockMapping_.size();
+    public int getBlockId(int index) {
+      return blockId_.get(index);
     }
-    public org.terasology.protobuf.NetData.BlockMapping getBlockMapping(int index) {
-      return blockMapping_.get(index);
+    private int blockIdMemoizedSerializedSize = -1;
+    
+    // repeated string blockName = 3;
+    public static final int BLOCKNAME_FIELD_NUMBER = 3;
+    private com.google.protobuf.LazyStringList blockName_;
+    public java.util.List<String>
+        getBlockNameList() {
+      return blockName_;
     }
-    public org.terasology.protobuf.NetData.BlockMappingOrBuilder getBlockMappingOrBuilder(
-        int index) {
-      return blockMapping_.get(index);
+    public int getBlockNameCount() {
+      return blockName_.size();
+    }
+    public String getBlockName(int index) {
+      return blockName_.get(index);
     }
     
-    // optional int64 time = 3;
-    public static final int TIME_FIELD_NUMBER = 3;
-    private long time_;
-    public boolean hasTime() {
-      return ((bitField0_ & 0x00000001) == 0x00000001);
+    // repeated .SerializationInfo component = 4;
+    public static final int COMPONENT_FIELD_NUMBER = 4;
+    private java.util.List<org.terasology.protobuf.NetData.SerializationInfo> component_;
+    public java.util.List<org.terasology.protobuf.NetData.SerializationInfo> getComponentList() {
+      return component_;
     }
-    public long getTime() {
-      return time_;
+    public java.util.List<? extends org.terasology.protobuf.NetData.SerializationInfoOrBuilder> 
+        getComponentOrBuilderList() {
+      return component_;
+    }
+    public int getComponentCount() {
+      return component_.size();
+    }
+    public org.terasology.protobuf.NetData.SerializationInfo getComponent(int index) {
+      return component_.get(index);
+    }
+    public org.terasology.protobuf.NetData.SerializationInfoOrBuilder getComponentOrBuilder(
+        int index) {
+      return component_.get(index);
+    }
+    
+    // repeated .SerializationInfo event = 5;
+    public static final int EVENT_FIELD_NUMBER = 5;
+    private java.util.List<org.terasology.protobuf.NetData.SerializationInfo> event_;
+    public java.util.List<org.terasology.protobuf.NetData.SerializationInfo> getEventList() {
+      return event_;
+    }
+    public java.util.List<? extends org.terasology.protobuf.NetData.SerializationInfoOrBuilder> 
+        getEventOrBuilderList() {
+      return event_;
+    }
+    public int getEventCount() {
+      return event_.size();
+    }
+    public org.terasology.protobuf.NetData.SerializationInfo getEvent(int index) {
+      return event_.get(index);
+    }
+    public org.terasology.protobuf.NetData.SerializationInfoOrBuilder getEventOrBuilder(
+        int index) {
+      return event_.get(index);
+    }
+    
+    // repeated int32 assetIds = 6 [packed = true];
+    public static final int ASSETIDS_FIELD_NUMBER = 6;
+    private java.util.List<java.lang.Integer> assetIds_;
+    public java.util.List<java.lang.Integer>
+        getAssetIdsList() {
+      return assetIds_;
+    }
+    public int getAssetIdsCount() {
+      return assetIds_.size();
+    }
+    public int getAssetIds(int index) {
+      return assetIds_.get(index);
+    }
+    private int assetIdsMemoizedSerializedSize = -1;
+    
+    // repeated string assetUris = 7;
+    public static final int ASSETURIS_FIELD_NUMBER = 7;
+    private com.google.protobuf.LazyStringList assetUris_;
+    public java.util.List<String>
+        getAssetUrisList() {
+      return assetUris_;
+    }
+    public int getAssetUrisCount() {
+      return assetUris_.size();
+    }
+    public String getAssetUris(int index) {
+      return assetUris_.get(index);
     }
     
     // optional string version = 15;
     public static final int VERSION_FIELD_NUMBER = 15;
     private java.lang.Object version_;
     public boolean hasVersion() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
+      return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     public String getVersion() {
       java.lang.Object ref = version_;
@@ -4573,7 +5250,7 @@ public final class NetData {
     public static final int WORLDNAME_FIELD_NUMBER = 16;
     private java.lang.Object worldName_;
     public boolean hasWorldName() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
+      return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     public String getWorldName() {
       java.lang.Object ref = worldName_;
@@ -4605,19 +5282,34 @@ public final class NetData {
     public static final int CLIENTID_FIELD_NUMBER = 17;
     private int clientId_;
     public boolean hasClientId() {
-      return ((bitField0_ & 0x00000008) == 0x00000008);
+      return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     public int getClientId() {
       return clientId_;
     }
     
+    // optional int64 time = 18;
+    public static final int TIME_FIELD_NUMBER = 18;
+    private long time_;
+    public boolean hasTime() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    public long getTime() {
+      return time_;
+    }
+    
     private void initFields() {
       module_ = java.util.Collections.emptyList();
-      blockMapping_ = java.util.Collections.emptyList();
-      time_ = 0L;
+      blockId_ = java.util.Collections.emptyList();;
+      blockName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      component_ = java.util.Collections.emptyList();
+      event_ = java.util.Collections.emptyList();
+      assetIds_ = java.util.Collections.emptyList();;
+      assetUris_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       version_ = "";
       worldName_ = "";
       clientId_ = 0;
+      time_ = 0L;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -4630,8 +5322,14 @@ public final class NetData {
           return false;
         }
       }
-      for (int i = 0; i < getBlockMappingCount(); i++) {
-        if (!getBlockMapping(i).isInitialized()) {
+      for (int i = 0; i < getComponentCount(); i++) {
+        if (!getComponent(i).isInitialized()) {
+          memoizedIsInitialized = 0;
+          return false;
+        }
+      }
+      for (int i = 0; i < getEventCount(); i++) {
+        if (!getEvent(i).isInitialized()) {
           memoizedIsInitialized = 0;
           return false;
         }
@@ -4653,20 +5351,43 @@ public final class NetData {
       for (int i = 0; i < module_.size(); i++) {
         output.writeMessage(1, module_.get(i));
       }
-      for (int i = 0; i < blockMapping_.size(); i++) {
-        output.writeMessage(2, blockMapping_.get(i));
+      if (getBlockIdList().size() > 0) {
+        output.writeRawVarint32(18);
+        output.writeRawVarint32(blockIdMemoizedSerializedSize);
+      }
+      for (int i = 0; i < blockId_.size(); i++) {
+        output.writeInt32NoTag(blockId_.get(i));
+      }
+      for (int i = 0; i < blockName_.size(); i++) {
+        output.writeBytes(3, blockName_.getByteString(i));
+      }
+      for (int i = 0; i < component_.size(); i++) {
+        output.writeMessage(4, component_.get(i));
+      }
+      for (int i = 0; i < event_.size(); i++) {
+        output.writeMessage(5, event_.get(i));
+      }
+      if (getAssetIdsList().size() > 0) {
+        output.writeRawVarint32(50);
+        output.writeRawVarint32(assetIdsMemoizedSerializedSize);
+      }
+      for (int i = 0; i < assetIds_.size(); i++) {
+        output.writeInt32NoTag(assetIds_.get(i));
+      }
+      for (int i = 0; i < assetUris_.size(); i++) {
+        output.writeBytes(7, assetUris_.getByteString(i));
       }
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeInt64(3, time_);
-      }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeBytes(15, getVersionBytes());
       }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeBytes(16, getWorldNameBytes());
       }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeInt32(17, clientId_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeInt64(18, time_);
       }
       extensionWriter.writeUntil(536870912, output);
       getUnknownFields().writeTo(output);
@@ -4682,25 +5403,75 @@ public final class NetData {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(1, module_.get(i));
       }
-      for (int i = 0; i < blockMapping_.size(); i++) {
+      {
+        int dataSize = 0;
+        for (int i = 0; i < blockId_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeInt32SizeNoTag(blockId_.get(i));
+        }
+        size += dataSize;
+        if (!getBlockIdList().isEmpty()) {
+          size += 1;
+          size += com.google.protobuf.CodedOutputStream
+              .computeInt32SizeNoTag(dataSize);
+        }
+        blockIdMemoizedSerializedSize = dataSize;
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < blockName_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeBytesSizeNoTag(blockName_.getByteString(i));
+        }
+        size += dataSize;
+        size += 1 * getBlockNameList().size();
+      }
+      for (int i = 0; i < component_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, blockMapping_.get(i));
+          .computeMessageSize(4, component_.get(i));
+      }
+      for (int i = 0; i < event_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(5, event_.get(i));
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < assetIds_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeInt32SizeNoTag(assetIds_.get(i));
+        }
+        size += dataSize;
+        if (!getAssetIdsList().isEmpty()) {
+          size += 1;
+          size += com.google.protobuf.CodedOutputStream
+              .computeInt32SizeNoTag(dataSize);
+        }
+        assetIdsMemoizedSerializedSize = dataSize;
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < assetUris_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeBytesSizeNoTag(assetUris_.getByteString(i));
+        }
+        size += dataSize;
+        size += 1 * getAssetUrisList().size();
       }
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(3, time_);
+          .computeBytesSize(15, getVersionBytes());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(15, getVersionBytes());
+          .computeBytesSize(16, getWorldNameBytes());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(16, getWorldNameBytes());
+          .computeInt32Size(17, clientId_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(17, clientId_);
+          .computeInt64Size(18, time_);
       }
       size += extensionsSerializedSize();
       size += getUnknownFields().getSerializedSize();
@@ -4820,7 +5591,8 @@ public final class NetData {
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
           getModuleFieldBuilder();
-          getBlockMappingFieldBuilder();
+          getComponentFieldBuilder();
+          getEventFieldBuilder();
         }
       }
       private static Builder create() {
@@ -4835,20 +5607,34 @@ public final class NetData {
         } else {
           moduleBuilder_.clear();
         }
-        if (blockMappingBuilder_ == null) {
-          blockMapping_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000002);
-        } else {
-          blockMappingBuilder_.clear();
-        }
-        time_ = 0L;
+        blockId_ = java.util.Collections.emptyList();;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        blockName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000004);
-        version_ = "";
-        bitField0_ = (bitField0_ & ~0x00000008);
-        worldName_ = "";
-        bitField0_ = (bitField0_ & ~0x00000010);
-        clientId_ = 0;
+        if (componentBuilder_ == null) {
+          component_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000008);
+        } else {
+          componentBuilder_.clear();
+        }
+        if (eventBuilder_ == null) {
+          event_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000010);
+        } else {
+          eventBuilder_.clear();
+        }
+        assetIds_ = java.util.Collections.emptyList();;
         bitField0_ = (bitField0_ & ~0x00000020);
+        assetUris_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000040);
+        version_ = "";
+        bitField0_ = (bitField0_ & ~0x00000080);
+        worldName_ = "";
+        bitField0_ = (bitField0_ & ~0x00000100);
+        clientId_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000200);
+        time_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000400);
         return this;
       }
       
@@ -4896,31 +5682,62 @@ public final class NetData {
         } else {
           result.module_ = moduleBuilder_.build();
         }
-        if (blockMappingBuilder_ == null) {
-          if (((bitField0_ & 0x00000002) == 0x00000002)) {
-            blockMapping_ = java.util.Collections.unmodifiableList(blockMapping_);
-            bitField0_ = (bitField0_ & ~0x00000002);
-          }
-          result.blockMapping_ = blockMapping_;
-        } else {
-          result.blockMapping_ = blockMappingBuilder_.build();
+        if (((bitField0_ & 0x00000002) == 0x00000002)) {
+          blockId_ = java.util.Collections.unmodifiableList(blockId_);
+          bitField0_ = (bitField0_ & ~0x00000002);
         }
-        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+        result.blockId_ = blockId_;
+        if (((bitField0_ & 0x00000004) == 0x00000004)) {
+          blockName_ = new com.google.protobuf.UnmodifiableLazyStringList(
+              blockName_);
+          bitField0_ = (bitField0_ & ~0x00000004);
+        }
+        result.blockName_ = blockName_;
+        if (componentBuilder_ == null) {
+          if (((bitField0_ & 0x00000008) == 0x00000008)) {
+            component_ = java.util.Collections.unmodifiableList(component_);
+            bitField0_ = (bitField0_ & ~0x00000008);
+          }
+          result.component_ = component_;
+        } else {
+          result.component_ = componentBuilder_.build();
+        }
+        if (eventBuilder_ == null) {
+          if (((bitField0_ & 0x00000010) == 0x00000010)) {
+            event_ = java.util.Collections.unmodifiableList(event_);
+            bitField0_ = (bitField0_ & ~0x00000010);
+          }
+          result.event_ = event_;
+        } else {
+          result.event_ = eventBuilder_.build();
+        }
+        if (((bitField0_ & 0x00000020) == 0x00000020)) {
+          assetIds_ = java.util.Collections.unmodifiableList(assetIds_);
+          bitField0_ = (bitField0_ & ~0x00000020);
+        }
+        result.assetIds_ = assetIds_;
+        if (((bitField0_ & 0x00000040) == 0x00000040)) {
+          assetUris_ = new com.google.protobuf.UnmodifiableLazyStringList(
+              assetUris_);
+          bitField0_ = (bitField0_ & ~0x00000040);
+        }
+        result.assetUris_ = assetUris_;
+        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
           to_bitField0_ |= 0x00000001;
         }
-        result.time_ = time_;
-        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+        result.version_ = version_;
+        if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
           to_bitField0_ |= 0x00000002;
         }
-        result.version_ = version_;
-        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+        result.worldName_ = worldName_;
+        if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
           to_bitField0_ |= 0x00000004;
         }
-        result.worldName_ = worldName_;
-        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+        result.clientId_ = clientId_;
+        if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
           to_bitField0_ |= 0x00000008;
         }
-        result.clientId_ = clientId_;
+        result.time_ = time_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -4963,34 +5780,97 @@ public final class NetData {
             }
           }
         }
-        if (blockMappingBuilder_ == null) {
-          if (!other.blockMapping_.isEmpty()) {
-            if (blockMapping_.isEmpty()) {
-              blockMapping_ = other.blockMapping_;
-              bitField0_ = (bitField0_ & ~0x00000002);
+        if (!other.blockId_.isEmpty()) {
+          if (blockId_.isEmpty()) {
+            blockId_ = other.blockId_;
+            bitField0_ = (bitField0_ & ~0x00000002);
+          } else {
+            ensureBlockIdIsMutable();
+            blockId_.addAll(other.blockId_);
+          }
+          onChanged();
+        }
+        if (!other.blockName_.isEmpty()) {
+          if (blockName_.isEmpty()) {
+            blockName_ = other.blockName_;
+            bitField0_ = (bitField0_ & ~0x00000004);
+          } else {
+            ensureBlockNameIsMutable();
+            blockName_.addAll(other.blockName_);
+          }
+          onChanged();
+        }
+        if (componentBuilder_ == null) {
+          if (!other.component_.isEmpty()) {
+            if (component_.isEmpty()) {
+              component_ = other.component_;
+              bitField0_ = (bitField0_ & ~0x00000008);
             } else {
-              ensureBlockMappingIsMutable();
-              blockMapping_.addAll(other.blockMapping_);
+              ensureComponentIsMutable();
+              component_.addAll(other.component_);
             }
             onChanged();
           }
         } else {
-          if (!other.blockMapping_.isEmpty()) {
-            if (blockMappingBuilder_.isEmpty()) {
-              blockMappingBuilder_.dispose();
-              blockMappingBuilder_ = null;
-              blockMapping_ = other.blockMapping_;
-              bitField0_ = (bitField0_ & ~0x00000002);
-              blockMappingBuilder_ = 
+          if (!other.component_.isEmpty()) {
+            if (componentBuilder_.isEmpty()) {
+              componentBuilder_.dispose();
+              componentBuilder_ = null;
+              component_ = other.component_;
+              bitField0_ = (bitField0_ & ~0x00000008);
+              componentBuilder_ = 
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
-                   getBlockMappingFieldBuilder() : null;
+                   getComponentFieldBuilder() : null;
             } else {
-              blockMappingBuilder_.addAllMessages(other.blockMapping_);
+              componentBuilder_.addAllMessages(other.component_);
             }
           }
         }
-        if (other.hasTime()) {
-          setTime(other.getTime());
+        if (eventBuilder_ == null) {
+          if (!other.event_.isEmpty()) {
+            if (event_.isEmpty()) {
+              event_ = other.event_;
+              bitField0_ = (bitField0_ & ~0x00000010);
+            } else {
+              ensureEventIsMutable();
+              event_.addAll(other.event_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.event_.isEmpty()) {
+            if (eventBuilder_.isEmpty()) {
+              eventBuilder_.dispose();
+              eventBuilder_ = null;
+              event_ = other.event_;
+              bitField0_ = (bitField0_ & ~0x00000010);
+              eventBuilder_ = 
+                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                   getEventFieldBuilder() : null;
+            } else {
+              eventBuilder_.addAllMessages(other.event_);
+            }
+          }
+        }
+        if (!other.assetIds_.isEmpty()) {
+          if (assetIds_.isEmpty()) {
+            assetIds_ = other.assetIds_;
+            bitField0_ = (bitField0_ & ~0x00000020);
+          } else {
+            ensureAssetIdsIsMutable();
+            assetIds_.addAll(other.assetIds_);
+          }
+          onChanged();
+        }
+        if (!other.assetUris_.isEmpty()) {
+          if (assetUris_.isEmpty()) {
+            assetUris_ = other.assetUris_;
+            bitField0_ = (bitField0_ & ~0x00000040);
+          } else {
+            ensureAssetUrisIsMutable();
+            assetUris_.addAll(other.assetUris_);
+          }
+          onChanged();
         }
         if (other.hasVersion()) {
           setVersion(other.getVersion());
@@ -5000,6 +5880,9 @@ public final class NetData {
         }
         if (other.hasClientId()) {
           setClientId(other.getClientId());
+        }
+        if (other.hasTime()) {
+          setTime(other.getTime());
         }
         this.mergeExtensionFields(other);
         this.mergeUnknownFields(other.getUnknownFields());
@@ -5013,8 +5896,14 @@ public final class NetData {
             return false;
           }
         }
-        for (int i = 0; i < getBlockMappingCount(); i++) {
-          if (!getBlockMapping(i).isInitialized()) {
+        for (int i = 0; i < getComponentCount(); i++) {
+          if (!getComponent(i).isInitialized()) {
+            
+            return false;
+          }
+        }
+        for (int i = 0; i < getEventCount(); i++) {
+          if (!getEvent(i).isInitialized()) {
             
             return false;
           }
@@ -5055,30 +5944,74 @@ public final class NetData {
               addModule(subBuilder.buildPartial());
               break;
             }
-            case 18: {
-              org.terasology.protobuf.NetData.BlockMapping.Builder subBuilder = org.terasology.protobuf.NetData.BlockMapping.newBuilder();
-              input.readMessage(subBuilder, extensionRegistry);
-              addBlockMapping(subBuilder.buildPartial());
+            case 16: {
+              ensureBlockIdIsMutable();
+              blockId_.add(input.readInt32());
               break;
             }
-            case 24: {
-              bitField0_ |= 0x00000004;
-              time_ = input.readInt64();
+            case 18: {
+              int length = input.readRawVarint32();
+              int limit = input.pushLimit(length);
+              while (input.getBytesUntilLimit() > 0) {
+                addBlockId(input.readInt32());
+              }
+              input.popLimit(limit);
+              break;
+            }
+            case 26: {
+              ensureBlockNameIsMutable();
+              blockName_.add(input.readBytes());
+              break;
+            }
+            case 34: {
+              org.terasology.protobuf.NetData.SerializationInfo.Builder subBuilder = org.terasology.protobuf.NetData.SerializationInfo.newBuilder();
+              input.readMessage(subBuilder, extensionRegistry);
+              addComponent(subBuilder.buildPartial());
+              break;
+            }
+            case 42: {
+              org.terasology.protobuf.NetData.SerializationInfo.Builder subBuilder = org.terasology.protobuf.NetData.SerializationInfo.newBuilder();
+              input.readMessage(subBuilder, extensionRegistry);
+              addEvent(subBuilder.buildPartial());
+              break;
+            }
+            case 48: {
+              ensureAssetIdsIsMutable();
+              assetIds_.add(input.readInt32());
+              break;
+            }
+            case 50: {
+              int length = input.readRawVarint32();
+              int limit = input.pushLimit(length);
+              while (input.getBytesUntilLimit() > 0) {
+                addAssetIds(input.readInt32());
+              }
+              input.popLimit(limit);
+              break;
+            }
+            case 58: {
+              ensureAssetUrisIsMutable();
+              assetUris_.add(input.readBytes());
               break;
             }
             case 122: {
-              bitField0_ |= 0x00000008;
+              bitField0_ |= 0x00000080;
               version_ = input.readBytes();
               break;
             }
             case 130: {
-              bitField0_ |= 0x00000010;
+              bitField0_ |= 0x00000100;
               worldName_ = input.readBytes();
               break;
             }
             case 136: {
-              bitField0_ |= 0x00000020;
+              bitField0_ |= 0x00000200;
               clientId_ = input.readInt32();
+              break;
+            }
+            case 144: {
+              bitField0_ |= 0x00000400;
+              time_ = input.readInt64();
               break;
             }
           }
@@ -5273,217 +6206,584 @@ public final class NetData {
         return moduleBuilder_;
       }
       
-      // repeated .BlockMapping blockMapping = 2;
-      private java.util.List<org.terasology.protobuf.NetData.BlockMapping> blockMapping_ =
-        java.util.Collections.emptyList();
-      private void ensureBlockMappingIsMutable() {
+      // repeated int32 blockId = 2 [packed = true];
+      private java.util.List<java.lang.Integer> blockId_ = java.util.Collections.emptyList();;
+      private void ensureBlockIdIsMutable() {
         if (!((bitField0_ & 0x00000002) == 0x00000002)) {
-          blockMapping_ = new java.util.ArrayList<org.terasology.protobuf.NetData.BlockMapping>(blockMapping_);
+          blockId_ = new java.util.ArrayList<java.lang.Integer>(blockId_);
           bitField0_ |= 0x00000002;
+         }
+      }
+      public java.util.List<java.lang.Integer>
+          getBlockIdList() {
+        return java.util.Collections.unmodifiableList(blockId_);
+      }
+      public int getBlockIdCount() {
+        return blockId_.size();
+      }
+      public int getBlockId(int index) {
+        return blockId_.get(index);
+      }
+      public Builder setBlockId(
+          int index, int value) {
+        ensureBlockIdIsMutable();
+        blockId_.set(index, value);
+        onChanged();
+        return this;
+      }
+      public Builder addBlockId(int value) {
+        ensureBlockIdIsMutable();
+        blockId_.add(value);
+        onChanged();
+        return this;
+      }
+      public Builder addAllBlockId(
+          java.lang.Iterable<? extends java.lang.Integer> values) {
+        ensureBlockIdIsMutable();
+        super.addAll(values, blockId_);
+        onChanged();
+        return this;
+      }
+      public Builder clearBlockId() {
+        blockId_ = java.util.Collections.emptyList();;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        onChanged();
+        return this;
+      }
+      
+      // repeated string blockName = 3;
+      private com.google.protobuf.LazyStringList blockName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensureBlockNameIsMutable() {
+        if (!((bitField0_ & 0x00000004) == 0x00000004)) {
+          blockName_ = new com.google.protobuf.LazyStringArrayList(blockName_);
+          bitField0_ |= 0x00000004;
+         }
+      }
+      public java.util.List<String>
+          getBlockNameList() {
+        return java.util.Collections.unmodifiableList(blockName_);
+      }
+      public int getBlockNameCount() {
+        return blockName_.size();
+      }
+      public String getBlockName(int index) {
+        return blockName_.get(index);
+      }
+      public Builder setBlockName(
+          int index, String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureBlockNameIsMutable();
+        blockName_.set(index, value);
+        onChanged();
+        return this;
+      }
+      public Builder addBlockName(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureBlockNameIsMutable();
+        blockName_.add(value);
+        onChanged();
+        return this;
+      }
+      public Builder addAllBlockName(
+          java.lang.Iterable<String> values) {
+        ensureBlockNameIsMutable();
+        super.addAll(values, blockName_);
+        onChanged();
+        return this;
+      }
+      public Builder clearBlockName() {
+        blockName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        onChanged();
+        return this;
+      }
+      void addBlockName(com.google.protobuf.ByteString value) {
+        ensureBlockNameIsMutable();
+        blockName_.add(value);
+        onChanged();
+      }
+      
+      // repeated .SerializationInfo component = 4;
+      private java.util.List<org.terasology.protobuf.NetData.SerializationInfo> component_ =
+        java.util.Collections.emptyList();
+      private void ensureComponentIsMutable() {
+        if (!((bitField0_ & 0x00000008) == 0x00000008)) {
+          component_ = new java.util.ArrayList<org.terasology.protobuf.NetData.SerializationInfo>(component_);
+          bitField0_ |= 0x00000008;
          }
       }
       
       private com.google.protobuf.RepeatedFieldBuilder<
-          org.terasology.protobuf.NetData.BlockMapping, org.terasology.protobuf.NetData.BlockMapping.Builder, org.terasology.protobuf.NetData.BlockMappingOrBuilder> blockMappingBuilder_;
+          org.terasology.protobuf.NetData.SerializationInfo, org.terasology.protobuf.NetData.SerializationInfo.Builder, org.terasology.protobuf.NetData.SerializationInfoOrBuilder> componentBuilder_;
       
-      public java.util.List<org.terasology.protobuf.NetData.BlockMapping> getBlockMappingList() {
-        if (blockMappingBuilder_ == null) {
-          return java.util.Collections.unmodifiableList(blockMapping_);
+      public java.util.List<org.terasology.protobuf.NetData.SerializationInfo> getComponentList() {
+        if (componentBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(component_);
         } else {
-          return blockMappingBuilder_.getMessageList();
+          return componentBuilder_.getMessageList();
         }
       }
-      public int getBlockMappingCount() {
-        if (blockMappingBuilder_ == null) {
-          return blockMapping_.size();
+      public int getComponentCount() {
+        if (componentBuilder_ == null) {
+          return component_.size();
         } else {
-          return blockMappingBuilder_.getCount();
+          return componentBuilder_.getCount();
         }
       }
-      public org.terasology.protobuf.NetData.BlockMapping getBlockMapping(int index) {
-        if (blockMappingBuilder_ == null) {
-          return blockMapping_.get(index);
+      public org.terasology.protobuf.NetData.SerializationInfo getComponent(int index) {
+        if (componentBuilder_ == null) {
+          return component_.get(index);
         } else {
-          return blockMappingBuilder_.getMessage(index);
+          return componentBuilder_.getMessage(index);
         }
       }
-      public Builder setBlockMapping(
-          int index, org.terasology.protobuf.NetData.BlockMapping value) {
-        if (blockMappingBuilder_ == null) {
+      public Builder setComponent(
+          int index, org.terasology.protobuf.NetData.SerializationInfo value) {
+        if (componentBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          ensureBlockMappingIsMutable();
-          blockMapping_.set(index, value);
+          ensureComponentIsMutable();
+          component_.set(index, value);
           onChanged();
         } else {
-          blockMappingBuilder_.setMessage(index, value);
+          componentBuilder_.setMessage(index, value);
         }
         return this;
       }
-      public Builder setBlockMapping(
-          int index, org.terasology.protobuf.NetData.BlockMapping.Builder builderForValue) {
-        if (blockMappingBuilder_ == null) {
-          ensureBlockMappingIsMutable();
-          blockMapping_.set(index, builderForValue.build());
+      public Builder setComponent(
+          int index, org.terasology.protobuf.NetData.SerializationInfo.Builder builderForValue) {
+        if (componentBuilder_ == null) {
+          ensureComponentIsMutable();
+          component_.set(index, builderForValue.build());
           onChanged();
         } else {
-          blockMappingBuilder_.setMessage(index, builderForValue.build());
+          componentBuilder_.setMessage(index, builderForValue.build());
         }
         return this;
       }
-      public Builder addBlockMapping(org.terasology.protobuf.NetData.BlockMapping value) {
-        if (blockMappingBuilder_ == null) {
+      public Builder addComponent(org.terasology.protobuf.NetData.SerializationInfo value) {
+        if (componentBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          ensureBlockMappingIsMutable();
-          blockMapping_.add(value);
+          ensureComponentIsMutable();
+          component_.add(value);
           onChanged();
         } else {
-          blockMappingBuilder_.addMessage(value);
+          componentBuilder_.addMessage(value);
         }
         return this;
       }
-      public Builder addBlockMapping(
-          int index, org.terasology.protobuf.NetData.BlockMapping value) {
-        if (blockMappingBuilder_ == null) {
+      public Builder addComponent(
+          int index, org.terasology.protobuf.NetData.SerializationInfo value) {
+        if (componentBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          ensureBlockMappingIsMutable();
-          blockMapping_.add(index, value);
+          ensureComponentIsMutable();
+          component_.add(index, value);
           onChanged();
         } else {
-          blockMappingBuilder_.addMessage(index, value);
+          componentBuilder_.addMessage(index, value);
         }
         return this;
       }
-      public Builder addBlockMapping(
-          org.terasology.protobuf.NetData.BlockMapping.Builder builderForValue) {
-        if (blockMappingBuilder_ == null) {
-          ensureBlockMappingIsMutable();
-          blockMapping_.add(builderForValue.build());
+      public Builder addComponent(
+          org.terasology.protobuf.NetData.SerializationInfo.Builder builderForValue) {
+        if (componentBuilder_ == null) {
+          ensureComponentIsMutable();
+          component_.add(builderForValue.build());
           onChanged();
         } else {
-          blockMappingBuilder_.addMessage(builderForValue.build());
+          componentBuilder_.addMessage(builderForValue.build());
         }
         return this;
       }
-      public Builder addBlockMapping(
-          int index, org.terasology.protobuf.NetData.BlockMapping.Builder builderForValue) {
-        if (blockMappingBuilder_ == null) {
-          ensureBlockMappingIsMutable();
-          blockMapping_.add(index, builderForValue.build());
+      public Builder addComponent(
+          int index, org.terasology.protobuf.NetData.SerializationInfo.Builder builderForValue) {
+        if (componentBuilder_ == null) {
+          ensureComponentIsMutable();
+          component_.add(index, builderForValue.build());
           onChanged();
         } else {
-          blockMappingBuilder_.addMessage(index, builderForValue.build());
+          componentBuilder_.addMessage(index, builderForValue.build());
         }
         return this;
       }
-      public Builder addAllBlockMapping(
-          java.lang.Iterable<? extends org.terasology.protobuf.NetData.BlockMapping> values) {
-        if (blockMappingBuilder_ == null) {
-          ensureBlockMappingIsMutable();
-          super.addAll(values, blockMapping_);
+      public Builder addAllComponent(
+          java.lang.Iterable<? extends org.terasology.protobuf.NetData.SerializationInfo> values) {
+        if (componentBuilder_ == null) {
+          ensureComponentIsMutable();
+          super.addAll(values, component_);
           onChanged();
         } else {
-          blockMappingBuilder_.addAllMessages(values);
+          componentBuilder_.addAllMessages(values);
         }
         return this;
       }
-      public Builder clearBlockMapping() {
-        if (blockMappingBuilder_ == null) {
-          blockMapping_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000002);
+      public Builder clearComponent() {
+        if (componentBuilder_ == null) {
+          component_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000008);
           onChanged();
         } else {
-          blockMappingBuilder_.clear();
+          componentBuilder_.clear();
         }
         return this;
       }
-      public Builder removeBlockMapping(int index) {
-        if (blockMappingBuilder_ == null) {
-          ensureBlockMappingIsMutable();
-          blockMapping_.remove(index);
+      public Builder removeComponent(int index) {
+        if (componentBuilder_ == null) {
+          ensureComponentIsMutable();
+          component_.remove(index);
           onChanged();
         } else {
-          blockMappingBuilder_.remove(index);
+          componentBuilder_.remove(index);
         }
         return this;
       }
-      public org.terasology.protobuf.NetData.BlockMapping.Builder getBlockMappingBuilder(
+      public org.terasology.protobuf.NetData.SerializationInfo.Builder getComponentBuilder(
           int index) {
-        return getBlockMappingFieldBuilder().getBuilder(index);
+        return getComponentFieldBuilder().getBuilder(index);
       }
-      public org.terasology.protobuf.NetData.BlockMappingOrBuilder getBlockMappingOrBuilder(
+      public org.terasology.protobuf.NetData.SerializationInfoOrBuilder getComponentOrBuilder(
           int index) {
-        if (blockMappingBuilder_ == null) {
-          return blockMapping_.get(index);  } else {
-          return blockMappingBuilder_.getMessageOrBuilder(index);
+        if (componentBuilder_ == null) {
+          return component_.get(index);  } else {
+          return componentBuilder_.getMessageOrBuilder(index);
         }
       }
-      public java.util.List<? extends org.terasology.protobuf.NetData.BlockMappingOrBuilder> 
-           getBlockMappingOrBuilderList() {
-        if (blockMappingBuilder_ != null) {
-          return blockMappingBuilder_.getMessageOrBuilderList();
+      public java.util.List<? extends org.terasology.protobuf.NetData.SerializationInfoOrBuilder> 
+           getComponentOrBuilderList() {
+        if (componentBuilder_ != null) {
+          return componentBuilder_.getMessageOrBuilderList();
         } else {
-          return java.util.Collections.unmodifiableList(blockMapping_);
+          return java.util.Collections.unmodifiableList(component_);
         }
       }
-      public org.terasology.protobuf.NetData.BlockMapping.Builder addBlockMappingBuilder() {
-        return getBlockMappingFieldBuilder().addBuilder(
-            org.terasology.protobuf.NetData.BlockMapping.getDefaultInstance());
+      public org.terasology.protobuf.NetData.SerializationInfo.Builder addComponentBuilder() {
+        return getComponentFieldBuilder().addBuilder(
+            org.terasology.protobuf.NetData.SerializationInfo.getDefaultInstance());
       }
-      public org.terasology.protobuf.NetData.BlockMapping.Builder addBlockMappingBuilder(
+      public org.terasology.protobuf.NetData.SerializationInfo.Builder addComponentBuilder(
           int index) {
-        return getBlockMappingFieldBuilder().addBuilder(
-            index, org.terasology.protobuf.NetData.BlockMapping.getDefaultInstance());
+        return getComponentFieldBuilder().addBuilder(
+            index, org.terasology.protobuf.NetData.SerializationInfo.getDefaultInstance());
       }
-      public java.util.List<org.terasology.protobuf.NetData.BlockMapping.Builder> 
-           getBlockMappingBuilderList() {
-        return getBlockMappingFieldBuilder().getBuilderList();
+      public java.util.List<org.terasology.protobuf.NetData.SerializationInfo.Builder> 
+           getComponentBuilderList() {
+        return getComponentFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          org.terasology.protobuf.NetData.BlockMapping, org.terasology.protobuf.NetData.BlockMapping.Builder, org.terasology.protobuf.NetData.BlockMappingOrBuilder> 
-          getBlockMappingFieldBuilder() {
-        if (blockMappingBuilder_ == null) {
-          blockMappingBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
-              org.terasology.protobuf.NetData.BlockMapping, org.terasology.protobuf.NetData.BlockMapping.Builder, org.terasology.protobuf.NetData.BlockMappingOrBuilder>(
-                  blockMapping_,
-                  ((bitField0_ & 0x00000002) == 0x00000002),
+          org.terasology.protobuf.NetData.SerializationInfo, org.terasology.protobuf.NetData.SerializationInfo.Builder, org.terasology.protobuf.NetData.SerializationInfoOrBuilder> 
+          getComponentFieldBuilder() {
+        if (componentBuilder_ == null) {
+          componentBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              org.terasology.protobuf.NetData.SerializationInfo, org.terasology.protobuf.NetData.SerializationInfo.Builder, org.terasology.protobuf.NetData.SerializationInfoOrBuilder>(
+                  component_,
+                  ((bitField0_ & 0x00000008) == 0x00000008),
                   getParentForChildren(),
                   isClean());
-          blockMapping_ = null;
+          component_ = null;
         }
-        return blockMappingBuilder_;
+        return componentBuilder_;
       }
       
-      // optional int64 time = 3;
-      private long time_ ;
-      public boolean hasTime() {
-        return ((bitField0_ & 0x00000004) == 0x00000004);
+      // repeated .SerializationInfo event = 5;
+      private java.util.List<org.terasology.protobuf.NetData.SerializationInfo> event_ =
+        java.util.Collections.emptyList();
+      private void ensureEventIsMutable() {
+        if (!((bitField0_ & 0x00000010) == 0x00000010)) {
+          event_ = new java.util.ArrayList<org.terasology.protobuf.NetData.SerializationInfo>(event_);
+          bitField0_ |= 0x00000010;
+         }
       }
-      public long getTime() {
-        return time_;
+      
+      private com.google.protobuf.RepeatedFieldBuilder<
+          org.terasology.protobuf.NetData.SerializationInfo, org.terasology.protobuf.NetData.SerializationInfo.Builder, org.terasology.protobuf.NetData.SerializationInfoOrBuilder> eventBuilder_;
+      
+      public java.util.List<org.terasology.protobuf.NetData.SerializationInfo> getEventList() {
+        if (eventBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(event_);
+        } else {
+          return eventBuilder_.getMessageList();
+        }
       }
-      public Builder setTime(long value) {
-        bitField0_ |= 0x00000004;
-        time_ = value;
+      public int getEventCount() {
+        if (eventBuilder_ == null) {
+          return event_.size();
+        } else {
+          return eventBuilder_.getCount();
+        }
+      }
+      public org.terasology.protobuf.NetData.SerializationInfo getEvent(int index) {
+        if (eventBuilder_ == null) {
+          return event_.get(index);
+        } else {
+          return eventBuilder_.getMessage(index);
+        }
+      }
+      public Builder setEvent(
+          int index, org.terasology.protobuf.NetData.SerializationInfo value) {
+        if (eventBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureEventIsMutable();
+          event_.set(index, value);
+          onChanged();
+        } else {
+          eventBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      public Builder setEvent(
+          int index, org.terasology.protobuf.NetData.SerializationInfo.Builder builderForValue) {
+        if (eventBuilder_ == null) {
+          ensureEventIsMutable();
+          event_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          eventBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      public Builder addEvent(org.terasology.protobuf.NetData.SerializationInfo value) {
+        if (eventBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureEventIsMutable();
+          event_.add(value);
+          onChanged();
+        } else {
+          eventBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      public Builder addEvent(
+          int index, org.terasology.protobuf.NetData.SerializationInfo value) {
+        if (eventBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureEventIsMutable();
+          event_.add(index, value);
+          onChanged();
+        } else {
+          eventBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      public Builder addEvent(
+          org.terasology.protobuf.NetData.SerializationInfo.Builder builderForValue) {
+        if (eventBuilder_ == null) {
+          ensureEventIsMutable();
+          event_.add(builderForValue.build());
+          onChanged();
+        } else {
+          eventBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      public Builder addEvent(
+          int index, org.terasology.protobuf.NetData.SerializationInfo.Builder builderForValue) {
+        if (eventBuilder_ == null) {
+          ensureEventIsMutable();
+          event_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          eventBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      public Builder addAllEvent(
+          java.lang.Iterable<? extends org.terasology.protobuf.NetData.SerializationInfo> values) {
+        if (eventBuilder_ == null) {
+          ensureEventIsMutable();
+          super.addAll(values, event_);
+          onChanged();
+        } else {
+          eventBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      public Builder clearEvent() {
+        if (eventBuilder_ == null) {
+          event_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000010);
+          onChanged();
+        } else {
+          eventBuilder_.clear();
+        }
+        return this;
+      }
+      public Builder removeEvent(int index) {
+        if (eventBuilder_ == null) {
+          ensureEventIsMutable();
+          event_.remove(index);
+          onChanged();
+        } else {
+          eventBuilder_.remove(index);
+        }
+        return this;
+      }
+      public org.terasology.protobuf.NetData.SerializationInfo.Builder getEventBuilder(
+          int index) {
+        return getEventFieldBuilder().getBuilder(index);
+      }
+      public org.terasology.protobuf.NetData.SerializationInfoOrBuilder getEventOrBuilder(
+          int index) {
+        if (eventBuilder_ == null) {
+          return event_.get(index);  } else {
+          return eventBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      public java.util.List<? extends org.terasology.protobuf.NetData.SerializationInfoOrBuilder> 
+           getEventOrBuilderList() {
+        if (eventBuilder_ != null) {
+          return eventBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(event_);
+        }
+      }
+      public org.terasology.protobuf.NetData.SerializationInfo.Builder addEventBuilder() {
+        return getEventFieldBuilder().addBuilder(
+            org.terasology.protobuf.NetData.SerializationInfo.getDefaultInstance());
+      }
+      public org.terasology.protobuf.NetData.SerializationInfo.Builder addEventBuilder(
+          int index) {
+        return getEventFieldBuilder().addBuilder(
+            index, org.terasology.protobuf.NetData.SerializationInfo.getDefaultInstance());
+      }
+      public java.util.List<org.terasology.protobuf.NetData.SerializationInfo.Builder> 
+           getEventBuilderList() {
+        return getEventFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilder<
+          org.terasology.protobuf.NetData.SerializationInfo, org.terasology.protobuf.NetData.SerializationInfo.Builder, org.terasology.protobuf.NetData.SerializationInfoOrBuilder> 
+          getEventFieldBuilder() {
+        if (eventBuilder_ == null) {
+          eventBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              org.terasology.protobuf.NetData.SerializationInfo, org.terasology.protobuf.NetData.SerializationInfo.Builder, org.terasology.protobuf.NetData.SerializationInfoOrBuilder>(
+                  event_,
+                  ((bitField0_ & 0x00000010) == 0x00000010),
+                  getParentForChildren(),
+                  isClean());
+          event_ = null;
+        }
+        return eventBuilder_;
+      }
+      
+      // repeated int32 assetIds = 6 [packed = true];
+      private java.util.List<java.lang.Integer> assetIds_ = java.util.Collections.emptyList();;
+      private void ensureAssetIdsIsMutable() {
+        if (!((bitField0_ & 0x00000020) == 0x00000020)) {
+          assetIds_ = new java.util.ArrayList<java.lang.Integer>(assetIds_);
+          bitField0_ |= 0x00000020;
+         }
+      }
+      public java.util.List<java.lang.Integer>
+          getAssetIdsList() {
+        return java.util.Collections.unmodifiableList(assetIds_);
+      }
+      public int getAssetIdsCount() {
+        return assetIds_.size();
+      }
+      public int getAssetIds(int index) {
+        return assetIds_.get(index);
+      }
+      public Builder setAssetIds(
+          int index, int value) {
+        ensureAssetIdsIsMutable();
+        assetIds_.set(index, value);
         onChanged();
         return this;
       }
-      public Builder clearTime() {
-        bitField0_ = (bitField0_ & ~0x00000004);
-        time_ = 0L;
+      public Builder addAssetIds(int value) {
+        ensureAssetIdsIsMutable();
+        assetIds_.add(value);
         onChanged();
         return this;
+      }
+      public Builder addAllAssetIds(
+          java.lang.Iterable<? extends java.lang.Integer> values) {
+        ensureAssetIdsIsMutable();
+        super.addAll(values, assetIds_);
+        onChanged();
+        return this;
+      }
+      public Builder clearAssetIds() {
+        assetIds_ = java.util.Collections.emptyList();;
+        bitField0_ = (bitField0_ & ~0x00000020);
+        onChanged();
+        return this;
+      }
+      
+      // repeated string assetUris = 7;
+      private com.google.protobuf.LazyStringList assetUris_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensureAssetUrisIsMutable() {
+        if (!((bitField0_ & 0x00000040) == 0x00000040)) {
+          assetUris_ = new com.google.protobuf.LazyStringArrayList(assetUris_);
+          bitField0_ |= 0x00000040;
+         }
+      }
+      public java.util.List<String>
+          getAssetUrisList() {
+        return java.util.Collections.unmodifiableList(assetUris_);
+      }
+      public int getAssetUrisCount() {
+        return assetUris_.size();
+      }
+      public String getAssetUris(int index) {
+        return assetUris_.get(index);
+      }
+      public Builder setAssetUris(
+          int index, String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureAssetUrisIsMutable();
+        assetUris_.set(index, value);
+        onChanged();
+        return this;
+      }
+      public Builder addAssetUris(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureAssetUrisIsMutable();
+        assetUris_.add(value);
+        onChanged();
+        return this;
+      }
+      public Builder addAllAssetUris(
+          java.lang.Iterable<String> values) {
+        ensureAssetUrisIsMutable();
+        super.addAll(values, assetUris_);
+        onChanged();
+        return this;
+      }
+      public Builder clearAssetUris() {
+        assetUris_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000040);
+        onChanged();
+        return this;
+      }
+      void addAssetUris(com.google.protobuf.ByteString value) {
+        ensureAssetUrisIsMutable();
+        assetUris_.add(value);
+        onChanged();
       }
       
       // optional string version = 15;
       private java.lang.Object version_ = "";
       public boolean hasVersion() {
-        return ((bitField0_ & 0x00000008) == 0x00000008);
+        return ((bitField0_ & 0x00000080) == 0x00000080);
       }
       public String getVersion() {
         java.lang.Object ref = version_;
@@ -5499,19 +6799,19 @@ public final class NetData {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000008;
+  bitField0_ |= 0x00000080;
         version_ = value;
         onChanged();
         return this;
       }
       public Builder clearVersion() {
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000080);
         version_ = getDefaultInstance().getVersion();
         onChanged();
         return this;
       }
       void setVersion(com.google.protobuf.ByteString value) {
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000080;
         version_ = value;
         onChanged();
       }
@@ -5519,7 +6819,7 @@ public final class NetData {
       // optional string worldName = 16;
       private java.lang.Object worldName_ = "";
       public boolean hasWorldName() {
-        return ((bitField0_ & 0x00000010) == 0x00000010);
+        return ((bitField0_ & 0x00000100) == 0x00000100);
       }
       public String getWorldName() {
         java.lang.Object ref = worldName_;
@@ -5535,19 +6835,19 @@ public final class NetData {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000010;
+  bitField0_ |= 0x00000100;
         worldName_ = value;
         onChanged();
         return this;
       }
       public Builder clearWorldName() {
-        bitField0_ = (bitField0_ & ~0x00000010);
+        bitField0_ = (bitField0_ & ~0x00000100);
         worldName_ = getDefaultInstance().getWorldName();
         onChanged();
         return this;
       }
       void setWorldName(com.google.protobuf.ByteString value) {
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000100;
         worldName_ = value;
         onChanged();
       }
@@ -5555,20 +6855,41 @@ public final class NetData {
       // optional int32 clientId = 17;
       private int clientId_ ;
       public boolean hasClientId() {
-        return ((bitField0_ & 0x00000020) == 0x00000020);
+        return ((bitField0_ & 0x00000200) == 0x00000200);
       }
       public int getClientId() {
         return clientId_;
       }
       public Builder setClientId(int value) {
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000200;
         clientId_ = value;
         onChanged();
         return this;
       }
       public Builder clearClientId() {
-        bitField0_ = (bitField0_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00000200);
         clientId_ = 0;
+        onChanged();
+        return this;
+      }
+      
+      // optional int64 time = 18;
+      private long time_ ;
+      public boolean hasTime() {
+        return ((bitField0_ & 0x00000400) == 0x00000400);
+      }
+      public long getTime() {
+        return time_;
+      }
+      public Builder setTime(long value) {
+        bitField0_ |= 0x00000400;
+        time_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearTime() {
+        bitField0_ = (bitField0_ & ~0x00000400);
+        time_ = 0L;
         onChanged();
         return this;
       }
@@ -5584,55 +6905,65 @@ public final class NetData {
     // @@protoc_insertion_point(class_scope:ServerInfoMessage)
   }
   
-  public interface BlockMappingOrBuilder extends
+  public interface SerializationInfoOrBuilder extends
       com.google.protobuf.GeneratedMessage.
-          ExtendableMessageOrBuilder<BlockMapping> {
+          ExtendableMessageOrBuilder<SerializationInfo> {
     
-    // optional string blockName = 1;
-    boolean hasBlockName();
-    String getBlockName();
+    // optional string name = 1;
+    boolean hasName();
+    String getName();
     
-    // optional int32 blockId = 2;
-    boolean hasBlockId();
-    int getBlockId();
+    // optional int32 id = 2;
+    boolean hasId();
+    int getId();
+    
+    // repeated string fieldName = 3;
+    java.util.List<String> getFieldNameList();
+    int getFieldNameCount();
+    String getFieldName(int index);
+    
+    // repeated int32 fieldId = 4 [packed = true];
+    java.util.List<java.lang.Integer> getFieldIdList();
+    int getFieldIdCount();
+    int getFieldId(int index);
   }
-  public static final class BlockMapping extends
+  public static final class SerializationInfo extends
       com.google.protobuf.GeneratedMessage.ExtendableMessage<
-        BlockMapping> implements BlockMappingOrBuilder {
-    // Use BlockMapping.newBuilder() to construct.
-    private BlockMapping(Builder builder) {
+        SerializationInfo> implements SerializationInfoOrBuilder {
+    // Use SerializationInfo.newBuilder() to construct.
+    private SerializationInfo(Builder builder) {
       super(builder);
     }
-    private BlockMapping(boolean noInit) {}
+    private SerializationInfo(boolean noInit) {}
     
-    private static final BlockMapping defaultInstance;
-    public static BlockMapping getDefaultInstance() {
+    private static final SerializationInfo defaultInstance;
+    public static SerializationInfo getDefaultInstance() {
       return defaultInstance;
     }
     
-    public BlockMapping getDefaultInstanceForType() {
+    public SerializationInfo getDefaultInstanceForType() {
       return defaultInstance;
     }
     
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return org.terasology.protobuf.NetData.internal_static_BlockMapping_descriptor;
+      return org.terasology.protobuf.NetData.internal_static_SerializationInfo_descriptor;
     }
     
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return org.terasology.protobuf.NetData.internal_static_BlockMapping_fieldAccessorTable;
+      return org.terasology.protobuf.NetData.internal_static_SerializationInfo_fieldAccessorTable;
     }
     
     private int bitField0_;
-    // optional string blockName = 1;
-    public static final int BLOCKNAME_FIELD_NUMBER = 1;
-    private java.lang.Object blockName_;
-    public boolean hasBlockName() {
+    // optional string name = 1;
+    public static final int NAME_FIELD_NUMBER = 1;
+    private java.lang.Object name_;
+    public boolean hasName() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
-    public String getBlockName() {
-      java.lang.Object ref = blockName_;
+    public String getName() {
+      java.lang.Object ref = name_;
       if (ref instanceof String) {
         return (String) ref;
       } else {
@@ -5640,36 +6971,67 @@ public final class NetData {
             (com.google.protobuf.ByteString) ref;
         String s = bs.toStringUtf8();
         if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          blockName_ = s;
+          name_ = s;
         }
         return s;
       }
     }
-    private com.google.protobuf.ByteString getBlockNameBytes() {
-      java.lang.Object ref = blockName_;
+    private com.google.protobuf.ByteString getNameBytes() {
+      java.lang.Object ref = name_;
       if (ref instanceof String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        blockName_ = b;
+        name_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
     
-    // optional int32 blockId = 2;
-    public static final int BLOCKID_FIELD_NUMBER = 2;
-    private int blockId_;
-    public boolean hasBlockId() {
+    // optional int32 id = 2;
+    public static final int ID_FIELD_NUMBER = 2;
+    private int id_;
+    public boolean hasId() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
-    public int getBlockId() {
-      return blockId_;
+    public int getId() {
+      return id_;
     }
     
+    // repeated string fieldName = 3;
+    public static final int FIELDNAME_FIELD_NUMBER = 3;
+    private com.google.protobuf.LazyStringList fieldName_;
+    public java.util.List<String>
+        getFieldNameList() {
+      return fieldName_;
+    }
+    public int getFieldNameCount() {
+      return fieldName_.size();
+    }
+    public String getFieldName(int index) {
+      return fieldName_.get(index);
+    }
+    
+    // repeated int32 fieldId = 4 [packed = true];
+    public static final int FIELDID_FIELD_NUMBER = 4;
+    private java.util.List<java.lang.Integer> fieldId_;
+    public java.util.List<java.lang.Integer>
+        getFieldIdList() {
+      return fieldId_;
+    }
+    public int getFieldIdCount() {
+      return fieldId_.size();
+    }
+    public int getFieldId(int index) {
+      return fieldId_.get(index);
+    }
+    private int fieldIdMemoizedSerializedSize = -1;
+    
     private void initFields() {
-      blockName_ = "";
-      blockId_ = 0;
+      name_ = "";
+      id_ = 0;
+      fieldName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      fieldId_ = java.util.Collections.emptyList();;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -5688,13 +7050,23 @@ public final class NetData {
                         throws java.io.IOException {
       getSerializedSize();
       com.google.protobuf.GeneratedMessage
-        .ExtendableMessage<org.terasology.protobuf.NetData.BlockMapping>.ExtensionWriter extensionWriter =
+        .ExtendableMessage<org.terasology.protobuf.NetData.SerializationInfo>.ExtensionWriter extensionWriter =
           newExtensionWriter();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeBytes(1, getBlockNameBytes());
+        output.writeBytes(1, getNameBytes());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeInt32(2, blockId_);
+        output.writeInt32(2, id_);
+      }
+      for (int i = 0; i < fieldName_.size(); i++) {
+        output.writeBytes(3, fieldName_.getByteString(i));
+      }
+      if (getFieldIdList().size() > 0) {
+        output.writeRawVarint32(34);
+        output.writeRawVarint32(fieldIdMemoizedSerializedSize);
+      }
+      for (int i = 0; i < fieldId_.size(); i++) {
+        output.writeInt32NoTag(fieldId_.get(i));
       }
       extensionWriter.writeUntil(536870912, output);
       getUnknownFields().writeTo(output);
@@ -5708,11 +7080,34 @@ public final class NetData {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, getBlockNameBytes());
+          .computeBytesSize(1, getNameBytes());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, blockId_);
+          .computeInt32Size(2, id_);
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < fieldName_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeBytesSizeNoTag(fieldName_.getByteString(i));
+        }
+        size += dataSize;
+        size += 1 * getFieldNameList().size();
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < fieldId_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeInt32SizeNoTag(fieldId_.get(i));
+        }
+        size += dataSize;
+        if (!getFieldIdList().isEmpty()) {
+          size += 1;
+          size += com.google.protobuf.CodedOutputStream
+              .computeInt32SizeNoTag(dataSize);
+        }
+        fieldIdMemoizedSerializedSize = dataSize;
       }
       size += extensionsSerializedSize();
       size += getUnknownFields().getSerializedSize();
@@ -5727,41 +7122,41 @@ public final class NetData {
       return super.writeReplace();
     }
     
-    public static org.terasology.protobuf.NetData.BlockMapping parseFrom(
+    public static org.terasology.protobuf.NetData.SerializationInfo parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
-    public static org.terasology.protobuf.NetData.BlockMapping parseFrom(
+    public static org.terasology.protobuf.NetData.SerializationInfo parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry)
                .buildParsed();
     }
-    public static org.terasology.protobuf.NetData.BlockMapping parseFrom(byte[] data)
+    public static org.terasology.protobuf.NetData.SerializationInfo parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
-    public static org.terasology.protobuf.NetData.BlockMapping parseFrom(
+    public static org.terasology.protobuf.NetData.SerializationInfo parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry)
                .buildParsed();
     }
-    public static org.terasology.protobuf.NetData.BlockMapping parseFrom(java.io.InputStream input)
+    public static org.terasology.protobuf.NetData.SerializationInfo parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
-    public static org.terasology.protobuf.NetData.BlockMapping parseFrom(
+    public static org.terasology.protobuf.NetData.SerializationInfo parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry)
                .buildParsed();
     }
-    public static org.terasology.protobuf.NetData.BlockMapping parseDelimitedFrom(java.io.InputStream input)
+    public static org.terasology.protobuf.NetData.SerializationInfo parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input)) {
@@ -5770,7 +7165,7 @@ public final class NetData {
         return null;
       }
     }
-    public static org.terasology.protobuf.NetData.BlockMapping parseDelimitedFrom(
+    public static org.terasology.protobuf.NetData.SerializationInfo parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -5781,12 +7176,12 @@ public final class NetData {
         return null;
       }
     }
-    public static org.terasology.protobuf.NetData.BlockMapping parseFrom(
+    public static org.terasology.protobuf.NetData.SerializationInfo parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
-    public static org.terasology.protobuf.NetData.BlockMapping parseFrom(
+    public static org.terasology.protobuf.NetData.SerializationInfo parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -5796,7 +7191,7 @@ public final class NetData {
     
     public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.terasology.protobuf.NetData.BlockMapping prototype) {
+    public static Builder newBuilder(org.terasology.protobuf.NetData.SerializationInfo prototype) {
       return newBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() { return newBuilder(this); }
@@ -5809,18 +7204,18 @@ public final class NetData {
     }
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.ExtendableBuilder<
-          org.terasology.protobuf.NetData.BlockMapping, Builder> implements org.terasology.protobuf.NetData.BlockMappingOrBuilder {
+          org.terasology.protobuf.NetData.SerializationInfo, Builder> implements org.terasology.protobuf.NetData.SerializationInfoOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return org.terasology.protobuf.NetData.internal_static_BlockMapping_descriptor;
+        return org.terasology.protobuf.NetData.internal_static_SerializationInfo_descriptor;
       }
       
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return org.terasology.protobuf.NetData.internal_static_BlockMapping_fieldAccessorTable;
+        return org.terasology.protobuf.NetData.internal_static_SerializationInfo_fieldAccessorTable;
       }
       
-      // Construct using org.terasology.protobuf.NetData.BlockMapping.newBuilder()
+      // Construct using org.terasology.protobuf.NetData.SerializationInfo.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -5839,10 +7234,14 @@ public final class NetData {
       
       public Builder clear() {
         super.clear();
-        blockName_ = "";
+        name_ = "";
         bitField0_ = (bitField0_ & ~0x00000001);
-        blockId_ = 0;
+        id_ = 0;
         bitField0_ = (bitField0_ & ~0x00000002);
+        fieldName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        fieldId_ = java.util.Collections.emptyList();;
+        bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
       
@@ -5852,24 +7251,24 @@ public final class NetData {
       
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return org.terasology.protobuf.NetData.BlockMapping.getDescriptor();
+        return org.terasology.protobuf.NetData.SerializationInfo.getDescriptor();
       }
       
-      public org.terasology.protobuf.NetData.BlockMapping getDefaultInstanceForType() {
-        return org.terasology.protobuf.NetData.BlockMapping.getDefaultInstance();
+      public org.terasology.protobuf.NetData.SerializationInfo getDefaultInstanceForType() {
+        return org.terasology.protobuf.NetData.SerializationInfo.getDefaultInstance();
       }
       
-      public org.terasology.protobuf.NetData.BlockMapping build() {
-        org.terasology.protobuf.NetData.BlockMapping result = buildPartial();
+      public org.terasology.protobuf.NetData.SerializationInfo build() {
+        org.terasology.protobuf.NetData.SerializationInfo result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
         return result;
       }
       
-      private org.terasology.protobuf.NetData.BlockMapping buildParsed()
+      private org.terasology.protobuf.NetData.SerializationInfo buildParsed()
           throws com.google.protobuf.InvalidProtocolBufferException {
-        org.terasology.protobuf.NetData.BlockMapping result = buildPartial();
+        org.terasology.protobuf.NetData.SerializationInfo result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(
             result).asInvalidProtocolBufferException();
@@ -5877,39 +7276,70 @@ public final class NetData {
         return result;
       }
       
-      public org.terasology.protobuf.NetData.BlockMapping buildPartial() {
-        org.terasology.protobuf.NetData.BlockMapping result = new org.terasology.protobuf.NetData.BlockMapping(this);
+      public org.terasology.protobuf.NetData.SerializationInfo buildPartial() {
+        org.terasology.protobuf.NetData.SerializationInfo result = new org.terasology.protobuf.NetData.SerializationInfo(this);
         int from_bitField0_ = bitField0_;
         int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
           to_bitField0_ |= 0x00000001;
         }
-        result.blockName_ = blockName_;
+        result.name_ = name_;
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
         }
-        result.blockId_ = blockId_;
+        result.id_ = id_;
+        if (((bitField0_ & 0x00000004) == 0x00000004)) {
+          fieldName_ = new com.google.protobuf.UnmodifiableLazyStringList(
+              fieldName_);
+          bitField0_ = (bitField0_ & ~0x00000004);
+        }
+        result.fieldName_ = fieldName_;
+        if (((bitField0_ & 0x00000008) == 0x00000008)) {
+          fieldId_ = java.util.Collections.unmodifiableList(fieldId_);
+          bitField0_ = (bitField0_ & ~0x00000008);
+        }
+        result.fieldId_ = fieldId_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
       }
       
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof org.terasology.protobuf.NetData.BlockMapping) {
-          return mergeFrom((org.terasology.protobuf.NetData.BlockMapping)other);
+        if (other instanceof org.terasology.protobuf.NetData.SerializationInfo) {
+          return mergeFrom((org.terasology.protobuf.NetData.SerializationInfo)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
       
-      public Builder mergeFrom(org.terasology.protobuf.NetData.BlockMapping other) {
-        if (other == org.terasology.protobuf.NetData.BlockMapping.getDefaultInstance()) return this;
-        if (other.hasBlockName()) {
-          setBlockName(other.getBlockName());
+      public Builder mergeFrom(org.terasology.protobuf.NetData.SerializationInfo other) {
+        if (other == org.terasology.protobuf.NetData.SerializationInfo.getDefaultInstance()) return this;
+        if (other.hasName()) {
+          setName(other.getName());
         }
-        if (other.hasBlockId()) {
-          setBlockId(other.getBlockId());
+        if (other.hasId()) {
+          setId(other.getId());
+        }
+        if (!other.fieldName_.isEmpty()) {
+          if (fieldName_.isEmpty()) {
+            fieldName_ = other.fieldName_;
+            bitField0_ = (bitField0_ & ~0x00000004);
+          } else {
+            ensureFieldNameIsMutable();
+            fieldName_.addAll(other.fieldName_);
+          }
+          onChanged();
+        }
+        if (!other.fieldId_.isEmpty()) {
+          if (fieldId_.isEmpty()) {
+            fieldId_ = other.fieldId_;
+            bitField0_ = (bitField0_ & ~0x00000008);
+          } else {
+            ensureFieldIdIsMutable();
+            fieldId_.addAll(other.fieldId_);
+          }
+          onChanged();
         }
         this.mergeExtensionFields(other);
         this.mergeUnknownFields(other.getUnknownFields());
@@ -5949,12 +7379,31 @@ public final class NetData {
             }
             case 10: {
               bitField0_ |= 0x00000001;
-              blockName_ = input.readBytes();
+              name_ = input.readBytes();
               break;
             }
             case 16: {
               bitField0_ |= 0x00000002;
-              blockId_ = input.readInt32();
+              id_ = input.readInt32();
+              break;
+            }
+            case 26: {
+              ensureFieldNameIsMutable();
+              fieldName_.add(input.readBytes());
+              break;
+            }
+            case 32: {
+              ensureFieldIdIsMutable();
+              fieldId_.add(input.readInt32());
+              break;
+            }
+            case 34: {
+              int length = input.readRawVarint32();
+              int limit = input.pushLimit(length);
+              while (input.getBytesUntilLimit() > 0) {
+                addFieldId(input.readInt32());
+              }
+              input.popLimit(limit);
               break;
             }
           }
@@ -5963,72 +7412,173 @@ public final class NetData {
       
       private int bitField0_;
       
-      // optional string blockName = 1;
-      private java.lang.Object blockName_ = "";
-      public boolean hasBlockName() {
+      // optional string name = 1;
+      private java.lang.Object name_ = "";
+      public boolean hasName() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
-      public String getBlockName() {
-        java.lang.Object ref = blockName_;
+      public String getName() {
+        java.lang.Object ref = name_;
         if (!(ref instanceof String)) {
           String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-          blockName_ = s;
+          name_ = s;
           return s;
         } else {
           return (String) ref;
         }
       }
-      public Builder setBlockName(String value) {
+      public Builder setName(String value) {
         if (value == null) {
     throw new NullPointerException();
   }
   bitField0_ |= 0x00000001;
-        blockName_ = value;
+        name_ = value;
         onChanged();
         return this;
       }
-      public Builder clearBlockName() {
+      public Builder clearName() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        blockName_ = getDefaultInstance().getBlockName();
+        name_ = getDefaultInstance().getName();
         onChanged();
         return this;
       }
-      void setBlockName(com.google.protobuf.ByteString value) {
+      void setName(com.google.protobuf.ByteString value) {
         bitField0_ |= 0x00000001;
-        blockName_ = value;
+        name_ = value;
         onChanged();
       }
       
-      // optional int32 blockId = 2;
-      private int blockId_ ;
-      public boolean hasBlockId() {
+      // optional int32 id = 2;
+      private int id_ ;
+      public boolean hasId() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
-      public int getBlockId() {
-        return blockId_;
+      public int getId() {
+        return id_;
       }
-      public Builder setBlockId(int value) {
+      public Builder setId(int value) {
         bitField0_ |= 0x00000002;
-        blockId_ = value;
+        id_ = value;
         onChanged();
         return this;
       }
-      public Builder clearBlockId() {
+      public Builder clearId() {
         bitField0_ = (bitField0_ & ~0x00000002);
-        blockId_ = 0;
+        id_ = 0;
         onChanged();
         return this;
       }
       
-      // @@protoc_insertion_point(builder_scope:BlockMapping)
+      // repeated string fieldName = 3;
+      private com.google.protobuf.LazyStringList fieldName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensureFieldNameIsMutable() {
+        if (!((bitField0_ & 0x00000004) == 0x00000004)) {
+          fieldName_ = new com.google.protobuf.LazyStringArrayList(fieldName_);
+          bitField0_ |= 0x00000004;
+         }
+      }
+      public java.util.List<String>
+          getFieldNameList() {
+        return java.util.Collections.unmodifiableList(fieldName_);
+      }
+      public int getFieldNameCount() {
+        return fieldName_.size();
+      }
+      public String getFieldName(int index) {
+        return fieldName_.get(index);
+      }
+      public Builder setFieldName(
+          int index, String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureFieldNameIsMutable();
+        fieldName_.set(index, value);
+        onChanged();
+        return this;
+      }
+      public Builder addFieldName(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureFieldNameIsMutable();
+        fieldName_.add(value);
+        onChanged();
+        return this;
+      }
+      public Builder addAllFieldName(
+          java.lang.Iterable<String> values) {
+        ensureFieldNameIsMutable();
+        super.addAll(values, fieldName_);
+        onChanged();
+        return this;
+      }
+      public Builder clearFieldName() {
+        fieldName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        onChanged();
+        return this;
+      }
+      void addFieldName(com.google.protobuf.ByteString value) {
+        ensureFieldNameIsMutable();
+        fieldName_.add(value);
+        onChanged();
+      }
+      
+      // repeated int32 fieldId = 4 [packed = true];
+      private java.util.List<java.lang.Integer> fieldId_ = java.util.Collections.emptyList();;
+      private void ensureFieldIdIsMutable() {
+        if (!((bitField0_ & 0x00000008) == 0x00000008)) {
+          fieldId_ = new java.util.ArrayList<java.lang.Integer>(fieldId_);
+          bitField0_ |= 0x00000008;
+         }
+      }
+      public java.util.List<java.lang.Integer>
+          getFieldIdList() {
+        return java.util.Collections.unmodifiableList(fieldId_);
+      }
+      public int getFieldIdCount() {
+        return fieldId_.size();
+      }
+      public int getFieldId(int index) {
+        return fieldId_.get(index);
+      }
+      public Builder setFieldId(
+          int index, int value) {
+        ensureFieldIdIsMutable();
+        fieldId_.set(index, value);
+        onChanged();
+        return this;
+      }
+      public Builder addFieldId(int value) {
+        ensureFieldIdIsMutable();
+        fieldId_.add(value);
+        onChanged();
+        return this;
+      }
+      public Builder addAllFieldId(
+          java.lang.Iterable<? extends java.lang.Integer> values) {
+        ensureFieldIdIsMutable();
+        super.addAll(values, fieldId_);
+        onChanged();
+        return this;
+      }
+      public Builder clearFieldId() {
+        fieldId_ = java.util.Collections.emptyList();;
+        bitField0_ = (bitField0_ & ~0x00000008);
+        onChanged();
+        return this;
+      }
+      
+      // @@protoc_insertion_point(builder_scope:SerializationInfo)
     }
     
     static {
-      defaultInstance = new BlockMapping(true);
+      defaultInstance = new SerializationInfo(true);
       defaultInstance.initFields();
     }
     
-    // @@protoc_insertion_point(class_scope:BlockMapping)
+    // @@protoc_insertion_point(class_scope:SerializationInfo)
   }
   
   public interface ModuleInfoOrBuilder extends
@@ -8385,6 +9935,11 @@ public final class NetData {
   }
   
   private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_NetPackage_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_NetPackage_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor
     internal_static_NetMessage_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -8420,10 +9975,10 @@ public final class NetData {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_ServerInfoMessage_fieldAccessorTable;
   private static com.google.protobuf.Descriptors.Descriptor
-    internal_static_BlockMapping_descriptor;
+    internal_static_SerializationInfo_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_BlockMapping_fieldAccessorTable;
+      internal_static_SerializationInfo_fieldAccessorTable;
   private static com.google.protobuf.Descriptors.Descriptor
     internal_static_ModuleInfo_descriptor;
   private static
@@ -8458,55 +10013,69 @@ public final class NetData {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\020NetMessage.proto\032\020EntityData.proto\"\340\004\n" +
-      "\nNetMessage\022\036\n\004type\030\001 \002(\0162\020.NetMessage.T" +
-      "ype\022 \n\tchunkInfo\030\002 \001(\0132\r.ChunkMessage\0220\n" +
-      "\017invalidateChunk\030\003 \001(\0132\027.InvalidateChunk" +
-      "Message\022(\n\013blockChange\030\004 \001(\0132\023.BlockChan" +
-      "geMessage\022*\n\014createEntity\030\005 \001(\0132\024.Create" +
-      "EntityMessage\022*\n\014removeEntity\030\006 \001(\0132\024.Re" +
-      "moveEntityMessage\022*\n\014updateEntity\030\007 \001(\0132" +
-      "\024.UpdateEntityMessage\022\034\n\005event\030\010 \001(\0132\r.E" +
-      "ventMessage\022,\n\rclientConnect\030\017 \001(\0132\025.Cli",
-      "entConnectMessage\022&\n\nserverInfo\030\020 \001(\0132\022." +
-      "ServerInfoMessage\"\260\001\n\004Type\022\022\n\016CLIENT_CON" +
-      "NECT\020\001\022\013\n\007CONSOLE\020\002\022\017\n\013SERVER_INFO\020\003\022\t\n\005" +
-      "CHUNK\020\004\022\024\n\020INVALIDATE_CHUNK\020\005\022\021\n\rBLOCK_C" +
-      "HANGED\020\006\022\021\n\rCREATE_ENTITY\020\007\022\021\n\rREMOVE_EN" +
-      "TITY\020\010\022\021\n\rUPDATE_ENTITY\020\t\022\t\n\005EVENT\020\n*\t\010\210" +
-      "\'\020\200\200\200\200\002\"\205\001\n\014ChunkMessage\022\032\n\003pos\030\001 \001(\0132\r." +
-      "Vector3iData\022\021\n\tblockData\030\002 \001(\014\022\022\n\nliqui" +
-      "dData\030\003 \001(\014\022\024\n\014sunlightData\030\017 \001(\014\022\021\n\tlig" +
-      "htData\030\020 \001(\014*\t\010\210\'\020\200\200\200\200\002\"?\n\026InvalidateChu",
-      "nkMessage\022\032\n\003pos\030\001 \001(\0132\r.Vector3iData*\t\010" +
-      "\210\'\020\200\200\200\200\002\"M\n\022BlockChangeMessage\022\032\n\003pos\030\001 " +
-      "\001(\0132\r.Vector3iData\022\020\n\010newBlock\030\002 \001(\005*\t\010\210" +
-      "\'\020\200\200\200\200\002\"/\n\014Vector3iData\022\t\n\001x\030\001 \001(\005\022\t\n\001y\030" +
-      "\002 \001(\005\022\t\n\001z\030\003 \001(\005\"@\n\024ClientConnectMessage" +
-      "\022\014\n\004name\030\001 \001(\t\022\017\n\007version\030\002 \001(\t*\t\010\210\'\020\200\200\200" +
-      "\200\002\"\244\001\n\021ServerInfoMessage\022\033\n\006module\030\001 \003(\013" +
-      "2\013.ModuleInfo\022#\n\014blockMapping\030\002 \003(\0132\r.Bl" +
-      "ockMapping\022\014\n\004time\030\003 \001(\003\022\017\n\007version\030\017 \001(" +
-      "\t\022\021\n\tworldName\030\020 \001(\t\022\020\n\010clientId\030\021 \001(\005*\t",
-      "\010\210\'\020\200\200\200\200\002\"=\n\014BlockMapping\022\021\n\tblockName\030\001" +
-      " \001(\t\022\017\n\007blockId\030\002 \001(\005*\t\010\210\'\020\200\200\200\200\002\")\n\nModu" +
-      "leInfo\022\020\n\010moduleId\030\001 \001(\t*\t\010\210\'\020\200\200\200\200\002\"Z\n\023C" +
-      "reateEntityMessage\022\027\n\006entity\030\001 \001(\0132\007.Ent" +
-      "ity\022\037\n\010blockPos\030\002 \001(\0132\r.Vector3iData*\t\010\210" +
-      "\'\020\200\200\200\200\002\"H\n\023UpdateEntityMessage\022\027\n\006entity" +
-      "\030\001 \001(\0132\007.Entity\022\r\n\005netId\030\002 \001(\005*\t\010\210\'\020\200\200\200\200" +
-      "\002\"/\n\023RemoveEntityMessage\022\r\n\005netId\030\001 \001(\005*" +
-      "\t\010\210\'\020\200\200\200\200\002\"B\n\014EventMessage\022\020\n\010targetId\030\001" +
-      " \001(\005\022\025\n\005event\030\002 \001(\0132\006.Event*\t\010\210\'\020\200\200\200\200\002B$",
-      "\n\027org.terasology.protobufB\007NetDataH\001"
+      "\n\020NetMessage.proto\032\020EntityData.proto\"5\n\n" +
+      "NetPackage\022\034\n\007message\030\001 \003(\0132\013.NetMessage" +
+      "*\t\010\210\'\020\200\200\200\200\002\"\340\004\n\nNetMessage\022\036\n\004type\030\001 \002(\016" +
+      "2\020.NetMessage.Type\022 \n\tchunkInfo\030\002 \001(\0132\r." +
+      "ChunkMessage\0220\n\017invalidateChunk\030\003 \001(\0132\027." +
+      "InvalidateChunkMessage\022(\n\013blockChange\030\004 " +
+      "\001(\0132\023.BlockChangeMessage\022*\n\014createEntity" +
+      "\030\005 \001(\0132\024.CreateEntityMessage\022*\n\014removeEn" +
+      "tity\030\006 \001(\0132\024.RemoveEntityMessage\022*\n\014upda" +
+      "teEntity\030\007 \001(\0132\024.UpdateEntityMessage\022\034\n\005",
+      "event\030\010 \001(\0132\r.EventMessage\022,\n\rclientConn" +
+      "ect\030\017 \001(\0132\025.ClientConnectMessage\022&\n\nserv" +
+      "erInfo\030\020 \001(\0132\022.ServerInfoMessage\"\260\001\n\004Typ" +
+      "e\022\022\n\016CLIENT_CONNECT\020\001\022\013\n\007CONSOLE\020\002\022\017\n\013SE" +
+      "RVER_INFO\020\003\022\t\n\005CHUNK\020\004\022\024\n\020INVALIDATE_CHU" +
+      "NK\020\005\022\021\n\rBLOCK_CHANGED\020\006\022\021\n\rCREATE_ENTITY" +
+      "\020\007\022\021\n\rREMOVE_ENTITY\020\010\022\021\n\rUPDATE_ENTITY\020\t" +
+      "\022\t\n\005EVENT\020\n*\t\010\210\'\020\200\200\200\200\002\"\205\001\n\014ChunkMessage\022" +
+      "\032\n\003pos\030\001 \001(\0132\r.Vector3iData\022\021\n\tblockData" +
+      "\030\002 \001(\014\022\022\n\nliquidData\030\003 \001(\014\022\024\n\014sunlightDa",
+      "ta\030\017 \001(\014\022\021\n\tlightData\030\020 \001(\014*\t\010\210\'\020\200\200\200\200\002\"?" +
+      "\n\026InvalidateChunkMessage\022\032\n\003pos\030\001 \001(\0132\r." +
+      "Vector3iData*\t\010\210\'\020\200\200\200\200\002\"M\n\022BlockChangeMe" +
+      "ssage\022\032\n\003pos\030\001 \001(\0132\r.Vector3iData\022\020\n\010new" +
+      "Block\030\002 \001(\005*\t\010\210\'\020\200\200\200\200\002\"/\n\014Vector3iData\022\t" +
+      "\n\001x\030\001 \001(\005\022\t\n\001y\030\002 \001(\005\022\t\n\001z\030\003 \001(\005\"@\n\024Clien" +
+      "tConnectMessage\022\014\n\004name\030\001 \001(\t\022\017\n\007version" +
+      "\030\002 \001(\t*\t\010\210\'\020\200\200\200\200\002\"\232\002\n\021ServerInfoMessage\022" +
+      "\033\n\006module\030\001 \003(\0132\013.ModuleInfo\022\023\n\007blockId\030" +
+      "\002 \003(\005B\002\020\001\022\021\n\tblockName\030\003 \003(\t\022%\n\tcomponen",
+      "t\030\004 \003(\0132\022.SerializationInfo\022!\n\005event\030\005 \003" +
+      "(\0132\022.SerializationInfo\022\024\n\010assetIds\030\006 \003(\005" +
+      "B\002\020\001\022\021\n\tassetUris\030\007 \003(\t\022\017\n\007version\030\017 \001(\t" +
+      "\022\021\n\tworldName\030\020 \001(\t\022\020\n\010clientId\030\021 \001(\005\022\014\n" +
+      "\004time\030\022 \001(\003*\t\010\210\'\020\200\200\200\200\002\"`\n\021SerializationI" +
+      "nfo\022\014\n\004name\030\001 \001(\t\022\n\n\002id\030\002 \001(\005\022\021\n\tfieldNa" +
+      "me\030\003 \003(\t\022\023\n\007fieldId\030\004 \003(\005B\002\020\001*\t\010\210\'\020\200\200\200\200\002" +
+      "\")\n\nModuleInfo\022\020\n\010moduleId\030\001 \001(\t*\t\010\210\'\020\200\200" +
+      "\200\200\002\"Z\n\023CreateEntityMessage\022\027\n\006entity\030\001 \001" +
+      "(\0132\007.Entity\022\037\n\010blockPos\030\002 \001(\0132\r.Vector3i",
+      "Data*\t\010\210\'\020\200\200\200\200\002\"H\n\023UpdateEntityMessage\022\027" +
+      "\n\006entity\030\001 \001(\0132\007.Entity\022\r\n\005netId\030\002 \001(\005*\t" +
+      "\010\210\'\020\200\200\200\200\002\"/\n\023RemoveEntityMessage\022\r\n\005netI" +
+      "d\030\001 \001(\005*\t\010\210\'\020\200\200\200\200\002\"B\n\014EventMessage\022\020\n\010ta" +
+      "rgetId\030\001 \001(\005\022\025\n\005event\030\002 \001(\0132\006.Event*\t\010\210\'" +
+      "\020\200\200\200\200\002B$\n\027org.terasology.protobufB\007NetDa" +
+      "taH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
         public com.google.protobuf.ExtensionRegistry assignDescriptors(
             com.google.protobuf.Descriptors.FileDescriptor root) {
           descriptor = root;
-          internal_static_NetMessage_descriptor =
+          internal_static_NetPackage_descriptor =
             getDescriptor().getMessageTypes().get(0);
+          internal_static_NetPackage_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_NetPackage_descriptor,
+              new java.lang.String[] { "Message", },
+              org.terasology.protobuf.NetData.NetPackage.class,
+              org.terasology.protobuf.NetData.NetPackage.Builder.class);
+          internal_static_NetMessage_descriptor =
+            getDescriptor().getMessageTypes().get(1);
           internal_static_NetMessage_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_NetMessage_descriptor,
@@ -8514,7 +10083,7 @@ public final class NetData {
               org.terasology.protobuf.NetData.NetMessage.class,
               org.terasology.protobuf.NetData.NetMessage.Builder.class);
           internal_static_ChunkMessage_descriptor =
-            getDescriptor().getMessageTypes().get(1);
+            getDescriptor().getMessageTypes().get(2);
           internal_static_ChunkMessage_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_ChunkMessage_descriptor,
@@ -8522,7 +10091,7 @@ public final class NetData {
               org.terasology.protobuf.NetData.ChunkMessage.class,
               org.terasology.protobuf.NetData.ChunkMessage.Builder.class);
           internal_static_InvalidateChunkMessage_descriptor =
-            getDescriptor().getMessageTypes().get(2);
+            getDescriptor().getMessageTypes().get(3);
           internal_static_InvalidateChunkMessage_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_InvalidateChunkMessage_descriptor,
@@ -8530,7 +10099,7 @@ public final class NetData {
               org.terasology.protobuf.NetData.InvalidateChunkMessage.class,
               org.terasology.protobuf.NetData.InvalidateChunkMessage.Builder.class);
           internal_static_BlockChangeMessage_descriptor =
-            getDescriptor().getMessageTypes().get(3);
+            getDescriptor().getMessageTypes().get(4);
           internal_static_BlockChangeMessage_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_BlockChangeMessage_descriptor,
@@ -8538,7 +10107,7 @@ public final class NetData {
               org.terasology.protobuf.NetData.BlockChangeMessage.class,
               org.terasology.protobuf.NetData.BlockChangeMessage.Builder.class);
           internal_static_Vector3iData_descriptor =
-            getDescriptor().getMessageTypes().get(4);
+            getDescriptor().getMessageTypes().get(5);
           internal_static_Vector3iData_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_Vector3iData_descriptor,
@@ -8546,7 +10115,7 @@ public final class NetData {
               org.terasology.protobuf.NetData.Vector3iData.class,
               org.terasology.protobuf.NetData.Vector3iData.Builder.class);
           internal_static_ClientConnectMessage_descriptor =
-            getDescriptor().getMessageTypes().get(5);
+            getDescriptor().getMessageTypes().get(6);
           internal_static_ClientConnectMessage_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_ClientConnectMessage_descriptor,
@@ -8554,23 +10123,23 @@ public final class NetData {
               org.terasology.protobuf.NetData.ClientConnectMessage.class,
               org.terasology.protobuf.NetData.ClientConnectMessage.Builder.class);
           internal_static_ServerInfoMessage_descriptor =
-            getDescriptor().getMessageTypes().get(6);
+            getDescriptor().getMessageTypes().get(7);
           internal_static_ServerInfoMessage_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_ServerInfoMessage_descriptor,
-              new java.lang.String[] { "Module", "BlockMapping", "Time", "Version", "WorldName", "ClientId", },
+              new java.lang.String[] { "Module", "BlockId", "BlockName", "Component", "Event", "AssetIds", "AssetUris", "Version", "WorldName", "ClientId", "Time", },
               org.terasology.protobuf.NetData.ServerInfoMessage.class,
               org.terasology.protobuf.NetData.ServerInfoMessage.Builder.class);
-          internal_static_BlockMapping_descriptor =
-            getDescriptor().getMessageTypes().get(7);
-          internal_static_BlockMapping_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_BlockMapping_descriptor,
-              new java.lang.String[] { "BlockName", "BlockId", },
-              org.terasology.protobuf.NetData.BlockMapping.class,
-              org.terasology.protobuf.NetData.BlockMapping.Builder.class);
-          internal_static_ModuleInfo_descriptor =
+          internal_static_SerializationInfo_descriptor =
             getDescriptor().getMessageTypes().get(8);
+          internal_static_SerializationInfo_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_SerializationInfo_descriptor,
+              new java.lang.String[] { "Name", "Id", "FieldName", "FieldId", },
+              org.terasology.protobuf.NetData.SerializationInfo.class,
+              org.terasology.protobuf.NetData.SerializationInfo.Builder.class);
+          internal_static_ModuleInfo_descriptor =
+            getDescriptor().getMessageTypes().get(9);
           internal_static_ModuleInfo_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_ModuleInfo_descriptor,
@@ -8578,7 +10147,7 @@ public final class NetData {
               org.terasology.protobuf.NetData.ModuleInfo.class,
               org.terasology.protobuf.NetData.ModuleInfo.Builder.class);
           internal_static_CreateEntityMessage_descriptor =
-            getDescriptor().getMessageTypes().get(9);
+            getDescriptor().getMessageTypes().get(10);
           internal_static_CreateEntityMessage_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_CreateEntityMessage_descriptor,
@@ -8586,7 +10155,7 @@ public final class NetData {
               org.terasology.protobuf.NetData.CreateEntityMessage.class,
               org.terasology.protobuf.NetData.CreateEntityMessage.Builder.class);
           internal_static_UpdateEntityMessage_descriptor =
-            getDescriptor().getMessageTypes().get(10);
+            getDescriptor().getMessageTypes().get(11);
           internal_static_UpdateEntityMessage_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_UpdateEntityMessage_descriptor,
@@ -8594,7 +10163,7 @@ public final class NetData {
               org.terasology.protobuf.NetData.UpdateEntityMessage.class,
               org.terasology.protobuf.NetData.UpdateEntityMessage.Builder.class);
           internal_static_RemoveEntityMessage_descriptor =
-            getDescriptor().getMessageTypes().get(11);
+            getDescriptor().getMessageTypes().get(12);
           internal_static_RemoveEntityMessage_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_RemoveEntityMessage_descriptor,
@@ -8602,7 +10171,7 @@ public final class NetData {
               org.terasology.protobuf.NetData.RemoveEntityMessage.class,
               org.terasology.protobuf.NetData.RemoveEntityMessage.Builder.class);
           internal_static_EventMessage_descriptor =
-            getDescriptor().getMessageTypes().get(12);
+            getDescriptor().getMessageTypes().get(13);
           internal_static_EventMessage_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_EventMessage_descriptor,

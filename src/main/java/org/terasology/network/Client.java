@@ -3,6 +3,7 @@ package org.terasology.network;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
+import com.google.protobuf.TextFormat;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
@@ -37,6 +38,9 @@ import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.ChunkRegionListener;
 import org.terasology.world.chunks.ChunkUnloadedEvent;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -54,7 +58,6 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
     private NetworkSystem networkSystem;
     private EntityRef clientEntity = EntityRef.NULL;
     private Channel channel;
-    private ChunkProvider chunkProvider;
     private EntitySerializer entitySerializer;
     private EventSerializer eventSerializer;
 
@@ -79,7 +82,6 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
     public Client(Channel channel, NetworkSystem networkSystem) {
         this.channel = channel;
         this.networkSystem = networkSystem;
-        this.chunkProvider = CoreRegistry.get(ChunkProvider.class);
         CoreRegistry.get(WorldProvider.class).registerListener(this);
     }
 
@@ -138,20 +140,6 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
             ClientComponent clientComponent = clientEntity.getComponent(ClientComponent.class);
             clientComponent.clientInfo = clientInfo;
             clientEntity.saveComponent(clientComponent);
-
-            // Send server info to client
-            NetData.ServerInfoMessage.Builder serverInfoMessageBuilder = NetData.ServerInfoMessage.newBuilder();
-            WorldProvider world = CoreRegistry.get(WorldProvider.class);
-            serverInfoMessageBuilder.setTime(world.getTime());
-            serverInfoMessageBuilder.setWorldName(world.getTitle());
-            for (Mod mod : CoreRegistry.get(ModManager.class).getActiveMods()) {
-                serverInfoMessageBuilder.addModule(NetData.ModuleInfo.newBuilder().setModuleId(mod.getModInfo().getId()).build());
-            }
-            for (Map.Entry<String, Byte> blockMapping : BlockManager.getInstance().getBlockIdMap().entrySet()) {
-                serverInfoMessageBuilder.addBlockMapping(NetData.BlockMapping.newBuilder().setBlockId(blockMapping.getValue()).setBlockName(blockMapping.getKey()));
-            }
-            serverInfoMessageBuilder.setClientId(clientEntity.getComponent(NetworkComponent.class).networkId);
-            send(NetData.NetMessage.newBuilder().setType(NetData.NetMessage.Type.SERVER_INFO).setServerInfo(serverInfoMessageBuilder.build()).build());
         }
     }
 
@@ -185,7 +173,7 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
         }
     }
 
-    private void send(NetData.NetMessage data) {
+    void send(NetData.NetMessage data) {
         sentMessages.incrementAndGet();
         sentBytes.addAndGet(data.getSerializedSize());
         channel.write(data);

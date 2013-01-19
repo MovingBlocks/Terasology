@@ -2,6 +2,7 @@ package org.terasology.entitySystem.persistence;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
+import com.google.common.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Event;
@@ -116,7 +117,7 @@ public class EventSerializer {
 
         for (FieldMetadata field : eventMetadata.iterateFields()) {
             if (check.shouldSerializeField(field, event)) {
-                EntityData.NameValue fieldData = field.serialize(event);
+                EntityData.NameValue fieldData = field.serialize(event, false);
                 if (fieldData != null) {
                     eventData.addField(fieldData);
                 }
@@ -166,5 +167,9 @@ public class EventSerializer {
         logger.warn("Unable to deserialize event, no type provided.");
 
         return null;
+    }
+
+    public Map<Class<? extends Event>, Integer> getIdMapping() {
+        return ImmutableMap.copyOf(idTable);
     }
 }

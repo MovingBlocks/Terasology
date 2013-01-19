@@ -25,8 +25,11 @@ import org.terasology.entitySystem.Event;
 import org.terasology.entitySystem.PersistableEntityManager;
 import org.terasology.entitySystem.metadata.ClassMetadata;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
+import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.metadata.EventLibrary;
+import org.terasology.entitySystem.metadata.EventMetadata;
+import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.entitySystem.metadata.TypeHandler;
 import org.terasology.entitySystem.metadata.TypeHandlerLibraryBuilder;
 import org.terasology.entitySystem.metadata.internal.EntitySystemLibraryImpl;
@@ -34,6 +37,8 @@ import org.terasology.entitySystem.persistence.EntitySerializer;
 import org.terasology.entitySystem.persistence.EventSerializer;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
+import org.terasology.logic.mod.Mod;
+import org.terasology.logic.mod.ModManager;
 import org.terasology.network.events.ConnectedEvent;
 import org.terasology.network.pipelineFactory.TerasologyClientPipelineFactory;
 import org.terasology.network.pipelineFactory.TerasologyServerPipelineFactory;
@@ -41,6 +46,8 @@ import org.terasology.network.serialization.NetComponentSerializeCheck;
 import org.terasology.network.serialization.NetEntityRefTypeHandler;
 import org.terasology.protobuf.NetData;
 import org.terasology.world.BlockEntityRegistry;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 
 import java.net.InetSocketAddress;
@@ -64,7 +71,6 @@ public class NetworkSystem implements EntityChangeSubscriber {
     private EntitySystemLibrary entitySystemLibrary;
     private EventSerializer eventSerializer;
     private EntitySerializer entitySerializer;
-    private BlockEntityRegistry blockEntityRegistry;
 
     private ChannelFactory factory;
     private TIntIntMap netIdToEntityId = new TIntIntHashMap();
@@ -97,6 +103,7 @@ public class NetworkSystem implements EntityChangeSubscriber {
             allChannels.add(listenChannel);
             logger.info("Started server");
             mode = NetworkMode.SERVER;
+            generateSerializationTables();
             nextNetworkTick = timer.getTimeInMs();
         }
     }
@@ -280,15 +287,18 @@ public class NetworkSystem implements EntityChangeSubscriber {
 
         eventSerializer = new EventSerializer(eventLibrary);
         entitySerializer = new EntitySerializer(entityManager, componentLibrary);
+        entitySerializer.setUsingFieldIds(true);
         entitySerializer.setIgnoringEntityId(true);
         entitySerializer.setComponentSerializeCheck(new NetComponentSerializeCheck());
-        this.blockEntityRegistry = blockEntityRegistry;
+
+        if (mode == NetworkMode.CLIENT) {
+            applySerializationTables();
+        }
 
         if (server != null) {
             server.connectToEntitySystem(entityManager, entitySerializer, eventSerializer, blockEntityRegistry);
         }
     }
-
 
     @Override
     public void onEntityChange(EntityRef entity) {
@@ -398,6 +408,8 @@ public class NetworkSystem implements EntityChangeSubscriber {
         client.connected(entityManager, entitySerializer, eventSerializer);
         clientList.add(client);
         clientPlayerLookup.put(client.getEntity(), client);
+        sendServerInfo(client);
+
         client.getEntity().send(new ConnectedEvent());
         logger.info("New client entity: {}", client.getEntity());
         for (EntityRef netEntity : entityManager.iteratorEntities(NetworkComponent.class)) {
@@ -416,6 +428,47 @@ public class NetworkSystem implements EntityChangeSubscriber {
         }
     }
 
+    private void sendServerInfo(Client client) {
+        NetData.ServerInfoMessage.Builder serverInfoMessageBuilder = NetData.ServerInfoMessage.newBuilder();
+        WorldProvider world = CoreRegistry.get(WorldProvider.class);
+        serverInfoMessageBuilder.setTime(world.getTime());
+        serverInfoMessageBuilder.setWorldName(world.getTitle());
+        for (Mod mod : CoreRegistry.get(ModManager.class).getActiveMods()) {
+            serverInfoMessageBuilder.addModule(NetData.ModuleInfo.newBuilder().setModuleId(mod.getModInfo().getId()).build());
+        }
+        for (Map.Entry<String, Byte> blockMapping : BlockManager.getInstance().getBlockIdMap().entrySet()) {
+            serverInfoMessageBuilder.addBlockId(blockMapping.getValue());
+            serverInfoMessageBuilder.addBlockName(blockMapping.getKey());
+        }
+        Map<Class<? extends Component>, Integer> componentIdTable = entitySerializer.getComponentIdMapping();
+        for (Map.Entry<Class<? extends Component>, Integer> componentIdMapping : componentIdTable.entrySet()) {
+            ComponentMetadata<?> metadata = entitySystemLibrary.getComponentLibrary().getMetadata(componentIdMapping.getKey());
+            NetData.SerializationInfo.Builder info = NetData.SerializationInfo.newBuilder()
+                    .setId(componentIdMapping.getValue())
+                    .setName(metadata.getName());
+            for (FieldMetadata field : metadata.iterateFields()) {
+                info.addFieldId(field.getId());
+                info.addFieldName(field.getName());
+            }
+            serverInfoMessageBuilder.addComponent(info);
+        }
+        Map<Class<? extends Event>, Integer> eventIdTable = eventSerializer.getIdMapping();
+        for (Map.Entry<Class<? extends Event>, Integer> eventMapping : eventIdTable.entrySet()) {
+            EventMetadata<?> metadata = entitySystemLibrary.getEventLibrary().getMetadata(eventMapping.getKey());
+            NetData.SerializationInfo.Builder info = NetData.SerializationInfo.newBuilder()
+                    .setId(eventMapping.getValue())
+                    .setName(metadata.getName());
+            for (FieldMetadata field : metadata.iterateFields()) {
+                info.addFieldId(field.getId());
+                info.addFieldName(field.getName());
+            }
+            serverInfoMessageBuilder.addEvent(info);
+        }
+
+        serverInfoMessageBuilder.setClientId(client.getEntity().getComponent(NetworkComponent.class).networkId);
+        client.send(NetData.NetMessage.newBuilder().setType(NetData.NetMessage.Type.SERVER_INFO).setServerInfo(serverInfoMessageBuilder.build()).build());
+    }
+
     void removeClient(Client client) {
         synchronized (clientList) {
             clientList.remove(client);
@@ -426,4 +479,70 @@ public class NetworkSystem implements EntityChangeSubscriber {
         this.server = server;
     }
 
+    private void generateSerializationTables() {
+        Map<Class<? extends Component>, Integer> componentIdTable = Maps.newHashMap();
+        for (ClassMetadata<? extends Component> componentMetadata : entitySystemLibrary.getComponentLibrary()) {
+            int index = componentIdTable.size();
+            componentIdTable.put(componentMetadata.getType(), index);
+
+            int fieldId = 1;
+            for (FieldMetadata field : componentMetadata.iterateFields()) {
+                componentMetadata.setFieldId(field, fieldId++);
+            }
+        }
+        entitySerializer.setComponentIdMapping(componentIdTable);
+
+        Map<Class<? extends Event>, Integer> eventIdTable = Maps.newHashMap();
+        for (ClassMetadata<? extends Event> eventMetadata : entitySystemLibrary.getEventLibrary()) {
+            int index = eventIdTable.size();
+            eventIdTable.put(eventMetadata.getType(), index);
+
+            int fieldId = 1;
+            for (FieldMetadata field : eventMetadata.iterateFields()) {
+                eventMetadata.setFieldId(field, fieldId++);
+            }
+        }
+        eventSerializer.setIdMapping(eventIdTable);
+    }
+
+    private void applySerializationTables() {
+        NetData.ServerInfoMessage serverInfo = server.getInfo();
+        Map<Class<? extends Component>, Integer> componentIdTable = Maps.newHashMap();
+        for (NetData.SerializationInfo info : serverInfo.getComponentList()) {
+            ComponentMetadata<?> metadata = entitySystemLibrary.getComponentLibrary().getMetadata(info.getName());
+            if (metadata != null) {
+                componentIdTable.put(metadata.getType(), info.getId());
+                for (int i = 0; i < info.getFieldIdCount(); ++i) {
+                    FieldMetadata field = metadata.getField(info.getFieldName(i));
+                    if (field != null) {
+                        metadata.setFieldId(field, info.getFieldId(i));
+                    } else {
+                        logger.error("Server has unknown field '{}' on component '{}'", info.getFieldName(i), info.getName());
+                    }
+                }
+            } else {
+                logger.error("Server has unknown component '{}'", info.getName());
+            }
+        }
+        entitySerializer.setComponentIdMapping(componentIdTable);
+
+        Map<Class<? extends Event>, Integer> eventIdTable = Maps.newHashMap();
+        for (NetData.SerializationInfo info : serverInfo.getEventList()) {
+            EventMetadata<?> metadata = entitySystemLibrary.getEventLibrary().getMetadata(info.getName());
+            if (metadata != null) {
+                eventIdTable.put(metadata.getType(), info.getId());
+                for (int i = 0; i < info.getFieldIdCount(); ++i) {
+                    FieldMetadata field = metadata.getField(info.getFieldName(i));
+                    if (field != null) {
+                        metadata.setFieldId(field, info.getFieldId(i));
+                    } else {
+                        logger.error("Server has unknown field '{}' on event '{}'", info.getFieldName(i), info.getName());
+                    }
+                }
+            } else {
+                logger.error("Server has unknown event '{}'", info.getName());
+            }
+        }
+        eventSerializer.setIdMapping(eventIdTable);
+    }
 }

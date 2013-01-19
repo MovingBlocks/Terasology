@@ -58,6 +58,14 @@ public class EntitySerializer {
         return ignoringEntityId;
     }
 
+    public boolean isUsingFieldIds() {
+        return componentSerializer.isUsingFieldIds();
+    }
+
+    public void setUsingFieldIds(boolean usingFieldIds) {
+        componentSerializer.setUsingFieldIds(usingFieldIds);
+    }
+
     public void setComponentSerializeCheck(ComponentSerializeCheck check) {
         this.componentSerializeCheck = check;
     }
@@ -78,6 +86,13 @@ public class EntitySerializer {
      */
     public void setComponentIdMapping(Map<Class<? extends Component>, Integer> table) {
         componentSerializer.setIdMapping(table);
+    }
+
+    /**
+     * @return An immutable copy of the component id mapping
+     */
+    public Map<Class<? extends Component>, Integer> getComponentIdMapping() {
+        return componentSerializer.getIdMapping();
     }
 
     /**
