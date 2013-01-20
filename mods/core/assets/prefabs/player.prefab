@@ -44,5 +44,13 @@
     "MinionBar" : {
         "minionSlots" : [0,0,0,0,0,0,0,0,0]
     },
-    "MinionController" : {}
+    "MinionController" : {},
+    "Spawner" : {
+        "types" : ["hopper","dangercube"],
+		"timeBetweenSpawns" : 30000,
+ 		"maxMobsPerSpawner" : 0,
+		"rangedSpawning" : true,
+ 		"minDistance" : 8,
+ 		"range" : 18
+    }
 }
