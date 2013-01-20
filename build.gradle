@@ -191,6 +191,7 @@ subprojects {
 		}
 		dependencies {
 			compile project(':')
+            testCompile group: 'junit', name: 'junit', version: '4.10'
 		}
 	}
 }
