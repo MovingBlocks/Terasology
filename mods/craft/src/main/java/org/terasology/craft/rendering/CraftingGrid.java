@@ -1,7 +1,11 @@
-package org.terasology.rendering;
+package org.terasology.craft.rendering;
 
+import org.terasology.craft.components.actions.CraftingActionComponent;
 import org.terasology.game.CoreRegistry;
+import org.terasology.input.CameraTargetSystem;
 import org.terasology.math.AABB;
+import org.terasology.rendering.AABBRenderer;
+import org.terasology.rendering.BlockOverlayRenderer;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -9,7 +13,7 @@ import java.util.ArrayList;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 
-public class CraftingGrid {
+public class CraftingGrid implements BlockOverlayRenderer {
 
     private int selectedLevel;
 
@@ -18,6 +22,16 @@ public class CraftingGrid {
     private AABB  aabb;
     private final int countOfCells = 3;
     private int selectedItem       = 0;
+
+    public void setAABB(AABB aabb) {
+        int level = CoreRegistry.get(CameraTargetSystem.class).getTarget().getComponent(CraftingActionComponent.class).getCurrentLevel();
+        if ( (aabb != null && !aabb.equals(this.aabb)) || selectedLevel != level) {
+            dispose();
+            this.aabb = aabb;
+            selectedLevel = level;
+            reCalculateCells();
+        }
+    }
 
     public void setAABB(AABB aabb, int level) {
         if ( (aabb != null && !aabb.equals(this.aabb)) || selectedLevel != level) {
@@ -35,7 +49,7 @@ public class CraftingGrid {
         cellsRender.clear();
     }
 
-    public void render(){
+    public void render(float lineThickness){
         Camera camera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
         boolean catched = false;
         for( AABBRenderer cell : cellsRender ){
