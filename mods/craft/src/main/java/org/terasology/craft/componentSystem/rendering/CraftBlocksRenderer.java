@@ -1,17 +1,15 @@
-package org.terasology.componentSystem.rendering;
+package org.terasology.craft.componentSystem.rendering;
 
 import org.terasology.math.*;
 import com.google.common.collect.Maps;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
-import org.terasology.asset.AssetManager;
 import org.terasology.asset.Assets;
 import org.terasology.componentSystem.RenderSystem;
-import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
-import org.terasology.components.actions.CraftingActionComponent;
+import org.terasology.craft.components.actions.CraftingActionComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.*;
@@ -88,7 +86,7 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
     public void initialise() {
         worldProvider = CoreRegistry.get(WorldProvider.class);
         entityManager = CoreRegistry.get(EntityManager.class);
-        toolTipTexture = Assets.getTexture("engine:gui_craft");
+        toolTipTexture = Assets.getTexture("craft:gui_craft");
         terrainTex = Assets.getTexture("engine:items");
         guiCraftElement = null;
         craftingCloudBackground = null;
