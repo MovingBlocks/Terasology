@@ -1,9 +1,7 @@
-package org.terasology.events.crafting;
+package org.terasology.craft.events.crafting;
 
 import org.terasology.entitySystem.AbstractEvent;
 import org.terasology.entitySystem.EntityRef;
-
-import javax.vecmath.Vector3f;
 
 /**
 @author Small-Jeeper

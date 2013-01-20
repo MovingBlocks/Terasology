@@ -13,15 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.components.actions;
+package org.terasology.craft.components.actions;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.components.actions.ActionTarget;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**

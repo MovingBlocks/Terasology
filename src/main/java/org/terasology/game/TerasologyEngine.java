@@ -362,7 +362,6 @@ public class TerasologyEngine implements GameEngine {
     private void initDisplay() {
         try {
             setDisplayMode();
-
             Display.setTitle("Terasology" + " | " + "Pre Alpha");
             Display.create(Config.getInstance().getPixelFormat());
         } catch (LWJGLException e) {
