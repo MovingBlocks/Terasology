@@ -1,0 +1,37 @@
+id 			= ExampleHouse;
+function 	= livinHouse;
+style 		= medieval;
+
+#rules
+
+exampleHouse : height >= 16
+		::- Subdiv(vert, 4, 4, 4, r)
+			{Subdiv(vert, 1, 3){basement, ground_storey}, storey, storey, roof};
+exampleHouse : height < 16 && height > 3
+		::- Subdiv(vert, 3, r){ground_storey, roof};
+
+basement ::- Set("engine:CobbleStone");
+
+ground_storey ::-
+		Comp(sidefaces){Set("engine:CobbleStone")} 						// Walls of CobbleStone
+		Comp(vertEdges){ground_edges} 									// Edges are defined randomly
+		Comp(inner){ Subdiv(vert,1, r){ Set("engine:Plank"), null} };	// Build the floor of Planks
+
+ground_edges
+	::- Set("engine:Stone") : .4		// Build the edges/cornes either with smooth Stone, ...
+	| Set("engine:CobbleStone") : .3	// CobbleStone, ...
+	| Set("engine:OakTrunk") : .3;		// or Oak Trunks
+
+storey ::- Subdiv(vert, 1, 3){storey_floor, storey_walls};
+
+storey_floor ::-
+		Comp(inner){Set("engine:Plank")}
+		Comp(vertices){Set("engine:OakTrunk")}
+		Comp(horizEdges){ Set("engine:PineTrunk") };
+
+storey_walls ::-
+		Comp(sidefaces){Set("engine:Chalk")}
+		Comp(vertEdges){Set("engine:OakTrunk")};
+
+roof : height > 1 ::- Subdiv(vert, 1, r){Set("engine:Brick"), roof};
+roof : heigt == 1 ::- Set("engine:Brick");
