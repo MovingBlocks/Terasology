@@ -9,5 +9,9 @@ public final class ModIcons {
 		Icon.set("minioncommand", "miniion:minionicon16", 0, 1);
 		Icon.set("emptycard", "miniion:minionicon16", 0, 2);
 		Icon.set("filledcard", "miniion:minionicon16", 0, 3);
+		Icon.set("cardbook", "miniion:minionicon16", 0, 4);
+		Icon.set("oreominionbook", "miniion:minionicon16", 0, 5);
+		Icon.set("zonebook", "miniion:minionicon16", 0, 6);
+		
 	}
 }

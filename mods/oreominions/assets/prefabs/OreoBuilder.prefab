@@ -1,0 +1,10 @@
+{
+    "persisted" : false,
+    "location" : {},
+    "skeletalmesh" : {
+        "mesh" : "OreoMinions:OreoBuilder",
+        "material" : "OreoMinions:OreonSkin",
+        "animation" : "OreoMinions:BuilderIdle",
+        "loop" : true
+    }
+}

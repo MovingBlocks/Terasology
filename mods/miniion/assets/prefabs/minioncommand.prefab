@@ -5,5 +5,8 @@
         "usage" : "ON_BLOCK",
         "consumedOnUse" : false,
         "renderWithIcon" : true
+    },
+    "OpenUiAction" : {
+    	"uiwindowid" : "minionTest"
     }
 }
