@@ -31,7 +31,7 @@ import static org.lwjgl.opengl.GL11.*;
  * Renderer for an AABB.
  * @author Immortius
  */
-public class AABBRenderer
+public class AABBRenderer implements BlockOverlayRenderer
 {
     private int displayListWire = -1;
     private int displayListSolid = -1;
