@@ -25,10 +25,11 @@ import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.FullHealthEvent;
 import org.terasology.events.HealthChangedEvent;
-import org.terasology.events.NoHealthEvent;
+import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.events.VerticalCollisionEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.types.GameType;
+import org.terasology.math.TeraMath;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -88,6 +89,22 @@ public class HealthSystem implements EventHandlerSystem, UpdateSubscriberSystem 
             }
         }
     }
+    
+    @ReceiveEvent(components = {HealthComponent.class})
+    public void onCrash(HorizontalCollisionEvent event, EntityRef entity) {
+        HealthComponent health = entity.getComponent(HealthComponent.class);
+
+        float velocity = (TeraMath.fastAbs(event.getVelocity().x)+TeraMath.fastAbs(event.getVelocity().z))/2;        
+        
+        if (velocity > health.crashingDamageSpeedThreshold) {
+            int damage = (int) ((velocity - health.crashingDamageSpeedThreshold) * health.excessSpeedDamageMultiplier);
+            if (damage > 0) {
+                applyDamage(entity, health, damage, null);
+            }
+        }
+    }
+    
+    
 
     private void applyDamage(EntityRef entity, HealthComponent health, int damageAmount, EntityRef instigator) {
         CoreRegistry.get(GameType.class).onPlayerDamageHook(entity, health, damageAmount, instigator);

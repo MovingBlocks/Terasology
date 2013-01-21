@@ -25,6 +25,7 @@ import org.terasology.components.LocalPlayerComponent;
 import org.terasology.entitySystem.*;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.utilities.EntityTools;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldProvider;
@@ -47,6 +48,7 @@ public class SpawnerSystem implements UpdateSubscriberSystem {
     protected EntityManager entityManager;
 
     private final FastRandom random = new FastRandom();
+    private EntityTools entityTools;
     private DefaultMobFactory factory;
 
     private long tick = 0;
@@ -63,6 +65,7 @@ public class SpawnerSystem implements UpdateSubscriberSystem {
         factory = new DefaultMobFactory();
         factory.setEntityManager(entityManager);
         factory.setRandom(random);
+        entityTools = new EntityTools(worldProvider,entityManager);
         cacheTypes();
     }
 
@@ -155,7 +158,6 @@ public class SpawnerSystem implements UpdateSubscriberSystem {
                             Vector3f dist = new Vector3f(originPos);
                             dist.sub(localPlayer.getPosition());
                             double distanceToPlayer = dist.lengthSquared();
-
                             if (distanceToPlayer > spawnComp.playerNeedRange) {
                                 logger.info("Spawner {} too far from player {}<{}", entity.getId(), distanceToPlayer, spawnComp.playerNeedRange);
                                 continue;

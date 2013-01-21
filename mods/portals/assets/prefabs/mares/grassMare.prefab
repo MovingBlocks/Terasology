@@ -1,0 +1,64 @@
+/*
+ * Copyright 2012 Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+{
+  "Location" : {},
+  "Mesh" : {
+    "renderType" : "GelatinousCube",
+    "color" : [0.10, 0.80, 0.20, 1]
+  },  
+  "Health" : {
+        "currentHealth" : 25,
+        "maxHealth" : 150,
+        "regenRate" : 5,
+        "waitBeforeRegen" : 2,
+        "excessSpeedDamageMultiplier" : 2,
+        "fallingDamageSpeedThreshold" : 30
+  },
+  "CharacterMovement" : {
+    "height" : 1,
+    "radius" : 0.5,
+    "stepHeight" : 0.4,
+    "faceMovementDirection" : true,
+    "maxGroundSpeed" : 2.5,
+    "groundFriction" = 16,
+    "jumpSpeed" = 10,
+    "distanceBetweenFootsteps" : 1.5
+  },
+  "HierarchicalAI" : {
+  	"hectic" : 1,
+  	"straightLined" : 1,
+  	"playerdistance" : 1,
+	"moveUpdateTime" : 500,
+	"directionUpdateTime" :1500,
+	"idlingUpdateTime" :10,
+  	"aggressive" : false,
+  	"hunter": false,
+    	"runDistance" : 60,
+    	"panicDistance" : 4,
+        "attackDistance" : 1,
+	"damage" : 10,
+        "damageFrequency" : 1000
+  },
+  "CharacterSound" : {
+        "footstepSounds" : ["engine:FootGrass2","engine:FootGrass3","engine:FootGrass4","engine:FootGrass5"],
+        "damageSounds"  : ["engine:HeartBeat"],
+    	"deathSounds" :["engine:Death"],
+    	"deathVolume" : 4
+    },
+  "Spawnable" : {
+    "type" : "mare"
+  }
+}

@@ -43,4 +43,9 @@ public final class HungerComponent implements Component {
         this.deregenRate = deregenRate;
         this.waitBeforeDeregen = waitBeforeDeregen;
     }
+    
+    public int hunger(){
+    	return maxContentment-currentContentment;
+    }
+    
 }
