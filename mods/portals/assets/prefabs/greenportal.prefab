@@ -18,11 +18,11 @@
     },
     "Spawner" : {
         "types" : ["dangercube"],
-	"timeBetweenSpawns" : 5000,
- 	"maxMobsPerSpawner" : 5,
-	"rangedSpawning" : true,
- 	"range" : 25,
- 	"needsPlayer" : true,
+	    "timeBetweenSpawns" : 5000,
+ 	    "maxMobsPerSpawner" : 5,
+	    "rangedSpawning" : true,
+ 	    "range" : 25,
+ 	    "needsPlayer" : true,
         "playerNeedRange" :1000
     },
     "PlaySoundAction" : {

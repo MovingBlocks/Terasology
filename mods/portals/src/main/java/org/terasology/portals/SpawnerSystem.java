@@ -25,11 +25,10 @@ import org.terasology.components.LocalPlayerComponent;
 import org.terasology.entitySystem.*;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
-import org.terasology.world.block.management.BlockManager;
 
 import javax.vecmath.Vector3f;
 import java.util.Collection;
@@ -101,159 +100,161 @@ public class SpawnerSystem implements UpdateSubscriberSystem {
             return;
         }
         classLastTick = tick;
-        
-        
-        // Go through entities that are spawners. Only accept block-based spawners for now (due to location need)
-        //logger.info("Count of entities with a SpawnerComponent: {}", entityManager.getComponentCount(SpawnerComponent.class));
-        for (EntityRef entity : entityManager.iteratorEntities(SpawnerComponent.class)) {
-            //logger.info("Found a spawner: {}", entity);
-            SpawnerComponent spawnComp = entity.getComponent(SpawnerComponent.class);
-            
-            if(spawnComp.lastTick > tick) {
+
+        PerformanceMonitor.startActivity("Spawn creatures");
+        try {
+
+            // Go through entities that are spawners. Only accept block-based spawners for now (due to location need)
+            logger.info("Count of entities with a SpawnerComponent: {}", entityManager.getComponentCount(SpawnerComponent.class));
+            for (EntityRef entity : entityManager.iteratorEntities(SpawnerComponent.class)) {
+                //logger.info("Found a spawner: {}", entity);
+                SpawnerComponent spawnComp = entity.getComponent(SpawnerComponent.class);
+
+                if(spawnComp.lastTick > tick) {
+                    spawnComp.lastTick = tick;
+                }
+
+                //logger.info("tick is " + tick + ", lastTick is " + spawnComp.lastTick);
+                if (tick - spawnComp.lastTick < spawnComp.timeBetweenSpawns) {
+                    return;
+                }
+
+                //logger.info("Going to do stuff");
                 spawnComp.lastTick = tick;
-            }
 
-            //logger.info("tick is " + tick + ", lastTick is " + spawnComp.lastTick);
-            if (tick - spawnComp.lastTick < spawnComp.timeBetweenSpawns) {
-                return;
-            }
+                if(spawnComp.maxMobsPerSpawner > 0) {
+                    // TODO Make sure we don't spawn too much stuff. Not very robust yet and doesn't tie mobs to their spawner of origin right
+                    int maxMobs = entityManager.getComponentCount(SpawnerComponent.class) * spawnComp.maxMobsPerSpawner;
+                    int currentMobs = entityManager.getComponentCount(SimpleAIComponent.class) + entityManager.getComponentCount(HierarchicalAIComponent.class);
 
-            //logger.info("Going to do stuff");
-            spawnComp.lastTick = tick;
+                    logger.info("Mob count: {}/{}", currentMobs, maxMobs);
 
-            if(spawnComp.maxMobsPerSpawner>0){
-            	// TODO Make sure we don't spawn too much stuff. Not very robust yet and doesn't tie mobs to their spawner of origin right
-            	int maxMobs = entityManager.getComponentCount(SpawnerComponent.class) * spawnComp.maxMobsPerSpawner;
-            	int currentMobs = entityManager.getComponentCount(SimpleAIComponent.class) + entityManager.getComponentCount(HierarchicalAIComponent.class);
-
-            	logger.info("Mob count: {}/{}", currentMobs, maxMobs);
-
-            	// TODO Probably need something better to base this threshold on eventually
-            	if (currentMobs >= maxMobs ) {
-            		logger.info("Too many mobs! Returning early");
-            		return;
-            	}
-            }
-
-            int spawnTypes = spawnComp.types.size();
-            if (spawnTypes == 0) {
-                logger.warn("Spawner has no types, sad - stopping this loop iteration early :-(");
-                continue;
-            }
-            
-            Vector3f spawnPos= new Vector3f();
-            Vector3f pos= new Vector3f();
-			if (entity.hasComponent(BlockComponent.class)) {
-				BlockComponent blockComp = entity.getComponent(BlockComponent.class);
-				spawnPos = blockComp.getPosition().toVector3f();
-				// find player position
-				// TODO: shouldn't use local player, need some way to find nearest player
-				if (spawnComp.needsPlayer) {
-					LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-					if (localPlayer != null) {
-						Vector3f dist = new Vector3f(spawnPos);
-						dist.sub(localPlayer.getPosition());
-						double distanceToPlayer = dist.lengthSquared();
-
-						if (distanceToPlayer > spawnComp.playerNeedRange) {
-							logger.info("Spawner {} too far from player {}<{}",entity.getId(),distanceToPlayer,spawnComp.playerNeedRange);
-							continue;
-						}
-					}
-				}
-			}else if(entity.hasComponent(LocalPlayerComponent.class)){
-				LocalPlayerComponent lpc = entity.getComponent(LocalPlayerComponent.class);
-				if(lpc.isDead)
-					return;
-				LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-				spawnPos =localPlayer.getPosition();
-				logger.info("your position"+ spawnPos.x +":"+ spawnPos.y +":"+spawnPos.z);
-			}
-            
-            //TODO chech for biger creatures and creatures whit special needs
-            //TODO check biome
-            if (spawnComp.rangedSpawning) {
-            	int i=0,a=0;
-            	do{
-                pos = new Vector3f(spawnPos.x + random.randomFloat() * spawnComp.range, spawnPos.y, spawnPos.z + random.randomFloat() * spawnComp.range);
-                if(spawnComp.minDistance!=0){
-                	Vector3f dist = new Vector3f(pos);
-                	dist.sub(spawnPos);
-                	if(spawnComp.minDistance>dist.lengthSquared())
-                		continue;
+                    // TODO Probably need something better to base this threshold on eventually
+                    if (currentMobs >= maxMobs) {
+                        logger.info("Too many mobs! Returning early");
+                        return;
+                    }
                 }
-                //check that spawned wont drop far
-                while(worldProvider.getBlock(new Vector3f(pos.x , pos.y-1, pos.z)).isPenetrable() && i < 30){
-                	pos =new Vector3f(pos.x , pos.y-1, pos.z);
-                	//logger.info("changing position"+ pos.x +":"+ pos.y +":"+pos.z);
-                	i++;
+
+                int spawnTypes = spawnComp.types.size();
+                if (spawnTypes == 0) {
+                    logger.warn("Spawner has no types, sad - stopping this loop iteration early :-(");
+                    continue;
                 }
-                i=0;
-                while(!worldProvider.getBlock(new Vector3f(pos.x , pos.y, pos.z)).isPenetrable() && i < 30){
-                	pos =new Vector3f(pos.x , pos.y+1, pos.z);
-                	//logger.info("changing position"+ pos.x +":"+ pos.y +":"+pos.z);
-                	i++;
+
+                // Figure out from where spawning is originating
+                Vector3f originPos = new Vector3f();
+                if (entity.hasComponent(BlockComponent.class)) {
+                    BlockComponent blockComp = entity.getComponent(BlockComponent.class);
+                    originPos = blockComp.getPosition().toVector3f();
+                    // Find player position
+                    // TODO: shouldn't use local player, need some way to find nearest player
+                    if (spawnComp.needsPlayer) {
+                        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+                        if (localPlayer != null) {
+                            Vector3f dist = new Vector3f(originPos);
+                            dist.sub(localPlayer.getPosition());
+                            double distanceToPlayer = dist.lengthSquared();
+
+                            if (distanceToPlayer > spawnComp.playerNeedRange) {
+                                logger.info("Spawner {} too far from player {}<{}", entity.getId(), distanceToPlayer, spawnComp.playerNeedRange);
+                                continue;
+                            }
+                        }
+                    }
+                } else if (entity.hasComponent(LocalPlayerComponent.class)) {
+                    LocalPlayerComponent lpc = entity.getComponent(LocalPlayerComponent.class);
+                    if (lpc.isDead) {
+                        return;
+                    }
+                    LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+                    originPos = localPlayer.getPosition();
+                    logger.info("Player position: {}, {}, {}", originPos.x, originPos.y, originPos.z);
                 }
-                
-                a++;
-                if(a>10)
-                	return;
-                //logger.info("trying find spawn point");
-            	}while(testEnviriment(pos,1,1,1));
-            }else{
-            	pos=spawnPos;
-            	if(!testEnviriment(pos,1,1,1)){
-            		logger.info("cannot local spawn inside terain");
-            		return;
-            		}
+
+                //TODO check for bigger creatures and creatures with special needs like biome
+
+                // In case we're doing ranged spawning we might be changing the exact spot to spawn at (otherwise they're the same)
+                Vector3f spawnPos = originPos;
+                if (spawnComp.rangedSpawning) {
+
+                    // Add random range on the x and z planes, leave y (height) unchanged for now
+                    spawnPos = new Vector3f(originPos.x + random.randomFloat() * spawnComp.range, originPos.y, originPos.z + random.randomFloat() * spawnComp.range);
+
+                    // If a minimum distance is set make sure we're beyond it
+                    if (spawnComp.minDistance != 0) {
+                        Vector3f dist = new Vector3f(spawnPos);
+                        dist.sub(originPos);
+
+                        if (spawnComp.minDistance > dist.lengthSquared()) {
+                            return;
+                        }
+                    }
+
+                    // Look for an open spawn position either above or below the chosen spot.
+                    int offset = 1;
+                    while (offset < 30) {
+                        if (worldProvider.getBlock(new Vector3f(spawnPos.x , spawnPos.y + offset, spawnPos.z)).isPenetrable()
+                                && validateSpawnPos(new Vector3f(spawnPos.x , spawnPos.y + offset, spawnPos.z), 1, 1, 1)) {
+                            break;
+                        } else if (worldProvider.getBlock(new Vector3f(spawnPos.x , spawnPos.y - offset, spawnPos.z)).isPenetrable()
+                                && validateSpawnPos(new Vector3f(spawnPos.x , spawnPos.y - offset, spawnPos.z), 1, 1, 1)) {
+                            offset *= -1;
+                            break;
+                        }
+
+                        offset++;
+                    }
+
+                    if (offset == 30) {
+                        logger.info("Failed to find an open position to spawn at, sad");
+                        return;
+                    } else {
+                        spawnPos = new Vector3f(spawnPos.x , spawnPos.y + offset, spawnPos.z);
+                        logger.info("Found a valid spawn position that can fit the Spawnable! {}", spawnPos);
+                    }
+                }
+
+                String chosenSpawnerType = spawnComp.types.get(random.randomIntAbs(spawnComp.types.size()));
+                Set randomType = typeLists.get(chosenSpawnerType);
+                logger.info("Picked random type {} which returned {} prefabs", chosenSpawnerType, randomType.size());
+                if (randomType.size() == 0) {
+                    logger.warn("Type {} wasn't found, sad :-( Won't spawn anything this time", chosenSpawnerType);
+                    return;
+                }
+                int anotherRandomIndex = random.randomIntAbs(randomType.size());
+                Object[] randomPrefabs = randomType.toArray();
+                Prefab chosenPrefab = (Prefab) randomPrefabs[anotherRandomIndex];
+                logger.info("Picked index {} of types {} which is a {}, to spawn at {}", anotherRandomIndex, chosenSpawnerType, chosenPrefab, spawnPos);
+
+                factory.generate(spawnPos, chosenPrefab);
+
+                // TODO: Use some sort of parent/inheritance thing with gelcubes -> specialized gelcubes
+                // TODO: Introduce proper probability-based spawning
             }
 
-
-
-            String chosenSpawnerType = spawnComp.types.get(random.randomIntAbs(spawnComp.types.size()));
-            Set randomType = typeLists.get(chosenSpawnerType);
-            logger.info("Picked random type {} which returned {} prefabs", chosenSpawnerType, randomType.size());
-            if (randomType.size() == 0) {
-                logger.warn("Type {} wasn't found, sad :-( Won't spawn anything this time", chosenSpawnerType);
-                return;
+            for (int i = 0; i < 1000000; i++) {
+                int fun = 2 + 6;
             }
-            int anotherRandomIndex = random.randomIntAbs(randomType.size());
-            Object[] randomPrefabs = randomType.toArray();
-            Prefab chosenPrefab = (Prefab) randomPrefabs[anotherRandomIndex];
-            logger.info("Picked index {} of types {} which is a {}, to spawn at {}", anotherRandomIndex, chosenSpawnerType, chosenPrefab, pos);
 
-            factory.generate(pos, chosenPrefab);
-            
-            // TODO: Use some sort of parent/inheritance thing with gelcubes -> specialized gelcubes
-            // TODO: Introduce proper probability-based spawning
+        } finally {
+            PerformanceMonitor.endActivity();
         }
     }
-    
+
     /**
-     * test if surounding blocks are penetrable
-     * starts from that level upward
-     * @return
+     * Validates a position as open enough to fit a Spawnable (or something else?) of the given dimensions
+     *
+     * @param pos position to start from
+     * @param spawnableHeight height of what we want to fit into the space
+     * @param spawnableDepth depth of what we want to fit into the space
+     * @param spawnableWidth width of what we want to fit into the space
+     * @return true if the spawn position will fit the Spawnable
      */
-    private boolean testEnviriment(Vector3f pos,int height,int depth,int width){
-    	boolean pass=true;
-    	int h=height/2;
-    	int w=width/2;
-    	int d=depth;
-    	int x=-h,y=-w,z=0;
-    	while(x<=h){
-    		while(y<=w){
-    			while(z<=d){
-    			if(!worldProvider.getBlock(new Vector3f(pos.x+x,pos.y+y,pos.z+z)).isPenetrable())
-    				pass=false;
-    				z++;
-    			}
-    			y++;
-    			z=0;
-    		}
-    		x++;
-    		y=-w;
-    	}
-    	return pass;
+    private boolean validateSpawnPos(Vector3f pos, int spawnableHeight, int spawnableDepth, int spawnableWidth) {
+        // TODO: Fill in with clean code or even switch to a generic utility method.
+        // TODO: Could enhance this further with more suitability like ground below, water/non-water, etc. Just pass the whole prefab in
+        return true;
     }
     
 }

@@ -18,11 +18,11 @@
     },
     "Spawner" : {
         "types" : ["hopper"],
-	"timeBetweenSpawns" : 5000,
- 	"maxMobsPerSpawner" : 2,
-	"rangedSpawning" : true,
- 	"range" : 30,
- 	"needsPlayer" : true,
+	    "timeBetweenSpawns" : 5000,
+ 	    "maxMobsPerSpawner" : 2,
+	    "rangedSpawning" : true,
+ 	    "range" : 30,
+ 	    "needsPlayer" : true,
         "playerNeedRange" :1000
     },
     "PlaySoundAction" : {
