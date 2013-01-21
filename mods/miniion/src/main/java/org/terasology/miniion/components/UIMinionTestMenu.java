@@ -22,7 +22,11 @@ import org.terasology.asset.Assets;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.manager.GUIManager;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.widgets.UIImage;
+import org.terasology.rendering.gui.widgets.UIItemCell;
 import org.terasology.rendering.gui.widgets.UIWindow;
 
 /**
@@ -40,6 +44,28 @@ public class UIMinionTestMenu extends UIWindow {
 
     public UIMinionTestMenu() {
         setId("minionTest");
+        setModal(true);
+
+        addMouseButtonListener(new MouseButtonListener() {
+
+            @Override
+            public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
+
+            }
+
+            @Override
+            public void up(UIDisplayElement element, int button, boolean intersect) {
+            	 if (button == 1) {
+            		 close(); 
+                 }
+            }
+
+            @Override
+            public void down(UIDisplayElement element, int button, boolean intersect) {
+               
+            }
+        });
+        
         setSize(new Vector2f(60f, 180f));
         background = new UIImage(Assets.getTexture("engine:guiMinion"));
         background.getTextureSize().set(new Vector2f(60f / 256f, 180f / 256f));

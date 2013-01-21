@@ -16,14 +16,18 @@
 
 package org.terasology.miniion.componentsystem.action;
 
+import org.terasology.components.ItemComponent;
+import org.terasology.components.LocalPlayerComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
+import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.miniion.components.actions.OpenUiActionComponent;
+import org.terasology.miniion.gui.UICardBook;
 
 /**
  * @author Immortius
@@ -39,11 +43,17 @@ public class OpenUiAction implements EventHandlerSystem {
     public void shutdown() {
     }
 
-    @ReceiveEvent(components = OpenUiActionComponent.class)
+    @ReceiveEvent(components = {ItemComponent.class, OpenUiActionComponent.class})
     public void onActivate(ActivateEvent event, EntityRef entity) {
     	OpenUiActionComponent uiInfo = entity.getComponent(OpenUiActionComponent.class);
         if (uiInfo != null) {
-        	CoreRegistry.get(GUIManager.class).openWindow(uiInfo.uiwindowid);
+        	if(uiInfo.uiwindowid.matches("cardbook")){
+        		UICardBook cardbookui =  (UICardBook)CoreRegistry.get(GUIManager.class).openWindow("cardbook");
+        		cardbookui.openContainer(entity, CoreRegistry.get(LocalPlayer.class).getEntity());
+        	}
+        	else{
+        		CoreRegistry.get(GUIManager.class).openWindow(uiInfo.uiwindowid);
+        	}
         }
     }
 }

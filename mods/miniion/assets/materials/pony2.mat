@@ -1,0 +1,8 @@
+{
+    "shader" : "engine:genericMesh",
+    "params" : {
+        "diffuse" : "miniion:pony2",
+        "colorOffset" : [1.0, 1.0, 1.0],
+        "textured" : true
+    }
+}

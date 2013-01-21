@@ -1,0 +1,10 @@
+{
+    "Item" : {
+        "name" : "filled card",
+        "icon" : "filledcard",
+        "usage" : "ON_BLOCK",
+        "consumedOnUse" : true,
+        "renderWithIcon" : false
+    },
+    "SpawnMinionAction" : { }
+}

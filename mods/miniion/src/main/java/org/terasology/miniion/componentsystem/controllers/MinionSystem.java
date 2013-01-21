@@ -46,6 +46,7 @@ import org.terasology.miniion.components.UIMinionTestMenu;
 import org.terasology.miniion.componentsystem.entityfactory.MiniionFactory;
 import org.terasology.miniion.events.MinionMessageEvent;
 import org.terasology.miniion.events.ToggleMinionModeButton;
+import org.terasology.miniion.gui.UICardBook;
 import org.terasology.miniion.minionenum.MinionBehaviour;
 import org.terasology.miniion.minionenum.MinionMessagePriority;
 import org.terasology.miniion.components.UIMinionBehaviourMenu;
@@ -84,6 +85,7 @@ public class MinionSystem implements EventHandlerSystem {
         minionFactory.setRandom(new FastRandom());
         guiManager.registerWindow("minionBehaviour", UIMinionBehaviourMenu.class);
         guiManager.registerWindow("minionTest", UIMinionTestMenu.class);
+        guiManager.registerWindow("cardbook", UICardBook.class);
     }
 
     @ReceiveEvent(components = {WorldComponent.class})
