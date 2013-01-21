@@ -61,7 +61,7 @@ public class DroppedItemFactory {
         Mesh itemMesh = iconMeshes.get(iconName);
         if (itemMesh == null) {
             Icon icon = Icon.get(iconName);
-            itemMesh = MeshFactory.getInstance().generateItemMesh(icon.getX(), icon.getY());
+            itemMesh = MeshFactory.getInstance().generateItemMesh(icon.getTextureSimpleUri(), icon.getX(), icon.getY());
             iconMeshes.put(iconName, itemMesh);
         }
 

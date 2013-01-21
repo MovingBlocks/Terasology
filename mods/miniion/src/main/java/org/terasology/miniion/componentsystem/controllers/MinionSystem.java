@@ -49,6 +49,7 @@ import org.terasology.miniion.minionenum.MinionBehaviour;
 import org.terasology.miniion.minionenum.MinionMessagePriority;
 import org.terasology.miniion.components.UIMinionBehaviourMenu;
 import org.terasology.miniion.utilities.MinionMessage;
+import org.terasology.miniion.utilities.ModIcons;
 import org.terasology.utilities.FastRandom;
 
 /**
@@ -73,6 +74,7 @@ public class MinionSystem implements EventHandlerSystem {
 
     @Override
     public void initialise() {
+    	ModIcons.loadIcons();
         guiManager = CoreRegistry.get(GUIManager.class);
         minionFactory = new MiniionFactory();
         minionFactory.setEntityManager(CoreRegistry.get(EntityManager.class));
