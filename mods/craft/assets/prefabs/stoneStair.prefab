@@ -3,7 +3,7 @@
         "type" : "EXTERNAL",
         "result" : "engine:stonestair",
         "recipe" :  {
-            bottom:
+            "bottom":
                 [
                     "stone",  "stone", "stone",
                     "stone",  "stone", "stone",
