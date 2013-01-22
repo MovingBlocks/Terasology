@@ -51,6 +51,18 @@ message Entity {
     extensions 5000 to max;
 }
 
+message PackedEntity {
+    optional int32 id = 1;
+    repeated int32 componentId = 2 [packed=true];
+    optional bytes componentFieldCounts = 3;
+    optional bytes fieldIds = 4;
+    repeated Value fieldValue = 5;
+    repeated int32 removedComponent = 6 [packed=true];
+    optional string parentPrefabUri = 16;
+
+    extensions 5000 to max;
+}
+
 message Prefab {
     optional int32 name_index = 1;
     repeated Component component = 2;
@@ -63,9 +75,9 @@ message Prefab {
 }
 
 message Event {
-    optional int32 type_index = 1; // Index of the type, if contained in a world with component_classes table
-    repeated NameValue field = 2;
-    optional string type = 15; // The name of the type. Not needed if index provided
+    optional int32 type = 1;
+    optional bytes fieldIds = 2;
+    repeated Value fieldValue = 3;
 
     extensions 5000 to max;
 }
@@ -73,6 +85,7 @@ message Event {
 message World {
     repeated Entity entity = 1;
     repeated Prefab prefab = 2;
+    repeated PackedEntity packedEntity = 3;
     repeated string component_class = 15; // Table of component classes, the index of which corresponds to Component's type_index.
     optional int32 next_entity_id = 16;
     repeated int32 freed_entity_id = 17 [packed=true];

@@ -68,7 +68,7 @@ message ClientConnectMessage {
 
 message ServerInfoMessage {
     repeated ModuleInfo module = 1;
-    repeated int32 blockId = 2 [packed=true];
+    repeated sint32 blockId = 2 [packed=true];
     repeated string blockName = 3;
     repeated SerializationInfo component = 4;
     repeated SerializationInfo event = 5;
@@ -87,7 +87,7 @@ message SerializationInfo {
     optional string name = 1;
     optional int32 id = 2;
     repeated string fieldName = 3;
-    repeated int32 fieldId = 4 [packed=true];
+    optional bytes fieldIds = 4;
 
     extensions 5000 to max;
 }
@@ -99,14 +99,14 @@ message ModuleInfo {
 }
 
 message CreateEntityMessage {
-    optional Entity entity = 1;
+    optional PackedEntity entity = 1;
     optional Vector3iData blockPos = 2;
 
     extensions 5000 to max;
 }
 
 message UpdateEntityMessage {
-    optional Entity entity = 1;
+    optional PackedEntity entity = 1;
     optional int32 netId = 2;
 
     extensions 5000 to max;

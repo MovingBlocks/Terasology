@@ -14,7 +14,6 @@ import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.entitySystem.metadata.MetadataUtil;
 import org.terasology.protobuf.EntityData;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 /**
@@ -118,28 +117,18 @@ public class ComponentSerializer {
 
 
     private Component deserializeOnto(Component targetComponent, EntityData.Component componentData, ClassMetadata componentMetadata, FieldSerializeCheck<Component> fieldCheck) {
-        try {
-            for (EntityData.NameValue field : componentData.getFieldList()) {
-                FieldMetadata fieldInfo = null;
-                if (field.hasNameIndex()) {
-                    fieldInfo = componentMetadata.getFieldById(field.getNameIndex());
-                } else if (field.hasName()) {
-                    fieldInfo = componentMetadata.getField(field.getName());
-                }
-                if (fieldInfo == null || !fieldCheck.shouldDeserializeField(fieldInfo)) {
-                    continue;
-                }
-
-                Object value = fieldInfo.deserialize(field.getValue());
-                if (value != null) {
-                    fieldInfo.setValue(targetComponent, value);
-                }
+        for (EntityData.NameValue field : componentData.getFieldList()) {
+            FieldMetadata fieldInfo = null;
+            if (field.hasNameIndex()) {
+                fieldInfo = componentMetadata.getFieldById(field.getNameIndex());
+            } else if (field.hasName()) {
+                fieldInfo = componentMetadata.getField(field.getName());
             }
-            return targetComponent;
-        } catch (InvocationTargetException e) {
-            logger.error("Exception during serializing component type: {}", targetComponent.getClass(), e);
-        } catch (IllegalAccessException e) {
-            logger.error("Exception during serializing component type: {}", targetComponent.getClass(), e);
+            if (fieldInfo == null || !fieldCheck.shouldDeserializeField(fieldInfo)) {
+                continue;
+            }
+
+            fieldInfo.deserializeOnto(targetComponent, field.getValue());
         }
         return targetComponent;
     }
@@ -173,7 +162,7 @@ public class ComponentSerializer {
 
         for (FieldMetadata field : componentMetadata.iterateFields()) {
             if (check.shouldSerializeField(field, component)) {
-                EntityData.NameValue fieldData = field.serialize(component, usingFieldIds);
+                EntityData.NameValue fieldData = field.serializeNameValue(component, usingFieldIds);
                 if (fieldData != null) {
                     componentMessage.addField(fieldData);
                 }
@@ -224,27 +213,21 @@ public class ComponentSerializer {
         boolean changed = false;
         for (FieldMetadata field : componentMetadata.iterateFields()) {
             if (check.shouldSerializeField(field, delta)) {
-                try {
-                    Object origValue = field.getValue(base);
-                    Object deltaValue = field.getValue(delta);
+                Object origValue = field.getValue(base);
+                Object deltaValue = field.getValue(delta);
 
-                    if (!Objects.equal(origValue, deltaValue)) {
-                        EntityData.Value value = field.serializeValue(deltaValue);
-                        if (value != null) {
-                            if (usingFieldIds) {
-                                componentMessage.addField(EntityData.NameValue.newBuilder().setNameIndex(field.getId()).setValue(value).build());
-                            } else {
-                                componentMessage.addField(EntityData.NameValue.newBuilder().setName(field.getName()).setValue(value).build());
-                            }
-                            changed = true;
+                if (!Objects.equal(origValue, deltaValue)) {
+                    EntityData.Value value = field.serializeValue(deltaValue);
+                    if (value != null) {
+                        if (usingFieldIds) {
+                            componentMessage.addField(EntityData.NameValue.newBuilder().setNameIndex(field.getId()).setValue(value).build());
                         } else {
-                            logger.error("Exception serializing component type: {}, field: {} - returned null", base.getClass(), field.getName());
+                            componentMessage.addField(EntityData.NameValue.newBuilder().setName(field.getName()).setValue(value).build());
                         }
+                        changed = true;
+                    } else {
+                        logger.error("Exception serializing component type: {}, field: {} - returned null", base.getClass(), field.getName());
                     }
-                } catch (IllegalAccessException e) {
-                    logger.error("Exception during serializing component type: {}", base.getClass(), e);
-                } catch (InvocationTargetException e) {
-                    logger.error("Exception during serializing component type: {}", base.getClass(), e);
                 }
             }
         }

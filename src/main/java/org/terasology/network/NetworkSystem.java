@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
+import com.google.protobuf.ByteString;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import org.jboss.netty.bootstrap.ClientBootstrap;
@@ -23,6 +24,7 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Event;
 import org.terasology.entitySystem.PersistableEntityManager;
+import org.terasology.entitySystem.metadata.ClassLibrary;
 import org.terasology.entitySystem.metadata.ClassMetadata;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
@@ -33,8 +35,8 @@ import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.entitySystem.metadata.TypeHandler;
 import org.terasology.entitySystem.metadata.TypeHandlerLibraryBuilder;
 import org.terasology.entitySystem.metadata.internal.EntitySystemLibraryImpl;
-import org.terasology.entitySystem.persistence.EntitySerializer;
 import org.terasology.entitySystem.persistence.EventSerializer;
+import org.terasology.entitySystem.persistence.PackedEntitySerializer;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.mod.Mod;
@@ -49,7 +51,9 @@ import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
+import sun.reflect.generics.tree.ReturnType;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +74,7 @@ public class NetworkSystem implements EntityChangeSubscriber {
     private PersistableEntityManager entityManager;
     private EntitySystemLibrary entitySystemLibrary;
     private EventSerializer eventSerializer;
-    private EntitySerializer entitySerializer;
+    private PackedEntitySerializer entitySerializer;
 
     private ChannelFactory factory;
     private TIntIntMap netIdToEntityId = new TIntIntHashMap();
@@ -286,9 +290,7 @@ public class NetworkSystem implements EntityChangeSubscriber {
         }
 
         eventSerializer = new EventSerializer(eventLibrary);
-        entitySerializer = new EntitySerializer(entityManager, componentLibrary);
-        entitySerializer.setUsingFieldIds(true);
-        entitySerializer.setIgnoringEntityId(true);
+        entitySerializer = new PackedEntitySerializer(entityManager, componentLibrary);
         entitySerializer.setComponentSerializeCheck(new NetComponentSerializeCheck());
 
         if (mode == NetworkMode.CLIENT) {
@@ -301,14 +303,23 @@ public class NetworkSystem implements EntityChangeSubscriber {
     }
 
     @Override
-    public void onEntityChange(EntityRef entity) {
+    public void onEntityChange(EntityRef entity, Class<? extends Component> component) {
         NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
         if (netComp != null) {
-            for (Client client : clientList) {
-                client.setNetDirty(netComp.networkId);
-            }
-            if (server != null) {
-                server.setNetDirty(netComp.networkId);
+            ComponentMetadata<? extends Component> metadata = entitySystemLibrary.getComponentLibrary().getMetadata(component);
+            switch (mode) {
+                case SERVER:
+                    if (metadata.isReplicated()) {
+                        for (Client client : clientList) {
+                            client.setNetDirty(netComp.networkId);
+                        }
+                    }
+                    break;
+                case CLIENT:
+                    if (server != null && metadata.isReplicatedFromOwner() && getOwnerEntity(entity).equals(server.getEntity())) {
+                        server.setNetDirty(netComp.networkId);
+                    }
+                    break;
             }
         }
     }
@@ -440,33 +451,55 @@ public class NetworkSystem implements EntityChangeSubscriber {
             serverInfoMessageBuilder.addBlockId(blockMapping.getValue());
             serverInfoMessageBuilder.addBlockName(blockMapping.getKey());
         }
-        Map<Class<? extends Component>, Integer> componentIdTable = entitySerializer.getComponentIdMapping();
-        for (Map.Entry<Class<? extends Component>, Integer> componentIdMapping : componentIdTable.entrySet()) {
-            ComponentMetadata<?> metadata = entitySystemLibrary.getComponentLibrary().getMetadata(componentIdMapping.getKey());
-            NetData.SerializationInfo.Builder info = NetData.SerializationInfo.newBuilder()
-                    .setId(componentIdMapping.getValue())
-                    .setName(metadata.getName());
-            for (FieldMetadata field : metadata.iterateFields()) {
-                info.addFieldId(field.getId());
-                info.addFieldName(field.getName());
-            }
-            serverInfoMessageBuilder.addComponent(info);
-        }
+        serializeComponentInfo(serverInfoMessageBuilder);
+        serializeEventInfo(serverInfoMessageBuilder);
+
+        serverInfoMessageBuilder.setClientId(client.getEntity().getComponent(NetworkComponent.class).networkId);
+        client.send(NetData.NetMessage.newBuilder().setType(NetData.NetMessage.Type.SERVER_INFO).setServerInfo(serverInfoMessageBuilder.build()).build());
+    }
+
+    private void serializeEventInfo(NetData.ServerInfoMessage.Builder serverInfoMessageBuilder) {
         Map<Class<? extends Event>, Integer> eventIdTable = eventSerializer.getIdMapping();
         for (Map.Entry<Class<? extends Event>, Integer> eventMapping : eventIdTable.entrySet()) {
+            ByteString.Output fieldIds = ByteString.newOutput();
             EventMetadata<?> metadata = entitySystemLibrary.getEventLibrary().getMetadata(eventMapping.getKey());
             NetData.SerializationInfo.Builder info = NetData.SerializationInfo.newBuilder()
                     .setId(eventMapping.getValue())
                     .setName(metadata.getName());
             for (FieldMetadata field : metadata.iterateFields()) {
-                info.addFieldId(field.getId());
-                info.addFieldName(field.getName());
+                try {
+                    fieldIds.write(field.getId());
+                    info.addFieldName(field.getName());
+                } catch (IOException e) {
+                    // TODO: Disconnect client and fail more gracefully
+                    throw new RuntimeException("Failed writing field id " + field.getId() + " for field " + field.getName());
+                }
+
             }
             serverInfoMessageBuilder.addEvent(info);
         }
+    }
 
-        serverInfoMessageBuilder.setClientId(client.getEntity().getComponent(NetworkComponent.class).networkId);
-        client.send(NetData.NetMessage.newBuilder().setType(NetData.NetMessage.Type.SERVER_INFO).setServerInfo(serverInfoMessageBuilder.build()).build());
+    private void serializeComponentInfo(NetData.ServerInfoMessage.Builder serverInfoMessageBuilder) {
+        Map<Class<? extends Component>, Integer> componentIdTable = entitySerializer.getIdMapping();
+        for (Map.Entry<Class<? extends Component>, Integer> componentIdMapping : componentIdTable.entrySet()) {
+            ByteString.Output fieldIds = ByteString.newOutput();
+            ComponentMetadata<?> metadata = entitySystemLibrary.getComponentLibrary().getMetadata(componentIdMapping.getKey());
+            NetData.SerializationInfo.Builder info = NetData.SerializationInfo.newBuilder()
+                    .setId(componentIdMapping.getValue())
+                    .setName(metadata.getName());
+            for (FieldMetadata field : metadata.iterateFields()) {
+                try {
+                    fieldIds.write(field.getId());
+                    info.addFieldName(field.getName());
+                } catch (IOException e) {
+                    // TODO: Disconnect client and fail more gracefully
+                    throw new RuntimeException("Failed writing field id " + field.getId() + " for field " + field.getName());
+                }
+            }
+            info.setFieldIds(fieldIds.toByteString());
+            serverInfoMessageBuilder.addComponent(info);
+        }
     }
 
     void removeClient(Client client) {
@@ -480,69 +513,53 @@ public class NetworkSystem implements EntityChangeSubscriber {
     }
 
     private void generateSerializationTables() {
-        Map<Class<? extends Component>, Integer> componentIdTable = Maps.newHashMap();
-        for (ClassMetadata<? extends Component> componentMetadata : entitySystemLibrary.getComponentLibrary()) {
-            int index = componentIdTable.size();
-            componentIdTable.put(componentMetadata.getType(), index);
+        entitySerializer.setIdMapping(generateIds(entitySystemLibrary.getComponentLibrary()));
+        eventSerializer.setIdMapping(generateIds(entitySystemLibrary.getEventLibrary()));
+    }
 
-            int fieldId = 1;
-            for (FieldMetadata field : componentMetadata.iterateFields()) {
-                componentMetadata.setFieldId(field, fieldId++);
+    private <T> Map<Class<? extends T>, Integer> generateIds(ClassLibrary<T> classLibrary) {
+        Map<Class<? extends T>, Integer> result = Maps.newHashMap();
+        for (ClassMetadata<? extends T> metadata : classLibrary) {
+            int index = result.size();
+            result.put(metadata.getType(), index);
+
+            int fieldId = 0;
+            for (FieldMetadata field : metadata.iterateFields()) {
+                if (fieldId >= 256) {
+                    logger.error("Class {} has too many fields (>255), serialization will be incomplete", metadata.getName());
+                    break;
+                }
+                metadata.setFieldId(field, (byte)fieldId);
+                fieldId++;
             }
         }
-        entitySerializer.setComponentIdMapping(componentIdTable);
-
-        Map<Class<? extends Event>, Integer> eventIdTable = Maps.newHashMap();
-        for (ClassMetadata<? extends Event> eventMetadata : entitySystemLibrary.getEventLibrary()) {
-            int index = eventIdTable.size();
-            eventIdTable.put(eventMetadata.getType(), index);
-
-            int fieldId = 1;
-            for (FieldMetadata field : eventMetadata.iterateFields()) {
-                eventMetadata.setFieldId(field, fieldId++);
-            }
-        }
-        eventSerializer.setIdMapping(eventIdTable);
+        return result;
     }
 
     private void applySerializationTables() {
         NetData.ServerInfoMessage serverInfo = server.getInfo();
-        Map<Class<? extends Component>, Integer> componentIdTable = Maps.newHashMap();
-        for (NetData.SerializationInfo info : serverInfo.getComponentList()) {
-            ComponentMetadata<?> metadata = entitySystemLibrary.getComponentLibrary().getMetadata(info.getName());
-            if (metadata != null) {
-                componentIdTable.put(metadata.getType(), info.getId());
-                for (int i = 0; i < info.getFieldIdCount(); ++i) {
-                    FieldMetadata field = metadata.getField(info.getFieldName(i));
-                    if (field != null) {
-                        metadata.setFieldId(field, info.getFieldId(i));
-                    } else {
-                        logger.error("Server has unknown field '{}' on component '{}'", info.getFieldName(i), info.getName());
-                    }
-                }
-            } else {
-                logger.error("Server has unknown component '{}'", info.getName());
-            }
-        }
-        entitySerializer.setComponentIdMapping(componentIdTable);
+        entitySerializer.setIdMapping(applySerializationInfo(serverInfo.getComponentList(), entitySystemLibrary.getComponentLibrary()));
+        eventSerializer.setIdMapping(applySerializationInfo(serverInfo.getEventList(), entitySystemLibrary.getEventLibrary()));
+    }
 
-        Map<Class<? extends Event>, Integer> eventIdTable = Maps.newHashMap();
-        for (NetData.SerializationInfo info : serverInfo.getEventList()) {
-            EventMetadata<?> metadata = entitySystemLibrary.getEventLibrary().getMetadata(info.getName());
+    private <T> Map<Class<? extends T>, Integer> applySerializationInfo(List<NetData.SerializationInfo> infoList, ClassLibrary<T> classLibrary) {
+        Map<Class<? extends T>, Integer> idTable = Maps.newHashMap();
+        for (NetData.SerializationInfo info : infoList) {
+            ClassMetadata<? extends T> metadata = classLibrary.getMetadata(info.getName());
             if (metadata != null) {
-                eventIdTable.put(metadata.getType(), info.getId());
-                for (int i = 0; i < info.getFieldIdCount(); ++i) {
+                idTable.put(metadata.getType(), info.getId());
+                for (int i = 0; i < info.getFieldIds().size(); ++i) {
                     FieldMetadata field = metadata.getField(info.getFieldName(i));
                     if (field != null) {
-                        metadata.setFieldId(field, info.getFieldId(i));
+                        metadata.setFieldId(field, info.getFieldIds().byteAt(i));
                     } else {
-                        logger.error("Server has unknown field '{}' on event '{}'", info.getFieldName(i), info.getName());
+                        logger.error("Server has unknown field '{}' on '{}'", info.getFieldName(i), info.getName());
                     }
                 }
             } else {
-                logger.error("Server has unknown event '{}'", info.getName());
+                logger.error("Server has unknown class '{}'", info.getName());
             }
         }
-        eventSerializer.setIdMapping(eventIdTable);
+        return idTable;
     }
 }

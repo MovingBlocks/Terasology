@@ -15,16 +15,15 @@
  */
 package org.terasology.entitySystem.metadata;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.util.Locale;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.network.Replicate;
 import org.terasology.protobuf.EntityData;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Locale;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -32,7 +31,7 @@ import org.terasology.protobuf.EntityData;
 public final class FieldMetadata {
     private static final Logger logger = LoggerFactory.getLogger(FieldMetadata.class);
 
-    private int id;
+    private byte id;
     private Field field;
     private Method getter;
     private Method setter;
@@ -51,6 +50,13 @@ public final class FieldMetadata {
         return serializationHandler.deserialize(value);
     }
 
+    public void deserializeOnto(Object target, EntityData.Value value) {
+        Object deserializedValue = deserialize(value);
+        if (deserializedValue != null) {
+            setValue(target, deserializedValue);
+        }
+    }
+
     public Object copy(Object field) {
         return serializationHandler.copy(field);
     }
@@ -63,26 +69,39 @@ public final class FieldMetadata {
         return field.getType();
     }
 
-    void setId(int id) {
+    void setId(byte id) {
         this.id = id;
     }
 
-    public int getId() {
+    public byte getId() {
         return id;
     }
 
-    public Object getValue(Object obj) throws IllegalAccessException, InvocationTargetException {
-        if (getter != null) {
-            return getter.invoke(obj);
+    public Object getValue(Object obj) {
+        try {
+            if (getter != null) {
+                return getter.invoke(obj);
+            }
+            return field.get(obj);
+        } catch (InvocationTargetException e) {
+            logger.error("Exception during access of {} from {}", field.getName(), obj.getClass(), e);
+        } catch (IllegalAccessException e) {
+            logger.error("Exception during access of {} from {}", field.getName(), obj.getClass(), e);
         }
-        return field.get(obj);
+        return null;
     }
 
-    public void setValue(Object target, Object value) throws IllegalAccessException, InvocationTargetException {
-        if (setter != null) {
-            setter.invoke(target, value);
-        } else {
-            field.set(target, value);
+    public void setValue(Object target, Object value) {
+        try {
+            if (setter != null) {
+                setter.invoke(target, value);
+            } else {
+                field.set(target, value);
+            }
+        } catch (InvocationTargetException e) {
+            logger.error("Exception during setting of {} from {}", field.getName(), target.getClass(), e);
+        } catch (IllegalAccessException e) {
+            logger.error("Exception during setting of {} from {}", field.getName(), target.getClass(), e);
         }
     }
 
@@ -123,6 +142,7 @@ public final class FieldMetadata {
      * Serializes the given value, that was originally obtained from this field.
      * <p/>
      * This is provided for performance, to avoid obtaining the same value twice via reflection.
+     *
      * @param rawValue
      * @return
      */
@@ -130,31 +150,39 @@ public final class FieldMetadata {
         return serializationHandler.serialize(rawValue);
     }
 
-    /**
-     * Serializes the field for the given object
-     * @param event
-     * @return
-     */
-    public EntityData.NameValue serialize(Object event, boolean usingFieldIds) {
-        try {
-            Object rawValue = getValue(event);
-            if (rawValue == null) {
-                return null;
-            }
-
-            EntityData.Value value = serializeValue(rawValue);
-            if (value != null) {
-                if (usingFieldIds) {
-                    return EntityData.NameValue.newBuilder().setNameIndex(id).setValue(value).build();
-                } else {
-                    return EntityData.NameValue.newBuilder().setName(field.getName()).setValue(value).build();
-                }
-            }
-        } catch (IllegalAccessException e) {
-            logger.error("Exception during serializing of {}", event.getClass(), e);
-        } catch (InvocationTargetException e) {
-            logger.error("Exception during serializing of {}", event.getClass(), e);
+    public EntityData.Value serialize(Object container) {
+        Object rawValue = getValue(container);
+        if (rawValue != null) {
+            return serializationHandler.serialize(rawValue);
         }
         return null;
+    }
+
+    /**
+     * Serializes the field for the given object
+     *
+     * @param container
+     * @return
+     */
+    public EntityData.NameValue serializeNameValue(Object container, boolean usingFieldIds) {
+        Object rawValue = getValue(container);
+        if (rawValue == null) {
+            return null;
+        }
+
+        EntityData.Value value = serializeValue(rawValue);
+        if (value != null) {
+            if (usingFieldIds) {
+                return EntityData.NameValue.newBuilder().setNameIndex(id).setValue(value).build();
+            } else {
+                return EntityData.NameValue.newBuilder().setName(field.getName()).setValue(value).build();
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public String toString() {
+        return field.getName();
     }
 }

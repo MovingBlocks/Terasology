@@ -8,14 +8,35 @@ import org.terasology.network.NoReplicate;
  */
 public class ComponentMetadata<T extends Component> extends ClassMetadata<T> {
 
-    private boolean noReplicate = false;
+    private boolean noReplicateExistance = false;
+    private boolean replicated = false;
+    private boolean replicatedFromOwner = false;
+
 
     public ComponentMetadata(Class<T> simpleClass, String... names) throws NoSuchMethodException {
         super(simpleClass, names);
-        noReplicate = simpleClass.getAnnotation(NoReplicate.class) != null;
+        noReplicateExistance = simpleClass.getAnnotation(NoReplicate.class) != null;
     }
 
-    public boolean isNoReplicate() {
-        return noReplicate;
+    public void addField(FieldMetadata fieldInfo) {
+        super.addField(fieldInfo);
+        if (fieldInfo.isReplicated()) {
+            replicated = true;
+            if (fieldInfo.getReplicationInfo().value().isReplicateFromOwner()) {
+                replicatedFromOwner = true;
+            }
+        }
+    }
+
+    public boolean isNoReplicateExistence() {
+        return noReplicateExistance;
+    }
+
+    public boolean isReplicatedFromOwner() {
+        return replicatedFromOwner;
+    }
+
+    public boolean isReplicated() {
+        return replicated;
     }
 }

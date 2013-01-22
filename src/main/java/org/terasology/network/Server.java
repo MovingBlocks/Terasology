@@ -13,6 +13,7 @@ import org.terasology.entitySystem.Event;
 import org.terasology.entitySystem.PersistableEntityManager;
 import org.terasology.entitySystem.persistence.EntitySerializer;
 import org.terasology.entitySystem.persistence.EventSerializer;
+import org.terasology.entitySystem.persistence.PackedEntitySerializer;
 import org.terasology.math.Vector3i;
 import org.terasology.network.serialization.ClientComponentFieldCheck;
 import org.terasology.network.serialization.ServerComponentFieldCheck;
@@ -41,7 +42,7 @@ public class Server {
     private NetData.ServerInfoMessage serverInfo;
 
     private PersistableEntityManager entityManager;
-    private EntitySerializer entitySerializer;
+    private PackedEntitySerializer entitySerializer;
     private EventSerializer eventSerializer;
 
     private BlockEntityRegistry blockEntityRegistry;
@@ -61,7 +62,7 @@ public class Server {
         this.networkSystem = system;
     }
 
-    void connectToEntitySystem(PersistableEntityManager entityManager, EntitySerializer entitySerializer, EventSerializer eventSerializer, BlockEntityRegistry blockEntityRegistry) {
+    void connectToEntitySystem(PersistableEntityManager entityManager, PackedEntitySerializer entitySerializer, EventSerializer eventSerializer, BlockEntityRegistry blockEntityRegistry) {
         this.entityManager = entityManager;
         this.eventSerializer = eventSerializer;
         this.entitySerializer = entitySerializer;
@@ -71,6 +72,10 @@ public class Server {
     void setServerInfo(NetData.ServerInfoMessage serverInfo) {
         this.serverInfo = serverInfo;
         clientEntity = new NetEntityRef(serverInfo.getClientId(), networkSystem);
+    }
+
+    public EntityRef getEntity() {
+        return clientEntity;
     }
 
     public NetData.ServerInfoMessage getInfo() {
@@ -103,6 +108,7 @@ public class Server {
     }
 
     private void send(NetData.NetMessage data) {
+        logger.trace("Sending {} size {}", data.getType(), data.getSerializedSize());
         sentMessages.incrementAndGet();
         sentBytes.addAndGet(data.getSerializedSize());
         channel.write(data);
@@ -114,7 +120,7 @@ public class Server {
             int netId = dirtyIterator.next();
             EntityRef entity = networkSystem.getEntity(netId);
             if (isOwned(entity)) {
-                EntityData.Entity entityData = entitySerializer.serialize(entity, false, new ClientComponentFieldCheck());
+                EntityData.PackedEntity entityData = entitySerializer.serialize(entity, false, new ClientComponentFieldCheck());
                 NetData.NetMessage message = NetData.NetMessage.newBuilder()
                         .setType(NetData.NetMessage.Type.UPDATE_ENTITY)
                         .setUpdateEntity(NetData.UpdateEntityMessage.newBuilder().setEntity(entityData).setNetId(netId))

@@ -320,7 +320,7 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
                 eventSystem.send(createEntityRef(entityId), ChangedComponentEvent.newInstance(), component);
             }
         }
-        notifyChangeSubscribers(getEntity(entityId));
+        notifyChangeSubscribers(getEntity(entityId), component.getClass());
         return component;
     }
 
@@ -331,7 +331,7 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
                 eventSystem.send(createEntityRef(entityId), RemovedComponentEvent.newInstance(), component);
             }
             store.remove(entityId, componentClass);
-            notifyChangeSubscribers(getEntity(entityId));
+            notifyChangeSubscribers(getEntity(entityId), componentClass);
         }
     }
 
@@ -390,9 +390,9 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
         return freedIds;
     }
 
-    private void notifyChangeSubscribers(EntityRef changedEntity) {
+    private void notifyChangeSubscribers(EntityRef changedEntity, Class<? extends Component> component) {
         for (EntityChangeSubscriber subscriber : subscribers) {
-            subscriber.onEntityChange(changedEntity);
+            subscriber.onEntityChange(changedEntity, component);
         }
     }
 

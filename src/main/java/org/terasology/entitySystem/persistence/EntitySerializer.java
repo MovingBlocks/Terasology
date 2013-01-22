@@ -11,6 +11,7 @@ import org.terasology.entitySystem.PrefabManager;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.metadata.ComponentMetadata;
 import org.terasology.entitySystem.metadata.MetadataUtil;
+import org.terasology.network.serialization.ServerComponentFieldCheck;
 import org.terasology.protobuf.EntityData;
 
 import java.util.List;
@@ -148,6 +149,21 @@ public class EntitySerializer {
      * @return The deserialized entity
      */
     public EntityRef deserialize(EntityData.Entity entityData) {
+        Map<Class<? extends Component>, Component> componentMap = createInitialComponents(entityData);
+        deserializeOntoComponents(entityData, componentMap);
+        if (ignoringEntityId) {
+            return entityManager.create(componentMap.values());
+        } else {
+            return entityManager.createEntityWithId(entityData.getId(), componentMap.values());
+        }
+    }
+
+    /**
+     * Creates the components for the entity being deserialized based on its prefab (if any)
+     * @param entityData
+     * @return The mapping of components
+     */
+    private Map<Class<? extends Component>, Component> createInitialComponents(EntityData.Entity entityData) {
         Map<Class<? extends Component>, Component> componentMap = Maps.newHashMap();
         if (entityData.hasParentPrefab() && !entityData.getParentPrefab().isEmpty() && prefabManager.exists(entityData.getParentPrefab())) {
             Prefab prefab = prefabManager.getPrefab(entityData.getParentPrefab());
@@ -160,6 +176,15 @@ public class EntitySerializer {
             }
             componentMap.put(EntityInfoComponent.class, new EntityInfoComponent(entityData.getParentPrefab(), true));
         }
+        return componentMap;
+    }
+
+    /**
+     * Deserializes the components from an EntityData onto a map of components
+     * @param entityData
+     * @param componentMap
+     */
+    private void deserializeOntoComponents(EntityData.Entity entityData, Map<Class<? extends Component>, Component> componentMap) {
         for (EntityData.Component componentData : entityData.getComponentList()) {
             ComponentMetadata<? extends Component> metadata = componentSerializer.getComponentMetadata(componentData);
             if (metadata == null || !componentSerializeCheck.serialize(metadata)) {
@@ -173,11 +198,6 @@ public class EntitySerializer {
             } else {
                 componentSerializer.deserializeOnto(existingComponent, componentData, FieldSerializeCheck.NullCheck.<Component>newInstance());
             }
-        }
-        if (ignoringEntityId) {
-            return entityManager.create(componentMap.values());
-        } else {
-            return entityManager.createEntityWithId(entityData.getId(), componentMap.values());
         }
     }
 
@@ -273,4 +293,6 @@ public class EntitySerializer {
         }
         return false;
     }
+
+
 }

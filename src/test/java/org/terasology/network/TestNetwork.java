@@ -17,7 +17,14 @@
 package org.terasology.network;
 
 import org.junit.Test;
+import org.terasology.entitySystem.PersistableEntityManager;
+import org.terasology.entitySystem.metadata.EntitySystemLibrary;
+import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
+import org.terasology.game.bootstrap.EntitySystemBuilder;
+import org.terasology.logic.mod.ModManager;
+import org.terasology.world.BlockEntityRegistry;
+import org.terasology.world.block.BlockEntitySystem;
 
 import static org.mockito.Mockito.mock;
 
@@ -28,8 +35,10 @@ public class TestNetwork {
 
     @Test
     public void testNetwork() throws InterruptedException {
+        PersistableEntityManager entityManager = new EntitySystemBuilder().build(new ModManager());
         Timer timer = mock(Timer.class);
         NetworkSystem server = new NetworkSystem(timer);
+        server.connectToEntitySystem(entityManager, CoreRegistry.get(EntitySystemLibrary.class), null);
         server.host(7777);
 
         Thread.sleep(500);

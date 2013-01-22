@@ -50,21 +50,11 @@ public class MappedContainerTypeHandler<T> extends AbstractTypeHandler<T> {
 
         EntityData.Value.Builder result = EntityData.Value.newBuilder();
 
-        try {
-            for (FieldMetadata fieldInfo : fields.values()) {
-                Object rawValue = fieldInfo.getValue(value);
-                if (rawValue == null)
-                    continue;
-
-                EntityData.Value fieldValue = fieldInfo.serializeValue(rawValue);
-                if (fieldValue != null) {
-                    result.addNameValue(EntityData.NameValue.newBuilder().setName(fieldInfo.getName()).setValue(fieldValue).build());
-                }
+        for (FieldMetadata fieldInfo : fields.values()) {
+            EntityData.Value fieldValue = fieldInfo.serialize(value);
+            if (fieldValue != null) {
+                result.addNameValue(EntityData.NameValue.newBuilder().setName(fieldInfo.getName()).setValue(fieldValue).build());
             }
-        } catch (IllegalAccessException e) {
-            logger.error("Unable to serialize field of {}", value.getClass(), e);
-        } catch (InvocationTargetException e) {
-            logger.error("Unable to serialize field of {}", value.getClass(), e);
         }
         return result.build();
     }
@@ -75,10 +65,7 @@ public class MappedContainerTypeHandler<T> extends AbstractTypeHandler<T> {
             for (EntityData.NameValue entry : value.getNameValueList()) {
                 FieldMetadata fieldInfo = fields.get(entry.getName().toLowerCase(Locale.ENGLISH));
                 if (fieldInfo != null) {
-                    Object content = fieldInfo.deserialize(entry.getValue());
-                    if (content != null) {
-                        fieldInfo.setValue(result, content);
-                    }
+                    fieldInfo.deserializeOnto(result, entry.getValue());
                 }
             }
             return result;
@@ -99,8 +86,6 @@ public class MappedContainerTypeHandler<T> extends AbstractTypeHandler<T> {
             } catch (InstantiationException e) {
                 logger.error("Unable to clone {}", value.getClass(), e);
             } catch (IllegalAccessException e) {
-                logger.error("Unable to clone {}", value.getClass(), e);
-            } catch (InvocationTargetException e) {
                 logger.error("Unable to clone {}", value.getClass(), e);
             }
         }

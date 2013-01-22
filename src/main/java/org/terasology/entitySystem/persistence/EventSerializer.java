@@ -3,6 +3,7 @@ package org.terasology.entitySystem.persistence;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
+import com.google.protobuf.ByteString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Event;
@@ -11,7 +12,7 @@ import org.terasology.entitySystem.metadata.EventLibrary;
 import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.protobuf.EntityData;
 
-import java.lang.reflect.InvocationTargetException;
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -67,23 +68,15 @@ public class EventSerializer {
 
 
     private Event deserializeOnto(Event targetEvent, EntityData.Event eventData, ClassMetadata<? extends Event> eventMetadata) {
-        try {
-            for (EntityData.NameValue field : eventData.getFieldList()) {
-                FieldMetadata fieldInfo = eventMetadata.getField(field.getName());
-                if (fieldInfo == null) {
-                    continue;
-                }
-
-                Object value = fieldInfo.deserialize(field.getValue());
-                if (value != null) {
-                    fieldInfo.setValue(targetEvent, value);
-                }
+        for (int i = 0; i < eventData.getFieldIds().size(); ++i) {
+            byte fieldId = eventData.getFieldIds().byteAt(i);
+            FieldMetadata fieldInfo = eventMetadata.getFieldById(fieldId);
+            if (fieldInfo == null) {
+                logger.error("Unable to serialize field {}, out of bounds", fieldId);
+                continue;
             }
-            return targetEvent;
-        } catch (InvocationTargetException e) {
-            logger.error("Exception during serializing event type: {}", targetEvent.getClass(), e);
-        } catch (IllegalAccessException e) {
-            logger.error("Exception during serializing event type: {}", targetEvent.getClass(), e);
+
+            fieldInfo.deserializeOnto(targetEvent, eventData.getFieldValue(i));
         }
         return targetEvent;
     }
@@ -115,25 +108,26 @@ public class EventSerializer {
         EntityData.Event.Builder eventData = EntityData.Event.newBuilder();
         serializeEventType(event, eventData);
 
+        ByteString.Output fieldIds = ByteString.newOutput();
         for (FieldMetadata field : eventMetadata.iterateFields()) {
             if (check.shouldSerializeField(field, event)) {
-                EntityData.NameValue fieldData = field.serialize(event, false);
-                if (fieldData != null) {
-                    eventData.addField(fieldData);
+                try {
+                    EntityData.Value serializedValue = field.serialize(event);
+                    eventData.addFieldValue(serializedValue);
+                    fieldIds.write(field.getId());
+                } catch (IOException e) {
+                    logger.error("Exception during serializing of {}", event.getClass(), e);
                 }
             }
         }
+        eventData.setFieldIds(fieldIds.toByteString());
 
         return eventData.build();
     }
 
     private void serializeEventType(Event event, EntityData.Event.Builder eventData) {
         Integer compId = idTable.get(event.getClass());
-        if (compId != null) {
-            eventData.setTypeIndex(compId);
-        } else {
-            eventData.setType(eventLibrary.getMetadata(event).getId());
-        }
+        eventData.setType(compId);
     }
 
     /**
@@ -143,23 +137,16 @@ public class EventSerializer {
      * @return The event class the given eventData describes, or null if it is unknown.
      */
     public Class<? extends Event> getEventClass(EntityData.Event eventData) {
-        if (eventData.hasTypeIndex()) {
+        if (eventData.hasType()) {
             ClassMetadata<? extends Event> metadata = null;
             if (!idTable.isEmpty()) {
-                Class<? extends Event> eventClass = idTable.inverse().get(eventData.getTypeIndex());
+                Class<? extends Event> eventClass = idTable.inverse().get(eventData.getType());
                 if (eventClass != null) {
                     metadata = eventLibrary.getMetadata(eventClass);
                 }
             }
             if (metadata == null) {
-                logger.warn("Unable to deserialize unknown event with id: {}", eventData.getTypeIndex());
-                return null;
-            }
-            return metadata.getType();
-        } else if (eventData.hasType()) {
-            ClassMetadata<? extends Event> metadata = eventLibrary.getMetadata(eventData.getType());
-            if (metadata == null) {
-                logger.warn("Unable to deserialize unknown event type: {}", eventData.getType());
+                logger.warn("Unable to deserialize unknown event with id: {}", eventData.getType());
                 return null;
             }
             return metadata.getType();

@@ -58,7 +58,7 @@ public class ClassMetadata<T> {
         return clazz;
     }
 
-    public void setFieldId(FieldMetadata field, int id) {
+    public void setFieldId(FieldMetadata field, byte id) {
         if (fields.containsValue(field)) {
             field.setId(id);
             fieldsById.put(id, field);
@@ -113,5 +113,10 @@ public class ClassMetadata<T> {
 
     public int size() {
         return fields.size();
+    }
+
+    @Override
+    public String toString() {
+        return getName();
     }
 }
