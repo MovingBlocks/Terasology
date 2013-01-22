@@ -1,0 +1,15 @@
+{
+    "CraftRecipe" : {
+        "type" : "EXTERNAL",
+        "result" : "core:pickaxe",
+        "recipe" :  {
+            bottom:
+                [
+                    "refinement rock", "stone", "refinement rock",
+                    " ",               "stick", " ",
+                    " ",               "stick", " "
+                ]
+        }
+
+    }
+}
