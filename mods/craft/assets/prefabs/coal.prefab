@@ -1,0 +1,18 @@
+{
+    "CraftRecipe" : {
+        "type" : "EXTERNAL",
+        "result" : "core:coal",
+        "refinement":{
+            "coalore:coalore:4" : {
+                 "instigator": "coalore",
+                 "target":     "coalore",
+                 "resultCount" : "4"
+            },
+            "stone:coalore:2" : {
+                 "instigator": "stone",
+                 "target":     "coalore",
+                 "resultCount" : "2"
+            }
+         }
+    }
+}

@@ -12,9 +12,9 @@
         "recipe" :  {
             bottom:
                 [
-                    "refinement rock", "stone", "refinement rock",
-                    " ",               "stick", " ",
-                    " ",               "stick", " "
+                    "stone", "stone", "stone",
+                    " ",     "stick", " ",
+                    " ",     "stick", " "
                 ]
         }
 

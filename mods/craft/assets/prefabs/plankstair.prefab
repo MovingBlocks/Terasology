@@ -1,6 +1,7 @@
 {
     "CraftRecipe" : {
-        "fullMatch": false,
+        "type" : "EXTERNAL",
+        "result" : "engine:plankstair",
         "recipe" :  {
             bottom:
                 [
