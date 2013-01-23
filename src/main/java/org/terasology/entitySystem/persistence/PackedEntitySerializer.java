@@ -80,7 +80,7 @@ public class PackedEntitySerializer {
                 continue;
             }
 
-            serializeComponentFull(component, fieldCheck, entity, fieldIds, componentFieldCounts);
+            serializeComponentFull(component, false, fieldCheck, entity, fieldIds, componentFieldCounts);
         }
         entity.setFieldIds(fieldIds.toByteString());
         entity.setComponentFieldCounts(componentFieldCounts.toByteString());
@@ -105,7 +105,7 @@ public class PackedEntitySerializer {
             Component prefabComponent = prefab.getComponent(component.getClass());
 
             if (prefabComponent == null) {
-                serializeComponentFull(component, fieldCheck, entity, fieldIds, componentFieldCounts);
+                serializeComponentFull(component, false, fieldCheck, entity, fieldIds, componentFieldCounts);
             } else {
                 serializeComponentDelta(prefabComponent, component, fieldCheck, entity, fieldIds, componentFieldCounts);
             }
@@ -156,14 +156,13 @@ public class PackedEntitySerializer {
         }
     }
 
-    private void serializeComponentFull(Component component, FieldSerializeCheck<Component> fieldCheck, EntityData.PackedEntity.Builder entityData, ByteString.Output entityFieldIds, ByteString.Output componentFieldCounts) {
+    private void serializeComponentFull(Component component, boolean ignoreIfNoFields, FieldSerializeCheck<Component> fieldCheck, EntityData.PackedEntity.Builder entityData, ByteString.Output entityFieldIds, ByteString.Output componentFieldCounts) {
         ClassMetadata<?> componentMetadata = componentLibrary.getMetadata(component.getClass());
         if (componentMetadata == null) {
             logger.error("Unregistered component type: {}", component.getClass());
         }
 
         try {
-            entityData.addComponentId(idTable.get(component.getClass()));
             byte fieldCount = 0;
             for (FieldMetadata field : componentMetadata.iterateFields()) {
                 if (fieldCheck.shouldSerializeField(field, component)) {
@@ -178,7 +177,10 @@ public class PackedEntitySerializer {
                 }
             }
 
-            componentFieldCounts.write(fieldCount);
+            if (fieldCount != 0 || !ignoreIfNoFields) {
+                entityData.addComponentId(idTable.get(component.getClass()));
+                componentFieldCounts.write(fieldCount);
+            }
         } catch (IOException e) {
             logger.error("Failed to serialize component {}", componentMetadata, e);
         }
@@ -240,4 +242,29 @@ public class PackedEntitySerializer {
     }
 
 
+    public EntityData.PackedEntity serialize(EntityRef entityRef, Set<Class<? extends Component>> added, Set<Class<? extends Component>> changed, Set<Class<? extends Component>> removed, FieldSerializeCheck<Component> fieldCheck) {
+        EntityData.PackedEntity.Builder entity = EntityData.PackedEntity.newBuilder();
+
+        ByteString.Output fieldIds = ByteString.newOutput();
+        ByteString.Output componentFieldCounts = ByteString.newOutput();
+        for (Class<? extends Component> componentType : added) {
+            serializeComponentFull(entityRef.getComponent(componentType), false, fieldCheck, entity, fieldIds, componentFieldCounts);
+        }
+        for (Class<? extends Component> componentType : changed) {
+            Component comp = entityRef.getComponent(componentType);
+            if (comp != null) {
+                serializeComponentFull(comp, true, fieldCheck, entity, fieldIds, componentFieldCounts);
+            }
+        }
+        for (Class<? extends Component> componentType : removed) {
+            entity.addRemovedComponent(idTable.get(componentType));
+        }
+        entity.setFieldIds(fieldIds.toByteString());
+        entity.setComponentFieldCounts(componentFieldCounts.toByteString());
+        if (entity.getFieldIds().isEmpty()) {
+            return null;
+        } else {
+            return entity.build();
+        }
+    }
 }

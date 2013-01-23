@@ -24,6 +24,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Queues;
+import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
@@ -71,7 +72,7 @@ public class PojoEventSystem implements EventSystem {
 
     // Event metadata
     private BiMap<String, Class<? extends Event>> eventIdMap = HashBiMap.create();
-    private Multimap<Class<? extends Event>, Class<? extends Event>> childEvents = HashMultimap.create();
+    private SetMultimap<Class<? extends Event>, Class<? extends Event>> childEvents = HashMultimap.create();
 
     private Thread mainThread;
     private BlockingQueue<PendingEvent> pendingEvents = Queues.newLinkedBlockingQueue();

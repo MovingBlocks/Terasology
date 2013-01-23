@@ -1,13 +1,17 @@
 package org.terasology.network;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Queues;
+import com.google.common.collect.SetMultimap;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import org.jboss.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Event;
 import org.terasology.entitySystem.PersistableEntityManager;
@@ -23,6 +27,7 @@ import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -49,6 +54,7 @@ public class Server {
     private RemoteChunkProvider remoteWorldProvider;
     private BlockingQueue<Chunk> chunkQueue = Queues.newLinkedBlockingQueue();
     private TIntSet netDirty = new TIntHashSet();
+    private SetMultimap<Integer, Class<? extends Component>> changedComponents = HashMultimap.create();
 
     private EntityRef clientEntity = EntityRef.NULL;
 
@@ -120,12 +126,14 @@ public class Server {
             int netId = dirtyIterator.next();
             EntityRef entity = networkSystem.getEntity(netId);
             if (isOwned(entity)) {
-                EntityData.PackedEntity entityData = entitySerializer.serialize(entity, false, new ClientComponentFieldCheck());
-                NetData.NetMessage message = NetData.NetMessage.newBuilder()
-                        .setType(NetData.NetMessage.Type.UPDATE_ENTITY)
-                        .setUpdateEntity(NetData.UpdateEntityMessage.newBuilder().setEntity(entityData).setNetId(netId))
-                        .build();
-                send(message);
+                EntityData.PackedEntity entityData = entitySerializer.serialize(entity, Collections.EMPTY_SET, changedComponents.get(netId), Collections.EMPTY_SET, new ClientComponentFieldCheck());
+                if (entityData != null) {
+                    NetData.NetMessage message = NetData.NetMessage.newBuilder()
+                            .setType(NetData.NetMessage.Type.UPDATE_ENTITY)
+                            .setUpdateEntity(NetData.UpdateEntityMessage.newBuilder().setEntity(entityData).setNetId(netId))
+                            .build();
+                    send(message);
+                }
             }
         }
         netDirty.clear();
@@ -218,8 +226,9 @@ public class Server {
         queuedMessages.offer(message);
     }
 
-    public void setNetDirty(int netId) {
+    public void setComponentDirty(int netId, Class<? extends Component> componentType) {
         netDirty.add(netId);
+        changedComponents.put(netId, componentType);
     }
 
     public void receivedMessageWithSize(int serializedSize) {

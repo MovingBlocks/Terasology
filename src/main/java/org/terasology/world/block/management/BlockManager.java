@@ -18,6 +18,7 @@ package org.terasology.world.block.management;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import gnu.trove.iterator.TObjectByteIterator;
 import gnu.trove.map.hash.TByteObjectHashMap;
@@ -65,7 +66,7 @@ public class BlockManager {
     private final Map<BlockUri, BlockFamily> partiallyRegisteredFamilies = Maps.newHashMap();
     private final Map<BlockUri, BlockFamily> familyByUri = Maps.newHashMapWithExpectedSize(128);
 
-    private final Multimap<String, BlockUri> categoryLookup = HashMultimap.create();
+    private final SetMultimap<String, BlockUri> categoryLookup = HashMultimap.create();
 
     public static BlockManager getInstance() {
         if (instance == null)

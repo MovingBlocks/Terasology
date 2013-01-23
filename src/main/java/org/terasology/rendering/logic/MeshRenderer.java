@@ -32,6 +32,9 @@ import static org.lwjgl.opengl.GL11.glScalef;
 import static org.lwjgl.opengl.GL11.glTexCoordPointer;
 import static org.lwjgl.opengl.GL11.glTranslated;
 import static org.lwjgl.opengl.GL11.glVertexPointer;
+
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.SetMultimap;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TFloatArrayList;
@@ -94,8 +97,8 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
     private Mesh gelatinousCubeMesh;
     private WorldRenderer worldRenderer;
 
-    private Multimap<Material, EntityRef> opaqueMesh = ArrayListMultimap.create();
-    private Multimap<Material, EntityRef> translucentMesh = HashMultimap.create();
+    private SetMultimap<Material, EntityRef> opaqueMesh = HashMultimap.create();
+    private SetMultimap<Material, EntityRef> translucentMesh = HashMultimap.create();
     private Set<EntityRef> gelatinous = Sets.newHashSet();
 
     private int batchVertexBuffer;

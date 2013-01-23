@@ -1,21 +1,20 @@
 package org.terasology.entitySystem.metadata;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.network.NoReplicate;
+import org.terasology.network.Replicate;
 
 /**
  * @author Immortius
  */
 public class ComponentMetadata<T extends Component> extends ClassMetadata<T> {
 
-    private boolean noReplicateExistance = false;
     private boolean replicated = false;
     private boolean replicatedFromOwner = false;
 
 
     public ComponentMetadata(Class<T> simpleClass, String... names) throws NoSuchMethodException {
         super(simpleClass, names);
-        noReplicateExistance = simpleClass.getAnnotation(NoReplicate.class) != null;
+        replicated = simpleClass.getAnnotation(Replicate.class) != null;
     }
 
     public void addField(FieldMetadata fieldInfo) {
@@ -26,10 +25,6 @@ public class ComponentMetadata<T extends Component> extends ClassMetadata<T> {
                 replicatedFromOwner = true;
             }
         }
-    }
-
-    public boolean isNoReplicateExistence() {
-        return noReplicateExistance;
     }
 
     public boolean isReplicatedFromOwner() {

@@ -16,12 +16,10 @@
 package org.terasology.logic.players;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.network.NoReplicate;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
-@NoReplicate
 public final class LocalPlayerComponent implements Component {
     // View Direction should be in another component, possible Creature?
     public float viewYaw = 0;

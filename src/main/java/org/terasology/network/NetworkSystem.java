@@ -7,6 +7,8 @@ import com.google.common.collect.Sets;
 import com.google.protobuf.ByteString;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;
@@ -51,7 +53,6 @@ import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
-import sun.reflect.generics.tree.ReturnType;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -81,6 +82,10 @@ public class NetworkSystem implements EntityChangeSubscriber {
 
     private Timer timer;
     private long nextNetworkTick = 0;
+
+    private TIntSet netDirty = new TIntHashSet();
+    private TIntSet netInitial = new TIntHashSet();
+
 
     // Server only
     private ChannelGroup allChannels = new DefaultChannelGroup("tera-channels");
@@ -303,7 +308,7 @@ public class NetworkSystem implements EntityChangeSubscriber {
     }
 
     @Override
-    public void onEntityChange(EntityRef entity, Class<? extends Component> component) {
+    public void onEntityComponentAdded(EntityRef entity, Class<? extends Component> component) {
         NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
         if (netComp != null) {
             ComponentMetadata<? extends Component> metadata = entitySystemLibrary.getComponentLibrary().getMetadata(component);
@@ -311,13 +316,47 @@ public class NetworkSystem implements EntityChangeSubscriber {
                 case SERVER:
                     if (metadata.isReplicated()) {
                         for (Client client : clientList) {
-                            client.setNetDirty(netComp.networkId);
+                            client.setComponentAdded(netComp.networkId, component);
+                        }
+                    }
+                    break;
+            }
+        }
+    }
+
+    @Override
+    public void onEntityComponentRemoved(EntityRef entity, Class<? extends Component> component) {
+        NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
+        if (netComp != null) {
+            ComponentMetadata<? extends Component> metadata = entitySystemLibrary.getComponentLibrary().getMetadata(component);
+            switch (mode) {
+                case SERVER:
+                    if (metadata.isReplicated()) {
+                        for (Client client : clientList) {
+                            client.setComponentRemoved(netComp.networkId, component);
+                        }
+                    }
+                    break;
+            }
+        }
+    }
+
+    @Override
+    public void onEntityComponentChange(EntityRef entity, Class<? extends Component> component) {
+        NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
+        if (netComp != null) {
+            ComponentMetadata<? extends Component> metadata = entitySystemLibrary.getComponentLibrary().getMetadata(component);
+            switch (mode) {
+                case SERVER:
+                    if (metadata.isReplicated()) {
+                        for (Client client : clientList) {
+                            client.setComponentDirty(netComp.networkId, component);
                         }
                     }
                     break;
                 case CLIENT:
                     if (server != null && metadata.isReplicatedFromOwner() && getOwnerEntity(entity).equals(server.getEntity())) {
-                        server.setNetDirty(netComp.networkId);
+                        server.setComponentDirty(netComp.networkId, component);
                     }
                     break;
             }

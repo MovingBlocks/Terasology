@@ -28,7 +28,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.WeakHashMap;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -320,7 +319,11 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
                 eventSystem.send(createEntityRef(entityId), ChangedComponentEvent.newInstance(), component);
             }
         }
-        notifyChangeSubscribers(getEntity(entityId), component.getClass());
+        if (oldComponent == null) {
+            notifyComponentAdded(getEntity(entityId), component.getClass());
+        } else {
+            notifyComponentChanged(getEntity(entityId), component.getClass());
+        }
         return component;
     }
 
@@ -331,7 +334,7 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
                 eventSystem.send(createEntityRef(entityId), RemovedComponentEvent.newInstance(), component);
             }
             store.remove(entityId, componentClass);
-            notifyChangeSubscribers(getEntity(entityId), componentClass);
+            notifyComponentRemoved(getEntity(entityId), componentClass);
         }
     }
 
@@ -390,9 +393,21 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
         return freedIds;
     }
 
-    private void notifyChangeSubscribers(EntityRef changedEntity, Class<? extends Component> component) {
+    private void notifyComponentAdded(EntityRef changedEntity, Class<? extends Component> component) {
         for (EntityChangeSubscriber subscriber : subscribers) {
-            subscriber.onEntityChange(changedEntity, component);
+            subscriber.onEntityComponentAdded(changedEntity, component);
+        }
+    }
+
+    private void notifyComponentRemoved(EntityRef changedEntity, Class<? extends Component> component) {
+        for (EntityChangeSubscriber subscriber : subscribers) {
+            subscriber.onEntityComponentRemoved(changedEntity, component);
+        }
+    }
+
+    private void notifyComponentChanged(EntityRef changedEntity, Class<? extends Component> component) {
+        for (EntityChangeSubscriber subscriber : subscribers) {
+            subscriber.onEntityComponentChange(changedEntity, component);
         }
     }
 

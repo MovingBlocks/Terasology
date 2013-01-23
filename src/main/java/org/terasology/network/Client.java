@@ -1,8 +1,13 @@
 package org.terasology.network;
 
+import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multiset;
 import com.google.common.collect.Queues;
+import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
+import com.google.common.collect.Table;
 import com.google.protobuf.TextFormat;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.TIntSet;
@@ -12,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.components.DisplayInformationComponent;
 import org.terasology.components.world.WorldComponent;
+import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Event;
@@ -65,6 +71,9 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
     private Set<Vector3i> relevantChunks = Sets.newHashSet();
     private TIntSet netInitial = new TIntHashSet();
     private TIntSet netDirty = new TIntHashSet();
+    private SetMultimap<Integer, Class<? extends Component>> dirtyComponents = LinkedHashMultimap.create();
+    private SetMultimap<Integer, Class<? extends Component>> addedComponents = LinkedHashMultimap.create();
+    private SetMultimap<Integer, Class<? extends Component>> removedComponents = LinkedHashMultimap.create();
     private TIntSet netRelevant = new TIntHashSet();
 
     private boolean awaitingConnectMessage = true;
@@ -92,16 +101,40 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
 
     public void setNetRemoved(int netId, NetData.NetMessage removalMessage) {
         netInitial.remove(netId);
-        netDirty.remove(netId);
+        dirtyComponents.keySet().remove(netId);
+        addedComponents.keySet().remove(netId);
+        removedComponents.keySet().remove(netId);
         if (netRelevant.contains(netId)) {
             send(removalMessage);
             netRelevant.remove(netId);
         }
     }
 
-    public void setNetDirty(int netId) {
-        if (netRelevant.contains(netId) && !netInitial.contains(netId)) {
-            logger.trace("Marking dirty: {}", networkSystem.getEntity(netId));
+    public void setComponentAdded(int networkId, Class<? extends Component> component) {
+        if (netRelevant.contains(networkId) && !netInitial.contains(networkId)) {
+            if (removedComponents.remove(networkId, component)) {
+                dirtyComponents.put(networkId, component);
+            } else {
+                addedComponents.put(networkId, component);
+                netDirty.add(networkId);
+            }
+        }
+    }
+
+    public void setComponentRemoved(int networkId, Class<? extends Component> component) {
+        if (netRelevant.contains(networkId) && !netInitial.contains(networkId)) {
+            if (!addedComponents.remove(networkId, component)) {
+                removedComponents.put(networkId, component);
+                if (!dirtyComponents.remove(networkId, component)) {
+                    netDirty.add(networkId);
+                }
+            }
+        }
+    }
+
+    public void setComponentDirty(int netId, Class<? extends Component> componentType) {
+        if (netRelevant.contains(netId) && !netInitial.contains(netId) && !addedComponents.get(netId).contains(componentType)) {
+            dirtyComponents.put(netId, componentType);
             netDirty.add(netId);
         }
     }
@@ -221,7 +254,6 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
         // For now, send everything all at once
         sendInitialEntities();
         sendDirtyEntities();
-        netDirty.clear();
 
         processEntityUpdates();
         processEvents();
@@ -246,14 +278,19 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
             int netId = dirtyIterator.next();
             EntityRef entity = networkSystem.getEntity(netId);
             boolean isOwner = networkSystem.getOwner(entity) == this;
-            EntityData.PackedEntity entityData = entitySerializer.serialize(entity, false, new ServerComponentFieldCheck(isOwner, false));
-            NetData.NetMessage message = NetData.NetMessage.newBuilder()
-                    .setType(NetData.NetMessage.Type.UPDATE_ENTITY)
-                    .setUpdateEntity(NetData.UpdateEntityMessage.newBuilder().setEntity(entityData).setNetId(netId))
-                    .build();
-            send(message);
+            EntityData.PackedEntity entityData = entitySerializer.serialize(entity, addedComponents.get(netId), dirtyComponents.get(netId), removedComponents.get(netId), new ServerComponentFieldCheck(isOwner, false));
+            if (entityData != null) {
+                NetData.NetMessage message = NetData.NetMessage.newBuilder()
+                        .setType(NetData.NetMessage.Type.UPDATE_ENTITY)
+                        .setUpdateEntity(NetData.UpdateEntityMessage.newBuilder().setEntity(entityData).setNetId(netId))
+                        .build();
+                send(message);
+            }
         }
         netDirty.clear();
+        addedComponents.clear();
+        removedComponents.clear();
+        dirtyComponents.clear();
     }
 
     private void sendInitialEntities() {

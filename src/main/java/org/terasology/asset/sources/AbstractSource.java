@@ -19,6 +19,7 @@ package org.terasology.asset.sources;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.SetMultimap;
 import org.terasology.asset.AssetSource;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
@@ -31,8 +32,8 @@ import java.util.List;
  */
 public abstract class AbstractSource implements AssetSource {
     private String sourceId;
-    private Multimap<AssetUri, URL> assets = HashMultimap.create();
-    private Multimap<AssetType, AssetUri> assetsByType = HashMultimap.create();
+    private SetMultimap<AssetUri, URL> assets = HashMultimap.create();
+    private SetMultimap<AssetType, AssetUri> assetsByType = HashMultimap.create();
 
     public AbstractSource(String id) {
         sourceId = id;
