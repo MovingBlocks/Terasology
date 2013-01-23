@@ -179,18 +179,15 @@ public class UICardBook extends UIWindow {
     	//empty and fill combo box, just in case
     	 minioncombo.removeAll();
     	 PrefabManager prefMan = CoreRegistry.get(PrefabManager.class);
-         Iterator<Prefab> it = prefMan.listPrefabs().iterator();
-         MinionComponent minioncomp;
-         while (it.hasNext()) {
-             Prefab prefab = it.next();
-             minioncomp = prefab.getComponent(MinionComponent.class);
-             if (minioncomp != null) {
+         for(Prefab prefab : prefMan.listPrefabs(MinionComponent.class)){
             	 UIListItem listitem = new UIListItem();
             	 listitem.setTextColor(Color.black);
-        		 listitem.setText(minioncomp.miniontype);
-        		 minioncombo.addItem(listitem);
-             }
-         }
+            	 String[] tempstring = prefab.getName().split(":");
+            	 if(tempstring.length == 2){
+	        		 listitem.setText(tempstring[1]);
+	        		 minioncombo.addItem(listitem);
+            	 }
+         }        	
     	
         this.container = container;
         this.creature = creature;
@@ -218,26 +215,23 @@ public class UICardBook extends UIWindow {
     }
     
     private void executeCreate(UIDisplayElement element, int button){
-    	switch(minioncombo.getSelection().getText()){
-    	case "monkeyminion1" :{
-    		if(this.container != null){
-    	    	InventoryComponent invcomp = this.container.getComponent(InventoryComponent.class);
-    	    	if(invcomp != null){
-    	    		if(invcomp.itemSlots.get(0) != null){
-    			    	EntityRef itemstack = invcomp.itemSlots.get(0);
-    			    	itemstack.destroy();
-    			    	EntityRef filledcard = entityManager.create("miniion:filledcard");
-    			    	filledcard.getComponent(SpawnMinionActionComponent.class).prefab = "miniion:MonkeyMinion1";
-    			    	invcomp.itemSlots.set(0, filledcard);
-    	    		}
-    	    	}
-    		}
-    		break;
-    	}
-    	default : {
-    		break;
-    	}
-    	}
+    	PrefabManager prefMan = CoreRegistry.get(PrefabManager.class);
+        for(Prefab prefab : prefMan.listPrefabs(MinionComponent.class)){
+           	if(prefab.getName().contains(minioncombo.getSelection().getText())){
+           		if(this.container != null){
+        	    	InventoryComponent invcomp = this.container.getComponent(InventoryComponent.class);
+        	    	if(invcomp != null){
+        	    		if(invcomp.itemSlots.get(0) != null){
+        			    	EntityRef itemstack = invcomp.itemSlots.get(0);
+        			    	itemstack.destroy();
+        			    	EntityRef filledcard = entityManager.create("miniion:filledcard");
+        			    	filledcard.getComponent(SpawnMinionActionComponent.class).prefab = prefab.getName();
+        			    	invcomp.itemSlots.set(0, filledcard);
+        	    		}
+        	    	}
+        		}
+           	}   
+        }
     }
     
     @Override
