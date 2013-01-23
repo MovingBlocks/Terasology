@@ -1,6 +1,7 @@
 {
   "Minion" : {
-    "icon" = "minion8"
+    "icon" = "minion8",
+    "miniontype" = "monkeyminion8"
   },
   "Location" : {},
   "Mesh" : {

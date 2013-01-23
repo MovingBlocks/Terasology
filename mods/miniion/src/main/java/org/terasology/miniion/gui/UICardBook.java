@@ -31,6 +31,7 @@ import org.terasology.entitySystem.Prefab;
 import org.terasology.rendering.gui.animation.AnimationMove;
 import org.terasology.rendering.gui.animation.AnimationRotate;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.VisibilityListener;
 import org.terasology.miniion.components.MinionComponent;
 import org.terasology.miniion.gui.*;
@@ -108,6 +109,13 @@ public class UICardBook extends UIWindow {
         buttoncreatecard.setSize(new Vector2f(180, 180));
         buttoncreatecard.setLabel("Create card");
         buttoncreatecard.setVisible(false);
+        buttoncreatecard.addClickListener(new ClickListener() {
+            @Override
+            public void click(UIDisplayElement element, int button) {
+            	executeCreate(element,button);
+            }
+        });
+
         background.addDisplayElement(buttoncreatecard);
 
         playerToolbar = new UIItemContainer(10);
@@ -206,6 +214,28 @@ public class UICardBook extends UIWindow {
         leftGearWheel.getAnimation(AnimationRotate.class).start();
         rightGearWheel.addAnimation(new AnimationRotate(120f,10f));
         rightGearWheel.getAnimation(AnimationRotate.class).start();
+    }
+    
+    private void executeCreate(UIDisplayElement element, int button){
+    	switch(minioncombo.getSelection().getText()){
+    	case "monkeyminion1" :{
+    		if(this.container != null){
+    	    	InventoryComponent invcomp = this.container.getComponent(InventoryComponent.class);
+    	    	if(invcomp != null){
+    	    		if(invcomp.itemSlots.get(0) != null){
+    			    	EntityRef itemstack = invcomp.itemSlots.get(0);
+    			    	itemstack.destroy();
+    			    	EntityRef filledcard = entityManager.create("miniion:MonkeyMinion1");
+    			    	invcomp.itemSlots.set(0, filledcard);
+    	    		}
+    	    	}
+    		}
+    		break;
+    	}
+    	default : {
+    		break;
+    	}
+    	}
     }
     
     @Override
