@@ -44,8 +44,7 @@ public class UISelectedMinion extends UICompositeScrollable{
     		butInventory.setVisible(false);
     		butBye.setVisible(false);
     		butStay.setVisible(false);
-    		butStay.setVisible(false);
-    		butStay.setVisible(false);
+    		butAttack.setVisible(false);
     		lblname.setVisible(false);
     		lblflavor.setVisible(false);
     		setBehaviourToggle(null);
@@ -99,7 +98,7 @@ public class UISelectedMinion extends UICompositeScrollable{
 	private UIMinionbarCell cell = new UIMinionbarCell();
 	private UIScreenBookOreo minionscreen;
 	
-	private UIModButton butfollow, butStay, butInventory, butBye;
+	private UIModButton butfollow, butStay, butInventory, butBye, butAttack;
 	private UILabel lblBehaviour, lblname, lblflavor;
 	
 	public UISelectedMinion(UIScreenBookOreo minionscreen){
@@ -156,6 +155,20 @@ public class UISelectedMinion extends UICompositeScrollable{
         });
 		this.addDisplayElement(butStay);
 		
+		butAttack = new UIModButton(new Vector2f(50, 20), ButtonType.TOGGLE);
+		butAttack.setLabel("Attack");
+		butAttack.setColorOffset(180);
+		butAttack.setVisible(false);
+		butAttack.setPosition(new Vector2f(140, 110));
+		butAttack.setId("btnAttack");
+		butAttack.addClickListener(new ClickListener() {
+            @Override
+            public void click(UIDisplayElement element, int button) {
+            	executeClick(element,button);
+            }
+        });
+		this.addDisplayElement(butAttack);
+		
 		butInventory = new UIModButton(new Vector2f(100, 20), ButtonType.NORMAL);
 		butInventory.setLabel("Inventory");
 		butInventory.setVisible(false);
@@ -188,15 +201,6 @@ public class UISelectedMinion extends UICompositeScrollable{
 		MinionComponent minioncomp = minion.getComponent(MinionComponent.class);
 		lblname.setText(minioncomp.name);
 		lblflavor.setText(minioncomp.flavortext);
-		if(minioncomp.minionBehaviour == MinionBehaviour.Follow){
-			setBehaviourToggle(this.butfollow);
-		}
-		else if(minioncomp.minionBehaviour == MinionBehaviour.Stay){
-			setBehaviourToggle(butStay);
-		}
-		else if(minioncomp.minionBehaviour == MinionBehaviour.Patrol){
-			setBehaviourToggle(null);
-		}
 		lblname.setVisible(true);
 		lblflavor.setVisible(true);
 		lblBehaviour.setVisible(true);
@@ -204,8 +208,21 @@ public class UISelectedMinion extends UICompositeScrollable{
 		butInventory.setVisible(true);
 		butBye.setVisible(true);
 		butStay.setVisible(true);
-		butStay.setVisible(true);
-		butStay.setVisible(true);
+		butAttack.setVisible(true);
+		lblname.setVisible(true);
+		lblflavor.setVisible(true);
+		if(minioncomp.minionBehaviour == MinionBehaviour.Follow){
+			setBehaviourToggle(butfollow);
+		}
+		else if(minioncomp.minionBehaviour == MinionBehaviour.Stay){
+			setBehaviourToggle(butStay);
+		}
+		else if(minioncomp.minionBehaviour == MinionBehaviour.Attack){
+			setBehaviourToggle(butAttack);
+		}
+		else {
+			setBehaviourToggle(null);
+		}		
 	}
 	
 	public void executeClick(UIDisplayElement element, int id){
@@ -214,19 +231,26 @@ public class UISelectedMinion extends UICompositeScrollable{
 		if(clickedbutton.getId() == "btnStay")
 		{
 			minioncomp.minionBehaviour = MinionBehaviour.Stay;
-			setBehaviourToggle(butfollow);
+			setBehaviourToggle(butStay);
 		}
 		if(clickedbutton.getId() == "btnFollow")
 		{
 			minioncomp.minionBehaviour = MinionBehaviour.Follow;
-			setBehaviourToggle(butStay);
+			setBehaviourToggle(butfollow);
 		}
+		if(clickedbutton.getId() == "btnAttack")
+		{
+			minioncomp.minionBehaviour = MinionBehaviour.Attack;
+			setBehaviourToggle(butAttack);
+		}
+		this.cell.minion.saveComponent(minioncomp);
 	}
 	
 	 private void setBehaviourToggle(UIModButton button)
      {
      	butStay.setToggleState(false);
      	butfollow.setToggleState(false);
+     	butAttack.setToggleState(false);
      	if(button != null){
      		button.setToggleState(true);
      	}
