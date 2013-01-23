@@ -10,6 +10,7 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 import javax.vecmath.Vector2f;
 
 import org.lwjgl.opengl.GL11;
+import org.newdawn.slick.Color;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
@@ -45,6 +46,8 @@ public class UISelectedMinion extends UICompositeScrollable{
     		butStay.setVisible(false);
     		butStay.setVisible(false);
     		butStay.setVisible(false);
+    		lblname.setVisible(false);
+    		lblflavor.setVisible(false);
     		setBehaviourToggle(null);
         }               
         
@@ -64,7 +67,7 @@ public class UISelectedMinion extends UICompositeScrollable{
         		if(this.minion.hasComponent(MinionComponent.class))
         		{
 		            if (minion.getComponent(MinionComponent.class).icon.isEmpty()) {
-		                Icon icon = Icon.get("gelcube");
+		                Icon icon = Icon.get("minionskull");
 		                if (icon != null) {
 		                    renderIcon(icon);
 		                }
@@ -97,7 +100,7 @@ public class UISelectedMinion extends UICompositeScrollable{
 	private UIScreenBookOreo minionscreen;
 	
 	private UIModButton butfollow, butStay, butInventory, butBye;
-	private UILabel lblBehaviour;
+	private UILabel lblBehaviour, lblname, lblflavor;
 	
 	public UISelectedMinion(UIScreenBookOreo minionscreen){
 		
@@ -107,8 +110,21 @@ public class UISelectedMinion extends UICompositeScrollable{
 		cell.setVisible(true);		
 		this.addDisplayElement(cell);
 		
+		lblname = new UILabel("");
+		lblname.setPosition(new Vector2f(50, 30));
+		lblname.setColor(Color.black);
+		lblname.setVisible(false);
+		this.addDisplayElement(lblname);
+		
+		lblflavor = new UILabel("");
+		lblflavor.setPosition(new Vector2f(50, 50));
+		lblflavor.setColor(Color.black);
+		lblflavor.setVisible(false);
+		this.addDisplayElement(lblflavor);
+		
 		lblBehaviour = new UILabel("Behaviour");
 		lblBehaviour.setPosition(new Vector2f(20, 80));
+		lblBehaviour.setColor(Color.black);
 		lblBehaviour.setVisible(false);
 		this.addDisplayElement(lblBehaviour);
 		
@@ -168,8 +184,10 @@ public class UISelectedMinion extends UICompositeScrollable{
 	}
 	
 	public void setMinion(EntityRef minion){
-		cell.setMinion(minion);
+		cell.setMinion(minion);		
 		MinionComponent minioncomp = minion.getComponent(MinionComponent.class);
+		lblname.setText(minioncomp.name);
+		lblflavor.setText(minioncomp.flavortext);
 		if(minioncomp.minionBehaviour == MinionBehaviour.Follow){
 			setBehaviourToggle(this.butfollow);
 		}
@@ -179,6 +197,8 @@ public class UISelectedMinion extends UICompositeScrollable{
 		else if(minioncomp.minionBehaviour == MinionBehaviour.Patrol){
 			setBehaviourToggle(null);
 		}
+		lblname.setVisible(true);
+		lblflavor.setVisible(true);
 		lblBehaviour.setVisible(true);
 		butfollow.setVisible(true);
 		butInventory.setVisible(true);

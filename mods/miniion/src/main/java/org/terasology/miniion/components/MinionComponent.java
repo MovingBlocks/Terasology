@@ -30,7 +30,7 @@ public final class MinionComponent implements Component {
     //personal name for the minion, not set in prefab!
     public String name = "unknown";
     // minion type, eg : oreoBuilder, needs to be defined in prefab
-    public String miniontype = "unknown";
+    public String flavortext = "unknown";
     // used by minionsystem, init at stay normally
     public MinionBehaviour minionBehaviour = MinionBehaviour.Stay;
 

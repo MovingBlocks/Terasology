@@ -33,9 +33,11 @@ import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.miniion.components.AnimationComponent;
+import org.terasology.miniion.components.MinionComponent;
 import org.terasology.miniion.components.SimpleMinionAIComponent;
 //import org.terasology.math.Side;
 import org.terasology.miniion.components.actions.SpawnMinionActionComponent;
+import org.terasology.miniion.componentsystem.controllers.MinionSystem;
 import org.terasology.physics.character.CharacterMovementComponent;
 //import org.terasology.physics.shapes.BoxShapeComponent;
 import org.terasology.rendering.cameras.Camera;
@@ -70,7 +72,13 @@ public class SpawnMinionAction implements EventHandlerSystem {
             	if(minion != null){
             		CharacterMovementComponent movecomp = minion.getComponent(CharacterMovementComponent.class);
             		movecomp.height = 0.3f;
-            		minion.saveComponent(movecomp);            		
+            		minion.saveComponent(movecomp);
+            		MinionComponent minioncomp = minion.getComponent(MinionComponent.class);
+            		String[] tempstring = MinionSystem.getName().split(":");
+            		if(tempstring.length == 2){
+            			minioncomp.name = tempstring[0];
+            			minioncomp.flavortext = tempstring[1];
+            		}
             	}
             }	
         }

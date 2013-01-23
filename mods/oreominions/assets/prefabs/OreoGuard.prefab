@@ -1,10 +1,52 @@
 {
-    "persisted" : false,
+    "persisted" : true,
     "location" : {},
     "skeletalmesh" : {
         "mesh" : "OreoMinions:OreoGuard",
         "material" : "OreoMinions:OreonSkin",
         "animation" : "OreoMinions:GuardIdle",
         "loop" : true
-    }
+    },
+     "Minion" : {
+     "icon" = "minionskull"
+   },
+	"CharacterMovement" : {
+    "faceMovementDirection" : true
+  },
+  "Animation" : {
+		"walkAnim" = "OreoMinions:GuardWalk",
+		"idleAnim" = "OreoMinions:GuardIdle",
+		"attackAnim" = "OreoMinions:GuardAttack",
+		"dieAnim" = "OreoMinions:GuardAfraidNonloop",
+		"fadeInAnim" = "OreoMinions:GuardIdle",
+		"fadeOutAnim" = "OreoMinions:GuardIdle",
+		"workAnim" = "OreoMinions:GuardWave",
+		"randomAnim" : ["OreoMinions:GuardWave", "OreoMinions:GuardShow"]
+	},
+  "SimpleMinionAI" : {},
+  "CharacterSound" : {
+    "footstepSounds" : ["Slime1", "Slime2", "Slime3", "Slime4", "Slime5"],
+    "footstepVolume" : 0.7
+  },
+  "Inventory": {
+      "itemSlots": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "AccessInventoryAction": {}
 }

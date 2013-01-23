@@ -102,7 +102,7 @@ public class UICardBook extends UIWindow {
         page1label.setVisible(true);
         background.addDisplayElement(page1label);
         
-        minioncombo = new UIComboBox(new Vector2f(190, 20));
+        minioncombo = new UIComboBox(new Vector2f(190, 20), new Vector2f(190, 120));
         minioncombo.setPosition(new Vector2f(40, 120));
         minioncombo.setVisible(false);        
         background.addDisplayElement(minioncombo);
@@ -219,7 +219,7 @@ public class UICardBook extends UIWindow {
     private void executeCreate(UIDisplayElement element, int button){
     	PrefabManager prefMan = CoreRegistry.get(PrefabManager.class);
         for(Prefab prefab : prefMan.listPrefabs(MinionComponent.class)){
-           	if(prefab.getName().contains(minioncombo.getSelection().getText())){
+           	if(minioncombo.getSelection() != null && prefab.getName().contains(minioncombo.getSelection().getText())){
            		if(this.container != null){
         	    	InventoryComponent invcomp = this.container.getComponent(InventoryComponent.class);
         	    	if(invcomp != null){

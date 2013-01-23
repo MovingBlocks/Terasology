@@ -15,12 +15,13 @@
  */
 package org.terasology.miniion.componentsystem.controllers;
 
+import java.util.Random;
+
 import javax.vecmath.Vector3f;
 
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.components.world.WorldComponent;
 import org.terasology.miniion.components.UIMessageQueue;
-import org.terasology.miniion.components.UIMinionbar;
 import org.terasology.rendering.gui.events.UIWindowOpenedEvent;
 import org.terasology.rendering.logic.AnimEndEvent;
 import org.terasology.rendering.logic.SkeletalMeshComponent;
@@ -28,11 +29,12 @@ import org.terasology.world.block.BlockComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.Prefab;
+import org.terasology.entitySystem.PrefabManager;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.input.events.MouseWheelEvent;
-import org.terasology.input.binds.AttackButton;
 import org.terasology.input.binds.ToolbarNextButton;
 import org.terasology.input.binds.ToolbarPrevButton;
 import org.terasology.input.binds.UseItemButton;
@@ -46,6 +48,7 @@ import org.terasology.miniion.components.MinionComponent;
 import org.terasology.miniion.components.MinionControllerComponent;
 import org.terasology.miniion.components.SimpleMinionAIComponent;
 import org.terasology.miniion.components.UIMinionTestMenu;
+import org.terasology.miniion.components.namesComponent;
 import org.terasology.miniion.componentsystem.entityfactory.MiniionFactory;
 import org.terasology.miniion.events.MinionMessageEvent;
 import org.terasology.miniion.events.ToggleMinionModeButton;
@@ -91,6 +94,16 @@ public class MinionSystem implements EventHandlerSystem {
         guiManager.registerWindow("minionTest", UIMinionTestMenu.class);
         guiManager.registerWindow("cardbook", UICardBook.class);
         guiManager.registerWindow("oreobook", UIScreenBookOreo.class);
+    }
+    
+    public static String getName(){
+    	PrefabManager prefMan = CoreRegistry.get(PrefabManager.class);
+        Prefab prefab = prefMan.getPrefab("miniion:nameslist");
+    	EntityRef namelist = CoreRegistry.get(EntityManager.class).create(prefab);
+    	namelist.hasComponent(namesComponent.class);
+    	namesComponent namecomp = namelist.getComponent(namesComponent.class);
+    	Random rand = new Random();
+    	return namecomp.namelist.get(rand.nextInt(namecomp.namelist.size()));
     }
     
     @ReceiveEvent(components = {SkeletalMeshComponent.class, AnimationComponent.class})
