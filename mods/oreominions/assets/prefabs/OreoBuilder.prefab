@@ -6,5 +6,47 @@
         "material" : "OreoMinions:OreonSkin",
         "animation" : "OreoMinions:BuilderIdle",
         "loop" : true
-    }
+    },
+     "Minion" : {
+     "icon" = "minionskull"
+   },
+	"CharacterMovement" : {
+    "faceMovementDirection" : true
+  },
+  "Animation" : {
+		"walkAnim" = "OreoMinions:BuilderWalk",
+		"idleAnim" = "OreoMinions:BuilderIdle",
+		"attackAnim" = "OreoMinions:BuilderThor",
+		"dieAnim" = "OreoMinions:BuilderDead",
+		"fadeInAnim" = "OreoMinions:BuilderIdle",
+		"fadeOutAnim" = "OreoMinions:BuilderIdle",
+		"workAnim" = "OreoMinions:BuilderBuild",
+		"randomAnim" : ["OreoMinions:BuilderWave", "OreoMinions:BuilderShow"]
+	},
+  "SimpleMinionAI" : {},
+  "CharacterSound" : {
+    "footstepSounds" : ["Slime1", "Slime2", "Slime3", "Slime4", "Slime5"],
+    "footstepVolume" : 0.7
+  },
+  "Inventory": {
+      "itemSlots": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "AccessInventoryAction": {}
 }

@@ -28,11 +28,13 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.entitySystem.Prefab;
+import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.rendering.gui.animation.AnimationMove;
 import org.terasology.rendering.gui.animation.AnimationRotate;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.VisibilityListener;
+import org.terasology.logic.LocalPlayer;
 import org.terasology.miniion.components.MinionComponent;
 import org.terasology.miniion.components.actions.SpawnMinionActionComponent;
 import org.terasology.miniion.gui.*;
@@ -225,8 +227,10 @@ public class UICardBook extends UIWindow {
         			    	EntityRef itemstack = invcomp.itemSlots.get(0);
         			    	itemstack.destroy();
         			    	EntityRef filledcard = entityManager.create("miniion:filledcard");
+        			    	filledcard.getComponent(ItemComponent.class).name = minioncombo.getSelection().getText() + " card";
         			    	filledcard.getComponent(SpawnMinionActionComponent.class).prefab = prefab.getName();
-        			    	invcomp.itemSlots.set(0, filledcard);
+        			    	EntityRef player = CoreRegistry.get(LocalPlayer.class).getEntity();
+        			    	player.send(new ReceiveItemEvent(filledcard));
         	    		}
         	    	}
         		}

@@ -33,6 +33,7 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.math.Vector3i;
+import org.terasology.miniion.components.AnimationComponent;
 import org.terasology.miniion.components.MinionComponent;
 import org.terasology.miniion.components.SimpleMinionAIComponent;
 import org.terasology.miniion.events.MinionMessageEvent;
@@ -40,6 +41,8 @@ import org.terasology.miniion.pathfinder.AStarPathing;
 import org.terasology.miniion.minionenum.MinionMessagePriority;
 import org.terasology.miniion.utilities.MinionMessage;
 import org.terasology.physics.character.CharacterMovementComponent;
+import org.terasology.rendering.assets.animation.MeshAnimation;
+import org.terasology.rendering.logic.SkeletalMeshComponent;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
@@ -75,11 +78,13 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
     }
 
     public void update(float delta) {
-        for (EntityRef entity : entityManager.iteratorEntities(SimpleMinionAIComponent.class, CharacterMovementComponent.class, LocationComponent.class, MinionComponent.class)) {
+        for (EntityRef entity : entityManager.iteratorEntities(SimpleMinionAIComponent.class, CharacterMovementComponent.class, LocationComponent.class, MinionComponent.class, SkeletalMeshComponent.class, AnimationComponent.class)) {
             LocationComponent location = entity.getComponent(LocationComponent.class);
             SimpleMinionAIComponent ai = entity.getComponent(SimpleMinionAIComponent.class);
             CharacterMovementComponent moveComp = entity.getComponent(CharacterMovementComponent.class);
             MinionComponent minioncomp = entity.getComponent(MinionComponent.class);
+            SkeletalMeshComponent skeletalcomp = entity.getComponent(SkeletalMeshComponent.class);
+            AnimationComponent animcomp = entity.getComponent(AnimationComponent.class);
 
             Vector3f worldPos = new Vector3f(location.getWorldPosition());
             moveComp.getDrive().set(0, 0, 0);
@@ -89,10 +94,12 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
             if (localPlayer != null) {
                 switch (minioncomp.minionBehaviour) {
                     case Follow: {
+                    	changeAnimation(entity, skeletalcomp, animcomp, animcomp.walkAnim, true);
                         executeFollowAI(worldPos, localPlayer, ai, entity, moveComp, location);
                         break;
                     }
                     case Gather: {
+                    	changeAnimation(entity, skeletalcomp, animcomp, animcomp.workAnim, true);
                         executeGatherAI(worldPos, ai, entity, moveComp, location);
                         break;
                     }
@@ -104,6 +111,14 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                         executePatrolAI(worldPos, ai, entity, moveComp, location);
                         break;
                     }
+                    case Attack : {
+                    	changeAnimation(entity, skeletalcomp, animcomp, animcomp.attackAnim, true);
+                    	break;
+                    }
+                    case Die : {
+                    	changeAnimation(entity, skeletalcomp, animcomp, animcomp.dieAnim, false);
+                    	break;
+                    }
                     case Test: {
                         executeTestAI(worldPos, ai, localPlayer, entity, moveComp, location);
                         break;
@@ -114,6 +129,19 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                 }
             }
         }
+    }
+    
+    private void changeAnimation(EntityRef entity, SkeletalMeshComponent skeletalcomp, AnimationComponent animcomp, MeshAnimation animation, boolean loop){
+    	if(skeletalcomp.animation != animation)
+        {
+        	skeletalcomp.animation = animation;
+        	skeletalcomp.loop = loop;
+        	entity.saveComponent(skeletalcomp);
+        }
+    }
+    
+    private void randomAnimation(EntityRef entity, SkeletalMeshComponent skeletalcomp, AnimationComponent animcomp){
+    	
     }
 
     private void executeFollowAI(Vector3f worldPos, LocalPlayer localPlayer, SimpleMinionAIComponent ai, EntityRef entity, CharacterMovementComponent moveComp, LocationComponent location) {

@@ -22,6 +22,8 @@ import org.terasology.components.world.WorldComponent;
 import org.terasology.miniion.components.UIMessageQueue;
 import org.terasology.miniion.components.UIMinionbar;
 import org.terasology.rendering.gui.events.UIWindowOpenedEvent;
+import org.terasology.rendering.logic.AnimEndEvent;
+import org.terasology.rendering.logic.SkeletalMeshComponent;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -38,6 +40,7 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.math.Vector3i;
+import org.terasology.miniion.components.AnimationComponent;
 import org.terasology.miniion.components.MinionBarComponent;
 import org.terasology.miniion.components.MinionComponent;
 import org.terasology.miniion.components.MinionControllerComponent;
@@ -47,6 +50,7 @@ import org.terasology.miniion.componentsystem.entityfactory.MiniionFactory;
 import org.terasology.miniion.events.MinionMessageEvent;
 import org.terasology.miniion.events.ToggleMinionModeButton;
 import org.terasology.miniion.gui.UICardBook;
+import org.terasology.miniion.gui.UIScreenBookOreo;
 import org.terasology.miniion.minionenum.MinionBehaviour;
 import org.terasology.miniion.minionenum.MinionMessagePriority;
 import org.terasology.miniion.components.UIMinionBehaviourMenu;
@@ -86,11 +90,22 @@ public class MinionSystem implements EventHandlerSystem {
         guiManager.registerWindow("minionBehaviour", UIMinionBehaviourMenu.class);
         guiManager.registerWindow("minionTest", UIMinionTestMenu.class);
         guiManager.registerWindow("cardbook", UICardBook.class);
+        guiManager.registerWindow("oreobook", UIScreenBookOreo.class);
+    }
+    
+    @ReceiveEvent(components = {SkeletalMeshComponent.class, AnimationComponent.class})
+    public void onAnimationEnd(AnimEndEvent event, EntityRef entity){
+    	AnimationComponent animcomp = entity.getComponent(AnimationComponent.class);
+    	//SkeletalMeshComponent skelcomp = entity.getComponent(SkeletalMeshComponent.class);
+    	if(animcomp != null && event.getAnimation().equals(animcomp.dieAnim)){
+    			entity.destroy();
+    	}
     }
 
+    
     @ReceiveEvent(components = {WorldComponent.class})
     public void onWindowOpened(UIWindowOpenedEvent event, EntityRef entity) {
-        if (event.getWindow().getId().equals("hud")) {
+        /*if (event.getWindow().getId().equals("hud")) {
             UIMinionbar bar = new UIMinionbar();
             bar.setVisible(true);
             event.getWindow().addDisplayElement(bar);
@@ -99,7 +114,7 @@ public class MinionSystem implements EventHandlerSystem {
             event.getWindow().addDisplayElement(messageQueue);
             event.getWindow().update();
             event.getWindow().layout();
-        }
+        }*/
     }
 
     @ReceiveEvent(components = {MinionComponent.class})
@@ -115,14 +130,14 @@ public class MinionSystem implements EventHandlerSystem {
 
     @ReceiveEvent(components = {LocalPlayerComponent.class, MinionControllerComponent.class})
     public void onToggleMinionMode(ToggleMinionModeButton event, EntityRef entity) {
-        MinionControllerComponent minionController = entity.getComponent(MinionControllerComponent.class);
+        /*MinionControllerComponent minionController = entity.getComponent(MinionControllerComponent.class);
         minionController.minionMode = !minionController.minionMode;
         if (!minionController.minionMode) {
             guiManager.closeWindow(BEHAVIOUR_MENU);
             guiManager.closeWindow(MENU_TEST);
         }
         entity.saveComponent(minionController);
-        event.consume();
+        event.consume();*/
     }
 
     @ReceiveEvent(components = {LocalPlayerComponent.class, MinionControllerComponent.class}, priority = PRIORITY_LOCAL_PLAYER_OVERRIDE)
