@@ -34,6 +34,7 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.framework.events.VisibilityListener;
 import org.terasology.miniion.components.MinionComponent;
+import org.terasology.miniion.components.actions.SpawnMinionActionComponent;
 import org.terasology.miniion.gui.*;
 import org.terasology.miniion.gui.UIModButton.ButtonType;
 import org.terasology.rendering.gui.widgets.*;
@@ -225,7 +226,8 @@ public class UICardBook extends UIWindow {
     	    		if(invcomp.itemSlots.get(0) != null){
     			    	EntityRef itemstack = invcomp.itemSlots.get(0);
     			    	itemstack.destroy();
-    			    	EntityRef filledcard = entityManager.create("miniion:MonkeyMinion1");
+    			    	EntityRef filledcard = entityManager.create("miniion:filledcard");
+    			    	filledcard.getComponent(SpawnMinionActionComponent.class).prefab = "miniion:MonkeyMinion1";
     			    	invcomp.itemSlots.set(0, filledcard);
     	    		}
     	    	}
