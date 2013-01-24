@@ -167,7 +167,11 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
             return;
         }
         Vector3f currentTarget = targets.get(0);
-
+        if(currentTarget == null){
+        	 ai.gatherTargets.remove(currentTarget);
+        	 entity.saveComponent(ai);
+        	return;
+        }
         Vector3f dist = new Vector3f(worldPos);
         dist.sub(currentTarget);
         double distanceToTarget = dist.lengthSquared();

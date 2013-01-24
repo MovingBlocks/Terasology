@@ -19,36 +19,24 @@ import java.util.Random;
 
 import javax.vecmath.Vector3f;
 
-import org.terasology.components.LocalPlayerComponent;
-import org.terasology.components.world.WorldComponent;
+import org.terasology.components.*;
+import org.terasology.components.world.*;
 import org.terasology.miniion.components.UIMessageQueue;
 import org.terasology.rendering.gui.events.UIWindowOpenedEvent;
-import org.terasology.rendering.logic.AnimEndEvent;
-import org.terasology.rendering.logic.SkeletalMeshComponent;
-import org.terasology.world.block.BlockComponent;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.entitySystem.Prefab;
-import org.terasology.entitySystem.PrefabManager;
-import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
-import org.terasology.events.ActivateEvent;
+import org.terasology.rendering.gui.widgets.UIItemContainer;
+import org.terasology.rendering.logic.*;
+import org.terasology.world.block.*;
+import org.terasology.entityFactory.*;
+import org.terasology.entitySystem.*;
+import org.terasology.events.*;
+import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.input.events.MouseWheelEvent;
-import org.terasology.input.binds.ToolbarNextButton;
-import org.terasology.input.binds.ToolbarPrevButton;
-import org.terasology.input.binds.UseItemButton;
+import org.terasology.input.binds.*;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.math.Vector3i;
-import org.terasology.miniion.components.AnimationComponent;
-import org.terasology.miniion.components.MinionBarComponent;
-import org.terasology.miniion.components.MinionComponent;
-import org.terasology.miniion.components.MinionControllerComponent;
-import org.terasology.miniion.components.SimpleMinionAIComponent;
-import org.terasology.miniion.components.UIMinionTestMenu;
-import org.terasology.miniion.components.namesComponent;
+import org.terasology.miniion.components.*;
 import org.terasology.miniion.componentsystem.entityfactory.MiniionFactory;
 import org.terasology.miniion.events.MinionMessageEvent;
 import org.terasology.miniion.events.ToggleMinionModeButton;
@@ -76,8 +64,16 @@ public class MinionSystem implements EventHandlerSystem {
     private static final int POPUP_ENTRIES = 9;
     private static final String BEHAVIOUR_MENU = "minionBehaviour";
     private static final String MENU_TEST = "minionTest";
-        
+    private static EntityRef activeminion;
+    
+    @In
+    private LocalPlayer localPlayer;
+    @In
+    private EntityManager entityManager;
+    
     private GUIManager guiManager;
+    private BlockItemFactory blockItemFactory;
+    private DroppedBlockFactory droppedBlockFactory;
     private UIMinionBehaviourMenu minionMenu;
     private UIMinionTestMenu minionTest;
     private MiniionFactory minionFactory;
@@ -88,7 +84,9 @@ public class MinionSystem implements EventHandlerSystem {
     	ModIcons.loadIcons();
         guiManager = CoreRegistry.get(GUIManager.class);
         minionFactory = new MiniionFactory();
-        minionFactory.setEntityManager(CoreRegistry.get(EntityManager.class));
+        blockItemFactory = new BlockItemFactory(entityManager);
+        droppedBlockFactory = new DroppedBlockFactory(entityManager);
+        minionFactory.setEntityManager(entityManager);
         minionFactory.setRandom(new FastRandom());
         guiManager.registerWindow("minionBehaviour", UIMinionBehaviourMenu.class);
         guiManager.registerWindow("minionTest", UIMinionTestMenu.class);
@@ -114,7 +112,28 @@ public class MinionSystem implements EventHandlerSystem {
     			entity.destroy();
     	}
     }
-
+    
+    @ReceiveEvent(components = {BlockPickupComponent.class})
+    public void onBlockDropped(BlockDroppedEvent event, EntityRef entity) {
+    	if(event.getInstigator().hasComponent(MinionComponent.class)){
+    		EntityRef item;
+            if (event.getoldBlock().getEntityMode() == BlockEntityMode.PERSISTENT) {
+                item = blockItemFactory.newInstance(event.getoldBlock().getBlockFamily(), entity);
+            } else {
+                item = blockItemFactory.newInstance(event.getoldBlock().getBlockFamily());
+            }
+            event.getInstigator().send(new ReceiveItemEvent(item));
+            event.getDroppedBlock().destroy();
+    	}
+    }
+    
+    public static void setActiveMinion(EntityRef minion){
+    	activeminion = minion;
+    }
+    
+    public static EntityRef getActiveMinion(){
+    	return activeminion;
+    }
     
     @ReceiveEvent(components = {WorldComponent.class})
     public void onWindowOpened(UIWindowOpenedEvent event, EntityRef entity) {
@@ -221,6 +240,25 @@ public class MinionSystem implements EventHandlerSystem {
             }
             event.consume();
         }*/
+    }
+    
+    @ReceiveEvent(components = {LocalPlayerComponent.class, MinionControllerComponent.class}, priority = PRIORITY_LOCAL_PLAYER_OVERRIDE)
+    public void onAttack(AttackButton event, EntityRef entity) {
+        LocalPlayerComponent locplaycomp = entity.getComponent(LocalPlayerComponent.class);
+        UIItemContainer toolbar = (UIItemContainer) CoreRegistry.get(GUIManager.class).getWindowById("hud").getElementById("toolbar");
+        int invSlotIndex = localPlayer.getEntity().getComponent(LocalPlayerComponent.class).selectedTool + toolbar.getSlotStart();
+        EntityRef heldItem = localPlayer.getEntity().getComponent(InventoryComponent.class).itemSlots.get(invSlotIndex);
+        ItemComponent heldItemComp = heldItem.getComponent(ItemComponent.class);
+
+        if (heldItemComp != null && activeminion != null && heldItemComp.name.matches("Minion Command")) {
+            SimpleMinionAIComponent aicomp = activeminion.getComponent(SimpleMinionAIComponent.class);
+            LocationComponent loccomp = event.getTarget().getComponent(LocationComponent.class);
+            aicomp.gatherTargets.add(loccomp.getWorldPosition());
+            activeminion.saveComponent(aicomp);
+            locplaycomp.handAnimation = 0.5f;
+            entity.saveComponent(locplaycomp);
+            event.consume();
+        }
     }
 
     public void updateBehaviour(EntityRef player) {

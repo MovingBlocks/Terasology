@@ -16,6 +16,7 @@ import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.miniion.components.MinionComponent;
+import org.terasology.miniion.componentsystem.controllers.MinionSystem;
 import org.terasology.model.inventory.Icon;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -45,6 +46,7 @@ public class UISelectedMinion extends UICompositeScrollable{
     		butBye.setVisible(false);
     		butStay.setVisible(false);
     		butAttack.setVisible(false);
+    		butGather.setVisible(false);
     		lblname.setVisible(false);
     		lblflavor.setVisible(false);
     		setBehaviourToggle(null);
@@ -98,7 +100,7 @@ public class UISelectedMinion extends UICompositeScrollable{
 	private UIMinionbarCell cell = new UIMinionbarCell();
 	private UIScreenBookOreo minionscreen;
 	
-	private UIModButton butfollow, butStay, butInventory, butBye, butAttack;
+	private UIModButton butfollow, butStay, butInventory, butBye, butAttack, butGather;
 	private UILabel lblBehaviour, lblname, lblflavor;
 	
 	public UISelectedMinion(UIScreenBookOreo minionscreen){
@@ -169,6 +171,20 @@ public class UISelectedMinion extends UICompositeScrollable{
         });
 		this.addDisplayElement(butAttack);
 		
+		butGather = new UIModButton(new Vector2f(50, 20), ButtonType.TOGGLE);
+		butGather.setLabel("Gather");
+		butGather.setColorOffset(180);
+		butGather.setVisible(false);
+		butGather.setPosition(new Vector2f(200, 110));
+		butGather.setId("btnGather");
+		butGather.addClickListener(new ClickListener() {
+            @Override
+            public void click(UIDisplayElement element, int button) {
+            	executeClick(element,button);
+            }
+        });
+		this.addDisplayElement(butGather);
+		
 		butInventory = new UIModButton(new Vector2f(100, 20), ButtonType.NORMAL);
 		butInventory.setLabel("Inventory");
 		butInventory.setVisible(false);
@@ -197,6 +213,7 @@ public class UISelectedMinion extends UICompositeScrollable{
 	}
 	
 	public void setMinion(EntityRef minion){
+		MinionSystem.setActiveMinion(minion);
 		cell.setMinion(minion);		
 		MinionComponent minioncomp = minion.getComponent(MinionComponent.class);
 		lblname.setText(minioncomp.name);
@@ -209,6 +226,7 @@ public class UISelectedMinion extends UICompositeScrollable{
 		butBye.setVisible(true);
 		butStay.setVisible(true);
 		butAttack.setVisible(true);
+		butGather.setVisible(true);
 		lblname.setVisible(true);
 		lblflavor.setVisible(true);
 		if(minioncomp.minionBehaviour == MinionBehaviour.Follow){
@@ -219,6 +237,9 @@ public class UISelectedMinion extends UICompositeScrollable{
 		}
 		else if(minioncomp.minionBehaviour == MinionBehaviour.Attack){
 			setBehaviourToggle(butAttack);
+		}
+		else if(minioncomp.minionBehaviour == MinionBehaviour.Gather){
+			setBehaviourToggle(butGather);
 		}
 		else {
 			setBehaviourToggle(null);
@@ -243,6 +264,11 @@ public class UISelectedMinion extends UICompositeScrollable{
 			minioncomp.minionBehaviour = MinionBehaviour.Attack;
 			setBehaviourToggle(butAttack);
 		}
+		if(clickedbutton.getId() == "btnGather")
+		{
+			minioncomp.minionBehaviour = MinionBehaviour.Gather;
+			setBehaviourToggle(butGather);
+		}
 		this.cell.minion.saveComponent(minioncomp);
 	}
 	
@@ -251,6 +277,7 @@ public class UISelectedMinion extends UICompositeScrollable{
      	butStay.setToggleState(false);
      	butfollow.setToggleState(false);
      	butAttack.setToggleState(false);
+     	butGather.setToggleState(false);
      	if(button != null){
      		button.setToggleState(true);
      	}
