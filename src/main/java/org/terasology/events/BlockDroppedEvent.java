@@ -20,7 +20,11 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.world.block.Block;
 
 /**
+ * copied from the attackevent
  * @author Immortius <immortius@gmail.com>
+ * created as a way to catch minions breaking blocks and sending them to their inventory
+ * oldblock is the block being destroyed, instigator is the entity who broke the block
+ * droppedblock is the itemblock dropped in the world
  */
 public class BlockDroppedEvent extends AbstractEvent {
     private EntityRef droppedblock;

@@ -71,7 +71,7 @@ public class SpawnMinionAction implements EventHandlerSystem {
             	EntityRef minion = entityManager.create(prefab, spawnPos);
             	if(minion != null){
             		CharacterMovementComponent movecomp = minion.getComponent(CharacterMovementComponent.class);
-            		movecomp.height = 0.3f;
+            		movecomp.height = 0.35f;
             		minion.saveComponent(movecomp);
             		MinionComponent minioncomp = minion.getComponent(MinionComponent.class);
             		String[] tempstring = MinionSystem.getName().split(":");

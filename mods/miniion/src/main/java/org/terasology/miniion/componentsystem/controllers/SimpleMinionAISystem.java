@@ -22,20 +22,14 @@ import javax.vecmath.Vector3f;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.world.LocationComponent;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.*;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.math.Vector3i;
-import org.terasology.miniion.components.AnimationComponent;
-import org.terasology.miniion.components.MinionComponent;
-import org.terasology.miniion.components.SimpleMinionAIComponent;
+import org.terasology.miniion.components.*;
 import org.terasology.miniion.events.MinionMessageEvent;
 import org.terasology.miniion.pathfinder.AStarPathing;
 import org.terasology.miniion.minionenum.MinionMessagePriority;
@@ -43,9 +37,7 @@ import org.terasology.miniion.utilities.MinionMessage;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.logic.SkeletalMeshComponent;
-import org.terasology.utilities.FastRandom;
-import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.WorldProvider;
+import org.terasology.world.*;
 import org.terasology.world.block.Block;
 
 /**
@@ -61,7 +53,6 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
     private EntityManager entityManager;
     private WorldProvider worldProvider;
     private BlockEntityRegistry blockEntityRegistry;
-    private FastRandom random = new FastRandom();
     private AStarPathing aStarPathing;
     private Timer timer;
 
@@ -79,51 +70,51 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
 
     public void update(float delta) {
         for (EntityRef entity : entityManager.iteratorEntities(SimpleMinionAIComponent.class, CharacterMovementComponent.class, LocationComponent.class, MinionComponent.class, SkeletalMeshComponent.class, AnimationComponent.class)) {
-            LocationComponent location = entity.getComponent(LocationComponent.class);
-            SimpleMinionAIComponent ai = entity.getComponent(SimpleMinionAIComponent.class);
+
             CharacterMovementComponent moveComp = entity.getComponent(CharacterMovementComponent.class);
             MinionComponent minioncomp = entity.getComponent(MinionComponent.class);
-            SkeletalMeshComponent skeletalcomp = entity.getComponent(SkeletalMeshComponent.class);
             AnimationComponent animcomp = entity.getComponent(AnimationComponent.class);
 
-            Vector3f worldPos = new Vector3f(location.getWorldPosition());
             moveComp.getDrive().set(0, 0, 0);
             //  shouldn't use local player, need some way to find nearest player
             LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
 
             if (localPlayer != null) {
                 switch (minioncomp.minionBehaviour) {
-                    case Follow: {
-                    	changeAnimation(entity, skeletalcomp, animcomp, animcomp.walkAnim, true);
-                        executeFollowAI(worldPos, localPlayer, ai, entity, moveComp, location);
+                    case Follow: {                    	
+                        executeFollowAI(localPlayer, entity);
                         break;
                     }
-                    case Gather: {
-                    	changeAnimation(entity, skeletalcomp, animcomp, animcomp.workAnim, true);
-                        executeGatherAI(worldPos, ai, entity, moveComp, location);
+                    case Gather: {                    	
+                        executeGatherAI(entity);
                         break;
                     }
                     case Move: {
-                        executeMoveAI(worldPos, ai, entity, moveComp, location);
+                        executeMoveAI(entity);
                         break;
                     }
                     case Patrol: {
-                        executePatrolAI(worldPos, ai, entity, moveComp, location);
+                        executePatrolAI(entity);
                         break;
                     }
                     case Attack : {
-                    	changeAnimation(entity, skeletalcomp, animcomp, animcomp.attackAnim, true);
+                    	changeAnimation(entity, animcomp.attackAnim, true);
                     	break;
                     }
                     case Die : {
-                    	changeAnimation(entity, skeletalcomp, animcomp, animcomp.dieAnim, false);
+                    	changeAnimation(entity, animcomp.dieAnim, false);
+                    	break;
+                    }
+                    case Stay : {
+                    	changeAnimation(entity, animcomp.idleAnim, false);
                     	break;
                     }
                     case Test: {
-                        executeTestAI(worldPos, ai, localPlayer, entity, moveComp, location);
+                        executeTestAI(localPlayer, entity);
                         break;
                     }
                     default: {
+                    	changeAnimation(entity, animcomp.idleAnim, false);
                         break;
                     }
                 }
@@ -131,7 +122,8 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
         }
     }
     
-    private void changeAnimation(EntityRef entity, SkeletalMeshComponent skeletalcomp, AnimationComponent animcomp, MeshAnimation animation, boolean loop){
+    private void changeAnimation(EntityRef entity, MeshAnimation animation, boolean loop){
+    	SkeletalMeshComponent skeletalcomp = entity.getComponent(SkeletalMeshComponent.class);
     	if(skeletalcomp.animation != animation)
         {
         	skeletalcomp.animation = animation;
@@ -144,7 +136,11 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
     	
     }
 
-    private void executeFollowAI(Vector3f worldPos, LocalPlayer localPlayer, SimpleMinionAIComponent ai, EntityRef entity, CharacterMovementComponent moveComp, LocationComponent location) {
+    private void executeFollowAI(LocalPlayer localPlayer, EntityRef entity) {
+    	LocationComponent location = entity.getComponent(LocationComponent.class);
+        SimpleMinionAIComponent ai = entity.getComponent(SimpleMinionAIComponent.class);
+        Vector3f worldPos = new Vector3f(location.getWorldPosition());
+    	
         Vector3f dist = new Vector3f(worldPos);
         dist.sub(localPlayer.getPosition());
         double distanceToPlayer = dist.lengthSquared();
@@ -158,10 +154,15 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
             entity.saveComponent(ai);
         }
 
-        setMovement(ai.movementTarget, worldPos, entity, moveComp, location);
+        setMovement(ai.movementTarget, entity);
     }
 
-    private void executeGatherAI(Vector3f worldPos, SimpleMinionAIComponent ai, EntityRef entity, CharacterMovementComponent moveComp, LocationComponent location) {
+    private void executeGatherAI(EntityRef entity) {
+    	LocationComponent location = entity.getComponent(LocationComponent.class);
+        SimpleMinionAIComponent ai = entity.getComponent(SimpleMinionAIComponent.class);    
+        AnimationComponent animcomp = entity.getComponent(AnimationComponent.class);
+        Vector3f worldPos = new Vector3f(location.getWorldPosition());
+        
         List<Vector3f> targets = ai.gatherTargets;
         if ((targets == null) || (targets.size() < 1)) {
             return;
@@ -169,6 +170,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
         Vector3f currentTarget = targets.get(0);
         if(currentTarget == null){
         	 ai.gatherTargets.remove(currentTarget);
+        	 changeAnimation(entity, animcomp.idleAnim, true);
         	 entity.saveComponent(ai);
         	return;
         }
@@ -177,21 +179,28 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
         double distanceToTarget = dist.lengthSquared();
 
         if (distanceToTarget < 4) {
+        	//switch animation
+        	changeAnimation(entity, animcomp.workAnim, false);
             // gather the block
-            if (timer.getTimeInMs() - ai.lastAttacktime > 500) {
+            if (timer.getTimeInMs() - ai.lastAttacktime > 1000) {
                 ai.lastAttacktime = timer.getTimeInMs();
                 boolean attacked = attack(entity, currentTarget);
                 if (!attacked) {
+                	changeAnimation(entity, animcomp.idleAnim, true);
                     ai.gatherTargets.remove(currentTarget);
                 }
             }
         }
 
         entity.saveComponent(ai);
-        setMovement(currentTarget, worldPos, entity, moveComp, location);
+        setMovement(currentTarget, entity);
     }
 
-    private void executeMoveAI(Vector3f worldPos, SimpleMinionAIComponent ai, EntityRef entity, CharacterMovementComponent moveComp, LocationComponent location) {
+    private void executeMoveAI(EntityRef entity) {
+    	 LocationComponent location = entity.getComponent(LocationComponent.class);
+         SimpleMinionAIComponent ai = entity.getComponent(SimpleMinionAIComponent.class);
+         Vector3f worldPos = new Vector3f(location.getWorldPosition());
+    	
         //get targets, break if none
         List<Vector3f> targets = ai.movementTargets;
         if ((targets == null) || (targets.size() < 1)) {
@@ -214,10 +223,14 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
             return;
         }
 
-        setMovement(currentTarget, worldPos, entity, moveComp, location);
+        setMovement(currentTarget, entity);
     }
 
-    private void executePatrolAI(Vector3f worldPos, SimpleMinionAIComponent ai, EntityRef entity, CharacterMovementComponent moveComp, LocationComponent location) {
+    private void executePatrolAI(EntityRef entity) {
+    	LocationComponent location = entity.getComponent(LocationComponent.class);
+        SimpleMinionAIComponent ai = entity.getComponent(SimpleMinionAIComponent.class);
+        Vector3f worldPos = new Vector3f(location.getWorldPosition());
+        
         //get targets, break if none
         List<Vector3f> targets = ai.patrolTargets;
         if ((targets == null) || (targets.size() < 1)) {
@@ -248,10 +261,14 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
             return;
         }
 
-        setMovement(currentTarget, worldPos, entity, moveComp, location);
+        setMovement(currentTarget, entity);
     }
 
-    private void executeTestAI(Vector3f worldPos, SimpleMinionAIComponent ai, LocalPlayer localPlayer, EntityRef entity, CharacterMovementComponent moveComp, LocationComponent location) {
+    private void executeTestAI(LocalPlayer localPlayer, EntityRef entity) {
+    	LocationComponent location = entity.getComponent(LocationComponent.class);
+        SimpleMinionAIComponent ai = entity.getComponent(SimpleMinionAIComponent.class);
+        Vector3f worldPos = new Vector3f(location.getWorldPosition());
+        
         if (!ai.locked) {
             //get targets, break if none
             List<Vector3f> targets = ai.movementTargets;
@@ -270,7 +287,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                 ai.locked = true;
                 ai.pathTargets = aStarPathing.findPath(worldPos, new Vector3f(currentTarget));
                 if (ai.pathTargets == null) {
-                    MinionSystem minionSystem = new MinionSystem();
+                    //MinionSystem minionSystem = new MinionSystem();
                     MinionMessage messagetosend = new MinionMessage(MinionMessagePriority.Debug, "test", "testdesc", "testcont", entity, localPlayer.getEntity());
                     entity.send(new MinionMessageEvent(messagetosend));
                     ai.movementTargets.remove(0);
@@ -304,14 +321,21 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
                 return;
             }
 
-            setMovement(currentTarget, worldPos, entity, moveComp, location);
+            setMovement(currentTarget, entity);
         }
     }
 
-    private void setMovement(Vector3f currentTarget, Vector3f worldPos, EntityRef entity, CharacterMovementComponent moveComp, LocationComponent location) {
+    private void setMovement(Vector3f currentTarget, EntityRef entity) {
+    	LocationComponent location = entity.getComponent(LocationComponent.class);
+        CharacterMovementComponent moveComp = entity.getComponent(CharacterMovementComponent.class);
+        AnimationComponent animcomp = entity.getComponent(AnimationComponent.class);
+        SkeletalMeshComponent skeletalcomp = entity.getComponent(SkeletalMeshComponent.class);
+        Vector3f worldPos = new Vector3f(location.getWorldPosition());
+    	
         Vector3f targetDirection = new Vector3f();
         targetDirection.sub(currentTarget, worldPos);
         if (targetDirection.x * targetDirection.x + targetDirection.z * targetDirection.z > 0.01f) {
+        	changeAnimation(entity, animcomp.walkAnim, true);
             targetDirection.normalize();
             moveComp.setDrive(targetDirection);
 
@@ -319,13 +343,16 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
             AxisAngle4f axisAngle = new AxisAngle4f(0, 1, 0, yaw);
             location.getLocalRotation().set(axisAngle);
         } else {
+        	if(skeletalcomp.animation == animcomp.walkAnim){
+        		changeAnimation(entity, animcomp.idleAnim, true);
+        	}
             moveComp.setDrive(new Vector3f());
         }
         entity.saveComponent(moveComp);
         entity.saveComponent(location);
     }
 
-    private boolean attack(EntityRef player, Vector3f position) {
+    private boolean attack(EntityRef minion, Vector3f position) {
 
         int damage = 1;
         Block block = worldProvider.getBlock(new Vector3f(position.x, position.y - 0.5f, position.z));
@@ -334,7 +361,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
             if (blockEntity == EntityRef.NULL) {
                 return false;
             } else {
-                blockEntity.send(new DamageEvent(damage, player));
+                blockEntity.send(new DamageEvent(damage, minion));
                 return true;
             }
         }

@@ -21,7 +21,7 @@ import javax.vecmath.Vector3f;
 
 import org.terasology.components.*;
 import org.terasology.components.world.*;
-import org.terasology.miniion.components.UIMessageQueue;
+
 import org.terasology.rendering.gui.events.UIWindowOpenedEvent;
 import org.terasology.rendering.gui.widgets.UIItemContainer;
 import org.terasology.rendering.logic.*;
@@ -42,12 +42,8 @@ import org.terasology.miniion.events.MinionMessageEvent;
 import org.terasology.miniion.events.ToggleMinionModeButton;
 import org.terasology.miniion.gui.UICardBook;
 import org.terasology.miniion.gui.UIScreenBookOreo;
-import org.terasology.miniion.minionenum.MinionBehaviour;
-import org.terasology.miniion.minionenum.MinionMessagePriority;
-import org.terasology.miniion.components.UIMinionBehaviourMenu;
-import org.terasology.miniion.utilities.MinionMessage;
-import org.terasology.miniion.utilities.ModIcons;
-import org.terasology.utilities.FastRandom;
+import org.terasology.miniion.minionenum.*;
+import org.terasology.miniion.utilities.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -83,17 +79,22 @@ public class MinionSystem implements EventHandlerSystem {
     public void initialise() {
     	ModIcons.loadIcons();
         guiManager = CoreRegistry.get(GUIManager.class);
-        minionFactory = new MiniionFactory();
+        //minionFactory = new MiniionFactory();
         blockItemFactory = new BlockItemFactory(entityManager);
         droppedBlockFactory = new DroppedBlockFactory(entityManager);
-        minionFactory.setEntityManager(entityManager);
-        minionFactory.setRandom(new FastRandom());
-        guiManager.registerWindow("minionBehaviour", UIMinionBehaviourMenu.class);
-        guiManager.registerWindow("minionTest", UIMinionTestMenu.class);
-        guiManager.registerWindow("cardbook", UICardBook.class);
-        guiManager.registerWindow("oreobook", UIScreenBookOreo.class);
+        //minionFactory.setEntityManager(entityManager);
+        //minionFactory.setRandom(new FastRandom());
+        //guiManager.registerWindow("minionBehaviour", UIMinionBehaviourMenu.class);
+        guiManager.registerWindow("minionTest", UIMinionTestMenu.class); // experimental popup menu for the minion command tool
+        guiManager.registerWindow("cardbook", UICardBook.class);		// ui to create summonable cards
+        guiManager.registerWindow("oreobook", UIScreenBookOreo.class);  // ui to manage summoned minions, selecting one sets it active!
     }
     
+    
+    /**
+     * Ugly way to retrieve a name from a prefab
+     * @return a ":" seperated string, with name and flavor text.
+     */
     public static String getName(){
     	PrefabManager prefMan = CoreRegistry.get(PrefabManager.class);
         Prefab prefab = prefMan.getPrefab("miniion:nameslist");
@@ -104,6 +105,11 @@ public class MinionSystem implements EventHandlerSystem {
     	return namecomp.namelist.get(rand.nextInt(namecomp.namelist.size()));
     }
     
+    
+    /**
+     * destroys a minion at the end of their dying animation
+     * this implies that setting their animation to die will destroy them.
+     */
     @ReceiveEvent(components = {SkeletalMeshComponent.class, AnimationComponent.class})
     public void onAnimationEnd(AnimEndEvent event, EntityRef entity){
     	AnimationComponent animcomp = entity.getComponent(AnimationComponent.class);
@@ -113,6 +119,11 @@ public class MinionSystem implements EventHandlerSystem {
     	}
     }
     
+    /**
+     * triggered when a block was destroyed and dropped in the world
+     * used to intercept gathering by minions and sending the block to their inventory
+     * the droppedblock in the world then gets destroyed, possible duplication exploit
+     */
     @ReceiveEvent(components = {BlockPickupComponent.class})
     public void onBlockDropped(BlockDroppedEvent event, EntityRef entity) {
     	if(event.getInstigator().hasComponent(MinionComponent.class)){
@@ -127,14 +138,23 @@ public class MinionSystem implements EventHandlerSystem {
     	}
     }
     
+    /**
+     * The active minion, to be commanded by the minion command item
+     * @param minion : the new active minion entity
+     */
     public static void setActiveMinion(EntityRef minion){
     	activeminion = minion;
     }
     
+    /**
+     * returns the currently active minion
+     * @return : the currently active minion
+     */
     public static EntityRef getActiveMinion(){
     	return activeminion;
     }
     
+    @Deprecated
     @ReceiveEvent(components = {WorldComponent.class})
     public void onWindowOpened(UIWindowOpenedEvent event, EntityRef entity) {
         /*if (event.getWindow().getId().equals("hud")) {
@@ -149,6 +169,7 @@ public class MinionSystem implements EventHandlerSystem {
         }*/
     }
 
+    @Deprecated
     @ReceiveEvent(components = {MinionComponent.class})
     public void onMessageReceived(MinionMessageEvent event, EntityRef entityref) {
         if (messageQueue != null) {
@@ -160,6 +181,7 @@ public class MinionSystem implements EventHandlerSystem {
     public void shutdown() {
     }
 
+    @Deprecated
     @ReceiveEvent(components = {LocalPlayerComponent.class, MinionControllerComponent.class})
     public void onToggleMinionMode(ToggleMinionModeButton event, EntityRef entity) {
         /*MinionControllerComponent minionController = entity.getComponent(MinionControllerComponent.class);
@@ -172,6 +194,7 @@ public class MinionSystem implements EventHandlerSystem {
         event.consume();*/
     }
 
+    @Deprecated
     @ReceiveEvent(components = {LocalPlayerComponent.class, MinionControllerComponent.class}, priority = PRIORITY_LOCAL_PLAYER_OVERRIDE)
     public void onNextMinion(ToolbarNextButton event, EntityRef entity) {
         MinionControllerComponent minionController = entity.getComponent(MinionControllerComponent.class);
@@ -182,6 +205,7 @@ public class MinionSystem implements EventHandlerSystem {
         }
     }
 
+    @Deprecated
     @ReceiveEvent(components = {LocalPlayerComponent.class, MinionControllerComponent.class}, priority = PRIORITY_LOCAL_PLAYER_OVERRIDE)
     public void onPrevMinion(ToolbarPrevButton event, EntityRef entity) {
         MinionControllerComponent minionController = entity.getComponent(MinionControllerComponent.class);
@@ -195,6 +219,7 @@ public class MinionSystem implements EventHandlerSystem {
         }
     }
 
+    @Deprecated
     @ReceiveEvent(components = {LocalPlayerComponent.class, MinionControllerComponent.class})
     public void onMouseWheel(MouseWheelEvent wheelEvent, EntityRef entity) {
         if (minionMenu != null && minionMenu.isVisible()) {
@@ -207,6 +232,7 @@ public class MinionSystem implements EventHandlerSystem {
 	   }
     }
 
+    @Deprecated
     private void menuScroll(int wheelMoved, EntityRef playerEntity) {
         EntityRef minion = getSelectedMinion(playerEntity);
         MinionComponent minionComp = minion.getComponent(MinionComponent.class);
@@ -221,6 +247,8 @@ public class MinionSystem implements EventHandlerSystem {
         minion.saveComponent(minionComp);
     }
 
+    //replaced by openuicomponent in items
+    @Deprecated
     @ReceiveEvent(components = {LocalPlayerComponent.class, MinionControllerComponent.class}, priority = PRIORITY_LOCAL_PLAYER_OVERRIDE)
     public void onUseItem(UseItemButton event, EntityRef entity) {
         /*MinionControllerComponent minionController = entity.getComponent(MinionControllerComponent.class);
@@ -242,6 +270,10 @@ public class MinionSystem implements EventHandlerSystem {
         }*/
     }
     
+    /**
+     * overrides the default attack event if the minion command item is the current helditem
+     * only adds gather targets for now, minion command needs popuup to set behaviour 
+     */
     @ReceiveEvent(components = {LocalPlayerComponent.class, MinionControllerComponent.class}, priority = PRIORITY_LOCAL_PLAYER_OVERRIDE)
     public void onAttack(AttackButton event, EntityRef entity) {
         LocalPlayerComponent locplaycomp = entity.getComponent(LocalPlayerComponent.class);
@@ -261,6 +293,7 @@ public class MinionSystem implements EventHandlerSystem {
         }
     }
 
+    @Deprecated
     public void updateBehaviour(EntityRef player) {
         EntityRef minion = getSelectedMinion(player);
         MinionComponent minionComp = minion.getComponent(MinionComponent.class);
@@ -301,6 +334,7 @@ public class MinionSystem implements EventHandlerSystem {
         }
     }
 
+    @Deprecated
     @ReceiveEvent(components = {LocalPlayerComponent.class, MinionControllerComponent.class}, priority = PRIORITY_LOCAL_PLAYER_OVERRIDE)
     public void onUseMinion(UseItemButton event, EntityRef playerEntity) {
         MinionControllerComponent minionController = playerEntity.getComponent(MinionControllerComponent.class);
@@ -315,6 +349,7 @@ public class MinionSystem implements EventHandlerSystem {
         }
     }
 
+    @Deprecated
     private EntityRef getSelectedMinion(EntityRef entity) {
         MinionControllerComponent minionController = entity.getComponent(MinionControllerComponent.class);
         if (minionController == null) {
@@ -328,6 +363,7 @@ public class MinionSystem implements EventHandlerSystem {
         return minion;
     }
 
+    @Deprecated
     private void createMinion(EntityRef player, EntityRef target) {
         MinionControllerComponent minionController = player.getComponent(MinionControllerComponent.class);
         MinionBarComponent inventory = player.getComponent(MinionBarComponent.class);
@@ -339,7 +375,7 @@ public class MinionSystem implements EventHandlerSystem {
         inventory.minionSlots.set(minionController.selectedMinion, minionFactory.generateMiniion(new Vector3f(centerPos.x, centerPos.y + 1, centerPos.z), minionController.selectedMinion));
     }
 
-
+    @Deprecated
     private void setTarget(EntityRef minion, EntityRef target, EntityRef player) {
         BlockComponent blockComp = target.getComponent(BlockComponent.class);
         if (blockComp == null) {
