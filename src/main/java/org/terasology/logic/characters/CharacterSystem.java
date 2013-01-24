@@ -16,6 +16,7 @@
 
 package org.terasology.logic.characters;
 
+import org.slf4j.spi.LocationAwareLogger;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
@@ -67,8 +68,10 @@ public class CharacterSystem implements EventHandlerSystem {
     // TODO: May need to make this more lenient to account for lag - should work better with client side prediction algorithms in place
     @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class})
     public void onUseItemOnTargetRequest(UseItemOnTargetRequest event, EntityRef character) {
-        if (!network.getOwnerEntity(event.getItem()).equals(event.getClient())) {
-            return;
+        if (event.getItem().exists()) {
+            if (!character.equals(event.getItem().getComponent(ItemComponent.class).container)) {
+                return;
+            }
         }
 
         if (event.getTarget().exists()) {
@@ -96,8 +99,10 @@ public class CharacterSystem implements EventHandlerSystem {
 
     @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class})
     public void onUseItemInDirectionRequest(UseItemInDirectionRequest event, EntityRef character) {
-        if (!network.getOwnerEntity(event.getItem()).equals(event.getClient())) {
-            return;
+        if (event.getItem().exists()) {
+            if (!character.equals(event.getItem().getComponent(ItemComponent.class).container)) {
+                return;
+            }
         }
 
         LocationComponent location = character.getComponent(LocationComponent.class);
@@ -110,12 +115,13 @@ public class CharacterSystem implements EventHandlerSystem {
 
     @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class})
     public void onAttackTargetRequest(AttackTargetRequest event, EntityRef character) {
-        int damage = 1;
-
-        if (event.getItem().exists() && !network.getOwnerEntity(event.getItem()).equals(event.getClient())) {
-            return;
+        if (event.getItem().exists()) {
+            if (!character.equals(event.getItem().getComponent(ItemComponent.class).container)) {
+                return;
+            }
         }
 
+        int damage = 1;
         // Calculate damage from item
         ItemComponent item = event.getItem().getComponent(ItemComponent.class);
         if (item != null) {

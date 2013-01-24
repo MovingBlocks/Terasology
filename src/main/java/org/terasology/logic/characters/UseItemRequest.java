@@ -18,6 +18,7 @@ package org.terasology.logic.characters;
 
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.network.NetworkEvent;
+import org.terasology.network.Replicate;
 import org.terasology.network.ServerEvent;
 
 import javax.vecmath.Vector3f;
@@ -28,6 +29,8 @@ import javax.vecmath.Vector3f;
  */
 @ServerEvent
 public class UseItemRequest extends NetworkEvent {
+
+    @Replicate
     private EntityRef item = EntityRef.NULL;
 
     protected UseItemRequest() {

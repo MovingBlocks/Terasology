@@ -29,27 +29,27 @@ public class NetEntityRefTypeHandler implements TypeHandler<EntityRef> {
 
     @Override
     public EntityData.Value serialize(EntityRef value) {
+        BlockComponent blockComponent = value.getComponent(BlockComponent.class);
+        if (blockComponent != null) {
+            Vector3i pos = blockComponent.getPosition();
+            return EntityData.Value.newBuilder().addInteger(pos.x).addInteger(pos.y).addInteger(pos.z).build();
+        }
         NetworkComponent netComponent = value.getComponent(NetworkComponent.class);
         if (netComponent != null) {
             return EntityData.Value.newBuilder().addInteger(netComponent.networkId).build();
-        } else {
-            BlockComponent blockComponent = value.getComponent(BlockComponent.class);
-            if (blockComponent != null) {
-                Vector3i pos = blockComponent.getPosition();
-                return EntityData.Value.newBuilder().addValue(EntityData.Value.newBuilder().addInteger(pos.x).addInteger(pos.y).addInteger(pos.z)).build();
-            }
         }
         return null;
     }
 
     @Override
     public EntityRef deserialize(EntityData.Value value) {
-        if (value.getIntegerCount() > 0) {
-            return new NetEntityRef(value.getInteger(0), networkSystem);
-        } else if (value.getValueCount() > 0 && value.getValue(0).getIntegerCount() > 2) {
-            EntityData.Value vec3iData = value.getValue(0);
-            Vector3i pos = new Vector3i(vec3iData.getInteger(0), vec3iData.getInteger(1), vec3iData.getInteger(2));
+        if (value.getIntegerCount() > 2) {
+            Vector3i pos = new Vector3i(value.getInteger(0), value.getInteger(1), value.getInteger(2));
             return blockEntityRegistry.getOrCreateBlockEntityAt(pos);
+        }
+        if (value.getIntegerCount() > 0) {
+            EntityRef result = new NetEntityRef(value.getInteger(0), networkSystem);
+            return result;
         }
         return EntityRef.NULL;
     }
@@ -63,14 +63,14 @@ public class NetEntityRefTypeHandler implements TypeHandler<EntityRef> {
     public EntityData.Value serialize(Iterable<EntityRef> value) {
         EntityData.Value.Builder result = EntityData.Value.newBuilder();
         for (EntityRef ref : value) {
-            NetworkComponent netComponent = ref.getComponent(NetworkComponent.class);
-            if (netComponent != null) {
-                result.addInteger(netComponent.networkId);
+            BlockComponent blockComponent = ref.getComponent(BlockComponent.class);
+            if (blockComponent != null) {
+                Vector3i blockPos = blockComponent.getPosition();
+                result.addValue(EntityData.Value.newBuilder().addInteger(blockPos.x).addInteger(blockPos.y).addInteger(blockPos.z));
             } else {
-                BlockComponent blockComponent = ref.getComponent(BlockComponent.class);
-                if (blockComponent != null) {
-                    Vector3i blockPos = blockComponent.getPosition();
-                    result.addValue(EntityData.Value.newBuilder().addInteger(blockPos.x).addInteger(blockPos.y).addInteger(blockPos.z));
+                NetworkComponent netComponent = ref.getComponent(NetworkComponent.class);
+                if (netComponent != null) {
+                    result.addInteger(netComponent.networkId);
                 } else {
                     result.addInteger(0);
                 }

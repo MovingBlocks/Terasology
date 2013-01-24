@@ -113,8 +113,10 @@ public class EventSerializer {
             if (check.shouldSerializeField(field, event)) {
                 try {
                     EntityData.Value serializedValue = field.serialize(event);
-                    eventData.addFieldValue(serializedValue);
-                    fieldIds.write(field.getId());
+                    if (serializedValue != null) {
+                        eventData.addFieldValue(serializedValue);
+                        fieldIds.write(field.getId());
+                    }
                 } catch (IOException e) {
                     logger.error("Exception during serializing of {}", event.getClass(), e);
                 }

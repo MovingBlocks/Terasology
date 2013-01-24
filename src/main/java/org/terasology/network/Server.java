@@ -20,6 +20,7 @@ import org.terasology.entitySystem.persistence.EventSerializer;
 import org.terasology.entitySystem.persistence.PackedEntitySerializer;
 import org.terasology.math.Vector3i;
 import org.terasology.network.serialization.ClientComponentFieldCheck;
+import org.terasology.network.serialization.NetworkEventFieldCheck;
 import org.terasology.network.serialization.ServerComponentFieldCheck;
 import org.terasology.protobuf.EntityData;
 import org.terasology.protobuf.NetData;
@@ -92,7 +93,7 @@ public class Server {
         NetData.NetMessage message = NetData.NetMessage.newBuilder()
                 .setType(NetData.NetMessage.Type.EVENT)
                 .setEvent(NetData.EventMessage.newBuilder()
-                        .setEvent(eventSerializer.serialize(event))
+                        .setEvent(eventSerializer.serialize(event, new NetworkEventFieldCheck()))
                         .setTargetId(targetId))
                 .build();
         send(message);

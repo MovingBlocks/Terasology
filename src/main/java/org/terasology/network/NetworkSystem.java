@@ -83,10 +83,6 @@ public class NetworkSystem implements EntityChangeSubscriber {
     private Timer timer;
     private long nextNetworkTick = 0;
 
-    private TIntSet netDirty = new TIntHashSet();
-    private TIntSet netInitial = new TIntHashSet();
-
-
     // Server only
     private ChannelGroup allChannels = new DefaultChannelGroup("tera-channels");
     private BlockingQueue<Client> newClients = Queues.newLinkedBlockingQueue();
@@ -513,8 +509,8 @@ public class NetworkSystem implements EntityChangeSubscriber {
                     // TODO: Disconnect client and fail more gracefully
                     throw new RuntimeException("Failed writing field id " + field.getId() + " for field " + field.getName());
                 }
-
             }
+            info.setFieldIds(fieldIds.toByteString());
             serverInfoMessageBuilder.addEvent(info);
         }
     }

@@ -1,6 +1,7 @@
 package org.terasology.logic.characters;
 
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.network.Replicate;
 import org.terasology.network.ServerEvent;
 
 import javax.vecmath.Vector3f;
@@ -10,6 +11,8 @@ import javax.vecmath.Vector3f;
  */
 @ServerEvent
 public class AttackInDirectionRequest extends AttackRequest {
+
+    @Replicate
     private Vector3f direction = new Vector3f();
 
     protected AttackInDirectionRequest() {
