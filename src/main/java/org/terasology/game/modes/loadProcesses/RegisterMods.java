@@ -16,6 +16,7 @@
 
 package org.terasology.game.modes.loadProcesses;
 
+import org.terasology.asset.AssetManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.modes.LoadProcess;
 import org.terasology.logic.mod.Mod;
@@ -57,6 +58,7 @@ public class RegisterMods implements LoadProcess {
         }
 
         modManager.applyActiveMods();
+        AssetManager.getInstance().applyOverrides();
         return true;
     }
 

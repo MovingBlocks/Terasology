@@ -44,6 +44,7 @@ import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
 import org.terasology.world.chunks.ChunkRegionListener;
 import org.terasology.world.chunks.ChunkUnloadedEvent;
+import org.terasology.world.chunks.Chunks;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -219,7 +220,7 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
         if (relevantChunks.add(pos)) {
             logger.debug("Sending chunk: {}", pos);
             // TODO: probably need to queue and dripfeed these to prevent flooding
-            NetData.NetMessage message = NetData.NetMessage.newBuilder().setType(NetData.NetMessage.Type.CHUNK).setChunkInfo(chunk.getChunkData()).build();
+            NetData.NetMessage message = NetData.NetMessage.newBuilder().setType(NetData.NetMessage.Type.CHUNK).setChunkInfo(Chunks.getInstance().encode(chunk)).build();
             send(message);
         }
     }

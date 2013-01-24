@@ -43,6 +43,7 @@ import org.terasology.rendering.gui.framework.UIDisplayRenderer;
 import org.terasology.rendering.gui.widgets.UIMessageBox;
 import org.terasology.rendering.gui.widgets.UIWindow;
 import org.terasology.rendering.gui.windows.UIMenuConfig;
+import org.terasology.rendering.gui.windows.UIMenuConfigAdvanced;
 import org.terasology.rendering.gui.windows.UIMenuConfigAudio;
 import org.terasology.rendering.gui.windows.UIMenuConfigControls;
 import org.terasology.rendering.gui.windows.UIMenuConfigVideo;
@@ -91,6 +92,7 @@ public class GUIManager implements EventHandlerSystem {
         registeredWindows.put("config:video", UIMenuConfigVideo.class);
         registeredWindows.put("config:audio", UIMenuConfigAudio.class);
         registeredWindows.put("config:controls", UIMenuConfigControls.class);
+        registeredWindows.put("config:advanced", UIMenuConfigAdvanced.class);
         registeredWindows.put("loading", UIScreenLoading.class);
         registeredWindows.put("container", UIScreenContainer.class);
         registeredWindows.put("metrics", UIScreenMetrics.class);
@@ -116,6 +118,18 @@ public class GUIManager implements EventHandlerSystem {
         renderer.update();
 
         if (Display.wasResized()) {
+            renderer.setSize(new Vector2f(Display.getWidth(), Display.getHeight()));
+            renderer.layout();
+        }
+    }
+
+    /**
+     * Updates all visible display elements and their child's. Will update the layout if force is set to true.
+     */
+    public void update(boolean force) {
+        renderer.update();
+
+        if (Display.wasResized() || force) {
             renderer.setSize(new Vector2f(Display.getWidth(), Display.getHeight()));
             renderer.layout();
         }

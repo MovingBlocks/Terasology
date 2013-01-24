@@ -41,4 +41,8 @@ public interface AssetSource {
 
     Iterable<AssetUri> list(AssetType type);
 
+    List<URL> getOverride(AssetUri uri);
+
+    Iterable<AssetUri> listOverrides();
+
 }

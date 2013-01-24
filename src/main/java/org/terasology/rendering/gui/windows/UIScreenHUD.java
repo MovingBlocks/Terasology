@@ -16,6 +16,7 @@
 package org.terasology.rendering.gui.windows;
 
 import org.terasology.asset.Assets;
+import org.newdawn.slick.Color;
 import org.terasology.components.HealthComponent;
 import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.entitySystem.EntityManager;
@@ -33,11 +34,8 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.VisibilityListener;
-import org.terasology.rendering.gui.widgets.UIImage;
-import org.terasology.rendering.gui.widgets.UIItemCell;
-import org.terasology.rendering.gui.widgets.UIItemContainer;
-import org.terasology.rendering.gui.widgets.UILabel;
-import org.terasology.rendering.gui.widgets.UIWindow;
+import org.terasology.rendering.gui.layout.ChooseRowLayout;
+import org.terasology.rendering.gui.widgets.*;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -119,6 +117,7 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
         debugLine4.setPosition(new Vector2f(4, 54));
 
         toolbar = new UIItemContainer(10);
+        toolbar.setId("toolbar");
         toolbar.setVisible(true);
         toolbar.setHorizontalAlign(EHorizontalAlign.CENTER);
         toolbar.setVerticalAlign(EVerticalAlign.BOTTOM);
@@ -127,9 +126,8 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
         toolbar.setCellMargin(new Vector2f(0f, 0f));
         toolbar.setBorderImage("engine:inventory", new Vector2f(0f, 84f), new Vector2f(169f, 83f), new Vector4f(4f, 4f, 4f, 4f));
 
-        addDisplayElement(crosshair);
-
         leftGearWheel = new UIImage(Assets.getTexture("engine:inventory"));
+
         leftGearWheel.setSize(new Vector2f(36f, 36f));
         leftGearWheel.setTextureOrigin(new Vector2f(121.0f, 168.0f));
         leftGearWheel.setTextureSize(new Vector2f(27.0f, 27.0f));
@@ -157,9 +155,11 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
                 rightGearWheel.getPosition().y - 4f)
         );
 
+
+
+        addDisplayElement(crosshair);
         addDisplayElement(rightGearWheel);
         addDisplayElement(leftGearWheel);
-
         addDisplayElement(debugLine1);
         addDisplayElement(debugLine2);
         addDisplayElement(debugLine3);
@@ -188,7 +188,9 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
             double memoryUsage = ((double) Runtime.getRuntime().totalMemory() - (double) Runtime.getRuntime().freeMemory()) / 1048576.0;
             Timer timer = CoreRegistry.get(Timer.class);
             debugLine1.setText(String.format("fps: %.2f, mem usage: %.2f MB, total mem: %.2f, max mem: %.2f", timer.getFps(), memoryUsage, Runtime.getRuntime().totalMemory() / 1048576.0, Runtime.getRuntime().maxMemory() / 1048576.0));
-            debugLine2.setText(String.format("%s", cameraTarget.toString()));
+            if (entityManager != null) {
+                debugLine2.setText(String.format("Active Entities: %s, Current Target: %s", entityManager.getActiveEntities(), cameraTarget.toString()));
+            }
             debugLine3.setText(String.format("%s", CoreRegistry.get(WorldRenderer.class)));
             debugLine4.setText(String.format("total vus: %s | active threads: %s", ChunkTessellator.getVertexArrayUpdateCount(), CoreRegistry.get(GameEngine.class).getActiveTaskCount()));
         }

@@ -1,0 +1,27 @@
+{
+    "CraftRecipe" : {
+        "fullMatch": false,
+        "recipe" :  {
+            bottom:
+                [
+                    "plank",  "plank", "plank",
+                    "plank",  "plank", "plank",
+                    "plank",  "plank", "plank"
+                ],
+            "middle":
+                [
+                    " ",  " ",     " ",
+                    "plank",  "plank", "plank",
+                    "plank",  "plank", "plank"
+                ],
+            "top":
+                [
+                    " ",  " ",     " ",
+                    " ",  " ", " ",
+                    "plank",  "plank", "plank"
+                ]
+        }
+
+    }
+
+}

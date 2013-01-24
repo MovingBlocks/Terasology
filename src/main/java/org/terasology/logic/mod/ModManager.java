@@ -58,6 +58,7 @@ public class ModManager {
     public static final String ENGINE_PACKAGE = "engine";
 
     public static final String ASSETS_SUBDIRECTORY = "assets";
+    public static final String OVERRIDES_SUBDIRECTORY = "overrides";
 
     private static final Logger logger = LoggerFactory.getLogger(ModManager.class);
 
@@ -140,12 +141,8 @@ public class ModManager {
                     ModInfo modInfo = gson.fromJson(new FileReader(modInfoFile), ModInfo.class);
                     if (!mods.containsKey(modInfo.getId())) {
                         File assetLocation = new File(modFile, ASSETS_SUBDIRECTORY);
-                        AssetSource source;
-                        if (assetLocation.exists() && assetLocation.isDirectory()) {
-                            source = new DirectorySource(modInfo.getId(), assetLocation);
-                        } else {
-                            source = new NullSource(modInfo.getId());
-                        }
+                        File overridesLocation = new File(modFile, OVERRIDES_SUBDIRECTORY);
+                        AssetSource source = new DirectorySource(modInfo.getId(), assetLocation, overridesLocation);
                         Mod mod = new Mod(modFile, modInfo, source);
                         mods.put(modInfo.getId(), mod);
                         logger.info("Discovered mod: {} (hasCode = {})", modInfo.getDisplayName(), mod.isCodeMod());
@@ -174,7 +171,7 @@ public class ModManager {
                     try {
                         ModInfo modInfo = gson.fromJson(new InputStreamReader(zipFile.getInputStream(modInfoEntry)), ModInfo.class);
                         if (!mods.containsKey(modInfo.getId())) {
-                            Mod mod = new Mod(modFile, modInfo, new ArchiveSource(modInfo.getId(), modFile, ASSETS_SUBDIRECTORY));
+                            Mod mod = new Mod(modFile, modInfo, new ArchiveSource(modInfo.getId(), modFile, ASSETS_SUBDIRECTORY, OVERRIDES_SUBDIRECTORY));
                             mods.put(modInfo.getId(), mod);
                             logger.info("Discovered mod: {} (hasCode = {})", modInfo.getDisplayName(), mod.isCodeMod());
                         } else {

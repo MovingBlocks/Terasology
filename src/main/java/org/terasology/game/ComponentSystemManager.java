@@ -65,6 +65,7 @@ public class ComponentSystemManager {
             RegisterComponentSystem registerInfo = system.getAnnotation(RegisterComponentSystem.class);
             if (shouldRegister(registerInfo, netMode)) {
                 String id = packageName + ":" + system.getSimpleName();
+                logger.debug("Registering system {}", id);
                 try {
                     ComponentSystem newSystem = (ComponentSystem) system.newInstance();
                     register(newSystem, id);

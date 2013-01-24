@@ -22,23 +22,22 @@ import org.lwjgl.opengl.GL11;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.componentSystem.RenderSystem;
-import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.Timer;
-import org.terasology.logic.players.LocalPlayer;
+import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.manager.PostProcessingRenderer;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.WorldTimeEventManager;
+import org.terasology.logic.players.LocalPlayer;
+import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.AABB;
 import org.terasology.math.Rect2i;
 import org.terasology.math.Region3i;
-import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.physics.BulletPhysics;
@@ -61,6 +60,9 @@ import org.terasology.world.WorldView;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.ChunkStore;
+import org.terasology.world.chunks.store.ChunkStoreGZip;
+import org.terasology.world.chunks.store.ChunkStoreProtobuf;
 
 import javax.imageio.ImageIO;
 import javax.vecmath.Vector3f;
@@ -484,15 +486,13 @@ public final class WorldRenderer {
 
         updateAndQueueVisibleChunks();
 
-        if (Config.getInstance().isComplexWater()) {
-            PostProcessingRenderer.getInstance().beginRenderReflectedScene();
-            glCullFace(GL11.GL_FRONT);
-            getActiveCamera().setReflected(true);
-            renderWorldReflection(getActiveCamera());
-            getActiveCamera().setReflected(false);
-            glCullFace(GL11.GL_BACK);
-            PostProcessingRenderer.getInstance().endRenderReflectedScene();
-        }
+        PostProcessingRenderer.getInstance().beginRenderReflectedScene();
+        glCullFace(GL11.GL_FRONT);
+        getActiveCamera().setReflected(true);
+        renderWorldReflection(getActiveCamera());
+        getActiveCamera().setReflected(false);
+        glCullFace(GL11.GL_BACK);
+        PostProcessingRenderer.getInstance().endRenderReflectedScene();
 
         PostProcessingRenderer.getInstance().beginRenderScene();
         renderWorld(getActiveCamera());
@@ -507,7 +507,7 @@ public final class WorldRenderer {
             glClear(GL_DEPTH_BUFFER_BIT);
             glPushMatrix();
             glLoadIdentity();
-            activeCamera.loadProjectionMatrix(80f);
+            activeCamera.loadProjectionMatrix(90f);
 
             PerformanceMonitor.startActivity("Render First Person");
             for (RenderSystem renderer : systemManager.iterateRenderSubscribers()) {
@@ -535,23 +535,20 @@ public final class WorldRenderer {
 
         glEnable(GL_LIGHT0);
 
-        boolean headUnderWater;
-
-        headUnderWater = cameraMode == CAMERA_MODE.PLAYER && isUnderwater();
+        boolean headUnderWater = cameraMode == CAMERA_MODE.PLAYER && isUnderWater();
 
         if (wireframe)
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-        PerformanceMonitor.startActivity("RenderOpaque");
+        PerformanceMonitor.startActivity("Render Objects (Opaque)");
 
         for (RenderSystem renderer : systemManager.iterateRenderSubscribers()) {
             renderer.renderOpaque();
         }
 
-
         PerformanceMonitor.endActivity();
 
-        PerformanceMonitor.startActivity("Render ChunkOpaque");
+        PerformanceMonitor.startActivity("Render Chunks (Opaque)");
 
         /*
          * FIRST RENDER PASS: OPAQUE ELEMENTS
@@ -561,7 +558,7 @@ public final class WorldRenderer {
 
         PerformanceMonitor.endActivity();
 
-        PerformanceMonitor.startActivity("Render ChunkTransparent");
+        PerformanceMonitor.startActivity("Render Chunks (Transparent)");
 
         /*
          * SECOND RENDER PASS: BILLBOARDS
@@ -574,7 +571,7 @@ public final class WorldRenderer {
 
         PerformanceMonitor.endActivity();
 
-        PerformanceMonitor.startActivity("Render Transparent");
+        PerformanceMonitor.startActivity("Render Objects (Transparent)");
 
         for (RenderSystem renderer : systemManager.iterateRenderSubscribers()) {
             renderer.renderTransparent();
@@ -582,7 +579,7 @@ public final class WorldRenderer {
 
         PerformanceMonitor.endActivity();
 
-        PerformanceMonitor.startActivity("Render ChunkWaterIce");
+        PerformanceMonitor.startActivity("Render Chunks (Water, Ice)");
 
         // Make sure the water surface is rendered if the player is swimming
         if (headUnderWater) {
@@ -607,9 +604,15 @@ public final class WorldRenderer {
             }
         }
 
+        PerformanceMonitor.endActivity();
+
+        PerformanceMonitor.startActivity("Render Overlays");
+
         for (RenderSystem renderer : systemManager.iterateRenderSubscribers()) {
             renderer.renderOverlay();
         }
+
+        PerformanceMonitor.endActivity();
 
         glDisable(GL_BLEND);
 
@@ -620,31 +623,33 @@ public final class WorldRenderer {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         glDisable(GL_LIGHT0);
-
-        PerformanceMonitor.endActivity();
     }
 
     public void renderWorldReflection(Camera camera) {
-        PerformanceMonitor.startActivity("Render Sky");
+        PerformanceMonitor.startActivity("Render World (Reflection)");
         camera.lookThroughNormalized();
         skysphere.render();
 
-        camera.lookThrough();
+        if (Config.getInstance().isComplexWater()) {
+            camera.lookThrough();
 
-        glEnable(GL_LIGHT0);
+            glEnable(GL_LIGHT0);
 
-        for (Chunk c : renderQueueChunksOpaque)
-            renderChunk(c, ChunkMesh.RENDER_PHASE.OPAQUE, camera);
+            for (Chunk c : renderQueueChunksOpaque) {
+                renderChunk(c, ChunkMesh.RENDER_PHASE.OPAQUE, camera);
+            }
 
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        for (Chunk c : renderQueueChunksSortedBillboards)
-            renderChunk(c, ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT, camera);
+            for (Chunk c : renderQueueChunksSortedBillboards) {
+                renderChunk(c, ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT, camera);
+            }
+            glDisable(GL_BLEND);
+            glDisable(GL_LIGHT0);
+        }
 
-
-        glDisable(GL_BLEND);
-        glDisable(GL_LIGHT0);
+        PerformanceMonitor.endActivity();
     }
 
     private void renderChunk(Chunk chunk, ChunkMesh.RENDER_PHASE phase, Camera camera) {
@@ -686,13 +691,11 @@ public final class WorldRenderer {
     }
 
     public float getRenderingLightValueAt(Vector3f pos) {
-        float lightValueSun = worldProvider.getSunlight(pos);
-        lightValueSun /= 15.0f;
+        float lightValueSun = (float) Math.pow(0.76, 16 - worldProvider.getSunlight(pos));
         lightValueSun *= getDaylight();
-        float lightValueBlock = worldProvider.getLight(pos);
-        lightValueBlock /= 15f;
+        float lightValueBlock = (float) Math.pow(0.76, 16 - worldProvider.getLight(pos));
 
-        return (float) TeraMath.clamp(lightValueSun + lightValueBlock * (1.0 - lightValueSun));
+        return (lightValueSun + lightValueBlock * (1.0f - lightValueSun)) + (1.0f - (float) getDaylight()) * 0.05f;
     }
 
     public void update(float delta) {
@@ -737,7 +740,7 @@ public final class WorldRenderer {
         // TODO: Implement
     }
 
-    private boolean isUnderwater() {
+    public boolean isUnderWater() {
         Vector3f cameraPos = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
         Block block = CoreRegistry.get(WorldProvider.class).getBlock(new Vector3f(cameraPos));
         return block.isLiquid();

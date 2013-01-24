@@ -67,18 +67,17 @@ public class ShaderParametersChunk implements IShaderParameters {
 
         program.setFloat("blockScale", 1.0f);
 
-        if (worldRenderer != null)
+        if (worldRenderer != null) {
             program.setFloat("daylight", (float) worldRenderer.getDaylight());
+            program.setFloat("swimming", worldRenderer.isUnderWater() ? 1.0f : 0.0f);
+        }
 
         if (localPlayer != null) {
-            // TODO: This should be whether the camera is underwater I think?
-            //program.setInt("swimming", tera.getActivePlayer().isSwimming() ? 1 : 0);
-            // TODO: Should be a camera setting?
             program.setInt("carryingTorch", localPlayer.isCarryingTorch() ? 1 : 0);
         }
 
         if (worldProvider != null) {
-            program.setFloat("time", (float) worldProvider.getTimeInDays());
+            program.setFloat("time", worldProvider.getTimeInDays());
         }
 
         program.setFloat1("wavingCoordinates", BlockManager.getInstance().calcCoordinatesForWavingBlocks());
@@ -86,5 +85,4 @@ public class ShaderParametersChunk implements IShaderParameters {
         program.setFloat2("waterCoordinate", BlockManager.getInstance().calcCoordinate("engine:water"));
         program.setFloat2("lavaCoordinate", BlockManager.getInstance().calcCoordinate("engine:lava"));
     }
-
 }

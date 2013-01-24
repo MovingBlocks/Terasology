@@ -21,6 +21,7 @@ import org.lwjgl.LWJGLUtil;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -299,14 +300,7 @@ public class TerasologyEngine implements GameEngine {
 
     private void initDisplay() {
         try {
-            if (Config.getInstance().isFullscreen()) {
-                Display.setDisplayMode(Display.getDesktopDisplayMode());
-                Display.setFullscreen(true);
-            } else {
-                Display.setDisplayMode(Config.getInstance().getDisplayMode());
-                Display.setResizable(true);
-            }
-
+            setDisplayMode();
             Display.setTitle("Terasology" + " | " + "Pre Alpha");
             Display.create(Config.getInstance().getPixelFormat());
         } catch (LWJGLException e) {
@@ -365,7 +359,7 @@ public class TerasologyEngine implements GameEngine {
         CoreRegistry.put(NetworkSystem.class, new NetworkSystem(timer));
 
         AssetType.registerAssetTypes();
-        AssetManager.getInstance().addAssetSource(new ClasspathSource(ModManager.ENGINE_PACKAGE, getClass().getProtectionDomain().getCodeSource(), ModManager.ASSETS_SUBDIRECTORY));
+        AssetManager.getInstance().addAssetSource(new ClasspathSource(ModManager.ENGINE_PACKAGE, getClass().getProtectionDomain().getCodeSource(), ModManager.ASSETS_SUBDIRECTORY, ModManager.OVERRIDES_SUBDIRECTORY));
 
         ShaderManager.getInstance();
         VertexBufferObjectManager.getInstance();
@@ -470,5 +464,29 @@ public class TerasologyEngine implements GameEngine {
         }
         currentState = newState;
         newState.init(this);
+    }
+
+    private void setDisplayMode() {
+        try {
+            if (Config.getInstance().isFullscreen()) {
+                Display.setDisplayMode(Display.getDesktopDisplayMode());
+                Display.setFullscreen(true);
+            } else {
+                Display.setDisplayMode(Config.getInstance().getDisplayMode());
+                Display.setResizable(true);
+            }
+        } catch (LWJGLException e) {
+            logger.error("Can not initialize graphics device.", e);
+            System.exit(1);
+        }
+    }
+
+    public void setFullscreen(Boolean state) {
+        if (Config.getInstance().isFullscreen() != state) {
+            Config.getInstance().setFullscreen(state);
+            setDisplayMode();
+            resizeViewport();
+            CoreRegistry.get(GUIManager.class).update(true);
+        }
     }
 }

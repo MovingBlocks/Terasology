@@ -39,8 +39,6 @@ import org.terasology.world.chunks.Chunk;
  */
 public final class ChunkTessellator {
 
-    private static final int FLOAT_BYTES = 4;
-    private static final int INT_BYTES = 4;
     private static int _statVertexArrayUpdateCount = 0;
 
     private WorldBiomeProvider biomeProvider;
@@ -128,7 +126,8 @@ public final class ChunkTessellator {
                 mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].tex.get(cTex + 2));
 
                 float[] result = new float[3];
-                calcLightingValuesForVertexPos(worldView, vertexPos, result);
+                Vector3f normal = new Vector3f(mesh._vertexElements[j].normals.get(i), mesh._vertexElements[j].normals.get(i+1), mesh._vertexElements[j].normals.get(i+2));
+                calcLightingValuesForVertexPos(worldView, vertexPos, result, normal);
 
                 mesh._vertexElements[j].finalVertices.putFloat(result[0]);
                 mesh._vertexElements[j].finalVertices.putFloat(result[1]);
@@ -139,9 +138,9 @@ public final class ChunkTessellator {
                 mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].color.get(cColor + 2));
                 mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].color.get(cColor + 3));
 
-                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].normals.get(i));
-                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].normals.get(i + 1));
-                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].normals.get(i + 2));
+                mesh._vertexElements[j].finalVertices.putFloat(normal.x);
+                mesh._vertexElements[j].finalVertices.putFloat(normal.y);
+                mesh._vertexElements[j].finalVertices.putFloat(normal.z);
             }
 
             mesh._vertexElements[j].finalIndices = BufferUtils.createIntBuffer(mesh._vertexElements[j].indices.size());
@@ -156,17 +155,29 @@ public final class ChunkTessellator {
         PerformanceMonitor.endActivity();
     }
 
-    private void calcLightingValuesForVertexPos(WorldView worldView, Vector3f vertexPos, float[] output) {
+    private void calcLightingValuesForVertexPos(WorldView worldView, Vector3f vertexPos, float[] output, Vector3f normal) {
         PerformanceMonitor.startActivity("calcLighting");
         float[] lights = new float[8];
         float[] blockLights = new float[8];
         Block[] blocks = new Block[4];
 
         PerformanceMonitor.startActivity("gatherLightInfo");
-        blocks[0] = worldView.getBlock((vertexPos.x + 0.1f), (vertexPos.y + 0.8f), (vertexPos.z + 0.1f));
-        blocks[1] = worldView.getBlock((vertexPos.x + 0.1f), (vertexPos.y + 0.8f), (vertexPos.z - 0.1f));
-        blocks[2] = worldView.getBlock((vertexPos.x - 0.1f), (vertexPos.y + 0.8f), (vertexPos.z - 0.1f));
-        blocks[3] = worldView.getBlock((vertexPos.x - 0.1f), (vertexPos.y + 0.8f), (vertexPos.z + 0.1f));
+        if (normal.y == 1.0f || normal.y == -1.0f) {
+            blocks[0] = worldView.getBlock((vertexPos.x + 0.1f), (vertexPos.y + 0.8f * normal.y), (vertexPos.z + 0.1f));
+            blocks[1] = worldView.getBlock((vertexPos.x + 0.1f), (vertexPos.y + 0.8f * normal.y), (vertexPos.z - 0.1f));
+            blocks[2] = worldView.getBlock((vertexPos.x - 0.1f), (vertexPos.y + 0.8f * normal.y), (vertexPos.z - 0.1f));
+            blocks[3] = worldView.getBlock((vertexPos.x - 0.1f), (vertexPos.y + 0.8f * normal.y), (vertexPos.z + 0.1f));
+        } else if (normal.x == 1.0f || normal.x == -1.0f) {
+            blocks[0] = worldView.getBlock((vertexPos.x + 0.8f * normal.x), (vertexPos.y + 0.1f), (vertexPos.z + 0.1f));
+            blocks[1] = worldView.getBlock((vertexPos.x + 0.8f * normal.x), (vertexPos.y + 0.1f), (vertexPos.z - 0.1f));
+            blocks[2] = worldView.getBlock((vertexPos.x + 0.8f * normal.x), (vertexPos.y - 0.1f), (vertexPos.z - 0.1f));
+            blocks[3] = worldView.getBlock((vertexPos.x + 0.8f * normal.x), (vertexPos.y - 0.1f), (vertexPos.z + 0.1f));
+        } else /*if (normal.z == 1.0f)*/ {
+            blocks[0] = worldView.getBlock((vertexPos.x + 0.1f), (vertexPos.y + 0.1f), (vertexPos.z + 0.8f * normal.z));
+            blocks[1] = worldView.getBlock((vertexPos.x + 0.1f), (vertexPos.y - 0.1f), (vertexPos.z + 0.8f * normal.z));
+            blocks[2] = worldView.getBlock((vertexPos.x - 0.1f), (vertexPos.y - 0.1f), (vertexPos.z + 0.8f * normal.z));
+            blocks[3] = worldView.getBlock((vertexPos.x - 0.1f), (vertexPos.y + 0.1f), (vertexPos.z + 0.8f * normal.z));
+        }
 
         lights[0] = worldView.getSunlight((vertexPos.x + 0.1f), (vertexPos.y + 0.8f), (vertexPos.z + 0.1f));
         lights[1] = worldView.getSunlight((vertexPos.x + 0.1f), (vertexPos.y + 0.8f), (vertexPos.z - 0.1f));
@@ -217,7 +228,7 @@ public final class ChunkTessellator {
             }
         }
 
-        double resultAmbientOcclusion = (Math.pow(0.60, occCounter) + Math.pow(0.86, occCounterBillboard)) / 2.0;
+        double resultAmbientOcclusion = (Math.pow(0.40, occCounter) + Math.pow(0.80, occCounterBillboard)) / 2.0;
 
         if (counterLight == 0)
             output[0] = 0;
@@ -271,8 +282,11 @@ public final class ChunkTessellator {
             // Draw horizontal sides if visible from below
             for (Side side : Side.horizontalSides()) {
                 Vector3i offset = side.getVector3i();
-                Block blockToCheck = view.getBlock(x + offset.x, y - 1, z + offset.z);
-                drawDir[side.ordinal()] |= isSideVisibleForBlockTypes(blockToCheck, block, side);
+                Block adjacentBelow = view.getBlock(x + offset.x, y - 1, z + offset.z);
+                Block adjacent = view.getBlock(x + offset.x, y, z + offset.z);
+                Block below = view.getBlock(x, y - 1, z);
+
+                drawDir[side.ordinal()] |= (isSideVisibleForBlockTypes(adjacentBelow, block, side) && !isSideVisibleForBlockTypes(below, adjacent, side.reverse()));
             }
 
             // Draw the top if below a non-lowered block
@@ -311,7 +325,6 @@ public final class ChunkTessellator {
         if (currentBlock.getMeshPart(BlockPart.fromSide(side)) == null) return false;
 
         // Liquids can be transparent but there should be no visible adjacent faces
-        // !!! In comparison to leaves !!!
         if (currentBlock.isLiquid() && blockToCheck.isLiquid()) return false;
 
         return blockToCheck.getId() == 0x0 ||

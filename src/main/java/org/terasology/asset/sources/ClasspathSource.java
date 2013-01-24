@@ -32,7 +32,7 @@ public class ClasspathSource implements AssetSource {
 
     private AssetSource source;
 
-    public ClasspathSource(String id, CodeSource cs, String basePath) {
+    public ClasspathSource(String id, CodeSource cs, String baseAssetsPath, String baseOverridesPath) {
         if (cs == null) {
             throw new IllegalStateException("Can't access assets: CodeSource is null");
         }
@@ -42,9 +42,9 @@ public class ClasspathSource implements AssetSource {
         try {
             File codePath = new File(url.toURI());
             if (codePath.isFile()) {
-                source = new ArchiveSource(id, codePath, basePath);
+                source = new ArchiveSource(id, codePath, baseAssetsPath, baseOverridesPath);
             } else {
-                source = new DirectorySource(id, new File(codePath, basePath));
+                source = new DirectorySource(id, new File(codePath, baseAssetsPath), new File(codePath, baseOverridesPath));
             }
         } catch (Throwable e) {
             throw new IllegalStateException("Error loading assets: " + e.getMessage(), e);
@@ -69,5 +69,15 @@ public class ClasspathSource implements AssetSource {
     @Override
     public Iterable<AssetUri> list(AssetType type) {
         return source.list(type);
+    }
+
+    @Override
+    public List<URL> getOverride(AssetUri uri) {
+        return source.getOverride(uri);
+    }
+
+    @Override
+    public Iterable<AssetUri> listOverrides() {
+        return source.listOverrides();
     }
 }

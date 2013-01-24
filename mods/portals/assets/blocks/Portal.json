@@ -18,6 +18,10 @@
  * Portal blocks are used in portals!
  */
 {
+    "shadowCasting" : false,
+    "luminance" : 10,
+    "hardness" : 10,
+    "penetrable" : true,
     "entity" : {
         "prefab" : "portals:portal"
     }

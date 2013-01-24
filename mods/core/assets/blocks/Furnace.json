@@ -18,6 +18,7 @@
  * A chest is interesting for two reasons: It is asymmetrical (front texture differs) and should store stuff
  */
 {
+    "craftPlace" : false,
     "tiles" : {
         "sides" : "core:FurnaceSides",
         "front" : "core:FurnaceFront",

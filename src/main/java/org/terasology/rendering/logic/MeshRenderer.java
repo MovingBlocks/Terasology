@@ -15,6 +15,53 @@
  */
 package org.terasology.rendering.logic;
 
+import com.bulletphysics.linearmath.Transform;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.SetMultimap;
+import com.google.common.collect.Sets;
+import gnu.trove.list.TFloatList;
+import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TFloatArrayList;
+import gnu.trove.list.array.TIntArrayList;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL13;
+import org.lwjgl.opengl.GL15;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.componentSystem.RenderSystem;
+import org.terasology.components.utility.DroppedItemTypeComponent;
+import org.terasology.components.world.LocationComponent;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.event.AddComponentEvent;
+import org.terasology.entitySystem.event.RemovedComponentEvent;
+import org.terasology.game.CoreRegistry;
+import org.terasology.logic.manager.ShaderManager;
+import org.terasology.logic.manager.VertexBufferObjectManager;
+import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.AABB;
+import org.terasology.math.TeraMath;
+import org.terasology.performanceMonitor.PerformanceMonitor;
+import org.terasology.rendering.assets.Material;
+import org.terasology.rendering.primitives.Mesh;
+import org.terasology.rendering.primitives.Tessellator;
+import org.terasology.rendering.primitives.TessellatorHelper;
+import org.terasology.rendering.shader.ShaderProgram;
+import org.terasology.rendering.world.WorldRenderer;
+
+import javax.vecmath.AxisAngle4f;
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.util.Set;
+
 import static org.lwjgl.opengl.GL11.GL_COLOR_ARRAY;
 import static org.lwjgl.opengl.GL11.GL_NORMAL_ARRAY;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_COORD_ARRAY;
@@ -32,58 +79,6 @@ import static org.lwjgl.opengl.GL11.glScalef;
 import static org.lwjgl.opengl.GL11.glTexCoordPointer;
 import static org.lwjgl.opengl.GL11.glTranslated;
 import static org.lwjgl.opengl.GL11.glVertexPointer;
-
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.SetMultimap;
-import gnu.trove.list.TFloatList;
-import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TFloatArrayList;
-import gnu.trove.list.array.TIntArrayList;
-
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.util.Set;
-
-import javax.vecmath.AxisAngle4f;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
-
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-import org.lwjgl.opengl.GL13;
-import org.lwjgl.opengl.GL15;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.componentSystem.RenderSystem;
-import org.terasology.components.world.LocationComponent;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
-import org.terasology.entitySystem.event.AddComponentEvent;
-import org.terasology.entitySystem.event.RemovedComponentEvent;
-import org.terasology.game.CoreRegistry;
-import org.terasology.logic.players.LocalPlayer;
-import org.terasology.logic.manager.ShaderManager;
-import org.terasology.logic.manager.VertexBufferObjectManager;
-import org.terasology.math.AABB;
-import org.terasology.math.TeraMath;
-import org.terasology.performanceMonitor.PerformanceMonitor;
-import org.terasology.rendering.assets.Material;
-import org.terasology.rendering.primitives.Mesh;
-import org.terasology.rendering.primitives.Tessellator;
-import org.terasology.rendering.primitives.TessellatorHelper;
-import org.terasology.rendering.shader.ShaderProgram;
-import org.terasology.rendering.world.WorldRenderer;
-
-import com.bulletphysics.linearmath.Transform;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 
 /**
  * TODO: This should be made generic (no explicit shader or mesh) and ported directly into WorldRenderer? Later note: some GelCube functionality moved to a mod
@@ -134,6 +129,9 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
 
     @ReceiveEvent(components = {MeshComponent.class})
     public void onNewMesh(AddComponentEvent event, EntityRef entity) {
+        if (entity.getComponent(DroppedItemTypeComponent.class) != null) {
+            return;
+        }
         MeshComponent meshComp = entity.getComponent(MeshComponent.class);
         if (meshComp.renderType == MeshComponent.RenderType.GelatinousCube) {
             gelatinous.add(entity);
@@ -144,6 +142,9 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
 
     @ReceiveEvent(components = {MeshComponent.class})
     public void onDestroyMesh(RemovedComponentEvent event, EntityRef entity) {
+        if (entity.getComponent(DroppedItemTypeComponent.class) != null) {
+            return;
+        }
         MeshComponent meshComponent = entity.getComponent(MeshComponent.class);
         if (meshComponent.renderType == MeshComponent.RenderType.GelatinousCube) {
             gelatinous.remove(entity);
@@ -277,8 +278,7 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
                         indexOffset = meshComp.mesh.addToBatch(trans, normTrans, vertexData, indexData, indexOffset);
                     }
 
-                    if (indexOffset > 100)
-                    {
+                    if (indexOffset > 100) {
                         renderBatch(vertexData, indexData);
                         vertexData.clear();
                         indexData.clear();

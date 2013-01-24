@@ -22,6 +22,7 @@ import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.network.ClientComponent;
+import org.terasology.math.TeraMath;
 import org.terasology.physics.character.CharacterMovementComponent;
 
 import javax.vecmath.Quat4f;
@@ -98,10 +99,14 @@ public class LocalPlayer {
             return new Vector3f(0, 0, -1);
         }
         Quat4f rot = new Quat4f();
+        QuaternionUtil.setEuler(rot, TeraMath.DEG_TO_RAD * localPlayer.viewYaw, TeraMath.DEG_TO_RAD * localPlayer.viewPitch, 0);
+        /* This code does not work, as it grabs the rotation of the mouse instead
+        Quat4f rot = new Quat4f();
         QuaternionUtil.setEuler(rot, localPlayer.viewYaw, localPlayer.viewPitch, 0);
+        */
         // TODO: Put a generator for direction vectors in a util class somewhere
         // And just put quaternion -> vector somewhere too
-        Vector3f dir = new Vector3f(0, 0, -1);
+        Vector3f dir = new Vector3f(0, 0, 1);
         return QuaternionUtil.quatRotate(rot, dir, dir);
     }
 

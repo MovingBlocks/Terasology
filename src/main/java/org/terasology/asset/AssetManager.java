@@ -53,6 +53,7 @@ public class AssetManager {
     private Map<String, AssetSource> assetSources = Maps.newHashMap();
     private EnumMap<AssetType, Map<String, AssetLoader>> assetLoaders = Maps.newEnumMap(AssetType.class);
     private Map<AssetUri, Asset> assetCache = Maps.newHashMap();
+    private Map<AssetUri, AssetSource> overrides = Maps.newHashMap();
 
     protected AssetManager() {
     }
@@ -167,6 +168,15 @@ public class AssetManager {
         assetSources.remove(source.getSourceId().toLowerCase(Locale.ENGLISH));
     }
 
+    public void applyOverrides() {
+        overrides.clear();
+        for (AssetSource assetSource : assetSources.values()) {
+            for (AssetUri overrideURI : assetSource.listOverrides()) {
+                overrides.put(overrideURI, assetSource);
+            }
+        }
+    }
+
     public Iterable<AssetUri> listAssets() {
         return new Iterable<AssetUri>() {
 
@@ -192,9 +202,14 @@ public class AssetManager {
     }
 
     public List<URL> getAssetURLs(AssetUri uri) {
-        AssetSource source = assetSources.get(uri.getPackage());
-        if (source != null) {
-            return source.get(uri);
+        AssetSource overrideSource = overrides.get(uri);
+        if (overrideSource != null) {
+            return overrideSource.getOverride(uri);
+        } else {
+            AssetSource source = assetSources.get(uri.getPackage());
+            if (source != null) {
+                return source.get(uri);
+            }
         }
         return Lists.newArrayList();
     }

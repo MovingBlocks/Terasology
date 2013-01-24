@@ -59,6 +59,7 @@ import static org.lwjgl.opengl.GL11.glIsEnabled;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
+// TODO: Make this immutable, add a block builder class
 public class Block {
     public static final float TEXTURE_OFFSET = 0.0625f;
     public static final float TEXTURE_OFFSET_WIDTH = 0.0624f;
@@ -130,6 +131,7 @@ public class Block {
     private String displayName = "Untitled block";
     private BlockUri uri;
     private BlockFamily family = null;
+    private Side direction = Side.FRONT;
 
     /* PROPERTIES */
 
@@ -137,6 +139,7 @@ public class Block {
     private boolean liquid = false;
     private boolean attachmentAllowed = true;
     private boolean replacementAllowed = false;
+    private boolean craftPlace = true;
     private byte hardness = 0x3;
     private boolean supportRequired = false;
     private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<Side>(Side.class);
@@ -220,6 +223,14 @@ public class Block {
 
     public void setBlockFamily(BlockFamily family) {
         this.family = family;
+    }
+
+    public void setDirection(Side direction) {
+        this.direction = direction;
+    }
+
+    public Side getDirection() {
+        return direction;
     }
 
     /**
@@ -428,6 +439,18 @@ public class Block {
 
     public void setDebrisOnDestroy(boolean debrisOnDestroy) {
         this.debrisOnDestroy = debrisOnDestroy;
+    }
+
+    /**
+     * @return Can player craft on this block?
+     */
+
+    public boolean isCraftPlace(){
+        return craftPlace;
+    }
+
+    public void setCraftPlace(boolean craftPlace){
+        this.craftPlace = craftPlace;
     }
 
     public float getMass() {

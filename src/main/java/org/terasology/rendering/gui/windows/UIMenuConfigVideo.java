@@ -16,6 +16,9 @@
 package org.terasology.rendering.gui.windows;
 
 import org.terasology.asset.Assets;
+import org.terasology.game.CoreRegistry;
+import org.terasology.game.GameEngine;
+import org.terasology.game.TerasologyEngine;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -47,6 +50,7 @@ public class UIMenuConfigVideo extends UIWindow {
     private final UIStateButton reflectiveWaterButton;
     private final UIStateButton blurIntensityButton;
     private final UIStateButton bobbingButton;
+    private final UIStateButton fullscreenButton;
     private final UIButton backToConfigMenuButton;
 
     final UILabel version;
@@ -192,8 +196,8 @@ public class UIMenuConfigVideo extends UIWindow {
                 ShaderManager.getInstance().recompileAllShaders();
             }
         };
-        reflectiveWaterButton.addState("Reflective water: Off", reflectiveWaterStateAction);
-        reflectiveWaterButton.addState("Reflective water: On", reflectiveWaterStateAction);
+        reflectiveWaterButton.addState("Water World Reflection: Off", reflectiveWaterStateAction);
+        reflectiveWaterButton.addState("Water World Reflection: On", reflectiveWaterStateAction);
         reflectiveWaterButton.addClickListener(clickAction);
         reflectiveWaterButton.setHorizontalAlign(EHorizontalAlign.CENTER);
         reflectiveWaterButton.setPosition(new Vector2f(reflectiveWaterButton.getSize().x / 2f, 300f + 40f));
@@ -205,16 +209,37 @@ public class UIMenuConfigVideo extends UIWindow {
             public void action(UIDisplayElement element) {
                 UIStateButton button = (UIStateButton)element;
                 Config.getInstance().setBlurIntensity(button.getState());
+                ShaderManager.getInstance().recompileAllShaders();
             }
         };
-        blurIntensityButton.addState("Blur intensity: Off", blurIntensityStateAction);
-        blurIntensityButton.addState("Blur intensity: Some", blurIntensityStateAction);
-        blurIntensityButton.addState("Blur intensity: Normal", blurIntensityStateAction);
-        blurIntensityButton.addState("Blur intensity: Max", blurIntensityStateAction);
+        blurIntensityButton.addState("Blur Intensity: Off", blurIntensityStateAction);
+        blurIntensityButton.addState("Blur Intensity: Some", blurIntensityStateAction);
+        blurIntensityButton.addState("Blur Intensity: Normal", blurIntensityStateAction);
+        blurIntensityButton.addState("Blur Intensity: Max", blurIntensityStateAction);
         blurIntensityButton.addClickListener(clickAction);
         blurIntensityButton.setHorizontalAlign(EHorizontalAlign.CENTER);
         blurIntensityButton.setPosition(new Vector2f(blurIntensityButton.getSize().x / 2f, 300f + 2 * 40f));
         blurIntensityButton.setVisible(true);
+
+        fullscreenButton = new UIStateButton(new Vector2f(256f, 32f));
+        StateButtonAction fullscreenStateAction = new StateButtonAction() {
+            @Override
+            public void action(UIDisplayElement element) {
+                UIStateButton button = (UIStateButton)element;
+                TerasologyEngine te = (TerasologyEngine) CoreRegistry.get(GameEngine.class);
+
+                if (button.getState() == 0)
+                    te.setFullscreen(false);
+                else
+                    te.setFullscreen(true);
+            }
+        };
+        fullscreenButton.addState("Fullscreen: Off", fullscreenStateAction);
+        fullscreenButton.addState("Fullscreen: On", fullscreenStateAction);
+        fullscreenButton.addClickListener(clickAction);
+        fullscreenButton.setHorizontalAlign(EHorizontalAlign.CENTER);
+        fullscreenButton.setPosition(new Vector2f(fullscreenButton.getSize().x / 2f, 300f + 3 * 40f));
+        fullscreenButton.setVisible(true);
         
         backToConfigMenuButton = new UIButton(new Vector2f(256f, 32f), UIButton.ButtonType.NORMAL);
         backToConfigMenuButton.getLabel().setText("Back");
@@ -239,6 +264,7 @@ public class UIMenuConfigVideo extends UIWindow {
         addDisplayElement(blurIntensityButton);
         addDisplayElement(bobbingButton);
         addDisplayElement(backToConfigMenuButton);
+        addDisplayElement(fullscreenButton);
         
         setup();
     }
@@ -271,6 +297,12 @@ public class UIMenuConfigVideo extends UIWindow {
             bobbingButton.setState(1);
         } else {
             bobbingButton.setState(0);
+        }
+
+        if (Config.getInstance().isFullscreen()) {
+            fullscreenButton.setState(1);
+        } else {
+            fullscreenButton.setState(0);
         }
     }
 }

@@ -22,17 +22,18 @@ uniform sampler2D textureWaterReflection;
 
 uniform float time;
 uniform float daylight = 1.0;
-uniform bool swimming;
 uniform bool carryingTorch;
+uniform bool swimming;
 
 uniform float clipHeight = 0.0;
 
 varying vec4 vertexWorldPosRaw;
 varying vec4 vertexWorldPos;
 varying vec4 vertexPos;
-varying vec3 eyeVec;
 varying vec3 lightDir;
 varying vec3 normal;
+varying vec3 waterNormal;
+varying float isUpside;
 
 varying float flickering;
 varying float flickeringAlternative;
@@ -45,8 +46,9 @@ uniform vec2 grassCoordinate;
 #define DAYLIGHT_AMBIENT_COLOR 0.95, 0.92, 0.91
 #define MOONLIGHT_AMBIENT_COLOR 0.8, 0.8, 1.0
 #define NIGHT_BRIGHTNESS 0.05
-#define WATER_COLOR 0.325, 0.419, 0.525, 0.5
-#define REFLECTION_COLOR 0.95, 0.97, 1.0, 0.75
+#define WATER_COLOR_SWIMMING 0.8, 1.0, 1.0, 0.975
+#define WATER_COLOR 0.8, 1.0, 1.0, 0.75
+#define REFLECTION_COLOR 1.0, 1.0, 1.0, 1.0
 
 #define TORCH_WATER_SPEC 8.0
 #define TORCH_WATER_DIFF 0.7
@@ -54,13 +56,13 @@ uniform vec2 grassCoordinate;
 #define TORCH_BLOCK_DIFF 1.0
 #define WATER_SPEC 2.0
 #define WATER_DIFF 1.0
-#define BLOCK_DIFF 0.25
+#define BLOCK_DIFF 0.6
 #define BLOCK_AMB 1.0
 
 #define WATER_REFRACTION 0.1
 
 void main(){
-	if (clipHeight > 0.0 && vertexWorldPosRaw.y < clipHeight) {
+	if (clipHeight > 0.0 && vertexWorldPosRaw.y < clipHeight && !swimming) {
         discard;
 	}
 
@@ -73,7 +75,7 @@ void main(){
     vec3 finalLightDir = lightDir;
 
     /* DAYLIGHT BECOMES... MOONLIGHT! */
-    /* Now featuring linear interpolation to make the transition more smoothly... :-) */
+    /* Now featuring linear interpolation to make the transition smoother... :-) */
     if (daylight < 0.1)
         finalLightDir = mix(finalLightDir * -1.0, finalLightDir, daylight / 0.1);
 
@@ -82,26 +84,22 @@ void main(){
     /* APPLY WATER TEXTURE */
     if (texCoord.x >= waterCoordinate.x && texCoord.x < waterCoordinate.x + TEXTURE_OFFSET && texCoord.y >= waterCoordinate.y && texCoord.y < waterCoordinate.y + TEXTURE_OFFSET) {
         vec2 waterOffset = vec2(vertexWorldPosRaw.x + timeToTick(time, 0.1), vertexWorldPosRaw.z + timeToTick(time, 0.1)) / 8.0;
-        vec2 waterOffsetLarge = vec2(vertexWorldPosRaw.x - timeToTick(time, 0.1), vertexWorldPosRaw.z + timeToTick(time, 0.1)) / 16.0;
+        normalWater.xyz = texture2D(textureWaterNormal, waterOffset).xyz * 2.0 - 1.0;
 
-        normalWater = (texture2D(textureWaterNormal, waterOffset) * 2.0 - 1.0).xyz;
+       // Enable reflection only when not swimming and for blocks on sea level
+        if (!swimming && isUpside > 0.99 && vertexWorldPosRaw.y < 32.5 && vertexWorldPosRaw.y > 31.5) {
+            vec2 projectedPos = 0.5 * (vertexPos.st/vertexPos.q) + vec2(0.5);
 
-#ifdef COMPLEX_WATER
-        vec3 normalWaterLarge = (texture2D(textureWaterNormal, waterOffsetLarge) * 2.0 - 1.0).xyz;
-
-        vec2 projectedPos = 0.5 * (vertexPos.st/vertexPos.q) + vec2(0.5);
-        normalWater = mix(normalWater, normalWaterLarge, clamp(0.5 + length(projectedPos), 0.0, 1.0));
-
-        color = texture2D(textureWaterReflection, projectedPos + normalWater.xy * WATER_REFRACTION) * vec4(REFLECTION_COLOR);
-
-        float ndot = dot(normalize(eyeVec), vec3(0.0, 1.0, 0.0));
-        float fresnel= 1.0 - clamp(0.5 + ndot * ndot * 0.5, 0.0, 1.0);
-        // Fresnel
-        //color = vec4(vec3(fresnel), 1.0);
-        color = mix(vec4(WATER_COLOR), color, fresnel);
-#else
-        color = vec4(WATER_COLOR);
-#endif
+            // Fresnel
+            float refractionFactor = WATER_REFRACTION * clamp(1.0 - length(vertexWorldPos.xyz) / 50.0, 0.25, 1.0);
+            vec4 reflectionColor = vec4(texture2D(textureWaterReflection, projectedPos + normalWater.xy * refractionFactor).xyz, 1.0);
+            float f = fresnel(max(dot(normalizedVPos, waterNormal), 0.0), 0.1, 5.0);
+            color = mix(reflectionColor * vec4(WATER_COLOR), reflectionColor * vec4(REFLECTION_COLOR), f);
+        } else if (!swimming && (vertexWorldPosRaw.y >= 32.5 || vertexWorldPosRaw.y <= 31.5)) {
+            color = vec4(WATER_COLOR);
+        } else {
+            color = vec4(WATER_COLOR_SWIMMING);
+        }
 
         isWater = true;
     /* APPLY LAVA TEXTURE */
@@ -161,10 +159,10 @@ void main(){
     if (carryingTorch) {
         if (isWater)
             torchlight = calcTorchlight(calcLambLight(normalWater, normalizedVPos) * TORCH_WATER_DIFF
-            + TORCH_WATER_SPEC * calcSpecLightWithOffset(normal, normalizedVPos, normalize(eyeVec), 64.0, normalWater), vertexWorldPos.xyz);
+            + TORCH_WATER_SPEC * calcSpecLightWithOffset(normal, normalizedVPos, normalizedVPos, 16.0, normalWater), vertexWorldPos.xyz);
         else
             torchlight = calcTorchlight(calcLambLight(normal, normalizedVPos) * TORCH_BLOCK_DIFF
-            + TORCH_BLOCK_SPEC * calcSpecLight(normal, normalizedVPos, normalize(eyeVec), 32.0), vertexWorldPos.xyz);
+            + TORCH_BLOCK_SPEC * calcSpecLight(normal, normalizedVPos, normalizedVPos, 32.0), vertexWorldPos.xyz);
     }
 
     vec3 daylightColorValue;
@@ -173,7 +171,7 @@ void main(){
     if (isWater) {
         /* WATER NEEDS DIFFUSE AND SPECULAR LIGHT */
         daylightColorValue = vec3(diffuseLighting) * WATER_DIFF;
-        daylightColorValue += calcSpecLightWithOffset(normal, finalLightDir, normalize(eyeVec), 64.0, normalWater) * WATER_SPEC;
+        daylightColorValue += calcSpecLightWithOffset(normal, finalLightDir, normalizedVPos, 64.0, normalWater) * WATER_SPEC;
     } else {
         /* DEFAULT LIGHTING ONLY CONSIST OF DIFFUSE AND AMBIENT LIGHT */
         daylightColorValue = vec3(BLOCK_AMB + diffuseLighting * BLOCK_DIFF);

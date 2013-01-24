@@ -17,7 +17,7 @@
         </encoder>
     </appender>
 
-    <logger name="org.terasology" level="INFO"/>
+    <logger name="org.terasology" level="DEBUG"/>
     <logger name="org.terasology.network" level="DEBUG"/>
 
     <root level="debug">

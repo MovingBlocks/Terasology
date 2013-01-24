@@ -36,5 +36,18 @@
   "PlaySoundAction" : {
     sounds = "engine:click"
   },
-  "AccessInventoryAction": {}
+  "AccessInventoryAction": {},
+  "CraftRecipe" : {
+        "recipe" :  {
+            bottom:
+                [
+                    "plank",  "plank", "plank",
+                    "plank",  " ",     "plank",
+                    "plank",  "plank", "plank"
+                ]
+        },
+
+        "resultCount": 1
+
+    }
 }

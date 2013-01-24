@@ -3,6 +3,13 @@
   "Mesh" : {
     "renderType" : "GelatinousCube"
   },
+    "Hunger" : {
+        "currentContentment" : 50,
+        "maxContentment" : 50,
+        "deregenRate" : 10,
+        "waitBeforeDeregen" : 10,
+	"waitBeetweenDamage" : 2
+    },
   "CharacterMovement" : {
     "height" : 1,
     "radius" : 0.5,

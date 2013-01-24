@@ -114,4 +114,12 @@ class ComponentTable {
         return idSet.iterator();
     }
 
+    public int numEntities() {
+        TIntSet idSet = new TIntHashSet();
+        for (TIntObjectMap<Component> componentMap : store.values()) {
+            idSet.addAll(componentMap.keys());
+        }
+        return idSet.size();
+    }
+
 }

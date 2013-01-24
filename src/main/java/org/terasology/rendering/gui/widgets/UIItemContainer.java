@@ -43,7 +43,8 @@ public class UIItemContainer extends UIDisplayContainer {
 
     private Vector2f cellMargin = new Vector2f(2, 2);
     private Vector2f cellSize = new Vector2f(48, 48);
-
+    private Vector2f iconPosition = new Vector2f(2f, 2f);
+    
     private int cols;
 
     private int slotStart = -1;
@@ -80,9 +81,10 @@ public class UIItemContainer extends UIDisplayContainer {
             if (slotEnd != -1) {
                 end = slotEnd;
             }
-
-            for (int i = start; i < end; ++i) {
-                UIItemCell cell = new UIItemCell(entity, cellSize);
+            
+            for (int i = start; i < end; ++i)
+            {
+                UIItemCell cell = new UIItemCell(entity, cellSize, iconPosition);
                 cell.setItemEntity(entityInventory.itemSlots.get(i), i);
                 cell.setSize(cellSize);
                 cell.setConnected(connectedEntity);
@@ -194,6 +196,18 @@ public class UIItemContainer extends UIDisplayContainer {
     public void setCols(int cols) {
         this.cols = cols;
         fillInventoryCells(entity.getComponent(InventoryComponent.class));
+    }
+    
+    public int getSlotStart(){
+        return slotStart;
+    }
+    
+    public int getSlotEnd(){
+        return slotEnd - 1;
+    }
+    
+    public void setIconPosition(Vector2f position){
+        iconPosition = position;
     }
 }
 

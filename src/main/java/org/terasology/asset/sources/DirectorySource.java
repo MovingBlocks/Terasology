@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetUri;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 
 /**
@@ -31,27 +30,55 @@ public class DirectorySource extends AbstractSource {
 
     private static final Logger logger = LoggerFactory.getLogger(DirectorySource.class);
 
-    public DirectorySource(String id, File rootDirectory) {
+    public DirectorySource(String id, File rootAssetsDirectory, File rootOverridesDirectory) {
         super(id);
 
-        assert rootDirectory.isDirectory();
+        assert rootAssetsDirectory.isDirectory();
+        assert rootOverridesDirectory.isDirectory();
 
-        try {
-            loadAssetsFrom(rootDirectory);
-        } catch (IOException e) {
-            throw new IllegalStateException("Error loading assets: " + e.getMessage(), e);
+        clear();
+        if (rootAssetsDirectory.exists() && rootAssetsDirectory.isDirectory()) {
+            scanAssets(rootAssetsDirectory, rootAssetsDirectory.getAbsolutePath());
+        }
+        if (rootOverridesDirectory.exists() && rootOverridesDirectory.isDirectory()) {
+            scanOverrides(rootOverridesDirectory, rootOverridesDirectory.getAbsolutePath());
         }
     }
 
-    private void loadAssetsFrom(File directory) throws IOException {
-        clear();
-        scanFiles(directory, directory.getAbsolutePath());
+    private void scanOverrides(File overrideDirectory, String basePath) {
+        for (File child : overrideDirectory.listFiles()) {
+            if (child.isDirectory()) {
+                scanOverrides(child, basePath);
+            } else if (child.isFile()) {
+                String key = child.getAbsolutePath();
+                if (key.startsWith(basePath)) {
+                    key = key.substring(basePath.length() + 1);
+                    key = key.replace(File.separatorChar, '/');
+
+                    int separatorIndex = key.indexOf('/');
+                    if (separatorIndex == -1) {
+                        continue;
+                    }
+                    String moduleName = key.substring(0, separatorIndex);
+                    key = key.substring(separatorIndex + 1);
+
+                    AssetUri uri = getUri(moduleName, key);
+                    if (uri != null) {
+                        try {
+                            addOverride(uri, child.toURI().toURL());
+                        } catch (MalformedURLException e) {
+                            logger.warn("Failed to load override {}", key, e.getMessage());
+                        }
+                    }
+                }
+            }
+        }
     }
 
-    private void scanFiles(File file, String basePath) {
+    private void scanAssets(File file, String basePath) {
         for (File child : file.listFiles()) {
             if (child.isDirectory()) {
-                scanFiles(child, basePath);
+                scanAssets(child, basePath);
             } else if (child.isFile()) {
                 String key = child.getAbsolutePath();
 
@@ -71,5 +98,6 @@ public class DirectorySource extends AbstractSource {
                 }
             }
         }
+
     }
 }

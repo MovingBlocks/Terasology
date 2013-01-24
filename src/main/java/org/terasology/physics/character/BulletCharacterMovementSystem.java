@@ -41,6 +41,7 @@ import org.terasology.events.VerticalCollisionEvent;
 import org.terasology.math.Vector3fUtil;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.physics.CollisionGroup;
+import org.terasology.physics.MovedEvent;
 import org.terasology.world.WorldProvider;
 
 import javax.vecmath.AxisAngle4f;
@@ -170,7 +171,7 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
 
     private void updatePosition(final float delta, final EntityRef entity, final LocationComponent location, final CharacterMovementComponent movementComp) {
         if (movementComp.isGhosting) {
-            ghost(delta, location, movementComp);
+            ghost(delta, entity, location, movementComp);
         } else if (movementComp.isSwimming) {
             swim(delta, entity, location, movementComp);
         } else {
@@ -212,6 +213,9 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
         distanceMoved.sub(location.getWorldPosition());
 
         location.setWorldPosition(moveResult.finalPosition);
+        if (distanceMoved.length() > 0)
+            entity.send(new MovedEvent(distanceMoved, moveResult.finalPosition));
+
         movementComp.collider.setWorldTransform(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), moveResult.finalPosition, 1.0f)));
 
         if (movementComp.faceMovementDirection && distanceMoved.lengthSquared() > 0.01f) {
@@ -221,7 +225,7 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
         }
     }
 
-    private void ghost(float delta, LocationComponent location, CharacterMovementComponent movementComp) {
+    private void ghost(float delta, EntityRef entity, LocationComponent location, CharacterMovementComponent movementComp) {
         Vector3f desiredVelocity = new Vector3f(movementComp.getDrive());
         float maxSpeed = movementComp.maxGhostSpeed;
         if (movementComp.isRunning) {
@@ -244,6 +248,9 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
         deltaPos.scale(delta);
         worldPos.add(deltaPos);
         location.setWorldPosition(worldPos);
+        if (deltaPos.length() > 0)
+            entity.send(new MovedEvent(deltaPos, worldPos));
+
         movementComp.collider.setWorldTransform(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), worldPos, 1.0f)));
 
         if (movementComp.faceMovementDirection && movementComp.getVelocity().lengthSquared() > 0.01f) {
@@ -289,6 +296,9 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
         distanceMoved.sub(location.getWorldPosition());
 
         location.setWorldPosition(moveResult.finalPosition);
+        if (distanceMoved.length() > 0)
+            entity.send(new MovedEvent(distanceMoved, moveResult.finalPosition));
+
         movementComp.collider.setWorldTransform(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), moveResult.finalPosition, 1.0f)));
 
         if (moveResult.hitBottom) {
@@ -313,7 +323,7 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
         }
 
         if (moveResult.hitHoriz) {
-            entity.send(new HorizontalCollisionEvent());
+            entity.send(new HorizontalCollisionEvent(location.getWorldPosition(),movementComp.getVelocity()));
         }
 
         if (movementComp.isGrounded) {

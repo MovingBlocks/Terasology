@@ -27,15 +27,14 @@ import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.Vector3i;
-import org.terasology.model.structures.TeraArray;
-import org.terasology.model.structures.TeraSmartArray;
+import org.terasology.protobuf.ChunksProtobuf;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.Chunks;
 
 import static org.terasology.protobuf.NetData.BlockChangeMessage;
-import static org.terasology.protobuf.NetData.ChunkMessage;
 import static org.terasology.protobuf.NetData.ClientConnectMessage;
 import static org.terasology.protobuf.NetData.InvalidateChunkMessage;
 import static org.terasology.protobuf.NetData.NetMessage;
@@ -113,13 +112,9 @@ public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
         server.invalidateChunks(NetworkUtil.convert(invalidateChunk.getPos()));
     }
 
-    private void receivedChunk(ChunkMessage chunkInfo) {
-        logger.debug("Received chunk {}", NetworkUtil.convert(chunkInfo.getPos()));
-        TeraArray blocks = new TeraArray(Chunk.SIZE_X, Chunk.SIZE_Y, Chunk.SIZE_Z, chunkInfo.getBlockData().toByteArray());
-        TeraSmartArray sunlight = new TeraSmartArray(Chunk.SIZE_X, Chunk.SIZE_Y, Chunk.SIZE_Z, chunkInfo.getSunlightData().toByteArray());
-        TeraSmartArray light = new TeraSmartArray(Chunk.SIZE_X, Chunk.SIZE_Y, Chunk.SIZE_Z, chunkInfo.getLightData().toByteArray());
-        TeraSmartArray liquid = new TeraSmartArray(Chunk.SIZE_X, Chunk.SIZE_Y, Chunk.SIZE_Z, chunkInfo.getLiquidData().toByteArray());
-        Chunk chunk = new Chunk(NetworkUtil.convert(chunkInfo.getPos()), blocks, sunlight, light, liquid);
+    private void receivedChunk(ChunksProtobuf.Chunk chunkInfo) {
+        logger.debug("Received chunk {}, {}, {}", chunkInfo.getX(), chunkInfo.getY(), chunkInfo.getZ());
+        Chunk chunk = Chunks.getInstance().decode(chunkInfo);
         server.receiveChunk(chunk);
     }
 

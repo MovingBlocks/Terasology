@@ -17,6 +17,7 @@
 package org.terasology.asset.sources;
 
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 
 import org.terasology.asset.AssetSource;
@@ -53,6 +54,16 @@ public class NullSource implements AssetSource {
 
     @Override
     public Iterable<AssetUri> list(AssetType type) {
+        return NullIterator.newInstance();
+    }
+
+    @Override
+    public List<URL> getOverride(AssetUri uri) {
+        return Collections.EMPTY_LIST;
+    }
+
+    @Override
+    public Iterable<AssetUri> listOverrides() {
         return NullIterator.newInstance();
     }
 }

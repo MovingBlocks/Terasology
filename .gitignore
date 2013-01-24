@@ -18,6 +18,7 @@
 /bin
 /data/console/consolelog.json
 /mods/*/classes
+/mods/*/testClasses
 /mods/*/build
 /mods/*/.*
 *~
@@ -25,4 +26,7 @@ entityDump.txt
 
 # Ignore error logs 
 *.log
+
+#Ignore linux directory files
+*.directory
 

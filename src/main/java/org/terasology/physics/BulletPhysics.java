@@ -231,7 +231,7 @@ public class BulletPhysics implements EventReceiver<BlockChangedEvent> {
         processQueuedBodies();
         try {
             PerformanceMonitor.startActivity("Step Simulation");
-            _discreteDynamicsWorld.stepSimulation(delta, 1);
+            _discreteDynamicsWorld.stepSimulation(delta, 8);
             PerformanceMonitor.endActivity();
         } catch (Exception e) {
             logger.error("Error running simulation step.", e);

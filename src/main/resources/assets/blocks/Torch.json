@@ -31,6 +31,10 @@
     "shadowCasting" : false,
     "luminance" : 15,
     "hardness" : 1,
+    "entity" : {
+        "prefab" : "core:torch",
+        "mode" : "on_interaction"
+    },
     "inventory" : {
         "directPickup" : true
     }

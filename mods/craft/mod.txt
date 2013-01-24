@@ -1,0 +1,5 @@
+{
+    "id" : "craft",
+    "displayName" : "Craft System",
+    "description" : "This mod adds craft system"
+}

@@ -34,20 +34,19 @@ import java.util.zip.ZipFile;
 public class ArchiveSource extends AbstractSource {
 
     private final Logger logger = LoggerFactory.getLogger(ArchiveSource.class);
-    private String basePath;
 
-    public ArchiveSource(String sourceId, File archive, String basePath) {
+    public ArchiveSource(String sourceId, File archive, String assetsPath, String overridesPath) {
         super(sourceId);
-        this.basePath = basePath;
 
         try {
-            scanArchive(archive);
+            scanArchiveForAssets(archive, assetsPath);
+            scanArchiveForOverrides(archive, overridesPath);
         } catch (IOException e) {
             throw new IllegalStateException("Error loading assets: " + e.getMessage(), e);
         }
     }
 
-    protected void scanArchive(File file) throws IOException {
+    private void scanArchiveForOverrides(File file, String overridesPath) throws IOException {
         ZipFile archive;
 
         if (file.getName().endsWith(".jar")) {
@@ -63,8 +62,44 @@ public class ArchiveSource extends AbstractSource {
             String entryPath = entry.getName();
             logger.debug("Found {}", entryPath);
 
-            if (entryPath.startsWith(basePath)) {
-                String key = entryPath.substring(basePath.length() + 1);
+            if (entryPath.startsWith(overridesPath)) {
+                String key = entryPath.substring(overridesPath.length() + 1);
+                int moduleIndex = key.indexOf('/');
+                String moduleName = key.substring(0, moduleIndex);
+                key = key.substring(moduleIndex + 1);
+
+                AssetUri uri = getUri(moduleName, key);
+                if (uri == null || !uri.isValid()) {
+                    continue;
+                }
+
+                logger.debug("Discovered override {} at {}", uri, entryPath);
+
+                // Using a jar protocol for zip files, because cannot register new protocols for the applet
+                URL url = new URL("jar:file:" + file.getAbsolutePath() + "!/" + entryPath);
+                addOverride(uri, url);
+            }
+        }
+    }
+
+    protected void scanArchiveForAssets(File file, String assetsPath) throws IOException {
+        ZipFile archive;
+
+        if (file.getName().endsWith(".jar")) {
+            archive = new JarFile(file, false);
+        } else {
+            archive = new ZipFile(file);
+        }
+
+        Enumeration<? extends ZipEntry> lister = archive.entries();
+
+        while (lister.hasMoreElements()) {
+            ZipEntry entry = lister.nextElement();
+            String entryPath = entry.getName();
+            logger.debug("Found {}", entryPath);
+
+            if (entryPath.startsWith(assetsPath)) {
+                String key = entryPath.substring(assetsPath.length() + 1);
                 AssetUri uri = getUri(key);
                 if (uri == null || !uri.isValid()) {
                     continue;

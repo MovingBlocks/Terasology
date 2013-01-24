@@ -1,0 +1,21 @@
+{
+    "Item" : {
+        "name" : "Stick",
+        "icon" : "Stick",
+        "renderWithIcon" : true,
+        "stackId" : "core:stick"
+    },
+    "CraftRecipe" : {
+        "fullMatch": false,
+        "recipe" :  {
+            bottom:
+                [
+                    "plank", " ", " ",
+                    "plank", " ", " ",
+                    " ",     " ", " ",
+                ]
+        },
+        "resultCount": 4
+
+    }
+}

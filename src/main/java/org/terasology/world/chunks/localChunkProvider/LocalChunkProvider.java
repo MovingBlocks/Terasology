@@ -22,6 +22,7 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.components.world.LocationComponent;
+import org.terasology.config.AdvancedConfig;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.PathManager;
@@ -89,6 +90,8 @@ public class LocalChunkProvider implements ChunkProvider {
     public LocalChunkProvider(ChunkStore farStore, ChunkGeneratorManager generator) {
         this.farStore = farStore;
         this.generator = generator;
+        
+        logger.info("CACHE_SIZE = {} for nearby chunks", CACHE_SIZE);
 
         reviewChunkQueue = new PriorityBlockingQueue<ChunkRequest>(32);
         reviewThreads = Executors.newFixedThreadPool(REQUEST_CHUNK_THREADS);
@@ -512,6 +515,20 @@ public class LocalChunkProvider implements ChunkProvider {
             }
             logger.debug("Now complete {}", pos);
             chunk.setChunkState(Chunk.State.COMPLETE);
+            AdvancedConfig config = CoreRegistry.get(org.terasology.config.Config.class).getAdvancedConfig();
+            if (config.isChunkDeflationEnabled()) {
+                if (!chunkTasksQueue.offer(new AbstractChunkTask(pos, this) {
+                    @Override
+                    public void enact() {
+                        Chunk chunk = getChunk(getPosition());
+                        if (chunk != null) {
+                            chunk.deflate();
+                        }
+                    }
+                })) {
+                    logger.warn("LocalChunkProvider.chunkTasksQueue rejected deflation task for chunk {}", pos);
+                }
+            }
             for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, LOCAL_REGION_EXTENTS)) {
                 checkChunkReady(adjPos);
             }

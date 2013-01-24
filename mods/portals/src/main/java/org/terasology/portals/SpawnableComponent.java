@@ -26,4 +26,9 @@ public class SpawnableComponent implements Component {
 
     /** What category is this spawnable */
     public String type = "undefined";
+    
+    /** Weight for how common the spawnable is, from 0-255 with 0 meaning unspawnable and 255 being the most common */
+    public short probability = 1;
+    
+    //TODO add darkness level and biome when map generation has reached better level
 }
