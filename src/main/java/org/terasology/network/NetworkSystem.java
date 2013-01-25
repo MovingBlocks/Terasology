@@ -255,8 +255,7 @@ public class NetworkSystem implements EntityChangeSubscriber {
             netIdToEntityId.remove(netComponent.networkId);
             if (mode == NetworkMode.SERVER) {
                 NetData.NetMessage message = NetData.NetMessage.newBuilder()
-                        .setType(NetData.NetMessage.Type.REMOVE_ENTITY)
-                        .setRemoveEntity(
+                        .addRemoveEntity(
                                 NetData.RemoveEntityMessage.newBuilder().setNetId(netComponent.networkId).build())
                         .build();
                 for (Client client : clientList) {
@@ -490,7 +489,7 @@ public class NetworkSystem implements EntityChangeSubscriber {
         serializeEventInfo(serverInfoMessageBuilder);
 
         serverInfoMessageBuilder.setClientId(client.getEntity().getComponent(NetworkComponent.class).networkId);
-        client.send(NetData.NetMessage.newBuilder().setType(NetData.NetMessage.Type.SERVER_INFO).setServerInfo(serverInfoMessageBuilder.build()).build());
+        client.send(NetData.NetMessage.newBuilder().setTime(timer.getTimeInMs()).setServerInfo(serverInfoMessageBuilder).build());
     }
 
     private void serializeEventInfo(NetData.ServerInfoMessage.Builder serverInfoMessageBuilder) {

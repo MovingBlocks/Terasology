@@ -18,6 +18,8 @@ import org.terasology.entitySystem.PersistableEntityManager;
 import org.terasology.entitySystem.persistence.EntitySerializer;
 import org.terasology.entitySystem.persistence.EventSerializer;
 import org.terasology.entitySystem.persistence.PackedEntitySerializer;
+import org.terasology.game.CoreRegistry;
+import org.terasology.game.Timer;
 import org.terasology.math.Vector3i;
 import org.terasology.network.serialization.ClientComponentFieldCheck;
 import org.terasology.network.serialization.NetworkEventFieldCheck;
@@ -64,9 +66,12 @@ public class Server {
     private AtomicInteger sentMessages = new AtomicInteger();
     private AtomicInteger sentBytes = new AtomicInteger();
 
+    private Timer timer;
+
     public Server(NetworkSystem system, Channel channel) {
         this.channel = channel;
         this.networkSystem = system;
+        this.timer = CoreRegistry.get(Timer.class);
     }
 
     void connectToEntitySystem(PersistableEntityManager entityManager, PackedEntitySerializer entitySerializer, EventSerializer eventSerializer, BlockEntityRegistry blockEntityRegistry) {
@@ -91,8 +96,7 @@ public class Server {
 
     public void send(Event event, int targetId) {
         NetData.NetMessage message = NetData.NetMessage.newBuilder()
-                .setType(NetData.NetMessage.Type.EVENT)
-                .setEvent(NetData.EventMessage.newBuilder()
+                .addEvent(NetData.EventMessage.newBuilder()
                         .setEvent(eventSerializer.serialize(event, new NetworkEventFieldCheck()))
                         .setTargetId(targetId))
                 .build();
@@ -115,7 +119,7 @@ public class Server {
     }
 
     private void send(NetData.NetMessage data) {
-        logger.trace("Sending {} size {}", data.getType(), data.getSerializedSize());
+        logger.trace("Sending with size {}",  data.getSerializedSize());
         sentMessages.incrementAndGet();
         sentBytes.addAndGet(data.getSerializedSize());
         channel.write(data);
@@ -130,8 +134,7 @@ public class Server {
                 EntityData.PackedEntity entityData = entitySerializer.serialize(entity, Collections.EMPTY_SET, changedComponents.get(netId), Collections.EMPTY_SET, new ClientComponentFieldCheck());
                 if (entityData != null) {
                     NetData.NetMessage message = NetData.NetMessage.newBuilder()
-                            .setType(NetData.NetMessage.Type.UPDATE_ENTITY)
-                            .setUpdateEntity(NetData.UpdateEntityMessage.newBuilder().setEntity(entityData).setNetId(netId))
+                            .addUpdateEntity(NetData.UpdateEntityMessage.newBuilder().setEntity(entityData).setNetId(netId))
                             .build();
                     send(message);
                 }
@@ -185,27 +188,28 @@ public class Server {
         queuedMessages.drainTo(messages);
 
         for (NetData.NetMessage message : messages) {
-            switch (message.getType()) {
-                case CREATE_ENTITY:
-                    createEntityMessage(message.getCreateEntity());
-                    break;
-                case UPDATE_ENTITY:
-                    EntityRef currentEntity = networkSystem.getEntity(message.getUpdateEntity().getNetId());
-                    if (currentEntity.exists()) {
-                        entitySerializer.deserializeOnto(currentEntity, message.getUpdateEntity().getEntity());
-                    }
-                    break;
-                case REMOVE_ENTITY:
-                    int netId = message.getRemoveEntity().getNetId();
-                    EntityRef entity = networkSystem.getEntity(netId);
-                    networkSystem.unregisterNetworkEntity(entity);
-                    entity.destroy();
-                    break;
-                case EVENT:
-                    Event event = eventSerializer.deserialize(message.getEvent().getEvent());
-                    EntityRef target = networkSystem.getEntity(message.getEvent().getTargetId());
+            if (message.hasTime()) {
+                timer.updateServerTime(message.getTime(), false);
+            }
+            for (NetData.CreateEntityMessage createEntity : message.getCreateEntityList()) {
+                createEntityMessage(createEntity);
+            }
+            for (NetData.UpdateEntityMessage updateEntity : message.getUpdateEntityList()) {
+                EntityRef currentEntity = networkSystem.getEntity(updateEntity.getNetId());
+                if (currentEntity.exists()) {
+                    entitySerializer.deserializeOnto(currentEntity, updateEntity.getEntity());
+                }
+            }
+            for (NetData.RemoveEntityMessage removeEntity : message.getRemoveEntityList()) {
+                int netId = removeEntity.getNetId();
+                EntityRef entity = networkSystem.getEntity(netId);
+                networkSystem.unregisterNetworkEntity(entity);
+                entity.destroy();
+            }
+            for (NetData.EventMessage eventMessage : message.getEventList()) {
+                    Event event = eventSerializer.deserialize(eventMessage.getEvent());
+                    EntityRef target = networkSystem.getEntity(eventMessage.getTargetId());
                     target.send(event);
-                    break;
             }
         }
 

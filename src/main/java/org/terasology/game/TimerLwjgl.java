@@ -16,23 +16,41 @@
 package org.terasology.game;
 
 import org.lwjgl.Sys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class TimerLwjgl implements Timer {
+    private static final Logger logger = LoggerFactory.getLogger(TimerLwjgl.class);
     private final float decayRate = 0.95f;
     private final float oneMinusDecayRate = 1.0f - decayRate;
+    private final float resyncTimeRate = 0.1f;
+
     private long last = 0;
     private long delta = 0;
     private float avgDelta = 0;
+    private long serverTimeOffset = 0;
+    private long desynch = 0;
+
 
     public TimerLwjgl() {
     }
 
     @Override
     public void tick() {
-        long now = getTimeInMs();
+        long now = getRawTimeInMs();
         delta = now - last;
         last = now;
         avgDelta = avgDelta * decayRate + delta * oneMinusDecayRate;
+
+        if (desynch != 0) {
+            long diff = (long)Math.ceil(desynch * resyncTimeRate);
+            if (diff == 0) {
+                diff = (long)Math.signum(desynch);
+            }
+            serverTimeOffset += diff;
+            desynch -= diff;
+        }
+
     }
 
     @Override
@@ -41,7 +59,7 @@ public final class TimerLwjgl implements Timer {
     }
 
     @Override
-    public double getDeltaInMS() {
+    public long getDeltaInMS() {
         return (delta >= 100) ? 100 : delta;
     }
 
@@ -51,7 +69,21 @@ public final class TimerLwjgl implements Timer {
     }
 
     @Override
-    public long getTimeInMs() {
+    public long getRawTimeInMs() {
         return (Sys.getTime() * 1000) / Sys.getTimerResolution();
+    }
+
+    @Override
+    public long getTimeInMs() {
+        return last + serverTimeOffset;
+    }
+
+    @Override
+    public void updateServerTime(long ms, boolean immediate) {
+        if (immediate) {
+            serverTimeOffset = ms - last;
+        } else {
+            desynch = ms - getTimeInMs();
+        }
     }
 }

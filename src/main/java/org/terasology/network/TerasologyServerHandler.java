@@ -63,18 +63,14 @@ public class TerasologyServerHandler extends SimpleChannelUpstreamHandler {
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
         NetMessage message = (NetMessage) e.getMessage();
         client.receivedMessageWithSize(message.getSerializedSize());
-        switch (message.getType()) {
-            case CLIENT_CONNECT:
-                receivedConnect(message.getClientConnect());
-                break;
-            case EVENT:
-                receivedEvent(message.getEvent());
-                break;
-            case UPDATE_ENTITY:
-                receivedEntityUpdate(message.getUpdateEntity());
-                break;
-            default:
-                logger.warn("Received unexpected message: {}", message.getType());
+        if (message.hasClientConnect()) {
+            receivedConnect(message.getClientConnect());
+        }
+        for (NetData.EventMessage event : message.getEventList()) {
+            receivedEvent(event);
+        }
+        for (NetData.UpdateEntityMessage updateEntityMessage : message.getUpdateEntityList()) {
+                receivedEntityUpdate(updateEntityMessage);
         }
     }
 

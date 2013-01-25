@@ -26,8 +26,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.game.CoreRegistry;
+import org.terasology.game.Timer;
 import org.terasology.math.Vector3i;
 import org.terasology.protobuf.ChunksProtobuf;
+import org.terasology.protobuf.NetData;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
@@ -60,7 +62,6 @@ public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
         this.server = new Server(networkSystem, e.getChannel());
         networkSystem.setServer(server);
         e.getChannel().write(NetMessage.newBuilder()
-                .setType(NetMessage.Type.CLIENT_CONNECT)
                 .setClientConnect(ClientConnectMessage.newBuilder()
                         .setName(CoreRegistry.get(Config.class).getPlayerConfig().getName()))
                 .build());
@@ -70,29 +71,24 @@ public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
         NetMessage message = (NetMessage) e.getMessage();
         server.receivedMessageWithSize(message.getSerializedSize());
-        switch (message.getType()) {
-            case SERVER_INFO:
-                receivedServerInfo(message.getServerInfo());
-                break;
-            case CHUNK:
-                receivedChunk(message.getChunkInfo());
-                break;
-            case INVALIDATE_CHUNK:
-                invalidateChunk(message.getInvalidateChunk());
-                break;
-            case BLOCK_CHANGED:
-                blockChanged(message.getBlockChange());
-                break;
-            case CREATE_ENTITY:
-            case UPDATE_ENTITY:
-            case REMOVE_ENTITY:
-                server.queueMessage(message);
-                break;
-            case EVENT:
-                server.queueEvent(message.getEvent());
-                break;
-            default:
-                logger.warn("Received unexpected message: {}", message.getType());
+        if (message.hasServerInfo()) {
+            CoreRegistry.get(Timer.class).updateServerTime(message.getTime(), true);
+            receivedServerInfo(message.getServerInfo());
+        } else if (message.hasTime()) {
+            CoreRegistry.get(Timer.class).updateServerTime(message.getTime(), false);
+        }
+        for (ChunksProtobuf.Chunk chunk : message.getChunkInfoList()) {
+            receivedChunk(chunk);
+        }
+        for (InvalidateChunkMessage invalidatedChunk : message.getInvalidateChunkList()) {
+            invalidateChunk(invalidatedChunk);
+        }
+        for (BlockChangeMessage blockChanged : message.getBlockChangeList()) {
+            blockChanged(blockChanged);
+        }
+        server.queueMessage(message);
+        for (NetData.EventMessage eventMessage : message.getEventList()) {
+            server.queueEvent(eventMessage);
         }
     }
 

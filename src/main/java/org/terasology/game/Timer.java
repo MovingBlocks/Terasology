@@ -19,13 +19,25 @@ package org.terasology.game;
  * @author Immortius
  */
 public interface Timer {
+
     void tick();
 
     float getDelta();
 
-    double getDeltaInMS();
+    long getDeltaInMS();
 
     double getFps();
 
+    long getRawTimeInMs();
+
+    /**
+     * @return Game time in milliseconds. This is synched with the server.
+     */
     long getTimeInMs();
+
+    /**
+     * Updates the server time. This is used to resynchronise with the server.
+     * @param ms
+     */
+    void updateServerTime(long ms, boolean immediate);
 }

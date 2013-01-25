@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
+import org.terasology.game.Timer;
 import org.terasology.game.modes.loadProcesses.AwaitCharacterSpawn;
 import org.terasology.game.modes.loadProcesses.CacheBlocks;
 import org.terasology.game.modes.loadProcesses.CacheTextures;
@@ -97,6 +98,7 @@ public class StateLoading implements GameState {
 
     @Override
     public void init(GameEngine engine) {
+        CoreRegistry.get(Timer.class).updateServerTime(0, true);
         switch (netMode) {
             case CLIENT:
                 initClient();
