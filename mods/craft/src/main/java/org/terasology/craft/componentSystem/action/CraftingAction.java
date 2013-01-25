@@ -115,7 +115,7 @@ public class CraftingAction implements EventHandlerSystem {
 
     @ReceiveEvent(components = {CraftingActionComponent.class})
     public void onActivate(ActivateEvent event, EntityRef entity) {
-            CraftingActionComponent craftingComponent = entity.getComponent(CraftingActionComponent.class);
+        CraftingActionComponent craftingComponent = entity.getComponent(CraftingActionComponent.class);
 
         if ( !craftingComponent.possibleItem.equals(EntityRef.NULL) ){
             EntityRef player = CoreRegistry.get(LocalPlayer.class).getEntity();
@@ -128,7 +128,8 @@ public class CraftingAction implements EventHandlerSystem {
                 EntityRef possibleCraft = tryCraft(entity);
 
                 craftingComponent.possibleItem = possibleCraft;
-                entity.saveComponent(craftingComponent);            }
+                entity.saveComponent(craftingComponent);
+            }
 
         }else{
             entity.send(new AddItemEvent(event.getTarget(), event.getInstigator()));
@@ -160,17 +161,17 @@ public class CraftingAction implements EventHandlerSystem {
         }
 
 
-        if ( percent > 0 && playerItem.stackCount > 1 ){
-           sendingCount = (byte)Math.round( percent * playerItem.stackCount );
+        if ( percent > 0 && playerItem.stackCount > 1 ) {
+            sendingCount = (byte)Math.round( percent * playerItem.stackCount );
 
-           playerItem.stackCount -= sendingCount;
+            playerItem.stackCount -= sendingCount;
 
-           if(playerItem.stackCount < 0){
-               playerItem.stackCount = 0;
-               sendingCount--;
-           }
-        }else{
-           playerItem.stackCount--;
+            if(playerItem.stackCount < 0) {
+                playerItem.stackCount = 0;
+                sendingCount--;
+            }
+        } else {
+            playerItem.stackCount--;
         }
 
         ItemComponent craftItem  = selectedEntity.getComponent(ItemComponent.class);
@@ -186,7 +187,7 @@ public class CraftingAction implements EventHandlerSystem {
                 craftItem.stackCount = InventorySystem.MAX_STACK;
 
             }else{
-               craftItem.stackCount += sendingCount;
+                craftItem.stackCount += sendingCount;
             }
 
             selectedEntity.saveComponent(craftItem);
@@ -263,23 +264,23 @@ public class CraftingAction implements EventHandlerSystem {
         ItemComponent craftItem  = selectedEntity.getComponent(ItemComponent.class);
 
         if ( percent > 0 && craftItem.stackCount > 1 ){
-           sendingCount = (byte)Math.round( percent * craftItem.stackCount );
-           craftItem.stackCount -= sendingCount;
+            sendingCount = (byte)Math.round( percent * craftItem.stackCount );
+            craftItem.stackCount -= sendingCount;
 
-           if (craftItem.stackCount < 0){
-               craftItem.stackCount = 0;
-               sendingCount--;
-           }
+            if (craftItem.stackCount < 0) {
+                craftItem.stackCount = 0;
+                sendingCount--;
+            }
         }else{
             craftItem.stackCount--;
         }
 
         //Send item to player
         EntityRef entityForPlayer = entityManager.copy(selectedEntity);
-        ItemComponent enityForPlayerItem  = entityForPlayer.getComponent(ItemComponent.class);
-        enityForPlayerItem.container = EntityRef.NULL;
-        enityForPlayerItem.stackCount = sendingCount;
-        entityForPlayer.saveComponent(enityForPlayerItem);
+        ItemComponent entityForPlayerItem  = entityForPlayer.getComponent(ItemComponent.class);
+        entityForPlayerItem.container = EntityRef.NULL;
+        entityForPlayerItem.stackCount = sendingCount;
+        entityForPlayer.saveComponent(entityForPlayerItem);
 
         EntityRef player = CoreRegistry.get(LocalPlayer.class).getEntity();
         player.send(new ReceiveItemEvent(entityForPlayer));
@@ -437,7 +438,7 @@ public class CraftingAction implements EventHandlerSystem {
             }
         }
 
-            String searchingKey = getRecipeKey(possibleRecipe);
+        String searchingKey = getRecipeKey(possibleRecipe);
 
         if (entitesWithRecipes.containsKey(searchingKey)){
             boolean isRecipe = false;
@@ -471,8 +472,8 @@ public class CraftingAction implements EventHandlerSystem {
         String name = "";
 
         if (craftRecipe.type != CraftRecipeComponent.CraftRecipeType.SELF &&  craftRecipe.result.isEmpty() ){
-                logger.warn("The recipe does not have result name");
-                return EntityRef.NULL;
+            logger.warn("The recipe does not have result name");
+            return EntityRef.NULL;
         }
 
         if ( craftRecipe.type != CraftRecipeComponent.CraftRecipeType.SELF ){
@@ -687,9 +688,9 @@ public class CraftingAction implements EventHandlerSystem {
         public RecipeMatrix trim(){
             HashMap<String, List<String>> matrix = new HashMap<String, List<String>>();
 
-            ArrayList<Integer> counterLines     = new ArrayList<Integer>(width);
-            ArrayList<Integer> counterColumns   = new ArrayList<Integer>(height);
-            int countLevels      = recipe.size();
+            ArrayList<Integer> counterLines = new ArrayList<Integer>(width);
+            ArrayList<Integer> counterColumns = new ArrayList<Integer>(height);
+            int countLevels = recipe.size();
 
             //calculate count for empty rows
             for(int i = 0; i < height; i++){

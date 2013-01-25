@@ -105,7 +105,7 @@ public class SpawnerSystem implements UpdateSubscriberSystem {
         try {
 
             // Go through entities that are spawners. Only accept block-based spawners for now (due to location need)
-            logger.info("Count of entities with a SpawnerComponent: {}", entityManager.getComponentCount(SpawnerComponent.class));
+            //logger.info("Count of entities with a SpawnerComponent: {}", entityManager.getComponentCount(SpawnerComponent.class));
             for (EntityRef entity : entityManager.iteratorEntities(SpawnerComponent.class)) {
                 //logger.info("Found a spawner: {}", entity);
                 SpawnerComponent spawnComp = entity.getComponent(SpawnerComponent.class);
