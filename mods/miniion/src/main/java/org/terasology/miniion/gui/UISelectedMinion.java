@@ -38,6 +38,9 @@ public class UISelectedMinion extends UICompositeScrollable{
             layout();
         }
         
+        /**
+         * clears the selected minion and hides the buttons again
+         */
         public void clearMinion(){
         	this.minion = null;
         	lblBehaviour.setVisible(false);
@@ -60,7 +63,10 @@ public class UISelectedMinion extends UICompositeScrollable{
     	public void layout() {
 
     	}
-
+    	
+    	/**
+    	 * render minion icons //TODO icons should get replaces with names list
+    	 */
         @Override
         public void render() {
         	if(minion != null)
@@ -212,8 +218,12 @@ public class UISelectedMinion extends UICompositeScrollable{
 		
 	}
 	
+	/**
+	 * sets the currently active minion and shows it's setting page
+	 * @param minion : the minion selected in the list of summoned minions
+	 */
 	public void setMinion(EntityRef minion){
-		MinionSystem.setActiveMinion(minion);
+		MinionSystem.setActiveMinion(minion); // new way of defining the active minion, //TODO book ui should reflect this (selection rectangle, minor inconsistence)
 		cell.setMinion(minion);		
 		MinionComponent minioncomp = minion.getComponent(MinionComponent.class);
 		lblname.setText(minioncomp.name);
@@ -246,6 +256,11 @@ public class UISelectedMinion extends UICompositeScrollable{
 		}		
 	}
 	
+	
+	/**
+	 * set behaviour toggles and matching behaviour
+	 * all behaviour toggles should be added here
+	 */
 	public void executeClick(UIDisplayElement element, int id){
 		UIModButton clickedbutton = (UIModButton)element;
 		MinionComponent minioncomp = this.cell.minion.getComponent(MinionComponent.class);
@@ -272,6 +287,10 @@ public class UISelectedMinion extends UICompositeScrollable{
 		this.cell.minion.saveComponent(minioncomp);
 	}
 	
+	/**
+	 * make sure only 1 toggle is active
+	 * @param button : the active toggle
+	 */
 	 private void setBehaviourToggle(UIModButton button)
      {
      	butStay.setToggleState(false);
@@ -283,6 +302,9 @@ public class UISelectedMinion extends UICompositeScrollable{
      	}
      }
 	
+	 /**
+	  * no comment.
+	  */
 	private void destroyMinion(){
 		if(this.cell.minion != null){
 			MinionComponent minioncomp = this.cell.minion.getComponent(MinionComponent.class);
@@ -295,10 +317,15 @@ public class UISelectedMinion extends UICompositeScrollable{
 		}
 	}
 	
+	/**
+	 * changes the minions behaviour to iddle, opens it's inventory, probably needs a distance check
+	 * closes the settings screen and opens the inventory
+	 */
 	private void openInventory(){
 		if(this.cell.minion != null){
 			this.cell.minion.send(new ActivateEvent(this.cell.minion, CoreRegistry.get(LocalPlayer.class).getEntity()));
 			this.cell.minion.getComponent(MinionComponent.class).minionBehaviour = MinionBehaviour.Stay;
+			setBehaviourToggle(butStay);
 			this.cell.minion.saveComponent(this.cell.minion.getComponent(MinionComponent.class));
 			this.getGUIManager().closeWindow(minionscreen);
 		}

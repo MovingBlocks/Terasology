@@ -12,6 +12,7 @@ public final class ModIcons {
 		Icon.set("cardbook", "miniion:minionicon16", 0, 4);
 		Icon.set("oreominionbook", "miniion:minionicon16", 0, 5);
 		Icon.set("zonebook", "miniion:minionicon16", 0, 6);
+		Icon.set("zonetool", "miniion:minionicon16", 0, 7);
 		
 	}
 }

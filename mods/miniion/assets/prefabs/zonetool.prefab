@@ -1,0 +1,10 @@
+{
+    "Item" : {
+        "name" : "Zoning tool",
+        "icon" : "zonetool",
+        "usage" : "ON_BLOCK",
+        "consumedOnUse" : false,
+        "renderWithIcon" : true
+    },
+    "ZoneSelection" : { }
+}

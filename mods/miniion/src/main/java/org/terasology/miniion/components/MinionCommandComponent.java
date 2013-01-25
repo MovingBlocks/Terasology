@@ -17,6 +17,9 @@ package org.terasology.miniion.components;
 
 import javax.vecmath.Vector3f;
 
+import org.terasology.entitySystem.Component;
+import org.terasology.rendering.world.BlockGrid;
+
 /**
  * Created with IntelliJ IDEA.
  * User: Overdhose
@@ -29,13 +32,6 @@ import javax.vecmath.Vector3f;
  * selected blocks will get grouped by height, and minions will gather top to bottom
  * startpoint should be a miniion (waypoint) flag block
  */
-public class MinionCommandComponent {
+public class MinionCommandComponent implements Component{	
 
-    public MinionCommandComponent() {
-    }
-
-    public Vector3f startPoint = null;
-    public Vector3f endPoint = null;
-    public Vector3f heightPoint = null;
-    public Vector3f depthPoint = null;
 }

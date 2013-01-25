@@ -72,7 +72,7 @@ public class UICardBook extends UIWindow {
         setBackgroundColor(new Color(0, 0, 0, 200));
         setModal(true);
         maximize();
-        setCloseBinds(new String[] {"engine:useHeldItem"});
+        //setCloseBinds(new String[] {"engine:useHeldItem"});
         setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
 
         addVisibilityListener(new VisibilityListener() {

@@ -42,6 +42,7 @@ import org.terasology.miniion.events.MinionMessageEvent;
 import org.terasology.miniion.events.ToggleMinionModeButton;
 import org.terasology.miniion.gui.UICardBook;
 import org.terasology.miniion.gui.UIScreenBookOreo;
+import org.terasology.miniion.gui.UIZoneBook;
 import org.terasology.miniion.minionenum.*;
 import org.terasology.miniion.utilities.*;
 
@@ -88,6 +89,7 @@ public class MinionSystem implements EventHandlerSystem {
         guiManager.registerWindow("minionTest", UIMinionTestMenu.class); // experimental popup menu for the minion command tool
         guiManager.registerWindow("cardbook", UICardBook.class);		// ui to create summonable cards
         guiManager.registerWindow("oreobook", UIScreenBookOreo.class);  // ui to manage summoned minions, selecting one sets it active!
+        guiManager.registerWindow("zonebook", UIZoneBook.class);  // ui to manage zones
     }
     
     
