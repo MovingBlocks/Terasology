@@ -27,6 +27,7 @@ import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.HorizontalCollisionEvent;
+import org.terasology.events.NoHealthEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
@@ -114,4 +115,10 @@ public class SimpleAISystem implements EventHandlerSystem, UpdateSubscriberSyste
             entity.saveComponent(moveComp);
         }
     }
+
+    @ReceiveEvent(components = {SimpleAIComponent.class})
+    public void onDeath(NoHealthEvent event, EntityRef entity) {
+       entity.destroy();
+    }
+
 }

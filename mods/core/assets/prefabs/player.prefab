@@ -31,7 +31,12 @@
         "detectGroups" : ["engine:debris"]
     },
     "CharacterSound" : {
-        "footstepSounds" : ["engine:FootGrass1","engine:FootGrass2","engine:FootGrass3","engine:FootGrass4","engine:FootGrass5"]
+        "footstepSounds" : ["engine:FootGrass1","engine:FootGrass2","engine:FootGrass3","engine:FootGrass4","engine:FootGrass5"],
+        "damageSounds"  : ["engine:HeartBeat"],
+    	"landingSounds" :["engine:Land"],
+    	"deathSounds" :["engine:Death"],
+    	"deathVolume" : 4,
+    	"landingVolume" : 0.2
     },
     "Inventory" : {
         "itemSlots": [
@@ -46,7 +51,7 @@
     },
     "MinionController" : {},
     "Spawner" : {
-        "types" : ["gelcube", "chromaticgelcube", "metallicgelcube"],
+        "types" : ["gelcube", "chromaticgelcube", "metallicgelcube","mare"],
 		"timeBetweenSpawns" : 10000,
  		"maxMobsPerSpawner" : 64,
 		"rangedSpawning" : true,
