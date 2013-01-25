@@ -19,6 +19,7 @@ import java.util.Random;
 
 import javax.vecmath.Vector3f;
 
+import org.terasology.asset.Assets;
 import org.terasology.components.*;
 import org.terasology.components.world.*;
 
@@ -62,6 +63,7 @@ public class MinionSystem implements EventHandlerSystem {
     private static final String BEHAVIOUR_MENU = "minionBehaviour";
     private static final String MENU_TEST = "minionTest";
     private static EntityRef activeminion;
+    private static EntityRef zonelist;
     
     @In
     private LocalPlayer localPlayer;
@@ -90,6 +92,9 @@ public class MinionSystem implements EventHandlerSystem {
         guiManager.registerWindow("cardbook", UICardBook.class);		// ui to create summonable cards
         guiManager.registerWindow("oreobook", UIScreenBookOreo.class);  // ui to manage summoned minions, selecting one sets it active!
         guiManager.registerWindow("zonebook", UIZoneBook.class);  // ui to manage zones
+        
+        //create thezonelist
+        
     }
     
     
@@ -145,6 +150,19 @@ public class MinionSystem implements EventHandlerSystem {
      * @param minion : the new active minion entity
      */
     public static void setActiveMinion(EntityRef minion){
+    	SkeletalMeshComponent skelcomp;
+    	if(activeminion != null){
+	    	skelcomp= activeminion.getComponent(SkeletalMeshComponent.class);
+			if(skelcomp != null){
+				skelcomp.material = Assets.getMaterial("OreoMinions:OreonSkin");
+				activeminion.saveComponent(skelcomp);
+			}
+    	}
+    	skelcomp= minion.getComponent(SkeletalMeshComponent.class);
+		if(skelcomp != null){
+			skelcomp.material = Assets.getMaterial("OreoMinions:OreonSkinSelected");
+			minion.saveComponent(skelcomp);
+		}
     	activeminion = minion;
     }
     
