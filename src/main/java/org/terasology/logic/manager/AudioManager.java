@@ -40,6 +40,7 @@ import com.bulletphysics.linearmath.QuaternionUtil;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author t3hk0d3 <contact@tehkode.ru>
+ * @author Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
  */
 public abstract class AudioManager implements SoundManager {
 
@@ -255,6 +256,25 @@ public abstract class AudioManager implements SoundManager {
     /**
      * Plays specified sound at specified position and with specified gain
      *
+     * @param String shortUri
+     * @param pos   Sound source position
+     * @param gain  Sound source gain
+     * @return Sound source object, or null if there is no free sound sources in effects pool
+     */
+    public static SoundSource play(String shortUri, Vector3d pos, float gain, int priority) {
+    	AssetUri uri = new AssetUri(AssetType.SOUND, shortUri);
+        SoundSource source = source(uri, new Vector3d(pos), gain, priority);
+
+        if (source == null) {
+            return null;
+        }
+
+        return source.setGain(gain).play();
+    }
+    
+    /**
+     * Plays specified sound at specified position and with specified gain
+     *
      * @param sound Sound object
      * @param pos   Sound source position
      * @param gain  Sound source gain
@@ -270,6 +290,25 @@ public abstract class AudioManager implements SoundManager {
         return source.setGain(gain).play();
     }
 
+    /**
+     * Plays specified sound at specified position and with specified gain
+     *
+     * @param String shortUri
+     * @param pos   Sound source position
+     * @param gain  Sound source gain
+     * @return Sound source object, or null if there is no free sound sources in effects pool
+     */
+    public static SoundSource play(String shortUri, Vector3f pos, float gain, int priority) {
+    	AssetUri uri = new AssetUri(AssetType.SOUND, shortUri);
+        SoundSource source = source(uri, new Vector3d(pos), gain, priority);
+
+        if (source == null) {
+            return null;
+        }
+
+        return source.setGain(gain).play();
+    }
+    
     /**
      * Plays specified sound tuned for specified entity
      *
@@ -292,6 +331,8 @@ public abstract class AudioManager implements SoundManager {
 
         return source.setVelocity(new Vector3d(getEntityVelocity(entity))).setDirection(new Vector3d(getEntityDirection(entity))).play();
     }
+    
+    
 
     private static Vector3f getEntityPosition(EntityRef entity) {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
@@ -344,6 +385,12 @@ public abstract class AudioManager implements SoundManager {
         return source.setGain(0.1f).play();
     }
 
+    /**
+     * Plays specified music
+     * 
+     * @param shortUri
+     * @return Sound source object, or null if there is no free sound sources in music pool
+     */
     public static SoundSource playMusic(String shortUri) {
         AssetUri uri = new AssetUri(AssetType.MUSIC, shortUri);
         return playMusic(uri);

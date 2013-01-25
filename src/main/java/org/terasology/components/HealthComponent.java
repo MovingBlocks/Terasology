@@ -26,7 +26,8 @@ public final class HealthComponent implements Component {
     public float regenRate = 0.0f;
     public float waitBeforeRegen = 0.0f;
 
-    public float fallingDamageSpeedThreshold = 20;
+    public float fallingDamageSpeedThreshold = 20f;
+    public float crashingDamageSpeedThreshold = 4.5f;
     public float excessSpeedDamageMultiplier = 10f;
 
     public int currentHealth = 20;
