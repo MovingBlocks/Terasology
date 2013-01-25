@@ -21,9 +21,5 @@
     "rotation" : "horizontal",
     "tile" : "engine:Plank",
     "shape" : "engine:stair",
-    "craftPlace" : false,
-    "entity" : {
-        "prefab" : "core:plankstair",
-        "mode" : "on_interaction"
-    }
+    "craftPlace" : false
 }

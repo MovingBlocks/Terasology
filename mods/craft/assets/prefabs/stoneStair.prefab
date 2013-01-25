@@ -1,0 +1,27 @@
+{
+    "CraftRecipe" : {
+        "type" : "EXTERNAL",
+        "result" : "engine:stonestair",
+        "recipe" :  {
+            "bottom":
+                [
+                    "stone",  "stone", "stone",
+                    "stone",  "stone", "stone",
+                    "stone",  "stone", "stone"
+                ],
+            "middle":
+                [
+                    " ",  " ",     " ",
+                    "stone",  "stone", "stone",
+                    "stone",  "stone", "stone"
+                ],
+            "top":
+                [
+                    " ",  " ",     " ",
+                    " ",  " ",     " ",
+                    "stone",  "stone", "stone"
+                ]
+        }
+
+    }
+}

@@ -303,8 +303,8 @@ public class HierarchicalAISystem implements EventHandlerSystem,
 	}
 	
 	//Destroy AI on death
-    //@ReceiveEvent(components = {LocalPlayerComponent.class})
-    //public void onDeath(NoHealthEvent event, EntityRef entity) {
-    //	entity.destroy();
-    //}
+    @ReceiveEvent(components = {HierarchicalAIComponent.class})
+    public void onDeath(NoHealthEvent event, EntityRef entity) {
+    	entity.destroy();
+    }
 }
