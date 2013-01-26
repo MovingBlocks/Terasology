@@ -6,7 +6,7 @@
 {
     // Graphics
     "tiles" : {
-		"bottom" : "CakeLie:CakeButtom" 
+		"bottom" : "CakeLie:CakeBottom" 
     },
     "inventory" : {
         "stackable" : true,

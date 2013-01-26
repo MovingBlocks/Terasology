@@ -22,5 +22,5 @@ import org.terasology.entitySystem.Component;
  * @author Immortius
  */
 public class OpenUiActionComponent implements Component {
-    public String uiwindowid;
+	public String uiwindowid;
 }

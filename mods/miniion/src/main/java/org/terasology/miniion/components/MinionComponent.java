@@ -16,28 +16,35 @@
 package org.terasology.miniion.components;
 
 import org.terasology.entitySystem.Component;
+import org.terasology.miniion.componentsystem.controllers.MinionSystem;
 import org.terasology.miniion.minionenum.MinionBehaviour;
 import org.terasology.miniion.utilities.Zone;
 
 /**
  * Allows an entity to store items
- *
+ * 
  * @author Immortius <immortius@gmail.com>
  */
 public final class MinionComponent implements Component {
 
+	public final int id;
 	// simple uri defining an icon
-    public String icon = "";
-    //personal name for the minion, not set in prefab!
-    public String name = "unknown";
-    // minion type, eg : oreoBuilder, needs to be defined in prefab
-    public String flavortext = "unknown";
-    // used by minionsystem, init at stay normally
-    public MinionBehaviour minionBehaviour = MinionBehaviour.Stay;
-    
-    public Zone gatherzone;
+	public String icon = "";
+	// personal name for the minion, not set in prefab!
+	public String name = "unknown";
+	// minion type, eg : oreoBuilder, needs to be defined in prefab
+	public String flavortext = "unknown";
+	// used by minionsystem, init at stay normally
+	public MinionBehaviour minionBehaviour = MinionBehaviour.Stay;
 
-    public MinionComponent() {
-    }
+	public Zone gatherzone;
+
+	public int getID() {
+		return id;
+	}
+
+	public MinionComponent() {
+		id = MinionSystem.getNewMinionID();
+	}
 
 }

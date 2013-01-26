@@ -23,6 +23,6 @@ import org.terasology.entitySystem.Component;
  */
 public final class MinionControllerComponent implements Component {
 
-    public boolean minionMode = false;
-    public int selectedMinion = 0;
+	public boolean minionMode = false;
+	public int selectedMinion = 0;
 }

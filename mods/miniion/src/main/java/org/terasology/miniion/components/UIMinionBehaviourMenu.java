@@ -26,64 +26,74 @@ import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UIWindow;
 
 /**
- * Created with IntelliJ IDEA.
- * User: Overdhose
- * Date: 8/05/12
- * Time: 20:25
- * used as a dial menu without ungrabbing the mouse
+ * Created with IntelliJ IDEA. User: Overdhose Date: 8/05/12 Time: 20:25 used as
+ * a dial menu without ungrabbing the mouse
  */
 public class UIMinionBehaviourMenu extends UIWindow {
 
-    //private UIButton buttonMove;
-    private final UIImage background;
-    private final UIImage selectionrectangle;
+	// private UIButton buttonMove;
+	private final UIImage background;
+	private final UIImage selectionrectangle;
 
-    public UIMinionBehaviourMenu() {
-        setId("minionBehaviour");
-        setSize(new Vector2f(60f, 180f));
-        background = new UIImage(Assets.getTexture("engine:guiMinion"));
-        background.getTextureSize().set(new Vector2f(60f / 256f, 180f / 256f));
-        background.getTextureOrigin().set(new Vector2f(30.0f / 256f, 20.0f / 256f));
-        background.setSize(getSize());
-        addDisplayElement(background);
-        background.setVisible(true);
+	public UIMinionBehaviourMenu() {
+		setId("minionBehaviour");
+		setSize(new Vector2f(60f, 180f));
+		background = new UIImage(Assets.getTexture("engine:guiMinion"));
+		background.getTextureSize().set(new Vector2f(60f / 256f, 180f / 256f));
+		background.getTextureOrigin().set(
+				new Vector2f(30.0f / 256f, 20.0f / 256f));
+		background.setSize(getSize());
+		addDisplayElement(background);
+		background.setVisible(true);
 
-        selectionrectangle = new UIImage(Assets.getTexture("engine:guiMinion"));
-        selectionrectangle.getTextureSize().set(new Vector2f(60f / 256f, 20f / 256f));
-        selectionrectangle.getTextureOrigin().set(new Vector2f(30f / 256, 0.0f));
-        selectionrectangle.setSize(new Vector2f(60f, 20f));
-        selectionrectangle.setVisible(true);
-        addDisplayElement(selectionrectangle);
+		selectionrectangle = new UIImage(Assets.getTexture("engine:guiMinion"));
+		selectionrectangle.getTextureSize().set(
+				new Vector2f(60f / 256f, 20f / 256f));
+		selectionrectangle.getTextureOrigin()
+				.set(new Vector2f(30f / 256, 0.0f));
+		selectionrectangle.setSize(new Vector2f(60f, 20f));
+		selectionrectangle.setVisible(true);
+		addDisplayElement(selectionrectangle);
 
-        update();
-    }
+		update();
+	}
 
-    @Override
-    public void update() {
-    	super.update();
-    	
-        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-        if (localPlayer != null) {
-            MinionBarComponent inventory = localPlayer.getEntity().getComponent(MinionBarComponent.class);
-            if (inventory == null) {
-                return;
-            }
-            
-            MinionControllerComponent minionController = localPlayer.getEntity().getComponent(MinionControllerComponent.class);
-            if (minionController != null) {
-	            int selectedMinion = minionController.selectedMinion;
-	            EntityRef minion = inventory.minionSlots.get(selectedMinion);
-	            if (minion != null) {
-	                MinionComponent minioncomp = minion.getComponent(MinionComponent.class);
-	                if (minioncomp != null) {
-	                    int selection = 20 * (minioncomp.minionBehaviour.ordinal());
-	                    int startpos = (44 * (6 - (selectedMinion + 1)));
-	                    selectionrectangle.setPosition(new Vector2f(Display.getWidth() - (100), (Display.getHeight() / 2) - startpos + selection));
-	                    //setPosition(new Vector2f(2f, (getSize().y - 8f) * selectedMinion - 2f));
-	                    background.setPosition(new Vector2f(Display.getWidth() - (100), (Display.getHeight() / 2) - startpos)); //(25 *(6-(selectedMinion+1)))
-	                }
-	            }
-            }
-        }
-    }
+	@Override
+	public void update() {
+		super.update();
+
+		LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+		if (localPlayer != null) {
+			MinionBarComponent inventory = localPlayer.getEntity()
+					.getComponent(MinionBarComponent.class);
+			if (inventory == null) {
+				return;
+			}
+
+			MinionControllerComponent minionController = localPlayer
+					.getEntity().getComponent(MinionControllerComponent.class);
+			if (minionController != null) {
+				int selectedMinion = minionController.selectedMinion;
+				EntityRef minion = inventory.minionSlots.get(selectedMinion);
+				if (minion != null) {
+					MinionComponent minioncomp = minion
+							.getComponent(MinionComponent.class);
+					if (minioncomp != null) {
+						int selection = 20 * (minioncomp.minionBehaviour
+								.ordinal());
+						int startpos = (44 * (6 - (selectedMinion + 1)));
+						selectionrectangle.setPosition(new Vector2f(Display
+								.getWidth() - (100), (Display.getHeight() / 2)
+								- startpos + selection));
+						// setPosition(new Vector2f(2f, (getSize().y - 8f) *
+						// selectedMinion - 2f));
+						background.setPosition(new Vector2f(
+								Display.getWidth() - (100), (Display
+										.getHeight() / 2) - startpos)); // (25
+																		// *(6-(selectedMinion+1)))
+					}
+				}
+			}
+		}
+	}
 }

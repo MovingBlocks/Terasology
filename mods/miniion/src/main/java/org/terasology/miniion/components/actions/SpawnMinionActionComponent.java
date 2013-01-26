@@ -23,6 +23,6 @@ import org.terasology.entitySystem.Component;
  * @author Immortius
  */
 public class SpawnMinionActionComponent implements Component {
-    public String prefab;
-    public ActionTarget spawnLocationRelativeTo = ActionTarget.Target;
+	public String prefab;
+	public ActionTarget spawnLocationRelativeTo = ActionTarget.Target;
 }

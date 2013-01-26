@@ -3,8 +3,8 @@ package org.terasology.miniion.utilities;
 import org.terasology.model.inventory.Icon;
 
 public final class ModIcons {
-	
-	public static void loadIcons(){
+
+	public static void loadIcons() {
 		Icon.set("minionskull", "miniion:minionicon16", 0, 0);
 		Icon.set("minioncommand", "miniion:minionicon16", 0, 1);
 		Icon.set("emptycard", "miniion:minionicon16", 0, 2);
@@ -13,6 +13,6 @@ public final class ModIcons {
 		Icon.set("oreominionbook", "miniion:minionicon16", 0, 5);
 		Icon.set("zonebook", "miniion:minionicon16", 0, 6);
 		Icon.set("zonetool", "miniion:minionicon16", 0, 7);
-		
+
 	}
 }

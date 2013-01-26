@@ -16,7 +16,6 @@
 
 package org.terasology.miniion.componentsystem.action;
 
-import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
 //import com.bulletphysics.collision.shapes.BoxShape;
@@ -32,16 +31,11 @@ import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.miniion.components.AnimationComponent;
 import org.terasology.miniion.components.MinionComponent;
-import org.terasology.miniion.components.SimpleMinionAIComponent;
 //import org.terasology.math.Side;
 import org.terasology.miniion.components.actions.SpawnMinionActionComponent;
 import org.terasology.miniion.componentsystem.controllers.MinionSystem;
 import org.terasology.physics.character.CharacterMovementComponent;
-//import org.terasology.physics.shapes.BoxShapeComponent;
-import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.world.WorldRenderer;
 
 /**
  * @author Immortius
@@ -49,38 +43,43 @@ import org.terasology.rendering.world.WorldRenderer;
 @RegisterComponentSystem
 public class SpawnMinionAction implements EventHandlerSystem {
 
-    private EntityManager entityManager;
+	private EntityManager entityManager;
 
-    @Override
-    public void initialise() {
-        entityManager = CoreRegistry.get(EntityManager.class);
-    }
+	@Override
+	public void initialise() {
+		entityManager = CoreRegistry.get(EntityManager.class);
+	}
 
-    @Override
-    public void shutdown() {
-    }
+	@Override
+	public void shutdown() {
+	}
 
-    @ReceiveEvent(components = SpawnMinionActionComponent.class)
-    public void onActivate(ActivateEvent event, EntityRef entity) {
-    	SpawnMinionActionComponent spawnInfo = entity.getComponent(SpawnMinionActionComponent.class);
-        if (spawnInfo.prefab != null) {
-        	Vector3f spawnPos = event.getTargetLocation();
-        	spawnPos.y += 2;
-            Prefab prefab = CoreRegistry.get(PrefabManager.class).getPrefab(spawnInfo.prefab);
-            if (prefab != null && prefab.getComponent(LocationComponent.class) != null) {
-            	EntityRef minion = entityManager.create(prefab, spawnPos);
-            	if(minion != null){
-            		CharacterMovementComponent movecomp = minion.getComponent(CharacterMovementComponent.class);
-            		movecomp.height = 0.35f;
-            		minion.saveComponent(movecomp);
-            		MinionComponent minioncomp = minion.getComponent(MinionComponent.class);
-            		String[] tempstring = MinionSystem.getName().split(":");
-            		if(tempstring.length == 2){
-            			minioncomp.name = tempstring[0];
-            			minioncomp.flavortext = tempstring[1];
-            		}
-            	}
-            }	
-        }
-    }
+	@ReceiveEvent(components = SpawnMinionActionComponent.class)
+	public void onActivate(ActivateEvent event, EntityRef entity) {
+		SpawnMinionActionComponent spawnInfo = entity
+				.getComponent(SpawnMinionActionComponent.class);
+		if (spawnInfo.prefab != null) {
+			Vector3f spawnPos = event.getTargetLocation();
+			spawnPos.y += 2;
+			Prefab prefab = CoreRegistry.get(PrefabManager.class).getPrefab(
+					spawnInfo.prefab);
+			if (prefab != null
+					&& prefab.getComponent(LocationComponent.class) != null) {
+				EntityRef minion = entityManager.create(prefab, spawnPos);
+				if (minion != null) {
+					CharacterMovementComponent movecomp = minion
+							.getComponent(CharacterMovementComponent.class);
+					movecomp.height = 0.35f;
+					minion.saveComponent(movecomp);
+					MinionComponent minioncomp = minion
+							.getComponent(MinionComponent.class);
+					String[] tempstring = MinionSystem.getName().split(":");
+					if (tempstring.length == 2) {
+						minioncomp.name = tempstring[0];
+						minioncomp.flavortext = tempstring[1];
+					}
+				}
+			}
+		}
+	}
 }
