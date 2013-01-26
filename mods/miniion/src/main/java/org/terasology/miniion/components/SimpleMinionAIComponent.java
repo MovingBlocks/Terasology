@@ -29,8 +29,11 @@ import org.terasology.entitySystem.Component;
 public final class SimpleMinionAIComponent implements Component {
 
     public long lastChangeOfDirectionAt = 0;
+    public Vector3f lastPosition = null;
+    public double previousdistanceToTarget = Double.NEGATIVE_INFINITY;
 
     public long lastAttacktime = 0;
+    public long lastDistancecheck = 0;
     public long lastPathtime = 0;
     public int patrolCounter = 0;
 

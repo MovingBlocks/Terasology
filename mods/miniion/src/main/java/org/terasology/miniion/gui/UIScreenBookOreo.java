@@ -38,7 +38,7 @@ public class UIScreenBookOreo extends UIWindow {
         setModal(true);
         //setCloseBinds(new String[]{"engine:useHeldItem"});
         setCloseKeys(new int[]{Keyboard.KEY_ESCAPE});
-        setSize(new Vector2f(600, 400));
+        setSize(new Vector2f(800, 400));
 
         background = new UIImage();
         background.setTexture(Assets.getTexture("miniion:openbook"));
@@ -64,7 +64,7 @@ public class UIScreenBookOreo extends UIWindow {
         
         container = new UIMinionContainer();
         container.setPosition(new Vector2f(20, 40));
-        container.setSize(new Vector2f(200, 170));
+        container.setSize(new Vector2f(260, 170));
         container.setEnableScrolling(true);
         container.setEnableScrollbar(true);
         container.setLayout(layout);

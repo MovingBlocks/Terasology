@@ -28,7 +28,7 @@ public class ZoneSystem implements UpdateSubscriberSystem, RenderSystem {
         for (EntityRef entity : entityManager.iteratorEntities(ZoneSelectionComponent.class)) {
         	ZoneSelectionComponent selection = entity.getComponent(ZoneSelectionComponent.class);        	
         	selection.blockGrid.render();
-            entity.saveComponent(selection);
+            //entity.saveComponent(selection); // deserialization error tracing 
         }
 
     }

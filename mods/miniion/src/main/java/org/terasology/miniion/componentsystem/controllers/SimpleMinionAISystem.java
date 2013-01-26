@@ -34,9 +34,11 @@ import org.terasology.miniion.events.MinionMessageEvent;
 import org.terasology.miniion.pathfinder.AStarPathing;
 import org.terasology.miniion.minionenum.MinionMessagePriority;
 import org.terasology.miniion.utilities.MinionMessage;
+import org.terasology.miniion.utilities.Zone;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.logic.SkeletalMeshComponent;
+import org.terasology.rendering.world.BlockGrid;
 import org.terasology.world.*;
 import org.terasology.world.block.Block;
 
@@ -158,10 +160,15 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
     }
 
     private void executeGatherAI(EntityRef entity) {
+    	MinionComponent minioncomp = entity.getComponent(MinionComponent.class);
     	LocationComponent location = entity.getComponent(LocationComponent.class);
         SimpleMinionAIComponent ai = entity.getComponent(SimpleMinionAIComponent.class);    
         AnimationComponent animcomp = entity.getComponent(AnimationComponent.class);
         Vector3f worldPos = new Vector3f(location.getWorldPosition());
+        
+        if(ai.gatherTargets.size() == 0 && minioncomp.gatherzone != null){
+        	getTargetsfromZone(minioncomp, ai);
+        }
         
         List<Vector3f> targets = ai.gatherTargets;
         if ((targets == null) || (targets.size() < 1)) {
@@ -194,6 +201,22 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
 
         entity.saveComponent(ai);
         setMovement(currentTarget, entity);
+    }
+    
+    private void getTargetsfromZone(MinionComponent minioncomp, SimpleMinionAIComponent ai){
+    	Zone zone = minioncomp.gatherzone;
+    	//first loop at highest blocks (y)
+    	for(int y = zone.getMaxBounds().y; y >= zone.getMinBounds().y; y--){
+    		for(int x = zone.getMinBounds().x; x <= zone.getMaxBounds().x; x++){    		
+    			for(int z = zone.getMinBounds().z; z <= zone.getMaxBounds().z; z++){
+    				Block tmpblock = worldProvider.getBlock(x, y, z);
+					 if(!tmpblock.isInvisible()){
+						 ai.gatherTargets.add(new Vector3f(x,y,z));
+					 }
+    			}
+    		}
+    	}
+    	
     }
 
     private void executeMoveAI(EntityRef entity) {
@@ -327,14 +350,33 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
 
     private void setMovement(Vector3f currentTarget, EntityRef entity) {
     	LocationComponent location = entity.getComponent(LocationComponent.class);
+    	SimpleMinionAIComponent ai = entity.getComponent(SimpleMinionAIComponent.class);
         CharacterMovementComponent moveComp = entity.getComponent(CharacterMovementComponent.class);
         AnimationComponent animcomp = entity.getComponent(AnimationComponent.class);
         SkeletalMeshComponent skeletalcomp = entity.getComponent(SkeletalMeshComponent.class);
         Vector3f worldPos = new Vector3f(location.getWorldPosition());
     	
+        Vector3f dist = new Vector3f(worldPos);
+        dist.sub(currentTarget);
+        double distanceToTarget = dist.length();
+        
         Vector3f targetDirection = new Vector3f();
         targetDirection.sub(currentTarget, worldPos);
         if (targetDirection.x * targetDirection.x + targetDirection.z * targetDirection.z > 0.01f) {
+        	if (timer.getTimeInMs() - ai.lastDistancecheck > 4000) {
+                ai.lastDistancecheck = timer.getTimeInMs();
+                if(ai.lastPosition == null){
+                	ai.lastPosition = location.getWorldPosition();
+                }else if (ai.lastPosition.x == location.getLocalPosition().x && ai.lastPosition.z == location.getWorldPosition().z){
+                	//teleport
+                	if(skeletalcomp.animation == animcomp.walkAnim){
+                		changeAnimation(entity, animcomp.idleAnim, true);
+                	}
+                	location.setWorldPosition(currentTarget);
+                }else{
+                	ai.lastPosition = location.getWorldPosition();
+                }
+        	}
         	changeAnimation(entity, animcomp.walkAnim, true);
             targetDirection.normalize();
             moveComp.setDrive(targetDirection);
@@ -348,6 +390,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
         	}
             moveComp.setDrive(new Vector3f());
         }
+        entity.saveComponent(ai);
         entity.saveComponent(moveComp);
         entity.saveComponent(location);
     }

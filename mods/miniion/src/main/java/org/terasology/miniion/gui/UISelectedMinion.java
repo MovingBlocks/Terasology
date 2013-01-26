@@ -7,7 +7,10 @@ import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
+import java.util.List;
+
 import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
 
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
@@ -16,16 +19,21 @@ import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.miniion.components.MinionComponent;
+import org.terasology.miniion.components.ZoneListComponent;
 import org.terasology.miniion.componentsystem.controllers.MinionSystem;
 import org.terasology.model.inventory.Icon;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
+import org.terasology.rendering.gui.layout.GridLayout;
 import org.terasology.miniion.gui.UIModButton;
 import org.terasology.miniion.gui.UIModButton.ButtonType;
 import org.terasology.miniion.minionenum.MinionBehaviour;
+import org.terasology.miniion.utilities.Zone;
 import org.terasology.rendering.gui.widgets.UICompositeScrollable;
 import org.terasology.rendering.gui.widgets.UILabel;
+import org.terasology.rendering.gui.widgets.UIList;
+import org.terasology.rendering.gui.widgets.UIListItem;
 
 public class UISelectedMinion extends UICompositeScrollable{
 	
@@ -45,6 +53,7 @@ public class UISelectedMinion extends UICompositeScrollable{
         	this.minion = null;
         	lblBehaviour.setVisible(false);
     		butfollow.setVisible(false);
+    		butSetZone.setVisible(false);
     		butInventory.setVisible(false);
     		butBye.setVisible(false);
     		butStay.setVisible(false);
@@ -106,8 +115,9 @@ public class UISelectedMinion extends UICompositeScrollable{
 	private UIMinionbarCell cell = new UIMinionbarCell();
 	private UIScreenBookOreo minionscreen;
 	
-	private UIModButton butfollow, butStay, butInventory, butBye, butAttack, butGather;
+	private UIModButton butfollow, butStay, butInventory, butBye, butAttack, butGather, butSetZone;
 	private UILabel lblBehaviour, lblname, lblflavor;
+	private UIList uizonelist;
 	
 	public UISelectedMinion(UIScreenBookOreo minionscreen){
 		
@@ -191,6 +201,25 @@ public class UISelectedMinion extends UICompositeScrollable{
         });
 		this.addDisplayElement(butGather);
 		
+		butSetZone = new UIModButton(new Vector2f(100, 20), ButtonType.NORMAL);
+		butSetZone.setLabel("select zone");
+		butSetZone.setVisible(false);
+		butSetZone.setPosition(new Vector2f(140, 170));
+		butSetZone.addClickListener(new ClickListener() {
+			@Override
+            public void click(UIDisplayElement element, int button) {
+				if(uizonelist.isVisible()){
+            		getZone();
+            		butSetZone.setLabel("select zone");
+            	}
+            	else {
+            		setZone();
+            		butSetZone.setLabel("save zone");
+            	}     
+            }
+        });
+		this.addDisplayElement(butSetZone);
+		
 		butInventory = new UIModButton(new Vector2f(100, 20), ButtonType.NORMAL);
 		butInventory.setLabel("Inventory");
 		butInventory.setVisible(false);
@@ -216,6 +245,13 @@ public class UISelectedMinion extends UICompositeScrollable{
         });
 		this.addDisplayElement(butBye);
 		
+		uizonelist = new UIList();
+		uizonelist.setSize(new Vector2f(250, 300));
+		uizonelist.setPosition(new Vector2f(300, 0));
+		uizonelist.setBackgroundColor(Color.black);
+		uizonelist.setVisible(false);
+		this.addDisplayElement(uizonelist);		
+		
 	}
 	
 	/**
@@ -224,7 +260,7 @@ public class UISelectedMinion extends UICompositeScrollable{
 	 */
 	public void setMinion(EntityRef minion){
 		MinionSystem.setActiveMinion(minion); // new way of defining the active minion, //TODO book ui should reflect this (selection rectangle, minor inconsistence)
-		cell.setMinion(minion);		
+		cell.setMinion(minion);
 		MinionComponent minioncomp = minion.getComponent(MinionComponent.class);
 		lblname.setText(minioncomp.name);
 		lblflavor.setText(minioncomp.flavortext);
@@ -232,6 +268,7 @@ public class UISelectedMinion extends UICompositeScrollable{
 		lblflavor.setVisible(true);
 		lblBehaviour.setVisible(true);
 		butfollow.setVisible(true);
+		butSetZone.setVisible(true);
 		butInventory.setVisible(true);
 		butBye.setVisible(true);
 		butStay.setVisible(true);
@@ -329,5 +366,30 @@ public class UISelectedMinion extends UICompositeScrollable{
 			this.cell.minion.saveComponent(this.cell.minion.getComponent(MinionComponent.class));
 			this.getGUIManager().closeWindow(minionscreen);
 		}
+	}
+	
+	/**
+	 * dirty trick to select zone
+	 */
+	private void setZone(){
+		uizonelist.removeAll();		
+		for(Zone zone : MinionSystem.getGatherZoneList()){
+			UIListItem listitem = new UIListItem(zone.Name, zone);
+			uizonelist.addItem(listitem);
+		}
+		uizonelist.setVisible(true);
+	}
+	
+	private void getZone(){		
+		if(uizonelist.getSelection() != null){
+			MinionComponent minioncomp =  cell.minion.getComponent(MinionComponent.class);
+			for(Zone zone : MinionSystem.getGatherZoneList()){
+				if(zone.Name.matches(uizonelist.getSelection().getText())){
+					minioncomp.gatherzone = zone;
+					}
+			}			
+			cell.minion.saveComponent(minioncomp);
+		}
+		uizonelist.setVisible(false);
 	}
 }

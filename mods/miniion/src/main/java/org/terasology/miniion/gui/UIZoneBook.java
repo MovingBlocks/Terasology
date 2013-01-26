@@ -5,21 +5,39 @@ import javax.vecmath.Vector2f;
 import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.Color;
 import org.terasology.asset.Assets;
+import org.terasology.components.InventoryComponent;
+import org.terasology.components.ItemComponent;
+import org.terasology.components.LocalPlayerComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.In;
 import org.terasology.game.CoreRegistry;
+import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.manager.GUIManager;
 import org.terasology.math.Vector3i;
+import org.terasology.miniion.components.ZoneListComponent;
 import org.terasology.miniion.components.ZoneSelectionComponent;
+import org.terasology.miniion.componentsystem.controllers.MinionSystem;
 import org.terasology.miniion.gui.UIModButton.ButtonType;
+import org.terasology.miniion.minionenum.ZoneType;
+import org.terasology.miniion.utilities.Zone;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.widgets.*;
 
 public class UIZoneBook extends UIWindow{
+	/*
+	@In
+    private LocalPlayer localPlayer;
+    @In
+    private EntityManager entityManager;
+	*/
 	 private final UIImage background;
 	 private final UILabel lblzonename, lblheight, lbldepth, lblwidth;
 	 private final UIText txtzonename, txtheight, txtdepth, txtwidth;
 	 private UIModButton btnSave;
+	 private EntityRef zoneselection;
+	 private boolean newzonefound;
 
 	 public UIZoneBook(){
 		 
@@ -89,7 +107,7 @@ public class UIZoneBook extends UIWindow{
 		background.addDisplayElement(txtdepth);
 		
 		btnSave = new UIModButton(new Vector2f(50,20), ButtonType.NORMAL);
-		btnSave.setPosition(new Vector2f(260, 250));
+		btnSave.setPosition(new Vector2f(260, 230));
 		btnSave.setLabel("Save");
 		btnSave.setId("btnSave");
 		btnSave.setVisible(true);
@@ -105,25 +123,63 @@ public class UIZoneBook extends UIWindow{
 	 
 	 public void executeClick(UIDisplayElement element, int id){
 			UIModButton clickedbutton = (UIModButton)element;
-			//TODO : save the zone to the zonelist, made a component but that's not very ideal.
+			if(txtzonename.getText().length() < 2){
+				return;
+			}
+			int tmp;
+			for(Zone zone : MinionSystem.getGatherZoneList()){
+				if(zone.Name.matches(txtzonename.getText())){
+					return;
+				}
+			}
+			try{
+				tmp = Integer.parseInt(txtheight.getText());
+				tmp = Integer.parseInt(txtwidth.getText());
+				tmp = Integer.parseInt(txtdepth.getText());
+			}
+			catch(NumberFormatException e){
+				return;
+			}
+			ZoneSelectionComponent zoneselectioncomp = zoneselection.getComponent(ZoneSelectionComponent.class);
+			Zone newzone = new Zone(zoneselectioncomp.startpos, zoneselectioncomp.endpos);
+			newzone.Name = txtzonename.getText();
+			newzone.zoneheight = Integer.parseInt(txtheight.getText());
+			newzone.zonewidth =  Integer.parseInt(txtwidth.getText());
+			newzone.zonedepth = Integer.parseInt(txtdepth.getText());
+			newzone.zonetype = ZoneType.Gather;
+			MinionSystem.addZone(newzone);
+			newzonefound = false;
+			this.close();
 	 }
 	 
 	 @Override
 	public void open() {
-		super.open();
+		super.open();		
+		newzonefound = false;
+        //hopefully people won't run around with 50 zoning tools, I take the first one that has data in it
 		EntityManager entityManager = CoreRegistry.get(EntityManager.class);
         for (EntityRef entity : entityManager.iteratorEntities(ZoneSelectionComponent.class))
         {
         	ZoneSelectionComponent selection = entity.getComponent(ZoneSelectionComponent.class);
         	if(selection.blockGrid != null && selection.blockGrid.getGridPositions().size() > 1){
+        		newzonefound = true;
+        		zoneselection = entity;
 	        	Vector3i minbounds = selection.blockGrid.getMinBounds();
 	        	Vector3i maxbounds = selection.blockGrid.getMaxBounds();
-	        	txtzonename.setText("comingsoon");
+	        	//ZoneListComponent zonelistcomp = zonelist.getComponent(ZoneListComponent.class);
+	        	if(MinionSystem.getGatherZoneList() == null){
+	        		txtzonename.setText("Gather0");
+	        	}else{
+	        		txtzonename.setText("Gather" + MinionSystem.getGatherZoneList().size());
+	        	}
 	        	txtwidth.setText("" + (getAbsoluteDiff(maxbounds.x, minbounds.x)));
 	        	txtdepth.setText("" + (getAbsoluteDiff(maxbounds.z, minbounds.z)));
-	        	txtheight.setText("" + (getAbsoluteDiff(maxbounds.y, minbounds.y)));
+	        	txtheight.setText("" + (getAbsoluteDiff(maxbounds.y, minbounds.y)));	        	
         	}
-        }
+        	if(newzonefound){
+        		break;
+        	}
+        }        
 	}
 	 
 	 private int getAbsoluteDiff(int val1, int val2){

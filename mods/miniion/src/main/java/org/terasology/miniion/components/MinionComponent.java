@@ -17,6 +17,7 @@ package org.terasology.miniion.components;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.miniion.minionenum.MinionBehaviour;
+import org.terasology.miniion.utilities.Zone;
 
 /**
  * Allows an entity to store items
@@ -33,6 +34,8 @@ public final class MinionComponent implements Component {
     public String flavortext = "unknown";
     // used by minionsystem, init at stay normally
     public MinionBehaviour minionBehaviour = MinionBehaviour.Stay;
+    
+    public Zone gatherzone;
 
     public MinionComponent() {
     }

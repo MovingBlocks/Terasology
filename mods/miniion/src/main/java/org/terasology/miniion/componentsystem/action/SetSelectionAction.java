@@ -59,6 +59,6 @@ public class SetSelectionAction implements EventHandlerSystem{
 		 else {
 			 comp.blockGrid.clear();
 		 }	        			 			
-		 entity.saveComponent(comp);		 
+		 //entity.saveComponent(comp); // deserialization error tracing 		 
 	 }
 }

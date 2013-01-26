@@ -15,6 +15,7 @@
  */
 package org.terasology.miniion.componentsystem.controllers;
 
+import java.util.List;
 import java.util.Random;
 
 import javax.vecmath.Vector3f;
@@ -63,6 +64,7 @@ public class MinionSystem implements EventHandlerSystem {
     private static final String BEHAVIOUR_MENU = "minionBehaviour";
     private static final String MENU_TEST = "minionTest";
     private static EntityRef activeminion;
+    //TODO : a better way to save / load zones, but it does the trick
     private static EntityRef zonelist;
     
     @In
@@ -92,9 +94,7 @@ public class MinionSystem implements EventHandlerSystem {
         guiManager.registerWindow("cardbook", UICardBook.class);		// ui to create summonable cards
         guiManager.registerWindow("oreobook", UIScreenBookOreo.class);  // ui to manage summoned minions, selecting one sets it active!
         guiManager.registerWindow("zonebook", UIZoneBook.class);  // ui to manage zones
-        
-        //create thezonelist
-        
+        createZoneList();
     }
     
     
@@ -120,7 +120,6 @@ public class MinionSystem implements EventHandlerSystem {
     @ReceiveEvent(components = {SkeletalMeshComponent.class, AnimationComponent.class})
     public void onAnimationEnd(AnimEndEvent event, EntityRef entity){
     	AnimationComponent animcomp = entity.getComponent(AnimationComponent.class);
-    	//SkeletalMeshComponent skelcomp = entity.getComponent(SkeletalMeshComponent.class);
     	if(animcomp != null && event.getAnimation().equals(animcomp.dieAnim)){
     			entity.destroy();
     	}
@@ -146,7 +145,8 @@ public class MinionSystem implements EventHandlerSystem {
     }
     
     /**
-     * The active minion, to be commanded by the minion command item
+     * The active minion, to be commanded by the minion command item etc
+     * uses a slightly different texture to indicate selection
      * @param minion : the new active minion entity
      */
     public static void setActiveMinion(EntityRef minion){
@@ -172,6 +172,31 @@ public class MinionSystem implements EventHandlerSystem {
      */
     public static EntityRef getActiveMinion(){
     	return activeminion;
+    }
+    
+    public static void addZone(Zone zone){
+    	ZoneListComponent zonelistcomp = zonelist.getComponent(ZoneListComponent.class);    	
+    	zonelistcomp.Gatherzones.add(zone);
+    	zonelist.saveComponent(zonelistcomp);
+    }
+    
+    public static List<Zone> getGatherZoneList(){
+    	if(zonelist == null){
+    		return null;
+    	}
+    	return zonelist.getComponent(ZoneListComponent.class).Gatherzones;
+    }
+    
+    /**
+     * bit of a forced way to create an entity
+     * I bet Immortius weeps when he sees atrocities like these :D
+     */
+    private static void createZoneList(){
+    	zonelist = CoreRegistry.get(EntityManager.class).create();
+		ZoneListComponent zonecomp = new ZoneListComponent();
+		zonelist.addComponent(zonecomp);
+		zonelist.setPersisted(true);
+		zonelist.saveComponent(zonecomp);
     }
     
     @Deprecated
