@@ -22,18 +22,14 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.miniion.components.MinionComponent;
-import org.terasology.miniion.componentsystem.controllers.MinionSystem;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
-import org.terasology.rendering.gui.layout.GridLayout;
 import org.terasology.rendering.gui.widgets.*;
 
 import javax.vecmath.Vector2f;
-import javax.vecmath.Vector4f;
 
 public class UIScreenBookOreo extends UIWindow {
 
-	private UIMinionContainer container;
 	private UISelectedMinion selected;
 	private UIList uiminionlist;
 	private final UIImage background;
@@ -80,20 +76,7 @@ public class UIScreenBookOreo extends UIWindow {
 		uiminionlist.setSize(new Vector2f(250, 350));
 		uiminionlist.setPosition(new Vector2f(45, 40));
 		uiminionlist.setVisible(true);
-		addDisplayElement(uiminionlist);
-		
-		GridLayout layout = new GridLayout(4);
-		layout.setCellPadding(new Vector4f(2f, 2f, 2f, 2f));
-
-		container = new UIMinionContainer();
-		container.setPosition(new Vector2f(20, 40));
-		container.setSize(new Vector2f(260, 170));
-		container.setEnableScrolling(true);
-		container.setEnableScrollbar(true);
-		container.setLayout(layout);
-		container.setPadding(new Vector4f(12f, 12f, 12f, 12f));
-		container.setVisible(true);
-		//addDisplayElement(container);
+		addDisplayElement(uiminionlist);	
 
 		selected = new UISelectedMinion(this);
 		selected.setPosition(new Vector2f(310, 40));
@@ -103,11 +86,6 @@ public class UIScreenBookOreo extends UIWindow {
 		
 		
 	}
-
-	/*public void setSelectedMinion(EntityRef minion) {
-		selected.setMinion(minion);
-
-	}*/
 
 	@Override
 	public void open() {
@@ -128,11 +106,15 @@ public class UIScreenBookOreo extends UIWindow {
 	}
 	
 	public void removeMinionFromList(EntityRef minion){
-		MinionComponent minioncomp = minion.getComponent(MinionComponent.class);
 		for(UIListItem item : uiminionlist.getItems()){
 			EntityRef listminion = (EntityRef)item.getValue();
-			if(listminion.getComponent(MinionComponent.class).getID() == minioncomp.getID()){
+			if(listminion.getId() == minion.getId()){
 				uiminionlist.removeItem(item);
+				//doesn't seem to work
+				/*if(uiminionlist.getItemCount() > 0){
+					uiminionlist.select(0);
+					selected.setMinion((EntityRef)uiminionlist.getSelection().getValue());
+				}*/
 			}
 		}
 		

@@ -62,7 +62,7 @@ public class UISelectedMinion extends UICompositeScrollable {
 			butfollow.setVisible(false);
 			butSetZone.setVisible(false);
 			butInventory.setVisible(false);
-			butClearComm.setVisible(true);
+			butClearComm.setVisible(false);
 			butBye.setVisible(false);
 			butStay.setVisible(false);
 			butAttack.setVisible(false);
@@ -291,7 +291,7 @@ public class UISelectedMinion extends UICompositeScrollable {
 												// inconsistence)
 		cell.setMinion(minion);
 		MinionComponent minioncomp = minion.getComponent(MinionComponent.class);
-		lblname.setText(minioncomp.getID() + " : " + minioncomp.name);
+		lblname.setText(minioncomp.name);
 		lblflavor.setText(minioncomp.flavortext);
 		lblname.setVisible(true);
 		lblflavor.setVisible(true);

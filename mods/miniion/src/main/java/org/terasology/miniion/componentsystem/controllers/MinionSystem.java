@@ -16,7 +16,6 @@
 package org.terasology.miniion.componentsystem.controllers;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -214,10 +213,10 @@ public class MinionSystem implements EventHandlerSystem {
 
 	/**
 	 * Creates a new ID for minions
-	 * 
+	 * using entityID instead
 	 * @return an integer id
 	 */
-	public static int getNewMinionID() {
+	/*public static int getNewMinionID() {
 		if (minionid == null)
 			minionid = new AtomicInteger(Integer.MIN_VALUE);
 		boolean idexists = false;
@@ -238,7 +237,7 @@ public class MinionSystem implements EventHandlerSystem {
 			}
 		}
 		return minionid.getAndIncrement();
-	}
+	}*/
 
 	@Deprecated
 	@ReceiveEvent(components = { WorldComponent.class })
@@ -361,8 +360,7 @@ public class MinionSystem implements EventHandlerSystem {
 	 * current helditem only adds gather targets for now, minion command needs
 	 * popuup to set behaviour
 	 */
-	@ReceiveEvent(components = { LocalPlayerComponent.class,
-			MinionControllerComponent.class }, priority = PRIORITY_LOCAL_PLAYER_OVERRIDE)
+	@ReceiveEvent(components = { LocalPlayerComponent.class, MinionControllerComponent.class }, priority = PRIORITY_LOCAL_PLAYER_OVERRIDE)
 	public void onAttack(AttackButton event, EntityRef entity) {
 		LocalPlayerComponent locplaycomp = entity
 				.getComponent(LocalPlayerComponent.class);
