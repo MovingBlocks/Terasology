@@ -48,8 +48,8 @@ public class UIMinionContainer extends UICompositeScrollable {
 					for (UIMinionbarCell cell : cells) {
 						cell.setSelected(false);
 					}
-					minionscreen
-							.setSelectedMinion(((UIMinionbarCell) element).minion);
+					//minionscreen
+						//	.setSelectedMinion(((UIMinionbarCell) element).minion);
 				}
 				UIMinionbarCell minion = (UIMinionbarCell) element;
 				minion.selected = true;

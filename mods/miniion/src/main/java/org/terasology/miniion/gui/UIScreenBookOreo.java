@@ -16,8 +16,15 @@
 package org.terasology.miniion.gui;
 
 import org.lwjgl.input.Keyboard;
+import org.newdawn.slick.Color;
 import org.terasology.asset.Assets;
+import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.game.CoreRegistry;
+import org.terasology.miniion.components.MinionComponent;
+import org.terasology.miniion.componentsystem.controllers.MinionSystem;
+import org.terasology.rendering.gui.framework.UIDisplayElement;
+import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.layout.GridLayout;
 import org.terasology.rendering.gui.widgets.*;
 
@@ -28,8 +35,18 @@ public class UIScreenBookOreo extends UIWindow {
 
 	private UIMinionContainer container;
 	private UISelectedMinion selected;
+	private UIList uiminionlist;
 	private final UIImage background;
 	private final UILabel pagetitle, pagetitle2;
+	
+	private ClickListener minionistener = new ClickListener() {		
+		@Override
+		public void click(UIDisplayElement element, int button) {
+			UIListItem listitem = (UIListItem)element;
+			selected.setMinion((EntityRef)listitem.getValue());
+			//MinionSystem.setActiveMinion((EntityRef)listitem.getValue());
+		}
+	};
 
 	public UIScreenBookOreo() {
 		setId("oreobook");
@@ -58,7 +75,13 @@ public class UIScreenBookOreo extends UIWindow {
 		pagetitle2.setColor(org.newdawn.slick.Color.black);
 		pagetitle2.setVisible(true);
 		addDisplayElement(pagetitle2);
-
+		
+		uiminionlist = new UIList();
+		uiminionlist.setSize(new Vector2f(250, 350));
+		uiminionlist.setPosition(new Vector2f(45, 40));
+		uiminionlist.setVisible(true);
+		addDisplayElement(uiminionlist);
+		
 		GridLayout layout = new GridLayout(4);
 		layout.setCellPadding(new Vector4f(2f, 2f, 2f, 2f));
 
@@ -70,19 +93,21 @@ public class UIScreenBookOreo extends UIWindow {
 		container.setLayout(layout);
 		container.setPadding(new Vector4f(12f, 12f, 12f, 12f));
 		container.setVisible(true);
-		addDisplayElement(container);
+		//addDisplayElement(container);
 
 		selected = new UISelectedMinion(this);
 		selected.setPosition(new Vector2f(310, 40));
 		selected.setSize(new Vector2f(250, 170));
 		selected.setVisible(true);
 		addDisplayElement(selected);
+		
+		
 	}
 
-	public void setSelectedMinion(EntityRef minion) {
+	/*public void setSelectedMinion(EntityRef minion) {
 		selected.setMinion(minion);
 
-	}
+	}*/
 
 	@Override
 	public void open() {
@@ -91,6 +116,25 @@ public class UIScreenBookOreo extends UIWindow {
 	}
 
 	public void refresh() {
-		container.fillInventoryCells(this);
+		//container.fillInventoryCells(this);
+		uiminionlist.removeAll();
+		EntityManager entMan = CoreRegistry.get(EntityManager.class);
+		for(EntityRef minion : entMan.iteratorEntities(MinionComponent.class)){
+			UIListItem listitem = new UIListItem(minion.getComponent(MinionComponent.class).name, minion);
+			listitem.setTextColor(Color.black);
+			listitem.addClickListener(minionistener);
+			uiminionlist.addItem(listitem);
+		}
+	}
+	
+	public void removeMinionFromList(EntityRef minion){
+		MinionComponent minioncomp = minion.getComponent(MinionComponent.class);
+		for(UIListItem item : uiminionlist.getItems()){
+			EntityRef listminion = (EntityRef)item.getValue();
+			if(listminion.getComponent(MinionComponent.class).getID() == minioncomp.getID()){
+				uiminionlist.removeItem(item);
+			}
+		}
+		
 	}
 }

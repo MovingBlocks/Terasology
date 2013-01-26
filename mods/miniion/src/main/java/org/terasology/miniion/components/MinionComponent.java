@@ -27,7 +27,7 @@ import org.terasology.miniion.utilities.Zone;
  */
 public final class MinionComponent implements Component {
 
-	public final int id;
+	public int minionid = MinionSystem.getNewMinionID();
 	// simple uri defining an icon
 	public String icon = "";
 	// personal name for the minion, not set in prefab!
@@ -40,11 +40,11 @@ public final class MinionComponent implements Component {
 	public Zone gatherzone;
 
 	public int getID() {
-		return id;
+		return minionid;
 	}
 
 	public MinionComponent() {
-		id = MinionSystem.getNewMinionID();
+		
 	}
 
 }

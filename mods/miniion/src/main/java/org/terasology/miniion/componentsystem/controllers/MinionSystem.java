@@ -91,28 +91,14 @@ public class MinionSystem implements EventHandlerSystem {
 		// minionFactory.setRandom(new FastRandom());
 		// guiManager.registerWindow("minionBehaviour",
 		// UIMinionBehaviourMenu.class);
-		guiManager.registerWindow("minionTest", UIMinionTestMenu.class); // experimental
-																			// popup
-																			// menu
-																			// for
-																			// the
-																			// minion
-																			// command
-																			// tool
-		guiManager.registerWindow("cardbook", UICardBook.class); // ui to create
-																	// summonable
-																	// cards
-		guiManager.registerWindow("oreobook", UIScreenBookOreo.class); // ui to
-																		// manage
-																		// summoned
-																		// minions,
-																		// selecting
-																		// one
-																		// sets
-																		// it
-																		// active!
-		guiManager.registerWindow("zonebook", UIZoneBook.class); // ui to manage
-																	// zones
+		// experimental popup menu for the minion command tool
+		guiManager.registerWindow("minionTest", UIMinionTestMenu.class);
+		// ui to create summonable cards
+		guiManager.registerWindow("cardbook", UICardBook.class); 
+		// ui to manage summoned minions, selecting one sets it active!
+		guiManager.registerWindow("oreobook", UIScreenBookOreo.class);
+		// ui to manage zones
+		guiManager.registerWindow("zonebook", UIZoneBook.class); 
 		createZoneList();
 	}
 

@@ -1,3 +1,18 @@
+/*
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.terasology.miniion.gui;
 
 import javax.vecmath.Vector2f;
@@ -27,10 +42,25 @@ public class UIZoneBook extends UIWindow {
 	private final UIImage background;
 	private final UILabel lblzonename, lblheight, lbldepth, lblwidth;
 	private final UIText txtzonename, txtheight, txtdepth, txtwidth;
-	private UIModButton btnSave;
+	private UIList uizonelist;
+	private UIModButton btnSave, btnDelete;
 	private EntityRef zoneselection;
 	private boolean newzonefound;
-
+	
+	private ClickListener zonelistener = new ClickListener() {		
+		@Override
+		public void click(UIDisplayElement element, int button) {
+			UIListItem listitem = (UIListItem) element;
+			Zone zone = (Zone)listitem.getValue();
+			txtzonename.setText(zone.Name);
+			txtheight.setText("" + zone.zoneheight);
+			txtwidth.setText("" + zone.zonewidth);
+			txtdepth.setText("" + zone.zonedepth);
+			btnSave.setVisible(false);
+			btnDelete.setVisible(true);			
+		}
+	};
+	
 	public UIZoneBook() {
 
 		setId("zonebook");
@@ -45,6 +75,12 @@ public class UIZoneBook extends UIWindow {
 		background.setSize(new Vector2f(500, 300));
 		background.setVisible(true);
 		addDisplayElement(background);
+		
+		uizonelist = new UIList();
+		uizonelist.setSize(new Vector2f(200, 250));
+		uizonelist.setPosition(new Vector2f(40, 20));
+		uizonelist.setVisible(true);
+		background.addDisplayElement(uizonelist);
 
 		lblzonename = new UILabel("Zone name :");
 		lblzonename.setPosition(new Vector2f(260, 20));
@@ -110,10 +146,23 @@ public class UIZoneBook extends UIWindow {
 			}
 		});
 		background.addDisplayElement(btnSave);
+		
+		btnDelete = new UIModButton(new Vector2f(50, 20), ButtonType.NORMAL);
+		btnDelete.setPosition(new Vector2f(260, 230));
+		btnDelete.setLabel("Delete");
+		btnDelete.setId("btnDelZone");
+		btnDelete.setVisible(false);
+		btnDelete.addClickListener(new ClickListener() {
+			@Override
+			public void click(UIDisplayElement element, int button) {
+				executeDelClick(element, button, (Zone)uizonelist.getSelection().getValue());
+			}
+		});
+		background.addDisplayElement(btnDelete);
 
 	}
 
-	public void executeClick(UIDisplayElement element, int id) {
+	private void executeClick(UIDisplayElement element, int id) {
 		UIModButton clickedbutton = (UIModButton) element;
 		if (txtzonename.getText().length() < 2) {
 			return;
@@ -144,11 +193,35 @@ public class UIZoneBook extends UIWindow {
 		newzonefound = false;
 		this.close();
 	}
+	
+	private void executeDelClick(UIDisplayElement element, int id, Zone deletezone) {
+		MinionSystem.getGatherZoneList().remove(deletezone);
+		fillUI();
+	}
 
 	@Override
 	public void open() {
 		super.open();
+		fillUI();
+	}
+	
+	private void fillUI(){
+		//clear and init the list
+		uizonelist.removeAll();
+		for (Zone zone : MinionSystem.getGatherZoneList()) {
+			UIListItem listitem = new UIListItem(zone.Name, zone);
+			listitem.setTextColor(Color.black);
+			listitem.addClickListener(zonelistener);
+			uizonelist.addItem(listitem);
+		}
+		//clear the textbowes
+		txtzonename.setText("");
+		txtheight.setText("");
+		txtwidth.setText("");
+		txtdepth.setText("");
 		newzonefound = false;
+		btnSave.setVisible(false);
+		btnDelete.setVisible(false);
 		// hopefully people won't run around with 50 zoning tools, I take the
 		// first one that has data in it
 		EntityManager entityManager = CoreRegistry.get(EntityManager.class);
@@ -178,6 +251,8 @@ public class UIZoneBook extends UIWindow {
 						+ (getAbsoluteDiff(maxbounds.y, minbounds.y)));
 			}
 			if (newzonefound) {
+				btnSave.setVisible(true);
+				btnDelete.setVisible(false);
 				break;
 			}
 		}

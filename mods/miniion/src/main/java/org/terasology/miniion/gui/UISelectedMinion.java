@@ -1,3 +1,18 @@
+/*
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.terasology.miniion.gui;
 
 import static org.lwjgl.opengl.GL11.glClear;
@@ -16,6 +31,7 @@ import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.miniion.components.MinionComponent;
+import org.terasology.miniion.components.SimpleMinionAIComponent;
 import org.terasology.miniion.componentsystem.controllers.MinionSystem;
 import org.terasology.model.inventory.Icon;
 import org.terasology.rendering.gui.framework.*;
@@ -46,6 +62,7 @@ public class UISelectedMinion extends UICompositeScrollable {
 			butfollow.setVisible(false);
 			butSetZone.setVisible(false);
 			butInventory.setVisible(false);
+			butClearComm.setVisible(true);
 			butBye.setVisible(false);
 			butStay.setVisible(false);
 			butAttack.setVisible(false);
@@ -106,7 +123,7 @@ public class UISelectedMinion extends UICompositeScrollable {
 	private UIMinionbarCell cell = new UIMinionbarCell();
 	private UIScreenBookOreo minionscreen;
 	private UIModButton butfollow, butStay, butInventory, butBye, butAttack,
-			butGather, butSetZone;
+			butGather, butSetZone, butClearComm;
 	private UILabel lblBehaviour, lblname, lblflavor;
 	private UIList uizonelist;
 
@@ -221,6 +238,21 @@ public class UISelectedMinion extends UICompositeScrollable {
 			}
 		});
 		this.addDisplayElement(butInventory);
+		
+		butClearComm = new UIModButton(new Vector2f(100, 20), ButtonType.NORMAL);
+		butClearComm.setLabel("clear orders");
+		butClearComm.setColorOffset(120);
+		butClearComm.setVisible(false);
+		butClearComm.setPosition(new Vector2f(20, 200));
+		butClearComm.addClickListener(new ClickListener() {
+			@Override
+			public void click(UIDisplayElement element, int button) {
+				SimpleMinionAIComponent aicomp = cell.minion.getComponent(SimpleMinionAIComponent.class);
+				aicomp.ClearCommands();
+				cell.minion.saveComponent(aicomp);
+			}
+		});
+		this.addDisplayElement(butClearComm);
 
 		butBye = new UIModButton(new Vector2f(100, 20), ButtonType.NORMAL);
 		butBye.setLabel("bye bye");
@@ -259,7 +291,7 @@ public class UISelectedMinion extends UICompositeScrollable {
 												// inconsistence)
 		cell.setMinion(minion);
 		MinionComponent minioncomp = minion.getComponent(MinionComponent.class);
-		lblname.setText(minioncomp.name);
+		lblname.setText(minioncomp.getID() + " : " + minioncomp.name);
 		lblflavor.setText(minioncomp.flavortext);
 		lblname.setVisible(true);
 		lblflavor.setVisible(true);
@@ -267,6 +299,7 @@ public class UISelectedMinion extends UICompositeScrollable {
 		butfollow.setVisible(true);
 		butSetZone.setVisible(true);
 		butInventory.setVisible(true);
+		butClearComm.setVisible(true);
 		butBye.setVisible(true);
 		butStay.setVisible(true);
 		butAttack.setVisible(true);
@@ -338,10 +371,10 @@ public class UISelectedMinion extends UICompositeScrollable {
 					.getComponent(MinionComponent.class);
 			minioncomp.minionBehaviour = MinionBehaviour.Die;
 			this.cell.minion.saveComponent(minioncomp);
-			this.cell.clearMinion();
 			if (minionscreen != null) {
-				minionscreen.refresh();
+				minionscreen.removeMinionFromList(this.cell.minion);
 			}
+			this.cell.clearMinion();			
 		}
 	}
 
