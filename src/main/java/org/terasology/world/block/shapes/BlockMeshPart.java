@@ -77,11 +77,10 @@ public class BlockMeshPart {
         return new BlockMeshPart(vertices, normals, newTexCoords, indices);
     }
 
-    public void appendTo(ChunkMesh chunk, int offsetX, int offsetY, int offsetZ, Vector4f colorOffset, int meshBit) {
+    public void appendTo(ChunkMesh chunk, int offsetX, int offsetY, int offsetZ, Vector4f colorOffset, int meshBit, int flags) {
         for (Vector2f texCoord : texCoords) {
             chunk._vertexElements[meshBit].tex.add(texCoord.x);
             chunk._vertexElements[meshBit].tex.add(texCoord.y);
-            chunk._vertexElements[meshBit].tex.add(1.0f);
         }
 
         int nextIndex = chunk._vertexElements[meshBit].vertCount;
@@ -96,6 +95,7 @@ public class BlockMeshPart {
             chunk._vertexElements[meshBit].normals.add(normals[vIdx].x);
             chunk._vertexElements[meshBit].normals.add(normals[vIdx].y);
             chunk._vertexElements[meshBit].normals.add(normals[vIdx].z);
+            chunk._vertexElements[meshBit].flags.add(flags);
         }
         chunk._vertexElements[meshBit].vertCount += vertices.length;
 

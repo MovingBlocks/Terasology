@@ -109,11 +109,12 @@ public final class ChunkTessellator {
 
         for (int j = 0; j < mesh._vertexElements.length; j++) {
             // Vertices double to account for light info
-            mesh._vertexElements[j].finalVertices = BufferUtils.createByteBuffer(mesh._vertexElements[j].vertices.size() * 2 * 4 + mesh._vertexElements[j].tex.size() * 4 + mesh._vertexElements[j].color.size() * 4 + mesh._vertexElements[j].normals.size() * 4);
+            mesh._vertexElements[j].finalVertices = BufferUtils.createByteBuffer(mesh._vertexElements[j].vertices.size() * 2 * 4 + mesh._vertexElements[j].tex.size() * 4 + mesh._vertexElements[j].flags.size() * 4 + mesh._vertexElements[j].color.size() * 4 + mesh._vertexElements[j].normals.size() * 4);
 
             int cTex = 0;
             int cColor = 0;
-            for (int i = 0; i < mesh._vertexElements[j].vertices.size(); i += 3, cTex += 3, cColor += 4) {
+            int cFlags = 0;
+            for (int i = 0; i < mesh._vertexElements[j].vertices.size(); i += 3, cTex += 2, cColor += 4, cFlags++) {
 
                 Vector3f vertexPos = new Vector3f(mesh._vertexElements[j].vertices.get(i), mesh._vertexElements[j].vertices.get(i + 1), mesh._vertexElements[j].vertices.get(i + 2));
 
@@ -123,7 +124,7 @@ public final class ChunkTessellator {
 
                 mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].tex.get(cTex));
                 mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].tex.get(cTex + 1));
-                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].tex.get(cTex + 2));
+                mesh._vertexElements[j].finalVertices.putInt(mesh._vertexElements[j].flags.get(cFlags));
 
                 float[] result = new float[3];
                 Vector3f normal = new Vector3f(mesh._vertexElements[j].normals.get(i), mesh._vertexElements[j].normals.get(i+1), mesh._vertexElements[j].normals.get(i+2));
@@ -246,6 +247,17 @@ public final class ChunkTessellator {
 
     private void generateBlockVertices(WorldView view, ChunkMesh mesh, int x, int y, int z, float temp, float hum) {
         Block block = view.getBlock(x, y, z);
+        int vertexFlags = 0;
+
+        // TODO: Needs review since the new per-vertex flags introduce a lot of special scenarios
+        if (block.getURI().toString().equals("engine:water")) {
+            vertexFlags |= 0x10000000;
+        } else if (block.getURI().toString().equals("engine:lava")) {
+            vertexFlags |= 0x20000000;
+        }
+        if (block.isWaving()) {
+            vertexFlags |= 0x40000000;
+        }
 
         /*
          * Determine the render process.
@@ -262,7 +274,7 @@ public final class ChunkTessellator {
 
         if (block.getMeshPart(BlockPart.CENTER) != null) {
             Vector4f colorOffset = block.calcColorOffsetFor(BlockPart.CENTER, temp, hum);
-            block.getMeshPart(BlockPart.CENTER).appendTo(mesh, x, y, z, colorOffset, renderType.getIndex());
+            block.getMeshPart(BlockPart.CENTER).appendTo(mesh, x, y, z, colorOffset, renderType.getIndex(), vertexFlags);
         }
 
         boolean[] drawDir = new boolean[6];
@@ -299,7 +311,7 @@ public final class ChunkTessellator {
                 for (Side dir : Side.values()) {
                     if (drawDir[dir.ordinal()]) {
                         Vector4f colorOffset = block.calcColorOffsetFor(BlockPart.fromSide(dir), temp, hum);
-                        block.getLoweredLiquidMesh(dir).appendTo(mesh, x, y, z, colorOffset, renderType.getIndex());
+                        block.getLoweredLiquidMesh(dir).appendTo(mesh, x, y, z, colorOffset, renderType.getIndex(), vertexFlags);
                     }
                 }
                 return;
@@ -309,7 +321,13 @@ public final class ChunkTessellator {
         for (Side dir : Side.values()) {
             if (drawDir[dir.ordinal()]) {
                 Vector4f colorOffset = block.calcColorOffsetFor(BlockPart.fromSide(dir), temp, hum);
-                block.getMeshPart(BlockPart.fromSide(dir)).appendTo(mesh, x, y, z, colorOffset, renderType.getIndex());
+
+                // TODO: Needs review since the new per-vertex flags introduce a lot of special scenarios
+                if (block.getURI().toString().equals("engine:grass") && dir != Side.TOP && dir != Side.BOTTOM) {
+                    vertexFlags |= 0x80000000;
+                }
+
+                block.getMeshPart(BlockPart.fromSide(dir)).appendTo(mesh, x, y, z, colorOffset, renderType.getIndex(), vertexFlags);
             }
         }
     }

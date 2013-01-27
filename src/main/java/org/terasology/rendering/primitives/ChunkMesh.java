@@ -61,6 +61,7 @@ public class ChunkMesh {
             tex = new TFloatArrayList();
             color = new TFloatArrayList();
             indices = new TIntArrayList();
+            flags = new TIntArrayList();
         }
 
         public final TFloatList normals;
@@ -68,6 +69,7 @@ public class ChunkMesh {
         public final TFloatList tex;
         public final TFloatList color;
         public final TIntList indices;
+        public final TIntList flags;
         public int vertCount;
 
         public ByteBuffer finalVertices;

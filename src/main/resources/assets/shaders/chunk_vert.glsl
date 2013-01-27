@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-#define WAVING_COORDINATE_COUNT 32
-
 varying vec3 normal;
 varying vec4 vertexWorldPosRaw;
 varying vec4 vertexWorldPos;
@@ -23,16 +21,12 @@ varying vec4 vertexPos;
 varying vec3 lightDir;
 varying vec3 waterNormal;
 
-varying float flickering;
-
+varying float flickeringLightOffset;
 varying float isUpside;
+varying uint perVertexFlags;
 
 uniform float blockScale = 1.0;
-
 uniform float time;
-uniform float wavingCoordinates[WAVING_COORDINATE_COUNT];
-uniform vec2 waterCoordinate;
-uniform vec2 lavaCoordinate;
 uniform vec3 chunkOffset;
 
 uniform float animated;
@@ -40,6 +34,8 @@ uniform float animated;
 void main()
 {
 	gl_TexCoord[0] = gl_MultiTexCoord0;
+	perVertexFlags = floatBitsToUint(gl_TexCoord[0].z);
+
     gl_TexCoord[1] = gl_MultiTexCoord1;
 
 	vertexWorldPosRaw = gl_Vertex;
@@ -47,23 +43,19 @@ void main()
 	vertexWorldPos = gl_ModelViewMatrix * vertexWorldPosRaw;
 	waterNormal = gl_NormalMatrix * vec3(0,1,0);
 
-	if (gl_Normal.y == 1.0) {
-	    isUpside = 1.0;
-	} else {
-	    isUpside = 0.0;
-	}
+	isUpside = gl_Normal.y == 1.0 ? 1.0 : 0.0;
 
 	lightDir = gl_LightSource[0].position.xyz;
 
     normal = gl_NormalMatrix * gl_Normal;
     gl_FrontColor = gl_Color;
 
-#ifdef FLICKERING_LIGHT
-	flickering = smoothTriangleWave(timeToTick(time, 0.5)) / 64.0;
-	flickering += smoothTriangleWave(timeToTick(time, 0.25) + 0.3762618) / 32.0;
-	flickering += smoothTriangleWave(timeToTick(time, 0.1) + 0.872917) / 16.0;
+#ifdef flickeringLightOffset_LIGHT
+	flickeringLightOffset = smoothTriangleWave(timeToTick(time, 0.5)) / 64.0;
+	flickeringLightOffset += smoothTriangleWave(timeToTick(time, 0.25) + 0.3762618) / 32.0;
+	flickeringLightOffset += smoothTriangleWave(timeToTick(time, 0.1) + 0.872917) / 16.0;
 #else
-	flickering = 0.0;
+	flickeringLightOffset = 0.0;
 #endif
 
 #ifdef ANIMATED_WATER_AND_GRASS
@@ -71,29 +63,21 @@ void main()
 
     if (animated > 0.0) {
         // GRASS ANIMATION
-        for (int i=0; i < WAVING_COORDINATE_COUNT; i+=2) {
-           if (gl_TexCoord[0].x >= wavingCoordinates[i] && gl_TexCoord[0].x < wavingCoordinates[i] + TEXTURE_OFFSET && gl_TexCoord[0].y >= wavingCoordinates[i+1] && gl_TexCoord[0].y < wavingCoordinates[i+1] + TEXTURE_OFFSET) {
-               if (gl_TexCoord[0].y < wavingCoordinates[i+1] + TEXTURE_OFFSET / 2.0) {
-                   vertexWorldPos.x += (smoothTriangleWave(timeToTick(time, 0.2) + vertexChunkPos.x * 0.1 + vertexChunkPos.z * 0.1) * 2.0 - 1.0) * 0.1 * blockScale;
-                   vertexWorldPos.y += (smoothTriangleWave(timeToTick(time, 0.1) + vertexChunkPos.x * -0.5 + vertexChunkPos.z * -0.5) * 2.0 - 1.0) * 0.05 * blockScale;
-               }
+        if ((perVertexFlags & 0x40000000) > 0) {
+           if (mod(gl_TexCoord[0].y, TEXTURE_OFFSET) < TEXTURE_OFFSET / 2.0) {
+               vertexWorldPos.x += (smoothTriangleWave(timeToTick(time, 0.2) + vertexChunkPos.x * 0.1 + vertexChunkPos.z * 0.1) * 2.0 - 1.0) * 0.1 * blockScale;
+               vertexWorldPos.y += (smoothTriangleWave(timeToTick(time, 0.1) + vertexChunkPos.x * -0.5 + vertexChunkPos.z * -0.5) * 2.0 - 1.0) * 0.05 * blockScale;
            }
         }
-    }
+     }
 
-    if (gl_TexCoord[0].x >= waterCoordinate.x && gl_TexCoord[0].x < waterCoordinate.x + TEXTURE_OFFSET && gl_TexCoord[0].y >= waterCoordinate.y && gl_TexCoord[0].y < waterCoordinate.y + TEXTURE_OFFSET) {
+    if ((perVertexFlags & 0x10000000) > 0) {
        // Only animate blocks on sea level
        if (vertexWorldPosRaw.y < 32.5 && vertexWorldPosRaw.y > 31.5) {
             vertexWorldPos.y += (smoothTriangleWave(timeToTick(time, 0.1) + vertexChunkPos.x * 0.05 + vertexChunkPos.z * 0.05) * 2.0 - 1.0) * 0.1 * blockScale
             + (smoothTriangleWave(timeToTick(time, 0.25)  + vertexChunkPos.x *-0.25 + vertexChunkPos.z * 0.25) * 2.0 - 1.0) * 0.025 * blockScale;
         }
     }
-#if 0
-    else if (gl_TexCoord[0].x >= lavaCoordinate.x && gl_TexCoord[0].x < lavaCoordinate.x + TEXTURE_OFFSET && gl_TexCoord[0].y >= lavaCoordinate.y && gl_TexCoord[0].y < lavaCoordinate.y + TEXTURE_OFFSET) {
-        vertexWorldPos.y += smoothTriangleWave(timeToTick(time, 0.05) + vertexChunkPos.x * 0.1 + vertexChunkPos.z * 0.1) * 0.2 * blockScale;
-    }
-#endif
-
 #endif
 
     vertexPos = gl_ProjectionMatrix * vertexWorldPos;

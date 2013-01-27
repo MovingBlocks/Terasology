@@ -12,36 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-
-uniform sampler2D textureAtlas;
-uniform sampler2D textureWaterNormal;
-uniform sampler2D textureLava;
-uniform sampler2D textureEffects;
-uniform sampler2D textureWaterReflection;
-
-uniform float time;
-uniform float daylight = 1.0;
-uniform bool carryingTorch;
-uniform bool swimming;
-
-uniform float clipHeight = 0.0;
-
-varying vec4 vertexWorldPosRaw;
-varying vec4 vertexWorldPos;
-varying vec4 vertexPos;
-varying vec3 lightDir;
-varying vec3 normal;
-varying vec3 waterNormal;
-varying float isUpside;
-
-varying float flickering;
-varying float flickeringAlternative;
-
-uniform vec3 chunkOffset;
-uniform vec2 waterCoordinate;
-uniform vec2 lavaCoordinate;
-uniform vec2 grassCoordinate;
+*/
 
 #define DAYLIGHT_AMBIENT_COLOR 0.95, 0.92, 0.91
 #define MOONLIGHT_AMBIENT_COLOR 0.8, 0.8, 1.0
@@ -61,12 +32,37 @@ uniform vec2 grassCoordinate;
 
 #define WATER_REFRACTION 0.1
 
+uniform sampler2D textureAtlas;
+uniform sampler2D textureWaterNormal;
+uniform sampler2D textureLava;
+uniform sampler2D textureEffects;
+uniform sampler2D textureWaterReflection;
+
+uniform float time;
+uniform float daylight = 1.0;
+
+uniform float clipHeight = 0.0;
+
+uniform bool carryingTorch;
+uniform bool swimming;
+
+varying vec4 vertexWorldPosRaw;
+varying vec4 vertexWorldPos;
+varying vec4 vertexPos;
+varying vec3 lightDir;
+varying vec3 normal;
+varying vec3 waterNormal;
+
+varying float flickeringLightOffset;
+varying uint perVertexFlags;
+varying float isUpside;
+
 void main(){
 	if (clipHeight > 0.0 && vertexWorldPosRaw.y < clipHeight && !swimming) {
         discard;
 	}
 
-    vec4 texCoord = gl_TexCoord[0];
+    vec2 texCoord = gl_TexCoord[0].xy;
 
     vec3 normalizedVPos = -normalize(vertexWorldPos.xyz);
     vec3 normalWater;
@@ -79,10 +75,10 @@ void main(){
     if (daylight < 0.1)
         finalLightDir = mix(finalLightDir * -1.0, finalLightDir, daylight / 0.1);
 
-    vec4 color;
+    vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
 
-    /* APPLY WATER TEXTURE */
-    if (texCoord.x >= waterCoordinate.x && texCoord.x < waterCoordinate.x + TEXTURE_OFFSET && texCoord.y >= waterCoordinate.y && texCoord.y < waterCoordinate.y + TEXTURE_OFFSET) {
+    /* WATER */
+    if ((perVertexFlags & 0x10000000) > 0) {
         vec2 waterOffset = vec2(vertexWorldPosRaw.x + timeToTick(time, 0.1), vertexWorldPosRaw.z + timeToTick(time, 0.1)) / 8.0;
         normalWater.xyz = texture2D(textureWaterNormal, waterOffset).xyz * 2.0 - 1.0;
 
@@ -102,8 +98,8 @@ void main(){
         }
 
         isWater = true;
-    /* APPLY LAVA TEXTURE */
-    } else if (texCoord.x >= lavaCoordinate.x && texCoord.x < lavaCoordinate.x + TEXTURE_OFFSET && texCoord.y >= lavaCoordinate.y && texCoord.y < lavaCoordinate.y + TEXTURE_OFFSET) {
+    /* LAVA */
+    } else if ((perVertexFlags & 0x20000000) > 0) {
         texCoord.x = mod(texCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET);
         texCoord.y = mod(texCoord.y, TEXTURE_OFFSET) / (128.0 / (1.0 / TEXTURE_OFFSET));
         texCoord.y += mod(timeToTick(time, 0.1), 127.0) * (1.0/128.0);
@@ -114,11 +110,12 @@ void main(){
         color = texture2D(textureAtlas, texCoord.xy);
     }
 
-    if (color.a < 0.5)
+    if (color.a < 0.5) {
         discard;
+    }
 
     /* APPLY OVERALL BIOME COLOR OFFSET */
-    if (!(texCoord.x >= grassCoordinate.x && texCoord.x < grassCoordinate.x + TEXTURE_OFFSET && texCoord.y >= grassCoordinate.y && texCoord.y < grassCoordinate.y + TEXTURE_OFFSET)) {
+    if ((perVertexFlags & 0x80000000) == 0) {
         if (gl_Color.r < 0.99 && gl_Color.g < 0.99 && gl_Color.b < 0.99) {
             if (color.g > 0.5) {
                 color.rgb = vec3(color.g) * gl_Color.rgb;
@@ -187,10 +184,10 @@ void main(){
     // Calculate the final block light brightness
     float blockBrightness = (expLightValue(blocklightValue) + diffuseLighting * blocklightValue * BLOCK_DIFF);
 
-    torchlight -= flickering * torchlight;
+    torchlight -= flickeringLightOffset * torchlight;
 
     blockBrightness += (1.0 - blockBrightness) * torchlight;
-    blockBrightness -= flickering * blocklightValue;
+    blockBrightness -= flickeringLightOffset * blocklightValue;
     blockBrightness *= blocklightDayIntensity;
 
     // Calculate the final blocklight color value and add a slight reddish tint to it

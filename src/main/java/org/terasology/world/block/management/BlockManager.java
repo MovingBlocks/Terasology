@@ -302,55 +302,6 @@ public class BlockManager {
         return familyByUri.size();
     }
 
-    public FloatBuffer calcCoordinatesForWavingBlocks() {
-        FloatBuffer buffer = BufferUtils.createFloatBuffer(32);
-
-        int counter = 0;
-        for (BlockFamily b : familyByUri.values()) {
-            if (b.getArchetypeBlock().isWaving()) {
-                // TODO: Don't use random block part
-                Vector2f pos = b.getArchetypeBlock().getTextureAtlasPos(BlockPart.TOP);
-                buffer.put(pos.x);
-                buffer.put(pos.y);
-                counter++;
-            }
-        }
-        for (BlockFamily b : partiallyRegisteredFamilies.values()) {
-            if (b.getArchetypeBlock().isWaving()) {
-                // TODO: Don't use random block part
-                Vector2f pos = b.getArchetypeBlock().getTextureAtlasPos(BlockPart.TOP);
-                buffer.put(pos.x);
-                buffer.put(pos.y);
-                counter++;
-            }
-        }
-
-        while (counter < 16) {
-            buffer.put(-1);
-            buffer.put(-1);
-            counter++;
-        }
-
-        buffer.flip();
-        return buffer;
-    }
-
-    public FloatBuffer calcCoordinate(String uri) {
-        BlockUri blockUri = new BlockUri(uri);
-        Block block = getBlock(blockUri);
-        FloatBuffer buffer = BufferUtils.createFloatBuffer(2);
-
-        if (!block.isInvisible()) {
-            // TODO: Don't use random block part
-            Vector2f position = block.getTextureAtlasPos(BlockPart.LEFT);
-            buffer.put(position.x);
-            buffer.put(position.y);
-        }
-
-        buffer.flip();
-        return buffer;
-    }
-
     public boolean hasBlockFamily(BlockUri uri) {
         return familyByUri.containsKey(uri) || partiallyRegisteredFamilies.containsKey(uri) || shapelessBlockDefinition.contains(uri);
     }
