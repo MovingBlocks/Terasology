@@ -58,7 +58,16 @@ public class FencesSystem implements EventHandlerSystem {
         @ReceiveEvent(components = {BlockComponent.class}, priority = EventPriority.PRIORITY_HIGH)
     public void onDestroyed(NoHealthEvent event, EntityRef entity) {
         BlockComponent blockComp = entity.getComponent(BlockComponent.class);
+        Block oldBlock = worldProvider.getBlock(blockComp.getPosition());
         checkAroundBlocks(blockComp.getPosition(), true, blockComp.getPosition());
+
+        if ( oldBlock.getBlockFamily().getURI().getPackage().equals("fences") ){
+            BlockFamily newBlock =  BlockManager.getInstance().getBlockFamily("fences:fenceend");
+
+            if ( newBlock != null ){
+                worldProvider.setBlock(blockComp.getPosition(), newBlock.getBlockFor(Side.LEFT, Side.RIGHT), oldBlock);
+            }
+        }
     }
     
     private ArrayList<Side> checkAroundBlocks(Vector3i primePos, boolean checkAround, Vector3i ignorePos){
