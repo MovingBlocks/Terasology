@@ -250,6 +250,9 @@ public class UISelectedMinion extends UICompositeScrollable {
 				SimpleMinionAIComponent aicomp = cell.minion.getComponent(SimpleMinionAIComponent.class);
 				aicomp.ClearCommands();
 				cell.minion.saveComponent(aicomp);
+				MinionComponent minioncomp = cell.minion.getComponent(MinionComponent.class);
+				minioncomp.gatherzone = null;
+				cell.minion.saveComponent(minioncomp);
 			}
 		});
 		this.addDisplayElement(butClearComm);

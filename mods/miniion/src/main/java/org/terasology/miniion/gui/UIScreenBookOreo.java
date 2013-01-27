@@ -22,6 +22,7 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.miniion.components.MinionComponent;
+import org.terasology.miniion.gui.UIModButton.ButtonType;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.widgets.*;
@@ -34,6 +35,7 @@ public class UIScreenBookOreo extends UIWindow {
 	private UIList uiminionlist;
 	private final UIImage background;
 	private final UILabel pagetitle, pagetitle2;
+	private UIModButton btnshowminion;
 	
 	private ClickListener minionistener = new ClickListener() {		
 		@Override
@@ -84,6 +86,22 @@ public class UIScreenBookOreo extends UIWindow {
 		selected.setVisible(true);
 		addDisplayElement(selected);
 		
+		btnshowminion = new UIModButton(new Vector2f(100, 20), ButtonType.NORMAL);
+		btnshowminion.setLabel("Show minion window");
+		btnshowminion.setColorOffset(120);
+		btnshowminion.setVisible(true);
+		btnshowminion.setPosition(new Vector2f(375, 260));
+		btnshowminion.addClickListener(new ClickListener() {
+			@Override
+			public void click(UIDisplayElement element, int button) {
+				if(btnshowminion.getLabel().getText() == "Show minion window"){
+					btnshowminion.setLabel("Hide minion minion");
+				}else {
+					btnshowminion.setLabel("Show minion window");
+				}
+			}
+		});
+		this.addDisplayElement(btnshowminion);
 		
 	}
 

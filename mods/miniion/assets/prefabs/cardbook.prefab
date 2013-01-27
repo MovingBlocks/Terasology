@@ -4,7 +4,7 @@
         "icon" : "cardbook",
         "usage" : "ON_USER",
         "consumedOnUse" : false,
-        "renderWithIcon" : true
+        "renderWithIcon" : false
     },
     "OpenUiAction" : {
     	"uiwindowid" : "cardbook"

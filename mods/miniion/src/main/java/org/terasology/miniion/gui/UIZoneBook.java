@@ -40,7 +40,7 @@ public class UIZoneBook extends UIWindow {
 	 * @In private EntityManager entityManager;
 	 */
 	private final UIImage background;
-	private final UILabel lblzonename, lblheight, lbldepth, lblwidth;
+	private final UILabel lblzonename, lblheight, lbldepth, lblwidth, lblzonetype;
 	private final UIText txtzonename, txtheight, txtdepth, txtwidth;
 	private UIList uizonelist;
 	private UIModButton btnSave, btnDelete;
@@ -133,7 +133,13 @@ public class UIZoneBook extends UIWindow {
 		txtdepth.setSize(new Vector2f(80, 20));
 		txtdepth.setVisible(true);
 		background.addDisplayElement(txtdepth);
-
+		
+		lblzonetype = new UILabel("ZoneType : Gatherzone");
+		lblzonetype.setPosition(new Vector2f(260, 100));
+		lblzonetype.setColor(Color.black);
+		lblzonetype.setVisible(true);
+		background.addDisplayElement(lblzonetype);
+		
 		btnSave = new UIModButton(new Vector2f(50, 20), ButtonType.NORMAL);
 		btnSave.setPosition(new Vector2f(260, 230));
 		btnSave.setLabel("Save");

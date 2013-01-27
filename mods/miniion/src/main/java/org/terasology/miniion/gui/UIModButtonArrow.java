@@ -41,17 +41,11 @@ import org.terasology.rendering.gui.widgets.UILabel;
  *         TODO program from scratch -> integrate state button here -> implement
  *         radio button?
  */
-public class UIModButton extends UIDisplayContainer {
-
-	private final UILabel _label;
+public class UIModButtonArrow extends UIDisplayContainer {
 
 	public enum ButtonType {
-		NORMAL, TOGGLE
+		LEFT, RIGHT
 	};
-
-	private boolean _toggleState = false;
-	private ButtonType _buttonType;
-
 	private final List<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
 	private final Map<String, Vector2f[]> states = new HashMap<String, Vector2f[]>();
 
@@ -64,16 +58,27 @@ public class UIModButton extends UIDisplayContainer {
 	 * @param buttonType
 	 *            The type of the button which can be normal or toggle.
 	 */
-	public UIModButton(Vector2f size, ButtonType buttonType) {
+	public UIModButtonArrow(Vector2f size, ButtonType buttontype) {
 		setSize(size);
 
-		_buttonType = buttonType;
-
 		// default button
-		setTexture("miniion:buttons");
-		setNormalState(new Vector2f(0.0f, 0.0f), new Vector2f(256f, 30f));
-		setHoverState(new Vector2f(0.0f, 30f), new Vector2f(256f, 30f));
-		setPressedState(new Vector2f(0.0f, 60f), new Vector2f(256f, 30f));
+		switch(buttontype){
+			case LEFT :{
+				setTexture("miniion:ArrowLeft");
+				break;
+			}
+			case RIGHT :{
+				setTexture("miniion:ArrowRight");
+				break;
+			}
+			default : {
+				setTexture("miniion:ArrowLeft");
+				break;
+			} 
+		}		
+		setNormalState(new Vector2f(0.0f, 0.0f), new Vector2f(12f, 23f));
+		setHoverState(new Vector2f(12f, 0.0f), new Vector2f(12f, 23f));
+		setPressedState(new Vector2f(24f, 0.0f), new Vector2f(12f, 23f));
 
 		// default state
 		setBackgroundImage(states.get("normal")[0], states.get("normal")[1]);
@@ -81,18 +86,7 @@ public class UIModButton extends UIDisplayContainer {
 		addMouseMoveListener(new MouseMoveListener() {
 			@Override
 			public void leave(UIDisplayElement element) {
-				if (_buttonType == ButtonType.TOGGLE) {
-					if (_toggleState) {
-						setBackgroundImage(states.get("pressed")[0],
-								states.get("pressed")[1]);
-					} else {
-						setBackgroundImage(states.get("normal")[0],
-								states.get("normal")[1]);
-					}
-				} else {
-					setBackgroundImage(states.get("normal")[0],
-							states.get("normal")[1]);
-				}
+				setBackgroundImage(states.get("normal")[0], states.get("normal")[1]);
 			}
 
 			@Override
@@ -102,12 +96,8 @@ public class UIModButton extends UIDisplayContainer {
 
 			@Override
 			public void enter(UIDisplayElement element) {
-				AudioManager.play(
-						new AssetUri(AssetType.SOUND, "engine:click"), 1.0f);
-				if (_buttonType == ButtonType.NORMAL) {
-					setBackgroundImage(states.get("hover")[0],
-							states.get("hover")[1]);
-				}
+				AudioManager.play(new AssetUri(AssetType.SOUND, "engine:click"), 1.0f);
+				setBackgroundImage(states.get("hover")[0], states.get("hover")[1]);
 			}
 
 			@Override
@@ -118,24 +108,15 @@ public class UIModButton extends UIDisplayContainer {
 
 		addMouseButtonListener(new MouseButtonListener() {
 			@Override
-			public void up(UIDisplayElement element, int button,
-					boolean intersect) {
-				if (_buttonType == ButtonType.NORMAL) {
-					setBackgroundImage(states.get("normal")[0],
-							states.get("normal")[1]);
-				}
+			public void up(UIDisplayElement element, int button, boolean intersect) {
+				setBackgroundImage(states.get("normal")[0],	states.get("normal")[1]);
 			}
 
 			@Override
 			public void down(UIDisplayElement element, int button,
 					boolean intersect) {
 				if (intersect) {
-					if (_buttonType == ButtonType.TOGGLE) {
-						setToggleState(!_toggleState);
-					} else {
-						setBackgroundImage(states.get("pressed")[0],
-								states.get("pressed")[1]);
-					}
+					setBackgroundImage(states.get("pressed")[0], states.get("pressed")[1]);
 				}
 			}
 
@@ -146,35 +127,10 @@ public class UIModButton extends UIDisplayContainer {
 			}
 		});
 
-		_label = new UILabel("Untitled");
-		_label.addChangedListener(new ChangedListener() {
-			@Override
-			public void changed(UIDisplayElement element) {
-				layout();
-			}
-		});
-		_label.setHorizontalAlign(EHorizontalAlign.CENTER);
-		_label.setVerticalAlign(EVerticalAlign.CENTER);
-		_label.setVisible(true);
-		_label.setTextShadow(true);
-
-		addDisplayElement(_label);
-	}
-	
-	public void hideLabel(){
-		_label.setVisible(false);
-	}
-
-	public UILabel getLabel() {
-		return _label;
-	}
-
-	public void setLabel(String label) {
-		_label.setText(label);
-	}
+	}	
 
 	public void setColorOffset(int offset) {
-		setNormalState(new Vector2f(0.0f, offset), new Vector2f(256f, 30f));
+		setNormalState(new Vector2f(0.0f, offset), new Vector2f(12f, 23f));
 	}
 
 	/**
@@ -238,39 +194,6 @@ public class UIModButton extends UIDisplayContainer {
 
 		// set default state
 		setBackgroundImage(states.get("normal")[0], states.get("normal")[1]);
-	}
-
-	public boolean getToggleState() {
-		return _toggleState;
-	}
-
-	/**
-	 * Set the state of the toggle button. Only has an affect if the button was
-	 * created as an toggle button.
-	 * 
-	 * @param state
-	 *            True to set the pressed state.
-	 */
-	public void setToggleState(boolean state) {
-		if (_toggleState != state) {
-			_toggleState = state;
-
-			if (_toggleState) {
-				setBackgroundImage(states.get("pressed")[0],
-						states.get("pressed")[1]);
-			} else {
-				setBackgroundImage(states.get("normal")[0],
-						states.get("normal")[1]);
-			}
-
-			notifyChangedListeners();
-		}
-	}
-
-	private void notifyChangedListeners() {
-		for (ChangedListener listener : changedListeners) {
-			listener.changed(this);
-		}
 	}
 
 	public void addChangedListener(ChangedListener listener) {

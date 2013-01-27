@@ -248,6 +248,8 @@ public class UICardBook extends UIWindow {
 							EntityRef player = CoreRegistry.get(
 									LocalPlayer.class).getEntity();
 							player.send(new ReceiveItemEvent(filledcard));
+							buttoncreatecard.setVisible(false);
+							minioncombo.setVisible(false);
 						}
 					}
 				}

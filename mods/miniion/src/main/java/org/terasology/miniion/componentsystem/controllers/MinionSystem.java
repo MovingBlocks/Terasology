@@ -17,7 +17,6 @@ package org.terasology.miniion.componentsystem.controllers;
 
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.vecmath.Vector3f;
 
@@ -43,7 +42,9 @@ import org.terasology.miniion.components.*;
 import org.terasology.miniion.componentsystem.entityfactory.MiniionFactory;
 import org.terasology.miniion.events.MinionMessageEvent;
 import org.terasology.miniion.events.ToggleMinionModeButton;
+import org.terasology.miniion.gui.UIActiveMinion;
 import org.terasology.miniion.gui.UICardBook;
+import org.terasology.miniion.gui.UICommandPoppup;
 import org.terasology.miniion.gui.UIScreenBookOreo;
 import org.terasology.miniion.gui.UIZoneBook;
 import org.terasology.miniion.minionenum.*;
@@ -64,18 +65,15 @@ public class MinionSystem implements EventHandlerSystem {
 
 	private static final int PRIORITY_LOCAL_PLAYER_OVERRIDE = 160;
 	private static final int POPUP_ENTRIES = 9;
-	private static final String BEHAVIOUR_MENU = "minionBehaviour";
-	private static final String MENU_TEST = "minionTest";
+	private static boolean showactiveminion = false;
 	private static EntityRef activeminion;
 	// TODO : a better way to save / load zones, but it does the trick
 	private static EntityRef zonelist;
-	private static AtomicInteger minionid;
+	//private static AtomicInteger minionid;
 
 	private GUIManager guiManager;
 	private BlockItemFactory blockItemFactory;
-	private DroppedBlockFactory droppedBlockFactory;
 	private UIMinionBehaviourMenu minionMenu;
-	private UIMinionTestMenu minionTest;
 	private MiniionFactory minionFactory;
 	private UIMessageQueue messageQueue;
 
@@ -85,13 +83,12 @@ public class MinionSystem implements EventHandlerSystem {
 		guiManager = CoreRegistry.get(GUIManager.class);
 		// minionFactory = new MiniionFactory();
 		blockItemFactory = new BlockItemFactory(entityManager);
-		droppedBlockFactory = new DroppedBlockFactory(entityManager);
 		// minionFactory.setEntityManager(entityManager);
 		// minionFactory.setRandom(new FastRandom());
 		// guiManager.registerWindow("minionBehaviour",
 		// UIMinionBehaviourMenu.class);
 		// experimental popup menu for the minion command tool
-		guiManager.registerWindow("minionTest", UIMinionTestMenu.class);
+		guiManager.registerWindow("activeminiion", UIActiveMinion.class);
 		// ui to create summonable cards
 		guiManager.registerWindow("cardbook", UICardBook.class); 
 		// ui to manage summoned minions, selecting one sets it active!
@@ -210,34 +207,20 @@ public class MinionSystem implements EventHandlerSystem {
 		zonelist.setPersisted(true);
 		zonelist.saveComponent(zonecomp);
 	}
-
+	
 	/**
-	 * Creates a new ID for minions
-	 * using entityID instead
-	 * @return an integer id
+	 * Returns true if the user set option in the oreobook
 	 */
-	/*public static int getNewMinionID() {
-		if (minionid == null)
-			minionid = new AtomicInteger(Integer.MIN_VALUE);
-		boolean idexists = false;
-		EntityManager entman = CoreRegistry.get(EntityManager.class);
-		for (int x = minionid.getAndIncrement(); x < Integer.MAX_VALUE; x = minionid
-				.getAndIncrement()) {
-			for (Map.Entry<EntityRef, MinionComponent> item : entman
-					.iterateComponents(MinionComponent.class)) {
-				if (item.getValue().getID() == x) {
-					idexists = true;
-					break;
-				}
-			}
-			if (idexists) {
-				idexists = false;
-			} else {
-				return x;
-			}
-		}
-		return minionid.getAndIncrement();
-	}*/
+	public static boolean isActiveMinionShown(){
+		return showactiveminion;
+	}
+	
+	/**
+	 * hide / show the active minion
+	 */
+	public void showActiveMinion(boolean show){
+		showactiveminion = show;
+	}
 
 	@Deprecated
 	@ReceiveEvent(components = { WorldComponent.class })
@@ -262,22 +245,6 @@ public class MinionSystem implements EventHandlerSystem {
 
 	@Override
 	public void shutdown() {
-	}
-
-	@Deprecated
-	@ReceiveEvent(components = { LocalPlayerComponent.class,
-			MinionControllerComponent.class })
-	public void onToggleMinionMode(ToggleMinionModeButton event,
-			EntityRef entity) {
-		/*
-		 * MinionControllerComponent minionController =
-		 * entity.getComponent(MinionControllerComponent.class);
-		 * minionController.minionMode = !minionController.minionMode; if
-		 * (!minionController.minionMode) {
-		 * guiManager.closeWindow(BEHAVIOUR_MENU);
-		 * guiManager.closeWindow(MENU_TEST); }
-		 * entity.saveComponent(minionController); event.consume();
-		 */
 	}
 
 	@Deprecated
@@ -314,10 +281,6 @@ public class MinionSystem implements EventHandlerSystem {
 			MinionControllerComponent.class })
 	public void onMouseWheel(MouseWheelEvent wheelEvent, EntityRef entity) {
 		if (minionMenu != null && minionMenu.isVisible()) {
-			menuScroll(wheelEvent.getWheelTurns(), entity);
-			wheelEvent.consume();
-		}
-		if (minionTest != null && minionTest.isVisible()) {
 			menuScroll(wheelEvent.getWheelTurns(), entity);
 			wheelEvent.consume();
 		}

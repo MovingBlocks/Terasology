@@ -4,9 +4,9 @@
         "icon" : "minioncommand",
         "usage" : "ON_USER",
         "consumedOnUse" : false,
-        "renderWithIcon" : true
+        "renderWithIcon" : false
     },
     "OpenUiAction" : {
-    	"uiwindowid" : "minionTest"
+    	"uiwindowid" : "activeminiion"
     }
 }
