@@ -262,18 +262,15 @@ public class BulletCharacterMovementSystem implements CharacterMovementSystem {
             }
             newState.getVelocity().y = 0;
             // Jumping is only possible, if the entity is standing on ground
-            /*if (movementComp.jump) {
-                //entity.send(new JumpEvent());
-                movementComp.jump = false;
-                movementComp.isGrounded = false;
-                movementComp.getVelocity().y += movementComp.jumpSpeed;
-            } */
+            if (input.isJumpRequested()) {
+                newState.setGrounded(false);
+                newState.getVelocity().y += movementComp.jumpSpeed;
+            }
         } else {
             if (moveResult.hitTop && newState.getVelocity().y > 0) {
                 newState.getVelocity().y = -0.5f * newState.getVelocity().y;
             }
             newState.setGrounded(false);
-            //movementComp.jump = false;
         }
 
         if (moveResult.hitHoriz) {
