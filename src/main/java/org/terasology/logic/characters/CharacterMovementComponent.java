@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.physics.character;
+package org.terasology.logic.characters;
 
 import java.util.List;
 
@@ -55,24 +55,18 @@ public final class CharacterMovementComponent implements Component {
     public boolean faceMovementDirection = false;
 
     // Current movement mode
-    // TODO: Use enum?
-    public boolean isGhosting = false;
-    public boolean isSwimming = false;
-    public boolean isGrounded = false;
-    public boolean isRunning = false;
+    public MovementMode mode = MovementMode.WALKING;
+    public boolean grounded = false;
 
     private Vector3f velocity = new Vector3f();
 
     // Movement inputs - desired direction, etc
     public boolean jump = false;
 
-    // The direction and strength of movement desired
-    // Should have a length between 0 and 1
-    private Vector3f drive = new Vector3f();
-
     // Distance since last footstep
     public float footstepDelta = 0.0f;
 
+    // TODO: Remove this from here, put in system instead
     public transient PairCachingGhostObject collider;
 
     public Vector3f getVelocity() {
@@ -81,14 +75,6 @@ public final class CharacterMovementComponent implements Component {
 
     public void setVelocity(Vector3f newVelocity) {
         velocity.set(newVelocity);
-    }
-
-    public Vector3f getDrive() {
-        return drive;
-    }
-
-    public void setDrive(Vector3f newDrive) {
-        drive.set(newDrive);
     }
 
 }

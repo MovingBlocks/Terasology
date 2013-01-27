@@ -17,6 +17,7 @@ import org.terasology.entitySystem.Event;
 import org.terasology.entitySystem.PersistableEntityManager;
 import org.terasology.entitySystem.persistence.EntitySerializer;
 import org.terasology.entitySystem.persistence.EventSerializer;
+import org.terasology.entitySystem.persistence.FieldSerializeCheck;
 import org.terasology.entitySystem.persistence.PackedEntitySerializer;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
@@ -97,7 +98,7 @@ public class Server {
     public void send(Event event, int targetId) {
         NetData.NetMessage message = NetData.NetMessage.newBuilder()
                 .addEvent(NetData.EventMessage.newBuilder()
-                        .setEvent(eventSerializer.serialize(event, new NetworkEventFieldCheck()))
+                        .setEvent(eventSerializer.serialize(event, FieldSerializeCheck.NullCheck.<Event>newInstance()))
                         .setTargetId(targetId))
                 .build();
         send(message);

@@ -20,6 +20,7 @@ import org.terasology.entitySystem.Event;
 import org.terasology.entitySystem.EventReceiver;
 import org.terasology.entitySystem.EventSystem;
 import org.terasology.entitySystem.persistence.EventSerializer;
+import org.terasology.entitySystem.persistence.FieldSerializeCheck;
 import org.terasology.entitySystem.persistence.PackedEntitySerializer;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
@@ -49,7 +50,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Client implements ChunkRegionListener, WorldChangeListener, EventReceiver<ChunkUnloadedEvent> {
     private static final Logger logger = LoggerFactory.getLogger(Client.class);
 
-    private static final NetworkEventFieldCheck EVENT_FIELD_CHECK = new NetworkEventFieldCheck();
+    private static final FieldSerializeCheck<Event> EVENT_FIELD_CHECK = FieldSerializeCheck.NullCheck.<Event>newInstance();
 
     private Timer timer;
     private NetworkSystem networkSystem;

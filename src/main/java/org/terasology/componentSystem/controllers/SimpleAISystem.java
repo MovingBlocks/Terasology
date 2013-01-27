@@ -15,9 +15,6 @@
  */
 package org.terasology.componentSystem.controllers;
 
-import javax.vecmath.AxisAngle4f;
-import javax.vecmath.Vector3f;
-
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.SimpleAIComponent;
 import org.terasology.components.world.LocationComponent;
@@ -30,10 +27,14 @@ import org.terasology.entitySystem.RegisterMode;
 import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
+import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.physics.character.CharacterMovementComponent;
+import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldProvider;
+
+import javax.vecmath.AxisAngle4f;
+import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -68,9 +69,8 @@ public class SimpleAISystem implements EventHandlerSystem, UpdateSubscriberSyste
                 continue;
             }
             SimpleAIComponent ai = entity.getComponent(SimpleAIComponent.class);
-            CharacterMovementComponent moveComp = entity.getComponent(CharacterMovementComponent.class);
 
-            moveComp.getDrive().set(0, 0, 0);
+            Vector3f drive = new Vector3f();
             // TODO: shouldn't use local player, need some way to find nearest player
             LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
             if (localPlayer != null) {
@@ -96,21 +96,21 @@ public class SimpleAISystem implements EventHandlerSystem, UpdateSubscriberSyste
                 Vector3f targetDirection = new Vector3f();
                 targetDirection.sub(ai.movementTarget, worldPos);
                 targetDirection.normalize();
-                moveComp.setDrive(targetDirection);
+                drive.set(targetDirection);
 
                 float yaw = (float) Math.atan2(targetDirection.x, targetDirection.z);
                 AxisAngle4f axisAngle = new AxisAngle4f(0, 1, 0, yaw);
                 location.getLocalRotation().set(axisAngle);
-                entity.saveComponent(moveComp);
                 entity.saveComponent(location);
             }
+            entity.send(new CharacterMoveInputEvent(0, 0, drive, false, false));
         }
     }
 
     @ReceiveEvent(components = {SimpleAIComponent.class})
     public void onBump(HorizontalCollisionEvent event, EntityRef entity) {
         CharacterMovementComponent moveComp = entity.getComponent(CharacterMovementComponent.class);
-        if (moveComp != null && moveComp.isGrounded) {
+        if (moveComp != null && moveComp.grounded) {
             moveComp.jump = true;
             entity.saveComponent(moveComp);
         }

@@ -40,6 +40,8 @@ public final class MeshComponent implements Component {
     @Replicate
     public Material material;
 
+    public boolean hideFromOwner;
+
     // TODO: Some sort of Texture + Shader type?
     //public String material;
 

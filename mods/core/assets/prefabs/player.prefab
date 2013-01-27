@@ -30,7 +30,8 @@
     },
     "Mesh" : {
         "mesh" : "engine:testmonkey",
-        "material" : "engine:monkeyHead1"
+        "material" : "engine:monkeyHead1",
+        "hideFromOwner" : true
     },
     "BoxShape" : {
         "extents" : [1.5, 1.6, 1.5]

@@ -28,13 +28,13 @@ import org.terasology.events.DamageEvent;
 import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
+import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.TeraMath;
-import org.terasology.physics.character.CharacterMovementComponent;
+import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldProvider;
 
-import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Vector3f;
 
 /**
@@ -96,8 +96,6 @@ public class HierarchicalAISystem implements EventHandlerSystem,
                       Vector3f worldPos) {
         HierarchicalAIComponent ai = entity
                 .getComponent(HierarchicalAIComponent.class);
-        CharacterMovementComponent moveComp = entity
-                .getComponent(CharacterMovementComponent.class);
         long tempTime = CoreRegistry.get(Timer.class).getTimeInMs();
         //TODO remove next
         long lastAttack = 0;
@@ -115,10 +113,7 @@ public class HierarchicalAISystem implements EventHandlerSystem,
                 dangerChangeTime = ai.dangerUpdateTime;
 
         // get movement
-        Vector3f drive = moveComp.getDrive();
-
-        // stop movement
-        drive.set(0, 0, 0);
+        Vector3f drive = new Vector3f();
 
         // find player position
         // TODO: shouldn't use local player, need some way to find nearest
@@ -272,12 +267,10 @@ public class HierarchicalAISystem implements EventHandlerSystem,
         Vector3f targetDirection = new Vector3f();
         targetDirection.sub(ai.movementTarget, worldPos);
         targetDirection.normalize();
-        moveComp.setDrive(targetDirection);
+        drive.set(targetDirection);
 
         float yaw = (float) Math.atan2(targetDirection.x, targetDirection.z);
-        AxisAngle4f axisAngle = new AxisAngle4f(0, 1, 0, yaw);
-        location.getLocalRotation().set(axisAngle);
-        entity.saveComponent(moveComp);
+        entity.send(new CharacterMoveInputEvent(0, yaw, drive, false, false));
         entity.saveComponent(location);
         // System.out.print("\Destination set: " + targetDirection.x + ":" +targetDirection.z + "\n");
         // System.out.print("\nI am: " + worldPos.x + ":" + worldPos.z + "\n");
@@ -295,7 +288,7 @@ public class HierarchicalAISystem implements EventHandlerSystem,
     public void onBump(HorizontalCollisionEvent event, EntityRef entity) {
         CharacterMovementComponent moveComp = entity
                 .getComponent(CharacterMovementComponent.class);
-        if (moveComp != null && moveComp.isGrounded) {
+        if (moveComp != null && moveComp.grounded) {
             moveComp.jump = true;
             entity.saveComponent(moveComp);
         }

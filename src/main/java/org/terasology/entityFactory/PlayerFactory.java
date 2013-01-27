@@ -40,10 +40,7 @@ public class PlayerFactory {
     }
 
     public EntityRef newInstance(Vector3f spawnPosition) {
-        EntityRef player = entityManager.create("core:player");
-        LocationComponent location = player.getComponent(LocationComponent.class);
-        location.setWorldPosition(spawnPosition);
-        player.saveComponent(location);
+        EntityRef player = entityManager.create("core:player", spawnPosition);
         CharacterComponent playerComponent = player.getComponent(CharacterComponent.class);
         playerComponent.spawnPosition.set(spawnPosition);
         player.saveComponent(playerComponent);

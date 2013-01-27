@@ -26,7 +26,7 @@ import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.HealthChangedEvent;
 import org.terasology.events.NoHealthEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.physics.character.CharacterMovementComponent;
+import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.rendering.gui.events.UIWindowOpenedEvent;
 
 /**

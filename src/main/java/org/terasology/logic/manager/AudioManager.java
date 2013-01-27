@@ -31,7 +31,7 @@ import org.terasology.audio.SoundPool;
 import org.terasology.audio.SoundSource;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.physics.character.CharacterMovementComponent;
+import org.terasology.logic.characters.CharacterMovementComponent;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
 

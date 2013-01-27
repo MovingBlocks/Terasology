@@ -1,4 +1,4 @@
-package org.terasology.logic.characters;
+package org.terasology.logic.characters.events;
 
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.network.NetworkEvent;

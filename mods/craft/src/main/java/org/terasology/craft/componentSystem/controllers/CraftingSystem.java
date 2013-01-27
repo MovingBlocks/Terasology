@@ -38,7 +38,7 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.AABB;
-import org.terasology.physics.character.CharacterMovementComponent;
+import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.BlockOverlayRenderer;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;

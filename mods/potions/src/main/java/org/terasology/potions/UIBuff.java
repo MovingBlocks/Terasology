@@ -20,7 +20,7 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.physics.character.CharacterMovementComponent;
+import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.widgets.UIImage;
 
@@ -70,9 +70,7 @@ public class UIBuff extends UIDisplayContainer {
         for (EntityRef entity : entityManager.iteratorEntities(SpeedBoostComponent.class)) {
             if (speed.speedBoostDuration >= 1) {
                 speedbuff.setVisible(true);
-                if (charmov.isRunning) {
-                    speedbuff.getTextureOrigin().set(new Vector2f(16f / 256f, 16f / 256f));
-                } else speedbuff.getTextureOrigin().set(new Vector2f(0.0f / 256f, 16f / 256f));
+                speedbuff.getTextureOrigin().set(new Vector2f(0.0f / 256f, 16f / 256f));
 
             } else speedbuff.setVisible(false);
 

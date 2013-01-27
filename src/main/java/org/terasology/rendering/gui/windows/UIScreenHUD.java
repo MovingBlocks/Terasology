@@ -18,6 +18,7 @@ package org.terasology.rendering.gui.windows;
 import org.terasology.asset.Assets;
 import org.newdawn.slick.Color;
 import org.terasology.components.HealthComponent;
+import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -191,7 +192,7 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
             if (entityManager != null) {
                 debugLine2.setText(String.format("Active Entities: %s, Current Target: %s", entityManager.getActiveEntities(), cameraTarget.toString()));
             }
-            debugLine3.setText(String.format("%s", CoreRegistry.get(WorldRenderer.class)));
+            debugLine3.setText(String.format("%s, %s", CoreRegistry.get(LocalPlayer.class).getPosition(), CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(CharacterMovementComponent.class).mode));
             debugLine4.setText(String.format("total vus: %s | active threads: %s", ChunkTessellator.getVertexArrayUpdateCount(), CoreRegistry.get(GameEngine.class).getActiveTaskCount()));
         }
     }

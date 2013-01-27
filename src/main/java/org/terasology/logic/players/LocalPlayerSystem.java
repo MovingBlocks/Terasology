@@ -47,13 +47,15 @@ import org.terasology.input.binds.VerticalMovementAxis;
 import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.logic.characters.CharacterComponent;
+import org.terasology.logic.characters.CharacterMoveInputEvent;
+import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.math.AABB;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.physics.ImpulseEvent;
-import org.terasology.physics.character.CharacterMovementComponent;
+import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.BlockOverlayRenderer;
 import org.terasology.rendering.cameras.DefaultCamera;
@@ -91,7 +93,10 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     private float bobFactor = 0;
     private float lastStepDelta = 0;
 
+    // Input
     private Vector3f relativeMovement = new Vector3f();
+    private boolean run = false;
+    private boolean jump = false;
 
     private BlockOverlayRenderer aabbRenderer = new AABBRenderer(AABB.createEmpty());
 
@@ -126,18 +131,39 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             return;
         }
 
-        updateMovement(localPlayerComponent, characterMovementComponent, location);
-
-        // TODO: Remove, use component camera, breaks spawn camera anyway
-        Quat4f lookRotation = new Quat4f();
-        QuaternionUtil.setEuler(lookRotation, TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw, TeraMath.DEG_TO_RAD * localPlayerComponent.viewPitch, 0);
-        updateCamera(characterComp, characterMovementComponent, location.getWorldPosition(), lookRotation);
+        processInput(entity, localPlayerComponent, characterMovementComponent);
+        updateCamera(localPlayerComponent, characterMovementComponent, characterComp, location);
 
         // Hand animation update
         localPlayerComponent.handAnimation = Math.max(0, localPlayerComponent.handAnimation - 2.5f * delta);
 
-        entity.saveComponent(characterMovementComponent);
         entity.saveComponent(localPlayerComponent);
+    }
+
+    private void processInput(EntityRef entity, LocalPlayerComponent localPlayerComponent, CharacterMovementComponent characterMovementComponent) {
+        Vector3f relMove = new Vector3f(relativeMovement);
+        relMove.y = 0;
+
+        Quat4f viewRot = new Quat4f();
+        switch (characterMovementComponent.mode) {
+            case WALKING:
+                QuaternionUtil.setEuler(viewRot, TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw, 0, 0);
+                QuaternionUtil.quatRotate(viewRot, relMove, relMove);
+                break;
+            default:
+                QuaternionUtil.setEuler(viewRot, TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw, TeraMath.DEG_TO_RAD * localPlayerComponent.viewPitch, 0);
+                QuaternionUtil.quatRotate(viewRot, relMove, relMove);
+                relMove.y += relativeMovement.y;
+                break;
+        }
+        entity.send(new CharacterMoveInputEvent(localPlayerComponent.viewPitch, localPlayerComponent.viewYaw, relMove, run, jump));
+    }
+
+    private void updateCamera(LocalPlayerComponent localPlayerComponent, CharacterMovementComponent characterMovementComponent, CharacterComponent characterComp, LocationComponent location) {
+        // TODO: Remove, use component camera, breaks spawn camera anyway
+        Quat4f lookRotation = new Quat4f();
+        QuaternionUtil.setEuler(lookRotation, TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw, TeraMath.DEG_TO_RAD * localPlayerComponent.viewPitch, 0);
+        updateCamera(characterComp, characterMovementComponent, location.getWorldPosition(), lookRotation);
     }
 
     @ReceiveEvent(components = LocalPlayerComponent.class)
@@ -169,7 +195,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             CharacterMovementComponent characterMovement = entity.getComponent(CharacterMovementComponent.class);
             characterMovement.jump = true;
             if (timer.getTimeInMs() - lastTimeSpacePressed < 200) {
-                characterMovement.isGhosting = !characterMovement.isGhosting;
+                //characterMovement.isGhosting = !characterMovement.isGhosting;
             }
             lastTimeSpacePressed = timer.getTimeInMs();
             event.consume();
@@ -196,8 +222,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
     @ReceiveEvent(components = {LocalPlayerComponent.class, CharacterMovementComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
     public void onRun(RunButton event, EntityRef entity) {
-        CharacterMovementComponent characterMovement = entity.getComponent(CharacterMovementComponent.class);
-        characterMovement.isRunning = event.isDown();
+        run = event.isDown();
         event.consume();
     }
 
@@ -270,25 +295,10 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
         CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
         if (characterMovementComponent != null) {
+            // TODO: Fix
             characterMovementComponent.setVelocity(new Vector3f(0, 0, 0));
             entity.saveComponent(characterMovementComponent);
         }
-    }
-
-    private void updateMovement(LocalPlayerComponent localPlayerComponent, CharacterMovementComponent characterMovementComponent, LocationComponent location) {
-        Vector3f relMove = new Vector3f(relativeMovement);
-        relMove.y = 0;
-        if (characterMovementComponent.isGhosting || characterMovementComponent.isSwimming) {
-            Quat4f viewRot = new Quat4f();
-            QuaternionUtil.setEuler(viewRot, TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw, TeraMath.DEG_TO_RAD * localPlayerComponent.viewPitch, 0);
-            QuaternionUtil.quatRotate(viewRot, relMove, relMove);
-            relMove.y += relativeMovement.y;
-        } else {
-            QuaternionUtil.quatRotate(location.getLocalRotation(), relMove, relMove);
-        }
-        float lengthSquared = relMove.lengthSquared();
-        if (lengthSquared > 1) relMove.normalize();
-        characterMovementComponent.setDrive(relMove);
     }
 
     private void updateCamera(CharacterComponent characterComponent, CharacterMovementComponent charMovementComp, Vector3f position, Quat4f rotation) {
@@ -313,7 +323,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             playerCamera.setBobbingVerticalOffsetFactor(0.0f);
         }
 
-        if (charMovementComp.isGhosting) {
+        if (charMovementComp.mode == MovementMode.GHOSTING) {
             playerCamera.extendFov(24);
         } else {
             playerCamera.resetFov();

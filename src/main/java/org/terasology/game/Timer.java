@@ -24,7 +24,7 @@ public interface Timer {
 
     float getDelta();
 
-    long getDeltaInMS();
+    long getDeltaInMs();
 
     double getFps();
 

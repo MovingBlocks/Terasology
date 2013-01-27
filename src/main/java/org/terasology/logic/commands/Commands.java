@@ -50,7 +50,7 @@ import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.MessageManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.physics.character.CharacterMovementComponent;
+import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.rendering.world.WorldRenderer;

@@ -23,7 +23,7 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.network.ClientComponent;
 import org.terasology.math.TeraMath;
-import org.terasology.physics.character.CharacterMovementComponent;
+import org.terasology.logic.characters.CharacterMovementComponent;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;

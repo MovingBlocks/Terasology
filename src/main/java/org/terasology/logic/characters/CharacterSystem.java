@@ -16,7 +16,6 @@
 
 package org.terasology.logic.characters;
 
-import org.slf4j.spi.LocationAwareLogger;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
@@ -27,7 +26,9 @@ import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.events.ActivateEvent;
 import org.terasology.events.DamageEvent;
-import org.terasology.math.Vector3i;
+import org.terasology.logic.characters.events.AttackTargetRequest;
+import org.terasology.logic.characters.events.UseItemInDirectionRequest;
+import org.terasology.logic.characters.events.UseItemOnTargetRequest;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.physics.CollisionGroup;

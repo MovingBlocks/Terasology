@@ -52,7 +52,7 @@ import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.TeraMath;
 import org.terasology.model.inventory.Icon;
-import org.terasology.physics.character.CharacterMovementComponent;
+import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.MeshFactory;

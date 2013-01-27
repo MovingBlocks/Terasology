@@ -30,10 +30,10 @@ import org.terasology.input.binds.ToolbarNextButton;
 import org.terasology.input.binds.ToolbarPrevButton;
 import org.terasology.input.binds.ToolbarSlotButton;
 import org.terasology.input.binds.UseItemButton;
-import org.terasology.logic.characters.AttackInDirectionRequest;
-import org.terasology.logic.characters.AttackTargetRequest;
-import org.terasology.logic.characters.UseItemInDirectionRequest;
-import org.terasology.logic.characters.UseItemOnTargetRequest;
+import org.terasology.logic.characters.events.AttackInDirectionRequest;
+import org.terasology.logic.characters.events.AttackTargetRequest;
+import org.terasology.logic.characters.events.UseItemInDirectionRequest;
+import org.terasology.logic.characters.events.UseItemOnTargetRequest;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**

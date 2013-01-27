@@ -59,7 +59,7 @@ public final class TimerLwjgl implements Timer {
     }
 
     @Override
-    public long getDeltaInMS() {
+    public long getDeltaInMs() {
         return (delta >= 100) ? 100 : delta;
     }
 

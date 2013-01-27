@@ -17,6 +17,7 @@ package org.terasology.rendering.logic;
 
 import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import gnu.trove.list.TFloatList;
@@ -35,16 +36,20 @@ import org.terasology.components.utility.DroppedItemTypeComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.entitySystem.event.AddComponentEvent;
+import org.terasology.entitySystem.event.ChangedComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.logic.manager.VertexBufferObjectManager;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.math.AABB;
 import org.terasology.math.TeraMath;
+import org.terasology.network.NetworkSystem;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.primitives.Mesh;
@@ -60,6 +65,7 @@ import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.Map;
 import java.util.Set;
 
 import static org.lwjgl.opengl.GL11.GL_COLOR_ARRAY;
@@ -89,12 +95,21 @@ import static org.lwjgl.opengl.GL11.glVertexPointer;
 public class MeshRenderer implements RenderSystem, EventHandlerSystem {
     private static final Logger logger = LoggerFactory.getLogger(MeshRenderer.class);
 
+    @In
+    private NetworkSystem network;
+
+    @In
+    private LocalPlayer localPlayer;
+
     private Mesh gelatinousCubeMesh;
     private WorldRenderer worldRenderer;
 
     private SetMultimap<Material, EntityRef> opaqueMesh = HashMultimap.create();
     private SetMultimap<Material, EntityRef> translucentMesh = HashMultimap.create();
     private Set<EntityRef> gelatinous = Sets.newHashSet();
+    private Map<EntityRef, Material> opaqueEntities = Maps.newHashMap();
+    private Map<EntityRef, Material> translucentEntities = Maps.newHashMap();
+
 
     private int batchVertexBuffer;
     private int batchIndexBuffer;
@@ -127,30 +142,64 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
         }
     }*/
 
-    @ReceiveEvent(components = {MeshComponent.class})
+    @ReceiveEvent(components = {MeshComponent.class, LocationComponent.class})
     public void onNewMesh(AddComponentEvent event, EntityRef entity) {
+        addMesh(entity);
+    }
+
+    private void addMesh(EntityRef entity) {
         if (entity.getComponent(DroppedItemTypeComponent.class) != null) {
             return;
         }
         MeshComponent meshComp = entity.getComponent(MeshComponent.class);
+        // Don't render if hidden from owner (need to improve for third person)
+        // TODO: This should be based on ownership, need to fix that up
+        if (meshComp.hideFromOwner && entity.hasComponent(LocalPlayerComponent.class)) {
+            return;
+        }
         if (meshComp.renderType == MeshComponent.RenderType.GelatinousCube) {
             gelatinous.add(entity);
         } else {
             opaqueMesh.put(meshComp.material, entity);
+            opaqueEntities.put(entity, meshComp.material);
+        }
+    }
+
+    @ReceiveEvent(components = {LocalPlayerComponent.class, MeshComponent.class})
+    public void onLocalMesh(AddComponentEvent event, EntityRef entity) {
+        MeshComponent meshComp = entity.getComponent(MeshComponent.class);
+        if (meshComp != null) {
+            removeMesh(entity);
         }
     }
 
     @ReceiveEvent(components = {MeshComponent.class})
+    public void onChangeMesh(ChangedComponentEvent event, EntityRef entity)
+    {
+        removeMesh(entity);
+        addMesh(entity);
+    }
+
+    private void removeMesh(EntityRef entity) {
+        if (!gelatinous.remove(entity)){
+            Material mat = opaqueEntities.remove(entity);
+            if (mat != null) {
+                opaqueMesh.remove(mat, entity);
+            } else {
+                mat = translucentEntities.remove(entity);
+                if (mat != null) {
+                    translucentMesh.remove(mat, entity);
+                }
+            }
+        }
+    }
+
+    @ReceiveEvent(components = {MeshComponent.class, LocationComponent.class})
     public void onDestroyMesh(RemovedComponentEvent event, EntityRef entity) {
         if (entity.getComponent(DroppedItemTypeComponent.class) != null) {
             return;
         }
-        MeshComponent meshComponent = entity.getComponent(MeshComponent.class);
-        if (meshComponent.renderType == MeshComponent.RenderType.GelatinousCube) {
-            gelatinous.remove(entity);
-        } else {
-            opaqueMesh.remove(meshComponent.material, entity);
-        }
+        removeMesh(entity);
     }
 
     @Override

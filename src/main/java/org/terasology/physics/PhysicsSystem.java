@@ -37,7 +37,7 @@ import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.ChangedComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.physics.character.CharacterMovementComponent;
+import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.physics.shapes.BoxShapeComponent;
 import org.terasology.physics.shapes.CapsuleShapeComponent;
 import org.terasology.physics.shapes.CylinderShapeComponent;

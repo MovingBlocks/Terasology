@@ -31,13 +31,14 @@ import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.events.ActivateEvent;
+import org.terasology.game.Timer;
+import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.MovedEvent;
-import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.physics.shapes.BoxShapeComponent;
 import org.terasology.world.WorldProvider;
 
@@ -59,6 +60,9 @@ public final class DynamicBlocksSystem implements UpdateSubscriberSystem, EventH
 
     @In
     private BulletPhysics physics;
+
+    @In
+    private Timer timer;
 
     DynamicFactory dynamicFactory;
 
@@ -176,13 +180,9 @@ public final class DynamicBlocksSystem implements UpdateSubscriberSystem, EventH
                 Vector3f desiredVelocity = new Vector3f(movementDirection);
                 desiredVelocity.scale(loco.getMaximumSpeed());
 
-                CharacterMovementComponent movement = entity.getComponent(CharacterMovementComponent.class);
-                movement.setDrive(desiredVelocity);
-                entity.saveComponent(movement);
+                entity.send(new CharacterMoveInputEvent(0, 0, desiredVelocity, false, false));
             } else {
-                CharacterMovementComponent movement = entity.getComponent(CharacterMovementComponent.class);
-                movement.setDrive(new Vector3f(0, 0, 0));
-                entity.saveComponent(movement);
+                entity.send(new CharacterMoveInputEvent(0, 0, new Vector3f(), false, false));
             }
         }
     }
