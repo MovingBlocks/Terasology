@@ -28,13 +28,15 @@ import org.terasology.miniion.utilities.Zone;
 public final class MinionComponent implements Component {
 
 	// simple uri defining an icon
-	public String icon = "";
+	public String icon;
 	// personal name for the minion, not set in prefab!
 	public String name = "unknown";
 	// minion type, eg : oreoBuilder, needs to be defined in prefab
 	public String flavortext = "unknown";
 	// used by minionsystem, init at stay normally
 	public MinionBehaviour minionBehaviour = MinionBehaviour.Stay;
+	
+	public boolean dying = false;
 
 	public Zone gatherzone;
 

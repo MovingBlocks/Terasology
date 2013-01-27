@@ -41,13 +41,17 @@ import org.terasology.rendering.gui.widgets.UILabel;
  *         TODO program from scratch -> integrate state button here -> implement
  *         radio button?
  */
-public class UIModButtonArrow extends UIDisplayContainer {
+public class UIModButtonMenu extends UIDisplayContainer {
+
+	private final UILabel _label;
 
 	public enum ButtonType {
-		LEFT, RIGHT, UP, DOWN
-	};
-	private UILabel hoverlabel;
-	private boolean mouseover = false;
+		NORMAL, TOGGLE
+	};	
+
+	private boolean _toggleState = false;
+	private ButtonType _buttonType;
+
 	private final List<ChangedListener> changedListeners = new ArrayList<ChangedListener>();
 	private final Map<String, Vector2f[]> states = new HashMap<String, Vector2f[]>();
 
@@ -60,44 +64,16 @@ public class UIModButtonArrow extends UIDisplayContainer {
 	 * @param buttonType
 	 *            The type of the button which can be normal or toggle.
 	 */
-	public UIModButtonArrow(Vector2f size, ButtonType buttontype) {
+	public UIModButtonMenu(Vector2f size, ButtonType buttonType) {
 		setSize(size);
 
-		// default arrow buttons
-		setTexture("miniion:Arrows2");
-		switch(buttontype){
-			case LEFT :{
-				setNormalState(new Vector2f(0.0f, 0.0f), new Vector2f(12f, 23f));
-				setHoverState(new Vector2f(12f, 0.0f), new Vector2f(12f, 23f));
-				setPressedState(new Vector2f(24f, 0.0f), new Vector2f(12f, 23f));
-				break;
-			}
-			case RIGHT :{
-				setNormalState(new Vector2f(0.0f, 23f), new Vector2f(12f, 23f));
-				setHoverState(new Vector2f(12f, 23f), new Vector2f(12f, 23f));
-				setPressedState(new Vector2f(24f, 23f), new Vector2f(12f, 23f));
-				break;
-			}
-			case UP: {
-				setNormalState(new Vector2f(23f, 46f), new Vector2f(23f, 12f));
-				setHoverState(new Vector2f(23f, 58f), new Vector2f(23f, 12f));
-				setPressedState(new Vector2f(23f, 70f), new Vector2f(23f, 12f));
-				break;
-			}
-			case DOWN : {
-				setNormalState(new Vector2f(0.0f, 46f), new Vector2f(23f, 12f));
-				setHoverState(new Vector2f(0.0f, 58f), new Vector2f(23f, 12f));
-				setPressedState(new Vector2f(0.0f, 70f), new Vector2f(23f, 12f));
-				break;
-			}
-			default : {
-				setNormalState(new Vector2f(0.0f, 0.0f), new Vector2f(12f, 23f));
-				setHoverState(new Vector2f(12f, 0.0f), new Vector2f(12f, 23f));
-				setPressedState(new Vector2f(24f, 0.0f), new Vector2f(12f, 23f));
-				break;
-			} 
-		}		
-		
+		_buttonType = buttonType;
+
+		// default button
+		setTexture("miniion:modularbutton");
+		setNormalState(new Vector2f(0.0f, 0.0f), new Vector2f(100f, 20f));
+		setHoverState(new Vector2f(0.0f, 20f), new Vector2f(100f, 20f));
+		setPressedState(new Vector2f(0.0f, 80f), new Vector2f(100f, 20f));
 
 		// default state
 		setBackgroundImage(states.get("normal")[0], states.get("normal")[1]);
@@ -105,10 +81,17 @@ public class UIModButtonArrow extends UIDisplayContainer {
 		addMouseMoveListener(new MouseMoveListener() {
 			@Override
 			public void leave(UIDisplayElement element) {
-				setBackgroundImage(states.get("normal")[0], states.get("normal")[1]);
-				if(hoverlabel != null){
-					hoverlabel.setVisible(false);
-					mouseover = false;
+				if (_buttonType == ButtonType.TOGGLE) {
+					if (_toggleState) {
+						setBackgroundImage(states.get("pressed")[0],
+								states.get("pressed")[1]);
+					} else {
+						setBackgroundImage(states.get("normal")[0],
+								states.get("normal")[1]);
+					}
+				} else {
+					setBackgroundImage(states.get("normal")[0],
+							states.get("normal")[1]);
 				}
 			}
 
@@ -119,11 +102,11 @@ public class UIModButtonArrow extends UIDisplayContainer {
 
 			@Override
 			public void enter(UIDisplayElement element) {
-				AudioManager.play(new AssetUri(AssetType.SOUND, "engine:click"), 1.0f);
-				setBackgroundImage(states.get("hover")[0], states.get("hover")[1]);
-				if(hoverlabel != null){
-					hoverlabel.setVisible(true);
-					mouseover = true;
+				AudioManager.play(
+						new AssetUri(AssetType.SOUND, "engine:click"), 1.0f);
+				if (_buttonType == ButtonType.NORMAL) {
+					setBackgroundImage(states.get("hover")[0],
+							states.get("hover")[1]);
 				}
 			}
 
@@ -135,15 +118,24 @@ public class UIModButtonArrow extends UIDisplayContainer {
 
 		addMouseButtonListener(new MouseButtonListener() {
 			@Override
-			public void up(UIDisplayElement element, int button, boolean intersect) {
-				setBackgroundImage(states.get("normal")[0],	states.get("normal")[1]);
+			public void up(UIDisplayElement element, int button,
+					boolean intersect) {
+				if (_buttonType == ButtonType.NORMAL) {
+					setBackgroundImage(states.get("normal")[0],
+							states.get("normal")[1]);
+				}
 			}
 
 			@Override
 			public void down(UIDisplayElement element, int button,
 					boolean intersect) {
 				if (intersect) {
-					setBackgroundImage(states.get("pressed")[0], states.get("pressed")[1]);
+					if (_buttonType == ButtonType.TOGGLE) {
+						setToggleState(!_toggleState);
+					} else {
+						setBackgroundImage(states.get("pressed")[0],
+								states.get("pressed")[1]);
+					}
 				}
 			}
 
@@ -154,31 +146,35 @@ public class UIModButtonArrow extends UIDisplayContainer {
 			}
 		});
 
+		_label = new UILabel("Untitled");
+		_label.addChangedListener(new ChangedListener() {
+			@Override
+			public void changed(UIDisplayElement element) {
+				layout();
+			}
+		});
+		_label.setHorizontalAlign(EHorizontalAlign.CENTER);
+		_label.setVerticalAlign(EVerticalAlign.CENTER);
+		_label.setVisible(true);
+		_label.setTextShadow(true);
+
+		addDisplayElement(_label);
 	}
 	
-	public UIModButtonArrow(Vector2f size, ButtonType buttontype, String Hovertext) {
-		this(size,buttontype);
-		hoverlabel = new UILabel(Hovertext);
-		hoverlabel.setPosition(new Vector2f((this.getPosition().x - Hovertext.length() * 2), (this.getPosition().y - 18)));
-		hoverlabel.setVisible(false);
-		addDisplayElement(hoverlabel);
+	public void hideLabel(){
+		_label.setVisible(false);
 	}
 
-	public void setColorOffset(int offset, ButtonType buttontype) {
-		switch(buttontype)
-		{
-			case UP : {
-				setNormalState(new Vector2f(0.0f, offset), new Vector2f(23f, 12f));
-				break;
-			}
-			case DOWN : {
-				setNormalState(new Vector2f(0.0f, offset), new Vector2f(23f, 12f));
-				break;
-			}
-			default : {
-				setNormalState(new Vector2f(0.0f, offset), new Vector2f(12f, 23f));
-			}		
-		}
+	public UILabel getLabel() {
+		return _label;
+	}
+
+	public void setLabel(String label) {
+		_label.setText(label);
+	}
+
+	public void setColorOffset(int offset) {
+		setNormalState(new Vector2f(0.0f, offset), new Vector2f(256f, 30f));
 	}
 
 	/**
@@ -244,15 +240,44 @@ public class UIModButtonArrow extends UIDisplayContainer {
 		setBackgroundImage(states.get("normal")[0], states.get("normal")[1]);
 	}
 
+	public boolean getToggleState() {
+		return _toggleState;
+	}
+
+	/**
+	 * Set the state of the toggle button. Only has an affect if the button was
+	 * created as an toggle button.
+	 * 
+	 * @param state
+	 *            True to set the pressed state.
+	 */
+	public void setToggleState(boolean state) {
+		if (_toggleState != state) {
+			_toggleState = state;
+
+			if (_toggleState) {
+				setBackgroundImage(states.get("pressed")[0],
+						states.get("pressed")[1]);
+			} else {
+				setBackgroundImage(states.get("normal")[0],
+						states.get("normal")[1]);
+			}
+
+			notifyChangedListeners();
+		}
+	}
+
+	private void notifyChangedListeners() {
+		for (ChangedListener listener : changedListeners) {
+			listener.changed(this);
+		}
+	}
+
 	public void addChangedListener(ChangedListener listener) {
 		changedListeners.add(listener);
 	}
 
 	public void removeChangedListener(ChangedListener listener) {
 		changedListeners.remove(listener);
-	}
-	
-	public boolean isMouseOver(){
-		return mouseover;
 	}
 }

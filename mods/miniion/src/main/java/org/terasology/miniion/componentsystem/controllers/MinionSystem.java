@@ -15,6 +15,8 @@
  */
 package org.terasology.miniion.componentsystem.controllers;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -41,12 +43,7 @@ import org.terasology.math.Vector3i;
 import org.terasology.miniion.components.*;
 import org.terasology.miniion.componentsystem.entityfactory.MiniionFactory;
 import org.terasology.miniion.events.MinionMessageEvent;
-import org.terasology.miniion.events.ToggleMinionModeButton;
-import org.terasology.miniion.gui.UIActiveMinion;
-import org.terasology.miniion.gui.UICardBook;
-import org.terasology.miniion.gui.UICommandPoppup;
-import org.terasology.miniion.gui.UIScreenBookOreo;
-import org.terasology.miniion.gui.UIZoneBook;
+import org.terasology.miniion.gui.*;
 import org.terasology.miniion.minionenum.*;
 import org.terasology.miniion.utilities.*;
 
@@ -220,6 +217,76 @@ public class MinionSystem implements EventHandlerSystem {
 	 */
 	public void showActiveMinion(boolean show){
 		showactiveminion = show;
+	}
+	
+	/**
+	 * order the minions by id and return the next one, or the first if none were active!
+	 */
+	public static void getNextMinion(boolean deleteactive){
+		EntityManager entman = CoreRegistry.get(EntityManager.class);
+		List<Integer> sortedlist = new ArrayList<Integer>();		
+		for(EntityRef minion : entman.iteratorEntities(MinionComponent.class)){
+			if(!minion.getComponent(MinionComponent.class).dying){
+				sortedlist.add(minion.getId());
+			}
+		}
+		if(sortedlist.size() ==0){
+			return;
+		}else if(deleteactive && sortedlist.size() == 1){
+			activeminion = null;
+			return;
+		}
+		Collections.sort(sortedlist);
+		int index = 0;
+		if(activeminion != null){			
+			index = sortedlist.indexOf(activeminion.getId());
+		}		
+		if(index + 1 == sortedlist.size()){
+			index = 0;
+		}else{
+			index++;
+		}
+		index = sortedlist.get(index);
+		for(EntityRef minion : entman.iteratorEntities(MinionComponent.class)){
+			if(minion.getId() == index){
+				setActiveMinion(minion);
+			}
+		}
+	}
+	
+	/**
+	 * order the minions by id and return the previous one, or the first if none were active!
+	 */
+	public static void getPreviousMinion(boolean deleteactive){
+		EntityManager entman = CoreRegistry.get(EntityManager.class);
+		List<Integer> sortedlist = new ArrayList<Integer>();		
+		for(EntityRef minion : entman.iteratorEntities(MinionComponent.class)){
+			if(!minion.getComponent(MinionComponent.class).dying){
+				sortedlist.add(minion.getId());
+			}
+		}
+		if(sortedlist.size() ==0){
+			return;
+		}else if(deleteactive && sortedlist.size() == 1){
+			activeminion = null;
+			return;
+		}
+		Collections.sort(sortedlist);
+		int index = 0;
+		if(activeminion != null){			
+			index = sortedlist.indexOf(activeminion.getId());
+		}		
+		if(index == 0){
+			index = sortedlist.size() -1;
+		}else{
+			index--;
+		}
+		index = sortedlist.get(index);
+		for(EntityRef minion : entman.iteratorEntities(MinionComponent.class)){
+			if(minion.getId() == index){
+				setActiveMinion(minion);
+			}
+		}
 	}
 
 	@Deprecated
