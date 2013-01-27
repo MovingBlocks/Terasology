@@ -24,7 +24,6 @@ varying vec3 lightDir;
 varying vec3 waterNormal;
 
 varying float flickering;
-varying float flickeringAlternative;
 
 varying float isUpside;
 
@@ -60,11 +59,11 @@ void main()
     gl_FrontColor = gl_Color;
 
 #ifdef FLICKERING_LIGHT
-	flickering = smoothTriangleWave(timeToTick(time, 1.0)) / 64.0;
-	flickeringAlternative = smoothTriangleWave(timeToTick(time, 1.0) + 0.37281) / 64.0;
+	flickering = smoothTriangleWave(timeToTick(time, 0.5)) / 64.0;
+	flickering += smoothTriangleWave(timeToTick(time, 0.25) + 0.3762618) / 32.0;
+	flickering += smoothTriangleWave(timeToTick(time, 0.1) + 0.872917) / 16.0;
 #else
 	flickering = 0.0;
-	flickeringAlternative = 0.0f;
 #endif
 
 #ifdef ANIMATED_WATER_AND_GRASS

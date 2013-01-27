@@ -187,7 +187,7 @@ void main(){
     // Calculate the final block light brightness
     float blockBrightness = (expLightValue(blocklightValue) + diffuseLighting * blocklightValue * BLOCK_DIFF);
 
-    torchlight -= flickeringAlternative * torchlight;
+    torchlight -= flickering * torchlight;
 
     blockBrightness += (1.0 - blockBrightness) * torchlight;
     blockBrightness -= flickering * blocklightValue;

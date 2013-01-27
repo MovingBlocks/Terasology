@@ -45,7 +45,7 @@ float calcSpecLight(vec3 normal, vec3 lightVec, vec3 eyeVec, float exp) {
 }
 
 float calcTorchlight(float light, vec3 lightPos) {
-    return light * clamp(1.0 - (length(lightPos) / 16.0), 0.0, 1.0);
+    return light * clamp(1.0 - (length(lightPos) / 8.0), 0.0, 1.0);
 }
 
 vec4 linearToSrgb(vec4 color) {
