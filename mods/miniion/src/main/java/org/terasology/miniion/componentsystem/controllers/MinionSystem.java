@@ -410,7 +410,10 @@ public class MinionSystem implements EventHandlerSystem {
 					.getComponent(SimpleMinionAIComponent.class);
 			LocationComponent loccomp = event.getTarget().getComponent(
 					LocationComponent.class);
-			aicomp.gatherTargets.add(loccomp.getWorldPosition());
+			if(loccomp != null)
+			{
+				aicomp.gatherTargets.add(loccomp.getWorldPosition());
+			}
 			activeminion.saveComponent(aicomp);
 			locplaycomp.handAnimation = 0.5f;
 			entity.saveComponent(locplaycomp);
