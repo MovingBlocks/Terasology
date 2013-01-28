@@ -34,7 +34,7 @@ message Setting {
     }
 
     message Player {
-        optional float fov = 1 [default = 100];
+        optional float fov = 1 [default = 80];
         optional float mouse_sens = 2 [default = 0.075];
         optional bool camera_bobbing = 3 [default = true];
         optional bool render_first_person_view = 4 [default = true];
@@ -51,13 +51,10 @@ message Setting {
             optional int32 height = 2 [default = 720];
         }
         optional int32 max_particles = 1 [default = 256];
-        optional CloudRes cloud_resolution = 2;
-        optional int32 cloud_update_interval = 3 [default = 8000];
         optional int32 max_threads = 4 [default = 2];
         optional bool save_chunks = 5 [default = true];
         optional int32 chunk_cache_size = 6 [default = 2048];
         optional int32 max_chunk_VBOs = 7 [default = 512];
-        optional float gamma = 8 [default = 2.2];
         optional int32 pixel_format = 9 [default = 24];
         optional DisplayMode display_mode = 10;
         optional bool fullscreen = 11 [default = false];
@@ -67,13 +64,16 @@ message Setting {
         optional int32 viewing_distance_far = 15 [default = 32];
         optional int32 viewing_distance_ultra = 16 [default = 48];
         optional bool flickering_light = 17 [default = false];
-        optional bool enable_post_processing_effects = 18 [default = false];
+        optional bool enable_post_processing_effects = 18 [default = true];
         optional bool animated_grass = 19 [default = false];
         optional int32 vertical_chunk_mesh_segments = 20 [default = 1];
         optional int32 blur_intensity = 21 [default = 3];  // 0-4 Off, Some, Normal, Max
         optional bool reflective_water = 22 [default = false];
         optional int32 music_volume = 23 [default = 100];
         optional int32 sound_volume = 24 [default = 100];
+        optional bool vignette = 25 [default = false];
+		optional bool eye_adapation = 26 [default = false];
+		optional bool bloom = 27 [default = false];
     }
 
     optional World world = 1;

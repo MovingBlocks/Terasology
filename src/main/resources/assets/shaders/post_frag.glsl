@@ -15,7 +15,9 @@
  */
 
 uniform sampler2D texScene;
+#ifdef BLOOM
 uniform sampler2D texBloom;
+#endif
 #ifndef NO_BLUR
 uniform sampler2D texBlur;
 #endif
@@ -45,9 +47,8 @@ void main() {
     vec4 colorBlur = texture2D(texBlur, gl_TexCoord[0].xy);
 #endif
 
-    float depth = linDepth();
-
 #ifndef NO_BLUR
+    float depth = linDepth();
     float blur = 0.0;
 
     if (depth > BLUR_START && !swimming)
@@ -56,31 +57,25 @@ void main() {
        blur = 1.0;
 #endif
 
-    /* COLOR AND BLOOM */
+    /* COLOR */
     vec4 color = texture2D(texScene, gl_TexCoord[0].xy);
-    vec4 colorBloom = texture2D(texBloom, gl_TexCoord[0].xy);
 
+#ifdef BLOOM
+    vec4 colorBloom = texture2D(texBloom, gl_TexCoord[0].xy);
     color = clamp(color + colorBloom, 0.0, 1.0);
+#endif
+
 #ifndef NO_BLUR
     colorBlur = clamp(colorBlur , 0.0, 1.0);
 #endif
 
-    /* FINAL MIX */
 #ifndef NO_BLUR
     vec4 finalColor = mix(color, colorBlur, blur);
 #else
     vec4 finalColor = color;
 #endif
 
-#if 0
-    if (fogIntensity > 0.0 || fogLinearIntensity > 0.0) {
-        float fogDensity = depth * fogIntensity;
-        float fog = clamp((1.0 - 1.0 / pow(2.71828, fogDensity * fogDensity)) + depth * fogLinearIntensity, 0.0, 1.0);
-        finalColor = mix(finalColor, vec4(1.0), fog);
-    }
-#endif
-
-    /* VIGNETTE */
+#ifdef VIGNETTE
     float vig = texture2D(texVignette, gl_TexCoord[0].xy).x;
 
     if (!swimming) {
@@ -89,6 +84,7 @@ void main() {
         finalColor.rgb *= vig * vig * vig;
         finalColor.rgb *= vec3(0.1, 0.2, 0.2);
     }
+#endif
 
     gl_FragColor = finalColor;
 }

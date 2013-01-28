@@ -238,25 +238,6 @@ public final class Config {
         _setting.getSystemBuilder().setMaxParticles(maxParticles);
     }
 
-    public Vector2f getCloudResolution() {
-        float x = _setting.getSystemBuilder().getCloudResolutionBuilder().getX();
-        float y = _setting.getSystemBuilder().getCloudResolutionBuilder().getY();
-        return new Vector2f(x, y);
-    }
-
-    public void setCloudResolution(Vector2f cloudResolution) {
-        _setting.getSystemBuilder().getCloudResolutionBuilder().setX(cloudResolution.x);
-        _setting.getSystemBuilder().getCloudResolutionBuilder().setX(cloudResolution.y);
-    }
-
-    public int getCloudUpdateInterval() {
-        return _setting.getSystemBuilder().getCloudUpdateInterval();
-    }
-
-    public void setCloudUpdateInterval(int cloudUpdateInterval) {
-        _setting.getSystemBuilder().setCloudUpdateInterval(cloudUpdateInterval);
-    }
-
     public int getMaxThreads() {
         return _setting.getSystemBuilder().getMaxThreads();
     }
@@ -287,14 +268,6 @@ public final class Config {
 
     public void setMaxChunkVBOs(int maxChunkVBOs) {
         _setting.getSystemBuilder().setMaxChunkVBOs(maxChunkVBOs);
-    }
-
-    public double getGamma() {
-        return _setting.getSystemBuilder().getGamma();
-    }
-
-    public void setGamma(float gamma) {
-        _setting.getSystemBuilder().setGamma(gamma);
     }
 
     public PixelFormat getPixelFormat() {
@@ -455,6 +428,30 @@ public final class Config {
 
     public void setSoundVolume(int volume) {
         _setting.getSystemBuilder().setSoundVolume(volume);
+    }
+
+    public void setVignette(boolean vignette) {
+        _setting.getSystemBuilder().setVignette(vignette);
+    }
+
+    public boolean isVignette() {
+        return _setting.getSystemBuilder().getVignette();
+    }
+
+    public void setEyeAdaption(boolean eyeAdaption) {
+        _setting.getSystemBuilder().setEyeAdapation(eyeAdaption);
+    }
+
+    public boolean isEyeAdaption() {
+        return _setting.getSystemBuilder().getEyeAdapation();
+    }
+
+    public void setBloom(boolean bloom) {
+        _setting.getSystemBuilder().setBloom(bloom);
+    }
+
+    public boolean isBloom() {
+        return _setting.getSystemBuilder().getBloom();
     }
 
     /* MODS */

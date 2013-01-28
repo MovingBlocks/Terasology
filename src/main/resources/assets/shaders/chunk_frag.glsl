@@ -88,16 +88,18 @@ void main(){
         normalWater.xyz = texture2D(textureWaterNormal, waterOffset).xyz * 2.0 - 1.0;
 
        // Enable reflection only when not swimming and for blocks on sea level
-        if (!swimming && isUpside > 0.99 && vertexWorldPosRaw.y < 32.5 && vertexWorldPosRaw.y > 31.5) {
-            vec2 projectedPos = 0.5 * (vertexPos.st/vertexPos.q) + vec2(0.5);
+        if (!swimming && isUpside > 0.99) {
+            if ( vertexWorldPosRaw.y < 32.5 && vertexWorldPosRaw.y > 31.5) {
+                vec2 projectedPos = 0.5 * (vertexPos.st/vertexPos.q) + vec2(0.5);
 
-            // Fresnel
-            float refractionFactor = WATER_REFRACTION * clamp(1.0 - length(vertexWorldPos.xyz) / 50.0, 0.25, 1.0);
-            vec4 reflectionColor = vec4(texture2D(textureWaterReflection, projectedPos + normalWater.xy * refractionFactor).xyz, 1.0);
-            float f = fresnel(max(dot(normalizedVPos, waterNormal), 0.0), 0.1, 5.0);
-            color = mix(reflectionColor * vec4(WATER_COLOR), reflectionColor * vec4(REFLECTION_COLOR), f);
-        } else if (!swimming && (vertexWorldPosRaw.y >= 32.5 || vertexWorldPosRaw.y <= 31.5)) {
-            color = vec4(WATER_COLOR);
+                // Fresnel
+                float refractionFactor = WATER_REFRACTION * clamp(1.0 - length(vertexWorldPos.xyz) / 50.0, 0.25, 1.0);
+                vec4 reflectionColor = vec4(texture2D(textureWaterReflection, projectedPos + normalWater.xy * refractionFactor).xyz, 1.0);
+                float f = fresnel(max(dot(normalizedVPos, waterNormal), 0.0), 0.1, 5.0);
+                color = mix(reflectionColor * vec4(WATER_COLOR), reflectionColor * vec4(REFLECTION_COLOR), f);
+            } else {
+                color = vec4(WATER_COLOR);
+            }
         } else {
             color = vec4(WATER_COLOR_SWIMMING);
         }
@@ -113,10 +115,10 @@ void main(){
     /* APPLY DEFAULT TEXTURE FROM ATLAS */
     } else {
         color = texture2D(textureAtlas, texCoord.xy);
-    }
 
-    if (color.a < 0.5) {
-        discard;
+        if (color.a < 0.1) {
+            discard;
+        }
     }
 
     /* APPLY OVERALL BIOME COLOR OFFSET */

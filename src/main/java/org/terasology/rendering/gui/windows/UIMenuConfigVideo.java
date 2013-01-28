@@ -91,23 +91,24 @@ public class UIMenuConfigVideo extends UIWindow {
                 UIStateButton button = (UIStateButton)element;
                 switch (button.getState()) {
                 case 0:
-                    Config.getInstance().setEnablePostProcessingEffects(false);
+                    Config.getInstance().setEnablePostProcessingEffects(true);
                     Config.getInstance().setFlickeringLight(false);
+                    Config.getInstance().setVignette(true);
+                    Config.getInstance().setEyeAdaption(false);
+                    Config.getInstance().setBloom(false);
                     break;
                 case 1:
-                    Config.getInstance().setEnablePostProcessingEffects(false);
-                    Config.getInstance().setFlickeringLight(true);
-                    break;
-                case 2:
                     Config.getInstance().setEnablePostProcessingEffects(true);
                     Config.getInstance().setFlickeringLight(true);
+                    Config.getInstance().setVignette(true);
+                    Config.getInstance().setEyeAdaption(true);
+                    Config.getInstance().setBloom(true);
                     break;
                 }
                 
                 ShaderManager.getInstance().recompileAllShaders();
             }
         };
-        graphicsQualityButton.addState("Graphics Quality: Ugly", graphicsQualityStateAction);
         graphicsQualityButton.addState("Graphics Quality: Nice", graphicsQualityStateAction);
         graphicsQualityButton.addState("Graphics Quality: Epic", graphicsQualityStateAction);
         graphicsQualityButton.addClickListener(clickAction);

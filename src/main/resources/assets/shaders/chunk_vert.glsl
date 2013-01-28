@@ -55,7 +55,7 @@ void main()
     normal = gl_NormalMatrix * gl_Normal;
     gl_FrontColor = gl_Color;
 
-#ifdef flickeringLightOffset_LIGHT
+#ifdef FLICKERING_LIGHT
 	flickeringLightOffset = smoothTriangleWave(timeToTick(time, 0.5)) / 64.0;
 	flickeringLightOffset += smoothTriangleWave(timeToTick(time, 0.25) + 0.3762618) / 32.0;
 	flickeringLightOffset += smoothTriangleWave(timeToTick(time, 0.1) + 0.872917) / 16.0;

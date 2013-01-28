@@ -42,6 +42,7 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class PostProcessingRenderer {
 
+    public static final float DEFAULT_EXPOSURE = 2.5f;
     public static final float MAX_EXPOSURE = 6.0f;
     public static final float MAX_EXPOSURE_NIGHT = 0.5f;
     public static final float MIN_EXPOSURE = 0.5f;
@@ -49,7 +50,7 @@ public class PostProcessingRenderer {
     public static final float ADJUSTMENT_SPEED = 0.05f;
 
     private static PostProcessingRenderer _instance = null;
-    private float _exposure = 16.0f;
+    private float _exposure = 2.0f;
     private float _sceneLuminance = 1.0f;
     private int _displayListQuad = -1;
 
@@ -204,6 +205,7 @@ public class PostProcessingRenderer {
     }
 
     private void updateExposure() {
+        if (Config.getInstance().isEyeAdaption()) {
         ByteBuffer pixels = BufferUtils.createByteBuffer(4);
         FBO scene = PostProcessingRenderer.getInstance().getFBO("scene1");
 
@@ -229,6 +231,13 @@ public class PostProcessingRenderer {
         if (_exposure < MIN_EXPOSURE) {
             _exposure = MIN_EXPOSURE;
         }
+      } else {
+        if (CoreRegistry.get(WorldRenderer.class).getSkysphere().getDaylight() == 0.0) {
+            _exposure = MAX_EXPOSURE_NIGHT;
+        } else {
+            _exposure = DEFAULT_EXPOSURE;
+        }
+      }
     }
 
     public void beginRenderScene() {
@@ -285,7 +294,9 @@ public class PostProcessingRenderer {
             generateHighPass();
 
             for (int i = 0; i < 2; i++) {
-                generateBloom(i);
+                if (Config.getInstance().isBloom()) {
+                    generateBloom(i);
+                }
                 if (Config.getInstance().getBlurIntensity() != 0) {
                     generateBlur(i);
                 }

@@ -2264,7 +2264,7 @@ public final class Configuration {
     public interface PlayerOrBuilder
         extends com.google.protobuf.MessageOrBuilder {
       
-      // optional float fov = 1 [default = 100];
+      // optional float fov = 1 [default = 80];
       boolean hasFov();
       float getFov();
       
@@ -2313,7 +2313,7 @@ public final class Configuration {
       }
       
       private int bitField0_;
-      // optional float fov = 1 [default = 100];
+      // optional float fov = 1 [default = 80];
       public static final int FOV_FIELD_NUMBER = 1;
       private float fov_;
       public boolean hasFov() {
@@ -2364,7 +2364,7 @@ public final class Configuration {
       }
       
       private void initFields() {
-        fov_ = 100F;
+        fov_ = 80F;
         mouseSens_ = 0.075F;
         cameraBobbing_ = true;
         renderFirstPersonView_ = true;
@@ -2550,7 +2550,7 @@ public final class Configuration {
         
         public Builder clear() {
           super.clear();
-          fov_ = 100F;
+          fov_ = 80F;
           bitField0_ = (bitField0_ & ~0x00000001);
           mouseSens_ = 0.075F;
           bitField0_ = (bitField0_ & ~0x00000002);
@@ -2711,8 +2711,8 @@ public final class Configuration {
         
         private int bitField0_;
         
-        // optional float fov = 1 [default = 100];
-        private float fov_ = 100F;
+        // optional float fov = 1 [default = 80];
+        private float fov_ = 80F;
         public boolean hasFov() {
           return ((bitField0_ & 0x00000001) == 0x00000001);
         }
@@ -2727,7 +2727,7 @@ public final class Configuration {
         }
         public Builder clearFov() {
           bitField0_ = (bitField0_ & ~0x00000001);
-          fov_ = 100F;
+          fov_ = 80F;
           onChanged();
           return this;
         }
@@ -2834,15 +2834,6 @@ public final class Configuration {
       boolean hasMaxParticles();
       int getMaxParticles();
       
-      // optional .protobuf.Setting.System.CloudRes cloud_resolution = 2;
-      boolean hasCloudResolution();
-      org.terasology.protobuf.Configuration.Setting.System.CloudRes getCloudResolution();
-      org.terasology.protobuf.Configuration.Setting.System.CloudResOrBuilder getCloudResolutionOrBuilder();
-      
-      // optional int32 cloud_update_interval = 3 [default = 8000];
-      boolean hasCloudUpdateInterval();
-      int getCloudUpdateInterval();
-      
       // optional int32 max_threads = 4 [default = 2];
       boolean hasMaxThreads();
       int getMaxThreads();
@@ -2858,10 +2849,6 @@ public final class Configuration {
       // optional int32 max_chunk_VBOs = 7 [default = 512];
       boolean hasMaxChunkVBOs();
       int getMaxChunkVBOs();
-      
-      // optional float gamma = 8 [default = 2.2];
-      boolean hasGamma();
-      float getGamma();
       
       // optional int32 pixel_format = 9 [default = 24];
       boolean hasPixelFormat();
@@ -2900,7 +2887,7 @@ public final class Configuration {
       boolean hasFlickeringLight();
       boolean getFlickeringLight();
       
-      // optional bool enable_post_processing_effects = 18 [default = false];
+      // optional bool enable_post_processing_effects = 18 [default = true];
       boolean hasEnablePostProcessingEffects();
       boolean getEnablePostProcessingEffects();
       
@@ -2927,6 +2914,18 @@ public final class Configuration {
       // optional int32 sound_volume = 24 [default = 100];
       boolean hasSoundVolume();
       int getSoundVolume();
+      
+      // optional bool vignette = 25 [default = false];
+      boolean hasVignette();
+      boolean getVignette();
+      
+      // optional bool eye_adapation = 26 [default = false];
+      boolean hasEyeAdapation();
+      boolean getEyeAdapation();
+      
+      // optional bool bloom = 27 [default = false];
+      boolean hasBloom();
+      boolean getBloom();
     }
     public static final class System extends
         com.google.protobuf.GeneratedMessage
@@ -3757,34 +3756,11 @@ public final class Configuration {
         return maxParticles_;
       }
       
-      // optional .protobuf.Setting.System.CloudRes cloud_resolution = 2;
-      public static final int CLOUD_RESOLUTION_FIELD_NUMBER = 2;
-      private org.terasology.protobuf.Configuration.Setting.System.CloudRes cloudResolution_;
-      public boolean hasCloudResolution() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
-      }
-      public org.terasology.protobuf.Configuration.Setting.System.CloudRes getCloudResolution() {
-        return cloudResolution_;
-      }
-      public org.terasology.protobuf.Configuration.Setting.System.CloudResOrBuilder getCloudResolutionOrBuilder() {
-        return cloudResolution_;
-      }
-      
-      // optional int32 cloud_update_interval = 3 [default = 8000];
-      public static final int CLOUD_UPDATE_INTERVAL_FIELD_NUMBER = 3;
-      private int cloudUpdateInterval_;
-      public boolean hasCloudUpdateInterval() {
-        return ((bitField0_ & 0x00000004) == 0x00000004);
-      }
-      public int getCloudUpdateInterval() {
-        return cloudUpdateInterval_;
-      }
-      
       // optional int32 max_threads = 4 [default = 2];
       public static final int MAX_THREADS_FIELD_NUMBER = 4;
       private int maxThreads_;
       public boolean hasMaxThreads() {
-        return ((bitField0_ & 0x00000008) == 0x00000008);
+        return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       public int getMaxThreads() {
         return maxThreads_;
@@ -3794,7 +3770,7 @@ public final class Configuration {
       public static final int SAVE_CHUNKS_FIELD_NUMBER = 5;
       private boolean saveChunks_;
       public boolean hasSaveChunks() {
-        return ((bitField0_ & 0x00000010) == 0x00000010);
+        return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       public boolean getSaveChunks() {
         return saveChunks_;
@@ -3804,7 +3780,7 @@ public final class Configuration {
       public static final int CHUNK_CACHE_SIZE_FIELD_NUMBER = 6;
       private int chunkCacheSize_;
       public boolean hasChunkCacheSize() {
-        return ((bitField0_ & 0x00000020) == 0x00000020);
+        return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       public int getChunkCacheSize() {
         return chunkCacheSize_;
@@ -3814,27 +3790,17 @@ public final class Configuration {
       public static final int MAX_CHUNK_VBOS_FIELD_NUMBER = 7;
       private int maxChunkVBOs_;
       public boolean hasMaxChunkVBOs() {
-        return ((bitField0_ & 0x00000040) == 0x00000040);
+        return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       public int getMaxChunkVBOs() {
         return maxChunkVBOs_;
-      }
-      
-      // optional float gamma = 8 [default = 2.2];
-      public static final int GAMMA_FIELD_NUMBER = 8;
-      private float gamma_;
-      public boolean hasGamma() {
-        return ((bitField0_ & 0x00000080) == 0x00000080);
-      }
-      public float getGamma() {
-        return gamma_;
       }
       
       // optional int32 pixel_format = 9 [default = 24];
       public static final int PIXEL_FORMAT_FIELD_NUMBER = 9;
       private int pixelFormat_;
       public boolean hasPixelFormat() {
-        return ((bitField0_ & 0x00000100) == 0x00000100);
+        return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       public int getPixelFormat() {
         return pixelFormat_;
@@ -3844,7 +3810,7 @@ public final class Configuration {
       public static final int DISPLAY_MODE_FIELD_NUMBER = 10;
       private org.terasology.protobuf.Configuration.Setting.System.DisplayMode displayMode_;
       public boolean hasDisplayMode() {
-        return ((bitField0_ & 0x00000200) == 0x00000200);
+        return ((bitField0_ & 0x00000040) == 0x00000040);
       }
       public org.terasology.protobuf.Configuration.Setting.System.DisplayMode getDisplayMode() {
         return displayMode_;
@@ -3857,7 +3823,7 @@ public final class Configuration {
       public static final int FULLSCREEN_FIELD_NUMBER = 11;
       private boolean fullscreen_;
       public boolean hasFullscreen() {
-        return ((bitField0_ & 0x00000400) == 0x00000400);
+        return ((bitField0_ & 0x00000080) == 0x00000080);
       }
       public boolean getFullscreen() {
         return fullscreen_;
@@ -3867,7 +3833,7 @@ public final class Configuration {
       public static final int ACTIVE_VIEWING_DISTANCE_ID_FIELD_NUMBER = 12;
       private int activeViewingDistanceId_;
       public boolean hasActiveViewingDistanceId() {
-        return ((bitField0_ & 0x00000800) == 0x00000800);
+        return ((bitField0_ & 0x00000100) == 0x00000100);
       }
       public int getActiveViewingDistanceId() {
         return activeViewingDistanceId_;
@@ -3877,7 +3843,7 @@ public final class Configuration {
       public static final int VIEWING_DISTANCE_NEAR_FIELD_NUMBER = 13;
       private int viewingDistanceNear_;
       public boolean hasViewingDistanceNear() {
-        return ((bitField0_ & 0x00001000) == 0x00001000);
+        return ((bitField0_ & 0x00000200) == 0x00000200);
       }
       public int getViewingDistanceNear() {
         return viewingDistanceNear_;
@@ -3887,7 +3853,7 @@ public final class Configuration {
       public static final int VIEWING_DISTANCE_MODERATE_FIELD_NUMBER = 14;
       private int viewingDistanceModerate_;
       public boolean hasViewingDistanceModerate() {
-        return ((bitField0_ & 0x00002000) == 0x00002000);
+        return ((bitField0_ & 0x00000400) == 0x00000400);
       }
       public int getViewingDistanceModerate() {
         return viewingDistanceModerate_;
@@ -3897,7 +3863,7 @@ public final class Configuration {
       public static final int VIEWING_DISTANCE_FAR_FIELD_NUMBER = 15;
       private int viewingDistanceFar_;
       public boolean hasViewingDistanceFar() {
-        return ((bitField0_ & 0x00004000) == 0x00004000);
+        return ((bitField0_ & 0x00000800) == 0x00000800);
       }
       public int getViewingDistanceFar() {
         return viewingDistanceFar_;
@@ -3907,7 +3873,7 @@ public final class Configuration {
       public static final int VIEWING_DISTANCE_ULTRA_FIELD_NUMBER = 16;
       private int viewingDistanceUltra_;
       public boolean hasViewingDistanceUltra() {
-        return ((bitField0_ & 0x00008000) == 0x00008000);
+        return ((bitField0_ & 0x00001000) == 0x00001000);
       }
       public int getViewingDistanceUltra() {
         return viewingDistanceUltra_;
@@ -3917,17 +3883,17 @@ public final class Configuration {
       public static final int FLICKERING_LIGHT_FIELD_NUMBER = 17;
       private boolean flickeringLight_;
       public boolean hasFlickeringLight() {
-        return ((bitField0_ & 0x00010000) == 0x00010000);
+        return ((bitField0_ & 0x00002000) == 0x00002000);
       }
       public boolean getFlickeringLight() {
         return flickeringLight_;
       }
       
-      // optional bool enable_post_processing_effects = 18 [default = false];
+      // optional bool enable_post_processing_effects = 18 [default = true];
       public static final int ENABLE_POST_PROCESSING_EFFECTS_FIELD_NUMBER = 18;
       private boolean enablePostProcessingEffects_;
       public boolean hasEnablePostProcessingEffects() {
-        return ((bitField0_ & 0x00020000) == 0x00020000);
+        return ((bitField0_ & 0x00004000) == 0x00004000);
       }
       public boolean getEnablePostProcessingEffects() {
         return enablePostProcessingEffects_;
@@ -3937,7 +3903,7 @@ public final class Configuration {
       public static final int ANIMATED_GRASS_FIELD_NUMBER = 19;
       private boolean animatedGrass_;
       public boolean hasAnimatedGrass() {
-        return ((bitField0_ & 0x00040000) == 0x00040000);
+        return ((bitField0_ & 0x00008000) == 0x00008000);
       }
       public boolean getAnimatedGrass() {
         return animatedGrass_;
@@ -3947,7 +3913,7 @@ public final class Configuration {
       public static final int VERTICAL_CHUNK_MESH_SEGMENTS_FIELD_NUMBER = 20;
       private int verticalChunkMeshSegments_;
       public boolean hasVerticalChunkMeshSegments() {
-        return ((bitField0_ & 0x00080000) == 0x00080000);
+        return ((bitField0_ & 0x00010000) == 0x00010000);
       }
       public int getVerticalChunkMeshSegments() {
         return verticalChunkMeshSegments_;
@@ -3957,7 +3923,7 @@ public final class Configuration {
       public static final int BLUR_INTENSITY_FIELD_NUMBER = 21;
       private int blurIntensity_;
       public boolean hasBlurIntensity() {
-        return ((bitField0_ & 0x00100000) == 0x00100000);
+        return ((bitField0_ & 0x00020000) == 0x00020000);
       }
       public int getBlurIntensity() {
         return blurIntensity_;
@@ -3967,7 +3933,7 @@ public final class Configuration {
       public static final int REFLECTIVE_WATER_FIELD_NUMBER = 22;
       private boolean reflectiveWater_;
       public boolean hasReflectiveWater() {
-        return ((bitField0_ & 0x00200000) == 0x00200000);
+        return ((bitField0_ & 0x00040000) == 0x00040000);
       }
       public boolean getReflectiveWater() {
         return reflectiveWater_;
@@ -3977,7 +3943,7 @@ public final class Configuration {
       public static final int MUSIC_VOLUME_FIELD_NUMBER = 23;
       private int musicVolume_;
       public boolean hasMusicVolume() {
-        return ((bitField0_ & 0x00400000) == 0x00400000);
+        return ((bitField0_ & 0x00080000) == 0x00080000);
       }
       public int getMusicVolume() {
         return musicVolume_;
@@ -3987,21 +3953,48 @@ public final class Configuration {
       public static final int SOUND_VOLUME_FIELD_NUMBER = 24;
       private int soundVolume_;
       public boolean hasSoundVolume() {
-        return ((bitField0_ & 0x00800000) == 0x00800000);
+        return ((bitField0_ & 0x00100000) == 0x00100000);
       }
       public int getSoundVolume() {
         return soundVolume_;
       }
       
+      // optional bool vignette = 25 [default = false];
+      public static final int VIGNETTE_FIELD_NUMBER = 25;
+      private boolean vignette_;
+      public boolean hasVignette() {
+        return ((bitField0_ & 0x00200000) == 0x00200000);
+      }
+      public boolean getVignette() {
+        return vignette_;
+      }
+      
+      // optional bool eye_adapation = 26 [default = false];
+      public static final int EYE_ADAPATION_FIELD_NUMBER = 26;
+      private boolean eyeAdapation_;
+      public boolean hasEyeAdapation() {
+        return ((bitField0_ & 0x00400000) == 0x00400000);
+      }
+      public boolean getEyeAdapation() {
+        return eyeAdapation_;
+      }
+      
+      // optional bool bloom = 27 [default = false];
+      public static final int BLOOM_FIELD_NUMBER = 27;
+      private boolean bloom_;
+      public boolean hasBloom() {
+        return ((bitField0_ & 0x00800000) == 0x00800000);
+      }
+      public boolean getBloom() {
+        return bloom_;
+      }
+      
       private void initFields() {
         maxParticles_ = 256;
-        cloudResolution_ = org.terasology.protobuf.Configuration.Setting.System.CloudRes.getDefaultInstance();
-        cloudUpdateInterval_ = 8000;
         maxThreads_ = 2;
         saveChunks_ = true;
         chunkCacheSize_ = 2048;
         maxChunkVBOs_ = 512;
-        gamma_ = 2.2F;
         pixelFormat_ = 24;
         displayMode_ = org.terasology.protobuf.Configuration.Setting.System.DisplayMode.getDefaultInstance();
         fullscreen_ = false;
@@ -4011,13 +4004,16 @@ public final class Configuration {
         viewingDistanceFar_ = 32;
         viewingDistanceUltra_ = 48;
         flickeringLight_ = false;
-        enablePostProcessingEffects_ = false;
+        enablePostProcessingEffects_ = true;
         animatedGrass_ = false;
         verticalChunkMeshSegments_ = 1;
         blurIntensity_ = 3;
         reflectiveWater_ = false;
         musicVolume_ = 100;
         soundVolume_ = 100;
+        vignette_ = false;
+        eyeAdapation_ = false;
+        bloom_ = false;
       }
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
@@ -4035,73 +4031,73 @@ public final class Configuration {
           output.writeInt32(1, maxParticles_);
         }
         if (((bitField0_ & 0x00000002) == 0x00000002)) {
-          output.writeMessage(2, cloudResolution_);
-        }
-        if (((bitField0_ & 0x00000004) == 0x00000004)) {
-          output.writeInt32(3, cloudUpdateInterval_);
-        }
-        if (((bitField0_ & 0x00000008) == 0x00000008)) {
           output.writeInt32(4, maxThreads_);
         }
-        if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        if (((bitField0_ & 0x00000004) == 0x00000004)) {
           output.writeBool(5, saveChunks_);
         }
-        if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        if (((bitField0_ & 0x00000008) == 0x00000008)) {
           output.writeInt32(6, chunkCacheSize_);
         }
-        if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        if (((bitField0_ & 0x00000010) == 0x00000010)) {
           output.writeInt32(7, maxChunkVBOs_);
         }
-        if (((bitField0_ & 0x00000080) == 0x00000080)) {
-          output.writeFloat(8, gamma_);
-        }
-        if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        if (((bitField0_ & 0x00000020) == 0x00000020)) {
           output.writeInt32(9, pixelFormat_);
         }
-        if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        if (((bitField0_ & 0x00000040) == 0x00000040)) {
           output.writeMessage(10, displayMode_);
         }
-        if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        if (((bitField0_ & 0x00000080) == 0x00000080)) {
           output.writeBool(11, fullscreen_);
         }
-        if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        if (((bitField0_ & 0x00000100) == 0x00000100)) {
           output.writeInt32(12, activeViewingDistanceId_);
         }
-        if (((bitField0_ & 0x00001000) == 0x00001000)) {
+        if (((bitField0_ & 0x00000200) == 0x00000200)) {
           output.writeInt32(13, viewingDistanceNear_);
         }
-        if (((bitField0_ & 0x00002000) == 0x00002000)) {
+        if (((bitField0_ & 0x00000400) == 0x00000400)) {
           output.writeInt32(14, viewingDistanceModerate_);
         }
-        if (((bitField0_ & 0x00004000) == 0x00004000)) {
+        if (((bitField0_ & 0x00000800) == 0x00000800)) {
           output.writeInt32(15, viewingDistanceFar_);
         }
-        if (((bitField0_ & 0x00008000) == 0x00008000)) {
+        if (((bitField0_ & 0x00001000) == 0x00001000)) {
           output.writeInt32(16, viewingDistanceUltra_);
         }
-        if (((bitField0_ & 0x00010000) == 0x00010000)) {
+        if (((bitField0_ & 0x00002000) == 0x00002000)) {
           output.writeBool(17, flickeringLight_);
         }
-        if (((bitField0_ & 0x00020000) == 0x00020000)) {
+        if (((bitField0_ & 0x00004000) == 0x00004000)) {
           output.writeBool(18, enablePostProcessingEffects_);
         }
-        if (((bitField0_ & 0x00040000) == 0x00040000)) {
+        if (((bitField0_ & 0x00008000) == 0x00008000)) {
           output.writeBool(19, animatedGrass_);
         }
-        if (((bitField0_ & 0x00080000) == 0x00080000)) {
+        if (((bitField0_ & 0x00010000) == 0x00010000)) {
           output.writeInt32(20, verticalChunkMeshSegments_);
         }
-        if (((bitField0_ & 0x00100000) == 0x00100000)) {
+        if (((bitField0_ & 0x00020000) == 0x00020000)) {
           output.writeInt32(21, blurIntensity_);
         }
-        if (((bitField0_ & 0x00200000) == 0x00200000)) {
+        if (((bitField0_ & 0x00040000) == 0x00040000)) {
           output.writeBool(22, reflectiveWater_);
         }
-        if (((bitField0_ & 0x00400000) == 0x00400000)) {
+        if (((bitField0_ & 0x00080000) == 0x00080000)) {
           output.writeInt32(23, musicVolume_);
         }
-        if (((bitField0_ & 0x00800000) == 0x00800000)) {
+        if (((bitField0_ & 0x00100000) == 0x00100000)) {
           output.writeInt32(24, soundVolume_);
+        }
+        if (((bitField0_ & 0x00200000) == 0x00200000)) {
+          output.writeBool(25, vignette_);
+        }
+        if (((bitField0_ & 0x00400000) == 0x00400000)) {
+          output.writeBool(26, eyeAdapation_);
+        }
+        if (((bitField0_ & 0x00800000) == 0x00800000)) {
+          output.writeBool(27, bloom_);
         }
         getUnknownFields().writeTo(output);
       }
@@ -4118,95 +4114,95 @@ public final class Configuration {
         }
         if (((bitField0_ & 0x00000002) == 0x00000002)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeMessageSize(2, cloudResolution_);
+            .computeInt32Size(4, maxThreads_);
         }
         if (((bitField0_ & 0x00000004) == 0x00000004)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeInt32Size(3, cloudUpdateInterval_);
+            .computeBoolSize(5, saveChunks_);
         }
         if (((bitField0_ & 0x00000008) == 0x00000008)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeInt32Size(4, maxThreads_);
+            .computeInt32Size(6, chunkCacheSize_);
         }
         if (((bitField0_ & 0x00000010) == 0x00000010)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeBoolSize(5, saveChunks_);
+            .computeInt32Size(7, maxChunkVBOs_);
         }
         if (((bitField0_ & 0x00000020) == 0x00000020)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeInt32Size(6, chunkCacheSize_);
+            .computeInt32Size(9, pixelFormat_);
         }
         if (((bitField0_ & 0x00000040) == 0x00000040)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeInt32Size(7, maxChunkVBOs_);
+            .computeMessageSize(10, displayMode_);
         }
         if (((bitField0_ & 0x00000080) == 0x00000080)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeFloatSize(8, gamma_);
+            .computeBoolSize(11, fullscreen_);
         }
         if (((bitField0_ & 0x00000100) == 0x00000100)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeInt32Size(9, pixelFormat_);
+            .computeInt32Size(12, activeViewingDistanceId_);
         }
         if (((bitField0_ & 0x00000200) == 0x00000200)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeMessageSize(10, displayMode_);
+            .computeInt32Size(13, viewingDistanceNear_);
         }
         if (((bitField0_ & 0x00000400) == 0x00000400)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeBoolSize(11, fullscreen_);
+            .computeInt32Size(14, viewingDistanceModerate_);
         }
         if (((bitField0_ & 0x00000800) == 0x00000800)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeInt32Size(12, activeViewingDistanceId_);
+            .computeInt32Size(15, viewingDistanceFar_);
         }
         if (((bitField0_ & 0x00001000) == 0x00001000)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeInt32Size(13, viewingDistanceNear_);
+            .computeInt32Size(16, viewingDistanceUltra_);
         }
         if (((bitField0_ & 0x00002000) == 0x00002000)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeInt32Size(14, viewingDistanceModerate_);
+            .computeBoolSize(17, flickeringLight_);
         }
         if (((bitField0_ & 0x00004000) == 0x00004000)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeInt32Size(15, viewingDistanceFar_);
+            .computeBoolSize(18, enablePostProcessingEffects_);
         }
         if (((bitField0_ & 0x00008000) == 0x00008000)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeInt32Size(16, viewingDistanceUltra_);
+            .computeBoolSize(19, animatedGrass_);
         }
         if (((bitField0_ & 0x00010000) == 0x00010000)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeBoolSize(17, flickeringLight_);
+            .computeInt32Size(20, verticalChunkMeshSegments_);
         }
         if (((bitField0_ & 0x00020000) == 0x00020000)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeBoolSize(18, enablePostProcessingEffects_);
+            .computeInt32Size(21, blurIntensity_);
         }
         if (((bitField0_ & 0x00040000) == 0x00040000)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeBoolSize(19, animatedGrass_);
+            .computeBoolSize(22, reflectiveWater_);
         }
         if (((bitField0_ & 0x00080000) == 0x00080000)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeInt32Size(20, verticalChunkMeshSegments_);
+            .computeInt32Size(23, musicVolume_);
         }
         if (((bitField0_ & 0x00100000) == 0x00100000)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeInt32Size(21, blurIntensity_);
+            .computeInt32Size(24, soundVolume_);
         }
         if (((bitField0_ & 0x00200000) == 0x00200000)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeBoolSize(22, reflectiveWater_);
+            .computeBoolSize(25, vignette_);
         }
         if (((bitField0_ & 0x00400000) == 0x00400000)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeInt32Size(23, musicVolume_);
+            .computeBoolSize(26, eyeAdapation_);
         }
         if (((bitField0_ & 0x00800000) == 0x00800000)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeInt32Size(24, soundVolume_);
+            .computeBoolSize(27, bloom_);
         }
         size += getUnknownFields().getSerializedSize();
         memoizedSerializedSize = size;
@@ -4324,7 +4320,6 @@ public final class Configuration {
         }
         private void maybeForceBuilderInitialization() {
           if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
-            getCloudResolutionFieldBuilder();
             getDisplayModeFieldBuilder();
           }
         }
@@ -4336,59 +4331,55 @@ public final class Configuration {
           super.clear();
           maxParticles_ = 256;
           bitField0_ = (bitField0_ & ~0x00000001);
-          if (cloudResolutionBuilder_ == null) {
-            cloudResolution_ = org.terasology.protobuf.Configuration.Setting.System.CloudRes.getDefaultInstance();
-          } else {
-            cloudResolutionBuilder_.clear();
-          }
-          bitField0_ = (bitField0_ & ~0x00000002);
-          cloudUpdateInterval_ = 8000;
-          bitField0_ = (bitField0_ & ~0x00000004);
           maxThreads_ = 2;
-          bitField0_ = (bitField0_ & ~0x00000008);
+          bitField0_ = (bitField0_ & ~0x00000002);
           saveChunks_ = true;
-          bitField0_ = (bitField0_ & ~0x00000010);
+          bitField0_ = (bitField0_ & ~0x00000004);
           chunkCacheSize_ = 2048;
-          bitField0_ = (bitField0_ & ~0x00000020);
+          bitField0_ = (bitField0_ & ~0x00000008);
           maxChunkVBOs_ = 512;
-          bitField0_ = (bitField0_ & ~0x00000040);
-          gamma_ = 2.2F;
-          bitField0_ = (bitField0_ & ~0x00000080);
+          bitField0_ = (bitField0_ & ~0x00000010);
           pixelFormat_ = 24;
-          bitField0_ = (bitField0_ & ~0x00000100);
+          bitField0_ = (bitField0_ & ~0x00000020);
           if (displayModeBuilder_ == null) {
             displayMode_ = org.terasology.protobuf.Configuration.Setting.System.DisplayMode.getDefaultInstance();
           } else {
             displayModeBuilder_.clear();
           }
-          bitField0_ = (bitField0_ & ~0x00000200);
+          bitField0_ = (bitField0_ & ~0x00000040);
           fullscreen_ = false;
-          bitField0_ = (bitField0_ & ~0x00000400);
+          bitField0_ = (bitField0_ & ~0x00000080);
           activeViewingDistanceId_ = 0;
-          bitField0_ = (bitField0_ & ~0x00000800);
+          bitField0_ = (bitField0_ & ~0x00000100);
           viewingDistanceNear_ = 8;
-          bitField0_ = (bitField0_ & ~0x00001000);
+          bitField0_ = (bitField0_ & ~0x00000200);
           viewingDistanceModerate_ = 16;
-          bitField0_ = (bitField0_ & ~0x00002000);
+          bitField0_ = (bitField0_ & ~0x00000400);
           viewingDistanceFar_ = 32;
-          bitField0_ = (bitField0_ & ~0x00004000);
+          bitField0_ = (bitField0_ & ~0x00000800);
           viewingDistanceUltra_ = 48;
-          bitField0_ = (bitField0_ & ~0x00008000);
+          bitField0_ = (bitField0_ & ~0x00001000);
           flickeringLight_ = false;
-          bitField0_ = (bitField0_ & ~0x00010000);
-          enablePostProcessingEffects_ = false;
-          bitField0_ = (bitField0_ & ~0x00020000);
+          bitField0_ = (bitField0_ & ~0x00002000);
+          enablePostProcessingEffects_ = true;
+          bitField0_ = (bitField0_ & ~0x00004000);
           animatedGrass_ = false;
-          bitField0_ = (bitField0_ & ~0x00040000);
+          bitField0_ = (bitField0_ & ~0x00008000);
           verticalChunkMeshSegments_ = 1;
-          bitField0_ = (bitField0_ & ~0x00080000);
+          bitField0_ = (bitField0_ & ~0x00010000);
           blurIntensity_ = 3;
-          bitField0_ = (bitField0_ & ~0x00100000);
+          bitField0_ = (bitField0_ & ~0x00020000);
           reflectiveWater_ = false;
-          bitField0_ = (bitField0_ & ~0x00200000);
+          bitField0_ = (bitField0_ & ~0x00040000);
           musicVolume_ = 100;
-          bitField0_ = (bitField0_ & ~0x00400000);
+          bitField0_ = (bitField0_ & ~0x00080000);
           soundVolume_ = 100;
+          bitField0_ = (bitField0_ & ~0x00100000);
+          vignette_ = false;
+          bitField0_ = (bitField0_ & ~0x00200000);
+          eyeAdapation_ = false;
+          bitField0_ = (bitField0_ & ~0x00400000);
+          bloom_ = false;
           bitField0_ = (bitField0_ & ~0x00800000);
           return this;
         }
@@ -4435,103 +4426,99 @@ public final class Configuration {
           if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
             to_bitField0_ |= 0x00000002;
           }
-          if (cloudResolutionBuilder_ == null) {
-            result.cloudResolution_ = cloudResolution_;
-          } else {
-            result.cloudResolution_ = cloudResolutionBuilder_.build();
-          }
+          result.maxThreads_ = maxThreads_;
           if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
             to_bitField0_ |= 0x00000004;
           }
-          result.cloudUpdateInterval_ = cloudUpdateInterval_;
+          result.saveChunks_ = saveChunks_;
           if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
             to_bitField0_ |= 0x00000008;
           }
-          result.maxThreads_ = maxThreads_;
+          result.chunkCacheSize_ = chunkCacheSize_;
           if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
             to_bitField0_ |= 0x00000010;
           }
-          result.saveChunks_ = saveChunks_;
+          result.maxChunkVBOs_ = maxChunkVBOs_;
           if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
             to_bitField0_ |= 0x00000020;
           }
-          result.chunkCacheSize_ = chunkCacheSize_;
+          result.pixelFormat_ = pixelFormat_;
           if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
             to_bitField0_ |= 0x00000040;
-          }
-          result.maxChunkVBOs_ = maxChunkVBOs_;
-          if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
-            to_bitField0_ |= 0x00000080;
-          }
-          result.gamma_ = gamma_;
-          if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
-            to_bitField0_ |= 0x00000100;
-          }
-          result.pixelFormat_ = pixelFormat_;
-          if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
-            to_bitField0_ |= 0x00000200;
           }
           if (displayModeBuilder_ == null) {
             result.displayMode_ = displayMode_;
           } else {
             result.displayMode_ = displayModeBuilder_.build();
           }
+          if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+            to_bitField0_ |= 0x00000080;
+          }
+          result.fullscreen_ = fullscreen_;
+          if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
+            to_bitField0_ |= 0x00000100;
+          }
+          result.activeViewingDistanceId_ = activeViewingDistanceId_;
+          if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
+            to_bitField0_ |= 0x00000200;
+          }
+          result.viewingDistanceNear_ = viewingDistanceNear_;
           if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
             to_bitField0_ |= 0x00000400;
           }
-          result.fullscreen_ = fullscreen_;
+          result.viewingDistanceModerate_ = viewingDistanceModerate_;
           if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
             to_bitField0_ |= 0x00000800;
           }
-          result.activeViewingDistanceId_ = activeViewingDistanceId_;
+          result.viewingDistanceFar_ = viewingDistanceFar_;
           if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
             to_bitField0_ |= 0x00001000;
           }
-          result.viewingDistanceNear_ = viewingDistanceNear_;
+          result.viewingDistanceUltra_ = viewingDistanceUltra_;
           if (((from_bitField0_ & 0x00002000) == 0x00002000)) {
             to_bitField0_ |= 0x00002000;
           }
-          result.viewingDistanceModerate_ = viewingDistanceModerate_;
+          result.flickeringLight_ = flickeringLight_;
           if (((from_bitField0_ & 0x00004000) == 0x00004000)) {
             to_bitField0_ |= 0x00004000;
           }
-          result.viewingDistanceFar_ = viewingDistanceFar_;
+          result.enablePostProcessingEffects_ = enablePostProcessingEffects_;
           if (((from_bitField0_ & 0x00008000) == 0x00008000)) {
             to_bitField0_ |= 0x00008000;
           }
-          result.viewingDistanceUltra_ = viewingDistanceUltra_;
+          result.animatedGrass_ = animatedGrass_;
           if (((from_bitField0_ & 0x00010000) == 0x00010000)) {
             to_bitField0_ |= 0x00010000;
           }
-          result.flickeringLight_ = flickeringLight_;
+          result.verticalChunkMeshSegments_ = verticalChunkMeshSegments_;
           if (((from_bitField0_ & 0x00020000) == 0x00020000)) {
             to_bitField0_ |= 0x00020000;
           }
-          result.enablePostProcessingEffects_ = enablePostProcessingEffects_;
+          result.blurIntensity_ = blurIntensity_;
           if (((from_bitField0_ & 0x00040000) == 0x00040000)) {
             to_bitField0_ |= 0x00040000;
           }
-          result.animatedGrass_ = animatedGrass_;
+          result.reflectiveWater_ = reflectiveWater_;
           if (((from_bitField0_ & 0x00080000) == 0x00080000)) {
             to_bitField0_ |= 0x00080000;
           }
-          result.verticalChunkMeshSegments_ = verticalChunkMeshSegments_;
+          result.musicVolume_ = musicVolume_;
           if (((from_bitField0_ & 0x00100000) == 0x00100000)) {
             to_bitField0_ |= 0x00100000;
           }
-          result.blurIntensity_ = blurIntensity_;
+          result.soundVolume_ = soundVolume_;
           if (((from_bitField0_ & 0x00200000) == 0x00200000)) {
             to_bitField0_ |= 0x00200000;
           }
-          result.reflectiveWater_ = reflectiveWater_;
+          result.vignette_ = vignette_;
           if (((from_bitField0_ & 0x00400000) == 0x00400000)) {
             to_bitField0_ |= 0x00400000;
           }
-          result.musicVolume_ = musicVolume_;
+          result.eyeAdapation_ = eyeAdapation_;
           if (((from_bitField0_ & 0x00800000) == 0x00800000)) {
             to_bitField0_ |= 0x00800000;
           }
-          result.soundVolume_ = soundVolume_;
+          result.bloom_ = bloom_;
           result.bitField0_ = to_bitField0_;
           onBuilt();
           return result;
@@ -4551,12 +4538,6 @@ public final class Configuration {
           if (other.hasMaxParticles()) {
             setMaxParticles(other.getMaxParticles());
           }
-          if (other.hasCloudResolution()) {
-            mergeCloudResolution(other.getCloudResolution());
-          }
-          if (other.hasCloudUpdateInterval()) {
-            setCloudUpdateInterval(other.getCloudUpdateInterval());
-          }
           if (other.hasMaxThreads()) {
             setMaxThreads(other.getMaxThreads());
           }
@@ -4568,9 +4549,6 @@ public final class Configuration {
           }
           if (other.hasMaxChunkVBOs()) {
             setMaxChunkVBOs(other.getMaxChunkVBOs());
-          }
-          if (other.hasGamma()) {
-            setGamma(other.getGamma());
           }
           if (other.hasPixelFormat()) {
             setPixelFormat(other.getPixelFormat());
@@ -4620,6 +4598,15 @@ public final class Configuration {
           if (other.hasSoundVolume()) {
             setSoundVolume(other.getSoundVolume());
           }
+          if (other.hasVignette()) {
+            setVignette(other.getVignette());
+          }
+          if (other.hasEyeAdapation()) {
+            setEyeAdapation(other.getEyeAdapation());
+          }
+          if (other.hasBloom()) {
+            setBloom(other.getBloom());
+          }
           this.mergeUnknownFields(other.getUnknownFields());
           return this;
         }
@@ -4656,47 +4643,28 @@ public final class Configuration {
                 maxParticles_ = input.readInt32();
                 break;
               }
-              case 18: {
-                org.terasology.protobuf.Configuration.Setting.System.CloudRes.Builder subBuilder = org.terasology.protobuf.Configuration.Setting.System.CloudRes.newBuilder();
-                if (hasCloudResolution()) {
-                  subBuilder.mergeFrom(getCloudResolution());
-                }
-                input.readMessage(subBuilder, extensionRegistry);
-                setCloudResolution(subBuilder.buildPartial());
-                break;
-              }
-              case 24: {
-                bitField0_ |= 0x00000004;
-                cloudUpdateInterval_ = input.readInt32();
-                break;
-              }
               case 32: {
-                bitField0_ |= 0x00000008;
+                bitField0_ |= 0x00000002;
                 maxThreads_ = input.readInt32();
                 break;
               }
               case 40: {
-                bitField0_ |= 0x00000010;
+                bitField0_ |= 0x00000004;
                 saveChunks_ = input.readBool();
                 break;
               }
               case 48: {
-                bitField0_ |= 0x00000020;
+                bitField0_ |= 0x00000008;
                 chunkCacheSize_ = input.readInt32();
                 break;
               }
               case 56: {
-                bitField0_ |= 0x00000040;
+                bitField0_ |= 0x00000010;
                 maxChunkVBOs_ = input.readInt32();
                 break;
               }
-              case 69: {
-                bitField0_ |= 0x00000080;
-                gamma_ = input.readFloat();
-                break;
-              }
               case 72: {
-                bitField0_ |= 0x00000100;
+                bitField0_ |= 0x00000020;
                 pixelFormat_ = input.readInt32();
                 break;
               }
@@ -4710,73 +4678,88 @@ public final class Configuration {
                 break;
               }
               case 88: {
-                bitField0_ |= 0x00000400;
+                bitField0_ |= 0x00000080;
                 fullscreen_ = input.readBool();
                 break;
               }
               case 96: {
-                bitField0_ |= 0x00000800;
+                bitField0_ |= 0x00000100;
                 activeViewingDistanceId_ = input.readInt32();
                 break;
               }
               case 104: {
-                bitField0_ |= 0x00001000;
+                bitField0_ |= 0x00000200;
                 viewingDistanceNear_ = input.readInt32();
                 break;
               }
               case 112: {
-                bitField0_ |= 0x00002000;
+                bitField0_ |= 0x00000400;
                 viewingDistanceModerate_ = input.readInt32();
                 break;
               }
               case 120: {
-                bitField0_ |= 0x00004000;
+                bitField0_ |= 0x00000800;
                 viewingDistanceFar_ = input.readInt32();
                 break;
               }
               case 128: {
-                bitField0_ |= 0x00008000;
+                bitField0_ |= 0x00001000;
                 viewingDistanceUltra_ = input.readInt32();
                 break;
               }
               case 136: {
-                bitField0_ |= 0x00010000;
+                bitField0_ |= 0x00002000;
                 flickeringLight_ = input.readBool();
                 break;
               }
               case 144: {
-                bitField0_ |= 0x00020000;
+                bitField0_ |= 0x00004000;
                 enablePostProcessingEffects_ = input.readBool();
                 break;
               }
               case 152: {
-                bitField0_ |= 0x00040000;
+                bitField0_ |= 0x00008000;
                 animatedGrass_ = input.readBool();
                 break;
               }
               case 160: {
-                bitField0_ |= 0x00080000;
+                bitField0_ |= 0x00010000;
                 verticalChunkMeshSegments_ = input.readInt32();
                 break;
               }
               case 168: {
-                bitField0_ |= 0x00100000;
+                bitField0_ |= 0x00020000;
                 blurIntensity_ = input.readInt32();
                 break;
               }
               case 176: {
-                bitField0_ |= 0x00200000;
+                bitField0_ |= 0x00040000;
                 reflectiveWater_ = input.readBool();
                 break;
               }
               case 184: {
-                bitField0_ |= 0x00400000;
+                bitField0_ |= 0x00080000;
                 musicVolume_ = input.readInt32();
                 break;
               }
               case 192: {
-                bitField0_ |= 0x00800000;
+                bitField0_ |= 0x00100000;
                 soundVolume_ = input.readInt32();
+                break;
+              }
+              case 200: {
+                bitField0_ |= 0x00200000;
+                vignette_ = input.readBool();
+                break;
+              }
+              case 208: {
+                bitField0_ |= 0x00400000;
+                eyeAdapation_ = input.readBool();
+                break;
+              }
+              case 216: {
+                bitField0_ |= 0x00800000;
+                bloom_ = input.readBool();
                 break;
               }
             }
@@ -4806,133 +4789,22 @@ public final class Configuration {
           return this;
         }
         
-        // optional .protobuf.Setting.System.CloudRes cloud_resolution = 2;
-        private org.terasology.protobuf.Configuration.Setting.System.CloudRes cloudResolution_ = org.terasology.protobuf.Configuration.Setting.System.CloudRes.getDefaultInstance();
-        private com.google.protobuf.SingleFieldBuilder<
-            org.terasology.protobuf.Configuration.Setting.System.CloudRes, org.terasology.protobuf.Configuration.Setting.System.CloudRes.Builder, org.terasology.protobuf.Configuration.Setting.System.CloudResOrBuilder> cloudResolutionBuilder_;
-        public boolean hasCloudResolution() {
-          return ((bitField0_ & 0x00000002) == 0x00000002);
-        }
-        public org.terasology.protobuf.Configuration.Setting.System.CloudRes getCloudResolution() {
-          if (cloudResolutionBuilder_ == null) {
-            return cloudResolution_;
-          } else {
-            return cloudResolutionBuilder_.getMessage();
-          }
-        }
-        public Builder setCloudResolution(org.terasology.protobuf.Configuration.Setting.System.CloudRes value) {
-          if (cloudResolutionBuilder_ == null) {
-            if (value == null) {
-              throw new NullPointerException();
-            }
-            cloudResolution_ = value;
-            onChanged();
-          } else {
-            cloudResolutionBuilder_.setMessage(value);
-          }
-          bitField0_ |= 0x00000002;
-          return this;
-        }
-        public Builder setCloudResolution(
-            org.terasology.protobuf.Configuration.Setting.System.CloudRes.Builder builderForValue) {
-          if (cloudResolutionBuilder_ == null) {
-            cloudResolution_ = builderForValue.build();
-            onChanged();
-          } else {
-            cloudResolutionBuilder_.setMessage(builderForValue.build());
-          }
-          bitField0_ |= 0x00000002;
-          return this;
-        }
-        public Builder mergeCloudResolution(org.terasology.protobuf.Configuration.Setting.System.CloudRes value) {
-          if (cloudResolutionBuilder_ == null) {
-            if (((bitField0_ & 0x00000002) == 0x00000002) &&
-                cloudResolution_ != org.terasology.protobuf.Configuration.Setting.System.CloudRes.getDefaultInstance()) {
-              cloudResolution_ =
-                org.terasology.protobuf.Configuration.Setting.System.CloudRes.newBuilder(cloudResolution_).mergeFrom(value).buildPartial();
-            } else {
-              cloudResolution_ = value;
-            }
-            onChanged();
-          } else {
-            cloudResolutionBuilder_.mergeFrom(value);
-          }
-          bitField0_ |= 0x00000002;
-          return this;
-        }
-        public Builder clearCloudResolution() {
-          if (cloudResolutionBuilder_ == null) {
-            cloudResolution_ = org.terasology.protobuf.Configuration.Setting.System.CloudRes.getDefaultInstance();
-            onChanged();
-          } else {
-            cloudResolutionBuilder_.clear();
-          }
-          bitField0_ = (bitField0_ & ~0x00000002);
-          return this;
-        }
-        public org.terasology.protobuf.Configuration.Setting.System.CloudRes.Builder getCloudResolutionBuilder() {
-          bitField0_ |= 0x00000002;
-          onChanged();
-          return getCloudResolutionFieldBuilder().getBuilder();
-        }
-        public org.terasology.protobuf.Configuration.Setting.System.CloudResOrBuilder getCloudResolutionOrBuilder() {
-          if (cloudResolutionBuilder_ != null) {
-            return cloudResolutionBuilder_.getMessageOrBuilder();
-          } else {
-            return cloudResolution_;
-          }
-        }
-        private com.google.protobuf.SingleFieldBuilder<
-            org.terasology.protobuf.Configuration.Setting.System.CloudRes, org.terasology.protobuf.Configuration.Setting.System.CloudRes.Builder, org.terasology.protobuf.Configuration.Setting.System.CloudResOrBuilder> 
-            getCloudResolutionFieldBuilder() {
-          if (cloudResolutionBuilder_ == null) {
-            cloudResolutionBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-                org.terasology.protobuf.Configuration.Setting.System.CloudRes, org.terasology.protobuf.Configuration.Setting.System.CloudRes.Builder, org.terasology.protobuf.Configuration.Setting.System.CloudResOrBuilder>(
-                    cloudResolution_,
-                    getParentForChildren(),
-                    isClean());
-            cloudResolution_ = null;
-          }
-          return cloudResolutionBuilder_;
-        }
-        
-        // optional int32 cloud_update_interval = 3 [default = 8000];
-        private int cloudUpdateInterval_ = 8000;
-        public boolean hasCloudUpdateInterval() {
-          return ((bitField0_ & 0x00000004) == 0x00000004);
-        }
-        public int getCloudUpdateInterval() {
-          return cloudUpdateInterval_;
-        }
-        public Builder setCloudUpdateInterval(int value) {
-          bitField0_ |= 0x00000004;
-          cloudUpdateInterval_ = value;
-          onChanged();
-          return this;
-        }
-        public Builder clearCloudUpdateInterval() {
-          bitField0_ = (bitField0_ & ~0x00000004);
-          cloudUpdateInterval_ = 8000;
-          onChanged();
-          return this;
-        }
-        
         // optional int32 max_threads = 4 [default = 2];
         private int maxThreads_ = 2;
         public boolean hasMaxThreads() {
-          return ((bitField0_ & 0x00000008) == 0x00000008);
+          return ((bitField0_ & 0x00000002) == 0x00000002);
         }
         public int getMaxThreads() {
           return maxThreads_;
         }
         public Builder setMaxThreads(int value) {
-          bitField0_ |= 0x00000008;
+          bitField0_ |= 0x00000002;
           maxThreads_ = value;
           onChanged();
           return this;
         }
         public Builder clearMaxThreads() {
-          bitField0_ = (bitField0_ & ~0x00000008);
+          bitField0_ = (bitField0_ & ~0x00000002);
           maxThreads_ = 2;
           onChanged();
           return this;
@@ -4941,19 +4813,19 @@ public final class Configuration {
         // optional bool save_chunks = 5 [default = true];
         private boolean saveChunks_ = true;
         public boolean hasSaveChunks() {
-          return ((bitField0_ & 0x00000010) == 0x00000010);
+          return ((bitField0_ & 0x00000004) == 0x00000004);
         }
         public boolean getSaveChunks() {
           return saveChunks_;
         }
         public Builder setSaveChunks(boolean value) {
-          bitField0_ |= 0x00000010;
+          bitField0_ |= 0x00000004;
           saveChunks_ = value;
           onChanged();
           return this;
         }
         public Builder clearSaveChunks() {
-          bitField0_ = (bitField0_ & ~0x00000010);
+          bitField0_ = (bitField0_ & ~0x00000004);
           saveChunks_ = true;
           onChanged();
           return this;
@@ -4962,19 +4834,19 @@ public final class Configuration {
         // optional int32 chunk_cache_size = 6 [default = 2048];
         private int chunkCacheSize_ = 2048;
         public boolean hasChunkCacheSize() {
-          return ((bitField0_ & 0x00000020) == 0x00000020);
+          return ((bitField0_ & 0x00000008) == 0x00000008);
         }
         public int getChunkCacheSize() {
           return chunkCacheSize_;
         }
         public Builder setChunkCacheSize(int value) {
-          bitField0_ |= 0x00000020;
+          bitField0_ |= 0x00000008;
           chunkCacheSize_ = value;
           onChanged();
           return this;
         }
         public Builder clearChunkCacheSize() {
-          bitField0_ = (bitField0_ & ~0x00000020);
+          bitField0_ = (bitField0_ & ~0x00000008);
           chunkCacheSize_ = 2048;
           onChanged();
           return this;
@@ -4983,41 +4855,20 @@ public final class Configuration {
         // optional int32 max_chunk_VBOs = 7 [default = 512];
         private int maxChunkVBOs_ = 512;
         public boolean hasMaxChunkVBOs() {
-          return ((bitField0_ & 0x00000040) == 0x00000040);
+          return ((bitField0_ & 0x00000010) == 0x00000010);
         }
         public int getMaxChunkVBOs() {
           return maxChunkVBOs_;
         }
         public Builder setMaxChunkVBOs(int value) {
-          bitField0_ |= 0x00000040;
+          bitField0_ |= 0x00000010;
           maxChunkVBOs_ = value;
           onChanged();
           return this;
         }
         public Builder clearMaxChunkVBOs() {
-          bitField0_ = (bitField0_ & ~0x00000040);
+          bitField0_ = (bitField0_ & ~0x00000010);
           maxChunkVBOs_ = 512;
-          onChanged();
-          return this;
-        }
-        
-        // optional float gamma = 8 [default = 2.2];
-        private float gamma_ = 2.2F;
-        public boolean hasGamma() {
-          return ((bitField0_ & 0x00000080) == 0x00000080);
-        }
-        public float getGamma() {
-          return gamma_;
-        }
-        public Builder setGamma(float value) {
-          bitField0_ |= 0x00000080;
-          gamma_ = value;
-          onChanged();
-          return this;
-        }
-        public Builder clearGamma() {
-          bitField0_ = (bitField0_ & ~0x00000080);
-          gamma_ = 2.2F;
           onChanged();
           return this;
         }
@@ -5025,19 +4876,19 @@ public final class Configuration {
         // optional int32 pixel_format = 9 [default = 24];
         private int pixelFormat_ = 24;
         public boolean hasPixelFormat() {
-          return ((bitField0_ & 0x00000100) == 0x00000100);
+          return ((bitField0_ & 0x00000020) == 0x00000020);
         }
         public int getPixelFormat() {
           return pixelFormat_;
         }
         public Builder setPixelFormat(int value) {
-          bitField0_ |= 0x00000100;
+          bitField0_ |= 0x00000020;
           pixelFormat_ = value;
           onChanged();
           return this;
         }
         public Builder clearPixelFormat() {
-          bitField0_ = (bitField0_ & ~0x00000100);
+          bitField0_ = (bitField0_ & ~0x00000020);
           pixelFormat_ = 24;
           onChanged();
           return this;
@@ -5048,7 +4899,7 @@ public final class Configuration {
         private com.google.protobuf.SingleFieldBuilder<
             org.terasology.protobuf.Configuration.Setting.System.DisplayMode, org.terasology.protobuf.Configuration.Setting.System.DisplayMode.Builder, org.terasology.protobuf.Configuration.Setting.System.DisplayModeOrBuilder> displayModeBuilder_;
         public boolean hasDisplayMode() {
-          return ((bitField0_ & 0x00000200) == 0x00000200);
+          return ((bitField0_ & 0x00000040) == 0x00000040);
         }
         public org.terasology.protobuf.Configuration.Setting.System.DisplayMode getDisplayMode() {
           if (displayModeBuilder_ == null) {
@@ -5067,7 +4918,7 @@ public final class Configuration {
           } else {
             displayModeBuilder_.setMessage(value);
           }
-          bitField0_ |= 0x00000200;
+          bitField0_ |= 0x00000040;
           return this;
         }
         public Builder setDisplayMode(
@@ -5078,12 +4929,12 @@ public final class Configuration {
           } else {
             displayModeBuilder_.setMessage(builderForValue.build());
           }
-          bitField0_ |= 0x00000200;
+          bitField0_ |= 0x00000040;
           return this;
         }
         public Builder mergeDisplayMode(org.terasology.protobuf.Configuration.Setting.System.DisplayMode value) {
           if (displayModeBuilder_ == null) {
-            if (((bitField0_ & 0x00000200) == 0x00000200) &&
+            if (((bitField0_ & 0x00000040) == 0x00000040) &&
                 displayMode_ != org.terasology.protobuf.Configuration.Setting.System.DisplayMode.getDefaultInstance()) {
               displayMode_ =
                 org.terasology.protobuf.Configuration.Setting.System.DisplayMode.newBuilder(displayMode_).mergeFrom(value).buildPartial();
@@ -5094,7 +4945,7 @@ public final class Configuration {
           } else {
             displayModeBuilder_.mergeFrom(value);
           }
-          bitField0_ |= 0x00000200;
+          bitField0_ |= 0x00000040;
           return this;
         }
         public Builder clearDisplayMode() {
@@ -5104,11 +4955,11 @@ public final class Configuration {
           } else {
             displayModeBuilder_.clear();
           }
-          bitField0_ = (bitField0_ & ~0x00000200);
+          bitField0_ = (bitField0_ & ~0x00000040);
           return this;
         }
         public org.terasology.protobuf.Configuration.Setting.System.DisplayMode.Builder getDisplayModeBuilder() {
-          bitField0_ |= 0x00000200;
+          bitField0_ |= 0x00000040;
           onChanged();
           return getDisplayModeFieldBuilder().getBuilder();
         }
@@ -5136,19 +4987,19 @@ public final class Configuration {
         // optional bool fullscreen = 11 [default = false];
         private boolean fullscreen_ ;
         public boolean hasFullscreen() {
-          return ((bitField0_ & 0x00000400) == 0x00000400);
+          return ((bitField0_ & 0x00000080) == 0x00000080);
         }
         public boolean getFullscreen() {
           return fullscreen_;
         }
         public Builder setFullscreen(boolean value) {
-          bitField0_ |= 0x00000400;
+          bitField0_ |= 0x00000080;
           fullscreen_ = value;
           onChanged();
           return this;
         }
         public Builder clearFullscreen() {
-          bitField0_ = (bitField0_ & ~0x00000400);
+          bitField0_ = (bitField0_ & ~0x00000080);
           fullscreen_ = false;
           onChanged();
           return this;
@@ -5157,19 +5008,19 @@ public final class Configuration {
         // optional int32 active_viewing_distance_id = 12 [default = 0];
         private int activeViewingDistanceId_ ;
         public boolean hasActiveViewingDistanceId() {
-          return ((bitField0_ & 0x00000800) == 0x00000800);
+          return ((bitField0_ & 0x00000100) == 0x00000100);
         }
         public int getActiveViewingDistanceId() {
           return activeViewingDistanceId_;
         }
         public Builder setActiveViewingDistanceId(int value) {
-          bitField0_ |= 0x00000800;
+          bitField0_ |= 0x00000100;
           activeViewingDistanceId_ = value;
           onChanged();
           return this;
         }
         public Builder clearActiveViewingDistanceId() {
-          bitField0_ = (bitField0_ & ~0x00000800);
+          bitField0_ = (bitField0_ & ~0x00000100);
           activeViewingDistanceId_ = 0;
           onChanged();
           return this;
@@ -5178,19 +5029,19 @@ public final class Configuration {
         // optional int32 viewing_distance_near = 13 [default = 8];
         private int viewingDistanceNear_ = 8;
         public boolean hasViewingDistanceNear() {
-          return ((bitField0_ & 0x00001000) == 0x00001000);
+          return ((bitField0_ & 0x00000200) == 0x00000200);
         }
         public int getViewingDistanceNear() {
           return viewingDistanceNear_;
         }
         public Builder setViewingDistanceNear(int value) {
-          bitField0_ |= 0x00001000;
+          bitField0_ |= 0x00000200;
           viewingDistanceNear_ = value;
           onChanged();
           return this;
         }
         public Builder clearViewingDistanceNear() {
-          bitField0_ = (bitField0_ & ~0x00001000);
+          bitField0_ = (bitField0_ & ~0x00000200);
           viewingDistanceNear_ = 8;
           onChanged();
           return this;
@@ -5199,19 +5050,19 @@ public final class Configuration {
         // optional int32 viewing_distance_moderate = 14 [default = 16];
         private int viewingDistanceModerate_ = 16;
         public boolean hasViewingDistanceModerate() {
-          return ((bitField0_ & 0x00002000) == 0x00002000);
+          return ((bitField0_ & 0x00000400) == 0x00000400);
         }
         public int getViewingDistanceModerate() {
           return viewingDistanceModerate_;
         }
         public Builder setViewingDistanceModerate(int value) {
-          bitField0_ |= 0x00002000;
+          bitField0_ |= 0x00000400;
           viewingDistanceModerate_ = value;
           onChanged();
           return this;
         }
         public Builder clearViewingDistanceModerate() {
-          bitField0_ = (bitField0_ & ~0x00002000);
+          bitField0_ = (bitField0_ & ~0x00000400);
           viewingDistanceModerate_ = 16;
           onChanged();
           return this;
@@ -5220,19 +5071,19 @@ public final class Configuration {
         // optional int32 viewing_distance_far = 15 [default = 32];
         private int viewingDistanceFar_ = 32;
         public boolean hasViewingDistanceFar() {
-          return ((bitField0_ & 0x00004000) == 0x00004000);
+          return ((bitField0_ & 0x00000800) == 0x00000800);
         }
         public int getViewingDistanceFar() {
           return viewingDistanceFar_;
         }
         public Builder setViewingDistanceFar(int value) {
-          bitField0_ |= 0x00004000;
+          bitField0_ |= 0x00000800;
           viewingDistanceFar_ = value;
           onChanged();
           return this;
         }
         public Builder clearViewingDistanceFar() {
-          bitField0_ = (bitField0_ & ~0x00004000);
+          bitField0_ = (bitField0_ & ~0x00000800);
           viewingDistanceFar_ = 32;
           onChanged();
           return this;
@@ -5241,19 +5092,19 @@ public final class Configuration {
         // optional int32 viewing_distance_ultra = 16 [default = 48];
         private int viewingDistanceUltra_ = 48;
         public boolean hasViewingDistanceUltra() {
-          return ((bitField0_ & 0x00008000) == 0x00008000);
+          return ((bitField0_ & 0x00001000) == 0x00001000);
         }
         public int getViewingDistanceUltra() {
           return viewingDistanceUltra_;
         }
         public Builder setViewingDistanceUltra(int value) {
-          bitField0_ |= 0x00008000;
+          bitField0_ |= 0x00001000;
           viewingDistanceUltra_ = value;
           onChanged();
           return this;
         }
         public Builder clearViewingDistanceUltra() {
-          bitField0_ = (bitField0_ & ~0x00008000);
+          bitField0_ = (bitField0_ & ~0x00001000);
           viewingDistanceUltra_ = 48;
           onChanged();
           return this;
@@ -5262,41 +5113,41 @@ public final class Configuration {
         // optional bool flickering_light = 17 [default = false];
         private boolean flickeringLight_ ;
         public boolean hasFlickeringLight() {
-          return ((bitField0_ & 0x00010000) == 0x00010000);
+          return ((bitField0_ & 0x00002000) == 0x00002000);
         }
         public boolean getFlickeringLight() {
           return flickeringLight_;
         }
         public Builder setFlickeringLight(boolean value) {
-          bitField0_ |= 0x00010000;
+          bitField0_ |= 0x00002000;
           flickeringLight_ = value;
           onChanged();
           return this;
         }
         public Builder clearFlickeringLight() {
-          bitField0_ = (bitField0_ & ~0x00010000);
+          bitField0_ = (bitField0_ & ~0x00002000);
           flickeringLight_ = false;
           onChanged();
           return this;
         }
         
-        // optional bool enable_post_processing_effects = 18 [default = false];
-        private boolean enablePostProcessingEffects_ ;
+        // optional bool enable_post_processing_effects = 18 [default = true];
+        private boolean enablePostProcessingEffects_ = true;
         public boolean hasEnablePostProcessingEffects() {
-          return ((bitField0_ & 0x00020000) == 0x00020000);
+          return ((bitField0_ & 0x00004000) == 0x00004000);
         }
         public boolean getEnablePostProcessingEffects() {
           return enablePostProcessingEffects_;
         }
         public Builder setEnablePostProcessingEffects(boolean value) {
-          bitField0_ |= 0x00020000;
+          bitField0_ |= 0x00004000;
           enablePostProcessingEffects_ = value;
           onChanged();
           return this;
         }
         public Builder clearEnablePostProcessingEffects() {
-          bitField0_ = (bitField0_ & ~0x00020000);
-          enablePostProcessingEffects_ = false;
+          bitField0_ = (bitField0_ & ~0x00004000);
+          enablePostProcessingEffects_ = true;
           onChanged();
           return this;
         }
@@ -5304,19 +5155,19 @@ public final class Configuration {
         // optional bool animated_grass = 19 [default = false];
         private boolean animatedGrass_ ;
         public boolean hasAnimatedGrass() {
-          return ((bitField0_ & 0x00040000) == 0x00040000);
+          return ((bitField0_ & 0x00008000) == 0x00008000);
         }
         public boolean getAnimatedGrass() {
           return animatedGrass_;
         }
         public Builder setAnimatedGrass(boolean value) {
-          bitField0_ |= 0x00040000;
+          bitField0_ |= 0x00008000;
           animatedGrass_ = value;
           onChanged();
           return this;
         }
         public Builder clearAnimatedGrass() {
-          bitField0_ = (bitField0_ & ~0x00040000);
+          bitField0_ = (bitField0_ & ~0x00008000);
           animatedGrass_ = false;
           onChanged();
           return this;
@@ -5325,19 +5176,19 @@ public final class Configuration {
         // optional int32 vertical_chunk_mesh_segments = 20 [default = 1];
         private int verticalChunkMeshSegments_ = 1;
         public boolean hasVerticalChunkMeshSegments() {
-          return ((bitField0_ & 0x00080000) == 0x00080000);
+          return ((bitField0_ & 0x00010000) == 0x00010000);
         }
         public int getVerticalChunkMeshSegments() {
           return verticalChunkMeshSegments_;
         }
         public Builder setVerticalChunkMeshSegments(int value) {
-          bitField0_ |= 0x00080000;
+          bitField0_ |= 0x00010000;
           verticalChunkMeshSegments_ = value;
           onChanged();
           return this;
         }
         public Builder clearVerticalChunkMeshSegments() {
-          bitField0_ = (bitField0_ & ~0x00080000);
+          bitField0_ = (bitField0_ & ~0x00010000);
           verticalChunkMeshSegments_ = 1;
           onChanged();
           return this;
@@ -5346,19 +5197,19 @@ public final class Configuration {
         // optional int32 blur_intensity = 21 [default = 3];
         private int blurIntensity_ = 3;
         public boolean hasBlurIntensity() {
-          return ((bitField0_ & 0x00100000) == 0x00100000);
+          return ((bitField0_ & 0x00020000) == 0x00020000);
         }
         public int getBlurIntensity() {
           return blurIntensity_;
         }
         public Builder setBlurIntensity(int value) {
-          bitField0_ |= 0x00100000;
+          bitField0_ |= 0x00020000;
           blurIntensity_ = value;
           onChanged();
           return this;
         }
         public Builder clearBlurIntensity() {
-          bitField0_ = (bitField0_ & ~0x00100000);
+          bitField0_ = (bitField0_ & ~0x00020000);
           blurIntensity_ = 3;
           onChanged();
           return this;
@@ -5367,19 +5218,19 @@ public final class Configuration {
         // optional bool reflective_water = 22 [default = false];
         private boolean reflectiveWater_ ;
         public boolean hasReflectiveWater() {
-          return ((bitField0_ & 0x00200000) == 0x00200000);
+          return ((bitField0_ & 0x00040000) == 0x00040000);
         }
         public boolean getReflectiveWater() {
           return reflectiveWater_;
         }
         public Builder setReflectiveWater(boolean value) {
-          bitField0_ |= 0x00200000;
+          bitField0_ |= 0x00040000;
           reflectiveWater_ = value;
           onChanged();
           return this;
         }
         public Builder clearReflectiveWater() {
-          bitField0_ = (bitField0_ & ~0x00200000);
+          bitField0_ = (bitField0_ & ~0x00040000);
           reflectiveWater_ = false;
           onChanged();
           return this;
@@ -5388,19 +5239,19 @@ public final class Configuration {
         // optional int32 music_volume = 23 [default = 100];
         private int musicVolume_ = 100;
         public boolean hasMusicVolume() {
-          return ((bitField0_ & 0x00400000) == 0x00400000);
+          return ((bitField0_ & 0x00080000) == 0x00080000);
         }
         public int getMusicVolume() {
           return musicVolume_;
         }
         public Builder setMusicVolume(int value) {
-          bitField0_ |= 0x00400000;
+          bitField0_ |= 0x00080000;
           musicVolume_ = value;
           onChanged();
           return this;
         }
         public Builder clearMusicVolume() {
-          bitField0_ = (bitField0_ & ~0x00400000);
+          bitField0_ = (bitField0_ & ~0x00080000);
           musicVolume_ = 100;
           onChanged();
           return this;
@@ -5409,20 +5260,83 @@ public final class Configuration {
         // optional int32 sound_volume = 24 [default = 100];
         private int soundVolume_ = 100;
         public boolean hasSoundVolume() {
-          return ((bitField0_ & 0x00800000) == 0x00800000);
+          return ((bitField0_ & 0x00100000) == 0x00100000);
         }
         public int getSoundVolume() {
           return soundVolume_;
         }
         public Builder setSoundVolume(int value) {
-          bitField0_ |= 0x00800000;
+          bitField0_ |= 0x00100000;
           soundVolume_ = value;
           onChanged();
           return this;
         }
         public Builder clearSoundVolume() {
-          bitField0_ = (bitField0_ & ~0x00800000);
+          bitField0_ = (bitField0_ & ~0x00100000);
           soundVolume_ = 100;
+          onChanged();
+          return this;
+        }
+        
+        // optional bool vignette = 25 [default = false];
+        private boolean vignette_ ;
+        public boolean hasVignette() {
+          return ((bitField0_ & 0x00200000) == 0x00200000);
+        }
+        public boolean getVignette() {
+          return vignette_;
+        }
+        public Builder setVignette(boolean value) {
+          bitField0_ |= 0x00200000;
+          vignette_ = value;
+          onChanged();
+          return this;
+        }
+        public Builder clearVignette() {
+          bitField0_ = (bitField0_ & ~0x00200000);
+          vignette_ = false;
+          onChanged();
+          return this;
+        }
+        
+        // optional bool eye_adapation = 26 [default = false];
+        private boolean eyeAdapation_ ;
+        public boolean hasEyeAdapation() {
+          return ((bitField0_ & 0x00400000) == 0x00400000);
+        }
+        public boolean getEyeAdapation() {
+          return eyeAdapation_;
+        }
+        public Builder setEyeAdapation(boolean value) {
+          bitField0_ |= 0x00400000;
+          eyeAdapation_ = value;
+          onChanged();
+          return this;
+        }
+        public Builder clearEyeAdapation() {
+          bitField0_ = (bitField0_ & ~0x00400000);
+          eyeAdapation_ = false;
+          onChanged();
+          return this;
+        }
+        
+        // optional bool bloom = 27 [default = false];
+        private boolean bloom_ ;
+        public boolean hasBloom() {
+          return ((bitField0_ & 0x00800000) == 0x00800000);
+        }
+        public boolean getBloom() {
+          return bloom_;
+        }
+        public Builder setBloom(boolean value) {
+          bitField0_ |= 0x00800000;
+          bloom_ = value;
+          onChanged();
+          return this;
+        }
+        public Builder clearBloom() {
+          bitField0_ = (bitField0_ & ~0x00800000);
+          bloom_ = false;
           onChanged();
           return this;
         }
@@ -6395,7 +6309,7 @@ public final class Configuration {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\rConfig2.proto\022\010protobuf\"\322\017\n\007Setting\022&\n" +
+      "\n\rConfig2.proto\022\010protobuf\"\247\017\n\007Setting\022&\n" +
       "\005world\030\001 \001(\0132\027.protobuf.Setting.World\022(\n" +
       "\006player\030\002 \001(\0132\030.protobuf.Setting.Player\022" +
       "(\n\006system\030\003 \001(\0132\030.protobuf.Setting.Syste" +
@@ -6418,35 +6332,34 @@ public final class Configuration {
       "false\022*\n\033render_chunk_bounding_boxes\030\003 \001" +
       "(\010:\005false\022\032\n\013demo_flight\030\004 \001(\010:\005false\022\037\n" +
       "\021demo_flight_speed\030\005 \001(\002:\0040.08\022\"\n\023DEPREC" +
-      "ATED_god_mode\030\006 \001(\010:\005false\032\226\001\n\006Player\022\020\n" +
-      "\003fov\030\001 \001(\002:\003100\022\031\n\nmouse_sens\030\002 \001(\002:\0050.0" +
-      "75\022\034\n\016camera_bobbing\030\003 \001(\010:\004true\022&\n\030rend" +
-      "er_first_person_view\030\004 \001(\010:\004true\022\031\n\013plac" +
-      "ing_box\030\005 \001(\010:\004true\032\240\007\n\006System\022\032\n\rmax_pa" +
-      "rticles\030\001 \001(\005:\003256\022;\n\020cloud_resolution\030\002" +
-      " \001(\0132!.protobuf.Setting.System.CloudRes\022",
-      "#\n\025cloud_update_interval\030\003 \001(\005:\0048000\022\026\n\013" +
-      "max_threads\030\004 \001(\005:\0012\022\031\n\013save_chunks\030\005 \001(" +
-      "\010:\004true\022\036\n\020chunk_cache_size\030\006 \001(\005:\0042048\022" +
-      "\033\n\016max_chunk_VBOs\030\007 \001(\005:\003512\022\022\n\005gamma\030\010 " +
-      "\001(\002:\0032.2\022\030\n\014pixel_format\030\t \001(\005:\00224\022:\n\014di" +
-      "splay_mode\030\n \001(\0132$.protobuf.Setting.Syst" +
-      "em.DisplayMode\022\031\n\nfullscreen\030\013 \001(\010:\005fals" +
-      "e\022%\n\032active_viewing_distance_id\030\014 \001(\005:\0010" +
-      "\022 \n\025viewing_distance_near\030\r \001(\005:\0018\022%\n\031vi" +
-      "ewing_distance_moderate\030\016 \001(\005:\00216\022 \n\024vie",
-      "wing_distance_far\030\017 \001(\005:\00232\022\"\n\026viewing_d" +
-      "istance_ultra\030\020 \001(\005:\00248\022\037\n\020flickering_li" +
-      "ght\030\021 \001(\010:\005false\022-\n\036enable_post_processi" +
-      "ng_effects\030\022 \001(\010:\005false\022\035\n\016animated_gras" +
+      "ATED_god_mode\030\006 \001(\010:\005false\032\225\001\n\006Player\022\017\n" +
+      "\003fov\030\001 \001(\002:\00280\022\031\n\nmouse_sens\030\002 \001(\002:\0050.07" +
+      "5\022\034\n\016camera_bobbing\030\003 \001(\010:\004true\022&\n\030rende" +
+      "r_first_person_view\030\004 \001(\010:\004true\022\031\n\013placi" +
+      "ng_box\030\005 \001(\010:\004true\032\366\006\n\006System\022\032\n\rmax_par" +
+      "ticles\030\001 \001(\005:\003256\022\026\n\013max_threads\030\004 \001(\005:\001" +
+      "2\022\031\n\013save_chunks\030\005 \001(\010:\004true\022\036\n\020chunk_ca",
+      "che_size\030\006 \001(\005:\0042048\022\033\n\016max_chunk_VBOs\030\007" +
+      " \001(\005:\003512\022\030\n\014pixel_format\030\t \001(\005:\00224\022:\n\014d" +
+      "isplay_mode\030\n \001(\0132$.protobuf.Setting.Sys" +
+      "tem.DisplayMode\022\031\n\nfullscreen\030\013 \001(\010:\005fal" +
+      "se\022%\n\032active_viewing_distance_id\030\014 \001(\005:\001" +
+      "0\022 \n\025viewing_distance_near\030\r \001(\005:\0018\022%\n\031v" +
+      "iewing_distance_moderate\030\016 \001(\005:\00216\022 \n\024vi" +
+      "ewing_distance_far\030\017 \001(\005:\00232\022\"\n\026viewing_" +
+      "distance_ultra\030\020 \001(\005:\00248\022\037\n\020flickering_l" +
+      "ight\030\021 \001(\010:\005false\022,\n\036enable_post_process",
+      "ing_effects\030\022 \001(\010:\004true\022\035\n\016animated_gras" +
       "s\030\023 \001(\010:\005false\022\'\n\034vertical_chunk_mesh_se" +
       "gments\030\024 \001(\005:\0011\022\031\n\016blur_intensity\030\025 \001(\005:" +
       "\0013\022\037\n\020reflective_water\030\026 \001(\010:\005false\022\031\n\014m" +
       "usic_volume\030\027 \001(\005:\003100\022\031\n\014sound_volume\030\030" +
-      " \001(\005:\003100\032*\n\010CloudRes\022\016\n\001x\030\001 \001(\002:\003512\022\016\n" +
-      "\001y\030\002 \001(\002:\003512\0327\n\013DisplayMode\022\023\n\005width\030\001 ",
-      "\001(\005:\0041280\022\023\n\006height\030\002 \001(\005:\003720B*\n\027org.te" +
-      "rasology.protobufB\rConfigurationH\001"
+      " \001(\005:\003100\022\027\n\010vignette\030\031 \001(\010:\005false\022\034\n\rey" +
+      "e_adapation\030\032 \001(\010:\005false\022\024\n\005bloom\030\033 \001(\010:" +
+      "\005false\032*\n\010CloudRes\022\016\n\001x\030\001 \001(\002:\003512\022\016\n\001y\030" +
+      "\002 \001(\002:\003512\0327\n\013DisplayMode\022\023\n\005width\030\001 \001(\005" +
+      ":\0041280\022\023\n\006height\030\002 \001(\005:\003720B*\n\027org.teras",
+      "ology.protobufB\rConfigurationH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -6498,7 +6411,7 @@ public final class Configuration {
           internal_static_protobuf_Setting_System_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_protobuf_Setting_System_descriptor,
-              new java.lang.String[] { "MaxParticles", "CloudResolution", "CloudUpdateInterval", "MaxThreads", "SaveChunks", "ChunkCacheSize", "MaxChunkVBOs", "Gamma", "PixelFormat", "DisplayMode", "Fullscreen", "ActiveViewingDistanceId", "ViewingDistanceNear", "ViewingDistanceModerate", "ViewingDistanceFar", "ViewingDistanceUltra", "FlickeringLight", "EnablePostProcessingEffects", "AnimatedGrass", "VerticalChunkMeshSegments", "BlurIntensity", "ReflectiveWater", "MusicVolume", "SoundVolume", },
+              new java.lang.String[] { "MaxParticles", "MaxThreads", "SaveChunks", "ChunkCacheSize", "MaxChunkVBOs", "PixelFormat", "DisplayMode", "Fullscreen", "ActiveViewingDistanceId", "ViewingDistanceNear", "ViewingDistanceModerate", "ViewingDistanceFar", "ViewingDistanceUltra", "FlickeringLight", "EnablePostProcessingEffects", "AnimatedGrass", "VerticalChunkMeshSegments", "BlurIntensity", "ReflectiveWater", "MusicVolume", "SoundVolume", "Vignette", "EyeAdapation", "Bloom", },
               org.terasology.protobuf.Configuration.Setting.System.class,
               org.terasology.protobuf.Configuration.Setting.System.Builder.class);
           internal_static_protobuf_Setting_System_CloudRes_descriptor =

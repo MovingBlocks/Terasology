@@ -215,6 +215,10 @@ public class Shader implements Asset {
             builder.append("#define NO_POST_PROCESSING \n");
         if (Config.getInstance().isFlickeringLight())
             builder.append("#define FLICKERING_LIGHT \n");
+        if (Config.getInstance().isVignette())
+            builder.append("#define VIGNETTE \n");
+        if (Config.getInstance().isBloom())
+            builder.append("#define BLOOM \n");
         return builder;
     }
 
