@@ -635,14 +635,6 @@ public final class WorldRenderer {
 
         PerformanceMonitor.endActivity();
 
-        PerformanceMonitor.startActivity("Render Objects (Transparent)");
-
-        for (RenderSystem renderer : _systemManager.iterateRenderSubscribers()) {
-            renderer.renderTransparent();
-        }
-
-        PerformanceMonitor.endActivity();
-
         PerformanceMonitor.startActivity("Render Chunks (Water, Ice)");
 
         // Make sure the water surface is rendered if the player is swimming
@@ -666,6 +658,14 @@ public final class WorldRenderer {
                     renderChunk(c, ChunkMesh.RENDER_PHASE.WATER_AND_ICE, camera);
                 }
             }
+        }
+
+        PerformanceMonitor.endActivity();
+
+        PerformanceMonitor.startActivity("Render Objects (Transparent)");
+
+        for (RenderSystem renderer : _systemManager.iterateRenderSubscribers()) {
+            renderer.renderTransparent();
         }
 
         PerformanceMonitor.endActivity();
