@@ -32,6 +32,7 @@ public enum MinionBehaviour {
     Build,
     Move,
     Gather,
+    Work,
     Patrol,
     Test,
     Inventory,

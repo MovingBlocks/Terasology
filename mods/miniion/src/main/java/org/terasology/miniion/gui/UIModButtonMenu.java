@@ -118,11 +118,13 @@ public class UIModButtonMenu extends UIDisplayContainer {
 
 		addMouseButtonListener(new MouseButtonListener() {
 			@Override
-			public void up(UIDisplayElement element, int button,
-					boolean intersect) {
+			public void up(UIDisplayElement element, int button, boolean intersect) {
 				if (_buttonType == ButtonType.NORMAL) {
-					setBackgroundImage(states.get("normal")[0],
-							states.get("normal")[1]);
+					if(intersect){
+						setBackgroundImage(states.get("hover")[0],	states.get("hover")[1]);
+					}else{
+						setBackgroundImage(states.get("normal")[0],	states.get("normal")[1]);
+					}
 				}
 			}
 

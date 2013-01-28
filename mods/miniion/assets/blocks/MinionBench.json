@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package org.terasology.miniion.components;
-
-import org.terasology.entitySystem.Component;
-
 /**
- * @author Immortius
+ * A minion bench to test some stuff
  */
-public final class MinionControllerComponent implements Component {
-
-	public boolean minionMode = false;
-	public int selectedMinion = 0;
+{
+    "craftPlace" : false,
+    "tiles" : {
+        "sides" : "miniion:minionbenchsides",
+        "topBottom" : "miniion:minionbenchtop"
+    },
+    "entity" : {
+        "prefab" : "miniion:minionbench",
+        "mode" : "persistent"
+    }
 }

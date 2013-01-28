@@ -18,13 +18,18 @@ package org.terasology.miniion.componentsystem.controllers;
 import java.util.List;
 
 import javax.vecmath.AxisAngle4f;
+import javax.vecmath.Tuple3f;
 import javax.vecmath.Vector3f;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
+import org.terasology.components.InventoryComponent;
+import org.terasology.components.ItemComponent;
 import org.terasology.components.world.LocationComponent;
+import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.*;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.HorizontalCollisionEvent;
+import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
@@ -33,6 +38,7 @@ import org.terasology.miniion.components.*;
 import org.terasology.miniion.events.MinionMessageEvent;
 import org.terasology.miniion.pathfinder.AStarPathing;
 import org.terasology.miniion.minionenum.MinionMessagePriority;
+import org.terasology.miniion.minionenum.ZoneType;
 import org.terasology.miniion.utilities.MinionMessage;
 import org.terasology.miniion.utilities.Zone;
 import org.terasology.physics.character.CharacterMovementComponent;
@@ -40,6 +46,9 @@ import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.logic.SkeletalMeshComponent;
 import org.terasology.world.*;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockItemComponent;
+import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.management.BlockManager;
 
 /**
  * Created with IntelliJ IDEA. User: Overdhose Date: 7/05/12 Time: 18:25 first
@@ -95,6 +104,10 @@ public class SimpleMinionAISystem implements EventHandlerSystem,
 				}
 				case Gather: {
 					executeGatherAI(entity);
+					break;
+				}
+				case Work: {
+					executeWorkAI(entity);
 					break;
 				}
 				case Move: {
@@ -177,7 +190,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem,
 				.getComponent(AnimationComponent.class);
 		Vector3f worldPos = new Vector3f(location.getWorldPosition());
 
-		if (ai.gatherTargets.size() == 0 && minioncomp.gatherzone != null) {
+		if (ai.gatherTargets.size() == 0 && minioncomp.assignedzone != null && minioncomp.assignedzone.zonetype == ZoneType.Gather) {
 			getTargetsfromZone(minioncomp, ai);
 		}
 
@@ -216,19 +229,111 @@ public class SimpleMinionAISystem implements EventHandlerSystem,
 
 	private void getTargetsfromZone(MinionComponent minioncomp,
 			SimpleMinionAIComponent ai) {
-		Zone zone = minioncomp.gatherzone;
+		Zone zone = minioncomp.assignedzone;
 		// first loop at highest blocks (y)
 		for (int y = zone.getMaxBounds().y; y >= zone.getMinBounds().y; y--) {
 			for (int x = zone.getMinBounds().x; x <= zone.getMaxBounds().x; x++) {
 				for (int z = zone.getMinBounds().z; z <= zone.getMaxBounds().z; z++) {
 					Block tmpblock = worldProvider.getBlock(x, y, z);
 					if (!tmpblock.isInvisible()) {
-						ai.gatherTargets.add(new Vector3f(x, y, z));
+						ai.gatherTargets.add(new Vector3f(x, y + 0.5f, z));
 					}
 				}
 			}
 		}
 
+	}
+	
+	private void executeWorkAI(EntityRef entity) {
+		MinionComponent minioncomp = entity.getComponent(MinionComponent.class);
+		LocationComponent location = entity
+				.getComponent(LocationComponent.class);
+		SimpleMinionAIComponent ai = entity
+				.getComponent(SimpleMinionAIComponent.class);
+		AnimationComponent animcomp = entity
+				.getComponent(AnimationComponent.class);
+		Vector3f worldPos = new Vector3f(location.getWorldPosition());
+		
+		if(minioncomp.assignedzone == null){
+			changeAnimation(entity, animcomp.idleAnim, true);
+			return;
+		}else if(minioncomp.assignedzone.getStartPosition() == null){
+			changeAnimation(entity, animcomp.idleAnim, true);
+			return;
+		}else if(minioncomp.assignedzone.zonetype != ZoneType.Work){
+			changeAnimation(entity, animcomp.idleAnim, true);
+			return;
+		}
+		
+		Vector3f currentTarget = minioncomp.assignedzone.getStartPosition().toVector3f();
+		currentTarget.y += 0.5;
+		
+		Vector3f dist = new Vector3f(worldPos);
+		dist.sub(currentTarget);
+		double distanceToTarget = dist.lengthSquared();
+
+		if (distanceToTarget < 4) {
+			
+			// gather the block
+			if (timer.getTimeInMs() - ai.lastAttacktime > 1000) {
+				ai.lastAttacktime = timer.getTimeInMs();
+				//increase craft progress
+				boolean hasResources = false;
+				if(minioncomp.assignedrecipe != null){
+					InventoryComponent invcomp = entity.getComponent(InventoryComponent.class);
+					for(String simpleuri : minioncomp.assignedrecipe.craftRes){
+						hasResources = false;
+						for(EntityRef slot : invcomp.itemSlots){
+							if(slot != null){
+								BlockItemComponent blockItem = slot.getComponent(BlockItemComponent.class);
+								if(blockItem != null){
+									if(blockItem.blockFamily.getURI().getFamily().matches(simpleuri)){
+										hasResources = true;
+										break;
+									}
+								}
+							}
+						}
+						if(!hasResources){
+							break;
+						}
+					}
+					if(hasResources){
+						// switch animation
+						changeAnimation(entity, animcomp.workAnim, false);
+						ai.craftprogress++;
+						if(ai.craftprogress >= minioncomp.assignedrecipe.craftsteps){
+							for(String simpleuri : minioncomp.assignedrecipe.craftRes){
+								for(EntityRef slot : invcomp.itemSlots){
+									if(slot != null){
+										BlockItemComponent blockItem = slot.getComponent(BlockItemComponent.class);
+										ItemComponent item = slot.getComponent(ItemComponent.class);
+										if(blockItem != null){
+											if(blockItem.blockFamily.getURI().getFamily().matches(simpleuri)){
+												item.stackCount--;
+												if(item.stackCount == 0){
+													slot.destroy();
+												}
+												break;
+											}
+										}
+									}
+								}
+							}
+							Block recipeBlock = null;
+							EntityRef result = EntityRef.NULL;
+				            BlockItemFactory blockFactory = new BlockItemFactory(entityManager);
+				            result = blockFactory.newInstance(BlockManager.getInstance().getBlockFamily(minioncomp.assignedrecipe.result));
+							entity.send(new ReceiveItemEvent(result));
+							ai.craftprogress = 0;
+						}
+					}
+				}
+			}
+		}
+
+		entity.saveComponent(ai);
+		setMovement(currentTarget, entity);
 	}
 
 	private void executeMoveAI(EntityRef entity) {

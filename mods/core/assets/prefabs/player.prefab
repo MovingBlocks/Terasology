@@ -46,10 +46,6 @@
               0,0,0,0,0,0,0,0,0,0
             ]
     },
-    "MinionBar" : {
-        "minionSlots" : [0,0,0,0,0,0,0,0,0]
-    },
-    "MinionController" : {},
     "Spawner" : {
         "types" : ["gelcube", "chromaticgelcube", "metallicgelcube","mare"],
 		"timeBetweenSpawns" : 10000,

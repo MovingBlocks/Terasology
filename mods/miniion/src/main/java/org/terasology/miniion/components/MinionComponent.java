@@ -16,8 +16,8 @@
 package org.terasology.miniion.components;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.miniion.componentsystem.controllers.MinionSystem;
 import org.terasology.miniion.minionenum.MinionBehaviour;
+import org.terasology.miniion.utilities.MinionRecipe;
 import org.terasology.miniion.utilities.Zone;
 
 /**
@@ -37,8 +37,11 @@ public final class MinionComponent implements Component {
 	public MinionBehaviour minionBehaviour = MinionBehaviour.Stay;
 	
 	public boolean dying = false;
-
-	public Zone gatherzone;
+	
+	//determines an action point for the minion
+	public Zone assignedzone;
+	//the recipe to craft when working
+	public MinionRecipe assignedrecipe;
 
 	public MinionComponent() {
 		

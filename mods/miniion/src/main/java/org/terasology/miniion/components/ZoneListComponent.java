@@ -30,4 +30,5 @@ import org.terasology.miniion.utilities.Zone;
  */
 public class ZoneListComponent implements Component {
 	public List<Zone> Gatherzones = new ArrayList<Zone>();
+	public List<Zone> Workzones = new ArrayList<Zone>();
 }

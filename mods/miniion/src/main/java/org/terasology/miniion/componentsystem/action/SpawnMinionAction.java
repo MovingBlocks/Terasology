@@ -69,7 +69,7 @@ public class SpawnMinionAction implements EventHandlerSystem {
 				if (minion != null) {
 					CharacterMovementComponent movecomp = minion
 							.getComponent(CharacterMovementComponent.class);
-					movecomp.height = 0.35f;
+					movecomp.height = 0.31f;
 					minion.saveComponent(movecomp);
 					MinionComponent minioncomp = minion
 							.getComponent(MinionComponent.class);

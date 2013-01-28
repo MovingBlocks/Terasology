@@ -16,7 +16,7 @@
   "Animation" : {
 		"walkAnim" = "OreoMinions:BuilderWalk",
 		"idleAnim" = "OreoMinions:BuilderIdle",
-		"attackAnim" = "OreoMinions:BuilderThor",
+		"attackAnim" = "OreoMinions:BuilderShow",
 		"dieAnim" = "OreoMinions:BuilderDead",
 		"fadeInAnim" = "OreoMinions:BuilderIdle",
 		"fadeOutAnim" = "OreoMinions:BuilderIdle",

@@ -6,6 +6,7 @@ import javax.vecmath.Vector4f;
 import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.Color;
 import org.terasology.asset.Assets;
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
@@ -13,6 +14,7 @@ import org.terasology.miniion.components.MinionComponent;
 import org.terasology.miniion.components.SimpleMinionAIComponent;
 import org.terasology.miniion.componentsystem.controllers.MinionSystem;
 import org.terasology.miniion.minionenum.MinionBehaviour;
+import org.terasology.miniion.utilities.MinionRecipe;
 import org.terasology.miniion.utilities.Zone;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
@@ -23,16 +25,16 @@ import org.terasology.rendering.gui.widgets.*;
 
 public class UIActiveMinion extends UIWindow{
 	
-	private UILabel lblname, lblflavor, lblzone;
+	private UILabel lblname, lblflavor, lblzone, lblrecipe;
 	private UIImage backgroundmain;
 	private UIComposite behaviourlist, actionlist;
 	private UIList uizonelist;
 	private UIScreenStats uistats;
 	private UIModButtonArrow btnLeft, btnRight, btnBehaviour, btnActions, btnStats;
 	//behaviour buttons
-	private UIModButtonMenu btnStay, btnFollow, btnAttack, btnGather;
+	private UIModButtonMenu btnStay, btnFollow, btnAttack, btnGather, btnWork;
 	//action buttons
-	private UIModButtonMenu btnInventory, btnZone, btnClear, btnBye;
+	private UIModButtonMenu btnInventory, btnZone, btnRecipe, btnClear, btnBye;
 	
 	public UIActiveMinion() {
 		setId("activeminiion");
@@ -90,7 +92,12 @@ public class UIActiveMinion extends UIWindow{
 		lblzone = new UILabel();
 		lblzone.setPosition(new Vector2f(10, 65));
 		lblzone.setVisible(true);
-		backgroundmain.addDisplayElement(lblzone);		
+		backgroundmain.addDisplayElement(lblzone);	
+		
+		lblrecipe = new UILabel();
+		lblrecipe.setPosition(new Vector2f(10, 80));
+		lblrecipe.setVisible(true);
+		backgroundmain.addDisplayElement(lblrecipe);	
 		
 		btnLeft = new UIModButtonArrow(new Vector2f(12,23), org.terasology.miniion.gui.UIModButtonArrow.ButtonType.LEFT);
 		btnLeft.setPosition(new Vector2f(8,41));
@@ -109,7 +116,7 @@ public class UIActiveMinion extends UIWindow{
 		GridLayout layout = new GridLayout(1);
         layout.setCellPadding(new Vector4f(0f, 0f, 0f, 0f));
 		behaviourlist = new UIComposite();
-		behaviourlist.setSize(new Vector2f(100,80));
+		behaviourlist.setSize(new Vector2f(100,100));
 		behaviourlist.setPosition(new Vector2f(200,200));
 		behaviourlist.setBackgroundImage("miniion:modularback");
 		behaviourlist.setLayout(layout);
@@ -151,6 +158,13 @@ public class UIActiveMinion extends UIWindow{
 		btnGather.setVisible(true);
 		behaviourlist.addDisplayElement(btnGather);
 		
+		btnWork = new UIModButtonMenu(new Vector2f(100,20), org.terasology.miniion.gui.UIModButtonMenu.ButtonType.TOGGLE);
+		btnWork.setLabel("WORK");
+		btnWork.setId("work");
+		btnWork.addClickListener(behaviourToggleListener);
+		btnWork.setVisible(true);
+		behaviourlist.addDisplayElement(btnWork);
+		
 		btnActions  = new UIModButtonArrow(new Vector2f(46,12), org.terasology.miniion.gui.UIModButtonArrow.ButtonType.DOWN, "select action");
 		btnActions.setPosition(new Vector2f(137,186));
 		btnActions.setVisible(true);
@@ -159,7 +173,7 @@ public class UIActiveMinion extends UIWindow{
 		backgroundmain.addDisplayElement(btnActions);
 		
 		actionlist = new UIComposite();
-		actionlist.setSize(new Vector2f(100,80));
+		actionlist.setSize(new Vector2f(100,100));
 		actionlist.setPosition(new Vector2f(100,200));
 		actionlist.setBackgroundImage("miniion:modularback");
 		actionlist.setLayout(layout);
@@ -180,6 +194,13 @@ public class UIActiveMinion extends UIWindow{
 		btnZone.setVisible(true);
 		actionlist.addDisplayElement(btnZone);
 		
+		btnRecipe = new UIModButtonMenu(new Vector2f(100,20), org.terasology.miniion.gui.UIModButtonMenu.ButtonType.NORMAL);
+		btnRecipe.setLabel("recipe");
+		btnRecipe.setId("reci");
+		btnRecipe.addClickListener(actionListener);
+		btnRecipe.setVisible(true);
+		actionlist.addDisplayElement(btnRecipe);
+		
 		btnClear = new UIModButtonMenu(new Vector2f(100,20), org.terasology.miniion.gui.UIModButtonMenu.ButtonType.NORMAL);
 		btnClear.setLabel("clear orders");
 		btnClear.setId("clea");
@@ -199,7 +220,7 @@ public class UIActiveMinion extends UIWindow{
 		uizonelist.setPosition(new Vector2f(0, 200));
 		uizonelist.setBackgroundImage("miniion:modularback");
 		uizonelist.setVisible(false);
-		this.addDisplayElement(uizonelist);
+		this.addDisplayElement(uizonelist);		
 		
 		btnStats = new UIModButtonArrow(new Vector2f(12,46), org.terasology.miniion.gui.UIModButtonArrow.ButtonType.LEFT);
 		btnStats.setPosition(new Vector2f(8,135));
@@ -235,13 +256,19 @@ public class UIActiveMinion extends UIWindow{
 		public void click(UIDisplayElement element, int button) {
 			UIModButtonArrow arrow = (UIModButtonArrow)element;
 			if(arrow.getId() == "showbehaviour"){
-				behaviourlist.setVisible(!behaviourlist.isVisible());
+				if(MinionSystem.getActiveMinion() != null){
+					behaviourlist.setVisible(!behaviourlist.isVisible());
+				}
 			}else
 			if(arrow.getId() == "showactions"){
-				actionlist.setVisible(!actionlist.isVisible());
+				if(MinionSystem.getActiveMinion() != null){
+					actionlist.setVisible(!actionlist.isVisible());
+				}
 			}else
 			if(arrow.getId() == "showstats"){
-				uistats.setVisible(!uistats.isVisible());
+				if(MinionSystem.getActiveMinion() != null){
+					uistats.setVisible(!uistats.isVisible());
+				}
 			}else
 			if(arrow.getId() == "previousminion"){
 				MinionSystem.getNextMinion(false);
@@ -252,7 +279,14 @@ public class UIActiveMinion extends UIWindow{
 				refreshScreen();
 			}
 		}
-	};	
+	};
+	
+	private void closeAllFoldouts(){
+		behaviourlist.setVisible(false);
+		actionlist.setVisible(false);
+		uistats.setVisible(false);
+		uizonelist.setVisible(false);
+	}
 			
 	/**
 	 * sets the clicked toggle button and matching behaviour
@@ -276,6 +310,9 @@ public class UIActiveMinion extends UIWindow{
 				}else
 				if (clickedbutton.getId() == "gath") {
 					minioncomp.minionBehaviour = MinionBehaviour.Gather;
+				}else
+				if (clickedbutton.getId() == "work") {
+					minioncomp.minionBehaviour = MinionBehaviour.Work;
 				}
 				MinionSystem.getActiveMinion().saveComponent(minioncomp);
 			}
@@ -298,29 +335,57 @@ public class UIActiveMinion extends UIWindow{
 				}else
 				if (clickedbutton.getId() == "zone") {
 					uizonelist.removeAll();
-					for (Zone zone : MinionSystem.getGatherZoneList()) {
-						UIListItem listitem = new UIListItem(zone.Name, zone);
-						listitem.addClickListener(zoneItemListener);
-						uizonelist.addItem(listitem);
+					if(uizonelist.isVisible()){
+						uizonelist.setVisible(false);
 					}
-					uizonelist.setVisible(true);
+					else{
+						for (Zone zone : MinionSystem.getGatherZoneList()) {
+							UIListItem listitem = new UIListItem(zone.Name, zone);
+							listitem.addClickListener(zoneItemListener);
+							uizonelist.addItem(listitem);
+						}
+						for (Zone zone : MinionSystem.getWorkZoneList()) {
+							UIListItem listitem = new UIListItem(zone.Name, zone);
+							listitem.addClickListener(zoneItemListener);
+							uizonelist.addItem(listitem);
+						}
+						uizonelist.setVisible(true);
+					}
+				}else
+				if (clickedbutton.getId() == "reci") {
+					uizonelist.removeAll();
+					if(uizonelist.isVisible()){
+						uizonelist.setVisible(false);
+					}
+					else{
+						for (MinionRecipe recipe : MinionSystem.getRecipesList()) {
+							UIListItem listitem = new UIListItem(recipe.Name, recipe);
+							listitem.addClickListener(recipeItemListener);
+							uizonelist.addItem(listitem);
+						}
+						uizonelist.setVisible(true);
+					}
 				}else
 				if (clickedbutton.getId() == "clea") {
 					SimpleMinionAIComponent aicomp = MinionSystem.getActiveMinion().getComponent(SimpleMinionAIComponent.class);
 					aicomp.ClearCommands();
 					MinionSystem.getActiveMinion().saveComponent(aicomp);
-					minioncomp.gatherzone = null;
+					minioncomp.assignedzone = null;
+					minioncomp.assignedrecipe = null;
+					MinionSystem.getActiveMinion().saveComponent(minioncomp);
 					refreshScreen();
 				}else
 				if (clickedbutton.getId() == "byeb") {
 					//WARNING!!!! execute getprevious before setting the component to dying, 
-					//else getprevious will have trouble determining what minion needs to become active! 
+					//else getprevious will have trouble determining what minion needs to become active!
+					EntityRef dyingminion = MinionSystem.getActiveMinion();
 					MinionSystem.getPreviousMinion(true);
 					minioncomp.minionBehaviour = MinionBehaviour.Die;
-					minioncomp.dying = true;					
+					minioncomp.dying = true;
+					dyingminion.saveComponent(minioncomp);
+					closeAllFoldouts();
 					refreshScreen();
-				}
-				MinionSystem.getActiveMinion().saveComponent(minioncomp);
+				}				
 			}
 		}
 	};
@@ -333,7 +398,29 @@ public class UIActiveMinion extends UIWindow{
 			MinionComponent minioncomp = MinionSystem.getActiveMinion().getComponent(MinionComponent.class);
 			for (Zone zone : MinionSystem.getGatherZoneList()) {
 				if (zone.Name.matches(selectedzone.Name)) {
-					minioncomp.gatherzone = zone;
+					minioncomp.assignedzone = zone;
+				}
+			}
+			for (Zone zone : MinionSystem.getWorkZoneList()) {
+				if (zone.Name.matches(selectedzone.Name)) {
+					minioncomp.assignedzone = zone;
+				}
+			}
+			MinionSystem.getActiveMinion().saveComponent(minioncomp);
+			uizonelist.setVisible(false);
+			refreshScreen();
+		}
+	};
+	
+	private ClickListener recipeItemListener = new ClickListener() {
+		
+		@Override
+		public void click(UIDisplayElement element, int button) {
+			MinionRecipe selectedrecipe = (MinionRecipe) ((UIListItem)element).getValue();
+			MinionComponent minioncomp = MinionSystem.getActiveMinion().getComponent(MinionComponent.class);
+			for (MinionRecipe recipe : MinionSystem.getRecipesList()) {
+				if (recipe.Name.matches(selectedrecipe.Name)) {
+					minioncomp.assignedrecipe = recipe;
 				}
 			}
 			MinionSystem.getActiveMinion().saveComponent(minioncomp);
@@ -366,37 +453,48 @@ public class UIActiveMinion extends UIWindow{
 			lblname.setBorderSolid(new Vector4f(2f, 2f, 2f, 2f), Color.magenta);
 			lblflavor.setText("Get your Oreominions now!!! 75% off if you bought any other DLC");
 			lblzone.setText("");
+			lblrecipe.setText("");
 		}else {
 			MinionComponent minioncomp = MinionSystem.getActiveMinion().getComponent(MinionComponent.class);
 			// remove and add border for resize
 			// would be nice if I could lock the size to default size
 			lblname.removeBorderSolid();
-			lblname.setText(minioncomp.name);
-			lblname.setBorderSolid(new Vector4f(2f, 2f, 2f, 2f), Color.magenta);
-			lblflavor.setText(minioncomp.flavortext);
-			if(minioncomp.gatherzone == null){
-				lblzone.setText("no zone assigned");
-			}else
-			{
-				lblzone.setText("workzone : " + minioncomp.gatherzone.Name);
-			}
-			if (minioncomp.minionBehaviour == MinionBehaviour.Follow) {
-				toggleBehaviour(btnFollow);
-			} else if (minioncomp.minionBehaviour == MinionBehaviour.Stay) {
-				toggleBehaviour(btnStay);
-			} else if (minioncomp.minionBehaviour == MinionBehaviour.Attack) {
-				toggleBehaviour(btnAttack);
-			} else if (minioncomp.minionBehaviour == MinionBehaviour.Gather) {
-				toggleBehaviour(btnGather);
-			} else {
-				toggleBehaviour(null);
-			}
+			if(minioncomp == null){
+				lblname.setText("missing component");
+				lblflavor.setText("something went wrong, contact your system administrator! Quickly!");
+			}else{
+				lblname.setText(minioncomp.name);
+				lblflavor.setText(minioncomp.flavortext);
+				if(minioncomp.assignedzone == null){
+					lblzone.setText("no zone assigned");
+				}else
+				{
+					lblzone.setText("workzone : " + minioncomp.assignedzone.Name);
+				}
+				if(minioncomp.assignedrecipe == null){
+					lblrecipe.setText("");
+				}else
+				{
+					String tmpstr = " requires : ";
+					for(String resource : minioncomp.assignedrecipe.craftRes){
+						tmpstr = tmpstr.concat(resource + ", ");
+					}					
+					lblrecipe.setText("recipe : " + minioncomp.assignedrecipe.Name + tmpstr.substring(0, tmpstr.lastIndexOf(",")));
+				}
+				if (minioncomp.minionBehaviour == MinionBehaviour.Follow) {
+					toggleBehaviour(btnFollow);
+				} else if (minioncomp.minionBehaviour == MinionBehaviour.Stay) {
+					toggleBehaviour(btnStay);
+				} else if (minioncomp.minionBehaviour == MinionBehaviour.Attack) {
+					toggleBehaviour(btnAttack);
+				} else if (minioncomp.minionBehaviour == MinionBehaviour.Gather) {
+					toggleBehaviour(btnGather);
+				} else {
+					toggleBehaviour(null);
+				}
+			}			
+			lblname.setBorderSolid(new Vector4f(2f, 2f, 2f, 2f), Color.magenta);						
 		}
-	}
-	
-	@Override
-	public void setModal(boolean modal) {
-		super.setModal(modal);
-	}
+	}	
 }
 	

@@ -136,12 +136,15 @@ public class UIModButtonArrow extends UIDisplayContainer {
 		addMouseButtonListener(new MouseButtonListener() {
 			@Override
 			public void up(UIDisplayElement element, int button, boolean intersect) {
-				setBackgroundImage(states.get("normal")[0],	states.get("normal")[1]);
+				if (intersect) {
+					setBackgroundImage(states.get("hover")[0],	states.get("hover")[1]);					
+				}else{
+					setBackgroundImage(states.get("normal")[0], states.get("normal")[1]);
+				}
 			}
 
 			@Override
-			public void down(UIDisplayElement element, int button,
-					boolean intersect) {
+			public void down(UIDisplayElement element, int button, boolean intersect) {
 				if (intersect) {
 					setBackgroundImage(states.get("pressed")[0], states.get("pressed")[1]);
 				}

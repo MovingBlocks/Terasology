@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.miniion.components;
+package org.terasology.miniion.gui;
 
 import java.util.ArrayList;
 import java.util.Iterator;

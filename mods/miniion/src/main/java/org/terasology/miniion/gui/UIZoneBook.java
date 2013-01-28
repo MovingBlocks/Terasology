@@ -15,6 +15,8 @@
  */
 package org.terasology.miniion.gui;
 
+import java.util.Set;
+
 import javax.vecmath.Vector2f;
 
 import org.lwjgl.input.Keyboard;
@@ -32,6 +34,10 @@ import org.terasology.miniion.utilities.Zone;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.widgets.*;
+import org.terasology.rendering.world.BlockGrid.GridPosition;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.family.BlockFamily;
 
 public class UIZoneBook extends UIWindow {
 	/*
@@ -134,7 +140,7 @@ public class UIZoneBook extends UIWindow {
 		txtdepth.setVisible(true);
 		background.addDisplayElement(txtdepth);
 		
-		lblzonetype = new UILabel("ZoneType : Gatherzone");
+		lblzonetype = new UILabel("");
 		lblzonetype.setPosition(new Vector2f(260, 100));
 		lblzonetype.setColor(Color.black);
 		lblzonetype.setVisible(true);
@@ -169,10 +175,14 @@ public class UIZoneBook extends UIWindow {
 	}
 
 	private void executeClick(UIDisplayElement element, int id) {
+		if(zoneselection.getComponent(ZoneSelectionComponent.class).zonetype == null){
+			newzonefound = false;
+			this.close();
+		}
 		UIModButton clickedbutton = (UIModButton) element;
 		if (txtzonename.getText().length() < 2) {
 			return;
-		}
+		}		
 		int tmp;
 		for (Zone zone : MinionSystem.getGatherZoneList()) {
 			if (zone.Name.matches(txtzonename.getText())) {
@@ -194,14 +204,24 @@ public class UIZoneBook extends UIWindow {
 		newzone.zoneheight = Integer.parseInt(txtheight.getText());
 		newzone.zonewidth = Integer.parseInt(txtwidth.getText());
 		newzone.zonedepth = Integer.parseInt(txtdepth.getText());
-		newzone.zonetype = ZoneType.Gather;
+		newzone.zonetype = zoneselection.getComponent(ZoneSelectionComponent.class).zonetype;
 		MinionSystem.addZone(newzone);
 		newzonefound = false;
+		lblzonetype.setText("ZoneType : Gatherzone");
 		this.close();
 	}
 	
 	private void executeDelClick(UIDisplayElement element, int id, Zone deletezone) {
-		MinionSystem.getGatherZoneList().remove(deletezone);
+		switch(deletezone.zonetype){
+			case Gather : {
+				MinionSystem.getGatherZoneList().remove(deletezone);
+				break;
+			}
+			case Work : {
+				MinionSystem.getWorkZoneList().remove(deletezone);
+				break;
+			}
+		}		
 		fillUI();
 	}
 
@@ -220,6 +240,12 @@ public class UIZoneBook extends UIWindow {
 			listitem.addClickListener(zonelistener);
 			uizonelist.addItem(listitem);
 		}
+		for (Zone zone : MinionSystem.getWorkZoneList()) {
+			UIListItem listitem = new UIListItem(zone.Name, zone);
+			listitem.setTextColor(Color.black);
+			listitem.addClickListener(zonelistener);
+			uizonelist.addItem(listitem);
+		}
 		//clear the textbowes
 		txtzonename.setText("");
 		txtheight.setText("");
@@ -231,24 +257,48 @@ public class UIZoneBook extends UIWindow {
 		// hopefully people won't run around with 50 zoning tools, I take the
 		// first one that has data in it
 		EntityManager entityManager = CoreRegistry.get(EntityManager.class);
-		for (EntityRef entity : entityManager
-				.iteratorEntities(ZoneSelectionComponent.class)) {
-			ZoneSelectionComponent selection = entity
-					.getComponent(ZoneSelectionComponent.class);
+		for (EntityRef entity : entityManager.iteratorEntities(ZoneSelectionComponent.class)) {
+			ZoneSelectionComponent selection = entity.getComponent(ZoneSelectionComponent.class);
+			if (selection.blockGrid != null	&& selection.blockGrid.getGridPositions().size() == 1) {
+				Set<GridPosition> gridpositions =  selection.blockGrid.getGridPositions();
+				for(GridPosition gridpos : gridpositions){
+					WorldProvider worldprovider = CoreRegistry.get(WorldProvider.class);
+					Block block = worldprovider.getBlock(gridpos.position);
+					if(block.getURI().getFamily().matches("minionbench")){
+						newzonefound = true;
+						selection.zonetype = ZoneType.Work;
+						entity.saveComponent(selection);
+						zoneselection = entity;
+						Vector3i minbounds = selection.blockGrid.getMinBounds();
+						Vector3i maxbounds = selection.blockGrid.getMaxBounds();
+						if (MinionSystem.getWorkZoneList() == null) {
+							txtzonename.setText("Workzone0");
+						} else {
+							txtzonename.setText("Workzone" + MinionSystem.getWorkZoneList().size());
+						}
+						lblzonetype.setText("ZoneType : Workzone");
+						txtwidth.setText("1");
+						txtdepth.setText("1");
+						txtheight.setText("1");
+					}
+				}
+				
+			}else
 			if (selection.blockGrid != null
 					&& selection.blockGrid.getGridPositions().size() > 1) {
 				newzonefound = true;
+				selection.zonetype = ZoneType.Gather;
+				entity.saveComponent(selection);
 				zoneselection = entity;
 				Vector3i minbounds = selection.blockGrid.getMinBounds();
 				Vector3i maxbounds = selection.blockGrid.getMaxBounds();
-				// ZoneListComponent zonelistcomp =
-				// zonelist.getComponent(ZoneListComponent.class);
 				if (MinionSystem.getGatherZoneList() == null) {
 					txtzonename.setText("Gather0");
 				} else {
 					txtzonename.setText("Gather"
 							+ MinionSystem.getGatherZoneList().size());
 				}
+				lblzonetype.setText("ZoneType : Gatherzone");
 				txtwidth.setText(""
 						+ (getAbsoluteDiff(maxbounds.x, minbounds.x)));
 				txtdepth.setText(""

@@ -251,7 +251,7 @@ public class UISelectedMinion extends UICompositeScrollable {
 				aicomp.ClearCommands();
 				cell.minion.saveComponent(aicomp);
 				MinionComponent minioncomp = cell.minion.getComponent(MinionComponent.class);
-				minioncomp.gatherzone = null;
+				minioncomp.assignedzone = null;
 				cell.minion.saveComponent(minioncomp);
 			}
 		});
@@ -416,7 +416,7 @@ public class UISelectedMinion extends UICompositeScrollable {
 					.getComponent(MinionComponent.class);
 			for (Zone zone : MinionSystem.getGatherZoneList()) {
 				if (zone.Name.matches(uizonelist.getSelection().getText())) {
-					minioncomp.gatherzone = zone;
+					minioncomp.assignedzone = zone;
 				}
 			}
 			cell.minion.saveComponent(minioncomp);

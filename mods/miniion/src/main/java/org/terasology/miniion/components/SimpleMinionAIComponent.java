@@ -36,6 +36,7 @@ public final class SimpleMinionAIComponent implements Component {
 	public long lastDistancecheck = 0;
 	public long lastPathtime = 0;
 	public int patrolCounter = 0;
+	public int craftprogress = 0;
 
 	public Vector3f movementTarget = new Vector3f();
 	public Vector3f previousTarget = new Vector3f();

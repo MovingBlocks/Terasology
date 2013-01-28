@@ -18,6 +18,8 @@ package org.terasology.miniion.utilities;
 import org.terasology.model.inventory.Icon;
 
 public final class ModIcons {
+	
+	private static final String MINIONICONS16 = "miniion:minionicon16";
 
 	public static void loadIcons() {
 		Icon.set("minionskull", "miniion:minionicon16", 0, 0);
@@ -28,6 +30,9 @@ public final class ModIcons {
 		Icon.set("oreominionbook", "miniion:minionicon16", 0, 5);
 		Icon.set("zonebook", "miniion:minionicon16", 0, 6);
 		Icon.set("zonetool", "miniion:minionicon16", 0, 7);
-
+		
+		Icon.set("mulch", MINIONICONS16, 1, 0);
+		Icon.set("paper", MINIONICONS16, 1, 1);
+		Icon.set("bookcover", MINIONICONS16, 1, 2);
 	}
 }

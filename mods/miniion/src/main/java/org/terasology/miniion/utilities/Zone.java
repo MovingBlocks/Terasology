@@ -41,7 +41,9 @@ public class Zone {
 		this.startposition = startposition;
 		this.endposition = endposition;
 		calcBounds(startposition);
-		calcBounds(endposition);
+		if(endposition != null){
+			calcBounds(endposition);
+		}
 	}
 
 	private void calcBounds(Vector3i gridPosition) {

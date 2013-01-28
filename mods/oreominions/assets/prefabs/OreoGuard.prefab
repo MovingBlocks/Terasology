@@ -15,8 +15,8 @@
   },
   "Animation" : {
 		"walkAnim" = "OreoMinions:GuardWalk",
-		"idleAnim" = "OreoMinions:GuardIdle",
-		"attackAnim" = "OreoMinions:GuardAttack",
+		"idleAnim" = "OreoMinions:GuardIdleSkygaze",
+		"attackAnim" = "OreoMinions:GuardShow",
 		"dieAnim" = "OreoMinions:GuardAfraidNonloop",
 		"fadeInAnim" = "OreoMinions:GuardIdle",
 		"fadeOutAnim" = "OreoMinions:GuardIdle",
