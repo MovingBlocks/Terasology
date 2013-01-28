@@ -100,6 +100,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
     private BlockOverlayRenderer aabbRenderer = new AABBRenderer(AABB.createEmpty());
 
+    private int inputSequenceNumber = 1;
+
     @Override
     public void initialise() {
         worldProvider = CoreRegistry.get(WorldProvider.class);
@@ -156,7 +158,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
                 relMove.y += relativeMovement.y;
                 break;
         }
-        entity.send(new CharacterMoveInputEvent(localPlayerComponent.viewPitch, localPlayerComponent.viewYaw, relMove, run, jump));
+        entity.send(new CharacterMoveInputEvent(inputSequenceNumber++, localPlayerComponent.viewPitch, localPlayerComponent.viewYaw, relMove, run, jump));
     }
 
     private void updateCamera(LocalPlayerComponent localPlayerComponent, CharacterMovementComponent characterMovementComponent, CharacterComponent characterComp, LocationComponent location) {

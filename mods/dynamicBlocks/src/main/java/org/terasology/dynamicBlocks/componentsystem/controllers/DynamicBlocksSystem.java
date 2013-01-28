@@ -180,9 +180,9 @@ public final class DynamicBlocksSystem implements UpdateSubscriberSystem, EventH
                 Vector3f desiredVelocity = new Vector3f(movementDirection);
                 desiredVelocity.scale(loco.getMaximumSpeed());
 
-                entity.send(new CharacterMoveInputEvent(0, 0, desiredVelocity, false, false));
+                entity.send(new CharacterMoveInputEvent(0, 0, 0, desiredVelocity, false, false));
             } else {
-                entity.send(new CharacterMoveInputEvent(0, 0, new Vector3f(), false, false));
+                entity.send(new CharacterMoveInputEvent(0, 0, 0, new Vector3f(), false, false));
             }
         }
     }

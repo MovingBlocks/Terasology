@@ -45,7 +45,6 @@ public class BulletCharacterMovementSystem implements CharacterMovementSystem {
 
     public static final float UNDERWATER_GRAVITY = 0.25f;
     public static final float UNDERWATER_INERTIA = 2.0f;
-    public static final float WATER_TERMINAL_VELOCITY = 4.0f;
 
     public static final float GHOST_INERTIA = 4f;
 
@@ -63,10 +62,12 @@ public class BulletCharacterMovementSystem implements CharacterMovementSystem {
     }
 
     @Override
-    public CharacterState step(CharacterState initial, CharacterMoveInputEvent input, EntityRef entity) {
+    public CharacterStateEvent step(CharacterStateEvent initial, CharacterMoveInputEvent input, EntityRef entity) {
         CharacterMovementComponent characterMovementComponent = entity.getComponent(CharacterMovementComponent.class);
 
-        CharacterState result = updatePosition(characterMovementComponent, initial, input);
+        CharacterStateEvent result = new CharacterStateEvent(initial);
+        result.setSequenceNumber(input.getSequenceNumber());
+        updatePosition(characterMovementComponent, result, input);
         result.setTime(input.getTime());
         if (result.getMode() != MovementMode.GHOSTING) {
             checkSwimming(characterMovementComponent, result);
@@ -75,7 +76,7 @@ public class BulletCharacterMovementSystem implements CharacterMovementSystem {
         return result;
     }
 
-    private void updateRotation(CharacterMovementComponent movementComp, CharacterState result, CharacterMoveInputEvent input) {
+    private void updateRotation(CharacterMovementComponent movementComp, CharacterStateEvent result, CharacterMoveInputEvent input) {
         if (movementComp.faceMovementDirection && result.getVelocity().lengthSquared() > 0.01f) {
             float yaw = (float) Math.atan2(result.getVelocity().x, result.getVelocity().z);
             AxisAngle4f axisAngle = new AxisAngle4f(0, 1, 0, yaw);
@@ -93,7 +94,7 @@ public class BulletCharacterMovementSystem implements CharacterMovementSystem {
      * @param movementComp
      * @param state
      */
-    private void checkSwimming(final CharacterMovementComponent movementComp, final CharacterState state) {
+    private void checkSwimming(final CharacterMovementComponent movementComp, final CharacterStateEvent state) {
         Vector3f worldPos = state.getPosition();
         boolean topUnderwater = false;
         boolean bottomUnderwater = false;
@@ -114,21 +115,24 @@ public class BulletCharacterMovementSystem implements CharacterMovementSystem {
         state.setMode((newSwimming) ? MovementMode.SWIMMING : MovementMode.WALKING);
     }
 
-    private CharacterState updatePosition(final CharacterMovementComponent movementComp, final CharacterState state, CharacterMoveInputEvent input) {
+    private void updatePosition(final CharacterMovementComponent movementComp, final CharacterStateEvent state, CharacterMoveInputEvent input) {
         switch (state.getMode()) {
             case GHOSTING:
-                return ghost(movementComp, state, input);
+                ghost(movementComp, state, input);
+                break;
             case SWIMMING:
-                return swim(movementComp, state, input);
+                swim(movementComp, state, input);
+                break;
             case WALKING:
-                return walk(movementComp, state, input);
+                walk(movementComp, state, input);
+                break;
             default:
-                return walk(movementComp, state, input);
+                walk(movementComp, state, input);
+                break;
         }
     }
 
-    private CharacterState swim(final CharacterMovementComponent movementComp, final CharacterState state, CharacterMoveInputEvent input) {
-        CharacterState newState = new CharacterState(state);
+    private void swim(final CharacterMovementComponent movementComp, final CharacterStateEvent state, CharacterMoveInputEvent input) {
         Vector3f desiredVelocity = new Vector3f(input.getMovementDirection());
         float lengthSquared = desiredVelocity.lengthSquared();
         if (lengthSquared > 1) {
@@ -145,34 +149,32 @@ public class BulletCharacterMovementSystem implements CharacterMovementSystem {
         // Modify velocity towards desired, up to the maximum rate determined by friction
         Vector3f velocityDiff = new Vector3f(desiredVelocity);
         velocityDiff.sub(state.getVelocity());
-        velocityDiff.scale(Math.min(UNDERWATER_INERTIA * input.getDeltaMS(), 1.0f));
+        velocityDiff.scale(Math.min(UNDERWATER_INERTIA * input.getDeltaMs(), 1.0f));
 
-        newState.getVelocity().x += velocityDiff.x;
-        newState.getVelocity().y += velocityDiff.y;
-        newState.getVelocity().z += velocityDiff.z;
+        state.getVelocity().x += velocityDiff.x;
+        state.getVelocity().y += velocityDiff.y;
+        state.getVelocity().z += velocityDiff.z;
 
         // Slow down due to friction
-        float speed = newState.getVelocity().length();
+        float speed = state.getVelocity().length();
         if (speed > movementComp.maxWaterSpeed) {
-            newState.getVelocity().scale((speed - 4 * (speed - movementComp.maxWaterSpeed) * input.getDeltaMS()) / speed);
+            state.getVelocity().scale((speed - 4 * (speed - movementComp.maxWaterSpeed) * input.getDeltaMs()) / speed);
         }
 
-        Vector3f moveDelta = new Vector3f(newState.getVelocity());
-        moveDelta.scale(input.getDeltaMS());
+        Vector3f moveDelta = new Vector3f(state.getVelocity());
+        moveDelta.scale(input.getDeltaMs());
 
         // Note: No stepping underwater, no issue with slopes
         MoveResult moveResult = move(state.getPosition(), moveDelta, 0, -1, movementComp.collider);
         Vector3f distanceMoved = new Vector3f(moveResult.finalPosition);
         distanceMoved.sub(state.getPosition());
 
-        newState.getPosition().set(moveResult.finalPosition);
+        state.getPosition().set(moveResult.finalPosition);
         //if (distanceMoved.length() > 0)
         //    entity.send(new MovedEvent(distanceMoved, moveResult.finalPosition));
-
-        return newState;
     }
 
-    private CharacterState ghost(final CharacterMovementComponent movementComp, final CharacterState state, CharacterMoveInputEvent input) {
+    private void ghost(final CharacterMovementComponent movementComp, final CharacterStateEvent state, CharacterMoveInputEvent input) {
         Vector3f desiredVelocity = new Vector3f(input.getMovementDirection());
         float lengthSquared = desiredVelocity.lengthSquared();
         if (lengthSquared > 1) {
@@ -190,26 +192,21 @@ public class BulletCharacterMovementSystem implements CharacterMovementSystem {
         Vector3f velocityDiff = new Vector3f(desiredVelocity);
         velocityDiff.sub(state.getVelocity());
 
-        velocityDiff.scale(Math.min(GHOST_INERTIA * input.getDeltaMS(), 1.0f));
+        velocityDiff.scale(Math.min(GHOST_INERTIA * input.getDeltaMs(), 1.0f));
 
-        CharacterState newState = new CharacterState(state);
-
-        newState.getVelocity().add(velocityDiff);
+        state.getVelocity().add(velocityDiff);
 
         // No collision, so just do the move
-        Vector3f deltaPos = new Vector3f(newState.getVelocity());
-        deltaPos.scale(input.getDeltaMS());
-        newState.getPosition().add(deltaPos);
+        Vector3f deltaPos = new Vector3f(state.getVelocity());
+        deltaPos.scale(input.getDeltaMs());
+        state.getPosition().add(deltaPos);
         //if (deltaPos.length() > 0)
         //    entity.send(new MovedEvent(deltaPos, worldPos));
 
         //movementComp.collider.setWorldTransform(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), worldPos, 1.0f)));
-
-        return newState;
     }
 
-    private CharacterState walk(final CharacterMovementComponent movementComp, final CharacterState state, CharacterMoveInputEvent input) {
-        CharacterState newState = new CharacterState(state);
+    private void walk(final CharacterMovementComponent movementComp, final CharacterStateEvent state, CharacterMoveInputEvent input) {
         Vector3f desiredVelocity = new Vector3f(input.getMovementDirection());
         float lengthSquared = desiredVelocity.lengthSquared();
         if (lengthSquared > 1) {
@@ -236,56 +233,54 @@ public class BulletCharacterMovementSystem implements CharacterMovementSystem {
         Vector3f velocityDiff = new Vector3f(desiredVelocity);
         velocityDiff.sub(state.getVelocity());
 
-        velocityDiff.scale(Math.min(movementComp.groundFriction * input.getDeltaMS(), 1.0f));
+        velocityDiff.scale(Math.min(movementComp.groundFriction * input.getDeltaMs(), 1.0f));
 
-        newState.getVelocity().x += velocityDiff.x;
-        newState.getVelocity().z += velocityDiff.z;
-        newState.getVelocity().y = Math.max(-TERMINAL_VELOCITY, (newState.getVelocity().y - GRAVITY * input.getDeltaMS()));
+        state.getVelocity().x += velocityDiff.x;
+        state.getVelocity().z += velocityDiff.z;
+        state.getVelocity().y = Math.max(-TERMINAL_VELOCITY, (state.getVelocity().y - GRAVITY * input.getDeltaMs()));
 
-        Vector3f moveDelta = new Vector3f(newState.getVelocity());
-        moveDelta.scale(input.getDeltaMS());
+        Vector3f moveDelta = new Vector3f(state.getVelocity());
+        moveDelta.scale(input.getDeltaMs());
 
         MoveResult moveResult = move(state.getPosition(), moveDelta, (state.isGrounded()) ? movementComp.stepHeight : 0, movementComp.slopeFactor, movementComp.collider);
         Vector3f distanceMoved = new Vector3f(moveResult.finalPosition);
-        distanceMoved.sub(newState.getPosition());
+        distanceMoved.sub(state.getPosition());
 
-        newState.getPosition().set(moveResult.finalPosition);
+        state.getPosition().set(moveResult.finalPosition);
         //if (distanceMoved.length() > 0)
         //    entity.send(new MovedEvent(distanceMoved, moveResult.finalPosition));
 
         movementComp.collider.setWorldTransform(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), moveResult.finalPosition, 1.0f)));
 
         if (moveResult.hitBottom) {
-            if (!newState.isGrounded()) {
+            if (!state.isGrounded()) {
                 //entity.send(new VerticalCollisionEvent(movementComp.getVelocity(), moveResult.finalPosition));
-                newState.setGrounded(true);
+                state.setGrounded(true);
             }
-            newState.getVelocity().y = 0;
+            state.getVelocity().y = 0;
             // Jumping is only possible, if the entity is standing on ground
             if (input.isJumpRequested()) {
-                newState.setGrounded(false);
-                newState.getVelocity().y += movementComp.jumpSpeed;
+                state.setGrounded(false);
+                state.getVelocity().y += movementComp.jumpSpeed;
             }
         } else {
-            if (moveResult.hitTop && newState.getVelocity().y > 0) {
-                newState.getVelocity().y = -0.5f * newState.getVelocity().y;
+            if (moveResult.hitTop && state.getVelocity().y > 0) {
+                state.getVelocity().y = -0.5f * state.getVelocity().y;
             }
-            newState.setGrounded(false);
+            state.setGrounded(false);
         }
 
         if (moveResult.hitHoriz) {
             //entity.send(new HorizontalCollisionEvent(location.getWorldPosition(),movementComp.getVelocity()));
         }
 
-        if (newState.isGrounded()) {
+        if (state.isGrounded()) {
             /*movementComp.footstepDelta += distanceMoved.length();
             if (movementComp.footstepDelta > movementComp.distanceBetweenFootsteps) {
                 movementComp.footstepDelta -= movementComp.distanceBetweenFootsteps;
                 entity.send(new FootstepEvent());
             } */
         }
-
-        return newState;
     }
 
     private static class MoveResult {

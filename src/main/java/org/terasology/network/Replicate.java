@@ -11,5 +11,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.TYPE})
 public @interface Replicate {
-    public ReplicateDirection value() default ReplicateDirection.SERVER_TO_CLIENT;
+    public ReplicateType value() default ReplicateType.SERVER_TO_CLIENT;
 }

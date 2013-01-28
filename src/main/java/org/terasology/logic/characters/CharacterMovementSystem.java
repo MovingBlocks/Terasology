@@ -13,6 +13,6 @@ public interface CharacterMovementSystem {
      * @param entity The character
      * @return The new state of the character
      */
-    CharacterState step(CharacterState initial, CharacterMoveInputEvent input, EntityRef entity);
+    CharacterStateEvent step(CharacterStateEvent initial, CharacterMoveInputEvent input, EntityRef entity);
 
 }

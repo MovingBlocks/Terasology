@@ -270,7 +270,7 @@ public class HierarchicalAISystem implements EventHandlerSystem,
         drive.set(targetDirection);
 
         float yaw = (float) Math.atan2(targetDirection.x, targetDirection.z);
-        entity.send(new CharacterMoveInputEvent(0, yaw, drive, false, false));
+        entity.send(new CharacterMoveInputEvent(0, 0, yaw, drive, false, false));
         entity.saveComponent(location);
         // System.out.print("\Destination set: " + targetDirection.x + ":" +targetDirection.z + "\n");
         // System.out.print("\nI am: " + worldPos.x + ":" + worldPos.z + "\n");

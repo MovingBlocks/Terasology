@@ -19,11 +19,12 @@ public class CharacterMoveInputEvent extends NetworkEvent {
     private boolean running;
     private boolean jumpRequested;
     private Vector3f movementDirection = new Vector3f();
+    private int sequenceNumber = 0;
 
     private CharacterMoveInputEvent() {
     }
 
-    public CharacterMoveInputEvent(float pitch, float yaw, Vector3f movementDirection, boolean running, boolean jumpRequested) {
+    public CharacterMoveInputEvent(int sequence, float pitch, float yaw, Vector3f movementDirection, boolean running, boolean jumpRequested) {
         Timer timer = CoreRegistry.get(Timer.class);
         this.time = timer.getTimeInMs();
         this.delta = timer.getDeltaInMs();
@@ -32,6 +33,7 @@ public class CharacterMoveInputEvent extends NetworkEvent {
         this.running = running;
         this.jumpRequested = jumpRequested;
         this.movementDirection.set(movementDirection);
+        this.sequenceNumber = sequence;
     }
 
     public long getTime() {
@@ -42,7 +44,7 @@ public class CharacterMoveInputEvent extends NetworkEvent {
         return delta;
     }
 
-    public float getDeltaMS() {
+    public float getDeltaMs() {
         return delta / 1000f;
     }
 
@@ -64,5 +66,9 @@ public class CharacterMoveInputEvent extends NetworkEvent {
 
     public boolean isJumpRequested() {
         return jumpRequested;
+    }
+
+    public int getSequenceNumber() {
+        return sequenceNumber;
     }
 }

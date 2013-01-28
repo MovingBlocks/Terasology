@@ -26,7 +26,6 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
-import org.terasology.network.serialization.NetworkEventFieldCheck;
 import org.terasology.network.serialization.ServerComponentFieldCheck;
 import org.terasology.protobuf.EntityData;
 import org.terasology.protobuf.NetData;
@@ -188,7 +187,6 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
 
     public void send(Event event, int targetId) {
         if (netRelevant.contains(targetId)) {
-            logger.info("Sending: {}", event);
             NetData.NetMessage message = NetData.NetMessage.newBuilder()
                     .addEvent(NetData.EventMessage.newBuilder()
                             .setTargetId(targetId)

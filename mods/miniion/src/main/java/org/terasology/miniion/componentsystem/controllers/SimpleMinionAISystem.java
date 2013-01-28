@@ -117,7 +117,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscribe
             if (drive.x * drive.x + drive.y * drive.y > 0.01f) {
                 yaw = (float) Math.atan2(drive.x, drive.z);
             }
-            entity.send(new CharacterMoveInputEvent(0, yaw, drive, false, false));
+            entity.send(new CharacterMoveInputEvent(0, 0, yaw, drive, false, false));
         }
     }
 

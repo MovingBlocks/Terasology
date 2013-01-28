@@ -18,7 +18,7 @@ package org.terasology.world.block;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.network.Replicate;
-import org.terasology.network.ReplicateDirection;
+import org.terasology.network.ReplicateType;
 import org.terasology.world.block.family.BlockFamily;
 
 /**
@@ -27,7 +27,7 @@ import org.terasology.world.block.family.BlockFamily;
  * @author Immortius <immortius@gmail.com>
  */
 public final class BlockItemComponent implements Component {
-    @Replicate(ReplicateDirection.SERVER_TO_OWNER)
+    @Replicate(ReplicateType.SERVER_TO_OWNER)
     public BlockFamily blockFamily;
     public EntityRef placedEntity = EntityRef.NULL;
 

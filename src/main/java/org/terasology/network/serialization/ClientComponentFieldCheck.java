@@ -3,7 +3,6 @@ package org.terasology.network.serialization;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.entitySystem.persistence.FieldSerializeCheck;
-import org.terasology.network.ReplicateDirection;
 
 /**
  * @author Immortius

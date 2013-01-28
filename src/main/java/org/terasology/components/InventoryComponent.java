@@ -22,7 +22,7 @@ import org.terasology.entitySystem.EntityRef;
 
 import com.google.common.collect.Lists;
 import org.terasology.network.Replicate;
-import org.terasology.network.ReplicateDirection;
+import org.terasology.network.ReplicateType;
 
 /**
  * Allows an entity to store items
@@ -31,7 +31,7 @@ import org.terasology.network.ReplicateDirection;
  */
 public final class InventoryComponent implements Component {
 
-    @Replicate(ReplicateDirection.SERVER_TO_OWNER)
+    @Replicate(ReplicateType.SERVER_TO_OWNER)
     public List<EntityRef> itemSlots = Lists.newArrayList();
 
     public InventoryComponent() {

@@ -1,6 +1,8 @@
 {
     "persisted" : false,
-    "Location" : {},
+    "Location" : {
+        "replicateChanges" : false
+    },
     "Character" : {},
     "Network" : {
         "replicateMode" : "ALWAYS"

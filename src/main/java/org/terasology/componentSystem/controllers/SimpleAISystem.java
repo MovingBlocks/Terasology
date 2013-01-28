@@ -103,7 +103,7 @@ public class SimpleAISystem implements EventHandlerSystem, UpdateSubscriberSyste
                 location.getLocalRotation().set(axisAngle);
                 entity.saveComponent(location);
             }
-            entity.send(new CharacterMoveInputEvent(0, 0, drive, false, false));
+            entity.send(new CharacterMoveInputEvent(0, 0, 0, drive, false, false));
         }
     }
 

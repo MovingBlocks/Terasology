@@ -2,7 +2,6 @@ package org.terasology.network;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
 import com.google.common.collect.Queues;
 import com.google.common.collect.SetMultimap;
 import gnu.trove.iterator.TIntIterator;
@@ -15,7 +14,6 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Event;
 import org.terasology.entitySystem.PersistableEntityManager;
-import org.terasology.entitySystem.persistence.EntitySerializer;
 import org.terasology.entitySystem.persistence.EventSerializer;
 import org.terasology.entitySystem.persistence.FieldSerializeCheck;
 import org.terasology.entitySystem.persistence.PackedEntitySerializer;
@@ -23,8 +21,6 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.math.Vector3i;
 import org.terasology.network.serialization.ClientComponentFieldCheck;
-import org.terasology.network.serialization.NetworkEventFieldCheck;
-import org.terasology.network.serialization.ServerComponentFieldCheck;
 import org.terasology.protobuf.EntityData;
 import org.terasology.protobuf.NetData;
 import org.terasology.world.BlockEntityRegistry;
@@ -120,7 +116,7 @@ public class Server {
     }
 
     private void send(NetData.NetMessage data) {
-        logger.trace("Sending with size {}",  data.getSerializedSize());
+        logger.trace("Sending with size {}", data.getSerializedSize());
         sentMessages.incrementAndGet();
         sentBytes.addAndGet(data.getSerializedSize());
         channel.write(data);
@@ -156,7 +152,6 @@ public class Server {
 
         for (NetData.EventMessage message : messages) {
             Event event = eventSerializer.deserialize(message.getEvent());
-            logger.info("Received event {} for target {}", event, message.getTargetId());
             EntityRef target = networkSystem.getEntity(message.getTargetId());
             if (target.exists()) {
                 target.send(event);
@@ -198,6 +193,7 @@ public class Server {
             for (NetData.UpdateEntityMessage updateEntity : message.getUpdateEntityList()) {
                 EntityRef currentEntity = networkSystem.getEntity(updateEntity.getNetId());
                 if (currentEntity.exists()) {
+                    logger.info("Updating entity: {}", currentEntity);
                     entitySerializer.deserializeOnto(currentEntity, updateEntity.getEntity());
                 }
             }
@@ -206,11 +202,6 @@ public class Server {
                 EntityRef entity = networkSystem.getEntity(netId);
                 networkSystem.unregisterNetworkEntity(entity);
                 entity.destroy();
-            }
-            for (NetData.EventMessage eventMessage : message.getEventList()) {
-                    Event event = eventSerializer.deserialize(eventMessage.getEvent());
-                    EntityRef target = networkSystem.getEntity(eventMessage.getTargetId());
-                    target.send(event);
             }
         }
 

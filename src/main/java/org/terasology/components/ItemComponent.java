@@ -22,7 +22,7 @@ import org.terasology.entitySystem.EntityRef;
 
 import com.google.common.collect.Maps;
 import org.terasology.network.Replicate;
-import org.terasology.network.ReplicateDirection;
+import org.terasology.network.ReplicateType;
 
 /**
  * Item data is stored using this component
@@ -33,19 +33,19 @@ public final class ItemComponent implements Component {
     /**
      * The display name of this item
      */
-    @Replicate(ReplicateDirection.SERVER_TO_OWNER)
+    @Replicate(ReplicateType.SERVER_TO_OWNER)
     public String name = "";
 
     /**
      * Should this item be rendered? Some items have an inventory icon but no "held" representation
      */
-    @Replicate(ReplicateDirection.SERVER_TO_OWNER)
+    @Replicate(ReplicateType.SERVER_TO_OWNER)
     public boolean renderWithIcon = false;
 
     /**
      * Name of the icon this item should be rendered with
      */
-    @Replicate(ReplicateDirection.SERVER_TO_OWNER)
+    @Replicate(ReplicateType.SERVER_TO_OWNER)
     public String icon = "";
 
     /**
@@ -56,7 +56,7 @@ public final class ItemComponent implements Component {
     /**
      * How many of said item are there in this stack
      */
-    @Replicate(ReplicateDirection.SERVER_TO_OWNER)
+    @Replicate(ReplicateType.SERVER_TO_OWNER)
     public byte stackCount = 1;
 
     /**
@@ -78,7 +78,7 @@ public final class ItemComponent implements Component {
     /**
      * Usage setting for this item
      */
-    @Replicate(ReplicateDirection.SERVER_TO_OWNER)
+    @Replicate(ReplicateType.SERVER_TO_OWNER)
     public UsageType usage = UsageType.NONE;
 
     /**

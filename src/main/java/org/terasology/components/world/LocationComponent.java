@@ -23,9 +23,10 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
-import org.terasology.entitySystem.metadata.core.ListTypeHandler;
+import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.network.Replicate;
-import org.terasology.network.ReplicateDirection;
+import org.terasology.network.ReplicateType;
+import org.terasology.network.ReplicationCheck;
 
 import java.util.Collection;
 import java.util.List;
@@ -35,11 +36,11 @@ import java.util.List;
  *
  * @author Immortius <immortius@gmail.com>
  */
-public final class LocationComponent implements Component {
+public final class LocationComponent implements Component, ReplicationCheck {
     // Standard position/rotation
-    @Replicate(ReplicateDirection.OWNER_TO_SERVER_TO_CLIENT)
+    @Replicate
     private Vector3f position = new Vector3f();
-    @Replicate(ReplicateDirection.OWNER_TO_SERVER_TO_CLIENT)
+    @Replicate
     private Quat4f rotation = new Quat4f(0, 0, 0, 1);
     @Replicate
     private float scale = 1.0f;
@@ -48,6 +49,8 @@ public final class LocationComponent implements Component {
     @Replicate
     private EntityRef parent = EntityRef.NULL;
     private List<EntityRef> children = Lists.newArrayList();
+
+    private boolean replicateChanges = true;
 
     public LocationComponent() {
     }
@@ -197,5 +200,10 @@ public final class LocationComponent implements Component {
         result = 31 * result + (scale != +0.0f ? Float.floatToIntBits(scale) : 0);
         result = 31 * result + (parent != null ? parent.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public boolean shouldReplicate(FieldMetadata field, boolean initial, boolean toOwner) {
+        return initial || replicateChanges;
     }
 }

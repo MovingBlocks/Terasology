@@ -74,8 +74,6 @@ public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
         if (message.hasServerInfo()) {
             CoreRegistry.get(Timer.class).updateServerTime(message.getTime(), true);
             receivedServerInfo(message.getServerInfo());
-        } else if (message.hasTime()) {
-            CoreRegistry.get(Timer.class).updateServerTime(message.getTime(), false);
         }
         for (ChunksProtobuf.Chunk chunk : message.getChunkInfoList()) {
             receivedChunk(chunk);
