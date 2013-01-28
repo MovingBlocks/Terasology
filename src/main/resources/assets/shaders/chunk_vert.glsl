@@ -28,7 +28,7 @@ varying vec3 waterNormal;
 
 varying float flickeringLightOffset;
 varying float isUpside;
-varying int blockHint;
+varying float blockHint;
 
 uniform float blockScale = 1.0;
 uniform float time;

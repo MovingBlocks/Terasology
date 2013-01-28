@@ -59,7 +59,7 @@ varying vec3 normal;
 varying vec3 waterNormal;
 
 varying float flickeringLightOffset;
-varying int blockHint;
+varying float blockHint;
 varying float isUpside;
 
 void main(){
