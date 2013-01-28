@@ -124,7 +124,7 @@ public final class ChunkTessellator {
 
                 mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].tex.get(cTex));
                 mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].tex.get(cTex + 1));
-                mesh._vertexElements[j].finalVertices.putInt(mesh._vertexElements[j].flags.get(cFlags));
+                mesh._vertexElements[j].finalVertices.putFloat(mesh._vertexElements[j].flags.get(cFlags));
 
                 float[] result = new float[3];
                 Vector3f normal = new Vector3f(mesh._vertexElements[j].normals.get(i), mesh._vertexElements[j].normals.get(i+1), mesh._vertexElements[j].normals.get(i+2));
@@ -251,12 +251,11 @@ public final class ChunkTessellator {
 
         // TODO: Needs review since the new per-vertex flags introduce a lot of special scenarios
         if (block.getURI().toString().equals("engine:water")) {
-            vertexFlags |= 0x10000000;
+            vertexFlags = 1;
         } else if (block.getURI().toString().equals("engine:lava")) {
-            vertexFlags |= 0x20000000;
-        }
-        if (block.isWaving()) {
-            vertexFlags |= 0x40000000;
+            vertexFlags = 2;
+        } else if (block.isWaving()) {
+            vertexFlags = 4;
         }
 
         /*
@@ -323,8 +322,8 @@ public final class ChunkTessellator {
                 Vector4f colorOffset = block.calcColorOffsetFor(BlockPart.fromSide(dir), temp, hum);
 
                 // TODO: Needs review since the new per-vertex flags introduce a lot of special scenarios
-                if (block.getURI().toString().equals("engine:grass") && dir != Side.TOP && dir != Side.BOTTOM) {
-                    vertexFlags |= 0x80000000;
+                if (block.getURI().toString().equals("engine:grass")) {
+                    vertexFlags = (dir != Side.TOP && dir != Side.BOTTOM) ? 3 : 0;
                 }
 
                 block.getMeshPart(BlockPart.fromSide(dir)).appendTo(mesh, x, y, z, colorOffset, renderType.getIndex(), vertexFlags);

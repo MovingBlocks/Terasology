@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
+#define BLOCK_HINT_WATER     1
+#define BLOCK_HINT_LAVA      2
+#define BLOCK_HINT_GRASS     3
+#define BLOCK_HINT_WAVING    4
+
 varying vec3 normal;
 varying vec4 vertexWorldPosRaw;
 varying vec4 vertexWorldPos;
@@ -23,7 +28,7 @@ varying vec3 waterNormal;
 
 varying float flickeringLightOffset;
 varying float isUpside;
-varying uint perVertexFlags;
+varying int blockHint;
 
 uniform float blockScale = 1.0;
 uniform float time;
@@ -34,7 +39,7 @@ uniform float animated;
 void main()
 {
 	gl_TexCoord[0] = gl_MultiTexCoord0;
-	perVertexFlags = floatBitsToUint(gl_TexCoord[0].z);
+	blockHint = int(gl_TexCoord[0].z);
 
     gl_TexCoord[1] = gl_MultiTexCoord1;
 
@@ -63,7 +68,7 @@ void main()
 
     if (animated > 0.0) {
         // GRASS ANIMATION
-        if ((perVertexFlags & 0x40000000) > 0) {
+        if ( blockHint == BLOCK_HINT_WAVING ) {
            if (mod(gl_TexCoord[0].y, TEXTURE_OFFSET) < TEXTURE_OFFSET / 2.0) {
                vertexWorldPos.x += (smoothTriangleWave(timeToTick(time, 0.2) + vertexChunkPos.x * 0.1 + vertexChunkPos.z * 0.1) * 2.0 - 1.0) * 0.1 * blockScale;
                vertexWorldPos.y += (smoothTriangleWave(timeToTick(time, 0.1) + vertexChunkPos.x * -0.5 + vertexChunkPos.z * -0.5) * 2.0 - 1.0) * 0.05 * blockScale;
@@ -71,7 +76,7 @@ void main()
         }
      }
 
-    if ((perVertexFlags & 0x10000000) > 0) {
+    if ( blockHint == BLOCK_HINT_WATER ) {
        // Only animate blocks on sea level
        if (vertexWorldPosRaw.y < 32.5 && vertexWorldPosRaw.y > 31.5) {
             vertexWorldPos.y += (smoothTriangleWave(timeToTick(time, 0.1) + vertexChunkPos.x * 0.05 + vertexChunkPos.z * 0.05) * 2.0 - 1.0) * 0.1 * blockScale

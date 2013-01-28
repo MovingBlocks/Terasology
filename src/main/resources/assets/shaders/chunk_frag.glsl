@@ -14,6 +14,11 @@
  * limitations under the License.
 */
 
+#define BLOCK_HINT_WATER     1
+#define BLOCK_HINT_LAVA      2
+#define BLOCK_HINT_GRASS     3
+#define BLOCK_HINT_WAVING    4
+
 #define DAYLIGHT_AMBIENT_COLOR 0.95, 0.92, 0.91
 #define MOONLIGHT_AMBIENT_COLOR 0.8, 0.8, 1.0
 #define NIGHT_BRIGHTNESS 0.05
@@ -54,7 +59,7 @@ varying vec3 normal;
 varying vec3 waterNormal;
 
 varying float flickeringLightOffset;
-varying uint perVertexFlags;
+varying int blockHint;
 varying float isUpside;
 
 void main(){
@@ -78,7 +83,7 @@ void main(){
     vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
 
     /* WATER */
-    if ((perVertexFlags & 0x10000000) > 0) {
+    if ( blockHint == BLOCK_HINT_WATER ) {
         vec2 waterOffset = vec2(vertexWorldPosRaw.x + timeToTick(time, 0.1), vertexWorldPosRaw.z + timeToTick(time, 0.1)) / 8.0;
         normalWater.xyz = texture2D(textureWaterNormal, waterOffset).xyz * 2.0 - 1.0;
 
@@ -99,7 +104,7 @@ void main(){
 
         isWater = true;
     /* LAVA */
-    } else if ((perVertexFlags & 0x20000000) > 0) {
+    } else if ( blockHint == BLOCK_HINT_LAVA ) {
         texCoord.x = mod(texCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET);
         texCoord.y = mod(texCoord.y, TEXTURE_OFFSET) / (128.0 / (1.0 / TEXTURE_OFFSET));
         texCoord.y += mod(timeToTick(time, 0.1), 127.0) * (1.0/128.0);
@@ -115,7 +120,7 @@ void main(){
     }
 
     /* APPLY OVERALL BIOME COLOR OFFSET */
-    if ((perVertexFlags & 0x80000000) == 0) {
+    if ( blockHint != BLOCK_HINT_GRASS ) {
         if (gl_Color.r < 0.99 && gl_Color.g < 0.99 && gl_Color.b < 0.99) {
             if (color.g > 0.5) {
                 color.rgb = vec3(color.g) * gl_Color.rgb;
