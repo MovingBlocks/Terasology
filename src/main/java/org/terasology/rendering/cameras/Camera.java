@@ -18,9 +18,11 @@ package org.terasology.rendering.cameras;
 import static org.lwjgl.opengl.GL11.glScalef;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
+import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 
 import org.terasology.logic.manager.Config;
+import org.terasology.math.TeraMath;
 import org.terasology.model.structures.ViewFrustum;
 
 /**
@@ -41,6 +43,15 @@ public abstract class Camera {
     /* VIEW FRUSTUM */
     protected final ViewFrustum _viewFrustum = new ViewFrustum();
 
+    /* MATRICES */
+    protected Matrix4f _projectionMatrix = new Matrix4f();
+    protected Matrix4f _normViewMatrix = new Matrix4f();
+    protected Matrix4f _viewMatrix = new Matrix4f();
+    protected Matrix4f _viewProjectionMatrix = new Matrix4f();
+    protected Matrix4f _inverseViewProjectionMatrix = new Matrix4f();
+    protected Matrix4f _prevInverseViewProjectionMatrix = new Matrix4f();
+
+    /* ETC */
     protected boolean _reflected = false;
 
     /**
