@@ -438,6 +438,14 @@ public final class Config {
         return _setting.getSystemBuilder().getVignette();
     }
 
+    public void setMotionBlur(boolean motionBlur) {
+        _setting.getSystemBuilder().setMotionBlur(motionBlur);
+    }
+
+    public boolean isMotionBlur() {
+        return _setting.getSystemBuilder().getMotionBlur();
+    }
+
     public void setEyeAdaption(boolean eyeAdaption) {
         _setting.getSystemBuilder().setEyeAdapation(eyeAdaption);
     }

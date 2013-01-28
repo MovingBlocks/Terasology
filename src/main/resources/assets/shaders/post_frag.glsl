@@ -14,6 +14,13 @@
  * limitations under the License.
  */
 
+
+#define Z_NEAR 0.1
+#define BLUR_START 0.6
+#define BLUR_LENGTH 0.05
+
+#define MOTION_BLUR_SAMPLES 8
+
 uniform sampler2D texScene;
 #ifdef BLOOM
 uniform sampler2D texBloom;
@@ -25,17 +32,12 @@ uniform sampler2D texVignette;
 uniform sampler2D texDepth;
 
 uniform bool swimming;
-
-#if 0
-uniform float fogIntensity = 0.1;
-uniform float fogLinearIntensity = 0.1;
-#endif
-
 uniform float viewingDistance;
 
-#define Z_NEAR 0.1
-#define BLUR_START 0.6
-#define BLUR_LENGTH 0.05
+#ifdef MOTION_BLUR
+uniform mat4 invViewProjMatrix;
+uniform mat4 prevViewProjMatrix;
+#endif
 
 float linDepth() {
     float z = texture2D(texDepth, gl_TexCoord[0].xy).x;
@@ -67,6 +69,32 @@ void main() {
 
 #ifndef NO_BLUR
     colorBlur = clamp(colorBlur , 0.0, 1.0);
+#endif
+
+#ifdef MOTION_BLUR
+    float zOverW = texture2D(texDepth, gl_TexCoord[0].xy).x;
+    vec4 screenSpacePos = vec4(gl_TexCoord[0].x, gl_TexCoord[0].y, zOverW, 1.0) * 2.0 - 1.0;
+    vec4 worldSpacePos = invViewProjMatrix * screenSpacePos;
+    vec4 normWorldSpacePos = worldSpacePos / worldSpacePos.w;
+    vec4 prevScreenSpacePos = prevViewProjMatrix * normWorldSpacePos;
+    prevScreenSpacePos /= prevScreenSpacePos.w;
+
+    vec2 velocity = (screenSpacePos.xy - prevScreenSpacePos.xy) / 16.0;
+    velocity = clamp(velocity, vec2(-0.025), vec2(0.025));
+
+    vec2 blurTexCoord = gl_TexCoord[0].xy;
+    blurTexCoord += velocity;
+    for(int i = 1; i < MOTION_BLUR_SAMPLES; ++i, blurTexCoord += velocity)
+    {
+      vec4 currentColor = texture2D(texScene, blurTexCoord);
+      vec4 currentColorBlur = texture2D(texBlur, blurTexCoord);
+
+      color += currentColor;
+      colorBlur += currentColorBlur;
+    }
+
+    color /= MOTION_BLUR_SAMPLES;
+    colorBlur /= MOTION_BLUR_SAMPLES;
 #endif
 
 #ifndef NO_BLUR

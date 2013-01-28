@@ -571,12 +571,17 @@ public final class WorldRenderer {
             glClear(GL_DEPTH_BUFFER_BIT);
             glPushMatrix();
             glLoadIdentity();
-            _activeCamera.loadProjectionMatrix(90f);
+
+            _activeCamera.updateMatrices(90f);
+            _activeCamera.loadProjectionMatrix();
 
             PerformanceMonitor.startActivity("Render First Person");
             for (RenderSystem renderer : _systemManager.iterateRenderSubscribers()) {
                 renderer.renderFirstPerson();
             }
+
+            _activeCamera.updateMatrices();
+
             PerformanceMonitor.endActivity();
 
             glPopMatrix();

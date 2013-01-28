@@ -49,7 +49,7 @@ public abstract class Camera {
     protected Matrix4f _viewMatrix = new Matrix4f();
     protected Matrix4f _viewProjectionMatrix = new Matrix4f();
     protected Matrix4f _inverseViewProjectionMatrix = new Matrix4f();
-    protected Matrix4f _prevInverseViewProjectionMatrix = new Matrix4f();
+    protected Matrix4f _prevViewProjectionMatrix = new Matrix4f();
 
     /* ETC */
     protected boolean _reflected = false;
@@ -80,15 +80,15 @@ public abstract class Camera {
         }
     }
 
-    public abstract void loadProjectionMatrix(float fov);
-
-    public void loadProjectionMatrix() {
-        loadProjectionMatrix(_activeFov);
-    }
+    public abstract void loadProjectionMatrix();
 
     public abstract void loadModelViewMatrix();
 
     public abstract void loadNormalizedModelViewMatrix();
+
+    public abstract void updateMatrices();
+
+    public abstract void updateMatrices(float overrideFov);
 
     public Vector3f getPosition() {
         return _position;
@@ -141,5 +141,21 @@ public abstract class Camera {
         if (_reflected)
             return 31.5f;
         return 0;
+    }
+
+    public Matrix4f getViewMatrix() {
+        return _viewMatrix;
+    }
+
+    public Matrix4f getProjectionMatrix() {
+        return _projectionMatrix;
+    }
+
+    public Matrix4f getInverseViewProjectionMatrix() {
+        return _inverseViewProjectionMatrix;
+    }
+
+    public Matrix4f getPrevViewProjectionMatrix() {
+        return _prevViewProjectionMatrix;
     }
 }

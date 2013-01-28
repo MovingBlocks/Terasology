@@ -37,7 +37,7 @@ public class DefaultCamera extends Camera {
 
     private float _bobbingRotationOffsetFactor, _bobbingVerticalOffsetFactor = 0.0f;
 
-    public void loadProjectionMatrix(float fov) {
+    public void loadProjectionMatrix() {
         glMatrixMode(GL_PROJECTION);
         GL11.glLoadMatrix(TeraMath.matrixToBuffer(_projectionMatrix));
         glMatrixMode(GL11.GL_MODELVIEW);
@@ -60,18 +60,23 @@ public class DefaultCamera extends Camera {
         updateMatrices();
     }
 
-    protected void updateMatrices() {
+    public void updateMatrices() {
+        updateMatrices(_activeFov);
+    }
+
+    public void updateMatrices(float overrideFov) {
         Vector3f right = new Vector3f();
         right.cross(_viewingDirection, _up);
         right.scale(_bobbingRotationOffsetFactor);
 
-        _projectionMatrix = TeraMath.createProjectionMatrix(_activeFov, 0.1f, 512.0f);
+        _projectionMatrix = TeraMath.createProjectionMatrix(overrideFov, 0.1f, 512.0f);
+
         _viewMatrix = TeraMath.createViewMatrix(0f, _bobbingVerticalOffsetFactor * 2.0f, 0f, _viewingDirection.x, _viewingDirection.y + _bobbingVerticalOffsetFactor * 2.0f,
                 _viewingDirection.z, _up.x + right.x, _up.y + right.y, _up.z + right.z);
         _normViewMatrix = TeraMath.createViewMatrix(0f, 0f, 0f, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, _up.x + right.x, _up.y + right.y, _up.z + right.z);
-        _viewProjectionMatrix = TeraMath.calcViewProjectionMatrix(_viewMatrix, _projectionMatrix);
 
-        _prevInverseViewProjectionMatrix = new Matrix4f(_inverseViewProjectionMatrix);
+        _prevViewProjectionMatrix = new Matrix4f(_viewProjectionMatrix);
+        _viewProjectionMatrix = TeraMath.calcViewProjectionMatrix(_viewMatrix, _projectionMatrix);
         _inverseViewProjectionMatrix.invert(_viewProjectionMatrix);
     }
 

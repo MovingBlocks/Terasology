@@ -219,6 +219,8 @@ public class Shader implements Asset {
             builder.append("#define VIGNETTE \n");
         if (Config.getInstance().isBloom())
             builder.append("#define BLOOM \n");
+        if (Config.getInstance().isMotionBlur())
+            builder.append("#define MOTION_BLUR \n");
         return builder;
     }
 

@@ -96,6 +96,7 @@ public class UIMenuConfigVideo extends UIWindow {
                     Config.getInstance().setVignette(true);
                     Config.getInstance().setEyeAdaption(false);
                     Config.getInstance().setBloom(false);
+                    Config.getInstance().setMotionBlur(false);
                     break;
                 case 1:
                     Config.getInstance().setEnablePostProcessingEffects(true);
@@ -103,6 +104,15 @@ public class UIMenuConfigVideo extends UIWindow {
                     Config.getInstance().setVignette(true);
                     Config.getInstance().setEyeAdaption(true);
                     Config.getInstance().setBloom(true);
+                    Config.getInstance().setMotionBlur(false);
+                    break;
+                case 2:
+                    Config.getInstance().setEnablePostProcessingEffects(true);
+                    Config.getInstance().setFlickeringLight(true);
+                    Config.getInstance().setVignette(true);
+                    Config.getInstance().setEyeAdaption(true);
+                    Config.getInstance().setBloom(true);
+                    Config.getInstance().setMotionBlur(true);
                     break;
                 }
                 
@@ -111,6 +121,7 @@ public class UIMenuConfigVideo extends UIWindow {
         };
         graphicsQualityButton.addState("Graphics Quality: Nice", graphicsQualityStateAction);
         graphicsQualityButton.addState("Graphics Quality: Epic", graphicsQualityStateAction);
+        graphicsQualityButton.addState("Graphics Quality: Insane", graphicsQualityStateAction);
         graphicsQualityButton.addClickListener(clickAction);
         graphicsQualityButton.setHorizontalAlign(EHorizontalAlign.CENTER);
         graphicsQualityButton.setPosition(new Vector2f(-graphicsQualityButton.getSize().x / 2f - 10f, 300f));

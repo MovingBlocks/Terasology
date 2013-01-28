@@ -31,7 +31,11 @@ import org.newdawn.slick.util.ResourceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.logic.manager.ShaderManager;
+import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.Shader;
+
+import javax.vecmath.Matrix3f;
+import javax.vecmath.Matrix4f;
 
 /**
  * Wraps a OpenGL shader program. Provides convenience methods for setting
@@ -213,6 +217,18 @@ public class ShaderProgram {
         enable();
         int id = GL20.glGetUniformLocation(shaderProgram, desc);
         GL20.glUniform1(id, buffer);
+    }
+
+    public void setMatrix4(String desc, Matrix4f m) {
+        enable();
+        int id = GL20.glGetUniformLocation(shaderProgram, desc);
+        GL20.glUniformMatrix4(id, false, TeraMath.matrixToFloatBuffer(m));
+    }
+
+    public void setMatrix3(String desc, Matrix3f m) {
+        enable();
+        int id = GL20.glGetUniformLocation(shaderProgram, desc);
+        GL20.glUniformMatrix3(id, false, TeraMath.matrixToFloatBuffer(m));
     }
 
     public IShaderParameters getShaderParameters() {

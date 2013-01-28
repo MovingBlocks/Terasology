@@ -34,7 +34,7 @@ message Setting {
     }
 
     message Player {
-        optional float fov = 1 [default = 80];
+        optional float fov = 1 [default = 90];
         optional float mouse_sens = 2 [default = 0.075];
         optional bool camera_bobbing = 3 [default = true];
         optional bool render_first_person_view = 4 [default = true];
@@ -74,6 +74,7 @@ message Setting {
         optional bool vignette = 25 [default = false];
 		optional bool eye_adapation = 26 [default = false];
 		optional bool bloom = 27 [default = false];
+		optional bool motion_blur = 28 [default = false];
     }
 
     optional World world = 1;
