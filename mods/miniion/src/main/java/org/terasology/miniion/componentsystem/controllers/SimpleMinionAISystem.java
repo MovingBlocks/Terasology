@@ -91,11 +91,25 @@ public class SimpleMinionAISystem implements EventHandlerSystem,
 					.getComponent(MinionComponent.class);
 			AnimationComponent animcomp = entity
 					.getComponent(AnimationComponent.class);
+			SimpleMinionAIComponent ai = entity
+					.getComponent(SimpleMinionAIComponent.class);
 
-			moveComp.getDrive().set(0, 0, 0);
-			// shouldn't use local player, need some way to find nearest player
+			//hunger system, increase the delay by increasing > 10000
+			if (timer.getTimeInMs() - ai.lastHungerCheck > 10000) {
+				ai.lastHungerCheck = timer.getTimeInMs();
+				if(minioncomp.Hunger > 0){
+					minioncomp.Hunger-- ;
+					//need to save components for data to persist when game restarts
+					entity.saveComponent(minioncomp);
+				}else{
+					//die? reset for now so you see effect
+					minioncomp.Hunger = 100;
+				}
+			}
+			
+			
+			//moveComp.getDrive().set(0, 0, 0);
 			LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-
 			if (localPlayer != null) {
 				switch (minioncomp.minionBehaviour) {
 				case Follow: {

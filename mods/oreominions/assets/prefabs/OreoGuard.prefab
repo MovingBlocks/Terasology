@@ -8,7 +8,10 @@
         "loop" : true
     },
      "Minion" : {
-     "icon" = "minionskull"
+     "icon" = "minionskull",
+     "Healthtotal" = "800",
+     "Hungertotal" = "100",
+     "Staminatotal" = "100"
    },
 	"CharacterMovement" : {
     "faceMovementDirection" : true

@@ -35,6 +35,7 @@ public final class SimpleMinionAIComponent implements Component {
 	public long lastAttacktime = 0;
 	public long lastDistancecheck = 0;
 	public long lastPathtime = 0;
+	public long lastHungerCheck = 0;
 	public int patrolCounter = 0;
 	public int craftprogress = 0;
 

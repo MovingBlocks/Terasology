@@ -38,6 +38,14 @@ public final class MinionComponent implements Component {
 	
 	public boolean dying = false;
 	
+	//stats
+	public int Health;
+	public int HealthTotal;
+	public int Hunger;
+	public int Hungertotal;
+	public int Stamina;
+	public int Staminatotal;
+	
 	//determines an action point for the minion
 	public Zone assignedzone;
 	//the recipe to craft when working

@@ -227,7 +227,7 @@ public class UIActiveMinion extends UIWindow{
 		btnStats.setId("showstats");
 		btnStats.addClickListener(executeArrowButton);
 		btnStats.setVisible(true);
-		backgroundmain.addDisplayElement(btnStats);
+		backgroundmain.addDisplayElement(btnStats);				
 		
 		uistats = new UIScreenStats();
 		uistats.setSize(new Vector2f(300,600));
@@ -453,7 +453,7 @@ public class UIActiveMinion extends UIWindow{
 			lblname.setBorderSolid(new Vector4f(2f, 2f, 2f, 2f), Color.magenta);
 			lblflavor.setText("Get your Oreominions now!!! 75% off if you bought any other DLC");
 			lblzone.setText("");
-			lblrecipe.setText("");
+			lblrecipe.setText("");            
 		}else {
 			MinionComponent minioncomp = MinionSystem.getActiveMinion().getComponent(MinionComponent.class);
 			// remove and add border for resize
@@ -464,7 +464,7 @@ public class UIActiveMinion extends UIWindow{
 				lblflavor.setText("something went wrong, contact your system administrator! Quickly!");
 			}else{
 				lblname.setText(minioncomp.name);
-				lblflavor.setText(minioncomp.flavortext);
+				lblflavor.setText(minioncomp.flavortext);				
 				if(minioncomp.assignedzone == null){
 					lblzone.setText("no zone assigned");
 				}else
@@ -495,6 +495,8 @@ public class UIActiveMinion extends UIWindow{
 			}			
 			lblname.setBorderSolid(new Vector4f(2f, 2f, 2f, 2f), Color.magenta);						
 		}
+		//refresh the stats screen whenever the main window refreshes.
+		uistats.refreshScreen();
 	}	
 }
 	
