@@ -215,8 +215,10 @@ public class PostProcessingRenderer {
 
         _sceneLuminance = 0.2126f * pixels.get(2) / 255.f + 0.7152f * pixels.get(1) / 255.f + 0.0722f * pixels.get(0) / 255.f;
 
-        if (_sceneLuminance > 0.0f) { // Avoid division by zero
-            _exposure = (float) TeraMath.lerp(_exposure, TARGET_LUMINANCE / _sceneLuminance, ADJUSTMENT_SPEED);
+        float targetExposure = MIN_EXPOSURE;
+
+        if (_sceneLuminance > 0) {
+            targetExposure = TARGET_LUMINANCE / _sceneLuminance;
         }
 
         float maxExposure = MAX_EXPOSURE;
@@ -225,12 +227,14 @@ public class PostProcessingRenderer {
             maxExposure = MAX_EXPOSURE_NIGHT;
         }
 
-        if (_exposure > maxExposure) {
-            _exposure = maxExposure;
+        if (targetExposure > maxExposure) {
+            targetExposure = maxExposure;
+        } else if (targetExposure < MIN_EXPOSURE) {
+            targetExposure = MIN_EXPOSURE;
         }
-        if (_exposure < MIN_EXPOSURE) {
-            _exposure = MIN_EXPOSURE;
-        }
+
+        _exposure = (float) TeraMath.lerp(_exposure, targetExposure, ADJUSTMENT_SPEED);
+
       } else {
         if (CoreRegistry.get(WorldRenderer.class).getSkysphere().getDaylight() == 0.0) {
             _exposure = MAX_EXPOSURE_NIGHT;
