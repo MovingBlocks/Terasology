@@ -24,7 +24,6 @@ import org.terasology.components.HealthComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.event.AddComponentEvent;
@@ -46,7 +45,7 @@ import java.util.concurrent.BlockingQueue;
 /**
  * @author Immortius
  */
-public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator implements BlockEntityRegistry, EventHandlerSystem, UpdateSubscriberSystem {
+public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator implements BlockEntityRegistry, UpdateSubscriberSystem {
     @In
     EntityManager entityManager;
 

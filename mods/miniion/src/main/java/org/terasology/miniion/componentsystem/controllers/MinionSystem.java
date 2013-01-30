@@ -17,6 +17,7 @@ package org.terasology.miniion.componentsystem.controllers;
 
 import javax.vecmath.Vector3f;
 
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.components.world.WorldComponent;
 import org.terasology.miniion.components.UIMessageQueue;
@@ -25,9 +26,8 @@ import org.terasology.rendering.gui.events.UIWindowOpenedEvent;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.input.events.MouseWheelEvent;
 import org.terasology.input.binds.AttackButton;
@@ -59,8 +59,8 @@ import org.terasology.utilities.FastRandom;
  * Minionsystem gives you some control over the minions.
  * this is the home of the minionbar.
  */
-@RegisterComponentSystem
-public class MinionSystem implements EventHandlerSystem {
+@RegisterSystem
+public class MinionSystem implements ComponentSystem {
 
     private static final int PRIORITY_LOCAL_PLAYER_OVERRIDE = 160;
     private static final int POPUP_ENTRIES = 9;

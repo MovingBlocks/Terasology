@@ -16,12 +16,12 @@
 package org.terasology.componentSystem.action;
 
 import org.terasology.components.InventoryComponent;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.components.actions.AccessInventoryActionComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.events.ActivateEvent;
 import org.terasology.events.OpenInventoryEvent;
@@ -33,8 +33,8 @@ import org.terasology.rendering.gui.windows.UIScreenContainer;
  * @author Immortius <immortius@gmail.com>
  */
 // TODO: Network
-@RegisterComponentSystem(RegisterMode.AUTHORITY)
-public class AccessInventoryAction implements EventHandlerSystem {
+@RegisterSystem(RegisterMode.AUTHORITY)
+public class AccessInventoryAction implements ComponentSystem {
 
     public void initialise() {
 

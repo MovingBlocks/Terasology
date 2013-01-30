@@ -40,7 +40,7 @@ public interface EventSystem {
      *
      * @param handler
      */
-    void registerEventHandler(EventHandlerSystem handler);
+    void registerEventHandler(ComponentSystem handler);
 
     /**
      * Registers an event receiver object

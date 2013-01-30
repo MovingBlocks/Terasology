@@ -21,7 +21,6 @@ import org.terasology.config.ModConfig;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.modes.StateLoading;
-import org.terasology.game.modes.StateSinglePlayer;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.network.NetworkMode;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;

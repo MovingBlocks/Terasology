@@ -26,7 +26,7 @@ import org.terasology.entityFactory.DroppedBlockFactory;
 import org.terasology.entityFactory.DroppedItemFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EventPriority;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.ActivateEvent;
@@ -78,7 +78,7 @@ import javax.vecmath.Vector3f;
 // TODO: This needs a really good cleanup
 // TODO: Move more input stuff to a specific input system?
 // TODO: Camera should become an entity/component, so it can follow the player naturally
-public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, EventHandlerSystem {
+public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
     private LocalPlayer localPlayer;
     private CameraTargetSystem cameraTargetSystem;
     private Timer timer;

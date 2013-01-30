@@ -186,7 +186,7 @@ public class StateLoading implements GameState {
         }
         if (current == null) {
             CoreRegistry.get(GUIManager.class).closeAllWindows();
-            CoreRegistry.get(GameEngine.class).changeState(new StateSinglePlayer());
+            CoreRegistry.get(GameEngine.class).changeState(new StateIngame());
         } else {
             if (currentExpectedSteps > 0) {
                 loadingScreen.updateStatus(current.getMessage(), 100f * completedSteps / currentExpectedSteps);
@@ -200,6 +200,11 @@ public class StateLoading implements GameState {
     @Override
     public void render() {
         CoreRegistry.get(GUIManager.class).render();
+    }
+
+    @Override
+    public boolean isHibernationAllowed() {
+        return false;
     }
 
 }

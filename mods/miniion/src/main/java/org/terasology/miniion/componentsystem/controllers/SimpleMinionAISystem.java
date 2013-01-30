@@ -23,9 +23,8 @@ import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.game.CoreRegistry;
@@ -52,8 +51,8 @@ import org.terasology.world.block.Block;
  * Time: 18:25
  * first evolution of the minion AI, could probably use a lot of improvements
  */
-@RegisterComponentSystem
-public class SimpleMinionAISystem implements EventHandlerSystem, UpdateSubscriberSystem {
+@RegisterSystem
+public class SimpleMinionAISystem implements UpdateSubscriberSystem {
 
     private EntityManager entityManager;
     private WorldProvider worldProvider;

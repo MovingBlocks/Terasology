@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.componentSystem.controllers.MenuControlSystem;
-import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EventSystem;
 import org.terasology.entitySystem.persistence.WorldPersister;
@@ -31,6 +30,7 @@ import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
+import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.rendering.world.WorldRenderer;
@@ -51,9 +51,9 @@ import static org.lwjgl.opengl.GL11.glLoadIdentity;
  * @author Anton Kireev <adeon.k87@gmail.com>
  * @version 0.1
  */
-public class StateSinglePlayer implements GameState {
+public class StateIngame implements GameState {
 
-    private static final Logger logger = LoggerFactory.getLogger(StateSinglePlayer.class);
+    private static final Logger logger = LoggerFactory.getLogger(StateIngame.class);
 
     private ComponentSystemManager componentSystemManager;
     private EventSystem eventSystem;
@@ -62,11 +62,13 @@ public class StateSinglePlayer implements GameState {
     private EntityManager entityManager;
     private CameraTargetSystem cameraTargetSystem;
     private InputSystem inputSystem;
+    private NetworkSystem networkSystem;
 
     /* GAME LOOP */
     private boolean pauseGame = false;
 
-    public StateSinglePlayer() {
+
+    public StateIngame() {
 
     }
 
@@ -78,6 +80,7 @@ public class StateSinglePlayer implements GameState {
         entityManager = CoreRegistry.get(EntityManager.class);
         cameraTargetSystem = CoreRegistry.get(CameraTargetSystem.class);
         inputSystem = CoreRegistry.get(InputSystem.class);
+        networkSystem = CoreRegistry.get(NetworkSystem.class);
 
         guiManager.openWindow(MenuControlSystem.HUD);
     }
@@ -144,6 +147,11 @@ public class StateSinglePlayer implements GameState {
         PerformanceMonitor.startActivity("Render and Update UI");
         renderUserInterface();
         PerformanceMonitor.endActivity();
+    }
+
+    @Override
+    public boolean isHibernationAllowed() {
+        return networkSystem.getMode() == NetworkMode.NONE;
     }
 
     public void renderUserInterface() {

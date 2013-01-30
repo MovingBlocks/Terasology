@@ -40,6 +40,7 @@ import org.terasology.asset.Assets;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.entitySystem.In;
 import org.terasology.game.CoreRegistry;
@@ -47,7 +48,6 @@ import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.widgets.UIItemContainer;
 import org.terasology.world.block.BlockItemComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.TeraMath;
@@ -70,7 +70,7 @@ import com.google.common.collect.Maps;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-@RegisterComponentSystem(whenHeadless = false)
+@RegisterSystem(whenHeadless = false)
 public class FirstPersonRenderer implements RenderSystem {
 
     @In

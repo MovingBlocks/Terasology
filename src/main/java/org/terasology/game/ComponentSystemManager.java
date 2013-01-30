@@ -24,9 +24,9 @@ import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.In;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.RegisterSystem;
+import org.terasology.entitySystem.Share;
 import org.terasology.network.NetworkMode;
 
 import java.lang.reflect.Field;
@@ -36,7 +36,14 @@ import java.util.Set;
 
 /**
  * Simple manager for component systems.
- * This is an initial, rough implementation to be improved later.
+ * The manager takes care of registering systems with the Core Registry (if they are marked as shared), initialising them
+ * and unloading them.
+ * The ComponentSystemManager has two states:
+ * <ul>
+ *     <li>Inactive: In this state the registered systems are created, but not initialised</li>
+ *     <li>Active: In this state all the registered systems are initialised</li>
+ * </ul>
+ * It becomes active when initialise() is called, and inactive when shutdown() is called.
  *
  * @author Immortius <immortius@gmail.com>
  */
@@ -48,6 +55,7 @@ public class ComponentSystemManager {
     private List<UpdateSubscriberSystem> updateSubscribers = Lists.newArrayList();
     private List<RenderSystem> renderSubscribers = Lists.newArrayList();
     private List<ComponentSystem> store = Lists.newArrayList();
+    private List<Class<?>> sharedSystems = Lists.newArrayList();
 
     public boolean initialised = false;
 
@@ -55,19 +63,24 @@ public class ComponentSystemManager {
     }
 
     public void loadSystems(String packageName, Reflections reflections, NetworkMode netMode) {
-        Set<Class<?>> systems = reflections.getTypesAnnotatedWith(RegisterComponentSystem.class);
+        Set<Class<?>> systems = reflections.getTypesAnnotatedWith(RegisterSystem.class);
         for (Class<?> system : systems) {
             if (!ComponentSystem.class.isAssignableFrom(system)) {
                 logger.error("Cannot load {}, must be a subclass of ComponentSystem", system.getSimpleName());
                 continue;
             }
 
-            RegisterComponentSystem registerInfo = system.getAnnotation(RegisterComponentSystem.class);
+            RegisterSystem registerInfo = system.getAnnotation(RegisterSystem.class);
             if (shouldRegister(registerInfo, netMode)) {
                 String id = packageName + ":" + system.getSimpleName();
                 logger.debug("Registering system {}", id);
                 try {
                     ComponentSystem newSystem = (ComponentSystem) system.newInstance();
+                    Share share = system.getAnnotation(Share.class);
+                    if (share != null && share.value() != null) {
+                        sharedSystems.add(share.value());
+                        CoreRegistry.put((Class<Object>)share.value(), newSystem);
+                    }
                     register(newSystem, id);
                     logger.debug("Loaded system {}", id);
                 } catch (InstantiationException e) {
@@ -80,7 +93,7 @@ public class ComponentSystemManager {
 
     }
 
-    private boolean shouldRegister(RegisterComponentSystem registerInfo, NetworkMode netMode) {
+    private boolean shouldRegister(RegisterSystem registerInfo, NetworkMode netMode) {
         switch (registerInfo.value()) {
             case AUTHORITY:
                 return netMode.isAuthority();
@@ -101,9 +114,7 @@ public class ComponentSystemManager {
         if (object instanceof RenderSystem) {
             renderSubscribers.add((RenderSystem) object);
         }
-        if (object instanceof EventHandlerSystem) {
-            CoreRegistry.get(EntityManager.class).getEventSystem().registerEventHandler((EventHandlerSystem) object);
-        }
+        CoreRegistry.get(EntityManager.class).getEventSystem().registerEventHandler(object);
         namedLookup.put(name, object);
 
         if (initialised) {
@@ -135,13 +146,19 @@ public class ComponentSystemManager {
         system.initialise();
     }
 
-    // TODO: unregister?
+    public boolean isActive() {
+        return initialised;
+    }
 
     public ComponentSystem get(String name) {
         return namedLookup.get(name);
     }
 
     private void clear() {
+        for (Class<?> sharedSystem : sharedSystems) {
+            CoreRegistry.remove(sharedSystem);
+        }
+        sharedSystems.clear();
         namedLookup.clear();
         store.clear();
         updateSubscribers.clear();

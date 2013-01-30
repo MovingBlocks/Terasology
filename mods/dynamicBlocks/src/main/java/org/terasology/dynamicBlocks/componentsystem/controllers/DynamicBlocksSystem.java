@@ -24,11 +24,10 @@ import org.terasology.dynamicBlocks.components.DynamicBlockComponent;
 import org.terasology.dynamicBlocks.componentsystem.entityfactory.DynamicFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.EventPriority;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.Timer;
@@ -47,8 +46,8 @@ import javax.vecmath.Vector3f;
 /**
  * @author Pencilcheck <pennsu@gmail.com>
  */
-@RegisterComponentSystem
-public final class DynamicBlocksSystem implements UpdateSubscriberSystem, EventHandlerSystem {
+@RegisterSystem
+public final class DynamicBlocksSystem implements UpdateSubscriberSystem {
     @In
     private LocalPlayer localPlayer;
 

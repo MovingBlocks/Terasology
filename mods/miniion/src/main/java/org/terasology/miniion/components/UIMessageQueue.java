@@ -24,7 +24,7 @@ import javax.vecmath.Vector2f;
 
 import org.lwjgl.opengl.Display;
 import org.terasology.asset.Assets;
-import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.miniion.minionenum.MinionMessagePriority;
 import org.terasology.miniion.utilities.MinionMessage;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
@@ -37,7 +37,7 @@ import org.terasology.rendering.gui.widgets.UIImage;
  * Time: 3:34
  * Queue for message icons containing miniion messages
  */
-public class UIMessageQueue extends UIDisplayContainer implements EventHandlerSystem {
+public class UIMessageQueue extends UIDisplayContainer implements ComponentSystem {
 
     private static final float ICON_SIZE = 32.0f;
 

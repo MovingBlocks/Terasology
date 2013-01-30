@@ -19,9 +19,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.world.block.BlockComponent;
@@ -32,8 +32,8 @@ import org.terasology.world.block.BlockComponent;
  *
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
-@RegisterComponentSystem
-public class PortalSystem implements EventHandlerSystem {
+@RegisterSystem
+public class PortalSystem implements ComponentSystem {
     protected EntityManager entityManager;
 
     private static final Logger logger = LoggerFactory.getLogger(SpawnerSystem.class);

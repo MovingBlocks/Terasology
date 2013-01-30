@@ -48,8 +48,8 @@ import java.util.Map;
 /**
  * @author Small-Jeeper
  */
-@RegisterComponentSystem
-public class CraftingAction implements EventHandlerSystem {
+@RegisterSystem
+public class CraftingAction implements ComponentSystem {
     private WorldProvider worldProvider;
     private EntityManager entityManager;
     private Map<String, ArrayList<Prefab>> entitesWithRecipes = Maps.newHashMap();

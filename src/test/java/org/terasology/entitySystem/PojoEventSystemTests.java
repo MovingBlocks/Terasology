@@ -162,7 +162,7 @@ public class PojoEventSystemTests {
 
     }
 
-    public static class TestEventHandler implements EventHandlerSystem {
+    public static class TestEventHandler implements ComponentSystem {
 
         List<Received> receivedList = Lists.newArrayList();
         List<Received> childEventReceived = Lists.newArrayList();
@@ -202,7 +202,7 @@ public class PojoEventSystemTests {
     }
 
 
-    public static class TestHighPriorityEventHandler implements EventHandlerSystem {
+    public static class TestHighPriorityEventHandler implements ComponentSystem {
 
         List<Received> receivedList = Lists.newArrayList();
         public boolean cancel = false;
@@ -240,7 +240,7 @@ public class PojoEventSystemTests {
         }
     }
 
-    public static class TestCompoundComponentEventHandler implements EventHandlerSystem {
+    public static class TestCompoundComponentEventHandler implements ComponentSystem {
 
         List<Received> receivedList = Lists.newArrayList();
 

@@ -9,9 +9,8 @@ import org.terasology.componentSystem.RenderSystem;
 import org.terasology.components.utility.DroppedItemTypeComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.game.CoreRegistry;
@@ -38,8 +37,8 @@ import static org.lwjgl.opengl.GL11.glTranslated;
 * @author Small-Jeeper
 */
 
-@RegisterComponentSystem()
-public class DroppedItemsRenderer implements RenderSystem, EventHandlerSystem {
+@RegisterSystem()
+public class DroppedItemsRenderer implements RenderSystem {
     private static final Logger logger = LoggerFactory.getLogger(MeshRenderer.class);
     private WorldRenderer worldRenderer;
     private Set<EntityRef> itemMesh = Sets.newHashSet();

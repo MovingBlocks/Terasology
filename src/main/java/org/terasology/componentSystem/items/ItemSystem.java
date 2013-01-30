@@ -15,23 +15,19 @@
  */
 package org.terasology.componentSystem.items;
 
-import javax.vecmath.Vector3f;
-
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.RegisterMode;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.math.TeraMath;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockItemComponent;
-import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EventPriority;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
@@ -53,8 +49,8 @@ import com.google.common.collect.Lists;
  *
  * @author Immortius <immortius@gmail.com>
  */
-@RegisterComponentSystem(RegisterMode.AUTHORITY)
-public class ItemSystem implements EventHandlerSystem {
+@RegisterSystem(RegisterMode.AUTHORITY)
+public class ItemSystem implements ComponentSystem {
     @In
     private WorldProvider worldProvider;
 

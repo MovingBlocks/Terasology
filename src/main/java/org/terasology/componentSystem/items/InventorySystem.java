@@ -17,13 +17,12 @@ package org.terasology.componentSystem.items;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.spi.LocationAwareLogger;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.events.inventory.ReceiveItemEvent;
@@ -34,8 +33,8 @@ import org.terasology.network.NetworkComponent;
  *
  * @author Immortius <immortius@gmail.com>
  */
-@RegisterComponentSystem(RegisterMode.AUTHORITY)
-public class InventorySystem implements EventHandlerSystem {
+@RegisterSystem(RegisterMode.AUTHORITY)
+public class InventorySystem implements ComponentSystem {
 
     // TODO: differ per item?
     public static final byte MAX_STACK = (byte) 99;

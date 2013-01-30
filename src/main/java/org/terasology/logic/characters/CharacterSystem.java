@@ -19,10 +19,10 @@ package org.terasology.logic.characters;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.events.ActivateEvent;
 import org.terasology.events.DamageEvent;
@@ -44,8 +44,8 @@ import javax.vecmath.Vector3f;
 /**
  * @author Immortius
  */
-@RegisterComponentSystem(RegisterMode.SERVER)
-public class CharacterSystem implements EventHandlerSystem {
+@RegisterSystem(RegisterMode.SERVER)
+public class CharacterSystem implements ComponentSystem {
 
     @In
     private BulletPhysics physics;

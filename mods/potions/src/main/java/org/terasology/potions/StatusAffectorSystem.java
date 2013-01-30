@@ -20,9 +20,8 @@ import org.terasology.components.HealthComponent;
 import org.terasology.components.world.WorldComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.events.HealthChangedEvent;
 import org.terasology.events.NoHealthEvent;
 import org.terasology.game.CoreRegistry;
@@ -32,8 +31,8 @@ import org.terasology.rendering.gui.events.UIWindowOpenedEvent;
 /**
  * Status Affector System : Different Effect Handling [Affecting the player]
  */
-@RegisterComponentSystem
-public class StatusAffectorSystem implements EventHandlerSystem, UpdateSubscriberSystem {
+@RegisterSystem
+public class StatusAffectorSystem implements UpdateSubscriberSystem {
     protected EntityManager entityManager;
 
     public void initialise() {

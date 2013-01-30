@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.components.world.WorldComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EventPriority;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.game.CoreRegistry;
@@ -69,7 +69,7 @@ import javax.vecmath.Vector2f;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
 
-public class GUIManager implements EventHandlerSystem {
+public class GUIManager implements ComponentSystem {
 
     private static final Logger logger = LoggerFactory.getLogger(GUIManager.class);
     private UIDisplayRenderer renderer;

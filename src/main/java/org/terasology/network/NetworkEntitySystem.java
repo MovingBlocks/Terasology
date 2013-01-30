@@ -2,7 +2,7 @@ package org.terasology.network;
 
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.event.AddComponentEvent;
@@ -11,7 +11,7 @@ import org.terasology.entitySystem.event.RemovedComponentEvent;
 /**
  * @author Immortius
  */
-public class NetworkEntitySystem implements EventHandlerSystem {
+public class NetworkEntitySystem implements ComponentSystem {
 
     @In
     private NetworkSystem networkSystem;

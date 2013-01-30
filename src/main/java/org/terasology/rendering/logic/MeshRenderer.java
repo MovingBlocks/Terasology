@@ -35,10 +35,9 @@ import org.terasology.componentSystem.RenderSystem;
 import org.terasology.components.utility.DroppedItemTypeComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.ChangedComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
@@ -91,8 +90,8 @@ import static org.lwjgl.opengl.GL11.glVertexPointer;
  *
  * @author Immortius <immortius@gmail.com>
  */
-@RegisterComponentSystem(whenHeadless = false)
-public class MeshRenderer implements RenderSystem, EventHandlerSystem {
+@RegisterSystem(whenHeadless = false)
+public class MeshRenderer implements RenderSystem {
     private static final Logger logger = LoggerFactory.getLogger(MeshRenderer.class);
 
     @In

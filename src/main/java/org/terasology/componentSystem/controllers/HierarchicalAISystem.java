@@ -20,9 +20,9 @@ import org.terasology.components.HierarchicalAIComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.HorizontalCollisionEvent;
@@ -42,8 +42,8 @@ import javax.vecmath.Vector3f;
  *
  * @author Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
  */
-@RegisterComponentSystem(RegisterMode.AUTHORITY)
-public class HierarchicalAISystem implements EventHandlerSystem,
+@RegisterSystem(RegisterMode.AUTHORITY)
+public class HierarchicalAISystem implements ComponentSystem,
         UpdateSubscriberSystem {
 
     private WorldProvider worldProvider;

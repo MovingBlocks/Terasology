@@ -29,10 +29,9 @@ import javax.vecmath.Vector3f;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.EventPriority;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.ChangedComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
@@ -69,8 +68,8 @@ import com.google.common.collect.Maps;
 /**
  * @author Immortius
  */
-@RegisterComponentSystem
-public class PhysicsSystem implements EventHandlerSystem, UpdateSubscriberSystem {
+@RegisterSystem
+public class PhysicsSystem implements UpdateSubscriberSystem {
 
     private BulletPhysics physics;
     private Map<EntityRef, RigidBody> entityRigidBodies = Maps.newHashMap();

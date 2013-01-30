@@ -3,39 +3,32 @@ package org.terasology.logic.characters;
 import com.bulletphysics.collision.dispatch.CollisionFlags;
 import com.bulletphysics.collision.shapes.CapsuleShape;
 import com.bulletphysics.collision.shapes.ConvexShape;
-import com.bulletphysics.linearmath.QuaternionUtil;
-import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.game.Timer;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.TeraMath;
-import org.terasology.math.Vector3fUtil;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.utilities.collection.CircularBuffer;
 import org.terasology.world.WorldProvider;
 
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.util.Map;
 
 /**
  * @author Immortius
  */
-@RegisterComponentSystem(RegisterMode.AUTHORITY)
-public class ServerCharacterPredictionSystem implements EventHandlerSystem, UpdateSubscriberSystem {
+@RegisterSystem(RegisterMode.AUTHORITY)
+public class ServerCharacterPredictionSystem implements UpdateSubscriberSystem {
     private static final int BUFFER_SIZE = 128;
     private static final int TIME_BETWEEN_STATE_REPLICATE = 50;
     public static final int RENDER_DELAY = 100;

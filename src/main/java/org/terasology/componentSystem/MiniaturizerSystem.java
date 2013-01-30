@@ -26,7 +26,7 @@ import org.lwjgl.opengl.GL11;
 import org.terasology.components.actions.MiniaturizerComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.primitives.ChunkMesh;
@@ -35,7 +35,7 @@ import org.terasology.rendering.world.WorldRenderer;
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-@RegisterComponentSystem(whenHeadless = false)
+@RegisterSystem(whenHeadless = false)
 public class MiniaturizerSystem implements UpdateSubscriberSystem, RenderSystem {
 
     private EntityManager entityManager;

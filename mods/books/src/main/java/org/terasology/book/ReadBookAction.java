@@ -16,9 +16,9 @@
 package org.terasology.book;
 
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.GUIManager;
@@ -29,8 +29,8 @@ import org.terasology.logic.manager.GUIManager;
  *
  * @author bi0hax
  */
-@RegisterComponentSystem
-public class ReadBookAction implements EventHandlerSystem {
+@RegisterSystem
+public class ReadBookAction implements ComponentSystem {
 
     public void initialise() {
         CoreRegistry.get(GUIManager.class).registerWindow("book", UIScreenBook.class);

@@ -22,7 +22,7 @@ import org.terasology.components.HealthComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.Vector3i;
@@ -56,7 +56,7 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-@RegisterComponentSystem(whenHeadless = false)
+@RegisterSystem(whenHeadless = false)
 public class BlockDamageRenderer implements RenderSystem {
 
     @In

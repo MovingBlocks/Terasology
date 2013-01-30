@@ -17,12 +17,6 @@ package org.terasology.rendering.gui.widgets;
 
 import org.terasology.components.InventoryComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.entitySystem.EventPriority;
-import org.terasology.entitySystem.EventSystem;
-import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.event.ChangedComponentEvent;
-import org.terasology.game.CoreRegistry;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 
 import javax.vecmath.Vector2f;

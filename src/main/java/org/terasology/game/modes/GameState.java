@@ -33,4 +33,8 @@ public interface GameState {
 
     public void render();
 
+    /**
+     * @return Whether the game should hibernate when it loses focus
+     */
+    boolean isHibernationAllowed();
 }

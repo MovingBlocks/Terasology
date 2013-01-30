@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface RegisterComponentSystem {
+public @interface RegisterSystem {
     RegisterMode value() default RegisterMode.ALWAYS;
     boolean whenHeadless() default true;
 }

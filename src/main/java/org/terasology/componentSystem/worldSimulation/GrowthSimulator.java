@@ -24,11 +24,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
@@ -44,8 +44,8 @@ import com.google.common.collect.Queues;
 /**
  * @author Immortius
  */
-@RegisterComponentSystem
-public class GrowthSimulator implements EventHandlerSystem {
+@RegisterSystem
+public class GrowthSimulator implements ComponentSystem {
 
     private static final Logger logger = LoggerFactory.getLogger(GrowthSimulator.class);
 

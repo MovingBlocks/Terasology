@@ -20,7 +20,7 @@ import com.google.common.collect.Maps;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EventSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.input.events.InputEvent;
@@ -52,7 +52,7 @@ import java.util.Map;
  * In addition to raw keyboard and mouse input, the system handles Bind Buttons and Bind Axis, which can be mapped
  * to one or more inputs.
  */
-public class InputSystem implements EventHandlerSystem {
+public class InputSystem implements ComponentSystem {
 
     private float mouseSensitivity = (float) Config.getInstance().getMouseSens();
 

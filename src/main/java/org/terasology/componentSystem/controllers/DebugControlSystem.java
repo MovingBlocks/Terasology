@@ -17,12 +17,12 @@
 package org.terasology.componentSystem.controllers;
 
 import org.lwjgl.input.Keyboard;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.DamageEvent;
 import org.terasology.input.events.KeyDownEvent;
 import org.terasology.input.events.KeyEvent;
@@ -38,8 +38,8 @@ import org.terasology.world.WorldProvider;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  * @author Immortius
  */
-@RegisterComponentSystem
-public class DebugControlSystem implements EventHandlerSystem {
+@RegisterSystem
+public class DebugControlSystem implements ComponentSystem {
 
     private UIScreenMetrics metrics;
 

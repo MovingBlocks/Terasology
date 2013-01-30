@@ -33,7 +33,7 @@ import org.terasology.entitySystem.AbstractEvent;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Event;
-import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EventPriority;
 import org.terasology.entitySystem.EventReceiver;
 import org.terasology.entitySystem.EventSystem;
@@ -125,7 +125,7 @@ public class PojoEventSystem implements EventSystem {
     }
 
     @Override
-    public void registerEventHandler(EventHandlerSystem handler) {
+    public void registerEventHandler(ComponentSystem handler) {
         Class handlerClass = handler.getClass();
         // TODO: Support private methods
         if (!Modifier.isPublic(handlerClass.getModifiers())) {
@@ -309,12 +309,12 @@ public class PojoEventSystem implements EventSystem {
     }
 
     private class ReflectedEventHandlerInfo implements EventHandlerInfo {
-        private EventHandlerSystem handler;
+        private ComponentSystem handler;
         private Method method;
         private Class<? extends Component>[] components;
         private int priority;
 
-        public ReflectedEventHandlerInfo(EventHandlerSystem handler, Method method, int priority, Class<? extends Component>... components) {
+        public ReflectedEventHandlerInfo(ComponentSystem handler, Method method, int priority, Class<? extends Component>... components) {
             this.handler = handler;
             this.method = method;
             this.components = Arrays.copyOf(components, components.length);

@@ -21,9 +21,8 @@ import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.HealthComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.HealthChangedEvent;
@@ -35,8 +34,8 @@ import org.terasology.game.CoreRegistry;
  * @author Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
  * 
  */
-@RegisterComponentSystem(RegisterMode.AUTHORITY)
-public class HungerSystem implements EventHandlerSystem, UpdateSubscriberSystem {
+@RegisterSystem(RegisterMode.AUTHORITY)
+public class HungerSystem implements UpdateSubscriberSystem {
 	private static final Logger logger = LoggerFactory.getLogger(HungerSystem.class);
     private EntityManager entityManager;
 

@@ -21,9 +21,9 @@ import org.terasology.audio.Sound;
 import org.terasology.components.CharacterSoundComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.events.FootstepEvent;
 import org.terasology.events.JumpEvent;
@@ -35,8 +35,8 @@ import org.terasology.utilities.FastRandom;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-@RegisterComponentSystem(RegisterMode.ALWAYS)
-public class CharacterSoundSystem implements EventHandlerSystem {
+@RegisterSystem(RegisterMode.ALWAYS)
+public class CharacterSoundSystem implements ComponentSystem {
 
     private FastRandom random = new FastRandom();
 

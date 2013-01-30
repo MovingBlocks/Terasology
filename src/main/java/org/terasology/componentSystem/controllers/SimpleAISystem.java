@@ -20,9 +20,8 @@ import org.terasology.components.SimpleAIComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.game.CoreRegistry;
@@ -39,8 +38,8 @@ import javax.vecmath.Vector3f;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-@RegisterComponentSystem(RegisterMode.AUTHORITY)
-public class SimpleAISystem implements EventHandlerSystem, UpdateSubscriberSystem {
+@RegisterSystem(RegisterMode.AUTHORITY)
+public class SimpleAISystem implements UpdateSubscriberSystem {
 
     private WorldProvider worldProvider;
     private EntityManager entityManager;

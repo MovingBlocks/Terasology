@@ -22,9 +22,9 @@ import org.terasology.components.ItemComponent;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AudioManager;
@@ -33,8 +33,8 @@ import org.terasology.physics.CollideEvent;
 /**
  * @author Immortius
  */
-@RegisterComponentSystem
-public class BlockPickupSystem implements EventHandlerSystem {
+@RegisterSystem
+public class BlockPickupSystem implements ComponentSystem {
 
     private BlockItemFactory blockItemFactory;
 

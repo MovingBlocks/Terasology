@@ -19,10 +19,10 @@ package org.terasology.logic.players;
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.game.Timer;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.binds.AttackButton;
@@ -39,8 +39,8 @@ import org.terasology.rendering.world.WorldRenderer;
 /**
  * @author Immortius
  */
-@RegisterComponentSystem
-public class PlayerInventorySystem implements EventHandlerSystem {
+@RegisterSystem
+public class PlayerInventorySystem implements ComponentSystem {
 
     @In
     private LocalPlayer localPlayer;

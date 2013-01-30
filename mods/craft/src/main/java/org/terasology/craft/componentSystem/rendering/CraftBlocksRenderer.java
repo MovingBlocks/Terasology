@@ -48,8 +48,8 @@ import static org.lwjgl.opengl.GL11.glEnd;
 /**
  * @author Small-Jeeper
  */
-@RegisterComponentSystem()
-public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
+@RegisterSystem()
+public class CraftBlocksRenderer implements RenderSystem  {
     private Texture toolTipTexture;
     private Texture terrainTex;
     private WorldProvider worldProvider;

@@ -129,6 +129,11 @@ public class StateMainMenu implements GameState {
         renderUserInterface();
     }
 
+    @Override
+    public boolean isHibernationAllowed() {
+        return true;
+    }
+
     public void renderUserInterface() {
         guiManager.render();
     }

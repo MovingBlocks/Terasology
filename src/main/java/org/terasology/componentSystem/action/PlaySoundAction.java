@@ -20,9 +20,9 @@ import javax.vecmath.Vector3f;
 import org.terasology.audio.Sound;
 import org.terasology.components.actions.PlaySoundActionComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.events.ActivateEvent;
 import org.terasology.logic.manager.AudioManager;
@@ -32,8 +32,8 @@ import org.terasology.utilities.FastRandom;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-@RegisterComponentSystem(RegisterMode.ALWAYS)
-public class PlaySoundAction implements EventHandlerSystem {
+@RegisterSystem(RegisterMode.ALWAYS)
+public class PlaySoundAction implements ComponentSystem {
 
     private FastRandom random = new FastRandom();
 

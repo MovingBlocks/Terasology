@@ -39,7 +39,7 @@ import java.util.Set;
  *
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
-@RegisterComponentSystem
+@RegisterSystem
 public class SpawnerSystem implements UpdateSubscriberSystem {
     @In
     private WorldProvider worldProvider;

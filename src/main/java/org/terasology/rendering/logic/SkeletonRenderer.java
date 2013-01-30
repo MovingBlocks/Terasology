@@ -26,13 +26,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.players.LocalPlayer;
@@ -57,8 +56,8 @@ import static org.lwjgl.opengl.GL11.glVertex3f;
 /**
  * @author Immortius
  */
-@RegisterComponentSystem
-public class SkeletonRenderer implements RenderSystem, EventHandlerSystem, UpdateSubscriberSystem {
+@RegisterSystem
+public class SkeletonRenderer implements RenderSystem, UpdateSubscriberSystem {
 
     private static final Logger logger = LoggerFactory.getLogger(SkeletonRenderer.class);
 

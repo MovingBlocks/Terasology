@@ -46,8 +46,7 @@ import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;
-import org.terasology.entitySystem.RegisterComponentSystem;
-import org.terasology.game.CoreRegistry;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
@@ -62,7 +61,7 @@ import org.terasology.world.block.management.BlockManager;
  */
 // TODO: Generalise for non-block particles
 // TODO: Dispose display lists
-@RegisterComponentSystem(whenHeadless = false)
+@RegisterSystem(whenHeadless = false)
 public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, RenderSystem {
     private static final int PARTICLES_PER_UPDATE = 32;
     private static final float TEX_SIZE = Block.TEXTURE_OFFSET / 4f;

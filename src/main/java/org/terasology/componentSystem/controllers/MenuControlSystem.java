@@ -17,11 +17,11 @@
 package org.terasology.componentSystem.controllers;
 
 import org.lwjgl.input.Keyboard;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.NoHealthEvent;
 import org.terasology.input.events.KeyDownEvent;
 import org.terasology.input.binds.ConsoleButton;
@@ -35,8 +35,8 @@ import org.terasology.rendering.world.WorldRenderer;
 /**
  * @author Immortius
  */
-@RegisterComponentSystem
-public class MenuControlSystem implements EventHandlerSystem {
+@RegisterSystem
+public class MenuControlSystem implements ComponentSystem {
 
     public static final String PAUSE_MENU = "pause";
     public static final String INVENTORY = "inventory";

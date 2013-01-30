@@ -397,8 +397,7 @@ public class TerasologyEngine implements GameEngine {
         while (running && !Display.isCloseRequested()) {
 
             // Only process rendering and updating once a second
-            // TODO: Add debug config setting to run even if display inactive
-            if (!Display.isActive() && CoreRegistry.get(NetworkSystem.class).getMode() == NetworkMode.NONE) {
+            if (!Display.isActive() && currentState.isHibernationAllowed()) {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -432,12 +431,12 @@ public class TerasologyEngine implements GameEngine {
             Display.sync(60);
             PerformanceMonitor.endActivity();
 
-            PerformanceMonitor.startActivity("Input");
-            currentState.handleInput(timer.getDelta());
-            PerformanceMonitor.endActivity();
-
             PerformanceMonitor.startActivity("Audio");
             AudioManager.getInstance().update();
+            PerformanceMonitor.endActivity();
+
+            PerformanceMonitor.startActivity("Input");
+            currentState.handleInput(timer.getDelta());
             PerformanceMonitor.endActivity();
 
             PerformanceMonitor.rollCycle();

@@ -22,7 +22,7 @@ import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EventSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.event.ChangedComponentEvent;
@@ -50,7 +50,7 @@ import javax.vecmath.Vector4f;
  *         <p/>
  *         TODO clean up -> remove debug stuff, move to debug window together with metrics
  */
-public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
+public class UIScreenHUD extends UIWindow implements ComponentSystem {
 
     protected EntityManager entityManager;
 

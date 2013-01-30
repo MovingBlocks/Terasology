@@ -4,10 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.events.messaging.ChatMessageEvent;
 import org.terasology.events.messaging.SendChatMessage;
 import org.terasology.logic.manager.MessageManager;
@@ -17,8 +17,8 @@ import org.terasology.network.NetworkSystem;
 /**
  * @author Immortius
  */
-@RegisterComponentSystem
-public class MessagingSystem implements EventHandlerSystem {
+@RegisterSystem
+public class MessagingSystem implements ComponentSystem {
     private static final Logger logger = LoggerFactory.getLogger(MessagingSystem.class);
 
     @In

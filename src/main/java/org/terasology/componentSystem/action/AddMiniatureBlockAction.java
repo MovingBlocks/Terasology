@@ -16,12 +16,11 @@
 package org.terasology.componentSystem.action;
 
 import org.terasology.components.actions.MiniaturizerComponent;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
-import org.terasology.entitySystem.RegisterMode;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.world.BlockGrid;
@@ -29,15 +28,14 @@ import org.terasology.world.MiniatureChunk;
 import org.terasology.world.WorldProvider;
 
 import javax.vecmath.Vector3f;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 // TODO: Network
-@RegisterComponentSystem()
-public class AddMiniatureBlockAction implements EventHandlerSystem {
+@RegisterSystem()
+public class AddMiniatureBlockAction implements ComponentSystem {
 
     @In
     private WorldProvider worldProvider;

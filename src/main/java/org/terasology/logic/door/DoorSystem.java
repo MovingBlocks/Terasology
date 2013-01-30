@@ -22,25 +22,22 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.audio.Sound;
 import org.terasology.components.BlockParticleEffectComponent;
-import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityInfoComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.NoHealthEvent;
 import org.terasology.events.inventory.ReceiveItemEvent;
-import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
-import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
@@ -53,8 +50,8 @@ import javax.vecmath.Vector3f;
 /**
  * @author Immortius
  */
-@RegisterComponentSystem
-public class DoorSystem implements EventHandlerSystem {
+@RegisterSystem
+public class DoorSystem implements ComponentSystem {
     private static final Logger logger = LoggerFactory.getLogger(DoorSystem.class);
 
     @In

@@ -5,16 +5,17 @@ import org.terasology.asset.AssetUri;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.utility.DroppedItemTypeComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.physics.CollideEvent;
 
 
-@RegisterComponentSystem
-public class ItemPickupSystem implements EventHandlerSystem {
+@RegisterSystem
+public class ItemPickupSystem implements ComponentSystem {
+
     @Override
     public void initialise() {
     }

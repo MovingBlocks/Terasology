@@ -22,12 +22,12 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.components.world.WorldComponent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
@@ -49,8 +49,8 @@ import com.google.common.collect.Queues;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-@RegisterComponentSystem
-public class LiquidSimulator implements EventHandlerSystem {
+@RegisterSystem
+public class LiquidSimulator implements ComponentSystem {
 
     private static int NUM_THREADS = 2;
     private static byte MAX_LIQUID_DEPTH = 0x7;

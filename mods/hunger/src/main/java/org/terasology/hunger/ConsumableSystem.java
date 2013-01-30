@@ -20,10 +20,10 @@ import org.slf4j.LoggerFactory;
 import org.terasology.components.ItemComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.game.CoreRegistry;
 import org.terasology.hunger.events.*;
 import org.terasology.world.WorldProvider;
@@ -37,8 +37,8 @@ import org.terasology.events.ActivateEvent;
  *
  * @author Esa-Petri Tirkkonen <esereja@yahoo.co.uk>
  */
-@RegisterComponentSystem
-public class ConsumableSystem implements EventHandlerSystem {
+@RegisterSystem
+public class ConsumableSystem implements ComponentSystem {
 	 protected EntityManager entityManager;
     private static final Logger logger = LoggerFactory.getLogger(ConsumableSystem.class);
 

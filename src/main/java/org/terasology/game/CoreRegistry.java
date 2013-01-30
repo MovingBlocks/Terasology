@@ -48,6 +48,10 @@ public class CoreRegistry {
         return type.cast(store.get(type));
     }
 
+    public static <T> void remove(Class<T> type) {
+        store.remove(type);
+    }
+
     private CoreRegistry() {
     }
 }

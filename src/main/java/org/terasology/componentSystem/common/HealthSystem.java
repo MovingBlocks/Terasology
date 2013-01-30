@@ -19,9 +19,9 @@ import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.HealthComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.FullHealthEvent;
@@ -33,8 +33,8 @@ import org.terasology.game.CoreRegistry;
 /**
  * @author Immortius <immortius@gmail.com>
  */
-@RegisterComponentSystem(RegisterMode.AUTHORITY)
-public class HealthSystem implements EventHandlerSystem, UpdateSubscriberSystem {
+@RegisterSystem(RegisterMode.AUTHORITY)
+public class HealthSystem implements ComponentSystem, UpdateSubscriberSystem {
 
     private EntityManager entityManager;
 
