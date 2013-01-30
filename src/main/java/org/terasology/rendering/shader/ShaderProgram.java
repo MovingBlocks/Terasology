@@ -125,8 +125,9 @@ public class ShaderProgram {
         GL20.glShaderSource(shaderId, shader.toString());
         GL20.glCompileShader(shaderId);
 
-        if (!printLogInfo(shaderId)) {
-            JOptionPane.showMessageDialog(null, "Shader '"+title+"' failed to compile. Terasology might not look quite as good as it should now...", "Shader compilation error", JOptionPane.ERROR_MESSAGE);
+        String error;
+        if ((error = printLogInfo(shaderId)) != null) {
+            JOptionPane.showMessageDialog(null, "Shader '"+title+"' failed to compile. Terasology might not look quite as good as it should now...\n\n"+error, "Shader compilation error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -144,16 +145,17 @@ public class ShaderProgram {
         return code;
     }
 
-    private boolean printLogInfo(int shaderId) {
+    private String printLogInfo(int shaderId) {
         int length = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects.GL_OBJECT_INFO_LOG_LENGTH_ARB);
 
         if (length <= 1) {
-            return true;
+            return null;
         }
 
         String logEntry = ARBShaderObjects.glGetInfoLogARB(shaderId, length);
         logger.error("{}", logEntry);
-        return false;
+
+        return logEntry;
     }
 
     public void enable() {

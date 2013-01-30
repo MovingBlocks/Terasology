@@ -21,10 +21,14 @@ import java.util.HashMap;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
+
+import javax.swing.*;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -42,6 +46,8 @@ public class PostProcessingRenderer {
     public static final float MIN_EXPOSURE = 0.5f;
     public static final float TARGET_LUMINANCE = 1.5f;
     public static final float ADJUSTMENT_SPEED = 0.0075f;
+
+    private static final Logger logger = LoggerFactory.getLogger(PostProcessingRenderer.class);
 
     private static PostProcessingRenderer _instance = null;
     private float _exposure = 2.0f;
@@ -124,6 +130,11 @@ public class PostProcessingRenderer {
 
         if (_extensionsAvailable) {
             initialize();
+        } else {
+            final String message = "Your graphics driver does not support the needed OpenGL extensions to run Terasology. Terasology might not look quite as good as it should now...";
+            logger.error(message);
+
+            JOptionPane.showMessageDialog(null, message, "OpenGL extension(s) unavailable", JOptionPane.ERROR_MESSAGE);
         }
     }
 
