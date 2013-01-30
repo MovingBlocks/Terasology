@@ -17,6 +17,13 @@ package org.terasology.miniion.minionenum;
 
 public enum ZoneType {
 	Gather,
-	Work,
-	Rest
+	Work,	
+	Terraform	
 }
+
+/*
+ * Build,
+	Eat,
+	Rest,Farm,
+	Home
+	*/

@@ -34,6 +34,7 @@ public enum MinionBehaviour {
     Gather,
     Work,
     Patrol,
+    Terraform,
     Test,
     Inventory,
     Disappear,

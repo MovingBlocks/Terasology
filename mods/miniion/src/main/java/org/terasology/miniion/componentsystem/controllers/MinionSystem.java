@@ -179,6 +179,10 @@ public class MinionSystem implements EventHandlerSystem {
 				zonelistcomp.Workzones.add(zone);
 				break;
 			}
+			case Terraform : {
+				zonelistcomp.Terrazones.add(zone);
+				break;
+			}
 		}		
 		zonelist.saveComponent(zonelistcomp);
 	}
@@ -205,6 +209,18 @@ public class MinionSystem implements EventHandlerSystem {
 			return null;
 		}
 		return zonelist.getComponent(ZoneListComponent.class).Workzones;
+	}
+	
+	/**
+	 * returns a list with all terraform zones
+	 * @return
+	 * 			a list with all terraform zones
+	 */
+	public static List<Zone> getTerraformZoneList() {
+		if (zonelist == null) {
+			return null;
+		}
+		return zonelist.getComponent(ZoneListComponent.class).Terrazones;
 	}
 	
 	public static List<MinionRecipe> getRecipesList(){
@@ -382,6 +398,12 @@ public class MinionSystem implements EventHandlerSystem {
 
 	@Override
 	public void shutdown() {
+		if(activeminion != null){
+			SkeletalMeshComponent skelcomp = activeminion.getComponent(SkeletalMeshComponent.class);
+			if (skelcomp != null) {
+				skelcomp.material = Assets.getMaterial("OreoMinions:OreonSkin");
+			}
+		}
 	}
 
 	/**

@@ -107,52 +107,51 @@ public class SimpleMinionAISystem implements EventHandlerSystem,
 				}
 			}
 			
-			
-			//moveComp.getDrive().set(0, 0, 0);
-			LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-			if (localPlayer != null) {
-				switch (minioncomp.minionBehaviour) {
-				case Follow: {
-					executeFollowAI(localPlayer, entity);
-					break;
-				}
-				case Gather: {
-					executeGatherAI(entity);
-					break;
-				}
-				case Work: {
-					executeWorkAI(entity);
-					break;
-				}
-				case Move: {
-					executeMoveAI(entity);
-					break;
-				}
-				case Patrol: {
-					executePatrolAI(entity);
-					break;
-				}
-				case Attack: {
-					changeAnimation(entity, animcomp.attackAnim, true);
-					break;
-				}
-				case Die: {
-					changeAnimation(entity, animcomp.dieAnim, false);
-					break;
-				}
-				case Stay: {
-					changeAnimation(entity, animcomp.idleAnim, false);
-					break;
-				}
-				case Test: {
-					executeTestAI(localPlayer, entity);
-					break;
-				}
-				default: {
-					changeAnimation(entity, animcomp.idleAnim, false);
-					break;
-				}
-				}
+			switch (minioncomp.minionBehaviour) {
+			case Follow: {
+				executeFollowAI(entity);
+				break;
+			}
+			case Gather: {
+				executeGatherAI(entity);
+				break;
+			}
+			case Work: {
+				executeWorkAI(entity);
+				break;
+			}
+			case Terraform: {
+				executeTerraformAI(entity);
+				break;
+			}
+			case Move: {
+				executeMoveAI(entity);
+				break;
+			}
+			case Patrol: {
+				executePatrolAI(entity);
+				break;
+			}
+			case Attack: {
+				changeAnimation(entity, animcomp.attackAnim, true);
+				break;
+			}
+			case Die: {
+				changeAnimation(entity, animcomp.dieAnim, false);
+				break;
+			}
+			case Stay: {
+				changeAnimation(entity, animcomp.idleAnim, false);
+				break;
+			}
+			case Test: {
+				executeTestAI(entity);
+				break;
+			}
+			default: {
+				changeAnimation(entity, animcomp.idleAnim, false);
+				break;
+			}
 			}
 		}
 	}
@@ -172,7 +171,11 @@ public class SimpleMinionAISystem implements EventHandlerSystem,
 			SkeletalMeshComponent skeletalcomp, AnimationComponent animcomp) {
 	}
 
-	private void executeFollowAI(LocalPlayer localPlayer, EntityRef entity) {
+	private void executeFollowAI(EntityRef entity) {
+		LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+		if (localPlayer != null) {
+			return;
+		}
 		LocationComponent location = entity
 				.getComponent(LocationComponent.class);
 		SimpleMinionAIComponent ai = entity
@@ -208,11 +211,10 @@ public class SimpleMinionAISystem implements EventHandlerSystem,
 			getTargetsfromZone(minioncomp, ai);
 		}
 
-		List<Vector3f> targets = ai.gatherTargets;
-		if ((targets == null) || (targets.size() < 1)) {
+		if ((ai.gatherTargets == null) || (ai.gatherTargets.size() < 1)) {
 			return;
 		}
-		Vector3f currentTarget = targets.get(0);
+		Vector3f currentTarget = ai.gatherTargets.get(0);
 		if (currentTarget == null) {
 			ai.gatherTargets.remove(currentTarget);
 			changeAnimation(entity, animcomp.idleAnim, true);
@@ -227,7 +229,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem,
 			// switch animation
 			changeAnimation(entity, animcomp.workAnim, false);
 			// gather the block
-			if (timer.getTimeInMs() - ai.lastAttacktime > 1000) {
+			if (timer.getTimeInMs() - ai.lastAttacktime > 500) {
 				ai.lastAttacktime = timer.getTimeInMs();
 				boolean attacked = attack(entity, currentTarget);
 				if (!attacked) {
@@ -255,7 +257,6 @@ public class SimpleMinionAISystem implements EventHandlerSystem,
 				}
 			}
 		}
-
 	}
 	
 	private void executeWorkAI(EntityRef entity) {
@@ -349,6 +350,94 @@ public class SimpleMinionAISystem implements EventHandlerSystem,
 		entity.saveComponent(ai);
 		setMovement(currentTarget, entity);
 	}
+	
+	private void executeTerraformAI(EntityRef entity) {
+		MinionComponent minioncomp = entity.getComponent(MinionComponent.class);
+		LocationComponent location = entity
+				.getComponent(LocationComponent.class);
+		SimpleMinionAIComponent ai = entity
+				.getComponent(SimpleMinionAIComponent.class);
+		AnimationComponent animcomp = entity
+				.getComponent(AnimationComponent.class);
+		Vector3f worldPos = new Vector3f(location.getWorldPosition());
+		
+		if(minioncomp.assignedzone == null){
+			changeAnimation(entity, animcomp.idleAnim, true);
+			return;
+		}else if(minioncomp.assignedzone.getStartPosition() == null){
+			changeAnimation(entity, animcomp.idleAnim, true);
+			return;
+		}else if(minioncomp.assignedzone.zonetype != ZoneType.Terraform){
+			changeAnimation(entity, animcomp.idleAnim, true);
+			return;
+		}
+		
+		if (ai.movementTargets.size() == 0) {
+			getFirsBlocktfromZone(minioncomp, ai);
+		}
+		
+		Vector3f currentTarget = ai.movementTargets.get(0);
+		if (currentTarget == null) {
+			ai.movementTargets.remove(currentTarget);
+			changeAnimation(entity, animcomp.idleAnim, true);
+			entity.saveComponent(ai);
+			return;
+		}		
+		
+		Vector3f dist = new Vector3f(worldPos);
+		dist.sub(currentTarget);
+		double distanceToTarget = dist.lengthSquared();
+
+		if (distanceToTarget < 4) {			
+			// terraform
+			if (timer.getTimeInMs() - ai.lastAttacktime > 200) {
+				ai.lastAttacktime = timer.getTimeInMs();
+				for(int y = (int)(currentTarget.y - 0.5); y >= minioncomp.assignedzone.getMinBounds().y; y--){
+					Block tmpblock = worldProvider.getBlock((int)currentTarget.x, y, (int)currentTarget.z);
+					if (!tmpblock.isInvisible()) {
+						if(tmpblock.getBlockFamily().getURI().getPackage().equals("engine")){
+							ai.craftprogress++;							
+							if(ai.craftprogress > 20){
+								BlockItemFactory blockFactory = new BlockItemFactory(entityManager);
+								Block newBlock;
+								if(minioncomp.assignedrecipe == null){
+									newBlock = BlockManager.getInstance().getBlock("CakeLie:ChocolateBlock");
+								}else
+								{
+									newBlock = BlockManager.getInstance().getBlock(minioncomp.assignedrecipe.result);
+								}
+								worldProvider.setBlock((int)currentTarget.x, y, (int)currentTarget.z, newBlock, tmpblock);
+								ai.craftprogress = 0;
+								if(y == minioncomp.assignedzone.getMinBounds().y){
+									ai.movementTargets.remove(currentTarget);
+								}
+							}
+							break;
+						}
+					}
+				}
+				
+			}
+		}
+
+		entity.saveComponent(ai);
+		setMovement(currentTarget, entity);
+	}
+	
+	private void getFirsBlocktfromZone(MinionComponent minioncomp,	SimpleMinionAIComponent ai) {
+		Zone zone = minioncomp.assignedzone;		
+		for (int x = zone.getMinBounds().x; x <= zone.getMaxBounds().x; x++) {
+			for (int z = zone.getMinBounds().z; z <= zone.getMaxBounds().z; z++) {
+				for (int y = zone.getMaxBounds().y; y >= zone.getMinBounds().y; y--) {
+					Block tmpblock = worldProvider.getBlock(x, y, z);
+					if (!tmpblock.isInvisible()) {
+						ai.movementTargets.add(new Vector3f(x, (y + 0.5f), z));
+						break;
+					}
+				}
+			}
+		}
+	}
 
 	private void executeMoveAI(EntityRef entity) {
 		LocationComponent location = entity
@@ -425,7 +514,11 @@ public class SimpleMinionAISystem implements EventHandlerSystem,
 		setMovement(currentTarget, entity);
 	}
 
-	private void executeTestAI(LocalPlayer localPlayer, EntityRef entity) {
+	private void executeTestAI(EntityRef entity) {
+		LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+		if (localPlayer != null) {
+			return;
+		}
 		LocationComponent location = entity
 				.getComponent(LocationComponent.class);
 		SimpleMinionAIComponent ai = entity

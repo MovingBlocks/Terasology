@@ -1,4 +1,21 @@
+/*
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.terasology.miniion.gui;
+
+import java.util.Map.Entry;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
@@ -6,6 +23,7 @@ import javax.vecmath.Vector4f;
 import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.Color;
 import org.terasology.asset.Assets;
+import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
@@ -14,6 +32,7 @@ import org.terasology.miniion.components.MinionComponent;
 import org.terasology.miniion.components.SimpleMinionAIComponent;
 import org.terasology.miniion.componentsystem.controllers.MinionSystem;
 import org.terasology.miniion.minionenum.MinionBehaviour;
+import org.terasology.miniion.minionenum.ZoneType;
 import org.terasology.miniion.utilities.MinionRecipe;
 import org.terasology.miniion.utilities.Zone;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -25,16 +44,16 @@ import org.terasology.rendering.gui.widgets.*;
 
 public class UIActiveMinion extends UIWindow{
 	
-	private UILabel lblname, lblflavor, lblzone, lblrecipe;
+	private final UILabel lblname, lblflavor, lblzone, lblrecipe;
 	private UIImage backgroundmain;
 	private UIComposite behaviourlist, actionlist;
-	private UIList uizonelist;
+	private UIList uiMainlist, uiDetailList;
 	private UIScreenStats uistats;
-	private UIModButtonArrow btnLeft, btnRight, btnBehaviour, btnActions, btnStats;
+	private final UIModButtonArrow btnLeft, btnRight, btnBehaviour, btnActions, btnStats;
 	//behaviour buttons
-	private UIModButtonMenu btnStay, btnFollow, btnAttack, btnGather, btnWork;
+	private final UIModButtonMenu btnStay, btnFollow, btnAttack, btnGather, btnWork, btnTerra;
 	//action buttons
-	private UIModButtonMenu btnInventory, btnZone, btnRecipe, btnClear, btnBye;
+	private final UIModButtonMenu btnInventory, btnZone, btnRecipe, btnClear, btnBye, btnMinionlist;
 	
 	public UIActiveMinion() {
 		setId("activeminiion");
@@ -116,7 +135,7 @@ public class UIActiveMinion extends UIWindow{
 		GridLayout layout = new GridLayout(1);
         layout.setCellPadding(new Vector4f(0f, 0f, 0f, 0f));
 		behaviourlist = new UIComposite();
-		behaviourlist.setSize(new Vector2f(100,100));
+		behaviourlist.setSize(new Vector2f(100,120));
 		behaviourlist.setPosition(new Vector2f(200,200));
 		behaviourlist.setBackgroundImage("miniion:modularback");
 		behaviourlist.setLayout(layout);
@@ -165,6 +184,13 @@ public class UIActiveMinion extends UIWindow{
 		btnWork.setVisible(true);
 		behaviourlist.addDisplayElement(btnWork);
 		
+		btnTerra = new UIModButtonMenu(new Vector2f(100,20), org.terasology.miniion.gui.UIModButtonMenu.ButtonType.TOGGLE);
+		btnTerra.setLabel("Terrafrom");
+		btnTerra.setId("terr");
+		btnTerra.addClickListener(behaviourToggleListener);
+		btnTerra.setVisible(true);
+		behaviourlist.addDisplayElement(btnTerra);
+		
 		btnActions  = new UIModButtonArrow(new Vector2f(46,12), org.terasology.miniion.gui.UIModButtonArrow.ButtonType.DOWN, "select action");
 		btnActions.setPosition(new Vector2f(137,186));
 		btnActions.setVisible(true);
@@ -173,7 +199,7 @@ public class UIActiveMinion extends UIWindow{
 		backgroundmain.addDisplayElement(btnActions);
 		
 		actionlist = new UIComposite();
-		actionlist.setSize(new Vector2f(100,100));
+		actionlist.setSize(new Vector2f(100,120));
 		actionlist.setPosition(new Vector2f(100,200));
 		actionlist.setBackgroundImage("miniion:modularback");
 		actionlist.setLayout(layout);
@@ -201,6 +227,13 @@ public class UIActiveMinion extends UIWindow{
 		btnRecipe.setVisible(true);
 		actionlist.addDisplayElement(btnRecipe);
 		
+		btnMinionlist = new UIModButtonMenu(new Vector2f(100,20), org.terasology.miniion.gui.UIModButtonMenu.ButtonType.NORMAL);
+		btnMinionlist.setLabel("minionlist");
+		btnMinionlist.setId("list");
+		btnMinionlist.addClickListener(actionListener);
+		btnMinionlist.setVisible(true);
+		actionlist.addDisplayElement(btnMinionlist);
+		
 		btnClear = new UIModButtonMenu(new Vector2f(100,20), org.terasology.miniion.gui.UIModButtonMenu.ButtonType.NORMAL);
 		btnClear.setLabel("clear orders");
 		btnClear.setId("clea");
@@ -215,12 +248,19 @@ public class UIActiveMinion extends UIWindow{
 		btnBye.setVisible(true);
 		actionlist.addDisplayElement(btnBye);
 		
-		uizonelist = new UIList();
-		uizonelist.setSize(new Vector2f(100, 300));
-		uizonelist.setPosition(new Vector2f(0, 200));
-		uizonelist.setBackgroundImage("miniion:modularback");
-		uizonelist.setVisible(false);
-		this.addDisplayElement(uizonelist);		
+		uiMainlist = new UIList();
+		uiMainlist.setSize(new Vector2f(100, 300));
+		uiMainlist.setPosition(new Vector2f(0, 200));
+		uiMainlist.setBackgroundImage("miniion:modularback");
+		uiMainlist.setVisible(false);
+		this.addDisplayElement(uiMainlist);
+		
+		uiDetailList = new UIList();
+		uiDetailList.setSize(new Vector2f(100, 300));
+		uiDetailList.setPosition(new Vector2f(0, 200));
+		uiDetailList.setBackgroundImage("miniion:modularback");
+		uiDetailList.setVisible(false);
+		this.addDisplayElement(uiDetailList);
 		
 		btnStats = new UIModButtonArrow(new Vector2f(12,46), org.terasology.miniion.gui.UIModButtonArrow.ButtonType.LEFT);
 		btnStats.setPosition(new Vector2f(8,135));
@@ -271,7 +311,7 @@ public class UIActiveMinion extends UIWindow{
 				}
 			}else
 			if(arrow.getId() == "previousminion"){
-				MinionSystem.getNextMinion(false);
+				MinionSystem.getPreviousMinion(false);
 				refreshScreen();
 			}else
 			if(arrow.getId() == "nextminion"){
@@ -285,7 +325,8 @@ public class UIActiveMinion extends UIWindow{
 		behaviourlist.setVisible(false);
 		actionlist.setVisible(false);
 		uistats.setVisible(false);
-		uizonelist.setVisible(false);
+		uiMainlist.setVisible(false);
+		uiDetailList.setVisible(false);
 	}
 			
 	/**
@@ -313,6 +354,9 @@ public class UIActiveMinion extends UIWindow{
 				}else
 				if (clickedbutton.getId() == "work") {
 					minioncomp.minionBehaviour = MinionBehaviour.Work;
+				}else
+				if (clickedbutton.getId() == "terr") {
+					minioncomp.minionBehaviour = MinionBehaviour.Terraform;
 				}
 				MinionSystem.getActiveMinion().saveComponent(minioncomp);
 			}
@@ -334,38 +378,51 @@ public class UIActiveMinion extends UIWindow{
 					MinionSystem.getActiveMinion().send(new ActivateEvent(MinionSystem.getActiveMinion(), CoreRegistry.get(LocalPlayer.class).getEntity()));
 				}else
 				if (clickedbutton.getId() == "zone") {
-					uizonelist.removeAll();
-					if(uizonelist.isVisible()){
-						uizonelist.setVisible(false);
+					if(uiDetailList.isVisible()){
+						uiDetailList.setVisible(false);
+					}
+					if(uiMainlist.isVisible()){
+						uiMainlist.setVisible(false);
 					}
 					else{
-						for (Zone zone : MinionSystem.getGatherZoneList()) {
-							UIListItem listitem = new UIListItem(zone.Name, zone);
+						uiMainlist.removeAll();
+						for (ZoneType zonetype : ZoneType.values()) {
+							UIListItem listitem = new UIListItem(zonetype.toString(), zonetype);
 							listitem.addClickListener(zoneItemListener);
-							uizonelist.addItem(listitem);
+							uiMainlist.addItem(listitem);
 						}
-						for (Zone zone : MinionSystem.getWorkZoneList()) {
-							UIListItem listitem = new UIListItem(zone.Name, zone);
-							listitem.addClickListener(zoneItemListener);
-							uizonelist.addItem(listitem);
-						}
-						uizonelist.setVisible(true);
+						uiMainlist.setVisible(true);
 					}
 				}else
 				if (clickedbutton.getId() == "reci") {
-					uizonelist.removeAll();
-					if(uizonelist.isVisible()){
-						uizonelist.setVisible(false);
+					uiMainlist.removeAll();
+					if(uiMainlist.isVisible()){
+						uiMainlist.setVisible(false);
 					}
 					else{
 						for (MinionRecipe recipe : MinionSystem.getRecipesList()) {
 							UIListItem listitem = new UIListItem(recipe.Name, recipe);
 							listitem.addClickListener(recipeItemListener);
-							uizonelist.addItem(listitem);
+							uiMainlist.addItem(listitem);
 						}
-						uizonelist.setVisible(true);
+						uiMainlist.setVisible(true);
 					}
 				}else
+				if (clickedbutton.getId() == "list") {
+					uiMainlist.removeAll();
+					if(uiMainlist.isVisible()){
+						uiMainlist.setVisible(false);
+					}
+					else{
+						EntityManager entman = CoreRegistry.get(EntityManager.class);
+						for (Entry<EntityRef, MinionComponent> minion : entman.iterateComponents(MinionComponent.class)) {
+							UIListItem listitem = new UIListItem(minion.getValue().name, minion.getKey());
+							listitem.addClickListener(minionlistItemListener);
+							uiMainlist.addItem(listitem);
+						}
+						uiMainlist.setVisible(true);
+					}
+				}else	
 				if (clickedbutton.getId() == "clea") {
 					SimpleMinionAIComponent aicomp = MinionSystem.getActiveMinion().getComponent(SimpleMinionAIComponent.class);
 					aicomp.ClearCommands();
@@ -394,21 +451,54 @@ public class UIActiveMinion extends UIWindow{
 		
 		@Override
 		public void click(UIDisplayElement element, int button) {
-			Zone selectedzone = (Zone) ((UIListItem)element).getValue();
-			MinionComponent minioncomp = MinionSystem.getActiveMinion().getComponent(MinionComponent.class);
-			for (Zone zone : MinionSystem.getGatherZoneList()) {
-				if (zone.Name.matches(selectedzone.Name)) {
-					minioncomp.assignedzone = zone;
+			UIListItem listitem = (UIListItem) element;
+			if(listitem.getValue().getClass().equals(ZoneType.class)){
+				switch(((ZoneType)listitem.getValue())){
+				case Gather: {
+					uiDetailList.removeAll();
+					for (Zone zone : MinionSystem.getGatherZoneList()) {
+						UIListItem newlistitem = new UIListItem(zone.Name, zone);
+						newlistitem.addClickListener(zoneItemListener);
+						uiDetailList.addItem(newlistitem);
+					}
+					uiMainlist.setVisible(false);
+					uiDetailList.setVisible(true);
+					break;
 				}
-			}
-			for (Zone zone : MinionSystem.getWorkZoneList()) {
-				if (zone.Name.matches(selectedzone.Name)) {
-					minioncomp.assignedzone = zone;
+				case Terraform: {
+					uiDetailList.removeAll();
+					for (Zone zone : MinionSystem.getTerraformZoneList()) {
+						UIListItem newlistitem = new UIListItem(zone.Name, zone);
+						newlistitem.addClickListener(zoneItemListener);
+						uiDetailList.addItem(newlistitem);
+					}
+					uiMainlist.setVisible(false);
+					uiDetailList.setVisible(true);
+					break;
 				}
+				case Work : {
+					uiDetailList.removeAll();
+					for (Zone zone : MinionSystem.getWorkZoneList()) {
+						UIListItem newlistitem = new UIListItem(zone.Name, zone);
+						newlistitem.addClickListener(zoneItemListener);
+						uiDetailList.addItem(newlistitem);
+					}
+					uiMainlist.setVisible(false);
+					uiDetailList.setVisible(true);
+					break;
+				}
+				default : {					
+					break;
+				}
+				}
+			}else if(listitem.getValue().getClass().equals(Zone.class)){
+				Zone selectedzone = (Zone) ((UIListItem)element).getValue();
+				MinionComponent minioncomp = MinionSystem.getActiveMinion().getComponent(MinionComponent.class);
+				minioncomp.assignedzone = selectedzone;
+				MinionSystem.getActiveMinion().saveComponent(minioncomp);
+				uiDetailList.setVisible(false);
+				refreshScreen();
 			}
-			MinionSystem.getActiveMinion().saveComponent(minioncomp);
-			uizonelist.setVisible(false);
-			refreshScreen();
 		}
 	};
 	
@@ -424,7 +514,17 @@ public class UIActiveMinion extends UIWindow{
 				}
 			}
 			MinionSystem.getActiveMinion().saveComponent(minioncomp);
-			uizonelist.setVisible(false);
+			uiMainlist.setVisible(false);
+			refreshScreen();
+		}
+	};
+	
+	private ClickListener minionlistItemListener = new ClickListener() {
+		
+		@Override
+		public void click(UIDisplayElement element, int button) {
+			EntityRef selectedminion = (EntityRef) ((UIListItem)element).getValue();
+			MinionSystem.setActiveMinion(selectedminion);
 			refreshScreen();
 		}
 	};
@@ -489,6 +589,10 @@ public class UIActiveMinion extends UIWindow{
 					toggleBehaviour(btnAttack);
 				} else if (minioncomp.minionBehaviour == MinionBehaviour.Gather) {
 					toggleBehaviour(btnGather);
+				} else if (minioncomp.minionBehaviour == MinionBehaviour.Work) {
+					toggleBehaviour(btnWork);
+				} else if (minioncomp.minionBehaviour == MinionBehaviour.Terraform) {
+					toggleBehaviour(btnTerra);		
 				} else {
 					toggleBehaviour(null);
 				}

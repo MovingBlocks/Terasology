@@ -8,28 +8,29 @@
         "loop" : true
     },
      "Minion" : {
-     "icon" = "minionskull",
-     "Healthtotal" = 300,
-     "Hungertotal" = 100,
-     "Staminatotal" = 100
+	     "icon" = "minionskull",
+	     "Healthtotal" = 300,
+	     "Hungertotal" = 100,
+	     "Staminatotal" = 100
    },
 	"CharacterMovement" : {
-    "faceMovementDirection" : true
+    	"faceMovementDirection" : true
   },
   "Animation" : {
 		"walkAnim" = "OreoMinions:BuilderWalk",
 		"idleAnim" = "OreoMinions:BuilderIdle",
-		"attackAnim" = "OreoMinions:BuilderShow",
+		"attackAnim" = "OreoMinions:BuilderThor",
 		"dieAnim" = "OreoMinions:BuilderDead",
 		"fadeInAnim" = "OreoMinions:BuilderIdle",
 		"fadeOutAnim" = "OreoMinions:BuilderIdle",
 		"workAnim" = "OreoMinions:BuilderBuild",
+		"terraformAnim" = "OreoMinions:BuilderShow",
 		"randomAnim" : ["OreoMinions:BuilderWave", "OreoMinions:BuilderShow"]
 	},
   "SimpleMinionAI" : {},
   "CharacterSound" : {
-    "footstepSounds" : ["Slime1", "Slime2", "Slime3", "Slime4", "Slime5"],
-    "footstepVolume" : 0.7
+	    "footstepSounds" : ["Slime1", "Slime2", "Slime3", "Slime4", "Slime5"],
+	    "footstepVolume" : 0.7
   },
   "Inventory": {
       "itemSlots": [
