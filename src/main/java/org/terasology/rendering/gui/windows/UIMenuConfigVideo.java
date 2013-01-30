@@ -91,7 +91,6 @@ public class UIMenuConfigVideo extends UIWindow {
                 UIStateButton button = (UIStateButton)element;
                 switch (button.getState()) {
                 case 0:
-                    Config.getInstance().setEnablePostProcessingEffects(true);
                     Config.getInstance().setFlickeringLight(false);
                     Config.getInstance().setVignette(true);
                     Config.getInstance().setEyeAdaption(false);
@@ -100,7 +99,6 @@ public class UIMenuConfigVideo extends UIWindow {
                     Config.getInstance().setSSAO(false);
                     break;
                 case 1:
-                    Config.getInstance().setEnablePostProcessingEffects(true);
                     Config.getInstance().setFlickeringLight(true);
                     Config.getInstance().setVignette(true);
                     Config.getInstance().setEyeAdaption(true);
@@ -109,7 +107,6 @@ public class UIMenuConfigVideo extends UIWindow {
                     Config.getInstance().setSSAO(false);
                     break;
                 case 2:
-                    Config.getInstance().setEnablePostProcessingEffects(true);
                     Config.getInstance().setFlickeringLight(true);
                     Config.getInstance().setVignette(true);
                     Config.getInstance().setEyeAdaption(true);
@@ -289,9 +286,9 @@ public class UIMenuConfigVideo extends UIWindow {
         viewingDistanceButton.setState(Config.getInstance().getActiveViewingDistanceId());
         blurIntensityButton.setState(Config.getInstance().getBlurIntensity());
         
-        if (Config.getInstance().isEnablePostProcessingEffects() && Config.getInstance().isFlickeringLight())
+        if (Config.getInstance().isMotionBlur())
             graphicsQualityButton.setState(2);
-        else if (!Config.getInstance().isEnablePostProcessingEffects() && Config.getInstance().isFlickeringLight())
+        else if (Config.getInstance().isBloom())
             graphicsQualityButton.setState(1);
         else
             graphicsQualityButton.setState(0);

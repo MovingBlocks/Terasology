@@ -211,8 +211,6 @@ public class Shader implements Asset {
             builder.append("#define ANIMATED_WATER_AND_GRASS \n");
         if (Config.getInstance().getBlurIntensity() == 0)
             builder.append("#define NO_BLUR \n");
-        if (!Config.getInstance().isEnablePostProcessingEffects())
-            builder.append("#define NO_POST_PROCESSING \n");
         if (Config.getInstance().isFlickeringLight())
             builder.append("#define FLICKERING_LIGHT \n");
         if (Config.getInstance().isVignette())

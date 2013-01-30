@@ -297,41 +297,32 @@ public class PostProcessingRenderer {
      * of the viewport changes.
      */
     public void renderScene() {
-        if (Config.getInstance().isEnablePostProcessingEffects()) {
-            generateDownsampledScene();
+        createOrUpdateFullscreenFbos();
 
-            if (Config.getInstance().isSSAO()) {
-                generateSSAO();
-                generateBlurredSSAO();
-            }
+        generateDownsampledScene();
 
-            screenSpaceCombine();
-
-            generateTonemappedScene();
-
-            generateHighPass();
-
-            for (int i = 0; i < 2; i++) {
-                if (Config.getInstance().isBloom()) {
-                    generateBloom(i);
-                }
-                if (Config.getInstance().getBlurIntensity() != 0) {
-                    generateBlur(i);
-                }
-            }
-
-            renderFinalScene();
-            updateExposure();
-        } else {
-            PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("scene");
-
-            ShaderManager.getInstance().enableDefaultTextured();
-            scene.bindTexture();
-
-            renderFullQuad();
+        if (Config.getInstance().isSSAO()) {
+            generateSSAO();
+            generateBlurredSSAO();
         }
 
-        createOrUpdateFullscreenFbos();
+        screenSpaceCombine();
+
+        generateTonemappedScene();
+
+        generateHighPass();
+
+        for (int i = 0; i < 2; i++) {
+            if (Config.getInstance().isBloom()) {
+                generateBloom(i);
+            }
+            if (Config.getInstance().getBlurIntensity() != 0) {
+                generateBlur(i);
+            }
+        }
+
+        renderFinalScene();
+        updateExposure();
     }
 
     private void renderFinalScene() {
