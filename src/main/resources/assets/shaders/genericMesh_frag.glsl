@@ -45,8 +45,8 @@ void main(){
 
     if (textured) {
         color.rgb *= colorOffset.rgb;
-        gl_FragColor = color;
+        gl_FragData[0].rgba = color;
     } else {
-        gl_FragColor = color;
+        gl_FragData[0].rgba = color;
     }
 }

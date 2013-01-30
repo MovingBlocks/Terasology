@@ -39,5 +39,5 @@ void main(){
 
     color.a = gl_Color.a;
 
-    gl_FragColor = color;
+    gl_FragData[0].rgba = color;
 }

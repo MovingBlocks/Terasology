@@ -22,7 +22,7 @@ void main() {
     float lum = 0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b;
 
     if (lum > highPassThreshold)
-        gl_FragColor = color;
+        gl_FragData[0].rgba = color;
     else
-        gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+        gl_FragData[0].rgba = vec4(0.0, 0.0, 0.0, 1.0);
 }

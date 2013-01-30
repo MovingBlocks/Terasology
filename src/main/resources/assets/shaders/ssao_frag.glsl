@@ -63,5 +63,5 @@ void main() {
     }
 
     float ao = 1.0-ssaoTotalStrength*bl*ssaoInvSamples;
-    gl_FragColor = vec4(ao, ao, ao, 1.0);
+    gl_FragData[0].rgba = vec4(ao, ao, ao, 1.0);
 }

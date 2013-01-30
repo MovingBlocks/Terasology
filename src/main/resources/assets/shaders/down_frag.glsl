@@ -37,5 +37,5 @@ void main() {
 	texCoordSample = gl_TexCoord[0].xy + s4 / size;
 	color += texture2D(tex, texCoordSample);
 
-	gl_FragColor = color * 0.25;
+	gl_FragData[0].rgba = color * 0.25;
 }

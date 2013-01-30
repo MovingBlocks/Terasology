@@ -26,5 +26,5 @@ void main() {
     color *= vec4(ssao, ssao, ssao, 1.0);
 #endif
 
-    gl_FragColor = color;
+    gl_FragData[0].rgba = color;
 }

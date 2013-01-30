@@ -21,5 +21,5 @@ void main(){
     if(color.a>alpha && color.a>0){
           color.a = alpha;
     }
-    gl_FragColor = color;
+    gl_FragData[0].rgba = color;
 }

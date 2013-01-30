@@ -30,7 +30,7 @@ void main() {
         vec2(-0.32194,-0.932615), vec2(-0.791559,-0.59771)
     );
 
-    vec4 cSampleAccum = texture2D(tex, gl_TexCoord[0].xy);
+    vec4 cSampleAccum = vec4(0.0, 0.0, 0.0, 0.0);
 
     for (int nTapIndex = 0; nTapIndex < 12; nTapIndex++)
     {
@@ -38,5 +38,5 @@ void main() {
         cSampleAccum += texture2D(tex, vTapCoord);
     }
 
-    gl_FragColor = cSampleAccum / 13.0;
+    gl_FragData[0].rgba = cSampleAccum / 12.0;
 }

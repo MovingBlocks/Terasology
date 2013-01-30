@@ -30,5 +30,5 @@ void main(){
     if (light < 0.25)
         color.a *= 1.0 - clamp(abs(0.25 - expLightValue(light)) / 0.25, 0.0, 1.0);
 
-    gl_FragColor = color;
+    gl_FragData[0].rgba = color;
 }

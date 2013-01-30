@@ -111,5 +111,5 @@ void main() {
     }
 #endif
 
-    gl_FragColor = finalColor;
+    gl_FragData[0].rgba = finalColor;
 }

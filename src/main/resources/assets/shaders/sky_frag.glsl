@@ -73,5 +73,5 @@ void main () {
     skyColor += daylight * textureCube (texCubeSky, skyVec);
     skyColor += alpha * textureCube (texCubeStars, skyVecR);
 
-    gl_FragColor = skyColor;
+    gl_FragData[0].rgba = skyColor;
 }

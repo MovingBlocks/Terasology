@@ -46,5 +46,5 @@ void main(){
     color.rgb = finalColor;
 #endif
 
-    gl_FragColor = linearToSrgb(color);
+    gl_FragData[0].rgba = linearToSrgb(color);
 }
