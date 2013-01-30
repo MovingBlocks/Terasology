@@ -19,12 +19,9 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.newdawn.slick.util.ResourceLoader;
@@ -34,6 +31,7 @@ import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.Shader;
 
+import javax.swing.*;
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Matrix4f;
 
@@ -127,7 +125,9 @@ public class ShaderProgram {
         GL20.glShaderSource(shaderId, shader.toString());
         GL20.glCompileShader(shaderId);
 
-        printLogInfo(shaderId);
+        if (!printLogInfo(shaderId)) {
+            JOptionPane.showMessageDialog(null, "Shader '"+title+"' failed to compile. Terasology might not look quite as good as it should now...", "Shader compilation error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private String readShader(String filename) {
@@ -144,26 +144,16 @@ public class ShaderProgram {
         return code;
     }
 
-    private void printLogInfo(int shaderId) {
-        IntBuffer intBuffer = BufferUtils.createIntBuffer(1);
-        GL20.glGetShader(shaderId, GL20.GL_INFO_LOG_LENGTH, intBuffer);
-
-        int length = intBuffer.get();
+    private boolean printLogInfo(int shaderId) {
+        int length = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects.GL_OBJECT_INFO_LOG_LENGTH_ARB);
 
         if (length <= 1) {
-            return;
+            return true;
         }
 
-        ByteBuffer infoBuffer = BufferUtils.createByteBuffer(length);
-        intBuffer.flip();
-
-        GL20.glGetShaderInfoLog(shaderId, intBuffer, infoBuffer);
-
-        int actualLength = intBuffer.get();
-        byte[] infoBytes = new byte[actualLength];
-        infoBuffer.get(infoBytes);
-
-        logger.debug("{}", new String(infoBytes));
+        String logEntry = ARBShaderObjects.glGetInfoLogARB(shaderId, length);
+        logger.error("{}", logEntry);
+        return false;
     }
 
     public void enable() {
