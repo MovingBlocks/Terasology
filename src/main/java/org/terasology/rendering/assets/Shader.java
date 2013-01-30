@@ -44,7 +44,7 @@ import com.google.common.io.CharStreams;
  * @author Immortius
  */
 public class Shader implements Asset {
-    private static final String PreProcessorPreamble = "#version 120 \n float TEXTURE_OFFSET = " + Block.TEXTURE_OFFSET + "; \n";
+    private static final String PreProcessorPreamble = "#version 120\n float TEXTURE_OFFSET = " + Block.TEXTURE_OFFSET + ";\n";
     private static String IncludedFunctionsVertex = "", IncludedFunctionsFragment = "";
 
     private static final Logger logger = LoggerFactory.getLogger(Shader.class);

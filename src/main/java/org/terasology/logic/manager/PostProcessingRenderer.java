@@ -54,8 +54,6 @@ public class PostProcessingRenderer {
     private float _sceneLuminance = 1.0f;
     private int _displayListQuad = -1;
 
-    private boolean _extensionsAvailable = false;
-
     public class FBO {
         public int _fboId = 0;
         public int _textureId = 0;
@@ -126,16 +124,7 @@ public class PostProcessingRenderer {
     }
 
     public PostProcessingRenderer() {
-        _extensionsAvailable = GLContext.getCapabilities().GL_ARB_framebuffer_object;
-
-        if (_extensionsAvailable) {
-            initialize();
-        } else {
-            final String message = "Your graphics driver does not support the needed OpenGL extensions to run Terasology. Terasology might not look quite as good as it should now...";
-            logger.error(message);
-
-            JOptionPane.showMessageDialog(null, message, "OpenGL extension(s) unavailable", JOptionPane.ERROR_MESSAGE);
-        }
+        initialize();
     }
 
     public void initialize() {
@@ -282,19 +271,11 @@ public class PostProcessingRenderer {
     }
 
     public void beginRenderScene() {
-        if (!_extensionsAvailable) {
-            return;
-        }
-
         getFBO("scene").bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
     public void beginRenderReflectedScene() {
-        if (!_extensionsAvailable) {
-            return;
-        }
-
         FBO reflected = getFBO("sceneReflected");
         reflected.bind();
 
@@ -303,18 +284,10 @@ public class PostProcessingRenderer {
     }
 
     public void endRenderScene() {
-        if (!_extensionsAvailable) {
-            return;
-        }
-
         getFBO("scene").unbind();
     }
 
     public void endRenderReflectedScene() {
-        if (!_extensionsAvailable) {
-            return;
-        }
-
         getFBO("sceneReflected").unbind();
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
@@ -324,10 +297,6 @@ public class PostProcessingRenderer {
      * of the viewport changes.
      */
     public void renderScene() {
-        if (!_extensionsAvailable) {
-            return;
-        }
-
         if (Config.getInstance().isEnablePostProcessingEffects()) {
             generateDownsampledScene();
 
