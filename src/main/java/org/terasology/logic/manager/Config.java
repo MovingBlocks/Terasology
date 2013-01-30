@@ -338,14 +338,6 @@ public final class Config {
         _setting.getSystemBuilder().setFlickeringLight(flickeringLight);
     }
 
-    public boolean isEnablePostProcessingEffects() {
-        return _setting.getSystemBuilder().getEnablePostProcessingEffects();
-    }
-
-    public void setEnablePostProcessingEffects(boolean enablePostProcessingEffects) {
-        _setting.getSystemBuilder().setEnablePostProcessingEffects(enablePostProcessingEffects);
-    }
-
     public boolean isAnimatedGrass() {
         return _setting.getSystemBuilder().getAnimatedGrass();
     }

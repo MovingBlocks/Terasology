@@ -148,14 +148,22 @@ public class ShaderProgram {
     private String printLogInfo(int shaderId) {
         int length = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects.GL_OBJECT_INFO_LOG_LENGTH_ARB);
 
-        if (length <= 1) {
-            return null;
-        }
+        int compileStatus = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects.GL_OBJECT_COMPILE_STATUS_ARB);
+        //int linkStatus = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects.GL_OBJECT_LINK_STATUS_ARB);
+        //int validateStatus = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects.GL_OBJECT_VALIDATE_STATUS_ARB);
 
         String logEntry = ARBShaderObjects.glGetInfoLogARB(shaderId, length);
-        logger.error("{}", logEntry);
 
-        return logEntry;
+        if (length > 0) {
+            logger.error("{}", logEntry);
+        }
+
+        if (compileStatus == 0 /*|| linkStatus == 0 || validateStatus == 0*/) {
+            return logEntry;
+        }
+
+        logger.info("Shader '"+title+"' successfully compiled.");
+        return null;
     }
 
     public void enable() {
