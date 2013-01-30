@@ -26,7 +26,6 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PostProcessingRenderer;
-import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
@@ -40,7 +39,8 @@ import org.terasology.world.block.Block;
  */
 public class ShaderParametersPost implements IShaderParameters {
 
-    Texture texture = Assets.getTexture("engine:vignette");
+    Texture vignetteTexture = Assets.getTexture("engine:vignette");
+    Texture noiseTexture = Assets.getTexture("engine:noise");
 
     @Override
     public void applyParameters(ShaderProgram program) {
@@ -48,14 +48,15 @@ public class ShaderParametersPost implements IShaderParameters {
 
         GL13.glActiveTexture(GL13.GL_TEXTURE1);
         PostProcessingRenderer.getInstance().getFBO("sceneBloom1").bindTexture();
-        if (Config.getInstance().getBlurIntensity() != 0) {
+        if (Config.getInstance().getBlurIntensity() != 0 || Config.getInstance().isMotionBlur()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE2);
             PostProcessingRenderer.getInstance().getFBO("sceneBlur1").bindTexture();
         }
         GL13.glActiveTexture(GL13.GL_TEXTURE3);
-        glBindTexture(GL11.GL_TEXTURE_2D, texture.getId());
+        glBindTexture(GL11.GL_TEXTURE_2D, vignetteTexture.getId());
         GL13.glActiveTexture(GL13.GL_TEXTURE4);
         scene.bindDepthTexture();
+
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         PostProcessingRenderer.getInstance().getFBO("sceneTonemapped").bindTexture();
 

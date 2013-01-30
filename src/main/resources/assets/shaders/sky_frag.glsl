@@ -73,9 +73,5 @@ void main () {
     skyColor += daylight * textureCube (texCubeSky, skyVec);
     skyColor += alpha * textureCube (texCubeStars, skyVecR);
 
-#ifdef NO_POST_PROCESSING
-    skyColor.rgb /= 1.5;
-#endif
-
     gl_FragColor = skyColor;
 }

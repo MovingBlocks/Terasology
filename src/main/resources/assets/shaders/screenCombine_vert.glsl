@@ -14,22 +14,9 @@
  * limitations under the License.
  */
 
-float timeToTick(float time, float speed) {
-    return time * 4000.0 * speed;
-}
-
-// Crytek fast sin/cos approximations
-
-float smoothCurve( float x ) {
-  return x * x * ( 3.0 - 2.0 * x );
-}
-float triangleWave( float x ) {
-  return abs( fract( x + 0.5 ) * 2.0 - 1.0 );
-}
-float smoothTriangleWave( float x ) {
-  return smoothCurve( triangleWave( x ) ) * 2.0 - 1.0 ;
-}
-
-bool checkFlag (int flag, float val) {
-    return val > float(flag) - 0.5 && val < float(flag) + 0.5;
+void main()
+{
+	gl_Position = ftransform();
+    gl_TexCoord[0] = gl_MultiTexCoord0;
+    gl_FrontColor = gl_Color;
 }

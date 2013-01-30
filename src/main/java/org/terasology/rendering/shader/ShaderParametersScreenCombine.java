@@ -15,23 +15,38 @@
  */
 package org.terasology.rendering.shader;
 
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
+import org.terasology.asset.Assets;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PostProcessingRenderer;
+import org.terasology.rendering.assets.Texture;
+
+import static org.lwjgl.opengl.GL11.glBindTexture;
 
 /**
  * Shader parameters for the Post-processing shader program.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ShaderParametersHdr implements IShaderParameters {
+public class ShaderParametersScreenCombine implements IShaderParameters {
 
+    Texture noiseTexture = Assets.getTexture("engine:noise");
+
+    @Override
     public void applyParameters(ShaderProgram program) {
-        GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        PostProcessingRenderer.getInstance().getFBO("sceneCombined").bindTexture();
+        PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("scene");
 
+        if (Config.getInstance().isSSAO()) {
+            PostProcessingRenderer.FBO ssao = PostProcessingRenderer.getInstance().getFBO("ssaoBlurred");
+            GL13.glActiveTexture(GL13.GL_TEXTURE1);
+            ssao.bindTexture();
+            program.setInt("texSsao", 1);
+        }
+
+        GL13.glActiveTexture(GL13.GL_TEXTURE0);
+        scene.bindTexture();
         program.setInt("texScene", 0);
-        program.setFloat("exposure", PostProcessingRenderer.getInstance().getExposure());
     }
 
 }

@@ -27,15 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.assets.Texture;
-import org.terasology.rendering.shader.IShaderParameters;
-import org.terasology.rendering.shader.ShaderParametersBlock;
-import org.terasology.rendering.shader.ShaderParametersChunk;
-import org.terasology.rendering.shader.ShaderParametersDefault;
-import org.terasology.rendering.shader.ShaderParametersGelCube;
-import org.terasology.rendering.shader.ShaderParametersHdr;
-import org.terasology.rendering.shader.ShaderParametersParticle;
-import org.terasology.rendering.shader.ShaderParametersPost;
-import org.terasology.rendering.shader.ShaderProgram;
+import org.terasology.rendering.shader.*;
 
 /**
  * Provides support for loading and applying shaders.
@@ -79,6 +71,8 @@ public class ShaderManager {
         _defaultTexturedShaderProgram = createAndStoreShaderProgram("defaultTextured", new ShaderParametersDefault());
 
         createAndStoreShaderProgram("post", new ShaderParametersPost());
+        createAndStoreShaderProgram("ssao", new ShaderParametersSSAO());
+        createAndStoreShaderProgram("screenCombine", new ShaderParametersScreenCombine());
         createAndStoreShaderProgram("highp", new ShaderParametersDefault());
         createAndStoreShaderProgram("blur", new ShaderParametersDefault());
         createAndStoreShaderProgram("down", new ShaderParametersDefault());

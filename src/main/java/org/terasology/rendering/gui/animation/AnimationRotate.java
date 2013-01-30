@@ -57,14 +57,13 @@ public class AnimationRotate extends Animation {
     @Override
     public void renderBegin(){
         if(fbo == null){
-            fbo = PostProcessingRenderer.getInstance().createFBO(id, Display.getWidth(), Display.getHeight(), false, false);
+            fbo = PostProcessingRenderer.getInstance().createFBO(id, Display.getWidth(), Display.getHeight(), false, false, false);
         }else if(fbo._height != Display.getHeight() || fbo._width != Display.getWidth()){
-            fbo = PostProcessingRenderer.getInstance().createFBO(id, Display.getWidth(), Display.getHeight(), false, false);
+            fbo = PostProcessingRenderer.getInstance().createFBO(id, Display.getWidth(), Display.getHeight(), false, false, false);
         }
 
         PostProcessingRenderer.getInstance().getFBO(id).bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     }
 
     @Override

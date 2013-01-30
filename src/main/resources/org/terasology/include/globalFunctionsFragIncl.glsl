@@ -73,3 +73,7 @@ float fresnel(float nDotL, float fresnelBias, float fresnelPow) {
   float facing = (1.0 - nDotL);
   return max(fresnelBias + (1.0 - fresnelBias) * pow(facing, fresnelPow), 0.0);
 }
+
+bool checkFlag (int flag, float val) {
+    return val > float(flag) - 0.5 && val < float(flag) + 0.5;
+}

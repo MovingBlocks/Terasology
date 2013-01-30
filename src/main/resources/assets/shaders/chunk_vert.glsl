@@ -68,7 +68,7 @@ void main()
 
     if (animated > 0.0) {
         // GRASS ANIMATION
-        if ( blockHint == BLOCK_HINT_WAVING ) {
+        if ( checkFlag(BLOCK_HINT_WAVING, blockHint) ) {
            if (mod(gl_TexCoord[0].y, TEXTURE_OFFSET) < TEXTURE_OFFSET / 2.0) {
                vertexWorldPos.x += (smoothTriangleWave(timeToTick(time, 0.2) + vertexChunkPos.x * 0.1 + vertexChunkPos.z * 0.1) * 2.0 - 1.0) * 0.1 * blockScale;
                vertexWorldPos.y += (smoothTriangleWave(timeToTick(time, 0.1) + vertexChunkPos.x * -0.5 + vertexChunkPos.z * -0.5) * 2.0 - 1.0) * 0.05 * blockScale;
@@ -76,7 +76,7 @@ void main()
         }
      }
 
-    if ( blockHint == BLOCK_HINT_WATER ) {
+    if ( checkFlag(BLOCK_HINT_WATER, blockHint) ) {
        // Only animate blocks on sea level
        if (vertexWorldPosRaw.y < 32.5 && vertexWorldPosRaw.y > 31.5) {
             vertexWorldPos.y += (smoothTriangleWave(timeToTick(time, 0.1) + vertexChunkPos.x * 0.05 + vertexChunkPos.z * 0.05) * 2.0 - 1.0) * 0.1 * blockScale

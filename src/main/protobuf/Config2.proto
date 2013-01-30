@@ -75,6 +75,7 @@ message Setting {
 		optional bool eye_adapation = 26 [default = false];
 		optional bool bloom = 27 [default = false];
 		optional bool motion_blur = 28 [default = false];
+		optional bool ssao = 29 [default = false];
     }
 
     optional World world = 1;

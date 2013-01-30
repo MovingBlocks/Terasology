@@ -29,6 +29,7 @@ import org.terasology.input.events.KeyEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.windows.UIScreenMetrics;
 import org.terasology.rendering.world.WorldRenderer;
@@ -129,6 +130,11 @@ public class DebugControlSystem implements EventHandlerSystem {
                 break;
             case Keyboard.KEY_F5:
                 CoreRegistry.get(GUIManager.class).openWindow("itemList");
+                event.consume();
+                break;
+            case Keyboard.KEY_F9:
+                Config.getInstance().setSSAO(!Config.getInstance().isSSAO());
+                ShaderManager.getInstance().recompileAllShaders();
                 event.consume();
                 break;
         }

@@ -2264,7 +2264,7 @@ public final class Configuration {
     public interface PlayerOrBuilder
         extends com.google.protobuf.MessageOrBuilder {
       
-      // optional float fov = 1 [default = 80];
+      // optional float fov = 1 [default = 90];
       boolean hasFov();
       float getFov();
       
@@ -2313,7 +2313,7 @@ public final class Configuration {
       }
       
       private int bitField0_;
-      // optional float fov = 1 [default = 80];
+      // optional float fov = 1 [default = 90];
       public static final int FOV_FIELD_NUMBER = 1;
       private float fov_;
       public boolean hasFov() {
@@ -2364,7 +2364,7 @@ public final class Configuration {
       }
       
       private void initFields() {
-        fov_ = 80F;
+        fov_ = 90F;
         mouseSens_ = 0.075F;
         cameraBobbing_ = true;
         renderFirstPersonView_ = true;
@@ -2550,7 +2550,7 @@ public final class Configuration {
         
         public Builder clear() {
           super.clear();
-          fov_ = 80F;
+          fov_ = 90F;
           bitField0_ = (bitField0_ & ~0x00000001);
           mouseSens_ = 0.075F;
           bitField0_ = (bitField0_ & ~0x00000002);
@@ -2711,8 +2711,8 @@ public final class Configuration {
         
         private int bitField0_;
         
-        // optional float fov = 1 [default = 80];
-        private float fov_ = 80F;
+        // optional float fov = 1 [default = 90];
+        private float fov_ = 90F;
         public boolean hasFov() {
           return ((bitField0_ & 0x00000001) == 0x00000001);
         }
@@ -2727,7 +2727,7 @@ public final class Configuration {
         }
         public Builder clearFov() {
           bitField0_ = (bitField0_ & ~0x00000001);
-          fov_ = 80F;
+          fov_ = 90F;
           onChanged();
           return this;
         }
@@ -2930,6 +2930,10 @@ public final class Configuration {
       // optional bool motion_blur = 28 [default = false];
       boolean hasMotionBlur();
       boolean getMotionBlur();
+      
+      // optional bool ssao = 29 [default = false];
+      boolean hasSsao();
+      boolean getSsao();
     }
     public static final class System extends
         com.google.protobuf.GeneratedMessage
@@ -4003,6 +4007,16 @@ public final class Configuration {
         return motionBlur_;
       }
       
+      // optional bool ssao = 29 [default = false];
+      public static final int SSAO_FIELD_NUMBER = 29;
+      private boolean ssao_;
+      public boolean hasSsao() {
+        return ((bitField0_ & 0x02000000) == 0x02000000);
+      }
+      public boolean getSsao() {
+        return ssao_;
+      }
+      
       private void initFields() {
         maxParticles_ = 256;
         maxThreads_ = 2;
@@ -4029,6 +4043,7 @@ public final class Configuration {
         eyeAdapation_ = false;
         bloom_ = false;
         motionBlur_ = false;
+        ssao_ = false;
       }
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
@@ -4116,6 +4131,9 @@ public final class Configuration {
         }
         if (((bitField0_ & 0x01000000) == 0x01000000)) {
           output.writeBool(28, motionBlur_);
+        }
+        if (((bitField0_ & 0x02000000) == 0x02000000)) {
+          output.writeBool(29, ssao_);
         }
         getUnknownFields().writeTo(output);
       }
@@ -4225,6 +4243,10 @@ public final class Configuration {
         if (((bitField0_ & 0x01000000) == 0x01000000)) {
           size += com.google.protobuf.CodedOutputStream
             .computeBoolSize(28, motionBlur_);
+        }
+        if (((bitField0_ & 0x02000000) == 0x02000000)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeBoolSize(29, ssao_);
         }
         size += getUnknownFields().getSerializedSize();
         memoizedSerializedSize = size;
@@ -4405,6 +4427,8 @@ public final class Configuration {
           bitField0_ = (bitField0_ & ~0x00800000);
           motionBlur_ = false;
           bitField0_ = (bitField0_ & ~0x01000000);
+          ssao_ = false;
+          bitField0_ = (bitField0_ & ~0x02000000);
           return this;
         }
         
@@ -4547,6 +4571,10 @@ public final class Configuration {
             to_bitField0_ |= 0x01000000;
           }
           result.motionBlur_ = motionBlur_;
+          if (((from_bitField0_ & 0x02000000) == 0x02000000)) {
+            to_bitField0_ |= 0x02000000;
+          }
+          result.ssao_ = ssao_;
           result.bitField0_ = to_bitField0_;
           onBuilt();
           return result;
@@ -4637,6 +4665,9 @@ public final class Configuration {
           }
           if (other.hasMotionBlur()) {
             setMotionBlur(other.getMotionBlur());
+          }
+          if (other.hasSsao()) {
+            setSsao(other.getSsao());
           }
           this.mergeUnknownFields(other.getUnknownFields());
           return this;
@@ -4796,6 +4827,11 @@ public final class Configuration {
               case 224: {
                 bitField0_ |= 0x01000000;
                 motionBlur_ = input.readBool();
+                break;
+              }
+              case 232: {
+                bitField0_ |= 0x02000000;
+                ssao_ = input.readBool();
                 break;
               }
             }
@@ -5394,6 +5430,27 @@ public final class Configuration {
         public Builder clearMotionBlur() {
           bitField0_ = (bitField0_ & ~0x01000000);
           motionBlur_ = false;
+          onChanged();
+          return this;
+        }
+        
+        // optional bool ssao = 29 [default = false];
+        private boolean ssao_ ;
+        public boolean hasSsao() {
+          return ((bitField0_ & 0x02000000) == 0x02000000);
+        }
+        public boolean getSsao() {
+          return ssao_;
+        }
+        public Builder setSsao(boolean value) {
+          bitField0_ |= 0x02000000;
+          ssao_ = value;
+          onChanged();
+          return this;
+        }
+        public Builder clearSsao() {
+          bitField0_ = (bitField0_ & ~0x02000000);
+          ssao_ = false;
           onChanged();
           return this;
         }
@@ -6366,7 +6423,7 @@ public final class Configuration {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\rConfig2.proto\022\010protobuf\"\303\017\n\007Setting\022&\n" +
+      "\n\rConfig2.proto\022\010protobuf\"\330\017\n\007Setting\022&\n" +
       "\005world\030\001 \001(\0132\027.protobuf.Setting.World\022(\n" +
       "\006player\030\002 \001(\0132\030.protobuf.Setting.Player\022" +
       "(\n\006system\030\003 \001(\0132\030.protobuf.Setting.Syste" +
@@ -6390,10 +6447,10 @@ public final class Configuration {
       "(\010:\005false\022\032\n\013demo_flight\030\004 \001(\010:\005false\022\037\n" +
       "\021demo_flight_speed\030\005 \001(\002:\0040.08\022\"\n\023DEPREC" +
       "ATED_god_mode\030\006 \001(\010:\005false\032\225\001\n\006Player\022\017\n" +
-      "\003fov\030\001 \001(\002:\00280\022\031\n\nmouse_sens\030\002 \001(\002:\0050.07" +
+      "\003fov\030\001 \001(\002:\00290\022\031\n\nmouse_sens\030\002 \001(\002:\0050.07" +
       "5\022\034\n\016camera_bobbing\030\003 \001(\010:\004true\022&\n\030rende" +
       "r_first_person_view\030\004 \001(\010:\004true\022\031\n\013placi" +
-      "ng_box\030\005 \001(\010:\004true\032\222\007\n\006System\022\032\n\rmax_par" +
+      "ng_box\030\005 \001(\010:\004true\032\247\007\n\006System\022\032\n\rmax_par" +
       "ticles\030\001 \001(\005:\003256\022\026\n\013max_threads\030\004 \001(\005:\001" +
       "2\022\031\n\013save_chunks\030\005 \001(\010:\004true\022\036\n\020chunk_ca",
       "che_size\030\006 \001(\005:\0042048\022\033\n\016max_chunk_VBOs\030\007" +
@@ -6413,11 +6470,11 @@ public final class Configuration {
       "usic_volume\030\027 \001(\005:\003100\022\031\n\014sound_volume\030\030" +
       " \001(\005:\003100\022\027\n\010vignette\030\031 \001(\010:\005false\022\034\n\rey" +
       "e_adapation\030\032 \001(\010:\005false\022\024\n\005bloom\030\033 \001(\010:" +
-      "\005false\022\032\n\013motion_blur\030\034 \001(\010:\005false\032*\n\010Cl" +
-      "oudRes\022\016\n\001x\030\001 \001(\002:\003512\022\016\n\001y\030\002 \001(\002:\003512\0327" +
-      "\n\013DisplayMode\022\023\n\005width\030\001 \001(\005:\0041280\022\023\n\006he",
-      "ight\030\002 \001(\005:\003720B*\n\027org.terasology.protob" +
-      "ufB\rConfigurationH\001"
+      "\005false\022\032\n\013motion_blur\030\034 \001(\010:\005false\022\023\n\004ss" +
+      "ao\030\035 \001(\010:\005false\032*\n\010CloudRes\022\016\n\001x\030\001 \001(\002:\003" +
+      "512\022\016\n\001y\030\002 \001(\002:\003512\0327\n\013DisplayMode\022\023\n\005wi",
+      "dth\030\001 \001(\005:\0041280\022\023\n\006height\030\002 \001(\005:\003720B*\n\027" +
+      "org.terasology.protobufB\rConfigurationH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -6469,7 +6526,7 @@ public final class Configuration {
           internal_static_protobuf_Setting_System_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_protobuf_Setting_System_descriptor,
-              new java.lang.String[] { "MaxParticles", "MaxThreads", "SaveChunks", "ChunkCacheSize", "MaxChunkVBOs", "PixelFormat", "DisplayMode", "Fullscreen", "ActiveViewingDistanceId", "ViewingDistanceNear", "ViewingDistanceModerate", "ViewingDistanceFar", "ViewingDistanceUltra", "FlickeringLight", "EnablePostProcessingEffects", "AnimatedGrass", "VerticalChunkMeshSegments", "BlurIntensity", "ReflectiveWater", "MusicVolume", "SoundVolume", "Vignette", "EyeAdapation", "Bloom", "MotionBlur", },
+              new java.lang.String[] { "MaxParticles", "MaxThreads", "SaveChunks", "ChunkCacheSize", "MaxChunkVBOs", "PixelFormat", "DisplayMode", "Fullscreen", "ActiveViewingDistanceId", "ViewingDistanceNear", "ViewingDistanceModerate", "ViewingDistanceFar", "ViewingDistanceUltra", "FlickeringLight", "EnablePostProcessingEffects", "AnimatedGrass", "VerticalChunkMeshSegments", "BlurIntensity", "ReflectiveWater", "MusicVolume", "SoundVolume", "Vignette", "EyeAdapation", "Bloom", "MotionBlur", "Ssao", },
               org.terasology.protobuf.Configuration.Setting.System.class,
               org.terasology.protobuf.Configuration.Setting.System.Builder.class);
           internal_static_protobuf_Setting_System_CloudRes_descriptor =

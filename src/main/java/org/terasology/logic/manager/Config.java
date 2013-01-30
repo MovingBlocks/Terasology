@@ -446,6 +446,14 @@ public final class Config {
         return _setting.getSystemBuilder().getMotionBlur();
     }
 
+    public void setSSAO(boolean ssao) {
+        _setting.getSystemBuilder().setSsao(ssao);
+    }
+
+    public boolean isSSAO() {
+        return _setting.getSystemBuilder().getSsao();
+    }
+
     public void setEyeAdaption(boolean eyeAdaption) {
         _setting.getSystemBuilder().setEyeAdapation(eyeAdaption);
     }

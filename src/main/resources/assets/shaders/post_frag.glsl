@@ -22,14 +22,16 @@
 #define MOTION_BLUR_SAMPLES 8
 
 uniform sampler2D texScene;
+uniform sampler2D texDepth;
 #ifdef BLOOM
 uniform sampler2D texBloom;
 #endif
-#ifndef NO_BLUR
+#if !defined (NO_BLUR) || defined (MOTION_BLUR)
 uniform sampler2D texBlur;
 #endif
+#ifdef VIGNETTE
 uniform sampler2D texVignette;
-uniform sampler2D texDepth;
+#endif
 
 uniform bool swimming;
 uniform float viewingDistance;
@@ -39,41 +41,31 @@ uniform mat4 invViewProjMatrix;
 uniform mat4 prevViewProjMatrix;
 #endif
 
-float linDepth() {
-    float z = texture2D(texDepth, gl_TexCoord[0].xy).x;
-    return (2.0 * Z_NEAR) / (viewingDistance + Z_NEAR - z * (viewingDistance - Z_NEAR));
-}
-
 void main() {
-#ifndef NO_BLUR
+#if !defined (NO_BLUR) || defined (MOTION_BLUR)
     vec4 colorBlur = texture2D(texBlur, gl_TexCoord[0].xy);
 #endif
 
+    float currentDepth = texture2D(texDepth, gl_TexCoord[0].xy).x;
+
 #ifndef NO_BLUR
-    float depth = linDepth();
+    float linDepth = (2.0 * Z_NEAR) / (viewingDistance + Z_NEAR - currentDepth * (viewingDistance - Z_NEAR));
     float blur = 0.0;
 
-    if (depth > BLUR_START && !swimming)
-       blur = clamp((depth - BLUR_START) / BLUR_LENGTH, 0.0, 1.0);
+    if (linDepth > BLUR_START && !swimming)
+       blur = clamp((linDepth - BLUR_START) / BLUR_LENGTH, 0.0, 1.0);
     else if (swimming)
        blur = 1.0;
 #endif
 
-    /* COLOR */
     vec4 color = texture2D(texScene, gl_TexCoord[0].xy);
 
-#ifdef BLOOM
-    vec4 colorBloom = texture2D(texBloom, gl_TexCoord[0].xy);
-    color = clamp(color + colorBloom, 0.0, 1.0);
-#endif
-
-#ifndef NO_BLUR
-    colorBlur = clamp(colorBlur , 0.0, 1.0);
+#if defined (MOTION_BLUR)
+    vec4 screenSpaceNorm = vec4(gl_TexCoord[0].x, gl_TexCoord[0].y, currentDepth, 1.0);
+    vec4 screenSpacePos = screenSpaceNorm * vec4(2.0, 2.0, 1.0, 1.0) - vec4(1.0, 1.0, 0.0, 0.0);
 #endif
 
 #ifdef MOTION_BLUR
-    float zOverW = texture2D(texDepth, gl_TexCoord[0].xy).x;
-    vec4 screenSpacePos = vec4(gl_TexCoord[0].x, gl_TexCoord[0].y, zOverW, 1.0) * 2.0 - 1.0;
     vec4 worldSpacePos = invViewProjMatrix * screenSpacePos;
     vec4 normWorldSpacePos = worldSpacePos / worldSpacePos.w;
     vec4 prevScreenSpacePos = prevViewProjMatrix * normWorldSpacePos;
@@ -101,6 +93,11 @@ void main() {
     vec4 finalColor = mix(color, colorBlur, blur);
 #else
     vec4 finalColor = color;
+#endif
+
+#ifdef BLOOM
+    vec4 colorBloom = texture2D(texBloom, gl_TexCoord[0].xy);
+    finalColor += colorBloom;
 #endif
 
 #ifdef VIGNETTE

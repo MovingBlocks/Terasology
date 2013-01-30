@@ -221,6 +221,8 @@ public class Shader implements Asset {
             builder.append("#define BLOOM \n");
         if (Config.getInstance().isMotionBlur())
             builder.append("#define MOTION_BLUR \n");
+        if (Config.getInstance().isSSAO())
+            builder.append("#define SSAO \n");
         return builder;
     }
 

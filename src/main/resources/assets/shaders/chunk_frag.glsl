@@ -83,7 +83,7 @@ void main(){
     vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
 
     /* WATER */
-    if ( blockHint == BLOCK_HINT_WATER ) {
+    if ( checkFlag(BLOCK_HINT_WATER, blockHint) ) {
         vec2 waterOffset = vec2(vertexWorldPosRaw.x + timeToTick(time, 0.1), vertexWorldPosRaw.z + timeToTick(time, 0.1)) / 8.0;
         normalWater.xyz = texture2D(textureWaterNormal, waterOffset).xyz * 2.0 - 1.0;
 
@@ -106,7 +106,7 @@ void main(){
 
         isWater = true;
     /* LAVA */
-    } else if ( blockHint == BLOCK_HINT_LAVA ) {
+    } else if ( checkFlag(BLOCK_HINT_LAVA, blockHint) ) {
         texCoord.x = mod(texCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET);
         texCoord.y = mod(texCoord.y, TEXTURE_OFFSET) / (128.0 / (1.0 / TEXTURE_OFFSET));
         texCoord.y += mod(timeToTick(time, 0.1), 127.0) * (1.0/128.0);
@@ -122,7 +122,7 @@ void main(){
     }
 
     /* APPLY OVERALL BIOME COLOR OFFSET */
-    if ( blockHint != BLOCK_HINT_GRASS ) {
+    if ( !checkFlag(BLOCK_HINT_GRASS, blockHint) ) {
         if (gl_Color.r < 0.99 && gl_Color.g < 0.99 && gl_Color.b < 0.99) {
             if (color.g > 0.5) {
                 color.rgb = vec3(color.g) * gl_Color.rgb;
@@ -189,18 +189,19 @@ void main(){
     daylightColorValue.xyz *= daylightScaledValue + (NIGHT_BRIGHTNESS * (1.0 - daylight) * expLightValue(daylightValue));
 
     // Calculate the final block light brightness
-    float blockBrightness = (expLightValue(blocklightValue) + diffuseLighting * blocklightValue * BLOCK_DIFF);
+    float blockBrightness = expLightValue(blocklightValue);
 
     torchlight -= flickeringLightOffset * torchlight;
 
     blockBrightness += (1.0 - blockBrightness) * torchlight;
     blockBrightness -= flickeringLightOffset * blocklightValue;
-    blockBrightness *= blocklightDayIntensity;
 
     // Calculate the final blocklight color value and add a slight reddish tint to it
     vec3 blocklightColorValue = vec3(blockBrightness) * vec3(1.0, 0.95, 0.94);
 
     // Apply the final lighting mix
-    color.xyz *= (daylightColorValue + blocklightColorValue) * occlusionValue;
-    gl_FragColor = color;
+    color.xyz *= max(daylightColorValue, blocklightColorValue) * occlusionValue;
+
+    gl_FragData[0].rgba = color;
+    gl_FragData[1].rgba = vec4(normal.x / 2.0 + 0.5, normal.y / 2.0 + 0.5, normal.z / 2.0 + 0.5, 0.0f);
 }

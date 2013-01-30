@@ -16,17 +16,11 @@
 package org.terasology.logic.manager;
 
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.util.HashMap;
 
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.ARBHalfFloatPixel;
-import org.lwjgl.opengl.ARBTextureFloat;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.EXTFramebufferObject;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-import org.lwjgl.opengl.GL14;
-import org.lwjgl.opengl.GLContext;
+import org.lwjgl.opengl.*;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.shader.ShaderProgram;
@@ -46,8 +40,8 @@ public class PostProcessingRenderer {
     public static final float MAX_EXPOSURE = 6.0f;
     public static final float MAX_EXPOSURE_NIGHT = 0.5f;
     public static final float MIN_EXPOSURE = 0.5f;
-    public static final float TARGET_LUMINANCE = 0.72f;
-    public static final float ADJUSTMENT_SPEED = 0.05f;
+    public static final float TARGET_LUMINANCE = 1.5f;
+    public static final float ADJUSTMENT_SPEED = 0.0075f;
 
     private static PostProcessingRenderer _instance = null;
     private float _exposure = 2.0f;
@@ -61,12 +55,31 @@ public class PostProcessingRenderer {
         public int _textureId = 0;
         public int _depthTextureId = 0;
         public int _depthRboId = 0;
+        public int _normalsTextureId = 0;
 
         public int _width = 0;
         public int _height = 0;
 
         public void bind() {
             EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, _fboId);
+
+            int bufferCount = 0;
+
+            if (_textureId > 0) {
+                bufferCount++;
+            }
+
+            if (_normalsTextureId > 0) {
+                bufferCount++;
+            }
+
+            IntBuffer bufferIds = BufferUtils.createIntBuffer(bufferCount);
+            for (int i=0; i<bufferCount; ++i) {
+                bufferIds.put(EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT+i);
+            }
+            bufferIds.flip();
+
+            GL20.glDrawBuffers(bufferIds);
         }
 
         public void unbind() {
@@ -79,6 +92,10 @@ public class PostProcessingRenderer {
 
         public void bindTexture() {
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, _textureId);
+        }
+
+        public void bindNormalsTexture() {
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, _normalsTextureId);
         }
 
         public void unbindTexture() {
@@ -113,20 +130,11 @@ public class PostProcessingRenderer {
     public void initialize() {
         createOrUpdateFullscreenFbos();
 
-        createFBO("sceneReflected", 512, 512, true, true);
-
-        createFBO("sceneHighPass", 256, 256, false, false);
-        createFBO("sceneBloom0", 256, 256, false, false);
-        createFBO("sceneBloom1", 256, 256, false, false);
-
-        createFBO("sceneBlur0", 512, 512, false, false);
-        createFBO("sceneBlur1", 512, 512, false, false);
-
-        createFBO("scene16", 16, 16, false, false);
-        createFBO("scene8", 8, 8, false, false);
-        createFBO("scene4", 4, 4, false, false);
-        createFBO("scene2", 2, 2, false, false);
-        createFBO("scene1", 1, 1, false, false);
+        createFBO("scene16", 16, 16, false, false, false);
+        createFBO("scene8", 8, 8, false, false, false);
+        createFBO("scene4", 4, 4, false, false, false);
+        createFBO("scene2", 2, 2, false, false, false);
+        createFBO("scene1", 1, 1, false, false, false);
     }
 
     public void deleteFBO(String title) {
@@ -140,7 +148,7 @@ public class PostProcessingRenderer {
         }
     }
 
-    public FBO createFBO(String title, int width, int height, boolean hdr, boolean depth) {
+    public FBO createFBO(String title, int width, int height, boolean hdr, boolean depth, boolean normals) {
         // Make sure to delete the existing FBO before creating a new one
         deleteFBO(title);
 
@@ -154,7 +162,7 @@ public class PostProcessingRenderer {
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo._textureId);
 
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-        GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+        GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_NEAREST );
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
 
@@ -184,6 +192,19 @@ public class PostProcessingRenderer {
             EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, 0);
         }
 
+        if (normals) {
+            // Generate the normals texture
+            fbo._normalsTextureId = GL11.glGenTextures();
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo._normalsTextureId);
+
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
+
+            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (java.nio.ByteBuffer) null);
+        }
+
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 
         // Create the FBO
@@ -198,6 +219,10 @@ public class PostProcessingRenderer {
             EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, fbo._depthTextureId, 0);
         }
 
+        if (normals) {
+            EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_COLOR_ATTACHMENT1_EXT, GL11.GL_TEXTURE_2D, fbo._normalsTextureId, 0);
+        }
+
         EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, 0);
 
         _FBOs.put(title, fbo);
@@ -206,34 +231,35 @@ public class PostProcessingRenderer {
 
     private void updateExposure() {
         if (Config.getInstance().isEyeAdaption()) {
-        ByteBuffer pixels = BufferUtils.createByteBuffer(4);
-        FBO scene = PostProcessingRenderer.getInstance().getFBO("scene1");
 
-        scene.bind();
-        glReadPixels(0, 0, 1, 1, GL12.GL_BGRA, GL11.GL_BYTE, pixels);
-        scene.unbind();
+            ByteBuffer pixels = BufferUtils.createByteBuffer(4);
+            FBO scene = PostProcessingRenderer.getInstance().getFBO("scene1");
 
-        _sceneLuminance = 0.2126f * pixels.get(2) / 255.f + 0.7152f * pixels.get(1) / 255.f + 0.0722f * pixels.get(0) / 255.f;
+            scene.bind();
+            glReadPixels(0, 0, 1, 1, GL12.GL_BGRA, GL11.GL_BYTE, pixels);
+            scene.unbind();
 
-        float targetExposure = MIN_EXPOSURE;
+            _sceneLuminance = 0.2126f * pixels.get(2) / 255.f + 0.7152f * pixels.get(1) / 255.f + 0.0722f * pixels.get(0) / 255.f;
 
-        if (_sceneLuminance > 0) {
-            targetExposure = TARGET_LUMINANCE / _sceneLuminance;
-        }
+            float targetExposure = MIN_EXPOSURE;
 
-        float maxExposure = MAX_EXPOSURE;
+            if (_sceneLuminance > 0) {
+                targetExposure = TARGET_LUMINANCE / _sceneLuminance;
+            }
 
-        if (CoreRegistry.get(WorldRenderer.class).getSkysphere().getDaylight() == 0.0) {
-            maxExposure = MAX_EXPOSURE_NIGHT;
-        }
+            float maxExposure = MAX_EXPOSURE;
 
-        if (targetExposure > maxExposure) {
-            targetExposure = maxExposure;
-        } else if (targetExposure < MIN_EXPOSURE) {
-            targetExposure = MIN_EXPOSURE;
-        }
+            if (CoreRegistry.get(WorldRenderer.class).getSkysphere().getDaylight() == 0.0) {
+                maxExposure = MAX_EXPOSURE_NIGHT;
+            }
 
-        _exposure = (float) TeraMath.lerp(_exposure, targetExposure, ADJUSTMENT_SPEED);
+            if (targetExposure > maxExposure) {
+                targetExposure = maxExposure;
+            } else if (targetExposure < MIN_EXPOSURE) {
+                targetExposure = MIN_EXPOSURE;
+            }
+
+            _exposure = (float) TeraMath.lerp(_exposure, targetExposure, ADJUSTMENT_SPEED);
 
       } else {
         if (CoreRegistry.get(WorldRenderer.class).getSkysphere().getDaylight() == 0.0) {
@@ -250,7 +276,6 @@ public class PostProcessingRenderer {
         }
 
         getFBO("scene").bind();
-
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
@@ -259,9 +284,10 @@ public class PostProcessingRenderer {
             return;
         }
 
-        getFBO("sceneReflected").bind();
+        FBO reflected = getFBO("sceneReflected");
+        reflected.bind();
 
-        glViewport(0, 0, 512, 512);
+        glViewport(0, 0, reflected._width, reflected._height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
@@ -294,7 +320,15 @@ public class PostProcessingRenderer {
         if (Config.getInstance().isEnablePostProcessingEffects()) {
             generateDownsampledScene();
 
+            if (Config.getInstance().isSSAO()) {
+                generateSSAO();
+                generateBlurredSSAO();
+            }
+
+            screenSpaceCombine();
+
             generateTonemappedScene();
+
             generateHighPass();
 
             for (int i = 0; i < 2; i++) {
@@ -338,28 +372,95 @@ public class PostProcessingRenderer {
         PostProcessingRenderer.getInstance().getFBO("sceneTonemapped").unbind();
     }
 
+    public void generateSSAO() {
+        ShaderManager.getInstance().enableShader("ssao");
+
+        FBO ssao = PostProcessingRenderer.getInstance().getFBO("ssao");
+        ssao.bind();
+
+        glViewport(0, 0, ssao._width, ssao._height);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        renderFullQuad();
+
+        PostProcessingRenderer.getInstance().getFBO("ssao").unbind();
+        glViewport(0, 0, Display.getWidth(), Display.getHeight());
+    }
+
+    public void generateBlurredSSAO() {
+        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("blur");
+        shader.enable();
+
+        shader.setFloat("radius", 4.0f);
+
+        FBO ssaoBlurred = PostProcessingRenderer.getInstance().getFBO("ssaoBlurred");
+        ssaoBlurred.bind();
+
+        glViewport(0, 0, ssaoBlurred._width, ssaoBlurred._height);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        PostProcessingRenderer.getInstance().getFBO("ssao").bindTexture();
+        renderFullQuad();
+
+        PostProcessingRenderer.getInstance().getFBO("ssaoBlurred").unbind();
+        glViewport(0, 0, Display.getWidth(), Display.getHeight());
+    }
+
+    public void screenSpaceCombine() {
+        ShaderManager.getInstance().enableShader("screenCombine");
+
+        PostProcessingRenderer.getInstance().getFBO("sceneCombined").bind();
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        renderFullQuad();
+
+        PostProcessingRenderer.getInstance().getFBO("sceneCombined").unbind();
+    }
+
     /**
      * Initially creates the scene FBO and updates it according to the size of the viewport.
      */
     private void createOrUpdateFullscreenFbos() {
-        if (!_FBOs.containsKey("scene")) {
-            createFBO("scene", Display.getWidth(), Display.getHeight(), true, true);
-            createFBO("sceneTonemapped", Display.getWidth(), Display.getHeight(), true, false);
-        } else {
-            FBO scene = getFBO("scene");
+        FBO scene = getFBO("scene");
+        boolean recreate = scene == null || (scene != null && (scene._width != Display.getWidth() || scene._height != Display.getHeight()));
 
-            if (scene._width != Display.getWidth() || scene._height != Display.getHeight()) {
-                createFBO("scene", Display.getWidth(), Display.getHeight(), true, true);
-                createFBO("sceneTonemapped", Display.getWidth(), Display.getHeight(), true, false);
-            }
-        }
+        if (!recreate)
+            return;
+
+        createFBO("scene", Display.getWidth(), Display.getHeight(), true, true, true);
+        createFBO("sceneCombined", Display.getWidth(), Display.getHeight(), true, false, false);
+        createFBO("sceneTonemapped", Display.getWidth(), Display.getHeight(), true, false, false);
+
+        final int halfWidth = Display.getWidth() / 2;
+        final int halfHeight = Display.getHeight() / 2;
+        final int quarterWidth = halfWidth / 2;
+        final int quarterHeight = halfHeight / 2;
+        final int halfQuarterWidth = quarterWidth / 2;
+        final int halfQuarterHeight = quarterHeight / 2;
+
+        createFBO("sceneReflected", halfWidth, halfHeight, true, true, false);
+
+        createFBO("sceneHighPass", halfQuarterWidth, halfQuarterHeight, false, false, false);
+        createFBO("sceneBloom0", halfQuarterWidth, halfQuarterHeight, false, false, false);
+        createFBO("sceneBloom1", halfQuarterWidth, halfQuarterHeight, false, false, false);
+
+        createFBO("sceneBlur0", quarterWidth, quarterHeight, false, false, false);
+        createFBO("sceneBlur1", quarterWidth, quarterHeight, false, false, false);
+
+        createFBO("ssao", halfWidth, halfHeight, false, false, false);
+        createFBO("ssaoBlurred", halfWidth, halfHeight, false, false, false);
     }
 
     private void generateHighPass() {
-        ShaderManager.getInstance().enableShader("highp");
+        ShaderProgram program = ShaderManager.getInstance().getShaderProgram("highp");
+        program.setFloat("highPassThreshold", 1.05f);
+        program.enable();
 
-        PostProcessingRenderer.getInstance().getFBO("sceneHighPass").bind();
-        glViewport(0, 0, 256, 256);
+        FBO highPass = PostProcessingRenderer.getInstance().getFBO("sceneHighPass");
+        highPass.bind();
+
+        glViewport(0, 0, highPass._width, highPass._height);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         PostProcessingRenderer.getInstance().getFBO("sceneTonemapped").bindTexture();
@@ -378,8 +479,10 @@ public class PostProcessingRenderer {
 
         shader.setFloat("radius", 1.5f * Config.getInstance().getBlurIntensity());
 
-        PostProcessingRenderer.getInstance().getFBO("sceneBlur" + id).bind();
-        glViewport(0, 0, 512, 512);
+        FBO blur = PostProcessingRenderer.getInstance().getFBO("sceneBlur" + id);
+        blur.bind();
+
+        glViewport(0, 0, blur._width, blur._height);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -403,8 +506,10 @@ public class PostProcessingRenderer {
         shader.enable();
         shader.setFloat("radius", 16.0f);
 
-        PostProcessingRenderer.getInstance().getFBO("sceneBloom" + id).bind();
-        glViewport(0, 0, 256, 256);
+        FBO bloom = PostProcessingRenderer.getInstance().getFBO("sceneBloom" + id);
+        bloom.bind();
+
+        glViewport(0, 0, bloom._width, bloom._height);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

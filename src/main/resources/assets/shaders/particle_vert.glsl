@@ -15,11 +15,14 @@
  */
 
 varying vec4 vertexWorldPos;
+varying vec3 normal;
 
 void main()
 {
 	vertexWorldPos = ftransform();
 
 	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+	normal = gl_NormalMatrix * vec3(0.0f, 1.0f, 0.0f);
+
     gl_TexCoord[0] = gl_MultiTexCoord0;
 }

@@ -97,6 +97,7 @@ public class UIMenuConfigVideo extends UIWindow {
                     Config.getInstance().setEyeAdaption(false);
                     Config.getInstance().setBloom(false);
                     Config.getInstance().setMotionBlur(false);
+                    Config.getInstance().setSSAO(false);
                     break;
                 case 1:
                     Config.getInstance().setEnablePostProcessingEffects(true);
@@ -105,6 +106,7 @@ public class UIMenuConfigVideo extends UIWindow {
                     Config.getInstance().setEyeAdaption(true);
                     Config.getInstance().setBloom(true);
                     Config.getInstance().setMotionBlur(false);
+                    Config.getInstance().setSSAO(false);
                     break;
                 case 2:
                     Config.getInstance().setEnablePostProcessingEffects(true);
@@ -113,6 +115,7 @@ public class UIMenuConfigVideo extends UIWindow {
                     Config.getInstance().setEyeAdaption(true);
                     Config.getInstance().setBloom(true);
                     Config.getInstance().setMotionBlur(true);
+                    Config.getInstance().setSSAO(false);
                     break;
                 }
                 

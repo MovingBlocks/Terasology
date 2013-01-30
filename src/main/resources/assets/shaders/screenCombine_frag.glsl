@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
-float timeToTick(float time, float speed) {
-    return time * 4000.0 * speed;
-}
+uniform sampler2D texScene;
+#ifdef SSAO
+uniform sampler2D texSsao;
+#endif
 
-// Crytek fast sin/cos approximations
+void main() {
+    vec4 color = texture2D(texScene, gl_TexCoord[0].xy);
+#ifdef SSAO
+    float ssao = texture2D(texSsao, gl_TexCoord[0].xy).x;
+    color *= vec4(ssao, ssao, ssao, 1.0);
+#endif
 
-float smoothCurve( float x ) {
-  return x * x * ( 3.0 - 2.0 * x );
-}
-float triangleWave( float x ) {
-  return abs( fract( x + 0.5 ) * 2.0 - 1.0 );
-}
-float smoothTriangleWave( float x ) {
-  return smoothCurve( triangleWave( x ) ) * 2.0 - 1.0 ;
-}
-
-bool checkFlag (int flag, float val) {
-    return val > float(flag) - 0.5 && val < float(flag) + 0.5;
+    gl_FragColor = color;
 }

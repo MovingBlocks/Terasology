@@ -1,0 +1,67 @@
+/*
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+uniform float   ssaoStrength = 0.1;
+uniform float   ssaoTotalStrength = 1.0;
+uniform float   ssaoOffset = 18.0;
+uniform float   ssaoFalloff = 0.000002;
+uniform float   ssaoRad = 0.006;
+uniform int     ssaoSamples = 16;
+uniform float   ssaoInvSamples = 1.0 / 16.0;
+
+uniform sampler2D texNormals;
+uniform sampler2D texNoise;
+uniform sampler2D texDepth;
+
+vec3 sphereSamples[16] = vec3[](
+    vec3(0.53812504, 0.18565957, -0.43192),vec3(0.13790712, 0.24864247, 0.44301823),vec3(0.33715037, 0.56794053, -0.005789503),
+    vec3(-0.6999805, -0.04511441, -0.0019965635),vec3(0.06896307, -0.15983082, -0.85477847),vec3(0.056099437, 0.006954967, -0.1843352),
+    vec3(-0.014653638, 0.14027752, 0.0762037),vec3(0.010019933, -0.1924225, -0.034443386),vec3(-0.35775623, -0.5301969, -0.43581226),
+    vec3(-0.3169221, 0.106360726, 0.015860917),vec3(0.010350345, -0.58698344, 0.0046293875),vec3(-0.08972908, -0.49408212, 0.3287904),
+    vec3(0.7119986, -0.0154690035, -0.09183723),vec3(-0.053382345, 0.059675813, -0.5411899),vec3(0.035267662, -0.063188605, 0.54602677),
+    vec3(-0.47761092, 0.2847911, -0.0271716)
+    );
+
+void main() {
+    float currentDepth = texture2D(texDepth, gl_TexCoord[0].xy).x;
+    vec4 screenSpaceNorm = vec4(gl_TexCoord[0].x, gl_TexCoord[0].y, currentDepth, 1.0);
+
+    vec3 screenNormal = texture2D(texNormals, gl_TexCoord[0].xy).xyz * 2.0 - 1.0;
+    vec3 fres = (texture2D(texNoise,gl_TexCoord[0].xy * ssaoOffset).xyz * 2.0) - vec3(1.0);
+
+    float bl = 0.0;
+    float radD = ssaoRad;
+
+    vec3 ray, se, occNorm;
+    float occluderDepth, depthDifference, normDiff, occDepth;
+
+    for (int i=0; i<ssaoSamples;++i) {
+        ray = radD*reflect(sphereSamples[i],fres);
+        se = screenSpaceNorm.xyz + sign(dot(ray,screenNormal))*ray;
+
+        occNorm = texture2D(texNormals,se.xy).xyz * 2.0 - 1.0;
+
+        occDepth = texture2D(texDepth, se.xy).x;
+        depthDifference = currentDepth-occDepth;
+
+        normDiff = (1.0-dot(occNorm,screenNormal));
+
+        bl += step(ssaoFalloff, depthDifference) * normDiff * (1.0 - smoothstep(ssaoFalloff, ssaoStrength, depthDifference));
+    }
+
+    float ao = 1.0-ssaoTotalStrength*bl*ssaoInvSamples;
+    gl_FragColor = vec4(ao, ao, ao, 1.0);
+}
