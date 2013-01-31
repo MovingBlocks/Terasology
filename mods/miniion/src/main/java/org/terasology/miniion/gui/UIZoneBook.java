@@ -307,8 +307,8 @@ public class UIZoneBook extends UIWindow {
 		}
 		ZoneSelectionComponent zoneselectioncomp = zoneselection
 				.getComponent(ZoneSelectionComponent.class);
-		Zone newzone = new Zone(zoneselectioncomp.startpos,
-				zoneselectioncomp.endpos);
+		Zone newzone = new Zone(MinionSystem.getNewZone().getStartPosition(),
+				MinionSystem.getNewZone().getEndPosition());
 		newzone.Name = txtzonename.getText();
 		newzone.zoneheight = Integer.parseInt(txtheight.getText());
 		newzone.zonewidth = Integer.parseInt(txtwidth.getText());
