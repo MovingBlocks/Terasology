@@ -1,0 +1,6 @@
+{
+	"PlaySoundAction" : {
+    	"sounds" : ["engine:PlaceBlock"]
+  	},
+  	"MinionBench" : {}
+}

@@ -1,0 +1,9 @@
+{
+    "Item" : {
+        "name" : "empty card",
+        "icon" : "emptycard",
+        "usage" : "NONE",
+        "consumedOnUse" : false,
+        "renderWithIcon" : true
+    }
+}

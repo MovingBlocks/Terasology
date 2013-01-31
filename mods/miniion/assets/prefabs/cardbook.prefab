@@ -1,0 +1,17 @@
+{
+    "Item" : {
+        "name" : "card book",
+        "icon" : "cardbook",
+        "usage" : "ON_USER",
+        "consumedOnUse" : false,
+        "renderWithIcon" : false
+    },
+    "OpenUiAction" : {
+    	"uiwindowid" : "cardbook"
+    },
+    "Inventory": {
+      "itemSlots": [
+        0
+      ]
+    }
+}

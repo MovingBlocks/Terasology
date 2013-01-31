@@ -15,293 +15,469 @@
  */
 package org.terasology.miniion.componentsystem.controllers;
 
-import javax.vecmath.Vector3f;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
-import org.terasology.components.LocalPlayerComponent;
-import org.terasology.components.world.WorldComponent;
-import org.terasology.miniion.components.UIMessageQueue;
-import org.terasology.miniion.components.UIMinionbar;
-import org.terasology.rendering.gui.events.UIWindowOpenedEvent;
-import org.terasology.world.block.BlockComponent;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
-import org.terasology.events.ActivateEvent;
-import org.terasology.input.events.MouseWheelEvent;
-import org.terasology.input.binds.AttackButton;
-import org.terasology.input.binds.ToolbarNextButton;
-import org.terasology.input.binds.ToolbarPrevButton;
-import org.terasology.input.binds.UseItemButton;
+import org.terasology.asset.Assets;
+
+import org.terasology.rendering.logic.*;
+import org.terasology.world.block.*;
+import org.terasology.entityFactory.*;
+import org.terasology.entitySystem.*;
+import org.terasology.events.*;
+import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.math.Vector3i;
-import org.terasology.miniion.components.MinionBarComponent;
-import org.terasology.miniion.components.MinionComponent;
-import org.terasology.miniion.components.MinionControllerComponent;
-import org.terasology.miniion.components.SimpleMinionAIComponent;
-import org.terasology.miniion.componentsystem.entityfactory.MiniionFactory;
-import org.terasology.miniion.events.MinionMessageEvent;
-import org.terasology.miniion.events.ToggleMinionModeButton;
-import org.terasology.miniion.minionenum.MinionBehaviour;
-import org.terasology.miniion.minionenum.MinionMessagePriority;
-import org.terasology.miniion.components.UIMinionBehaviourMenu;
-import org.terasology.miniion.utilities.MinionMessage;
-import org.terasology.utilities.FastRandom;
+import org.terasology.miniion.components.*;
+import org.terasology.miniion.gui.*;
+import org.terasology.miniion.utilities.*;
 
 /**
- * Created with IntelliJ IDEA.
- * User: Overdhose
- * Date: 10/05/12
- * Time: 17:54
- * Minionsystem gives you some control over the minions.
- * this is the home of the minionbar.
+ * Created with IntelliJ IDEA. User: Overdhose Date: 10/05/12 Time: 17:54
+ * Minionsystem gives you some control over the minions. this is the home of the
+ * minionbar.
  */
 @RegisterComponentSystem
 public class MinionSystem implements EventHandlerSystem {
 
-    private static final int PRIORITY_LOCAL_PLAYER_OVERRIDE = 160;
-    private static final int POPUP_ENTRIES = 9;
-    private static final String BEHAVIOUR_MENU = "minionBehaviour";
+	@In
+	private LocalPlayer localPlayer;
+	@In
+	private EntityManager entityManager;
 
-    private GUIManager guiManager;
-    private UIMinionBehaviourMenu minionMenu;
-    private MiniionFactory minionFactory;
-    private UIMessageQueue messageQueue;
+	private static final int PRIORITY_LOCAL_PLAYER_OVERRIDE = 160;
+	private static final int POPUP_ENTRIES = 9;
+	private static boolean showactiveminion = false;
+	private static boolean showSelectionOverlay = false;
+	private static EntityRef activeminion;
+	// TODO : a better way to save / load zones, but it does the trick
+	private static EntityRef zonelist;
+	private static Zone newzone;
+	
+	
+	
+	private static List<MinionRecipe> recipeslist = new ArrayList<MinionRecipe>();
 
-    @Override
-    public void initialise() {
-        guiManager = CoreRegistry.get(GUIManager.class);
-        minionFactory = new MiniionFactory();
-        minionFactory.setEntityManager(CoreRegistry.get(EntityManager.class));
-        minionFactory.setRandom(new FastRandom());
-        guiManager.registerWindow("minionBehaviour", UIMinionBehaviourMenu.class);
-    }
-
-    @ReceiveEvent(components = {WorldComponent.class})
-    public void onWindowOpened(UIWindowOpenedEvent event, EntityRef entity) {
-        if (event.getWindow().getId().equals("hud")) {
-            UIMinionbar bar = new UIMinionbar();
-            bar.setVisible(true);
-            event.getWindow().addDisplayElement(bar);
-            messageQueue = new UIMessageQueue();
-            messageQueue.setVisible(true);
-            event.getWindow().addDisplayElement(messageQueue);
-            event.getWindow().update();
-            event.getWindow().layout();
-        }
-    }
-
-    @ReceiveEvent(components = {MinionComponent.class})
-    public void onMessageReceived(MinionMessageEvent event, EntityRef entityref) {
-        if (messageQueue != null) {
-            messageQueue.addIconToQueue(event.getMinionMessage());
-        }
-    }
-
-    @Override
-    public void shutdown() {
-    }
-
-    @ReceiveEvent(components = {LocalPlayerComponent.class, MinionControllerComponent.class})
-    public void onToggleMinionMode(ToggleMinionModeButton event, EntityRef entity) {
-        MinionControllerComponent minionController = entity.getComponent(MinionControllerComponent.class);
-        minionController.minionMode = !minionController.minionMode;
-        if (!minionController.minionMode) {
-            guiManager.closeWindow(BEHAVIOUR_MENU);
-        }
-        entity.saveComponent(minionController);
-        event.consume();
-    }
-
-    @ReceiveEvent(components = {LocalPlayerComponent.class, MinionControllerComponent.class}, priority = PRIORITY_LOCAL_PLAYER_OVERRIDE)
-    public void onNextMinion(ToolbarNextButton event, EntityRef entity) {
-        MinionControllerComponent minionController = entity.getComponent(MinionControllerComponent.class);
-        if (minionController.minionMode) {
-            minionController.selectedMinion = (minionController.selectedMinion + 1) % 9;
-            entity.saveComponent(minionController);
-            event.consume();
-        }
-    }
-
-    @ReceiveEvent(components = {LocalPlayerComponent.class, MinionControllerComponent.class}, priority = PRIORITY_LOCAL_PLAYER_OVERRIDE)
-    public void onPrevMinion(ToolbarPrevButton event, EntityRef entity) {
-        MinionControllerComponent minionController = entity.getComponent(MinionControllerComponent.class);
-        if (minionController.minionMode) {
-            minionController.selectedMinion = (minionController.selectedMinion - 1) % 9;
-            if (minionController.selectedMinion < 0) {
-                minionController.selectedMinion += 9;
-            }
-            entity.saveComponent(minionController);
-            event.consume();
-        }
-    }
-
-    @ReceiveEvent(components = {LocalPlayerComponent.class, MinionControllerComponent.class})
-    public void onMouseWheel(MouseWheelEvent wheelEvent, EntityRef entity) {
-        if (minionMenu != null && minionMenu.isVisible()) {
-            menuScroll(wheelEvent.getWheelTurns(), entity);
-            wheelEvent.consume();
-        }
-    }
-
-    private void menuScroll(int wheelMoved, EntityRef playerEntity) {
-        EntityRef minion = getSelectedMinion(playerEntity);
-        MinionComponent minionComp = minion.getComponent(MinionComponent.class);
-        if (minionComp == null) {
-            return;
-        }
-        int ordinal = ((minionComp.minionBehaviour.ordinal() - wheelMoved) % POPUP_ENTRIES);
-        while (ordinal < 0) {
-            ordinal += POPUP_ENTRIES;
-        }
-        minionComp.minionBehaviour = MinionBehaviour.values()[ordinal];
-        minion.saveComponent(minionComp);
-    }
-
-    @ReceiveEvent(components = {LocalPlayerComponent.class, MinionControllerComponent.class}, priority = PRIORITY_LOCAL_PLAYER_OVERRIDE)
-    public void onAttack(AttackButton event, EntityRef entity) {
-        MinionControllerComponent minionController = entity.getComponent(MinionControllerComponent.class);
-        if (minionController.minionMode) {
-            switch (event.getState()) {
-                case DOWN:
-                    minionMenu = (UIMinionBehaviourMenu) guiManager.openWindow(BEHAVIOUR_MENU);
-                    break;
-                case UP:
-                    minionMenu.setVisible(false);
-                    updateBehaviour(entity);
-                    break;
-                default:
-                    break;
-            }
-            event.consume();
-        }
-    }
-
-    public void updateBehaviour(EntityRef player) {
-        EntityRef minion = getSelectedMinion(player);
-        MinionComponent minionComp = minion.getComponent(MinionComponent.class);
-        if (minionComp == null) {
-            return;
-        }
-        switch (minionComp.minionBehaviour) {
-            case Clear: {
-                SimpleMinionAIComponent minionai = minion.getComponent(SimpleMinionAIComponent.class);
-                if (minionai == null) {
-                    return;
-                }
-                minionai.ClearCommands();
-                minionComp.minionBehaviour = MinionBehaviour.Stay;
-                minion.saveComponent(minionai);
-                minion.saveComponent(minionComp);
-                break;
-            }
-            case Inventory: {
-                minion.send(new ActivateEvent(minion, player));
-                minionComp.minionBehaviour = MinionBehaviour.Stay;
-                minion.saveComponent(minionComp);
-                break;
-            }
-            case Test: {
-                LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-                if (localPlayer == null) return;
-                MinionMessage messagetosend = new MinionMessage(MinionMessagePriority.Debug, "test", "testdesc", "testcont", minion, localPlayer.getEntity());
-                minion.send(new MinionMessageEvent(messagetosend));
-                break;
-            }
-            case Disappear: {
-                minion.destroy();
-                break;
-            }
-            default:
-                break;
-        }
-    }
-
-    @ReceiveEvent(components = {LocalPlayerComponent.class, MinionControllerComponent.class}, priority = PRIORITY_LOCAL_PLAYER_OVERRIDE)
-    public void onUseMinion(UseItemButton event, EntityRef playerEntity) {
-        MinionControllerComponent minionController = playerEntity.getComponent(MinionControllerComponent.class);
-        if (minionController.minionMode) {
-            EntityRef minion = getSelectedMinion(playerEntity);
-            if (minion.exists()) {
-                setTarget(minion, event.getTarget(), playerEntity);
-            } else {
-                createMinion(playerEntity, event.getTarget());
-            }
-            event.consume();
-        }
-    }
-
-    private EntityRef getSelectedMinion(EntityRef entity) {
-        MinionControllerComponent minionController = entity.getComponent(MinionControllerComponent.class);
-        if (minionController == null) {
-            return EntityRef.NULL;
-        }
-        MinionBarComponent minionbar = entity.getComponent(MinionBarComponent.class);
-        if (minionbar == null) {
-            return EntityRef.NULL;
-        }
-        EntityRef minion = minionbar.minionSlots.get(minionController.selectedMinion);
-        return minion;
-    }
-
-    private void createMinion(EntityRef player, EntityRef target) {
-        MinionControllerComponent minionController = player.getComponent(MinionControllerComponent.class);
-        MinionBarComponent inventory = player.getComponent(MinionBarComponent.class);
-        BlockComponent blockComp = target.getComponent(BlockComponent.class);
-        if (blockComp == null || minionController == null || inventory == null) {
-            return;
-        }
-        Vector3i centerPos = blockComp.getPosition();
-        inventory.minionSlots.set(minionController.selectedMinion, minionFactory.generateMiniion(new Vector3f(centerPos.x, centerPos.y + 1, centerPos.z), minionController.selectedMinion));
-    }
+	private GUIManager guiManager;
+	private BlockItemFactory blockItemFactory;
 
 
-    private void setTarget(EntityRef minion, EntityRef target, EntityRef player) {
-        BlockComponent blockComp = target.getComponent(BlockComponent.class);
-        if (blockComp == null) {
-            return;
-        }
-        SimpleMinionAIComponent minionai = minion.getComponent(SimpleMinionAIComponent.class);
-        MinionComponent minionComp = minion.getComponent(MinionComponent.class);
-        if (minionai == null || minionComp == null) {
-            return;
-        }
+	@Override
+	public void initialise() {
+		ModIcons.loadIcons();
+		guiManager = CoreRegistry.get(GUIManager.class);
+		blockItemFactory = new BlockItemFactory(entityManager);
+		// experimental popup menu for the minion command tool
+		guiManager.registerWindow("activeminiion", UIActiveMinion.class);
+		// ui to create summonable cards
+		guiManager.registerWindow("cardbook", UICardBook.class); 
+		// ui to manage summoned minions, selecting one sets it active!
+		guiManager.registerWindow("oreobook", UIScreenBookOreo.class);
+		// ui to manage zones
+		guiManager.registerWindow("zonebook", UIZoneBook.class); 
+		createZoneList();
+		initRecipes();
+	}
 
-        Vector3i centerPos = blockComp.getPosition();
-        Vector3f centerPosf = new Vector3f(centerPos.x, centerPos.y + 0.5f, centerPos.z);
-        minionai.followingPlayer = false;
-        switch (minionComp.minionBehaviour) {
-            case Follow: {
-                minionai.movementTarget = centerPosf;
-                minion.saveComponent(minionai);
-                break;
-            }
-            case Move: {
-                minionai.movementTargets.add(centerPosf);
-                minion.saveComponent(minionai);
-                break;
-            }
-            case Gather: {
-                minionai.gatherTargets.add(centerPosf);
-                minion.saveComponent(minionai);
-                break;
-            }
-            case Patrol: {
-                minionai.patrolTargets.add(centerPosf);
-                minion.saveComponent(minionai);
-                break;
-            }
-            case Test: {
-                minionai.movementTargets.add(centerPosf);
-                minion.saveComponent(minionai);
-                break;
-            }
-            default:
-                break;
-        }
-    }
+	/**
+	 * Ugly way to retrieve a name from a prefab
+	 * 
+	 * @return 
+	 * 			a ":" seperated string, with name and flavor text.
+	 */
+	public static String getName() {
+		PrefabManager prefMan = CoreRegistry.get(PrefabManager.class);
+		Prefab prefab = prefMan.getPrefab("miniion:nameslist");
+		EntityRef namelist = CoreRegistry.get(EntityManager.class).create(
+				prefab);
+		namelist.hasComponent(namesComponent.class);
+		namesComponent namecomp = namelist.getComponent(namesComponent.class);
+		Random rand = new Random();
+		return namecomp.namelist.get(rand.nextInt(namecomp.namelist.size()));
+	}
 
+	/**
+	 * destroys a minion at the end of their dying animation this implies that
+	 * setting their animation to die will destroy them.
+	 */
+	@ReceiveEvent(components = { SkeletalMeshComponent.class,
+			AnimationComponent.class })
+	public void onAnimationEnd(AnimEndEvent event, EntityRef entity) {
+		AnimationComponent animcomp = entity
+				.getComponent(AnimationComponent.class);
+		if (animcomp != null && event.getAnimation().equals(animcomp.dieAnim)) {
+			entity.destroy();
+		}
+	}
+
+	/**
+	 * triggered when a block was destroyed and dropped in the world used to
+	 * intercept gathering by minions and sending the block to their inventory
+	 * the droppedblock in the world then gets destroyed, possible duplication
+	 * exploit
+	 */
+	@ReceiveEvent(components = { BlockPickupComponent.class })
+	public void onBlockDropped(BlockDroppedEvent event, EntityRef entity) {
+		if (event.getInstigator().hasComponent(MinionComponent.class)) {
+			EntityRef item;
+			if (event.getoldBlock().getEntityMode() == BlockEntityMode.PERSISTENT) {
+				item = blockItemFactory.newInstance(event.getoldBlock()
+						.getBlockFamily(), entity);
+			} else {
+				item = blockItemFactory.newInstance(event.getoldBlock()
+						.getBlockFamily());
+			}
+			event.getInstigator().send(new ReceiveItemEvent(item));
+			event.getDroppedBlock().destroy();
+		}
+	}
+
+	/**
+	 * The active minion, to be commanded by the minion command item etc uses a
+	 * slightly different texture to indicate selection
+	 * 
+	 * @param minion
+	 *            : the new active minion entity
+	 */
+	public static void setActiveMinion(EntityRef minion) {
+		SkeletalMeshComponent skelcomp;
+		if (activeminion != null) {
+			skelcomp = activeminion.getComponent(SkeletalMeshComponent.class);
+			if (skelcomp != null) {
+				skelcomp.material = Assets.getMaterial("OreoMinions:OreonSkin");
+			}
+		}
+		skelcomp = minion.getComponent(SkeletalMeshComponent.class);
+		if (skelcomp != null) {
+			skelcomp.material = Assets
+					.getMaterial("OreoMinions:OreonSkinSelected");
+		}
+		activeminion = minion;
+	}
+
+	/**
+	 * returns the currently active minion
+	 * 
+	 * @return : the currently active minion
+	 */
+	public static EntityRef getActiveMinion() {
+		return activeminion;
+	}
+	
+	public static void startNewSelection(Vector3i startpos){
+		newzone = new Zone();
+		newzone.setStartPosition(startpos);
+	}
+
+	public static void endNewSelection(Vector3i endpos){
+		if(newzone != null){
+			newzone.setEndPosition(endpos);
+		}
+	}
+
+	public static void resetNewSelection(){
+		newzone = null;
+	}
+
+	public static Zone getNewZone(){
+		return newzone;
+	}
+
+	/**
+	 * adds a new zone to the corresponding zone list
+	 * @param zone
+	 * 				the zone to be added
+	 */
+	public static void addZone(Zone zone) {		
+		ZoneListComponent zonelistcomp = zonelist.getComponent(ZoneListComponent.class);
+		switch(zone.zonetype){
+			case Gather : {
+				zonelistcomp.Gatherzones.add(zone);
+				break;
+			}
+			case Work : {
+				zonelistcomp.Workzones.add(zone);
+				break;
+			}
+			case Terraform : {
+				zonelistcomp.Terrazones.add(zone);
+				break;
+			}
+		}		
+		zonelist.saveComponent(zonelistcomp);
+	}
+
+	/**
+	 * returns a list with all gather zones
+	 * @return
+	 * 			a list with all gather zones
+	 */
+	public static List<Zone> getGatherZoneList() {
+		if (zonelist == null) {
+			return null;
+		}
+		return zonelist.getComponent(ZoneListComponent.class).Gatherzones;
+	}
+	
+	/**
+	 * returns a list with all work zones
+	 * @return
+	 * 			a list with all work zones
+	 */
+	public static List<Zone> getWorkZoneList() {
+		if (zonelist == null) {
+			return null;
+		}
+		return zonelist.getComponent(ZoneListComponent.class).Workzones;
+	}
+	
+	/**
+	 * returns a list with all terraform zones
+	 * @return
+	 * 			a list with all terraform zones
+	 */
+	public static List<Zone> getTerraformZoneList() {
+		if (zonelist == null) {
+			return null;
+		}
+		return zonelist.getComponent(ZoneListComponent.class).Terrazones;
+	}
+	
+	public static List<MinionRecipe> getRecipesList(){
+		if(recipeslist == null){
+			return null;
+		}
+		return recipeslist;
+	}
+
+	/**
+	 * creates a zonelist component
+	 * used to save all zones (persist)
+	 */
+	private static void createZoneList() {
+		zonelist = CoreRegistry.get(EntityManager.class).create();
+		ZoneListComponent zonecomp = new ZoneListComponent();
+		zonelist.addComponent(zonecomp);
+		zonelist.setPersisted(true);
+		zonelist.saveComponent(zonecomp);
+	}
+	
+	/**
+	 * Returns true if the user set option in minion settings
+	 */
+	public static boolean isActiveMinionShown(){
+		return showactiveminion;
+	}
+	
+	public static void toggleActiveMinionShown(){
+		showactiveminion = !showactiveminion;
+	}
+	
+	/**
+	 * Returns true if the user set option in minion settings
+	 */
+	public static boolean isSelectionShown(){
+		return showSelectionOverlay;
+	}
+	
+	public static void toggleSelectionShown(){
+		showSelectionOverlay = !showSelectionOverlay;
+	}
+	
+	/**
+	 * hide / show the active minion
+	 */
+	public void showActiveMinion(boolean show){
+		showactiveminion = show;
+	}
+	
+	/**
+	 * order the minions by id and return the next one, or the first if none were active!
+	 */
+	public static void getNextMinion(boolean deleteactive){
+		EntityManager entman = CoreRegistry.get(EntityManager.class);
+		List<Integer> sortedlist = new ArrayList<Integer>();		
+		for(EntityRef minion : entman.iteratorEntities(MinionComponent.class)){
+			if(!minion.getComponent(MinionComponent.class).dying){
+				sortedlist.add(minion.getId());
+			}
+		}
+		if(sortedlist.size() ==0){
+			return;
+		}else if(deleteactive && sortedlist.size() == 1){
+			activeminion = null;
+			return;
+		}
+		Collections.sort(sortedlist);
+		int index = 0;
+		if(activeminion != null){			
+			index = sortedlist.indexOf(activeminion.getId());
+		}		
+		if(index + 1 == sortedlist.size()){
+			index = 0;
+		}else{
+			index++;
+		}
+		index = sortedlist.get(index);
+		for(EntityRef minion : entman.iteratorEntities(MinionComponent.class)){
+			if(minion.getId() == index){
+				setActiveMinion(minion);
+			}
+		}
+	}
+	
+	/**
+	 * order the minions by id and return the previous one, or the first if none were active!
+	 */
+	public static void getPreviousMinion(boolean deleteactive){
+		EntityManager entman = CoreRegistry.get(EntityManager.class);
+		List<Integer> sortedlist = new ArrayList<Integer>();		
+		for(EntityRef minion : entman.iteratorEntities(MinionComponent.class)){
+			if(!minion.getComponent(MinionComponent.class).dying){
+				sortedlist.add(minion.getId());
+			}
+		}
+		if(sortedlist.size() ==0){
+			return;
+		}else if(deleteactive && sortedlist.size() == 1){
+			activeminion = null;
+			return;
+		}
+		Collections.sort(sortedlist);
+		int index = 0;
+		if(activeminion != null){			
+			index = sortedlist.indexOf(activeminion.getId());
+		}		
+		if(index == 0){
+			index = sortedlist.size() -1;
+		}else{
+			index--;
+		}
+		index = sortedlist.get(index);
+		for(EntityRef minion : entman.iteratorEntities(MinionComponent.class)){
+			if(minion.getId() == index){
+				setActiveMinion(minion);
+			}
+		}
+	}
+	
+	private void initRecipes(){
+		MinionRecipe recipe = new MinionRecipe();
+		
+		recipe.Name = "Chocolate";
+		recipe.result = "CakeLie:ChocolateBlock";
+		recipe.craftRes.add("dirt");
+		recipe.craftsteps = 20;
+		recipeslist.add(recipe);
+		
+		recipe = new MinionRecipe();
+		recipe.Name = "Brownie";
+		recipe.result = "CakeLie:ChocolateBrownieBlock";
+		recipe.craftRes.add("stone");
+		recipe.craftsteps = 35;
+		recipeslist.add(recipe);
+		
+		recipe = new MinionRecipe();
+		recipe.Name = "Brownie top";
+		recipe.result = "CakeLie:ChocolateBrownieTop";
+		recipe.craftRes.add("stone");
+		recipe.craftRes.add("snow");
+		recipe.craftsteps = 60;
+		recipeslist.add(recipe);
+		
+		recipe = new MinionRecipe();
+		recipe.Name = "Kiwi cake";
+		recipe.result = "CakeLie:KiwiCakeBlock";
+		recipe.craftRes.add("cactus");
+		recipe.craftsteps = 30;
+		recipeslist.add(recipe);
+		
+		recipe = new MinionRecipe();
+		recipe.Name = "Kiwi top";
+		recipe.result = "CakeLie:KiwiCakeTop";
+		recipe.craftRes.add("cactus");
+		recipe.craftRes.add("snow");
+		recipe.craftsteps = 50;
+		recipeslist.add(recipe);
+		
+		recipe = new MinionRecipe();
+		recipe.Name = "Corny choco";
+		recipe.result = "CakeLie:CornyChokoBlock";
+		recipe.craftRes.add("grass");
+		recipe.craftsteps = 30;
+		recipeslist.add(recipe);
+		
+		recipe = new MinionRecipe();
+		recipe.Name = "Corny top";
+		recipe.result = "CakeLie:CornyChokoTop";
+		recipe.craftRes.add("grass");
+		recipe.craftRes.add("snow");
+		recipe.craftsteps = 50;
+		recipeslist.add(recipe);
+		
+		recipe = new MinionRecipe();
+		recipe.Name = "Orange cake";
+		recipe.result = "CakeLie:OrangeCakeBlock";
+		recipe.craftRes.add("sand");
+		recipe.craftsteps = 30;
+		recipeslist.add(recipe);
+		
+		recipe = new MinionRecipe();
+		recipe.Name = "Orange Top";
+		recipe.result = "CakeLie:OrangeCakeTop";
+		recipe.craftRes.add("sand");
+		recipe.craftRes.add("snow");
+		recipe.craftsteps = 50;
+		recipeslist.add(recipe);
+	} 	
+
+	@Override
+	public void shutdown() {
+		if(activeminion != null){
+			SkeletalMeshComponent skelcomp = activeminion.getComponent(SkeletalMeshComponent.class);
+			if (skelcomp != null) {
+				skelcomp.material = Assets.getMaterial("OreoMinions:OreonSkin");
+			}
+		}
+	}
+
+	/**
+	 * overrides the default attack event if the minion command item is the
+	 * current helditem only adds gather targets for now, minion command needs
+	 * popuup to set behaviour
+	 */
+	/*@ReceiveEvent(components = { LocalPlayerComponent.class, MinionControllerComponent.class }, priority = PRIORITY_LOCAL_PLAYER_OVERRIDE)
+	public void onAttack(AttackButton event, EntityRef entity) {
+		LocalPlayerComponent locplaycomp = entity
+				.getComponent(LocalPlayerComponent.class);
+		UIItemContainer toolbar = (UIItemContainer) CoreRegistry
+				.get(GUIManager.class).getWindowById("hud")
+				.getElementById("toolbar");
+		int invSlotIndex = localPlayer.getEntity().getComponent(
+				LocalPlayerComponent.class).selectedTool
+				+ toolbar.getSlotStart();
+		EntityRef heldItem = localPlayer.getEntity().getComponent(
+				InventoryComponent.class).itemSlots.get(invSlotIndex);
+		ItemComponent heldItemComp = heldItem.getComponent(ItemComponent.class);
+
+		if (heldItemComp != null && activeminion != null
+				&& heldItemComp.name.matches("Minion Command")) {
+			SimpleMinionAIComponent aicomp = activeminion
+					.getComponent(SimpleMinionAIComponent.class);
+			LocationComponent loccomp = event.getTarget().getComponent(
+					LocationComponent.class);
+			if(loccomp != null)
+			{
+				aicomp.gatherTargets.add(loccomp.getWorldPosition());
+			}
+			activeminion.saveComponent(aicomp);
+			locplaycomp.handAnimation = 0.5f;
+			entity.saveComponent(locplaycomp);
+			event.consume();
+		}
+	}*/
 }

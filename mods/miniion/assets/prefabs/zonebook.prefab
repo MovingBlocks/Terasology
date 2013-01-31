@@ -1,0 +1,12 @@
+{
+    "Item" : {
+        "name" : "zoning book",
+        "icon" : "zonebook",
+        "usage" : "ON_USER",
+        "consumedOnUse" : false,
+        "renderWithIcon" : false
+    },
+    "OpenUiAction" : {
+    	"uiwindowid" : "zonebook"
+    }
+}
