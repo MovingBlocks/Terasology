@@ -118,7 +118,8 @@ public class BlockEntitySystem implements EventHandlerSystem {
                 block = droppedBlockFactory.newInstance(blockComp.getPosition().toVector3f(), oldBlock.getBlockFamily(), 20);
             }
             block.send(new ImpulseEvent(random.randomVector3f(30)));
-            block.send(new BlockDroppedEvent(oldBlock, block, event.getInstigator())); // added as a hook to catch minions breaking blocks
+         // added as a hook to catch minions breaking blocks
+            event.getInstigator().send(new BlockDroppedEvent(oldBlock, block)); 
         }
 
         if (oldBlock.getEntityMode() != BlockEntityMode.PERSISTENT) {

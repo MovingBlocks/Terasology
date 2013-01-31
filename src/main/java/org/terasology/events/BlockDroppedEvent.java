@@ -28,17 +28,11 @@ import org.terasology.world.block.Block;
  */
 public class BlockDroppedEvent extends AbstractEvent {
     private EntityRef droppedblock;
-    private EntityRef instigator;
     private Block oldblock;
     
-    public BlockDroppedEvent(Block oldblock, EntityRef droppedblock, EntityRef instigator) {
+    public BlockDroppedEvent(Block oldblock, EntityRef droppedblock) {
         this.oldblock = oldblock;
         this.droppedblock = droppedblock;
-        this.instigator = instigator;
-    }
-
-    public EntityRef getInstigator() {
-        return instigator;
     }
     
     public EntityRef getDroppedBlock() {

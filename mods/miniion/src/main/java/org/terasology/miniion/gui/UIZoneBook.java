@@ -34,10 +34,8 @@ import org.terasology.miniion.utilities.Zone;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.widgets.*;
-import org.terasology.rendering.world.BlockGrid.GridPosition;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.family.BlockFamily;
 
 public class UIZoneBook extends UIWindow {
 	/*
@@ -281,6 +279,7 @@ public class UIZoneBook extends UIWindow {
 	}
 
 	private void executeClick(UIDisplayElement element, int id) {
+		lblError.setText("");
 		if( (!cmbType.isVisible()) && zoneselection.getComponent(ZoneSelectionComponent.class).zonetype == null){
 			newzonefound = false;
 			this.close();
@@ -289,12 +288,26 @@ public class UIZoneBook extends UIWindow {
 			return;
 		}
 		UIModButton clickedbutton = (UIModButton) element;
-		if (txtzonename.getText().length() < 2) {
+		if (txtzonename.getText().length() < 3) {
+			lblError.setText("Zone name needs to be longer then 2 characters!");
 			return;
 		}		
 		int tmp;
 		for (Zone zone : MinionSystem.getGatherZoneList()) {
 			if (zone.Name.matches(txtzonename.getText())) {
+				lblError.setText("Zone name already exists!");
+				return;
+			}
+		}
+		for (Zone zone : MinionSystem.getTerraformZoneList()) {
+			if (zone.Name.matches(txtzonename.getText())) {
+				lblError.setText("Zone name already exists!");
+				return;
+			}
+		}
+		for (Zone zone : MinionSystem.getWorkZoneList()) {
+			if (zone.Name.matches(txtzonename.getText())) {
+				lblError.setText("Zone name already exists!");
 				return;
 			}
 		}
@@ -302,6 +315,7 @@ public class UIZoneBook extends UIWindow {
 			tmp = Integer.parseInt(txtheight.getText());
 			tmp = Integer.parseInt(txtwidth.getText());
 			tmp = Integer.parseInt(txtdepth.getText());
+			lblError.setText("value needs to be an number, check for trailing spaces!");
 		} catch (NumberFormatException e) {
 			return;
 		}
@@ -320,7 +334,8 @@ public class UIZoneBook extends UIWindow {
 		}
 		MinionSystem.addZone(newzone);
 		newzonefound = false;
-		lblzonetype.setText("ZoneType : Gatherzone");
+		lblzonetype.setText("");
+		MinionSystem.resetNewSelection();
 		this.close();
 	}
 	
