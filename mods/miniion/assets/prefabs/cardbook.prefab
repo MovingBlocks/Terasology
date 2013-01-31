@@ -13,5 +13,19 @@
       "itemSlots": [
         0
       ]
+    },
+    "CraftRecipe" : {
+    	"fullMatch": false,
+        "recipe" :  {
+            bottom:
+                [
+                    " ",  "book cover", " ",
+                    " ",  "paper", " ",
+                    " ",  " ", " "
+                ]
+        },
+ 
+        "resultCount": 1
+ 
     }
 }

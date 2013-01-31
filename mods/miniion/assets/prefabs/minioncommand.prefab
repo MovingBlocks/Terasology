@@ -8,5 +8,19 @@
     },
     "OpenUiAction" : {
     	"uiwindowid" : "activeminiion"
+    },
+    "CraftRecipe" : {
+    	"fullMatch": false,
+        "recipe" :  {
+            bottom:
+                [
+                    " ",  "stick", " ",
+                    " ",  "stick", " ",
+                    " ",  "filled card", " "
+                ]
+        },
+ 
+        "resultCount": 1
+ 
     }
 }

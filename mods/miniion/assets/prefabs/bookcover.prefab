@@ -1,0 +1,24 @@
+{
+    "Item" : {
+        "name" : "book cover",
+        "icon" : "bookcover",
+        "usage" : "NONE",
+        "consumedOnUse" : false,
+        "stackId" : "miniion:bookcover",
+        "renderWithIcon" : false
+    },
+    "CraftRecipe" : {
+    	"fullMatch": false,
+        "recipe" :  {
+            bottom:
+                [
+                    "empty card",  " ", "empty card",
+                    "empty card",  " ", "empty card",
+                    "empty card",  " ", "empty card"
+                ]
+        },
+ 
+        "resultCount": 1
+ 
+    }
+}

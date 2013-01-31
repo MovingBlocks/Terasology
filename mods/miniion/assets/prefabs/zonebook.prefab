@@ -8,5 +8,19 @@
     },
     "OpenUiAction" : {
     	"uiwindowid" : "zonebook"
+    },
+    "CraftRecipe" : {
+    	"fullMatch": false,
+        "recipe" :  {
+            bottom:
+                [
+                    " ",  "book cover", " ",
+                    " ",  "paper", " ",
+                    " ",  "paper", " "
+                ]
+        },
+ 
+        "resultCount": 1
+ 
     }
 }

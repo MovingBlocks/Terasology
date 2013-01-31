@@ -1,0 +1,18 @@
+{	
+	"CraftRecipe" : {
+  		"type" : "EXTERNAL",
+  		"result" : "engine:plank",
+  		"fullMatch": false,
+        "recipe" :  {
+            bottom:
+                [
+                    " ",  " ", " ",
+                    " ",  "oaktrunk", " ",
+                    " ",  " ", " "
+                ]
+        },
+ 
+        "resultCount": 1
+ 
+    }
+}

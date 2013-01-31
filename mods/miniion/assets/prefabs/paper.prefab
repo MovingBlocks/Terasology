@@ -1,18 +1,18 @@
 {
     "Item" : {
-        "name" : "empty card",
-        "icon" : "emptycard",
+        "name" : "paper",
+        "icon" : "paper",
         "usage" : "NONE",
         "consumedOnUse" : false,
-        "stackId" : "miniion:emptycard",
-        "renderWithIcon" : true
+        "stackId" : "miniion:paper",
+        "renderWithIcon" : false
     },
     "CraftRecipe" : {
     	"fullMatch": false,
         "recipe" :  {
             bottom:
                 [
-                    " ",  "wood mulch", " ",
+                    " ",  " ", " ",
                     " ",  "wood mulch", " ",
                     " ",  " ", " "
                 ]

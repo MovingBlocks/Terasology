@@ -49,7 +49,7 @@ public class UIZoneBook extends UIWindow {
 	private final UIComboBox cmbType;
 	private UIList uizonelistgroup, uizonelist;
 	private UIModButton btnSave, btnDelete, btnBack;
-	private EntityRef zoneselection;
+	//private EntityRef zoneselection;
 	private boolean newzonefound;
 	
 	private ClickListener zonelistener = new ClickListener() {		
@@ -280,19 +280,17 @@ public class UIZoneBook extends UIWindow {
 
 	private void executeClick(UIDisplayElement element, int id) {
 		lblError.setText("");
-		if( (!cmbType.isVisible()) && zoneselection.getComponent(ZoneSelectionComponent.class).zonetype == null){
+		if( (!cmbType.isVisible()) && MinionSystem.getNewZone() == null){
 			newzonefound = false;
 			this.close();
 		}
 		if(cmbType.isVisible() && cmbType.getSelection() == null){
 			return;
 		}
-		UIModButton clickedbutton = (UIModButton) element;
 		if (txtzonename.getText().length() < 3) {
 			lblError.setText("Zone name needs to be longer then 2 characters!");
 			return;
-		}		
-		int tmp;
+		}				
 		for (Zone zone : MinionSystem.getGatherZoneList()) {
 			if (zone.Name.matches(txtzonename.getText())) {
 				lblError.setText("Zone name already exists!");
@@ -311,6 +309,7 @@ public class UIZoneBook extends UIWindow {
 				return;
 			}
 		}
+		int tmp;
 		try {
 			tmp = Integer.parseInt(txtheight.getText());
 			tmp = Integer.parseInt(txtwidth.getText());
@@ -319,10 +318,8 @@ public class UIZoneBook extends UIWindow {
 		} catch (NumberFormatException e) {
 			return;
 		}
-		ZoneSelectionComponent zoneselectioncomp = zoneselection
-				.getComponent(ZoneSelectionComponent.class);
 		Zone newzone = new Zone(MinionSystem.getNewZone().getStartPosition(),
-				MinionSystem.getNewZone().getEndPosition());
+								MinionSystem.getNewZone().getEndPosition());
 		newzone.Name = txtzonename.getText();
 		newzone.zoneheight = Integer.parseInt(txtheight.getText());
 		newzone.zonewidth = Integer.parseInt(txtwidth.getText());
@@ -330,7 +327,7 @@ public class UIZoneBook extends UIWindow {
 		if(cmbType.isVisible()){
 			newzone.zonetype = ZoneType.valueOf(cmbType.getSelection().getText());
 		}else{
-			newzone.zonetype = zoneselection.getComponent(ZoneSelectionComponent.class).zonetype;
+			newzone.zonetype = MinionSystem.getNewZone().zonetype;
 		}
 		MinionSystem.addZone(newzone);
 		newzonefound = false;
@@ -361,78 +358,66 @@ public class UIZoneBook extends UIWindow {
 	
 	private void fillUI(){
 		initList();
-		//clear the textbowes
-		txtzonename.setText("");
-		txtheight.setText("");
-		txtwidth.setText("");
-		txtdepth.setText("");
-		lblzonetype.setText("");
-		lblError.setText("");
-		newzonefound = false;
-		btnSave.setVisible(false);
-		btnDelete.setVisible(false);
-		// hopefully people won't run around with 50 zoning tools, I take the
-		// first one that has data in it
-		EntityManager entityManager = CoreRegistry.get(EntityManager.class);
-		for (EntityRef entity : entityManager.iteratorEntities(ZoneSelectionComponent.class)) {
-			ZoneSelectionComponent selection = entity.getComponent(ZoneSelectionComponent.class);
-			if (MinionSystem.getNewZone() != null	&& MinionSystem.getNewZone().getEndPosition() == null) {
-				WorldProvider worldprovider = CoreRegistry.get(WorldProvider.class);
-				Block block = worldprovider.getBlock(MinionSystem.getNewZone().getStartPosition());
-				if(block.getURI().getFamily().matches("minionbench")){
-					newzonefound = true;
-					selection.zonetype = ZoneType.Work;
-					entity.saveComponent(selection);
-					zoneselection = entity;
-					Vector3i minbounds = MinionSystem.getNewZone().getMinBounds();
-					Vector3i maxbounds = MinionSystem.getNewZone().getMaxBounds();
-					if (MinionSystem.getWorkZoneList() == null) {
-						txtzonename.setText("Workzone0");
-					} else {
-						txtzonename.setText("Workzone" + MinionSystem.getWorkZoneList().size());
-					}
-					lblzonetype.setText("ZoneType : Workzone");
-					txtwidth.setText("1");
-					txtdepth.setText("1");
-					txtheight.setText("1");
-				}
-				
-			}else
-			if (MinionSystem.getNewZone() != null	&& MinionSystem.getNewZone().getEndPosition() != null) {
-				newzonefound = true;
-				selection.zonetype = ZoneType.Gather;
-				entity.saveComponent(selection);
-				zoneselection = entity;
+		resetInput();
+
+		if (MinionSystem.getNewZone() != null	&& MinionSystem.getNewZone().getEndPosition() == null) {				
+			if(checkSingleZone()){										 					
 				Vector3i minbounds = MinionSystem.getNewZone().getMinBounds();
-				Vector3i maxbounds = MinionSystem.getNewZone().getMaxBounds();
-				if (MinionSystem.getGatherZoneList() == null) {
-					txtzonename.setText("Zone0");
-				} else {
-					txtzonename.setText("Zone"
-							+ (MinionSystem.getGatherZoneList().size()
-							+ MinionSystem.getTerraformZoneList().size()));
-				}
-				lblzonetype.setText("ZoneType :");
-				cmbType.setVisible(true);
-				txtwidth.setText(""
-						+ (getAbsoluteDiff(maxbounds.x, minbounds.x)));
-				txtdepth.setText(""
-						+ (getAbsoluteDiff(maxbounds.z, minbounds.z)));
-				txtheight.setText(""
-						+ (getAbsoluteDiff(maxbounds.y, minbounds.y)));
+				Vector3i maxbounds = MinionSystem.getNewZone().getMaxBounds();					
+				txtwidth.setText("1");
+				txtdepth.setText("1");
+				txtheight.setText("1");
+			}				
+		}else
+		if (MinionSystem.getNewZone() != null	&& MinionSystem.getNewZone().getEndPosition() != null) {
+			newzonefound = true;
+			MinionSystem.getNewZone().zonetype = ZoneType.Gather; 
+			
+			Vector3i minbounds = MinionSystem.getNewZone().getMinBounds();
+			Vector3i maxbounds = MinionSystem.getNewZone().getMaxBounds();
+			if (MinionSystem.getGatherZoneList() == null) {
+				txtzonename.setText("Zone0");
+			} else {
+				txtzonename.setText("Zone"
+						+ (MinionSystem.getGatherZoneList().size()
+						+ MinionSystem.getTerraformZoneList().size()));
 			}
-			if (newzonefound) {
-				if(MinionSystem.getNewZone().outofboundselection()){
-					btnSave.setVisible(true);
-					lblError.setText("The zone is to big to be saved, depth, width, height should not exceed 50");
-				}
-				else{
-					btnSave.setVisible(true);					
-				}
-				btnDelete.setVisible(false);
-				break;
-			}
+			lblzonetype.setText("ZoneType :");
+			cmbType.setVisible(true);
+			txtwidth.setText(""
+					+ (getAbsoluteDiff(maxbounds.x, minbounds.x)));
+			txtdepth.setText(""
+					+ (getAbsoluteDiff(maxbounds.z, minbounds.z)));
+			txtheight.setText(""
+					+ (getAbsoluteDiff(maxbounds.y, minbounds.y)));
 		}
+		if (newzonefound) {
+			if(MinionSystem.getNewZone().outofboundselection()){
+				btnSave.setVisible(true);
+				lblError.setText("The zone is to big to be saved, depth, width, height should not exceed 50");
+			}
+			else{
+				btnSave.setVisible(true);					
+			}
+			btnDelete.setVisible(false);
+
+		}
+	}
+	
+	private boolean checkSingleZone(){
+		WorldProvider worldprovider = CoreRegistry.get(WorldProvider.class);
+		Block block = worldprovider.getBlock(MinionSystem.getNewZone().getStartPosition());
+		if(block.getURI().getFamily().matches("minionbench")){
+			MinionSystem.getNewZone().zonetype = ZoneType.Work;
+			if (MinionSystem.getWorkZoneList() == null) {
+				txtzonename.setText("Workzone0");
+			} else {
+				txtzonename.setText("Workzone" + MinionSystem.getWorkZoneList().size());
+			}
+			lblzonetype.setText("ZoneType : Workzone");
+			newzonefound = true;
+		}		
+		return newzonefound;
 	}
 	
 	private void initList(){
@@ -455,6 +440,19 @@ public class UIZoneBook extends UIWindow {
 		listitem = new UIListItem(ZoneType.Terraform.toString(), ZoneType.Terraform);
 		listitem.setTextColor(Color.black);
 		cmbType.addItem(listitem);
+	}
+	
+	private void resetInput(){
+		//clear the textbowes
+		txtzonename.setText("");
+		txtheight.setText("");
+		txtwidth.setText("");
+		txtdepth.setText("");
+		lblzonetype.setText("");
+		lblError.setText("");
+		newzonefound = false;
+		btnSave.setVisible(false);
+		btnDelete.setVisible(false);
 	}
 
 	private int getAbsoluteDiff(int val1, int val2) {

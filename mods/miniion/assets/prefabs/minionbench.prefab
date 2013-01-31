@@ -2,5 +2,19 @@
 	"PlaySoundAction" : {
     	"sounds" : ["engine:PlaceBlock"]
   	},
-  	"MinionBench" : {}
+  	"MinionBench" : {},
+  	"CraftRecipe" : {
+  		"type" : "EXTERNAL",
+  		"result" : "miniion:minionbench",
+  		"fullMatch": false,
+        "recipe" :  {
+            bottom:
+                [
+                    "plank",  "plank", " ",
+                    "plank",  "plank", " ",
+                    " ",  " ", " "
+                ]                
+        }, 
+        "resultCount": 1 
+    }
 }

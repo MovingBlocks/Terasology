@@ -6,5 +6,19 @@
         "consumedOnUse" : false,
         "renderWithIcon" : true
     },
-    "ZoneSelection" : { }
+    "ZoneSelection" : { },
+     "CraftRecipe" : {
+    	"fullMatch": false,
+        "recipe" :  {
+            bottom:
+                [
+                    " ",  "stick", " ",
+                    " ",  "stick", " ",
+                    " ",  "sand", " "
+                ]
+        },
+ 
+        "resultCount": 1
+ 
+    }
 }
