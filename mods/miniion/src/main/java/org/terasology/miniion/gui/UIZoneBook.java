@@ -336,7 +336,8 @@ public class UIZoneBook extends UIWindow {
 		}
 		MinionSystem.addZone(newzone);
 		newzonefound = false;
-		lblzonetype.setText("ZoneType : Gatherzone");
+		lblzonetype.setText("");
+		MinionSystem.resetNewSelection();
 		this.close();
 	}
 	
