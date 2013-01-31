@@ -237,7 +237,12 @@ public class UICardBook extends UIWindow {
 					if (invcomp != null) {
 						if (invcomp.itemSlots.get(0) != null) {
 							EntityRef itemstack = invcomp.itemSlots.get(0);
-							itemstack.destroy();
+							ItemComponent item = itemstack.getComponent(ItemComponent.class);
+							if(item.stackCount == 1){
+								itemstack.destroy();
+							}else{
+								item.stackCount--;
+							}
 							EntityRef filledcard = entityManager
 									.create("miniion:filledcard");
 							filledcard.getComponent(ItemComponent.class).name = minioncombo
