@@ -31,6 +31,7 @@ import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.math.Vector3i;
 import org.terasology.miniion.components.*;
 import org.terasology.miniion.gui.*;
 import org.terasology.miniion.utilities.*;
@@ -51,9 +52,13 @@ public class MinionSystem implements EventHandlerSystem {
 	private static final int PRIORITY_LOCAL_PLAYER_OVERRIDE = 160;
 	private static final int POPUP_ENTRIES = 9;
 	private static boolean showactiveminion = false;
+	private static boolean showSelectionOverlay = false;
 	private static EntityRef activeminion;
 	// TODO : a better way to save / load zones, but it does the trick
 	private static EntityRef zonelist;
+	private static Zone newzone;
+	
+	
 	
 	private static List<MinionRecipe> recipeslist = new ArrayList<MinionRecipe>();
 
@@ -162,6 +167,25 @@ public class MinionSystem implements EventHandlerSystem {
 	public static EntityRef getActiveMinion() {
 		return activeminion;
 	}
+	
+	public static void startNewSelection(Vector3i startpos){
+		newzone = new Zone();
+		newzone.setStartPosition(startpos);
+	}
+
+	public static void endNewSelection(Vector3i endpos){
+		if(newzone != null){
+			newzone.setEndPosition(endpos);
+		}
+	}
+
+	public static void resetNewSelection(){
+		newzone = null;
+	}
+
+	public static Zone getNewZone(){
+		return newzone;
+	}
 
 	/**
 	 * adds a new zone to the corresponding zone list
@@ -243,10 +267,25 @@ public class MinionSystem implements EventHandlerSystem {
 	}
 	
 	/**
-	 * Returns true if the user set option in the oreobook
+	 * Returns true if the user set option in minion settings
 	 */
 	public static boolean isActiveMinionShown(){
 		return showactiveminion;
+	}
+	
+	public static void toggleActiveMinionShown(){
+		showactiveminion = !showactiveminion;
+	}
+	
+	/**
+	 * Returns true if the user set option in minion settings
+	 */
+	public static boolean isSelectionShown(){
+		return showSelectionOverlay;
+	}
+	
+	public static void toggleSelectionShown(){
+		showSelectionOverlay = !showSelectionOverlay;
 	}
 	
 	/**

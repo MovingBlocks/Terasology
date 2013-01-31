@@ -46,7 +46,7 @@ public class UIZoneBook extends UIWindow {
 	 * @In private EntityManager entityManager;
 	 */
 	private final UIImage background;
-	private final UILabel lblzonename, lblheight, lbldepth, lblwidth, lblzonetype;
+	private final UILabel lblzonename, lblheight, lbldepth, lblwidth, lblzonetype, lblError;
 	private final UIText txtzonename, txtheight, txtdepth, txtwidth;
 	private final UIComboBox cmbType;
 	private UIList uizonelistgroup, uizonelist;
@@ -108,6 +108,7 @@ public class UIZoneBook extends UIWindow {
 				if(cmbType.isVisible()){
 					cmbType.setVisible(false);
 				}
+				lblError.setText("");
 				Zone zone = (Zone)listitem.getValue();
 				txtzonename.setText(zone.Name);
 				txtheight.setText("" + zone.zoneheight);
@@ -229,6 +230,14 @@ public class UIZoneBook extends UIWindow {
 		background.addDisplayElement(cmbType);
 		initTypes();
 		
+		lblError = new UILabel("");
+		lblError.setWrap(true);
+		lblError.setSize(new Vector2f(200, 80));
+		lblError.setPosition(new Vector2f(260, 130));
+		lblError.setColor(Color.red);
+		lblError.setVisible(true);
+		background.addDisplayElement(lblError);
+		
 		btnSave = new UIModButton(new Vector2f(50, 20), ButtonType.NORMAL);
 		btnSave.setPosition(new Vector2f(260, 230));
 		btnSave.setLabel("Save");
@@ -343,6 +352,7 @@ public class UIZoneBook extends UIWindow {
 		txtwidth.setText("");
 		txtdepth.setText("");
 		lblzonetype.setText("");
+		lblError.setText("");
 		newzonefound = false;
 		btnSave.setVisible(false);
 		btnDelete.setVisible(false);
@@ -351,44 +361,41 @@ public class UIZoneBook extends UIWindow {
 		EntityManager entityManager = CoreRegistry.get(EntityManager.class);
 		for (EntityRef entity : entityManager.iteratorEntities(ZoneSelectionComponent.class)) {
 			ZoneSelectionComponent selection = entity.getComponent(ZoneSelectionComponent.class);
-			if (selection.blockGrid != null	&& selection.blockGrid.getGridPositions().size() == 1) {
-				Set<GridPosition> gridpositions =  selection.blockGrid.getGridPositions();
-				for(GridPosition gridpos : gridpositions){
-					WorldProvider worldprovider = CoreRegistry.get(WorldProvider.class);
-					Block block = worldprovider.getBlock(gridpos.position);
-					if(block.getURI().getFamily().matches("minionbench")){
-						newzonefound = true;
-						selection.zonetype = ZoneType.Work;
-						entity.saveComponent(selection);
-						zoneselection = entity;
-						Vector3i minbounds = selection.blockGrid.getMinBounds();
-						Vector3i maxbounds = selection.blockGrid.getMaxBounds();
-						if (MinionSystem.getWorkZoneList() == null) {
-							txtzonename.setText("Workzone0");
-						} else {
-							txtzonename.setText("Workzone" + MinionSystem.getWorkZoneList().size());
-						}
-						lblzonetype.setText("ZoneType : Workzone");
-						txtwidth.setText("1");
-						txtdepth.setText("1");
-						txtheight.setText("1");
+			if (MinionSystem.getNewZone() != null	&& MinionSystem.getNewZone().getEndPosition() == null) {
+				WorldProvider worldprovider = CoreRegistry.get(WorldProvider.class);
+				Block block = worldprovider.getBlock(MinionSystem.getNewZone().getStartPosition());
+				if(block.getURI().getFamily().matches("minionbench")){
+					newzonefound = true;
+					selection.zonetype = ZoneType.Work;
+					entity.saveComponent(selection);
+					zoneselection = entity;
+					Vector3i minbounds = MinionSystem.getNewZone().getMinBounds();
+					Vector3i maxbounds = MinionSystem.getNewZone().getMaxBounds();
+					if (MinionSystem.getWorkZoneList() == null) {
+						txtzonename.setText("Workzone0");
+					} else {
+						txtzonename.setText("Workzone" + MinionSystem.getWorkZoneList().size());
 					}
+					lblzonetype.setText("ZoneType : Workzone");
+					txtwidth.setText("1");
+					txtdepth.setText("1");
+					txtheight.setText("1");
 				}
 				
 			}else
-			if (selection.blockGrid != null
-					&& selection.blockGrid.getGridPositions().size() > 1) {
+			if (MinionSystem.getNewZone() != null	&& MinionSystem.getNewZone().getEndPosition() != null) {
 				newzonefound = true;
 				selection.zonetype = ZoneType.Gather;
 				entity.saveComponent(selection);
 				zoneselection = entity;
-				Vector3i minbounds = selection.blockGrid.getMinBounds();
-				Vector3i maxbounds = selection.blockGrid.getMaxBounds();
+				Vector3i minbounds = MinionSystem.getNewZone().getMinBounds();
+				Vector3i maxbounds = MinionSystem.getNewZone().getMaxBounds();
 				if (MinionSystem.getGatherZoneList() == null) {
 					txtzonename.setText("Zone0");
 				} else {
 					txtzonename.setText("Zone"
-							+ MinionSystem.getGatherZoneList().size());
+							+ (MinionSystem.getGatherZoneList().size()
+							+ MinionSystem.getTerraformZoneList().size()));
 				}
 				lblzonetype.setText("ZoneType :");
 				cmbType.setVisible(true);
@@ -400,7 +407,13 @@ public class UIZoneBook extends UIWindow {
 						+ (getAbsoluteDiff(maxbounds.y, minbounds.y)));
 			}
 			if (newzonefound) {
-				btnSave.setVisible(true);
+				if(MinionSystem.getNewZone().outofboundselection()){
+					btnSave.setVisible(true);
+					lblError.setText("The zone is to big to be saved, depth, width, height should not exceed 50");
+				}
+				else{
+					btnSave.setVisible(true);					
+				}
 				btnDelete.setVisible(false);
 				break;
 			}

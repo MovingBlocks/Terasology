@@ -390,6 +390,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem,
 
 		if (distanceToTarget < 4) {			
 			// terraform
+			changeAnimation(entity, animcomp.terraformAnim, true);
 			if (timer.getTimeInMs() - ai.lastAttacktime > 200) {
 				ai.lastAttacktime = timer.getTimeInMs();
 				for(int y = (int)(currentTarget.y - 0.5); y >= minioncomp.assignedzone.getMinBounds().y; y--){
@@ -413,6 +414,16 @@ public class SimpleMinionAISystem implements EventHandlerSystem,
 								}
 							}
 							break;
+						}else
+						{
+							if(y == minioncomp.assignedzone.getMinBounds().y){
+								ai.movementTargets.remove(currentTarget);
+							}
+						}
+					}else
+					{
+						if(y == minioncomp.assignedzone.getMinBounds().y){
+							ai.movementTargets.remove(currentTarget);
 						}
 					}
 				}
@@ -609,7 +620,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem,
 		targetDirection.sub(currentTarget, worldPos);
 		if (targetDirection.x * targetDirection.x + targetDirection.z
 				* targetDirection.z > 0.01f) {
-			if (timer.getTimeInMs() - ai.lastDistancecheck > 4000) {
+			if (timer.getTimeInMs() - ai.lastDistancecheck > 2000) {
 				ai.lastDistancecheck = timer.getTimeInMs();
 				if (ai.lastPosition == null) {
 					ai.lastPosition = location.getWorldPosition();

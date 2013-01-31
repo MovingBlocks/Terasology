@@ -15,10 +15,19 @@
  */
 package org.terasology.miniion.componentsystem.controllers;
 
+import javax.vecmath.Vector4f;
+
 import org.terasology.componentSystem.*;
 import org.terasology.entitySystem.*;
 import org.terasology.game.CoreRegistry;
+import org.terasology.math.TeraMath;
+import org.terasology.math.Vector3i;
 import org.terasology.miniion.components.ZoneSelectionComponent;
+import org.terasology.rendering.primitives.Mesh;
+import org.terasology.rendering.primitives.Tessellator;
+import org.terasology.rendering.primitives.TessellatorHelper;
+import org.terasology.world.chunks.Chunk;
+import org.terasology.world.chunks.ChunkProvider;
 
 @RegisterComponentSystem(headedOnly = true)
 public class ZoneSystem implements UpdateSubscriberSystem, RenderSystem {
@@ -41,15 +50,9 @@ public class ZoneSystem implements UpdateSubscriberSystem, RenderSystem {
 
 	@Override
 	public void renderTransparent() {
-
-		for (EntityRef entity : entityManager
-				.iteratorEntities(ZoneSelectionComponent.class)) {
-			ZoneSelectionComponent selection = entity
-					.getComponent(ZoneSelectionComponent.class);
-			selection.blockGrid.render();
-			// entity.saveComponent(selection); // deserialization error tracing
+		if(MinionSystem.getNewZone() != null){
+			MinionSystem.getNewZone().render();
 		}
-
 	}
 
 	@Override
