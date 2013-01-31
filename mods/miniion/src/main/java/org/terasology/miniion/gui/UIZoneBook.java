@@ -34,10 +34,8 @@ import org.terasology.miniion.utilities.Zone;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
 import org.terasology.rendering.gui.widgets.*;
-import org.terasology.rendering.world.BlockGrid.GridPosition;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.family.BlockFamily;
 
 public class UIZoneBook extends UIWindow {
 	/*

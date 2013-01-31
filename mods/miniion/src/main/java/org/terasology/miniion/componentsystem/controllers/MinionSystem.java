@@ -120,9 +120,9 @@ public class MinionSystem implements EventHandlerSystem {
 	 * the droppedblock in the world then gets destroyed, possible duplication
 	 * exploit
 	 */
-	@ReceiveEvent(components = { BlockPickupComponent.class })
+	@ReceiveEvent(components = { MinionComponent.class })
 	public void onBlockDropped(BlockDroppedEvent event, EntityRef entity) {
-		if (event.getInstigator().hasComponent(MinionComponent.class)) {
+		if (entity.hasComponent(MinionComponent.class)) {
 			EntityRef item;
 			if (event.getoldBlock().getEntityMode() == BlockEntityMode.PERSISTENT) {
 				item = blockItemFactory.newInstance(event.getoldBlock()
@@ -131,7 +131,7 @@ public class MinionSystem implements EventHandlerSystem {
 				item = blockItemFactory.newInstance(event.getoldBlock()
 						.getBlockFamily());
 			}
-			event.getInstigator().send(new ReceiveItemEvent(item));
+			entity.send(new ReceiveItemEvent(item));
 			event.getDroppedBlock().destroy();
 		}
 	}
