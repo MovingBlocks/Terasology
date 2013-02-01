@@ -38,12 +38,12 @@ public class MeshFactory {
     private MeshFactory() {
     }
 
-    public Mesh generateItemMesh(int posX, int posY) {
-        return generateItemMesh(posX, posY, 0, false, null);
+    public Mesh generateItemMesh(String simpleuri, int posX, int posY) {
+        return generateItemMesh(simpleuri, posX, posY, 0, false, null);
     }
 
-    public Mesh generateItemMesh(int posX, int posY, int alphaLimit, boolean withContour, Vector4f colorContour) {
-        Texture tex = Assets.getTexture("engine:items");
+    public Mesh generateItemMesh(String simpleuri, int posX, int posY, int alphaLimit, boolean withContour, Vector4f colorContour) {
+        Texture tex = Assets.getTexture(simpleuri);
         ByteBuffer buffer = tex.getImageData(0);
 
         posX *= 16;

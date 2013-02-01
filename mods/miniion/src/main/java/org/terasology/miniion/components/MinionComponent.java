@@ -17,18 +17,42 @@ package org.terasology.miniion.components;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.miniion.minionenum.MinionBehaviour;
+import org.terasology.miniion.utilities.MinionRecipe;
+import org.terasology.miniion.utilities.Zone;
 
 /**
  * Allows an entity to store items
- *
+ * 
  * @author Immortius <immortius@gmail.com>
  */
 public final class MinionComponent implements Component {
 
-    public String icon = "";
-    public MinionBehaviour minionBehaviour = MinionBehaviour.Stay;
+	// simple uri defining an icon
+	public String icon;
+	// personal name for the minion, not set in prefab!
+	public String name = "unknown";
+	// minion type, eg : oreoBuilder, needs to be defined in prefab
+	public String flavortext = "unknown";
+	// used by minionsystem, init at stay normally
+	public MinionBehaviour minionBehaviour = MinionBehaviour.Stay;
+	
+	public boolean dying = false;
+	
+	//stats
+	public int Health;
+	public int HealthTotal;
+	public int Hunger;
+	public int Hungertotal;
+	public int Stamina;
+	public int Staminatotal;
+	
+	//determines an action point for the minion
+	public Zone assignedzone;
+	//the recipe to craft when working
+	public MinionRecipe assignedrecipe;
 
-    public MinionComponent() {
-    }
+	public MinionComponent() {
+		
+	}
 
 }

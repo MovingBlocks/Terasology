@@ -1,0 +1,15 @@
+/*
+ * Copyright 2013 Maternal <Mathes.wenzel@googlemail.com>
+/**
+ * The Cake is a Lie ! This Block needs three textures so it uses the default one and than ovverides it manually*
+ */
+{
+    // Graphics
+    "tiles" : {
+		"bottom" : "CakeLie:CakeBottom" 
+    },
+    "inventory" : {
+        "stackable" : true,
+        "directPickup" : true
+    }
+}

@@ -30,6 +30,7 @@ import org.terasology.entitySystem.EventPriority;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.events.BlockDroppedEvent;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.FullHealthEvent;
 import org.terasology.events.NoHealthEvent;
@@ -117,6 +118,8 @@ public class BlockEntitySystem implements EventHandlerSystem {
                 block = droppedBlockFactory.newInstance(blockComp.getPosition().toVector3f(), oldBlock.getBlockFamily(), 20);
             }
             block.send(new ImpulseEvent(random.randomVector3f(30)));
+         // added as a hook to catch minions breaking blocks
+            event.getInstigator().send(new BlockDroppedEvent(oldBlock, block)); 
         }
 
         if (oldBlock.getEntityMode() != BlockEntityMode.PERSISTENT) {

@@ -1,0 +1,56 @@
+{
+    "persisted" : true,
+    "location" : {},
+    "skeletalmesh" : {
+        "mesh" : "OreoMinions:OreoBuilder",
+        "material" : "OreoMinions:OreonSkin",
+        "animation" : "OreoMinions:BuilderIdle",
+        "loop" : true
+    },
+     "Minion" : {
+	     "icon" = "minionskull",
+	     "Healthtotal" = 300,
+	     "Hungertotal" = 100,
+	     "Staminatotal" = 100
+   },
+	"CharacterMovement" : {
+    	"faceMovementDirection" : true
+  },
+  "Animation" : {
+		"walkAnim" = "OreoMinions:BuilderWalk",
+		"idleAnim" = "OreoMinions:BuilderIdle",
+		"attackAnim" = "OreoMinions:BuilderThor",
+		"dieAnim" = "OreoMinions:BuilderDead",
+		"fadeInAnim" = "OreoMinions:BuilderIdle",
+		"fadeOutAnim" = "OreoMinions:BuilderIdle",
+		"workAnim" = "OreoMinions:BuilderBuild",
+		"terraformAnim" = "OreoMinions:BuilderShow",
+		"randomAnim" : ["OreoMinions:BuilderWave", "OreoMinions:BuilderShow"]
+	},
+  "SimpleMinionAI" : {},
+  "CharacterSound" : {
+	    "footstepSounds" : ["Slime1", "Slime2", "Slime3", "Slime4", "Slime5"],
+	    "footstepVolume" : 0.7
+  },
+  "Inventory": {
+      "itemSlots": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "AccessInventoryAction": {}
+}
