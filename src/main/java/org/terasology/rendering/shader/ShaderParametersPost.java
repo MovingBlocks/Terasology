@@ -19,6 +19,7 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 
 import javax.vecmath.Vector3f;
 
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
@@ -29,8 +30,11 @@ import org.terasology.logic.manager.PostProcessingRenderer;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
+
+import java.nio.FloatBuffer;
 
 /**
  * Shader parameters for the Post-processing shader program.
@@ -38,6 +42,8 @@ import org.terasology.world.block.Block;
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
 public class ShaderParametersPost implements IShaderParameters {
+
+    FastRandom rand = new FastRandom();
 
     Texture vignetteTexture = Assets.getTexture("engine:vignette");
     Texture noiseTexture = Assets.getTexture("engine:noise");
@@ -57,6 +63,11 @@ public class ShaderParametersPost implements IShaderParameters {
         GL13.glActiveTexture(GL13.GL_TEXTURE4);
         scene.bindDepthTexture();
 
+        if (Config.getInstance().isFilmGrain()) {
+            GL13.glActiveTexture(GL13.GL_TEXTURE5);
+            glBindTexture(GL11.GL_TEXTURE_2D, noiseTexture.getId());
+        }
+
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         PostProcessingRenderer.getInstance().getFBO("sceneTonemapped").bindTexture();
 
@@ -67,6 +78,18 @@ public class ShaderParametersPost implements IShaderParameters {
         }
         program.setInt("texVignette", 3);
         program.setInt("texDepth", 4);
+
+        if (Config.getInstance().isFilmGrain()) {
+            program.setInt("texNoise", 5);
+            program.setFloat("grainIntensity", 0.075f);
+            program.setFloat("noiseOffset", rand.randomPosFloat());
+
+            FloatBuffer rtSize = BufferUtils.createFloatBuffer(2);
+            rtSize.put((float) scene._width).put((float) scene._height);
+            rtSize.flip();
+
+            program.setFloat2("renderTargetSize", rtSize);
+        }
 
         program.setFloat("viewingDistance", Config.getInstance().getActiveViewingDistance() * 8.0f);
 

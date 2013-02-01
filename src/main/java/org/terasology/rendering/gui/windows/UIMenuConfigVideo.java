@@ -97,6 +97,7 @@ public class UIMenuConfigVideo extends UIWindow {
                     Config.getInstance().setBloom(false);
                     Config.getInstance().setMotionBlur(false);
                     Config.getInstance().setSSAO(false);
+                    Config.getInstance().setFilmGrain(false);
                     break;
                 case 1:
                     Config.getInstance().setFlickeringLight(true);
@@ -105,6 +106,7 @@ public class UIMenuConfigVideo extends UIWindow {
                     Config.getInstance().setBloom(true);
                     Config.getInstance().setMotionBlur(false);
                     Config.getInstance().setSSAO(false);
+                    Config.getInstance().setFilmGrain(true);
                     break;
                 case 2:
                     Config.getInstance().setFlickeringLight(true);
@@ -112,7 +114,8 @@ public class UIMenuConfigVideo extends UIWindow {
                     Config.getInstance().setEyeAdaption(true);
                     Config.getInstance().setBloom(true);
                     Config.getInstance().setMotionBlur(true);
-                    Config.getInstance().setSSAO(false);
+                    Config.getInstance().setSSAO(true);
+                    Config.getInstance().setFilmGrain(true);
                     break;
                 }
                 
