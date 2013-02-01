@@ -15,19 +15,12 @@
  */
 package org.terasology.rendering.shader;
 
-import com.sun.prism.impl.BufferUtil;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
-import org.terasology.game.CoreRegistry;
-import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PostProcessingRenderer;
 import org.terasology.rendering.assets.Texture;
-import org.terasology.rendering.cameras.Camera;
-import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.block.Block;
 
 import javax.vecmath.Vector3f;
 
@@ -67,7 +60,7 @@ public class ShaderParametersSSAO implements IShaderParameters {
         program.setFloat("ssaoFalloff", 0.0000001f);
         program.setFloat("ssaoRad", 0.05f);
 
-        FloatBuffer rtSize = BufferUtil.newFloatBuffer(2);
+        FloatBuffer rtSize = BufferUtils.createFloatBuffer(2);
         rtSize.put((float) scene._width).put((float) scene._height);
         rtSize.flip();
 

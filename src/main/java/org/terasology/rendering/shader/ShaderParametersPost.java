@@ -19,7 +19,7 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 
 import javax.vecmath.Vector3f;
 
-import com.sun.prism.impl.BufferUtil;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
@@ -84,7 +84,7 @@ public class ShaderParametersPost implements IShaderParameters {
             program.setFloat("grainIntensity", 0.075f);
             program.setFloat("noiseOffset", rand.randomPosFloat());
 
-            FloatBuffer rtSize = BufferUtil.newFloatBuffer(2);
+            FloatBuffer rtSize = BufferUtils.createFloatBuffer(2);
             rtSize.put((float) scene._width).put((float) scene._height);
             rtSize.flip();
 
