@@ -221,6 +221,8 @@ public class Shader implements Asset {
             builder.append("#define MOTION_BLUR \n");
         if (Config.getInstance().isSSAO())
             builder.append("#define SSAO \n");
+        if (Config.getInstance().isFilmGrain())
+            builder.append("#define FILM_GRAIN \n");
         return builder;
     }
 

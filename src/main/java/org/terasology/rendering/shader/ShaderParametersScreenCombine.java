@@ -38,7 +38,7 @@ public class ShaderParametersScreenCombine implements IShaderParameters {
         PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("scene");
 
         if (Config.getInstance().isSSAO()) {
-            PostProcessingRenderer.FBO ssao = PostProcessingRenderer.getInstance().getFBO("ssaoBlurred");
+            PostProcessingRenderer.FBO ssao = PostProcessingRenderer.getInstance().getFBO("ssaoBlurred1");
             GL13.glActiveTexture(GL13.GL_TEXTURE1);
             ssao.bindTexture();
             program.setInt("texSsao", 1);
