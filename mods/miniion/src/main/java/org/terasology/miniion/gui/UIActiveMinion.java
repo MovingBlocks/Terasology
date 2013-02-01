@@ -512,6 +512,28 @@ public class UIActiveMinion extends UIWindow{
 					uiDetailList.setVisible(true);
 					break;
 				}
+				case Storage : {
+					uiDetailList.removeAll();
+					for (Zone zone : MinionSystem.getStorageZoneList()) {
+						UIListItem newlistitem = new UIListItem(zone.Name, zone);
+						newlistitem.addClickListener(zoneItemListener);
+						uiDetailList.addItem(newlistitem);
+					}
+					uiMainlist.setVisible(false);
+					uiDetailList.setVisible(true);
+					break;
+				}
+				case OreonFarm : {
+					uiDetailList.removeAll();
+					for (Zone zone : MinionSystem.getOreonFarmZoneList()) {
+						UIListItem newlistitem = new UIListItem(zone.Name, zone);
+						newlistitem.addClickListener(zoneItemListener);
+						uiDetailList.addItem(newlistitem);
+					}
+					uiMainlist.setVisible(false);
+					uiDetailList.setVisible(true);
+					break;
+				}
 				default : {					
 					break;
 				}

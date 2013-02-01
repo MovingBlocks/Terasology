@@ -207,6 +207,14 @@ public class MinionSystem implements EventHandlerSystem {
 				zonelistcomp.Terrazones.add(zone);
 				break;
 			}
+			case Storage : {
+				zonelistcomp.Storagezones.add(zone);
+				break;
+			}
+			case OreonFarm : {
+				zonelistcomp.OreonFarmzones.add(zone);
+				break;
+			}
 		}		
 		zonelist.saveComponent(zonelistcomp);
 	}
@@ -245,6 +253,30 @@ public class MinionSystem implements EventHandlerSystem {
 			return null;
 		}
 		return zonelist.getComponent(ZoneListComponent.class).Terrazones;
+	}
+	
+	/**
+	 * returns a list with all storage zones
+	 * @return
+	 * 			a list with all storage zones
+	 */
+	public static List<Zone> getStorageZoneList() {
+		if (zonelist == null) {
+			return null;
+		}
+		return zonelist.getComponent(ZoneListComponent.class).Storagezones;
+	}
+	
+	/**
+	 * returns a list with all Oreon farm zones
+	 * @return
+	 * 			a list with all Oreon farm zones
+	 */
+	public static List<Zone> getOreonFarmZoneList() {
+		if (zonelist == null) {
+			return null;
+		}
+		return zonelist.getComponent(ZoneListComponent.class).OreonFarmzones;
 	}
 	
 	public static List<MinionRecipe> getRecipesList(){
@@ -432,6 +464,14 @@ public class MinionSystem implements EventHandlerSystem {
 		recipe.craftRes.add("sand");
 		recipe.craftRes.add("snow");
 		recipe.craftsteps = 50;
+		recipeslist.add(recipe);
+		
+		recipe = new MinionRecipe();
+		recipe.Name = "chest";
+		recipe.result = "core:chest";
+		recipe.craftRes.add("plank");
+		recipe.quantity = 8;
+		recipe.craftsteps = 100;
 		recipeslist.add(recipe);
 	} 	
 

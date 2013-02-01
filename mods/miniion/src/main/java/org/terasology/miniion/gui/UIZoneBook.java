@@ -97,6 +97,32 @@ public class UIZoneBook extends UIWindow {
 					btnBack.setVisible(true);
 					break;
 				}
+				case Storage : {
+					uizonelist.removeAll();
+					for (Zone zone : MinionSystem.getStorageZoneList()) {
+						UIListItem newlistitem = new UIListItem(zone.Name, zone);
+						newlistitem.setTextColor(Color.black);
+						newlistitem.addClickListener(zonelistener);
+						uizonelist.addItem(newlistitem);
+					}
+					uizonelistgroup.setVisible(false);
+					uizonelist.setVisible(true);
+					btnBack.setVisible(true);
+					break;
+				}
+				case OreonFarm : {
+					uizonelist.removeAll();
+					for (Zone zone : MinionSystem.getOreonFarmZoneList()) {
+						UIListItem newlistitem = new UIListItem(zone.Name, zone);
+						newlistitem.setTextColor(Color.black);
+						newlistitem.addClickListener(zonelistener);
+						uizonelist.addItem(newlistitem);
+					}
+					uizonelistgroup.setVisible(false);
+					uizonelist.setVisible(true);
+					btnBack.setVisible(true);
+					break;
+				}
 				default : {					
 					break;
 				}
@@ -280,12 +306,36 @@ public class UIZoneBook extends UIWindow {
 
 	private void executeClick(UIDisplayElement element, int id) {
 		lblError.setText("");
-		if( (!cmbType.isVisible()) && MinionSystem.getNewZone() == null){
+		if( MinionSystem.getNewZone() == null){
 			newzonefound = false;
+			MinionSystem.resetNewSelection();
+			lblError.setText("Something went wrong. Please close the book and recreate the selection.");
+		}
+		if( MinionSystem.getNewZone().zonetype == ZoneType.OreonFarm){
+			if(MinionSystem.getNewZone().getEndPosition() == null){
+				newzonefound = false;
+				MinionSystem.resetNewSelection();
+				lblError.setText("Something went wrong. Please close the book and recreate the selection.");
+			}else{
+				
+			}			
+		}
+		if( (!cmbType.isVisible()) && MinionSystem.getNewZone() == null){
+			newzonefound = false;			
 			this.close();
 		}
 		if(cmbType.isVisible() && cmbType.getSelection() == null){
+			lblError.setText("Please select a zone type");
 			return;
+		}
+		if(cmbType.isVisible() && cmbType.getSelection() != null){
+			if(ZoneType.valueOf(cmbType.getSelection().getText()) == ZoneType.OreonFarm){
+				if(MinionSystem.getNewZone().getMinBounds().y != MinionSystem.getNewZone().getMaxBounds().y){
+					newzonefound = false;
+					lblError.setText("A farm zone needs to be level. Please select a flat zone and try again");
+					return;
+				}
+			}
 		}
 		if (txtzonename.getText().length() < 3) {
 			lblError.setText("Zone name needs to be longer then 2 characters!");
@@ -344,6 +394,18 @@ public class UIZoneBook extends UIWindow {
 			}
 			case Work : {
 				MinionSystem.getWorkZoneList().remove(deletezone);
+				break;
+			}
+			case Terraform : {
+				MinionSystem.getTerraformZoneList().remove(deletezone);
+				break;
+			}
+			case Storage : {
+				MinionSystem.getStorageZoneList().remove(deletezone);
+				break;
+			}
+			case OreonFarm : {
+				MinionSystem.getOreonFarmZoneList().remove(deletezone);
 				break;
 			}
 		}		
@@ -416,6 +478,16 @@ public class UIZoneBook extends UIWindow {
 			}
 			lblzonetype.setText("ZoneType : Workzone");
 			newzonefound = true;
+		}else
+		if(block.getURI().getFamily().matches("chest")){
+			MinionSystem.getNewZone().zonetype = ZoneType.Storage;
+			if (MinionSystem.getWorkZoneList() == null) {
+				txtzonename.setText("Storage0");
+			} else {
+				txtzonename.setText("Storage" + MinionSystem.getWorkZoneList().size());
+			}
+			lblzonetype.setText("ZoneType : Storage");
+			newzonefound = true;
 		}		
 		return newzonefound;
 	}
@@ -438,6 +510,9 @@ public class UIZoneBook extends UIWindow {
 		listitem.setTextColor(Color.black);
 		cmbType.addItem(listitem);
 		listitem = new UIListItem(ZoneType.Terraform.toString(), ZoneType.Terraform);
+		listitem.setTextColor(Color.black);
+		cmbType.addItem(listitem);
+		listitem = new UIListItem(ZoneType.OreonFarm.toString(), ZoneType.OreonFarm);
 		listitem.setTextColor(Color.black);
 		cmbType.addItem(listitem);
 	}

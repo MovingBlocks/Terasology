@@ -14,26 +14,7 @@
  * limitations under the License.
  */
 {
-    "Item" : {
-        "name" : "empty card",
-        "icon" : "emptycard",
-        "usage" : "NONE",
-        "consumedOnUse" : false,
-        "stackId" : "miniion:emptycard",
-        "renderWithIcon" : true
-    },
-    "CraftRecipe" : {
-    	"fullMatch": false,
-        "recipe" :  {
-            bottom:
-                [
-                    " ",  "wood mulch", " ",
-                    " ",  "wood mulch", " ",
-                    " ",  " ", " "
-                ]
-        },
- 
-        "resultCount": 1
- 
-    }
+	"OreonCrop" = {
+		"stages" = 7
+	}
 }
