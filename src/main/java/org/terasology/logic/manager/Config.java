@@ -446,6 +446,14 @@ public final class Config {
         return _setting.getSystemBuilder().getSsao();
     }
 
+    public void setFilmGrain(boolean filmGrain) {
+        _setting.getSystemBuilder().setFilmGrain(filmGrain);
+    }
+
+    public boolean isFilmGrain() {
+        return _setting.getSystemBuilder().getFilmGrain();
+    }
+
     public void setEyeAdaption(boolean eyeAdaption) {
         _setting.getSystemBuilder().setEyeAdapation(eyeAdaption);
     }

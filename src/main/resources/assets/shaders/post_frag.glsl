@@ -32,7 +32,16 @@ uniform sampler2D texBlur;
 #ifdef VIGNETTE
 uniform sampler2D texVignette;
 #endif
+#ifdef FILM_GRAIN
+uniform sampler2D   texNoise;
+uniform vec2        noiseSize = vec2(64.0, 64.0);
+uniform vec2        renderTargetSize = vec2(1280.0, 720.0);
+#endif
 
+#ifdef FILM_GRAIN
+uniform float noiseOffset;
+uniform float grainIntensity;
+#endif
 uniform bool swimming;
 uniform float viewingDistance;
 
@@ -98,6 +107,11 @@ void main() {
 #ifdef BLOOM
     vec4 colorBloom = texture2D(texBloom, gl_TexCoord[0].xy);
     finalColor += colorBloom;
+#endif
+
+#ifdef FILM_GRAIN
+    vec3 noise = texture2D(texNoise, renderTargetSize * (gl_TexCoord[0].xy + noiseOffset) / noiseSize).xyz * 2.0 - 1.0;
+    finalColor.rgb += vec3(noise) * grainIntensity;
 #endif
 
 #ifdef VIGNETTE

@@ -44,8 +44,8 @@ public class PostProcessingRenderer {
     public static final float MAX_EXPOSURE = 6.0f;
     public static final float MAX_EXPOSURE_NIGHT = 0.5f;
     public static final float MIN_EXPOSURE = 0.5f;
-    public static final float TARGET_LUMINANCE = 1.5f;
-    public static final float ADJUSTMENT_SPEED = 0.0075f;
+    public static final float TARGET_LUMINANCE = 1.0f;
+    public static final float ADJUSTMENT_SPEED = 0.025f;
 
     private static final Logger logger = LoggerFactory.getLogger(PostProcessingRenderer.class);
 
@@ -266,7 +266,7 @@ public class PostProcessingRenderer {
 
             _sceneLuminance = 0.2126f * pixels.get(2) / 255.f + 0.7152f * pixels.get(1) / 255.f + 0.0722f * pixels.get(0) / 255.f;
 
-            float targetExposure = MIN_EXPOSURE;
+            float targetExposure = MAX_EXPOSURE;
 
             if (_sceneLuminance > 0) {
                 targetExposure = TARGET_LUMINANCE / _sceneLuminance;
@@ -325,16 +325,17 @@ public class PostProcessingRenderer {
         createOrUpdateFullscreenFbos();
 
         generateDownsampledScene();
+        updateExposure();
 
         if (Config.getInstance().isSSAO()) {
             generateSSAO();
-            generateBlurredSSAO();
+            for (int i = 0; i < 2; i++) {
+                generateBlurredSSAO(i);
+            }
         }
 
         screenSpaceCombine();
-
         generateTonemappedScene();
-
         generateHighPass();
 
         for (int i = 0; i < 2; i++) {
@@ -347,7 +348,6 @@ public class PostProcessingRenderer {
         }
 
         renderFinalScene();
-        updateExposure();
     }
 
     private void renderFinalScene() {
@@ -383,22 +383,30 @@ public class PostProcessingRenderer {
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
 
-    public void generateBlurredSSAO() {
+    public void generateBlurredSSAO(int id) {
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("blur");
+
         shader.enable();
+        shader.setFloat("radius", 8.0f);
 
-        shader.setFloat("radius", 4.0f);
+        FBO bloom = PostProcessingRenderer.getInstance().getFBO("ssaoBlurred" + id);
+        bloom.bind();
 
-        FBO ssaoBlurred = PostProcessingRenderer.getInstance().getFBO("ssaoBlurred");
-        ssaoBlurred.bind();
+        glViewport(0, 0, bloom._width, bloom._height);
 
-        glViewport(0, 0, ssaoBlurred._width, ssaoBlurred._height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        PostProcessingRenderer.getInstance().getFBO("ssao").bindTexture();
+        if (id == 0) {
+            PostProcessingRenderer.getInstance().getFBO("ssao").bindTexture();
+        }
+        else {
+            PostProcessingRenderer.getInstance().getFBO("ssaoBlurred" + (id - 1)).bindTexture();
+        }
+
         renderFullQuad();
 
-        PostProcessingRenderer.getInstance().getFBO("ssaoBlurred").unbind();
+        PostProcessingRenderer.getInstance().getFBO("ssaoBlurred" + id).unbind();
+
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
 
@@ -425,8 +433,10 @@ public class PostProcessingRenderer {
             return;
 
         createFBO("scene", Display.getWidth(), Display.getHeight(), true, true, true);
+
         createFBO("sceneCombined", Display.getWidth(), Display.getHeight(), true, false, false);
         createFBO("sceneTonemapped", Display.getWidth(), Display.getHeight(), true, false, false);
+
 
         final int halfWidth = Display.getWidth() / 2;
         final int halfHeight = Display.getHeight() / 2;
@@ -434,6 +444,10 @@ public class PostProcessingRenderer {
         final int quarterHeight = halfHeight / 2;
         final int halfQuarterWidth = quarterWidth / 2;
         final int halfQuarterHeight = quarterHeight / 2;
+
+        createFBO("ssao", halfWidth,  halfHeight, false, false, false);
+        createFBO("ssaoBlurred0", halfWidth, halfHeight, false, false, false);
+        createFBO("ssaoBlurred1", halfWidth, halfHeight, false, false, false);
 
         createFBO("sceneReflected", halfWidth, halfHeight, true, true, false);
 
@@ -443,9 +457,6 @@ public class PostProcessingRenderer {
 
         createFBO("sceneBlur0", quarterWidth, quarterHeight, false, false, false);
         createFBO("sceneBlur1", quarterWidth, quarterHeight, false, false, false);
-
-        createFBO("ssao", halfWidth, halfHeight, false, false, false);
-        createFBO("ssaoBlurred", halfWidth, halfHeight, false, false, false);
     }
 
     private void generateHighPass() {
@@ -500,7 +511,7 @@ public class PostProcessingRenderer {
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("blur");
 
         shader.enable();
-        shader.setFloat("radius", 16.0f);
+        shader.setFloat("radius", 32.0f);
 
         FBO bloom = PostProcessingRenderer.getInstance().getFBO("sceneBloom" + id);
         bloom.bind();

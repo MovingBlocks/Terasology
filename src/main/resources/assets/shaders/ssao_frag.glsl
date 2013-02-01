@@ -16,11 +16,13 @@
 
 uniform float   ssaoStrength = 0.1;
 uniform float   ssaoTotalStrength = 1.0;
-uniform float   ssaoOffset = 18.0;
 uniform float   ssaoFalloff = 0.000002;
 uniform float   ssaoRad = 0.006;
 uniform int     ssaoSamples = 16;
 uniform float   ssaoInvSamples = 1.0 / 16.0;
+
+uniform vec2    noiseSize = vec2(64.0, 64.0);
+uniform vec2    renderTargetSize = vec2(1280.0, 720.0);
 
 uniform sampler2D texNormals;
 uniform sampler2D texNoise;
@@ -37,22 +39,22 @@ vec3 sphereSamples[16] = vec3[](
 
 void main() {
     float currentDepth = texture2D(texDepth, gl_TexCoord[0].xy).x;
-    vec4 screenSpaceNorm = vec4(gl_TexCoord[0].x, gl_TexCoord[0].y, currentDepth, 1.0);
+    vec3 screenSpacePosition = vec3(gl_TexCoord[0].x, gl_TexCoord[0].y, currentDepth);
 
-    vec3 screenNormal = texture2D(texNormals, gl_TexCoord[0].xy).xyz * 2.0 - 1.0;
-    vec3 fres = (texture2D(texNoise,gl_TexCoord[0].xy * ssaoOffset).xyz * 2.0) - vec3(1.0);
+    vec3 screenNormal = normalize(texture2D(texNormals, gl_TexCoord[0].xy).xyz * 2.0 - 1.0);
+    vec3 randomNormal = normalize(texture2D(texNoise, renderTargetSize * gl_TexCoord[0].xy / noiseSize).xyz * 2.0 - 1.0);
 
     float bl = 0.0;
-    float radD = ssaoRad;
+    float radD = ssaoRad / screenSpacePosition.z;
 
     vec3 ray, se, occNorm;
     float occluderDepth, depthDifference, normDiff, occDepth;
 
     for (int i=0; i<ssaoSamples;++i) {
-        ray = radD*reflect(sphereSamples[i],fres);
-        se = screenSpaceNorm.xyz + sign(dot(ray,screenNormal))*ray;
+        ray = radD*reflect(sphereSamples[i],randomNormal);
+        se = screenSpacePosition.xyz + sign(dot(ray,screenNormal))*ray;
 
-        occNorm = texture2D(texNormals,se.xy).xyz * 2.0 - 1.0;
+        occNorm = normalize(texture2D(texNormals,se.xy).xyz * 2.0 - 1.0);
 
         occDepth = texture2D(texDepth, se.xy).x;
         depthDifference = currentDepth-occDepth;
@@ -63,5 +65,5 @@ void main() {
     }
 
     float ao = 1.0-ssaoTotalStrength*bl*ssaoInvSamples;
-    gl_FragData[0].rgba = vec4(ao, ao, ao, 1.0);
+    gl_FragData[0].rgba = vec4(ao);
 }

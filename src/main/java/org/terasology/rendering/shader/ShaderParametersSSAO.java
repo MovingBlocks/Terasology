@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.shader;
 
+import com.sun.prism.impl.BufferUtil;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
@@ -29,6 +30,8 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 
 import javax.vecmath.Vector3f;
+
+import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
 
@@ -59,11 +62,16 @@ public class ShaderParametersSSAO implements IShaderParameters {
         final int ssaoSamples = 16;
         program.setInt("ssaoSamples", ssaoSamples);
         program.setFloat("ssaoInvSamples", 1.0f / ssaoSamples);
-        program.setFloat("ssaoStrength", 0.2f);
-        program.setFloat("ssaoTotalStrength", 2.0f);
-        program.setFloat("ssaoOffset", 20.0f);
-        program.setFloat("ssaoFalloff", 0.000002f);
-        program.setFloat("ssaoRad", 0.006f);
+        program.setFloat("ssaoStrength", 0.15f);
+        program.setFloat("ssaoTotalStrength", 1.25f);
+        program.setFloat("ssaoFalloff", 0.0000001f);
+        program.setFloat("ssaoRad", 0.05f);
+
+        FloatBuffer rtSize = BufferUtil.newFloatBuffer(2);
+        rtSize.put((float) scene._width).put((float) scene._height);
+        rtSize.flip();
+
+        program.setFloat2("renderTargetSize", rtSize);
     }
 
 }
