@@ -254,8 +254,10 @@ public final class ChunkTessellator {
             vertexFlags = 1;
         } else if (block.getURI().toString().equals("engine:lava")) {
             vertexFlags = 2;
-        } else if (block.isWaving()) {
+        } else if (block.isWaving() && block.isDoubleSided()) {
             vertexFlags = 4;
+        } else if (block.isWaving() && !block.isDoubleSided()) {
+            vertexFlags = 5;
         }
 
         /*

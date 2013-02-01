@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-#define BLOCK_HINT_WATER     1
-#define BLOCK_HINT_LAVA      2
-#define BLOCK_HINT_GRASS     3
-#define BLOCK_HINT_WAVING    4
+#define BLOCK_HINT_WATER            1
+#define BLOCK_HINT_LAVA             2
+#define BLOCK_HINT_WAVING           4
+#define BLOCK_HINT_WAVING_BLOCK     5
 
 varying vec3 normal;
 varying vec4 vertexWorldPosRaw;
@@ -73,8 +73,12 @@ void main()
                vertexWorldPos.x += (smoothTriangleWave(timeToTick(time, 0.2) + vertexChunkPos.x * 0.1 + vertexChunkPos.z * 0.1) * 2.0 - 1.0) * 0.1 * blockScale;
                vertexWorldPos.y += (smoothTriangleWave(timeToTick(time, 0.1) + vertexChunkPos.x * -0.5 + vertexChunkPos.z * -0.5) * 2.0 - 1.0) * 0.05 * blockScale;
            }
+        } else if ( checkFlag(BLOCK_HINT_WAVING_BLOCK, blockHint) ) {
+            vertexWorldPos.x += (smoothTriangleWave(timeToTick(time, 0.1) + vertexChunkPos.x * 0.01 + vertexChunkPos.z * 0.01) * 2.0 - 1.0) * 0.01 * blockScale;
+            vertexWorldPos.y += (smoothTriangleWave(timeToTick(time, 0.15) + vertexChunkPos.x * -0.01 + vertexChunkPos.z * -0.01) * 2.0 - 1.0) * 0.05 * blockScale;
+            vertexWorldPos.z += (smoothTriangleWave(timeToTick(time, 0.1) + vertexChunkPos.x * -0.01 + vertexChunkPos.z * -0.01) * 2.0 - 1.0) * 0.01 * blockScale;
         }
-     }
+    }
 
     if ( checkFlag(BLOCK_HINT_WATER, blockHint) ) {
        // Only animate blocks on sea level

@@ -56,7 +56,7 @@ public class DefaultGenerators {
         // Add the trees to the generator lists
         mngr.addTreeGenerator(WorldBiomeProvider.Biome.MOUNTAINS, oakTree);
         mngr.addTreeGenerator(WorldBiomeProvider.Biome.MOUNTAINS, pineTree);
-        mngr.addTreeGenerator(WorldBiomeProvider.Biome.MOUNTAINS, redTree);
+        mngr.addTreeGenerator(WorldBiomeProvider.Biome.FOREST, oakVariationTree);
 
         mngr.addTreeGenerator(WorldBiomeProvider.Biome.FOREST, oakTree);
         mngr.addTreeGenerator(WorldBiomeProvider.Biome.FOREST, pineTree);
