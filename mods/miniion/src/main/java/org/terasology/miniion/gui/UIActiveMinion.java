@@ -36,9 +36,7 @@ import org.terasology.miniion.minionenum.ZoneType;
 import org.terasology.miniion.utilities.MinionRecipe;
 import org.terasology.miniion.utilities.Zone;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.events.ChangedListener;
-import org.terasology.rendering.gui.framework.events.ClickListener;
-import org.terasology.rendering.gui.framework.events.MouseButtonListener;
+import org.terasology.rendering.gui.framework.events.*;
 import org.terasology.rendering.gui.layout.GridLayout;
 import org.terasology.rendering.gui.widgets.*;
 
@@ -504,6 +502,28 @@ public class UIActiveMinion extends UIWindow{
 				case Work : {
 					uiDetailList.removeAll();
 					for (Zone zone : MinionSystem.getWorkZoneList()) {
+						UIListItem newlistitem = new UIListItem(zone.Name, zone);
+						newlistitem.addClickListener(zoneItemListener);
+						uiDetailList.addItem(newlistitem);
+					}
+					uiMainlist.setVisible(false);
+					uiDetailList.setVisible(true);
+					break;
+				}
+				case Storage : {
+					uiDetailList.removeAll();
+					for (Zone zone : MinionSystem.getStorageZoneList()) {
+						UIListItem newlistitem = new UIListItem(zone.Name, zone);
+						newlistitem.addClickListener(zoneItemListener);
+						uiDetailList.addItem(newlistitem);
+					}
+					uiMainlist.setVisible(false);
+					uiDetailList.setVisible(true);
+					break;
+				}
+				case OreonFarm : {
+					uiDetailList.removeAll();
+					for (Zone zone : MinionSystem.getOreonFarmZoneList()) {
 						UIListItem newlistitem = new UIListItem(zone.Name, zone);
 						newlistitem.addClickListener(zoneItemListener);
 						uiDetailList.addItem(newlistitem);

@@ -15,21 +15,21 @@
  */
 {
     "Item" : {
-        "name" : "empty card",
-        "icon" : "emptycard",
+        "name" : "book cover",
+        "icon" : "bookcover",
         "usage" : "NONE",
         "consumedOnUse" : false,
-        "stackId" : "miniion:emptycard",
-        "renderWithIcon" : true
+        "stackId" : "miniion:bookcover",
+        "renderWithIcon" : false
     },
     "CraftRecipe" : {
     	"fullMatch": false,
         "recipe" :  {
             bottom:
                 [
-                    " ",  "wood mulch", " ",
-                    " ",  "wood mulch", " ",
-                    " ",  " ", " "
+                    "empty card",  " ", "empty card",
+                    "empty card",  " ", "empty card",
+                    "empty card",  " ", "empty card"
                 ]
         },
  

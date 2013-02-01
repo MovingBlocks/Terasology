@@ -18,7 +18,6 @@ package org.terasology.miniion.componentsystem.controllers;
 import java.util.List;
 
 import javax.vecmath.AxisAngle4f;
-import javax.vecmath.Tuple3f;
 import javax.vecmath.Vector3f;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
@@ -27,6 +26,7 @@ import org.terasology.components.ItemComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.*;
+import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.HorizontalCollisionEvent;
 import org.terasology.events.inventory.ReceiveItemEvent;
@@ -39,15 +39,13 @@ import org.terasology.miniion.events.MinionMessageEvent;
 import org.terasology.miniion.pathfinder.AStarPathing;
 import org.terasology.miniion.minionenum.MinionMessagePriority;
 import org.terasology.miniion.minionenum.ZoneType;
-import org.terasology.miniion.utilities.MinionMessage;
-import org.terasology.miniion.utilities.Zone;
+import org.terasology.miniion.utilities.*;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.assets.animation.MeshAnimation;
 import org.terasology.rendering.logic.SkeletalMeshComponent;
 import org.terasology.world.*;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockItemComponent;
-import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.management.BlockManager;
 
 /**
@@ -71,6 +69,24 @@ public class SimpleMinionAISystem implements EventHandlerSystem,
 		blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
 		timer = CoreRegistry.get(Timer.class);
 		aStarPathing = new AStarPathing(worldProvider);
+		
+	}
+	
+	 @ReceiveEvent(components = {SimpleMinionAIComponent.class})
+	    public void onSpawn(AddComponentEvent event, EntityRef entity) {
+		 	initMinionAI();
+	    }
+	
+	private void initMinionAI(){
+		//add 3000 to init to create  bit of a delay before first check
+		long initTime = timer.getTimeInMs() +3000;
+		for(EntityRef minion : entityManager.iteratorEntities(SimpleMinionAIComponent.class)){
+			SimpleMinionAIComponent ai = minion.getComponent(SimpleMinionAIComponent.class);
+			ai.lastAttacktime = initTime;
+			ai.lastDistancecheck = initTime;
+			ai.lastHungerCheck = initTime;
+			minion.saveComponent(ai);
+		}
 	}
 
 	@Override
@@ -121,7 +137,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem,
 				break;
 			}
 			case Terraform: {
-				executeTerraformAI(entity);
+				executeTerraformAI(entity, "");
 				break;
 			}
 			case Move: {
@@ -173,7 +189,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem,
 
 	private void executeFollowAI(EntityRef entity) {
 		LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-		if (localPlayer != null) {
+		if (localPlayer == null) {
 			return;
 		}
 		LocationComponent location = entity
@@ -276,7 +292,17 @@ public class SimpleMinionAISystem implements EventHandlerSystem,
 			changeAnimation(entity, animcomp.idleAnim, true);
 			return;
 		}else if(minioncomp.assignedzone.zonetype != ZoneType.Work){
-			changeAnimation(entity, animcomp.idleAnim, true);
+			if(minioncomp.assignedzone.zonetype == ZoneType.OreonFarm){
+				if(minioncomp.assignedzone.isTerraformComplete()){
+					//farming
+					executeFarmmAI(entity);
+				}else{
+					executeTerraformAI(entity, "miniion:OreonFarmDry");
+				}
+			}else{
+				changeAnimation(entity, animcomp.idleAnim, true);
+				
+			}
 			return;
 		}
 		
@@ -325,11 +351,14 @@ public class SimpleMinionAISystem implements EventHandlerSystem,
 										ItemComponent item = slot.getComponent(ItemComponent.class);
 										if(blockItem != null){
 											if(blockItem.blockFamily.getURI().getFamily().matches(simpleuri)){
-												item.stackCount--;
-												if(item.stackCount == 0){
-													slot.destroy();
+												if(item.stackCount >= minioncomp.assignedrecipe.quantity)
+												{
+													item.stackCount -= minioncomp.assignedrecipe.quantity;
+													if(item.stackCount == 0){
+														slot.destroy();
+													}
+													break;
 												}
-												break;
 											}
 										}
 									}
@@ -351,7 +380,15 @@ public class SimpleMinionAISystem implements EventHandlerSystem,
 		setMovement(currentTarget, entity);
 	}
 	
-	private void executeTerraformAI(EntityRef entity) {
+	/**
+	 * Terraforms a zone into a set recipe, by default chocolate.
+	 * @param entity 
+	 * 				the minion that is terraforming
+	 * @param fixedrecipeuri
+	 * 				set to empty string by default for normal terraforming, 
+	 * 				can override the default recipe for farming. 
+	 */
+	private void executeTerraformAI(EntityRef entity, String fixedrecipeuri) {
 		MinionComponent minioncomp = entity.getComponent(MinionComponent.class);
 		LocationComponent location = entity
 				.getComponent(LocationComponent.class);
@@ -367,13 +404,16 @@ public class SimpleMinionAISystem implements EventHandlerSystem,
 		}else if(minioncomp.assignedzone.getStartPosition() == null){
 			changeAnimation(entity, animcomp.idleAnim, true);
 			return;
-		}else if(minioncomp.assignedzone.zonetype != ZoneType.Terraform){
+		}else if(minioncomp.assignedzone.zonetype != ZoneType.Terraform && fixedrecipeuri.isEmpty()){
+			changeAnimation(entity, animcomp.idleAnim, true);
+			return;
+		}else if(minioncomp.assignedzone.zonetype != ZoneType.OreonFarm){
 			changeAnimation(entity, animcomp.idleAnim, true);
 			return;
 		}
 		
 		if (ai.movementTargets.size() == 0) {
-			getFirsBlocktfromZone(minioncomp, ai);
+				getFirsBlockfromZone(minioncomp, ai);
 		}
 		
 		Vector3f currentTarget = ai.movementTargets.get(0);
@@ -399,8 +439,10 @@ public class SimpleMinionAISystem implements EventHandlerSystem,
 						if(tmpblock.getBlockFamily().getURI().getPackage().equals("engine")){
 							ai.craftprogress++;							
 							if(ai.craftprogress > 20){
-								BlockItemFactory blockFactory = new BlockItemFactory(entityManager);
 								Block newBlock;
+								if(!fixedrecipeuri.isEmpty()){
+									newBlock = BlockManager.getInstance().getBlock(fixedrecipeuri);
+								}else
 								if(minioncomp.assignedrecipe == null){
 									newBlock = BlockManager.getInstance().getBlock("CakeLie:ChocolateBlock");
 								}else
@@ -426,6 +468,9 @@ public class SimpleMinionAISystem implements EventHandlerSystem,
 							ai.movementTargets.remove(currentTarget);
 						}
 					}
+					if(ai.movementTargets.size() == 0 && !fixedrecipeuri.isEmpty()){
+						minioncomp.assignedzone.setTerraformComplete();
+					}
 				}
 				
 			}
@@ -435,7 +480,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem,
 		setMovement(currentTarget, entity);
 	}
 	
-	private void getFirsBlocktfromZone(MinionComponent minioncomp,	SimpleMinionAIComponent ai) {
+	private void getFirsBlockfromZone(MinionComponent minioncomp,	SimpleMinionAIComponent ai) {
 		Zone zone = minioncomp.assignedzone;		
 		for (int x = zone.getMinBounds().x; x <= zone.getMaxBounds().x; x++) {
 			for (int z = zone.getMinBounds().z; z <= zone.getMaxBounds().z; z++) {
@@ -448,6 +493,65 @@ public class SimpleMinionAISystem implements EventHandlerSystem,
 				}
 			}
 		}
+	}
+	
+	/**
+	 * plants crops
+	 * @param entity 
+	 * 				the minion that is terraforming
+	 * @param fixedrecipeuri
+	 * 				set to empty string by default for normal terraforming, 
+	 * 				can override the default recipe for farming. 
+	 */
+	private void executeFarmmAI(EntityRef entity) {
+		MinionComponent minioncomp = entity.getComponent(MinionComponent.class);
+		LocationComponent location = entity
+				.getComponent(LocationComponent.class);
+		SimpleMinionAIComponent ai = entity
+				.getComponent(SimpleMinionAIComponent.class);
+		AnimationComponent animcomp = entity
+				.getComponent(AnimationComponent.class);
+		Vector3f worldPos = new Vector3f(location.getWorldPosition());
+		
+		if (ai.movementTargets.size() == 0) {
+			getFirsBlockfromZone(minioncomp, ai);
+		}
+		
+		Vector3f currentTarget = ai.movementTargets.get(0);
+		if (currentTarget == null) {
+			ai.movementTargets.remove(currentTarget);
+			changeAnimation(entity, animcomp.idleAnim, true);
+			entity.saveComponent(ai);
+			return;
+		}
+		
+		Vector3f dist = new Vector3f(worldPos);
+		dist.sub(currentTarget);
+		double distanceToTarget = dist.lengthSquared();
+
+		if (distanceToTarget < 4) {			
+			// terraform
+			changeAnimation(entity, animcomp.terraformAnim, true);
+			if (timer.getTimeInMs() - ai.lastAttacktime > 200) {
+				ai.lastAttacktime = timer.getTimeInMs();
+				for(int y = (int)(currentTarget.y - 0.5); y >= minioncomp.assignedzone.getMinBounds().y; y--){
+					Block tmpblock = worldProvider.getBlock((int)currentTarget.x, y + 1, (int)currentTarget.z);
+					ai.craftprogress++;							
+					if(ai.craftprogress > 20){
+						Block newBlock;
+						newBlock = BlockManager.getInstance().getBlock("miniion:OreonPlant0");
+						worldProvider.setBlock((int)currentTarget.x, y+1, (int)currentTarget.z, newBlock, tmpblock);
+						ai.craftprogress = 0;
+						if(y == minioncomp.assignedzone.getMinBounds().y){
+							ai.movementTargets.remove(currentTarget);
+						}
+					}					
+				}				
+			}
+		}
+
+		entity.saveComponent(ai);
+		setMovement(currentTarget, entity);
 	}
 
 	private void executeMoveAI(EntityRef entity) {
@@ -527,7 +631,7 @@ public class SimpleMinionAISystem implements EventHandlerSystem,
 
 	private void executeTestAI(EntityRef entity) {
 		LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-		if (localPlayer != null) {
+		if (localPlayer == null) {
 			return;
 		}
 		LocationComponent location = entity

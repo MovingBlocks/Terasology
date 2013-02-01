@@ -48,7 +48,10 @@ public class Zone {
     
 	private Vector3i startposition;
 	private Vector3i endposition;
-	private boolean render = false;
+	private boolean terraformcomplete = false;
+	//used to undo zones with unbreakable blocks
+	//zone set to delete untill blocks are removed
+	private boolean deleted = false;
 
 	public String Name;
 	public ZoneType zonetype;
@@ -118,6 +121,14 @@ public class Zone {
 
 	public Vector3i getMaxBounds() {
 		return maxbounds;
+	}
+	
+	public boolean isTerraformComplete(){
+		return terraformcomplete;
+	}
+	
+	public void setTerraformComplete(){
+		terraformcomplete = true;
 	}
 
 	public boolean outofboundselection(){

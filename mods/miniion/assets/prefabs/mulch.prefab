@@ -15,25 +15,25 @@
  */
 {
     "Item" : {
-        "name" : "empty card",
-        "icon" : "emptycard",
+        "name" : "wood mulch",
+        "icon" : "mulch",
         "usage" : "NONE",
         "consumedOnUse" : false,
-        "stackId" : "miniion:emptycard",
-        "renderWithIcon" : true
+        "stackId" : "miniion:mulch",
+        "renderWithIcon" : false
     },
     "CraftRecipe" : {
     	"fullMatch": false,
         "recipe" :  {
             bottom:
                 [
-                    " ",  "wood mulch", " ",
-                    " ",  "wood mulch", " ",
+                    " ",  " ", " ",
+                    " ",  "plank", " ",
                     " ",  " ", " "
                 ]
         },
  
-        "resultCount": 1
+        "resultCount": 8
  
     }
 }

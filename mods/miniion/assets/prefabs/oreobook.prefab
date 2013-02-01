@@ -5,10 +5,7 @@
         "usage" : "ON_USER",
         "consumedOnUse" : false,
         "renderWithIcon" : false
-    },
-    "OpenUiAction" : {
-    	"uiwindowid" : "oreobook"
-    },
+    },    
     "Inventory": {
       "itemSlots": [
         0
