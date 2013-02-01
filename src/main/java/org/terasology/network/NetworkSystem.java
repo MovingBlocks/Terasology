@@ -165,14 +165,16 @@ public class NetworkSystem implements EntityChangeSubscriber {
                     }
                 }
                 long currentTimer = timer.getTimeInMs();
+                boolean netTick = false;
                 if (currentTimer > nextNetworkTick) {
                     nextNetworkTick += NET_TICK_RATE;
-                    for (Client client : clientList) {
-                        client.update();
-                    }
-                    if (server != null) {
-                        server.update();
-                    }
+                    netTick = true;
+                }
+                for (Client client : clientList) {
+                    client.update(netTick);
+                }
+                if (server != null) {
+                    server.update(netTick);
                 }
             }
         }
@@ -254,12 +256,8 @@ public class NetworkSystem implements EntityChangeSubscriber {
         if (netComponent != null) {
             netIdToEntityId.remove(netComponent.networkId);
             if (mode == NetworkMode.SERVER) {
-                NetData.NetMessage message = NetData.NetMessage.newBuilder()
-                        .addRemoveEntity(
-                                NetData.RemoveEntityMessage.newBuilder().setNetId(netComponent.networkId).build())
-                        .build();
                 for (Client client : clientList) {
-                    client.setNetRemoved(netComponent.networkId, message);
+                    client.setNetRemoved(netComponent.networkId);
                 }
             }
         }
@@ -450,7 +448,7 @@ public class NetworkSystem implements EntityChangeSubscriber {
 
     private void processNewClient(Client client) {
         logger.info("New client connected: {}", client.getName());
-        client.connected(entityManager, entitySerializer, eventSerializer);
+        client.connected(entityManager, entitySerializer, eventSerializer, entitySystemLibrary);
         clientList.add(client);
         clientPlayerLookup.put(client.getEntity(), client);
         sendServerInfo(client);

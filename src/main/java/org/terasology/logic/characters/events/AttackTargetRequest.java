@@ -9,7 +9,7 @@ import javax.vecmath.Vector3f;
 /**
  * @author Immortius
  */
-@ServerEvent
+@ServerEvent(lagCompensate = true)
 public class AttackTargetRequest extends AttackRequest {
 
     @Replicate

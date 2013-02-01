@@ -18,6 +18,7 @@ import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.game.Timer;
+import org.terasology.logic.characters.bullet.BulletCharacterMover;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.physics.BulletPhysics;
@@ -50,7 +51,7 @@ public class ClientCharacterPredictionSystem implements UpdateSubscriberSystem {
     @In
     private LocalPlayer localPlayer;
 
-    private CharacterMovementSystem characterMovementSystem;
+    private CharacterMover characterMover;
     private Map<EntityRef, CircularBuffer<CharacterStateEvent>> playerStates = Maps.newHashMap();
     private Deque<CharacterMoveInputEvent> inputs = Queues.newArrayDeque();
     private CharacterStateEvent predictedState;
@@ -58,7 +59,7 @@ public class ClientCharacterPredictionSystem implements UpdateSubscriberSystem {
 
     @Override
     public void initialise() {
-        characterMovementSystem = new BulletCharacterMovementSystem(worldProvider);
+        characterMover = new BulletCharacterMover(worldProvider);
     }
 
     @Override
@@ -139,7 +140,7 @@ public class ClientCharacterPredictionSystem implements UpdateSubscriberSystem {
     }
 
     private CharacterStateEvent stepState(CharacterMoveInputEvent input, CharacterStateEvent lastState, EntityRef entity) {
-        return characterMovementSystem.step(lastState, input, entity);
+        return characterMover.step(lastState, input, entity);
     }
 
     @Override

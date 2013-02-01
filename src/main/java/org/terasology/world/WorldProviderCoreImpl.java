@@ -182,6 +182,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     private void notifyBlockChanged(int x, int y, int z, Block type, Block oldType) {
         Vector3i pos = new Vector3i(x, y, z);
+        // TODO: Could use a read/write lock
         synchronized (listeners) {
             for (WorldChangeListener listener : listeners) {
                 listener.onBlockChanged(pos, type, oldType);

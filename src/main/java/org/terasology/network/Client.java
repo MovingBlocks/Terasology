@@ -19,11 +19,16 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Event;
 import org.terasology.entitySystem.EventReceiver;
 import org.terasology.entitySystem.EventSystem;
+import org.terasology.entitySystem.metadata.EntitySystemLibrary;
+import org.terasology.entitySystem.metadata.EventMetadata;
+import org.terasology.entitySystem.metadata.NetworkEventType;
 import org.terasology.entitySystem.persistence.EventSerializer;
 import org.terasology.entitySystem.persistence.FieldSerializeCheck;
 import org.terasology.entitySystem.persistence.PackedEntitySerializer;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
+import org.terasology.logic.characters.ClientCharacterPredictionSystem;
+import org.terasology.logic.characters.PredictionSystem;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.network.serialization.ServerComponentFieldCheck;
@@ -57,21 +62,31 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
     private Channel channel;
     private PackedEntitySerializer entitySerializer;
     private EventSerializer eventSerializer;
+    private EntitySystemLibrary entitySystemLibrary;
 
+    // Relevance
     private Set<Vector3i> relevantChunks = Sets.newHashSet();
+    private TIntSet netRelevant = new TIntHashSet();
+
+    // Entity replication data
     private TIntSet netInitial = new TIntHashSet();
     private TIntSet netDirty = new TIntHashSet();
+    private TIntSet netRemoved = new TIntHashSet();
     private SetMultimap<Integer, Class<? extends Component>> dirtyComponents = LinkedHashMultimap.create();
     private SetMultimap<Integer, Class<? extends Component>> addedComponents = LinkedHashMultimap.create();
     private SetMultimap<Integer, Class<? extends Component>> removedComponents = LinkedHashMultimap.create();
-    private TIntSet netRelevant = new TIntHashSet();
 
     private boolean awaitingConnectMessage = true;
-
     private String name = "Unknown";
+    private long lastReceivedTime = 0;
 
-    private BlockingQueue<NetData.EventMessage> queuedEvents = Queues.newLinkedBlockingQueue();
-    private BlockingQueue<NetData.UpdateEntityMessage> queuedEntityUpdates = Queues.newLinkedBlockingQueue();
+    // Outgoing messages
+    private BlockingQueue<NetData.BlockChangeMessage> queuedOutgoingBlockChanges = Queues.newLinkedBlockingQueue();
+    private List<NetData.EventMessage> queuedOutgoingEvents = Lists.newArrayList();
+    private List<NetData.InvalidateChunkMessage> queuedInvalidatedChunkEvents = Lists.newArrayList();
+
+    // Incoming messages
+    private BlockingQueue<NetData.NetMessage> queuedIncomingMessage = Queues.newLinkedBlockingQueue();
 
     // Metrics
     private AtomicInteger receivedMessages = new AtomicInteger();
@@ -90,15 +105,14 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
         netInitial.add(netId);
     }
 
-    public void setNetRemoved(int netId, NetData.NetMessage removalMessage) {
-        netInitial.remove(netId);
+    public void setNetRemoved(int netId) {
+        if (!netInitial.remove(netId)) {
+            netDirty.add(netId);
+        }
         dirtyComponents.keySet().remove(netId);
         addedComponents.keySet().remove(netId);
         removedComponents.keySet().remove(netId);
-        if (netRelevant.contains(netId)) {
-            send(removalMessage);
-            netRelevant.remove(netId);
-        }
+        netRelevant.remove(netId);
     }
 
     public void setComponentAdded(int networkId, Class<? extends Component> component) {
@@ -146,12 +160,13 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
         }
     }
 
-    public void connected(EntityManager entityManager, PackedEntitySerializer entitySerializer, EventSerializer eventSerializer) {
+    public void connected(EntityManager entityManager, PackedEntitySerializer entitySerializer, EventSerializer eventSerializer, EntitySystemLibrary entitySystemLibrary) {
         if (awaitingConnectMessage) {
             awaitingConnectMessage = false;
 
             this.entitySerializer = entitySerializer;
             this.eventSerializer = eventSerializer;
+            this.entitySystemLibrary = entitySystemLibrary;
 
             // Create player entity
             clientEntity = entityManager.create("engine:client");
@@ -187,12 +202,9 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
 
     public void send(Event event, int targetId) {
         if (netRelevant.contains(targetId)) {
-            NetData.NetMessage message = NetData.NetMessage.newBuilder()
-                    .addEvent(NetData.EventMessage.newBuilder()
-                            .setTargetId(targetId)
-                            .setEvent(eventSerializer.serialize(event, EVENT_FIELD_CHECK)))
-                    .build();
-            send(message);
+            queuedOutgoingEvents.add(NetData.EventMessage.newBuilder()
+                    .setTargetId(targetId)
+                    .setEvent(eventSerializer.serialize(event, EVENT_FIELD_CHECK)).build());
         }
     }
 
@@ -208,7 +220,9 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
         if (relevantChunks.add(pos)) {
             logger.debug("Sending chunk: {}", pos);
             // TODO: probably need to queue and dripfeed these to prevent flooding
-            NetData.NetMessage message = NetData.NetMessage.newBuilder().addChunkInfo(Chunks.getInstance().encode(chunk)).build();
+            NetData.NetMessage message = NetData.NetMessage.newBuilder()
+                    .setTime(timer.getTimeInMs())
+                    .addChunkInfo(Chunks.getInstance().encode(chunk)).build();
             send(message);
         }
     }
@@ -216,11 +230,8 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
     @Override
     public void onEvent(ChunkUnloadedEvent event, EntityRef entity) {
         if (relevantChunks.remove(event.getChunkPos())) {
-            NetData.NetMessage message = NetData.NetMessage.newBuilder().
-                    addInvalidateChunk(NetData.InvalidateChunkMessage.newBuilder().
-                            setPos(NetworkUtil.convert(event.getChunkPos())).build()).
-                    build();
-            send(message);
+            queuedInvalidatedChunkEvents.add(NetData.InvalidateChunkMessage.newBuilder().
+                    setPos(NetworkUtil.convert(event.getChunkPos())).build());
         }
     }
 
@@ -228,35 +239,61 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
     public void onBlockChanged(Vector3i pos, Block newBlock, Block originalBlock) {
         Vector3i chunkPos = TeraMath.calcChunkPos(pos);
         if (relevantChunks.contains(chunkPos)) {
-            NetData.NetMessage message = NetData.NetMessage.newBuilder()
-                    .addBlockChange(NetData.BlockChangeMessage.newBuilder()
-                            .setPos(NetworkUtil.convert(pos))
-                            .setNewBlock(newBlock.getId())
-                            .build()).build();
-            send(message);
+            queuedOutgoingBlockChanges.add(NetData.BlockChangeMessage.newBuilder()
+                    .setPos(NetworkUtil.convert(pos))
+                    .setNewBlock(newBlock.getId())
+                    .build());
         }
     }
 
-    public void update() {
-        NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
-        message.setTime(timer.getTimeInMs());
-        // For now, send everything all at once
-        sendInitialEntities(message);
-        sendDirtyEntities(message);
-        send(message.build());
-
-        processEntityUpdates();
-        processEvents();
+    public void update(boolean netTick) {
+        if (netTick) {
+            NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
+            message.setTime(timer.getTimeInMs());
+            sendRemovedEntities(message);
+            sendInitialEntities(message);
+            sendDirtyEntities(message);
+            sendEvents(message);
+            send(message.build());
+        } else if (!queuedOutgoingEvents.isEmpty() || !queuedOutgoingBlockChanges.isEmpty() || !queuedInvalidatedChunkEvents.isEmpty()) {
+            NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
+            message.setTime(timer.getTimeInMs());
+            sendEvents(message);
+            send(message.build());
+        }
+        processReceivedMessages();
     }
 
-    private void processEntityUpdates() {
-        List<NetData.UpdateEntityMessage> messages = Lists.newArrayListWithExpectedSize(queuedEntityUpdates.size());
-        queuedEntityUpdates.drainTo(messages);
-        for (NetData.UpdateEntityMessage message : messages) {
+    private void processReceivedMessages() {
+        List<NetData.NetMessage> messages = Lists.newArrayListWithExpectedSize(queuedIncomingMessage.size());
+        queuedIncomingMessage.drainTo(messages);
+        for (NetData.NetMessage message : messages) {
+            if (message.hasTime() && message.getTime() > lastReceivedTime) {
+                lastReceivedTime = message.getTime();
+            }
+            processEntityUpdates(message);
+            processEvents(message);
 
-            EntityRef currentEntity = networkSystem.getEntity(message.getNetId());
+        }
+    }
+
+    private void sendEvents(NetData.NetMessage.Builder message) {
+        List<NetData.BlockChangeMessage> blockChanges = Lists.newArrayListWithExpectedSize(queuedOutgoingBlockChanges.size());
+        queuedOutgoingBlockChanges.drainTo(blockChanges);
+        message.addAllBlockChange(blockChanges);
+
+        message.addAllEvent(queuedOutgoingEvents);
+        message.addAllInvalidateChunk(queuedInvalidatedChunkEvents);
+        queuedOutgoingEvents.clear();
+        queuedInvalidatedChunkEvents.clear();
+    }
+
+    private void processEntityUpdates(NetData.NetMessage message) {
+        for (NetData.UpdateEntityMessage updateMessage : message.getUpdateEntityList()) {
+
+            EntityRef currentEntity = networkSystem.getEntity(updateMessage.getNetId());
             if (networkSystem.getOwner(currentEntity) == this) {
-                entitySerializer.deserializeOnto(currentEntity, message.getEntity(), new ServerComponentFieldCheck(false, true));
+                entitySerializer.deserializeOnto(currentEntity, updateMessage.getEntity(), new ServerComponentFieldCheck(false, true));
             }
         }
     }
@@ -278,6 +315,14 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
         dirtyComponents.clear();
     }
 
+    private void sendRemovedEntities(NetData.NetMessage.Builder message) {
+        TIntIterator initialIterator = netRemoved.iterator();
+        while (initialIterator.hasNext()) {
+            message.addRemoveEntity(NetData.RemoveEntityMessage.newBuilder().setNetId(initialIterator.next()));
+        }
+        netRemoved.clear();
+    }
+
     private void sendInitialEntities(NetData.NetMessage.Builder message) {
         TIntIterator initialIterator = netInitial.iterator();
         while (initialIterator.hasNext()) {
@@ -296,13 +341,23 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
         netInitial.clear();
     }
 
-    private void processEvents() {
-        List<NetData.EventMessage> messages = Lists.newArrayListWithExpectedSize(queuedEvents.size());
-        queuedEvents.drainTo(messages);
-
-        for (NetData.EventMessage message : messages) {
-            Event event = eventSerializer.deserialize(message.getEvent());
-            EntityRef target = networkSystem.getEntity(message.getTargetId());
+    private void processEvents(NetData.NetMessage message) {
+        boolean lagCompensated = false;
+        PredictionSystem predictionSystem = CoreRegistry.get(PredictionSystem.class);
+        for (NetData.EventMessage eventMessage : message.getEventList()) {
+            Event event = eventSerializer.deserialize(eventMessage.getEvent());
+            EventMetadata<?> metadata = entitySystemLibrary.getEventLibrary().getMetadata(event.getClass());
+            if (metadata.getNetworkEventType() != NetworkEventType.SERVER) {
+                logger.warn("Received non-server event '{}' from client '{}'", metadata, getName());
+                continue;
+            }
+            if (!lagCompensated && metadata.isLagCompensated()) {
+                if (predictionSystem != null) {
+                    predictionSystem.lagCompensate(getEntity(), lastReceivedTime);
+                }
+                lagCompensated = true;
+            }
+            EntityRef target = networkSystem.getEntity(eventMessage.getTargetId());
             if (target.exists()) {
                 if (networkSystem.getOwner(target).equals(this)) {
                     if (event instanceof NetworkEvent) {
@@ -312,9 +367,10 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
                 } else {
                     logger.warn("Received event {} for non-owned entity {} from {}", event, target, this);
                 }
-            } else {
-                queuedEvents.offer(message);
             }
+        }
+        if (lagCompensated && predictionSystem != null) {
+            predictionSystem.restoreToPresent();
         }
     }
 
@@ -322,17 +378,11 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
         return clientEntity;
     }
 
-    void queueEvent(NetData.EventMessage message) {
-        queuedEvents.offer(message);
-    }
-
-    public void queueEntityUpdate(NetData.UpdateEntityMessage message) {
-        queuedEntityUpdates.offer(message);
-    }
-
-    public void receivedMessageWithSize(int serializedSize) {
+    public void messageReceived(NetData.NetMessage message) {
+        int serializedSize = message.getSerializedSize();
         receivedBytes.addAndGet(serializedSize);
         receivedMessages.incrementAndGet();
+        queuedIncomingMessage.offer(message);
     }
 
     public int getReceivedMessagesSinceLastCall() {
@@ -350,4 +400,6 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
     public int getSentBytesSinceLastCall() {
         return sentBytes.getAndSet(0);
     }
+
+
 }

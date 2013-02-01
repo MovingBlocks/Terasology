@@ -21,7 +21,7 @@ public class CharacterMoveInputEvent extends NetworkEvent {
     private Vector3f movementDirection = new Vector3f();
     private int sequenceNumber = 0;
 
-    private CharacterMoveInputEvent() {
+    protected CharacterMoveInputEvent() {
     }
 
     public CharacterMoveInputEvent(int sequence, float pitch, float yaw, Vector3f movementDirection, boolean running, boolean jumpRequested) {

@@ -19,16 +19,18 @@ import org.lwjgl.Sys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 public final class TimerLwjgl implements Timer {
     private static final Logger logger = LoggerFactory.getLogger(TimerLwjgl.class);
-    private final float decayRate = 0.95f;
-    private final float oneMinusDecayRate = 1.0f - decayRate;
-    private final float resyncTimeRate = 0.1f;
+    private static final float DECAY_RATE = 0.95f;
+    private static final float ONE_MINUS_DECAY_RATE = 1.0f - DECAY_RATE;
+    private static final float RESYNC_TIME_RATE = 0.1f;
 
-    private long last = 0;
-    private long delta = 0;
+    private AtomicLong last = new AtomicLong(0);
+    private AtomicLong delta = new AtomicLong(0);
     private float avgDelta = 0;
-    private long serverTimeOffset = 0;
+    private AtomicLong serverTimeOffset = new AtomicLong(0);
     private long desynch = 0;
 
 
@@ -38,16 +40,17 @@ public final class TimerLwjgl implements Timer {
     @Override
     public void tick() {
         long now = getRawTimeInMs();
-        delta = now - last;
-        last = now;
-        avgDelta = avgDelta * decayRate + delta * oneMinusDecayRate;
+        long newDelta = now - last.get();
+        delta.set(newDelta);
+        last.set(now);
+        avgDelta = avgDelta * DECAY_RATE + newDelta * ONE_MINUS_DECAY_RATE;
 
         if (desynch != 0) {
-            long diff = (long)Math.ceil(desynch * resyncTimeRate);
+            long diff = (long) Math.ceil(desynch * RESYNC_TIME_RATE);
             if (diff == 0) {
-                diff = (long)Math.signum(desynch);
+                diff = (long) Math.signum(desynch);
             }
-            serverTimeOffset += diff;
+            serverTimeOffset.getAndAdd(diff);
             desynch -= diff;
         }
 
@@ -55,12 +58,14 @@ public final class TimerLwjgl implements Timer {
 
     @Override
     public float getDelta() {
-        return (delta >= 100) ? 0.1f : delta / 1000f;
+        long d = delta.get();
+        return (d >= 100) ? 0.1f : d / 1000f;
     }
 
     @Override
     public long getDeltaInMs() {
-        return (delta >= 100) ? 100 : delta;
+        long d = delta.get();
+        return (d >= 100) ? 100 : d;
     }
 
     @Override
@@ -75,13 +80,13 @@ public final class TimerLwjgl implements Timer {
 
     @Override
     public long getTimeInMs() {
-        return last + serverTimeOffset;
+        return last.get() + serverTimeOffset.get();
     }
 
     @Override
     public void updateServerTime(long ms, boolean immediate) {
         if (immediate) {
-            serverTimeOffset = ms - last;
+            serverTimeOffset.set(ms - last.get());
         } else {
             desynch = ms - getTimeInMs();
         }

@@ -11,7 +11,7 @@ import javax.vecmath.Vector3f;
  *
  * @author Immortius
  */
-@ServerEvent
+@ServerEvent(lagCompensate = true)
 public class UseItemInDirectionRequest extends UseItemRequest {
 
     @Replicate

@@ -26,7 +26,7 @@ public class CharacterStateEvent extends NetworkEvent {
     private boolean grounded = false;
     private Vector3f velocity = new Vector3f();
 
-    private CharacterStateEvent() {};
+    protected CharacterStateEvent() {};
 
     public CharacterStateEvent(CharacterStateEvent previous) {
         this.time = previous.time;
@@ -107,7 +107,6 @@ public class CharacterStateEvent extends NetworkEvent {
 
     public static void setToInterpolateState(EntityRef entity, CharacterStateEvent a, CharacterStateEvent b, long time) {
         float t = (float)(time - a.getTime()) / (b.getTime() - a.getTime());
-        LoggerFactory.getLogger(CharacterStateEvent.class).info("Interpolate: {}, {}, {}, {}", a.getTime(), b.getTime(), time, t);
         Vector3f newPos = new Vector3f();
         newPos.interpolate(a.getPosition(), b.getPosition(), t);
         Quat4f newRot = new Quat4f();
@@ -141,7 +140,6 @@ public class CharacterStateEvent extends NetworkEvent {
         movementComponent.grounded = state.isGrounded();
         entity.saveComponent(movementComponent);
         movementComponent.collider.setInterpolationWorldTransform(new Transform(new Matrix4f(new Quat4f(0,0,0,1), newPos, 1.0f)));
-
     }
 
 }

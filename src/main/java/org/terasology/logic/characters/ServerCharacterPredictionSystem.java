@@ -12,10 +12,13 @@ import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.entitySystem.RegisterMode;
+import org.terasology.entitySystem.Share;
 import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.game.Timer;
+import org.terasology.logic.characters.bullet.BulletCharacterMover;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.network.NetworkSystem;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.utilities.collection.CircularBuffer;
@@ -28,10 +31,14 @@ import java.util.Map;
  * @author Immortius
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
-public class ServerCharacterPredictionSystem implements UpdateSubscriberSystem {
+@Share(PredictionSystem.class)
+public class ServerCharacterPredictionSystem implements UpdateSubscriberSystem, PredictionSystem {
     private static final int BUFFER_SIZE = 128;
     private static final int TIME_BETWEEN_STATE_REPLICATE = 50;
     public static final int RENDER_DELAY = 100;
+
+    public static final int MAX_INPUT_OVERFLOW = 100;
+    public static final int MAX_INPUT_UNDERFLOW = 100;
 
     @In
     private Timer timer;
@@ -45,13 +52,16 @@ public class ServerCharacterPredictionSystem implements UpdateSubscriberSystem {
     @In
     private LocalPlayer localPlayer;
 
-    private CharacterMovementSystem characterMovementSystem;
-    private Map<EntityRef, CircularBuffer<CharacterStateEvent>> playerStates = Maps.newHashMap();
+    @In
+    private NetworkSystem networkSystem;
+
+    private CharacterMover characterMover;
+    private Map<EntityRef, CircularBuffer<CharacterStateEvent>> characterStates = Maps.newHashMap();
     private long nextSendState;
 
     @Override
     public void initialise() {
-        characterMovementSystem = new BulletCharacterMovementSystem(worldProvider);
+        characterMover = new BulletCharacterMover(worldProvider);
         nextSendState = timer.getTimeInMs() + TIME_BETWEEN_STATE_REPLICATE;
     }
 
@@ -72,7 +82,7 @@ public class ServerCharacterPredictionSystem implements UpdateSubscriberSystem {
 
         CircularBuffer<CharacterStateEvent> stateBuffer = CircularBuffer.create(BUFFER_SIZE);
         stateBuffer.add(createInitialState(entity));
-        playerStates.put(entity, stateBuffer);
+        characterStates.put(entity, stateBuffer);
     }
 
     @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
@@ -81,14 +91,14 @@ public class ServerCharacterPredictionSystem implements UpdateSubscriberSystem {
         if (comp.collider != null) {
             physics.removeCollider(comp.collider);
         }
-        playerStates.remove(entity);
+        characterStates.remove(entity);
     }
 
 
 
     @ReceiveEvent(components = {CharacterMovementComponent.class, LocationComponent.class})
     public void onPlayerInput(CharacterMoveInputEvent input, EntityRef entity) {
-        CircularBuffer<CharacterStateEvent> stateBuffer = playerStates.get(entity);
+        CircularBuffer<CharacterStateEvent> stateBuffer = characterStates.get(entity);
 
         CharacterStateEvent lastState = stateBuffer.getLast();
         CharacterStateEvent newState = stepState(input, lastState, entity);
@@ -103,13 +113,13 @@ public class ServerCharacterPredictionSystem implements UpdateSubscriberSystem {
     }
 
     private CharacterStateEvent stepState(CharacterMoveInputEvent input, CharacterStateEvent lastState, EntityRef entity) {
-        return characterMovementSystem.step(lastState, input, entity);
+        return characterMover.step(lastState, input, entity);
     }
 
     @Override
     public void update(float delta) {
         if (nextSendState < timer.getTimeInMs()) {
-            for (Map.Entry<EntityRef, CircularBuffer<CharacterStateEvent>> entry : playerStates.entrySet()) {
+            for (Map.Entry<EntityRef, CircularBuffer<CharacterStateEvent>> entry : characterStates.entrySet()) {
                 if (entry.getValue().size() > 0) {
                     entry.getKey().send(entry.getValue().getLast());
                 }
@@ -117,28 +127,51 @@ public class ServerCharacterPredictionSystem implements UpdateSubscriberSystem {
             nextSendState += TIME_BETWEEN_STATE_REPLICATE;
         }
         long renderTime = timer.getTimeInMs() - RENDER_DELAY;
-        for (Map.Entry<EntityRef, CircularBuffer<CharacterStateEvent>> entry : playerStates.entrySet()) {
+        for (Map.Entry<EntityRef, CircularBuffer<CharacterStateEvent>> entry : characterStates.entrySet()) {
             if (entry.getKey().equals(localPlayer.getCharacterEntity())) {
                 continue;
             }
 
-            CharacterStateEvent previous = null;
-            CharacterStateEvent next = null;
-            for (CharacterStateEvent state : entry.getValue()) {
-                if (state.getTime() <= renderTime) {
-                    previous = state;
-                } else {
-                    next = state;
-                    break;
-                }
+            setToTime(renderTime, entry.getKey(), entry.getValue());
+        }
+    }
+
+    private void setToTime(long renderTime, EntityRef entity, CircularBuffer<CharacterStateEvent> buffer) {
+        CharacterStateEvent previous = null;
+        CharacterStateEvent next = null;
+        for (CharacterStateEvent state : buffer) {
+            if (state.getTime() <= renderTime) {
+                previous = state;
+            } else {
+                next = state;
+                break;
             }
-            if (previous != null) {
-                if (next != null) {
-                    CharacterStateEvent.setToInterpolateState(entry.getKey(), previous, next, renderTime);
-                } else {
-                    CharacterStateEvent.setToExtrapolateState(entry.getKey(), previous, renderTime);
-                }
+        }
+        if (previous != null) {
+            if (next != null) {
+                CharacterStateEvent.setToInterpolateState(entity, previous, next, renderTime);
+            } else {
+                CharacterStateEvent.setToExtrapolateState(entity, previous, renderTime);
             }
+        }
+    }
+
+    @Override
+    public void lagCompensate(EntityRef client, long timeMs) {
+        for (Map.Entry<EntityRef, CircularBuffer<CharacterStateEvent>> entry : characterStates.entrySet()) {
+            if (networkSystem.getOwnerEntity(entry.getKey()).equals(client)) {
+                CharacterStateEvent.setToState(entry.getKey(), entry.getValue().getLast());
+            } else {
+                setToTime(timeMs - RENDER_DELAY, entry.getKey(), entry.getValue());
+            }
+        }
+    }
+
+    @Override
+    public void restoreToPresent() {
+        long renderTime = timer.getTimeInMs() - RENDER_DELAY;
+        for (Map.Entry<EntityRef, CircularBuffer<CharacterStateEvent>> entry : characterStates.entrySet()) {
+            setToTime(renderTime, entry.getKey(), entry.getValue());
         }
     }
 }

@@ -5,7 +5,7 @@ import org.terasology.entitySystem.EntityRef;
 /**
  * @author Immortius
  */
-public interface CharacterMovementSystem {
+public interface CharacterMover {
     /**
      * Steps the state of a character
      * @param initial The initial state to start from

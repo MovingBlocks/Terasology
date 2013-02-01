@@ -26,7 +26,7 @@ import javax.vecmath.Vector3f;
  * A request for a player to use an item on a target
  * @author Immortius
  */
-@ServerEvent
+@ServerEvent(lagCompensate = true)
 public class UseItemOnTargetRequest extends UseItemRequest {
 
     @Replicate

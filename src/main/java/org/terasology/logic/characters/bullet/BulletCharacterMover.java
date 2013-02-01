@@ -1,4 +1,4 @@
-package org.terasology.logic.characters;
+package org.terasology.logic.characters.bullet;
 
 import com.bulletphysics.BulletGlobals;
 import com.bulletphysics.collision.dispatch.CollisionObject;
@@ -9,6 +9,11 @@ import com.bulletphysics.collision.shapes.ConvexShape;
 import com.bulletphysics.linearmath.QuaternionUtil;
 import com.bulletphysics.linearmath.Transform;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.logic.characters.CharacterMoveInputEvent;
+import org.terasology.logic.characters.CharacterMovementComponent;
+import org.terasology.logic.characters.CharacterMover;
+import org.terasology.logic.characters.CharacterStateEvent;
+import org.terasology.logic.characters.MovementMode;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3fUtil;
 import org.terasology.world.WorldProvider;
@@ -21,7 +26,7 @@ import javax.vecmath.Vector3f;
 /**
  * @author Immortius
  */
-public class BulletCharacterMovementSystem implements CharacterMovementSystem {
+public class BulletCharacterMover implements CharacterMover {
 
     /**
      * The amount of extra distance added to vertical movement to allow for penetration.
@@ -57,7 +62,7 @@ public class BulletCharacterMovementSystem implements CharacterMovementSystem {
     private float steppedUpDist = 0;
     private boolean stepped = false;
 
-    public BulletCharacterMovementSystem(WorldProvider worldProvider) {
+    public BulletCharacterMover(WorldProvider worldProvider) {
         this.worldProvider = worldProvider;
     }
 
@@ -166,10 +171,10 @@ public class BulletCharacterMovementSystem implements CharacterMovementSystem {
 
         // Note: No stepping underwater, no issue with slopes
         MoveResult moveResult = move(state.getPosition(), moveDelta, 0, -1, movementComp.collider);
-        Vector3f distanceMoved = new Vector3f(moveResult.finalPosition);
+        Vector3f distanceMoved = new Vector3f(moveResult.getFinalPosition());
         distanceMoved.sub(state.getPosition());
 
-        state.getPosition().set(moveResult.finalPosition);
+        state.getPosition().set(moveResult.getFinalPosition());
         //if (distanceMoved.length() > 0)
         //    entity.send(new MovedEvent(distanceMoved, moveResult.finalPosition));
     }
@@ -243,16 +248,16 @@ public class BulletCharacterMovementSystem implements CharacterMovementSystem {
         moveDelta.scale(input.getDeltaMs());
 
         MoveResult moveResult = move(state.getPosition(), moveDelta, (state.isGrounded()) ? movementComp.stepHeight : 0, movementComp.slopeFactor, movementComp.collider);
-        Vector3f distanceMoved = new Vector3f(moveResult.finalPosition);
+        Vector3f distanceMoved = new Vector3f(moveResult.getFinalPosition());
         distanceMoved.sub(state.getPosition());
 
-        state.getPosition().set(moveResult.finalPosition);
+        state.getPosition().set(moveResult.getFinalPosition());
         //if (distanceMoved.length() > 0)
         //    entity.send(new MovedEvent(distanceMoved, moveResult.finalPosition));
 
-        movementComp.collider.setWorldTransform(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), moveResult.finalPosition, 1.0f)));
+        movementComp.collider.setWorldTransform(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), moveResult.getFinalPosition(), 1.0f)));
 
-        if (moveResult.hitBottom) {
+        if (moveResult.isBottomHit()) {
             if (!state.isGrounded()) {
                 //entity.send(new VerticalCollisionEvent(movementComp.getVelocity(), moveResult.finalPosition));
                 state.setGrounded(true);
@@ -264,13 +269,13 @@ public class BulletCharacterMovementSystem implements CharacterMovementSystem {
                 state.getVelocity().y += movementComp.jumpSpeed;
             }
         } else {
-            if (moveResult.hitTop && state.getVelocity().y > 0) {
+            if (moveResult.isTopHit() && state.getVelocity().y > 0) {
                 state.getVelocity().y = -0.5f * state.getVelocity().y;
             }
             state.setGrounded(false);
         }
 
-        if (moveResult.hitHoriz) {
+        if (moveResult.isHorizontalHit()) {
             //entity.send(new HorizontalCollisionEvent(location.getWorldPosition(),movementComp.getVelocity()));
         }
 
@@ -283,40 +288,36 @@ public class BulletCharacterMovementSystem implements CharacterMovementSystem {
         }
     }
 
-    private static class MoveResult {
-        public Vector3f finalPosition;
-        public boolean hitHoriz = false;
-        public boolean hitBottom = false;
-        public boolean hitTop = false;
-    }
-
     private MoveResult move(final Vector3f startPosition, final Vector3f moveDelta, final float stepHeight, final float slopeFactor, final PairCachingGhostObject collider) {
         steppedUpDist = 0;
         stepped = false;
 
-        MoveResult result = new MoveResult();
         Vector3f position = new Vector3f(startPosition);
-        result.finalPosition = position;
+        Vector3f finalPosition = position;
+        boolean hitTop = false;
+        boolean hitBottom = false;
+        boolean hitSide = false;
+
 
         // Actual upwards movement
         if (moveDelta.y > 0) {
-            result.hitTop = moveDelta.y - moveUp(moveDelta.y, collider, position) > BulletGlobals.SIMD_EPSILON;
+            hitTop = moveDelta.y - moveUp(moveDelta.y, collider, position) > BulletGlobals.SIMD_EPSILON;
         }
-        result.hitHoriz = moveHorizontal(new Vector3f(moveDelta.x, 0, moveDelta.z), collider, position, slopeFactor, stepHeight);
+        hitSide = moveHorizontal(new Vector3f(moveDelta.x, 0, moveDelta.z), collider, position, slopeFactor, stepHeight);
         if (moveDelta.y < 0 || steppedUpDist > 0) {
             float dist = (moveDelta.y < 0) ? moveDelta.y : 0;
             dist -= steppedUpDist;
-            result.hitBottom = moveDown(dist, slopeFactor, collider, position);
+            hitBottom = moveDown(dist, slopeFactor, collider, position);
         }
-        if (!result.hitBottom && stepHeight > 0) {
+        if (!hitBottom && stepHeight > 0) {
             Vector3f tempPos = new Vector3f(position);
-            result.hitBottom = moveDown(-stepHeight, slopeFactor, collider, tempPos);
+            hitBottom = moveDown(-stepHeight, slopeFactor, collider, tempPos);
             // Don't apply step down if nothing to step onto
-            if (result.hitBottom) {
+            if (hitBottom) {
                 position.set(tempPos);
             }
         }
-        return result;
+        return new MoveResult(finalPosition, hitSide, hitBottom, hitTop);
     }
 
     private boolean moveHorizontal(Vector3f horizMove, PairCachingGhostObject collider, Vector3f position, float slopeFactor, float stepHeight) {

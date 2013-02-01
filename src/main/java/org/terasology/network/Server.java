@@ -43,7 +43,8 @@ public class Server {
     private NetworkSystem networkSystem;
     private Channel channel;
     private BlockingQueue<NetData.NetMessage> queuedMessages = Queues.newLinkedBlockingQueue();
-    private BlockingQueue<NetData.EventMessage> queuedEvents = Queues.newLinkedBlockingQueue();
+    private BlockingQueue<NetData.EventMessage> queuedReceivedEvents = Queues.newLinkedBlockingQueue();
+    private List<NetData.EventMessage> queuedOutgoingEvents = Lists.newArrayList();
     private NetData.ServerInfoMessage serverInfo;
 
     private PersistableEntityManager entityManager;
@@ -92,26 +93,46 @@ public class Server {
     }
 
     public void send(Event event, int targetId) {
-        NetData.NetMessage message = NetData.NetMessage.newBuilder()
-                .addEvent(NetData.EventMessage.newBuilder()
-                        .setEvent(eventSerializer.serialize(event, FieldSerializeCheck.NullCheck.<Event>newInstance()))
-                        .setTargetId(targetId))
-                .build();
-        send(message);
+        queuedOutgoingEvents.add(NetData.EventMessage.newBuilder()
+                .setEvent(eventSerializer.serialize(event, FieldSerializeCheck.NullCheck.<Event>newInstance()))
+                .setTargetId(targetId).build());
     }
 
-    public void update() {
+    public void update(boolean netTick) {
+        processReceivedChunks();
+        if (entityManager != null) {
+            if (netTick) {
+                NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
+                message.setTime(timer.getTimeInMs());
+                sendEntities(message);
+                sendEvents(message);
+                send(message.build());
+            } else if (!queuedOutgoingEvents.isEmpty()) {
+                NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
+                message.setTime(timer.getTimeInMs());
+                sendEntities(message);
+                send(message.build());
+            }
+
+            processMessages();
+            processEvents();
+        }
+    }
+
+    private void sendEvents(NetData.NetMessage.Builder message) {
+        for (NetData.EventMessage event : queuedOutgoingEvents) {
+            message.addEvent(event);
+        }
+        queuedOutgoingEvents.clear();
+    }
+
+    private void processReceivedChunks() {
         if (remoteWorldProvider != null) {
             List<Chunk> chunks = Lists.newArrayListWithExpectedSize(chunkQueue.size());
             chunkQueue.drainTo(chunks);
             for (Chunk chunk : chunks) {
                 remoteWorldProvider.receiveChunk(chunk);
             }
-        }
-        if (entityManager != null) {
-            processEntities();
-            processMessages();
-            processEvents();
         }
     }
 
@@ -122,7 +143,7 @@ public class Server {
         channel.write(data);
     }
 
-    private void processEntities() {
+    private void sendEntities(NetData.NetMessage.Builder message) {
         TIntIterator dirtyIterator = netDirty.iterator();
         while (dirtyIterator.hasNext()) {
             int netId = dirtyIterator.next();
@@ -130,10 +151,7 @@ public class Server {
             if (isOwned(entity)) {
                 EntityData.PackedEntity entityData = entitySerializer.serialize(entity, Collections.EMPTY_SET, changedComponents.get(netId), Collections.EMPTY_SET, new ClientComponentFieldCheck());
                 if (entityData != null) {
-                    NetData.NetMessage message = NetData.NetMessage.newBuilder()
-                            .addUpdateEntity(NetData.UpdateEntityMessage.newBuilder().setEntity(entityData).setNetId(netId))
-                            .build();
-                    send(message);
+                    message.addUpdateEntity(NetData.UpdateEntityMessage.newBuilder().setEntity(entityData).setNetId(netId));
                 }
             }
         }
@@ -147,8 +165,8 @@ public class Server {
 
 
     private void processEvents() {
-        List<NetData.EventMessage> messages = Lists.newArrayListWithExpectedSize(queuedEvents.size());
-        queuedEvents.drainTo(messages);
+        List<NetData.EventMessage> messages = Lists.newArrayListWithExpectedSize(queuedReceivedEvents.size());
+        queuedReceivedEvents.drainTo(messages);
 
         for (NetData.EventMessage message : messages) {
             Event event = eventSerializer.deserialize(message.getEvent());
@@ -156,13 +174,13 @@ public class Server {
             if (target.exists()) {
                 target.send(event);
             } else {
-                queuedEvents.offer(message);
+                queuedReceivedEvents.offer(message);
             }
         }
     }
 
     void queueEvent(NetData.EventMessage message) {
-        queuedEvents.offer(message);
+        queuedReceivedEvents.offer(message);
     }
 
 
@@ -187,6 +205,12 @@ public class Server {
             if (message.hasTime()) {
                 timer.updateServerTime(message.getTime(), false);
             }
+            for (NetData.RemoveEntityMessage removeEntity : message.getRemoveEntityList()) {
+                int netId = removeEntity.getNetId();
+                EntityRef entity = networkSystem.getEntity(netId);
+                networkSystem.unregisterNetworkEntity(entity);
+                entity.destroy();
+            }
             for (NetData.CreateEntityMessage createEntity : message.getCreateEntityList()) {
                 createEntityMessage(createEntity);
             }
@@ -197,12 +221,7 @@ public class Server {
                     entitySerializer.deserializeOnto(currentEntity, updateEntity.getEntity());
                 }
             }
-            for (NetData.RemoveEntityMessage removeEntity : message.getRemoveEntityList()) {
-                int netId = removeEntity.getNetId();
-                EntityRef entity = networkSystem.getEntity(netId);
-                networkSystem.unregisterNetworkEntity(entity);
-                entity.destroy();
-            }
+
         }
 
     }
