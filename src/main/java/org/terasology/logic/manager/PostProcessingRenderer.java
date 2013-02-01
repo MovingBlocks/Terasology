@@ -65,24 +65,7 @@ public class PostProcessingRenderer {
         public int _height = 0;
 
         public void bind() {
-            int bufferCount = 0;
-
-            if (_textureId > 0) {
-                bufferCount++;
-            }
-
-            if (_normalsTextureId > 0) {
-                bufferCount++;
-            }
-
-            IntBuffer bufferIds = BufferUtils.createIntBuffer(bufferCount);
-            for (int i=0; i<bufferCount; ++i) {
-                bufferIds.put(EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT+i);
-            }
-            bufferIds.flip();
-
             EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, _fboId);
-            GL20.glDrawBuffers(bufferIds);
         }
 
         public void unbind() {
@@ -177,8 +160,8 @@ public class PostProcessingRenderer {
             fbo._depthTextureId = GL11.glGenTextures();
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo._depthTextureId);
 
-            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
-            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
 
@@ -187,7 +170,7 @@ public class PostProcessingRenderer {
             // Create depth render buffer object
             fbo._depthRboId = EXTFramebufferObject.glGenRenderbuffersEXT();
             EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, fbo._depthRboId);
-            EXTFramebufferObject.glRenderbufferStorageEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, GL14.GL_DEPTH_COMPONENT24, width, height);
+            EXTFramebufferObject.glRenderbufferStorageEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, GL14.GL_DEPTH_COMPONENT16, width, height);
             EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, 0);
         }
 
@@ -196,8 +179,8 @@ public class PostProcessingRenderer {
             fbo._normalsTextureId = GL11.glGenTextures();
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo._normalsTextureId);
 
-            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
-            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
 
@@ -222,27 +205,35 @@ public class PostProcessingRenderer {
             EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_COLOR_ATTACHMENT1_EXT, GL11.GL_TEXTURE_2D, fbo._normalsTextureId, 0);
         }
 
+        IntBuffer bufferIds = BufferUtils.createIntBuffer(3);
+        bufferIds.put(EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT);
+        if (normals) {
+            bufferIds.put(EXTFramebufferObject.GL_COLOR_ATTACHMENT1_EXT);
+        }
+        bufferIds.flip();
+        GL20.glDrawBuffers(bufferIds);
+
         int framebuffer = EXTFramebufferObject.glCheckFramebufferStatusEXT( EXTFramebufferObject.GL_FRAMEBUFFER_EXT );
         switch (framebuffer) {
             case EXTFramebufferObject.GL_FRAMEBUFFER_COMPLETE_EXT:
                 break;
             case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
-                throw new RuntimeException( "FrameBuffer: " + title
+                logger.error( "FrameBuffer: " + title
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT exception" );
             case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
-                throw new RuntimeException( "FrameBuffer: " + title
+                logger.error( "FrameBuffer: " + title
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT exception" );
             case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
-                throw new RuntimeException( "FrameBuffer: " + title
+                logger.error( "FrameBuffer: " + title
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT exception" );
             case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
-                throw new RuntimeException( "FrameBuffer: " + title
+                logger.error( "FrameBuffer: " + title
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT exception" );
             case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
-                throw new RuntimeException( "FrameBuffer: " + title
+                logger.error( "FrameBuffer: " + title
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT exception" );
             case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
-                throw new RuntimeException( "FrameBuffer: " + title
+                logger.error( "FrameBuffer: " + title
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT exception" );
             default:
                 throw new RuntimeException( "Unexpected reply from glCheckFramebufferStatusEXT: " + framebuffer );
