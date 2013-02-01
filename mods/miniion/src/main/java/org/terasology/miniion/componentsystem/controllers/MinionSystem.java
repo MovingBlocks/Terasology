@@ -21,11 +21,13 @@ import java.util.List;
 import java.util.Random;
 
 import org.terasology.asset.Assets;
+import org.terasology.components.LocalPlayerComponent;
 
 import org.terasology.rendering.logic.*;
 import org.terasology.world.block.*;
 import org.terasology.entityFactory.*;
 import org.terasology.entitySystem.*;
+import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.events.*;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
@@ -49,8 +51,7 @@ public class MinionSystem implements EventHandlerSystem {
 	@In
 	private EntityManager entityManager;
 
-	private static final int PRIORITY_LOCAL_PLAYER_OVERRIDE = 160;
-	private static final int POPUP_ENTRIES = 9;
+	//private static final int PRIORITY_LOCAL_PLAYER_OVERRIDE = 160;
 	private static boolean showactiveminion = false;
 	private static boolean showSelectionOverlay = false;
 	private static EntityRef activeminion;
@@ -82,6 +83,12 @@ public class MinionSystem implements EventHandlerSystem {
 		createZoneList();
 		initRecipes();
 	}
+	
+	//need to check inventory if already has one or not before sending this
+    /*@ReceiveEvent(components = {LocalPlayerComponent.class})
+    public void onSpawn(AddComponentEvent event, EntityRef entity) {
+        entity.send(new ReceiveItemEvent(CoreRegistry.get(EntityManager.class).create("miniion:minioncommand")));
+    }*/
 
 	/**
 	 * Ugly way to retrieve a name from a prefab

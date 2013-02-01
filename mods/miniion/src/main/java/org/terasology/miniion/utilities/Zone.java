@@ -48,7 +48,6 @@ public class Zone {
     
 	private Vector3i startposition;
 	private Vector3i endposition;
-	private boolean render = false;
 	private boolean terraformcomplete = false;
 	//used to undo zones with unbreakable blocks
 	//zone set to delete untill blocks are removed

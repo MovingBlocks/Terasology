@@ -2,11 +2,8 @@ package org.terasology.miniion.componentsystem.controllers;
 
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.world.LocationComponent;
-import org.terasology.entityFactory.BlockItemFactory;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.*;
+import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.math.Vector3i;
@@ -29,6 +26,21 @@ public class OreonCropSystem implements EventHandlerSystem, UpdateSubscriberSyst
 		entityManager = CoreRegistry.get(EntityManager.class);
 		timer = CoreRegistry.get(Timer.class);
 		worldprovider = CoreRegistry.get(WorldProvider.class);
+	}
+	
+	 @ReceiveEvent(components = {OreonCropComponent.class})
+	    public void onSpawn(AddComponentEvent event, EntityRef entity) {
+		 initCrops();
+	    }
+	
+	private void initCrops(){
+		//add 3000 to init to create  bit of a delay before first check
+		long initTime = timer.getTimeInMs();
+		for(EntityRef minion : entityManager.iteratorEntities(OreonCropComponent.class)){
+			OreonCropComponent crop = minion.getComponent(OreonCropComponent.class);
+			crop.lastgrowthcheck = initTime;
+			minion.saveComponent(crop);
+		}
 	}
 
 	@Override
