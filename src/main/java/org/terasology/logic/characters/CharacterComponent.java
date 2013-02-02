@@ -15,10 +15,13 @@
  */
 package org.terasology.logic.characters;
 
-import javax.vecmath.Vector3f;
-
+import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.math.TeraMath;
+
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
 
 /**
  * Information common to characters (the physical body of players and creatures)
@@ -30,4 +33,18 @@ public final class CharacterComponent implements Component {
     public EntityRef transferSlot = EntityRef.NULL;
     public float eyeOffset = 0.6f;
     public float interactionRange = 5f;
+    public float pitch;
+    public float yaw;
+
+    public Quat4f getLookRotation() {
+        Quat4f lookRotation = new Quat4f();
+        QuaternionUtil.setEuler(lookRotation, TeraMath.DEG_TO_RAD * yaw, TeraMath.DEG_TO_RAD * pitch, 0);
+        return lookRotation;
+    }
+
+    public Vector3f getLookDirection() {
+        Vector3f result = new Vector3f(0, 0, 1);
+        QuaternionUtil.quatRotate(getLookRotation(), result, result);
+        return result;
+    }
 }

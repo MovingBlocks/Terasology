@@ -16,7 +16,7 @@ public class EventLibraryImpl extends BaseLibraryImpl<Event> implements EventLib
     private TypeHandlerLibrary metadataBuilder;
 
     public EventLibraryImpl(TypeHandlerLibrary metadataBuilder) {
-        super(metadataBuilder);
+        super();
         this.metadataBuilder = metadataBuilder;
     }
 
@@ -50,7 +50,7 @@ public class EventLibraryImpl extends BaseLibraryImpl<Event> implements EventLib
             return null;
         }
 
-        metadataBuilder.populateFields(clazz, info);
+        metadataBuilder.populateFields(clazz, info, true);
         return info;
     }
 }

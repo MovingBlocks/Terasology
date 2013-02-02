@@ -35,7 +35,7 @@ public final class ComponentLibraryImpl extends BaseLibraryImpl<Component> imple
     private TypeHandlerLibrary metadataBuilder;
 
     public ComponentLibraryImpl(TypeHandlerLibrary metadataBuilder) {
-        super(metadataBuilder);
+        super();
         this.metadataBuilder = metadataBuilder;
     }
 
@@ -72,7 +72,7 @@ public final class ComponentLibraryImpl extends BaseLibraryImpl<Component> imple
             return null;
         }
 
-        metadataBuilder.populateFields(clazz, info);
+        metadataBuilder.populateFields(clazz, info, false);
         return info;
     }
 }

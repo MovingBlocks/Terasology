@@ -105,6 +105,7 @@ message RemoveEntityMessage {
 message EventMessage {
     optional int32 targetId = 1;
     optional Event event = 2;
+    optional Vector3iData targetBlockPos = 3;
 
     extensions 5000 to max;
 }

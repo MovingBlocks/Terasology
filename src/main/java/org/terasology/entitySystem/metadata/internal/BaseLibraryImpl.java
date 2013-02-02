@@ -3,7 +3,6 @@ package org.terasology.entitySystem.metadata.internal;
 import com.google.common.collect.Maps;
 import org.terasology.entitySystem.metadata.ClassLibrary;
 import org.terasology.entitySystem.metadata.ClassMetadata;
-import org.terasology.entitySystem.metadata.TypeHandlerLibrary;
 
 import java.util.Iterator;
 import java.util.Locale;
@@ -17,12 +16,6 @@ public abstract class BaseLibraryImpl<T> implements ClassLibrary<T> {
     private Map<Class<? extends T>, ClassMetadata<? extends T>> serializationLookup = Maps.newHashMap();
     private Map<String, Class<? extends T>> typeLookup = Maps.newHashMap();
 
-    private TypeHandlerLibrary metadataBuilder;
-
-    public BaseLibraryImpl(TypeHandlerLibrary metadataBuilder) {
-        this.metadataBuilder = metadataBuilder;
-    }
-
     public abstract String[] getNamesFor(Class<? extends T> clazz);
 
     @Override
@@ -30,7 +23,7 @@ public abstract class BaseLibraryImpl<T> implements ClassLibrary<T> {
         register(clazz, getNamesFor(clazz));
     }
 
-    public void register(Class<? extends T> clazz, String ... names) {
+    public void register(Class<? extends T> clazz, String... names) {
         ClassMetadata<? extends T> metadata = createMetadata(clazz, names);
 
         serializationLookup.put(clazz, metadata);
@@ -40,10 +33,7 @@ public abstract class BaseLibraryImpl<T> implements ClassLibrary<T> {
         }
     }
 
-    // TODO: Review this
-    protected <U extends T> ClassMetadata<U> createMetadata(Class<U> clazz, String ... names) {
-        return metadataBuilder.build(clazz, names);
-    }
+    protected abstract <U extends T> ClassMetadata<U> createMetadata(Class<U> clazz, String... names);
 
     @Override
     @SuppressWarnings("unchecked")

@@ -78,6 +78,8 @@ public class BulletCharacterMover implements CharacterMover {
             checkSwimming(characterMovementComponent, result);
         }
         updateRotation(characterMovementComponent, result, input);
+        result.setPitch(input.getPitch());
+        result.setYaw(input.getYaw());
         return result;
     }
 

@@ -36,11 +36,13 @@ public final class FieldMetadata {
     private Method getter;
     private Method setter;
     private TypeHandler serializationHandler;
+    private boolean replicated;
     private Replicate replicationInfo;
 
-    public FieldMetadata(Field field, Class type, TypeHandler handler) {
+    public FieldMetadata(Field field, Class type, TypeHandler handler, boolean replicated) {
         this.field = field;
         this.serializationHandler = handler;
+        this.replicated = replicated;
         this.replicationInfo = field.getAnnotation(Replicate.class);
         getter = findGetter(type, field);
         setter = findSetter(type, field);
@@ -106,7 +108,7 @@ public final class FieldMetadata {
     }
 
     public boolean isReplicated() {
-        return replicationInfo != null;
+        return replicated;
     }
 
     public Replicate getReplicationInfo() {

@@ -31,9 +31,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.AbstractEvent;
 import org.terasology.entitySystem.Component;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Event;
-import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EventPriority;
 import org.terasology.entitySystem.EventReceiver;
 import org.terasology.entitySystem.EventSystem;
@@ -43,6 +43,7 @@ import org.terasology.entitySystem.metadata.EventMetadata;
 import org.terasology.network.BroadcastEvent;
 import org.terasology.network.Client;
 import org.terasology.network.NetworkComponent;
+import org.terasology.network.NetworkEvent;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.OwnerEvent;
@@ -225,35 +226,54 @@ public class PojoEventSystem implements EventSystem {
             logger.debug("Replicating event: {}", event);
             switch (metadata.getNetworkEventType()) {
                 case BROADCAST:
-                    if (networkSystem.getMode() == NetworkMode.SERVER) {
-                        NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
-                        if (netComp != null) {
-                            for (Client client : networkSystem.getPlayers()) {
-                                client.send(event, netComp.networkId);
-                            }
-                        }
-                    }
+                    broadcastEvent(entity, event, metadata);
                     break;
                 case OWNER:
-                    if (networkSystem.getMode() == NetworkMode.SERVER) {
-                        NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
-                        if (netComp != null) {
-                            Client client = networkSystem.getOwner(entity);
-                            if (client != null) {
-                                client.send(event, netComp.networkId);
-                            }
-                        }
-                    }
+                    sendEventToOwner(entity, event);
                     break;
                 case SERVER:
-                    if (networkSystem.getMode() == NetworkMode.CLIENT) {
-                        NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
-                        if (netComp != null) {
-                            networkSystem.getServer().send(event, netComp.networkId);
-                        }
-                    }
+                    sendEventToServer(entity, event);
                     break;
 
+            }
+        }
+    }
+
+    private void sendEventToServer(EntityRef entity, Event event) {
+        if (networkSystem.getMode() == NetworkMode.CLIENT) {
+            NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
+            if (netComp != null) {
+                networkSystem.getServer().send(event, entity);
+            }
+        }
+    }
+
+    private void sendEventToOwner(EntityRef entity, Event event) {
+        if (networkSystem.getMode() == NetworkMode.SERVER) {
+            NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
+            if (netComp != null) {
+                Client client = networkSystem.getOwner(entity);
+                if (client != null) {
+                    client.send(event, entity);
+                }
+            }
+        }
+    }
+
+    private void broadcastEvent(EntityRef entity, Event event, EventMetadata metadata) {
+        if (networkSystem.getMode() == NetworkMode.SERVER) {
+            NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
+            BlockComponent blockComp = entity.getComponent(BlockComponent.class);
+            if (netComp != null || blockComp != null) {
+                EntityRef instigatorClient = EntityRef.NULL;
+                if (metadata.isSkipInstigator() && event instanceof NetworkEvent) {
+                    instigatorClient = networkSystem.getOwnerEntity(((NetworkEvent) event).getInstigator());
+                }
+                for (Client client : networkSystem.getPlayers()) {
+                    if (!client.equals(instigatorClient)) {
+                        client.send(event, entity);
+                    }
+                }
             }
         }
     }

@@ -12,7 +12,8 @@ public class EventMetadata<T extends Event> extends ClassMetadata<T> {
 
     private NetworkEventType networkEventType;
     private String uri;
-    private boolean lagCompensated;
+    private boolean lagCompensated = false;
+    private boolean skipInstigator = false;
 
     public EventMetadata(Class<T> simpleClass, String uri) throws NoSuchMethodException {
         super(simpleClass, uri);
@@ -24,6 +25,7 @@ public class EventMetadata<T extends Event> extends ClassMetadata<T> {
             networkEventType = NetworkEventType.OWNER;
         } else if (simpleClass.getAnnotation(BroadcastEvent.class) != null) {
             networkEventType = NetworkEventType.BROADCAST;
+            skipInstigator = simpleClass.getAnnotation(BroadcastEvent.class).skipInstigator();
         }
     }
 
@@ -33,6 +35,10 @@ public class EventMetadata<T extends Event> extends ClassMetadata<T> {
 
     public boolean isLagCompensated() {
         return lagCompensated;
+    }
+
+    public boolean isSkipInstigator() {
+        return skipInstigator;
     }
 
     public NetworkEventType getNetworkEventType() {

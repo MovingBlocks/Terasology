@@ -15,13 +15,6 @@
         "excessSpeedDamageMultiplier" : 20,
         "fallingDamageSpeedThreshold" : 15
     },
-    "Hunger" : {
-        "currentContentment" : 200,
-        "maxContentment" : 200,
-        "deregenRate" : 0.4,
-        "waitBeforeDeregen" : 10,
-	"waitBeetweenDamage" : 12
-    },
     "CharacterMovement" : {
         "groundFriction" : 16,
         "maxGroundSpeed" : 3,
@@ -51,17 +44,5 @@
               0,0,0,0,0,0,0,0,0,0,
               0,0,0,0,0,0,0,0,0,0
             ]
-    },
-    "MinionBar" : {
-        "minionSlots" : [0,0,0,0,0,0,0,0,0]
-    },
-    "MinionController" : {},
-    "Spawner" : {
-        "types" : ["gelcube", "chromaticgelcube", "metallicgelcube"],
-        "timeBetweenSpawns" : 10000,
-        "maxMobsPerSpawner" : 64,
-        "rangedSpawning" : true,
-        "minDistance" : 8,
-        "range" : 18
     }
 }

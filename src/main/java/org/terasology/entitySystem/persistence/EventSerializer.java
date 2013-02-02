@@ -75,12 +75,12 @@ public class EventSerializer {
                 logger.error("Unable to serialize field {}, out of bounds", fieldId);
                 continue;
             }
-
-            fieldInfo.deserializeOnto(targetEvent, eventData.getFieldValue(i));
+            if (fieldInfo.isReplicated()) {
+                fieldInfo.deserializeOnto(targetEvent, eventData.getFieldValue(i));
+            }
         }
         return targetEvent;
     }
-
 
     /**
      * Serializes an event.
@@ -89,17 +89,6 @@ public class EventSerializer {
      * @return The serialized event, or null if it could not be serialized.
      */
     public EntityData.Event serialize(Event event) {
-        return serialize(event, FieldSerializeCheck.NullCheck.<Event>newInstance());
-    }
-
-    /**
-     * Serializes an event.
-     *
-     * @param event
-     * @param check A check to use to see if each field should be serialized.
-     * @return The serialized event, or null if it could not be serialized.
-     */
-    public EntityData.Event serialize(Event event, FieldSerializeCheck<Event> check) {
         ClassMetadata<?> eventMetadata = eventLibrary.getMetadata(event.getClass());
         if (eventMetadata == null) {
             logger.error("Unregistered event type: {}", event.getClass());
@@ -110,7 +99,7 @@ public class EventSerializer {
 
         ByteString.Output fieldIds = ByteString.newOutput();
         for (FieldMetadata field : eventMetadata.iterateFields()) {
-            if (check.shouldSerializeField(field, event)) {
+            if (field.isReplicated()) {
                 try {
                     EntityData.Value serializedValue = field.serialize(event);
                     if (serializedValue != null) {

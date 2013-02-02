@@ -1,9 +1,6 @@
 package org.terasology.logic.characters;
 
 import com.bulletphysics.linearmath.Transform;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.spi.LocationAwareLogger;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.network.BroadcastEvent;
@@ -21,12 +18,15 @@ public class CharacterStateEvent extends NetworkEvent {
     private long time;
     private int sequenceNumber;
     private Vector3f position = new Vector3f();
-    private Quat4f rotation = new Quat4f(0,0,0,1);
+    private Quat4f rotation = new Quat4f(0, 0, 0, 1);
     private MovementMode mode = MovementMode.WALKING;
     private boolean grounded = false;
     private Vector3f velocity = new Vector3f();
+    private float yaw = 0;
+    private float pitch = 0;
 
-    protected CharacterStateEvent() {};
+    protected CharacterStateEvent() {
+    }
 
     public CharacterStateEvent(CharacterStateEvent previous) {
         this.time = previous.time;
@@ -36,9 +36,11 @@ public class CharacterStateEvent extends NetworkEvent {
         this.grounded = previous.grounded;
         this.velocity.set(previous.velocity);
         this.sequenceNumber = previous.sequenceNumber + 1;
+        this.pitch = previous.pitch;
+        this.yaw = previous.yaw;
     }
 
-    public CharacterStateEvent(long time, int sequenceNumber, Vector3f position, Quat4f rotation, Vector3f velocity, MovementMode mode, boolean grounded) {
+    public CharacterStateEvent(long time, int sequenceNumber, Vector3f position, Quat4f rotation, Vector3f velocity, float yaw, float pitch, MovementMode mode, boolean grounded) {
         this.time = time;
         this.position.set(position);
         this.rotation.set(rotation);
@@ -46,6 +48,8 @@ public class CharacterStateEvent extends NetworkEvent {
         this.mode = mode;
         this.grounded = grounded;
         this.sequenceNumber = sequenceNumber;
+        this.pitch = pitch;
+        this.yaw = yaw;
     }
 
     public long getTime() {
@@ -92,6 +96,22 @@ public class CharacterStateEvent extends NetworkEvent {
         this.sequenceNumber = sequenceNumber;
     }
 
+    public float getPitch() {
+        return pitch;
+    }
+
+    public void setPitch(float pitch) {
+        this.pitch = pitch;
+    }
+
+    public float getYaw() {
+        return yaw;
+    }
+
+    public void setYaw(float yaw) {
+        this.yaw = yaw;
+    }
+
     public static void setToState(EntityRef entity, CharacterStateEvent state) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         location.setWorldPosition(state.getPosition());
@@ -102,11 +122,16 @@ public class CharacterStateEvent extends NetworkEvent {
         movementComp.setVelocity(state.getVelocity());
         movementComp.grounded = state.isGrounded();
         entity.saveComponent(movementComp);
+        CharacterComponent characterComponent = entity.getComponent(CharacterComponent.class);
+        characterComponent.pitch = state.pitch;
+        characterComponent.yaw = state.yaw;
+        entity.saveComponent(characterComponent);
+
         movementComp.collider.setInterpolationWorldTransform(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), state.getPosition(), 1.0f)));
     }
 
     public static void setToInterpolateState(EntityRef entity, CharacterStateEvent a, CharacterStateEvent b, long time) {
-        float t = (float)(time - a.getTime()) / (b.getTime() - a.getTime());
+        float t = (float) (time - a.getTime()) / (b.getTime() - a.getTime());
         Vector3f newPos = new Vector3f();
         newPos.interpolate(a.getPosition(), b.getPosition(), t);
         Quat4f newRot = new Quat4f();
@@ -121,7 +146,13 @@ public class CharacterStateEvent extends NetworkEvent {
         movementComponent.setVelocity(a.getVelocity());
         movementComponent.grounded = a.isGrounded();
         entity.saveComponent(movementComponent);
-        movementComponent.collider.setInterpolationWorldTransform(new Transform(new Matrix4f(new Quat4f(0,0,0,1), newPos, 1.0f)));
+
+        CharacterComponent characterComponent = entity.getComponent(CharacterComponent.class);
+        characterComponent.pitch = b.pitch;
+        characterComponent.yaw = b.yaw;
+        entity.saveComponent(characterComponent);
+
+        movementComponent.collider.setInterpolationWorldTransform(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), newPos, 1.0f)));
     }
 
     public static void setToExtrapolateState(EntityRef entity, CharacterStateEvent state, long time) {
@@ -139,7 +170,13 @@ public class CharacterStateEvent extends NetworkEvent {
         movementComponent.setVelocity(state.getVelocity());
         movementComponent.grounded = state.isGrounded();
         entity.saveComponent(movementComponent);
-        movementComponent.collider.setInterpolationWorldTransform(new Transform(new Matrix4f(new Quat4f(0,0,0,1), newPos, 1.0f)));
+
+        CharacterComponent characterComponent = entity.getComponent(CharacterComponent.class);
+        characterComponent.pitch = state.pitch;
+        characterComponent.yaw = state.yaw;
+        entity.saveComponent(characterComponent);
+
+        movementComponent.collider.setInterpolationWorldTransform(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), newPos, 1.0f)));
     }
 
 }

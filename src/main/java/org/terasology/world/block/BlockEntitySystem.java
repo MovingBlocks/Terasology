@@ -38,6 +38,7 @@ import org.terasology.logic.manager.AudioManager;
 import org.terasology.physics.ImpulseEvent;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.management.BlockManager;
 
 /**
@@ -134,29 +135,22 @@ public class BlockEntitySystem implements ComponentSystem {
 
     @ReceiveEvent(components = {BlockComponent.class}, priority = EventPriority.PRIORITY_HIGH)
     public void onDamaged(DamageEvent event, EntityRef entity) {
+        entity.send(new PlayBlockDamagedEvent(event.getInstigator()));
+    }
+
+    @ReceiveEvent(components = {BlockComponent.class})
+    public void onPlayBlockDamage(PlayBlockDamagedEvent event, EntityRef entity) {
         BlockComponent blockComp = entity.getComponent(BlockComponent.class);
+        BlockFamily family = worldProvider.getBlock(blockComp.getPosition()).getBlockFamily();
+        if (family.getArchetypeBlock().isDestructible()) {
+            EntityRef particles = entityManager.create("engine:blockParticles", blockComp.getPosition().toVector3f());
+            BlockParticleEffectComponent comp = particles.getComponent(BlockParticleEffectComponent.class);
+            comp.blockType = family;
+            particles.saveComponent(comp);
 
-        EntityRef particlesEntity = entityManager.create();
-        particlesEntity.addComponent(new LocationComponent(blockComp.getPosition().toVector3f()));
-
-        BlockParticleEffectComponent particleEffect = new BlockParticleEffectComponent();
-        particleEffect.spawnCount = 64;
-        particleEffect.blockType = worldProvider.getBlock(blockComp.getPosition()).getBlockFamily();
-        particleEffect.initialVelocityRange.set(4, 4, 4);
-        particleEffect.spawnRange.set(0.3f, 0.3f, 0.3f);
-        particleEffect.destroyEntityOnCompletion = true;
-        particleEffect.minSize = 0.05f;
-        particleEffect.maxSize = 0.1f;
-        particleEffect.minLifespan = 1f;
-        particleEffect.maxLifespan = 1.5f;
-        particleEffect.targetVelocity.set(0, -5, 0);
-        particleEffect.acceleration.set(2f, 2f, 2f);
-        particleEffect.collideWithBlocks = true;
-        particlesEntity.addComponent(particleEffect);
-
-        // TODO: Don't play this if destroyed?
-        // TODO: Configurable via block definition
-        AudioManager.play(new AssetUri(AssetType.SOUND, "engine:Dig"), 1.0f);
+            // TODO: Configurable via block definition
+            AudioManager.play(new AssetUri(AssetType.SOUND, "engine:Dig"), 1.0f);
+        }
     }
 
 }

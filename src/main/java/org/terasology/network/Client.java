@@ -23,11 +23,9 @@ import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
 import org.terasology.entitySystem.metadata.NetworkEventType;
 import org.terasology.entitySystem.persistence.EventSerializer;
-import org.terasology.entitySystem.persistence.FieldSerializeCheck;
 import org.terasology.entitySystem.persistence.PackedEntitySerializer;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
-import org.terasology.logic.characters.ClientCharacterPredictionSystem;
 import org.terasology.logic.characters.PredictionSystem;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
@@ -53,8 +51,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class Client implements ChunkRegionListener, WorldChangeListener, EventReceiver<ChunkUnloadedEvent> {
     private static final Logger logger = LoggerFactory.getLogger(Client.class);
-
-    private static final FieldSerializeCheck<Event> EVENT_FIELD_CHECK = FieldSerializeCheck.NullCheck.<Event>newInstance();
 
     private Timer timer;
     private NetworkSystem networkSystem;
@@ -107,7 +103,7 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
 
     public void setNetRemoved(int netId) {
         if (!netInitial.remove(netId)) {
-            netDirty.add(netId);
+            netRemoved.add(netId);
         }
         dirtyComponents.keySet().remove(netId);
         addedComponents.keySet().remove(netId);
@@ -200,11 +196,23 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
         CoreRegistry.get(WorldProvider.class).unregisterListener(this);
     }
 
-    public void send(Event event, int targetId) {
-        if (netRelevant.contains(targetId)) {
-            queuedOutgoingEvents.add(NetData.EventMessage.newBuilder()
-                    .setTargetId(targetId)
-                    .setEvent(eventSerializer.serialize(event, EVENT_FIELD_CHECK)).build());
+    public void send(Event event, EntityRef target) {
+        BlockComponent blockComp = target.getComponent(BlockComponent.class);
+        if (blockComp != null) {
+            if (relevantChunks.contains(TeraMath.calcChunkPos(blockComp.getPosition()))) {
+                queuedOutgoingEvents.add(NetData.EventMessage.newBuilder()
+                        .setTargetBlockPos(NetworkUtil.convert(blockComp.getPosition()))
+                        .setEvent(eventSerializer.serialize(event)).build());
+            }
+        } else {
+            NetworkComponent networkComponent = target.getComponent(NetworkComponent.class);
+            if (networkComponent != null) {
+                if (netRelevant.contains(networkComponent.networkId)) {
+                    queuedOutgoingEvents.add(NetData.EventMessage.newBuilder()
+                            .setTargetId(networkComponent.networkId)
+                            .setEvent(eventSerializer.serialize(event)).build());
+                }
+            }
         }
     }
 
@@ -357,12 +365,12 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
                 }
                 lagCompensated = true;
             }
-            EntityRef target = networkSystem.getEntity(eventMessage.getTargetId());
+            EntityRef target = EntityRef.NULL;
+            if (eventMessage.hasTargetId()) {
+                target = networkSystem.getEntity(eventMessage.getTargetId());
+            }
             if (target.exists()) {
                 if (networkSystem.getOwner(target).equals(this)) {
-                    if (event instanceof NetworkEvent) {
-                        ((NetworkEvent) event).setClient(clientEntity);
-                    }
                     target.send(event);
                 } else {
                     logger.warn("Received event {} for non-owned entity {} from {}", event, target, this);

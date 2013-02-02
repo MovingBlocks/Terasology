@@ -6,11 +6,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks a type or field to be replicated. For events, fields default to replicated so this isn't needed
+ * Used to mark a field or type not to be replicated. This is only needed for event fields (at the moment), since
+ * everything else defaults to not be replicated.
+ *
  * @author Immortius
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.TYPE})
-public @interface Replicate {
-    public ReplicateType value() default ReplicateType.SERVER_TO_CLIENT;
+public @interface NoReplicate {
 }

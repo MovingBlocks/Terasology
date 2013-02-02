@@ -97,6 +97,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
     private Vector3f relativeMovement = new Vector3f();
     private boolean run = false;
     private boolean jump = false;
+    private float lookPitch = 0;
+    private float lookYaw = 0;
 
     private BlockOverlayRenderer aabbRenderer = new AABBRenderer(AABB.createEmpty());
 
@@ -133,61 +135,52 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
             return;
         }
 
-        processInput(entity, localPlayerComponent, characterMovementComponent);
-        updateCamera(localPlayerComponent, characterMovementComponent, characterComp, location);
+        processInput(entity, characterComp, characterMovementComponent);
+        updateCamera(characterComp, characterMovementComponent, characterComp, location);
 
         // Hand animation update
         localPlayerComponent.handAnimation = Math.max(0, localPlayerComponent.handAnimation - 2.5f * delta);
 
-        entity.saveComponent(localPlayerComponent);
+        entity.saveComponent(characterComp);
     }
 
-    private void processInput(EntityRef entity, LocalPlayerComponent localPlayerComponent, CharacterMovementComponent characterMovementComponent) {
+    private void processInput(EntityRef entity, CharacterComponent characterComponent, CharacterMovementComponent characterMovementComponent) {
         Vector3f relMove = new Vector3f(relativeMovement);
         relMove.y = 0;
 
         Quat4f viewRot = new Quat4f();
         switch (characterMovementComponent.mode) {
             case WALKING:
-                QuaternionUtil.setEuler(viewRot, TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw, 0, 0);
+                QuaternionUtil.setEuler(viewRot, TeraMath.DEG_TO_RAD * characterComponent.yaw, 0, 0);
                 QuaternionUtil.quatRotate(viewRot, relMove, relMove);
                 break;
             default:
-                QuaternionUtil.setEuler(viewRot, TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw, TeraMath.DEG_TO_RAD * localPlayerComponent.viewPitch, 0);
+                QuaternionUtil.setEuler(viewRot, TeraMath.DEG_TO_RAD * characterComponent.yaw, TeraMath.DEG_TO_RAD * characterComponent.pitch, 0);
                 QuaternionUtil.quatRotate(viewRot, relMove, relMove);
                 relMove.y += relativeMovement.y;
                 break;
         }
-        entity.send(new CharacterMoveInputEvent(inputSequenceNumber++, localPlayerComponent.viewPitch, localPlayerComponent.viewYaw, relMove, run, jump));
+        entity.send(new CharacterMoveInputEvent(inputSequenceNumber++, lookPitch, lookYaw, relMove, run, jump));
     }
 
-    private void updateCamera(LocalPlayerComponent localPlayerComponent, CharacterMovementComponent characterMovementComponent, CharacterComponent characterComp, LocationComponent location) {
+    private void updateCamera(CharacterComponent characterComponent, CharacterMovementComponent characterMovementComponent, CharacterComponent characterComp, LocationComponent location) {
         // TODO: Remove, use component camera, breaks spawn camera anyway
         Quat4f lookRotation = new Quat4f();
-        QuaternionUtil.setEuler(lookRotation, TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw, TeraMath.DEG_TO_RAD * localPlayerComponent.viewPitch, 0);
+        QuaternionUtil.setEuler(lookRotation, TeraMath.DEG_TO_RAD * characterComponent.yaw, TeraMath.DEG_TO_RAD * characterComponent.pitch, 0);
         updateCamera(characterComp, characterMovementComponent, location.getWorldPosition(), lookRotation);
     }
 
     @ReceiveEvent(components = LocalPlayerComponent.class)
     public void onMouseX(MouseXAxisEvent event, EntityRef entity) {
-        LocalPlayerComponent localPlayer = entity.getComponent(LocalPlayerComponent.class);
-        localPlayer.viewYaw = (localPlayer.viewYaw - event.getValue()) % 360;
-        entity.saveComponent(localPlayer);
-        LocationComponent loc = entity.getComponent(LocationComponent.class);
-
-        if (loc != null) {
-            QuaternionUtil.setEuler(loc.getLocalRotation(), TeraMath.DEG_TO_RAD * localPlayer.viewYaw, 0, 0);
-            entity.saveComponent(loc);
-        }
+        CharacterComponent characterComponent = entity.getComponent(CharacterComponent.class);
+        lookYaw = (characterComponent.yaw - event.getValue()) % 360;
         event.consume();
     }
 
     @ReceiveEvent(components = LocalPlayerComponent.class)
     public void onMouseY(MouseYAxisEvent event, EntityRef entity) {
-        LocalPlayerComponent localPlayer = entity.getComponent(LocalPlayerComponent.class);
-
-        localPlayer.viewPitch = TeraMath.clamp(localPlayer.viewPitch - event.getValue(), -89, 89);
-        entity.saveComponent(localPlayer);
+        CharacterComponent character = entity.getComponent(CharacterComponent.class);
+        lookPitch = TeraMath.clamp(character.pitch - event.getValue(), -89, 89);
         event.consume();
     }
 

@@ -7,21 +7,17 @@ import org.terasology.entitySystem.EntityRef;
  * @author Immortius
  */
 public class NetworkEvent extends AbstractEvent {
-    private EntityRef client;
 
-    void setClient(EntityRef client) {
-        this.client = client;
+    private EntityRef instigator = EntityRef.NULL;
+
+    protected NetworkEvent() {
     }
 
-    /**
-     *
-     * @return The entity for the client this message came from (server-only).
-     */
-    public EntityRef getClient() {
-        return client;
+    protected NetworkEvent(EntityRef instigator) {
+        this.instigator = instigator;
     }
 
-    public boolean isValidFor(EntityRef expectedClient) {
-        return client == null || expectedClient.equals(client);
+    public EntityRef getInstigator() {
+        return instigator;
     }
 }

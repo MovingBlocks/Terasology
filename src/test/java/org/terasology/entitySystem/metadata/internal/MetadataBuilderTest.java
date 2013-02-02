@@ -10,7 +10,6 @@ import org.terasology.entitySystem.metadata.TypeHandlerLibraryBuilder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Immortius
@@ -26,19 +25,19 @@ public class MetadataBuilderTest {
 
     @Test
     public void requireDefaultConstructor() {
-        assertNull(metadataBuilder.build(NoDefaultConstructor.class));
+        assertNull(metadataBuilder.build(NoDefaultConstructor.class, false));
     }
 
     @Test
     public void trivialMetadata() {
-        ClassMetadata<Trivial> metadata = metadataBuilder.build(Trivial.class);
+        ClassMetadata<Trivial> metadata = metadataBuilder.build(Trivial.class, false);
         assertNotNull(metadata);
         assertEquals(0, metadata.size());
     }
 
     @Test
     public void testPrivateField() {
-        ClassMetadata<PrivateField> metadata = metadataBuilder.build(PrivateField.class);
+        ClassMetadata<PrivateField> metadata = metadataBuilder.build(PrivateField.class, false);
         assertNotNull(metadata);
         assertEquals(1, metadata.size());
         FieldMetadata fieldMetadata = metadata.getField("name");
@@ -50,7 +49,7 @@ public class MetadataBuilderTest {
 
     @Test
     public void testInheritsFields() {
-        ClassMetadata<Inheriting> metadata = metadataBuilder.build(Inheriting.class);
+        ClassMetadata<Inheriting> metadata = metadataBuilder.build(Inheriting.class, false);
         assertNotNull(metadata);
         assertEquals(2, metadata.size());
         assertNotNull(metadata.getField("name"));
@@ -70,7 +69,8 @@ public class MetadataBuilderTest {
     public static class PrivateField {
         private String name;
 
-        private PrivateField() {}
+        private PrivateField() {
+        }
 
         public PrivateField(String name) {
             this.name = name;

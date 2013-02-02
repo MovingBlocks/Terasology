@@ -8,10 +8,9 @@ import org.terasology.network.ServerEvent;
 /**
  * @author Immortius
  */
-@ServerEvent
+@ServerEvent(lagCompensate = true)
 public class AttackRequest extends NetworkEvent {
 
-    @Replicate
     private EntityRef item = EntityRef.NULL;
 
     protected AttackRequest() {

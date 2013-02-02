@@ -15,7 +15,6 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Event;
 import org.terasology.entitySystem.PersistableEntityManager;
 import org.terasology.entitySystem.persistence.EventSerializer;
-import org.terasology.entitySystem.persistence.FieldSerializeCheck;
 import org.terasology.entitySystem.persistence.PackedEntitySerializer;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
@@ -92,10 +91,13 @@ public class Server {
         return serverInfo;
     }
 
-    public void send(Event event, int targetId) {
-        queuedOutgoingEvents.add(NetData.EventMessage.newBuilder()
-                .setEvent(eventSerializer.serialize(event, FieldSerializeCheck.NullCheck.<Event>newInstance()))
-                .setTargetId(targetId).build());
+    public void send(Event event, EntityRef target) {
+        NetworkComponent netComp = target.getComponent(NetworkComponent.class);
+        if (netComp != null) {
+            queuedOutgoingEvents.add(NetData.EventMessage.newBuilder()
+                .setEvent(eventSerializer.serialize(event))
+                .setTargetId(netComp.networkId).build());
+        }
     }
 
     public void update(boolean netTick) {
@@ -170,7 +172,12 @@ public class Server {
 
         for (NetData.EventMessage message : messages) {
             Event event = eventSerializer.deserialize(message.getEvent());
-            EntityRef target = networkSystem.getEntity(message.getTargetId());
+            EntityRef target = EntityRef.NULL;
+            if (message.hasTargetBlockPos()) {
+                target = blockEntityRegistry.getOrCreateBlockEntityAt(NetworkUtil.convert(message.getTargetBlockPos()));
+            } else if (message.hasTargetId()) {
+                target = networkSystem.getEntity(message.getTargetId());
+            }
             if (target.exists()) {
                 target.send(event);
             } else {
@@ -209,6 +216,7 @@ public class Server {
                 int netId = removeEntity.getNetId();
                 EntityRef entity = networkSystem.getEntity(netId);
                 networkSystem.unregisterNetworkEntity(entity);
+                logger.info("Destroying entity: {}", entity);
                 entity.destroy();
             }
             for (NetData.CreateEntityMessage createEntity : message.getCreateEntityList()) {

@@ -94,16 +94,12 @@ public class LocalPlayer {
     }
 
     public Vector3f getViewDirection() {
-        LocalPlayerComponent localPlayer = getCharacterEntity().getComponent(LocalPlayerComponent.class);
-        if (localPlayer == null) {
+        CharacterComponent character = getCharacterEntity().getComponent(CharacterComponent.class);
+        if (character == null) {
             return new Vector3f(0, 0, -1);
         }
         Quat4f rot = new Quat4f();
-        QuaternionUtil.setEuler(rot, TeraMath.DEG_TO_RAD * localPlayer.viewYaw, TeraMath.DEG_TO_RAD * localPlayer.viewPitch, 0);
-        /* This code does not work, as it grabs the rotation of the mouse instead
-        Quat4f rot = new Quat4f();
-        QuaternionUtil.setEuler(rot, localPlayer.viewYaw, localPlayer.viewPitch, 0);
-        */
+        QuaternionUtil.setEuler(rot, TeraMath.DEG_TO_RAD * character.yaw, TeraMath.DEG_TO_RAD * character.pitch, 0);
         // TODO: Put a generator for direction vectors in a util class somewhere
         // And just put quaternion -> vector somewhere too
         Vector3f dir = new Vector3f(0, 0, 1);

@@ -11,9 +11,7 @@ import org.terasology.network.Replicate;
  */
 @OwnerEvent
 public class ChatMessageEvent extends NetworkEvent {
-    @Replicate
     private String message;
-    @Replicate
     private EntityRef from;
 
     private ChatMessageEvent() {

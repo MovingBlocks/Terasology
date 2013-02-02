@@ -16,19 +16,21 @@
 
 package org.terasology.logic.characters;
 
+import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.world.LocationComponent;
-import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.ComponentSystem;
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.entitySystem.RegisterMode;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.events.DamageEvent;
-import org.terasology.logic.characters.events.AttackTargetRequest;
+import org.terasology.logic.characters.events.AttackRequest;
 import org.terasology.logic.characters.events.UseItemInDirectionRequest;
 import org.terasology.logic.characters.events.UseItemOnTargetRequest;
+import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.physics.CollisionGroup;
@@ -37,14 +39,14 @@ import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
-import org.terasology.world.block.BlockRegionComponent;
 
+import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius
  */
-@RegisterSystem(RegisterMode.SERVER)
+@RegisterSystem()
 public class CharacterSystem implements ComponentSystem {
 
     @In
@@ -115,51 +117,38 @@ public class CharacterSystem implements ComponentSystem {
     }
 
     @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class})
-    public void onAttackTargetRequest(AttackTargetRequest event, EntityRef character) {
+    public void onAttackRequest(AttackRequest event, EntityRef character) {
         if (event.getItem().exists()) {
-            if (!character.equals(event.getItem().getComponent(ItemComponent.class).container)) {
+            if (!character.equals(event.getItem().getComponent(NetworkComponent.class).owner)) {
                 return;
             }
         }
 
-        int damage = 1;
-        // Calculate damage from item
-        ItemComponent item = event.getItem().getComponent(ItemComponent.class);
-        if (item != null) {
-            damage = item.baseDamage;
+        LocationComponent location = character.getComponent(LocationComponent.class);
+        CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
+        Vector3f direction = characterComponent.getLookDirection();
+        Vector3f originPos = location.getWorldPosition();
+        originPos.y += characterComponent.eyeOffset;
 
-            BlockComponent blockComp = event.getTarget().getComponent(BlockComponent.class);
-            BlockRegionComponent blockRegionComponent = event.getTarget().getComponent(BlockRegionComponent.class);
-            if (blockComp != null || blockRegionComponent != null) {
-                Block block = worldProvider.getBlock(blockComp.getPosition());
-                if (item.getPerBlockDamageBonus().containsKey(block.getBlockFamily().getURI().toString())) {
-                    damage += item.getPerBlockDamageBonus().get(block.getBlockFamily().getURI().toString());
+        HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, filter);
+
+        if (result.isHit()) {
+            int damage = 1;
+            // Calculate damage from item
+            ItemComponent item = event.getItem().getComponent(ItemComponent.class);
+            if (item != null) {
+                damage = item.baseDamage;
+
+                BlockComponent blockComp = result.getEntity().getComponent(BlockComponent.class);
+                if (blockComp != null) {
+                    Block block = worldProvider.getBlock(blockComp.getPosition());
+                    if (item.getPerBlockDamageBonus().containsKey(block.getBlockFamily().getURI().toString())) {
+                        damage += item.getPerBlockDamageBonus().get(block.getBlockFamily().getURI().toString());
+                    }
                 }
             }
-        }
 
-        // Check target
-        if (event.getTarget().exists()) {
-            LocationComponent location = character.getComponent(LocationComponent.class);
-            CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
-            Vector3f targetPos = event.getTargetPosition();
-            Vector3f originPos = location.getWorldPosition();
-            originPos.y += characterComponent.eyeOffset;
-
-            Vector3f direction = new Vector3f(targetPos);
-            direction.sub(originPos);
-            // Too far away
-            if (direction.lengthSquared() > characterComponent.interactionRange * characterComponent.interactionRange) {
-                return;
-            }
-
-            direction.normalize();
-
-            HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, filter);
-            if (result.getEntity().equals(event.getTarget())) {
-                event.getTarget().send(new DamageEvent(damage, character));
-            }
+            result.getEntity().send(new DamageEvent(damage, character));
         }
     }
-
 }

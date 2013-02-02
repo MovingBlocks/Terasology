@@ -37,7 +37,7 @@ public class MessagingSystem implements ComponentSystem {
 
     @ReceiveEvent(components = ClientComponent.class)
     public void onReceiveMessage(SendChatMessage event, EntityRef entity) {
-        if (networkSystem.getMode().isAuthority() && event.isValidFor(entity)) {
+        if (networkSystem.getMode().isAuthority()) {
             logger.info("Received message from {} : '{}'", entity, event.getMessage());
             for (EntityRef client : entityManager.iteratorEntities(ClientComponent.class)) {
                 client.send(new ChatMessageEvent(event.getMessage(), entity.getComponent(ClientComponent.class).clientInfo));

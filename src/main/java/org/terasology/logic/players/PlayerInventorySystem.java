@@ -18,8 +18,8 @@ package org.terasology.logic.players;
 
 import org.terasology.components.InventoryComponent;
 import org.terasology.components.ItemComponent;
-import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.ComponentSystem;
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterSystem;
@@ -30,8 +30,7 @@ import org.terasology.input.binds.ToolbarNextButton;
 import org.terasology.input.binds.ToolbarPrevButton;
 import org.terasology.input.binds.ToolbarSlotButton;
 import org.terasology.input.binds.UseItemButton;
-import org.terasology.logic.characters.events.AttackInDirectionRequest;
-import org.terasology.logic.characters.events.AttackTargetRequest;
+import org.terasology.logic.characters.events.AttackRequest;
 import org.terasology.logic.characters.events.UseItemInDirectionRequest;
 import org.terasology.logic.characters.events.UseItemOnTargetRequest;
 import org.terasology.rendering.world.WorldRenderer;
@@ -58,12 +57,10 @@ public class PlayerInventorySystem implements ComponentSystem {
 
     @Override
     public void initialise() {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public void shutdown() {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @ReceiveEvent(components = {LocalPlayerComponent.class})
@@ -133,11 +130,7 @@ public class PlayerInventorySystem implements ComponentSystem {
         InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
         EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayerComp.selectedTool);
 
-        if (event.getTarget().exists()) {
-            entity.send(new AttackTargetRequest(selectedItemEntity, event.getTarget(), event.getHitPosition()));
-        } else {
-            entity.send(new AttackInDirectionRequest(selectedItemEntity, worldRenderer.getActiveCamera().getViewingDirection()));
-        }
+        entity.send(new AttackRequest(selectedItemEntity));
 
         lastInteraction = timer.getTimeInMs();
         localPlayerComp.handAnimation = 0.5f;

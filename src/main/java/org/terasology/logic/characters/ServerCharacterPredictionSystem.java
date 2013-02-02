@@ -117,7 +117,7 @@ public class ServerCharacterPredictionSystem implements UpdateSubscriberSystem, 
 
     private CharacterStateEvent createInitialState(EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
-        return new CharacterStateEvent(timer.getTimeInMs(), 0, location.getWorldPosition(), location.getWorldRotation(), new Vector3f(), MovementMode.WALKING, false);
+        return new CharacterStateEvent(timer.getTimeInMs(), 0, location.getWorldPosition(), location.getWorldRotation(), new Vector3f(), 0, 0, MovementMode.WALKING, false);
     }
 
     private CharacterStateEvent stepState(CharacterMoveInputEvent input, CharacterStateEvent lastState, EntityRef entity) {
@@ -137,7 +137,7 @@ public class ServerCharacterPredictionSystem implements UpdateSubscriberSystem, 
                         // Haven't received input in a while, repeat last input
                         CharacterMoveInputEvent lastInput = lastInputEvent.get(entry.getKey());
                         if (lastInput != null) {
-                            CharacterMoveInputEvent newInput = new CharacterMoveInputEvent(lastInput, MAX_INPUT_UNDERFLOW / 2);
+                            CharacterMoveInputEvent newInput = new CharacterMoveInputEvent(lastInput, (int)(timer.getTimeInMs() - state.getTime()));
                             onPlayerInput(newInput, entry.getKey());
                         }
                         entry.getKey().send(state);

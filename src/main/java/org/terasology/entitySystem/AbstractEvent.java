@@ -16,10 +16,13 @@
 
 package org.terasology.entitySystem;
 
+import org.terasology.network.NoReplicate;
+
 /**
  * @author Immortius
  */
 public abstract class AbstractEvent implements Event {
+    @NoReplicate
     protected boolean cancelled;
 
     @Override

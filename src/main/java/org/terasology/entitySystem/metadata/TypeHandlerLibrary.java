@@ -10,6 +10,8 @@ import org.terasology.entitySystem.metadata.core.ListTypeHandler;
 import org.terasology.entitySystem.metadata.core.MappedContainerTypeHandler;
 import org.terasology.entitySystem.metadata.core.SetTypeHandler;
 import org.terasology.entitySystem.metadata.core.StringMapTypeHandler;
+import org.terasology.network.NoReplicate;
+import org.terasology.network.Replicate;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -24,8 +26,8 @@ import java.util.Set;
  * @author Immortius
  */
 public class TypeHandlerLibrary implements Iterable<Map.Entry<Class<?>, TypeHandler<?>>> {
-    private static final int MAX_SERIALIZATION_DEPTH = 1;
     private static final Logger logger = LoggerFactory.getLogger(TypeHandlerLibrary.class);
+    private static final int MAX_SERIALIZATION_DEPTH = 1;
 
     private Map<Class<?>, TypeHandler<?>> typeHandlers;
 
@@ -38,7 +40,7 @@ public class TypeHandlerLibrary implements Iterable<Map.Entry<Class<?>, TypeHand
         return (TypeHandler<? super T>) typeHandlers.get(forClass);
     }
 
-    public <T> ClassMetadata<T> build(Class<T> forClass, String ... names) {
+    public <T> ClassMetadata<T> build(Class<T> forClass, boolean replicateFieldsByDefault, String... names) {
         ClassMetadata<T> info;
         try {
             info = new ClassMetadata<T>(forClass, names);
@@ -47,12 +49,12 @@ public class TypeHandlerLibrary implements Iterable<Map.Entry<Class<?>, TypeHand
             return null;
         }
 
-        populateFields(forClass, info);
+        populateFields(forClass, info, replicateFieldsByDefault);
         return info;
     }
 
 
-    public <T> void populateFields(Class<T> forClass, ClassMetadata<T> info) {
+    public <T> void populateFields(Class<T> forClass, ClassMetadata<T> info, boolean replicateFieldsByDefault) {
         for (Field field : Reflections.getAllFields(forClass, Predicates.alwaysTrue())) {
             if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers()))
                 continue;
@@ -61,7 +63,14 @@ public class TypeHandlerLibrary implements Iterable<Map.Entry<Class<?>, TypeHand
             if (typeHandler == null) {
                 logger.error("Unsupported field type in component type {}, {} : {}", forClass.getSimpleName(), field.getName(), field.getGenericType());
             } else {
-                info.addField(new FieldMetadata(field, forClass, typeHandler));
+                boolean replicate = replicateFieldsByDefault;
+                if (field.getAnnotation(NoReplicate.class) != null) {
+                    replicate = false;
+                }
+                if (field.getAnnotation(Replicate.class) != null) {
+                    replicate = true;
+                }
+                info.addField(new FieldMetadata(field, forClass, typeHandler, replicate));
             }
         }
     }
@@ -142,7 +151,7 @@ public class TypeHandlerLibrary implements Iterable<Map.Entry<Class<?>, TypeHand
                 if (handler == null) {
                     logger.error("Unsupported field type in component type {}, {} : {}", typeClass.getSimpleName(), field.getName(), field.getGenericType());
                 } else {
-                    mappedHandler.addField(new FieldMetadata(field, typeClass, handler));
+                    mappedHandler.addField(new FieldMetadata(field, typeClass, handler, true));
                 }
             }
             return mappedHandler;
