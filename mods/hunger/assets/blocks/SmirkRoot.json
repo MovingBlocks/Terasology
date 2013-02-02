@@ -15,7 +15,7 @@
  */
 
 /**
- * GooseGrass
+ * Hmm, the colors on this thing don't look suspicious at all, it can't be bad to eat, can it?
  */
 {
     "attachmentAllowed" : false,
@@ -26,7 +26,7 @@
     "penetrable" : true,
     "shadowCasting" : false,
     "hardness" : 1,
-    "waving" : false,
+    "waving" : true,
     "penetrable" : true,
     "targetable" : true,
     "debrisOnDestroy" : true,

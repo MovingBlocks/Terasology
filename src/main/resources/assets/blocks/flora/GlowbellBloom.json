@@ -21,5 +21,6 @@
 {
     "author" : "eleazzaar",
     "basedOn" : "engine:plant",
-    "luminance" : 6
+    "luminance" : 6,
+    "waving" : true
 }
