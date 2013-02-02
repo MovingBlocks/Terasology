@@ -73,7 +73,7 @@ public class BulletCharacterMover implements CharacterMover {
         CharacterStateEvent result = new CharacterStateEvent(initial);
         result.setSequenceNumber(input.getSequenceNumber());
         updatePosition(characterMovementComponent, result, input);
-        result.setTime(input.getTime());
+        result.setTime(initial.getTime() + input.getDeltaMs());
         if (result.getMode() != MovementMode.GHOSTING) {
             checkSwimming(characterMovementComponent, result);
         }
@@ -154,7 +154,7 @@ public class BulletCharacterMover implements CharacterMover {
         // Modify velocity towards desired, up to the maximum rate determined by friction
         Vector3f velocityDiff = new Vector3f(desiredVelocity);
         velocityDiff.sub(state.getVelocity());
-        velocityDiff.scale(Math.min(UNDERWATER_INERTIA * input.getDeltaMs(), 1.0f));
+        velocityDiff.scale(Math.min(UNDERWATER_INERTIA * input.getDelta(), 1.0f));
 
         state.getVelocity().x += velocityDiff.x;
         state.getVelocity().y += velocityDiff.y;
@@ -163,11 +163,11 @@ public class BulletCharacterMover implements CharacterMover {
         // Slow down due to friction
         float speed = state.getVelocity().length();
         if (speed > movementComp.maxWaterSpeed) {
-            state.getVelocity().scale((speed - 4 * (speed - movementComp.maxWaterSpeed) * input.getDeltaMs()) / speed);
+            state.getVelocity().scale((speed - 4 * (speed - movementComp.maxWaterSpeed) * input.getDelta()) / speed);
         }
 
         Vector3f moveDelta = new Vector3f(state.getVelocity());
-        moveDelta.scale(input.getDeltaMs());
+        moveDelta.scale(input.getDelta());
 
         // Note: No stepping underwater, no issue with slopes
         MoveResult moveResult = move(state.getPosition(), moveDelta, 0, -1, movementComp.collider);
@@ -197,13 +197,13 @@ public class BulletCharacterMover implements CharacterMover {
         Vector3f velocityDiff = new Vector3f(desiredVelocity);
         velocityDiff.sub(state.getVelocity());
 
-        velocityDiff.scale(Math.min(GHOST_INERTIA * input.getDeltaMs(), 1.0f));
+        velocityDiff.scale(Math.min(GHOST_INERTIA * input.getDelta(), 1.0f));
 
         state.getVelocity().add(velocityDiff);
 
         // No collision, so just do the move
         Vector3f deltaPos = new Vector3f(state.getVelocity());
-        deltaPos.scale(input.getDeltaMs());
+        deltaPos.scale(input.getDelta());
         state.getPosition().add(deltaPos);
         //if (deltaPos.length() > 0)
         //    entity.send(new MovedEvent(deltaPos, worldPos));
@@ -238,14 +238,14 @@ public class BulletCharacterMover implements CharacterMover {
         Vector3f velocityDiff = new Vector3f(desiredVelocity);
         velocityDiff.sub(state.getVelocity());
 
-        velocityDiff.scale(Math.min(movementComp.groundFriction * input.getDeltaMs(), 1.0f));
+        velocityDiff.scale(Math.min(movementComp.groundFriction * input.getDelta(), 1.0f));
 
         state.getVelocity().x += velocityDiff.x;
         state.getVelocity().z += velocityDiff.z;
-        state.getVelocity().y = Math.max(-TERMINAL_VELOCITY, (state.getVelocity().y - GRAVITY * input.getDeltaMs()));
+        state.getVelocity().y = Math.max(-TERMINAL_VELOCITY, (state.getVelocity().y - GRAVITY * input.getDelta()));
 
         Vector3f moveDelta = new Vector3f(state.getVelocity());
-        moveDelta.scale(input.getDeltaMs());
+        moveDelta.scale(input.getDelta());
 
         MoveResult moveResult = move(state.getPosition(), moveDelta, (state.isGrounded()) ? movementComp.stepHeight : 0, movementComp.slopeFactor, movementComp.collider);
         Vector3f distanceMoved = new Vector3f(moveResult.getFinalPosition());
@@ -293,7 +293,6 @@ public class BulletCharacterMover implements CharacterMover {
         stepped = false;
 
         Vector3f position = new Vector3f(startPosition);
-        Vector3f finalPosition = position;
         boolean hitTop = false;
         boolean hitBottom = false;
         boolean hitSide = false;
@@ -317,7 +316,7 @@ public class BulletCharacterMover implements CharacterMover {
                 position.set(tempPos);
             }
         }
-        return new MoveResult(finalPosition, hitSide, hitBottom, hitTop);
+        return new MoveResult(position, hitSide, hitBottom, hitTop);
     }
 
     private boolean moveHorizontal(Vector3f horizMove, PairCachingGhostObject collider, Vector3f position, float slopeFactor, float stepHeight) {

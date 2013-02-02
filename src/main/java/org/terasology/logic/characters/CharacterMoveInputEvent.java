@@ -12,7 +12,6 @@ import javax.vecmath.Vector3f;
  */
 @ServerEvent
 public class CharacterMoveInputEvent extends NetworkEvent {
-    private long time;
     private long delta;
     private float pitch;
     private float yaw;
@@ -26,7 +25,6 @@ public class CharacterMoveInputEvent extends NetworkEvent {
 
     public CharacterMoveInputEvent(int sequence, float pitch, float yaw, Vector3f movementDirection, boolean running, boolean jumpRequested) {
         Timer timer = CoreRegistry.get(Timer.class);
-        this.time = timer.getTimeInMs();
         this.delta = timer.getDeltaInMs();
         this.pitch = pitch;
         this.yaw = yaw;
@@ -36,15 +34,21 @@ public class CharacterMoveInputEvent extends NetworkEvent {
         this.sequenceNumber = sequence;
     }
 
-    public long getTime() {
-        return time;
+    public CharacterMoveInputEvent(CharacterMoveInputEvent repeatInput, int withLength) {
+        this.delta = withLength;
+        this.pitch = repeatInput.pitch;
+        this.yaw = repeatInput.yaw;
+        this.running = repeatInput.running;
+        this.jumpRequested = false;
+        this.movementDirection.set(repeatInput.movementDirection);
+        this.sequenceNumber = repeatInput.sequenceNumber;
     }
 
-    public long getDelta() {
+    public long getDeltaMs() {
         return delta;
     }
 
-    public float getDeltaMs() {
+    public float getDelta() {
         return delta / 1000f;
     }
 
