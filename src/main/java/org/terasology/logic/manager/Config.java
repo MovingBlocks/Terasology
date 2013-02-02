@@ -501,9 +501,8 @@ public final class Config {
 
         WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
 
-        // BG:  Limit the amount of chunk VBOs to store by the amount of needed chunks at the current setting
         int chunksToLoad = getActiveViewingDistance() * getActiveViewingDistance();
-        setMaxChunkVBOs(chunksToLoad >= getMaxChunkVBOs() ? getMaxChunkVBOs() : chunksToLoad);
+        setMaxChunkVBOs(chunksToLoad >= 512 ? 512 : chunksToLoad);
 
         // Make sure to update the chunks "around" the player
         if (worldRenderer != null)
