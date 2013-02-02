@@ -58,16 +58,21 @@ public class Icon {
     /**
      * Creates an Icon for a non-BlockFamily class
      */
-    public Icon() {
-        _element = new UIImage(Assets.getTexture("engine:items"));
+    public Icon(String simpleuri) {
+        _element = new UIImage(Assets.getTexture(simpleuri));
         _blockFamily = null;
 
         _element.setSize(new Vector2f(32, 32));
-        _element.getTextureSize().set(new Vector2f(0.0624f, 0.0624f));
+        _element.setTextureSize(new Vector2f(16, 16));
         _element.setVisible(true);
         _element.setPosition(new Vector2f(-10f, -16f));
 
         setAtlasPosition(0, 0);
+    }
+    
+    public Icon(String simpleuri, int atlasx, int atlasy) {
+        this(simpleuri);
+        setAtlasPosition(atlasx, atlasy);
     }
 
     /**
@@ -83,91 +88,86 @@ public class Icon {
 
         return icons.get(name.toLowerCase(Locale.ENGLISH));
     }
+    
+    public static void set(String name, String simpleuri, int atlasx, int atlasy){
+    	if (icons == null) {
+            loadIcons();
+        }
+    	Icon addicon = new Icon(simpleuri, atlasx, atlasy);
+    	icons.put(name, addicon);
+    }
 
     private static void loadIcons() {
         icons = new HashMap<String, Icon>();
-
+        String simpleuri = "engine:items";
         // TODO: Hmm, does this mean we have hard coded our tool displays? Should try to move this to ToolManager in that case?
         // TODO: I'ld suggest an icon atlas asset
-        Icon questionMarkIcon = new Icon();
+        Icon questionMarkIcon = new Icon(simpleuri);
 
         //* TOOLS *//
-        Icon pickAxeIcon = new Icon();
-        Icon axeIcon = new Icon();
-        Icon sickleIcon = new Icon();
-        Icon hammerIcon = new Icon();
-        Icon knifeIcon = new Icon();
-        Icon swordIcon = new Icon();
-        Icon bowIcon = new Icon();
-        Icon xbowIcon = new Icon();
+        Icon pickAxeIcon = new Icon(simpleuri);
+        Icon axeIcon = new Icon(simpleuri);
+        Icon sickleIcon = new Icon(simpleuri);
+        Icon hammerIcon = new Icon(simpleuri);
+        Icon knifeIcon = new Icon(simpleuri);
+        Icon swordIcon = new Icon(simpleuri);
+        Icon bowIcon = new Icon(simpleuri);
+        Icon xbowIcon = new Icon(simpleuri);
 
         //* VIALS & POTIONS *//
-        Icon emptyVialIcon = new Icon();
-        Icon redVialIcon = new Icon();
-        Icon orangeVialIcon = new Icon();
-        Icon greenVialIcon = new Icon();
-        Icon purpleVialIcon = new Icon();
-        Icon ceruleanVialIcon = new Icon();
-        Icon blueVialIcon = new Icon();
-        Icon blackVialIcon = new Icon();
+        Icon emptyVialIcon = new Icon(simpleuri);
+        Icon redVialIcon = new Icon(simpleuri);
+        Icon orangeVialIcon = new Icon(simpleuri);
+        Icon greenVialIcon = new Icon(simpleuri);
+        Icon purpleVialIcon = new Icon(simpleuri);
+        Icon ceruleanVialIcon = new Icon(simpleuri);
+        Icon blueVialIcon = new Icon(simpleuri);
+        Icon blackVialIcon = new Icon(simpleuri);
         //* POWDER REAGENTS *//
-        Icon whitePowderIcon = new Icon();
-        Icon paleredPowderIcon = new Icon();
-        Icon palebluePowderIcon = new Icon();
-        Icon greenPowderIcon = new Icon();
-        Icon brownPowderIcon = new Icon();
-        Icon redPowderIcon = new Icon();
-        Icon bluePowderIcon = new Icon();
-        Icon purplePowderIcon = new Icon();
+        Icon whitePowderIcon = new Icon(simpleuri);
+        Icon paleredPowderIcon = new Icon(simpleuri);
+        Icon palebluePowderIcon = new Icon(simpleuri);
+        Icon greenPowderIcon = new Icon(simpleuri);
+        Icon brownPowderIcon = new Icon(simpleuri);
+        Icon redPowderIcon = new Icon(simpleuri);
+        Icon bluePowderIcon = new Icon(simpleuri);
+        Icon purplePowderIcon = new Icon(simpleuri);
         //* PLANTS *//
-        Icon mandrakeIcon = new Icon();
-        Icon wildRoseIcon = new Icon();
-        Icon amanitaIcon = new Icon();
-        Icon purpleHazeIcon = new Icon();
-        Icon goldBloomIcon = new Icon();
+        Icon mandrakeIcon = new Icon(simpleuri);
+        Icon wildRoseIcon = new Icon(simpleuri);
+        Icon amanitaIcon = new Icon(simpleuri);
+        Icon purpleHazeIcon = new Icon(simpleuri);
+        Icon goldBloomIcon = new Icon(simpleuri);
         //* Other Tools *//
-        Icon bowlIcon = new Icon();
-        Icon heatedflaskIcon = new Icon();
-        Icon scissorsIcon = new Icon();
-        Icon candleIcon = new Icon();
-        Icon dynamiteIcon = new Icon();
-        Icon dynamitexlIcon = new Icon();
+        Icon bowlIcon = new Icon(simpleuri);
+        Icon heatedflaskIcon = new Icon(simpleuri);
+        Icon scissorsIcon = new Icon(simpleuri);
+        Icon candleIcon = new Icon(simpleuri);
+        Icon dynamiteIcon = new Icon(simpleuri);
+        Icon dynamitexlIcon = new Icon(simpleuri);
         //* BOOKs & RECIPEs *//
-        Icon recipeIcon = new Icon();
-        Icon bookIcon = new Icon();
-        Icon redBookIcon = new Icon();
-        Icon blueBookIcon = new Icon();
+        Icon recipeIcon = new Icon(simpleuri);
+        Icon bookIcon = new Icon(simpleuri);
+        Icon redBookIcon = new Icon(simpleuri);
+        Icon blueBookIcon = new Icon(simpleuri);
         //* MISC. *//
-        Icon appleIcon = new Icon();
-        Icon bannanaIcon = new Icon();
-        Icon emptyJarIcon = new Icon();
-        Icon waterJarIcon = new Icon();
-        Icon coal = new Icon();
-        Icon stick = new Icon();
-        Icon refinementrock = new Icon();
+        Icon appleIcon = new Icon(simpleuri);
+        Icon bannanaIcon = new Icon(simpleuri);
+        Icon emptyJarIcon = new Icon(simpleuri);
+        Icon waterJarIcon = new Icon(simpleuri);
+        Icon coal = new Icon(simpleuri);
+        Icon stick = new Icon(simpleuri);
+        Icon refinementrock = new Icon(simpleuri);
 
         //* INGOTS *//
-        Icon ironingotIcon = new Icon();
-        Icon copperingotIcon = new Icon();
-        Icon goldingotIcon = new Icon();
-        Icon shadowingotIcon = new Icon();
+        Icon ironingotIcon = new Icon(simpleuri);
+        Icon copperingotIcon = new Icon(simpleuri);
+        Icon goldingotIcon = new Icon(simpleuri);
+        Icon shadowingotIcon = new Icon(simpleuri);
         //* BOWCRAFTING & FLETCHING *//
-        Icon woodshaftIcon = new Icon();
+        Icon woodshaftIcon = new Icon(simpleuri);
         //* Furniture *//
-        Icon doorIcon = new Icon();
-
-        //* Minion bar *//
-        Icon gelcubeIcon = new Icon();
-        Icon minionIcon1 = new Icon();
-        Icon minionIcon2 = new Icon();
-        Icon minionIcon3 = new Icon();
-        Icon minionIcon4 = new Icon();
-        Icon minionIcon5 = new Icon();
-        Icon minionIcon6 = new Icon();
-        Icon minionIcon7 = new Icon();
-        Icon minionIcon8 = new Icon();
-        Icon minionIcon9 = new Icon();
-        Icon minioncommandIcon = new Icon();
+        Icon doorIcon = new Icon(simpleuri);
 
         questionMarkIcon.setAtlasPosition(4,0);
 
@@ -234,18 +234,6 @@ public class Icon {
         woodshaftIcon.setAtlasPosition(9, 1);
         // Furniture
         doorIcon.setAtlasPosition(6, 2);
-        //gel icon (Will be moved to a Minion Icon Atlas)
-        gelcubeIcon.setAtlasPosition(13, 0);
-        minionIcon1.setAtlasPosition(15, 0);
-        minionIcon2.setAtlasPosition(15, 1);
-        minionIcon3.setAtlasPosition(15, 2);
-        minionIcon4.setAtlasPosition(15, 3);
-        minionIcon5.setAtlasPosition(15, 4);
-        minionIcon6.setAtlasPosition(15, 5);
-        minionIcon7.setAtlasPosition(15, 6);
-        minionIcon8.setAtlasPosition(15, 7);
-        minionIcon9.setAtlasPosition(15, 8);
-        minioncommandIcon.setAtlasPosition(13, 3);
 
         icons.put("questionmark", questionMarkIcon);
 
@@ -312,18 +300,6 @@ public class Icon {
         //From old system, no specific icon:
         icons.put("blueprint", palebluePowderIcon);
         icons.put("debug", greenPowderIcon);
-
-        icons.put("gelcube", gelcubeIcon);
-        icons.put("minion1", minionIcon1);
-        icons.put("minion2", minionIcon2);
-        icons.put("minion3", minionIcon3);
-        icons.put("minion4", minionIcon4);
-        icons.put("minion5", minionIcon5);
-        icons.put("minion6", minionIcon6);
-        icons.put("minion7", minionIcon7);
-        icons.put("minion8", minionIcon8);
-        icons.put("minion9", minionIcon9);
-        icons.put("minioncommand", minioncommandIcon);
         
         icons.put("coal", coal);
         icons.put("stick", stick);
@@ -368,6 +344,10 @@ public class Icon {
     public int getY() {
         return _y;
     }
+    
+    public String getTextureSimpleUri(){
+    	return _element.getTexture().getURI().getSimpleString();
+    }
 
     private void setAtlasPosition(int x, int y) {
         _x = x;
@@ -377,7 +357,7 @@ public class Icon {
             return;
         }
 
-        _element.getTextureOrigin().set(new Vector2f(x * 0.0625f, y * 0.0625f));
+        _element.setTextureOrigin(new Vector2f(x * 16, y * 16));
     }
 }
 

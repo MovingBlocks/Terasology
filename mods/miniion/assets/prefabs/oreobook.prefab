@@ -1,0 +1,14 @@
+{
+    "Item" : {
+        "name" : "oreo book",
+        "icon" : "oreominionbook",
+        "usage" : "ON_USER",
+        "consumedOnUse" : false,
+        "renderWithIcon" : false
+    },    
+    "Inventory": {
+      "itemSlots": [
+        0
+      ]
+    }
+}

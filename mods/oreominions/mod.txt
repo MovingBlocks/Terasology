@@ -1,0 +1,6 @@
+{
+    "id" : "OreoMinions",
+    "displayName" : "OreoMinions",
+    "author" : "Maternal Mathes.Wenzel@googlemail.com",
+    "description" : "Oreo Invasion for Terasology"
+}
