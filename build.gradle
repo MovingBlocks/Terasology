@@ -11,11 +11,16 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'checkstyle'
 
-/* Gradle Wrapper: Uncomment this task, change 'gradleVersion' and run "wrapper".
-task wrapper(type: Wrapper) {
-    gradleVersion = '1.1'
-}
-*/
+/* 
+ * Update Gradle Wrapper:
+ * 1. Uncomment 'wrapper' task
+ * 2. Change 'gradleVersion'
+ * 3. Run "gradlew wrapper"
+ * 4. Comment 'wrapper' task
+ */
+//task wrapper(type: Wrapper) {
+//    gradleVersion = '1.4'
+//}
 
 import org.apache.tools.ant.filters.FixCrLfFilter;
 
