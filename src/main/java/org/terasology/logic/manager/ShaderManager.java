@@ -72,7 +72,8 @@ public class ShaderManager {
 
         createAndStoreShaderProgram("post", new ShaderParametersPost());
         createAndStoreShaderProgram("ssao", new ShaderParametersSSAO());
-        createAndStoreShaderProgram("screenCombine", new ShaderParametersScreenCombine());
+        createAndStoreShaderProgram("sobel", new ShaderParametersSobel());
+        createAndStoreShaderProgram("prePost", new ShaderParametersPrePost());
         createAndStoreShaderProgram("highp", new ShaderParametersDefault());
         createAndStoreShaderProgram("blur", new ShaderParametersDefault());
         createAndStoreShaderProgram("down", new ShaderParametersDefault());

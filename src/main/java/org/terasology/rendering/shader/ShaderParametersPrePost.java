@@ -29,12 +29,14 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ShaderParametersScreenCombine implements IShaderParameters {
+public class ShaderParametersPrePost extends ShaderParametersBase {
 
     Texture noiseTexture = Assets.getTexture("engine:noise");
 
     @Override
     public void applyParameters(ShaderProgram program) {
+        super.applyParameters(program);
+
         PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("scene");
 
         if (Config.getInstance().isSSAO()) {
@@ -47,6 +49,18 @@ public class ShaderParametersScreenCombine implements IShaderParameters {
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         scene.bindTexture();
         program.setInt("texScene", 0);
+
+        GL13.glActiveTexture(GL13.GL_TEXTURE2);
+        scene.bindDepthTexture();
+        program.setInt("texDepth", 2);
+
+        PostProcessingRenderer.FBO sobel = PostProcessingRenderer.getInstance().getFBO("sobel");
+        GL13.glActiveTexture(GL13.GL_TEXTURE3);
+        sobel.bindTexture();
+        program.setInt("texEdges", 3);
+
+        program.setFloat("outlineDepthThreshold", 0.05f);
+        program.setFloat("outlineThickness", 1.0f);
     }
 
 }

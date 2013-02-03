@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 
+uniform bool swimming;
+uniform float viewingDistance;
+uniform float daylight;
+uniform float tick;
+uniform float time;
+
 float timeToTick(float time, float speed) {
     return time * 4000.0 * speed;
 }

@@ -25,9 +25,11 @@ import org.lwjgl.opengl.GL13;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ShaderParametersDefault implements IShaderParameters {
+public class ShaderParametersDefault extends ShaderParametersBase {
 
     public void applyParameters(ShaderProgram program) {
+        super.applyParameters(program);
+
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         glBindTexture(GL11.GL_TEXTURE_2D, 0);
     }

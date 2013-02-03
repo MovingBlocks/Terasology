@@ -446,6 +446,14 @@ public final class Config {
         return _setting.getSystemBuilder().getSsao();
     }
 
+    public void setOutline(boolean outline) {
+        _setting.getSystemBuilder().setOutline(outline);
+    }
+
+    public boolean isOutline() {
+        return _setting.getSystemBuilder().getOutline();
+    }
+
     public void setFilmGrain(boolean filmGrain) {
         _setting.getSystemBuilder().setFilmGrain(filmGrain);
     }

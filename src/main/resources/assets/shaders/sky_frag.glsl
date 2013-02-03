@@ -20,7 +20,6 @@ varying vec3 skyVecR;
 varying	vec4 McPosition;
 varying	float lv;
 uniform	vec4  sunPos;
-uniform float daylight;
 
 uniform samplerCube texCubeSky;
 uniform samplerCube texCubeStars;

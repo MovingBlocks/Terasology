@@ -29,19 +29,16 @@ import org.terasology.rendering.assets.Texture;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ShaderParametersGenericMesh implements IShaderParameters {
+public class ShaderParametersGenericMesh extends ShaderParametersBase {
 
     private Texture texture = Assets.getTexture("engine:mhead");
 
     @Override
     public void applyParameters(ShaderProgram program) {
-        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+        super.applyParameters(program);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         glBindTexture(GL11.GL_TEXTURE_2D, texture.getId());
-
-        if (localPlayer != null)
-            program.setInt("carryingTorch", localPlayer.isCarryingTorch() ? 1 : 0);
 
         program.setFloat3("colorOffset", 1.0f, 1.0f, 1.0f);
         program.setInt("textured", 1);

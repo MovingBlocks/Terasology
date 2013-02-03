@@ -119,6 +119,46 @@ public class PostProcessingRenderer {
         createFBO("scene1", 1, 1, false, false, false);
     }
 
+
+    /**
+     * Initially creates the scene FBO and updates it according to the size of the viewport.
+     */
+    private void createOrUpdateFullscreenFbos() {
+        FBO scene = getFBO("scene");
+        boolean recreate = scene == null || (scene._width != Display.getWidth() || scene._height != Display.getHeight());
+
+        if (!recreate)
+            return;
+
+        createFBO("scene", Display.getWidth(), Display.getHeight(), true, true, true);
+
+        createFBO("scenePrePost", Display.getWidth(), Display.getHeight(), true, false, false);
+        createFBO("sceneTonemapped", Display.getWidth(), Display.getHeight(), true, false, false);
+
+
+        final int halfWidth = Display.getWidth() / 2;
+        final int halfHeight = Display.getHeight() / 2;
+        final int quarterWidth = halfWidth / 2;
+        final int quarterHeight = halfHeight / 2;
+        final int halfQuarterWidth = quarterWidth / 2;
+        final int halfQuarterHeight = quarterHeight / 2;
+
+        createFBO("sobel", Display.getWidth(),  Display.getHeight(), false, false, false);
+
+        createFBO("ssao", halfWidth,  halfHeight, false, false, false);
+        createFBO("ssaoBlurred0", halfWidth, halfHeight, false, false, false);
+        createFBO("ssaoBlurred1", halfWidth, halfHeight, false, false, false);
+
+        createFBO("sceneReflected", halfWidth, halfHeight, true, true, false);
+
+        createFBO("sceneHighPass", halfQuarterWidth, halfQuarterHeight, false, false, false);
+        createFBO("sceneBloom0", halfQuarterWidth, halfQuarterHeight, false, false, false);
+        createFBO("sceneBloom1", halfQuarterWidth, halfQuarterHeight, false, false, false);
+
+        createFBO("sceneBlur0", quarterWidth, quarterHeight, false, false, false);
+        createFBO("sceneBlur1", quarterWidth, quarterHeight, false, false, false);
+    }
+
     public void deleteFBO(String title) {
         if (_FBOs.containsKey(title)) {
             FBO fbo = _FBOs.get(title);
@@ -286,9 +326,12 @@ public class PostProcessingRenderer {
       }
     }
 
-    public void beginRenderScene() {
+    public void beginRenderScene(boolean clear) {
         getFBO("scene").bind();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        if (clear) {
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        }
     }
 
     public void beginRenderReflectedScene() {
@@ -308,12 +351,20 @@ public class PostProcessingRenderer {
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
 
+    public void notifyBeforeTransparent() {
+
+    }
+
     /**
      * Renders the final scene to a quad and displays it. The FBO gets automatically rescaled if the size
      * of the viewport changes.
      */
     public void renderScene() {
         createOrUpdateFullscreenFbos();
+
+        if (Config.getInstance().isOutline()) {
+            generateSobel();
+        }
 
         generateDownsampledScene();
         updateExposure();
@@ -359,7 +410,7 @@ public class PostProcessingRenderer {
         PostProcessingRenderer.getInstance().getFBO("sceneTonemapped").unbind();
     }
 
-    public void generateSSAO() {
+    private void generateSSAO() {
         ShaderManager.getInstance().enableShader("ssao");
 
         FBO ssao = PostProcessingRenderer.getInstance().getFBO("ssao");
@@ -374,7 +425,22 @@ public class PostProcessingRenderer {
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
 
-    public void generateBlurredSSAO(int id) {
+    private void generateSobel() {
+        ShaderManager.getInstance().enableShader("sobel");
+
+        FBO sobel = PostProcessingRenderer.getInstance().getFBO("sobel");
+        sobel.bind();
+
+        glViewport(0, 0, sobel._width, sobel._height);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        renderFullQuad();
+
+        PostProcessingRenderer.getInstance().getFBO("sobel").unbind();
+        glViewport(0, 0, Display.getWidth(), Display.getHeight());
+    }
+
+    private void generateBlurredSSAO(int id) {
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("blur");
 
         shader.enable();
@@ -401,53 +467,16 @@ public class PostProcessingRenderer {
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
 
-    public void screenSpaceCombine() {
-        ShaderManager.getInstance().enableShader("screenCombine");
+    private void screenSpaceCombine() {
+        ShaderManager.getInstance().enableShader("prePost");
 
-        PostProcessingRenderer.getInstance().getFBO("sceneCombined").bind();
+        PostProcessingRenderer.getInstance().getFBO("scenePrePost").bind();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullQuad();
 
-        PostProcessingRenderer.getInstance().getFBO("sceneCombined").unbind();
-    }
-
-    /**
-     * Initially creates the scene FBO and updates it according to the size of the viewport.
-     */
-    private void createOrUpdateFullscreenFbos() {
-        FBO scene = getFBO("scene");
-        boolean recreate = scene == null || (scene._width != Display.getWidth() || scene._height != Display.getHeight());
-
-        if (!recreate)
-            return;
-
-        createFBO("scene", Display.getWidth(), Display.getHeight(), true, true, true);
-
-        createFBO("sceneCombined", Display.getWidth(), Display.getHeight(), true, false, false);
-        createFBO("sceneTonemapped", Display.getWidth(), Display.getHeight(), true, false, false);
-
-
-        final int halfWidth = Display.getWidth() / 2;
-        final int halfHeight = Display.getHeight() / 2;
-        final int quarterWidth = halfWidth / 2;
-        final int quarterHeight = halfHeight / 2;
-        final int halfQuarterWidth = quarterWidth / 2;
-        final int halfQuarterHeight = quarterHeight / 2;
-
-        createFBO("ssao", halfWidth,  halfHeight, false, false, false);
-        createFBO("ssaoBlurred0", halfWidth, halfHeight, false, false, false);
-        createFBO("ssaoBlurred1", halfWidth, halfHeight, false, false, false);
-
-        createFBO("sceneReflected", halfWidth, halfHeight, true, true, false);
-
-        createFBO("sceneHighPass", halfQuarterWidth, halfQuarterHeight, false, false, false);
-        createFBO("sceneBloom0", halfQuarterWidth, halfQuarterHeight, false, false, false);
-        createFBO("sceneBloom1", halfQuarterWidth, halfQuarterHeight, false, false, false);
-
-        createFBO("sceneBlur0", quarterWidth, quarterHeight, false, false, false);
-        createFBO("sceneBlur1", quarterWidth, quarterHeight, false, false, false);
+        PostProcessingRenderer.getInstance().getFBO("scenePrePost").unbind();
     }
 
     private void generateHighPass() {

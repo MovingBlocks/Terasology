@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-uniform float tick;
-
 varying vec3 normal;
 varying vec4 vertexWorldPos;
 

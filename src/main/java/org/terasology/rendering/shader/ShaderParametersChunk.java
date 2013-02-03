@@ -33,20 +33,18 @@ import org.terasology.world.block.management.BlockManager;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ShaderParametersChunk implements IShaderParameters {
+public class ShaderParametersChunk extends ShaderParametersBase {
     private Texture lava = Assets.getTexture("engine:custom_lava_still");
     private Texture water = Assets.getTexture("engine:water_normal");
     private Texture effects = Assets.getTexture("engine:effects");
 
     public void applyParameters(ShaderProgram program) {
+        super.applyParameters(program);
+
         Texture terrain = Assets.getTexture("engine:terrain");
         if (terrain == null) {
             return;
         }
-
-        WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
-        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-        WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE1);
         glBindTexture(GL11.GL_TEXTURE_2D, lava.getId());
@@ -66,18 +64,5 @@ public class ShaderParametersChunk implements IShaderParameters {
         program.setInt("textureAtlas", 0);
 
         program.setFloat("blockScale", 1.0f);
-
-        if (worldRenderer != null) {
-            program.setFloat("daylight", (float) worldRenderer.getDaylight());
-            program.setFloat("swimming", worldRenderer.isUnderWater() ? 1.0f : 0.0f);
-        }
-
-        if (localPlayer != null) {
-            program.setInt("carryingTorch", localPlayer.isCarryingTorch() ? 1 : 0);
-        }
-
-        if (worldProvider != null) {
-            program.setFloat("time", worldProvider.getTimeInDays());
-        }
     }
 }

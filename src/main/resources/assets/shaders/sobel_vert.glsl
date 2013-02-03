@@ -14,17 +14,9 @@
  * limitations under the License.
  */
 
-uniform sampler2D texScene;
-#ifdef SSAO
-uniform sampler2D texSsao;
-#endif
-
-void main() {
-    vec4 color = texture2D(texScene, gl_TexCoord[0].xy);
-#ifdef SSAO
-    float ssao = texture2D(texSsao, gl_TexCoord[0].xy).x;
-    color *= vec4(ssao, ssao, ssao, 1.0);
-#endif
-
-    gl_FragData[0].rgba = color;
+void main()
+{
+	gl_Position = ftransform();
+    gl_TexCoord[0] = gl_MultiTexCoord0;
+    gl_FrontColor = gl_Color;
 }

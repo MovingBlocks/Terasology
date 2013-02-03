@@ -42,13 +42,9 @@ uniform sampler2D textureLava;
 uniform sampler2D textureEffects;
 uniform sampler2D textureWaterReflection;
 
-uniform float time;
-uniform float daylight = 1.0;
-
 uniform float clipHeight = 0.0;
 
 uniform bool carryingTorch;
-uniform bool swimming;
 
 varying vec4 vertexWorldPosRaw;
 varying vec4 vertexWorldPos;

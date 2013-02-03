@@ -31,7 +31,6 @@ varying float isUpside;
 varying float blockHint;
 
 uniform float blockScale = 1.0;
-uniform float time;
 uniform vec3 chunkOffset;
 
 uniform float animated;
