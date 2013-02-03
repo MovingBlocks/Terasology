@@ -24,7 +24,7 @@ uniform float outlineDepthThreshold = 0.05;
 uniform float outlineThickness = 0.75;
 #endif
 
-#define OUTLINE_COLOR 0.0, 0.0, 0.0, 1.0
+#define OUTLINE_COLOR 0.0, 0.0, 0.0
 
 void main() {
     vec4 color = texture2D(texScene, gl_TexCoord[0].xy);
@@ -36,7 +36,7 @@ void main() {
 
 #ifdef OUTLINE
     float outline = step(outlineDepthThreshold, texture2D(texEdges, gl_TexCoord[0].xy).x) * outlineThickness;
-    color.rgb = (1.0 - outline) * color.rgb + outline * vec4(OUTLINE_COLOR);
+    color.rgb = (1.0 - outline) * color.rgb + outline * vec3(OUTLINE_COLOR);
 #endif
 
     gl_FragData[0].rgba = color;
