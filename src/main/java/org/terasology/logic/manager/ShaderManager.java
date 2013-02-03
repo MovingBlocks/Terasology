@@ -171,4 +171,12 @@ public class ShaderManager {
     public ShaderProgram getShaderProgram(String s) {
         return _shaderPrograms.get(s);
     }
+
+    /**
+     *
+     * @return
+     */
+    public HashMap<String, ShaderProgram> getShaderPrograms() {
+        return _shaderPrograms;
+    }
 }

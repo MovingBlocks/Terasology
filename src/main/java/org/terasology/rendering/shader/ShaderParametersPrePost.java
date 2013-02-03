@@ -15,14 +15,12 @@
  */
 package org.terasology.rendering.shader;
 
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
-import org.terasology.asset.Assets;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PostProcessingRenderer;
-import org.terasology.rendering.assets.Texture;
+import org.terasology.properties.Property;
 
-import static org.lwjgl.opengl.GL11.glBindTexture;
+import java.util.List;
 
 /**
  * Shader parameters for the Post-processing shader program.
@@ -31,7 +29,8 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
  */
 public class ShaderParametersPrePost extends ShaderParametersBase {
 
-    Texture noiseTexture = Assets.getTexture("engine:noise");
+    private Property outlineDepthThreshold = new Property("outlineDepthThreshold", 0.05f);
+    private Property outlineThickness = new Property("outlineThickness", 1.0f);
 
     @Override
     public void applyParameters(ShaderProgram program) {
@@ -59,8 +58,13 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
         sobel.bindTexture();
         program.setInt("texEdges", 3);
 
-        program.setFloat("outlineDepthThreshold", 0.05f);
-        program.setFloat("outlineThickness", 1.0f);
+        program.setFloat("outlineDepthThreshold", (Float) outlineDepthThreshold.getValue());
+        program.setFloat("outlineThickness", (Float) outlineThickness.getValue());
     }
 
+    @Override
+    public void addPropertiesToList(List<Property> properties) {
+        properties.add(outlineThickness);
+        properties.add(outlineDepthThreshold);
+    }
 }
