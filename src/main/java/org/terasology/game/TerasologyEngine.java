@@ -217,7 +217,7 @@ public class TerasologyEngine implements GameEngine {
                         } catch (Exception ex) {
                         }
                     }
-                    return String.format("[%s] (%s)\t%s - %s\n%s", record.getLevel().getLocalizedName(), dateFormat.format(new Date(record.getMillis())), record.getLoggerName(), record.getSourceMethodName(), formatMessage(record), thrownMessage);
+                    return String.format("[%s] (%s)\t%s:%s() - %s\n%s", record.getLevel().getLocalizedName(), dateFormat.format(new Date(record.getMillis())), record.getLoggerName(), record.getSourceMethodName(), formatMessage(record), thrownMessage);
                 }
             });
             java.util.logging.Logger.getLogger("").addHandler(fh);
