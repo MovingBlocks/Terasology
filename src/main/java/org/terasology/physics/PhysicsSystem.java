@@ -17,32 +17,6 @@
 package org.terasology.physics;
 
 import com.bulletphysics.BulletGlobals;
-import gnu.trove.iterator.TFloatIterator;
-
-import java.util.List;
-import java.util.Map;
-
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
-
-import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.components.world.LocationComponent;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventPriority;
-import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterSystem;
-import org.terasology.entitySystem.event.AddComponentEvent;
-import org.terasology.entitySystem.event.ChangedComponentEvent;
-import org.terasology.entitySystem.event.RemovedComponentEvent;
-import org.terasology.game.CoreRegistry;
-import org.terasology.logic.characters.CharacterMovementComponent;
-import org.terasology.physics.shapes.BoxShapeComponent;
-import org.terasology.physics.shapes.CapsuleShapeComponent;
-import org.terasology.physics.shapes.CylinderShapeComponent;
-import org.terasology.physics.shapes.HullShapeComponent;
-import org.terasology.physics.shapes.SphereShapeComponent;
-
 import com.bulletphysics.collision.broadphase.BroadphasePair;
 import com.bulletphysics.collision.dispatch.CollisionFlags;
 import com.bulletphysics.collision.dispatch.CollisionObject;
@@ -64,22 +38,68 @@ import com.bulletphysics.linearmath.Transform;
 import com.bulletphysics.util.ObjectArrayList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import gnu.trove.iterator.TFloatIterator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.componentSystem.UpdateSubscriberSystem;
+import org.terasology.components.world.LocationComponent;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventPriority;
+import org.terasology.entitySystem.In;
+import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.RegisterSystem;
+import org.terasology.entitySystem.event.AddComponentEvent;
+import org.terasology.entitySystem.event.ChangedComponentEvent;
+import org.terasology.entitySystem.event.RemovedComponentEvent;
+import org.terasology.game.CoreRegistry;
+import org.terasology.game.Timer;
+import org.terasology.logic.characters.CharacterMovementComponent;
+import org.terasology.network.NetworkComponent;
+import org.terasology.network.NetworkMode;
+import org.terasology.network.NetworkSystem;
+import org.terasology.physics.shapes.BoxShapeComponent;
+import org.terasology.physics.shapes.CapsuleShapeComponent;
+import org.terasology.physics.shapes.CylinderShapeComponent;
+import org.terasology.physics.shapes.HullShapeComponent;
+import org.terasology.physics.shapes.SphereShapeComponent;
+
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Immortius
  */
 @RegisterSystem
 public class PhysicsSystem implements UpdateSubscriberSystem {
+    private static final Logger logger = LoggerFactory.getLogger(PhysicsSystem.class);
+
+    private static final long TIME_BETWEEN_NETSYNCS = 200;
+    private static final float RESYNC_TIME = 0.25f;
+
+    @In
+    private Timer timer;
+
+    @In
+    private NetworkSystem networkSystem;
 
     private BulletPhysics physics;
     private Map<EntityRef, RigidBody> entityRigidBodies = Maps.newHashMap();
     private Map<EntityRef, PairCachingGhostObject> entityTriggers = Maps.newHashMap();
     private int skipProcessingFrames = 4;
+    private List<EntityRef> newRigidBodies = Lists.newArrayList();
+    private Map<EntityRef, Vector3f> pendingImpulses = Maps.newLinkedHashMap();
+    private long lastNetsync = 0;
+    private Map<EntityRef, ResynchData> pendingResynch = Maps.newLinkedHashMap();
 
     @Override
     public void initialise() {
         physics = CoreRegistry.get(BulletPhysics.class);
         skipProcessingFrames = 4;
+        lastNetsync = 0;
     }
 
     @Override
@@ -88,39 +108,7 @@ public class PhysicsSystem implements UpdateSubscriberSystem {
 
     @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class}, priority = EventPriority.PRIORITY_NORMAL)
     public void newRigidBody(AddComponentEvent event, EntityRef entity) {
-        createRigidBody(entity);
-    }
-
-    private void createRigidBody(EntityRef entity) {
-        LocationComponent location = entity.getComponent(LocationComponent.class);
-        RigidBodyComponent rigidBody = entity.getComponent(RigidBodyComponent.class);
-        ConvexShape shape = getShapeFor(entity);
-        if (shape != null) {
-            float scale = location.getWorldScale();
-            shape.setLocalScaling(new Vector3f(scale, scale, scale));
-
-            Vector3f fallInertia = new Vector3f();
-            shape.calculateLocalInertia(rigidBody.mass, fallInertia);
-            RigidBodyConstructionInfo info = new RigidBodyConstructionInfo(rigidBody.mass, new EntityMotionState(entity), shape, fallInertia);
-            RigidBody collider = new RigidBody(info);
-            collider.setUserPointer(entity);
-            updateKinematicSettings(rigidBody, collider);
-            RigidBody oldBody = entityRigidBodies.put(entity, collider);
-            physics.addRigidBody(collider, Lists.<CollisionGroup>newArrayList(rigidBody.collisionGroup), rigidBody.collidesWith);
-            if (oldBody != null) {
-                physics.removeRigidBody(oldBody);
-            }
-        }
-    }
-
-    private void updateKinematicSettings(RigidBodyComponent rigidBody, RigidBody collider) {
-        if (rigidBody.kinematic) {
-            collider.setCollisionFlags(collider.getCollisionFlags() | CollisionFlags.KINEMATIC_OBJECT);
-            collider.setActivationState(CollisionObject.DISABLE_DEACTIVATION);
-        } else {
-            collider.setCollisionFlags(collider.getCollisionFlags() & ~CollisionFlags.KINEMATIC_OBJECT);
-            collider.setActivationState(CollisionObject.ACTIVE_TAG);
-        }
+        newRigidBodies.add(entity);
     }
 
     @ReceiveEvent(components = {TriggerComponent.class, LocationComponent.class})
@@ -128,26 +116,9 @@ public class PhysicsSystem implements UpdateSubscriberSystem {
         createTrigger(entity);
     }
 
-    private void createTrigger(EntityRef entity) {
-        LocationComponent location = entity.getComponent(LocationComponent.class);
-        TriggerComponent trigger = entity.getComponent(TriggerComponent.class);
-        ConvexShape shape = getShapeFor(entity);
-        if (shape != null) {
-            float scale = location.getWorldScale();
-            shape.setLocalScaling(new Vector3f(scale, scale, scale));
-            List<CollisionGroup> detectGroups = Lists.newArrayList(trigger.detectGroups);
-            PairCachingGhostObject triggerObj = physics.createCollider(location.getWorldPosition(), shape, Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.SENSOR), detectGroups, CollisionFlags.NO_CONTACT_RESPONSE);
-            triggerObj.setUserPointer(entity);
-            entityTriggers.put(entity, triggerObj);
-        }
-    }
-
     @ReceiveEvent(components = {RigidBodyComponent.class})
     public void onImpulse(ImpulseEvent event, EntityRef entity) {
-        RigidBody body = entityRigidBodies.get(entity);
-        if (body != null) {
-            body.applyCentralImpulse(event.getImpulse());
-        }
+        pendingImpulses.put(entity, new Vector3f(event.getImpulse()));
     }
 
     @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class})
@@ -244,6 +215,16 @@ public class PhysicsSystem implements UpdateSubscriberSystem {
 
     @Override
     public void update(float delta) {
+        addPendingRigidBodies();
+        applyPendingImpulses();
+
+        if (networkSystem.getMode() == NetworkMode.SERVER && timer.getTimeInMs() - TIME_BETWEEN_NETSYNCS > lastNetsync) {
+            sendSyncMessages();
+            lastNetsync = timer.getTimeInMs();
+        }
+
+        resynchronize(delta);
+
         // TODO: This shouldn't be necessary once this is correctly sequenced after the main physics update
         if (skipProcessingFrames > 0) {
             skipProcessingFrames--;
@@ -300,6 +281,122 @@ public class PhysicsSystem implements UpdateSubscriberSystem {
         }
     }
 
+    private void resynchronize(float delta) {
+        Iterator<Map.Entry<EntityRef, ResynchData>> i = pendingResynch.entrySet().iterator();
+        while (i.hasNext()) {
+            Map.Entry<EntityRef, ResynchData> entry = i.next();
+
+            RigidBody body = entityRigidBodies.get(entry.getKey());
+            ResynchData data = entry.getValue();
+
+            if (body == null) {
+                i.remove();
+            } else {
+                float applyDelta = delta;
+                float time = delta + data.getT();
+                if (time >= RESYNC_TIME) {
+                    applyDelta -= time - RESYNC_TIME;
+                    i.remove();
+                }
+                Vector3f change = new Vector3f();
+                data.positionDelta.scale(applyDelta / RESYNC_TIME, change);
+                Transform current = body.getWorldTransform(new Transform());
+                change.add(current.origin);
+                body.proceedToTransform(new Transform(new Matrix4f(current.getRotation(new Quat4f()), change, 1)));
+            }
+        }
+    }
+
+    private void sendSyncMessages() {
+        for (Map.Entry<EntityRef, RigidBody> physicsObj : entityRigidBodies.entrySet()) {
+            if (physicsObj.getKey().hasComponent(NetworkComponent.class)) {
+                Transform transform = physicsObj.getValue().getWorldTransform(new Transform());
+                if (physicsObj.getValue().getActivationState() == RigidBody.ACTIVE_TAG) {
+                    physicsObj.getKey().send(new PhysicsResynchEvent(transform.origin, transform.getRotation(new Quat4f()), physicsObj.getValue().getLinearVelocity(new Vector3f()), physicsObj.getValue().getAngularVelocity(new Vector3f())));
+                }
+            }
+        }
+    }
+
+    @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class})
+    public void resynch(PhysicsResynchEvent event, EntityRef entity) {
+        if (!networkSystem.getMode().isAuthority()) {
+            logger.debug("Received resynch event");
+            LocationComponent loc = entity.getComponent(LocationComponent.class);
+            Vector3f delta = new Vector3f(event.getPosition());
+            delta.sub(loc.getWorldPosition());
+            pendingResynch.put(entity, new ResynchData(delta, new Quat4f()));
+            RigidBody body = entityRigidBodies.get(entity);
+            if (body != null) {
+                body.setLinearVelocity(event.getVelocity());
+                body.setAngularVelocity(event.getAngularVelocity());
+            }
+        }
+    }
+
+    private void applyPendingImpulses() {
+        for (Map.Entry<EntityRef, Vector3f> impulse : pendingImpulses.entrySet()) {
+            RigidBody body = entityRigidBodies.get(impulse.getKey());
+            if (body != null) {
+                body.applyCentralImpulse(impulse.getValue());
+            }
+        }
+        pendingImpulses.clear();
+    }
+
+    private void addPendingRigidBodies() {
+        for (EntityRef entity : newRigidBodies) {
+            createRigidBody(entity);
+        }
+        newRigidBodies.clear();
+    }
+
+    private void createRigidBody(EntityRef entity) {
+        LocationComponent location = entity.getComponent(LocationComponent.class);
+        RigidBodyComponent rigidBody = entity.getComponent(RigidBodyComponent.class);
+        ConvexShape shape = getShapeFor(entity);
+        if (location != null && rigidBody != null && shape != null) {
+            float scale = location.getWorldScale();
+            shape.setLocalScaling(new Vector3f(scale, scale, scale));
+
+            Vector3f fallInertia = new Vector3f();
+            shape.calculateLocalInertia(rigidBody.mass, fallInertia);
+            RigidBodyConstructionInfo info = new RigidBodyConstructionInfo(rigidBody.mass, new EntityMotionState(entity), shape, fallInertia);
+            RigidBody collider = new RigidBody(info);
+            collider.setUserPointer(entity);
+            updateKinematicSettings(rigidBody, collider);
+            RigidBody oldBody = entityRigidBodies.put(entity, collider);
+            physics.addRigidBody(collider, Lists.<CollisionGroup>newArrayList(rigidBody.collisionGroup), rigidBody.collidesWith);
+            if (oldBody != null) {
+                physics.removeRigidBody(oldBody);
+            }
+        }
+    }
+
+    private void updateKinematicSettings(RigidBodyComponent rigidBody, RigidBody collider) {
+        if (rigidBody.kinematic) {
+            collider.setCollisionFlags(collider.getCollisionFlags() | CollisionFlags.KINEMATIC_OBJECT);
+            collider.setActivationState(CollisionObject.DISABLE_DEACTIVATION);
+        } else {
+            collider.setCollisionFlags(collider.getCollisionFlags() & ~CollisionFlags.KINEMATIC_OBJECT);
+            collider.setActivationState(CollisionObject.ACTIVE_TAG);
+        }
+    }
+
+    private void createTrigger(EntityRef entity) {
+        LocationComponent location = entity.getComponent(LocationComponent.class);
+        TriggerComponent trigger = entity.getComponent(TriggerComponent.class);
+        ConvexShape shape = getShapeFor(entity);
+        if (shape != null) {
+            float scale = location.getWorldScale();
+            shape.setLocalScaling(new Vector3f(scale, scale, scale));
+            List<CollisionGroup> detectGroups = Lists.newArrayList(trigger.detectGroups);
+            PairCachingGhostObject triggerObj = physics.createCollider(location.getWorldPosition(), shape, Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.SENSOR), detectGroups, CollisionFlags.NO_CONTACT_RESPONSE);
+            triggerObj.setUserPointer(entity);
+            entityTriggers.put(entity, triggerObj);
+        }
+    }
+
     private static class CollisionPair {
         EntityRef a;
         EntityRef b;
@@ -339,6 +436,33 @@ public class PhysicsSystem implements UpdateSubscriberSystem {
                     entity.saveComponent(loc);
                 }
             }
+        }
+    }
+
+    private static class ResynchData {
+        private Vector3f positionDelta = new Vector3f();
+        private Quat4f rotationDelta = new Quat4f();
+        private float t = 0;
+
+        public ResynchData(Vector3f position, Quat4f rotation) {
+            this.positionDelta.set(position);
+            this.rotationDelta.set(rotation);
+        }
+
+        public float getT() {
+            return t;
+        }
+
+        public void setT(float t) {
+            this.t = t;
+        }
+
+        public Vector3f getPositionDelta() {
+            return positionDelta;
+        }
+
+        public Quat4f getRotationDelta() {
+            return rotationDelta;
         }
     }
 }

@@ -225,7 +225,6 @@ public class Server {
             for (NetData.UpdateEntityMessage updateEntity : message.getUpdateEntityList()) {
                 EntityRef currentEntity = networkSystem.getEntity(updateEntity.getNetId());
                 if (currentEntity.exists()) {
-                    logger.info("Updating entity: {}", currentEntity);
                     entitySerializer.deserializeOnto(currentEntity, updateEntity.getEntity());
                 }
             }

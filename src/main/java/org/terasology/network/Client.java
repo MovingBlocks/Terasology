@@ -207,7 +207,7 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
         } else {
             NetworkComponent networkComponent = target.getComponent(NetworkComponent.class);
             if (networkComponent != null) {
-                if (netRelevant.contains(networkComponent.networkId)) {
+                if (netRelevant.contains(networkComponent.networkId) || netInitial.contains(networkComponent.networkId)) {
                     queuedOutgoingEvents.add(NetData.EventMessage.newBuilder()
                             .setTargetId(networkComponent.networkId)
                             .setEvent(eventSerializer.serialize(event)).build());
