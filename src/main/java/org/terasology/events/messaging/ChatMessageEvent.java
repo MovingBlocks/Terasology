@@ -2,6 +2,7 @@ package org.terasology.events.messaging;
 
 import org.terasology.components.DisplayInformationComponent;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.logic.console.MessageEvent;
 import org.terasology.network.NetworkEvent;
 import org.terasology.network.OwnerEvent;
 import org.terasology.network.Replicate;
@@ -10,7 +11,7 @@ import org.terasology.network.Replicate;
  * @author Immortius
  */
 @OwnerEvent
-public class ChatMessageEvent extends NetworkEvent {
+public class ChatMessageEvent extends MessageEvent {
     private String message;
     private EntityRef from;
 

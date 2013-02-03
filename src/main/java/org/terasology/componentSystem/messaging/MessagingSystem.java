@@ -10,6 +10,7 @@ import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.events.messaging.ChatMessageEvent;
 import org.terasology.events.messaging.SendChatMessage;
+import org.terasology.logic.console.MessageEvent;
 import org.terasology.logic.manager.MessageManager;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
@@ -47,10 +48,10 @@ public class MessagingSystem implements ComponentSystem {
     }
 
     @ReceiveEvent(components = ClientComponent.class)
-    public void onChatMessage(ChatMessageEvent event, EntityRef entity) {
+    public void onChatMessage(MessageEvent event, EntityRef entity) {
         ClientComponent client = entity.getComponent(ClientComponent.class);
         if (client.local) {
-            logger.info("Chat message from {} : '{}'", event.getFrom(), event.getFormattedMessage());
+            logger.info("Message Received : '{}'", event.getFormattedMessage());
             MessageManager.getInstance().addMessage(event.getFormattedMessage());
         }
     }

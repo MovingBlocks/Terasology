@@ -57,4 +57,8 @@ public interface SoundManager {
     SoundSource getSoundSource(String pool, Sound sound, int priority);
 
     void stopAllSounds();
+
+    boolean isMute();
+
+    void setMute(boolean mute);
 }

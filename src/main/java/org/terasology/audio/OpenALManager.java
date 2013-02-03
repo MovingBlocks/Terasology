@@ -97,6 +97,20 @@ public class OpenALManager extends AudioManager {
     }
 
     @Override
+    public boolean isMute() {
+        return AL10.alGetListenerf(AL10.AL_GAIN) < 0.01f;
+    }
+
+    @Override
+    public void setMute(boolean mute) {
+        if (mute) {
+            AL10.alListenerf(AL10.AL_GAIN, 0);
+        } else {
+            AL10.alListenerf(AL10.AL_GAIN, 1.0f);
+        }
+    }
+
+    @Override
     public void update() {
         LocalPlayer player = CoreRegistry.get(LocalPlayer.class);
 

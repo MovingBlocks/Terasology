@@ -44,6 +44,8 @@ import org.terasology.game.GameEngine;
 import org.terasology.game.TerasologyEngine;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.characters.CharacterComponent;
+import org.terasology.logic.console.SimpleMessageEvent;
+import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.CommandManager;
 import org.terasology.logic.manager.CommandManager.CommandInfo;
 import org.terasology.logic.manager.Config;
@@ -153,6 +155,13 @@ public class Commands implements CommandProvider {
     //==============================
     //          Commands
     //==============================
+
+    @Command(shortDescription = "Toggle muting all sound")
+    public void toggleMute() {
+        AudioManager.getInstance().setMute(!AudioManager.getInstance().isMute());
+        CoreRegistry.get(LocalPlayer.class).getClientEntity().send(new SimpleMessageEvent("All sound is now " + ((AudioManager.getInstance().isMute()) ? "muted." : "unmuted.")));
+    }
+
     @Command(shortDescription = "List all available blocks")
     public void listBlocks() {
         StringBuilder stringBuilder = new StringBuilder();
