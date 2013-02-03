@@ -25,8 +25,18 @@ public class Property {
     private Class valueType;
     private String title;
 
+    private Float minValue = new Float(0.0f);
+    private Float maxValue = new Float(1.0f);
+
     public Property(String title, Object value) {
         this.title = title;
+        setValue(value);
+    }
+
+    public Property(String title, Float value, Float minValue, Float maxValue) {
+        this.title = title;
+        this.minValue = minValue;
+        this.maxValue = maxValue;
         setValue(value);
     }
 
@@ -86,5 +96,13 @@ public class Property {
      */
     public String getTitle() {
         return title;
+    }
+
+    public Float getMinValue() {
+        return minValue;
+    }
+
+    public Float getMaxValue() {
+        return maxValue;
     }
 }

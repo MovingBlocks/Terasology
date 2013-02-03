@@ -21,6 +21,7 @@ import org.terasology.game.GameEngine;
 import org.terasology.game.TerasologyEngine;
 import org.terasology.game.modes.StateMainMenu;
 import org.terasology.logic.manager.PathManager;
+import org.terasology.ui.MainWindow;
 
 import javax.swing.*;
 
@@ -54,6 +55,10 @@ public final class TeraEd extends JWindow {
 
     public static GameEngine getEngine() {
         return engine;
+    }
+
+    public static MainWindow getMainWindow() {
+        return mainWindow;
     }
 
 }

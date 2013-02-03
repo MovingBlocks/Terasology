@@ -48,7 +48,7 @@ public class ShaderParametersBlock extends ShaderParametersBase {
 
         program.setFloat3("colorOffset", 1.0f, 1.0f, 1.0f);
         program.setInt("textured", 1);
-        program.setFloat("alpha", 1f);
+        program.setFloat("alpha", 1.0f);
     }
 
 }

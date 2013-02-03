@@ -13,12 +13,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.terasology.editor;
+package org.terasology.ui;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.editor.TeraEd;
 import org.terasology.logic.manager.ShaderManager;
-import org.terasology.properties.GenericPropertyPanel;
 import org.terasology.rendering.shader.ShaderParametersBase;
 
 import javax.swing.*;
@@ -39,7 +39,7 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
     private static final Logger logger = LoggerFactory.getLogger(MainWindow.class);
 
     private BorderLayout borderLayout;
-    private Canvas viewPort;
+    private ViewPort viewPort;
     private GenericPropertyPanel propertyEditor;
 
     private JSplitPane verticalSplitPane;
@@ -51,18 +51,16 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
 
     private JMenu propertyMenu;
     private JMenuItem propertyMenuShaderPrePost;
+    private JMenuItem propertyMenuShaderSSAO;
 
-    public Canvas getViewPort() {
+    public ViewPort getViewPort() {
         return viewPort;
     }
 
     public MainWindow() {
         this.addWindowListener(this);
 
-        viewPort = new Canvas();
-        viewPort.setSize(1280, 720);
-        viewPort.setMinimumSize(new Dimension(640, 480));
-        viewPort.setPreferredSize(new Dimension(1280, 720));
+        viewPort = new ViewPort();
 
         borderLayout = new BorderLayout();
         getContentPane().setLayout(borderLayout);
@@ -96,6 +94,10 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
         propertyMenuShaderPrePost.addActionListener(this);
         propertyMenu.add(propertyMenuShaderPrePost);
 
+        propertyMenuShaderSSAO = new JMenuItem("Shader: SSAO");
+        propertyMenuShaderSSAO.addActionListener(this);
+        propertyMenu.add(propertyMenuShaderSSAO);
+
         mainMenuBar.add(fileMenu);
         mainMenuBar.add(propertyMenu);
 
@@ -110,6 +112,8 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
            TeraEd.getEngine().shutdown();
        } else if (e.getSource() == propertyMenuShaderPrePost) {
            propertyEditor.setActivePropertyProvider((ShaderParametersBase) ShaderManager.getInstance().getShaderProgram("prePost").getShaderParameters());
+       } else if (e.getSource() == propertyMenuShaderSSAO) {
+           propertyEditor.setActivePropertyProvider((ShaderParametersBase) ShaderManager.getInstance().getShaderProgram("ssao").getShaderParameters());
        }
     }
     @Override

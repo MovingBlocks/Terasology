@@ -13,7 +13,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.terasology.properties;
+package org.terasology.ui;
+
+import org.terasology.properties.Property;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -28,8 +30,6 @@ public class EditorPropertySlider extends JPanel implements ChangeListener {
 
     private JSlider slider;
     private Property activeProperty = null;
-    private float minValue = 0.0f;
-    private float maxValue = 1.0f;
     private TitledBorder titledBorder;
 
     public EditorPropertySlider() {
@@ -60,30 +60,20 @@ public class EditorPropertySlider extends JPanel implements ChangeListener {
         if (activeProperty != null) {
             titledBorder.setTitle(activeProperty.getTitle());
             if (activeProperty.getValueType() == Float.class) {
-                setValue((Float) activeProperty.getValue());
+                setValue((Float) activeProperty.getValue(), activeProperty.getMinValue(), activeProperty.getMaxValue());
             }
         }
     }
 
-    public void setValue(float value) {
+    public void setValue(float value, float minValue, float maxValue) {
         int sliderValue = (int) (((value - minValue) / maxValue) * 100.0f);
         slider.setValue(sliderValue);
     }
-
-    public void setMinValue(float min) {
-        minValue = min;
-    }
-
-    public void setMaxValue(float max) {
-        maxValue = max;
-    }
-
     @Override
     public void stateChanged(ChangeEvent e) {
-        float range = Math.abs(maxValue - minValue);
-
         if (activeProperty.getValueType() == Float.class) {
-            float val = (slider.getValue() / 100.0f) * range + minValue;
+            float range = Math.abs(activeProperty.getMaxValue() - activeProperty.getMinValue());
+            float val = (slider.getValue() / 100.0f) * range + activeProperty.getMinValue();
             activeProperty.setValue(val);
         }
     }

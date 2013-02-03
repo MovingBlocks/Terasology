@@ -13,7 +13,11 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.terasology.properties;
+package org.terasology.ui;
+
+import org.terasology.editor.TeraEd;
+import org.terasology.properties.Property;
+import org.terasology.properties.PropertyProvider;
 
 import javax.swing.*;
 import java.awt.*;
@@ -62,6 +66,7 @@ public class GenericPropertyPanel extends JPanel {
             }
         }
 
-        revalidate();
+        TeraEd.getMainWindow().revalidate();
+        TeraEd.getMainWindow().repaint();
     }
 }
