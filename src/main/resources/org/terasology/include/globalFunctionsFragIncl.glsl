@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 
+#define Z_NEAR 0.1
+#define BLUR_START 0.6
+#define BLUR_LENGTH 0.05
+
+#define MOTION_BLUR_SAMPLES 8
+
 #define A 0.15
 #define B 0.50
 #define C 0.10
@@ -21,6 +27,16 @@
 #define E 0.02
 #define F 0.30
 #define W 11.2
+
+uniform bool swimming;
+uniform float viewingDistance;
+uniform float daylight;
+uniform float tick;
+uniform float time;
+
+float linDepth(float depth) {
+    return (2.0 * Z_NEAR) / (viewingDistance + Z_NEAR - depth * (viewingDistance - Z_NEAR));
+}
 
 vec3 uncharted2Tonemap(vec3 x) {
 	return ((x*(A*x+C*B)+D*E)/(x*(A*x+B)+D*F))-E/F;

@@ -17,7 +17,6 @@
 #define BLOCK_HINT_WATER     1
 #define BLOCK_HINT_LAVA      2
 #define BLOCK_HINT_GRASS     3
-#define BLOCK_HINT_WAVING    4
 
 #define DAYLIGHT_AMBIENT_COLOR 0.95, 0.92, 0.91
 #define MOONLIGHT_AMBIENT_COLOR 0.8, 0.8, 1.0
@@ -43,13 +42,9 @@ uniform sampler2D textureLava;
 uniform sampler2D textureEffects;
 uniform sampler2D textureWaterReflection;
 
-uniform float time;
-uniform float daylight = 1.0;
-
 uniform float clipHeight = 0.0;
 
 uniform bool carryingTorch;
-uniform bool swimming;
 
 varying vec4 vertexWorldPosRaw;
 varying vec4 vertexWorldPos;

@@ -20,5 +20,6 @@
  */
 {
     "author" : "eleazzaar",
-    "basedOn" : "engine:plant"
+    "basedOn" : "engine:plant",
+    "waving" : true
 }

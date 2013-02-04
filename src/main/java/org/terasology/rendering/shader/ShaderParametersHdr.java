@@ -24,13 +24,15 @@ import org.terasology.logic.manager.PostProcessingRenderer;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ShaderParametersHdr implements IShaderParameters {
+public class ShaderParametersHdr extends ShaderParametersBase {
 
     static final float exposureBias = 2.5f;
 
     public void applyParameters(ShaderProgram program) {
+        super.applyParameters(program);
+
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        PostProcessingRenderer.getInstance().getFBO("sceneCombined").bindTexture();
+        PostProcessingRenderer.getInstance().getFBO("scenePrePost").bindTexture();
 
         program.setInt("texScene", 0);
         program.setFloat("exposure", PostProcessingRenderer.getInstance().getExposure() *exposureBias);

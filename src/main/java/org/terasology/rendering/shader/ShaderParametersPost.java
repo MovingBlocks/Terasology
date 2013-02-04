@@ -41,7 +41,7 @@ import java.nio.FloatBuffer;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ShaderParametersPost implements IShaderParameters {
+public class ShaderParametersPost extends ShaderParametersBase {
 
     FastRandom rand = new FastRandom();
 
@@ -50,6 +50,8 @@ public class ShaderParametersPost implements IShaderParameters {
 
     @Override
     public void applyParameters(ShaderProgram program) {
+        super.applyParameters(program);
+
         PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("scene");
 
         GL13.glActiveTexture(GL13.GL_TEXTURE1);
@@ -90,8 +92,6 @@ public class ShaderParametersPost implements IShaderParameters {
 
             program.setFloat2("renderTargetSize", rtSize);
         }
-
-        program.setFloat("viewingDistance", Config.getInstance().getActiveViewingDistance() * 8.0f);
 
         if (CoreRegistry.get(LocalPlayer.class).isValid()) {
             Vector3f cameraPos = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();

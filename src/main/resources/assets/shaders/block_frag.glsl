@@ -20,7 +20,7 @@ uniform float light;
 uniform vec3 colorOffset;
 uniform bool textured;
 uniform bool carryingTorch;
-uniform float alpha;
+uniform float alpha = 1.0;
 
 varying vec3 normal;
 varying vec4 vertexWorldPos;
@@ -29,10 +29,16 @@ void main(){
     vec4 color;
 
     if (textured) {
-        color = texture2D(textureAtlas, vec2(gl_TexCoord[0].x , gl_TexCoord[0].y));
+        color = texture2D(textureAtlas, gl_TexCoord[0].xy);
         color.rgb *= gl_Color.rgb;
     } else {
-        color = gl_Color;
+        color.rgba = gl_Color.rgba;
+    }
+
+    color.a *= alpha;
+
+    if (color.a < 0.1) {
+        discard;
     }
 
     float torchlight = 0.0;
@@ -44,8 +50,6 @@ void main(){
 
     // Apply light
     color.rgb *= clamp(light + torchlight, 0.0, 1.0);
-
-    color.a = alpha;
 
     if (textured) {
         color.rgb *= colorOffset.rgb;

@@ -72,7 +72,8 @@ public class ShaderManager {
 
         createAndStoreShaderProgram("post", new ShaderParametersPost());
         createAndStoreShaderProgram("ssao", new ShaderParametersSSAO());
-        createAndStoreShaderProgram("screenCombine", new ShaderParametersScreenCombine());
+        createAndStoreShaderProgram("sobel", new ShaderParametersSobel());
+        createAndStoreShaderProgram("prePost", new ShaderParametersPrePost());
         createAndStoreShaderProgram("highp", new ShaderParametersDefault());
         createAndStoreShaderProgram("blur", new ShaderParametersDefault());
         createAndStoreShaderProgram("down", new ShaderParametersDefault());
@@ -169,5 +170,13 @@ public class ShaderManager {
      */
     public ShaderProgram getShaderProgram(String s) {
         return _shaderPrograms.get(s);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public HashMap<String, ShaderProgram> getShaderPrograms() {
+        return _shaderPrograms;
     }
 }

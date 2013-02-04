@@ -1,0 +1,6 @@
+{
+    "id" : "CakeLie",
+    "displayName" : "CandyBlocks",
+    "author" : "Maternal Mathes.Wenzel@googlemail.com",
+    "description" : "Cake and Candy stuff. Go to the Candy Mountain Cave Charlie !"
+}

@@ -30,24 +30,16 @@ import org.terasology.rendering.world.WorldRenderer;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ShaderParametersGelCube implements IShaderParameters {
+public class ShaderParametersGelCube extends ShaderParametersBase {
 
     private Texture slimeTex = Assets.getTexture("engine:slime");
 
     @Override
     public void applyParameters(ShaderProgram program) {
-        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-        WorldRenderer worldRendererd = CoreRegistry.get(WorldRenderer.class);
+        super.applyParameters(program);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         glBindTexture(GL11.GL_TEXTURE_2D, slimeTex.getId());
-
-        if (localPlayer != null) {
-            program.setInt("carryingTorch", localPlayer.isCarryingTorch() ? 1 : 0);
-        }
-        if (worldRendererd != null) {
-            program.setFloat("tick", (float) worldRendererd.getTick());
-        }
     }
 
 }

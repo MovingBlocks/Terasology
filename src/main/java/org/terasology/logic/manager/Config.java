@@ -446,6 +446,14 @@ public final class Config {
         return _setting.getSystemBuilder().getSsao();
     }
 
+    public void setOutline(boolean outline) {
+        _setting.getSystemBuilder().setOutline(outline);
+    }
+
+    public boolean isOutline() {
+        return _setting.getSystemBuilder().getOutline();
+    }
+
     public void setFilmGrain(boolean filmGrain) {
         _setting.getSystemBuilder().setFilmGrain(filmGrain);
     }
@@ -500,6 +508,9 @@ public final class Config {
         _setting.getSystemBuilder().setActiveViewingDistanceId(viewingDistance);
 
         WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
+
+        int chunksToLoad = getActiveViewingDistance() * getActiveViewingDistance();
+        setMaxChunkVBOs(chunksToLoad >= 512 ? 512 : chunksToLoad);
 
         // Make sure to update the chunks "around" the player
         if (worldRenderer != null)

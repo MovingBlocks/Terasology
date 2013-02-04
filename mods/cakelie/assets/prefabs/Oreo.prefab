@@ -1,0 +1,10 @@
+{
+    "persisted" : false,
+    "location" : {},
+    "skeletalmesh" : {
+        "mesh" : "Cakelie:Oreoking",
+        "material" : "CakeLie:OreonSkin",
+        "animation" : "CakeLie:Oreokingwalk",
+        "loop" : true
+    }
+}
