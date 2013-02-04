@@ -142,6 +142,8 @@ public class PostProcessingRenderer {
         final int quarterHeight = halfHeight / 2;
         final int halfQuarterWidth = quarterWidth / 2;
         final int halfQuarterHeight = quarterHeight / 2;
+        final int halfHalfQuarterWidth = halfQuarterWidth / 2;
+        final int halfHalfQuarterHeight = halfQuarterHeight / 2;
 
         createFBO("sobel", Display.getWidth(),  Display.getHeight(), false, false, false);
 
@@ -151,9 +153,9 @@ public class PostProcessingRenderer {
 
         createFBO("sceneReflected", halfWidth, halfHeight, true, true, false);
 
-        createFBO("sceneHighPass", halfQuarterWidth, halfQuarterHeight, false, false, false);
-        createFBO("sceneBloom0", halfQuarterWidth, halfQuarterHeight, false, false, false);
-        createFBO("sceneBloom1", halfQuarterWidth, halfQuarterHeight, false, false, false);
+        createFBO("sceneHighPass", halfHalfQuarterWidth, halfHalfQuarterHeight, false, false, false);
+        createFBO("sceneBloom0", halfHalfQuarterWidth, halfHalfQuarterHeight, false, false, false);
+        createFBO("sceneBloom1", halfHalfQuarterWidth, halfHalfQuarterHeight, false, false, false);
 
         createFBO("sceneBlur0", quarterWidth, quarterHeight, false, false, false);
         createFBO("sceneBlur1", quarterWidth, quarterHeight, false, false, false);

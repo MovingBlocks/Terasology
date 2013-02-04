@@ -16,10 +16,11 @@
 package org.terasology.ui;
 
 import org.terasology.editor.TeraEd;
+import org.terasology.properties.IPropertyProvider;
 import org.terasology.properties.Property;
-import org.terasology.properties.PropertyProvider;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -29,22 +30,30 @@ import java.util.List;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class GenericPropertyPanel extends JPanel {
+public class PropertyPanel extends JPanel {
 
-    private PropertyProvider activePropertyProvider = null;
-    private FlowLayout flowLayout;
+    private IPropertyProvider activePropertyProvider = null;
 
-    public GenericPropertyPanel() {
-        flowLayout = new FlowLayout();
-        setLayout(flowLayout);
+    private TitledBorder border = null;
+    private String title = "";
+
+    public PropertyPanel() {
+        border = new TitledBorder("");
+        setBorder(border);
     }
 
-    public GenericPropertyPanel(PropertyProvider provider) {
+    public PropertyPanel(String title) {
+        this();
+        this.title = title;
+        border.setTitle(title);
+    }
+
+    public PropertyPanel(IPropertyProvider provider) {
         this();
         setActivePropertyProvider(provider);
     }
 
-    public void setActivePropertyProvider(PropertyProvider provider) {
+    public void setActivePropertyProvider(IPropertyProvider provider) {
         activePropertyProvider = provider;
         onActivePropertyProviderChanged();
     }
@@ -56,17 +65,25 @@ public class GenericPropertyPanel extends JPanel {
             List<Property> properties = new ArrayList<Property>();
             activePropertyProvider.addPropertiesToList(properties);
 
+            setLayout(new GridLayout(properties.size() >= 16 ? properties.size() : 16, 1));
+
             Iterator<Property> it = properties.iterator();
             while (it.hasNext()) {
                 Property property = it.next();
 
                 if (property.getValueType() == Float.class) {
-                    add(new EditorPropertySlider(property));
+                    add(new PropertySlider(property));
+                    revalidate();
                 }
             }
         }
 
-        TeraEd.getMainWindow().revalidate();
-        TeraEd.getMainWindow().repaint();
+        repaint();
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+        border.setTitle(title);
+        revalidate();
     }
 }

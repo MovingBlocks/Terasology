@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.terasology.editor.TeraEd;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.shader.ShaderParametersBase;
+import org.terasology.rendering.shader.ShaderProgram;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,6 +28,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * TeraEd main class.
@@ -40,7 +44,7 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
 
     private BorderLayout borderLayout;
     private ViewPort viewPort;
-    private GenericPropertyPanel propertyEditor;
+    private PropertyPanel propertyPanel;
 
     private JSplitPane verticalSplitPane;
 
@@ -49,15 +53,35 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
     private JMenu fileMenu;
     private JMenuItem fileMenuExitItem;
 
-    private JMenu propertyMenu;
-    private JMenuItem propertyMenuShaderPrePost;
-    private JMenuItem propertyMenuShaderSSAO;
+    private JMenu shaderPropertiesMenu;
+    private ArrayList<JMenuItem> shaderPropertyMenuEntries = new ArrayList<JMenuItem>(64);
+
+    private JMenu propertiesMenu;
+    private JMenuItem propertiesMenuScene;
+
+    //private JToolBar toolbar;
+    //private JToggleButton activateGameModeButton;
+
+    private JScrollPane propertyPanelScrollPane;
 
     public ViewPort getViewPort() {
         return viewPort;
     }
 
     public MainWindow() {
+        JPopupMenu.setDefaultLightWeightPopupEnabled(false);
+
+        try {
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            // If Nimbus is not available, you can set the GUI to another look and feel.
+        }
+
         this.addWindowListener(this);
 
         viewPort = new ViewPort();
@@ -66,12 +90,17 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
         getContentPane().setLayout(borderLayout);
 
         // Build up the main window editor layout...
-        propertyEditor = new GenericPropertyPanel();
-        propertyEditor.setSize(256, 720);
-        propertyEditor.setMinimumSize(new Dimension(256, 720));
-        propertyEditor.setPreferredSize(new Dimension(256, 720));
+        propertyPanel = new PropertyPanel();
 
-        verticalSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, viewPort, propertyEditor);
+        propertyPanelScrollPane = new JScrollPane(
+                propertyPanel,
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        propertyPanelScrollPane.setSize(350, 720);
+        propertyPanelScrollPane.setMinimumSize(new Dimension(350, 720));
+        propertyPanelScrollPane.setPreferredSize(new Dimension(350, 720));
+
+        verticalSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, viewPort, propertyPanelScrollPane);
         verticalSplitPane.setContinuousLayout(true);
         verticalSplitPane.setResizeWeight(1.0);
         getContentPane().add(verticalSplitPane, BorderLayout.CENTER);
@@ -80,7 +109,7 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
         setSize(new Dimension(1280, 720));
 
         mainMenuBar = new JMenuBar();
-        add(mainMenuBar, BorderLayout.NORTH);
+        setJMenuBar(mainMenuBar);
 
         fileMenu = new JMenu("File");
 
@@ -88,33 +117,61 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
         fileMenuExitItem.addActionListener(this);
         fileMenu.add(fileMenuExitItem);
 
-        propertyMenu = new JMenu("Properties");
+        shaderPropertiesMenu = new JMenu("Shader Properties");
 
-        propertyMenuShaderPrePost = new JMenuItem("Shader: PrePost");
-        propertyMenuShaderPrePost.addActionListener(this);
-        propertyMenu.add(propertyMenuShaderPrePost);
+        propertiesMenu = new JMenu("Properties");
 
-        propertyMenuShaderSSAO = new JMenuItem("Shader: SSAO");
-        propertyMenuShaderSSAO.addActionListener(this);
-        propertyMenu.add(propertyMenuShaderSSAO);
+        propertiesMenuScene = new JMenuItem("Scene");
+        propertiesMenuScene.addActionListener(this);
+        propertiesMenu.add(propertiesMenuScene);
 
         mainMenuBar.add(fileMenu);
-        mainMenuBar.add(propertyMenu);
+        mainMenuBar.add(shaderPropertiesMenu);
+        mainMenuBar.add(propertiesMenu);
 
-        mainMenuBar.setVisible(true);
+//        toolbar = new JToolBar();
+//        add(toolbar, BorderLayout.NORTH);
+//
+//        activateGameModeButton = new JToggleButton(UIManager.getIcon("OptionPane.warningIcon"));
+//        activateGameModeButton.addActionListener(this);
+//        toolbar.add(activateGameModeButton);
 
         setVisible(true);
+    }
+
+    public void initPostEngine() {
+        HashMap<String, ShaderProgram> shaderPrograms = ShaderManager.getInstance().getShaderPrograms();
+        Iterator<String> shaderIterator = shaderPrograms.keySet().iterator();
+        while (shaderIterator.hasNext()) {
+            String programName = shaderIterator.next();
+
+            JMenuItem menuItem = new JMenuItem(programName);
+            menuItem.addActionListener(this);
+
+            shaderPropertyMenuEntries.add(menuItem);
+            shaderPropertiesMenu.add(menuItem);
+        }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
        if (e.getSource() == fileMenuExitItem) {
            TeraEd.getEngine().shutdown();
-       } else if (e.getSource() == propertyMenuShaderPrePost) {
-           propertyEditor.setActivePropertyProvider((ShaderParametersBase) ShaderManager.getInstance().getShaderProgram("prePost").getShaderParameters());
-       } else if (e.getSource() == propertyMenuShaderSSAO) {
-           propertyEditor.setActivePropertyProvider((ShaderParametersBase) ShaderManager.getInstance().getShaderProgram("ssao").getShaderParameters());
-       }
+       } else if (e.getSource() == propertiesMenuScene) {
+           propertyPanel.setActivePropertyProvider(TeraEd.getSceneProperties());
+           propertyPanel.setTitle("Scene Properties");
+       } else {
+           for (int i=0; i<shaderPropertyMenuEntries.size(); ++i) {
+                if (e.getSource() == shaderPropertyMenuEntries.get(i)) {
+                    String shaderProgramName = shaderPropertyMenuEntries.get(i).getText();
+                    propertyPanel.setActivePropertyProvider((ShaderParametersBase) ShaderManager.getInstance().getShaderProgram(shaderProgramName).getShaderParameters());
+                    propertyPanel.setTitle(shaderProgramName);
+                }
+           }
+       }// else if (e.getSource() == activateGameModeButton) {
+//           TerasologyEngine.setEditorInFocus(!TerasologyEngine.isEditorInFocus());
+//           Mouse.setGrabbed(!TerasologyEngine.isEditorInFocus());
+//       }
     }
     @Override
     public void windowOpened(WindowEvent e) {

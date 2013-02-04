@@ -20,8 +20,8 @@ uniform sampler2D texEdges;
 uniform sampler2D texSsao;
 #endif
 #ifdef OUTLINE
-uniform float outlineDepthThreshold = 0.05;
-uniform float outlineThickness = 0.75;
+uniform float outlineDepthThreshold = 0.1;
+uniform float outlineThickness = 1.0;
 #endif
 
 #define OUTLINE_COLOR 0.0, 0.0, 0.0

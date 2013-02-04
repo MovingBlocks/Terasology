@@ -39,7 +39,7 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
 
     Property ssaoStrength = new Property("ssaoStrength", 0.15f, 0.0f, 1.0f);
     Property ssaoTotalStrength = new Property("ssaoTotalStrength", 1.25f, 0.0f, 4.0f);
-    Property ssaoFalloff = new Property("ssaoFalloff", 0.0000001f, 0.0000001f, 0.000001f);
+    Property ssaoFalloff = new Property("ssaoFalloff", 0.0000001f, 0.00000001f, 0.0001f);
     Property ssaoRad = new Property("ssaoRad", 0.05f, 0.00f, 0.2f);
 
     Texture noiseTexture = Assets.getTexture("engine:noise");

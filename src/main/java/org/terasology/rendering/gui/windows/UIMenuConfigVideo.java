@@ -98,7 +98,7 @@ public class UIMenuConfigVideo extends UIWindow {
                     Config.getInstance().setMotionBlur(false);
                     Config.getInstance().setSSAO(false);
                     Config.getInstance().setFilmGrain(false);
-                    Config.getInstance().setOutline(false);
+                    Config.getInstance().setOutline(true);
                     break;
                 case 1:
                     Config.getInstance().setFlickeringLight(true);
@@ -108,7 +108,7 @@ public class UIMenuConfigVideo extends UIWindow {
                     Config.getInstance().setMotionBlur(false);
                     Config.getInstance().setSSAO(false);
                     Config.getInstance().setFilmGrain(true);
-                    Config.getInstance().setOutline(false);
+                    Config.getInstance().setOutline(true);
                     break;
                 case 2:
                     Config.getInstance().setFlickeringLight(true);

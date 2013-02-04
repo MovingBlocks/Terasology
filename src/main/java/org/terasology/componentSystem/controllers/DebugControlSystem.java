@@ -17,6 +17,7 @@
 package org.terasology.componentSystem.controllers;
 
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
@@ -24,6 +25,7 @@ import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.DamageEvent;
+import org.terasology.game.TerasologyEngine;
 import org.terasology.input.events.KeyDownEvent;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.game.CoreRegistry;
@@ -132,9 +134,9 @@ public class DebugControlSystem implements EventHandlerSystem {
                 CoreRegistry.get(GUIManager.class).openWindow("itemList");
                 event.consume();
                 break;
-            case Keyboard.KEY_F9:
-                Config.getInstance().setSSAO(!Config.getInstance().isSSAO());
-                ShaderManager.getInstance().recompileAllShaders();
+            case Keyboard.KEY_F1:
+                TerasologyEngine.setEditorInFocus(!TerasologyEngine.isEditorInFocus());
+                Mouse.setGrabbed(!TerasologyEngine.isEditorInFocus());
                 event.consume();
                 break;
         }

@@ -2935,7 +2935,7 @@ public final class Configuration {
       boolean hasFilmGrain();
       boolean getFilmGrain();
       
-      // optional bool outline = 31 [default = false];
+      // optional bool outline = 31 [default = true];
       boolean hasOutline();
       boolean getOutline();
     }
@@ -4021,7 +4021,7 @@ public final class Configuration {
         return filmGrain_;
       }
       
-      // optional bool outline = 31 [default = false];
+      // optional bool outline = 31 [default = true];
       public static final int OUTLINE_FIELD_NUMBER = 31;
       private boolean outline_;
       public boolean hasOutline() {
@@ -4058,7 +4058,7 @@ public final class Configuration {
         motionBlur_ = false;
         ssao_ = false;
         filmGrain_ = false;
-        outline_ = false;
+        outline_ = true;
       }
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
@@ -4451,7 +4451,7 @@ public final class Configuration {
           bitField0_ = (bitField0_ & ~0x01000000);
           filmGrain_ = false;
           bitField0_ = (bitField0_ & ~0x02000000);
-          outline_ = false;
+          outline_ = true;
           bitField0_ = (bitField0_ & ~0x04000000);
           return this;
         }
@@ -5491,8 +5491,8 @@ public final class Configuration {
           return this;
         }
         
-        // optional bool outline = 31 [default = false];
-        private boolean outline_ ;
+        // optional bool outline = 31 [default = true];
+        private boolean outline_ = true;
         public boolean hasOutline() {
           return ((bitField0_ & 0x04000000) == 0x04000000);
         }
@@ -5507,7 +5507,7 @@ public final class Configuration {
         }
         public Builder clearOutline() {
           bitField0_ = (bitField0_ & ~0x04000000);
-          outline_ = false;
+          outline_ = true;
           onChanged();
           return this;
         }
@@ -6480,7 +6480,7 @@ public final class Configuration {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\rConfig2.proto\022\010protobuf\"\335\017\n\007Setting\022&\n" +
+      "\n\rConfig2.proto\022\010protobuf\"\334\017\n\007Setting\022&\n" +
       "\005world\030\001 \001(\0132\027.protobuf.Setting.World\022(\n" +
       "\006player\030\002 \001(\0132\030.protobuf.Setting.Player\022" +
       "(\n\006system\030\003 \001(\0132\030.protobuf.Setting.Syste" +
@@ -6507,7 +6507,7 @@ public final class Configuration {
       "\003fov\030\001 \001(\002:\00290\022\031\n\nmouse_sens\030\002 \001(\002:\0050.07" +
       "5\022\034\n\016camera_bobbing\030\003 \001(\010:\004true\022&\n\030rende" +
       "r_first_person_view\030\004 \001(\010:\004true\022\031\n\013placi" +
-      "ng_box\030\005 \001(\010:\004true\032\254\007\n\006System\022\032\n\rmax_par" +
+      "ng_box\030\005 \001(\010:\004true\032\253\007\n\006System\022\032\n\rmax_par" +
       "ticles\030\001 \001(\005:\003256\022\026\n\013max_threads\030\004 \001(\005:\001" +
       "2\022\031\n\013save_chunks\030\005 \001(\010:\004true\022\036\n\020chunk_ca",
       "che_size\030\006 \001(\005:\0042048\022\033\n\016max_chunk_VBOs\030\007" +
@@ -6527,12 +6527,12 @@ public final class Configuration {
       "100\022\027\n\010vignette\030\031 \001(\010:\005false\022\034\n\reye_adap" +
       "ation\030\032 \001(\010:\005false\022\024\n\005bloom\030\033 \001(\010:\005false" +
       "\022\032\n\013motion_blur\030\034 \001(\010:\005false\022\023\n\004ssao\030\035 \001" +
-      "(\010:\005false\022\031\n\nfilm_grain\030\036 \001(\010:\005false\022\026\n\007" +
-      "outline\030\037 \001(\010:\005false\032*\n\010CloudRes\022\016\n\001x\030\001 " +
-      "\001(\002:\003512\022\016\n\001y\030\002 \001(\002:\003512\0327\n\013DisplayMode\022",
-      "\023\n\005width\030\001 \001(\005:\0041280\022\023\n\006height\030\002 \001(\005:\00372" +
-      "0B*\n\027org.terasology.protobufB\rConfigurat" +
-      "ionH\001"
+      "(\010:\005false\022\031\n\nfilm_grain\030\036 \001(\010:\005false\022\025\n\007" +
+      "outline\030\037 \001(\010:\004true\032*\n\010CloudRes\022\016\n\001x\030\001 \001" +
+      "(\002:\003512\022\016\n\001y\030\002 \001(\002:\003512\0327\n\013DisplayMode\022\023",
+      "\n\005width\030\001 \001(\005:\0041280\022\023\n\006height\030\002 \001(\005:\003720" +
+      "B*\n\027org.terasology.protobufB\rConfigurati" +
+      "onH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {

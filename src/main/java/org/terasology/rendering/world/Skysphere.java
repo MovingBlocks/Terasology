@@ -29,6 +29,7 @@ import static org.lwjgl.opengl.GL11.glNewList;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.List;
 
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector4d;
@@ -42,6 +43,8 @@ import org.lwjgl.util.glu.Sphere;
 import org.terasology.asset.Assets;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.TeraMath;
+import org.terasology.properties.IPropertyProvider;
+import org.terasology.properties.Property;
 import org.terasology.rendering.shader.ShaderProgram;
 
 /**
@@ -50,13 +53,15 @@ import org.terasology.rendering.shader.ShaderProgram;
  * @author Anthony Kireev <adeon.k87@gmail.com>
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class Skysphere {
+public class Skysphere implements IPropertyProvider {
 
     private static int _displayListSphere = -1;
     private static final float PI = 3.1415926f;
 
     /* SKY */
-    private double _turbidity = 4.0f, _sunPosAngle = 0.1f;
+    private Property turbidity = new Property("turbidity", 14.0f, 0.0f, 100.0f);
+
+    private float _sunPosAngle = 0.1f;
     private static IntBuffer _textureIds;
 
     private final WorldRenderer _parent;
@@ -112,7 +117,7 @@ public class Skysphere {
 
         Vector3d zenithColor = new Vector3d();
 
-        if (sunNormalise.y >= -0.35)
+        if (sunNormalise.y >= -0.05)
             zenithColor = getAllWeatherZenith((float) sunNormalise.y);
 
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("sky");
@@ -121,11 +126,9 @@ public class Skysphere {
         shader.setInt("texCubeStars", 0);
         shader.setInt("texCubeSky", 1);
         shader.setFloat4("sunPos", 0.0f, (float) java.lang.Math.cos(_sunPosAngle), (float) java.lang.Math.sin(_sunPosAngle), 1.0f);
-        shader.setFloat("time", _parent.getWorldProvider().getTimeInDays());
-        shader.setFloat("sunAngle", (float) _sunPosAngle);
-        shader.setFloat("turbidity", (float) _turbidity);
+        shader.setFloat("sunAngle", _sunPosAngle);
+        shader.setFloat("turbidity", (Float) turbidity.getValue());
         shader.setFloat3("zenith", (float) zenithColor.x, (float) zenithColor.y, (float) zenithColor.z);
-        shader.setFloat("daylight", (float) getDaylight());
 
         // Draw the skysphere
         drawSphere();
@@ -144,14 +147,14 @@ public class Skysphere {
         Vector4f cy2 = new Vector4f(0.00516f, -0.04153f, 0.08970f, -0.04214f);
         Vector4f cy3 = new Vector4f(0.26688f, 0.06670f, -0.26756f, 0.15346f);
 
-        double t2 = (float) java.lang.Math.pow(_turbidity, 2);
-        double chi = (4.0f / 9.0f - _turbidity / 120.0f) * (PI - 2.0f * thetaSun);
+        double t2 = (float) java.lang.Math.pow((Float) turbidity.getValue(), 2);
+        double chi = (4.0f / 9.0f - (Float) turbidity.getValue() / 120.0f) * (PI - 2.0f * thetaSun);
 
         Vector4f theta = new Vector4f(1, thetaSun, (float) java.lang.Math.pow(thetaSun, 2), (float) java.lang.Math.pow(thetaSun, 3));
 
-        double Y = (4.0453f * _turbidity - 4.9710f) * (float) java.lang.Math.tan(chi) - 0.2155f * _turbidity + 2.4192f;
-        double x = t2 * cx1.dot(theta) + _turbidity * cx2.dot(theta) + cx3.dot(theta);
-        double y = t2 * cy1.dot(theta) + _turbidity * cy2.dot(theta) + cy3.dot(theta);
+        double Y = (4.0453f * (Float) turbidity.getValue() - 4.9710f) * (float) java.lang.Math.tan(chi) - 0.2155f * (Float) turbidity.getValue() + 2.4192f;
+        double x = t2 * cx1.dot(theta) + (Float) turbidity.getValue() * cx2.dot(theta) + cx3.dot(theta);
+        double y = t2 * cy1.dot(theta) + (Float) turbidity.getValue() * cy2.dot(theta) + cy3.dot(theta);
 
         return new Vector3d(Y, x, y);
     }
@@ -184,10 +187,6 @@ public class Skysphere {
         return _sunPosAngle;
     }
 
-    public double getTurbidity() {
-        return _turbidity;
-    }
-
     public double getDaylight() {
         double angle = java.lang.Math.toDegrees(TeraMath.clamp(java.lang.Math.cos(_sunPosAngle)));
         double daylight = 1.0;
@@ -197,5 +196,10 @@ public class Skysphere {
         }
 
         return daylight;
+    }
+
+    @Override
+    public void addPropertiesToList(List<Property> properties) {
+        properties.add(turbidity);
     }
 }
