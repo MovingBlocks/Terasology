@@ -45,7 +45,7 @@ import org.terasology.game.TerasologyEngine;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.console.SimpleMessageEvent;
-import org.terasology.logic.manager.AudioManager;
+import org.terasology.audio.AudioManager;
 import org.terasology.logic.manager.CommandManager;
 import org.terasology.logic.manager.CommandManager.CommandInfo;
 import org.terasology.logic.manager.Config;

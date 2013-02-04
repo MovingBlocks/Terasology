@@ -25,7 +25,7 @@ import org.terasology.game.bootstrap.EntitySystemBuilder;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.logic.manager.AudioManager;
+import org.terasology.audio.AudioManager;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.network.ClientComponent;

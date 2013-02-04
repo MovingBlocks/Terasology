@@ -17,9 +17,11 @@ package org.terasology.entitySystem.pojo;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Predicates;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -68,7 +70,8 @@ public class PojoEventSystem implements EventSystem {
 
     private static final Logger logger = LoggerFactory.getLogger(PojoEventSystem.class);
 
-    private Map<Class<? extends Event>, Multimap<Class<? extends Component>, EventHandlerInfo>> componentSpecificHandlers = Maps.newHashMap();
+    private Map<Class<? extends Event>, ListMultimap<Class<? extends Component>, EventHandlerInfo>> componentSpecificHandlers = Maps.newHashMap();
+    private ListMultimap<Class<? extends Event>, EventHandlerInfo> generalHandlers = ArrayListMultimap.create();
     private Comparator<EventHandlerInfo> priorityComparator = new EventHandlerPriorityComparator();
 
     // Event metadata
@@ -146,10 +149,14 @@ public class PojoEventSystem implements EventSystem {
                 if (types.length == 2 && Event.class.isAssignableFrom(types[0]) && EntityRef.class.isAssignableFrom(types[1])) {
                     logger.debug("Found method: " + method.toString());
                     ReflectedEventHandlerInfo handlerInfo = new ReflectedEventHandlerInfo(handler, method, receiveEventAnnotation.priority(), receiveEventAnnotation.components());
-                    for (Class<? extends Component> c : receiveEventAnnotation.components()) {
-                        addEventHandler((Class<? extends Event>) types[0], handlerInfo, c);
-                        for (Class<? extends Event> childType : childEvents.get((Class<? extends Event>) types[0])) {
-                            addEventHandler(childType, handlerInfo, c);
+                    if (receiveEventAnnotation.components().length == 0) {
+                        generalHandlers.put((Class<? extends Event>) types[0], handlerInfo);
+                    } else {
+                        for (Class<? extends Component> c : receiveEventAnnotation.components()) {
+                            addEventHandler((Class<? extends Event>) types[0], handlerInfo, c);
+                            for (Class<? extends Event> childType : childEvents.get((Class<? extends Event>) types[0])) {
+                                addEventHandler(childType, handlerInfo, c);
+                            }
                         }
                     }
                 } else {
@@ -160,9 +167,9 @@ public class PojoEventSystem implements EventSystem {
     }
 
     private void addEventHandler(Class<? extends Event> type, EventHandlerInfo handlerInfo, Class<? extends Component> c) {
-        Multimap<Class<? extends Component>, EventHandlerInfo> componentMap = componentSpecificHandlers.get(type);
+        ListMultimap<Class<? extends Component>, EventHandlerInfo> componentMap = componentSpecificHandlers.get(type);
         if (componentMap == null) {
-            componentMap = HashMultimap.create();
+            componentMap = ArrayListMultimap.create();
             componentSpecificHandlers.put(type, componentMap);
         }
         componentMap.put(c, handlerInfo);
@@ -265,9 +272,9 @@ public class PojoEventSystem implements EventSystem {
             NetworkComponent netComp = entity.getComponent(NetworkComponent.class);
             BlockComponent blockComp = entity.getComponent(BlockComponent.class);
             if (netComp != null || blockComp != null) {
-                EntityRef instigatorClient = EntityRef.NULL;
+                Client instigatorClient = null;
                 if (metadata.isSkipInstigator() && event instanceof NetworkEvent) {
-                    instigatorClient = networkSystem.getOwnerEntity(((NetworkEvent) event).getInstigator());
+                    instigatorClient = networkSystem.getOwner(((NetworkEvent) event).getInstigator());
                 }
                 for (Client client : networkSystem.getPlayers()) {
                     if (!client.equals(instigatorClient)) {
@@ -296,6 +303,7 @@ public class PojoEventSystem implements EventSystem {
 
     private Set<EventHandlerInfo> selectEventHandlers(Class<? extends Event> eventType, EntityRef entity) {
         Set<EventHandlerInfo> result = Sets.newHashSet();
+        result.addAll(generalHandlers.get(eventType));
         Multimap<Class<? extends Component>, EventHandlerInfo> handlers = componentSpecificHandlers.get(eventType);
         if (handlers == null)
             return result;

@@ -16,24 +16,28 @@
 
 package org.terasology.world.block;
 
+import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
+import org.terasology.audio.events.PlaySoundForOwnerEvent;
 import org.terasology.components.ItemComponent;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.manager.AudioManager;
+import org.terasology.audio.AudioManager;
 import org.terasology.physics.CollideEvent;
 
 /**
  * @author Immortius
  */
-@RegisterSystem
+@RegisterSystem(RegisterMode.AUTHORITY)
 public class BlockPickupSystem implements ComponentSystem {
 
     private BlockItemFactory blockItemFactory;
@@ -49,7 +53,7 @@ public class BlockPickupSystem implements ComponentSystem {
         if (itemComp != null && !itemComp.container.exists()) {
             blockItem.destroy();
         } else {
-            AudioManager.play(new AssetUri(AssetType.SOUND, "engine:Loot"));
+            event.getOtherEntity().send(new PlaySoundForOwnerEvent(Assets.getSound("engine:Loot"), 1.0f));
             entity.destroy();
         }
     }

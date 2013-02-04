@@ -31,7 +31,7 @@ import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.manager.AudioManager;
+import org.terasology.audio.AudioManager;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.physics.BulletPhysics;

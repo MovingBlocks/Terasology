@@ -27,7 +27,7 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.Timer;
 import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.manager.AudioManager;
+import org.terasology.audio.AudioManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.manager.PostProcessingRenderer;
@@ -60,9 +60,6 @@ import org.terasology.world.WorldView;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
-import org.terasology.world.chunks.ChunkStore;
-import org.terasology.world.chunks.store.ChunkStoreGZip;
-import org.terasology.world.chunks.store.ChunkStoreProtobuf;
 
 import javax.imageio.ImageIO;
 import javax.vecmath.Vector3f;

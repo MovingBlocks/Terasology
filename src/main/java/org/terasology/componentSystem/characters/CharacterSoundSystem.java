@@ -28,7 +28,7 @@ import org.terasology.entitySystem.RegisterMode;
 import org.terasology.events.FootstepEvent;
 import org.terasology.events.JumpEvent;
 import org.terasology.events.VerticalCollisionEvent;
-import org.terasology.logic.manager.AudioManager;
+import org.terasology.audio.AudioManager;
 import org.terasology.logic.manager.SoundManager;
 import org.terasology.utilities.FastRandom;
 
@@ -57,7 +57,7 @@ public class CharacterSoundSystem implements ComponentSystem {
             CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
             if (characterSounds.footstepSounds.size() > 0) {
                 Sound sound = characterSounds.footstepSounds.get(random.randomIntAbs(characterSounds.footstepSounds.size()));
-                AudioManager.play(sound, new Vector3d(location.getWorldPosition()), characterSounds.footstepVolume, SoundManager.PRIORITY_NORMAL);
+                AudioManager.play(sound, location.getWorldPosition(), characterSounds.footstepVolume, SoundManager.PRIORITY_NORMAL);
             }
         }
     }
@@ -71,7 +71,7 @@ public class CharacterSoundSystem implements ComponentSystem {
             CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
             if (characterSounds.footstepSounds.size() > 0) {
                 Sound sound = characterSounds.footstepSounds.get(random.randomIntAbs(characterSounds.footstepSounds.size()));
-                AudioManager.play(sound, new Vector3d(location.getWorldPosition()), 0.8f, SoundManager.PRIORITY_NORMAL);
+                AudioManager.play(sound, location.getWorldPosition(), 0.8f, SoundManager.PRIORITY_NORMAL);
             }
         }
     }

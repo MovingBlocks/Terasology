@@ -9,7 +9,7 @@ import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.events.inventory.ReceiveItemEvent;
-import org.terasology.logic.manager.AudioManager;
+import org.terasology.audio.AudioManager;
 import org.terasology.physics.CollideEvent;
 
 

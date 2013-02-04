@@ -25,7 +25,7 @@ import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.events.ActivateEvent;
-import org.terasology.logic.manager.AudioManager;
+import org.terasology.audio.AudioManager;
 import org.terasology.logic.manager.SoundManager;
 import org.terasology.utilities.FastRandom;
 

@@ -50,9 +50,9 @@ public class BasicSoundSource implements SoundSource {
     protected float targetGain = 1.0f;
     protected boolean fade = false;
 
-    protected Vector3d position = new Vector3d();
-    protected Vector3d velocity = new Vector3d();
-    protected Vector3d direction = new Vector3d();
+    protected Vector3f position = new Vector3f();
+    protected Vector3f velocity = new Vector3f();
+    protected Vector3f direction = new Vector3f();
 
     protected boolean absolutePosition = false;
 
@@ -142,7 +142,7 @@ public class BasicSoundSource implements SoundSource {
         setGain(1.0f);
         setAbsolute(false);
 
-        Vector3d zeroVector = new Vector3d();
+        Vector3f zeroVector = new Vector3f();
         setPosition(zeroVector);
         setVelocity(zeroVector);
         setDirection(zeroVector);
@@ -224,19 +224,19 @@ public class BasicSoundSource implements SoundSource {
     }
 
     @Override
-    public Vector3d getVelocity() {
+    public Vector3f getVelocity() {
         return velocity;
     }
 
     @Override
-    public SoundSource setVelocity(Vector3d velocity) {
+    public SoundSource setVelocity(Vector3f velocity) {
         if (velocity == null || this.velocity.equals(velocity)) {
             return this;
         }
 
         this.velocity.set(velocity);
 
-        AL10.alSource3f(getSourceId(), AL10.AL_VELOCITY, (float) velocity.x, (float) velocity.y, (float) velocity.z);
+        AL10.alSource3f(getSourceId(), AL10.AL_VELOCITY, velocity.x, velocity.y, velocity.z);
 
         OpenALException.checkState("Setting sound source velocity");
 
@@ -244,12 +244,12 @@ public class BasicSoundSource implements SoundSource {
     }
 
     @Override
-    public Vector3d getPosition() {
+    public Vector3f getPosition() {
         return position;
     }
 
     @Override
-    public SoundSource setPosition(Vector3d position) {
+    public SoundSource setPosition(Vector3f position) {
         if (position == null || this.position.equals(position)) {
             return this;
         }
@@ -262,12 +262,12 @@ public class BasicSoundSource implements SoundSource {
     }
 
     @Override
-    public SoundSource setDirection(Vector3d direction) {
+    public SoundSource setDirection(Vector3f direction) {
         if (direction == null || this.direction.equals(direction)) {
             return this;
         }
 
-        AL10.alSource3f(getSourceId(), AL10.AL_DIRECTION, (float) direction.x, (float) direction.y, (float) direction.z);
+        AL10.alSource3f(getSourceId(), AL10.AL_DIRECTION, direction.x, direction.y, direction.z);
 
         OpenALException.checkState("Setting sound source direction");
 
@@ -277,7 +277,7 @@ public class BasicSoundSource implements SoundSource {
     }
 
     @Override
-    public Vector3d getDirection() {
+    public Vector3f getDirection() {
         return direction;
     }
 
@@ -366,8 +366,8 @@ public class BasicSoundSource implements SoundSource {
         return sourceId;
     }
 
-    protected void updatePosition(Vector3d position) {
-        float[] pos = new float[]{(float) position.x, (float) position.y, (float) position.z};
+    protected void updatePosition(Vector3f position) {
+        float[] pos = new float[]{position.x, position.y, position.z};
 
         if (isAbsolute()) {
             Vector3f cameraPos = getCameraPosition();

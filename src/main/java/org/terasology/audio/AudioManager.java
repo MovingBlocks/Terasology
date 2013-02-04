@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.manager;
+package org.terasology.audio;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,15 +25,12 @@ import javax.vecmath.Vector3f;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.audio.OpenALManager;
-import org.terasology.audio.Sound;
-import org.terasology.audio.SoundPool;
-import org.terasology.audio.SoundSource;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.logic.characters.CharacterMovementComponent;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
+import org.terasology.logic.manager.SoundManager;
 
 /**
  * Simple managing class for loading and accessing audio files.
@@ -53,7 +50,7 @@ public abstract class AudioManager implements SoundManager {
     protected AudioManager() {
     }
 
-    protected abstract boolean checkDistance(Vector3d soundSource);
+    protected abstract boolean checkDistance(Vector3f soundSource);
 
     /**
      * Returns sound pool with specified name
@@ -160,7 +157,7 @@ public abstract class AudioManager implements SoundManager {
      * @param gain Sound source gain
      * @return Sound source object, or null if there is no free sound sources in effects pool
      */
-    public static SoundSource source(AssetUri uri, Vector3d pos, float gain, int priority) {
+    public static SoundSource source(AssetUri uri, Vector3f pos, float gain, int priority) {
         SoundSource source = source(uri, priority);
         if (source == null) {
             return null;
@@ -177,7 +174,7 @@ public abstract class AudioManager implements SoundManager {
      * @param gain  Sound source gain
      * @return Sound source object, or null if there is no free sound sources in effects pool
      */
-    public static SoundSource source(Sound sound, Vector3d pos, float gain, int priority) {
+    public static SoundSource source(Sound sound, Vector3f pos, float gain, int priority) {
         SoundSource source = source(sound, priority);
 
         if (source == null) {
@@ -216,6 +213,10 @@ public abstract class AudioManager implements SoundManager {
         return play(uri, null, gain, PRIORITY_NORMAL);
     }
 
+    public static SoundSource play(Sound sound, float gain) {
+        return play(sound, (Vector3f)null, gain, PRIORITY_NORMAL);
+    }
+
     /**
      * Plays specified sound at specified position and with specified gain
      *
@@ -224,7 +225,7 @@ public abstract class AudioManager implements SoundManager {
      * @param gain Sound source gain
      * @return Sound source object, or null if there is no free sound sources in effects pool
      */
-    public static SoundSource play(AssetUri uri, Vector3d pos, float gain, int priority) {
+    public static SoundSource play(AssetUri uri, Vector3f pos, float gain, int priority) {
         SoundSource source = source(uri, pos, gain, priority);
 
         if (source == null) {
@@ -242,26 +243,8 @@ public abstract class AudioManager implements SoundManager {
      * @param gain  Sound source gain
      * @return Sound source object, or null if there is no free sound sources in effects pool
      */
-    public static SoundSource play(Sound sound, Vector3d pos, float gain, int priority) {
-        SoundSource source = source(sound, pos, gain, priority);
-
-        if (source == null) {
-            return null;
-        }
-
-        return source.setGain(gain).play();
-    }
-
-    /**
-     * Plays specified sound at specified position and with specified gain
-     *
-     * @param sound Sound object
-     * @param pos   Sound source position
-     * @param gain  Sound source gain
-     * @return Sound source object, or null if there is no free sound sources in effects pool
-     */
     public static SoundSource play(Sound sound, Vector3f pos, float gain, int priority) {
-        SoundSource source = source(sound, new Vector3d(pos), gain, priority);
+        SoundSource source = source(sound, pos, gain, priority);
 
         if (source == null) {
             return null;
@@ -283,14 +266,14 @@ public abstract class AudioManager implements SoundManager {
         Vector3f pos = getEntityPosition(entity);
         if (pos == null) return null;
 
-        SoundSource source = source(sound, new Vector3d(pos), gain, priority);
+        SoundSource source = source(sound, pos, gain, priority);
 
         if (source == null) {
             // Nof free sound sources
             return null;
         }
 
-        return source.setVelocity(new Vector3d(getEntityVelocity(entity))).setDirection(new Vector3d(getEntityDirection(entity))).play();
+        return source.setVelocity(getEntityVelocity(entity)).setDirection(getEntityDirection(entity)).play();
     }
 
     private static Vector3f getEntityPosition(EntityRef entity) {
