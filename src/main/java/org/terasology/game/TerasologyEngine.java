@@ -89,7 +89,7 @@ public class TerasologyEngine implements GameEngine {
     private final ThreadPoolExecutor threadPool = (ThreadPoolExecutor) Executors.newCachedThreadPool();
 
     private Canvas customViewPort = null;
-    static private boolean editorInFocus = false;
+    private static boolean editorInFocus = false;
     private static boolean editorAttached = false;
 
     public TerasologyEngine() {

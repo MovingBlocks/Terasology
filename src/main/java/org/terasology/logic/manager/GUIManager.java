@@ -315,7 +315,7 @@ public class GUIManager implements EventHandlerSystem {
 	 * Check whether the mouse of the current focused window is visible and can be moved on the display.
 	 */
     public void checkMouseGrabbing() {
-        if (isConsumingInput() || renderer.getWindowFocused() == null || !TerasologyEngine.isEditorInFocus()) {
+        if (isConsumingInput() || renderer.getWindowFocused() == null || TerasologyEngine.isEditorInFocus()) {
             Mouse.setGrabbed(false);
         } else {
             Mouse.setGrabbed(true);
