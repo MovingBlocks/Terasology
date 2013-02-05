@@ -21,6 +21,7 @@ import org.terasology.game.GameEngine;
 import org.terasology.game.TerasologyEngine;
 import org.terasology.game.modes.StateMainMenu;
 import org.terasology.logic.manager.PathManager;
+import org.terasology.properties.SceneProperties;
 import org.terasology.ui.MainWindow;
 
 import javax.swing.*;
@@ -33,18 +34,26 @@ import javax.swing.*;
 @SuppressWarnings("serial")
 public final class TeraEd extends JWindow {
 
-    private static final MainWindow mainWindow = new MainWindow();
-    private static TerasologyEngine engine = new TerasologyEngine();
+    private static MainWindow mainWindow;
+    private static TerasologyEngine engine;
     private static final Logger logger = LoggerFactory.getLogger(TeraEd.class);
 
+    private static final SceneProperties sceneProperties = new SceneProperties();
+
     public static void main(String[] args) {
+        engine = new TerasologyEngine();
+        mainWindow = new MainWindow();
+
         try {
             PathManager.getInstance().determineRootPath(true);
 
-            TerasologyEngine.setRunningInEditorMode(true);
+            TerasologyEngine.setEditorAttached(true);
             engine.setCustomViewPort(mainWindow.getViewPort());
 
             engine.init();
+
+            mainWindow.initPostEngine();
+
             engine.run(new StateMainMenu());
             engine.dispose();
         } catch (Throwable t) {
@@ -61,4 +70,7 @@ public final class TeraEd extends JWindow {
         return mainWindow;
     }
 
+    public static SceneProperties getSceneProperties() {
+        return sceneProperties;
+    }
 }

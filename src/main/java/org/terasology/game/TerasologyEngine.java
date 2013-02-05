@@ -89,7 +89,8 @@ public class TerasologyEngine implements GameEngine {
     private final ThreadPoolExecutor threadPool = (ThreadPoolExecutor) Executors.newCachedThreadPool();
 
     private Canvas customViewPort = null;
-    static private boolean runningInEditorMode = false;
+    private static boolean editorInFocus = false;
+    private static boolean editorAttached = false;
 
     public TerasologyEngine() {
     }
@@ -419,7 +420,7 @@ public class TerasologyEngine implements GameEngine {
             Keyboard.create();
             Keyboard.enableRepeatEvents(true);
             Mouse.create();
-            if (!TerasologyEngine.isRunningInEditorMode()) {
+            if (!TerasologyEngine.isEditorInFocus()) {
                 Mouse.setGrabbed(true);
             }
         } catch (LWJGLException e) {
@@ -470,7 +471,7 @@ public class TerasologyEngine implements GameEngine {
         while (running && !Display.isCloseRequested()) {
 
             // Only process rendering and updating once a second
-            if (!Display.isActive() && !TerasologyEngine.isRunningInEditorMode()) {
+            if (!Display.isActive() && !TerasologyEngine.isEditorAttached()) {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -559,11 +560,19 @@ public class TerasologyEngine implements GameEngine {
         customViewPort = viewPort;
     }
 
-    public static void setRunningInEditorMode(boolean editor) {
-        runningInEditorMode = editor;
+    public static void setEditorInFocus(boolean focus) {
+        editorInFocus = focus;
     }
 
-    public static boolean isRunningInEditorMode() {
-        return runningInEditorMode;
+    public static boolean isEditorInFocus() {
+        return editorInFocus;
+    }
+
+    public static void setEditorAttached(boolean attached) {
+        editorAttached = attached;
+    }
+
+    public static boolean isEditorAttached() {
+        return editorAttached;
     }
 }

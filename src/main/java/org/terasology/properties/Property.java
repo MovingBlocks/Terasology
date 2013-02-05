@@ -15,6 +15,8 @@
  */
 package org.terasology.properties;
 
+import java.text.DecimalFormat;
+
 /**
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
@@ -24,6 +26,8 @@ public class Property {
     private Object value;
     private Class valueType;
     private String title;
+
+    private static final DecimalFormat defaultDecimalFormat = new DecimalFormat("0.0000000");
 
     private Float minValue = new Float(0.0f);
     private Float maxValue = new Float(1.0f);
@@ -80,6 +84,10 @@ public class Property {
 
     @Override
     public String toString() {
+        if (valueType == Float.class) {
+            return defaultDecimalFormat.format(value);
+        }
+
         return String.valueOf(value);
     }
 

@@ -29,7 +29,7 @@ import java.util.List;
  */
 public class ShaderParametersPrePost extends ShaderParametersBase {
 
-    private Property outlineDepthThreshold = new Property("outlineDepthThreshold", 0.05f);
+    private Property outlineDepthThreshold = new Property("outlineDepthThreshold", 0.1f);
     private Property outlineThickness = new Property("outlineThickness", 1.0f);
 
     @Override

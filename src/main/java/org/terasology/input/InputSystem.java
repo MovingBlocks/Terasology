@@ -22,6 +22,7 @@ import org.lwjgl.input.Mouse;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.EventSystem;
 import org.terasology.game.CoreRegistry;
+import org.terasology.game.TerasologyEngine;
 import org.terasology.input.events.InputEvent;
 import org.terasology.input.events.KeyDownEvent;
 import org.terasology.input.events.KeyEvent;
@@ -163,6 +164,9 @@ public class InputSystem implements EventHandlerSystem {
     }
 
     private void processMouseInput(float delta) {
+        if (TerasologyEngine.isEditorInFocus())
+            return;
+
         //process mouse clicks
         while (Mouse.next()) {
             //left/right/middle mouse click

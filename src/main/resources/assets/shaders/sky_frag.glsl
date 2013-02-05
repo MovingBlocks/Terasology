@@ -19,13 +19,13 @@ varying vec3 skyVec;
 varying vec3 skyVecR;
 varying	vec4 McPosition;
 varying	float lv;
-uniform	vec4  sunPos;
+uniform	vec4 sunPos;
 
 uniform samplerCube texCubeSky;
 uniform samplerCube texCubeStars;
 
-vec4 	eyePos   = vec4(0.0, 0.0, 0.0, 1.0);
-float	colorExp = 12.0;
+vec4 eyePos = vec4(0.0, 0.0, 0.0, 1.0);
+uniform float colorExp = 12.0;
 
 vec3 convertColor() {
     if (colorYxy == vec3(0.0, 0.0, 0.0))
@@ -73,4 +73,5 @@ void main () {
     skyColor += alpha * textureCube (texCubeStars, skyVecR);
 
     gl_FragData[0].rgba = skyColor;
+    gl_FragData[1].rgba = vec4(0, 0, 0, 0);
 }

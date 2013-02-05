@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-uniform float   ssaoStrength = 0.1;
-uniform float   ssaoTotalStrength = 1.0;
-uniform float   ssaoFalloff = 0.000002;
-uniform float   ssaoRad = 0.006;
+uniform float   ssaoStrength;
+uniform float   ssaoTotalStrength;
+uniform float   ssaoFalloff;
+uniform float   ssaoRad;
 
 uniform vec2    noiseSize = vec2(64.0, 64.0);
 uniform vec2    renderTargetSize = vec2(1280.0, 720.0);

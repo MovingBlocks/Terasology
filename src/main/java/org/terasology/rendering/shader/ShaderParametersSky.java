@@ -30,35 +30,21 @@ import java.util.List;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ShaderParametersBase  implements IPropertyProvider, IShaderParameters {
+public class ShaderParametersSky extends ShaderParametersBase {
 
-    public ShaderParametersBase() {
+    Property colorExp = new Property("colorExp", 12.0f, 0.0f, 100.0f);
+
+    public ShaderParametersSky() {
     }
 
     @Override
     public void applyParameters(ShaderProgram program) {
-        program.setFloat("viewingDistance", Config.getInstance().getActiveViewingDistance() * 8.0f);
-
-        WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
-        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-        WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
-
-        if (worldRenderer != null) {
-            program.setFloat("daylight", (float) worldRenderer.getDaylight());
-            program.setFloat("swimming", worldRenderer.isUnderWater() ? 1.0f : 0.0f);
-            program.setFloat("tick", (float) worldRenderer.getTick());
-        }
-
-        if (localPlayer != null) {
-            program.setInt("carryingTorch", localPlayer.isCarryingTorch() ? 1 : 0);
-        }
-
-        if (worldProvider != null) {
-            program.setFloat("time", worldProvider.getTimeInDays());
-        }
+        super.applyParameters(program);
+        program.setFloat("colorExp", (Float) colorExp.getValue());
     }
 
     @Override
     public void addPropertiesToList(List<Property> properties) {
+        properties.add(colorExp);
     }
 }

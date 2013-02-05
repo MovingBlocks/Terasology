@@ -21,6 +21,11 @@ import java.util.List;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public abstract class PropertyProvider {
+public interface IPropertyProvider {
+    /**
+     * Adds the properties of this Object to the given property list.
+     *
+     * @param properties
+     */
     public abstract void addPropertiesToList(List<Property> properties);
 }

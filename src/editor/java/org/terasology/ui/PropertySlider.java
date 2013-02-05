@@ -21,20 +21,29 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import java.awt.*;
 
 /**
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class EditorPropertySlider extends JPanel implements ChangeListener {
+public class PropertySlider extends JPanel implements ChangeListener {
 
     private JSlider slider;
     private Property activeProperty = null;
-    private TitledBorder titledBorder;
 
-    public EditorPropertySlider() {
+    private BorderLayout borderLayout;
+    private TitledBorder titledBorder;
+    private JLabel label;
+
+    public PropertySlider() {
         titledBorder = new TitledBorder("");
         setBorder(titledBorder);
+
+        borderLayout = new BorderLayout();
+        setLayout(borderLayout);
+
+        label = new JLabel("");
 
         slider = new JSlider();
         slider.setMinimum(0);
@@ -43,10 +52,11 @@ public class EditorPropertySlider extends JPanel implements ChangeListener {
         slider.setMajorTickSpacing(10);
         slider.addChangeListener(this);
 
-        add(slider);
+        add(slider, BorderLayout.CENTER);
+        add(label, BorderLayout.EAST);
     }
 
-    public EditorPropertySlider(Property property) {
+    public PropertySlider(Property property) {
         this();
         setActiveProperty(property);
     }
@@ -75,6 +85,7 @@ public class EditorPropertySlider extends JPanel implements ChangeListener {
             float range = Math.abs(activeProperty.getMaxValue() - activeProperty.getMinValue());
             float val = (slider.getValue() / 100.0f) * range + activeProperty.getMinValue();
             activeProperty.setValue(val);
+            label.setText(activeProperty.toString());
         }
     }
 }
