@@ -125,8 +125,10 @@ public class Skysphere implements IPropertyProvider {
 
         shader.setInt("texCubeStars", 0);
         shader.setInt("texCubeSky", 1);
+
         shader.setFloat4("sunPos", 0.0f, (float) java.lang.Math.cos(_sunPosAngle), (float) java.lang.Math.sin(_sunPosAngle), 1.0f);
         shader.setFloat("sunAngle", _sunPosAngle);
+
         shader.setFloat("turbidity", (Float) turbidity.getValue());
         shader.setFloat3("zenith", (float) zenithColor.x, (float) zenithColor.y, (float) zenithColor.z);
 
@@ -147,10 +149,10 @@ public class Skysphere implements IPropertyProvider {
         Vector4f cy2 = new Vector4f(0.00516f, -0.04153f, 0.08970f, -0.04214f);
         Vector4f cy3 = new Vector4f(0.26688f, 0.06670f, -0.26756f, 0.15346f);
 
-        double t2 = (float) java.lang.Math.pow((Float) turbidity.getValue(), 2);
+        double t2 = (Float) turbidity.getValue() * (Float) turbidity.getValue();
         double chi = (4.0f / 9.0f - (Float) turbidity.getValue() / 120.0f) * (PI - 2.0f * thetaSun);
 
-        Vector4f theta = new Vector4f(1, thetaSun, (float) java.lang.Math.pow(thetaSun, 2), (float) java.lang.Math.pow(thetaSun, 3));
+        Vector4f theta = new Vector4f(1, thetaSun, thetaSun * thetaSun, thetaSun * thetaSun * thetaSun);
 
         double Y = (4.0453f * (Float) turbidity.getValue() - 4.9710f) * (float) java.lang.Math.tan(chi) - 0.2155f * (Float) turbidity.getValue() + 2.4192f;
         double x = t2 * cx1.dot(theta) + (Float) turbidity.getValue() * cx2.dot(theta) + cx3.dot(theta);

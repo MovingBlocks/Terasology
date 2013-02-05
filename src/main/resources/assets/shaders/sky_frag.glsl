@@ -73,4 +73,5 @@ void main () {
     skyColor += alpha * textureCube (texCubeStars, skyVecR);
 
     gl_FragData[0].rgba = skyColor;
+    gl_FragData[1].rgba = vec4(0, 0, 0, 0);
 }
