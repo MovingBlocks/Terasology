@@ -15,6 +15,7 @@
  */
 package org.terasology.game.modes;
 
+import com.leapmotion.leap.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
@@ -29,6 +30,7 @@ import org.terasology.game.GameEngine;
 import org.terasology.game.TerasologyConstants;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.InputSystem;
+import org.terasology.input.LeapSystem;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
@@ -61,6 +63,7 @@ public class StateSinglePlayer implements GameState {
     private EntityManager entityManager;
     private CameraTargetSystem cameraTargetSystem;
     private InputSystem inputSystem;
+    private LeapSystem leapSystem;
 
     /* GAME LOOP */
     private boolean pauseGame = false;
@@ -77,6 +80,11 @@ public class StateSinglePlayer implements GameState {
         entityManager = CoreRegistry.get(EntityManager.class);
         cameraTargetSystem = CoreRegistry.get(CameraTargetSystem.class);
         inputSystem = CoreRegistry.get(InputSystem.class);
+
+        CoreRegistry.put(Controller.class, new Controller());
+        leapSystem = new LeapSystem();
+        CoreRegistry.put(LeapSystem.class, leapSystem);
+        componentSystemManager.register(leapSystem, "engine:LeapSystem");
 
         guiManager.openWindow(MenuControlSystem.HUD);
     }
@@ -123,6 +131,7 @@ public class StateSinglePlayer implements GameState {
     public void handleInput(float delta) {
         cameraTargetSystem.update();
         inputSystem.update(delta);
+        leapSystem.update(delta);
     }
 
     private boolean shouldUpdateWorld() {
