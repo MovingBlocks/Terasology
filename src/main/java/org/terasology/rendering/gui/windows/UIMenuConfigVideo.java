@@ -121,7 +121,7 @@ public class UIMenuConfigVideo extends UIWindow {
                     Config.getInstance().setSSAO(true);
                     Config.getInstance().setFilmGrain(true);
                     Config.getInstance().setOutline(true);
-                    Config.getInstance().setLightShafts(false);
+                    Config.getInstance().setLightShafts(true);
                     break;
                 }
                 

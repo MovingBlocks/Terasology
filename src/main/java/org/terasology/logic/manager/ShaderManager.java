@@ -84,7 +84,6 @@ public class ShaderManager {
         createAndStoreShaderProgram("particle", new ShaderParametersParticle());
         createAndStoreShaderProgram("block", new ShaderParametersBlock());
         createAndStoreShaderProgram("gelatinousCube", new ShaderParametersGelCube());
-        createAndStoreShaderProgram("clouds", new ShaderParametersDefault());
         createAndStoreShaderProgram("animateOpacity", new ShaderParametersDefault());
         //createAndStoreShaderProgram("genericMesh", new ShaderParametersGenericMesh());
     }

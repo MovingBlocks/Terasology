@@ -42,11 +42,11 @@ import static org.lwjgl.opengl.GL11.*;
 public class PostProcessingRenderer implements IPropertyProvider {
 
     private Property hdrExposureDefault = new Property("hdrExposureDefault", 2.5f, 0.0f, 10.0f);
-    private Property hdrMaxExposure = new Property("hdrMaxExposure", 4.0f, 0.0f, 10.0f);
-    private Property hdrMaxExposureNight = new Property("hdrMaxExposureNight", 1.0f, 0.0f, 10.0f);
+    private Property hdrMaxExposure = new Property("hdrMaxExposure", 8.0f, 0.0f, 10.0f);
+    private Property hdrMaxExposureNight = new Property("hdrMaxExposureNight", 3.0f, 0.0f, 10.0f);
     private Property hdrMinExposure = new Property("hdrMinExposure", 0.5f, 0.0f, 10.0f);
-    private Property hdrTargetLuminance = new Property("hdrTargetLuminance", 1.0f, 0.0f, 4.0f);
-    private Property hdrExposureAdjustmentSpeed = new Property("hdrExposureAdjustmentSpeed", 0.025f, 0.0f, 0.1f);
+    private Property hdrTargetLuminance = new Property("hdrTargetLuminance", 0.55f, 0.0f, 4.0f);
+    private Property hdrExposureAdjustmentSpeed = new Property("hdrExposureAdjustmentSpeed", 0.1f, 0.0f, 0.5f);
 
     private static final Logger logger = LoggerFactory.getLogger(PostProcessingRenderer.class);
 
@@ -210,7 +210,7 @@ public class PostProcessingRenderer implements IPropertyProvider {
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
 
-            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL14.GL_DEPTH_COMPONENT24, width, height, 0, GL11.GL_DEPTH_COMPONENT, ARBHalfFloatPixel.GL_HALF_FLOAT_ARB, (java.nio.ByteBuffer) null);
+            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL14.GL_DEPTH_COMPONENT16, width, height, 0, GL11.GL_DEPTH_COMPONENT, ARBHalfFloatPixel.GL_HALF_FLOAT_ARB, (java.nio.ByteBuffer) null);
 
             // Create depth render buffer object
             fbo._depthRboId = EXTFramebufferObject.glGenRenderbuffersEXT();

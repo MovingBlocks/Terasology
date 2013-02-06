@@ -23,18 +23,17 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
+import org.terasology.editor.properties.Property;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PostProcessingRenderer;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.block.Block;
 
 import java.nio.FloatBuffer;
+import java.util.List;
 
 /**
  * Shader parameters for the Post-processing shader program.
@@ -47,6 +46,8 @@ public class ShaderParametersPost extends ShaderParametersBase {
 
     Texture vignetteTexture = Assets.getTexture("engine:vignette");
     Texture noiseTexture = Assets.getTexture("engine:noise");
+
+    Property filmGrainIntensity = new Property("filmGrainIntensity", 0.1f, 0.0f, 1.0f);
 
     @Override
     public void applyParameters(ShaderProgram program) {
@@ -77,17 +78,11 @@ public class ShaderParametersPost extends ShaderParametersBase {
         scene.bindDepthTexture();
         program.setInt("texDepth", 4);
 
-        if (Config.getInstance().isLightShafts()) {
-            GL13.glActiveTexture(GL13.GL_TEXTURE6);
-            PostProcessingRenderer.getInstance().getFBO("lightShafts").bindTexture();
-            program.setInt("texLightShafts", 6);
-        }
-
         if (Config.getInstance().isFilmGrain()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE5);
             glBindTexture(GL11.GL_TEXTURE_2D, noiseTexture.getId());
             program.setInt("texNoise", 5);
-            program.setFloat("grainIntensity", 0.075f);
+            program.setFloat("grainIntensity", (Float) filmGrainIntensity.getValue());
             program.setFloat("noiseOffset", rand.randomPosFloat());
 
             FloatBuffer rtSize = BufferUtils.createFloatBuffer(2);
@@ -104,4 +99,8 @@ public class ShaderParametersPost extends ShaderParametersBase {
         }
     }
 
+    @Override
+    public void addPropertiesToList(List<Property> properties) {
+        properties.add(filmGrainIntensity);
+    }
 }

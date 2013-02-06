@@ -58,6 +58,12 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
         sobel.bindTexture();
         program.setInt("texEdges", 3);
 
+        if (Config.getInstance().isLightShafts()) {
+            GL13.glActiveTexture(GL13.GL_TEXTURE4);
+            PostProcessingRenderer.getInstance().getFBO("lightShafts").bindTexture();
+            program.setInt("texLightShafts", 4);
+        }
+
         program.setFloat("outlineDepthThreshold", (Float) outlineDepthThreshold.getValue());
         program.setFloat("outlineThickness", (Float) outlineThickness.getValue());
     }

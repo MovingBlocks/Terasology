@@ -14,15 +14,8 @@
  * limitations under the License.
  */
 
-varying vec4 lightScreenPos;
-
-uniform vec3 lightVector;
-uniform mat4 viewProjMatrix;
-
 void main()
 {
-    lightScreenPos = viewProjMatrix  * vec4(lightVector * viewingDistance, 1.0);
-
 	gl_Position = ftransform();
     gl_TexCoord[0] = gl_MultiTexCoord0;
     gl_FrontColor = gl_Color;

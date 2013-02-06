@@ -189,6 +189,12 @@ public class ShaderProgram {
         GL20.glUniform1f(id, f);
     }
 
+    public void setFloat2(String desc, float f1, float f2) {
+        enable();
+        int id = GL20.glGetUniformLocation(shaderProgram, desc);
+        GL20.glUniform2f(id, f1, f2);
+    }
+
     public void setFloat3(String desc, float f1, float f2, float f3) {
         enable();
         int id = GL20.glGetUniformLocation(shaderProgram, desc);

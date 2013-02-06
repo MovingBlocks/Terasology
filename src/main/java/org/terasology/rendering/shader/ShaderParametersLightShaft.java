@@ -16,18 +16,14 @@
 package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL13;
-import org.lwjgl.util.vector.Vector4f;
 import org.terasology.editor.properties.Property;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PostProcessingRenderer;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.WorldProvider;
 
 import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4d;
+import javax.vecmath.Vector4f;
 import java.util.List;
 
 /**
@@ -37,10 +33,10 @@ import java.util.List;
  */
 public class ShaderParametersLightShaft extends ShaderParametersBase {
 
-    private Property density = new Property("density", 0.8f, 0.0f, 1.0f);
-    private Property exposure = new Property("exposure", 0.35f, 0.0f, 1.0f);
-    private Property weight = new Property("weight", 0.21f, 0.0f, 1.0f);
-    private Property decay = new Property("decay", 0.79f, 0.0f, 1.0f);
+    private Property density = new Property("density", 1.5f, 0.0f, 10.0f);
+    private Property exposure = new Property("exposure", 0.0075f, 0.0f, 0.01f);
+    private Property weight = new Property("weight", 8.0f, 0.0f, 10.0f);
+    private Property decay = new Property("decay", 0.9f, 0.0f, 0.99f);
 
     @Override
     public void applyParameters(ShaderProgram program) {
@@ -51,8 +47,8 @@ public class ShaderParametersLightShaft extends ShaderParametersBase {
         scene.bindTexture();
         program.setInt("texScene", 0);
         GL13.glActiveTexture(GL13.GL_TEXTURE1);
-        scene.bindDepthTexture();
-        program.setInt("texDepth", 0);
+        scene.bindNormalsTexture();
+        program.setInt("texNormals", 0);
 
         program.setFloat("density", (Float) density.getValue());
         program.setFloat("exposure", (Float) exposure.getValue());
@@ -62,16 +58,23 @@ public class ShaderParametersLightShaft extends ShaderParametersBase {
         WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
         if (worldRenderer != null) {
             float sunAngle = worldRenderer.getSkysphere().getSunPosAngle();
-            Vector3f sunNormalise = new Vector3f(0.0f, (float) java.lang.Math.cos(sunAngle), (float) java.lang.Math.sin(sunAngle));
-            sunNormalise.normalize();
 
-            program.setFloat3("lightVector", sunNormalise.x, sunNormalise.y, sunNormalise.z);
-        }
+            Vector3f sunDirection = new Vector3f(0.0f, (float) java.lang.Math.cos(sunAngle), (float) java.lang.Math.sin(sunAngle));
+            sunDirection.normalize();
 
-        Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
+            Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
 
-        if (activeCamera != null) {
-            program.setMatrix4("viewProjMatrix", activeCamera.getViewProjectionMatrix());
+            Vector4f sunPositionWorldSpace4 = new Vector4f(sunDirection.x * 10000.0f, sunDirection.y * 10000.0f, sunDirection.z * 10000.0f, 1.0f);
+            Vector4f sunPositionScreenSpace = new Vector4f();
+            activeCamera.getViewProjectionMatrix().transform(sunPositionWorldSpace4, sunPositionScreenSpace);
+
+            sunPositionScreenSpace.x /= sunPositionScreenSpace.w;
+            sunPositionScreenSpace.y /= sunPositionScreenSpace.w;
+            sunPositionScreenSpace.z /= sunPositionScreenSpace.w;
+            sunPositionScreenSpace.w = 1.0f;
+
+            program.setFloat("lightDirDotViewDir", activeCamera.getViewingDirection().dot(sunDirection));
+            program.setFloat2("lightScreenPos", (sunPositionScreenSpace.x + 1.0f) / 2.0f, (sunPositionScreenSpace.y + 1.0f) / 2.0f);
         }
     }
 
