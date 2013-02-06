@@ -13,17 +13,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.terasology.ui;
+package org.terasology.editor.ui;
 
-import org.lwjgl.input.Mouse;
-import org.lwjgl.util.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 /**
  * TeraEd main class.

@@ -72,6 +72,7 @@ public class ShaderManager {
 
         createAndStoreShaderProgram("post", new ShaderParametersPost());
         createAndStoreShaderProgram("ssao", new ShaderParametersSSAO());
+        createAndStoreShaderProgram("lightshaft", new ShaderParametersLightShaft());
         createAndStoreShaderProgram("sobel", new ShaderParametersSobel());
         createAndStoreShaderProgram("prePost", new ShaderParametersPrePost());
         createAndStoreShaderProgram("highp", new ShaderParametersDefault());

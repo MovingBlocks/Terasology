@@ -18,7 +18,7 @@ package org.terasology.rendering.shader;
 import org.lwjgl.opengl.GL13;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PostProcessingRenderer;
-import org.terasology.properties.Property;
+import org.terasology.editor.properties.Property;
 
 import java.util.List;
 

@@ -446,6 +446,14 @@ public final class Config {
         return _setting.getSystemBuilder().getSsao();
     }
 
+    public void setLightShafts(boolean lightShafts) {
+        _setting.getSystemBuilder().setLightShafts(lightShafts);
+    }
+
+    public boolean isLightShafts() {
+        return _setting.getSystemBuilder().getLightShafts();
+    }
+
     public void setOutline(boolean outline) {
         _setting.getSystemBuilder().setOutline(outline);
     }

@@ -18,6 +18,7 @@
 #define BLUR_START 0.6
 #define BLUR_LENGTH 0.05
 
+#define LIGHT_SHAFT_SAMPLES 100
 #define MOTION_BLUR_SAMPLES 8
 
 #define A 0.15
@@ -90,6 +91,28 @@ float fresnel(float nDotL, float fresnelBias, float fresnelPow) {
   return max(fresnelBias + (1.0 - fresnelBias) * pow(facing, fresnelPow), 0.0);
 }
 
-bool checkFlag (int flag, float val) {
+bool checkFlag(int flag, float val) {
     return val > float(flag) - 0.5 && val < float(flag) + 0.5;
+}
+
+vec3 convertColorYxy(vec3 color, float colorExp) {
+    if (color.x < 0.0 || color.y < 0.0 || color.z < 0.0) {
+        return vec3(0.0, 0.0, 0.0);
+    }
+
+    vec3 clrYxy = color;
+    clrYxy.x = 1.0 - exp (-clrYxy.x / colorExp);
+
+    float ratio = clrYxy.x / clrYxy.z;
+
+    vec3 XYZ;
+    XYZ.x = clrYxy.y * ratio;
+    XYZ.y = clrYxy.x;
+    XYZ.z = ratio - XYZ.x - XYZ.y;
+
+    const vec3 rCoeffs = vec3 (3.240479, -1.53715, -0.49853);
+    const vec3 gCoeffs = vec3 (-0.969256, 1.875991, 0.041556);
+    const vec3 bCoeffs = vec3 (0.055684, -0.204043, 1.057311);
+
+    return vec3 (dot(rCoeffs, XYZ), dot(gCoeffs, XYZ), dot(bCoeffs, XYZ));
 }

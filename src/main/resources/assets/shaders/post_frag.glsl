@@ -26,9 +26,12 @@ uniform sampler2D texBlur;
 uniform sampler2D texVignette;
 #endif
 #ifdef FILM_GRAIN
-uniform sampler2D   texNoise;
-uniform vec2        noiseSize = vec2(64.0, 64.0);
-uniform vec2        renderTargetSize = vec2(1280.0, 720.0);
+uniform sampler2D texNoise;
+uniform vec2 noiseSize = vec2(64.0, 64.0);
+uniform vec2 renderTargetSize = vec2(1280.0, 720.0);
+#endif
+#ifdef LIGHT_SHAFTS
+uniform sampler2D texLightShafts;
 #endif
 
 #ifdef FILM_GRAIN
@@ -98,6 +101,11 @@ void main() {
 #ifdef BLOOM
     vec4 colorBloom = texture2D(texBloom, gl_TexCoord[0].xy);
     finalColor += colorBloom;
+#endif
+
+#ifdef LIGHT_SHAFTS
+    vec4 colorShafts = texture2D(texLightShafts, gl_TexCoord[0].xy);
+    finalColor *= clamp(1.0 - colorShafts.r, 0.0, 1.0);
 #endif
 
 #ifdef FILM_GRAIN

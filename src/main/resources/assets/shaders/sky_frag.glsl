@@ -17,61 +17,40 @@
 varying	vec3 colorYxy;
 varying vec3 skyVec;
 varying vec3 skyVecR;
-varying	vec4 McPosition;
+varying	vec4 position;
+
 varying	float lv;
-uniform	vec4 sunPos;
 
 uniform samplerCube texCubeSky;
 uniform samplerCube texCubeStars;
 
-vec4 eyePos = vec4(0.0, 0.0, 0.0, 1.0);
-uniform float colorExp = 12.0;
+uniform	vec4 sunPos;
+uniform float colorExp;
+uniform vec3 zenith;
 
-vec3 convertColor() {
-    if (colorYxy == vec3(0.0, 0.0, 0.0))
-        return vec3(0.0, 0.0, 0.0);
-
-    vec3 clrYxy = vec3(colorYxy);
-    clrYxy.x = 1.0 - exp (-clrYxy.x / colorExp);
-
-    float ratio = clrYxy.x / clrYxy.z;
-
-    vec3 XYZ;
-
-    XYZ.x = clrYxy.y * ratio;					// X = x * ratio
-    XYZ.y = clrYxy.x;							// Y = Y
-    XYZ.z = ratio - XYZ.x - XYZ.y;				// Z = ratio - X - Y
-
-    const vec3 rCoeffs = vec3 (3.240479, -1.53715, -0.49853);
-    const vec3 gCoeffs = vec3 (-0.969256, 1.875991, 0.041556);
-    const vec3 bCoeffs = vec3 (0.055684, -0.204043, 1.057311);
-
-    return vec3 (dot(rCoeffs, XYZ), dot(gCoeffs, XYZ), dot(bCoeffs, XYZ));
-}
+const vec4 eyePos = vec4(0.0, 0.0, 0.0, 1.0);
 
 void main () {
-    vec3 v = normalize ( McPosition.xyz );
-    vec3 l;
+    vec3 v = normalize (position.xyz);
+    vec3 l = normalize (sunPos.xyz);
 
-    if (daylight > 0.0)
-       l = normalize (sunPos.xyz);
-    else
-       l = normalize (-sunPos.xyz);
-
-    float sunHighlight = pow(max(0.0, dot(l, v)), 1024.0) * 16.0;
+    float lDotV = max(0.0, dot(l, v));
+    float sunHighlight = pow(lDotV, 1024.0) * 16.0;
     float posSunY = 0.0;
 
     if (sunPos.y > 0.0){
         posSunY = sunPos.y;
     }
 
-    /* ALPHA STARRY NIGHT */
-    float alpha  = clamp((0.7 - posSunY) * (1.0 - lv), 0.0, 1.0);
+    float alpha = clamp((0.7 - posSunY) * (1.0 - lv), 0.0, 1.0);
 
-    vec4 skyColor = vec4(clamp(convertColor(), 0.0, 1.0) + sunHighlight, 1.0);
-    skyColor += daylight * textureCube (texCubeSky, skyVec);
-    skyColor += alpha * textureCube (texCubeStars, skyVecR);
+    vec4 cloudsColor = textureCube(texCubeSky, skyVec);
+    sunHighlight *= clamp(1.0 - (cloudsColor.r + cloudsColor.g + cloudsColor.b), 0.0, 1.0);
 
-    gl_FragData[0].rgba = skyColor;
+    vec4 skyColor = vec4(convertColorYxy(colorYxy, colorExp) + sunHighlight, 1.0);
+    skyColor.rgb += daylight * cloudsColor.rgb;
+    skyColor.rgb += alpha * textureCube(texCubeStars, skyVecR);
+
+    gl_FragData[0].rgb = skyColor;
     gl_FragData[1].rgba = vec4(0, 0, 0, 0);
 }

@@ -18,6 +18,7 @@ package org.terasology.logic.manager;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.HashMap;
+import java.util.List;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.*;
@@ -25,10 +26,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.TeraMath;
+import org.terasology.editor.properties.IPropertyProvider;
+import org.terasology.editor.properties.Property;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.rendering.world.WorldRenderer;
-
-import javax.swing.*;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -38,14 +39,14 @@ import static org.lwjgl.opengl.GL11.*;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class PostProcessingRenderer {
+public class PostProcessingRenderer implements IPropertyProvider {
 
-    public static final float DEFAULT_EXPOSURE = 2.5f;
-    public static final float MAX_EXPOSURE = 6.0f;
-    public static final float MAX_EXPOSURE_NIGHT = 1.0f;
-    public static final float MIN_EXPOSURE = 0.5f;
-    public static final float TARGET_LUMINANCE = 1.0f;
-    public static final float ADJUSTMENT_SPEED = 0.025f;
+    private Property hdrExposureDefault = new Property("hdrExposureDefault", 2.5f, 0.0f, 10.0f);
+    private Property hdrMaxExposure = new Property("hdrMaxExposure", 4.0f, 0.0f, 10.0f);
+    private Property hdrMaxExposureNight = new Property("hdrMaxExposureNight", 1.0f, 0.0f, 10.0f);
+    private Property hdrMinExposure = new Property("hdrMinExposure", 0.5f, 0.0f, 10.0f);
+    private Property hdrTargetLuminance = new Property("hdrTargetLuminance", 1.0f, 0.0f, 4.0f);
+    private Property hdrExposureAdjustmentSpeed = new Property("hdrExposureAdjustmentSpeed", 0.025f, 0.0f, 0.1f);
 
     private static final Logger logger = LoggerFactory.getLogger(PostProcessingRenderer.class);
 
@@ -151,14 +152,16 @@ public class PostProcessingRenderer {
         createFBO("ssaoBlurred0", halfWidth, halfHeight, false, false, false);
         createFBO("ssaoBlurred1", halfWidth, halfHeight, false, false, false);
 
+        createFBO("lightShafts", halfWidth,  halfHeight, false, false, false);
+
         createFBO("sceneReflected", halfWidth, halfHeight, true, true, false);
 
-        createFBO("sceneHighPass", halfHalfQuarterWidth, halfHalfQuarterHeight, false, false, false);
-        createFBO("sceneBloom0", halfHalfQuarterWidth, halfHalfQuarterHeight, false, false, false);
-        createFBO("sceneBloom1", halfHalfQuarterWidth, halfHalfQuarterHeight, false, false, false);
+        createFBO("sceneHighPass", halfQuarterWidth, halfQuarterHeight, false, false, false);
+        createFBO("sceneBloom0", halfQuarterWidth, halfQuarterHeight, false, false, false);
+        createFBO("sceneBloom1", halfQuarterWidth, halfQuarterHeight, false, false, false);
 
-        createFBO("sceneBlur0", quarterWidth, quarterHeight, false, false, false);
-        createFBO("sceneBlur1", quarterWidth, quarterHeight, false, false, false);
+        createFBO("sceneBlur0", halfWidth, halfHeight, false, false, false);
+        createFBO("sceneBlur1", halfWidth, halfHeight, false, false, false);
     }
 
     public void deleteFBO(String title) {
@@ -299,31 +302,31 @@ public class PostProcessingRenderer {
 
             _sceneLuminance = 0.2126f * pixels.get(2) / 255.f + 0.7152f * pixels.get(1) / 255.f + 0.0722f * pixels.get(0) / 255.f;
 
-            float targetExposure = MAX_EXPOSURE;
+            float targetExposure = (Float) hdrMaxExposure.getValue();
 
             if (_sceneLuminance > 0) {
-                targetExposure = TARGET_LUMINANCE / _sceneLuminance;
+                targetExposure = (Float) hdrTargetLuminance.getValue() / _sceneLuminance;
             }
 
-            float maxExposure = MAX_EXPOSURE;
+            float maxExposure = (Float) hdrMaxExposure.getValue();
 
             if (CoreRegistry.get(WorldRenderer.class).getSkysphere().getDaylight() == 0.0) {
-                maxExposure = MAX_EXPOSURE_NIGHT;
+                maxExposure = (Float) hdrMaxExposureNight.getValue();
             }
 
             if (targetExposure > maxExposure) {
                 targetExposure = maxExposure;
-            } else if (targetExposure < MIN_EXPOSURE) {
-                targetExposure = MIN_EXPOSURE;
+            } else if (targetExposure < (Float) hdrMinExposure.getValue()) {
+                targetExposure = (Float) hdrMinExposure.getValue();
             }
 
-            _exposure = (float) TeraMath.lerp(_exposure, targetExposure, ADJUSTMENT_SPEED);
+            _exposure = (float) TeraMath.lerp(_exposure, targetExposure, (Float) hdrExposureAdjustmentSpeed.getValue());
 
       } else {
         if (CoreRegistry.get(WorldRenderer.class).getSkysphere().getDaylight() == 0.0) {
-            _exposure = MAX_EXPOSURE_NIGHT;
+            _exposure = (Float) hdrMaxExposureNight.getValue();
         } else {
-            _exposure = DEFAULT_EXPOSURE;
+            _exposure = (Float) hdrExposureDefault.getValue();
         }
       }
     }
@@ -382,6 +385,10 @@ public class PostProcessingRenderer {
         generateTonemappedScene();
         generateHighPass();
 
+        if (Config.getInstance().isLightShafts()) {
+            generateLightShafts();
+        }
+
         for (int i = 0; i < 2; i++) {
             if (Config.getInstance().isBloom()) {
                 generateBloom(i);
@@ -410,6 +417,21 @@ public class PostProcessingRenderer {
         renderFullQuad();
 
         PostProcessingRenderer.getInstance().getFBO("sceneTonemapped").unbind();
+    }
+
+    private void generateLightShafts() {
+        ShaderManager.getInstance().enableShader("lightshaft");
+
+        FBO lightshaft = PostProcessingRenderer.getInstance().getFBO("lightShafts");
+        lightshaft.bind();
+
+        glViewport(0, 0, lightshaft._width, lightshaft._height);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        renderFullQuad();
+
+        PostProcessingRenderer.getInstance().getFBO("lightShafts").unbind();
+        glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
 
     private void generateSSAO() {
@@ -639,5 +661,16 @@ public class PostProcessingRenderer {
 
     public FBO getFBO(String title) {
         return _FBOs.get(title);
+    }
+
+
+    @Override
+    public void addPropertiesToList(List<Property> properties) {
+        properties.add(hdrMaxExposure);
+        properties.add(hdrExposureAdjustmentSpeed);
+        properties.add(hdrExposureDefault);
+        properties.add(hdrMaxExposureNight);
+        properties.add(hdrMinExposure);
+        properties.add(hdrTargetLuminance);
     }
 }
