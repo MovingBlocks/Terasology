@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.properties;
+package org.terasology.editor.properties;
 
 import java.text.DecimalFormat;
 

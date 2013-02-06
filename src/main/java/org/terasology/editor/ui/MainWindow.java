@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.terasology.ui;
+package org.terasology.editor.ui;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,19 +69,6 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
     }
 
     public MainWindow() {
-        JPopupMenu.setDefaultLightWeightPopupEnabled(false);
-
-        try {
-            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            // If Nimbus is not available, you can set the GUI to another look and feel.
-        }
-
         this.addWindowListener(this);
 
         viewPort = new ViewPort();
@@ -106,7 +93,7 @@ public final class MainWindow extends JFrame implements ActionListener, WindowLi
         getContentPane().add(verticalSplitPane, BorderLayout.CENTER);
 
         setTitle("TeraEd - Terasology" + " | " + "Pre Alpha");
-        setSize(new Dimension(1280, 720));
+        setSize(new Dimension(1280+350, 720));
 
         mainMenuBar = new JMenuBar();
         setJMenuBar(mainMenuBar);

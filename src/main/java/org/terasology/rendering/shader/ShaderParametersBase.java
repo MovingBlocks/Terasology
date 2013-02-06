@@ -18,8 +18,8 @@ package org.terasology.rendering.shader;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
-import org.terasology.properties.IPropertyProvider;
-import org.terasology.properties.Property;
+import org.terasology.editor.properties.IPropertyProvider;
+import org.terasology.editor.properties.Property;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 

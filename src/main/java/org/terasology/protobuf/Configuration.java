@@ -2938,6 +2938,10 @@ public final class Configuration {
       // optional bool outline = 31 [default = true];
       boolean hasOutline();
       boolean getOutline();
+      
+      // optional bool light_shafts = 32 [default = false];
+      boolean hasLightShafts();
+      boolean getLightShafts();
     }
     public static final class System extends
         com.google.protobuf.GeneratedMessage
@@ -4031,6 +4035,16 @@ public final class Configuration {
         return outline_;
       }
       
+      // optional bool light_shafts = 32 [default = false];
+      public static final int LIGHT_SHAFTS_FIELD_NUMBER = 32;
+      private boolean lightShafts_;
+      public boolean hasLightShafts() {
+        return ((bitField0_ & 0x08000000) == 0x08000000);
+      }
+      public boolean getLightShafts() {
+        return lightShafts_;
+      }
+      
       private void initFields() {
         maxParticles_ = 256;
         maxThreads_ = 2;
@@ -4059,6 +4073,7 @@ public final class Configuration {
         ssao_ = false;
         filmGrain_ = false;
         outline_ = true;
+        lightShafts_ = false;
       }
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
@@ -4152,6 +4167,9 @@ public final class Configuration {
         }
         if (((bitField0_ & 0x04000000) == 0x04000000)) {
           output.writeBool(31, outline_);
+        }
+        if (((bitField0_ & 0x08000000) == 0x08000000)) {
+          output.writeBool(32, lightShafts_);
         }
         getUnknownFields().writeTo(output);
       }
@@ -4269,6 +4287,10 @@ public final class Configuration {
         if (((bitField0_ & 0x04000000) == 0x04000000)) {
           size += com.google.protobuf.CodedOutputStream
             .computeBoolSize(31, outline_);
+        }
+        if (((bitField0_ & 0x08000000) == 0x08000000)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeBoolSize(32, lightShafts_);
         }
         size += getUnknownFields().getSerializedSize();
         memoizedSerializedSize = size;
@@ -4453,6 +4475,8 @@ public final class Configuration {
           bitField0_ = (bitField0_ & ~0x02000000);
           outline_ = true;
           bitField0_ = (bitField0_ & ~0x04000000);
+          lightShafts_ = false;
+          bitField0_ = (bitField0_ & ~0x08000000);
           return this;
         }
         
@@ -4603,6 +4627,10 @@ public final class Configuration {
             to_bitField0_ |= 0x04000000;
           }
           result.outline_ = outline_;
+          if (((from_bitField0_ & 0x08000000) == 0x08000000)) {
+            to_bitField0_ |= 0x08000000;
+          }
+          result.lightShafts_ = lightShafts_;
           result.bitField0_ = to_bitField0_;
           onBuilt();
           return result;
@@ -4699,6 +4727,9 @@ public final class Configuration {
           }
           if (other.hasOutline()) {
             setOutline(other.getOutline());
+          }
+          if (other.hasLightShafts()) {
+            setLightShafts(other.getLightShafts());
           }
           this.mergeUnknownFields(other.getUnknownFields());
           return this;
@@ -4868,6 +4899,11 @@ public final class Configuration {
               case 248: {
                 bitField0_ |= 0x04000000;
                 outline_ = input.readBool();
+                break;
+              }
+              case 256: {
+                bitField0_ |= 0x08000000;
+                lightShafts_ = input.readBool();
                 break;
               }
             }
@@ -5508,6 +5544,27 @@ public final class Configuration {
         public Builder clearOutline() {
           bitField0_ = (bitField0_ & ~0x04000000);
           outline_ = true;
+          onChanged();
+          return this;
+        }
+        
+        // optional bool light_shafts = 32 [default = false];
+        private boolean lightShafts_ ;
+        public boolean hasLightShafts() {
+          return ((bitField0_ & 0x08000000) == 0x08000000);
+        }
+        public boolean getLightShafts() {
+          return lightShafts_;
+        }
+        public Builder setLightShafts(boolean value) {
+          bitField0_ |= 0x08000000;
+          lightShafts_ = value;
+          onChanged();
+          return this;
+        }
+        public Builder clearLightShafts() {
+          bitField0_ = (bitField0_ & ~0x08000000);
+          lightShafts_ = false;
           onChanged();
           return this;
         }
@@ -6480,7 +6537,7 @@ public final class Configuration {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\rConfig2.proto\022\010protobuf\"\334\017\n\007Setting\022&\n" +
+      "\n\rConfig2.proto\022\010protobuf\"\371\017\n\007Setting\022&\n" +
       "\005world\030\001 \001(\0132\027.protobuf.Setting.World\022(\n" +
       "\006player\030\002 \001(\0132\030.protobuf.Setting.Player\022" +
       "(\n\006system\030\003 \001(\0132\030.protobuf.Setting.Syste" +
@@ -6507,7 +6564,7 @@ public final class Configuration {
       "\003fov\030\001 \001(\002:\00290\022\031\n\nmouse_sens\030\002 \001(\002:\0050.07" +
       "5\022\034\n\016camera_bobbing\030\003 \001(\010:\004true\022&\n\030rende" +
       "r_first_person_view\030\004 \001(\010:\004true\022\031\n\013placi" +
-      "ng_box\030\005 \001(\010:\004true\032\253\007\n\006System\022\032\n\rmax_par" +
+      "ng_box\030\005 \001(\010:\004true\032\310\007\n\006System\022\032\n\rmax_par" +
       "ticles\030\001 \001(\005:\003256\022\026\n\013max_threads\030\004 \001(\005:\001" +
       "2\022\031\n\013save_chunks\030\005 \001(\010:\004true\022\036\n\020chunk_ca",
       "che_size\030\006 \001(\005:\0042048\022\033\n\016max_chunk_VBOs\030\007" +
@@ -6528,11 +6585,11 @@ public final class Configuration {
       "ation\030\032 \001(\010:\005false\022\024\n\005bloom\030\033 \001(\010:\005false" +
       "\022\032\n\013motion_blur\030\034 \001(\010:\005false\022\023\n\004ssao\030\035 \001" +
       "(\010:\005false\022\031\n\nfilm_grain\030\036 \001(\010:\005false\022\025\n\007" +
-      "outline\030\037 \001(\010:\004true\032*\n\010CloudRes\022\016\n\001x\030\001 \001" +
-      "(\002:\003512\022\016\n\001y\030\002 \001(\002:\003512\0327\n\013DisplayMode\022\023",
-      "\n\005width\030\001 \001(\005:\0041280\022\023\n\006height\030\002 \001(\005:\003720" +
-      "B*\n\027org.terasology.protobufB\rConfigurati" +
-      "onH\001"
+      "outline\030\037 \001(\010:\004true\022\033\n\014light_shafts\030  \001(" +
+      "\010:\005false\032*\n\010CloudRes\022\016\n\001x\030\001 \001(\002:\003512\022\016\n\001",
+      "y\030\002 \001(\002:\003512\0327\n\013DisplayMode\022\023\n\005width\030\001 \001" +
+      "(\005:\0041280\022\023\n\006height\030\002 \001(\005:\003720B*\n\027org.ter" +
+      "asology.protobufB\rConfigurationH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -6584,7 +6641,7 @@ public final class Configuration {
           internal_static_protobuf_Setting_System_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_protobuf_Setting_System_descriptor,
-              new java.lang.String[] { "MaxParticles", "MaxThreads", "SaveChunks", "ChunkCacheSize", "MaxChunkVBOs", "PixelFormat", "DisplayMode", "Fullscreen", "ActiveViewingDistanceId", "ViewingDistanceNear", "ViewingDistanceModerate", "ViewingDistanceFar", "ViewingDistanceUltra", "FlickeringLight", "AnimatedGrass", "VerticalChunkMeshSegments", "BlurIntensity", "ReflectiveWater", "MusicVolume", "SoundVolume", "Vignette", "EyeAdapation", "Bloom", "MotionBlur", "Ssao", "FilmGrain", "Outline", },
+              new java.lang.String[] { "MaxParticles", "MaxThreads", "SaveChunks", "ChunkCacheSize", "MaxChunkVBOs", "PixelFormat", "DisplayMode", "Fullscreen", "ActiveViewingDistanceId", "ViewingDistanceNear", "ViewingDistanceModerate", "ViewingDistanceFar", "ViewingDistanceUltra", "FlickeringLight", "AnimatedGrass", "VerticalChunkMeshSegments", "BlurIntensity", "ReflectiveWater", "MusicVolume", "SoundVolume", "Vignette", "EyeAdapation", "Bloom", "MotionBlur", "Ssao", "FilmGrain", "Outline", "LightShafts", },
               org.terasology.protobuf.Configuration.Setting.System.class,
               org.terasology.protobuf.Configuration.Setting.System.Builder.class);
           internal_static_protobuf_Setting_System_CloudRes_descriptor =

@@ -99,6 +99,7 @@ public class UIMenuConfigVideo extends UIWindow {
                     Config.getInstance().setSSAO(false);
                     Config.getInstance().setFilmGrain(false);
                     Config.getInstance().setOutline(true);
+                    Config.getInstance().setLightShafts(false);
                     break;
                 case 1:
                     Config.getInstance().setFlickeringLight(true);
@@ -109,6 +110,7 @@ public class UIMenuConfigVideo extends UIWindow {
                     Config.getInstance().setSSAO(false);
                     Config.getInstance().setFilmGrain(true);
                     Config.getInstance().setOutline(true);
+                    Config.getInstance().setLightShafts(false);
                     break;
                 case 2:
                     Config.getInstance().setFlickeringLight(true);
@@ -119,6 +121,7 @@ public class UIMenuConfigVideo extends UIWindow {
                     Config.getInstance().setSSAO(true);
                     Config.getInstance().setFilmGrain(true);
                     Config.getInstance().setOutline(true);
+                    Config.getInstance().setLightShafts(false);
                     break;
                 }
                 

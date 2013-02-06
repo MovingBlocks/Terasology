@@ -77,6 +77,7 @@ message Setting {
 		optional bool ssao = 29 [default = false];
 		optional bool film_grain = 30 [default = false];
 		optional bool outline = 31 [default = true];
+		optional bool light_shafts = 32 [default = false];
     }
 
     optional World world = 1;

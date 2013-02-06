@@ -13,11 +13,10 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.terasology.ui;
+package org.terasology.editor.ui;
 
-import org.terasology.editor.TeraEd;
-import org.terasology.properties.IPropertyProvider;
-import org.terasology.properties.Property;
+import org.terasology.editor.properties.IPropertyProvider;
+import org.terasology.editor.properties.Property;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;

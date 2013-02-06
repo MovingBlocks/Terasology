@@ -21,8 +21,8 @@ import org.terasology.game.GameEngine;
 import org.terasology.game.TerasologyEngine;
 import org.terasology.game.modes.StateMainMenu;
 import org.terasology.logic.manager.PathManager;
-import org.terasology.properties.SceneProperties;
-import org.terasology.ui.MainWindow;
+import org.terasology.editor.properties.SceneProperties;
+import org.terasology.editor.ui.MainWindow;
 
 import javax.swing.*;
 
@@ -41,6 +41,19 @@ public final class TeraEd extends JWindow {
     private static final SceneProperties sceneProperties = new SceneProperties();
 
     public static void main(String[] args) {
+        JPopupMenu.setDefaultLightWeightPopupEnabled(false);
+
+        try {
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            // If Nimbus is not available, you can set the GUI to another look and feel.
+        }
+
         engine = new TerasologyEngine();
         mainWindow = new MainWindow();
 

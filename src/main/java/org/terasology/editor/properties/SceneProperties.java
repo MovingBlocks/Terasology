@@ -13,9 +13,10 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.terasology.properties;
+package org.terasology.editor.properties;
 
 import org.terasology.game.CoreRegistry;
+import org.terasology.logic.manager.PostProcessingRenderer;
 import org.terasology.rendering.world.Skysphere;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -31,6 +32,10 @@ public class SceneProperties implements IPropertyProvider {
         Skysphere skysphere = CoreRegistry.get(WorldRenderer.class).getSkysphere();
         if (skysphere != null) {
             skysphere.addPropertiesToList(properties);
+        }
+        PostProcessingRenderer postRenderer = PostProcessingRenderer.getInstance();
+        if (postRenderer != null) {
+            postRenderer.addPropertiesToList(properties);
         }
     }
 }

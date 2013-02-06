@@ -20,10 +20,8 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
 import org.terasology.logic.manager.PostProcessingRenderer;
-import org.terasology.properties.Property;
+import org.terasology.editor.properties.Property;
 import org.terasology.rendering.assets.Texture;
-
-import javax.vecmath.Vector3f;
 
 import java.nio.FloatBuffer;
 import java.util.List;
