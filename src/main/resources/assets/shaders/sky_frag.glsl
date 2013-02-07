@@ -49,8 +49,8 @@ void main () {
 
     vec4 skyColor = vec4(convertColorYxy(colorYxy, colorExp) + sunHighlight, 1.0);
     skyColor.rgb += daylight * cloudsColor.rgb;
-    skyColor.rgb += alpha * textureCube(texCubeStars, skyVecR);
+    skyColor.rgba += alpha * textureCube(texCubeStars, skyVecR);
 
     gl_FragData[0].rgba = skyColor.rgba;
-    gl_FragData[1].rgba = vec4(0, 0, 0, 1.0);
+    gl_FragData[1].rgba = vec4(0.0, 0.0, 0.0, 1.0);
 }
