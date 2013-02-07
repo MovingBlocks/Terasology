@@ -76,7 +76,7 @@ public class PropertySlider extends JPanel implements ChangeListener {
     }
 
     public void setValue(float value, float minValue, float maxValue) {
-        int sliderValue = (int) (((value - minValue) / maxValue) * 100.0f);
+        int sliderValue = (int) (((value - minValue) / (maxValue - minValue)) * 100.0f);
         slider.setValue(sliderValue);
     }
     @Override

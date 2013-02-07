@@ -56,7 +56,7 @@ vec3 allWeatherSky(float t, float cosTheta, float cosGamma, float cosThetaSun)
   float	thetaSun = acos(cosThetaSun);
 
   vec3	clrYxy = zenith * allWeather(t, cosTheta, cosGamma) / allWeather (t, 1.0, cosThetaSun);
-   clrYxy.x *= smoothstep ( 0.0, 0.1, cosThetaSun );
+  clrYxy.x *= smoothstep ( 0.0, 0.1, cosThetaSun );
 
   return clrYxy;
 }
@@ -72,7 +72,7 @@ void main(void)
     lv              = dot(l, v);
     skyVecR         = r * v.xyz;
     skyVec          = v.xyz;
-    colorYxy        = allWeatherSky (turbidity, max(v.y, 0.0) + 0.05, lv, l.y);
+    colorYxy        = allWeatherSky(turbidity, max(v.y, 0.0) + 0.05, lv, l.y);
     position        = gl_Vertex;
     gl_Position     = ftransform();
     gl_TexCoord[0]  = gl_MultiTexCoord0;

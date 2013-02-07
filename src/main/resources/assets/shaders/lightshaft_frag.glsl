@@ -20,35 +20,35 @@ uniform float exposure;
 uniform float density;
 
 uniform sampler2D texScene;
-uniform sampler2D texDepth;
+uniform sampler2D texNormals;
 
-varying vec4 lightScreenPos;
+uniform float lightDirDotViewDir;
+uniform vec2 lightScreenPos;
 
 void main() {
-    gl_FragData[0].rgba = vec4(1.0, 1.0, 1.0, 1.0);
+    gl_FragData[0].rgba = vec4(0.0, 0.0, 0.0, 1.0);
 
-    lightScreenPos.xyz /= lightScreenPos.w;
+    if (lightDirDotViewDir > 0.0) {
+        vec2 textCoo = gl_TexCoord[0].xy;
+        vec2 deltaTextCoord = vec2( textCoo.xy - lightScreenPos.xy);
 
- 	vec2 textCoo = gl_TexCoord[0].xy;
-    vec2 deltaTextCoord = vec2( textCoo.xy - lightScreenPos.xy );
+        deltaTextCoord *= (1.0 / float(LIGHT_SHAFT_SAMPLES)) * density;
 
-    float depth = texture2D(texDepth, textCoo);
+        float illuminationDecay = 1.0;
+        for(int i=0; i < LIGHT_SHAFT_SAMPLES ; i++)
+        {
+            textCoo -= deltaTextCoord;
 
-    if (depth > 0.999999) {
-        return;
+            float mask = texture2D(texNormals, textCoo).w;
+            vec3 sample = texture2D(texScene, textCoo).rgb * mask;
+
+            sample *= illuminationDecay * weight;
+
+            gl_FragData[0].rgb += sample;
+
+            illuminationDecay *= decay;
+        }
+
+        gl_FragData[0].rgb *= exposure * lightDirDotViewDir;
     }
-
- 	deltaTextCoord *= 1.0 /  float(LIGHT_SHAFT_SAMPLES) * density;
-
- 	float illuminationDecay = 1.0;
- 	for(int i=0; i < LIGHT_SHAFT_SAMPLES ; i++)
-  	{
-  	    textCoo -= deltaTextCoord;
-  	    vec4 sample = texture2D(texScene, textCoo);
-  	    sample *= illuminationDecay * weight;
-  	    gl_FragData[0].rgb += sample;
-  	    illuminationDecay *= decay;
- 	}
-
- 	gl_FragData[0].rgb *= exposure;
 }
