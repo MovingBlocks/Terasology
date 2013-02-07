@@ -18,23 +18,13 @@ package org.terasology.world.block.loader;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
-import com.google.gson.TypeAdapter;
-import com.google.gson.TypeAdapterFactory;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
-import org.codehaus.groovy.tools.groovydoc.SimpleGroovyExecutableMemberDoc;
 import org.newdawn.slick.opengl.PNGDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,12 +40,10 @@ import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.utilities.gson.Vector4fHandler;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockAdjacentType;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.BlockUri;
-import org.terasology.world.block.family.AlignToSurfaceFamily;
-import org.terasology.world.block.family.BlockFamily;
-import org.terasology.world.block.family.HorizontalBlockFamily;
-import org.terasology.world.block.family.SymmetricFamily;
+import org.terasology.world.block.family.*;
 import org.terasology.world.block.shapes.BlockShape;
 
 import javax.imageio.ImageIO;
@@ -157,7 +145,9 @@ public class BlockLoader {
                                 case HORIZONTAL:
                                     result.families.add(processHorizontalBlockFamily(blockDefUri, blockDef));
                                     break;
-
+                                case CONNECTTOADJACENT:
+                                    result.families.add(processConnectToAdjacentFamily(blockDefUri, blockDefJson));
+                                    break;
                                 default:
                                     result.families.add(processSingleBlockFamily(blockDefUri, blockDef));
                                     break;
@@ -366,6 +356,45 @@ public class BlockLoader {
         return new AlignToSurfaceFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap, categories);
     }
 
+    private BlockFamily processConnectToAdjacentFamily(AssetUri blockDefUri, JsonObject blockDefJson) {
+        Map<BlockAdjacentType, EnumMap<Side, Block> > blockMap = Maps.newEnumMap(BlockAdjacentType.class);
+        String[] categories = new String[0];
+
+        if ( blockDefJson.has("types") ){
+
+            JsonArray blockTypes = blockDefJson.getAsJsonArray("types");
+
+            blockDefJson.remove("types");
+
+            for ( JsonElement element : blockTypes.getAsJsonArray() ){
+                JsonObject typeDefJson = element.getAsJsonObject();
+
+                BlockAdjacentType type = null;
+
+                if ( !typeDefJson.has("type") ){
+                    throw new IllegalArgumentException("Block type is empty");
+                }
+                type = gson.fromJson(typeDefJson.get("type"), BlockAdjacentType.class);
+
+                if ( type == null ){
+                    throw new IllegalArgumentException("Invalid type block: " + gson.fromJson(typeDefJson.get("type"), String.class));
+                }
+
+                if ( !blockMap.containsKey(type) ){
+                    blockMap.put( type, Maps.<Side, Block>newEnumMap(Side.class));
+                }
+
+                typeDefJson.remove("type");
+                mergeJsonInto(blockDefJson, typeDefJson);
+                BlockDefinition typeDef = loadBlockDefinition(typeDefJson);
+                constructHorizontalBlocks( blockDefUri, typeDef, blockMap.get(type) );
+
+
+            }
+        }
+        return  new ConnectToAdjacentBlockFamily(new BlockUri(blockDefUri.getPackage(), blockDefUri.getAssetName()), blockMap,  categories);
+    }
+
     private void mergeJsonInto(JsonObject from, JsonObject to) {
         for (Map.Entry<String, JsonElement> entry : from.entrySet()) {
             if (entry.getValue().isJsonObject()) {
@@ -415,6 +444,28 @@ public class BlockLoader {
     }
 
     private void constructHorizontalBlocks(AssetUri blockDefUri, BlockDefinition blockDef, Map<Side, Block> blockMap) {
+        Map<BlockPart, AssetUri> tileUris = prepareTiles(blockDef, blockDefUri);
+        Map<BlockPart, Block.ColorSource> colorSourceMap = prepareColorSources(blockDef);
+        Map<BlockPart, Vector4f> colorOffsetsMap = prepareColorOffsets(blockDef);
+        BlockShape shape = getShape(blockDef);
+
+        for (Rotation rot : Rotation.horizontalRotations()) {
+            Block block = createRawBlock(blockDef, properCase(blockDefUri.getAssetName()));
+
+            block.setDirection(rot.rotate(Side.FRONT));
+
+            applyShape(block, shape, tileUris, rot);
+
+            for (BlockPart part : BlockPart.values()) {
+                block.setColorSource(part, colorSourceMap.get(part));
+                block.setColorOffset(part, colorOffsetsMap.get(part));
+            }
+
+            blockMap.put(rot.rotate(Side.FRONT), block);
+        }
+    }
+
+    private void constructConnectToAdjacentBlocks(AssetUri blockDefUri, BlockDefinition blockDef, Map<Side, Block> blockMap) {
         Map<BlockPart, AssetUri> tileUris = prepareTiles(blockDef, blockDefUri);
         Map<BlockPart, Block.ColorSource> colorSourceMap = prepareColorSources(blockDef);
         Map<BlockPart, Vector4f> colorOffsetsMap = prepareColorOffsets(blockDef);
@@ -507,6 +558,7 @@ public class BlockLoader {
     private Block createRawBlock(BlockDefinition def, String defaultName) {
         Block block = new Block();
         block.setLiquid(def.liquid);
+        block.setLader(def.lader);
         block.setHardness(def.hardness);
         block.setAttachmentAllowed(def.attachmentAllowed);
         block.setReplacementAllowed(def.replacementAllowed);
@@ -520,11 +572,15 @@ public class BlockLoader {
         block.setWaving(def.waving);
         block.setLuminance(def.luminance);
         block.setCraftPlace(def.craftPlace);
+        block.setConnectToAllBlocks(def.connectToAllBlock);
+        block.setCheckHeightDiff(def.checkHeightDiff);
         if (!def.displayName.isEmpty()) {
             block.setDisplayName(def.displayName);
         } else {
             block.setDisplayName(properCase(defaultName));
         }
+
+        block.setAcceptedToConnectBlocks(def.acceptedToConnectBlocks);
 
         block.setMass(def.mass);
         block.setDebrisOnDestroy(def.debrisOnDestroy);

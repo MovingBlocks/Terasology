@@ -15,9 +15,13 @@
  */
 
 /**
- * Placeholder train track by Metouto. Needs a bit more engine work for proper transparency / block shape
+ * A chest is interesting for two reasons: It is asymmetrical (front texture differs) and should store stuff
  */
 {
+    "attachmentAllowed" : false,
     "rotation" : "horizontal",
-    "translucent" : true
+    "craftPlace" : false,
+    "lader"      : true,
+    "penetrable" : true,
+    "shape" : "engine:verticalOffsetPlane"
 }

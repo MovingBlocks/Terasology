@@ -21,6 +21,7 @@ import java.util.List;
 
 import javax.vecmath.Vector4f;
 
+import org.terasology.world.block.BlockAdjacentType;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockEntityMode;
 import org.terasology.world.block.BlockPart;
@@ -34,6 +35,7 @@ import com.google.common.collect.Maps;
 public class BlockDefinition {
     public String displayName = "";
     public boolean liquid = false;
+    public boolean lader = false;
     public boolean craftPlace = true;
     public byte hardness = 0x3;
 
@@ -49,6 +51,9 @@ public class BlockDefinition {
     public boolean doubleSided = false;
     public boolean shadowCasting = true;
     public boolean waving = false;
+    public boolean connectToAllBlock = false;
+    public boolean checkHeightDiff = false;
+    public List<String> acceptedToConnectBlocks = Lists.newArrayList();
 
     public byte luminance = 0;
 
@@ -73,10 +78,13 @@ public class BlockDefinition {
     public List<String> shapes = Lists.newArrayList();
     public RotationType rotation = RotationType.NONE;
 
+    public List<Type> types;
+
     public static enum RotationType {
         NONE,
         HORIZONTAL,
-        ALIGNTOSURFACE
+        ALIGNTOSURFACE,
+        CONNECTTOADJACENT
     }
 
     public static class Tiles {
@@ -99,5 +107,12 @@ public class BlockDefinition {
     public static class Inventory {
         public boolean directPickup = false;
         public boolean stackable = true;
+    }
+
+    public static class Type {
+        public BlockAdjacentType type;
+        public String shape;
+        public List<String> shapes = Lists.newArrayList();
+        public Tiles tiles;
     }
 }
