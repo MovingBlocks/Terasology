@@ -18,7 +18,7 @@ package org.terasology.input;
 import com.leapmotion.leap.*;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.game.CoreRegistry;
-import org.terasology.input.events.*;
+import org.terasology.input.binds.ForwardsMovementAxis;
 import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.performanceMonitor.PerformanceMonitor;
@@ -105,12 +105,14 @@ public class LeapSystem implements EventHandlerSystem {
             if (deltaY > 100) {
                 // If the player's hand moved back a fair amount, start moving forwards (key 17, default 'w')!
                 System.out.println("Detecting RAISED hand, triggering move forward");
-                KeyEvent event = KeyDownEvent.create(17, 0f);
+                BindAxisEvent event = new ForwardsMovementAxis();
+                event.prepare("Whatisthisidonteven", 1f, 1f);
                 CoreRegistry.get(LocalPlayer.class).getEntity().send(event);
             } else if (deltaY < -100) {
                 // Alternatively if the hand moved forward, stop moving forwards!
                 System.out.println("Detecting LOWERED hand, cancelling move forward");
-                KeyEvent event = KeyUpEvent.create(17, 0f);
+                BindAxisEvent event = new ForwardsMovementAxis();
+                event.prepare("Whatisthisidonteven", -1f, 1f);
                 CoreRegistry.get(LocalPlayer.class).getEntity().send(event);
             }
 
