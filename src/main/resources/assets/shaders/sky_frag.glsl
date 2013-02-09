@@ -33,15 +33,30 @@ uniform float moonExponent;
 
 const vec4 eyePos = vec4(0.0, 0.0, 0.0, 1.0);
 
+#define HIGHLIGHT_BLEND_START 0.1
+
 void main () {
     vec3 v = normalize (position.xyz);
     vec3 l = normalize (sunPos.xyz);
 
-    float lDotV = max(0.0, dot(l, v));
-    float negLDotV = max(0.0, dot(-l, v));
+    float lDotV = dot(l, v);
+    float negLDotV = dot(-l, v);
 
-    float sunHighlight = pow(lDotV, sunExponent) * 2.0;
-    float moonHighlight = pow(negLDotV, moonExponent) * 1.0;
+    float sunHighlight = 0.0;
+    if (lDotV >= 0.0 && l.y >= 0.0) {
+       sunHighlight = pow(lDotV, sunExponent) * 2.0;
+    }
+    if (l.y < HIGHLIGHT_BLEND_START && l.y >= 0.0) {
+       sunHighlight *= 1.0 - (HIGHLIGHT_BLEND_START - l.y) / HIGHLIGHT_BLEND_START;
+    }
+
+    float moonHighlight = 0.0;
+    if (negLDotV >= 0.0 && -l.y >= 0.0) {
+       moonHighlight = pow(negLDotV, moonExponent);
+    }
+    if (-l.y < HIGHLIGHT_BLEND_START && -l.y >= 0.0) {
+       moonHighlight *= 1.0 - (HIGHLIGHT_BLEND_START + l.y) / HIGHLIGHT_BLEND_START;
+    }
 
     float blendNight = clamp((0.7 - sunPos.y) * (1.0 - lv), 0.0, 1.0);
 
