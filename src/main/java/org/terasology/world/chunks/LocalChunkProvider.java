@@ -281,8 +281,7 @@ public class LocalChunkProvider implements ChunkProvider {
         Chunk chunk = getChunk(chunkPos);
         if (chunk == null) {
             PerformanceMonitor.startActivity("Check chunk in cache");
-            if (!genCache.containsKey(chunkPos)) {
-                genCache.put(chunkPos, true);
+            if (genCache.putIfAbsent(chunkPos, true) == null) {
                 if (farStore.contains(chunkPos)) {
                     chunkTasksQueue.offer(new AbstractChunkTask(chunkPos, this) {
                         @Override
