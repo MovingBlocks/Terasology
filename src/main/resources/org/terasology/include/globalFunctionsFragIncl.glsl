@@ -18,7 +18,7 @@
 #define BLUR_START 0.6
 #define BLUR_LENGTH 0.05
 
-#define LIGHT_SHAFT_SAMPLES 100
+#define LIGHT_SHAFT_SAMPLES 50
 #define MOTION_BLUR_SAMPLES 8
 
 #define A 0.15
