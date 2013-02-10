@@ -254,22 +254,21 @@ public class NetworkSystem implements EntityChangeSubscriber {
 
     public void updateNetworkEntity(EntityRef entity) {
         NetworkComponent netComponent = entity.getComponent(NetworkComponent.class);
-        EntityRef lastOwner = ownerLookup.get(entity);
-        if (lastOwner == null) {
-            lastOwner = EntityRef.NULL;
-        }
+
+        EntityRef lastOwnerEntity = ownerLookup.get(entity);
+        Client lastOwner = (lastOwnerEntity == null) ? null : getOwner(lastOwnerEntity);
+        Client newOwner = getOwner(netComponent.owner);
+
         // If the owner has changed, we need to update the old and new owners
-        if (!lastOwner.equals(netComponent.owner)) {
+        if (lastOwner != newOwner) {
             if (netComponent.replicateMode == NetworkComponent.ReplicateMode.OWNER) {
                 // Remove from last owner
-                Client lastClient = getOwner(lastOwner);
-                if (lastClient != null) {
-                    lastClient.setNetRemoved(netComponent.networkId);
+                if (lastOwner != null) {
+                    lastOwner.setNetRemoved(netComponent.networkId);
                 }
                 // Add to new owner
-                Client newClient = getOwner(netComponent.owner);
-                if (newClient != null) {
-                    newClient.setNetInitial(netComponent.networkId);
+                if (newOwner != null) {
+                    newOwner.setNetInitial(netComponent.networkId);
                 }
             }
             if (!netComponent.owner.exists()) {

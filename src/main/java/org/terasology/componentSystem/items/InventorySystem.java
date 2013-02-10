@@ -123,6 +123,7 @@ public class InventorySystem implements ComponentSystem {
                 NetworkComponent networkComponent = event.getItem().getComponent(NetworkComponent.class);
                 if (networkComponent != null) {
                     networkComponent.owner = entity;
+                    event.getItem().saveComponent(networkComponent);
                 }
 	            return;
 	        } // If there are no free slots we do nothing, but may still save if part of the stack was merged in
