@@ -18,7 +18,7 @@ varying	vec4 	position;
 varying	vec3 	colorYxy;
 varying vec3    skyVec;
 varying vec3    skyVecR;
-varying float   lv;
+
 uniform	vec4 	sunPos;
 uniform float	sunAngle;
 uniform	float	turbidity;
@@ -69,7 +69,7 @@ void main(void)
 
     vec3 v          = normalize ((gl_Vertex-eyePos).xyz);
     vec3 l          = normalize (sunPos.xyz);
-    lv              = dot(l, v);
+    float lv        = dot(l, v);
     skyVecR         = r * v.xyz;
     skyVec          = v.xyz;
     colorYxy        = allWeatherSky(turbidity, max(v.y, 0.0) + 0.05, lv, l.y);

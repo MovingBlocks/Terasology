@@ -398,6 +398,10 @@ public final class Config {
         return _setting.getSystemBuilder().getBlurIntensity();
     }
 
+    public int getBlurRadius() {
+        return Math.max(getBlurIntensity(), 1);
+    }
+
     public boolean isComplexWater() {
         return _setting.getSystemBuilder().getReflectiveWater();
     }

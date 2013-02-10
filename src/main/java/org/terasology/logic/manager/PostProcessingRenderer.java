@@ -41,6 +41,10 @@ import static org.lwjgl.opengl.GL11.*;
  */
 public class PostProcessingRenderer implements IPropertyProvider {
 
+    private static final Logger logger = LoggerFactory.getLogger(PostProcessingRenderer.class);
+
+    private static PostProcessingRenderer _instance = null;
+
     private Property hdrExposureDefault = new Property("hdrExposureDefault", 2.5f, 0.0f, 10.0f);
     private Property hdrMaxExposure = new Property("hdrMaxExposure", 8.0f, 0.0f, 10.0f);
     private Property hdrMaxExposureNight = new Property("hdrMaxExposureNight", 3.0f, 0.0f, 10.0f);
@@ -48,12 +52,18 @@ public class PostProcessingRenderer implements IPropertyProvider {
     private Property hdrTargetLuminance = new Property("hdrTargetLuminance", 0.55f, 0.0f, 4.0f);
     private Property hdrExposureAdjustmentSpeed = new Property("hdrExposureAdjustmentSpeed", 0.1f, 0.0f, 0.5f);
 
-    private static final Logger logger = LoggerFactory.getLogger(PostProcessingRenderer.class);
+    private Property ssaoBlurRadius = new Property("ssaoBlurRadius", 8.0f, 0.0f, 64.0f);
+    private Property overallBlurFactor = new Property("overallBlurFactor", 1.5f, 0.0f, 16.0f);
 
-    private static PostProcessingRenderer _instance = null;
-    private float _exposure = 2.0f;
-    private float _sceneLuminance = 1.0f;
-    private int _displayListQuad = -1;
+    private float currentExposure = 2.0f;
+    private float currentSceneLuminance = 1.0f;
+
+    private int displayListQuad = -1;
+
+    public enum FBOType {
+        DEFAULT,
+        HDR
+    }
 
     public class FBO {
         public int _fboId = 0;
@@ -113,11 +123,11 @@ public class PostProcessingRenderer implements IPropertyProvider {
     public void initialize() {
         createOrUpdateFullscreenFbos();
 
-        createFBO("scene16", 16, 16, false, false, false);
-        createFBO("scene8", 8, 8, false, false, false);
-        createFBO("scene4", 4, 4, false, false, false);
-        createFBO("scene2", 2, 2, false, false, false);
-        createFBO("scene1", 1, 1, false, false, false);
+        createFBO("scene16", 16, 16, FBOType.DEFAULT, false, false);
+        createFBO("scene8", 8, 8, FBOType.DEFAULT, false, false);
+        createFBO("scene4", 4, 4, FBOType.DEFAULT, false, false);
+        createFBO("scene2", 2, 2, FBOType.DEFAULT, false, false);
+        createFBO("scene1", 1, 1, FBOType.DEFAULT, false, false);
     }
 
 
@@ -131,10 +141,10 @@ public class PostProcessingRenderer implements IPropertyProvider {
         if (!recreate)
             return;
 
-        createFBO("scene", Display.getWidth(), Display.getHeight(), true, true, true);
+        createFBO("scene", Display.getWidth(), Display.getHeight(), FBOType.HDR, true, true);
 
-        createFBO("scenePrePost", Display.getWidth(), Display.getHeight(), true, false, false);
-        createFBO("sceneTonemapped", Display.getWidth(), Display.getHeight(), true, false, false);
+        createFBO("scenePrePost", Display.getWidth(), Display.getHeight(), FBOType.HDR, false, false);
+        createFBO("sceneTonemapped", Display.getWidth(), Display.getHeight(), FBOType.HDR, false, false);
 
 
         final int halfWidth = Display.getWidth() / 2;
@@ -143,25 +153,23 @@ public class PostProcessingRenderer implements IPropertyProvider {
         final int quarterHeight = halfHeight / 2;
         final int halfQuarterWidth = quarterWidth / 2;
         final int halfQuarterHeight = quarterHeight / 2;
-        final int halfHalfQuarterWidth = halfQuarterWidth / 2;
-        final int halfHalfQuarterHeight = halfQuarterHeight / 2;
 
-        createFBO("sobel", Display.getWidth(),  Display.getHeight(), false, false, false);
+        createFBO("sobel", Display.getWidth(),  Display.getHeight(), FBOType.DEFAULT, false, false);
 
-        createFBO("ssao", halfWidth,  halfHeight, false, false, false);
-        createFBO("ssaoBlurred0", halfWidth, halfHeight, false, false, false);
-        createFBO("ssaoBlurred1", halfWidth, halfHeight, false, false, false);
+        createFBO("ssao", halfWidth,  halfHeight, FBOType.DEFAULT, false, false);
+        createFBO("ssaoBlurred0", halfWidth, halfHeight, FBOType.DEFAULT, false, false);
+        createFBO("ssaoBlurred1", halfWidth, halfHeight, FBOType.DEFAULT, false, false);
 
-        createFBO("lightShafts", halfWidth,  halfHeight, false, false, false);
+        createFBO("lightShafts", halfWidth,  halfHeight, FBOType.DEFAULT, false, false);
 
-        createFBO("sceneReflected", halfWidth, halfHeight, true, true, false);
+        createFBO("sceneReflected", halfWidth, halfHeight, FBOType.HDR, true, false);
 
-        createFBO("sceneHighPass", halfQuarterWidth, halfQuarterHeight, false, false, false);
-        createFBO("sceneBloom0", halfQuarterWidth, halfQuarterHeight, false, false, false);
-        createFBO("sceneBloom1", halfQuarterWidth, halfQuarterHeight, false, false, false);
+        createFBO("sceneHighPass", halfQuarterWidth, halfQuarterHeight, FBOType.DEFAULT, false, false);
+        createFBO("sceneBloom0", halfQuarterWidth, halfQuarterHeight, FBOType.DEFAULT, false, false);
+        createFBO("sceneBloom1", halfQuarterWidth, halfQuarterHeight, FBOType.DEFAULT, false, false);
 
-        createFBO("sceneBlur0", halfWidth, halfHeight, false, false, false);
-        createFBO("sceneBlur1", halfWidth, halfHeight, false, false, false);
+        createFBO("sceneBlur0", halfWidth, halfHeight, FBOType.DEFAULT, false, false);
+        createFBO("sceneBlur1", halfWidth, halfHeight, FBOType.DEFAULT, false, false);
     }
 
     public void deleteFBO(String title) {
@@ -175,7 +183,7 @@ public class PostProcessingRenderer implements IPropertyProvider {
         }
     }
 
-    public FBO createFBO(String title, int width, int height, boolean hdr, boolean depth, boolean normals) {
+    public FBO createFBO(String title, int width, int height, FBOType type , boolean depth, boolean normals) {
         // Make sure to delete the existing FBO before creating a new one
         deleteFBO(title);
 
@@ -193,11 +201,10 @@ public class PostProcessingRenderer implements IPropertyProvider {
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
 
-        if (hdr) {
-            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, ARBTextureFloat.GL_RGBA16F_ARB, width, height, 0, GL11.GL_RGBA, ARBHalfFloatPixel.GL_HALF_FLOAT_ARB, (java.nio.ByteBuffer) null);
-        }
-        else {
+        if (type == FBOType.HDR) {
             GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (java.nio.ByteBuffer) null);
+        } else {
+            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, ARBTextureFloat.GL_RGBA16F_ARB, width, height, 0, GL11.GL_RGBA, ARBHalfFloatPixel.GL_HALF_FLOAT_ARB, (java.nio.ByteBuffer) null);
         }
 
         if (depth) {
@@ -210,12 +217,12 @@ public class PostProcessingRenderer implements IPropertyProvider {
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
 
-            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL14.GL_DEPTH_COMPONENT16, width, height, 0, GL11.GL_DEPTH_COMPONENT, ARBHalfFloatPixel.GL_HALF_FLOAT_ARB, (java.nio.ByteBuffer) null);
+            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL14.GL_DEPTH_COMPONENT24, width, height, 0, GL11.GL_DEPTH_COMPONENT, GL11.GL_FLOAT, (java.nio.ByteBuffer) null);
 
             // Create depth render buffer object
             fbo._depthRboId = EXTFramebufferObject.glGenRenderbuffersEXT();
             EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, fbo._depthRboId);
-            EXTFramebufferObject.glRenderbufferStorageEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, GL14.GL_DEPTH_COMPONENT16, width, height);
+            EXTFramebufferObject.glRenderbufferStorageEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, GL14.GL_DEPTH_COMPONENT24, width, height);
             EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, 0);
         }
 
@@ -300,12 +307,12 @@ public class PostProcessingRenderer implements IPropertyProvider {
             glReadPixels(0, 0, 1, 1, GL12.GL_BGRA, GL11.GL_BYTE, pixels);
             scene.unbind();
 
-            _sceneLuminance = 0.2126f * pixels.get(2) / 255.f + 0.7152f * pixels.get(1) / 255.f + 0.0722f * pixels.get(0) / 255.f;
+            currentSceneLuminance = 0.2126f * pixels.get(2) / 255.f + 0.7152f * pixels.get(1) / 255.f + 0.0722f * pixels.get(0) / 255.f;
 
             float targetExposure = (Float) hdrMaxExposure.getValue();
 
-            if (_sceneLuminance > 0) {
-                targetExposure = (Float) hdrTargetLuminance.getValue() / _sceneLuminance;
+            if (currentSceneLuminance > 0) {
+                targetExposure = (Float) hdrTargetLuminance.getValue() / currentSceneLuminance;
             }
 
             float maxExposure = (Float) hdrMaxExposure.getValue();
@@ -320,13 +327,13 @@ public class PostProcessingRenderer implements IPropertyProvider {
                 targetExposure = (Float) hdrMinExposure.getValue();
             }
 
-            _exposure = (float) TeraMath.lerp(_exposure, targetExposure, (Float) hdrExposureAdjustmentSpeed.getValue());
+            currentExposure = (float) TeraMath.lerp(currentExposure, targetExposure, (Float) hdrExposureAdjustmentSpeed.getValue());
 
       } else {
         if (CoreRegistry.get(WorldRenderer.class).getSkysphere().getDaylight() == 0.0) {
-            _exposure = (Float) hdrMaxExposureNight.getValue();
+            currentExposure = (Float) hdrMaxExposureNight.getValue();
         } else {
-            _exposure = (Float) hdrExposureDefault.getValue();
+            currentExposure = (Float) hdrExposureDefault.getValue();
         }
       }
     }
@@ -468,12 +475,12 @@ public class PostProcessingRenderer implements IPropertyProvider {
         ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("blur");
 
         shader.enable();
-        shader.setFloat("radius", 8.0f);
+        shader.setFloat("radius", (Float) ssaoBlurRadius.getValue());
 
-        FBO bloom = PostProcessingRenderer.getInstance().getFBO("ssaoBlurred" + id);
-        bloom.bind();
+        FBO ssao = PostProcessingRenderer.getInstance().getFBO("ssaoBlurred" + id);
+        ssao.bind();
 
-        glViewport(0, 0, bloom._width, bloom._height);
+        glViewport(0, 0, ssao._width, ssao._height);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -528,7 +535,7 @@ public class PostProcessingRenderer implements IPropertyProvider {
 
         shader.enable();
 
-        shader.setFloat("radius", 1.5f * Config.getInstance().getBlurIntensity());
+        shader.setFloat("radius", (Float) overallBlurFactor.getValue() * Config.getInstance().getBlurRadius());
 
         FBO blur = PostProcessingRenderer.getInstance().getFBO("sceneBlur" + id);
         blur.bind();
@@ -627,10 +634,10 @@ public class PostProcessingRenderer implements IPropertyProvider {
     }
 
     private void renderQuad() {
-        if (_displayListQuad == -1) {
-            _displayListQuad = glGenLists(1);
+        if (displayListQuad == -1) {
+            displayListQuad = glGenLists(1);
 
-            glNewList(_displayListQuad, GL11.GL_COMPILE);
+            glNewList(displayListQuad, GL11.GL_COMPILE);
 
             glBegin(GL_QUADS);
             glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -652,11 +659,11 @@ public class PostProcessingRenderer implements IPropertyProvider {
             glEndList();
         }
 
-        glCallList(_displayListQuad);
+        glCallList(displayListQuad);
     }
 
     public float getExposure() {
-        return _exposure;
+        return currentExposure;
     }
 
     public FBO getFBO(String title) {
@@ -672,5 +679,7 @@ public class PostProcessingRenderer implements IPropertyProvider {
         properties.add(hdrMaxExposureNight);
         properties.add(hdrMinExposure);
         properties.add(hdrTargetLuminance);
+        properties.add(ssaoBlurRadius);
+        properties.add(overallBlurFactor);
     }
 }

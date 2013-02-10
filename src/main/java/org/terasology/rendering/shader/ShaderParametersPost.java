@@ -48,6 +48,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
     Texture noiseTexture = Assets.getTexture("engine:noise");
 
     Property filmGrainIntensity = new Property("filmGrainIntensity", 0.1f, 0.0f, 1.0f);
+    Property maxBlurSky = new Property("maxBlurSky", 1.0f, 0.0f, 1.0f);
 
     @Override
     public void applyParameters(ShaderProgram program) {
@@ -68,6 +69,8 @@ public class ShaderParametersPost extends ShaderParametersBase {
             GL13.glActiveTexture(GL13.GL_TEXTURE2);
             PostProcessingRenderer.getInstance().getFBO("sceneBlur1").bindTexture();
             program.setInt("texBlur", 2);
+
+            program.setFloat("maxBlurSky", (Float) maxBlurSky.getValue());
         }
 
         GL13.glActiveTexture(GL13.GL_TEXTURE3);
@@ -102,5 +105,6 @@ public class ShaderParametersPost extends ShaderParametersBase {
     @Override
     public void addPropertiesToList(List<Property> properties) {
         properties.add(filmGrainIntensity);
+        properties.add(maxBlurSky);
     }
 }

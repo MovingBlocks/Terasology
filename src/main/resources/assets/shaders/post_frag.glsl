@@ -21,6 +21,7 @@ uniform sampler2D texBloom;
 #endif
 #if !defined (NO_BLUR) || defined (MOTION_BLUR)
 uniform sampler2D texBlur;
+uniform float maxBlurSky;
 #endif
 #ifdef VIGNETTE
 uniform sampler2D texVignette;
@@ -52,10 +53,15 @@ void main() {
     float depthLin = linDepth(currentDepth);
     float blur = 0.0;
 
-    if (depthLin > BLUR_START && !swimming)
+    if (depthLin > BLUR_START && !swimming) {
        blur = clamp((depthLin - BLUR_START) / BLUR_LENGTH, 0.0, 1.0);
-    else if (swimming)
+
+       if (currentDepth > 0.9999999) {
+           blur = min(blur, maxBlurSky);
+       }
+    } else if (swimming) {
        blur = 1.0;
+    }
 #endif
 
     vec4 color = texture2D(texScene, gl_TexCoord[0].xy);
