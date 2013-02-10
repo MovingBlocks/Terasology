@@ -16,22 +16,18 @@
 
 package org.terasology.world.block;
 
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.audio.events.PlaySoundForOwnerEvent;
 import org.terasology.components.ItemComponent;
 import org.terasology.entityFactory.BlockItemFactory;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.audio.AudioManager;
 import org.terasology.physics.CollideEvent;
 
 /**
@@ -42,7 +38,7 @@ public class BlockPickupSystem implements ComponentSystem {
 
     private BlockItemFactory blockItemFactory;
 
-    @ReceiveEvent(components=BlockPickupComponent.class)
+    @ReceiveEvent(components = BlockPickupComponent.class)
     public void onBump(CollideEvent event, EntityRef entity) {
         BlockPickupComponent blockPickupComponent = entity.getComponent(BlockPickupComponent.class);
         EntityRef blockItem = blockItemFactory.newInstance(blockPickupComponent.blockFamily, blockPickupComponent.placedEntity);

@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.audio;
+package org.terasology.audio.openAL;
 
-import javax.vecmath.Vector3d;
+import org.terasology.audio.Sound;
+
 import javax.vecmath.Vector3f;
 
 public interface SoundSource {
@@ -51,7 +52,7 @@ public interface SoundSource {
     /**
      * Update method, use it for position update, buffer switching, etc
      */
-    public void update();
+    public void update(float delta);
 
     /**
      * Returns audio length in seconds
@@ -172,6 +173,11 @@ public interface SoundSource {
      * @return
      */
     public float getGain();
+
+    /**
+     * Updates gain, used after pool volume is altered
+     */
+    public void updateGain();
 
     /**
      * Set sound source gain

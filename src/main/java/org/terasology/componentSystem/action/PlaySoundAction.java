@@ -15,19 +15,19 @@
  */
 package org.terasology.componentSystem.action;
 
-import javax.vecmath.Vector3f;
-
 import org.terasology.audio.Sound;
-import org.terasology.components.actions.PlaySoundActionComponent;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.ComponentSystem;
-import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterSystem;
-import org.terasology.entitySystem.RegisterMode;
-import org.terasology.events.ActivateEvent;
 import org.terasology.audio.AudioManager;
-import org.terasology.logic.manager.SoundManager;
+import org.terasology.components.actions.PlaySoundActionComponent;
+import org.terasology.entitySystem.ComponentSystem;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.In;
+import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.RegisterMode;
+import org.terasology.entitySystem.RegisterSystem;
+import org.terasology.events.ActivateEvent;
 import org.terasology.utilities.FastRandom;
+
+import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -36,6 +36,9 @@ import org.terasology.utilities.FastRandom;
 public class PlaySoundAction implements ComponentSystem {
 
     private FastRandom random = new FastRandom();
+
+    @In
+    private AudioManager audioManager;
 
     public void initialise() {
     }
@@ -61,7 +64,7 @@ public class PlaySoundAction implements ComponentSystem {
             if (pos == null) {
                 pos = event.getOrigin();
             }
-            AudioManager.play(sound, pos, playSound.volume, SoundManager.PRIORITY_NORMAL);
+            audioManager.playSound(sound, pos, playSound.volume, AudioManager.PRIORITY_NORMAL);
         }
     }
 }

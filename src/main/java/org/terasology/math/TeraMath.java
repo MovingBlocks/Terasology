@@ -22,6 +22,7 @@ import java.nio.FloatBuffer;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 
+import com.bulletphysics.linearmath.QuaternionUtil;
 import org.lwjgl.BufferUtils;
 import org.terasology.world.chunks.Chunk;
 
@@ -35,8 +36,10 @@ public final class TeraMath {
     private TeraMath() {
     }
 
+    public static final float PI = (float) Math.PI;
     public static final float RAD_TO_DEG = (float) (180.0f / Math.PI);
     public static final float DEG_TO_RAD = (float) (Math.PI / 180.0f);
+
 
     /**
      * Returns the absolute value.

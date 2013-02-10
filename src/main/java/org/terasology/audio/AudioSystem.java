@@ -1,15 +1,14 @@
 package org.terasology.audio;
 
-import org.terasology.audio.events.AbstractPlaySoundEvent;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.audio.events.PlaySoundForOwnerEvent;
+import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.world.LocationComponent;
-import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterSystem;
-import org.terasology.logic.manager.SoundManager;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkSystem;
 
@@ -17,10 +16,14 @@ import org.terasology.network.NetworkSystem;
  * @author Immortius
  */
 @RegisterSystem
-public class AudioSystem implements ComponentSystem {
+public class AudioSystem implements UpdateSubscriberSystem {
 
     @In
     private NetworkSystem networkSystem;
+    @In
+    private LocalPlayer localPlayer;
+    @In
+    private AudioManager audioManager;
 
 
     @Override
@@ -35,19 +38,23 @@ public class AudioSystem implements ComponentSystem {
     public void onPlaySound(PlaySoundEvent playSoundEvent, EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         if (location != null) {
-            AudioManager.play(playSoundEvent.getSound(), location.getWorldPosition(), playSoundEvent.getVolume(), SoundManager.PRIORITY_NORMAL);
+            audioManager.playSound(playSoundEvent.getSound(), location.getWorldPosition(), playSoundEvent.getVolume(), AudioManager.PRIORITY_NORMAL);
         } else {
-            AudioManager.play(playSoundEvent.getSound(), playSoundEvent.getVolume());
+            audioManager.playSound(playSoundEvent.getSound(), playSoundEvent.getVolume());
         }
     }
 
     @ReceiveEvent(components = {})
     public void onPlaySound(PlaySoundForOwnerEvent playSoundEvent, EntityRef entity) {
-        ClientComponent clientComponent = networkSystem.getOwnerEntity(playSoundEvent.getInstigator()).getComponent(ClientComponent.class);
+        ClientComponent clientComponent = networkSystem.getOwnerEntity(entity).getComponent(ClientComponent.class);
         if (clientComponent != null && !clientComponent.local) {
             return;
         }
-        AudioManager.play(playSoundEvent.getSound(), playSoundEvent.getVolume());
+        audioManager.playSound(playSoundEvent.getSound(), playSoundEvent.getVolume(), AudioManager.PRIORITY_HIGH);
     }
 
+    @Override
+    public void update(float delta) {
+        audioManager.updateListener(localPlayer.getPosition(), localPlayer.getViewRotation(), localPlayer.getVelocity());
+    }
 }

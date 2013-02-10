@@ -13,17 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.audio;
+package org.terasology.audio.openAL;
+
+import org.terasology.audio.Sound;
+import org.terasology.audio.AudioManager;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.terasology.logic.manager.SoundManager;
-
 public class BasicSoundPool implements SoundPool {
     private final static int DEFAULT_POOL_SIZE = 32;
+
+    private float volume;
 
     protected Map<SoundSource, Integer> soundSources;
 
@@ -77,7 +80,7 @@ public class BasicSoundPool implements SoundPool {
     }
 
     public SoundSource getSource(Sound sound) {
-        return getSource(sound, SoundManager.PRIORITY_NORMAL);
+        return getSource(sound, AudioManager.PRIORITY_NORMAL);
     }
 
     public Set<SoundSource> getSources() {
@@ -114,12 +117,25 @@ public class BasicSoundPool implements SoundPool {
         }
     }
 
-    public void update() {
+    public void update(float delta) {
         for (SoundSource source : soundSources.keySet()) {
             if (source.isPlaying()) {
-                source.update();
+                source.update(delta);
             }
         }
+    }
+
+    @Override
+    public void setVolume(float volume) {
+        this.volume = volume;
+        for (SoundSource soundSource : soundSources.keySet()) {
+            soundSource.updateGain();
+        }
+    }
+
+    @Override
+    public float getVolume() {
+        return this.volume;
     }
 
     public int size() {
@@ -132,7 +148,7 @@ public class BasicSoundPool implements SoundPool {
 
     public boolean isLocked(SoundSource source) {
         Integer lock = soundSources.get(source);
-        return lock != null && lock == SoundManager.PRIORITY_LOCKED;
+        return lock != null && lock == AudioManager.PRIORITY_LOCKED;
     }
 
     public boolean lock(SoundSource source) {
@@ -140,7 +156,7 @@ public class BasicSoundPool implements SoundPool {
             return false;
         }
 
-        soundSources.put(source, SoundManager.PRIORITY_LOCKED);
+        soundSources.put(source, AudioManager.PRIORITY_LOCKED);
 
         return true;
     }
@@ -154,7 +170,7 @@ public class BasicSoundPool implements SoundPool {
     }
 
     protected SoundSource createSoundSource() {
-        return new BasicSoundSource();
+        return new BasicSoundSource(this);
     }
 
     private void fillPool(int capacity) {

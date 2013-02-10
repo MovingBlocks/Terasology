@@ -25,7 +25,7 @@ import org.terasology.input.RegisterBindButton;
 /**
  * @author Immortius
  */
-@RegisterBindButton(id = "jump", description = "Jump")
+@RegisterBindButton(id = "jump", description = "Jump", repeating = false)
 @DefaultBinding(type = InputType.KEY, id = Keyboard.KEY_SPACE)
 public class JumpButton extends BindButtonEvent {
 }

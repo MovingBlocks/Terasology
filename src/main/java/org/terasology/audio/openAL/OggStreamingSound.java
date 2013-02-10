@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.audio;
+package org.terasology.audio.openAL;
 
 import java.io.IOException;
 import java.net.URL;
@@ -25,7 +25,7 @@ import org.terasology.asset.AssetUri;
 import org.terasology.utilities.OggReader;
 
 
-public class OggStreamingSound extends AbstractStreamingSound {
+public class OggStreamingSound extends OpenALStreamingSound {
 
     private static final Logger logger = LoggerFactory.getLogger(OggStreamingSound.class);
     private ByteBuffer dataBuffer = ByteBuffer.allocateDirect(4096 * 8);

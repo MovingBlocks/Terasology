@@ -29,8 +29,8 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.openal.AL10;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetUri;
-import org.terasology.audio.OggSound;
-import org.terasology.audio.OpenALException;
+import org.terasology.audio.openAL.OggSound;
+import org.terasology.audio.openAL.OpenALException;
 import org.terasology.audio.Sound;
 import org.terasology.utilities.OggReader;
 

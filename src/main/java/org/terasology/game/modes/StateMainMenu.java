@@ -15,6 +15,8 @@
  */
 package org.terasology.game.modes;
 
+import org.terasology.asset.Assets;
+import org.terasology.audio.AudioManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventSystem;
 import org.terasology.entitySystem.PersistableEntityManager;
@@ -24,10 +26,9 @@ import org.terasology.game.GameEngine;
 import org.terasology.game.bootstrap.EntitySystemBuilder;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.InputSystem;
-import org.terasology.logic.players.LocalPlayer;
-import org.terasology.audio.AudioManager;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.mod.ModManager;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.ClientComponent;
 
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
@@ -48,7 +49,7 @@ import static org.lwjgl.opengl.GL11.glLoadIdentity;
  */
 public class StateMainMenu implements GameState {
     private GameEngine _gameInstance = null;
-    
+
     private PersistableEntityManager entityManager;
     private EventSystem eventSystem;
     private InputSystem inputSystem;
@@ -69,7 +70,7 @@ public class StateMainMenu implements GameState {
 
         componentSystemManager = new ComponentSystemManager();
         CoreRegistry.put(ComponentSystemManager.class, componentSystemManager);
-        
+
         cameraTargetSystem = new CameraTargetSystem();
         CoreRegistry.put(CameraTargetSystem.class, cameraTargetSystem);
         componentSystemManager.register(cameraTargetSystem, "engine:CameraTargetSystem");
@@ -89,7 +90,7 @@ public class StateMainMenu implements GameState {
 
         guiManager.openWindow("main");
     }
-    
+
     @Override
     public void dispose() {
         eventSystem.process();
@@ -102,11 +103,11 @@ public class StateMainMenu implements GameState {
     }
 
     private void playBackgroundMusic() {
-        AudioManager.playMusic("engine:MenuTheme");
+        CoreRegistry.get(AudioManager.class).playMusic(Assets.getMusic("engine:MenuTheme"));
     }
 
     private void stopBackgroundMusic() {
-        AudioManager.getInstance().stopAllSounds();
+        CoreRegistry.get(AudioManager.class).stopAllSounds();
     }
 
     @Override
@@ -117,7 +118,7 @@ public class StateMainMenu implements GameState {
     @Override
     public void update(float delta) {
         updateUserInterface();
-        
+
         eventSystem.process();
     }
 

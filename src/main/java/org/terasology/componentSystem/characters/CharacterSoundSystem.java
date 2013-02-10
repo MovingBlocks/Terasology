@@ -15,21 +15,19 @@
  */
 package org.terasology.componentSystem.characters;
 
-import javax.vecmath.Vector3d;
-
 import org.terasology.audio.Sound;
+import org.terasology.audio.AudioManager;
 import org.terasology.components.CharacterSoundComponent;
 import org.terasology.components.world.LocationComponent;
-import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.ComponentSystem;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.entitySystem.RegisterMode;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.events.FootstepEvent;
 import org.terasology.events.JumpEvent;
 import org.terasology.events.VerticalCollisionEvent;
-import org.terasology.audio.AudioManager;
-import org.terasology.logic.manager.SoundManager;
 import org.terasology.utilities.FastRandom;
 
 /**
@@ -39,6 +37,9 @@ import org.terasology.utilities.FastRandom;
 public class CharacterSoundSystem implements ComponentSystem {
 
     private FastRandom random = new FastRandom();
+
+    @In
+    private AudioManager audioManager;
 
     @Override
     public void initialise() {
@@ -57,7 +58,7 @@ public class CharacterSoundSystem implements ComponentSystem {
             CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
             if (characterSounds.footstepSounds.size() > 0) {
                 Sound sound = characterSounds.footstepSounds.get(random.randomIntAbs(characterSounds.footstepSounds.size()));
-                AudioManager.play(sound, location.getWorldPosition(), characterSounds.footstepVolume, SoundManager.PRIORITY_NORMAL);
+                audioManager.playSound(sound, location.getWorldPosition(), characterSounds.footstepVolume, AudioManager.PRIORITY_NORMAL);
             }
         }
     }
@@ -71,7 +72,7 @@ public class CharacterSoundSystem implements ComponentSystem {
             CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
             if (characterSounds.footstepSounds.size() > 0) {
                 Sound sound = characterSounds.footstepSounds.get(random.randomIntAbs(characterSounds.footstepSounds.size()));
-                AudioManager.play(sound, location.getWorldPosition(), 0.8f, SoundManager.PRIORITY_NORMAL);
+                audioManager.playSound(sound, location.getWorldPosition(), 0.8f, AudioManager.PRIORITY_NORMAL);
             }
         }
     }
@@ -84,7 +85,7 @@ public class CharacterSoundSystem implements ComponentSystem {
         CharacterSoundComponent characterSounds = entity.getComponent(CharacterSoundComponent.class);
         if (characterSounds.footstepSounds.size() > 0) {
             Sound sound = characterSounds.footstepSounds.get(random.randomIntAbs(characterSounds.footstepSounds.size()));
-            AudioManager.play(sound, event.getLocation(), 1.0f, SoundManager.PRIORITY_NORMAL);
+            audioManager.playSound(sound, event.getLocation(), 1.0f, AudioManager.PRIORITY_NORMAL);
         }
     }
 

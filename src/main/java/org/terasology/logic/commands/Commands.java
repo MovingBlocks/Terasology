@@ -24,6 +24,7 @@ import org.terasology.asset.Asset;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
+import org.terasology.audio.AudioManager;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.HierarchicalAIComponent;
 import org.terasology.components.ItemComponent;
@@ -44,15 +45,16 @@ import org.terasology.game.GameEngine;
 import org.terasology.game.TerasologyEngine;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.characters.CharacterComponent;
+import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.console.SimpleMessageEvent;
-import org.terasology.audio.AudioManager;
 import org.terasology.logic.manager.CommandManager;
 import org.terasology.logic.manager.CommandManager.CommandInfo;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.MessageManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.logic.characters.CharacterMovementComponent;
+import org.terasology.math.Direction;
+import org.terasology.math.Side;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.rendering.world.WorldRenderer;
@@ -158,8 +160,18 @@ public class Commands implements CommandProvider {
 
     @Command(shortDescription = "Toggle muting all sound")
     public void toggleMute() {
-        AudioManager.getInstance().setMute(!AudioManager.getInstance().isMute());
-        CoreRegistry.get(LocalPlayer.class).getClientEntity().send(new SimpleMessageEvent("All sound is now " + ((AudioManager.getInstance().isMute()) ? "muted." : "unmuted.")));
+        AudioManager audioManager = CoreRegistry.get(AudioManager.class);
+        audioManager.setMute(!audioManager.isMute());
+        CoreRegistry.get(LocalPlayer.class).getClientEntity().send(new SimpleMessageEvent("All sound is now " + ((audioManager.isMute()) ? "muted." : "unmuted.")));
+    }
+
+    @Command(shortDescription = "Plays a test sound")
+    public void playTestSound(@CommandParam(name = "xOffset") float xOffset, @CommandParam(name = "yOffset") float zOffset) {
+        AudioManager audioManager = CoreRegistry.get(AudioManager.class);
+        Vector3f position = new Vector3f(CoreRegistry.get(LocalPlayer.class).getPosition());
+        position.x += xOffset;
+        position.z += zOffset;
+        audioManager.playSound(Assets.getSound("engine:dig"), position);
     }
 
     @Command(shortDescription = "List all available blocks")
@@ -593,9 +605,9 @@ public class Commands implements CommandProvider {
         if (dir.lengthSquared() > 0.001f) {
             dir.normalize();
         } else {
-            dir.set(0, 0, 1);
+            dir.set(Direction.FORWARD.getVector3f());
         }
-        Quat4f rotation = QuaternionUtil.shortestArcQuat(new Vector3f(0, 0, 1), dir, new Quat4f());
+        Quat4f rotation = QuaternionUtil.shortestArcQuat(Direction.FORWARD.getVector3f(), dir, new Quat4f());
 
         Prefab prefab = CoreRegistry.get(PrefabManager.class).getPrefab(prefabName);
         if (prefab != null && prefab.getComponent(LocationComponent.class) != null) {

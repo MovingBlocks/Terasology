@@ -100,7 +100,7 @@ public class ObjMeshLoader implements AssetLoader<Mesh> {
                     }
                     Vector2f texCoord = rawTexCoords.get(indexSet.y - 1);
                     texCoord0.add(texCoord.x);
-                    texCoord0.add(texCoord.y);
+                    texCoord0.add(1 - texCoord.y);
                 }
 
                 if (indexSet.z != -1) {
@@ -163,7 +163,7 @@ public class ObjMeshLoader implements AssetLoader<Mesh> {
                         throw new IOException("Bad statement");
                     }
                     // Need to flip v coord, apparently
-                    rawTexCoords.add(new Vector2f(Float.parseFloat(floats[0]), 1 - Float.parseFloat(floats[1])));
+                    rawTexCoords.add(new Vector2f(Float.parseFloat(floats[0]), Float.parseFloat(floats[1])));
                 }
                 // Vertex normal
                 else if ("vn".equals(prefix)) {

@@ -15,19 +15,19 @@
  */
 package org.terasology.potions;
 
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
+import org.terasology.audio.AudioManager;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.ComponentSystem;
+import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.audio.AudioManager;
 
 
 /**
@@ -38,6 +38,9 @@ import org.terasology.audio.AudioManager;
  */
 @RegisterSystem
 public class DrinkPotionAction implements ComponentSystem {
+
+    @In
+    private AudioManager audioManager;
 
     @Override
     public void initialise() {
@@ -112,7 +115,7 @@ public class DrinkPotionAction implements ComponentSystem {
             default:
                 break;
         }
-        AudioManager.play(new AssetUri(AssetType.SOUND, "engine:drink"), 1.0f);
+        audioManager.playSound(Assets.getSound("engine:drink"), 1.0f);
 
 
     }

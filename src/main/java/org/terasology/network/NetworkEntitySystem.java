@@ -6,6 +6,7 @@ import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.event.AddComponentEvent;
+import org.terasology.entitySystem.event.ChangedComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 
 /**
@@ -31,6 +32,11 @@ public class NetworkEntitySystem implements ComponentSystem {
     @ReceiveEvent(components = NetworkComponent.class)
     public void onAddNetworkComponent(AddComponentEvent event, EntityRef entity) {
         networkSystem.registerNetworkEntity(entity);
+    }
+
+    @ReceiveEvent(components = NetworkComponent.class)
+    public void onNetworkComponentChanged(ChangedComponentEvent event, EntityRef entity) {
+        networkSystem.updateNetworkEntity(entity);
     }
 
     @ReceiveEvent(components = NetworkComponent.class)

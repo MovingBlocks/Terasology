@@ -15,24 +15,22 @@
  */
 package org.terasology.componentSystem.items;
 
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
+import com.google.common.collect.Lists;
+import org.terasology.asset.Assets;
+import org.terasology.audio.AudioManager;
 import org.terasology.components.ItemComponent;
+import org.terasology.entitySystem.ComponentSystem;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.EventPriority;
 import org.terasology.entitySystem.In;
+import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.RegisterSystem;
-import org.terasology.math.TeraMath;
-import org.terasology.world.block.BlockComponent;
-import org.terasology.world.block.BlockItemComponent;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.ComponentSystem;
-import org.terasology.entitySystem.EventPriority;
-import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.audio.AudioManager;
 import org.terasology.math.Side;
+import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.physics.CollisionGroup;
@@ -40,9 +38,9 @@ import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.BlockItemComponent;
 import org.terasology.world.block.family.BlockFamily;
-
-import com.google.common.collect.Lists;
 
 /**
  * TODO: Refactor use methods into events? Usage should become a separate component
@@ -56,6 +54,9 @@ public class ItemSystem implements ComponentSystem {
 
     @In
     private BlockEntityRegistry blockEntityRegistry;
+
+    @In
+    private AudioManager audioManager;
 
     @Override
     public void initialise() {
@@ -121,20 +122,20 @@ public class ItemSystem implements ComponentSystem {
      * @param type The type of the block
      * @return True if a block was placed
      */
-    private boolean placeBlock(BlockFamily type, Vector3i targetBlock, Side surfaceDirection, Side secondaryDirection, BlockItemComponent blockItem) {
+    private boolean placeBlock(BlockFamily type, Vector3i targetBlock, Side surfaceSide, Side secondaryDirection, BlockItemComponent blockItem) {
         if (type == null)
             return true;
 
         Vector3i placementPos = new Vector3i(targetBlock);
-        placementPos.add(surfaceDirection.getVector3i());
+        placementPos.add(surfaceSide.getVector3i());
 
-        Block block = type.getBlockFor(surfaceDirection, secondaryDirection);
+        Block block = type.getBlockFor(surfaceSide, secondaryDirection);
         if (block == null)
             return false;
 
         if (canPlaceBlock(block, targetBlock, placementPos)) {
             if (blockEntityRegistry.setBlock(placementPos, block, worldProvider.getBlock(placementPos), blockItem.placedEntity)) {
-                AudioManager.play(new AssetUri(AssetType.SOUND, "engine:PlaceBlock"), 0.5f);
+                audioManager.playSound(Assets.getSound("engine:PlaceBlock"), 0.5f);
                 if (blockItem.placedEntity.exists()) {
                     blockItem.placedEntity = EntityRef.NULL;
                 }

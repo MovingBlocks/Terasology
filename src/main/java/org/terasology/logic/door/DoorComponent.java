@@ -27,8 +27,8 @@ import org.terasology.world.block.family.BlockFamily;
 public class DoorComponent implements Component {
     public BlockFamily topBlockFamily;
     public BlockFamily bottomBlockFamily;
-    public Side closedDirection;
-    public Side openDirection;
+    public Side closedSide;
+    public Side openSide;
     public Sound openSound;
     public Sound closeSound;
 

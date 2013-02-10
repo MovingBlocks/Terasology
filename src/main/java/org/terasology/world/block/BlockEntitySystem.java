@@ -15,16 +15,17 @@
  */
 package org.terasology.world.block;
 
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
+import org.terasology.audio.AudioManager;
+import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.components.BlockParticleEffectComponent;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.ItemComponent;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entityFactory.DroppedBlockFactory;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EventPriority;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
@@ -33,7 +34,6 @@ import org.terasology.events.DamageEvent;
 import org.terasology.events.FullHealthEvent;
 import org.terasology.events.NoHealthEvent;
 import org.terasology.events.inventory.ReceiveItemEvent;
-import org.terasology.audio.AudioManager;
 import org.terasology.physics.ImpulseEvent;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldProvider;
@@ -53,6 +53,9 @@ public class BlockEntitySystem implements ComponentSystem {
 
     @In
     private EntityManager entityManager;
+
+    @In
+    private AudioManager audioManager;
 
     private BlockItemFactory blockItemFactory;
     private DroppedBlockFactory droppedBlockFactory;
@@ -85,7 +88,7 @@ public class BlockEntitySystem implements ComponentSystem {
         }
 
         // TODO: Configurable via block definition
-        AudioManager.play(new AssetUri(AssetType.SOUND, "engine:RemoveBlock"), 0.6f);
+        entity.send(new PlaySoundEvent(Assets.getSound("engine:RemoveBlock"), 0.6f));
 
         if (oldBlock.getEntityMode() == BlockEntityMode.PERSISTENT) {
             entity.removeComponent(HealthComponent.class);
@@ -148,7 +151,7 @@ public class BlockEntitySystem implements ComponentSystem {
             particles.saveComponent(comp);
 
             // TODO: Configurable via block definition
-            AudioManager.play(new AssetUri(AssetType.SOUND, "engine:Dig"), 1.0f);
+            audioManager.playSound(Assets.getSound("engine:Dig"), blockComp.getPosition().toVector3f());
         }
     }
 

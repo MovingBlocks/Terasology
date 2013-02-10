@@ -21,13 +21,14 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.Assets;
+import org.terasology.audio.AudioManager;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.Timer;
 import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.audio.AudioManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.manager.PostProcessingRenderer;
@@ -170,6 +171,7 @@ public final class WorldRenderer {
     private static short playround;
 
     private ComponentSystemManager systemManager;
+    private AudioManager audioManager;
 
     /**
      * Initializes a new (local) world for the single player mode.
@@ -192,6 +194,7 @@ public final class WorldRenderer {
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
         localPlayerSystem.setPlayerCamera(defaultCamera);
         systemManager = CoreRegistry.get(ComponentSystemManager.class);
+        audioManager = CoreRegistry.get(AudioManager.class);
 
 
         initTimeEvents();
@@ -318,11 +321,11 @@ public final class WorldRenderer {
             @Override
             public void run() {
                 if (getPlayerPosition().y < 50)
-                    AudioManager.playMusic("engine:SpacialWinds");
+                    audioManager.playMusic(Assets.getMusic("engine:SpacialWinds"));
                 else if (getPlayerPosition().y > 175)
-                    AudioManager.playMusic("engine:Heaven");
+                    audioManager.playMusic(Assets.getMusic("engine:Heaven"));
                 else
-                    AudioManager.playMusic("engine:Sunrise");
+                    audioManager.playMusic(Assets.getMusic("engine:Sunrise"));
             }
         });
 
@@ -332,11 +335,11 @@ public final class WorldRenderer {
             public void run() {
                 //TODO get beter tck instead afternoon
                 if (getPlayerPosition().y < 50)
-                    AudioManager.playMusic("engine:DwarfForge");
+                    audioManager.playMusic(Assets.getMusic("engine:DwarfForge"));
                 else if (getPlayerPosition().y > 175)
-                    AudioManager.playMusic("engine:SpaceExplorers");
+                    audioManager.playMusic(Assets.getMusic("engine:SpaceExplorers"));
                 else
-                    AudioManager.playMusic("engine:Afternoon");
+                    audioManager.playMusic(Assets.getMusic("engine:Afternoon"));
             }
         });
 
@@ -345,11 +348,11 @@ public final class WorldRenderer {
             @Override
             public void run() {
                 if (getPlayerPosition().y < 50)
-                    AudioManager.playMusic("engine:OrcFortress");
+                    audioManager.playMusic(Assets.getMusic("engine:OrcFortress"));
                 else if (getPlayerPosition().y > 175)
-                    AudioManager.playMusic("engine:PeacefulWorld");
+                    audioManager.playMusic(Assets.getMusic("engine:PeacefulWorld"));
                 else
-                    AudioManager.playMusic("engine:Sunset");
+                    audioManager.playMusic(Assets.getMusic("engine:Sunset"));
             }
         });
 
@@ -358,11 +361,11 @@ public final class WorldRenderer {
             @Override
             public void run() {
                 if (getPlayerPosition().y < 50)
-                    AudioManager.playMusic("engine:CreepyCaves");
+                    audioManager.playMusic(Assets.getMusic("engine:CreepyCaves"));
                 else if (getPlayerPosition().y > 175)
-                    AudioManager.playMusic("engine:ShootingStars");
+                    audioManager.playMusic(Assets.getMusic("engine:ShootingStars"));
                 else
-                    AudioManager.playMusic("engine:Dimlight");
+                    audioManager.playMusic(Assets.getMusic("engine:Dimlight"));
             }
         });
 
@@ -371,11 +374,11 @@ public final class WorldRenderer {
             @Override
             public void run() {
                 if (getPlayerPosition().y < 50)
-                    AudioManager.playMusic("engine:CreepyCaves");
+                    audioManager.playMusic(Assets.getMusic("engine:CreepyCaves"));
                 else if (getPlayerPosition().y > 175)
-                    AudioManager.playMusic("engine:NightTheme");
+                    audioManager.playMusic(Assets.getMusic("engine:NightTheme"));
                 else
-                    AudioManager.playMusic("engine:OtherSide");
+                    audioManager.playMusic(Assets.getMusic("engine:OtherSide"));
             }
         });
 
@@ -384,11 +387,11 @@ public final class WorldRenderer {
             @Override
             public void run() {
                 if (getPlayerPosition().y < 50)
-                    AudioManager.playMusic("engine:CreepyCaves");
+                    audioManager.playMusic(Assets.getMusic("engine:CreepyCaves"));
                 else if (getPlayerPosition().y > 175)
-                    AudioManager.playMusic("engine:Heroes");
+                    audioManager.playMusic(Assets.getMusic("engine:Heroes"));
                 else
-                    AudioManager.playMusic("engine:Resurface");
+                    audioManager.playMusic(Assets.getMusic("engine:Resurface"));
             }
         });
     }
@@ -846,7 +849,7 @@ public final class WorldRenderer {
             logger.error("Failed to save world manifest", e);
         }
 
-        AudioManager.getInstance().stopAllSounds();
+        audioManager.stopAllSounds();
     }
 
     /**

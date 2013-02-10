@@ -13,7 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.audio;
+package org.terasology.audio.openAL;
+
+import org.lwjgl.BufferUtils;
+import org.terasology.audio.Sound;
+
+import java.nio.IntBuffer;
 
 import static org.lwjgl.openal.AL10.AL_BUFFER;
 import static org.lwjgl.openal.AL10.AL_BUFFERS_PROCESSED;
@@ -27,19 +32,12 @@ import static org.lwjgl.openal.AL10.alSourceStop;
 import static org.lwjgl.openal.AL10.alSourceUnqueueBuffers;
 import static org.lwjgl.openal.AL10.alSourcei;
 
-import java.nio.IntBuffer;
-
-import org.lwjgl.BufferUtils;
-
 public class BasicStreamingSoundSource extends BasicSoundSource {
 
-    public BasicStreamingSoundSource() {
-        super();
+    public BasicStreamingSoundSource(SoundPool owningPool) {
+        super(owningPool);
     }
 
-    public BasicStreamingSoundSource(AbstractStreamingSound audio) {
-        super(audio);
-    }
 
     @Override
     public float getPlaybackPositionf() {
@@ -82,29 +80,28 @@ public class BasicStreamingSoundSource extends BasicSoundSource {
     }
 
     @Override
-    public void update() {
+    public void update(float delta) {
         int buffersProcessed = alGetSourcei(this.getSourceId(), AL_BUFFERS_PROCESSED);
 
         while (buffersProcessed-- > 0) {
             int buffer = alSourceUnqueueBuffers(this.getSourceId());
             OpenALException.checkState("Buffer unqueue");
 
-            if (((AbstractStreamingSound) audio).updateBuffer(buffer)) {
+            if (((OpenALStreamingSound) audio).updateBuffer(buffer)) {
                 alSourceQueueBuffers(this.getSourceId(), buffer);
                 OpenALException.checkState("Buffer refill");
             } else {
-                _playing = false; // we aren't playing anymore, because stream seems to end
-                continue;  // do nothing, let source dequeue other buffers
+                playing = false; // we aren't playing anymore, because stream seems to end
             }
         }
 
-        super.update();
+        super.update(delta);
     }
 
     @Override
     protected void updateState() {
         // Start playing if playback for stopped by end of buffers
-        if (_playing && alGetSourcei(getSourceId(), AL_SOURCE_STATE) != AL_PLAYING) {
+        if (playing && alGetSourcei(getSourceId(), AL_SOURCE_STATE) != AL_PLAYING) {
             alSourcePlay(this.getSourceId());
         }
     }
@@ -116,10 +113,10 @@ public class BasicStreamingSoundSource extends BasicSoundSource {
             alSourceRewind(this.sourceId);
         }
 
-        if (sound instanceof AbstractStreamingSound) {
+        if (sound instanceof OpenALStreamingSound) {
             alSourcei(this.getSourceId(), AL_BUFFER, 0);
 
-            AbstractStreamingSound asa = (AbstractStreamingSound) sound;
+            OpenALStreamingSound asa = (OpenALStreamingSound) sound;
             this.audio = asa;
 
             asa.reset();

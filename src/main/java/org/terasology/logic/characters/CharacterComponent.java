@@ -18,6 +18,8 @@ package org.terasology.logic.characters;
 import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.math.Direction;
+import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 
 import javax.vecmath.Quat4f;
@@ -43,7 +45,7 @@ public final class CharacterComponent implements Component {
     }
 
     public Vector3f getLookDirection() {
-        Vector3f result = new Vector3f(0, 0, 1);
+        Vector3f result = Direction.FORWARD.getVector3f();
         QuaternionUtil.quatRotate(getLookRotation(), result, result);
         return result;
     }

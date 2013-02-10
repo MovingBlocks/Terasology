@@ -15,320 +15,61 @@
  */
 package org.terasology.audio;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
-import org.terasology.asset.Assets;
-import org.terasology.components.world.LocationComponent;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.logic.characters.CharacterMovementComponent;
-
-import com.bulletphysics.linearmath.QuaternionUtil;
-import org.terasology.logic.manager.SoundManager;
-
 /**
- * Simple managing class for loading and accessing audio files.
- *
- * @author Benjamin Glatzel <benjamin.glatzel@me.com>
- * @author t3hk0d3 <contact@tehkode.ru>
+ * @author Immortius <immortius@gmail.com>
  */
-public abstract class AudioManager implements SoundManager {
+// TODO: Rename this to AudioManager, and AudioManager to AudioManagerAbstract or something
+public interface AudioManager {
+    float MAX_DISTANCE = 100.0f;
+    int PRIORITY_LOCKED = Integer.MAX_VALUE;
+    int PRIORITY_HIGHEST = 100;
+    int PRIORITY_HIGH = 10;
+    int PRIORITY_NORMAL = 5;
+    int PRIORITY_LOW = 3;
+    int PRIORITY_LOWEST = 1;
 
-    private static AudioManager _instance = null;
+    boolean isMute();
 
-    protected Map<String, Sound> _audio = new HashMap<String, Sound>();
+    void setMute(boolean mute);
 
-    protected Map<String, SoundPool> _pools = new HashMap<String, SoundPool>();
+    void setSoundVolume(float volume);
 
+    void setMusicVolume(float volume);
 
-    protected AudioManager() {
-    }
+    float getSoundVolume();
 
-    protected abstract boolean checkDistance(Vector3f soundSource);
+    float getMusicVolume();
 
-    /**
-     * Returns sound pool with specified name
-     * <b>WARNING! Method will throw IllegalArgumentException if specified sound pool is not found</b>
-     *
-     * @param pool Sound pool name
-     * @return Sound pool object
-     */
-    @Override
-    public SoundPool getSoundPool(String pool) {
-        SoundPool soundPool = _pools.get(pool);
+    void playSound(Sound sound);
 
-        if (soundPool == null) {
-            throw new IllegalArgumentException("Unknown pool '" + pool + "', typo? Available pools: " + _pools.keySet());
-        }
+    void playSound(Sound sound, float volume);
 
-        return soundPool;
-    }
+    void playSound(Sound sound, float volume, int priority);
 
-    @Override
-    public SoundSource getSoundSource(String pool, Sound sound, int priority) {
-        return getSoundPool(pool).getSource(sound, priority);
-    }
+    void playSound(Sound sound, Vector3f position);
 
-    @Override
-    public SoundSource getSoundSource(String pool, AssetUri soundUri, int priority) {
-        Sound sound = (Sound) Assets.get(soundUri);
-        if (sound != null) {
-            return getSoundPool(pool).getSource(sound, priority);
-        }
-        return null;
-    }
+    void playSound(Sound sound, Vector3f position, float volume);
+
+    void playSound(Sound sound, Vector3f position, float volume, int priority);
+
+    void playMusic(Sound sound);
 
     /**
-     * Stops all playback.
+     * Update AudioManager sound sources
+     * <p/>
+     * Should be called in main game loop
      */
-    @Override
-    public void stopAllSounds() {
-        for (SoundPool pool : _pools.values()) {
-            pool.stopAll();
-        }
-    }
+    void update(float delta);
+
+    void updateListener(Vector3f position, Quat4f orientation, Vector3f velocity);
 
     /**
-     * Returns AudioManager instance
-     *
-     * @return
+     * Gracefully destroy audio subsystem
      */
-    public static AudioManager getInstance() {
-        if (_instance == null) {
-            _instance = new OpenALManager();
-        }
+    void dispose();
 
-        return _instance;
-    }
-
-    /**
-     * Returns sound source for specified sound from "sfx" pool with normal priority
-     *
-     * @param uri Sound uri
-     * @return Sound source object, or null if there is no free sound sources in effects pool
-     */
-    public static SoundSource source(AssetUri uri) {
-        return source(uri, PRIORITY_NORMAL);
-    }
-
-    /**
-     * Returns sound source for specified sound from "sfx" pool
-     *
-     * @param uri
-     * @param priority Priority
-     * @return Sound source object, or null if there is no free sound sources in effects pool
-     */
-    public static SoundSource source(AssetUri uri, int priority) {
-        return getInstance().getSoundSource("sfx", uri, priority);
-    }
-
-    /**
-     * Returns sound source for specified sound from "sfx" pool with normal priority
-     *
-     * @param sound Sound object
-     * @return Sound source object, or null if there is no free sound sources in effects pool
-     */
-    public static SoundSource source(Sound sound) {
-        return source(sound, PRIORITY_NORMAL);
-    }
-
-    /**
-     * Returns sound source for specified sound from "sfx" pool with normal priority
-     *
-     * @param sound    Sound object
-     * @param priority Sound priority
-     * @return Sound source object, or null if there is no free sound sources in effects pool
-     */
-    public static SoundSource source(Sound sound, int priority) {
-        return getInstance().getSoundSource("sfx", sound, priority);
-    }
-
-    /**
-     * Returns sound source from "sfx" pool configured for specified sound, position and gain
-     *
-     * @param uri  Sound uri
-     * @param pos  Sound source position
-     * @param gain Sound source gain
-     * @return Sound source object, or null if there is no free sound sources in effects pool
-     */
-    public static SoundSource source(AssetUri uri, Vector3f pos, float gain, int priority) {
-        SoundSource source = source(uri, priority);
-        if (source == null) {
-            return null;
-        }
-
-        return (pos != null ? source.setPosition(pos).setAbsolute(true) : source).setGain(gain);
-    }
-
-    /**
-     * Returns sound source from "sfx" pool configured for specified sound, position and gain
-     *
-     * @param sound Sound object
-     * @param pos   Sound source position
-     * @param gain  Sound source gain
-     * @return Sound source object, or null if there is no free sound sources in effects pool
-     */
-    public static SoundSource source(Sound sound, Vector3f pos, float gain, int priority) {
-        SoundSource source = source(sound, priority);
-
-        if (source == null) {
-            return null;
-        }
-
-        if (pos != null) {
-            if (!getInstance().checkDistance(pos)) {
-                return null;
-            }
-
-            source.setPosition(pos).setAbsolute(true);
-        }
-
-        return source.setGain(gain);
-    }
-
-    /**
-     * Plays specified sound with gain = 1.0f
-     *
-     * @param uri Sound uri
-     * @return Sound source object, or null if there is no free sound sources in effects pool
-     */
-    public static SoundSource play(AssetUri uri) {
-        return play(uri, null, 1.0f, PRIORITY_NORMAL);
-    }
-
-    /**
-     * Plays specified sound with specified gain
-     *
-     * @param uri  Sound uri
-     * @param gain Sound source gain
-     * @return Sound source object, or null if there is no free sound sources in effects pool
-     */
-    public static SoundSource play(AssetUri uri, float gain) {
-        return play(uri, null, gain, PRIORITY_NORMAL);
-    }
-
-    public static SoundSource play(Sound sound, float gain) {
-        return play(sound, (Vector3f)null, gain, PRIORITY_NORMAL);
-    }
-
-    /**
-     * Plays specified sound at specified position and with specified gain
-     *
-     * @param uri  Sound uri
-     * @param pos  Sound source position
-     * @param gain Sound source gain
-     * @return Sound source object, or null if there is no free sound sources in effects pool
-     */
-    public static SoundSource play(AssetUri uri, Vector3f pos, float gain, int priority) {
-        SoundSource source = source(uri, pos, gain, priority);
-
-        if (source == null) {
-            return null;
-        }
-
-        return source.play();
-    }
-
-    /**
-     * Plays specified sound at specified position and with specified gain
-     *
-     * @param sound Sound object
-     * @param pos   Sound source position
-     * @param gain  Sound source gain
-     * @return Sound source object, or null if there is no free sound sources in effects pool
-     */
-    public static SoundSource play(Sound sound, Vector3f pos, float gain, int priority) {
-        SoundSource source = source(sound, pos, gain, priority);
-
-        if (source == null) {
-            return null;
-        }
-
-        return source.setGain(gain).play();
-    }
-
-    /**
-     * Plays specified sound tuned for specified entity
-     *
-     * @param sound    Sound object
-     * @param entity   Entity sounding
-     * @param gain     Sound source gain
-     * @param priority Sound priority
-     * @return Sound source object, or null if there is no free sound sources in effects pool
-     */
-    public static SoundSource play(Sound sound, EntityRef entity, float gain, int priority) {
-        Vector3f pos = getEntityPosition(entity);
-        if (pos == null) return null;
-
-        SoundSource source = source(sound, pos, gain, priority);
-
-        if (source == null) {
-            // Nof free sound sources
-            return null;
-        }
-
-        return source.setVelocity(getEntityVelocity(entity)).setDirection(getEntityDirection(entity)).play();
-    }
-
-    private static Vector3f getEntityPosition(EntityRef entity) {
-        LocationComponent loc = entity.getComponent(LocationComponent.class);
-        if (loc != null) {
-            return loc.getWorldPosition();
-        }
-        return null;
-    }
-
-    private static Vector3f getEntityDirection(EntityRef entity) {
-        LocationComponent loc = entity.getComponent(LocationComponent.class);
-        if (loc != null) {
-            Quat4f rot = loc.getWorldRotation();
-            Vector3f dir = new Vector3f(0, 0, -1);
-            QuaternionUtil.quatRotate(rot, dir, dir);
-            return dir;
-        }
-        return new Vector3f();
-    }
-
-    private static Vector3f getEntityVelocity(EntityRef entity) {
-        CharacterMovementComponent charMove = entity.getComponent(CharacterMovementComponent.class);
-        if (charMove != null) {
-            return charMove.getVelocity();
-        }
-        return new Vector3f();
-    }
-
-    /**
-     * Plays specified music
-     *
-     * @param uri Music uri
-     * @return Sound source object, or null if there is no free sound sources in music pool
-     */
-    public static SoundSource playMusic(AssetUri uri) {
-        SoundPool pool = AudioManager.getInstance().getSoundPool("music");
-
-        pool.stopAll();
-
-        Sound sound = (Sound) Assets.get(uri);
-        if (sound == null)
-            return null;
-
-        SoundSource source = pool.getSource(sound);
-
-        if (source == null) { // no free music slots
-            return null;
-        }
-
-        return source.setGain(0.1f).play();
-    }
-
-    public static SoundSource playMusic(String shortUri) {
-        AssetUri uri = new AssetUri(AssetType.MUSIC, shortUri);
-        return playMusic(uri);
-    }
+    void stopAllSounds();
 }

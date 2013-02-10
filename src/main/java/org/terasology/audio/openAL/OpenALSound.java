@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.audio;
+package org.terasology.audio.openAL;
 
 import static org.lwjgl.openal.AL10.AL_BITS;
 import static org.lwjgl.openal.AL10.AL_CHANNELS;
@@ -22,8 +22,9 @@ import static org.lwjgl.openal.AL10.AL_SIZE;
 import static org.lwjgl.openal.AL10.alGetBufferi;
 
 import org.terasology.asset.AssetUri;
+import org.terasology.audio.Sound;
 
-public abstract class AbstractSound implements Sound {
+public abstract class OpenALSound implements Sound {
 
     // TODO: Do we have proper support for unloading sounds (as mods are changed?)
 
@@ -31,7 +32,7 @@ public abstract class AbstractSound implements Sound {
     private int bufferId = 0;
     protected int length = 0;
 
-    public AbstractSound(AssetUri uri, int bufferId) {
+    public OpenALSound(AssetUri uri, int bufferId) {
         this.uri = uri;
         this.bufferId = bufferId;
 

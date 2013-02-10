@@ -7,8 +7,6 @@ import com.google.common.collect.Sets;
 import com.google.protobuf.ByteString;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
-import gnu.trove.set.TIntSet;
-import gnu.trove.set.hash.TIntHashSet;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;
@@ -89,6 +87,7 @@ public class NetworkSystem implements EntityChangeSubscriber {
     private int nextNetId = 1;
     private final Set<Client> clientList = Sets.newLinkedHashSet();
     private Map<EntityRef, Client> clientPlayerLookup = Maps.newHashMap();
+    private Map<EntityRef, EntityRef> ownerLookup = Maps.newHashMap();
 
     // Client only
     private Server server;
@@ -247,7 +246,37 @@ public class NetworkSystem implements EntityChangeSubscriber {
                     }
                     break;
             }
+        }
+        if (netComponent.owner.exists()) {
+            ownerLookup.put(entity, netComponent.owner);
+        }
+    }
 
+    public void updateNetworkEntity(EntityRef entity) {
+        NetworkComponent netComponent = entity.getComponent(NetworkComponent.class);
+        EntityRef lastOwner = ownerLookup.get(entity);
+        if (lastOwner == null) {
+            lastOwner = EntityRef.NULL;
+        }
+        // If the owner has changed, we need to update the old and new owners
+        if (!lastOwner.equals(netComponent.owner)) {
+            if (netComponent.replicateMode == NetworkComponent.ReplicateMode.OWNER) {
+                // Remove from last owner
+                Client lastClient = getOwner(lastOwner);
+                if (lastClient != null) {
+                    lastClient.setNetRemoved(netComponent.networkId);
+                }
+                // Add to new owner
+                Client newClient = getOwner(netComponent.owner);
+                if (newClient != null) {
+                    newClient.setNetInitial(netComponent.networkId);
+                }
+            }
+            if (!netComponent.owner.exists()) {
+                ownerLookup.remove(entity);
+            } else {
+                ownerLookup.put(entity, netComponent.owner);
+            }
         }
     }
 
@@ -261,6 +290,7 @@ public class NetworkSystem implements EntityChangeSubscriber {
                 }
             }
         }
+        ownerLookup.remove(entity);
     }
 
     public void connectToEntitySystem(PersistableEntityManager entityManager, EntitySystemLibrary library, BlockEntityRegistry blockEntityRegistry) {
@@ -561,7 +591,7 @@ public class NetworkSystem implements EntityChangeSubscriber {
                     logger.error("Class {} has too many fields (>255), serialization will be incomplete", metadata.getName());
                     break;
                 }
-                metadata.setFieldId(field, (byte)fieldId);
+                metadata.setFieldId(field, (byte) fieldId);
                 fieldId++;
             }
         }
@@ -593,5 +623,7 @@ public class NetworkSystem implements EntityChangeSubscriber {
             }
         }
         return idTable;
+
     }
+
 }

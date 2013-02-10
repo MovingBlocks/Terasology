@@ -43,6 +43,7 @@ public final class Config {
     private ServerConfig serverConfig = new ServerConfig();
     private PlayerConfig playerConfig = new PlayerConfig();
     private AdvancedConfig advanced = AdvancedConfig.createDefault();
+    private SoundConfig soundConfig = new SoundConfig();
 
     /**
      * Create a new, empty config
@@ -71,6 +72,10 @@ public final class Config {
     
     public AdvancedConfig getAdvancedConfig() {
         return advanced;
+    }
+
+    public SoundConfig getSoundConfig() {
+        return soundConfig;
     }
 
     /**

@@ -26,7 +26,6 @@ import org.terasology.entityFactory.DroppedBlockFactory;
 import org.terasology.entityFactory.DroppedItemFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EventPriority;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.ActivateEvent;
@@ -52,6 +51,8 @@ import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.math.AABB;
+import org.terasology.math.Direction;
+import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.physics.ImpulseEvent;
@@ -161,6 +162,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
                 break;
         }
         entity.send(new CharacterMoveInputEvent(inputSequenceNumber++, lookPitch, lookYaw, relMove, run, jump));
+        jump = false;
     }
 
     private void updateCamera(CharacterComponent characterComponent, CharacterMovementComponent characterMovementComponent, CharacterComponent characterComp, LocationComponent location) {
@@ -303,7 +305,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
         cameraPosition.add(new Vector3d(position), new Vector3d(0, characterComponent.eyeOffset, 0));
 
         playerCamera.getPosition().set(cameraPosition);
-        Vector3f viewDir = new Vector3f(0, 0, 1);
+        Vector3f viewDir = Direction.FORWARD.getVector3f();
         QuaternionUtil.quatRotate(rotation, viewDir, playerCamera.getViewingDirection());
 
         float stepDelta = charMovementComp.footstepDelta - lastStepDelta;
