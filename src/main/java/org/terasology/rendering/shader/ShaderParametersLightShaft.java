@@ -54,6 +54,7 @@ public class ShaderParametersLightShaft extends ShaderParametersBase {
         program.setFloat("exposure", (Float) exposure.getValue());
         program.setFloat("weight", (Float) weight.getValue());
         program.setFloat("decay", (Float) decay.getValue());
+
         WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
         if (worldRenderer != null) {
             float sunAngle = worldRenderer.getSkysphere().getSunPosAngle();

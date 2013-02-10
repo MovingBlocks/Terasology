@@ -144,17 +144,17 @@ public class PostProcessingRenderer implements IPropertyProvider {
         if (!recreate)
             return;
 
-        createFBO("scene", Display.getWidth(), Display.getHeight(), FBOType.HDR, true, true);
-
-        createFBO("scenePrePost", Display.getWidth(), Display.getHeight(), FBOType.HDR, false, false);
-        createFBO("sceneToneMapped", Display.getWidth(), Display.getHeight(), FBOType.HDR, false, false);
-
         final int halfWidth = Display.getWidth() / 2;
         final int halfHeight = Display.getHeight() / 2;
         final int quarterWidth = halfWidth / 2;
         final int quarterHeight = halfHeight / 2;
         final int halfQuarterWidth = quarterWidth / 2;
         final int halfQuarterHeight = quarterHeight / 2;
+
+        createFBO("scene", Display.getWidth(), Display.getHeight(), FBOType.HDR, true, true);
+
+        createFBO("scenePrePost", Display.getWidth(), Display.getHeight(), FBOType.HDR, false, false);
+        createFBO("sceneToneMapped", Display.getWidth(), Display.getHeight(), FBOType.HDR, false, false);
 
         createFBO("sobel", Display.getWidth(),  Display.getHeight(), FBOType.DEFAULT, false, false);
 
@@ -180,6 +180,7 @@ public class PostProcessingRenderer implements IPropertyProvider {
 
             EXTFramebufferObject.glDeleteFramebuffersEXT(fbo._fboId);
             EXTFramebufferObject.glDeleteRenderbuffersEXT(fbo._depthRboId);
+            GL11.glDeleteTextures(fbo._normalsTextureId);
             GL11.glDeleteTextures(fbo._depthTextureId);
             GL11.glDeleteTextures(fbo._textureId);
         }
@@ -301,7 +302,6 @@ public class PostProcessingRenderer implements IPropertyProvider {
 
     private void updateExposure() {
         if (Config.getInstance().isEyeAdaption()) {
-
             ByteBuffer pixels = BufferUtils.createByteBuffer(4);
             FBO scene = PostProcessingRenderer.getInstance().getFBO("scene1");
 
@@ -371,7 +371,7 @@ public class PostProcessingRenderer implements IPropertyProvider {
 
     /**
      * Renders the final scene to a quad and displays it. The FBO gets automatically rescaled if the size
-     * of the viewport changes.
+     * of the view port changes.
      */
     public void renderScene() {
         createOrUpdateFullscreenFbos();
@@ -393,7 +393,10 @@ public class PostProcessingRenderer implements IPropertyProvider {
 
         generatePrePost();
 
-        generateDownsampledScene();
+        if (Config.getInstance().isEyeAdaption()) {
+            generateDownsampledScene();
+        }
+
         updateExposure();
 
         generateToneMappedScene();
@@ -406,9 +409,6 @@ public class PostProcessingRenderer implements IPropertyProvider {
             if (Config.getInstance().isBloom()) {
                 generateBloom(i);
             }
-        }
-
-        for (int i = 0; i < 2; i++) {
             if (Config.getInstance().getBlurIntensity() != 0) {
                 generateBlur(i);
             }
