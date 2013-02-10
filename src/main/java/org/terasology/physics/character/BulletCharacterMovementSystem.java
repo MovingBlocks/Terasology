@@ -81,6 +81,7 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
     public static final float TERMINAL_VELOCITY = 64.0f;
 
     public static final float UNDERWATER_GRAVITY = 0.25f;
+    public static final float CLIMB_GRAVITY      = 0.25f;
     public static final float UNDERWATER_INERTIA = 2.0f;
     public static final float WATER_TERMINAL_VELOCITY = 4.0f;
 
@@ -140,6 +141,7 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
 
             updatePosition(delta, entity, location, movementComp);
             updateSwimStatus(entity, location,  movementComp);
+            updateClimbingStatus(location,  movementComp);
 
             entity.saveComponent(location);
             entity.saveComponent(movementComp);
@@ -182,14 +184,115 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
         movementComp.isSwimming = newSwimming;
     }
 
+    private void updateClimbingStatus(LocationComponent location, CharacterMovementComponent movementComp) {
+        Vector3f worldPos = location.getWorldPosition();
+
+        Vector3f[] sides = { new Vector3f(worldPos), new Vector3f(worldPos), new Vector3f(worldPos), new Vector3f(worldPos), new Vector3f(worldPos)};
+
+        float factor = 0.25f;
+        boolean isClimbing = false;
+
+        sides[0].x   += factor * movementComp.radius;
+        sides[1].x  -= factor * movementComp.radius;
+        sides[2].z   += factor * movementComp.radius;
+        sides[3].z  -= factor * movementComp.radius;
+        sides[4].y  -= 0.65 * movementComp.height;
+
+        for ( Vector3f side : sides ){
+            if ( worldProvider.getBlock(side).isLader() ){
+                isClimbing = true;
+                break;
+            }
+        }
+
+        if ( movementComp.isClimbing && !isClimbing ){
+           movementComp.getDrive().y = 0;
+        }
+
+        movementComp.isClimbing = isClimbing;
+    }
+
     private void updatePosition(final float delta, final EntityRef entity, final LocationComponent location, final CharacterMovementComponent movementComp) {
         if (movementComp.isGhosting) {
             ghost(delta, entity, location, movementComp);
         } else if (movementComp.isSwimming) {
             swim(delta, entity, location, movementComp);
-        } else {
+        } else if ( movementComp.isClimbing ) {
+            climb(delta, entity, location, movementComp);
+        }else{
             walk(delta, entity, location, movementComp);
         }
+    }
+
+    private void climb(float delta, EntityRef entity, LocationComponent location, CharacterMovementComponent movementComp) {
+        Vector3f desiredVelocity = new Vector3f(movementComp.getDrive());
+        float maxSpeed = movementComp.maxClimbSpeed;
+        if (movementComp.isRunning) {
+            maxSpeed *= movementComp.runFactor;
+        }
+        desiredVelocity.scale(maxSpeed);
+
+        desiredVelocity.y -= CLIMB_GRAVITY;
+
+        // Modify velocity towards desired, up to the maximum rate determined by friction
+        Vector3f velocityDiff = new Vector3f(desiredVelocity);
+        velocityDiff.sub(movementComp.getVelocity());
+
+        movementComp.getVelocity().x += velocityDiff.x;
+        movementComp.getVelocity().y += velocityDiff.y;
+        movementComp.getVelocity().z += velocityDiff.z;
+        Vector3f moveDelta = new Vector3f(movementComp.getVelocity());
+        moveDelta.scale(delta);
+
+        steppedUpDist = 0;
+        stepped = false;
+
+        MoveResult result = new MoveResult();
+        Vector3f positionX = new Vector3f(location.getWorldPosition());
+        Vector3f positionZ = new Vector3f(location.getWorldPosition());
+        result.finalPosition = new Vector3f(location.getWorldPosition());;
+
+        //moveDelta.z
+        result.hitHoriz = moveHorizontal(new Vector3f(moveDelta.x, 0, 0), movementComp.collider, positionX, -1, 0);
+
+        if ( result.hitHoriz ){
+           result.finalPosition.y += moveDelta.x;
+        }else{
+          result.finalPosition.x = positionX.x;
+        }
+
+        result.hitHoriz = moveHorizontal(new Vector3f(0, 0, moveDelta.z), movementComp.collider, positionZ, -1, 0);
+
+        if ( result.hitHoriz ){
+           result.finalPosition.y += moveDelta.z;
+        }else{
+          result.finalPosition.z = positionZ.z;
+        }
+
+        if (moveDelta.y > 0) {
+            result.hitTop = moveDelta.y - moveUp(moveDelta.y, movementComp.collider, result.finalPosition) > BulletGlobals.SIMD_EPSILON;
+        }
+
+        if (moveDelta.y < 0 || steppedUpDist > 0) {
+            float dist = (moveDelta.y < 0) ? moveDelta.y : 0;
+            dist -= steppedUpDist;
+            result.hitBottom = moveDown(dist, -1, movementComp.collider, result.finalPosition);
+        }
+
+
+        Vector3f distanceMoved = new Vector3f(result.finalPosition);
+        distanceMoved.sub(location.getWorldPosition());
+
+        location.setWorldPosition(result.finalPosition);
+
+        movementComp.collider.setWorldTransform(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), result.finalPosition, 1.0f)));
+
+        if (movementComp.faceMovementDirection && distanceMoved.lengthSquared() > 0.01f) {
+            float yaw = (float) Math.atan2(distanceMoved.x, distanceMoved.z);
+            AxisAngle4f axisAngle = new AxisAngle4f(0, 1, 0, yaw);
+            location.getLocalRotation().set(axisAngle);
+        }
+
     }
 
     private void swim(float delta, EntityRef entity, LocationComponent location, CharacterMovementComponent movementComp) {
@@ -228,16 +331,16 @@ public final class BulletCharacterMovementSystem implements UpdateSubscriberSyst
         location.setWorldPosition(moveResult.finalPosition);
         if (distanceMoved.length() > 0){
             entity.send(new MovedEvent(distanceMoved, moveResult.finalPosition));
-            
+
             Vector3f top = new Vector3f(location.getWorldPosition());
             Vector3f bottom = new Vector3f(top);
             top.y += 0.25f * movementComp.height;
             bottom.y -= 0.25f * movementComp.height;
             if(worldProvider.getBlock(top).isLiquid() && speed > movementComp.maxWaterSpeed/4){
-            	entity.send(new SwimEvent(worldProvider.getBlock(bottom),location.getWorldPosition()));
+                entity.send(new SwimEvent(worldProvider.getBlock(bottom),location.getWorldPosition()));
             }
         }
-        
+
         movementComp.collider.setWorldTransform(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), moveResult.finalPosition, 1.0f)));
 
         if (movementComp.faceMovementDirection && distanceMoved.lengthSquared() > 0.01f) {

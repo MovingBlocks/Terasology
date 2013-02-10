@@ -14,9 +14,14 @@
  * limitations under the License.
  */
 
+/**
+ * A chest is interesting for two reasons: It is asymmetrical (front texture differs) and should store stuff
+ */
 {
-	"shadowCasting" : "false",
-	"rotation" : "Horizontal",
-	"shape" : "fences:fenceSlats",
-	"tile" : "fences:Fence"
+    "attachmentAllowed" : false,
+    "rotation" : "horizontal",
+    "craftPlace" : false,
+    "lader"      : true,
+    "penetrable" : true,
+    "shape" : "engine:verticalOffsetPlane"
 }
