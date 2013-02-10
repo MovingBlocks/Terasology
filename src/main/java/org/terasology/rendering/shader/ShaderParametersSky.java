@@ -26,7 +26,7 @@ import javax.vecmath.Vector4f;
 import java.util.List;
 
 /**
- * Basic shader parameters for all shader program.
+ * Parameters for the sky shader program.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
@@ -66,7 +66,7 @@ public class ShaderParametersSky extends ShaderParametersBase {
         if (worldProvider != null && worldRenderer != null) {
             program.setFloat("colorExp", (Float) worldRenderer.getSkysphere().getColorExp().getValue());
 
-            float sunAngle = (float) worldRenderer.getSkysphere().getSunPosAngle();
+            float sunAngle = worldRenderer.getSkysphere().getSunPosAngle();
 
             Vector4d sunNormalise = new Vector4d(0.0f, java.lang.Math.cos(sunAngle), java.lang.Math.sin(sunAngle), 1.0);
             sunNormalise.normalize();

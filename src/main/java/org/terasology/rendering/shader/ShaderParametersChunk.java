@@ -75,7 +75,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
 
         if (worldProvider != null && worldRenderer != null) {
-            float sunAngle = (float) worldRenderer.getSkysphere().getSunPosAngle();
+            float sunAngle = worldRenderer.getSkysphere().getSunPosAngle();
             Vector4d sunNormalise = new Vector4d(0.0f, java.lang.Math.cos(sunAngle), java.lang.Math.sin(sunAngle), 1.0);
             sunNormalise.normalize();
 

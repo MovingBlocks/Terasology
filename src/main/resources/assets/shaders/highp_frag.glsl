@@ -19,9 +19,9 @@ uniform float highPassThreshold = 1.25;
 
 void main() {
     vec4 color = texture2D(tex, gl_TexCoord[0].xy);
-    float lum = 0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b;
+    float avgBrightness = (color.r + color.g + color.b) / 3.0;
 
-    if (lum > highPassThreshold)
+    if (avgBrightness > highPassThreshold)
         gl_FragData[0].rgba = color;
     else
         gl_FragData[0].rgba = vec4(0.0, 0.0, 0.0, 1.0);

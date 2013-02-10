@@ -15,18 +15,18 @@
  */
 
 uniform sampler2D texScene;
-uniform sampler2D texEdges;
 #ifdef SSAO
 uniform sampler2D texSsao;
 #endif
 #ifdef OUTLINE
+uniform sampler2D texEdges;
+
 uniform float outlineDepthThreshold = 0.1;
 uniform float outlineThickness = 1.0;
 #endif
 #ifdef LIGHT_SHAFTS
 uniform sampler2D texLightShafts;
 #endif
-
 
 #define OUTLINE_COLOR 0.0, 0.0, 0.0
 
@@ -48,5 +48,5 @@ void main() {
     color.rgb += colorShafts.rgb;
 #endif
 
-    gl_FragData[0].rgba = color;
+    gl_FragData[0].rgba = color.rgba;
 }
