@@ -37,9 +37,11 @@ public class StringMapTypeHandler<T> extends AbstractTypeHandler<Map<String, T>>
     public EntityData.Value serialize(Map<String, T> value) {
         EntityData.Value.Builder result = EntityData.Value.newBuilder();
         for (Map.Entry<String, T> entry : value.entrySet()) {
-            EntityData.Value v = contentsHandler.serialize(entry.getValue());
-            if (v != null) {
-                result.addNameValue(EntityData.NameValue.newBuilder().setName(entry.getKey()).setValue(v));
+            if (entry.getValue() != null) {
+                EntityData.Value v = contentsHandler.serialize(entry.getValue());
+                if (v != null) {
+                    result.addNameValue(EntityData.NameValue.newBuilder().setName(entry.getKey()).setValue(v));
+                }
             }
         }
         return result.build();
