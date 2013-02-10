@@ -58,7 +58,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
 
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        PostProcessingRenderer.getInstance().getFBO("sceneTonemapped").bindTexture();
+        PostProcessingRenderer.getInstance().getFBO("sceneToneMapped").bindTexture();
         program.setInt("texScene", 0);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE1);

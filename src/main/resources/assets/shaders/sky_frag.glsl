@@ -42,7 +42,7 @@ void main () {
 
     float sunHighlight = 0.0;
     if (lDotV >= 0.0 && l.y >= 0.0) {
-       sunHighlight = pow(lDotV, sunExponent) * 2.0;
+       sunHighlight = pow(lDotV, sunExponent) * 16.0;
     }
     if (l.y < HIGHLIGHT_BLEND_START && l.y >= 0.0) {
        sunHighlight *= 1.0 - (HIGHLIGHT_BLEND_START - l.y) / HIGHLIGHT_BLEND_START;
@@ -64,14 +64,10 @@ void main () {
     vec4 cloudsColor = texture2D(texSky180, gl_TexCoord[0].xy);
     vec4 cloudsColorNight =  texture2D(texSky90, gl_TexCoord[0].xy);
 
-    float div = 1.0;
-    //if (v.y >= 0.0) {
-        skyColor += vec4(convertColorYxy(colorYxy, colorExp) + (1.0 - cloudsColor.r) * sunHighlight + (1.0 - cloudsColor.r) * moonHighlight, 1.0);
-        div += 1.0;
-    //}
+    skyColor += vec4(convertColorYxy(colorYxy, colorExp) + (1.0 - cloudsColor.r) * sunHighlight + (1.0 - cloudsColor.r) * moonHighlight, 1.0);
 
     /* DAY AND NIGHT TEXTURES */
-    skyColor.rgb += (daylight * cloudsColor.rgb + blendNight * cloudsColorNight.rgb) / div;
+    skyColor.rgb += (daylight * cloudsColor.rgb + blendNight * cloudsColorNight.rgb);
 
     gl_FragData[0].rgba = skyColor.rgba;
     gl_FragData[1].rgba = vec4(0.0, 0.0, 0.0, 1.0);
