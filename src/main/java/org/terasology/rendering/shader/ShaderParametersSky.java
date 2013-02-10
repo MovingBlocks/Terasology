@@ -32,6 +32,9 @@ import java.util.List;
  */
 public class ShaderParametersSky extends ShaderParametersBase {
 
+    private Property sunExponent = new Property("sunExponent", 4096.0f, 1.0f, 8192f);
+    private Property moonExponent = new Property("moonExponent", 256.0f, 1.0f, 8192f);
+
     public static Vector3d getAllWeatherZenith(float thetaSun, float turbidity) {
         thetaSun = (float) java.lang.Math.acos(thetaSun);
         Vector4f cx1 = new Vector4f(0.0f, 0.00209f, -0.00375f, 0.00165f);
@@ -70,14 +73,19 @@ public class ShaderParametersSky extends ShaderParametersBase {
 
             Vector3d zenithColor = getAllWeatherZenith((float) sunNormalise.y, (Float) worldRenderer.getSkysphere().getTurbidity().getValue());
 
-            program.setFloat("sunAngle", (float) worldRenderer.getSkysphere().getSunPosAngle());
+            program.setFloat("sunAngle", worldRenderer.getSkysphere().getSunPosAngle());
             program.setFloat("turbidity", (Float) worldRenderer.getSkysphere().getTurbidity().getValue());
             program.setFloat4("sunPos", 0.0f, (float) java.lang.Math.cos(sunAngle), (float) java.lang.Math.sin(sunAngle), 1.0f);
             program.setFloat3("zenith", (float) zenithColor.x, (float) zenithColor.y, (float) zenithColor.z);
         }
+
+        program.setFloat("sunExponent", (Float) sunExponent.getValue());
+        program.setFloat("moonExponent", (Float) moonExponent.getValue());
     }
 
     @Override
     public void addPropertiesToList(List<Property> properties) {
+        properties.add(sunExponent);
+        properties.add(moonExponent);
     }
 }
