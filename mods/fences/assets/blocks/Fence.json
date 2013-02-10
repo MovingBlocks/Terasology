@@ -16,6 +16,43 @@
 
 {
 	"shadowCasting" : "false",
-	"rotation" : "Horizontal",
-	"shape" : "fences:fence"
+	"rotation" : "ConnectToAdjacent",
+	"connectToAllBlock" : "true",
+    "types" : [
+        {
+            "type"  : "archetype",
+            "shape" : "fences:fenceSectionSmall",
+            "tile"  : "fences:Fence"
+        },
+        {
+            "type"  : "single",
+            "shape" : "fences:fenceSinglePost",
+            "tile"  : "fences:Fence"
+        },
+        {
+            "type"  : "end",
+            "shape" : "fences:fenceEnd",
+            "tile"  : "fences:Fence"
+        },
+        {
+            "type"  : "plain",
+            "shape" : "fences:fence",
+            "tile"  : "fences:Fence"
+        },
+        {
+            "type"  : "corner",
+            "shape" : "fences:fenceCorner",
+            "tile"  : "fences:Fence"
+        },
+        {
+            "type"  : "tee",
+            "shape" : "fences:fenceTee",
+            "tile"  : "fences:Fence"
+        },
+        {
+            "type"  : "cross",
+            "shape" : "fences:fenceCross",
+            "tile"  : "fences:Fence"
+        }
+    ]
 }

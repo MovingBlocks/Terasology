@@ -20,12 +20,16 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.components.ItemComponent;
 import org.terasology.entitySystem.*;
+import org.terasology.events.ReplaceAroundBlocksEvent;
+import org.terasology.math.TeraMath;
+import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.BlockEntitySystem;
+
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.AudioManager;
 import org.terasology.math.Side;
-import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.physics.CollisionGroup;
@@ -33,9 +37,9 @@ import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.BlockItemComponent;
 import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.family.ConnectToAdjacentBlockFamily;
 
 /**
  * TODO: Refactor use methods into events? Usage should become a separate component
@@ -48,11 +52,15 @@ public class ItemSystem implements EventHandlerSystem {
     private WorldProvider worldProvider;
     private BlockEntityRegistry blockEntityRegistry;
 
+    @In
+    private BlockEntitySystem   blockEntitySystem;
+
     @Override
     public void initialise() {
         entityManager = CoreRegistry.get(EntityManager.class);
         worldProvider = CoreRegistry.get(WorldProvider.class);
         blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
+        //blockEntitySystem  = CoreRegistry.get(BlockEntitySystem.class);
     }
 
     @Override
@@ -71,7 +79,7 @@ public class ItemSystem implements EventHandlerSystem {
         Side surfaceDir = Side.inDirection(event.getHitNormal());
         Side secondaryDirection = TeraMath.getSecondaryPlacementDirection(event.getDirection(), event.getHitNormal());
 
-        if (!placeBlock(blockItem.blockFamily, event.getTarget().getComponent(BlockComponent.class).getPosition(), surfaceDir, secondaryDirection, blockItem)) {
+        if (!placeBlock(blockItem.blockFamily, event.getTarget().getComponent(BlockComponent.class).getPosition(), surfaceDir, secondaryDirection, blockItem, item)) {
             event.cancel();
         }
     }
@@ -115,7 +123,7 @@ public class ItemSystem implements EventHandlerSystem {
      * @param type The type of the block
      * @return True if a block was placed
      */
-    private boolean placeBlock(BlockFamily type, Vector3i targetBlock, Side surfaceDirection, Side secondaryDirection, BlockItemComponent blockItem) {
+    private boolean placeBlock(BlockFamily type, Vector3i targetBlock, Side surfaceDirection, Side secondaryDirection, BlockItemComponent blockItem, EntityRef item ) {
         if (type == null)
             return true;
 
@@ -123,7 +131,14 @@ public class ItemSystem implements EventHandlerSystem {
         if (!worldProvider.getBlock(targetBlock).isReplacementAllowed())
             placementPos.add(surfaceDirection.getVector3i());
 
-        Block block = type.getBlockFor(surfaceDirection, secondaryDirection);
+        Block block = null;
+
+        if( type instanceof ConnectToAdjacentBlockFamily){
+            block = ( (ConnectToAdjacentBlockFamily) type ).getBlockFor(placementPos, worldProvider);
+        }else{
+            block = type.getBlockFor(surfaceDirection, secondaryDirection);
+        }
+
         if (block == null)
             return false;
 
@@ -133,6 +148,10 @@ public class ItemSystem implements EventHandlerSystem {
                 if (blockItem.placedEntity.exists()) {
                     blockItem.placedEntity = EntityRef.NULL;
                 }
+
+                item.saveComponent(new BlockComponent());
+                item.send( new ReplaceAroundBlocksEvent( placementPos ) );
+
                 return true;
             }
         }

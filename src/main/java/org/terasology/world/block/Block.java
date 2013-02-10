@@ -17,6 +17,7 @@ package org.terasology.world.block;
 
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.linearmath.Transform;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.util.ResourceLoader;
@@ -47,7 +48,8 @@ import javax.vecmath.Vector4f;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.EnumMap;
+import java.util.*;
+import java.util.List;
 
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
@@ -137,9 +139,13 @@ public class Block {
 
     // Overall behavioural
     private boolean liquid = false;
+    private boolean lader  = false;
     private boolean attachmentAllowed = true;
     private boolean replacementAllowed = false;
     private boolean craftPlace = true;
+    private boolean connectToAllBlocks = false;
+    private List<String> acceptedToConnectBlocks = Lists.newArrayList();
+    private boolean checkHeightDiff = false;
     private byte hardness = 0x3;
     private boolean supportRequired = false;
     private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<Side>(Side.class);
@@ -255,6 +261,14 @@ public class Block {
 
     public void setLiquid(boolean liquid) {
         this.liquid = liquid;
+    }
+
+    public boolean isLader() {
+        return lader;
+    }
+
+    public void setLader(boolean lader) {
+        this.lader = lader;
     }
 
     /**
@@ -451,6 +465,36 @@ public class Block {
 
     public void setCraftPlace(boolean craftPlace){
         this.craftPlace = craftPlace;
+    }
+
+    public boolean isCanConnectToAllBlocks(){
+        return connectToAllBlocks;
+    }
+
+    public void setConnectToAllBlocks(boolean connectToAllBlocks){
+        this.connectToAllBlocks = connectToAllBlocks;
+    }
+
+    public boolean isCheckHeightDiff(){
+        return checkHeightDiff;
+    }
+
+    public void setCheckHeightDiff(boolean checkHeightDiff){
+        this.checkHeightDiff = checkHeightDiff;
+    }
+
+    //checkHeightDiff
+
+    public void setAcceptedToConnectBlocks(List<String> blocksUri){
+        for ( String uri : blocksUri ){
+            if ( uri.length() > 0 ){
+                acceptedToConnectBlocks.add(uri.toLowerCase(Locale.ENGLISH));
+            }
+        }
+    }
+
+    public List<String> getAcceptedToConnectBlocks(){
+        return acceptedToConnectBlocks;
     }
 
     public float getMass() {

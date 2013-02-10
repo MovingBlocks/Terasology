@@ -18,6 +18,91 @@
  * Placeholder train track by Metouto. Needs a bit more engine work for proper transparency / block shape
  */
 {
-    "rotation" : "horizontal",
-    "translucent" : true
+    "translucent" : true,
+    "rotation" : "ConnectToAdjacent",
+	"connectToAllTypeBlocks" : "false",
+    "acceptedToConnectBlocks" : [ "dynamicBlocks:traintrackintersection", "dynamicBlocks:traintracktee"],
+    "checkHeightDiff" : "true",
+    "types" : [
+        {
+            "type"  : "archetype",
+            "tile" : "dynamicBlocks:TrainTrack",
+            "shape" : "engine:horizontalOffsetPlane",
+            "tiles" : {
+                "sides" : "dynamicBlocks:TrainTrackEmpty",
+                "top" : "dynamicBlocks:TrainTrack",
+                "bottom" : "dynamicBlocks:TrainTrackEmpty"
+            }
+        },
+        {
+            "type"  : "single",
+            "tile" : "dynamicBlocks:TrainTrack",
+            "shape" : "engine:horizontalOffsetPlane",
+            "tiles" : {
+               "sides" : "dynamicBlocks:TrainTrackEmpty",
+               "top" : "dynamicBlocks:TrainTrack",
+               "bottom" : "dynamicBlocks:TrainTrackEmpty"
+            }
+        },
+        {
+            "type"  : "end",
+            "tile" : "dynamicBlocks:TrainTrack",
+            "shape" : "engine:horizontalOffsetPlane",
+            "tiles" : {
+              "sides" : "dynamicBlocks:TrainTrackEmpty",
+              "top" : "dynamicBlocks:TrainTrack",
+              "bottom" : "dynamicBlocks:TrainTrackEmpty"
+            }
+        },
+        {
+            "type"  : "plain",
+            "tile" : "dynamicBlocks:TrainTrack",
+            "shape" : "engine:horizontalOffsetPlane",
+            "tiles" : {
+              "sides" : "dynamicBlocks:TrainTrackEmpty",
+              "top" : "dynamicBlocks:TrainTrack",
+              "bottom" : "dynamicBlocks:TrainTrackEmpty"
+            }
+        },
+        {
+            "type"  : "corner",
+            "tile" : "dynamicBlocks:TrainTrackCurve",
+            "shape" : "engine:horizontalOffsetPlane",
+            "tiles" : {
+              "sides" : "dynamicBlocks:TrainTrackEmpty",
+              "top" : "dynamicBlocks:TrainTrackCurve",
+              "bottom" : "dynamicBlocks:TrainTrackEmpty"
+            }
+        },
+        {
+            "type"  : "slope",
+            "tile"  : "dynamicBlocks:TrainTrackSlope",
+            "shape" : "engine:slope",
+            "tiles" : {
+              "sides" : "dynamicBlocks:TrainTrackEmpty",
+              "top" : "dynamicBlocks:TrainTrackSlope",
+              "bottom" : "dynamicBlocks:TrainTrackEmpty"
+            }
+        },
+        {
+            "type"  : "tee",
+            "tile" : "dynamicBlocks:TrainTrack",
+            "shape" : "engine:horizontalOffsetPlane",
+            "tiles" : {
+              "sides" : "dynamicBlocks:TrainTrackEmpty",
+              "top" : "dynamicBlocks:TrainTrack",
+              "bottom" : "dynamicBlocks:TrainTrackEmpty"
+            }
+        },
+        {
+            "type"  : "cross",
+            "tile" : "dynamicBlocks:TrainTrackIntersection",
+            "tiles" : {
+              "sides" : "dynamicBlocks:TrainTrackEmpty",
+              "top" : "dynamicBlocks:TrainTrack",
+              "center" : "dynamicBlocks:TrainTrack",
+              "bottom" : "dynamicBlocks:TrainTrackEmpty"
+            }
+        }
+    ]
 }
