@@ -29,13 +29,15 @@ import org.terasology.rendering.assets.Texture;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ShaderParametersBlock implements IShaderParameters {
+public class ShaderParametersBlock extends ShaderParametersBase {
 
     public ShaderParametersBlock() {
     }
 
     @Override
     public void applyParameters(ShaderProgram program) {
+        super.applyParameters(program);
+
         Texture terrainTex = Assets.getTexture("engine:terrain");
         if (terrainTex == null) {
             return;
@@ -44,12 +46,9 @@ public class ShaderParametersBlock implements IShaderParameters {
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         glBindTexture(GL11.GL_TEXTURE_2D, terrainTex.getId());
 
-        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-        program.setInt("carryingTorch", localPlayer.isCarryingTorch() ? 1 : 0);
-
         program.setFloat3("colorOffset", 1.0f, 1.0f, 1.0f);
         program.setInt("textured", 1);
-        program.setFloat("alpha", 1f);
+        program.setFloat("alpha", 1.0f);
     }
 
 }

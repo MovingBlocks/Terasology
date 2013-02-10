@@ -63,9 +63,9 @@ public class AnimationOpacity extends Animation {
     @Override
     public void renderBegin(){
         if(fbo == null){
-            fbo = PostProcessingRenderer.getInstance().createFBO(id, Display.getWidth(), Display.getHeight(), false, false, false);
+            fbo = PostProcessingRenderer.getInstance().createFBO(id, Display.getWidth(), Display.getHeight(), PostProcessingRenderer.FBOType.DEFAULT, false, false);
         }else if(fbo._height != Display.getHeight() || fbo._width != Display.getWidth()){
-            fbo = PostProcessingRenderer.getInstance().createFBO(id, Display.getWidth(), Display.getHeight(), false, false, false);
+            fbo = PostProcessingRenderer.getInstance().createFBO(id, Display.getWidth(), Display.getHeight(), PostProcessingRenderer.FBOType.DEFAULT, false, false);
         }
 
         PostProcessingRenderer.getInstance().getFBO(id).bind();

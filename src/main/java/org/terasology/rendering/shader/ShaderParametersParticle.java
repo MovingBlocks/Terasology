@@ -29,22 +29,19 @@ import org.terasology.rendering.assets.Texture;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ShaderParametersParticle implements IShaderParameters {
+public class ShaderParametersParticle extends ShaderParametersBase {
 
     @Override
     public void applyParameters(ShaderProgram program) {
+        super.applyParameters(program);
+
         Texture terrainTex = Assets.getTexture("engine:terrain");
         if (terrainTex == null) {
             return;
         }
 
-        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         glBindTexture(GL11.GL_TEXTURE_2D, terrainTex.getId());
-
-        if (localPlayer != null)
-            program.setInt("carryingTorch", localPlayer.isCarryingTorch() ? 1 : 0);
     }
 
 }

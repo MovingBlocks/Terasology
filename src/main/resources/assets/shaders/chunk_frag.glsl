@@ -42,13 +42,9 @@ uniform sampler2D textureLava;
 uniform sampler2D textureEffects;
 uniform sampler2D textureWaterReflection;
 
-uniform float time;
-uniform float daylight = 1.0;
-
 uniform float clipHeight = 0.0;
 
 uniform bool carryingTorch;
-uniform bool swimming;
 
 varying vec4 vertexWorldPosRaw;
 varying vec4 vertexWorldPos;
@@ -60,6 +56,14 @@ varying vec3 waterNormal;
 varying float flickeringLightOffset;
 varying float blockHint;
 varying float isUpside;
+
+varying float distance;
+
+uniform vec3 skyInscatteringColor;
+uniform float skyInscatteringExponent;
+
+uniform float skyInscatteringStrength;
+uniform float skyInscatteringLength;
 
 void main(){
 	if (clipHeight > 0.0 && vertexWorldPosRaw.y < clipHeight && !swimming) {
@@ -75,7 +79,7 @@ void main(){
     vec3 finalLightDir = lightDir;
 
     /* DAYLIGHT BECOMES... MOONLIGHT! */
-    /* Now featuring linear interpolation to make the transition smoother... :-) */
+    // Now featuring linear interpolation to make the transition smoother... :-)
     if (daylight < 0.1)
         finalLightDir = mix(finalLightDir * -1.0, finalLightDir, daylight / 0.1);
 
@@ -83,15 +87,18 @@ void main(){
 
     /* WATER */
     if ( checkFlag(BLOCK_HINT_WATER, blockHint) ) {
-        vec2 waterOffset = vec2(vertexWorldPosRaw.x + timeToTick(time, 0.1), vertexWorldPosRaw.z + timeToTick(time, 0.1)) / 8.0;
+        vec2 waterOffset = vec2(vertexWorldPosRaw.x + timeToTick(time, 0.05), vertexWorldPosRaw.z + timeToTick(time, 0.1)) / 8.0;
+        vec2 waterOffset2 = vec2(vertexWorldPosRaw.x - timeToTick(time, 0.1), vertexWorldPosRaw.z + timeToTick(time, 0.05)) / 8.0;
         normalWater.xyz = texture2D(textureWaterNormal, waterOffset).xyz * 2.0 - 1.0;
+        normalWater.xyz += texture2D(textureWaterNormal, waterOffset2).xyz * 2.0 - 1.0;
+        normalWater.xyz /= 2.0;
 
        // Enable reflection only when not swimming and for blocks on sea level
         if (!swimming && isUpside > 0.99) {
             if ( vertexWorldPosRaw.y < 32.5 && vertexWorldPosRaw.y > 31.5) {
                 vec2 projectedPos = 0.5 * (vertexPos.st/vertexPos.q) + vec2(0.5);
 
-                // Fresnel
+                /* FRESNEL */
                 float refractionFactor = WATER_REFRACTION * clamp(1.0 - length(vertexWorldPos.xyz) / 50.0, 0.25, 1.0);
                 vec4 reflectionColor = vec4(texture2D(textureWaterReflection, projectedPos + normalWater.xy * refractionFactor).xyz, 1.0);
                 float f = fresnel(max(dot(normalizedVPos, waterNormal), 0.0), 0.1, 5.0);
@@ -200,6 +207,10 @@ void main(){
 
     // Apply the final lighting mix
     color.xyz *= max(daylightColorValue, blocklightColorValue) * occlusionValue;
+
+    vec3 finalInscatteringColor = convertColorYxy(skyInscatteringColor, skyInscatteringExponent);
+    float fogValue = skyInscatteringStrength - clamp((viewingDistance - distance) / (viewingDistance - (1.0 - skyInscatteringLength) * viewingDistance), 0.0, skyInscatteringStrength);
+    color = mix(color, vec4(finalInscatteringColor, 1.0), fogValue);
 
     gl_FragData[0].rgba = color;
     gl_FragData[1].rgba = vec4(normal.x / 2.0 + 0.5, normal.y / 2.0 + 0.5, normal.z / 2.0 + 0.5, 0.0f);

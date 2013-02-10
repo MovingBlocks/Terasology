@@ -30,8 +30,9 @@ varying float flickeringLightOffset;
 varying float isUpside;
 varying float blockHint;
 
+varying float distance;
+
 uniform float blockScale = 1.0;
-uniform float time;
 uniform vec3 chunkOffset;
 
 uniform float animated;
@@ -83,12 +84,20 @@ void main()
     if ( checkFlag(BLOCK_HINT_WATER, blockHint) ) {
        // Only animate blocks on sea level
        if (vertexWorldPosRaw.y < 32.5 && vertexWorldPosRaw.y > 31.5) {
-            vertexWorldPos.y += (smoothTriangleWave(timeToTick(time, 0.1) + vertexChunkPos.x * 0.05 + vertexChunkPos.z * 0.05) * 2.0 - 1.0) * 0.1 * blockScale
-            + (smoothTriangleWave(timeToTick(time, 0.25)  + vertexChunkPos.x *-0.25 + vertexChunkPos.z * 0.25) * 2.0 - 1.0) * 0.025 * blockScale;
+
+            float offset = (smoothTriangleWave(timeToTick(time, 0.1) + vertexChunkPos.x * 0.125 + vertexChunkPos.z * 0.125) * 2.0 - 1.0) * 0.25 * blockScale
+                            + (smoothTriangleWave(timeToTick(time, 0.1) - vertexChunkPos.x *0.125 - vertexChunkPos.z * 0.125) * 2.0 - 1.0) * 0.125 * blockScale
+                            + (smoothTriangleWave(timeToTick(time, 0.1) + vertexChunkPos.x * 0.125 - vertexChunkPos.z * 0.125) * 2.0 - 1.0) * 0.075 * blockScale
+                            + (smoothTriangleWave(timeToTick(time, 0.1)  - vertexChunkPos.x *0.125 + vertexChunkPos.z * 0.125) * 2.0 - 1.0) * 0.05 * blockScale
+                            + (smoothTriangleWave(timeToTick(time, 0.1) + vertexChunkPos.x * 0.125 + vertexChunkPos.z * 0.125) * 2.0 - 1.0) * 0.025 * blockScale;
+            vertexWorldPos.y += offset * 0.25;
+
         }
     }
 #endif
 
     vertexPos = gl_ProjectionMatrix * vertexWorldPos;
+    distance = length(vertexWorldPos);
+
     gl_Position = vertexPos;
 }

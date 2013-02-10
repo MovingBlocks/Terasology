@@ -398,6 +398,10 @@ public final class Config {
         return _setting.getSystemBuilder().getBlurIntensity();
     }
 
+    public int getBlurRadius() {
+        return Math.max(getBlurIntensity(), 1);
+    }
+
     public boolean isComplexWater() {
         return _setting.getSystemBuilder().getReflectiveWater();
     }
@@ -444,6 +448,22 @@ public final class Config {
 
     public boolean isSSAO() {
         return _setting.getSystemBuilder().getSsao();
+    }
+
+    public void setLightShafts(boolean lightShafts) {
+        _setting.getSystemBuilder().setLightShafts(lightShafts);
+    }
+
+    public boolean isLightShafts() {
+        return _setting.getSystemBuilder().getLightShafts();
+    }
+
+    public void setOutline(boolean outline) {
+        _setting.getSystemBuilder().setOutline(outline);
+    }
+
+    public boolean isOutline() {
+        return _setting.getSystemBuilder().getOutline();
     }
 
     public void setFilmGrain(boolean filmGrain) {

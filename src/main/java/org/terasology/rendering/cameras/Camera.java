@@ -151,6 +151,10 @@ public abstract class Camera {
         return _projectionMatrix;
     }
 
+    public Matrix4f getViewProjectionMatrix() {
+        return _viewProjectionMatrix;
+    }
+
     public Matrix4f getInverseViewProjectionMatrix() {
         return _inverseViewProjectionMatrix;
     }

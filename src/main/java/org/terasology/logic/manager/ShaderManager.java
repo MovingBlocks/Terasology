@@ -72,17 +72,18 @@ public class ShaderManager {
 
         createAndStoreShaderProgram("post", new ShaderParametersPost());
         createAndStoreShaderProgram("ssao", new ShaderParametersSSAO());
-        createAndStoreShaderProgram("screenCombine", new ShaderParametersScreenCombine());
+        createAndStoreShaderProgram("lightshaft", new ShaderParametersLightShaft());
+        createAndStoreShaderProgram("sobel", new ShaderParametersSobel());
+        createAndStoreShaderProgram("prePost", new ShaderParametersPrePost());
         createAndStoreShaderProgram("highp", new ShaderParametersDefault());
         createAndStoreShaderProgram("blur", new ShaderParametersDefault());
         createAndStoreShaderProgram("down", new ShaderParametersDefault());
         createAndStoreShaderProgram("hdr", new ShaderParametersHdr());
-        createAndStoreShaderProgram("sky", new ShaderParametersDefault());
+        createAndStoreShaderProgram("sky", new ShaderParametersSky());
         createAndStoreShaderProgram("chunk", new ShaderParametersChunk());
         createAndStoreShaderProgram("particle", new ShaderParametersParticle());
         createAndStoreShaderProgram("block", new ShaderParametersBlock());
         createAndStoreShaderProgram("gelatinousCube", new ShaderParametersGelCube());
-        createAndStoreShaderProgram("clouds", new ShaderParametersDefault());
         createAndStoreShaderProgram("animateOpacity", new ShaderParametersDefault());
         //createAndStoreShaderProgram("genericMesh", new ShaderParametersGenericMesh());
     }
@@ -169,5 +170,13 @@ public class ShaderManager {
      */
     public ShaderProgram getShaderProgram(String s) {
         return _shaderPrograms.get(s);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public HashMap<String, ShaderProgram> getShaderPrograms() {
+        return _shaderPrograms;
     }
 }

@@ -49,4 +49,6 @@ void main(){
     } else {
         gl_FragData[0].rgba = color;
     }
+
+    gl_FragData[1].rgba = vec4(normal.x / 2.0 + 0.5, normal.y / 2.0 + 0.5, normal.z / 2.0 + 0.5, 0.0f);
 }

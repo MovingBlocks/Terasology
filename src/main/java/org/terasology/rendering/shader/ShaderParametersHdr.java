@@ -16,24 +16,34 @@
 package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL13;
-import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PostProcessingRenderer;
+import org.terasology.editor.properties.Property;
+
+import java.util.List;
 
 /**
  * Shader parameters for the Post-processing shader program.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ShaderParametersHdr implements IShaderParameters {
+public class ShaderParametersHdr extends ShaderParametersBase {
 
-    static final float exposureBias = 2.5f;
+    final Property exposureBias = new Property("exposureBias", 2.5f, 0.0f, 10.0f);
+    final Property whitePoint = new Property("whitePoint", 11.2f, 0.0f, 100.0f);
 
     public void applyParameters(ShaderProgram program) {
+        super.applyParameters(program);
+
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        PostProcessingRenderer.getInstance().getFBO("sceneCombined").bindTexture();
+        PostProcessingRenderer.getInstance().getFBO("scenePrePost").bindTexture();
 
         program.setInt("texScene", 0);
-        program.setFloat("exposure", PostProcessingRenderer.getInstance().getExposure() *exposureBias);
+        program.setFloat("exposure", PostProcessingRenderer.getInstance().getExposure() * (Float) exposureBias.getValue());
+        program.setFloat("whitePoint", (Float) whitePoint.getValue());
     }
 
+    public void addPropertiesToList(List<Property> properties) {
+        properties.add(exposureBias);
+        properties.add(whitePoint);
+    }
 }

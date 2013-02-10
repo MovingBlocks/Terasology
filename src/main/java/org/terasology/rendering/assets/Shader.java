@@ -223,6 +223,10 @@ public class Shader implements Asset {
             builder.append("#define SSAO \n");
         if (Config.getInstance().isFilmGrain())
             builder.append("#define FILM_GRAIN \n");
+        if (Config.getInstance().isOutline())
+            builder.append("#define OUTLINE \n");
+        if (Config.getInstance().isLightShafts())
+            builder.append("#define LIGHT_SHAFTS \n");
         return builder;
     }
 

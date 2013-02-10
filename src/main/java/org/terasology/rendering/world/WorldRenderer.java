@@ -558,7 +558,8 @@ public final class WorldRenderer {
         glCullFace(GL11.GL_BACK);
         PostProcessingRenderer.getInstance().endRenderReflectedScene();
 
-        PostProcessingRenderer.getInstance().beginRenderScene();
+
+        PostProcessingRenderer.getInstance().beginRenderScene(true);
         renderWorld(getActiveCamera());
         PostProcessingRenderer.getInstance().endRenderScene();
 
@@ -589,6 +590,7 @@ public final class WorldRenderer {
     }
 
     public void renderWorld(Camera camera) {
+
         /* SKYSPHERE */
         PerformanceMonitor.startActivity("Render Sky");
         camera.lookThroughNormalized();

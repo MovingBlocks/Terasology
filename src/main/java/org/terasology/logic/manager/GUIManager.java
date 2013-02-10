@@ -28,9 +28,9 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.EventPriority;
-import org.terasology.entitySystem.EventSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.game.CoreRegistry;
+import org.terasology.game.TerasologyEngine;
 import org.terasology.input.events.KeyEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
@@ -315,7 +315,7 @@ public class GUIManager implements EventHandlerSystem {
 	 * Check whether the mouse of the current focused window is visible and can be moved on the display.
 	 */
     public void checkMouseGrabbing() {
-        if (isConsumingInput() || renderer.getWindowFocused() == null) {
+        if (isConsumingInput() || renderer.getWindowFocused() == null || TerasologyEngine.isEditorInFocus()) {
             Mouse.setGrabbed(false);
         } else {
             Mouse.setGrabbed(true);

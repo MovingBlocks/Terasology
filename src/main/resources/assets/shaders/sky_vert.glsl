@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-varying	vec4 	McPosition;
+varying	vec4 	position;
 varying	vec3 	colorYxy;
 varying vec3    skyVec;
 varying vec3    skyVecR;
-varying float   lv;
+
 uniform	vec4 	sunPos;
 uniform float	sunAngle;
 uniform	float	turbidity;
 uniform vec3    zenith;
 
-vec4 eyePos = vec4(0.0, 0.0, 0.0, 1.0);
+const vec4 eyePos = vec4(0.0, 0.0, 0.0, 1.0);
 
-vec3	allweather ( float t, float cosTheta, float cosGamma )
+vec3 allWeather(float t, float cosTheta, float cosGamma)
 {
 	float	gamma      = acos ( cosGamma );
 	float	cosGammaSq = cosGamma * cosGamma;
@@ -46,33 +46,34 @@ vec3	allweather ( float t, float cosTheta, float cosGamma )
 	float	dy = -0.04405 * t - 1.65369;
 	float	ey = -0.01092 * t + 0.05291;
 
-	return vec3 ( (1.0 + aY * exp(bY/cosTheta)) * (1.0 + cY * exp(dY * gamma) + eY*cosGammaSq),
+	return vec3 ((1.0 + aY * exp(bY/cosTheta)) * (1.0 + cY * exp(dY * gamma) + eY*cosGammaSq),
 	              (1.0 + ax * exp(bx/cosTheta)) * (1.0 + cx * exp(dx * gamma) + ex*cosGammaSq),
-				  (1.0 + ay * exp(by/cosTheta)) * (1.0 + cy * exp(dy * gamma) + ey*cosGammaSq) );
+				  (1.0 + ay * exp(by/cosTheta)) * (1.0 + cy * exp(dy * gamma) + ey*cosGammaSq));
 }
 
-vec3	allweatherSky ( float t, float cosTheta, float cosGamma, float cosThetaSun )
+vec3 allWeatherSky(float t, float cosTheta, float cosGamma, float cosThetaSun)
 {
+  float	thetaSun = acos(cosThetaSun);
 
-  float	thetaSun = acos( cosThetaSun );
+  vec3	clrYxy = zenith * allWeather(t, cosTheta, cosGamma) / allWeather (t, 1.0, cosThetaSun);
+  clrYxy.x *= smoothstep ( 0.0, 0.1, cosThetaSun );
 
-	vec3	clrYxy = zenith * allweather ( t, cosTheta, cosGamma ) / allweather ( t, 1.0, cosThetaSun );	
-	return clrYxy;
+  return clrYxy;
 }
 
 void main(void)
 {
-    float	sa  = sin ( sunAngle + 0.35 );
-    float	ca  = cos ( sunAngle + 0.35 );
-    mat3	r   = mat3 ( 1.0, 0.0, 0.0, 0.0, ca, -sa, 0.0, sa, ca );
+    float	sa  = sin (sunAngle);
+    float	ca  = cos (sunAngle);
+    mat3	r   = mat3 (1.0, 0.0, 0.0, 0.0, ca, -sa, 0.0, sa, ca);
 
-    vec3 v          = normalize ( (gl_Vertex-eyePos).xyz );    
-    vec3 l          = normalize ( sunPos.xyz );
-    lv              = dot  ( l, v );
+    vec3 v          = normalize ((gl_Vertex-eyePos).xyz);
+    vec3 l          = normalize (sunPos.xyz);
+    float lv        = dot(l, v);
     skyVecR         = r * v.xyz;
     skyVec          = v.xyz;
-    colorYxy        = allweatherSky ( turbidity, abs(v.y)+0.35, lv, l.y );
-    McPosition      = gl_Vertex;
+    colorYxy        = allWeatherSky(turbidity, max(v.y, 0.0) + 0.05, lv, l.y);
+    position        = gl_Vertex;
     gl_Position     = ftransform();
     gl_TexCoord[0]  = gl_MultiTexCoord0;
 }

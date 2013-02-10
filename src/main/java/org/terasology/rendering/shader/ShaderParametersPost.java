@@ -23,65 +23,69 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
+import org.terasology.editor.properties.Property;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.LocalPlayer;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PostProcessingRenderer;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.utilities.FastRandom;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.block.Block;
 
 import java.nio.FloatBuffer;
+import java.util.List;
 
 /**
  * Shader parameters for the Post-processing shader program.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ShaderParametersPost implements IShaderParameters {
+public class ShaderParametersPost extends ShaderParametersBase {
 
     FastRandom rand = new FastRandom();
 
     Texture vignetteTexture = Assets.getTexture("engine:vignette");
     Texture noiseTexture = Assets.getTexture("engine:noise");
 
+    Property filmGrainIntensity = new Property("filmGrainIntensity", 0.1f, 0.0f, 1.0f);
+    Property maxBlurSky = new Property("maxBlurSky", 1.0f, 0.0f, 1.0f);
+
     @Override
     public void applyParameters(ShaderProgram program) {
+        super.applyParameters(program);
+
         PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("scene");
+
+
+        GL13.glActiveTexture(GL13.GL_TEXTURE0);
+        PostProcessingRenderer.getInstance().getFBO("sceneTonemapped").bindTexture();
+        program.setInt("texScene", 0);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE1);
         PostProcessingRenderer.getInstance().getFBO("sceneBloom1").bindTexture();
+        program.setInt("texBloom", 1);
+
         if (Config.getInstance().getBlurIntensity() != 0 || Config.getInstance().isMotionBlur()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE2);
             PostProcessingRenderer.getInstance().getFBO("sceneBlur1").bindTexture();
+            program.setInt("texBlur", 2);
+
+            program.setFloat("maxBlurSky", (Float) maxBlurSky.getValue());
         }
+
         GL13.glActiveTexture(GL13.GL_TEXTURE3);
         glBindTexture(GL11.GL_TEXTURE_2D, vignetteTexture.getId());
+        program.setInt("texVignette", 3);
+
         GL13.glActiveTexture(GL13.GL_TEXTURE4);
         scene.bindDepthTexture();
+        program.setInt("texDepth", 4);
 
         if (Config.getInstance().isFilmGrain()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE5);
             glBindTexture(GL11.GL_TEXTURE_2D, noiseTexture.getId());
-        }
-
-        GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        PostProcessingRenderer.getInstance().getFBO("sceneTonemapped").bindTexture();
-
-        program.setInt("texScene", 0);
-        program.setInt("texBloom", 1);
-        if (Config.getInstance().getBlurIntensity() != 0) {
-            program.setInt("texBlur", 2);
-        }
-        program.setInt("texVignette", 3);
-        program.setInt("texDepth", 4);
-
-        if (Config.getInstance().isFilmGrain()) {
             program.setInt("texNoise", 5);
-            program.setFloat("grainIntensity", 0.075f);
+            program.setFloat("grainIntensity", (Float) filmGrainIntensity.getValue());
             program.setFloat("noiseOffset", rand.randomPosFloat());
 
             FloatBuffer rtSize = BufferUtils.createFloatBuffer(2);
@@ -91,20 +95,16 @@ public class ShaderParametersPost implements IShaderParameters {
             program.setFloat2("renderTargetSize", rtSize);
         }
 
-        program.setFloat("viewingDistance", Config.getInstance().getActiveViewingDistance() * 8.0f);
-
-        if (CoreRegistry.get(LocalPlayer.class).isValid()) {
-            Vector3f cameraPos = CoreRegistry.get(WorldRenderer.class).getActiveCamera().getPosition();
-            Block block = CoreRegistry.get(WorldProvider.class).getBlock(cameraPos);
-            program.setInt("swimming", block.isLiquid() ? 1 : 0);
-        }
-
         Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
-
         if (activeCamera != null && Config.getInstance().isMotionBlur()) {
             program.setMatrix4("invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix());
             program.setMatrix4("prevViewProjMatrix", activeCamera.getPrevViewProjectionMatrix());
         }
     }
 
+    @Override
+    public void addPropertiesToList(List<Property> properties) {
+        properties.add(filmGrainIntensity);
+        properties.add(maxBlurSky);
+    }
 }

@@ -165,7 +165,6 @@ public class SkeletonRenderer implements RenderSystem, EventHandlerSystem, Updat
 
     @Override
     public void renderOpaque() {
-        boolean carryingTorch = CoreRegistry.get(LocalPlayer.class).isCarryingTorch();
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
 
         Quat4f worldRot = new Quat4f();
@@ -183,7 +182,6 @@ public class SkeletonRenderer implements RenderSystem, EventHandlerSystem, Updat
                 continue;
             }
             skeletalMesh.material.enable();
-            skeletalMesh.material.setInt("carryingTorch", carryingTorch ? 1 : 0);
             skeletalMesh.material.setFloat("light", 1);
             skeletalMesh.material.bindTextures();
 

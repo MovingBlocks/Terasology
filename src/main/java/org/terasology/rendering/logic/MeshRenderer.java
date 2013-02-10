@@ -195,7 +195,6 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
 
     @Override
     public void renderOpaque() {
-        boolean carryingTorch = CoreRegistry.get(LocalPlayer.class).isCarryingTorch();
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
 
         Quat4f worldRot = new Quat4f();
@@ -211,7 +210,6 @@ public class MeshRenderer implements RenderSystem, EventHandlerSystem {
         for (Material material : opaqueMesh.keys()) {
             Mesh lastMesh = null;
             material.enable();
-            material.setInt("carryingTorch", carryingTorch ? 1 : 0);
             material.setFloat("light", 1);
             material.bindTextures();
             lastRendered = opaqueMesh.get(material).size();

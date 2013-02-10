@@ -20,11 +20,11 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
 import org.terasology.logic.manager.PostProcessingRenderer;
+import org.terasology.editor.properties.Property;
 import org.terasology.rendering.assets.Texture;
 
-import javax.vecmath.Vector3f;
-
 import java.nio.FloatBuffer;
+import java.util.List;
 
 import static org.lwjgl.opengl.GL11.glBindTexture;
 
@@ -33,12 +33,19 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ShaderParametersSSAO implements IShaderParameters {
+public class ShaderParametersSSAO extends ShaderParametersBase {
+
+    Property ssaoStrength = new Property("ssaoStrength", 0.08f, 0.0f, 1.0f);
+    Property ssaoTotalStrength = new Property("ssaoTotalStrength", 1.5f, 0.0f, 4.0f);
+    Property ssaoFalloff = new Property("ssaoFalloff", 0.0f, 0.0f, 0.0001f);
+    Property ssaoRad = new Property("ssaoRad", 0.02f, 0.00f, 0.2f);
 
     Texture noiseTexture = Assets.getTexture("engine:noise");
 
     @Override
     public void applyParameters(ShaderProgram program) {
+        super.applyParameters(program);
+
         PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("scene");
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
@@ -52,13 +59,10 @@ public class ShaderParametersSSAO implements IShaderParameters {
         program.setInt("texNormals", 1);
         program.setInt("texNoise", 2);
 
-        final int ssaoSamples = 16;
-        program.setInt("ssaoSamples", ssaoSamples);
-        program.setFloat("ssaoInvSamples", 1.0f / ssaoSamples);
-        program.setFloat("ssaoStrength", 0.15f);
-        program.setFloat("ssaoTotalStrength", 1.25f);
-        program.setFloat("ssaoFalloff", 0.0000001f);
-        program.setFloat("ssaoRad", 0.05f);
+        program.setFloat("ssaoStrength", (Float) ssaoStrength.getValue());
+        program.setFloat("ssaoTotalStrength", (Float) ssaoTotalStrength.getValue());
+        program.setFloat("ssaoFalloff", (Float) ssaoFalloff.getValue());
+        program.setFloat("ssaoRad", (Float) ssaoRad.getValue());
 
         FloatBuffer rtSize = BufferUtils.createFloatBuffer(2);
         rtSize.put((float) scene._width).put((float) scene._height);
@@ -67,4 +71,11 @@ public class ShaderParametersSSAO implements IShaderParameters {
         program.setFloat2("renderTargetSize", rtSize);
     }
 
+    @Override
+    public void addPropertiesToList(List<Property> properties) {
+        properties.add(ssaoStrength);
+        properties.add(ssaoRad);
+        properties.add(ssaoTotalStrength);
+        properties.add(ssaoFalloff);
+    }
 }

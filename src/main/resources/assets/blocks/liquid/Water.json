@@ -25,5 +25,6 @@
     "translucent" : true,
     "targetable" : false,
     "penetrable" : true,
-    "shadowCasting" : true
+    "shadowCasting" : true,
+    "replacementAllowed" : true
 }

@@ -14,13 +14,6 @@
  * limitations under the License.
  */
 
-
-#define Z_NEAR 0.1
-#define BLUR_START 0.6
-#define BLUR_LENGTH 0.05
-
-#define MOTION_BLUR_SAMPLES 8
-
 uniform sampler2D texScene;
 uniform sampler2D texDepth;
 #ifdef BLOOM
@@ -28,22 +21,21 @@ uniform sampler2D texBloom;
 #endif
 #if !defined (NO_BLUR) || defined (MOTION_BLUR)
 uniform sampler2D texBlur;
+uniform float maxBlurSky;
 #endif
 #ifdef VIGNETTE
 uniform sampler2D texVignette;
 #endif
 #ifdef FILM_GRAIN
-uniform sampler2D   texNoise;
-uniform vec2        noiseSize = vec2(64.0, 64.0);
-uniform vec2        renderTargetSize = vec2(1280.0, 720.0);
+uniform sampler2D texNoise;
+uniform vec2 noiseSize = vec2(64.0, 64.0);
+uniform vec2 renderTargetSize = vec2(1280.0, 720.0);
 #endif
 
 #ifdef FILM_GRAIN
 uniform float noiseOffset;
 uniform float grainIntensity;
 #endif
-uniform bool swimming;
-uniform float viewingDistance;
 
 #ifdef MOTION_BLUR
 uniform mat4 invViewProjMatrix;
@@ -58,13 +50,18 @@ void main() {
     float currentDepth = texture2D(texDepth, gl_TexCoord[0].xy).x;
 
 #ifndef NO_BLUR
-    float linDepth = (2.0 * Z_NEAR) / (viewingDistance + Z_NEAR - currentDepth * (viewingDistance - Z_NEAR));
+    float depthLin = linDepth(currentDepth);
     float blur = 0.0;
 
-    if (linDepth > BLUR_START && !swimming)
-       blur = clamp((linDepth - BLUR_START) / BLUR_LENGTH, 0.0, 1.0);
-    else if (swimming)
+    if (depthLin > BLUR_START && !swimming) {
+       blur = clamp((depthLin - BLUR_START) / BLUR_LENGTH, 0.0, 1.0);
+
+       if (currentDepth > 0.9999999) {
+           blur = min(blur, maxBlurSky);
+       }
+    } else if (swimming) {
        blur = 1.0;
+    }
 #endif
 
     vec4 color = texture2D(texScene, gl_TexCoord[0].xy);

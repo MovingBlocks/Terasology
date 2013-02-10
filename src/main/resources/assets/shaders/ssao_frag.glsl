@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-uniform float   ssaoStrength = 0.1;
-uniform float   ssaoTotalStrength = 1.0;
-uniform float   ssaoFalloff = 0.000002;
-uniform float   ssaoRad = 0.006;
-uniform int     ssaoSamples = 16;
-uniform float   ssaoInvSamples = 1.0 / 16.0;
+uniform float   ssaoStrength;
+uniform float   ssaoTotalStrength;
+uniform float   ssaoFalloff;
+uniform float   ssaoRad;
 
 uniform vec2    noiseSize = vec2(64.0, 64.0);
 uniform vec2    renderTargetSize = vec2(1280.0, 720.0);
@@ -27,6 +25,9 @@ uniform vec2    renderTargetSize = vec2(1280.0, 720.0);
 uniform sampler2D texNormals;
 uniform sampler2D texNoise;
 uniform sampler2D texDepth;
+
+const int     ssaoSamples = 16;
+const float   ssaoInvSamples = 1.0 / 16.0;
 
 vec3 sphereSamples[16] = vec3[](
     vec3(0.53812504, 0.18565957, -0.43192),vec3(0.13790712, 0.24864247, 0.44301823),vec3(0.33715037, 0.56794053, -0.005789503),

@@ -75,7 +75,8 @@ public class LocalChunkProvider implements ChunkProvider {
     private Set<CacheRegion> regions = Sets.newHashSet();
 
     private ConcurrentMap<Vector3i, Chunk> nearCache = Maps.newConcurrentMap();
-
+    private final Set<Vector3i> preparingChunks = Sets.newSetFromMap(Maps.<Vector3i, Boolean>newConcurrentMap());
+    
     private EntityRef worldEntity = EntityRef.NULL;
 
     private ReadWriteLock regionLock = new ReentrantReadWriteLock();
@@ -280,12 +281,16 @@ public class LocalChunkProvider implements ChunkProvider {
         Chunk chunk = getChunk(chunkPos);
         if (chunk == null) {
             PerformanceMonitor.startActivity("Check chunk in cache");
-            if (farStore.contains(chunkPos)) {
-                chunkTasksQueue.offer(new AbstractChunkTask(chunkPos, this) {
-                    @Override
-                    public void enact() {
-                        Chunk chunk = farStore.get(getPosition());
-                        if (nearCache.putIfAbsent(getPosition(), chunk) == null) {
+            if (preparingChunks.add(chunkPos)) {
+                if (farStore.contains(chunkPos)) {
+                    chunkTasksQueue.offer(new AbstractChunkTask(chunkPos, this) {
+                        @Override
+                        public void enact() {
+                            Chunk chunk = farStore.get(getPosition());
+                            if (nearCache.putIfAbsent(getPosition(), chunk) != null) {
+                                logger.warn("Chunk {} is already in the near cache", getPosition());
+                            }
+                            preparingChunks.remove(getPosition());
                             if (chunk.getChunkState() == Chunk.State.COMPLETE) {
                                 for (Vector3i adjPos : Region3i.createFromCenterExtents(getPosition(), LOCAL_REGION_EXTENTS)) {
                                     checkChunkReady(adjPos);
@@ -293,18 +298,20 @@ public class LocalChunkProvider implements ChunkProvider {
                             }
                             reviewChunkQueue.offer(new ChunkRequest(ChunkRequest.RequestType.REVIEW, Region3i.createFromCenterExtents(getPosition(), LOCAL_REGION_EXTENTS)));
                         }
-                    }
-                });
-            } else {
-                chunkTasksQueue.offer(new AbstractChunkTask(chunkPos, this) {
-                    @Override
-                    public void enact() {
-                        Chunk chunk = generator.generateChunk(getPosition());
-                        if (null == nearCache.putIfAbsent(getPosition(), chunk)) {
+                    });
+                } else {
+                    chunkTasksQueue.offer(new AbstractChunkTask(chunkPos, this) {
+                        @Override
+                        public void enact() {
+                            Chunk chunk = generator.generateChunk(getPosition());
+                            if (nearCache.putIfAbsent(getPosition(), chunk) != null) {
+                                logger.warn("Chunk {} is already in the near cache", getPosition());
+                            }
+                            preparingChunks.remove(getPosition());
                             reviewChunkQueue.offer(new ChunkRequest(ChunkRequest.RequestType.REVIEW, Region3i.createFromCenterExtents(getPosition(), LOCAL_REGION_EXTENTS)));
                         }
-                    }
-                });
+                    });
+                }
             }
             PerformanceMonitor.endActivity();
         } else {

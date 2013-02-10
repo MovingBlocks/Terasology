@@ -21,7 +21,6 @@ import org.lwjgl.LWJGLUtil;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +42,7 @@ import org.terasology.physics.CollisionGroupManager;
 import org.terasology.version.TerasologyVersion;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -87,6 +87,10 @@ public class TerasologyEngine implements GameEngine {
 
     private Timer timer;
     private final ThreadPoolExecutor threadPool = (ThreadPoolExecutor) Executors.newCachedThreadPool();
+
+    private Canvas customViewPort = null;
+    private static boolean editorInFocus = false;
+    private static boolean editorAttached = false;
 
     public TerasologyEngine() {
     }
@@ -363,6 +367,7 @@ public class TerasologyEngine implements GameEngine {
     private void initDisplay() {
         try {
             setDisplayMode();
+            Display.setParent(customViewPort);
             Display.setTitle("Terasology" + " | " + "Pre Alpha");
             Display.create(Config.getInstance().getPixelFormat());
         } catch (LWJGLException e) {
@@ -415,7 +420,9 @@ public class TerasologyEngine implements GameEngine {
             Keyboard.create();
             Keyboard.enableRepeatEvents(true);
             Mouse.create();
-            Mouse.setGrabbed(true);
+            if (!TerasologyEngine.isEditorInFocus()) {
+                Mouse.setGrabbed(true);
+            }
         } catch (LWJGLException e) {
             logger.error("Could not initialize controls.", e);
             System.exit(1);
@@ -464,16 +471,12 @@ public class TerasologyEngine implements GameEngine {
         while (running && !Display.isCloseRequested()) {
 
             // Only process rendering and updating once a second
-            // TODO: Add debug config setting to run even if display inactive
-            if (!Display.isActive()) {
+            if (!Display.isActive() && !TerasologyEngine.isEditorAttached()) {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     logger.warn("Display inactivity sleep interrupted", e);
                 }
-
-                Display.processMessages();
-                continue;
             }
 
             processStateChanges();
@@ -551,5 +554,25 @@ public class TerasologyEngine implements GameEngine {
             resizeViewport();
             CoreRegistry.get(GUIManager.class).update(true);
         }
+    }
+
+    public void setCustomViewPort(Canvas viewPort) {
+        customViewPort = viewPort;
+    }
+
+    public static void setEditorInFocus(boolean focus) {
+        editorInFocus = focus;
+    }
+
+    public static boolean isEditorInFocus() {
+        return editorInFocus;
+    }
+
+    public static void setEditorAttached(boolean attached) {
+        editorAttached = attached;
+    }
+
+    public static boolean isEditorAttached() {
+        return editorAttached;
     }
 }
