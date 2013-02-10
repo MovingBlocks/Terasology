@@ -31,15 +31,6 @@ import org.terasology.physics.character.CharacterMovementComponent;
  */
 public class LeapSystem implements EventHandlerSystem {
 
-    /** Max width of the motion space from the *center* (so times 2 total) - 'x' */
-    private static final int MOTION_SPACE_WIDTH_MAX = 150;
-
-    /** Max height of the motion space from the *ground* (total) - 'y' */
-    private static final int MOTION_SPACE_HEIGHT_MAX = 500;
-
-    /** Max depth of the motion space from the *center* (so times 2 total) - 'z' */
-    private static final int MOTION_SPACE_DEPTH_MAX = 150;
-
     /** Min width of the space we want to be sensitive toward (closer is "dead space") */
     private static final int MOTION_SPACE_WIDTH_MIN = 40;
 
@@ -48,6 +39,18 @@ public class LeapSystem implements EventHandlerSystem {
 
     /** Min depth of the space we want to be sensitive toward (closer is "dead space") */
     private static final int MOTION_SPACE_DEPTH_MIN = 40;
+
+    /** Width of the motion space from either side beyond the dead space - 'x' */
+    private static final int MOTION_SPACE_WIDTH = 150;
+
+    /** Height of the motion space beyond the minimum height - 'y' */
+    private static final int MOTION_SPACE_HEIGHT = 300;
+
+    /** Depth of the motion space from either side beyond the dead space - 'z' */
+    private static final int MOTION_SPACE_DEPTH = 150;
+
+    /** Rate at which we'll consider frames from the Leap */
+    private static final int LEAP_FRAME_RATE = 10;
 
     /** Counter for total frames processed */
     private int framesTotal = 0;
@@ -66,9 +69,8 @@ public class LeapSystem implements EventHandlerSystem {
 
         framesTotal++;
 
-        // Start simple by turning the Leap fps waaaay down. Only check the hand about once a second (at 60 fps)
-        // Leap by default only stores 59 frames
-        if (framesTotal % 59 != 0) {
+        // Leap by default only stores 59 frames and we might want to process at a lower rate than that
+        if (framesTotal % LEAP_FRAME_RATE != 0) {
             return;
         }
 
@@ -76,17 +78,17 @@ public class LeapSystem implements EventHandlerSystem {
         EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
 
         // Grab the previous frame (that we care about) for comparisons
-        //Frame oldFrame = leapController.frame(59);
+        //Frame oldFrame = leapController.frame(LEAP_FRAME_RATE);
 
         // Get the most recent frame and report some basic information
         Frame frame = leapController.frame();
-        System.out.println("Frame id: " + frame.id()
+        /*System.out.println("Frame id: " + frame.id()
                 + ", timestamp: " + frame.timestamp()
                 + ", hands: " + frame.hands().count()
                 + ", fingers: " + frame.fingers().count()
                 + ", tools: " + frame.tools().count()
                 + ", framesTotal: " + framesTotal);
-
+*/
         if (!frame.hands().empty()) {
             // Get the first hand
             Hand hand = frame.hands().get(0);
@@ -146,58 +148,86 @@ public class LeapSystem implements EventHandlerSystem {
             float x = hand.palmPosition().getX();
             float y = hand.palmPosition().getY();
             float z = hand.palmPosition().getZ();
-            float absX = Math.abs(x);
-            float absZ = Math.abs(z);
+
+            // These ranges relate to how far in the sensitive space the player's hand was (for scaled velocity).
+            // Negative results will be within the min space and thus be disqualified, likewise results beyond the max range
+            float rangeX = Math.abs(x) - MOTION_SPACE_WIDTH_MIN;
+            float rangeZ = Math.abs(z) - MOTION_SPACE_DEPTH_MIN;
 
             System.out.println("X = " + x + ", Y = " + y + ", Z = " + z);
 
             // TODO: Make half width/depth enough to reach max walk speed
-            // TODO: Use runFactor when more than half *depth* (no pure run-strafing?), but scale it up to max depth
+            // TODO: Apply runFactor when more than half *depth* (no pure run-strafing?)
             // TODO: Use pitch/roll/yaw to change camera direction (impersonate mouse?)
 
-            // Left / right
-            if (absX < MOTION_SPACE_WIDTH_MAX && absX > MOTION_SPACE_WIDTH_MIN) {
-                float xVelocity = (absX - MOTION_SPACE_WIDTH_MIN) / (MOTION_SPACE_WIDTH_MAX - MOTION_SPACE_WIDTH_MIN);
-                BindAxisEvent event = new StrafeMovementAxis();
-                if (x > 0) {
-                    xVelocity *= -1;
+            CharacterMovementComponent characterMovement = playerEntity.getComponent(CharacterMovementComponent.class);
+            // Forwards / backwards - also responsible for triggering running or not (which then indirectly can increase strafing speed?)
+            if (rangeZ > 0 && rangeZ < MOTION_SPACE_DEPTH) {
+                float ratioZ = rangeZ / MOTION_SPACE_DEPTH;
+
+                // If the hand is more than half way through the range we care about then the player is running.
+                if (rangeZ > MOTION_SPACE_DEPTH / 2) {
+                    // Base running on max walk speed and set the flag. Note that said flag may impact sideways strafing speed?
+                    ratioZ = 1;
+                    characterMovement.isRunning = true;
+                } else {
+                    // We're walking, but still need to adjust up speed to max walk speed at half the max range we care about
+                    ratioZ *= 2;
                 }
-                // The first and last variable here aren't really needed - first is unused and third gets reset
-                System.out.println("xVelocity is" + xVelocity);
-                event.prepare("leap:stopsideways", xVelocity, 1f);
+
+                // Reverse direction in case the coordinate was negative
+                if (z > 0) {
+                    ratioZ *= -1;
+                }
+
+                if (characterMovement.isRunning) {
+                    System.out.println("ratioZ is " + ratioZ + ", which was based on a range of " + rangeZ + " out of " + MOTION_SPACE_DEPTH + ". Player IS running");
+                } else {
+                    System.out.println("ratioZ is " + ratioZ + ", which was based on a range of " + rangeZ + " out of " + MOTION_SPACE_DEPTH + " then doubled as the player is NOT running?");
+                }
+
+                BindAxisEvent event = new ForwardsMovementAxis();
+
+                // The first and last variables here aren't really needed (refactor?) - first is unused and third relates to delta time which may not matter here?
+                event.prepare("leap:forwardbackwards", ratioZ, 1f);
+                playerEntity.send(event);
+
+            } else {
+                BindAxisEvent event = new ForwardsMovementAxis();
+                //System.out.println("Stopping z velocity");
+                event.prepare("leap:stopforwardbackwards", 0f, 1f);
+                playerEntity.send(event);
+            }
+
+            // Left / right
+            if (rangeX > 0 && rangeX < MOTION_SPACE_WIDTH) {
+                float ratioX = rangeX / MOTION_SPACE_WIDTH;
+
+                // Reverse direction in case the coordinate was negative
+                if (x > 0) {
+                    ratioX *= -1;
+                }
+
+                System.out.println("ratioX is " + ratioX + ", which was based on a range of " + rangeX + " out of " + MOTION_SPACE_WIDTH);
+                BindAxisEvent event = new StrafeMovementAxis();
+
+                // The first and last variables here aren't really needed (refactor?) - first is unused and third relates to delta time which may not matter here?
+                event.prepare("leap:sideways", ratioX, 1f);
                 playerEntity.send(event);
             } else {
                 BindAxisEvent event = new StrafeMovementAxis();
-                System.out.println("Stopping x velocity");
+                //System.out.println("Stopping x velocity");
                 event.prepare("leap:stopsideways", 0f, 1f);
                 playerEntity.send(event);
             }
 
             // Jump
-            if (y > MOTION_SPACE_HEIGHT_MIN && y < MOTION_SPACE_HEIGHT_MAX) {
+            if (y > MOTION_SPACE_HEIGHT_MIN && y < MOTION_SPACE_HEIGHT) {
                 System.out.println("Tank: Load the jump program");
-                CharacterMovementComponent characterMovement = playerEntity.getComponent(CharacterMovementComponent.class);
                 characterMovement.jump = true;
             }
 
-            // Forwards / backwards
-            if (absZ < MOTION_SPACE_DEPTH_MAX && absZ > MOTION_SPACE_DEPTH_MIN) {
-                float zVelocity = (absZ - MOTION_SPACE_DEPTH_MIN) / (MOTION_SPACE_DEPTH_MAX - MOTION_SPACE_DEPTH_MIN);
-                BindAxisEvent event = new ForwardsMovementAxis();
-                if (z > 0) {
-                    zVelocity *= -1;
-                }
-                // The first and last variable here aren't really needed - first is unused and third gets reset
-                System.out.println("zVelocity is" + zVelocity);
-                event.prepare("leap:stopforwardbackwards", zVelocity, 1f);
-                playerEntity.send(event);
-            } else {
-                BindAxisEvent event = new ForwardsMovementAxis();
-                System.out.println("Stopping z velocity");
-                event.prepare("leap:stopforwardbackwards", 0f, 1f);
-                playerEntity.send(event);
-            }
-
+            characterMovement.isRunning = false;
         }
 
         PerformanceMonitor.endActivity();
