@@ -21,6 +21,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
 import org.terasology.game.CoreRegistry;
+import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PostProcessingRenderer;
 import org.terasology.editor.properties.Property;
 import org.terasology.rendering.assets.Texture;
@@ -43,6 +44,19 @@ public class ShaderParametersChunk extends ShaderParametersBase {
 
     Property skyInscatteringLength = new Property("skyInscatteringLength", 0.9f, 0.0f, 1.0f);
     Property skyInscatteringStrength = new Property("skyInscatteringStrength", 0.25f, 0.0f, 1.0f);
+
+    Property waveIntens = new Property("waveIntens", 0.88f, 0.0f, 2.0f);
+    Property waveIntensFalloff = new Property("waveIntensFalloff", 1.0f, 0.0f, 2.0f);
+    Property waveSize = new Property("waveSize", 0.76f, 0.0f, 2.0f);
+    Property waveSizeFalloff = new Property("waveSizeFalloff", 0.86f, 0.0f, 2.0f);
+    Property waveSpeed = new Property("waveSpeed", 0.16f, 0.0f, 2.0f);
+    Property waveSpeedFalloff = new Property("waveSpeedFalloff", 0.8f, 0.0f, 2.0f);
+
+    Property waterNormalBias = new Property("waterNormalBias", 1.5f, 1.0f, 4.0f);
+
+    Property torchWaterSpecExp = new Property("torchWaterSpecExp", 16.0f, 0.0f, 64.0f);
+    Property waterSpecExp = new Property("waterSpecExp", 64.0f, 0.0f, 64.0f);
+    Property torchSpexExp = new Property("torchSpexExp", 32.0f, 0.0f, 64.0f);
 
     public void applyParameters(ShaderProgram program) {
         super.applyParameters(program);
@@ -69,7 +83,11 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         program.setInt("textureWaterReflection", 4);
         program.setInt("textureAtlas", 0);
 
-        program.setFloat("blockScale", 1.0f);
+        program.setFloat("torchWaterSpecExp", (Float) torchWaterSpecExp.getValue());
+        program.setFloat("waterSpecExp", (Float) waterSpecExp.getValue());
+        program.setFloat("torchSpecExp", (Float) torchSpexExp.getValue());
+
+        program.setFloat("waterNormalBias", (Float) waterNormalBias.getValue());
 
         WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
         WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
@@ -86,11 +104,30 @@ public class ShaderParametersChunk extends ShaderParametersBase {
             program.setFloat("skyInscatteringLength", (Float) skyInscatteringLength.getValue());
             program.setFloat("skyInscatteringStrength", (Float) skyInscatteringStrength.getValue());
         }
+
+        if (Config.getInstance().isAnimatedWater()) {
+            program.setFloat("waveIntensFalloff", (Float) waveIntensFalloff.getValue());
+            program.setFloat("waveSizeFalloff", (Float) waveSizeFalloff.getValue());
+            program.setFloat("waveSize", (Float) waveSize.getValue());
+            program.setFloat("waveSpeedFalloff", (Float) waveSpeedFalloff.getValue());
+            program.setFloat("waveSpeed", (Float) waveSpeed.getValue());
+            program.setFloat("waveIntens", (Float) waveIntens.getValue());
+        }
     }
 
     @Override
     public void addPropertiesToList(List<Property> properties) {
         properties.add(skyInscatteringLength);
         properties.add(skyInscatteringStrength);
+        properties.add(waveIntens);
+        properties.add(waveIntensFalloff);
+        properties.add(waveSize);
+        properties.add(waveSizeFalloff);
+        properties.add(waveSpeed);
+        properties.add(waveSpeedFalloff);
+        properties.add(torchSpexExp);
+        properties.add(torchWaterSpecExp);
+        properties.add(waterSpecExp);
+        properties.add(waterNormalBias);
     }
 }

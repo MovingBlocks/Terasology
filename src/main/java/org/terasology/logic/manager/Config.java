@@ -346,6 +346,22 @@ public final class Config {
         _setting.getSystemBuilder().setAnimatedGrass(animatedGrass);
     }
 
+    public boolean isAnimatedWater() {
+        return _setting.getSystemBuilder().getAnimatedWater();
+    }
+
+    public void setAnimatedWater(boolean animatedWater) {
+        _setting.getSystemBuilder().setAnimatedWater(animatedWater);
+    }
+
+    public int getOceanOctaves() {
+        return _setting.getSystemBuilder().getOceanOctaves();
+    }
+
+    public void setOceanOctaves(int octaves) {
+        _setting.getSystemBuilder().setOceanOctaves(octaves);
+    }
+
     public int getVerticalChunkMeshSegments() {
         return _setting.getSystemBuilder().getVerticalChunkMeshSegments();
     }

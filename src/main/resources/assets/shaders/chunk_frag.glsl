@@ -29,9 +29,9 @@
 #define TORCH_WATER_DIFF 0.7
 #define TORCH_BLOCK_SPEC 0.7
 #define TORCH_BLOCK_DIFF 1.0
-#define WATER_SPEC 2.0
+#define WATER_SPEC 1.0
 #define WATER_DIFF 1.0
-#define BLOCK_DIFF 0.6
+#define BLOCK_DIFF 0.75
 #define BLOCK_AMB 1.0
 
 #define WATER_REFRACTION 0.1
@@ -59,6 +59,12 @@ varying float isUpside;
 
 varying float distance;
 
+uniform float torchSpecExp;
+uniform float torchWaterSpecExp;
+uniform float waterSpecExp;
+
+uniform float waterNormalBias;
+
 uniform vec3 skyInscatteringColor;
 uniform float skyInscatteringExponent;
 
@@ -73,7 +79,7 @@ void main(){
     vec2 texCoord = gl_TexCoord[0].xy;
 
     vec3 normalizedVPos = -normalize(vertexWorldPos.xyz);
-    vec3 normalWater;
+    vec3 normalWater = waterNormal;
     bool isWater = false;
 
     vec3 finalLightDir = lightDir;
@@ -87,11 +93,11 @@ void main(){
 
     /* WATER */
     if ( checkFlag(BLOCK_HINT_WATER, blockHint) ) {
-        vec2 waterOffset = vec2(vertexWorldPosRaw.x + timeToTick(time, 0.05), vertexWorldPosRaw.z + timeToTick(time, 0.1)) / 8.0;
-        vec2 waterOffset2 = vec2(vertexWorldPosRaw.x - timeToTick(time, 0.1), vertexWorldPosRaw.z + timeToTick(time, 0.05)) / 8.0;
-        normalWater.xyz = texture2D(textureWaterNormal, waterOffset).xyz * 2.0 - 1.0;
-        normalWater.xyz += texture2D(textureWaterNormal, waterOffset2).xyz * 2.0 - 1.0;
-        normalWater.xyz /= 2.0;
+        vec2 waterOffset = vec2(vertexWorldPosRaw.x + timeToTick(time, 0.05), vertexWorldPosRaw.z + timeToTick(time, 0.05)) / 16.0;
+        vec2 waterOffset2 = vec2(vertexWorldPosRaw.x - timeToTick(time, 0.05), vertexWorldPosRaw.z + timeToTick(time, 0.05)) / 16.0;
+        normalWater.xyz += (texture2D(textureWaterNormal, waterOffset).xyz * 2.0 - 1.0) * waterNormalBias;
+        normalWater.xyz += (texture2D(textureWaterNormal, waterOffset2).xyz * 2.0 - 1.0) * waterNormalBias;
+        normalWater.xyz /= 3.0;
 
        // Enable reflection only when not swimming and for blocks on sea level
         if (!swimming && isUpside > 0.99) {
@@ -169,10 +175,10 @@ void main(){
     if (carryingTorch) {
         if (isWater)
             torchlight = calcTorchlight(calcLambLight(normalWater, normalizedVPos) * TORCH_WATER_DIFF
-            + TORCH_WATER_SPEC * calcSpecLightWithOffset(normal, normalizedVPos, normalizedVPos, 16.0, normalWater), vertexWorldPos.xyz);
+            + TORCH_WATER_SPEC * calcSpecLightWithOffset(normal, normalizedVPos, normalizedVPos, torchWaterSpecExp, normalWater), vertexWorldPos.xyz);
         else
             torchlight = calcTorchlight(calcLambLight(normal, normalizedVPos) * TORCH_BLOCK_DIFF
-            + TORCH_BLOCK_SPEC * calcSpecLight(normal, normalizedVPos, normalizedVPos, 32.0), vertexWorldPos.xyz);
+            + TORCH_BLOCK_SPEC * calcSpecLight(normal, normalizedVPos, normalizedVPos, torchSpecExp), vertexWorldPos.xyz);
     }
 
     vec3 daylightColorValue;
@@ -181,7 +187,7 @@ void main(){
     if (isWater) {
         /* WATER NEEDS DIFFUSE AND SPECULAR LIGHT */
         daylightColorValue = vec3(diffuseLighting) * WATER_DIFF;
-        daylightColorValue += calcSpecLightWithOffset(normal, finalLightDir, normalizedVPos, 64.0, normalWater) * WATER_SPEC;
+        daylightColorValue += calcSpecLightWithOffset(normal, finalLightDir, normalizedVPos, waterSpecExp, normalWater) * WATER_SPEC;
     } else {
         /* DEFAULT LIGHTING ONLY CONSIST OF DIFFUSE AND AMBIENT LIGHT */
         daylightColorValue = vec3(BLOCK_AMB + diffuseLighting * BLOCK_DIFF);
@@ -214,4 +220,8 @@ void main(){
 
     gl_FragData[0].rgba = color;
     gl_FragData[1].rgba = vec4(normal.x / 2.0 + 0.5, normal.y / 2.0 + 0.5, normal.z / 2.0 + 0.5, 0.0f);
+
+    if (isWater) {
+        gl_FragData[1].rgba = vec4(waterNormal.x / 2.0 + 0.5, waterNormal.y / 2.0 + 0.5, waterNormal.z / 2.0 + 0.5, 0.0f);
+    }
 }
