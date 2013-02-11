@@ -29,7 +29,7 @@ import org.terasology.game.bootstrap.EntitySystemBuilder;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.testUtil.WorldProviderCoreStub;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.entity.BlockComponent;
 import org.terasology.world.block.BlockEntityMode;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.family.SymmetricFamily;

@@ -34,7 +34,7 @@ import org.terasology.math.Vector3i;
 import org.terasology.network.NetworkComponent;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.entity.BlockComponent;
 import org.terasology.world.block.BlockEntityMode;
 import org.terasology.world.block.BlockRegionComponent;
 

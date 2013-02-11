@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.block;
+package org.terasology.world.block.entity;
 
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
@@ -37,6 +37,8 @@ import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.physics.ImpulseEvent;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldProvider;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockEntityMode;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.management.BlockManager;
 

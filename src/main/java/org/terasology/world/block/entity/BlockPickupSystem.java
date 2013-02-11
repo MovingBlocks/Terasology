@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.world.block;
+package org.terasology.world.block.entity;
 
 import org.terasology.asset.Assets;
 import org.terasology.audio.events.PlaySoundForOwnerEvent;

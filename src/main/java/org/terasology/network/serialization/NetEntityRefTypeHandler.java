@@ -9,7 +9,7 @@ import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.protobuf.EntityData;
 import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.entity.BlockComponent;
 
 import java.util.List;
 

@@ -35,7 +35,7 @@ import org.terasology.protobuf.NetData;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.entity.BlockComponent;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkRegionListener;
 import org.terasology.world.chunks.ChunkUnloadedEvent;

@@ -38,25 +38,15 @@ import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockComponent;
-import org.terasology.world.block.BlockItemComponent;
+import org.terasology.world.block.entity.BlockComponent;
+import org.terasology.world.block.entity.BlockItemComponent;
 import org.terasology.world.block.family.BlockFamily;
 
 /**
- * TODO: Refactor use methods into events? Usage should become a separate component
- *
  * @author Immortius <immortius@gmail.com>
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class ItemSystem implements ComponentSystem {
-    @In
-    private WorldProvider worldProvider;
-
-    @In
-    private BlockEntityRegistry blockEntityRegistry;
-
-    @In
-    private AudioManager audioManager;
 
     @Override
     public void initialise() {
@@ -64,43 +54,6 @@ public class ItemSystem implements ComponentSystem {
 
     @Override
     public void shutdown() {
-    }
-
-    @ReceiveEvent(components = BlockItemComponent.class)
-    public void onDestroyed(RemovedComponentEvent event, EntityRef entity) {
-        entity.getComponent(BlockItemComponent.class).placedEntity.destroy();
-    }
-
-    @ReceiveEvent(components = {BlockItemComponent.class, ItemComponent.class})
-    public void onPlaceBlock(ActivateEvent event, EntityRef item) {
-        BlockItemComponent blockItem = item.getComponent(BlockItemComponent.class);
-
-        Side surfaceDir = Side.inDirection(event.getHitNormal());
-        Side secondaryDirection = TeraMath.getSecondaryPlacementDirection(event.getDirection(), event.getHitNormal());
-
-        if (!placeBlock(blockItem.blockFamily, event.getTarget().getComponent(BlockComponent.class).getPosition(), surfaceDir, secondaryDirection, blockItem)) {
-            event.cancel();
-        }
-    }
-
-    @ReceiveEvent(components = ItemComponent.class, priority = EventPriority.PRIORITY_CRITICAL)
-    public void checkCanUseItem(ActivateEvent event, EntityRef item) {
-        ItemComponent itemComp = item.getComponent(ItemComponent.class);
-        switch (itemComp.usage) {
-            case NONE:
-                event.cancel();
-                break;
-            case ON_BLOCK:
-                if (event.getTarget().getComponent(BlockComponent.class) == null) {
-                    event.cancel();
-                }
-                break;
-            case ON_ENTITY:
-                if (event.getTarget().getComponent(BlockComponent.class) != null) {
-                    event.cancel();
-                }
-                break;
-        }
     }
 
     @ReceiveEvent(components = ItemComponent.class, priority = EventPriority.PRIORITY_TRIVIAL)
@@ -114,53 +67,5 @@ public class ItemSystem implements ComponentSystem {
                 item.saveComponent(itemComp);
             }
         }
-    }
-
-    /**
-     * Places a block of a given type in front of the player.
-     *
-     * @param type The type of the block
-     * @return True if a block was placed
-     */
-    private boolean placeBlock(BlockFamily type, Vector3i targetBlock, Side surfaceSide, Side secondaryDirection, BlockItemComponent blockItem) {
-        if (type == null)
-            return true;
-
-        Vector3i placementPos = new Vector3i(targetBlock);
-        placementPos.add(surfaceSide.getVector3i());
-
-        Block block = type.getBlockFor(surfaceSide, secondaryDirection);
-        if (block == null)
-            return false;
-
-        if (canPlaceBlock(block, targetBlock, placementPos)) {
-            if (blockEntityRegistry.setBlock(placementPos, block, worldProvider.getBlock(placementPos), blockItem.placedEntity)) {
-                audioManager.playSound(Assets.getSound("engine:PlaceBlock"), 0.5f);
-                if (blockItem.placedEntity.exists()) {
-                    blockItem.placedEntity = EntityRef.NULL;
-                }
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean canPlaceBlock(Block block, Vector3i targetBlock, Vector3i blockPos) {
-        Block centerBlock = worldProvider.getBlock(targetBlock.x, targetBlock.y, targetBlock.z);
-
-        if (!centerBlock.isAttachmentAllowed()) {
-            return false;
-        }
-
-        Block adjBlock = worldProvider.getBlock(blockPos.x, blockPos.y, blockPos.z);
-        if (!adjBlock.isReplacementAllowed() || adjBlock.isTargetable()) {
-            return false;
-        }
-
-        // Prevent players from placing blocks inside their bounding boxes
-        if (!block.isPenetrable()) {
-            return !CoreRegistry.get(BulletPhysics.class).scanArea(block.getBounds(blockPos), Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.DEFAULT, StandardCollisionGroup.CHARACTER)).iterator().hasNext();
-        }
-        return true;
     }
 }

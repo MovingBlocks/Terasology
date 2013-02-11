@@ -27,7 +27,7 @@ import javax.vecmath.Vector3f;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.entity.BlockComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventReceiver;
 import org.terasology.entitySystem.EventSystem;

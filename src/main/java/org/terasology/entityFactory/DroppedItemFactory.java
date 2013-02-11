@@ -17,10 +17,6 @@
 package org.terasology.entityFactory;
 
 import com.google.common.collect.Maps;
-import org.terasology.asset.AssetManager;
-import org.terasology.asset.AssetType;
-import org.terasology.asset.AssetUri;
-import org.terasology.componentSystem.controllers.ItemPickupSystem;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.utility.DroppedItemTypeComponent;
 import org.terasology.components.utility.LifespanComponent;
@@ -28,18 +24,11 @@ import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.*;
 import org.terasology.game.CoreRegistry;
 import org.terasology.model.inventory.Icon;
-import org.terasology.physics.RigidBodyComponent;
-import org.terasology.physics.shapes.BoxShapeComponent;
-import org.terasology.physics.shapes.HullShapeComponent;
-import org.terasology.rendering.assets.Material;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.MeshFactory;
-import org.terasology.world.block.BlockPickupComponent;
-import org.terasology.world.block.family.BlockFamily;
 
 import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
 import java.util.Map;
 
 /**

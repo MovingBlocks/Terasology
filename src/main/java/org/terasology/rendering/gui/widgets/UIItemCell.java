@@ -34,7 +34,7 @@ import org.terasology.components.ItemComponent;
 import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockItemComponent;
+import org.terasology.world.block.entity.BlockItemComponent;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.entityFactory.DroppedBlockFactory;
 import org.terasology.entitySystem.EntityManager;

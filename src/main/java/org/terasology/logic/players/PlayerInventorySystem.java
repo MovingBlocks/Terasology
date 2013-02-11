@@ -17,7 +17,6 @@
 package org.terasology.logic.players;
 
 import org.terasology.components.InventoryComponent;
-import org.terasology.components.ItemComponent;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;
@@ -31,8 +30,7 @@ import org.terasology.input.binds.ToolbarPrevButton;
 import org.terasology.input.binds.ToolbarSlotButton;
 import org.terasology.input.binds.UseItemButton;
 import org.terasology.logic.characters.events.AttackRequest;
-import org.terasology.logic.characters.events.UseItemInDirectionRequest;
-import org.terasology.logic.characters.events.UseItemOnTargetRequest;
+import org.terasology.logic.characters.events.UseItemRequest;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
@@ -99,17 +97,12 @@ public class PlayerInventorySystem implements ComponentSystem {
         if (localPlayerComp.isDead) {
             return;
         }
+
         InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
         EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayerComp.selectedTool);
 
-        ItemComponent item = selectedItemEntity.getComponent(ItemComponent.class);
-        if (item != null && item.usage != ItemComponent.UsageType.NONE) {
-            if (event.getTarget().exists()) {
-                entity.send(new UseItemOnTargetRequest(selectedItemEntity, event.getTarget(), event.getHitPosition()));
-            } else {
-                entity.send(new UseItemInDirectionRequest(selectedItemEntity, worldRenderer.getActiveCamera().getViewingDirection()));
-            }
-        }
+        entity.send(new UseItemRequest(selectedItemEntity));
+
         lastInteraction = timer.getTimeInMs();
         localPlayerComp.handAnimation = 0.5f;
         entity.saveComponent(localPlayerComp);

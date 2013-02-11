@@ -49,8 +49,8 @@ import org.terasology.rendering.gui.widgets.UIItemContainer;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockComponent;
-import org.terasology.world.block.BlockItemComponent;
+import org.terasology.world.block.entity.BlockComponent;
+import org.terasology.world.block.entity.BlockItemComponent;
 import org.terasology.world.block.management.BlockManager;
 
 import javax.vecmath.Vector2f;

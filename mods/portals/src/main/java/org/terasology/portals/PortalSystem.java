@@ -24,7 +24,7 @@ import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.entity.BlockComponent;
 
 /**
  * System that handles interactions with portals

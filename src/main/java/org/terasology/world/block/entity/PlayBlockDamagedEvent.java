@@ -1,4 +1,4 @@
-package org.terasology.world.block;
+package org.terasology.world.block.entity;
 
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.math.Vector3i;

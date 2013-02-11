@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.block;
+package org.terasology.world.block.entity;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
@@ -22,7 +22,7 @@ import org.terasology.network.ReplicateType;
 import org.terasology.world.block.family.BlockFamily;
 
 /**
- * Combined with ItemComponent, represents an
+ * Combined with ItemComponent, represents a held block
  *
  * @author Immortius <immortius@gmail.com>
  */

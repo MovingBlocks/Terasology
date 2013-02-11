@@ -32,7 +32,7 @@ import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.primitives.TessellatorHelper;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.entity.BlockComponent;
 import org.terasology.world.block.BlockRegionComponent;
 
 import javax.vecmath.Vector2f;

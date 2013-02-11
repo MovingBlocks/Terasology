@@ -26,7 +26,7 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.PrefabManager;
 import org.terasology.game.CoreRegistry;
-import org.terasology.world.block.BlockPickupComponent;
+import org.terasology.world.block.entity.BlockPickupComponent;
 import org.terasology.physics.RigidBodyComponent;
 import org.terasology.world.block.family.BlockFamily;
 

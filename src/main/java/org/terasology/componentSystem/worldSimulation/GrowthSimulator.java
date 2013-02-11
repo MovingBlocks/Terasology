@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.RegisterSystem;
-import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.entity.BlockComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.ReceiveEvent;

@@ -15,7 +15,7 @@
  */
 
 // TODO: Move to another package
-package org.terasology.world.block;
+package org.terasology.world.block.entity;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;

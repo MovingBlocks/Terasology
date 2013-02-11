@@ -46,7 +46,7 @@ import org.terasology.entitySystem.In;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.rendering.gui.widgets.UIItemContainer;
-import org.terasology.world.block.BlockItemComponent;
+import org.terasology.world.block.entity.BlockItemComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.manager.ShaderManager;

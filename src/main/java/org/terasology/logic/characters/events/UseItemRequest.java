@@ -21,13 +21,12 @@ import org.terasology.network.NetworkEvent;
 import org.terasology.network.Replicate;
 import org.terasology.network.ServerEvent;
 
-import javax.vecmath.Vector3f;
-
 /**
  * A request for a player to use an item
+ *
  * @author Immortius
  */
-@ServerEvent
+@ServerEvent(lagCompensate = true)
 public class UseItemRequest extends NetworkEvent {
 
     @Replicate

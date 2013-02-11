@@ -28,7 +28,7 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.hunger.events.*;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.entity.BlockComponent;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.events.ActivateEvent;
 

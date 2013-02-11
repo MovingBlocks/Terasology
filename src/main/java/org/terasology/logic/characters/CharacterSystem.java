@@ -16,31 +16,26 @@
 
 package org.terasology.logic.characters;
 
-import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.components.ItemComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.events.DamageEvent;
 import org.terasology.logic.characters.events.AttackRequest;
-import org.terasology.logic.characters.events.UseItemInDirectionRequest;
-import org.terasology.logic.characters.events.UseItemOnTargetRequest;
+import org.terasology.logic.characters.events.UseItemRequest;
 import org.terasology.network.NetworkComponent;
-import org.terasology.network.NetworkSystem;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.entity.BlockComponent;
 
-import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
 /**
@@ -51,9 +46,6 @@ public class CharacterSystem implements ComponentSystem {
 
     @In
     private BulletPhysics physics;
-
-    @In
-    private NetworkSystem network;
 
     @In
     private WorldProvider worldProvider;
@@ -68,52 +60,27 @@ public class CharacterSystem implements ComponentSystem {
     public void shutdown() {
     }
 
-    // TODO: May need to make this more lenient to account for lag - should work better with client side prediction algorithms in place
     @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class})
-    public void onUseItemOnTargetRequest(UseItemOnTargetRequest event, EntityRef character) {
-        if (event.getItem().exists()) {
-            if (!character.equals(event.getItem().getComponent(ItemComponent.class).container)) {
-                return;
-            }
-        }
-
-        if (event.getTarget().exists()) {
-            LocationComponent location = character.getComponent(LocationComponent.class);
-            CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
-            Vector3f targetPos = event.getTargetPosition();
-            Vector3f originPos = location.getWorldPosition();
-            originPos.y += characterComponent.eyeOffset;
-
-            Vector3f direction = new Vector3f(targetPos);
-            direction.sub(originPos);
-            // Too far away
-            if (direction.lengthSquared() > characterComponent.interactionRange * characterComponent.interactionRange) {
-                return;
-            }
-
-            direction.normalize();
-
-            HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, filter);
-            if (result.getEntity().equals(event.getTarget())) {
-                event.getItem().send(new ActivateEvent(event.getTarget(), character, originPos, direction, event.getTargetPosition(), result.getHitNormal()));
-            }
-        }
-    }
-
-    @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class})
-    public void onUseItemInDirectionRequest(UseItemInDirectionRequest event, EntityRef character) {
-        if (event.getItem().exists()) {
-            if (!character.equals(event.getItem().getComponent(ItemComponent.class).container)) {
-                return;
-            }
+    public void onUseItem(UseItemRequest event, EntityRef character) {
+        if (!event.getItem().exists() || !character.equals(event.getItem().getComponent(ItemComponent.class).container)) {
+            return;
         }
 
         LocationComponent location = character.getComponent(LocationComponent.class);
         CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
+        Vector3f direction = characterComponent.getLookDirection();
         Vector3f originPos = location.getWorldPosition();
         originPos.y += characterComponent.eyeOffset;
 
-        event.getItem().send(new ActivateEvent(character, originPos, event.getDirection()));
+        HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, filter);
+
+        if (result.isHit()) {
+            event.getItem().send(new ActivateEvent(result.getEntity(), character, originPos, direction, result.getHitPoint(), result.getHitNormal()));
+        } else {
+            originPos.y += characterComponent.eyeOffset;
+            event.getItem().send(new ActivateEvent(character, originPos, direction));
+        }
+
     }
 
     @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class})

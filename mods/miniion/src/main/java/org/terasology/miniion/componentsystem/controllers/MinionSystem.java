@@ -23,7 +23,7 @@ import org.terasology.components.world.WorldComponent;
 import org.terasology.miniion.components.UIMessageQueue;
 import org.terasology.miniion.components.UIMinionbar;
 import org.terasology.rendering.gui.events.UIWindowOpenedEvent;
-import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.entity.BlockComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.ComponentSystem;

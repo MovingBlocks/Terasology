@@ -38,6 +38,7 @@ import org.terasology.math.AABB;
 import org.terasology.rendering.gui.widgets.UIItemContainer;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.*;
+import org.terasology.world.block.entity.BlockComponent;
 import org.terasology.world.block.management.BlockManager;
 
 import java.util.ArrayList;

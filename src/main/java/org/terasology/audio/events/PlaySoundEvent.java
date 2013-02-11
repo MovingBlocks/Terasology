@@ -22,7 +22,6 @@ public class PlaySoundEvent extends AbstractPlaySoundEvent {
      * @param exceptOwner The sound is not sent to the owner of this entity.
      * @param sound
      * @param volume
-     * @param position
      */
     public PlaySoundEvent(EntityRef exceptOwner, Sound sound, float volume) {
         super(exceptOwner, sound, volume);

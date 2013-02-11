@@ -19,8 +19,7 @@ import javax.vecmath.Vector3f;
 
 import org.terasology.components.ItemComponent;
 import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.world.block.BlockItemComponent;
-import org.terasology.components.world.LocationComponent;
+import org.terasology.world.block.entity.BlockItemComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.events.inventory.ReceiveItemEvent;

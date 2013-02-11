@@ -23,8 +23,6 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.game.bootstrap.EntitySystemBuilder;
 import org.terasology.logic.mod.ModManager;
-import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.block.BlockEntitySystem;
 
 import static org.mockito.Mockito.mock;
 

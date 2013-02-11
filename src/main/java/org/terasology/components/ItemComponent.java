@@ -62,6 +62,7 @@ public final class ItemComponent implements Component {
     /**
      * The entity that contains this one (if appropriate, defaults to this item not being contained by anything)
      */
+    @Replicate(ReplicateType.SERVER_TO_OWNER)
     public EntityRef container = EntityRef.NULL;
 
     /**

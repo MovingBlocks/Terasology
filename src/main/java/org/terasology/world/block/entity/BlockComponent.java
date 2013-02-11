@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.block;
+package org.terasology.world.block.entity;
 
 import javax.vecmath.Tuple3i;
 

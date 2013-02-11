@@ -28,7 +28,7 @@ import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.entity.BlockComponent;
 
 import javax.vecmath.Vector3f;
 import java.util.Collection;
