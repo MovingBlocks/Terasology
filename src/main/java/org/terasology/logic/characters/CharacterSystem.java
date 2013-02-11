@@ -26,6 +26,7 @@ import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.events.DamageEvent;
 import org.terasology.logic.characters.events.AttackRequest;
+import org.terasology.logic.characters.events.FrobRequest;
 import org.terasology.logic.characters.events.UseItemRequest;
 import org.terasology.network.NetworkComponent;
 import org.terasology.physics.BulletPhysics;
@@ -116,6 +117,20 @@ public class CharacterSystem implements ComponentSystem {
             }
 
             result.getEntity().send(new DamageEvent(damage, character));
+        }
+    }
+
+    @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class})
+    public void onFrob(FrobRequest event, EntityRef character) {
+        LocationComponent location = character.getComponent(LocationComponent.class);
+        CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
+        Vector3f direction = characterComponent.getLookDirection();
+        Vector3f originPos = location.getWorldPosition();
+        originPos.y += characterComponent.eyeOffset;
+
+        HitResult result = physics.rayTrace(originPos, direction, characterComponent.interactionRange, filter);
+        if (result.isHit()) {
+            result.getEntity().send(new ActivateEvent(character, character, originPos, direction, result.getHitPoint(), result.getHitNormal()));
         }
     }
 }

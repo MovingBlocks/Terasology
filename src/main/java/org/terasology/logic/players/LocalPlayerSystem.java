@@ -42,12 +42,15 @@ import org.terasology.input.binds.FrobButton;
 import org.terasology.input.binds.JumpButton;
 import org.terasology.input.binds.RunButton;
 import org.terasology.input.binds.StrafeMovementAxis;
+import org.terasology.input.binds.UseItemButton;
 import org.terasology.input.binds.VerticalMovementAxis;
 import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.characters.MovementMode;
+import org.terasology.logic.characters.events.FrobRequest;
+import org.terasology.logic.characters.events.UseItemRequest;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.math.AABB;
@@ -335,9 +338,11 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
         }
 
         LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
-        if (localPlayerComp.isDead) return;
+        if (localPlayerComp.isDead) {
+            return;
+        }
 
-        event.getTarget().send(new ActivateEvent(entity, entity, playerCamera.getPosition(), playerCamera.getViewingDirection(), event.getHitPosition(), event.getHitNormal()));
+        entity.send(new FrobRequest());
         event.consume();
     }
 
