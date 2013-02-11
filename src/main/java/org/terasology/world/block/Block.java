@@ -20,6 +20,7 @@ import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.Maps;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.util.ResourceLoader;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
@@ -34,6 +35,8 @@ import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
 import org.terasology.rendering.shader.ShaderProgram;
 import org.terasology.utilities.collection.EnumBooleanMap;
+import java.util.*;
+import java.util.List;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.shapes.BlockMeshPart;
 import org.terasology.world.chunks.Chunk;
@@ -136,10 +139,14 @@ public class Block {
     /* PROPERTIES */
 
     // Overall behavioural
-    private boolean liquid = false;
+    private boolean liquid     = false;
+    private boolean climbable  = false;
     private boolean attachmentAllowed = true;
     private boolean replacementAllowed = false;
     private boolean craftPlace = true;
+    private boolean connectToAllBlocks = false;
+    private List<String> acceptedToConnectBlocks = Lists.newArrayList();
+    private boolean checkHeightDiff = false;
     private byte hardness = 0x3;
     private boolean supportRequired = false;
     private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<Side>(Side.class);
@@ -255,6 +262,46 @@ public class Block {
 
     public void setLiquid(boolean liquid) {
         this.liquid = liquid;
+    }
+
+    public boolean isClimbable() {
+        return climbable;
+    }
+
+    public void setClimbable(boolean climbable) {
+        this.climbable = climbable;
+    }
+
+    public boolean isCanConnectToAllBlocks(){
+        return connectToAllBlocks;
+    }
+
+    public void setConnectToAllBlocks(boolean connectToAllBlocks){
+        this.connectToAllBlocks = connectToAllBlocks;
+    }
+
+   /*
+    * If option is true, then the blocks with the currentBlockPosition.y+1 will be checked.
+    * And if current block can be adjacented then new block will created with the "slope" shape.
+    */
+    public boolean isCheckHeightDiff(){
+        return checkHeightDiff;
+    }
+
+    public void setCheckHeightDiff(boolean checkHeightDiff){
+        this.checkHeightDiff = checkHeightDiff;
+    }
+
+    public void setAcceptedToConnectBlocks(List<String> blocksUri){
+        for ( String uri : blocksUri ){
+            if ( uri.length() > 0 ){
+                acceptedToConnectBlocks.add(uri.toLowerCase(Locale.ENGLISH));
+            }
+        }
+    }
+
+    public List<String> getAcceptedToConnectBlocks(){
+        return acceptedToConnectBlocks;
     }
 
     /**

@@ -16,7 +16,15 @@
 
 {
 	"shadowCasting" : "false",
-	"rotation" : "Horizontal",
+    "rotation" : "horizontal",
 	"shape" : "fences:fenceGateClosed",
-	"tile" : "fences:Fence"
+	"tile" : "fences:Fence",
+    "craftPlace" : false,
+    "entity" : {
+        "prefab" : "fences:fenceGateClosed",
+        "mode"   : "persistent"
+    },
+    "inventory" : {
+        "stackable" : false
+    }
 }
