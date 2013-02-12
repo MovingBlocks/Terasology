@@ -40,6 +40,7 @@ public final class CharacterMovementComponent implements Component {
     // Speed settings
     public float maxGroundSpeed = 5.0f;
     public float maxWaterSpeed = 2.0f;
+    public float maxClimbSpeed = 3.0f;
     public float maxGhostSpeed = 5.0f;
     public float runFactor = 1.5f;
     public float jumpSpeed = 10.0f;
@@ -58,6 +59,7 @@ public final class CharacterMovementComponent implements Component {
     // TODO: Use enum?
     public boolean isGhosting = false;
     public boolean isSwimming = false;
+    public boolean isClimbing = false;
     public boolean isGrounded = false;
     public boolean isRunning = false;
 

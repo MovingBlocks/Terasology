@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright 2013 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 {
-	"shadowCasting" : "false",
-	"rotation" : "Horizontal",
-	"shape" : "fences:fenceSlats",
-	"tile" : "fences:Fence"
+    "attachmentAllowed" : false,
+    "rotation"   : "horizontal",
+    "craftPlace" : false,
+    "climbable"  : true,
+    "penetrable" : true,
+    "shape" : "engine:verticalOffsetPlane"
 }
