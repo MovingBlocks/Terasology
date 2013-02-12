@@ -30,6 +30,7 @@ import org.terasology.world.WorldProvider;
 
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector4d;
+import javax.vecmath.Vector4f;
 import java.util.List;
 
 /**
@@ -52,7 +53,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
     Property waveSpeed = new Property("waveSpeed", 0.44f, 0.0f, 2.0f);
     Property waveSpeedFalloff = new Property("waveSpeedFalloff", 0.26f, 0.0f, 2.0f);
 
-    Property waterRefraction = new Property("waterRefraction", 0.01f, 0.0f, 1.0f);
+    Property waterRefraction = new Property("waterRefraction", 0.1f, 0.0f, 1.0f);
     Property waterFresnelBias = new Property("waterFresnelBias", 0.01f, 0.01f, 0.1f);
     Property waterFresnelPow = new Property("waterFresnelPow", 2.8f, 0.0f, 10.0f);
     Property waterNormalBias = new Property("waterNormalBias", 2.0f, 1.0f, 4.0f);
@@ -93,11 +94,11 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         program.setInt("textureWaterRefraction", 5);
         program.setInt("textureAtlas", 0);
 
-        program.setFloat("torchWaterSpecExp", (Float) torchWaterSpecExp.getValue());
-        program.setFloat("waterSpecExp", (Float) waterSpecExp.getValue());
-        program.setFloat("torchSpecExp", (Float) torchSpecExp.getValue());
-
-        program.setFloat("waterNormalBias", (Float) waterNormalBias.getValue());
+        Vector4f lightingSettingsFrag = new Vector4f();
+        lightingSettingsFrag.x = (Float) torchSpecExp.getValue();
+        lightingSettingsFrag.y = (Float) torchWaterSpecExp.getValue();
+        lightingSettingsFrag.z = (Float) waterSpecExp.getValue();
+        program.setFloat4("lightingSettingsFrag", lightingSettingsFrag);
 
         WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
         WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
@@ -108,19 +109,21 @@ public class ShaderParametersChunk extends ShaderParametersBase {
             sunNormalise.normalize();
 
             Vector3d zenithColor = ShaderParametersSky.getAllWeatherZenith((float) sunNormalise.y, (Float) worldRenderer.getSkysphere().getTurbidity().getValue());
-
-            program.setFloat("skyInscatteringExponent", (Float) worldRenderer.getSkysphere().getColorExp().getValue());
             program.setFloat3("skyInscatteringColor", (float) zenithColor.x, (float) zenithColor.y, (float) zenithColor.z);
-            program.setFloat("skyInscatteringLength", (Float) skyInscatteringLength.getValue());
-            program.setFloat("skyInscatteringStrength", (Float) skyInscatteringStrength.getValue());
+
+            Vector4f skyInscatteringSettingsFrag = new Vector4f();
+            skyInscatteringSettingsFrag.x = (Float) worldRenderer.getSkysphere().getColorExp().getValue();
+            skyInscatteringSettingsFrag.y = (Float) skyInscatteringStrength.getValue();
+            skyInscatteringSettingsFrag.z = (Float) skyInscatteringLength.getValue();
+            program.setFloat4("skyInscatteringSettingsFrag", skyInscatteringSettingsFrag);
         }
 
-        program.setFloat("waterRefraction", (Float) waterRefraction.getValue());
-
-        if (Config.getInstance().isRefractiveWater()) {
-            program.setFloat("waterFresnelBias", (Float) waterFresnelBias.getValue());
-            program.setFloat("waterFresnelPow", (Float) waterFresnelPow.getValue());
-        }
+        Vector4f waterSettingsFrag = new Vector4f();
+        waterSettingsFrag.x = (Float) waterNormalBias.getValue();
+        waterSettingsFrag.y = (Float) waterRefraction.getValue();
+        waterSettingsFrag.z = (Float) waterFresnelBias.getValue();
+        waterSettingsFrag.w = (Float) waterFresnelPow.getValue();
+        program.setFloat4("waterSettingsFrag", waterSettingsFrag);
 
         if (Config.getInstance().isAnimatedWater()) {
             program.setFloat("waveIntensFalloff", (Float) waveIntensFalloff.getValue());

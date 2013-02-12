@@ -62,7 +62,7 @@ public class ShaderParametersBase  implements IPropertyProvider, IShaderParamete
         }
 
         if (localPlayer != null) {
-            program.setInt("carryingTorch", localPlayer.isCarryingTorch() ? 1 : 0);
+            program.setFloat("carryingTorch", localPlayer.isCarryingTorch() ? 1.0f : 0.0f);
         }
 
         if (worldProvider != null) {

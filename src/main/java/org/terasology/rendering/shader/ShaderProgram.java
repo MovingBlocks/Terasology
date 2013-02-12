@@ -34,6 +34,7 @@ import org.terasology.rendering.assets.Shader;
 import javax.swing.*;
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Matrix4f;
+import javax.vecmath.Vector4f;
 
 /**
  * Wraps a OpenGL shader program. Provides convenience methods for setting
@@ -223,6 +224,10 @@ public class ShaderProgram {
         enable();
         int id = GL20.glGetUniformLocation(shaderProgram, desc);
         GL20.glUniform1(id, buffer);
+    }
+
+    public void setFloat4(String desc, Vector4f vec) {
+        setFloat4(desc, vec.x, vec.y, vec.z, vec.w);
     }
 
     public void setMatrix4(String desc, Matrix4f m) {
