@@ -724,6 +724,9 @@ public final class WorldRenderer {
 
         camera.lookThrough();
 
+        for (RenderSystem renderer : _systemManager.iterateRenderSubscribers())
+            renderer.renderOpaque();
+
         for (Chunk c : _renderQueueChunksOpaque)
             renderChunk(c, ChunkMesh.RENDER_PHASE.OPAQUE, camera, false, true);
 

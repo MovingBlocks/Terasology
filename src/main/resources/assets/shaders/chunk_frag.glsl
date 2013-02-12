@@ -105,23 +105,25 @@ void main(){
 
     /* WATER */
     if ( checkFlag(BLOCK_HINT_WATER, blockHint) ) {
-        vec2 waterOffset = vec2(vertexWorldPos.x + timeToTick(time, 0.05), vertexWorldPos.z + timeToTick(time, 0.05)) / 16.0;
-        vec2 waterOffset2 = vec2(vertexWorldPos.x - timeToTick(time, 0.05), vertexWorldPos.z + timeToTick(time, 0.05)) / 16.0;
-        normalWater.xy += (texture2D(textureWaterNormal, waterOffset).xyz * 2.0 - 1.0).xy * waterNormalBias;
-        normalWater.xy += (texture2D(textureWaterNormal, waterOffset2).xyz * 2.0 - 1.0).xy * waterNormalBias;
+        vec2 waterOffset = vec2(vertexWorldPos.x + timeToTick(time, 0.1), vertexWorldPos.z + timeToTick(time, 0.1)) / 8.0;
+        vec2 waterOffset2 = vec2(vertexWorldPos.x + timeToTick(time, 0.1), vertexWorldPos.z - timeToTick(time, 0.1)) / 16.0;
+
+        vec2 normalOffset = (texture2D(textureWaterNormal, waterOffset).xyz * 2.0 - 1.0).xy * waterNormalBias;
+        normalOffset += (texture2D(textureWaterNormal, waterOffset2).xyz * 2.0 - 1.0).xy * waterNormalBias;
+
+        normalWater.xy += normalOffset;
         normalWater = normalize(normalWater);
 
        // Enable reflection only when not swimming and for blocks on sea level
         if (!swimming && isUpside > 0.99) {
             if ( vertexWorldPos.y < 32.5 && vertexWorldPos.y > 31.5) {
-                vec2 projectedPos = 0.5 * (vertexProjPos.st/vertexProjPos.q) + vec2(0.5);
+                vec2 projectedPos = 0.5 * (vertexProjPos.xy/vertexProjPos.w) + vec2(0.5);
 
-                float refractionFactor = waterRefraction * clamp(1.0 - length(vertexViewPos.xyz) / 50.0, 0.25, 1.0);
-                vec4 reflectionColor = vec4(texture2D(textureWaterReflection, projectedPos + normalWater.xy * refractionFactor).xyz, 1.0);
+                vec4 reflectionColor = vec4(texture2D(textureWaterReflection, projectedPos + normalOffset.xy * waterRefraction).xyz, 1.0);
 
 #ifdef REFRACTIVE_WATER
                 /* FRESNEL */
-                vec4 refractionColor = vec4(texture2D(textureWaterRefraction, projectedPos + normalWater.xy * refractionFactor).xyz, 1.0);
+                vec4 refractionColor = vec4(texture2D(textureWaterRefraction, projectedPos + normalOffset.xy * waterRefraction).xyz, 1.0);
                 float f = fresnel(dot(waterNormalWorldSpace, normalizedVPos), waterFresnelBias, waterFresnelPow);
                 color = mix(refractionColor * vec4(WATER_COLOR), reflectionColor * vec4(WATER_COLOR), f);
 #else
