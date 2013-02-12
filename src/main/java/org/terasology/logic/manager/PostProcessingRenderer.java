@@ -47,7 +47,7 @@ public class PostProcessingRenderer implements IPropertyProvider {
 
     private Property hdrExposureDefault = new Property("hdrExposureDefault", 2.5f, 0.0f, 10.0f);
     private Property hdrMaxExposure = new Property("hdrMaxExposure", 8.0f, 0.0f, 10.0f);
-    private Property hdrMaxExposureNight = new Property("hdrMaxExposureNight", 3.0f, 0.0f, 10.0f);
+    private Property hdrMaxExposureNight = new Property("hdrMaxExposureNight", 1.0f, 0.0f, 10.0f);
     private Property hdrMinExposure = new Property("hdrMinExposure", 0.5f, 0.0f, 10.0f);
     private Property hdrTargetLuminance = new Property("hdrTargetLuminance", 0.5f, 0.0f, 4.0f);
     private Property hdrExposureAdjustmentSpeed = new Property("hdrExposureAdjustmentSpeed", 0.05f, 0.0f, 0.5f);
@@ -165,6 +165,7 @@ public class PostProcessingRenderer implements IPropertyProvider {
         createFBO("lightShafts", halfWidth,  halfHeight, FBOType.DEFAULT, false, false);
 
         createFBO("sceneReflected", halfWidth, halfHeight, FBOType.HDR, true, false);
+        createFBO("sceneRefracted", halfWidth, halfHeight, FBOType.HDR, true, false);
 
         createFBO("sceneHighPass", halfQuarterWidth, halfQuarterHeight, FBOType.DEFAULT, false, false);
         createFBO("sceneBloom0", halfQuarterWidth, halfQuarterHeight, FBOType.DEFAULT, false, false);
@@ -365,9 +366,20 @@ public class PostProcessingRenderer implements IPropertyProvider {
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
 
-    public void notifyBeforeTransparent() {
 
+    public void beginRenderRefractedScene() {
+        FBO refracted = getFBO("sceneRefracted");
+        refracted.bind();
+
+        glViewport(0, 0, refracted._width, refracted._height);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
+
+    public void endRenderRefractedScene() {
+        getFBO("sceneRefracted").unbind();
+        glViewport(0, 0, Display.getWidth(), Display.getHeight());
+    }
+
 
     /**
      * Renders the final scene to a quad and displays it. The FBO gets automatically rescaled if the size

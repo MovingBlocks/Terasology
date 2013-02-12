@@ -23,6 +23,7 @@ import org.terasology.editor.properties.Property;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 
+import javax.vecmath.Vector3f;
 import java.util.List;
 
 /**
@@ -47,6 +48,17 @@ public class ShaderParametersBase  implements IPropertyProvider, IShaderParamete
             program.setFloat("daylight", (float) worldRenderer.getDaylight());
             program.setFloat("swimming", worldRenderer.isUnderWater() ? 1.0f : 0.0f);
             program.setFloat("tick", (float) worldRenderer.getTick());
+
+            if (worldRenderer.getActiveCamera() != null) {
+                Vector3f cameraDir = worldRenderer.getActiveCamera().getViewingDirection();
+                program.setFloat3("cameraDirection", cameraDir.x, cameraDir.y, cameraDir.z);
+            }
+
+            float sunAngle = worldRenderer.getSkysphere().getSunPosAngle();
+            Vector3f sunNormalise = new Vector3f(0.0f, (float) java.lang.Math.cos(sunAngle),  (float) java.lang.Math.sin(sunAngle));
+            sunNormalise.normalize();
+
+            program.setFloat3("sunVec", sunNormalise.x, sunNormalise.y, sunNormalise.z);
         }
 
         if (localPlayer != null) {

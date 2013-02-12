@@ -30,10 +30,14 @@
 #define W 11.2
 
 uniform bool swimming;
+uniform bool carryingTorch;
 uniform float viewingDistance;
 uniform float daylight;
 uniform float tick;
 uniform float time;
+
+uniform vec3 sunVec;
+uniform vec3 cameraDirection;
 
 float linDepth(float depth) {
     return (2.0 * Z_NEAR) / (viewingDistance + Z_NEAR - depth * (viewingDistance - Z_NEAR));
@@ -49,11 +53,6 @@ float tonemapReinhard(float brightMax, float exposure) {
 
 float calcLambLight(vec3 normal, vec3 lightVec) {
     return dot(normal,lightVec);
-}
-
-float calcSpecLightWithOffset(vec3 normal, vec3 lightVec, vec3 eyeVec, float exp, vec3 offset) {
-    vec3 halfWay = normalize(eyeVec+lightVec+vec3(offset.x, offset.y, 0.0));
-    return pow(clamp(dot(halfWay, normal), 0.0, 1.0), exp);
 }
 
 float calcSpecLight(vec3 normal, vec3 lightVec, vec3 eyeVec, float exp) {

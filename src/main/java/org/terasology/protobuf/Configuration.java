@@ -2942,6 +2942,18 @@ public final class Configuration {
       // optional bool light_shafts = 32 [default = false];
       boolean hasLightShafts();
       boolean getLightShafts();
+      
+      // optional bool animated_water = 33 [default = false];
+      boolean hasAnimatedWater();
+      boolean getAnimatedWater();
+      
+      // optional uint32 ocean_octaves = 34 [default = 8];
+      boolean hasOceanOctaves();
+      int getOceanOctaves();
+      
+      // optional bool refractive_water = 35 [default = false];
+      boolean hasRefractiveWater();
+      boolean getRefractiveWater();
     }
     public static final class System extends
         com.google.protobuf.GeneratedMessage
@@ -4045,6 +4057,36 @@ public final class Configuration {
         return lightShafts_;
       }
       
+      // optional bool animated_water = 33 [default = false];
+      public static final int ANIMATED_WATER_FIELD_NUMBER = 33;
+      private boolean animatedWater_;
+      public boolean hasAnimatedWater() {
+        return ((bitField0_ & 0x10000000) == 0x10000000);
+      }
+      public boolean getAnimatedWater() {
+        return animatedWater_;
+      }
+      
+      // optional uint32 ocean_octaves = 34 [default = 8];
+      public static final int OCEAN_OCTAVES_FIELD_NUMBER = 34;
+      private int oceanOctaves_;
+      public boolean hasOceanOctaves() {
+        return ((bitField0_ & 0x20000000) == 0x20000000);
+      }
+      public int getOceanOctaves() {
+        return oceanOctaves_;
+      }
+      
+      // optional bool refractive_water = 35 [default = false];
+      public static final int REFRACTIVE_WATER_FIELD_NUMBER = 35;
+      private boolean refractiveWater_;
+      public boolean hasRefractiveWater() {
+        return ((bitField0_ & 0x40000000) == 0x40000000);
+      }
+      public boolean getRefractiveWater() {
+        return refractiveWater_;
+      }
+      
       private void initFields() {
         maxParticles_ = 256;
         maxThreads_ = 2;
@@ -4074,6 +4116,9 @@ public final class Configuration {
         filmGrain_ = false;
         outline_ = true;
         lightShafts_ = false;
+        animatedWater_ = false;
+        oceanOctaves_ = 8;
+        refractiveWater_ = false;
       }
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
@@ -4170,6 +4215,15 @@ public final class Configuration {
         }
         if (((bitField0_ & 0x08000000) == 0x08000000)) {
           output.writeBool(32, lightShafts_);
+        }
+        if (((bitField0_ & 0x10000000) == 0x10000000)) {
+          output.writeBool(33, animatedWater_);
+        }
+        if (((bitField0_ & 0x20000000) == 0x20000000)) {
+          output.writeUInt32(34, oceanOctaves_);
+        }
+        if (((bitField0_ & 0x40000000) == 0x40000000)) {
+          output.writeBool(35, refractiveWater_);
         }
         getUnknownFields().writeTo(output);
       }
@@ -4291,6 +4345,18 @@ public final class Configuration {
         if (((bitField0_ & 0x08000000) == 0x08000000)) {
           size += com.google.protobuf.CodedOutputStream
             .computeBoolSize(32, lightShafts_);
+        }
+        if (((bitField0_ & 0x10000000) == 0x10000000)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeBoolSize(33, animatedWater_);
+        }
+        if (((bitField0_ & 0x20000000) == 0x20000000)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeUInt32Size(34, oceanOctaves_);
+        }
+        if (((bitField0_ & 0x40000000) == 0x40000000)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeBoolSize(35, refractiveWater_);
         }
         size += getUnknownFields().getSerializedSize();
         memoizedSerializedSize = size;
@@ -4477,6 +4543,12 @@ public final class Configuration {
           bitField0_ = (bitField0_ & ~0x04000000);
           lightShafts_ = false;
           bitField0_ = (bitField0_ & ~0x08000000);
+          animatedWater_ = false;
+          bitField0_ = (bitField0_ & ~0x10000000);
+          oceanOctaves_ = 8;
+          bitField0_ = (bitField0_ & ~0x20000000);
+          refractiveWater_ = false;
+          bitField0_ = (bitField0_ & ~0x40000000);
           return this;
         }
         
@@ -4631,6 +4703,18 @@ public final class Configuration {
             to_bitField0_ |= 0x08000000;
           }
           result.lightShafts_ = lightShafts_;
+          if (((from_bitField0_ & 0x10000000) == 0x10000000)) {
+            to_bitField0_ |= 0x10000000;
+          }
+          result.animatedWater_ = animatedWater_;
+          if (((from_bitField0_ & 0x20000000) == 0x20000000)) {
+            to_bitField0_ |= 0x20000000;
+          }
+          result.oceanOctaves_ = oceanOctaves_;
+          if (((from_bitField0_ & 0x40000000) == 0x40000000)) {
+            to_bitField0_ |= 0x40000000;
+          }
+          result.refractiveWater_ = refractiveWater_;
           result.bitField0_ = to_bitField0_;
           onBuilt();
           return result;
@@ -4730,6 +4814,15 @@ public final class Configuration {
           }
           if (other.hasLightShafts()) {
             setLightShafts(other.getLightShafts());
+          }
+          if (other.hasAnimatedWater()) {
+            setAnimatedWater(other.getAnimatedWater());
+          }
+          if (other.hasOceanOctaves()) {
+            setOceanOctaves(other.getOceanOctaves());
+          }
+          if (other.hasRefractiveWater()) {
+            setRefractiveWater(other.getRefractiveWater());
           }
           this.mergeUnknownFields(other.getUnknownFields());
           return this;
@@ -4904,6 +4997,21 @@ public final class Configuration {
               case 256: {
                 bitField0_ |= 0x08000000;
                 lightShafts_ = input.readBool();
+                break;
+              }
+              case 264: {
+                bitField0_ |= 0x10000000;
+                animatedWater_ = input.readBool();
+                break;
+              }
+              case 272: {
+                bitField0_ |= 0x20000000;
+                oceanOctaves_ = input.readUInt32();
+                break;
+              }
+              case 280: {
+                bitField0_ |= 0x40000000;
+                refractiveWater_ = input.readBool();
                 break;
               }
             }
@@ -5565,6 +5673,69 @@ public final class Configuration {
         public Builder clearLightShafts() {
           bitField0_ = (bitField0_ & ~0x08000000);
           lightShafts_ = false;
+          onChanged();
+          return this;
+        }
+        
+        // optional bool animated_water = 33 [default = false];
+        private boolean animatedWater_ ;
+        public boolean hasAnimatedWater() {
+          return ((bitField0_ & 0x10000000) == 0x10000000);
+        }
+        public boolean getAnimatedWater() {
+          return animatedWater_;
+        }
+        public Builder setAnimatedWater(boolean value) {
+          bitField0_ |= 0x10000000;
+          animatedWater_ = value;
+          onChanged();
+          return this;
+        }
+        public Builder clearAnimatedWater() {
+          bitField0_ = (bitField0_ & ~0x10000000);
+          animatedWater_ = false;
+          onChanged();
+          return this;
+        }
+        
+        // optional uint32 ocean_octaves = 34 [default = 8];
+        private int oceanOctaves_ = 8;
+        public boolean hasOceanOctaves() {
+          return ((bitField0_ & 0x20000000) == 0x20000000);
+        }
+        public int getOceanOctaves() {
+          return oceanOctaves_;
+        }
+        public Builder setOceanOctaves(int value) {
+          bitField0_ |= 0x20000000;
+          oceanOctaves_ = value;
+          onChanged();
+          return this;
+        }
+        public Builder clearOceanOctaves() {
+          bitField0_ = (bitField0_ & ~0x20000000);
+          oceanOctaves_ = 8;
+          onChanged();
+          return this;
+        }
+        
+        // optional bool refractive_water = 35 [default = false];
+        private boolean refractiveWater_ ;
+        public boolean hasRefractiveWater() {
+          return ((bitField0_ & 0x40000000) == 0x40000000);
+        }
+        public boolean getRefractiveWater() {
+          return refractiveWater_;
+        }
+        public Builder setRefractiveWater(boolean value) {
+          bitField0_ |= 0x40000000;
+          refractiveWater_ = value;
+          onChanged();
+          return this;
+        }
+        public Builder clearRefractiveWater() {
+          bitField0_ = (bitField0_ & ~0x40000000);
+          refractiveWater_ = false;
           onChanged();
           return this;
         }
@@ -6537,7 +6708,7 @@ public final class Configuration {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\rConfig2.proto\022\010protobuf\"\371\017\n\007Setting\022&\n" +
+      "\n\rConfig2.proto\022\010protobuf\"\323\020\n\007Setting\022&\n" +
       "\005world\030\001 \001(\0132\027.protobuf.Setting.World\022(\n" +
       "\006player\030\002 \001(\0132\030.protobuf.Setting.Player\022" +
       "(\n\006system\030\003 \001(\0132\030.protobuf.Setting.Syste" +
@@ -6564,7 +6735,7 @@ public final class Configuration {
       "\003fov\030\001 \001(\002:\00290\022\031\n\nmouse_sens\030\002 \001(\002:\0050.07" +
       "5\022\034\n\016camera_bobbing\030\003 \001(\010:\004true\022&\n\030rende" +
       "r_first_person_view\030\004 \001(\010:\004true\022\031\n\013placi" +
-      "ng_box\030\005 \001(\010:\004true\032\310\007\n\006System\022\032\n\rmax_par" +
+      "ng_box\030\005 \001(\010:\004true\032\242\010\n\006System\022\032\n\rmax_par" +
       "ticles\030\001 \001(\005:\003256\022\026\n\013max_threads\030\004 \001(\005:\001" +
       "2\022\031\n\013save_chunks\030\005 \001(\010:\004true\022\036\n\020chunk_ca",
       "che_size\030\006 \001(\005:\0042048\022\033\n\016max_chunk_VBOs\030\007" +
@@ -6586,10 +6757,13 @@ public final class Configuration {
       "\022\032\n\013motion_blur\030\034 \001(\010:\005false\022\023\n\004ssao\030\035 \001" +
       "(\010:\005false\022\031\n\nfilm_grain\030\036 \001(\010:\005false\022\025\n\007" +
       "outline\030\037 \001(\010:\004true\022\033\n\014light_shafts\030  \001(" +
-      "\010:\005false\032*\n\010CloudRes\022\016\n\001x\030\001 \001(\002:\003512\022\016\n\001",
-      "y\030\002 \001(\002:\003512\0327\n\013DisplayMode\022\023\n\005width\030\001 \001" +
-      "(\005:\0041280\022\023\n\006height\030\002 \001(\005:\003720B*\n\027org.ter" +
-      "asology.protobufB\rConfigurationH\001"
+      "\010:\005false\022\035\n\016animated_water\030! \001(\010:\005false\022",
+      "\030\n\rocean_octaves\030\" \001(\r:\0018\022\037\n\020refractive_" +
+      "water\030# \001(\010:\005false\032*\n\010CloudRes\022\016\n\001x\030\001 \001(" +
+      "\002:\003512\022\016\n\001y\030\002 \001(\002:\003512\0327\n\013DisplayMode\022\023\n" +
+      "\005width\030\001 \001(\005:\0041280\022\023\n\006height\030\002 \001(\005:\003720B" +
+      "*\n\027org.terasology.protobufB\rConfiguratio" +
+      "nH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -6641,7 +6815,7 @@ public final class Configuration {
           internal_static_protobuf_Setting_System_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_protobuf_Setting_System_descriptor,
-              new java.lang.String[] { "MaxParticles", "MaxThreads", "SaveChunks", "ChunkCacheSize", "MaxChunkVBOs", "PixelFormat", "DisplayMode", "Fullscreen", "ActiveViewingDistanceId", "ViewingDistanceNear", "ViewingDistanceModerate", "ViewingDistanceFar", "ViewingDistanceUltra", "FlickeringLight", "AnimatedGrass", "VerticalChunkMeshSegments", "BlurIntensity", "ReflectiveWater", "MusicVolume", "SoundVolume", "Vignette", "EyeAdapation", "Bloom", "MotionBlur", "Ssao", "FilmGrain", "Outline", "LightShafts", },
+              new java.lang.String[] { "MaxParticles", "MaxThreads", "SaveChunks", "ChunkCacheSize", "MaxChunkVBOs", "PixelFormat", "DisplayMode", "Fullscreen", "ActiveViewingDistanceId", "ViewingDistanceNear", "ViewingDistanceModerate", "ViewingDistanceFar", "ViewingDistanceUltra", "FlickeringLight", "AnimatedGrass", "VerticalChunkMeshSegments", "BlurIntensity", "ReflectiveWater", "MusicVolume", "SoundVolume", "Vignette", "EyeAdapation", "Bloom", "MotionBlur", "Ssao", "FilmGrain", "Outline", "LightShafts", "AnimatedWater", "OceanOctaves", "RefractiveWater", },
               org.terasology.protobuf.Configuration.Setting.System.class,
               org.terasology.protobuf.Configuration.Setting.System.Builder.class);
           internal_static_protobuf_Setting_System_CloudRes_descriptor =
