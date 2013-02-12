@@ -16,6 +16,12 @@
 
 package org.terasology.logic.mod;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
+import java.util.List;
+import java.util.Set;
+
 /**
  * Information on a mod
  *
@@ -25,6 +31,7 @@ public class ModInfo {
     private String id;
     private String displayName;
     private String description;
+    private Set<String> dependencies = Sets.newLinkedHashSet();
 
     public String getId() {
         return id;
@@ -48,5 +55,12 @@ public class ModInfo {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Set<String> getDependencies() {
+        if (dependencies == null) {
+            dependencies = Sets.newLinkedHashSet();
+        }
+        return dependencies;
     }
 }

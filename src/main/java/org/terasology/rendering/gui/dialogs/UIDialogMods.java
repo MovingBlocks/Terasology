@@ -58,6 +58,7 @@ public class UIDialogMods extends UIDialog {
     private UILabel nameLabel;
     private UILabel descriptionLabel;
     private UIComposite detailPanel;
+    private ModManager modManager = CoreRegistry.get(ModManager.class);
 
     public UIDialogMods(ModConfig modConfig) {
         super(new Vector2f(640f, 480f));
@@ -70,7 +71,7 @@ public class UIDialogMods extends UIDialog {
     }
 
     private void populateModList() {
-        ModManager modManager = CoreRegistry.get(ModManager.class);
+
 
         List<Mod> mods = Lists.newArrayList(modManager.getMods());
         Collections.sort(mods, new Comparator<Mod>() {
@@ -114,19 +115,51 @@ public class UIDialogMods extends UIDialog {
             public void click(UIDisplayElement element, int button) {
                 Mod selectedMod = (Mod) modList.getSelection().getValue();
                 if (modConfig.hasMod(selectedMod.getModInfo().getId())) {
-                    modConfig.removeMod(selectedMod.getModInfo().getId());
+                    deactivateMod(selectedMod);
                     toggleButton.getLabel().setText(ACTIVATE_TEXT);
-                    modList.getSelection().setTextColor(INACTIVE_TEXT_COLOR);
-                    modList.getSelection().setTextSelectionColor(INACTIVE_SELECTED_TEXT_COLOR);
                 } else {
-                    modConfig.addMod(selectedMod.getModInfo().getId());
+                    activateMod(selectedMod);
                     toggleButton.getLabel().setText(DEACTIVATE_TEXT);
-                    modList.getSelection().setTextColor(ACTIVE_TEXT_COLOR);
-                    modList.getSelection().setTextSelectionColor(ACTIVE_SELECTED_TEXT_COLOR);
                 }
+                refreshListItemActivation();
             }
         });
     }
+
+    private void refreshListItemActivation() {
+        for (UIListItem item : modList.getItems()) {
+            Mod mod = (Mod) item.getValue();
+            if (modConfig.hasMod(mod.getModInfo().getId())) {
+                item.setTextColor(ACTIVE_TEXT_COLOR);
+                item.setTextSelectionColor(ACTIVE_SELECTED_TEXT_COLOR);
+            } else {
+                item.setTextColor(INACTIVE_TEXT_COLOR);
+                item.setTextSelectionColor(INACTIVE_SELECTED_TEXT_COLOR);
+            }
+        }
+    }
+
+    private void deactivateMod(Mod mod) {
+        modConfig.removeMod(mod.getModInfo().getId());
+        for (String activeModName : Lists.newArrayList(modConfig.listMods())) {
+            Mod activeMod = modManager.getMod(activeModName);
+            if (activeMod != null && activeMod.getModInfo().getDependencies().contains(mod.getModInfo().getId())) {
+                deactivateMod(activeMod);
+            }
+        }
+    }
+
+    private void activateMod(Mod mod) {
+        modConfig.addMod(mod.getModInfo().getId());
+        for (String dependencyName : mod.getModInfo().getDependencies()) {
+            Mod dependency = modManager.getMod(dependencyName);
+            if (dependency != null) {
+                activateMod(dependency);
+            }
+        }
+    }
+
+
 
     @Override
     protected void createDialogArea(UIDisplayContainer parent) {

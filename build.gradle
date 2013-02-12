@@ -4,7 +4,7 @@
  * - Gradle Documentation: http://gradle.org/documentation
  * - View tasks for this project: $ gradlew tasks
  */
-
+ 
 apply plugin: 'java'
 apply plugin: 'project-report'
 apply plugin: 'eclipse'
@@ -22,7 +22,11 @@ apply plugin: 'checkstyle'
 //    gradleVersion = '1.4'
 //}
 
+import groovy.json.JsonSlurper
 import org.apache.tools.ant.filters.FixCrLfFilter;
+
+def DEFAULT_MOD_TXT_START = '{\n    "id" : "'
+def DEFAULT_MOD_TXT_END = '",\n    "displayName" : "",\n    "description" : "",\n    "dependencies" : []\n}'
 
 ext {
     startDateTimeString = new Date().format("yyyy-MM-dd_HH-mm-ss")
@@ -154,11 +158,14 @@ test {
 
 /* Mods -------------------------------------------------------------------- */
 
+
+
 subprojects {
     if (name != 'mods') {
         apply plugin: 'java'
         apply plugin: 'eclipse'
         apply plugin: 'idea'
+		
         sourceSets {
             main {
                 java {
@@ -166,10 +173,35 @@ subprojects {
                 }
             }
         }
+		task createSkeleton() {
+			mkdir('assets')
+			mkdir('src/main/java')
+			mkdir('assets/blocks')
+			mkdir('assets/blockTiles')
+			mkdir('assets/fonts')
+			mkdir('assets/materials')
+			mkdir('assets/mesh')
+			mkdir('assets/music')
+			mkdir('assets/prefabs')
+			mkdir('assets/shaders')
+			mkdir('assets/shapes')
+			mkdir('assets/sounds')
+			mkdir('assets/textures')
+			mkdir('src/test/java')
+		}
         task syncAssets(type: Sync) {
             from 'assets'
             into 'classes/assets'
         }
+		def modFile = file('mod.txt')
+		if (!modFile.exists()) {
+			modFile.createNewFile()
+			modFile.withWriter { writer -> 
+				writer.write(DEFAULT_MOD_TXT_START)
+				writer.write(name)
+				writer.write(DEFAULT_MOD_TXT_END) 
+			}
+		}
         jar.doFirst {
             copy {
                 from 'mod.txt'
@@ -177,6 +209,9 @@ subprojects {
             }
         }
         jar.dependsOn syncAssets
+		def slurper = new JsonSlurper()
+		def modConfig = slurper.parseText( file('mod.txt').text)
+		def modDepends = modConfig.dependencies;
         idea {
             module {
                 inheritOutputDirs = false
@@ -198,6 +233,9 @@ subprojects {
         dependencies {
             compile project(':')
             testCompile group: 'junit', name: 'junit', version: '4.10'
+			for (dependency in modDepends) {
+				compile project(':mods:' + dependency)
+			}
         }
     }
 }
