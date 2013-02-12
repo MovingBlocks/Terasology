@@ -15,10 +15,14 @@
  */
 
 uniform bool swimming;
+uniform bool carryingTorch;
 uniform float viewingDistance;
 uniform float daylight;
 uniform float tick;
 uniform float time;
+
+uniform vec3 sunVec;
+uniform vec3 cameraDirection;
 
 float timeToTick(float time, float speed) {
     return time * 4000.0 * speed;

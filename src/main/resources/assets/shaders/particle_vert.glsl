@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-varying vec4 vertexWorldPos;
+varying vec4 vertexViewPos;
 varying vec3 normal;
 
 void main()
 {
-	vertexWorldPos = ftransform();
+	vertexViewPos = gl_ModelViewMatrix * gl_Vertex;
 
 	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 	normal = gl_NormalMatrix * vec3(0.0f, 1.0f, 0.0f);

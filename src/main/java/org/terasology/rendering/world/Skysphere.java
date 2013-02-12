@@ -17,13 +17,11 @@ package org.terasology.rendering.world;
 
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_LIGHT0;
 import static org.lwjgl.opengl.GL11.glCallList;
 import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glEndList;
 import static org.lwjgl.opengl.GL11.glGenLists;
-import static org.lwjgl.opengl.GL11.glLight;
 import static org.lwjgl.opengl.GL11.glNewList;
 
 import java.nio.FloatBuffer;
@@ -115,13 +113,6 @@ public class Skysphere implements IPropertyProvider {
 
     public void update(float delta) {
         sunPosAngle = (float) java.lang.Math.toRadians(360.0 * _parent.getWorldProvider().getTimeInDays() - 90.0);
-
-        // Set the light direction according to the position of the sun
-        FloatBuffer buffer = BufferUtils.createFloatBuffer(4);
-        buffer.put(0.0f).put((float) java.lang.Math.cos(sunPosAngle)).put((float) java.lang.Math.sin(sunPosAngle)).put(1.0f);
-        buffer.flip();
-
-        glLight(GL_LIGHT0, GL11.GL_POSITION, buffer);
     }
 
     private void drawSphere() {

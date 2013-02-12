@@ -67,7 +67,6 @@ public class ShaderParametersSky extends ShaderParametersBase {
             program.setFloat("colorExp", (Float) worldRenderer.getSkysphere().getColorExp().getValue());
 
             float sunAngle = worldRenderer.getSkysphere().getSunPosAngle();
-
             Vector4d sunNormalise = new Vector4d(0.0f, java.lang.Math.cos(sunAngle), java.lang.Math.sin(sunAngle), 1.0);
             sunNormalise.normalize();
 
@@ -75,7 +74,6 @@ public class ShaderParametersSky extends ShaderParametersBase {
 
             program.setFloat("sunAngle", worldRenderer.getSkysphere().getSunPosAngle());
             program.setFloat("turbidity", (Float) worldRenderer.getSkysphere().getTurbidity().getValue());
-            program.setFloat4("sunPos", 0.0f, (float) java.lang.Math.cos(sunAngle), (float) java.lang.Math.sin(sunAngle), 1.0f);
             program.setFloat3("zenith", (float) zenithColor.x, (float) zenithColor.y, (float) zenithColor.z);
         }
 

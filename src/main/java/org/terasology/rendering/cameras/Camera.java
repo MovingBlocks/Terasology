@@ -138,9 +138,7 @@ public abstract class Camera {
     }
 
     public float getClipHeight() {
-        if (_reflected)
-            return 31.5f;
-        return 0;
+        return 31.5f;
     }
 
     public Matrix4f getViewMatrix() {

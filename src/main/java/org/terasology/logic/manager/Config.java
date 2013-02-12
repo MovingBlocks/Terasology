@@ -354,6 +354,14 @@ public final class Config {
         _setting.getSystemBuilder().setAnimatedWater(animatedWater);
     }
 
+    public boolean isRefractiveWater() {
+        return _setting.getSystemBuilder().getRefractiveWater();
+    }
+
+    public void setRefractiveWater(boolean refr) {
+        _setting.getSystemBuilder().setRefractiveWater(refr);
+    }
+
     public int getOceanOctaves() {
         return _setting.getSystemBuilder().getOceanOctaves();
     }

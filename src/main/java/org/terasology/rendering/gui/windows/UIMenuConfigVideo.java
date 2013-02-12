@@ -101,7 +101,7 @@ public class UIMenuConfigVideo extends UIWindow {
                     Config.getInstance().setOutline(true);
                     Config.getInstance().setLightShafts(false);
                     Config.getInstance().setAnimatedWater(false);
-                    Config.getInstance().setOceanOctaves(4);
+                    Config.getInstance().setRefractiveWater(false);
                     break;
                 case 1:
                     Config.getInstance().setFlickeringLight(true);
@@ -113,8 +113,8 @@ public class UIMenuConfigVideo extends UIWindow {
                     Config.getInstance().setFilmGrain(true);
                     Config.getInstance().setOutline(true);
                     Config.getInstance().setLightShafts(false);
-                    Config.getInstance().setAnimatedWater(true);
-                    Config.getInstance().setOceanOctaves(8);
+                    Config.getInstance().setAnimatedWater(false);
+                    Config.getInstance().setRefractiveWater(false);
                     break;
                 case 2:
                     Config.getInstance().setFlickeringLight(true);
@@ -128,6 +128,7 @@ public class UIMenuConfigVideo extends UIWindow {
                     Config.getInstance().setLightShafts(true);
                     Config.getInstance().setAnimatedWater(true);
                     Config.getInstance().setOceanOctaves(16);
+                    Config.getInstance().setRefractiveWater(true);
                     break;
                 }
                 

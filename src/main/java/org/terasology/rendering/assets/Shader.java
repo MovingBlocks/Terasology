@@ -213,6 +213,8 @@ public class Shader implements Asset {
             builder.append("#define ANIMATED_WATER \n");
             builder.append("#define OCEAN_OCTAVES " + Config.getInstance().getOceanOctaves() + " \n");
         }
+        if (Config.getInstance().isRefractiveWater())
+            builder.append("#define REFRACTIVE_WATER \n");
         if (Config.getInstance().getBlurIntensity() == 0)
             builder.append("#define NO_BLUR \n");
         if (Config.getInstance().isFlickeringLight())

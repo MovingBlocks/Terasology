@@ -22,7 +22,6 @@ varying	vec4 position;
 uniform sampler2D texSky180;
 uniform sampler2D texSky90;
 
-uniform	vec4 sunPos;
 uniform float colorExp;
 uniform vec3 zenith;
 
@@ -35,7 +34,7 @@ const vec4 eyePos = vec4(0.0, 0.0, 0.0, 1.0);
 
 void main () {
     vec3 v = normalize (position.xyz);
-    vec3 l = normalize (sunPos.xyz);
+    vec3 l = normalize (sunVec.xyz);
 
     float lDotV = dot(l, v);
     float negLDotV = dot(-l, v);
@@ -56,7 +55,7 @@ void main () {
        moonHighlight *= 1.0 - (HIGHLIGHT_BLEND_START + l.y) / HIGHLIGHT_BLEND_START;
     }
 
-    float blendNight = clamp((0.707 - sunPos.y) * (1.0 - lDotV), 0.0, 1.0);
+    float blendNight = clamp((0.707 - sunVec.y) * (1.0 - lDotV), 0.0, 1.0);
 
     vec4 skyColor = vec4(0);
 

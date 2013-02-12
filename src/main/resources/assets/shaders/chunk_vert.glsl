@@ -20,11 +20,12 @@
 #define BLOCK_HINT_WAVING_BLOCK     5
 
 varying vec3 normal;
-varying vec4 vertexWorldPosRaw;
 varying vec4 vertexWorldPos;
-varying vec4 vertexPos;
-varying vec3 lightDir;
-varying vec3 waterNormal;
+varying vec4 vertexViewPos;
+varying vec4 vertexProjPos;
+varying vec3 waterNormalWorldSpace;
+
+varying vec3 sunVecView;
 
 varying float flickeringLightOffset;
 varying float isUpside;
@@ -35,7 +36,7 @@ varying float distance;
 uniform float blockScale = 1.0;
 uniform vec3 chunkOffset;
 
-uniform float animated;
+uniform bool animated;
 
 #ifdef ANIMATED_WATER
 const vec3 normalDiffOffset   = vec3(-1.0, 0.0, 1.0);
@@ -47,6 +48,7 @@ uniform float waveSpeedFalloff;
 uniform float waveSize;
 uniform float waveIntens;
 uniform float waveSpeed;
+uniform float waterOffsetY;
 
 const vec2[] waveDirections = vec2[](
     vec2(-0.613392, 0.617481),
@@ -88,11 +90,11 @@ vec4 calcWaterNormalAndOffset(vec2 worldPosRaw) {
     float s11 = calcWaterHeightAtOffset(worldPosRaw.xy);
     float s01 = calcWaterHeightAtOffset(worldPosRaw.xy + normalDiffOffset.xy);
     float s21 = calcWaterHeightAtOffset(worldPosRaw.xy + normalDiffOffset.zy);
-    float s10 = calcWaterHeightAtOffset(worldPosRaw.xy + normalDiffOffset.xy);
+    float s10 = calcWaterHeightAtOffset(worldPosRaw.xy + normalDiffOffset.yx);
     float s12 = calcWaterHeightAtOffset(worldPosRaw.xy + normalDiffOffset.yz);
 
-    vec3 va = normalize(vec3(normalDiffSize.x, normalDiffSize.y, s21-s11));
-    vec3 vb = normalize(vec3(normalDiffSize.y, normalDiffSize.x, s12-s10));
+    vec3 va = normalize(vec3(normalDiffSize.x, s21-s01, normalDiffSize.y));
+    vec3 vb = normalize(vec3(normalDiffSize.y, s12-s10, -normalDiffSize.x));
 
     return vec4(cross(va,vb), s11);
 }
@@ -105,13 +107,13 @@ void main()
 
     gl_TexCoord[1] = gl_MultiTexCoord1;
 
-	vertexWorldPosRaw = gl_Vertex;
+	vertexWorldPos = gl_Vertex;
 
-	vertexWorldPos = gl_ModelViewMatrix * vertexWorldPosRaw;
+	vertexViewPos = gl_ModelViewMatrix * vertexWorldPos;
+
+	sunVecView = (gl_ModelViewMatrix * vec4(sunVec.x, sunVec.y, sunVec.z, 0.0)).xyz;
 
 	isUpside = gl_Normal.y == 1.0 ? 1.0 : 0.0;
-
-	lightDir = gl_LightSource[0].position.xyz;
 
     normal = gl_NormalMatrix * gl_Normal;
     gl_FrontColor = gl_Color;
@@ -125,40 +127,40 @@ void main()
 #endif
 
 #ifdef ANIMATED_GRASS
-    vec3 vertexChunkPos = vertexWorldPosRaw.xyz + chunkOffset.xyz;
+    vec3 vertexChunkPos = vertexWorldPos.xyz + chunkOffset.xyz;
 
-    if (animated > 0.0) {
+    if (animated) {
         // GRASS ANIMATION
         if ( checkFlag(BLOCK_HINT_WAVING, blockHint) ) {
            // Only animate the upper two vertices
            if (mod(gl_TexCoord[0].y, TEXTURE_OFFSET) < TEXTURE_OFFSET / 2.0) {
-               vertexWorldPos.x += (smoothTriangleWave(timeToTick(time, 0.2) + vertexChunkPos.x * 0.1 + vertexChunkPos.z * 0.1) * 2.0 - 1.0) * 0.1 * blockScale;
-               vertexWorldPos.y += (smoothTriangleWave(timeToTick(time, 0.1) + vertexChunkPos.x * -0.5 + vertexChunkPos.z * -0.5) * 2.0 - 1.0) * 0.05 * blockScale;
+               vertexViewPos.x += (smoothTriangleWave(timeToTick(time, 0.2) + vertexChunkPos.x * 0.1 + vertexChunkPos.z * 0.1) * 2.0 - 1.0) * 0.1 * blockScale;
+               vertexViewPos.y += (smoothTriangleWave(timeToTick(time, 0.1) + vertexChunkPos.x * -0.5 + vertexChunkPos.z * -0.5) * 2.0 - 1.0) * 0.05 * blockScale;
            }
         } else if ( checkFlag(BLOCK_HINT_WAVING_BLOCK, blockHint) ) {
-            vertexWorldPos.x += (smoothTriangleWave(timeToTick(time, 0.1) + vertexChunkPos.x * 0.01 + vertexChunkPos.z * 0.01) * 2.0 - 1.0) * 0.01 * blockScale;
-            vertexWorldPos.y += (smoothTriangleWave(timeToTick(time, 0.15) + vertexChunkPos.x * -0.01 + vertexChunkPos.z * -0.01) * 2.0 - 1.0) * 0.05 * blockScale;
-            vertexWorldPos.z += (smoothTriangleWave(timeToTick(time, 0.1) + vertexChunkPos.x * -0.01 + vertexChunkPos.z * -0.01) * 2.0 - 1.0) * 0.01 * blockScale;
+            vertexViewPos.x += (smoothTriangleWave(timeToTick(time, 0.1) + vertexChunkPos.x * 0.01 + vertexChunkPos.z * 0.01) * 2.0 - 1.0) * 0.01 * blockScale;
+            vertexViewPos.y += (smoothTriangleWave(timeToTick(time, 0.15) + vertexChunkPos.x * -0.01 + vertexChunkPos.z * -0.01) * 2.0 - 1.0) * 0.05 * blockScale;
+            vertexViewPos.z += (smoothTriangleWave(timeToTick(time, 0.1) + vertexChunkPos.x * -0.01 + vertexChunkPos.z * -0.01) * 2.0 - 1.0) * 0.01 * blockScale;
         }
     }
 #endif
 
 #ifdef ANIMATED_WATER
-    if ( checkFlag(BLOCK_HINT_WATER, blockHint) ) {
+    if (checkFlag(BLOCK_HINT_WATER, blockHint)) {
        // Only animate blocks on sea level
-       if (vertexWorldPosRaw.y < 32.5 && vertexWorldPosRaw.y > 31.5) {
+       if (vertexWorldPos.y < 32.5 && vertexWorldPos.y > 31.5) {
             vec4 normalAndOffset = calcWaterNormalAndOffset(vertexChunkPos.xz);
 
-            waterNormal = gl_NormalMatrix * normalAndOffset.xyz;
-            vertexWorldPos.y += normalAndOffset.w;
+            waterNormalWorldSpace = gl_NormalMatrix * normalAndOffset.xyz;
+            vertexViewPos.y += normalAndOffset.w - waterOffsetY;
        }
     }
 #else
-    waterNormal = gl_NormalMatrix * vec3(0.0, 1.0, 0.0);
+    waterNormalWorldSpace = gl_NormalMatrix * vec3(0.0, 1.0, 0.0);
 #endif
 
-    vertexPos = gl_ProjectionMatrix * vertexWorldPos;
-    distance = length(vertexWorldPos);
+    vertexProjPos = gl_ProjectionMatrix * vertexViewPos;
+    distance = length(vertexViewPos);
 
-    gl_Position = vertexPos;
+    gl_Position = vertexProjPos;
 }

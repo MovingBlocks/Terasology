@@ -80,6 +80,7 @@ message Setting {
 		optional bool light_shafts = 32 [default = false];
 		optional bool animated_water = 33 [default = false];
 		optional uint32 ocean_octaves = 34 [default = 8];
+		optional bool refractive_water = 35 [default = false];
     }
 
     optional World world = 1;

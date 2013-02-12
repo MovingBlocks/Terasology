@@ -19,7 +19,6 @@ import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_FILL;
 import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
-import static org.lwjgl.opengl.GL11.GL_LIGHT0;
 import static org.lwjgl.opengl.GL11.GL_LINE;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
@@ -558,6 +557,11 @@ public final class WorldRenderer {
         glCullFace(GL11.GL_BACK);
         PostProcessingRenderer.getInstance().endRenderReflectedScene();
 
+        if (Config.getInstance().isRefractiveWater()) {
+            PostProcessingRenderer.getInstance().beginRenderRefractedScene();
+            renderWorldRefraction(getActiveCamera());
+            PostProcessingRenderer.getInstance().endRenderRefractedScene();
+        }
 
         PostProcessingRenderer.getInstance().beginRenderScene(true);
         renderWorld(getActiveCamera());
@@ -604,8 +608,6 @@ public final class WorldRenderer {
             renderDebugCollision(camera);
         }
 
-        glEnable(GL_LIGHT0);
-
         boolean headUnderWater =_cameraMode == CAMERA_MODE.PLAYER && isUnderWater();
 
         if (_wireframe)
@@ -625,7 +627,7 @@ public final class WorldRenderer {
          * FIRST RENDER PASS: OPAQUE ELEMENTS
          */
         while (_renderQueueChunksOpaque.size() > 0)
-            renderChunk(_renderQueueChunksOpaque.poll(), ChunkMesh.RENDER_PHASE.OPAQUE, camera);
+            renderChunk(_renderQueueChunksOpaque.poll(), ChunkMesh.RENDER_PHASE.OPAQUE, camera, false, false);
 
         PerformanceMonitor.endActivity();
 
@@ -638,7 +640,7 @@ public final class WorldRenderer {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         while (_renderQueueChunksSortedBillboards.size() > 0)
-            renderChunk(_renderQueueChunksSortedBillboards.poll(), ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT, camera);
+            renderChunk(_renderQueueChunksSortedBillboards.poll(), ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT, camera, false, false);
 
         PerformanceMonitor.endActivity();
 
@@ -659,10 +661,10 @@ public final class WorldRenderer {
 
                 if (j == 0) {
                     glColorMask(false, false, false, false);
-                    renderChunk(c, ChunkMesh.RENDER_PHASE.WATER_AND_ICE, camera);
+                    renderChunk(c, ChunkMesh.RENDER_PHASE.WATER_AND_ICE, camera, false, false);
                 } else {
                     glColorMask(true, true, true, true);
-                    renderChunk(c, ChunkMesh.RENDER_PHASE.WATER_AND_ICE, camera);
+                    renderChunk(c, ChunkMesh.RENDER_PHASE.WATER_AND_ICE, camera, false, false);
                 }
             }
         }
@@ -692,8 +694,6 @@ public final class WorldRenderer {
 
         if (_wireframe)
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-        glDisable(GL_LIGHT0);
     }
 
     public void renderWorldReflection(Camera camera) {
@@ -704,32 +704,59 @@ public final class WorldRenderer {
         if (Config.getInstance().isComplexWater()) {
             camera.lookThrough();
 
-            glEnable(GL_LIGHT0);
-
             for (Chunk c : _renderQueueChunksOpaque)
-                renderChunk(c, ChunkMesh.RENDER_PHASE.OPAQUE, camera);
+                renderChunk(c, ChunkMesh.RENDER_PHASE.OPAQUE, camera, true, false);
 
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
             for (Chunk c : _renderQueueChunksSortedBillboards)
-                renderChunk(c, ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT, camera);
+                renderChunk(c, ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT, camera, true, false);
 
             glDisable(GL_BLEND);
-            glDisable(GL_LIGHT0);
         }
 
         PerformanceMonitor.endActivity();
     }
 
-    private void renderChunk(Chunk chunk, ChunkMesh.RENDER_PHASE phase, Camera camera) {
+    public void renderWorldRefraction(Camera camera) {
+        PerformanceMonitor.startActivity("Render World (Refraction)");
+
+        camera.lookThrough();
+
+        for (Chunk c : _renderQueueChunksOpaque)
+            renderChunk(c, ChunkMesh.RENDER_PHASE.OPAQUE, camera, false, true);
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        for (Chunk c : _renderQueueChunksSortedBillboards)
+            renderChunk(c, ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT, camera, false, true);
+
+        glDisable(GL_BLEND);
+
+        PerformanceMonitor.endActivity();
+    }
+
+    private void renderChunk(Chunk chunk, ChunkMesh.RENDER_PHASE phase, Camera camera, boolean clipPos, boolean clipNeg) {
 
         if (chunk.getChunkState() == Chunk.State.COMPLETE && chunk.getMesh() != null) {
             ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("chunk");
             // Transfer the world offset of the chunk to the shader for various effects
             shader.setFloat3("chunkOffset", (float) (chunk.getPos().x * Chunk.SIZE_X), (float) (chunk.getPos().y * Chunk.SIZE_Y), (float) (chunk.getPos().z * Chunk.SIZE_Z));
             shader.setFloat("animated", chunk.getAnimated() ? 1.0f: 0.0f);
-            shader.setFloat("clipHeight", camera.getClipHeight());
+
+            if (clipPos) {
+                shader.setFloat("clipHeightPos", camera.getClipHeight());
+            } else {
+                shader.setFloat("clipHeightPos", 0.0f);
+            }
+
+            if (clipNeg) {
+                shader.setFloat("clipHeightNeg", camera.getClipHeight());
+            } else {
+                shader.setFloat("clipHeightNeg", 0.0f);
+            }
 
             GL11.glPushMatrix();
 

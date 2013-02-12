@@ -19,7 +19,6 @@ varying	vec3 	colorYxy;
 varying vec3    skyVec;
 varying vec3    skyVecR;
 
-uniform	vec4 	sunPos;
 uniform float	sunAngle;
 uniform	float	turbidity;
 uniform vec3    zenith;
@@ -68,7 +67,7 @@ void main(void)
     mat3	r   = mat3 (1.0, 0.0, 0.0, 0.0, ca, -sa, 0.0, sa, ca);
 
     vec3 v          = normalize ((gl_Vertex-eyePos).xyz);
-    vec3 l          = normalize (sunPos.xyz);
+    vec3 l          = sunVec;
     float lv        = dot(l, v);
     skyVecR         = r * v.xyz;
     skyVec          = v.xyz;

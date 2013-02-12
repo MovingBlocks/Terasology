@@ -19,10 +19,9 @@ uniform sampler2D diffuse;
 uniform float light;
 uniform vec3 colorOffset;
 uniform bool textured;
-uniform bool carryingTorch;
 
 varying vec3 normal;
-varying vec4 vertexWorldPos;
+varying vec4 vertexViewPos;
 
 void main(){
     vec4 color;
@@ -37,7 +36,7 @@ void main(){
 
     // Apply torchlight
     if (carryingTorch)
-        torchlight = calcTorchlight(calcLambLight(normal, -normalize(vertexWorldPos.xyz)), vertexWorldPos.xyz);
+        torchlight = calcTorchlight(calcLambLight(normal, -normalize(vertexViewPos.xyz)), vertexViewPos.xyz);
 
     // Apply light
     float lightValue = expLightValue(light);
