@@ -272,6 +272,14 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             QuaternionUtil.setEuler(viewRot, TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw, TeraMath.DEG_TO_RAD * localPlayerComponent.viewPitch, 0);
             QuaternionUtil.quatRotate(viewRot, relMove, relMove);
             relMove.y += relativeMovement.y;
+        } else if( characterMovementComponent.isClimbing ){
+
+            float pitch = localPlayerComponent.viewPitch > 0 ? 60f : -60f;
+
+            Quat4f viewRot = new Quat4f();
+            QuaternionUtil.setEuler(viewRot, TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw, TeraMath.DEG_TO_RAD * pitch, 0);
+            QuaternionUtil.quatRotate(viewRot, relMove, relMove);
+            relMove.y += relativeMovement.y;
         } else {
             QuaternionUtil.quatRotate(location.getLocalRotation(), relMove, relMove);
         }
