@@ -1,25 +1,35 @@
+/*
+ * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.terasology.fences.componentSystem;
 
-import org.terasology.components.InventoryComponent;
-import org.terasology.components.LocalPlayerComponent;
-import org.terasology.components.actions.AccessInventoryActionComponent;
 import org.terasology.entitySystem.*;
 import org.terasology.events.ActivateEvent;
-import org.terasology.events.OpenInventoryEvent;
 import org.terasology.fences.components.FenceGateComponent;
-import org.terasology.game.CoreRegistry;
-import org.terasology.logic.manager.GUIManager;
 import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
-import org.terasology.rendering.gui.windows.UIScreenContainer;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
 import org.terasology.world.block.management.BlockManager;
 
-import javax.vecmath.Vector3f;
-
+/**
+ * System for opening and closing fence gates
+ * @author Small-Jeeper
+ */
 @RegisterComponentSystem
 public class FenceGateSystem  implements EventHandlerSystem {
 
