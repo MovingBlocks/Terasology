@@ -20,6 +20,8 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.FloatBuffer;
+import java.util.Scanner;
+import java.util.StringTokenizer;
 
 import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.GL13;
@@ -117,10 +119,13 @@ public class ShaderProgram {
         // Read in the shader code
         shader.append(readShader(filename));
 
+        String debugShaderType = "UNKNOWN";
         if (type == GL20.GL_FRAGMENT_SHADER) {
             fragmentProgram = shaderId;
+            debugShaderType = "FRAGMENT";
         } else if (type == GL20.GL_VERTEX_SHADER) {
             vertexProgram = shaderId;
+            debugShaderType = "VERTEX";
         }
 
         GL20.glShaderSource(shaderId, shader.toString());
@@ -128,7 +133,31 @@ public class ShaderProgram {
 
         String error;
         if ((error = printLogInfo(shaderId)) != null) {
-            JOptionPane.showMessageDialog(null, "Shader '"+title+"' failed to compile. Terasology might not look quite as good as it should now...\n\n"+error, "Shader compilation error", JOptionPane.ERROR_MESSAGE);
+            String errorLine = "";
+            if (error.contains("ERROR") || error.contains("WARNING")) {
+                try {
+                    StringTokenizer token = new StringTokenizer(error);
+                    token.nextToken(":");
+
+                    String charNumber = token.nextToken(":").trim();
+                    String lineNumber = token.nextToken(":").trim();
+
+                    int lineNumberInt = Integer.valueOf(lineNumber);
+                    int charNumberInt = Integer.valueOf(charNumber);
+
+                    Scanner reader = new Scanner(shader.toString());
+                    for (int i=0; i<lineNumberInt - 1; ++i) {
+                        reader.nextLine();
+                    }
+
+                    errorLine = reader.nextLine();
+                    errorLine = "\n\nError prone line: '" + errorLine + "'";
+                } catch (Exception e) {
+                    // Do nothing...
+                }
+            }
+
+            JOptionPane.showMessageDialog(null, debugShaderType+ " Shader '"+title+"' failed to compile. Terasology might not look quite as good as it should now...\n\n"+error+errorLine, "Shader compilation error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
