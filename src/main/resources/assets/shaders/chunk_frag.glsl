@@ -28,7 +28,7 @@
 #define TORCH_WATER_DIFF 0.7
 #define TORCH_BLOCK_SPEC 0.7
 #define TORCH_BLOCK_DIFF 1.0
-#define WATER_AMB 0.25
+#define WATER_AMB 0.1
 #define WATER_SPEC 2.0
 #define WATER_DIFF 1.0
 #define BLOCK_DIFF 0.75
@@ -48,23 +48,24 @@ varying float isUpside;
 
 varying float distance;
 
-uniform float torchSpecExp;
-uniform float torchWaterSpecExp;
-uniform float waterSpecExp;
-
-uniform float waterNormalBias;
+uniform vec4 lightingSettingsFrag;
+#define torchSpecExp lightingSettingsFrag.x
+#define torchWaterSpecExp lightingSettingsFrag.y
+#define waterSpecExp lightingSettingsFrag.z
 
 uniform vec3 skyInscatteringColor;
-uniform float skyInscatteringExponent;
 
-uniform float skyInscatteringStrength;
-uniform float skyInscatteringLength;
+uniform vec4 skyInscatteringSettingsFrag;
+#define skyInscatteringExponent skyInscatteringSettingsFrag.x
+#define skyInscatteringStrength skyInscatteringSettingsFrag.y
+#define skyInscatteringLength skyInscatteringSettingsFrag.z
 
-uniform float waterRefraction;
-
+uniform vec4 waterSettingsFrag;
+#define waterNormalBias waterSettingsFrag.x
+#define waterRefraction waterSettingsFrag.y
 #ifdef REFRACTIVE_WATER
-uniform float waterFresnelBias;
-uniform float waterFresnelPow;
+#define waterFresnelBias waterSettingsFrag.z
+#define waterFresnelPow waterSettingsFrag.w
 
 uniform sampler2D textureWaterRefraction;
 #endif
@@ -104,23 +105,25 @@ void main(){
 
     /* WATER */
     if ( checkFlag(BLOCK_HINT_WATER, blockHint) ) {
-        vec2 waterOffset = vec2(vertexWorldPos.x + timeToTick(time, 0.05), vertexWorldPos.z + timeToTick(time, 0.05)) / 16.0;
-        vec2 waterOffset2 = vec2(vertexWorldPos.x - timeToTick(time, 0.05), vertexWorldPos.z + timeToTick(time, 0.05)) / 16.0;
-        normalWater.xy += (texture2D(textureWaterNormal, waterOffset).xyz * 2.0 - 1.0).xy * waterNormalBias;
-        normalWater.xy += (texture2D(textureWaterNormal, waterOffset2).xyz * 2.0 - 1.0).xy * waterNormalBias;
+        vec2 waterOffset = vec2(vertexWorldPos.x + timeToTick(time, 0.1), vertexWorldPos.z + timeToTick(time, 0.1)) / 8.0;
+        vec2 waterOffset2 = vec2(vertexWorldPos.x + timeToTick(time, 0.1), vertexWorldPos.z - timeToTick(time, 0.1)) / 16.0;
+
+        vec2 normalOffset = (texture2D(textureWaterNormal, waterOffset).xyz * 2.0 - 1.0).xy * waterNormalBias;
+        normalOffset += (texture2D(textureWaterNormal, waterOffset2).xyz * 2.0 - 1.0).xy * waterNormalBias;
+
+        normalWater.xy += normalOffset;
         normalWater = normalize(normalWater);
 
        // Enable reflection only when not swimming and for blocks on sea level
         if (!swimming && isUpside > 0.99) {
             if ( vertexWorldPos.y < 32.5 && vertexWorldPos.y > 31.5) {
-                vec2 projectedPos = 0.5 * (vertexProjPos.st/vertexProjPos.q) + vec2(0.5);
+                vec2 projectedPos = 0.5 * (vertexProjPos.xy/vertexProjPos.w) + vec2(0.5);
 
-                float refractionFactor = waterRefraction * clamp(1.0 - length(vertexViewPos.xyz) / 50.0, 0.25, 1.0);
-                vec4 reflectionColor = vec4(texture2D(textureWaterReflection, projectedPos + normalWater.xy * refractionFactor).xyz, 1.0);
+                vec4 reflectionColor = vec4(texture2D(textureWaterReflection, projectedPos + normalOffset.xy * waterRefraction).xyz, 1.0);
 
 #ifdef REFRACTIVE_WATER
                 /* FRESNEL */
-                vec4 refractionColor = vec4(texture2D(textureWaterRefraction, projectedPos + normalWater.xy * refractionFactor).xyz, 1.0);
+                vec4 refractionColor = vec4(texture2D(textureWaterRefraction, projectedPos + normalOffset.xy * waterRefraction).xyz, 1.0);
                 float f = fresnel(dot(waterNormalWorldSpace, normalizedVPos), waterFresnelBias, waterFresnelPow);
                 color = mix(refractionColor * vec4(WATER_COLOR), reflectionColor * vec4(WATER_COLOR), f);
 #else
@@ -203,7 +206,7 @@ void main(){
     /* CREATE THE DAYLIGHT LIGHTING MIX */
     if (isWater) {
         /* WATER NEEDS DIFFUSE AND SPECULAR LIGHT */
-        daylightColorValue = vec3(diffuseLighting) * WATER_DIFF + WATER_AMB;
+        daylightColorValue = vec3(diffuseLighting) * WATER_DIFF;
         daylightColorValue += calcSpecLight(normalWater, sunVecViewAdjusted, normalizedVPos, waterSpecExp) * WATER_SPEC;
     } else {
         /* DEFAULT LIGHTING ONLY CONSIST OF DIFFUSE AND AMBIENT LIGHT */
@@ -227,6 +230,10 @@ void main(){
 
     // Calculate the final blocklight color value and add a slight reddish tint to it
     vec3 blocklightColorValue = vec3(blockBrightness) * vec3(1.0, 0.95, 0.94);
+
+    if (isWater) {
+        color.xyz += vec4(WATER_COLOR) * WATER_AMB;
+    }
 
     // Apply the final lighting mix
     color.xyz *= max(daylightColorValue, blocklightColorValue) * occlusionValue;

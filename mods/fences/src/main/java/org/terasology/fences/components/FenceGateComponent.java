@@ -13,10 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.fences.components;
 
-{
-	"shadowCasting" : "false",
-	"rotation" : "Horizontal",
-	"shape" : "fences:fenceSinglePost",
-	"tile" : "fences:Fence"
+
+import org.terasology.entitySystem.Component;
+
+/**
+ * Component for opening and closing fence gates
+ * @author Small-Jeeper
+ */
+public class FenceGateComponent implements Component {
+    public boolean isClosed = true;
 }

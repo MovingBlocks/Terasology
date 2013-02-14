@@ -48,7 +48,7 @@ void main(){
     }
 
     // Apply light
-    color.rgb *= clamp(light + torchlight, 0.0, 1.0);
+    color.rgb *= light + torchlight;
 
     if (textured) {
         color.rgb *= colorOffset.rgb;

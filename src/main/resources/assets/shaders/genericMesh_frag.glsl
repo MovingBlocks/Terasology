@@ -40,7 +40,7 @@ void main(){
 
     // Apply light
     float lightValue = expLightValue(light);
-    color.rgb *= clamp(lightValue + torchlight, 0.0, 1.0);
+    color.rgb *= lightValue + torchlight;
 
     if (textured) {
         color.rgb *= colorOffset.rgb;

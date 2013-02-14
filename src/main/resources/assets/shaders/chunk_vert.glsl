@@ -85,7 +85,6 @@ float calcWaterHeightAtOffset(vec2 worldPos) {
     return height / float(OCEAN_OCTAVES);
 }
 
-
 vec4 calcWaterNormalAndOffset(vec2 worldPosRaw) {
     float s11 = calcWaterHeightAtOffset(worldPosRaw.xy);
     float s01 = calcWaterHeightAtOffset(worldPosRaw.xy + normalDiffOffset.xy);
@@ -126,9 +125,11 @@ void main()
 	flickeringLightOffset = 0.0;
 #endif
 
-#ifdef ANIMATED_GRASS
+#if defined (ANIMATED_GRASS) || defined (ANIMATED_WATER)
     vec3 vertexChunkPos = vertexWorldPos.xyz + chunkOffset.xyz;
+#endif
 
+#ifdef ANIMATED_GRASS
     if (animated) {
         // GRASS ANIMATION
         if ( checkFlag(BLOCK_HINT_WAVING, blockHint) ) {
