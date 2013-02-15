@@ -172,7 +172,7 @@ public class EntityAwareWorldProvider extends AbstractWorldProviderDecorator imp
 
     @Override
     public boolean setBlock(Vector3i pos, Block type, Block oldType, EntityRef entity) {
-        if (super.setBlock(pos.x, pos.y, pos.z, type, oldType)) {
+        if (setBlock(pos.x, pos.y, pos.z, type, oldType)) {
             replaceEntityAt(pos, entity, type);
             return true;
         }
