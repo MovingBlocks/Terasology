@@ -35,14 +35,6 @@ public interface AudioManager {
 
     void setMute(boolean mute);
 
-    void setSoundVolume(float volume);
-
-    void setMusicVolume(float volume);
-
-    float getSoundVolume();
-
-    float getMusicVolume();
-
     void playSound(Sound sound);
 
     void playSound(Sound sound, float volume);

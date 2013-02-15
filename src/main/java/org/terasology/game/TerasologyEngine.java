@@ -27,8 +27,8 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.sources.ClasspathSource;
-import org.terasology.audio.NullAudioManager;
 import org.terasology.audio.AudioManager;
+import org.terasology.audio.NullAudioManager;
 import org.terasology.audio.openAL.OpenALManager;
 import org.terasology.config.InputConfig;
 import org.terasology.game.modes.GameState;
@@ -300,9 +300,7 @@ public class TerasologyEngine implements GameEngine {
         if (config.getSoundConfig().isDisableSound()) {
             audioManager = new NullAudioManager();
         } else {
-            audioManager = new OpenALManager();
-            audioManager.setSoundVolume(config.getSoundConfig().getSoundVolume());
-            audioManager.setMusicVolume(config.getSoundConfig().getMusicVolume());
+            audioManager = new OpenALManager(config.getSoundConfig());
         }
         CoreRegistry.put(AudioManager.class, audioManager);
     }

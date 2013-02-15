@@ -28,11 +28,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.audio.Sound;
 import org.terasology.audio.AudioManager;
+import org.terasology.config.SoundConfig;
 import org.terasology.math.Direction;
 import org.terasology.math.Side;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.HashMap;
@@ -51,8 +54,20 @@ public class OpenALManager implements AudioManager {
 
     private Vector3f listenerPosition = new Vector3f();
 
-    public OpenALManager() {
+    private PropertyChangeListener configListener = new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            if (evt.getPropertyName().equals(SoundConfig.MUSIC_VOLUME)) {
+                setMusicVolume((Float)evt.getNewValue());
+            } else if (evt.getPropertyName().equals(SoundConfig.SOUND_VOLUME)) {
+                setSoundVolume((Float)evt.getNewValue());
+            }
+        }
+    };
+
+    public OpenALManager(SoundConfig config) {
         logger.info("Initializing OpenAL audio manager");
+        config.subscribe(configListener);
         try {
             AL.create();
         } catch (LWJGLException e) {
@@ -89,6 +104,8 @@ public class OpenALManager implements AudioManager {
         // Initialize sound pools
         pools.put("sfx", new BasicSoundPool(30)); // effects pool
         pools.put("music", new BasicStreamingSoundPool(2)); // music pool
+        pools.get("sfx").setVolume(config.getSoundVolume());
+        pools.get("music").setVolume(config.getMusicVolume());
     }
 
     @Override
@@ -117,24 +134,12 @@ public class OpenALManager implements AudioManager {
         }
     }
 
-    @Override
-    public void setSoundVolume(float volume) {
+    private void setSoundVolume(float volume) {
         pools.get("sfx").setVolume(volume);
     }
 
-    @Override
-    public void setMusicVolume(float volume) {
+    private void setMusicVolume(float volume) {
         pools.get("music").setVolume(volume);
-    }
-
-    @Override
-    public float getSoundVolume() {
-        return pools.get("sfx").getVolume();
-    }
-
-    @Override
-    public float getMusicVolume() {
-        return pools.get("music").getVolume();
     }
 
     @Override

@@ -440,22 +440,6 @@ public final class Config {
     public void setComplexWater(boolean reflectwater) {
         _setting.getSystemBuilder().setReflectiveWater(reflectwater);
     }
-    
-    public int getMusicVolume() {
-        return _setting.getSystemBuilder().getMusicVolume();
-    }
-
-    public void setMusicVolume(int volume) {
-        _setting.getSystemBuilder().setMusicVolume(volume);
-    }
-    
-    public int getSoundVolume() {
-        return _setting.getSystemBuilder().getSoundVolume();
-    }
-
-    public void setSoundVolume(int volume) {
-        _setting.getSystemBuilder().setSoundVolume(volume);
-    }
 
     /* MODS */
     public List<String> getActiveMods() {

@@ -18,24 +18,6 @@ public class NullAudioManager implements AudioManager {
     }
 
     @Override
-    public void setSoundVolume(float volume) {
-    }
-
-    @Override
-    public void setMusicVolume(float volume) {
-    }
-
-    @Override
-    public float getSoundVolume() {
-        return 0;
-    }
-
-    @Override
-    public float getMusicVolume() {
-        return 0;
-    }
-
-    @Override
     public void playSound(Sound sound) {
     }
 
