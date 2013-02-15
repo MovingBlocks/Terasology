@@ -1,5 +1,0 @@
-{
-    "id" : "potions",
-    "displayName" : "Potion Pack",
-    "description" : "A small collection of potions"
-}

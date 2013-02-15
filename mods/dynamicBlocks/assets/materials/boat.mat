@@ -1,8 +1,0 @@
-{
-    "shader" : "engine:genericMesh",
-    "params" : {
-        "diffuse" : "dynamicBlocks:ice",
-        "colorOffset" : [1.0, 1.0, 1.0],
-        "textured" : true
-    }
-}

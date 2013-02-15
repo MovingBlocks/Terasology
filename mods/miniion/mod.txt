@@ -1,5 +1,0 @@
-{
-    "id" : "miniion",
-    "displayName" : "Miniions",
-    "description" : "A prototype of summonable, commandable minions"
-}
