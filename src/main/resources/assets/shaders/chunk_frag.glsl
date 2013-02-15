@@ -232,7 +232,7 @@ void main(){
     vec3 blocklightColorValue = vec3(blockBrightness) * vec3(1.0, 0.95, 0.94);
 
     if (isWater) {
-        color.xyz += vec4(WATER_COLOR) * WATER_AMB;
+        color.xyz += (vec4(WATER_COLOR) * WATER_AMB).xyz;
     }
 
     // Apply the final lighting mix
