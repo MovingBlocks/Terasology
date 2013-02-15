@@ -17,15 +17,15 @@ package org.terasology.componentSystem.action;
 
 import javax.vecmath.Vector3f;
 
+import org.terasology.audio.AudioManager;
 import org.terasology.audio.Sound;
 import org.terasology.components.actions.PlaySoundActionComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
+import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterComponentSystem;
 import org.terasology.events.ActivateEvent;
-import org.terasology.logic.manager.AudioManager;
-import org.terasology.logic.manager.SoundManager;
 import org.terasology.utilities.FastRandom;
 
 /**
@@ -35,6 +35,9 @@ import org.terasology.utilities.FastRandom;
 public class PlaySoundAction implements EventHandlerSystem {
 
     private FastRandom random = new FastRandom();
+
+    @In
+    private AudioManager audioManager;
 
     public void initialise() {
     }
@@ -60,7 +63,7 @@ public class PlaySoundAction implements EventHandlerSystem {
             if (pos == null) {
                 pos = event.getOrigin();
             }
-            AudioManager.play(sound, pos, playSound.volume, SoundManager.PRIORITY_NORMAL);
+            audioManager.playSound(sound, pos, playSound.volume, AudioManager.PRIORITY_NORMAL);
         }
     }
 }

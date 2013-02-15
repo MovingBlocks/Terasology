@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright 2013 Benjamin Glatzel <benjamin.glatzel@me.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,25 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.audio.events;
 
-package org.terasology.audio.loaders;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.List;
-
-import org.terasology.asset.AssetLoader;
-import org.terasology.asset.AssetUri;
-import org.terasology.audio.openAL.OggStreamingSound;
 import org.terasology.audio.Sound;
+import org.terasology.entitySystem.EntityRef;
 
 /**
  * @author Immortius
  */
-public class OggStreamingSoundLoader implements AssetLoader<Sound> {
-    @Override
-    public Sound load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
-        return new OggStreamingSound(uri, urls.get(0));
+public class PlaySoundEvent extends AbstractPlaySoundEvent {
+    protected PlaySoundEvent() {
     }
+
+    public PlaySoundEvent(Sound sound, float volume) {
+        super(sound, volume);
+    }
+
+    /**
+     * @param exceptOwner The sound is not sent to the owner of this entity.
+     * @param sound
+     * @param volume
+     */
+    public PlaySoundEvent(EntityRef exceptOwner, Sound sound, float volume) {
+        super(exceptOwner, sound, volume);
+    }
+
 }

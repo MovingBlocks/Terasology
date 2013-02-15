@@ -13,19 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.logic.manager;
+package org.terasology.audio;
 
-import org.terasology.asset.AssetUri;
-import org.terasology.audio.Sound;
-import org.terasology.audio.SoundPool;
-import org.terasology.audio.SoundSource;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
 // TODO: Rename this to AudioManager, and AudioManager to AudioManagerAbstract or something
-public interface SoundManager {
-    float MAX_DISTANCE = 50.0f;
+public interface AudioManager {
+    float MAX_DISTANCE = 100.0f;
     int PRIORITY_LOCKED = Integer.MAX_VALUE;
     int PRIORITY_HIGHEST = 100;
     int PRIORITY_HIGH = 10;
@@ -33,28 +31,37 @@ public interface SoundManager {
     int PRIORITY_LOW = 3;
     int PRIORITY_LOWEST = 1;
 
-    /**
-     * Initializes AudioManager
-     */
-    void initialize();
+    boolean isMute();
+
+    void setMute(boolean mute);
+
+    void playSound(Sound sound);
+
+    void playSound(Sound sound, float volume);
+
+    void playSound(Sound sound, float volume, int priority);
+
+    void playSound(Sound sound, Vector3f position);
+
+    void playSound(Sound sound, Vector3f position, float volume);
+
+    void playSound(Sound sound, Vector3f position, float volume, int priority);
+
+    void playMusic(Sound sound);
 
     /**
      * Update AudioManager sound sources
      * <p/>
      * Should be called in main game loop
      */
-    void update();
+    void update(float delta);
+
+    void updateListener(Vector3f position, Quat4f orientation, Vector3f velocity);
 
     /**
      * Gracefully destroy audio subsystem
      */
-    void destroy();
-
-    SoundPool getSoundPool(String pool);
-
-    SoundSource getSoundSource(String pool, AssetUri sound, int priority);
-
-    SoundSource getSoundSource(String pool, Sound sound, int priority);
+    void dispose();
 
     void stopAllSounds();
 }

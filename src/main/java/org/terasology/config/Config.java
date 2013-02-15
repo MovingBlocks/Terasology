@@ -41,6 +41,7 @@ public final class Config {
     private InputConfig input = new InputConfig();
     private ModConfig defaultModConfig = new ModConfig();
     private AdvancedConfig advanced = AdvancedConfig.createDefault();
+    private SoundConfig soundConfig = new SoundConfig();
 
     /**
      * Create a new, empty config
@@ -61,6 +62,10 @@ public final class Config {
     
     public AdvancedConfig getAdvancedConfig() {
         return advanced;
+    }
+
+    public SoundConfig getSoundConfig() {
+        return soundConfig;
     }
 
     /**

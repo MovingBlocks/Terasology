@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.audio;
+package org.terasology.audio.openAL;
 
 import static org.lwjgl.openal.AL10.AL_SIZE;
 import static org.lwjgl.openal.AL10.alGetBufferi;
@@ -23,8 +23,10 @@ import java.nio.ByteBuffer;
 
 import org.lwjgl.openal.AL10;
 import org.terasology.asset.AssetUri;
+import org.terasology.audio.Sound;
+import org.terasology.audio.openAL.OpenALException;
 
-public abstract class AbstractStreamingSound implements Sound {
+public abstract class OpenALStreamingSound implements Sound {
     private final static int BUFFER_POOL_SIZE = 3;
 
     private final AssetUri uri;
@@ -34,7 +36,7 @@ public abstract class AbstractStreamingSound implements Sound {
 
     protected int lastUpdatedBuffer;
 
-    public AbstractStreamingSound(AssetUri uri, URL source) {
+    public OpenALStreamingSound(AssetUri uri, URL source) {
         this.uri = uri;
         this.audioSource = source;
 

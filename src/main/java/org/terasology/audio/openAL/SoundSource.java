@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.audio;
+package org.terasology.audio.openAL;
 
-import javax.vecmath.Vector3d;
+import org.terasology.audio.Sound;
+
+import javax.vecmath.Vector3f;
 
 public interface SoundSource {
 
@@ -50,7 +52,7 @@ public interface SoundSource {
     /**
      * Update method, use it for position update, buffer switching, etc
      */
-    public void update();
+    public void update(float delta);
 
     /**
      * Returns audio length in seconds
@@ -110,14 +112,14 @@ public interface SoundSource {
      * @param pos
      * @return
      */
-    public SoundSource setPosition(Vector3d pos);
+    public SoundSource setPosition(Vector3f pos);
 
     /**
      * Returns sound position in space
      *
      * @return
      */
-    public Vector3d getPosition();
+    public Vector3f getPosition();
 
     /**
      * Set sound source velocity
@@ -126,14 +128,14 @@ public interface SoundSource {
      * @param velocity
      * @return
      */
-    public SoundSource setVelocity(Vector3d velocity);
+    public SoundSource setVelocity(Vector3f velocity);
 
     /**
      * Returns sound source velocity
      *
      * @return
      */
-    public Vector3d getVelocity();
+    public Vector3f getVelocity();
 
     /**
      * Set sound source direction in cartesian coordinates
@@ -141,14 +143,14 @@ public interface SoundSource {
      * @param direction
      * @return
      */
-    public SoundSource setDirection(Vector3d direction);
+    public SoundSource setDirection(Vector3f direction);
 
     /**
      * Returns sound source direction in cartesian coordinates
      *
      * @return
      */
-    public Vector3d getDirection();
+    public Vector3f getDirection();
 
     /**
      * Returns sound source pitch
@@ -171,6 +173,11 @@ public interface SoundSource {
      * @return
      */
     public float getGain();
+
+    /**
+     * Updates gain, used after pool volume is altered
+     */
+    public void updateGain();
 
     /**
      * Set sound source gain

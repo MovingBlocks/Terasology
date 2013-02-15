@@ -27,9 +27,11 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.sources.ClasspathSource;
+import org.terasology.audio.AudioManager;
+import org.terasology.audio.NullAudioManager;
+import org.terasology.audio.openAL.OpenALManager;
 import org.terasology.config.InputConfig;
 import org.terasology.game.modes.GameState;
-import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
@@ -84,6 +86,8 @@ public class TerasologyEngine implements GameEngine {
     private boolean running;
     private boolean disposed;
     private GameState pendingState;
+
+    private AudioManager audioManager;
 
     private Timer timer;
     private final ThreadPoolExecutor threadPool = (ThreadPoolExecutor) Executors.newCachedThreadPool();
@@ -255,10 +259,10 @@ public class TerasologyEngine implements GameEngine {
         if (!running) {
             disposed = true;
             initialised = false;
-            AudioManager.getInstance().destroy();
             Mouse.destroy();
             Keyboard.destroy();
             Display.destroy();
+            audioManager.dispose();
         }
     }
 
@@ -360,8 +364,13 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void initOpenAL() {
-        // TODO: Put in registry
-        AudioManager.getInstance().initialize();
+        org.terasology.config.Config config = CoreRegistry.get(org.terasology.config.Config.class);
+        if (config.getSoundConfig().isDisableSound()) {
+            audioManager = new NullAudioManager();
+        } else {
+            audioManager = new OpenALManager(config.getSoundConfig());
+        }
+        CoreRegistry.put(AudioManager.class, audioManager);
     }
 
     private void initDisplay() {
@@ -385,14 +394,14 @@ public class TerasologyEngine implements GameEngine {
     private void checkOpenGL() {
         boolean canRunGame =
                 GLContext.getCapabilities().OpenGL20
-                && GLContext.getCapabilities().OpenGL11
-                && GLContext.getCapabilities().OpenGL12
-                && GLContext.getCapabilities().OpenGL14
-                && GLContext.getCapabilities().OpenGL15
-                && GLContext.getCapabilities().GL_ARB_framebuffer_object
-                && GLContext.getCapabilities().GL_ARB_texture_float
-                && GLContext.getCapabilities().GL_ARB_half_float_pixel
-                && GLContext.getCapabilities().GL_ARB_shader_objects;
+                        && GLContext.getCapabilities().OpenGL11
+                        && GLContext.getCapabilities().OpenGL12
+                        && GLContext.getCapabilities().OpenGL14
+                        && GLContext.getCapabilities().OpenGL15
+                        && GLContext.getCapabilities().GL_ARB_framebuffer_object
+                        && GLContext.getCapabilities().GL_ARB_texture_float
+                        && GLContext.getCapabilities().GL_ARB_half_float_pixel
+                        && GLContext.getCapabilities().GL_ARB_shader_objects;
 
         if (!canRunGame) {
             final String message = "Your GPU driver is not supporting the mandatory versions of OpenGL or some needed OpenGL extension. Considered updating your GPU drivers? Exiting...";
@@ -503,7 +512,7 @@ public class TerasologyEngine implements GameEngine {
             PerformanceMonitor.endActivity();
 
             PerformanceMonitor.startActivity("Audio");
-            AudioManager.getInstance().update();
+            audioManager.update(timer.getDelta());
             PerformanceMonitor.endActivity();
 
             PerformanceMonitor.rollCycle();

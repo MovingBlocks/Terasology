@@ -17,6 +17,8 @@ package org.terasology.world.block;
 
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
+import org.terasology.audio.AudioManager;
 import org.terasology.componentSystem.items.ItemSystem;
 import org.terasology.components.BlockParticleEffectComponent;
 import org.terasology.components.HealthComponent;
@@ -36,7 +38,6 @@ import org.terasology.events.DamageEvent;
 import org.terasology.events.FullHealthEvent;
 import org.terasology.events.NoHealthEvent;
 import org.terasology.events.inventory.ReceiveItemEvent;
-import org.terasology.logic.manager.AudioManager;
 import org.terasology.math.Vector3i;
 import org.terasology.physics.ImpulseEvent;
 import org.terasology.utilities.FastRandom;
@@ -58,6 +59,9 @@ public class BlockEntitySystem implements EventHandlerSystem {
 
     @In
     private EntityManager entityManager;
+
+    @In
+    private AudioManager audioManager;
 
     private BlockItemFactory blockItemFactory;
     private DroppedBlockFactory droppedBlockFactory;
@@ -92,7 +96,7 @@ public class BlockEntitySystem implements EventHandlerSystem {
         entity.send( new BlockChangedEvent( blockComp.getPosition(), BlockManager.getInstance().getAir(), oldBlock) );
 
         // TODO: Configurable via block definition
-        AudioManager.play(new AssetUri(AssetType.SOUND, "engine:RemoveBlock"), 0.6f);
+        audioManager.playSound(Assets.getSound("engine:RemoveBlock"), 0.6f);
 
         if (oldBlock.getEntityMode() == BlockEntityMode.PERSISTENT) {
             entity.removeComponent(HealthComponent.class);
@@ -165,7 +169,7 @@ public class BlockEntitySystem implements EventHandlerSystem {
 
         // TODO: Don't play this if destroyed?
         // TODO: Configurable via block definition
-        AudioManager.play(new AssetUri(AssetType.SOUND, "engine:Dig"), 1.0f);
+        audioManager.playSound(Assets.getSound("engine:Dig"), 1.0f);
     }
 
 

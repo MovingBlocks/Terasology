@@ -18,12 +18,13 @@ package org.terasology.componentSystem.items;
 import com.google.common.collect.Lists;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
+import org.terasology.asset.Assets;
+import org.terasology.audio.AudioManager;
 import org.terasology.components.ItemComponent;
 import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.manager.AudioManager;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
@@ -51,6 +52,9 @@ public class ItemSystem implements EventHandlerSystem {
     private EntityManager entityManager;
     private WorldProvider worldProvider;
     private BlockEntityRegistry blockEntityRegistry;
+
+    @In
+    private AudioManager audioManager;
 
     @Override
     public void initialise() {
@@ -141,7 +145,7 @@ public class ItemSystem implements EventHandlerSystem {
         if (canPlaceBlock(block, targetBlock, placementPos)) {
             Block oldBlockType = BlockManager.getInstance().getBlock(worldProvider.getBlock(placementPos).getURI());
             if (blockEntityRegistry.setBlock(placementPos, block, worldProvider.getBlock(placementPos), blockItem.placedEntity)) {
-                AudioManager.play(new AssetUri(AssetType.SOUND, "engine:PlaceBlock"), 0.5f);
+                audioManager.playSound(Assets.getSound("engine:PlaceBlock"), 0.5f);
                 if (blockItem.placedEntity.exists()) {
                     blockItem.placedEntity = EntityRef.NULL;
                 }

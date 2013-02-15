@@ -24,7 +24,8 @@ import org.lwjgl.opengl.Display;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
-import org.terasology.logic.manager.AudioManager;
+import org.terasology.audio.AudioManager;
+import org.terasology.game.CoreRegistry;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
@@ -78,7 +79,7 @@ public class UISlider extends UIDisplayContainer {
             
             @Override
             public void enter(UIDisplayElement element) {
-                AudioManager.play(new AssetUri(AssetType.SOUND, "engine:click"), 1.0f);
+                CoreRegistry.get(AudioManager.class).playSound(Assets.getSound("engine:click"), 1.0f);
                 setBackgroundImage(new Vector2f(0f, 30f), new Vector2f(256f, 30f));
             }
 

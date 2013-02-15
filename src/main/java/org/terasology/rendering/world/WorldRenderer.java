@@ -15,52 +15,16 @@
  */
 package org.terasology.rendering.world;
 
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_FILL;
-import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
-import static org.lwjgl.opengl.GL11.GL_LINE;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glColorMask;
-import static org.lwjgl.opengl.GL11.glCullFace;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glPolygonMode;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-
-import java.awt.image.BufferedImage;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.nio.ByteBuffer;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.PriorityQueue;
-
-import javax.imageio.ImageIO;
-import javax.vecmath.Vector3f;
-
+import com.google.common.collect.Lists;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.Assets;
+import org.terasology.audio.AudioManager;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.controllers.LocalPlayerSystem;
-import org.terasology.rendering.logic.MeshRenderer;
 import org.terasology.components.PlayerComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.game.ComponentSystemManager;
@@ -68,7 +32,6 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.Timer;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.manager.PostProcessingRenderer;
@@ -83,6 +46,7 @@ import org.terasology.physics.BulletPhysics;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.DefaultCamera;
+import org.terasology.rendering.logic.MeshRenderer;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.shader.ShaderProgram;
@@ -104,7 +68,42 @@ import org.terasology.world.chunks.store.ChunkStoreGZip;
 import org.terasology.world.chunks.store.ChunkStoreProtobuf;
 import org.terasology.world.generator.core.ChunkGeneratorManager;
 
-import com.google.common.collect.Lists;
+import javax.imageio.ImageIO;
+import javax.vecmath.Vector3f;
+import java.awt.image.BufferedImage;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.PriorityQueue;
+
+import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_FILL;
+import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
+import static org.lwjgl.opengl.GL11.GL_LINE;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glColorMask;
+import static org.lwjgl.opengl.GL11.glCullFace;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glPolygonMode;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
 
 /**
  * The world of Terasology. At its most basic the world contains chunks (consisting of a fixed amount of blocks)
@@ -180,10 +179,10 @@ public final class WorldRenderer {
     /* OTHER SETTINGS */
     private boolean _wireframe;
     //for soundtrack
-    private static short playround; 
+    private static short playround;
 
     private ComponentSystemManager _systemManager;
-    
+
     private ChunkStore loadChunkStore(File file) throws IOException {
         FileInputStream fileIn = null;
         ObjectInputStream in = null;
@@ -199,7 +198,7 @@ public final class WorldRenderer {
                 ((ChunkStoreProtobuf) cache).setup();
             else
                 logger.warn("Chunk store might not have been initialized: {}", cache.getClass().getName());
-            
+
             return cache;
 
         } catch (ClassNotFoundException e) {
@@ -259,7 +258,7 @@ public final class WorldRenderer {
         // TODO: won't need localPlayerSystem here once camera is in the ES proper
         localPlayerSystem.setPlayerCamera(_defaultCamera);
         _systemManager = CoreRegistry.get(ComponentSystemManager.class);
-        
+
 
         initTimeEvents();
     }
@@ -379,17 +378,20 @@ public final class WorldRenderer {
      * Creates the world time events to play the game's soundtrack at specific times.
      */
     public void initTimeEvents() {
-    	
+
+        final AudioManager audioManager = CoreRegistry.get(AudioManager.class);
+
         // SUNRISE
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.1, true) {
             @Override
             public void run() {
-            	if(getPlayerPosition().y<50)
-            		AudioManager.playMusic("engine:SpacialWinds");
-            	else if(getPlayerPosition().y>175)
-            		AudioManager.playMusic("engine:Heaven");
-            	else
-            		AudioManager.playMusic("engine:Sunrise");
+                if (getPlayerPosition().y < 50) {
+                    audioManager.playMusic(Assets.getMusic("engine:SpacialWinds"));
+                } else if (getPlayerPosition().y > 175) {
+                    audioManager.playMusic(Assets.getMusic("engine:Heaven"));
+                } else {
+                    audioManager.playMusic(Assets.getMusic("engine:Sunrise"));
+                }
             }
         });
 
@@ -397,12 +399,13 @@ public final class WorldRenderer {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.25, true) {
             @Override
             public void run() {
-            	if(getPlayerPosition().y<50)
-            		AudioManager.playMusic("engine:DwarfForge");
-            	else if(getPlayerPosition().y>175)
-            		AudioManager.playMusic("engine:SpaceExplorers");
-            	else
-                AudioManager.playMusic("engine:Afternoon");
+                if (getPlayerPosition().y < 50) {
+                    audioManager.playMusic(Assets.getMusic("engine:DwarfForge"));
+                } else if (getPlayerPosition().y > 175) {
+                    audioManager.playMusic(Assets.getMusic("engine:SpaceExplorers"));
+                } else {
+                    audioManager.playMusic(Assets.getMusic("engine:Afternoon"));
+                }
             }
         });
 
@@ -410,12 +413,13 @@ public final class WorldRenderer {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.4, true) {
             @Override
             public void run() {
-            	if(getPlayerPosition().y<50)
-            		AudioManager.playMusic("engine:OrcFortress");
-            	else if(getPlayerPosition().y>175)
-            		AudioManager.playMusic("engine:PeacefulWorld");
-            	else
-            		AudioManager.playMusic("engine:Sunset");
+                if (getPlayerPosition().y < 50) {
+                    audioManager.playMusic(Assets.getMusic("engine:OrcFortress"));
+                } else if (getPlayerPosition().y > 175) {
+                    audioManager.playMusic(Assets.getMusic("engine:PeacefulWorld"));
+                } else {
+                    audioManager.playMusic(Assets.getMusic("engine:Sunset"));
+                }
             }
         });
 
@@ -423,12 +427,13 @@ public final class WorldRenderer {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.6, true) {
             @Override
             public void run() {
-            	if(getPlayerPosition().y<50)
-            		AudioManager.playMusic("engine:CreepyCaves");
-            	else if(getPlayerPosition().y>175)
-            		AudioManager.playMusic("engine:ShootingStars");
-            	else
-            		AudioManager.playMusic("engine:Dimlight");
+                if (getPlayerPosition().y < 50) {
+                    audioManager.playMusic(Assets.getMusic("engine:CreepyCaves"));
+                } else if (getPlayerPosition().y > 175) {
+                    audioManager.playMusic(Assets.getMusic("engine:ShootingStars"));
+                } else {
+                    audioManager.playMusic(Assets.getMusic("engine:Dimlight"));
+                }
             }
         });
 
@@ -436,12 +441,13 @@ public final class WorldRenderer {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.75, true) {
             @Override
             public void run() {
-            	if(getPlayerPosition().y<50)
-            		AudioManager.playMusic("engine:CreepyCaves");
-            	else if(getPlayerPosition().y>175)
-            		AudioManager.playMusic("engine:NightTheme");
-            	else
-            		AudioManager.playMusic("engine:OtherSide");
+                if (getPlayerPosition().y < 50) {
+                    audioManager.playMusic(Assets.getMusic("engine:CreepyCaves"));
+                } else if (getPlayerPosition().y > 175) {
+                    audioManager.playMusic(Assets.getMusic("engine:NightTheme"));
+                } else {
+                    audioManager.playMusic(Assets.getMusic("engine:OtherSide"));
+                }
             }
         });
 
@@ -449,12 +455,13 @@ public final class WorldRenderer {
         _worldTimeEventManager.addWorldTimeEvent(new WorldTimeEvent(0.9, true) {
             @Override
             public void run() {
-            	if(getPlayerPosition().y<50)
-            		AudioManager.playMusic("engine:CreepyCaves");
-            	else if(getPlayerPosition().y>175)
-            		AudioManager.playMusic("engine:Heroes");
-            	else
-            		AudioManager.playMusic("engine:Resurface");
+                if (getPlayerPosition().y < 50) {
+                    audioManager.playMusic(Assets.getMusic("engine:CreepyCaves"));
+                } else if (getPlayerPosition().y > 175) {
+                    audioManager.playMusic(Assets.getMusic("engine:Heroes"));
+                } else {
+                    audioManager.playMusic(Assets.getMusic("engine:Resurface"));
+                }
             }
         });
     }
@@ -608,7 +615,7 @@ public final class WorldRenderer {
             renderDebugCollision(camera);
         }
 
-        boolean headUnderWater =_cameraMode == CAMERA_MODE.PLAYER && isUnderWater();
+        boolean headUnderWater = _cameraMode == CAMERA_MODE.PLAYER && isUnderWater();
 
         if (_wireframe)
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -747,7 +754,7 @@ public final class WorldRenderer {
             ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("chunk");
             // Transfer the world offset of the chunk to the shader for various effects
             shader.setFloat3("chunkOffset", (float) (chunk.getPos().x * Chunk.SIZE_X), (float) (chunk.getPos().y * Chunk.SIZE_Y), (float) (chunk.getPos().z * Chunk.SIZE_Z));
-            shader.setFloat("animated", chunk.getAnimated() ? 1.0f: 0.0f);
+            shader.setFloat("animated", chunk.getAnimated() ? 1.0f : 0.0f);
 
             if (clipPos) {
                 shader.setFloat("clipHeightPos", camera.getClipHeight());
@@ -950,7 +957,7 @@ public final class WorldRenderer {
             logger.error("Failed to save world manifest", e);
         }
 
-        AudioManager.getInstance().stopAllSounds();
+        CoreRegistry.get(AudioManager.class).stopAllSounds();
 
         chunkStore.dispose();
         // TODO: this should be elsewhere, perhaps within the chunk cache.
@@ -1057,7 +1064,7 @@ public final class WorldRenderer {
 
     @Override
     public String toString() {
-        return String.format("world (numdropped: %d, biome: %s, time: %.2f, exposure: %.2f, sun: %.2f, cache: %fMb, dirty: %d, ign: %d, vis: %d, tri: %d, empty: %d, !ready: %d, seed: \"%s\", title: \"%s\")", ((MeshRenderer)CoreRegistry.get(ComponentSystemManager.class).get("engine:MeshRenderer")).lastRendered, getPlayerBiome(), _worldProvider.getTimeInDays(), PostProcessingRenderer.getInstance().getExposure(), _skysphere.getSunPosAngle(), _chunkProvider.size(), _statDirtyChunks, _statIgnoredPhases, _statVisibleChunks, _statRenderedTriangles, _statChunkMeshEmpty, _statChunkNotReady, _worldProvider.getSeed(), _worldProvider.getTitle());
+        return String.format("world (numdropped: %d, biome: %s, time: %.2f, exposure: %.2f, sun: %.2f, cache: %fMb, dirty: %d, ign: %d, vis: %d, tri: %d, empty: %d, !ready: %d, seed: \"%s\", title: \"%s\")", ((MeshRenderer) CoreRegistry.get(ComponentSystemManager.class).get("engine:MeshRenderer")).lastRendered, getPlayerBiome(), _worldProvider.getTimeInDays(), PostProcessingRenderer.getInstance().getExposure(), _skysphere.getSunPosAngle(), _chunkProvider.size(), _statDirtyChunks, _statIgnoredPhases, _statVisibleChunks, _statRenderedTriangles, _statChunkMeshEmpty, _statChunkNotReady, _worldProvider.getSeed(), _worldProvider.getTitle());
     }
 
     public LocalPlayer getPlayer() {

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.audio;
+package org.terasology.audio.openAL;
 
 import static org.lwjgl.openal.AL10.AL_FALSE;
 import static org.lwjgl.openal.AL10.AL_GAIN;
@@ -21,10 +21,11 @@ import static org.lwjgl.openal.AL10.AL_LOOPING;
 import static org.lwjgl.openal.AL10.AL_MAX_DISTANCE;
 import static org.lwjgl.openal.AL10.AL_PLAYING;
 import static org.lwjgl.openal.AL10.AL_REFERENCE_DISTANCE;
+import static org.lwjgl.openal.AL10.AL_ROLLOFF_FACTOR;
+import static org.lwjgl.openal.AL10.AL_SOURCE_RELATIVE;
 import static org.lwjgl.openal.AL10.AL_SOURCE_STATE;
 import static org.lwjgl.openal.AL10.AL_TRUE;
 import static org.lwjgl.openal.AL10.alGenSources;
-import static org.lwjgl.openal.AL10.alGetSourcef;
 import static org.lwjgl.openal.AL10.alGetSourcei;
 import static org.lwjgl.openal.AL10.alSource3f;
 import static org.lwjgl.openal.AL10.alSourceRewind;
@@ -32,16 +33,18 @@ import static org.lwjgl.openal.AL10.alSourceStop;
 import static org.lwjgl.openal.AL10.alSourcef;
 import static org.lwjgl.openal.AL10.alSourcei;
 
-import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
 
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.AL11;
+import org.terasology.audio.Sound;
+import org.terasology.audio.AudioManager;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.manager.SoundManager;
 import org.terasology.rendering.world.WorldRenderer;
 
 public class BasicSoundSource implements SoundSource {
+
+    private SoundPool owningPool;
 
     protected Sound audio;
     protected int sourceId;
@@ -50,32 +53,27 @@ public class BasicSoundSource implements SoundSource {
     protected float targetGain = 1.0f;
     protected boolean fade = false;
 
-    protected Vector3d position = new Vector3d();
-    protected Vector3d velocity = new Vector3d();
-    protected Vector3d direction = new Vector3d();
+    protected Vector3f position = new Vector3f();
+    protected Vector3f velocity = new Vector3f();
+    protected Vector3f direction = new Vector3f();
 
     protected boolean absolutePosition = false;
 
-    protected boolean _playing = false;
+    protected boolean playing = false;
 
-    public BasicSoundSource() {
+    public BasicSoundSource(SoundPool pool) {
+        this.owningPool = pool;
         sourceId = alGenSources();
         OpenALException.checkState("Creating sound source");
 
         reset();
     }
 
-    public BasicSoundSource(Sound audio) {
-        this();
-
-        setAudio(audio);
-    }
-
     @Override
     public SoundSource play() {
         if (!isPlaying()) {
             AL10.alSourcePlay(getSourceId());
-            _playing = true;
+            playing = true;
         }
 
         return this;
@@ -88,14 +86,13 @@ public class BasicSoundSource implements SoundSource {
         }
 
         alSourceStop(getSourceId());
-
-        OpenALException.checkState("Rewind");
-
-        alSourceRewind(getSourceId());
-
         OpenALException.checkState("Stop playback");
 
-        _playing = false;
+        alSourceRewind(getSourceId());
+        OpenALException.checkState("Rewind");
+
+
+        playing = false;
 
         return this;
     }
@@ -107,7 +104,7 @@ public class BasicSoundSource implements SoundSource {
 
             OpenALException.checkState("Pause playback");
 
-            _playing = false;
+            playing = false;
         }
 
         return this;
@@ -115,23 +112,18 @@ public class BasicSoundSource implements SoundSource {
 
     @Override
     public boolean isPlaying() {
-        return alGetSourcei(sourceId, AL_SOURCE_STATE) == AL_PLAYING || _playing;
+        return alGetSourcei(sourceId, AL_SOURCE_STATE) == AL_PLAYING || playing;
     }
 
     @Override
-    public void update() {
-        updateFade();
-
-        if (absolutePosition) {
-            updatePosition(position);
-        }
-
+    public void update(float delta) {
+        updateFade(delta);
         updateState();
     }
 
     protected void updateState() {
-        if (_playing && alGetSourcei(sourceId, AL_SOURCE_STATE) != AL_PLAYING) {
-            _playing = false; // sound stop playing
+        if (playing && alGetSourcei(sourceId, AL_SOURCE_STATE) != AL_PLAYING) {
+            playing = false; // sound stop playing
         }
     }
 
@@ -140,16 +132,18 @@ public class BasicSoundSource implements SoundSource {
         setPitch(1.0f);
         setLooping(false);
         setGain(1.0f);
-        setAbsolute(false);
+        setAbsolute(true);
 
-        Vector3d zeroVector = new Vector3d();
+        Vector3f zeroVector = new Vector3f();
         setPosition(zeroVector);
         setVelocity(zeroVector);
         setDirection(zeroVector);
 
         // some additional settings
-        alSourcef(getSourceId(), AL_MAX_DISTANCE, SoundManager.MAX_DISTANCE);
-        alSourcef(getSourceId(), AL_REFERENCE_DISTANCE, 0.1f);
+        alSourcef(getSourceId(), AL_MAX_DISTANCE, AudioManager.MAX_DISTANCE);
+        alSourcef(getSourceId(), AL_REFERENCE_DISTANCE, 1f);
+        AL10.alSourcei(getSourceId(), AL_SOURCE_RELATIVE, AL_FALSE);
+        AL10.alSourcef(getSourceId(), AL_ROLLOFF_FACTOR, 0.25f);
 
         fade = false;
         srcGain = 1.0f;
@@ -214,6 +208,7 @@ public class BasicSoundSource implements SoundSource {
     @Override
     public SoundSource setAbsolute(boolean absolute) {
         absolutePosition = absolute;
+        AL10.alSourcei(getSourceId(), AL_SOURCE_RELATIVE, (absolute) ? AL_FALSE : AL_TRUE);
 
         return this;
     }
@@ -224,19 +219,19 @@ public class BasicSoundSource implements SoundSource {
     }
 
     @Override
-    public Vector3d getVelocity() {
+    public Vector3f getVelocity() {
         return velocity;
     }
 
     @Override
-    public SoundSource setVelocity(Vector3d velocity) {
+    public SoundSource setVelocity(Vector3f velocity) {
         if (velocity == null || this.velocity.equals(velocity)) {
             return this;
         }
 
         this.velocity.set(velocity);
 
-        AL10.alSource3f(getSourceId(), AL10.AL_VELOCITY, (float) velocity.x, (float) velocity.y, (float) velocity.z);
+        AL10.alSource3f(getSourceId(), AL10.AL_VELOCITY, velocity.x, velocity.y, velocity.z);
 
         OpenALException.checkState("Setting sound source velocity");
 
@@ -244,30 +239,31 @@ public class BasicSoundSource implements SoundSource {
     }
 
     @Override
-    public Vector3d getPosition() {
+    public Vector3f getPosition() {
         return position;
     }
 
     @Override
-    public SoundSource setPosition(Vector3d position) {
+    public SoundSource setPosition(Vector3f position) {
         if (position == null || this.position.equals(position)) {
             return this;
         }
 
         this.position.set(position);
+        alSource3f(getSourceId(), AL10.AL_POSITION, position.x, position.y, position.z);
 
-        updatePosition(position);
+        OpenALException.checkState("Changing sound position");
 
         return this;
     }
 
     @Override
-    public SoundSource setDirection(Vector3d direction) {
+    public SoundSource setDirection(Vector3f direction) {
         if (direction == null || this.direction.equals(direction)) {
             return this;
         }
 
-        AL10.alSource3f(getSourceId(), AL10.AL_DIRECTION, (float) direction.x, (float) direction.y, (float) direction.z);
+        AL10.alSource3f(getSourceId(), AL10.AL_DIRECTION, direction.x, direction.y, direction.z);
 
         OpenALException.checkState("Setting sound source direction");
 
@@ -277,7 +273,7 @@ public class BasicSoundSource implements SoundSource {
     }
 
     @Override
-    public Vector3d getDirection() {
+    public Vector3f getDirection() {
         return direction;
     }
 
@@ -297,12 +293,20 @@ public class BasicSoundSource implements SoundSource {
 
     @Override
     public float getGain() {
-        return alGetSourcef(getSourceId(), AL_GAIN);
+        return srcGain;
+    }
+
+    @Override
+    public void updateGain() {
+        alSourcef(getSourceId(), AL_GAIN, srcGain * owningPool.getVolume());
+
+        OpenALException.checkState("Setting sound gain");
     }
 
     @Override
     public SoundSource setGain(float gain) {
-        alSourcef(getSourceId(), AL_GAIN, gain);
+        srcGain = gain;
+        alSourcef(getSourceId(), AL_GAIN, gain * owningPool.getVolume());
 
         OpenALException.checkState("Setting sound gain");
 
@@ -332,7 +336,7 @@ public class BasicSoundSource implements SoundSource {
 
         reset();
 
-        if (sound instanceof AbstractSound) {
+        if (sound instanceof OpenALSound) {
             audio = sound;
             AL10.alSourcei(getSourceId(), AL10.AL_BUFFER, audio.getBufferId());
 
@@ -355,7 +359,6 @@ public class BasicSoundSource implements SoundSource {
 
     @Override
     public SoundSource fade(float targetGain) {
-        srcGain = getGain();
         this.targetGain = targetGain;
         fade = true;
 
@@ -366,34 +369,18 @@ public class BasicSoundSource implements SoundSource {
         return sourceId;
     }
 
-    protected void updatePosition(Vector3d position) {
-        float[] pos = new float[]{(float) position.x, (float) position.y, (float) position.z};
-
-        if (isAbsolute()) {
-            Vector3f cameraPos = getCameraPosition();
-            pos[0] -= cameraPos.x;
-            pos[1] -= cameraPos.y;
-            pos[2] -= cameraPos.z;
-        }
-
-        alSource3f(getSourceId(), AL10.AL_POSITION, pos[0], pos[1], pos[2]);
-
-        OpenALException.checkState("Changing sound position");
-    }
-
-    private void updateFade() {
+    private void updateFade(float delta) {
         if (!fade) {
             return;
         }
 
-        float delta = (srcGain - targetGain) / 100;
-        setGain(getGain() - delta);
-
-        if (getGain() >= targetGain) {
-            if (targetGain == 0.0f) {
-                stop();
-            }
-
+        float newGain = Math.max(targetGain, srcGain - delta);
+        if (newGain == 0.0f) {
+            stop();
+        } else {
+            setGain(newGain);
+        }
+        if (targetGain == newGain) {
             fade = false;
         }
     }
