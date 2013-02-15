@@ -48,23 +48,14 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.Field;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.FileHandler;
-import java.util.logging.Formatter;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
 
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
@@ -160,6 +151,7 @@ public class TerasologyEngine implements GameEngine {
 
     private void initLogger() {
         if (LWJGLUtil.DEBUG) {
+            // Pipes System.out and err to log, because that's where lwjgl writes it to.
             System.setOut(new PrintStream(System.out) {
                 private Logger logger = LoggerFactory.getLogger("org.lwjgl");
 
@@ -176,61 +168,6 @@ public class TerasologyEngine implements GameEngine {
                     logger.error(message);
                 }
             });
-        }
-        File dirPath = PathManager.getInstance().getLogPath();
-
-        if (!dirPath.exists()) {
-            if (!dirPath.mkdirs()) {
-                return;
-            }
-        }
-
-        try {
-            java.util.logging.Logger.getLogger("").getHandlers()[0].setLevel(Level.FINE);
-            java.util.logging.Logger.getLogger("org.terasology").setLevel(Level.INFO);
-            java.util.logging.Logger.getLogger("").getHandlers()[0].setFormatter(new Formatter() {
-                DateFormat dateFormat = new SimpleDateFormat("MM-dd HH:mm:ss");
-
-                @Override
-                public String format(LogRecord record) {
-                    String thrownMessage = "";
-                    if (record.getThrown() != null) {
-                        try {
-                            StringWriter sw = new StringWriter();
-                            PrintWriter pw = new PrintWriter(sw);
-                            record.getThrown().printStackTrace(pw);
-                            pw.close();
-                            thrownMessage = sw.toString();
-                        } catch (Exception ex) {
-                        }
-                    }
-                    return String.format("[%s] (%s)\t%s:%s() - %s (Thread: %d)\n%s", record.getLevel().getLocalizedName(), dateFormat.format(new Date(record.getMillis())), record.getLoggerName(), record.getSourceMethodName(), formatMessage(record), record.getThreadID(), thrownMessage);
-                }
-            });
-            FileHandler fh = new FileHandler(new File(dirPath, "Terasology.log").getAbsolutePath(), false);
-            fh.setLevel(Level.INFO);
-            fh.setFormatter(new Formatter() {
-                DateFormat dateFormat = new SimpleDateFormat("MM-dd HH:mm:ss");
-
-                @Override
-                public String format(LogRecord record) {
-                    String thrownMessage = "";
-                    if (record.getThrown() != null) {
-                        try {
-                            StringWriter sw = new StringWriter();
-                            PrintWriter pw = new PrintWriter(sw);
-                            record.getThrown().printStackTrace(pw);
-                            pw.close();
-                            thrownMessage = sw.toString();
-                        } catch (Exception ex) {
-                        }
-                    }
-                    return String.format("[%s] (%s)\t%s:%s() - %s\n%s", record.getLevel().getLocalizedName(), dateFormat.format(new Date(record.getMillis())), record.getLoggerName(), record.getSourceMethodName(), formatMessage(record), thrownMessage);
-                }
-            });
-            java.util.logging.Logger.getLogger("").addHandler(fh);
-        } catch (IOException ex) {
-            logger.error("Failed to set up logging to file", ex);
         }
     }
 
