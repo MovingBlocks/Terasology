@@ -346,6 +346,30 @@ public final class Config {
         _setting.getSystemBuilder().setAnimatedGrass(animatedGrass);
     }
 
+    public boolean isAnimatedWater() {
+        return _setting.getSystemBuilder().getAnimatedWater();
+    }
+
+    public void setAnimatedWater(boolean animatedWater) {
+        _setting.getSystemBuilder().setAnimatedWater(animatedWater);
+    }
+
+    public boolean isRefractiveWater() {
+        return _setting.getSystemBuilder().getRefractiveWater();
+    }
+
+    public void setRefractiveWater(boolean refr) {
+        _setting.getSystemBuilder().setRefractiveWater(refr);
+    }
+
+    public int getOceanOctaves() {
+        return _setting.getSystemBuilder().getOceanOctaves();
+    }
+
+    public void setOceanOctaves(int octaves) {
+        _setting.getSystemBuilder().setOceanOctaves(octaves);
+    }
+
     public int getVerticalChunkMeshSegments() {
         return _setting.getSystemBuilder().getVerticalChunkMeshSegments();
     }
@@ -398,28 +422,16 @@ public final class Config {
         return _setting.getSystemBuilder().getBlurIntensity();
     }
 
+    public int getBlurRadius() {
+        return Math.max(getBlurIntensity(), 1);
+    }
+
     public boolean isComplexWater() {
         return _setting.getSystemBuilder().getReflectiveWater();
     }
 
     public void setComplexWater(boolean reflectwater) {
         _setting.getSystemBuilder().setReflectiveWater(reflectwater);
-    }
-    
-    public int getMusicVolume() {
-        return _setting.getSystemBuilder().getMusicVolume();
-    }
-
-    public void setMusicVolume(int volume) {
-        _setting.getSystemBuilder().setMusicVolume(volume);
-    }
-    
-    public int getSoundVolume() {
-        return _setting.getSystemBuilder().getSoundVolume();
-    }
-
-    public void setSoundVolume(int volume) {
-        _setting.getSystemBuilder().setSoundVolume(volume);
     }
 
     public void setVignette(boolean vignette) {
@@ -444,6 +456,14 @@ public final class Config {
 
     public boolean isSSAO() {
         return _setting.getSystemBuilder().getSsao();
+    }
+
+    public void setLightShafts(boolean lightShafts) {
+        _setting.getSystemBuilder().setLightShafts(lightShafts);
+    }
+
+    public boolean isLightShafts() {
+        return _setting.getSystemBuilder().getLightShafts();
     }
 
     public void setOutline(boolean outline) {

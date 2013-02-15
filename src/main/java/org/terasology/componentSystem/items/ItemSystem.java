@@ -15,36 +15,32 @@
  */
 package org.terasology.componentSystem.items;
 
-import javax.vecmath.Vector3f;
-
+import com.google.common.collect.Lists;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
-import org.terasology.components.HealthComponent;
+import org.terasology.asset.Assets;
+import org.terasology.audio.AudioManager;
 import org.terasology.components.ItemComponent;
-import org.terasology.math.TeraMath;
-import org.terasology.world.block.BlockComponent;
-import org.terasology.world.block.BlockItemComponent;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.EventHandlerSystem;
-import org.terasology.entitySystem.EventPriority;
-import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterComponentSystem;
+import org.terasology.entitySystem.*;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.events.ActivateEvent;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.manager.AudioManager;
 import org.terasology.math.Side;
+import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.StandardCollisionGroup;
+import org.terasology.world.BlockChangedEvent;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockComponent;
+import org.terasology.world.block.BlockItemComponent;
 import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.family.ConnectToAdjacentBlockFamily;
+import org.terasology.world.block.management.BlockManager;
 
-import com.google.common.collect.Lists;
 
 /**
  * TODO: Refactor use methods into events? Usage should become a separate component
@@ -56,6 +52,9 @@ public class ItemSystem implements EventHandlerSystem {
     private EntityManager entityManager;
     private WorldProvider worldProvider;
     private BlockEntityRegistry blockEntityRegistry;
+
+    @In
+    private AudioManager audioManager;
 
     @Override
     public void initialise() {
@@ -80,7 +79,7 @@ public class ItemSystem implements EventHandlerSystem {
         Side surfaceDir = Side.inDirection(event.getHitNormal());
         Side secondaryDirection = TeraMath.getSecondaryPlacementDirection(event.getDirection(), event.getHitNormal());
 
-        if (!placeBlock(blockItem.blockFamily, event.getTarget().getComponent(BlockComponent.class).getPosition(), surfaceDir, secondaryDirection, blockItem)) {
+        if (!placeBlock(blockItem.blockFamily, event.getTarget().getComponent(BlockComponent.class).getPosition(), surfaceDir, secondaryDirection, blockItem, item)) {
             event.cancel();
         }
     }
@@ -124,23 +123,35 @@ public class ItemSystem implements EventHandlerSystem {
      * @param type The type of the block
      * @return True if a block was placed
      */
-    private boolean placeBlock(BlockFamily type, Vector3i targetBlock, Side surfaceDirection, Side secondaryDirection, BlockItemComponent blockItem) {
+    private boolean placeBlock(BlockFamily type, Vector3i targetBlock, Side surfaceDirection, Side secondaryDirection, BlockItemComponent blockItem, EntityRef item ) {
         if (type == null)
             return true;
 
         Vector3i placementPos = new Vector3i(targetBlock);
-        placementPos.add(surfaceDirection.getVector3i());
+        if (!worldProvider.getBlock(targetBlock).isReplacementAllowed())
+            placementPos.add(surfaceDirection.getVector3i());
 
-        Block block = type.getBlockFor(surfaceDirection, secondaryDirection);
+        Block block = null;
+
+        if( type instanceof ConnectToAdjacentBlockFamily){
+            block = ( (ConnectToAdjacentBlockFamily) type ).getBlockFor(placementPos, worldProvider);
+        }else{
+            block = type.getBlockFor(surfaceDirection, secondaryDirection);
+        }
+
         if (block == null)
             return false;
 
         if (canPlaceBlock(block, targetBlock, placementPos)) {
+            Block oldBlockType = BlockManager.getInstance().getBlock(worldProvider.getBlock(placementPos).getURI());
             if (blockEntityRegistry.setBlock(placementPos, block, worldProvider.getBlock(placementPos), blockItem.placedEntity)) {
-                AudioManager.play(new AssetUri(AssetType.SOUND, "engine:PlaceBlock"), 0.5f);
+                audioManager.playSound(Assets.getSound("engine:PlaceBlock"), 0.5f);
                 if (blockItem.placedEntity.exists()) {
                     blockItem.placedEntity = EntityRef.NULL;
                 }
+
+                item.saveComponent(new BlockComponent());
+                item.send( new BlockChangedEvent( placementPos, block, oldBlockType) );
                 return true;
             }
         }
@@ -150,15 +161,16 @@ public class ItemSystem implements EventHandlerSystem {
     private boolean canPlaceBlock(Block block, Vector3i targetBlock, Vector3i blockPos) {
         Block centerBlock = worldProvider.getBlock(targetBlock.x, targetBlock.y, targetBlock.z);
 
-        if (!centerBlock.isAttachmentAllowed()) {
-            return false;
-        }
+        if (!centerBlock.isReplacementAllowed()) {
+            if (!centerBlock.isAttachmentAllowed()) {
+                return false;
+            }
 
-        Block adjBlock = worldProvider.getBlock(blockPos.x, blockPos.y, blockPos.z);
-        if (!adjBlock.isReplacementAllowed() || adjBlock.isTargetable()) {
-            return false;
+            Block adjBlock = worldProvider.getBlock(blockPos.x, blockPos.y, blockPos.z);
+            if (!adjBlock.isReplacementAllowed() || adjBlock.isTargetable()) {
+                return false;
+            }
         }
-
         // Prevent players from placing blocks inside their bounding boxes
         if (!block.isPenetrable()) {
             return !CoreRegistry.get(BulletPhysics.class).scanArea(block.getBounds(blockPos), Lists.<CollisionGroup>newArrayList(StandardCollisionGroup.DEFAULT, StandardCollisionGroup.CHARACTER)).iterator().hasNext();

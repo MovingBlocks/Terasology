@@ -15,13 +15,17 @@
  */
 
 uniform sampler2D texScene;
-uniform sampler2D texEdges;
 #ifdef SSAO
 uniform sampler2D texSsao;
 #endif
 #ifdef OUTLINE
+uniform sampler2D texEdges;
+
 uniform float outlineDepthThreshold = 0.1;
 uniform float outlineThickness = 1.0;
+#endif
+#ifdef LIGHT_SHAFTS
+uniform sampler2D texLightShafts;
 #endif
 
 #define OUTLINE_COLOR 0.0, 0.0, 0.0
@@ -39,5 +43,10 @@ void main() {
     color.rgb = (1.0 - outline) * color.rgb + outline * vec3(OUTLINE_COLOR);
 #endif
 
-    gl_FragData[0].rgba = color;
+#ifdef LIGHT_SHAFTS
+    vec4 colorShafts = texture2D(texLightShafts, gl_TexCoord[0].xy);
+    color.rgb += colorShafts.rgb;
+#endif
+
+    gl_FragData[0].rgba = color.rgba;
 }

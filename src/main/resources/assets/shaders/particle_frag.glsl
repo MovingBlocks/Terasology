@@ -22,10 +22,8 @@ uniform float texOffsetY = 0.0;
 
 uniform vec3 colorOffset = vec3(1.0, 1.0, 1.0);
 
-uniform bool carryingTorch = false;
-
 varying vec3 normal;
-varying vec4 vertexWorldPos;
+varying vec4 vertexViewPos;
 
 void main(){
     vec4 color = texture2D(textureAtlas, vec2(gl_TexCoord[0].x + texOffsetX , gl_TexCoord[0].y + texOffsetY ));
@@ -34,11 +32,11 @@ void main(){
 
     // Apply torchlight
     if (carryingTorch) {
-        torchlight = calcTorchlight(1.0, vertexWorldPos.xyz);
+        torchlight = calcTorchlight(1.0, vertexViewPos.xyz);
     }
 
     color.rgb *= colorOffset.rgb;
-    color.rgb *= clamp(light + torchlight, 0.0, 1.0);
+    color.rgb *= light + torchlight;
 
     gl_FragData[0].rgba = color;
     gl_FragData[1].rgba = vec4(normal.x / 2.0 + 0.5, normal.y / 2.0 + 0.5, normal.z / 2.0 + 0.5, 0.0f);

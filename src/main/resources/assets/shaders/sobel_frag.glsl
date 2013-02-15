@@ -15,12 +15,17 @@
  */
 
 uniform sampler2D texDepth;
-uniform sampler2D texEdges;
+
 uniform float texelWidth;
 uniform float texelHeight;
 
+uniform float pixelOffsetX;
+uniform float pixelOffsetY;
+
+uniform float threshold;
+
 float fetchDepth(float x, float y) {
-    return linDepth(texture2D(texDepth, gl_TexCoord[0].xy + vec2(x*texelWidth, y*texelHeight)).x);
+    return linDepth(texture2D(texDepth, gl_TexCoord[0].xy + vec2(x*texelWidth*pixelOffsetX, y*texelHeight*pixelOffsetY)).x);
 }
 
 void main() {
@@ -39,5 +44,10 @@ void main() {
     gy = -1.0*depthMatrix[0][0]-2.0*depthMatrix[0][1]-1.0*depthMatrix[0][2]+1.0*depthMatrix[2][0]+2.0*depthMatrix[2][1]+1.0*depthMatrix[2][2];
 
     float result = sqrt(gx*gx + gy*gy);
-    gl_FragData[0].rgba = vec4(result, result, result, 1.0);
+
+    if (result > threshold) {
+        gl_FragData[0].rgba = vec4(0.0, 0.0, 0.0, 1.0);
+    } else {
+        gl_FragData[0].rgba = vec4(result, result, result, 1.0);
+    }
 }

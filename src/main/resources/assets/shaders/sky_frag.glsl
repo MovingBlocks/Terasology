@@ -17,61 +17,57 @@
 varying	vec3 colorYxy;
 varying vec3 skyVec;
 varying vec3 skyVecR;
-varying	vec4 McPosition;
-varying	float lv;
-uniform	vec4 sunPos;
+varying	vec4 position;
 
-uniform samplerCube texCubeSky;
-uniform samplerCube texCubeStars;
+uniform sampler2D texSky180;
+uniform sampler2D texSky90;
 
-vec4 eyePos = vec4(0.0, 0.0, 0.0, 1.0);
-uniform float colorExp = 12.0;
+uniform float colorExp;
+uniform vec3 zenith;
 
-vec3 convertColor() {
-    if (colorYxy == vec3(0.0, 0.0, 0.0))
-        return vec3(0.0, 0.0, 0.0);
+uniform float sunExponent;
+uniform float moonExponent;
 
-    vec3 clrYxy = vec3(colorYxy);
-    clrYxy.x = 1.0 - exp (-clrYxy.x / colorExp);
+const vec4 eyePos = vec4(0.0, 0.0, 0.0, 1.0);
 
-    float ratio = clrYxy.x / clrYxy.z;
-
-    vec3 XYZ;
-
-    XYZ.x = clrYxy.y * ratio;					// X = x * ratio
-    XYZ.y = clrYxy.x;							// Y = Y
-    XYZ.z = ratio - XYZ.x - XYZ.y;				// Z = ratio - X - Y
-
-    const vec3 rCoeffs = vec3 (3.240479, -1.53715, -0.49853);
-    const vec3 gCoeffs = vec3 (-0.969256, 1.875991, 0.041556);
-    const vec3 bCoeffs = vec3 (0.055684, -0.204043, 1.057311);
-
-    return vec3 (dot(rCoeffs, XYZ), dot(gCoeffs, XYZ), dot(bCoeffs, XYZ));
-}
+#define HIGHLIGHT_BLEND_START 0.1
 
 void main () {
-    vec3 v = normalize ( McPosition.xyz );
-    vec3 l;
+    vec3 v = normalize (position.xyz);
+    vec3 l = normalize (sunVec.xyz);
 
-    if (daylight > 0.0)
-       l = normalize (sunPos.xyz);
-    else
-       l = normalize (-sunPos.xyz);
+    float lDotV = dot(l, v);
+    float negLDotV = dot(-l, v);
 
-    float sunHighlight = pow(max(0.0, dot(l, v)), 1024.0) * 16.0;
-    float posSunY = 0.0;
-
-    if (sunPos.y > 0.0){
-        posSunY = sunPos.y;
+    float sunHighlight = 0.0;
+    if (lDotV >= 0.0 && l.y >= 0.0) {
+       sunHighlight = pow(lDotV, sunExponent) * 16.0;
+    }
+    if (l.y < HIGHLIGHT_BLEND_START && l.y >= 0.0) {
+       sunHighlight *= 1.0 - (HIGHLIGHT_BLEND_START - l.y) / HIGHLIGHT_BLEND_START;
     }
 
-    /* ALPHA STARRY NIGHT */
-    float alpha  = clamp((0.7 - posSunY) * (1.0 - lv), 0.0, 1.0);
+    float moonHighlight = 0.0;
+    if (negLDotV >= 0.0 && -l.y >= 0.0) {
+       moonHighlight = pow(negLDotV, moonExponent);
+    }
+    if (-l.y < HIGHLIGHT_BLEND_START && -l.y >= 0.0) {
+       moonHighlight *= 1.0 - (HIGHLIGHT_BLEND_START + l.y) / HIGHLIGHT_BLEND_START;
+    }
 
-    vec4 skyColor = vec4(clamp(convertColor(), 0.0, 1.0) + sunHighlight, 1.0);
-    skyColor += daylight * textureCube (texCubeSky, skyVec);
-    skyColor += alpha * textureCube (texCubeStars, skyVecR);
+    float blendNight = clamp((0.707 - sunVec.y) * (1.0 - lDotV), 0.0, 1.0);
 
-    gl_FragData[0].rgba = skyColor;
-    gl_FragData[1].rgba = vec4(0, 0, 0, 0);
+    vec4 skyColor = vec4(0);
+
+    /* PROCEDURAL SKY COLOR */
+    vec4 cloudsColor = texture2D(texSky180, gl_TexCoord[0].xy);
+    vec4 cloudsColorNight =  texture2D(texSky90, gl_TexCoord[0].xy);
+
+    skyColor += vec4(convertColorYxy(colorYxy, colorExp) + (1.0 - cloudsColor.r) * sunHighlight + (1.0 - cloudsColor.r) * moonHighlight, 1.0);
+
+    /* DAY AND NIGHT TEXTURES */
+    skyColor.rgb += (daylight * cloudsColor.rgb + blendNight * cloudsColorNight.rgb);
+
+    gl_FragData[0].rgba = skyColor.rgba;
+    gl_FragData[1].rgba = vec4(0.0, 0.0, 0.0, 1.0);
 }

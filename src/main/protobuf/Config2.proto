@@ -68,8 +68,6 @@ message Setting {
         optional int32 vertical_chunk_mesh_segments = 20 [default = 1];
         optional int32 blur_intensity = 21 [default = 3];  // 0-4 Off, Some, Normal, Max
         optional bool reflective_water = 22 [default = false];
-        optional int32 music_volume = 23 [default = 100];
-        optional int32 sound_volume = 24 [default = 100];
         optional bool vignette = 25 [default = false];
 		optional bool eye_adapation = 26 [default = false];
 		optional bool bloom = 27 [default = false];
@@ -77,6 +75,10 @@ message Setting {
 		optional bool ssao = 29 [default = false];
 		optional bool film_grain = 30 [default = false];
 		optional bool outline = 31 [default = true];
+		optional bool light_shafts = 32 [default = false];
+		optional bool animated_water = 33 [default = false];
+		optional uint32 ocean_octaves = 34 [default = 8];
+		optional bool refractive_water = 35 [default = false];
     }
 
     optional World world = 1;

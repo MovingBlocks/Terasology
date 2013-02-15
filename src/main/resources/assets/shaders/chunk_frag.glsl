@@ -22,19 +22,53 @@
 #define MOONLIGHT_AMBIENT_COLOR 0.8, 0.8, 1.0
 #define NIGHT_BRIGHTNESS 0.05
 #define WATER_COLOR_SWIMMING 0.8, 1.0, 1.0, 0.975
-#define WATER_COLOR 0.8, 1.0, 1.0, 0.75
-#define REFLECTION_COLOR 1.0, 1.0, 1.0, 1.0
+#define WATER_COLOR 0.75, 0.8, 1.0, 1.0
 
 #define TORCH_WATER_SPEC 8.0
 #define TORCH_WATER_DIFF 0.7
 #define TORCH_BLOCK_SPEC 0.7
 #define TORCH_BLOCK_DIFF 1.0
+#define WATER_AMB 0.1
 #define WATER_SPEC 2.0
 #define WATER_DIFF 1.0
-#define BLOCK_DIFF 0.6
+#define BLOCK_DIFF 0.75
 #define BLOCK_AMB 1.0
 
-#define WATER_REFRACTION 0.1
+varying vec4 vertexWorldPos;
+varying vec4 vertexViewPos;
+varying vec4 vertexProjPos;
+varying vec3 normal;
+varying vec3 waterNormalWorldSpace;
+
+varying vec3 sunVecView;
+
+varying float flickeringLightOffset;
+varying float blockHint;
+varying float isUpside;
+
+varying float distance;
+
+uniform vec4 lightingSettingsFrag;
+#define torchSpecExp lightingSettingsFrag.x
+#define torchWaterSpecExp lightingSettingsFrag.y
+#define waterSpecExp lightingSettingsFrag.z
+
+uniform vec3 skyInscatteringColor;
+
+uniform vec4 skyInscatteringSettingsFrag;
+#define skyInscatteringExponent skyInscatteringSettingsFrag.x
+#define skyInscatteringStrength skyInscatteringSettingsFrag.y
+#define skyInscatteringLength skyInscatteringSettingsFrag.z
+
+uniform vec4 waterSettingsFrag;
+#define waterNormalBias waterSettingsFrag.x
+#define waterRefraction waterSettingsFrag.y
+#ifdef REFRACTIVE_WATER
+#define waterFresnelBias waterSettingsFrag.z
+#define waterFresnelPow waterSettingsFrag.w
+
+uniform sampler2D textureWaterRefraction;
+#endif
 
 uniform sampler2D textureAtlas;
 uniform sampler2D textureWaterNormal;
@@ -42,56 +76,59 @@ uniform sampler2D textureLava;
 uniform sampler2D textureEffects;
 uniform sampler2D textureWaterReflection;
 
-uniform float clipHeight = 0.0;
-
-uniform bool carryingTorch;
-
-varying vec4 vertexWorldPosRaw;
-varying vec4 vertexWorldPos;
-varying vec4 vertexPos;
-varying vec3 lightDir;
-varying vec3 normal;
-varying vec3 waterNormal;
-
-varying float flickeringLightOffset;
-varying float blockHint;
-varying float isUpside;
+uniform float clipHeightPos = 0.0;
+uniform float clipHeightNeg = 0.0;
 
 void main(){
-	if (clipHeight > 0.0 && vertexWorldPosRaw.y < clipHeight && !swimming) {
+	if (clipHeightPos > 0.001 && vertexWorldPos.y < clipHeightPos) {
         discard;
 	}
 
+    if (clipHeightNeg > 0.001 && vertexWorldPos.y > clipHeightNeg) {
+        discard;
+    }
+
     vec2 texCoord = gl_TexCoord[0].xy;
 
-    vec3 normalizedVPos = -normalize(vertexWorldPos.xyz);
-    vec3 normalWater;
+    vec3 normalizedVPos = -normalize(vertexViewPos.xyz);
+    vec3 normalWater = waterNormalWorldSpace;
     bool isWater = false;
 
-    vec3 finalLightDir = lightDir;
+    vec3 sunVecViewAdjusted = sunVecView;
 
     /* DAYLIGHT BECOMES... MOONLIGHT! */
-    /* Now featuring linear interpolation to make the transition smoother... :-) */
+    // Now featuring linear interpolation to make the transition smoother... :-)
     if (daylight < 0.1)
-        finalLightDir = mix(finalLightDir * -1.0, finalLightDir, daylight / 0.1);
+        sunVecViewAdjusted = mix(sunVecViewAdjusted * -1.0, sunVecViewAdjusted, daylight / 0.1);
 
     vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
 
     /* WATER */
     if ( checkFlag(BLOCK_HINT_WATER, blockHint) ) {
-        vec2 waterOffset = vec2(vertexWorldPosRaw.x + timeToTick(time, 0.1), vertexWorldPosRaw.z + timeToTick(time, 0.1)) / 8.0;
-        normalWater.xyz = texture2D(textureWaterNormal, waterOffset).xyz * 2.0 - 1.0;
+        vec2 waterOffset = vec2(vertexWorldPos.x + timeToTick(time, 0.1), vertexWorldPos.z + timeToTick(time, 0.1)) / 8.0;
+        vec2 waterOffset2 = vec2(vertexWorldPos.x + timeToTick(time, 0.1), vertexWorldPos.z - timeToTick(time, 0.1)) / 16.0;
+
+        vec2 normalOffset = (texture2D(textureWaterNormal, waterOffset).xyz * 2.0 - 1.0).xy * waterNormalBias;
+        normalOffset += (texture2D(textureWaterNormal, waterOffset2).xyz * 2.0 - 1.0).xy * waterNormalBias;
+
+        normalWater.xy += normalOffset;
+        normalWater = normalize(normalWater);
 
        // Enable reflection only when not swimming and for blocks on sea level
         if (!swimming && isUpside > 0.99) {
-            if ( vertexWorldPosRaw.y < 32.5 && vertexWorldPosRaw.y > 31.5) {
-                vec2 projectedPos = 0.5 * (vertexPos.st/vertexPos.q) + vec2(0.5);
+            if ( vertexWorldPos.y < 32.5 && vertexWorldPos.y > 31.5) {
+                vec2 projectedPos = 0.5 * (vertexProjPos.xy/vertexProjPos.w) + vec2(0.5);
 
-                // Fresnel
-                float refractionFactor = WATER_REFRACTION * clamp(1.0 - length(vertexWorldPos.xyz) / 50.0, 0.25, 1.0);
-                vec4 reflectionColor = vec4(texture2D(textureWaterReflection, projectedPos + normalWater.xy * refractionFactor).xyz, 1.0);
-                float f = fresnel(max(dot(normalizedVPos, waterNormal), 0.0), 0.1, 5.0);
-                color = mix(reflectionColor * vec4(WATER_COLOR), reflectionColor * vec4(REFLECTION_COLOR), f);
+                vec4 reflectionColor = vec4(texture2D(textureWaterReflection, projectedPos + normalOffset.xy * waterRefraction).xyz, 1.0);
+
+#ifdef REFRACTIVE_WATER
+                /* FRESNEL */
+                vec4 refractionColor = vec4(texture2D(textureWaterRefraction, projectedPos + normalOffset.xy * waterRefraction).xyz, 1.0);
+                float f = fresnel(dot(waterNormalWorldSpace, normalizedVPos), waterFresnelBias, waterFresnelPow);
+                color = mix(refractionColor * vec4(WATER_COLOR), reflectionColor * vec4(WATER_COLOR), f);
+#else
+                color = reflectionColor  * vec4(WATER_COLOR);
+#endif
             } else {
                 color = vec4(WATER_COLOR);
             }
@@ -147,9 +184,9 @@ void main(){
     float diffuseLighting;
 
     if (isWater) {
-        diffuseLighting = calcLambLight(normalWater, normalizedVPos);
+        diffuseLighting = calcLambLight(waterNormalWorldSpace, sunVecViewAdjusted);
     } else {
-        diffuseLighting = calcLambLight(normal, finalLightDir);
+        diffuseLighting = calcLambLight(normal, sunVecViewAdjusted);
     }
 
     float torchlight = 0.0;
@@ -158,10 +195,10 @@ void main(){
     if (carryingTorch) {
         if (isWater)
             torchlight = calcTorchlight(calcLambLight(normalWater, normalizedVPos) * TORCH_WATER_DIFF
-            + TORCH_WATER_SPEC * calcSpecLightWithOffset(normal, normalizedVPos, normalizedVPos, 16.0, normalWater), vertexWorldPos.xyz);
+            + TORCH_WATER_SPEC * calcSpecLight(normal, normalizedVPos, normalizedVPos, torchWaterSpecExp), vertexViewPos.xyz);
         else
             torchlight = calcTorchlight(calcLambLight(normal, normalizedVPos) * TORCH_BLOCK_DIFF
-            + TORCH_BLOCK_SPEC * calcSpecLight(normal, normalizedVPos, normalizedVPos, 32.0), vertexWorldPos.xyz);
+            + TORCH_BLOCK_SPEC * calcSpecLight(normal, normalizedVPos, normalizedVPos, torchSpecExp), vertexViewPos.xyz);
     }
 
     vec3 daylightColorValue;
@@ -170,7 +207,7 @@ void main(){
     if (isWater) {
         /* WATER NEEDS DIFFUSE AND SPECULAR LIGHT */
         daylightColorValue = vec3(diffuseLighting) * WATER_DIFF;
-        daylightColorValue += calcSpecLightWithOffset(normal, finalLightDir, normalizedVPos, 64.0, normalWater) * WATER_SPEC;
+        daylightColorValue += calcSpecLight(normalWater, sunVecViewAdjusted, normalizedVPos, waterSpecExp) * WATER_SPEC;
     } else {
         /* DEFAULT LIGHTING ONLY CONSIST OF DIFFUSE AND AMBIENT LIGHT */
         daylightColorValue = vec3(BLOCK_AMB + diffuseLighting * BLOCK_DIFF);
@@ -194,8 +231,16 @@ void main(){
     // Calculate the final blocklight color value and add a slight reddish tint to it
     vec3 blocklightColorValue = vec3(blockBrightness) * vec3(1.0, 0.95, 0.94);
 
+    if (isWater) {
+        color.xyz += (vec4(WATER_COLOR) * WATER_AMB).xyz;
+    }
+
     // Apply the final lighting mix
     color.xyz *= max(daylightColorValue, blocklightColorValue) * occlusionValue;
+
+    vec3 finalInscatteringColor = convertColorYxy(skyInscatteringColor, skyInscatteringExponent);
+    float fogValue = skyInscatteringStrength - clamp((viewingDistance - distance) / (viewingDistance - (1.0 - skyInscatteringLength) * viewingDistance), 0.0, skyInscatteringStrength);
+    color = mix(color, vec4(finalInscatteringColor, 1.0), fogValue);
 
     gl_FragData[0].rgba = color;
     gl_FragData[1].rgba = vec4(normal.x / 2.0 + 0.5, normal.y / 2.0 + 0.5, normal.z / 2.0 + 0.5, 0.0f);

@@ -111,6 +111,7 @@ public class BlockMeshPart {
         for (int i = 0; i < newVertices.length; ++i) {
             newVertices[i] = QuaternionUtil.quatRotate(rotation, vertices[i], new Vector3f());
             newNormals[i] = QuaternionUtil.quatRotate(rotation, normals[i], new Vector3f());
+            newNormals[i].normalize();
         }
 
         return new BlockMeshPart(newVertices, newNormals, texCoords, indices);

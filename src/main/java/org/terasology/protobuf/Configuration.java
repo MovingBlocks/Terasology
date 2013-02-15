@@ -2903,14 +2903,6 @@ public final class Configuration {
       boolean hasReflectiveWater();
       boolean getReflectiveWater();
       
-      // optional int32 music_volume = 23 [default = 100];
-      boolean hasMusicVolume();
-      int getMusicVolume();
-      
-      // optional int32 sound_volume = 24 [default = 100];
-      boolean hasSoundVolume();
-      int getSoundVolume();
-      
       // optional bool vignette = 25 [default = false];
       boolean hasVignette();
       boolean getVignette();
@@ -2938,6 +2930,22 @@ public final class Configuration {
       // optional bool outline = 31 [default = true];
       boolean hasOutline();
       boolean getOutline();
+      
+      // optional bool light_shafts = 32 [default = false];
+      boolean hasLightShafts();
+      boolean getLightShafts();
+      
+      // optional bool animated_water = 33 [default = false];
+      boolean hasAnimatedWater();
+      boolean getAnimatedWater();
+      
+      // optional uint32 ocean_octaves = 34 [default = 8];
+      boolean hasOceanOctaves();
+      int getOceanOctaves();
+      
+      // optional bool refractive_water = 35 [default = false];
+      boolean hasRefractiveWater();
+      boolean getRefractiveWater();
     }
     public static final class System extends
         com.google.protobuf.GeneratedMessage
@@ -3941,31 +3949,11 @@ public final class Configuration {
         return reflectiveWater_;
       }
       
-      // optional int32 music_volume = 23 [default = 100];
-      public static final int MUSIC_VOLUME_FIELD_NUMBER = 23;
-      private int musicVolume_;
-      public boolean hasMusicVolume() {
-        return ((bitField0_ & 0x00040000) == 0x00040000);
-      }
-      public int getMusicVolume() {
-        return musicVolume_;
-      }
-      
-      // optional int32 sound_volume = 24 [default = 100];
-      public static final int SOUND_VOLUME_FIELD_NUMBER = 24;
-      private int soundVolume_;
-      public boolean hasSoundVolume() {
-        return ((bitField0_ & 0x00080000) == 0x00080000);
-      }
-      public int getSoundVolume() {
-        return soundVolume_;
-      }
-      
       // optional bool vignette = 25 [default = false];
       public static final int VIGNETTE_FIELD_NUMBER = 25;
       private boolean vignette_;
       public boolean hasVignette() {
-        return ((bitField0_ & 0x00100000) == 0x00100000);
+        return ((bitField0_ & 0x00040000) == 0x00040000);
       }
       public boolean getVignette() {
         return vignette_;
@@ -3975,7 +3963,7 @@ public final class Configuration {
       public static final int EYE_ADAPATION_FIELD_NUMBER = 26;
       private boolean eyeAdapation_;
       public boolean hasEyeAdapation() {
-        return ((bitField0_ & 0x00200000) == 0x00200000);
+        return ((bitField0_ & 0x00080000) == 0x00080000);
       }
       public boolean getEyeAdapation() {
         return eyeAdapation_;
@@ -3985,7 +3973,7 @@ public final class Configuration {
       public static final int BLOOM_FIELD_NUMBER = 27;
       private boolean bloom_;
       public boolean hasBloom() {
-        return ((bitField0_ & 0x00400000) == 0x00400000);
+        return ((bitField0_ & 0x00100000) == 0x00100000);
       }
       public boolean getBloom() {
         return bloom_;
@@ -3995,7 +3983,7 @@ public final class Configuration {
       public static final int MOTION_BLUR_FIELD_NUMBER = 28;
       private boolean motionBlur_;
       public boolean hasMotionBlur() {
-        return ((bitField0_ & 0x00800000) == 0x00800000);
+        return ((bitField0_ & 0x00200000) == 0x00200000);
       }
       public boolean getMotionBlur() {
         return motionBlur_;
@@ -4005,7 +3993,7 @@ public final class Configuration {
       public static final int SSAO_FIELD_NUMBER = 29;
       private boolean ssao_;
       public boolean hasSsao() {
-        return ((bitField0_ & 0x01000000) == 0x01000000);
+        return ((bitField0_ & 0x00400000) == 0x00400000);
       }
       public boolean getSsao() {
         return ssao_;
@@ -4015,7 +4003,7 @@ public final class Configuration {
       public static final int FILM_GRAIN_FIELD_NUMBER = 30;
       private boolean filmGrain_;
       public boolean hasFilmGrain() {
-        return ((bitField0_ & 0x02000000) == 0x02000000);
+        return ((bitField0_ & 0x00800000) == 0x00800000);
       }
       public boolean getFilmGrain() {
         return filmGrain_;
@@ -4025,10 +4013,50 @@ public final class Configuration {
       public static final int OUTLINE_FIELD_NUMBER = 31;
       private boolean outline_;
       public boolean hasOutline() {
-        return ((bitField0_ & 0x04000000) == 0x04000000);
+        return ((bitField0_ & 0x01000000) == 0x01000000);
       }
       public boolean getOutline() {
         return outline_;
+      }
+      
+      // optional bool light_shafts = 32 [default = false];
+      public static final int LIGHT_SHAFTS_FIELD_NUMBER = 32;
+      private boolean lightShafts_;
+      public boolean hasLightShafts() {
+        return ((bitField0_ & 0x02000000) == 0x02000000);
+      }
+      public boolean getLightShafts() {
+        return lightShafts_;
+      }
+      
+      // optional bool animated_water = 33 [default = false];
+      public static final int ANIMATED_WATER_FIELD_NUMBER = 33;
+      private boolean animatedWater_;
+      public boolean hasAnimatedWater() {
+        return ((bitField0_ & 0x04000000) == 0x04000000);
+      }
+      public boolean getAnimatedWater() {
+        return animatedWater_;
+      }
+      
+      // optional uint32 ocean_octaves = 34 [default = 8];
+      public static final int OCEAN_OCTAVES_FIELD_NUMBER = 34;
+      private int oceanOctaves_;
+      public boolean hasOceanOctaves() {
+        return ((bitField0_ & 0x08000000) == 0x08000000);
+      }
+      public int getOceanOctaves() {
+        return oceanOctaves_;
+      }
+      
+      // optional bool refractive_water = 35 [default = false];
+      public static final int REFRACTIVE_WATER_FIELD_NUMBER = 35;
+      private boolean refractiveWater_;
+      public boolean hasRefractiveWater() {
+        return ((bitField0_ & 0x10000000) == 0x10000000);
+      }
+      public boolean getRefractiveWater() {
+        return refractiveWater_;
       }
       
       private void initFields() {
@@ -4050,8 +4078,6 @@ public final class Configuration {
         verticalChunkMeshSegments_ = 1;
         blurIntensity_ = 3;
         reflectiveWater_ = false;
-        musicVolume_ = 100;
-        soundVolume_ = 100;
         vignette_ = false;
         eyeAdapation_ = false;
         bloom_ = false;
@@ -4059,6 +4085,10 @@ public final class Configuration {
         ssao_ = false;
         filmGrain_ = false;
         outline_ = true;
+        lightShafts_ = false;
+        animatedWater_ = false;
+        oceanOctaves_ = 8;
+        refractiveWater_ = false;
       }
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
@@ -4127,31 +4157,37 @@ public final class Configuration {
           output.writeBool(22, reflectiveWater_);
         }
         if (((bitField0_ & 0x00040000) == 0x00040000)) {
-          output.writeInt32(23, musicVolume_);
-        }
-        if (((bitField0_ & 0x00080000) == 0x00080000)) {
-          output.writeInt32(24, soundVolume_);
-        }
-        if (((bitField0_ & 0x00100000) == 0x00100000)) {
           output.writeBool(25, vignette_);
         }
-        if (((bitField0_ & 0x00200000) == 0x00200000)) {
+        if (((bitField0_ & 0x00080000) == 0x00080000)) {
           output.writeBool(26, eyeAdapation_);
         }
-        if (((bitField0_ & 0x00400000) == 0x00400000)) {
+        if (((bitField0_ & 0x00100000) == 0x00100000)) {
           output.writeBool(27, bloom_);
         }
-        if (((bitField0_ & 0x00800000) == 0x00800000)) {
+        if (((bitField0_ & 0x00200000) == 0x00200000)) {
           output.writeBool(28, motionBlur_);
         }
-        if (((bitField0_ & 0x01000000) == 0x01000000)) {
+        if (((bitField0_ & 0x00400000) == 0x00400000)) {
           output.writeBool(29, ssao_);
         }
-        if (((bitField0_ & 0x02000000) == 0x02000000)) {
+        if (((bitField0_ & 0x00800000) == 0x00800000)) {
           output.writeBool(30, filmGrain_);
         }
-        if (((bitField0_ & 0x04000000) == 0x04000000)) {
+        if (((bitField0_ & 0x01000000) == 0x01000000)) {
           output.writeBool(31, outline_);
+        }
+        if (((bitField0_ & 0x02000000) == 0x02000000)) {
+          output.writeBool(32, lightShafts_);
+        }
+        if (((bitField0_ & 0x04000000) == 0x04000000)) {
+          output.writeBool(33, animatedWater_);
+        }
+        if (((bitField0_ & 0x08000000) == 0x08000000)) {
+          output.writeUInt32(34, oceanOctaves_);
+        }
+        if (((bitField0_ & 0x10000000) == 0x10000000)) {
+          output.writeBool(35, refractiveWater_);
         }
         getUnknownFields().writeTo(output);
       }
@@ -4236,39 +4272,47 @@ public final class Configuration {
         }
         if (((bitField0_ & 0x00040000) == 0x00040000)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeInt32Size(23, musicVolume_);
+            .computeBoolSize(25, vignette_);
         }
         if (((bitField0_ & 0x00080000) == 0x00080000)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeInt32Size(24, soundVolume_);
+            .computeBoolSize(26, eyeAdapation_);
         }
         if (((bitField0_ & 0x00100000) == 0x00100000)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeBoolSize(25, vignette_);
+            .computeBoolSize(27, bloom_);
         }
         if (((bitField0_ & 0x00200000) == 0x00200000)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeBoolSize(26, eyeAdapation_);
+            .computeBoolSize(28, motionBlur_);
         }
         if (((bitField0_ & 0x00400000) == 0x00400000)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeBoolSize(27, bloom_);
+            .computeBoolSize(29, ssao_);
         }
         if (((bitField0_ & 0x00800000) == 0x00800000)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeBoolSize(28, motionBlur_);
+            .computeBoolSize(30, filmGrain_);
         }
         if (((bitField0_ & 0x01000000) == 0x01000000)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeBoolSize(29, ssao_);
+            .computeBoolSize(31, outline_);
         }
         if (((bitField0_ & 0x02000000) == 0x02000000)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeBoolSize(30, filmGrain_);
+            .computeBoolSize(32, lightShafts_);
         }
         if (((bitField0_ & 0x04000000) == 0x04000000)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeBoolSize(31, outline_);
+            .computeBoolSize(33, animatedWater_);
+        }
+        if (((bitField0_ & 0x08000000) == 0x08000000)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeUInt32Size(34, oceanOctaves_);
+        }
+        if (((bitField0_ & 0x10000000) == 0x10000000)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeBoolSize(35, refractiveWater_);
         }
         size += getUnknownFields().getSerializedSize();
         memoizedSerializedSize = size;
@@ -4435,24 +4479,28 @@ public final class Configuration {
           bitField0_ = (bitField0_ & ~0x00010000);
           reflectiveWater_ = false;
           bitField0_ = (bitField0_ & ~0x00020000);
-          musicVolume_ = 100;
-          bitField0_ = (bitField0_ & ~0x00040000);
-          soundVolume_ = 100;
-          bitField0_ = (bitField0_ & ~0x00080000);
           vignette_ = false;
-          bitField0_ = (bitField0_ & ~0x00100000);
+          bitField0_ = (bitField0_ & ~0x00040000);
           eyeAdapation_ = false;
-          bitField0_ = (bitField0_ & ~0x00200000);
+          bitField0_ = (bitField0_ & ~0x00080000);
           bloom_ = false;
-          bitField0_ = (bitField0_ & ~0x00400000);
+          bitField0_ = (bitField0_ & ~0x00100000);
           motionBlur_ = false;
-          bitField0_ = (bitField0_ & ~0x00800000);
+          bitField0_ = (bitField0_ & ~0x00200000);
           ssao_ = false;
-          bitField0_ = (bitField0_ & ~0x01000000);
+          bitField0_ = (bitField0_ & ~0x00400000);
           filmGrain_ = false;
-          bitField0_ = (bitField0_ & ~0x02000000);
+          bitField0_ = (bitField0_ & ~0x00800000);
           outline_ = true;
+          bitField0_ = (bitField0_ & ~0x01000000);
+          lightShafts_ = false;
+          bitField0_ = (bitField0_ & ~0x02000000);
+          animatedWater_ = false;
           bitField0_ = (bitField0_ & ~0x04000000);
+          oceanOctaves_ = 8;
+          bitField0_ = (bitField0_ & ~0x08000000);
+          refractiveWater_ = false;
+          bitField0_ = (bitField0_ & ~0x10000000);
           return this;
         }
         
@@ -4570,39 +4618,47 @@ public final class Configuration {
           if (((from_bitField0_ & 0x00040000) == 0x00040000)) {
             to_bitField0_ |= 0x00040000;
           }
-          result.musicVolume_ = musicVolume_;
+          result.vignette_ = vignette_;
           if (((from_bitField0_ & 0x00080000) == 0x00080000)) {
             to_bitField0_ |= 0x00080000;
           }
-          result.soundVolume_ = soundVolume_;
+          result.eyeAdapation_ = eyeAdapation_;
           if (((from_bitField0_ & 0x00100000) == 0x00100000)) {
             to_bitField0_ |= 0x00100000;
           }
-          result.vignette_ = vignette_;
+          result.bloom_ = bloom_;
           if (((from_bitField0_ & 0x00200000) == 0x00200000)) {
             to_bitField0_ |= 0x00200000;
           }
-          result.eyeAdapation_ = eyeAdapation_;
+          result.motionBlur_ = motionBlur_;
           if (((from_bitField0_ & 0x00400000) == 0x00400000)) {
             to_bitField0_ |= 0x00400000;
           }
-          result.bloom_ = bloom_;
+          result.ssao_ = ssao_;
           if (((from_bitField0_ & 0x00800000) == 0x00800000)) {
             to_bitField0_ |= 0x00800000;
           }
-          result.motionBlur_ = motionBlur_;
+          result.filmGrain_ = filmGrain_;
           if (((from_bitField0_ & 0x01000000) == 0x01000000)) {
             to_bitField0_ |= 0x01000000;
           }
-          result.ssao_ = ssao_;
+          result.outline_ = outline_;
           if (((from_bitField0_ & 0x02000000) == 0x02000000)) {
             to_bitField0_ |= 0x02000000;
           }
-          result.filmGrain_ = filmGrain_;
+          result.lightShafts_ = lightShafts_;
           if (((from_bitField0_ & 0x04000000) == 0x04000000)) {
             to_bitField0_ |= 0x04000000;
           }
-          result.outline_ = outline_;
+          result.animatedWater_ = animatedWater_;
+          if (((from_bitField0_ & 0x08000000) == 0x08000000)) {
+            to_bitField0_ |= 0x08000000;
+          }
+          result.oceanOctaves_ = oceanOctaves_;
+          if (((from_bitField0_ & 0x10000000) == 0x10000000)) {
+            to_bitField0_ |= 0x10000000;
+          }
+          result.refractiveWater_ = refractiveWater_;
           result.bitField0_ = to_bitField0_;
           onBuilt();
           return result;
@@ -4673,12 +4729,6 @@ public final class Configuration {
           if (other.hasReflectiveWater()) {
             setReflectiveWater(other.getReflectiveWater());
           }
-          if (other.hasMusicVolume()) {
-            setMusicVolume(other.getMusicVolume());
-          }
-          if (other.hasSoundVolume()) {
-            setSoundVolume(other.getSoundVolume());
-          }
           if (other.hasVignette()) {
             setVignette(other.getVignette());
           }
@@ -4699,6 +4749,18 @@ public final class Configuration {
           }
           if (other.hasOutline()) {
             setOutline(other.getOutline());
+          }
+          if (other.hasLightShafts()) {
+            setLightShafts(other.getLightShafts());
+          }
+          if (other.hasAnimatedWater()) {
+            setAnimatedWater(other.getAnimatedWater());
+          }
+          if (other.hasOceanOctaves()) {
+            setOceanOctaves(other.getOceanOctaves());
+          }
+          if (other.hasRefractiveWater()) {
+            setRefractiveWater(other.getRefractiveWater());
           }
           this.mergeUnknownFields(other.getUnknownFields());
           return this;
@@ -4825,49 +4887,59 @@ public final class Configuration {
                 reflectiveWater_ = input.readBool();
                 break;
               }
-              case 184: {
-                bitField0_ |= 0x00040000;
-                musicVolume_ = input.readInt32();
-                break;
-              }
-              case 192: {
-                bitField0_ |= 0x00080000;
-                soundVolume_ = input.readInt32();
-                break;
-              }
               case 200: {
-                bitField0_ |= 0x00100000;
+                bitField0_ |= 0x00040000;
                 vignette_ = input.readBool();
                 break;
               }
               case 208: {
-                bitField0_ |= 0x00200000;
+                bitField0_ |= 0x00080000;
                 eyeAdapation_ = input.readBool();
                 break;
               }
               case 216: {
-                bitField0_ |= 0x00400000;
+                bitField0_ |= 0x00100000;
                 bloom_ = input.readBool();
                 break;
               }
               case 224: {
-                bitField0_ |= 0x00800000;
+                bitField0_ |= 0x00200000;
                 motionBlur_ = input.readBool();
                 break;
               }
               case 232: {
-                bitField0_ |= 0x01000000;
+                bitField0_ |= 0x00400000;
                 ssao_ = input.readBool();
                 break;
               }
               case 240: {
-                bitField0_ |= 0x02000000;
+                bitField0_ |= 0x00800000;
                 filmGrain_ = input.readBool();
                 break;
               }
               case 248: {
-                bitField0_ |= 0x04000000;
+                bitField0_ |= 0x01000000;
                 outline_ = input.readBool();
+                break;
+              }
+              case 256: {
+                bitField0_ |= 0x02000000;
+                lightShafts_ = input.readBool();
+                break;
+              }
+              case 264: {
+                bitField0_ |= 0x04000000;
+                animatedWater_ = input.readBool();
+                break;
+              }
+              case 272: {
+                bitField0_ |= 0x08000000;
+                oceanOctaves_ = input.readUInt32();
+                break;
+              }
+              case 280: {
+                bitField0_ |= 0x10000000;
+                refractiveWater_ = input.readBool();
                 break;
               }
             }
@@ -5323,64 +5395,22 @@ public final class Configuration {
           return this;
         }
         
-        // optional int32 music_volume = 23 [default = 100];
-        private int musicVolume_ = 100;
-        public boolean hasMusicVolume() {
-          return ((bitField0_ & 0x00040000) == 0x00040000);
-        }
-        public int getMusicVolume() {
-          return musicVolume_;
-        }
-        public Builder setMusicVolume(int value) {
-          bitField0_ |= 0x00040000;
-          musicVolume_ = value;
-          onChanged();
-          return this;
-        }
-        public Builder clearMusicVolume() {
-          bitField0_ = (bitField0_ & ~0x00040000);
-          musicVolume_ = 100;
-          onChanged();
-          return this;
-        }
-        
-        // optional int32 sound_volume = 24 [default = 100];
-        private int soundVolume_ = 100;
-        public boolean hasSoundVolume() {
-          return ((bitField0_ & 0x00080000) == 0x00080000);
-        }
-        public int getSoundVolume() {
-          return soundVolume_;
-        }
-        public Builder setSoundVolume(int value) {
-          bitField0_ |= 0x00080000;
-          soundVolume_ = value;
-          onChanged();
-          return this;
-        }
-        public Builder clearSoundVolume() {
-          bitField0_ = (bitField0_ & ~0x00080000);
-          soundVolume_ = 100;
-          onChanged();
-          return this;
-        }
-        
         // optional bool vignette = 25 [default = false];
         private boolean vignette_ ;
         public boolean hasVignette() {
-          return ((bitField0_ & 0x00100000) == 0x00100000);
+          return ((bitField0_ & 0x00040000) == 0x00040000);
         }
         public boolean getVignette() {
           return vignette_;
         }
         public Builder setVignette(boolean value) {
-          bitField0_ |= 0x00100000;
+          bitField0_ |= 0x00040000;
           vignette_ = value;
           onChanged();
           return this;
         }
         public Builder clearVignette() {
-          bitField0_ = (bitField0_ & ~0x00100000);
+          bitField0_ = (bitField0_ & ~0x00040000);
           vignette_ = false;
           onChanged();
           return this;
@@ -5389,19 +5419,19 @@ public final class Configuration {
         // optional bool eye_adapation = 26 [default = false];
         private boolean eyeAdapation_ ;
         public boolean hasEyeAdapation() {
-          return ((bitField0_ & 0x00200000) == 0x00200000);
+          return ((bitField0_ & 0x00080000) == 0x00080000);
         }
         public boolean getEyeAdapation() {
           return eyeAdapation_;
         }
         public Builder setEyeAdapation(boolean value) {
-          bitField0_ |= 0x00200000;
+          bitField0_ |= 0x00080000;
           eyeAdapation_ = value;
           onChanged();
           return this;
         }
         public Builder clearEyeAdapation() {
-          bitField0_ = (bitField0_ & ~0x00200000);
+          bitField0_ = (bitField0_ & ~0x00080000);
           eyeAdapation_ = false;
           onChanged();
           return this;
@@ -5410,19 +5440,19 @@ public final class Configuration {
         // optional bool bloom = 27 [default = false];
         private boolean bloom_ ;
         public boolean hasBloom() {
-          return ((bitField0_ & 0x00400000) == 0x00400000);
+          return ((bitField0_ & 0x00100000) == 0x00100000);
         }
         public boolean getBloom() {
           return bloom_;
         }
         public Builder setBloom(boolean value) {
-          bitField0_ |= 0x00400000;
+          bitField0_ |= 0x00100000;
           bloom_ = value;
           onChanged();
           return this;
         }
         public Builder clearBloom() {
-          bitField0_ = (bitField0_ & ~0x00400000);
+          bitField0_ = (bitField0_ & ~0x00100000);
           bloom_ = false;
           onChanged();
           return this;
@@ -5431,19 +5461,19 @@ public final class Configuration {
         // optional bool motion_blur = 28 [default = false];
         private boolean motionBlur_ ;
         public boolean hasMotionBlur() {
-          return ((bitField0_ & 0x00800000) == 0x00800000);
+          return ((bitField0_ & 0x00200000) == 0x00200000);
         }
         public boolean getMotionBlur() {
           return motionBlur_;
         }
         public Builder setMotionBlur(boolean value) {
-          bitField0_ |= 0x00800000;
+          bitField0_ |= 0x00200000;
           motionBlur_ = value;
           onChanged();
           return this;
         }
         public Builder clearMotionBlur() {
-          bitField0_ = (bitField0_ & ~0x00800000);
+          bitField0_ = (bitField0_ & ~0x00200000);
           motionBlur_ = false;
           onChanged();
           return this;
@@ -5452,19 +5482,19 @@ public final class Configuration {
         // optional bool ssao = 29 [default = false];
         private boolean ssao_ ;
         public boolean hasSsao() {
-          return ((bitField0_ & 0x01000000) == 0x01000000);
+          return ((bitField0_ & 0x00400000) == 0x00400000);
         }
         public boolean getSsao() {
           return ssao_;
         }
         public Builder setSsao(boolean value) {
-          bitField0_ |= 0x01000000;
+          bitField0_ |= 0x00400000;
           ssao_ = value;
           onChanged();
           return this;
         }
         public Builder clearSsao() {
-          bitField0_ = (bitField0_ & ~0x01000000);
+          bitField0_ = (bitField0_ & ~0x00400000);
           ssao_ = false;
           onChanged();
           return this;
@@ -5473,19 +5503,19 @@ public final class Configuration {
         // optional bool film_grain = 30 [default = false];
         private boolean filmGrain_ ;
         public boolean hasFilmGrain() {
-          return ((bitField0_ & 0x02000000) == 0x02000000);
+          return ((bitField0_ & 0x00800000) == 0x00800000);
         }
         public boolean getFilmGrain() {
           return filmGrain_;
         }
         public Builder setFilmGrain(boolean value) {
-          bitField0_ |= 0x02000000;
+          bitField0_ |= 0x00800000;
           filmGrain_ = value;
           onChanged();
           return this;
         }
         public Builder clearFilmGrain() {
-          bitField0_ = (bitField0_ & ~0x02000000);
+          bitField0_ = (bitField0_ & ~0x00800000);
           filmGrain_ = false;
           onChanged();
           return this;
@@ -5494,20 +5524,104 @@ public final class Configuration {
         // optional bool outline = 31 [default = true];
         private boolean outline_ = true;
         public boolean hasOutline() {
-          return ((bitField0_ & 0x04000000) == 0x04000000);
+          return ((bitField0_ & 0x01000000) == 0x01000000);
         }
         public boolean getOutline() {
           return outline_;
         }
         public Builder setOutline(boolean value) {
-          bitField0_ |= 0x04000000;
+          bitField0_ |= 0x01000000;
           outline_ = value;
           onChanged();
           return this;
         }
         public Builder clearOutline() {
-          bitField0_ = (bitField0_ & ~0x04000000);
+          bitField0_ = (bitField0_ & ~0x01000000);
           outline_ = true;
+          onChanged();
+          return this;
+        }
+        
+        // optional bool light_shafts = 32 [default = false];
+        private boolean lightShafts_ ;
+        public boolean hasLightShafts() {
+          return ((bitField0_ & 0x02000000) == 0x02000000);
+        }
+        public boolean getLightShafts() {
+          return lightShafts_;
+        }
+        public Builder setLightShafts(boolean value) {
+          bitField0_ |= 0x02000000;
+          lightShafts_ = value;
+          onChanged();
+          return this;
+        }
+        public Builder clearLightShafts() {
+          bitField0_ = (bitField0_ & ~0x02000000);
+          lightShafts_ = false;
+          onChanged();
+          return this;
+        }
+        
+        // optional bool animated_water = 33 [default = false];
+        private boolean animatedWater_ ;
+        public boolean hasAnimatedWater() {
+          return ((bitField0_ & 0x04000000) == 0x04000000);
+        }
+        public boolean getAnimatedWater() {
+          return animatedWater_;
+        }
+        public Builder setAnimatedWater(boolean value) {
+          bitField0_ |= 0x04000000;
+          animatedWater_ = value;
+          onChanged();
+          return this;
+        }
+        public Builder clearAnimatedWater() {
+          bitField0_ = (bitField0_ & ~0x04000000);
+          animatedWater_ = false;
+          onChanged();
+          return this;
+        }
+        
+        // optional uint32 ocean_octaves = 34 [default = 8];
+        private int oceanOctaves_ = 8;
+        public boolean hasOceanOctaves() {
+          return ((bitField0_ & 0x08000000) == 0x08000000);
+        }
+        public int getOceanOctaves() {
+          return oceanOctaves_;
+        }
+        public Builder setOceanOctaves(int value) {
+          bitField0_ |= 0x08000000;
+          oceanOctaves_ = value;
+          onChanged();
+          return this;
+        }
+        public Builder clearOceanOctaves() {
+          bitField0_ = (bitField0_ & ~0x08000000);
+          oceanOctaves_ = 8;
+          onChanged();
+          return this;
+        }
+        
+        // optional bool refractive_water = 35 [default = false];
+        private boolean refractiveWater_ ;
+        public boolean hasRefractiveWater() {
+          return ((bitField0_ & 0x10000000) == 0x10000000);
+        }
+        public boolean getRefractiveWater() {
+          return refractiveWater_;
+        }
+        public Builder setRefractiveWater(boolean value) {
+          bitField0_ |= 0x10000000;
+          refractiveWater_ = value;
+          onChanged();
+          return this;
+        }
+        public Builder clearRefractiveWater() {
+          bitField0_ = (bitField0_ & ~0x10000000);
+          refractiveWater_ = false;
           onChanged();
           return this;
         }
@@ -6480,7 +6594,7 @@ public final class Configuration {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\rConfig2.proto\022\010protobuf\"\334\017\n\007Setting\022&\n" +
+      "\n\rConfig2.proto\022\010protobuf\"\235\020\n\007Setting\022&\n" +
       "\005world\030\001 \001(\0132\027.protobuf.Setting.World\022(\n" +
       "\006player\030\002 \001(\0132\030.protobuf.Setting.Player\022" +
       "(\n\006system\030\003 \001(\0132\030.protobuf.Setting.Syste" +
@@ -6507,7 +6621,7 @@ public final class Configuration {
       "\003fov\030\001 \001(\002:\00290\022\031\n\nmouse_sens\030\002 \001(\002:\0050.07" +
       "5\022\034\n\016camera_bobbing\030\003 \001(\010:\004true\022&\n\030rende" +
       "r_first_person_view\030\004 \001(\010:\004true\022\031\n\013placi" +
-      "ng_box\030\005 \001(\010:\004true\032\253\007\n\006System\022\032\n\rmax_par" +
+      "ng_box\030\005 \001(\010:\004true\032\354\007\n\006System\022\032\n\rmax_par" +
       "ticles\030\001 \001(\005:\003256\022\026\n\013max_threads\030\004 \001(\005:\001" +
       "2\022\031\n\013save_chunks\030\005 \001(\010:\004true\022\036\n\020chunk_ca",
       "che_size\030\006 \001(\005:\0042048\022\033\n\016max_chunk_VBOs\030\007" +
@@ -6522,17 +6636,18 @@ public final class Configuration {
       "ight\030\021 \001(\010:\005false\022\035\n\016animated_grass\030\023 \001(",
       "\010:\005false\022\'\n\034vertical_chunk_mesh_segments" +
       "\030\024 \001(\005:\0011\022\031\n\016blur_intensity\030\025 \001(\005:\0013\022\037\n\020" +
-      "reflective_water\030\026 \001(\010:\005false\022\031\n\014music_v" +
-      "olume\030\027 \001(\005:\003100\022\031\n\014sound_volume\030\030 \001(\005:\003" +
-      "100\022\027\n\010vignette\030\031 \001(\010:\005false\022\034\n\reye_adap" +
-      "ation\030\032 \001(\010:\005false\022\024\n\005bloom\030\033 \001(\010:\005false" +
-      "\022\032\n\013motion_blur\030\034 \001(\010:\005false\022\023\n\004ssao\030\035 \001" +
-      "(\010:\005false\022\031\n\nfilm_grain\030\036 \001(\010:\005false\022\025\n\007" +
-      "outline\030\037 \001(\010:\004true\032*\n\010CloudRes\022\016\n\001x\030\001 \001" +
-      "(\002:\003512\022\016\n\001y\030\002 \001(\002:\003512\0327\n\013DisplayMode\022\023",
-      "\n\005width\030\001 \001(\005:\0041280\022\023\n\006height\030\002 \001(\005:\003720" +
-      "B*\n\027org.terasology.protobufB\rConfigurati" +
-      "onH\001"
+      "reflective_water\030\026 \001(\010:\005false\022\027\n\010vignett" +
+      "e\030\031 \001(\010:\005false\022\034\n\reye_adapation\030\032 \001(\010:\005f" +
+      "alse\022\024\n\005bloom\030\033 \001(\010:\005false\022\032\n\013motion_blu" +
+      "r\030\034 \001(\010:\005false\022\023\n\004ssao\030\035 \001(\010:\005false\022\031\n\nf" +
+      "ilm_grain\030\036 \001(\010:\005false\022\025\n\007outline\030\037 \001(\010:" +
+      "\004true\022\033\n\014light_shafts\030  \001(\010:\005false\022\035\n\016an" +
+      "imated_water\030! \001(\010:\005false\022\030\n\rocean_octav" +
+      "es\030\" \001(\r:\0018\022\037\n\020refractive_water\030# \001(\010:\005f",
+      "alse\032*\n\010CloudRes\022\016\n\001x\030\001 \001(\002:\003512\022\016\n\001y\030\002 " +
+      "\001(\002:\003512\0327\n\013DisplayMode\022\023\n\005width\030\001 \001(\005:\004" +
+      "1280\022\023\n\006height\030\002 \001(\005:\003720B*\n\027org.terasol" +
+      "ogy.protobufB\rConfigurationH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -6584,7 +6699,7 @@ public final class Configuration {
           internal_static_protobuf_Setting_System_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_protobuf_Setting_System_descriptor,
-              new java.lang.String[] { "MaxParticles", "MaxThreads", "SaveChunks", "ChunkCacheSize", "MaxChunkVBOs", "PixelFormat", "DisplayMode", "Fullscreen", "ActiveViewingDistanceId", "ViewingDistanceNear", "ViewingDistanceModerate", "ViewingDistanceFar", "ViewingDistanceUltra", "FlickeringLight", "AnimatedGrass", "VerticalChunkMeshSegments", "BlurIntensity", "ReflectiveWater", "MusicVolume", "SoundVolume", "Vignette", "EyeAdapation", "Bloom", "MotionBlur", "Ssao", "FilmGrain", "Outline", },
+              new java.lang.String[] { "MaxParticles", "MaxThreads", "SaveChunks", "ChunkCacheSize", "MaxChunkVBOs", "PixelFormat", "DisplayMode", "Fullscreen", "ActiveViewingDistanceId", "ViewingDistanceNear", "ViewingDistanceModerate", "ViewingDistanceFar", "ViewingDistanceUltra", "FlickeringLight", "AnimatedGrass", "VerticalChunkMeshSegments", "BlurIntensity", "ReflectiveWater", "Vignette", "EyeAdapation", "Bloom", "MotionBlur", "Ssao", "FilmGrain", "Outline", "LightShafts", "AnimatedWater", "OceanOctaves", "RefractiveWater", },
               org.terasology.protobuf.Configuration.Setting.System.class,
               org.terasology.protobuf.Configuration.Setting.System.Builder.class);
           internal_static_protobuf_Setting_System_CloudRes_descriptor =

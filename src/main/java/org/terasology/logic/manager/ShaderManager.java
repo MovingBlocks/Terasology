@@ -72,6 +72,7 @@ public class ShaderManager {
 
         createAndStoreShaderProgram("post", new ShaderParametersPost());
         createAndStoreShaderProgram("ssao", new ShaderParametersSSAO());
+        createAndStoreShaderProgram("lightshaft", new ShaderParametersLightShaft());
         createAndStoreShaderProgram("sobel", new ShaderParametersSobel());
         createAndStoreShaderProgram("prePost", new ShaderParametersPrePost());
         createAndStoreShaderProgram("highp", new ShaderParametersDefault());
@@ -83,7 +84,6 @@ public class ShaderManager {
         createAndStoreShaderProgram("particle", new ShaderParametersParticle());
         createAndStoreShaderProgram("block", new ShaderParametersBlock());
         createAndStoreShaderProgram("gelatinousCube", new ShaderParametersGelCube());
-        createAndStoreShaderProgram("clouds", new ShaderParametersDefault());
         createAndStoreShaderProgram("animateOpacity", new ShaderParametersDefault());
         //createAndStoreShaderProgram("genericMesh", new ShaderParametersGenericMesh());
     }

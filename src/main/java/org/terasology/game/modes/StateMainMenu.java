@@ -17,6 +17,8 @@ package org.terasology.game.modes;
 
 import java.util.Iterator;
 
+import org.terasology.asset.Assets;
+import org.terasology.audio.AudioManager;
 import org.terasology.components.LocalPlayerComponent;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
@@ -29,7 +31,6 @@ import org.terasology.game.bootstrap.EntitySystemBuilder;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.input.InputSystem;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.mod.ModManager;
 
@@ -114,11 +115,11 @@ public class StateMainMenu implements GameState {
     }
 
     private void playBackgroundMusic() {
-        AudioManager.playMusic("engine:MenuTheme");
+        CoreRegistry.get(AudioManager.class).playMusic(Assets.getMusic("engine:MenuTheme"));
     }
 
     private void stopBackgroundMusic() {
-        AudioManager.getInstance().stopAllSounds();
+        CoreRegistry.get(AudioManager.class).stopAllSounds();
     }
 
     @Override

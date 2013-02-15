@@ -20,6 +20,8 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.FloatBuffer;
+import java.util.Scanner;
+import java.util.StringTokenizer;
 
 import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.GL13;
@@ -34,6 +36,7 @@ import org.terasology.rendering.assets.Shader;
 import javax.swing.*;
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Matrix4f;
+import javax.vecmath.Vector4f;
 
 /**
  * Wraps a OpenGL shader program. Provides convenience methods for setting
@@ -116,10 +119,13 @@ public class ShaderProgram {
         // Read in the shader code
         shader.append(readShader(filename));
 
+        String debugShaderType = "UNKNOWN";
         if (type == GL20.GL_FRAGMENT_SHADER) {
             fragmentProgram = shaderId;
+            debugShaderType = "FRAGMENT";
         } else if (type == GL20.GL_VERTEX_SHADER) {
             vertexProgram = shaderId;
+            debugShaderType = "VERTEX";
         }
 
         GL20.glShaderSource(shaderId, shader.toString());
@@ -127,7 +133,31 @@ public class ShaderProgram {
 
         String error;
         if ((error = printLogInfo(shaderId)) != null) {
-            JOptionPane.showMessageDialog(null, "Shader '"+title+"' failed to compile. Terasology might not look quite as good as it should now...\n\n"+error, "Shader compilation error", JOptionPane.ERROR_MESSAGE);
+            String errorLine = "";
+            if (error.contains("ERROR") || error.contains("WARNING")) {
+                try {
+                    StringTokenizer token = new StringTokenizer(error);
+                    token.nextToken(":");
+
+                    String charNumber = token.nextToken(":").trim();
+                    String lineNumber = token.nextToken(":").trim();
+
+                    int lineNumberInt = Integer.valueOf(lineNumber);
+                    int charNumberInt = Integer.valueOf(charNumber);
+
+                    Scanner reader = new Scanner(shader.toString());
+                    for (int i=0; i<lineNumberInt - 1; ++i) {
+                        reader.nextLine();
+                    }
+
+                    errorLine = reader.nextLine();
+                    errorLine = "\n\nError prone line: '" + errorLine + "'";
+                } catch (Exception e) {
+                    // Do nothing...
+                }
+            }
+
+            JOptionPane.showMessageDialog(null, debugShaderType+ " Shader '"+title+"' failed to compile. Terasology might not look quite as good as it should now...\n\n"+error+errorLine, "Shader compilation error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -189,6 +219,12 @@ public class ShaderProgram {
         GL20.glUniform1f(id, f);
     }
 
+    public void setFloat2(String desc, float f1, float f2) {
+        enable();
+        int id = GL20.glGetUniformLocation(shaderProgram, desc);
+        GL20.glUniform2f(id, f1, f2);
+    }
+
     public void setFloat3(String desc, float f1, float f2, float f3) {
         enable();
         int id = GL20.glGetUniformLocation(shaderProgram, desc);
@@ -217,6 +253,10 @@ public class ShaderProgram {
         enable();
         int id = GL20.glGetUniformLocation(shaderProgram, desc);
         GL20.glUniform1(id, buffer);
+    }
+
+    public void setFloat4(String desc, Vector4f vec) {
+        setFloat4(desc, vec.x, vec.y, vec.z, vec.w);
     }
 
     public void setMatrix4(String desc, Matrix4f m) {

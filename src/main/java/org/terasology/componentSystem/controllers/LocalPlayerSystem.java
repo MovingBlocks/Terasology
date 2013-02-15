@@ -272,6 +272,14 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             QuaternionUtil.setEuler(viewRot, TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw, TeraMath.DEG_TO_RAD * localPlayerComponent.viewPitch, 0);
             QuaternionUtil.quatRotate(viewRot, relMove, relMove);
             relMove.y += relativeMovement.y;
+        } else if( characterMovementComponent.isClimbing ){
+
+            float pitch = localPlayerComponent.viewPitch > 0 ? 60f : -60f;
+
+            Quat4f viewRot = new Quat4f();
+            QuaternionUtil.setEuler(viewRot, TeraMath.DEG_TO_RAD * localPlayerComponent.viewYaw, TeraMath.DEG_TO_RAD * pitch, 0);
+            QuaternionUtil.quatRotate(viewRot, relMove, relMove);
+            relMove.y += relativeMovement.y;
         } else {
             QuaternionUtil.quatRotate(location.getLocalRotation(), relMove, relMove);
         }
@@ -389,24 +397,24 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
             return;
         }
 
-        if (localPlayerComp.isDead) return;
+        if (localPlayerComp.isDead) {
+            return;
+        }
 
         UIImage crossHair = (UIImage)CoreRegistry.get(GUIManager.class).getWindowById("hud").getElementById("crosshair");
-
-        crossHair.getTextureSize().set(new Vector2f(22f / 256f, 22f / 256f));
+        crossHair.setTextureSize(new Vector2f(22f, 22f));
 
         float dropPower  = getDropPower();
-
-        crossHair.getTextureOrigin().set(new Vector2f((46f + 22f*dropPower) / 256f, 23f / 256f));
+        crossHair.setTextureOrigin(new Vector2f((46f + 22f*dropPower), 23f));
 
         if(event.getState() == ButtonState.UP){
             dropPower *= 25f;
             EntityManager entityManager = CoreRegistry.get(EntityManager.class);
             ItemComponent item  = selectedItemEntity.getComponent(ItemComponent.class);
 
-            Vector3f newPosition = new Vector3f(playerCamera.getPosition().x + playerCamera.getViewingDirection().x*1.5f,
-                                                playerCamera.getPosition().y + playerCamera.getViewingDirection().y*1.5f,
-                                                playerCamera.getPosition().z + playerCamera.getViewingDirection().z*1.5f
+            Vector3f newPosition = new Vector3f(playerCamera.getPosition().x + playerCamera.getViewingDirection().x*2f,
+                                                playerCamera.getPosition().y + playerCamera.getViewingDirection().y*2f,
+                                                playerCamera.getPosition().z + playerCamera.getViewingDirection().z*2f
                                                );
 
             boolean changed = false;
@@ -420,14 +428,16 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
                 }
             }else{
                 DroppedBlockFactory droppedBlockFactory = new DroppedBlockFactory(entityManager);
-                EntityRef droppedBlock = droppedBlockFactory.newInstance(new Vector3f(newPosition), block.blockFamily, 20);
+                EntityRef droppedBlock = droppedBlockFactory.newInstance(new Vector3f(newPosition), block.blockFamily, 20,
+                        selectedItemEntity.getComponent(BlockItemComponent.class).placedEntity);
+                BlockItemComponent blockItem = selectedItemEntity.getComponent(BlockItemComponent.class);
+                blockItem.placedEntity = EntityRef.NULL;
+                selectedItemEntity.saveComponent(blockItem);
                 if(!droppedBlock.equals(EntityRef.NULL)){
                     droppedBlock.send(new ImpulseEvent(new Vector3f(playerCamera.getViewingDirection().x*dropPower, playerCamera.getViewingDirection().y*dropPower, playerCamera.getViewingDirection().z*dropPower)));
                     changed = true;
                 }
             }
-
-
 
             if(changed){
                 item.stackCount--;

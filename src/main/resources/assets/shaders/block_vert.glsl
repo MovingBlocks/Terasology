@@ -15,11 +15,11 @@
  */
 
 varying vec3 normal;
-varying vec4 vertexWorldPos;
+varying vec4 vertexViewPos;
 
 void main()
 {
-	vertexWorldPos = gl_ModelViewMatrix * gl_Vertex;
+	vertexViewPos = gl_ModelViewMatrix * gl_Vertex;
     normal = gl_NormalMatrix * gl_Normal;
 
 	gl_Position = ftransform();

@@ -27,9 +27,11 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetManager;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.sources.ClasspathSource;
+import org.terasology.audio.AudioManager;
+import org.terasology.audio.NullAudioManager;
+import org.terasology.audio.openAL.OpenALManager;
 import org.terasology.config.InputConfig;
 import org.terasology.game.modes.GameState;
-import org.terasology.logic.manager.AudioManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
@@ -46,23 +48,14 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.Field;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.FileHandler;
-import java.util.logging.Formatter;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
 
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
@@ -84,6 +77,8 @@ public class TerasologyEngine implements GameEngine {
     private boolean running;
     private boolean disposed;
     private GameState pendingState;
+
+    private AudioManager audioManager;
 
     private Timer timer;
     private final ThreadPoolExecutor threadPool = (ThreadPoolExecutor) Executors.newCachedThreadPool();
@@ -156,6 +151,7 @@ public class TerasologyEngine implements GameEngine {
 
     private void initLogger() {
         if (LWJGLUtil.DEBUG) {
+            // Pipes System.out and err to log, because that's where lwjgl writes it to.
             System.setOut(new PrintStream(System.out) {
                 private Logger logger = LoggerFactory.getLogger("org.lwjgl");
 
@@ -172,61 +168,6 @@ public class TerasologyEngine implements GameEngine {
                     logger.error(message);
                 }
             });
-        }
-        File dirPath = PathManager.getInstance().getLogPath();
-
-        if (!dirPath.exists()) {
-            if (!dirPath.mkdirs()) {
-                return;
-            }
-        }
-
-        try {
-            java.util.logging.Logger.getLogger("").getHandlers()[0].setLevel(Level.FINE);
-            java.util.logging.Logger.getLogger("org.terasology").setLevel(Level.INFO);
-            java.util.logging.Logger.getLogger("").getHandlers()[0].setFormatter(new Formatter() {
-                DateFormat dateFormat = new SimpleDateFormat("MM-dd HH:mm:ss");
-
-                @Override
-                public String format(LogRecord record) {
-                    String thrownMessage = "";
-                    if (record.getThrown() != null) {
-                        try {
-                            StringWriter sw = new StringWriter();
-                            PrintWriter pw = new PrintWriter(sw);
-                            record.getThrown().printStackTrace(pw);
-                            pw.close();
-                            thrownMessage = sw.toString();
-                        } catch (Exception ex) {
-                        }
-                    }
-                    return String.format("[%s] (%s)\t%s:%s() - %s (Thread: %d)\n%s", record.getLevel().getLocalizedName(), dateFormat.format(new Date(record.getMillis())), record.getLoggerName(), record.getSourceMethodName(), formatMessage(record), record.getThreadID(), thrownMessage);
-                }
-            });
-            FileHandler fh = new FileHandler(new File(dirPath, "Terasology.log").getAbsolutePath(), false);
-            fh.setLevel(Level.INFO);
-            fh.setFormatter(new Formatter() {
-                DateFormat dateFormat = new SimpleDateFormat("MM-dd HH:mm:ss");
-
-                @Override
-                public String format(LogRecord record) {
-                    String thrownMessage = "";
-                    if (record.getThrown() != null) {
-                        try {
-                            StringWriter sw = new StringWriter();
-                            PrintWriter pw = new PrintWriter(sw);
-                            record.getThrown().printStackTrace(pw);
-                            pw.close();
-                            thrownMessage = sw.toString();
-                        } catch (Exception ex) {
-                        }
-                    }
-                    return String.format("[%s] (%s)\t%s:%s() - %s\n%s", record.getLevel().getLocalizedName(), dateFormat.format(new Date(record.getMillis())), record.getLoggerName(), record.getSourceMethodName(), formatMessage(record), thrownMessage);
-                }
-            });
-            java.util.logging.Logger.getLogger("").addHandler(fh);
-        } catch (IOException ex) {
-            logger.error("Failed to set up logging to file", ex);
         }
     }
 
@@ -255,10 +196,10 @@ public class TerasologyEngine implements GameEngine {
         if (!running) {
             disposed = true;
             initialised = false;
-            AudioManager.getInstance().destroy();
             Mouse.destroy();
             Keyboard.destroy();
             Display.destroy();
+            audioManager.dispose();
         }
     }
 
@@ -360,8 +301,13 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void initOpenAL() {
-        // TODO: Put in registry
-        AudioManager.getInstance().initialize();
+        org.terasology.config.Config config = CoreRegistry.get(org.terasology.config.Config.class);
+        if (config.getSoundConfig().isDisableSound()) {
+            audioManager = new NullAudioManager();
+        } else {
+            audioManager = new OpenALManager(config.getSoundConfig());
+        }
+        CoreRegistry.put(AudioManager.class, audioManager);
     }
 
     private void initDisplay() {
@@ -385,14 +331,14 @@ public class TerasologyEngine implements GameEngine {
     private void checkOpenGL() {
         boolean canRunGame =
                 GLContext.getCapabilities().OpenGL20
-                && GLContext.getCapabilities().OpenGL11
-                && GLContext.getCapabilities().OpenGL12
-                && GLContext.getCapabilities().OpenGL14
-                && GLContext.getCapabilities().OpenGL15
-                && GLContext.getCapabilities().GL_ARB_framebuffer_object
-                && GLContext.getCapabilities().GL_ARB_texture_float
-                && GLContext.getCapabilities().GL_ARB_half_float_pixel
-                && GLContext.getCapabilities().GL_ARB_shader_objects;
+                        && GLContext.getCapabilities().OpenGL11
+                        && GLContext.getCapabilities().OpenGL12
+                        && GLContext.getCapabilities().OpenGL14
+                        && GLContext.getCapabilities().OpenGL15
+                        && GLContext.getCapabilities().GL_ARB_framebuffer_object
+                        && GLContext.getCapabilities().GL_ARB_texture_float
+                        && GLContext.getCapabilities().GL_ARB_half_float_pixel
+                        && GLContext.getCapabilities().GL_ARB_shader_objects;
 
         if (!canRunGame) {
             final String message = "Your GPU driver is not supporting the mandatory versions of OpenGL or some needed OpenGL extension. Considered updating your GPU drivers? Exiting...";
@@ -503,7 +449,7 @@ public class TerasologyEngine implements GameEngine {
             PerformanceMonitor.endActivity();
 
             PerformanceMonitor.startActivity("Audio");
-            AudioManager.getInstance().update();
+            audioManager.update(timer.getDelta());
             PerformanceMonitor.endActivity();
 
             PerformanceMonitor.rollCycle();

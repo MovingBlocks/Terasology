@@ -208,7 +208,13 @@ public class Shader implements Asset {
     public static StringBuilder createShaderBuilder() {
         StringBuilder builder = new StringBuilder().append(PreProcessorPreamble);
         if (Config.getInstance().isAnimatedGrass())
-            builder.append("#define ANIMATED_WATER_AND_GRASS \n");
+            builder.append("#define ANIMATED_GRASS \n");
+        if (Config.getInstance().isAnimatedWater()) {
+            builder.append("#define ANIMATED_WATER \n");
+            builder.append("#define OCEAN_OCTAVES " + Config.getInstance().getOceanOctaves() + " \n");
+        }
+        if (Config.getInstance().isRefractiveWater())
+            builder.append("#define REFRACTIVE_WATER \n");
         if (Config.getInstance().getBlurIntensity() == 0)
             builder.append("#define NO_BLUR \n");
         if (Config.getInstance().isFlickeringLight())
@@ -225,6 +231,8 @@ public class Shader implements Asset {
             builder.append("#define FILM_GRAIN \n");
         if (Config.getInstance().isOutline())
             builder.append("#define OUTLINE \n");
+        if (Config.getInstance().isLightShafts())
+            builder.append("#define LIGHT_SHAFTS \n");
         return builder;
     }
 

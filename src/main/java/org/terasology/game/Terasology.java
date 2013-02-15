@@ -15,7 +15,6 @@
  */
 package org.terasology.game;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.game.modes.StateMainMenu;
 import org.terasology.logic.manager.PathManager;
@@ -29,21 +28,18 @@ import org.terasology.logic.manager.PathManager;
  * @author Kireev   Anton   <adeon.k87@gmail.com>
  */
 public final class Terasology {
-    private static TerasologyEngine engine = new TerasologyEngine();
-
-    private static final Logger logger = LoggerFactory.getLogger(Terasology.class);
-
     private Terasology() {
     }
 
     public static void main(String[] args) {
         try {
             PathManager.getInstance().determineRootPath(true);
+            TerasologyEngine engine = new TerasologyEngine();
             engine.init();
             engine.run(new StateMainMenu());
             engine.dispose();
         } catch (Throwable t) {
-            logger.error("Uncaught Exception", t);
+            LoggerFactory.getLogger(Terasology.class).error("Uncaught Exception", t);
         }
         System.exit(0);
     }
