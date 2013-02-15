@@ -16,7 +16,7 @@
 
 package org.terasology.logic.characters;
 
-import org.terasology.components.ItemComponent;
+import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;

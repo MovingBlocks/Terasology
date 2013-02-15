@@ -80,6 +80,7 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
             public void changed(UIDisplayElement element, boolean visibility) {
                 if (visibility) {
                     toolbar.setEntity(CoreRegistry.get(LocalPlayer.class).getCharacterEntity(), 0, 9);
+                    toolbar.getCells().get(CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(LocalPlayerComponent.class).selectedTool).setSelection(true);
                 }
             }
         });

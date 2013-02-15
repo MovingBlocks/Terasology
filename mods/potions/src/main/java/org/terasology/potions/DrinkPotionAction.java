@@ -18,16 +18,16 @@ package org.terasology.potions;
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.components.HealthComponent;
-import org.terasology.components.ItemComponent;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.events.ActivateEvent;
-import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
+import org.terasology.logic.inventory.InventoryManager;
+import org.terasology.logic.inventory.ItemComponent;
 
 
 /**
@@ -41,6 +41,9 @@ public class DrinkPotionAction implements ComponentSystem {
 
     @In
     private AudioManager audioManager;
+
+    @In
+    private InventoryManager inventoryManager;
 
     @Override
     public void initialise() {
@@ -75,18 +78,15 @@ public class DrinkPotionAction implements ComponentSystem {
                 //Max HP
                 event.getInstigator().send(new BoostHpEvent());
                 //Receive an Empty Vial (Destroy it if no inventory space available)
-                event.getInstigator().send(new ReceiveItemEvent(item));
-                if (itemComp != null && !itemComp.container.exists()) {
+                if (!inventoryManager.giveItem(event.getInstigator(), item)) {
                     item.destroy();
                 }
-
 
                 break;
 
             case Green:
                 //Receive an Empty Vial (Destroy it if no inventory space available)
-                event.getInstigator().send(new ReceiveItemEvent(item));
-                if (itemComp != null && !itemComp.container.exists()) {
+                if (!inventoryManager.giveItem(event.getInstigator(), item)) {
                     item.destroy();
                 }
                 //Poison time!
@@ -96,16 +96,14 @@ public class DrinkPotionAction implements ComponentSystem {
             case Orange: //Cures the Poison.
                 event.getInstigator().send(new CurePoisonEvent());
                 //Receive an Empty Vial (Destroy it if no inventory space available)
-                event.getInstigator().send(new ReceiveItemEvent(item));
-                if (itemComp != null && !itemComp.container.exists()) {
+                if (!inventoryManager.giveItem(event.getInstigator(), item)) {
                     item.destroy();
                 }
                 break;
 
             case Purple:
                 //Receive an Empty Vial (Destroy it if no inventory space available)
-                event.getInstigator().send(new ReceiveItemEvent(item));
-                if (itemComp != null && !itemComp.container.exists()) {
+                if (!inventoryManager.giveItem(event.getInstigator(), item)) {
                     item.destroy();
                 }
                 //Speed time!

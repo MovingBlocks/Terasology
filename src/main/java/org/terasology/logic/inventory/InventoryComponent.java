@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.components;
+package org.terasology.logic.inventory;
 
 import java.util.List;
 
+import com.google.common.collect.ImmutableList;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 
@@ -32,7 +33,7 @@ import org.terasology.network.ReplicateType;
 public final class InventoryComponent implements Component {
 
     @Replicate(ReplicateType.SERVER_TO_OWNER)
-    public List<EntityRef> itemSlots = Lists.newArrayList();
+    List<EntityRef> itemSlots = Lists.newArrayList();
 
     public InventoryComponent() {
     }
@@ -41,5 +42,9 @@ public final class InventoryComponent implements Component {
         for (int i = 0; i < numSlots; ++i) {
             itemSlots.add(EntityRef.NULL);
         }
+    }
+
+    public List<EntityRef> getItemSlots() {
+        return ImmutableList.copyOf(itemSlots);
     }
 }

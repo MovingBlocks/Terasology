@@ -20,7 +20,6 @@ import org.terasology.audio.AudioManager;
 import org.terasology.audio.events.PlaySoundEvent;
 import org.terasology.components.BlockParticleEffectComponent;
 import org.terasology.components.HealthComponent;
-import org.terasology.components.ItemComponent;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entityFactory.DroppedBlockFactory;
 import org.terasology.entitySystem.ComponentSystem;
@@ -33,7 +32,7 @@ import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.FullHealthEvent;
 import org.terasology.events.NoHealthEvent;
-import org.terasology.events.inventory.ReceiveItemEvent;
+import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.physics.ImpulseEvent;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldProvider;
@@ -59,6 +58,9 @@ public class BlockEntitySystem implements ComponentSystem {
     @In
     private AudioManager audioManager;
 
+    @In
+    private InventoryManager inventoryManager;
+
     private BlockItemFactory blockItemFactory;
     private DroppedBlockFactory droppedBlockFactory;
     private FastRandom random;
@@ -82,8 +84,6 @@ public class BlockEntitySystem implements ComponentSystem {
         Block oldBlock = worldProvider.getBlock(blockComp.getPosition());
         worldProvider.setBlock(blockComp.getPosition(), BlockManager.getInstance().getAir(), oldBlock);
 
-        // TODO: This should be driven by block attachment info, and not be billboard specific
-        // Remove the upper block if it's a billboard
         Block upperBlock = worldProvider.getBlock(blockComp.getPosition().x, blockComp.getPosition().y + 1, blockComp.getPosition().z);
         if (upperBlock.isSupportRequired()) {
             worldProvider.setBlock(blockComp.getPosition().x, blockComp.getPosition().y + 1, blockComp.getPosition().z, BlockManager.getInstance().getAir(), upperBlock);
@@ -104,9 +104,8 @@ public class BlockEntitySystem implements ComponentSystem {
             } else {
                 item = blockItemFactory.newInstance(oldBlock.getBlockFamily());
             }
-            event.getInstigator().send(new ReceiveItemEvent(item));
-            ItemComponent itemComp = item.getComponent(ItemComponent.class);
-            if (itemComp != null && !itemComp.container.exists()) {
+
+            if (!inventoryManager.giveItem(event.getInstigator(), item)) {
                 // TODO: Fix this - entity needs to be added to lootable block or destroyed
                 item.destroy();
                 EntityRef block = droppedBlockFactory.newInstance(blockComp.getPosition().toVector3f(), oldBlock.getBlockFamily(), 20);

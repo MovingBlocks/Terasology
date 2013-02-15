@@ -13,34 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.componentSystem.items;
+package org.terasology.logic.inventory;
 
-import com.google.common.collect.Lists;
-import org.terasology.asset.Assets;
-import org.terasology.audio.AudioManager;
-import org.terasology.components.ItemComponent;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventPriority;
-import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.RegisterSystem;
-import org.terasology.entitySystem.event.RemovedComponentEvent;
 import org.terasology.events.ActivateEvent;
-import org.terasology.game.CoreRegistry;
-import org.terasology.math.Side;
-import org.terasology.math.TeraMath;
-import org.terasology.math.Vector3i;
-import org.terasology.physics.BulletPhysics;
-import org.terasology.physics.CollisionGroup;
-import org.terasology.physics.StandardCollisionGroup;
-import org.terasology.world.BlockEntityRegistry;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.entity.BlockComponent;
-import org.terasology.world.block.entity.BlockItemComponent;
-import org.terasology.world.block.family.BlockFamily;
 
 /**
  * @author Immortius <immortius@gmail.com>

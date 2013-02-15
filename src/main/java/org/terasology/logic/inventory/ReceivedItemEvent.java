@@ -13,31 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.book;
 
+package org.terasology.logic.inventory;
+
+import org.terasology.entitySystem.AbstractEvent;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.ComponentSystem;
-import org.terasology.entitySystem.EventPriority;
-import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.entitySystem.RegisterSystem;
-import org.terasology.events.inventory.ReceiveItemEvent;
 
 /**
- *
+ * @author Immortius
  */
-@RegisterSystem()
-public class BookshelfHandler implements ComponentSystem {
+public class ReceivedItemEvent extends AbstractEvent {
+    private EntityRef item;
+    private int slot = -1;
 
-    @Override
-    public void initialise() {
+    public ReceivedItemEvent(EntityRef item) {
+        this.item = item;
     }
 
-    @Override
-    public void shutdown() {
+    public ReceivedItemEvent(EntityRef item, int slot) {
+        this.item = item;
+        this.slot = slot;
     }
 
-    @ReceiveEvent(components = BookshelfComponent.class, priority = EventPriority.PRIORITY_HIGH)
-    public void onActivate(ReceiveItemEvent event, EntityRef entity) {
-        if (!event.getItem().hasComponent(BookComponent.class)) event.cancel();
+    public EntityRef getItem() {
+        return item;
     }
+    
+    public int getSlot() {
+		return slot;
+	}
 }

@@ -16,7 +16,7 @@
 
 package org.terasology.logic.players;
 
-import org.terasology.components.InventoryComponent;
+import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;
@@ -31,6 +31,7 @@ import org.terasology.input.binds.ToolbarSlotButton;
 import org.terasology.input.binds.UseItemButton;
 import org.terasology.logic.characters.events.AttackRequest;
 import org.terasology.logic.characters.events.UseItemRequest;
+import org.terasology.logic.inventory.SlotBasedInventoryManager;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
@@ -50,6 +51,9 @@ public class PlayerInventorySystem implements ComponentSystem {
 
     @In
     private WorldRenderer worldRenderer;
+
+    @In
+    private SlotBasedInventoryManager inventoryManager;
 
     private long lastInteraction;
 
@@ -98,8 +102,7 @@ public class PlayerInventorySystem implements ComponentSystem {
             return;
         }
 
-        InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
-        EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayerComp.selectedTool);
+        EntityRef selectedItemEntity = inventoryManager.getItemInSlot(entity, localPlayerComp.selectedTool);
 
         entity.send(new UseItemRequest(selectedItemEntity));
 
@@ -120,8 +123,7 @@ public class PlayerInventorySystem implements ComponentSystem {
             return;
         }
 
-        InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
-        EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayerComp.selectedTool);
+        EntityRef selectedItemEntity = inventoryManager.getItemInSlot(entity, localPlayerComp.selectedTool);
 
         entity.send(new AttackRequest(selectedItemEntity));
 

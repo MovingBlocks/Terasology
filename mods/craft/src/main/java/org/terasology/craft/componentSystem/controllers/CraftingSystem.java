@@ -4,8 +4,6 @@ import org.newdawn.slick.Color;
 import org.terasology.asset.Assets;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.components.InventoryComponent;
-import org.terasology.components.ItemComponent;
 import org.terasology.craft.components.actions.CraftingActionComponent;
 import org.terasology.craft.events.crafting.AddItemEvent;
 import org.terasology.craft.events.crafting.ChangeLevelEvent;
@@ -32,12 +30,15 @@ import org.terasology.input.binds.ToolbarPrevButton;
 import org.terasology.input.binds.UseItemButton;
 import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
+import org.terasology.logic.characters.CharacterMovementComponent;
+import org.terasology.logic.inventory.InventoryComponent;
+import org.terasology.logic.inventory.ItemComponent;
+import org.terasology.logic.inventory.SlotBasedInventoryManager;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.logic.players.LocalPlayerSystem;
 import org.terasology.math.AABB;
-import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.BlockOverlayRenderer;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
@@ -65,6 +66,9 @@ public class CraftingSystem implements UpdateSubscriberSystem, RenderSystem {
 
     @In
     private LocalPlayer localPlayer;
+
+    @In
+    private SlotBasedInventoryManager inventoryManager;
 
     @In
     private CameraTargetSystem cameraTargetSystem;
@@ -290,7 +294,7 @@ public class CraftingSystem implements UpdateSubscriberSystem, RenderSystem {
             slotStart += 10;
             slotEnd += 10;
 
-            if (slotEnd > inventory.itemSlots.size() - 1) {
+            if (slotEnd > inventory.getItemSlots().size() - 1) {
                 slotStart = 0;
                 slotEnd = 9;
             }
@@ -319,8 +323,8 @@ public class CraftingSystem implements UpdateSubscriberSystem, RenderSystem {
             slotEnd -= 10;
 
             if (slotStart < -1) {
-                slotStart = inventory.itemSlots.size() - 10;
-                slotEnd = inventory.itemSlots.size() - 1;
+                slotStart = inventory.getItemSlots().size() - 10;
+                slotEnd = inventory.getItemSlots().size() - 1;
             }
 
             if (slotStart < 0) {
@@ -381,7 +385,7 @@ public class CraftingSystem implements UpdateSubscriberSystem, RenderSystem {
                 InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
                 UIItemContainer toolbar = (UIItemContainer) guiManager.getWindowById("hud").getElementById("toolbar");
 
-                EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayerComp.selectedTool + toolbar.getSlotStart());
+                EntityRef selectedItemEntity = inventoryManager.getItemInSlot(entity, localPlayerComp.selectedTool + toolbar.getSlotStart());
 
                 if (!selectedItemEntity.equals(EntityRef.NULL)) {
                     float dropPower = getDropPower();
@@ -423,10 +427,9 @@ public class CraftingSystem implements UpdateSubscriberSystem, RenderSystem {
                     !currentBlock.isPenetrable() &&
                     currentBlock.isCraftPlace()
                     ) {
-                InventoryComponent inventory = playerEntity.getComponent(InventoryComponent.class);
                 if (localPlayerComp.isDead) return;
 
-                EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayerComp.selectedTool);
+                EntityRef selectedItemEntity = inventoryManager.getItemInSlot(playerEntity, localPlayerComp.selectedTool);
 
                 ItemComponent item = selectedItemEntity.getComponent(ItemComponent.class);
 

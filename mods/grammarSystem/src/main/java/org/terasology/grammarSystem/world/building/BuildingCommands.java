@@ -33,6 +33,7 @@ import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.BlockUri;
+import org.terasology.world.block.management.BlockManager;
 
 import javax.vecmath.Vector3f;
 import java.util.*;
@@ -154,12 +155,12 @@ public class BuildingCommands implements CommandProvider {
         ShapeSymbol middle_part = new ShapeSymbol("middle_part");
         ShapeSymbol middle_part_walls = new ShapeSymbol("middle_part_walls");
         //================================================
-        SetRule setStone = new SetRule(Commands.resolveBlockUri("stone").get(0));
-        SetRule setCobblestone = new SetRule(Commands.resolveBlockUri("cobblestone").get(0));
-        SetRule setOaktrunk = new SetRule(Commands.resolveBlockUri("oaktrunk").get(0));
-        SetRule setGlass = new SetRule(Commands.resolveBlockUri("glass").get(0));
-        SetRule setPlank = new SetRule(Commands.resolveBlockUri("plank").get(0));
-        SetRule setAir = new SetRule(Commands.resolveBlockUri("air").get(0));
+        SetRule setStone = new SetRule(BlockManager.getInstance().resolveBlockUri("stone").get(0));
+        SetRule setCobblestone = new SetRule(BlockManager.getInstance().resolveBlockUri("cobblestone").get(0));
+        SetRule setOaktrunk = new SetRule(BlockManager.getInstance().resolveBlockUri("oaktrunk").get(0));
+        SetRule setGlass = new SetRule(BlockManager.getInstance().resolveBlockUri("glass").get(0));
+        SetRule setPlank = new SetRule(BlockManager.getInstance().resolveBlockUri("plank").get(0));
+        SetRule setAir = new SetRule(BlockManager.getInstance().resolveBlockUri("air").get(0));
         //================================================
         DivideArg divideHouseGroundFloorArg = new DivideArg(new Size(3f, true), ground_floor);
         DivideArg divideHouseBorderArg = new DivideArg(new Size(1f, true), border);

@@ -50,6 +50,9 @@ public class AddMiniatureBlockAction implements ComponentSystem {
 
     @ReceiveEvent(components = MiniaturizerComponent.class)
     public void onActivate(ActivateEvent event, EntityRef entity) {
+        if (!event.getTarget().exists()) {
+            return;
+        }
         MiniaturizerComponent comp = entity.getComponent(MiniaturizerComponent.class);
         BlockGrid grid = comp.blockGrid;
 

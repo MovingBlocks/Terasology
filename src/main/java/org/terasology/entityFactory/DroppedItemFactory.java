@@ -17,7 +17,7 @@
 package org.terasology.entityFactory;
 
 import com.google.common.collect.Maps;
-import org.terasology.components.ItemComponent;
+import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.components.utility.DroppedItemTypeComponent;
 import org.terasology.components.utility.LifespanComponent;
 import org.terasology.components.world.LocationComponent;

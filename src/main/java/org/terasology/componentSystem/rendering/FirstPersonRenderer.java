@@ -38,8 +38,8 @@ import javax.vecmath.Vector4f;
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.Assets;
 import org.terasology.componentSystem.RenderSystem;
-import org.terasology.components.InventoryComponent;
-import org.terasology.components.ItemComponent;
+import org.terasology.logic.inventory.InventoryComponent;
+import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.entitySystem.In;
@@ -79,6 +79,7 @@ public class FirstPersonRenderer implements RenderSystem {
     private LocalPlayer localPlayer;
     @In
     private WorldRenderer worldRenderer;
+
     private Mesh handMesh;
     private Texture handTex;
 
@@ -117,7 +118,7 @@ public class FirstPersonRenderer implements RenderSystem {
 
         UIItemContainer toolbar = (UIItemContainer) CoreRegistry.get(GUIManager.class).getWindowById("hud").getElementById("toolbar");
         int invSlotIndex = localPlayer.getCharacterEntity().getComponent(LocalPlayerComponent.class).selectedTool + toolbar.getSlotStart();
-        EntityRef heldItem = localPlayer.getCharacterEntity().getComponent(InventoryComponent.class).itemSlots.get(invSlotIndex);
+        EntityRef heldItem = localPlayer.getCharacterEntity().getComponent(InventoryComponent.class).getItemSlots().get(invSlotIndex);
         ItemComponent heldItemComp = heldItem.getComponent(ItemComponent.class);
         BlockItemComponent blockItem = heldItem.getComponent(BlockItemComponent.class);
         if (blockItem != null && blockItem.blockFamily != null) {

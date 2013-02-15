@@ -1,5 +1,6 @@
 package org.terasology.craft.componentSystem.rendering;
 
+import org.terasology.logic.inventory.SlotBasedInventoryManager;
 import org.terasology.math.*;
 import com.google.common.collect.Maps;
 import org.lwjgl.BufferUtils;
@@ -7,8 +8,8 @@ import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 import org.terasology.asset.Assets;
 import org.terasology.componentSystem.RenderSystem;
-import org.terasology.components.InventoryComponent;
-import org.terasology.components.ItemComponent;
+import org.terasology.logic.inventory.InventoryComponent;
+import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.craft.components.actions.CraftingActionComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -81,6 +82,8 @@ public class CraftBlocksRenderer implements RenderSystem  {
     private Font font = Assets.getFont("engine:default");
     @In
     private WorldRenderer worldRenderer;
+    @In
+    private SlotBasedInventoryManager inventoryManager;
 
     @Override
     public void initialise() {
@@ -132,10 +135,9 @@ public class CraftBlocksRenderer implements RenderSystem  {
                             initResultItem();
                         }
 
-                        if( !resultItemContainer.getComponent(InventoryComponent.class).itemSlots.get(0).equals(craftingActionComponent.possibleItem) ){
-                            InventoryComponent inventoryComponent = resultItemContainer.getComponent(InventoryComponent.class);
-                            inventoryComponent.itemSlots.set(0, craftingActionComponent.possibleItem);
-                            resultItemContainer.saveComponent(inventoryComponent);
+                        EntityRef resultItem = inventoryManager.getItemInSlot(resultItemContainer, 0);
+                        if( !resultItem.equals(craftingActionComponent.possibleItem) ){
+                            inventoryManager.putItemInSlot(resultItemContainer, 0, craftingActionComponent.possibleItem);
                         }
 
                         if( guiCraftElement == null ){
@@ -341,10 +343,7 @@ public class CraftBlocksRenderer implements RenderSystem  {
 
     private void initResultItem(){
         resultItemContainer = entityManager.create("core:chest");
-        InventoryComponent inventory = resultItemContainer.getComponent(InventoryComponent.class);
-        inventory.itemSlots.clear();
-        inventory.itemSlots.add(EntityRef.NULL);
-        resultItemContainer.saveComponent(inventory);
+        inventoryManager.removeItem(resultItemContainer, inventoryManager.getItemInSlot(resultItemContainer, 0));
     }
 
     private void renderBackgroundToolTip(Vector3f worldPos, Vector3f offset, Vector3f scale){

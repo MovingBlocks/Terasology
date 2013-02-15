@@ -16,13 +16,12 @@
 package org.terasology.logic.players;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
-import org.terasology.components.InventoryComponent;
+import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.components.LightComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.math.Direction;
-import org.terasology.math.Side;
 import org.terasology.network.ClientComponent;
 import org.terasology.math.TeraMath;
 import org.terasology.logic.characters.CharacterMovementComponent;
@@ -76,7 +75,7 @@ public class LocalPlayer {
         if (inventory == null || localPlayer == null)
             return false;
 
-        return inventory.itemSlots.get(localPlayer.selectedTool).hasComponent(LightComponent.class);
+        return inventory.getItemSlots().get(localPlayer.selectedTool).hasComponent(LightComponent.class);
     }
 
     public EntityRef getCharacterEntity() {

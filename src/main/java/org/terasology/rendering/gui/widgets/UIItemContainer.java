@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.gui.widgets;
 
-import org.terasology.components.InventoryComponent;
+import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.rendering.gui.framework.UIDisplayContainer;
 
@@ -66,7 +66,7 @@ public class UIItemContainer extends UIDisplayContainer {
             setVisible(true);
 
             int start = 0;
-            int end = entityInventory.itemSlots.size();
+            int end = entityInventory.getItemSlots().size();
 
             if (slotStart != -1) {
                 start = slotStart;
@@ -79,7 +79,7 @@ public class UIItemContainer extends UIDisplayContainer {
             for (int i = start; i < end; ++i)
             {
                 UIItemCell cell = new UIItemCell(entity, cellSize, iconPosition);
-                cell.setItemEntity(entityInventory.itemSlots.get(i), i);
+                cell.setItemEntity(entityInventory.getItemSlots().get(i), i);
                 cell.setSize(cellSize);
                 cell.setConnected(connectedEntity);
                 cell.setPosition(new Vector2f(((i - start) % cols) * (cellSize.x + cellMargin.x), ((i - start) / cols) * (cellSize.y + cellMargin.y)));
@@ -97,7 +97,7 @@ public class UIItemContainer extends UIDisplayContainer {
         if (entityInventory != null) {
             int start = Math.max(slotStart, 0);
             for (int i = 0; i < cells.size(); ++i) {
-                cells.get(i).setItemEntity(entityInventory.itemSlots.get(start), start);
+                cells.get(i).setItemEntity(entityInventory.getItemSlots().get(start), start);
                 start++;
             }
         }

@@ -18,7 +18,7 @@ package org.terasology.dynamicBlocks.componentsystem.controllers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
-import org.terasology.components.ItemComponent;
+import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.dynamicBlocks.components.DynamicBlockComponent;
 import org.terasology.dynamicBlocks.componentsystem.entityfactory.DynamicFactory;

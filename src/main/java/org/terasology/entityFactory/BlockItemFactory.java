@@ -15,7 +15,7 @@
  */
 package org.terasology.entityFactory;
 
-import org.terasology.components.ItemComponent;
+import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.components.LightComponent;
 import org.terasology.network.NetworkComponent;
 import org.terasology.world.block.BlockEntityMode;

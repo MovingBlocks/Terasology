@@ -19,8 +19,8 @@ import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.HealthComponent;
-import org.terasology.components.InventoryComponent;
-import org.terasology.components.ItemComponent;
+import org.terasology.logic.inventory.InventoryComponent;
+import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entityFactory.DroppedBlockFactory;
 import org.terasology.entityFactory.DroppedItemFactory;
@@ -28,7 +28,6 @@ import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventPriority;
 import org.terasology.entitySystem.ReceiveEvent;
-import org.terasology.events.ActivateEvent;
 import org.terasology.events.HealthChangedEvent;
 import org.terasology.events.NoHealthEvent;
 import org.terasology.events.RespawnEvent;
@@ -42,7 +41,6 @@ import org.terasology.input.binds.FrobButton;
 import org.terasology.input.binds.JumpButton;
 import org.terasology.input.binds.RunButton;
 import org.terasology.input.binds.StrafeMovementAxis;
-import org.terasology.input.binds.UseItemButton;
 import org.terasology.input.binds.VerticalMovementAxis;
 import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
@@ -50,7 +48,6 @@ import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.characters.events.FrobRequest;
-import org.terasology.logic.characters.events.UseItemRequest;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.math.AABB;
@@ -350,7 +347,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
     public void onDropItem(DropItemButton event, EntityRef entity) {
         LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
         InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
-        EntityRef selectedItemEntity = inventory.itemSlots.get(localPlayerComp.selectedTool);
+        EntityRef selectedItemEntity = inventory.getItemSlots().get(localPlayerComp.selectedTool);
         BlockItemComponent block = selectedItemEntity.getComponent(BlockItemComponent.class);
 
         if (selectedItemEntity.equals(EntityRef.NULL)) {

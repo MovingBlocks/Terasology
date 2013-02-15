@@ -17,7 +17,7 @@ package org.terasology.hunger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.components.ItemComponent;
+import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.ComponentSystem;

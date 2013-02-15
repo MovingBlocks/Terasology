@@ -10,6 +10,7 @@ import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.entitySystem.RegisterMode;
+import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.math.Vector3i;
 import org.terasology.network.Client;
@@ -40,6 +41,9 @@ public class PlayerSystem implements UpdateSubscriberSystem {
 
     @In
     private NetworkSystem networkSystem;
+
+    @In
+    private InventoryManager inventoryManager;
 
     private ChunkProvider chunkProvider;
 
@@ -75,7 +79,7 @@ public class PlayerSystem implements UpdateSubscriberSystem {
 
         ClientComponent client = clientEntity.getComponent(ClientComponent.class);
         if (client != null) {
-            PlayerFactory playerFactory = new PlayerFactory(entityManager);
+            PlayerFactory playerFactory = new PlayerFactory(entityManager, inventoryManager);
             EntityRef playerCharacter = playerFactory.newInstance(new Vector3f(spawnPos.x, spawnPos.y + 1.5f, spawnPos.z));
             NetworkComponent netComp = playerCharacter.getComponent(NetworkComponent.class);
             if (netComp != null) {

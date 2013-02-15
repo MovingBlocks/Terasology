@@ -78,8 +78,10 @@ public class ComponentSystemManager {
                     ComponentSystem newSystem = (ComponentSystem) system.newInstance();
                     Share share = system.getAnnotation(Share.class);
                     if (share != null && share.value() != null) {
-                        sharedSystems.add(share.value());
-                        CoreRegistry.put((Class<Object>)share.value(), newSystem);
+                        for (Class<?> interfaceType : share.value()) {
+                            sharedSystems.add(interfaceType);
+                            CoreRegistry.put((Class<Object>)interfaceType, newSystem);
+                        }
                     }
                     register(newSystem, id);
                     logger.debug("Loaded system {}", id);

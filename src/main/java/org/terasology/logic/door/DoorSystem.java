@@ -19,10 +19,9 @@ package org.terasology.logic.door;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
-import org.terasology.audio.Sound;
 import org.terasology.audio.AudioManager;
+import org.terasology.audio.Sound;
 import org.terasology.components.BlockParticleEffectComponent;
-import org.terasology.components.ItemComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityInfoComponent;
@@ -34,14 +33,15 @@ import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.events.ActivateEvent;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.NoHealthEvent;
-import org.terasology.events.inventory.ReceiveItemEvent;
-import org.terasology.math.Side;
+import org.terasology.logic.inventory.InventoryManager;
+import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.math.Region3i;
+import org.terasology.math.Side;
 import org.terasology.math.Vector3i;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
-import org.terasology.world.block.entity.BlockComponent;
 import org.terasology.world.block.BlockRegionComponent;
+import org.terasology.world.block.entity.BlockComponent;
 import org.terasology.world.block.management.BlockManager;
 
 import javax.vecmath.Vector3f;
@@ -59,6 +59,8 @@ public class DoorSystem implements ComponentSystem {
     private EntityManager entityManager;
     @In
     private AudioManager audioManager;
+    @In
+    private InventoryManager inventoryManager;
 
     @Override
     public void initialise() {
@@ -232,11 +234,7 @@ public class DoorSystem implements ComponentSystem {
         EntityInfoComponent entityInfo = entity.getComponent(EntityInfoComponent.class);
         if (entityInfo != null) {
             EntityRef doorItem = entityManager.create(entityInfo.parentPrefab);
-            if (event.getInstigator().exists()) {
-                event.getInstigator().send(new ReceiveItemEvent(doorItem));
-            }
-            ItemComponent itemComp = doorItem.getComponent(ItemComponent.class);
-            if (itemComp != null && !itemComp.container.exists()) {
+            if (!inventoryManager.giveItem(event.getInstigator(), doorItem)) {
                 doorItem.destroy();
             }
         }

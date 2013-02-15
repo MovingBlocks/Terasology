@@ -15,7 +15,7 @@
  */
 package org.terasology.componentSystem.action;
 
-import org.terasology.components.InventoryComponent;
+import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.components.actions.AccessInventoryActionComponent;

@@ -16,20 +16,30 @@
 package org.terasology.rendering.gui.windows;
 
 import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
 import org.terasology.asset.Assets;
+import org.terasology.entityFactory.DroppedBlockFactory;
+import org.terasology.entitySystem.EntityManager;
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
+import org.terasology.logic.characters.CharacterComponent;
+import org.terasology.logic.inventory.InventoryManager;
+import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.players.LocalPlayer;
+import org.terasology.logic.players.LocalPlayerComponent;
+import org.terasology.physics.ImpulseEvent;
 import org.terasology.rendering.gui.animation.AnimationMove;
 import org.terasology.rendering.gui.animation.AnimationRotate;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.VisibilityListener;
 import org.terasology.rendering.gui.widgets.*;
+import org.terasology.world.block.entity.BlockItemComponent;
 
 /**
  * The player's inventory.
@@ -96,7 +106,7 @@ public class UIScreenInventory extends UIWindow {
             @Override
             public void down(UIDisplayElement element, int button, boolean intersect) {
                 if (button == 0) {
-                    UIItemCell.reset(); //TODO drop item
+                    reset(); //TODO drop item
                 }
             }
         });
@@ -144,5 +154,58 @@ public class UIScreenInventory extends UIWindow {
         addDisplayElement(leftGearWheel);
         addDisplayElement(inventory);
         addDisplayElement(toolbar);
+    }
+
+    /**
+     * Resets the item in the transfer slot to its owner.
+     */
+    private void reset() {
+        EntityRef item = getTransferItem();
+        if (item.exists()) {
+            ItemComponent itemComponent = item.getComponent(ItemComponent.class);
+            InventoryManager inventoryManager = CoreRegistry.get(InventoryManager.class);
+            if (!inventoryManager.giveItem(itemComponent.container, getTransferItem())) {
+               // TODO: Drop item;
+               item.destroy();
+               //dropitem();
+            }
+            CharacterComponent charComp = CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(CharacterComponent.class);
+            charComp.transferSlot = EntityRef.NULL;
+            CoreRegistry.get(LocalPlayer.class).getCharacterEntity().saveComponent(charComp);
+
+        }
+    }
+
+    private EntityRef getTransferItem() {
+        return CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(CharacterComponent.class).transferSlot;
+    }
+
+    /**
+     * Drop the item in the transfer slot.
+     * TODO this needs some work.
+     */
+    public void dropitem() {
+        EntityRef item = getTransferItem();
+
+
+        if (item.exists()) {
+            ItemComponent itemComp = item.getComponent(ItemComponent.class);
+            BlockItemComponent blockItem = item.getComponent(BlockItemComponent.class);
+
+            if (blockItem != null) {
+                int dropPower = 6;
+                EntityManager entityManager = CoreRegistry.get(EntityManager.class);
+                LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+                LocalPlayerComponent localPlayerComp = localPlayer.getCharacterEntity().getComponent(LocalPlayerComponent.class);
+                DroppedBlockFactory droppedBlockFactory = new DroppedBlockFactory(entityManager);
+                EntityRef droppedBlock = droppedBlockFactory.newInstance(new Vector3f(localPlayer.getPosition().x + localPlayer.getViewDirection().x * 1.5f, localPlayer.getPosition().y + localPlayer.getViewDirection().y * 1.5f, localPlayer.getPosition().z + localPlayer.getViewDirection().z * 1.5f), blockItem.blockFamily, 20);
+
+                for (int i = 0; i < itemComp.stackCount; i++) {
+                    droppedBlock.send(new ImpulseEvent(new Vector3f(localPlayer.getViewDirection().x * dropPower, localPlayer.getViewDirection().y * dropPower, localPlayer.getViewDirection().z * dropPower)));
+                }
+
+                localPlayerComp.handAnimation = 0.5f;
+            }
+        }
     }
 }

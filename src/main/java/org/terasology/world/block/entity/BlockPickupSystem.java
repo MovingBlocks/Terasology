@@ -18,16 +18,16 @@ package org.terasology.world.block.entity;
 
 import org.terasology.asset.Assets;
 import org.terasology.audio.events.PlaySoundForOwnerEvent;
-import org.terasology.components.ItemComponent;
 import org.terasology.entityFactory.BlockItemFactory;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.RegisterSystem;
-import org.terasology.events.inventory.ReceiveItemEvent;
 import org.terasology.game.CoreRegistry;
+import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.physics.CollideEvent;
 
 /**
@@ -36,21 +36,20 @@ import org.terasology.physics.CollideEvent;
 @RegisterSystem(RegisterMode.AUTHORITY)
 public class BlockPickupSystem implements ComponentSystem {
 
+    @In
+    private InventoryManager inventoryManager;
+
     private BlockItemFactory blockItemFactory;
 
     @ReceiveEvent(components = BlockPickupComponent.class)
     public void onBump(CollideEvent event, EntityRef entity) {
         BlockPickupComponent blockPickupComponent = entity.getComponent(BlockPickupComponent.class);
         EntityRef blockItem = blockItemFactory.newInstance(blockPickupComponent.blockFamily, blockPickupComponent.placedEntity);
-        ReceiveItemEvent giveItemEvent = new ReceiveItemEvent(blockItem);
-        event.getOtherEntity().send(giveItemEvent);
-
-        ItemComponent itemComp = blockItem.getComponent(ItemComponent.class);
-        if (itemComp != null && !itemComp.container.exists()) {
-            blockItem.destroy();
-        } else {
+        if (inventoryManager.giveItem(event.getOtherEntity(), blockItem)) {
             event.getOtherEntity().send(new PlaySoundForOwnerEvent(Assets.getSound("engine:Loot"), 1.0f));
             entity.destroy();
+        } else {
+            blockItem.destroy();
         }
     }
 

@@ -16,6 +16,7 @@
 package org.terasology.world.block.management;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.SetMultimap;
@@ -26,6 +27,7 @@ import gnu.trove.map.hash.TObjectByteHashMap;
 import org.lwjgl.BufferUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.asset.Assets;
 import org.terasology.entitySystem.Prefab;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.world.block.Block;
@@ -37,6 +39,7 @@ import org.terasology.world.block.loader.BlockLoader;
 
 import javax.vecmath.Vector2f;
 import java.nio.FloatBuffer;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -141,6 +144,32 @@ public class BlockManager {
                 logger.warn("Block {} no longer available", blockUri);
             }
         }
+    }
+
+    /**
+     * Retrieve all {@code BlockUri}s that match the given string.
+     * <p/>
+     * In order to resolve the {@code BlockUri}s, every package is searched for the given uri pattern.
+     *
+     * @param uri the uri pattern to match
+     * @return a list of matching block uris
+     */
+    public List<BlockUri> resolveBlockUri(String uri) {
+        List<BlockUri> matches = Lists.newArrayList();
+        BlockUri straightUri = new BlockUri(uri);
+        if (straightUri.isValid()) {
+            if (hasBlockFamily(straightUri)) {
+                matches.add(straightUri);
+            }
+        } else {
+            for (String packageName : Assets.listModules()) {
+                BlockUri modUri = new BlockUri(packageName, uri);
+                if (hasBlockFamily(modUri)) {
+                    matches.add(modUri);
+                }
+            }
+        }
+        return matches;
     }
 
     public Map<String, Byte> getBlockIdMap() {
