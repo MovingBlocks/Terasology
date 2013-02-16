@@ -16,47 +16,124 @@
 package org.terasology.input;
 
 import com.leapmotion.leap.*;
-import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.game.CoreRegistry;
+import org.terasology.input.binds.AttackButton;
 import org.terasology.input.binds.ForwardsMovementAxis;
 import org.terasology.input.binds.StrafeMovementAxis;
+import org.terasology.input.binds.VerticalMovementAxis;
+import org.terasology.input.events.MouseXAxisEvent;
+import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.math.TeraMath;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.physics.character.CharacterMovementComponent;
 
+import javax.vecmath.Vector3f;
+import java.util.*;
+
 /**
- * Test implementation for the Leap Motion Controller.
+ * First draft for the LEAP motion player controls.
+ *
+ * How to get started?
+ * -----------------
+ *
+ * Just put one hand on the front left side of the controller, and one hand on the front right side of the controller.
+ * Make sure that no more and no less than one finger tip (clearly pointing in the direction
+ * of your computer screen) is visible per hand and that both palms are facing downwards.
+ *
+ * Tell me... How does it work?
+ * -----------------
+ *
+ * The player is controlled using two hands placed on the front left and the front right
+ * of the LEAP Motion controller. The left hand is responsible for moving the player
+ * around using forwards/backwards, sidewards upwards/downwards movement. The right hand
+ * acts as an virtual mouse which can be used to adjust the player's viewing direction.
+ * The input is controlled by analyzing the hand positions relatively to two virtual origin points
+ * in the coordinate space of the LEAP Motion controller. If the player's left hand is placed to the
+ * right of the left origin point, the player will strafe to the right. If the player's right hand is placed to
+ * the left of the right origin point, the player will look to the left. The speed of the view adjustment and
+ * the speed of the movement is determined using a specified region around those origin points. The more the
+ * hands move away from those origin points, the more intense the action will be.
+ *
+ * How are the hands detected?
+ * -----------------
+ *
+ * If only one hand is detected by the LEAP Motion controller, it is interpreted as a right hand
+ * used for looking around. If a second hand comes into play and is placed on the left side of the controller, it is interpreted as a left hand.
+ * Both hands are cached so they can keep their initial task until the controller might eventually loose track of them and they have to
+ * be reassigned.
+ *
+ * NOTE: The hands HAVE to be placed on the left and right side to ensure a less error prone separation of the hands. If
+ * a previous left hand moves to the right side of the controller (or if a right hand...), both cached hands get invalidated
+ * and reassigned to ensure less sudden movements and overall artifacts.
+ *
+ * How does the movement work?
+ * -----------------
+ *
+ * Movement works as stated above. Additionally jumping can be triggered by a sudden movement of the left palm
+ * along the positive y-axis. The player can be stopped by moving the left hand out of the range of the controller
+ * or by forming a stop sign (point the palm of the left hand in direction of the screen.)
+ *
+ * How does looking around work?
+ * -----------------
+ *
+ * Looking around works as stated above. An attack movement can be triggered by wiggling your right finger up and down.
+ *
+ * Summary
+ * -----------------
+ *
+ * Left hand: Movement (forwards/backwards, strafing, upwards(downwards)) and jumping
+ * Right hand: Looking around and attacking
+ *
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
+ * @author Benjamin 'begla' Glatzel <benjamin.glatzel@me.com>
  */
 public class LeapSystem implements EventHandlerSystem {
 
-    /** Min width of the space we want to be sensitive toward (closer is "dead space") */
-    private static final int MOTION_SPACE_WIDTH_MIN = 40;
-
-    /** Min height of the space we want to be sensitive toward (closer is "dead space") */
-    private static final int MOTION_SPACE_HEIGHT_MIN = 200;
-
-    /** Min depth of the space we want to be sensitive toward (closer is "dead space") */
-    private static final int MOTION_SPACE_DEPTH_MIN = 40;
-
-    /** Width of the motion space from either side beyond the dead space - 'x' */
-    private static final int MOTION_SPACE_WIDTH = 150;
-
-    /** Height of the motion space beyond the minimum height - 'y' */
-    private static final int MOTION_SPACE_HEIGHT = 300;
-
-    /** Depth of the motion space from either side beyond the dead space - 'z' */
-    private static final int MOTION_SPACE_DEPTH = 150;
-
     /** Rate at which we'll consider frames from the Leap */
-    private static final int LEAP_FRAME_RATE = 10;
+    private static final int LEAP_FRAME_RATE = 1;
+
+    /** The 'virtual' origin for the left hand */
+    private static final Vector3f LEFT_HAND_ORIGIN = new Vector3f(-120.0f, 180.0f, 180.0f);
+    /** The 'virtual' origin for the right hand */
+    private static final Vector3f RIGHT_HAND_ORIGIN = new Vector3f(120.0f, 180.0f, 180.0f);
+    /** The area around the origins to control the 'intensity' of the movement */
+    private static final float MOVEMENT_ADAPTATION_LENGTH = 50.0f;
+    /** The relative hand position to start running (tracked along the y-axis) */
+    private static final float RUNNING_REL_THRESHOLD = 0.5f;
+    /** The velocity threshold to start a jump (tracked by the left hand) */
+    private static final float JUMPING_THRESHOLD = 750.0f;
+    /** The velocity threshold to start an attack (first finger of the right hand is tracked) */
+    private static final float ATTACK_THRESHOLD = 500.0f;
+    /** The sensitivity for looking around in the first person perspective (right hand) */
+    private static final float LOOKING_SENSITIVITY = 10.0f;
+    /** Palm normal threshold for stopping movement */
+    private static final float PALM_NORMAL_THRESHOLD_MOVEMENT = -0.8f;
+    /** The amount of frames to consider for averaging the position, normal and velocity. */
+    private static final int DEFAULT_PAST_FRAMES_TO_CONSIDER = 10;
+    /** Time to disable looking during attacking. */
+    private static final float ATTACK_TIMEOUT = 0.1f;
+
+    /** Various components that are used to control the game via the LEAP controller  */
+    private LocalPlayer localPlayer;
+    private CameraTargetSystem cameraTargetSystem;
+    private Controller leapController;
+
+    /** Stores the IDs of the currently tracked left and right hand */
+    private int currentLeftHand = -1;
+    private int currentRightHand = -1;
+
+    /** The time since the last attack by the player. */
+    private float timeSinceLastAttack = 0.0f;
 
     /** Counter for total frames processed */
     private int framesTotal = 0;
 
     public void initialise() {
-        // Doesn't seem to persist variables right the way I use it? Have to set them again inside update() :-(
+        leapController = CoreRegistry.get(Controller.class);
+        localPlayer = CoreRegistry.get(LocalPlayer.class);
+        cameraTargetSystem = CoreRegistry.get(CameraTargetSystem.class);
     }
 
     @Override
@@ -64,9 +141,6 @@ public class LeapSystem implements EventHandlerSystem {
     }
 
     public void update(float delta) {
-        // Hackity hacky hack - using the Listener directly only survives 56-59 frames then crashes/exits (something I'm missing)
-        PerformanceMonitor.startActivity("Leap");
-
         framesTotal++;
 
         // Leap by default only stores 59 frames and we might want to process at a lower rate than that
@@ -74,165 +148,337 @@ public class LeapSystem implements EventHandlerSystem {
             return;
         }
 
-        Controller leapController = CoreRegistry.get(Controller.class);
-        EntityRef playerEntity = CoreRegistry.get(LocalPlayer.class).getEntity();
+        PerformanceMonitor.startActivity("Leap");
 
-        // Grab the previous frame (that we care about) for comparisons
-        //Frame oldFrame = leapController.frame(LEAP_FRAME_RATE);
+        // There are certain scenarios where the currently tracked hands should be invalidated...
+        // One nasty example is when the left hand has moved over in the area of the right hand (or reverse)
+        // In that case the LEAP controller looses track of one hand and one of the hands can suddenly become
+        // interpreted as the opposite one (left hand is suddenly used for looking around or the right hand suddenly controls
+        // the movement very firmly...). Since the origins are not altered dynamically the player might suddenly
+        // start to look in the sky and rotate or walk from a mountain with high-speed.
+        // For this case...
 
-        // Get the most recent frame and report some basic information
         Frame frame = leapController.frame();
-        /*System.out.println("Frame id: " + frame.id()
-                + ", timestamp: " + frame.timestamp()
-                + ", hands: " + frame.hands().count()
-                + ", fingers: " + frame.fingers().count()
-                + ", tools: " + frame.tools().count()
-                + ", framesTotal: " + framesTotal);
-*/
-        if (!frame.hands().empty()) {
-            // Get the first hand
-            Hand hand = frame.hands().get(0);
-/*
-            // Check if the hand has any fingers
-            FingerList fingers = hand.fingers();
-            if (!fingers.empty()) {
-                // Calculate the hand's average finger tip position
-                Vector avgPos = Vector.zero();
-                for (Finger finger : fingers) {
-                    avgPos = avgPos.plus(finger.tipPosition());
-                }
-                avgPos = avgPos.divide(fingers.count());
-                System.out.println("Hand has " + fingers.count()
-                        + " fingers, average finger tip position: " + avgPos);
-            }
 
-            // Get the hand's sphere radius and palm position
-            System.out.println("Hand sphere radius: " + hand.sphereRadius()
-                    + " mm, palm position: " + hand.palmPosition());
-            */
+        // Check if the current left hand is in the area of the right hand...
+        if (currentLeftHand != -1
+                && frame.hand(currentLeftHand).isValid()
+                && frame.hand(currentLeftHand).palmPosition().getX() > 0.0f) {
+            currentLeftHand = -1;
+        }
 
-            /*
-            // Cheap dirty way to base an action off a change :D
-            Hand oldHand = oldFrame.hands().get(0);
-            float y = hand.palmPosition().getY();
-            float oldY = oldHand.palmPosition().getY();
-            float deltaY = y - oldY;
-            System.out.println("Previous hand y was " + oldY + " while new is " + y + " so delta is " + deltaY);
+        // Or if the current right hand is in the area of the left hand...
+        if (currentRightHand != -1
+                && frame.hand(currentRightHand).isValid()
+                && frame.hand(currentRightHand).palmPosition().getX() < 0.0f) {
+            currentRightHand = -1;
+        }
 
-            if (deltaY > 100) {
-                // If the player's hand moved back a fair amount, start moving forwards (key 17, default 'w')!
-                System.out.println("Detecting RAISED hand, triggering move forward");
-                BindAxisEvent event = new ForwardsMovementAxis();
-                event.prepare("Whatisthisidonteven", 1f, 1f);
-                CoreRegistry.get(LocalPlayer.class).getEntity().send(event);
-            } else if (deltaY < -100) {
-                // Alternatively if the hand moved forward, stop moving forwards!
-                System.out.println("Detecting LOWERED hand, cancelling move forward");
-                BindAxisEvent event = new ForwardsMovementAxis();
-                event.prepare("Whatisthisidonteven", -1f, 1f);
-                CoreRegistry.get(LocalPlayer.class).getEntity().send(event);
-            }
-            */
+        // The right hand is used for looking around in the first person view...
 
-            // Get the hand's normal vector and direction
-            Vector normal = hand.palmNormal();
-            Vector direction = hand.direction();
+        LinkedList<Hand> rightHandCandidates = new LinkedList<Hand>();
 
-            // Calculate the hand's pitch, roll, and yaw angles
-            //System.out.println("Hand pitch: " + Math.toDegrees(direction.pitch()) + " degrees, "
-            //        + "roll: " + Math.toDegrees(normal.roll()) + " degrees, "
-            //        + "yaw: " + Math.toDegrees(direction.yaw()) + " degrees\n");
+        // Start out by putting all right hand candidates in a list ( they have to be on the right side of the leap controller)
+        // DO NOT add hands that are currently being tracked!
+        for (int i=0; i<frame.hands().count(); ++i) {
+            if (frame.hands().get(i).id() != currentLeftHand
+                    && frame.hands().get(i).id() != currentRightHand) {
 
-
-            // Use the hand's location relative to the controller to direct player's direction and speed
-            float x = hand.palmPosition().getX();
-            float y = hand.palmPosition().getY();
-            float z = hand.palmPosition().getZ();
-
-            // These ranges relate to how far in the sensitive space the player's hand was (for scaled velocity).
-            // Negative results will be within the min space and thus be disqualified, likewise results beyond the max range
-            float rangeX = Math.abs(x) - MOTION_SPACE_WIDTH_MIN;
-            float rangeZ = Math.abs(z) - MOTION_SPACE_DEPTH_MIN;
-
-            System.out.println("X = " + x + ", Y = " + y + ", Z = " + z);
-
-            // TODO: Make half width/depth enough to reach max walk speed
-            // TODO: Apply runFactor when more than half *depth* (no pure run-strafing?)
-            // TODO: Use pitch/roll/yaw to change camera direction (impersonate mouse?)
-
-            CharacterMovementComponent characterMovement = playerEntity.getComponent(CharacterMovementComponent.class);
-            // Forwards / backwards - also responsible for triggering running or not (which then indirectly can increase strafing speed?)
-            if (rangeZ > 0 && rangeZ < MOTION_SPACE_DEPTH) {
-                float ratioZ = rangeZ / MOTION_SPACE_DEPTH;
-
-                // If the hand is more than half way through the range we care about then the player is running.
-                if (rangeZ > MOTION_SPACE_DEPTH / 2) {
-                    // Base running on max walk speed and set the flag. Note that said flag may impact sideways strafing speed?
-                    ratioZ = 1;
-                    characterMovement.isRunning = true;
-                } else {
-                    // We're walking, but still need to adjust up speed to max walk speed at half the max range we care about
-                    ratioZ *= 2;
+                Hand hand = frame.hands().get(i);
+                if (hand.isValid() && hand.palmPosition().getX() > 0.0f) {
+                    rightHandCandidates.add(hand);
                 }
 
-                // Reverse direction in case the coordinate was negative
-                if (z > 0) {
-                    ratioZ *= -1;
+            }
+        }
+
+        // If we've got multiple hands in the right hand area... Take the one closest to the virtual origin
+        Collections.sort(rightHandCandidates, new Comparator<Hand>() {
+            @Override
+            public int compare(Hand o1, Hand o2) {
+                Vector3f handPositionA = TeraMath.convert(o1.palmPosition());
+                Vector3f originToHandPosA = new Vector3f();
+                originToHandPosA.sub(handPositionA, RIGHT_HAND_ORIGIN);
+
+                Vector3f handPositionB = TeraMath.convert(o2.palmPosition());
+                Vector3f originToHandPosB = new Vector3f();
+                originToHandPosB.sub(handPositionB, RIGHT_HAND_ORIGIN);
+
+                float distA = originToHandPosA.length();
+                float distB = originToHandPosB.length();
+
+                if (distA > distB) {
+                    return 1;
+                } else if (distA < distB) {
+                    return -1;
                 }
 
-                if (characterMovement.isRunning) {
-                    System.out.println("ratioZ is " + ratioZ + ", which was based on a range of " + rangeZ + " out of " + MOTION_SPACE_DEPTH + ". Player IS running");
-                } else {
-                    System.out.println("ratioZ is " + ratioZ + ", which was based on a range of " + rangeZ + " out of " + MOTION_SPACE_DEPTH + " then doubled as the player is NOT running?");
+                return 0;
+            }
+        });
+
+        // If there are valid right hand candidates and the current right hand is invalid (or has never been used before)...
+        if (!rightHandCandidates.isEmpty()) {
+            if (currentRightHand == -1 || !frame.hand(currentRightHand).isValid()) {
+                System.out.println("New 'LOOKING' hand found!");
+
+                // .. replace the current hand with the best right hand candidate
+                Hand h = rightHandCandidates.removeFirst();
+                currentRightHand = h.id();
+            }
+        }
+
+        // The same goes for the left hand...
+
+        LinkedList<Hand> leftHandCandidates = new LinkedList<Hand>();
+
+        // Start out by putting all left hand candidates in a list ( they have to be on the left side of the leap controller)
+        // DO NOT add hands that are currently being tracked!
+        for (int i=0; i<frame.hands().count(); ++i) {
+            // Only add hands that are not used for something, yet...
+            if (frame.hands().get(i).id() != currentLeftHand
+                    && frame.hands().get(i).id() != currentRightHand) {
+
+                Hand hand = frame.hands().get(i);
+                if (hand.isValid() && hand.palmPosition().getX() < 0.0f) {
+                    leftHandCandidates.add(hand);
                 }
 
-                BindAxisEvent event = new ForwardsMovementAxis();
-
-                // The first and last variables here aren't really needed (refactor?) - first is unused and third relates to delta time which may not matter here?
-                event.prepare("leap:forwardbackwards", ratioZ, 1f);
-                playerEntity.send(event);
-
-            } else {
-                BindAxisEvent event = new ForwardsMovementAxis();
-                //System.out.println("Stopping z velocity");
-                event.prepare("leap:stopforwardbackwards", 0f, 1f);
-                playerEntity.send(event);
             }
+        }
 
-            // Left / right
-            if (rangeX > 0 && rangeX < MOTION_SPACE_WIDTH) {
-                float ratioX = rangeX / MOTION_SPACE_WIDTH;
+        // If we've got multiple hands in the left hand area... Take the one closest to the virtual origin
+        Collections.sort(leftHandCandidates, new Comparator<Hand>() {
+            @Override
+            public int compare(Hand o1, Hand o2) {
+                Vector3f handPositionA = TeraMath.convert(o1.palmPosition());
+                Vector3f originToHandPosA = new Vector3f();
+                originToHandPosA.sub(handPositionA, LEFT_HAND_ORIGIN);
 
-                // Reverse direction in case the coordinate was negative
-                if (x > 0) {
-                    ratioX *= -1;
+                Vector3f handPositionB = TeraMath.convert(o2.palmPosition());
+                Vector3f originToHandPosB = new Vector3f();
+                originToHandPosB.sub(handPositionB, LEFT_HAND_ORIGIN);
+
+                float distA = originToHandPosA.length();
+                float distB = originToHandPosB.length();
+
+                if (distA > distB) {
+                    return 1;
+                } else if (distA < distB) {
+                    return -1;
                 }
 
-                System.out.println("ratioX is " + ratioX + ", which was based on a range of " + rangeX + " out of " + MOTION_SPACE_WIDTH);
-                BindAxisEvent event = new StrafeMovementAxis();
-
-                // The first and last variables here aren't really needed (refactor?) - first is unused and third relates to delta time which may not matter here?
-                event.prepare("leap:sideways", ratioX, 1f);
-                playerEntity.send(event);
-            } else {
-                BindAxisEvent event = new StrafeMovementAxis();
-                //System.out.println("Stopping x velocity");
-                event.prepare("leap:stopsideways", 0f, 1f);
-                playerEntity.send(event);
+                return 0;
             }
+        });
 
-            // Jump
-            if (y > MOTION_SPACE_HEIGHT_MIN && y < MOTION_SPACE_HEIGHT) {
-                System.out.println("Tank: Load the jump program");
-                characterMovement.jump = true;
+        // If there are valid left hand candidates and the current left hand is invalid (or has never been used before)...
+        if (!leftHandCandidates.isEmpty()) {
+            if (currentLeftHand == -1 || !frame.hand(currentLeftHand).isValid()) {
+                System.out.println("New 'MOVEMENT' hand found!");
+
+                // .. replace the current hand with the best left hand candidate
+                Hand h = leftHandCandidates.removeFirst();
+                currentLeftHand = h.id();
             }
+        }
 
-            characterMovement.isRunning = false;
+        // Check if we've got a valid right hand available...
+        if (currentRightHand != -1 && frame.hand(currentRightHand).isValid()) {
+            // ... and use it for letting the player look around (like a virtual mouse)
+            doPlayerLooking(currentRightHand, delta);
+        }
+
+        // Check if we've got a valid left hand available...
+        if (currentLeftHand != -1 && frame.hand(currentLeftHand).isValid()) {
+            // ... and use it for moving the player around (walking forwards/backwards, upwards/downwards or left and right)
+            doPlayerMovement(currentLeftHand, delta);
+        } else {
+            // No hand available? Halt the machine!
+            doPlayerMovement(-1, delta);
         }
 
         PerformanceMonitor.endActivity();
     }
 
+    public void doPlayerMovement(int leftHandId, float delta) {
 
+        Hand hand = leapController.frame().hand(leftHandId);
+        CharacterMovementComponent movComp = localPlayer.getEntity().getComponent(CharacterMovementComponent.class);
+
+        BindAxisEvent eventForwardsAndBackwards = new ForwardsMovementAxis();
+        BindAxisEvent eventLeftAndRight = new StrafeMovementAxis();
+        BindAxisEvent eventUpAndDown = new VerticalMovementAxis();
+
+        boolean stopMovement = !hand.isValid();
+
+        Vector3f palmNormal = calcAveragePalmNormal(leftHandId, DEFAULT_PAST_FRAMES_TO_CONSIDER);
+        stopMovement |= palmNormal.y > PALM_NORMAL_THRESHOLD_MOVEMENT;
+
+        if (stopMovement) {
+            eventForwardsAndBackwards.prepare("leap:forwardAndBackwards", 0.0f, 1f);
+            localPlayer.getEntity().send(eventForwardsAndBackwards);
+
+            eventLeftAndRight.prepare("leap:leftAndRight", 0.0f, 1f);
+            localPlayer.getEntity().send(eventLeftAndRight);
+
+            eventUpAndDown.prepare("leap:eventUpAndDown", 0.0f, 1f);
+            localPlayer.getEntity().send(eventUpAndDown);
+
+            movComp.isRunning = false;
+
+            return;
+        }
+
+        // Use the hand's location relative to the controller to direct player's direction and speed
+        Vector3f absPosition = calcAveragePalmPosition(leftHandId, DEFAULT_PAST_FRAMES_TO_CONSIDER);
+
+        // Use the hand's location relative to the controller to direct player's direction and speed
+        Vector3f velocity = calcAveragePalmVelocity(leftHandId, DEFAULT_PAST_FRAMES_TO_CONSIDER);
+
+        Vector3f relPosition = new Vector3f();
+        relPosition.sub(absPosition, LEFT_HAND_ORIGIN);
+
+        Vector3f normOffset = new Vector3f(
+               -relPosition.x / MOVEMENT_ADAPTATION_LENGTH,
+               relPosition.y / MOVEMENT_ADAPTATION_LENGTH,
+               -relPosition.z / MOVEMENT_ADAPTATION_LENGTH
+        );
+
+        normOffset.clamp(-1.0f, 1.0f);
+
+        if (normOffset.y > RUNNING_REL_THRESHOLD) {
+            movComp.isRunning = true;
+        } else {
+            movComp.isRunning = false;
+        }
+
+        if (velocity.y > JUMPING_THRESHOLD) {
+            movComp.jump = true;
+        }
+        else
+        {
+            movComp.jump = false;
+        }
+
+        //if (!suddenMovement) {
+            eventForwardsAndBackwards.prepare("leap:forwardAndBackwards", normOffset.z, 1f);
+            localPlayer.getEntity().send(eventForwardsAndBackwards);
+
+            eventLeftAndRight.prepare("leap:leftAndRight", normOffset.x, 1f);
+            localPlayer.getEntity().send(eventLeftAndRight);
+
+            eventUpAndDown.prepare("leap:eventUpAndDown", normOffset.y, 1f);
+            localPlayer.getEntity().send(eventUpAndDown);
+        //}
+    }
+
+    public void doPlayerLooking(int rightHandId, float delta) {
+        Hand hand = leapController.frame().hand(rightHandId);
+
+        if (!hand.isValid()) {
+            return;
+        }
+
+        // Use the hand's location relative to the controller to direct player's direction and speed
+        Vector3f absPosition = calcAveragePalmPosition(rightHandId, DEFAULT_PAST_FRAMES_TO_CONSIDER);
+
+        // Use the hand's location relative to the controller to direct player's direction and speed
+        Vector3f velocity = calcAverageTipVelocity(rightHandId, hand.fingers().get(0).id(), DEFAULT_PAST_FRAMES_TO_CONSIDER);
+
+        Vector3f relPosition = new Vector3f();
+        relPosition.sub(absPosition, RIGHT_HAND_ORIGIN);
+
+        Vector3f normOffset = new Vector3f(
+                -relPosition.x / MOVEMENT_ADAPTATION_LENGTH,
+                relPosition.y / MOVEMENT_ADAPTATION_LENGTH,
+                -relPosition.z / MOVEMENT_ADAPTATION_LENGTH
+        );
+
+        normOffset.clamp(-1.0f, 1.0f);
+
+        if (velocity.length() > ATTACK_THRESHOLD) {
+            BindButtonEvent eventAttack = new AttackButton();
+            eventAttack.prepare("leap:attack", ButtonState.DOWN, 0.0f);
+            eventAttack.setTarget(cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal());
+            localPlayer.getEntity().send(eventAttack);
+
+            timeSinceLastAttack = 0.f;
+        } else {
+            timeSinceLastAttack += delta;
+        }
+
+        if (timeSinceLastAttack > ATTACK_TIMEOUT) {
+            MouseXAxisEvent mouseXAxisEvent = new MouseXAxisEvent(relPosition.x / LOOKING_SENSITIVITY, 0f);
+            localPlayer.getEntity().send(mouseXAxisEvent);
+            MouseYAxisEvent mouseYAxisEvent = new MouseYAxisEvent(relPosition.y / LOOKING_SENSITIVITY, 0f);
+            localPlayer.getEntity().send(mouseYAxisEvent);
+        }
+    }
+
+    Vector3f calcAveragePalmPosition(int handId, int pastFrames) {
+        float count = 1.0f;
+        Vector3f position = TeraMath.convert(leapController.frame(0).hand(handId).palmPosition());
+        for (int i=0; i<pastFrames; ++i) {
+            Hand handFromThePast = leapController.frame(i+1).hand(handId);
+
+            if (handFromThePast.isValid()) {
+                position.add(TeraMath.convert(handFromThePast.palmPosition()));
+                count += 1.0f;
+            }
+        }
+
+        position.scale(1.0f / count);
+        return position;
+    }
+
+    Vector3f calcAveragePalmNormal(int handId, int pastFrames) {
+        float count = 1.0f;
+        Vector3f velocity = TeraMath.convert(leapController.frame(0).hand(handId).palmNormal());
+        for (int i=0; i<pastFrames; ++i) {
+            Hand handFromThePast = leapController.frame(i+1).hand(handId);
+
+            if (handFromThePast.isValid()) {
+                velocity.add(TeraMath.convert(handFromThePast.palmNormal()));
+                count += 1.0f;
+            }
+        }
+
+        velocity.scale(1.0f / count);
+        return velocity;
+    }
+
+    Vector3f calcAveragePalmVelocity(int handId, int pastFrames) {
+        float count = 1.0f;
+        Vector3f velocity = TeraMath.convert(leapController.frame(0).hand(handId).palmVelocity());
+        for (int i=0; i<pastFrames; ++i) {
+            Hand handFromThePast = leapController.frame(i+1).hand(handId);
+
+            if (handFromThePast.isValid()) {
+                velocity.add(TeraMath.convert(handFromThePast.palmVelocity()));
+                count += 1.0f;
+            }
+        }
+
+        velocity.scale(1.0f / count);
+        return velocity;
+    }
+
+    Vector3f calcAverageTipVelocity(int handId, int fingerId, int pastFrames) {
+        float count = 1.0f;
+        Vector3f velocity = TeraMath.convert(leapController.frame(0).hand(handId).finger(fingerId).tipVelocity());
+        for (int i=0; i<pastFrames; ++i) {
+            Hand handFromThePast = leapController.frame(i+1).hand(handId);
+            Finger fingerFromThePast = handFromThePast.finger(fingerId);
+
+            if (handFromThePast.isValid() && fingerFromThePast.isValid()) {
+                velocity.add(TeraMath.convert(fingerFromThePast.tipVelocity()));
+                count += 1.0f;
+            }
+        }
+
+        velocity.scale(1.0f / count);
+        return velocity;
+    }
 }
 

@@ -83,6 +83,7 @@ public class StateSinglePlayer implements GameState {
 
         CoreRegistry.put(Controller.class, new Controller());
         leapSystem = new LeapSystem();
+        leapSystem.initialise();
         CoreRegistry.put(LeapSystem.class, leapSystem);
         componentSystemManager.register(leapSystem, "engine:LeapSystem");
 

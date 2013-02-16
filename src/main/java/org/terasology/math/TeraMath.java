@@ -23,6 +23,7 @@ import javax.vecmath.Matrix3f;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 
+import com.leapmotion.leap.Vector;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.terasology.world.chunks.Chunk;
@@ -522,5 +523,9 @@ public final class TeraMath {
         result.m11 = -1.0f;
 
         return result;
+    }
+
+    public static Vector3f convert(Vector leapVector) {
+        return new Vector3f(leapVector.getX(), leapVector.getY(), leapVector.getZ());
     }
 }
