@@ -15,17 +15,13 @@
  */
 package org.terasology.rendering.shader;
 
-import static org.lwjgl.opengl.GL11.glBindTexture;
-
-import javax.vecmath.Vector3f;
-
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
+import org.terasology.config.Config;
 import org.terasology.editor.properties.Property;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PostProcessingRenderer;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.cameras.Camera;
@@ -34,6 +30,8 @@ import org.terasology.utilities.FastRandom;
 
 import java.nio.FloatBuffer;
 import java.util.List;
+
+import static org.lwjgl.opengl.GL11.glBindTexture;
 
 /**
  * Shader parameters for the Post-processing shader program.
@@ -65,7 +63,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
         PostProcessingRenderer.getInstance().getFBO("sceneBloom1").bindTexture();
         program.setInt("texBloom", 1);
 
-        if (Config.getInstance().getBlurIntensity() != 0 || Config.getInstance().isMotionBlur()) {
+        if (CoreRegistry.get(Config.class).getRendering().getBlurIntensity() != 0 || CoreRegistry.get(Config.class).getRendering().isMotionBlur()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE2);
             PostProcessingRenderer.getInstance().getFBO("sceneBlur1").bindTexture();
             program.setInt("texBlur", 2);
@@ -81,7 +79,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
         scene.bindDepthTexture();
         program.setInt("texDepth", 4);
 
-        if (Config.getInstance().isFilmGrain()) {
+        if (CoreRegistry.get(Config.class).getRendering().isFilmGrain()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE5);
             glBindTexture(GL11.GL_TEXTURE_2D, noiseTexture.getId());
             program.setInt("texNoise", 5);
@@ -96,7 +94,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
         }
 
         Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
-        if (activeCamera != null && Config.getInstance().isMotionBlur()) {
+        if (activeCamera != null && CoreRegistry.get(Config.class).getRendering().isMotionBlur()) {
             program.setMatrix4("invViewProjMatrix", activeCamera.getInverseViewProjectionMatrix());
             program.setMatrix4("prevViewProjMatrix", activeCamera.getPrevViewProjectionMatrix());
         }

@@ -17,8 +17,8 @@ package org.terasology.rendering.gui.windows;
 
 import org.lwjgl.input.Keyboard;
 import org.terasology.asset.Assets;
+import org.terasology.config.AudioConfig;
 import org.terasology.config.Config;
-import org.terasology.config.SoundConfig;
 import org.terasology.game.CoreRegistry;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
@@ -44,10 +44,10 @@ public class UIMenuConfigAudio extends UIWindow {
     private final UISlider soundOptionSlider;
     private final UISlider musicOptionSlider;
     private final UIButton backToConfigMenuButton;
-    private final SoundConfig config;
+    private final AudioConfig config;
 
     public UIMenuConfigAudio() {
-        config = CoreRegistry.get(Config.class).getSoundConfig();
+        config = CoreRegistry.get(Config.class).getAudio();
         setId("config:audio");
         setBackgroundImage("engine:loadingbackground");
         setModal(true);

@@ -16,9 +16,10 @@
 package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL13;
-import org.terasology.logic.manager.Config;
-import org.terasology.logic.manager.PostProcessingRenderer;
+import org.terasology.config.Config;
 import org.terasology.editor.properties.Property;
+import org.terasology.game.CoreRegistry;
+import org.terasology.logic.manager.PostProcessingRenderer;
 
 import java.util.List;
 
@@ -42,14 +43,14 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
         scene.bindTexture();
         program.setInt("texScene", 0);
 
-        if (Config.getInstance().isSSAO()) {
+        if (CoreRegistry.get(Config.class).getRendering().isSsao()) {
             PostProcessingRenderer.FBO ssao = PostProcessingRenderer.getInstance().getFBO("ssaoBlurred1");
             GL13.glActiveTexture(GL13.GL_TEXTURE1);
             ssao.bindTexture();
             program.setInt("texSsao", 1);
         }
 
-        if (Config.getInstance().isOutline()) {
+        if (CoreRegistry.get(Config.class).getRendering().isOutline()) {
             PostProcessingRenderer.FBO sobel = PostProcessingRenderer.getInstance().getFBO("sobel");
             GL13.glActiveTexture(GL13.GL_TEXTURE2);
             sobel.bindTexture();
@@ -59,7 +60,7 @@ public class ShaderParametersPrePost extends ShaderParametersBase {
             program.setFloat("outlineThickness", (Float) outlineThickness.getValue());
         }
 
-        if (Config.getInstance().isLightShafts()) {
+        if (CoreRegistry.get(Config.class).getRendering().isLightShafts()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE3);
             PostProcessingRenderer.getInstance().getFBO("lightShafts").bindTexture();
             program.setInt("texLightShafts", 3);

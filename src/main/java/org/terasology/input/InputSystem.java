@@ -19,8 +19,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.terasology.config.Config;
 import org.terasology.entitySystem.EventHandlerSystem;
 import org.terasology.entitySystem.EventSystem;
+import org.terasology.entitySystem.In;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.TerasologyEngine;
 import org.terasology.input.events.InputEvent;
@@ -40,7 +42,6 @@ import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.input.events.RightMouseDownButtonEvent;
 import org.terasology.input.events.RightMouseUpButtonEvent;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 
 import java.util.List;
@@ -54,7 +55,8 @@ import java.util.Map;
  */
 public class InputSystem implements EventHandlerSystem {
 
-    private float mouseSensitivity = (float) Config.getInstance().getMouseSens();
+    @In
+    private Config config;
 
     private Map<String, BindableAxisImpl> axisLookup = Maps.newHashMap();
     private Map<String, BindableButtonImpl> buttonLookup = Maps.newHashMap();
@@ -196,7 +198,7 @@ public class InputSystem implements EventHandlerSystem {
         //process mouse movement x axis
         int deltaX = Mouse.getDX();
         if (deltaX != 0) {
-            MouseAxisEvent event = new MouseXAxisEvent(deltaX * mouseSensitivity, delta);
+            MouseAxisEvent event = new MouseXAxisEvent(deltaX * config.getInput().getMouseSensitivity(), delta);
             setupTarget(event);
             localPlayer.getEntity().send(event);
         }
@@ -204,7 +206,7 @@ public class InputSystem implements EventHandlerSystem {
         //process mouse movement y axis
         int deltaY = Mouse.getDY();
         if (deltaY != 0) {
-            MouseAxisEvent event = new MouseYAxisEvent(deltaY * mouseSensitivity, delta);
+            MouseAxisEvent event = new MouseYAxisEvent(deltaY * config.getInput().getMouseSensitivity(), delta);
             setupTarget(event);
             localPlayer.getEntity().send(event);
         }

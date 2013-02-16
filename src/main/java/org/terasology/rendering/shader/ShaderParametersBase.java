@@ -15,11 +15,11 @@
  */
 package org.terasology.rendering.shader;
 
-import org.terasology.game.CoreRegistry;
-import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.manager.Config;
+import org.terasology.config.Config;
 import org.terasology.editor.properties.IPropertyProvider;
 import org.terasology.editor.properties.Property;
+import org.terasology.game.CoreRegistry;
+import org.terasology.logic.LocalPlayer;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 
@@ -31,14 +31,14 @@ import java.util.List;
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class ShaderParametersBase  implements IPropertyProvider, IShaderParameters {
+public class ShaderParametersBase implements IPropertyProvider, IShaderParameters {
 
     public ShaderParametersBase() {
     }
 
     @Override
     public void applyParameters(ShaderProgram program) {
-        program.setFloat("viewingDistance", Config.getInstance().getActiveViewingDistance() * 8.0f);
+        program.setFloat("viewingDistance", CoreRegistry.get(Config.class).getRendering().getActiveViewingDistance() * 8.0f);
 
         WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
         LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
@@ -55,7 +55,7 @@ public class ShaderParametersBase  implements IPropertyProvider, IShaderParamete
             }
 
             float sunAngle = worldRenderer.getSkysphere().getSunPosAngle();
-            Vector3f sunNormalise = new Vector3f(0.0f, (float) java.lang.Math.cos(sunAngle),  (float) java.lang.Math.sin(sunAngle));
+            Vector3f sunNormalise = new Vector3f(0.0f, (float) java.lang.Math.cos(sunAngle), (float) java.lang.Math.sin(sunAngle));
             sunNormalise.normalize();
 
             program.setFloat3("sunVec", sunNormalise.x, sunNormalise.y, sunNormalise.z);

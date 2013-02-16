@@ -15,15 +15,13 @@
  */
 package org.terasology.rendering.shader;
 
-import static org.lwjgl.opengl.GL11.glBindTexture;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
-import org.terasology.game.CoreRegistry;
-import org.terasology.logic.manager.Config;
-import org.terasology.logic.manager.PostProcessingRenderer;
+import org.terasology.config.Config;
 import org.terasology.editor.properties.Property;
+import org.terasology.game.CoreRegistry;
+import org.terasology.logic.manager.PostProcessingRenderer;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
@@ -32,6 +30,8 @@ import javax.vecmath.Vector3d;
 import javax.vecmath.Vector4d;
 import javax.vecmath.Vector4f;
 import java.util.List;
+
+import static org.lwjgl.opengl.GL11.glBindTexture;
 
 /**
  * Shader parameters for the Chunk shader program.
@@ -80,7 +80,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         glBindTexture(GL11.GL_TEXTURE_2D, effects.getId());
         GL13.glActiveTexture(GL13.GL_TEXTURE4);
         PostProcessingRenderer.getInstance().getFBO("sceneReflected").bindTexture();
-        if (Config.getInstance().isRefractiveWater()) {
+        if (CoreRegistry.get(Config.class).getRendering().isRefractiveWater()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE5);
             PostProcessingRenderer.getInstance().getFBO("sceneRefracted").bindTexture();
         }
@@ -125,7 +125,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         waterSettingsFrag.w = (Float) waterFresnelPow.getValue();
         program.setFloat4("waterSettingsFrag", waterSettingsFrag);
 
-        if (Config.getInstance().isAnimatedWater()) {
+        if (CoreRegistry.get(Config.class).getRendering().isAnimateWater()) {
             program.setFloat("waveIntensFalloff", (Float) waveIntensFalloff.getValue());
             program.setFloat("waveSizeFalloff", (Float) waveSizeFalloff.getValue());
             program.setFloat("waveSize", (Float) waveSize.getValue());

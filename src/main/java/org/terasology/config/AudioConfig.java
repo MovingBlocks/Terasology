@@ -21,7 +21,7 @@ import java.beans.PropertyChangeSupport;
 /**
  * @author Immortius
  */
-public class SoundConfig {
+public class AudioConfig {
     public final static String SOUND_VOLUME = "soundVolume";
     public final static String MUSIC_VOLUME = "musicVolume";
 

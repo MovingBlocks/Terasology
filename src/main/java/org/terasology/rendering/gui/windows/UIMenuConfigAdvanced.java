@@ -171,7 +171,7 @@ public class UIMenuConfigAdvanced extends UIWindow {
         setModal(true);
         maximize();
         
-        config = CoreRegistry.get(org.terasology.config.Config.class).getAdvancedConfig();
+        config = CoreRegistry.get(org.terasology.config.Config.class).getAdvanced();
         
         title = new UIImage(Assets.getTexture("engine:terasology"));
         title.setHorizontalAlign(EHorizontalAlign.CENTER);
