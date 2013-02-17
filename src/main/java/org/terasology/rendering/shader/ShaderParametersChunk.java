@@ -56,7 +56,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
     Property waterRefraction = new Property("waterRefraction", 0.05f, 0.0f, 1.0f);
     Property waterFresnelBias = new Property("waterFresnelBias", 0.01f, 0.01f, 0.1f);
     Property waterFresnelPow = new Property("waterFresnelPow", 2.8f, 0.0f, 10.0f);
-    Property waterNormalBias = new Property("waterNormalBias", 2.0f, 1.0f, 4.0f);
+    Property waterNormalBias = new Property("waterNormalBias", 10.0f, 1.0f, 100.0f);
 
     Property waterOffsetY = new Property("waterOffsetY", 0.0f, 0.0f, 1.0f);
 
