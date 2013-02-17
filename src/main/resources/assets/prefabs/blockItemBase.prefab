@@ -1,6 +1,4 @@
 {
-    "DisplayInformation" : {
-    },
     "Item" : {
         "consumedOnUse" : true,
         "usage" : "ON_BLOCK"

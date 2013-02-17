@@ -32,11 +32,11 @@ import javax.vecmath.Vector3f;
  */
 public final class CharacterComponent implements Component {
     public Vector3f spawnPosition = new Vector3f();
-    public EntityRef transferSlot = EntityRef.NULL;
     public float eyeOffset = 0.6f;
     public float interactionRange = 5f;
     public float pitch;
     public float yaw;
+    public EntityRef movingItem;
 
     public Quat4f getLookRotation() {
         Quat4f lookRotation = new Quat4f();

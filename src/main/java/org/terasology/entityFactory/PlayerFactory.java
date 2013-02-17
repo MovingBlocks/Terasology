@@ -20,6 +20,7 @@ import javax.vecmath.Vector3f;
 import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.characters.CharacterComponent;
+import org.terasology.network.NetworkComponent;
 import org.terasology.world.block.entity.BlockItemComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -42,8 +43,14 @@ public class PlayerFactory {
 
     public EntityRef newInstance(Vector3f spawnPosition) {
         EntityRef player = entityManager.create("core:player", spawnPosition);
+        EntityRef transferSlot = entityManager.create("engine:transferSlot");
+        NetworkComponent netComp = transferSlot.getComponent(NetworkComponent.class);
+        netComp.owner = player;
+        transferSlot.saveComponent(netComp);
+
         CharacterComponent playerComponent = player.getComponent(CharacterComponent.class);
         playerComponent.spawnPosition.set(spawnPosition);
+        playerComponent.movingItem = transferSlot;
         player.saveComponent(playerComponent);
 
         // Goodie chest

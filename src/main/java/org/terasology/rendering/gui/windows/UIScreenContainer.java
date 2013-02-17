@@ -25,7 +25,7 @@ import org.terasology.rendering.gui.animation.AnimationRotate;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.VisibilityListener;
 import org.terasology.rendering.gui.widgets.UIImage;
-import org.terasology.rendering.gui.widgets.UIItemContainer;
+import org.terasology.rendering.gui.widgets.UIInventoryGrid;
 import org.terasology.rendering.gui.widgets.UIWindow;
 
 import javax.vecmath.Vector2f;
@@ -41,9 +41,9 @@ public class UIScreenContainer extends UIWindow {
     EntityRef container = EntityRef.NULL;
     EntityRef creature = EntityRef.NULL;
 
-    private final UIItemContainer playerInventory;
-    private final UIItemContainer playerToolbar;
-    private final UIItemContainer containerInventory;
+    private final UIInventoryGrid playerInventory;
+    private final UIInventoryGrid playerToolbar;
+    private final UIInventoryGrid containerInventory;
 
     private final UIImage leftGearWheel;
     private final UIImage rightGearWheel;
@@ -66,19 +66,19 @@ public class UIScreenContainer extends UIWindow {
             }
         });
 
-        playerToolbar = new UIItemContainer(10);
+        playerToolbar = new UIInventoryGrid(10);
         playerToolbar.setVisible(true);
         playerToolbar.setHorizontalAlign(EHorizontalAlign.CENTER);
         playerToolbar.setVerticalAlign(EVerticalAlign.BOTTOM);
         playerToolbar.setCellMargin(new Vector2f(0f, 0f));
         playerToolbar.setBorderImage("engine:inventory", new Vector2f(0f, 84f), new Vector2f(169f, 83f), new Vector4f(4f, 4f, 4f, 4f));
 
-        playerInventory = new UIItemContainer(10);
+        playerInventory = new UIInventoryGrid(10);
         playerInventory.setVisible(true);
         playerInventory.setCellMargin(new Vector2f(0f, 0f));
         playerInventory.setBorderImage("engine:inventory", new Vector2f(0f, 84f), new Vector2f(169f, 61f), new Vector4f(5f, 4f, 3f, 4f));
 
-        containerInventory = new UIItemContainer(10);
+        containerInventory = new UIInventoryGrid(10);
         containerInventory.setVisible(true);
         containerInventory.setHorizontalAlign(EHorizontalAlign.CENTER);
         containerInventory.setVerticalAlign(EVerticalAlign.CENTER);
@@ -125,13 +125,13 @@ public class UIScreenContainer extends UIWindow {
         this.container = container;
         this.creature = creature;
 
-        playerToolbar.setEntity(creature,0, 9);
-        playerInventory.setEntity(creature,10);
-        containerInventory.setEntity(container);
+        playerToolbar.linkToEntity(creature, 0, 10);
+        playerInventory.linkToEntity(creature, 10);
+        containerInventory.linkToEntity(container);
 
-        playerToolbar.setConnected(container);
-        playerInventory.setConnected(container);
-        containerInventory.setConnected(creature);
+        //playerToolbar.setConnected(container);
+        //playerInventory.setConnected(container);
+        //containerInventory.setConnected(creature);
         //TODO connect toolbar <-> inventory somehow to allow fast transfer.
 
         getGUIManager().getWindowById("hud").getElementById("leftGearWheel").setVisible(false);

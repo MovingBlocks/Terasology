@@ -65,7 +65,7 @@ public class UIWindow extends UIDisplayContainerScrollable {
                 if (closeKeys != null) {
                     for (int key : closeKeys) {
                         if (key == event.getKey() && event.isDown()) {
-                            setVisible(false);
+                            getGUIManager().closeWindow(getId());
                             event.consume();
                             
                             return;
@@ -81,7 +81,7 @@ public class UIWindow extends UIDisplayContainerScrollable {
                 if (closeBinds != null) {
                     for (String key : closeBinds) {
                         if (key.equals(event.getId()) && event.isDown()) {
-                            setVisible(false);
+                            getGUIManager().closeWindow(getId());
                             event.consume();
                             
                             return;

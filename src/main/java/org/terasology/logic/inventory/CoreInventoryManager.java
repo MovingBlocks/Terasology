@@ -16,6 +16,8 @@
 package org.terasology.logic.inventory;
 
 import com.google.common.base.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -34,7 +36,8 @@ import org.terasology.network.NetworkComponent;
  */
 @RegisterSystem(RegisterMode.AUTHORITY)
 @Share({InventoryManager.class, SlotBasedInventoryManager.class})
-public class InventorySystem implements ComponentSystem, SlotBasedInventoryManager {
+public class CoreInventoryManager implements ComponentSystem, SlotBasedInventoryManager {
+    private static final Logger logger = LoggerFactory.getLogger(CoreInventoryManager.class);
 
     // TODO: differ per item?
     public static final byte MAX_STACK = (byte) 99;
@@ -89,7 +92,7 @@ public class InventorySystem implements ComponentSystem, SlotBasedInventoryManag
             if (itemComponent.stackCount > 0) {
                 int freeSlot = inventory.itemSlots.indexOf(EntityRef.NULL);
                 if (freeSlot > -1) {
-                    putItemInSlot(item, itemComponent, freeSlot, inventoryEntity, inventory);
+                    putItemInSlot(inventoryEntity, inventory, freeSlot, item, itemComponent);
                     return true;
                 } else if (itemChanged) {
                     item.saveComponent(itemComponent);
@@ -142,6 +145,90 @@ public class InventorySystem implements ComponentSystem, SlotBasedInventoryManag
     }
 
     @Override
+    public void moveItemAmount(EntityRef fromInventory, int fromSlot, EntityRef toInventory, int toSlot, int amount) {
+        InventoryComponent fromInvComp = fromInventory.getComponent(InventoryComponent.class);
+        InventoryComponent toInvComp = toInventory.getComponent(InventoryComponent.class);
+        if (fromInvComp == null || fromSlot < 0 || fromSlot >= fromInvComp.itemSlots.size()
+                || toInvComp == null || toSlot < 0 || toSlot >= toInvComp.itemSlots.size() || amount <= 0) {
+            return;
+        }
+
+        EntityRef fromItem = fromInvComp.itemSlots.get(fromSlot);
+        ItemComponent fromItemComp = fromItem.getComponent(ItemComponent.class);
+        EntityRef toItem = toInvComp.itemSlots.get(toSlot);
+        ItemComponent toItemComp = toItem.getComponent(ItemComponent.class);
+        if (fromItemComp != null) {
+            int amountToTransfer = Math.min(amount, fromItemComp.stackCount);
+            if (toItemComp == null) {
+                if (amountToTransfer < fromItemComp.stackCount) {
+                    EntityRef newItem = entityManager.copy(fromItem);
+                    ItemComponent newItemComponent = newItem.getComponent(ItemComponent.class);
+                    newItemComponent.stackCount = (byte)amountToTransfer;
+                    putItemInSlot(toInventory, toInvComp, toSlot, newItem, newItemComponent);
+                    fromItemComp.stackCount -= amountToTransfer;
+                    fromItem.saveComponent(fromItemComp);
+                } else {
+                    putItemInSlot(toInventory, toInvComp, toSlot, fromItem, fromItemComp);
+                }
+            } else if (!fromItemComp.stackId.isEmpty() && Objects.equal(fromItemComp.stackId, toItemComp.stackId)) {
+                amountToTransfer = Math.min(amountToTransfer, MAX_STACK - toItemComp.stackCount);
+                if (amountToTransfer > 0) {
+                    toItemComp.stackCount += amountToTransfer;
+                    toItem.saveComponent(toItemComp);
+                    if (amountToTransfer == fromItemComp.stackCount) {
+                        fromItem.destroy();
+                    } else {
+                        fromItemComp.stackCount -= amountToTransfer;
+                        fromItem.saveComponent(fromItemComp);
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void moveItem(EntityRef fromInventory, int fromSlot, EntityRef toInventory, int toSlot) {
+        InventoryComponent fromInvComp = fromInventory.getComponent(InventoryComponent.class);
+        InventoryComponent toInvComp = toInventory.getComponent(InventoryComponent.class);
+        if (fromInvComp == null || fromSlot < 0 || fromSlot >= fromInvComp.itemSlots.size()
+                || toInvComp == null || toSlot < 0 || toSlot >= toInvComp.itemSlots.size()) {
+            return;
+        }
+
+
+        EntityRef fromItem = fromInvComp.itemSlots.get(fromSlot);
+        ItemComponent fromItemComp = fromItem.getComponent(ItemComponent.class);
+        EntityRef toItem = toInvComp.itemSlots.get(toSlot);
+        ItemComponent toItemComp = toItem.getComponent(ItemComponent.class);
+
+        if (fromItemComp != null) {
+            if (toItemComp == null) {
+                putItemInSlot(toInventory, toSlot, fromInvComp.itemSlots.get(fromSlot));
+            } else if (!fromItemComp.stackId.isEmpty() && Objects.equal(fromItemComp.stackId, toItemComp.stackId)) {
+                int amountToTransfer = Math.min(MAX_STACK - toItemComp.stackCount, fromItemComp.stackCount);
+                if (amountToTransfer == 0) {
+                    putItemInSlot(fromInventory, fromInvComp, fromSlot, toItem, toItemComp);
+                    putItemInSlot(toInventory, toInvComp, toSlot, fromItem, fromItemComp);
+                } else {
+                    toItemComp.stackCount += amountToTransfer;
+                    toItem.saveComponent(toItemComp);
+                    if (amountToTransfer == fromItemComp.stackCount) {
+                        fromItem.destroy();
+                    } else {
+                        fromItemComp.stackCount -= amountToTransfer;
+                        fromItem.saveComponent(fromItemComp);
+                    }
+                }
+            } else {
+                putItemInSlot(fromInventory, fromInvComp, fromSlot, toItem, toItemComp);
+                putItemInSlot(toInventory, toInvComp, toSlot, fromItem, fromItemComp);
+            }
+        }
+
+
+    }
+
+    @Override
     public EntityRef putItemInSlot(EntityRef inventoryEntity, int slot, EntityRef item) {
         InventoryComponent inventory = inventoryEntity.getComponent(InventoryComponent.class);
         ItemComponent itemComponent = item.getComponent(ItemComponent.class);
@@ -159,44 +246,14 @@ public class InventorySystem implements ComponentSystem, SlotBasedInventoryManag
                 return item;
             } else {
                 removeItem(inventoryEntity, existingItem);
-                putItemInSlot(item, itemComponent, slot, inventoryEntity, inventory);
+                putItemInSlot(inventoryEntity, inventory, slot, item, itemComponent);
                 return existingItem;
             }
         }
         return item;
     }
 
-    @Override
-    public boolean putAmountInSlot(EntityRef inventoryEntity, int slot, EntityRef item, int amount) {
-        InventoryComponent inventory = inventoryEntity.getComponent(InventoryComponent.class);
-        ItemComponent itemComponent = item.getComponent(ItemComponent.class);
-        if (inventory != null && itemComponent != null) {
-            ItemComponent targetItemComponent = inventory.itemSlots.get(slot).getComponent(ItemComponent.class);
-            if (itemComponent.stackId.isEmpty() || amount >= itemComponent.stackCount) {
-                // Move the whole thing
-                putItemInSlot(inventoryEntity, slot, item);
-                return true;
-            } else if (targetItemComponent == null) {
-                EntityRef newItem = entityManager.copy(item);
-                ItemComponent newItemComponent = newItem.getComponent(ItemComponent.class);
-                newItemComponent.stackCount = (byte) amount;
-                itemComponent.stackCount -= amount;
-                putItemInSlot(newItem, newItemComponent, slot, inventoryEntity, inventory);
-                item.saveComponent(itemComponent);
-            } else if (Objects.equal(targetItemComponent.stackId, itemComponent.stackId)) {
-                int amountToTransfer = Math.min(amount, MAX_STACK - targetItemComponent.stackCount);
-                if (amountToTransfer > 0) {
-                    targetItemComponent.stackCount += amountToTransfer;
-                    itemComponent.stackCount -= amountToTransfer;
-                    inventory.itemSlots.get(slot).saveComponent(targetItemComponent);
-                    item.saveComponent(itemComponent);
-                }
-            }
-        }
-        return false;
-    }
-
-    private void putItemInSlot(EntityRef item, ItemComponent itemComponent, int slot, EntityRef inventoryEntity, InventoryComponent inventory) {
+    private void putItemInSlot(EntityRef inventoryEntity, InventoryComponent inventory, int slot, EntityRef item, ItemComponent itemComponent) {
         inventory.itemSlots.set(slot, item);
         removeItem(itemComponent.container, item);
         itemComponent.container = inventoryEntity;
@@ -214,7 +271,7 @@ public class InventorySystem implements ComponentSystem, SlotBasedInventoryManag
 
 
     @Override
-    public int findSlotForItem(EntityRef inventoryEntity, EntityRef item) {
+    public int findSlotWithItem(EntityRef inventoryEntity, EntityRef item) {
         InventoryComponent inventory = inventoryEntity.getComponent(InventoryComponent.class);
         if (inventory != null) {
             return inventory.itemSlots.indexOf(item);
@@ -222,12 +279,25 @@ public class InventorySystem implements ComponentSystem, SlotBasedInventoryManag
         return -1;
     }
 
+    @Override
+    public int getNumSlots(EntityRef inventoryEntity) {
+        InventoryComponent inventory = inventoryEntity.getComponent(InventoryComponent.class);
+        if (inventory != null) {
+            return inventory.itemSlots.size();
+        }
+        return 0;
+    }
+
 
     @ReceiveEvent(components = InventoryComponent.class)
     public void onDestroyed(RemovedComponentEvent event, EntityRef entity) {
         InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
         for (EntityRef content : inventory.itemSlots) {
-            content.destroy();
+            if (content != entity) {
+                content.destroy();
+            } else {
+                logger.warn("Inventory contained itself: {}", entity);
+            }
         }
     }
 

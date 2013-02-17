@@ -104,6 +104,9 @@ public class BindableAxisImpl implements BindableAxis {
             event.setTarget(target, targetBlockPos, hitPosition, hitNormal);
             for (EntityRef entity : inputEntities) {
                 entity.send(event);
+                if (event.isCancelled()) {
+                    break;
+                }
             }
             sendEventToSubscribers(delta, target);
         }

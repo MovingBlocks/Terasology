@@ -45,7 +45,7 @@ import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.entitySystem.In;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.GUIManager;
-import org.terasology.rendering.gui.widgets.UIItemContainer;
+import org.terasology.rendering.gui.widgets.UIInventoryGrid;
 import org.terasology.world.block.entity.BlockItemComponent;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.logic.players.LocalPlayer;
@@ -116,8 +116,8 @@ public class FirstPersonRenderer implements RenderSystem {
         float bobOffset = calcBobbingOffset(charMoveComp.footstepDelta / charMoveComp.distanceBetweenFootsteps, (float) java.lang.Math.PI / 8f, 0.05f, 1f);
         float handMovementAnimationOffset = localPlayer.getCharacterEntity().getComponent(LocalPlayerComponent.class).handAnimation;
 
-        UIItemContainer toolbar = (UIItemContainer) CoreRegistry.get(GUIManager.class).getWindowById("hud").getElementById("toolbar");
-        int invSlotIndex = localPlayer.getCharacterEntity().getComponent(LocalPlayerComponent.class).selectedTool + toolbar.getSlotStart();
+        UIInventoryGrid toolbar = (UIInventoryGrid) CoreRegistry.get(GUIManager.class).getWindowById("hud").getElementById("toolbar");
+        int invSlotIndex = localPlayer.getCharacterEntity().getComponent(LocalPlayerComponent.class).selectedTool + toolbar.getStartSlot();
         EntityRef heldItem = localPlayer.getCharacterEntity().getComponent(InventoryComponent.class).getItemSlots().get(invSlotIndex);
         ItemComponent heldItemComp = heldItem.getComponent(ItemComponent.class);
         BlockItemComponent blockItem = heldItem.getComponent(BlockItemComponent.class);

@@ -79,7 +79,7 @@ public abstract class UIDisplayElement {
     private boolean consumeEvents = true;
     
     //layout
-    private boolean isVisible = false;
+    private boolean isVisible = true;
     private boolean isFixed = false;
     private boolean isCrop = true;
     
@@ -886,7 +886,7 @@ public abstract class UIDisplayElement {
      * @param visible
      */
     protected void notifyVisibilityListeners(boolean visible) {
-        //we copy the list so the listener can remove itself within the close/open method call (see UIItemCell). Otherwise ConcurrentModificationException.
+        //we copy the list so the listener can remove itself within the close/open method call (see UIInventoryCell). Otherwise ConcurrentModificationException.
         //TODO other solution?
         @SuppressWarnings("unchecked")
         ArrayList<VisibilityListener> listeners = (ArrayList<VisibilityListener>) visibilityListeners.clone();

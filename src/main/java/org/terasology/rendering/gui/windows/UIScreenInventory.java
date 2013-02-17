@@ -15,31 +15,23 @@
  */
 package org.terasology.rendering.gui.windows;
 
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
-
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
 import org.terasology.asset.Assets;
-import org.terasology.entityFactory.DroppedBlockFactory;
-import org.terasology.entitySystem.EntityManager;
-import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.inventory.InventoryManager;
-import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.logic.players.LocalPlayerComponent;
-import org.terasology.physics.ImpulseEvent;
 import org.terasology.rendering.gui.animation.AnimationMove;
 import org.terasology.rendering.gui.animation.AnimationRotate;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.MouseButtonListener;
 import org.terasology.rendering.gui.framework.events.VisibilityListener;
-import org.terasology.rendering.gui.widgets.*;
-import org.terasology.world.block.entity.BlockItemComponent;
+import org.terasology.rendering.gui.widgets.UIImage;
+import org.terasology.rendering.gui.widgets.UIInventoryGrid;
+import org.terasology.rendering.gui.widgets.UIWindow;
+
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
 
 /**
  * The player's inventory.
@@ -48,49 +40,19 @@ import org.terasology.world.block.entity.BlockItemComponent;
  */
 public class UIScreenInventory extends UIWindow {
 
-    private final UIItemContainer toolbar;
-    private final UIItemContainer inventory;
+    private final UIInventoryGrid toolbar;
+    private final UIInventoryGrid inventory;
 
     private final UIImage leftGearWheel;
     private final UIImage rightGearWheel;
-
-    //Todo this is a temporary solution
-    private boolean setVisible = true;
 
     public UIScreenInventory() {
         setId("inventory");
         setBackgroundColor(new Color(0, 0, 0, 200));
         setModal(true);
-        setCloseBinds(new String[] {"engine:inventory"});
-        setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
+        setCloseKeys(new int[]{Keyboard.KEY_ESCAPE});
+        setCloseBinds(new String[]{"engine:inventory"});
         maximize();
-        
-        addVisibilityListener(new VisibilityListener() {
-            @Override
-            public void changed(UIDisplayElement element, boolean visibility) {
-                if (visibility) {
-                    toolbar.setEntity(CoreRegistry.get(LocalPlayer.class).getCharacterEntity(), 0, 9);
-                    inventory.setEntity(CoreRegistry.get(LocalPlayer.class).getCharacterEntity(), 10);
-                    //TODO connect toolbar <-> inventory somehow to allow fast transfer.
-
-                    getGUIManager().getWindowById("hud").getElementById("leftGearWheel").setVisible(false);
-                    getGUIManager().getWindowById("hud").getElementById("rightGearWheel").setVisible(false);
-                    layout();
-                    inventory.setPosition(new Vector2f(Display.getWidth()/2 - inventory.getSize().x/2, Display.getHeight() + 5f));
-                    inventory.addAnimation(new AnimationMove(new Vector2f(Display.getWidth() / 2 - inventory.getSize().x / 2, Display.getHeight() - 192f), 20f));
-                    inventory.getAnimation(AnimationMove.class).start();
-
-                    leftGearWheel.addAnimation(new AnimationRotate(-120f,10f));
-                    leftGearWheel.getAnimation(AnimationRotate.class).start();
-                    rightGearWheel.addAnimation(new AnimationRotate(120f,10f));
-                    rightGearWheel.getAnimation(AnimationRotate.class).start();
-                }else{
-                    getGUIManager().getWindowById("hud").getElementById("leftGearWheel").setVisible(true);
-                    getGUIManager().getWindowById("hud").getElementById("rightGearWheel").setVisible(true);
-                }
-            }
-        });
-
         addMouseButtonListener(new MouseButtonListener() {
 
             @Override
@@ -106,19 +68,19 @@ public class UIScreenInventory extends UIWindow {
             @Override
             public void down(UIDisplayElement element, int button, boolean intersect) {
                 if (button == 0) {
-                    reset(); //TODO drop item
+                    //TODO drop item
                 }
             }
         });
 
-        toolbar = new UIItemContainer(10);
+        toolbar = new UIInventoryGrid(10);
         toolbar.setVisible(true);
         toolbar.setHorizontalAlign(EHorizontalAlign.CENTER);
         toolbar.setVerticalAlign(EVerticalAlign.BOTTOM);
         toolbar.setCellMargin(new Vector2f(0f, 0f));
         toolbar.setBorderImage("engine:inventory", new Vector2f(0f, 84f), new Vector2f(169f, 83f), new Vector4f(4f, 4f, 4f, 4f));
 
-        inventory = new UIItemContainer(10);
+        inventory = new UIInventoryGrid(10);
         inventory.setVisible(true);
         inventory.setCellMargin(new Vector2f(0f, 0f));
         inventory.setBorderImage("engine:inventory", new Vector2f(0f, 84f), new Vector2f(169f, 61f), new Vector4f(5f, 4f, 3f, 4f));
@@ -156,56 +118,63 @@ public class UIScreenInventory extends UIWindow {
         addDisplayElement(toolbar);
     }
 
-    /**
-     * Resets the item in the transfer slot to its owner.
-     */
-    private void reset() {
-        EntityRef item = getTransferItem();
-        if (item.exists()) {
-            ItemComponent itemComponent = item.getComponent(ItemComponent.class);
-            InventoryManager inventoryManager = CoreRegistry.get(InventoryManager.class);
-            if (!inventoryManager.giveItem(itemComponent.container, getTransferItem())) {
-               // TODO: Drop item;
-               item.destroy();
-               //dropitem();
-            }
-            CharacterComponent charComp = CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(CharacterComponent.class);
-            charComp.transferSlot = EntityRef.NULL;
-            CoreRegistry.get(LocalPlayer.class).getCharacterEntity().saveComponent(charComp);
-
-        }
+    @Override
+    public void update() {
+        super.update();    //To change body of overridden methods use File | Settings | File Templates.
     }
 
-    private EntityRef getTransferItem() {
-        return CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(CharacterComponent.class).transferSlot;
+    @Override
+    public void close() {
+        super.close();
+        getGUIManager().getWindowById("hud").getElementById("leftGearWheel").setVisible(true);
+        getGUIManager().getWindowById("hud").getElementById("rightGearWheel").setVisible(true);
     }
+
+    @Override
+    public void open() {
+        super.open();
+        toolbar.linkToEntity(CoreRegistry.get(LocalPlayer.class).getCharacterEntity(), 0, 10);
+        inventory.linkToEntity(CoreRegistry.get(LocalPlayer.class).getCharacterEntity(), 10);
+        //TODO connect toolbar <-> inventory somehow to allow fast transfer.
+
+        getGUIManager().getWindowById("hud").getElementById("leftGearWheel").setVisible(false);
+        getGUIManager().getWindowById("hud").getElementById("rightGearWheel").setVisible(false);
+        layout();
+        inventory.setPosition(new Vector2f(Display.getWidth() / 2 - inventory.getSize().x / 2, Display.getHeight() + 5f));
+        inventory.addAnimation(new AnimationMove(new Vector2f(Display.getWidth() / 2 - inventory.getSize().x / 2, Display.getHeight() - 192f), 20f));
+        inventory.getAnimation(AnimationMove.class).start();
+
+        leftGearWheel.addAnimation(new AnimationRotate(-120f, 10f));
+        leftGearWheel.getAnimation(AnimationRotate.class).start();
+        rightGearWheel.addAnimation(new AnimationRotate(120f, 10f));
+        rightGearWheel.getAnimation(AnimationRotate.class).start();
+    }
+
 
     /**
      * Drop the item in the transfer slot.
      * TODO this needs some work.
      */
-    public void dropitem() {
-        EntityRef item = getTransferItem();
-
-
-        if (item.exists()) {
-            ItemComponent itemComp = item.getComponent(ItemComponent.class);
-            BlockItemComponent blockItem = item.getComponent(BlockItemComponent.class);
-
-            if (blockItem != null) {
-                int dropPower = 6;
-                EntityManager entityManager = CoreRegistry.get(EntityManager.class);
-                LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-                LocalPlayerComponent localPlayerComp = localPlayer.getCharacterEntity().getComponent(LocalPlayerComponent.class);
-                DroppedBlockFactory droppedBlockFactory = new DroppedBlockFactory(entityManager);
-                EntityRef droppedBlock = droppedBlockFactory.newInstance(new Vector3f(localPlayer.getPosition().x + localPlayer.getViewDirection().x * 1.5f, localPlayer.getPosition().y + localPlayer.getViewDirection().y * 1.5f, localPlayer.getPosition().z + localPlayer.getViewDirection().z * 1.5f), blockItem.blockFamily, 20);
-
-                for (int i = 0; i < itemComp.stackCount; i++) {
-                    droppedBlock.send(new ImpulseEvent(new Vector3f(localPlayer.getViewDirection().x * dropPower, localPlayer.getViewDirection().y * dropPower, localPlayer.getViewDirection().z * dropPower)));
-                }
-
-                localPlayerComp.handAnimation = 0.5f;
-            }
-        }
-    }
+//    public void dropitem() {
+//
+//        if (item.exists()) {
+//            ItemComponent itemComp = item.getComponent(ItemComponent.class);
+//            BlockItemComponent blockItem = item.getComponent(BlockItemComponent.class);
+//
+//            if (blockItem != null) {
+//                int dropPower = 6;
+//                EntityManager entityManager = CoreRegistry.get(EntityManager.class);
+//                LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+//                LocalPlayerComponent localPlayerComp = localPlayer.getCharacterEntity().getComponent(LocalPlayerComponent.class);
+//                DroppedBlockFactory droppedBlockFactory = new DroppedBlockFactory(entityManager);
+//                EntityRef droppedBlock = droppedBlockFactory.newInstance(new Vector3f(localPlayer.getPosition().x + localPlayer.getViewDirection().x * 1.5f, localPlayer.getPosition().y + localPlayer.getViewDirection().y * 1.5f, localPlayer.getPosition().z + localPlayer.getViewDirection().z * 1.5f), blockItem.blockFamily, 20);
+//
+//                for (int i = 0; i < itemComp.stackCount; i++) {
+//                    droppedBlock.send(new ImpulseEvent(new Vector3f(localPlayer.getViewDirection().x * dropPower, localPlayer.getViewDirection().y * dropPower, localPlayer.getViewDirection().z * dropPower)));
+//                }
+//
+//                localPlayerComp.handAnimation = 0.5f;
+//            }
+//        }
+//    }
 }

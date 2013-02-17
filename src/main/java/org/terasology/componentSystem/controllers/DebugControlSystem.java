@@ -127,10 +127,6 @@ public class DebugControlSystem implements ComponentSystem {
                 metrics.toggleMode();
                 event.consume();
                 break;
-            case Keyboard.KEY_F5:
-                CoreRegistry.get(GUIManager.class).openWindow("itemList");
-                event.consume();
-                break;
         }
     }
 

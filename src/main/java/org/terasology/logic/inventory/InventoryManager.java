@@ -29,6 +29,12 @@ public interface InventoryManager {
      */
     void removeItem(EntityRef inventoryEntity, EntityRef item);
 
+    /**
+     *
+     * @param itemA
+     * @param itemB
+     * @return Whether the two items can be merged (ignoring stack size limits)
+     */
     boolean canStackTogether(EntityRef itemA, EntityRef itemB);
 
 }

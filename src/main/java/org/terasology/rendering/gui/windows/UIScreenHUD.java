@@ -16,14 +16,10 @@
 package org.terasology.rendering.gui.windows;
 
 import org.terasology.asset.Assets;
-import org.newdawn.slick.Color;
 import org.terasology.components.HealthComponent;
-import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.characters.CharacterMovementComponent;
-import org.terasology.logic.players.LocalPlayerComponent;
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EventSystem;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.event.ChangedComponentEvent;
@@ -32,14 +28,17 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.Timer;
 import org.terasology.input.CameraTargetSystem;
-import org.terasology.logic.players.LocalPlayer;
+import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.manager.Config;
+import org.terasology.logic.players.LocalPlayer;
+import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.VisibilityListener;
-import org.terasology.rendering.gui.layout.ChooseRowLayout;
-import org.terasology.rendering.gui.widgets.*;
+import org.terasology.rendering.gui.widgets.UIImage;
+import org.terasology.rendering.gui.widgets.UIInventoryGrid;
+import org.terasology.rendering.gui.widgets.UILabel;
+import org.terasology.rendering.gui.widgets.UIWindow;
 import org.terasology.rendering.primitives.ChunkTessellator;
-import org.terasology.rendering.world.WorldRenderer;
 
 import javax.vecmath.Vector2f;
 import javax.vecmath.Vector4f;
@@ -63,7 +62,7 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
     private final UILabel debugLine3;
     private final UILabel debugLine4;
 
-    private final UIItemContainer toolbar;
+    private final UIInventoryGrid toolbar;
 
     private final UIImage leftGearWheel;
     private final UIImage rightGearWheel;
@@ -74,17 +73,6 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
     public UIScreenHUD() {
         setId("hud");
         maximize();
-
-        addVisibilityListener(new VisibilityListener() {
-            @Override
-            public void changed(UIDisplayElement element, boolean visibility) {
-                if (visibility) {
-                    toolbar.setEntity(CoreRegistry.get(LocalPlayer.class).getCharacterEntity(), 0, 9);
-                    toolbar.getCells().get(CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(LocalPlayerComponent.class).selectedTool).setSelection(true);
-                }
-            }
-        });
-
         _hearts = new UIImage[10];
 
         // Create hearts
@@ -119,7 +107,7 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
         debugLine4 = new UILabel();
         debugLine4.setPosition(new Vector2f(4, 54));
 
-        toolbar = new UIItemContainer(10);
+        toolbar = new UIInventoryGrid(10);
         toolbar.setId("toolbar");
         toolbar.setVisible(true);
         toolbar.setHorizontalAlign(EHorizontalAlign.CENTER);
@@ -128,6 +116,9 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
         toolbar.setVisible(true);
         toolbar.setCellMargin(new Vector2f(0f, 0f));
         toolbar.setBorderImage("engine:inventory", new Vector2f(0f, 84f), new Vector2f(169f, 83f), new Vector4f(4f, 4f, 4f, 4f));
+
+        toolbar.linkToEntity(CoreRegistry.get(LocalPlayer.class).getCharacterEntity(), 0, 10);
+        toolbar.setSelected(CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(LocalPlayerComponent.class).selectedTool);
 
         leftGearWheel = new UIImage(Assets.getTexture("engine:inventory"));
 
@@ -157,7 +148,6 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
                 rightGearWheel.getPosition().x + 240f,
                 rightGearWheel.getPosition().y - 4f)
         );
-
 
 
         addDisplayElement(crosshair);
@@ -245,13 +235,7 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
 
     @ReceiveEvent(components = LocalPlayerComponent.class)
     public void onSelectedItemChanged(ChangedComponentEvent event, EntityRef entity) {
-        for (UIItemCell cell : toolbar.getCells()) {
-            cell.setSelection(false);
-        }
-
-        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-        LocalPlayerComponent localPlayerComp = localPlayer.getCharacterEntity().getComponent(LocalPlayerComponent.class);
-        toolbar.getCells().get(localPlayerComp.selectedTool).setSelection(true);
+        toolbar.setSelected(CoreRegistry.get(LocalPlayer.class).getCharacterEntity().getComponent(LocalPlayerComponent.class).selectedTool);
     }
 
     @ReceiveEvent(components = {LocalPlayerComponent.class, HealthComponent.class})

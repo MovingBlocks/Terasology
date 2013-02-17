@@ -17,6 +17,7 @@
 package org.terasology.componentSystem.controllers;
 
 import org.lwjgl.input.Keyboard;
+import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.entitySystem.EntityRef;
@@ -43,6 +44,9 @@ public class MenuControlSystem implements ComponentSystem {
     public static final String CHAT = "chat";
 	public static final String HUD = "hud";
 
+    @In
+    GUIManager guiManager;
+
     @Override
     public void initialise() {
 
@@ -55,7 +59,7 @@ public class MenuControlSystem implements ComponentSystem {
     @ReceiveEvent(components = LocalPlayerComponent.class)
     public void onToggleConsole(ConsoleButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
-            CoreRegistry.get(GUIManager.class).openWindow(CHAT);
+            guiManager.openWindow(CHAT);
             event.consume();
         }
     }
@@ -63,7 +67,7 @@ public class MenuControlSystem implements ComponentSystem {
     @ReceiveEvent(components = LocalPlayerComponent.class)
     public void onToggleInventory(InventoryButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
-            CoreRegistry.get(GUIManager.class).openWindow(INVENTORY);
+            guiManager.openWindow(INVENTORY);
             event.consume();
         }
     }

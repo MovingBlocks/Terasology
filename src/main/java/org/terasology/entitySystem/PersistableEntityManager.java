@@ -16,6 +16,7 @@
 package org.terasology.entitySystem;
 
 import gnu.trove.list.TIntList;
+import gnu.trove.set.TIntSet;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -30,5 +31,5 @@ public interface PersistableEntityManager extends EntityManager {
 
     void setNextId(int id);
 
-    TIntList getFreedIds();
+    TIntSet getFreedIds();
 }

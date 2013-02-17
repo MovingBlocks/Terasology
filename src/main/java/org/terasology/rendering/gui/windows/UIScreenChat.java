@@ -16,23 +16,17 @@
 
 package org.terasology.rendering.gui.windows;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector4f;
-
 import org.lwjgl.input.Keyboard;
 import org.newdawn.slick.Color;
 import org.terasology.events.messaging.SendChatMessage;
 import org.terasology.game.CoreRegistry;
 import org.terasology.input.events.KeyEvent;
-import org.terasology.logic.players.LocalPlayer;
-import org.terasology.logic.manager.MessageManager;
 import org.terasology.logic.manager.CommandManager;
-import org.terasology.logic.manager.MessageManager.MessageSubscription;
-import org.terasology.logic.manager.MessageManager.Message;
 import org.terasology.logic.manager.CommandManager.CommandInfo;
+import org.terasology.logic.manager.MessageManager;
+import org.terasology.logic.manager.MessageManager.Message;
+import org.terasology.logic.manager.MessageManager.MessageSubscription;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.KeyListener;
 import org.terasology.rendering.gui.framework.events.VisibilityListener;
@@ -42,35 +36,40 @@ import org.terasology.rendering.gui.widgets.UIListItem;
 import org.terasology.rendering.gui.widgets.UIText;
 import org.terasology.rendering.gui.widgets.UIWindow;
 
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector4f;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * The in-game chat.
- * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  *
+ * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
 public class UIScreenChat extends UIWindow {
-    
+
     private final CommandManager commandManager;
     private final String commandPrefix = "/";
-    
+
     //history
     private final List<String> history = new ArrayList<String>();
     private final int historyMax = 30;
     private int historyPosition = 0;
-    
+
     private final UIText inputBox;
     private final UIList messageList;
-    
+
     private final MessageSubscription chatSubscription = new MessageSubscription() {
         @Override
         public void message(Message message) {
             boolean scroll = messageList.isScrolledToBottom();
             boolean scrollable = messageList.isScrollable();
-            
+
             UIListItem item = new UIListItem(message.getMessage(), null);
             item.setPadding(new Vector4f(0f, 5f, 0f, 5f));
             item.setTextColor(Color.black);
             messageList.addItem(item);
-            
+
             if (messageList.getItemCount() > historyMax) {
                 messageList.removeItem(0);
             }
@@ -80,12 +79,12 @@ public class UIScreenChat extends UIWindow {
             }
         }
     };
-    
+
     public UIScreenChat() {
         commandManager = CoreRegistry.get(CommandManager.class);
 
-        setCloseKeys(new int[] {Keyboard.KEY_ESCAPE});
-        setCloseBinds(new String[] {"engine:console"});
+        setCloseKeys(new int[]{Keyboard.KEY_ESCAPE});
+        setCloseBinds(new String[]{"engine:console"});
         setId("chat");
         setModal(true);
         maximize();
@@ -98,7 +97,7 @@ public class UIScreenChat extends UIWindow {
                 }
             }
         });
-        
+
         inputBox = new UIText();
         inputBox.setSize(new Vector2f(900f, 28f));
         inputBox.setBackgroundColor(new Color(255, 255, 255, 200));
@@ -116,7 +115,7 @@ public class UIScreenChat extends UIWindow {
                         inputBox.deleteText();
 
                         addHistory(message);
-    
+
                         // check if message is a command
                         if (message.startsWith(commandPrefix)) {
                             // execute the command
@@ -145,14 +144,14 @@ public class UIScreenChat extends UIWindow {
                             String commandName = message.substring(1);
                             List<CommandInfo> commands = commandManager.getCommandList();
                             List<CommandInfo> matches = new ArrayList<CommandInfo>();
-                            
+
                             //check for matching commands
                             for (CommandInfo cmd : commands) {
                                 if (cmd.getName().regionMatches(0, commandName, 0, commandName.length())) {
                                     matches.add(cmd);
                                 }
                             }
-                            
+
                             //one match found
                             if (matches.size() == 1) {
                                 inputBox.setText(commandPrefix + matches.get(0).getName());
@@ -166,20 +165,20 @@ public class UIScreenChat extends UIWindow {
                                     if (!commandMatches.isEmpty()) {
                                         commandMatches += " ";
                                     }
-                                    
+
                                     commandMatches += cmd.getName();
                                 }
                                 MessageManager.getInstance().addMessage(commandMatches);
-                                
+
                                 //complete input
-                                
+
                             }
                         }
                     }
                 }
             }
         });
-        
+
         messageList = new UIList();
         messageList.setSize(new Vector2f(900f, 400f));
         messageList.setBackgroundColor(new Color(255, 255, 255, 200));
@@ -190,7 +189,7 @@ public class UIScreenChat extends UIWindow {
         messageList.setPadding(new Vector4f(0f, 5f, 0f, 5f));
         messageList.setDisabled(true);
         messageList.setVisible(true);
-        
+
         addDisplayElement(inputBox);
         addDisplayElement(messageList);
 
@@ -198,10 +197,10 @@ public class UIScreenChat extends UIWindow {
             addHistory(message.getMessage());
         }
         MessageManager.getInstance().subscribe(chatSubscription);
-        
+
         startMessage();
     }
-    
+
     private void startMessage() {
         MessageManager.getInstance().addMessage("Welcome to the wonderful world of Terasology!\n\nType '/help' to see a list with available commands.\nTo see a detailed command description try '/help \"<commandName>\"'.\nBe sure to surround text type parameters in quotes.\nNo commas needed for multiple parameters.\nCommands are case-sensitive, block names and such are not.");
     }
@@ -209,22 +208,22 @@ public class UIScreenChat extends UIWindow {
     private void addHistory(String message) {
         history.add(0, message);
         historyPosition = -1;
-        
+
         if (history.size() > historyMax) {
             history.remove(history.get(history.size() - 1));
         }
     }
-    
+
     public String getHistory() {
         if (!history.isEmpty()) {
             return history.get(historyPosition);
         }
         return "";
     }
-    
+
     private void moveHistory(int i) {
         historyPosition += i;
-        
+
         if (historyPosition < 0) {
             historyPosition = 0;
         } else if (historyPosition > (history.size() - 1)) {

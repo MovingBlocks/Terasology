@@ -51,7 +51,6 @@ import org.terasology.rendering.gui.windows.UIMenuJoinServer;
 import org.terasology.rendering.gui.windows.UIMenuMain;
 import org.terasology.rendering.gui.windows.UIMenuPause;
 import org.terasology.rendering.gui.windows.UIMenuSingleplayer;
-import org.terasology.rendering.gui.windows.UIScreenItems;
 import org.terasology.rendering.gui.windows.UIScreenChat;
 import org.terasology.rendering.gui.windows.UIScreenContainer;
 import org.terasology.rendering.gui.windows.UIScreenDeath;
@@ -101,7 +100,6 @@ public class GUIManager implements ComponentSystem {
         registeredWindows.put("inventory", UIScreenInventory.class);
         registeredWindows.put("chat", UIScreenChat.class);
         registeredWindows.put("hud", UIScreenHUD.class);
-        registeredWindows.put("itemList", UIScreenItems.class);
     }
 
     /**
@@ -188,6 +186,7 @@ public class GUIManager implements ComponentSystem {
             logger.debug("Closed window by reference with ID \"{}\"", window.getId());
             
             removeWindow(window);
+            checkMouseGrabbing();
         }
     }
     
@@ -468,6 +467,14 @@ public class GUIManager implements ComponentSystem {
                     event.consume();
                 }
             }
+        }
+    }
+
+    public void toggleWindow(String id) {
+        if (getWindowById(id) != null) {
+            closeWindow(id);
+        } else {
+            openWindow(id);
         }
     }
 }

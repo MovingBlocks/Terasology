@@ -15,6 +15,7 @@
  */
 package org.terasology.entitySystem.pojo;
 
+import org.slf4j.spi.LocationAwareLogger;
 import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.Component;
@@ -30,6 +31,7 @@ import org.terasology.entitySystem.common.NullIterator;
 public class PojoEntityRef extends EntityRef {
     int id;
     PojoEntityManager entityManager;
+    private boolean destroying;
 
     PojoEntityRef(PojoEntityManager manager, int id) {
         this.id = id;

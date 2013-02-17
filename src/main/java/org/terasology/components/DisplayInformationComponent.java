@@ -8,9 +8,9 @@ import org.terasology.network.Replicate;
  */
 public class DisplayInformationComponent implements Component {
     @Replicate
-    public String name;
+    public String name = "";
     @Replicate
-    public String description;
+    public String description = "";
 
 
     public String toString() {

@@ -197,6 +197,9 @@ public class InputSystem implements ComponentSystem {
             setupTarget(event);
             for (EntityRef entity : getInputEntities()) {
                 entity.send(event);
+                if (event.isCancelled()) {
+                    break;
+                }
             }
         }
 
@@ -207,6 +210,9 @@ public class InputSystem implements ComponentSystem {
             setupTarget(event);
             for (EntityRef entity : getInputEntities()) {
                 entity.send(event);
+                if (event.isCancelled()) {
+                    break;
+                }
             }
         }
     }
@@ -270,6 +276,9 @@ public class InputSystem implements ComponentSystem {
         setupTarget(event);
         for (EntityRef entity : getInputEntities()) {
             entity.send(event);
+            if (event.isCancelled()) {
+                break;
+            }
         }
 
         return event.isConsumed();
@@ -293,6 +302,9 @@ public class InputSystem implements ComponentSystem {
         setupTarget(event);
         for (EntityRef entity : getInputEntities()) {
             entity.send(event);
+            if (event.isCancelled()) {
+                break;
+            }
         }
         return event.isConsumed();
     }
@@ -302,6 +314,9 @@ public class InputSystem implements ComponentSystem {
         setupTarget(mouseWheelEvent);
         for (EntityRef entity : getInputEntities()) {
             entity.send(mouseWheelEvent);
+            if (mouseWheelEvent.isCancelled()) {
+                break;
+            }
         }
         return mouseWheelEvent.isConsumed();
     }

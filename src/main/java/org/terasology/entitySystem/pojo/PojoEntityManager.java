@@ -22,6 +22,8 @@ import gnu.trove.iterator.TIntIterator;
 import gnu.trove.iterator.TIntObjectIterator;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.components.world.LocationComponent;
@@ -61,7 +63,7 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
     private static final Logger logger = LoggerFactory.getLogger(PojoEntityManager.class);
 
     private int nextEntityId = 1;
-    private TIntList freedIds = new TIntArrayList();
+    private TIntSet freedIds = new TIntHashSet();
     private Map<Integer, EntityRef> entityCache = new MapMaker().concurrencyLevel(4).weakValues().makeMap();
     private Set<EntityChangeSubscriber> subscribers = Sets.newLinkedHashSet();
 
@@ -94,7 +96,10 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
     @Override
     public EntityRef create() {
         if (!freedIds.isEmpty()) {
-            return createEntityRef(freedIds.removeAt(freedIds.size() - 1));
+            TIntIterator iterator = freedIds.iterator();
+            int id = iterator.next();
+            iterator.remove();
+            return createEntityRef(id);
         }
         if (nextEntityId == NULL_ID) nextEntityId++;
         return createEntityRef(nextEntityId++);
@@ -386,7 +391,7 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
     }
 
     @Override
-    public TIntList getFreedIds() {
+    public TIntSet getFreedIds() {
         return freedIds;
     }
 

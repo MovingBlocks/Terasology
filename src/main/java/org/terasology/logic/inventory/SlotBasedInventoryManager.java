@@ -19,17 +19,6 @@ public interface SlotBasedInventoryManager extends InventoryManager {
     EntityRef putItemInSlot(EntityRef inventoryEntity, int slot, EntityRef item);
 
     /**
-     * Moves some of an item to a specific slot. If that slot cannot accept the item, then no transfer happens.
-     *
-     * @param inventoryEntity
-     * @param slot
-     * @param item
-     * @param amount
-     * @return Whether the item was completely consumed in the transfer process
-     */
-    boolean putAmountInSlot(EntityRef inventoryEntity, int slot, EntityRef item, int amount);
-
-    /**
      *
      * @param inventoryEntity
      * @param slot
@@ -38,11 +27,37 @@ public interface SlotBasedInventoryManager extends InventoryManager {
     EntityRef getItemInSlot(EntityRef inventoryEntity, int slot);
 
     /**
+     * Attempts to move an amount of an item from one location to another. If the target location cannot except the item
+     * no change occurs.
+     * @param fromInventory
+     * @param fromSlot
+     * @param toInventory
+     * @param toSlot
+     * @param amount
+     */
+    void moveItemAmount(EntityRef fromInventory, int fromSlot, EntityRef toInventory, int toSlot, int amount);
+
+    /**
+     * Moves an item into the target slot. If possible, the item is merged partially or fully with the target item.
+     * Otherwise the items are swapped.
+     * @param fromInventory
+     * @param fromSlot
+     * @param toInventory
+     * @param toSlot
+     */
+    void moveItem(EntityRef fromInventory, int fromSlot, EntityRef toInventory, int toSlot);
+
+    /**
      *
      * @param inventoryEntity
      * @param item
      * @return The slot containing the given item, or -1 if it wasn't found in the inventory
      */
-    int findSlotForItem(EntityRef inventoryEntity, EntityRef item);
+    int findSlotWithItem(EntityRef inventoryEntity, EntityRef item);
 
+    /**
+     * @param inventoryEntity
+     * @return The number of slots the given entity has
+     */
+    int getNumSlots(EntityRef inventoryEntity);
 }

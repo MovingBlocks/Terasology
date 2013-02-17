@@ -109,9 +109,6 @@ public class StateIngame implements GameState {
 
     @Override
     public void update(float delta) {
-        /* GUI */
-        updateUserInterface();
-
         eventSystem.process();
 
         for (UpdateSubscriberSystem updater : componentSystemManager.iterateUpdateSubscribers()) {
@@ -123,6 +120,8 @@ public class StateIngame implements GameState {
         if (worldRenderer != null && shouldUpdateWorld()) {
             worldRenderer.update(delta);
         }
+
+        updateUserInterface();
     }
 
     @Override
