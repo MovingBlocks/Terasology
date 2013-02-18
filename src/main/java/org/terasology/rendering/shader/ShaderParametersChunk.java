@@ -46,12 +46,12 @@ public class ShaderParametersChunk extends ShaderParametersBase {
     Property skyInscatteringLength = new Property("skyInscatteringLength", 0.9f, 0.0f, 1.0f);
     Property skyInscatteringStrength = new Property("skyInscatteringStrength", 0.25f, 0.0f, 1.0f);
 
-    Property waveIntens = new Property("waveIntens", 0.68f, 0.0f, 2.0f);
-    Property waveIntensFalloff = new Property("waveIntensFalloff", 0.98f, 0.0f, 2.0f);
+    Property waveIntens = new Property("waveIntens", 0.88f, 0.0f, 2.0f);
+    Property waveIntensFalloff = new Property("waveIntensFalloff", 0.94f, 0.0f, 2.0f);
     Property waveSize = new Property("waveSize", 0.76f, 0.0f, 2.0f);
     Property waveSizeFalloff = new Property("waveSizeFalloff", 0.9f, 0.0f, 2.0f);
-    Property waveSpeed = new Property("waveSpeed", 0.44f, 0.0f, 2.0f);
-    Property waveSpeedFalloff = new Property("waveSpeedFalloff", 0.26f, 0.0f, 2.0f);
+    Property waveSpeed = new Property("waveSpeed", 0.18f, 0.0f, 2.0f);
+    Property waveSpeedFalloff = new Property("waveSpeedFalloff", 0.8f, 0.0f, 2.0f);
 
     Property waterRefraction = new Property("waterRefraction", 0.05f, 0.0f, 1.0f);
     Property waterFresnelBias = new Property("waterFresnelBias", 0.01f, 0.01f, 0.1f);
@@ -61,7 +61,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
     Property waterOffsetY = new Property("waterOffsetY", 0.0f, 0.0f, 1.0f);
 
     Property torchWaterSpecExp = new Property("torchWaterSpecExp", 30.0f, 0.0f, 64.0f);
-    Property waterSpecExp = new Property("waterSpecExp", 64.0f, 0.0f, 128.0f);
+    Property waterSpecExp = new Property("waterSpecExp", 512.0f, 0.0f, 1024.0f);
     Property torchSpecExp = new Property("torchSpecExp", 32.0f, 0.0f, 64.0f);
 
     public void applyParameters(ShaderProgram program) {

@@ -28,7 +28,7 @@
 #define TORCH_WATER_DIFF 0.7
 #define TORCH_BLOCK_SPEC 0.7
 #define TORCH_BLOCK_DIFF 1.0
-#define WATER_AMB 0.1
+#define WATER_AMB 0.35
 #define WATER_SPEC 2.0
 #define WATER_DIFF 1.0
 #define BLOCK_DIFF 0.75
@@ -207,8 +207,8 @@ void main(){
     /* CREATE THE DAYLIGHT LIGHTING MIX */
     if (isWater) {
         /* WATER NEEDS DIFFUSE AND SPECULAR LIGHT */
-        daylightColorValue = vec3(diffuseLighting) * WATER_DIFF;
-        daylightColorValue += calcSpecLight(normalWater, sunVecViewAdjusted, normalizedVPos, waterSpecExp) * WATER_SPEC;
+        daylightColorValue = diffuseLighting * WATER_DIFF + WATER_AMB;
+        color.xyz += calcSpecLight(normalWater, sunVecViewAdjusted, normalizedVPos, waterSpecExp) * WATER_SPEC;
     } else {
         /* DEFAULT LIGHTING ONLY CONSIST OF DIFFUSE AND AMBIENT LIGHT */
         daylightColorValue = vec3(BLOCK_AMB + diffuseLighting * BLOCK_DIFF);
@@ -231,10 +231,6 @@ void main(){
 
     // Calculate the final blocklight color value and add a slight reddish tint to it
     vec3 blocklightColorValue = vec3(blockBrightness) * vec3(1.0, 0.95, 0.94);
-
-    if (isWater) {
-        color.xyz += (vec4(WATER_COLOR) * WATER_AMB).xyz;
-    }
 
     // Apply the final lighting mix
     color.xyz *= max(daylightColorValue, blocklightColorValue) * occlusionValue;

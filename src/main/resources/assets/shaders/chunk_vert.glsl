@@ -93,7 +93,7 @@ vec4 calcWaterNormalAndOffset(vec2 worldPosRaw) {
     float s12 = calcWaterHeightAtOffset(worldPosRaw.xy + normalDiffOffset.yz);
 
     vec3 va = normalize(vec3(normalDiffSize.x, s21-s01, normalDiffSize.y));
-    vec3 vb = normalize(vec3(normalDiffSize.y, s12-s10, -normalDiffSize.x));
+    vec3 vb = normalize(vec3(normalDiffSize.y, s10-s12, -normalDiffSize.x));
 
     return vec4(cross(va,vb), s11);
 }
