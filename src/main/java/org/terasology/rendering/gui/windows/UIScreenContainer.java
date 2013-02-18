@@ -26,6 +26,7 @@ import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.VisibilityListener;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UIInventoryGrid;
+import org.terasology.rendering.gui.widgets.UITransferSlotCursor;
 import org.terasology.rendering.gui.widgets.UIWindow;
 
 import javax.vecmath.Vector2f;
@@ -117,6 +118,8 @@ public class UIScreenContainer extends UIWindow {
         addDisplayElement(playerInventory);
         addDisplayElement(playerToolbar);
         addDisplayElement(containerInventory);
+
+        addDisplayElement(new UITransferSlotCursor());
 
         layout();
     }
