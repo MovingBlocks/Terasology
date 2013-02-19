@@ -48,7 +48,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
 
     Property waveIntens = new Property("waveIntens", 0.88f, 0.0f, 2.0f);
     Property waveIntensFalloff = new Property("waveIntensFalloff", 0.94f, 0.0f, 2.0f);
-    Property waveSize = new Property("waveSize", 0.76f, 0.0f, 2.0f);
+    Property waveSize = new Property("waveSize", 0.45f, 0.0f, 2.0f);
     Property waveSizeFalloff = new Property("waveSizeFalloff", 0.9f, 0.0f, 2.0f);
     Property waveSpeed = new Property("waveSpeed", 0.18f, 0.0f, 2.0f);
     Property waveSpeedFalloff = new Property("waveSpeedFalloff", 0.8f, 0.0f, 2.0f);
@@ -72,27 +72,25 @@ public class ShaderParametersChunk extends ShaderParametersBase {
             return;
         }
 
-        GL13.glActiveTexture(GL13.GL_TEXTURE1);
-        glBindTexture(GL11.GL_TEXTURE_2D, lava.getId());
-        GL13.glActiveTexture(GL13.GL_TEXTURE2);
-        glBindTexture(GL11.GL_TEXTURE_2D, water.getId());
-        GL13.glActiveTexture(GL13.GL_TEXTURE3);
-        glBindTexture(GL11.GL_TEXTURE_2D, effects.getId());
-        GL13.glActiveTexture(GL13.GL_TEXTURE4);
-        PostProcessingRenderer.getInstance().getFBO("sceneReflected").bindTexture();
-        if (CoreRegistry.get(Config.class).getRendering().isRefractiveWater()) {
-            GL13.glActiveTexture(GL13.GL_TEXTURE5);
-            PostProcessingRenderer.getInstance().getFBO("sceneRefracted").bindTexture();
-        }
-        GL13.glActiveTexture(GL13.GL_TEXTURE0);
+        int texId = 0;
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         glBindTexture(GL11.GL_TEXTURE_2D, terrain.getId());
-
-        program.setInt("textureLava", 1);
-        program.setInt("textureWaterNormal", 2);
-        program.setInt("textureEffects", 3);
-        program.setInt("textureWaterReflection", 4);
-        program.setInt("textureWaterRefraction", 5);
-        program.setInt("textureAtlas", 0);
+        program.setInt("textureAtlas", texId++);
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        glBindTexture(GL11.GL_TEXTURE_2D, lava.getId());
+        program.setInt("textureLava", texId++);
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        glBindTexture(GL11.GL_TEXTURE_2D, water.getId());
+        program.setInt("textureWaterNormal", texId++);
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        glBindTexture(GL11.GL_TEXTURE_2D, effects.getId());
+        program.setInt("textureEffects", texId++);
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        PostProcessingRenderer.getInstance().getFBO("sceneReflected").bindTexture();
+        program.setInt("textureWaterReflection", texId++);
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        PostProcessingRenderer.getInstance().getFBO("sceneOpaque").bindTexture();
+        program.setInt("texSceneOpaque", texId++);
 
         Vector4f lightingSettingsFrag = new Vector4f();
         lightingSettingsFrag.x = (Float) torchSpecExp.getValue();

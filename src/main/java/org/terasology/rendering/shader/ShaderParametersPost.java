@@ -52,8 +52,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
     public void applyParameters(ShaderProgram program) {
         super.applyParameters(program);
 
-        PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("scene");
-
+        PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("sceneOpaque");
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         PostProcessingRenderer.getInstance().getFBO("sceneToneMapped").bindTexture();

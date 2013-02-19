@@ -23,7 +23,10 @@ varying vec3 normal;
 varying vec4 vertexWorldPos;
 varying vec4 vertexViewPos;
 varying vec4 vertexProjPos;
+
+#ifdef FEATURE_TRANSPARENT_PASS
 varying vec3 waterNormalWorldSpace;
+#endif
 
 varying vec3 sunVecView;
 
@@ -38,7 +41,7 @@ uniform vec3 chunkOffset;
 
 uniform bool animated;
 
-#ifdef ANIMATED_WATER
+#if defined (ANIMATED_WATER) && defined (FEATURE_TRANSPARENT_PASS)
 const vec3 normalDiffOffset   = vec3(-1.0, 0.0, 1.0);
 const vec2 normalDiffSize     = vec2(2.0, 0.0);
 
@@ -112,7 +115,7 @@ void main()
 
 	sunVecView = (gl_ModelViewMatrix * vec4(sunVec.x, sunVec.y, sunVec.z, 0.0)).xyz;
 
-	isUpside = gl_Normal.y == 1.0 ? 1.0 : 0.0;
+	isUpside = (gl_Normal.y > 0.5) ? 1.0 : 0.0;
 
     normal = gl_NormalMatrix * gl_Normal;
     gl_FrontColor = gl_Color;
@@ -146,7 +149,8 @@ void main()
     }
 #endif
 
-#ifdef ANIMATED_WATER
+#ifdef FEATURE_TRANSPARENT_PASS
+# ifdef ANIMATED_WATER
     if (checkFlag(BLOCK_HINT_WATER, blockHint)) {
        // Only animate blocks on sea level
        if (vertexWorldPos.y < 32.5 && vertexWorldPos.y > 31.5) {
@@ -156,8 +160,9 @@ void main()
             vertexViewPos.y += normalAndOffset.w - waterOffsetY;
        }
     }
-#else
+# else
     waterNormalWorldSpace = gl_NormalMatrix * vec3(0.0, 1.0, 0.0);
+# endif
 #endif
 
     vertexProjPos = gl_ProjectionMatrix * vertexViewPos;

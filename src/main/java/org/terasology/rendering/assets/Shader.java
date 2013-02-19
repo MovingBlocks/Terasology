@@ -211,10 +211,7 @@ public class Shader implements Asset {
             builder.append("#define ANIMATED_GRASS \n");
         if (config.getRendering().isAnimateWater()) {
             builder.append("#define ANIMATED_WATER \n");
-            builder.append("#define OCEAN_OCTAVES " + config.getRendering().getOceanOctaves() + " \n");
         }
-        if (config.getRendering().isRefractiveWater())
-            builder.append("#define REFRACTIVE_WATER \n");
         if (config.getRendering().getBlurIntensity() == 0)
             builder.append("#define NO_BLUR \n");
         if (config.getRendering().isFlickeringLight())

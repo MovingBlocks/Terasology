@@ -28,9 +28,11 @@
 #define TORCH_WATER_DIFF 0.7
 #define TORCH_BLOCK_SPEC 0.7
 #define TORCH_BLOCK_DIFF 1.0
-#define WATER_AMB 0.35
+
+#define WATER_AMB 0.5
 #define WATER_SPEC 2.0
 #define WATER_DIFF 1.0
+
 #define BLOCK_DIFF 0.75
 #define BLOCK_AMB 1.0
 
@@ -38,7 +40,10 @@ varying vec4 vertexWorldPos;
 varying vec4 vertexViewPos;
 varying vec4 vertexProjPos;
 varying vec3 normal;
+
+#ifdef FEATURE_TRANSPARENT_PASS
 varying vec3 waterNormalWorldSpace;
+#endif
 
 varying vec3 sunVecView;
 
@@ -60,39 +65,44 @@ uniform vec4 skyInscatteringSettingsFrag;
 #define skyInscatteringStrength skyInscatteringSettingsFrag.y
 #define skyInscatteringLength skyInscatteringSettingsFrag.z
 
+#ifdef FEATURE_TRANSPARENT_PASS
 uniform vec4 waterSettingsFrag;
 #define waterNormalBias waterSettingsFrag.x
 #define waterRefraction waterSettingsFrag.y
-#ifdef REFRACTIVE_WATER
 #define waterFresnelBias waterSettingsFrag.z
 #define waterFresnelPow waterSettingsFrag.w
 
 uniform sampler2D textureWaterRefraction;
 #endif
 
-uniform sampler2D textureAtlas;
+#ifdef FEATURE_TRANSPARENT_PASS
 uniform sampler2D textureWaterNormal;
+uniform sampler2D textureWaterReflection;
+uniform sampler2D texSceneOpaque;
+#endif
+
+uniform sampler2D textureAtlas;
 uniform sampler2D textureLava;
 uniform sampler2D textureEffects;
-uniform sampler2D textureWaterReflection;
 
-uniform float clipHeightPos = 0.0;
-uniform float clipHeightNeg = 0.0;
+uniform float clip;
 
 void main(){
-	if (clipHeightPos > 0.001 && vertexWorldPos.y < clipHeightPos) {
+// Only necessary for opaque objects
+#if !defined (FEATURE_TRANSPARENT_PASS)
+	if (clip > 0.001 && vertexWorldPos.y < clip) {
         discard;
 	}
-
-    if (clipHeightNeg > 0.001 && vertexWorldPos.y > clipHeightNeg) {
-        discard;
-    }
+#endif
 
     vec2 texCoord = gl_TexCoord[0].xy;
 
     vec3 normalizedVPos = -normalize(vertexViewPos.xyz);
+
+#ifdef FEATURE_TRANSPARENT_PASS
     vec3 normalWater = waterNormalWorldSpace;
     bool isWater = false;
+#endif
 
     vec3 sunVecViewAdjusted = sunVecView;
 
@@ -103,7 +113,7 @@ void main(){
 
     vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
 
-    /* WATER */
+#ifdef FEATURE_TRANSPARENT_PASS
     if ( checkFlag(BLOCK_HINT_WATER, blockHint) ) {
         vec2 waterOffset = vec2(vertexWorldPos.x + timeToTick(time, 0.1), vertexWorldPos.z + timeToTick(time, 0.1)) / 8.0;
         vec2 waterOffset2 = vec2(vertexWorldPos.x + timeToTick(time, 0.1), vertexWorldPos.z - timeToTick(time, 0.1)) / 16.0;
@@ -121,15 +131,11 @@ void main(){
                 vec2 projectedPos = 0.5 * (vertexProjPos.xy/vertexProjPos.w) + vec2(0.5);
 
                 vec4 reflectionColor = vec4(texture2D(textureWaterReflection, projectedPos + normalOffset.xy * waterRefraction).xyz, 1.0);
+                vec4 refractionColor = vec4(texture2D(texSceneOpaque, projectedPos + normalOffset.xy * waterRefraction).xyz, 1.0);
 
-#ifdef REFRACTIVE_WATER
                 /* FRESNEL */
-                vec4 refractionColor = vec4(texture2D(textureWaterRefraction, projectedPos + normalOffset.xy * waterRefraction).xyz, 1.0);
                 float f = fresnel(dot(waterNormalWorldSpace, normalizedVPos), waterFresnelBias, waterFresnelPow);
                 color = mix(refractionColor * vec4(WATER_COLOR), reflectionColor * vec4(WATER_COLOR), f);
-#else
-                color = reflectionColor  * vec4(WATER_COLOR);
-#endif
             } else {
                 color = vec4(WATER_COLOR);
             }
@@ -139,7 +145,9 @@ void main(){
 
         isWater = true;
     /* LAVA */
-    } else if ( checkFlag(BLOCK_HINT_LAVA, blockHint) ) {
+    } else
+#endif
+    if ( checkFlag(BLOCK_HINT_LAVA, blockHint) ) {
         texCoord.x = mod(texCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET);
         texCoord.y = mod(texCoord.y, TEXTURE_OFFSET) / (128.0 / (1.0 / TEXTURE_OFFSET));
         texCoord.y += mod(timeToTick(time, 0.1), 127.0) * (1.0/128.0);
@@ -184,9 +192,12 @@ void main(){
     float occlusionValue = expOccValue(gl_TexCoord[1].z);
     float diffuseLighting;
 
+#ifdef FEATURE_TRANSPARENT_PASS
     if (isWater) {
         diffuseLighting = calcLambLight(waterNormalWorldSpace, sunVecViewAdjusted);
-    } else {
+    } else
+#endif
+    {
         diffuseLighting = calcLambLight(normal, sunVecViewAdjusted);
     }
 
@@ -194,10 +205,12 @@ void main(){
 
     /* CALCULATE TORCHLIGHT */
     if (carryingTorch) {
+#ifdef FEATURE_TRANSPARENT_PASS
         if (isWater)
             torchlight = calcTorchlight(calcLambLight(normalWater, normalizedVPos) * TORCH_WATER_DIFF
             + TORCH_WATER_SPEC * calcSpecLight(normal, normalizedVPos, normalizedVPos, torchWaterSpecExp), vertexViewPos.xyz);
         else
+#endif
             torchlight = calcTorchlight(calcLambLight(normal, normalizedVPos) * TORCH_BLOCK_DIFF
             + TORCH_BLOCK_SPEC * calcSpecLight(normal, normalizedVPos, normalizedVPos, torchSpecExp), vertexViewPos.xyz);
     }
@@ -205,11 +218,14 @@ void main(){
     vec3 daylightColorValue;
 
     /* CREATE THE DAYLIGHT LIGHTING MIX */
+#ifdef FEATURE_TRANSPARENT_PASS
     if (isWater) {
         /* WATER NEEDS DIFFUSE AND SPECULAR LIGHT */
-        daylightColorValue = diffuseLighting * WATER_DIFF + WATER_AMB;
+        daylightColorValue = vec3(diffuseLighting * WATER_DIFF + WATER_AMB);
         color.xyz += calcSpecLight(normalWater, sunVecViewAdjusted, normalizedVPos, waterSpecExp) * WATER_SPEC;
-    } else {
+    } else
+#endif
+    {
         /* DEFAULT LIGHTING ONLY CONSIST OF DIFFUSE AND AMBIENT LIGHT */
         daylightColorValue = vec3(BLOCK_AMB + diffuseLighting * BLOCK_DIFF);
     }
@@ -240,5 +256,16 @@ void main(){
     color = mix(color, vec4(finalInscatteringColor, 1.0), fogValue);
 
     gl_FragData[0].rgba = color;
-    gl_FragData[1].rgba = vec4(normal.x / 2.0 + 0.5, normal.y / 2.0 + 0.5, normal.z / 2.0 + 0.5, 0.0f);
+    gl_FragData[1].rgb = vec3(normal.x / 2.0 + 0.5, normal.y / 2.0 + 0.5, normal.z / 2.0 + 0.5);
+
+    // Primitive objects ids... Will be extended later on
+#ifdef FEATURE_TRANSPARENT_PASS
+    if (isWater) {
+        gl_FragData[1].a = 1.0f;
+    }
+    else
+#endif
+    {
+        gl_FragData[1].a = 0.0f;
+    }
 }

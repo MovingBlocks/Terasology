@@ -168,7 +168,7 @@ public class PostProcessingRenderer implements IPropertyProvider {
      * Initially creates the scene FBO and updates it according to the size of the viewport.
      */
     private void createOrUpdateFullscreenFbos() {
-        FBO scene = getFBO("scene");
+        FBO scene = getFBO("sceneOpaque");
         boolean recreate = scene == null || (scene._width != Display.getWidth() || scene._height != Display.getHeight());
 
         if (!recreate)
@@ -181,7 +181,8 @@ public class PostProcessingRenderer implements IPropertyProvider {
         final int halfQuarterWidth = quarterWidth / 2;
         final int halfQuarterHeight = quarterHeight / 2;
 
-        createFBO("scene", Display.getWidth(), Display.getHeight(), FBOType.HDR, true, true);
+        createFBO("sceneOpaque", Display.getWidth(), Display.getHeight(), FBOType.HDR, true, true);
+        createFBO("sceneTransparent", Display.getWidth(), Display.getHeight(), FBOType.HDR, true, true);
 
         createFBO("scenePrePost", Display.getWidth(), Display.getHeight(), FBOType.HDR, false, false);
         createFBO("sceneToneMapped", Display.getWidth(), Display.getHeight(), FBOType.HDR, false, false);
@@ -195,7 +196,6 @@ public class PostProcessingRenderer implements IPropertyProvider {
         createFBO("lightShafts", halfWidth, halfHeight, FBOType.DEFAULT, false, false);
 
         createFBO("sceneReflected", halfWidth, halfHeight, FBOType.HDR, true, false);
-        createFBO("sceneRefracted", halfWidth, halfHeight, FBOType.HDR, true, false);
 
         createFBO("sceneHighPass", halfQuarterWidth, halfQuarterHeight, FBOType.DEFAULT, false, false);
         createFBO("sceneBloom0", halfQuarterWidth, halfQuarterHeight, FBOType.DEFAULT, false, false);
@@ -371,12 +371,28 @@ public class PostProcessingRenderer implements IPropertyProvider {
         }
     }
 
-    public void beginRenderScene(boolean clear) {
-        getFBO("scene").bind();
+    public void beginRenderSceneOpaque(boolean clear) {
+        getFBO("sceneOpaque").bind();
 
         if (clear) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         }
+    }
+
+    public void endRenderSceneOpaque() {
+        getFBO("sceneOpaque").unbind();
+    }
+
+    public void beginRenderSceneTransparent(boolean clear) {
+        getFBO("sceneTransparent").bind();
+
+        if (clear) {
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        }
+    }
+
+    public void endRenderSceneTransparent() {
+        getFBO("sceneTransparent").unbind();
     }
 
     public void beginRenderReflectedScene() {
@@ -387,29 +403,10 @@ public class PostProcessingRenderer implements IPropertyProvider {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    public void endRenderScene() {
-        getFBO("scene").unbind();
-    }
-
     public void endRenderReflectedScene() {
         getFBO("sceneReflected").unbind();
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
-
-
-    public void beginRenderRefractedScene() {
-        FBO refracted = getFBO("sceneRefracted");
-        refracted.bind();
-
-        glViewport(0, 0, refracted._width, refracted._height);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    }
-
-    public void endRenderRefractedScene() {
-        getFBO("sceneRefracted").unbind();
-        glViewport(0, 0, Display.getWidth(), Display.getHeight());
-    }
-
 
     /**
      * Renders the final scene to a quad and displays it. The FBO gets automatically rescaled if the size

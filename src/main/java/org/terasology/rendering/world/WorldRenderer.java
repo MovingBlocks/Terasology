@@ -566,15 +566,7 @@ public final class WorldRenderer {
         glCullFace(GL11.GL_BACK);
         PostProcessingRenderer.getInstance().endRenderReflectedScene();
 
-        if (config.getRendering().isRefractiveWater()) {
-            PostProcessingRenderer.getInstance().beginRenderRefractedScene();
-            renderWorldRefraction(getActiveCamera());
-            PostProcessingRenderer.getInstance().endRenderRefractedScene();
-        }
-
-        PostProcessingRenderer.getInstance().beginRenderScene(true);
         renderWorld(getActiveCamera());
-        PostProcessingRenderer.getInstance().endRenderScene();
 
         /* RENDER THE FINAL POST-PROCESSED SCENE */
         PerformanceMonitor.startActivity("Render Post-Processing");
@@ -604,6 +596,7 @@ public final class WorldRenderer {
 
     public void renderWorld(Camera camera) {
 
+        PostProcessingRenderer.getInstance().beginRenderSceneOpaque(true);
         /* SKYSPHERE */
         PerformanceMonitor.startActivity("Render Sky");
         camera.lookThroughNormalized();
@@ -633,9 +626,12 @@ public final class WorldRenderer {
          * FIRST RENDER PASS: OPAQUE ELEMENTS
          */
         while (_renderQueueChunksOpaque.size() > 0)
-            renderChunk(_renderQueueChunksOpaque.poll(), ChunkMesh.RENDER_PHASE.OPAQUE, camera, false, false);
+            renderChunk(_renderQueueChunksOpaque.poll(), ChunkMesh.RENDER_PHASE.OPAQUE, camera, false);
 
         PerformanceMonitor.endActivity();
+
+        PostProcessingRenderer.getInstance().endRenderSceneOpaque();
+        PostProcessingRenderer.getInstance().beginRenderSceneTransparent(true);
 
         PerformanceMonitor.startActivity("Render Chunks (Transparent)");
 
@@ -646,7 +642,7 @@ public final class WorldRenderer {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         while (_renderQueueChunksSortedBillboards.size() > 0)
-            renderChunk(_renderQueueChunksSortedBillboards.poll(), ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT, camera, false, false);
+            renderChunk(_renderQueueChunksSortedBillboards.poll(), ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT, camera, false);
 
         PerformanceMonitor.endActivity();
 
@@ -667,10 +663,10 @@ public final class WorldRenderer {
 
                 if (j == 0) {
                     glColorMask(false, false, false, false);
-                    renderChunk(c, ChunkMesh.RENDER_PHASE.WATER_AND_ICE, camera, false, false);
+                    renderChunk(c, ChunkMesh.RENDER_PHASE.WATER_AND_ICE, camera, false);
                 } else {
                     glColorMask(true, true, true, true);
-                    renderChunk(c, ChunkMesh.RENDER_PHASE.WATER_AND_ICE, camera, false, false);
+                    renderChunk(c, ChunkMesh.RENDER_PHASE.WATER_AND_ICE, camera, false);
                 }
             }
         }
@@ -684,6 +680,9 @@ public final class WorldRenderer {
         }
 
         PerformanceMonitor.endActivity();
+
+        PostProcessingRenderer.getInstance().endRenderSceneTransparent();
+        PostProcessingRenderer.getInstance().beginRenderSceneOpaque(false);
 
         PerformanceMonitor.startActivity("Render Overlays");
 
@@ -700,6 +699,8 @@ public final class WorldRenderer {
 
         if (_wireframe)
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+        PostProcessingRenderer.getInstance().endRenderSceneOpaque();
     }
 
     public void renderWorldReflection(Camera camera) {
@@ -711,13 +712,13 @@ public final class WorldRenderer {
             camera.lookThrough();
 
             for (Chunk c : _renderQueueChunksOpaque)
-                renderChunk(c, ChunkMesh.RENDER_PHASE.OPAQUE, camera, true, false);
+                renderChunk(c, ChunkMesh.RENDER_PHASE.OPAQUE, camera, true);
 
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
             for (Chunk c : _renderQueueChunksSortedBillboards)
-                renderChunk(c, ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT, camera, true, false);
+                renderChunk(c, ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT, camera, true);
 
             glDisable(GL_BLEND);
         }
@@ -734,37 +735,39 @@ public final class WorldRenderer {
             renderer.renderOpaque();
 
         for (Chunk c : _renderQueueChunksOpaque)
-            renderChunk(c, ChunkMesh.RENDER_PHASE.OPAQUE, camera, false, true);
+            renderChunk(c, ChunkMesh.RENDER_PHASE.OPAQUE, camera, false);
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         for (Chunk c : _renderQueueChunksSortedBillboards)
-            renderChunk(c, ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT, camera, false, true);
+            renderChunk(c, ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT, camera, false);
 
         glDisable(GL_BLEND);
 
         PerformanceMonitor.endActivity();
     }
 
-    private void renderChunk(Chunk chunk, ChunkMesh.RENDER_PHASE phase, Camera camera, boolean clipPos, boolean clipNeg) {
+    private void renderChunk(Chunk chunk, ChunkMesh.RENDER_PHASE phase, Camera camera, boolean clip) {
 
         if (chunk.getChunkState() == Chunk.State.COMPLETE && chunk.getMesh() != null) {
             ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("chunk");
+
+            if (phase != ChunkMesh.RENDER_PHASE.OPAQUE) {
+                // This chunks can actually contain water...
+                shader.setActiveFeatures(ShaderProgram.ShaderProgramFeatures.FEATURE_TRANSPARENT_PASS.getValue());
+            } else {
+                shader.setActiveFeatures(0);
+            }
+
             // Transfer the world offset of the chunk to the shader for various effects
             shader.setFloat3("chunkOffset", (float) (chunk.getPos().x * Chunk.SIZE_X), (float) (chunk.getPos().y * Chunk.SIZE_Y), (float) (chunk.getPos().z * Chunk.SIZE_Z));
             shader.setFloat("animated", chunk.getAnimated() ? 1.0f : 0.0f);
 
-            if (clipPos) {
-                shader.setFloat("clipHeightPos", camera.getClipHeight());
+            if (clip) {
+                shader.setFloat("clip", camera.getClipHeight());
             } else {
-                shader.setFloat("clipHeightPos", 0.0f);
-            }
-
-            if (clipNeg) {
-                shader.setFloat("clipHeightNeg", camera.getClipHeight());
-            } else {
-                shader.setFloat("clipHeightNeg", 0.0f);
+                shader.setFloat("clip", 0.0f);
             }
 
             GL11.glPushMatrix();

@@ -23,6 +23,9 @@ import java.nio.FloatBuffer;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
+import gnu.trove.iterator.TIntIntIterator;
+import gnu.trove.map.TIntIntMap;
+import gnu.trove.map.hash.TIntIntHashMap;
 import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
@@ -47,10 +50,30 @@ import javax.vecmath.Vector4f;
 public class ShaderProgram {
     private static final Logger logger = LoggerFactory.getLogger(ShaderProgram.class);
 
-    private int shaderProgram, fragmentProgram, vertexProgram;
+    private TIntIntMap fragmentPrograms = new TIntIntHashMap();
+    private TIntIntMap vertexPrograms = new TIntIntHashMap();
+    private TIntIntMap shaderPrograms = new TIntIntHashMap();
+
     private String title;
 
+    private int availableFeatures = 0;
+
+    private int activeFeatures = 0;
+
     private IShaderParameters parameters;
+
+    public enum ShaderProgramFeatures {
+        FEATURE_TRANSPARENT_PASS(0x01),
+        FEATURE_ALL(0x02);
+
+        private int value;
+        private ShaderProgramFeatures(int value) {
+            this.value = value;
+        }
+        public int getValue() {
+            return value;
+        }
+    }
 
     public ShaderProgram(String title) {
         this(title, null);
@@ -60,46 +83,89 @@ public class ShaderProgram {
         this.title = title;
         this.parameters = params;
 
-        compileShaderProgram();
+        compileAllShaderPermutations();
     }
 
-    private void compileShaderProgram() {
-        compileShader(GL20.GL_FRAGMENT_SHADER);
-        compileShader(GL20.GL_VERTEX_SHADER);
+    public ShaderProgram(String title, IShaderParameters params, int availableFeatures) {
+        this.title = title;
+        this.parameters = params;
+        this.availableFeatures = availableFeatures;
 
-        shaderProgram = GL20.glCreateProgram();
+        compileAllShaderPermutations();
+    }
 
-        GL20.glAttachShader(shaderProgram, fragmentProgram);
-        GL20.glAttachShader(shaderProgram, vertexProgram);
+    private void compileShaderProgram(int featureHash) {
+        compileShader(GL20.GL_FRAGMENT_SHADER, featureHash);
+        compileShader(GL20.GL_VERTEX_SHADER, featureHash);
+
+        int shaderProgram = GL20.glCreateProgram();
+        shaderPrograms.put(featureHash, shaderProgram);
+
+        GL20.glAttachShader(shaderProgram, fragmentPrograms.get(featureHash));
+        GL20.glAttachShader(shaderProgram, vertexPrograms.get(featureHash));
         GL20.glLinkProgram(shaderProgram);
         GL20.glValidateProgram(shaderProgram);
+    }
+
+    private void compileAllShaderPermutations() {
+        int counter = 1;
+        compileShaderProgram(0);
+
+        for (int i=1; i<ShaderProgramFeatures.FEATURE_ALL.getValue(); ++i) {
+            // Compile all selected features for this shader...
+            if ((i & availableFeatures) > 0) {
+                compileShaderProgram(i);
+                counter++;
+            }
+        }
+
+        logger.info("Compiled {} permutations.", counter);
     }
 
     public void recompile() {
         logger.debug("Recompiling shader {}.", title);
 
         dispose();
-        compileShaderProgram();
+        compileAllShaderPermutations();
     }
 
     public void dispose() {
         logger.debug("Disposing shader {}.", title);
 
-        GL20.glDeleteShader(shaderProgram);
-        shaderProgram = 0;
+        TIntIntIterator it = shaderPrograms.iterator();
+        while (it.hasNext()) {
+            it.advance();
+            GL20.glDeleteShader(it.value());
+        }
+        shaderPrograms.clear();
 
-        GL20.glDeleteProgram(fragmentProgram);
-        fragmentProgram = 0;
+        it = fragmentPrograms.iterator();
+        while (it.hasNext()) {
+            it.advance();
+            GL20.glDeleteShader(it.value());
+        }
+        fragmentPrograms.clear();
 
-        GL20.glDeleteProgram(vertexProgram);
-        vertexProgram = 0;
+        it = vertexPrograms.iterator();
+        while (it.hasNext()) {
+            it.advance();
+            GL20.glDeleteShader(it.value());
+        }
+        vertexPrograms.clear();
     }
 
-    private void compileShader(int type) {
+    private void compileShader(int type, int featureHash) {
 
         int shaderId = GL20.glCreateShader(type);
 
         StringBuilder shader = Shader.createShaderBuilder();
+
+        // Add the activated features for this shader
+        for (int i=0; i<ShaderProgramFeatures.FEATURE_ALL.ordinal(); ++i) {
+            if ((ShaderProgramFeatures.values()[i].getValue() & featureHash) > 0) {
+                shader.append("#define ").append(ShaderProgramFeatures.values()[i].name()).append("\n");
+            }
+        }
 
         if (type == GL20.GL_FRAGMENT_SHADER)
             shader.append(Shader.getIncludedFunctionsFragment()).append("\n");
@@ -121,10 +187,10 @@ public class ShaderProgram {
 
         String debugShaderType = "UNKNOWN";
         if (type == GL20.GL_FRAGMENT_SHADER) {
-            fragmentProgram = shaderId;
+            fragmentPrograms.put(featureHash, shaderId);
             debugShaderType = "FRAGMENT";
         } else if (type == GL20.GL_VERTEX_SHADER) {
-            vertexProgram = shaderId;
+            vertexPrograms.put(featureHash, shaderId);
             debugShaderType = "VERTEX";
         }
 
@@ -199,9 +265,9 @@ public class ShaderProgram {
     public void enable() {
         ShaderProgram activeProgram = ShaderManager.getInstance().getActiveShaderProgram();
 
-        if (activeProgram != this) {
+        if (activeProgram != this || (activeProgram != null && ShaderManager.getInstance().getActiveFeatures() != activeFeatures)) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
-            GL20.glUseProgram(shaderProgram);
+            GL20.glUseProgram(shaderPrograms.get(activeFeatures));
 
             // Make sure the shader manager knows that this program is currently active
             ShaderManager.getInstance().setActiveShaderProgram(this);
@@ -215,43 +281,43 @@ public class ShaderProgram {
 
     public void setFloat(String desc, float f) {
         enable();
-        int id = GL20.glGetUniformLocation(shaderProgram, desc);
+        int id = GL20.glGetUniformLocation(shaderPrograms.get(activeFeatures), desc);
         GL20.glUniform1f(id, f);
     }
 
     public void setFloat2(String desc, float f1, float f2) {
         enable();
-        int id = GL20.glGetUniformLocation(shaderProgram, desc);
+        int id = GL20.glGetUniformLocation(shaderPrograms.get(activeFeatures), desc);
         GL20.glUniform2f(id, f1, f2);
     }
 
     public void setFloat3(String desc, float f1, float f2, float f3) {
         enable();
-        int id = GL20.glGetUniformLocation(shaderProgram, desc);
+        int id = GL20.glGetUniformLocation(shaderPrograms.get(activeFeatures), desc);
         GL20.glUniform3f(id, f1, f2, f3);
     }
 
     public void setFloat4(String desc, float f1, float f2, float f3, float f4) {
         enable();
-        int id = GL20.glGetUniformLocation(shaderProgram, desc);
+        int id = GL20.glGetUniformLocation(shaderPrograms.get(activeFeatures), desc);
         GL20.glUniform4f(id, f1, f2, f3, f4);
     }
 
     public void setInt(String desc, int i) {
         enable();
-        int id = GL20.glGetUniformLocation(shaderProgram, desc);
+        int id = GL20.glGetUniformLocation(shaderPrograms.get(activeFeatures), desc);
         GL20.glUniform1i(id, i);
     }
 
     public void setFloat2(String desc, FloatBuffer buffer) {
         enable();
-        int id = GL20.glGetUniformLocation(shaderProgram, desc);
+        int id = GL20.glGetUniformLocation(shaderPrograms.get(activeFeatures), desc);
         GL20.glUniform2(id, buffer);
     }
 
     public void setFloat1(String desc, FloatBuffer buffer) {
         enable();
-        int id = GL20.glGetUniformLocation(shaderProgram, desc);
+        int id = GL20.glGetUniformLocation(shaderPrograms.get(activeFeatures), desc);
         GL20.glUniform1(id, buffer);
     }
 
@@ -261,13 +327,13 @@ public class ShaderProgram {
 
     public void setMatrix4(String desc, Matrix4f m) {
         enable();
-        int id = GL20.glGetUniformLocation(shaderProgram, desc);
+        int id = GL20.glGetUniformLocation(shaderPrograms.get(activeFeatures), desc);
         GL20.glUniformMatrix4(id, false, TeraMath.matrixToFloatBuffer(m));
     }
 
     public void setMatrix3(String desc, Matrix3f m) {
         enable();
-        int id = GL20.glGetUniformLocation(shaderProgram, desc);
+        int id = GL20.glGetUniformLocation(shaderPrograms.get(activeFeatures), desc);
         GL20.glUniformMatrix3(id, false, TeraMath.matrixToFloatBuffer(m));
     }
 
@@ -275,7 +341,15 @@ public class ShaderProgram {
         return parameters;
     }
 
+    public int getActiveFeatures() {
+        return activeFeatures;
+    }
+
     public int getShaderId() {
-        return shaderProgram;
+        return shaderPrograms.get(activeFeatures);
+    }
+
+    public void setActiveFeatures(int featureHash) {
+        activeFeatures = featureHash;
     }
 }
