@@ -25,7 +25,7 @@ varying vec4 vertexViewPos;
 varying vec4 vertexProjPos;
 
 #ifdef FEATURE_TRANSPARENT_PASS
-varying vec3 waterNormalWorldSpace;
+varying vec3 waterNormalViewSpace;
 #endif
 
 varying vec3 sunVecView;
@@ -52,6 +52,7 @@ uniform float waveSize;
 uniform float waveIntens;
 uniform float waveSpeed;
 uniform float waterOffsetY;
+uniform float waveOverallScale;
 
 const vec2[] waveDirections = vec2[](
     vec2(-0.613392, 0.617481),
@@ -85,7 +86,7 @@ float calcWaterHeightAtOffset(vec2 worldPos) {
         timeFactor *= waveSpeedFalloff;
     }
 
-    return height / float(OCEAN_OCTAVES);
+    return (height / float(OCEAN_OCTAVES)) * waveOverallScale;
 }
 
 vec4 calcWaterNormalAndOffset(vec2 worldPosRaw) {
@@ -156,12 +157,12 @@ void main()
        if (vertexWorldPos.y < 32.5 && vertexWorldPos.y > 31.5) {
             vec4 normalAndOffset = calcWaterNormalAndOffset(vertexChunkPos.xz);
 
-            waterNormalWorldSpace = gl_NormalMatrix * normalAndOffset.xyz;
-            vertexViewPos.y += normalAndOffset.w - waterOffsetY;
+            waterNormalViewSpace = gl_NormalMatrix * normalAndOffset.xyz;
+            vertexViewPos.y += normalAndOffset.w + waterOffsetY;
        }
     }
 # else
-    waterNormalWorldSpace = gl_NormalMatrix * vec3(0.0, 1.0, 0.0);
+    waterNormalViewSpace = gl_NormalMatrix * vec3(0.0, 1.0, 0.0);
 # endif
 #endif
 

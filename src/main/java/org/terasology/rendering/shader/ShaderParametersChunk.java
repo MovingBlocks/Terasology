@@ -43,22 +43,24 @@ public class ShaderParametersChunk extends ShaderParametersBase {
     private Texture water = Assets.getTexture("engine:water_normal");
     private Texture effects = Assets.getTexture("engine:effects");
 
-    Property skyInscatteringLength = new Property("skyInscatteringLength", 0.9f, 0.0f, 1.0f);
-    Property skyInscatteringStrength = new Property("skyInscatteringStrength", 0.25f, 0.0f, 1.0f);
+    Property skyInscatteringLength = new Property("skyInscatteringLength", 1.0f, 0.0f, 1.0f);
+    Property skyInscatteringStrength = new Property("skyInscatteringStrength", 0.35f, 0.0f, 1.0f);
 
-    Property waveIntens = new Property("waveIntens", 0.88f, 0.0f, 2.0f);
-    Property waveIntensFalloff = new Property("waveIntensFalloff", 0.94f, 0.0f, 2.0f);
-    Property waveSize = new Property("waveSize", 0.45f, 0.0f, 2.0f);
-    Property waveSizeFalloff = new Property("waveSizeFalloff", 0.9f, 0.0f, 2.0f);
-    Property waveSpeed = new Property("waveSpeed", 0.18f, 0.0f, 2.0f);
-    Property waveSpeedFalloff = new Property("waveSpeedFalloff", 0.8f, 0.0f, 2.0f);
+    Property waveIntens = new Property("waveIntens", 1.0f, 0.0f, 2.0f);
+    Property waveIntensFalloff = new Property("waveIntensFalloff", 0.88f, 0.0f, 2.0f);
+    Property waveSize = new Property("waveSize", 0.24f, 0.0f, 2.0f);
+    Property waveSizeFalloff = new Property("waveSizeFalloff", 0.88f, 0.0f, 2.0f);
+    Property waveSpeed = new Property("waveSpeed", 0.14f, 0.0f, 2.0f);
+    Property waveSpeedFalloff = new Property("waveSpeedFalloff", 0.75f, 0.0f, 2.0f);
 
-    Property waterRefraction = new Property("waterRefraction", 0.05f, 0.0f, 1.0f);
+    Property waveOverallScale = new Property("waveOverallScale", 1.0f, 0.0f, 2.0f);
+
+    Property waterRefraction = new Property("waterRefraction", 0.04f, 0.0f, 1.0f);
     Property waterFresnelBias = new Property("waterFresnelBias", 0.01f, 0.01f, 0.1f);
-    Property waterFresnelPow = new Property("waterFresnelPow", 2.8f, 0.0f, 10.0f);
-    Property waterNormalBias = new Property("waterNormalBias", 20.0f, 1.0f, 100.0f);
+    Property waterFresnelPow = new Property("waterFresnelPow", 2.5f, 0.0f, 10.0f);
+    Property waterNormalBias = new Property("waterNormalBias", 25.0f, 1.0f, 100.0f);
 
-    Property waterOffsetY = new Property("waterOffsetY", 0.0f, 0.0f, 1.0f);
+    Property waterOffsetY = new Property("waterOffsetY", 0.0f, 0.0f, 5.0f);
 
     Property torchWaterSpecExp = new Property("torchWaterSpecExp", 30.0f, 0.0f, 64.0f);
     Property waterSpecExp = new Property("waterSpecExp", 512.0f, 0.0f, 1024.0f);
@@ -131,6 +133,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
             program.setFloat("waveSpeed", (Float) waveSpeed.getValue());
             program.setFloat("waveIntens", (Float) waveIntens.getValue());
             program.setFloat("waterOffsetY", (Float) waterOffsetY.getValue());
+            program.setFloat("waveOverallScale", (Float) waveOverallScale.getValue());
         }
     }
 
@@ -152,5 +155,6 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         properties.add(waterFresnelPow);
         properties.add(waterRefraction);
         properties.add(waterOffsetY);
+        properties.add(waveOverallScale);
     }
 }

@@ -29,9 +29,9 @@
 #define TORCH_BLOCK_SPEC 0.7
 #define TORCH_BLOCK_DIFF 1.0
 
-#define WATER_AMB 0.5
-#define WATER_SPEC 2.0
-#define WATER_DIFF 1.0
+#define WATER_AMB 0.25
+#define WATER_SPEC 4.0
+#define WATER_DIFF 0.75
 
 #define BLOCK_DIFF 0.75
 #define BLOCK_AMB 1.0
@@ -42,7 +42,7 @@ varying vec4 vertexProjPos;
 varying vec3 normal;
 
 #ifdef FEATURE_TRANSPARENT_PASS
-varying vec3 waterNormalWorldSpace;
+varying vec3 waterNormalViewSpace;
 #endif
 
 varying vec3 sunVecView;
@@ -100,7 +100,7 @@ void main(){
     vec3 normalizedVPos = -normalize(vertexViewPos.xyz);
 
 #ifdef FEATURE_TRANSPARENT_PASS
-    vec3 normalWater = waterNormalWorldSpace;
+    vec3 normalWater = waterNormalViewSpace;
     bool isWater = false;
 #endif
 
@@ -134,7 +134,7 @@ void main(){
                 vec4 refractionColor = vec4(texture2D(texSceneOpaque, projectedPos + normalOffset.xy * waterRefraction).xyz, 1.0);
 
                 /* FRESNEL */
-                float f = fresnel(dot(waterNormalWorldSpace, normalizedVPos), waterFresnelBias, waterFresnelPow);
+                float f = fresnel(dot(normalWater, normalizedVPos), waterFresnelBias, waterFresnelPow);
                 color = mix(refractionColor * vec4(WATER_COLOR), reflectionColor * vec4(WATER_COLOR), f);
             } else {
                 color = vec4(WATER_COLOR);
@@ -163,7 +163,7 @@ void main(){
     }
 
     /* APPLY OVERALL BIOME COLOR OFFSET */
-    if ( !checkFlag(BLOCK_HINT_GRASS, blockHint) ) {
+    if (!checkFlag(BLOCK_HINT_GRASS, blockHint)) {
         if (gl_Color.r < 0.99 && gl_Color.g < 0.99 && gl_Color.b < 0.99) {
             if (color.g > 0.5) {
                 color.rgb = vec3(color.g) * gl_Color.rgb;
@@ -194,7 +194,7 @@ void main(){
 
 #ifdef FEATURE_TRANSPARENT_PASS
     if (isWater) {
-        diffuseLighting = calcLambLight(waterNormalWorldSpace, sunVecViewAdjusted);
+        diffuseLighting = calcLambLight(normalWater, sunVecViewAdjusted);
     } else
 #endif
     {
