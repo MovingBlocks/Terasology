@@ -354,6 +354,9 @@ public final class ChunkTessellator {
         // Liquids can be transparent but there should be no visible adjacent faces
         if (currentBlock.isLiquid() && blockToCheck.isLiquid()) return false;
 
+        // Draw faces adjacent to animated blocks (which are of different types)
+        //if (blockToCheck.isWaving() && !blockToCheck.isDoubleSided() && currentBlock.getId() != blockToCheck.getId()) return true;
+
         return blockToCheck.getId() == 0x0 ||
                 !blockToCheck.isFullSide(side.reverse()) ||
                 (!currentBlock.isTranslucent() && blockToCheck.isTranslucent());

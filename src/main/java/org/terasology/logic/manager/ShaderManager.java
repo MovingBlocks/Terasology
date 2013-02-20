@@ -39,9 +39,10 @@ public class ShaderManager {
     private static final Logger logger = LoggerFactory.getLogger(ShaderManager.class);
     private static ShaderManager _instance = null;
 
-    private final HashMap<String, ShaderProgram> _shaderPrograms = new HashMap<String, ShaderProgram>(16);
+    private final HashMap<String, ShaderProgram> shaderPrograms = new HashMap<String, ShaderProgram>(16);
 
-    private ShaderProgram _activeShaderProgram = null;
+    private int activeFeatures = 0;
+    private ShaderProgram activeShaderProgram = null;
 
     private ShaderProgram _defaultShaderProgram, _defaultTexturedShaderProgram;
 
@@ -80,7 +81,8 @@ public class ShaderManager {
         createAndStoreShaderProgram("down", new ShaderParametersDefault());
         createAndStoreShaderProgram("hdr", new ShaderParametersHdr());
         createAndStoreShaderProgram("sky", new ShaderParametersSky());
-        createAndStoreShaderProgram("chunk", new ShaderParametersChunk());
+        createAndStoreShaderProgram("chunk", new ShaderParametersChunk(),
+                ShaderProgram.ShaderProgramFeatures.FEATURE_TRANSPARENT_PASS.getValue());
         createAndStoreShaderProgram("particle", new ShaderParametersParticle());
         createAndStoreShaderProgram("block", new ShaderParametersBlock());
         createAndStoreShaderProgram("gelatinousCube", new ShaderParametersGelCube());
@@ -97,7 +99,7 @@ public class ShaderManager {
         if (!material.equals(activateMaterial)) {
             GL20.glUseProgram(material.getShaderId());
             activateMaterial = material;
-            _activeShaderProgram = null;
+            activeShaderProgram = null;
         }
     }
 
@@ -117,19 +119,30 @@ public class ShaderManager {
     }
 
     public void recompileAllShaders() {
-        for (ShaderProgram program : _shaderPrograms.values()) {
+        for (ShaderProgram program : shaderPrograms.values()) {
             program.recompile();
         }
     }
 
+    private ShaderProgram createAndStoreShaderProgram(String title, IShaderParameters params, int availableFeatures) {
+        // Make sure to remove the old shader program
+        if (shaderPrograms.containsKey(title)) {
+            shaderPrograms.remove(title).dispose();
+        }
+
+        ShaderProgram program = new ShaderProgram(title, params, availableFeatures);
+        shaderPrograms.put(title, program);
+        return program;
+    }
+
     private ShaderProgram createAndStoreShaderProgram(String title, IShaderParameters params) {
         // Make sure to remove the old shader program
-        if (_shaderPrograms.containsKey(title)) {
-            _shaderPrograms.remove(title).dispose();
+        if (shaderPrograms.containsKey(title)) {
+            shaderPrograms.remove(title).dispose();
         }
 
         ShaderProgram program = new ShaderProgram(title, params);
-        _shaderPrograms.put(title, program);
+        shaderPrograms.put(title, program);
         return program;
     }
 
@@ -156,20 +169,24 @@ public class ShaderManager {
     }
 
     public ShaderProgram getActiveShaderProgram() {
-        return _activeShaderProgram;
+        return activeShaderProgram;
+    }
+
+    public int getActiveFeatures() {
+        return activeFeatures;
     }
 
     public void setActiveShaderProgram(ShaderProgram program) {
-        _activeShaderProgram = program;
+        activeShaderProgram = program;
         activateMaterial = null;
+        activeFeatures = program.getActiveFeatures();
     }
-
     /**
      * @param s Nave of the shader to return
      * @return The id of the requested shader
      */
     public ShaderProgram getShaderProgram(String s) {
-        return _shaderPrograms.get(s);
+        return shaderPrograms.get(s);
     }
 
     /**
@@ -177,6 +194,6 @@ public class ShaderManager {
      * @return
      */
     public HashMap<String, ShaderProgram> getShaderPrograms() {
-        return _shaderPrograms;
+        return shaderPrograms;
     }
 }

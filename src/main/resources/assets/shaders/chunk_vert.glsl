@@ -23,7 +23,10 @@ varying vec3 normal;
 varying vec4 vertexWorldPos;
 varying vec4 vertexViewPos;
 varying vec4 vertexProjPos;
-varying vec3 waterNormalWorldSpace;
+
+#ifdef FEATURE_TRANSPARENT_PASS
+varying vec3 waterNormalViewSpace;
+#endif
 
 varying vec3 sunVecView;
 
@@ -38,7 +41,7 @@ uniform vec3 chunkOffset;
 
 uniform bool animated;
 
-#ifdef ANIMATED_WATER
+#if defined (ANIMATED_WATER) && defined (FEATURE_TRANSPARENT_PASS)
 const vec3 normalDiffOffset   = vec3(-1.0, 0.0, 1.0);
 const vec2 normalDiffSize     = vec2(2.0, 0.0);
 
@@ -49,6 +52,7 @@ uniform float waveSize;
 uniform float waveIntens;
 uniform float waveSpeed;
 uniform float waterOffsetY;
+uniform float waveOverallScale;
 
 const vec2[] waveDirections = vec2[](
     vec2(-0.613392, 0.617481),
@@ -82,7 +86,7 @@ float calcWaterHeightAtOffset(vec2 worldPos) {
         timeFactor *= waveSpeedFalloff;
     }
 
-    return height / float(OCEAN_OCTAVES);
+    return (height / float(OCEAN_OCTAVES)) * waveOverallScale;
 }
 
 vec4 calcWaterNormalAndOffset(vec2 worldPosRaw) {
@@ -93,7 +97,7 @@ vec4 calcWaterNormalAndOffset(vec2 worldPosRaw) {
     float s12 = calcWaterHeightAtOffset(worldPosRaw.xy + normalDiffOffset.yz);
 
     vec3 va = normalize(vec3(normalDiffSize.x, s21-s01, normalDiffSize.y));
-    vec3 vb = normalize(vec3(normalDiffSize.y, s12-s10, -normalDiffSize.x));
+    vec3 vb = normalize(vec3(normalDiffSize.y, s10-s12, -normalDiffSize.x));
 
     return vec4(cross(va,vb), s11);
 }
@@ -112,7 +116,7 @@ void main()
 
 	sunVecView = (gl_ModelViewMatrix * vec4(sunVec.x, sunVec.y, sunVec.z, 0.0)).xyz;
 
-	isUpside = gl_Normal.y == 1.0 ? 1.0 : 0.0;
+	isUpside = (gl_Normal.y > 0.5) ? 1.0 : 0.0;
 
     normal = gl_NormalMatrix * gl_Normal;
     gl_FrontColor = gl_Color;
@@ -146,18 +150,20 @@ void main()
     }
 #endif
 
-#ifdef ANIMATED_WATER
+#ifdef FEATURE_TRANSPARENT_PASS
+# ifdef ANIMATED_WATER
     if (checkFlag(BLOCK_HINT_WATER, blockHint)) {
        // Only animate blocks on sea level
        if (vertexWorldPos.y < 32.5 && vertexWorldPos.y > 31.5) {
             vec4 normalAndOffset = calcWaterNormalAndOffset(vertexChunkPos.xz);
 
-            waterNormalWorldSpace = gl_NormalMatrix * normalAndOffset.xyz;
-            vertexViewPos.y += normalAndOffset.w - waterOffsetY;
+            waterNormalViewSpace = gl_NormalMatrix * normalAndOffset.xyz;
+            vertexViewPos.y += normalAndOffset.w + waterOffsetY;
        }
     }
-#else
-    waterNormalWorldSpace = gl_NormalMatrix * vec3(0.0, 1.0, 0.0);
+# else
+    waterNormalViewSpace = gl_NormalMatrix * vec3(0.0, 1.0, 0.0);
+# endif
 #endif
 
     vertexProjPos = gl_ProjectionMatrix * vertexViewPos;

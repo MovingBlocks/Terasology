@@ -22,8 +22,6 @@ public class RenderingConfig {
     private boolean flickeringLight = false;
     private boolean animateGrass = false;
     private boolean animateWater = false;
-    private boolean refractiveWater = false;
-    private int oceanOctaves = 8;
     private float fieldOfView = 90;
     private boolean cameraBobbing = true;
     private boolean renderPlacingBox = true;
@@ -156,22 +154,6 @@ public class RenderingConfig {
 
     public void setAnimateWater(boolean animateWater) {
         this.animateWater = animateWater;
-    }
-
-    public boolean isRefractiveWater() {
-        return refractiveWater;
-    }
-
-    public void setRefractiveWater(boolean refractiveWater) {
-        this.refractiveWater = refractiveWater;
-    }
-
-    public int getOceanOctaves() {
-        return oceanOctaves;
-    }
-
-    public void setOceanOctaves(int oceanOctaves) {
-        this.oceanOctaves = oceanOctaves;
     }
 
     public float getFieldOfView() {

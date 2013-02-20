@@ -28,6 +28,9 @@ varying vec4 vertexViewPos;
 void main(){
     vec4 color = texture2D(textureAtlas, vec2(gl_TexCoord[0].x + texOffsetX , gl_TexCoord[0].y + texOffsetY ));
 
+    if (color.a < 0.5)
+        discard;
+
     float torchlight = 0.0;
 
     // Apply torchlight

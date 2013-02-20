@@ -43,25 +43,27 @@ public class ShaderParametersChunk extends ShaderParametersBase {
     private Texture water = Assets.getTexture("engine:water_normal");
     private Texture effects = Assets.getTexture("engine:effects");
 
-    Property skyInscatteringLength = new Property("skyInscatteringLength", 0.9f, 0.0f, 1.0f);
-    Property skyInscatteringStrength = new Property("skyInscatteringStrength", 0.25f, 0.0f, 1.0f);
+    Property skyInscatteringLength = new Property("skyInscatteringLength", 1.0f, 0.0f, 1.0f);
+    Property skyInscatteringStrength = new Property("skyInscatteringStrength", 0.35f, 0.0f, 1.0f);
 
-    Property waveIntens = new Property("waveIntens", 0.68f, 0.0f, 2.0f);
-    Property waveIntensFalloff = new Property("waveIntensFalloff", 0.98f, 0.0f, 2.0f);
-    Property waveSize = new Property("waveSize", 0.76f, 0.0f, 2.0f);
-    Property waveSizeFalloff = new Property("waveSizeFalloff", 0.9f, 0.0f, 2.0f);
-    Property waveSpeed = new Property("waveSpeed", 0.44f, 0.0f, 2.0f);
-    Property waveSpeedFalloff = new Property("waveSpeedFalloff", 0.26f, 0.0f, 2.0f);
+    Property waveIntens = new Property("waveIntens", 1.0f, 0.0f, 2.0f);
+    Property waveIntensFalloff = new Property("waveIntensFalloff", 0.88f, 0.0f, 2.0f);
+    Property waveSize = new Property("waveSize", 0.24f, 0.0f, 2.0f);
+    Property waveSizeFalloff = new Property("waveSizeFalloff", 0.88f, 0.0f, 2.0f);
+    Property waveSpeed = new Property("waveSpeed", 0.14f, 0.0f, 2.0f);
+    Property waveSpeedFalloff = new Property("waveSpeedFalloff", 0.75f, 0.0f, 2.0f);
 
-    Property waterRefraction = new Property("waterRefraction", 0.05f, 0.0f, 1.0f);
+    Property waveOverallScale = new Property("waveOverallScale", 1.0f, 0.0f, 2.0f);
+
+    Property waterRefraction = new Property("waterRefraction", 0.04f, 0.0f, 1.0f);
     Property waterFresnelBias = new Property("waterFresnelBias", 0.01f, 0.01f, 0.1f);
-    Property waterFresnelPow = new Property("waterFresnelPow", 2.8f, 0.0f, 10.0f);
-    Property waterNormalBias = new Property("waterNormalBias", 2.0f, 1.0f, 4.0f);
+    Property waterFresnelPow = new Property("waterFresnelPow", 2.5f, 0.0f, 10.0f);
+    Property waterNormalBias = new Property("waterNormalBias", 25.0f, 1.0f, 100.0f);
 
-    Property waterOffsetY = new Property("waterOffsetY", 0.0f, 0.0f, 1.0f);
+    Property waterOffsetY = new Property("waterOffsetY", 0.0f, 0.0f, 5.0f);
 
     Property torchWaterSpecExp = new Property("torchWaterSpecExp", 30.0f, 0.0f, 64.0f);
-    Property waterSpecExp = new Property("waterSpecExp", 64.0f, 0.0f, 128.0f);
+    Property waterSpecExp = new Property("waterSpecExp", 512.0f, 0.0f, 1024.0f);
     Property torchSpecExp = new Property("torchSpecExp", 32.0f, 0.0f, 64.0f);
 
     public void applyParameters(ShaderProgram program) {
@@ -72,27 +74,25 @@ public class ShaderParametersChunk extends ShaderParametersBase {
             return;
         }
 
-        GL13.glActiveTexture(GL13.GL_TEXTURE1);
-        glBindTexture(GL11.GL_TEXTURE_2D, lava.getId());
-        GL13.glActiveTexture(GL13.GL_TEXTURE2);
-        glBindTexture(GL11.GL_TEXTURE_2D, water.getId());
-        GL13.glActiveTexture(GL13.GL_TEXTURE3);
-        glBindTexture(GL11.GL_TEXTURE_2D, effects.getId());
-        GL13.glActiveTexture(GL13.GL_TEXTURE4);
-        PostProcessingRenderer.getInstance().getFBO("sceneReflected").bindTexture();
-        if (CoreRegistry.get(Config.class).getRendering().isRefractiveWater()) {
-            GL13.glActiveTexture(GL13.GL_TEXTURE5);
-            PostProcessingRenderer.getInstance().getFBO("sceneRefracted").bindTexture();
-        }
-        GL13.glActiveTexture(GL13.GL_TEXTURE0);
+        int texId = 0;
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
         glBindTexture(GL11.GL_TEXTURE_2D, terrain.getId());
-
-        program.setInt("textureLava", 1);
-        program.setInt("textureWaterNormal", 2);
-        program.setInt("textureEffects", 3);
-        program.setInt("textureWaterReflection", 4);
-        program.setInt("textureWaterRefraction", 5);
-        program.setInt("textureAtlas", 0);
+        program.setInt("textureAtlas", texId++);
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        glBindTexture(GL11.GL_TEXTURE_2D, lava.getId());
+        program.setInt("textureLava", texId++);
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        glBindTexture(GL11.GL_TEXTURE_2D, water.getId());
+        program.setInt("textureWaterNormal", texId++);
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        glBindTexture(GL11.GL_TEXTURE_2D, effects.getId());
+        program.setInt("textureEffects", texId++);
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        PostProcessingRenderer.getInstance().getFBO("sceneReflected").bindTexture();
+        program.setInt("textureWaterReflection", texId++);
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        PostProcessingRenderer.getInstance().getFBO("sceneOpaque").bindTexture();
+        program.setInt("texSceneOpaque", texId++);
 
         Vector4f lightingSettingsFrag = new Vector4f();
         lightingSettingsFrag.x = (Float) torchSpecExp.getValue();
@@ -133,6 +133,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
             program.setFloat("waveSpeed", (Float) waveSpeed.getValue());
             program.setFloat("waveIntens", (Float) waveIntens.getValue());
             program.setFloat("waterOffsetY", (Float) waterOffsetY.getValue());
+            program.setFloat("waveOverallScale", (Float) waveOverallScale.getValue());
         }
     }
 
@@ -154,5 +155,6 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         properties.add(waterFresnelPow);
         properties.add(waterRefraction);
         properties.add(waterOffsetY);
+        properties.add(waveOverallScale);
     }
 }
