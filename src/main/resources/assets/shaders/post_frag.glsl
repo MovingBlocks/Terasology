@@ -15,8 +15,7 @@
  */
 
 uniform sampler2D texScene;
-uniform sampler2D texDepthOpaque;
-uniform sampler2D texDepthTransparent;
+uniform sampler2D texDepth;
 #ifdef BLOOM
 uniform sampler2D texBloom;
 #endif
@@ -48,9 +47,7 @@ void main() {
     vec4 colorBlur = texture2D(texBlur, gl_TexCoord[0].xy);
 #endif
 
-    float currentDepthOpaque = texture2D(texDepthOpaque, gl_TexCoord[0].xy).x;
-    float currentDepthTransparent = texture2D(texDepthTransparent, gl_TexCoord[0].xy).x;
-    float currentDepth = (currentDepthOpaque < currentDepthTransparent) ? currentDepthOpaque : currentDepthTransparent;
+    float currentDepth = texture2D(texDepth, gl_TexCoord[0].xy).x;
 
 #ifndef NO_BLUR
     float depthLin = linDepth(currentDepth);

@@ -30,8 +30,8 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
  */
 public class ShaderParametersSobel extends ShaderParametersBase {
 
-    Property pixelOffsetX = new Property("pixelOffsetX", 1.0f, 0.0f, 16.0f);
-    Property pixelOffsetY = new Property("pixelOffsetY", 1.0f, 0.0f, 16.0f);
+    Property pixelOffsetX = new Property("pixelOffsetX", 1.25f, 0.0f, 16.0f);
+    Property pixelOffsetY = new Property("pixelOffsetY", 1.25f, 0.0f, 16.0f);
 
     Property threshold = new Property("threshold", 16.0f, 0.0f, 16.0f);
 

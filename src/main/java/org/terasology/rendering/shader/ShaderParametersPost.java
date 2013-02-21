@@ -52,8 +52,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
     public void applyParameters(ShaderProgram program) {
         super.applyParameters(program);
 
-        PostProcessingRenderer.FBO sceneOpaque = PostProcessingRenderer.getInstance().getFBO("sceneOpaque");
-        PostProcessingRenderer.FBO sceneTransparent = PostProcessingRenderer.getInstance().getFBO("sceneTransparent");
+        PostProcessingRenderer.FBO sceneCombined = PostProcessingRenderer.getInstance().getFBO("sceneCombined");
 
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
@@ -77,11 +76,8 @@ public class ShaderParametersPost extends ShaderParametersBase {
         program.setInt("texVignette", texId++);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        sceneOpaque.bindDepthTexture();
-        program.setInt("texDepthOpaque", texId++);
-        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        sceneTransparent.bindDepthTexture();
-        program.setInt("texDepthTransparent", texId++);
+        sceneCombined.bindDepthTexture();
+        program.setInt("texDepth", texId++);
 
         if (CoreRegistry.get(Config.class).getRendering().isFilmGrain()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
@@ -91,7 +87,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
             program.setFloat("noiseOffset", rand.randomPosFloat());
 
             FloatBuffer rtSize = BufferUtils.createFloatBuffer(2);
-            rtSize.put((float) sceneOpaque._width).put((float) sceneOpaque._height);
+            rtSize.put((float) sceneCombined._width).put((float) sceneCombined._height);
             rtSize.flip();
 
             program.setFloat2("renderTargetSize", rtSize);

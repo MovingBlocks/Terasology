@@ -42,7 +42,7 @@ import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector4f;
 
 /**
- * Wraps a OpenGL shader program. Provides convenience methods for setting
+ * Wraps an OpenGL shader program. Provides convenience methods for setting
  * uniform variables of various types.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>

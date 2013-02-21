@@ -184,6 +184,8 @@ public class PostProcessingRenderer implements IPropertyProvider {
         createFBO("sceneOpaque", Display.getWidth(), Display.getHeight(), FBOType.HDR, true, true);
         createFBO("sceneTransparent", Display.getWidth(), Display.getHeight(), FBOType.HDR, true, true);
 
+        createFBO("sceneCombined", Display.getWidth(), Display.getHeight(), FBOType.HDR, true, true);
+
         createFBO("scenePrePost", Display.getWidth(), Display.getHeight(), FBOType.HDR, false, false);
         createFBO("sceneToneMapped", Display.getWidth(), Display.getHeight(), FBOType.HDR, false, false);
 
@@ -426,6 +428,8 @@ public class PostProcessingRenderer implements IPropertyProvider {
             }
         }
 
+        generateCombinedScene();
+
         if (config.getRendering().isLightShafts()) {
             generateLightShafts();
         }
@@ -462,6 +466,18 @@ public class PostProcessingRenderer implements IPropertyProvider {
 
         renderFullQuad();
     }
+
+    private void generateCombinedScene() {
+        ShaderManager.getInstance().enableShader("combine");
+
+        PostProcessingRenderer.getInstance().getFBO("sceneCombined").bind();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        renderFullQuad();
+
+        PostProcessingRenderer.getInstance().getFBO("sceneCombined").unbind();
+    }
+
 
     private void generateToneMappedScene() {
         ShaderManager.getInstance().enableShader("hdr");

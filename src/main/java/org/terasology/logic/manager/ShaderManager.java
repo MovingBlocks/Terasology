@@ -76,6 +76,7 @@ public class ShaderManager {
         createAndStoreShaderProgram("lightshaft", new ShaderParametersLightShaft());
         createAndStoreShaderProgram("sobel", new ShaderParametersSobel());
         createAndStoreShaderProgram("prePost", new ShaderParametersPrePost());
+        createAndStoreShaderProgram("combine", new ShaderParametersCombine());
         createAndStoreShaderProgram("highp", new ShaderParametersDefault());
         createAndStoreShaderProgram("blur", new ShaderParametersDefault());
         createAndStoreShaderProgram("down", new ShaderParametersDefault());
