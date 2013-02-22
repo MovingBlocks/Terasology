@@ -157,7 +157,7 @@ void main(){
     } else {
         color = texture2D(textureAtlas, texCoord.xy);
 
-        if (color.a < 0.1) {
+        if (color.a < 0.5) {
             discard;
         }
     }
