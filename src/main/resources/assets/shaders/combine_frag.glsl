@@ -26,7 +26,8 @@ uniform sampler2D texSsao;
 #ifdef OUTLINE
 uniform sampler2D texEdges;
 
-uniform float shoreFactor;
+uniform float shoreStart;
+uniform float shoreEnd;
 
 uniform float outlineDepthThreshold;
 uniform float outlineThickness;
@@ -67,7 +68,8 @@ void main() {
             float linDepthOpaque = linDepth(depthOpaque.r);
             float linDepthTransparent = linDepth(depthTransparent.r);
 
-            fade = 1.0 - clamp((linDepthOpaque - linDepthTransparent) * shoreFactor, 0.0, 1.0);
+            float depthDiff = linDepthOpaque - linDepthTransparent;
+            fade = clamp((shoreEnd - depthDiff) / (shoreEnd - shoreStart), 0.0, 1.0);
         }
 
         normals = mix(normalsTransparent, normalsOpaque, fade);

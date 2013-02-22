@@ -32,7 +32,8 @@ public class ShaderParametersCombine extends ShaderParametersBase {
 
     private Property outlineDepthThreshold = new Property("outlineDepthThreshold", 0.1f);
     private Property outlineThickness = new Property("outlineThickness", 1.0f);
-    private Property shoreFactor = new Property("shoreFactor", 15.0f, 0.0f, 100.0f);
+    private Property shoreStart = new Property("shoreStart",0.006f, 0.0f, 0.1f);
+    private Property shoreEnd = new Property("shoreEnd",0.016f, 0.0f, 0.1f);
 
     @Override
     public void applyParameters(ShaderProgram program) {
@@ -84,13 +85,15 @@ public class ShaderParametersCombine extends ShaderParametersBase {
             program.setFloat("outlineThickness", (Float) outlineThickness.getValue());
         }
 
-        program.setFloat("shoreFactor", (Float) shoreFactor.getValue());
+        program.setFloat("shoreStart", (Float) shoreStart.getValue());
+        program.setFloat("shoreEnd", (Float) shoreEnd.getValue());
     }
 
     @Override
     public void addPropertiesToList(List<Property> properties) {
         properties.add(outlineThickness);
         properties.add(outlineDepthThreshold);
-        properties.add(shoreFactor);
+        properties.add(shoreStart);
+        properties.add(shoreEnd);
     }
 }
