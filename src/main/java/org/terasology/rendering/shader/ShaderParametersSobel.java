@@ -21,8 +21,6 @@ import org.terasology.logic.manager.PostProcessingRenderer;
 
 import java.util.List;
 
-import static org.lwjgl.opengl.GL11.glBindTexture;
-
 /**
  * Shader parameters for the Post-processing shader program.
  *
@@ -44,8 +42,8 @@ public class ShaderParametersSobel extends ShaderParametersBase {
         scene.bindDepthTexture();
         program.setInt("texDepth", 0);
 
-        program.setFloat("texelWidth", 1.0f / scene._width);
-        program.setFloat("texelHeight", 1.0f / scene._height);
+        program.setFloat("texelWidth", 1.0f / scene.width);
+        program.setFloat("texelHeight", 1.0f / scene.height);
 
         program.setFloat("pixelOffsetX", (Float) pixelOffsetX.getValue());
         program.setFloat("pixelOffsetY", (Float) pixelOffsetY.getValue());

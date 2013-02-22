@@ -87,7 +87,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
             program.setFloat("noiseOffset", rand.randomPosFloat());
 
             FloatBuffer rtSize = BufferUtils.createFloatBuffer(2);
-            rtSize.put((float) sceneCombined._width).put((float) sceneCombined._height);
+            rtSize.put((float) sceneCombined.width).put((float) sceneCombined.height);
             rtSize.flip();
 
             program.setFloat2("renderTargetSize", rtSize);

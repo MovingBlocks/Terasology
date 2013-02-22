@@ -16,14 +16,7 @@
 package org.terasology.logic.manager;
 
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.ARBHalfFloatPixel;
-import org.lwjgl.opengl.ARBTextureFloat;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.EXTFramebufferObject;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-import org.lwjgl.opengl.GL14;
-import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -39,27 +32,8 @@ import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
-import static org.lwjgl.opengl.GL11.GL_PROJECTION;
-import static org.lwjgl.opengl.GL11.GL_QUADS;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glCallList;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glColor4f;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glEndList;
-import static org.lwjgl.opengl.GL11.glGenLists;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
-import static org.lwjgl.opengl.GL11.glNewList;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glReadPixels;
-import static org.lwjgl.opengl.GL11.glTexCoord2d;
-import static org.lwjgl.opengl.GL11.glVertex3i;
-import static org.lwjgl.opengl.GL11.glViewport;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL15.GL_READ_ONLY;
 
 /**
  * Responsible for applying and rendering various shader based
@@ -91,6 +65,8 @@ public class PostProcessingRenderer implements IPropertyProvider {
 
     private int displayListQuad = -1;
 
+    private PBO readBackPBOFront, readBackPBOBack, readBackPBOCurrent;
+
     private Config config = CoreRegistry.get(Config.class);
 
     public enum FBOType {
@@ -98,18 +74,65 @@ public class PostProcessingRenderer implements IPropertyProvider {
         HDR
     }
 
-    public class FBO {
-        public int _fboId = 0;
-        public int _textureId = 0;
-        public int _depthTextureId = 0;
-        public int _depthRboId = 0;
-        public int _normalsTextureId = 0;
+    public class PBO {
+        public int pboId = 0;
+        public int width, height;
+        ByteBuffer cachedBuffer = null;
 
-        public int _width = 0;
-        public int _height = 0;
+        public PBO() {
+            pboId = EXTPixelBufferObject.glGenBuffersARB();
+        }
 
         public void bind() {
-            EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, _fboId);
+            EXTPixelBufferObject.glBindBufferARB(EXTPixelBufferObject.GL_PIXEL_PACK_BUFFER_EXT, pboId);
+        }
+
+        public void unbind() {
+            EXTPixelBufferObject.glBindBufferARB(EXTPixelBufferObject.GL_PIXEL_PACK_BUFFER_EXT, 0);
+        }
+
+        public void init(int width, int height) {
+            this.width = width;
+            this.height = height;
+
+            int byteSize = width * height * 4;
+            cachedBuffer = BufferUtils.createByteBuffer(byteSize);
+
+            bind();
+            EXTPixelBufferObject.glBufferDataARB(EXTPixelBufferObject.GL_PIXEL_PACK_BUFFER_EXT, byteSize, EXTPixelBufferObject.GL_STREAM_READ_ARB);
+            unbind();
+        }
+
+        public void copyFromFBO(int fboId, int width, int height, int format, int type) {
+            bind();
+            EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, fboId);
+            glReadPixels(0, 0, width, height, format, type, 0);
+            unbind();
+            EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, 0);
+        }
+
+        public ByteBuffer readBackPixels() {
+            bind();
+            cachedBuffer = EXTPixelBufferObject.glMapBufferARB(EXTPixelBufferObject.GL_PIXEL_PACK_BUFFER_EXT, GL_READ_ONLY, cachedBuffer);
+            EXTPixelBufferObject.glUnmapBufferARB(EXTPixelBufferObject.GL_PIXEL_PACK_BUFFER_EXT);
+            unbind();
+
+            return cachedBuffer;
+        }
+    }
+
+    public class FBO {
+        public int fboId = 0;
+        public int textureId = 0;
+        public int depthTextureId = 0;
+        public int depthRboId = 0;
+        public int normalsTextureId = 0;
+
+        public int width = 0;
+        public int height = 0;
+
+        public void bind() {
+            EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, fboId);
         }
 
         public void unbind() {
@@ -117,15 +140,15 @@ public class PostProcessingRenderer implements IPropertyProvider {
         }
 
         public void bindDepthTexture() {
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, _depthTextureId);
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, depthTextureId);
         }
 
         public void bindTexture() {
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, _textureId);
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId);
         }
 
         public void bindNormalsTexture() {
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, _normalsTextureId);
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, normalsTextureId);
         }
 
         public void unbindTexture() {
@@ -161,6 +184,13 @@ public class PostProcessingRenderer implements IPropertyProvider {
         createFBO("scene4", 4, 4, FBOType.DEFAULT, false, false);
         createFBO("scene2", 2, 2, FBOType.DEFAULT, false, false);
         createFBO("scene1", 1, 1, FBOType.DEFAULT, false, false);
+
+        readBackPBOFront = new PBO();
+        readBackPBOBack = new PBO();
+        readBackPBOFront.init(1,1);
+        readBackPBOBack.init(1,1);
+
+        readBackPBOCurrent = readBackPBOFront;
     }
 
 
@@ -169,7 +199,7 @@ public class PostProcessingRenderer implements IPropertyProvider {
      */
     private void createOrUpdateFullscreenFbos() {
         FBO scene = getFBO("sceneOpaque");
-        boolean recreate = scene == null || (scene._width != Display.getWidth() || scene._height != Display.getHeight());
+        boolean recreate = scene == null || (scene.width != Display.getWidth() || scene.height != Display.getHeight());
 
         if (!recreate)
             return;
@@ -211,11 +241,11 @@ public class PostProcessingRenderer implements IPropertyProvider {
         if (_FBOs.containsKey(title)) {
             FBO fbo = _FBOs.get(title);
 
-            EXTFramebufferObject.glDeleteFramebuffersEXT(fbo._fboId);
-            EXTFramebufferObject.glDeleteRenderbuffersEXT(fbo._depthRboId);
-            GL11.glDeleteTextures(fbo._normalsTextureId);
-            GL11.glDeleteTextures(fbo._depthTextureId);
-            GL11.glDeleteTextures(fbo._textureId);
+            EXTFramebufferObject.glDeleteFramebuffersEXT(fbo.fboId);
+            EXTFramebufferObject.glDeleteRenderbuffersEXT(fbo.depthRboId);
+            GL11.glDeleteTextures(fbo.normalsTextureId);
+            GL11.glDeleteTextures(fbo.depthTextureId);
+            GL11.glDeleteTextures(fbo.textureId);
         }
     }
 
@@ -225,12 +255,12 @@ public class PostProcessingRenderer implements IPropertyProvider {
 
         // Create a new FBO object
         FBO fbo = new FBO();
-        fbo._width = width;
-        fbo._height = height;
+        fbo.width = width;
+        fbo.height = height;
 
         // Create the color target texture
-        fbo._textureId = GL11.glGenTextures();
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo._textureId);
+        fbo.textureId = GL11.glGenTextures();
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo.textureId);
 
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
@@ -245,8 +275,8 @@ public class PostProcessingRenderer implements IPropertyProvider {
 
         if (depth) {
             // Generate the depth texture
-            fbo._depthTextureId = GL11.glGenTextures();
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo._depthTextureId);
+            fbo.depthTextureId = GL11.glGenTextures();
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo.depthTextureId);
 
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
@@ -256,16 +286,16 @@ public class PostProcessingRenderer implements IPropertyProvider {
             GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL14.GL_DEPTH_COMPONENT24, width, height, 0, GL11.GL_DEPTH_COMPONENT, GL11.GL_FLOAT, (java.nio.ByteBuffer) null);
 
             // Create depth render buffer object
-            fbo._depthRboId = EXTFramebufferObject.glGenRenderbuffersEXT();
-            EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, fbo._depthRboId);
+            fbo.depthRboId = EXTFramebufferObject.glGenRenderbuffersEXT();
+            EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, fbo.depthRboId);
             EXTFramebufferObject.glRenderbufferStorageEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, GL14.GL_DEPTH_COMPONENT24, width, height);
             EXTFramebufferObject.glBindRenderbufferEXT(EXTFramebufferObject.GL_RENDERBUFFER_EXT, 0);
         }
 
         if (normals) {
             // Generate the normals texture
-            fbo._normalsTextureId = GL11.glGenTextures();
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo._normalsTextureId);
+            fbo.normalsTextureId = GL11.glGenTextures();
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo.normalsTextureId);
 
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
@@ -278,19 +308,19 @@ public class PostProcessingRenderer implements IPropertyProvider {
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 
         // Create the FBO
-        fbo._fboId = EXTFramebufferObject.glGenFramebuffersEXT();
-        EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, fbo._fboId);
+        fbo.fboId = EXTFramebufferObject.glGenFramebuffersEXT();
+        EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, fbo.fboId);
 
-        EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT, GL11.GL_TEXTURE_2D, fbo._textureId, 0);
+        EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT, GL11.GL_TEXTURE_2D, fbo.textureId, 0);
 
         if (depth) {
             // Generate the depth render buffer and depth map texture
-            EXTFramebufferObject.glFramebufferRenderbufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, EXTFramebufferObject.GL_RENDERBUFFER_EXT, fbo._depthRboId);
-            EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, fbo._depthTextureId, 0);
+            EXTFramebufferObject.glFramebufferRenderbufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, EXTFramebufferObject.GL_RENDERBUFFER_EXT, fbo.depthRboId);
+            EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_DEPTH_ATTACHMENT_EXT, GL11.GL_TEXTURE_2D, fbo.depthTextureId, 0);
         }
 
         if (normals) {
-            EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_COLOR_ATTACHMENT1_EXT, GL11.GL_TEXTURE_2D, fbo._normalsTextureId, 0);
+            EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_COLOR_ATTACHMENT1_EXT, GL11.GL_TEXTURE_2D, fbo.normalsTextureId, 0);
         }
 
         IntBuffer bufferIds = BufferUtils.createIntBuffer(3);
@@ -301,8 +331,8 @@ public class PostProcessingRenderer implements IPropertyProvider {
         bufferIds.flip();
         GL20.glDrawBuffers(bufferIds);
 
-        int framebuffer = EXTFramebufferObject.glCheckFramebufferStatusEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT);
-        switch (framebuffer) {
+        int checkFB = EXTFramebufferObject.glCheckFramebufferStatusEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT);
+        switch (checkFB) {
             case EXTFramebufferObject.GL_FRAMEBUFFER_COMPLETE_EXT:
                 break;
             case EXTFramebufferObject.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
@@ -324,7 +354,7 @@ public class PostProcessingRenderer implements IPropertyProvider {
                 logger.error("FrameBuffer: " + title
                         + ", has caused a GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT exception");
             default:
-                throw new RuntimeException("Unexpected reply from glCheckFramebufferStatusEXT: " + framebuffer);
+                throw new RuntimeException("Unexpected reply from glCheckFramebufferStatusEXT: " + checkFB);
         }
 
         EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, 0);
@@ -335,14 +365,19 @@ public class PostProcessingRenderer implements IPropertyProvider {
 
     private void updateExposure() {
         if (config.getRendering().isEyeAdapting()) {
-            ByteBuffer pixels = BufferUtils.createByteBuffer(4);
             FBO scene = PostProcessingRenderer.getInstance().getFBO("scene1");
 
-            scene.bind();
-            glReadPixels(0, 0, 1, 1, GL12.GL_BGRA, GL11.GL_BYTE, pixels);
-            scene.unbind();
+            readBackPBOCurrent.copyFromFBO(scene.fboId, 1, 1, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE);
 
-            currentSceneLuminance = 0.2126f * pixels.get(2) / 255.f + 0.7152f * pixels.get(1) / 255.f + 0.0722f * pixels.get(0) / 255.f;
+            if (readBackPBOCurrent == readBackPBOFront) {
+                readBackPBOCurrent = readBackPBOBack;
+            } else {
+                readBackPBOCurrent = readBackPBOFront;
+            }
+
+            ByteBuffer pixels = readBackPBOCurrent.readBackPixels();
+
+            currentSceneLuminance = 0.2126f * (pixels.get(2)& 0xFF) / 255.f + 0.7152f * (pixels.get(1) & 0xFF) / 255.f + 0.0722f * (pixels.get(0) & 0xFF) / 255.f;
 
             float targetExposure = (Float) hdrMaxExposure.getValue();
 
@@ -401,7 +436,7 @@ public class PostProcessingRenderer implements IPropertyProvider {
         FBO reflected = getFBO("sceneReflected");
         reflected.bind();
 
-        glViewport(0, 0, reflected._width, reflected._height);
+        glViewport(0, 0, reflected.width, reflected.height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
@@ -496,7 +531,7 @@ public class PostProcessingRenderer implements IPropertyProvider {
         FBO lightshaft = PostProcessingRenderer.getInstance().getFBO("lightShafts");
         lightshaft.bind();
 
-        glViewport(0, 0, lightshaft._width, lightshaft._height);
+        glViewport(0, 0, lightshaft.width, lightshaft.height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullQuad();
@@ -511,7 +546,7 @@ public class PostProcessingRenderer implements IPropertyProvider {
         FBO ssao = PostProcessingRenderer.getInstance().getFBO("ssao");
         ssao.bind();
 
-        glViewport(0, 0, ssao._width, ssao._height);
+        glViewport(0, 0, ssao.width, ssao.height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullQuad();
@@ -526,7 +561,7 @@ public class PostProcessingRenderer implements IPropertyProvider {
         FBO sobel = PostProcessingRenderer.getInstance().getFBO("sobel");
         sobel.bind();
 
-        glViewport(0, 0, sobel._width, sobel._height);
+        glViewport(0, 0, sobel.width, sobel.height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         renderFullQuad();
@@ -544,7 +579,7 @@ public class PostProcessingRenderer implements IPropertyProvider {
         FBO ssao = PostProcessingRenderer.getInstance().getFBO("ssaoBlurred" + id);
         ssao.bind();
 
-        glViewport(0, 0, ssao._width, ssao._height);
+        glViewport(0, 0, ssao.width, ssao.height);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -581,7 +616,7 @@ public class PostProcessingRenderer implements IPropertyProvider {
         FBO highPass = PostProcessingRenderer.getInstance().getFBO("sceneHighPass");
         highPass.bind();
 
-        glViewport(0, 0, highPass._width, highPass._height);
+        glViewport(0, 0, highPass.width, highPass.height);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         PostProcessingRenderer.getInstance().getFBO("sceneToneMapped").bindTexture();
@@ -603,7 +638,7 @@ public class PostProcessingRenderer implements IPropertyProvider {
         FBO blur = PostProcessingRenderer.getInstance().getFBO("sceneBlur" + id);
         blur.bind();
 
-        glViewport(0, 0, blur._width, blur._height);
+        glViewport(0, 0, blur.width, blur.height);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -629,7 +664,7 @@ public class PostProcessingRenderer implements IPropertyProvider {
         FBO bloom = PostProcessingRenderer.getInstance().getFBO("sceneBloom" + id);
         bloom.bind();
 
-        glViewport(0, 0, bloom._width, bloom._height);
+        glViewport(0, 0, bloom.width, bloom.height);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

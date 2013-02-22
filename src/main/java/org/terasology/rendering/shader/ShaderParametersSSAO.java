@@ -65,7 +65,7 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
         program.setFloat("ssaoRad", (Float) ssaoRad.getValue());
 
         FloatBuffer rtSize = BufferUtils.createFloatBuffer(2);
-        rtSize.put((float) scene._width).put((float) scene._height);
+        rtSize.put((float) scene.width).put((float) scene.height);
         rtSize.flip();
 
         program.setFloat2("renderTargetSize", rtSize);
