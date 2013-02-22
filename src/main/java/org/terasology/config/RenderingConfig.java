@@ -248,7 +248,7 @@ public class RenderingConfig {
         return eyeAdapting;
     }
 
-    public void setEyeAdapting(boolean eyeAdapting) {
+    public void setEyeAdapation(boolean eyeAdapting) {
         this.eyeAdapting = eyeAdapting;
     }
 

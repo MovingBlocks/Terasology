@@ -95,7 +95,7 @@ public class UIMenuConfigVideo extends UIWindow {
                     case 0:
                         config.getRendering().setFlickeringLight(false);
                         config.getRendering().setVignette(true);
-                        config.getRendering().setEyeAdapting(false);
+                        config.getRendering().setEyeAdapation(true);
                         config.getRendering().setBloom(false);
                         config.getRendering().setMotionBlur(false);
                         config.getRendering().setSsao(false);
@@ -107,7 +107,7 @@ public class UIMenuConfigVideo extends UIWindow {
                     case 1:
                         config.getRendering().setFlickeringLight(true);
                         config.getRendering().setVignette(true);
-                        config.getRendering().setEyeAdapting(true);
+                        config.getRendering().setEyeAdapation(true);
                         config.getRendering().setBloom(true);
                         config.getRendering().setMotionBlur(false);
                         config.getRendering().setSsao(false);
@@ -119,7 +119,7 @@ public class UIMenuConfigVideo extends UIWindow {
                     case 2:
                         config.getRendering().setFlickeringLight(true);
                         config.getRendering().setVignette(true);
-                        config.getRendering().setEyeAdapting(true);
+                        config.getRendering().setEyeAdapation(true);
                         config.getRendering().setBloom(true);
                         config.getRendering().setMotionBlur(true);
                         config.getRendering().setSsao(true);
