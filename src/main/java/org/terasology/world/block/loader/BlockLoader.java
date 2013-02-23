@@ -91,12 +91,12 @@ public class BlockLoader {
     public BlockLoader() {
         parser = new JsonParser();
         gson = new GsonBuilder()
-        .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
-        .registerTypeAdapter(BlockDefinition.Tiles.class, new BlockTilesDefinitionHandler())
-        .registerTypeAdapter(BlockDefinition.ColorSources.class, new BlockColorSourceDefinitionHandler())
-        .registerTypeAdapter(BlockDefinition.ColorOffsets.class, new BlockColorOffsetDefinitionHandler())
-        .registerTypeAdapter(Vector4f.class, new Vector4fHandler())
-        .create();
+            .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
+            .registerTypeAdapter(BlockDefinition.Tiles.class, new BlockTilesDefinitionHandler())
+            .registerTypeAdapter(BlockDefinition.ColorSources.class, new BlockColorSourceDefinitionHandler())
+            .registerTypeAdapter(BlockDefinition.ColorOffsets.class, new BlockColorOffsetDefinitionHandler())
+            .registerTypeAdapter(Vector4f.class, new Vector4fHandler())
+            .create();
         cubeShape = (BlockShape) Assets.get(new AssetUri(AssetType.SHAPE, "engine:cube"));
         loweredShape = (BlockShape) Assets.get(new AssetUri(AssetType.SHAPE, "engine:loweredCube"));
         trimmedLoweredShape = (BlockShape) Assets.get(new AssetUri(AssetType.SHAPE, "engine:trimmedLoweredCube"));
@@ -139,18 +139,18 @@ public class BlockLoader {
 
                         if (blockDef.shapes.isEmpty()) {
                             switch (blockDef.rotation) {
-                            case ALIGNTOSURFACE:
-                                result.families.add(processAlignToSurfaceFamily(blockDefUri, blockDefJson));
-                                break;
-                            case HORIZONTAL:
-                                result.families.add(processHorizontalBlockFamily(blockDefUri, blockDef));
-                                break;
-                            case CONNECTTOADJACENT:
-                                result.families.add(processConnectToAdjacentFamily(blockDefUri, blockDefJson));
-                                break;
-                            default:
-                                result.families.add(processSingleBlockFamily(blockDefUri, blockDef));
-                                break;
+                                case ALIGNTOSURFACE:
+                                    result.families.add(processAlignToSurfaceFamily(blockDefUri, blockDefJson));
+                                    break;
+                                case HORIZONTAL:
+                                    result.families.add(processHorizontalBlockFamily(blockDefUri, blockDef));
+                                    break;
+                                case CONNECTTOADJACENT:
+                                    result.families.add(processConnectToAdjacentFamily(blockDefUri, blockDefJson));
+                                    break;
+                                default:
+                                    result.families.add(processSingleBlockFamily(blockDefUri, blockDef));
+                                    break;
                             }
                         } else {
                             result.families.addAll(processMultiBlockFamily(blockDefUri, blockDef));
@@ -369,12 +369,10 @@ public class BlockLoader {
             for ( JsonElement element : blockTypes.getAsJsonArray() ){
                 JsonObject typeDefJson = element.getAsJsonObject();
 
-                BlockAdjacentType type = null;
-
                 if ( !typeDefJson.has("type") ){
                     throw new IllegalArgumentException("Block type is empty");
                 }
-                type = gson.fromJson(typeDefJson.get("type"), BlockAdjacentType.class);
+                BlockAdjacentType type = gson.fromJson(typeDefJson.get("type"), BlockAdjacentType.class);
 
                 if ( type == null ){
                     throw new IllegalArgumentException("Invalid type block: " + gson.fromJson(typeDefJson.get("type"), String.class));
