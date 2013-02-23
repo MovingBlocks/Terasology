@@ -26,7 +26,7 @@ import static org.lwjgl.opengl.GL11.glScalef;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
 /**
- * Provides global access to fonts.
+ * Camera base class.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */

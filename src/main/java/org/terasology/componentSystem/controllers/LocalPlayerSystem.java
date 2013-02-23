@@ -65,7 +65,8 @@ import org.terasology.physics.ImpulseEvent;
 import org.terasology.physics.character.CharacterMovementComponent;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.BlockOverlayRenderer;
-import org.terasology.rendering.cameras.DefaultCamera;
+import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.cameras.PerspectiveCamera;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.world.WorldProvider;
@@ -91,7 +92,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     private Timer timer;
 
     private WorldProvider worldProvider;
-    private DefaultCamera playerCamera;
+    private Camera playerCamera;
 
     private long lastTimeSpacePressed;
     private long lastInteraction, lastTimeThrowInteraction;
@@ -121,7 +122,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
     public void shutdown() {
     }
 
-    public void setPlayerCamera(DefaultCamera camera) {
+    public void setPlayerCamera(Camera camera) {
         playerCamera = camera;
     }
 
@@ -327,12 +328,14 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
         bobFactor += stepDelta;
         lastStepDelta = charMovementComp.footstepDelta;
 
-        if (config.getRendering().isCameraBobbing()) {
-            playerCamera.setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.5f));
-            playerCamera.setBobbingVerticalOffsetFactor(calcBobbingOffset((float) java.lang.Math.PI / 4f, 0.025f, 3f));
-        } else {
-            playerCamera.setBobbingRotationOffsetFactor(0.0f);
-            playerCamera.setBobbingVerticalOffsetFactor(0.0f);
+        if (playerCamera.getClass() == PerspectiveCamera.class) {
+            if (config.getRendering().isCameraBobbing()) {
+                ((PerspectiveCamera) playerCamera).setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.5f));
+                ((PerspectiveCamera) playerCamera).setBobbingVerticalOffsetFactor(calcBobbingOffset((float) java.lang.Math.PI / 4f, 0.025f, 3f));
+            } else {
+                ((PerspectiveCamera) playerCamera).setBobbingRotationOffsetFactor(0.0f);
+                ((PerspectiveCamera) playerCamera).setBobbingVerticalOffsetFactor(0.0f);
+            }
         }
 
         if (charMovementComp.isGhosting) {
@@ -577,6 +580,11 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem, 
 
     @Override
     public void renderFirstPerson() {
+    }
+
+    @Override
+    public void renderShadows() {
+
     }
 
 }

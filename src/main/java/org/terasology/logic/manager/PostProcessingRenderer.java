@@ -71,7 +71,8 @@ public class PostProcessingRenderer implements IPropertyProvider {
 
     public enum FBOType {
         DEFAULT,
-        HDR
+        HDR,
+        NO_COLOR
     }
 
     public class PBO {
@@ -214,6 +215,8 @@ public class PostProcessingRenderer implements IPropertyProvider {
         createFBO("sceneOpaque", Display.getWidth(), Display.getHeight(), FBOType.HDR, true, true);
         createFBO("sceneTransparent", Display.getWidth(), Display.getHeight(), FBOType.HDR, true, true);
 
+        createFBO("sceneShadowMap", 4096, 4096, FBOType.NO_COLOR, true, false);
+
         createFBO("sceneCombined", Display.getWidth(), Display.getHeight(), FBOType.HDR, true, true);
 
         createFBO("scenePrePost", Display.getWidth(), Display.getHeight(), FBOType.HDR, false, false);
@@ -267,10 +270,12 @@ public class PostProcessingRenderer implements IPropertyProvider {
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
 
-        if (type == FBOType.HDR) {
-            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, ARBTextureFloat.GL_RGBA16F_ARB, width, height, 0, GL11.GL_RGBA, ARBHalfFloatPixel.GL_HALF_FLOAT_ARB, (java.nio.ByteBuffer) null);
-        } else {
-            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (java.nio.ByteBuffer) null);
+        if (type != FBOType.NO_COLOR) {
+            if (type == FBOType.HDR) {
+                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, ARBTextureFloat.GL_RGBA16F_ARB, width, height, 0, GL11.GL_RGBA, ARBHalfFloatPixel.GL_HALF_FLOAT_ARB, (java.nio.ByteBuffer) null);
+            } else {
+                GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (java.nio.ByteBuffer) null);
+            }
         }
 
         if (depth) {
@@ -311,7 +316,9 @@ public class PostProcessingRenderer implements IPropertyProvider {
         fbo.fboId = EXTFramebufferObject.glGenFramebuffersEXT();
         EXTFramebufferObject.glBindFramebufferEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, fbo.fboId);
 
-        EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT, GL11.GL_TEXTURE_2D, fbo.textureId, 0);
+        if (type != FBOType.NO_COLOR) {
+            EXTFramebufferObject.glFramebufferTexture2DEXT(EXTFramebufferObject.GL_FRAMEBUFFER_EXT, EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT, GL11.GL_TEXTURE_2D, fbo.textureId, 0);
+        }
 
         if (depth) {
             // Generate the depth render buffer and depth map texture
@@ -324,7 +331,9 @@ public class PostProcessingRenderer implements IPropertyProvider {
         }
 
         IntBuffer bufferIds = BufferUtils.createIntBuffer(3);
-        bufferIds.put(EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT);
+        if (type != FBOType.NO_COLOR) {
+            bufferIds.put(EXTFramebufferObject.GL_COLOR_ATTACHMENT0_EXT);
+        }
         if (normals) {
             bufferIds.put(EXTFramebufferObject.GL_COLOR_ATTACHMENT1_EXT);
         }
@@ -364,7 +373,7 @@ public class PostProcessingRenderer implements IPropertyProvider {
     }
 
     private void updateExposure() {
-        if (config.getRendering().isEyeAdapting()) {
+        if (config.getRendering().isEyeAdaptation()) {
             FBO scene = PostProcessingRenderer.getInstance().getFBO("scene1");
 
             readBackPBOCurrent.copyFromFBO(scene.fboId, 1, 1, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE);
@@ -445,6 +454,19 @@ public class PostProcessingRenderer implements IPropertyProvider {
         glViewport(0, 0, Display.getWidth(), Display.getHeight());
     }
 
+    public void beginRenderSceneShadowMap() {
+        FBO shadowMap = getFBO("sceneShadowMap");
+        shadowMap.bind();
+
+        glViewport(0, 0, shadowMap.width, shadowMap.height);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+
+    public void endRenderSceneShadowMap() {
+        getFBO("sceneShadowMap").unbind();
+        glViewport(0, 0, Display.getWidth(), Display.getHeight());
+    }
+
     /**
      * Renders the final scene to a quad and displays it. The FBO gets automatically rescaled if the size
      * of the view port changes.
@@ -471,7 +493,7 @@ public class PostProcessingRenderer implements IPropertyProvider {
 
         generatePrePost();
 
-        if (config.getRendering().isEyeAdapting()) {
+        if (config.getRendering().isEyeAdaptation()) {
             generateDownsampledScene();
         }
 

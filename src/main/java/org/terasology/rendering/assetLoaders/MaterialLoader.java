@@ -29,7 +29,7 @@ import org.terasology.asset.AssetType;
 import org.terasology.asset.AssetUri;
 import org.terasology.asset.Assets;
 import org.terasology.rendering.assets.Material;
-import org.terasology.rendering.assets.Shader;
+import org.terasology.rendering.assets.MaterialShader;
 import org.terasology.rendering.assets.Texture;
 
 import com.google.common.collect.Maps;
@@ -57,10 +57,10 @@ public class MaterialLoader implements AssetLoader<Material> {
     public Material load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
         MaterialMetadata metadata = gson.fromJson(new InputStreamReader(stream), MaterialMetadata.class);
 
-        Shader shader = Assets.get(new AssetUri(AssetType.SHADER, metadata.shader), Shader.class);
-        if (shader == null) return null;
+        MaterialShader materialShader = Assets.get(new AssetUri(AssetType.SHADER, metadata.shader), MaterialShader.class);
+        if (materialShader == null) return null;
 
-        Material result = new Material(uri, shader);
+        Material result = new Material(uri, materialShader);
 
         for (Map.Entry<String, Texture> entry : metadata.textures.entrySet()) {
             result.setTexture(entry.getKey(), entry.getValue());

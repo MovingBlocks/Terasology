@@ -54,11 +54,8 @@ public class ShaderParametersBase implements IPropertyProvider, IShaderParameter
                 program.setFloat3("cameraDirection", cameraDir.x, cameraDir.y, cameraDir.z);
             }
 
-            float sunAngle = worldRenderer.getSkysphere().getSunPosAngle();
-            Vector3f sunNormalise = new Vector3f(0.0f, (float) java.lang.Math.cos(sunAngle), (float) java.lang.Math.sin(sunAngle));
-            sunNormalise.normalize();
-
-            program.setFloat3("sunVec", sunNormalise.x, sunNormalise.y, sunNormalise.z);
+            Vector3f sunDirection = worldRenderer.getSkysphere().getSunDirection(false);
+            program.setFloat3("sunVec", sunDirection.x, sunDirection.y, sunDirection.z);
         }
 
         if (localPlayer != null) {

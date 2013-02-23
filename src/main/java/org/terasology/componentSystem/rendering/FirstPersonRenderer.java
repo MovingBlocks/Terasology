@@ -131,6 +131,10 @@ public class FirstPersonRenderer implements RenderSystem {
     }
 
     @Override
+    public void renderShadows() {
+    }
+
+    @Override
     public void renderOverlay() {
 
     }

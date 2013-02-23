@@ -40,16 +40,16 @@ public class Material implements Asset {
 
     private final AssetUri uri;
 
-    private Shader shader;
+    private MaterialShader materialShader;
     private int shaderProgram;
     private int textureIndex = 0;
     private TObjectIntMap<String> bindMap = new TObjectIntHashMap<String>();
     private TIntObjectMap<Texture> textureMap = new TIntObjectHashMap<Texture>();
 
-    public Material(AssetUri uri, Shader shader) {
+    public Material(AssetUri uri, MaterialShader materialShader) {
         this.uri = uri;
-        this.shader = shader;
-        shaderProgram = shader.generateShaderInstance();
+        this.materialShader = materialShader;
+        shaderProgram = materialShader.generateShaderInstance();
     }
 
     public void dispose() {
@@ -183,7 +183,7 @@ public class Material implements Asset {
             texId = bindMap.get(desc);
         } else {
             // TODO: do this initially, and try and have similar textures in similar slots for all materials.
-            ParamMetadata metadata = shader.getParameter(desc);
+            ParamMetadata metadata = materialShader.getParameter(desc);
             if (metadata == null) {
                 return;
             }

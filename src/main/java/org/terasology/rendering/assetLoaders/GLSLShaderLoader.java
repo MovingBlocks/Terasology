@@ -27,7 +27,7 @@ import java.util.List;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetLoader;
 import org.terasology.asset.AssetUri;
-import org.terasology.rendering.assets.Shader;
+import org.terasology.rendering.assets.MaterialShader;
 import org.terasology.rendering.assets.metadata.ParamMetadata;
 import org.terasology.rendering.assets.metadata.ShaderMetadata;
 
@@ -42,7 +42,7 @@ import com.google.gson.JsonParseException;
 /**
  * @author Immortius
  */
-public class GLSLShaderLoader implements AssetLoader<Shader> {
+public class GLSLShaderLoader implements AssetLoader<MaterialShader> {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(GLSLShaderLoader.class);
 
     private Gson gson;
@@ -54,7 +54,7 @@ public class GLSLShaderLoader implements AssetLoader<Shader> {
     }
 
     @Override
-    public Shader load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
+    public MaterialShader load(AssetUri uri, InputStream stream, List<URL> urls) throws IOException {
         String vertProgram = null;
         String fragProgram = null;
         ShaderMetadata metadata = new ShaderMetadata();
@@ -69,7 +69,7 @@ public class GLSLShaderLoader implements AssetLoader<Shader> {
             }
         }
         if (vertProgram != null && fragProgram != null) {
-            return new Shader(uri, vertProgram, fragProgram, metadata);
+            return new MaterialShader(uri, vertProgram, fragProgram, metadata);
         }
         return null;
     }

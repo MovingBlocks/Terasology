@@ -43,11 +43,11 @@ import java.util.Map;
 /**
  * @author Immortius
  */
-public class Shader implements Asset {
+public class MaterialShader implements Asset {
     private static final String PreProcessorPreamble = "#version 120\n float TEXTURE_OFFSET = " + Block.TEXTURE_OFFSET + ";\n";
     private static String IncludedFunctionsVertex = "", IncludedFunctionsFragment = "";
 
-    private static final Logger logger = LoggerFactory.getLogger(Shader.class);
+    private static final Logger logger = LoggerFactory.getLogger(MaterialShader.class);
 
     private final AssetUri uri;
     private String vertShader;
@@ -58,7 +58,7 @@ public class Shader implements Asset {
     private boolean valid = false;
     private Map<String, ParamType> params = Maps.newHashMap();
 
-    public Shader(AssetUri uri, String vertShader, String fragShader, ShaderMetadata metadata) {
+    public MaterialShader(AssetUri uri, String vertShader, String fragShader, ShaderMetadata metadata) {
         this.uri = uri;
 
         this.vertShader = vertShader;
@@ -230,6 +230,8 @@ public class Shader implements Asset {
             builder.append("#define OUTLINE \n");
         if (config.getRendering().isLightShafts())
             builder.append("#define LIGHT_SHAFTS \n");
+        if (config.getRendering().isDynamicShadows())
+            builder.append("#define DYNAMIC_SHADOWS \n");
         return builder;
     }
 
@@ -242,8 +244,8 @@ public class Shader implements Asset {
     }
 
     static {
-        InputStream vertStream = Shader.class.getClassLoader().getResourceAsStream("org/terasology/include/globalFunctionsVertIncl.glsl");
-        InputStream fragStream = Shader.class.getClassLoader().getResourceAsStream("org/terasology/include/globalFunctionsFragIncl.glsl");
+        InputStream vertStream = MaterialShader.class.getClassLoader().getResourceAsStream("org/terasology/include/globalFunctionsVertIncl.glsl");
+        InputStream fragStream = MaterialShader.class.getClassLoader().getResourceAsStream("org/terasology/include/globalFunctionsFragIncl.glsl");
         try {
             IncludedFunctionsVertex = CharStreams.toString(new InputStreamReader(vertStream));
             IncludedFunctionsFragment = CharStreams.toString(new InputStreamReader(fragStream));

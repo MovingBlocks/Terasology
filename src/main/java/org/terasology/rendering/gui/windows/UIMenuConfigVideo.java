@@ -95,7 +95,7 @@ public class UIMenuConfigVideo extends UIWindow {
                     case 0:
                         config.getRendering().setFlickeringLight(false);
                         config.getRendering().setVignette(true);
-                        config.getRendering().setEyeAdapation(true);
+                        config.getRendering().setEyeAdaptation(true);
                         config.getRendering().setBloom(false);
                         config.getRendering().setMotionBlur(false);
                         config.getRendering().setSsao(false);
@@ -103,11 +103,12 @@ public class UIMenuConfigVideo extends UIWindow {
                         config.getRendering().setOutline(true);
                         config.getRendering().setLightShafts(false);
                         config.getRendering().setAnimateWater(false);
+                        config.getRendering().setDynamicShadows(false);
                         break;
                     case 1:
                         config.getRendering().setFlickeringLight(true);
                         config.getRendering().setVignette(true);
-                        config.getRendering().setEyeAdapation(true);
+                        config.getRendering().setEyeAdaptation(true);
                         config.getRendering().setBloom(true);
                         config.getRendering().setMotionBlur(false);
                         config.getRendering().setSsao(false);
@@ -115,11 +116,25 @@ public class UIMenuConfigVideo extends UIWindow {
                         config.getRendering().setOutline(true);
                         config.getRendering().setLightShafts(false);
                         config.getRendering().setAnimateWater(false);
+                        config.getRendering().setDynamicShadows(false);
                         break;
                     case 2:
                         config.getRendering().setFlickeringLight(true);
                         config.getRendering().setVignette(true);
-                        config.getRendering().setEyeAdapation(true);
+                        config.getRendering().setEyeAdaptation(true);
+                        config.getRendering().setBloom(true);
+                        config.getRendering().setMotionBlur(true);
+                        config.getRendering().setSsao(true);
+                        config.getRendering().setFilmGrain(true);
+                        config.getRendering().setOutline(true);
+                        config.getRendering().setLightShafts(true);
+                        config.getRendering().setAnimateWater(false);
+                        config.getRendering().setDynamicShadows(false);
+                        break;
+                    case 3:
+                        config.getRendering().setFlickeringLight(true);
+                        config.getRendering().setVignette(true);
+                        config.getRendering().setEyeAdaptation(true);
                         config.getRendering().setBloom(true);
                         config.getRendering().setMotionBlur(true);
                         config.getRendering().setSsao(true);
@@ -127,6 +142,7 @@ public class UIMenuConfigVideo extends UIWindow {
                         config.getRendering().setOutline(true);
                         config.getRendering().setLightShafts(true);
                         config.getRendering().setAnimateWater(true);
+                        config.getRendering().setDynamicShadows(true);
                         break;
                 }
 
@@ -136,6 +152,7 @@ public class UIMenuConfigVideo extends UIWindow {
         graphicsQualityButton.addState("Graphics Quality: Nice", graphicsQualityStateAction);
         graphicsQualityButton.addState("Graphics Quality: Epic", graphicsQualityStateAction);
         graphicsQualityButton.addState("Graphics Quality: Insane", graphicsQualityStateAction);
+        graphicsQualityButton.addState("Graphics Quality: Uber", graphicsQualityStateAction);
         graphicsQualityButton.addClickListener(clickAction);
         graphicsQualityButton.setHorizontalAlign(EHorizontalAlign.CENTER);
         graphicsQualityButton.setPosition(new Vector2f(-graphicsQualityButton.getSize().x / 2f - 10f, 300f));

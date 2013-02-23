@@ -57,10 +57,7 @@ public class ShaderParametersLightShaft extends ShaderParametersBase {
 
         WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
         if (worldRenderer != null) {
-            float sunAngle = worldRenderer.getSkysphere().getSunPosAngle();
-
-            Vector3f sunDirection = new Vector3f(0.0f, (float) java.lang.Math.cos(sunAngle), (float) java.lang.Math.sin(sunAngle));
-            sunDirection.normalize();
+            Vector3f sunDirection = worldRenderer.getSkysphere().getSunDirection(true);
 
             Camera activeCamera = CoreRegistry.get(WorldRenderer.class).getActiveCamera();
 

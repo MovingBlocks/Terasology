@@ -35,6 +35,7 @@ public class RenderingConfig {
     private boolean lightShafts = false;
     private boolean eyeAdapting = false;
     private boolean bloom = false;
+    private boolean dynamicShadows = false;
 
     public int getBlurRadius() {
         return Math.max(1, blurIntensity);
@@ -156,6 +157,14 @@ public class RenderingConfig {
         this.animateWater = animateWater;
     }
 
+    public boolean isDynamicShadows() {
+        return dynamicShadows;
+    }
+
+    public void setDynamicShadows(boolean dynamicShadows) {
+        this.dynamicShadows = dynamicShadows;
+    }
+
     public float getFieldOfView() {
         return fieldOfView;
     }
@@ -244,11 +253,11 @@ public class RenderingConfig {
         this.lightShafts = lightShafts;
     }
 
-    public boolean isEyeAdapting() {
+    public boolean isEyeAdaptation() {
         return eyeAdapting;
     }
 
-    public void setEyeAdapation(boolean eyeAdapting) {
+    public void setEyeAdaptation(boolean eyeAdapting) {
         this.eyeAdapting = eyeAdapting;
     }
 

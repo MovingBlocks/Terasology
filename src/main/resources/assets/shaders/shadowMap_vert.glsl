@@ -13,22 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.componentSystem;
 
-import org.terasology.entitySystem.ComponentSystem;
+varying vec4 positionProj;
 
-/**
- * @author Immortius <immortius@gmail.com>
- */
-public interface RenderSystem extends ComponentSystem {
+void main()
+{
+	gl_Position = ftransform();
+	positionProj = gl_Position;
 
-    public void renderOpaque();
-
-    public void renderTransparent();
-
-    public void renderOverlay();
-
-    public void renderFirstPerson();
-
-    public void renderShadows();
+    gl_FrontColor = gl_Color;
 }

@@ -28,7 +28,7 @@ import java.util.List;
  */
 public class ShaderParametersHdr extends ShaderParametersBase {
 
-    final Property exposureBias = new Property("exposureBias", 2.5f, 0.0f, 10.0f);
+    final Property exposureBias = new Property("exposureBias", 4.0f, 0.0f, 10.0f);
     final Property whitePoint = new Property("whitePoint", 11.2f, 0.0f, 100.0f);
 
     public void applyParameters(ShaderProgram program) {

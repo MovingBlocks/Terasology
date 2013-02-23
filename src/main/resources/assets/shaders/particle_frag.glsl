@@ -34,7 +34,7 @@ void main(){
     float torchlight = 0.0;
 
     // Apply torchlight
-    if (carryingTorch) {
+    if (carryingTorch > 0.99) {
         torchlight = calcTorchlight(1.0, vertexViewPos.xyz);
     }
 

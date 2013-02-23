@@ -85,8 +85,7 @@ public class DroppedItemsRenderer  implements RenderSystem, EventHandlerSystem {
     public void shutdown() {
     }
 
-    @Override
-    public void renderOpaque() {
+    private void render(boolean shadows) {
         Vector3f cameraPosition = worldRenderer.getActiveCamera().getPosition();
 
         Quat4f worldRot = new Quat4f();
@@ -96,50 +95,76 @@ public class DroppedItemsRenderer  implements RenderSystem, EventHandlerSystem {
         Transform trans = new Transform();
         Transform normTrans = new Transform();
 
+        ShaderProgram shader;
 
-        ShaderProgram shader = ShaderManager.getInstance().getShaderProgram("block");
-        shader.setInt("textured", 0);
-        shader.setFloat("light", worldRenderer.getRenderingLightValue());
+        if (!shadows) {
+            shader = ShaderManager.getInstance().getShaderProgram("block");
+            shader.setInt("textured", 0);
+            shader.setFloat("light", worldRenderer.getRenderingLightValue());
+        } else {
+            shader = ShaderManager.getInstance().getShaderProgram("shadowMap");
+        }
+
+        shader.enable();
+
         glPushMatrix();
-        glTranslated(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
 
-            float[] openglMat = new float[16];
-            FloatBuffer mBuffer = BufferUtils.createFloatBuffer(16);
+        if (!shadows) {
+            glTranslated(-cameraPosition.x, -cameraPosition.y, -cameraPosition.z);
+        } else {
+            Vector3f lightCamPos = worldRenderer.getLightCamera().getPosition();
+            glTranslated(-lightCamPos.x, -lightCamPos.y, -lightCamPos.z);
+        }
 
-            for (EntityRef entity : itemMesh) {
-                //Basic rendering
-                MeshComponent meshComp = entity.getComponent(MeshComponent.class);
-                LocationComponent location = entity.getComponent(LocationComponent.class);
+        float[] openglMat = new float[16];
+        FloatBuffer mBuffer = BufferUtils.createFloatBuffer(16);
 
-                if (location == null || meshComp.mesh == null) {
-                    continue;
-                }
+        for (EntityRef entity : itemMesh) {
+            //Basic rendering
+            MeshComponent meshComp = entity.getComponent(MeshComponent.class);
+            LocationComponent location = entity.getComponent(LocationComponent.class);
 
-                if (meshComp.mesh.isDisposed()) {
-                    logger.error("Attempted to render disposed ITEM mesh");
-                    continue;
-                }
-
-                location.getWorldRotation(worldRot);
-                location.getWorldPosition(worldPos);
-                float worldScale = location.getWorldScale();
-                matrix.set(worldRot, worldPos, worldScale);
-                trans.set(matrix);
-                AABB aabb = meshComp.mesh.getAABB().transform(trans);
-                if (worldRenderer.isAABBVisible(aabb)) {
-                    glPushMatrix();
-                    trans.getOpenGLMatrix(openglMat);
-                    mBuffer.put(openglMat);
-                    mBuffer.flip();
-                    glMultMatrix(mBuffer);
-
-                    meshComp.mesh.render();
-                    glPopMatrix();
-                }
+            if (location == null || meshComp.mesh == null) {
+                continue;
             }
+
+            if (meshComp.mesh.isDisposed()) {
+                logger.error("Attempted to render disposed ITEM mesh");
+                continue;
+            }
+
+            location.getWorldRotation(worldRot);
+            location.getWorldPosition(worldPos);
+            float worldScale = location.getWorldScale();
+            matrix.set(worldRot, worldPos, worldScale);
+            trans.set(matrix);
+            AABB aabb = meshComp.mesh.getAABB().transform(trans);
+
+            boolean visible;
+            if (shadows) {
+                visible = worldRenderer.isAABBVisibleLight(aabb);
+            } else {
+                visible = worldRenderer.isAABBVisible(aabb);
+            }
+
+            if (visible) {
+                glPushMatrix();
+                trans.getOpenGLMatrix(openglMat);
+                mBuffer.put(openglMat);
+                mBuffer.flip();
+                glMultMatrix(mBuffer);
+
+                meshComp.mesh.render();
+                glPopMatrix();
+            }
+        }
         glPopMatrix();
     }
 
+    @Override
+    public void renderOpaque() {
+        render(false);
+    }
 
     @Override
     public void renderTransparent() {
@@ -151,5 +176,10 @@ public class DroppedItemsRenderer  implements RenderSystem, EventHandlerSystem {
 
     @Override
     public void renderFirstPerson() {
+    }
+
+    @Override
+    public void renderShadows() {
+        //render(true);
     }
 }

@@ -253,6 +253,9 @@ public class BlockParticleEmitterSystem implements UpdateSubscriberSystem, Rende
     }
 
     public void renderFirstPerson() {
+    }
 
+    @Override
+    public void renderShadows() {
     }
 }

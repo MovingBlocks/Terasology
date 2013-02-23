@@ -19,6 +19,13 @@
 #define BLOCK_HINT_WAVING           4
 #define BLOCK_HINT_WAVING_BLOCK     5
 
+#if defined (DYNAMIC_SHADOWS)
+uniform vec3 chunkPositionRelToLightCamera;
+uniform mat4 lightViewProjMatrix;
+
+varying vec4 vertexLightProjPos;
+#endif
+
 varying vec3 normal;
 varying vec4 vertexWorldPos;
 varying vec4 vertexViewPos;
@@ -37,7 +44,7 @@ varying float blockHint;
 varying float distance;
 
 uniform float blockScale = 1.0;
-uniform vec3 chunkOffset;
+uniform vec3 chunkPositionWorld;
 
 uniform bool animated;
 
@@ -112,11 +119,17 @@ void main()
 
 	vertexWorldPos = gl_Vertex;
 
+#if defined (DYNAMIC_SHADOWS)
+	vertexLightProjPos =
+	    lightViewProjMatrix
+	    * vec4(vertexWorldPos.x + chunkPositionRelToLightCamera.x, gl_Vertex.y + chunkPositionRelToLightCamera.y, gl_Vertex.z + chunkPositionRelToLightCamera.z, gl_Vertex.w);
+#endif
+
 	vertexViewPos = gl_ModelViewMatrix * vertexWorldPos;
 
 	sunVecView = (gl_ModelViewMatrix * vec4(sunVec.x, sunVec.y, sunVec.z, 0.0)).xyz;
 
-	isUpside = (gl_Normal.y > 0.5) ? 1.0 : 0.0;
+	isUpside = (gl_Normal.y > 0.9) ? 1.0 : 0.0;
 
     normal = gl_NormalMatrix * gl_Normal;
     gl_FrontColor = gl_Color;
@@ -130,7 +143,7 @@ void main()
 #endif
 
 #if defined (ANIMATED_GRASS) || defined (ANIMATED_WATER)
-    vec3 vertexChunkPos = vertexWorldPos.xyz + chunkOffset.xyz;
+    vec3 vertexChunkPos = vertexWorldPos.xyz + chunkPositionWorld.xyz;
 #endif
 
 #ifdef ANIMATED_GRASS

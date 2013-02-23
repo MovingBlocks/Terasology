@@ -13,22 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.componentSystem;
+package org.terasology.rendering.shader;
 
-import org.terasology.entitySystem.ComponentSystem;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
+import org.terasology.config.Config;
+import org.terasology.game.CoreRegistry;
+import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.world.WorldRenderer;
+
+import static org.lwjgl.opengl.GL11.glBindTexture;
 
 /**
- * @author Immortius <immortius@gmail.com>
+ * Shader parameters for the Shadow Map shader program.
+ *
+ * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public interface RenderSystem extends ComponentSystem {
+public class ShaderParametersShadowMap extends ShaderParametersBase {
 
-    public void renderOpaque();
+    public void applyParameters(ShaderProgram program) {
+        super.applyParameters(program);
+    }
 
-    public void renderTransparent();
-
-    public void renderOverlay();
-
-    public void renderFirstPerson();
-
-    public void renderShadows();
 }

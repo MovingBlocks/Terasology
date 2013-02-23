@@ -61,6 +61,8 @@ void main() {
     if (depthTransparent < depthOpaque) {
         depth = depthTransparent;
 
+        // TODO: Fix alpha blending...
+        //float fade = 1.0 - colorTransparent.a;
         float fade = 0.0;
         // Detect water in the transparent RT...
         if (normalsTransparent.a > 0.99) {

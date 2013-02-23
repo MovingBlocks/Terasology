@@ -103,4 +103,8 @@ public class MiniaturizerSystem implements UpdateSubscriberSystem, RenderSystem 
     public void renderFirstPerson() {
 
     }
+
+    @Override
+    public void renderShadows() {
+    }
 }

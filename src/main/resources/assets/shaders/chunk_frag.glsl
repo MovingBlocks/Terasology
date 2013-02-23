@@ -36,6 +36,15 @@
 #define BLOCK_DIFF 0.75
 #define BLOCK_AMB 1.0
 
+#if defined (DYNAMIC_SHADOWS)
+uniform vec4 shadowSettingsFrag;
+#define shadowIntens shadowSettingsFrag.x
+#define shadowMapBias shadowSettingsFrag.y
+
+uniform sampler2D texSceneShadowMap;
+varying vec4 vertexLightProjPos;
+#endif
+
 varying vec4 vertexWorldPos;
 varying vec4 vertexViewPos;
 varying vec4 vertexProjPos;
@@ -82,6 +91,7 @@ uniform sampler2D texSceneOpaque;
 #endif
 
 uniform sampler2D textureAtlas;
+uniform sampler2D textureWater;
 uniform sampler2D textureLava;
 uniform sampler2D textureEffects;
 
@@ -101,6 +111,7 @@ void main(){
 
 #ifdef FEATURE_TRANSPARENT_PASS
     vec3 normalWater = waterNormalViewSpace;
+    bool isOceanWater = false;
     bool isWater = false;
 #endif
 
@@ -115,19 +126,18 @@ void main(){
 
 #ifdef FEATURE_TRANSPARENT_PASS
     if ( checkFlag(BLOCK_HINT_WATER, blockHint) ) {
-        vec2 waterOffset = vec2(vertexWorldPos.x + timeToTick(time, 0.1), vertexWorldPos.z + timeToTick(time, 0.1)) / 8.0;
-        vec2 waterOffset2 = vec2(vertexWorldPos.x + timeToTick(time, 0.1), vertexWorldPos.z - timeToTick(time, 0.1)) / 16.0;
+        if (!swimming) {
+            if ( vertexWorldPos.y < 32.5 && vertexWorldPos.y > 31.5 && isUpside > 0.99) {
+                vec2 waterOffset = vec2(vertexWorldPos.x + timeToTick(time, 0.1), vertexWorldPos.z + timeToTick(time, 0.1)) / 8.0;
+                vec2 waterOffset2 = vec2(vertexWorldPos.x + timeToTick(time, 0.1), vertexWorldPos.z - timeToTick(time, 0.1)) / 16.0;
 
-        vec2 normalOffset = (texture2D(textureWaterNormal, waterOffset).xyz * 2.0 - 1.0).xy;
-        normalOffset += (texture2D(textureWaterNormal, waterOffset2).xyz * 2.0 - 1.0).xy;
-        normalOffset *= 0.5 * (1.0 / vertexViewPos.z * waterNormalBias);
+                vec2 normalOffset = (texture2D(textureWaterNormal, waterOffset).xyz * 2.0 - 1.0).xy;
+                normalOffset += (texture2D(textureWaterNormal, waterOffset2).xyz * 2.0 - 1.0).xy;
+                normalOffset *= 0.5 * (1.0 / vertexViewPos.z * waterNormalBias);
 
-        normalWater.xy += normalOffset;
-        normalWater = normalize(normalWater);
+                normalWater.xy += normalOffset;
+                normalWater = normalize(normalWater);
 
-       // Enable reflection only when not swimming and for blocks on sea level
-        if (!swimming && isUpside > 0.99) {
-            if ( vertexWorldPos.y < 32.5 && vertexWorldPos.y > 31.5) {
                 vec2 projectedPos = 0.5 * (vertexProjPos.xy/vertexProjPos.w) + vec2(0.5);
 
                 vec4 reflectionColor = vec4(texture2D(textureWaterReflection, projectedPos + normalOffset.xy * waterRefraction).xyz, 1.0);
@@ -136,14 +146,19 @@ void main(){
                 /* FRESNEL */
                 float f = fresnel(dot(normalWater, normalizedVPos), waterFresnelBias, waterFresnelPow);
                 color = mix(refractionColor * vec4(WATER_COLOR), reflectionColor * vec4(WATER_COLOR), f);
+
+                isOceanWater = true;
+                isWater = true;
             } else {
-                color = vec4(WATER_COLOR);
+                texCoord.x = mod(texCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET);
+                texCoord.y = mod(texCoord.y, TEXTURE_OFFSET) / (128.0 / (1.0 / TEXTURE_OFFSET));
+                texCoord.y += mod(timeToTick(time, 0.1), 127.0) * (1.0/128.0);
+
+                color = vec4(texture2D(textureWater, texCoord.xy).xyz, 1.0);
             }
         } else {
-            color = vec4(WATER_COLOR_SWIMMING);
+            color = vec4(texture2D(textureAtlas, texCoord.xy).xyz, 1.0) * vec4(WATER_COLOR_SWIMMING);
         }
-
-        isWater = true;
     /* LAVA */
     } else
 #endif
@@ -201,10 +216,24 @@ void main(){
         diffuseLighting = calcLambLight(normal, sunVecViewAdjusted);
     }
 
+
+    float shadowTerm = 1.0;
+
+#if defined (DYNAMIC_SHADOWS)
+    /* DYNAMIC SHADOWS */
+    vec3 vertexLightPosClipSpace = vertexLightProjPos.xyz / vertexLightProjPos.w;
+    vec2 shadowMapTexPos = vertexLightPosClipSpace.xy * vec2(0.5, 0.5) + vec2(0.5);
+    float shadowMapDepth = texture2D(texSceneShadowMap, shadowMapTexPos);
+
+    if (shadowMapDepth < vertexLightPosClipSpace.z - shadowMapBias) {
+        shadowTerm = shadowIntens;
+    }
+#endif
+
     float torchlight = 0.0;
 
     /* CALCULATE TORCHLIGHT */
-    if (carryingTorch) {
+    if (carryingTorch > 0.99) {
 #ifdef FEATURE_TRANSPARENT_PASS
         if (isWater)
             torchlight = calcTorchlight(calcLambLight(normalWater, normalizedVPos) * TORCH_WATER_DIFF
@@ -251,6 +280,10 @@ void main(){
     // Apply the final lighting mix
     color.xyz *= max(daylightColorValue, blocklightColorValue) * occlusionValue;
 
+#if defined (DYNAMIC_SHADOWS)
+    color.xyz *= shadowTerm;
+#endif
+
     vec3 finalInscatteringColor = convertColorYxy(skyInscatteringColor, skyInscatteringExponent);
     float fogValue = skyInscatteringStrength - clamp((viewingDistance - distance) / (viewingDistance - (1.0 - skyInscatteringLength) * viewingDistance), 0.0, skyInscatteringStrength);
     color = mix(color, vec4(finalInscatteringColor, 1.0), fogValue);
@@ -260,7 +293,7 @@ void main(){
 
     // Primitive objects ids... Will be extended later on
 #ifdef FEATURE_TRANSPARENT_PASS
-    if (isWater) {
+    if (isOceanWater) {
         gl_FragData[1].a = 1.0f;
     }
     else

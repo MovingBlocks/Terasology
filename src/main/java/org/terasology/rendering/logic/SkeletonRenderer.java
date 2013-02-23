@@ -308,4 +308,8 @@ public class SkeletonRenderer implements RenderSystem, EventHandlerSystem, Updat
     public void renderFirstPerson() {
     }
 
+    @Override
+    public void renderShadows() {
+    }
+
 }

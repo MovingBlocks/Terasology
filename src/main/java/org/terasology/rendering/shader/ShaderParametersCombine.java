@@ -32,8 +32,8 @@ public class ShaderParametersCombine extends ShaderParametersBase {
 
     private Property outlineDepthThreshold = new Property("outlineDepthThreshold", 0.1f);
     private Property outlineThickness = new Property("outlineThickness", 1.0f);
-    private Property shoreStart = new Property("shoreStart",0.006f, 0.0f, 0.1f);
-    private Property shoreEnd = new Property("shoreEnd",0.016f, 0.0f, 0.1f);
+    private Property shoreStart = new Property("shoreStart",0.0001f, 0.0f, 0.01f);
+    private Property shoreEnd = new Property("shoreEnd",0.0002f, 0.0f, 0.01f);
 
     @Override
     public void applyParameters(ShaderProgram program) {

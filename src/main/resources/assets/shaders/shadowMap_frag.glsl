@@ -13,22 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.componentSystem;
 
-import org.terasology.entitySystem.ComponentSystem;
+varying vec4 positionProj;
 
-/**
- * @author Immortius <immortius@gmail.com>
- */
-public interface RenderSystem extends ComponentSystem {
-
-    public void renderOpaque();
-
-    public void renderTransparent();
-
-    public void renderOverlay();
-
-    public void renderFirstPerson();
-
-    public void renderShadows();
+void main(){
+    gl_FragData[0] = vec4(0.0);
+    gl_FragDepth = positionProj.z / positionProj.w;
 }

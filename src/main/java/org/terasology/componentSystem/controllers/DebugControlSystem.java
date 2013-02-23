@@ -96,14 +96,6 @@ public class DebugControlSystem implements EventHandlerSystem {
                     worldRenderer.setWireframe(!worldRenderer.isWireframe());
                     event.consume();
                     break;
-                case Keyboard.KEY_P:
-                    worldRenderer.setCameraMode(WorldRenderer.CAMERA_MODE.PLAYER);
-                    event.consume();
-                    break;
-                case Keyboard.KEY_O:
-                    worldRenderer.setCameraMode(WorldRenderer.CAMERA_MODE.SPAWN);
-                    event.consume();
-                    break;
                 case Keyboard.KEY_K:
                     entity.send(new DamageEvent(9999, null));
                     break;

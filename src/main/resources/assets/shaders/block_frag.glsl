@@ -43,7 +43,7 @@ void main(){
     float torchlight = 0.0;
 
     // Apply torchlight
-    if (carryingTorch) {
+    if (carryingTorch > 0.99) {
         torchlight = calcTorchlight(calcLambLight(normal, -normalize(vertexViewPos.xyz)), vertexViewPos.xyz);
     }
 

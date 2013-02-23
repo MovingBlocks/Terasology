@@ -15,8 +15,6 @@
  */
 package org.terasology.rendering.shader;
 
-import static org.lwjgl.opengl.GL11.glBindTexture;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.FloatBuffer;
@@ -34,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.TeraMath;
-import org.terasology.rendering.assets.Shader;
+import org.terasology.rendering.assets.MaterialShader;
 
 import javax.swing.*;
 import javax.vecmath.Matrix3f;
@@ -158,7 +156,7 @@ public class ShaderProgram {
 
         int shaderId = GL20.glCreateShader(type);
 
-        StringBuilder shader = Shader.createShaderBuilder();
+        StringBuilder shader = MaterialShader.createShaderBuilder();
 
         // Add the activated features for this shader
         for (int i=0; i<ShaderProgramFeatures.FEATURE_ALL.ordinal(); ++i) {
@@ -168,9 +166,9 @@ public class ShaderProgram {
         }
 
         if (type == GL20.GL_FRAGMENT_SHADER)
-            shader.append(Shader.getIncludedFunctionsFragment()).append("\n");
+            shader.append(MaterialShader.getIncludedFunctionsFragment()).append("\n");
         else
-            shader.append(Shader.getIncludedFunctionsVertex()).append("\n");
+            shader.append(MaterialShader.getIncludedFunctionsVertex()).append("\n");
 
         String filename = title;
 
@@ -258,7 +256,7 @@ public class ShaderProgram {
             return logEntry;
         }
 
-        logger.info("Shader '"+title+"' successfully compiled.");
+        logger.info("Shader '" + title + "' successfully compiled.");
         return null;
     }
 
