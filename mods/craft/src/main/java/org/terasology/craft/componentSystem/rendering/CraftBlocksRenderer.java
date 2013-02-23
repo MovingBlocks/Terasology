@@ -515,6 +515,10 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
     }
 
     @Override
+    public void renderShadows() {
+    }
+
+    @Override
     public void renderOpaque() {
     }
 }
