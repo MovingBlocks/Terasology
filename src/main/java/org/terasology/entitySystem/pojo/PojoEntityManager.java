@@ -17,6 +17,7 @@ package org.terasology.entitySystem.pojo;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.iterator.TIntObjectIterator;
@@ -200,6 +201,15 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
             newEntityComponents.add(componentLibrary.copy(c));
         }
         return create(newEntityComponents);
+    }
+
+    @Override
+    public Map<Class<? extends Component>, Component> copyComponents(EntityRef other) {
+        Map<Class<? extends Component>, Component> result = Maps.newHashMap();
+        for (Component c : other.iterateComponents()) {
+            result.put(c.getClass(), componentLibrary.copy(c));
+        }
+        return result;
     }
 
     @Override

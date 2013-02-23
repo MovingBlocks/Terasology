@@ -22,7 +22,7 @@ public class UITransferSlotCursor extends UIDisplayContainer {
     public UITransferSlotCursor() {
         this.localPlayer = CoreRegistry.get(LocalPlayer.class);
         this.inventoryManager = CoreRegistry.get(SlotBasedInventoryManager.class);
-        item = new UIItemIcon();
+        item = new UIItemIcon(inventoryManager);
         addDisplayElement(item);
     }
 

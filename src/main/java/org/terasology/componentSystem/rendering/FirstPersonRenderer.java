@@ -15,6 +15,42 @@
  */
 package org.terasology.componentSystem.rendering;
 
+import com.google.common.collect.Maps;
+import org.lwjgl.opengl.GL11;
+import org.terasology.asset.Assets;
+import org.terasology.componentSystem.RenderSystem;
+import org.terasology.entitySystem.EntityRef;
+import org.terasology.entitySystem.In;
+import org.terasology.entitySystem.RegisterSystem;
+import org.terasology.game.CoreRegistry;
+import org.terasology.logic.characters.CharacterMovementComponent;
+import org.terasology.logic.inventory.ItemComponent;
+import org.terasology.logic.inventory.SlotBasedInventoryManager;
+import org.terasology.logic.manager.GUIManager;
+import org.terasology.logic.manager.ShaderManager;
+import org.terasology.logic.players.LocalPlayer;
+import org.terasology.logic.players.LocalPlayerComponent;
+import org.terasology.math.TeraMath;
+import org.terasology.model.inventory.Icon;
+import org.terasology.rendering.assets.Texture;
+import org.terasology.rendering.gui.widgets.UIInventoryGrid;
+import org.terasology.rendering.primitives.Mesh;
+import org.terasology.rendering.primitives.MeshFactory;
+import org.terasology.rendering.primitives.Tessellator;
+import org.terasology.rendering.primitives.TessellatorHelper;
+import org.terasology.rendering.shader.ShaderProgram;
+import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockPart;
+import org.terasology.world.block.entity.BlockItemComponent;
+import org.terasology.world.block.family.BlockFamily;
+
+import javax.vecmath.Vector2f;
+import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
+import java.util.Map;
+
 import static org.lwjgl.opengl.GL11.GL_GREATER;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
@@ -29,44 +65,6 @@ import static org.lwjgl.opengl.GL11.glRotatef;
 import static org.lwjgl.opengl.GL11.glScalef;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
-import java.util.Map;
-
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
-
-import org.lwjgl.opengl.GL11;
-import org.terasology.asset.Assets;
-import org.terasology.componentSystem.RenderSystem;
-import org.terasology.logic.inventory.InventoryComponent;
-import org.terasology.logic.inventory.ItemComponent;
-import org.terasology.entitySystem.RegisterSystem;
-import org.terasology.logic.players.LocalPlayerComponent;
-import org.terasology.entitySystem.In;
-import org.terasology.game.CoreRegistry;
-import org.terasology.logic.manager.GUIManager;
-import org.terasology.rendering.gui.widgets.UIInventoryGrid;
-import org.terasology.world.block.entity.BlockItemComponent;
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.logic.players.LocalPlayer;
-import org.terasology.logic.manager.ShaderManager;
-import org.terasology.math.TeraMath;
-import org.terasology.model.inventory.Icon;
-import org.terasology.logic.characters.CharacterMovementComponent;
-import org.terasology.rendering.assets.Texture;
-import org.terasology.rendering.primitives.Mesh;
-import org.terasology.rendering.primitives.MeshFactory;
-import org.terasology.rendering.primitives.Tessellator;
-import org.terasology.rendering.primitives.TessellatorHelper;
-import org.terasology.rendering.shader.ShaderProgram;
-import org.terasology.rendering.world.WorldRenderer;
-import org.terasology.world.WorldProvider;
-import org.terasology.world.block.Block;
-import org.terasology.world.block.BlockPart;
-import org.terasology.world.block.family.BlockFamily;
-
-import com.google.common.collect.Maps;
-
 /**
  * @author Immortius <immortius@gmail.com>
  */
@@ -79,6 +77,8 @@ public class FirstPersonRenderer implements RenderSystem {
     private LocalPlayer localPlayer;
     @In
     private WorldRenderer worldRenderer;
+    @In
+    private SlotBasedInventoryManager inventoryManager;
 
     private Mesh handMesh;
     private Texture handTex;
@@ -118,7 +118,7 @@ public class FirstPersonRenderer implements RenderSystem {
 
         UIInventoryGrid toolbar = (UIInventoryGrid) CoreRegistry.get(GUIManager.class).getWindowById("hud").getElementById("toolbar");
         int invSlotIndex = localPlayer.getCharacterEntity().getComponent(LocalPlayerComponent.class).selectedTool + toolbar.getStartSlot();
-        EntityRef heldItem = localPlayer.getCharacterEntity().getComponent(InventoryComponent.class).getItemSlots().get(invSlotIndex);
+        EntityRef heldItem = inventoryManager.getItemInSlot(localPlayer.getCharacterEntity(), invSlotIndex);
         ItemComponent heldItemComp = heldItem.getComponent(ItemComponent.class);
         BlockItemComponent blockItem = heldItem.getComponent(BlockItemComponent.class);
         if (blockItem != null && blockItem.blockFamily != null) {

@@ -15,6 +15,8 @@
  */
 package org.terasology.rendering.gui.widgets;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.inventory.SlotBasedInventoryManager;
@@ -30,6 +32,7 @@ import java.util.List;
  * @author Marcel Lehwald <marcel.lehwald@googlemail.com>
  */
 public class UIInventoryGrid extends UIDisplayContainer {
+    private static final Logger logger = LoggerFactory.getLogger(UIInventoryGrid.class);
 
     private SlotBasedInventoryManager inventoryManager = CoreRegistry.get(SlotBasedInventoryManager.class);
     private EntityRef entity = EntityRef.NULL;
@@ -44,6 +47,9 @@ public class UIInventoryGrid extends UIDisplayContainer {
     private int maxSlotsInGrid = 0;
 
     public UIInventoryGrid(int numColumns) {
+        if (inventoryManager == null) {
+            logger.error("No inventory manager");
+        }
         this.numColumns = numColumns;
     }
 

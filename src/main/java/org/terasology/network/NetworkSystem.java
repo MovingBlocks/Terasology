@@ -1,7 +1,10 @@
 package org.terasology.network;
 
+import com.google.common.base.Objects;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import com.google.protobuf.ByteString;
@@ -20,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityChangeSubscriber;
-import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Event;
 import org.terasology.entitySystem.PersistableEntityManager;
@@ -88,6 +90,7 @@ public class NetworkSystem implements EntityChangeSubscriber {
     private final Set<Client> clientList = Sets.newLinkedHashSet();
     private Map<EntityRef, Client> clientPlayerLookup = Maps.newHashMap();
     private Map<EntityRef, EntityRef> ownerLookup = Maps.newHashMap();
+    private Multimap<EntityRef, EntityRef> ownedLookup = HashMultimap.create();
 
     // Client only
     private Server server;
@@ -249,6 +252,7 @@ public class NetworkSystem implements EntityChangeSubscriber {
         }
         if (netComponent.owner.exists()) {
             ownerLookup.put(entity, netComponent.owner);
+            ownedLookup.put(netComponent.owner, entity);
         }
     }
 
@@ -256,25 +260,46 @@ public class NetworkSystem implements EntityChangeSubscriber {
         NetworkComponent netComponent = entity.getComponent(NetworkComponent.class);
 
         EntityRef lastOwnerEntity = ownerLookup.get(entity);
-        Client lastOwner = (lastOwnerEntity == null) ? null : getOwner(lastOwnerEntity);
-        Client newOwner = getOwner(netComponent.owner);
+        if (lastOwnerEntity == null) {
+            lastOwnerEntity = EntityRef.NULL;
+        }
 
-        // If the owner has changed, we need to update the old and new owners
-        if (lastOwner != newOwner) {
-            if (netComponent.replicateMode == NetworkComponent.ReplicateMode.OWNER) {
+        if (!Objects.equal(lastOwnerEntity, netComponent.owner)) {
+            Client lastOwner = (lastOwnerEntity == null) ? null : getOwner(lastOwnerEntity);
+            Client newOwner = getOwner(netComponent.owner);
+
+            if (!Objects.equal(lastOwner, newOwner)) {
+                recursiveUpdateOwnership(entity, lastOwner, newOwner);
+            }
+
+            if (lastOwnerEntity.exists()) {
+                ownedLookup.remove(lastOwnerEntity, entity);
+            }
+            if (netComponent.owner.exists()) {
+                ownerLookup.put(entity, netComponent.owner);
+                ownedLookup.put(netComponent.owner, entity);
+            } else {
+                ownerLookup.remove(entity);
+            }
+        }
+    }
+
+    private void recursiveUpdateOwnership(EntityRef entity, Client lastOwner, Client newOwner) {
+        NetworkComponent networkComponent = entity.getComponent(NetworkComponent.class);
+        if (networkComponent != null) {
+            if (networkComponent.replicateMode == NetworkComponent.ReplicateMode.OWNER) {
+                logger.debug("{}'s owner changed from {} to {}, so replicating.", entity, lastOwner, newOwner);
                 // Remove from last owner
                 if (lastOwner != null) {
-                    lastOwner.setNetRemoved(netComponent.networkId);
+                    lastOwner.setNetRemoved(networkComponent.networkId);
                 }
                 // Add to new owner
                 if (newOwner != null) {
-                    newOwner.setNetInitial(netComponent.networkId);
+                    newOwner.setNetInitial(networkComponent.networkId);
                 }
             }
-            if (!netComponent.owner.exists()) {
-                ownerLookup.remove(entity);
-            } else {
-                ownerLookup.put(entity, netComponent.owner);
+            for (EntityRef owned : ownedLookup.get(entity)) {
+                recursiveUpdateOwnership(owned, lastOwner, newOwner);
             }
         }
     }
@@ -462,7 +487,7 @@ public class NetworkSystem implements EntityChangeSubscriber {
     EntityRef getEntity(int netId) {
         int entityId = netIdToEntityId.get(netId);
         if (entityId != 0) {
-            return CoreRegistry.get(EntityManager.class).getEntity(entityId);
+            return entityManager.getEntity(entityId);
         }
         return EntityRef.NULL;
     }
@@ -503,8 +528,10 @@ public class NetworkSystem implements EntityChangeSubscriber {
     private void sendServerInfo(Client client) {
         NetData.ServerInfoMessage.Builder serverInfoMessageBuilder = NetData.ServerInfoMessage.newBuilder();
         WorldProvider world = CoreRegistry.get(WorldProvider.class);
-        serverInfoMessageBuilder.setTime(world.getTime());
-        serverInfoMessageBuilder.setWorldName(world.getTitle());
+        if (world != null) {
+            serverInfoMessageBuilder.setTime(world.getTime());
+            serverInfoMessageBuilder.setWorldName(world.getTitle());
+        }
         for (Mod mod : CoreRegistry.get(ModManager.class).getActiveMods()) {
             serverInfoMessageBuilder.addModule(NetData.ModuleInfo.newBuilder().setModuleId(mod.getModInfo().getId()).build());
         }
@@ -625,4 +652,7 @@ public class NetworkSystem implements EntityChangeSubscriber {
 
     }
 
+    void mockHost() {
+        mode = NetworkMode.SERVER;
+    }
 }

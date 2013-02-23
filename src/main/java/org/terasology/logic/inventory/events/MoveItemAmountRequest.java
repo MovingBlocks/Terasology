@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright 2013 Moving Blocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,32 +14,27 @@
  * limitations under the License.
  */
 
-package org.terasology.logic.inventory;
+package org.terasology.logic.inventory.events;
 
-import org.terasology.entitySystem.AbstractEvent;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.network.ServerEvent;
 
 /**
  * @author Immortius
  */
-public class ReceivedItemEvent extends AbstractEvent {
-    private EntityRef item;
-    private int slot = -1;
+@ServerEvent
+public class MoveItemAmountRequest extends MoveItemRequest {
+    private int amount;
 
-    public ReceivedItemEvent(EntityRef item) {
-        this.item = item;
+    protected MoveItemAmountRequest() {
     }
 
-    public ReceivedItemEvent(EntityRef item, int slot) {
-        this.item = item;
-        this.slot = slot;
+    public MoveItemAmountRequest(EntityRef fromInventory, int fromSlot, EntityRef toInventory, int toSlot, int amount, int changeId) {
+        super(fromInventory, fromSlot, toInventory, toSlot, changeId);
+        this.amount = amount;
     }
 
-    public EntityRef getItem() {
-        return item;
+    public int getAmount() {
+        return amount;
     }
-    
-    public int getSlot() {
-		return slot;
-	}
 }

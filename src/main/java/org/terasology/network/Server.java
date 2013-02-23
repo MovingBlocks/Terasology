@@ -241,6 +241,11 @@ public class Server {
         } else {
             newEntity = entitySerializer.deserialize(message.getEntity());
         }
+        if (newEntity == null) {
+            logger.error("Received entity is null");
+        } else if (newEntity.getComponent(NetworkComponent.class) == null) {
+            logger.error("Received entity with no NetworkComponent: {}", newEntity);
+        }
         logger.info("Received new entity: {} with net id {}", newEntity, newEntity.getComponent(NetworkComponent.class).networkId);
         networkSystem.registerNetworkEntity(newEntity);
     }

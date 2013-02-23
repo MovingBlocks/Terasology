@@ -100,7 +100,7 @@ public class UIInventoryCell extends UIDisplayContainer {
         itemLabel.setVisible(false);
         itemLabel.setPosition(ITEM_LABEL_POSITION);
 
-        icon = new UIItemIcon();
+        icon = new UIItemIcon(inventoryManager);
         icon.setPosition(iconPosition);
         icon.setVisible(true);
 
@@ -198,9 +198,10 @@ public class UIInventoryCell extends UIDisplayContainer {
                 if (MouseInput.MOUSE_LEFT.getId() == button) {
                     swapItem();
                 } else if (MouseInput.MOUSE_RIGHT.getId() == button) {
-                    ItemComponent itemComp = inventoryManager.getItemInSlot(inventoryEntity, slot).getComponent(ItemComponent.class);
-                    if (itemComp != null) {
-                        giveAmount((itemComp.stackCount + 1) / 2);
+                    EntityRef item = inventoryManager.getItemInSlot(inventoryEntity, slot);
+                    int stackSize = inventoryManager.getStackSize(item);
+                    if (stackSize > 0) {
+                        giveAmount((stackSize + 1) / 2);
                     }
                 }
             }

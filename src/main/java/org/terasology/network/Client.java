@@ -263,11 +263,6 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
             sendDirtyEntities(message);
             sendEvents(message);
             send(message.build());
-        } else if (!queuedOutgoingEvents.isEmpty() || !queuedOutgoingBlockChanges.isEmpty() || !queuedInvalidatedChunkEvents.isEmpty()) {
-            NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
-            message.setTime(timer.getTimeInMs());
-            sendEvents(message);
-            send(message.build());
         }
         processReceivedMessages();
     }

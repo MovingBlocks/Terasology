@@ -29,6 +29,7 @@ import org.terasology.logic.characters.events.AttackRequest;
 import org.terasology.logic.characters.events.FrobRequest;
 import org.terasology.logic.characters.events.UseItemRequest;
 import org.terasology.network.NetworkComponent;
+import org.terasology.network.NetworkSystem;
 import org.terasology.physics.BulletPhysics;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
@@ -51,6 +52,9 @@ public class CharacterSystem implements ComponentSystem {
     @In
     private WorldProvider worldProvider;
 
+    @In
+    private NetworkSystem networkSystem;
+
     private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD};
 
     @Override
@@ -63,7 +67,8 @@ public class CharacterSystem implements ComponentSystem {
 
     @ReceiveEvent(components = {CharacterComponent.class, LocationComponent.class})
     public void onUseItem(UseItemRequest event, EntityRef character) {
-        if (!event.getItem().exists() || !character.equals(event.getItem().getComponent(ItemComponent.class).container)) {
+
+        if (!event.getItem().exists() || !networkSystem.getOwnerEntity(event.getItem()).equals(networkSystem.getOwnerEntity(character))) {
             return;
         }
 

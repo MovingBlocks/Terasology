@@ -70,8 +70,8 @@ public class PojoEventSystem implements EventSystem {
 
     private static final Logger logger = LoggerFactory.getLogger(PojoEventSystem.class);
 
-    private Map<Class<? extends Event>, ListMultimap<Class<? extends Component>, EventHandlerInfo>> componentSpecificHandlers = Maps.newHashMap();
-    private ListMultimap<Class<? extends Event>, EventHandlerInfo> generalHandlers = ArrayListMultimap.create();
+    private Map<Class<? extends Event>, SetMultimap<Class<? extends Component>, EventHandlerInfo>> componentSpecificHandlers = Maps.newHashMap();
+    private SetMultimap<Class<? extends Event>, EventHandlerInfo> generalHandlers = HashMultimap.create();
     private Comparator<EventHandlerInfo> priorityComparator = new EventHandlerPriorityComparator();
 
     // Event metadata
@@ -167,9 +167,9 @@ public class PojoEventSystem implements EventSystem {
     }
 
     private void addEventHandler(Class<? extends Event> type, EventHandlerInfo handlerInfo, Class<? extends Component> c) {
-        ListMultimap<Class<? extends Component>, EventHandlerInfo> componentMap = componentSpecificHandlers.get(type);
+        SetMultimap<Class<? extends Component>, EventHandlerInfo> componentMap = componentSpecificHandlers.get(type);
         if (componentMap == null) {
-            componentMap = ArrayListMultimap.create();
+            componentMap = HashMultimap.create();
             componentSpecificHandlers.put(type, componentMap);
         }
         componentMap.put(c, handlerInfo);

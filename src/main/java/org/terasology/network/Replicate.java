@@ -13,4 +13,5 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD, ElementType.TYPE})
 public @interface Replicate {
     public ReplicateType value() default ReplicateType.SERVER_TO_CLIENT;
+    public boolean initialOnly() default false;
 }

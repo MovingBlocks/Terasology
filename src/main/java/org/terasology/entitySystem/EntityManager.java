@@ -117,4 +117,5 @@ public interface EntityManager {
 
     int getActiveEntities();
 
+    Map<Class<? extends Component>,Component> copyComponents(EntityRef original);
 }

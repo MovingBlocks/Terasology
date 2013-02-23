@@ -19,8 +19,9 @@ import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.math.Direction;
-import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
+import org.terasology.network.Replicate;
+import org.terasology.network.ReplicateType;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -36,7 +37,8 @@ public final class CharacterComponent implements Component {
     public float interactionRange = 5f;
     public float pitch;
     public float yaw;
-    public EntityRef movingItem;
+    @Replicate(ReplicateType.SERVER_TO_OWNER)
+    public EntityRef movingItem = EntityRef.NULL;
 
     public Quat4f getLookRotation() {
         Quat4f lookRotation = new Quat4f();

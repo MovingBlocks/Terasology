@@ -19,14 +19,13 @@ import com.bulletphysics.linearmath.QuaternionUtil;
 import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.HealthComponent;
-import org.terasology.logic.inventory.InventoryComponent;
-import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entityFactory.DroppedBlockFactory;
 import org.terasology.entityFactory.DroppedItemFactory;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventPriority;
+import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.events.HealthChangedEvent;
 import org.terasology.events.NoHealthEvent;
@@ -46,8 +45,12 @@ import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.logic.characters.CharacterComponent;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
+import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.characters.events.FrobRequest;
+import org.terasology.logic.inventory.InventoryComponent;
+import org.terasology.logic.inventory.ItemComponent;
+import org.terasology.logic.inventory.SlotBasedInventoryManager;
 import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.math.AABB;
@@ -55,7 +58,6 @@ import org.terasology.math.Direction;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.physics.ImpulseEvent;
-import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.rendering.AABBRenderer;
 import org.terasology.rendering.BlockOverlayRenderer;
 import org.terasology.rendering.cameras.DefaultCamera;
@@ -63,9 +65,9 @@ import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.logic.MeshComponent;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockRegionComponent;
 import org.terasology.world.block.entity.BlockComponent;
 import org.terasology.world.block.entity.BlockItemComponent;
-import org.terasology.world.block.BlockRegionComponent;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector2f;
@@ -103,6 +105,9 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
     private BlockOverlayRenderer aabbRenderer = new AABBRenderer(AABB.createEmpty());
 
     private int inputSequenceNumber = 1;
+
+    @In
+    private SlotBasedInventoryManager inventoryManager;
 
     @Override
     public void initialise() {
@@ -346,8 +351,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
     @ReceiveEvent(components = {LocalPlayerComponent.class})
     public void onDropItem(DropItemButton event, EntityRef entity) {
         LocalPlayerComponent localPlayerComp = entity.getComponent(LocalPlayerComponent.class);
-        InventoryComponent inventory = entity.getComponent(InventoryComponent.class);
-        EntityRef selectedItemEntity = inventory.getItemSlots().get(localPlayerComp.selectedTool);
+        EntityRef selectedItemEntity = inventoryManager.getItemInSlot(entity, localPlayerComp.selectedTool);
         BlockItemComponent block = selectedItemEntity.getComponent(BlockItemComponent.class);
 
         if (selectedItemEntity.equals(EntityRef.NULL)) {

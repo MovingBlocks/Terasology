@@ -80,7 +80,6 @@ public class DroppedItemFactory {
             ItemComponent newItem = new ItemComponent();
 
             newItem.stackCount    = 1;
-            newItem.container     = EntityRef.NULL;
             newItem.name          = itemComponent.name;
             newItem.baseDamage    = itemComponent.baseDamage;
             newItem.consumedOnUse = itemComponent.consumedOnUse;

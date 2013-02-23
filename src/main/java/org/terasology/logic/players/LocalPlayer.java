@@ -16,15 +16,16 @@
 package org.terasology.logic.players;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
-import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.components.LightComponent;
 import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.game.CoreRegistry;
 import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.math.Direction;
-import org.terasology.network.ClientComponent;
-import org.terasology.math.TeraMath;
 import org.terasology.logic.characters.CharacterMovementComponent;
+import org.terasology.logic.inventory.SlotBasedInventoryManager;
+import org.terasology.math.Direction;
+import org.terasology.math.TeraMath;
+import org.terasology.network.ClientComponent;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -69,13 +70,11 @@ public class LocalPlayer {
     }
 
     public boolean isCarryingTorch() {
-
-        InventoryComponent inventory = getCharacterEntity().getComponent(InventoryComponent.class);
         LocalPlayerComponent localPlayer = getCharacterEntity().getComponent(LocalPlayerComponent.class);
-        if (inventory == null || localPlayer == null)
+        if (localPlayer == null)
             return false;
 
-        return inventory.getItemSlots().get(localPlayer.selectedTool).hasComponent(LightComponent.class);
+        return CoreRegistry.get(SlotBasedInventoryManager.class).getItemInSlot(getCharacterEntity(), localPlayer.selectedTool).hasComponent(LightComponent.class);
     }
 
     public EntityRef getCharacterEntity() {
@@ -97,7 +96,7 @@ public class LocalPlayer {
     public Quat4f getViewRotation() {
         CharacterComponent character = getCharacterEntity().getComponent(CharacterComponent.class);
         if (character == null) {
-            return new Quat4f(0,0,0,1);
+            return new Quat4f(0, 0, 0, 1);
         }
         Quat4f rot = new Quat4f();
         QuaternionUtil.setEuler(rot, TeraMath.DEG_TO_RAD * character.yaw, TeraMath.DEG_TO_RAD * character.pitch, 0);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright 2013 Moving Blocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.terasology.logic.inventory;
 
 import java.util.Map;
@@ -58,12 +59,6 @@ public final class ItemComponent implements Component {
      */
     @Replicate(ReplicateType.SERVER_TO_OWNER)
     public byte stackCount = 1;
-
-    /**
-     * The entity that contains this one (if appropriate, defaults to this item not being contained by anything)
-     */
-    @Replicate(ReplicateType.SERVER_TO_OWNER)
-    public EntityRef container = EntityRef.NULL;
 
     /**
      * Enum to hold item usage possibilities

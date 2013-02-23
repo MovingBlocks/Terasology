@@ -3,6 +3,7 @@ package org.terasology.rendering.gui.widgets;
 import org.lwjgl.opengl.GL11;
 import org.terasology.asset.Assets;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.logic.inventory.InventoryManager;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.model.inventory.Icon;
 import org.terasology.rendering.assets.Texture;
@@ -29,8 +30,11 @@ public class UIItemIcon extends UIDisplayContainer {
     //rendering
     private Texture terrainTex;
 
+    private InventoryManager inventoryManager;
 
-    public UIItemIcon() {
+
+    public UIItemIcon(InventoryManager inventoryManager) {
+        this.inventoryManager = inventoryManager;
         terrainTex = Assets.getTexture("engine:terrain");
 
         itemCount = new UILabel();
@@ -46,7 +50,7 @@ public class UIItemIcon extends UIDisplayContainer {
 
         ItemComponent itemComponent = item.getComponent(ItemComponent.class);
         setVisible(itemComponent != null);
-        updateCountLabel(itemComponent);
+        updateCountLabel(item);
     }
 
 
@@ -56,18 +60,17 @@ public class UIItemIcon extends UIDisplayContainer {
 
     public void setDisplayingItemCount(boolean enable) {
         displayingItemCount = enable;
-        updateCountLabel(item.getComponent(ItemComponent.class));
+        updateCountLabel(item);
 
     }
 
-    private void updateCountLabel(ItemComponent itemComponent) {
-        if (itemComponent != null) {
-            if (itemComponent.stackCount > 1 && displayingItemCount) {
-                itemCount.setVisible(true);
-                itemCount.setText(Integer.toString(itemComponent.stackCount));
-            } else {
-                itemCount.setVisible(false);
-            }
+    private void updateCountLabel(EntityRef item) {
+        int stackSize = inventoryManager.getStackSize(item);
+        if (stackSize > 1 && displayingItemCount) {
+            itemCount.setVisible(true);
+            itemCount.setText(Integer.toString(stackSize));
+        } else {
+            itemCount.setVisible(false);
         }
     }
 
