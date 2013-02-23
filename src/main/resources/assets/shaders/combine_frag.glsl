@@ -58,15 +58,15 @@ void main() {
     vec4 normals = vec4(0.0);
 
     // Combine transparent and opaque RTs
-    if (depthTransparent.r < depthOpaque.r) {
+    if (depthTransparent < depthOpaque) {
         depth = depthTransparent;
 
         float fade = 0.0;
         // Detect water in the transparent RT...
         if (normalsTransparent.a > 0.99) {
             // ... and fade out at the shore
-            float linDepthOpaque = linDepth(depthOpaque.r);
-            float linDepthTransparent = linDepth(depthTransparent.r);
+            float linDepthOpaque = linDepth(depthOpaque);
+            float linDepthTransparent = linDepth(depthTransparent);
 
             float depthDiff = linDepthOpaque - linDepthTransparent;
             fade = clamp((shoreEnd - depthDiff) / (shoreEnd - shoreStart), 0.0, 1.0);
