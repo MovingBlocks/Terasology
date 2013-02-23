@@ -50,6 +50,9 @@ ext {
 
 repositories {
     mavenCentral()
+    maven {
+        url "http://slick2d-maven-dependencies.googlecode.com/svn/trunk/repository/"
+    }
 }
 
 /* Natives ----------------------------------------------------------------- */
@@ -119,6 +122,8 @@ dependencies {
     compile group: 'io.netty', name: 'netty', version: '3.5.11.Final'
     compile group: 'org.reflections', name: 'reflections', version: '0.9.8'
     compile group: 'java3d', name: 'vecmath', version: '1.3.1'
+    compile group: 'com.github.jponge', name: 'lzma-java', version: '1.2'
+    compile group: 'org.newdawn.slick', name: 'slick', version: '236'
     // Would have liked to have left this runtime, but needed to "compile" the groovy config in IntelliJ
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.0.9'
     compile fileTree(dir: 'libs', include: '*.jar')
@@ -230,6 +235,9 @@ subprojects {
         }
         repositories {
             mavenCentral()
+            maven {
+                url "http://slick2d-maven-dependencies.googlecode.com/svn/trunk/repository/"
+            }
         }
         dependencies {
             compile project(':')
