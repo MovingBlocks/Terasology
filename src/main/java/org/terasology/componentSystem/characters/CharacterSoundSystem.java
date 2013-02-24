@@ -52,8 +52,8 @@ public class CharacterSoundSystem implements EventHandlerSystem {
     final private long MIN_TIME_CRASH = 100;
     final private long MIN_TIME_SWIMMING = 1000;
 
-    // TODO: Moved this here from the CharacterSoundComponent since it caused
-    // sounds from being played completely at that location (sometimes and somehow).
+    // TODO: Moved this here from the CharacterSoundComponent  caused
+    // sounds from being played completely.
     private long lastSound = 0;
 
     private FastRandom random = new FastRandom();
