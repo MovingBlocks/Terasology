@@ -130,10 +130,15 @@ public class LeapSystem implements EventHandlerSystem {
     /** Counter for total frames processed */
     private int framesTotal = 0;
 
+    /** Flag for not halting movement more than once (when a hand is lost) */
+    private boolean shouldLostHandCancelMovement = true;
+
     public void initialise() {
         leapController = CoreRegistry.get(Controller.class);
         localPlayer = CoreRegistry.get(LocalPlayer.class);
         cameraTargetSystem = CoreRegistry.get(CameraTargetSystem.class);
+        leapController.enableGesture(Gesture.Type.TYPE_CIRCLE);
+        leapController.enableGesture(Gesture.Type.TYPE_KEY_TAP);
     }
 
     @Override
@@ -293,9 +298,52 @@ public class LeapSystem implements EventHandlerSystem {
         if (currentLeftHand != -1 && frame.hand(currentLeftHand).isValid()) {
             // ... and use it for moving the player around (walking forwards/backwards, upwards/downwards or left and right)
             doPlayerMovement(currentLeftHand, delta);
-        } else {
-            // No hand available? Halt the machine!
+            shouldLostHandCancelMovement = true;
+        } else if (shouldLostHandCancelMovement) {
+            // No hand available? Halt the machine! But only once, so player can switch to keyboard movement if desired
             doPlayerMovement(-1, delta);
+            shouldLostHandCancelMovement = false;
+        }
+
+        // Check if we've got valid gestures (for either hand) to process
+        GestureList gestures = frame.gestures();
+        for (int i = 0; i < gestures.count(); i++) {
+            Gesture gesture = gestures.get(i);
+
+            switch (gesture.type()) {
+                case TYPE_CIRCLE:
+                    CircleGesture circle = new CircleGesture(gesture);
+
+                    // Calculate clock direction using the angle between circle normal and pointable
+                    boolean clockwise = circle.pointable().direction().angleTo(circle.normal()) <= Math.PI/4;
+
+                    // When a circle is completed act on its clock direction
+                    if (circle.state() == Gesture.State.STATE_STOP) {
+                        CharacterMovementComponent movComp = localPlayer.getEntity().getComponent(CharacterMovementComponent.class);
+                        if (clockwise) {
+                            // Enable God Mode (ghosting)
+                            System.out.println("Enabling god mode");
+                            movComp.isGhosting = true;
+
+                        } else {
+                            // Disable God Mode (ghosting)
+                            System.out.println("Disabling god mode");
+                            movComp.isGhosting = false;
+                        }
+                    }
+
+                    break;
+                case TYPE_KEY_TAP:
+                    BindButtonEvent eventAttack = new AttackButton();
+                    eventAttack.prepare("leap:attack", ButtonState.DOWN, 0.0f);
+                    eventAttack.setTarget(cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal());
+                    localPlayer.getEntity().send(eventAttack);
+
+                    break;
+                default:
+                    System.out.println("Unknown gesture type.");
+                    break;
+            }
         }
 
         PerformanceMonitor.endActivity();
@@ -333,7 +381,7 @@ public class LeapSystem implements EventHandlerSystem {
         // Use the hand's location relative to the controller to direct player's direction and speed
         Vector3f absPosition = calcAveragePalmPosition(leftHandId, DEFAULT_PAST_FRAMES_TO_CONSIDER);
 
-        // Use the hand's location relative to the controller to direct player's direction and speed
+        // Use this palm's velocity to determine whether or not the player should jump
         Vector3f velocity = calcAveragePalmVelocity(leftHandId, DEFAULT_PAST_FRAMES_TO_CONSIDER);
 
         Vector3f relPosition = new Vector3f();
@@ -347,19 +395,11 @@ public class LeapSystem implements EventHandlerSystem {
 
         normOffset.clamp(-1.0f, 1.0f);
 
-        if (normOffset.y > RUNNING_REL_THRESHOLD) {
-            movComp.isRunning = true;
-        } else {
-            movComp.isRunning = false;
-        }
+        // Trigger running
+        movComp.isRunning = normOffset.y > RUNNING_REL_THRESHOLD;
 
-        if (velocity.y > JUMPING_THRESHOLD) {
-            movComp.jump = true;
-        }
-        else
-        {
-            movComp.jump = false;
-        }
+        // Trigger a jump if the vertical velocity is high enough
+        movComp.jump = velocity.y > JUMPING_THRESHOLD;
 
         //if (!suddenMovement) {
             eventForwardsAndBackwards.prepare("leap:forwardAndBackwards", normOffset.z, 1f);
@@ -383,9 +423,6 @@ public class LeapSystem implements EventHandlerSystem {
         // Use the hand's location relative to the controller to direct player's direction and speed
         Vector3f absPosition = calcAveragePalmPosition(rightHandId, DEFAULT_PAST_FRAMES_TO_CONSIDER);
 
-        // Use the hand's location relative to the controller to direct player's direction and speed
-        Vector3f velocity = calcAverageTipVelocity(rightHandId, hand.fingers().get(0).id(), DEFAULT_PAST_FRAMES_TO_CONSIDER);
-
         Vector3f relPosition = new Vector3f();
         relPosition.sub(absPosition, RIGHT_HAND_ORIGIN);
 
@@ -397,23 +434,10 @@ public class LeapSystem implements EventHandlerSystem {
 
         normOffset.clamp(-1.0f, 1.0f);
 
-        if (velocity.length() > ATTACK_THRESHOLD) {
-            BindButtonEvent eventAttack = new AttackButton();
-            eventAttack.prepare("leap:attack", ButtonState.DOWN, 0.0f);
-            eventAttack.setTarget(cameraTargetSystem.getTarget(), cameraTargetSystem.getTargetBlockPosition(), cameraTargetSystem.getHitPosition(), cameraTargetSystem.getHitNormal());
-            localPlayer.getEntity().send(eventAttack);
-
-            timeSinceLastAttack = 0.f;
-        } else {
-            timeSinceLastAttack += delta;
-        }
-
-        if (timeSinceLastAttack > ATTACK_TIMEOUT) {
-            MouseXAxisEvent mouseXAxisEvent = new MouseXAxisEvent(relPosition.x / LOOKING_SENSITIVITY, 0f);
-            localPlayer.getEntity().send(mouseXAxisEvent);
-            MouseYAxisEvent mouseYAxisEvent = new MouseYAxisEvent(relPosition.y / LOOKING_SENSITIVITY, 0f);
-            localPlayer.getEntity().send(mouseYAxisEvent);
-        }
+        MouseXAxisEvent mouseXAxisEvent = new MouseXAxisEvent(relPosition.x / LOOKING_SENSITIVITY, 0f);
+        localPlayer.getEntity().send(mouseXAxisEvent);
+        MouseYAxisEvent mouseYAxisEvent = new MouseYAxisEvent(relPosition.y / LOOKING_SENSITIVITY, 0f);
+        localPlayer.getEntity().send(mouseYAxisEvent);
     }
 
     Vector3f calcAveragePalmPosition(int handId, int pastFrames) {
