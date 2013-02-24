@@ -163,6 +163,8 @@ public class ShaderParametersChunk extends ShaderParametersBase {
             program.setFloat("waterOffsetY", (Float) waterOffsetY.getValue());
             program.setFloat("waveOverallScale", (Float) waveOverallScale.getValue());
         }
+
+        program.setFloat("blockScale", 1.0f);
     }
 
     @Override

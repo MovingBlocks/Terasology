@@ -308,7 +308,9 @@ public class UIMenuConfigVideo extends UIWindow {
         viewingDistanceButton.setState(config.getRendering().getActiveViewDistanceMode());
         blurIntensityButton.setState(config.getRendering().getBlurIntensity());
 
-        if (config.getRendering().isMotionBlur())
+        if (config.getRendering().isDynamicShadows())
+            graphicsQualityButton.setState(3);
+        else if (config.getRendering().isLightShafts())
             graphicsQualityButton.setState(2);
         else if (config.getRendering().isBloom())
             graphicsQualityButton.setState(1);
