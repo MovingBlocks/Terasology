@@ -67,4 +67,8 @@ public class ZoneSystem implements UpdateSubscriberSystem, RenderSystem {
 	public void renderFirstPerson() {
 
 	}
+
+    @Override
+    public void renderShadows() {
+    }
 }

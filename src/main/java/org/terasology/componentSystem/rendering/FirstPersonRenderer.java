@@ -131,6 +131,10 @@ public class FirstPersonRenderer implements RenderSystem {
     }
 
     @Override
+    public void renderShadows() {
+    }
+
+    @Override
     public void renderOverlay() {
 
     }
@@ -167,6 +171,7 @@ public class FirstPersonRenderer implements RenderSystem {
         glRotatef(-20f, 1.0f, 0.0f, 0.0f);
         glRotatef(-80f, 0.0f, 1.0f, 0.0f);
         glRotatef(45f, 0.0f, 0.0f, 1.0f);
+        glScalef(0.75f, 0.75f, 0.75f);
 
         Mesh itemMesh = iconMeshes.get(iconName);
         if (itemMesh == null) {
@@ -205,7 +210,8 @@ public class FirstPersonRenderer implements RenderSystem {
         glTranslatef(1.0f, -0.7f + bobOffset - handMovementAnimationOffset * 0.5f, -1.5f - handMovementAnimationOffset * 0.5f);
         glRotatef(-25f - handMovementAnimationOffset * 64.0f, 1.0f, 0.0f, 0.0f);
         glRotatef(35f, 0.0f, 1.0f, 0.0f);
-        glTranslatef(0f, 0.25f, 0f);
+        glTranslatef(0f, 0.1f, 0f);
+        glScalef(0.75f, 0.75f, 0.75f);
 
         activeBlock.renderWithLightValue(worldRenderer.getRenderingLightValue());
 

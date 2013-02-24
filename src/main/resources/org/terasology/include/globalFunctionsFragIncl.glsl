@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#define Z_FAR 5000.0
 #define Z_NEAR 0.1
 #define BLUR_START 0.6
 #define BLUR_LENGTH 0.05
@@ -30,7 +31,7 @@
 #define W 11.2
 
 uniform bool swimming;
-uniform bool carryingTorch;
+uniform float carryingTorch;
 uniform float viewingDistance;
 uniform float daylight;
 uniform float tick;
@@ -40,7 +41,7 @@ uniform vec3 sunVec;
 uniform vec3 cameraDirection;
 
 float linDepth(float depth) {
-    return (2.0 * Z_NEAR) / (viewingDistance + Z_NEAR - depth * (viewingDistance - Z_NEAR));
+    return (2.0 * Z_NEAR) / (Z_FAR + Z_NEAR - depth * (Z_FAR - Z_NEAR));
 }
 
 vec3 uncharted2Tonemap(vec3 x) {

@@ -29,4 +29,6 @@ public interface RenderSystem extends ComponentSystem {
     public void renderOverlay();
 
     public void renderFirstPerson();
+
+    public void renderShadows();
 }

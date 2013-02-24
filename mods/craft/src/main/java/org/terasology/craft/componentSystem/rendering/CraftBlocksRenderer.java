@@ -479,7 +479,7 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
             glBindTexture(GL11.GL_TEXTURE_2D, textureId);
         }
 
-        glDepthMask ( false );
+        glDepthMask (false);
         glEnable(GL11.GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -508,17 +508,17 @@ public class CraftBlocksRenderer implements RenderSystem, EventHandlerSystem  {
 
     @Override
     public void renderOverlay() {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public void renderFirstPerson() {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    @Override
+    public void renderShadows() {
+    }
 
     @Override
     public void renderOpaque() {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 }

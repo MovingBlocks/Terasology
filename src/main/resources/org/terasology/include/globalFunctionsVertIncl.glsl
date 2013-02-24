@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
+#define OCEAN_OCTAVES 16
+
 uniform bool swimming;
-uniform bool carryingTorch;
+uniform float carryingTorch;
 uniform float viewingDistance;
 uniform float daylight;
 uniform float tick;

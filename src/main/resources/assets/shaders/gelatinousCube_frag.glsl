@@ -28,7 +28,7 @@ void main(){
     float torchlight = 0.0;
     float highlight = calcLambLight(normal, -normalize(vertexViewPos.xyz));
 
-    if (carryingTorch)
+    if (carryingTorch > 0.99)
         torchlight = calcTorchlight(highlight, vertexViewPos.xyz);
 
     color.rgb *= clamp(gl_Color.rgb, 0.0, 1.0) * colorOffset.rgb;

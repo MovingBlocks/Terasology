@@ -15,18 +15,17 @@
  */
 package org.terasology.rendering.world;
 
-import java.util.Set;
-
+import com.google.common.collect.Sets;
+import org.terasology.config.Config;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
-import org.terasology.logic.manager.Config;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.WorldView;
 import org.terasology.world.chunks.Chunk;
 
-import com.google.common.collect.Sets;
+import java.util.Set;
 
 /**
  * Provides the mechanism for updating and generating chunks.
@@ -40,7 +39,7 @@ public final class ChunkUpdateManager {
     }
 
     /* CONST */
-    private static final int MAX_THREADS = Config.getInstance().getMaxThreads();
+    private static final int MAX_THREADS = CoreRegistry.get(Config.class).getSystem().getMaxThreads();
 
     /* CHUNK UPDATES */
     private static final Set<Chunk> currentlyProcessedChunks = Sets.newHashSet();

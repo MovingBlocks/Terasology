@@ -15,15 +15,17 @@
  */
 package org.terasology.world.generator.core;
 
-import java.util.Map;
-
-import org.terasology.logic.manager.Config;
+import org.terasology.config.Config;
+import org.terasology.config.WorldGenerationConfig;
+import org.terasology.game.CoreRegistry;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldBiomeProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.generator.ChunkGenerator;
+
+import java.util.Map;
 
 /**
  * Generates some trees, flowers and high grass.
@@ -32,18 +34,13 @@ import org.terasology.world.generator.ChunkGenerator;
  */
 public class FloraGenerator implements ChunkGenerator {
 
-    private static final double DESERT_GRASS_DENSITY = Config.getInstance().getDesertGrassDensity();
-    private static final double FOREST_GRASS_DENSITY = Config.getInstance().getForestGrassDensity();
-    private static final double PLAINS_GRASS_DENSITY = Config.getInstance().getPlainsGrassDensity();
-    private static final double SNOW_GRASS_DENSITY = Config.getInstance().getSnowGrassDensity();
-    private static final double MOUNTAINS_GRASS_DENSITY = Config.getInstance().getMountainGrassDensity();
-
     private String worldSeed;
     private WorldBiomeProvider biomeProvider;
 
     private Block grassBlock;
     private Block snowBlock;
     private Block sandBlock;
+    private WorldGenerationConfig config = CoreRegistry.get(Config.class).getWorldGeneration();
 
     public FloraGenerator() {
         grassBlock = BlockManager.getInstance().getBlock("engine:Grass");
@@ -93,19 +90,19 @@ public class FloraGenerator implements ChunkGenerator {
 
             switch (biome) {
                 case PLAINS:
-                    grassProb = 1.0 - PLAINS_GRASS_DENSITY;
+                    grassProb = 1.0 - config.getPlainsGrassDensity();
                     break;
                 case MOUNTAINS:
-                    grassProb = 1.0 - MOUNTAINS_GRASS_DENSITY;
+                    grassProb = 1.0 - config.getMountainGrassDensity();
                     break;
                 case FOREST:
-                    grassProb = 1.0 - FOREST_GRASS_DENSITY;
+                    grassProb = 1.0 - config.getForestGrassDensity();
                     break;
                 case SNOW:
-                    grassProb = 1.0 - SNOW_GRASS_DENSITY;
+                    grassProb = 1.0 - config.getSnowGrassDensity();
                     break;
                 case DESERT:
-                    grassProb = 1.0 - DESERT_GRASS_DENSITY;
+                    grassProb = 1.0 - config.getDesertGrassDensity();
                     break;
             }
 

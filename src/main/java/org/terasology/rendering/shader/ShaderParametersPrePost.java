@@ -16,9 +16,10 @@
 package org.terasology.rendering.shader;
 
 import org.lwjgl.opengl.GL13;
-import org.terasology.logic.manager.Config;
-import org.terasology.logic.manager.PostProcessingRenderer;
+import org.terasology.config.Config;
 import org.terasology.editor.properties.Property;
+import org.terasology.game.CoreRegistry;
+import org.terasology.logic.manager.PostProcessingRenderer;
 
 import java.util.List;
 
@@ -29,46 +30,25 @@ import java.util.List;
  */
 public class ShaderParametersPrePost extends ShaderParametersBase {
 
-    private Property outlineDepthThreshold = new Property("outlineDepthThreshold", 0.1f);
-    private Property outlineThickness = new Property("outlineThickness", 1.0f);
-
     @Override
     public void applyParameters(ShaderProgram program) {
         super.applyParameters(program);
 
-        PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("scene");
+        PostProcessingRenderer.FBO sceneCombined = PostProcessingRenderer.getInstance().getFBO("sceneCombined");
 
-        GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        scene.bindTexture();
-        program.setInt("texScene", 0);
+        int texId = 0;
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        sceneCombined.bindTexture();
+        program.setInt("texScene", texId++);
 
-        if (Config.getInstance().isSSAO()) {
-            PostProcessingRenderer.FBO ssao = PostProcessingRenderer.getInstance().getFBO("ssaoBlurred1");
-            GL13.glActiveTexture(GL13.GL_TEXTURE1);
-            ssao.bindTexture();
-            program.setInt("texSsao", 1);
-        }
-
-        if (Config.getInstance().isOutline()) {
-            PostProcessingRenderer.FBO sobel = PostProcessingRenderer.getInstance().getFBO("sobel");
-            GL13.glActiveTexture(GL13.GL_TEXTURE2);
-            sobel.bindTexture();
-            program.setInt("texEdges", 2);
-
-            program.setFloat("outlineDepthThreshold", (Float) outlineDepthThreshold.getValue());
-            program.setFloat("outlineThickness", (Float) outlineThickness.getValue());
-        }
-
-        if (Config.getInstance().isLightShafts()) {
-            GL13.glActiveTexture(GL13.GL_TEXTURE3);
+        if (CoreRegistry.get(Config.class).getRendering().isLightShafts()) {
+            GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             PostProcessingRenderer.getInstance().getFBO("lightShafts").bindTexture();
-            program.setInt("texLightShafts", 3);
+            program.setInt("texLightShafts", texId++);
         }
     }
 
     @Override
     public void addPropertiesToList(List<Property> properties) {
-        properties.add(outlineThickness);
-        properties.add(outlineDepthThreshold);
     }
 }

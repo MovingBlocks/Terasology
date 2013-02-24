@@ -39,6 +39,8 @@ import org.terasology.editor.properties.Property;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.shader.ShaderProgram;
 
+import javax.vecmath.Vector3f;
+
 /**
  * Skysphere based on the Perez all weather luminance model.
  *
@@ -159,5 +161,29 @@ public class Skysphere implements IPropertyProvider {
     public void addPropertiesToList(List<Property> properties) {
         properties.add(turbidity);
         properties.add(colorExp);
+    }
+
+    public Vector3f getQuantizedSunDirection(float stepSize) {
+        float sunAngle = (float) Math.floor(getSunPosAngle() * stepSize) / stepSize + 0.0001f;
+        Vector3f sunDirection = new Vector3f(0.0f, (float) Math.cos(sunAngle), (float) Math.sin(sunAngle));
+
+        // Moonlight flip
+        if (sunDirection.y < 0.0f) {
+            sunDirection.scale(-1.0f);
+        }
+
+        return sunDirection;
+    }
+
+    public Vector3f getSunDirection(boolean moonlightFlip) {
+        float sunAngle = getSunPosAngle() + 0.0001f;
+        Vector3f sunDirection = new Vector3f(0.0f, (float) java.lang.Math.cos(sunAngle), (float) java.lang.Math.sin(sunAngle));
+
+        // Moonlight flip
+        if (moonlightFlip && sunDirection.y < 0.0f) {
+            sunDirection.scale(-1.0f);
+        }
+
+        return sunDirection;
     }
 }

@@ -36,7 +36,7 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 public class ShaderParametersSSAO extends ShaderParametersBase {
 
     Property ssaoStrength = new Property("ssaoStrength", 0.08f, 0.0f, 1.0f);
-    Property ssaoTotalStrength = new Property("ssaoTotalStrength", 1.5f, 0.0f, 4.0f);
+    Property ssaoTotalStrength = new Property("ssaoTotalStrength", 2.0f, 0.0f, 4.0f);
     Property ssaoFalloff = new Property("ssaoFalloff", 0.0f, 0.0f, 0.0001f);
     Property ssaoRad = new Property("ssaoRad", 0.02f, 0.00f, 0.2f);
 
@@ -46,7 +46,7 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
     public void applyParameters(ShaderProgram program) {
         super.applyParameters(program);
 
-        PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("scene");
+        PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("sceneOpaque");
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         scene.bindDepthTexture();
@@ -65,7 +65,7 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
         program.setFloat("ssaoRad", (Float) ssaoRad.getValue());
 
         FloatBuffer rtSize = BufferUtils.createFloatBuffer(2);
-        rtSize.put((float) scene._width).put((float) scene._height);
+        rtSize.put((float) scene.width).put((float) scene.height);
         rtSize.flip();
 
         program.setFloat2("renderTargetSize", rtSize);

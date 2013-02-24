@@ -15,21 +15,14 @@
  */
 package org.terasology.world.chunks;
 
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
-import java.text.DecimalFormat;
-import java.util.Map;
-import java.util.concurrent.locks.ReentrantLock;
-
-import javax.vecmath.Vector3f;
-
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.AdvancedConfig;
+import org.terasology.config.Config;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.manager.Config;
 import org.terasology.math.AABB;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
@@ -41,13 +34,18 @@ import org.terasology.world.chunks.blockdata.TeraArray;
 import org.terasology.world.chunks.blockdata.TeraArrays;
 import org.terasology.world.chunks.blockdata.TeraDenseArray4Bit;
 import org.terasology.world.chunks.blockdata.TeraDenseArray8Bit;
-import org.terasology.world.chunks.deflate.TeraStandardDeflator;
 import org.terasology.world.chunks.deflate.TeraDeflator;
+import org.terasology.world.chunks.deflate.TeraStandardDeflator;
 import org.terasology.world.liquid.LiquidData;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
+import javax.vecmath.Vector3f;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.text.DecimalFormat;
+import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Chunks are the basic components of the world. Each chunk contains a fixed amount of blocks
@@ -62,35 +60,35 @@ import com.google.common.collect.Maps;
  */
 public class Chunk implements Externalizable {
     protected static final Logger logger = LoggerFactory.getLogger(Chunk.class);
-    
+
     public static final long serialVersionUID = 79881925217704826L;
-    
+
     public static enum State {
         ADJACENCY_GENERATION_PENDING(ChunksProtobuf.State.ADJACENCY_GENERATION_PENDING),
         INTERNAL_LIGHT_GENERATION_PENDING(ChunksProtobuf.State.INTERNAL_LIGHT_GENERATION_PENDING),
         LIGHT_PROPAGATION_PENDING(ChunksProtobuf.State.LIGHT_PROPAGATION_PENDING),
         FULL_LIGHT_CONNECTIVITY_PENDING(ChunksProtobuf.State.FULL_LIGHT_CONNECTIVITY_PENDING),
         COMPLETE(ChunksProtobuf.State.COMPLETE);
-        
+
         private final ChunksProtobuf.State protobufState;
-        
+
         private static final Map<ChunksProtobuf.State, State> lookup;
-        
+
         static {
             lookup = Maps.newHashMap();
             for (State s : State.values()) {
                 lookup.put(s.protobufState, s);
             }
         }
-        
+
         private State(ChunksProtobuf.State protobufState) {
             this.protobufState = Preconditions.checkNotNull(protobufState);
         }
-        
+
         public final ChunksProtobuf.State getProtobufState() {
             return protobufState;
         }
-        
+
         public static final State lookup(ChunksProtobuf.State state) {
             State result = lookup.get(Preconditions.checkNotNull(state, "The parameter 'state' must not be null"));
             if (result == null)
@@ -107,7 +105,7 @@ public class Chunk implements Externalizable {
     public static final int INNER_CHUNK_POS_FILTER_Z = TeraMath.ceilPowerOfTwo(SIZE_Z) - 1;
     public static final int POWER_X = TeraMath.sizeOfPower(SIZE_X);
     public static final int POWER_Z = TeraMath.sizeOfPower(SIZE_Z);
-    public static final int VERTICAL_SEGMENTS = Config.getInstance().getVerticalChunkMeshSegments();
+    public static final int VERTICAL_SEGMENTS = CoreRegistry.get(Config.class).getSystem().getVerticalChunkMeshSegments();
     public static final byte MAX_LIGHT = 0x0f;
     public static final byte MAX_LIQUID_DEPTH = 0x07;
 
@@ -165,7 +163,7 @@ public class Chunk implements Externalizable {
         chunkState = other.chunkState;
         dirty = true;
     }
-    
+
     public Chunk(Vector3i pos, State chunkState, TeraArray blocks, TeraArray sunlight, TeraArray light, TeraArray liquid) {
         this.pos.set(Preconditions.checkNotNull(pos));
         this.blockData = Preconditions.checkNotNull(blocks);
@@ -175,13 +173,12 @@ public class Chunk implements Externalizable {
         this.chunkState = Preconditions.checkNotNull(chunkState);
         dirty = true;
     }
-    
+
     /**
      * ProtobufHandler implements support for encoding/decoding chunks into/from protobuf messages.
-     * 
+     *
      * @author Manuel Brotz <manu.brotz@gmx.ch>
      * @todo Add support for chunk data extensions.
-     *
      */
     public static class ProtobufHandler implements org.terasology.io.ProtobufHandler<Chunk, ChunksProtobuf.Chunk> {
 
@@ -196,7 +193,7 @@ public class Chunk implements Externalizable {
                     .setSunlightData(t.encode(chunk.sunlightData))
                     .setLightData(t.encode(chunk.lightData))
                     .setExtraData(t.encode(chunk.extraData));
-            return b.build(); 
+            return b.build();
         }
 
         @Override
@@ -270,17 +267,17 @@ public class Chunk implements Externalizable {
             unlock();
         }
     }
-    
+
     public int getEstimatedMemoryConsumptionInBytes() {
         return blockData.getEstimatedMemoryConsumptionInBytes() + sunlightData.getEstimatedMemoryConsumptionInBytes() + lightData.getEstimatedMemoryConsumptionInBytes() + extraData.getEstimatedMemoryConsumptionInBytes();
     }
 
     public Block getBlock(Vector3i pos) {
-        return BlockManager.getInstance().getBlock((byte)blockData.get(pos.x, pos.y, pos.z));
+        return BlockManager.getInstance().getBlock((byte) blockData.get(pos.x, pos.y, pos.z));
     }
 
     public Block getBlock(int x, int y, int z) {
-        return BlockManager.getInstance().getBlock((byte)blockData.get(x, y, z));
+        return BlockManager.getInstance().getBlock((byte) blockData.get(x, y, z));
     }
 
     public boolean setBlock(int x, int y, int z, Block block) {
@@ -440,18 +437,19 @@ public class Chunk implements Externalizable {
         lightData = (TeraArray) in.readObject();
         extraData = (TeraArray) in.readObject();
     }
-    
+
     private static DecimalFormat fpercent = new DecimalFormat("0.##");
     private static DecimalFormat fsize = new DecimalFormat("#,###");
+
     public void deflate() {
         if (getChunkState() != State.COMPLETE) {
             logger.warn("Before deflation the state of the chunk ({}, {}, {}) should be set to State.COMPLETE but is now State.{}", getPos().x, getPos().y, getPos().z, getChunkState().toString());
         }
         lock();
         try {
-            AdvancedConfig config = CoreRegistry.get(org.terasology.config.Config.class).getAdvancedConfig();
+            AdvancedConfig config = CoreRegistry.get(org.terasology.config.Config.class).getAdvanced();
             final TeraDeflator def = new TeraStandardDeflator();
-            
+
             if (config.isChunkDeflationLoggingEnabled()) {
                 int blocksSize = blockData.getEstimatedMemoryConsumptionInBytes();
                 int sunlightSize = sunlightData.getEstimatedMemoryConsumptionInBytes();
@@ -487,7 +485,7 @@ public class Chunk implements Externalizable {
             unlock();
         }
     }
-    
+
     public void inflate() {
         lock();
         try {

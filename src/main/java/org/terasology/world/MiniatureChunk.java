@@ -15,7 +15,8 @@
  */
 package org.terasology.world;
 
-import org.terasology.logic.manager.Config;
+import org.terasology.config.Config;
+import org.terasology.game.CoreRegistry;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.world.chunks.Chunk;
@@ -38,7 +39,7 @@ public class MiniatureChunk extends Chunk {
     public static final int INNER_CHUNK_POS_FILTER_Z = TeraMath.ceilPowerOfTwo(SIZE_Z) - 1;
     public static final int POWER_X = TeraMath.sizeOfPower(SIZE_X);
     public static final int POWER_Z = TeraMath.sizeOfPower(SIZE_Z);
-    public static final int VERTICAL_SEGMENTS = Config.getInstance().getVerticalChunkMeshSegments();
+    public static final int VERTICAL_SEGMENTS = CoreRegistry.get(Config.class).getSystem().getVerticalChunkMeshSegments();
     public static final byte MAX_LIGHT = 0x0f;
 
     public static final Vector3i CHUNK_POWER = new Vector3i(POWER_X, 0, POWER_Z);

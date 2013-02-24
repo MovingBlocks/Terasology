@@ -16,6 +16,22 @@
 
 package org.terasology.rendering.assets;
 
+import com.google.common.collect.Maps;
+import com.google.common.io.CharStreams;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL20;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.asset.Asset;
+import org.terasology.asset.AssetUri;
+import org.terasology.config.Config;
+import org.terasology.game.CoreRegistry;
+import org.terasology.rendering.assets.metadata.ParamMetadata;
+import org.terasology.rendering.assets.metadata.ParamType;
+import org.terasology.rendering.assets.metadata.ShaderMetadata;
+import org.terasology.world.block.Block;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -24,30 +40,14 @@ import java.nio.IntBuffer;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.asset.Asset;
-import org.terasology.asset.AssetUri;
-import org.terasology.logic.manager.Config;
-import org.terasology.rendering.assets.metadata.ParamMetadata;
-import org.terasology.rendering.assets.metadata.ParamType;
-import org.terasology.rendering.assets.metadata.ShaderMetadata;
-import org.terasology.world.block.Block;
-
-import com.google.common.collect.Maps;
-import com.google.common.io.CharStreams;
-
 /**
  * @author Immortius
  */
-public class Shader implements Asset {
+public class MaterialShader implements Asset {
     private static final String PreProcessorPreamble = "#version 120\n float TEXTURE_OFFSET = " + Block.TEXTURE_OFFSET + ";\n";
     private static String IncludedFunctionsVertex = "", IncludedFunctionsFragment = "";
 
-    private static final Logger logger = LoggerFactory.getLogger(Shader.class);
+    private static final Logger logger = LoggerFactory.getLogger(MaterialShader.class);
 
     private final AssetUri uri;
     private String vertShader;
@@ -58,8 +58,7 @@ public class Shader implements Asset {
     private boolean valid = false;
     private Map<String, ParamType> params = Maps.newHashMap();
 
-
-    public Shader(AssetUri uri, String vertShader, String fragShader, ShaderMetadata metadata) {
+    public MaterialShader(AssetUri uri, String vertShader, String fragShader, ShaderMetadata metadata) {
         this.uri = uri;
 
         this.vertShader = vertShader;
@@ -206,33 +205,33 @@ public class Shader implements Asset {
     }
 
     public static StringBuilder createShaderBuilder() {
+        Config config = CoreRegistry.get(Config.class);
         StringBuilder builder = new StringBuilder().append(PreProcessorPreamble);
-        if (Config.getInstance().isAnimatedGrass())
+        if (config.getRendering().isAnimateGrass())
             builder.append("#define ANIMATED_GRASS \n");
-        if (Config.getInstance().isAnimatedWater()) {
+        if (config.getRendering().isAnimateWater()) {
             builder.append("#define ANIMATED_WATER \n");
-            builder.append("#define OCEAN_OCTAVES " + Config.getInstance().getOceanOctaves() + " \n");
         }
-        if (Config.getInstance().isRefractiveWater())
-            builder.append("#define REFRACTIVE_WATER \n");
-        if (Config.getInstance().getBlurIntensity() == 0)
+        if (config.getRendering().getBlurIntensity() == 0)
             builder.append("#define NO_BLUR \n");
-        if (Config.getInstance().isFlickeringLight())
+        if (config.getRendering().isFlickeringLight())
             builder.append("#define FLICKERING_LIGHT \n");
-        if (Config.getInstance().isVignette())
+        if (config.getRendering().isVignette())
             builder.append("#define VIGNETTE \n");
-        if (Config.getInstance().isBloom())
+        if (config.getRendering().isBloom())
             builder.append("#define BLOOM \n");
-        if (Config.getInstance().isMotionBlur())
+        if (config.getRendering().isMotionBlur())
             builder.append("#define MOTION_BLUR \n");
-        if (Config.getInstance().isSSAO())
+        if (config.getRendering().isSsao())
             builder.append("#define SSAO \n");
-        if (Config.getInstance().isFilmGrain())
+        if (config.getRendering().isFilmGrain())
             builder.append("#define FILM_GRAIN \n");
-        if (Config.getInstance().isOutline())
+        if (config.getRendering().isOutline())
             builder.append("#define OUTLINE \n");
-        if (Config.getInstance().isLightShafts())
+        if (config.getRendering().isLightShafts())
             builder.append("#define LIGHT_SHAFTS \n");
+        if (config.getRendering().isDynamicShadows())
+            builder.append("#define DYNAMIC_SHADOWS \n");
         return builder;
     }
 
@@ -245,8 +244,8 @@ public class Shader implements Asset {
     }
 
     static {
-        InputStream vertStream = Shader.class.getClassLoader().getResourceAsStream("org/terasology/include/globalFunctionsVertIncl.glsl");
-        InputStream fragStream = Shader.class.getClassLoader().getResourceAsStream("org/terasology/include/globalFunctionsFragIncl.glsl");
+        InputStream vertStream = MaterialShader.class.getClassLoader().getResourceAsStream("org/terasology/include/globalFunctionsVertIncl.glsl");
+        InputStream fragStream = MaterialShader.class.getClassLoader().getResourceAsStream("org/terasology/include/globalFunctionsFragIncl.glsl");
         try {
             IncludedFunctionsVertex = CharStreams.toString(new InputStreamReader(vertStream));
             IncludedFunctionsFragment = CharStreams.toString(new InputStreamReader(fragStream));

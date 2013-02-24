@@ -17,12 +17,12 @@ package org.terasology.rendering.gui.windows;
 
 import com.google.common.collect.Lists;
 import org.terasology.asset.Assets;
-import org.terasology.config.InputConfig;
+import org.terasology.config.BindsConfig;
+import org.terasology.config.Config;
 import org.terasology.game.CoreRegistry;
 import org.terasology.input.Input;
 import org.terasology.input.InputType;
 import org.terasology.input.events.KeyEvent;
-import org.terasology.logic.manager.Config;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ChangedListener;
 import org.terasology.rendering.gui.framework.events.ClickListener;
@@ -32,8 +32,8 @@ import org.terasology.rendering.gui.layout.GridLayout;
 import org.terasology.rendering.gui.widgets.UIButton;
 import org.terasology.rendering.gui.widgets.UIComposite;
 import org.terasology.rendering.gui.widgets.UIImage;
-import org.terasology.rendering.gui.widgets.UISlider;
 import org.terasology.rendering.gui.widgets.UILabel;
+import org.terasology.rendering.gui.widgets.UISlider;
 import org.terasology.rendering.gui.widgets.UIWindow;
 
 import javax.vecmath.Vector2f;
@@ -98,6 +98,8 @@ public final class UIMenuConfigControls extends UIWindow {
     UIButton editButton = null;
     final UIImage title;
 
+    private final Config config = CoreRegistry.get(Config.class);
+
     private final UIButton backToConfigMenuButton;
     private final UIButton defaultButton;
 
@@ -112,7 +114,7 @@ public final class UIMenuConfigControls extends UIWindow {
         setBackgroundImage("engine:loadingbackground");
         setModal(true);
         maximize();
-        
+
         addMouseButtonListener(new MouseButtonListener() {
             @Override
             public void wheel(UIDisplayElement element, int wheel, boolean intersect) {
@@ -121,12 +123,12 @@ public final class UIMenuConfigControls extends UIWindow {
                     editButton = null;
                 }
             }
-            
+
             @Override
             public void up(UIDisplayElement element, int button, boolean intersect) {
-                
+
             }
-            
+
             @Override
             public void down(UIDisplayElement element, int button, boolean intersect) {
                 if (editButton != null) {
@@ -135,7 +137,7 @@ public final class UIMenuConfigControls extends UIWindow {
                 }
             }
         });
-        
+
         addKeyListener(new KeyListener() {
             @Override
             public void key(UIDisplayElement element, KeyEvent event) {
@@ -145,7 +147,7 @@ public final class UIMenuConfigControls extends UIWindow {
                 }
             }
         });
-        
+
         ClickListener editButtonClick = new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
@@ -213,29 +215,29 @@ public final class UIMenuConfigControls extends UIWindow {
             public void changed(UIDisplayElement element) {
                 UISlider slider = (UISlider) element;
                 slider.setText("Mouse Sensitivity: " + String.valueOf(slider.getValue()));
-                Config.getInstance().setMouseSens((float) slider.getValue() / 1000f);
+                config.getInput().setMouseSensitivity((float) slider.getValue() / 1000f);
             }
         });
-        mouseSensitivity.setValue((int) (Config.getInstance().getMouseSens() * 1000));
+        mouseSensitivity.setValue((int) (config.getInput().getMouseSensitivity() * 1000));
         defaultButton = new UIButton(new Vector2f(128f, 32f), UIButton.ButtonType.NORMAL);
         defaultButton.getLabel().setText("Default");
         defaultButton.setHorizontalAlign(EHorizontalAlign.CENTER);
         defaultButton.setPosition(new Vector2f(-30f, 570f));
         defaultButton.setVisible(true);
-        defaultButton.addClickListener(new ClickListener() {    
+        defaultButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                CoreRegistry.get(org.terasology.config.Config.class).getInputConfig().setInputs(InputConfig.createDefault());
-                Config.getInstance().setMouseSens(0.075f);
-                
+                CoreRegistry.get(org.terasology.config.Config.class).getInputConfig().getBinds().setInputs(BindsConfig.createDefault());
+                config.getInput().setMouseSensitivity(0.075f);
+
                 setup();
-                mouseSensitivity.setValue((int) (Config.getInstance().getMouseSens() * 1000));
+                mouseSensitivity.setValue((int) (config.getInput().getMouseSensitivity() * 1000));
             }
         });
 
         GridLayout layout = new GridLayout(4);
         layout.setCellPadding(new Vector4f(0f, 20f, 0f, 20f));
-        
+
         container = new UIComposite();
         container.setHorizontalAlign(EHorizontalAlign.CENTER);
         container.setPosition(new Vector2f(0f, 170f));
@@ -252,22 +254,22 @@ public final class UIMenuConfigControls extends UIWindow {
         addDisplayElement(mouseSensitivity);
         addDisplayElement(defaultButton);
         addDisplayElement(backToConfigMenuButton);
-        
+
         setup();
     }
-    
+
     private void changeButton(UIButton button, Input input) {
         String bindId = button.getUserData().toString();
-        CoreRegistry.get(org.terasology.config.Config.class).getInputConfig().setInputs(bindId, input);
+        CoreRegistry.get(org.terasology.config.Config.class).getInputConfig().getBinds().setInputs(bindId, input);
 
         editButton.getLabel().setText(input.toShortString());
     }
 
     public void setup() {
-        InputConfig inputConfig = CoreRegistry.get(org.terasology.config.Config.class).getInputConfig();
+        BindsConfig bindsConfig = CoreRegistry.get(org.terasology.config.Config.class).getInputConfig().getBinds();
         for (UIButton button : inputButtons) {
             String bindId = button.getUserData().toString();
-            Collection<Input> inputs = inputConfig.getInputs(bindId);
+            Collection<Input> inputs = bindsConfig.getInputs(bindId);
             if (inputs.size() > 0) {
                 // TODO: Support multiple binds?
                 button.getLabel().setText(inputs.iterator().next().toShortString());

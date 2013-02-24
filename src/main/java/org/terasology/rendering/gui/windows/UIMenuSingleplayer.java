@@ -17,13 +17,12 @@ package org.terasology.rendering.gui.windows;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.Config;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.modes.StateLoading;
-import org.terasology.game.modes.StateSinglePlayer;
 import org.terasology.game.types.GameType;
 import org.terasology.game.types.SurvivalType;
-import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
@@ -171,9 +170,10 @@ public class UIMenuSingleplayer extends UIWindow {
                 CoreRegistry.put(GameType.class, new SurvivalType());
             }
 
-            Config.getInstance().setDefaultSeed(info.getSeed());
-            Config.getInstance().setWorldTitle(info.getTitle());
-            Config.getInstance().setChunkGenerator(info.getChunkGenerators());
+            Config config = CoreRegistry.get(Config.class);
+
+            config.getWorldGeneration().setDefaultSeed(info.getSeed());
+            config.getWorldGeneration().setWorldTitle(info.getTitle());
             CoreRegistry.get(GameEngine.class).changeState(new StateLoading(info));
         } catch (Exception e) {
             getGUIManager().showMessage("Error", "Failed reading world data object. Sorry.");

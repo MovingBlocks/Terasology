@@ -16,9 +16,9 @@
 package org.terasology.rendering.gui.windows;
 
 import org.terasology.asset.Assets;
-import org.newdawn.slick.Color;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.LocalPlayerComponent;
+import org.terasology.config.Config;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventHandlerSystem;
@@ -31,11 +31,13 @@ import org.terasology.game.GameEngine;
 import org.terasology.game.Timer;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.logic.LocalPlayer;
-import org.terasology.logic.manager.Config;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.VisibilityListener;
-import org.terasology.rendering.gui.layout.ChooseRowLayout;
-import org.terasology.rendering.gui.widgets.*;
+import org.terasology.rendering.gui.widgets.UIImage;
+import org.terasology.rendering.gui.widgets.UIItemCell;
+import org.terasology.rendering.gui.widgets.UIItemContainer;
+import org.terasology.rendering.gui.widgets.UILabel;
+import org.terasology.rendering.gui.widgets.UIWindow;
 import org.terasology.rendering.primitives.ChunkTessellator;
 import org.terasology.rendering.world.WorldRenderer;
 
@@ -65,6 +67,8 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
 
     private final UIImage leftGearWheel;
     private final UIImage rightGearWheel;
+
+    private final Config config = CoreRegistry.get(Config.class);
 
     /**
      * Init. the HUD.
@@ -156,7 +160,6 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
         );
 
 
-
         addDisplayElement(crosshair);
         addDisplayElement(rightGearWheel);
         addDisplayElement(leftGearWheel);
@@ -177,7 +180,7 @@ public class UIScreenHUD extends UIWindow implements EventHandlerSystem {
     public void update() {
         super.update();
 
-        boolean enableDebug = Config.getInstance().isDebug();
+        boolean enableDebug = config.getSystem().isDebugEnabled();
         debugLine1.setVisible(enableDebug);
         debugLine2.setVisible(enableDebug);
         debugLine3.setVisible(enableDebug);

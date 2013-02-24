@@ -30,8 +30,6 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.AssetSource;
 import org.terasology.asset.sources.ArchiveSource;
 import org.terasology.asset.sources.DirectorySource;
-import org.terasology.asset.sources.NullSource;
-import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PathManager;
 
 import java.io.File;
@@ -200,14 +198,6 @@ public class ModManager {
 
         activeModClassLoader = null;
         allReflections = null;
-
-        //TODO: Remove this from here
-        for (String activeModId : Config.getInstance().getActiveMods()) {
-            Mod mod = mods.get(activeModId);
-            if (mod != null) {
-                mod.setEnabled(true);
-            }
-        }
     }
 
     public void applyActiveMods() {

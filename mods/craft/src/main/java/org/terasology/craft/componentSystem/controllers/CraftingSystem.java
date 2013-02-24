@@ -617,4 +617,9 @@ public class CraftingSystem implements UpdateSubscriberSystem, RenderSystem, Eve
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    @Override
+    public void renderShadows() {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
 }

@@ -21,7 +21,7 @@ import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 
 import javax.vecmath.Vector3d;
-import javax.vecmath.Vector4d;
+import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 import java.util.List;
 
@@ -66,11 +66,8 @@ public class ShaderParametersSky extends ShaderParametersBase {
         if (worldProvider != null && worldRenderer != null) {
             program.setFloat("colorExp", (Float) worldRenderer.getSkysphere().getColorExp().getValue());
 
-            float sunAngle = worldRenderer.getSkysphere().getSunPosAngle();
-            Vector4d sunNormalise = new Vector4d(0.0f, java.lang.Math.cos(sunAngle), java.lang.Math.sin(sunAngle), 1.0);
-            sunNormalise.normalize();
-
-            Vector3d zenithColor = getAllWeatherZenith((float) sunNormalise.y, (Float) worldRenderer.getSkysphere().getTurbidity().getValue());
+            Vector3f sunDirection = worldRenderer.getSkysphere().getSunDirection(false);
+            Vector3d zenithColor = getAllWeatherZenith(sunDirection.y, (Float) worldRenderer.getSkysphere().getTurbidity().getValue());
 
             program.setFloat("sunAngle", worldRenderer.getSkysphere().getSunPosAngle());
             program.setFloat("turbidity", (Float) worldRenderer.getSkysphere().getTurbidity().getValue());

@@ -13,19 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.terasology.rendering.shader;
 
-uniform sampler2D texScene;
-#ifdef LIGHT_SHAFTS
-uniform sampler2D texLightShafts;
-#endif
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
+import org.terasology.config.Config;
+import org.terasology.game.CoreRegistry;
+import org.terasology.rendering.cameras.Camera;
+import org.terasology.rendering.world.WorldRenderer;
 
-void main() {
-    vec4 color = texture2D(texScene, gl_TexCoord[0].xy);
+import static org.lwjgl.opengl.GL11.glBindTexture;
 
-#ifdef LIGHT_SHAFTS
-    vec4 colorShafts = texture2D(texLightShafts, gl_TexCoord[0].xy);
-    color.rgb += colorShafts.rgb;
-#endif
+/**
+ * Shader parameters for the Shadow Map shader program.
+ *
+ * @author Benjamin Glatzel <benjamin.glatzel@me.com>
+ */
+public class ShaderParametersShadowMap extends ShaderParametersBase {
 
-    gl_FragData[0].rgba = color.rgba;
+    public void applyParameters(ShaderProgram program) {
+        super.applyParameters(program);
+    }
+
 }

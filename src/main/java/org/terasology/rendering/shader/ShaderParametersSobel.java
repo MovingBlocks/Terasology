@@ -21,8 +21,6 @@ import org.terasology.logic.manager.PostProcessingRenderer;
 
 import java.util.List;
 
-import static org.lwjgl.opengl.GL11.glBindTexture;
-
 /**
  * Shader parameters for the Post-processing shader program.
  *
@@ -30,8 +28,8 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
  */
 public class ShaderParametersSobel extends ShaderParametersBase {
 
-    Property pixelOffsetX = new Property("pixelOffsetX", 1.0f, 0.0f, 16.0f);
-    Property pixelOffsetY = new Property("pixelOffsetY", 1.0f, 0.0f, 16.0f);
+    Property pixelOffsetX = new Property("pixelOffsetX", 1.25f, 0.0f, 16.0f);
+    Property pixelOffsetY = new Property("pixelOffsetY", 1.25f, 0.0f, 16.0f);
 
     Property threshold = new Property("threshold", 16.0f, 0.0f, 16.0f);
 
@@ -39,13 +37,13 @@ public class ShaderParametersSobel extends ShaderParametersBase {
     public void applyParameters(ShaderProgram program) {
         super.applyParameters(program);
 
-        PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("scene");
+        PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("sceneOpaque");
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         scene.bindDepthTexture();
         program.setInt("texDepth", 0);
 
-        program.setFloat("texelWidth", 1.0f / scene._width);
-        program.setFloat("texelHeight", 1.0f / scene._height);
+        program.setFloat("texelWidth", 1.0f / scene.width);
+        program.setFloat("texelHeight", 1.0f / scene.height);
 
         program.setFloat("pixelOffsetX", (Float) pixelOffsetX.getValue());
         program.setFloat("pixelOffsetY", (Float) pixelOffsetY.getValue());

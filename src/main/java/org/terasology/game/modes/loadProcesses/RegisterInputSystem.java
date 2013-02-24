@@ -20,8 +20,8 @@ import org.lwjgl.input.Keyboard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.componentSystem.controllers.LocalPlayerSystem;
+import org.terasology.config.BindsConfig;
 import org.terasology.config.Config;
-import org.terasology.config.InputConfig;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.modes.LoadProcess;
@@ -66,20 +66,20 @@ public class RegisterInputSystem implements LoadProcess {
         componentSystemManager.register(cameraTargetSystem, "engine:CameraTargetSystem");
 
         InputSystem inputSystem = new InputSystem();
-        InputConfig inputConfig = CoreRegistry.get(Config.class).getInputConfig();
+        BindsConfig bindsConfig = CoreRegistry.get(Config.class).getInputConfig().getBinds();
         CoreRegistry.put(InputSystem.class, inputSystem);
         componentSystemManager.register(inputSystem, "engine:InputSystem");
 
-        registerButtonBinds(inputSystem, ModManager.ENGINE_PACKAGE, modManager.getEngineReflections().getTypesAnnotatedWith(RegisterBindButton.class), inputConfig);
+        registerButtonBinds(inputSystem, ModManager.ENGINE_PACKAGE, modManager.getEngineReflections().getTypesAnnotatedWith(RegisterBindButton.class), bindsConfig);
         registerAxisBinds(inputSystem, ModManager.ENGINE_PACKAGE, modManager.getEngineReflections().getTypesAnnotatedWith(RegisterBindAxis.class));
         for (Mod mod : modManager.getActiveMods()) {
             if (mod.isCodeMod()) {
-                registerButtonBinds(inputSystem, mod.getModInfo().getId(), mod.getReflections().getTypesAnnotatedWith(RegisterBindButton.class), inputConfig);
+                registerButtonBinds(inputSystem, mod.getModInfo().getId(), mod.getReflections().getTypesAnnotatedWith(RegisterBindButton.class), bindsConfig);
                 registerAxisBinds(inputSystem, mod.getModInfo().getId(), mod.getReflections().getTypesAnnotatedWith(RegisterBindAxis.class));
             }
         }
 
-        registerToolbarShortcuts(inputSystem, inputConfig);
+        registerToolbarShortcuts(inputSystem, bindsConfig);
         return true;
     }
 
@@ -88,14 +88,14 @@ public class RegisterInputSystem implements LoadProcess {
         return 1;
     }
 
-    private void registerToolbarShortcuts(InputSystem inputSystem, InputConfig inputConfig) {
+    private void registerToolbarShortcuts(InputSystem inputSystem, BindsConfig bindsConfig) {
         // Manually register toolbar shortcut keys
         // TODO: Put this elsewhere? (Maybe under gametype) And give mods a similar opportunity
         for (int i = 0; i < 10; ++i) {
             String inventorySlotBind = "engine:toolbarSlot" + i;
             inputSystem.registerBindButton(inventorySlotBind, "Inventory Slot " + (i + 1), new ToolbarSlotButton(i));
-            if (inputConfig.hasInputs(inventorySlotBind)) {
-                for (Input input : inputConfig.getInputs(inventorySlotBind)) {
+            if (bindsConfig.hasInputs(inventorySlotBind)) {
+                for (Input input : bindsConfig.getInputs(inventorySlotBind)) {
                     inputSystem.linkBindButtonToInput(input, inventorySlotBind);
                 }
             } else {
@@ -135,7 +135,7 @@ public class RegisterInputSystem implements LoadProcess {
         }
     }
 
-    private void registerButtonBinds(InputSystem inputSystem, String packageName, Iterable<Class<?>> classes, InputConfig config) {
+    private void registerButtonBinds(InputSystem inputSystem, String packageName, Iterable<Class<?>> classes, BindsConfig config) {
         String prefix = packageName.toLowerCase(Locale.ENGLISH) + ":";
         for (Class registerBindClass : classes) {
             RegisterBindButton info = (RegisterBindButton) registerBindClass.getAnnotation(RegisterBindButton.class);

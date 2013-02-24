@@ -91,12 +91,12 @@ public class BlockLoader {
     public BlockLoader() {
         parser = new JsonParser();
         gson = new GsonBuilder()
-                .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
-                .registerTypeAdapter(BlockDefinition.Tiles.class, new BlockTilesDefinitionHandler())
-                .registerTypeAdapter(BlockDefinition.ColorSources.class, new BlockColorSourceDefinitionHandler())
-                .registerTypeAdapter(BlockDefinition.ColorOffsets.class, new BlockColorOffsetDefinitionHandler())
-                .registerTypeAdapter(Vector4f.class, new Vector4fHandler())
-                .create();
+            .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
+            .registerTypeAdapter(BlockDefinition.Tiles.class, new BlockTilesDefinitionHandler())
+            .registerTypeAdapter(BlockDefinition.ColorSources.class, new BlockColorSourceDefinitionHandler())
+            .registerTypeAdapter(BlockDefinition.ColorOffsets.class, new BlockColorOffsetDefinitionHandler())
+            .registerTypeAdapter(Vector4f.class, new Vector4fHandler())
+            .create();
         cubeShape = (BlockShape) Assets.get(new AssetUri(AssetType.SHAPE, "engine:cube"));
         loweredShape = (BlockShape) Assets.get(new AssetUri(AssetType.SHAPE, "engine:loweredCube"));
         trimmedLoweredShape = (BlockShape) Assets.get(new AssetUri(AssetType.SHAPE, "engine:trimmedLoweredCube"));
@@ -219,7 +219,7 @@ public class BlockLoader {
                 ImageIO.write(image, "png", bos);
                 PNGDecoder decoder = new PNGDecoder(new ByteArrayInputStream(bos.toByteArray()));
                 ByteBuffer buf = ByteBuffer.allocateDirect(4 * decoder.getWidth() * decoder.getHeight());
-                decoder.decode(buf, decoder.getWidth() * 4, PNGDecoder.RGBA);
+                decoder.decode(buf, decoder.getWidth() * 4, PNGDecoder.Format.RGBA);
                 buf.flip();
                 data[i] = buf;
             } catch (IOException e) {
@@ -369,12 +369,10 @@ public class BlockLoader {
             for ( JsonElement element : blockTypes.getAsJsonArray() ){
                 JsonObject typeDefJson = element.getAsJsonObject();
 
-                BlockAdjacentType type = null;
-
                 if ( !typeDefJson.has("type") ){
                     throw new IllegalArgumentException("Block type is empty");
                 }
-                type = gson.fromJson(typeDefJson.get("type"), BlockAdjacentType.class);
+                BlockAdjacentType type = gson.fromJson(typeDefJson.get("type"), BlockAdjacentType.class);
 
                 if ( type == null ){
                     throw new IllegalArgumentException("Invalid type block: " + gson.fromJson(typeDefJson.get("type"), String.class));
@@ -773,6 +771,7 @@ public class BlockLoader {
     }
 
     public static class CaseInsensitiveEnumTypeAdapterFactory implements TypeAdapterFactory {
+        @Override
         public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
             Class<T> rawType = (Class<T>) type.getRawType();
             if (!rawType.isEnum()) {

@@ -21,7 +21,6 @@ import org.terasology.config.ModConfig;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.modes.StateLoading;
-import org.terasology.game.modes.StateSinglePlayer;
 import org.terasology.game.types.FreeStyleType;
 import org.terasology.game.types.GameType;
 import org.terasology.game.types.SurvivalType;
@@ -38,7 +37,12 @@ import org.terasology.rendering.gui.widgets.UIText;
 import org.terasology.rendering.gui.windows.UIMenuSingleplayer;
 import org.terasology.utilities.FastRandom;
 import org.terasology.world.WorldInfo;
-import org.terasology.world.generator.core.*;
+import org.terasology.world.generator.core.BasicHMTerrainGenerator;
+import org.terasology.world.generator.core.FlatTerrainGenerator;
+import org.terasology.world.generator.core.FloraGenerator;
+import org.terasology.world.generator.core.ForestGenerator;
+import org.terasology.world.generator.core.MultiTerrainGenerator;
+import org.terasology.world.generator.core.PerlinTerrainGenerator;
 import org.terasology.world.liquid.LiquidsGenerator;
 
 import javax.vecmath.Vector2f;
@@ -74,7 +78,7 @@ public class UIDialogCreateNewWorld extends UIDialog {
         setTitle("Create new world");
 
         modConfig = new ModConfig();
-        modConfig.copy(CoreRegistry.get(Config.class).getDefaultModConfig());
+        modConfig.copy(CoreRegistry.get(Config.class).getDefaultModSelection());
     }
 
     @Override
@@ -189,6 +193,8 @@ public class UIDialogCreateNewWorld extends UIDialog {
         okButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
+                Config config = CoreRegistry.get(Config.class);
+
                 //validation of the input
                 if (inputWorldTitle.getText().isEmpty()) {
                     getGUIManager().showMessage("Error", "Please enter a world name");
@@ -204,16 +210,16 @@ public class UIDialogCreateNewWorld extends UIDialog {
 
                 //set the world settings
                 if (inputSeed.getText().length() > 0) {
-                    org.terasology.logic.manager.Config.getInstance().setDefaultSeed(inputSeed.getText());
+                    config.getWorldGeneration().setDefaultSeed(inputSeed.getText());
                 } else {
                     FastRandom random = new FastRandom();
-                    org.terasology.logic.manager.Config.getInstance().setDefaultSeed(random.randomCharacterString(32));
+                    config.getWorldGeneration().setDefaultSeed(random.randomCharacterString(32));
                 }
 
                 if (inputWorldTitle.getText().length() > 0) {
-                    org.terasology.logic.manager.Config.getInstance().setWorldTitle(inputWorldTitle.getText());
+                    config.getWorldGeneration().setWorldTitle(inputWorldTitle.getText());
                 } else {
-                    org.terasology.logic.manager.Config.getInstance().setWorldTitle(getWorldName());
+                    config.getWorldGeneration().setWorldTitle(getWorldName());
                 }
 
                 List<String> chunkList = new ArrayList<String>();
@@ -248,11 +254,10 @@ public class UIDialogCreateNewWorld extends UIDialog {
                 }
 
                 String[] chunksListArr = chunkList.toArray(new String[chunkList.size()]);
-                org.terasology.logic.manager.Config.getInstance().setChunkGenerator(chunksListArr);
-                CoreRegistry.get(Config.class).getDefaultModConfig().copy(modConfig);
+                CoreRegistry.get(Config.class).getDefaultModSelection().copy(modConfig);
                 CoreRegistry.get(Config.class).save();
 
-                CoreRegistry.get(GameEngine.class).changeState(new StateLoading(new WorldInfo(org.terasology.logic.manager.Config.getInstance().getWorldTitle(), org.terasology.logic.manager.Config.getInstance().getDefaultSeed(), org.terasology.logic.manager.Config.getInstance().getDayNightLengthInMs() / 4, chunksListArr, CoreRegistry.get(GameType.class).getClass().toString(), modConfig)));
+                CoreRegistry.get(GameEngine.class).changeState(new StateLoading(new WorldInfo(config.getWorldGeneration().getWorldTitle(), config.getWorldGeneration().getDefaultSeed(), config.getSystem().getDayNightLengthInMs() / 4, chunksListArr, CoreRegistry.get(GameType.class).getClass().toString(), modConfig)));
             }
         });
 

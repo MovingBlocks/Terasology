@@ -14,18 +14,9 @@
  * limitations under the License.
  */
 
-uniform sampler2D texScene;
-#ifdef LIGHT_SHAFTS
-uniform sampler2D texLightShafts;
-#endif
+varying vec4 positionProj;
 
-void main() {
-    vec4 color = texture2D(texScene, gl_TexCoord[0].xy);
-
-#ifdef LIGHT_SHAFTS
-    vec4 colorShafts = texture2D(texLightShafts, gl_TexCoord[0].xy);
-    color.rgb += colorShafts.rgb;
-#endif
-
-    gl_FragData[0].rgba = color.rgba;
+void main(){
+    gl_FragData[0] = vec4(0.0);
+    gl_FragDepth = positionProj.z / positionProj.w;
 }

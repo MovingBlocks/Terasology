@@ -18,9 +18,12 @@
 /bin
 /data/console/consolelog.json
 /mods/*/classes
+/mods/*/testClasses
 /mods/*/build
 /mods/*/.*
 *~
+config.cfg
+entityDump.txt
 
 # Ignore error logs 
 *.log

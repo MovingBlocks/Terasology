@@ -22,23 +22,37 @@
 #define MOONLIGHT_AMBIENT_COLOR 0.8, 0.8, 1.0
 #define NIGHT_BRIGHTNESS 0.05
 #define WATER_COLOR_SWIMMING 0.8, 1.0, 1.0, 0.975
-#define WATER_COLOR 0.75, 0.8, 1.0, 1.0
+#define WATER_TINT 0.1, 0.41, 0.627, 1.0
 
 #define TORCH_WATER_SPEC 8.0
 #define TORCH_WATER_DIFF 0.7
 #define TORCH_BLOCK_SPEC 0.7
 #define TORCH_BLOCK_DIFF 1.0
-#define WATER_AMB 0.1
-#define WATER_SPEC 2.0
-#define WATER_DIFF 1.0
+
+#define WATER_AMB 0.25
+#define WATER_SPEC 4.0
+#define WATER_DIFF 0.75
+
 #define BLOCK_DIFF 0.75
 #define BLOCK_AMB 1.0
+
+#if defined (DYNAMIC_SHADOWS)
+uniform vec4 shadowSettingsFrag;
+#define shadowIntens shadowSettingsFrag.x
+#define shadowMapBias shadowSettingsFrag.y
+
+uniform sampler2D texSceneShadowMap;
+varying vec4 vertexLightProjPos;
+#endif
 
 varying vec4 vertexWorldPos;
 varying vec4 vertexViewPos;
 varying vec4 vertexProjPos;
 varying vec3 normal;
-varying vec3 waterNormalWorldSpace;
+
+#ifdef FEATURE_TRANSPARENT_PASS
+varying vec3 waterNormalViewSpace;
+#endif
 
 varying vec3 sunVecView;
 
@@ -60,39 +74,49 @@ uniform vec4 skyInscatteringSettingsFrag;
 #define skyInscatteringStrength skyInscatteringSettingsFrag.y
 #define skyInscatteringLength skyInscatteringSettingsFrag.z
 
+#ifdef FEATURE_TRANSPARENT_PASS
 uniform vec4 waterSettingsFrag;
 #define waterNormalBias waterSettingsFrag.x
 #define waterRefraction waterSettingsFrag.y
-#ifdef REFRACTIVE_WATER
 #define waterFresnelBias waterSettingsFrag.z
 #define waterFresnelPow waterSettingsFrag.w
+
+uniform vec4 alternativeWaterSettingsFrag;
+#define waterTint alternativeWaterSettingsFrag.x
 
 uniform sampler2D textureWaterRefraction;
 #endif
 
-uniform sampler2D textureAtlas;
+#ifdef FEATURE_TRANSPARENT_PASS
 uniform sampler2D textureWaterNormal;
+uniform sampler2D textureWaterReflection;
+uniform sampler2D texSceneOpaque;
+#endif
+
+uniform sampler2D textureAtlas;
+uniform sampler2D textureWater;
 uniform sampler2D textureLava;
 uniform sampler2D textureEffects;
-uniform sampler2D textureWaterReflection;
 
-uniform float clipHeightPos = 0.0;
-uniform float clipHeightNeg = 0.0;
+uniform float clip;
 
 void main(){
-	if (clipHeightPos > 0.001 && vertexWorldPos.y < clipHeightPos) {
+// Only necessary for opaque objects
+#if !defined (FEATURE_TRANSPARENT_PASS)
+	if (clip > 0.001 && vertexWorldPos.y < clip) {
         discard;
 	}
-
-    if (clipHeightNeg > 0.001 && vertexWorldPos.y > clipHeightNeg) {
-        discard;
-    }
+#endif
 
     vec2 texCoord = gl_TexCoord[0].xy;
 
     vec3 normalizedVPos = -normalize(vertexViewPos.xyz);
-    vec3 normalWater = waterNormalWorldSpace;
+
+#ifdef FEATURE_TRANSPARENT_PASS
+    vec3 normalWater = waterNormalViewSpace;
+    bool isOceanWater = false;
     bool isWater = false;
+#endif
 
     vec3 sunVecViewAdjusted = sunVecView;
 
@@ -103,42 +127,45 @@ void main(){
 
     vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
 
-    /* WATER */
+#ifdef FEATURE_TRANSPARENT_PASS
     if ( checkFlag(BLOCK_HINT_WATER, blockHint) ) {
-        vec2 waterOffset = vec2(vertexWorldPos.x + timeToTick(time, 0.1), vertexWorldPos.z + timeToTick(time, 0.1)) / 8.0;
-        vec2 waterOffset2 = vec2(vertexWorldPos.x + timeToTick(time, 0.1), vertexWorldPos.z - timeToTick(time, 0.1)) / 16.0;
+        if (!swimming) {
+            if ( vertexWorldPos.y < 32.5 && vertexWorldPos.y > 31.5 && isUpside > 0.99) {
+                vec2 waterOffset = vec2(vertexWorldPos.x + timeToTick(time, 0.1), vertexWorldPos.z + timeToTick(time, 0.1)) / 8.0;
+                vec2 waterOffset2 = vec2(vertexWorldPos.x + timeToTick(time, 0.1), vertexWorldPos.z - timeToTick(time, 0.1)) / 16.0;
 
-        vec2 normalOffset = (texture2D(textureWaterNormal, waterOffset).xyz * 2.0 - 1.0).xy * waterNormalBias;
-        normalOffset += (texture2D(textureWaterNormal, waterOffset2).xyz * 2.0 - 1.0).xy * waterNormalBias;
+                vec2 normalOffset = (texture2D(textureWaterNormal, waterOffset).xyz * 2.0 - 1.0).xy;
+                normalOffset += (texture2D(textureWaterNormal, waterOffset2).xyz * 2.0 - 1.0).xy;
+                normalOffset *= 0.5 * (1.0 / vertexViewPos.z * waterNormalBias);
 
-        normalWater.xy += normalOffset;
-        normalWater = normalize(normalWater);
+                normalWater.xy += normalOffset;
+                normalWater = normalize(normalWater);
 
-       // Enable reflection only when not swimming and for blocks on sea level
-        if (!swimming && isUpside > 0.99) {
-            if ( vertexWorldPos.y < 32.5 && vertexWorldPos.y > 31.5) {
                 vec2 projectedPos = 0.5 * (vertexProjPos.xy/vertexProjPos.w) + vec2(0.5);
 
                 vec4 reflectionColor = vec4(texture2D(textureWaterReflection, projectedPos + normalOffset.xy * waterRefraction).xyz, 1.0);
+                vec4 refractionColor = vec4(texture2D(texSceneOpaque, projectedPos + normalOffset.xy * waterRefraction).xyz, 1.0);
 
-#ifdef REFRACTIVE_WATER
                 /* FRESNEL */
-                vec4 refractionColor = vec4(texture2D(textureWaterRefraction, projectedPos + normalOffset.xy * waterRefraction).xyz, 1.0);
-                float f = fresnel(dot(waterNormalWorldSpace, normalizedVPos), waterFresnelBias, waterFresnelPow);
-                color = mix(refractionColor * vec4(WATER_COLOR), reflectionColor * vec4(WATER_COLOR), f);
-#else
-                color = reflectionColor  * vec4(WATER_COLOR);
-#endif
+                float f = fresnel(dot(normalWater, normalizedVPos), waterFresnelBias, waterFresnelPow);
+                color = mix(refractionColor * (1.0 - waterTint) +  waterTint * vec4(WATER_TINT), reflectionColor * (1.0 - waterTint) + waterTint * vec4(WATER_TINT), f);
+
+                isOceanWater = true;
+                isWater = true;
             } else {
-                color = vec4(WATER_COLOR);
+                texCoord.x = mod(texCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET);
+                texCoord.y = mod(texCoord.y, TEXTURE_OFFSET) / (128.0 / (1.0 / TEXTURE_OFFSET));
+                texCoord.y += mod(timeToTick(time, 0.1), 127.0) * (1.0/128.0);
+
+                color = vec4(texture2D(textureWater, texCoord.xy).xyz, 1.0);
             }
         } else {
-            color = vec4(WATER_COLOR_SWIMMING);
+            color = vec4(texture2D(textureAtlas, texCoord.xy).xyz, 1.0) * vec4(WATER_COLOR_SWIMMING);
         }
-
-        isWater = true;
     /* LAVA */
-    } else if ( checkFlag(BLOCK_HINT_LAVA, blockHint) ) {
+    } else
+#endif
+    if ( checkFlag(BLOCK_HINT_LAVA, blockHint) ) {
         texCoord.x = mod(texCoord.x, TEXTURE_OFFSET) * (1.0 / TEXTURE_OFFSET);
         texCoord.y = mod(texCoord.y, TEXTURE_OFFSET) / (128.0 / (1.0 / TEXTURE_OFFSET));
         texCoord.y += mod(timeToTick(time, 0.1), 127.0) * (1.0/128.0);
@@ -148,13 +175,13 @@ void main(){
     } else {
         color = texture2D(textureAtlas, texCoord.xy);
 
-        if (color.a < 0.1) {
+        if (color.a < 0.5) {
             discard;
         }
     }
 
     /* APPLY OVERALL BIOME COLOR OFFSET */
-    if ( !checkFlag(BLOCK_HINT_GRASS, blockHint) ) {
+    if (!checkFlag(BLOCK_HINT_GRASS, blockHint)) {
         if (gl_Color.r < 0.99 && gl_Color.g < 0.99 && gl_Color.b < 0.99) {
             if (color.g > 0.5) {
                 color.rgb = vec3(color.g) * gl_Color.rgb;
@@ -183,20 +210,38 @@ void main(){
     float occlusionValue = expOccValue(gl_TexCoord[1].z);
     float diffuseLighting;
 
+#ifdef FEATURE_TRANSPARENT_PASS
     if (isWater) {
-        diffuseLighting = calcLambLight(waterNormalWorldSpace, sunVecViewAdjusted);
-    } else {
+        diffuseLighting = calcLambLight(normalWater, sunVecViewAdjusted);
+    } else
+#endif
+    {
         diffuseLighting = calcLambLight(normal, sunVecViewAdjusted);
     }
+
+    float shadowTerm = 1.0;
+
+#if defined (DYNAMIC_SHADOWS)
+    /* DYNAMIC SHADOWS */
+    vec3 vertexLightPosClipSpace = vertexLightProjPos.xyz / vertexLightProjPos.w;
+    vec2 shadowMapTexPos = vertexLightPosClipSpace.xy * vec2(0.5, 0.5) + vec2(0.5);
+    float shadowMapDepth = texture2D(texSceneShadowMap, shadowMapTexPos).x;
+
+    if (shadowMapDepth < vertexLightPosClipSpace.z - shadowMapBias) {
+        shadowTerm = shadowIntens;
+    }
+#endif
 
     float torchlight = 0.0;
 
     /* CALCULATE TORCHLIGHT */
-    if (carryingTorch) {
+    if (carryingTorch > 0.99) {
+#ifdef FEATURE_TRANSPARENT_PASS
         if (isWater)
             torchlight = calcTorchlight(calcLambLight(normalWater, normalizedVPos) * TORCH_WATER_DIFF
             + TORCH_WATER_SPEC * calcSpecLight(normal, normalizedVPos, normalizedVPos, torchWaterSpecExp), vertexViewPos.xyz);
         else
+#endif
             torchlight = calcTorchlight(calcLambLight(normal, normalizedVPos) * TORCH_BLOCK_DIFF
             + TORCH_BLOCK_SPEC * calcSpecLight(normal, normalizedVPos, normalizedVPos, torchSpecExp), vertexViewPos.xyz);
     }
@@ -204,11 +249,14 @@ void main(){
     vec3 daylightColorValue;
 
     /* CREATE THE DAYLIGHT LIGHTING MIX */
+#ifdef FEATURE_TRANSPARENT_PASS
     if (isWater) {
         /* WATER NEEDS DIFFUSE AND SPECULAR LIGHT */
-        daylightColorValue = vec3(diffuseLighting) * WATER_DIFF;
-        daylightColorValue += calcSpecLight(normalWater, sunVecViewAdjusted, normalizedVPos, waterSpecExp) * WATER_SPEC;
-    } else {
+        daylightColorValue = vec3(diffuseLighting * WATER_DIFF + WATER_AMB);
+        color.xyz += calcSpecLight(normalWater, sunVecViewAdjusted, normalizedVPos, waterSpecExp) * WATER_SPEC;
+    } else
+#endif
+    {
         /* DEFAULT LIGHTING ONLY CONSIST OF DIFFUSE AND AMBIENT LIGHT */
         daylightColorValue = vec3(BLOCK_AMB + diffuseLighting * BLOCK_DIFF);
     }
@@ -231,17 +279,28 @@ void main(){
     // Calculate the final blocklight color value and add a slight reddish tint to it
     vec3 blocklightColorValue = vec3(blockBrightness) * vec3(1.0, 0.95, 0.94);
 
-    if (isWater) {
-        color.xyz += (vec4(WATER_COLOR) * WATER_AMB).xyz;
-    }
-
     // Apply the final lighting mix
     color.xyz *= max(daylightColorValue, blocklightColorValue) * occlusionValue;
+
+#if defined (DYNAMIC_SHADOWS)
+    color.xyz *= shadowTerm;
+#endif
 
     vec3 finalInscatteringColor = convertColorYxy(skyInscatteringColor, skyInscatteringExponent);
     float fogValue = skyInscatteringStrength - clamp((viewingDistance - distance) / (viewingDistance - (1.0 - skyInscatteringLength) * viewingDistance), 0.0, skyInscatteringStrength);
     color = mix(color, vec4(finalInscatteringColor, 1.0), fogValue);
 
     gl_FragData[0].rgba = color;
-    gl_FragData[1].rgba = vec4(normal.x / 2.0 + 0.5, normal.y / 2.0 + 0.5, normal.z / 2.0 + 0.5, 0.0f);
+    gl_FragData[1].rgb = vec3(normal.x / 2.0 + 0.5, normal.y / 2.0 + 0.5, normal.z / 2.0 + 0.5);
+
+    // Primitive objects ids... Will be extended later on
+#ifdef FEATURE_TRANSPARENT_PASS
+    if (isOceanWater) {
+        gl_FragData[1].a = 1.0f;
+    }
+    else
+#endif
+    {
+        gl_FragData[1].a = 0.0f;
+    }
 }

@@ -28,6 +28,7 @@ public final class PathManager {
     private static final String LOG_DIR = "logs";
     private static final String MOD_DIR = "mods";
     private static final String SCREENS_DIR = "screens";
+    private static final String CONFIG_DIR = "config";
 
     private static PathManager instance;
     private File rootPath;
@@ -94,7 +95,6 @@ public final class PathManager {
     public File getScreensPath() {
         return screenPath;
     }
-
 
     private void updateDirs() {
         rootPath.mkdirs();

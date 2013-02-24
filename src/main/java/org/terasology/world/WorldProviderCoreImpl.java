@@ -16,11 +16,11 @@
 
 package org.terasology.world;
 
+import org.terasology.config.Config;
 import org.terasology.config.ModConfig;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.game.types.GameType;
-import org.terasology.logic.manager.Config;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.math.Region3i;
@@ -39,7 +39,7 @@ import org.terasology.world.liquid.LiquidData;
  * @author Immortius
  */
 public class WorldProviderCoreImpl implements WorldProviderCore {
-    private final long DAY_NIGHT_LENGTH_IN_MS = Config.getInstance().getDayNightLengthInMs();
+    private final long DAY_NIGHT_LENGTH_IN_MS = CoreRegistry.get(Config.class).getSystem().getDayNightLengthInMs();
 
     private String title;
     private String seed;
@@ -50,7 +50,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     private long timeOffset;
 
-    public WorldProviderCoreImpl(String title, String seed, String[] chunkGenerators, ChunkProvider chunkProvider) {
+    public WorldProviderCoreImpl(String title, String seed, long time, String[] chunkGenerators, ChunkProvider chunkProvider) {
         if (seed == null || seed.isEmpty()) {
             throw new IllegalArgumentException("No seed provided.");
         }
@@ -63,15 +63,6 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         this.chunkGenerators = chunkGenerators;
         this.biomeProvider = new WorldBiomeProviderImpl(seed);
         this.chunkProvider = chunkProvider;
-
-        Timer timer = CoreRegistry.get(Timer.class);
-        if (timer != null) {
-            timeOffset = -timer.getTimeInMs() + Config.getInstance().getInitialTimeOffsetInMs();
-        }
-    }
-
-    public WorldProviderCoreImpl(String title, String seed, long time, String[] chunkGenerators, ChunkProvider chunkProvider) {
-        this(title, seed, chunkGenerators, chunkProvider);
         setTime(time);
     }
 

@@ -15,27 +15,32 @@
  */
 package org.terasology.rendering.cameras;
 
-import static org.lwjgl.opengl.GL11.GL_PROJECTION;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
-import static org.lwjgl.util.glu.GLU.gluPerspective;
+import org.lwjgl.opengl.GL11;
+import org.terasology.math.TeraMath;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.glu.GLU;
-import org.terasology.math.TeraMath;
+import static org.lwjgl.opengl.GL11.GL_PROJECTION;
+import static org.lwjgl.opengl.GL11.glMatrixMode;
 
 /**
  * Simple default camera.
  *
  * @author Benjamin Glatzel <benjamin.glatzel@me.com>
  */
-public class DefaultCamera extends Camera {
+public class OrthographicCamera extends Camera {
 
-    private float _bobbingRotationOffsetFactor, _bobbingVerticalOffsetFactor = 0.0f;
+    float top, bottom, left, right;
+
+    public OrthographicCamera(float left, float right, float top, float bottom) {
+        super();
+
+        this.top = top;
+        this.bottom = bottom;
+        this.left = left;
+        this.right = right;
+    }
 
     public void loadProjectionMatrix() {
         glMatrixMode(GL_PROJECTION);
@@ -65,26 +70,12 @@ public class DefaultCamera extends Camera {
     }
 
     public void updateMatrices(float overrideFov) {
-        Vector3f right = new Vector3f();
-        right.cross(_viewingDirection, _up);
-        right.scale(_bobbingRotationOffsetFactor);
+        _projectionMatrix = TeraMath.createOrthogonalProjectionMatrix(left, right, top, bottom, -1000.0f, 1000.0f);
 
-        _projectionMatrix = TeraMath.createProjectionMatrix(overrideFov, 0.1f, 512.0f);
-
-        _viewMatrix = TeraMath.createViewMatrix(0f, _bobbingVerticalOffsetFactor * 2.0f, 0f, _viewingDirection.x, _viewingDirection.y + _bobbingVerticalOffsetFactor * 2.0f,
-                _viewingDirection.z, _up.x + right.x, _up.y + right.y, _up.z + right.z);
-        _normViewMatrix = TeraMath.createViewMatrix(0f, 0f, 0f, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, _up.x + right.x, _up.y + right.y, _up.z + right.z);
+        _viewMatrix = TeraMath.createViewMatrix(0f, 0.0f, 0f, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, _up.x, _up.y, _up.z);
+        _normViewMatrix = TeraMath.createViewMatrix(0f, 0f, 0f, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, _up.x, _up.y, _up.z);
 
         _prevViewProjectionMatrix = new Matrix4f(_viewProjectionMatrix);
         _viewProjectionMatrix = TeraMath.calcViewProjectionMatrix(_viewMatrix, _projectionMatrix);
-        _inverseViewProjectionMatrix.invert(_viewProjectionMatrix);
-    }
-
-    public void setBobbingRotationOffsetFactor(float f) {
-        _bobbingRotationOffsetFactor = f;
-    }
-
-    public void setBobbingVerticalOffsetFactor(float f) {
-        _bobbingVerticalOffsetFactor = f;
     }
 }
