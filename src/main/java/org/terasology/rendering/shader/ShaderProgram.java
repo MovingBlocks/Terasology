@@ -134,7 +134,7 @@ public class ShaderProgram {
         TIntIntIterator it = shaderPrograms.iterator();
         while (it.hasNext()) {
             it.advance();
-            GL20.glDeleteShader(it.value());
+            GL20.glDeleteProgram(it.value());
         }
         shaderPrograms.clear();
 
