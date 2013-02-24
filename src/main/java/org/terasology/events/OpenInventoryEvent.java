@@ -17,12 +17,17 @@ package org.terasology.events;
 
 import org.terasology.entitySystem.AbstractEvent;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.network.OwnerEvent;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
+@OwnerEvent
 public class OpenInventoryEvent extends AbstractEvent {
     private EntityRef container;
+
+    protected OpenInventoryEvent() {
+    }
 
     public OpenInventoryEvent(EntityRef container) {
         this.container = container;

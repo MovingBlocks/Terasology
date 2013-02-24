@@ -6,6 +6,6 @@
     "BlockItem" : {
     },
     "Network" : {
-        "replicateMode" : "OWNER"
+        "replicateMode" : "RELEVANT"
     }
 }

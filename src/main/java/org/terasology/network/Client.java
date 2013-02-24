@@ -333,7 +333,8 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
             netRelevant.add(netId);
             EntityRef entity = networkSystem.getEntity(netId);
             // Note: Send owner->server fields on initial create
-            EntityData.PackedEntity entityData = entitySerializer.serialize(entity, true, new ServerComponentFieldCheck(false, true));
+            Client owner = networkSystem.getOwner(entity);
+            EntityData.PackedEntity entityData = entitySerializer.serialize(entity, true, new ServerComponentFieldCheck(owner == this, true));
             NetData.CreateEntityMessage.Builder createMessage = NetData.CreateEntityMessage.newBuilder().setEntity(entityData);
             BlockComponent blockComponent = entity.getComponent(BlockComponent.class);
             if (blockComponent != null) {

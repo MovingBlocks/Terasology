@@ -15,6 +15,7 @@
  */
 package org.terasology.componentSystem.action;
 
+import org.terasology.entitySystem.In;
 import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.logic.players.LocalPlayerComponent;
@@ -27,15 +28,19 @@ import org.terasology.events.ActivateEvent;
 import org.terasology.events.OpenInventoryEvent;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.network.NetworkSystem;
 import org.terasology.rendering.gui.windows.UIScreenContainer;
 
 /**
  * @author Immortius <immortius@gmail.com>
  */
-// TODO: Network
-@RegisterSystem(RegisterMode.AUTHORITY)
+@RegisterSystem(RegisterMode.ALWAYS)
 public class AccessInventoryAction implements ComponentSystem {
 
+    @In
+    private NetworkSystem networkSystem;
+
+    @Override
     public void initialise() {
 
     }
@@ -46,7 +51,14 @@ public class AccessInventoryAction implements ComponentSystem {
 
     @ReceiveEvent(components = {AccessInventoryActionComponent.class})
     public void onActivate(ActivateEvent event, EntityRef entity) {
-        event.getInstigator().send(new OpenInventoryEvent(entity));
+        if (networkSystem.getMode().isAuthority()) {
+            InventoryComponent inv = entity.getComponent(InventoryComponent.class);
+            if (inv != null) {
+                inv.accessors.add(event.getInstigator());
+                entity.saveComponent(inv);
+                event.getInstigator().send(new OpenInventoryEvent(entity));
+            }
+        }
     }
 
     @ReceiveEvent(components = {LocalPlayerComponent.class, InventoryComponent.class})

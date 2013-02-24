@@ -34,30 +34,31 @@ public final class ItemComponent implements Component {
     /**
      * The display name of this item
      */
-    @Replicate(ReplicateType.SERVER_TO_OWNER)
+    @Replicate(value = ReplicateType.SERVER_TO_CLIENT, initialOnly = true)
     public String name = "";
 
     /**
      * Should this item be rendered? Some items have an inventory icon but no "held" representation
      */
-    @Replicate(ReplicateType.SERVER_TO_OWNER)
+    @Replicate(value = ReplicateType.SERVER_TO_CLIENT, initialOnly = true)
     public boolean renderWithIcon = false;
 
     /**
      * Name of the icon this item should be rendered with
      */
-    @Replicate(ReplicateType.SERVER_TO_OWNER)
+    @Replicate(value = ReplicateType.SERVER_TO_CLIENT, initialOnly = true)
     public String icon = "";
 
     /**
      * If this item is stackable, it should have a unique ID (so alike stacks can be merged)
      */
+    @Replicate(value = ReplicateType.SERVER_TO_CLIENT, initialOnly = true)
     public String stackId = "";
 
     /**
      * How many of said item are there in this stack
      */
-    @Replicate(ReplicateType.SERVER_TO_OWNER)
+    @Replicate(ReplicateType.SERVER_TO_CLIENT)
     public byte stackCount = 1;
 
     /**

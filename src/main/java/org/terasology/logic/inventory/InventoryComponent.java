@@ -23,18 +23,23 @@ import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityRef;
 
 import com.google.common.collect.Lists;
+import org.terasology.entitySystem.metadata.FieldMetadata;
 import org.terasology.network.Replicate;
 import org.terasology.network.ReplicateType;
+import org.terasology.network.ReplicationCheck;
 
 /**
  * Allows an entity to store items
  *
  * @author Immortius <immortius@gmail.com>
  */
-public final class InventoryComponent implements Component {
+public final class InventoryComponent implements Component, ReplicationCheck {
 
-    @Replicate(value = ReplicateType.SERVER_TO_OWNER)
+    @Replicate
     List<EntityRef> itemSlots = Lists.newArrayList();
+
+    public boolean privateToOwner = true;
+    public List<EntityRef> accessors = Lists.newArrayList();
 
     public InventoryComponent() {
     }
@@ -45,4 +50,8 @@ public final class InventoryComponent implements Component {
         }
     }
 
+    @Override
+    public boolean shouldReplicate(FieldMetadata field, boolean initial, boolean toOwner) {
+        return !privateToOwner || toOwner;
+    }
 }

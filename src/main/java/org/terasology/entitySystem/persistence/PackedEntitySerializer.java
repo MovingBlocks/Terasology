@@ -222,7 +222,7 @@ public class PackedEntitySerializer {
         }
 
         for (int componentId : entityData.getRemovedComponentList()) {
-            Class<? extends Component> componentClass = idTable.inverse().get((Integer) entityData.getComponentId(componentId));
+            Class<? extends Component> componentClass = idTable.inverse().get(componentId);
             ComponentMetadata<?> metadata = componentLibrary.getMetadata(componentClass);
             if (componentSerializeCheck.serialize(metadata)) {
                 entity.removeComponent(metadata.getType());

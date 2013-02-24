@@ -170,6 +170,9 @@ public class CoreInventoryManager implements ComponentSystem, SlotBasedInventory
         } else {
             MoveItemRequest request = new MoveItemRequest(fromInventory, fromSlot, toInventory, toSlot, nextChangeId++);
             localPlayer.getClientEntity().send(request);
+            InventoryComponent from = getPredictedInventoryComponent(request.getFromInventory());
+            InventoryComponent to = getPredictedInventoryComponent(request.getToInventory());
+            moveItemCommon(fromInventory, from, request.getFromSlot(), toInventory, to, request.getToSlot());
         }
     }
 
@@ -351,6 +354,7 @@ public class CoreInventoryManager implements ComponentSystem, SlotBasedInventory
             result = inventoryEntity.getComponent(InventoryComponent.class);
             if (result != null) {
                 result = entitySystemLibrary.getComponentLibrary().copy(result);
+                predictedState.put(inventoryEntity, result);
             }
         }
         return result;
