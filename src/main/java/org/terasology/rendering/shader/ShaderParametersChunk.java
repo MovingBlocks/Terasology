@@ -61,6 +61,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
     Property waterFresnelBias = new Property("waterFresnelBias", 0.01f, 0.01f, 0.1f);
     Property waterFresnelPow = new Property("waterFresnelPow", 2.5f, 0.0f, 10.0f);
     Property waterNormalBias = new Property("waterNormalBias", 25.0f, 1.0f, 100.0f);
+    Property waterTint = new Property("waterTint", 0.24f, 0.0f, 1.0f);
 
     Property waterOffsetY = new Property("waterOffsetY", 0.0f, 0.0f, 5.0f);
 
@@ -148,6 +149,10 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         waterSettingsFrag.w = (Float) waterFresnelPow.getValue();
         program.setFloat4("waterSettingsFrag", waterSettingsFrag);
 
+        Vector4f alternativeWaterSettingsFrag = new Vector4f();
+        alternativeWaterSettingsFrag.x = (Float) waterTint.getValue();
+        program.setFloat4("alternativeWaterSettingsFrag", alternativeWaterSettingsFrag);
+
         if (CoreRegistry.get(Config.class).getRendering().isAnimateWater()) {
             program.setFloat("waveIntensFalloff", (Float) waveIntensFalloff.getValue());
             program.setFloat("waveSizeFalloff", (Float) waveSizeFalloff.getValue());
@@ -181,5 +186,6 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         properties.add(waveOverallScale);
         properties.add(shadowIntens);
         properties.add(shadowMapBias);
+        properties.add(waterTint);
     }
 }

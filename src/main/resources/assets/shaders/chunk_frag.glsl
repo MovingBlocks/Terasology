@@ -22,7 +22,7 @@
 #define MOONLIGHT_AMBIENT_COLOR 0.8, 0.8, 1.0
 #define NIGHT_BRIGHTNESS 0.05
 #define WATER_COLOR_SWIMMING 0.8, 1.0, 1.0, 0.975
-#define WATER_COLOR 0.75, 0.8, 1.0, 1.0
+#define WATER_TINT 0.1, 0.41, 0.627, 1.0
 
 #define TORCH_WATER_SPEC 8.0
 #define TORCH_WATER_DIFF 0.7
@@ -80,6 +80,9 @@ uniform vec4 waterSettingsFrag;
 #define waterRefraction waterSettingsFrag.y
 #define waterFresnelBias waterSettingsFrag.z
 #define waterFresnelPow waterSettingsFrag.w
+
+uniform vec4 alternativeWaterSettingsFrag;
+#define waterTint alternativeWaterSettingsFrag.x
 
 uniform sampler2D textureWaterRefraction;
 #endif
@@ -145,7 +148,7 @@ void main(){
 
                 /* FRESNEL */
                 float f = fresnel(dot(normalWater, normalizedVPos), waterFresnelBias, waterFresnelPow);
-                color = mix(refractionColor * vec4(WATER_COLOR), reflectionColor * vec4(WATER_COLOR), f);
+                color = mix(refractionColor * (1.0 - waterTint) +  waterTint * vec4(WATER_TINT), reflectionColor * (1.0 - waterTint) + waterTint * vec4(WATER_TINT), f);
 
                 isOceanWater = true;
                 isWater = true;
