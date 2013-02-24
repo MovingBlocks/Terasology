@@ -717,14 +717,6 @@ public final class WorldRenderer {
 
             for (Chunk c : renderQueueChunksOpaque)
                 renderChunk(c, ChunkMesh.RENDER_PHASE.OPAQUE, camera, CHUNK_RENDER_MODE.REFLECTED);
-
-            glEnable(GL_BLEND);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-            for (Chunk c : renderQueueChunksSortedBillboards)
-                renderChunk(c, ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT, camera, CHUNK_RENDER_MODE.REFLECTED);
-
-            glDisable(GL_BLEND);
         }
 
         PerformanceMonitor.endActivity();
