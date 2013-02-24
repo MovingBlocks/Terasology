@@ -19,7 +19,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.FloatBuffer;
 import java.util.Scanner;
-import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.map.TIntIntMap;
@@ -195,33 +196,45 @@ public class ShaderProgram {
         GL20.glShaderSource(shaderId, shader.toString());
         GL20.glCompileShader(shaderId);
 
-        String error;
-        if ((error = printLogInfo(shaderId)) != null) {
-            String errorLine = "";
-            if (error.contains("ERROR") || error.contains("WARNING")) {
-                try {
-                    StringTokenizer token = new StringTokenizer(error);
-                    token.nextToken(":");
+        StringBuilder error = new StringBuilder();
+        boolean success = printLogInfo(shaderId, error);
 
-                    String charNumber = token.nextToken(":").trim();
-                    String lineNumber = token.nextToken(":").trim();
+        String errorLine = "";
+        if (error.length() > 0) {
+            try {
+                Pattern p = Pattern.compile("-?\\d+");
+                Matcher m = p.matcher(error.toString());
 
-                    int lineNumberInt = Integer.valueOf(lineNumber);
-                    int charNumberInt = Integer.valueOf(charNumber);
+                int counter = 0;
+                while (m.find()) {
+                    if (counter++ % 2 == 1) {
+                        int lineNumberInt = Integer.valueOf(m.group());
 
-                    Scanner reader = new Scanner(shader.toString());
-                    for (int i=0; i<lineNumberInt - 1; ++i) {
-                        reader.nextLine();
+                        Scanner reader = new Scanner(shader.toString());
+                        for (int i=0; i<lineNumberInt - 1; ++i) {
+                            reader.nextLine();
+                        }
+
+                        errorLine = reader.nextLine();
+                        errorLine = "Error prone line: '" + errorLine + "'";
+
+                        logger.warn("{}", error);
+                        logger.warn("{}", errorLine);
+
+                        break;
                     }
-
-                    errorLine = reader.nextLine();
-                    errorLine = "\n\nError prone line: '" + errorLine + "'";
-                } catch (Exception e) {
-                    // Do nothing...
                 }
-            }
 
-            JOptionPane.showMessageDialog(null, debugShaderType+ " Shader '"+title+"' failed to compile. Terasology might not look quite as good as it should now...\n\n"+error+errorLine, "Shader compilation error", JOptionPane.ERROR_MESSAGE);
+            } catch (Exception e) {
+                // Do nothing...
+            }
+        }
+
+        if (!success) {
+            String errorMessage = debugShaderType+ " Shader '"+title+"' failed to compile. Terasology might not look quite as good as it should now...\n\n"+error+"\n\n"+errorLine;
+
+            logger.error("{}", errorMessage);
+            JOptionPane.showMessageDialog(null, errorMessage, "Shader compilation error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -239,25 +252,23 @@ public class ShaderProgram {
         return code;
     }
 
-    private String printLogInfo(int shaderId) {
+    private boolean printLogInfo(int shaderId, StringBuilder logEntry) {
         int length = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects.GL_OBJECT_INFO_LOG_LENGTH_ARB);
 
         int compileStatus = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects.GL_OBJECT_COMPILE_STATUS_ARB);
         //int linkStatus = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects.GL_OBJECT_LINK_STATUS_ARB);
         //int validateStatus = ARBShaderObjects.glGetObjectParameteriARB(shaderId, ARBShaderObjects.GL_OBJECT_VALIDATE_STATUS_ARB);
 
-        String logEntry = ARBShaderObjects.glGetInfoLogARB(shaderId, length);
-
         if (length > 0) {
-            logger.error("{}", logEntry);
+            logEntry.append(ARBShaderObjects.glGetInfoLogARB(shaderId, length));
         }
 
         if (compileStatus == 0 /*|| linkStatus == 0 || validateStatus == 0*/) {
-            return logEntry;
+            return false;
         }
 
         logger.info("Shader '" + title + "' successfully compiled.");
-        return null;
+        return true;
     }
 
     public void enable() {

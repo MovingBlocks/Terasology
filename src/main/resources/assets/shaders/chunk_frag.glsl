@@ -216,14 +216,13 @@ void main(){
         diffuseLighting = calcLambLight(normal, sunVecViewAdjusted);
     }
 
-
     float shadowTerm = 1.0;
 
 #if defined (DYNAMIC_SHADOWS)
     /* DYNAMIC SHADOWS */
     vec3 vertexLightPosClipSpace = vertexLightProjPos.xyz / vertexLightProjPos.w;
     vec2 shadowMapTexPos = vertexLightPosClipSpace.xy * vec2(0.5, 0.5) + vec2(0.5);
-    float shadowMapDepth = texture2D(texSceneShadowMap, shadowMapTexPos);
+    float shadowMapDepth = texture2D(texSceneShadowMap, shadowMapTexPos).x;
 
     if (shadowMapDepth < vertexLightPosClipSpace.z - shadowMapBias) {
         shadowTerm = shadowIntens;
