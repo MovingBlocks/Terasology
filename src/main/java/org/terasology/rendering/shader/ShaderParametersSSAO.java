@@ -19,7 +19,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
-import org.terasology.logic.manager.PostProcessingRenderer;
+import org.terasology.logic.manager.DefaultRenderingProcess;
 import org.terasology.editor.properties.Property;
 import org.terasology.rendering.assets.Texture;
 
@@ -46,7 +46,7 @@ public class ShaderParametersSSAO extends ShaderParametersBase {
     public void applyParameters(ShaderProgram program) {
         super.applyParameters(program);
 
-        PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("sceneOpaque");
+        DefaultRenderingProcess.FBO scene = DefaultRenderingProcess.getInstance().getFBO("sceneOpaque");
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         scene.bindDepthTexture();

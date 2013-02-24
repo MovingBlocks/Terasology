@@ -31,9 +31,14 @@ import org.lwjgl.opengl.GL20;
 import org.newdawn.slick.util.ResourceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.Config;
+import org.terasology.config.SystemConfig;
+import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.assets.MaterialShader;
+import org.terasology.rendering.primitives.ChunkTessellator;
+import org.terasology.world.block.Block;
 
 import javax.swing.*;
 import javax.vecmath.Matrix3f;
@@ -48,6 +53,8 @@ import javax.vecmath.Vector4f;
  */
 public class ShaderProgram {
     private static final Logger logger = LoggerFactory.getLogger(ShaderProgram.class);
+
+    private static final String PreProcessorPreamble = "#version 120\n float TEXTURE_OFFSET = " + Block.TEXTURE_OFFSET + ";\n";
 
     private TIntIntMap fragmentPrograms = new TIntIntHashMap();
     private TIntIntMap vertexPrograms = new TIntIntHashMap();
@@ -157,7 +164,7 @@ public class ShaderProgram {
 
         int shaderId = GL20.glCreateShader(type);
 
-        StringBuilder shader = MaterialShader.createShaderBuilder();
+        StringBuilder shader = createShaderBuilder();
 
         // Add the activated features for this shader
         for (int i=0; i<ShaderProgramFeatures.FEATURE_ALL.ordinal(); ++i) {
@@ -360,5 +367,46 @@ public class ShaderProgram {
 
     public void setActiveFeatures(int featureHash) {
         activeFeatures = featureHash;
+    }
+
+    public static StringBuilder createShaderBuilder() {
+        Config config = CoreRegistry.get(Config.class);
+        StringBuilder builder = new StringBuilder().append(PreProcessorPreamble);
+        if (config.getRendering().isAnimateGrass())
+            builder.append("#define ANIMATED_GRASS \n");
+        if (config.getRendering().isAnimateWater()) {
+            builder.append("#define ANIMATED_WATER \n");
+        }
+        if (config.getRendering().getBlurIntensity() == 0)
+            builder.append("#define NO_BLUR \n");
+        if (config.getRendering().isFlickeringLight())
+            builder.append("#define FLICKERING_LIGHT \n");
+        if (config.getRendering().isVignette())
+            builder.append("#define VIGNETTE \n");
+        if (config.getRendering().isBloom())
+            builder.append("#define BLOOM \n");
+        if (config.getRendering().isMotionBlur())
+            builder.append("#define MOTION_BLUR \n");
+        if (config.getRendering().isSsao())
+            builder.append("#define SSAO \n");
+        if (config.getRendering().isFilmGrain())
+            builder.append("#define FILM_GRAIN \n");
+        if (config.getRendering().isOutline())
+            builder.append("#define OUTLINE \n");
+        if (config.getRendering().isLightShafts())
+            builder.append("#define LIGHT_SHAFTS \n");
+        if (config.getRendering().isDynamicShadows())
+            builder.append("#define DYNAMIC_SHADOWS \n");
+
+        // BG: Add the enums for the debug rendering stages
+        for (int i=0; i<SystemConfig.DebugRenderingStages.values().length; ++i) {
+            builder.append("#define "+SystemConfig.DebugRenderingStages.values()[i].toString()+" "+SystemConfig.DebugRenderingStages.values()[i].ordinal()+" \n");
+        }
+        // BG: Add the enums for the block flags
+        for (int i=0; i< ChunkTessellator.ChunkVertexFlags.values().length; ++i) {
+            builder.append("#define "+ChunkTessellator.ChunkVertexFlags.values()[i].toString()+" "+ChunkTessellator.ChunkVertexFlags.values()[i].getValue()+" \n");
+        }
+
+        return builder;
     }
 }

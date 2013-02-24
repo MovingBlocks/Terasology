@@ -14,10 +14,6 @@
  * limitations under the License.
 */
 
-#define BLOCK_HINT_WATER     1
-#define BLOCK_HINT_LAVA      2
-#define BLOCK_HINT_GRASS     3
-
 #define DAYLIGHT_AMBIENT_COLOR 0.95, 0.92, 0.91
 #define MOONLIGHT_AMBIENT_COLOR 0.8, 0.8, 1.0
 #define NIGHT_BRIGHTNESS 0.05

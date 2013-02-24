@@ -17,7 +17,7 @@ package org.terasology.rendering.gui.animation;
 
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
-import org.terasology.logic.manager.PostProcessingRenderer;
+import org.terasology.logic.manager.DefaultRenderingProcess;
 import org.terasology.logic.manager.ShaderManager;
 import org.terasology.rendering.primitives.Mesh;
 import org.terasology.rendering.primitives.Tessellator;
@@ -38,7 +38,7 @@ public class AnimationOpacity extends Animation {
     private float speed;
     private Mesh mesh;
 
-    private PostProcessingRenderer.FBO fbo = null;
+    private DefaultRenderingProcess.FBO fbo = null;
     private String id = null;
 
 
@@ -63,23 +63,23 @@ public class AnimationOpacity extends Animation {
     @Override
     public void renderBegin(){
         if(fbo == null){
-            fbo = PostProcessingRenderer.getInstance().createFBO(id, Display.getWidth(), Display.getHeight(), PostProcessingRenderer.FBOType.DEFAULT, false, false);
+            fbo = DefaultRenderingProcess.getInstance().createFBO(id, Display.getWidth(), Display.getHeight(), DefaultRenderingProcess.FBOType.DEFAULT, false, false);
         }else if(fbo.height != Display.getHeight() || fbo.width != Display.getWidth()){
-            fbo = PostProcessingRenderer.getInstance().createFBO(id, Display.getWidth(), Display.getHeight(), PostProcessingRenderer.FBOType.DEFAULT, false, false);
+            fbo = DefaultRenderingProcess.getInstance().createFBO(id, Display.getWidth(), Display.getHeight(), DefaultRenderingProcess.FBOType.DEFAULT, false, false);
         }
 
-        PostProcessingRenderer.getInstance().getFBO(id).bind();
+        DefaultRenderingProcess.getInstance().getFBO(id).bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     }
 
     @Override
     public void renderEnd(){
-        PostProcessingRenderer.getInstance().getFBO(id).unbind();
+        DefaultRenderingProcess.getInstance().getFBO(id).unbind();
         ShaderProgram program = ShaderManager.getInstance().getShaderProgram("animateOpacity");
         program.setFloat("alpha", currentOpacity);
         program.enable();
-        PostProcessingRenderer.getInstance().getFBO(id).bindTexture();
+        DefaultRenderingProcess.getInstance().getFBO(id).bindTexture();
         glMatrixMode(GL_TEXTURE);
         glPushMatrix();
         glLoadIdentity();

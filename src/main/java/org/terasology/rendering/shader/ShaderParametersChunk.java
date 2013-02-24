@@ -21,7 +21,7 @@ import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.editor.properties.Property;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.manager.PostProcessingRenderer;
+import org.terasology.logic.manager.DefaultRenderingProcess;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
@@ -97,15 +97,15 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         glBindTexture(GL11.GL_TEXTURE_2D, effects.getId());
         program.setInt("textureEffects", texId++);
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        PostProcessingRenderer.getInstance().getFBO("sceneReflected").bindTexture();
+        DefaultRenderingProcess.getInstance().getFBO("sceneReflected").bindTexture();
         program.setInt("textureWaterReflection", texId++);
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        PostProcessingRenderer.getInstance().getFBO("sceneOpaque").bindTexture();
+        DefaultRenderingProcess.getInstance().getFBO("sceneOpaque").bindTexture();
         program.setInt("texSceneOpaque", texId++);
 
         if (CoreRegistry.get(Config.class).getRendering().isDynamicShadows()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            PostProcessingRenderer.getInstance().getFBO("sceneShadowMap").bindDepthTexture();
+            DefaultRenderingProcess.getInstance().getFBO("sceneShadowMap").bindDepthTexture();
             program.setInt("texSceneShadowMap", texId++);
 
             Camera lightCamera = CoreRegistry.get(WorldRenderer.class).getLightCamera();

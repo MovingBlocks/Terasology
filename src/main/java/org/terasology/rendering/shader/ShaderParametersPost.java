@@ -22,7 +22,7 @@ import org.terasology.asset.Assets;
 import org.terasology.config.Config;
 import org.terasology.editor.properties.Property;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.manager.PostProcessingRenderer;
+import org.terasology.logic.manager.DefaultRenderingProcess;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.world.WorldRenderer;
@@ -52,20 +52,20 @@ public class ShaderParametersPost extends ShaderParametersBase {
     public void applyParameters(ShaderProgram program) {
         super.applyParameters(program);
 
-        PostProcessingRenderer.FBO sceneCombined = PostProcessingRenderer.getInstance().getFBO("sceneCombined");
+        DefaultRenderingProcess.FBO sceneCombined = DefaultRenderingProcess.getInstance().getFBO("sceneCombined");
 
         int texId = 0;
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        PostProcessingRenderer.getInstance().getFBO("sceneToneMapped").bindTexture();
+        DefaultRenderingProcess.getInstance().getFBO("sceneToneMapped").bindTexture();
         program.setInt("texScene", texId++);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-        PostProcessingRenderer.getInstance().getFBO("sceneBloom1").bindTexture();
+        DefaultRenderingProcess.getInstance().getFBO("sceneBloom1").bindTexture();
         program.setInt("texBloom", texId++);
 
         if (CoreRegistry.get(Config.class).getRendering().getBlurIntensity() != 0 || CoreRegistry.get(Config.class).getRendering().isMotionBlur()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
-            PostProcessingRenderer.getInstance().getFBO("sceneBlur1").bindTexture();
+            DefaultRenderingProcess.getInstance().getFBO("sceneBlur1").bindTexture();
             program.setInt("texBlur", texId++);
 
             program.setFloat("maxBlurSky", (Float) maxBlurSky.getValue());
