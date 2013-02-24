@@ -70,7 +70,7 @@ public class OrthographicCamera extends Camera {
     }
 
     public void updateMatrices(float overrideFov) {
-        _projectionMatrix = TeraMath.createOrthogonalProjectionMatrix(left, right, top, bottom, -1000.0f, 1000.0f);
+        _projectionMatrix = TeraMath.createOrthogonalProjectionMatrix(left, right, top, bottom, -50000.0f, 50000.0f);
 
         _viewMatrix = TeraMath.createViewMatrix(0f, 0.0f, 0f, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, _up.x, _up.y, _up.z);
         _normViewMatrix = TeraMath.createViewMatrix(0f, 0f, 0f, _viewingDirection.x, _viewingDirection.y, _viewingDirection.z, _up.x, _up.y, _up.z);
