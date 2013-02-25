@@ -16,8 +16,6 @@
 
 #define Z_FAR 5000.0
 #define Z_NEAR 0.1
-#define BLUR_START 0.6
-#define BLUR_LENGTH 0.05
 
 #define LIGHT_SHAFT_SAMPLES 50
 #define MOTION_BLUR_SAMPLES 8
@@ -39,6 +37,10 @@ uniform float time;
 
 uniform vec3 sunVec;
 uniform vec3 cameraDirection;
+
+float linDepthVDist(float depth) {
+    return (2.0 * Z_NEAR) / (viewingDistance + Z_NEAR - depth * (viewingDistance - Z_NEAR));
+}
 
 float linDepth(float depth) {
     return (2.0 * Z_NEAR) / (Z_FAR + Z_NEAR - depth * (Z_FAR - Z_NEAR));

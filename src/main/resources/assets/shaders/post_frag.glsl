@@ -22,6 +22,9 @@ uniform sampler2D texBloom;
 #if !defined (NO_BLUR) || defined (MOTION_BLUR)
 uniform sampler2D texBlur;
 uniform float maxBlurSky;
+uniform float blurFocusDistance;
+uniform float blurStart;
+uniform float blurLength;
 #endif
 #ifdef VIGNETTE
 uniform sampler2D texVignette;
@@ -50,11 +53,13 @@ void main() {
     float currentDepth = texture2D(texDepth, gl_TexCoord[0].xy).x;
 
 #ifndef NO_BLUR
-    float depthLin = linDepth(currentDepth);
+    float depthLin = linDepthVDist(currentDepth);
     float blur = 0.0;
 
-    if (depthLin > BLUR_START && !swimming) {
-       blur = clamp((depthLin - BLUR_START) / BLUR_LENGTH, 0.0, 1.0);
+    if (depthLin > blurStart && !swimming) {
+
+       float finalBlurStart = blurFocusDistance / viewingDistance + blurStart;
+       blur = clamp((depthLin - finalBlurStart) / blurLength, 0.0, 1.0);
 
        if (currentDepth > 0.9999999) {
            blur = min(blur, maxBlurSky);

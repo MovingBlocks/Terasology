@@ -70,7 +70,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
     Property torchSpecExp = new Property("torchSpecExp", 32.0f, 0.0f, 64.0f);
 
     Property shadowIntens = new Property("shadowIntens", 0.5f, 0.0f, 1.0f);
-    Property shadowMapBias = new Property("shadowMapBias", 0.00001f, 0.0f, 0.0001f);
+    Property shadowMapBias = new Property("shadowMapBias", 0.01f, 0.0f, 0.1f);
 
     public void applyParameters(ShaderProgram program) {
         super.applyParameters(program);

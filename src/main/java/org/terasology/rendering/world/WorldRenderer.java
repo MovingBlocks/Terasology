@@ -130,7 +130,7 @@ public final class WorldRenderer {
     private Camera localPlayerCamera = new PerspectiveCamera();
 
     //private Camera lightCamera = new PerspectiveCamera();
-    private Camera lightCamera = new OrthographicCamera(-1000.0f, 1000.0f, 1000.0f, -1000.0f);
+    private Camera lightCamera = new OrthographicCamera(-500f, 500f, 500f, -500f);
 
     private Camera activeCamera = localPlayerCamera;
 
@@ -848,8 +848,8 @@ public final class WorldRenderer {
     }
 
     public void positionLightCamera() {
-        int lightPosX = calcCamChunkOffsetX();
-        int lightPosZ = calcCamChunkOffsetZ();
+        int lightPosX = calcCamChunkOffsetX() * Chunk.CHUNK_SIZE.x;
+        int lightPosZ = calcCamChunkOffsetZ() * Chunk.CHUNK_SIZE.z;
 
         // Shadows are rendered around the player so...
         Vector3f lightPosition = new Vector3f(lightPosX, 0.0f, lightPosZ);
@@ -862,7 +862,7 @@ public final class WorldRenderer {
         Vector3f sunDirection = skysphere.getQuantizedSunDirection(stepSize);
 
         Vector3f sunPosition = new Vector3f(sunDirection);
-        sunPosition.scale(1000.0f);
+        sunPosition.scale(500f);
 
         lightPosition.add(sunPosition);
         lightCamera.getPosition().set(lightPosition);

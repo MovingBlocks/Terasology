@@ -19,6 +19,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
+import org.terasology.componentSystem.controllers.LocalPlayerSystem;
 import org.terasology.config.Config;
 import org.terasology.editor.properties.Property;
 import org.terasology.game.CoreRegistry;
@@ -47,10 +48,14 @@ public class ShaderParametersPost extends ShaderParametersBase {
 
     Property filmGrainIntensity = new Property("filmGrainIntensity", 0.1f, 0.0f, 1.0f);
     Property maxBlurSky = new Property("maxBlurSky", 1.0f, 0.0f, 1.0f);
+    Property blurStart = new Property("blurStart", 0.1f, 0.0f, 1.0f);
+    Property blurLength = new Property("blurLength", 0.1f, 0.0f, 1.0f);
 
     @Override
     public void applyParameters(ShaderProgram program) {
         super.applyParameters(program);
+
+        LocalPlayerSystem localPlayerSystem = CoreRegistry.get(LocalPlayerSystem.class);
 
         DefaultRenderingProcess.FBO sceneCombined = DefaultRenderingProcess.getInstance().getFBO("sceneCombined");
 
@@ -68,7 +73,13 @@ public class ShaderParametersPost extends ShaderParametersBase {
             DefaultRenderingProcess.getInstance().getFBO("sceneBlur1").bindTexture();
             program.setInt("texBlur", texId++);
 
+            if (localPlayerSystem != null) {
+                program.setFloat("blurFocusDistance", localPlayerSystem.getEyeFocusDistance());
+            }
+
             program.setFloat("maxBlurSky", (Float) maxBlurSky.getValue());
+            program.setFloat("blurStart", (Float) blurStart.getValue());
+            program.setFloat("blurLength", (Float) blurLength.getValue());
         }
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
@@ -104,5 +115,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
     public void addPropertiesToList(List<Property> properties) {
         properties.add(filmGrainIntensity);
         properties.add(maxBlurSky);
+        properties.add(blurStart);
+        properties.add(blurLength);
     }
 }

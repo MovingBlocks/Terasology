@@ -215,7 +215,7 @@ public class DefaultRenderingProcess implements IPropertyProvider {
         createFBO("sceneOpaque", Display.getWidth(), Display.getHeight(), FBOType.HDR, true, true);
         createFBO("sceneTransparent", Display.getWidth(), Display.getHeight(), FBOType.HDR, true, true);
 
-        createFBO("sceneShadowMap", 4096, 4096, FBOType.NO_COLOR, true, false);
+        createFBO("sceneShadowMap", 1024, 1024, FBOType.NO_COLOR, true, false);
 
         createFBO("sceneCombined", Display.getWidth(), Display.getHeight(), FBOType.HDR, true, true);
 
@@ -283,8 +283,8 @@ public class DefaultRenderingProcess implements IPropertyProvider {
             fbo.depthTextureId = GL11.glGenTextures();
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbo.depthTextureId);
 
-            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+            GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
 
