@@ -21,7 +21,6 @@ uniform sampler2D texBloom;
 #endif
 #if !defined (NO_BLUR)
 uniform sampler2D texBlur;
-uniform float maxBlurSky;
 uniform float blurFocusDistance;
 uniform float blurStart;
 uniform float blurLength;
@@ -59,10 +58,6 @@ void main() {
     float finalBlurStart = blurFocusDistance / viewingDistance + blurStart;
     if (depthLin > finalBlurStart && !swimming) {
        blur = clamp((depthLin - finalBlurStart) / blurLength, 0.0, 1.0);
-
-       if (currentDepth > 0.9999999) {
-           blur = min(blur, maxBlurSky);
-       }
     } else if (swimming) {
        blur = 1.0;
     }

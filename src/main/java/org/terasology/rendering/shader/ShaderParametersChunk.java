@@ -46,8 +46,8 @@ public class ShaderParametersChunk extends ShaderParametersBase {
     private Texture effects = Assets.getTexture("engine:effects");
 
     Property skyInscatteringLength = new Property("skyInscatteringLength", 1.0f, 0.0f, 1.0f);
-    Property skyInscatteringStrength = new Property("skyInscatteringStrength", 0.25f, 0.0f, 1.0f);
-    Property skyInscatteringThreshold = new Property("skyInscatteringThreshold", 0.17f, 0.0f, 1.0f);
+    Property skyInscatteringStrength = new Property("skyInscatteringStrength", 0.075f, 0.0f, 1.0f);
+    Property skyInscatteringThreshold = new Property("skyInscatteringThreshold", 0.60f, 0.0f, 1.0f);
 
     Property waveIntens = new Property("waveIntens", 1.0f, 0.0f, 2.0f);
     Property waveIntensFalloff = new Property("waveIntensFalloff", 0.88f, 0.0f, 2.0f);
@@ -173,6 +173,7 @@ public class ShaderParametersChunk extends ShaderParametersBase {
     public void addPropertiesToList(List<Property> properties) {
         properties.add(skyInscatteringLength);
         properties.add(skyInscatteringStrength);
+        properties.add(skyInscatteringThreshold);
         properties.add(waveIntens);
         properties.add(waveIntensFalloff);
         properties.add(waveSize);
@@ -191,6 +192,5 @@ public class ShaderParametersChunk extends ShaderParametersBase {
         properties.add(shadowIntens);
         properties.add(shadowMapBias);
         properties.add(waterTint);
-        properties.add(skyInscatteringThreshold);
     }
 }

@@ -47,7 +47,6 @@ public class ShaderParametersPost extends ShaderParametersBase {
     Texture noiseTexture = Assets.getTexture("engine:noise");
 
     Property filmGrainIntensity = new Property("filmGrainIntensity", 0.1f, 0.0f, 1.0f);
-    Property maxBlurSky = new Property("maxBlurSky", 1.0f, 0.0f, 1.0f);
     Property blurStart = new Property("blurStart", 0.1f, 0.0f, 1.0f);
     Property blurLength = new Property("blurLength", 0.1f, 0.0f, 1.0f);
 
@@ -77,7 +76,6 @@ public class ShaderParametersPost extends ShaderParametersBase {
                 program.setFloat("blurFocusDistance", localPlayerSystem.getEyeFocusDistance());
             }
 
-            program.setFloat("maxBlurSky", (Float) maxBlurSky.getValue());
             program.setFloat("blurStart", (Float) blurStart.getValue());
             program.setFloat("blurLength", (Float) blurLength.getValue());
         }
@@ -114,7 +112,6 @@ public class ShaderParametersPost extends ShaderParametersBase {
     @Override
     public void addPropertiesToList(List<Property> properties) {
         properties.add(filmGrainIntensity);
-        properties.add(maxBlurSky);
         properties.add(blurStart);
         properties.add(blurLength);
     }

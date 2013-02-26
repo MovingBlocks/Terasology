@@ -83,7 +83,8 @@ public class ShaderManager {
         createAndStoreShaderProgram("hdr", new ShaderParametersHdr());
         createAndStoreShaderProgram("sky", new ShaderParametersSky());
         createAndStoreShaderProgram("chunk", new ShaderParametersChunk(),
-                ShaderProgram.ShaderProgramFeatures.FEATURE_TRANSPARENT_PASS.getValue());
+                ShaderProgram.ShaderProgramFeatures.FEATURE_TRANSPARENT_PASS.getValue()
+                | ShaderProgram.ShaderProgramFeatures.FEATURE_ALPHA_REJECT.getValue());
         createAndStoreShaderProgram("particle", new ShaderParametersParticle());
         createAndStoreShaderProgram("block", new ShaderParametersBlock());
         createAndStoreShaderProgram("gelatinousCube", new ShaderParametersGelCube());

@@ -28,10 +28,8 @@ import java.util.List;
  */
 public class ShaderParametersSobel extends ShaderParametersBase {
 
-    Property pixelOffsetX = new Property("pixelOffsetX", 1.25f, 0.0f, 16.0f);
-    Property pixelOffsetY = new Property("pixelOffsetY", 1.25f, 0.0f, 16.0f);
-
-    Property threshold = new Property("threshold", 16.0f, 0.0f, 16.0f);
+    Property pixelOffsetX = new Property("pixelOffsetX", 1.0f, 0.0f, 16.0f);
+    Property pixelOffsetY = new Property("pixelOffsetY", 1.0f, 0.0f, 16.0f);
 
     @Override
     public void applyParameters(ShaderProgram program) {
@@ -47,14 +45,11 @@ public class ShaderParametersSobel extends ShaderParametersBase {
 
         program.setFloat("pixelOffsetX", (Float) pixelOffsetX.getValue());
         program.setFloat("pixelOffsetY", (Float) pixelOffsetY.getValue());
-
-        program.setFloat("threshold", (Float) threshold.getValue());
     }
 
     @Override
     public void addPropertiesToList(List<Property> properties) {
         properties.add(pixelOffsetX);
         properties.add(pixelOffsetY);
-        properties.add(threshold);
     }
 }

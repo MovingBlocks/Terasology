@@ -743,9 +743,11 @@ public final class WorldRenderer {
                 shader = ShaderManager.getInstance().getShaderProgram("chunk");
                 shader.enable();
 
-                if (phase != ChunkMesh.RENDER_PHASE.OPAQUE) {
+                if (phase == ChunkMesh.RENDER_PHASE.WATER_AND_ICE) {
                     // This chunks can actually contain water...
                     shader.setActiveFeatures(ShaderProgram.ShaderProgramFeatures.FEATURE_TRANSPARENT_PASS.getValue());
+                } else if (phase == ChunkMesh.RENDER_PHASE.BILLBOARD_AND_TRANSLUCENT) {
+                    shader.setActiveFeatures(ShaderProgram.ShaderProgramFeatures.FEATURE_ALPHA_REJECT.getValue());
                 } else {
                     shader.setActiveFeatures(0);
                 }

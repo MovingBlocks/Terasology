@@ -70,7 +70,8 @@ public class ShaderProgram {
 
     public enum ShaderProgramFeatures {
         FEATURE_TRANSPARENT_PASS(0x01),
-        FEATURE_ALL(0x02);
+        FEATURE_ALPHA_REJECT(0x02),
+        FEATURE_ALL(0x04);
 
         private int value;
         private ShaderProgramFeatures(int value) {
