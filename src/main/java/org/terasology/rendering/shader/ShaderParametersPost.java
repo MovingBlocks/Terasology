@@ -68,7 +68,7 @@ public class ShaderParametersPost extends ShaderParametersBase {
         DefaultRenderingProcess.getInstance().getFBO("sceneBloom1").bindTexture();
         program.setInt("texBloom", texId++);
 
-        if (CoreRegistry.get(Config.class).getRendering().getBlurIntensity() != 0 || CoreRegistry.get(Config.class).getRendering().isMotionBlur()) {
+        if (CoreRegistry.get(Config.class).getRendering().getBlurIntensity() != 0) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
             DefaultRenderingProcess.getInstance().getFBO("sceneBlur1").bindTexture();
             program.setInt("texBlur", texId++);

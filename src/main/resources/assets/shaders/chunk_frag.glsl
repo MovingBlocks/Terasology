@@ -69,6 +69,7 @@ uniform vec4 skyInscatteringSettingsFrag;
 #define skyInscatteringExponent skyInscatteringSettingsFrag.x
 #define skyInscatteringStrength skyInscatteringSettingsFrag.y
 #define skyInscatteringLength skyInscatteringSettingsFrag.z
+#define skyInscatteringThreshold skyInscatteringSettingsFrag.w
 
 #ifdef FEATURE_TRANSPARENT_PASS
 uniform vec4 waterSettingsFrag;
@@ -282,8 +283,9 @@ void main(){
     color.xyz *= shadowTerm;
 #endif
 
+    float finalFogStart = skyInscatteringThreshold * viewingDistance;
+    float fogValue = clamp((distance - finalFogStart) / (skyInscatteringLength * viewingDistance + finalFogStart), 0.0, skyInscatteringStrength);
     vec3 finalInscatteringColor = convertColorYxy(skyInscatteringColor, skyInscatteringExponent);
-    float fogValue = skyInscatteringStrength - clamp((viewingDistance - distance) / (viewingDistance - (1.0 - skyInscatteringLength) * viewingDistance), 0.0, skyInscatteringStrength);
     color = mix(color, vec4(finalInscatteringColor, 1.0), fogValue);
 
     gl_FragData[0].rgba = color;

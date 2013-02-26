@@ -33,7 +33,7 @@ public class RenderingConfig {
     private boolean filmGrain = false;
     private boolean outline = true;
     private boolean lightShafts = false;
-    private boolean eyeAdapting = false;
+    private boolean eyeAdaptation = false;
     private boolean bloom = false;
     private boolean dynamicShadows = false;
 
@@ -254,11 +254,11 @@ public class RenderingConfig {
     }
 
     public boolean isEyeAdaptation() {
-        return eyeAdapting;
+        return eyeAdaptation;
     }
 
     public void setEyeAdaptation(boolean eyeAdapting) {
-        this.eyeAdapting = eyeAdapting;
+        this.eyeAdaptation = eyeAdapting;
     }
 
     public boolean isBloom() {
