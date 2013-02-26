@@ -15,8 +15,12 @@
  */
 package org.terasology.rendering.shader;
 
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
+import org.terasology.asset.Assets;
 import org.terasology.game.CoreRegistry;
 import org.terasology.editor.properties.Property;
+import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 
@@ -34,6 +38,9 @@ public class ShaderParametersSky extends ShaderParametersBase {
 
     private Property sunExponent = new Property("sunExponent", 4096.0f, 1.0f, 8192f);
     private Property moonExponent = new Property("moonExponent", 256.0f, 1.0f, 8192f);
+
+    private Texture skyTexture90 = Assets.getTexture("engine:sky90");;
+    private Texture skyTexture180 = Assets.getTexture("engine:sky180");;
 
     public static Vector3d getAllWeatherZenith(float thetaSun, float turbidity) {
         thetaSun = (float) java.lang.Math.acos(thetaSun);
@@ -59,6 +66,14 @@ public class ShaderParametersSky extends ShaderParametersBase {
     @Override
     public void applyParameters(ShaderProgram program) {
         super.applyParameters(program);
+
+        int texId = 0;
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, skyTexture90.getId());
+        program.setInt("texSky90", texId++);
+        GL13.glActiveTexture(GL13.GL_TEXTURE0 + texId);
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, skyTexture180.getId());
+        program.setInt("texSky180", texId++);
 
         WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
         WorldProvider worldProvider = CoreRegistry.get(WorldProvider.class);
