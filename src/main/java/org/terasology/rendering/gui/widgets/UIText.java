@@ -154,6 +154,16 @@ public class UIText extends UIDisplayContainerScrollable {
                     
                     event.consume();
                 }
+                else if (event.getKey() == Keyboard.KEY_HOME && event.isDown()) {
+                    clearSelection();
+                    setCursorToTextPosition(0);
+                    event.consume();
+                }
+                else if (event.getKey() == Keyboard.KEY_END && event.isDown()) {
+                    clearSelection();
+                    setCursorToTextPosition(text.getText().length());
+                    event.consume();
+                }
                 //move cursor left
                 else if (event.getKey() == Keyboard.KEY_LEFT && event.isDown()) {
                     clearSelection();
@@ -243,9 +253,9 @@ public class UIText extends UIDisplayContainerScrollable {
                         int num = insertText(getWrapOffset(cursorPosition), String.valueOf(c));
                         
                         setCursorToTextPosition(cursorPosition + num);
+                        event.consume();
                     }
-                    
-                    event.consume();
+
                 }
             }
         }
@@ -1101,18 +1111,20 @@ public class UIText extends UIDisplayContainerScrollable {
         text.setColor(color);
         cursor.setColor(color);
     }
-    
-    /**
-     * Get the text selection color.
-     * @return Returns the text selection color.
-     */
-    public void setSelectionColor(Color color) {
-        selectionRectangle.setColor(color);
-    }
-    
+
+
     /**
      * Set the text selection color.
      * @param color The text selection color to set.
+     */
+
+    public void setSelectionColor(Color color) {
+        selectionRectangle.setColor(color);
+    }
+
+    /**
+     * Get the text selection color.
+     * @return Returns the text selection color.
      */
     public Color getSelectionColor() {
         return selectionRectangle.getColor();

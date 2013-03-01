@@ -294,7 +294,7 @@ public abstract class UIDisplayElement {
      * @param focus True if the display element should be focused.
      */
     public void setFocus(UIDisplayElement focus) {
-        if (focusedElement != focus) {
+        if (focusedElement != focus && !focus.isParentOf(focusedElement)) {
             if (focus == null && focusedElement != this) {
                 return;
             }
@@ -308,6 +308,16 @@ public abstract class UIDisplayElement {
                 focusedElement.notifyFocusListeners(true);
             }
         }
+    }
+
+    private boolean isParentOf(UIDisplayElement otherElement) {
+        while (otherElement != null) {
+            if (otherElement == this) {
+                return true;
+            }
+            otherElement = otherElement.parent;
+        }
+        return false;
     }
 
     /**

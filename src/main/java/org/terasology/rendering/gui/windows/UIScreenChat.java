@@ -89,15 +89,6 @@ public class UIScreenChat extends UIWindow {
         setModal(true);
         maximize();
 
-        addVisibilityListener(new VisibilityListener() {
-            @Override
-            public void changed(UIDisplayElement element, boolean visibility) {
-                if (visibility) {
-                    setFocus(inputBox);
-                }
-            }
-        });
-
         inputBox = new UIText();
         inputBox.setSize(new Vector2f(900f, 28f));
         inputBox.setBackgroundColor(new Color(255, 255, 255, 200));
@@ -178,6 +169,7 @@ public class UIScreenChat extends UIWindow {
                 }
             }
         });
+        setFocus(inputBox);
 
         messageList = new UIList();
         messageList.setSize(new Vector2f(900f, 400f));
