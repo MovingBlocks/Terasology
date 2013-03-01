@@ -23,13 +23,9 @@ public class JoinServer implements LoadProcess {
 
     private NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
     private WorldInfo worldInfo;
-    private String address;
-    private int port;
 
-    public JoinServer(String address, int port, WorldInfo worldInfo) {
+    public JoinServer(WorldInfo worldInfo) {
         this.worldInfo = worldInfo;
-        this.address = address;
-        this.port = port;
     }
 
     @Override
@@ -71,9 +67,6 @@ public class JoinServer implements LoadProcess {
 
     @Override
     public int begin() {
-        if (!networkSystem.join(address, port)) {
-            // TODO: Deal with failure to connect
-        }
         return 1;
     }
 }

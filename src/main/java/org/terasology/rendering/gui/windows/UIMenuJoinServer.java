@@ -9,6 +9,8 @@ import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.TerasologyConstants;
 import org.terasology.game.modes.StateLoading;
+import org.terasology.network.NetworkMode;
+import org.terasology.network.NetworkSystem;
 import org.terasology.rendering.gui.dialogs.UIDialogServer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
@@ -55,7 +57,7 @@ public class UIMenuJoinServer extends UIWindow {
         list.addDoubleClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-
+                tryJoinServer();
             }
         });
         list.setVisible(true);
@@ -134,11 +136,7 @@ public class UIMenuJoinServer extends UIWindow {
         joinServerButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                saveServerList();
-                if (list.getSelection() != null && list.getSelection().getValue() != null) {
-                    ServerInfo server = (ServerInfo) list.getSelection().getValue();
-                    CoreRegistry.get(GameEngine.class).changeState(new StateLoading(server.getAddress(), TerasologyConstants.DEFAULT_PORT));
-                }
+                tryJoinServer();
             }
         });
         joinServerButton.setVisible(true);
@@ -189,6 +187,19 @@ public class UIMenuJoinServer extends UIWindow {
         buttonContainer.addDisplayElement(refreshServerButton);
     }
 
+    private void tryJoinServer() {
+        saveServerList();
+        if (list.getSelection() != null && list.getSelection().getValue() != null) {
+            ServerInfo server = (ServerInfo) list.getSelection().getValue();
+            NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
+            if (networkSystem.join(server.getAddress(), TerasologyConstants.DEFAULT_PORT)) {
+                CoreRegistry.get(GameEngine.class).changeState(new StateLoading(NetworkMode.CLIENT));
+            } else {
+                getGUIManager().showMessage("Failed to Join", "Could not connect to server (does it exist?)");
+            }
+        }
+    }
+
     private void loadServerList() {
         list.removeAll();
         Config config = CoreRegistry.get(Config.class);
@@ -209,7 +220,6 @@ public class UIMenuJoinServer extends UIWindow {
         layout.setCellPadding(new Vector4f(5f, 5f, 5f, 10f));
 
         UIComposite composite = new UIComposite();
-        composite.setSize("100%", "0px");
         composite.setLayout(layout);
         composite.setVisible(true);
 
@@ -236,6 +246,8 @@ public class UIMenuJoinServer extends UIWindow {
 
         item.addDisplayElement(composite);
         item.addDisplayElement(connectionImage);
+
+        item.setPadding(new Vector4f(10f, 10f, 10f, 10f));
 
         list.addItem(item);
     }

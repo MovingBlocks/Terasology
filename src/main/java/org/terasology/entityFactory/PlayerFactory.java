@@ -61,34 +61,13 @@ public class PlayerFactory {
         inventoryManager.giveItem(chestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("core:companion"), 99));
         inventoryManager.giveItem(chestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:brick:engine:stair"), 99));
         inventoryManager.giveItem(chestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("core:Tnt"), 99));
-        inventoryManager.giveItem(chestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("books:Bookcase"), 1));
 
-        inventoryManager.giveItem(chestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:clay:engine:slope"), 99));
-        inventoryManager.giveItem(chestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:clay:engine:steepslope"), 99));
         inventoryManager.giveItem(chestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:StoneStair"), 99));
-        inventoryManager.giveItem(chestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:marble:engine:stair"), 99));
 
-        inventoryManager.giveItem(chestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:Marble"), 99));
-        inventoryManager.giveItem(chestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:marble:engine:testsphere"), 99));
-        inventoryManager.giveItem(chestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:marble:engine:slope"), 99));
-        inventoryManager.giveItem(chestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:marble:engine:steepslope"), 99));
-
-        inventoryManager.giveItem(chestContents, entityManager.create("potions:purplepotion"));
-        inventoryManager.giveItem(chestContents, entityManager.create("potions:greenpotion"));
-        inventoryManager.giveItem(chestContents, entityManager.create("potions:orangepotion"));
-        inventoryManager.giveItem(chestContents, entityManager.create("potions:redpotion"));
-
-        inventoryManager.giveItem(chestContents, entityManager.create("books:book"));
-        inventoryManager.giveItem(chestContents, entityManager.create("books:bluebook"));
-        inventoryManager.giveItem(chestContents, entityManager.create("books:redbook"));
         inventoryManager.giveItem(chestContents, entityManager.create("core:railgunTool"));
 
         inventoryManager.giveItem(chestContents, entityManager.create("core:mrbarsack"));
-        inventoryManager.giveItem(chestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:Cobaltite"), 99));
-        inventoryManager.giveItem(chestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:NativeGoldOre"), 99));
-        inventoryManager.giveItem(chestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:Microcline"), 99));
-
-        inventoryManager.giveItem(chestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Brick"), 99));
+                inventoryManager.giveItem(chestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Brick"), 99));
         inventoryManager.giveItem(chestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Ice"), 99));
         inventoryManager.giveItem(chestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Plank"), 99));
 
@@ -103,21 +82,8 @@ public class PlayerFactory {
         BlockItemComponent innerBlockItem = innerChest.getComponent(BlockItemComponent.class);
         EntityRef innerChestContents = innerBlockItem.placedEntity;
 
-
-        inventoryManager.giveItem(innerChestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:Alabaster"), 99));
-        inventoryManager.giveItem(innerChestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:Basalt"), 99));
-        inventoryManager.giveItem(innerChestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:Gabbro"), 99));
-        inventoryManager.giveItem(innerChestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:Hornblende"), 99));
-
-        inventoryManager.giveItem(innerChestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:OrangeSandStone"), 99));
-        inventoryManager.giveItem(innerChestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:Phyllite"), 99));
-        inventoryManager.giveItem(innerChestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:Schist"), 99));
-        inventoryManager.giveItem(innerChestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:Cinnabar"), 99));
-
         inventoryManager.giveItem(innerChestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Lava"), 99));
         inventoryManager.giveItem(innerChestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Water"), 99));
-        inventoryManager.giveItem(innerChestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:Rutile"), 99));
-        inventoryManager.giveItem(innerChestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("minerals:Kaolinite"), 99));
 
         inventoryManager.giveItem(innerChestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Iris"), 99));
         inventoryManager.giveItem(innerChestContents, blockFactory.newInstance(BlockManager.getInstance().getBlockFamily("engine:Dandelion"), 99));
@@ -134,9 +100,6 @@ public class PlayerFactory {
         inventoryManager.giveItem(player, entityManager.create("core:railgunTool"));
         inventoryManager.giveItem(player, entityManager.create("core:miniaturizer"));
         inventoryManager.giveItem(player, chest);
-
-        inventoryManager.giveItem(player, entityManager.create("dynamicBlocks:train"));
-        inventoryManager.giveItem(player, entityManager.create("dynamicBlocks:boat"));
 
         return player;
     }

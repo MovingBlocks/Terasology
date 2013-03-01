@@ -83,17 +83,13 @@ public class StateLoading implements GameState {
     }
 
     /**
-     * Constructor for client games
-     *
-     * @param serverAddress
-     * @param port
+     * Constructor for client of multiplayer game
+     * @param netMode
      */
-    public StateLoading(String serverAddress, int port) {
+    public StateLoading(NetworkMode netMode) {
         this.worldInfo = new WorldInfo();
-        this.serverAddress = serverAddress;
-        this.serverPort = port;
         this.guiManager = CoreRegistry.get(GUIManager.class);
-        this.netMode = NetworkMode.CLIENT;
+        this.netMode = netMode;
     }
 
     @Override
@@ -115,7 +111,7 @@ public class StateLoading implements GameState {
     }
 
     private void initClient() {
-        loadProcesses.add(new JoinServer(serverAddress, serverPort, worldInfo));
+        loadProcesses.add(new JoinServer(worldInfo));
         loadProcesses.add(new RegisterMods(worldInfo));
         loadProcesses.add(new CacheTextures());
         loadProcesses.add(new RegisterBlocks(worldInfo));

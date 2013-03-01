@@ -89,8 +89,12 @@ public class UIDialogServer extends UIDialog {
         okButton.addClickListener(new ClickListener() {
             @Override
             public void click(UIDisplayElement element, int button) {
-                ServerInfo serverInfo = new ServerInfo(inputName.getText(), inputIp.getText());
-                closeDialog(EReturnCode.OK, serverInfo);
+                if (inputName.getText().isEmpty() || inputIp.getText().isEmpty()) {
+                    getGUIManager().showMessage("Error", "Please specify both a name and address for the server.");
+                } else {
+                    ServerInfo serverInfo = new ServerInfo(inputName.getText(), inputIp.getText());
+                    closeDialog(EReturnCode.OK, serverInfo);
+                }
             }
         });
         

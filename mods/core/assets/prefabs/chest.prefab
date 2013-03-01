@@ -38,19 +38,6 @@
     sounds = "engine:click"
   },
   "AccessInventoryAction": {},
-  "CraftRecipe" : {
-        "recipe" :  {
-            bottom:
-                [
-                    "plank",  "plank", "plank",
-                    "plank",  " ",     "plank",
-                    "plank",  "plank", "plank"
-                ]
-        },
-
-        "resultCount": 1
-
-    },
-    "Network" : {
-    }
+  "Network" : {
+  }
 }

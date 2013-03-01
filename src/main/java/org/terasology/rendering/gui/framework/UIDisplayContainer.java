@@ -50,7 +50,7 @@ public abstract class UIDisplayContainer extends UIDisplayElement {
 
     //cropping
     private boolean cropContainer = false;
-    protected Vector4f cropMargin = new Vector4f(0.0f, 0.0f,0.0f, 0.0f);
+    protected Vector4f cropMargin = new Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
     
     public UIDisplayContainer() {
         super();

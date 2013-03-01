@@ -294,7 +294,7 @@ public abstract class UIDisplayElement {
      * @param focus True if the display element should be focused.
      */
     public void setFocus(UIDisplayElement focus) {
-        if (focusedElement != focus && !focus.isParentOf(focusedElement)) {
+        if (focusedElement != focus && (focus == null || !focus.isParentOf(focusedElement))) {
             if (focus == null && focusedElement != this) {
                 return;
             }

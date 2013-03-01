@@ -7,17 +7,5 @@
             "Stone" : 1
         },
         "renderWithIcon" : true
-    },
-
-    "CraftRecipe" : {
-        "recipe" :  {
-            bottom:
-                [
-                    "refinement rock", "stone", "refinement rock",
-                    " ",               "stick", " ",
-                    " ",               "stick", " "
-                ]
-        }
-
     }
 }
