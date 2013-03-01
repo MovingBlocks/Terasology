@@ -108,6 +108,7 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
         dirtyComponents.keySet().remove(netId);
         addedComponents.keySet().remove(netId);
         removedComponents.keySet().remove(netId);
+        netDirty.remove(netId);
         netRelevant.remove(netId);
     }
 
@@ -207,9 +208,9 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
         } else {
             NetworkComponent networkComponent = target.getComponent(NetworkComponent.class);
             if (networkComponent != null) {
-                if (netRelevant.contains(networkComponent.networkId) || netInitial.contains(networkComponent.networkId)) {
+                if (netRelevant.contains(networkComponent.getNetworkId()) || netInitial.contains(networkComponent.getNetworkId())) {
                     queuedOutgoingEvents.add(NetData.EventMessage.newBuilder()
-                            .setTargetId(networkComponent.networkId)
+                            .setTargetId(networkComponent.getNetworkId())
                             .setEvent(eventSerializer.serialize(event)).build());
                 }
             }
@@ -306,6 +307,9 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
         while (dirtyIterator.hasNext()) {
             int netId = dirtyIterator.next();
             EntityRef entity = networkSystem.getEntity(netId);
+            if (!entity.exists()) {
+                logger.error("Sending non-existent entity update for netId {}", netId);
+            }
             boolean isOwner = networkSystem.getOwner(entity) == this;
             EntityData.PackedEntity entityData = entitySerializer.serialize(entity, addedComponents.get(netId), dirtyComponents.get(netId), removedComponents.get(netId), new ServerComponentFieldCheck(isOwner, false));
             if (entityData != null) {
@@ -332,6 +336,10 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
             int netId = initialIterator.next();
             netRelevant.add(netId);
             EntityRef entity = networkSystem.getEntity(netId);
+            if (!entity.hasComponent(NetworkComponent.class)) {
+                logger.error("Sending net entity with no network component: {} - {}", netId, entity);
+                continue;
+            }
             // Note: Send owner->server fields on initial create
             Client owner = networkSystem.getOwner(entity);
             EntityData.PackedEntity entityData = entitySerializer.serialize(entity, true, new ServerComponentFieldCheck(owner == this, true));

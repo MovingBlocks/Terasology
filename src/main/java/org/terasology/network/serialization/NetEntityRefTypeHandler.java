@@ -36,7 +36,7 @@ public class NetEntityRefTypeHandler implements TypeHandler<EntityRef> {
         }
         NetworkComponent netComponent = value.getComponent(NetworkComponent.class);
         if (netComponent != null) {
-            return EntityData.Value.newBuilder().addInteger(netComponent.networkId).build();
+            return EntityData.Value.newBuilder().addInteger(netComponent.getNetworkId()).build();
         }
         return null;
     }
@@ -70,7 +70,7 @@ public class NetEntityRefTypeHandler implements TypeHandler<EntityRef> {
             } else {
                 NetworkComponent netComponent = ref.getComponent(NetworkComponent.class);
                 if (netComponent != null) {
-                    result.addInteger(netComponent.networkId);
+                    result.addInteger(netComponent.getNetworkId());
                 } else {
                     result.addInteger(0);
                 }

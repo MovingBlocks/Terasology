@@ -19,6 +19,7 @@ import javax.vecmath.Tuple3i;
 
 import org.terasology.entitySystem.Component;
 import org.terasology.math.Vector3i;
+import org.terasology.network.Replicate;
 
 /**
  * Used for entities representing a block in the world
@@ -26,6 +27,7 @@ import org.terasology.math.Vector3i;
  * @author Immortius <immortius@gmail.com>
  */
 public final class BlockComponent implements Component {
+    @Replicate
     private Vector3i position = new Vector3i();
 
     // Does this block component exist only for excavation (and should be removed when back at full heath)

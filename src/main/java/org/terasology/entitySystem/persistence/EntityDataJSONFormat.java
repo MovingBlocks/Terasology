@@ -62,6 +62,10 @@ public class EntityDataJSONFormat {
         newGson().toJson(prefab, writer);
     }
 
+    public static String write(EntityData.Entity entity) {
+        return newGson().toJson(entity);
+    }
+
     public static EntityData.World readWorld(BufferedReader reader) throws IOException {
         try {
             return newGson().fromJson(reader, EntityData.World.class);

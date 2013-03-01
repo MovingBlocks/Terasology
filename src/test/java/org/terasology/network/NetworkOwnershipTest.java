@@ -74,7 +74,7 @@ public class NetworkOwnershipTest {
     private void connectClient() {
         networkSystem.addClient(client);
         networkSystem.update();
-        verify(client).setNetInitial(clientEntity.getComponent(NetworkComponent.class).networkId);
+        verify(client).setNetInitial(clientEntity.getComponent(NetworkComponent.class).getNetworkId());
     }
 
     @Test
@@ -82,8 +82,8 @@ public class NetworkOwnershipTest {
         connectClient();
         EntityRef entity = entityManager.create(new NetworkComponent());
         networkSystem.registerNetworkEntity(entity);
-        assertTrue(entity.getComponent(NetworkComponent.class).networkId != 0);
-        verify(client).setNetInitial(entity.getComponent(NetworkComponent.class).networkId);
+        assertTrue(entity.getComponent(NetworkComponent.class).getNetworkId() != 0);
+        verify(client).setNetInitial(entity.getComponent(NetworkComponent.class).getNetworkId());
     }
 
     @Test
@@ -91,8 +91,8 @@ public class NetworkOwnershipTest {
         EntityRef entity = entityManager.create(new NetworkComponent());
         networkSystem.registerNetworkEntity(entity);
         connectClient();
-        assertTrue(entity.getComponent(NetworkComponent.class).networkId != 0);
-        verify(client).setNetInitial(entity.getComponent(NetworkComponent.class).networkId);
+        assertTrue(entity.getComponent(NetworkComponent.class).getNetworkId() != 0);
+        verify(client).setNetInitial(entity.getComponent(NetworkComponent.class).getNetworkId());
     }
 
     @Test
@@ -104,9 +104,9 @@ public class NetworkOwnershipTest {
 
         networkSystem.registerNetworkEntity(entity);
 
-        assertTrue(entity.getComponent(NetworkComponent.class).networkId != 0);
+        assertTrue(entity.getComponent(NetworkComponent.class).getNetworkId() != 0);
 
-        verify(client, times(0)).setNetInitial(entity.getComponent(NetworkComponent.class).networkId);
+        verify(client, times(0)).setNetInitial(entity.getComponent(NetworkComponent.class).getNetworkId());
     }
 
     @Test
@@ -119,8 +119,8 @@ public class NetworkOwnershipTest {
 
         networkSystem.registerNetworkEntity(entity);
 
-        assertTrue(entity.getComponent(NetworkComponent.class).networkId != 0);
-        verify(client).setNetInitial(entity.getComponent(NetworkComponent.class).networkId);
+        assertTrue(entity.getComponent(NetworkComponent.class).getNetworkId() != 0);
+        verify(client).setNetInitial(entity.getComponent(NetworkComponent.class).getNetworkId());
     }
 
     @Test
@@ -134,7 +134,7 @@ public class NetworkOwnershipTest {
         connectClient();
         networkSystem.updateNetworkEntity(entity);
 
-        verify(client, times(1)).setNetInitial(entity.getComponent(NetworkComponent.class).networkId);
+        verify(client, times(1)).setNetInitial(entity.getComponent(NetworkComponent.class).getNetworkId());
     }
 
     @Test
@@ -151,14 +151,27 @@ public class NetworkOwnershipTest {
         networkSystem.registerNetworkEntity(entityA);
         networkSystem.registerNetworkEntity(entityB);
         connectClient();
-        verify(client, times(0)).setNetInitial(entityA.getComponent(NetworkComponent.class).networkId);
-        verify(client, times(0)).setNetInitial(entityB.getComponent(NetworkComponent.class).networkId);
+        verify(client, times(0)).setNetInitial(entityA.getComponent(NetworkComponent.class).getNetworkId());
+        verify(client, times(0)).setNetInitial(entityB.getComponent(NetworkComponent.class).getNetworkId());
         netCompA = entityA.getComponent(NetworkComponent.class);
         netCompA.owner = clientEntity;
         entityA.saveComponent(netCompA);
         networkSystem.updateNetworkEntity(entityA);
 
-        verify(client, times(1)).setNetInitial(entityA.getComponent(NetworkComponent.class).networkId);
-        verify(client, times(1)).setNetInitial(entityB.getComponent(NetworkComponent.class).networkId);
+        verify(client, times(1)).setNetInitial(entityA.getComponent(NetworkComponent.class).getNetworkId());
+        verify(client, times(1)).setNetInitial(entityB.getComponent(NetworkComponent.class).getNetworkId());
+    }
+
+    @Test
+    public void clientSendInitialForRelevantOwnedItems() {
+        NetworkComponent netCompA = new NetworkComponent();
+        netCompA.replicateMode = NetworkComponent.ReplicateMode.RELEVANT;
+        netCompA.owner = clientEntity;
+        EntityRef entityA = entityManager.create(netCompA);
+
+        networkSystem.registerNetworkEntity(entityA);
+        connectClient();
+        verify(client, times(1)).setNetInitial(entityA.getComponent(NetworkComponent.class).getNetworkId());
+
     }
 }

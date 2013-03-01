@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.events.PlaySoundEvent;
+import org.terasology.entitySystem.RegisterMode;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityRef;
@@ -29,7 +30,7 @@ import org.terasology.world.block.family.BlockFamily;
  * @author Immortius
  */
 // TODO: Predict placement client-side (and handle confirm/denial)
-@RegisterSystem
+@RegisterSystem(RegisterMode.AUTHORITY)
 public class BlockItemSystem implements ComponentSystem {
 
     @In

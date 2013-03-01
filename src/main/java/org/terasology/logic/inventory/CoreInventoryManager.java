@@ -493,7 +493,7 @@ public class CoreInventoryManager implements ComponentSystem, SlotBasedInventory
     private EntityRef createNewStack(EntityRef original, int withAmount) {
         Map<Class<? extends Component>, Component> componentMap = entityManager.copyComponents(original);
         NetworkComponent netComp = (NetworkComponent) componentMap.get(NetworkComponent.class);
-        netComp.networkId = 0;
+        netComp.setNetworkId(0);
         ItemComponent itemComp = (ItemComponent) componentMap.get(ItemComponent.class);
         itemComp.stackCount = (byte) withAmount;
         EntityRef result = entityManager.create(componentMap.values());

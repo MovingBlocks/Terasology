@@ -17,11 +17,9 @@ package org.terasology.entitySystem.pojo;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Predicates;
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -64,11 +62,12 @@ import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 
 /**
+ * An implementation of the EntitySystem.
  * @author Immortius <immortius@gmail.com>
  */
-public class PojoEventSystem implements EventSystem {
+public class EventSystemImpl implements EventSystem {
 
-    private static final Logger logger = LoggerFactory.getLogger(PojoEventSystem.class);
+    private static final Logger logger = LoggerFactory.getLogger(EventSystemImpl.class);
 
     private Map<Class<? extends Event>, SetMultimap<Class<? extends Component>, EventHandlerInfo>> componentSpecificHandlers = Maps.newHashMap();
     private SetMultimap<Class<? extends Event>, EventHandlerInfo> generalHandlers = HashMultimap.create();
@@ -84,7 +83,7 @@ public class PojoEventSystem implements EventSystem {
     private EventLibrary eventLibrary;
     private NetworkSystem networkSystem;
 
-    public PojoEventSystem(EventLibrary eventLibrary, NetworkSystem networkSystem) {
+    public EventSystemImpl(EventLibrary eventLibrary, NetworkSystem networkSystem) {
         this.mainThread = Thread.currentThread();
         this.eventLibrary = eventLibrary;
         this.networkSystem = networkSystem;
@@ -131,7 +130,6 @@ public class PojoEventSystem implements EventSystem {
     @Override
     public void registerEventHandler(ComponentSystem handler) {
         Class handlerClass = handler.getClass();
-        // TODO: Support private methods
         if (!Modifier.isPublic(handlerClass.getModifiers())) {
             logger.error("Cannot register handler {}, must be public", handler.getClass().getName());
             return;

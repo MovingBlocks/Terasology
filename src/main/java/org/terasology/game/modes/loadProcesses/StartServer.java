@@ -21,7 +21,6 @@ public class StartServer implements LoadProcess {
     @Override
     public boolean step() {
         CoreRegistry.get(NetworkSystem.class).host(TerasologyConstants.DEFAULT_PORT);
-        CoreRegistry.get(ComponentSystemManager.class).register(new NetworkEntitySystem(), "engine:networkEntitySystem");
         return true;
     }
 

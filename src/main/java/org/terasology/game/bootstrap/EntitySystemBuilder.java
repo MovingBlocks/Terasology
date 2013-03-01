@@ -44,8 +44,8 @@ import org.terasology.entitySystem.metadata.extension.Vector2fTypeHandler;
 import org.terasology.entitySystem.metadata.extension.Vector3fTypeHandler;
 import org.terasology.entitySystem.metadata.extension.Vector3iTypeHandler;
 import org.terasology.entitySystem.metadata.internal.EntitySystemLibraryImpl;
+import org.terasology.entitySystem.pojo.EventSystemImpl;
 import org.terasology.entitySystem.pojo.PojoEntityManager;
-import org.terasology.entitySystem.pojo.PojoEventSystem;
 import org.terasology.entitySystem.pojo.PojoPrefabManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.mod.Mod;
@@ -84,7 +84,7 @@ public class EntitySystemBuilder {
         entityManager.setPrefabManager(prefabManager);
         CoreRegistry.put(PrefabManager.class, prefabManager);
 
-        entityManager.setEventSystem(new PojoEventSystem(library.getEventLibrary(), CoreRegistry.get(NetworkSystem.class)));
+        entityManager.setEventSystem(new EventSystemImpl(library.getEventLibrary(), CoreRegistry.get(NetworkSystem.class)));
         CoreRegistry.put(EntityManager.class, entityManager);
         CoreRegistry.put(EventSystem.class, entityManager.getEventSystem());
 

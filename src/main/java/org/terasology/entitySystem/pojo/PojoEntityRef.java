@@ -24,6 +24,7 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Event;
 import org.terasology.entitySystem.Prefab;
 import org.terasology.entitySystem.common.NullIterator;
+import org.terasology.network.NetworkComponent;
 
 /**
  * @author Immortius <immortius@gmail.com>
@@ -176,13 +177,21 @@ public class PojoEntityRef extends EntityRef {
     @Override
     public String toString() {
         AssetUri prefabUri = getPrefabURI();
-        if (prefabUri != null) {
-            return "EntityRef{id = " + id + ", prefab = '" + prefabUri.getSimpleString() + "'}";
-        } else {
-            return "EntityRef{" +
-                    "id=" + id +
-                    '}';
+        StringBuilder builder = new StringBuilder();
+        builder.append("EntityRef{id = ");
+        builder.append(id);
+        NetworkComponent networkComponent = getComponent(NetworkComponent.class);
+        if (networkComponent != null) {
+            builder.append(", netId = ");
+            builder.append(networkComponent.getNetworkId());
         }
+        if (prefabUri != null) {
+            builder.append(", prefab = '");
+            builder.append(prefabUri.getSimpleString());
+            builder.append("'");
+        }
+        builder.append("}");
+        return builder.toString();
     }
 
     void invalidate() {

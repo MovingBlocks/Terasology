@@ -17,6 +17,9 @@ package org.terasology.entitySystem;
 
 import org.terasology.asset.AssetUri;
 import org.terasology.entitySystem.common.NullEntityRef;
+import org.terasology.entitySystem.persistence.EntityDataJSONFormat;
+import org.terasology.entitySystem.persistence.EntitySerializer;
+import org.terasology.game.CoreRegistry;
 
 /**
  * A wrapper around an entity id providing access to common functionality
@@ -99,4 +102,9 @@ public abstract class EntityRef {
 
     public abstract AssetUri getPrefabURI();
 
+    public String toFullDescription() {
+        EntitySerializer serializer = new EntitySerializer((PersistableEntityManager) CoreRegistry.get(EntityManager.class));
+        serializer.setUsingFieldIds(false);
+        return EntityDataJSONFormat.write(serializer.serialize(this));
+    }
 }

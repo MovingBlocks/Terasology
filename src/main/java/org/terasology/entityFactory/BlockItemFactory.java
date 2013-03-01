@@ -69,7 +69,6 @@ public class BlockItemFactory {
         if (blockFamily.getArchetypeBlock().getEntityMode() == BlockEntityMode.PERSISTENT) {
             if (!placedEntity.exists()) {
                 placedEntity = entityManager.create(blockFamily.getArchetypeBlock().getEntityPrefab());
-                placedEntity.addComponent(new NetworkComponent());
             }
             blockItem.placedEntity = placedEntity;
         }

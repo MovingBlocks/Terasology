@@ -205,19 +205,26 @@ public class PackedEntitySerializer {
                 continue;
             }
 
-            Component existingComponent = entity.getComponent(metadata.getType());
-            if (existingComponent == null) {
-                existingComponent = metadata.newInstance();
+            Component component = entity.getComponent(metadata.getType());
+            boolean createdNewComponent = false;
+            if (component == null) {
+                createdNewComponent = true;
+                component = metadata.newInstance();
             }
             for (int fieldIndex = 0; fieldIndex < UnsignedBytes.toInt(entityData.getComponentFieldCounts().byteAt(componentIndex)); ++fieldIndex) {
                 byte fieldId = entityData.getFieldIds().byteAt(fieldPos);
                 FieldMetadata fieldMetadata = metadata.getFieldById(fieldId);
                 if (fieldMetadata != null && fieldCheck.shouldDeserializeField(fieldMetadata)) {
-                    fieldMetadata.deserializeOnto(existingComponent, entityData.getFieldValue(fieldPos));
+                    logger.trace("Deserializing field {} of component {} as value {}", fieldMetadata, metadata, entityData.getFieldValue(fieldPos));
+                    fieldMetadata.deserializeOnto(component, entityData.getFieldValue(fieldPos));
                 }
                 fieldPos++;
             }
-            entity.addComponent(existingComponent);
+            if (createdNewComponent) {
+                entity.addComponent(component);
+            } else {
+                entity.saveComponent(component);
+            }
 
         }
 
@@ -248,12 +255,18 @@ public class PackedEntitySerializer {
         ByteString.Output fieldIds = ByteString.newOutput();
         ByteString.Output componentFieldCounts = ByteString.newOutput();
         for (Class<? extends Component> componentType : added) {
+            Component component = entityRef.getComponent(componentType);
+            if (component == null) {
+                logger.error("Non-existent component marked as added: {}", componentType);
+            }
             serializeComponentFull(entityRef.getComponent(componentType), false, fieldCheck, entity, fieldIds, componentFieldCounts);
         }
         for (Class<? extends Component> componentType : changed) {
             Component comp = entityRef.getComponent(componentType);
             if (comp != null) {
                 serializeComponentFull(comp, true, fieldCheck, entity, fieldIds, componentFieldCounts);
+            } else {
+                logger.error("Non-existent component marked as changed: {}", componentType);
             }
         }
         for (Class<? extends Component> componentType : removed) {

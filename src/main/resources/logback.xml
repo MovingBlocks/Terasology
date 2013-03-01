@@ -19,6 +19,7 @@
 
     <logger name="org.terasology" level="INFO"/>
     <logger name="org.terasology.network" level="DEBUG"/>
+    <logger name="org.terasology.entitySystem.persistence" level="INFO"/>
 
     <root level="debug">
         <appender-ref ref="CONSOLE" />

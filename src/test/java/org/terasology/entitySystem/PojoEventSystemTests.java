@@ -8,8 +8,8 @@ import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.metadata.TypeHandlerLibrary;
 import org.terasology.entitySystem.metadata.TypeHandlerLibraryBuilder;
 import org.terasology.entitySystem.metadata.internal.EntitySystemLibraryImpl;
+import org.terasology.entitySystem.pojo.EventSystemImpl;
 import org.terasology.entitySystem.pojo.PojoEntityManager;
-import org.terasology.entitySystem.pojo.PojoEventSystem;
 import org.terasology.entitySystem.pojo.PojoPrefabManager;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.mock;
 public class PojoEventSystemTests {
 
     ComponentLibrary compLibrary;
-    PojoEventSystem eventSystem;
+    EventSystemImpl eventSystem;
     PojoEntityManager entityManager;
     EntityRef entity;
 
@@ -40,7 +40,7 @@ public class PojoEventSystemTests {
         entityManager = new PojoEntityManager();
         entityManager.setEntitySystemLibrary(entitySystemLibrary);
         entityManager.setPrefabManager(new PojoPrefabManager(compLibrary));
-        eventSystem = new PojoEventSystem(entitySystemLibrary.getEventLibrary(), mock(NetworkSystem.class));
+        eventSystem = new EventSystemImpl(entitySystemLibrary.getEventLibrary(), mock(NetworkSystem.class));
         entityManager.setEventSystem(eventSystem);
         entity = entityManager.create();
     }

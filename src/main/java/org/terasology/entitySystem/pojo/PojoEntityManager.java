@@ -324,6 +324,9 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
 
     <T extends Component> T addComponent(int entityId, T component) {
         Component oldComponent = store.put(entityId, component);
+        if (oldComponent != null) {
+            logger.error("Adding a component ({}) over an existing component for entity {}", component.getClass(), entityId);
+        }
         if (eventSystem != null) {
             if (oldComponent == null) {
                 eventSystem.send(createEntityRef(entityId), AddComponentEvent.newInstance(), component);
@@ -351,7 +354,22 @@ public class PojoEntityManager implements EntityManager, PersistableEntityManage
     }
 
     void saveComponent(int entityId, Component component) {
-        addComponent(entityId, component);
+        Component oldComponent = store.put(entityId, component);
+        if (oldComponent == null) {
+            logger.error("Saving a component ({}) that doesn't belong to this entity {}", component.getClass(), entityId);
+        }
+        if (eventSystem != null) {
+            if (oldComponent == null) {
+                eventSystem.send(createEntityRef(entityId), AddComponentEvent.newInstance(), component);
+            } else {
+                eventSystem.send(createEntityRef(entityId), ChangedComponentEvent.newInstance(), component);
+            }
+        }
+        if (oldComponent == null) {
+            notifyComponentAdded(getEntity(entityId), component.getClass());
+        } else {
+            notifyComponentChanged(getEntity(entityId), component.getClass());
+        }
     }
 
     @Override

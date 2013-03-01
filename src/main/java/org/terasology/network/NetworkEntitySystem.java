@@ -31,7 +31,9 @@ public class NetworkEntitySystem implements ComponentSystem {
 
     @ReceiveEvent(components = NetworkComponent.class)
     public void onAddNetworkComponent(AddComponentEvent event, EntityRef entity) {
-        networkSystem.registerNetworkEntity(entity);
+        if (networkSystem.getMode() == NetworkMode.SERVER) {
+            networkSystem.registerNetworkEntity(entity);
+        }
     }
 
     @ReceiveEvent(components = NetworkComponent.class)
@@ -41,7 +43,9 @@ public class NetworkEntitySystem implements ComponentSystem {
 
     @ReceiveEvent(components = NetworkComponent.class)
     public void onRemoveNetworkComponent(RemovedComponentEvent event, EntityRef entity) {
-        networkSystem.unregisterNetworkEntity(entity);
+        if (networkSystem.getMode() == NetworkMode.SERVER) {
+            networkSystem.unregisterNetworkEntity(entity);
+        }
     }
 
     @Override

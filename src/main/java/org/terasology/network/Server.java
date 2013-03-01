@@ -23,6 +23,7 @@ import org.terasology.network.serialization.ClientComponentFieldCheck;
 import org.terasology.protobuf.EntityData;
 import org.terasology.protobuf.NetData;
 import org.terasology.world.BlockEntityRegistry;
+import org.terasology.world.block.entity.BlockComponent;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.remoteChunkProvider.RemoteChunkProvider;
 
@@ -96,7 +97,7 @@ public class Server {
         if (netComp != null) {
             queuedOutgoingEvents.add(NetData.EventMessage.newBuilder()
                 .setEvent(eventSerializer.serialize(event))
-                .setTargetId(netComp.networkId).build());
+                .setTargetId(netComp.getNetworkId()).build());
         }
     }
 
@@ -223,14 +224,31 @@ public class Server {
                 createEntityMessage(createEntity);
             }
             for (NetData.UpdateEntityMessage updateEntity : message.getUpdateEntityList()) {
-                EntityRef currentEntity = networkSystem.getEntity(updateEntity.getNetId());
-                if (currentEntity.exists()) {
-                    entitySerializer.deserializeOnto(currentEntity, updateEntity.getEntity());
-                }
+                updateEntity(updateEntity);
             }
 
         }
 
+    }
+
+    private void updateEntity(NetData.UpdateEntityMessage updateEntity) {
+        EntityRef currentEntity = networkSystem.getEntity(updateEntity.getNetId());
+        if (currentEntity.exists()) {
+            if (currentEntity.getComponent(NetworkComponent.class).getNetworkId() != updateEntity.getNetId()) {
+                logger.error("Network ID wrong before update");
+            }
+            boolean blockEntityBefore = currentEntity.hasComponent(BlockComponent.class);
+            entitySerializer.deserializeOnto(currentEntity, updateEntity.getEntity());
+            BlockComponent blockComponent = currentEntity.getComponent(BlockComponent.class);
+            if (blockComponent != null && !blockEntityBefore) {
+                if (!blockEntityRegistry.getBlockEntityAt(blockComponent.getPosition()).equals(currentEntity)) {
+                    logger.error("Failed to associated new block entity");
+                }
+            }
+            if (currentEntity.getComponent(NetworkComponent.class).getNetworkId() != updateEntity.getNetId()) {
+                logger.error("Network ID lost in update: {}, {} -> {}", currentEntity, updateEntity.getNetId(), currentEntity.getComponent(NetworkComponent.class).getNetworkId());
+            }
+        }
     }
 
     private void createEntityMessage(NetData.CreateEntityMessage message) {
@@ -245,8 +263,10 @@ public class Server {
             logger.error("Received entity is null");
         } else if (newEntity.getComponent(NetworkComponent.class) == null) {
             logger.error("Received entity with no NetworkComponent: {}", newEntity);
+        } else if (newEntity.getComponent(NetworkComponent.class).getNetworkId() == 0) {
+            logger.error("Received entity with null network id: {}", newEntity);
         }
-        logger.info("Received new entity: {} with net id {}", newEntity, newEntity.getComponent(NetworkComponent.class).networkId);
+        logger.info("Received new entity: {} with net id {}", newEntity, newEntity.getComponent(NetworkComponent.class).getNetworkId());
         networkSystem.registerNetworkEntity(newEntity);
     }
 

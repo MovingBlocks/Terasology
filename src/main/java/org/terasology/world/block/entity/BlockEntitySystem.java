@@ -28,6 +28,7 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventPriority;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.RegisterMode;
 import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.events.DamageEvent;
 import org.terasology.events.FullHealthEvent;
@@ -46,7 +47,7 @@ import org.terasology.world.block.management.BlockManager;
  *
  * @author Immortius <immortius@gmail.com>
  */
-@RegisterSystem
+@RegisterSystem()
 public class BlockEntitySystem implements ComponentSystem {
 
     @In

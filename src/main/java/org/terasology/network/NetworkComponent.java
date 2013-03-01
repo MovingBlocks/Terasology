@@ -11,7 +11,7 @@ import java.util.List;
 public class NetworkComponent implements Component {
     // Network identifier for the entity
     @Replicate
-    public int networkId;
+    private int networkId;
 
     @Replicate
     public EntityRef owner = EntityRef.NULL;
@@ -24,4 +24,11 @@ public class NetworkComponent implements Component {
 
     public ReplicateMode replicateMode = ReplicateMode.RELEVANT;
 
+    public void setNetworkId(int networkId) {
+        this.networkId = networkId;
+    }
+
+    public int getNetworkId() {
+        return networkId;
+    }
 }
