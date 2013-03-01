@@ -113,7 +113,7 @@ public class Server {
             } else if (!queuedOutgoingEvents.isEmpty()) {
                 NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
                 message.setTime(timer.getTimeInMs());
-                sendEntities(message);
+                sendEvents(message);
                 send(message.build());
             }
 

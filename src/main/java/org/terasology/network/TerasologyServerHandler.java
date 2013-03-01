@@ -54,9 +54,7 @@ public class TerasologyServerHandler extends SimpleChannelUpstreamHandler {
 
     @Override
     public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-        MessageManager.getInstance().addMessage("Client disconnected: " + client.getName());
         networkSystem.removeClient(client);
-        client.disconnect();
     }
 
     @Override

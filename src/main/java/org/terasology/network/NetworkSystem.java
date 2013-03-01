@@ -42,9 +42,11 @@ import org.terasology.entitySystem.persistence.PackedEntitySerializer;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
+import org.terasology.logic.manager.MessageManager;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.network.events.ConnectedEvent;
+import org.terasology.network.events.DisconnectedEvent;
 import org.terasology.network.pipelineFactory.TerasologyClientPipelineFactory;
 import org.terasology.network.pipelineFactory.TerasologyServerPipelineFactory;
 import org.terasology.network.serialization.NetComponentSerializeCheck;
@@ -88,6 +90,7 @@ public class NetworkSystem implements EntityChangeSubscriber {
     // Server only
     private ChannelGroup allChannels = new DefaultChannelGroup("tera-channels");
     private BlockingQueue<Client> newClients = Queues.newLinkedBlockingQueue();
+    private BlockingQueue<Client> disconnectedClients = Queues.newLinkedBlockingQueue();
     private int nextNetId = 1;
     private final Set<Client> clientList = Sets.newLinkedHashSet();
     private Map<EntityRef, Client> clientPlayerLookup = Maps.newHashMap();
@@ -140,7 +143,7 @@ public class NetworkSystem implements EntityChangeSubscriber {
                 allChannels.add(connectCheck.getChannel());
                 logger.info("Connected to server");
                 mode = NetworkMode.CLIENT;
-                nextNetworkTick = timer.getTimeInMs();
+                nextNetworkTick = 0;
                 return true;
             }
         }
@@ -173,7 +176,14 @@ public class NetworkSystem implements EntityChangeSubscriber {
                         processNewClient(client);
                     }
                 }
-                long currentTimer = timer.getTimeInMs();
+                if (!disconnectedClients.isEmpty()) {
+                    List<Client> removedPlayers = Lists.newArrayListWithExpectedSize(disconnectedClients.size());
+                    disconnectedClients.drainTo(removedPlayers);
+                    for (Client client : removedPlayers) {
+                        processRemovedClient(client);
+                    }
+                }
+                long currentTimer = timer.getRawTimeInMs();
                 boolean netTick = false;
                 if (currentTimer > nextNetworkTick) {
                     nextNetworkTick += NET_TICK_RATE;
@@ -513,6 +523,21 @@ public class NetworkSystem implements EntityChangeSubscriber {
         newClients.offer(client);
     }
 
+    void removeClient(Client client) {
+        disconnectedClients.offer(client);
+        synchronized (clientList) {
+            clientList.remove(client);
+        }
+    }
+
+    private void processRemovedClient(Client client) {
+        clientList.remove(client);
+        logger.info("Client disconnected: " + client.getName());
+        MessageManager.getInstance().addMessage("Client disconnected: " + client.getName());
+        client.getEntity().send(new DisconnectedEvent());
+        client.disconnect();
+    }
+
     private void processNewClient(Client client) {
         logger.info("New client connected: {}", client.getName());
         client.connected(entityManager, entitySerializer, eventSerializer, entitySystemLibrary);
@@ -600,12 +625,6 @@ public class NetworkSystem implements EntityChangeSubscriber {
             }
             info.setFieldIds(fieldIds.toByteString());
             serverInfoMessageBuilder.addComponent(info);
-        }
-    }
-
-    void removeClient(Client client) {
-        synchronized (clientList) {
-            clientList.remove(client);
         }
     }
 

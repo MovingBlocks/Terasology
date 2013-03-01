@@ -18,6 +18,7 @@ import org.terasology.network.ClientComponent;
 import org.terasology.network.NetworkComponent;
 import org.terasology.network.NetworkSystem;
 import org.terasology.network.events.ConnectedEvent;
+import org.terasology.network.events.DisconnectedEvent;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
@@ -110,6 +111,11 @@ public class PlayerSystem implements UpdateSubscriberSystem {
 
             ongoingSpawns.add(new SpawnCachingInfo(spawnZoneEntity, entity));
         }
+    }
+
+    @ReceiveEvent(components = ClientComponent.class)
+    public void onDisconnect(DisconnectedEvent connected, EntityRef entity) {
+        entity.getComponent(ClientComponent.class).character.destroy();
     }
 
     /**

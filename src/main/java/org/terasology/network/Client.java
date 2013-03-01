@@ -192,6 +192,7 @@ public class Client implements ChunkRegionListener, WorldChangeListener, EventRe
     }
 
     public void disconnect() {
+        clientEntity.getComponent(ClientComponent.class).clientInfo.destroy();
         clientEntity.destroy();
         CoreRegistry.get(EventSystem.class).unregisterEventReceiver(this, ChunkUnloadedEvent.class, WorldComponent.class);
         CoreRegistry.get(WorldProvider.class).unregisterListener(this);
