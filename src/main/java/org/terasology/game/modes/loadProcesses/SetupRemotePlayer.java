@@ -6,6 +6,7 @@ import org.terasology.game.modes.LoadProcess;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.network.NetEntityRef;
 import org.terasology.network.NetworkSystem;
+import org.terasology.network.NetworkSystemImpl;
 
 /**
  * @author Immortius
@@ -18,7 +19,7 @@ public class SetupRemotePlayer implements LoadProcess {
 
     @Override
     public boolean step() {
-        NetworkSystem networkSystem = CoreRegistry.get(NetworkSystem.class);
+        NetworkSystemImpl networkSystem = (NetworkSystemImpl)CoreRegistry.get(NetworkSystem.class);
         EntityRef client = new NetEntityRef(networkSystem.getServer().getInfo().getClientId(), networkSystem);
         if (client.exists()) {
             CoreRegistry.get(LocalPlayer.class).setClientEntity(client);

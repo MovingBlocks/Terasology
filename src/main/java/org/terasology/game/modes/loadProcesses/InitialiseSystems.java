@@ -36,7 +36,7 @@ public class InitialiseSystems implements LoadProcess {
 
     @Override
     public boolean step() {
-        CoreRegistry.get(NetworkSystem.class).connectToEntitySystem((PersistableEntityManager)CoreRegistry.get(EntityManager.class), CoreRegistry.get(EntitySystemLibrary.class), CoreRegistry.get(BlockEntityRegistry.class));
+        CoreRegistry.get(NetworkSystem.class).connectToEntitySystem((PersistableEntityManager) CoreRegistry.get(EntityManager.class), CoreRegistry.get(EntitySystemLibrary.class), CoreRegistry.get(BlockEntityRegistry.class));
         CoreRegistry.get(ComponentSystemManager.class).initialise();
         return true;
     }

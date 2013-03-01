@@ -28,9 +28,9 @@ import org.terasology.entitySystem.Prefab;
 public class NetEntityRef extends EntityRef {
 
     private int networkId;
-    private NetworkSystem networkSystem;
+    private NetworkSystemImpl networkSystem;
 
-    public NetEntityRef(int networkId, NetworkSystem system) {
+    public NetEntityRef(int networkId, NetworkSystemImpl system) {
         this.networkId = networkId;
         this.networkSystem = system;
     }

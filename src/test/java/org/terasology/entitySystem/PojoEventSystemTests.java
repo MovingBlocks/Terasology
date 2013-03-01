@@ -14,6 +14,7 @@ import org.terasology.entitySystem.pojo.PojoPrefabManager;
 import org.terasology.entitySystem.stubs.IntegerComponent;
 import org.terasology.entitySystem.stubs.StringComponent;
 import org.terasology.network.NetworkSystem;
+import org.terasology.network.NetworkSystemImpl;
 
 import java.util.List;
 

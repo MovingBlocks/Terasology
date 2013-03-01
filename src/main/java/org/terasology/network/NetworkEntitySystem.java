@@ -14,12 +14,12 @@ import org.terasology.entitySystem.event.RemovedComponentEvent;
  */
 public class NetworkEntitySystem implements ComponentSystem {
 
-    @In
-    private NetworkSystem networkSystem;
+    private NetworkSystemImpl networkSystem;
     @In
     private EntityManager entityManager;
 
-    public NetworkEntitySystem() {
+    public NetworkEntitySystem(NetworkSystemImpl networkSystem) {
+        this.networkSystem = networkSystem;
     }
 
     @Override

@@ -19,13 +19,11 @@ package org.terasology.network;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.internal.verification.Times;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.PersistableEntityManager;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
-import org.terasology.game.TimerLwjgl;
 import org.terasology.game.bootstrap.EntitySystemBuilder;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.world.BlockEntityRegistry;
@@ -34,8 +32,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -44,9 +40,9 @@ import static org.mockito.Mockito.when;
 public class NetworkOwnershipTest {
 
     private static PersistableEntityManager entityManager;
-    private NetworkSystem networkSystem;
+    private NetworkSystemImpl networkSystem;
     private Timer mockTimer;
-    private Client client;
+    private NetClient client;
     private EntityRef clientEntity;
 
     @BeforeClass
@@ -60,8 +56,8 @@ public class NetworkOwnershipTest {
     public void setup() {
         entityManager.clear();
         mockTimer = mock(Timer.class);
-        networkSystem = new NetworkSystem(mockTimer);
-        client = mock(Client.class);
+        networkSystem = new NetworkSystemImpl(mockTimer);
+        client = mock(NetClient.class);
         NetworkComponent clientNetComp = new NetworkComponent();
         clientNetComp.replicateMode = NetworkComponent.ReplicateMode.OWNER;
         clientEntity = entityManager.create(clientNetComp);

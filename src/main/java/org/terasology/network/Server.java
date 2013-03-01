@@ -40,7 +40,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Server {
     private static final Logger logger = LoggerFactory.getLogger(Server.class);
 
-    private NetworkSystem networkSystem;
+    private NetworkSystemImpl networkSystem;
     private Channel channel;
     private BlockingQueue<NetData.NetMessage> queuedMessages = Queues.newLinkedBlockingQueue();
     private BlockingQueue<NetData.EventMessage> queuedReceivedEvents = Queues.newLinkedBlockingQueue();
@@ -66,7 +66,7 @@ public class Server {
 
     private Timer timer;
 
-    public Server(NetworkSystem system, Channel channel) {
+    public Server(NetworkSystemImpl system, Channel channel) {
         this.channel = channel;
         this.networkSystem = system;
         this.timer = CoreRegistry.get(Timer.class);

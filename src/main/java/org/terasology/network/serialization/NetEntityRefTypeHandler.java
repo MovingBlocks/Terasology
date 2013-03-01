@@ -6,7 +6,7 @@ import org.terasology.entitySystem.metadata.TypeHandler;
 import org.terasology.math.Vector3i;
 import org.terasology.network.NetEntityRef;
 import org.terasology.network.NetworkComponent;
-import org.terasology.network.NetworkSystem;
+import org.terasology.network.NetworkSystemImpl;
 import org.terasology.protobuf.EntityData;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.block.entity.BlockComponent;
@@ -19,10 +19,10 @@ import java.util.List;
  * @author Immortius
  */
 public class NetEntityRefTypeHandler implements TypeHandler<EntityRef> {
-    private NetworkSystem networkSystem;
+    private NetworkSystemImpl networkSystem;
     private BlockEntityRegistry blockEntityRegistry;
 
-    public NetEntityRefTypeHandler(NetworkSystem networkSystem, BlockEntityRegistry blockEntityRegistry) {
+    public NetEntityRefTypeHandler(NetworkSystemImpl networkSystem, BlockEntityRegistry blockEntityRegistry) {
         this.networkSystem = networkSystem;
         this.blockEntityRegistry = blockEntityRegistry;
     }

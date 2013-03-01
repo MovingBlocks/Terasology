@@ -57,6 +57,16 @@ public class StateMainMenu implements GameState {
     private CameraTargetSystem cameraTargetSystem;
     private GUIManager guiManager;
 
+    private String messageOnLoad = "";
+
+    public StateMainMenu() {
+    }
+
+    public StateMainMenu(String showMessageOnLoad) {
+        messageOnLoad = showMessageOnLoad;
+    }
+
+
     @Override
     public void init(GameEngine gameEngine) {
         _gameInstance = gameEngine;
@@ -89,6 +99,9 @@ public class StateMainMenu implements GameState {
         playBackgroundMusic();
 
         guiManager.openWindow("main");
+        if (!messageOnLoad.isEmpty()) {
+            guiManager.showMessage("", messageOnLoad);
+        }
     }
 
     @Override

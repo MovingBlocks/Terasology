@@ -35,13 +35,13 @@ public class TestNetwork {
     public void testNetwork() throws InterruptedException {
         PersistableEntityManager entityManager = new EntitySystemBuilder().build(new ModManager());
         Timer timer = mock(Timer.class);
-        NetworkSystem server = new NetworkSystem(timer);
+        NetworkSystem server = new NetworkSystemImpl(timer);
         server.connectToEntitySystem(entityManager, CoreRegistry.get(EntitySystemLibrary.class), null);
         server.host(7777);
 
         Thread.sleep(500);
 
-        NetworkSystem client = new NetworkSystem(timer);
+        NetworkSystem client = new NetworkSystemImpl(timer);
         client.join("localhost", 7777);
 
         Thread.sleep(500);

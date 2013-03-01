@@ -4,12 +4,12 @@ import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.ModConfig;
-import org.terasology.config.ServerInfo;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.modes.LoadProcess;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.network.NetworkSystem;
+import org.terasology.network.NetworkSystemImpl;
 import org.terasology.protobuf.NetData;
 import org.terasology.world.WorldInfo;
 

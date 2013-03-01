@@ -24,7 +24,7 @@ import org.jboss.netty.handler.codec.protobuf.ProtobufDecoder;
 import org.jboss.netty.handler.codec.protobuf.ProtobufEncoder;
 import org.jboss.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import org.jboss.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
-import org.terasology.network.NetworkSystem;
+import org.terasology.network.NetworkSystemImpl;
 import org.terasology.network.TerasologyClientHandler;
 import org.terasology.protobuf.NetData;
 
@@ -33,9 +33,9 @@ import org.terasology.protobuf.NetData;
  */
 public class TerasologyClientPipelineFactory implements ChannelPipelineFactory {
 
-    private NetworkSystem networkSystem;
+    private NetworkSystemImpl networkSystem;
 
-    public TerasologyClientPipelineFactory(NetworkSystem networkSystem) {
+    public TerasologyClientPipelineFactory(NetworkSystemImpl networkSystem) {
         this.networkSystem = networkSystem;
     }
 

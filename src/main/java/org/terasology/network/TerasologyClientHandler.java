@@ -26,7 +26,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
 import org.terasology.game.CoreRegistry;
+import org.terasology.game.GameEngine;
 import org.terasology.game.Timer;
+import org.terasology.game.modes.StateMainMenu;
 import org.terasology.math.Vector3i;
 import org.terasology.protobuf.ChunksProtobuf;
 import org.terasology.protobuf.NetData;
@@ -49,11 +51,11 @@ public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(TerasologyClientHandler.class);
 
-    private NetworkSystem networkSystem;
+    private NetworkSystemImpl networkSystem;
     private Server server;
     private boolean awaitingServerInfo = true;
 
-    public TerasologyClientHandler(NetworkSystem networkSystem) {
+    public TerasologyClientHandler(NetworkSystemImpl networkSystem) {
         this.networkSystem = networkSystem;
     }
 
@@ -65,6 +67,11 @@ public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
                 .setClientConnect(ClientConnectMessage.newBuilder()
                         .setName(CoreRegistry.get(Config.class).getPlayerConfig().getName()))
                 .build());
+    }
+
+    @Override
+    public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+        CoreRegistry.get(GameEngine.class).changeState(new StateMainMenu("Disconnected From Server"));
     }
 
     @Override

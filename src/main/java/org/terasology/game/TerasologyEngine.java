@@ -40,6 +40,7 @@ import org.terasology.logic.manager.VertexBufferObjectManager;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.logic.mod.ModSecurityManager;
 import org.terasology.network.NetworkSystem;
+import org.terasology.network.NetworkSystemImpl;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.physics.CollisionGroupManager;
 import org.terasology.version.TerasologyVersion;
@@ -363,7 +364,7 @@ public class TerasologyEngine implements GameEngine {
         CoreRegistry.put(CollisionGroupManager.class, new CollisionGroupManager());
         CoreRegistry.put(ModManager.class, new ModManager());
         CoreRegistry.put(ComponentSystemManager.class, new ComponentSystemManager());
-        CoreRegistry.put(NetworkSystem.class, new NetworkSystem(timer));
+        CoreRegistry.put(NetworkSystem.class, new NetworkSystemImpl(timer));
 
         AssetType.registerAssetTypes();
         AssetManager.getInstance().addAssetSource(new ClasspathSource(ModManager.ENGINE_PACKAGE, getClass().getProtectionDomain().getCodeSource(), ModManager.ASSETS_SUBDIRECTORY, ModManager.OVERRIDES_SUBDIRECTORY));
