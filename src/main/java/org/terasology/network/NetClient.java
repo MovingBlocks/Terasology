@@ -28,6 +28,7 @@ import org.terasology.entitySystem.persistence.PackedEntitySerializer;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.characters.PredictionSystem;
+import org.terasology.logic.manager.Config;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.network.serialization.ServerComponentFieldCheck;
@@ -77,6 +78,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener, Ev
     private boolean awaitingConnectMessage = true;
     private String name = "Unknown";
     private long lastReceivedTime = 0;
+    private int viewDistance = 0;
 
     // Outgoing messages
     private BlockingQueue<NetData.BlockChangeMessage> queuedOutgoingBlockChanges = Queues.newLinkedBlockingQueue();
@@ -255,6 +257,20 @@ public class NetClient extends AbstractClient implements WorldChangeListener, Ev
                             .setEvent(eventSerializer.serialize(event)).build());
                 }
             }
+        }
+    }
+
+    @Override
+    public int getViewDistance() {
+        switch (viewDistance) {
+            case 1:
+                return Config.getInstance().getViewingDistanceModerate();
+            case 2:
+                return Config.getInstance().getViewingDistanceFar();
+            case 3:
+                return Config.getInstance().getViewingDistanceUltra();
+            default:
+                return Config.getInstance().getViewingDistanceNear();
         }
     }
 

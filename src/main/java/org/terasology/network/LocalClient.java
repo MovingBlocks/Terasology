@@ -20,6 +20,7 @@ import org.terasology.components.DisplayInformationComponent;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Event;
+import org.terasology.logic.manager.Config;
 import org.terasology.math.Vector3i;
 import org.terasology.world.chunks.Chunk;
 
@@ -60,6 +61,11 @@ public class LocalClient extends AbstractClient {
 
     @Override
     public void send(Event event, EntityRef target) {
+    }
+
+    @Override
+    public int getViewDistance() {
+        return Config.getInstance().getActiveViewingDistance();
     }
 
     @Override

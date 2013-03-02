@@ -183,6 +183,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
     public Client joinLocal(String name) {
         Client localClient = new LocalClient(name, entityManager);
         clientList.add(localClient);
+        clientPlayerLookup.put(localClient.getEntity(), localClient);
         localClient.getEntity().send(new ConnectedEvent());
         return localClient;
     }

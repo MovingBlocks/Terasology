@@ -65,8 +65,9 @@ public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
         networkSystem.setServer(server);
         e.getChannel().write(NetMessage.newBuilder()
                 .setClientConnect(ClientConnectMessage.newBuilder()
-                        .setName(CoreRegistry.get(Config.class).getPlayerConfig().getName()))
-                .build());
+                        .setName(CoreRegistry.get(Config.class).getPlayerConfig().getName())
+                        .setViewDistanceLevel(org.terasology.logic.manager.Config.getInstance().getActiveViewingDistance())
+                ).build());
     }
 
     @Override

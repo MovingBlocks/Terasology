@@ -46,6 +46,7 @@ message Vector3iData {
 message ClientConnectMessage {
     optional string name = 1;
     optional string version = 2;
+    optional sint32 viewDistanceLevel = 3;
 
     extensions 5000 to max;
 }

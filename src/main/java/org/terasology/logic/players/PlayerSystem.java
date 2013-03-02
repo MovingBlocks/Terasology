@@ -87,12 +87,9 @@ public class PlayerSystem implements UpdateSubscriberSystem {
                 netComp.owner = clientEntity;
                 playerCharacter.saveComponent(netComp);
             }
-            Client netClient = networkSystem.getOwner(clientEntity);
-            if (netClient != null) {
-                worldRenderer.getChunkProvider().addRegionEntity(playerCharacter, Config.getInstance().getActiveViewingDistance(), netClient);
-            } else {
-                worldRenderer.getChunkProvider().addRegionEntity(playerCharacter, Config.getInstance().getActiveViewingDistance());
-            }
+            Client clientListener = networkSystem.getOwner(clientEntity);
+            worldRenderer.getChunkProvider().addRegionEntity(playerCharacter, clientListener.getViewDistance(), clientListener);
+
             client.character = playerCharacter;
             clientEntity.saveComponent(client);
         }

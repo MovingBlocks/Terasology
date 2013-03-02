@@ -4064,6 +4064,10 @@ public final class NetData {
     // optional string version = 2;
     boolean hasVersion();
     String getVersion();
+    
+    // optional sint32 viewDistanceLevel = 3;
+    boolean hasViewDistanceLevel();
+    int getViewDistanceLevel();
   }
   public static final class ClientConnectMessage extends
       com.google.protobuf.GeneratedMessage.ExtendableMessage<
@@ -4158,9 +4162,20 @@ public final class NetData {
       }
     }
     
+    // optional sint32 viewDistanceLevel = 3;
+    public static final int VIEWDISTANCELEVEL_FIELD_NUMBER = 3;
+    private int viewDistanceLevel_;
+    public boolean hasViewDistanceLevel() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    public int getViewDistanceLevel() {
+      return viewDistanceLevel_;
+    }
+    
     private void initFields() {
       name_ = "";
       version_ = "";
+      viewDistanceLevel_ = 0;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -4187,6 +4202,9 @@ public final class NetData {
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeBytes(2, getVersionBytes());
       }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeSInt32(3, viewDistanceLevel_);
+      }
       extensionWriter.writeUntil(536870912, output);
       getUnknownFields().writeTo(output);
     }
@@ -4204,6 +4222,10 @@ public final class NetData {
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(2, getVersionBytes());
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeSInt32Size(3, viewDistanceLevel_);
       }
       size += extensionsSerializedSize();
       size += getUnknownFields().getSerializedSize();
@@ -4334,6 +4356,8 @@ public final class NetData {
         bitField0_ = (bitField0_ & ~0x00000001);
         version_ = "";
         bitField0_ = (bitField0_ & ~0x00000002);
+        viewDistanceLevel_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000004);
         return this;
       }
       
@@ -4380,6 +4404,10 @@ public final class NetData {
           to_bitField0_ |= 0x00000002;
         }
         result.version_ = version_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.viewDistanceLevel_ = viewDistanceLevel_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -4401,6 +4429,9 @@ public final class NetData {
         }
         if (other.hasVersion()) {
           setVersion(other.getVersion());
+        }
+        if (other.hasViewDistanceLevel()) {
+          setViewDistanceLevel(other.getViewDistanceLevel());
         }
         this.mergeExtensionFields(other);
         this.mergeUnknownFields(other.getUnknownFields());
@@ -4446,6 +4477,11 @@ public final class NetData {
             case 18: {
               bitField0_ |= 0x00000002;
               version_ = input.readBytes();
+              break;
+            }
+            case 24: {
+              bitField0_ |= 0x00000004;
+              viewDistanceLevel_ = input.readSInt32();
               break;
             }
           }
@@ -4524,6 +4560,27 @@ public final class NetData {
         bitField0_ |= 0x00000002;
         version_ = value;
         onChanged();
+      }
+      
+      // optional sint32 viewDistanceLevel = 3;
+      private int viewDistanceLevel_ ;
+      public boolean hasViewDistanceLevel() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      public int getViewDistanceLevel() {
+        return viewDistanceLevel_;
+      }
+      public Builder setViewDistanceLevel(int value) {
+        bitField0_ |= 0x00000004;
+        viewDistanceLevel_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearViewDistanceLevel() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        viewDistanceLevel_ = 0;
+        onChanged();
+        return this;
       }
       
       // @@protoc_insertion_point(builder_scope:ClientConnectMessage)
@@ -9647,28 +9704,29 @@ public final class NetData {
       "\200\002\"M\n\022BlockChangeMessage\022\032\n\003pos\030\001 \001(\0132\r." +
       "Vector3iData\022\020\n\010newBlock\030\002 \001(\005*\t\010\210\'\020\200\200\200\200" +
       "\002\"/\n\014Vector3iData\022\t\n\001x\030\001 \001(\005\022\t\n\001y\030\002 \001(\005\022" +
-      "\t\n\001z\030\003 \001(\005\"@\n\024ClientConnectMessage\022\014\n\004na" +
-      "me\030\001 \001(\t\022\017\n\007version\030\002 \001(\t*\t\010\210\'\020\200\200\200\200\002\"\232\002\n" +
-      "\021ServerInfoMessage\022\033\n\006module\030\001 \003(\0132\013.Mod" +
-      "uleInfo\022\023\n\007blockId\030\002 \003(\021B\002\020\001\022\021\n\tblockNam",
-      "e\030\003 \003(\t\022%\n\tcomponent\030\004 \003(\0132\022.Serializati" +
-      "onInfo\022!\n\005event\030\005 \003(\0132\022.SerializationInf" +
-      "o\022\024\n\010assetIds\030\006 \003(\005B\002\020\001\022\021\n\tassetUris\030\007 \003" +
-      "(\t\022\017\n\007version\030\017 \001(\t\022\021\n\tworldName\030\020 \001(\t\022\020" +
-      "\n\010clientId\030\021 \001(\005\022\014\n\004time\030\022 \001(\003*\t\010\210\'\020\200\200\200\200" +
-      "\002\"]\n\021SerializationInfo\022\014\n\004name\030\001 \001(\t\022\n\n\002" +
-      "id\030\002 \001(\005\022\021\n\tfieldName\030\003 \003(\t\022\020\n\010fieldIds\030" +
-      "\004 \001(\014*\t\010\210\'\020\200\200\200\200\002\")\n\nModuleInfo\022\020\n\010module" +
-      "Id\030\001 \001(\t*\t\010\210\'\020\200\200\200\200\002\"`\n\023CreateEntityMessa" +
-      "ge\022\035\n\006entity\030\001 \001(\0132\r.PackedEntity\022\037\n\010blo",
-      "ckPos\030\002 \001(\0132\r.Vector3iData*\t\010\210\'\020\200\200\200\200\002\"N\n" +
-      "\023UpdateEntityMessage\022\035\n\006entity\030\001 \001(\0132\r.P" +
-      "ackedEntity\022\r\n\005netId\030\002 \001(\005*\t\010\210\'\020\200\200\200\200\002\"/\n" +
-      "\023RemoveEntityMessage\022\r\n\005netId\030\001 \001(\005*\t\010\210\'" +
-      "\020\200\200\200\200\002\"i\n\014EventMessage\022\020\n\010targetId\030\001 \001(\005" +
-      "\022\025\n\005event\030\002 \001(\0132\006.Event\022%\n\016targetBlockPo" +
-      "s\030\003 \001(\0132\r.Vector3iData*\t\010\210\'\020\200\200\200\200\002B$\n\027org" +
-      ".terasology.protobufB\007NetDataH\001"
+      "\t\n\001z\030\003 \001(\005\"[\n\024ClientConnectMessage\022\014\n\004na" +
+      "me\030\001 \001(\t\022\017\n\007version\030\002 \001(\t\022\031\n\021viewDistanc" +
+      "eLevel\030\003 \001(\021*\t\010\210\'\020\200\200\200\200\002\"\232\002\n\021ServerInfoMe" +
+      "ssage\022\033\n\006module\030\001 \003(\0132\013.ModuleInfo\022\023\n\007bl",
+      "ockId\030\002 \003(\021B\002\020\001\022\021\n\tblockName\030\003 \003(\t\022%\n\tco" +
+      "mponent\030\004 \003(\0132\022.SerializationInfo\022!\n\005eve" +
+      "nt\030\005 \003(\0132\022.SerializationInfo\022\024\n\010assetIds" +
+      "\030\006 \003(\005B\002\020\001\022\021\n\tassetUris\030\007 \003(\t\022\017\n\007version" +
+      "\030\017 \001(\t\022\021\n\tworldName\030\020 \001(\t\022\020\n\010clientId\030\021 " +
+      "\001(\005\022\014\n\004time\030\022 \001(\003*\t\010\210\'\020\200\200\200\200\002\"]\n\021Serializ" +
+      "ationInfo\022\014\n\004name\030\001 \001(\t\022\n\n\002id\030\002 \001(\005\022\021\n\tf" +
+      "ieldName\030\003 \003(\t\022\020\n\010fieldIds\030\004 \001(\014*\t\010\210\'\020\200\200" +
+      "\200\200\002\")\n\nModuleInfo\022\020\n\010moduleId\030\001 \001(\t*\t\010\210\'" +
+      "\020\200\200\200\200\002\"`\n\023CreateEntityMessage\022\035\n\006entity\030",
+      "\001 \001(\0132\r.PackedEntity\022\037\n\010blockPos\030\002 \001(\0132\r" +
+      ".Vector3iData*\t\010\210\'\020\200\200\200\200\002\"N\n\023UpdateEntity" +
+      "Message\022\035\n\006entity\030\001 \001(\0132\r.PackedEntity\022\r" +
+      "\n\005netId\030\002 \001(\005*\t\010\210\'\020\200\200\200\200\002\"/\n\023RemoveEntity" +
+      "Message\022\r\n\005netId\030\001 \001(\005*\t\010\210\'\020\200\200\200\200\002\"i\n\014Eve" +
+      "ntMessage\022\020\n\010targetId\030\001 \001(\005\022\025\n\005event\030\002 \001" +
+      "(\0132\006.Event\022%\n\016targetBlockPos\030\003 \001(\0132\r.Vec" +
+      "tor3iData*\t\010\210\'\020\200\200\200\200\002B$\n\027org.terasology.p" +
+      "rotobufB\007NetDataH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -9712,7 +9770,7 @@ public final class NetData {
           internal_static_ClientConnectMessage_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_ClientConnectMessage_descriptor,
-              new java.lang.String[] { "Name", "Version", },
+              new java.lang.String[] { "Name", "Version", "ViewDistanceLevel", },
               org.terasology.protobuf.NetData.ClientConnectMessage.class,
               org.terasology.protobuf.NetData.ClientConnectMessage.Builder.class);
           internal_static_ServerInfoMessage_descriptor =

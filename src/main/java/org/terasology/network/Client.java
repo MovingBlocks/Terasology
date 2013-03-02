@@ -35,4 +35,6 @@ public interface Client extends ChunkRegionListener {
     EntityRef getEntity();
 
     void send(Event event, EntityRef target);
+
+    int getViewDistance();
 }
