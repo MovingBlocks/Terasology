@@ -76,7 +76,7 @@ public abstract class TeraArray implements Externalizable {
      * @author Manuel Brotz <manu.brotz@gmx.ch>
      * @see org.terasology.world.chunks.blockdata.TeraArray.BasicSerializationHandler
      */
-    public static interface SerializationHandler<T extends TeraArray> extends org.terasology.io.SerializationHandler<T> {
+    public static interface SerializationHandler<T extends TeraArray> extends org.terasology.world.chunks.SerializationHandler<T> {
         
         public int computeMinimumBufferSize(T array);
 

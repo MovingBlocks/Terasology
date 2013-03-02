@@ -1,4 +1,4 @@
-package org.terasology.io;
+package org.terasology.world.chunks;
 
 import java.nio.ByteBuffer;
 

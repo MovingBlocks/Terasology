@@ -43,9 +43,7 @@ public class NetworkEntitySystem implements ComponentSystem {
 
     @ReceiveEvent(components = NetworkComponent.class)
     public void onRemoveNetworkComponent(RemovedComponentEvent event, EntityRef entity) {
-        if (networkSystem.getMode() == NetworkMode.SERVER) {
-            networkSystem.unregisterNetworkEntity(entity);
-        }
+        networkSystem.unregisterNetworkEntity(entity);
     }
 
     @Override

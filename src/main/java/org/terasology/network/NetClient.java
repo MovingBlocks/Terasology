@@ -2,6 +2,7 @@ package org.terasology.network;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.MapMaker;
 import com.google.common.collect.Queues;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
@@ -37,13 +38,15 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.entity.BlockComponent;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkRegionListener;
 import org.terasology.world.chunks.ChunkUnloadedEvent;
 import org.terasology.world.chunks.Chunks;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -78,7 +81,10 @@ public class NetClient extends AbstractClient implements WorldChangeListener, Ev
     // Outgoing messages
     private BlockingQueue<NetData.BlockChangeMessage> queuedOutgoingBlockChanges = Queues.newLinkedBlockingQueue();
     private List<NetData.EventMessage> queuedOutgoingEvents = Lists.newArrayList();
-    private List<NetData.InvalidateChunkMessage> queuedInvalidatedChunkEvents = Lists.newArrayList();
+
+    private ConcurrentMap<Vector3i, Chunk> readyChunks = new MapMaker().concurrencyLevel(3).makeMap();
+    private Set<Vector3i> invalidatedChunks = Sets.newSetFromMap(new MapMaker().concurrencyLevel(3).<Vector3i, Boolean>makeMap());
+
 
     // Incoming messages
     private BlockingQueue<NetData.NetMessage> queuedIncomingMessage = Queues.newLinkedBlockingQueue();
@@ -137,6 +143,8 @@ public class NetClient extends AbstractClient implements WorldChangeListener, Ev
         if (netTick) {
             NetData.NetMessage.Builder message = NetData.NetMessage.newBuilder();
             message.setTime(timer.getTimeInMs());
+            sendChunkInvalidations(message);
+            sendNewChunks(message);
             sendRemovedEntities(message);
             sendInitialEntities(message);
             sendDirtyEntities(message);
@@ -144,6 +152,31 @@ public class NetClient extends AbstractClient implements WorldChangeListener, Ev
             send(message.build());
         }
         processReceivedMessages();
+    }
+
+    private void sendNewChunks(NetData.NetMessage.Builder message) {
+        if (!readyChunks.isEmpty()) {
+            Iterator<Map.Entry<Vector3i, Chunk>> i = readyChunks.entrySet().iterator();
+            while (i.hasNext()) {
+                Map.Entry<Vector3i, Chunk> chunkEntry = i.next();
+                i.remove();
+                relevantChunks.add(chunkEntry.getKey());
+                logger.debug("Sending chunk: {}", chunkEntry.getKey());
+                // TODO: probably need to queue and dripfeed these to prevent flooding
+                message.addChunkInfo(Chunks.getInstance().encode(chunkEntry.getValue())).build();
+            }
+        }
+    }
+
+    private void sendChunkInvalidations(NetData.NetMessage.Builder message) {
+        Iterator<Vector3i> i = invalidatedChunks.iterator();
+        while (i.hasNext()) {
+            Vector3i pos = i.next();
+            i.remove();
+            relevantChunks.remove(pos);
+            message.addInvalidateChunk(NetData.InvalidateChunkMessage.newBuilder().setPos(NetworkUtil.convert(pos)));
+        }
+        invalidatedChunks.clear();
     }
 
     public void setNetInitial(int netId) {
@@ -234,22 +267,14 @@ public class NetClient extends AbstractClient implements WorldChangeListener, Ev
 
     @Override
     public void onChunkReady(Vector3i pos, Chunk chunk) {
-        if (relevantChunks.add(pos)) {
-            logger.debug("Sending chunk: {}", pos);
-            // TODO: probably need to queue and dripfeed these to prevent flooding
-            NetData.NetMessage message = NetData.NetMessage.newBuilder()
-                    .setTime(timer.getTimeInMs())
-                    .addChunkInfo(Chunks.getInstance().encode(chunk)).build();
-            send(message);
-        }
+        invalidatedChunks.remove(pos);
+        readyChunks.put(pos, chunk);
     }
 
     @Override
     public void onEvent(ChunkUnloadedEvent event, EntityRef entity) {
-        if (relevantChunks.remove(event.getChunkPos())) {
-            queuedInvalidatedChunkEvents.add(NetData.InvalidateChunkMessage.newBuilder().
-                    setPos(NetworkUtil.convert(event.getChunkPos())).build());
-        }
+        readyChunks.remove(event.getChunkPos());
+        invalidatedChunks.add(event.getChunkPos());
     }
 
     @Override
@@ -282,9 +307,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener, Ev
         message.addAllBlockChange(blockChanges);
 
         message.addAllEvent(queuedOutgoingEvents);
-        message.addAllInvalidateChunk(queuedInvalidatedChunkEvents);
         queuedOutgoingEvents.clear();
-        queuedInvalidatedChunkEvents.clear();
     }
 
     private void processEntityUpdates(NetData.NetMessage message) {

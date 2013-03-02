@@ -216,9 +216,11 @@ public class Server {
             for (NetData.RemoveEntityMessage removeEntity : message.getRemoveEntityList()) {
                 int netId = removeEntity.getNetId();
                 EntityRef entity = networkSystem.getEntity(netId);
-                networkSystem.unregisterNetworkEntity(entity);
-                logger.info("Destroying entity: {}", entity);
-                entity.destroy();
+                if (entity.exists()) {
+                    networkSystem.unregisterNetworkEntity(entity);
+                    logger.info("Destroying entity: {}", entity);
+                    entity.destroy();
+                }
             }
             for (NetData.CreateEntityMessage createEntity : message.getCreateEntityList()) {
                 createEntityMessage(createEntity);
@@ -234,6 +236,9 @@ public class Server {
     private void updateEntity(NetData.UpdateEntityMessage updateEntity) {
         EntityRef currentEntity = networkSystem.getEntity(updateEntity.getNetId());
         if (currentEntity.exists()) {
+            if (currentEntity.getComponent(NetworkComponent.class) == null) {
+                logger.error("Updating entity with no network component: {}, expected netId {}", currentEntity, updateEntity.getNetId());
+            }
             if (currentEntity.getComponent(NetworkComponent.class).getNetworkId() != updateEntity.getNetId()) {
                 logger.error("Network ID wrong before update");
             }

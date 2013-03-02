@@ -8,6 +8,8 @@ import com.bulletphysics.collision.dispatch.PairCachingGhostObject;
 import com.bulletphysics.collision.shapes.ConvexShape;
 import com.bulletphysics.linearmath.QuaternionUtil;
 import com.bulletphysics.linearmath.Transform;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.characters.CharacterMovementComponent;
@@ -27,6 +29,7 @@ import javax.vecmath.Vector3f;
  * @author Immortius
  */
 public class BulletCharacterMover implements CharacterMover {
+    private static final Logger logger = LoggerFactory.getLogger(BulletCharacterMover.class);
 
     /**
      * The amount of extra distance added to vertical movement to allow for penetration.
@@ -103,21 +106,18 @@ public class BulletCharacterMover implements CharacterMover {
      */
     private void checkSwimming(final CharacterMovementComponent movementComp, final CharacterStateEvent state) {
         Vector3f worldPos = state.getPosition();
-        boolean topUnderwater = false;
-        boolean bottomUnderwater = false;
         Vector3f top = new Vector3f(worldPos);
         Vector3f bottom = new Vector3f(worldPos);
         top.y += 0.25f * movementComp.height;
         bottom.y -= 0.25f * movementComp.height;
 
-        topUnderwater = worldProvider.getBlock(top).isLiquid();
-        bottomUnderwater = worldProvider.getBlock(bottom).isLiquid();
+        boolean topUnderwater = worldProvider.getBlock(top).isLiquid();
+        boolean bottomUnderwater = worldProvider.getBlock(bottom).isLiquid();
         boolean newSwimming = topUnderwater && bottomUnderwater;
 
         // Boost when leaving water
         if (!newSwimming && state.getMode() == MovementMode.SWIMMING && state.getVelocity().y > 0) {
-            float len = state.getVelocity().length();
-            state.getVelocity().scale((len + 8) / len);
+            state.getVelocity().y += 8;
         }
         state.setMode((newSwimming) ? MovementMode.SWIMMING : MovementMode.WALKING);
     }
@@ -172,7 +172,7 @@ public class BulletCharacterMover implements CharacterMover {
         moveDelta.scale(input.getDelta());
 
         // Note: No stepping underwater, no issue with slopes
-        MoveResult moveResult = move(state.getPosition(), moveDelta, 0, -1, movementComp.collider);
+        MoveResult moveResult = move(state.getPosition(), moveDelta, 0, 0.1f, movementComp.collider);
         Vector3f distanceMoved = new Vector3f(moveResult.getFinalPosition());
         distanceMoved.sub(state.getPosition());
 
@@ -209,8 +209,6 @@ public class BulletCharacterMover implements CharacterMover {
         state.getPosition().add(deltaPos);
         //if (deltaPos.length() > 0)
         //    entity.send(new MovedEvent(deltaPos, worldPos));
-
-        //movementComp.collider.setWorldTransform(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), worldPos, 1.0f)));
     }
 
     private void walk(final CharacterMovementComponent movementComp, final CharacterStateEvent state, CharacterMoveInputEvent input) {

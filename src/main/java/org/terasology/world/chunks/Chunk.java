@@ -182,9 +182,8 @@ public class Chunk implements Externalizable {
      * @author Manuel Brotz <manu.brotz@gmx.ch>
      * @todo Add support for chunk data extensions.
      */
-    public static class ProtobufHandler implements org.terasology.io.ProtobufHandler<Chunk, ChunksProtobuf.Chunk> {
+    public static class ProtobufHandler {
 
-        @Override
         public ChunksProtobuf.Chunk encode(Chunk chunk) {
             Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
             final TeraArrays t = TeraArrays.getInstance();
@@ -198,7 +197,6 @@ public class Chunk implements Externalizable {
             return b.build();
         }
 
-        @Override
         public Chunk decode(ChunksProtobuf.Chunk message) {
             Preconditions.checkNotNull(message, "The parameter 'message' must not be null");
             if (!message.hasX())
