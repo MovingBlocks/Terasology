@@ -48,6 +48,13 @@ public interface ChunkProvider {
     public void addRegionEntity(EntityRef entity, int distance, ChunkRegionListener listener);
 
     /**
+     * Updates the distance for an existing region entity
+     * @param entity
+     * @param distance
+     */
+    public void updateRegionEntity(EntityRef entity, int distance);
+
+    /**
      * Removes an entity from producing a caching region
      *
      * @param entity

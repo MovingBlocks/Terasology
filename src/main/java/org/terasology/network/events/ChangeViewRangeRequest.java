@@ -14,28 +14,26 @@
  * limitations under the License.
  */
 
-package org.terasology.network;
+package org.terasology.network.events;
 
-import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.Event;
-import org.terasology.world.chunks.ChunkRegionListener;
+import org.terasology.entitySystem.AbstractEvent;
+import org.terasology.network.ServerEvent;
 
 /**
  * @author Immortius
  */
-public interface Client extends ChunkRegionListener {
-    boolean isAwaitingConnectMessage();
+@ServerEvent
+public class ChangeViewRangeRequest extends AbstractEvent {
 
-    String getName();
+    private int newViewRange;
 
-    void disconnect();
+    protected ChangeViewRangeRequest() {}
 
-    void update(boolean netTick);
+    public ChangeViewRangeRequest(int newRangeMode) {
+        newViewRange = newRangeMode;
+    }
 
-    EntityRef getEntity();
-
-    void send(Event event, EntityRef target);
-
-    int getViewDistance();
-
+    public int getNewViewRange() {
+        return newViewRange;
+    }
 }

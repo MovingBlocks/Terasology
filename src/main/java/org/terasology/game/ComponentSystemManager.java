@@ -99,8 +99,6 @@ public class ComponentSystemManager {
         switch (registerInfo.value()) {
             case AUTHORITY:
                 return netMode.isAuthority();
-            case SERVER:
-                return netMode == NetworkMode.SERVER;
             case CLIENT:
                 return netMode == NetworkMode.CLIENT;
             default:

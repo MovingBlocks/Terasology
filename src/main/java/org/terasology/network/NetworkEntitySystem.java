@@ -1,22 +1,28 @@
 package org.terasology.network;
 
+import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
-import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.event.AddComponentEvent;
 import org.terasology.entitySystem.event.ChangedComponentEvent;
 import org.terasology.entitySystem.event.RemovedComponentEvent;
+import org.terasology.network.events.ChangeViewRangeRequest;
+import org.terasology.rendering.world.WorldRenderer;
 
 /**
  * @author Immortius
  */
 public class NetworkEntitySystem implements ComponentSystem {
 
-    private NetworkSystemImpl networkSystem;
     @In
     private EntityManager entityManager;
+
+    @In
+    private WorldRenderer worldRenderer;
+
+    private NetworkSystemImpl networkSystem;
 
     public NetworkEntitySystem(NetworkSystemImpl networkSystem) {
         this.networkSystem = networkSystem;
@@ -44,6 +50,20 @@ public class NetworkEntitySystem implements ComponentSystem {
     @ReceiveEvent(components = NetworkComponent.class)
     public void onRemoveNetworkComponent(RemovedComponentEvent event, EntityRef entity) {
         networkSystem.unregisterNetworkEntity(entity);
+    }
+
+    @ReceiveEvent(components = ClientComponent.class)
+    public void onChangeViewRequest(ChangeViewRangeRequest request, EntityRef entity) {
+        if (networkSystem.getMode().isAuthority()) {
+            NetClient netClient = networkSystem.getNetOwner(entity);
+            if (netClient != null) {
+                netClient.setViewDistanceMode(request.getNewViewRange());
+                ClientComponent clientComp = netClient.getEntity().getComponent(ClientComponent.class);
+                if (clientComp != null && clientComp.character.exists()) {
+                    worldRenderer.getChunkProvider().updateRegionEntity(clientComp.character, netClient.getViewDistance());
+                }
+            }
+        }
     }
 
     @Override

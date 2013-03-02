@@ -6,6 +6,5 @@ package org.terasology.entitySystem;
 public enum RegisterMode {
     ALWAYS,
     AUTHORITY,
-    CLIENT,
-    SERVER
+    CLIENT
 }

@@ -50,6 +50,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentMap;
@@ -79,7 +80,7 @@ public class LocalChunkProvider implements ChunkProvider {
     private ExecutorService chunkProcessingThreads;
     private ChunkGeneratorManager generator;
 
-    private Set<CacheRegion> regions = Sets.newHashSet();
+    private Map<EntityRef, CacheRegion> regions = Maps.newHashMap();
 
     private ConcurrentMap<Vector3i, Chunk> nearCache = Maps.newConcurrentMap();
 
@@ -172,12 +173,15 @@ public class LocalChunkProvider implements ChunkProvider {
 
     @Override
     public void addRegionEntity(EntityRef entity, int distance, ChunkRegionListener listener) {
+        if (!entity.exists()) {
+            return;
+        }
         CacheRegion region = new CacheRegion(entity, distance);
         region.setListener(listener);
         regionLock.writeLock().lock();
         try {
-            regions.remove(region);
-            regions.add(region);
+            regions.remove(entity);
+            regions.put(entity, region);
         } finally {
             regionLock.writeLock().unlock();
         }
@@ -190,6 +194,22 @@ public class LocalChunkProvider implements ChunkProvider {
             }
         }
         reviewChunkQueue.offer(new ChunkRequest(ChunkRequest.RequestType.PRODUCE, region.getRegion().expand(new Vector3i(2, 0, 2))));
+    }
+
+    public void updateRegionEntity(EntityRef entity, int distance) {
+        regionLock.writeLock().lock();
+        try {
+            CacheRegion region = regions.get(entity);
+            if (region != null) {
+                region.setDistance(distance);
+            } else {
+                addRegionEntity(entity, distance);
+            }
+            reviewChunkQueue.offer(new ChunkRequest(ChunkRequest.RequestType.PRODUCE, region.getRegion().expand(new Vector3i(2, 0, 2))));
+        } finally {
+            regionLock.writeLock().unlock();
+        }
+
     }
 
     @Override
@@ -206,7 +226,7 @@ public class LocalChunkProvider implements ChunkProvider {
     public void update() {
         regionLock.readLock().lock();
         try {
-            for (CacheRegion cacheRegion : regions) {
+            for (CacheRegion cacheRegion : regions.values()) {
                 cacheRegion.update();
                 if (cacheRegion.isDirty()) {
                     Region3i previousRegion = cacheRegion.getCurrentRegion();
@@ -231,7 +251,7 @@ public class LocalChunkProvider implements ChunkProvider {
                 while (iterator.hasNext()) {
                     Vector3i pos = iterator.next();
                     boolean keep = false;
-                    for (CacheRegion region : regions) {
+                    for (CacheRegion region : regions.values()) {
                         if (region.getRegion().expand(new Vector3i(4, 0, 4)).encompasses(pos)) {
                             keep = true;
                             break;
@@ -562,7 +582,7 @@ public class LocalChunkProvider implements ChunkProvider {
             worldEntity.send(new ChunkReadyEvent(pos));
             regionLock.readLock().lock();
             try {
-                for (CacheRegion region : regions) {
+                for (CacheRegion region : regions.values()) {
                     if (region.getRegion().encompasses(pos)) {
                         region.sendChunkReady(getChunk(pos));
                     }
@@ -592,6 +612,11 @@ public class LocalChunkProvider implements ChunkProvider {
                 center.set(worldToChunkPos(loc.getWorldPosition()));
                 dirty = true;
             }
+        }
+
+        public void setDistance(int distance) {
+            this.distance = distance;
+            dirty = true;
         }
 
         public boolean isValid() {
@@ -670,8 +695,6 @@ public class LocalChunkProvider implements ChunkProvider {
         public int hashCode() {
             return Objects.hashCode(entity);
         }
-
-
     }
 
     private class ChunkTaskRelevanceComparator implements Comparator<ChunkTask> {
@@ -687,7 +710,7 @@ public class LocalChunkProvider implements ChunkProvider {
 
             regionLock.readLock().lock();
             try {
-                for (CacheRegion region : regions) {
+                for (CacheRegion region : regions.values()) {
                     int dist = distFromRegion(chunk, region.center);
                     if (dist < score) {
                         score = dist;

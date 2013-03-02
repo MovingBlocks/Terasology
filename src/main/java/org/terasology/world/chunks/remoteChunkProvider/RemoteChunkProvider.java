@@ -69,6 +69,10 @@ public class RemoteChunkProvider implements ChunkProvider {
     }
 
     @Override
+    public void updateRegionEntity(EntityRef entity, int distance) {
+    }
+
+    @Override
     public void removeRegionEntity(EntityRef entity) {
 
     }

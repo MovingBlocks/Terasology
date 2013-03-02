@@ -19,6 +19,8 @@ package org.terasology.config;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.PixelFormat;
 import org.terasology.game.CoreRegistry;
+import org.terasology.logic.players.LocalPlayer;
+import org.terasology.network.events.ChangeViewRangeRequest;
 import org.terasology.rendering.world.WorldRenderer;
 
 /**
@@ -139,6 +141,10 @@ public class RenderingConfig {
         WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
         if (worldRenderer != null) {
             worldRenderer.changeViewDistance(getActiveViewingDistance());
+        }
+        LocalPlayer player = CoreRegistry.get(LocalPlayer.class);
+        if (player != null) {
+            player.getClientEntity().send(new ChangeViewRangeRequest(activeViewDistanceMode));
         }
     }
 

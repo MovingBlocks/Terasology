@@ -446,5 +446,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener, Ev
         return sentBytes.getAndSet(0);
     }
 
-
+    public void setViewDistanceMode(int newViewRange) {
+        this.viewDistance = newViewRange;
+    }
 }

@@ -251,7 +251,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
         return clientPlayerLookup.get(owner);
     }
 
-    private NetClient getNetOwner(EntityRef entity) {
+    NetClient getNetOwner(EntityRef entity) {
         Client owner = getOwner(entity);
         if (owner instanceof NetClient) {
             return (NetClient) owner;
