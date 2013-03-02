@@ -27,6 +27,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL14;
 import org.lwjgl.opengl.GLContext;
+import org.terasology.config.Config;
 import org.terasology.game.CoreRegistry;
 import org.terasology.math.TeraMath;
 import org.terasology.rendering.shader.ShaderProgram;
@@ -52,6 +53,8 @@ public class PostProcessingRenderer {
     private float _exposure = 16.0f;
     private float _sceneLuminance = 1.0f;
     private int _displayListQuad = -1;
+
+    private Config config = CoreRegistry.get(Config.class);
 
     private boolean _extensionsAvailable = false;
 
@@ -278,7 +281,7 @@ public class PostProcessingRenderer {
             return;
         }
 
-        if (Config.getInstance().isEnablePostProcessingEffects()) {
+        if (config.getRendering().isBloom()) {
             generateDownsampledScene();
 
             generateTonemappedScene();
@@ -286,7 +289,7 @@ public class PostProcessingRenderer {
 
             for (int i = 0; i < 2; i++) {
                 generateBloom(i);
-                if (Config.getInstance().getBlurIntensity() != 0) {
+                if (config.getRendering().getBlurIntensity() != 0) {
                     generateBlur(i);
                 }
             }
@@ -361,7 +364,7 @@ public class PostProcessingRenderer {
 
         shader.enable();
 
-        shader.setFloat("radius", 1.5f * Config.getInstance().getBlurIntensity());
+        shader.setFloat("radius", 1.5f * config.getRendering().getBlurIntensity());
 
         PostProcessingRenderer.getInstance().getFBO("sceneBlur" + id).bind();
         glViewport(0, 0, 512, 512);

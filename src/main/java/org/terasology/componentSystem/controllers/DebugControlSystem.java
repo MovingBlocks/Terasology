@@ -17,18 +17,18 @@
 package org.terasology.componentSystem.controllers;
 
 import org.lwjgl.input.Keyboard;
-import org.terasology.entitySystem.RegisterSystem;
-import org.terasology.logic.players.LocalPlayerComponent;
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.config.Config;
 import org.terasology.entitySystem.ComponentSystem;
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.In;
 import org.terasology.entitySystem.ReceiveEvent;
+import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.events.DamageEvent;
+import org.terasology.game.CoreRegistry;
 import org.terasology.input.events.KeyDownEvent;
 import org.terasology.input.events.KeyEvent;
-import org.terasology.game.CoreRegistry;
-import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.logic.players.LocalPlayerComponent;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.windows.metricsScreen.UIScreenMetrics;
 import org.terasology.rendering.world.WorldRenderer;
@@ -47,6 +47,8 @@ public class DebugControlSystem implements ComponentSystem {
     private WorldProvider world;
     @In
     private WorldRenderer worldRenderer;
+    @In
+    private Config config;
 
     @Override
     public void initialise() {
@@ -58,7 +60,7 @@ public class DebugControlSystem implements ComponentSystem {
 
     @ReceiveEvent(components = LocalPlayerComponent.class)
     public void onKeyEvent(KeyEvent event, EntityRef entity) {
-        boolean debugEnabled = Config.getInstance().isDebug();
+        boolean debugEnabled = config.getSystem().isDebugEnabled();
         // Features for debug mode only
         if (debugEnabled && event.isDown()) {
             switch (event.getKey()) {
@@ -84,7 +86,7 @@ public class DebugControlSystem implements ComponentSystem {
 
     @ReceiveEvent(components = LocalPlayerComponent.class)
     public void onKeyDown(KeyDownEvent event, EntityRef entity) {
-        boolean debugEnabled = Config.getInstance().isDebug();
+        boolean debugEnabled = config.getSystem().isDebugEnabled();
         // Features for debug mode only
         if (debugEnabled) {
             switch (event.getKey()) {
@@ -104,10 +106,10 @@ public class DebugControlSystem implements ComponentSystem {
                     entity.send(new DamageEvent(9999, null));
                     break;
                 case Keyboard.KEY_H:
-                	for (UIDisplayElement element : CoreRegistry.get(GUIManager.class).getWindowById("hud").getDisplayElements()) {
+                    for (UIDisplayElement element : CoreRegistry.get(GUIManager.class).getWindowById("hud").getDisplayElements()) {
                         element.setVisible(!element.isVisible());
                     }
-                	
+
                     event.consume();
                     break;
             }
@@ -115,7 +117,7 @@ public class DebugControlSystem implements ComponentSystem {
 
         switch (event.getKey()) {
             case Keyboard.KEY_F3:
-                Config.getInstance().setDebug(!Config.getInstance().isDebug());
+                config.getSystem().setDebugEnabled(!config.getSystem().isDebugEnabled());
                 event.consume();
                 break;
             case Keyboard.KEY_F:
@@ -131,6 +133,6 @@ public class DebugControlSystem implements ComponentSystem {
     }
 
     private void toggleViewingDistance() {
-        Config.getInstance().setViewingDistanceById((Config.getInstance().getActiveViewingDistanceId() + 1) % 4);
+        config.getRendering().setActiveViewDistanceMode((config.getRendering().getActiveViewDistanceMode() + 1) % 4);
     }
 }

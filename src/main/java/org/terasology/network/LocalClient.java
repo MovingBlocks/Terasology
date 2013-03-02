@@ -17,10 +17,11 @@
 package org.terasology.network;
 
 import org.terasology.components.DisplayInformationComponent;
+import org.terasology.config.Config;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Event;
-import org.terasology.logic.manager.Config;
+import org.terasology.game.CoreRegistry;
 import org.terasology.math.Vector3i;
 import org.terasology.world.chunks.Chunk;
 
@@ -28,6 +29,8 @@ import org.terasology.world.chunks.Chunk;
  * @author Immortius
  */
 public class LocalClient extends AbstractClient {
+
+    private Config config = CoreRegistry.get(Config.class);
 
     public LocalClient(String name, EntityManager entityManager) {
         createEntity(name, entityManager);
@@ -65,7 +68,7 @@ public class LocalClient extends AbstractClient {
 
     @Override
     public int getViewDistance() {
-        return Config.getInstance().getActiveViewingDistance();
+        return config.getRendering().getActiveViewingDistance();
     }
 
     @Override

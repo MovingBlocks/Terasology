@@ -21,14 +21,12 @@ import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.AdvancedConfig;
+import org.terasology.config.Config;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.manager.Config;
 import org.terasology.math.AABB;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
-import org.terasology.network.NetworkUtil;
 import org.terasology.protobuf.ChunksProtobuf;
-import org.terasology.protobuf.NetData;
 import org.terasology.rendering.primitives.ChunkMesh;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
@@ -107,7 +105,7 @@ public class Chunk implements Externalizable {
     public static final int INNER_CHUNK_POS_FILTER_Z = TeraMath.ceilPowerOfTwo(SIZE_Z) - 1;
     public static final int POWER_X = TeraMath.sizeOfPower(SIZE_X);
     public static final int POWER_Z = TeraMath.sizeOfPower(SIZE_Z);
-    public static final int VERTICAL_SEGMENTS = Config.getInstance().getVerticalChunkMeshSegments();
+    public static final int VERTICAL_SEGMENTS = CoreRegistry.get(Config.class).getSystem().getVerticalChunkMeshSegments();
     public static final byte MAX_LIGHT = 0x0f;
     public static final byte MAX_LIQUID_DEPTH = 0x07;
 
@@ -447,7 +445,7 @@ public class Chunk implements Externalizable {
         }
         lock();
         try {
-            AdvancedConfig config = CoreRegistry.get(org.terasology.config.Config.class).getAdvancedConfig();
+            AdvancedConfig config = CoreRegistry.get(org.terasology.config.Config.class).getAdvanced();
             final TeraDeflator def = new TeraStandardDeflator();
 
             if (config.isChunkDeflationLoggingEnabled()) {

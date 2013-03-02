@@ -15,22 +15,21 @@
  */
 package org.terasology.rendering.shader;
 
-import static org.lwjgl.opengl.GL11.glBindTexture;
-
-import javax.vecmath.Vector3f;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.terasology.asset.Assets;
+import org.terasology.config.Config;
 import org.terasology.game.CoreRegistry;
-import org.terasology.logic.players.LocalPlayer;
-import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PostProcessingRenderer;
-import org.terasology.math.TeraMath;
+import org.terasology.logic.players.LocalPlayer;
 import org.terasology.rendering.assets.Texture;
 import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
+
+import javax.vecmath.Vector3f;
+
+import static org.lwjgl.opengl.GL11.glBindTexture;
 
 /**
  * Shader parameters for the Post-processing shader program.
@@ -44,10 +43,11 @@ public class ShaderParametersPost implements IShaderParameters {
     @Override
     public void applyParameters(ShaderProgram program) {
         PostProcessingRenderer.FBO scene = PostProcessingRenderer.getInstance().getFBO("scene");
+        Config config = CoreRegistry.get(Config.class);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE1);
         PostProcessingRenderer.getInstance().getFBO("sceneBloom1").bindTexture();
-        if (Config.getInstance().getBlurIntensity() != 0) {
+        if (config.getRendering().getBlurIntensity() != 0) {
             GL13.glActiveTexture(GL13.GL_TEXTURE2);
             PostProcessingRenderer.getInstance().getFBO("sceneBlur1").bindTexture();
         }
@@ -60,13 +60,13 @@ public class ShaderParametersPost implements IShaderParameters {
 
         program.setInt("texScene", 0);
         program.setInt("texBloom", 1);
-        if (Config.getInstance().getBlurIntensity() != 0) {
+        if (config.getRendering().getBlurIntensity() != 0) {
             program.setInt("texBlur", 2);
         }
         program.setInt("texVignette", 3);
         program.setInt("texDepth", 4);
 
-        program.setFloat("viewingDistance", Config.getInstance().getActiveViewingDistance() * 8.0f);
+        program.setFloat("viewingDistance", config.getRendering().getActiveViewingDistance() * 8.0f);
 
 //        WorldRenderer renderer = CoreRegistry.get(WorldRenderer.class);
 //        float timeInDays = renderer.getWorldProvider().getTimeInDays();

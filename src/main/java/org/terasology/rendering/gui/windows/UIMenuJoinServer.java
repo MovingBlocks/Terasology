@@ -10,7 +10,6 @@ import org.terasology.game.TerasologyConstants;
 import org.terasology.game.modes.StateLoading;
 import org.terasology.network.NetworkMode;
 import org.terasology.network.NetworkSystem;
-import org.terasology.network.NetworkSystemImpl;
 import org.terasology.rendering.gui.dialogs.UIDialogServer;
 import org.terasology.rendering.gui.framework.UIDisplayElement;
 import org.terasology.rendering.gui.framework.events.ClickListener;
@@ -81,7 +80,7 @@ public class UIMenuJoinServer extends UIWindow {
                     public void close(UIDisplayElement dialog, EReturnCode returnCode, Object returnValue) {
                         if (returnCode == EReturnCode.OK && returnValue != null) {
                             add((ServerInfo) returnValue);
-                            CoreRegistry.get(Config.class).getServerConfig().add((ServerInfo) returnValue);
+                            CoreRegistry.get(Config.class).getServer().add((ServerInfo) returnValue);
                         }
                     }
                 });
@@ -124,7 +123,7 @@ public class UIMenuJoinServer extends UIWindow {
             public void click(UIDisplayElement element, int button) {
                 if (list.getSelection() != null) {
                     ServerInfo info = (ServerInfo) list.getSelection().getValue();
-                    CoreRegistry.get(Config.class).getServerConfig().remove(info);
+                    CoreRegistry.get(Config.class).getServer().remove(info);
                     list.removeItem(list.getSelectionIndex());
                 }
             }
@@ -203,7 +202,7 @@ public class UIMenuJoinServer extends UIWindow {
     private void loadServerList() {
         list.removeAll();
         Config config = CoreRegistry.get(Config.class);
-        for (ServerInfo serverInfo : config.getServerConfig()) {
+        for (ServerInfo serverInfo : config.getServer()) {
             add(serverInfo);
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012  Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright 2013 Moving Blocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,18 @@
 package org.terasology.config;
 
 import com.google.common.collect.Multimap;
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+import org.lwjgl.opengl.PixelFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.input.Input;
@@ -29,6 +40,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.Map;
 
 /**
  * Terasology user config. Holds the various global configuration information that the user can modify. It can be saved
@@ -38,12 +51,16 @@ import java.io.IOException;
  */
 public final class Config {
     private static final Logger logger = LoggerFactory.getLogger(Config.class);
+
+    private SystemConfig system = new SystemConfig();
+    private PlayerConfig player = new PlayerConfig();
     private InputConfig input = new InputConfig();
-    private ModConfig defaultModConfig = new ModConfig();
-    private ServerConfig serverConfig = new ServerConfig();
-    private PlayerConfig playerConfig = new PlayerConfig();
+    private AudioConfig audio = new AudioConfig();
+    private RenderingConfig rendering = new RenderingConfig();
+    private ModConfig defaultModSelection = new ModConfig();
+    private WorldGenerationConfig worldGeneration = new WorldGenerationConfig();
+    private ServerConfig server = new ServerConfig();
     private AdvancedConfig advanced = AdvancedConfig.createDefault();
-    private SoundConfig soundConfig = new SoundConfig();
 
     /**
      * Create a new, empty config
@@ -54,28 +71,40 @@ public final class Config {
     /**
      * @return Input configuration (mostly binds)
      */
-    public InputConfig getInputConfig() {
+    public InputConfig getInput() {
         return input;
     }
 
-    public ModConfig getDefaultModConfig() {
-        return defaultModConfig;
+    public ModConfig getDefaultModSelection() {
+        return defaultModSelection;
     }
 
-    public ServerConfig getServerConfig() {
-        return serverConfig;
+    public ServerConfig getServer() {
+        return server;
     }
 
-    public PlayerConfig getPlayerConfig() {
-        return playerConfig;
+    public PlayerConfig getPlayer() {
+        return player;
     }
-    
-    public AdvancedConfig getAdvancedConfig() {
+
+    public AdvancedConfig getAdvanced() {
         return advanced;
     }
 
-    public SoundConfig getSoundConfig() {
-        return soundConfig;
+    public AudioConfig getAudio() {
+        return audio;
+    }
+
+    public SystemConfig getSystem() {
+        return system;
+    }
+
+    public RenderingConfig getRendering() {
+        return rendering;
+    }
+
+    public WorldGenerationConfig getWorldGeneration() {
+        return worldGeneration;
     }
 
     /**
@@ -93,11 +122,12 @@ public final class Config {
      * @return The default configuration file location
      */
     public static File getConfigFile() {
-        return new File(PathManager.getInstance().getWorldPath(), "config.cfg");
+        return new File(PathManager.getInstance().getDataPath(), "config.cfg");
     }
 
     /**
      * Saves a Config to a file, in a JSON format
+     *
      * @param toFile
      * @param config
      * @throws IOException
@@ -106,10 +136,11 @@ public final class Config {
         FileWriter writer = new FileWriter(toFile);
         try {
             new GsonBuilder()
-                    .registerTypeAdapter(InputConfig.class, new InputConfig.Handler())
+                    .registerTypeAdapter(BindsConfig.class, new BindsConfig.Handler())
                     .registerTypeAdapter(Multimap.class, new MultimapHandler<Input>(Input.class))
                     .registerTypeAdapter(Input.class, new InputHandler())
                     .registerTypeAdapter(AdvancedConfig.class, new AdvancedConfig.Handler())
+                    .registerTypeAdapter(PixelFormat.class, new PixelFormatHandler())
                     .setPrettyPrinting().create().toJson(config, writer);
         } finally {
             // JAVA7: better closing support
@@ -119,6 +150,7 @@ public final class Config {
 
     /**
      * Loads a JSON format configuration file as a new Config
+     *
      * @param fromFile
      * @return The loaded configuration
      * @throws IOException
@@ -126,14 +158,56 @@ public final class Config {
     public static Config load(File fromFile) throws IOException {
         FileReader reader = new FileReader(fromFile);
         try {
-            return new GsonBuilder()
-                    .registerTypeAdapter(InputConfig.class, new InputConfig.Handler())
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(BindsConfig.class, new BindsConfig.Handler())
                     .registerTypeAdapter(Multimap.class, new MultimapHandler<Input>(Input.class))
                     .registerTypeAdapter(Input.class, new InputHandler())
                     .registerTypeAdapter(AdvancedConfig.class, new AdvancedConfig.Handler())
-                    .create().fromJson(reader, Config.class);
+                    .registerTypeAdapter(PixelFormat.class, new PixelFormatHandler())
+                    .create();
+            JsonElement baseConfig = gson.toJsonTree(new Config());
+            JsonParser parser = new JsonParser();
+            JsonElement config = parser.parse(reader);
+            if (!config.isJsonObject()) {
+                return new Config();
+            } else {
+                merge(baseConfig.getAsJsonObject(), config.getAsJsonObject());
+                return gson.fromJson(baseConfig, Config.class);
+            }
         } finally {
             reader.close();
+        }
+    }
+
+    private static void merge(JsonObject target, JsonObject from) {
+        for (Map.Entry<String, JsonElement> entry : from.entrySet()) {
+            if (entry.getValue().isJsonObject()) {
+                if (target.has(entry.getKey()) && target.get(entry.getKey()).isJsonObject()) {
+                    merge(target.get(entry.getKey()).getAsJsonObject(), entry.getValue().getAsJsonObject());
+                } else {
+                    target.remove(entry.getKey());
+                    target.add(entry.getKey(), entry.getValue());
+                }
+            } else {
+                target.remove(entry.getKey());
+                target.add(entry.getKey(), entry.getValue());
+            }
+        }
+    }
+
+    private static class PixelFormatHandler implements JsonSerializer<PixelFormat>, JsonDeserializer<PixelFormat> {
+
+        @Override
+        public PixelFormat deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            if (json.isJsonPrimitive() && json.getAsJsonPrimitive().isNumber()) {
+                return new PixelFormat().withDepthBits(json.getAsInt());
+            }
+            return new PixelFormat().withDepthBits(24);
+        }
+
+        @Override
+        public JsonElement serialize(PixelFormat src, Type typeOfSrc, JsonSerializationContext context) {
+            return new JsonPrimitive(src.getDepthBits());
         }
     }
 }

@@ -523,7 +523,7 @@ public class LocalChunkProvider implements ChunkProvider {
             }
             logger.debug("Now complete {}", pos);
             chunk.setChunkState(Chunk.State.COMPLETE);
-            AdvancedConfig config = CoreRegistry.get(org.terasology.config.Config.class).getAdvancedConfig();
+            AdvancedConfig config = CoreRegistry.get(org.terasology.config.Config.class).getAdvanced();
             if (config.isChunkDeflationEnabled()) {
                 if (!chunkTasksQueue.offer(new AbstractChunkTask(pos, this) {
                     @Override

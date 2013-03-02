@@ -19,9 +19,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.terasology.entitySystem.EntityRef;
+import org.terasology.config.Config;
 import org.terasology.entitySystem.ComponentSystem;
+import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.EventSystem;
+import org.terasology.entitySystem.In;
 import org.terasology.game.CoreRegistry;
 import org.terasology.input.events.InputEvent;
 import org.terasology.input.events.KeyDownEvent;
@@ -39,9 +41,8 @@ import org.terasology.input.events.MouseXAxisEvent;
 import org.terasology.input.events.MouseYAxisEvent;
 import org.terasology.input.events.RightMouseDownButtonEvent;
 import org.terasology.input.events.RightMouseUpButtonEvent;
-import org.terasology.logic.players.LocalPlayer;
-import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
+import org.terasology.logic.players.LocalPlayer;
 
 import java.util.List;
 import java.util.Map;
@@ -54,7 +55,8 @@ import java.util.Map;
  */
 public class InputSystem implements ComponentSystem {
 
-    private float mouseSensitivity = (float) Config.getInstance().getMouseSens();
+    @In
+    private Config config;
 
     private Map<String, BindableAxisImpl> axisLookup = Maps.newHashMap();
     private Map<String, BindableButtonImpl> buttonLookup = Maps.newHashMap();
@@ -193,7 +195,7 @@ public class InputSystem implements ComponentSystem {
         //process mouse movement x axis
         int deltaX = Mouse.getDX();
         if (deltaX != 0) {
-            MouseAxisEvent event = new MouseXAxisEvent(deltaX * mouseSensitivity, delta);
+            MouseAxisEvent event = new MouseXAxisEvent(deltaX * config.getInput().getMouseSensitivity(), delta);
             setupTarget(event);
             for (EntityRef entity : getInputEntities()) {
                 entity.send(event);
@@ -206,7 +208,7 @@ public class InputSystem implements ComponentSystem {
         //process mouse movement y axis
         int deltaY = Mouse.getDY();
         if (deltaY != 0) {
-            MouseAxisEvent event = new MouseYAxisEvent(deltaY * mouseSensitivity, delta);
+            MouseAxisEvent event = new MouseYAxisEvent(deltaY * config.getInput().getMouseSensitivity(), delta);
             setupTarget(event);
             for (EntityRef entity : getInputEntities()) {
                 entity.send(event);
@@ -322,7 +324,7 @@ public class InputSystem implements ComponentSystem {
     }
 
     private EntityRef[] getInputEntities() {
-        return new EntityRef[] {localPlayer.getClientEntity(), localPlayer.getCharacterEntity()};
+        return new EntityRef[]{localPlayer.getClientEntity(), localPlayer.getCharacterEntity()};
     }
 
 }

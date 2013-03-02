@@ -15,13 +15,14 @@
  */
 package org.terasology.rendering.cameras;
 
-import static org.lwjgl.opengl.GL11.glScalef;
-import static org.lwjgl.opengl.GL11.glTranslatef;
+import org.terasology.config.Config;
+import org.terasology.game.CoreRegistry;
+import org.terasology.model.structures.ViewFrustum;
 
 import javax.vecmath.Vector3f;
 
-import org.terasology.logic.manager.Config;
-import org.terasology.model.structures.ViewFrustum;
+import static org.lwjgl.opengl.GL11.glScalef;
+import static org.lwjgl.opengl.GL11.glTranslatef;
 
 /**
  * Provides global access to fonts.
@@ -35,8 +36,8 @@ public abstract class Camera {
     protected final Vector3f _up = new Vector3f(0, 1, 0);
     protected final Vector3f _viewingDirection = new Vector3f(1, 0, 0);
 
-    protected float _targetFov = Config.getInstance().getFov();
-    protected float _activeFov = Config.getInstance().getFov() / 4f;
+    protected float _targetFov = CoreRegistry.get(Config.class).getRendering().getFieldOfView();
+    protected float _activeFov = _targetFov / 4f;
 
     /* VIEW FRUSTUM */
     protected final ViewFrustum _viewFrustum = new ViewFrustum();
@@ -115,11 +116,11 @@ public abstract class Camera {
     }
 
     public void extendFov(float fov) {
-        _targetFov = Config.getInstance().getFov() + fov;
+        _targetFov = CoreRegistry.get(Config.class).getRendering().getFieldOfView() + fov;
     }
 
     public void resetFov() {
-        _targetFov = Config.getInstance().getFov();
+        _targetFov = CoreRegistry.get(Config.class).getRendering().getFieldOfView();
     }
 
     public void setReflected(boolean reflected) {

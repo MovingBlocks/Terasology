@@ -26,11 +26,10 @@ import org.lwjgl.openal.ALCcontext;
 import org.lwjgl.openal.ALCdevice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.audio.Sound;
 import org.terasology.audio.AudioManager;
-import org.terasology.config.SoundConfig;
+import org.terasology.audio.Sound;
+import org.terasology.config.AudioConfig;
 import org.terasology.math.Direction;
-import org.terasology.math.Side;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -57,15 +56,15 @@ public class OpenALManager implements AudioManager {
     private PropertyChangeListener configListener = new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
-            if (evt.getPropertyName().equals(SoundConfig.MUSIC_VOLUME)) {
-                setMusicVolume((Float)evt.getNewValue());
-            } else if (evt.getPropertyName().equals(SoundConfig.SOUND_VOLUME)) {
-                setSoundVolume((Float)evt.getNewValue());
+            if (evt.getPropertyName().equals(AudioConfig.MUSIC_VOLUME)) {
+                setMusicVolume((Float) evt.getNewValue());
+            } else if (evt.getPropertyName().equals(AudioConfig.SOUND_VOLUME)) {
+                setSoundVolume((Float) evt.getNewValue());
             }
         }
     };
 
-    public OpenALManager(SoundConfig config) {
+    public OpenALManager(AudioConfig config) {
         logger.info("Initializing OpenAL audio manager");
         config.subscribe(configListener);
         try {

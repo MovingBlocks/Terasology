@@ -41,7 +41,6 @@ import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.console.SimpleMessageEvent;
 import org.terasology.logic.manager.CommandManager;
 import org.terasology.logic.manager.CommandManager.CommandInfo;
-import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.MessageManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.players.LocalPlayer;
@@ -464,11 +463,11 @@ public class Commands implements CommandProvider {
     public void fullscreen() {
         TerasologyEngine te = (TerasologyEngine) CoreRegistry.get(GameEngine.class);
 
-        if (Config.getInstance().isFullscreen()) {
+        if (te.isFullscreen()) {
             MessageManager.getInstance().addMessage("returning to desktop size");
         } else {
             MessageManager.getInstance().addMessage("switching to fullscreen mode");
         }
-        te.setFullscreen(!Config.getInstance().isFullscreen());
+        te.setFullscreen(te.isFullscreen());
     }
 }

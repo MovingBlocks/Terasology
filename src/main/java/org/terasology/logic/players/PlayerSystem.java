@@ -11,7 +11,6 @@ import org.terasology.entitySystem.ReceiveEvent;
 import org.terasology.entitySystem.RegisterSystem;
 import org.terasology.entitySystem.RegisterMode;
 import org.terasology.logic.inventory.InventoryManager;
-import org.terasology.logic.manager.Config;
 import org.terasology.math.Vector3i;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;

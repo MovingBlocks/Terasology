@@ -16,14 +16,8 @@
 
 package org.terasology.rendering.assets;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-import java.util.Iterator;
-import java.util.Map;
-
+import com.google.common.collect.Maps;
+import com.google.common.io.CharStreams;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
@@ -31,14 +25,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.asset.Asset;
 import org.terasology.asset.AssetUri;
-import org.terasology.logic.manager.Config;
+import org.terasology.config.Config;
+import org.terasology.game.CoreRegistry;
 import org.terasology.rendering.assets.metadata.ParamMetadata;
 import org.terasology.rendering.assets.metadata.ParamType;
 import org.terasology.rendering.assets.metadata.ShaderMetadata;
 import org.terasology.world.block.Block;
 
-import com.google.common.collect.Maps;
-import com.google.common.io.CharStreams;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * @author Immortius
@@ -206,14 +206,15 @@ public class Shader implements Asset {
     }
 
     public static StringBuilder createShaderBuilder() {
+        Config config = CoreRegistry.get(Config.class);
         StringBuilder builder = new StringBuilder().append(PreProcessorPreamble);
-        if (Config.getInstance().isAnimatedGrass())
+        if (config.getRendering().isAnimateGrass())
             builder.append("#define ANIMATED_WATER_AND_GRASS \n");
-        if (Config.getInstance().getBlurIntensity() == 0)
+        if (config.getRendering().getBlurIntensity() == 0)
             builder.append("#define NO_BLUR \n");
-        if (!Config.getInstance().isEnablePostProcessingEffects())
+        if (!config.getRendering().isBloom())
             builder.append("#define NO_POST_PROCESSING \n");
-        if (Config.getInstance().isFlickeringLight())
+        if (config.getRendering().isFlickeringLight())
             builder.append("#define FLICKERING_LIGHT \n");
         return builder;
     }

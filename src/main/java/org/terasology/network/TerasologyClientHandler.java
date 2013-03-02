@@ -63,10 +63,11 @@ public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
     public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
         this.server = new Server(networkSystem, e.getChannel());
         networkSystem.setServer(server);
+        Config config = CoreRegistry.get(Config.class);
         e.getChannel().write(NetMessage.newBuilder()
                 .setClientConnect(ClientConnectMessage.newBuilder()
-                        .setName(CoreRegistry.get(Config.class).getPlayerConfig().getName())
-                        .setViewDistanceLevel(org.terasology.logic.manager.Config.getInstance().getActiveViewingDistance())
+                        .setName(config.getPlayer().getName())
+                        .setViewDistanceLevel(config.getRendering().getActiveViewDistanceMode())
                 ).build());
     }
 

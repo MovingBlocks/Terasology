@@ -10,10 +10,12 @@ import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import org.jboss.netty.channel.Channel;
+import org.jboss.netty.channel.ChannelConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.components.DisplayInformationComponent;
 import org.terasology.components.world.WorldComponent;
+import org.terasology.config.Config;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -28,7 +30,6 @@ import org.terasology.entitySystem.persistence.PackedEntitySerializer;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
 import org.terasology.logic.characters.PredictionSystem;
-import org.terasology.logic.manager.Config;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.network.serialization.ServerComponentFieldCheck;
@@ -55,6 +56,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class NetClient extends AbstractClient implements WorldChangeListener, EventReceiver<ChunkUnloadedEvent> {
     private static final Logger logger = LoggerFactory.getLogger(NetClient.class);
+
+    private Config config = CoreRegistry.get(Config.class);
 
     private Timer timer;
     private NetworkSystemImpl networkSystem;
@@ -264,13 +267,13 @@ public class NetClient extends AbstractClient implements WorldChangeListener, Ev
     public int getViewDistance() {
         switch (viewDistance) {
             case 1:
-                return Config.getInstance().getViewingDistanceModerate();
+                return config.getRendering().getViewDistanceModerate();
             case 2:
-                return Config.getInstance().getViewingDistanceFar();
+                return config.getRendering().getViewDistanceFar();
             case 3:
-                return Config.getInstance().getViewingDistanceUltra();
+                return config.getRendering().getViewDistanceUltra();
             default:
-                return Config.getInstance().getViewingDistanceNear();
+                return config.getRendering().getViewDistanceNear();
         }
     }
 

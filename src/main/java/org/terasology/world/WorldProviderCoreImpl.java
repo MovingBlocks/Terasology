@@ -17,10 +17,10 @@
 package org.terasology.world;
 
 import com.google.common.collect.Lists;
+import org.terasology.config.Config;
 import org.terasology.config.ModConfig;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.Timer;
-import org.terasology.logic.manager.Config;
 import org.terasology.logic.mod.Mod;
 import org.terasology.logic.mod.ModManager;
 import org.terasology.math.Region3i;
@@ -41,7 +41,7 @@ import java.util.List;
  * @author Immortius
  */
 public class WorldProviderCoreImpl implements WorldProviderCore {
-    private final long DAY_NIGHT_LENGTH_IN_MS = Config.getInstance().getDayNightLengthInMs();
+    private final long DAY_NIGHT_LENGTH_IN_MS = CoreRegistry.get(Config.class).getSystem().getDayNightLengthInMs();
 
     private String title;
     private String seed = "";
@@ -54,7 +54,7 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
 
     private List<WorldChangeListener> listeners = Lists.newArrayList();
 
-    public WorldProviderCoreImpl(String title, String seed, String[] chunkGenerators, ChunkProvider chunkProvider) {
+    public WorldProviderCoreImpl(String title, String seed, long time, String[] chunkGenerators, ChunkProvider chunkProvider) {
         if (title == null) {
             title = seed;
         }
@@ -66,14 +66,6 @@ public class WorldProviderCoreImpl implements WorldProviderCore {
         this.chunkProvider = chunkProvider;
         CoreRegistry.put(ChunkProvider.class, chunkProvider);
 
-        Timer timer = CoreRegistry.get(Timer.class);
-        if (timer != null) {
-            timeOffset = -timer.getTimeInMs() + Config.getInstance().getInitialTimeOffsetInMs();
-        }
-    }
-
-    public WorldProviderCoreImpl(String title, String seed, long time, String[] chunkGenerators, ChunkProvider chunkProvider) {
-        this(title, seed, chunkGenerators, chunkProvider);
         setTime(time);
     }
 

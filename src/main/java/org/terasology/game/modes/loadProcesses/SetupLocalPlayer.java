@@ -18,7 +18,7 @@ public class SetupLocalPlayer implements LoadProcess {
 
     @Override
     public boolean step() {
-        Client localClient = CoreRegistry.get(NetworkSystem.class).joinLocal(CoreRegistry.get(Config.class).getPlayerConfig().getName());
+        Client localClient = CoreRegistry.get(NetworkSystem.class).joinLocal(CoreRegistry.get(Config.class).getPlayer().getName());
         CoreRegistry.get(LocalPlayer.class).setClientEntity(localClient.getEntity());
         return true;
     }

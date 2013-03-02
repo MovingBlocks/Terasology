@@ -24,12 +24,12 @@ import org.slf4j.LoggerFactory;
 import org.terasology.asset.Assets;
 import org.terasology.audio.AudioManager;
 import org.terasology.componentSystem.RenderSystem;
+import org.terasology.config.Config;
 import org.terasology.game.ComponentSystemManager;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.Timer;
 import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.manager.PostProcessingRenderer;
 import org.terasology.logic.manager.ShaderManager;
@@ -107,7 +107,7 @@ import static org.lwjgl.opengl.GL11.glPushMatrix;
 public final class WorldRenderer {
     public static final int MAX_ANIMATED_CHUNKS = 64;
     public static final int MAX_BILLBOARD_CHUNKS = 64;
-    public static final int VERTICAL_SEGMENTS = Config.getInstance().getVerticalChunkMeshSegments();
+    public static final int VERTICAL_SEGMENTS = CoreRegistry.get(Config.class).getSystem().getVerticalChunkMeshSegments();
 
     private static final Logger logger = LoggerFactory.getLogger(WorldRenderer.class);
 
@@ -173,6 +173,8 @@ public final class WorldRenderer {
     private ComponentSystemManager systemManager;
     private AudioManager audioManager;
 
+    private Config config = CoreRegistry.get(Config.class);
+
     /**
      * Initializes a new (local) world for the single player mode.
      *
@@ -211,7 +213,7 @@ public final class WorldRenderer {
         int newChunkPosZ = calcCamChunkOffsetZ();
 
         // TODO: This should actually be done based on events from the ChunkProvider on new chunk availability/old chunk removal
-        int viewingDistance = Config.getInstance().getActiveViewingDistance();
+        int viewingDistance = config.getRendering().getActiveViewingDistance();
 
         if (chunkPosX != newChunkPosX || chunkPosZ != newChunkPosZ || force || pendingChunks) {
             // just add all visible chunks
@@ -449,7 +451,7 @@ public final class WorldRenderer {
                 }
 
                 statVisibleChunks++;
-            } else if (i > Config.getInstance().getMaxChunkVBOs()) {
+            } else if (i > config.getRendering().getMaxChunkVBOs()) {
                 if (mesh != null) {
                     // Make sure not too many chunk VBOs are available in the video memory at the same time
                     // Otherwise VBOs are moved into system memory which is REALLY slow and causes lag
@@ -529,9 +531,6 @@ public final class WorldRenderer {
         /* WORLD RENDERING */
         PerformanceMonitor.startActivity("Render World");
         camera.lookThrough();
-        if (Config.getInstance().isDebugCollision()) {
-            renderDebugCollision(camera);
-        }
 
         glEnable(GL_LIGHT0);
 
@@ -630,7 +629,7 @@ public final class WorldRenderer {
         camera.lookThroughNormalized();
         skysphere.render();
 
-        if (Config.getInstance().isComplexWater()) {
+        if (config.getRendering().isReflectiveWater()) {
             camera.lookThrough();
 
             glEnable(GL_LIGHT0);
@@ -668,7 +667,7 @@ public final class WorldRenderer {
 
             for (int i = 0; i < VERTICAL_SEGMENTS; i++) {
                 if (!chunk.getMesh()[i].isEmpty()) {
-                    if (Config.getInstance().isRenderChunkBoundingBoxes()) {
+                    if (config.getSystem().isRenderChunkBoundingBoxes()) {
                         AABBRenderer aabbRenderer = new AABBRenderer(chunk.getSubMeshAABB(i));
                         aabbRenderer.renderLocally(1f);
                         statRenderedTriangles += 12;
@@ -734,10 +733,6 @@ public final class WorldRenderer {
         PerformanceMonitor.startActivity("Physics Renderer");
         bulletPhysics.update(delta);
         PerformanceMonitor.endActivity();
-    }
-
-    private void renderDebugCollision(Camera camera) {
-        // TODO: Implement
     }
 
     public boolean isUnderWater() {
@@ -859,7 +854,7 @@ public final class WorldRenderer {
         boolean complete = true;
         int newChunkPosX = calcCamChunkOffsetX();
         int newChunkPosZ = calcCamChunkOffsetZ();
-        int viewingDistance = Config.getInstance().getActiveViewingDistance();
+        int viewingDistance = config.getRendering().getActiveViewingDistance();
 
         chunkProvider.update();
         for (Vector3i pos : Region3i.createFromCenterExtents(new Vector3i(newChunkPosX, 0, newChunkPosZ), new Vector3i(viewingDistance / 2, 0, viewingDistance / 2))) {

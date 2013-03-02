@@ -17,10 +17,10 @@ package org.terasology.rendering.gui.windows;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.terasology.config.Config;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.GameEngine;
 import org.terasology.game.modes.StateLoading;
-import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.network.NetworkMode;
 import org.terasology.rendering.gui.dialogs.UIDialogCreateNewWorld;
@@ -164,10 +164,10 @@ public class UIMenuSingleplayer extends UIWindow {
 
         try {
             WorldInfo info = (WorldInfo) list.getSelection().getValue();
+            Config config = CoreRegistry.get(Config.class);
 
-            Config.getInstance().setDefaultSeed(info.getSeed());
-            Config.getInstance().setWorldTitle(info.getTitle());
-            Config.getInstance().setChunkGenerator(info.getChunkGenerators());
+            config.getWorldGeneration().setDefaultSeed(info.getSeed());
+            config.getWorldGeneration().setWorldTitle(info.getTitle());
             CoreRegistry.get(GameEngine.class).changeState(new StateLoading(info, (createServerGame) ? NetworkMode.SERVER : NetworkMode.NONE));
         } catch (Exception e) {
             getGUIManager().showMessage("Error", "Failed reading world data object. Sorry.");

@@ -17,6 +17,7 @@ package org.terasology.rendering.gui.windows;
 
 import org.terasology.asset.Assets;
 import org.terasology.components.HealthComponent;
+import org.terasology.config.Config;
 import org.terasology.entitySystem.ComponentSystem;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
@@ -29,11 +30,8 @@ import org.terasology.game.GameEngine;
 import org.terasology.game.Timer;
 import org.terasology.input.CameraTargetSystem;
 import org.terasology.logic.characters.CharacterComponent;
-import org.terasology.logic.manager.Config;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.logic.players.LocalPlayerComponent;
-import org.terasology.rendering.gui.framework.UIDisplayElement;
-import org.terasology.rendering.gui.framework.events.VisibilityListener;
 import org.terasology.rendering.gui.widgets.UIImage;
 import org.terasology.rendering.gui.widgets.UIInventoryGrid;
 import org.terasology.rendering.gui.widgets.UILabel;
@@ -66,6 +64,8 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
 
     private final UIImage leftGearWheel;
     private final UIImage rightGearWheel;
+
+    private final Config config = CoreRegistry.get(Config.class);
 
     /**
      * Init. the HUD.
@@ -170,7 +170,7 @@ public class UIScreenHUD extends UIWindow implements ComponentSystem {
     public void update() {
         super.update();
 
-        boolean enableDebug = Config.getInstance().isDebug();
+        boolean enableDebug = config.getSystem().isDebugEnabled();
         debugLine1.setVisible(enableDebug);
         debugLine2.setVisible(enableDebug);
         debugLine3.setVisible(enableDebug);

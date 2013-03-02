@@ -20,6 +20,7 @@ import org.terasology.componentSystem.RenderSystem;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.HealthComponent;
 import org.terasology.components.world.LocationComponent;
+import org.terasology.config.Config;
 import org.terasology.entityFactory.DroppedBlockFactory;
 import org.terasology.entityFactory.DroppedItemFactory;
 import org.terasology.entitySystem.EntityManager;
@@ -48,10 +49,8 @@ import org.terasology.logic.characters.CharacterMoveInputEvent;
 import org.terasology.logic.characters.CharacterMovementComponent;
 import org.terasology.logic.characters.MovementMode;
 import org.terasology.logic.characters.events.FrobRequest;
-import org.terasology.logic.inventory.InventoryComponent;
 import org.terasology.logic.inventory.ItemComponent;
 import org.terasology.logic.inventory.SlotBasedInventoryManager;
-import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.math.AABB;
 import org.terasology.math.Direction;
@@ -91,7 +90,8 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
     private long lastTimeSpacePressed;
     private long lastInteraction, lastTimeThrowInteraction;
 
-    private boolean cameraBobbing = Config.getInstance().isCameraBobbing();
+    @In
+    private Config config;
     private float bobFactor = 0;
     private float lastStepDelta = 0;
 
@@ -232,7 +232,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
     public void renderOverlay() {
         // TODO: Don't render if not in first person?
         // Display the block the player is aiming at
-        if (Config.getInstance().isPlacingBox()) {
+        if (config.getRendering().isRenderPlacingBox()) {
             EntityRef target = cameraTargetSystem.getTarget();
             Vector3i blockPos = cameraTargetSystem.getTargetBlockPosition();
             AABB aabb = null;
@@ -317,7 +317,7 @@ public class LocalPlayerSystem implements UpdateSubscriberSystem, RenderSystem {
         bobFactor += stepDelta;
         lastStepDelta = charMovementComp.footstepDelta;
 
-        if (cameraBobbing) {
+        if (config.getRendering().isCameraBobbing()) {
             playerCamera.setBobbingRotationOffsetFactor(calcBobbingOffset(0.0f, 0.01f, 2.5f));
             playerCamera.setBobbingVerticalOffsetFactor(calcBobbingOffset((float) java.lang.Math.PI / 4f, 0.025f, 3f));
         } else {

@@ -30,9 +30,10 @@ import org.terasology.asset.sources.ClasspathSource;
 import org.terasology.audio.AudioManager;
 import org.terasology.audio.NullAudioManager;
 import org.terasology.audio.openAL.OpenALManager;
+import org.terasology.config.BindsConfig;
+import org.terasology.config.Config;
 import org.terasology.config.InputConfig;
 import org.terasology.game.modes.GameState;
-import org.terasology.logic.manager.Config;
 import org.terasology.logic.manager.GUIManager;
 import org.terasology.logic.manager.PathManager;
 import org.terasology.logic.manager.ShaderManager;
@@ -79,6 +80,7 @@ public class TerasologyEngine implements GameEngine {
     private GameState pendingState;
 
     private AudioManager audioManager;
+    private Config config;
 
     private Timer timer;
     private final ThreadPoolExecutor threadPool = (ThreadPoolExecutor) Executors.newCachedThreadPool();
@@ -120,28 +122,22 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void initConfig() {
-        if (org.terasology.config.Config.getConfigFile().exists()) {
-            org.terasology.config.Config config;
+        if (Config.getConfigFile().exists()) {
             try {
-                config = org.terasology.config.Config.load(org.terasology.config.Config.getConfigFile());
-                config.getDefaultModConfig().addMod("core");
-
+                config = Config.load(Config.getConfigFile());
             } catch (IOException e) {
                 logger.error("Failed to load config", e);
-                config = new org.terasology.config.Config();
-                config.getDefaultModConfig().addMod("core");
+                config = new Config();
             }
-            CoreRegistry.put(org.terasology.config.Config.class, config);
         } else {
-            org.terasology.config.Config config = new org.terasology.config.Config();
-            config.getDefaultModConfig().addMod("core");
-            CoreRegistry.put(org.terasology.config.Config.class, config);
+            config = new Config();
         }
+        config.getDefaultModSelection().addMod("core");
+        CoreRegistry.put(Config.class, config);
     }
 
     private void updateInputConfig() {
-        org.terasology.config.Config config = CoreRegistry.get(org.terasology.config.Config.class);
-        InputConfig.updateForChangedMods(config.getInputConfig());
+        config.getInput().getBinds().updateForChangedMods();
         config.save();
     }
 
@@ -297,11 +293,10 @@ public class TerasologyEngine implements GameEngine {
     }
 
     private void initOpenAL() {
-        org.terasology.config.Config config = CoreRegistry.get(org.terasology.config.Config.class);
-        if (config.getSoundConfig().isDisableSound()) {
+        if (config.getAudio().isDisableSound()) {
             audioManager = new NullAudioManager();
         } else {
-            audioManager = new OpenALManager(config.getSoundConfig());
+            audioManager = new OpenALManager(config.getAudio());
         }
         CoreRegistry.put(AudioManager.class, audioManager);
     }
@@ -310,7 +305,7 @@ public class TerasologyEngine implements GameEngine {
         try {
             setDisplayMode();
             Display.setTitle("Terasology" + " | " + "Pre Alpha");
-            Display.create(Config.getInstance().getPixelFormat());
+            Display.create(config.getRendering().getPixelFormat());
         } catch (LWJGLException e) {
             logger.error("Can not initialize graphics device.", e);
             System.exit(1);
@@ -380,7 +375,7 @@ public class TerasologyEngine implements GameEngine {
 
     private void cleanup() {
         logger.info("Shutting down Terasology...");
-        Config.getInstance().saveConfig(new File(PathManager.getInstance().getWorldPath(), "last.cfg"));
+        config.save();
         if (currentState != null) {
             currentState.dispose();
             currentState = null;
@@ -475,11 +470,11 @@ public class TerasologyEngine implements GameEngine {
 
     private void setDisplayMode() {
         try {
-            if (Config.getInstance().isFullscreen()) {
+            if (config.getRendering().isFullscreen()) {
                 Display.setDisplayMode(Display.getDesktopDisplayMode());
                 Display.setFullscreen(true);
             } else {
-                Display.setDisplayMode(Config.getInstance().getDisplayMode());
+                Display.setDisplayMode(config.getRendering().getDisplayMode());
                 Display.setResizable(true);
             }
         } catch (LWJGLException e) {
@@ -488,9 +483,13 @@ public class TerasologyEngine implements GameEngine {
         }
     }
 
+    public boolean isFullscreen() {
+        return config.getRendering().isFullscreen();
+    }
+
     public void setFullscreen(Boolean state) {
-        if (Config.getInstance().isFullscreen() != state) {
-            Config.getInstance().setFullscreen(state);
+        if (config.getRendering().isFullscreen() != state) {
+            config.getRendering().setFullscreen(state);
             setDisplayMode();
             resizeViewport();
             CoreRegistry.get(GUIManager.class).update(true);
