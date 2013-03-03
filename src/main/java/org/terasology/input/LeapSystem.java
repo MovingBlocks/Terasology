@@ -78,13 +78,20 @@ import java.util.*;
  * How does looking around work?
  * -----------------
  *
- * Looking around works as stated above. An attack movement can be triggered by wiggling your right finger up and down.
+ * Looking around works as stated above.
+ *
+ * What about gestures?
+ * -----------------
+ * Specific actions can be performed by making a gesture with either hand (gestures may get tied to a specific hand later)
+ * * An attack action can be triggered by wiggling any finger up and down.
+ * * God mode can be entered and exited by moving a finger in a circle - clockwise enables, counter-clockwise disables
  *
  * Summary
  * -----------------
  *
  * Left hand: Movement (forwards/backwards, strafing, upwards(downwards)) and jumping
- * Right hand: Looking around and attacking
+ * Right hand: Looking around
+ * Either: Tap finger to attack, circle finger for god mode
  *
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  * @author Benjamin 'begla' Glatzel <benjamin.glatzel@me.com>
@@ -95,19 +102,19 @@ public class LeapSystem implements EventHandlerSystem {
     private static final int LEAP_FRAME_RATE = 1;
 
     /** The 'virtual' origin for the left hand */
-    private static final Vector3f LEFT_HAND_ORIGIN = new Vector3f(-120.0f, 180.0f, 180.0f);
+    private static final Vector3f LEFT_HAND_ORIGIN = new Vector3f(-120.0f, 240.0f, 60.0f);
     /** The 'virtual' origin for the right hand */
-    private static final Vector3f RIGHT_HAND_ORIGIN = new Vector3f(120.0f, 180.0f, 180.0f);
+    private static final Vector3f RIGHT_HAND_ORIGIN = new Vector3f(120.0f, 240.0f, 60.0f);
     /** The area around the origins to control the 'intensity' of the movement */
     private static final float MOVEMENT_ADAPTATION_LENGTH = 50.0f;
     /** The relative hand position to start running (tracked along the y-axis) */
     private static final float RUNNING_REL_THRESHOLD = 0.5f;
     /** The velocity threshold to start a jump (tracked by the left hand) */
-    private static final float JUMPING_THRESHOLD = 750.0f;
+    private static final float JUMPING_THRESHOLD = 500.0f;
     /** The velocity threshold to start an attack (first finger of the right hand is tracked) */
     private static final float ATTACK_THRESHOLD = 500.0f;
     /** The sensitivity for looking around in the first person perspective (right hand) */
-    private static final float LOOKING_SENSITIVITY = 10.0f;
+    private static final float LOOKING_SENSITIVITY = 20.0f;
     /** Palm normal threshold for stopping movement */
     private static final float PALM_NORMAL_THRESHOLD_MOVEMENT = -0.8f;
     /** The amount of frames to consider for averaging the position, normal and velocity. */
@@ -301,7 +308,7 @@ public class LeapSystem implements EventHandlerSystem {
             shouldLostHandCancelMovement = true;
         } else if (shouldLostHandCancelMovement) {
             // No hand available? Halt the machine! But only once, so player can switch to keyboard movement if desired
-            doPlayerMovement(-1, delta);
+            sendMovementEvents(new Vector3f());
             shouldLostHandCancelMovement = false;
         }
 
@@ -318,6 +325,7 @@ public class LeapSystem implements EventHandlerSystem {
                     boolean clockwise = circle.pointable().direction().angleTo(circle.normal()) <= Math.PI/4;
 
                     // When a circle is completed act on its clock direction
+                    // TODO: Should harden this by making sure a full circle has been made, tiny circle end events can trigger this
                     if (circle.state() == Gesture.State.STATE_STOP) {
                         CharacterMovementComponent movComp = localPlayer.getEntity().getComponent(CharacterMovementComponent.class);
                         if (clockwise) {
@@ -354,27 +362,14 @@ public class LeapSystem implements EventHandlerSystem {
         Hand hand = leapController.frame().hand(leftHandId);
         CharacterMovementComponent movComp = localPlayer.getEntity().getComponent(CharacterMovementComponent.class);
 
-        BindAxisEvent eventForwardsAndBackwards = new ForwardsMovementAxis();
-        BindAxisEvent eventLeftAndRight = new StrafeMovementAxis();
-        BindAxisEvent eventUpAndDown = new VerticalMovementAxis();
-
         boolean stopMovement = !hand.isValid();
 
+        // Figure out if the palm is close enough to vertical to cease moment. Also: a use of |= woo!
         Vector3f palmNormal = calcAveragePalmNormal(leftHandId, DEFAULT_PAST_FRAMES_TO_CONSIDER);
         stopMovement |= palmNormal.y > PALM_NORMAL_THRESHOLD_MOVEMENT;
 
         if (stopMovement) {
-            eventForwardsAndBackwards.prepare("leap:forwardAndBackwards", 0.0f, 1f);
-            localPlayer.getEntity().send(eventForwardsAndBackwards);
-
-            eventLeftAndRight.prepare("leap:leftAndRight", 0.0f, 1f);
-            localPlayer.getEntity().send(eventLeftAndRight);
-
-            eventUpAndDown.prepare("leap:eventUpAndDown", 0.0f, 1f);
-            localPlayer.getEntity().send(eventUpAndDown);
-
-            movComp.isRunning = false;
-
+            sendMovementEvents(new Vector3f());
             return;
         }
 
@@ -395,22 +390,39 @@ public class LeapSystem implements EventHandlerSystem {
 
         normOffset.clamp(-1.0f, 1.0f);
 
-        // Trigger running
-        movComp.isRunning = normOffset.y > RUNNING_REL_THRESHOLD;
-
         // Trigger a jump if the vertical velocity is high enough
         movComp.jump = velocity.y > JUMPING_THRESHOLD;
 
-        //if (!suddenMovement) {
-            eventForwardsAndBackwards.prepare("leap:forwardAndBackwards", normOffset.z, 1f);
-            localPlayer.getEntity().send(eventForwardsAndBackwards);
 
-            eventLeftAndRight.prepare("leap:leftAndRight", normOffset.x, 1f);
-            localPlayer.getEntity().send(eventLeftAndRight);
+        // Obey a "dead zone" where the player's hand can be left with movement frozen
+        // Not working well based on the normOffset, which differs from the original absolute coordinates used with the single-hand setup
+        /*if (Math.abs(normOffset.x) < 0.7f && (Math.abs(normOffset.y) < 0.7f) && (Math.abs(normOffset.z) < 0.7f)) {
+            System.out.println("Ignoring movement as the hand is within the dead zone");
+            sendMovementEvents(new Vector3f());
+            return;
+        }   //*/
 
-            eventUpAndDown.prepare("leap:eventUpAndDown", normOffset.y, 1f);
-            localPlayer.getEntity().send(eventUpAndDown);
-        //}
+        // Finally if we're still here go ahead and send events for normal movement
+        sendMovementEvents(normOffset);
+    }
+
+    public void sendMovementEvents(Vector3f direction) {
+        BindAxisEvent eventForwardsAndBackwards = new ForwardsMovementAxis();
+        BindAxisEvent eventLeftAndRight = new StrafeMovementAxis();
+        BindAxisEvent eventUpAndDown = new VerticalMovementAxis();
+
+        eventForwardsAndBackwards.prepare("leap:forwardAndBackwards", direction.z, 1f);
+        localPlayer.getEntity().send(eventForwardsAndBackwards);
+
+        eventLeftAndRight.prepare("leap:leftAndRight", direction.x, 1f);
+        localPlayer.getEntity().send(eventLeftAndRight);
+
+        eventUpAndDown.prepare("leap:eventUpAndDown", direction.y, 1f);
+        localPlayer.getEntity().send(eventUpAndDown);
+
+        // Trigger running (or not)
+        CharacterMovementComponent movComp = localPlayer.getEntity().getComponent(CharacterMovementComponent.class);
+        movComp.isRunning = direction.y > RUNNING_REL_THRESHOLD;
     }
 
     public void doPlayerLooking(int rightHandId, float delta) {
