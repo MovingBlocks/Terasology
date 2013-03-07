@@ -16,23 +16,20 @@
 package org.terasology.portals;
 
 import org.terasology.entitySystem.Component;
-import org.terasology.entitySystem.EntityRef;
 
 /**
- * Component that enables an entity to be spawned by something.
+ * Component that enables an entity to be a Holding.
  *
  * @author Rasmus 'Cervator' Praestholm <cervator@gmail.com>
  */
-public class SpawnableComponent implements Component {
+public class HoldingComponent implements Component {
 
-    /** What category is this spawnable */
-    public String type = "undefined";
-    
-    /** Weight for how common the spawnable is, from 0-255 with 0 meaning unspawnable and 255 being the most common */
-    public short probability = 1;
+    /** How many Spawnables until the next queen */
+    int queenThreshold = 10;
 
-    /** What made this Spawnable? */
-    public EntityRef parent = null;
-    
-    //TODO add darkness level and biome when map generation has reached better level
+    /** How many queens max for this holding */
+    int queenMax = 5;
+
+    /** Counter for the number of queens for this Holding. TODO: Harden / calculate elsewhere */
+    int queenCurrent = 0;
 }

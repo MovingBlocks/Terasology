@@ -22,6 +22,7 @@ import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.components.SimpleAIComponent;
 import org.terasology.components.HierarchicalAIComponent;
 import org.terasology.components.LocalPlayerComponent;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.entitySystem.*;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.LocalPlayer;
@@ -32,6 +33,7 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.BlockComponent;
 
 import javax.vecmath.Vector3f;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
@@ -44,11 +46,10 @@ import java.util.Set;
 public class SpawnerSystem implements UpdateSubscriberSystem {
     @In
     private WorldProvider worldProvider;
-    
+
     protected EntityManager entityManager;
 
     private final FastRandom random = new FastRandom();
-    private EntityTools entityTools;
     private DefaultMobFactory factory;
 
     private long tick = 0;
@@ -65,7 +66,6 @@ public class SpawnerSystem implements UpdateSubscriberSystem {
         factory = new DefaultMobFactory();
         factory.setEntityManager(entityManager);
         factory.setRandom(random);
-        entityTools = new EntityTools(worldProvider,entityManager);
         cacheTypes();
     }
 
@@ -107,9 +107,19 @@ public class SpawnerSystem implements UpdateSubscriberSystem {
         PerformanceMonitor.startActivity("Spawn creatures");
         try {
 
-            // Go through entities that are spawners. Only accept block-based spawners for now (due to location need)
+
+            // Prep a list of the Spawners we know about and a total count for max mobs (which is a hack - needs to be per Spawner)
+            // TODO: Do we have a helper method for this? I forgot and it is late :P
+            int maxMobs = 0;
+            ArrayList<EntityRef> spawnerEntities = new ArrayList<EntityRef>(4);
+            for (EntityRef spawnerEntity : entityManager.iteratorEntities(SpawnerComponent.class)) {
+                spawnerEntities.add(spawnerEntity);
+                maxMobs += spawnerEntity.getComponent(SpawnerComponent.class).maxMobsPerSpawner;
+            }
+
+            // Go through entities that are spawners and check to see if something should spawn
             //logger.info("Count of entities with a SpawnerComponent: {}", entityManager.getComponentCount(SpawnerComponent.class));
-            for (EntityRef entity : entityManager.iteratorEntities(SpawnerComponent.class)) {
+            for (EntityRef entity : spawnerEntities) {
                 //logger.info("Found a spawner: {}", entity);
                 SpawnerComponent spawnComp = entity.getComponent(SpawnerComponent.class);
 
@@ -127,7 +137,7 @@ public class SpawnerSystem implements UpdateSubscriberSystem {
 
                 if(spawnComp.maxMobsPerSpawner > 0) {
                     // TODO Make sure we don't spawn too much stuff. Not very robust yet and doesn't tie mobs to their spawner of origin right
-                    int maxMobs = entityManager.getComponentCount(SpawnerComponent.class) * spawnComp.maxMobsPerSpawner;
+                    //int maxMobs = entityManager.getComponentCount(SpawnerComponent.class) * spawnComp.maxMobsPerSpawner;
                     int currentMobs = entityManager.getComponentCount(SimpleAIComponent.class) + entityManager.getComponentCount(HierarchicalAIComponent.class);
 
                     logger.info("Mob count: {}/{}", currentMobs, maxMobs);
@@ -145,33 +155,44 @@ public class SpawnerSystem implements UpdateSubscriberSystem {
                     continue;
                 }
 
-                // Figure out from where spawning is originating
-                Vector3f originPos = new Vector3f();
+                // Find spawn origin
+                Vector3f originPos;
                 if (entity.hasComponent(BlockComponent.class)) {
                     BlockComponent blockComp = entity.getComponent(BlockComponent.class);
                     originPos = blockComp.getPosition().toVector3f();
-                    // Find player position
-                    // TODO: shouldn't use local player, need some way to find nearest player
-                    if (spawnComp.needsPlayer) {
-                        LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-                        if (localPlayer != null) {
-                            Vector3f dist = new Vector3f(originPos);
-                            dist.sub(localPlayer.getPosition());
-                            double distanceToPlayer = dist.lengthSquared();
-                            if (distanceToPlayer > spawnComp.playerNeedRange) {
-                                logger.info("Spawner {} too far from player {}<{}", entity.getId(), distanceToPlayer, spawnComp.playerNeedRange);
-                                continue;
-                            }
+
+                } else if (entity.hasComponent(LocationComponent.class)) {
+                    // Check if this is a player in which case don't spawn if the player is dead
+                    // TODO: Does this really matter?
+                    if (entity.hasComponent(LocalPlayerComponent.class)) {
+                        LocalPlayerComponent lpc = entity.getComponent(LocalPlayerComponent.class);
+                        if (lpc.isDead) {
+                            continue;
                         }
                     }
-                } else if (entity.hasComponent(LocalPlayerComponent.class)) {
-                    LocalPlayerComponent lpc = entity.getComponent(LocalPlayerComponent.class);
-                    if (lpc.isDead) {
-                        return;
-                    }
+
+                    LocationComponent lc = entity.getComponent(LocationComponent.class);
+                    originPos = lc.getWorldPosition();
+                    logger.info("Spawner has a LocationComponent with position: {}, {}, {}", originPos.x, originPos.y, originPos.z);
+
+                } else {
+                    logger.warn("Spawning was attempted by a Spawner entity without a BlockComponent or LocationComponent. No can do.");
+                    continue;
+                }
+
+                // Check for spawning that depends on a player position
+                if (spawnComp.needsPlayer) {
+                    // TODO: shouldn't use local player, need some way to find nearest player
                     LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
-                    originPos = localPlayer.getPosition();
-                    logger.info("Player position: {}, {}, {}", originPos.x, originPos.y, originPos.z);
+                    if (localPlayer != null) {
+                        Vector3f dist = new Vector3f(originPos);
+                        dist.sub(localPlayer.getPosition());
+                        double distanceToPlayer = dist.lengthSquared();
+                        if (distanceToPlayer > spawnComp.playerNeedRange) {
+                            logger.info("Spawner {} too far from player {}<{}", entity.getId(), distanceToPlayer, spawnComp.playerNeedRange);
+                            continue;
+                        }
+                    }
                 }
 
                 //TODO check for bigger creatures and creatures with special needs like biome
@@ -229,14 +250,14 @@ public class SpawnerSystem implements UpdateSubscriberSystem {
                 Prefab chosenPrefab = (Prefab) randomPrefabs[anotherRandomIndex];
                 logger.info("Picked index {} of types {} which is a {}, to spawn at {}", anotherRandomIndex, chosenSpawnerType, chosenPrefab, spawnPos);
 
-                factory.generate(spawnPos, chosenPrefab);
+                // Finally create the Spawnable. Assign parentage so we can tie Spawnables to their Spawner if needed
+                EntityRef newSpawnableRef = factory.generate(spawnPos, chosenPrefab);
+                SpawnableComponent newSpawnable = newSpawnableRef.getComponent(SpawnableComponent.class);
+                newSpawnable.parent = entity;
 
                 // TODO: Use some sort of parent/inheritance thing with gelcubes -> specialized gelcubes
                 // TODO: Introduce proper probability-based spawning
-            }
 
-            for (int i = 0; i < 1000000; i++) {
-                int fun = 2 + 6;
             }
 
         } finally {

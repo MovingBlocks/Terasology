@@ -16,6 +16,8 @@
 {
     "Portal" : {
     },
+    "Holding" : {
+    },
     "Spawner" : {
         // Want to be able to spawn multiple things (or one thing in different ways)
         // Ex 1: Spawn a gelcube in the immediate vicinity

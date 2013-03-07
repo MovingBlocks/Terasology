@@ -50,13 +50,13 @@
               0,0,0,0,0,0,0,0,0,0,
               0,0,0,0,0,0,0,0,0,0
             ]
-    },
-    "Spawner" : {
-        "types" : ["gelcube", "chromaticgelcube", "metallicgelcube","mare"],
-		"timeBetweenSpawns" : 10000,
- 		"maxMobsPerSpawner" : 64,
-		"rangedSpawning" : true,
- 		"minDistance" : 8,
- 		"range" : 18
-    }
+    }//,
+//    "Spawner" : {
+//        "types" : ["gelcube", "chromaticgelcube", "metallicgelcube","mare"],
+//		"timeBetweenSpawns" : 10000,
+// 		"maxMobsPerSpawner" : 64,
+//		"rangedSpawning" : true,
+// 		"minDistance" : 8,
+// 		"range" : 18
+//    }
 }
