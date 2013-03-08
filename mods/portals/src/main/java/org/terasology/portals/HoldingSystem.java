@@ -7,6 +7,9 @@ import org.slf4j.LoggerFactory;
 import org.terasology.componentSystem.UpdateSubscriberSystem;
 import org.terasology.entitySystem.*;
 import org.terasology.game.CoreRegistry;
+import org.terasology.rendering.logic.MeshComponent;
+
+import javax.vecmath.Color4f;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -105,6 +108,12 @@ public class HoldingSystem implements UpdateSubscriberSystem {
                 newSpawnerComp.types.add("gelcube");
                 newSpawnerComp.maxMobsPerSpawner = 666;
                 newSpawnerComp.timeBetweenSpawns = 1000;
+
+                // Make the queen a unique color (in this case, black)
+                MeshComponent mesh = queenInWaiting.getComponent(MeshComponent.class);
+                if (mesh != null) {
+                    mesh.color.set(new Color4f(0, 0, 0, 1));
+                }
 
                 queenInWaiting.addComponent(newSpawnerComp);
                 logger.info("Queen prepped, id {} and spawnercomp {}", queenInWaiting, queenInWaiting.getComponent(SpawnerComponent.class));
