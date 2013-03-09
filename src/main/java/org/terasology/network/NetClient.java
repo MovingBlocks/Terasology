@@ -13,6 +13,7 @@ import org.jboss.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.components.DisplayInformationComponent;
+import org.terasology.components.world.LocationComponent;
 import org.terasology.config.Config;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityManager;
@@ -156,15 +157,24 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
 
     private void sendNewChunks(NetData.NetMessage.Builder message) {
         if (!readyChunks.isEmpty()) {
-            Iterator<Map.Entry<Vector3i, Chunk>> i = readyChunks.entrySet().iterator();
-            while (i.hasNext()) {
-                Map.Entry<Vector3i, Chunk> chunkEntry = i.next();
-                i.remove();
-                relevantChunks.add(chunkEntry.getKey());
-                logger.debug("Sending chunk: {}", chunkEntry.getKey());
-                // TODO: probably need to queue and dripfeed these to prevent flooding
-                message.addChunkInfo(Chunks.getInstance().encode(chunkEntry.getValue())).build();
+            Vector3i center = new Vector3i();
+            LocationComponent loc = getEntity().getComponent(ClientComponent.class).character.getComponent(LocationComponent.class);
+            if (loc != null) {
+                center.set(TeraMath.calcChunkPos(new Vector3i(loc.getWorldPosition(), 0.5f)));
             }
+            Vector3i pos = null;
+            int distance = Integer.MAX_VALUE;
+            for (Vector3i chunkPos : readyChunks.keySet()) {
+                int chunkDistance = chunkPos.distanceSquared(center);
+                if (pos == null || chunkDistance < distance) {
+                    pos = chunkPos;
+                    distance = chunkDistance;
+                }
+            }
+            Chunk chunk = readyChunks.remove(pos);
+            relevantChunks.add(pos);
+            logger.debug("Sending chunk: {}", pos);
+            message.addChunkInfo(Chunks.getInstance().encode(chunk)).build();
         }
     }
 

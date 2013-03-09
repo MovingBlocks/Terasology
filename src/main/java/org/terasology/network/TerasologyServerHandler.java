@@ -67,6 +67,7 @@ public class TerasologyServerHandler extends SimpleChannelUpstreamHandler {
     private void receivedConnect(ClientConnectMessage message) {
         if (client.isAwaitingConnectMessage()) {
             client.setName(message.getName());
+            client.setViewDistanceMode(message.getViewDistanceLevel());
             networkSystem.addClient(client);
         }
     }
