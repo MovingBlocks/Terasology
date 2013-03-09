@@ -42,6 +42,7 @@ public class Server {
 
     private NetworkSystemImpl networkSystem;
     private Channel channel;
+    private NetMetricSource metricsSource;
     private BlockingQueue<NetData.NetMessage> queuedMessages = Queues.newLinkedBlockingQueue();
     private BlockingQueue<NetData.EventMessage> queuedReceivedEvents = Queues.newLinkedBlockingQueue();
     private List<NetData.EventMessage> queuedOutgoingEvents = Lists.newArrayList();
@@ -59,15 +60,11 @@ public class Server {
 
     private EntityRef clientEntity = EntityRef.NULL;
 
-    private AtomicInteger receivedMessages = new AtomicInteger();
-    private AtomicInteger receivedBytes = new AtomicInteger();
-    private AtomicInteger sentMessages = new AtomicInteger();
-    private AtomicInteger sentBytes = new AtomicInteger();
-
     private Timer timer;
 
     public Server(NetworkSystemImpl system, Channel channel) {
         this.channel = channel;
+        metricsSource = (NetMetricSource) channel.getPipeline().get(MetricRecordingHandler.NAME);
         this.networkSystem = system;
         this.timer = CoreRegistry.get(Timer.class);
     }
@@ -118,7 +115,6 @@ public class Server {
             }
 
             processMessages();
-            processEvents();
         }
     }
 
@@ -141,8 +137,6 @@ public class Server {
 
     private void send(NetData.NetMessage data) {
         logger.trace("Sending with size {}", data.getSerializedSize());
-        sentMessages.incrementAndGet();
-        sentBytes.addAndGet(data.getSerializedSize());
         channel.write(data);
     }
 
@@ -167,23 +161,18 @@ public class Server {
     }
 
 
-    private void processEvents() {
-        List<NetData.EventMessage> messages = Lists.newArrayListWithExpectedSize(queuedReceivedEvents.size());
-        queuedReceivedEvents.drainTo(messages);
-
-        for (NetData.EventMessage message : messages) {
-            Event event = eventSerializer.deserialize(message.getEvent());
-            EntityRef target = EntityRef.NULL;
-            if (message.hasTargetBlockPos()) {
-                target = blockEntityRegistry.getOrCreateBlockEntityAt(NetworkUtil.convert(message.getTargetBlockPos()));
-            } else if (message.hasTargetId()) {
-                target = networkSystem.getEntity(message.getTargetId());
-            }
-            if (target.exists()) {
-                target.send(event);
-            } else {
-                queuedReceivedEvents.offer(message);
-            }
+    private void processEvent(NetData.EventMessage message) {
+        Event event = eventSerializer.deserialize(message.getEvent());
+        EntityRef target = EntityRef.NULL;
+        if (message.hasTargetBlockPos()) {
+            target = blockEntityRegistry.getOrCreateBlockEntityAt(NetworkUtil.convert(message.getTargetBlockPos()));
+        } else if (message.hasTargetId()) {
+            target = networkSystem.getEntity(message.getTargetId());
+        }
+        if (target.exists()) {
+            target.send(event);
+        } else {
+            queuedReceivedEvents.offer(message);
         }
     }
 
@@ -228,9 +217,10 @@ public class Server {
             for (NetData.UpdateEntityMessage updateEntity : message.getUpdateEntityList()) {
                 updateEntity(updateEntity);
             }
-
+            for (NetData.EventMessage event : message.getEventList()) {
+                processEvent(event);
+            }
         }
-
     }
 
     private void updateEntity(NetData.UpdateEntityMessage updateEntity) {
@@ -284,25 +274,8 @@ public class Server {
         changedComponents.put(netId, componentType);
     }
 
-    public void receivedMessageWithSize(int serializedSize) {
-        receivedBytes.addAndGet(serializedSize);
-        receivedMessages.incrementAndGet();
-    }
-
-    public int getReceivedMessagesSinceLastCall() {
-        return receivedMessages.getAndSet(0);
-    }
-
-    public int getReceivedBytesSinceLastCall() {
-        return receivedBytes.getAndSet(0);
-    }
-
-    public int getSentMessagesSinceLastCall() {
-        return sentMessages.getAndSet(0);
-    }
-
-    public int getSentBytesSinceLastCall() {
-        return sentBytes.getAndSet(0);
+    public NetMetricSource getMetrics() {
+        return metricsSource;
     }
 }
 

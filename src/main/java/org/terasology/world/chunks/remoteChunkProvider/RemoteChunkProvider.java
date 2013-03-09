@@ -61,19 +61,19 @@ public class RemoteChunkProvider implements ChunkProvider {
     }
 
     @Override
-    public void addRegionEntity(EntityRef entity, int distance) {
+    public void addRelevanceEntity(EntityRef entity, int distance) {
     }
 
     @Override
-    public void addRegionEntity(EntityRef entity, int distance, ChunkRegionListener listener) {
+    public void addRelevanceEntity(EntityRef entity, int distance, ChunkRegionListener listener) {
     }
 
     @Override
-    public void updateRegionEntity(EntityRef entity, int distance) {
+    public void updateRelevanceEntity(EntityRef entity, int distance) {
     }
 
     @Override
-    public void removeRegionEntity(EntityRef entity) {
+    public void removeRelevanceEntity(EntityRef entity) {
 
     }
 }

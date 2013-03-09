@@ -22,6 +22,7 @@ import org.terasology.rendering.world.WorldRenderer;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.ChunkRelevanceRegion;
 
 import javax.vecmath.Vector3f;
 import java.util.Iterator;
@@ -65,7 +66,7 @@ public class PlayerSystem implements UpdateSubscriberSystem {
             SpawnCachingInfo spawning = i.next();
             if (chunkProvider.getChunk(Vector3i.zero()) != null && chunkProvider.getChunk(Vector3i.zero()).getChunkState() == Chunk.State.COMPLETE) {
                 spawnPlayer(spawning.clientEntity, new Vector3i(Chunk.SIZE_X / 2, Chunk.SIZE_Y, Chunk.SIZE_Z / 2));
-                chunkProvider.removeRegionEntity(spawning.cachingEntity);
+                chunkProvider.removeRelevanceEntity(spawning.cachingEntity);
                 spawning.cachingEntity.destroy();
                 i.remove();
             }
@@ -87,7 +88,7 @@ public class PlayerSystem implements UpdateSubscriberSystem {
                 playerCharacter.saveComponent(netComp);
             }
             Client clientListener = networkSystem.getOwner(clientEntity);
-            worldRenderer.getChunkProvider().addRegionEntity(playerCharacter, clientListener.getViewDistance(), clientListener);
+            worldRenderer.getChunkProvider().addRelevanceEntity(playerCharacter, clientListener.getViewDistance(), clientListener);
 
             client.character = playerCharacter;
             clientEntity.saveComponent(client);
@@ -103,7 +104,7 @@ public class PlayerSystem implements UpdateSubscriberSystem {
             EntityRef spawnZoneEntity = entityManager.create();
             spawnZoneEntity.setPersisted(false);
             spawnZoneEntity.addComponent(new LocationComponent(new Vector3f(Chunk.SIZE_X / 2, Chunk.SIZE_Y / 2, Chunk.SIZE_Z / 2)));
-            worldRenderer.getChunkProvider().addRegionEntity(spawnZoneEntity, 4);
+            worldRenderer.getChunkProvider().addRelevanceEntity(spawnZoneEntity, 4);
 
             ongoingSpawns.add(new SpawnCachingInfo(spawnZoneEntity, entity));
         }

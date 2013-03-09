@@ -123,7 +123,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             allChannels.add(listenChannel);
             logger.info("Started server");
 
-            nextNetworkTick = timer.getTimeInMs();
+            nextNetworkTick = timer.getRawTimeInMs();
         }
     }
 
@@ -146,7 +146,7 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
                 allChannels.add(connectCheck.getChannel());
                 logger.info("Connected to server");
                 mode = NetworkMode.CLIENT;
-                nextNetworkTick = 0;
+                nextNetworkTick = timer.getRawTimeInMs();
                 return true;
             }
         }
@@ -488,12 +488,12 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             case SERVER:
                 int total = 0;
                 for (NetClient client : netClientList) {
-                    total += client.getReceivedMessagesSinceLastCall();
+                    total += client.getMetrics().getReceivedMessagesSinceLastCall();
                 }
                 return total;
             case CLIENT:
                 if (server != null) {
-                    return server.getReceivedMessagesSinceLastCall();
+                    return server.getMetrics().getReceivedMessagesSinceLastCall();
                 }
             default:
                 return 0;
@@ -509,12 +509,12 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             case SERVER:
                 int total = 0;
                 for (NetClient client : netClientList) {
-                    total += client.getReceivedBytesSinceLastCall();
+                    total += client.getMetrics().getReceivedBytesSinceLastCall();
                 }
                 return total;
             case CLIENT:
                 if (server != null) {
-                    return server.getReceivedBytesSinceLastCall();
+                    return server.getMetrics().getReceivedBytesSinceLastCall();
                 }
             default:
                 return 0;
@@ -527,12 +527,12 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             case SERVER:
                 int total = 0;
                 for (NetClient client : netClientList) {
-                    total += client.getSentMessagesSinceLastCall();
+                    total += client.getMetrics().getSentMessagesSinceLastCall();
                 }
                 return total;
             case CLIENT:
                 if (server != null) {
-                    return server.getSentMessagesSinceLastCall();
+                    return server.getMetrics().getSentMessagesSinceLastCall();
                 }
             default:
                 return 0;
@@ -545,12 +545,12 @@ public class NetworkSystemImpl implements EntityChangeSubscriber, NetworkSystem 
             case SERVER:
                 int total = 0;
                 for (NetClient client : netClientList) {
-                    total += client.getSentBytesSinceLastCall();
+                    total += client.getMetrics().getSentBytesSinceLastCall();
                 }
                 return total;
             case CLIENT:
                 if (server != null) {
-                    return server.getSentBytesSinceLastCall();
+                    return server.getMetrics().getSentBytesSinceLastCall();
                 }
             default:
                 return 0;

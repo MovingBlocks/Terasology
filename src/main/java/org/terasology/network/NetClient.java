@@ -2,7 +2,7 @@ package org.terasology.network;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.MapMaker;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
@@ -10,18 +10,14 @@ import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.components.DisplayInformationComponent;
-import org.terasology.components.world.WorldComponent;
 import org.terasology.config.Config;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.EntityManager;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.entitySystem.Event;
-import org.terasology.entitySystem.EventReceiver;
-import org.terasology.entitySystem.EventSystem;
 import org.terasology.entitySystem.metadata.EntitySystemLibrary;
 import org.terasology.entitySystem.metadata.EventMetadata;
 import org.terasology.entitySystem.metadata.NetworkEventType;
@@ -40,7 +36,6 @@ import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.entity.BlockComponent;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkUnloadedEvent;
 import org.terasology.world.chunks.Chunks;
 
 import java.util.Iterator;
@@ -48,13 +43,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Immortius
  */
-public class NetClient extends AbstractClient implements WorldChangeListener, EventReceiver<ChunkUnloadedEvent> {
+public class NetClient extends AbstractClient implements WorldChangeListener {
     private static final Logger logger = LoggerFactory.getLogger(NetClient.class);
 
     private Config config = CoreRegistry.get(Config.class);
@@ -65,6 +59,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener, Ev
     private PackedEntitySerializer entitySerializer;
     private EventSerializer eventSerializer;
     private EntitySystemLibrary entitySystemLibrary;
+    private NetMetricSource metricSource;
 
     // Relevance
     private Set<Vector3i> relevantChunks = Sets.newHashSet();
@@ -87,8 +82,8 @@ public class NetClient extends AbstractClient implements WorldChangeListener, Ev
     private BlockingQueue<NetData.BlockChangeMessage> queuedOutgoingBlockChanges = Queues.newLinkedBlockingQueue();
     private List<NetData.EventMessage> queuedOutgoingEvents = Lists.newArrayList();
 
-    private ConcurrentMap<Vector3i, Chunk> readyChunks = new MapMaker().concurrencyLevel(3).makeMap();
-    private Set<Vector3i> invalidatedChunks = Sets.newSetFromMap(new MapMaker().concurrencyLevel(3).<Vector3i, Boolean>makeMap());
+    private Map<Vector3i, Chunk> readyChunks = Maps.newLinkedHashMap();
+    private Set<Vector3i> invalidatedChunks = Sets.newLinkedHashSet();
 
 
     // Incoming messages
@@ -102,6 +97,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener, Ev
 
     public NetClient(Channel channel, NetworkSystemImpl networkSystem) {
         this.channel = channel;
+        metricSource = (NetMetricSource) channel.getPipeline().get(MetricRecordingHandler.NAME);
         this.networkSystem = networkSystem;
         this.timer = CoreRegistry.get(Timer.class);
         CoreRegistry.get(WorldProvider.class).registerListener(this);
@@ -139,7 +135,6 @@ public class NetClient extends AbstractClient implements WorldChangeListener, Ev
     @Override
     public void disconnect() {
         super.disconnect();
-        CoreRegistry.get(EventSystem.class).unregisterEventReceiver(this, ChunkUnloadedEvent.class, WorldComponent.class);
         CoreRegistry.get(WorldProvider.class).unregisterListener(this);
     }
 
@@ -236,8 +231,6 @@ public class NetClient extends AbstractClient implements WorldChangeListener, Ev
             this.eventSerializer = eventSerializer;
             this.entitySystemLibrary = entitySystemLibrary;
 
-            CoreRegistry.get(EventSystem.class).registerEventReceiver(this, ChunkUnloadedEvent.class, WorldComponent.class);
-
             createEntity(name, entityManager);
         }
     }
@@ -285,15 +278,15 @@ public class NetClient extends AbstractClient implements WorldChangeListener, Ev
     }
 
     @Override
-    public void onChunkReady(Vector3i pos, Chunk chunk) {
+    public void onChunkRelevant(Vector3i pos, Chunk chunk) {
         invalidatedChunks.remove(pos);
         readyChunks.put(pos, chunk);
     }
 
     @Override
-    public void onEvent(ChunkUnloadedEvent event, EntityRef entity) {
-        readyChunks.remove(event.getChunkPos());
-        invalidatedChunks.add(event.getChunkPos());
+    public void onChunkIrrelevant(Vector3i pos) {
+        readyChunks.remove(pos);
+        invalidatedChunks.add(pos);
     }
 
     @Override
@@ -430,20 +423,8 @@ public class NetClient extends AbstractClient implements WorldChangeListener, Ev
         queuedIncomingMessage.offer(message);
     }
 
-    public int getReceivedMessagesSinceLastCall() {
-        return receivedMessages.getAndSet(0);
-    }
-
-    public int getReceivedBytesSinceLastCall() {
-        return receivedBytes.getAndSet(0);
-    }
-
-    public int getSentMessagesSinceLastCall() {
-        return sentMessages.getAndSet(0);
-    }
-
-    public int getSentBytesSinceLastCall() {
-        return sentBytes.getAndSet(0);
+    public NetMetricSource getMetrics() {
+        return metricSource;
     }
 
     public void setViewDistanceMode(int newViewRange) {

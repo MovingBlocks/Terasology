@@ -31,7 +31,6 @@ import org.terasology.game.Timer;
 import org.terasology.game.modes.StateMainMenu;
 import org.terasology.math.Vector3i;
 import org.terasology.protobuf.ChunksProtobuf;
-import org.terasology.protobuf.NetData;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.management.BlockManager;
@@ -79,7 +78,6 @@ public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
         NetMessage message = (NetMessage) e.getMessage();
-        server.receivedMessageWithSize(message.getSerializedSize());
         if (message.hasServerInfo()) {
             CoreRegistry.get(Timer.class).updateServerTime(message.getTime(), true);
             receivedServerInfo(message.getServerInfo());
@@ -94,9 +92,6 @@ public class TerasologyClientHandler extends SimpleChannelUpstreamHandler {
             blockChanged(blockChanged);
         }
         server.queueMessage(message);
-        for (NetData.EventMessage eventMessage : message.getEventList()) {
-            server.queueEvent(eventMessage);
-        }
     }
 
     private void blockChanged(BlockChangeMessage blockChange) {

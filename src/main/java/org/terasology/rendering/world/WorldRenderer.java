@@ -822,9 +822,6 @@ public final class WorldRenderer {
 
     public void changeViewDistance(int viewingDistance) {
         logger.debug("New Viewing Distance: {}", viewingDistance);
-        if (player != null) {
-            chunkProvider.updateRegionEntity(player.getCharacterEntity(), viewingDistance);
-        }
         updateChunksInProximity(true);
     }
 

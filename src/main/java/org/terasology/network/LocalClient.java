@@ -72,6 +72,10 @@ public class LocalClient extends AbstractClient {
     }
 
     @Override
-    public void onChunkReady(Vector3i pos, Chunk chunk) {
+    public void onChunkRelevant(Vector3i pos, Chunk chunk) {
+    }
+
+    @Override
+    public void onChunkIrrelevant(Vector3i pos) {
     }
 }

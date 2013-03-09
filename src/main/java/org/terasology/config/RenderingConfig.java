@@ -139,12 +139,12 @@ public class RenderingConfig {
         int chunksToLoad = getActiveViewingDistance() * getActiveViewingDistance();
         setMaxChunkVBOs(chunksToLoad >= 512 ? 512 : chunksToLoad);
         WorldRenderer worldRenderer = CoreRegistry.get(WorldRenderer.class);
-        if (worldRenderer != null) {
-            worldRenderer.changeViewDistance(getActiveViewingDistance());
-        }
         LocalPlayer player = CoreRegistry.get(LocalPlayer.class);
         if (player != null) {
             player.getClientEntity().send(new ChangeViewRangeRequest(activeViewDistanceMode));
+        }
+        if (worldRenderer != null) {
+            worldRenderer.changeViewDistance(getActiveViewingDistance());
         }
     }
 

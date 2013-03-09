@@ -9,10 +9,16 @@ import org.terasology.world.chunks.Chunk;
 public interface ChunkRegionListener {
 
     /**
-     * Invoked when a chunk is ready.
-     * Note: This happens off of the main thread
+     * Invoked when a chunk has entered relevance for this chunk region (may be just loaded, or region may have moved
+     * to include it)
      * @param pos
      * @param chunk
      */
-    public void onChunkReady(Vector3i pos, Chunk chunk);
+    public void onChunkRelevant(Vector3i pos, Chunk chunk);
+
+    /**
+     * Invoked when a chunk ceases to be relevant for this chunk region (
+     * @param pos
+     */
+    public void onChunkIrrelevant(Vector3i pos);
 }
