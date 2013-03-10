@@ -102,9 +102,9 @@ public class LeapSystem implements EventHandlerSystem {
     private static final int LEAP_FRAME_RATE = 1;
 
     /** The 'virtual' origin for the left hand */
-    private static final Vector3f LEFT_HAND_ORIGIN = new Vector3f(-120.0f, 240.0f, 60.0f);
+    private static final Vector3f LEFT_HAND_ORIGIN = new Vector3f(-120.0f, 180.0f, 60.0f);
     /** The 'virtual' origin for the right hand */
-    private static final Vector3f RIGHT_HAND_ORIGIN = new Vector3f(120.0f, 240.0f, 60.0f);
+    private static final Vector3f RIGHT_HAND_ORIGIN = new Vector3f(120.0f, 180.0f, 60.0f);
     /** The area around the origins to control the 'intensity' of the movement */
     private static final float MOVEMENT_ADAPTATION_LENGTH = 50.0f;
     /** The relative hand position to start running (tracked along the y-axis) */
