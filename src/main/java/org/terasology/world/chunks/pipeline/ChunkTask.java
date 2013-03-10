@@ -14,32 +14,20 @@
  * limitations under the License.
  */
 
-package org.terasology.world.chunks.localChunkProvider;
+package org.terasology.world.chunks.pipeline;
 
 import org.terasology.math.Vector3i;
+import org.terasology.utilities.concurrency.Task;
 import org.terasology.world.chunks.ChunkProvider;
 
 /**
  * @author Immortius
  */
-public class ShutdownTask implements ChunkTask {
+public interface ChunkTask extends Task {
 
-    @Override
-    public void enact() {
-    }
+    Vector3i getPosition();
 
-    @Override
-    public boolean isShutdownRequest() {
-        return true;
-    }
+    ChunkProvider getProvider();
 
-    @Override
-    public Vector3i getPosition() {
-        return Vector3i.zero();
-    }
-
-    @Override
-    public ChunkProvider getProvider() {
-        return null;
-    }
+    ChunkGenerationPipeline getPipeline();
 }

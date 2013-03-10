@@ -22,7 +22,6 @@ import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.config.AdvancedConfig;
 import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.logic.manager.PathManager;
@@ -30,17 +29,18 @@ import org.terasology.math.Region3i;
 import org.terasology.math.Vector3i;
 import org.terasology.performanceMonitor.PerformanceMonitor;
 import org.terasology.world.WorldProvider;
-import org.terasology.world.WorldView;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkReadyEvent;
 import org.terasology.world.chunks.ChunkRegionListener;
 import org.terasology.world.chunks.ChunkRelevanceRegion;
 import org.terasology.world.chunks.ChunkStore;
 import org.terasology.world.chunks.ChunkUnloadedEvent;
+import org.terasology.world.chunks.GeneratingChunkProvider;
+import org.terasology.world.chunks.pipeline.AbstractChunkTask;
+import org.terasology.world.chunks.pipeline.ChunkGenerationPipeline;
+import org.terasology.world.chunks.pipeline.ChunkTask;
 import org.terasology.world.generator.core.ChunkGeneratorManager;
-import org.terasology.world.lighting.InternalLightProcessor;
-import org.terasology.world.lighting.LightPropagator;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -54,17 +54,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @author Immortius
  */
-public class LocalChunkProvider implements ChunkProvider {
+public class LocalChunkProvider implements GeneratingChunkProvider {
     private static final int CACHE_SIZE = (int) (2 * Runtime.getRuntime().maxMemory() / 1048576);
     private static final int REQUEST_CHUNK_THREADS = 1;
     private static final int CHUNK_PROCESSING_THREADS = 8;
@@ -74,10 +70,7 @@ public class LocalChunkProvider implements ChunkProvider {
 
     private ChunkStore farStore;
 
-    private BlockingQueue<ChunkTask> chunkTasksQueue;
-    private BlockingQueue<ChunkRequest> reviewChunkQueue;
-    private ExecutorService reviewThreads;
-    private ExecutorService chunkProcessingThreads;
+    private ChunkGenerationPipeline pipeline;
     private ChunkGeneratorManager generator;
 
     private Map<EntityRef, ChunkRelevanceRegion> regions = Maps.newHashMap();
@@ -94,73 +87,9 @@ public class LocalChunkProvider implements ChunkProvider {
     public LocalChunkProvider(ChunkStore farStore, ChunkGeneratorManager generator) {
         this.farStore = farStore;
         this.generator = generator;
+        this.pipeline = new ChunkGenerationPipeline(this, generator, new ChunkTaskRelevanceComparator());
 
         logger.info("CACHE_SIZE = {} for nearby chunks", CACHE_SIZE);
-
-        reviewChunkQueue = new PriorityBlockingQueue<ChunkRequest>(32);
-        reviewThreads = Executors.newFixedThreadPool(REQUEST_CHUNK_THREADS);
-        for (int i = 0; i < REQUEST_CHUNK_THREADS; ++i) {
-            reviewThreads.execute(new Runnable() {
-                @Override
-                public void run() {
-                    boolean running = true;
-                    Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-                    while (running) {
-
-                        try {
-                            ChunkRequest request = reviewChunkQueue.take();
-                            switch (request.getType()) {
-                                case REVIEW:
-                                    for (Vector3i pos : request.getRegion()) {
-                                        checkState(pos);
-                                    }
-                                    break;
-                                case PRODUCE:
-                                    for (Vector3i pos : request.getRegion()) {
-                                        checkOrCreateChunk(pos);
-                                    }
-                                    break;
-                                case EXIT:
-                                    running = false;
-                                    break;
-                            }
-                        } catch (InterruptedException e) {
-                            logger.error("Thread interrupted", e);
-                        } catch (Exception e) {
-                            logger.error("Error in thread", e);
-                        }
-                    }
-                    logger.debug("Thread shutdown safely");
-                }
-            });
-        }
-
-        chunkTasksQueue = new PriorityBlockingQueue<ChunkTask>(128, new ChunkTaskRelevanceComparator());
-        chunkProcessingThreads = Executors.newFixedThreadPool(CHUNK_PROCESSING_THREADS);
-        for (int i = 0; i < CHUNK_PROCESSING_THREADS; ++i) {
-            chunkProcessingThreads.submit(new Runnable() {
-                @Override
-                public void run() {
-                    boolean running = true;
-                    Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-                    while (running) {
-                        try {
-                            ChunkTask request = chunkTasksQueue.take();
-                            if (request.isShutdownRequest()) {
-                                running = false;
-                                break;
-                            }
-                            request.enact();
-                        } catch (InterruptedException e) {
-                            logger.error("Thread interrupted", e);
-                        } catch (Exception e) {
-                            logger.error("Error in thread", e);
-                        }
-                    }
-                    logger.debug("Thread shutdown safely");
-                }
-            });
-        }
     }
 
     public void setWorldEntity(EntityRef worldEntity) {
@@ -204,7 +133,7 @@ public class LocalChunkProvider implements ChunkProvider {
                 region.chunkReady(chunk);
             }
         }
-        reviewChunkQueue.offer(new ChunkRequest(ChunkRequest.RequestType.PRODUCE, region.getRegion().expand(new Vector3i(2, 0, 2))));
+        pipeline.requestProduction(region.getRegion().expand(new Vector3i(2, 0, 2)));
     }
 
     @Override
@@ -247,7 +176,7 @@ public class LocalChunkProvider implements ChunkProvider {
                         }
                     }
                     if (produceChunks) {
-                        reviewChunkQueue.offer(new ChunkRequest(ChunkRequest.RequestType.PRODUCE, chunkRelevanceRegion.getRegion().expand(new Vector3i(2, 0, 2))));
+                        pipeline.requestProduction(chunkRelevanceRegion.getRegion().expand(new Vector3i(2, 0, 2)));
                     }
                     chunkRelevanceRegion.setUpToDate();
                 }
@@ -324,24 +253,7 @@ public class LocalChunkProvider implements ChunkProvider {
 
     @Override
     public void dispose() {
-        for (int i = 0; i < REQUEST_CHUNK_THREADS; ++i) {
-            reviewChunkQueue.offer(new ChunkRequest(ChunkRequest.RequestType.EXIT, Region3i.EMPTY));
-        }
-        for (int i = 0; i < CHUNK_PROCESSING_THREADS; ++i) {
-            chunkTasksQueue.offer(new ShutdownTask());
-        }
-        reviewThreads.shutdown();
-        chunkProcessingThreads.shutdown();
-        try {
-            if (!reviewThreads.awaitTermination(1, TimeUnit.SECONDS)) {
-                logger.warn("Timed out awaiting chunk review thread termination");
-            }
-            if (!chunkProcessingThreads.awaitTermination(1, TimeUnit.SECONDS)) {
-                logger.warn("Timed out awaiting chunk processing thread termination");
-            }
-        } catch (InterruptedException e) {
-            logger.warn("Interrupted awaiting chunk thread termination");
-        }
+        pipeline.shutdown();
 
         for (Chunk chunk : nearCache.values()) {
             farStore.put(chunk);
@@ -371,13 +283,14 @@ public class LocalChunkProvider implements ChunkProvider {
         return farStore.size();
     }
 
-    private void checkOrCreateChunk(Vector3i chunkPos) {
+    @Override
+    public void createOrLoadChunk(Vector3i chunkPos) {
         Chunk chunk = getChunk(chunkPos);
         if (chunk == null) {
             PerformanceMonitor.startActivity("Check chunk in cache");
             if (preparingChunks.add(chunkPos)) {
                 if (farStore.contains(chunkPos)) {
-                    chunkTasksQueue.offer(new AbstractChunkTask(chunkPos, this) {
+                    pipeline.doTask(new AbstractChunkTask(pipeline, chunkPos, this) {
                         @Override
                         public void enact() {
                             Chunk chunk = farStore.get(getPosition());
@@ -387,14 +300,17 @@ public class LocalChunkProvider implements ChunkProvider {
                             preparingChunks.remove(getPosition());
                             if (chunk.getChunkState() == Chunk.State.COMPLETE) {
                                 for (Vector3i adjPos : Region3i.createFromCenterExtents(getPosition(), LOCAL_REGION_EXTENTS)) {
-                                    checkChunkReady(adjPos);
+                                    if (isChunkReady(adjPos)) {
+                                        readyChunks.offer(adjPos);
+                                    }
                                 }
                             }
-                            reviewChunkQueue.offer(new ChunkRequest(ChunkRequest.RequestType.REVIEW, Region3i.createFromCenterExtents(getPosition(), LOCAL_REGION_EXTENTS)));
+                            pipeline.requestReview(Region3i.createFromCenterExtents(getPosition(), LOCAL_REGION_EXTENTS));
                         }
                     });
                 } else {
-                    chunkTasksQueue.offer(new AbstractChunkTask(chunkPos, this) {
+                    pipeline.doTask(new AbstractChunkTask(pipeline, chunkPos, this) {
+
                         @Override
                         public void enact() {
                             Chunk chunk = generator.generateChunk(getPosition());
@@ -402,210 +318,33 @@ public class LocalChunkProvider implements ChunkProvider {
                                 logger.warn("Chunk {} is already in the near cache", getPosition());
                             }
                             preparingChunks.remove(getPosition());
-                            reviewChunkQueue.offer(new ChunkRequest(ChunkRequest.RequestType.REVIEW, Region3i.createFromCenterExtents(getPosition(), LOCAL_REGION_EXTENTS)));
+                            pipeline.requestReview(Region3i.createFromCenterExtents(getPosition(), LOCAL_REGION_EXTENTS));
                         }
                     });
                 }
             }
             PerformanceMonitor.endActivity();
-        } else {
-            checkState(chunk);
         }
     }
 
-    private void checkState(Vector3i pos) {
-        Chunk chunk = getChunk(pos);
-        if (chunk != null) {
-            checkState(chunk);
-        }
+    @Override
+    public void chunkIsReady(Vector3i position) {
+        readyChunks.offer(position);
     }
 
-    private void checkState(Chunk chunk) {
-        switch (chunk.getChunkState()) {
-            case ADJACENCY_GENERATION_PENDING:
-                checkReadyForSecondPass(chunk.getPos());
-                break;
-            case INTERNAL_LIGHT_GENERATION_PENDING:
-                checkReadyToDoInternalLighting(chunk.getPos());
-                break;
-            case LIGHT_PROPAGATION_PENDING:
-                checkReadyToPropagateLighting(chunk.getPos());
-                break;
-            case FULL_LIGHT_CONNECTIVITY_PENDING:
-                checkComplete(chunk.getPos());
-                break;
-            default:
-                break;
-        }
-    }
-
-    private void checkReadyForSecondPass(Vector3i pos) {
-        Chunk chunk = getChunk(pos);
-        if (chunk != null && chunk.getChunkState() == Chunk.State.ADJACENCY_GENERATION_PENDING) {
-            for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, LOCAL_REGION_EXTENTS)) {
-                if (!adjPos.equals(pos)) {
-                    Chunk adjChunk = getChunk(adjPos);
-                    if (adjChunk == null) {
-                        return;
-                    }
-                }
-            }
-            logger.debug("Queueing for adjacency generation {}", pos);
-            chunkTasksQueue.offer(new AbstractChunkTask(pos, this) {
-                @Override
-                public void enact() {
-                    WorldView view = WorldView.createLocalView(getPosition(), getProvider());
-                    if (view == null) {
-                        return;
-                    }
-                    view.lock();
-                    try {
-                        if (!view.isValidView()) {
-                            return;
-                        }
-                        Chunk chunk = getProvider().getChunk(getPosition());
-                        if (chunk.getChunkState() != Chunk.State.ADJACENCY_GENERATION_PENDING) {
-                            return;
-                        }
-
-                        generator.secondPassChunk(getPosition(), view);
-                        chunk.setChunkState(Chunk.State.INTERNAL_LIGHT_GENERATION_PENDING);
-                        reviewChunkQueue.offer(new ChunkRequest(ChunkRequest.RequestType.REVIEW, Region3i.createFromCenterExtents(getPosition(), LOCAL_REGION_EXTENTS)));
-                    } finally {
-                        view.unlock();
-                    }
-                }
-            });
-        }
-    }
-
-    private void checkReadyToDoInternalLighting(Vector3i pos) {
-        Chunk chunk = getChunk(pos);
-        if (chunk != null && chunk.getChunkState() == Chunk.State.INTERNAL_LIGHT_GENERATION_PENDING) {
-            for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, LOCAL_REGION_EXTENTS)) {
-                if (!adjPos.equals(pos)) {
-                    Chunk adjChunk = getChunk(adjPos);
-                    if (adjChunk == null || adjChunk.getChunkState().compareTo(Chunk.State.INTERNAL_LIGHT_GENERATION_PENDING) < 0) {
-                        return;
-                    }
-                }
-            }
-            logger.debug("Queueing for internal light generation {}", pos);
-            chunkTasksQueue.offer(new AbstractChunkTask(pos, this) {
-                @Override
-                public void enact() {
-                    Chunk chunk = getProvider().getChunk(getPosition());
-                    if (chunk == null) {
-                        return;
-                    }
-
-                    chunk.lock();
-                    try {
-                        if (chunk.isDisposed() || chunk.getChunkState() != Chunk.State.INTERNAL_LIGHT_GENERATION_PENDING) {
-                            return;
-                        }
-                        InternalLightProcessor.generateInternalLighting(chunk);
-                        chunk.setChunkState(Chunk.State.LIGHT_PROPAGATION_PENDING);
-                        reviewChunkQueue.offer(new ChunkRequest(ChunkRequest.RequestType.REVIEW, Region3i.createFromCenterExtents(getPosition(), LOCAL_REGION_EXTENTS)));
-                    } finally {
-                        chunk.unlock();
-                    }
-                }
-            });
-        }
-    }
-
-    private void checkReadyToPropagateLighting(Vector3i pos) {
-        Chunk chunk = getChunk(pos);
-        if (chunk != null && chunk.getChunkState() == Chunk.State.LIGHT_PROPAGATION_PENDING) {
-            for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, LOCAL_REGION_EXTENTS)) {
-                if (!adjPos.equals(pos)) {
-                    Chunk adjChunk = getChunk(adjPos);
-                    if (adjChunk == null || adjChunk.getChunkState().compareTo(Chunk.State.LIGHT_PROPAGATION_PENDING) < 0) {
-                        return;
-                    }
-                }
-            }
-            logger.debug("Queueing for light propagation pass {}", pos);
-            chunkTasksQueue.offer(new AbstractChunkTask(pos, this) {
-                @Override
-                public void enact() {
-                    WorldView worldView = WorldView.createLocalView(getPosition(), getProvider());
-                    if (worldView == null) {
-                        return;
-                    }
-                    worldView.lock();
-                    try {
-                        if (!worldView.isValidView()) {
-                            return;
-                        }
-                        Chunk chunk = getProvider().getChunk(getPosition());
-                        if (chunk.getChunkState() != Chunk.State.LIGHT_PROPAGATION_PENDING) {
-                            return;
-                        }
-
-                        new LightPropagator(worldView).propagateOutOfTargetChunk();
-                        chunk.setChunkState(Chunk.State.FULL_LIGHT_CONNECTIVITY_PENDING);
-                        reviewChunkQueue.offer(new ChunkRequest(ChunkRequest.RequestType.REVIEW, Region3i.createFromCenterExtents(getPosition(), LOCAL_REGION_EXTENTS)));
-                    } finally {
-                        worldView.unlock();
-                    }
-                }
-            });
-        }
-    }
-
-    private void checkComplete(Vector3i pos) {
-        Chunk chunk = getChunk(pos);
-        if (chunk != null && chunk.getChunkState() == Chunk.State.FULL_LIGHT_CONNECTIVITY_PENDING) {
-            for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, LOCAL_REGION_EXTENTS)) {
-                if (!adjPos.equals(pos)) {
-                    Chunk adjChunk = getChunk(adjPos);
-                    if (adjChunk == null || adjChunk.getChunkState().compareTo(Chunk.State.FULL_LIGHT_CONNECTIVITY_PENDING) < 0) {
-                        return;
-                    }
-                }
-            }
-            logger.debug("Now complete {}", pos);
-            chunk.setChunkState(Chunk.State.COMPLETE);
-            AdvancedConfig config = CoreRegistry.get(org.terasology.config.Config.class).getAdvanced();
-            if (config.isChunkDeflationEnabled()) {
-                if (!chunkTasksQueue.offer(new AbstractChunkTask(pos, this) {
-                    @Override
-                    public void enact() {
-                        Chunk chunk = getChunk(getPosition());
-                        if (chunk != null) {
-                            chunk.deflate();
-                        }
-                    }
-                })) {
-                    logger.warn("LocalChunkProvider.chunkTasksQueue rejected deflation task for chunk {}", pos);
-                }
-            }
-            for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, LOCAL_REGION_EXTENTS)) {
-                checkChunkReady(adjPos);
-            }
-        }
-    }
-
-    private boolean isChunkReady(Vector3i pos) {
+    @Override
+    public boolean isChunkReady(Vector3i pos) {
         Chunk chunk = getChunk(pos);
         if (chunk == null || chunk.getChunkState() != Chunk.State.COMPLETE) {
             return false;
         }
-        for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, LOCAL_REGION_EXTENTS)) {
+        for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, ChunkConstants.LOCAL_REGION_EXTENTS)) {
             Chunk adjChunk = getChunk(adjPos);
             if (adjChunk == null || adjChunk.getChunkState() != Chunk.State.COMPLETE) {
                 return false;
             }
         }
         return true;
-    }
-
-    private void checkChunkReady(Vector3i pos) {
-        if (worldEntity.exists() && isChunkReady(pos)) {
-            readyChunks.offer(pos);
-        }
     }
 
     private class ChunkTaskRelevanceComparator implements Comparator<ChunkTask> {

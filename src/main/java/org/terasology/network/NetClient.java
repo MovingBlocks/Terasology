@@ -174,7 +174,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
             Chunk chunk = readyChunks.remove(pos);
             relevantChunks.add(pos);
             logger.debug("Sending chunk: {}", pos);
-            message.addChunkInfo(Chunks.getInstance().encode(chunk)).build();
+            message.addChunkInfo(Chunks.getInstance().encode(chunk, true)).build();
         }
     }
 

@@ -1,24 +1,41 @@
 package org.terasology.world.chunks.remoteChunkProvider;
 
 import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.EntityRef;
+import org.terasology.game.CoreRegistry;
+import org.terasology.logic.players.LocalPlayer;
+import org.terasology.math.Region3i;
+import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.world.chunks.Chunk;
-import org.terasology.world.chunks.ChunkProvider;
+import org.terasology.world.chunks.ChunkConstants;
 import org.terasology.world.chunks.ChunkRegionListener;
+import org.terasology.world.chunks.ChunkRelevanceRegion;
+import org.terasology.world.chunks.GeneratingChunkProvider;
+import org.terasology.world.chunks.pipeline.ChunkGenerationPipeline;
+import org.terasology.world.chunks.pipeline.ChunkTask;
 
+import java.util.Comparator;
 import java.util.Map;
 
 /**
  * @author Immortius
  */
-// TODO: Have the remote chunk provider generate lighting on received chunks (so it doesn't have to be generated)
-public class RemoteChunkProvider implements ChunkProvider {
+public class RemoteChunkProvider implements GeneratingChunkProvider {
 
+    private static final Logger logger = LoggerFactory.getLogger(RemoteChunkProvider.class);
     private Map<Vector3i, Chunk> chunkCache = Maps.newHashMap();
+    private ChunkGenerationPipeline pipeline;
+
+    public RemoteChunkProvider() {
+        pipeline = new ChunkGenerationPipeline(this, null, new ChunkTaskRelevanceComparator());
+    }
 
     public void receiveChunk(Chunk chunk) {
         chunkCache.put(chunk.getPos(), chunk);
+        pipeline.requestReview(Region3i.createFromCenterExtents(chunk.getPos(), ChunkConstants.LOCAL_REGION_EXTENTS));
     }
 
     public void invalidateChunks(Vector3i pos) {
@@ -51,6 +68,21 @@ public class RemoteChunkProvider implements ChunkProvider {
     }
 
     @Override
+    public boolean isChunkReady(Vector3i pos) {
+        Chunk chunk = getChunk(pos);
+        if (chunk == null || chunk.getChunkState() != Chunk.State.COMPLETE) {
+            return false;
+        }
+        for (Vector3i adjPos : Region3i.createFromCenterExtents(pos, ChunkConstants.LOCAL_REGION_EXTENTS)) {
+            Chunk adjChunk = getChunk(adjPos);
+            if (adjChunk == null || adjChunk.getChunkState() != Chunk.State.COMPLETE) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
     public void dispose() {
 
     }
@@ -75,5 +107,28 @@ public class RemoteChunkProvider implements ChunkProvider {
     @Override
     public void removeRelevanceEntity(EntityRef entity) {
 
+    }
+
+    @Override
+    public void createOrLoadChunk(Vector3i position) {
+    }
+
+    @Override
+    public void chunkIsReady(Vector3i position) {
+    }
+
+    private class ChunkTaskRelevanceComparator implements Comparator<ChunkTask> {
+
+        private LocalPlayer localPlayer = CoreRegistry.get(LocalPlayer.class);
+
+        @Override
+        public int compare(ChunkTask o1, ChunkTask o2) {
+            return score(o1.getPosition()) - score(o2.getPosition());
+        }
+
+        private int score(Vector3i chunk) {
+            Vector3i playerChunk = TeraMath.calcChunkPos(new Vector3i(localPlayer.getPosition(), 0.5f));
+            return playerChunk.distanceSquared(chunk);
+        }
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright 2013 Moving Blocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.terasology.world.chunks.localChunkProvider;
+package org.terasology.world.chunks.pipeline;
 
 import org.terasology.math.Vector3i;
 import org.terasology.world.chunks.ChunkProvider;
@@ -25,15 +25,12 @@ import org.terasology.world.chunks.ChunkProvider;
 public abstract class AbstractChunkTask implements ChunkTask {
     private final Vector3i position;
     private final ChunkProvider provider;
+    private final ChunkGenerationPipeline pipeline;
 
-    public AbstractChunkTask(Vector3i position, ChunkProvider provider) {
+    public AbstractChunkTask(ChunkGenerationPipeline pipeline, Vector3i position, ChunkProvider provider) {
+        this.pipeline = pipeline;
         this.position = new Vector3i(position);
         this.provider = provider;
-    }
-
-    @Override
-    public boolean isShutdownRequest() {
-        return false;
     }
 
     @Override
@@ -44,5 +41,15 @@ public abstract class AbstractChunkTask implements ChunkTask {
     @Override
     public ChunkProvider getProvider() {
         return provider;
+    }
+
+    @Override
+    public boolean isTerminateSignal() {
+        return false;
+    }
+
+    @Override
+    public ChunkGenerationPipeline getPipeline() {
+        return pipeline;
     }
 }

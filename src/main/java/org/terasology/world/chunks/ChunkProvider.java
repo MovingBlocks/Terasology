@@ -98,4 +98,5 @@ public interface ChunkProvider {
      */
     public float size();
 
+    boolean isChunkReady(Vector3i pos);
 }

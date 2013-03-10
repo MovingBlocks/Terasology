@@ -63,6 +63,9 @@ public class Chunk implements Externalizable {
 
     public static final long serialVersionUID = 79881925217704826L;
 
+    private static final DecimalFormat PERCENT_FORMAT = new DecimalFormat("0.##");
+    private static final DecimalFormat SIZE_FORMAT = new DecimalFormat("#,###");
+
     public static enum State {
         ADJACENCY_GENERATION_PENDING(ChunksProtobuf.State.ADJACENCY_GENERATION_PENDING),
         INTERNAL_LIGHT_GENERATION_PENDING(ChunksProtobuf.State.INTERNAL_LIGHT_GENERATION_PENDING),
@@ -182,44 +185,63 @@ public class Chunk implements Externalizable {
      */
     public static class ProtobufHandler {
 
-        public ChunksProtobuf.Chunk encode(Chunk chunk) {
+        public ChunksProtobuf.Chunk encode(Chunk chunk, boolean coreOnly) {
             Preconditions.checkNotNull(chunk, "The parameter 'chunk' must not be null");
             final TeraArrays t = TeraArrays.getInstance();
             final ChunksProtobuf.Chunk.Builder b = ChunksProtobuf.Chunk.newBuilder()
                     .setX(chunk.pos.x).setY(chunk.pos.y).setZ(chunk.pos.z)
                     .setState(chunk.chunkState.protobufState)
-                    .setBlockData(t.encode(chunk.blockData))
-                    .setSunlightData(t.encode(chunk.sunlightData))
-                    .setLightData(t.encode(chunk.lightData))
-                    .setExtraData(t.encode(chunk.extraData));
+                    .setBlockData(t.encode(chunk.blockData));
+            if (!coreOnly) {
+                b.setSunlightData(t.encode(chunk.sunlightData))
+                        .setLightData(t.encode(chunk.lightData))
+                        .setExtraData(t.encode(chunk.extraData));
+            }
             return b.build();
         }
 
         public Chunk decode(ChunksProtobuf.Chunk message) {
             Preconditions.checkNotNull(message, "The parameter 'message' must not be null");
-            if (!message.hasX())
-                throw new IllegalArgumentException("Illformed protobuf message. Missing x coordinate.");
-            if (!message.hasY())
-                throw new IllegalArgumentException("Illformed protobuf message. Missing y coordinate.");
-            if (!message.hasZ())
-                throw new IllegalArgumentException("Illformed protobuf message. Missing z coordinate.");
-            final Vector3i pos = new Vector3i(message.getX(), message.getY(), message.getZ());
-            if (!message.hasState())
+            if (!message.hasX() || !message.hasY() || !message.hasZ()) {
+                throw new IllegalArgumentException("Illformed protobuf message. Missing chunk position.");
+            }
+            Vector3i pos = new Vector3i(message.getX(), message.getY(), message.getZ());
+            if (!message.hasState()) {
                 throw new IllegalArgumentException("Illformed protobuf message. Missing chunk state.");
-            final State state = State.lookup(message.getState());
-            if (!message.hasBlockData())
+            }
+            State state = State.lookup(message.getState());
+            if (!message.hasBlockData()) {
                 throw new IllegalArgumentException("Illformed protobuf message. Missing block data.");
-            if (!message.hasSunlightData())
-                throw new IllegalArgumentException("Illformed protobuf message. Missing sunlight data.");
-            if (!message.hasLightData())
-                throw new IllegalArgumentException("Illformed protobuf message. Missing light data.");
-            if (!message.hasExtraData())
-                throw new IllegalArgumentException("Illformed protobuf message. Missing extra data.");
+            }
+
             final TeraArrays t = TeraArrays.getInstance();
             final TeraArray blockData = t.decode(message.getBlockData());
-            final TeraArray sunlightData = t.decode(message.getSunlightData());
-            final TeraArray lightData = t.decode(message.getLightData());
-            final TeraArray extraData = t.decode(message.getExtraData());
+
+            Chunks c = Chunks.getInstance();
+            TeraArray sunlightData;
+            if (message.hasSunlightData()) {
+                sunlightData = t.decode(message.getSunlightData());
+            } else {
+                sunlightData = c.getSunlightDataEntry().factory.create(SIZE_X, SIZE_Y, SIZE_Z);
+                if (state == State.COMPLETE || state == State.FULL_LIGHT_CONNECTIVITY_PENDING || state == State.LIGHT_PROPAGATION_PENDING) {
+                    state = State.INTERNAL_LIGHT_GENERATION_PENDING;
+                }
+            }
+            TeraArray lightData;
+            if (message.hasLightData()) {
+                lightData = t.decode(message.getLightData());
+            } else {
+                lightData = c.getLightDataEntry().factory.create(SIZE_X, SIZE_Y, SIZE_Z);
+                if (state == State.COMPLETE || state == State.FULL_LIGHT_CONNECTIVITY_PENDING || state == State.LIGHT_PROPAGATION_PENDING) {
+                    state = State.INTERNAL_LIGHT_GENERATION_PENDING;
+                }
+            }
+            TeraArray extraData;
+            if (message.hasExtraData()) {
+                extraData = t.decode(message.getExtraData());
+            } else {
+                extraData = c.getExtraDataEntry().factory.create(SIZE_X, SIZE_Y, SIZE_Z);
+            }
             return new Chunk(pos, state, blockData, sunlightData, lightData, extraData);
         }
     }
@@ -436,9 +458,6 @@ public class Chunk implements Externalizable {
         extraData = (TeraArray) in.readObject();
     }
 
-    private static DecimalFormat fpercent = new DecimalFormat("0.##");
-    private static DecimalFormat fsize = new DecimalFormat("#,###");
-
     public void deflate() {
         if (getChunkState() != State.COMPLETE) {
             logger.warn("Before deflation the state of the chunk ({}, {}, {}) should be set to State.COMPLETE but is now State.{}", getPos().x, getPos().y, getPos().z, getChunkState().toString());
@@ -472,7 +491,7 @@ public class Chunk implements Externalizable {
                 double liquidPercent = 100d - (100d / liquidSize * liquidReduced);
                 double totalPercent = 100d - (100d / totalSize * totalReduced);
 
-                logger.info(String.format("chunk (%d, %d, %d): size-before: %s bytes, size-after: %s bytes, total-deflated-by: %s%%, blocks-deflated-by=%s%%, sunlight-deflated-by=%s%%, light-deflated-by=%s%%, liquid-deflated-by=%s%%", pos.x, pos.y, pos.z, fsize.format(totalSize), fsize.format(totalReduced), fpercent.format(totalPercent), fpercent.format(blocksPercent), fpercent.format(sunlightPercent), fpercent.format(lightPercent), fpercent.format(liquidPercent)));
+                logger.info(String.format("chunk (%d, %d, %d): size-before: %s bytes, size-after: %s bytes, total-deflated-by: %s%%, blocks-deflated-by=%s%%, sunlight-deflated-by=%s%%, light-deflated-by=%s%%, liquid-deflated-by=%s%%", pos.x, pos.y, pos.z, SIZE_FORMAT.format(totalSize), SIZE_FORMAT.format(totalReduced), PERCENT_FORMAT.format(totalPercent), PERCENT_FORMAT.format(blocksPercent), PERCENT_FORMAT.format(sunlightPercent), PERCENT_FORMAT.format(lightPercent), PERCENT_FORMAT.format(liquidPercent)));
             } else {
                 blockData = def.deflate(blockData);
                 sunlightData = def.deflate(sunlightData);

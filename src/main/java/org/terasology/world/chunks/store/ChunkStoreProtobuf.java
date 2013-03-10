@@ -159,7 +159,7 @@ public class ChunkStoreProtobuf implements ChunkStore, Serializable {
 
     private void saveChunk(Chunk c) {
         try {
-            final ChunksProtobuf.Chunk message = Chunks.getInstance().encode(c);
+            final ChunksProtobuf.Chunk message = Chunks.getInstance().encode(c, false);
             final ByteArrayOutputStream baOut = new ByteArrayOutputStream();
             final GZIPOutputStream gzOut = new GZIPOutputStream(baOut);
             final CodedOutputStream cOut = CodedOutputStream.newInstance(gzOut);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Benjamin Glatzel <benjamin.glatzel@me.com>
+ * Copyright 2013 Moving Blocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package org.terasology.world.chunks.localChunkProvider;
+package org.terasology.world.chunks;
 
 import org.terasology.math.Vector3i;
-import org.terasology.world.chunks.ChunkProvider;
 
 /**
+ * Internal interface used within the chunk generation system, allows a chunk provider to manage "generation" (including
+ * reloading) of a chunk.
+ *
  * @author Immortius
  */
-public interface ChunkTask {
+public interface GeneratingChunkProvider extends ChunkProvider {
 
-    void enact();
+    void createOrLoadChunk(Vector3i position);
 
-    boolean isShutdownRequest();
-
-    Vector3i getPosition();
-
-    ChunkProvider getProvider();
+    void chunkIsReady(Vector3i position);
 }

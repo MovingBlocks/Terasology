@@ -75,8 +75,8 @@ public final class Chunks {
         modDataEntries.put(id, entry);
     }
     
-    public final ChunksProtobuf.Chunk encode(Chunk chunk) {
-        return handler.encode(chunk);
+    public final ChunksProtobuf.Chunk encode(Chunk chunk, boolean coreOnly) {
+        return handler.encode(chunk, coreOnly);
     }
     
     public final Chunk decode(ChunksProtobuf.Chunk message) {
