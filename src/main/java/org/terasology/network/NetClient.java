@@ -51,6 +51,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class NetClient extends AbstractClient implements WorldChangeListener {
     private static final Logger logger = LoggerFactory.getLogger(NetClient.class);
+    public static final float NET_TICK_RATE = 0.05f;
 
     private Config config = CoreRegistry.get(Config.class);
 
@@ -78,6 +79,9 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     private String name = "Unknown";
     private long lastReceivedTime = 0;
     private int viewDistance = 0;
+    private float chunkSendCounter = 1.0f;
+
+    private float chunkSendRate = 7f;
 
     // Outgoing messages
     private BlockingQueue<NetData.BlockChangeMessage> queuedOutgoingBlockChanges = Queues.newLinkedBlockingQueue();
@@ -157,24 +161,30 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
 
     private void sendNewChunks(NetData.NetMessage.Builder message) {
         if (!readyChunks.isEmpty()) {
-            Vector3i center = new Vector3i();
-            LocationComponent loc = getEntity().getComponent(ClientComponent.class).character.getComponent(LocationComponent.class);
-            if (loc != null) {
-                center.set(TeraMath.calcChunkPos(new Vector3i(loc.getWorldPosition(), 0.5f)));
-            }
-            Vector3i pos = null;
-            int distance = Integer.MAX_VALUE;
-            for (Vector3i chunkPos : readyChunks.keySet()) {
-                int chunkDistance = chunkPos.distanceSquared(center);
-                if (pos == null || chunkDistance < distance) {
-                    pos = chunkPos;
-                    distance = chunkDistance;
+            chunkSendCounter += chunkSendRate * NET_TICK_RATE;
+            if (chunkSendCounter > 1.0f) {
+                chunkSendCounter -= 1.0f;
+                Vector3i center = new Vector3i();
+                LocationComponent loc = getEntity().getComponent(ClientComponent.class).character.getComponent(LocationComponent.class);
+                if (loc != null) {
+                    center.set(TeraMath.calcChunkPos(new Vector3i(loc.getWorldPosition(), 0.5f)));
                 }
+                Vector3i pos = null;
+                int distance = Integer.MAX_VALUE;
+                for (Vector3i chunkPos : readyChunks.keySet()) {
+                    int chunkDistance = chunkPos.distanceSquared(center);
+                    if (pos == null || chunkDistance < distance) {
+                        pos = chunkPos;
+                        distance = chunkDistance;
+                    }
+                }
+                Chunk chunk = readyChunks.remove(pos);
+                relevantChunks.add(pos);
+                logger.debug("Sending chunk: {}", pos);
+                message.addChunkInfo(Chunks.getInstance().encode(chunk, true)).build();
             }
-            Chunk chunk = readyChunks.remove(pos);
-            relevantChunks.add(pos);
-            logger.debug("Sending chunk: {}", pos);
-            message.addChunkInfo(Chunks.getInstance().encode(chunk, true)).build();
+        } else {
+            chunkSendCounter = 1.0f;
         }
     }
 
