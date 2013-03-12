@@ -30,6 +30,7 @@ import org.terasology.logic.SpawnManager;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.world.WorldRenderer;
+import org.terasology.world.WorldProvider;
 import org.terasology.world.block.management.BlockManager;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.ChunkProvider;
@@ -90,8 +91,16 @@ public class PrepareLocalWorld implements LoadProcess {
     }
 
     private void spawnPlayer() {
-        Vector3i spawnPoint = SpawnManager.getRandomSpawnPoint(worldRenderer.getWorldProvider());
-
+    	WorldProvider worldProvider = worldRenderer.getWorldProvider();
+        Vector3i spawnPoint = SpawnManager.getRandomSpawnPoint(worldProvider);
+        
+        // Partially prevent players from bugging the spawn block by placing
+        // an indestructible block.
+        //
+        // We also need to implement something that makes sure the required number
+        // of air blocks above the spawn block is present.
+        worldProvider.setBlock(spawnPoint, BlockManager.getInstance().getBlock("engine:MantleStone"), worldProvider.getBlock(spawnPoint));
+        
         PlayerFactory playerFactory = new PlayerFactory(entityManager);
         CoreRegistry.get(LocalPlayer.class).setEntity(playerFactory.newInstance(new Vector3f(spawnPoint.x, spawnPoint.y + 1.5f, spawnPoint.z)));
         worldRenderer.setPlayer(CoreRegistry.get(LocalPlayer.class));

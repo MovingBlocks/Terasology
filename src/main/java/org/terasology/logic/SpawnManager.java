@@ -157,6 +157,22 @@ public class SpawnManager {
 		return point;
 	}
 	
+	public int getRequiredAirAboveSpawn() {
+		return airAboveSpawn;
+	}
+	
+	public void ensureSpawnIsClear() {
+		Vector3i aboveBlockPoint = null;
+		for (int i = 1; i <= airAboveSpawn; i++) {
+			aboveBlockPoint = new Vector3i(spawnPoint.x, spawnPoint.y + i, spawnPoint.z);
+			worldProvider.setBlock(spawnPoint, BlockManager.getInstance().getAir(), pointToBlock(aboveBlockPoint));
+		}
+	}
+	
+	public static void ensureSpawnIsClear(WorldProvider provider, Vector3i point) {
+		(new SpawnManager(provider, point)).ensureSpawnIsClear();
+	}
+	
 	public static Vector3i getRandomSpawnPoint(WorldProvider provider) {
 		return (new SpawnManager(provider)).getRandomSpawnPoint();
 	}
