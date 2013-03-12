@@ -26,6 +26,7 @@ import org.terasology.entitySystem.EntityRef;
 import org.terasology.game.CoreRegistry;
 import org.terasology.game.modes.LoadProcess;
 import org.terasology.logic.LocalPlayer;
+import org.terasology.logic.SpawnManager;
 import org.terasology.math.TeraMath;
 import org.terasology.math.Vector3i;
 import org.terasology.rendering.world.WorldRenderer;
@@ -89,10 +90,7 @@ public class PrepareLocalWorld implements LoadProcess {
     }
 
     private void spawnPlayer() {
-        Vector3i spawnPoint = new Vector3i(Chunk.SIZE_X / 2, Chunk.SIZE_Y, Chunk.SIZE_Z / 2);
-        while (worldRenderer.getWorldProvider().getBlock(spawnPoint) == BlockManager.getInstance().getAir() && spawnPoint.y > 0) {
-            spawnPoint.y--;
-        }
+        Vector3i spawnPoint = SpawnManager.getRandomSpawnPoint(worldRenderer.getWorldProvider());
 
         PlayerFactory playerFactory = new PlayerFactory(entityManager);
         CoreRegistry.get(LocalPlayer.class).setEntity(playerFactory.newInstance(new Vector3f(spawnPoint.x, spawnPoint.y + 1.5f, spawnPoint.z)));
